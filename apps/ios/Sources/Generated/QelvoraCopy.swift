@@ -914,7 +914,20 @@ public enum QelvoraCopy {
     "accountUnavailableBody": "Your session is kept on this device. Try again in a moment.",
     "pageUnavailableTitle": "This page didn't load",
     "pageUnavailableBody": "Nothing you saved was changed. Try again in a moment.",
-    "growthSpendingLimitReached": "You've reached {percent}% of your monthly limit."
+    "growthSpendingLimitReached": "You've reached {percent}% of your monthly limit.",
+    "w6UploadsAndSigningAreUnavailableYourPreviewStaysOnThisDevice": "Uploads and signing are unavailable here. Your preview stays on this device.",
+    "w6RecordAVoiceReply": "Record a voice reply",
+    "w6DeliverThisRecording": "Deliver this recording",
+    "w6RecordingCredentialsAreProcessing": "Your signature is saved. Content credentials are processing before delivery.",
+    "w6RecordingDeliveryIsUnconfirmed": "Delivery is unconfirmed. Retry this same recording before starting another.",
+    "w6RecordingDelivered": "Your signed recording was delivered to this conversation.",
+    "w6VoiceReplyUnavailable": "Voice replies are unavailable for this conversation. Your text draft is kept.",
+    "w6SelectedConversationChanged": "This recording belongs to another conversation. Reopen the selected thread.",
+    "w6RetryRecordingDelivery": "Retry this recording delivery",
+    "w6AvailabilitySaveIsUnconfirmed": "Saving is unconfirmed. Retry this same change before editing your windows.",
+    "w6RetryAvailabilitySave": "Retry this availability save",
+    "w6RefreshWillReplaceAvailabilityChanges": "Replace your unsaved changes with the saved availability?",
+    "w6AvailabilityAccountChanged": "Your account changed. Reopen availability to continue."
   ]
   private static let variables = try! NSRegularExpression(pattern: #"\{([^}]+)\}"#)
   public static func text(_ key: String, values: [String: String] = [:]) -> String {

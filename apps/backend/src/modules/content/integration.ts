@@ -7,6 +7,10 @@ import { createCommercePublicationPermission } from "../commerce/publication.js"
 import { DomainError } from "../../core/errors.js";
 import { StudioService } from "../studio/service.js";
 import { studioFeature } from "../studio/registration.js";
+import {
+  ContentPublicationWorker,
+  type ContentPublicationDependencies,
+} from "./publication.js";
 
 /** W1 host seam: one service instance for HTTP and exact W1 signed subjects.
  * Production hosts supply W8's current scope denial callback. Each downstream
@@ -67,6 +71,11 @@ export function composeContentHost(input: {
     follows?: ContentFollowReaders;
   };
   paidAudienceCount?: NonNullable<ContentDependencies["audienceCount"]>;
+  /** Separate Growth API pool: this producer rechecks the original publisher
+   * through the bound canonical content service before projecting publicly. */
+  publicProjection?: NonNullable<ContentDependencies["effect"]>;
+  publication?: ContentPublicationDependencies;
+  publicationSource?: ContentDependencies["publicationSource"];
   packetRead?: {
     prepare: NonNullable<ContentDependencies["preparePublicPacketRead"]>;
     preparePositive: NonNullable<
@@ -93,6 +102,9 @@ export function composeContentHost(input: {
   const dependencies: ContentDependencies &
     Required<Pick<ContentDependencies, "assertAllowed">> = {
     ...input.dependencies,
+    ...(input.publicationSource
+      ? { publicationSource: input.publicationSource }
+      : {}),
     ...(input.packetRead
       ? {
           preparePublicPacketRead: input.packetRead.prepare,
@@ -157,8 +169,14 @@ export function composeContentHost(input: {
         );
         return { reference: `revoked:${effect.contentId}:${effect.version}` };
       }
-      if (["published", "withdrawn"].includes(effect.type))
-        return projection ? projection(actor, effect) : unavailable();
+      if (["published", "withdrawn"].includes(effect.type)) {
+        if (!content) return unavailable();
+        return projection
+          ? projection(actor, effect)
+          : input.publicProjection
+            ? input.publicProjection(actor, effect)
+            : unavailable();
+      }
       return input.dependencies.effect
         ? input.dependencies.effect(actor, effect)
         : unavailable();
@@ -167,6 +185,9 @@ export function composeContentHost(input: {
   return {
     owners: input.owners,
     dependencies,
+    publicationWorker: input.publication
+      ? new ContentPublicationWorker(input.publication)
+      : null,
     bindContent(service: ContentService) {
       if (service.pool !== input.pool || (content && content !== service))
         throw new Error(

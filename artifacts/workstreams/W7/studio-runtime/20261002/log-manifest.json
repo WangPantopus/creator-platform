@@ -513,5 +513,421 @@
         "bytes": 536
       }
     ]
+  },
+  "mainIntegration": {
+    "baseHead": "212ab8d6b64639db6bbdd18fd648386b1f4af3b8",
+    "files": [
+      {
+        "path": "main-integration-raw/android-build-checks.log",
+        "sha256": "c5a5bfd88476238f7e63cfbd5cf9f3b83584984d7a9787b3a83a0895696b1444",
+        "bytes": 2987
+      },
+      {
+        "path": "main-integration-raw/android-home-dump.log",
+        "sha256": "41e751a7076fd07f3254e5e62248ea04f9db9a2cc8f7d89ee39caefb4ecfd65b",
+        "bytes": 49
+      },
+      {
+        "path": "main-integration-raw/android-home.png",
+        "sha256": "b0c7fa59970f751ead3016ed90cfc409d1f805adb8d091d5836fbed71cd46e5c",
+        "bytes": 101898
+      },
+      {
+        "path": "main-integration-raw/android-home.xml",
+        "sha256": "542db4ba546ae2de41432ea71aacb462ea5e7b36f9302fdcd35e444e24986b49",
+        "bytes": 12370
+      },
+      {
+        "path": "main-integration-raw/android-install.log",
+        "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7",
+        "bytes": 36
+      },
+      {
+        "path": "main-integration-raw/android-launch.log",
+        "sha256": "826b8550d79f188c9456aac15bbd9bba2aa6225738cab70f540d8edd2f9297fa",
+        "bytes": 187
+      },
+      {
+        "path": "main-integration-raw/android-notifications-dump.log",
+        "sha256": "c75d59bae32a29b385dfe15b807cfadb4277421041207b5744b692108489a6ce",
+        "bytes": 58
+      },
+      {
+        "path": "main-integration-raw/android-notifications.png",
+        "sha256": "4e9cd236cdc29a1fdfba4fd03ebb9d765f41d89daeace9547ba5672509e79cd6",
+        "bytes": 94928
+      },
+      {
+        "path": "main-integration-raw/android-notifications.xml",
+        "sha256": "1f651e1a16421e6d56a6a8c78cb4d2bb5adbdb936b5bb200453adbc2be9dbba2",
+        "bytes": 11370
+      },
+      {
+        "path": "main-integration-raw/android-reload-control-dump.log",
+        "sha256": "9c059b983088943c2116ccdf54c5b4392f44075c11440e4c0785d4fc34d7c218",
+        "bytes": 68
+      },
+      {
+        "path": "main-integration-raw/android-reload-control.xml",
+        "sha256": "09ba07f460e5ebb7afd331f0f76c016673fce890cf2ec655aacd0f3b0e9754fa",
+        "bytes": 19418
+      },
+      {
+        "path": "main-integration-raw/android-settings-bottom-dump.log",
+        "sha256": "e2874dcb7b9127c7f5f1b2125799d8aa2340e28dbee980292ceb4c6af90f9978",
+        "bytes": 60
+      },
+      {
+        "path": "main-integration-raw/android-settings-bottom.xml",
+        "sha256": "142b3a972ba1840e4bf8328e1afeeaaf2a5be4fc55e231fa52e3fee90ab45c5f",
+        "bytes": 19763
+      },
+      {
+        "path": "main-integration-raw/android-settings-dump.log",
+        "sha256": "ec2c105a083dba0501183aefa90b20ab6fa170d3c970f5837ff8339aa52ab459",
+        "bytes": 53
+      },
+      {
+        "path": "main-integration-raw/android-settings-final-dump.log",
+        "sha256": "a07a7abfd38e622a26dc526812aa0a444eb6e610714b03cc27e5cb9987b39f0b",
+        "bytes": 59
+      },
+      {
+        "path": "main-integration-raw/android-settings-final.xml",
+        "sha256": "5966f959ff4dcdb7835b9443e0497991eea9c76965a53a12950f5bbd33866bb0",
+        "bytes": 20048
+      },
+      {
+        "path": "main-integration-raw/android-settings-reload-dump.log",
+        "sha256": "f9c03dd65362ab673320eb02ab1baaabc0f5078df5dac2e0370cd56e8ed22497",
+        "bytes": 62
+      },
+      {
+        "path": "main-integration-raw/android-settings-reloaded.png",
+        "sha256": "55dc887efcf25d888740cf727b18328dfaeee93100b5c98c9310514244f905b7",
+        "bytes": 172175
+      },
+      {
+        "path": "main-integration-raw/android-settings-reloaded.xml",
+        "sha256": "5966f959ff4dcdb7835b9443e0497991eea9c76965a53a12950f5bbd33866bb0",
+        "bytes": 20048
+      },
+      {
+        "path": "main-integration-raw/android-settings-save-dump.log",
+        "sha256": "c4841f766cd4cd52e380a51ed11379c407aba9b525bd236b974b222db1e7986a",
+        "bytes": 58
+      },
+      {
+        "path": "main-integration-raw/android-settings-save.xml",
+        "sha256": "2a2233e43c34201d2fa189b4a5bd9affde6238650486a38b4d565083d81fa5e5",
+        "bytes": 20102
+      },
+      {
+        "path": "main-integration-raw/android-settings-saved.png",
+        "sha256": "91f71e949cff2e85fb91a4fe9257c3ffd3b45e5419c772cb0245ca845b10b973",
+        "bytes": 179112
+      },
+      {
+        "path": "main-integration-raw/android-settings.png",
+        "sha256": "b0d0d6a8313994ac4fd0542c1b5879244c58b685854dfe371dbcbd1819941d60",
+        "bytes": 183773
+      },
+      {
+        "path": "main-integration-raw/android-settings.xml",
+        "sha256": "beed30fa7af923bb82302a6468fcfcdc9582d2f71d65fcac92cfafd2ad796b77",
+        "bytes": 15955
+      },
+      {
+        "path": "main-integration-raw/android-share-dump.log",
+        "sha256": "725edaa1c195771d1f27a7bcdf9bb5dc7c0d67a5e1d193d518a3a6cd7f0b2863",
+        "bytes": 50
+      },
+      {
+        "path": "main-integration-raw/android-share-retry-dump.log",
+        "sha256": "8bf22b3ee2f4269dd2a7e80e054550acb910053577212ba436ca8c9b51e2a872",
+        "bytes": 56
+      },
+      {
+        "path": "main-integration-raw/android-share-retry.xml",
+        "sha256": "12f31e70f32573ba9975512f0cbfaadd379bec325bb74e34615f3d2cea7d8364",
+        "bytes": 11674
+      },
+      {
+        "path": "main-integration-raw/android-share-warm-launch.log",
+        "sha256": "6c204f76e130b87155292d8e8452c0c81a0c7e2aa7d3954462e4526f84524349",
+        "bytes": 326
+      },
+      {
+        "path": "main-integration-raw/android-share-warm.png",
+        "sha256": "62acf02a99ea110a851d5bdab77ca267a3f2b3a29193ebc23b65a8e07a310659",
+        "bytes": 82003
+      },
+      {
+        "path": "main-integration-raw/android-share.xml",
+        "sha256": "12f31e70f32573ba9975512f0cbfaadd379bec325bb74e34615f3d2cea7d8364",
+        "bytes": 11674
+      },
+      {
+        "path": "main-integration-raw/bundle-backend-build.log",
+        "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+        "bytes": 41
+      },
+      {
+        "path": "main-integration-raw/bundle-format.log",
+        "sha256": "6b1bbbfe56b7a87c83e3d6b2855f63e076b50da0ea279362f22eb6572f0e4ff2",
+        "bytes": 111
+      },
+      {
+        "path": "main-integration-raw/bundle-lint.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "main-integration-raw/bundle-workspace-check.log",
+        "sha256": "8e0e2520bab31f7a9c3066a133ee5d1a86fe90b40b35f45092a467d65eccde3b",
+        "bytes": 10028
+      },
+      {
+        "path": "main-integration-raw/compiled-startup-failure.sanitized.log",
+        "sha256": "c627319306ca3ba52fd5ffcfd9e3a1ca6687f538994c078ae13e78c6e851bf90",
+        "bytes": 1467
+      },
+      {
+        "path": "main-integration-raw/ios-boot.log",
+        "sha256": "00f61b48c081a7b7aaa674e876a9a7e96bbc2deb923d146263666f36dc993b17",
+        "bytes": 269
+      },
+      {
+        "path": "main-integration-raw/ios-build-retry.log",
+        "sha256": "1387630f064bd52175def20bbe9707734319cb067c961b6435c3be3ebecf6520",
+        "bytes": 47577
+      },
+      {
+        "path": "main-integration-raw/ios-build.log",
+        "sha256": "5c03f76a2597c87da29fae44412e1d299dfff9b2c9671f7656770eadb99756f0",
+        "bytes": 519661
+      },
+      {
+        "path": "main-integration-raw/ios-home.ax.json",
+        "sha256": "110abd6472426291c9bc204a2d3fc614d7f2ee4fad705756e51ffdcbdb37a058",
+        "bytes": 4600
+      },
+      {
+        "path": "main-integration-raw/ios-home.png",
+        "sha256": "72a072e4404b3b8af809d88e13f385884547aff164f69b301f72ba6ba059f0cb",
+        "bytes": 151469
+      },
+      {
+        "path": "main-integration-raw/ios-launch.log",
+        "sha256": "fe6b75e337090dedce8b80e2eac1ed79130b875000542ca652da26a19ca0cff5",
+        "bytes": 28
+      },
+      {
+        "path": "main-integration-raw/ios-notifications.ax.json",
+        "sha256": "5189d9b08cbe9fb525b70e8b65e52d367337aac303fcf729861cfe3e029ca1e3",
+        "bytes": 4104
+      },
+      {
+        "path": "main-integration-raw/ios-notifications.png",
+        "sha256": "7f50dd5073c2a33f5f30d4fa44d8be000f20f87cf3aff22e5919b9a07a391eec",
+        "bytes": 144652
+      },
+      {
+        "path": "main-integration-raw/ios-project.log",
+        "sha256": "90a1959f36b440b2b3634dc76c1e415e11ab50ec302606f531484e7a6ed3d577",
+        "bytes": 209
+      },
+      {
+        "path": "main-integration-raw/ios-settings-bottom.ax.json",
+        "sha256": "d53bca485c1792bb0a93b39808c641437feaf29a7b421a0e3a65acd01ffeb475",
+        "bytes": 32462
+      },
+      {
+        "path": "main-integration-raw/ios-settings-reload-actual.ax.json",
+        "sha256": "5e1d7c416352069d4d4449fe0e0062b2a720ed220f92008842c2964b31e8f33d",
+        "bytes": 32436
+      },
+      {
+        "path": "main-integration-raw/ios-settings-reload-confirmed.ax.json",
+        "sha256": "7b4b4e8afdbcd2ef9b7ec5488bd250a0d72f0f4c9173945f75d8fd55be6e0c37",
+        "bytes": 32436
+      },
+      {
+        "path": "main-integration-raw/ios-settings-reload-confirmed.png",
+        "sha256": "2b65d4009069d09b7f179f0203122ad65cf7eb757f919f6f4e8bde5db633e343",
+        "bytes": 196030
+      },
+      {
+        "path": "main-integration-raw/ios-settings-reload-control.ax.json",
+        "sha256": "520a228fd30881184a5acb8cecbcecf48be4225b559d0bed98673f17ae2a63c1",
+        "bytes": 32448
+      },
+      {
+        "path": "main-integration-raw/ios-settings-reloaded-final.ax.json",
+        "sha256": "0ab0ad126a8a43b4986db2092df6ea32b141bc2c0b919d026599b94743b07f46",
+        "bytes": 4600
+      },
+      {
+        "path": "main-integration-raw/ios-settings-reloaded.ax.json",
+        "sha256": "cf59591d71edc7052e256a95164b5460935ff070dbc661a3fd389baa988eb74b",
+        "bytes": 2717
+      },
+      {
+        "path": "main-integration-raw/ios-settings-reloaded.png",
+        "sha256": "ccd6988e2e9b195351375d2adb3fcc4fdb3821839eaaf80779d96fa0793f64e8",
+        "bytes": 151748
+      },
+      {
+        "path": "main-integration-raw/ios-settings-save.ax.json",
+        "sha256": "a4a060d2df7f9c0fab4363d17416b0b641e1065e3b7e82ff875b19fd391b4338",
+        "bytes": 32953
+      },
+      {
+        "path": "main-integration-raw/ios-settings-saved.png",
+        "sha256": "94d0afd3698132dc8f010447b0149d16ea7215e97d07a31c134619811207a036",
+        "bytes": 203842
+      },
+      {
+        "path": "main-integration-raw/ios-settings-warm-return.ax.json",
+        "sha256": "c65114d511746d4d9340047996c62c43fd48c343d41e26e4bcc692093324d52c",
+        "bytes": 32158
+      },
+      {
+        "path": "main-integration-raw/ios-settings.ax.json",
+        "sha256": "582d2e7172a48d7b301153b88dfa2dd0104faedb9012a7b397e64e8ea65c9774",
+        "bytes": 32158
+      },
+      {
+        "path": "main-integration-raw/ios-settings.png",
+        "sha256": "22ae968d78588c4044728634c14b106229e49f342056bc9009f3f06693acc231",
+        "bytes": 225678
+      },
+      {
+        "path": "main-integration-raw/ios-share-retry.ax.json",
+        "sha256": "0628f28aaba73b46f186961f684f59ff19e1366b586e8b07f55bb2b853da36c7",
+        "bytes": 3237
+      },
+      {
+        "path": "main-integration-raw/ios-share-warm-final.ax.json",
+        "sha256": "1ad99af482359a2009cc8de6993ea191aabf9cdf462ddc86e35642e6086e83d5",
+        "bytes": 3237
+      },
+      {
+        "path": "main-integration-raw/ios-share-warm.ax.json",
+        "sha256": "bbb2a3acbeb580ec88c769f3c9af87279cde2bab6494c06d8b764efde83b5e95",
+        "bytes": 3237
+      },
+      {
+        "path": "main-integration-raw/ios-share-warm.png",
+        "sha256": "a1ab545a645a8b7e9d3ebf61d84f175fa2a9592afdb8dc8e7bb5ccd8bcbfcabe",
+        "bytes": 135284
+      },
+      {
+        "path": "main-integration-raw/ios-signature-final.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "main-integration-raw/ios-signature.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "main-integration-raw/personal-source-review.json",
+        "sha256": "460c85eef2913a2898d19ba1c0dc393496f0b322b7ea2b21d13cc4d80681cb45",
+        "bytes": 11138
+      },
+      {
+        "path": "main-integration-raw/preserved-tool-outcomes.txt",
+        "sha256": "f7ee8c974b778b26aa8febfedc0ff258763858b360970b341c77034df83777f5",
+        "bytes": 2430
+      },
+      {
+        "path": "main-integration-raw/readiness-retry.json",
+        "sha256": "86ff8eaaa966a644437543314e7d2760f27b023793cd2f8ee1fff545507a50de",
+        "bytes": 162
+      },
+      {
+        "path": "main-integration-raw/receipt.json",
+        "sha256": "bad6211d30516484cb2aa89d096ffbe1ea0ca6b422588b0b63d25e352b5240cb",
+        "bytes": 4179
+      },
+      {
+        "path": "main-integration-raw/runtime-catalogue-retry.json",
+        "sha256": "ea471bdecb89b2768433413ea0f30023a7e51061c02d4e390a570a65c31ddffa",
+        "bytes": 301
+      },
+      {
+        "path": "main-integration-raw/runtime-catalogue.json",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "main-integration-raw/swift-original-checks-retry.log",
+        "sha256": "e94fae76a6c7ce99a627def6796899237b0a3c040a6def80adba237fe894b919",
+        "bytes": 55669
+      },
+      {
+        "path": "main-integration-raw/swift-original-checks.log",
+        "sha256": "9013cf0a3a1139138de3081445d96395cf86fb0c51337a736a8ad9e512a483f2",
+        "bytes": 45067
+      },
+      {
+        "path": "main-integration-raw/web-auth-api.json",
+        "sha256": "bf80a7ab21f4b561c569b036ed70bc4f8cb20e762a3866cea131cb6b008ef9b1",
+        "bytes": 110
+      },
+      {
+        "path": "main-integration-raw/web-discover-search.ax.txt",
+        "sha256": "b6d3956856af3708db888cac6ee5b6e9b9e6d15f0c09a697711a1570408106a6",
+        "bytes": 1289
+      },
+      {
+        "path": "main-integration-raw/web-discover-search.png",
+        "sha256": "790195a3545f882d05dfcc63a8b239d9153c2831eee0173ac433219a6dde938d",
+        "bytes": 23129
+      },
+      {
+        "path": "main-integration-raw/web-settings-auth.ax.txt",
+        "sha256": "5bec35da7787f47144075e2c835813ce53638345b42605e6995a9488e13bab0a",
+        "bytes": 855
+      },
+      {
+        "path": "main-integration-raw/web-settings-auth.png",
+        "sha256": "dd57a0fe627dfde60fe74990ba181f9eee2d58be9674440cfbfc2e6ecfa272b7",
+        "bytes": 29969
+      },
+      {
+        "path": "main-integration-raw/web-settings-production-refusal.ax.txt",
+        "sha256": "95b6875dd839423512496ed4652d04c76a7422223273fe29395d55eb36bf7236",
+        "bytes": 882
+      },
+      {
+        "path": "main-integration-raw/web-share-retry.ax.txt",
+        "sha256": "45938203878dad7658d3cd834ece3e98d9be0b7996474d1dd8d7375143a5b3fa",
+        "bytes": 1177
+      },
+      {
+        "path": "main-integration-raw/web-share-unavailable.png",
+        "sha256": "873eb7d2fd2ee555bc759ccacb218f053ec76bbb49c6dd386043ba0ad4c01880",
+        "bytes": 14804
+      },
+      {
+        "path": "main-integration-raw/web-visual-retry.log",
+        "sha256": "3e931724d6b2fb93c90a31560eece77e8b5a790dc374a1282eae7bad3bc73711",
+        "bytes": 47437
+      },
+      {
+        "path": "main-integration-raw/web-visual.log",
+        "sha256": "b7678523316f5659ab85eadbb00e0311a7a54bf9c326fbbeaa47c4deb81efe9d",
+        "bytes": 49533
+      },
+      {
+        "path": "main-integration-raw/workspace-check.log",
+        "sha256": "a18ae9760223fec6c65b01b97bae398ba53507552a13008aeef659e475300960",
+        "bytes": 10219
+      }
+    ],
+    "custody": "Actual output/primary-operated screenshots; narrated failures separately identified; private full API/process/env logs excluded, successful Swift host Contacts storage URI metadata redacted."
   }
 }

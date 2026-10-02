@@ -1,0 +1,77 @@
+{
+  "observedAt": "2026-10-02T11:23:42.241Z",
+  "qualification": "Real self-hosted signed callbacks through current one-use proof; labelled developer SQLite, not canonical0092 or history completeness",
+  "connected": {
+    "rooms": [
+      {
+        "sid": "RM_AjsYGY2iDnSA",
+        "name": "w6-development-577856ab-8e7b-459d-86b2-0623a9eee383",
+        "numParticipants": 1,
+        "activeRecording": false
+      }
+    ],
+    "participants": [
+      {
+        "sid": "PA_xsDKNuqLR7Bs",
+        "identity": "49237d56-aa23-4aaf-aae2-ae3779c49be6",
+        "state": 2,
+        "tracks": []
+      }
+    ],
+    "callbacks": [
+      {
+        "id": "EV_aGZrapv5MWVU",
+        "event": "room_started",
+        "room_sid": "RM_AjsYGY2iDnSA",
+        "complete_history": 0
+      },
+      {
+        "id": "EV_Pp2n5BFGbFwD",
+        "event": "participant_joined",
+        "room_sid": "RM_AjsYGY2iDnSA",
+        "complete_history": 0
+      }
+    ],
+    "historyComplete": false
+  },
+  "afterDisconnect": {
+    "rooms": [
+      {
+        "sid": "RM_AjsYGY2iDnSA",
+        "name": "w6-development-577856ab-8e7b-459d-86b2-0623a9eee383",
+        "numParticipants": 0,
+        "activeRecording": false
+      }
+    ],
+    "participants": [],
+    "callbacks": [
+      {
+        "id": "EV_aGZrapv5MWVU",
+        "event": "room_started",
+        "room_sid": "RM_AjsYGY2iDnSA",
+        "complete_history": 0
+      },
+      {
+        "id": "EV_Pp2n5BFGbFwD",
+        "event": "participant_joined",
+        "room_sid": "RM_AjsYGY2iDnSA",
+        "complete_history": 0
+      },
+      {
+        "id": "EV_qjcE4DpkUS6m",
+        "event": "participant_left",
+        "room_sid": "RM_AjsYGY2iDnSA",
+        "complete_history": 0
+      }
+    ],
+    "historyComplete": false
+  },
+  "unauthenticatedIngress": {
+    "status": 401,
+    "body": {
+      "error": {
+        "code": "call_webhook_unauthenticated"
+      }
+    }
+  }
+}

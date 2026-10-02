@@ -10,15 +10,16 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@qelvora/api": "workspace:*",
     "@qelvora/brand": "workspace:*",
-    "@qelvora/tokens": "workspace:*",
     "@qelvora/copy": "workspace:*",
+    "@qelvora/tokens": "workspace:*",
     "@qelvora/ui-web": "workspace:*",
+    "livekit-client": "2.22.3",
     "next": "16.3.7",
+    "parse5": "^8.0.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "parse5": "^8.0.0",
-    "@qelvora/api": "workspace:*",
     "fflate": "0.8.3"
   },
   "devDependencies": {

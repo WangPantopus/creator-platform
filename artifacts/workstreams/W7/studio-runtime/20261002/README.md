@@ -1,5 +1,7 @@
 # W7 shipping runtime continuation — 2026-10-02
 
+**Current reviewed-main/shipping continuation, 2026-10-02:** The primary personally integrated frozen8d4a source, canonical core Content/separate Growth publisher composition, strict W8 held restoration and real compiled registry packaging repair. First duplicate compile, macOS availability compile, local visual hostname mismatch and iOS Reload mistap are preserved; repaired workspace/production/native/original checks pass. Actual native Home→Notifications→Settings saves/Reload and warm unavailable-share/retry, production web Discover/destination/share refusal observed. Actual40 migrations/0 creators/no0101; no new SQL, tests, references, purpose/provider authority or populated acceptance. Own services/devices/leases stopped. PR31 ready/open/unmerged; exact new-head5 Foundation/Trust plus final combined review and all original rows remain binding. W7 is not complete. [Current evidence](main-integration.md).
+
 Current [live core Follow custody](core-follow-live.md) binds the actual PostgreSQL17 definition and broader ACL checks. Only a closed empty qualification database contains the proposal; canonical runtime remains unregistered/unconfigured.
 
 Current [post-entry metadata consumer](post-entry.md) is compiled with its actual host seam; genuine W5 reader/purpose and W3 shipping consumers remain unbound. No post-context runtime acceptance is claimed.

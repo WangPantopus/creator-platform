@@ -915,4 +915,17 @@
   <string name="page_unavailable_title" formatted="false">This page didn\'t load</string>
   <string name="page_unavailable_body" formatted="false">Nothing you saved was changed. Try again in a moment.</string>
   <string name="growth_spending_limit_reached" formatted="false">You\'ve reached {percent}% of your monthly limit.</string>
+  <string name="w6_uploads_and_signing_are_unavailable_your_preview_stays_on_this_device" formatted="false">Uploads and signing are unavailable here. Your preview stays on this device.</string>
+  <string name="w6_record_a_voice_reply" formatted="false">Record a voice reply</string>
+  <string name="w6_deliver_this_recording" formatted="false">Deliver this recording</string>
+  <string name="w6_recording_credentials_are_processing" formatted="false">Your signature is saved. Content credentials are processing before delivery.</string>
+  <string name="w6_recording_delivery_is_unconfirmed" formatted="false">Delivery is unconfirmed. Retry this same recording before starting another.</string>
+  <string name="w6_recording_delivered" formatted="false">Your signed recording was delivered to this conversation.</string>
+  <string name="w6_voice_reply_unavailable" formatted="false">Voice replies are unavailable for this conversation. Your text draft is kept.</string>
+  <string name="w6_selected_conversation_changed" formatted="false">This recording belongs to another conversation. Reopen the selected thread.</string>
+  <string name="w6_retry_recording_delivery" formatted="false">Retry this recording delivery</string>
+  <string name="w6_availability_save_is_unconfirmed" formatted="false">Saving is unconfirmed. Retry this same change before editing your windows.</string>
+  <string name="w6_retry_availability_save" formatted="false">Retry this availability save</string>
+  <string name="w6_refresh_will_replace_availability_changes" formatted="false">Replace your unsaved changes with the saved availability?</string>
+  <string name="w6_availability_account_changed" formatted="false">Your account changed. Reopen availability to continue.</string>
 </resources>

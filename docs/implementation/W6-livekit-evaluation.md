@@ -1,5 +1,7 @@
 # W6 LiveKit Cloud evaluation — 2026-09-30
 
+**October2 implementation update:** Exact SDK candidates below are now installed behind existing transport seams; no factory or paid-call capability is registered automatically. Real self-hosted1.13.7 operation proved authenticated callbacks, recording off and cached-JWT replay after leave and DeleteRoom, including recreation under a new SID. `supportsSingleUseAdmission` remains false. Signed Swift simulator packaging and real fan/owner unavailable-gate operation passed; normal Android SDK packaging passed but its latest installed-app repeat is pending. Future0092 minimal callback custody source is unregistered/unapplied and has no retention default. Approved Cloud credentials, current CallCustody, C10 authority, authoritative history, revocation and human/physical-device acceptance remain dependencies. [Actual source/binary-qualified receipts](../../artifacts/workstreams/W6/livekit-development/2026-10-02/README.md). The dated evaluation below is historical.
+
 The founder approved evaluation of LiveKit Cloud on2026-09-30. This is not account purchase, provider selection, credentials, retention approval or permission to enable calls. Recommendation: retain Cloud as the candidate named by BUILD_PROMPT, but keep the provider registry empty until the admission and history gaps below are resolved with observed evidence. A bare JWT adapter cannot truthfully implement the current `CallProvider.supportsSingleUseAdmission` contract.
 
 ## Current qualification

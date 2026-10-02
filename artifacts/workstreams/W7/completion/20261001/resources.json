@@ -126,7 +126,7 @@
     "nativeProcessesRunning": false
   },
   "currentHost": {
-    "recordedAt": "2026-10-02T12:52:06.158144+00:00",
+    "recordedAt": "2026-10-02T14:31:41.202148+00:00",
     "note": "W7 moved from the old iMac (Intel, macOS 26, Xcode 26.5) to Yingpeng's Mac Studio (Apple M2 Max, macOS 27.0 26A428, Xcode 27.0 27A266a, iOS 27.0 simulator runtime). Every iMac-era resource listed elsewhere in this file (container creator-platform-w7-document-20261001, simulator CE855FD5-A4AA-4C62-A63B-5E80D2E1DFF1, /private/tmp/creator-platform-w7-completion-20261001 caches, ~/.config/creator-platform/{secrets,cleanup-20261001,w7-completion-20261001}) is absent from this machine and was not copied. Those entries are historical iMac custody only.",
     "checkout": "/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545",
     "postgres": {
@@ -271,6 +271,31 @@
         "POSTGRES_DB",
         "POSTGRES_PASSWORD"
       ]
+    },
+    "mainIntegrationRuntime": {
+      "stoppedAt": "2026-10-02T14:31:41.202148+00:00",
+      "apiLastPid": 51804,
+      "apiExit": 0,
+      "webLastPid": 66458,
+      "webExit": 1,
+      "webExitNote": "Owned next process terminated with TERM; pnpm wrapper returned1; no product failure inferred from shutdown wrapper",
+      "iosUDID": "FAB31883-2F36-4E50-83B3-D9654B60FF00",
+      "ios": "App terminated/simulator shutdown",
+      "android": "emulator-5580 explicitly killed,exit0",
+      "companionLastPid": 80720,
+      "companionExit": 0,
+      "released": [
+        "simulator-slot1",
+        "emulator-slot1"
+      ],
+      "leaseCustody": "Actual owner UUID+inode checked before owner-file unlink and empty directory removal",
+      "database": "creator-platform-w7-macstudio-20261001 normally stopped,exit0",
+      "browser": "own w7MainTab closed",
+      "peerResourcesTouched": false,
+      "state": "All W7 resources stopped; current source/acceptance limits in main-integration.md",
+      "evidence": "artifacts/workstreams/W7/studio-runtime/20261002/main-integration.md",
+      "environmentValues": "Not recorded; existing private0600 runtime input names unchanged",
+      "SQLActivated": false
     }
   }
 }

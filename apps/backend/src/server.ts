@@ -4,29 +4,32 @@ import { readConfig } from "./config.js";
 import { createConfiguredBackend } from "./integration.js";
 import { DevelopmentIdentityAdapter } from "./modules/identity/development.js";
 import { commerceSignedSubjects } from "./modules/commerce/registration.js";
-import { createCommerceRuntime } from "./modules/commerce/runtime.js";
-import { readCommerceEnvironment } from "./modules/commerce/environment.js";
 import { configureGrowthForBackend } from "./modules/growth/configured.js";
-import { createConversationRuntime } from "./modules/conversation/runtime.js";
+import { composeConversationHost } from "./modules/conversation/host.js";
 import { createCommerceStudio } from "./modules/commerce/studio.js";
-import { createContentStudio } from "./modules/content/integration.js";
+import {
+  composeContentHost,
+  createContentStudio,
+} from "./modules/content/integration.js";
 import { mediaFeature } from "./modules/media/registration.js";
-import { createAgentDomain } from "./modules/agent/integration.js";
+import { readMediaEnvironment } from "./modules/media/environment.js";
+import { composeMediaHost, runtimeMediaDenials } from "./modules/media/host.js";
+import { createDevelopmentTrust } from "./modules/trust/development.js";
 import { agentFeature } from "./modules/agent/feature.js";
 import { contentPublicProjection } from "./modules/growth/content.js";
 import { canonicalConversationHomePage } from "./modules/growth/home.js";
 import { canonicalHomePage } from "./modules/growth/home-composition.js";
 import { canonicalPassAccess } from "./modules/growth/integration.js";
-import { DomainError } from "./core/errors.js";
-import { copy } from "@qelvora/copy";
 import { createGrowthAPIPool } from "./db/growth-api-pool.js";
+import { DomainError } from "./core/errors.js";
 
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
 const config = readConfig();
 const features: {
   growth: Awaited<ReturnType<typeof configureGrowthForBackend>>;
-} = { growth: null };
+  close: (() => void)[];
+} = { growth: null, close: [] };
 if (config.identityAdapter === "development" && !config.identitySessionKey)
   throw new Error(
     "Development identity requires an explicit IDENTITY_SESSION_KEY.",
@@ -48,84 +51,48 @@ try {
             },
           },
           signedSubjectPolicies: [commerceSignedSubjects],
+          ...(process.env.TRUST_LOCAL_DEVELOPMENT === "true"
+            ? { trust: createDevelopmentTrust }
+            : {}),
           registerFeatures: async (runtime) => {
-            const commerceConfiguration = readCommerceEnvironment(runtime.pool);
-            const commerce = commerceConfiguration
-              ? await createCommerceRuntime({
-                  ...runtime,
-                  ...commerceConfiguration,
-                })
-              : undefined;
-            const conversation = createConversationRuntime(runtime);
-            runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
-            const agent = createAgentDomain({
-              pool: runtime.pool,
-              model: null,
-            });
-            const contentDependencies = {
-              assertAllowed: runtime.assertCreatorAllowed,
-              follows: async (
-                ...args: Parameters<
-                  NonNullable<
-                    import("./modules/content/service.js").ContentDependencies["follows"]
-                  >
-                >
-              ) => {
-                if (!features.growth)
-                  throw new DomainError(
-                    "content_delivery_unconfigured",
-                    copy.growthErrorContentEffectUnconfigured,
-                    503,
-                  );
-                return features.growth.contentFollows(...args);
-              },
-              effect: async (
-                ...args: Parameters<ReturnType<typeof contentPublicProjection>>
-              ): Promise<{ reference: string }> => {
-                if (!features.growth || !runtime.identity)
-                  throw new DomainError(
-                    "content_delivery_unconfigured",
-                    copy.growthErrorContentEffectUnconfigured,
-                    503,
-                  );
-                return contentPublicProjection(
-                  features.growth.service,
-                  content.content,
-                  runtime.identity.signing,
-                )(...args);
-              },
-            };
-            const content = runtime.assertScopeAllowedInTransaction
-              ? await createCommerceStudio({
-                  assertScopeAllowedInTransaction:
-                    runtime.assertScopeAllowedInTransaction,
-                  ...(commerce?.publicPacketRead
-                    ? { publicPacketRead: commerce.publicPacketRead }
-                    : {}),
-                  pool: growthAPIPool ?? runtime.pool,
-                  owners: {
-                    commerce: commerce?.service,
-                    conversation: runtime.conversation,
-                    access: runtime.access,
-                    profiles: runtime.identity?.profiles,
-                  },
-                  dependencies: contentDependencies,
-                })
-              : createContentStudio({
-                  pool: growthAPIPool ?? runtime.pool,
-                  owners: {
-                    commerce: commerce?.service,
-                    conversation: runtime.conversation,
-                    access: runtime.access,
-                    profiles: runtime.identity?.profiles,
-                  },
-                  dependencies: contentDependencies,
-                });
-            runtime.configureSignedSubjects(
-              Array.isArray(content.signedSubjects)
-                ? content.signedSubjects
-                : [content.signedSubjects],
+            const mediaEnvironment = readMediaEnvironment();
+            const mediaDenials = runtimeMediaDenials(runtime);
+            // The development host consumes W8's 0082 held try-fence. A code
+            // callback alone cannot advertise media while its real producer is
+            // absent. Registry activation and custody remain with W8.
+            const mediaAuthorityReady =
+              mediaEnvironment && mediaDenials
+                ? (
+                    await runtime.pool.query<{ ready: boolean }>(
+                      "SELECT to_regprocedure('creator_trust.interactive_denial(text,uuid,uuid)') IS NOT NULL AS ready",
+                    )
+                  ).rows[0]?.ready === true
+                : false;
+            const mediaHost =
+              mediaEnvironment && mediaDenials && mediaAuthorityReady
+                ? composeMediaHost({
+                    runtime,
+                    environment: mediaEnvironment,
+                    denials: mediaDenials,
+                    development: true,
+                  })
+                : undefined;
+            // W3 composes conversations, Creator AI and commerce together so
+            // fan generation uses one model, journal, allowance and trial path.
+            const host = await composeConversationHost(
+              runtime,
+              config,
+              mediaHost
+                ? {
+                    media: mediaHost.media,
+                    bindRecordingPublication:
+                      mediaHost.bindRecordingPublication,
+                  }
+                : {},
             );
+            features.close.push(() => host.close());
+            const { commerce, conversation, agent } = host;
+            runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
             features.growth = await configureGrowthForBackend({
               ...runtime,
               pool: growthAPIPool ?? runtime.pool,
@@ -143,7 +110,7 @@ try {
                         runtime.identity.signing,
                         async (creatorId) => {
                           const row = (
-                            await runtime.pool.query(
+                            await runtime.pool.query<{ handle: string }>(
                               "SELECT handle FROM creator.creator_profile WHERE id=$1",
                               [creatorId],
                             )
@@ -162,6 +129,80 @@ try {
                   }
                 : undefined,
             });
+            const contentHost = composeContentHost({
+              pool: runtime.pool,
+              owners: {
+                commerce: commerce?.service,
+                conversation: runtime.conversation,
+                access: runtime.access,
+                profiles: runtime.identity?.profiles,
+              },
+              dependencies: {
+                assertAllowed: runtime.assertCreatorAllowed,
+                assertAllowedInTransaction: async (
+                  client,
+                  actor,
+                  creatorId,
+                ) => {
+                  if (
+                    !runtime.assertRestoredInTransaction ||
+                    !runtime.assertContentAllowedInTransaction
+                  )
+                    throw new DomainError(
+                      "content_denial_unconfigured",
+                      "Content requires current held denial authority.",
+                      503,
+                    );
+                  await runtime.assertRestoredInTransaction(client);
+                  await runtime.assertContentAllowedInTransaction(
+                    client,
+                    actor,
+                    creatorId,
+                  );
+                },
+                mediaPublication: mediaHost?.contentPublication,
+                // Canonical content retains creator_runtime and actual held
+                // scopes. Missing 0101 custody fails closed without Growth grants.
+                ...(features.growth
+                  ? { follows: features.growth.coreContentFollows }
+                  : {}),
+              },
+              ...(features.growth && runtime.identity
+                ? {
+                    publicProjection: async (actor, effect) =>
+                      contentPublicProjection(
+                        features.growth!.service,
+                        content.content,
+                        runtime.identity!.signing,
+                      )(actor, effect),
+                  }
+                : {}),
+              assertScopeAllowedInTransaction:
+                runtime.assertScopeAllowedInTransaction,
+            });
+            const content = runtime.assertScopeAllowedInTransaction
+              ? await createCommerceStudio({
+                  assertScopeAllowedInTransaction:
+                    runtime.assertScopeAllowedInTransaction,
+                  ...(commerce?.publicPacketRead
+                    ? { publicPacketRead: commerce.publicPacketRead }
+                    : {}),
+                  pool: runtime.pool,
+                  owners: contentHost.owners,
+                  dependencies: contentHost.dependencies,
+                })
+              : createContentStudio({
+                  pool: runtime.pool,
+                  owners: contentHost.owners,
+                  dependencies: contentHost.dependencies,
+                });
+            contentHost.bindContent(content.content);
+            mediaHost?.bindContent(content.content);
+            runtime.configureSignedSubjects(
+              Array.isArray(content.signedSubjects)
+                ? content.signedSubjects
+                : [content.signedSubjects],
+            );
             return [
               conversation.registration,
               agentFeature({
@@ -169,7 +210,7 @@ try {
                 pool: runtime.pool,
                 development: config.identityAdapter === "development",
               }),
-              mediaFeature({}),
+              mediaHost?.feature() ?? mediaFeature({}),
               ...(commerce ? [commerce.feature] : []),
               ...(content ? content.features : []),
               ...(features.growth ? [features.growth.feature] : []),
@@ -178,7 +219,11 @@ try {
         })
       : undefined;
 } catch (error) {
-  await Promise.allSettled([features.growth?.close(), growthAPIPool?.end()]);
+  await Promise.allSettled([
+    features.growth?.close(),
+    ...features.close.map((close) => Promise.resolve().then(close)),
+    growthAPIPool?.end(),
+  ]);
   throw error;
 }
 features.growth?.start();
@@ -196,6 +241,7 @@ server.listen(
 const shutdown = () => {
   void (async () => {
     await features.growth?.close();
+    for (const close of features.close) await close();
     if (configured) await configured.close();
     else await new Promise<void>((resolve) => server.close(() => resolve()));
     await growthAPIPool?.end();

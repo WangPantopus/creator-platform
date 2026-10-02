@@ -26,6 +26,10 @@ import {
 } from "../identity/subjects.js";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
+import {
+  ContentPublicationSources,
+  type ContentPublicationSourceController,
+} from "./publication-source.js";
 import type { SignedActCommand } from "@qelvora/api";
 import { consentEnvelope } from "../identity/consent.js";
 import {
@@ -131,6 +135,7 @@ export interface ContentDependencies {
     audience: Audience,
   ) => Promise<number | null>;
   mediaPublication?: ContentPublicationMedia;
+  publicationSource?: ContentPublicationSourceController;
   /** W1 withdrawal-only registry. Must verify this exact consumed act and
    * persist a durable audit for the actual publisher on this held client.
    * It cannot issue signing authority or disclose a new public command. */
@@ -178,6 +183,13 @@ export interface ContentDependencies {
     reference: string;
     textHash: string;
   }>;
+  /** Hold current W1 session and W8 creator/fan denial on the domain client,
+   * before object locks. This callback cannot substitute a worker Actor. */
+  assertAllowedInTransaction?: (
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+  ) => Promise<void>;
   assertAllowed?: (actor: Actor, creatorId: string) => Promise<void>;
   effect?: (
     actor: Actor,
@@ -219,7 +231,7 @@ export interface ContentDependencies {
 }
 
 export function publicationCommand(
-  row: Index,
+  row: Pick<Index, "id" | "creator_id" | "version">,
   document: ContentBody,
   mediaEvidence: readonly ProcessedMediaEvidence[] = [],
 ): SignedActCommand {
@@ -254,10 +266,15 @@ export function reactionCommand(
 }
 
 export class ContentService {
+  readonly publicationSources: ContentPublicationSources;
   constructor(
     readonly pool: Pool,
     readonly dependencies: ContentDependencies = {},
-  ) {}
+  ) {
+    this.publicationSources = new ContentPublicationSources(
+      dependencies.publicationSource,
+    );
+  }
   private async consentRecord(
     client: PoolClient,
     actor: Actor,
@@ -330,7 +347,14 @@ export class ContentService {
       "adult_eligibility_required",
       "Adult eligibility is required.",
     );
-    await this.dependencies.assertAllowed?.(actor, creatorId);
+    await assertCurrentSession(client, actor.accountId);
+    if (this.dependencies.assertAllowedInTransaction)
+      await this.dependencies.assertAllowedInTransaction(
+        client,
+        actor,
+        creatorId,
+      );
+    else await this.dependencies.assertAllowed?.(actor, creatorId);
     const denied = await client.query(
       "SELECT 1 FROM creator.content_tombstone WHERE account_id=$1",
       [actor.accountId],
@@ -485,6 +509,7 @@ export class ContentService {
     key: string,
     body: unknown,
     work: () => Promise<T>,
+    onReplay?: (response: T) => Promise<void>,
   ): Promise<T> {
     await client.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", [
       `${actor.accountId}:content:${operation}:${key}`,
@@ -503,6 +528,7 @@ export class ContentService {
         "idempotency_conflict",
         "This retry key was used for different content.",
       );
+      await onReplay?.(prior.response);
       return prior.response;
     }
     const result = await work();
@@ -998,12 +1024,13 @@ export class ContentService {
     }
     if (document.packetId)
       invariant(
-        await this.dependencies.publicPacket?.(
-          client,
-          actor,
-          row.creator_id,
-          document.packetId,
-        ),
+        await this.publicationSources.permission(client, actor, {
+          creatorId: row.creator_id,
+          packetId: document.packetId,
+          contentId: row.id,
+          contentVersion: row.version,
+          audience: document.audience,
+        }),
         "public_packet_consent_required",
         "The current public request or accepted group conversion is required.",
       );
@@ -1048,6 +1075,7 @@ export class ContentService {
   }
   async review(actor: Actor, creatorId: string, id: string) {
     return this.transaction(actor, creatorId, async (client) => {
+      await this.publicationSources.prepare(client, actor, creatorId, id);
       await this.authorizeMedia(client, actor, creatorId);
       await this.role(client, actor, creatorId);
       const row = await this.index(client, creatorId, id),
@@ -1063,10 +1091,15 @@ export class ContentService {
         row,
         view.document,
       );
-      return {
+      const result = {
         command: publicationCommand(row, view.document, mediaEvidence),
         view,
       };
+      await this.publicationSources.finalize(client, actor, {
+        stage: "review",
+        publicationSignedActId: null,
+      });
+      return result;
     });
   }
   async publish(
@@ -1080,6 +1113,7 @@ export class ContentService {
       ? ContentVersionCommand.parse(raw)
       : PublishContent.parse(raw);
     return this.transaction(actor, creatorId, async (client) => {
+      await this.publicationSources.prepare(client, actor, creatorId, id);
       if (!team) await this.authorizeMedia(client, actor, creatorId);
       const role = await this.role(
         client,
@@ -1092,7 +1126,7 @@ export class ContentService {
         "team_identity_required",
         "Use creator signing for your own words.",
       );
-      return this.command(
+      const result = await this.command(
         client,
         actor,
         "publish",
@@ -1216,7 +1250,73 @@ export class ContentService {
             signedActId: signature,
           };
         },
+        async (receipt) => {
+          // A saved response is not a current publication grant. Reacquire the
+          // stored source positives before the same final W4 fence as a first
+          // publication, without consuming the signature or writing again.
+          const row = await this.index(client, creatorId, id, true);
+          invariant(
+            receipt.id === id &&
+              receipt.version === input.version &&
+              row.version === input.version &&
+              ["published", "scheduled", "media_pending"].includes(row.state),
+            "publication_changed",
+            "This publication changed. Refresh before retrying.",
+          );
+          const publication = (
+            await client.query<{
+              signed_act_id: string | null;
+              author_account_id: string;
+              author_kind: string;
+              media_evidence: unknown;
+            }>(
+              "SELECT * FROM creator.content_publication WHERE content_id=$1 AND creator_id=$2 AND version=$3",
+              [id, creatorId, row.version],
+            )
+          ).rows[0];
+          invariant(
+            publication?.author_account_id === actor.accountId &&
+              publication.signed_act_id === receipt.signedActId &&
+              (publication.author_kind === "team") === team,
+            "publication_changed",
+            "The stored publication no longer matches this retry.",
+          );
+          const view = await this.view(client, actor, row, false);
+          invariant(
+            view.document.kind === row.kind &&
+              contentHash(view.document.audience) ===
+                contentHash(row.audience) &&
+              view.document.packetId === row.packet_id &&
+              (view.document.quote?.replyId ?? null) === row.quote_reply_id &&
+              (view.document.quote?.consentVersion ?? null) ===
+                row.quote_consent_version,
+            "publication_evidence_changed",
+            "The stored publication source changed. Refresh before retrying.",
+          );
+          const current = await this.validatePublication(
+            client,
+            actor,
+            row,
+            view.document,
+          );
+          invariant(
+            contentHash(current.mediaEvidence) ===
+              contentHash(
+                z
+                  .array(ProcessedMediaEvidenceSchema)
+                  .max(10)
+                  .parse(publication.media_evidence ?? []),
+              ),
+            "publication_evidence_changed",
+            "The signed media revision changed. Refresh before retrying.",
+          );
+        },
       );
+      await this.publicationSources.finalize(client, actor, {
+        stage: "publication",
+        publicationSignedActId: result.signedActId,
+      });
+      return result;
     });
   }
   async lifecycle(
@@ -1436,6 +1536,7 @@ export class ContentService {
     id: string,
   ): Promise<ContentPublicationProof | null> {
     return this.transaction(actor, creatorId, async (client) => {
+      await this.publicationSources.prepare(client, actor, creatorId, id);
       await this.authorizeOwnedMedia(client, actor, creatorId);
       const role = await this.role(client, actor, creatorId, ["publisher"]);
       const row = await this.index(client, creatorId, id);
@@ -1458,7 +1559,7 @@ export class ContentService {
       // real phased owner fence and each source's retraction producer must be
       // composed before these proofs are available. Do not take late negative
       // leases below the creator/content positives or call a viewer as owner.
-      if (current.document.packetId || current.document.quote)
+      if (current.document.quote)
         throw new DomainError(
           "publication_source_authority_unconfigured",
           "Current publication source authority is not connected.",
@@ -1515,12 +1616,17 @@ export class ContentService {
           )
             mediaReady = false;
       }
-      return {
+      const result = {
         view: current,
         command,
         signedActId: publication.signed_act_id as string | null,
         mediaReady,
       };
+      await this.publicationSources.finalize(client, actor, {
+        stage: "review",
+        publicationSignedActId: result.signedActId,
+      });
+      return result;
     });
   }
   async list(actor: Actor, creatorId: string, raw: unknown, studio = false) {

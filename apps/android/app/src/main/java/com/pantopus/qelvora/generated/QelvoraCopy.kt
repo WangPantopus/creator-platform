@@ -914,7 +914,20 @@ object QelvoraCopy {
     "accountUnavailableBody" to "Your session is kept on this device. Try again in a moment.",
     "pageUnavailableTitle" to "This page didn't load",
     "pageUnavailableBody" to "Nothing you saved was changed. Try again in a moment.",
-    "growthSpendingLimitReached" to "You've reached {percent}% of your monthly limit."
+    "growthSpendingLimitReached" to "You've reached {percent}% of your monthly limit.",
+    "w6UploadsAndSigningAreUnavailableYourPreviewStaysOnThisDevice" to "Uploads and signing are unavailable here. Your preview stays on this device.",
+    "w6RecordAVoiceReply" to "Record a voice reply",
+    "w6DeliverThisRecording" to "Deliver this recording",
+    "w6RecordingCredentialsAreProcessing" to "Your signature is saved. Content credentials are processing before delivery.",
+    "w6RecordingDeliveryIsUnconfirmed" to "Delivery is unconfirmed. Retry this same recording before starting another.",
+    "w6RecordingDelivered" to "Your signed recording was delivered to this conversation.",
+    "w6VoiceReplyUnavailable" to "Voice replies are unavailable for this conversation. Your text draft is kept.",
+    "w6SelectedConversationChanged" to "This recording belongs to another conversation. Reopen the selected thread.",
+    "w6RetryRecordingDelivery" to "Retry this recording delivery",
+    "w6AvailabilitySaveIsUnconfirmed" to "Saving is unconfirmed. Retry this same change before editing your windows.",
+    "w6RetryAvailabilitySave" to "Retry this availability save",
+    "w6RefreshWillReplaceAvailabilityChanges" to "Replace your unsaved changes with the saved availability?",
+    "w6AvailabilityAccountChanged" to "Your account changed. Reopen availability to continue."
   )
   private val variables = Regex("""\{([^}]+)\}""")
   fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }
