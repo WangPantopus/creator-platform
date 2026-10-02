@@ -1181,6 +1181,7 @@ export class SessionService {
       typeof provider.complete === "boolean" &&
         typeof provider.closed === "boolean" &&
         typeof provider.reference === "string" &&
+        provider.reference.length <= 2000 &&
         (!provider.complete || provider.reference.trim().length > 0) &&
         Array.isArray(provider.participants) &&
         provider.participants.every(
@@ -1376,6 +1377,7 @@ export class SessionService {
               recording: false,
               presentAccountIds: [],
               providerHistoryComplete: true,
+              providerName: this.provider.name,
               providerHistoryReference: provider.reference,
               reconciledAt: now,
               outcome: null,
