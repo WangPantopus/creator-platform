@@ -24,6 +24,57 @@ const consumerSchema = z.strictObject({
 export type GenerationPurposeConsumer = Readonly<
   z.infer<typeof consumerSchema>
 >;
+const terminalConsumerSchema = consumerSchema.extend({
+  purpose: z.literal("generation_terminal"),
+});
+/** Explicit original settlement mode. This packet never grants generation
+ * input, lease, provider use or an original GenerationTaskScope. */
+export type GenerationTerminalPurposeConsumer = Readonly<
+  z.infer<typeof terminalConsumerSchema>
+>;
+const terminalContracts = [
+  {
+    owner: "creator_generation_terminal_authority",
+    version: "0183_w1_generation_terminal_scope",
+    checksum:
+      "fadbf62a3ddf06142c3a6ad30313503f9bebe7b6d64f67f8ba01ff13ce2398c7",
+    signatures: [
+      "creator.pending_generation_terminals(integer)",
+      "creator.begin_generation_terminal(uuid,uuid,text,uuid,integer,boolean)",
+      "creator.generation_terminal_matches(uuid,uuid,boolean)",
+      "creator.end_generation_terminal()",
+    ],
+  },
+  {
+    owner: "creator_w2_generation_terminal_journal",
+    version: "0188_w2_generation_terminal_journal",
+    checksum:
+      "7ab8974d065b1b9e5befa2ded26c6978876957fab0eee80b9632825bbac98477",
+    signatures: [
+      "creator.generation_agent_journal_receipt(uuid,uuid)",
+      "creator.generation_seal_agent_journal(uuid,uuid)",
+    ],
+  },
+  {
+    owner: "creator_w4_generation_terminal",
+    version: "0189_w4_generation_terminal_settlement",
+    checksum:
+      "a6e386de7506035d6bc0d10da644cb8ee2620824217b9c2c61a9a34cb7fa4fc9",
+    signatures: [
+      "creator.generation_settle_original_allowance(uuid,uuid)",
+      "creator.generation_original_allowance_receipt(uuid,uuid)",
+    ],
+  },
+] as const;
+function reviewedTerminalConsumer(consumer: GenerationTerminalPurposeConsumer) {
+  return terminalContracts.some(
+    (contract) =>
+      consumer.owner === contract.owner &&
+      consumer.migration.version === contract.version &&
+      consumer.migration.checksum === contract.checksum &&
+      contract.signatures.some((signature) => signature === consumer.signature),
+  );
+}
 const Instant = z.iso
   .datetime({ offset: true })
   .transform((value) => new Date(value).toISOString());
@@ -115,6 +166,7 @@ type GenerationCatalogue = Readonly<{
   migration: Readonly<{ version: string; checksum: string }>;
   denialMigration: Readonly<{ version: string; checksum: string }>;
   consumers: readonly GenerationPurposeConsumer[];
+  terminalConsumers: readonly GenerationTerminalPurposeConsumer[];
 }>;
 
 /** Current original role/schema and every registered fixed consumer. Metadata
@@ -123,7 +175,7 @@ async function assertGenerationCatalogue(
   query: Pick<Pool, "query">,
   input: GenerationCatalogue,
 ): Promise<void> {
-  const consumers = input.consumers;
+  const consumers = [...input.consumers, ...input.terminalConsumers];
   const installed = (
     await query.query<{ installed: boolean }>(
       `SELECT session_user='creator_generation_worker' AND current_user=session_user
@@ -248,7 +300,9 @@ async function assertGenerationCatalogue(
          AND EXISTS(SELECT FROM aclexplode(p.proacl) a JOIN pg_roles worker ON worker.oid=a.grantee
           WHERE worker.rolname=session_user AND a.privilege_type='EXECUTE' AND NOT a.is_grantable)
          AND has_function_privilege(current_user,p.oid,'EXECUTE')
-         AND has_function_privilege($4,to_regprocedure('creator.generation_scope_matches(uuid,uuid)'),'EXECUTE')
+         AND has_function_privilege($4,to_regprocedure($5),'EXECUTE')
+         AND (NOT $6::boolean OR NOT has_function_privilege($4,
+          to_regprocedure('creator.generation_scope_matches(uuid,uuid)'),'EXECUTE'))
          AS ready,pg_get_functiondef(p.oid) AS definition
          FROM pg_proc p JOIN pg_roles r ON r.oid=p.proowner JOIN pg_language l ON l.oid=p.prolang
          WHERE p.oid=to_regprocedure($1)`,
@@ -257,6 +311,10 @@ async function assertGenerationCatalogue(
           consumer.migration.version,
           consumer.migration.checksum,
           consumer.owner,
+          "purpose" in consumer
+            ? "creator.generation_terminal_matches(uuid,uuid,boolean)"
+            : "creator.generation_scope_matches(uuid,uuid)",
+          "purpose" in consumer,
         ],
       )
     ).rows[0];
@@ -281,6 +339,7 @@ export class GenerationIdentityAuthority {
       assertAllowed: GenerationRestriction;
       assertDiscoveryAllowed: (client: PoolClient) => Promise<void>;
       consumers: readonly GenerationPurposeConsumer[];
+      terminalConsumers: readonly GenerationTerminalPurposeConsumer[];
     }>,
   ) {}
 
@@ -303,6 +362,8 @@ export class GenerationIdentityAuthority {
     /** Only activated, individually reviewed narrow entrypoints. Empty by
      * default; a migration receipt alone does not authorize an executable. */
     consumers?: readonly GenerationPurposeConsumer[];
+    /** Separate fixed settlement registry. No original-scope grant is added. */
+    terminalConsumers?: readonly GenerationTerminalPurposeConsumer[];
   }): Promise<GenerationIdentityAuthority> {
     const input = Object.freeze({
       ...configuration,
@@ -323,26 +384,54 @@ export class GenerationIdentityAuthority {
         503,
       );
     let consumers: GenerationPurposeConsumer[];
+    let terminalConsumers: GenerationTerminalPurposeConsumer[];
     try {
       consumers = z
         .array(consumerSchema)
         .max(32)
         .parse(input.consumers ?? []);
+      terminalConsumers = z
+        .array(terminalConsumerSchema)
+        .max(8)
+        .parse(input.terminalConsumers ?? []);
+      const combined = [...consumers, ...terminalConsumers];
       if (
-        new Set(consumers.map((consumer) => consumer.signature)).size !==
-          consumers.length ||
+        new Set(combined.map((consumer) => consumer.signature)).size !==
+          combined.length ||
         consumers.some(
           (consumer) =>
             consumer.owner === "creator_generation_authority" ||
             consumer.owner === "creator_generation_worker" ||
             consumer.migration.version === input.migration.version ||
-            consumer.migration.version === input.denialMigration.version,
-        )
+            consumer.migration.version === input.denialMigration.version ||
+            terminalContracts.some(
+              (contract) =>
+                consumer.owner === contract.owner ||
+                consumer.migration.version === contract.version ||
+                contract.signatures.some(
+                  (signature) => signature === consumer.signature,
+                ),
+            ),
+        ) ||
+        terminalConsumers.some(
+          (consumer) => !reviewedTerminalConsumer(consumer),
+        ) ||
+        (terminalConsumers.length > 0 &&
+          terminalContracts[0].signatures.some(
+            (signature) =>
+              !terminalConsumers.some(
+                (consumer) => consumer.signature === signature,
+              ),
+          ))
       )
         throw new Error(
           "Generation consumers require distinct reviewed custody",
         );
-      await assertGenerationCatalogue(input.pool, { ...input, consumers });
+      await assertGenerationCatalogue(input.pool, {
+        ...input,
+        consumers,
+        terminalConsumers,
+      });
     } catch {
       throw new DomainError(
         "generation_scope_unconfigured",
@@ -358,15 +447,25 @@ export class GenerationIdentityAuthority {
         }),
       ),
     );
+    const frozenTerminalConsumers = Object.freeze(
+      terminalConsumers.map((consumer) =>
+        Object.freeze({
+          ...consumer,
+          migration: Object.freeze({ ...consumer.migration }),
+        }),
+      ),
+    );
     return new GenerationIdentityAuthority(input.pool, {
       catalogue: Object.freeze({
         migration: Object.freeze({ ...input.migration }),
         denialMigration: Object.freeze({ ...input.denialMigration }),
         consumers: frozenConsumers,
+        terminalConsumers: frozenTerminalConsumers,
       }),
       assertAllowed: input.assertAllowed,
       assertDiscoveryAllowed: input.assertDiscoveryAllowed,
       consumers: frozenConsumers,
+      terminalConsumers: frozenTerminalConsumers,
     });
   }
 
@@ -381,6 +480,23 @@ export class GenerationIdentityAuthority {
       throw new DomainError(
         "generation_scope_unconfigured",
         "The exact worker purpose consumer is not registered.",
+        503,
+      );
+  }
+
+  assertTerminalConsumerRegistered(
+    consumer: GenerationTerminalPurposeConsumer,
+  ): void {
+    if (
+      !terminalConsumerSchema.safeParse(consumer).success ||
+      !reviewedTerminalConsumer(consumer) ||
+      !this.configuration.terminalConsumers.some(
+        (registered) => canonical(registered) === canonical(consumer),
+      )
+    )
+      throw new DomainError(
+        "generation_terminal_unconfigured",
+        "The exact original settlement consumer is not registered.",
         503,
       );
   }

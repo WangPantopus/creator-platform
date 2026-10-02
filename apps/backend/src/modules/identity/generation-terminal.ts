@@ -377,7 +377,8 @@ export class GenerationTerminalAuthority {
       );
       input.generation.assertPool(input.pool);
       for (const signature of Executables)
-        input.generation.assertConsumerRegistered({
+        input.generation.assertTerminalConsumerRegistered({
+          purpose: "generation_terminal",
           migration: input.migration,
           signature,
           owner: Owner,
