@@ -1,5 +1,11 @@
 # W8 resume prompt — complete the workstream
 
+## Finite development feedback source — 2026-10-02
+
+Held 0207 now implements the development-only notice, seven-day feedback limit capped at November 1, physical withdrawal/expiry and SQL offer uniqueness. The actual configured-runtime factory supplies W1/W3 policy callbacks and a bounded isolated expiry worker. [Integration contract](../../operations/W8-development-feedback.md) gives exact exports and source hash. Zero compiler diagnostics, fourteen deliberate catalogue drifts, executable-registry refusal and six unchanged custody comparisons passed on a closed rolled-back database. Types and scoped lint passed. No new unit tests or routine capture/JSON commits.
+
+Original 0056/0057 and old unknown events remain unchanged. Owner composition, actual fan consent, native/web operation, saved physical effects, C10 and activation remain pending. Financial retention, original recovery and the complete workstream remain open. Own app services are stopped; the W8 emulator has just been leased for the separate ownership increment.
+
 ## Executable privacy-wave registry correction — 2026-10-02
 
 W4's actual backend launch found missing executable hashes for the active continuation. [Exact unchanged SQL and real registeredMigration receipt](../../../artifacts/workstreams/W8/privacy-wave-source-pins/20261002-mac-studio/README.md) adds only0074/0082/0087/0103 sourceSha256 registry metadata. No guard/history/SQL/role/wave change or application/traffic-ready claim. Own services/devices are stopped with private checkpoints retained. Support PR179 merged7f57b825; fully reviewed W1 finalization PR180 merged79e3b0c7. All-scope privacy ownership source remains held/in progress: original0027 account-only constraint requires additive0209, original0087 held projection stays unchanged; real web refused without saving a new request. Development policy lifecycle and full workstream remain open.
