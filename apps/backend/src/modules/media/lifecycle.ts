@@ -390,7 +390,11 @@ export function createMediaPrivacyHook(input: {
                 5000,
               ),
             );
-            if (!truth.closed || truth.recording)
+            if (
+              !truth.closed ||
+              truth.recording ||
+              truth.presentAccountIds.length !== 0
+            )
               throw new Error("call_deletion_unconfirmed");
             await transaction(scope, async (client) => {
               await client.query(

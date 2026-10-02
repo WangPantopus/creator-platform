@@ -166,7 +166,12 @@ export class SessionWorker {
         const truth = validateProviderState(
           await withDeadline(this.sessions.provider.state(row.room_id), 5000),
         );
-        if (recording.recording || !truth.closed || truth.recording)
+        if (
+          recording.recording ||
+          !truth.closed ||
+          truth.recording ||
+          truth.presentAccountIds.length !== 0
+        )
           throw new Error("room_closure_unconfirmed");
         await this.sessions.db.withThread(scope, async (client) => {
           const current = await this.sessions.lifecycleRow(
