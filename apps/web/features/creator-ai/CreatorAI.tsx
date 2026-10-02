@@ -542,13 +542,11 @@ export function CreatorAI({
   useEffect(() => {
     const notice = errorNotice.current;
     if (!actionFailure || !notice) return;
-    // Notices sit at the top of the screen. Bring this one to whoever acted
-    // further down; reduced-motion preferences get an immediate jump.
+    // The design system never animates scrolling. Make the focused recovery
+    // notice visible immediately, including for reduced-motion users.
     notice.scrollIntoView({
       block: "start",
-      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-        ? "auto"
-        : "smooth",
+      behavior: "instant",
     });
     notice.focus({ preventScroll: true });
   }, [actionFailure]);

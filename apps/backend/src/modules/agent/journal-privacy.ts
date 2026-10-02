@@ -1,6 +1,7 @@
 import type { PoolClient } from "pg";
 import { createHash } from "node:crypto";
 import { invariant } from "../../core/errors.js";
+import { canonical } from "../../core/canonical.js";
 import type { PreparedUsageRetention } from "./usage-retention.js";
 import {
   type PreparedGenerationJournal,
@@ -149,6 +150,209 @@ export function generationAccountingLifecycle(input: {
   };
   return Object.freeze({
     exportMetadataTo,
+    /** Complete large-family deletion with bounded memory on the caller's held
+     * transaction. W8 must persist this receipt only with that transaction's
+     * completion; cancellation or a lost lease requires rollback, never ACK. */
+    async purgeFamilyPaged(
+      client: PoolClient,
+      job: JournalPrivacyJob,
+      family: JournalPrivacyFamily,
+      signal: AbortSignal,
+    ) {
+      signal.throwIfAborted();
+      invariant(
+        job.kind === "delete",
+        "privacy_kind_mismatch",
+        "This is a verified deletion operation.",
+      );
+      await assert(client, job, family);
+      await input.usageRetention.assertClient(client);
+      await client.query(
+        "SELECT creator_id FROM creator.ai_workspace WHERE creator_id=$1 FOR UPDATE",
+        [family.creatorId],
+      );
+      const open = await client.query(
+        "SELECT 1 FROM creator.ai_generation_admission WHERE creator_id=$1 AND thread_id=$2 AND fan_id=$3 AND state='open' UNION ALL SELECT 1 FROM creator.ai_generation_attempt WHERE creator_id=$1 AND thread_id=$2 AND fan_id=$3 AND state='open' LIMIT 1",
+        bind(family),
+      );
+      invariant(
+        !open.rowCount,
+        "accounting_cleanup_pending",
+        "Seal every admission and attempt before financial disposition and deletion.",
+      );
+      const plan = await retention.current(client, job, family);
+      const budgetEnd = (
+        await client.query<{ at: Date }>(
+          "SELECT date_trunc('day',now())+interval '1 day' AS at",
+        )
+      ).rows[0]!.at;
+      invariant(
+        plan.financialDispositionReference.length >= 8 &&
+          plan.financialDispositionReference.length <= 2048 &&
+          plan.reason.length >= 12 &&
+          plan.reason.length <= 2000 &&
+          Number.isFinite(Date.parse(plan.accountingUntil)) &&
+          Date.parse(plan.accountingUntil) >= budgetEnd.getTime(),
+        "accounting_retention_unconfigured",
+        "Reviewed financial disposition and minimal accounting retention through the active cap window are required.",
+      );
+      const hash = createHash("sha256");
+      let cursor: string | null = null;
+      let unlinkedCount = 0;
+      let unlinkedMetadataBytes = 0;
+      let knownCount = 0;
+      let unknownCount = 0;
+      for (;;) {
+        signal.throwIfAborted();
+        await assert(client, job, family);
+        const rows: { id: string; cost_micros: string | null }[] = (
+          await client.query<{ id: string; cost_micros: string | null }>(
+            `SELECT id,cost_micros FROM creator.ai_usage WHERE creator_id=$1 AND ${usagePredicate} AND ($4::uuid IS NULL OR id>$4::uuid) ORDER BY id LIMIT 100 FOR UPDATE`,
+            [...bind(family), cursor],
+          )
+        ).rows;
+        if (!rows.length) break;
+        // Attempt/hold membership stays intact until every usage page is
+        // detached. Changing a page's predicate cannot hide later hold rows.
+        const detached = await client.query(
+          "UPDATE creator.ai_usage SET thread_id=NULL,fan_id=NULL,generation_id=NULL,attempt_id=NULL,call_ordinal=NULL,creator_hold_id=NULL,accounting_retained_until=$3,accounting_retention_version=$4,accounting_retention_reason=$5,accounting_disposition_reference=$6 WHERE creator_id=$1 AND id=ANY($2::uuid[])",
+          [
+            family.creatorId,
+            rows.map((row) => row.id),
+            plan.accountingUntil,
+            retention.version,
+            plan.reason,
+            plan.financialDispositionReference,
+          ],
+        );
+        invariant(
+          detached.rowCount === rows.length,
+          "accounting_cleanup_pending",
+          "Every locked usage record must receive its actual accounting plan.",
+        );
+        for (const row of rows) {
+          const metadata = `${canonical({ id: row.id, costMicros: row.cost_micros })}\n`;
+          hash.update(metadata);
+          unlinkedMetadataBytes += Buffer.byteLength(metadata);
+          if (row.cost_micros === null) unknownCount++;
+          else knownCount++;
+        }
+        unlinkedCount += rows.length;
+        invariant(
+          Number.isSafeInteger(unlinkedCount) &&
+            Number.isSafeInteger(unlinkedMetadataBytes),
+          "bounded_subjob_required",
+          "Accounting counts must remain exact.",
+        );
+        cursor = rows[rows.length - 1]!.id;
+      }
+      const residual = await client.query(
+        `SELECT 1 FROM creator.ai_usage WHERE creator_id=$1 AND ${usagePredicate} LIMIT 1`,
+        bind(family),
+      );
+      invariant(
+        !residual.rowCount,
+        "accounting_cleanup_pending",
+        "No fan-linked or attempt-hold-linked usage may remain before journal deletion.",
+      );
+      const deleted: Record<string, number> = {};
+      for (const table of [
+        "ai_event",
+        "ai_generation_receipt",
+        "ai_generation_attempt",
+        "ai_generation_admission",
+      ] as const) {
+        const predicate =
+          table === "ai_event"
+            ? "type='ai.generation_receipt' AND payload->>'threadId'=$2 AND payload->>'fanId'=$3"
+            : "thread_id=$2::uuid AND fan_id=$3::uuid";
+        deleted[table] = 0;
+        for (;;) {
+          signal.throwIfAborted();
+          await assert(client, job, family);
+          const page = await client.query(
+            `WITH page AS (SELECT ctid FROM creator.${table} WHERE creator_id=$1 AND ${predicate} ORDER BY ctid LIMIT 100 FOR UPDATE) DELETE FROM creator.${table} WHERE ctid IN (SELECT ctid FROM page) RETURNING 1`,
+            bind(family),
+          );
+          deleted[table]! += page.rowCount ?? 0;
+          invariant(
+            Number.isSafeInteger(deleted[table]),
+            "bounded_subjob_required",
+            "Deleted journal counts must remain exact.",
+          );
+          if (!page.rowCount) break;
+        }
+        const remaining = await client.query(
+          `SELECT 1 FROM creator.${table} WHERE creator_id=$1 AND ${predicate} LIMIT 1`,
+          bind(family),
+        );
+        invariant(
+          !remaining.rowCount,
+          "accounting_cleanup_pending",
+          "Every journal and receipt notification page must be removed.",
+        );
+      }
+      signal.throwIfAborted();
+      await assert(client, job, family);
+      const current = await retention.current(client, job, family);
+      invariant(
+        current.financialDispositionReference ===
+          plan.financialDispositionReference &&
+          current.accountingUntil === plan.accountingUntil &&
+          current.reason === plan.reason,
+        "accounting_retention_changed",
+        "The exact reviewed accounting disposition must stay current through completion.",
+      );
+      await assert(client, job, family);
+      const finalResidual = await client.query(
+        "SELECT 1 FROM creator.ai_usage WHERE creator_id=$1 AND thread_id=$2 AND fan_id=$3 UNION ALL SELECT 1 FROM creator.ai_generation_admission WHERE creator_id=$1 AND thread_id=$2 AND fan_id=$3 UNION ALL SELECT 1 FROM creator.ai_generation_attempt WHERE creator_id=$1 AND thread_id=$2 AND fan_id=$3 UNION ALL SELECT 1 FROM creator.ai_generation_receipt WHERE creator_id=$1 AND thread_id=$2 AND fan_id=$3 UNION ALL SELECT 1 FROM creator.ai_event WHERE creator_id=$1 AND type='ai.generation_receipt' AND payload->>'threadId'=$2::text AND payload->>'fanId'=$3::text LIMIT 1",
+        bind(family),
+      );
+      invariant(
+        !finalResidual.rowCount,
+        "accounting_cleanup_pending",
+        "A complete accounting family and its notifications must stay purged.",
+      );
+      signal.throwIfAborted();
+      return {
+        receipt: {
+          schemaVersion: 2,
+          domain: "agent",
+          jobId: job.jobId,
+          family: { ...family },
+          threadAccountingPurged: true,
+          retentionVersion: retention.version,
+          financialDispositionReference: plan.financialDispositionReference,
+          unlinkedCount,
+          unlinkedMetadataBytes,
+          knownCount,
+          unknownCount,
+          unlinkedSha256: hash.digest("hex"),
+          hashEncoding: "canonical-json-lines-uuid-order",
+          deleted,
+        },
+        retained: [
+          ...(knownCount
+            ? [
+                {
+                  category: "unlinked_agent_accounting",
+                  until: plan.accountingUntil,
+                  reason: plan.reason,
+                },
+              ]
+            : []),
+          ...(unknownCount
+            ? [
+                {
+                  category: "unresolved_agent_cost",
+                  until: null,
+                  reason: `${plan.reason} Unresolved provider cost requires actual reconciliation; expiry cannot clear this marker.`,
+                },
+              ]
+            : []),
+        ],
+      };
+    },
     async sealGeneration(
       client: PoolClient,
       job: JournalPrivacyJob,
