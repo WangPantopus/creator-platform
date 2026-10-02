@@ -1,0 +1,80 @@
+{
+  "source": "72559a219b579b770eb6fc5a4f7890223252bd44",
+  "at": "2026-10-02T15:12:16.349886+00:00",
+  "actualChecks": [
+    "backend tsc --noEmit passed",
+    "scoped ESLint passed",
+    "scoped Prettier passed",
+    "git diff --check passed"
+  ],
+  "actualRuntime": {
+    "status": "ok",
+    "ready": false,
+    "foundationReady": true,
+    "identity": "configured",
+    "identityMode": "development",
+    "generation": "unconfigured",
+    "registeredFeatures": [
+      "conversation",
+      "content",
+      "studio",
+      "commerce",
+      "growth",
+      "agent"
+    ],
+    "readinessEndpoint": "/health/ready",
+    "database": "configured",
+    "featureEnabled": true
+  },
+  "actualReadiness": {
+    "ready": false,
+    "capabilities": [
+      {
+        "name": "trust_runtime",
+        "required": true,
+        "state": "unavailable",
+        "code": "trust_unconfigured",
+        "checkedAt": "2026-10-02T15:11:25.505Z"
+      }
+    ]
+  },
+  "poolComposition": {
+    "canonicalContent": "creator_runtime",
+    "growthAPI": "w5_content_runtime inherits creator_runtime and growth_runtime; exact W7 catalog guard passed during startup",
+    "agent": "separate creator_runtime pool",
+    "growthWorker": "separate growth_worker pool"
+  },
+  "actualManualOperation": [
+    {
+      "actor": "creator; development-only seeded verification, no proof/passkey",
+      "viewport": [
+        390,
+        844
+      ],
+      "appearance": "Night",
+      "observed": "Retained creator session opened Notes; actual Studio and queue HTTP200; unchanged unsigned draft displayed; reviewed reply feed empty. Screenshot personally inspected."
+    },
+    {
+      "actor": "fan one, retained kilnfire account",
+      "viewport": [
+        1280,
+        900
+      ],
+      "appearance": "Night",
+      "observed": "Direct creator Studio return displayed current-account no-role denial; private draft, reply feed and Studio navigation concealed. Screenshot personally inspected."
+    }
+  ],
+  "ownerSource": {
+    "commit": "9841372c38f1afe17d27a35e06e92c550b246bae",
+    "unchangedFiles": {
+      "apps/backend/src/db/growth-api-pool.ts": "0f0eca08b17ab9637700f5ea8b9c33cc56e0a6ef8877299edbb8219630a9c4a8",
+      "apps/backend/src/modules/growth/core-follows.ts": "e31c673af82a391c2aabd6fdad30a51a1880c2ac0e7723049cb625e13480337b"
+    }
+  },
+  "limits": [
+    "Canonical57 has no0101 activation receipt; follower reader is deliberately unconfigured. No count or follower eligibility acceptance.",
+    "No genuine signature, publication, public projection receipt, reply approval, payment, media provenance or delivery acceptance.",
+    "Trust readiness503 is preserved. This is not release-ready.",
+    "No new tests. Private database URLs and key material remain outside the repository."
+  ]
+}

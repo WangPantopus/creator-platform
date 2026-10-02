@@ -9790,6 +9790,149 @@
           }
         }
       }
+    },
+    "Content status": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Content status"
+          }
+        }
+      }
+    },
+    "Checking current access. Your input is kept during a connection interruption.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking current access. Your input is kept during a connection interruption."
+          }
+        }
+      }
+    },
+    "Check current access": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check current access"
+          }
+        }
+      }
+    },
+    "This content is unavailable. Check current access to try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This content is unavailable. Check current access to try again."
+          }
+        }
+      }
+    },
+    "Content could not be refreshed. Reconnect and check current access. Your input is kept.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Content could not be refreshed. Reconnect and check current access. Your input is kept."
+          }
+        }
+      }
+    },
+    "We could not confirm this action. Check current access before retrying. Your input is kept.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We could not confirm this action. Check current access before retrying. Your input is kept."
+          }
+        }
+      }
+    },
+    "Your session ended. Continue with Pantopus again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your session ended. Continue with Pantopus again."
+          }
+        }
+      }
+    },
+    "The signed-in account changed. Refresh before continuing.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The signed-in account changed. Refresh before continuing."
+          }
+        }
+      }
+    },
+    "This changed while you were viewing it. Refresh before trying again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This changed while you were viewing it. Refresh before trying again."
+          }
+        }
+      }
+    },
+    "This retry differs from the earlier action. Refresh before trying again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This retry differs from the earlier action. Refresh before trying again."
+          }
+        }
+      }
+    },
+    "This reply was withdrawn. It cannot be shared again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This reply was withdrawn. It cannot be shared again."
+          }
+        }
+      }
+    },
+    "Set up your fan profile before continuing.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set up your fan profile before continuing."
+          }
+        }
+      }
+    },
+    "Check your reply and sharing choices before trying again. Your input is kept.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check your reply and sharing choices before trying again. Your input is kept."
+          }
+        }
+      }
     }
   },
   "version": "1.0"
