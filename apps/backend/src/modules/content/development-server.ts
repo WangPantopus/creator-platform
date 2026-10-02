@@ -231,6 +231,14 @@ const backend = await createConfiguredBackend({
       ...(runtime.audienceIdentity
         ? { tenure: { audienceIdentity: runtime.audienceIdentity } }
         : {}),
+      ...(runtime.holdCreatorFanNegativeAuthority
+        ? {
+            creatorTenure: {
+              holdCreatorFanNegativeAuthority:
+                runtime.holdCreatorFanNegativeAuthority,
+            },
+          }
+        : {}),
       ...(growth && runtime.identity
         ? {
             followReaders: {
