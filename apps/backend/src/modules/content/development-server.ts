@@ -23,6 +23,7 @@ import { DomainError } from "../../core/errors.js";
 import { composeContentHost } from "./integration.js";
 import { configureGrowthForBackend } from "../growth/configured.js";
 import { canonicalContentFollows } from "../growth/integration.js";
+import { createTrustReplyReviewer } from "../trust/reply-review.js";
 import { canonicalConversationHome } from "../growth/home.js";
 import { createConversationRuntime } from "../conversation/runtime.js";
 
@@ -195,7 +196,10 @@ const backend = await createConfiguredBackend({
         agent,
         profiles: runtime.identity?.profiles,
       },
-      dependencies: { assertAllowed: runtime.assertCreatorAllowed },
+      dependencies: {
+        assertAllowed: runtime.assertCreatorAllowed,
+        reviewReply: createTrustReplyReviewer(),
+      },
       sources: { service: sources, repository },
       ...(growth && runtime.identity
         ? {

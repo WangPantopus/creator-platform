@@ -982,7 +982,20 @@ export const copy = {
   "introOfferSkippedPending": "Your choice is kept on this screen. Reconnect to finish dismissing this offer.",
   "introOfferUnavailable": "Your intro could not be saved. Your input is kept. Reconnect and try again.",
   "introOfferAckUnavailable": "This offer could not be dismissed. Reconnect and try again.",
-  "introOfferAcknowledging": "Finishing…"
+  "introOfferAcknowledging": "Finishing…",
+  "w5ContentStatus": "Content status",
+  "w5ContentCheckingAccess": "Checking current access. Your input is kept during a connection interruption.",
+  "w5ContentCheckCurrentAccess": "Check current access",
+  "w5ContentAccessUnavailable": "This content is unavailable. Check current access to try again.",
+  "w5ContentRefreshUnavailable": "Content could not be refreshed. Reconnect and check current access. Your input is kept.",
+  "w5ContentActionUnconfirmed": "We could not confirm this action. Check current access before retrying. Your input is kept.",
+  "w5ContentSessionEnded": "Your session ended. Continue with Pantopus again.",
+  "w5ContentAccountChanged": "The signed-in account changed. Refresh before continuing.",
+  "w5ContentChanged": "This changed while you were viewing it. Refresh before trying again.",
+  "w5ContentDuplicateChanged": "This retry differs from the earlier action. Refresh before trying again.",
+  "w5ContentReplyWithdrawn": "This reply was withdrawn. It cannot be shared again.",
+  "w5ContentFanProfileRequired": "Set up your fan profile before continuing.",
+  "w5ContentInvalidRequest": "Check your reply and sharing choices before trying again. Your input is kept."
 } as const;
 export type CopyKey = keyof typeof copy;
 type Placeholders<T extends string> = T extends `${string}{${infer Key}}${infer Rest}` ? Key | Placeholders<Rest> : never;

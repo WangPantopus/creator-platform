@@ -41,6 +41,8 @@ export type CurrentThanksTarget = (input: {
   fanAccountId: string;
   targetKind: string;
   targetId: string;
+  /** Propagates the real worker deadline; it cannot grant target access. */
+  signal?: AbortSignal;
 }) => Promise<boolean>;
 
 export type ContentFollowReaders = {
@@ -69,7 +71,13 @@ export function composeContentHost(input: {
     >;
     follows?: ContentFollowReaders;
   };
+  /** W7's actual canonical-core reader can remain on Content's held client
+   * while public projection uses a separately configured Growth API pool. */
+  followReaders?: ContentFollowReaders;
   paidAudienceCount?: NonNullable<ContentDependencies["audienceCount"]>;
+  /** Use W7's contentPublicProjection bound to this exact Content service.
+   * This producer is neither a recipient grant nor a background purpose. */
+  publicProjection?: NonNullable<ContentDependencies["effect"]>;
   publication?: ContentPublicationDependencies;
   publicationSource?: ContentDependencies["publicationSource"];
   packetRead?: {
@@ -85,6 +93,7 @@ export function composeContentHost(input: {
     throw new Error(
       "Content and Growth must share the configured runtime pool.",
     );
+  const follows = input.followReaders ?? input.growth?.follows;
   let content: ContentService | null = null;
   let sources: ContentSources | null = null;
   let projection: ReturnType<typeof contentPublicProjection> | null = null;
@@ -108,8 +117,8 @@ export function composeContentHost(input: {
           publicPacketRead: input.packetRead.read,
         }
       : {}),
-    ...(input.growth?.follows ? { follows: input.growth.follows.follows } : {}),
-    ...(input.growth?.follows?.count || input.paidAudienceCount
+    ...(follows ? { follows: follows.follows } : {}),
+    ...(follows?.count || input.paidAudienceCount
       ? {
           audienceCount: async (client, creatorId, audience) => {
             // W4's count is creator authoring metadata. A fan or Team view
@@ -121,7 +130,7 @@ export function composeContentHost(input: {
             if (owner.rows[0]?.owned !== true) return null;
             const reader =
               audience.kind === "followers"
-                ? input.growth?.follows?.count
+                ? follows?.count
                 : input.paidAudienceCount;
             const value = reader
               ? await reader(client, creatorId, audience)
@@ -165,8 +174,14 @@ export function composeContentHost(input: {
         );
         return { reference: `revoked:${effect.contentId}:${effect.version}` };
       }
-      if (["published", "withdrawn"].includes(effect.type))
-        return projection ? projection(actor, effect) : unavailable();
+      if (["published", "withdrawn"].includes(effect.type)) {
+        if (!content) return unavailable();
+        return projection
+          ? projection(actor, effect)
+          : input.publicProjection
+            ? input.publicProjection(actor, effect)
+            : unavailable();
+      }
       return input.dependencies.effect
         ? input.dependencies.effect(actor, effect)
         : unavailable();

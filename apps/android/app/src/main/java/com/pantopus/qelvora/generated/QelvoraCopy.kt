@@ -984,7 +984,20 @@ object QelvoraCopy {
     "introOfferSkippedPending" to "Your choice is kept on this screen. Reconnect to finish dismissing this offer.",
     "introOfferUnavailable" to "Your intro could not be saved. Your input is kept. Reconnect and try again.",
     "introOfferAckUnavailable" to "This offer could not be dismissed. Reconnect and try again.",
-    "introOfferAcknowledging" to "Finishing…"
+    "introOfferAcknowledging" to "Finishing…",
+    "w5ContentStatus" to "Content status",
+    "w5ContentCheckingAccess" to "Checking current access. Your input is kept during a connection interruption.",
+    "w5ContentCheckCurrentAccess" to "Check current access",
+    "w5ContentAccessUnavailable" to "This content is unavailable. Check current access to try again.",
+    "w5ContentRefreshUnavailable" to "Content could not be refreshed. Reconnect and check current access. Your input is kept.",
+    "w5ContentActionUnconfirmed" to "We could not confirm this action. Check current access before retrying. Your input is kept.",
+    "w5ContentSessionEnded" to "Your session ended. Continue with Pantopus again.",
+    "w5ContentAccountChanged" to "The signed-in account changed. Refresh before continuing.",
+    "w5ContentChanged" to "This changed while you were viewing it. Refresh before trying again.",
+    "w5ContentDuplicateChanged" to "This retry differs from the earlier action. Refresh before trying again.",
+    "w5ContentReplyWithdrawn" to "This reply was withdrawn. It cannot be shared again.",
+    "w5ContentFanProfileRequired" to "Set up your fan profile before continuing.",
+    "w5ContentInvalidRequest" to "Check your reply and sharing choices before trying again. Your input is kept."
   )
   private val variables = Regex("""\{([^}]+)\}""")
   fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }
