@@ -2,8 +2,41 @@
 -- and additive 0073 publication denial are required before canonical activation.
 -- No passwords, impersonated account/session, signing write or private fan grant.
 BEGIN;
-CREATE ROLE creator_publication_worker LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOBYPASSRLS;
-CREATE ROLE creator_publication_authority NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOBYPASSRLS;
+RESET ROLE;
+DO $$ DECLARE role_name text; login boolean; oid_value oid; relation text; BEGIN
+ FOR role_name,login IN VALUES ('creator_publication_worker',true),('creator_publication_authority',false) LOOP
+  IF NOT EXISTS(SELECT 1 FROM pg_roles WHERE rolname=role_name) THEN
+   EXECUTE format('CREATE ROLE %I %s NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOBYPASSRLS',role_name,CASE WHEN login THEN 'LOGIN' ELSE 'NOLOGIN' END);
+  END IF;
+  SELECT oid INTO oid_value FROM pg_roles WHERE rolname=role_name AND rolcanlogin=login
+   AND NOT rolsuper AND NOT rolcreatedb AND NOT rolcreaterole AND NOT rolinherit AND NOT rolbypassrls;
+  IF oid_value IS NULL OR EXISTS(SELECT 1 FROM pg_auth_members WHERE member=oid_value OR roleid=oid_value)
+   OR EXISTS(SELECT 1 FROM pg_namespace WHERE nspowner=oid_value)
+   OR EXISTS(SELECT 1 FROM pg_class WHERE relowner=oid_value)
+   OR EXISTS(SELECT 1 FROM pg_proc proc JOIN pg_namespace ns ON ns.oid=proc.pronamespace WHERE proc.proowner=oid_value AND
+    (role_name='creator_publication_worker' OR ns.nspname<>'creator' OR NOT(proc.oid=ANY(array_remove(ARRAY[
+      to_regprocedure('creator.publication_task_proof(uuid,uuid,integer,uuid,uuid,text,text,boolean)'),
+      to_regprocedure('creator.read_publication_task(uuid,uuid,integer,uuid,uuid)'),
+      to_regprocedure('creator.pending_publication_tasks(integer)'),
+      to_regprocedure('creator.begin_publication_scope(uuid,uuid,integer,uuid,uuid,text,text)'),
+      to_regprocedure('creator.publication_scope_matches(uuid,uuid,integer)'),
+      to_regprocedure('creator.end_publication_scope()')]::oid[],NULL))))) THEN
+   RAISE EXCEPTION 'Unsafe existing publication purpose role';
+  END IF;
+  FOREACH relation IN ARRAY ARRAY['thread','message','generation','memory','fan_profile','identity_session','access_grant'] LOOP
+   IF to_regclass('creator.'||relation) IS NOT NULL AND (
+    has_any_column_privilege(oid_value,to_regclass('creator.'||relation),'SELECT,INSERT,UPDATE,REFERENCES')
+    OR has_table_privilege(oid_value,to_regclass('creator.'||relation),'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')) THEN
+    RAISE EXCEPTION 'Publication purpose role has private participant privileges';
+   END IF;
+  END LOOP;
+  IF to_regclass('creator.passkey_credential') IS NOT NULL AND has_column_privilege(oid_value,'creator.passkey_credential','public_key','SELECT')
+   OR to_regclass('creator.signed_act') IS NOT NULL AND (
+    has_column_privilege(oid_value,'creator.signed_act','assertion','SELECT') OR has_column_privilege(oid_value,'creator.signed_act','challenge','SELECT')) THEN
+   RAISE EXCEPTION 'Publication purpose role has signing secret privileges';
+  END IF;
+ END LOOP;
+END $$;
 GRANT USAGE ON SCHEMA creator,creator_trust TO creator_publication_worker,creator_publication_authority;
 SET LOCAL ROLE creator_owner;
 

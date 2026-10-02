@@ -240,7 +240,7 @@ public struct FanAppShell: View {
                 while !Task.isCancelled {
                     do { try await Task.sleep(for: .seconds(4)) } catch { return }
                     guard !Task.isCancelled else { return }
-                    if model.session != nil { await model.refresh() }
+                    if !model.busy && !model.choosingDevelopmentActor { await model.refresh() }
                 }
             }
             .task(id: model.destination + destinationDelivery.uuidString) { await model.loadArrival() }
@@ -262,7 +262,14 @@ public struct FanAppShell: View {
                 if ApplicationDestination.isPermitted(target) { destinationDelivery = UUID() }
             }
     }
-    private var tab: FanTab { FanTab.allCases.first(where: { model.destination.components(separatedBy: "?")[0] == "/" + $0.rawValue.lowercased() }) ?? .home }
+    private var tab: FanTab {
+        let path = model.destination.components(separatedBy: "?")[0]
+        if path.hasPrefix("/identity/") || path == "/support" || path.hasPrefix("/support/") || path == "/notifications/settings" { return .you }
+        return FanTab.allCases.first { tab in
+            let root = "/" + tab.rawValue.lowercased()
+            return path == root || path.hasPrefix(root + "/")
+        } ?? .home
+    }
 }
 
 struct NativeHandleForm: View {

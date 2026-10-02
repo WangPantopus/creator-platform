@@ -73,6 +73,12 @@ try {
             });
             const contentDependencies = {
               assertAllowed: runtime.assertCreatorAllowed,
+              ...(runtime.assertContentAllowedInTransaction
+                ? {
+                    assertAllowedInTransaction:
+                      runtime.assertContentAllowedInTransaction,
+                  }
+                : {}),
               follows: async (
                 ...args: Parameters<
                   NonNullable<

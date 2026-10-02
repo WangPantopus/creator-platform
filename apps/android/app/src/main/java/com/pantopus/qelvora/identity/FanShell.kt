@@ -212,7 +212,10 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                     else Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) { BasicText("This destination is not connected yet", style = qText("title").copy(color = qColor("ink"))); BasicText("Your account and arrival context are kept.", style = qText("body").copy(color = qColor("ink-muted"))); Button("Your account", ButtonVariant.SECONDARY) { model.destination = "/you" } }
                 }
                 val labels = listOf("navHome" to "/home", "navDiscover" to "/discover", "navRequests" to "/requests", "navYou" to "/you")
-                TabBar(labels.firstOrNull { it.second == model.destination.substringBefore('?') }?.let { QelvoraCopy.text(it.first) } ?: QelvoraCopy.text("navHome")) { label -> model.destination = labels.first { QelvoraCopy.text(it.first) == label }.second }
+                val path = model.destination.substringBefore('?')
+                val accountDestination = path.startsWith("/identity/") || path == "/support" || path.startsWith("/support/") || path == "/notifications/settings"
+                val selectedTab = if (accountDestination) "navYou" else labels.firstOrNull { path == it.second || path.startsWith(it.second + "/") }?.first ?: "navHome"
+                TabBar(QelvoraCopy.text(selectedTab)) { label -> model.destination = labels.first { QelvoraCopy.text(it.first) == label }.second }
             }
         }
     }
