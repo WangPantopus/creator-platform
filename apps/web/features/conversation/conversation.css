@@ -232,7 +232,7 @@
   font: 24px/28px var(--font-mono);
 }
 .conversation-you nav a {
-  padding: 10px 16px;
+  padding: 7px 16px;
 }
 .account-row-label {
   display: flex;

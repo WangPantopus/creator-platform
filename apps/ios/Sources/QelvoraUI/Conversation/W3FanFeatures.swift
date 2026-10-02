@@ -445,7 +445,7 @@ private struct W3AccountScreen: View {
                     Text(detail).qText("caption").foregroundStyle(qColor("ink-muted", scheme))
                 }.frame(maxWidth: .infinity, alignment: .leading)
                 QelvoraGlyph(name: "chevron", size: 16).accessibilityHidden(true)
-            }.padding(.horizontal, 16).padding(.vertical, 10).frame(minHeight: 56)
+            }.padding(.horizontal, 16).padding(.vertical, 7).frame(minHeight: 56)
                 .contentShape(Rectangle())
         }.buttonStyle(.plain).accessibilityElement(children: .combine)
     }
