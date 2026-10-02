@@ -45,6 +45,10 @@ import {
 } from "./audience.js";
 import { CommerceVoiceFulfillment } from "./voice-fulfillment.js";
 import { createCommerceTenureReader, type TenureAuthority } from "./tenure.js";
+import {
+  createCommercePublicPacketHost,
+  type CommercePublicPacketConfiguration,
+} from "./public-packet-host.js";
 
 /** W1's configured-host seam consumes this graph. Providers and economics are
  * explicit injected dependencies; configuring a payment key cannot enable AI. */
@@ -79,6 +83,7 @@ export async function createCommerceRuntime(input: {
   /** W3's actual prepared exact association and W6 recording reader. */
   voiceRecordings?: import("../conversation/recordings.js").ConversationRecordings;
   qualifiedReads?: QualifiedReadAuthority;
+  publicPacketRead?: CommercePublicPacketConfiguration;
   tierCatalog?: TierCatalog;
   pass?: (service: CommerceService) => import("./pass.js").PassCommerce;
   passPurchases?: (
@@ -220,6 +225,18 @@ export async function createCommerceRuntime(input: {
     input.qualifiedReads,
     paidCoverage,
   );
+  if (input.publicPacketRead)
+    invariant(
+      input.database.pool === input.pool,
+      "public_packet_host_mismatch",
+      "Public request viewing must share the canonical runtime pool.",
+    );
+  const publicPacketRead = input.publicPacketRead
+    ? await createCommercePublicPacketHost({
+        ...input.publicPacketRead,
+        database: input.database,
+      })
+    : undefined;
   return {
     ...(poolJournal && poolSettlement ? { poolJournal, poolSettlement } : {}),
     ...(generationAllowance ? { allowance: generationAllowance } : {}),
@@ -227,6 +244,7 @@ export async function createCommerceRuntime(input: {
     billing,
     extended,
     paidAudienceCount,
+    publicPacketRead,
     currentTenure: input.tenureAuthority
       ? createCommerceTenureReader(input.tenureAuthority, paidCoverage)
       : undefined,

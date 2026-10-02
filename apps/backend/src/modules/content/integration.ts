@@ -66,6 +66,13 @@ export function composeContentHost(input: {
     follows?: ContentFollowReaders;
   };
   paidAudienceCount?: NonNullable<ContentDependencies["audienceCount"]>;
+  packetRead?: {
+    prepare: NonNullable<ContentDependencies["preparePublicPacketRead"]>;
+    preparePositive: NonNullable<
+      ContentDependencies["preparePublicPacketReadPositive"]
+    >;
+    read: NonNullable<ContentDependencies["publicPacketRead"]>;
+  };
   assertScopeAllowedInTransaction?: import("../access/scope.js").ScopeRestrictionInTransaction;
 }) {
   if (input.growth && input.growth.service.db.runtime !== input.pool)
@@ -85,10 +92,24 @@ export function composeContentHost(input: {
   const dependencies: ContentDependencies &
     Required<Pick<ContentDependencies, "assertAllowed">> = {
     ...input.dependencies,
+    ...(input.packetRead
+      ? {
+          preparePublicPacketRead: input.packetRead.prepare,
+          preparePublicPacketReadPositive: input.packetRead.preparePositive,
+          publicPacketRead: input.packetRead.read,
+        }
+      : {}),
     ...(input.growth?.follows ? { follows: input.growth.follows.follows } : {}),
     ...(input.growth?.follows?.count || input.paidAudienceCount
       ? {
           audienceCount: async (client, creatorId, audience) => {
+            // W4's count is creator authoring metadata. A fan or Team view
+            // must neither call that owner-only port nor substitute its owner.
+            const owner = await client.query<{ owned: boolean }>(
+              "SELECT account_id=nullif(current_setting('app.account_id',true),'')::uuid AS owned FROM creator.creator_profile WHERE id=$1",
+              [creatorId],
+            );
+            if (owner.rows[0]?.owned !== true) return null;
             const reader =
               audience.kind === "followers"
                 ? input.growth?.follows?.count
