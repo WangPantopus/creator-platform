@@ -73,7 +73,7 @@ export interface ConversationPrivacyAuthority {
   families(job: Job): Promise<readonly ConversationPrivacyFamily[]>;
   /** W8's actual task lock and deferred commit-currentness check, on this same
    * held domain client and before family locks. No separate-pool substitute. */
-  fenceTaskInTransaction?(client: PoolClient, job: Job): Promise<void>;
+  fenceTaskInTransaction(client: PoolClient, job: Job): Promise<void>;
   assertFamily(
     client: PoolClient,
     job: Job,
@@ -85,15 +85,15 @@ export async function fenceConversationPrivacyTask(
   client: PoolClient,
   job: Job,
 ) {
-  if (!authority.fenceTaskInTransaction)
+  if (!authority.fenceTaskInTransaction || !job.signal)
     throw new DomainError(
       "privacy_commit_fence_unavailable",
       "This data request needs the actual held task-lease commit barrier.",
       503,
     );
-  job.signal?.throwIfAborted();
+  job.signal.throwIfAborted();
   await authority.fenceTaskInTransaction(client, job);
-  job.signal?.throwIfAborted();
+  job.signal.throwIfAborted();
 }
 export interface ConversationPrivacyRetention {
   retainedMessages(
@@ -206,6 +206,14 @@ export function conversationPrivacyHook(
           stream: conversationPrivacyExportStream(input, job, families, signal),
         };
       const client = await input.pool.connect();
+      let released = false;
+      const abort = () => {
+        if (!released) {
+          released = true;
+          client.release(true);
+        }
+      };
+      signal.addEventListener("abort", abort, { once: true });
       const accountingReceipts: Record<string, unknown>[] = [];
       const financialDispositions: {
         threadId: string;
@@ -487,10 +495,11 @@ export function conversationPrivacyHook(
           signal.throwIfAborted();
           await input.authority.assertFamily(client, job, family);
         }
-        // Empty verified scopes still require a current actual task.
-        if (!families.length) await input.authority.families(job);
+        // This client's actual task remains current even for an empty family set.
+        await fenceConversationPrivacyTask(input.authority, client, job);
         signal.throwIfAborted();
         await client.query("COMMIT");
+        signal.throwIfAborted();
         return {
           receipt: {
             schemaVersion: 1,
@@ -505,10 +514,14 @@ export function conversationPrivacyHook(
           retained,
         };
       } catch (error) {
-        await client.query("ROLLBACK");
+        if (!released) await client.query("ROLLBACK").catch(() => undefined);
         throw error;
       } finally {
-        client.release();
+        signal.removeEventListener("abort", abort);
+        if (!released) {
+          released = true;
+          client.release();
+        }
       }
     },
   };
