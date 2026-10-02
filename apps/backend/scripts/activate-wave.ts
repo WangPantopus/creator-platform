@@ -15,6 +15,10 @@ import {
   waveDataDigest,
   waveRoleCustody,
 } from "./migration-wave-custody.js";
+import {
+  assertWaveRoleSafety,
+  WaveRoleSafetyError,
+} from "./migration-wave-roles.js";
 
 type Source = { version: string; path: string; checksum: string };
 type Packet = {
@@ -173,6 +177,12 @@ async function activate() {
       "Stop all other clients on the closed target before rollout.",
     );
     const before = await readLedger(client);
+    await assertWaveRoleSafety(client, {
+      trust: before.some(
+        (r) => r.version === "0053_w8_runtime_denial_projection",
+      ),
+      media: before.some((r) => r.version === "0062_w6_creator_media_worker"),
+    });
     const tables = await waveDataTables(client);
     const beforeData = await waveDataDigest(client, tables);
     const beforeRoles = await waveRoleCustody(client);
@@ -233,6 +243,10 @@ async function activate() {
     const after = await readLedger(client);
     const afterData = await waveDataDigest(client, tables);
     const afterRoles = await waveRoleCustody(client);
+    const roleSafety = await assertWaveRoleSafety(client, {
+      trust: true,
+      media: true,
+    });
     check(
       afterData.sha256 === beforeData.sha256 &&
         afterData.rows === beforeData.rows,
@@ -274,6 +288,7 @@ async function activate() {
         originalRows: beforeData.rows,
         originalTables: beforeData.tables,
         oldRolesPreserved: true,
+        roleSafety,
         afterSchemaSha256,
         trafficClosed: true,
         releaseReady: false,
@@ -295,7 +310,7 @@ activate().catch((error) => {
   // PostgreSQL detail can contain private row values. Expose only safe operator
   // diagnostics, never the raw error, SQL, URL, backup or source records.
   process.stderr.write(
-    error instanceof Preflight
+    error instanceof Preflight || error instanceof WaveRoleSafetyError
       ? error.message + "\n"
       : `Migration wave failed (${typeof error?.code === "string" ? error.code : "operator_error"}); transaction not accepted.\n`,
   );

@@ -471,9 +471,19 @@
       "id": "0080",
       "owner": "W4",
       "version": "0080_w4_fan_request_page_index",
-      "path": "apps/backend/src/modules/commerce/schema-fan-request-page-index.sql",
+      "path": "apps/backend/src/modules/commerce/schema-home-request-metadata.sql",
       "state": "reserved_unapplied",
-      "reason": "Allocated for metadata-only commerce_packet(fan_id,updated_at DESC,id DESC) keyset paging; exact source review pending."
+      "reason": "Allocated for metadata-only commerce_packet(fan_id,updated_at DESC,id DESC) keyset paging; exact source review pending.",
+      "sourceCommit": "3fc7040a",
+      "sourceSha256": "4af3abb0065e69565a45da5309e0963774bb17dbebadeed70de6236ad23c436e"
+    },
+    {
+      "id": "0081",
+      "owner": "W1",
+      "version": "0081_w1_signature_read_fence",
+      "path": "apps/backend/src/modules/identity/schema-signature-read-fence.sql",
+      "state": "reserved_unapplied",
+      "reason": "Allocated for actual shared signature read and withdrawal fences; exact source/security/integration review pending."
     }
   ]
 }
