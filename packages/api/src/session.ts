@@ -173,6 +173,8 @@ export type CallSession = {
   consents: SessionConsent[];
   outcome: SessionOutcome | null;
   reconciliation: "pending" | "complete" | "blocked";
+  /** Actual creator takeover bound to this call, never a worker/control grant. */
+  conversationEpoch?: number;
   packet: { summary: string; attachmentIds: string[] };
   summary: string | null;
   creatorSummaryNote?: string;
