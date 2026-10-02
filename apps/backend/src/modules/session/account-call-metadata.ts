@@ -22,6 +22,7 @@ import {
 } from "./call-metadata-catalog.js";
 
 const issued = new WeakSet<AccountCallMetadata>();
+const factoryToken = Symbol("AccountCallMetadataFactory");
 const Tuple = z.strictObject({
   session_id: z.uuid(),
   creator_id: z.uuid(),
@@ -52,7 +53,13 @@ export class AccountCallMetadata {
   private constructor(
     private readonly runtime: BackendRuntime,
     private readonly migration: CallMetadataMigration,
+    token: symbol,
   ) {
+    invariant(
+      token === factoryToken && isConfiguredBackendRuntime(runtime),
+      "call_metadata_unconfigured",
+      "Call recovery requires its original prepared host.",
+    );
     issued.add(this);
   }
   static async prepare(
@@ -76,7 +83,7 @@ export class AccountCallMetadata {
       await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
       await assertCallMetadataCatalog(client, migration);
       await client.query("ROLLBACK");
-      return new AccountCallMetadata(runtime, migration);
+      return new AccountCallMetadata(runtime, migration, factoryToken);
     } catch (error) {
       await client.query("ROLLBACK");
       if (
