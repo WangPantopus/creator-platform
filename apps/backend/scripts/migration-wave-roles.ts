@@ -76,7 +76,12 @@ const workerColumns = [
  * Run inside the caller's transaction with the fixed PG17 catalog path. */
 export async function assertWaveRoleSafety(
   client: PoolClient,
-  installed: { trust: boolean; media: boolean },
+  installed: {
+    trust: boolean;
+    media: boolean;
+    content?: boolean;
+    interactive?: boolean;
+  },
 ) {
   const fail = (role: string): never => {
     throw new WaveRoleSafetyError(
@@ -134,7 +139,56 @@ export async function assertWaveRoleSafety(
     ).rows[0]?.major !== pins.postgresMajor
   )
     fail("PostgreSQL17 required");
-  const expected = pins.functions.filter((f) =>
+  if (
+    (installed.content && !installed.trust) ||
+    (installed.interactive && !installed.content)
+  )
+    fail("continuation dependency order");
+  const additions = JSON.parse(
+    await readFile(
+      new URL(
+        "infra/migrations/waves/20261002-privacy-roles.json",
+        repositoryRoot,
+      ),
+      "utf8",
+    ),
+  ) as typeof pins;
+  if (
+    additions.schemaVersion !== 1 ||
+    additions.postgresMajor !== 17 ||
+    additions.sourceWave !== "20261002-privacy" ||
+    additions.functions.length !== 3
+  )
+    fail("continuation function packet");
+  for (const source of [
+    {
+      installed: installed.content,
+      path: "apps/backend/migrations/0074_w8_content_runtime_denial.sql",
+      checksum:
+        "61866894c579039cfc2bf11522edeaf46fa03bd51761cca3791ab3471fb9b2f3",
+    },
+    {
+      installed: installed.interactive,
+      path: "apps/backend/migrations/0082_w8_interactive_denial_try_fence.sql",
+      checksum:
+        "3742b1e6b7f367ca626176615c5362ecf002fe5fcc5a96ea941d35a4708e8686",
+    },
+  ]) {
+    if (
+      source.installed &&
+      sha256(await readFile(new URL(source.path, repositoryRoot))) !==
+        source.checksum
+    )
+      fail("immutable continuation source");
+  }
+  const expected = [
+    ...pins.functions,
+    ...additions.functions.filter((f) =>
+      f.name === "creator_trust.runtime_content_denial(uuid)"
+        ? installed.content
+        : installed.interactive,
+    ),
+  ].filter((f) =>
     f.owner === "creator_trust_denial" ? installed.trust : installed.media,
   );
   const functions = (
@@ -207,7 +261,19 @@ export async function assertWaveRoleSafety(
         allowed = Boolean(
           (c.role === "creator_trust_denial" &&
             installed.trust &&
-            metadata[c.object]?.includes(c.column)) ||
+            (metadata[c.object]?.includes(c.column) ||
+              (installed.content &&
+                ((c.object === "creator.identity_session" &&
+                  ["id", "account_id", "expires_at", "revoked_at"].includes(
+                    c.column,
+                  )) ||
+                  (c.object === "creator.team_membership" &&
+                    [
+                      "creator_id",
+                      "account_id",
+                      "roles",
+                      "revoked_at",
+                    ].includes(c.column)))))) ||
             (c.role === "creator_media_discovery" &&
               installed.media &&
               discovery[c.object]?.includes(c.column)),
@@ -226,6 +292,27 @@ export async function assertWaveRoleSafety(
       }
     }
     if (!allowed) fail(c.role);
+  }
+  if (installed.content) {
+    const policies = (
+      await client.query<{
+        relation: string;
+        expression: string;
+        safe: boolean;
+      }>(
+        `SELECT c.relname AS relation,pg_get_expr(p.polqual,p.polrelid) AS expression,
+        p.polcmd='r' AND p.polpermissive AND p.polwithcheck IS NULL
+        AND p.polroles=ARRAY[(SELECT oid FROM pg_roles WHERE rolname='creator_trust_denial')] AS safe
+      FROM pg_policy p JOIN pg_class c ON c.oid=p.polrelid JOIN pg_namespace n ON n.oid=c.relnamespace
+      WHERE n.nspname='creator' AND c.relname IN('identity_session','team_membership')
+        AND (SELECT oid FROM pg_roles WHERE rolname='creator_trust_denial')=ANY(p.polroles)`,
+      )
+    ).rows;
+    if (
+      policies.length !== 2 ||
+      policies.some((p) => !p.safe || p.expression !== "true")
+    )
+      fail("content denial metadata policies");
   }
   const publicCapabilities = (
     await client.query<{
