@@ -33,8 +33,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
   web-visual:
-    # Match the macOS26/Intel environment used to verify the preserved images.
-    runs-on: macos-26-intel
+    # The preserved source baselines pass on macOS27/arm64; macOS26/Intel
+    # now rasterizes two text-edge pixels differently. Keep exact comparisons.
+    runs-on: xcode-27
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
@@ -44,6 +45,11 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install chromium
+      - name: Record visual capture environment
+        run: |
+          sw_vers
+          uname -m
+          pnpm exec playwright --version
       - run: pnpm test:visual
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
