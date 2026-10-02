@@ -1,6 +1,7 @@
 -- W8 custody: 0049_w4_generation_cost_settlement, reserved_unapplied at3240da0.
 -- Additive proposal; canonical registration/checksum and installation are separate.
 BEGIN;
+SET LOCAL ROLE creator_owner;
 ALTER TABLE creator.commerce_allowance_reservation
  ADD COLUMN cost_policy_version text,
  ADD COLUMN settled_units integer,
