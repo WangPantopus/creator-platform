@@ -760,6 +760,17 @@
         }
       }
     },
+    "Reply unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reply unavailable"
+          }
+        }
+      }
+    },
     "Unreviewed development policy": {
       "extractionState": "manual",
       "localizations": {
