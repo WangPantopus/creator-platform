@@ -1,3 +1,5 @@
+**Current continuation, October 2, 2026:** [Read the current Mac Studio handoff](W3-mac-studio-2026-10-02.md) before using the runtime or policy values below. The original database is closed; the current labelled synthetic copy has 57 migrations and the provider remains unapproved. The rest of this file is dated October 1 history.
+
 # W3 handoff — Mac Studio continuation, October 1, 2026
 
 This supersedes the iMac/Codex handoffs ([W3-resume-2026-10-01.md](W3-resume-2026-10-01.md) and its prompt) for **where and how** to continue. Their scope, standards and historical evidence still apply. W3 is **not complete**.
