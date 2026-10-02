@@ -5,6 +5,7 @@ import { canonical } from "../../core/canonical.js";
 import {
   Destination,
   EventEnvelope,
+  StoredEventEnvelope,
   Preferences,
   defaultPreferences,
   type GrowthEvent,
@@ -15,6 +16,13 @@ import {
 } from "./contracts.js";
 import type { GrowthDatabase } from "./database.js";
 import type { GrowthErasure } from "./erasure.js";
+import { requireAccountNotificationSchema } from "./account-notifications.js";
+import {
+  interactiveNotificationCustody,
+  leasedNotificationCustody,
+  type NotificationReadCustody,
+} from "./notification-custody.js";
+import type { Actor } from "../identity/adapter.js";
 
 const authorKinds: Record<
   NotificationKind,
@@ -216,8 +224,10 @@ export class Notifications {
     private readonly erasure: GrowthErasure,
     private readonly provider?: DeliveryProvider,
   ) {}
-  async consume(input: unknown) {
+  async consume(input: unknown, custody?: NotificationReadCustody) {
     const event = EventEnvelope.parse(input);
+    if (event.creatorId === null)
+      await requireAccountNotificationSchema(this.db.worker);
     const envelopeHash = createHash("sha256")
       .update(canonical(event))
       .digest("hex");
@@ -225,7 +235,7 @@ export class Notifications {
     const states = await Promise.all(
       event.recipients.map(async (recipient) => ({
         recipient,
-        state: await this.owners.notificationState(event, recipient),
+        state: await this.owners.notificationState(event, recipient, custody),
       })),
     );
     if (states.some(({ state }) => state.retryable))
@@ -330,7 +340,7 @@ export class Notifications {
         );
         const notification = result.rows[0];
         if (!notification) throw new DeliveryFailure(1);
-        const event = EventEnvelope.parse(notification.envelope);
+        const event = StoredEventEnvelope.parse(notification.envelope);
         const prepared = await this.prepareDelivery(
           [job],
           [event],
@@ -436,7 +446,7 @@ export class Notifications {
             )
           ).rows[0];
           if (!row) throw new DeliveryFailure(1);
-          events.push(EventEnvelope.parse(row.envelope));
+          events.push(StoredEventEnvelope.parse(row.envelope));
         }
         const prepared = await this.prepareDelivery(
           jobs,
@@ -516,7 +526,17 @@ export class Notifications {
         views.push(null);
         continue;
       }
-      const state = await this.owners.notificationState(event, recipient);
+      const state = await this.owners.notificationState(
+        event,
+        recipient,
+        event.creatorId === null
+          ? leasedNotificationCustody(this.db, this.erasure, event, accountId, {
+              kind: "delivery",
+              id: jobs[index]!.id,
+              leaseId,
+            })
+          : undefined,
+      );
       if (state.retryable) throw new Error("notification_owner_unconfigured");
       views.push(
         state.available &&
@@ -559,7 +579,8 @@ export class Notifications {
           !view ||
           !retained?.recipients.some((r) => r.accountId === accountId) ||
           !preferences[channel] ||
-          preferences.mutedCreators.includes(event.creatorId) ||
+          (event.creatorId !== null &&
+            preferences.mutedCreators.includes(event.creatorId)) ||
           disabled.includes(event.type)
         ) {
           await client.query(
@@ -599,6 +620,7 @@ export class Notifications {
       read_at: string | null;
       created_at: string;
     }[],
+    actor: Actor,
   ) {
     const output = [];
     const envelopes = (
@@ -611,12 +633,16 @@ export class Notifications {
     for (const row of rows) {
       const raw = byId.get(row.event_id);
       if (!raw) continue;
-      const event = EventEnvelope.parse(raw);
+      const event = StoredEventEnvelope.parse(raw);
       const recipient = event.recipients.find(
         (r) => r.accountId === row.account_id,
       );
       if (!recipient) continue;
-      const state = await this.owners.notificationState(event, recipient);
+      const state = await this.owners.notificationState(
+        event,
+        recipient,
+        interactiveNotificationCustody(this.db, actor, row.id, event),
+      );
       if (state.retryable)
         throw new DomainError(
           "notification_owner_unconfigured",

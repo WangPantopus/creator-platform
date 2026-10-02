@@ -126,7 +126,7 @@
     "nativeProcessesRunning": false
   },
   "currentHost": {
-    "recordedAt": "2026-10-02T09:34:27.530773+00:00",
+    "recordedAt": "2026-10-02T10:49:33.884282+00:00",
     "note": "W7 moved from the old iMac (Intel, macOS 26, Xcode 26.5) to Yingpeng's Mac Studio (Apple M2 Max, macOS 27.0 26A428, Xcode 27.0 27A266a, iOS 27.0 simulator runtime). Every iMac-era resource listed elsewhere in this file (container creator-platform-w7-document-20261001, simulator CE855FD5-A4AA-4C62-A63B-5E80D2E1DFF1, /private/tmp/creator-platform-w7-completion-20261001 caches, ~/.config/creator-platform/{secrets,cleanup-20261001,w7-completion-20261001}) is absent from this machine and was not copied. Those entries are historical iMac custody only.",
     "checkout": "/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545",
     "postgres": {
@@ -136,35 +136,33 @@
       "address": "127.0.0.1:55447",
       "database": "creator_w7",
       "superuserPasswordFile": "~/.config/creator-platform/w7-macstudio-20261001/pg-superuser-password (mode 0600, never printed)",
-      "state": "Running;40 active migrations through0043, separated nonowner roles; actual UI created one fan w7_studio_fan and one optional usefulness feedback row.0 creator/verified public rows. No pending migration activated.",
+      "state": "Stopped normally;40 active migrations through0043; separated nonowner roles; actual UI one fan/one optional feedback,0 verified creators. No pending schema applied.",
       "recoveredIMacData": "not restored; the iMac backup holds 0 creators/relationships/shares and is not on this machine"
     },
     "reservedPorts": {
       "api": 4107,
       "web": 3007,
-      "note": "Owned API4107 PID34841/session10018; development web3007 PID72333/session15471. Native devices and leases stopped/released. Verify listeners before reuse."
+      "note": "W7 API/web normally stopped after actual acceptance; owned devices and exact leases stopped/released. Verify ports and current compiled source before reusing."
     },
     "iosSimulator": {
       "name": "Qelvora W7 iPhone 16e",
       "udid": "FAB31883-2F36-4E50-83B3-D9654B60FF00",
       "runtime": "iOS 27.0",
       "points": "390x844",
-      "state": "Shipping signed dylib52417387 personally operated cold Light/cold Night/warm ID unavailable; real sign-out→cold ID→development sign-in preserves ID; reads web-saved22:30/08:15/AmericaLosAngeles. App terminated/simulator shut down; exact slot3 UUID/inode released; own idb55076 stopped; app data retained."
+      "state": "Stopped normally; signed account-copy shipping dylib fdd1fe5d installed and actual saved Settings/Home\u2192Notifications observed. Exact slot1 released. Populated/provider/privacy acceptance remains open."
     },
     "androidAvd": {
       "name": "Qelvora_W7_API34",
       "image": "system-images;android-34;google_apis;arm64-v8a",
       "display": "1170x2532 @480dpi = 390x844 dp",
-      "state": "Shipping APK28012bd9 personally operated same notification-ID recovery/sign-out/cold/sign-in and cross-client saved22:30/08:15 settings; default-off providers. Own emulator5580 normally stopped and exact slot1 UUID/inode released; app data retained."
+      "state": "Stopped normally; shipping APK01754237 installed and actual Home action200% Light/Night, Notifications and saved Settings observed. Own font scale restored1.0; exact slot2 released. Shared Requests wrap preserved pending reviewed W1 source integration."
     },
     "swiftBuildScratch": "/private/tmp/claude-501/... session scratchpad (disposable; not a dependency)",
     "sharedMachineBudget": "Adopted W1's 2026-10-01 budget: one heavy native build machine-wide via mkdir /private/tmp/creator-platform-heavy-build.lock (+owner file); at most two creator-platform emulators via /private/tmp/creator-platform-emulator-slot-{1,2}; at most three booted simulators via /private/tmp/creator-platform-simulator-slot-{1,2,3}; explicit UDID/serial only. Three earlier local swift test passes in this session ran before the budget message.",
     "peerResourcesObserved": "W1 55441/4101-range, W2 55442 and 55449, W3 55443, W4 55444, W5 55435/API 4105/web 3005, W6 55446, W8 55438 and 55439/web 3008/API 4108; peer simulators and emulators were never touched.",
     "privateConfigurationDirectory": "~/.config/creator-platform/w7-macstudio-20261001",
     "environmentFiles": {
-      "migration.env": [
-        "DATABASE_MIGRATION_URL"
-      ],
+      "migration.env": ["DATABASE_MIGRATION_URL"],
       "runtime.env": [
         "NODE_ENV",
         "PORT",
@@ -185,18 +183,20 @@
       "roles.private.json": "fresh private API/worker passwords; files0600; no values logged or committed",
       "runtime-before-pool-split.env": "Private0600 recovery copy only; never print/commit/upload values"
     },
-    "nativeBuild": "Signed shipping iOS build and Android assemble/testDebugUnitTest/verifyPaparazziDebug pass. Original18 Swift checks/110 comparisons pass after first heavy-slot busy refusal. No W7 native build/device/GUI/lease held. No new test/ref/tolerance.",
+    "nativeBuild": "Signed shipping iOS and Android shipping/original checks pass; actual clients Settings and navigation observed, Android Home action200% Light/Night. Original18 Swift/110 comparisons pass. Both own devices normally stopped, exact UUID/inode leases released; companion stopped. No new tests/references/tolerances.",
     "api": {
-      "pid": 34841,
-      "session": 10018,
-      "source": "099c7c53 plus exact provider-lock receipt source hashes; restarted after personally reviewed main66dfb1ee",
-      "log": "/private/tmp/creator-platform-w7-active-20261001/provider-lock-api.log"
+      "source": "2dceb35e plus reviewed account boundary; last tiny creator-delivery custody selection edit not yet restarted",
+      "log": "/private/tmp/creator-platform-w7-active-20261001/account-notification-api-reviewed.log",
+      "lastPid": 44633,
+      "lastSession": 25014,
+      "state": "Stopped normally after actual native/web acceptance. Tiny final creator-delivery custody selection source edit compiled/reviewed; its positive affected provider path remains externally blocked."
     },
     "web": {
-      "pid": 72333,
-      "session": 15471,
-      "mode": "Next development, explicit real loopback development identity, .next-w7-notification-dev",
-      "productionBuild": "Shipping production .next-w7-notification-20261002 built and launched PID63140/session73421; signed-out notification ID survives sign-in entry. Normally stopped for actual development save/reload. First env-file worker failure preserved; corrected environment loading passes. Authenticated production needs approved HTTPS."
+      "mode": "Shipping production .next-w7-account-20261002, loopback3007",
+      "acceptance": "Personally observed signed-out settings and retained destination at sign-in entry; actual editable rejection/save/reload verified separately with development identity; approved HTTPS needed for authenticated production",
+      "lastPid": 38871,
+      "lastParentSession": 91059,
+      "state": "Stopped normally after production signed-out destination operation; production build retained."
     },
     "pushConfiguration": {
       "CreatorPushEnabled": false,
@@ -211,6 +211,7 @@
       "growthAPI": "w7_api direct LOGIN, INHERIT, only creator_runtime+growth_runtime, no worker",
       "growthWorker": "growth_worker direct LOGIN, NOINHERIT",
       "realCoreAndGrowthReadiness": "passed; protected trust/purpose authorities remain unconfigured"
-    }
+    },
+    "accountNotifications": "Unregistered pending SQL and owner port; actual40-migration catalogue refuses503. No allowed W7 slot free, no migration above0060 activated, no purpose/Actor/provider fabricated."
   }
 }

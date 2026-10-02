@@ -9801,6 +9801,17 @@
           }
         }
       }
+    },
+    "You've reached {percent}% of your monthly limit.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You've reached {percent}% of your monthly limit."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

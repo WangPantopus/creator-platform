@@ -1,6 +1,7 @@
 import { copy } from "@qelvora/copy";
 import { z } from "zod";
 import type { Actor } from "../identity/adapter.js";
+import type { NotificationReadCustody } from "./notification-custody.js";
 
 export const notificationTypes = [
   "ai_reply",
@@ -31,16 +32,19 @@ export const Destination = z
   .regex(
     /^\/(?:creators\/[a-z0-9_-]+(?:\/(?:posts\/[a-f0-9-]+|chat(?:\?context=[a-f0-9-]+)?))?|commerce\/(?:requests|spending|status\?packetId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})|requests\/[a-f0-9-]+|calls\/[a-f0-9-]{36}\/[a-f0-9-]{36}\/[a-f0-9-]{36}|notifications|studio\/(?:impact|insights)|you(?:\/spending)?|share\/[a-f0-9-]+)$/u,
   );
-export const EventEnvelope = z.strictObject({
+const EventFields = {
   id: z.uuid(),
-  schemaVersion: z.literal(1),
-  type: NotificationType,
-  creatorId: z.uuid(),
   aggregateId: z.uuid(),
   aggregateVersion: z.int().positive(),
   causationId: z.uuid(),
   correlationId: z.uuid(),
   occurredAt: z.iso.datetime(),
+};
+export const CreatorEventEnvelope = z.strictObject({
+  ...EventFields,
+  schemaVersion: z.literal(1),
+  type: NotificationType.exclude(["spending_reminder"]),
+  creatorId: z.uuid(),
   recipients: z
     .array(
       z.strictObject({
@@ -51,7 +55,32 @@ export const EventEnvelope = z.strictObject({
     .min(1)
     .max(500),
 });
-export type GrowthEvent = z.infer<typeof EventEnvelope>;
+/** Portfolio-wide reminders belong to the actual fan account, never a made-up creator. */
+export const SpendingEventEnvelope = z
+  .strictObject({
+    ...EventFields,
+    schemaVersion: z.literal(2),
+    type: z.literal("spending_reminder"),
+    creatorId: z.null(),
+    accountId: z.uuid(),
+    recipients: z
+      .array(z.strictObject({ accountId: z.uuid(), role: z.literal("fan") }))
+      .length(1),
+  })
+  .refine((event) => event.recipients[0]!.accountId === event.accountId, {
+    message: "Spending reminders require the exact account recipient",
+  });
+export const EventEnvelope = z.union([
+  CreatorEventEnvelope,
+  SpendingEventEnvelope,
+]);
+/** Read existing v1 spending rows without accepting any new creator-scoped
+ * spending producer. Their former creator cannot authorize portfolio data. */
+export const StoredEventEnvelope = z.union([
+  CreatorEventEnvelope.extend({ type: NotificationType }),
+  SpendingEventEnvelope,
+]);
+export type GrowthEvent = z.infer<typeof StoredEventEnvelope>;
 export const CreatorProjection = z.strictObject({
   id: z.uuid(),
   version: z.int().positive(),
@@ -199,6 +228,7 @@ export interface GrowthOwners {
   notificationState(
     event: GrowthEvent,
     recipient: GrowthEvent["recipients"][number],
+    custody?: NotificationReadCustody,
   ): Promise<NotificationState>;
   home(actor: Actor): Promise<HomeEntry[]>;
   homePage?(

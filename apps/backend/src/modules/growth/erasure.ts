@@ -77,6 +77,16 @@ export class GrowthErasure {
       )
     ).rowCount;
   }
+  /** Observe a negative account fence without holding it while another owner
+   * obtains its own purpose/denial gates. This is not positive read authority. */
+  async accountRetained(client: PoolClient, accountId: string) {
+    return !(
+      await client.query(
+        "SELECT 1 FROM growth.erasure_fence WHERE subject_key=$1",
+        [this.key("account", accountId)],
+      )
+    ).rowCount;
+  }
   /** Negative fences only. Device transfer may remove an erased account's
    * old registration, but must never recreate any of its data. */
   async lockSubjects(client: PoolClient, accountIds: readonly string[]) {
@@ -97,6 +107,8 @@ export class GrowthErasure {
     client: PoolClient,
     event: GrowthEvent,
   ): Promise<GrowthEvent | null> {
+    if (event.creatorId === null)
+      return (await this.subjects(client, [event.accountId])) ? event : null;
     const creator = this.key("creator", event.creatorId);
     const accounts = event.recipients.map((r) =>
       this.key("account", r.accountId),
@@ -120,7 +132,9 @@ export class GrowthErasure {
     await this.lock(
       client,
       events.flatMap((event) => [
-        this.key("creator", event.creatorId),
+        ...(event.creatorId === null
+          ? []
+          : [this.key("creator", event.creatorId)]),
         ...event.recipients.map((r) => this.key("account", r.accountId)),
       ]),
     );

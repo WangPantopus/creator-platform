@@ -19,6 +19,10 @@ import type {
 import type { DeliveryProvider } from "./notifications.js";
 import type { GrowthEventSources } from "./relay.js";
 import type { ActivationSource, ThanksPermission } from "./retention.js";
+import {
+  spendingNotificationState,
+  type SpendingNotificationReader,
+} from "./account-notifications.js";
 
 /** Canonical host seam. Owner callbacks are injected; absent producers never become fixtures. */
 export async function configureGrowthForBackend(
@@ -35,6 +39,7 @@ export async function configureGrowthForBackend(
     sourceScan?: Parameters<typeof createGrowthRuntime>[0]["sourceScan"];
     activationSource?: ActivationSource;
     thanksPermission?: ThanksPermission;
+    spendingNotices?: SpendingNotificationReader;
     experimentsEnabled?: boolean;
   },
   env: NodeJS.ProcessEnv = process.env,
@@ -74,6 +79,17 @@ export async function configureGrowthForBackend(
       owners: {
         ...unavailableOwners,
         ...input.owners,
+        notificationState: async (event, recipient, custody) =>
+          event.type === "spending_reminder"
+            ? spendingNotificationState(input.spendingNotices)(
+                event,
+                recipient,
+                custody,
+              )
+            : (
+                input.owners?.notificationState ??
+                unavailableOwners.notificationState
+              )(event, recipient, custody),
         creatorFor: input.assertAllowed
           ? canonicalCreatorOwner(input.identity.profiles, input.assertAllowed)
           : async (actor) => {

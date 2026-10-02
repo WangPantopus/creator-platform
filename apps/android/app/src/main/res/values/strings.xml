@@ -904,4 +904,5 @@
   <string name="account_unavailable_body" formatted="false">Your session is kept on this device. Try again in a moment.</string>
   <string name="page_unavailable_title" formatted="false">This page didn\'t load</string>
   <string name="page_unavailable_body" formatted="false">Nothing you saved was changed. Try again in a moment.</string>
+  <string name="growth_spending_limit_reached" formatted="false">You\'ve reached {percent}% of your monthly limit.</string>
 </resources>

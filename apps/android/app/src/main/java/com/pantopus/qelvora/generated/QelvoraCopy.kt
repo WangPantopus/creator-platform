@@ -903,7 +903,8 @@ object QelvoraCopy {
     "accountUnavailableTitle" to "We can't reach your account right now",
     "accountUnavailableBody" to "Your session is kept on this device. Try again in a moment.",
     "pageUnavailableTitle" to "This page didn't load",
-    "pageUnavailableBody" to "Nothing you saved was changed. Try again in a moment."
+    "pageUnavailableBody" to "Nothing you saved was changed. Try again in a moment.",
+    "growthSpendingLimitReached" to "You've reached {percent}% of your monthly limit."
   )
   private val variables = Regex("""\{([^}]+)\}""")
   fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }

@@ -903,7 +903,8 @@ public enum QelvoraCopy {
     "accountUnavailableTitle": "We can't reach your account right now",
     "accountUnavailableBody": "Your session is kept on this device. Try again in a moment.",
     "pageUnavailableTitle": "This page didn't load",
-    "pageUnavailableBody": "Nothing you saved was changed. Try again in a moment."
+    "pageUnavailableBody": "Nothing you saved was changed. Try again in a moment.",
+    "growthSpendingLimitReached": "You've reached {percent}% of your monthly limit."
   ]
   private static let variables = try! NSRegularExpression(pattern: #"\{([^}]+)\}"#)
   public static func text(_ key: String, values: [String: String] = [:]) -> String {

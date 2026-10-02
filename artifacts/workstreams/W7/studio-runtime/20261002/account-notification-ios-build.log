@@ -1,0 +1,12 @@
+Heavy build slot acquired by W7 account notification signed iOS shipping build.
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project apps/ios/Qelvora.xcodeproj -scheme QelvoraApp -configuration Debug -sdk iphonesimulator -destination id=FAB31883-2F36-4E50-83B3-D9654B60FF00 -derivedDataPath /private/tmp/creator-platform-w7-active-20261001/ios-derived -jobs 2 CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- build
+
+Build settings from command line:
+    CODE_SIGN_IDENTITY = -
+    CODE_SIGNING_ALLOWED = YES
+    SDKROOT = iphonesimulator27.0
+
+2026-10-02 03:23:32.214 xcodebuild[40829:40632868] Writing error result bundle to /var/folders/h5/grcwysw948l00jvs3180ntdw0000gn/T/ResultBundle_2026-02-10_03-23-0032.xcresult
+xcodebuild: error: 'apps/ios/Qelvora.xcodeproj' does not exist.
+Heavy build slot released.

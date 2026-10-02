@@ -776,7 +776,7 @@ export class GrowthService {
           )
         ).rows,
     );
-    return this.notifications.listCurrent(rows);
+    return this.notifications.listCurrent(rows, actor);
   }
   async markRead(actor: Actor, id: string) {
     return this.db.actor(actor, null, async (client) => {
@@ -805,7 +805,7 @@ export class GrowthService {
           )
         ).rows,
     );
-    const current = (await this.notifications.listCurrent(rows))[0];
+    const current = (await this.notifications.listCurrent(rows, actor))[0];
     if (!current)
       throw new DomainError(
         "notification_unavailable",

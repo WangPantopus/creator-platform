@@ -183,7 +183,7 @@ object GrowthPush {
                     if (start == end) true else if (start < end) minute in start until end else minute >= start || minute < end
                 }
                 if (!item.optBoolean("available", false) || !item.isNull("readAt") || quiet || !preferences.getBoolean("push") ||
-                    (0 until muted.length()).any { muted.getString(it) == item.getString("creatorId") } ||
+                    (!item.isNull("creatorId") && (0 until muted.length()).any { muted.getString(it) == item.getString("creatorId") }) ||
                     (0 until disabled.length()).any { disabled.getString(it) == item.getString("type") } || current != generation || credential(app) != captured || !permitted(app)) return@launch
                 check(item.getString("id") == id)
                 val intent = Intent(app, MainActivity::class.java).setAction(TAP_ACTION).setData(Uri.fromParts("qelvora-notification", id, null)).putExtra(NOTIFICATION_ID, id)
