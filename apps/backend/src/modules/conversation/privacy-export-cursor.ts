@@ -21,7 +21,7 @@ const Owner = "creator_w3_privacy_export";
 export const CONVERSATION_PRIVACY_CURSOR_MIGRATION =
   "0206_w3_privacy_cursor_export";
 export const CONVERSATION_PRIVACY_CURSOR_SOURCE_SHA256 =
-  "bd2b0a5c7574d085e9b23d79db181f04c0699c74f12810f15dd75f1dc2ede067";
+  "73474526575ecbdec8b5452039f953d5af35357f5ba1922d300394791b94aa06";
 const Signatures = [
   "creator.fence_conversation_privacy_export(uuid,uuid,text,uuid,uuid,uuid)",
   "creator.conversation_privacy_export_rows(uuid,uuid)",
