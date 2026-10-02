@@ -1,0 +1,66 @@
+{
+  "readAt": "2026-10-02T16:49:23.985526+00:00",
+  "privateRawLogs": [
+    {
+      "name": "privacy-wave-verification.log",
+      "bytes": 1180,
+      "sha256": "e700884b388062f0c16ba7b03814836c43d2667385183897ff426d67b23a1085"
+    },
+    {
+      "name": "privacy-wave-existing-postgres-contracts.log",
+      "bytes": 512,
+      "sha256": "f662183ff1d37784810c7a18eea8d706fc55612b7ee885efb6a85297f430df7f"
+    },
+    {
+      "name": "privacy-wave-composed-denial-build.log",
+      "bytes": 41,
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    {
+      "name": "privacy-wave-composed-denial-api.log",
+      "bytes": 41707,
+      "sha256": "5498668f4bc19253282128f8a53a2b8bda3f1db44b27bd7810e96170c5bc52b4"
+    },
+    {
+      "name": "privacy-wave-composed-denial-restarted-api.log",
+      "bytes": 48948,
+      "sha256": "121e5f9a70452ffcb2434cd425fd3af519e25d975f4f0262c538219ffffbd837"
+    },
+    {
+      "name": "privacy-wave-ios-actual-call.log",
+      "bytes": 9544,
+      "sha256": "2bacab659cda882a66bcdc54bb3ef37ef1985f2124f86560ba34e55b0dd7b3de"
+    },
+    {
+      "name": "privacy-wave-ios-composed-call.log",
+      "bytes": 9707,
+      "sha256": "e6c6d160c4e37eda88921d271f64309c7e5fb162660bf5fbef7a4c66aee0827b"
+    },
+    {
+      "name": "privacy-wave-android-emulator.log",
+      "bytes": 3709,
+      "sha256": "9c1ec25c45a017d932b7b65b32de3bb23a77813490b60d6e606dea612de21e75"
+    },
+    {
+      "name": "privacy-wave-android-emulator-private.log",
+      "bytes": 1715,
+      "sha256": "580ab7bf6c95315453ac82c4c2a828043ea899900ca163bd0c41b522c18d9920"
+    },
+    {
+      "name": "privacy-wave-android-emulator-headless.log",
+      "bytes": 8034,
+      "sha256": "ff3f72609bf7a15056321061c824c41eb2283483c2b554cac121f2bb32a2b553"
+    },
+    {
+      "name": "account-call-metadata-production-web-build.log",
+      "bytes": 2744,
+      "sha256": "ebd29efa7eb0b894b75329ed86a7ad8644f447d78ab4d26002718eb70b71ca19"
+    },
+    {
+      "name": "privacy-wave-ios-composed-xcode-sample.txt",
+      "bytes": 208335,
+      "sha256": "4fd6814c03d48f921426600f9d1d04e9cc8e665557b7875521548f1f019b1495"
+    }
+  ],
+  "rawLogsContainNoAcceptanceByThemselves": true
+}

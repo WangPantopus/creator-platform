@@ -12,14 +12,14 @@ import {
 } from "../identity/generation-scope.js";
 
 export const GENERATION_AUDIENCE_MIGRATION =
-  "0098_w4_generation_allowance_audience";
+  "0182_w4_generation_allowance_audience";
 export const GENERATION_AUDIENCE_SIGNATURE =
   "creator.generation_allowance_audience(uuid,uuid)";
 export const GENERATION_AUDIENCE_OWNER = "creator_w4_generation_audience";
 export const GENERATION_AUDIENCE_SQL_CHECKSUM =
-  "91e56109c91c9437104d68a00ccf1c7f5cc3ea0180db8d3535becb8d72f1bb2c";
+  "98f9373fbf2403e05f6f26a4223a94779d3280fefa89f2ab2c6f30fbbef796be";
 export const GENERATION_AUDIENCE_DEFINITION_CHECKSUM =
-  "19880cbdf7c0a7afdeb29fb1abb0b41f7e342940e233dec01849817846db7567";
+  "0f8d71b2adf8e27ab5c3e94a96144ceb934f6a65fd420ab04e1eff9011e61d2f";
 const Hash = z.string().regex(/^[a-f0-9]{64}$/u);
 const Facts = z.strictObject({
   revision: Hash,

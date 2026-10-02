@@ -1,0 +1,68 @@
+{
+  "source": "616698f3d9a034ba0fb4ffc3d4dff36465c011d0",
+  "label": "Actual labelled synthetic development61 web export; genuine Trust task acceptance, no complete C10 or original recovery",
+  "errors": [],
+  "realTrustRetryBeforeRecovery": {
+    "state": "retry",
+    "errorCode": "domain_hook_error",
+    "receiptPresent": false
+  },
+  "savedStatus": 202,
+  "jobHash": "f5b1dc68facdb329a12a35fd847114817f13b91ce0ea350757232b8f7a4d51b9",
+  "state": "blocked",
+  "tasks": [
+    {
+      "domain": "agent",
+      "state": "complete",
+      "errorCode": null,
+      "receiptPresent": true
+    },
+    {
+      "domain": "commerce",
+      "state": "blocked",
+      "errorCode": "domain_hook_unavailable",
+      "receiptPresent": false
+    },
+    {
+      "domain": "content",
+      "state": "blocked",
+      "errorCode": "domain_hook_unavailable",
+      "receiptPresent": false
+    },
+    {
+      "domain": "conversation",
+      "state": "blocked",
+      "errorCode": "conversation_lineage_unavailable",
+      "receiptPresent": false
+    },
+    {
+      "domain": "growth",
+      "state": "blocked",
+      "errorCode": "domain_hook_unavailable",
+      "receiptPresent": false
+    },
+    {
+      "domain": "identity",
+      "state": "complete",
+      "errorCode": null,
+      "receiptPresent": true
+    },
+    {
+      "domain": "media",
+      "state": "complete",
+      "errorCode": null,
+      "receiptPresent": true
+    },
+    {
+      "domain": "trust",
+      "state": "complete",
+      "errorCode": null,
+      "receiptPresent": true
+    }
+  ],
+  "downloadVisible": false,
+  "phone": {
+    "width": 390,
+    "scroll": 390
+  }
+}
