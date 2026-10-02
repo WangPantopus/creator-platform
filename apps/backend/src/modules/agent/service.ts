@@ -42,6 +42,10 @@ import type {
   PublicAIReadScope,
 } from "../identity/public-ai-scope.js";
 import { isDevelopmentLicense } from "./development-license.js";
+import {
+  PreparedGenerationAgentInputs,
+  type GenerationAILicenseContext,
+} from "./generation-inputs.js";
 
 /** Genuine server-issued public metadata; this is never a creator Actor. */
 export type PublicAILicenseContext = Readonly<{
@@ -71,6 +75,12 @@ export interface LicenseVerifier {
    * changing visitor GUCs or inventing a creator scope. */
   isCurrentPublicInTransaction?(
     context: PublicAILicenseContext,
+    client: PoolClient,
+  ): Promise<boolean>;
+  /** Genuine worker-purpose current stored proof; never a CreatorScope or
+   * interactive session synthesized from accepted generation metadata. */
+  isCurrentGenerationInTransaction?(
+    context: GenerationAILicenseContext,
     client: PoolClient,
   ): Promise<boolean>;
 }
@@ -177,6 +187,46 @@ export class AgentService {
       context.facts,
     );
     return current === true ? license : null;
+  }
+  async currentGenerationLicense(
+    context: GenerationAILicenseContext,
+    client: PoolClient,
+  ): Promise<License | null> {
+    invariant(
+      context.inputs instanceof PreparedGenerationAgentInputs,
+      "generation_inputs_required",
+      "Genuine generation-purpose compiled inputs are required.",
+    );
+    context.inputs.assertHostPool(this.repository.pool);
+    await context.inputs.authorizeInTransaction(
+      context.facts,
+      context.scope,
+      client,
+    );
+    const license: License = {
+      ...context.facts.license,
+      permittedUses: [...context.facts.license.permittedUses],
+    };
+    if (!licensed(license)) return null;
+    const verifier = this.licenseVerifier;
+    if (!verifier?.isCurrentGenerationInTransaction)
+      throw new DomainError(
+        "generation_license_unconfigured",
+        "Current generation-purpose licence authority is unavailable.",
+        503,
+      );
+    if (isDevelopmentLicense(license) !== (verifier.synthetic === true))
+      return null;
+    const allowed = await verifier.isCurrentGenerationInTransaction(
+      context,
+      client,
+    );
+    await context.inputs.authorizeInTransaction(
+      context.facts,
+      context.scope,
+      client,
+    );
+    return allowed === true ? license : null;
   }
   async snapshot(
     client: PoolClient,
