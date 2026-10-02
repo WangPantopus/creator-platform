@@ -1,8 +1,9 @@
 import type { Pool, PoolClient } from "pg";
 import { z } from "zod";
 import { DomainError, invariant } from "../../core/errors.js";
-import { PrivacyDomains, type PrivacyHook } from "./contracts.js";
 import { requestAuthority } from "../identity/request-authority.js";
+import { PrivacyDomains, type PrivacyHook } from "./contracts.js";
+import { assertPrivacyTaskCatalog } from "./privacy-catalog.js";
 
 export type PrivacyTaskInput = Parameters<PrivacyHook["run"]>[0];
 /** Same held-client lifecycle capability. The exact real task and its signal
@@ -59,6 +60,7 @@ export async function privacyTaskAuthorityInTransaction(
     );
   await client.query("SAVEPOINT w8_privacy_task_fence");
   try {
+    await assertPrivacyTaskCatalog(client);
     const row = (
       await client.query<{ owned: string[] }>(
         "SELECT creator_trust.fence_privacy_task($1,$2,$3,$4,$5,$6,$7,$8) AS owned",
@@ -104,6 +106,13 @@ export async function privacyTaskAuthorityInTransaction(
 /** Worker-only negative/ownership metadata. A client UUID never grants a lifecycle scope. */
 export function privacyTaskAuthority(pool: Pool) {
   return async (input: PrivacyTaskInput) => {
+    if (!input.signal || requestAuthority.getStore())
+      throw new DomainError(
+        "privacy_authority_unavailable",
+        "The actual cancellable lifecycle task is required.",
+        503,
+      );
+    input.signal.throwIfAborted();
     z.uuid().parse(input.jobId);
     z.uuid().parse(input.accountId);
     z.uuid().parse(input.leaseToken);
@@ -135,6 +144,7 @@ export function privacyTaskAuthority(pool: Pool) {
         ],
       )
     ).rows[0];
+    input.signal.throwIfAborted();
     invariant(
       job,
       "privacy_authority_changed",
