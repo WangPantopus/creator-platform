@@ -23,6 +23,10 @@ import {
   spendingNotificationState,
   type SpendingNotificationReader,
 } from "./account-notifications.js";
+import {
+  canonicalCoreContentFollows,
+  type CoreFollowMigration,
+} from "./core-follows.js";
 
 /** Canonical host seam. Owner callbacks are injected; absent producers never become fixtures. */
 export async function configureGrowthForBackend(
@@ -39,6 +43,8 @@ export async function configureGrowthForBackend(
     sourceScan?: Parameters<typeof createGrowthRuntime>[0]["sourceScan"];
     activationSource?: ActivationSource;
     thanksPermission?: ThanksPermission;
+    /** Actual W8 receipt for the unregistered core Follow proposal; absent stays unavailable. */
+    coreFollowMigration?: CoreFollowMigration;
     spendingNotices?: SpendingNotificationReader;
     experimentsEnabled?: boolean;
   },
@@ -132,6 +138,9 @@ export async function configureGrowthForBackend(
     return {
       ...runtime,
       contentFollows: canonicalContentFollows(),
+      coreContentFollows: canonicalCoreContentFollows(
+        input.coreFollowMigration,
+      ),
       async close() {
         await runtime.stop();
         await worker.end();
