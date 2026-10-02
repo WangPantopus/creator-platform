@@ -246,7 +246,7 @@ public struct FanAppShell: View {
                 Welcome(returnTo: model.destination, showContext: model.arrival != nil, contextSource: model.arrival?.source, contextTitle: model.arrival?.title, bodyCopy: model.arrival.map { "Every message says who wrote it: " + $0.creatorName + "'s AI, " + $0.creatorName + ", or their team. You'll always know which." } ?? "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext: model.removeArrival, onContinue: { Task { await model.beginSignIn() } }).id(model.arrival?.title)
             } else if model.session?.fan == nil, let feature = features.first(where: { $0.matches(model.destination) && $0.allowsSignedOut(model.destination) }) {
                 feature.screen(model).id((model.session?.accountId ?? "") + model.destination)
-            } else if model.session?.fan == nil, model.destination != "/identity/account" {
+            } else if model.session?.fan == nil, ApplicationDestination.requiresFanProfile(model.destination) {
                 NativeHandleForm(model: model)
             } else {
                 VStack(spacing: 0) {

@@ -913,6 +913,7 @@
   <string name="identity_team_access_title" formatted="false">Current team access</string>
   <string name="identity_team_access_loading" formatted="false">Checking team access…</string>
   <string name="identity_team_access_required" formatted="false">Refresh team access before creating or changing invitations.</string>
+  <string name="identity_verification_page_title" formatted="false">Signature verification</string>
   <string name="identity_verification_invalid_link" formatted="false">This verification link is invalid.</string>
   <string name="identity_verification_missing" formatted="false">This signed act could not be found.</string>
   <string name="identity_verification_unavailable_title" formatted="false">Verification unavailable</string>

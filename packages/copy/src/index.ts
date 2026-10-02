@@ -911,6 +911,7 @@ export const copy = {
   "identityTeamAccessTitle": "Current team access",
   "identityTeamAccessLoading": "Checking team access…",
   "identityTeamAccessRequired": "Refresh team access before creating or changing invitations.",
+  "identityVerificationPageTitle": "Signature verification",
   "identityVerificationInvalidLink": "This verification link is invalid.",
   "identityVerificationMissing": "This signed act could not be found.",
   "identityVerificationUnavailableTitle": "Verification unavailable",

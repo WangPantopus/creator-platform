@@ -1,6 +1,10 @@
 import { z } from "zod";
 import navigation from "../../../config/navigation.json" with { type: "json" };
 const destinationPattern = new RegExp(navigation.pathPattern, "u");
+const fanHandleExemptPattern = new RegExp(
+  navigation.fanHandleExemptPathPattern,
+  "u",
+);
 const literalQueryValues: Readonly<Record<string, string>> =
   navigation.literalQueryValues;
 
@@ -34,6 +38,15 @@ export function validReturnTarget(value: string): boolean {
         : value === value.toLowerCase() && z.uuid().safeParse(value).success)
     );
   });
+}
+/** Account security, public status and independently guarded Ops membership
+ * do not depend on enrolling a fan persona. Destination validation remains
+ * mandatory; an invalid destination never receives this exception. */
+export function requiresFanProfile(value: string): boolean {
+  return (
+    !validReturnTarget(value) ||
+    !fanHandleExemptPattern.test(value.split("?")[0]!)
+  );
 }
 export const ReturnTargetSchema = z
   .string()

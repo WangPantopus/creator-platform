@@ -9901,6 +9901,17 @@
         }
       }
     },
+    "Signature verification": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signature verification"
+          }
+        }
+      }
+    },
     "This verification link is invalid.": {
       "extractionState": "manual",
       "localizations": {

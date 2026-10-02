@@ -913,6 +913,7 @@ object QelvoraCopy {
     "identityTeamAccessTitle" to "Current team access",
     "identityTeamAccessLoading" to "Checking team access…",
     "identityTeamAccessRequired" to "Refresh team access before creating or changing invitations.",
+    "identityVerificationPageTitle" to "Signature verification",
     "identityVerificationInvalidLink" to "This verification link is invalid.",
     "identityVerificationMissing" to "This signed act could not be found.",
     "identityVerificationUnavailableTitle" to "Verification unavailable",
