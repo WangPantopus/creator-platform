@@ -1,0 +1,16 @@
+{
+  "source": "3a0527b170074e286543aeaf5cb42821d8636567",
+  "serviceSha256": "c10be6313fba368c6bcd8944807904498b915f45c362d932eb2af035dceebf0b",
+  "checks": {
+    "backendTypecheck": true,
+    "affectedESLint": true,
+    "prettier": true,
+    "canonicalGenerationCheck": true,
+    "diffCheck": true
+  },
+  "transitionPersonallyOperated": false,
+  "callerCOMMITRequired": true,
+  "actorlessLifecycleAvailable": false,
+  "newTestCode": false,
+  "w3Complete": false
+}
