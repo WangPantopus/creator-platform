@@ -1,5 +1,13 @@
 # W8 resume prompt — complete the workstream
 
+## Original privacy ownership and current app checks — 2026-10-02
+
+New requests capture W1’s original full ownership and reference for every data scope; missing original snapshots refuse before owner hooks. Held 0209 changes the original account-only constraint through an additive migration and grants metadata readiness only. Original 0027/0087 sources and all historical rows stay intact. Closed rollback qualification and eight catalogue drifts preserve all six custody comparisons. The executable registry still refuses the unactivated source.
+
+Actual web creator/conversation requests return the specific schema dependency without a new job. A new account export saved its original one-creator snapshot; Trust, Identity and Media completed, while the five other domains remained incomplete. iOS showed the same saved job in both appearances; its narrower request reached fresh-verification 401, so native 0209 acceptance is pending. Android awaits an ordinary peer slot release. Own API/web/simulator are stopped, the database is closed, and the new private checkpoint is retained; its separate restore is not yet verified. The main source merge includes W1’s real session producers and W2’s missing-artifact refusal, which still need current W8 app operation.
+
+Follow the latest human direction: keep functional JSON and brief verification notes; routine captures and bulky operator receipts stay private outside Git. Full C10, non-account family authority, feedback lifecycle, provider, original recovery and release acceptance remain open.
+
 ## Executable privacy-wave registry correction — 2026-10-02
 
 W4's actual backend launch found missing executable hashes for the active continuation. [Exact unchanged SQL and real registeredMigration receipt](../../../artifacts/workstreams/W8/privacy-wave-source-pins/20261002-mac-studio/README.md) adds only0074/0082/0087/0103 sourceSha256 registry metadata. No guard/history/SQL/role/wave change or application/traffic-ready claim. Own services/devices are stopped with private checkpoints retained. Support PR179 merged7f57b825; fully reviewed W1 finalization PR180 merged79e3b0c7. All-scope privacy ownership source remains held/in progress: original0027 account-only constraint requires additive0209, original0087 held projection stays unchanged; real web refused without saving a new request. Development policy lifecycle and full workstream remain open.
