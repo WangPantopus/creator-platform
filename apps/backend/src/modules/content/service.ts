@@ -170,7 +170,7 @@ export interface ContentDependencies {
     input: ContentPacketRead,
   ) => Promise<boolean>;
   /** W8 reviews the exact immutable reply. Missing/unavailable review leaves it quarantined. */
-  reviewReply?: (
+  reviewReply?: ((
     client: PoolClient,
     input: {
       replyId: string;
@@ -184,10 +184,10 @@ export interface ContentDependencies {
     state: "pending" | "allowed" | "flagged";
     reference: string;
     textHash: string;
-  }>;
-  /** Actual mounted W8 producer ceiling. Missing means its existing 4000;
-   * never advertise longer replies that cannot enter its exact review queue. */
-  reviewReplyTextLimit?: 4000 | 12000;
+  }>) & {
+    /** Actual W8 callback capability, not host-supplied tenure permission. */
+    readonly maxTextLength?: number;
+  };
   /** Hold current W1 session and W8 creator/fan denial on the domain client,
    * before object locks. This callback cannot substitute a worker Actor. */
   assertAllowedInTransaction?: (
@@ -1699,7 +1699,7 @@ export class ContentService {
       "Reopen this Note with your current account.",
     );
     return this.dependencies.reviewReply &&
-      this.dependencies.reviewReplyTextLimit === 12000
+      this.dependencies.reviewReply.maxTextLength === 12000
       ? policy
       : NoteReplyPolicy.parse({
           ...policy,
