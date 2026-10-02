@@ -1,0 +1,28 @@
+{
+  "source": "5e1f54acad536fa0af1a9a1ae933e37dc42746b5",
+  "ownedApiPid": 2182,
+  "healthBeforeActualSignals": {
+    "status": "ok",
+    "ready": false,
+    "foundationReady": true,
+    "identity": "configured",
+    "identityMode": "development",
+    "generation": "unconfigured",
+    "registeredFeatures": [
+      "conversation",
+      "content",
+      "studio",
+      "commerce",
+      "growth",
+      "agent"
+    ],
+    "readinessEndpoint": "/health/ready",
+    "database": "configured",
+    "featureEnabled": true
+  },
+  "actualSignals": ["SIGINT", "SIGTERM"],
+  "limits": "No positive publication, projection or new test suite. This is actual owned process operation.",
+  "observedProcessExitCode": 0,
+  "listenerAfterActualSignals": "No listener on owned 41055",
+  "poolAlreadyEndedError": false
+}
