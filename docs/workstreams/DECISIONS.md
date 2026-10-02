@@ -70,3 +70,12 @@ A gap entry records requirement/source, owner, affected platforms, proposed reus
 Resolve exact typed boundaries before parallel consumers diverge: `Approval` owner and invalidation, `ShareGrant` dual consent/revocation, stable current-authorization/grant versions, allowance transaction participation, packet-vs-thread audit, call acceptance timing, immutable signed original versus translated display, Note fan-out ordering, domain-wide outbox beyond the thread log, and privacy job completion receipts. See [CONTRACTS](CONTRACTS.md) and backend research for proposed ownership.
 
 The immediate planning work raises no blocking question: these owners can start useful, reversible implementation with the established decisions. A release may remain blocked for specific inputs even while its feature development is complete; record that distinction explicitly.
+
+
+### W1 — separate Growth/content API pool (October 2, 2026)
+
+The canonical core connection stays non-owner `creator_runtime` NOINHERIT for identity, Conversation, Agent and Trust. Growth and W5 follower-content transactions use an explicit same-database `GROWTH_API_DATABASE_URL` pool, inheriting only `creator_runtime` and `growth_runtime`. This preserves the actual follow row lock through the content transaction; a Boolean obtained from a released second connection cannot provide that guarantee. The root rejects a shared core login, another database, additional reachable roles, owner/bypass/create-role privileges and direct private relation/column/function grants. Disabled Growth allocates no extra pool. Startup failure and shutdown close the owned pool without logging URLs or credentials. Negative probes against W1's actual non-owner core connection pass; positive role/readiness and configured application journeys await reviewed role/schema composition.
+
+### W1 — purpose policies and issuer-bound push (October 2, 2026)
+
+0071 normalizes only existing PUBLIC content policies, preserving every named purpose role added by earlier migrations. W8 identified that normalizing all policies would break0069 reply-review metadata. Scope expiry uses wall-clock time, since transaction `now()` cannot measure a long callback's age. Integrated native push consumers bind credential reads to their API issuer; Android also refuses a captured credential from another issuer before unregistering remotely. Local notification cancellation still occurs during private cleanup. No push provider/device permission or delivery success is fabricated.

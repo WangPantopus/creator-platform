@@ -48,3 +48,12 @@ Current backend/web typechecks, affected lint/format, native API98 operations an
 W1 personally implements the separate purpose module and reserved0071 SQL proposal described in the identity authority guide. Backend TypeScript and affected ESLint/Prettier pass; no new test code. No SQL is activated or worker credentials provisioned, and no signed/Team publication outcome is claimed. W8 owns the additive0073 denial projection/security review and canonical activation. This source closes neither native acceptance nor release readiness.
 
 PR59 and PR53 are now marked merged at2026-10-02T06:10:35Z through W5's normally merged PR70/main95d60b3e ancestry. Exact PR59d5e has actual completed successes for all five distinct foundation jobs, including both original visual runs and both hosted iOS runs. A duplicate push Android foundation job remains queued and is not counted as passed. W1 did not bypass or force merge any check.
+
+
+### Integrated native build and pool guard checkpoint
+
+W1 normally integrates current main95d60b3e, coherent W3 PR71ba2c15cc account privacy/You source and exact W3 metadata0e5da123, plus W2 Handle metadata1b9a4b5d. Conflicts retain W1 strict root API origin/link ports, issuer-bound stores, cancellation-safe rotation, private purge fences and foreground polling cancellation. W1 corrects its two Handle metadata heads to original `.qv-meta` data-sm; the field label remains original caption/semibold.
+
+Shipping normally signed iOS build0d5ac895 passes; strict codesign succeeds and effective plist API/link host are http://127.0.0.1:4111 / localhost. Shipping Android0a8f56be passes14s. Both use the shared atomic build wrapper and release their exact custody. These builds predate subsequent Growth integration7401b8d4 and are not acceptance of that new native source. No W1 device is currently running.
+
+Growth integration7401 preserves W1 authority and native custody; new push storage is explicitly issuer-bound and captured unregister tokens are checked against that issuer. W1's separate Growth/content API pool implementation typechecks. Actual core-role negative diagnostics return true for same-login rejection, different-database rejection, rejection of the genuine non-inherited core role as Growth API, and no extra pool when disabled. No positive composite role/runtime, activation, populated content, native journey or release acceptance is claimed.
