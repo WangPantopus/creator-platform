@@ -26,6 +26,7 @@ import { canonicalPassAccess } from "./modules/growth/integration.js";
 import { DomainError } from "./core/errors.js";
 import { copy } from "@qelvora/copy";
 import { createGrowthAPIPool } from "./db/growth-api-pool.js";
+import type { ConversationPrivacyOwnerPorts } from "./modules/trust/privacy-consumers.js";
 
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
@@ -33,6 +34,7 @@ const config = readConfig();
 const features: {
   growth: Awaited<ReturnType<typeof configureGrowthForBackend>>;
   close: (() => void)[];
+  conversationPrivacy?: ConversationPrivacyOwnerPorts;
 } = { growth: null, close: [] };
 if (config.identityAdapter === "development" && !config.identitySessionKey)
   throw new Error(
@@ -53,7 +55,14 @@ try {
               : [],
           ),
           ...(process.env.TRUST_LOCAL_DEVELOPMENT === "true"
-            ? { trust: (runtime) => createDevelopmentTrust(runtime) }
+            ? {
+                trust: (runtime) =>
+                  createDevelopmentTrust(runtime, {
+                    consumers: {
+                      conversation: () => features.conversationPrivacy,
+                    },
+                  }),
+              }
             : {}),
           guardrails: {
             checkSentence: async () => {
@@ -101,6 +110,7 @@ try {
                 : {}),
             });
             features.close.push(() => host.close());
+            features.conversationPrivacy = host.privacy;
             const { commerce, conversation, agent } = host;
             runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
             const contentDependencies = {

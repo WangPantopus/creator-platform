@@ -337,6 +337,10 @@ export async function composeConversationHost(
     commerce,
     conversation,
     agent,
+    privacy: {
+      ...(lineage ? { lineage } : {}),
+      ...(recordings ? { recordings } : {}),
+    },
     fanGeneration: { available, missing },
     close() {
       if (timer) clearInterval(timer);

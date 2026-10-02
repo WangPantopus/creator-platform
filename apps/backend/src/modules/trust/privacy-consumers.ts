@@ -5,6 +5,7 @@ import { conversationPrivacyAuthority } from "./conversation-privacy-authority.j
 import {
   conversationPrivacyHook,
   type ConversationPrivacyRetention,
+  type ConversationPrivacyInput,
 } from "../conversation/privacy.js";
 import {
   agentPrivacyHook,
@@ -26,6 +27,11 @@ import { growthPrivacyHook } from "../growth/lifecycle.js";
 import type { GrowthService } from "../growth/service.js";
 import { contentPrivacyHook } from "../content/privacy.js";
 
+export type ConversationPrivacyOwnerPorts = Omit<
+  ConversationPrivacyInput,
+  "pool" | "authority" | "retention"
+>;
+
 /** Install actual owner hooks, leaving unavailable providers/policies explicit.
  * Domain services use their own non-owner pools; the coordinator never obtains
  * SELECT on peer private tables or an interactive grant. */
@@ -33,6 +39,11 @@ export function createPrivacyConsumers(input: {
   runtimePool: Pool;
   coordinatorPool: Pool;
   conversationRetention?: ConversationPrivacyRetention;
+  /** Prepared owner ports only; pool, real task/family authority and reviewed
+   * retention remain fixed by this coordinator composition. */
+  conversation?:
+    | ConversationPrivacyOwnerPorts
+    | (() => ConversationPrivacyOwnerPorts | undefined);
   agent?: {
     service: AgentService;
     lifecycle: AgentLifecycle;
@@ -52,17 +63,36 @@ export function createPrivacyConsumers(input: {
   additional?: PrivacyHook[];
 }) {
   const verify = privacyTaskAuthority(input.coordinatorPool);
+  const conversationAuthority = conversationPrivacyAuthority(
+    input.runtimePool,
+    input.coordinatorPool,
+  );
   const hooks: PrivacyHook[] = [
     trustPrivacyHook(input.coordinatorPool),
     identityPrivacyHook(input.runtimePool, input.coordinatorPool),
-    conversationPrivacyHook({
-      pool: input.runtimePool,
-      authority: conversationPrivacyAuthority(
-        input.runtimePool,
-        input.coordinatorPool,
-      ),
-      retention: input.conversationRetention,
-    }),
+    {
+      domain: "conversation",
+      async run(job) {
+        // Trust composes before feature owners. Resolve actual prepared owner
+        // instances once per genuine task; never replace its fixed authority.
+        const owners =
+          typeof input.conversation === "function"
+            ? input.conversation()
+            : input.conversation;
+        if (typeof input.conversation === "function" && !owners)
+          throw new DomainError(
+            "conversation_privacy_unavailable",
+            "Conversation privacy owners are not composed yet.",
+            503,
+          );
+        return conversationPrivacyHook({
+          ...owners,
+          pool: input.runtimePool,
+          authority: conversationAuthority,
+          retention: input.conversationRetention,
+        }).run(job);
+      },
+    },
     mediaPrivacyHook({
       runtime: input.runtimePool,
       coordinator: input.coordinatorPool,

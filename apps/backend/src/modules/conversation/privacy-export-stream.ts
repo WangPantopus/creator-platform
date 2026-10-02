@@ -8,6 +8,7 @@ import type { PrivacyExportStream } from "../trust/privacy-export.js";
 import { generationJournalInstalled } from "../agent/generation-journal.js";
 import {
   conversationAuthorLabel,
+  fenceConversationPrivacyTask,
   type ConversationPrivacyFamily,
   type ConversationPrivacyInput,
 } from "./privacy.js";
@@ -118,6 +119,7 @@ export function conversationPrivacyExportStream(
       await client.query(
         "SET LOCAL timezone='UTC'; SET LOCAL statement_timeout='10s'; SET LOCAL lock_timeout='5s'",
       );
+      await fenceConversationPrivacyTask(input.authority, client, job);
       invariant(
         !(await generationJournalInstalled(client)) || input.accounting,
         "conversation_accounting_unavailable",

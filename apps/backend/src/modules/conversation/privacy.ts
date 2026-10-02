@@ -1,6 +1,6 @@
 import type { Pool, PoolClient } from "pg";
 import type { PrivacyHook } from "../trust/contracts.js";
-import { invariant } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
 import { copy } from "@qelvora/copy";
 import type { AuthorKind } from "@qelvora/api";
 import type { ConversationRecordings } from "./recordings.js";
@@ -71,11 +71,29 @@ export type ConversationPrivacyFamily = {
  * These are lifecycle scopes, never fabricated interactive ThreadScopes. */
 export interface ConversationPrivacyAuthority {
   families(job: Job): Promise<readonly ConversationPrivacyFamily[]>;
+  /** W8's actual task lock and deferred commit-currentness check, on this same
+   * held domain client and before family locks. No separate-pool substitute. */
+  fenceTaskInTransaction?(client: PoolClient, job: Job): Promise<void>;
   assertFamily(
     client: PoolClient,
     job: Job,
     family: ConversationPrivacyFamily,
   ): Promise<void>;
+}
+export async function fenceConversationPrivacyTask(
+  authority: ConversationPrivacyAuthority,
+  client: PoolClient,
+  job: Job,
+) {
+  if (!authority.fenceTaskInTransaction)
+    throw new DomainError(
+      "privacy_commit_fence_unavailable",
+      "This data request needs the actual held task-lease commit barrier.",
+      503,
+    );
+  job.signal?.throwIfAborted();
+  await authority.fenceTaskInTransaction(client, job);
+  job.signal?.throwIfAborted();
 }
 export interface ConversationPrivacyRetention {
   retainedMessages(
@@ -133,6 +151,12 @@ export function conversationPrivacyHook(
       );
       const signal = job.signal;
       signal.throwIfAborted();
+      if (!input.authority.fenceTaskInTransaction)
+        throw new DomainError(
+          "privacy_commit_fence_unavailable",
+          "This data request needs the actual held task-lease commit barrier.",
+          503,
+        );
       const lineageSchema = (
         await input.pool.query(
           "SELECT to_regclass('creator.conversation_feedback') AS relation",
@@ -198,6 +222,7 @@ export function conversationPrivacyHook(
         await client.query(
           "SET LOCAL statement_timeout='10s'; SET LOCAL lock_timeout='5s'",
         );
+        await fenceConversationPrivacyTask(input.authority, client, job);
         const accountingInstalled = await generationJournalInstalled(client);
         const weightedInstalled = (
           await client.query<{ installed: boolean }>(
