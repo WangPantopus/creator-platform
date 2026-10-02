@@ -1,5 +1,8 @@
 # W8 contract, migration and runtime register
 
+Held metadata only:0083 carries W3 actual immutable translation job/consumer;0111 W1 private translation issuer and0112 W8 original-participant negatives await its exact source/currentness/policy.0113 is W2's separate NoLogin all-owned Agent export snapshot with its own scope and genuine job/token/XID/PID/immutable ownership; it must not widen0087 private scope ACL or isolated owner. Actual Agent empty fan/thread preflight also needs0087 same-client lifecycle/restoration before locks and COMMIT. W2 is adding this owner port. No registry activation, fabricated Actor/provenance/policy or complete C10 is authorized by these allocations.
+
+
 Reserved0103 source exports `domainPrivacyTaskAuthorityInTransaction(client, actualJob, domain, assertRestoredInTransaction)`; [exact dedicated owner/caller/currentness contract](../../operations/W8-domain-privacy-fence.md). Actual Trust/Growth worker roles are domain-bound, metadata/scope are private, the real signal and held restoration are mandatory and COMMIT is separately fenced.0087 is unchanged. W7 owns the one-cursor/read-committed consistent export and delete seam; outer pool verification does not satisfy this port. Actual activation and leased task/COMMIT/app/purge acceptance remain open.
 
 
