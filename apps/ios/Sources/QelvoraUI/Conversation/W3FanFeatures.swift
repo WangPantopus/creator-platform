@@ -127,7 +127,16 @@ private struct W3ThreadScreen: View {
             .alert("Source unavailable", isPresented: Binding(get: { !sourceFailure.isEmpty }, set: { if !$0 { sourceFailure = "" } })) { SwiftUI.Button("Close") { sourceFailure = "" } } message: { Text(sourceFailure) }
     }
     @ViewBuilder private func row(_ message: W3Message, page: W3Page) -> some View {
-        if message.authorKind == .system { SystemLine(children: message.text) }
+        if message.authorKind == .system {
+            if let destination = message.publicAnswerDestination(creatorId: page.creatorId) {
+                SwiftUI.Button { session.open(destination) } label: {
+                    SystemLine(children: message.text).frame(minHeight: 48).contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(model.offline || scenePhase != .active)
+                .accessibilityLabel("System update: Answered publicly. Open answer")
+            } else { SystemLine(children: message.text) }
+        }
         else if message.recording != nil { recordingRow(message, page: page) }
         else if let correction = message.correction, let original = (model.older + page.messages).first(where: { $0.id == correction.originalMessageId && $0.version == correction.originalVersion && $0.authorKind == .ai }) {
             Correction(aiText: original.text, children: message.text, name: page.creatorName, onVerify: { if let act = message.signedActId { session.open("/verify/" + act) } })

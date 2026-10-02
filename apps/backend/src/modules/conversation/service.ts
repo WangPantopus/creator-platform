@@ -41,6 +41,15 @@ import type { ConversationLineage } from "./lineage.js";
 import type { PreparedGenerationJournal } from "../agent/generation-journal.js";
 import type { GenerationCostReconciliation } from "../commerce/generation-allowance.js";
 import type { Actor } from "../identity/adapter.js";
+import {
+  CommerceFulfillmentPlans,
+  type CommerceGroupRecipient,
+} from "../commerce/fulfillment-plans.js";
+import {
+  FULFILLMENT_CATALOGUE_QUERY,
+  FULFILLMENT_CATALOGUE_SHA256,
+} from "../commerce/fulfillment-catalogue.js";
+import { ConversationSystemLinkSchema } from "../../../../../packages/api/src/conversation/system-link.js";
 
 type ThreadRow = {
   control: ThreadControl;
@@ -93,6 +102,165 @@ function message(row: MessageRow): Message {
 }
 
 export class ConversationService {
+  private fulfillmentPlans?: CommerceFulfillmentPlans;
+  configureFulfillmentPlans(plans: CommerceFulfillmentPlans): void {
+    CommerceFulfillmentPlans.assertRuntime(plans, this.db, this.access);
+    invariant(
+      !this.fulfillmentPlans,
+      "fulfillment_already_configured",
+      "Original fulfillment is already configured.",
+    );
+    this.fulfillmentPlans = plans;
+  }
+
+  /** W5 owns this transaction. Consume only W4's actual positive recipient on
+   * its original held client; never open another transaction or rebuild a scope.
+   * W4's final publication fence must run after this and every other domain
+   * effect. Only COMMIT may follow that fence. */
+  async appendSystemLink(
+    client: PoolClient,
+    recipient: CommerceGroupRecipient,
+  ): Promise<Readonly<{ message: Message; frame: Frame }>> {
+    const plans = this.fulfillmentPlans;
+    if (!plans)
+      throw new DomainError(
+        "system_link_unconfigured",
+        "Original public-answer delivery is unavailable.",
+        503,
+      );
+    CommerceFulfillmentPlans.assertRuntime(plans, this.db, this.access);
+    const scope = await plans.recipientScope(client, recipient);
+    assertThreadScope(scope);
+    invariant(
+      scope.authority === "creator" &&
+        scope.actorAccountId === scope.creatorAccountId,
+      "system_link_creator_required",
+      "The original creator publication is required.",
+    );
+    const original = await plans.recipientLink(client, recipient);
+    const systemLink = ConversationSystemLinkSchema.parse({
+      kind: "published_answer",
+      creatorId: scope.creatorId,
+      contentId: original.contentId,
+      contentVersion: original.contentVersion,
+      label: original.text,
+    });
+    // A plan may include multiple families. Restore only the actual owner-
+    // issued scope's RLS coordinates, never a synthetic recipient Actor.
+    await client.query(
+      "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true),set_config('app.account_id',$3,true)",
+      [scope.creatorId, scope.fanId, scope.actorAccountId],
+    );
+    // W4 already obtained this exact existing-thread UPDATE lease before W5's
+    // document locks. This re-read never creates a thread or changes control.
+    const thread = await this.lockThread(client, scope);
+    const stored = await this.insertMessage(
+      client,
+      scope,
+      "system",
+      systemLink.label,
+      thread.control_epoch,
+      "delivered",
+    );
+    const frame = await appendFrame(client, scope, {
+      epoch: thread.control_epoch,
+      kind: "delivered",
+      messageId: stored.id,
+      authorKind: "system",
+      text: stored.text,
+      generationId: null,
+      sequence: 0,
+      systemLink,
+    });
+    // The actual W4 insert trigger checks family, neutral authorship, genuine
+    // signed publication and publication time; it also records the original
+    // commitment and durable Commerce event on this same transaction.
+    await plans.recordDelivery(client, recipient, stored.id);
+    return Object.freeze({
+      message: Object.freeze({ ...stored, systemLink }),
+      frame: Object.freeze(frame),
+    });
+  }
+
+  /** Called only inside the caller's actual scoped read transaction. A saved
+   * delivery association provides minimal historical link metadata; opening
+   * it still uses the current W5 viewer. No title/body/fan/plan is projected. */
+  async enrichSystemLinksInTransaction<T extends Message>(
+    scope: ThreadScope,
+    client: PoolClient,
+    messages: readonly T[],
+  ): Promise<T[]> {
+    assertThreadScope(scope);
+    const plans = this.fulfillmentPlans;
+    const selected = messages.filter(
+      (m) =>
+        m.threadId === scope.threadId &&
+        m.authorKind === "system" &&
+        m.deliveryState === "delivered" &&
+        m.signedActId === null &&
+        m.authorAccountId == null &&
+        m.text === "Answered publicly.",
+    );
+    if (!plans || selected.length === 0) return [...messages];
+    invariant(
+      messages.length <= 100,
+      "system_link_projection_bounded",
+      "Refresh this conversation to read its links.",
+    );
+    CommerceFulfillmentPlans.assertRuntime(plans, this.db, this.access);
+    const catalogue = (
+      await client.query<{ checksum: string }>(FULFILLMENT_CATALOGUE_QUERY)
+    ).rows[0]?.checksum;
+    invariant(
+      catalogue === FULFILLMENT_CATALOGUE_SHA256,
+      "system_link_catalogue_changed",
+      "Original public-answer delivery is unavailable.",
+    );
+    const rows = (
+      await client.query<{
+        message_id: string;
+        creator_id: string;
+        content_id: string;
+        content_version: number;
+      }>(
+        `SELECT g.message_id,g.creator_id,g.content_id,g.content_version
+         FROM creator.commerce_group_delivery g
+         JOIN creator.commerce_fulfillment_plan p
+          ON p.id=g.plan_id AND p.revision=g.plan_revision
+           AND p.creator_id=g.creator_id AND p.content_id=g.content_id
+           AND p.content_version=g.content_version
+         JOIN creator.message m
+          ON m.id=g.message_id AND m.thread_id=g.thread_id
+           AND m.creator_id=g.creator_id AND m.fan_id=g.fan_id
+         WHERE g.thread_id=$1 AND g.creator_id=$2 AND g.fan_id=$3
+          AND g.message_id=ANY($4::uuid[]) AND m.author_kind='system'
+          AND m.delivery_state='delivered' AND m.text='Answered publicly.'
+          AND m.author_account_id IS NULL AND m.signed_act_id IS NULL
+          AND m.signed_content_hash IS NULL LIMIT 100`,
+        [
+          scope.threadId,
+          scope.creatorId,
+          scope.fanId,
+          selected.map((m) => m.id),
+        ],
+      )
+    ).rows;
+    const links = new Map(
+      rows.map((r) => [
+        r.message_id,
+        ConversationSystemLinkSchema.parse({
+          kind: "published_answer",
+          creatorId: r.creator_id,
+          contentId: r.content_id,
+          contentVersion: r.content_version,
+          label: "Answered publicly.",
+        }),
+      ]),
+    );
+    return messages.map((m) =>
+      links.has(m.id) ? { ...m, systemLink: links.get(m.id)! } : m,
+    );
+  }
   private frameNotifications?: ThreadFrameNotifications;
   watchFrames(threadId: string, wake: () => void): () => void {
     this.frameNotifications ??= new ThreadFrameNotifications(this.db.pool);
@@ -584,9 +752,14 @@ export class ConversationService {
             offTheRecord: row.off_the_record,
           }),
         );
-        const messages = this.delivery.lineage
+        const enriched = this.delivery.lineage
           ? await this.delivery.lineage.enrich(scope, client, selected)
           : selected;
+        const messages = await this.enrichSystemLinksInTransaction(
+          scope,
+          client,
+          enriched,
+        );
         return {
           threadId: scope.threadId,
           creatorId: scope.creatorId,

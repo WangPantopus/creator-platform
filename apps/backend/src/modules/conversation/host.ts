@@ -55,6 +55,8 @@ const DevelopmentEconomicsSchema = z.strictObject({
 
 /** Inputs supplied by their owners. Absent inputs keep their paths off. */
 export type ConversationHostProducers = {
+  /** W4: genuinely prepared original group fulfillment on this exact graph. */
+  fulfillmentPlans?: import("../commerce/fulfillment-plans.js").CommerceFulfillmentPlans;
   /** W2: the configured license authority for this host. */
   licenseVerifier?: LicenseVerifier;
   /** W2: the reviewed thread-accounting retention for the usage journal. */
@@ -347,6 +349,9 @@ export async function composeConversationHost(
     ...(lineage ? { lineage } : {}),
     ...(corrections ? { corrections } : {}),
     ...(recordings ? { recordings } : {}),
+    ...(producers.fulfillmentPlans
+      ? { fulfillmentPlans: producers.fulfillmentPlans }
+      : {}),
   });
   // Studio drafting, evaluation and ingestion use the same configured model.
   agent ??= createAgentDomain({
