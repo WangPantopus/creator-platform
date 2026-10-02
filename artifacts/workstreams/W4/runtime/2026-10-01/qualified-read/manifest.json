@@ -1,0 +1,45 @@
+{
+  "recordedAt": "2026-10-01T14:54:10.234200+00:00",
+  "base": "a92b04757378108e3a88b7c03f71e8a68e66c6ec",
+  "branch": "codex/w4-qualified-read-custody-20261001",
+  "requirements": ["R12", "R08", "R13"],
+  "sourceSha256": {
+    "apps/backend/src/modules/commerce/extended.ts": "19b411db5ba309a343bac6653a0aee9d6b039c32b82ac30e790d24b6031ff53e",
+    "apps/backend/src/modules/commerce/runtime.ts": "3844a6b34cc7b6352d60c63583ee3f75579442da53e2a1e9a8d6c937ce6449db"
+  },
+  "changes": [
+    "Issuer accepts only the original evidence ID, then reads the canonical durable receipt on the issuance transaction. No caller qualification booleans.",
+    "Exact creator/fan/packet/thread/commitment and fulfillment hash are bound to the receipt.",
+    "Current verified/recovered creator, captured payment, delivered eligible mode and nonrevoked sharing are required.",
+    "Existing complete UTC gross cap and monthly-reader/evidence deduplication remain."
+  ],
+  "verification": {
+    "typecheck": {
+      "exitCode": 0
+    },
+    "scopedLint": {
+      "exitCode": 0
+    },
+    "format": {
+      "exitCode": 0
+    },
+    "backendBundle": {
+      "exitCode": 0
+    },
+    "runtime": {
+      "api": "Canonical configured backend on 4104; explicit development identity; health ready:false.",
+      "database": "Fresh40 canonical checksummed migrations; old28 archive ledger preserved separately; existing old application data copied atomically; no newer pre-cleanup data claimed restored. Runtime role has no superuser/bypass/relation ownership.",
+      "actor": "Existing archived development actor one; fan w4_resume_fan; creators0, financial ledger0.",
+      "web": "Expired session rejected; canonical sign-in preserved earnings destination; actual existing development fan denied creator earnings. Next development web on3004,1280-wide Light; no positive credit journey.",
+      "qualifiedReadAcceptance": "Not verified: canonical W7 durable qualified-read/current signed publication/review producer is absent; no callback/default fabricated. Approved credit economics and live purpose authority remain mandatory."
+    }
+  },
+  "failedEnvironmentObservations": [
+    "Plain postgres17.11 lacks vector; the first fresh migration rolled back. Replaced only the owned container with the repository pgvector/pgvector:pg17 image.",
+    "New empty database inherited a different libc collation version from the first image; reindexed the owned fresh database and refreshed its collation version before restoring application data."
+  ],
+  "releaseReady": false,
+  "artifacts": {
+    "fan-earnings-denied-light.jpg": "019037567348c4c06456d58f10c0a0f8bdb776372c4841cb31543921dd33106d"
+  }
+}

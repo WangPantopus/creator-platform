@@ -59,6 +59,14 @@ const port = z.coerce
 const origin = z.url().parse(process.env.WEB_ORIGIN ?? "http://localhost:3008");
 if (!["localhost", "127.0.0.1"].includes(new URL(origin).hostname))
   throw new Error("Local web origin must be loopback.");
+const requestedRestoredTrafficDisabled =
+  process.env.RESTORED_TRAFFIC_DISABLED === "true";
+if (
+  process.env.RESTORED_DATABASE_NAME &&
+  (process.env.RESTORED_DATABASE_NAME !== "creator_w8" ||
+    !requestedRestoredTrafficDisabled)
+)
+  throw new Error("Restored local data must remain traffic-closed.");
 const databaseUrl = process.env.W8_DATABASE_URL;
 const workerUrl = process.env.W8_WORKER_DATABASE_URL;
 const conversationUrl = process.env.W8_CONVERSATION_DATABASE_URL;
@@ -140,6 +148,23 @@ if (
 }
 const store = new TrustStore(pool);
 await store.assertRole();
+// This owner-controlled marker survives restarts even if the recovery env flag
+// is accidentally omitted. Runtime roles cannot clear a database comment.
+const recoveryState = await pool.query<{ closed: boolean }>(
+  `SELECT shobj_description(oid,'pg_database') =
+    'creator-platform:restored-traffic-closed' AS closed
+   FROM pg_database WHERE datname=current_database()`,
+);
+const restoredTrafficDisabled =
+  requestedRestoredTrafficDisabled || recoveryState.rows[0]?.closed === true;
+const assertRestoredTraffic = () => {
+  if (restoredTrafficDisabled)
+    throw new DomainError(
+      "restoration_pending",
+      "This restored environment is unavailable while recovery is verified.",
+      503,
+    );
+};
 const db: Database = new Database(conversationPool, undefined, (...scope) =>
   trustScopeRestriction(service, workerPool)(...scope),
 );
@@ -378,6 +403,16 @@ const readiness = new Readiness(
         code: "synthetic_local_accounts",
       }),
     },
+    {
+      name: "restoration_denial",
+      required: true,
+      run: async () => ({
+        state: restoredTrafficDisabled ? "unavailable" : "available",
+        code: restoredTrafficDisabled
+          ? "restored_traffic_closed"
+          : "not_restored_local_harness",
+      }),
+    },
     ...["model", "payments", "calls", "voice", "push"].map((name) => ({
       name,
       required: true,
@@ -415,15 +450,38 @@ app.use((req, res, next) => {
   res.setHeader("Cache-Control", "no-store");
   next();
 });
+// A recovered database is available only to the recovery operator until every
+// domain has reapplied denial/purge. No local identity or worker can bypass it.
+app.use((req, res, next) => {
+  const publicRead =
+    ["GET", "HEAD"].includes(req.method) &&
+    [
+      "/health/live",
+      "/health/ready",
+      "/v1/identity/capabilities",
+      "/v1/trust/help",
+      "/v1/trust/status",
+    ].includes(req.path);
+  if (!restoredTrafficDisabled || publicRead) return next();
+  return next(
+    new DomainError(
+      "restoration_pending",
+      "This restored environment is unavailable while recovery is verified.",
+      503,
+    ),
+  );
+});
 // Reuse W1's canonical session implementation for the isolated native demonstration.
 // The ephemeral encryption key intentionally invalidates these synthetic sessions on restart.
 app.use("/v1/identity", express.json({ limit: "8kb" }));
 app.get("/v1/identity/capabilities", (_req, res) =>
   res.json({
-    signInAvailable: true,
+    signInAvailable: !restoredTrafficDisabled,
     localAccountsAllowed: false,
     mode: "development",
-    developmentActors: nativeIdentity.developmentActors,
+    developmentActors: restoredTrafficDisabled
+      ? []
+      : nativeIdentity.developmentActors,
   }),
 );
 app.post("/v1/identity/continue", async (req, res) =>
@@ -630,7 +688,8 @@ const worker = new TrustWorker(workerPool, privacyHooks, [], (signal, value) =>
     ? telemetry.increment(signal, value)
     : telemetry.observe(signal, value),
 );
-await worker.start();
+if (restoredTrafficDisabled) await new TrustStore(workerPool).assertRole(true);
+else await worker.start();
 const wal = new PostgresWalObserver(workerPool, telemetry);
 await wal.start();
 const server = createServer(app);
@@ -641,8 +700,14 @@ const sockets = attachRealtime(
   conversation,
   origin,
   {
-    assertActorAllowed: (actor) => service.assertAllowed(actor),
-    resolveSession: (token) => nativeIdentity.resolve(token),
+    assertActorAllowed: (actor) => {
+      assertRestoredTraffic();
+      return service.assertAllowed(actor);
+    },
+    resolveSession: async (token) => {
+      assertRestoredTraffic();
+      return nativeIdentity.resolve(token);
+    },
     telemetry,
   },
 );
