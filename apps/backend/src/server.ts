@@ -291,7 +291,8 @@ try {
                 pool: runtime.pool,
                 development: config.identityAdapter === "development",
               }),
-              mediaHost?.feature(accountCalls) ?? mediaFeature({ accountCalls }),
+              mediaHost?.feature(accountCalls) ??
+                mediaFeature({ accountCalls }),
               ...(commerce ? [commerce.feature] : []),
               ...(content ? content.features : []),
               ...(features.growth ? [features.growth.feature] : []),
