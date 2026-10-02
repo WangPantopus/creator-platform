@@ -1,0 +1,17 @@
+{
+  "candidateSource": "6771bfed2ac07d34bfb04ef66d4d909f014ba7da",
+  "packetSHA256": "2d72120d1be136081acb5d324f19dae44660d6e423e932cc962664596ab4c3e2",
+  "initialHeldMapSHA256": "9efbb69e476ad39a895e5aa5db0468ad8bd98061c308f0ba9c4e35fa61e90ba7",
+  "canonical57SourcesAndFourWaveSQLHashesPersonallyChecked": 61,
+  "actualCommands": [
+    "exact candidate activate-wave.ts on closed preserved57 copy",
+    "exact candidate migrate-trust.ts on closed empty copy",
+    "independent real backup/restore and original-history/data/security/sequence comparisons"
+  ],
+  "heldAllocation": "W8 is correcting the initial held producer/issuer ordering; no W5 factory/ID/SQL/path/registry edit from that map was applied.",
+  "originalApplicationDatabase": "creator_w5 remains canonical57; ledger/schema/data/sequence unchanged; reopened only original local-development admission.",
+  "copies": "All own61 rehearsal targets remain traffic-closed.",
+  "qualification": "SQL custody only, no actual worker/lease/expiry/COMMIT/app/C10/recovery/provider/identity/signature acceptance.",
+  "archiveRecovery": false,
+  "newTestsWritten": false
+}
