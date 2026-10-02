@@ -18,6 +18,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -514,6 +515,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     LaunchedEffect(client, foreground) { if (foreground) refresh(cursor) else conceal() }
     val fan=account?.get("fan")?.jsonObject
     val overview = commerce
+    val largeText = LocalDensity.current.fontScale >= 1.5f
     val limit = overview?.limits?.firstOrNull { it.currency == overview.policy.currency }
     val limitDetail = if (overview == null) "Currently unavailable" else if (limit == null) "Choose your limit" else if (limit.explicit_none) "No limit" else limit.amount?.toLongOrNull()?.let { "of your ${commerceMoney(it, limit.currency)} limit" } ?: "Limit unavailable"
     val privacyIndex = if (error.isNotEmpty()) 5 else 4
@@ -526,9 +528,16 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         }
         if(error.isNotEmpty()) item { Notice(title = "Account unavailable", children = error) }
         item {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Top) {
-                AccountMetric("THIS MONTH", overview?.exposure?.let { commerceMoney(it.captured, it.currency) } ?: "—", limitDetail, Modifier.weight(1f))
-                AccountMetric("MEMBERSHIPS", overview?.memberships?.size?.toString() ?: "—", if(overview == null) "Currently unavailable" else "Saved memberships", Modifier.weight(1f))
+            if (largeText) {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    AccountMetric("THIS MONTH", overview?.exposure?.let { commerceMoney(it.captured, it.currency) } ?: "—", limitDetail, Modifier.fillMaxWidth())
+                    AccountMetric("MEMBERSHIPS", overview?.memberships?.size?.toString() ?: "—", if(overview == null) "Currently unavailable" else "Saved memberships", Modifier.fillMaxWidth())
+                }
+            } else {
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Top) {
+                    AccountMetric("THIS MONTH", overview?.exposure?.let { commerceMoney(it.captured, it.currency) } ?: "—", limitDetail, Modifier.weight(1f))
+                    AccountMetric("MEMBERSHIPS", overview?.memberships?.size?.toString() ?: "—", if(overview == null) "Currently unavailable" else "Saved memberships", Modifier.weight(1f))
+                }
             }
         }
         item {

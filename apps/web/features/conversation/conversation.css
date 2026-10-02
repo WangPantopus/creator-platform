@@ -262,6 +262,11 @@
   box-sizing: border-box;
   z-index: 4;
 }
+@media (max-width: 320px) {
+  .conversation-you .account-metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 .conversation-memory {
   padding: 14px 16px;
   display: flex;

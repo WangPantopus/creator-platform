@@ -346,6 +346,7 @@ private struct W3AccountScreen: View {
     @State private var revision = 0
     @State private var commerce: CommerceOverview?
     @ScaledMetric(relativeTo: .title2) private var metricSize: CGFloat = 24
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var scheme
     var body: some View {
@@ -358,10 +359,15 @@ private struct W3AccountScreen: View {
                             .qText("caption").foregroundStyle(qColor("ink-muted", scheme))
                     }
                     if !failure.isEmpty { Notice(tone: .error, title: "Account unavailable", children: failure) }
-                    HStack(alignment: .top, spacing: 12) {
+                    if dynamicTypeSize.isAccessibilitySize {
+                        VStack(alignment: .leading, spacing: 12) {
+                            accountMetric("THIS MONTH", value: monthAmount, detail: limitDescription)
+                            accountMetric("MEMBERSHIPS", value: commerce.map { String($0.memberships.count) } ?? "—", detail: commerce == nil ? "Currently unavailable" : "Saved memberships")
+                        }
+                    } else { HStack(alignment: .top, spacing: 12) {
                         accountMetric("THIS MONTH", value: monthAmount, detail: limitDescription)
                         accountMetric("MEMBERSHIPS", value: commerce.map { String($0.memberships.count) } ?? "—", detail: commerce == nil ? "Currently unavailable" : "Saved memberships")
-                    }
+                    } }
                     accountPanel {
                         accountRow("Me and privacy", detail: "Memories, who opened your conversations, consents") { proxy.scrollTo("account-privacy", anchor: .top) }
                         accountDivider
