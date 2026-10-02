@@ -8,7 +8,8 @@ import {
 } from "../identity/request-authority.js";
 
 /** Actual W8 registry receipt, never a fabricated purpose or family scope.
- * W8 reserved 0101; this descriptor does not register or activate its SQL. */
+ * Corrected held map fb1cbca reserves0185; SQL bytes and applied history stay
+ * unchanged. This descriptor does not register or activate the proposal. */
 export interface CoreFollowMigration {
   version: string;
   checksum: string;
@@ -16,7 +17,7 @@ export interface CoreFollowMigration {
   functionDefinitionSha256: string;
 }
 const Migration = z.strictObject({
-  version: z.literal("0101_w7_core_follow_metadata"),
+  version: z.literal("0185_w7_core_follow_metadata"),
   checksum: z.string().regex(/^[a-f0-9]{64}$/u),
   functionDefinitionSha256: z.string().regex(/^[a-f0-9]{64}$/u),
 });

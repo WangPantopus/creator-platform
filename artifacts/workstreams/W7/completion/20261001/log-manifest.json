@@ -846,5 +846,14 @@
     "contentSha256": "8fa590989e4db3cb2d5e7f65863cc1e2c85ea1e85729900edfe1ca9c9e112f45",
     "bytes": 953,
     "kind": "Exact captured log bytes preserved with gzip; no whitespace normalization"
+  },
+  "../../studio-runtime/20261002/held-map-raw/backend-existing.log.gz": {
+    "sha256": "f064f04b1ef7bb44b2522260a60446aab57ca8fc9276d35f75da994aeaa81286",
+    "bytes": 404,
+    "contentSha256": "9c0bfd5cf5bb7466bec8217bcc889bee4847ad451462967f1782a7dd06532ca7"
+  },
+  "../../studio-runtime/20261002/held-map-raw/receipt.json": {
+    "sha256": "0351de85082c42f348290b9c488f59d376f9670ca54c109f2111e379fdfb787f",
+    "bytes": 3284
   }
 }
