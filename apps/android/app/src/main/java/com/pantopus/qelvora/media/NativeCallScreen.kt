@@ -89,9 +89,11 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
         catch (error: Exception) {
             if (!active || !api.current() || account != model.session?.accountId) return
             if (error is CreatorAPIError && error.status in listOf(401, 403, 404, 409)) { disconnectMedia(); call = null; automaticRefresh = false }
-            if (error is CreatorAPIError && (runCatching { Json.decodeFromString<APIError>(error.body).error.code }.getOrNull()) in listOf("calls_unconfigured", "call_control_unconfigured", "call_provider_unconfigured", "call_admission_unverified", "call_control_role_invalid")) automaticRefresh = false
+            val code = (error as? CreatorAPIError)?.let { runCatching { Json.decodeFromString<APIError>(it.body).error.code }.getOrNull() }
+            val unavailable = code in listOf("calls_unconfigured", "call_control_unconfigured", "call_provider_unconfigured", "call_admission_unverified", "call_control_role_invalid")
+            if (unavailable) { disconnectMedia(); call = null; automaticRefresh = false }
             pollDelay = minOf(pollDelay * 2, 30000L)
-            stale = true; notice = QelvoraCopy.text("w6ReconnectToRefreshThisCallActionsAreUnavailableUntilAccess")
+            stale = true; notice = QelvoraCopy.text(if (unavailable) "w6CallServiceUnavailable" else "w6ReconnectToRefreshThisCallActionsAreUnavailableUntilAccess")
         }
         finally { fetching = false }
     }

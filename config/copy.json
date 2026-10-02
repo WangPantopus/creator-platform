@@ -677,6 +677,7 @@
   "w6ReloadSavedWindows": "Reload saved windows",
   "w6TheCallIsUnavailable": "The call is unavailable.",
   "w6CameraOrMicrophoneAccessIsOffOrUnavailableCheckYour": "Camera or microphone access is off or unavailable. Check your device settings and try again.",
+  "w6CallServiceUnavailable": "Calling is not connected yet.",
   "w6CallingIsNotConnectedYetYourBookingIsUnchanged": "Calling is not connected yet. Your booking is unchanged.",
   "w6ConnectionFailedRejoinTheSameCall": "Connection failed. Rejoin the same call.",
   "w6ConsentCouldNotBeSaved": "Consent could not be saved.",

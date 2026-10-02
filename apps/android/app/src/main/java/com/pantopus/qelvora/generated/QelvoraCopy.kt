@@ -680,6 +680,7 @@ object QelvoraCopy {
     "w6ReloadSavedWindows" to "Reload saved windows",
     "w6TheCallIsUnavailable" to "The call is unavailable.",
     "w6CameraOrMicrophoneAccessIsOffOrUnavailableCheckYour" to "Camera or microphone access is off or unavailable. Check your device settings and try again.",
+    "w6CallServiceUnavailable" to "Calling is not connected yet.",
     "w6CallingIsNotConnectedYetYourBookingIsUnchanged" to "Calling is not connected yet. Your booking is unchanged.",
     "w6ConnectionFailedRejoinTheSameCall" to "Connection failed. Rejoin the same call.",
     "w6ConsentCouldNotBeSaved" to "Consent could not be saved.",

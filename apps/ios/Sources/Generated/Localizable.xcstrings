@@ -7382,6 +7382,17 @@
         }
       }
     },
+    "Calling is not connected yet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calling is not connected yet."
+          }
+        }
+      }
+    },
     "Calling is not connected yet. Your booking is unchanged.": {
       "extractionState": "manual",
       "localizations": {

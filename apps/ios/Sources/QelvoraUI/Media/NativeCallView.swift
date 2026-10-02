@@ -95,7 +95,10 @@ private struct NativeCallDocument: Decodable, Sendable {
             if let failure = error as? CreatorAPIError {
                 if [401, 403, 404, 409].contains(failure.status) { await disconnectMedia(); call = nil; automaticRefresh = false }
                 let code = (try? JSONDecoder().decode(APIError.self, from: failure.body))?.error.code
-                if ["calls_unconfigured", "call_control_unconfigured", "call_provider_unconfigured", "call_admission_unverified", "call_control_role_invalid"].contains(code ?? "") { automaticRefresh = false }
+                if ["calls_unconfigured", "call_control_unconfigured", "call_provider_unconfigured", "call_admission_unverified", "call_control_role_invalid"].contains(code ?? "") {
+                    await disconnectMedia(); call = nil; automaticRefresh = false; stale = true
+                    self.error = QelvoraCopy.text("w6CallServiceUnavailable"); return
+                }
             }
             pollDelay = min(pollDelay * 2, 30000)
             stale = true; self.error = QelvoraCopy.text("w6ReconnectToRefreshThisCallActionsAreUnavailableUntilAccess")
