@@ -63,7 +63,7 @@ fun trustFanRegistration(context: Context, baseURL: String?) = FanFeatureRegistr
     allowsSignedOut = { it.startsWith("/trust") },
     screen = { model ->
         val account = model.session?.accountId
-        key(account) { TrustFanFeature(context, baseURL, model.destination) {
+        key(account) { TrustFanFeature(context, baseURL, model.destination, onNavigate = model::open) {
             val credential = model.currentToken()
             check(account != null && model.session?.accountId == account) { "Your account changed. Reopen this screen before continuing." }
             credential
@@ -73,10 +73,11 @@ fun trustFanRegistration(context: Context, baseURL: String?) = FanFeatureRegistr
 
 /** Missing phone composition is recorded; use established tokens and controls at 16dp gutters. */
 @Composable
-fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/support", token: () -> String? = { SecureSessionStorage(context, baseURL).read() }) {
+fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/support", onNavigate: ((String) -> Unit)? = null, token: () -> String? = { SecureSessionStorage(context, baseURL).read() }) {
     val client = remember(baseURL) { baseURL?.let { TrustClient(it, token) } }
     val coroutine = rememberCoroutineScope()
-    var route by remember { mutableStateOf(destination) }
+    var route by remember(destination) { mutableStateOf(destination) }
+    fun navigate(target: String) { if (onNavigate != null) onNavigate(target) else route = target }
     var cases by remember { mutableStateOf<List<JsonObject>>(emptyList()) }
     var notices by remember { mutableStateOf<List<JsonObject>>(emptyList()) }
     var jobs by remember { mutableStateOf<List<JsonObject>>(emptyList()) }
@@ -193,9 +194,9 @@ fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/
     Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).imePadding().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         TrustText(if (route.contains("privacy")) "Your data" else if (route.contains("access")) "Case access history" else if (route.contains("feedback")) "Optional product feedback" else if (route.startsWith("/trust")) "Crisis help protocol" else "Help and reports", "display-md")
         TrustText("Reports are available without paid access. Evidence is limited to what you report.")
-        Row { Button("Support", ButtonVariant.QUIET) { route = "/support" }; Button("Your data", ButtonVariant.QUIET) { route = "/support/privacy" } }
-        Row { Button("Access history", ButtonVariant.QUIET) { route = "/support/access" }; Button("Feedback", ButtonVariant.QUIET) { route = "/support/feedback" } }
-        Button("Crisis help", ButtonVariant.QUIET) { route = "/trust/crisis" }
+        Row { Button("Support", ButtonVariant.QUIET) { navigate("/support") }; Button("Your data", ButtonVariant.QUIET) { navigate("/support/privacy") } }
+        Row { Button("Access history", ButtonVariant.QUIET) { navigate("/support/access") }; Button("Feedback", ButtonVariant.QUIET) { navigate("/support/feedback") } }
+        Button("Crisis help", ButtonVariant.QUIET) { navigate("/trust/crisis") }
         if (busy) TrustText("Loading…")
         if (error.isNotEmpty()) Notice("error", "Could not complete", error)
         if (result.isNotEmpty()) Notice(title = "Saved", children = result)
