@@ -1,0 +1,397 @@
+Heavy build slot acquired by W7 final existing Swift and original snapshots.
+Fetching https://github.com/swiftlang/swift-syntax from cache
+Fetching https://github.com/pointfreeco/swift-custom-dump from cache
+Fetching https://github.com/pointfreeco/swift-snapshot-testing.git from cache
+Fetching https://github.com/pointfreeco/swift-issue-reporting from cache
+Fetched https://github.com/pointfreeco/swift-custom-dump from cache (0.03s)
+Fetched https://github.com/pointfreeco/swift-snapshot-testing.git from cache (0.04s)
+Fetched https://github.com/pointfreeco/swift-issue-reporting from cache (0.04s)
+Fetched https://github.com/swiftlang/swift-syntax from cache (0.06s)
+Creating working copy for https://github.com/swiftlang/swift-syntax
+Creating working copy for https://github.com/pointfreeco/swift-snapshot-testing.git
+Creating working copy for https://github.com/pointfreeco/swift-issue-reporting
+Creating working copy for https://github.com/pointfreeco/swift-custom-dump
+Working copy of https://github.com/pointfreeco/swift-custom-dump resolved at 1.7.3
+Working copy of https://github.com/pointfreeco/swift-snapshot-testing.git resolved at 1.19.6
+Working copy of https://github.com/pointfreeco/swift-issue-reporting resolved at 2.1.1
+Working copy of https://github.com/swiftlang/swift-syntax resolved at 604.0.0
+warning: 'ios': found 110 file(s) which are unhandled; explicitly declare them as resources or exclude from the target
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testAuthorIdentitySurfaces.light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testAuthorIdentitySurfaces.night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AccessLines-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AccessLines-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuditBanner-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuditBanner-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuthorLabel-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuthorLabel-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Avatar-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Avatar-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Button-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Button-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CallChip-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CallChip-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CapacityHeader-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CapacityHeader-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CitationChip-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CitationChip-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Composer-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Composer-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ContextCard-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ContextCard-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Correction-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Correction-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Countdown-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Countdown-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Dialog-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Dialog-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.DigestItem-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.DigestItem-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmailFrame-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmailFrame-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmptyState-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmptyState-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EtaLine-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EtaLine-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IdentityStrip-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IdentityStrip-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IncludeList-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IncludeList-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.InsteadMenu-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.InsteadMenu-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.LabelPreview-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.LabelPreview-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Mark-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Mark-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.MemoryChip-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.MemoryChip-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Message-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Message-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ModeList-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ModeList-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Note-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Note-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Notice-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Notice-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.NotificationRow-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.NotificationRow-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.QueueCard-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.QueueCard-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReactionChip-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReactionChip-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Receipt-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Receipt-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.RequestStatus-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.RequestStatus-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReservedLabel-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReservedLabel-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Seal-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Seal-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Segmented-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Segmented-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ShareCard-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ShareCard-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sheet-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sheet-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sidebar-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sidebar-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SignedMarker-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SignedMarker-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SigningSheet-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SigningSheet-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Skeleton-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Skeleton-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SourceRow-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SourceRow-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SpendLimit-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SpendLimit-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StepIn-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StepIn-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StudioTabBar-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StudioTabBar-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SystemLine-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SystemLine-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TabBar-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TabBar-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TermsBlock-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TermsBlock-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TestConsole-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TestConsole-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ThreadHeader-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ThreadHeader-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Toast-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Toast-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VersionList-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VersionList-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VoiceNote-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VoiceNote-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testWelcomeThemes.light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testWelcomeThemes.night.png
+Building for debugging...
+[Constructing description]
+[Planning deferred tasks]
+[60 / 104] QelvoraNative_QelvoraUI
+[64 / 104]
+[66 / 106] SnapshotTesting
+[66 / 287]
+[79 / 298]
+[89 / 298]
+[102 / 298]
+[112 / 298]
+[116 / 298]
+[126 / 298]
+[128 / 298]
+[133 / 298]
+[141 / 298]
+[153 / 298]
+[157 / 298]
+[163 / 298]
+[165 / 298]
+[184 / 298]
+[191 / 298]
+[198 / 298]
+[202 / 298]
+[208 / 298]
+[213 / 298]
+[218 / 298]
+[219 / 298]
+[225 / 298]
+[231 / 298]
+[243 / 298] QelvoraUI
+[244 / 298] QelvoraUI
+[245 / 298] SnapshotTesting
+[248 / 298] SnapshotTesting
+[249 / 298] SnapshotTesting
+[250 / 298] SnapshotTesting
+/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Trust.swift:23:93: warning: no 'async' operations occur within 'await' expression [#UnnecessaryEffectMarker]
+ 21 |     public let baseURL: URL
+ 22 |     public let token: @Sendable () async throws -> String?
+ 23 |     public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    |                                                                                             `- warning: no 'async' operations occur within 'await' expression [#UnnecessaryEffectMarker]
+ 24 |     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
+ 25 |         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
+
+/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Trust.swift:76:128: warning: no 'async' operations occur within 'await' expression [#UnnecessaryEffectMarker]
+ 74 |     @State private var feedbackConsent = false
+ 75 |     @Environment(\.colorScheme) private var scheme
+ 76 |     public init(baseURL: URL?, destination: String = "/support", token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) {
+    |                                                                                                                                `- warning: no 'async' operations occur within 'await' expression [#UnnecessaryEffectMarker]
+ 77 |         client = baseURL.map { TrustClient(baseURL: $0, token: token) }; _route = State(initialValue: destination)
+ 78 |         let query = URLComponents(string: destination)?.queryItems ?? []
+
+[#UnnecessaryEffectMarker]: <https://docs.swift.org/compiler/documentation/diagnostics/unnecessary-effect-marker>
+[254 / 298] SnapshotTesting
+/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Trust.swift:23:93: warning: no 'async' operations occur within 'await' expression [#UnnecessaryEffectMarker]
+ 21 |     public let baseURL: URL
+ 22 |     public let token: @Sendable () async throws -> String?
+ 23 |     public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    |                                                                                             `- warning: no 'async' operations occur within 'await' expression [#UnnecessaryEffectMarker]
+ 24 |     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
+ 25 |         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
+
+/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Trust.swift:76:128: warning: no 'async' operations occur within 'await' expression [#UnnecessaryEffectMarker]
+ 74 |     @State private var feedbackConsent = false
+ 75 |     @Environment(\.colorScheme) private var scheme
+ 76 |     public init(baseURL: URL?, destination: String = "/support", token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) {
+    |                                                                                                                                `- warning: no 'async' operations occur within 'await' expression [#UnnecessaryEffectMarker]
+ 77 |         client = baseURL.map { TrustClient(baseURL: $0, token: token) }; _route = State(initialValue: destination)
+ 78 |         let query = URLComponents(string: destination)?.queryItems ?? []
+
+[#UnnecessaryEffectMarker]: <https://docs.swift.org/compiler/documentation/diagnostics/unnecessary-effect-marker>
+[261 / 298] QelvoraUI
+[266 / 298] SnapshotTesting-product
+[274 / 298]
+[275 / 299]
+[275 / 299] SnapshotTesting
+[277 / 299] qelvora-native-snapshots-product
+[279 / 301] qelvora-native-snapshots-product
+[280 / 301] qelvora-native-snapshots-product
+[281 / 301] QelvoraUI
+[283 / 301] QelvoraUI
+[289 / 302] qelvora-native-snapshots-product
+[298 / 325]
+[302 / 325]
+[307 / 325]
+[308 / 325]
+[314 / 325] QelvoraUITests-product
+/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift:180:7: warning: 'assertSnapshot(of:as:named:record:timeout:fileID:file:testName:line:column:)' is deprecated: Use overload with 'record: SnapshotTestingConfiguration.Record?' [#DeprecatedDeclaration]
+178 |         return ("\(different) pixels exceed the native sRGB rounding bound. " + failure.0, failure.1)
+179 |       }
+180 |       assertSnapshot(
+    |       `- warning: 'assertSnapshot(of:as:named:record:timeout:fileID:file:testName:line:column:)' is deprecated: Use overload with 'record: SnapshotTestingConfiguration.Record?' [#DeprecatedDeclaration]
+181 |         of: image, as: imageStrategy, named: name, record: record, file: file,
+182 |         testName: testName, line: line)
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[319 / 325] QelvoraUITests-product
+[321 / 325] QelvoraUITests-product
+[323 / 325] QelvoraUITests-product
+Build complete! (25.69 sec)
+Test Suite 'All tests' started at 2026-10-02 02:20:44.640.
+Test Suite 'QelvoraUITests.xctest' started at 2026-10-02 02:20:44.642.
+Test Suite 'DeliveryProtocolTests' started at 2026-10-02 02:20:44.642.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testDuplicateCursorAndGenerationSequenceDoNotRepeatText]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testDuplicateCursorAndGenerationSequenceDoNotRepeatText]' passed (0.002 seconds).
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testGenerationGapDoesNotAdvanceRenderedCursor]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testGenerationGapDoesNotAdvanceRenderedCursor]' passed (0.000 seconds).
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testOldAIFrameNeverAppearsAfterTakeover]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testOldAIFrameNeverAppearsAfterTakeover]' passed (0.000 seconds).
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testPersistedCheckpointResumesGenerationAfterProcessRecreation]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testPersistedCheckpointResumesGenerationAfterProcessRecreation]' passed (0.000 seconds).
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testReconnectWaitsForMissingCursorRatherThanSkippingABoundary]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testReconnectWaitsForMissingCursorRatherThanSkippingABoundary]' passed (0.000 seconds).
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testRejectedDrainDoesNotLoseEarlierValidSentence]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testRejectedDrainDoesNotLoseEarlierValidSentence]' passed (0.000 seconds).
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testReorderedTakeoverBoundaryPrecedesLaterContent]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testReorderedTakeoverBoundaryPrecedesLaterContent]' passed (0.000 seconds).
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testWrongThreadFailsClosed]' started.
+Test Case '-[QelvoraUITests.DeliveryProtocolTests testWrongThreadFailsClosed]' passed (0.000 seconds).
+Test Suite 'DeliveryProtocolTests' passed at 2026-10-02 02:20:44.646.
+	 Executed 8 tests, with 0 failures (0 unexpected) in 0.003 (0.004) seconds
+Test Suite 'GeneratedContractTests' started at 2026-10-02 02:20:44.646.
+Test Case '-[QelvoraUITests.GeneratedContractTests testIdentityCapabilityRejectsIndependentAccounts]' started.
+Test Case '-[QelvoraUITests.GeneratedContractTests testIdentityCapabilityRejectsIndependentAccounts]' passed (0.000 seconds).
+Test Case '-[QelvoraUITests.GeneratedContractTests testRealtimeControlFrameDecodesNullableGeneration]' started.
+Test Case '-[QelvoraUITests.GeneratedContractTests testRealtimeControlFrameDecodesNullableGeneration]' passed (0.000 seconds).
+Test Suite 'GeneratedContractTests' passed at 2026-10-02 02:20:44.647.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'IdentityTests' started at 2026-10-02 02:20:44.647.
+Test Case '-[QelvoraUITests.IdentityTests testEveryAuthorUsesItsFixedLabel]' started.
+Test Case '-[QelvoraUITests.IdentityTests testEveryAuthorUsesItsFixedLabel]' passed (0.001 seconds).
+Test Case '-[QelvoraUITests.IdentityTests testOnlyCreatorAuthorshipOwnsTheCreatorSurface]' started.
+Test Case '-[QelvoraUITests.IdentityTests testOnlyCreatorAuthorshipOwnsTheCreatorSurface]' passed (0.000 seconds).
+Test Case '-[QelvoraUITests.IdentityTests testRegistryHonestlyTracksAll53Components]' started.
+Test Case '-[QelvoraUITests.IdentityTests testRegistryHonestlyTracksAll53Components]' passed (0.000 seconds).
+Test Case '-[QelvoraUITests.IdentityTests testUnconnectedPantopusAdapterDoesNotReturnAnAccount]' started.
+Test Case '-[QelvoraUITests.IdentityTests testUnconnectedPantopusAdapterDoesNotReturnAnAccount]' passed (0.013 seconds).
+Test Case '-[QelvoraUITests.IdentityTests testUnknownOrReservedServerMessageKindCannotRenderAsAHuman]' started.
+Test Case '-[QelvoraUITests.IdentityTests testUnknownOrReservedServerMessageKindCannotRenderAsAHuman]' passed (0.000 seconds).
+Test Suite 'IdentityTests' passed at 2026-10-02 02:20:44.662.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.014 (0.015) seconds
+Test Suite 'NativeSnapshotTests' started at 2026-10-02 02:20:44.662.
+Test Case '-[QelvoraUITests.NativeSnapshotTests testAuthorIdentitySurfaces]' started.
+Test Case '-[QelvoraUITests.NativeSnapshotTests testAuthorIdentitySurfaces]' passed (0.499 seconds).
+Test Case '-[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes]' started.
+Test Case '-[QelvoraUITests.NativeSnapshotTests testComponentCatalogThemes]' passed (13.990 seconds).
+Test Case '-[QelvoraUITests.NativeSnapshotTests testWelcomeThemes]' started.
+Test Case '-[QelvoraUITests.NativeSnapshotTests testWelcomeThemes]' passed (0.239 seconds).
+Test Suite 'NativeSnapshotTests' passed at 2026-10-02 02:20:59.390.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 14.728 (14.729) seconds
+Test Suite 'QelvoraUITests.xctest' passed at 2026-10-02 02:20:59.390.
+	 Executed 18 tests, with 0 failures (0 unexpected) in 14.747 (14.748) seconds
+Test Suite 'All tests' passed at 2026-10-02 02:20:59.390.
+	 Executed 18 tests, with 0 failures (0 unexpected) in 14.747 (14.750) seconds
+Native capture testAuthorIdentitySurfaces()/light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testAuthorIdentitySurfaces()/night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Mark.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Seal.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Avatar.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/AuthorLabel.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/IdentityStrip.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/ThreadHeader.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/SignedMarker.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/SystemLine.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Message.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Note.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/ReactionChip.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/CitationChip.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/MemoryChip.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Correction.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/ContextCard.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/VoiceNote.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Composer.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/StepIn.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/AccessLines.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/ModeList.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/IncludeList.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/TermsBlock.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/EtaLine.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/RequestStatus.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Receipt.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/SpendLimit.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/QueueCard.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/CapacityHeader.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/LabelPreview.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/SigningSheet.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/AuditBanner.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/SourceRow.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Button.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/TabBar.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Segmented.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Notice.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/NotificationRow.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/EmptyState.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/ShareCard.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/CallChip.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/ReservedLabel.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Countdown.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/InsteadMenu.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/TestConsole.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/VersionList.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/DigestItem.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/StudioTabBar.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Sidebar.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Sheet.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Dialog.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Toast.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Skeleton.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/EmailFrame.light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Mark.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Seal.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Avatar.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/AuthorLabel.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/IdentityStrip.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/ThreadHeader.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/SignedMarker.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/SystemLine.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Message.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Note.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/ReactionChip.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/CitationChip.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/MemoryChip.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Correction.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/ContextCard.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/VoiceNote.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Composer.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/StepIn.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/AccessLines.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/ModeList.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/IncludeList.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/TermsBlock.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/EtaLine.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/RequestStatus.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Receipt.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/SpendLimit.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/QueueCard.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/CapacityHeader.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/LabelPreview.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/SigningSheet.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/AuditBanner.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/SourceRow.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Button.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/TabBar.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Segmented.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Notice.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/NotificationRow.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/EmptyState.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/ShareCard.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/CallChip.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/ReservedLabel.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Countdown.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/InsteadMenu.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/TestConsole.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/VersionList.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/DigestItem.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/StudioTabBar.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Sidebar.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Sheet.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Dialog.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Toast.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/Skeleton.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testComponentCatalogThemes()/EmailFrame.night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testWelcomeThemes()/light: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+Native capture testWelcomeThemes()/night: display=2.0, reported=2.0, points=(390.0, 844.0), bitmapPixels=780x1688
+◇ Test run started.
+↳ Testing Library Version: 2084
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.
+Heavy build slot released.

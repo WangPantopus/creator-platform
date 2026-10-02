@@ -197,6 +197,13 @@ fun GrowthFanFeature(baseUrl: String?, token: () -> String? = { null }, destinat
                 route.startsWith("/share/") -> shared = client.request("public/shares/${route.removePrefix("/share/")}")
                 route == "/notifications/settings" -> Unit
                 route == "/notifications" -> notifications = client.request("notifications").objects("notifications")
+                route.startsWith("/notifications/") -> {
+                    val openedRoute = route
+                    val id = java.util.UUID.fromString(route.removePrefix("/notifications/")).toString()
+                    val captured = token() ?: throw GrowthRequestFailure(401)
+                    val target = GrowthPush.resolveTap(client, id, captured)
+                    if(route == openedRoute && token() == captured) navigate(target)
+                }
                 route.startsWith("/creators/") -> {
                     val pieces = route.substringBefore('?').split('/'); val handle = pieces.getOrNull(2) ?: throw IllegalStateException(QelvoraCopy.text("growthThisCreatorIsUnavailable"))
                     val result = if (route.contains("/posts/")) client.request("public/creators/$handle/posts/${pieces.last()}") else client.request("public/creators/$handle")
@@ -224,10 +231,10 @@ fun GrowthFanFeature(baseUrl: String?, token: () -> String? = { null }, destinat
                     if(pagingDiscover) BasicText(QelvoraCopy.text("growthLoading"), style = qText("caption").copy(color = ink))
                     if (creators.isEmpty() && !loading && error.isEmpty()) EmptyState(QelvoraCopy.text("growthNoCreatorsFound"), QelvoraCopy.text("growthTryAnotherNeedOrBrowseACategory"))
                 }
-                route == "/notifications" -> {
+                route.startsWith("/notifications") -> {
                     BasicText(QelvoraCopy.text("growthNotifications"), style = qText("display-lg").copy(color = ink));Button(QelvoraCopy.text("growthSettings"), ButtonVariant.QUIET) {navigate("/notifications/settings")}
-                    notifications.forEach { item -> Column(Modifier.fillMaxWidth().clickable(role = Role.Button) { scope.launch {try {client?.request("notifications/${item.getString("id")}/read", "PUT", JSONObject());navigate(item.getString("destination"))}catch(cancelled: kotlinx.coroutines.CancellationException) {throw cancelled} catch(failure: Exception) {record(failure)}} }.padding(vertical = 16.dp).semantics {contentDescription = item.getString("sender") + ". " + item.getString("preview")}, verticalArrangement = Arrangement.spacedBy(6.dp)) {BasicText(item.getString("sender"), style = qText("label").copy(color = ink));BasicText(item.getString("preview"), style = qText("body").copy(color = ink))} }
-                    if (notifications.isEmpty() && !loading && error.isEmpty()) EmptyState(QelvoraCopy.text("growthNoUpdatesYet"), QelvoraCopy.text("growthYourInAppRecordCannotBeTurnedOff"))
+                    if(route == "/notifications") notifications.forEach { item -> Column(Modifier.fillMaxWidth().clickable(role = Role.Button) { navigate("/notifications/${item.getString("id")}") }.padding(vertical = 16.dp).semantics {contentDescription = item.getString("sender") + ". " + item.getString("preview")}, verticalArrangement = Arrangement.spacedBy(6.dp)) {BasicText(item.getString("sender"), style = qText("label").copy(color = ink));BasicText(item.getString("preview"), style = qText("body").copy(color = ink))} }
+                    if (route == "/notifications" && notifications.isEmpty() && !loading && error.isEmpty()) EmptyState(QelvoraCopy.text("growthNoUpdatesYet"), QelvoraCopy.text("growthYourInAppRecordCannotBeTurnedOff"))
                 }
                 creator != null -> {
                     val c = creator!!; val name = c.getString("name"); val handle = c.getString("handle")
