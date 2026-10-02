@@ -13,18 +13,26 @@ import type { CreatorMediaService } from "./creator-service.js";
 import type { CreatorScope } from "../identity/creator-scope.js";
 import type { AudienceScope } from "../identity/audience-scope.js";
 import type { SessionService } from "../session/service.js";
+import type { Actor } from "../identity/adapter.js";
+import type { AccountCallMetadata } from "../session/account-call-metadata.js";
 import type { AvailabilityService } from "../session/availability.js";
 import { visibleSession } from "../session/service.js";
 import { withDeadline } from "./deadline.js";
-import type { CallSession } from "../../../../../packages/api/src/session.js";
+import {
+  AdmissionRedemptionSchema,
+  type CallSession,
+} from "../../../../../packages/api/src/session.js";
 
 export type W6RouterDependencies = {
   scopeFor: (request: Request) => Promise<ThreadScope>;
+  /** Supplied only by the canonical host's actual request identity resolver. */
+  actorFor?: (request: Request) => Promise<Actor>;
   media?: MediaService;
   creatorMedia?: CreatorMediaService;
   creatorScopeFor?: (request: Request) => Promise<CreatorScope>;
   audienceScopeFor?: (request: Request) => Promise<AudienceScope>;
   sessions?: SessionService;
+  accountCalls?: AccountCallMetadata;
   availability?: AvailabilityService;
 };
 /** W1 mounts before its terminal404/error handler. No identity inference in W6. */
@@ -48,16 +56,36 @@ export function createW6Router(dependencies: W6RouterDependencies) {
       ),
       callsAvailable: Boolean(
         dependencies.sessions &&
+          dependencies.actorFor &&
           dependencies.sessions.provider.name !== "unconfigured" &&
+          dependencies.sessions.interactiveControlAvailable &&
           dependencies.sessions.provider.supportsSingleUseAdmission,
       ),
       aiAudioAvailable: false,
+      callRecoveryAvailable: dependencies.accountCalls?.available === true,
       reason: !dependencies.media
         ? "media_unconfigured"
         : "licensed_ai_audio_and_provider_verification_required",
     }),
   );
   router.use(express.json({ limit: "64kb" }));
+  router.get("/calls/:sessionId/route", async (req, res) => {
+    const sessionId = z.uuid().parse(req.params.sessionId);
+    if (!dependencies.accountCalls?.available)
+      throw new DomainError(
+        "call_metadata_unconfigured",
+        "Current-account call recovery is unavailable.",
+        503,
+      );
+    const selector = req.headers["x-qelvora-expected-account"];
+    if (selector !== undefined && typeof selector !== "string")
+      throw new DomainError(
+        "session_account_invalid",
+        "Reopen this call with your current account.",
+        400,
+      );
+    res.json(await dependencies.accountCalls.read(sessionId, selector));
+  });
   const root = "/threads/:creatorId/:fanId";
   const media = () => {
     if (!dependencies.media)
@@ -84,6 +112,18 @@ export function createW6Router(dependencies: W6RouterDependencies) {
     assertExpectedAccount(req, current.actorAccountId);
     return current;
   };
+  const callActor = async (req: Request) => {
+    if (!dependencies.actorFor)
+      throw new DomainError(
+        "call_control_request_required",
+        "Calling requires this host’s current authenticated request.",
+        503,
+      );
+    return dependencies.actorFor(req);
+  };
+  router.get(`${root}/recording-policy`, async (req, res) =>
+    res.json(await media().recordingPolicy(await scope(req))),
+  );
   const id = (req: Request, key = "assetId") => z.uuid().parse(req.params[key]);
   const creatorMedia = () => {
     if (!dependencies.creatorMedia || !dependencies.creatorScopeFor)
@@ -374,8 +414,26 @@ export function createW6Router(dependencies: W6RouterDependencies) {
     ),
   );
   router.post(`${root}/calls/:sessionId/join`, async (req, res) =>
-    res.json(await session().join(await scope(req), id(req, "sessionId"))),
+    res.json(
+      await session().join(
+        await scope(req),
+        id(req, "sessionId"),
+        await callActor(req),
+      ),
+    ),
   );
+  router.post(`${root}/calls/:sessionId/redeem`, async (req, res) => {
+    const service = session();
+    const body = AdmissionRedemptionSchema.parse(req.body);
+    res.json(
+      await service.redeem(
+        await scope(req),
+        id(req, "sessionId"),
+        body.nonce,
+        await callActor(req),
+      ),
+    );
+  });
   router.post(`${root}/calls/:sessionId/consent`, async (req, res) =>
     callResponse(req, res, (current) =>
       session().consent(current, id(req, "sessionId"), req.body),

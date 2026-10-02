@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+/** Navigation only after the current account's held booking is authorized.
+ * It grants no admission, provider token, worker or financial authority. */
+export const CallRouteSchema = z.strictObject({
+  sessionId: z.uuid(),
+  creatorId: z.uuid(),
+  fanId: z.uuid(),
+});
+
 export const AvailabilityCommandSchema = z.strictObject({
   timeZone: z.string().min(1).max(80),
   windows: z
@@ -72,6 +80,12 @@ export const EndCallSchema = z.strictObject({
   expectedVersion: z.number().int().positive(),
   fanChoice: z.enum(["end_by_choice", "technical_problem"]).optional(),
   idempotencyKey: z.string().min(8).max(128),
+});
+/** The nonce belongs to the actual current session/account. Redemption is
+ * application admission; the provider separately enforces its token custody. */
+export const AdmissionRedemptionSchema = z.strictObject({ nonce: z.uuid() });
+export const AdmissionReceiptSchema = z.strictObject({
+  admitted: z.literal(true),
 });
 export type CallConsentPurpose = z.infer<typeof CallConsentPurposeSchema>;
 export const CallSummaryNoteSchema = z.strictObject({
@@ -167,6 +181,8 @@ export type CallSession = {
   consents: SessionConsent[];
   outcome: SessionOutcome | null;
   reconciliation: "pending" | "complete" | "blocked";
+  /** Actual creator takeover bound to this call, never a worker/control grant. */
+  conversationEpoch?: number;
   packet: { summary: string; attachmentIds: string[] };
   summary: string | null;
   creatorSummaryNote?: string;

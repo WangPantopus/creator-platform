@@ -372,6 +372,22 @@
   cursor: default;
   opacity: 0.6;
 }
+@media (max-width: 280px) {
+  .w5-account,
+  .w5-heading {
+    flex-wrap: wrap;
+  }
+  .w5-studio .qv-meta {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .w5-tabs .qv-tabbar--studio {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .w5-main {
+    padding-bottom: calc(var(--space-8) * 5 + env(safe-area-inset-bottom));
+  }
+}
 @media (max-width: 899px) {
   .w5-studio--compose .w5-account,
   .w5-studio--compose .w5-tabs {

@@ -41,6 +41,19 @@ export async function assertPrivacyWaveRoleSafety(
   ).rows[0]?.safe;
   if (admin !== true) fail("separate migration administrator required");
   if (installed.domain && !installed.privacy) fail("dependency order");
+  // The live privacy fence requires this exact core caller. NOINHERIT does
+  // not remove SET ROLE authority from an obsolete Growth membership. Refuse
+  // the same drift before rollout rather than discovering it after the DDL.
+  const unsafeCore = await client.query(
+    `SELECT 1 FROM pg_roles r WHERE r.rolname='creator_runtime' AND (
+      r.rolsuper OR r.rolbypassrls OR r.rolcreatedb OR r.rolcreaterole
+      OR r.rolreplication OR r.rolinherit OR r.rolconfig IS NOT NULL
+      OR EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid)
+      OR EXISTS(SELECT FROM pg_db_role_setting WHERE setrole=r.oid)
+    )`,
+  );
+  if (unsafeCore.rowCount)
+    fail("core request role attributes, membership or settings");
   let checked = 0;
   for (const [index, purpose] of purposes.entries()) {
     if (

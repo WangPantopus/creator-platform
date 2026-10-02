@@ -1,5 +1,12 @@
 # W8 contract, migration and runtime register
 
+## Ready closed four-source privacy wave — 2026-10-02
+
+PR151 merged12ea10a6, exacthead91dcd4c6 after actual three-client cursor acceptance. Two web/backend and the current compile checks passed; one current Android runtime passed, its duplicate was still running at merge; six foundation jobs queued and one obsolete compile cancelled were not passes. [Actual receipt](../../../artifacts/workstreams/W8/privacy-domain-worker/20261002-mac-studio/app-acceptance/README.md) preserves the four completed/four blocked synthetic task result.
+
+PR159 remains the sole four-source57→61 activation continuation:0074/0082/0087/0103 exact original source bytes, closed atomic rollout with private fresh backup and independently executed separate six-hash restore. W1's reviewed early core-role preflight is included. Forty-seven prior held entries keep the exact frozen map; additional0198–0207 are held allocations/source dependencies only. The focused wave keeps main's uncomposed Growth refusal; reviewed W7 source integration is a separate increment. No all-eight C10, erasure, original recovery, provider or release completion is implied. Current W8 devices/services stopped; private data preserved.
+
+
 ## Corrected held dependency ordering and actual owner integration — 2026-10-02
 
 Focused draftPR159 publishes the closed four-source continuation; its original6771bfed future held map is superseded. W1 caught that moving only63–102 left dependent translation/terminal/Agent consumers before their producers. All47 held slots are now0151–0197, metadata only: original83→0168,111→0194,112→0195,113→0196;99→0183,100→0184,105→0188,106→0189; late subject108→0190 thennegative109→0191 thenfinancial107→0192. Actual map `infra/migrations/waves/20261002-privacy-held.json` SHA256 **2338f48ea4b1008f47eef43ff7a835021e5e917669ad44f21179c69d03227c0a** is authoritative. SQL files/bytes, canonical57 and selected74/82/87/103 are unchanged; unknown further DDL dependencies require review before any future wave. No fabricated ledger aliases.
@@ -23,6 +30,14 @@ Reserved0103 source exports `domainPrivacyTaskAuthorityInTransaction(client, act
 Current held recovery correctionc3576b61: `assertScopeAllowedInTransaction`, `assertAudienceAllowed` and `assertCreatorAllowedInTransaction` always require `assertRestoredInTransaction` on their exact supplied client; omitted ports deny503. General pool recovery cannot substitute.
 
 Additional metadata-only allocations:0103 W8 Trust/Growth worker privacy fence;0104 W2 retrieval;0105 W2 terminal journal;0106 W4 terminal settlement;0107 W4 late financial correction;0108 W1 accounting subject;0109 W8 accounting negatives;0110 W3 terminal finalization. All are held/unapplied; source/custody/policy/currentness/real owner acceptance is separate.
+
+## Focused negative-authority integration — 2026-10-02
+
+PR89 is being finalized against main after the initial activation merged. Its remaining source adds held public-creator and creator/fan negative ports, the separate genuine Team-triage negative path, and the reviewed development-pool role guard. The canonical Database now receives the composed in-transaction restriction callback; the raw optional input previously omitted Trust's check. Main's stricter privacy catalogue checks are preserved. Conversation lifecycle restoration/cancellation remains in the separate privacy continuation, rather than being partially copied into this increment. Existing dated web, native and independently saved-state evidence qualifies its original synthetic targets; this merge/typecheck does not requalify changed owner journeys or activate the held SQL. Full proof, positive publication, C10, accessibility, recovery and release gates remain open.
+
+## Held original-worker migration metadata — 2026-10-02
+
+[Closed0201 SQL/ACL review](../../../artifacts/workstreams/W8/worker-migration-metadata/20261002-mac-studio/README.md) qualifies only canonical ledger version/checksum reads for the existing isolated publication/callback worker logins. Eight real drift refusals roll back; all six original61 custody hashes remain unchanged. The held source creates no roles or active migration entry. Actual registered source/ledger/definition/role/ACL and currentness checks on the same original worker client remain required. No provider effect, password-login acceptance, activation, full C10 or release is claimed. All W8 qualification clients are stopped; private restored target remains closed.
 
 Reserved0087: `privacyTaskAuthorityInTransaction(client, actualPrivacyHookJob)` requires the genuine worker signal/token and same-client BEGIN. Call before journal/family/domain locks; producer must check the same signal before pages and the separate COMMIT. `conversationPrivacyAuthority().fenceTaskInTransaction(client,job)` exposes the early port; `assertFamily` now uses the held capability too. The bounded metadata-only definer locks current job→task NOWAIT, checks current task at COMMIT and erases its nonce, including an early-trigger refusal. Missing/unregistered custody fails503.
 
