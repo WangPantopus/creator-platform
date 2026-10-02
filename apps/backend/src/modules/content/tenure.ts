@@ -44,6 +44,28 @@ export function createContentTenureHost(input: {
   paidCoverage?: PaidCoverageJournal;
   groups?: ContentGroupAudienceReader;
 }) {
+  const requests = new WeakMap<object, Map<string, AudienceScope>>();
+  const prepareAudienceRequest: NonNullable<
+    ContentDependencies["prepareAudienceRequest"]
+  > = async (actor, creatorId) => {
+    const authority = requestAuthority.getStore();
+    if (!actor.adultEligible || authority?.accountId !== actor.accountId)
+      throw new DomainError(
+        "content_session_required",
+        "Reopen this content with your current account.",
+        401,
+      );
+    let prepared = requests.get(authority);
+    if (!prepared) {
+      prepared = new Map();
+      requests.set(authority, prepared);
+    }
+    if (!prepared.has(creatorId))
+      prepared.set(
+        creatorId,
+        await input.audienceIdentity.open(actor, creatorId),
+      );
+  };
   const scopes = new WeakMap<
     PoolClient,
     {
@@ -90,7 +112,17 @@ export function createContentTenureHost(input: {
       "audience_read_order_invalid",
       "Keep one actual audience family on the reading transaction.",
     );
-    const scope = await input.audienceIdentity.open(actor, creatorId);
+    // Scope issuance completes before acquiring the content pool client. Never
+    // hold every pool connection while waiting for the issuer's extra client.
+    const authority = requestAuthority.getStore();
+    const scope = authority
+      ? requests.get(authority)?.get(creatorId)
+      : undefined;
+    invariant(
+      scope?.actorAccountId === actor.accountId,
+      "audience_read_order_invalid",
+      "Prepare current audience identity before opening the reading transaction.",
+    );
     await input.audienceIdentity.authorizeInTransaction(scope, client);
     scopes.set(client, { ...current, scope, actor });
   };
@@ -199,5 +231,10 @@ export function createContentTenureHost(input: {
       },
       input.groups,
     );
-  return { prepareAudienceRead: prepare, replyPolicy, paidAudience };
+  return {
+    prepareAudienceRequest,
+    prepareAudienceRead: prepare,
+    replyPolicy,
+    paidAudience,
+  };
 }

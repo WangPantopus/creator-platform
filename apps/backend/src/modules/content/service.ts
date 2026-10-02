@@ -106,6 +106,8 @@ export type ContentPacketRead = {
   audience: Audience;
 };
 export interface ContentDependencies {
+  /** Issue the genuine request scope before leasing the content pool client. */
+  prepareAudienceRequest?: (actor: Actor, creatorId: string) => Promise<void>;
   /** Actual own-fan identity prepared after all packet negatives and before
    * content/quote/membership/grant positives, retained on this exact client. */
   prepareAudienceRead?: (
@@ -1439,6 +1441,8 @@ export class ContentService {
     );
   }
   async get(actor: Actor, creatorId: string, id: string, studio = false) {
+    if (!studio)
+      await this.dependencies.prepareAudienceRequest?.(actor, creatorId);
     return this.transaction(actor, creatorId, async (client) => {
       const row = await this.index(
         client,
@@ -1513,6 +1517,8 @@ export class ContentService {
   }
   async list(actor: Actor, creatorId: string, raw: unknown, studio = false) {
     const page = ContentPage.parse(raw);
+    if (!studio)
+      await this.dependencies.prepareAudienceRequest?.(actor, creatorId);
     return this.transaction(actor, creatorId, async (client) => {
       if (studio)
         await this.role(client, actor, creatorId, [
@@ -1601,6 +1607,7 @@ export class ContentService {
   }
   async reply(actor: Actor, creatorId: string, id: string, raw: unknown) {
     const input = ReplyToNote.parse(raw);
+    await this.dependencies.prepareAudienceRequest?.(actor, creatorId);
     return this.transaction(actor, creatorId, async (client) => {
       await this.assertReplyReviewInstalled(client);
       await this.prepareReadInTransaction(client, actor, creatorId, id);
@@ -1708,6 +1715,7 @@ export class ContentService {
         });
   }
   async replyPolicy(actor: Actor, creatorId: string) {
+    await this.dependencies.prepareAudienceRequest?.(actor, creatorId);
     return this.transaction(actor, creatorId, (client) =>
       this.currentReplyPolicy(client, actor, creatorId),
     );
@@ -2176,6 +2184,8 @@ export class ContentService {
   }
   async thanks(actor: Actor, creatorId: string, raw: unknown) {
     const input = ThanksCommand.parse(raw);
+    if (!input.withdrawn && input.targetKind === "content")
+      await this.dependencies.prepareAudienceRequest?.(actor, creatorId);
     return this.transaction(actor, creatorId, async (client) => {
       const fan = (
         await client.query(
