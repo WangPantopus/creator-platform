@@ -163,10 +163,14 @@ export function attachRealtime(
                     subscription.scope.fanId,
                     false,
                   );
-                  for (const frame of await conversations.replay(
+                  const frames = await conversations.replay(
                     subscription.scope,
                     subscription.cursor,
-                  )) {
+                  );
+                  // Drain a full durable page without waiting for another
+                  // notification, including after a long disconnected period.
+                  if (frames.length === 256) replayPending = true;
+                  for (const frame of frames) {
                     if (connection.bufferedAmount > 1024 * 1024) {
                       report("increment", "realtime_backpressure_closed", 1);
                       connection.close(1013, "Reconnect with your cursor");
