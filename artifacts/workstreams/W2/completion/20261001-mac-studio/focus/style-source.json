@@ -1,0 +1,20 @@
+{
+  "sourceBase": "6f51953b",
+  "host": "Yingpengs-Mac-Studio.local",
+  "files": {
+    "apps/web/features/creator-ai/CreatorAI.tsx": "d3fb18572a27b96374ada66abb8b4957e7ff4dde7828fe5388e397bd50177801",
+    "apps/web/features/creator-ai/creator-ai.css": "4eff03636b091dc48da14825a1708a2dc0cfb3501568b6df4baceca51925fdee"
+  },
+  "capture": {
+    "style-saved-light-desktop.png": "981b8330fd24f71e266dba78d55cde189c12f6e205ef380788681f87dd5232e0"
+  },
+  "persisted": {
+    "revision": 15,
+    "examples": 20,
+    "approvedFixed": 20,
+    "dailyCostCapMicros": 5000000,
+    "usage": 0,
+    "evaluations": 0,
+    "versions": 0
+  }
+}

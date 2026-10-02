@@ -1,5 +1,7 @@
 # W4 continuation handoff — October 1, 2026
 
+**Later update:** the evening operational state (CI root cause, PR41 reconciliation, reserved-schema verification, peer agreements, released resources and next actions) is in [W4-continuation-handoff-2026-10-01-evening.md](W4-continuation-handoff-2026-10-01-evening.md). Read it first; this file's mandate and scope still apply.
+
 Prepared at 12:29 p.m. America/Los_Angeles (19:29 UTC), from current GitHub PR metadata, local Git/source, the latest published W4 checklist, and the prior primary's recorded work. This is a handoff inspection, not a new application acceptance run. Refresh mutable GitHub/runtime state before acting.
 
 ## Worktree-retirement publication update
