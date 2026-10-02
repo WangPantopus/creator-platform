@@ -1,3 +1,7 @@
+### Exact initial57 migration rehearsal — October 2, 2026
+
+Personally ran W8 c7bbcbcd official fresh installer and closed preserved-data atomic operator on owned55444. The original40 database remains untouched. A current private backup was separately restored; all22 original rows across145 tables, original migration rows/timestamps/checksums, roles and sequences were preserved. Fresh and upgrade57 schema and broad ACL/security custody match. The upgraded clone remains traffic closed; application cutover and real app acceptance are pending. Future purpose/accounting/source waves are still held. [Sanitized receipt](../../../artifacts/workstreams/W4/runtime/2026-10-02/migration-wave-c7/receipt.json). PR95 merged5ec5cb07 and PR127 mergedb96e77ef; both web/backend and Android runtime jobs passed on their reviewed heads, while queued native/visual jobs supply no pass evidence.
+
 ### Reminder omission remains opt-in — October 2, 2026
 
 PR127 initial head66d3e961 passed both web/backend jobs and one Android runtime job. The other Android job failed before app/test execution: SDK34 system-image download reported an unknown ZIP archive and its unbooted emulator cleanup refused5554. GitHub rejected the actual per-job retry while the workflow remained queued. This evidence-only update requests fresh-head CI without changing source or expected outcomes; queued visual/native jobs remain unverified.
