@@ -13,6 +13,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { brand } from "@qelvora/brand";
+import { copy } from "@qelvora/copy";
 import {
   AuthorLabel,
   AuditBanner,
@@ -43,6 +44,7 @@ import {
 } from "../../../../packages/api/src/conversation/contracts";
 import { PhotoAttachment } from "./PhotoAttachment";
 import { PostVoiceAttachment } from "./PostVoiceAttachment";
+import { ConversationVoiceReply } from "./ConversationVoiceReply";
 import { ApprovedReply } from "./ApprovedReply";
 import { CorrectionReply } from "./CorrectionReply";
 import { ConversationCorrectionMessageSchema } from "../../../../packages/api/src/conversation/correction";
@@ -2738,6 +2740,12 @@ function Team({ creator }: { creator: Creator }) {
   );
 }
 function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
+  const voiceTrigger = useRef<HTMLButtonElement | null>(null);
+  const [voiceReply, setVoiceReply] = useState<{
+    fanId: string;
+    threadId: string;
+  } | null>(null);
+  const [voicePending, setVoicePending] = useState(false);
   const [entries, setEntries] = useState<{
       items: {
         fanId: string;
@@ -3294,6 +3302,20 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
                 >
                   Review signed reply
                 </button>
+                {creator.owned && fanId && (
+                  <button
+                    ref={voiceTrigger}
+                    className="qv-btn qv-btn--secondary"
+                    disabled={
+                      action.busy || data.timeline.control !== "human_active"
+                    }
+                    onClick={() =>
+                      setVoiceReply({ fanId, threadId: data.timeline.threadId })
+                    }
+                  >
+                    {copy.w6RecordAVoiceReply}
+                  </button>
+                )}
                 {!creator.owned && (
                   <>
                     <p className="qv-help">
@@ -3370,6 +3392,37 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
         </div>
       </div>
       <div hidden={!threadCurrent} inert={!threadCurrent}>
+        {creator.owned &&
+          fanId &&
+          data &&
+          voiceReply?.fanId === fanId &&
+          voiceReply.threadId === data.timeline.threadId && (
+            <Modal
+              title={copy.w6RecordAVoiceReply}
+              closeDisabled={voicePending}
+              restoreFocusTo={voiceTrigger}
+              onClose={() => setVoiceReply(null)}
+            >
+              <ConversationVoiceReply
+                key={`${creator.viewerAccountId}:${creator.id}:${fanId}:${data.timeline.threadId}`}
+                creatorId={creator.id}
+                fanId={fanId}
+                threadId={data.timeline.threadId}
+                creatorName={creator.display_name}
+                expectedAccountId={creator.viewerAccountId}
+                current={
+                  threadCurrent && data.timeline.control === "human_active"
+                }
+                onPendingChange={setVoicePending}
+                onDelivered={() => {
+                  setVoiceReply(null);
+                  void action
+                    .run(load)
+                    .then(() => action.setNotice(copy.w6RecordingDelivered));
+                }}
+              />
+            </Modal>
+          )}
         {attachedCorrection && fanId && data && (
           <Modal
             title="Correct this answer"

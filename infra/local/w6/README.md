@@ -50,6 +50,10 @@ MEDIA_STORAGE_ROOT=/tmp/qelvora-w6-runtime-20261001/storage
 MEDIA_TICKET_SECRET=<local base64 secret>
 MEDIA_TICKET_ORIGIN=http://127.0.0.1:4106
 MEDIA_POLICY_FILE=<absolute repo path>/infra/local/w6/media-policy.development.json
+TRUST_LOCAL_DEVELOPMENT=true
+TRUST_API_DATABASE_URL=postgresql://creator_trust_runtime:<local password>@127.0.0.1:55446/creator_w6
+TRUST_WORKER_DATABASE_URL=postgresql://creator_trust_worker:<local password>@127.0.0.1:55446/creator_w6
+RELEASE_REVISION=<full immutable Git revision>
 ```
 
 Then run `node --import tsx apps/backend/src/server.ts`. The storage directory
@@ -99,3 +103,25 @@ iOS DEBUG launch: `--api-url http://127.0.0.1:4106`. Android DEBUG launch:
 `adb -s <owned serial> reverse tcp:4106 tcp:4106`, then activity extra
 `--es api_url http://127.0.0.1:4106`. Respect shared native build/device leases.
 Stop only the processes, container and devices owned by this run afterward.
+
+For opt-in local iOS UI operation, adapt the canonical application spec into a
+new private directory. The driver taps real sign-in controls against API4106
+and checks the seeded fan shown by the shipping app. It supplies no session or
+network substitute and is outside the canonical test target.
+
+```sh
+node infra/local/w6/provision-ios-journey.mjs /tmp/w6-ios-journey
+xcodegen generate --spec /tmp/w6-ios-journey/project.json --project /tmp/w6-ios-journey
+node scripts/with-heavy-build-lock.mjs --owner W6 -- xcodebuild \
+  -project /tmp/w6-ios-journey/W6RuntimeJourney.xcodeproj -scheme QelvoraApp \
+  -destination 'platform=iOS Simulator,id=<owned leased simulator UUID>' \
+  -derivedDataPath /tmp/w6-ios-journey/DerivedData -jobs 2 \
+  -parallel-testing-enabled NO \
+  -only-testing:QelvoraUITests/W6RuntimeJourney/testActualFanSignIn test
+```
+
+Use normal simulator signing; disabling signing prevents Keychain acceptance.
+Acquire an actual owned simulator slot before launch, and stop/release it after
+operation. The helper refuses a busy machine-wide build slot without touching
+its owner or starting a child. A native sign-in case does not accept media,
+calling or physical-device behavior.

@@ -884,7 +884,15 @@ object QelvoraCopy {
     "growthRetainedFanAggregates" to "Closed fan aggregates contain no fan identifier or private text; removed creator snapshots are deleted.",
     "growthErrorQuietHoursPair" to "Both quiet-hour boundaries are required",
     "growthErrorTimeZone" to "Choose a valid time zone, such as America/Los_Angeles.",
-    "growthErrorQuietHoursFormat" to "Enter a time in HH:mm, from 00:00 to 23:59."
+    "growthErrorQuietHoursFormat" to "Enter a time in HH:mm, from 00:00 to 23:59.",
+    "w6RecordAVoiceReply" to "Record a voice reply",
+    "w6DeliverThisRecording" to "Deliver this recording",
+    "w6RecordingCredentialsAreProcessing" to "Your signature is saved. Content credentials are processing before delivery.",
+    "w6RecordingDeliveryIsUnconfirmed" to "Delivery is unconfirmed. Retry this same recording before starting another.",
+    "w6RecordingDelivered" to "Your signed recording was delivered to this conversation.",
+    "w6VoiceReplyUnavailable" to "Voice replies are unavailable for this conversation. Your text draft is kept.",
+    "w6SelectedConversationChanged" to "This recording belongs to another conversation. Reopen the selected thread.",
+    "w6RetryRecordingDelivery" to "Retry this recording delivery"
   )
   private val variables = Regex("""\{([^}]+)\}""")
   fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }
