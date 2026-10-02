@@ -1,0 +1,16 @@
+{
+  "phase": "actual_private_backup_and_separate_restore",
+  "ledgerRows": 57,
+  "originalRows": 36,
+  "originalTables": 161,
+  "backupBytes": 713859,
+  "backupSHA256": "35af6076512ac232998f1e640e359e3bc50ad0652d2c8268eed4b2a280059036",
+  "ledgerSHA256": "2b6f7b224f46cffa47da3ebddbf52207cb05d26a2964fdf4d92aab4dc0ac297b",
+  "schemaSHA256": "cfbc894fd59dc3981ab4fa31d2ff7154e2865b452a71b79afd483abe94557ea3",
+  "dataSHA256": "046f1f227386cfe56b226a60cccd047919b1df47bb5caca9cbc10579fbba1c2f",
+  "securitySHA256": "599b06ad644c190de3d133773033779805a929247a7ad17291d37f204d308a77",
+  "sequenceSHA256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+  "separateRestoreMatched": true,
+  "sourceAndTargetsTrafficClosed": true,
+  "archiveRecovery": false
+}

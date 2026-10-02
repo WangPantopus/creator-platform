@@ -13,6 +13,7 @@ import type { CreatorMediaService } from "./creator-service.js";
 import type { CreatorScope } from "../identity/creator-scope.js";
 import type { AudienceScope } from "../identity/audience-scope.js";
 import type { SessionService } from "../session/service.js";
+import type { Actor } from "../identity/adapter.js";
 import type { AvailabilityService } from "../session/availability.js";
 import { visibleSession } from "../session/service.js";
 import { withDeadline } from "./deadline.js";
@@ -23,6 +24,8 @@ import {
 
 export type W6RouterDependencies = {
   scopeFor: (request: Request) => Promise<ThreadScope>;
+  /** Supplied only by the canonical host's actual request identity resolver. */
+  actorFor?: (request: Request) => Promise<Actor>;
   media?: MediaService;
   creatorMedia?: CreatorMediaService;
   creatorScopeFor?: (request: Request) => Promise<CreatorScope>;
@@ -51,7 +54,9 @@ export function createW6Router(dependencies: W6RouterDependencies) {
       ),
       callsAvailable: Boolean(
         dependencies.sessions &&
+          dependencies.actorFor &&
           dependencies.sessions.provider.name !== "unconfigured" &&
+          dependencies.sessions.interactiveControlAvailable &&
           dependencies.sessions.provider.supportsSingleUseAdmission,
       ),
       aiAudioAvailable: false,
@@ -86,6 +91,15 @@ export function createW6Router(dependencies: W6RouterDependencies) {
     const current = await dependencies.scopeFor(req);
     assertExpectedAccount(req, current.actorAccountId);
     return current;
+  };
+  const callActor = async (req: Request) => {
+    if (!dependencies.actorFor)
+      throw new DomainError(
+        "call_control_request_required",
+        "Calling requires this host’s current authenticated request.",
+        503,
+      );
+    return dependencies.actorFor(req);
   };
   router.get(`${root}/recording-policy`, async (req, res) =>
     res.json(await media().recordingPolicy(await scope(req))),
@@ -380,13 +394,24 @@ export function createW6Router(dependencies: W6RouterDependencies) {
     ),
   );
   router.post(`${root}/calls/:sessionId/join`, async (req, res) =>
-    res.json(await session().join(await scope(req), id(req, "sessionId"))),
+    res.json(
+      await session().join(
+        await scope(req),
+        id(req, "sessionId"),
+        await callActor(req),
+      ),
+    ),
   );
   router.post(`${root}/calls/:sessionId/redeem`, async (req, res) => {
     const service = session();
     const body = AdmissionRedemptionSchema.parse(req.body);
     res.json(
-      await service.redeem(await scope(req), id(req, "sessionId"), body.nonce),
+      await service.redeem(
+        await scope(req),
+        id(req, "sessionId"),
+        body.nonce,
+        await callActor(req),
+      ),
     );
   });
   router.post(`${root}/calls/:sessionId/consent`, async (req, res) =>

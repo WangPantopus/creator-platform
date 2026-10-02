@@ -62,3 +62,5 @@ W2 implemented original0113 coherent account export producer/current W8 metadata
 Corrected W8 held mapfb1cbca/SHA2338f48e consumed: own163 lineage/165 expiry/180 inputs/181 admission/187 retrieval/188 journal/196 export metadata; original SQL bytes/paths unchanged, no aliases. W4 found an actual embedded old98 SQL registration guard and owns repair before future activation. Actual W4 terminal106 source1f18a5d1/PR161 is available, separately reviewing105 same-client drift fences. Late108/109/107, translation genuine-job accounting, weekly digest, provider/native/complete artboards/named p95 remain active work.
 
 Validated latest private715734-byte backup/SHA3997a822…1572 TOC/separate closed restore: all162 full-row tables99 rows/57 history/schema ACL/roles/membership/sequences match. First live comparison differed in canonical session touch; own API/web stopped for corrected snapshot, no peers stopped. Provider key and old archive last checked absent; no credential search.
+
+This independently extracted privacy fix is reviewed against main36f9505e; draft132 input/admission/retrieval/terminal work remains separate and unfinished.

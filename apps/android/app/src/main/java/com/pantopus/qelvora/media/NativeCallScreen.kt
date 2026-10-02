@@ -59,24 +59,34 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
     var transport by remember(route) { mutableStateOf<NativeCallScreenTransport?>(null) }
     var mediaEpoch by remember(route) { mutableStateOf(0) }
     var active by remember(route) { mutableStateOf(true) }
+    var automaticRefresh by remember(route) { mutableStateOf(true) }
+    var pollDelay by remember(route) { mutableStateOf(1000L) }
+    var refreshVersion by remember(route) { mutableStateOf(0) }
     val scope = rememberCoroutineScope()
     val devicePermissions = rememberNativeMediaDevicePermissions()
     val lifecycle = LocalLifecycleOwner.current
+    var foreground by remember(lifecycle) { mutableStateOf(lifecycle.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) }
     fun disconnectMedia() { mediaEpoch++; val current = transport; transport = null; localState = "disconnected"; current?.disconnect() }
     fun role(value: JSONObject): String? = when (model.session?.accountId) { value.getString("creatorAccountId") -> "creator"; value.getString("fanAccountId") -> "fan"; else -> null }
     suspend fun refresh() {
         val api = client ?: return; val currentRoute = route ?: return
         if (busy || fetching) return; fetching = true
+        val account = model.session?.accountId
+        if (account == null) { automaticRefresh = false; fetching = false; return }
         try {
-            val value = JSONObject(api.request(currentRoute.path).toString(Charsets.UTF_8))
-            if (!active) return
+            val value = JSONObject(api.request(currentRoute.path, expectedAccountId = account).toString(Charsets.UTF_8))
+            if (!active || account != model.session?.accountId) return
             if (value.getInt("version") >= (call?.getInt("version") ?: 0)) call = value
             stale = false
+            notice = null
+            pollDelay = if (value.getString("state") in listOf("ended", "cancelled")) 30000L else 1000L
             if (value.getString("state") in listOf("ending", "ended", "cancelled")) disconnectMedia()
         } catch (cancelled: CancellationException) { throw cancelled }
         catch (error: Exception) {
-            if (!active) return
-            if (error is NativeMediaRequestError && error.status in listOf(401, 403, 404)) { disconnectMedia(); call = null }
+            if (!active || account != model.session?.accountId) return
+            if (error is NativeMediaRequestError && error.status in listOf(401, 403, 404, 409)) { disconnectMedia(); call = null; automaticRefresh = false }
+            if (error is NativeMediaRequestError && error.code in listOf("calls_unconfigured", "call_control_unconfigured", "call_provider_unconfigured", "call_admission_unverified", "call_control_role_invalid")) automaticRefresh = false
+            pollDelay = minOf(pollDelay * 2, 30000L)
             stale = true; notice = QelvoraCopy.text("w6ReconnectToRefreshThisCallActionsAreUnavailableUntilAccess")
         }
         finally { fetching = false }
@@ -124,10 +134,16 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
         catch (_: Exception) { adapter.disconnect(); if (active && epoch == mediaEpoch) { transport = null; localState = "disconnected"; notice = QelvoraCopy.text("w6ConnectionFailedRejoinTheSameCall") } }
         finally { busy = false }
     }
-    LaunchedEffect(route, client) { while (true) { refresh(); delay(1000) } }
+    LaunchedEffect(route, client, model.session?.accountId, foreground, refreshVersion) {
+        if (!foreground) return@LaunchedEffect
+        automaticRefresh = true; pollDelay = 1000L
+        while (automaticRefresh) { refresh(); if (automaticRefresh) delay(pollDelay) }
+    }
     DisposableEffect(route) { active = true; onDispose { active = false; devicePermissions.cancel(); disconnectMedia() } }
     DisposableEffect(route, lifecycle) {
         val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_START) foreground = true
+            if (event == Lifecycle.Event.ON_STOP) foreground = false
             if (event == Lifecycle.Event.ON_STOP && transport == null) {
                 mediaEpoch++; devicePermissions.cancel()
             }
@@ -139,8 +155,8 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
     Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         val value = call
         if (value == null) {
-            BasicText(QelvoraCopy.text("w6ThisCallIsUnavailable"), style = qText("display-md").copy(color = qColor("ink")))
-            BasicText(if (route == null) QelvoraCopy.text("w6OpenThisCallFromItsAuthorizedRequestLink") else QelvoraCopy.text("w6CheckingTheBookingAndParticipantAccess"), style = qText("body").copy(color = qColor("ink")))
+            BasicText(QelvoraCopy.text(if (route != null && notice == null) "w6OpeningYourCall" else "w6ThisCallIsUnavailable"), style = qText("display-md").copy(color = qColor("ink")))
+            if (route == null || notice == null) BasicText(if (route == null) QelvoraCopy.text("w6OpenThisCallFromItsAuthorizedRequestLink") else QelvoraCopy.text("w6CheckingTheBookingAndParticipantAccess"), style = qText("body").copy(color = qColor("ink")))
         } else {
             val state = value.getString("state"); val live = state in listOf("connected", "reconnecting", "ending"); val ended = state in listOf("ended", "cancelled")
             val creator = value.getString("creatorName"); val duration = value.getLong("durationSeconds"); val connected = value.getLong("connectedMilliseconds")
@@ -204,6 +220,6 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
             }
         }
         notice?.let { BasicText(it, style = qText("caption").copy(color = qColor("ink-muted"))) }
-        Button(QelvoraCopy.text("w6RefreshCall"), ButtonVariant.QUIET, disabled = busy || fetching || client == null || route == null) { scope.launch { refresh() } }
+        Button(QelvoraCopy.text("w6RefreshCall"), ButtonVariant.QUIET, disabled = busy || fetching || client == null || route == null) { refreshVersion++ }
     }
 }
