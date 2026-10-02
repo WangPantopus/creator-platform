@@ -82,6 +82,7 @@ internal fun GrowthNotificationSettings(client: GrowthClient?) {
         BasicText(QelvoraCopy.text("growthNotificationSettings"), style = qText("display-md").copy(color = ink))
         BasicText(QelvoraCopy.text("growthYourInAppRecordCannotBeTurnedOffPushAnd"), style = qText("body").copy(color = ink))
         value?.let {current ->
+            GrowthDevicePushSettings()
             listOf("push" to QelvoraCopy.text("growthPushNotifications"), "email" to QelvoraCopy.text("growthEmailDigest"), "hideSensitive" to QelvoraCopy.text("growthHideSensitivePreviews")).forEach {(key, label) -> Button(QelvoraCopy.text("growthLabelWithState", mapOf("label" to label, "state" to if (current.getBoolean(key)) QelvoraCopy.text("growthOn") else QelvoraCopy.text("growthOff"))), ButtonVariant.SECONDARY, disabled = busy, block = true) {update(key, !current.getBoolean(key))} }
             GrowthPreferenceField(from, {from = it; clearError("from", "until")}, QelvoraCopy.text("growthQuietHoursFromHhMm"), errors["from"], fromFocus, fromView, !busy)
             GrowthPreferenceField(until, {until = it; clearError("from", "until")}, QelvoraCopy.text("growthQuietHoursUntilHhMm"), errors["until"], untilFocus, untilView, !busy)

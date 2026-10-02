@@ -672,6 +672,8 @@ export class Notifications {
       const current = state.available ? present(event.type, state) : null;
       output.push({
         id: row.id,
+        available: Boolean(current),
+        creatorId: event.creatorId,
         type: row.type,
         sender: current?.sender ?? row.sender,
         authorKind: state.available ? state.authorKind : "system",

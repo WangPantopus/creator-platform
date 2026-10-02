@@ -56,6 +56,21 @@ const configured =
           const agent = createAgentDomain({ pool: runtime.pool, model: null });
           const contentDependencies = {
             assertAllowed: runtime.assertCreatorAllowed,
+            follows: async (
+              ...args: Parameters<
+                NonNullable<
+                  import("./modules/content/service.js").ContentDependencies["follows"]
+                >
+              >
+            ) => {
+              if (!features.growth)
+                throw new DomainError(
+                  "content_delivery_unconfigured",
+                  copy.growthErrorContentEffectUnconfigured,
+                  503,
+                );
+              return features.growth.contentFollows(...args);
+            },
             effect: async (
               ...args: Parameters<ReturnType<typeof contentPublicProjection>>
             ): Promise<{ reference: string }> => {

@@ -1,5 +1,7 @@
 # W7 Mac Studio continuation handoff — 2026-10-01
 
+**Current continuation:** [The Mac Studio source/runtime receipt](../../../artifacts/workstreams/W7/studio-resume/20261001/README.md) and resources.json currentHost supersede the head/process/CI/draft-producer statements below. Public AI authority remains unconfigured, native current source compiles but is not interactive acceptance, and the visual retry failed. All original requirements remain open; no merge or completion is claimed.
+
 This session took over the [completion handoff](W7-2026-10-01-completion.md) and ended early at the founder's request so a successor can continue. It transfers the **entire unfinished original W7 assignment**; W7 is not complete. Paste-ready successor prompt: [W7-macstudio-handoff-2026-10-01.md](../prompts/W7-macstudio-handoff-2026-10-01.md). The [original acceptance matrix](../../../artifacts/workstreams/W7/resume/20260930/acceptance.md) and every requirement in the earlier handoffs remain binding.
 
 ## Repository state

@@ -17,6 +17,7 @@ import {
   type GrowthPrivacyTaskAuthority,
 } from "./lifecycle.js";
 import { registerGrowth } from "./integration.js";
+import type { CreatorProjectionSource } from "./creator-projection.js";
 import {
   rotatingGrowthSources,
   databaseGrowthSourceCheckpoint,
@@ -30,6 +31,7 @@ export async function createGrowthRuntime(input: {
   workerPool: Pool;
   secret: Buffer;
   owners: GrowthOwners;
+  creatorSource?: CreatorProjectionSource;
   provider?: DeliveryProvider;
   verificationOrigin?: string;
   sources?: GrowthEventSources;
@@ -68,7 +70,17 @@ export async function createGrowthRuntime(input: {
     input.secret,
     input.provider,
     input.verificationOrigin,
+    input.creatorSource,
   );
+  const checkpointSchema = (
+    await input.workerPool.query(
+      "SELECT to_regclass('growth.source_scan_checkpoint') IS NOT NULL AND (SELECT count(*)=2 FROM information_schema.columns WHERE table_schema='growth' AND table_name='source_scan_checkpoint' AND column_name IN ('generation','expires_at')) AS ready",
+    )
+  ).rows[0]?.ready;
+  const creatorCheckpoint =
+    checkpointSchema && input.creatorSource
+      ? databaseGrowthSourceCheckpoint(service, "creator-directory-v1")
+      : null;
   const sourceFactory = input.sourceScan
     ? rotatingGrowthSources(
         input.sourceScan.directory,
@@ -91,7 +103,38 @@ export async function createGrowthRuntime(input: {
     | "pending"
     | "available"
     | "unavailable" = sourceFactory ? "pending" : "unconfigured";
+  let creatorCursor: string | null = null;
+  let creatorReadiness:
+    | "unconfigured"
+    | "pending"
+    | "available"
+    | "unavailable" = input.creatorSource ? "pending" : "unconfigured";
   async function tick() {
+    if (checkpointSchema) {
+      try {
+        await input.workerPool.query(
+          "UPDATE growth.source_scan_checkpoint SET encrypted_cursor=NULL,generation=generation+1,updated_at=now() WHERE expires_at<=clock_timestamp() AND encrypted_cursor IS NOT NULL",
+        );
+      } catch {
+        input.observe?.("growth_worker_failure", 1);
+      }
+    }
+    if (input.creatorSource) {
+      try {
+        if (creatorCheckpoint) creatorCursor = await creatorCheckpoint.load();
+        const ids = await input.creatorSource.page(creatorCursor, 25);
+        for (const id of ids) await service.refreshCreator(id);
+        const next = ids.length === 25 ? ids[24]! : null;
+        if (creatorCheckpoint)
+          await creatorCheckpoint.save(next, creatorCursor);
+        creatorCursor = next;
+        creatorReadiness = "available";
+      } catch {
+        // Do not advance on failure or block already leased delivery recovery.
+        creatorReadiness = "unavailable";
+        input.observe?.("growth_worker_failure", 1);
+      }
+    }
     let sources: readonly import("./relay.js").GrowthEventSource[] = [];
     try {
       sources =
@@ -163,6 +206,9 @@ export async function createGrowthRuntime(input: {
     },
     readiness: () => ({
       persistence: "available" as const,
+      creatorProjection: creatorReadiness,
+      creatorPublicAI: input.creatorSource?.publicAIConfigured ?? false,
+      creatorScanDurable: Boolean(creatorCheckpoint),
       producerSources: sourceCount,
       producerReadiness: sourceReadiness,
       deliveryProvider: Boolean(input.provider),

@@ -42,7 +42,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     private var generation = 0
     private var rotatingCredential = false
     private var removedArrivalFor: String? = null
-    private suspend fun purge() { generation++; session = null; actors = emptyList(); error = ""; storage.save(null); com.pantopus.qelvora.conversation.W3FanFeatures.clearPrivateState(context) }
+    private suspend fun purge() { GrowthPush.clearSession(context, currentToken()); generation++; session = null; actors = emptyList(); error = ""; storage.save(null); com.pantopus.qelvora.conversation.W3FanFeatures.clearPrivateState(context) }
     suspend fun refresh() {
         if (rotatingCredential) return
         val client = api ?: return; val current = generation
@@ -106,11 +106,22 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
 class FanFeatureRegistration(val matches: (String) -> Boolean, val allowsSignedOut: (String) -> Boolean = { false }, val screen: @Composable (FanSession) -> Unit)
 
 @Composable
-fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/home", features: List<FanFeatureRegistration> = emptyList(), destinationDelivery: Long = 0L) {
+fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/home", features: List<FanFeatureRegistration> = emptyList(), destinationDelivery: Long = 0L, notificationID: String? = null, onNotificationConsumed: () -> Unit = {}) {
     val model = remember(baseURL) { FanSession(context, baseURL, returnTo) }; val scope = rememberCoroutineScope()
     LaunchedEffect(returnTo, destinationDelivery) { model.open(returnTo) }
     LaunchedEffect(model.destination) { model.loadArrival() }
     LaunchedEffect(model) { model.refresh(); while (true) { delay(4000); if (model.session != null) model.refresh() } }
+    LaunchedEffect(model.session?.accountId, model.currentToken()) { GrowthPush.refresh(context) }
+    LaunchedEffect(notificationID, destinationDelivery, model.session?.accountId) {
+        val id = notificationID ?: return@LaunchedEffect
+        if (model.session == null) return@LaunchedEffect
+        val captured = model.currentToken() ?: return@LaunchedEffect
+        val origin = baseURL ?: return@LaunchedEffect
+        try { val target = GrowthPush.resolveTap(GrowthClient(origin, model::currentToken), id, captured); if (model.currentToken() == captured) model.open(target) }
+        catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+        catch (_: Exception) { if (model.currentToken() == captured) { model.open("/notifications"); model.error = QelvoraCopy.text("growthUpdateUnavailable") } }
+        finally { if (model.currentToken() == captured) onNotificationConsumed() }
+    }
     Column(Modifier.fillMaxSize().background(qColor("ground")).windowInsetsPadding(WindowInsets.safeDrawing)) {
         if (model.error.isNotEmpty()) Notice("error", "Account status", model.error)
         when {

@@ -7,6 +7,7 @@ import {
   randomBytes,
 } from "node:crypto";
 import { z } from "zod";
+import type { QueryResultRow } from "pg";
 import type { Actor } from "../identity/adapter.js";
 import { DomainError } from "../../core/errors.js";
 import { contentHash } from "../../core/canonical.js";
@@ -27,6 +28,7 @@ import type { GrowthDatabase } from "./database.js";
 import { Notifications, type DeliveryProvider } from "./notifications.js";
 import { GrowthErasure } from "./erasure.js";
 import { GrowthDeviceSessions } from "./device-session.js";
+import type { CreatorProjectionSource } from "./creator-projection.js";
 
 const ShareSourceRecord = z.strictObject({
   id: z.uuid(),
@@ -55,6 +57,7 @@ export class GrowthService {
     private readonly secret: Buffer,
     provider?: DeliveryProvider,
     private readonly verificationOrigin?: string,
+    private readonly creatorSource?: CreatorProjectionSource,
   ) {
     if (verificationOrigin) {
       const origin = new URL(verificationOrigin);
@@ -78,6 +81,8 @@ export class GrowthService {
       db,
       (value) => this.seal(value),
       (value) => this.open(value),
+      (accountId, installationId) =>
+        "t:" + this.pseudonym("device-tombstone", accountId, installationId),
     );
     db.actorFence = async (client, accountId, creatorId) => {
       if (
@@ -133,12 +138,122 @@ export class GrowthService {
       );
     });
   }
+  /** Serialize before reading canonical state so an older concurrent producer
+   * cannot overwrite a pause, recovery or revocation with a higher version. */
+  async refreshCreator(id: string) {
+    if (!this.creatorSource) return;
+    z.uuid().parse(id);
+    const candidates = new Set([id]);
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const result = await this.db.transaction(
+        this.db.worker,
+        async (client) => {
+          // Acquire all known creator fences in the same order as erasure. A newly
+          // discovered collision is retried after releasing these locks.
+          await this.erasure.lockCreatorSubjects(client, [...candidates]);
+          if (!(await this.erasure.creator(client, id)))
+            return { done: true as const };
+          const current = await this.creatorSource!.current(id);
+          const prior = (
+            await client.query<{ version: number; document: PublicCreator }>(
+              "SELECT version,document FROM growth.creator_public WHERE id=$1 FOR UPDATE",
+              [id],
+            )
+          ).rows[0];
+          if (!current) {
+            // References can outlive the owner row. Keep an opaque, hidden negative
+            // record until W8 erases those references; release the reusable handle.
+            await client.query(
+              "UPDATE growth.creator_public SET version=version+1,handle='~'||id::text,state='revoked',document=jsonb_build_object('id',id,'state','revoked'),updated_at=clock_timestamp() WHERE id=$1 AND document<>jsonb_build_object('id',id,'state','revoked')",
+              [id],
+            );
+            return { done: true as const };
+          }
+          const collision = (
+            await client.query<{ id: string }>(
+              "SELECT id FROM growth.creator_public WHERE handle=$1 AND id<>$2",
+              [current.handle, id],
+            )
+          ).rows[0];
+          if (collision && !candidates.has(collision.id))
+            return { retry: collision.id };
+          // W1's canonical public handle directory, rather than the cache, decides
+          // who owns a reused handle. A concurrent rename causes a bounded retry.
+          if ((await this.creatorSource!.resolve(current.handle)) !== id)
+            return { retry: id };
+          if (collision)
+            await client.query(
+              "UPDATE growth.creator_public SET version=version+1,handle='~'||id::text,state='unpublished',document=jsonb_build_object('id',id,'state','unpublished'),updated_at=clock_timestamp() WHERE id=$1 AND handle=$2",
+              [collision.id, current.handle],
+            );
+          if (prior) {
+            if (
+              contentHash(prior.document) ===
+              contentHash({
+                ...current,
+                version: prior.version,
+                updatedAt: prior.document.updatedAt,
+              })
+            )
+              return { done: true as const };
+          }
+          const item = CreatorProjection.parse({
+            ...current,
+            version: (prior?.version ?? 0) + 1,
+            updatedAt: new Date().toISOString(),
+          });
+          await client.query(
+            "INSERT INTO growth.creator_public(id,version,handle,state,document,updated_at) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT(id) DO UPDATE SET version=excluded.version,handle=excluded.handle,state=excluded.state,document=excluded.document,updated_at=excluded.updated_at",
+            [id, item.version, item.handle, item.state, item, item.updatedAt],
+          );
+          return { done: true as const };
+        },
+      );
+      if ("done" in result) return;
+      candidates.add(result.retry);
+    }
+    throw new DomainError(
+      "creator_projection_unavailable",
+      copy.growthThisDestinationIsUnavailableReconnectAndTryAgain,
+      503,
+    );
+  }
+  private async refreshPublicCreators(ids: readonly string[]) {
+    if (!this.creatorSource) return;
+    for (const id of [...new Set(ids)]) await this.refreshCreator(id);
+  }
+  /** A refreshed negative row can expose another candidate in a bounded page.
+   * Refresh that candidate too; never return an unchecked replacement row. */
+  private async currentPublicRows<T extends QueryResultRow>(
+    query: () => Promise<T[]>,
+    creatorId: (row: T) => string,
+  ): Promise<T[]> {
+    let rows = await query();
+    if (!this.creatorSource) return rows;
+    const refreshed = new Set<string>();
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const ids = [...new Set(rows.map(creatorId))].filter(
+        (id) => !refreshed.has(id),
+      );
+      if (!ids.length) return rows;
+      await this.refreshPublicCreators(ids);
+      for (const id of ids) refreshed.add(id);
+      rows = await query();
+    }
+    if (rows.every((row) => refreshed.has(creatorId(row)))) return rows;
+    throw new DomainError(
+      "creator_projection_unavailable",
+      copy.growthThisDestinationIsUnavailableReconnectAndTryAgain,
+      503,
+    );
+  }
   async projectContent(input: unknown) {
     const item = ContentProjection.parse(input);
     if (item.state === "withdrawn") {
       await this.withdrawContent(item.creatorId, item.id, item.version);
       return { published: false };
     }
+    await this.refreshCreator(item.creatorId);
     if (item.authorKind !== "team" && !item.signedActId)
       throw new DomainError(
         "signed_content_required",
@@ -201,6 +316,12 @@ export class GrowthService {
     z.int().positive().parse(version);
     await this.db.transaction(this.db.worker, async (client) => {
       if (!(await this.erasure.creator(client, creatorId))) return;
+      // A negative event can arrive before the first positive projection.
+      // Its opaque parent cannot be served as a public creator or grant access.
+      await client.query(
+        "INSERT INTO growth.creator_public(id,version,handle,state,document,updated_at) VALUES($1,1,'~'||$1::text,'revoked',jsonb_build_object('id',$1::uuid,'state','revoked'),clock_timestamp()) ON CONFLICT(id) DO NOTHING",
+        [creatorId],
+      );
       await client.query(
         "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
         [`growth.content:${id}`],
@@ -257,26 +378,32 @@ export class GrowthService {
         );
       }
     }
-    const result = await this.db.runtime.query(
-      `SELECT handle,document FROM growth.creator_public WHERE state IN ('published','paused') AND document->>'verified'='true'
+    const sql = `SELECT handle,document FROM growth.creator_public WHERE state IN ('published','paused') AND document->>'verified'='true'
       AND ($1='' OR (document->>'name') ILIKE $2 OR (document->>'biography') ILIKE $2 OR (document->>'topics') ILIKE $2)
       AND ($3='' OR document->>'category'=$3) AND ($5::text IS NULL OR handle>$5)
-      ORDER BY handle LIMIT 31 OFFSET $4`,
-      [q, `%${q.replace(/[\\%_]/gu, "\\$&")}%`, cat, pageOffset, after],
+      ORDER BY handle LIMIT 31 OFFSET $4`;
+    const values = [
+      q,
+      `%${q.replace(/[\\%_]/gu, "\\$&")}%`,
+      cat,
+      pageOffset,
+      after,
+    ];
+    const rows = await this.currentPublicRows(
+      async () => (await this.db.runtime.query(sql, values)).rows,
+      (row) => row.document.id as string,
     );
     return {
-      creators: result.rows
-        .slice(0, 30)
-        .map((r) => r.document as PublicCreator),
-      hasMore: result.rows.length > 30,
+      creators: rows.slice(0, 30).map((r) => r.document as PublicCreator),
+      hasMore: rows.length > 30,
       nextCursor:
-        result.rows.length > 30
+        rows.length > 30
           ? this.seal(
               JSON.stringify({
                 kind: "discover-page",
                 query: q,
                 category: cat,
-                after: result.rows[29]!.handle,
+                after: rows[29]!.handle,
               }),
             )
           : null,
@@ -291,6 +418,7 @@ export class GrowthService {
             )
           ).rows.map((row) => row.id as string)
         : [...new Set(z.array(z.uuid()).max(100).parse(requestedIds))];
+    await this.refreshPublicCreators(ids);
     const publicIds = (
       await this.db.runtime.query(
         "SELECT id FROM growth.creator_public WHERE id=ANY($1::uuid[]) AND state IN ('published','paused') AND document->>'verified'='true'",
@@ -323,25 +451,35 @@ export class GrowthService {
       .max(160)
       .regex(/^(?:|\/creators\/[a-z0-9_]{3,30}(?:\/posts\/[a-f0-9-]{36})?)$/u)
       .parse(after);
-    const result = await this.db.runtime.query(
-      `SELECT path,updated_at FROM (
-        SELECT '/creators/'||handle AS path,updated_at FROM growth.creator_public WHERE state='published' AND document->>'verified'='true'
+    const rows = await this.currentPublicRows(
+      async () =>
+        (
+          await this.db.runtime.query(
+            `SELECT creator_id,path,updated_at FROM (
+        SELECT id AS creator_id,'/creators/'||handle AS path,updated_at FROM growth.creator_public WHERE state='published' AND document->>'verified'='true'
         UNION ALL
-        SELECT '/creators/'||c.handle||'/posts/'||p.id AS path,GREATEST(c.updated_at,p.published_at) AS updated_at FROM growth.content_public p JOIN growth.creator_public c ON c.id=p.creator_id WHERE p.state='published' AND c.state='published' AND c.document->>'verified'='true'
+        SELECT c.id AS creator_id,'/creators/'||c.handle||'/posts/'||p.id AS path,GREATEST(c.updated_at,p.published_at) AS updated_at FROM growth.content_public p JOIN growth.creator_public c ON c.id=p.creator_id WHERE p.state='published' AND c.state='published' AND c.document->>'verified'='true'
       ) pages WHERE path>$1 ORDER BY path LIMIT 501`,
-      [cursor],
+            [cursor],
+          )
+        ).rows,
+      (row) => row.creator_id as string,
     );
-    const pages = result.rows.slice(0, 500).map((row) => ({
+    const pages = rows.slice(0, 500).map((row) => ({
       path: row.path as string,
       updatedAt: new Date(row.updated_at).toISOString(),
     }));
     return {
       pages,
-      nextCursor:
-        result.rows.length > 500 ? pages[pages.length - 1]!.path : null,
+      nextCursor: rows.length > 500 ? pages[pages.length - 1]!.path : null,
     };
   }
   async creator(handle: string) {
+    if (this.creatorSource) {
+      const id = await this.creatorSource.resolve(handle);
+      if (!id) return null;
+      await this.refreshCreator(id);
+    }
     const result = await this.db.runtime.query(
       "SELECT document FROM growth.creator_public WHERE handle=$1 AND state IN ('published','paused') AND document->>'verified'='true'",
       [handle],
@@ -349,6 +487,7 @@ export class GrowthService {
     return (result.rows[0]?.document ?? null) as PublicCreator | null;
   }
   async posts(creatorId: string) {
+    await this.refreshCreator(creatorId);
     const result = await this.db.runtime.query(
       "SELECT p.document FROM growth.content_public p JOIN growth.creator_public c ON c.id=p.creator_id WHERE p.creator_id=$1 AND p.state='published' AND c.state='published' AND c.document->>'verified'='true' ORDER BY p.published_at DESC LIMIT 30",
       [creatorId],
@@ -366,28 +505,37 @@ export class GrowthService {
     return post ? { creator, post } : null;
   }
   async follow(actor: Actor, creatorId: string, value: boolean) {
-    const result = await this.db.runtime.query(
-      "SELECT id FROM growth.creator_public WHERE id=$1 AND state IN ('published','paused')",
-      [creatorId],
+    z.uuid().parse(creatorId);
+    // Removal is always allowed under the actual fan session, including when
+    // the creator has since paused, lost verification or disappeared.
+    if (value) await this.refreshCreator(creatorId);
+    await this.db.actor(
+      actor,
+      null,
+      async (client) => {
+        if (value) {
+          const result = await client.query(
+            "SELECT id FROM growth.creator_public WHERE id=$1 AND state IN ('published','paused') AND document->>'verified'='true'",
+            [creatorId],
+          );
+          if (!result.rowCount)
+            throw new DomainError(
+              "creator_unavailable",
+              copy.growthThisCreatorIsUnavailable,
+              404,
+            );
+          await client.query(
+            "INSERT INTO growth.follow(account_id,creator_id) VALUES($1,$2) ON CONFLICT DO NOTHING",
+            [actor.accountId, creatorId],
+          );
+        } else
+          await client.query(
+            "DELETE FROM growth.follow WHERE account_id=$1 AND creator_id=$2",
+            [actor.accountId, creatorId],
+          );
+      },
+      creatorId,
     );
-    if (!result.rowCount)
-      throw new DomainError(
-        "creator_unavailable",
-        copy.growthThisCreatorIsUnavailable,
-        404,
-      );
-    await this.db.actor(actor, null, async (client) => {
-      if (value)
-        await client.query(
-          "INSERT INTO growth.follow(account_id,creator_id) VALUES($1,$2) ON CONFLICT DO NOTHING",
-          [actor.accountId, creatorId],
-        );
-      else
-        await client.query(
-          "DELETE FROM growth.follow WHERE account_id=$1 AND creator_id=$2",
-          [actor.accountId, creatorId],
-        );
-    });
     return { following: value };
   }
   async following(actor: Actor, creatorId: string) {
@@ -403,16 +551,20 @@ export class GrowthService {
     }));
   }
   async preferenceCreators(actor: Actor) {
-    return this.db.actor(
-      actor,
-      null,
-      async (client) =>
-        (
-          await client.query(
-            `SELECT DISTINCT c.id,c.document->>'name' AS name FROM growth.creator_public c WHERE c.state IN ('published','paused') AND (c.id IN (SELECT creator_id FROM growth.follow WHERE account_id=$1 UNION SELECT creator_id FROM growth.notification WHERE account_id=$1) OR c.id IN (SELECT jsonb_array_elements_text(document->'mutedCreators')::uuid FROM growth.preference WHERE account_id=$1)) ORDER BY name LIMIT 500`,
-            [actor.accountId],
-          )
-        ).rows,
+    return this.currentPublicRows(
+      () =>
+        this.db.actor(
+          actor,
+          null,
+          async (client) =>
+            (
+              await client.query(
+                `SELECT DISTINCT c.id,c.document->>'name' AS name FROM growth.creator_public c WHERE c.state IN ('published','paused') AND (c.id IN (SELECT creator_id FROM growth.follow WHERE account_id=$1 UNION SELECT creator_id FROM growth.notification WHERE account_id=$1) OR c.id IN (SELECT jsonb_array_elements_text(document->'mutedCreators')::uuid FROM growth.preference WHERE account_id=$1)) ORDER BY name LIMIT 500`,
+                [actor.accountId],
+              )
+            ).rows,
+        ),
+      (row) => row.id as string,
     );
   }
   async home(actor: Actor, raw: unknown = {}) {
@@ -472,6 +624,31 @@ export class GrowthService {
         );
       }
     }
+    const postsQuery = () =>
+      this.db.actor(
+        actor,
+        null,
+        async (client) =>
+          (
+            await client.query(
+              `SELECT p.id,p.document,c.document AS creator,to_char(p.published_at AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS cursor_time
+         FROM growth.content_public p JOIN growth.creator_public c ON c.id=p.creator_id
+         WHERE EXISTS(SELECT 1 FROM growth.follow f WHERE f.account_id=$1 AND f.creator_id=p.creator_id)
+         AND p.state='published' AND c.state='published' AND c.document->>'verified'='true'
+         AND ($2::timestamptz IS NULL OR (p.published_at,p.id)<($2::timestamptz,$3::uuid))
+         ORDER BY p.published_at DESC,p.id DESC LIMIT 31`,
+              [
+                actor.accountId,
+                before?.publishedAt ?? null,
+                before?.id ?? null,
+              ],
+            )
+          ).rows,
+      );
+    const currentPosts = await this.currentPublicRows(
+      postsQuery,
+      (row) => row.creator.id as string,
+    );
     const own = await this.db.actor(actor, null, async (client) => {
       const follows = await client.query(
         "SELECT count(*)::int AS count FROM growth.follow WHERE account_id=$1",
@@ -484,17 +661,7 @@ export class GrowthService {
       return {
         followingCount: follows.rows[0].count as number,
         unread: unread.rows[0].count,
-        posts: (
-          await client.query(
-            `SELECT p.id,p.document,c.document AS creator,to_char(p.published_at AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS cursor_time
-           FROM growth.content_public p JOIN growth.creator_public c ON c.id=p.creator_id
-           WHERE EXISTS(SELECT 1 FROM growth.follow f WHERE f.account_id=$1 AND f.creator_id=p.creator_id)
-           AND p.state='published' AND c.state='published' AND c.document->>'verified'='true'
-           AND ($2::timestamptz IS NULL OR (p.published_at,p.id)<($2::timestamptz,$3::uuid))
-           ORDER BY p.published_at DESC,p.id DESC LIMIT 31`,
-            [actor.accountId, before?.publishedAt ?? null, before?.id ?? null],
-          )
-        ).rows,
+        posts: currentPosts,
       };
     });
     if (threadCursor && !this.owners.homePage)
@@ -651,8 +818,7 @@ export class GrowthService {
           .number()
           .int()
           .min(1)
-          .max(Number.MAX_SAFE_INTEGER)
-          .optional(),
+          .max(Number.MAX_SAFE_INTEGER),
       })
       .parse(input);
     const hash = createHash("sha256").update(value.token).digest("hex");
@@ -696,13 +862,39 @@ export class GrowthService {
           );
       },
       async (client) => {
-        // The token is globally unique. Remove its former binding and any
-        // former account on this installation in the same transaction as
-        // registration, so logout failure cannot retain the old recipient.
-        await client.query(
-          "DELETE FROM growth.device WHERE (installation_id=$1 OR token_hash=$2) AND (account_id<>$3 OR installation_id<>$1)",
+        // Retire former bindings without losing their installation high-water
+        // marks. Non-hex hashes cannot collide with real registration hashes.
+        const former = await client.query(
+          "SELECT id,account_id,installation_id,platform,token_hash,encrypted_token FROM growth.device WHERE (installation_id=$1 OR token_hash=$2) AND (account_id<>$3 OR installation_id<>$1) FOR UPDATE",
           [value.installationId, hash, actor.accountId],
         );
+        for (const row of former.rows) {
+          const revision = Math.max(
+            this.devices.revision(row),
+            row.installation_id === value.installationId
+              ? value.registrationRevision
+              : 1,
+          );
+          const tombstone = this.devices.tombstone(
+            row.account_id,
+            row.installation_id,
+            row.platform,
+            revision,
+          );
+          await client.query(
+            "UPDATE growth.device SET token_hash=$2,encrypted_token=$3,permission='denied',revoked_at=clock_timestamp(),updated_at=clock_timestamp() WHERE id=$1",
+            [row.id, tombstone.hash, tombstone.encrypted],
+          );
+        }
+        const denied =
+          value.permission === "denied"
+            ? this.devices.tombstone(
+                actor.accountId,
+                value.installationId,
+                value.platform,
+                value.registrationRevision,
+              )
+            : null;
         const result = await client.query(
           `INSERT INTO growth.device(account_id,installation_id,platform,token_hash,encrypted_token,permission,revoked_at) VALUES($1,$2,$3,$4,$5,$6,CASE WHEN $6='denied' THEN now() ELSE NULL END)
         ON CONFLICT(account_id,installation_id) DO UPDATE SET platform=excluded.platform,token_hash=excluded.token_hash,encrypted_token=excluded.encrypted_token,permission=excluded.permission,revoked_at=excluded.revoked_at,updated_at=now() RETURNING id`,
@@ -710,14 +902,15 @@ export class GrowthService {
             actor.accountId,
             value.installationId,
             value.platform,
-            hash,
-            this.devices.capture(
-              actor.accountId,
-              value.token,
-              value.installationId,
-              value.platform,
-              value.registrationRevision,
-            ),
+            denied?.hash ?? hash,
+            denied?.encrypted ??
+              this.devices.capture(
+                actor.accountId,
+                value.token,
+                value.installationId,
+                value.platform,
+                value.registrationRevision,
+              ),
             value.permission,
           ],
         );
@@ -732,46 +925,86 @@ export class GrowthService {
           .number()
           .int()
           .min(1)
-          .max(Number.MAX_SAFE_INTEGER)
-          .optional(),
+          .max(Number.MAX_SAFE_INTEGER),
+        platform: z.enum(["ios", "android"]),
       })
       .parse(input ?? {});
-    if (value.registrationRevision) {
-      const revision = value.registrationRevision;
-      await this.db.fencedWorkerActor(
-        actor,
-        async (client) => {
-          // Ordered revocation uses the installation ID, matching registration.
-          await client.query(
-            "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
-            [`growth.device:installation:${id}`],
+    const revision = value.registrationRevision;
+    await this.db.fencedWorkerActor(
+      actor,
+      async (client) => {
+        // Ordered revocation uses the installation ID, matching registration.
+        await client.query(
+          "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+          [`growth.device:installation:${id}`],
+        );
+        const previous = await client.query(
+          "SELECT account_id FROM growth.device WHERE installation_id=$1 LIMIT 257",
+          [id],
+        );
+        if (previous.rowCount! > 256)
+          throw new DomainError(
+            "device_registration_unavailable",
+            copy.growthErrorGrowthAuthorityRequired,
+            503,
           );
-          await this.erasure.lockSubjects(client, [actor.accountId]);
-        },
-        async (client) => {
-          const current = await client.query(
-            "SELECT id,encrypted_token FROM growth.device WHERE account_id=$1 AND installation_id=$2 FOR UPDATE",
-            [actor.accountId, id],
+        await this.erasure.lockSubjects(client, [
+          actor.accountId,
+          ...previous.rows.map((row) => row.account_id),
+        ]);
+        if (!(await this.erasure.subjects(client, [actor.accountId])))
+          throw new DomainError(
+            "growth_data_erased",
+            copy.growthErrorGrowthDataErased2,
+            410,
           );
-          for (const row of current.rows)
-            await client.query(
-              "UPDATE growth.device SET revoked_at=now(),permission='denied',encrypted_token=$3,updated_at=now() WHERE id=$1 AND account_id=$2",
-              [
-                row.id,
-                actor.accountId,
-                this.devices.revokeRegistration(row.encrypted_token, revision),
-              ],
+      },
+      async (client) => {
+        const current = await client.query(
+          "SELECT account_id,installation_id,platform,token_hash,encrypted_token FROM growth.device WHERE installation_id=$1 FOR UPDATE",
+          [id],
+        );
+        for (const row of current.rows) {
+          const priorRevision = this.devices.revision(row);
+          if (
+            revision < priorRevision ||
+            (row.account_id !== actor.accountId && revision === priorRevision)
+          )
+            throw new DomainError(
+              "device_registration_stale",
+              copy.growthThisActionIsUnavailableToThisAccount,
+              409,
             );
-        },
-      );
-      return { revoked: true };
-    }
-    await this.db.actor(actor, null, async (client) => {
-      await client.query(
-        "UPDATE growth.device SET revoked_at=now(),permission='denied' WHERE account_id=$1 AND (id=$2 OR installation_id=$2)",
-        [actor.accountId, id],
-      );
-    });
+          if (
+            row.account_id === actor.accountId &&
+            row.platform !== value.platform
+          )
+            throw new DomainError(
+              "device_registration_stale",
+              copy.growthThisActionIsUnavailableToThisAccount,
+              409,
+            );
+        }
+        const tombstone = this.devices.tombstone(
+          actor.accountId,
+          id,
+          value.platform,
+          revision,
+        );
+        // Even a revoke arriving before the first registration establishes
+        // a durable high-water mark. Other accounts' current rows survive.
+        await client.query(
+          "INSERT INTO growth.device(account_id,installation_id,platform,token_hash,encrypted_token,permission,revoked_at) VALUES($1,$2,$3,$4,$5,'denied',clock_timestamp()) ON CONFLICT(account_id,installation_id) DO UPDATE SET token_hash=excluded.token_hash,encrypted_token=excluded.encrypted_token,permission='denied',revoked_at=clock_timestamp(),updated_at=clock_timestamp()",
+          [
+            actor.accountId,
+            id,
+            value.platform,
+            tombstone.hash,
+            tombstone.encrypted,
+          ],
+        );
+      },
+    );
     return { revoked: true };
   }
   /** W1 supplies a verified email binding. There is no client-authored verification flag. */
@@ -1040,6 +1273,16 @@ export class GrowthService {
     });
   }
   async invite(id: string) {
+    if (this.creatorSource) {
+      const row = (
+        await this.db.worker.query<{ creator_id: string }>(
+          "SELECT creator_id FROM growth.invite WHERE id=$1 AND revoked_at IS NULL AND expires_at>now()",
+          [id],
+        )
+      ).rows[0];
+      if (!row) return null;
+      await this.refreshCreator(row.creator_id);
+    }
     const result = await this.db.worker.query(
       "SELECT i.context_id,c.document FROM growth.invite i JOIN growth.creator_public c ON c.id=i.creator_id WHERE i.id=$1 AND i.revoked_at IS NULL AND i.expires_at>now() AND c.state='published' AND c.document->>'verified'='true'",
       [id],
@@ -1423,6 +1666,18 @@ export class GrowthService {
         await assertAuthority();
         await this.erasure.mark(client, accountId, ownedCreatorIds);
         await assertAuthority();
+        const checkpointSchema = (
+          await client.query(
+            "SELECT to_regclass('growth.source_scan_checkpoint') IS NOT NULL AND (SELECT count(*)=2 FROM information_schema.columns WHERE table_schema='growth' AND table_name='source_scan_checkpoint' AND column_name IN ('generation','expires_at')) AS ready",
+          )
+        ).rows[0]?.ready;
+        if (checkpointSchema) {
+          // Generic directory pointers may reference this subject. Reset all
+          // pointers, keeping generations so pre-erasure scans cannot advance.
+          await client.query(
+            "UPDATE growth.source_scan_checkpoint SET encrypted_cursor=NULL,generation=generation+1,updated_at=now(),expires_at=now()",
+          );
+        }
         await client.query(
           "UPDATE growth.delivery SET state='suppressed' WHERE account_id=$1 AND state IN ('queued','leased')",
           [accountId],

@@ -183,7 +183,7 @@ public struct GrowthClient: Sendable {
   }
   public func revokeDevice(installationID: UUID, registrationRevision: Int, expectedSession: String) async throws {
     struct Ack: Decodable { let revoked: Bool }
-    let body = try JSONSerialization.data(withJSONObject: ["registrationRevision": registrationRevision])
+    let body = try JSONSerialization.data(withJSONObject: ["registrationRevision": registrationRevision, "platform": "ios"])
     let _: Ack = try await request("devices/" + installationID.uuidString.lowercased(), method: "DELETE", body: body, expectedSession: expectedSession)
   }
   func notificationDestination(id: UUID, expectedSession: String) async throws -> String {

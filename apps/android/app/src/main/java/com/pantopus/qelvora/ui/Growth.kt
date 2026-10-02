@@ -57,8 +57,8 @@ class GrowthClient(private val origin: String, private val token: () -> String? 
             JSONObject(response.toString(Charsets.UTF_8))
         } finally { connection.disconnect() }
     }
-    suspend fun registerDevice(installationId: String, registration: String, granted: Boolean) = request("devices", "PUT", JSONObject().put("installationId", installationId).put("platform", "android").put("token", registration).put("permission", if (granted) "granted" else "denied"))
-    suspend fun revokeDevice(installationId: String) = request("devices/$installationId", "DELETE")
+    suspend fun registerDevice(installationId: String, registration: String, granted: Boolean, registrationRevision: Long, expectedSession: String) = request("devices", "PUT", JSONObject().put("installationId", installationId).put("platform", "android").put("token", registration).put("permission", if (granted) "granted" else "denied").put("registrationRevision", registrationRevision), expectedSession)
+    suspend fun revokeDevice(installationId: String, registrationRevision: Long, expectedSession: String) = request("devices/$installationId", "DELETE", JSONObject().put("platform", "android").put("registrationRevision", registrationRevision), expectedSession)
 }
 
 private fun JSONObject.objects(key: String): List<JSONObject> {val values = optJSONArray(key) ?: return emptyList(); return (0 until values.length()).mapNotNull { values.optJSONObject(it) }}

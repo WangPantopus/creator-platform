@@ -3,7 +3,14 @@ import pg from "pg";
 import type { IdentityRuntime } from "../identity/router.js";
 import { DomainError } from "../../core/errors.js";
 import { unavailableOwners, type GrowthOwners } from "./contracts.js";
-import { canonicalCreatorOwner } from "./integration.js";
+import {
+  canonicalCreatorOwner,
+  canonicalContentFollows,
+} from "./integration.js";
+import {
+  canonicalCreatorProjections,
+  type PublicCreatorAIProjection,
+} from "./creator-projection.js";
 import { createGrowthRuntime } from "./runtime.js";
 import type {
   GrowthPrivacyScope,
@@ -19,6 +26,7 @@ export async function configureGrowthForBackend(
     pool: pg.Pool;
     identity: IdentityRuntime | undefined;
     owners?: Partial<GrowthOwners>;
+    publicCreatorAI?: PublicCreatorAIProjection;
     privacyScope?: GrowthPrivacyScope;
     privacyTaskAuthority?: GrowthPrivacyTaskAuthority;
     assertAllowed?: Parameters<typeof canonicalCreatorOwner>[1];
@@ -59,6 +67,10 @@ export async function configureGrowthForBackend(
       runtimePool: input.pool,
       workerPool: worker,
       secret: Buffer.from(env.GROWTH_ENCRYPTION_KEY!, "hex"),
+      creatorSource: canonicalCreatorProjections(
+        input.pool,
+        input.publicCreatorAI,
+      ),
       owners: {
         ...unavailableOwners,
         ...input.owners,
@@ -103,6 +115,7 @@ export async function configureGrowthForBackend(
     });
     return {
       ...runtime,
+      contentFollows: canonicalContentFollows(),
       async close() {
         await runtime.stop();
         await worker.end();

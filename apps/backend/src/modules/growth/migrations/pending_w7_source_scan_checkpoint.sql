@@ -4,12 +4,19 @@ BEGIN;
 SET LOCAL ROLE growth_owner;
 CREATE TABLE growth.source_scan_checkpoint (
   namespace text PRIMARY KEY CHECK(namespace ~ '^[a-z0-9_-]{1,80}$'),
-  encrypted_cursor text NOT NULL CHECK(length(encrypted_cursor) BETWEEN 1 AND 16384),
-  updated_at timestamptz NOT NULL DEFAULT clock_timestamp()
+  encrypted_cursor text CHECK(length(encrypted_cursor) BETWEEN 1 AND 16384),
+  generation bigint NOT NULL DEFAULT 1 CHECK(generation>0),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  expires_at timestamptz NOT NULL DEFAULT now()+interval '24 hours',
+  CHECK(expires_at<=updated_at+interval '24 hours')
 );
 ALTER TABLE growth.source_scan_checkpoint ENABLE ROW LEVEL SECURITY;
 ALTER TABLE growth.source_scan_checkpoint FORCE ROW LEVEL SECURITY;
 CREATE POLICY source_scan_worker ON growth.source_scan_checkpoint
   TO growth_worker USING(true) WITH CHECK(true);
 GRANT SELECT,INSERT,UPDATE ON growth.source_scan_checkpoint TO growth_worker;
+-- Cursors contain only a directory UUID, not an Actor, lease, text or token.
+-- The worker scrubs expired ciphertext every tick. Account erasure scrubs all
+-- scan pointers and increments generations; in-flight old advances then fail.
+-- Retain only namespace/generation metadata to prevent an ABA after deletion.
 COMMIT;

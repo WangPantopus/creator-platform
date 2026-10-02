@@ -126,9 +126,9 @@
     "nativeProcessesRunning": false
   },
   "currentHost": {
-    "recordedAt": "2026-10-01T20:59:59.084917+00:00",
+    "recordedAt": "2026-10-02T06:27:11.832751+00:00",
     "note": "W7 moved from the old iMac (Intel, macOS 26, Xcode 26.5) to Yingpeng's Mac Studio (Apple M2 Max, macOS 27.0 26A428, Xcode 27.0 27A266a, iOS 27.0 simulator runtime). Every iMac-era resource listed elsewhere in this file (container creator-platform-w7-document-20261001, simulator CE855FD5-A4AA-4C62-A63B-5E80D2E1DFF1, /private/tmp/creator-platform-w7-completion-20261001 caches, ~/.config/creator-platform/{secrets,cleanup-20261001,w7-completion-20261001}) is absent from this machine and was not copied. Those entries are historical iMac custody only.",
-    "checkout": "/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545 (Claude desktop worktree; branch codex/w7-completion-20261001 tracking origin)",
+    "checkout": "/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545",
     "postgres": {
       "container": "creator-platform-w7-macstudio-20261001",
       "volume": "creator-platform-w7-macstudio-20261001",
@@ -136,29 +136,73 @@
       "address": "127.0.0.1:55447",
       "database": "creator_w7",
       "superuserPasswordFile": "~/.config/creator-platform/w7-macstudio-20261001/pg-superuser-password (mode 0600, never printed)",
-      "state": "Created fresh and empty; no migrations, roles or data applied. Stopped at handoff with container and volume retained.",
+      "state": "Running;40 active migrations through0043, separated nonowner roles; actual UI created one fan w7_studio_fan and one optional usefulness feedback row.0 creator/verified public rows. No pending migration activated.",
       "recoveredIMacData": "not restored; the iMac backup holds 0 creators/relationships/shares and is not on this machine"
     },
     "reservedPorts": {
       "api": 4107,
       "web": 3007,
-      "note": "Free at reservation; nothing started on them in this session."
+      "note": "API loopback4107 PID92298/session28521; web3007 PID74906/session4318 Next development. API current at last restart; latest handle reuse repair compiled afterward. Verify listeners before reuse."
     },
     "iosSimulator": {
       "name": "Qelvora W7 iPhone 16e",
       "udid": "FAB31883-2F36-4E50-83B3-D9654B60FF00",
       "runtime": "iOS 27.0",
       "points": "390x844",
-      "state": "Created, never booted, shut down"
+      "state": "Earlier8c shipping app installed/launched but CUA timeouts; terminated/shutdown. New ordered-revocation source built successfully; not installed yet. No W7 simulator lease held."
     },
     "androidAvd": {
       "name": "Qelvora_W7_API34",
       "image": "system-images;android-34;google_apis;arm64-v8a",
       "display": "1170x2532 @480dpi = 390x844 dp",
-      "state": "Created, never started"
+      "state": "Qelvora_W7_API34/emulator5580 installed and launched earlier shipping draft; no personal taps yet. Stopped and emulator-slot-2 released. Final current-source APK compiled successfully after release; not installed yet."
     },
     "swiftBuildScratch": "/private/tmp/claude-501/... session scratchpad (disposable; not a dependency)",
     "sharedMachineBudget": "Adopted W1's 2026-10-01 budget: one heavy native build machine-wide via mkdir /private/tmp/creator-platform-heavy-build.lock (+owner file); at most two creator-platform emulators via /private/tmp/creator-platform-emulator-slot-{1,2}; at most three booted simulators via /private/tmp/creator-platform-simulator-slot-{1,2,3}; explicit UDID/serial only. Three earlier local swift test passes in this session ran before the budget message.",
-    "peerResourcesObserved": "W1 55441/4101-range, W2 55442 and 55449, W3 55443, W4 55444, W5 55435/API 4105/web 3005, W6 55446, W8 55438 and 55439/web 3008/API 4108; peer simulators and emulators were never touched."
+    "peerResourcesObserved": "W1 55441/4101-range, W2 55442 and 55449, W3 55443, W4 55444, W5 55435/API 4105/web 3005, W6 55446, W8 55438 and 55439/web 3008/API 4108; peer simulators and emulators were never touched.",
+    "privateConfigurationDirectory": "~/.config/creator-platform/w7-macstudio-20261001",
+    "environmentFiles": {
+      "migration.env": [
+        "DATABASE_MIGRATION_URL"
+      ],
+      "runtime.env": [
+        "NODE_ENV",
+        "PORT",
+        "WEB_ORIGIN",
+        "PASSKEY_RP_ID",
+        "PASSKEY_ORIGINS",
+        "CREATOR_FEATURE_ENABLED",
+        "IDENTITY_ADAPTER",
+        "IDENTITY_SESSION_KEY",
+        "DATABASE_URL",
+        "GROWTH_ENABLED",
+        "GROWTH_ENCRYPTION_KEY",
+        "GROWTH_WORKER_DATABASE_URL",
+        "QELVORA_API_URL",
+        "QELVORA_GROWTH_API_URL"
+      ],
+      "roles.private.json": "fresh private API/worker passwords; files0600; no values logged or committed"
+    },
+    "nativeBuild": "Final Android FCM build11s exit0 and final iOS build exit0 under reviewed W1 atomic UUID+inode helper94258f0e. Heavy slot released after each. No W7 heavy native build remains.",
+    "api": {
+      "pid": 92298,
+      "session": 28521,
+      "source": "Canonical public AI/held follows current at restart; latest handle collision repair compiled afterward, not yet restarted.",
+      "log": "/private/tmp/creator-platform-w7-active-20261001/api-current-source-3.log"
+    },
+    "web": {
+      "pid": 74906,
+      "session": 4318,
+      "mode": "Next development; actual local fan settings/feedback operated",
+      "productionBuild": "completed earlier; production signed-out settings/discovery recovery/share refusal observed only"
+    },
+    "pushConfiguration": {
+      "CreatorPushEnabled": false,
+      "firebaseSDK": "25.1.0",
+      "FirebaseProjectValuesSupplied": false,
+      "APNsProviderSupplied": false,
+      "emailProviderSupplied": false,
+      "publicHTTPSOriginSupplied": false
+    }
   }
 }

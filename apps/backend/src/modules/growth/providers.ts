@@ -73,15 +73,19 @@ export class NativeDeliveryProvider implements DeliveryProvider {
     );
     const receipts: string[] = [];
     for (const device of devices.rows) {
+      // Secret-management latency must not extend the live-session lock.
+      // The session is checked afterward and held only for bounded submission.
+      const authorization = await this.authorization(device.platform);
       const result = await service.devices.withCurrent(
         input.accountId,
         device.encrypted_token,
         device.token_hash,
         device.installation_id,
         device.platform,
-        async (token) => {
+        async (token, signal) => {
           const registrationHash = device.token_hash as string;
           let sending = false;
+          let reserved = false;
           try {
             if (device.platform === "ios") {
               if (!this.config.apns) throw new Error("apns_unconfigured");
@@ -93,47 +97,45 @@ export class NativeDeliveryProvider implements DeliveryProvider {
                   /^(........)(....)(....)(....)(............)$/u,
                   "$1-$2-$3-$4-$5",
                 );
-              const authorization = await this.bounded(() =>
-                this.config.apns!.authorization(),
-              );
               await this.beginReceipt(input.idempotencyKey, registrationHash);
+              reserved = true;
+              signal.throwIfAborted();
               sending = true;
               receipts.push(
-                await this.sendAPNS(token, id, input, authorization),
+                await this.sendAPNS(token, id, input, authorization, signal),
               );
             } else {
               if (!this.config.fcm) throw new Error("fcm_unconfigured");
-              const accessToken = await this.bounded(() =>
-                this.config.fcm!.accessToken(),
-              );
               await this.beginReceipt(input.idempotencyKey, registrationHash);
+              reserved = true;
+              signal.throwIfAborted();
               sending = true;
               const response = await fetch(
                 `https://fcm.googleapis.com/v1/projects/${encodeURIComponent(this.config.fcm.projectId)}/messages:send`,
                 {
                   method: "POST",
                   headers: {
-                    Authorization: `Bearer ${accessToken}`,
+                    Authorization: `Bearer ${authorization}`,
                     "Content-Type": "application/json",
                   },
                   body: JSON.stringify({
                     message: {
-                      token,
-                      notification: {
-                        title: input.sender,
-                        body: input.preview,
-                      },
+                      ...(token.startsWith("fcm-fid-v1:")
+                        ? { fid: token.slice("fcm-fid-v1:".length) }
+                        : { token }),
+                      // Data-only delivery lets the shipping app recheck its
+                      // real current account and permission before display.
                       data: {
-                        destination: input.destination,
                         notificationId: input.notificationId,
                       },
                       android: {
                         ttl: "0s",
+                        priority: "HIGH",
                         collapse_key: input.notificationId,
                       },
                     },
                   }),
-                  signal: AbortSignal.timeout(10000),
+                  signal,
                   redirect: "error",
                 },
               );
@@ -152,8 +154,13 @@ export class NativeDeliveryProvider implements DeliveryProvider {
                 );
                 sending = false;
                 await service.db.worker.query(
-                  "UPDATE growth.device SET revoked_at=now() WHERE id=$1",
-                  [device.id],
+                  "UPDATE growth.device SET revoked_at=now() WHERE id=$1 AND account_id=$2 AND token_hash=$3 AND encrypted_token=$4",
+                  [
+                    device.id,
+                    input.accountId,
+                    device.token_hash,
+                    device.encrypted_token,
+                  ],
                 );
                 return;
               }
@@ -194,6 +201,11 @@ export class NativeDeliveryProvider implements DeliveryProvider {
               [input.idempotencyKey, registrationHash, receipts.at(-1)],
             );
           } catch (error) {
+            if (reserved && !sending)
+              await service.db.worker.query(
+                "DELETE FROM growth.provider_receipt WHERE delivery_id=$1 AND registration_hash=$2 AND state='sending'",
+                [input.idempotencyKey, registrationHash],
+              );
             if (sending && error instanceof InvalidDeviceToken) {
               await service.db.worker.query(
                 "UPDATE growth.provider_receipt SET state='invalid',updated_at=now() WHERE delivery_id=$1 AND registration_hash=$2",
@@ -201,8 +213,13 @@ export class NativeDeliveryProvider implements DeliveryProvider {
               );
               sending = false;
               await service.db.worker.query(
-                "UPDATE growth.device SET revoked_at=now() WHERE id=$1",
-                [device.id],
+                "UPDATE growth.device SET revoked_at=now() WHERE id=$1 AND account_id=$2 AND token_hash=$3 AND encrypted_token=$4",
+                [
+                  device.id,
+                  input.accountId,
+                  device.token_hash,
+                  device.encrypted_token,
+                ],
               );
               return;
             }
@@ -225,8 +242,13 @@ export class NativeDeliveryProvider implements DeliveryProvider {
       );
       if (result === null)
         await service.db.worker.query(
-          "UPDATE growth.device SET revoked_at=now(),permission='denied' WHERE id=$1 AND account_id=$2",
-          [device.id, input.accountId],
+          "UPDATE growth.device SET revoked_at=now(),permission='denied' WHERE id=$1 AND account_id=$2 AND token_hash=$3 AND encrypted_token=$4",
+          [
+            device.id,
+            input.accountId,
+            device.token_hash,
+            device.encrypted_token,
+          ],
         );
     }
     const pending = await service.db.worker.query(
@@ -258,6 +280,16 @@ export class NativeDeliveryProvider implements DeliveryProvider {
       );
     });
     return Promise.race([Promise.resolve().then(() => work(signal)), timeout]);
+  }
+  private authorization(platform: string) {
+    if (platform === "ios") {
+      const config = this.config.apns;
+      if (!config) throw new Error("apns_unconfigured");
+      return this.bounded(() => config.authorization());
+    }
+    const config = this.config.fcm;
+    if (!config) throw new Error("fcm_unconfigured");
+    return this.bounded(() => config.accessToken());
   }
   private async sendEmail(input: Parameters<DeliveryProvider["send"]>[0]) {
     const config = this.config.email;
@@ -369,8 +401,10 @@ export class NativeDeliveryProvider implements DeliveryProvider {
     id: string,
     input: Parameters<DeliveryProvider["send"]>[0],
     authorization: string,
+    signal: AbortSignal,
   ): Promise<string> {
     const config = this.config.apns!;
+    signal.throwIfAborted();
     return new Promise((resolve, reject) => {
       const session = connect(
         config.sandbox
@@ -381,16 +415,14 @@ export class NativeDeliveryProvider implements DeliveryProvider {
       const finish = (error?: Error, result?: string) => {
         if (settled) return;
         settled = true;
-        clearTimeout(deadline);
+        signal.removeEventListener("abort", abort);
         if (error) session.destroy();
         else session.close();
         if (error) reject(error);
         else resolve(result ?? id);
       };
-      const deadline = setTimeout(
-        () => finish(new Error("apns_timeout")),
-        10000,
-      );
+      const abort = () => finish(new Error("provider_outcome_unknown"));
+      signal.addEventListener("abort", abort, { once: true });
       session.on("error", (error) => finish(error));
       const request = session.request({
         ":method": "POST",
