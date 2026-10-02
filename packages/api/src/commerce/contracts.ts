@@ -258,7 +258,7 @@ export const SpendLimitCommand = z
     currency: Currency,
     amount: MinorUnits.nullable(),
     explicitNone: z.boolean(),
-    remindersOn: z.boolean().default(true),
+    remindersOn: z.boolean().default(false),
     idempotencyKey: IdempotencyKey,
   })
   .refine((v) => (v.amount === null ? v.explicitNone : !v.explicitNone), {

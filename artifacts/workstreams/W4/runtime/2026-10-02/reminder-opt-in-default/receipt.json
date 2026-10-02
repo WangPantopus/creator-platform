@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-02T11:46:39.391478+00:00",
+  "workstream": "W4",
+  "state": "implemented opt-in contract correction; actual retained web regression verified",
+  "problem": "SpendLimitCommand defaulted omitted remindersOn totrue, inconsistent with R10 deliberate opt-in and app preferences",
+  "change": "Omitted remindersOn now defaultsfalse; explicittrue/false values retain their behavior. Regenerated OpenAPI publishes defaultfalse. No database migration or existing preference write.",
+  "validation": {
+    "backendTypecheck": "PASS",
+    "generatedConsistency": "PASS:12 resources,98 operations",
+    "scopedLint": "PASS",
+    "format": "PASS",
+    "personallyOperatedWeb": {
+      "origin": "http://localhost:3004",
+      "api": "4104 restarted current source",
+      "viewport": "390x844",
+      "appearance": "Night",
+      "observation": "Reload retained saved remindersoff, current7USD, original pending No limit Oct2 23:44 local and zero financial totals",
+      "scope": "Actual persisted regression; UI always supplies explicit reminder choice, so this is not an omitted-field transaction acceptance claim"
+    }
+  },
+  "limits": [
+    "No new unit tests, fabricated consent or API/SQL preference writes",
+    "No threshold notification producer/delivery, payment, native-provider or24hour passage acceptance",
+    "Native sources unchanged; existing shipping compilation and personal native evidence are separately dated",
+    "Publication source work continues on its own branch; all nine packages/R01\u2013R15 remain assigned, no release readiness"
+  ],
+  "files": [
+    {
+      "path": "packages/api/src/commerce/contracts.ts",
+      "sha256": "8d12c59c049c85bbbb8e90645d8293d90bce0e0e65cf6602846cf0f369f7cbe6"
+    },
+    {
+      "path": "packages/api/generated/openapi.json",
+      "sha256": "62f4eb9ae95d146d611764c9f4c40e8399ce5d07df9b3c1dabeb7e61bbbd6d17"
+    },
+    {
+      "path": "artifacts/workstreams/W4/runtime/2026-10-02/reminder-opt-in-default/fan-reload-night.png",
+      "sha256": "88d46b8cae46f1d5d825c4b0999305a4984f532fc7451c1a67e570e93266bc4e"
+    }
+  ]
+}
