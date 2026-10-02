@@ -556,6 +556,16 @@ export class ContentService {
     return row;
   }
   async eligible(client: PoolClient, actor: Actor, row: Index) {
+    return (
+      (await this.eligibleBeforePacket(client, actor, row)) &&
+      (await this.packetEligible(client, actor, row))
+    );
+  }
+  private async eligibleBeforePacket(
+    client: PoolClient,
+    actor: Actor,
+    row: Index,
+  ) {
     const creator = (
       await client.query(
         "SELECT verification,recovery_required FROM creator.creator_profile WHERE id=$1",
@@ -585,7 +595,9 @@ export class ContentService {
     }
     // Complete actual audience authority before the final W4 source fence.
     // No later view enrichment may acquire new identity locks for this read.
-    if (!(await this.audienceEligible(client, actor, row))) return false;
+    return this.audienceEligible(client, actor, row);
+  }
+  private async packetEligible(client: PoolClient, actor: Actor, row: Index) {
     return (
       !row.packet_id ||
       (await this.dependencies.publicPacketRead?.(client, actor, {
@@ -1478,6 +1490,7 @@ export class ContentService {
       if (!studio)
         for (const row of rows.slice(0, page.limit))
           await this.prepareReadInTransaction(client, actor, creatorId, row.id);
+      const currentRows: Index[] = [];
       for (const row of rows.slice(0, page.limit)) {
         let current: Index;
         try {
@@ -1491,7 +1504,22 @@ export class ContentService {
             continue;
           throw error;
         }
-        if (!studio && !(await this.eligible(client, actor, current))) continue;
+        currentRows.push(current);
+      }
+      const permitted: Index[] = [];
+      for (const current of currentRows) {
+        await client.query("SELECT set_config('app.content_id',$1,true)", [
+          current.id,
+        ]);
+        if (studio || (await this.eligibleBeforePacket(client, actor, current)))
+          permitted.push(current);
+      }
+      // Every content/quote/audience positive lock is now held. Final W4
+      // source gates and plain view reads cannot introduce a later identity or
+      // domain lock from another candidate after the first source fence.
+      for (const current of permitted) {
+        if (!studio && !(await this.packetEligible(client, actor, current)))
+          continue;
         await client.query("SELECT set_config('app.content_id',$1,true)", [
           current.id,
         ]);
