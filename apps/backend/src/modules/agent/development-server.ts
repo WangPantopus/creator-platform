@@ -77,6 +77,9 @@ const backend = await createConfiguredBackend({
     ? {
         trust: (runtime: BackendRuntime) =>
           createDevelopmentTrust(runtime, {
+            // Restoration must bind to the same validated W2 endpoint used
+            // by readConfig, rather than an unrelated ambient DATABASE_URL.
+            env: { ...process.env, DATABASE_URL: dbUrl },
             agent: prepareDomain(runtime),
             consumers: {
               assertRestoredInTransaction: runtime.assertRestoredInTransaction,
