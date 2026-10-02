@@ -29,6 +29,7 @@ import { domainPrivacyTaskAuthorityInTransaction } from "./modules/trust/domain-
 import type { ConversationPrivacyOwnerPorts } from "./modules/trust/privacy-consumers.js";
 import { createTrustReplyReviewer } from "./modules/trust/reply-review.js";
 import { InteractiveCallControl } from "./modules/session/interactive-control.js";
+import { AccountCallMetadata } from "./modules/session/account-call-metadata.js";
 
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
@@ -96,6 +97,7 @@ try {
               }
             : {}),
           registerFeatures: async (runtime) => {
+            const accountCalls = await AccountCallMetadata.prepare(runtime);
             const mediaEnvironment = readMediaEnvironment();
             const mediaDenials = runtimeMediaDenials(runtime);
             // The development host consumes W8's 0082 held try-fence. A code
@@ -289,7 +291,7 @@ try {
                 pool: runtime.pool,
                 development: config.identityAdapter === "development",
               }),
-              mediaHost?.feature() ?? mediaFeature({}),
+              mediaHost?.feature(accountCalls) ?? mediaFeature({ accountCalls }),
               ...(commerce ? [commerce.feature] : []),
               ...(content ? content.features : []),
               ...(features.growth ? [features.growth.feature] : []),

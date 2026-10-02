@@ -32,6 +32,7 @@ import {
 import { mediaFeature } from "./registration.js";
 import { AvailabilityService } from "../session/availability.js";
 import type { MediaInteractiveEnvironment } from "./environment.js";
+import type { AccountCallMetadata } from "../session/account-call-metadata.js";
 
 /** W3 proves a fan's read against its own delivered message on the held client. */
 export type RecordingPublicationPort = (
@@ -105,7 +106,7 @@ export type MediaHost = Readonly<{
   bindRecordingPublication(port: RecordingPublicationPort): void;
   /** Call after binding. A surface is mounted only when its consumer is real:
    * thread recordings need W3's association, creator media needs W5 content. */
-  feature(): FeatureRegistration;
+  feature(accountCalls?: AccountCallMetadata): FeatureRegistration;
 }>;
 
 function actorOf(scope: CreatorMediaReadScope): Actor {
@@ -279,9 +280,10 @@ export function composeMediaHost(input: {
       );
       recordingPublication = port;
     },
-    feature: () =>
+    feature: (accountCalls) =>
       mediaFeature({
         availability,
+        ...(accountCalls ? { accountCalls } : {}),
         ...(recordingPublication ? { media } : {}),
         ...(content ? { creatorMedia } : {}),
       }),
