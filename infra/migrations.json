@@ -914,6 +914,15 @@
       "path": "apps/backend/src/modules/commerce/schema-fulfillment-original-hash.sql",
       "state": "reserved_unapplied",
       "reason": "Distinct bounded original request hash validator after genuine0199 original-recipient viewer issuer. Exact source/NoLogin role/function/current viewer/session/client/PID/fullXID/plan/revision/original-member and C10 review pending. No arbitrary UUID oracle or raw viewer/runtime question, fan-answer or disclosure columns. Original0199 source remains immutable; no activation/positive viewing inferred."
+    },
+    {
+      "id": "0203",
+      "owner": "W3",
+      "version": "0203_w3_terminal_only_finalization",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_terminal_only_finalization.sql",
+      "sourceSha256": "8de1897f2e70f763382984459274eb7616ad7149b457811fffd90fb8b7df2e8c",
+      "state": "reserved_unapplied",
+      "reason": "Distinct terminal-only original-cursor finalization proposal. Original0193/0110 bytes remain frozen and held. Isolated creator_w3_terminal_output and generation_terminal_output(uuid,uuid) cannot receive or use the original generation_scope_matches bridge. Requires actual W1 ninth typed terminal contract with originalScopeBridge=false, independently reviewed installed definition/effective catalogue, real W2/W4 settlement, held restoration/negative currentness and separate COMMIT acceptance. Exact owner source/custody review and closed installation qualification remain pending; no activation, output text/provider/financial permission or positive settlement receipt."
     }
   ]
 }
