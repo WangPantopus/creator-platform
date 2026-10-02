@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-02T11:28:24.646831+00:00",
+  "host": "Yingpengs-Mac-Studio.local",
+  "base": "53bfe62b1d9ec7733467c6ed2c8d024c0b937647",
+  "sourceSha256": "fba43ad5303ecc7d59ebadf7b541b276009c897c07f3038c50bb1a70e12178da",
+  "actualRole": "creator_runtime",
+  "qualifiedHost": "actual configured loopback/development identity/explicit synthetic licensing flag",
+  "samePool": "accepted",
+  "identicalDatabaseUrlDifferentPool": "refused",
+  "code": "development_license_pool_mismatch",
+  "status": 503,
+  "otherPoolConnections": 0,
+  "providerCalls": 0,
+  "durableWrites": 0,
+  "newUnitTests": 0,
+  "limits": [
+    "This pure composition guard does not approve a licence, processor policy or retention.",
+    "No actual generation task/consumer or public positive policy was fabricated.",
+    "Temporary backend operator removed."
+  ]
+}

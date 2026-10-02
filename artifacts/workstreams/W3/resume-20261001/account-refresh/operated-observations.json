@@ -1,0 +1,1519 @@
+{
+  "description": "Sanitized labels observed after personal manual UI operation through official Maestro 2.11.0. These are receipts, not tests, fixtures, or saved flows.",
+  "observations": [
+    {
+      "source": "android20",
+      "requestId": 20,
+      "platform": "android",
+      "labels": [
+        {
+          "text": "Development identity",
+          "bounds": "[111,169][499,219]"
+        },
+        {
+          "text": "Synthetic account · actual local API.",
+          "bounds": "[111,219][731,269]"
+        },
+        {
+          "text": "You",
+          "bounds": "[44,346][123,407]"
+        },
+        {
+          "text": "@w3_dev_actor1",
+          "bounds": "[44,473][537,545]"
+        },
+        {
+          "text": "Synthetic W3 development account. Local acceptance only.",
+          "bounds": "[44,545][1036,659]"
+        },
+        {
+          "text": "Handle and intro",
+          "bounds": "[77,693][402,746]"
+        },
+        {
+          "text": "Memberships and requests",
+          "bounds": "[273,886][807,939]"
+        },
+        {
+          "text": "Spend and time",
+          "bounds": "[386,1012][694,1065]"
+        },
+        {
+          "text": "Notifications",
+          "bounds": "[412,1133][667,1186]"
+        },
+        {
+          "text": "Me and privacy",
+          "bounds": "[44,1286][487,1358]"
+        },
+        {
+          "text": "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.",
+          "bounds": "[44,1358][1036,1495]"
+        },
+        {
+          "text": "Memory and conversation access by creator",
+          "bounds": "[44,1495][869,1548]"
+        },
+        {
+          "text": "No conversations yet.",
+          "bounds": "[44,1614][447,1667]"
+        },
+        {
+          "text": "Export or delete my data",
+          "bounds": "[298,1839][782,1892]"
+        },
+        {
+          "text": "Help and safety",
+          "bounds": "[77,1965][386,2018]"
+        },
+        {
+          "text": "Home",
+          "bounds": "[109,2159][194,2198]"
+        },
+        {
+          "text": "Discover",
+          "bounds": "[347,2159][474,2198]"
+        },
+        {
+          "text": "Requests",
+          "bounds": "[600,2159][739,2198]"
+        },
+        {
+          "text": "You",
+          "bounds": "[903,2159][955,2198]"
+        },
+        {
+          "text": "3:38",
+          "bounds": "[147,48][255,94]"
+        },
+        {
+          "text": "Android System notification: ",
+          "bounds": "[255,6][316,136]"
+        },
+        {
+          "text": "Wifi signal full.",
+          "bounds": "[883,50][924,91]"
+        },
+        {
+          "text": "Phone signal full.",
+          "bounds": "[924,40][965,101]"
+        },
+        {
+          "text": "Battery charging, 100 percent.",
+          "bounds": "[982,52][1003,88]"
+        }
+      ]
+    },
+    {
+      "source": "android24",
+      "requestId": 24,
+      "platform": "android",
+      "labels": [
+        {
+          "text": "Development identity",
+          "bounds": "[111,169][499,219]"
+        },
+        {
+          "text": "Synthetic account · actual local API.",
+          "bounds": "[111,219][731,269]"
+        },
+        {
+          "text": "You",
+          "bounds": "[44,346][123,407]"
+        },
+        {
+          "text": "@w3_dev_actor1",
+          "bounds": "[44,473][537,545]"
+        },
+        {
+          "text": "Synthetic W3 development account. Local acceptance only. Return-visit verification.",
+          "bounds": "[44,545][1036,659]"
+        },
+        {
+          "text": "Handle and intro",
+          "bounds": "[77,693][402,746]"
+        },
+        {
+          "text": "Memberships and requests",
+          "bounds": "[273,886][807,939]"
+        },
+        {
+          "text": "Spend and time",
+          "bounds": "[386,1012][694,1065]"
+        },
+        {
+          "text": "Notifications",
+          "bounds": "[412,1133][667,1186]"
+        },
+        {
+          "text": "Me and privacy",
+          "bounds": "[44,1286][487,1358]"
+        },
+        {
+          "text": "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.",
+          "bounds": "[44,1358][1036,1495]"
+        },
+        {
+          "text": "Memory and conversation access by creator",
+          "bounds": "[44,1495][869,1548]"
+        },
+        {
+          "text": "No conversations yet.",
+          "bounds": "[44,1614][447,1667]"
+        },
+        {
+          "text": "Export or delete my data",
+          "bounds": "[298,1839][782,1892]"
+        },
+        {
+          "text": "Help and safety",
+          "bounds": "[77,1965][386,2018]"
+        },
+        {
+          "text": "Home",
+          "bounds": "[109,2159][194,2198]"
+        },
+        {
+          "text": "Discover",
+          "bounds": "[347,2159][474,2198]"
+        },
+        {
+          "text": "Requests",
+          "bounds": "[600,2159][739,2198]"
+        },
+        {
+          "text": "You",
+          "bounds": "[903,2159][955,2198]"
+        },
+        {
+          "text": "3:39",
+          "bounds": "[147,48][255,94]"
+        },
+        {
+          "text": "Android System notification: ",
+          "bounds": "[255,6][316,136]"
+        },
+        {
+          "text": "Wifi signal full.",
+          "bounds": "[883,50][924,91]"
+        },
+        {
+          "text": "Phone signal full.",
+          "bounds": "[924,40][965,101]"
+        },
+        {
+          "text": "Battery charging, 100 percent.",
+          "bounds": "[982,52][1003,88]"
+        }
+      ]
+    },
+    {
+      "source": "android28",
+      "requestId": 28,
+      "platform": "android",
+      "labels": [
+        {
+          "text": "Account status",
+          "bounds": "[111,169][388,219]"
+        },
+        {
+          "text": "Reconnect to refresh your account. Actions are unavailable while offline.",
+          "bounds": "[111,219][1041,324]"
+        },
+        {
+          "text": "Development identity",
+          "bounds": "[111,390][499,440]"
+        },
+        {
+          "text": "Synthetic account · actual local API.",
+          "bounds": "[111,440][731,490]"
+        },
+        {
+          "text": "You",
+          "bounds": "[44,567][123,628]"
+        },
+        {
+          "text": "Account unavailable",
+          "bounds": "[155,661][525,711]"
+        },
+        {
+          "text": "Failed to connect to /10.0.2.2:4103",
+          "bounds": "[155,711][762,761]"
+        },
+        {
+          "text": "Your account",
+          "bounds": "[44,860][416,932]"
+        },
+        {
+          "text": "Your intro is unavailable.",
+          "bounds": "[44,932][499,985]"
+        },
+        {
+          "text": "Handle and intro",
+          "bounds": "[77,1019][402,1072]"
+        },
+        {
+          "text": "Memberships and requests",
+          "bounds": "[273,1212][807,1265]"
+        },
+        {
+          "text": "Spend and time",
+          "bounds": "[386,1338][694,1391]"
+        },
+        {
+          "text": "Notifications",
+          "bounds": "[412,1459][667,1512]"
+        },
+        {
+          "text": "Me and privacy",
+          "bounds": "[44,1612][487,1684]"
+        },
+        {
+          "text": "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.",
+          "bounds": "[44,1684][1036,1821]"
+        },
+        {
+          "text": "Memory and conversation access by creator",
+          "bounds": "[44,1821][869,1874]"
+        },
+        {
+          "text": "Try again",
+          "bounds": "[77,1974][257,2027]"
+        },
+        {
+          "text": "Home",
+          "bounds": "[109,2159][194,2198]"
+        },
+        {
+          "text": "Discover",
+          "bounds": "[347,2159][474,2198]"
+        },
+        {
+          "text": "Requests",
+          "bounds": "[600,2159][739,2198]"
+        },
+        {
+          "text": "You",
+          "bounds": "[903,2159][955,2198]"
+        },
+        {
+          "text": "3:40",
+          "bounds": "[147,48][255,94]"
+        },
+        {
+          "text": "Android System notification: ",
+          "bounds": "[255,6][316,136]"
+        },
+        {
+          "text": "Wifi signal full.",
+          "bounds": "[883,50][924,91]"
+        },
+        {
+          "text": "Phone signal full.",
+          "bounds": "[924,40][965,101]"
+        },
+        {
+          "text": "Battery charging, 100 percent.",
+          "bounds": "[982,52][1003,88]"
+        }
+      ]
+    },
+    {
+      "source": "android32",
+      "requestId": 32,
+      "platform": "android",
+      "labels": [
+        {
+          "text": "Development identity",
+          "bounds": "[111,169][499,219]"
+        },
+        {
+          "text": "Synthetic account · actual local API.",
+          "bounds": "[111,219][731,269]"
+        },
+        {
+          "text": "You",
+          "bounds": "[44,346][123,407]"
+        },
+        {
+          "text": "@w3_dev_actor1",
+          "bounds": "[44,473][537,545]"
+        },
+        {
+          "text": "Synthetic W3 development account. Local acceptance only.",
+          "bounds": "[44,545][1036,659]"
+        },
+        {
+          "text": "Handle and intro",
+          "bounds": "[77,693][402,746]"
+        },
+        {
+          "text": "Memberships and requests",
+          "bounds": "[273,886][807,939]"
+        },
+        {
+          "text": "Spend and time",
+          "bounds": "[386,1012][694,1065]"
+        },
+        {
+          "text": "Notifications",
+          "bounds": "[412,1133][667,1186]"
+        },
+        {
+          "text": "Me and privacy",
+          "bounds": "[44,1286][487,1358]"
+        },
+        {
+          "text": "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.",
+          "bounds": "[44,1358][1036,1495]"
+        },
+        {
+          "text": "Memory and conversation access by creator",
+          "bounds": "[44,1495][869,1548]"
+        },
+        {
+          "text": "No conversations yet.",
+          "bounds": "[44,1614][447,1667]"
+        },
+        {
+          "text": "Export or delete my data",
+          "bounds": "[298,1839][782,1892]"
+        },
+        {
+          "text": "Help and safety",
+          "bounds": "[77,1965][386,2018]"
+        },
+        {
+          "text": "Home",
+          "bounds": "[109,2159][194,2198]"
+        },
+        {
+          "text": "Discover",
+          "bounds": "[347,2159][474,2198]"
+        },
+        {
+          "text": "Requests",
+          "bounds": "[600,2159][739,2198]"
+        },
+        {
+          "text": "You",
+          "bounds": "[903,2159][955,2198]"
+        },
+        {
+          "text": "3:41",
+          "bounds": "[147,48][255,94]"
+        },
+        {
+          "text": "Android System notification: ",
+          "bounds": "[255,6][316,136]"
+        },
+        {
+          "text": "Wifi signal full.",
+          "bounds": "[883,50][924,91]"
+        },
+        {
+          "text": "Phone signal full.",
+          "bounds": "[924,40][965,101]"
+        },
+        {
+          "text": "Battery charging, 100 percent.",
+          "bounds": "[982,52][1003,88]"
+        }
+      ]
+    },
+    {
+      "source": "android34",
+      "requestId": 34,
+      "platform": "android",
+      "labels": [
+        {
+          "text": "Development identity",
+          "bounds": "[111,169][499,219]"
+        },
+        {
+          "text": "Synthetic account · actual local API.",
+          "bounds": "[111,219][731,269]"
+        },
+        {
+          "text": "Your account",
+          "bounds": "[44,346][416,418]"
+        },
+        {
+          "text": "@w3_dev_actor1",
+          "bounds": "[44,462][369,515]"
+        },
+        {
+          "text": "Edit public profile",
+          "bounds": "[369,599][711,652]"
+        },
+        {
+          "text": "Sign out",
+          "bounds": "[458,775][622,828]"
+        },
+        {
+          "text": "Refresh session",
+          "bounds": "[382,951][698,1004]"
+        },
+        {
+          "text": "Sign out on all devices",
+          "bounds": "[318,1121][761,1174]"
+        },
+        {
+          "text": "Help and reports",
+          "bounds": "[376,1286][703,1339]"
+        },
+        {
+          "text": "Your data",
+          "bounds": "[446,1451][633,1504]"
+        },
+        {
+          "text": "Notification settings",
+          "bounds": "[339,1616][741,1669]"
+        },
+        {
+          "text": "Signing passkeys",
+          "bounds": "[44,1747][421,1808]"
+        },
+        {
+          "text": "External creator proof and fresh Pantopus authorization are required. Each named act needs its own exact-content signature.",
+          "bounds": "[44,1841][1036,1931]"
+        },
+        {
+          "text": "Register a signing passkey",
+          "bounds": "[276,2004][803,2012]"
+        },
+        {
+          "text": "Home",
+          "bounds": "[109,2159][194,2198]"
+        },
+        {
+          "text": "Discover",
+          "bounds": "[347,2159][474,2198]"
+        },
+        {
+          "text": "Requests",
+          "bounds": "[600,2159][739,2198]"
+        },
+        {
+          "text": "You",
+          "bounds": "[903,2159][955,2198]"
+        },
+        {
+          "text": "3:41",
+          "bounds": "[147,48][255,94]"
+        },
+        {
+          "text": "Android System notification: ",
+          "bounds": "[255,6][316,136]"
+        },
+        {
+          "text": "Wifi signal full.",
+          "bounds": "[883,50][924,91]"
+        },
+        {
+          "text": "Phone signal full.",
+          "bounds": "[924,40][965,101]"
+        },
+        {
+          "text": "Battery charging, 100 percent.",
+          "bounds": "[982,52][1003,88]"
+        }
+      ]
+    },
+    {
+      "source": "android38",
+      "requestId": 38,
+      "platform": "android",
+      "labels": [
+        {
+          "text": "Qelvora",
+          "bounds": "[66,312][251,372]"
+        },
+        {
+          "text": "Her AI answers you now. She answers in person when you ask.",
+          "bounds": "[66,865][1014,1367]"
+        },
+        {
+          "text": "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.",
+          "bounds": "[66,1444][1014,1619]"
+        },
+        {
+          "text": "Continue with Pantopus",
+          "bounds": "[289,1930][791,1987]"
+        },
+        {
+          "text": "One Pantopus account signs you in to every Pantopus app. New here? You'll create it in the next step.",
+          "bounds": "[66,2074][1014,2164]"
+        },
+        {
+          "text": "3:42",
+          "bounds": "[147,48][255,94]"
+        },
+        {
+          "text": "Android System notification: ",
+          "bounds": "[255,6][316,136]"
+        },
+        {
+          "text": "Wifi signal full.",
+          "bounds": "[883,50][924,91]"
+        },
+        {
+          "text": "Phone signal full.",
+          "bounds": "[924,40][965,101]"
+        },
+        {
+          "text": "Battery charging, 100 percent.",
+          "bounds": "[982,52][1003,88]"
+        }
+      ]
+    },
+    {
+      "source": "android43",
+      "requestId": 43,
+      "platform": "android",
+      "labels": [
+        {
+          "text": "Development identity",
+          "bounds": "[111,169][499,219]"
+        },
+        {
+          "text": "Synthetic account · actual local API.",
+          "bounds": "[111,219][731,269]"
+        },
+        {
+          "text": "You",
+          "bounds": "[44,346][123,407]"
+        },
+        {
+          "text": "@w3_dev_actor1",
+          "bounds": "[44,473][537,545]"
+        },
+        {
+          "text": "Synthetic W3 development account. Local acceptance only.",
+          "bounds": "[44,545][1036,659]"
+        },
+        {
+          "text": "Handle and intro",
+          "bounds": "[77,693][402,746]"
+        },
+        {
+          "text": "Memberships and requests",
+          "bounds": "[273,886][807,939]"
+        },
+        {
+          "text": "Spend and time",
+          "bounds": "[386,1012][694,1065]"
+        },
+        {
+          "text": "Notifications",
+          "bounds": "[412,1133][667,1186]"
+        },
+        {
+          "text": "Me and privacy",
+          "bounds": "[44,1286][487,1358]"
+        },
+        {
+          "text": "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.",
+          "bounds": "[44,1358][1036,1495]"
+        },
+        {
+          "text": "Memory and conversation access by creator",
+          "bounds": "[44,1495][869,1548]"
+        },
+        {
+          "text": "No conversations yet.",
+          "bounds": "[44,1614][447,1667]"
+        },
+        {
+          "text": "Export or delete my data",
+          "bounds": "[298,1839][782,1892]"
+        },
+        {
+          "text": "Help and safety",
+          "bounds": "[77,1965][386,2018]"
+        },
+        {
+          "text": "Home",
+          "bounds": "[109,2159][194,2198]"
+        },
+        {
+          "text": "Discover",
+          "bounds": "[347,2159][474,2198]"
+        },
+        {
+          "text": "Requests",
+          "bounds": "[600,2159][739,2198]"
+        },
+        {
+          "text": "You",
+          "bounds": "[903,2159][955,2198]"
+        },
+        {
+          "text": "3:43",
+          "bounds": "[147,48][255,94]"
+        },
+        {
+          "text": "Android System notification: ",
+          "bounds": "[255,6][316,136]"
+        },
+        {
+          "text": "Wifi signal full.",
+          "bounds": "[883,50][924,91]"
+        },
+        {
+          "text": "Phone three bars.",
+          "bounds": "[924,40][965,101]"
+        },
+        {
+          "text": "Battery charging, 100 percent.",
+          "bounds": "[982,52][1003,88]"
+        }
+      ]
+    },
+    {
+      "source": "android44",
+      "requestId": 44,
+      "platform": "android",
+      "labels": [
+        {
+          "text": "Development identity",
+          "bounds": "[111,169][499,219]"
+        },
+        {
+          "text": "Synthetic account · actual local API.",
+          "bounds": "[111,219][731,269]"
+        },
+        {
+          "text": "Your account",
+          "bounds": "[44,346][416,418]"
+        },
+        {
+          "text": "@w3_dev_actor1",
+          "bounds": "[44,462][369,515]"
+        },
+        {
+          "text": "Edit public profile",
+          "bounds": "[369,599][711,652]"
+        },
+        {
+          "text": "Sign out",
+          "bounds": "[458,775][622,828]"
+        },
+        {
+          "text": "Refresh session",
+          "bounds": "[382,951][698,1004]"
+        },
+        {
+          "text": "Sign out on all devices",
+          "bounds": "[318,1121][761,1174]"
+        },
+        {
+          "text": "Help and reports",
+          "bounds": "[376,1286][703,1339]"
+        },
+        {
+          "text": "Your data",
+          "bounds": "[446,1451][633,1504]"
+        },
+        {
+          "text": "Notification settings",
+          "bounds": "[339,1616][741,1669]"
+        },
+        {
+          "text": "Signing passkeys",
+          "bounds": "[44,1747][421,1808]"
+        },
+        {
+          "text": "External creator proof and fresh Pantopus authorization are required. Each named act needs its own exact-content signature.",
+          "bounds": "[44,1841][1036,1931]"
+        },
+        {
+          "text": "Register a signing passkey",
+          "bounds": "[276,2004][803,2012]"
+        },
+        {
+          "text": "Home",
+          "bounds": "[109,2159][194,2198]"
+        },
+        {
+          "text": "Discover",
+          "bounds": "[347,2159][474,2198]"
+        },
+        {
+          "text": "Requests",
+          "bounds": "[600,2159][739,2198]"
+        },
+        {
+          "text": "You",
+          "bounds": "[903,2159][955,2198]"
+        },
+        {
+          "text": "3:43",
+          "bounds": "[147,48][255,94]"
+        },
+        {
+          "text": "Android System notification: ",
+          "bounds": "[255,6][316,136]"
+        },
+        {
+          "text": "Wifi signal full.",
+          "bounds": "[883,50][924,91]"
+        },
+        {
+          "text": "Phone three bars.",
+          "bounds": "[924,40][965,101]"
+        },
+        {
+          "text": "Battery charging, 100 percent.",
+          "bounds": "[982,52][1003,88]"
+        }
+      ]
+    },
+    {
+      "source": "android48",
+      "requestId": 48,
+      "platform": "android",
+      "labels": [
+        {
+          "text": "Development identity",
+          "bounds": "[111,169][499,219]"
+        },
+        {
+          "text": "Synthetic account · actual local API.",
+          "bounds": "[111,219][731,269]"
+        },
+        {
+          "text": "Help and reports",
+          "bounds": "[44,346][523,418]"
+        },
+        {
+          "text": "Reports are available without paid access. Evidence is limited to what you report.",
+          "bounds": "[44,462][1036,576]"
+        },
+        {
+          "text": "Support",
+          "bounds": "[77,654][236,707]"
+        },
+        {
+          "text": "Your data",
+          "bounds": "[302,654][489,707]"
+        },
+        {
+          "text": "Access history",
+          "bounds": "[77,819][370,872]"
+        },
+        {
+          "text": "Feedback",
+          "bounds": "[436,819][630,872]"
+        },
+        {
+          "text": "Crisis help",
+          "bounds": "[77,984][285,1037]"
+        },
+        {
+          "text": "Could not complete",
+          "bounds": "[155,1148][512,1198]"
+        },
+        {
+          "text": "This endpoint is unavailable.",
+          "bounds": "[155,1198][643,1248]"
+        },
+        {
+          "text": "support",
+          "bounds": "[77,1359][231,1412]"
+        },
+        {
+          "text": "ai report",
+          "bounds": "[297,1359][464,1412]"
+        },
+        {
+          "text": "abuse",
+          "bounds": "[77,1524][196,1577]"
+        },
+        {
+          "text": "block",
+          "bounds": "[262,1524][373,1577]"
+        },
+        {
+          "text": "crisis",
+          "bounds": "[77,1689][184,1742]"
+        },
+        {
+          "text": "Report type: support",
+          "bounds": "[44,1820][393,1867]"
+        },
+        {
+          "text": "Request ID (optional)",
+          "bounds": "[44,1911][393,1958]"
+        },
+        {
+          "text": "Request ID (optional)",
+          "bounds": "[77,1980][1003,2076]"
+        },
+        {
+          "text": "Home",
+          "bounds": "[109,2159][194,2198]"
+        },
+        {
+          "text": "Discover",
+          "bounds": "[347,2159][474,2198]"
+        },
+        {
+          "text": "Requests",
+          "bounds": "[600,2159][739,2198]"
+        },
+        {
+          "text": "You",
+          "bounds": "[903,2159][955,2198]"
+        },
+        {
+          "text": "3:44",
+          "bounds": "[147,48][255,94]"
+        },
+        {
+          "text": "Android System notification: ",
+          "bounds": "[255,6][316,136]"
+        },
+        {
+          "text": "Wifi signal full.",
+          "bounds": "[883,50][924,91]"
+        },
+        {
+          "text": "Phone signal full.",
+          "bounds": "[924,40][965,101]"
+        },
+        {
+          "text": "Battery charging, 100 percent.",
+          "bounds": "[982,52][1003,88]"
+        }
+      ]
+    },
+    {
+      "source": "ios7",
+      "requestId": 7,
+      "platform": "ios",
+      "labels": [
+        {
+          "text": "Qelvora",
+          "bounds": "[0,0][393,852]"
+        },
+        {
+          "text": "Development identity, Synthetic account · actual local API.",
+          "bounds": "[15,74][377,136]"
+        },
+        {
+          "text": "Development identity",
+          "bounds": "[56,87][199,105]"
+        },
+        {
+          "text": "Synthetic account · actual local API.",
+          "bounds": "[56,105][283,123]"
+        },
+        {
+          "text": "You",
+          "bounds": "[17,167][46,190]"
+        },
+        {
+          "text": "@w3_dev_actor1",
+          "bounds": "[17,218][197,244]"
+        },
+        {
+          "text": "Synthetic W3 development account. Local acceptance only.",
+          "bounds": "[17,272][308,313]"
+        },
+        {
+          "text": "Handle and intro",
+          "bounds": "[17,341][160,385]"
+        },
+        {
+          "text": "Memberships and requests",
+          "bounds": "[17,413][375,461]"
+        },
+        {
+          "text": "Spend and time",
+          "bounds": "[17,489][375,533]"
+        },
+        {
+          "text": "Notifications",
+          "bounds": "[17,561][375,605]"
+        },
+        {
+          "text": "Me and privacy",
+          "bounds": "[17,633][179,659]"
+        },
+        {
+          "text": "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.",
+          "bounds": "[17,687][375,737]"
+        },
+        {
+          "text": "Memory and conversation access by creator",
+          "bounds": "[17,765][319,785]"
+        },
+        {
+          "text": "No conversations yet.",
+          "bounds": "[17,813][164,832]"
+        },
+        {
+          "text": "0%",
+          "bounds": "[358,151][388,740]"
+        },
+        {
+          "text": "0%",
+          "bounds": "[358,151][388,740]"
+        },
+        {
+          "text": "Home",
+          "bounds": "[8,746][102,794]"
+        },
+        {
+          "text": "Home",
+          "bounds": "[8,746][102,794]"
+        },
+        {
+          "text": "Discover",
+          "bounds": "[102,746][196,794]"
+        },
+        {
+          "text": "Discover",
+          "bounds": "[102,746][196,794]"
+        },
+        {
+          "text": "Requests",
+          "bounds": "[196,746][290,794]"
+        },
+        {
+          "text": "Requests",
+          "bounds": "[196,746][290,794]"
+        },
+        {
+          "text": "You",
+          "bounds": "[290,746][385,794]"
+        },
+        {
+          "text": "You",
+          "bounds": "[290,746][385,794]"
+        },
+        {
+          "text": "3:48 AM",
+          "bounds": "[52,19][90,39]"
+        },
+        {
+          "text": "No signal",
+          "bounds": "[282,23][301,35]"
+        },
+        {
+          "text": "SSID, 3 of 3 Wi-Fi bars",
+          "bounds": "[308,23][325,35]"
+        },
+        {
+          "text": "Not charging",
+          "bounds": "[333,22][360,35]"
+        }
+      ]
+    },
+    {
+      "source": "ios8",
+      "requestId": 8,
+      "platform": "ios",
+      "labels": [
+        {
+          "text": "Qelvora",
+          "bounds": "[0,0][393,852]"
+        },
+        {
+          "text": "Development identity, Synthetic account · actual local API.",
+          "bounds": "[15,74][377,136]"
+        },
+        {
+          "text": "Development identity",
+          "bounds": "[56,87][199,105]"
+        },
+        {
+          "text": "Synthetic account · actual local API.",
+          "bounds": "[56,105][283,123]"
+        },
+        {
+          "text": "You",
+          "bounds": "[17,167][46,190]"
+        },
+        {
+          "text": "@w3_dev_actor1",
+          "bounds": "[17,218][197,244]"
+        },
+        {
+          "text": "Synthetic W3 development account. Local acceptance only.",
+          "bounds": "[17,272][308,313]"
+        },
+        {
+          "text": "Handle and intro",
+          "bounds": "[17,341][160,385]"
+        },
+        {
+          "text": "Memberships and requests",
+          "bounds": "[17,413][375,461]"
+        },
+        {
+          "text": "Spend and time",
+          "bounds": "[17,489][375,533]"
+        },
+        {
+          "text": "Notifications",
+          "bounds": "[17,561][375,605]"
+        },
+        {
+          "text": "Me and privacy",
+          "bounds": "[17,633][179,659]"
+        },
+        {
+          "text": "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.",
+          "bounds": "[17,687][375,737]"
+        },
+        {
+          "text": "Memory and conversation access by creator",
+          "bounds": "[17,765][319,785]"
+        },
+        {
+          "text": "No conversations yet.",
+          "bounds": "[17,813][164,832]"
+        },
+        {
+          "text": "0%",
+          "bounds": "[358,151][388,740]"
+        },
+        {
+          "text": "0%",
+          "bounds": "[358,151][388,740]"
+        },
+        {
+          "text": "Home",
+          "bounds": "[8,746][102,794]"
+        },
+        {
+          "text": "Home",
+          "bounds": "[8,746][102,794]"
+        },
+        {
+          "text": "Discover",
+          "bounds": "[102,746][196,794]"
+        },
+        {
+          "text": "Discover",
+          "bounds": "[102,746][196,794]"
+        },
+        {
+          "text": "Requests",
+          "bounds": "[196,746][290,794]"
+        },
+        {
+          "text": "Requests",
+          "bounds": "[196,746][290,794]"
+        },
+        {
+          "text": "You",
+          "bounds": "[290,746][385,794]"
+        },
+        {
+          "text": "You",
+          "bounds": "[290,746][385,794]"
+        },
+        {
+          "text": "3:49 AM",
+          "bounds": "[52,19][90,39]"
+        },
+        {
+          "text": "No signal",
+          "bounds": "[282,23][301,35]"
+        },
+        {
+          "text": "SSID, 3 of 3 Wi-Fi bars",
+          "bounds": "[308,23][325,35]"
+        },
+        {
+          "text": "Not charging",
+          "bounds": "[333,22][360,35]"
+        }
+      ]
+    },
+    {
+      "source": "ios12",
+      "requestId": 12,
+      "platform": "ios",
+      "labels": [
+        {
+          "text": "Qelvora",
+          "bounds": "[0,0][393,852]"
+        },
+        {
+          "text": "Development identity, Synthetic account · actual local API.",
+          "bounds": "[15,74][377,136]"
+        },
+        {
+          "text": "Development identity",
+          "bounds": "[56,87][199,105]"
+        },
+        {
+          "text": "Synthetic account · actual local API.",
+          "bounds": "[56,105][283,123]"
+        },
+        {
+          "text": "You",
+          "bounds": "[17,167][46,190]"
+        },
+        {
+          "text": "@w3_dev_actor1",
+          "bounds": "[17,218][197,244]"
+        },
+        {
+          "text": "Synthetic W3 development account. Local acceptance only. Return-visit verification.",
+          "bounds": "[17,272][308,313]"
+        },
+        {
+          "text": "Handle and intro",
+          "bounds": "[17,341][160,385]"
+        },
+        {
+          "text": "Memberships and requests",
+          "bounds": "[17,413][375,461]"
+        },
+        {
+          "text": "Spend and time",
+          "bounds": "[17,489][375,533]"
+        },
+        {
+          "text": "Notifications",
+          "bounds": "[17,561][375,605]"
+        },
+        {
+          "text": "Me and privacy",
+          "bounds": "[17,633][179,659]"
+        },
+        {
+          "text": "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.",
+          "bounds": "[17,687][375,737]"
+        },
+        {
+          "text": "Memory and conversation access by creator",
+          "bounds": "[17,765][319,785]"
+        },
+        {
+          "text": "No conversations yet.",
+          "bounds": "[17,813][164,832]"
+        },
+        {
+          "text": "0%",
+          "bounds": "[358,151][388,740]"
+        },
+        {
+          "text": "0%",
+          "bounds": "[358,151][388,740]"
+        },
+        {
+          "text": "Home",
+          "bounds": "[8,746][102,794]"
+        },
+        {
+          "text": "Home",
+          "bounds": "[8,746][102,794]"
+        },
+        {
+          "text": "Discover",
+          "bounds": "[102,746][196,794]"
+        },
+        {
+          "text": "Discover",
+          "bounds": "[102,746][196,794]"
+        },
+        {
+          "text": "Requests",
+          "bounds": "[196,746][290,794]"
+        },
+        {
+          "text": "Requests",
+          "bounds": "[196,746][290,794]"
+        },
+        {
+          "text": "You",
+          "bounds": "[290,746][385,794]"
+        },
+        {
+          "text": "You",
+          "bounds": "[290,746][385,794]"
+        },
+        {
+          "text": "3:50 AM",
+          "bounds": "[52,19][90,39]"
+        },
+        {
+          "text": "No signal",
+          "bounds": "[282,23][301,35]"
+        },
+        {
+          "text": "SSID, 3 of 3 Wi-Fi bars",
+          "bounds": "[308,23][325,35]"
+        },
+        {
+          "text": "Not charging",
+          "bounds": "[333,22][360,35]"
+        }
+      ]
+    },
+    {
+      "source": "ios16",
+      "requestId": 16,
+      "platform": "ios",
+      "labels": [
+        {
+          "text": "Qelvora",
+          "bounds": "[0,0][393,852]"
+        },
+        {
+          "text": "Account status, Reconnect to refresh your account. Actions are unavailable while offline.",
+          "bounds": "[15,74][377,156]"
+        },
+        {
+          "text": "Account status",
+          "bounds": "[56,87][158,105]"
+        },
+        {
+          "text": "Reconnect to refresh your account. Actions are unavailable while offline.",
+          "bounds": "[56,105][359,143]"
+        },
+        {
+          "text": "Development identity, Synthetic account · actual local API.",
+          "bounds": "[15,187][377,248]"
+        },
+        {
+          "text": "Development identity",
+          "bounds": "[56,199][199,218]"
+        },
+        {
+          "text": "Synthetic account · actual local API.",
+          "bounds": "[56,218][283,236]"
+        },
+        {
+          "text": "You",
+          "bounds": "[17,280][46,302]"
+        },
+        {
+          "text": "Account unavailable, Reconnect to open You.",
+          "bounds": "[17,330][376,391]"
+        },
+        {
+          "text": "Account unavailable",
+          "bounds": "[57,342][194,361]"
+        },
+        {
+          "text": "Reconnect to open You.",
+          "bounds": "[57,361][208,379]"
+        },
+        {
+          "text": "Your account",
+          "bounds": "[17,419][152,445]"
+        },
+        {
+          "text": "Your intro is unavailable.",
+          "bounds": "[17,473][183,493]"
+        },
+        {
+          "text": "Handle and intro",
+          "bounds": "[17,521][160,565]"
+        },
+        {
+          "text": "Memberships and requests",
+          "bounds": "[17,593][375,641]"
+        },
+        {
+          "text": "Spend and time",
+          "bounds": "[17,669][375,713]"
+        },
+        {
+          "text": "Notifications",
+          "bounds": "[17,741][375,785]"
+        },
+        {
+          "text": "Me and privacy",
+          "bounds": "[17,813][179,839]"
+        },
+        {
+          "text": "0%",
+          "bounds": "[358,264][388,740]"
+        },
+        {
+          "text": "0%",
+          "bounds": "[358,264][388,740]"
+        },
+        {
+          "text": "Home",
+          "bounds": "[8,746][102,794]"
+        },
+        {
+          "text": "Home",
+          "bounds": "[8,746][102,794]"
+        },
+        {
+          "text": "Discover",
+          "bounds": "[102,746][196,794]"
+        },
+        {
+          "text": "Discover",
+          "bounds": "[102,746][196,794]"
+        },
+        {
+          "text": "Requests",
+          "bounds": "[196,746][290,794]"
+        },
+        {
+          "text": "Requests",
+          "bounds": "[196,746][290,794]"
+        },
+        {
+          "text": "You",
+          "bounds": "[290,746][385,794]"
+        },
+        {
+          "text": "You",
+          "bounds": "[290,746][385,794]"
+        },
+        {
+          "text": "3:51 AM",
+          "bounds": "[54,19][89,39]"
+        },
+        {
+          "text": "No signal",
+          "bounds": "[282,23][301,35]"
+        },
+        {
+          "text": "SSID, 3 of 3 Wi-Fi bars",
+          "bounds": "[308,23][325,35]"
+        },
+        {
+          "text": "Not charging",
+          "bounds": "[333,22][360,35]"
+        }
+      ]
+    },
+    {
+      "source": "ios20",
+      "requestId": 20,
+      "platform": "ios",
+      "labels": [
+        {
+          "text": "Qelvora",
+          "bounds": "[0,0][393,852]"
+        },
+        {
+          "text": "Development identity, Synthetic account · actual local API.",
+          "bounds": "[15,74][377,136]"
+        },
+        {
+          "text": "Development identity",
+          "bounds": "[56,87][199,105]"
+        },
+        {
+          "text": "Synthetic account · actual local API.",
+          "bounds": "[56,105][283,123]"
+        },
+        {
+          "text": "You",
+          "bounds": "[17,167][46,190]"
+        },
+        {
+          "text": "@w3_dev_actor1",
+          "bounds": "[17,218][197,244]"
+        },
+        {
+          "text": "Synthetic W3 development account. Local acceptance only.",
+          "bounds": "[17,272][308,313]"
+        },
+        {
+          "text": "Handle and intro",
+          "bounds": "[17,341][160,385]"
+        },
+        {
+          "text": "Memberships and requests",
+          "bounds": "[17,413][375,461]"
+        },
+        {
+          "text": "Spend and time",
+          "bounds": "[17,489][375,533]"
+        },
+        {
+          "text": "Notifications",
+          "bounds": "[17,561][375,605]"
+        },
+        {
+          "text": "Me and privacy",
+          "bounds": "[17,633][179,659]"
+        },
+        {
+          "text": "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.",
+          "bounds": "[17,687][375,737]"
+        },
+        {
+          "text": "Memory and conversation access by creator",
+          "bounds": "[17,765][319,785]"
+        },
+        {
+          "text": "No conversations yet.",
+          "bounds": "[17,813][164,832]"
+        },
+        {
+          "text": "0%",
+          "bounds": "[358,151][388,740]"
+        },
+        {
+          "text": "0%",
+          "bounds": "[358,151][388,740]"
+        },
+        {
+          "text": "Home",
+          "bounds": "[8,746][102,794]"
+        },
+        {
+          "text": "Home",
+          "bounds": "[8,746][102,794]"
+        },
+        {
+          "text": "Discover",
+          "bounds": "[102,746][196,794]"
+        },
+        {
+          "text": "Discover",
+          "bounds": "[102,746][196,794]"
+        },
+        {
+          "text": "Requests",
+          "bounds": "[196,746][290,794]"
+        },
+        {
+          "text": "Requests",
+          "bounds": "[196,746][290,794]"
+        },
+        {
+          "text": "You",
+          "bounds": "[290,746][385,794]"
+        },
+        {
+          "text": "You",
+          "bounds": "[290,746][385,794]"
+        },
+        {
+          "text": "3:53 AM",
+          "bounds": "[53,19][90,39]"
+        },
+        {
+          "text": "No signal",
+          "bounds": "[282,23][301,35]"
+        },
+        {
+          "text": "SSID, 3 of 3 Wi-Fi bars",
+          "bounds": "[308,23][325,35]"
+        },
+        {
+          "text": "Not charging",
+          "bounds": "[333,22][360,35]"
+        }
+      ]
+    }
+  ]
+}

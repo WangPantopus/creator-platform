@@ -11,6 +11,14 @@ import type { ContentDependencies } from "../content/service.js";
 import type { StudioService } from "../studio/service.js";
 import { createCommercePublicationPermission } from "./publication.js";
 import { createCommerceApprovals } from "./approval-registration.js";
+import {
+  assertCommercePublicPacketHost,
+  type CommercePublicPacketHost,
+} from "./public-packet-host.js";
+import {
+  assertCommercePublicationSource,
+  type CommercePublicationSource,
+} from "./publication-source.js";
 
 /** Explicit W1/W8 composition after canonical schema custody. Default hosts
  * remain unavailable; schema presence cannot substitute for current authority.
@@ -21,10 +29,13 @@ export async function createCommerceStudio(input: {
   dependencies: ContentDependencies &
     Required<Pick<ContentDependencies, "assertAllowed">>;
   assertScopeAllowedInTransaction: ScopeRestrictionInTransaction;
+  publicPacketRead?: CommercePublicPacketHost;
+  publicationSource?: CommercePublicationSource;
   approvals?: {
     database: Database;
     access: AccessService;
     conversation: ConversationService;
+    migration: { version: string; checksum: string };
   };
 }) {
   const tables = [
@@ -57,24 +68,44 @@ export async function createCommerceStudio(input: {
     );
   if (
     input.approvals &&
-    (input.approvals.access !== input.owners.access ||
+    (input.approvals.database.pool !== input.pool ||
+      input.approvals.access !== input.owners.access ||
       input.approvals.conversation !== input.owners.conversation)
   )
     throw new Error(
       "Studio and Approval must use the same canonical conversation and access services.",
+    );
+  if (input.publicPacketRead)
+    assertCommercePublicPacketHost(input.publicPacketRead, input.pool);
+  if (input.publicationSource)
+    assertCommercePublicationSource(input.publicationSource, input.pool);
+  if (input.dependencies.publicationSource)
+    assertCommercePublicationSource(
+      input.dependencies.publicationSource,
+      input.pool,
     );
   const content = createContentStudio({
     pool: input.pool,
     owners: input.owners,
     dependencies: {
       ...input.dependencies,
+      publicationSource:
+        input.publicationSource ?? input.dependencies.publicationSource,
+      ...(input.publicPacketRead
+        ? {
+            preparePublicPacketRead: input.publicPacketRead.prepare,
+            preparePublicPacketReadPositive:
+              input.publicPacketRead.preparePositive,
+            publicPacketRead: input.publicPacketRead.read,
+          }
+        : {}),
       publicPacket: createCommercePublicationPermission(
         input.assertScopeAllowedInTransaction,
       ),
     },
   });
   const approval = input.approvals
-    ? createCommerceApprovals(input.approvals)
+    ? await createCommerceApprovals(input.approvals)
     : undefined;
   return {
     ...content,

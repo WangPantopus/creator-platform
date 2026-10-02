@@ -143,7 +143,7 @@ object CommerceFanFeature {
                     current.exposure?.refunded?.let { CommerceRow("Refunds recorded", commerceMoney(it, current.policy.currency)) }
                     limit?.effective_at?.let { CommerceText("Your increase takes effect ${commerceWhen(it)}.", "caption") }
                 }
-                SpendLimit(options = listOf("Choose an amount", "No limit"), selected = choice, onSelect = { choice = it })
+                SpendLimit(options = listOf("Choose an amount", "No limit"), selected = choice, remindersOn = limit?.reminders_on, onSelect = { choice = it })
                 if (choice == "Choose an amount") CommerceField("Monthly amount in ${current.policy.currency}", amount, { amount = it })
                 Button(if (reminders) "Reminders at 50% and 100% · on" else "Reminders at 50% and 100% · off", ButtonVariant.QUIET, block = true) { reminders = !reminders }
                 CommerceText("Increases take 24 hours. Decreases are immediate and affect new requests. Existing obligations remain.", "caption")
@@ -181,6 +181,9 @@ object CommerceFanFeature {
                 val name = current.creators.firstOrNull { it.id == packet.creator_id }?.display_name ?: "the creator"
                 CommerceText(packet.snapshot.title, "display-md"); RequestStatus(reqId = commerceID(packet.id), mode = packet.snapshot.title, price = commerceMoney(packet.snapshot.amount, packet.snapshot.currency), outcome = commerceOutcome(packet))
                 CommerceRow("Decision deadline", commerceWhen(packet.decision_at)); CommerceRow("Bank authorization expires", commerceWhen(packet.hold_expires_at)); value.commitment?.let { CommerceRow("Delivery deadline", commerceWhen(it.due_at)) }
+                value.callTransport?.let { transport ->
+                    Notice(title = "System · call status", children = if (transport.state == "closed_unresolved") "The call room closed after neither participant joined during the arrival window. The service outcome remains unresolved. Recorded ${commerceWhen(transport.recordedAt)}. Check the current receipt for billing status." else "Current call status is unavailable. Your recorded receipt remains available.")
+                }
                 if (packet.state == "more_info") {
                     CommerceText(packet.question ?: "The creator asked for more information."); CommerceField("Your answer", info, { info = it }, 4)
                     Button("Send answer", ButtonVariant.SECONDARY, block = true, disabled = busy || info.isBlank()) { scope.launch { mutate("packets/${packet.id}/info", buildJsonObject { put("version", packet.version); put("text", info) }, "Your answer is saved.") } }
@@ -189,7 +192,13 @@ object CommerceFanFeature {
                 if (packet.payment_state in listOf("unknown", "requires_action")) Notice(title = "Payment processing", children = "The provider must confirm payment. No completion is inferred from this screen.")
                 if (value.commitment?.delivered_at != null && value.commitment.state in listOf("delivered", "refunded", "resolved")) {
                     val signedActId = value.commitment.evidence?.signedActId ?: value.commitment.accept_act_id
-                    val label = if (value.commitment.evidence?.authorKind == "approved_draft") "Prepared by AI · approved by $name" else "${packet.snapshot.title} · personally fulfilled by $name"
+                    val label = when (value.commitment.evidence?.authorKind) {
+                        "approved_draft" -> "Prepared by AI · approved by $name"
+                        "human_creator" -> "${packet.snapshot.title} · personally fulfilled by $name"
+                        "human_call" -> "Personal call · provider-confirmed outcome"
+                        "system" -> "System delivery notice"
+                        else -> "Delivery recorded"
+                    }
                     val refund = value.ledger.filter { it.kind == "refund" && it.currency == packet.snapshot.currency }.sumOf { it.amount.toLong() }
                     val rows = listOf("Charged" to commerceMoney(packet.snapshot.amount, packet.snapshot.currency), "Delivered" to commerceWhen(value.commitment.delivered_at)) + if (refund > 0) listOf("Refund confirmed" to commerceMoney(refund, packet.snapshot.currency)) else emptyList()
                     if (signedActId != null) Receipt(name = name, reqId = commerceID(packet.id), title = packet.snapshot.title, rows = rows, label = label, onVerify = { session.destination = "/verify/$signedActId" })
