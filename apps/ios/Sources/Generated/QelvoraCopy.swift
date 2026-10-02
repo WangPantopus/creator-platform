@@ -587,6 +587,7 @@ public enum QelvoraCopy {
     "growthErrorProducerEventConflict2": "The owner event does not match its retry key.",
     "growthErrorProducerEventConflict3": "This producer event ID has different contents.",
     "growthErrorImpactWindowOpen": "Impact uses closed weekly observation windows.",
+    "growthWeeklyImpactSummary": "This week: {people} people helped and {thanks} thanks.",
     "growthErrorGrowthDataErased": "Rebuild this Impact without erased subjects.",
     "growthErrorPrivateReplyUnavailable": "This private reply is not authorized.",
     "growthErrorCommentExpired": "This comment is outside the private-reply window.",

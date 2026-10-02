@@ -12,5 +12,91 @@
     "apps/ios/Sources/QelvoraUI/Navigation.swift": "43347965738bdecf78869c050773dd20569bf7c9ff1c92b18d85e666a92e2b2c",
     "config/copy.json": "653e4c640a007b10e2c23d748e6a924dd50dad8cf82e298ad7504c75b99586fd",
     "packages/copy/src/index.ts": "9766a7105d8ec26af8abf91eb75c3ee801e2097549371b9390653fbeee963d01"
+  },
+  "weeklyImpactAndCoreContext": {
+    "baseHead": "067a81d85a62676446c5f37969c6615650ef8f76",
+    "files": [
+      {
+        "path": "apps/backend/src/modules/growth/weekly-impact.ts",
+        "sha256": "519a0567910f8c04443b6cbacbbeca397d575072e615366a09de6e40537ad304"
+      },
+      {
+        "path": "apps/backend/src/modules/growth/impact-notifications.ts",
+        "sha256": "302f499e710079c84d64609f2d0ab31f59cf2c8401badf49060b64cfa2feaad4"
+      },
+      {
+        "path": "apps/backend/src/modules/growth/retention.ts",
+        "sha256": "f4808eaebd79d9b9ce9818dda96318faf05c7303c34c890da5f9db96ea215fad"
+      },
+      {
+        "path": "apps/backend/src/modules/growth/relay.ts",
+        "sha256": "e9ab34f6a8a0350dfd4ae9f1e05e244054fea37572b7adbff6ac08cb3548bedf"
+      },
+      {
+        "path": "apps/backend/src/modules/growth/notification-custody.ts",
+        "sha256": "fa36ae13dae74722769cceb1a7a91dbae079df83e13c8c8a0c810abefcae7cb1"
+      },
+      {
+        "path": "apps/backend/src/modules/growth/notifications.ts",
+        "sha256": "4a6ceb33a24780f430a27d3034fe710e9aa73e0416695e49a48a9e01c3619f87"
+      },
+      {
+        "path": "apps/backend/src/modules/growth/configured.ts",
+        "sha256": "07e4a78608e05ef70a72b3eb219a9184b7c4d470f84ce208da9b33319f645aea"
+      },
+      {
+        "path": "apps/backend/src/modules/growth/runtime.ts",
+        "sha256": "a89a54b57fa5a4e1e8f8cf07c00087a1f53af4801330a1a78ab0a9b6a20cfa50"
+      },
+      {
+        "path": "apps/backend/src/modules/growth/core-follows.ts",
+        "sha256": "00aaa202cd1a7076558d6fc1d744fc97b88a915cad1152cb20a497eefb05f505"
+      },
+      {
+        "path": "apps/backend/src/modules/growth/migrations/pending_w7_core_follow_metadata.sql",
+        "sha256": "3a87bd2c899ce0083b9d7e97eb79e93372fb83aa8f941e1f29ea3f61f5e821b6"
+      },
+      {
+        "path": "apps/backend/src/modules/identity/request-authority.ts",
+        "sha256": "ae27c9e9f851f76e6921580763677a31bc95a1b857721cf4f54d7ed505d93fac"
+      },
+      {
+        "path": "apps/backend/src/modules/content/integration.ts",
+        "sha256": "cf6f03416417d6b3da411bafe737d2dc90f6fe045cbb4bad7d7b76d8c6669b2b"
+      },
+      {
+        "path": "apps/backend/src/modules/content/thanks-projection.ts",
+        "sha256": "b668579962bffbde23197e909003959670b46bebd9338970eb74d0d4cefd06ec"
+      },
+      {
+        "path": "config/copy.json",
+        "sha256": "f02631660074cdebbd28f4d1347671776d8eac46a8546a89cd46be407da7db0d"
+      },
+      {
+        "path": "packages/copy/src/index.ts",
+        "sha256": "e5925bb9422eb05846915287142956b70ab0d3a249432e0762041b440480f89a"
+      },
+      {
+        "path": "apps/ios/Sources/Generated/QelvoraCopy.swift",
+        "sha256": "3ab90fb2605a7cdcf6475216e3c63a887ec37f9270b7ab1d84586625fd309c8d"
+      },
+      {
+        "path": "apps/ios/Sources/Generated/Localizable.xcstrings",
+        "sha256": "1c528e38d20aa0cbf31dad05af07f0d5e00096f79cdc9f4d56dd9f5eeb037663"
+      },
+      {
+        "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt",
+        "sha256": "63c68f2e1dbc0010ba937bcd62e24eaa5dbe7f712b3adaf5aac4dd5858f507e3"
+      },
+      {
+        "path": "apps/android/app/src/main/res/values/strings.xml",
+        "sha256": "2b7f08a2f80d010d32f5fdb0b2a624894e7d57c7a0b8957f926cfee264c164be"
+      }
+    ],
+    "nativeBinaries": {
+      "iosDebugDylibSha256": "f76b7e641e40936c734bb8a356d22cbee357645e802cc88e946c9bca33f0142b",
+      "androidDebugApkSha256": "5df649838e351b2a748e6d5681bb54fa229d32ef9af8f692b6a702b4fd03fe47"
+    },
+    "runtimeLimit": "API/native operated before final directory-starvation review; source-only unbound scheduling branch repaired/compiled afterwards. No directory collection runtime claim"
   }
 }

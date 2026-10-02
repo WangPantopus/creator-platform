@@ -529,7 +529,7 @@ export class Notifications {
       const state = await this.owners.notificationState(
         event,
         recipient,
-        event.creatorId === null
+        event.creatorId === null || event.type === "weekly_impact"
           ? leasedNotificationCustody(this.db, this.erasure, event, accountId, {
               kind: "delivery",
               id: jobs[index]!.id,

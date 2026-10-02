@@ -27,6 +27,10 @@ import {
   canonicalCoreContentFollows,
   type CoreFollowMigration,
 } from "./core-follows.js";
+import {
+  weeklyImpactNotificationState,
+  type WeeklyImpactNoticeReader,
+} from "./impact-notifications.js";
 
 /** Canonical host seam. Owner callbacks are injected; absent producers never become fixtures. */
 export async function configureGrowthForBackend(
@@ -43,9 +47,13 @@ export async function configureGrowthForBackend(
     sourceScan?: Parameters<typeof createGrowthRuntime>[0]["sourceScan"];
     activationSource?: ActivationSource;
     thanksPermission?: ThanksPermission;
+    weeklyImpactSource?: Parameters<
+      typeof createGrowthRuntime
+    >[0]["weeklyImpactSource"];
     /** Actual W8 receipt for the unregistered core Follow proposal; absent stays unavailable. */
     coreFollowMigration?: CoreFollowMigration;
     spendingNotices?: SpendingNotificationReader;
+    weeklyImpactNotices?: WeeklyImpactNoticeReader;
     experimentsEnabled?: boolean;
   },
   env: NodeJS.ProcessEnv = process.env,
@@ -92,10 +100,16 @@ export async function configureGrowthForBackend(
                 recipient,
                 custody,
               )
-            : (
-                input.owners?.notificationState ??
-                unavailableOwners.notificationState
-              )(event, recipient, custody),
+            : event.type === "weekly_impact"
+              ? weeklyImpactNotificationState(input.weeklyImpactNotices)(
+                  event,
+                  recipient,
+                  custody,
+                )
+              : (
+                  input.owners?.notificationState ??
+                  unavailableOwners.notificationState
+                )(event, recipient, custody),
         creatorFor: input.assertAllowed
           ? canonicalCreatorOwner(input.identity.profiles, input.assertAllowed)
           : async (actor) => {
@@ -125,6 +139,7 @@ export async function configureGrowthForBackend(
       sourceScan: input.sourceScan,
       activationSource: input.activationSource,
       thanksPermission: input.thanksPermission,
+      weeklyImpactSource: input.weeklyImpactSource,
       experimentsEnabled: input.experimentsEnabled,
       installURLs: {
         ...(env.GROWTH_IOS_INSTALL_URL

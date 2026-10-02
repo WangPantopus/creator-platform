@@ -7,14 +7,14 @@ import {
   requestAuthority,
 } from "../identity/request-authority.js";
 
-/** Actual W8 registered migration, never a fabricated purpose or family scope.
- * No higher W7 slot is enabled by this adapter. */
+/** Actual W8 registry receipt, never a fabricated purpose or family scope.
+ * W8 reserved 0101; this descriptor does not register or activate its SQL. */
 export interface CoreFollowMigration {
   version: string;
   checksum: string;
 }
 const Migration = z.strictObject({
-  version: z.string().regex(/^00(?:4[4-9]|5[0-9]|60)_[a-z0-9_]+$/u),
+  version: z.literal("0101_w7_core_follow_metadata"),
   checksum: z.string().regex(/^[a-f0-9]{64}$/u),
 });
 
@@ -55,8 +55,7 @@ export function canonicalCoreContentFollows(registered?: CoreFollowMigration) {
        AND NOT pg_has_role(current_user,'growth_worker','MEMBER')
        AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
          WHERE n.nspname IN('growth','creator') AND c.relowner=r.oid) AS safe,
-       EXISTS(SELECT FROM creator.fan_profile f WHERE f.account_id=$1
-         AND f.id::text=current_setting('app.fan_id',true)) AS fan
+       EXISTS(SELECT FROM creator.fan_profile f WHERE f.account_id=$1) AS fan
        FROM pg_roles r WHERE r.rolname=current_user`,
         [accountId],
       )
@@ -70,6 +69,10 @@ export function canonicalCoreContentFollows(registered?: CoreFollowMigration) {
     )
       throw unavailable();
     await assertCurrentSession(client, accountId);
+    const session = await client.query<{ id: string | null }>(
+      "SELECT current_setting('app.identity_session_id',true) AS id",
+    );
+    if (session.rows[0]?.id !== authority.sessionId) throw unavailable();
     const schema = (
       await client.query<{ ready: boolean }>(
         `SELECT
@@ -81,15 +84,15 @@ export function canonicalCoreContentFollows(registered?: CoreFollowMigration) {
          AND r.rolname='creator_growth_follow_metadata' AND NOT r.rolcanlogin
          AND NOT r.rolsuper AND NOT r.rolbypassrls AND NOT r.rolcreatedb AND NOT r.rolcreaterole
          AND NOT r.rolinherit AND NOT r.rolreplication
+         AND (r.rolconfig IS NULL OR cardinality(r.rolconfig)=0)
          AND NOT EXISTS(SELECT FROM pg_auth_members m WHERE m.member=r.oid OR m.roleid=r.oid)
-         AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
-           WHERE n.nspname IN('growth','creator') AND c.relowner=r.oid)
+         AND NOT EXISTS(SELECT FROM pg_namespace n WHERE n.nspowner=r.oid)
+         AND NOT EXISTS(SELECT FROM pg_class c WHERE c.relowner=r.oid)
+         AND NOT EXISTS(SELECT FROM pg_proc other WHERE other.proowner=r.oid AND other.oid<>p.oid)
          AND has_function_privilege(current_user,p.oid,'EXECUTE')
          AND NOT EXISTS(SELECT FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a
            WHERE a.privilege_type='EXECUTE' AND a.grantee NOT IN(r.oid,'creator_runtime'::regrole::oid))
-         AND NOT has_schema_privilege(r.oid,'creator','CREATE')
-         AND NOT has_schema_privilege(r.oid,'growth','CREATE')
-         AND NOT has_schema_privilege(r.oid,'creator_growth_metadata','CREATE')
+         AND NOT EXISTS(SELECT FROM pg_namespace n WHERE has_schema_privilege(r.oid,n.oid,'CREATE'))
          AND EXISTS(SELECT FROM pg_namespace n WHERE n.oid=p.pronamespace
            AND n.nspowner='growth_owner'::regrole::oid
            AND has_schema_privilege(current_user,n.oid,'USAGE')

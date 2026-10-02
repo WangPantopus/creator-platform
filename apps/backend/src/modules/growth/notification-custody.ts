@@ -13,6 +13,7 @@ export type NotificationReadFacts = Readonly<
     client: PoolClient;
     pool: Pool;
     accountId: string;
+    creatorId: string | null;
     eventId: string;
     aggregateId: string;
   } & (
@@ -94,6 +95,7 @@ export function interactiveNotificationCustody(
             client,
             pool: db.runtime,
             accountId: actor.accountId,
+            creatorId: event.creatorId,
             eventId: event.id,
             aggregateId: event.aggregateId,
             notificationId,
@@ -114,8 +116,12 @@ export function leasedNotificationCustody(
     withCurrent: (read) =>
       db.transaction(db.worker, async (client) => {
         if (
-          event.creatorId !== null ||
-          event.accountId !== accountId ||
+          !(event.creatorId === null
+            ? event.accountId === accountId
+            : event.type === "weekly_impact" &&
+              event.recipients.some(
+                (r) => r.accountId === accountId && r.role === "creator",
+              )) ||
           !(await erasure.accountRetained(client, accountId))
         )
           throw unavailable();
@@ -142,6 +148,7 @@ export function leasedNotificationCustody(
             client,
             pool: db.worker,
             accountId,
+            creatorId: event.creatorId,
             eventId: event.id,
             aggregateId: event.aggregateId,
             jobId: job.id,

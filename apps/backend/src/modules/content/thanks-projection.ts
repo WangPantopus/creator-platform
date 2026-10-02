@@ -2,14 +2,7 @@ import { createHash } from "node:crypto";
 import type { Pool } from "pg";
 import { z } from "zod";
 import type { ThanksPermission } from "../growth/retention.js";
-
-type CurrentThanksTarget = (input: {
-  creatorId: string;
-  fanAccountId: string;
-  targetKind: string;
-  targetId: string;
-  signal?: AbortSignal;
-}) => Promise<boolean>;
+import type { CurrentThanksTarget } from "./integration.js";
 type ThanksWindowRow = {
   id: string;
   version: number;

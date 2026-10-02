@@ -37,6 +37,7 @@ export type CurrentThanksTarget = (input: {
   fanAccountId: string;
   targetKind: string;
   targetId: string;
+  signal?: AbortSignal;
 }) => Promise<boolean>;
 
 export type ContentFollowReaders = {

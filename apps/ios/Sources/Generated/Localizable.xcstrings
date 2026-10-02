@@ -6392,6 +6392,17 @@
         }
       }
     },
+    "This week: {people} people helped and {thanks} thanks.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This week: {people} people helped and {thanks} thanks."
+          }
+        }
+      }
+    },
     "Rebuild this Impact without erased subjects.": {
       "extractionState": "manual",
       "localizations": {

@@ -63,5 +63,340 @@
     "sha256": "80533a4f26222354ac3a1023126ddc51beaa13b8709c7edaa065d59855d9248b",
     "preserved": false,
     "reason": "Private authentication log retained locally only; observed Keychain OSStatus -34018."
+  },
+  "weekly-impact-raw/impact-auth-continue-body.txt": {
+    "sha256": "bf80a7ab21f4b561c569b036ed70bc4f8cb20e762a3866cea131cb6b008ef9b1",
+    "bytes": 110,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/impact-production-auth-dom.txt": {
+    "sha256": "21f609c353181f0cf7439892391ca9b43355cb10a7d3988c233c2e711b84e87d",
+    "bytes": 462,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/impact-production-auth.jpg": {
+    "sha256": "dd57a0fe627dfde60fe74990ba181f9eee2d58be9674440cfbfc2e6ecfa272b7",
+    "bytes": 29969,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/impact-production-share-recovery-dom.txt": {
+    "sha256": "b1945201d376c505d418df89278de9aa38bc09274f389804bef8e07fc0836641",
+    "bytes": 427,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/impact-production-share-recovery.jpg": {
+    "sha256": "873eb7d2fd2ee555bc759ccacb218f053ec76bbb49c6dd386043ba0ad4c01880",
+    "bytes": 14804,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/preserved-tool-outcomes.txt": {
+    "sha256": "c0fa0a64dee91341b536d8ccf265888eef6060999d6df2a891b69b68e4d4b437",
+    "bytes": 3043,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-android-actual-home.png": {
+    "sha256": "ef82b602cc6d0d9b95c702d3ee58ecc14e78ae4ae228f0592470d8b9224371ea",
+    "bytes": 102729,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-android-auth-unconfigured.png": {
+    "sha256": "a562e75fc70654925c1382150e5f99ae1bed22b6f83213390be4298b5875aaf9",
+    "bytes": 197297,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-android-build.log": {
+    "sha256": "05cae4d3e0ec776bcf43fb1ac653e4773612e4a215eaddace323fb85eab6eb55",
+    "bytes": 2320,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-android-dev-choice.xml": {
+    "sha256": "542db4ba546ae2de41432ea71aacb462ea5e7b36f9302fdcd35e444e24986b49",
+    "bytes": 12370,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-android-discover.png": {
+    "sha256": "b2e0aa6562d6e3394eb59a8556bc8cf1e2719d7764fe1ffcafaf6b2e662b5c51",
+    "bytes": 115672,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-android-discover.xml": {
+    "sha256": "a104e5be878e79b5365e73fbb769d905376e6e2281f89fac4d4ddbd8e0fa3ca8",
+    "bytes": 15656,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-android-home.png": {
+    "sha256": "2bab992c77a1446a08e0d200e30e32fbd101c0c041dde8eef2f9aafe9ba9a59b",
+    "bytes": 92342,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-android-home.xml": {
+    "sha256": "30f61b526db18bbf97a40ff9184862324a2e80e9d014507fea3e0e55921801b4",
+    "bytes": 12640,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-android-identity.xml": {
+    "sha256": "3f412113d76866c0a1b0234ba213545cebe9c7c0222c06b6159a53030511bc8c",
+    "bytes": 6743,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-android-live-home.png": {
+    "sha256": "cffad8beb9ca01d6f13f86cc4553842fe53f5a9be5764240cf2b9298f27906fc",
+    "bytes": 177192,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-android-live-home.xml": {
+    "sha256": "ae31cb025625c6a91eba2435aa9a59692394686d1ec69db7b4903b065fe86918",
+    "bytes": 5382,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-android-notifications.png": {
+    "sha256": "e50726171fef9abce33d9232f572616f63a5292d830918b517453d6b1f0536db",
+    "bytes": 95528,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-android-notifications.xml": {
+    "sha256": "1f651e1a16421e6d56a6a8c78cb4d2bb5adbdb936b5bb200453adbc2be9dbba2",
+    "bytes": 11370,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-android-settings-saved.png": {
+    "sha256": "2856f786fdb0c07614bdee333b2247368807bac5dce001c93531260c12b2627d",
+    "bytes": 174098,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-android-settings-saved.xml": {
+    "sha256": "4333e304c60e1c18e415c8a451ceed77886197a236ad9b9ee251f5d56a1c49b0",
+    "bytes": 19423,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-android-settings-weekly.png": {
+    "sha256": "f8efdabd7a4a6e2af1d5a1229a7cb8c7de5a760acfe8afcc4571acd6992dc5c2",
+    "bytes": 174033,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-android-settings-weekly.xml": {
+    "sha256": "1dc6c19fbc2680c49f7d1bebae8872f1f6b6d9eaf1873f0dfcec781110058bc5",
+    "bytes": 20073,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-android-settings.png": {
+    "sha256": "51e2478717565fabb62b37320b8a3272a97e5e2daad0d02d6328d49f52dd52ce",
+    "bytes": 185057,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-android-settings.xml": {
+    "sha256": "beed30fa7af923bb82302a6468fcfcdc9582d2f71d65fcac92cfafd2ad796b77",
+    "bytes": 15955,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-android-share-retried.png": {
+    "sha256": "6d0ff68cf97562b3ea4224ecd39953a19e3e198b4519e8bddbb6734a442472a9",
+    "bytes": 82128,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-android-share-retried.xml": {
+    "sha256": "12f31e70f32573ba9975512f0cbfaadd379bec325bb74e34615f3d2cea7d8364",
+    "bytes": 11674,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-android-share.png": {
+    "sha256": "6d0ff68cf97562b3ea4224ecd39953a19e3e198b4519e8bddbb6734a442472a9",
+    "bytes": 82128,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-android-share.xml": {
+    "sha256": "12f31e70f32573ba9975512f0cbfaadd379bec325bb74e34615f3d2cea7d8364",
+    "bytes": 11674,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-build-current.log": {
+    "sha256": "917c7b2b2d1648303f61e131958818f381e248ac4a1de166ca8edb0b3af53668",
+    "bytes": 1044,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-build-final.log": {
+    "sha256": "917c7b2b2d1648303f61e131958818f381e248ac4a1de166ca8edb0b3af53668",
+    "bytes": 1044,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-build-first.log": {
+    "sha256": "141f67db3a013309f117ed0fc1336ea2eb8e4cdd72f19958fe57fbe590db3227",
+    "bytes": 496,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-cleanup.json": {
+    "sha256": "674e2785732ba8642127d398ec67720ccdf7672f17638d3d48a2ef48346d2735",
+    "bytes": 502,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-current-catalogue.json": {
+    "sha256": "675ddd1924c22621f41473fcdbadc688f2b6c878bf1ca5b859ce2d3516dc64f7",
+    "bytes": 459,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-final-build.log": {
+    "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "bytes": 41,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-final-contracts.log": {
+    "sha256": "5ae5bab6cfd1e701fb9527f9208e04f0cc5f35d0b048b8110de7f31dfe307860",
+    "bytes": 328,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-final-format-check.log": {
+    "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
+    "bytes": 66,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-final-format.log": {
+    "sha256": "0bf3a89011ea3eb7df27c37f7aa89d70dcd2e4c38669e88aaac040409d671a8d",
+    "bytes": 708,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-final-generator.log": {
+    "sha256": "783d7687fc7ed684f97dba116550e9768a96fef4e1b17fef8ea5bc74a393c317",
+    "bytes": 52,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-final-lint.log": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-ios-build.log": {
+    "sha256": "ec13b658fdd9abde342816557ff33dd6a3f10657a57adc32a746b65b714bc3a1",
+    "bytes": 82889,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-ios-discover.ax.json": {
+    "sha256": "1da1deb03e78451b4201318160f2af2916b455520606debb74d406779a682363",
+    "bytes": 4553,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-ios-discover.png": {
+    "sha256": "1e3827db8b2b34aa684f6fa37281bdf36dee13e8ef292df8553b5b52cd1fde03",
+    "bytes": 168607,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-ios-home-initial.png": {
+    "sha256": "eed434a458ae9d3da3ce9195a1db59a73887c6910dd807e7126f5c190404490c",
+    "bytes": 151702,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-ios-home.ax.json": {
+    "sha256": "32653b707fb4d2d79aa274c31f9fccfc866a39d7e2e64fe65a9505ba1b267d44",
+    "bytes": 4600,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-ios-notifications.ax.json": {
+    "sha256": "c859ca5d0ab5d61c152b6a2c50b88913124971d2353d222e3ccf30de1440c0de",
+    "bytes": 4104,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-ios-notifications.png": {
+    "sha256": "3aa192c6058978562733fd5650983d1ef730fd05a75be922001f4f9e8b1c4894",
+    "bytes": 144374,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-ios-settings-reload-actual.ax.json": {
+    "sha256": "e98e3d4550ba3791ec3798e200015879c19e409439d00002703fa19aa5423bf7",
+    "bytes": 32436,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-ios-settings-reload-actual.png": {
+    "sha256": "39c11fca5f261832148a8472ee022209cbfffecbfaca094ae7d954b9af6ed5e1",
+    "bytes": 195183,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-ios-settings-reloaded.ax.json": {
+    "sha256": "a48f729da90eda21fb8883c6d9508232e25768c8cbc9dbda1a48fc2952d6a69c",
+    "bytes": 32953,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-ios-settings-reloaded.png": {
+    "sha256": "f93b7a92d0fe0260b48bfa91e67b32e7ff7900a468c6a1672397d8a3e8240710",
+    "bytes": 203904,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-ios-settings-saved.ax.json": {
+    "sha256": "cbca5fba129115bef94daccc30da504daf848d587233d22fa3b78b7489ffed1c",
+    "bytes": 32953,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-ios-settings-saved.png": {
+    "sha256": "f93b7a92d0fe0260b48bfa91e67b32e7ff7900a468c6a1672397d8a3e8240710",
+    "bytes": 203904,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-ios-settings-weekly.ax.json": {
+    "sha256": "c3b3209c9a28c702ac2c2a3d7667d492ac8eb56ec7b5476ecd2657ae702bdc13",
+    "bytes": 32158,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-ios-settings-weekly.png": {
+    "sha256": "b5bf59c73e0a3424660e58a235fd68152d618bd631dc4e5903059f0ae25eddc6",
+    "bytes": 226328,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-ios-settings.ax.json": {
+    "sha256": "3ce0226c51c959835cbff73405e07192c75f99809139d04da389f4537a99e9ff",
+    "bytes": 32158,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-ios-settings.png": {
+    "sha256": "b5bf59c73e0a3424660e58a235fd68152d618bd631dc4e5903059f0ae25eddc6",
+    "bytes": 226328,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-ios-share-retried.ax.json": {
+    "sha256": "8f54d3f3f1ba530185efa4418f8d7b799b7d87cefcc9c0e13b57c259d5157f2b",
+    "bytes": 3237,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-ios-share-retried.png": {
+    "sha256": "55d1ac9b1974f399c27f9c5e2fc1514fc7e919ee50744b4f286e8f15a24b1a54",
+    "bytes": 134624,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-ios-share.ax.json": {
+    "sha256": "a5899dc28a7f5a61dcbcba58f9a7df6f29f40a07b930bb69a09a9d71148378d7",
+    "bytes": 3237,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-ios-share.png": {
+    "sha256": "55d1ac9b1974f399c27f9c5e2fc1514fc7e919ee50744b4f286e8f15a24b1a54",
+    "bytes": 134624,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-ios-signature.log": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-readiness-body.json": {
+    "sha256": "d8a935a49fa378149aee1fd9f99d10b76d2e229def017293d7c48538bd4e96e6",
+    "bytes": 162,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-session-build.log": {
+    "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "bytes": 41,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-session-contracts.log": {
+    "sha256": "2a34efae7d307805c2d57ce53381f3a65458ef3754fb27170c35ad24a9f2b90e",
+    "bytes": 329,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-session-lint.log": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "weekly-impact-raw/weekly-impact-web-build.log": {
+    "sha256": "1154ebada7f14707890e3334de674e1b0271ca5623130e5dc4d08d2b2b98057a",
+    "bytes": 2731,
+    "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
   }
 }

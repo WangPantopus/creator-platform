@@ -1,5 +1,7 @@
 # W7 shipping runtime continuation — 2026-10-02
 
+Current personally implemented [Weekly Impact/current-notice checkpoint](weekly-impact.md) and [genuine core Follow context correction](core-follow-context.md) preserve every original row and failure. Positive owner/Thanks/purpose/delivery/populated acceptance remains unobserved; own resources stopped. PR31 open/ready/unmerged, no higher SQL activation or new tests. W7 is not complete.
+
 W7 remains open. The primary personally implemented these fixes, built and operated the shipping clients. Every original acceptance row, all 19 notification kinds and all 13 Light/Night artboards remain binding. No new test code, reference, comparison threshold, runner label, approved authority or provider configuration was added.
 
 The receipt binds observations to parent `23945c32b9867bb0e8ad8a959168c13dbee1920d` plus the recorded source hashes. Later integration or a new commit needs fresh applicable checks and shipping verification. The real local development identity is visibly labeled; it establishes development session behavior, not production identity or verified creator authority. The database has one fan created through the actual app, no verified creator, and no populated public directory.

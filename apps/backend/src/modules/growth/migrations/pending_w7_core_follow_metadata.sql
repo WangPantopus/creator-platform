@@ -1,5 +1,6 @@
 -- W7 proposal only: UNNUMBERED, UNREGISTERED, UNAPPLIED. W8/W1 must review
--- narrow cross-owner metadata custody and allocate within0044-0060 first.
+-- narrow cross-owner metadata custody. W8 reserved HELD0101 metadata only;
+-- W7 must not apply it above the human's0044-0060 activation ceiling.
 -- Caller already holds genuine W1/W8 current audience/negative family gates;
 -- this fixed Boolean read neither issues a scope nor authorizes content.
 BEGIN;
@@ -11,11 +12,16 @@ DO $$ BEGIN
  IF NOT EXISTS(SELECT FROM pg_roles r WHERE r.rolname='creator_growth_follow_metadata'
     AND NOT r.rolcanlogin AND NOT r.rolinherit AND NOT r.rolsuper
     AND NOT r.rolcreatedb AND NOT r.rolcreaterole AND NOT r.rolreplication AND NOT r.rolbypassrls)
+    OR EXISTS(SELECT FROM pg_roles r WHERE r.rolname='creator_growth_follow_metadata'
+      AND r.rolconfig IS NOT NULL AND cardinality(r.rolconfig)>0)
     OR EXISTS(SELECT FROM pg_auth_members m JOIN pg_roles r
       ON r.oid=m.member OR r.oid=m.roleid WHERE r.rolname='creator_growth_follow_metadata')
-    OR EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
-      JOIN pg_roles r ON r.oid=c.relowner WHERE r.rolname='creator_growth_follow_metadata'
-      AND n.nspname IN('creator','growth'))
+    OR EXISTS(SELECT FROM pg_class c JOIN pg_roles r ON r.oid=c.relowner
+      WHERE r.rolname='creator_growth_follow_metadata')
+    OR EXISTS(SELECT FROM pg_namespace n JOIN pg_roles r ON r.oid=n.nspowner
+      WHERE r.rolname='creator_growth_follow_metadata')
+    OR EXISTS(SELECT FROM pg_proc p JOIN pg_roles r ON r.oid=p.proowner
+      WHERE r.rolname='creator_growth_follow_metadata')
  THEN RAISE EXCEPTION 'Unsafe core Follow metadata role'; END IF;
  IF NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
     WHERE n.nspname='growth' AND c.relname='follow' AND c.relrowsecurity AND c.relforcerowsecurity)
@@ -62,9 +68,9 @@ BEGIN
  IF session_user<>'creator_runtime' OR current_user<>'creator_growth_follow_metadata'
     OR current_setting('transaction_isolation')<>'read committed'
     OR pg_current_xact_id_if_assigned() IS NULL OR s IS NULL OR a IS NULL OR c IS NULL
+    OR s IS DISTINCT FROM nullif(current_setting('app.identity_session_id',true),'')::uuid
     OR a IS DISTINCT FROM nullif(current_setting('app.account_id',true),'')::uuid
     OR c IS DISTINCT FROM nullif(current_setting('app.creator_id',true),'')::uuid
-    OR nullif(current_setting('app.fan_id',true),'') IS NULL
  THEN RETURN NULL; END IF;
  IF NOT EXISTS(SELECT FROM creator.identity_session
     WHERE id=s AND account_id=a AND revoked_at IS NULL AND expires_at>clock_timestamp())
@@ -82,4 +88,31 @@ RESET ROLE;
 SET LOCAL ROLE growth_owner;
 REVOKE CREATE ON SCHEMA creator_growth_metadata FROM creator_growth_follow_metadata;
 RESET ROLE;
+DO $$ DECLARE owner_id oid:='creator_growth_follow_metadata'::regrole::oid;
+ function_id oid:=to_regprocedure('creator_growth_metadata.core_follow(uuid,uuid,uuid)');
+BEGIN
+ IF function_id IS NULL
+   OR EXISTS(SELECT FROM pg_namespace n WHERE has_schema_privilege(owner_id,n.oid,'CREATE'))
+   OR EXISTS(SELECT FROM pg_namespace n WHERE n.nspowner=owner_id)
+   OR EXISTS(SELECT FROM pg_class c WHERE c.relowner=owner_id)
+   OR EXISTS(SELECT FROM pg_proc p WHERE p.proowner=owner_id AND p.oid<>function_id)
+   OR EXISTS(SELECT FROM pg_proc p,
+     LATERAL aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a
+     WHERE p.oid=function_id AND a.privilege_type='EXECUTE'
+       AND a.grantee NOT IN(owner_id,'creator_runtime'::regrole::oid))
+   OR EXISTS(SELECT FROM pg_attribute col JOIN pg_class rel ON rel.oid=col.attrelid
+     JOIN pg_namespace n ON n.oid=rel.relnamespace
+     WHERE col.attnum>0 AND NOT col.attisdropped AND rel.relkind IN('r','p','v','m','f')
+       AND n.nspname IN('creator','growth') AND (
+       (has_column_privilege(owner_id,rel.oid,col.attnum,'SELECT') AND NOT (
+         (n.nspname='creator' AND rel.relname='identity_session' AND col.attname IN('id','account_id','revoked_at','expires_at'))
+         OR(n.nspname='growth' AND rel.relname='follow' AND col.attname IN('account_id','creator_id'))))
+       OR has_column_privilege(owner_id,rel.oid,col.attnum,'INSERT,REFERENCES')
+       OR(has_column_privilege(owner_id,rel.oid,col.attnum,'UPDATE') AND NOT (
+         n.nspname='growth' AND rel.relname='follow' AND col.attname='created_at'))))
+   OR EXISTS(SELECT FROM pg_class rel JOIN pg_namespace n ON n.oid=rel.relnamespace
+     WHERE n.nspname IN('creator','growth') AND rel.relkind IN('r','p','v','m','f')
+       AND has_table_privilege(owner_id,rel.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER'))
+ THEN RAISE EXCEPTION 'Unsafe final core Follow metadata custody'; END IF;
+END $$;
 COMMIT;
