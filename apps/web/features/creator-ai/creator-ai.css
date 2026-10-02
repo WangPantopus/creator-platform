@@ -318,6 +318,19 @@ details[open] > summary:before {
   color: var(--ai-ink);
   font-size: 13px;
 }
+.w2-confirmation {
+  position: fixed;
+  right: 48px;
+  bottom: 24px;
+  z-index: 20;
+  max-width: calc(100vw - 32px);
+  pointer-events: none;
+}
+.w2-confirmation .qv-toast {
+  box-sizing: border-box;
+  max-width: min(358px, calc(100vw - 32px));
+  overflow-wrap: anywhere;
+}
 .w2-development {
   font: 400 11px/16px var(--font-mono);
   color: var(--ink-muted);
@@ -456,6 +469,10 @@ details[open] > summary:before {
   }
 }
 @media (max-width: 700px) {
+  .w2-confirmation {
+    right: 16px;
+    bottom: calc(80px + env(safe-area-inset-bottom));
+  }
   html:has(.w2-studio) {
     scroll-padding-block: 16px calc(80px + env(safe-area-inset-bottom));
   }

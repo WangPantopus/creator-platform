@@ -11,7 +11,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { brand } from "@qelvora/brand";
 import { SessionSchema } from "@qelvora/api";
-import { AuthorLabel, Avatar, Mark, Notice, Skeleton } from "@qelvora/ui-web";
+import {
+  AuthorLabel,
+  Avatar,
+  Mark,
+  Notice,
+  Skeleton,
+  Toast,
+} from "@qelvora/ui-web";
 import type {
   Configuration,
   EvaluationCase,
@@ -225,7 +232,9 @@ export function CreatorAI({
     setActionFailure((count) => count + 1);
   };
   const [message, setMessage] = useState("");
+  const [confirmationVisible, setConfirmationVisible] = useState(false);
   const [busy, setBusy] = useState(false);
+  const completedActionFocus = useRef<HTMLElement | null>(null);
   const [online, setOnline] = useState(true);
   const [story, setStory] = useState("");
   const [boundaries, setBoundaries] = useState("");
@@ -534,6 +543,28 @@ export function CreatorAI({
     notice.focus({ preventScroll: true });
   }, [actionFailure]);
   useEffect(() => {
+    setConfirmationVisible(Boolean(message));
+    if (!message) return;
+    // The design system's Toast confirms successful actions without moving
+    // focus. Keep the inline receipt after its four-second display expires.
+    const timer = window.setTimeout(() => setConfirmationVisible(false), 4000);
+    return () => window.clearTimeout(timer);
+  }, [message]);
+  useEffect(() => {
+    if (busy) return;
+    const control = completedActionFocus.current;
+    completedActionFocus.current = null;
+    // Disabling an in-flight button can leave keyboard focus on the body.
+    // Restore only a surviving, enabled initiator, never a moved focus or a
+    // failed action's Notice/dialog.
+    if (
+      control?.isConnected &&
+      !control.matches(":disabled") &&
+      document.activeElement === document.body
+    )
+      control.focus({ preventScroll: true });
+  }, [busy]);
+  useEffect(() => {
     if (!state || identitySignal?.aborted) return;
     storeDraft(`w2-source:${state.actorAccountId}:${state.creator.id}`, {
       title,
@@ -664,6 +695,11 @@ export function CreatorAI({
     success = "Saved.",
   ) => {
     if (busy) return;
+    const initiator =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    completedActionFocus.current = null;
     setBusy(true);
     setError("");
     setMessage("");
@@ -671,6 +707,7 @@ export function CreatorAI({
       const outcome = await run();
       setMessage(outcome ?? success);
       await fetchState();
+      completedActionFocus.current = initiator;
     } catch (e) {
       failAction(e instanceof Error ? e.message : "The action did not finish.");
     } finally {
@@ -895,10 +932,11 @@ export function CreatorAI({
             )}
           </div>
         )}
-        {message && (
-          <p className="w2-status" role="status">
-            {message}
-          </p>
+        {message && <p className="w2-status">{message}</p>}
+        {message && confirmationVisible && (
+          <div className="w2-confirmation">
+            <Toast>{message}</Toast>
+          </div>
         )}
         {!state && !error && (
           <div aria-label="Loading creator AI">

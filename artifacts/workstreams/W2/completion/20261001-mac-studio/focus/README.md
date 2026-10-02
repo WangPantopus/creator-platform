@@ -28,3 +28,13 @@ The reconciled `30cc2866` hosted checks still include real web-visual and iOS fa
 ## Host preservation
 
 The original iMac archive and designated OpenAI key file are absent; no other credential locations were searched. The existing Mac Studio private backup was checked: 537,446 bytes, SHA256 `61ad84f2ff203ada5caf7fc8061f4072a6f9453271ec0866e90ddafd3972de07`. No W3/W4 state or peer device/container was changed.
+
+## Successful actions and keyboard recovery
+
+The successor implemented the shared confirmation Toast and restored the initiating control after successful actions only when disabling it left focus on the page body. It never overrides a moved focus, a dialog or an error Notice. The inline confirmation remains after the Toast's four-second display; it does not duplicate the live-region announcement.
+
+Personally saved the fictional weekly update through the real Studio UI using Enter on **Save this week's update** in Light/Night at both 1280×900 and 390×900. The completed save restored that button's focus in all four cases. No horizontal overflow was observed. The phone Toast occupied y=772…820, above the bottom navigation; desktop y=828…876. The update survived reload/navigation. A private backup restored revision 9 and expiry `2026-10-09T04:38:27.106Z`; later repeated saves advanced the revision normally. No provider state was fabricated.
+
+Exact viewport captures: [Light phone](success-light-phone.png), [Night phone](success-night-phone.png), [Light desktop](success-light-desktop.png), [Night desktop](success-night-desktop.png). [Source and capture hashes](success-source.json) identify the patch on base `b63f49d9`. Web typecheck, scoped ESLint and Prettier passed. No new tests were added.
+
+**Capture limit correction:** the original four JPEGs above were ordinary browser captures resized by the capture backend. Their pixel dimensions do not equal the requested viewport. The DOM viewport, geometry and focus observations remain valid; those JPEGs are not exact artboard comparison evidence. The new PNGs use explicit document clips at the observed scroll position and preserve the requested pixel dimensions. These successful-save checks do not establish VoiceOver, 200% text, reduced motion, native operation or full R12 fidelity.
