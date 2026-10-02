@@ -9978,6 +9978,105 @@
         }
       }
     },
+    "Choose your handle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose your handle"
+          }
+        }
+      }
+    },
+    "Edit public profile": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit public profile"
+          }
+        }
+      }
+    },
+    "This device could not read your session securely. Unlock it and try signing in again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This device could not read your session securely. Unlock it and try signing in again."
+          }
+        }
+      }
+    },
+    "This device could not save your session securely. Unlock it and try signing in again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This device could not save your session securely. Unlock it and try signing in again."
+          }
+        }
+      }
+    },
+    "This device could not clear its saved private data. Private screens are closed. Unlock it and retry clearing before signing in again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This device could not clear its saved private data. Private screens are closed. Unlock it and retry clearing before signing in again."
+          }
+        }
+      }
+    },
+    "Retry clearing saved private data": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry clearing saved private data"
+          }
+        }
+      }
+    },
+    "Your call": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your call"
+          }
+        }
+      }
+    },
+    "Checking the booking and your current access…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking the booking and your current access…"
+          }
+        }
+      }
+    },
+    "This call could not be opened. Retry, or open Requests to check its current status.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This call could not be opened. Retry, or open Requests to check its current status."
+          }
+        }
+      }
+    },
     "Request verification review": {
       "extractionState": "manual",
       "localizations": {

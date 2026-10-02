@@ -9,9 +9,40 @@ private struct NativeCallOffer: Decodable, Sendable {
     let baseURL: URL?; @ObservedObject var model: FanSession
     public init(baseURL: URL?, model: FanSession) { self.baseURL = baseURL; self.model = model }
     public var body: some View {
-        if URLComponents(string: model.destination)?.queryItems?.contains(where: { $0.name == "offer" && $0.value == "1" }) == true {
+        let parts = model.destination.components(separatedBy: "?")[0].split(separator: "/")
+        if parts.count == 2, parts[0] == "calls", let id = UUID(uuidString: String(parts[1])) {
+            NativeAccountCallLookup(model: model, callID: id.uuidString.lowercased()).id(model.destination)
+        } else if URLComponents(string: model.destination)?.queryItems?.contains(where: { $0.name == "offer" && $0.value == "1" }) == true {
             NativeCallOffers(baseURL: baseURL, destination: model.destination, fanID: model.session?.fan?.id, open: model.open).id(model.destination)
         } else { NativeCallView(baseURL: baseURL, destination: model.destination, actorAccountID: model.session?.accountId, open: model.open).id(model.destination) }
+    }
+}
+@MainActor private struct NativeAccountCallLookup: View {
+    @ObservedObject var model: FanSession
+    let callID: String
+    @Environment(\.colorScheme) private var scheme
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var attempt = 0
+    @State private var loading = true
+    @State private var unavailable = false
+    private var requestID: String { "\(model.destination):\(model.session?.accountId ?? ""):\(model.session?.sessionId ?? ""):\(scenePhase):\(attempt)" }
+    var body: some View {
+        ScrollView { VStack(alignment: .leading, spacing: QelvoraTokens.space4) {
+            Text(QelvoraCopy.text("w1CallLookupTitle")).qText("display-md").accessibilityAddTraits(.isHeader)
+            if loading { ProgressView(QelvoraCopy.text("w1CallLookupChecking")) }
+            if unavailable { Notice(tone: .error, children: QelvoraCopy.text("w1CallLookupUnavailable")) }
+            Button(QelvoraCopy.text("retry"), variant: .secondary, block: true, disabled: loading || model.busy || scenePhase != .active) { attempt += 1 }
+            Button(QelvoraCopy.text("w6OpenRequests"), variant: .quiet) { model.open("/requests") }
+        }.padding(QelvoraTokens.space4).frame(maxWidth: QelvoraTokens.phoneWidth, alignment: .leading) }
+        .background(qColor("ground", scheme)).foregroundStyle(qColor("ink", scheme))
+        .task(id: requestID) {
+            guard scenePhase == .active else { loading = false; return }
+            loading = true; unavailable = false
+            let target = model.destination
+            let resolved = await model.resolveCallDestination(callID, from: target)
+            guard !Task.isCancelled, model.destination == target else { return }
+            loading = false; unavailable = !resolved
+        }
     }
 }
 @MainActor private struct NativeCallOffers: View {
@@ -26,7 +57,7 @@ private struct NativeCallOffer: Decodable, Sendable {
     @State private var submission: (slot: String, version: Int, key: String)?
     init(baseURL: URL?, destination: String, fanID: String?, open: @escaping (String) -> Void) {
         route = NativeCallRoute(destination: destination); self.fanID = fanID; self.open = open
-        client = baseURL.map { NativeMediaClient(baseURL: $0, sessionToken: { guard let value = try await SecureSessionStorage().read() else { throw URLError(.userAuthenticationRequired) }; return value }) }
+        client = baseURL.map { origin in NativeMediaClient(baseURL: origin, sessionToken: { guard let value = try await SecureSessionStorage(issuer: origin).read() else { throw URLError(.userAuthenticationRequired) }; return value }) }
     }
     private var root: String? { route.map { "/v1/w6/threads/\($0.creatorID.uuidString.lowercased())/\($0.fanID.uuidString.lowercased())/call-offers" } }
     private var canSelect: Bool { fanID?.lowercased() == route?.fanID.uuidString.lowercased() }
