@@ -231,11 +231,16 @@ export async function exportCommerceFinancial(
             [creator],
           );
           const payoutCustody = (
-            await client.query<{ relation: string | null }>(
-              "SELECT to_regclass('creator.commerce_payout_custody')::text AS relation",
+            await client.query<{ count: string }>(
+              "SELECT count(*)::text AS count FROM information_schema.tables WHERE table_schema='creator' AND table_name IN('commerce_payout_custody','commerce_payout_reversal_custody')",
             )
           ).rows[0];
-          if (payoutCustody?.relation)
+          invariant(
+            payoutCustody?.count === "0" || payoutCustody?.count === "2",
+            "payout_schema_incomplete",
+            "Complete original transfer and compensation history is required before publishing this export.",
+          );
+          if (payoutCustody?.count === "2")
             await page(
               "payoutCustody",
               "SELECT effect_id,creator_id,commitment_id,destination,source_payment,source_transaction,amount,currency,request_hash,created_at FROM creator.commerce_payout_custody",
@@ -243,7 +248,41 @@ export async function exportCommerceFinancial(
               ["effect_id"],
               [creator],
             );
+          if (payoutCustody?.count === "2")
+            await page(
+              "payoutReversalCustody",
+              "SELECT effect_id,creator_id,commitment_id,provider_ref,amount,request_hash,created_at FROM creator.commerce_payout_reversal_custody",
+              scope,
+              ["effect_id"],
+              [creator],
+            );
           counts.accessGrants = 0;
+          const poolSchema = (
+            await client.query<{ count: string }>(
+              "SELECT count(*)::text AS count FROM information_schema.tables WHERE table_schema='creator' AND table_name IN('commerce_pool_cycle','commerce_pool_effect')",
+            )
+          ).rows[0]!;
+          invariant(
+            poolSchema.count === "0" || poolSchema.count === "2",
+            "pool_schema_incomplete",
+            "The complete original pool history is required before publishing this export.",
+          );
+          if (poolSchema.count === "2") {
+            await page(
+              "poolEffects",
+              "SELECT id,cycle,creator_id,allocation_cause,request_hash,source_transaction,provider_ref,state,attempt,error_code,compensation_required,compensation_request->>'reference' AS reversal_reference,compensation_request->>'amount' AS reversal_amount,created_at,updated_at FROM creator.commerce_pool_effect",
+              scope,
+              ["id"],
+              [creator],
+            );
+            await page(
+              "poolCycles",
+              "SELECT * FROM creator.commerce_pool_cycle",
+              "WHERE cycle IN(SELECT cycle FROM creator.commerce_pool_effect WHERE ($1::uuid IS NULL OR creator_id=$1))",
+              ["cycle"],
+              [creator],
+            );
+          }
           await grants(client, page, creator);
         }
         if (input.scope === "account") {

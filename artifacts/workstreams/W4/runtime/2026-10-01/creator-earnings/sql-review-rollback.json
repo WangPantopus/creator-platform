@@ -1,0 +1,45 @@
+{
+  "purpose": "Exact final owner lock, currency-bound page and complete totals compile/plan under non-owner then roll back; no actors/financial rows. Not positive large-population proof.",
+  "queryCount": 3,
+  "plans": [
+    [
+      "LockRows  (cost=0.00..0.00 rows=0 width=0)",
+      "  ->  Result  (cost=0.00..0.00 rows=0 width=0)",
+      "        One-Time Filter: false"
+    ],
+    [
+      "Limit  (cost=0.01..0.02 rows=1 width=168)",
+      "  ->  Sort  (cost=0.01..0.02 rows=0 width=168)",
+      "        Sort Key: created_at DESC, id DESC",
+      "        ->  Result  (cost=0.00..0.00 rows=0 width=168)",
+      "              One-Time Filter: false"
+    ],
+    [
+      "Sort  (cost=0.11..0.11 rows=1 width=258)",
+      "  Sort Key: (COALESCE(currency, currency))",
+      "  ->  Hash Full Join  (cost=0.03..0.10 rows=1 width=258)",
+      "        Hash Cond: (currency = currency)",
+      "        ->  HashAggregate  (cost=0.00..0.06 rows=1 width=224)",
+      "              Group Key: currency",
+      "              ->  Result  (cost=0.00..0.00 rows=0 width=0)",
+      "                    One-Time Filter: false",
+      "        ->  Hash  (cost=0.01..0.01 rows=1 width=66)",
+      "              ->  HashAggregate  (cost=0.00..0.01 rows=1 width=66)",
+      "                    Group Key: currency",
+      "                    ->  Result  (cost=0.00..0.00 rows=0 width=0)",
+      "                          One-Time Filter: false",
+      "                    SubPlan 1",
+      "                      ->  Index Scan using commerce_ledger_creator on commerce_ledger cash  (cost=0.15..8.43 rows=1 width=0)",
+      "                            Index Cond: ((creator_id = creator_id) AND (currency = currency))",
+      "                            Filter: ((kind = 'payout'::text) AND (cause = provider_key) AND (provider_ref = provider_ref) AND (amount = amount) AND creator.commerce_scope(creator_id, fan_id))"
+    ]
+  ],
+  "state": [
+    {
+      "database": "creator_w4_sql_review",
+      "role": "creator_runtime",
+      "migrations": "40",
+      "visible_ledger_entries": "0"
+    }
+  ]
+}

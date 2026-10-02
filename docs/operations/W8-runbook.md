@@ -1,5 +1,34 @@
 # Trust operation and recovery
 
+**Mac Studio host, 2026-10-01 (current):** this host does not have the iMac's private W8 archives, env files or Docker volumes. Read [the re-verification record](../../artifacts/workstreams/W8/recovery/20261001-mac-studio/README.md) before reusing any older instruction below.
+
+- **W8 resources on this host** (all stopped at handoff; volumes retained):
+  - `creator-platform-w8-macstudio-20261001`: loopback 55438. Synthetic `creator_w8`: canonical 40 migrations, W8 seed, 0043 backfill.
+  - `creator-platform-w8-closed-20261001`: loopback 55439. Closed copy carrying the owner closure marker.
+  - API 4108, web 3008.
+  - iOS simulator "Creator Platform W8" `A3DBA471-82BB-43B6-9216-9A74BB5DB11C`.
+  - AVD `CreatorPlatform_W8_API34` on console 5568 / adb 5569, 2 cores, 2048 MB.
+- **Private files** (`~/.config/creator-platform/w8-mac-studio-20261001`, mode 0700): `cluster.env`, `runtime.env`, `runtime-closed.env`, `backups/` and `ios-simulator-udid`. All are 0600; never print them.
+- **Restart:** run `docker start <container>`. Then, from `apps/backend`, run `RELEASE_REVISION=$(git rev-parse HEAD) node --env-file=$HOME/.config/creator-platform/w8-mac-studio-20261001/runtime.env --import tsx src/operations/local-server.ts`. Use `runtime-closed.env` to target the closed copy.
+- **Web:** from `apps/web`, run `CREATOR_NEXT_OUTPUT=.next-w8 QELVORA_API_URL=http://127.0.0.1:4108 W8_API_URL=http://127.0.0.1:4108 W8_LOCAL_DEVELOPMENT=true WEB_ORIGIN=http://localhost:3008 QELVORA_PUBLIC_ORIGIN=http://localhost:3008 W3_WEBSOCKET_URL=ws://127.0.0.1:4108/v1/realtime ./node_modules/.bin/next dev -p 3008 -H 127.0.0.1`. Revert the `next-env.d.ts` path rewrite this causes before committing.
+- **Fresh bootstrap of an isolated W8 database** (the procedure previously missing from these records):
+  1. Start a `pgvector/pgvector:pg17` container on a loopback port and run `createdb creator_w8`.
+  2. Run `DATABASE_MIGRATION_URL=<superuser url> pnpm --filter @qelvora/backend exec tsx scripts/migrate-trust.ts`. Leave `W8_LEGACY_ROOT_MIGRATIONS` unset.
+  3. Run `ALTER ROLE ... PASSWORD` for `creator_runtime`, `creator_trust_runtime`, `creator_trust_worker` and `growth_worker`. `growth_runtime` must use `growth_worker`'s password, because the harness derives its URL by swapping the username.
+  4. Apply `infra/local/seed-w8.sql`.
+  5. Re-run 0043's idempotent `conversation_relationship` insert for the seeded threads.
+- **Native launch:**
+  - iOS: `xcrun simctl launch --terminate-running-process <UDID> com.pantopus.qelvora --api-url http://127.0.0.1:4108 --return-to /trust --appearance night`.
+  - Android: `adb -s emulator-5568 shell am start -n com.pantopus.qelvora/.MainActivity --es api_url http://10.0.2.2:4108 --es return_to /trust`.
+
+**Shared Mac Studio budget (adopted by W8 as environment coordinator):**
+- Run one heavy native build at a time. Hold `mkdir /private/tmp/creator-platform-heavy-build.lock` plus an `owner` line, and remove it when done.
+- Run at most two creator-platform emulators (`/private/tmp/creator-platform-emulator-slot-{1,2}`; 2 cores, ≤2048 MB, `-no-snapshot-save`; kill when idle).
+- Boot at most three creator-platform simulators (`/private/tmp/creator-platform-simulator-slot-{1,2,3}`; shut down after 10 idle minutes).
+- Always use explicit UDID/serial, and never touch another stream's devices, containers or ports.
+
+**Resource cleanup override, 2026-10-01:** historical containers, volumes, services, device IDs and temporary outputs described below were removed. The human has now resumed implementation; the [post-cleanup procedure](W8-post-cleanup-recovery.md) and [actual restoration receipt](../../artifacts/workstreams/W8/recovery/20261001/receipt.json) identify newly owned durable custody and traffic-closed state. Use those current records before any restart. Original archives/private state remain preserved; W8-owned temporary services stop after verification. Full domain purge/reopen and release readiness remain gated.
+
 **PR7 merged/source checkpoint:** normal merge `705215955415332e601adf5c42a2169cd0d173a5` at2026-10-01T05:10:56Z; exact reviewed189db7c tree equals fetched main. [Actual merge receipt](../../artifacts/workstreams/W8/takeover/20260930/pr7-merged.json) records launched browser/iOS2/2/Android4/4 acceptance, preserved SQL/data and nonrequired CI queued/running. Full R1–R10 and release/private/provider/hardware gates remain open. No admin override, check removal, test weakening, live migration, reseed or paid call. The preserved W8 branch fast-forwarded to actual main before this evidence-only continuation.
 
 **Current PR7 merge verification (Sep30/Oct1UTC):** [Personal final acceptance](../../artifacts/workstreams/W8/takeover/20260930/final-merge-acceptance.json) has actual canonical Report without a grant, exact references and retained resolved case; iOS2/2 on-device flows64.206s and Android4/4 flows100.001s on the integrated source. No authenticated native/system-save/physical/provider release claim. Native devices are normally stopped with data/builds/results preserved. Non-owner APIa3e15ac/PID77099 remains live200/ready503; web3008/database55438/private env/backups and all40 SQL/cases/jobs/block/tombstone remain intact. GitHub main is unprotected with no rulesets/configured required checks at the verified observation. The human makes actual-app E2E the merge gate and excludes unit/coverage as a gate; the existing T11 five-vs-three context-statement failure stays recorded with its assertion/check unchanged. Visual/queued results are not called green. The local actor selection reset found during final E2E is fixed and personally accepted: pending choice survives unchanged-account polling, actual fan switch clears prior private data and shows the retained original export. Full R1–R10, C10/signing/retention/provider/hardware/pilot release gates remain assigned and closed where inputs are absent.

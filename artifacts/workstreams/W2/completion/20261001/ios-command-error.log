@@ -1,0 +1,9 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project apps/ios/QelvoraApp.xcodeproj -scheme QelvoraApp -configuration Debug -destination "generic/platform=iOS Simulator" -derivedDataPath tmp/w2-native-20261001/DerivedData -clonedSourcePackagesDirPath tmp/w2-native-20261001/SourcePackages -parallelizeTargets NO -jobs 2 build CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=-
+
+Build settings from command line:
+    CODE_SIGN_IDENTITY = -
+    CODE_SIGNING_ALLOWED = YES
+
+2026-10-01 02:41:36.355 xcodebuild[63109:2455195] Writing error result bundle to /var/folders/yk/tc3l5_sx061_10d4jh0pv2bc0000gn/T/ResultBundle_2026-01-10_02-41-0036.xcresult
+xcodebuild: error: Unknown build action 'NO'.

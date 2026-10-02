@@ -1,0 +1,35 @@
+{
+  "purpose": "Complete proposal DDL compiled inside one disposable-review transaction and rolled back. No actors or money rows created; no installation or provider acceptance.",
+  "priorFailure": "Initial command used the wrong configuration variable and attempted default port5432; corrected to the approved review URL variable.",
+  "commands": [
+    "BEGIN",
+    "SET",
+    "CREATE",
+    "ALTER",
+    "ALTER",
+    "CREATE",
+    "GRANT",
+    "CREATE",
+    "CREATE",
+    "CREATE",
+    "CREATE",
+    "CREATE",
+    "CREATE",
+    "ALTER",
+    "ALTER",
+    "CREATE",
+    "GRANT",
+    "CREATE",
+    "CREATE",
+    "CREATE",
+    "ROLLBACK"
+  ],
+  "state": [
+    {
+      "database": "creator_w4_sql_review",
+      "migrations": "40",
+      "transfer_custody": null,
+      "reversal_custody": null
+    }
+  ]
+}

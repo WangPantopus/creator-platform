@@ -1,0 +1,95 @@
+{
+  "observedAt": "2026-10-01T20:21:20.190093+00:00",
+  "repository": "/Users/yingpengwang/creator-platform",
+  "mainAtAudit": "cd78f7b677e3ffc5b6c588e647a1a0df08a21e4c",
+  "worktrees": [
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/28ed/creator-platform",
+      "headAtAudit": "b77ad263ac5fd63ab48766c9659363328d57fdcb",
+      "retainedBranch": "codex/w8-trust-handoff",
+      "remoteHead": "b77ad263ac5fd63ab48766c9659363328d57fdcb",
+      "pullRequests": [
+        7,
+        15
+      ],
+      "nonignoredUncommittedFilesAtInitialAudit": 0,
+      "ignoredFiles": [
+        "apps/android/.kotlin/errors/errors-1790828299771.log",
+        "apps/ios/QelvoraApp.xcodeproj/project.pbxproj",
+        "apps/ios/QelvoraApp.xcodeproj/project.xcworkspace/contents.xcworkspacedata",
+        "apps/ios/QelvoraApp.xcodeproj/xcshareddata/xcschemes/QelvoraApp.xcscheme",
+        "apps/web/tsconfig.tsbuildinfo"
+      ],
+      "privateIgnoredArchive": "/Users/yingpengwang/.config/creator-platform/worktree-retirement-20261001-w8/28ed-ignored-generated.tar.gz",
+      "allocatedKiB": 79988,
+      "disposition": "authorized retirement after remote/PR verification; final filesystem result in private audit"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/f25f/creator-platform",
+      "headAtAudit": "bc809085e22d997cf868071c5cedab2992187005",
+      "retainedBranch": "codex/w8-post-cleanup-recovery",
+      "remoteHead": "bc809085e22d997cf868071c5cedab2992187005",
+      "pullRequests": [
+        17
+      ],
+      "nonignoredUncommittedFilesAtInitialAudit": 0,
+      "ignoredFiles": [
+        "apps/backend/.turbo/turbo-typecheck.log",
+        "apps/backend/dist/integration.mjs",
+        "apps/backend/dist/integration.mjs.map",
+        "apps/backend/dist/server.mjs",
+        "apps/backend/dist/server.mjs.map",
+        "apps/backend/dist/workers/start.mjs",
+        "apps/backend/dist/workers/start.mjs.map",
+        "apps/web/.turbo/turbo-typecheck.log",
+        "apps/web/tsconfig.tsbuildinfo",
+        "packages/api/.turbo/turbo-typecheck.log",
+        "packages/brand/.turbo/turbo-typecheck.log",
+        "packages/copy/.turbo/turbo-typecheck.log",
+        "packages/tokens/.turbo/turbo-typecheck.log",
+        "packages/ui-web/.turbo/turbo-typecheck.log"
+      ],
+      "privateIgnoredArchive": "/Users/yingpengwang/.config/creator-platform/worktree-retirement-20261001-w8/f25f-ignored-generated.tar.gz",
+      "allocatedKiB": 144032,
+      "disposition": "authorized retirement after remote/PR verification; final filesystem result in private audit"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/99fa/creator-platform",
+      "headAtAudit": "2e337a1afdf6d8bba3974427588e0b34b6d42d36",
+      "retainedBranch": null,
+      "remoteHead": null,
+      "pullRequests": [],
+      "nonignoredUncommittedFilesAtInitialAudit": 0,
+      "ignoredFiles": [],
+      "privateIgnoredArchive": null,
+      "allocatedKiB": 1900,
+      "disposition": "authorized retirement after remote/PR verification; final filesystem result in private audit"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w8-current-handoff/creator-platform",
+      "headAtAudit": "8d423d6b22404b6c0daec0bd0449e75b19274840",
+      "retainedBranch": "codex/w8-handoff-20261001",
+      "remoteHead": "8d423d6b22404b6c0daec0bd0449e75b19274840",
+      "pullRequests": [
+        50
+      ],
+      "nonignoredUncommittedFilesAtInitialAudit": 0,
+      "ignoredFiles": [],
+      "privateIgnoredArchive": null,
+      "allocatedKiB": 152660,
+      "disposition": "authorized retirement after remote/PR verification; final filesystem result in private audit",
+      "retirementPublicationBranch": "codex/w8-worktree-retirement-20261001",
+      "publicationBase": "cd78f7b677e3ffc5b6c588e647a1a0df08a21e4c"
+    }
+  ],
+  "auditPhase": "before removal",
+  "historicalEvidenceCommits": [
+    "d1e8318a987ef938c4dff65645ea81e5cdfa4aaf",
+    "b77ad263ac5fd63ab48766c9659363328d57fdcb"
+  ],
+  "historicalEvidencePreservation": "Merged as ancestry into the retirement branch, with both original JSON receipts unchanged. Current assignment preserved during status conflict resolution.",
+  "scope": "Four W8 worktrees only. Primary repository, other workstreams, remote branches, private env files, backups, databases and devices excluded.",
+  "ignoredFileCustody": "All 19 ignored generated files archived privately (1,019,371 compressed bytes); no secrets or private archives committed.",
+  "validation": "Clean initial worktrees; GitHub PR heads and live remote heads checked; no app/test/SQL/CI changes. Documentation/source-custody work only, no new app acceptance claimed.",
+  "resume": "Recreate from origin/codex/w8-post-cleanup-recovery for PR17, reconcile latest main, read current main W8-resume-prompt.md."
+}

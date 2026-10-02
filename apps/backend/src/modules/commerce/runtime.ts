@@ -2,12 +2,20 @@ import type { Pool } from "pg";
 import type { Database } from "../../db/database.js";
 import type { AccessService, ThreadScope } from "../access/scope.js";
 import type { PaymentProvider } from "../payments/provider.js";
-import { CommerceService, type CommercePolicy } from "./service.js";
+import {
+  CommerceService,
+  type CommercePolicy,
+  type CommerceCreatorReadAuthority,
+} from "./service.js";
 import {
   MembershipBilling,
   type MembershipBillingProvider,
 } from "./billing.js";
-import { ExtendedCommerce, type StoreEntitlementVerifier } from "./extended.js";
+import {
+  ExtendedCommerce,
+  type StoreEntitlementVerifier,
+  type QualifiedReadAuthority,
+} from "./extended.js";
 import { commerceFeature } from "./registration.js";
 import {
   CommerceGenerationAllowance,
@@ -18,7 +26,12 @@ import {
   MoneyReconciliation,
   type MoneyStatementProvider,
 } from "./reconciliation.js";
-import type { CreatorSettlement } from "./accounting.js";
+import {
+  PoolSettlement,
+  type CreatorSettlement,
+  type PoolCycleVerifier,
+} from "./accounting.js";
+import type { PassPoolJournal } from "./pass-pool-journal.js";
 import type { PassPurchaseJournal } from "./pass-purchase-journal.js";
 import type { GenerationPrivacyConfiguration } from "./generation-privacy.js";
 import {
@@ -30,6 +43,7 @@ import {
   createCommerceAudience,
   type GroupAudienceReader,
 } from "./audience.js";
+import { CommerceVoiceFulfillment } from "./voice-fulfillment.js";
 
 /** W1's configured-host seam consumes this graph. Providers and economics are
  * explicit injected dependencies; configuring a payment key cannot enable AI. */
@@ -52,17 +66,26 @@ export async function createCommerceRuntime(input: {
   payments?: PaymentProvider;
   billing?: MembershipBillingProvider;
   stores?: StoreEntitlementVerifier;
+  /** W3's actual prepared exact association and W6 recording reader. */
+  voiceRecordings?: import("../conversation/recordings.js").ConversationRecordings;
+  qualifiedReads?: QualifiedReadAuthority;
   tierCatalog?: TierCatalog;
   pass?: (service: CommerceService) => import("./pass.js").PassCommerce;
   passPurchases?: (
     service: CommerceService,
     pass: import("./pass.js").PassCommerce,
+    pool: Readonly<{ journal: PassPoolJournal; settlement: PoolSettlement }>,
   ) => Promise<PassPurchaseJournal>;
   moneyStatement?: MoneyStatementProvider;
   settlement?: (service: CommerceService) => CreatorSettlement;
+  poolCycleVerifier?: PoolCycleVerifier;
+  poolJournal?: (service: CommerceService) => Promise<PassPoolJournal>;
   assertActorAllowed?: (
     actor: import("../identity/adapter.js").Actor,
   ) => Promise<void>;
+  /** Actual W8 creator-wide denial held on the owner projection transaction.
+   * No default or outside-client creator check enables earnings. */
+  assertCreatorReadAllowed?: CommerceCreatorReadAuthority;
 }) {
   invariant(
     !input.generationCostUnits,
@@ -119,6 +142,14 @@ export async function createCommerceRuntime(input: {
           assertReady: input.trialReadiness.bind(input),
         })
       : undefined,
+    input.assertCreatorReadAllowed,
+    input.voiceRecordings
+      ? await CommerceVoiceFulfillment.prepare({
+          database: input.database,
+          access: input.access,
+          recordings: input.voiceRecordings,
+        })
+      : undefined,
   );
   const billing = new MembershipBilling(service, input.billing);
   const tiers = new CommerceTiers(service, input.tierCatalog);
@@ -126,15 +157,34 @@ export async function createCommerceRuntime(input: {
     ? new MoneyReconciliation(service, input.moneyStatement)
     : undefined;
   const settlement = input.settlement?.(service);
+  invariant(
+    Boolean(input.poolJournal) === Boolean(input.poolCycleVerifier),
+    "pool_unconfigured",
+    "Pool allocation and cash require the same complete prepared provider graph.",
+  );
+  const poolJournal = input.poolJournal
+    ? await input.poolJournal(service)
+    : undefined;
+  invariant(
+    !poolJournal || poolJournal.isForService(service),
+    "pool_graph_mismatch",
+    "Pool custody must belong to this exact canonical commerce graph.",
+  );
+  const poolSettlement = poolJournal
+    ? new PoolSettlement(service, input.poolCycleVerifier, poolJournal)
+    : undefined;
   const pass = input.pass?.(service);
   invariant(
-    !input.passPurchases || pass,
+    !input.passPurchases || (pass && poolJournal && poolSettlement),
     "pass_billing_unconfigured",
-    "Pass purchases require the same canonical pass graph.",
+    "Pass purchases require the same canonical pass and prepared pool cash graph.",
   );
   const passPurchases =
-    input.passPurchases && pass
-      ? await input.passPurchases(service, pass)
+    input.passPurchases && pass && poolJournal && poolSettlement
+      ? await input.passPurchases(service, pass, {
+          journal: poolJournal,
+          settlement: poolSettlement,
+        })
       : undefined;
   const extended = new ExtendedCommerce(
     service,
@@ -145,8 +195,11 @@ export async function createCommerceRuntime(input: {
     money,
     settlement,
     passPurchases,
+    poolJournal,
+    input.qualifiedReads,
   );
   return {
+    ...(poolJournal && poolSettlement ? { poolJournal, poolSettlement } : {}),
     ...(generationAllowance ? { allowance: generationAllowance } : {}),
     service,
     billing,

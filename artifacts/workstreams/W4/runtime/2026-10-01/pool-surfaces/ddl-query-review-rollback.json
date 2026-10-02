@@ -1,0 +1,72 @@
+{
+  "purpose": "Final complete proposal DDL plus exact non-owner source query planning, rolled back. No actors or financial rows created; no activation or provider proof.",
+  "commands": [
+    "BEGIN",
+    "SET",
+    "CREATE",
+    "CREATE",
+    "CREATE",
+    "CREATE",
+    "ALTER",
+    "ALTER",
+    "CREATE",
+    "ALTER",
+    "ALTER",
+    "CREATE",
+    "GRANT",
+    "GRANT",
+    "CREATE",
+    "CREATE",
+    "CREATE"
+  ],
+  "plans": [
+    [
+      "Aggregate  (cost=0.02..0.06 rows=1 width=112)",
+      "  ->  Sort  (cost=0.01..0.02 rows=0 width=0)",
+      "        Sort Key: fan_id",
+      "        ->  Result  (cost=0.00..0.00 rows=0 width=0)",
+      "              One-Time Filter: false"
+    ],
+    [
+      "Limit  (cost=8.25..8.26 rows=1 width=266)",
+      "  InitPlan 1",
+      "    ->  Aggregate  (cost=0.00..0.02 rows=1 width=32)",
+      "          ->  Result  (cost=0.00..0.00 rows=0 width=0)",
+      "                One-Time Filter: false",
+      "  InitPlan 2",
+      "    ->  Aggregate  (cost=0.00..0.02 rows=1 width=32)",
+      "          ->  Result  (cost=0.00..0.00 rows=0 width=0)",
+      "                One-Time Filter: false",
+      "  InitPlan 3",
+      "    ->  Aggregate  (cost=0.00..0.01 rows=1 width=32)",
+      "          ->  Result  (cost=0.00..0.00 rows=0 width=0)",
+      "                One-Time Filter: false",
+      "  InitPlan 4",
+      "    ->  Aggregate  (cost=0.00..0.01 rows=1 width=32)",
+      "          ->  Result  (cost=0.00..0.00 rows=0 width=0)",
+      "                One-Time Filter: false",
+      "  InitPlan 6",
+      "    ->  Result  (cost=0.00..0.00 rows=0 width=0)",
+      "          One-Time Filter: false",
+      "  InitPlan 7",
+      "    ->  Index Scan using creator_profile_account_id_key on creator_profile p  (cost=0.16..8.18 rows=1 width=0)",
+      "          Index Cond: (account_id = (NULLIF(current_setting('app.account_id'::text, true), ''::text))::uuid)",
+      "          Filter: ((NOT recovery_required) AND (verification = 'verified'::text))",
+      "  ->  Sort  (cost=0.01..0.02 rows=0 width=266)",
+      "        Sort Key: cycle DESC",
+      "        ->  Result  (cost=0.00..0.00 rows=0 width=266)",
+      "              One-Time Filter: false",
+      "              SubPlan 5",
+      "                ->  Result  (cost=0.00..0.00 rows=0 width=0)",
+      "                      One-Time Filter: false"
+    ]
+  ],
+  "state": [
+    {
+      "migrations": "40",
+      "pool_cycle": null,
+      "pool_effect": null,
+      "slot_index": null
+    }
+  ]
+}

@@ -27,6 +27,7 @@ import { commerceAudience, type VerifiedGroupAudience } from "./audience.js";
 import type { Database } from "../../db/database.js";
 import type { PaymentProvider, Intent } from "../payments/provider.js";
 import { CreditWallet, type CreditRules } from "./accounting.js";
+import type { CommerceVoiceFulfillment } from "./voice-fulfillment.js";
 
 export type CommercePolicy = {
   currency: string;
@@ -105,6 +106,13 @@ export type CommerceTrialAdmission = Readonly<{
    * successful default. This must reject before the one-time window starts. */
   assertReady(scope: ThreadScope, client: PoolClient): Promise<void>;
 }>;
+/** Genuine current account/creator denials held until this exact transaction
+ * ends. A read-only check on another connection cannot satisfy this port. */
+export type CommerceCreatorReadAuthority = (
+  client: PoolClient,
+  actor: Actor,
+  creatorId: string,
+) => Promise<void>;
 const ModeCommand = z
   .strictObject({
     title: z.string().trim().min(1).max(100),
@@ -149,7 +157,64 @@ export class CommerceService {
     readonly provider?: PaymentProvider,
     private readonly assertActorAllowed?: (actor: Actor) => Promise<void>,
     private readonly trialAdmission?: CommerceTrialAdmission,
-  ) {}
+    private readonly assertCreatorReadAllowed?: CommerceCreatorReadAuthority,
+    private readonly voiceFulfillment?: CommerceVoiceFulfillment,
+  ) {
+    voiceFulfillment?.assertRuntime(db, access);
+  }
+  get voiceFulfillmentAvailable() {
+    return Boolean(this.voiceFulfillment);
+  }
+  private fulfillmentAvailable(kind: string) {
+    return (
+      kind === "written_reply" ||
+      (Boolean(this.policy.fulfillmentModes?.includes(kind)) &&
+        (kind !== "voice_note" || this.voiceFulfillmentAvailable))
+    );
+  }
+  get creatorFinancialReadAvailable() {
+    return typeof this.assertCreatorReadAllowed === "function";
+  }
+  /** Owner financial projections have no thread and must not mint one to
+   * obtain authority. Check the genuine owner, then hold denial before profile
+   * locks and recheck verification/recovery through the entire read. */
+  async assertCreatorFinancialRead(
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+  ) {
+    const ownerQuery =
+      "SELECT id FROM creator.creator_profile WHERE id=$1 AND account_id=$2 AND verification='verified' AND NOT recovery_required";
+    const values = [creatorId, actor.accountId];
+    const requireOwner = (count: number | null) => {
+      if (count !== 1)
+        throw new DomainError(
+          "creator_required",
+          "Earnings belong to the current verified creator account.",
+          403,
+        );
+    };
+    requireOwner((await client.query(ownerQuery, values)).rowCount);
+    if (!this.assertCreatorReadAllowed)
+      throw new DomainError(
+        "creator_financial_authority_unavailable",
+        "Current earnings authority is unavailable. Refresh before continuing.",
+        503,
+      );
+    try {
+      await this.assertCreatorReadAllowed(client, actor, creatorId);
+    } finally {
+      // The authority may read its own narrow scope; restore the real request
+      // account and clear pair scope before any financial projection runs.
+      await client.query(
+        "SELECT set_config('app.account_id',$1,true),set_config('app.creator_id','',true),set_config('app.fan_id','',true)",
+        [actor.accountId],
+      );
+    }
+    requireOwner(
+      (await client.query(`${ownerQuery} FOR SHARE`, values)).rowCount,
+    );
+  }
   get firstConversationAvailable() {
     return Boolean(
       this.trialAdmission &&
@@ -316,7 +381,11 @@ export class CommerceService {
       ],
     );
   }
-  async overview(actor: Actor, creatorId?: string) {
+  async overview(
+    actor: Actor,
+    creatorId?: string,
+    options?: { creatorFinance: boolean },
+  ) {
     return this.account(actor, async (client) => {
       const fan =
         (
@@ -333,10 +402,23 @@ export class CommerceService {
       ).rows;
       const owned = (
         await client.query(
-          "SELECT id,display_name,verification FROM creator.creator_profile WHERE account_id=$1",
+          "SELECT id,display_name,verification,recovery_required FROM creator.creator_profile WHERE account_id=$1",
           [actor.accountId],
         )
       ).rows;
+      const financialCreators: string[] = [];
+      if (options?.creatorFinance) {
+        for (const owner of owned) {
+          if (
+            owner.verification !== "verified" ||
+            owner.recovery_required ||
+            (creatorId && owner.id !== creatorId)
+          )
+            continue;
+          await this.assertCreatorFinancialRead(client, actor, owner.id);
+          financialCreators.push(owner.id);
+        }
+      }
       const packets = (
         await client.query(
           `SELECT p.*,c.id AS commitment_id,c.state AS commitment_state,c.due_at,c.delivered_at,c.outcome FROM creator.commerce_packet p LEFT JOIN creator.commerce_commitment c ON c.packet_id=p.id WHERE ($1::uuid IS NULL OR p.creator_id=$1) ORDER BY p.created_at DESC,p.id DESC LIMIT 50`,
@@ -375,16 +457,18 @@ export class CommerceService {
       const spendingNotices = fan
         ? await this.spendingNotices(client, fan.id, this.policy.currency)
         : [];
-      const payoutAccounts = owned.length
+      const payoutAccounts = financialCreators.length
         ? (
             await client.query(
-              "SELECT creator_id,state,details_due,version FROM creator.commerce_payout_account",
+              "SELECT creator_id,state,details_due,version FROM creator.commerce_payout_account WHERE creator_id=ANY($1::uuid[])",
+              [financialCreators],
             )
           ).rows
         : [];
       const ledger = (
         await client.query(
-          "SELECT * FROM creator.commerce_ledger ORDER BY created_at DESC,id DESC LIMIT 100",
+          "SELECT * FROM creator.commerce_ledger WHERE fan_id=$1 OR creator_id=ANY($2::uuid[]) ORDER BY created_at DESC,id DESC LIMIT 100",
+          [fan?.id ?? null, financialCreators],
         )
       ).rows;
       const pass = fan
@@ -438,8 +522,14 @@ export class CommerceService {
   }
   private async exposure(client: PoolClient, fanId: string, currency: string) {
     const totals = (
-      await client.query<{ captured: string; held: string }>(
-        `SELECT coalesce(sum(CASE WHEN kind='capture' THEN amount ELSE 0 END),0)::text AS captured FROM creator.commerce_ledger WHERE fan_id=$1 AND currency=$2 AND created_at>=date_trunc('month',now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC'`,
+      await client.query<{ captured: string; refunded: string; month: string }>(
+        `SELECT coalesce(sum(amount) FILTER(WHERE kind='capture'),0)::text AS captured,
+         coalesce(sum(amount) FILTER(WHERE kind='refund'),0)::text AS refunded,
+         to_char(now() AT TIME ZONE 'UTC','YYYY-MM') AS month
+         FROM creator.commerce_ledger WHERE fan_id=$1 AND currency=$2
+         AND kind IN('capture','refund')
+         AND created_at>=date_trunc('month',now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC'
+         AND created_at<(date_trunc('month',now() AT TIME ZONE 'UTC')+interval '1 month') AT TIME ZONE 'UTC'`,
         [fanId, currency],
       )
     ).rows[0]!;
@@ -478,11 +568,14 @@ export class CommerceService {
       BigInt(held.amount) + BigInt(billing.amount) + BigInt(passPending);
     const total = BigInt(totals.captured) + heldTotal;
     invariant(
-      total <= BigInt(Number.MAX_SAFE_INTEGER),
+      total <= BigInt(Number.MAX_SAFE_INTEGER) &&
+        BigInt(totals.refunded) <= BigInt(Number.MAX_SAFE_INTEGER),
       "balance_reconciliation_required",
       "This balance needs reconciliation before new spending.",
     );
     return {
+      month: totals.month,
+      refunded: Number(totals.refunded),
       captured: Number(totals.captured),
       held: Number(heldTotal),
       total: Number(total),
@@ -644,9 +737,7 @@ export class CommerceService {
   ) {
     const body = ModeCommand.parse(input);
     invariant(
-      body.state !== "offered" ||
-        body.kind === "written_reply" ||
-        this.policy.fulfillmentModes?.includes(body.kind),
+      body.state !== "offered" || this.fulfillmentAvailable(body.kind),
       "fulfillment_unavailable",
       "This mode needs its verified delivery service before it can be offered.",
     );
@@ -929,8 +1020,7 @@ export class CommerceService {
             "Shared intro disclosure is not connected yet.",
           );
           invariant(
-            mode.kind === "written_reply" ||
-              this.policy.fulfillmentModes?.includes(mode.kind),
+            this.fulfillmentAvailable(mode.kind),
             "fulfillment_unavailable",
             "This promised service is not connected yet.",
           );
@@ -1324,6 +1414,11 @@ export class CommerceService {
             "That action does not fulfill the requested mode.",
           );
           invariant(
+            this.fulfillmentAvailable(p.snapshot.mode),
+            "fulfillment_unavailable",
+            "This promised service is not connected yet.",
+          );
+          invariant(
             body.signedActId,
             "signed_act_required",
             "Sign the exact acceptance first.",
@@ -1559,8 +1654,7 @@ export class CommerceService {
             "Current access does not include this offer.",
           );
           invariant(
-            mode.kind === "written_reply" ||
-              this.policy.fulfillmentModes?.includes(mode.kind),
+            this.fulfillmentAvailable(mode.kind),
             "fulfillment_unavailable",
             "This promised service is not connected yet.",
           );
@@ -1705,6 +1799,7 @@ export class CommerceService {
               id: string;
               version: number;
               state: string;
+              mode: string;
               due_at: Date;
             }>(
               "SELECT * FROM creator.commerce_commitment WHERE packet_id=$1 FOR UPDATE",
@@ -1714,7 +1809,10 @@ export class CommerceService {
           invariant(
             c &&
               c.version === body.version &&
-              ["due", "in_progress"].includes(c.state),
+              ["due", "in_progress"].includes(c.state) &&
+              p.state === "accepted" &&
+              p.payment_state === "captured" &&
+              p.accepted_at,
             "commitment_unavailable",
             "This commitment changed. Refresh first.",
           );
@@ -1724,7 +1822,13 @@ export class CommerceService {
             "The deadline passed. Refund reconciliation is required.",
           );
           invariant(
-            p.snapshot.mode === "written_reply",
+            c.mode === p.snapshot.mode,
+            "mode_mismatch",
+            "The original promised service must match this commitment.",
+          );
+          invariant(
+            p.snapshot.mode === "written_reply" ||
+              (p.snapshot.mode === "voice_note" && this.voiceFulfillment),
             "media_evidence_required",
             "This mode needs verified media, session, published group or review evidence.",
           );
@@ -1735,8 +1839,9 @@ export class CommerceService {
               signed_act_id: string;
               text: string;
               version: number;
+              recording_asset_id?: string | null;
             }>(
-              `SELECT m.* FROM creator.message m JOIN creator.signed_act sa ON sa.id=m.signed_act_id JOIN creator.passkey_credential pc ON pc.id=sa.credential_id AND pc.revoked_at IS NULL JOIN creator.creator_profile cp ON cp.id=m.creator_id AND cp.verification='verified' WHERE m.id=$1 AND m.thread_id=$2 AND m.creator_id=$3 AND m.fan_id=$4 AND m.author_account_id=$5 AND m.author_kind IN ('human_creator','approved_draft') AND m.delivery_state='delivered' AND m.created_at >= $6`,
+              `SELECT m.* FROM creator.message m JOIN creator.signed_act sa ON sa.id=m.signed_act_id AND sa.account_id=m.author_account_id AND sa.creator_id=m.creator_id AND sa.subject_id=m.thread_id AND sa.content_hash=m.signed_content_hash AND sa.act_type=CASE WHEN m.author_kind='approved_draft' THEN 'approved_draft' ELSE 'reply' END JOIN creator.passkey_credential pc ON pc.id=sa.credential_id AND pc.account_id=sa.account_id AND pc.revoked_at IS NULL JOIN creator.creator_profile cp ON cp.id=m.creator_id AND cp.verification='verified' AND NOT cp.recovery_required WHERE m.id=$1 AND m.thread_id=$2 AND m.creator_id=$3 AND m.fan_id=$4 AND m.author_account_id=$5 AND m.author_kind IN ('human_creator','approved_draft') AND m.delivery_state='delivered' AND m.created_at >= $6 FOR SHARE OF m,pc,cp`,
               [
                 body.messageId,
                 scope.threadId,
@@ -1752,6 +1857,12 @@ export class CommerceService {
             "signed_delivery_required",
             "A delivered exact creator-signed reply is required.",
           );
+          invariant(
+            p.snapshot.mode !== "written_reply" ||
+              (message.text.trim().length > 0 && !message.recording_asset_id),
+            "written_delivery_required",
+            "A written request requires a signed written reply.",
+          );
           await client.query(
             "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
             [`commerce.delivery:${message.id}`],
@@ -1765,6 +1876,10 @@ export class CommerceService {
             "delivery_already_used",
             "This reply already fulfilled another paid commitment. Deliver the promised reply for this request.",
           );
+          const voiceEvidence =
+            p.snapshot.mode === "voice_note"
+              ? await this.voiceFulfillment!.read(scope, client, message.id)
+              : undefined;
           if (message.author_kind === "approved_draft") {
             const available = (
               await client.query<{ relation: string | null }>(
@@ -1804,14 +1919,20 @@ export class CommerceService {
             [
               c.id,
               message.id,
-              JSON.stringify({
-                messageId: message.id,
-                messageVersion: message.version,
-                signedActId: message.signed_act_id,
-                authorKind: message.author_kind,
-                contentHash: contentHash({ text: message.text }),
-              }),
+              JSON.stringify(
+                voiceEvidence ?? {
+                  messageId: message.id,
+                  messageVersion: message.version,
+                  signedActId: message.signed_act_id,
+                  authorKind: message.author_kind,
+                  contentHash: contentHash({ text: message.text }),
+                },
+              ),
             ],
+          );
+          await client.query(
+            "UPDATE creator.commerce_packet SET version=version+1,updated_at=now() WHERE id=$1",
+            [p.id],
           );
           await this.event(
             client,
@@ -1956,6 +2077,24 @@ export class CommerceService {
     cause: string,
     outcome: string,
   ) {
+    const effectId = await this.account(actor, (client) =>
+      this.queueRefundInTransaction(client, actor, id, amount, cause, outcome),
+    );
+    await this.runEffect(actor, effectId);
+    return this.packet(actor, id);
+  }
+
+  /** Persist an original refund obligation on the caller's genuine authorized
+   * transaction. The caller commits before runEffect; this performs no provider
+   * I/O, issues no actor/worker authority, and is never exposed as a client route. */
+  async queueRefundInTransaction(
+    client: PoolClient,
+    actor: Actor,
+    id: string,
+    amount: number,
+    cause: string,
+    outcome: string,
+  ): Promise<string> {
     invariant(
       Number.isSafeInteger(amount) &&
         amount > 0 &&
@@ -1964,72 +2103,88 @@ export class CommerceService {
       "invalid_refund",
       "The refund instruction is invalid.",
     );
-    const effectId = await this.account(actor, (client) =>
-      this.command(
-        client,
-        actor,
-        "commerce.refund",
-        cause,
-        { id, amount, outcome },
-        async () => {
-          const p = await this.lockPacket(client, id);
-          const c = (
-            await client.query(
-              "SELECT * FROM creator.commerce_commitment WHERE packet_id=$1 FOR UPDATE",
-              [id],
-            )
-          ).rows[0];
-          invariant(
-            c &&
-              p.intent_ref &&
-              ["captured", "refund_pending"].includes(p.payment_state),
-            "refund_unavailable",
-            "A confirmed captured commitment is required.",
-          );
-          const pending = (
-            await client.query<{ amount: string }>(
-              "SELECT coalesce(sum((request->>'amount')::bigint),0)::text AS amount FROM creator.commerce_effect WHERE packet_id=$1 AND operation='refund' AND state<>'failed'",
-              [id],
-            )
-          ).rows[0]!;
-          invariant(
-            BigInt(pending.amount) + BigInt(amount) <=
-              BigInt(p.snapshot.amount),
-            "refund_exceeds_balance",
-            "The refund exceeds the remaining captured amount.",
-          );
-          const result = (
-            await client.query<{ id: string }>(
-              "INSERT INTO creator.commerce_effect(creator_id,fan_id,packet_id,operation,provider_key,request) VALUES($1,$2,$3,'refund',$4,$5) RETURNING id",
-              [
-                p.creator_id,
-                p.fan_id,
-                p.id,
-                `${p.id}:refund:${cause}`,
-                JSON.stringify({
-                  intentId: p.intent_ref,
-                  amount,
-                  currency: p.snapshot.currency,
-                  returnState:
-                    c.state === "delivered" ? "delivered" : "resolved",
-                }),
-              ],
-            )
-          ).rows[0]!;
-          await client.query(
-            "UPDATE creator.commerce_packet SET payment_state='refund_pending',version=version+1 WHERE id=$1",
-            [id],
-          );
-          await client.query(
-            "UPDATE creator.commerce_commitment SET state=CASE WHEN state='delivered' THEN state ELSE 'refund_pending' END,outcome=$2,version=version+1 WHERE id=$1",
-            [c.id, outcome],
-          );
-          return result.id;
-        },
-      ),
+    const binding = (
+      await client.query<
+        Pick<PacketRow, "thread_id" | "creator_id" | "fan_id">
+      >(
+        "SELECT thread_id,creator_id,fan_id FROM creator.commerce_packet WHERE id=$1",
+        [id],
+      )
+    ).rows[0];
+    invariant(binding, "request_unavailable", "This request is unavailable.");
+    await client.query(
+      "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true)",
+      [binding.creator_id, binding.fan_id],
     );
-    await this.runEffect(actor, effectId);
-    return this.packet(actor, id);
+    const thread = await client.query(
+      "SELECT id FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 FOR UPDATE",
+      [binding.thread_id, binding.creator_id, binding.fan_id],
+    );
+    invariant(
+      thread.rowCount === 1,
+      "thread_unavailable",
+      "This conversation is unavailable.",
+    );
+    const p = await this.lockPacket(client, id);
+    const c = (
+      await client.query(
+        "SELECT * FROM creator.commerce_commitment WHERE packet_id=$1 FOR UPDATE",
+        [id],
+      )
+    ).rows[0];
+    return this.command(
+      client,
+      actor,
+      "commerce.refund",
+      cause,
+      { id, amount, outcome },
+      async () => {
+        invariant(
+          c &&
+            p.intent_ref &&
+            ["captured", "refund_pending"].includes(p.payment_state),
+          "refund_unavailable",
+          "A confirmed captured commitment is required.",
+        );
+        const pending = (
+          await client.query<{ amount: string }>(
+            "SELECT coalesce(sum((request->>'amount')::bigint),0)::text AS amount FROM creator.commerce_effect WHERE packet_id=$1 AND operation='refund' AND state<>'failed'",
+            [id],
+          )
+        ).rows[0]!;
+        invariant(
+          BigInt(pending.amount) + BigInt(amount) <= BigInt(p.snapshot.amount),
+          "refund_exceeds_balance",
+          "The refund exceeds the remaining captured amount.",
+        );
+        const result = (
+          await client.query<{ id: string }>(
+            "INSERT INTO creator.commerce_effect(creator_id,fan_id,packet_id,operation,provider_key,request) VALUES($1,$2,$3,'refund',$4,$5) RETURNING id",
+            [
+              p.creator_id,
+              p.fan_id,
+              p.id,
+              `${p.id}:refund:${cause}`,
+              JSON.stringify({
+                intentId: p.intent_ref,
+                amount,
+                currency: p.snapshot.currency,
+                returnState: c.state === "delivered" ? "delivered" : "resolved",
+              }),
+            ],
+          )
+        ).rows[0]!;
+        await client.query(
+          "UPDATE creator.commerce_packet SET payment_state='refund_pending',version=version+1 WHERE id=$1",
+          [id],
+        );
+        await client.query(
+          "UPDATE creator.commerce_commitment SET state=CASE WHEN state='delivered' THEN state ELSE 'refund_pending' END,outcome=$2,version=version+1 WHERE id=$1",
+          [c.id, outcome],
+        );
+        return result.id;
+      },
+    );
   }
 
   /** Claim durably, commit, then call the provider. No capacity/spend lock spans network I/O. */

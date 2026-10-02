@@ -1,0 +1,62 @@
+{
+  "recordedAt": "2026-10-01T12:17:31.782443Z",
+  "sourceBase": "0d1179980e6d0d3640fd226c485c9d2abffb95ab",
+  "branch": "codex/w2-acceptance",
+  "pipelineRevision": "w2-context-guardrails-10",
+  "sourceSha256": {
+    "apps/backend/src/modules/agent/pipeline.ts": "02eb87c77ed1474760db1aa53d62d52c19cbe752177baa114d0b3fbb7fa15d5f",
+    "apps/web/features/creator-ai/CreatorAI.tsx": "ec7759bfebb5b90fa3ba6f2827fb2e1a59332a11c85c554911724119f863da8b",
+    "apps/web/features/creator-ai/creator-ai.css": "28cce2ee1af0e5c874cb66d424cccf53072d3f6e25f737ff501caa349042137e"
+  },
+  "evidenceSha256": {
+    "preview-revision-recovery.json": "9db01dc1bb44cb16bc7a1e730c1332d8778d7f0086fecc051fa9b258926f9cfb",
+    "citation-data-checkpoint.json": "01b0692720e67ca6610a5f32a988d43f4988c43e85628a2e9503bbe14db08a70",
+    "preview-concurrency.json": "4a1931904818548056bb9a7ad002693e82cec08110ef9f393581235252d8c147",
+    "unsupported-citation-guard-recovery.json": "6dd5ea03bb7029946afc4f10f382796a1ad0cde2ee5c7e4616a28bfa52f9188b",
+    "preview-current-revision.json": "d46cc2654b61456d68abab6f1fb75898e96ed3e9469878a09d3bcb3e507083ee",
+    "companion-citation-correction-evaluation.json": "359d99934f62a8cb8feed79cf997dfd14ce809ccac72e7b9b926da08a633ffa1",
+    "expert-citation-evaluation.json": "4611b459aabca09a72cb69ffa534890e19d713a0255a0a883a5bbe9121ed7cad",
+    "citation-keyboard-continuation.md": "7f686b52df7741834b691605972f3c2dbc390f336ba3d0cad1c6050e0d0d16d5",
+    "citation-integrated-preview.json": "8fa9d77d8792477db7bf1340b73fcfd7fdcafb7ee7fc43ccdc0aa936de60424f",
+    "citation-integrated-preview.png": "4f8fcfcde409ed6a4cf9e28eebe7ecc2844f5f705af1ab058a68428eee310e07",
+    "citation-integrated-data.json": "1f155250224745ff5045266d9980dc2dca27b65732201777a38c2521a5b052a5",
+    "citation-current-data.json": "88c24c33ee4944310d32dc8426cbaf0c49e713b0a7f0359ac069ee2b26a99297",
+    "cross-creator-preview.json": "8701ddfcefb8a2874c548db2026a3db05d824a7b9c6708ba03576e2873313c3f",
+    "cross-creator-preview.png": "f2c6d7ebfe1cdf437b0313acb22bec201eef3e559760ef806b99dc716c114894"
+  },
+  "resourceState": {
+    "webPort": 3002,
+    "apiPort": 4102,
+    "apiPid": 2801,
+    "databasePort": 55442,
+    "nativeDevices": "normally stopped, data retained",
+    "disposableCheckDatabase": "normally stopped, data retained"
+  },
+  "limits": [
+    "synthetic creator-owned material only",
+    "real OpenAI permitted for review; no processor or zero-retention approval",
+    "no actual licensed fan delivery or native live input",
+    "single/two concurrency observations are not p95",
+    "database projection is not RLS experiment"
+  ],
+  "integratedSourceHead": "2386eb25613a749280c32b134f5f06bfda238a2a",
+  "consumedMain": "2824ed4e0079eb1a30ce177439fb3579be955ef9",
+  "currentResourceState": {
+    "webPort": 3002,
+    "apiPort": 4102,
+    "apiPid": 12173,
+    "databasePort": 55442,
+    "nativeDevices": "normally stopped, data retained",
+    "disposableCheckDatabase": "normally stopped, data retained"
+  },
+  "currentDataReceipt": "citation-current-data.json",
+  "checks": {
+    "generation": "12 resources / 96 operations pass",
+    "typecheck": "7/7 pass;13.732s",
+    "lint": "pass",
+    "format": "full root check pass",
+    "build": "6/6 pass;20.999s; existing API no-output warning",
+    "shared": "2/2 pass; earlier in this increment",
+    "backendPG": "new exact published-head CI pending; prior PR23 final-head18/18 pass"
+  }
+}

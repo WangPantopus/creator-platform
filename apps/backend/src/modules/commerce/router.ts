@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { Actor } from "../identity/adapter.js";
 import { DomainError } from "../../core/errors.js";
 import type { CommerceService } from "./service.js";
+import { CreatorEarningsReader } from "./creator-earnings.js";
 
 export function createCommerceRouter(input: {
   service?: CommerceService;
@@ -10,6 +11,9 @@ export function createCommerceRouter(input: {
   extended?: import("./extended.js").ExtendedCommerce;
 }) {
   const router = Router();
+  const earnings = input.service
+    ? new CreatorEarningsReader(input.service)
+    : undefined;
   const service = () => {
     if (!input.service)
       throw new DomainError(
@@ -40,15 +44,44 @@ export function createCommerceRouter(input: {
       passEnabled: input.extended?.pass?.configured ?? false,
       passPurchaseAvailable: input.extended?.passPurchases?.configured ?? false,
       payoutsAvailable: input.extended?.settlement?.configured ?? false,
+      voiceFulfillmentAvailable:
+        input.service?.voiceFulfillmentAvailable ?? false,
+      payoutOnboardingAvailable:
+        input.extended?.settlement?.onboardingConfigured ?? false,
+      creatorEarningsAvailable:
+        input.service?.creatorFinancialReadAvailable ?? false,
+      poolEarningsAvailable: Boolean(
+        input.extended?.poolJournal &&
+          input.service?.creatorFinancialReadAvailable,
+      ),
     }),
   );
   router.get("/overview", async (req, res) => {
+    const actor = await actorFor(req);
     const value = await service().overview(
-      await actorFor(req),
+      actor,
       req.query.creatorId ? id(req.query.creatorId) : undefined,
+      {
+        creatorFinance:
+          req.query.creatorEarnings === "1" || req.query.poolEarnings === "1",
+      },
     );
+    const poolCreator = req.query.creatorId
+      ? id(req.query.creatorId)
+      : value.owned.find((c) => c.verification === "verified")?.id;
     res.json({
       ...value,
+      creatorEarnings:
+        req.query.creatorEarnings === "1" && poolCreator
+          ? await earnings!.read(actor, poolCreator)
+          : null,
+      poolEarnings:
+        req.query.poolEarnings === "1" && poolCreator
+          ? ((await input.extended?.poolJournal?.earnings(
+              actor,
+              poolCreator,
+            )) ?? [])
+          : [],
       tierCatalog:
         (await input.extended?.tiers?.choices(await actorFor(req))) ?? [],
       policy: {
@@ -62,10 +95,53 @@ export function createCommerceRouter(input: {
         ...value.capabilities,
         storePurchasesAvailable: input.extended?.storeConfigured ?? false,
         membershipAvailable: input.extended?.billing?.configured ?? false,
+        voiceFulfillmentAvailable:
+          input.service?.voiceFulfillmentAvailable ?? false,
         passPurchaseAvailable:
           input.extended?.passPurchases?.configured ?? false,
+        creatorEarningsAvailable:
+          input.service?.creatorFinancialReadAvailable ?? false,
+        poolEarningsAvailable: Boolean(
+          input.extended?.poolJournal &&
+            input.service?.creatorFinancialReadAvailable,
+        ),
+        payoutOnboardingAvailable:
+          input.extended?.settlement?.onboardingConfigured ?? false,
       },
     });
+  });
+  router.get("/creators/:creatorId/earnings", async (req, res) => {
+    service();
+    res.json(
+      await earnings!.ledger(
+        await actorFor(req),
+        id(req.params.creatorId),
+        z
+          .string()
+          .regex(/^[A-Z]{3}$/u)
+          .parse(req.query.currency),
+        req.query.cursor === undefined
+          ? undefined
+          : z.string().min(1).max(512).parse(req.query.cursor),
+      ),
+    );
+  });
+  router.post("/creators/:creatorId/payout-onboarding", async (req, res) => {
+    const actor = await actorFor(req);
+    service();
+    if (!input.extended?.settlement)
+      throw new DomainError(
+        "payout_onboarding_unavailable",
+        "Payout verification is not connected yet.",
+        503,
+      );
+    res.json(
+      await input.extended.settlement.onboarding.start(
+        actor,
+        id(req.params.creatorId),
+        req.body,
+      ),
+    );
   });
   router.post("/packets/:packetId/reconcile-money", async (req, res) => {
     if (!input.extended?.money)
