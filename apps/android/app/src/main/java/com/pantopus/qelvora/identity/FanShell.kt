@@ -242,7 +242,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
 class FanFeatureRegistration(val matches: (String) -> Boolean, val allowsSignedOut: (String) -> Boolean = { false }, val screen: @Composable (FanSession) -> Unit)
 
 @Composable
-fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/home", features: List<FanFeatureRegistration> = emptyList(), destinationDelivery: Long = 0L, notificationID: String? = null, onNotificationConsumed: () -> Unit = {}) {
+fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/home", features: List<FanFeatureRegistration> = emptyList(), destinationDelivery: Long = 0L) {
     val model = remember(baseURL) { FanSession(context, baseURL, returnTo) }; val scope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
     var foreground by remember(lifecycleOwner) { mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
@@ -254,18 +254,6 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
     LaunchedEffect(returnTo, destinationDelivery) { model.open(returnTo) }
     LaunchedEffect(model.destination) { model.loadArrival() }
     LaunchedEffect(model, foreground) { if (foreground) { model.refresh(); while (true) { delay(4000); if (!model.choosingActor && !model.busy && (model.session != null || model.hasSavedCredential)) model.refresh() } } }
-    LaunchedEffect(model.session) { GrowthPush.refresh(context) }
-    LaunchedEffect(notificationID, destinationDelivery, model.session?.accountId) {
-        val id = notificationID ?: return@LaunchedEffect
-        if (model.session == null) return@LaunchedEffect
-        val captured = runCatching { model.currentToken() }.getOrNull() ?: return@LaunchedEffect
-        val sameCredential = { runCatching { model.currentToken() }.getOrNull() == captured }
-        val origin = baseURL ?: return@LaunchedEffect
-        try { val target = GrowthPush.resolveTap(GrowthClient(origin, model::currentToken), id, captured); if (sameCredential()) model.open(target) }
-        catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-        catch (_: Exception) { if (sameCredential()) { model.open("/notifications"); model.error = QelvoraCopy.text("growthUpdateUnavailable") } }
-        finally { if (sameCredential()) onNotificationConsumed() }
-    }
     Column(Modifier.fillMaxSize().background(qColor("ground")).windowInsetsPadding(WindowInsets.safeDrawing)) {
         if (model.error.isNotEmpty()) Notice("error", "Account status", model.error)
         if (model.localPurgeFailed) Button(QelvoraCopy.text("identityPrivateClearRetry"), ButtonVariant.SECONDARY, block = true, disabled = model.busy || model.purgingPrivateState) { scope.launch { model.purge() } }
