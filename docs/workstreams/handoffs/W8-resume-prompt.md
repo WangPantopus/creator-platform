@@ -1,5 +1,7 @@
 # W8 resume prompt — complete the workstream
 
+**Development role guard — 2026-10-02:** [Actual role/browser receipt](../../../artifacts/workstreams/W8/development-trust/20261002-composite/README.md) verifies optional exact `TRUST_CORE_DATABASE_ROLE`, only inherited core/Growth request roles, full reachable-role/ownership/direct-grant rejection and separate Trust pools. Worker-bearing and direct-private-grant hosts are refused before listen; the real browser re-authenticated and displayed saved own support state. W1 keeps the core NOINHERIT and uses a separate Growth/Content pool; this helper override is off by default. No migration activation, Follow/proof/reply approval, authenticated native or C10/provider/recovery completion. W8 services stopped, data retained.
+
 ## Latest update — exact reply review
 
 Continue branch `codex/w8-durable-reply-review` and [its receipt](../../../artifacts/workstreams/W8/reply-review/20261001-mac-studio/README.md). Source implements durable Ops review, but actual passkeys/begin403 fresh_proof_required prevented signing a Note; never infer external proof from seeded verification. Runtime-replyreview.env targets separate synthetic clone creator_w8_replyreview_20261002; services are stopped, data retained. Source reviewer consumes W5 held-client f4dd6a0e and W1 actors05208ebe.0069 is experimental only; registry40 unchanged. PR75 development Trust is draft pending genuine proof/native/full-host acceptance. PR73 proposal is normally merged6144c6b3, not applied SQL.

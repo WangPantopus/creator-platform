@@ -1,5 +1,7 @@
 # W8 contract, migration and runtime register
 
+**Development role guard — 2026-10-02:** [Actual role/browser receipt](../../../artifacts/workstreams/W8/development-trust/20261002-composite/README.md) verifies optional exact `TRUST_CORE_DATABASE_ROLE`, only inherited core/Growth request roles, full reachable-role/ownership/direct-grant rejection and separate Trust pools. Worker-bearing and direct-private-grant hosts are refused before listen; the real browser re-authenticated and displayed saved own support state. W1 keeps the core NOINHERIT and uses a separate Growth/Content pool; this helper override is off by default. No migration activation, Follow/proof/reply approval, authenticated native or C10/provider/recovery completion. W8 services stopped, data retained.
+
 ## Exact Note reply review and new reservations — 2026-10-01
 
 `createTrustReplyReviewer()` from `modules/trust/reply-review.ts` returns `(client, input) => Promise<{state:pending|allowed|flagged,reference,textHash}>`. W5 invokes it after the actual reply INSERT and on actual retry, inside the same held transaction and its unavailable-result savepoint. Actual author/session/scope denial is401/403/410; changed tuple409. No separate pool or request-style ThreadScope. Hash is `contentHash({replyId,creatorId,fanId,version,text})`, not SHA256(text). Use genuine requestAuthority and READ COMMITTED.
