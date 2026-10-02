@@ -1,0 +1,14 @@
+{
+  "source": "b6c073aef97b2ea7c06847b4baa9914d9bce06b7",
+  "completeFreshAndPreservedCustodyVerified": true,
+  "originalFixtureDataStillPending": true,
+  "financialRows": 0,
+  "pendingProofs": 1,
+  "verifiedCreators": 0,
+  "opsCases": 0,
+  "unfinishedPrivateScopes": 0,
+  "nonOwnerConnectionsAdmittedForClosedAppCheck": true,
+  "restoredTrafficMarkerStillClosed": true,
+  "applicationAccepted": false,
+  "releaseReady": false
+}

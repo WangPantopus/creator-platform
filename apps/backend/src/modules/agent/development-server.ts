@@ -1,6 +1,9 @@
 /** Isolated W2 launcher. Canonical W1 sessions and W3 conversations share the
  * actual runtime pool; missing licensing/policy/journal never enables delivery. */
-import { createConfiguredBackend } from "../../integration.js";
+import {
+  createConfiguredBackend,
+  type BackendRuntime,
+} from "../../integration.js";
 import { readConfig } from "../../config.js";
 import { DevelopmentIdentityAdapter } from "../identity/development.js";
 import { createConversationRuntime } from "../conversation/runtime.js";
@@ -8,6 +11,7 @@ import { modelFromEnvironment } from "./model.js";
 import { createAgentDomain } from "./integration.js";
 import { agentFeature } from "./feature.js";
 import { DevelopmentLicenseVerifier } from "./development-license.js";
+import { createDevelopmentTrust } from "../trust/development.js";
 
 if (
   process.env.NODE_ENV !== "development" ||
@@ -41,6 +45,26 @@ const config = readConfig({
 });
 let domain: ReturnType<typeof createAgentDomain> | undefined;
 let conversations: ReturnType<typeof createConversationRuntime> | undefined;
+// Trust is prepared before feature registration. Both consume this exact
+// owner instance so privacy and pause effects cannot drift from Studio.
+const prepareDomain = (runtime: BackendRuntime) => {
+  if (domain) return domain;
+  const licenseVerifier =
+    process.env.W2_DEVELOPMENT_SYNTHETIC_LICENSING === "true"
+      ? DevelopmentLicenseVerifier.create(runtime.pool, {
+          environment: process.env.NODE_ENV,
+          enabled: process.env.W2_DEVELOPMENT_SYNTHETIC_LICENSING,
+          identityMode: identity.mode,
+          webOrigin,
+        })
+      : undefined;
+  domain = createAgentDomain({
+    pool: runtime.pool,
+    model,
+    ...(licenseVerifier ? { licenseVerifier } : {}),
+  });
+  return domain;
+};
 const backend = await createConfiguredBackend({
   config,
   identity,
@@ -49,22 +73,23 @@ const backend = await createConfiguredBackend({
       throw new Error("Licensed fan generation is unconfigured.");
     },
   },
+  ...(process.env.TRUST_LOCAL_DEVELOPMENT === "true"
+    ? {
+        trust: (runtime: BackendRuntime) =>
+          createDevelopmentTrust(runtime, {
+            // Restoration must bind to the same validated W2 endpoint used
+            // by readConfig, rather than an unrelated ambient DATABASE_URL.
+            env: { ...process.env, DATABASE_URL: dbUrl },
+            agent: prepareDomain(runtime),
+            consumers: {
+              assertRestoredInTransaction: runtime.assertRestoredInTransaction,
+            },
+          }),
+      }
+    : {}),
   registerFeatures: async (runtime) => {
     // Opt-in labeled licensing for fictional development creators only.
-    const licenseVerifier =
-      process.env.W2_DEVELOPMENT_SYNTHETIC_LICENSING === "true"
-        ? DevelopmentLicenseVerifier.create(runtime.pool, {
-            environment: process.env.NODE_ENV,
-            enabled: process.env.W2_DEVELOPMENT_SYNTHETIC_LICENSING,
-            identityMode: identity.mode,
-            webOrigin,
-          })
-        : undefined;
-    domain = createAgentDomain({
-      pool: runtime.pool,
-      model,
-      ...(licenseVerifier ? { licenseVerifier } : {}),
-    });
+    domain = prepareDomain(runtime);
     await domain.service.repository.assertRuntimeRole();
     conversations = createConversationRuntime(runtime);
     runtime.configureSignedSubjects(conversations.signedSubjectPolicies);

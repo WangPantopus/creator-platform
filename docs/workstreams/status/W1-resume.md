@@ -159,6 +159,8 @@ W1 personally resolves DI09's initial Handle timing through the governing Produc
 
 The second logical database `creator_w1_onboarding_20261001` is W1-only interactive state in the existing 55451 container. All40 active migrations were applied; no original or peer state was restored/reset. The original proof-recovery database remains retained. No conversation, processor consent, creator approval, passkey or signed act was fabricated. Exact source/build/environment qualifications are in the manifest. Current-head Code Review CI remains unavailable pending a connected GitHub account; no hosted pass or merge is claimed.
 
+October 2 focused main increment: actual Ops/Account/Status return handling and truthful no-fan Account are implemented and personally browser-operated at cac6be9c on an independently restored, labelled canonical57 development copy. Same actual expired session rotates and returns to audits; Ops denies without membership. Original W1 remains closed. Production build/types/canonical generation/scoped checks pass; native/full workstream acceptance remains open. [Exact bounded evidence](../../../artifacts/workstreams/W1/resume/2026-10-02-ops-return/run.md).
+
 ## October 1, 2026 — full W1 resumed after centralized cleanup
 
 The entire original seven-group assignment and H01–H20 remain active. The October1 cleanup supersedes every historical lease/retained-data table below. Current main is `2f0319dbb6979878c5a9019e68503506902f9ea0`; original `5e104cd` is an ancestor. The preferred W1 checkout is absent; this clean `0516` checkout uses `codex/w1-resume-20261001`. No peer checkout was changed. There were zero open PRs at fetch.
