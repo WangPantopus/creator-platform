@@ -2014,8 +2014,9 @@ public struct APIContentDocument: Codable, Sendable {
   public let `scheduledAt`: String?
   public let `quote`: APIContentDocumentQuote?
   public let `packetId`: String?
+  public let `planRef`: APIContentDocumentPlanRef?
   public let `live`: APIContentDocumentLive?
-  public init(kind: APIContentDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentDocumentQuote? = nil, packetId: String? = nil, live: APIContentDocumentLive? = nil) {
+  public init(kind: APIContentDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentDocumentQuote? = nil, packetId: String? = nil, planRef: APIContentDocumentPlanRef? = nil, live: APIContentDocumentLive? = nil) {
     self.kind = kind
     self.title = title
     self.text = text
@@ -2027,6 +2028,7 @@ public struct APIContentDocument: Codable, Sendable {
     self.scheduledAt = scheduledAt
     self.quote = quote
     self.packetId = packetId
+    self.planRef = planRef
     self.live = live
   }
   private enum CodingKeys: String, CodingKey {
@@ -2041,6 +2043,7 @@ public struct APIContentDocument: Codable, Sendable {
     case `scheduledAt`
     case `quote`
     case `packetId`
+    case `planRef`
     case `live`
   }
   public init(from decoder: Decoder) throws {
@@ -2056,6 +2059,7 @@ public struct APIContentDocument: Codable, Sendable {
     self.scheduledAt = try container.decode(String?.self, forKey: .scheduledAt)
     self.quote = try container.decode(APIContentDocumentQuote?.self, forKey: .quote)
     self.packetId = try container.decode(String?.self, forKey: .packetId)
+    self.planRef = try container.decodeIfPresent(APIContentDocumentPlanRef.self, forKey: .planRef)
     self.live = try container.decodeIfPresent(APIContentDocumentLive.self, forKey: .live)
   }
   public func encode(to encoder: Encoder) throws {
@@ -2071,6 +2075,7 @@ public struct APIContentDocument: Codable, Sendable {
     try container.encode(scheduledAt, forKey: .scheduledAt)
     try container.encode(quote, forKey: .quote)
     try container.encode(packetId, forKey: .packetId)
+    try container.encodeIfPresent(planRef, forKey: .planRef)
     try container.encodeIfPresent(live, forKey: .live)
   }
 }
@@ -2111,6 +2116,17 @@ public struct APIContentDocumentQuote: Codable, Sendable {
   public init(replyId: String, consentVersion: Int) {
     self.replyId = replyId
     self.consentVersion = consentVersion
+  }
+}
+
+public struct APIContentDocumentPlanRef: Codable, Sendable {
+  public let `id`: String
+  public let `revision`: Int
+  public let `hash`: String
+  public init(id: String, revision: Int, hash: String) {
+    self.id = id
+    self.revision = revision
+    self.hash = hash
   }
 }
 
@@ -2305,8 +2321,9 @@ public struct APIContentListItemsItemDocument: Codable, Sendable {
   public let `scheduledAt`: String?
   public let `quote`: APIContentListItemsItemDocumentQuote?
   public let `packetId`: String?
+  public let `planRef`: APIContentListItemsItemDocumentPlanRef?
   public let `live`: APIContentListItemsItemDocumentLive?
-  public init(kind: APIContentListItemsItemDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentListItemsItemDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentListItemsItemDocumentQuote? = nil, packetId: String? = nil, live: APIContentListItemsItemDocumentLive? = nil) {
+  public init(kind: APIContentListItemsItemDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentListItemsItemDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentListItemsItemDocumentQuote? = nil, packetId: String? = nil, planRef: APIContentListItemsItemDocumentPlanRef? = nil, live: APIContentListItemsItemDocumentLive? = nil) {
     self.kind = kind
     self.title = title
     self.text = text
@@ -2318,6 +2335,7 @@ public struct APIContentListItemsItemDocument: Codable, Sendable {
     self.scheduledAt = scheduledAt
     self.quote = quote
     self.packetId = packetId
+    self.planRef = planRef
     self.live = live
   }
   private enum CodingKeys: String, CodingKey {
@@ -2332,6 +2350,7 @@ public struct APIContentListItemsItemDocument: Codable, Sendable {
     case `scheduledAt`
     case `quote`
     case `packetId`
+    case `planRef`
     case `live`
   }
   public init(from decoder: Decoder) throws {
@@ -2347,6 +2366,7 @@ public struct APIContentListItemsItemDocument: Codable, Sendable {
     self.scheduledAt = try container.decode(String?.self, forKey: .scheduledAt)
     self.quote = try container.decode(APIContentListItemsItemDocumentQuote?.self, forKey: .quote)
     self.packetId = try container.decode(String?.self, forKey: .packetId)
+    self.planRef = try container.decodeIfPresent(APIContentListItemsItemDocumentPlanRef.self, forKey: .planRef)
     self.live = try container.decodeIfPresent(APIContentListItemsItemDocumentLive.self, forKey: .live)
   }
   public func encode(to encoder: Encoder) throws {
@@ -2362,6 +2382,7 @@ public struct APIContentListItemsItemDocument: Codable, Sendable {
     try container.encode(scheduledAt, forKey: .scheduledAt)
     try container.encode(quote, forKey: .quote)
     try container.encode(packetId, forKey: .packetId)
+    try container.encodeIfPresent(planRef, forKey: .planRef)
     try container.encodeIfPresent(live, forKey: .live)
   }
 }
@@ -2402,6 +2423,17 @@ public struct APIContentListItemsItemDocumentQuote: Codable, Sendable {
   public init(replyId: String, consentVersion: Int) {
     self.replyId = replyId
     self.consentVersion = consentVersion
+  }
+}
+
+public struct APIContentListItemsItemDocumentPlanRef: Codable, Sendable {
+  public let `id`: String
+  public let `revision`: Int
+  public let `hash`: String
+  public init(id: String, revision: Int, hash: String) {
+    self.id = id
+    self.revision = revision
+    self.hash = hash
   }
 }
 
@@ -3099,8 +3131,9 @@ public struct APIContentViewDocument: Codable, Sendable {
   public let `scheduledAt`: String?
   public let `quote`: APIContentViewDocumentQuote?
   public let `packetId`: String?
+  public let `planRef`: APIContentViewDocumentPlanRef?
   public let `live`: APIContentViewDocumentLive?
-  public init(kind: APIContentViewDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentViewDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentViewDocumentQuote? = nil, packetId: String? = nil, live: APIContentViewDocumentLive? = nil) {
+  public init(kind: APIContentViewDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentViewDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentViewDocumentQuote? = nil, packetId: String? = nil, planRef: APIContentViewDocumentPlanRef? = nil, live: APIContentViewDocumentLive? = nil) {
     self.kind = kind
     self.title = title
     self.text = text
@@ -3112,6 +3145,7 @@ public struct APIContentViewDocument: Codable, Sendable {
     self.scheduledAt = scheduledAt
     self.quote = quote
     self.packetId = packetId
+    self.planRef = planRef
     self.live = live
   }
   private enum CodingKeys: String, CodingKey {
@@ -3126,6 +3160,7 @@ public struct APIContentViewDocument: Codable, Sendable {
     case `scheduledAt`
     case `quote`
     case `packetId`
+    case `planRef`
     case `live`
   }
   public init(from decoder: Decoder) throws {
@@ -3141,6 +3176,7 @@ public struct APIContentViewDocument: Codable, Sendable {
     self.scheduledAt = try container.decode(String?.self, forKey: .scheduledAt)
     self.quote = try container.decode(APIContentViewDocumentQuote?.self, forKey: .quote)
     self.packetId = try container.decode(String?.self, forKey: .packetId)
+    self.planRef = try container.decodeIfPresent(APIContentViewDocumentPlanRef.self, forKey: .planRef)
     self.live = try container.decodeIfPresent(APIContentViewDocumentLive.self, forKey: .live)
   }
   public func encode(to encoder: Encoder) throws {
@@ -3156,6 +3192,7 @@ public struct APIContentViewDocument: Codable, Sendable {
     try container.encode(scheduledAt, forKey: .scheduledAt)
     try container.encode(quote, forKey: .quote)
     try container.encode(packetId, forKey: .packetId)
+    try container.encodeIfPresent(planRef, forKey: .planRef)
     try container.encodeIfPresent(live, forKey: .live)
   }
 }
@@ -3196,6 +3233,17 @@ public struct APIContentViewDocumentQuote: Codable, Sendable {
   public init(replyId: String, consentVersion: Int) {
     self.replyId = replyId
     self.consentVersion = consentVersion
+  }
+}
+
+public struct APIContentViewDocumentPlanRef: Codable, Sendable {
+  public let `id`: String
+  public let `revision`: Int
+  public let `hash`: String
+  public init(id: String, revision: Int, hash: String) {
+    self.id = id
+    self.revision = revision
+    self.hash = hash
   }
 }
 
@@ -3566,8 +3614,9 @@ public struct APISaveContentDocument: Codable, Sendable {
   public let `scheduledAt`: String?
   public let `quote`: APISaveContentDocumentQuote?
   public let `packetId`: String?
+  public let `planRef`: APISaveContentDocumentPlanRef?
   public let `live`: APISaveContentDocumentLive?
-  public init(kind: APISaveContentDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APISaveContentDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APISaveContentDocumentQuote? = nil, packetId: String? = nil, live: APISaveContentDocumentLive? = nil) {
+  public init(kind: APISaveContentDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APISaveContentDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APISaveContentDocumentQuote? = nil, packetId: String? = nil, planRef: APISaveContentDocumentPlanRef? = nil, live: APISaveContentDocumentLive? = nil) {
     self.kind = kind
     self.title = title
     self.text = text
@@ -3579,6 +3628,7 @@ public struct APISaveContentDocument: Codable, Sendable {
     self.scheduledAt = scheduledAt
     self.quote = quote
     self.packetId = packetId
+    self.planRef = planRef
     self.live = live
   }
   private enum CodingKeys: String, CodingKey {
@@ -3593,6 +3643,7 @@ public struct APISaveContentDocument: Codable, Sendable {
     case `scheduledAt`
     case `quote`
     case `packetId`
+    case `planRef`
     case `live`
   }
   public init(from decoder: Decoder) throws {
@@ -3608,6 +3659,7 @@ public struct APISaveContentDocument: Codable, Sendable {
     self.scheduledAt = try container.decode(String?.self, forKey: .scheduledAt)
     self.quote = try container.decode(APISaveContentDocumentQuote?.self, forKey: .quote)
     self.packetId = try container.decode(String?.self, forKey: .packetId)
+    self.planRef = try container.decodeIfPresent(APISaveContentDocumentPlanRef.self, forKey: .planRef)
     self.live = try container.decodeIfPresent(APISaveContentDocumentLive.self, forKey: .live)
   }
   public func encode(to encoder: Encoder) throws {
@@ -3623,6 +3675,7 @@ public struct APISaveContentDocument: Codable, Sendable {
     try container.encode(scheduledAt, forKey: .scheduledAt)
     try container.encode(quote, forKey: .quote)
     try container.encode(packetId, forKey: .packetId)
+    try container.encodeIfPresent(planRef, forKey: .planRef)
     try container.encodeIfPresent(live, forKey: .live)
   }
 }
@@ -3663,6 +3716,17 @@ public struct APISaveContentDocumentQuote: Codable, Sendable {
   public init(replyId: String, consentVersion: Int) {
     self.replyId = replyId
     self.consentVersion = consentVersion
+  }
+}
+
+public struct APISaveContentDocumentPlanRef: Codable, Sendable {
+  public let `id`: String
+  public let `revision`: Int
+  public let `hash`: String
+  public init(id: String, revision: Int, hash: String) {
+    self.id = id
+    self.revision = revision
+    self.hash = hash
   }
 }
 
@@ -4297,8 +4361,9 @@ public struct APIContentReviewViewDocument: Codable, Sendable {
   public let `scheduledAt`: String?
   public let `quote`: APIContentReviewViewDocumentQuote?
   public let `packetId`: String?
+  public let `planRef`: APIContentReviewViewDocumentPlanRef?
   public let `live`: APIContentReviewViewDocumentLive?
-  public init(kind: APIContentReviewViewDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentReviewViewDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentReviewViewDocumentQuote? = nil, packetId: String? = nil, live: APIContentReviewViewDocumentLive? = nil) {
+  public init(kind: APIContentReviewViewDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentReviewViewDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentReviewViewDocumentQuote? = nil, packetId: String? = nil, planRef: APIContentReviewViewDocumentPlanRef? = nil, live: APIContentReviewViewDocumentLive? = nil) {
     self.kind = kind
     self.title = title
     self.text = text
@@ -4310,6 +4375,7 @@ public struct APIContentReviewViewDocument: Codable, Sendable {
     self.scheduledAt = scheduledAt
     self.quote = quote
     self.packetId = packetId
+    self.planRef = planRef
     self.live = live
   }
   private enum CodingKeys: String, CodingKey {
@@ -4324,6 +4390,7 @@ public struct APIContentReviewViewDocument: Codable, Sendable {
     case `scheduledAt`
     case `quote`
     case `packetId`
+    case `planRef`
     case `live`
   }
   public init(from decoder: Decoder) throws {
@@ -4339,6 +4406,7 @@ public struct APIContentReviewViewDocument: Codable, Sendable {
     self.scheduledAt = try container.decode(String?.self, forKey: .scheduledAt)
     self.quote = try container.decode(APIContentReviewViewDocumentQuote?.self, forKey: .quote)
     self.packetId = try container.decode(String?.self, forKey: .packetId)
+    self.planRef = try container.decodeIfPresent(APIContentReviewViewDocumentPlanRef.self, forKey: .planRef)
     self.live = try container.decodeIfPresent(APIContentReviewViewDocumentLive.self, forKey: .live)
   }
   public func encode(to encoder: Encoder) throws {
@@ -4354,6 +4422,7 @@ public struct APIContentReviewViewDocument: Codable, Sendable {
     try container.encode(scheduledAt, forKey: .scheduledAt)
     try container.encode(quote, forKey: .quote)
     try container.encode(packetId, forKey: .packetId)
+    try container.encodeIfPresent(planRef, forKey: .planRef)
     try container.encodeIfPresent(live, forKey: .live)
   }
 }
@@ -4394,6 +4463,17 @@ public struct APIContentReviewViewDocumentQuote: Codable, Sendable {
   public init(replyId: String, consentVersion: Int) {
     self.replyId = replyId
     self.consentVersion = consentVersion
+  }
+}
+
+public struct APIContentReviewViewDocumentPlanRef: Codable, Sendable {
+  public let `id`: String
+  public let `revision`: Int
+  public let `hash`: String
+  public init(id: String, revision: Int, hash: String) {
+    self.id = id
+    self.revision = revision
+    self.hash = hash
   }
 }
 
@@ -6951,8 +7031,9 @@ public struct APIContentContentDocument: Codable, Sendable {
   public let `scheduledAt`: String?
   public let `quote`: APIContentContentDocumentQuote?
   public let `packetId`: String?
+  public let `planRef`: APIContentContentDocumentPlanRef?
   public let `live`: APIContentContentDocumentLive?
-  public init(kind: APIContentContentDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentContentDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentContentDocumentQuote? = nil, packetId: String? = nil, live: APIContentContentDocumentLive? = nil) {
+  public init(kind: APIContentContentDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentContentDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentContentDocumentQuote? = nil, packetId: String? = nil, planRef: APIContentContentDocumentPlanRef? = nil, live: APIContentContentDocumentLive? = nil) {
     self.kind = kind
     self.title = title
     self.text = text
@@ -6964,6 +7045,7 @@ public struct APIContentContentDocument: Codable, Sendable {
     self.scheduledAt = scheduledAt
     self.quote = quote
     self.packetId = packetId
+    self.planRef = planRef
     self.live = live
   }
   private enum CodingKeys: String, CodingKey {
@@ -6978,6 +7060,7 @@ public struct APIContentContentDocument: Codable, Sendable {
     case `scheduledAt`
     case `quote`
     case `packetId`
+    case `planRef`
     case `live`
   }
   public init(from decoder: Decoder) throws {
@@ -6993,6 +7076,7 @@ public struct APIContentContentDocument: Codable, Sendable {
     self.scheduledAt = try container.decode(String?.self, forKey: .scheduledAt)
     self.quote = try container.decode(APIContentContentDocumentQuote?.self, forKey: .quote)
     self.packetId = try container.decode(String?.self, forKey: .packetId)
+    self.planRef = try container.decodeIfPresent(APIContentContentDocumentPlanRef.self, forKey: .planRef)
     self.live = try container.decodeIfPresent(APIContentContentDocumentLive.self, forKey: .live)
   }
   public func encode(to encoder: Encoder) throws {
@@ -7008,6 +7092,7 @@ public struct APIContentContentDocument: Codable, Sendable {
     try container.encode(scheduledAt, forKey: .scheduledAt)
     try container.encode(quote, forKey: .quote)
     try container.encode(packetId, forKey: .packetId)
+    try container.encodeIfPresent(planRef, forKey: .planRef)
     try container.encodeIfPresent(live, forKey: .live)
   }
 }
@@ -7048,6 +7133,17 @@ public struct APIContentContentDocumentQuote: Codable, Sendable {
   public init(replyId: String, consentVersion: Int) {
     self.replyId = replyId
     self.consentVersion = consentVersion
+  }
+}
+
+public struct APIContentContentDocumentPlanRef: Codable, Sendable {
+  public let `id`: String
+  public let `revision`: Int
+  public let `hash`: String
+  public init(id: String, revision: Int, hash: String) {
+    self.id = id
+    self.revision = revision
+    self.hash = hash
   }
 }
 
@@ -7242,8 +7338,9 @@ public struct APIContentContentListItemsItemDocument: Codable, Sendable {
   public let `scheduledAt`: String?
   public let `quote`: APIContentContentListItemsItemDocumentQuote?
   public let `packetId`: String?
+  public let `planRef`: APIContentContentListItemsItemDocumentPlanRef?
   public let `live`: APIContentContentListItemsItemDocumentLive?
-  public init(kind: APIContentContentListItemsItemDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentContentListItemsItemDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentContentListItemsItemDocumentQuote? = nil, packetId: String? = nil, live: APIContentContentListItemsItemDocumentLive? = nil) {
+  public init(kind: APIContentContentListItemsItemDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentContentListItemsItemDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentContentListItemsItemDocumentQuote? = nil, packetId: String? = nil, planRef: APIContentContentListItemsItemDocumentPlanRef? = nil, live: APIContentContentListItemsItemDocumentLive? = nil) {
     self.kind = kind
     self.title = title
     self.text = text
@@ -7255,6 +7352,7 @@ public struct APIContentContentListItemsItemDocument: Codable, Sendable {
     self.scheduledAt = scheduledAt
     self.quote = quote
     self.packetId = packetId
+    self.planRef = planRef
     self.live = live
   }
   private enum CodingKeys: String, CodingKey {
@@ -7269,6 +7367,7 @@ public struct APIContentContentListItemsItemDocument: Codable, Sendable {
     case `scheduledAt`
     case `quote`
     case `packetId`
+    case `planRef`
     case `live`
   }
   public init(from decoder: Decoder) throws {
@@ -7284,6 +7383,7 @@ public struct APIContentContentListItemsItemDocument: Codable, Sendable {
     self.scheduledAt = try container.decode(String?.self, forKey: .scheduledAt)
     self.quote = try container.decode(APIContentContentListItemsItemDocumentQuote?.self, forKey: .quote)
     self.packetId = try container.decode(String?.self, forKey: .packetId)
+    self.planRef = try container.decodeIfPresent(APIContentContentListItemsItemDocumentPlanRef.self, forKey: .planRef)
     self.live = try container.decodeIfPresent(APIContentContentListItemsItemDocumentLive.self, forKey: .live)
   }
   public func encode(to encoder: Encoder) throws {
@@ -7299,6 +7399,7 @@ public struct APIContentContentListItemsItemDocument: Codable, Sendable {
     try container.encode(scheduledAt, forKey: .scheduledAt)
     try container.encode(quote, forKey: .quote)
     try container.encode(packetId, forKey: .packetId)
+    try container.encodeIfPresent(planRef, forKey: .planRef)
     try container.encodeIfPresent(live, forKey: .live)
   }
 }
@@ -7339,6 +7440,17 @@ public struct APIContentContentListItemsItemDocumentQuote: Codable, Sendable {
   public init(replyId: String, consentVersion: Int) {
     self.replyId = replyId
     self.consentVersion = consentVersion
+  }
+}
+
+public struct APIContentContentListItemsItemDocumentPlanRef: Codable, Sendable {
+  public let `id`: String
+  public let `revision`: Int
+  public let `hash`: String
+  public init(id: String, revision: Int, hash: String) {
+    self.id = id
+    self.revision = revision
+    self.hash = hash
   }
 }
 
@@ -8036,8 +8148,9 @@ public struct APIContentContentViewDocument: Codable, Sendable {
   public let `scheduledAt`: String?
   public let `quote`: APIContentContentViewDocumentQuote?
   public let `packetId`: String?
+  public let `planRef`: APIContentContentViewDocumentPlanRef?
   public let `live`: APIContentContentViewDocumentLive?
-  public init(kind: APIContentContentViewDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentContentViewDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentContentViewDocumentQuote? = nil, packetId: String? = nil, live: APIContentContentViewDocumentLive? = nil) {
+  public init(kind: APIContentContentViewDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentContentViewDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentContentViewDocumentQuote? = nil, packetId: String? = nil, planRef: APIContentContentViewDocumentPlanRef? = nil, live: APIContentContentViewDocumentLive? = nil) {
     self.kind = kind
     self.title = title
     self.text = text
@@ -8049,6 +8162,7 @@ public struct APIContentContentViewDocument: Codable, Sendable {
     self.scheduledAt = scheduledAt
     self.quote = quote
     self.packetId = packetId
+    self.planRef = planRef
     self.live = live
   }
   private enum CodingKeys: String, CodingKey {
@@ -8063,6 +8177,7 @@ public struct APIContentContentViewDocument: Codable, Sendable {
     case `scheduledAt`
     case `quote`
     case `packetId`
+    case `planRef`
     case `live`
   }
   public init(from decoder: Decoder) throws {
@@ -8078,6 +8193,7 @@ public struct APIContentContentViewDocument: Codable, Sendable {
     self.scheduledAt = try container.decode(String?.self, forKey: .scheduledAt)
     self.quote = try container.decode(APIContentContentViewDocumentQuote?.self, forKey: .quote)
     self.packetId = try container.decode(String?.self, forKey: .packetId)
+    self.planRef = try container.decodeIfPresent(APIContentContentViewDocumentPlanRef.self, forKey: .planRef)
     self.live = try container.decodeIfPresent(APIContentContentViewDocumentLive.self, forKey: .live)
   }
   public func encode(to encoder: Encoder) throws {
@@ -8093,6 +8209,7 @@ public struct APIContentContentViewDocument: Codable, Sendable {
     try container.encode(scheduledAt, forKey: .scheduledAt)
     try container.encode(quote, forKey: .quote)
     try container.encode(packetId, forKey: .packetId)
+    try container.encodeIfPresent(planRef, forKey: .planRef)
     try container.encodeIfPresent(live, forKey: .live)
   }
 }
@@ -8133,6 +8250,17 @@ public struct APIContentContentViewDocumentQuote: Codable, Sendable {
   public init(replyId: String, consentVersion: Int) {
     self.replyId = replyId
     self.consentVersion = consentVersion
+  }
+}
+
+public struct APIContentContentViewDocumentPlanRef: Codable, Sendable {
+  public let `id`: String
+  public let `revision`: Int
+  public let `hash`: String
+  public init(id: String, revision: Int, hash: String) {
+    self.id = id
+    self.revision = revision
+    self.hash = hash
   }
 }
 
@@ -8503,8 +8631,9 @@ public struct APIContentSaveContentDocument: Codable, Sendable {
   public let `scheduledAt`: String?
   public let `quote`: APIContentSaveContentDocumentQuote?
   public let `packetId`: String?
+  public let `planRef`: APIContentSaveContentDocumentPlanRef?
   public let `live`: APIContentSaveContentDocumentLive?
-  public init(kind: APIContentSaveContentDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentSaveContentDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentSaveContentDocumentQuote? = nil, packetId: String? = nil, live: APIContentSaveContentDocumentLive? = nil) {
+  public init(kind: APIContentSaveContentDocumentKind, title: String, text: String, audience: APIJSONValue, media: [APIContentSaveContentDocumentMediaItem], nameToken: Bool, showAudienceCount: Bool, aiUseIntent: Bool, scheduledAt: String? = nil, quote: APIContentSaveContentDocumentQuote? = nil, packetId: String? = nil, planRef: APIContentSaveContentDocumentPlanRef? = nil, live: APIContentSaveContentDocumentLive? = nil) {
     self.kind = kind
     self.title = title
     self.text = text
@@ -8516,6 +8645,7 @@ public struct APIContentSaveContentDocument: Codable, Sendable {
     self.scheduledAt = scheduledAt
     self.quote = quote
     self.packetId = packetId
+    self.planRef = planRef
     self.live = live
   }
   private enum CodingKeys: String, CodingKey {
@@ -8530,6 +8660,7 @@ public struct APIContentSaveContentDocument: Codable, Sendable {
     case `scheduledAt`
     case `quote`
     case `packetId`
+    case `planRef`
     case `live`
   }
   public init(from decoder: Decoder) throws {
@@ -8545,6 +8676,7 @@ public struct APIContentSaveContentDocument: Codable, Sendable {
     self.scheduledAt = try container.decode(String?.self, forKey: .scheduledAt)
     self.quote = try container.decode(APIContentSaveContentDocumentQuote?.self, forKey: .quote)
     self.packetId = try container.decode(String?.self, forKey: .packetId)
+    self.planRef = try container.decodeIfPresent(APIContentSaveContentDocumentPlanRef.self, forKey: .planRef)
     self.live = try container.decodeIfPresent(APIContentSaveContentDocumentLive.self, forKey: .live)
   }
   public func encode(to encoder: Encoder) throws {
@@ -8560,6 +8692,7 @@ public struct APIContentSaveContentDocument: Codable, Sendable {
     try container.encode(scheduledAt, forKey: .scheduledAt)
     try container.encode(quote, forKey: .quote)
     try container.encode(packetId, forKey: .packetId)
+    try container.encodeIfPresent(planRef, forKey: .planRef)
     try container.encodeIfPresent(live, forKey: .live)
   }
 }
@@ -8600,6 +8733,17 @@ public struct APIContentSaveContentDocumentQuote: Codable, Sendable {
   public init(replyId: String, consentVersion: Int) {
     self.replyId = replyId
     self.consentVersion = consentVersion
+  }
+}
+
+public struct APIContentSaveContentDocumentPlanRef: Codable, Sendable {
+  public let `id`: String
+  public let `revision`: Int
+  public let `hash`: String
+  public init(id: String, revision: Int, hash: String) {
+    self.id = id
+    self.revision = revision
+    self.hash = hash
   }
 }
 

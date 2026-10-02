@@ -1168,6 +1168,7 @@ data class APIContentDocument(
   val `quote`: APIContentDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentDocumentPlanRef? = null,
   val `live`: APIContentDocumentLive? = null
 )
 
@@ -1201,6 +1202,13 @@ enum class APIContentDocumentMediaItemKind {
 data class APIContentDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -1278,6 +1286,7 @@ data class APIContentListItemsItemDocument(
   val `quote`: APIContentListItemsItemDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentListItemsItemDocumentPlanRef? = null,
   val `live`: APIContentListItemsItemDocumentLive? = null
 )
 
@@ -1311,6 +1320,13 @@ enum class APIContentListItemsItemDocumentMediaItemKind {
 data class APIContentListItemsItemDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentListItemsItemDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -1665,6 +1681,7 @@ data class APIContentViewDocument(
   val `quote`: APIContentViewDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentViewDocumentPlanRef? = null,
   val `live`: APIContentViewDocumentLive? = null
 )
 
@@ -1698,6 +1715,13 @@ enum class APIContentViewDocumentMediaItemKind {
 data class APIContentViewDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentViewDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -1893,6 +1917,7 @@ data class APISaveContentDocument(
   val `quote`: APISaveContentDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APISaveContentDocumentPlanRef? = null,
   val `live`: APISaveContentDocumentLive? = null
 )
 
@@ -1926,6 +1951,13 @@ enum class APISaveContentDocumentMediaItemKind {
 data class APISaveContentDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APISaveContentDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -2261,6 +2293,7 @@ data class APIContentReviewViewDocument(
   val `quote`: APIContentReviewViewDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentReviewViewDocumentPlanRef? = null,
   val `live`: APIContentReviewViewDocumentLive? = null
 )
 
@@ -2294,6 +2327,13 @@ enum class APIContentReviewViewDocumentMediaItemKind {
 data class APIContentReviewViewDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentReviewViewDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -3763,6 +3803,7 @@ data class APIContentContentDocument(
   val `quote`: APIContentContentDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentContentDocumentPlanRef? = null,
   val `live`: APIContentContentDocumentLive? = null
 )
 
@@ -3796,6 +3837,13 @@ enum class APIContentContentDocumentMediaItemKind {
 data class APIContentContentDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentContentDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -3873,6 +3921,7 @@ data class APIContentContentListItemsItemDocument(
   val `quote`: APIContentContentListItemsItemDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentContentListItemsItemDocumentPlanRef? = null,
   val `live`: APIContentContentListItemsItemDocumentLive? = null
 )
 
@@ -3906,6 +3955,13 @@ enum class APIContentContentListItemsItemDocumentMediaItemKind {
 data class APIContentContentListItemsItemDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentContentListItemsItemDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -4260,6 +4316,7 @@ data class APIContentContentViewDocument(
   val `quote`: APIContentContentViewDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentContentViewDocumentPlanRef? = null,
   val `live`: APIContentContentViewDocumentLive? = null
 )
 
@@ -4293,6 +4350,13 @@ enum class APIContentContentViewDocumentMediaItemKind {
 data class APIContentContentViewDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentContentViewDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -4488,6 +4552,7 @@ data class APIContentSaveContentDocument(
   val `quote`: APIContentSaveContentDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentSaveContentDocumentPlanRef? = null,
   val `live`: APIContentSaveContentDocumentLive? = null
 )
 
@@ -4521,6 +4586,13 @@ enum class APIContentSaveContentDocumentMediaItemKind {
 data class APIContentSaveContentDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentSaveContentDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
