@@ -184,7 +184,7 @@ export interface ContentDependencies {
 }
 
 export function publicationCommand(
-  row: Index,
+  row: Pick<Index, "id" | "creator_id" | "version">,
   document: ContentBody,
   mediaEvidence: readonly ProcessedMediaEvidence[] = [],
 ): SignedActCommand {
