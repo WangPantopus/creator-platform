@@ -1005,7 +1005,10 @@ export const copy = {
   "growthReplyImageExportFailed": "The complete image export could not be prepared. Retry, or download the complete text.",
   "growthNotificationChannel": "{kind} · {channel}",
   "growthWeeklyImpactSummary": "This week: {people} people helped and {thanks} thanks.",
-  "growthSpendingLimitReached": "You've reached {percent}% of your monthly limit."
+  "growthSpendingLimitReached": "You've reached {percent}% of your monthly limit.",
+  "w1CallLookupTitle": "Your call",
+  "w1CallLookupChecking": "Checking the booking and your current access…",
+  "w1CallLookupUnavailable": "This call could not be opened. Retry, or open Requests to check its current status."
 } as const;
 export type CopyKey = keyof typeof copy;
 type Placeholders<T extends string> = T extends `${string}{${infer Key}}${infer Rest}` ? Key | Placeholders<Rest> : never;

@@ -1007,7 +1007,10 @@ object QelvoraCopy {
     "growthReplyImageExportFailed" to "The complete image export could not be prepared. Retry, or download the complete text.",
     "growthNotificationChannel" to "{kind} · {channel}",
     "growthWeeklyImpactSummary" to "This week: {people} people helped and {thanks} thanks.",
-    "growthSpendingLimitReached" to "You've reached {percent}% of your monthly limit."
+    "growthSpendingLimitReached" to "You've reached {percent}% of your monthly limit.",
+    "w1CallLookupTitle" to "Your call",
+    "w1CallLookupChecking" to "Checking the booking and your current access…",
+    "w1CallLookupUnavailable" to "This call could not be opened. Retry, or open Requests to check its current status."
   )
   private val variables = Regex("""\{([^}]+)\}""")
   fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }

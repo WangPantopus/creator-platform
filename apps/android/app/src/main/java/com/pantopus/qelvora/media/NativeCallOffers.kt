@@ -9,7 +9,14 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.pantopus.qelvora.identity.FanSession
 import com.pantopus.qelvora.ui.*
 import kotlinx.coroutines.CancellationException
@@ -27,8 +34,40 @@ import org.json.JSONObject
 @Composable
 fun NativeCallDestination(baseURL: String?, model: FanSession) {
     key(model.destination) {
-        if (model.destination.substringAfter('?', "").split('&').contains("offer=1")) NativeCallOffers(baseURL, model)
+        val parts = model.destination.substringBefore('?').trim('/').split('/')
+        val callId = if (parts.size == 2 && parts[0] == "calls") runCatching { UUID.fromString(parts[1]).also { require(it.toString().equals(parts[1], ignoreCase = true)) } }.getOrNull() else null
+        if (callId != null) NativeAccountCallLookup(model, callId)
+        else if (model.destination.substringAfter('?', "").split('&').contains("offer=1")) NativeCallOffers(baseURL, model)
         else NativeCallScreen(baseURL, model)
+    }
+}
+
+@Composable
+private fun NativeAccountCallLookup(model: FanSession, callId: UUID) {
+    var attempt by remember { mutableStateOf(0) }
+    var loading by remember { mutableStateOf(true) }
+    var unavailable by remember { mutableStateOf(false) }
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    var active by remember(lifecycle) { mutableStateOf(lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
+    DisposableEffect(lifecycle) {
+        val observer = LifecycleEventObserver { _, _ -> active = lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED) }
+        lifecycle.addObserver(observer)
+        onDispose { lifecycle.removeObserver(observer) }
+    }
+    LaunchedEffect(model.destination, model.session?.accountId, model.session?.sessionId, attempt, active) {
+        if (!active) { loading = false; return@LaunchedEffect }
+        loading = true; unavailable = false
+        val target = model.destination
+        val resolved = model.resolveCallDestination(callId.toString(), target)
+        if (model.destination != target) return@LaunchedEffect
+        loading = false; unavailable = !resolved
+    }
+    Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        BasicText(QelvoraCopy.text("w1CallLookupTitle"), modifier = Modifier.semantics { heading() }, style = qText("display-md").copy(color = qColor("ink")))
+        if (loading) BasicText(QelvoraCopy.text("w1CallLookupChecking"), modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }, style = qText("body").copy(color = qColor("ink")))
+        if (unavailable) Notice(tone = "error", children = QelvoraCopy.text("w1CallLookupUnavailable"))
+        Button(QelvoraCopy.text("retry"), ButtonVariant.SECONDARY, block = true, disabled = loading || model.busy || !active) { attempt += 1 }
+        Button(QelvoraCopy.text("w6OpenRequests"), ButtonVariant.QUIET) { model.open("/requests") }
     }
 }
 

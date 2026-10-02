@@ -133,6 +133,29 @@ public final class FanSession: ObservableObject {
             return false
         }
     }
+    /// Recover navigation only with the credential and destination that opened it.
+    /// The call screen independently authorizes the booking and every action.
+    public func resolveCallDestination(_ callId: String, from target: String) async -> Bool {
+        guard let baseURL, let active = session, !busy, !purgingPrivateState,
+              destination == target, let id = UUID(uuidString: callId) else { return false }
+        let snapshot = generation
+        do {
+            guard let credential = try await storage.read(), !Task.isCancelled,
+                  snapshot == generation, destination == target else { return false }
+            let configuration = URLSessionConfiguration.ephemeral
+            configuration.urlCache = nil; configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+            let client = CreatorAPIClient(baseURL: baseURL, session: URLSession(configuration: configuration), token: { credential })
+            let route = try await client.readAccountCallRoute(sessionId: id.uuidString.lowercased(), xQelvoraExpectedAccount: active.accountId)
+            let currentCredential = try await storage.read()
+            guard !Task.isCancelled, !busy, snapshot == generation, destination == target,
+                  session?.accountId == active.accountId, session?.sessionId == active.sessionId,
+                  currentCredential == credential,
+                  UUID(uuidString: route.sessionId) == id,
+                  let creator = UUID(uuidString: route.creatorId), let fan = UUID(uuidString: route.fanId) else { return false }
+            open("/calls/\(creator.uuidString.lowercased())/\(fan.uuidString.lowercased())/\(id.uuidString.lowercased())")
+            return true
+        } catch { return false }
+    }
     public func logout(all: Bool = false) async {
         guard !busy else { return }; busy = true; defer { busy = false }
         guard let api else { await purge(); return }

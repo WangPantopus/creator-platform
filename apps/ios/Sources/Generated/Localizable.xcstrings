@@ -10912,6 +10912,39 @@
           }
         }
       }
+    },
+    "Your call": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your call"
+          }
+        }
+      }
+    },
+    "Checking the booking and your current access…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking the booking and your current access…"
+          }
+        }
+      }
+    },
+    "This call could not be opened. Retry, or open Requests to check its current status.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This call could not be opened. Retry, or open Requests to check its current status."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

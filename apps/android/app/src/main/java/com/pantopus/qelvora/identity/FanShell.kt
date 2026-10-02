@@ -171,6 +171,29 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         catch (failure: Exception) { if (snapshot == generation) error = message(failure); return false }
         finally { busy = false }
     }
+    /** Navigation only. Reject responses for a departed destination, account or credential. */
+    suspend fun resolveCallDestination(callId: String, from: String): Boolean {
+        val origin = baseURL ?: return false
+        val active = session ?: return false
+        if (busy || purgingPrivateState || destination != from) return false
+        val id = runCatching { java.util.UUID.fromString(callId).also { require(it.toString().equals(callId, ignoreCase = true)) } }.getOrNull() ?: return false
+        val snapshot = generation
+        try {
+            val credential = currentToken() ?: return false
+            if (snapshot != generation || destination != from) return false
+            val client = CreatorAPIClient(origin) { credential }
+            val route = client.readAccountCallRoute(id.toString(), active.accountId)
+            currentCoroutineContext().ensureActive()
+            if (busy || snapshot != generation || destination != from || session?.accountId != active.accountId || session?.sessionId != active.sessionId || currentToken() != credential) return false
+            val returned = java.util.UUID.fromString(route.sessionId)
+            val creator = java.util.UUID.fromString(route.creatorId)
+            val fan = java.util.UUID.fromString(route.fanId)
+            if (returned != id || !creator.toString().equals(route.creatorId, ignoreCase = true) || !fan.toString().equals(route.fanId, ignoreCase = true)) return false
+            open("/calls/$creator/$fan/$id")
+            return true
+        } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+        catch (_: Exception) { return false }
+    }
     suspend fun logout(all: Boolean = false) {
         if (busy) return; val client = api ?: run { purge(); return }; busy = true
         try { if (all) client.revokeSessions() else client.logout(); purge() }
