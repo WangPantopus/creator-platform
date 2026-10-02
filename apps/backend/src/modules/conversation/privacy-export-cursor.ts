@@ -1,8 +1,8 @@
-import type { Pool, PoolClient } from "pg";
+import { Client, type Pool, type PoolClient, type QueryResult } from "pg";
 import { createHash } from "node:crypto";
 import { z } from "zod";
 import { canonical, contentHash } from "../../core/canonical.js";
-import { invariant } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
 import { PreparedGenerationJournal } from "../agent/generation-journal.js";
 import { PreparedUsageRetention } from "../agent/usage-retention.js";
@@ -356,10 +356,89 @@ export class PreparedConversationPrivacyCursor {
     await this.assertCurrent(client, job, families);
   }
 
+  /** Cancel only the PID read from this held client. Await the control query
+   * and connection close before any later source query or cleanup SQL, so a
+   * delayed cancellation cannot reach ROLLBACK or COMMIT. */
+  private async fetchWithCancellation(
+    client: PoolClient,
+    signal: AbortSignal,
+  ): Promise<QueryResult<ConversationPrivacyCursorRow>> {
+    signal.throwIfAborted();
+    const pid = z
+      .int()
+      .positive()
+      .max(2147483647)
+      .parse(
+        (await client.query("SELECT pg_backend_pid() AS pid")).rows[0]?.pid,
+      );
+    let cancelling: Promise<void> | undefined;
+    let cancellationFailed = false;
+    const abort = () => {
+      cancelling = (async () => {
+        const control = new Client({
+          ...this.pool.options,
+          connectionTimeoutMillis: 1500,
+          statement_timeout: 1500,
+          query_timeout: 1500,
+        });
+        control.on("error", () => {
+          cancellationFailed = true;
+        });
+        try {
+          await control.connect();
+          const result = await control.query<{ cancelled: boolean }>(
+            "SELECT pg_cancel_backend($1) AS cancelled",
+            [pid],
+          );
+          invariant(
+            result.rows[0]?.cancelled === true,
+            "conversation_export_cancel_unavailable",
+            "The actual held source backend could not be cancelled.",
+          );
+        } finally {
+          await control.end();
+        }
+      })().catch(() => {
+        cancellationFailed = true;
+      });
+    };
+    signal.addEventListener("abort", abort, { once: true });
+    let result: QueryResult<ConversationPrivacyCursorRow> | undefined;
+    let queryFailed = false;
+    let queryFailure: unknown;
+    try {
+      signal.throwIfAborted();
+      result = await client.query<ConversationPrivacyCursorRow>(
+        "FETCH FORWARD 16 FROM w3_conversation_privacy_export",
+      );
+    } catch (error) {
+      queryFailed = true;
+      queryFailure = error;
+    } finally {
+      signal.removeEventListener("abort", abort);
+      await cancelling;
+    }
+    if (cancellationFailed)
+      throw new DomainError(
+        "conversation_export_cancel_unavailable",
+        "Source cancellation failed; this export cannot complete.",
+        503,
+      );
+    signal.throwIfAborted();
+    if (queryFailed) throw queryFailure;
+    invariant(
+      result,
+      "conversation_export_source_unavailable",
+      "The actual held source query must complete.",
+    );
+    return result;
+  }
+
   async next(
     client: PoolClient,
     job: Job,
     families: readonly ConversationPrivacyFamily[],
+    parentSignal: AbortSignal,
   ): Promise<ConversationPrivacyCursorRow[]> {
     const cursor = this.cursors.get(client);
     invariant(
@@ -367,18 +446,16 @@ export class PreparedConversationPrivacyCursor {
       "conversation_export_source_unavailable",
       "The complete original cursor must be open on this held client.",
     );
+    parentSignal.throwIfAborted();
     await this.assertCurrent(client, job, families);
+    const signal = AbortSignal.any([job.signal!, parentSignal]);
     const rows = z
       .array(ConversationPrivacyCursorRow)
       .max(16)
-      .parse(
-        (
-          await client.query(
-            "FETCH FORWARD 16 FROM w3_conversation_privacy_export",
-          )
-        ).rows,
-      );
+      .parse((await this.fetchWithCancellation(client, signal)).rows);
+    signal.throwIfAborted();
     await this.assertCurrent(client, job, families);
+    signal.throwIfAborted();
     if (rows.length === 0) cursor.exhausted = true;
     return rows;
   }

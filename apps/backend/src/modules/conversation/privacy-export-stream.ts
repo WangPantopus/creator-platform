@@ -66,9 +66,14 @@ export function conversationPrivacyExportStream(
   let client: PoolClient | undefined;
   let clientReleased = false;
   let discardClient = false;
-  const releaseClient = (destroy = false) => {
+  const releaseClient = async (destroy = false) => {
     if (client && !clientReleased) {
       clientReleased = true;
+      if (destroy)
+        await client.end().catch((error: unknown) => {
+          failed = true;
+          failure ??= error;
+        });
       cursor.forget(client);
       client.release(destroy);
     }
@@ -83,7 +88,8 @@ export function conversationPrivacyExportStream(
   };
   const abort = () => {
     rejectWrite?.(signal.reason);
-    releaseClient(true);
+    // The producer retains the held client through query cancellation and
+    // awaited rollback. Only its final cleanup may forget or release it.
     notify();
   };
   signal.addEventListener("abort", abort, { once: true });
@@ -148,7 +154,7 @@ export function conversationPrivacyExportStream(
       await cursor.open(client, job, families);
       const held = client;
       await writeConversationPrivacyCursor({
-        next: () => cursor.next(held, job, families),
+        next: () => cursor.next(held, job, families, signal),
         write,
         families,
         signal,
@@ -170,10 +176,16 @@ export function conversationPrivacyExportStream(
           discardClient = true;
         });
     } finally {
-      releaseClient(discardClient);
-      signal.removeEventListener("abort", abort);
-      resolveDone();
-      notify();
+      try {
+        await releaseClient(discardClient);
+      } catch (error) {
+        failed = true;
+        failure ??= error;
+      } finally {
+        signal.removeEventListener("abort", abort);
+        resolveDone();
+        notify();
+      }
     }
   };
   let checksum: string | undefined;
