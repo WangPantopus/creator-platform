@@ -1,5 +1,5 @@
 import type { Request } from "express";
-import type { Pool } from "pg";
+import type { Pool, PoolClient } from "pg";
 import type { Actor } from "../modules/identity/adapter.js";
 import {
   TrustService,
@@ -25,6 +25,11 @@ import {
   trustScopeRestrictionInTransaction,
   trustAudienceRestrictionInTransaction,
   trustCreatorRestrictionInTransaction,
+  trustContentRestrictionInTransaction,
+  trustPublicPacketDenial,
+  trustPublicCreatorDenial,
+  trustCreatorFanRestrictionInTransaction,
+  type TrustPublicPacketTuple,
 } from "../modules/trust/scope-restriction.js";
 import type { ScopeRestriction } from "../modules/access/scope.js";
 import type { PrivacyArtifactStore } from "../modules/trust/privacy-export.js";
@@ -45,6 +50,7 @@ export async function createTrustRuntime(options: {
   effectHooks: EffectHook[];
   probes: Probe[];
   restoreReady: () => Promise<boolean>;
+  restoreReadyInTransaction?: (client: PoolClient) => Promise<boolean>;
   crisisResources: TrustRouterOptions["crisisResources"];
 }) {
   const origin = new URL(options.origin);
@@ -280,11 +286,33 @@ export async function createTrustRuntime(options: {
   const restrictInTransaction = trustScopeRestrictionInTransaction();
   const restrictAudience = trustAudienceRestrictionInTransaction();
   const restrictCreator = trustCreatorRestrictionInTransaction();
+  const restrictContent = trustContentRestrictionInTransaction();
+  const restrictPacket = trustPublicPacketDenial();
+  const restrictPublicCreator = trustPublicCreatorDenial();
+  const restrictCreatorFan = trustCreatorFanRestrictionInTransaction();
   const assertRestored = async () => {
     if (!(await restored()))
       throw new DomainError(
         "restoration_pending",
         "This restored environment is unavailable while recovery is verified.",
+        503,
+      );
+  };
+  const assertRestoredInTransaction = async (client: PoolClient) => {
+    // The general gate may include external replay/reconciliation custody. A
+    // held-client port is additionally mandatory; no pool check or owner actor
+    // substitutes for currentness on this transaction.
+    await assertRestored();
+    let ready = false;
+    try {
+      ready = (await options.restoreReadyInTransaction?.(client)) === true;
+    } catch {
+      ready = false;
+    }
+    if (!ready)
+      throw new DomainError(
+        "restoration_pending",
+        "Current recovery authority is unavailable for this transaction.",
         503,
       );
   };
@@ -311,22 +339,60 @@ export async function createTrustRuntime(options: {
     trafficReady: restored,
     assertActorAllowed,
     assertScopeAllowed,
+    assertRestoredInTransaction,
+    assertContentAllowedInTransaction: async (
+      client: PoolClient,
+      actor: Actor,
+      creatorId: string,
+    ) => {
+      await assertRestoredInTransaction(client);
+      await restrictContent(client, actor, creatorId);
+    },
+    holdPublicPacketNegativeAuthority: async (
+      client: PoolClient,
+      actor: Actor,
+      tuple: TrustPublicPacketTuple,
+    ) => {
+      await assertRestoredInTransaction(client);
+      return restrictPacket(client, actor, tuple);
+    },
+    holdPublicCreatorNegativeAuthority: async (
+      client: PoolClient,
+      creatorId: string,
+    ) => {
+      await assertRestoredInTransaction(client);
+      return restrictPublicCreator(client, creatorId);
+    },
+    holdCreatorFanNegativeAuthority: async (
+      client: PoolClient,
+      actor: Actor,
+      tuple: { creatorId: string; fanId: string },
+    ) => {
+      await assertRestoredInTransaction(client);
+      await restrictCreatorFan(client, actor, tuple);
+    },
     assertScopeAllowedInTransaction: async (
       ...scope: Parameters<typeof restrictInTransaction>
     ) => {
-      await assertRestored();
+      if (options.restoreReadyInTransaction)
+        await assertRestoredInTransaction(scope[4]);
+      else await assertRestored();
       await restrictInTransaction(...scope);
     },
     assertAudienceAllowed: async (
       ...scope: Parameters<typeof restrictAudience>
     ) => {
-      await assertRestored();
+      if (options.restoreReadyInTransaction)
+        await assertRestoredInTransaction(scope[3]);
+      else await assertRestored();
       await restrictAudience(...scope);
     },
     assertCreatorAllowedInTransaction: async (
       ...scope: Parameters<typeof restrictCreator>
     ) => {
-      await assertRestored();
+      if (options.restoreReadyInTransaction)
+        await assertRestoredInTransaction(scope[2]);
+      else await assertRestored();
       await restrictCreator(...scope);
     },
     privacyOwnershipScope: privacyOwnershipScope(options.workerPool),

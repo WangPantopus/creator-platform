@@ -1,5 +1,38 @@
 # W8 resume prompt — complete the workstream
 
+## Actual held privacy and creator/fan fences — 2026-10-02
+
+Reserved0087 exports `privacyTaskAuthorityInTransaction(client, actualJob)` and `conversationPrivacyAuthority().fenceTaskInTransaction(client,actualJob)`. It locks the exact running job/task before domain locks, preserves its actual token/signal and verifies unexpired immutable ownership at the separate COMMIT; early deferred firing and expired commits fail. No raw Trust or domain content privilege is granted to core. Reserved0089 exports `trustCreatorFanRestrictionInTransaction()` and canonical `holdCreatorFanNegativeAuthority(client,actualActor,{creatorId,fanId})`; only the actual owner/fan candidate receives bounded negative authority, never a packet/thread/paid permission. [Personally operated web, real task and saved-state/negative evidence](../../../artifacts/workstreams/W8/privacy-fan-fences/20261002-mac-studio/README.md) leaves canonical40 unchanged and complete C10/initial57/full release acceptance open. Services stopped; data retained.
+
+Allocation custody also reserves0092 W6 authenticated callback/mapping purpose and0093 W8 generation-worker negatives, awaiting exact producer contracts. W7's human migration ceiling is preserved: no0044–0060 slot is free, so account-only spending SQL remains an unnumbered pending proposal for W8 review.
+
+## Team/public creator negative ports — 2026-10-02
+
+Reserved0084 is the separate real Team-triage candidate negative check used by `trustScopeRestrictionInTransaction()` for non-participants. Positive W1/W4 Team/current-family/Approval leases remain required. Reserved0086 exports `trustPublicCreatorDenial()` and canonical `holdPublicCreatorNegativeAuthority(client,creatorId)`, combining actual held restoration with a genuine visitor or explicitly empty anonymous context. [Personally reviewed exact W1dce780db0085 plus actual closed57 proposal/cleanup/grant checks](../../../artifacts/workstreams/W8/public-team-denial/20261002-mac-studio/README.md) leave all future ledger rows unregistered. No actual Team approval, creator proof, License or public AI permission is inferred.
+
+Additional allocation custody (not activation):0082 interactive tries;0083 W3 translation purpose;0084 Team negatives;0085 W1 public-AI metadata;0086 public-creator negatives;0087 W8 held privacy-task fence;0088 W5 policy-dependent reply cap;0089 W8 actual creator/fan negatives;0090 W4 spending-notice custody;0091 W8 current-account negative purpose. W8's sole activation branch will record these reservations and the exact ready-wave order. No client may invent a packet/thread/Actor or replay SQL to compensate for missing registration.
+
+
+## Actual authenticated native Report — 2026-10-02
+
+[Personally operated iOS/Android E2E and database readback](../../../artifacts/workstreams/W8/native-report/20261002-mac-studio/README.md) confirms canonical development sign-in, grant-free existing-AI Report, CASE-2/CASE-3 with exact evidence, cold Night return and the same account's cases across both clients. New private checkpoint retained; no new unit tests, provider proof/action or message was fabricated. This purpose-review target remains canonical40; actual57-wave, verified-creator/publication, full privacy/accessibility/recovery and R1–R10/release gates remain open.
+
+
+## Interactive denial contention correction — 2026-10-02
+
+Reserved additive0082 now supplies nonblocking exact-family negative gates through the existing held restriction exports. Applied0053 stays unchanged. [Actual web/saved-block and two-connection evidence](../../../artifacts/workstreams/W8/interactive-denial/20261002-mac-studio/README.md) verifies retryable503 on contention, genuine session/participant refusals, preserved saved block403 and usable caller transaction after refusal. Canonical ledger remains40 in this labelled purpose-review target. Native authenticated, real in-flight generation, canonical activation and complete R1–R10/release acceptance remain open.
+
+
+## Original-fan packet denial source — 2026-10-02
+
+W8 supplies reserved0076 original-fan/viewer/owner/publisher negative projection and `holdPublicPacketNegativeAuthority(client, actualActor, tuple)`. Unapplied0073 now runs packet negatives first and includes the schema-USAGE grant verified with the actual publication login. [Exact DDL/negative evidence](../../../artifacts/workstreams/W8/packet-denial/20261002-mac-studio/README.md) records zero fabricated publications, canonical57 unchanged and real non-owner refusals. Contention returns retryable unavailable, never successful empty permission. Actual signed packet, original-fan change and composed/native journeys remain open; this is not activation or release acceptance.
+
+
+## Held restoration/content integration — 2026-10-02
+
+W8 now exports canonical `assertRestoredInTransaction(client)` and `assertContentAllowedInTransaction(client, actualActor, creatorId)`, plus loopback-only `trustLocalRestorationInTransaction(env)`. The development helper supplies the actual held callback; missing ports deny503. [Personally operated web and held transaction evidence](../../../artifacts/workstreams/W8/held-restoration/20261002-mac-studio/README.md) verifies current closure, saved block/case and retained canonical40 ledger; no publication/proof/provider recovery is inferred. W1/W6 can compose these ports without owner substitution or a true/no-op callback. Native authenticated interaction, original recovery/C10 and packet-fan negatives remain open. No R1–R10 or release gate is declared complete.
+
+
 **Held content/publication denial — 2026-10-02:** reserved0073/0074 and `trustContentRestrictionInTransaction()` / `trustPublicationWorkerDenial()` are implemented on `codex/w8-purpose-denial-authority`, consuming W5's exactc56fe342 held-client seam. [Actual receipt](../../../artifacts/workstreams/W8/purpose-denial/20261002-mac-studio/README.md) has canonical real web block save and current content200→403, saved block/case, non-owner session/snapshot/role and unissued-worker refusals. Registry remains40. W1's0071 PUBLIC-only/wallclock correction is reviewed, final-wave installation/positive proof/publication/Team/native/provider/C10 acceptance remains open. W8 services stopped; data retained.
 
 **Development role guard — 2026-10-02:** [Actual role/browser receipt](../../../artifacts/workstreams/W8/development-trust/20261002-composite/README.md) verifies optional exact `TRUST_CORE_DATABASE_ROLE`, only inherited core/Growth request roles, full reachable-role/ownership/direct-grant rejection and separate Trust pools. Worker-bearing and direct-private-grant hosts are refused before listen; the real browser re-authenticated and displayed saved own support state. W1 keeps the core NOINHERIT and uses a separate Growth/Content pool; this helper override is off by default. No migration activation, Follow/proof/reply approval, authenticated native or C10/provider/recovery completion. W8 services stopped, data retained.
