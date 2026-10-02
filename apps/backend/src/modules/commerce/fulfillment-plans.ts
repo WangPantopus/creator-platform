@@ -18,7 +18,8 @@ import type { Actor } from "../identity/adapter.js";
 import { identityTransaction } from "../identity/transaction.js";
 import {
   requestAuthority,
-  assertCurrentSession,
+  holdCurrentRequestSession,
+  type HeldCurrentRequestSession,
 } from "../identity/request-authority.js";
 import {
   consumeCreatorSignedAct,
@@ -69,6 +70,7 @@ type Context = {
   pid: number;
   request: NonNullable<ReturnType<typeof requestAuthority.getStore>>;
   actor: Actor;
+  session: HeldCurrentRequestSession;
 };
 type Header = {
   id: string;
@@ -104,6 +106,12 @@ type Member = {
 const recipientBrand: unique symbol = Symbol("CommerceGroupRecipient");
 /** Process-issued only. It contains no serialized fan list or scalar license. */
 export type CommerceGroupRecipient = Readonly<{ [recipientBrand]: true }>;
+const draftReadBatchBrand: unique symbol = Symbol(
+  "CommerceFulfillmentDraftReadBatch",
+);
+export type CommerceFulfillmentDraftReadBatch = Readonly<{
+  [draftReadBatchBrand]: true;
+}>;
 type Recipient = {
   proof: CommerceGroupRecipient;
   member: Member;
@@ -119,6 +127,26 @@ type Held = Context & {
   recipients: Recipient[];
   positive: boolean;
   finalized: boolean;
+  readOnly?: true;
+};
+type PublicationInput = {
+  creatorId: string;
+  contentId: string;
+  planRef: CommerceFulfillmentPlanReference;
+};
+type PublicationMetadata = {
+  context: Context;
+  ref: CommerceFulfillmentPlanReference;
+  header: Header;
+  members: Member[];
+};
+type DraftReadBatch = {
+  client: PoolClient;
+  context: Context;
+  plans: Held[];
+  originals: { source: OriginalCommerceService; scope: ThreadScope }[];
+  positive: boolean;
+  finalized: boolean;
 };
 const issued = new WeakSet<CommerceFulfillmentPlans>();
 
@@ -130,6 +158,14 @@ const issued = new WeakSet<CommerceFulfillmentPlans>();
  */
 export class CommerceFulfillmentPlans {
   private readonly held = new WeakMap<PoolClient, Held>();
+  private readonly readBatches = new WeakMap<
+    CommerceFulfillmentDraftReadBatch,
+    DraftReadBatch
+  >();
+  private readonly activeReadBatches = new WeakMap<
+    PoolClient,
+    DraftReadBatch
+  >();
   private readonly recipients = new WeakMap<
     CommerceGroupRecipient,
     { client: PoolClient; held: Held; recipient: Recipient }
@@ -288,11 +324,15 @@ export class CommerceFulfillmentPlans {
     await this.assertCatalogue(client);
   }
 
-  private async context(client: PoolClient, actor: Actor): Promise<Context> {
+  private async context(
+    client: PoolClient,
+    actor: Actor,
+  ): Promise<Omit<Context, "session">> {
     const request = requestAuthority.getStore();
     if (
       !request ||
       request.accountId !== actor.accountId ||
+      request.actor !== actor ||
       !actor.adultEligible
     )
       throw fulfillmentChanged();
@@ -325,29 +365,18 @@ export class CommerceFulfillmentPlans {
       !actor.adultEligible
     )
       throw fulfillmentChanged();
-    await assertCurrentSession(client, actor.accountId);
-    const existing = (
-      await client.query<{ session: string | null }>(
-        "SELECT nullif(current_setting('app.identity_session_id',true),'') AS session",
-      )
-    ).rows[0]?.session;
-    if (
-      existing !== null &&
-      existing !== undefined &&
-      existing !== request.sessionId
-    )
-      throw fulfillmentChanged();
-    await client.query("SELECT set_config('app.identity_session_id',$1,true)", [
-      request.sessionId,
-    ]);
-    return this.context(client, actor);
+    const session = await holdCurrentRequestSession(client, actor.accountId);
+    if (session.actor !== actor) throw fulfillmentChanged();
+    return { ...(await this.context(client, actor)), session };
   }
   private async sameContext(client: PoolClient, context: Context) {
     const live = await this.context(client, context.actor);
     if (
       live.transaction !== context.transaction ||
       live.pid !== context.pid ||
-      live.request !== context.request
+      live.request !== context.request ||
+      live.request.actor !== context.session.actor ||
+      live.request.sessionId !== context.session.sessionId
     )
       throw fulfillmentChanged();
   }
@@ -364,6 +393,8 @@ export class CommerceFulfillmentPlans {
     packetIds: readonly string[],
     mode: OriginalCommerceService["mode"],
     states: readonly string[] = ["due", "in_progress"],
+    sharedThreads = false,
+    purpose: "read" | "write" = "write",
   ) {
     const pointers = (
       await client.query<{
@@ -381,7 +412,8 @@ export class CommerceFulfillmentPlans {
     ).rows;
     if (
       pointers.length !== packetIds.length ||
-      new Set(pointers.map((p) => p.thread_id)).size !== packetIds.length
+      (!sharedThreads &&
+        new Set(pointers.map((p) => p.thread_id)).size !== packetIds.length)
     )
       throw fulfillmentChanged();
     for (const p of pointers) {
@@ -413,7 +445,7 @@ export class CommerceFulfillmentPlans {
           creatorId,
           p.fan_id,
           false,
-          "write",
+          purpose,
         );
         assertThreadScope(scope);
         if (
@@ -669,6 +701,23 @@ export class CommerceFulfillmentPlans {
     return this.preparePublicationWithIntent(client, actor, input, "draft");
   }
 
+  /** Creator-owned saved draft read, including an empty draft. It cannot issue
+   * publication recipients or become a save, challenge or publication gate. */
+  async prepareDraftRead(
+    client: PoolClient,
+    actor: Actor,
+    input: PublicationInput,
+  ) {
+    return this.preparePublicationWithIntent(
+      client,
+      actor,
+      input,
+      "draft",
+      undefined,
+      true,
+    );
+  }
+
   /** The immutable plan binds the next saved revision. Resolve its original
    * recipients before W5 takes document/media owner locks; its actual save must
    * precede finalizeDraftPublication, and only COMMIT may follow that gate. */
@@ -742,11 +791,57 @@ export class CommerceFulfillmentPlans {
       document: z.infer<typeof PlanDocument>;
       saved?: true;
     },
+    readOnly = false,
   ) {
+    const metadata = await this.publicationMetadata(
+      client,
+      actor,
+      input,
+      staged?.expectedVersion,
+    );
+    const originals = await this.prepareOriginals(
+      client,
+      actor,
+      input.creatorId,
+      metadata.members.map((m) => m.packet_id),
+      "group_answer",
+      intent === "committed" ? ["delivered"] : ["due", "in_progress"],
+      false,
+      readOnly ? "read" : "write",
+    );
+    const value = await this.publicationValue(
+      client,
+      actor,
+      metadata,
+      originals,
+      intent,
+      staged,
+      readOnly,
+    );
+    if (!readOnly)
+      for (const recipient of value.recipients)
+        this.recipients.set(recipient.proof, {
+          client,
+          held: value,
+          recipient,
+        });
+    this.held.set(client, value);
+  }
+
+  private async publicationMetadata(
+    client: PoolClient,
+    actor: Actor,
+    input: PublicationInput,
+    expectedVersion?: number,
+  ): Promise<PublicationMetadata> {
     await this.assertCatalogue(client);
     const context = await this.initializeContext(client, actor),
       ref = CommerceFulfillmentPlanRef.parse(input.planRef);
-    if (this.held.get(client)?.transaction === context.transaction)
+    if (
+      this.held.get(client)?.transaction === context.transaction ||
+      this.activeReadBatches.get(client)?.context.transaction ===
+        context.transaction
+    )
       throw fulfillmentChanged();
     const header = (
       await client.query<Header>(
@@ -759,7 +854,8 @@ export class CommerceFulfillmentPlans {
       header.created_by !== actor.accountId ||
       header.source_hash !== ref.hash ||
       header.minimum_recipients !== this.minimumRecipients ||
-      (staged && header.content_version !== staged.expectedVersion + 1)
+      (expectedVersion !== undefined &&
+        header.content_version !== expectedVersion + 1)
     )
       throw fulfillmentChanged();
     const members = (
@@ -773,14 +869,23 @@ export class CommerceFulfillmentPlans {
       members.length < this.minimumRecipients
     )
       throw fulfillmentChanged();
-    const originals = await this.prepareOriginals(
-      client,
-      actor,
-      input.creatorId,
-      members.map((m) => m.packet_id),
-      "group_answer",
-      intent === "committed" ? ["delivered"] : ["due", "in_progress"],
-    );
+    return { context, ref, header, members };
+  }
+
+  private async publicationValue(
+    client: PoolClient,
+    actor: Actor,
+    metadata: PublicationMetadata,
+    originals: { source: OriginalCommerceService; scope: ThreadScope }[],
+    intent: "draft" | "committed",
+    staged?: {
+      expectedVersion: number;
+      document: z.infer<typeof PlanDocument>;
+      saved?: true;
+    },
+    readOnly = false,
+  ): Promise<Held> {
+    const { context, ref, header, members } = metadata;
     const stored = await this.document(
       client,
       staged && !staged.saved
@@ -805,6 +910,7 @@ export class CommerceFulfillmentPlans {
           contentHash(document)) ||
       contentHash(document.audience) !== contentHash(header.audience) ||
       (!staged &&
+        (!readOnly || intent === "committed") &&
         !document.text.trim() &&
         !document.media.some((m) => m.kind === "voice"))
     )
@@ -818,11 +924,19 @@ export class CommerceFulfillmentPlans {
       recipients: [],
       positive: false,
       finalized: false,
+      ...(readOnly ? { readOnly: true as const } : {}),
     };
     for (const member of members) {
       const original = originals.find(
         (o) => o.source.packet_id === member.packet_id,
-      )!;
+      );
+      if (
+        !original ||
+        !(
+          intent === "committed" ? ["delivered"] : ["due", "in_progress"]
+        ).includes(original.source.state)
+      )
+        throw fulfillmentChanged();
       if (
         contentHash(
           this.member(
@@ -856,9 +970,8 @@ export class CommerceFulfillmentPlans {
         recipient.messageId = delivery;
       }
       value.recipients.push(recipient);
-      this.recipients.set(proof, { client, held: value, recipient });
     }
-    this.held.set(client, value);
+    return value;
   }
 
   private async publication(client: PoolClient, actor: Actor) {
@@ -868,6 +981,225 @@ export class CommerceFulfillmentPlans {
     await this.sameContext(client, value);
     return value;
   }
+  /** Hold every original's negatives for one bounded creator page before
+   * reading any planned document. Single-held recipients are never cloned. */
+  async prepareDraftReadBatch(
+    client: PoolClient,
+    actor: Actor,
+    input: {
+      creatorId: string;
+      answers: readonly {
+        contentId: string;
+        planRef: CommerceFulfillmentPlanReference;
+      }[];
+    },
+  ): Promise<CommerceFulfillmentDraftReadBatch> {
+    const creatorId = z.uuid().parse(input.creatorId);
+    const answers = z
+      .array(
+        z.strictObject({
+          contentId: z.uuid(),
+          planRef: CommerceFulfillmentPlanRef,
+        }),
+      )
+      .min(1)
+      .max(100)
+      .parse(input.answers);
+    if (
+      new Set(answers.map((a) => a.contentId)).size !== answers.length ||
+      new Set(answers.map((a) => a.planRef.id)).size !== answers.length
+    )
+      throw fulfillmentChanged();
+    const metadata: {
+      value: PublicationMetadata;
+      intent: "draft" | "committed";
+    }[] = [];
+    for (const answer of [...answers].sort((a, b) =>
+      a.contentId.localeCompare(b.contentId),
+    )) {
+      const value = await this.publicationMetadata(client, actor, {
+        creatorId,
+        ...answer,
+      });
+      const state = (
+        await client.query<{ state: string }>(
+          "SELECT state FROM creator.content_index WHERE id=$1 AND creator_id=$2 AND version=$3",
+          [value.header.content_id, creatorId, value.header.content_version],
+        )
+      ).rows[0]?.state;
+      if (state !== "draft" && state !== "published")
+        throw fulfillmentChanged();
+      metadata.push({
+        value,
+        intent: state === "draft" ? "draft" : "committed",
+      });
+    }
+    const context = metadata[0]!.value.context;
+    for (const m of metadata) await this.sameContext(client, m.value.context);
+    const packetIds = [
+      ...new Set(
+        metadata.flatMap((m) => m.value.members.map((r) => r.packet_id)),
+      ),
+    ];
+    //100 plans have at most100 members each. Over-bound pages refuse whole,
+    // rather than silently omitting an answer or participant.
+    if (!packetIds.length || packetIds.length > 10000)
+      throw fulfillmentChanged();
+    const originals = await this.prepareOriginals(
+      client,
+      actor,
+      creatorId,
+      packetIds,
+      "group_answer",
+      ["due", "in_progress", "delivered"],
+      true,
+      "read",
+    );
+    const plans: Held[] = [];
+    for (const m of metadata)
+      plans.push(
+        await this.publicationValue(
+          client,
+          actor,
+          m.value,
+          originals,
+          m.intent,
+          undefined,
+          true,
+        ),
+      );
+    const value: DraftReadBatch = {
+      client,
+      context,
+      plans,
+      originals,
+      positive: false,
+      finalized: false,
+    };
+    const proof = Object.freeze({ [draftReadBatchBrand]: true as const });
+    this.readBatches.set(proof, value);
+    this.activeReadBatches.set(client, value);
+    return proof;
+  }
+
+  private async draftReadBatch(
+    client: PoolClient,
+    actor: Actor,
+    proof: CommerceFulfillmentDraftReadBatch,
+  ): Promise<DraftReadBatch> {
+    const value = this.readBatches.get(proof);
+    if (
+      !value ||
+      value.client !== client ||
+      value.context.actor !== actor ||
+      value.finalized ||
+      this.activeReadBatches.get(client) !== value
+    )
+      throw fulfillmentChanged();
+    await this.sameContext(client, value.context);
+    await this.assertCatalogue(client);
+    return value;
+  }
+
+  /** After all W5 page document/media/creator/audience positives. No recipient
+   * proof or delivery permission leaves this read-only batch. */
+  async prepareDraftReadBatchPositive(
+    client: PoolClient,
+    actor: Actor,
+    proof: CommerceFulfillmentDraftReadBatch,
+  ): Promise<void> {
+    const value = await this.draftReadBatch(client, actor, proof);
+    if (value.positive) throw fulfillmentChanged();
+    for (const original of value.originals)
+      await this.lockOriginal(client, actor, original.source);
+    for (const plan of value.plans) {
+      const hash = (
+        await client.query<{ hash: string }>(
+          "SELECT creator.commerce_fulfillment_plan_hash($1,$2) AS hash",
+          [plan.reference.id, plan.reference.revision],
+        )
+      ).rows[0]?.hash;
+      if (hash !== plan.reference.hash) throw fulfillmentChanged();
+    }
+    value.positive = true;
+  }
+
+  /** Final page gate. W5 has completed actual positive reads and its response.
+   * No row lock, identity change or domain write follows this final signer
+   * fence and metadata checks. Only COMMIT may follow. */
+  async finalizeDraftReadBatch(
+    client: PoolClient,
+    actor: Actor,
+    proof: CommerceFulfillmentDraftReadBatch,
+  ): Promise<void> {
+    const value = await this.draftReadBatch(client, actor, proof);
+    if (!value.positive) throw fulfillmentChanged();
+    await this.finalSigner(client, value.context);
+    for (const plan of value.plans) {
+      const stored = await this.document(client, plan.header);
+      if (
+        stored.state !== (plan.intent === "draft" ? "draft" : "published") ||
+        contentHash(PlanDocument.parse(stored.document)) !==
+          plan.documentHash ||
+        (plan.intent === "draft"
+          ? stored.signed_act_id !== null
+          : !stored.signed_act_id ||
+            stored.author_account_id !== actor.accountId)
+      )
+        throw fulfillmentChanged();
+      if (plan.intent === "committed") {
+        const command = await this.signedCommand(
+          client,
+          actor.accountId,
+          plan.header.creator_id,
+          stored.signed_act_id!,
+        );
+        if (
+          !this.matchesPublicationCommand(plan, command) ||
+          contentHash(
+            (
+              (command as SignedActCommand).content as {
+                mediaEvidence?: unknown[];
+              }
+            ).mediaEvidence ?? [],
+          ) !== contentHash(stored.media_evidence ?? [])
+        )
+          throw fulfillmentChanged();
+        for (const recipient of plan.recipients)
+          if (
+            (await this.existingDelivery(
+              client,
+              plan,
+              recipient,
+              stored.signed_act_id!,
+            )) !== recipient.messageId
+          )
+            throw fulfillmentChanged();
+      }
+    }
+    for (const original of value.originals) {
+      const current = await readOriginalCommerceService(
+        client,
+        actor.accountId,
+        original.source.creator_id,
+        original.source.packet_id,
+        "group_answer",
+        original.source.state === "delivered"
+          ? ["delivered"]
+          : ["due", "in_progress"],
+      );
+      if (
+        originalCommerceServiceHash(current) !==
+        originalCommerceServiceHash(original.source)
+      )
+        throw fulfillmentChanged();
+    }
+    value.finalized = true;
+    await this.assertCatalogue(client);
+    await this.currentSigner(client, value.context);
+    this.readBatches.delete(proof);
+  }
+
   private async document(client: PoolClient, header: Header) {
     const row = (
       await client.query<{
@@ -902,7 +1234,9 @@ export class CommerceFulfillmentPlans {
     if (hash !== value.reference.hash) throw fulfillmentChanged();
     value.positive = true;
     return Object.freeze(
-      value.intent === "draft" ? value.recipients.map((r) => r.proof) : [],
+      value.intent === "draft" && !value.readOnly
+        ? value.recipients.map((r) => r.proof)
+        : [],
     );
   }
 
@@ -1109,6 +1443,8 @@ export class CommerceFulfillmentPlans {
   }
 
   async finalizeDraftPublication(client: PoolClient, actor: Actor) {
+    if ((await this.publication(client, actor)).readOnly)
+      throw fulfillmentChanged();
     await this.finalizePreparedDraft(client, actor);
   }
 
@@ -1133,6 +1469,7 @@ export class CommerceFulfillmentPlans {
     const value = await this.publication(client, actor);
     if (
       value.intent !== "draft" ||
+      (value.readOnly && challengeId !== undefined) ||
       !value.positive ||
       value.recipients.some((r) => r.messageId)
     )
@@ -1358,6 +1695,10 @@ export class CommerceFulfillmentPlans {
       )
     ).rows[0]?.held;
     if (held !== true) throw fulfillmentChanged();
+    await this.currentSigner(client, context);
+  }
+  private async currentSigner(client: PoolClient, context: Context) {
+    await this.sameContext(client, context);
     const live = (
       await client.query(
         "SELECT FROM creator.identity_session WHERE id=$1 AND account_id=$2 AND revoked_at IS NULL AND expires_at>clock_timestamp()",
