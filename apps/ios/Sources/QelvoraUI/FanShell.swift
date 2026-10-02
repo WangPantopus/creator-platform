@@ -222,7 +222,7 @@ public struct FanAppShell: View {
                 Welcome(returnTo: model.destination, showContext: model.arrival != nil, contextSource: model.arrival?.source, contextTitle: model.arrival?.title, bodyCopy: model.arrival.map { "Every message says who wrote it: " + $0.creatorName + "'s AI, " + $0.creatorName + ", or their team. You'll always know which." } ?? "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext: model.removeArrival, onContinue: { Task { await model.beginSignIn() } }).id(model.arrival?.title)
             } else if model.session?.fan == nil, let feature = features.first(where: { $0.matches(model.destination) && $0.allowsSignedOut(model.destination) }) {
                 feature.screen(model).id((model.session?.accountId ?? "") + model.destination)
-            } else if model.session?.fan == nil {
+            } else if model.session?.fan == nil, model.destination != "/identity/account" {
                 NativeHandleForm(model: model)
             } else {
                 VStack(spacing: 0) {
@@ -231,8 +231,8 @@ public struct FanAppShell: View {
                     if model.destination == "/identity/account" || (model.destination == "/you" && feature == nil) {
                         ScrollView { VStack(alignment: .leading, spacing: 16) {
                             Text("Your account").qText("display-md")
-                            Text("@" + (model.session?.fan?.handle ?? "")).qText("body")
-                            Button("Edit public profile", variant: .secondary, block: true) { model.destination = "/onboarding/handle" }
+                            if let handle = model.session?.fan?.handle { Text("@" + handle).qText("body") }
+                            Button(QelvoraCopy.text(model.session?.fan == nil ? "identityChooseHandle" : "identityEditPublicProfile"), variant: .secondary, block: true) { model.destination = "/onboarding/handle" }
                             Button("Sign out", variant: .secondary, block: true) { Task { await model.logout() } }
                             Button("Refresh session", variant: .secondary, block: true, disabled: model.busy) { Task { await model.refreshCredentials() } }
                             Button("Sign out on all devices", variant: .quiet, block: true) { Task { await model.logout(all: true) } }

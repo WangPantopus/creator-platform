@@ -965,7 +965,9 @@ public enum QelvoraCopy {
     "w6RecordingDelivered": "Your signed recording was delivered to this conversation.",
     "w6VoiceReplyUnavailable": "Voice replies are unavailable for this conversation. Your text draft is kept.",
     "w6SelectedConversationChanged": "This recording belongs to another conversation. Reopen the selected thread.",
-    "w6RetryRecordingDelivery": "Retry this recording delivery"
+    "w6RetryRecordingDelivery": "Retry this recording delivery",
+    "identityChooseHandle": "Choose your handle",
+    "identityEditPublicProfile": "Edit public profile"
   ]
   private static let variables = try! NSRegularExpression(pattern: #"\{([^}]+)\}"#)
   public static func text(_ key: String, values: [String: String] = [:]) -> String {
