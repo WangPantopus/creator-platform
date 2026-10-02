@@ -1,7 +1,6 @@
 import { defineConfig } from "@playwright/test";
-const appPort = Number(
-  new URL(process.env.VISUAL_APP_ORIGIN ?? "http://localhost:3000").port || 80,
-);
+const visualWebURL = process.env.VISUAL_APP_ORIGIN ?? "http://localhost:3000";
+const appPort = Number(new URL(visualWebURL).port || 80);
 const referenceOrigin =
   process.env.VISUAL_REFERENCE_ORIGIN ?? "http://127.0.0.1:3101";
 const referencePort = Number(new URL(referenceOrigin).port || 80);
@@ -26,7 +25,7 @@ export default defineConfig({
     },
     {
       command: `pnpm --filter @qelvora/web exec next dev --webpack -p ${appPort}`,
-      url: `${process.env.VISUAL_APP_ORIGIN ?? "http://localhost:3000"}/auth/continue`,
+      url: `${visualWebURL}/auth/continue`,
       reuseExistingServer: !process.env.CI,
       timeout: 120000,
     },
