@@ -160,7 +160,6 @@ export function PreferenceForm({
               invalid.quietHours ? `${errorId}-quiet` : undefined
             }
             value={time(value.quietStart)}
-            onInput={(e) => update({ quietStart: minutes(e.currentTarget.value) })}
             onChange={(e) => update({ quietStart: minutes(e.target.value) })}
           />
         </label>
@@ -174,7 +173,6 @@ export function PreferenceForm({
               invalid.quietHours ? `${errorId}-quiet` : undefined
             }
             value={time(value.quietEnd)}
-            onInput={(e) => update({ quietEnd: minutes(e.currentTarget.value) })}
             onChange={(e) => update({ quietEnd: minutes(e.target.value) })}
           />
         </label>
