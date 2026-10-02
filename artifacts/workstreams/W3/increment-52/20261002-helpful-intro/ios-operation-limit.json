@@ -1,0 +1,20 @@
+{
+  "observedAt": "2026-10-02T14:33:39.793711+00:00",
+  "checkoutSource": "69fb505df37d3d1371bc2f4485903312504a39e7",
+  "shippingBinarySource": "f355db907b4beada09f4ad6f6d40e0af8d9a43ca",
+  "backendSource": "972216e8607a762c9b83da923f2fdd18250fc42d",
+  "database": "creator_w3_dev57_1790946508212",
+  "udid": "E375E748-AE89-4701-AB12-44EA240D61A8",
+  "installExit": 0,
+  "launchPID": 51957,
+  "deviceHubDirect": "supported CUA binding timed out",
+  "xcodeDeveloperTool": "personally clicked Xcode > Open Developer Tool > Device Hub; supported binding timed out again",
+  "simulatorAppPresent": false,
+  "iOSUIOperated": false,
+  "shutdownVerified": true,
+  "releasedOwnLeases": [
+    "/private/tmp/creator-platform-simulator-slot-1",
+    "/private/tmp/creator-platform-native-gui.lock"
+  ],
+  "peerDevicesTouched": false
+}
