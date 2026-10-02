@@ -1,0 +1,38 @@
+{
+  "recordedAt": "2026-10-02T06:30:54.116764+00:00",
+  "environment": "labelled synthetic W8 canonical clone creator_w8_devtrust_v2_20261001",
+  "canonicalLedgerRows": 40,
+  "migrationActivation": false,
+  "corePoolRole": {
+    "role": "creator_w8_api_20261002",
+    "core": true,
+    "growth": true,
+    "growth_worker": false,
+    "private_trust_select": false,
+    "negative_projection": true
+  },
+  "browser": {
+    "environment": "labelled synthetic canonical development host",
+    "realBrowserCanonicalSignIn": true,
+    "savedResolvedSupportCaseVisible": true,
+    "ownSavedNoticeVisible": true,
+    "legacyActorSelectCount": 0,
+    "horizontalOverflow": false
+  },
+  "refusals": {
+    "reachableGrowthWorker": true,
+    "directPrivateTableGrant": true,
+    "unsafeHostListenerStarted": false
+  },
+  "source": {
+    "parent": "ef96addd",
+    "developmentFileSha256": "69117896fd83501b183bcf42789f9a360515ab2b98e8911ce1d5bd875ef301bd"
+  },
+  "servicesStopped": true,
+  "dataRetained": true,
+  "limitations": [
+    "Native authenticated journeys not rerun for this role guard; device-control grant is still needed.",
+    "W1 root will use its separate Growth/Content composite pool and keep the core NOINHERIT; this helper opt-in is not enabled by W1.",
+    "No actual Follow, proof approval, reply decision, C10 completion, provider call or preserved recovery."
+  ]
+}
