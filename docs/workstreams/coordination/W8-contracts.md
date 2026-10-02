@@ -1,5 +1,11 @@
 # W8 contract, migration and runtime register
 
+Reserved0087: `privacyTaskAuthorityInTransaction(client, actualPrivacyHookJob)` requires the genuine worker signal/token and same-client BEGIN. Call before journal/family/domain locks; producer must check the same signal before pages and the separate COMMIT. `conversationPrivacyAuthority().fenceTaskInTransaction(client,job)` exposes the early port; `assertFamily` now uses the held capability too. The bounded metadata-only definer locks current job→task NOWAIT, checks current task at COMMIT and erases its nonce, including an early-trigger refusal. Missing/unregistered custody fails503.
+
+Reserved0089: `trustCreatorFanRestrictionInTransaction()` and `BackendRuntime.holdCreatorFanNegativeAuthority(client,actualActor,{creatorId,fanId}):Promise<void>` combine held restoration, canonical session and actual fan/owner negatives before positive tenure/content leases. Known denial403, missing authority/contention503. No Team/packet/ThreadScope constructed. Actual fan negative-gate pass and saved-block403 verified; creator/paid positivity open.
+
+Future0092 W6 provider callback ingress and0093 W8 durable generation-worker negative projection are metadata reservations only, awaiting exact authenticated producer/lease/C10 contracts. No accountless callback Actor or fake initiating scope.
+
 ## Team/public creator negative ports — 2026-10-02
 
 Reserved0084 is the separate real Team-triage candidate negative check used by `trustScopeRestrictionInTransaction()` for non-participants. Positive W1/W4 Team/current-family/Approval leases remain required. Reserved0086 exports `trustPublicCreatorDenial()` and canonical `holdPublicCreatorNegativeAuthority(client,creatorId)`, combining actual held restoration with a genuine visitor or explicitly empty anonymous context. [Personally reviewed exact W1dce780db0085 plus actual closed57 proposal/cleanup/grant checks](../../../artifacts/workstreams/W8/public-team-denial/20261002-mac-studio/README.md) leave all future ledger rows unregistered. No actual Team approval, creator proof, License or public AI permission is inferred.
