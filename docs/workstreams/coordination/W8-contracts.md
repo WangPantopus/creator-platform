@@ -1,5 +1,7 @@
 # W8 contract, migration and runtime register
 
+**Development role guard — 2026-10-02:** [Actual role/browser receipt](../../../artifacts/workstreams/W8/development-trust/20261002-composite/README.md) verifies optional exact `TRUST_CORE_DATABASE_ROLE`, only inherited core/Growth request roles, full reachable-role/ownership/direct-grant rejection and separate Trust pools. Worker-bearing and direct-private-grant hosts are refused before listen; the real browser re-authenticated and displayed saved own support state. W1 keeps the core NOINHERIT and uses a separate Growth/Content pool; this helper override is off by default. No migration activation, Follow/proof/reply approval, authenticated native or C10/provider/recovery completion. W8 services stopped, data retained.
+
 ## Canonical development trust increment — 2026-10-01
 
 Current source branch: `codex/w8-development-trust-runtime`. [Actual partial acceptance](../../../artifacts/workstreams/W8/development-trust/20261001-mac-studio/README.md) separates implemented source, experimental DDL, real app operation and release gates. PR17 is merged. W8 remains the sole registry activation owner;0053 is not active yet.
