@@ -45,6 +45,9 @@ export async function createCommerceHomePage(input: {
 }) {
   invariant(
     input.database.pool === input.service.pool &&
+      input.access.isForPool(input.service.pool) &&
+      input.access.threadScopeInTransactionAvailable &&
+      input.database.threadScopeInTransactionAvailable &&
       typeof input.assertAccountAllowed === "function" &&
       input.migration.version === "0080_w4_fan_request_page_index" &&
       /^[a-f0-9]{64}$/u.test(input.migration.checksum),
