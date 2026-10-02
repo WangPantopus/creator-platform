@@ -95,7 +95,8 @@ private fun NativeAvailability(baseURL: String?, model: FanSession, creator: UUI
             val value = decode(api.request(root, expectedAccountId = account, timeoutMs = 4000))
             if (!active || android.os.SystemClock.elapsedRealtime() >= started + 5000) return
             freshUntil = started + 5000; fresh = true
-            if (replace || !loaded) { current = value; zone = value?.zone ?: ZoneId.systemDefault().id; windows = value?.windows.orEmpty(); loaded = true; notice = null }
+            if (notice == QelvoraCopy.text("w6AvailabilityCouldNotBeLoaded")) notice = null
+            if (replace || !loaded || (!dirty && command == null && value?.version != current?.version)) { current = value; zone = value?.zone ?: ZoneId.systemDefault().id; windows = value?.windows.orEmpty(); loaded = true; notice = null }
         } catch (cancelled: CancellationException) { throw cancelled }
         catch (failure: NativeMediaRequestError) { fresh = false; if (authorityLost(failure)) clear(); notice = QelvoraCopy.text(if (failure.code == "session_account_changed") "w6AvailabilityAccountChanged" else "w6AvailabilityCouldNotBeLoaded") }
         catch (_: Exception) { fresh = false; notice = QelvoraCopy.text("w6AvailabilityCouldNotBeLoaded") }
