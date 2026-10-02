@@ -239,7 +239,7 @@ fun GrowthFanFeature(baseUrl: String?, token: () -> String? = { null }, destinat
     Column(Modifier.fillMaxSize().background(qColor("ground"))) {
         Column(Modifier.weight(1f).verticalScroll(scrollState).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             when {
-                route == "/notifications/settings" -> GrowthNotificationSettings(client)
+                route == "/notifications/settings" -> GrowthNotificationSettings(client, token)
                 route == "/discover" -> {
                     BasicText(QelvoraCopy.text("navDiscover"), style = qText("display-lg").copy(color = ink), modifier = Modifier.semantics {heading()})
                     BasicTextField(query, onValueChange = { query = it.take(120) }, textStyle = qText("body").copy(color = ink), singleLine = true, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), keyboardActions = KeyboardActions(onSearch = {refresh++}), decorationBox = {inner -> Box {if(query.isEmpty()) BasicText(QelvoraCopy.text("growthSearchCreatorsCraftsOrQuestions"), style = qText("body").copy(color = qColor("ink-muted")));inner()}}, modifier = Modifier.fillMaxWidth().background(qColor("surface"), RoundedCornerShape(12.dp)).padding(14.dp).semantics {contentDescription = QelvoraCopy.text("growthSearchCreatorsCraftsOrQuestions")})

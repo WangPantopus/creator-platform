@@ -13,6 +13,7 @@ struct GrowthNotificationSettings: View {
     private enum Field: Hashable { case from, until, timeZone }
     let client: GrowthClient?
     @State private var value: GrowthPreferences?
+    @State private var formSession: String?
     @State private var creators: [PreferenceCreators.Creator] = []
     @State private var from = ""
     @State private var until = ""
@@ -117,12 +118,14 @@ struct GrowthNotificationSettings: View {
         busy = true
         defer { busy = false }
         do {
-            let preferences: GrowthPreferences = try await client.request("preferences")
-            let directory: PreferenceCreators = try await client.request("preferences/creators")
+            guard let captured = try await client.token() else { throw GrowthRequestFailure(status: 401) }
+            let preferences: GrowthPreferences = try await client.request("preferences", expectedSession: captured)
+            let directory: PreferenceCreators = try await client.request("preferences/creators", expectedSession: captured)
             guard !Task.isCancelled else { return }
             // Commit the complete form only after both reads succeed. A partial
             // reload must not combine new toggles with old/empty quiet hours.
             value = preferences
+            formSession = captured
             creators = directory.creators
             from = time(preferences.quietStart)
             until = time(preferences.quietEnd)
@@ -156,7 +159,10 @@ struct GrowthNotificationSettings: View {
         current.quietStart = minute(from)
         current.quietEnd = minute(until)
         do {
-            let updated: GrowthPreferences = try await client.request("preferences", method: "PUT", body: JSONEncoder().encode(current))
+            // The loaded form owns this credential snapshot. Taking a new one
+            // here could submit an old account's choices after account transfer.
+            guard let formSession else { throw GrowthRequestFailure(status: 401) }
+            let updated: GrowthPreferences = try await client.request("preferences", method: "PUT", body: JSONEncoder().encode(current), expectedSession: formSession)
             value = updated
             message = QelvoraCopy.text("growthPreferencesSavedYourInAppRecordRemainsAvailable")
         } catch is CancellationError {

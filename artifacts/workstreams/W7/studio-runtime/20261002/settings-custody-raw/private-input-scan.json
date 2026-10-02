@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-02T18:53:08.208077+00:00",
+  "filesScanned": 135,
+  "privateFieldsChecked": [
+    "DATABASE_MIGRATION_URL",
+    "DATABASE_URL",
+    "GROWTH_API_DATABASE_URL",
+    "GROWTH_ENCRYPTION_KEY",
+    "GROWTH_WORKER_DATABASE_URL",
+    "IDENTITY_SESSION_KEY",
+    "POSTGRES_PASSWORD",
+    "pg-superuser-password"
+  ],
+  "matches": 0,
+  "gzipContentsScanned": true,
+  "rawHostCrashMemoryUploaded": false
+}

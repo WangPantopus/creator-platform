@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-02T18:21:53.734504+00:00",
+  "simulator": "FAB31883-2F36-4E50-83B3-D9654B60FF00",
+  "stateBeforeLeaseRelease": "Shutdown",
+  "releasedSlot": 2,
+  "matchedOwnerTokenDeviceDevInode": true,
+  "apiExit": 0,
+  "webInitialExit": 143,
+  "webFinalExit": 143,
+  "idbCompanionExit": 0,
+  "peerResourcesTouched": false,
+  "android": "not started; occupied peer capacity"
+}

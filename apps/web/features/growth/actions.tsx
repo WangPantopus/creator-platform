@@ -14,10 +14,20 @@ export class GrowthActionError extends Error {
     super(message);
   }
 }
-export async function mutate(path: string, body: unknown, method = "POST") {
+export async function mutate(
+  path: string,
+  body: unknown,
+  method = "POST",
+  expectedAccountId?: string,
+) {
   const response = await fetch(`/api/growth/${path}`, {
     method,
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(expectedAccountId
+        ? { "X-Expected-Account-Id": expectedAccountId }
+        : {}),
+    },
     ...(method !== "DELETE" ? { body: JSON.stringify(body) } : {}),
   });
   const result = await response.json();

@@ -1,0 +1,18 @@
+{
+  "at": "2026-10-02T18:39:14.917107+00:00",
+  "session": 13874,
+  "exitCode": 134,
+  "serial": "emulator-5580",
+  "physicalAdbInventoryAfterExit": [],
+  "beforeExit": [
+    "Netsim Wifi ipv6 socket closed warning",
+    "in_range_cast.h:38 out-of-range warning"
+  ],
+  "cause": "not established",
+  "SaveAndReloadPreviouslyObserved": true,
+  "accountRecoveryReleaseAccepted": false,
+  "signoutAttempt": "first signout capture/root invalid; second tap screenshot completed, later settled screenshot failed because device absent",
+  "lease": "W7 exact slot2 retained for owned recovery",
+  "zeroByteFailedCapture": "android-signout-second-settled.png",
+  "peerResourcesTouched": false
+}

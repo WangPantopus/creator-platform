@@ -31,8 +31,9 @@ private val growthKinds = listOf("ai_reply", "approved_draft", "personal_reply",
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
-internal fun GrowthNotificationSettings(client: GrowthClient?) {
+internal fun GrowthNotificationSettings(client: GrowthClient?, token: () -> String?) {
     var value by remember { mutableStateOf<JSONObject?>(null) }
+    var formSession by remember { mutableStateOf<String?>(null) }
     var creators by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
     var from by remember { mutableStateOf("") }
     var until by remember { mutableStateOf("") }
@@ -61,14 +62,16 @@ internal fun GrowthNotificationSettings(client: GrowthClient?) {
         busy = true
         try {
             requireNotNull(client)
-            val preferences = client.request("preferences")
-            val directory = client.request("preferences/creators").getJSONArray("creators")
+            val captured = token() ?: throw GrowthRequestFailure(401)
+            val preferences = client.request("preferences", expectedSession = captured)
+            val directory = client.request("preferences/creators", expectedSession = captured).getJSONArray("creators")
             val nextCreators = (0 until directory.length()).map { val c = directory.getJSONObject(it); c.getString("id") to c.getString("name") }
             val nextFrom = time(preferences, "quietStart")
             val nextUntil = time(preferences, "quietEnd")
             val nextZone = preferences.getString("timeZone")
             // Keep the whole old form if any part of the reload fails.
             value = preferences
+            formSession = captured
             creators = nextCreators
             from = nextFrom
             until = nextUntil
@@ -133,7 +136,10 @@ internal fun GrowthNotificationSettings(client: GrowthClient?) {
                         scope.launch {
                             try {
                                 requireNotNull(client)
-                                value = client.request("preferences", "PUT", body)
+                                // Bind writes to the form's original load, not
+                                // a credential acquired after account transfer.
+                                val captured = formSession ?: throw GrowthRequestFailure(401)
+                                value = client.request("preferences", "PUT", body, captured)
                                 message = QelvoraCopy.text("growthPreferencesSavedYourInAppRecordRemainsAvailable")
                             } catch (cancelled: CancellationException) { throw cancelled }
                             catch (_: Exception) { message = QelvoraCopy.text("growthPreferencesWereNotSaved") }

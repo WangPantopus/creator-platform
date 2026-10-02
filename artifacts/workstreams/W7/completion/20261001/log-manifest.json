@@ -1244,5 +1244,554 @@
         "roundTripEqual": true
       }
     }
+  },
+  "currentStudioSettingsCustody": {
+    "recordedAt": "2026-10-02T18:56:22.168317+00:00",
+    "parent": "6079ba3dd7bb7b95a2ed476f362f8cec995fa5bc",
+    "evidence": "../../studio-runtime/20261002/settings-custody.md",
+    "files": {
+      "additional-source-review.json": {
+        "bytes": 2789,
+        "sha256": "1e1ffe525b0997b72a47e6aade28d582377275ed5ef61e43569aa703fcaad52e"
+      },
+      "android-account-second.png": {
+        "bytes": 130516,
+        "sha256": "46f04b68636d54718622926fe4f9d42a7fecf10ad476054da340dbb30bb98eec"
+      },
+      "android-account-second.xml": {
+        "bytes": 16958,
+        "sha256": "5816804b3a8bb60097c3c0743266a326659a18e521d6ec3b5a63c9a8591f23a9"
+      },
+      "android-account.xml": {
+        "bytes": 16958,
+        "sha256": "5816804b3a8bb60097c3c0743266a326659a18e521d6ec3b5a63c9a8591f23a9"
+      },
+      "android-cleanup.json": {
+        "bytes": 560,
+        "sha256": "07a66a2446a3997c9caaa152094bd8e71c2daaa9bf576fd5512f75a0604e63da"
+      },
+      "android-emulator-retry-first.png": {
+        "bytes": 39047,
+        "sha256": "e9783c4fa427182824760d731e6352ed97fc0dfe124bc4f0f652b04a514d147b"
+      },
+      "android-emulator-retry-settled.png": {
+        "bytes": 177792,
+        "sha256": "98744e80543ea6b68a18aed4e5b364aed8a5fc036f7f86670b824b5644466579"
+      },
+      "android-emulator-retry-settled.xml": {
+        "bytes": 5382,
+        "sha256": "ae31cb025625c6a91eba2435aa9a59692394686d1ec69db7b4903b065fe86918"
+      },
+      "android-installed-binary.json": {
+        "bytes": 261,
+        "sha256": "23e34d513b2176f6031e8e468173904d540e66fe3b56b2622c2aba589e66df06"
+      },
+      "android-retry-actors.png": {
+        "bytes": 143403,
+        "sha256": "4ca685b5da42ce36d562424dae519a6a417ac8b1ab306d20bc575c46870a9228"
+      },
+      "android-retry-actors.xml": {
+        "bytes": 11822,
+        "sha256": "61e154af59b323262c01ca43e736136736f7cf7550b0116862373042ab85e457"
+      },
+      "android-retry-one-actors.xml": {
+        "bytes": 11822,
+        "sha256": "61e154af59b323262c01ca43e736136736f7cf7550b0116862373042ab85e457"
+      },
+      "android-retry-one-arrival.png": {
+        "bytes": 177794,
+        "sha256": "64228cb5b9f887f7560e5c43389d2331b3797870da38435130fa70ffff9dc0c2"
+      },
+      "android-retry-one-arrival.xml": {
+        "bytes": 5382,
+        "sha256": "ae31cb025625c6a91eba2435aa9a59692394686d1ec69db7b4903b065fe86918"
+      },
+      "android-retry-one-restored.png": {
+        "bytes": 185998,
+        "sha256": "74811c2dd37fb975ac9fd3d23edd0ff53ea639dbb105a8b20e7dbf3380559721"
+      },
+      "android-retry-one-restored.xml": {
+        "bytes": 15955,
+        "sha256": "beed30fa7af923bb82302a6468fcfcdc9582d2f71d65fcac92cfafd2ad796b77"
+      },
+      "android-retry-two-account-bottom.png": {
+        "bytes": 183762,
+        "sha256": "e50e7de5cc5bfe04a3da16739cc5e9fa2f95deaa2a2f552650f8efb8fff7deb6"
+      },
+      "android-retry-two-account-bottom.xml": {
+        "bytes": 17500,
+        "sha256": "9a0ca2d3f82efe9a6622e3ef3407abc79ecddc2675307356359e7ae0d2ed18ed"
+      },
+      "android-retry-two-account.png": {
+        "bytes": 183276,
+        "sha256": "9c3cf55b422c3c6c832de0c4fd10c9f0b08b5537f5b756580007b220f3b71a4d"
+      },
+      "android-retry-two-account.xml": {
+        "bytes": 17500,
+        "sha256": "9a0ca2d3f82efe9a6622e3ef3407abc79ecddc2675307356359e7ae0d2ed18ed"
+      },
+      "android-retry-two-canonical-account.png": {
+        "bytes": 183794,
+        "sha256": "cf4d2009f60f1e0c59bd1a20eb1ba294c5eb8c9a7692b8dfcee4980d3657270b"
+      },
+      "android-retry-two-canonical-account.xml": {
+        "bytes": 17500,
+        "sha256": "9a0ca2d3f82efe9a6622e3ef3407abc79ecddc2675307356359e7ae0d2ed18ed"
+      },
+      "android-retry-two-first.png": {
+        "bytes": 170930,
+        "sha256": "3ce83c61fcf84e1c7cd8eef409bfef382cb373e5c42fced84e394a2b31574098"
+      },
+      "android-retry-two-first.xml": {
+        "bytes": 15929,
+        "sha256": "4f032f192c05836f880fb1d90b7dd4c6e89b11d8933fe4ce5a921e1c27526554"
+      },
+      "android-retry-two-identity-account.png": {
+        "bytes": 130360,
+        "sha256": "6096a4a8574730c01158625573a638642f8d7a676ce308480941541fa44a99b9"
+      },
+      "android-retry-two-identity-account.xml": {
+        "bytes": 16962,
+        "sha256": "0ef41fe224b0b94da2bb11ee2c0021c0bd5fca5d5674e6761ee428bd0bb8699e"
+      },
+      "android-retry-two-signedout-first.png": {
+        "bytes": 177794,
+        "sha256": "64228cb5b9f887f7560e5c43389d2331b3797870da38435130fa70ffff9dc0c2"
+      },
+      "android-retry-two-signedout-first.xml": {
+        "bytes": 5382,
+        "sha256": "ae31cb025625c6a91eba2435aa9a59692394686d1ec69db7b4903b065fe86918"
+      },
+      "android-settings-arrival-after-signout-attempt.xml": {
+        "bytes": 15955,
+        "sha256": "beed30fa7af923bb82302a6468fcfcdc9582d2f71d65fcac92cfafd2ad796b77"
+      },
+      "android-settings-first.png": {
+        "bytes": 186047,
+        "sha256": "e20473d88cc421a9e91f42ff831b47b926bb21101049ac4eaf9a86c2ab8da7f3"
+      },
+      "android-settings-first.xml": {
+        "bytes": 15955,
+        "sha256": "beed30fa7af923bb82302a6468fcfcdc9582d2f71d65fcac92cfafd2ad796b77"
+      },
+      "android-settings-reload.png": {
+        "bytes": 173014,
+        "sha256": "3f35c12063d84324fdac31bd24d80312f6fc04b1f436b96701dc6bac828c015d"
+      },
+      "android-settings-reload.xml": {
+        "bytes": 20048,
+        "sha256": "5966f959ff4dcdb7835b9443e0497991eea9c76965a53a12950f5bbd33866bb0"
+      },
+      "android-settings-save-initial-stale.xml": {
+        "bytes": 20048,
+        "sha256": "5966f959ff4dcdb7835b9443e0497991eea9c76965a53a12950f5bbd33866bb0"
+      },
+      "android-settings-save-initial.png": {
+        "bytes": 191516,
+        "sha256": "f2f81fcc7e9c0f7816e2cf243276da63080d29877154c11d2fd587608ca748b6"
+      },
+      "android-settings-save-live.png": {
+        "bytes": 181181,
+        "sha256": "4b78276c9b7241b6f633e1bce3fc738594d41dff8b8a22495f282fb46e743e64"
+      },
+      "android-settings-save-settled.xml": {
+        "bytes": 19428,
+        "sha256": "1bcd57e5024eea6828861e02a2201ca004ed58f7ed2b5d3d6c197b17e08411aa"
+      },
+      "android-settings-top-reload.png": {
+        "bytes": 156173,
+        "sha256": "490acb74841c1ab8e7047c33add7f5bef65c643f676462ea028e2542615872a1"
+      },
+      "android-settings-top-reload.xml": {
+        "bytes": 19761,
+        "sha256": "846a65b81a2bf237a3b1a6ec99bab346f49d4c08cf9b3d14a443b883fe16dae1"
+      },
+      "android-signout-second-first.png": {
+        "bytes": 130020,
+        "sha256": "b446386274ede1c61dce5669c0afe5effb5b29f64e0e4b8b3847ac1094f994f9"
+      },
+      "android-signout-second-settled.png": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "acceptance": "failed capture after device exit; never displayed or counted"
+      },
+      "android-signout.png": {
+        "bytes": 186331,
+        "sha256": "d4ad2fee49398cdb7a574257cedcadb387f839586cb41d562a275f8b72a3f79b"
+      },
+      "capture-limits.json": {
+        "bytes": 1195,
+        "sha256": "b0bcf9dbe0cbd3422dfc4366ac11d9a24124e577c0182a026c7958d687068b94"
+      },
+      "database-closed-final.json": {
+        "bytes": 210,
+        "sha256": "2d087d2f2cca03f18e2a824289626d244ddae097f1272adcae5e0c4b297467e9"
+      },
+      "database-closed.json": {
+        "bytes": 210,
+        "sha256": "58953dae0f4cf2366c0801a99f41f3d200146f734ae4aecc8e068acb77161503"
+      },
+      "device-service-cleanup.json": {
+        "bytes": 381,
+        "sha256": "c1fcc6bf2039845c6da40f9b214fc5138b11e6f0082a1e7215b6c8fa5abf0e65"
+      },
+      "document-preservation.json": {
+        "bytes": 2875,
+        "sha256": "d82ad43628e9322053e575df0c2db7d8f2700ff328e3ff77885516504e0260ba"
+      },
+      "emulator-failure.json": {
+        "bytes": 686,
+        "sha256": "d745b9488fa689ab51dce4982713a278e5b6ea3f9ea0b9e646c0ff02c2c104e2"
+      },
+      "emulator-host-diagnostic.json": {
+        "bytes": 3135,
+        "sha256": "e8f2c5a33793fa3fdc5135973f384a6c986905391afe0b07964baf20b16e7fd3"
+      },
+      "ios-account-two-account.ax.json": {
+        "bytes": 5924,
+        "sha256": "0fc6c62e582899a889a5ca76d9a5871dc8dfdbd0d5aff7f8244d4de104d309cc"
+      },
+      "ios-account-two-first.ax.json": {
+        "bytes": 4788,
+        "sha256": "b777a88a76792f544a82934f62482219b584bae2e3e01981ba1cd048db2ca8b3"
+      },
+      "ios-account-two-first.png": {
+        "bytes": 158128,
+        "sha256": "40c6ac1b14d27d988b9a3cda4f5fc7e0d1529e5a3b0602df73be5f60e0fce53c"
+      },
+      "ios-account-two-handle-entry.ax.json": {
+        "bytes": 20115,
+        "sha256": "b1562ddab01e68a2f0f67eee0a1338b6d3b3864d8c7759e30a519cd4b97c5c60"
+      },
+      "ios-account-two-handle-entry.png": {
+        "bytes": 239004,
+        "sha256": "c3c5aa4dcdc5b28c0cd6be3e3684b8d0c398670fea03c161a5252485becdbb9c"
+      },
+      "ios-account-two-settings-settled.ax.json": {
+        "bytes": 32103,
+        "sha256": "ae5e2d23a0db4b6c01e7beb591610045130a46b6fd48f3a79dfa87d89eb17413"
+      },
+      "ios-account-two-settings-settled.png": {
+        "bytes": 230130,
+        "sha256": "bc7cf9801706ee362a96ecf9674e86db25206f9d9deb7d6ef95bed6916d98c49"
+      },
+      "ios-account-two-settings-visible.png": {
+        "bytes": 230130,
+        "sha256": "bc7cf9801706ee362a96ecf9674e86db25206f9d9deb7d6ef95bed6916d98c49"
+      },
+      "ios-account-two-settings.ax.json": {
+        "bytes": 4237,
+        "sha256": "33fe2b8721b01a41f6e45e356d2505f93d8d38704d0dc463cdd291e25f93542d"
+      },
+      "ios-account-two-settings.png": {
+        "bytes": 229412,
+        "sha256": "0fb1e34f28b6a5ee8c624f11a1ce71f4313b8ec141935a534b812b0d75dc32b6"
+      },
+      "ios-account-two-signout.ax.json": {
+        "bytes": 2638,
+        "sha256": "ccb499c40c1edf07a95499336f5f2ec5f422e4f6bca0335f029426f4e01025ad"
+      },
+      "ios-account.ax.json": {
+        "bytes": 5920,
+        "sha256": "4fbc45d9d556fdb2a914ce807630d8392c568a17705fd033b511c265a5ab4422"
+      },
+      "ios-account.png": {
+        "bytes": 181582,
+        "sha256": "c6540ef84454cc78105f1a2c96394150086c1f30cb62ac2ee011a2078fc7bb88"
+      },
+      "ios-actor-picker.ax.json": {
+        "bytes": 3757,
+        "sha256": "33c2d440445087ddac096b14badc887630bd397cfa64eb16e05c24eb2dd37cfe"
+      },
+      "ios-actor-picker.png": {
+        "bytes": 199345,
+        "sha256": "6d8d861b133b2cf67ca6f068b88fe94cba03fa8046ff079ff489fb155aa9d65a"
+      },
+      "ios-after-signout.ax.json": {
+        "bytes": 2638,
+        "sha256": "e29c449c5f126c9f4bcb850f49dd965b3127298b4da7bacb291d5435ffdc8c02"
+      },
+      "ios-after-signout.png": {
+        "bytes": 216793,
+        "sha256": "5343c19f499be56e45eb967850029acaf285523063997c1321a1e069f8974f30"
+      },
+      "ios-installed-binary.json": {
+        "bytes": 577,
+        "sha256": "e30bffa274c99e5eaea3b700a95b39c0885c84eb075a553126bafb1d8890c652"
+      },
+      "ios-return-account-one-first.ax.json": {
+        "bytes": 32079,
+        "sha256": "73aa06608f157ee53d9f48fffc10518bd13dc05d18ba3de7de4031699d22b3f2"
+      },
+      "ios-return-account-one-first.png": {
+        "bytes": 226798,
+        "sha256": "c3e26a47fc4a02e917dda14412c6b7dd2c50de0bb129f4687e9d83fd81ba25e9"
+      },
+      "ios-return-account-one-settled.ax.json": {
+        "bytes": 32079,
+        "sha256": "45dcaf002842cd9b675417b126791bf7468420aaa1a6af90fd0a433a11d121be"
+      },
+      "ios-return-account-one-settled.png": {
+        "bytes": 226798,
+        "sha256": "c3e26a47fc4a02e917dda14412c6b7dd2c50de0bb129f4687e9d83fd81ba25e9"
+      },
+      "ios-settings-first.ax.json": {
+        "bytes": 32079,
+        "sha256": "1134c40dc9d5f9f3e6e372e64fd1949fff870c0eb8f488edabec9e5000729c07"
+      },
+      "ios-settings-first.png": {
+        "bytes": 227287,
+        "sha256": "e2845ca7666475fb8c15be7ae1008b21276dd51d0e0737c4dc483b22b282a11c"
+      },
+      "ios-settings-reload.ax.json": {
+        "bytes": 32357,
+        "sha256": "e9125319544f4e7b5eabfd6b25ad5ffcc03daef88ffab5066ac7b7274bbe3986"
+      },
+      "ios-settings-reload.png": {
+        "bytes": 193666,
+        "sha256": "9cc2e0f46c3bd4a843248104894012e43fe8d31b5fc2e1bb932ce74505dc96bb"
+      },
+      "ios-settings-save.ax.json": {
+        "bytes": 32873,
+        "sha256": "02c7eef8316616a58bcdc83c95fe4533f18c6297c096aa77cd6a4cae027f4d95"
+      },
+      "ios-settings-save.png": {
+        "bytes": 202829,
+        "sha256": "62fc9b337c9167964fe7c356e13414d886b2089fd14a29a83a9feb423f78a48d"
+      },
+      "ios-settings-signed-out.ax.json": {
+        "bytes": 2638,
+        "sha256": "3faae1f5103cc80cc1ab21f30e0fccf1f7f77256326384e8205eed00b7116045"
+      },
+      "ios-settings-signed-out.png": {
+        "bytes": 216793,
+        "sha256": "5343c19f499be56e45eb967850029acaf285523063997c1321a1e069f8974f30"
+      },
+      "ios-signout-first-tap-nochange.ax.json": {
+        "bytes": 5920,
+        "sha256": "9b2f5322338ba0b85f14a4e1bef397c4a828a07a5c53f28f5a37600140392347"
+      },
+      "ios-signout-first-tap-nochange.png": {
+        "bytes": 181582,
+        "sha256": "c6540ef84454cc78105f1a2c96394150086c1f30cb62ac2ee011a2078fc7bb88"
+      },
+      "log-roundtrip.json": {
+        "bytes": 6168,
+        "sha256": "2868c8eda9bf0d8b90c84c19f2fe48da9f22d0d76917413c3d40a517e1c5e289"
+      },
+      "private-input-scan.json": {
+        "bytes": 414,
+        "sha256": "642d48024de9b4799fdc7cebfb0875b9ca6237cbfcf481b69c35f5305535e45f"
+      },
+      "published-foundation-final.json": {
+        "bytes": 5493,
+        "sha256": "2ab2925275f4d0f44506c7f79e0c42323f8d0d91c2269b63ccc687de4cfac33c"
+      },
+      "published-foundation.json": {
+        "bytes": 5493,
+        "sha256": "2ab2925275f4d0f44506c7f79e0c42323f8d0d91c2269b63ccc687de4cfac33c"
+      },
+      "published-trust.json": {
+        "bytes": 3134,
+        "sha256": "804cbaea9c924ccb002ef2836a0de08bad08c71ef0f46615acb7acd02451a8ac"
+      },
+      "readiness.json": {
+        "bytes": 162,
+        "sha256": "a5a04df4544e2d704b987382cdd261f6d2868eb539d8f0df09efc772f9ad9af9"
+      },
+      "settings-custody-android-account-dump.log.gz": {
+        "bytes": 84,
+        "sha256": "bfdf15fda840b31e53f607e0d844ffcb7965e8a0acb56d0e72b2b4d48388b575",
+        "contentSha256": "9a8572fa0a06b534cde91b2322c75ac5863c1c5a9d46bebbf0185bf69f2ce5e1"
+      },
+      "settings-custody-android-account-second-dump.log.gz": {
+        "bytes": 90,
+        "sha256": "b8055de19e3ecc201cd58dd48a7ec25cdbf549092fa31672a11ee2998a5fb5f2",
+        "contentSha256": "7b20b097f35976d8dc37a4583763c70d17c4ed2160e83b6ec5d98044d4b8622b"
+      },
+      "settings-custody-android-api-repaired.log.gz": {
+        "bytes": 133,
+        "sha256": "3009d94976c69afdc0e3dfd2517a6324d465f5340ea887073e591f465e5b2ac3",
+        "contentSha256": "fc921f908105fbd76ad1e4ee2a24d5e791e1047039c7d1d5b7f45eb9a6bc6579"
+      },
+      "settings-custody-android-api.log.gz": {
+        "bytes": 495,
+        "sha256": "41bd963327ae7694edbb815463ff8620a627c8067b602ee20c2466b9dac82a3d",
+        "contentSha256": "95c88c6523554644d143ab4101a15d01a9dd99694e6cd3df8bb31216a72d3f90"
+      },
+      "settings-custody-android-arrival-dump.log.gz": {
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+        "contentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "settings-custody-android-arrival-settled-dump.log.gz": {
+        "bytes": 89,
+        "sha256": "52d444f28c194aaf98692aea07bb44f338adb841f26f32b76a9933f0984a2eae",
+        "contentSha256": "5b8ea9e5b3ec22e4b5d2742ed4f3d888f29da48e4003ed5a8695490660d3a1d4"
+      },
+      "settings-custody-android-bottom-dump.log.gz": {
+        "bytes": 76,
+        "sha256": "a653b340cdc8c6e8d1ffe8a798bdebd80213e5ba5e7bd1bf4c0e8ee7e9915b45",
+        "contentSha256": "44ea0552a6d63331e3f642c3914cc63432183ff21dc426affa244db9362d28b7"
+      },
+      "settings-custody-android-first-dump.log.gz": {
+        "bytes": 76,
+        "sha256": "a653b340cdc8c6e8d1ffe8a798bdebd80213e5ba5e7bd1bf4c0e8ee7e9915b45",
+        "contentSha256": "44ea0552a6d63331e3f642c3914cc63432183ff21dc426affa244db9362d28b7"
+      },
+      "settings-custody-android-reload-dump.log.gz": {
+        "bytes": 85,
+        "sha256": "88a3451ba00964748e4580efa810424c68421d21a15cc8924f99cdd18579c7af",
+        "contentSha256": "073aaa40b1c85744d44b94861bf410d06f261fcc3e4ccaa11e7f948b61656dd7"
+      },
+      "settings-custody-android-save-dump.log.gz": {
+        "bytes": 78,
+        "sha256": "330c3f80bbbd6b71fb89b01a6fdafadd2242f06fbb9c302bb59eb9a2f823e32d",
+        "contentSha256": "406bd8df88b9c43b78dc2a75c35ee3f96f79a5b3ea922e8ead222b4c5b5752f9"
+      },
+      "settings-custody-android-save-settled-dump.log.gz": {
+        "bytes": 81,
+        "sha256": "ec65b20ca1c78098426931585fc1fed26f8a8ba8d280c1bdcfeea854277fe2ca",
+        "contentSha256": "8679ba0699edb77de268554c781cf3a67dbdad02100ce54ca3b297070f6411ae"
+      },
+      "settings-custody-android-scroll-dump.log.gz": {
+        "bytes": 76,
+        "sha256": "a653b340cdc8c6e8d1ffe8a798bdebd80213e5ba5e7bd1bf4c0e8ee7e9915b45",
+        "contentSha256": "44ea0552a6d63331e3f642c3914cc63432183ff21dc426affa244db9362d28b7"
+      },
+      "settings-custody-android-signout-dump.log.gz": {
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+        "contentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "settings-custody-android-top-reload-dump.log.gz": {
+        "bytes": 89,
+        "sha256": "d940e3898b74319669ea9968566a3c29d1391e14a00cf5539d66cb83d200e435",
+        "contentSha256": "6378c9cf4ad478d3d14a10d256673fef692266917d1dd59a3a1b302b04ccb634"
+      },
+      "settings-custody-android.log.gz": {
+        "bytes": 1000,
+        "sha256": "302f1d7288884fd2912571457212b89e8323456f0f9c52cb327cba88fc0aaf41",
+        "contentSha256": "140aa1c308a47b1421f6a2bd1c22762ae0d8b9359c6a5400aa30e148263c14f0"
+      },
+      "settings-custody-api.log.gz": {
+        "bytes": 133,
+        "sha256": "3009d94976c69afdc0e3dfd2517a6324d465f5340ea887073e591f465e5b2ac3",
+        "contentSha256": "fc921f908105fbd76ad1e4ee2a24d5e791e1047039c7d1d5b7f45eb9a6bc6579"
+      },
+      "settings-custody-emulator-retry.log.gz": {
+        "bytes": 4097,
+        "sha256": "83740d6d32212ec362c848af4bb91c638fb327d064f02c56d21a24c2a0999b8e",
+        "contentSha256": "f7f4880ea5840ef4706cc8388462ca34d2b2e0ba8c4daa31a4a39d34875e928f"
+      },
+      "settings-custody-emulator.log.gz": {
+        "bytes": 3036,
+        "sha256": "a34c3c355ef4d4b00b6034d9a81107b1681294f56b2802015765880b364b4c12",
+        "contentSha256": "0c5608efbb4dd4a35bd2ccfbb8289d76333e01d592e36fe55db3a6560334029b"
+      },
+      "settings-custody-idb.log.gz": {
+        "bytes": 8280,
+        "sha256": "4378265f02fc37c65a302c5849e2ba3a6707abd194049afb8ea8fdb1e388f395",
+        "contentSha256": "8c90c27182b8e0f32e9beb64c00b47a89594429ca5e6e09c951a4034d9c4f5d8"
+      },
+      "settings-custody-ios.log.gz": {
+        "bytes": 5174,
+        "sha256": "b8a8939f3dcb8c15ac149fcb8359d13b9b96f0b78698c131481732ab5a8bdad6",
+        "contentSha256": "4205e72c3f355ae3aa96e3c29a48f040fa95cdbc276ee4dce0752b449228af78"
+      },
+      "settings-custody-swift.log.gz": {
+        "bytes": 4072,
+        "sha256": "56ad716cffeaf82d0e5b16901585bc52a543a74a11042cd0f7e8e2f12e9ab6f2",
+        "contentSha256": "86d72f172825d3e22d5cac3cb4653d5fa4eecd32630b2a99b3b278a1107a60ab"
+      },
+      "settings-custody-web-final.log.gz": {
+        "bytes": 130,
+        "sha256": "63cacc212d13124178ce0d8f0803ff58620bdcd6c82c3b4c1218b474d74de927",
+        "contentSha256": "2666daca7215dfb4105e36ac9220cdde9ef82514ec56de31445b4d2c4da439e2"
+      },
+      "settings-custody-web.log.gz": {
+        "bytes": 131,
+        "sha256": "a8d41125a4135a1622ab394ea15c34c57c7c56e15fce068b2e81c05fef0c9832",
+        "contentSha256": "e9abee973db07e0006e917aecb8974d7a3405b76a82801849a567f35266e9dfe"
+      },
+      "settings-custody-workspace-final.log.gz": {
+        "bytes": 2536,
+        "sha256": "7ea8e4b6a04857581af2a64b5bd9301c8b396bf7af541f688e5db9e51f010e67",
+        "contentSha256": "0def0eb4806578dd214c2f185fa4c185286585dcf69d12dc06bc407a83970e4f"
+      },
+      "settings-custody-workspace.log.gz": {
+        "bytes": 2535,
+        "sha256": "06e642e36c67b54b72b9e8891b1c0ed61d3724d27ca7f472a8a7daff0a40b9a1",
+        "contentSha256": "fec4c199c6bddedda785696757dd641c1faac5c4246c705815ff15af48ba0578"
+      },
+      "source-review.json": {
+        "bytes": 1752,
+        "sha256": "45cb753812e38ca6d915811260673209af16cd4df6eefc1103abefa20c4c15ff"
+      },
+      "web-settings-back.ax.txt": {
+        "bytes": 855,
+        "sha256": "e0faf699f68361ab59d370db2595fb112d7350f6f4f21828b1bc35b49cbec5a9"
+      },
+      "web-settings-back.png": {
+        "bytes": 29957,
+        "sha256": "f5ca2689f1702c94f9bd0296e0ce8e7ab9763ff1e394510d3b38ff91acb62e1c"
+      },
+      "web-settings-final-back.ax.txt": {
+        "bytes": 855,
+        "sha256": "e0faf699f68361ab59d370db2595fb112d7350f6f4f21828b1bc35b49cbec5a9"
+      },
+      "web-settings-final-back.png": {
+        "bytes": 29957,
+        "sha256": "f5ca2689f1702c94f9bd0296e0ce8e7ab9763ff1e394510d3b38ff91acb62e1c"
+      },
+      "web-settings-final-identity-unconfigured.ax.txt": {
+        "bytes": 1130,
+        "sha256": "cc8bc70962690bba5fac97b1f460391cfec3045db789553fdce364ca2505e2dd"
+      },
+      "web-settings-final-identity-unconfigured.png": {
+        "bytes": 38709,
+        "sha256": "b1295d365918f7366574c05601bb5590d0da59e997e2001fd9e1978d3f4b215e"
+      },
+      "web-settings-final-retry.ax.txt": {
+        "bytes": 1130,
+        "sha256": "cc8bc70962690bba5fac97b1f460391cfec3045db789553fdce364ca2505e2dd"
+      },
+      "web-settings-final-retry.png": {
+        "bytes": 38709,
+        "sha256": "b1295d365918f7366574c05601bb5590d0da59e997e2001fd9e1978d3f4b215e"
+      },
+      "web-settings-final-signed-out.ax.txt": {
+        "bytes": 735,
+        "sha256": "147a0f09e6dddf454d143a1b1622885cc8255a1b9636ed9978ea9a21162d38d9"
+      },
+      "web-settings-final-signed-out.png": {
+        "bytes": 17920,
+        "sha256": "f8053ed889515b008e4e66ae7b57e4800d73acc0c0f78c79af6a8245b657a034"
+      },
+      "web-settings-identity-unconfigured.ax.txt": {
+        "bytes": 1130,
+        "sha256": "cc8bc70962690bba5fac97b1f460391cfec3045db789553fdce364ca2505e2dd"
+      },
+      "web-settings-identity-unconfigured.png": {
+        "bytes": 38709,
+        "sha256": "b1295d365918f7366574c05601bb5590d0da59e997e2001fd9e1978d3f4b215e"
+      },
+      "web-settings-retry.ax.txt": {
+        "bytes": 1130,
+        "sha256": "cc8bc70962690bba5fac97b1f460391cfec3045db789553fdce364ca2505e2dd"
+      },
+      "web-settings-retry.png": {
+        "bytes": 38709,
+        "sha256": "b1295d365918f7366574c05601bb5590d0da59e997e2001fd9e1978d3f4b215e"
+      },
+      "web-settings-signed-out.ax.txt": {
+        "bytes": 735,
+        "sha256": "147a0f09e6dddf454d143a1b1622885cc8255a1b9636ed9978ea9a21162d38d9"
+      },
+      "web-settings-signed-out.png": {
+        "bytes": 17920,
+        "sha256": "f8053ed889515b008e4e66ae7b57e4800d73acc0c0f78c79af6a8245b657a034"
+      }
+    }
   }
 }

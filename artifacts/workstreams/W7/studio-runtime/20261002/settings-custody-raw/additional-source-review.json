@@ -1,0 +1,40 @@
+{
+  "at": "2026-10-02T18:27:50.724076+00:00",
+  "headBase": "6079ba3d",
+  "currentFullFilesPersonallyRead": {
+    "apps/backend/src/modules/growth/entry-context.ts": "2ffc994641ab78339c2e92724212136e9b9cf1f636195d85b966f6c4648537d8",
+    "apps/backend/src/modules/growth/account-notifications.ts": "1d49fc3baf0024bad9a075361136ea680354e76ab338a4f2892f35d53c0f7849",
+    "apps/backend/src/modules/growth/impact-notifications.ts": "302f499e710079c84d64609f2d0ab31f59cf2c8401badf49060b64cfa2feaad4",
+    "apps/backend/src/modules/growth/notification-custody.ts": "fa36ae13dae74722769cceb1a7a91dbae079df83e13c8c8a0c810abefcae7cb1",
+    "apps/backend/src/modules/growth/sources.ts": "84dc4dfbbf856a19f391fe4d22e500a789d5fa8e9ab33ad3d357373232aa4ad0",
+    "apps/backend/src/modules/growth/home-composition.ts": "f6fc9a477a883a49d6dffc7a599c69499ad3a50cb33bcbfb47c4b36ba430825b",
+    "apps/backend/src/modules/growth/device-session.ts": "baf951123645f52e7d90fe5729e72e20cabadeb86ed779de5943c9d1d36d68dc",
+    "apps/backend/src/modules/growth/contracts.ts": "b9da970318fb39655194a6bedc4d346cc79cc099c7405ea7e7bd0e52f1a53922",
+    "apps/backend/src/modules/growth/router.ts": "d83c253ea2453a3758cd7d25094e79d7372f90bff4580a5800b2ce5e2b90cdfd",
+    "apps/backend/src/modules/growth/home.ts": "47aaa63893bf384c86022e28ed62d5bca99574468059089ab6917de0e255e7f5",
+    "apps/backend/src/modules/growth/database.ts": "592834d7e5afee4e8ca0e10ed0eb0a3fd49a8adb69190d9acf73cc876a0efb2e",
+    "apps/backend/src/modules/growth/runtime.ts": "a89a54b57fa5a4e1e8f8cf07c00087a1f53af4801330a1a78ab0a9b6a20cfa50",
+    "apps/backend/src/modules/growth/privacy-export.ts": "4c537faed97f6a1a6a27905c26102e8a36e2080b350eb423669cdd7f834abe28",
+    "apps/backend/src/modules/trust/domain-privacy-catalog.ts": "f36bfa5b69cfc2343a5fc65d44ae4d41509b04b97bbf0b96ebaad3bb449a2848",
+    "apps/backend/src/modules/trust/domain-privacy-authority.ts": "19a6a60fce2f390a1522374d959a495b425fc526d9bbb30796102696a0f5ee23",
+    "apps/web/lib/session.ts": "19c2b54ea67cb7cc0127649f4d684c0b99eefa71c790c95692c26d4f1374d58a",
+    "apps/web/features/growth/server.ts": "499d88845faf11b0b6e362e04f10418f27bb10f711ce8f68f32fdf24f50e47b7",
+    "apps/web/app/api/growth/[...path]/route.ts": "fa5e82c0ebfaf7e31925dd71f61f3c7c60363d5d64a84e4cdbe413816cb0c597"
+  },
+  "combinedDiffsPersonallyRead": [
+    "growth/configured.ts",
+    "growth/core-follows.ts",
+    "growth/lifecycle.ts",
+    "growth/integration.ts",
+    "growth/retention.ts",
+    "identity/request-authority.ts",
+    "identity/signed-acts.ts",
+    "operations/runtime.ts",
+    "trust/development.ts",
+    "trust/privacy-consumers.ts",
+    "trust/own-privacy-hook.ts",
+    "trust/worker.ts"
+  ],
+  "fullCombinedPRReviewComplete": false,
+  "acceptanceNotInferredFromReview": true
+}

@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-02T17:50:32.041335+00:00",
+  "updatedAt": "2026-10-02T18:54:10.931203+00:00",
   "owner": "W7 primary",
   "chatId": "01a0f6b7-6ddb-7d32-9efd-603858f6f60f",
   "checkout": "/Users/yingpengwang/.codex/worktrees/0546/creator-platform",
@@ -126,7 +126,7 @@
     "nativeProcessesRunning": false
   },
   "currentHost": {
-    "recordedAt": "2026-10-02T17:54:38.013881+00:00",
+    "recordedAt": "2026-10-02T18:54:10.931203+00:00",
     "note": "W7 moved from the old iMac (Intel, macOS 26, Xcode 26.5) to Yingpeng's Mac Studio (Apple M2 Max, macOS 27.0 26A428, Xcode 27.0 27A266a, iOS 27.0 simulator runtime). Every iMac-era resource listed elsewhere in this file (container creator-platform-w7-document-20261001, simulator CE855FD5-A4AA-4C62-A63B-5E80D2E1DFF1, /private/tmp/creator-platform-w7-completion-20261001 caches, ~/.config/creator-platform/{secrets,cleanup-20261001,w7-completion-20261001}) is absent from this machine and was not copied. Those entries are historical iMac custody only.",
     "checkout": "/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545",
     "postgres": {
@@ -136,7 +136,7 @@
       "address": "127.0.0.1:55447",
       "database": "creator_w7",
       "superuserPasswordFile": "~/.config/creator-platform/w7-macstudio-20261001/pg-superuser-password (mode 0600, never printed)",
-      "state": "stopped;40 canonical migrations;connectionlimit0 and trafficclosed comment after main-ecca journeys",
+      "state": "stopped, canonical40 unchanged, connectionLimit0, other_clients0; no wave activation",
       "recoveredIMacData": "not restored; the iMac backup holds 0 creators/relationships/shares and is not on this machine"
     },
     "reservedPorts": {
@@ -149,13 +149,13 @@
       "udid": "FAB31883-2F36-4E50-83B3-D9654B60FF00",
       "runtime": "iOS 27.0",
       "points": "390x844",
-      "state": "Current newly built signed main587 shipping app installed/operated Save/Reload/share warm/retry/cold Night, exactlease released; shutdown"
+      "state": "Current account-bound shipping app personally operated Save/Reload and actual development account switch; normally shut down; exact slot2 lease released after physical verification"
     },
     "androidAvd": {
       "name": "Qelvora_W7_API34",
       "image": "system-images;android-34;google_apis;arm64-v8a",
       "display": "1170x2532 @480dpi = 390x844 dp",
-      "state": "New main587 shipping APK0c0b2818 installed/operated actual expired-session recovery Save/Reload/share warm/retry/cold Night, exactlease released; stopped"
+      "state": "matching APK Save/Reload and ordinary account isolation personally observed; initial emulator host134 preserved; identical retained AVD retry exit0, exact slot2 released after absence"
     },
     "swiftBuildScratch": "/private/tmp/claude-501/... session scratchpad (disposable; not a dependency)",
     "sharedMachineBudget": "Adopted W1's 2026-10-01 budget: one heavy native build machine-wide via mkdir /private/tmp/creator-platform-heavy-build.lock (+owner file); at most two creator-platform emulators via /private/tmp/creator-platform-emulator-slot-{1,2}; at most three booted simulators via /private/tmp/creator-platform-simulator-slot-{1,2,3}; explicit UDID/serial only. Three earlier local swift test passes in this session ran before the budget message.",
@@ -187,18 +187,22 @@
     },
     "nativeBuild": "Signed shipping iOS and Android shipping/original checks pass; actual clients Settings and navigation observed, Android Home action200% Light/Night. Original18 Swift/110 comparisons pass. Both own devices normally stopped, exact UUID/inode leases released; companion stopped. No new tests/references/tolerances.",
     "api": {
-      "source": "5fc1a8ac811779cb13dae7ef485cb675cfeaccaa compiled backend with newly generated copy",
-      "log": "/private/tmp/creator-platform-w7-active-20261001/share-images-api.log",
-      "lastPid": 44338,
-      "lastSession": 37554,
-      "state": "Stopped normally after actual readiness and share-unavailable operation; no provider/purpose fabricated."
+      "source": "6079ba3d with six uncommitted account-bound settings files; backend rebuilt by workspace check",
+      "log": "/private/tmp/creator-platform-w7-active-20261001/settings-custody-android-api-repaired.log",
+      "lastPid": 86496,
+      "lastSession": 51569,
+      "state": "Normally stopped repaired API exit0; PID86496 verified own cwd before SIGTERM; initial53300 refusal preserved",
+      "session": null
     },
     "web": {
-      "mode": "Shipping production .next-w7-images-20261002, loopback3007",
+      "mode": "Shipping production Next 16.3.7, apps/web cwd, loopback 3007",
       "acceptance": "Actual unavailable-share export and recovery,410 no artifact; successful full-image download requires genuine approved share/origin and remains unobserved.",
       "lastPid": 42433,
       "lastParentSession": 64965,
-      "state": "Stopped normally after actual share export/recovery Light/Night; browser closed; fresh build retained."
+      "state": "Final shipping web personally operated signed-out settings/Continue/Retry/Back; normally stopped exit143",
+      "session": null,
+      "log": "/private/tmp/creator-platform-w7-active-20261001/settings-custody-web-final.log",
+      "lastSession": 15882
     },
     "pushConfiguration": {
       "CreatorPushEnabled": false,
@@ -386,6 +390,34 @@
       "webPid": 20712,
       "database": "stopped;40 ledger;connectionlimit0;trafficclosed;no other clients",
       "backupRefreshRequiredBeforeActivation": true
+    },
+    "settingsCustodyRuntime": {
+      "startedAt": "2026-10-02T18:08:21.108330+00:00",
+      "source": "6079ba3d + six source files uncommitted",
+      "apiSession": null,
+      "webSession": null,
+      "iosUDID": "FAB31883-2F36-4E50-83B3-D9654B60FF00",
+      "simulatorSlot": 2,
+      "simulatorLease": "f50170d9-ff25-4193-b46a-0a3f980c6b62",
+      "emulator": "5580 absent, retained AVD unchanged; exact slot2 released",
+      "migrationActivation": false,
+      "scopeComplete": false,
+      "ios": "shutdown after actual Save/Reload/account switch; lease released",
+      "web": "stopped exit143; own temporary browser tab closed",
+      "androidSession": null,
+      "androidSerial": "emulator-5580",
+      "androidSlot": 2,
+      "androidLease": "168382a8-41ab-448d-a024-6a6fcb64573f",
+      "firstAndroidApiExit": 1,
+      "initialAndroidSession": 13874,
+      "initialAndroidExit": 134,
+      "androidAccountAcceptance": "ordinary development account switch/persistence observed; mid-flight race and production acceptance open",
+      "deviceHostCause": "not established; preserved macOS SIGABRT/gRPC stack",
+      "cleanupAt": "2026-10-02T18:54:10.931203+00:00",
+      "retryAndroidExit": 0,
+      "repairedApiExit": 0,
+      "newTests": false,
+      "evidence": "artifacts/workstreams/W7/studio-runtime/20261002/settings-custody.md"
     }
   }
 }

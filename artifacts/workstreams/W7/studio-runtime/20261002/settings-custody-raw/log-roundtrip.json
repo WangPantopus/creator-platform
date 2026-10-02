@@ -1,0 +1,127 @@
+{
+  "settings-custody-workspace.log.gz": {
+    "sourceSha256": "fec4c199c6bddedda785696757dd641c1faac5c4246c705815ff15af48ba0578",
+    "gzipSha256": "06e642e36c67b54b72b9e8891b1c0ed61d3724d27ca7f472a8a7daff0a40b9a1",
+    "lossless": true
+  },
+  "settings-custody-workspace-final.log.gz": {
+    "sourceSha256": "0def0eb4806578dd214c2f185fa4c185286585dcf69d12dc06bc407a83970e4f",
+    "gzipSha256": "7ea8e4b6a04857581af2a64b5bd9301c8b396bf7af541f688e5db9e51f010e67",
+    "lossless": true
+  },
+  "settings-custody-android.log.gz": {
+    "sourceSha256": "140aa1c308a47b1421f6a2bd1c22762ae0d8b9359c6a5400aa30e148263c14f0",
+    "gzipSha256": "302f1d7288884fd2912571457212b89e8323456f0f9c52cb327cba88fc0aaf41",
+    "lossless": true
+  },
+  "settings-custody-ios.log.gz": {
+    "sourceSha256": "4205e72c3f355ae3aa96e3c29a48f040fa95cdbc276ee4dce0752b449228af78",
+    "gzipSha256": "b8a8939f3dcb8c15ac149fcb8359d13b9b96f0b78698c131481732ab5a8bdad6",
+    "lossless": true
+  },
+  "settings-custody-swift.log.gz": {
+    "sourceSha256": "86d72f172825d3e22d5cac3cb4653d5fa4eecd32630b2a99b3b278a1107a60ab",
+    "gzipSha256": "56ad716cffeaf82d0e5b16901585bc52a543a74a11042cd0f7e8e2f12e9ab6f2",
+    "lossless": true
+  },
+  "settings-custody-api.log.gz": {
+    "sourceSha256": "fc921f908105fbd76ad1e4ee2a24d5e791e1047039c7d1d5b7f45eb9a6bc6579",
+    "gzipSha256": "3009d94976c69afdc0e3dfd2517a6324d465f5340ea887073e591f465e5b2ac3",
+    "lossless": true
+  },
+  "settings-custody-web.log.gz": {
+    "sourceSha256": "e9abee973db07e0006e917aecb8974d7a3405b76a82801849a567f35266e9dfe",
+    "gzipSha256": "a8d41125a4135a1622ab394ea15c34c57c7c56e15fce068b2e81c05fef0c9832",
+    "lossless": true
+  },
+  "settings-custody-web-final.log.gz": {
+    "sourceSha256": "2666daca7215dfb4105e36ac9220cdde9ef82514ec56de31445b4d2c4da439e2",
+    "gzipSha256": "63cacc212d13124178ce0d8f0803ff58620bdcd6c82c3b4c1218b474d74de927",
+    "lossless": true
+  },
+  "settings-custody-idb.log.gz": {
+    "sourceSha256": "8c90c27182b8e0f32e9beb64c00b47a89594429ca5e6e09c951a4034d9c4f5d8",
+    "gzipSha256": "4378265f02fc37c65a302c5849e2ba3a6707abd194049afb8ea8fdb1e388f395",
+    "lossless": true
+  },
+  "settings-custody-android-reload-dump.log.gz": {
+    "sourceSha256": "073aaa40b1c85744d44b94861bf410d06f261fcc3e4ccaa11e7f948b61656dd7",
+    "gzipSha256": "88a3451ba00964748e4580efa810424c68421d21a15cc8924f99cdd18579c7af",
+    "lossless": true
+  },
+  "settings-custody-android-signout-dump.log.gz": {
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "gzipSha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "lossless": true
+  },
+  "settings-custody-android-first-dump.log.gz": {
+    "sourceSha256": "44ea0552a6d63331e3f642c3914cc63432183ff21dc426affa244db9362d28b7",
+    "gzipSha256": "a653b340cdc8c6e8d1ffe8a798bdebd80213e5ba5e7bd1bf4c0e8ee7e9915b45",
+    "lossless": true
+  },
+  "settings-custody-android-account-second-dump.log.gz": {
+    "sourceSha256": "7b20b097f35976d8dc37a4583763c70d17c4ed2160e83b6ec5d98044d4b8622b",
+    "gzipSha256": "b8055de19e3ecc201cd58dd48a7ec25cdbf549092fa31672a11ee2998a5fb5f2",
+    "lossless": true
+  },
+  "settings-custody-android-arrival-settled-dump.log.gz": {
+    "sourceSha256": "5b8ea9e5b3ec22e4b5d2742ed4f3d888f29da48e4003ed5a8695490660d3a1d4",
+    "gzipSha256": "52d444f28c194aaf98692aea07bb44f338adb841f26f32b76a9933f0984a2eae",
+    "lossless": true
+  },
+  "settings-custody-emulator-retry.log.gz": {
+    "sourceSha256": "f7f4880ea5840ef4706cc8388462ca34d2b2e0ba8c4daa31a4a39d34875e928f",
+    "gzipSha256": "83740d6d32212ec362c848af4bb91c638fb327d064f02c56d21a24c2a0999b8e",
+    "lossless": true
+  },
+  "settings-custody-android-bottom-dump.log.gz": {
+    "sourceSha256": "44ea0552a6d63331e3f642c3914cc63432183ff21dc426affa244db9362d28b7",
+    "gzipSha256": "a653b340cdc8c6e8d1ffe8a798bdebd80213e5ba5e7bd1bf4c0e8ee7e9915b45",
+    "lossless": true
+  },
+  "settings-custody-android-arrival-dump.log.gz": {
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "gzipSha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "lossless": true
+  },
+  "settings-custody-android-save-settled-dump.log.gz": {
+    "sourceSha256": "8679ba0699edb77de268554c781cf3a67dbdad02100ce54ca3b297070f6411ae",
+    "gzipSha256": "ec65b20ca1c78098426931585fc1fed26f8a8ba8d280c1bdcfeea854277fe2ca",
+    "lossless": true
+  },
+  "settings-custody-emulator.log.gz": {
+    "sourceSha256": "0c5608efbb4dd4a35bd2ccfbb8289d76333e01d592e36fe55db3a6560334029b",
+    "gzipSha256": "a34c3c355ef4d4b00b6034d9a81107b1681294f56b2802015765880b364b4c12",
+    "lossless": true
+  },
+  "settings-custody-android-save-dump.log.gz": {
+    "sourceSha256": "406bd8df88b9c43b78dc2a75c35ee3f96f79a5b3ea922e8ead222b4c5b5752f9",
+    "gzipSha256": "330c3f80bbbd6b71fb89b01a6fdafadd2242f06fbb9c302bb59eb9a2f823e32d",
+    "lossless": true
+  },
+  "settings-custody-android-account-dump.log.gz": {
+    "sourceSha256": "9a8572fa0a06b534cde91b2322c75ac5863c1c5a9d46bebbf0185bf69f2ce5e1",
+    "gzipSha256": "bfdf15fda840b31e53f607e0d844ffcb7965e8a0acb56d0e72b2b4d48388b575",
+    "lossless": true
+  },
+  "settings-custody-android-top-reload-dump.log.gz": {
+    "sourceSha256": "6378c9cf4ad478d3d14a10d256673fef692266917d1dd59a3a1b302b04ccb634",
+    "gzipSha256": "d940e3898b74319669ea9968566a3c29d1391e14a00cf5539d66cb83d200e435",
+    "lossless": true
+  },
+  "settings-custody-android-scroll-dump.log.gz": {
+    "sourceSha256": "44ea0552a6d63331e3f642c3914cc63432183ff21dc426affa244db9362d28b7",
+    "gzipSha256": "a653b340cdc8c6e8d1ffe8a798bdebd80213e5ba5e7bd1bf4c0e8ee7e9915b45",
+    "lossless": true
+  },
+  "settings-custody-android-api-repaired.log.gz": {
+    "sourceSha256": "fc921f908105fbd76ad1e4ee2a24d5e791e1047039c7d1d5b7f45eb9a6bc6579",
+    "gzipSha256": "3009d94976c69afdc0e3dfd2517a6324d465f5340ea887073e591f465e5b2ac3",
+    "lossless": true
+  },
+  "settings-custody-android-api.log.gz": {
+    "sourceSha256": "95c88c6523554644d143ab4101a15d01a9dd99694e6cd3df8bb31216a72d3f90",
+    "gzipSha256": "41bd963327ae7694edbb815463ff8620a627c8067b602ee20c2466b9dac82a3d",
+    "lossless": true
+  }
+}

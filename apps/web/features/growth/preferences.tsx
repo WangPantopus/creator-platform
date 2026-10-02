@@ -48,9 +48,11 @@ function minutes(value: string) {
 export function PreferenceForm({
   initial,
   creators,
+  accountId,
 }: {
   initial: PreferencesValue;
   creators: { id: string; name: string }[];
+  accountId: string;
 }) {
   const [value, setValue] = useState(initial),
     [message, setMessage] = useState(""),
@@ -125,12 +127,14 @@ export function PreferenceForm({
         setBusy(true);
         setRequiresSignIn(false);
         try {
-          await mutate("preferences", submitted, "PUT");
+          await mutate("preferences", submitted, "PUT", accountId);
           setMessage(
             growthCopy.growthPreferencesSavedYourInAppRecordRemainsAvailable,
           );
         } catch (e) {
-          setRequiresSignIn(e instanceof GrowthActionError && e.status === 401);
+          setRequiresSignIn(
+            e instanceof GrowthActionError && [401, 409].includes(e.status),
+          );
           setMessage(
             e instanceof GrowthActionError && e.status === 400
               ? growthCopy.growthPreferencesWereNotSaved
