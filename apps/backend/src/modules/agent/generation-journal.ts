@@ -4,7 +4,10 @@ import { contentHash } from "../../core/canonical.js";
 import { invariant } from "../../core/errors.js";
 import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import type { CreatorScope } from "./repository.js";
-import type { ProviderExecution } from "./provider-usage.js";
+import {
+  providerUsagePurpose,
+  type ProviderExecution,
+} from "./provider-usage.js";
 import type { Usage } from "../../../../../packages/api/src/agent/contracts.js";
 import type { PrivacyHook } from "../trust/contracts.js";
 
@@ -212,7 +215,15 @@ export class PreparedGenerationJournal {
     z.uuid().parse(execution.generationId);
     z.uuid().parse(execution.attemptId);
     z.uuid().parse(creatorHoldId);
+    providerUsagePurpose("reply", execution);
+    const purpose = execution.purpose ?? "reply";
+    invariant(
+      !execution.purpose || execution.assertPurposeInTransaction,
+      "execution_purpose_authority_required",
+      "An explicit execution purpose requires its genuine accepted job authority.",
+    );
     await this.assertClient(client);
+    await execution.assertPurposeInTransaction?.(client, purpose);
     await this.workspace(client, scope.creatorId);
     const row = this.matches(
       scope,
@@ -253,10 +264,29 @@ export class PreparedGenerationJournal {
   async open(
     client: PoolClient,
     scope: CreatorScope,
-    input: { versionHash: string; model: string; category: string },
+    input: {
+      versionHash: string;
+      model: string;
+      category: string;
+      purpose?: string;
+    },
     execution?: ProviderExecution,
   ) {
     await this.assertClient(client);
+    const purpose = providerUsagePurpose(input.category, execution);
+    invariant(
+      input.purpose === undefined || input.purpose === purpose,
+      "execution_purpose_changed",
+      "Provider admission must retain its captured purpose.",
+    );
+    if (execution?.purpose) {
+      invariant(
+        execution.assertPurposeInTransaction,
+        "execution_purpose_authority_required",
+        "An explicit execution purpose requires its actual held job authority.",
+      );
+      await execution.assertPurposeInTransaction(client, execution.purpose);
+    }
     await this.workspace(client, scope.creatorId);
     let lineage:
       | {
@@ -296,7 +326,7 @@ export class PreparedGenerationJournal {
     }
     const row = await client.query<{ id: string }>(
       `INSERT INTO creator.ai_usage(creator_id,version_hash,provider,model,input_tokens,output_tokens,cost_micros,category,duration_ms,thread_id,fan_id,generation_id,attempt_id,call_ordinal,purpose,provider_state,creator_hold_id)
-       VALUES($1,$2,'configured',$3,0,0,NULL,$4,0,$5,$6,$7,$8,$9,$4,'admitted',$10) RETURNING id`,
+       VALUES($1,$2,'configured',$3,0,0,NULL,$4,0,$5,$6,$7,$8,$9,$11,'admitted',$10) RETURNING id`,
       [
         scope.creatorId,
         input.versionHash,
@@ -308,6 +338,7 @@ export class PreparedGenerationJournal {
         execution?.attemptId ?? null,
         lineage?.ordinal ?? null,
         lineage?.creator_hold_id ?? null,
+        purpose,
       ],
     );
     return row.rows[0]!.id;
