@@ -251,8 +251,6 @@ object QelvoraCopy {
     "writtenBy" to "Written by {name}",
     "monthlyLimitLegend" to "Monthly limit for requests and memberships",
     "limitReminders" to "Reminders at 50% and 100% of your limit are on. Lowering a limit is immediate.",
-    "limitRemindersOff" to "Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.",
-    "limitRemindersUnknown" to "Lowering a limit is immediate.",
     "noLimit" to "No limit",
     "navChat" to "Chat",
     "navPosts" to "Posts",
@@ -969,7 +967,13 @@ object QelvoraCopy {
     "w6RecordingDelivered" to "Your signed recording was delivered to this conversation.",
     "w6VoiceReplyUnavailable" to "Voice replies are unavailable for this conversation. Your text draft is kept.",
     "w6SelectedConversationChanged" to "This recording belongs to another conversation. Reopen the selected thread.",
-    "w6RetryRecordingDelivery" to "Retry this recording delivery"
+    "w6RetryRecordingDelivery" to "Retry this recording delivery",
+    "w6AvailabilitySaveIsUnconfirmed" to "Saving is unconfirmed. Retry this same change before editing your windows.",
+    "w6RetryAvailabilitySave" to "Retry this availability save",
+    "w6RefreshWillReplaceAvailabilityChanges" to "Replace your unsaved changes with the saved availability?",
+    "w6AvailabilityAccountChanged" to "Your account changed. Reopen availability to continue.",
+    "limitRemindersOff" to "Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.",
+    "limitRemindersUnknown" to "Lowering a limit is immediate."
   )
   private val variables = Regex("""\{([^}]+)\}""")
   fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }

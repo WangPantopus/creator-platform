@@ -74,8 +74,19 @@ try {
           registerFeatures: async (runtime) => {
             const mediaEnvironment = readMediaEnvironment();
             const mediaDenials = runtimeMediaDenials(runtime);
-            const mediaHost =
+            // Unactivated held denial authority keeps media/calls unavailable.
+            // This presence check is a refusal gate; operations still require
+            // W8's genuine current held-client checks.
+            const mediaAuthorityReady =
               mediaEnvironment && mediaDenials
+                ? (
+                    await runtime.pool.query<{ ready: boolean }>(
+                      "SELECT to_regprocedure('creator_trust.interactive_denial(text,uuid,uuid)') IS NOT NULL AS ready",
+                    )
+                  ).rows[0]?.ready === true
+                : false;
+            const mediaHost =
+              mediaEnvironment && mediaDenials && mediaAuthorityReady
                 ? composeMediaHost({
                     runtime,
                     environment: mediaEnvironment,

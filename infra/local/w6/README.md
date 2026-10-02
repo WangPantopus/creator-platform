@@ -125,3 +125,58 @@ Acquire an actual owned simulator slot before launch, and stop/release it after
 operation. The helper refuses a busy machine-wide build slot without touching
 its owner or starting a child. A native sign-in case does not accept media,
 calling or physical-device behavior.
+
+Publication is a separate noninteractive worker:
+
+```sh
+node --import tsx apps/backend/src/workers/start.ts publication
+```
+
+It needs `PUBLICATION_WORKER_DATABASE_URL` for the dedicated non-owner
+`creator_publication_worker` login and the same private `MEDIA_STORAGE_ROOT`.
+It uses W8's actual held loopback restoration check for both discovery and
+issuance, then W8's purpose denial projection before W1 issues the sealed scope.
+W5 consumes that original scope and stored act; W6 checks immutable processed
+and credential-file hashes. It never borrows an owner Actor or signs again.
+Production hosts must inject their genuine restoration authority into
+`startPublicationWorker`; this executable's development helper rejects production.
+
+W8 must first activate and verify the exact0071/0073/0074/0075/0076 custody and
+purpose grants. The first57-entry wave does not contain them: actual startup on
+that database refuses `publication_schema_unconfigured`, and no publication is
+accepted. Quote, public/group packet fulfillment, live and displayed audience
+count purpose projections require their own genuine adapters and remain unavailable.
+
+For explicitly labelled self-hosted transport development, generate fresh keys
+and configuration in a new private directory:
+
+```sh
+NODE_ENV=development node infra/local/w6/provision-dev-livekit.mjs \
+  /tmp/qelvora-w6-livekit-development
+```
+
+Use its exact pinned official image/configuration. Publish only host loopback
+ports7886(TCP signaling),7887(TCP RTC),7888(UDP RTC), limit the container to
+one CPU/512MiB, and do not attach recording/egress or an agent. The configuration
+sends genuinely signed callbacks to the separate developer operator3106 via
+Docker's host address. Keys and SQLite remain outside Git with private modes.
+
+```sh
+NODE_ENV=development node --import tsx infra/local/w6/livekit-operator.mts \
+  /tmp/qelvora-w6-livekit-development
+```
+
+Open `http://localhost:3106`; its explicit buttons operate actual SDK room/token
+creation, transport connection, microphone capture, disconnect, replay and
+DeleteRoom. No canonical call, Actor, entitlement, settlement or full history is
+created. Browser transport-only operation is labelled and does not substitute
+for human voice or the real app journey. A short JWT and DeleteRoom do not
+provide single-use/revocation; actual replay was observed. Stop the exact owned
+operator/container afterward and preserve only redacted evidence.
+
+The web/Swift/Kotlin SDK adapters are not registered automatically. The backend
+provider advertises `supportsSingleUseAdmission=false`, leaving paid joins
+unavailable. Future0092 callback SQL is unregistered/unapplied and must be
+reviewed/activated by W8 with approved retention and actual CallCustody/C10
+adapters. Missing current schema or custody fails closed. The first57 wave and
+0082 availability/publication gates are independent of SDK installation.

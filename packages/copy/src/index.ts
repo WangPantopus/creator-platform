@@ -249,8 +249,6 @@ export const copy = {
   "writtenBy": "Written by {name}",
   "monthlyLimitLegend": "Monthly limit for requests and memberships",
   "limitReminders": "Reminders at 50% and 100% of your limit are on. Lowering a limit is immediate.",
-  "limitRemindersOff": "Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.",
-  "limitRemindersUnknown": "Lowering a limit is immediate.",
   "noLimit": "No limit",
   "navChat": "Chat",
   "navPosts": "Posts",
@@ -967,7 +965,13 @@ export const copy = {
   "w6RecordingDelivered": "Your signed recording was delivered to this conversation.",
   "w6VoiceReplyUnavailable": "Voice replies are unavailable for this conversation. Your text draft is kept.",
   "w6SelectedConversationChanged": "This recording belongs to another conversation. Reopen the selected thread.",
-  "w6RetryRecordingDelivery": "Retry this recording delivery"
+  "w6RetryRecordingDelivery": "Retry this recording delivery",
+  "w6AvailabilitySaveIsUnconfirmed": "Saving is unconfirmed. Retry this same change before editing your windows.",
+  "w6RetryAvailabilitySave": "Retry this availability save",
+  "w6RefreshWillReplaceAvailabilityChanges": "Replace your unsaved changes with the saved availability?",
+  "w6AvailabilityAccountChanged": "Your account changed. Reopen availability to continue.",
+  "limitRemindersOff": "Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.",
+  "limitRemindersUnknown": "Lowering a limit is immediate."
 } as const;
 export type CopyKey = keyof typeof copy;
 type Placeholders<T extends string> = T extends `${string}{${infer Key}}${infer Rest}` ? Key | Placeholders<Rest> : never;

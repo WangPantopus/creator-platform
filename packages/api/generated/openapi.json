@@ -8541,6 +8541,138 @@
         }
       }
     },
+    "/v1/w6/threads/{creatorId}/{fanId}/calls/{sessionId}/redeem": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "creatorId",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "in": "path",
+          "name": "fanId",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "in": "path",
+          "name": "sessionId",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "in": "header",
+          "name": "x-qelvora-expected-account",
+          "required": false,
+          "description": "Pin to the original account. Must match the actual current session; never grants authority.",
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "redeemCallAdmission",
+        "security": [
+          {
+            "PantopusSession": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CallAdmissionRedemption"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CallAdmissionReceipt"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "Consume the actual unused, unexpired admission nonce for this call and current authenticated account before connecting transport. Ended calls and invalid or reused admission are refused with the current service's 403 error. This receipt does not establish single-use provider-token enforcement."
+      }
+    },
     "/v1/w6/creators/{creatorId}/media-policy": {
       "parameters": [
         {
@@ -12373,7 +12505,7 @@
             "type": "boolean"
           },
           "remindersOn": {
-            "default": true,
+            "default": false,
             "type": "boolean"
           },
           "idempotencyKey": {
@@ -13684,6 +13816,35 @@
           "bytes",
           "sha256",
           "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "CallAdmissionReceipt": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "admitted": {
+            "type": "boolean",
+            "const": true
+          }
+        },
+        "required": [
+          "admitted"
+        ],
+        "additionalProperties": false
+      },
+      "CallAdmissionRedemption": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "nonce": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "required": [
+          "nonce"
         ],
         "additionalProperties": false
       },

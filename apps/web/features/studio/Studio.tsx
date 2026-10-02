@@ -47,6 +47,7 @@ import {
 import { PhotoAttachment } from "./PhotoAttachment";
 import { PostVoiceAttachment } from "./PostVoiceAttachment";
 import { ConversationVoiceReply } from "./ConversationVoiceReply";
+import { AvailabilityEditor } from "../calls/AvailabilityEditor";
 import { ApprovedReply } from "./ApprovedReply";
 import { CorrectionReply } from "./CorrectionReply";
 import { ConversationCorrectionMessageSchema } from "../../../../packages/api/src/conversation/correction";
@@ -3932,6 +3933,7 @@ function ThanksFeed({ creator }: { creator: Creator }) {
   );
 }
 function More({ creator }: { creator: Creator }) {
+  const { signal } = useIdentityRequest();
   return (
     <section className="w5-more">
       <header className="w5-heading">
@@ -3960,6 +3962,13 @@ function More({ creator }: { creator: Creator }) {
         Personal signing and commitments stay with the creator. Support access
         is scoped and audited.
       </p>
+      {creator.owned && creator.verification === "verified" && (
+        <AvailabilityEditor
+          creatorId={creator.id}
+          accountId={creator.viewerAccountId}
+          signal={signal}
+        />
+      )}
     </section>
   );
 }

@@ -30,6 +30,7 @@ import {
   PrivateMediaStorage,
 } from "./storage.js";
 import { mediaFeature } from "./registration.js";
+import { AvailabilityService } from "../session/availability.js";
 import type { MediaInteractiveEnvironment } from "./environment.js";
 
 /** W3 proves a fan's read against its own delivered message on the held client. */
@@ -95,6 +96,7 @@ export type MediaHost = Readonly<{
   media: MediaService;
   creatorMedia: CreatorMediaService;
   creatorIdentity: CreatorIdentityAuthority;
+  availability: AvailabilityService;
   /** W5 consumes this as ContentDependencies.mediaPublication. */
   contentPublication: ContentPublicationMedia;
   /** Once, after the host constructs W5's ContentService with contentPublication. */
@@ -149,11 +151,28 @@ export function composeMediaHost(input: {
     threadAuthority,
   );
 
+  const creatorRestriction = runtime.assertCreatorAllowedInTransaction;
+  invariant(
+    creatorRestriction,
+    "creator_denial_unconfigured",
+    "Creator operations require their current held denial authority.",
+  );
   const creatorIdentity = new CreatorIdentityAuthority(runtime.pool, {
     mode: input.development ? "development" : "pantopus",
-    assertAllowed: (actor, creatorId) =>
-      runtime.assertCreatorAllowed(actor, creatorId),
+    assertAllowed: (actor, creatorId, client) =>
+      creatorRestriction(actor, creatorId, client),
   });
+  const availability = new AvailabilityService(
+    runtime.database,
+    creatorIdentity,
+    async (scope, client) => {
+      const denied =
+        "accountId" in scope
+          ? await denials.creator(scope, client)
+          : await denials.thread(scope, client);
+      invariant(!denied, "scope_revoked", "This scope is closed.");
+    },
+  );
   // W5's object authority takes (client, actor, creatorId, ...). Keep the
   // issued scope for the same held client so its publication check reuses it.
   const scopes = new WeakMap<PoolClient, CreatorMediaReadScope>();
@@ -217,6 +236,7 @@ export function composeMediaHost(input: {
     media,
     creatorMedia,
     creatorIdentity,
+    availability,
     contentPublication: contentPublicationMedia(creatorIdentity, creatorMedia),
     bindContent(service: ContentService) {
       invariant(
@@ -261,6 +281,7 @@ export function composeMediaHost(input: {
     },
     feature: () =>
       mediaFeature({
+        availability,
         ...(recordingPublication ? { media } : {}),
         ...(content ? { creatorMedia } : {}),
       }),

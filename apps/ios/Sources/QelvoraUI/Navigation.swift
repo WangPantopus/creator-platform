@@ -93,6 +93,7 @@ public struct Segmented: View {
             .background(qColor("surface-sunken", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.token("radius-lg")))
             .accessibilityElement(children: .contain)
             .accessibilityLabel(label)
+            .accessibilityElement(children: .contain)
     }
 }
 

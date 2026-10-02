@@ -1783,6 +1783,30 @@ public enum APIMediaUploadRequestMimeType: String, Codable, Sendable {
   case `image_png` = "image/png"
 }
 
+public struct APICallAdmissionReceipt: Codable, Sendable {
+  public let `admitted`: APICallAdmissionReceiptAdmitted
+  public init(admitted: APICallAdmissionReceiptAdmitted) {
+    self.admitted = admitted
+  }
+}
+
+public struct APICallAdmissionReceiptAdmitted: Codable, Sendable {
+  public let value: Bool = true
+  public init() {}
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == true else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expected true") }
+  }
+  public func encode(to encoder: Encoder) throws { var container = encoder.singleValueContainer(); try container.encode(true) }
+}
+
+public struct APICallAdmissionRedemption: Codable, Sendable {
+  public let `nonce`: String
+  public init(nonce: String) {
+    self.nonce = nonce
+  }
+}
+
 public struct APICallAvailabilityCommand: Codable, Sendable {
   public let `timeZone`: String
   public let `windows`: [APICallAvailabilityCommandWindowsItem]
@@ -9245,6 +9269,9 @@ public actor CreatorAPIClient {
   }
   public func leaseOfflineConversation(creatorId: String, fanId: String) async throws -> APIConversationConversationOfflineSnapshot {
     try await request("/v1/conversations/\(segment(creatorId))/\(segment(fanId))/offline", method: "GET", authenticated: true)
+  }
+  public func redeemCallAdmission(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = nil, body: APICallAdmissionRedemption) async throws -> APICallAdmissionReceipt {
+    try await request("/v1/w6/threads/\(segment(creatorId))/\(segment(fanId))/calls/\(segment(sessionId))/redeem", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
   }
   public func readCreatorMediaPolicy(creatorId: String, objectId: String, purpose: ReadCreatorMediaPolicyPurpose) async throws -> APIMediaCreatorMediaPolicyView {
     try await request("/v1/w6/creators/\(segment(creatorId))/media-policy", method: "GET", authenticated: true, query: [URLQueryItem(name: "objectId", value: objectId), URLQueryItem(name: "purpose", value: purpose.rawValue)])
