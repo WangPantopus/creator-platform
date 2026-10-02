@@ -25,7 +25,7 @@ GRANT SELECT,INSERT,DELETE ON creator.publication_worker_scope TO creator_public
 -- app.content_id/app.account_id to enter them. Immutable applied SQL is unchanged.
 DO $$ DECLARE t text; p record; BEGIN
  FOREACH t IN ARRAY ARRAY['content_index','content_revision','content_publication','content_effect'] LOOP
-  FOR p IN SELECT polname FROM pg_policy WHERE polrelid=('creator.'||t)::regclass LOOP
+  FOR p IN SELECT polname FROM pg_policy WHERE polrelid=('creator.'||t)::regclass AND 0=ANY(polroles) LOOP
    EXECUTE format('ALTER POLICY %I ON creator.%I TO creator_runtime',p.polname,t);
   END LOOP;
   EXECUTE format('CREATE POLICY publication_authority_read ON creator.%I FOR SELECT TO creator_publication_authority USING(true)',t);
