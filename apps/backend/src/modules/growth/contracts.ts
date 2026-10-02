@@ -165,6 +165,9 @@ export interface HomeEntry {
   destination: string;
   updatedAt: string;
   kind: "thread" | "request" | "call";
+  /** Owner-issued directory position, never authority or a private preview.
+   * Used only to resume a partially consumed Home page; omitted from HTTP. */
+  cursor?: string;
 }
 export interface ShareSource {
   id: string;

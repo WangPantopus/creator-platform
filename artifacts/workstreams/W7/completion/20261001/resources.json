@@ -126,7 +126,7 @@
     "nativeProcessesRunning": false
   },
   "currentHost": {
-    "recordedAt": "2026-10-02T08:21:14.452763+00:00",
+    "recordedAt": "2026-10-02T08:47:41.028437+00:00",
     "note": "W7 moved from the old iMac (Intel, macOS 26, Xcode 26.5) to Yingpeng's Mac Studio (Apple M2 Max, macOS 27.0 26A428, Xcode 27.0 27A266a, iOS 27.0 simulator runtime). Every iMac-era resource listed elsewhere in this file (container creator-platform-w7-document-20261001, simulator CE855FD5-A4AA-4C62-A63B-5E80D2E1DFF1, /private/tmp/creator-platform-w7-completion-20261001 caches, ~/.config/creator-platform/{secrets,cleanup-20261001,w7-completion-20261001}) is absent from this machine and was not copied. Those entries are historical iMac custody only.",
     "checkout": "/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545",
     "postgres": {
@@ -142,7 +142,7 @@
     "reservedPorts": {
       "api": 4107,
       "web": 3007,
-      "note": "Owned API loopback4107 PID93807/session3007 after actual Android API outage/recovery; production web3007 PID1941/session71511. Verify listeners before reuse."
+      "note": "Owned loopback API4107 PID76439/session19861; production web3007 PID1941/session71511 source23945c32. Verify listeners before reuse."
     },
     "iosSimulator": {
       "name": "Qelvora W7 iPhone 16e",
@@ -155,7 +155,7 @@
       "name": "Qelvora_W7_API34",
       "image": "system-images;android-34;google_apis;arm64-v8a",
       "display": "1170x2532 @480dpi = 390x844 dp",
-      "state": "Shipping APK15978e25cb27ae0ce85d4d767e63460c62fdca44a84d37a85181025e86de10c2 installed and personally operated: real sign-in, settings save/cold Night restore22:00\u201307:00/America/Los_Angeles, Home/Notifications/Settings, Discover search/category/API failure/recovery, missing-share warm and cold custom-scheme arrival. Own emulator-5580 normally stopped; exact slot1 UUIDa1b64a6c-a416-49a8-ab49-e649fe35b47a/inode released; data retained. No W7 native device, heavy slot or GUI held."
+      "state": "Shipping APK15978e25 personally repeated cold fan Home\u2192Notifications\u2192saved22:00/07:00/AmericaLosAngeles settings against real separated-pool host. Own emulator-5580 normally stopped again, exact slot2 UUID/inode released; data retained. No W7 native device, build, GUI or lease held."
     },
     "swiftBuildScratch": "/private/tmp/claude-501/... session scratchpad (disposable; not a dependency)",
     "sharedMachineBudget": "Adopted W1's 2026-10-01 budget: one heavy native build machine-wide via mkdir /private/tmp/creator-platform-heavy-build.lock (+owner file); at most two creator-platform emulators via /private/tmp/creator-platform-emulator-slot-{1,2}; at most three booted simulators via /private/tmp/creator-platform-simulator-slot-{1,2,3}; explicit UDID/serial only. Three earlier local swift test passes in this session ran before the budget message.",
@@ -179,16 +179,18 @@
         "GROWTH_ENCRYPTION_KEY",
         "GROWTH_WORKER_DATABASE_URL",
         "QELVORA_API_URL",
-        "QELVORA_GROWTH_API_URL"
+        "QELVORA_GROWTH_API_URL",
+        "GROWTH_API_DATABASE_URL"
       ],
-      "roles.private.json": "fresh private API/worker passwords; files0600; no values logged or committed"
+      "roles.private.json": "fresh private API/worker passwords; files0600; no values logged or committed",
+      "runtime-before-pool-split.env": "Private0600 recovery copy only; never print/commit/upload values"
     },
     "nativeBuild": "Final signed shipping iOS build and Android shipping build pass under reviewed atomic UUID/inode heavy wrapper; final original18 Swift checks/110 comparisons pass. No heavy slot held. No new test/ref/tolerance.",
     "api": {
-      "pid": 93807,
-      "session": 3007,
-      "source": "23945c32 plus recorded W7 contracts route repair; current at restart. No uncommitted native source is executed in API.",
-      "log": "/private/tmp/creator-platform-w7-active-20261001/api-android-recovery.log"
+      "pid": 76439,
+      "session": 19861,
+      "source": "52fbab19 plus recorded Home composition and W1 exact Growth API pool guard; real separated core/Growth/worker startup passes",
+      "log": "/private/tmp/creator-platform-w7-active-20261001/api-pool-split-home.log"
     },
     "web": {
       "pid": 1941,
@@ -203,6 +205,12 @@
       "APNsProviderSupplied": false,
       "emailProviderSupplied": false,
       "publicHTTPSOriginSupplied": false
+    },
+    "databaseRoles": {
+      "core": "creator_runtime direct LOGIN, NOINHERIT, no Growth or worker membership",
+      "growthAPI": "w7_api direct LOGIN, INHERIT, only creator_runtime+growth_runtime, no worker",
+      "growthWorker": "growth_worker direct LOGIN, NOINHERIT",
+      "realCoreAndGrowthReadiness": "passed; protected trust/purpose authorities remain unconfigured"
     }
   }
 }

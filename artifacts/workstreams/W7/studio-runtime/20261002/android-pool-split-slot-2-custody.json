@@ -1,0 +1,9 @@
+{
+  "owner": "W7 8521feb9-c26e-49ea-a9de-a431a7e5d199 Qelvora_W7_API34 emulator-5580 2026-10-02T08:38:42.066857+00:00",
+  "inode": 240262659,
+  "device": 16777232,
+  "slot": 2,
+  "serial": "emulator-5580",
+  "releasedAt": "2026-10-02T08:45:13.374094+00:00",
+  "state": "Explicit own emulator-5580 stopped, exact slot2 released, data retained"
+}
