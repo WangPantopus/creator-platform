@@ -27,8 +27,12 @@ final class W6RuntimeJourney: XCTestCase {
             XCTAssertTrue(app.buttons[actor].waitForExistence(timeout: 15))
             app.buttons[actor].tap()
         }
+        // Normalize the actual prior run through product sign-out. A failed
+        // owner edit may leave a valid creator credential in Keychain.
+        launch("/identity/account")
+        if app.buttons["Sign out"].waitForExistence(timeout: 5) { signOut() }
         launch(destination)
-        if app.buttons["continue-with-pantopus"].waitForExistence(timeout: 3) { signIn("Development actor two") }
+        signIn("Development actor two")
         XCTAssertTrue(app.staticTexts["Availability could not be loaded."].waitForExistence(timeout: 15))
         XCTAssertFalse(app.buttons["Save availability"].isEnabled)
         capture(app, name: "W6-availability-fan-denied")
@@ -56,6 +60,8 @@ final class W6RuntimeJourney: XCTestCase {
         replace(app.textFields["availability-start-0"], with: "2026-11-01T01:30-07:00")
         replace(app.textFields["availability-end-0"], with: "2026-11-01T01:45-07:00")
         capture(app, name: "W6-availability-owner-minute-offset-alias")
+        XCTAssertTrue(app.keyboards.buttons["Done"].exists)
+        app.keyboards.buttons["Done"].tap()
         let save = app.buttons["Save availability"]
         for _ in 0..<4 { if save.isHittable { break }; app.swipeUp() }
         let enabled = XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true AND hittable == true"), object: save)

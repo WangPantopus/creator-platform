@@ -5,9 +5,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -53,6 +57,7 @@ internal fun NativeAvailabilityDestination(baseURL: String?, model: FanSession) 
 private fun NativeAvailability(baseURL: String?, model: FanSession, creator: UUID, account: String) {
     val client = remember(baseURL, model) { baseURL?.let { NativeMediaClient(URL(it)) { model.currentToken() ?: error("session_required") } } }
     val root = "/v1/w6/creators/$creator/call-availability"
+    val focus = LocalFocusManager.current
     var current by remember { mutableStateOf<AvailabilitySaved?>(null) }
     var zone by remember { mutableStateOf("") }
     var windows by remember { mutableStateOf<List<AvailabilityWindow>>(emptyList()) }
@@ -134,7 +139,7 @@ private fun NativeAvailability(baseURL: String?, model: FanSession, creator: UUI
     @Composable fun field(label: String, value: String, change: (String) -> Unit) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             BasicText(label, style = qText("caption").copy(color = qColor("ink-muted")))
-            BasicTextField(value, { change(it.take(80)) }, Modifier.fillMaxWidth().heightIn(min = 48.dp).background(qColor("surface")).padding(12.dp).semantics { contentDescription = label }, enabled = !replacingSavedWindows && command == null, textStyle = qText("body").copy(color = qColor("ink")))
+            BasicTextField(value, { change(it.take(80)) }, Modifier.fillMaxWidth().heightIn(min = 48.dp).background(qColor("surface")).padding(12.dp).semantics { contentDescription = label }, enabled = !replacingSavedWindows && command == null, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), keyboardActions = KeyboardActions(onDone = { focus.clearFocus() }), textStyle = qText("body").copy(color = qColor("ink")))
         }
     }
     Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {

@@ -57,6 +57,7 @@ private struct NativeAvailability: View {
     @State private var command: AvailabilitySave?
     @State private var confirmRefresh = false
     @State private var mutation: Task<Void, Never>?
+    @FocusState private var editedField: String?
     private var client: NativeMediaClient? {
         baseURL.map { NativeMediaClient(baseURL: $0, sessionToken: {
             guard let value = try await SecureSessionStorage().read() else { throw URLError(.userAuthenticationRequired) }
@@ -134,14 +135,14 @@ private struct NativeAvailability: View {
                 Text(QelvoraCopy.text("w6UseDatedWindowsEachOfferedCallAndItsReconnectAllowance")).qText("caption")
                 if fresh && scene == .active {
                     Text(QelvoraCopy.text("w6YourTimeZone")).qText("caption")
-                    TextField(QelvoraCopy.text("w6YourTimeZone"), text: $zone).textInputAutocapitalization(.never).autocorrectionDisabled().textFieldStyle(.roundedBorder).disabled(replacingSavedWindows || command != nil).accessibilityIdentifier("availability-zone")
+                    TextField(QelvoraCopy.text("w6YourTimeZone"), text: $zone).textInputAutocapitalization(.never).autocorrectionDisabled().textFieldStyle(.roundedBorder).disabled(replacingSavedWindows || command != nil).focused($editedField, equals: "zone").submitLabel(.done).onSubmit { editedField = nil }.accessibilityIdentifier("availability-zone")
                     ForEach(windows.indices, id: \.self) { index in
                         VStack(alignment: .leading, spacing: 8) {
                             Text(QelvoraCopy.text("w6Window", values: ["value1": String(index + 1)])).qText("label")
                             Text(QelvoraCopy.text("w6Starts")).qText("caption")
-                            TextField("YYYY-MM-DDTHH:mm±HH:mm", text: $windows[index].startsAt).textInputAutocapitalization(.never).autocorrectionDisabled().textFieldStyle(.roundedBorder).disabled(replacingSavedWindows || command != nil).accessibilityIdentifier("availability-start-\(index)")
+                            TextField("YYYY-MM-DDTHH:mm±HH:mm", text: $windows[index].startsAt).textInputAutocapitalization(.never).autocorrectionDisabled().textFieldStyle(.roundedBorder).disabled(replacingSavedWindows || command != nil).focused($editedField, equals: "start-\(index)").submitLabel(.done).onSubmit { editedField = nil }.accessibilityIdentifier("availability-start-\(index)")
                             Text(QelvoraCopy.text("w6Ends")).qText("caption")
-                            TextField("YYYY-MM-DDTHH:mm±HH:mm", text: $windows[index].endsAt).textInputAutocapitalization(.never).autocorrectionDisabled().textFieldStyle(.roundedBorder).disabled(replacingSavedWindows || command != nil).accessibilityIdentifier("availability-end-\(index)")
+                            TextField("YYYY-MM-DDTHH:mm±HH:mm", text: $windows[index].endsAt).textInputAutocapitalization(.never).autocorrectionDisabled().textFieldStyle(.roundedBorder).disabled(replacingSavedWindows || command != nil).focused($editedField, equals: "end-\(index)").submitLabel(.done).onSubmit { editedField = nil }.accessibilityIdentifier("availability-end-\(index)")
                             Button(QelvoraCopy.text("w6RemoveWindow", values: ["value1": String(index + 1)]), variant: .quiet, disabled: busy || command != nil) { windows.remove(at: index) }
                         }
                     }
@@ -152,7 +153,7 @@ private struct NativeAvailability: View {
                 Button(QelvoraCopy.text(command == nil ? "w6SaveAvailability" : "w6RetryAvailabilitySave"), variant: .secondary, block: true, disabled: busy || !loaded || (!fresh && command == nil) || scene != .active) { mutation = Task { await save() } }
                 Button(QelvoraCopy.text("w6ReloadSavedWindows"), variant: .quiet, disabled: busy || command != nil) { if dirty { confirmRefresh = true } else { Task { await read(replace: true) } } }
             }.padding(QelvoraTokens.space4).frame(maxWidth: QelvoraTokens.phoneWidth, alignment: .leading)
-        }.background(qColor("ground", scheme)).foregroundStyle(qColor("ink", scheme))
+        }.scrollDismissesKeyboard(.interactively).background(qColor("ground", scheme)).foregroundStyle(qColor("ink", scheme))
         .confirmationDialog(QelvoraCopy.text("w6RefreshWillReplaceAvailabilityChanges"), isPresented: $confirmRefresh, titleVisibility: .visible) {
             SwiftUI.Button(QelvoraCopy.text("confirm"), role: .destructive) { Task { await read(replace: true) } }
             SwiftUI.Button(QelvoraCopy.text("cancel"), role: .cancel) {}
