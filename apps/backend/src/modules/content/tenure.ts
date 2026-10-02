@@ -15,7 +15,7 @@ import {
 } from "../commerce/content-audience.js";
 import type { ContentDependencies } from "./service.js";
 
-export const NOTE_REPLY_TENURE_MIGRATION = "0088_w5_reply_tenure_cap";
+export const NOTE_REPLY_TENURE_MIGRATION = "0172_w5_reply_tenure_cap";
 export const NOTE_REPLY_TENURE_CHECKSUM =
   "b1ec7e9684e5f916253202cf8d6b484376fe3c74dbec63221500e68ecf7fe0ba";
 

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "thread": {
+    "human_reply": {
+      "maxBytes": 16777216,
+      "maxDurationMs": 600000,
+      "retentionSeconds": 31536000,
+      "allowTranscript": false
+    }
+  },
+  "creator": {
+    "human_note": {
+      "maxBytes": 8388608,
+      "maxDurationMs": 60000,
+      "retentionSeconds": 31536000,
+      "allowTranscript": false
+    },
+    "post_audio": {
+      "maxBytes": 16777216,
+      "maxDurationMs": 600000,
+      "retentionSeconds": 31536000,
+      "allowTranscript": false
+    },
+    "post_photo": {
+      "maxBytes": 16777216,
+      "maxDurationMs": 0,
+      "retentionSeconds": 31536000,
+      "allowTranscript": false
+    }
+  }
+}
