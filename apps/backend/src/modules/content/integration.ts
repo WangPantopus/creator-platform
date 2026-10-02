@@ -7,6 +7,7 @@ import { createCommercePublicationPermission } from "../commerce/publication.js"
 import { DomainError } from "../../core/errors.js";
 import { StudioService } from "../studio/service.js";
 import { studioFeature } from "../studio/registration.js";
+import { createContentTenureHost } from "./tenure.js";
 import {
   ContentPublicationWorker,
   type ContentPublicationDependencies,
@@ -70,6 +71,7 @@ export function composeContentHost(input: {
     follows?: ContentFollowReaders;
   };
   paidAudienceCount?: NonNullable<ContentDependencies["audienceCount"]>;
+  tenure?: Parameters<typeof createContentTenureHost>[0];
   packetRead?: {
     prepare: NonNullable<ContentDependencies["preparePublicPacketRead"]>;
     preparePositive: NonNullable<
@@ -97,6 +99,7 @@ export function composeContentHost(input: {
   const dependencies: ContentDependencies &
     Required<Pick<ContentDependencies, "assertAllowed">> = {
     ...input.dependencies,
+    ...(input.tenure ? createContentTenureHost(input.tenure) : {}),
     ...(input.packetRead
       ? {
           preparePublicPacketRead: input.packetRead.prepare,

@@ -217,6 +217,9 @@ const backend = await createConfiguredBackend({
         reviewReply: createTrustReplyReviewer(),
       },
       sources: { service: sources, repository },
+      ...(runtime.audienceIdentity
+        ? { tenure: { audienceIdentity: runtime.audienceIdentity } }
+        : {}),
       ...(growth && runtime.identity
         ? {
             growth: {

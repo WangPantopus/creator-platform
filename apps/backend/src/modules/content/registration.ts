@@ -198,6 +198,14 @@ export function contentFeature(service: ContentService): FeatureRegistration {
           ),
         ),
       );
+      router.get("/:creatorId/reply-policy", async (req, res) =>
+        res.json(
+          await service.replyPolicy(
+            await actorFor(req),
+            z.uuid().parse(req.params.creatorId),
+          ),
+        ),
+      );
       router.post("/:creatorId/mute", async (req, res) =>
         res.json(
           await service.mute(
