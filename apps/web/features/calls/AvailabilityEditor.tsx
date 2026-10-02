@@ -142,9 +142,28 @@ function AvailabilityForm({
           )
         )
           throw new Error(copy.w6UseISOTimesWithAnExplicitUTCOffsetForEach);
+        const boundary = (value: string) => {
+          // Human input allows minute precision; the wire follows RFC3339.
+          // Validate the original calendar/offset before Date can normalize
+          // an impossible date, then preserve its exact instant in UTC.
+          const seconds = value.replace(
+            /(T\d{2}:\d{2})(Z|[+-]\d{2}:\d{2})$/u,
+            "$1:00$2",
+          );
+          const valid =
+            AvailabilityCommandSchema.shape.windows.element.shape.startsAt.safeParse(
+              seconds,
+            );
+          if (!valid.success || !Number.isFinite(Date.parse(valid.data)))
+            throw new Error(copy.w6UseISOTimesWithAnExplicitUTCOffsetForEach);
+          return new Date(valid.data).toISOString();
+        };
         command.current = AvailabilityCommandSchema.parse({
           timeZone: canonicalZone,
-          windows: windows.map((value) => ({ ...value })),
+          windows: windows.map((value) => ({
+            startsAt: boundary(value.startsAt),
+            endsAt: boundary(value.endsAt),
+          })),
           expectedVersion: current?.version ?? 0,
           idempotencyKey: crypto.randomUUID(),
         });

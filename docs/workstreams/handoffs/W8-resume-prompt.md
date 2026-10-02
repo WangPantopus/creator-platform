@@ -1,5 +1,35 @@
 # W8 resume prompt — complete the workstream
 
+## Current domain cursor and three-client acceptance — 2026-10-02
+
+[Personally operated web/iOS/Android and independently saved state](../../../artifacts/workstreams/W8/privacy-domain-worker/20261002-mac-studio/app-acceptance/README.md) at48d69e36 qualifies the actual held task/restoration/cancellation composition and one fixed Identity cursor. Same new synthetic export8e411c31 across Light/Night: Trust/Identity/Media/genuine empty Agent complete, four blocked tasks, blocked parent/no download. Canonical61 candidate remains separate from main57 activation; Media coherent export, nonempty Agent196, all-eight C10/purge/provider/recovery/release remain open. Own devices/services normally stopped, exact leases released, new private checkpoint retained; no new unit tests. Synthetic proof saved one actual approval/effect, but Identity's proof read omits submitted postUrl; W1 has the exact correction and the original immutable evidence is preserved without a full proof claim.
+
+Focused PR89 merged53133967 (head780adc81) and PR142 mergedb6f12e24 (headfd4782ac). Current fast/compile checks passed; queued foundation and cancelled obsolete runs were not called passes. Held0201 metadata PR169 mergedb6738326 without activation.
+
+
+Actual0103 increment acceptance now includes [web plus normally shipped Android/iOS and independent saved-state readback](../../../artifacts/workstreams/W8/privacy-domain-fence/20261002-mac-studio/app-acceptance/README.md) at ccc4474b. Same new synthetic account-export hash across clients, Light/Night Trust blocked with no receipt/data/download. Missing activation never becomes an empty success. Existing Agent receipt is a separately identified unqualified lifecycle gap; W2 is correcting it. All own devices/services/slots are stopped/released, next-env restored and private0600 checkpoint retained. Actual activated task/COMMIT/expiry/owner/purge and full C10/recovery/release remain open. Additional held allocations:0111 W1 translation issuer,0112 W8 original translation negatives,0113 W2 distinct all-owned export snapshot;0087 scope ACL/owner stay isolated.
+
+
+## Private privacy worker COMMIT fence — 2026-10-02
+
+Reserved0103 now separates actual Trust/Growth worker lifecycle custody from0087. [Personally executed closed SQL/compiler/catalogue review](../../../artifacts/workstreams/W8/privacy-domain-fence/20261002-mac-studio/README.md) preserves canonical57, absent activation and zero scopes. All three functions have zero diagnostics; six permission refusals and eight rolled-back drift refusals are recorded. Both full guards refuse unregistered0103. Trust's real hook requires the current job/signal and held restoration before domain reads/deletes and COMMIT. [Owner contract](../../operations/W8-domain-privacy-fence.md) exports the actual same-client port; W7 is integrating a single-cursor consistent snapshot under read committed. No full privacy/COMMIT, original recovery or release acceptance is claimed.
+
+Terminal denial is published as draft [PR145](https://github.com/WangPantopus/creator-platform/pull/145), exact source d12db34c/pin8714bc0c. The current privacy-fence branch remains separate from this terminal stack. Actual worker/job/app acceptance follows source verification; canonical SQL/history and0087 remain unchanged.
+
+
+## Actual current privacy and scoped Ops — 2026-10-02
+
+[Real web/Android/iOS operation and independent saved-state evidence](../../../artifacts/workstreams/W8/privacy-reconciliation/20261002-mac-studio/app-acceptance/README.md) at backend/webc3c0a6d1 verifies the same synthetic export in both appearances, explicit blocked core0087/configuration dependencies and no download. Actual Ops purpose-limited access and recorded Close cold-reload resolved; DB verifies reviewer/access/one decision/version2/zero external effects. Queue1280×900/220sidebar and390/no overflow plus keyboard skip-link observed. No all-eight C10/owner COMMIT, accessibility200%/screen reader, provider, original recovery or release completion.
+
+The real run repaired canonical Signout visibility, cosmetic-query return routing and premature parent deadletter/opaque configuration failures. All transaction denial adapters require actual held recovery custody. W4 PR134 merged and actorless source integrated. Held0103–0110 are allocations only; concrete0099 now permits W8 terminal-denial implementation. Own devices/slots/API/web stopped; data retained. W1 handles shared Ops/status return destinations.
+
+
+## Closed reconciliation and privacy authority — 2026-10-02
+
+PR95 merged normally at5ec5cb07 after W8's real three-client Report acceptance. The new [closed reconciliation inventory and catalogue evidence](../../../artifacts/workstreams/W8/privacy-reconciliation/20261002-mac-studio/README.md) keeps trafficReady false, exact canonical57 and the retained six-complete/two-blocked export. [R6 procedure](../../operations/W8-preserved-reconciliation.md) distinguishes journal replay, all-eight owner effects, original financial custody, retention, current purpose/capability and real app acceptance from an owner opening a labelled development copy. Original iMac material remains absent.
+
+`createPrivacyConsumers` now composes prepared conversation owner ports with fixed pool/task authority/retention. Real0087 task fencing precedes family discovery; both held and coordinator verification require genuine cancellable jobs outside request ALS. A new catalogue guard requires actual activated0087 plus exact source/role/ACL/trigger custody; manually installed held proposals refuse503. W4's actorless port PR134 is under review; no adult Actor is constructed from a privacy job. Actual composed privacy/native/effect acceptance remains open. Worker-denial PR131 stays draft pending real worker/task acceptance. Held0098–0102 allocations are metadata only, not activation.
+
 ## Focused negative-authority integration — 2026-10-02
 
 PR89 is being finalized against main after the initial activation merged. Its remaining source adds held public-creator and creator/fan negative ports, the separate genuine Team-triage negative path, and the reviewed development-pool role guard. The canonical Database now receives the composed in-transaction restriction callback; the raw optional input previously omitted Trust's check. Main's stricter privacy catalogue checks are preserved. Conversation lifecycle restoration/cancellation remains in the separate privacy continuation, rather than being partially copied into this increment. Existing dated web, native and independently saved-state evidence qualifies its original synthetic targets; this merge/typecheck does not requalify changed owner journeys or activate the held SQL. Full proof, positive publication, C10, accessibility, recovery and release gates remain open.

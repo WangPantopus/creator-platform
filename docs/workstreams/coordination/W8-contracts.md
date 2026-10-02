@@ -1,5 +1,15 @@
 # W8 contract, migration and runtime register
 
+Held metadata only:0083 carries W3 actual immutable translation job/consumer;0111 W1 private translation issuer and0112 W8 original-participant negatives await its exact source/currentness/policy.0113 is W2's separate NoLogin all-owned Agent export snapshot with its own scope and genuine job/token/XID/PID/immutable ownership; it must not widen0087 private scope ACL or isolated owner. Actual Agent empty fan/thread preflight also needs0087 same-client lifecycle/restoration before locks and COMMIT. W2 is adding this owner port. No registry activation, fabricated Actor/provenance/policy or complete C10 is authorized by these allocations.
+
+
+Reserved0103 source exports `domainPrivacyTaskAuthorityInTransaction(client, actualJob, domain, assertRestoredInTransaction)`; [exact dedicated owner/caller/currentness contract](../../operations/W8-domain-privacy-fence.md). Actual Trust/Growth worker roles are domain-bound, metadata/scope are private, the real signal and held restoration are mandatory and COMMIT is separately fenced.0087 is unchanged. W7 owns the one-cursor/read-committed consistent export and delete seam; outer pool verification does not satisfy this port. Actual activation and leased task/COMMIT/app/purge acceptance remain open.
+
+
+Current held recovery correctionc3576b61: `assertScopeAllowedInTransaction`, `assertAudienceAllowed` and `assertCreatorAllowedInTransaction` always require `assertRestoredInTransaction` on their exact supplied client; omitted ports deny503. General pool recovery cannot substitute.
+
+Additional metadata-only allocations:0103 W8 Trust/Growth worker privacy fence;0104 W2 retrieval;0105 W2 terminal journal;0106 W4 terminal settlement;0107 W4 late financial correction;0108 W1 accounting subject;0109 W8 accounting negatives;0110 W3 terminal finalization. All are held/unapplied; source/custody/policy/currentness/real owner acceptance is separate.
+
 ## Focused negative-authority integration — 2026-10-02
 
 PR89 is being finalized against main after the initial activation merged. Its remaining source adds held public-creator and creator/fan negative ports, the separate genuine Team-triage negative path, and the reviewed development-pool role guard. The canonical Database now receives the composed in-transaction restriction callback; the raw optional input previously omitted Trust's check. Main's stricter privacy catalogue checks are preserved. Conversation lifecycle restoration/cancellation remains in the separate privacy continuation, rather than being partially copied into this increment. Existing dated web, native and independently saved-state evidence qualifies its original synthetic targets; this merge/typecheck does not requalify changed owner journeys or activate the held SQL. Full proof, positive publication, C10, accessibility, recovery and release gates remain open.

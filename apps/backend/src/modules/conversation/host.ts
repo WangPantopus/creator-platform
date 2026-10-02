@@ -64,6 +64,8 @@ export type ConversationHostProducers = {
   feedbackAuthority?: ReplyFeedbackAuthority;
   /** W8: approved minimal account-level intro-offer use and retention. */
   introOfferPolicy?: IntroOfferPolicy;
+  /** W4: genuinely prepared original group fulfillment on this exact graph. */
+  fulfillmentPlans?: import("../commerce/fulfillment-plans.js").CommerceFulfillmentPlans;
   /** W2: the configured license authority for this host. */
   licenseVerifier?: LicenseVerifier;
   /** W2: the reviewed thread-accounting retention for the usage journal. */
@@ -391,6 +393,9 @@ export async function composeConversationHost(
     ...(lineage ? { lineage } : {}),
     ...(corrections ? { corrections } : {}),
     ...(recordings ? { recordings } : {}),
+    ...(producers.fulfillmentPlans
+      ? { fulfillmentPlans: producers.fulfillmentPlans }
+      : {}),
   });
   // Studio drafting, evaluation and ingestion use the same configured model.
   agent ??= createAgentDomain({

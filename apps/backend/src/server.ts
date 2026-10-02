@@ -38,6 +38,16 @@ import { AccountCallMetadata } from "./modules/session/account-call-metadata.js"
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
 const config = readConfig();
+function canonicalDevelopmentIdentity() {
+  return new DevelopmentIdentityAdapter(
+    config.allowedOrigin,
+    process.env.NODE_ENV,
+    process.env.TRUST_LOCAL_DEVELOPMENT === "true"
+      ? developmentTrustActors
+      : [],
+  );
+}
+
 const features: {
   growth: Awaited<ReturnType<typeof configureGrowthForBackend>>;
   conversationPrivacy?: ConversationPrivacyOwnerPorts;
@@ -54,13 +64,7 @@ try {
     config.identityAdapter === "development"
       ? await createConfiguredBackend({
           config,
-          identity: new DevelopmentIdentityAdapter(
-            config.allowedOrigin,
-            process.env.NODE_ENV,
-            process.env.TRUST_LOCAL_DEVELOPMENT === "true"
-              ? developmentTrustActors
-              : [],
-          ),
+          identity: canonicalDevelopmentIdentity(),
           guardrails: {
             checkSentence: async () => {
               throw new Error("AI generation is unconfigured.");
@@ -102,19 +106,15 @@ try {
             : {}),
           registerFeatures: async (runtime) => {
             const accountCalls = await AccountCallMetadata.prepare(runtime);
+            const callControl = await InteractiveCallControl.prepare(runtime);
             const mediaEnvironment = readMediaEnvironment();
-            const mediaDenials = runtimeMediaDenials(runtime);
+            const mediaDenials = callControl
+              ? runtimeMediaDenials(runtime, callControl)
+              : null;
             // The development host consumes W8's 0082 held try-fence. A code
             // callback alone cannot advertise media while its real producer is
             // absent. Registry activation and custody remain with W8.
-            const mediaAuthorityReady =
-              mediaEnvironment && mediaDenials
-                ? (
-                    await runtime.pool.query<{ ready: boolean }>(
-                      "SELECT to_regprocedure('creator_trust.interactive_denial(text,uuid,uuid)') IS NOT NULL AS ready",
-                    )
-                  ).rows[0]?.ready === true
-                : false;
+            const mediaAuthorityReady = Boolean(callControl);
             const mediaHost =
               mediaEnvironment && mediaDenials && mediaAuthorityReady
                 ? composeMediaHost({
@@ -158,7 +158,6 @@ try {
             // Preparing the genuine graph does not configure a provider, worker
             // purpose or arrival policy. Calls remain unmounted until those
             // separate producers exist; no request Actor is invented.
-            const callControl = await InteractiveCallControl.prepare(runtime);
             process.stdout.write(
               callControl
                 ? "Call control: prepared; calling awaits provider, worker and policy composition.\n"

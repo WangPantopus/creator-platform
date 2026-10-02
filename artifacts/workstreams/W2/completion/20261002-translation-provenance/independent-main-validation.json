@@ -1,0 +1,44 @@
+{
+  "time": "2026-10-02T18:13:34.361310+00:00",
+  "candidateBase": "53133967245cf58a2b7019c7c74d1743a3f9be16",
+  "candidateCodeHead": "c7f9ae93ef57090f579407305b3b49273d2ee8ce",
+  "extraction": "Only W2 three-file repair and its new sanitized native/backup/source receipts over current main; held draft132 inputs/export migrations not copied",
+  "checks": {
+    "backendTypes": "PASS",
+    "scopedESLint": "PASS",
+    "format": "PASS",
+    "diffCheck": "PASS",
+    "existingContracts": {
+      "count": 9,
+      "milliseconds": 147,
+      "result": "PASS"
+    }
+  },
+  "personallyRestartedAPI": {
+    "port": 4102,
+    "source": "c7f9ae93ef57090f579407305b3b49273d2ee8ce",
+    "registeredFeatures": ["conversation", "creator-ai"],
+    "ready": false,
+    "generation": "unconfigured",
+    "database": "creator_w2",
+    "canonicalLedger": 57,
+    "absentProviderDisabledNotice": 1,
+    "ingestionRetryFailures": 0,
+    "startupOtherLogLines": 0
+  },
+  "sourceFiles": [
+    {
+      "path": "apps/backend/src/modules/agent/translation.ts",
+      "sha256": "d1493f1d9b25eaa20d9d70a1318e503a1b287ec4eb0af1a3f966391c77288ab9"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/runtime.ts",
+      "sha256": "2b2715e3a9fa8a68d8e5253f9a504b9a7d4f15470632c09272ecd306cb5d33e3"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/development-server.ts",
+      "sha256": "765211c93c542710022be7a44134e65569346b03fa9d96eec9dd6228fa539597"
+    }
+  ],
+  "limits": "No full host/Growth/Trust/nonempty privacy/translation/provider/financial/p95/release proof; native binary remains personally operated frozen ecca, not rewritten as current531."
+}

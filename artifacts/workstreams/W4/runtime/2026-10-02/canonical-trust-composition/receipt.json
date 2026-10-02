@@ -1,0 +1,37 @@
+{
+  "phase": "development composition preparation",
+  "source": "b633c439ddc737daef72086bcee7fad4d38a53f1",
+  "localBackendTypes": "passed",
+  "localWebTypes": "passed",
+  "generatedOperations": 101,
+  "hostedFulfillmentHead": "5a7925ef91fee53386136708a28eb1818b5ae8c4",
+  "hostedWebBackend": "two successful checks",
+  "hostedAndroidRuntime": "two successful checks",
+  "hostedNativeAndVisual": "six queued jobs; no pass inferred",
+  "databasePreparation": {
+    "source": "b633c439ddc737daef72086bcee7fad4d38a53f1",
+    "canonicalLedger": 57,
+    "financialRows": 0,
+    "existingOpsMemberships": 0,
+    "verifiedCreatorsBefore": 0,
+    "privateBackupSha256": "ea681c3559c65acaa6852fda14694ec3750265cdf13cc78910db112087a63e1a",
+    "separateNonOwnerTrustConnectionsPrepared": true,
+    "roleAttributesUnchanged": true,
+    "noBusinessWrites": true,
+    "creatorJourneyVerified": false
+  },
+  "labelledOpsFixture": {
+    "label": "W4 SYNTHETIC DEVELOPMENT OPS MEMBERSHIP",
+    "source": "infra/local/seed-w8.sql:Ops membership statement only",
+    "privateBackupPreserved": true,
+    "preexistingMemberships": 0,
+    "createdMemberships": 3,
+    "expiresWithinOneDay": true,
+    "noCreatorVerificationOrProofRowsWritten": true,
+    "noStorePaymentReceiptRowsWritten": true,
+    "notProductionAuthority": true
+  },
+  "normalCreatorProofAndOpsJourney": "not yet operated",
+  "externalOwnershipVerified": false,
+  "releaseReady": false
+}

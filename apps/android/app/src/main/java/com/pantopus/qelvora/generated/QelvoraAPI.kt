@@ -1175,6 +1175,7 @@ data class APIContentDocument(
   val `quote`: APIContentDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentDocumentPlanRef? = null,
   val `live`: APIContentDocumentLive? = null
 )
 
@@ -1208,6 +1209,13 @@ enum class APIContentDocumentMediaItemKind {
 data class APIContentDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -1285,6 +1293,7 @@ data class APIContentListItemsItemDocument(
   val `quote`: APIContentListItemsItemDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentListItemsItemDocumentPlanRef? = null,
   val `live`: APIContentListItemsItemDocumentLive? = null
 )
 
@@ -1318,6 +1327,13 @@ enum class APIContentListItemsItemDocumentMediaItemKind {
 data class APIContentListItemsItemDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentListItemsItemDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -1425,6 +1441,7 @@ data class APIContentReplyListItemsItem(
   val `text`: String,
   val `version`: Long,
   val `createdAt`: String,
+  val `tenure`: APIContentReplyListItemsItemTenure? = null,
   val `consent`: APIContentReplyListItemsItemConsent,
   @Required
   val `reaction`: APIContentReplyListItemsItemReaction? = null
@@ -1435,6 +1452,33 @@ enum class APIContentReplyListItemsItemSafetyState {
   @SerialName("pending") PENDING,
   @SerialName("allowed") ALLOWED,
   @SerialName("flagged") FLAGGED
+}
+
+@Serializable
+data class APIContentReplyListItemsItemTenure(
+  val `confirmedDays`: Long,
+  @Required
+  val `milestone`: JsonElement? = null,
+  val `basis`: APIContentReplyListItemsItemTenureBasis,
+  val `historyComplete`: APIContentReplyListItemsItemTenureHistoryComplete,
+  val `checkedAt`: String
+)
+
+@Serializable
+enum class APIContentReplyListItemsItemTenureBasis {
+  @SerialName("confirmed_stripe_paid_periods") CONFIRMED_STRIPE_PAID_PERIODS,
+  @SerialName("confirmed_paid_periods") CONFIRMED_PAID_PERIODS
+}
+
+@Serializable(with = APIContentReplyListItemsItemTenureHistoryCompleteSerializer::class)
+object APIContentReplyListItemsItemTenureHistoryComplete { const val value: Boolean = false }
+object APIContentReplyListItemsItemTenureHistoryCompleteSerializer : KSerializer<APIContentReplyListItemsItemTenureHistoryComplete> {
+  override val descriptor = PrimitiveSerialDescriptor("APIContentReplyListItemsItemTenureHistoryComplete", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APIContentReplyListItemsItemTenureHistoryComplete {
+    if (decoder.decodeBoolean() != false) throw SerializationException("Expected false")
+    return APIContentReplyListItemsItemTenureHistoryComplete
+  }
+  override fun serialize(encoder: Encoder, value: APIContentReplyListItemsItemTenureHistoryComplete) { encoder.encodeBoolean(false) }
 }
 
 @Serializable
@@ -1515,6 +1559,33 @@ data class APIContentRevisionResult(
 data class APIContentScheduledResult(
   val `published`: Long
 )
+
+@Serializable
+data class APIContentTenureRecognition(
+  val `confirmedDays`: Long,
+  @Required
+  val `milestone`: JsonElement? = null,
+  val `basis`: APIContentTenureRecognitionBasis,
+  val `historyComplete`: APIContentTenureRecognitionHistoryComplete,
+  val `checkedAt`: String
+)
+
+@Serializable
+enum class APIContentTenureRecognitionBasis {
+  @SerialName("confirmed_stripe_paid_periods") CONFIRMED_STRIPE_PAID_PERIODS,
+  @SerialName("confirmed_paid_periods") CONFIRMED_PAID_PERIODS
+}
+
+@Serializable(with = APIContentTenureRecognitionHistoryCompleteSerializer::class)
+object APIContentTenureRecognitionHistoryComplete { const val value: Boolean = false }
+object APIContentTenureRecognitionHistoryCompleteSerializer : KSerializer<APIContentTenureRecognitionHistoryComplete> {
+  override val descriptor = PrimitiveSerialDescriptor("APIContentTenureRecognitionHistoryComplete", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APIContentTenureRecognitionHistoryComplete {
+    if (decoder.decodeBoolean() != false) throw SerializationException("Expected false")
+    return APIContentTenureRecognitionHistoryComplete
+  }
+  override fun serialize(encoder: Encoder, value: APIContentTenureRecognitionHistoryComplete) { encoder.encodeBoolean(false) }
+}
 
 typealias APIContentThanksFeed = List<APIContentThanksFeedValueItem>
 
@@ -1617,6 +1688,7 @@ data class APIContentViewDocument(
   val `quote`: APIContentViewDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentViewDocumentPlanRef? = null,
   val `live`: APIContentViewDocumentLive? = null
 )
 
@@ -1650,6 +1722,13 @@ enum class APIContentViewDocumentMediaItemKind {
 data class APIContentViewDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentViewDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -1732,6 +1811,7 @@ data class APIPrivateNoteReply(
   val `text`: String,
   val `version`: Long,
   val `createdAt`: String,
+  val `tenure`: APIPrivateNoteReplyTenure? = null,
   val `consent`: APIPrivateNoteReplyConsent,
   @Required
   val `reaction`: APIPrivateNoteReplyReaction? = null
@@ -1742,6 +1822,33 @@ enum class APIPrivateNoteReplySafetyState {
   @SerialName("pending") PENDING,
   @SerialName("allowed") ALLOWED,
   @SerialName("flagged") FLAGGED
+}
+
+@Serializable
+data class APIPrivateNoteReplyTenure(
+  val `confirmedDays`: Long,
+  @Required
+  val `milestone`: JsonElement? = null,
+  val `basis`: APIPrivateNoteReplyTenureBasis,
+  val `historyComplete`: APIPrivateNoteReplyTenureHistoryComplete,
+  val `checkedAt`: String
+)
+
+@Serializable
+enum class APIPrivateNoteReplyTenureBasis {
+  @SerialName("confirmed_stripe_paid_periods") CONFIRMED_STRIPE_PAID_PERIODS,
+  @SerialName("confirmed_paid_periods") CONFIRMED_PAID_PERIODS
+}
+
+@Serializable(with = APIPrivateNoteReplyTenureHistoryCompleteSerializer::class)
+object APIPrivateNoteReplyTenureHistoryComplete { const val value: Boolean = false }
+object APIPrivateNoteReplyTenureHistoryCompleteSerializer : KSerializer<APIPrivateNoteReplyTenureHistoryComplete> {
+  override val descriptor = PrimitiveSerialDescriptor("APIPrivateNoteReplyTenureHistoryComplete", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APIPrivateNoteReplyTenureHistoryComplete {
+    if (decoder.decodeBoolean() != false) throw SerializationException("Expected false")
+    return APIPrivateNoteReplyTenureHistoryComplete
+  }
+  override fun serialize(encoder: Encoder, value: APIPrivateNoteReplyTenureHistoryComplete) { encoder.encodeBoolean(false) }
 }
 
 @Serializable
@@ -1817,6 +1924,7 @@ data class APISaveContentDocument(
   val `quote`: APISaveContentDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APISaveContentDocumentPlanRef? = null,
   val `live`: APISaveContentDocumentLive? = null
 )
 
@@ -1850,6 +1958,13 @@ enum class APISaveContentDocumentMediaItemKind {
 data class APISaveContentDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APISaveContentDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -2185,6 +2300,7 @@ data class APIContentReviewViewDocument(
   val `quote`: APIContentReviewViewDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentReviewViewDocumentPlanRef? = null,
   val `live`: APIContentReviewViewDocumentLive? = null
 )
 
@@ -2218,6 +2334,13 @@ enum class APIContentReviewViewDocumentMediaItemKind {
 data class APIContentReviewViewDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentReviewViewDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -2505,6 +2628,8 @@ data class APIProof(
   val `code`: String,
   val `platform`: APIProofPlatform,
   val `accountUrl`: String,
+  @Required
+  val `postUrl`: String? = null,
   val `expiresAt`: String,
   val `state`: APIProofState,
   @Required
@@ -2856,7 +2981,8 @@ data class APIMessage(
   @Required
   val `signedActId`: String? = null,
   val `member`: String? = null,
-  val `authorAccountId`: String? = null
+  val `authorAccountId`: String? = null,
+  val `systemLink`: APIMessageSystemLink? = null
 )
 
 @Serializable
@@ -2882,6 +3008,25 @@ enum class APIMessageDeliveryState {
 }
 
 @Serializable
+data class APIMessageSystemLink(
+  val `kind`: APIMessageSystemLinkKind,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `contentVersion`: Long,
+  val `label`: APIMessageSystemLinkLabel
+)
+
+@Serializable
+enum class APIMessageSystemLinkKind {
+  @SerialName("published_answer") PUBLISHED_ANSWER
+}
+
+@Serializable
+enum class APIMessageSystemLinkLabel {
+  @SerialName("Answered publicly.") ANSWERED_PUBLICLY_
+}
+
+@Serializable
 data class APIAcceptedMessage(
   val `message`: APIAcceptedMessageMessage,
   @Required
@@ -2900,7 +3045,8 @@ data class APIAcceptedMessageMessage(
   @Required
   val `signedActId`: String? = null,
   val `member`: String? = null,
-  val `authorAccountId`: String? = null
+  val `authorAccountId`: String? = null,
+  val `systemLink`: APIAcceptedMessageMessageSystemLink? = null
 )
 
 @Serializable
@@ -2926,6 +3072,25 @@ enum class APIAcceptedMessageMessageDeliveryState {
 }
 
 @Serializable
+data class APIAcceptedMessageMessageSystemLink(
+  val `kind`: APIAcceptedMessageMessageSystemLinkKind,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `contentVersion`: Long,
+  val `label`: APIAcceptedMessageMessageSystemLinkLabel
+)
+
+@Serializable
+enum class APIAcceptedMessageMessageSystemLinkKind {
+  @SerialName("published_answer") PUBLISHED_ANSWER
+}
+
+@Serializable
+enum class APIAcceptedMessageMessageSystemLinkLabel {
+  @SerialName("Answered publicly.") ANSWERED_PUBLICLY_
+}
+
+@Serializable
 data class APIFrame(
   val `threadId`: String,
   val `cursor`: Long,
@@ -2937,7 +3102,8 @@ data class APIFrame(
   @Required
   val `generationId`: String? = null,
   val `sequence`: Long,
-  val `control`: APIFrameControl? = null
+  val `control`: APIFrameControl? = null,
+  val `systemLink`: APIFrameSystemLink? = null
 )
 
 @Serializable
@@ -2969,6 +3135,25 @@ enum class APIFrameControl {
   @SerialName("ai_paused") AI_PAUSED,
   @SerialName("closed") CLOSED,
   @SerialName("blocked") BLOCKED
+}
+
+@Serializable
+data class APIFrameSystemLink(
+  val `kind`: APIFrameSystemLinkKind,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `contentVersion`: Long,
+  val `label`: APIFrameSystemLinkLabel
+)
+
+@Serializable
+enum class APIFrameSystemLinkKind {
+  @SerialName("published_answer") PUBLISHED_ANSWER
+}
+
+@Serializable
+enum class APIFrameSystemLinkLabel {
+  @SerialName("Answered publicly.") ANSWERED_PUBLICLY_
 }
 
 @Serializable
@@ -3017,7 +3202,8 @@ data class APIThreadTimelineMessagesItem(
   @Required
   val `signedActId`: String? = null,
   val `member`: String? = null,
-  val `authorAccountId`: String? = null
+  val `authorAccountId`: String? = null,
+  val `systemLink`: APIThreadTimelineMessagesItemSystemLink? = null
 )
 
 @Serializable
@@ -3040,6 +3226,25 @@ enum class APIThreadTimelineMessagesItemDeliveryState {
   @SerialName("delivered") DELIVERED,
   @SerialName("failed") FAILED,
   @SerialName("interrupted") INTERRUPTED
+}
+
+@Serializable
+data class APIThreadTimelineMessagesItemSystemLink(
+  val `kind`: APIThreadTimelineMessagesItemSystemLinkKind,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `contentVersion`: Long,
+  val `label`: APIThreadTimelineMessagesItemSystemLinkLabel
+)
+
+@Serializable
+enum class APIThreadTimelineMessagesItemSystemLinkKind {
+  @SerialName("published_answer") PUBLISHED_ANSWER
+}
+
+@Serializable
+enum class APIThreadTimelineMessagesItemSystemLinkLabel {
+  @SerialName("Answered publicly.") ANSWERED_PUBLICLY_
 }
 
 @Serializable
@@ -3212,6 +3417,7 @@ data class APIConversationConversationMessage(
   @Required
   val `member`: String? = null,
   val `authorAccountId`: String? = null,
+  val `systemLink`: APIConversationConversationMessageSystemLink? = null,
   val `citations`: List<String>,
   val `createdAt`: String,
   val `offTheRecord`: Boolean,
@@ -3242,6 +3448,25 @@ enum class APIConversationConversationMessageDeliveryState {
   @SerialName("delivered") DELIVERED,
   @SerialName("failed") FAILED,
   @SerialName("interrupted") INTERRUPTED
+}
+
+@Serializable
+data class APIConversationConversationMessageSystemLink(
+  val `kind`: APIConversationConversationMessageSystemLinkKind,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `contentVersion`: Long,
+  val `label`: APIConversationConversationMessageSystemLinkLabel
+)
+
+@Serializable
+enum class APIConversationConversationMessageSystemLinkKind {
+  @SerialName("published_answer") PUBLISHED_ANSWER
+}
+
+@Serializable
+enum class APIConversationConversationMessageSystemLinkLabel {
+  @SerialName("Answered publicly.") ANSWERED_PUBLICLY_
 }
 
 @Serializable
@@ -3476,6 +3701,7 @@ data class APIConversationConversationPageMessagesItem(
   @Required
   val `member`: String? = null,
   val `authorAccountId`: String? = null,
+  val `systemLink`: APIConversationConversationPageMessagesItemSystemLink? = null,
   val `citations`: List<String>,
   val `createdAt`: String,
   val `offTheRecord`: Boolean,
@@ -3506,6 +3732,25 @@ enum class APIConversationConversationPageMessagesItemDeliveryState {
   @SerialName("delivered") DELIVERED,
   @SerialName("failed") FAILED,
   @SerialName("interrupted") INTERRUPTED
+}
+
+@Serializable
+data class APIConversationConversationPageMessagesItemSystemLink(
+  val `kind`: APIConversationConversationPageMessagesItemSystemLinkKind,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `contentVersion`: Long,
+  val `label`: APIConversationConversationPageMessagesItemSystemLinkLabel
+)
+
+@Serializable
+enum class APIConversationConversationPageMessagesItemSystemLinkKind {
+  @SerialName("published_answer") PUBLISHED_ANSWER
+}
+
+@Serializable
+enum class APIConversationConversationPageMessagesItemSystemLinkLabel {
+  @SerialName("Answered publicly.") ANSWERED_PUBLICLY_
 }
 
 @Serializable
@@ -3625,6 +3870,7 @@ data class APIConversationConversationTimelineMessagesItem(
   @Required
   val `member`: String? = null,
   val `authorAccountId`: String? = null,
+  val `systemLink`: APIConversationConversationTimelineMessagesItemSystemLink? = null,
   val `citations`: List<String>,
   val `createdAt`: String,
   val `offTheRecord`: Boolean,
@@ -3655,6 +3901,25 @@ enum class APIConversationConversationTimelineMessagesItemDeliveryState {
   @SerialName("delivered") DELIVERED,
   @SerialName("failed") FAILED,
   @SerialName("interrupted") INTERRUPTED
+}
+
+@Serializable
+data class APIConversationConversationTimelineMessagesItemSystemLink(
+  val `kind`: APIConversationConversationTimelineMessagesItemSystemLinkKind,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `contentVersion`: Long,
+  val `label`: APIConversationConversationTimelineMessagesItemSystemLinkLabel
+)
+
+@Serializable
+enum class APIConversationConversationTimelineMessagesItemSystemLinkKind {
+  @SerialName("published_answer") PUBLISHED_ANSWER
+}
+
+@Serializable
+enum class APIConversationConversationTimelineMessagesItemSystemLinkLabel {
+  @SerialName("Answered publicly.") ANSWERED_PUBLICLY_
 }
 
 @Serializable
@@ -3888,6 +4153,7 @@ data class APIContentContentDocument(
   val `quote`: APIContentContentDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentContentDocumentPlanRef? = null,
   val `live`: APIContentContentDocumentLive? = null
 )
 
@@ -3921,6 +4187,13 @@ enum class APIContentContentDocumentMediaItemKind {
 data class APIContentContentDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentContentDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -3998,6 +4271,7 @@ data class APIContentContentListItemsItemDocument(
   val `quote`: APIContentContentListItemsItemDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentContentListItemsItemDocumentPlanRef? = null,
   val `live`: APIContentContentListItemsItemDocumentLive? = null
 )
 
@@ -4031,6 +4305,13 @@ enum class APIContentContentListItemsItemDocumentMediaItemKind {
 data class APIContentContentListItemsItemDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentContentListItemsItemDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -4138,6 +4419,7 @@ data class APIContentContentReplyListItemsItem(
   val `text`: String,
   val `version`: Long,
   val `createdAt`: String,
+  val `tenure`: APIContentContentReplyListItemsItemTenure? = null,
   val `consent`: APIContentContentReplyListItemsItemConsent,
   @Required
   val `reaction`: APIContentContentReplyListItemsItemReaction? = null
@@ -4148,6 +4430,33 @@ enum class APIContentContentReplyListItemsItemSafetyState {
   @SerialName("pending") PENDING,
   @SerialName("allowed") ALLOWED,
   @SerialName("flagged") FLAGGED
+}
+
+@Serializable
+data class APIContentContentReplyListItemsItemTenure(
+  val `confirmedDays`: Long,
+  @Required
+  val `milestone`: JsonElement? = null,
+  val `basis`: APIContentContentReplyListItemsItemTenureBasis,
+  val `historyComplete`: APIContentContentReplyListItemsItemTenureHistoryComplete,
+  val `checkedAt`: String
+)
+
+@Serializable
+enum class APIContentContentReplyListItemsItemTenureBasis {
+  @SerialName("confirmed_stripe_paid_periods") CONFIRMED_STRIPE_PAID_PERIODS,
+  @SerialName("confirmed_paid_periods") CONFIRMED_PAID_PERIODS
+}
+
+@Serializable(with = APIContentContentReplyListItemsItemTenureHistoryCompleteSerializer::class)
+object APIContentContentReplyListItemsItemTenureHistoryComplete { const val value: Boolean = false }
+object APIContentContentReplyListItemsItemTenureHistoryCompleteSerializer : KSerializer<APIContentContentReplyListItemsItemTenureHistoryComplete> {
+  override val descriptor = PrimitiveSerialDescriptor("APIContentContentReplyListItemsItemTenureHistoryComplete", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APIContentContentReplyListItemsItemTenureHistoryComplete {
+    if (decoder.decodeBoolean() != false) throw SerializationException("Expected false")
+    return APIContentContentReplyListItemsItemTenureHistoryComplete
+  }
+  override fun serialize(encoder: Encoder, value: APIContentContentReplyListItemsItemTenureHistoryComplete) { encoder.encodeBoolean(false) }
 }
 
 @Serializable
@@ -4228,6 +4537,33 @@ data class APIContentContentRevisionResult(
 data class APIContentContentScheduledResult(
   val `published`: Long
 )
+
+@Serializable
+data class APIContentContentTenureRecognition(
+  val `confirmedDays`: Long,
+  @Required
+  val `milestone`: JsonElement? = null,
+  val `basis`: APIContentContentTenureRecognitionBasis,
+  val `historyComplete`: APIContentContentTenureRecognitionHistoryComplete,
+  val `checkedAt`: String
+)
+
+@Serializable
+enum class APIContentContentTenureRecognitionBasis {
+  @SerialName("confirmed_stripe_paid_periods") CONFIRMED_STRIPE_PAID_PERIODS,
+  @SerialName("confirmed_paid_periods") CONFIRMED_PAID_PERIODS
+}
+
+@Serializable(with = APIContentContentTenureRecognitionHistoryCompleteSerializer::class)
+object APIContentContentTenureRecognitionHistoryComplete { const val value: Boolean = false }
+object APIContentContentTenureRecognitionHistoryCompleteSerializer : KSerializer<APIContentContentTenureRecognitionHistoryComplete> {
+  override val descriptor = PrimitiveSerialDescriptor("APIContentContentTenureRecognitionHistoryComplete", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APIContentContentTenureRecognitionHistoryComplete {
+    if (decoder.decodeBoolean() != false) throw SerializationException("Expected false")
+    return APIContentContentTenureRecognitionHistoryComplete
+  }
+  override fun serialize(encoder: Encoder, value: APIContentContentTenureRecognitionHistoryComplete) { encoder.encodeBoolean(false) }
+}
 
 typealias APIContentContentThanksFeed = List<APIContentContentThanksFeedValueItem>
 
@@ -4330,6 +4666,7 @@ data class APIContentContentViewDocument(
   val `quote`: APIContentContentViewDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentContentViewDocumentPlanRef? = null,
   val `live`: APIContentContentViewDocumentLive? = null
 )
 
@@ -4363,6 +4700,13 @@ enum class APIContentContentViewDocumentMediaItemKind {
 data class APIContentContentViewDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentContentViewDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
@@ -4445,6 +4789,7 @@ data class APIContentPrivateNoteReply(
   val `text`: String,
   val `version`: Long,
   val `createdAt`: String,
+  val `tenure`: APIContentPrivateNoteReplyTenure? = null,
   val `consent`: APIContentPrivateNoteReplyConsent,
   @Required
   val `reaction`: APIContentPrivateNoteReplyReaction? = null
@@ -4455,6 +4800,33 @@ enum class APIContentPrivateNoteReplySafetyState {
   @SerialName("pending") PENDING,
   @SerialName("allowed") ALLOWED,
   @SerialName("flagged") FLAGGED
+}
+
+@Serializable
+data class APIContentPrivateNoteReplyTenure(
+  val `confirmedDays`: Long,
+  @Required
+  val `milestone`: JsonElement? = null,
+  val `basis`: APIContentPrivateNoteReplyTenureBasis,
+  val `historyComplete`: APIContentPrivateNoteReplyTenureHistoryComplete,
+  val `checkedAt`: String
+)
+
+@Serializable
+enum class APIContentPrivateNoteReplyTenureBasis {
+  @SerialName("confirmed_stripe_paid_periods") CONFIRMED_STRIPE_PAID_PERIODS,
+  @SerialName("confirmed_paid_periods") CONFIRMED_PAID_PERIODS
+}
+
+@Serializable(with = APIContentPrivateNoteReplyTenureHistoryCompleteSerializer::class)
+object APIContentPrivateNoteReplyTenureHistoryComplete { const val value: Boolean = false }
+object APIContentPrivateNoteReplyTenureHistoryCompleteSerializer : KSerializer<APIContentPrivateNoteReplyTenureHistoryComplete> {
+  override val descriptor = PrimitiveSerialDescriptor("APIContentPrivateNoteReplyTenureHistoryComplete", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APIContentPrivateNoteReplyTenureHistoryComplete {
+    if (decoder.decodeBoolean() != false) throw SerializationException("Expected false")
+    return APIContentPrivateNoteReplyTenureHistoryComplete
+  }
+  override fun serialize(encoder: Encoder, value: APIContentPrivateNoteReplyTenureHistoryComplete) { encoder.encodeBoolean(false) }
 }
 
 @Serializable
@@ -4530,6 +4902,7 @@ data class APIContentSaveContentDocument(
   val `quote`: APIContentSaveContentDocumentQuote? = null,
   @Required
   val `packetId`: String? = null,
+  val `planRef`: APIContentSaveContentDocumentPlanRef? = null,
   val `live`: APIContentSaveContentDocumentLive? = null
 )
 
@@ -4563,6 +4936,13 @@ enum class APIContentSaveContentDocumentMediaItemKind {
 data class APIContentSaveContentDocumentQuote(
   val `replyId`: String,
   val `consentVersion`: Long
+)
+
+@Serializable
+data class APIContentSaveContentDocumentPlanRef(
+  val `id`: String,
+  val `revision`: Long,
+  val `hash`: String
 )
 
 @Serializable
