@@ -1,5 +1,8 @@
 # W2 recovery and canonical session continuation
 
+**Public metadata authority reconciliation:** [W2 producer](../20261001-mac-studio/public-projection/README.md) now consumes exact W1 immutable public-AI scope55058f90/SQLdce780db on the same actual pool/client/facts. No creator Actor, owner-scope/GUC substitution or default purpose approval remains. Actual40-migration factory refuses503 before callbacks, provider calls or writes. Existing backend18/18, unchanged T-1152,154ms, type/lint/format pass. Held0085/0086 and genuine positive licensing/purpose/publication, W7 host and W3 feed/digest remain open; earlier owner-scope receipt is historical.
+
+
 **Translation main increment:** PR100 normally merged exactdb0b6c1c→1d3571b5, with both web/backend and both Android-runtime passing; six Mac jobs queued/unpassed. Actual main checkout backend typecheck and negative language/provenance/verdict/purpose checks pass, with zero provider calls/signatures/jobs. [Exact merge/main receipt](../20261001-mac-studio/translation/merged-ci.json). Genuine W3 job/source producer, processor/retention, provider and native positive translation remain open.
 
 **Held-client license rechecks:** Studio read, publish, rollback and activation facts now use their existing transaction client. A real one-connection creator_runtime read failed before the change and returned persisted revision15 afterward (345/39 ms single samples, not p95; zero provider calls/writes). Existing backend18/18, type/lint/format pass; unchanged T-11 completed in101,881 ms. Source-qualified receipt: [held-client receipt](../20261001-mac-studio/held-license-rechecks/README.md). Actual provider/publication/C10/native/full W2 acceptance remains open.
