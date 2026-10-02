@@ -663,6 +663,20 @@
       "version": "0102_w5_generation_content_origin",
       "state": "reserved_unapplied",
       "reason": "Fixed metadata-only current public-own-text origin projection under exact W1 durable worker nonce/client and real consumed signature. Immutable source/function/role/C10 review pending; no body/fan/paid authority or activation."
+    },
+    {
+      "id": "0103",
+      "owner": "W8",
+      "version": "0103_w8_domain_privacy_task_fence",
+      "state": "reserved_unapplied",
+      "reason": "Actorless Trust/Growth private worker same-client job/task ownership/lease and separate-COMMIT custody. Exact dedicated domain issuer/role/source/C10 review pending; no widening0087 caller or scope ACL."
+    },
+    {
+      "id": "0104",
+      "owner": "W2",
+      "version": "0104_w2_generation_retrieval_context",
+      "state": "reserved_unapplied",
+      "reason": "Actual bounded actorless retrieval/current creator/style projection under genuine W1 worker nonce, unchanged0096 and real0098/0102 current audience/origin fences. Exact signature/dispatcher/private role/source/C10 review pending; no activation or extra LOGIN worker surface."
     }
   ]
 }
