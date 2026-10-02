@@ -40,6 +40,12 @@ export type BackendRuntime = {
     creatorId: string,
     client: pg.PoolClient,
   ) => Promise<void>;
+  assertRestoredInTransaction?: (client: pg.PoolClient) => Promise<void>;
+  assertContentAllowedInTransaction?: (
+    client: pg.PoolClient,
+    actor: import("./modules/identity/adapter.js").Actor,
+    creatorId: string,
+  ) => Promise<void>;
   assertActorAllowed: (
     actor: import("./modules/identity/adapter.js").Actor,
   ) => Promise<void>;
@@ -258,6 +264,32 @@ export async function createConfiguredBackend(input: {
       : {}),
     ...(input.trust
       ? {
+          assertRestoredInTransaction: async (client: pg.PoolClient) => {
+            if (!trust)
+              throw new DomainError(
+                "trust_unconfigured",
+                "Current recovery authority is unavailable.",
+                503,
+              );
+            await trust.assertRestoredInTransaction(client);
+          },
+          assertContentAllowedInTransaction: async (
+            client: pg.PoolClient,
+            actor: import("./modules/identity/adapter.js").Actor,
+            creatorId: string,
+          ) => {
+            if (!trust)
+              throw new DomainError(
+                "trust_unconfigured",
+                "Current content denial authority is unavailable.",
+                503,
+              );
+            await trust.assertContentAllowedInTransaction(
+              client,
+              actor,
+              creatorId,
+            );
+          },
           assertCreatorAllowedInTransaction: async (
             actor: import("./modules/identity/adapter.js").Actor,
             creatorId: string,
