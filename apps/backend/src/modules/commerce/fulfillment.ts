@@ -4,6 +4,7 @@ import { assertThreadScope } from "../access/scope.js";
 import type { CommerceService } from "./service.js";
 import { contentHash } from "../../core/canonical.js";
 import { invariant } from "../../core/errors.js";
+import { lockCommitmentPacket } from "./packet-locks.js";
 
 type CallResolution = {
   packetId: string;
@@ -82,9 +83,10 @@ export class CommerceFulfillment {
             "session_evidence_required",
             "The provider-reconciled session evidence is unavailable.",
           );
+          await lockCommitmentPacket(client, evidence.commitmentId);
           const record = (
             await client.query(
-              "SELECT c.*,p.thread_id,p.snapshot,p.intent_ref,cp.account_id AS creator_account,cp.verification,cp.recovery_required,fp.account_id AS fan_account FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id JOIN creator.creator_profile cp ON cp.id=c.creator_id JOIN creator.fan_profile fp ON fp.id=c.fan_id WHERE c.id=$1 AND c.creator_id=$2 AND c.fan_id=$3 FOR UPDATE OF c,p",
+              "SELECT c.*,p.thread_id,p.snapshot,p.intent_ref,cp.account_id AS creator_account,cp.verification,cp.recovery_required,fp.account_id AS fan_account FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id AND p.creator_id=c.creator_id AND p.fan_id=c.fan_id JOIN creator.creator_profile cp ON cp.id=c.creator_id JOIN creator.fan_profile fp ON fp.id=c.fan_id WHERE c.id=$1 AND c.creator_id=$2 AND c.fan_id=$3 FOR UPDATE OF c",
               [evidence.commitmentId, scope.creatorId, scope.fanId],
             )
           ).rows[0];

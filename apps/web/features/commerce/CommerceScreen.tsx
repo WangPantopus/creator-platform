@@ -676,7 +676,9 @@ function CommerceAccountScreen({
       pending.current.delete(signature);
       setNotice(
         result.delay
-          ? "Your increase takes effect in 24 hours. Your current limit still applies."
+          ? result.limit?.effective_at
+            ? `Your increase takes effect ${date(result.limit.effective_at)}. Your current limit still applies.`
+            : "Your increase is scheduled. Your current limit still applies."
           : result.processing
             ? "Processing. Check the current provider state before retrying."
             : result.state === "failed"

@@ -276,7 +276,15 @@ export class StudioService {
         (message) =>
           ["human_creator", "approved_draft"].includes(message.authorKind) &&
           message.deliveryState === "delivered" &&
-          message.signedActId,
+          message.signedActId &&
+          (packet.packet.snapshot.mode === "voice_note"
+            ? message.authorKind === "human_creator" &&
+              message.recording?.state === "available" &&
+              message.recording.asset.threadId === scope.threadId &&
+              message.recording.asset.signedActId === message.signedActId
+            : packet.packet.snapshot.mode === "written_reply" &&
+              message.text.trim().length > 0 &&
+              !message.recording),
       ),
       audited: true,
     };

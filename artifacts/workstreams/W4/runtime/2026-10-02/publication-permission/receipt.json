@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-02T10:20:55.488650+00:00",
+  "workstream": "W4",
+  "status": "implemented; current-runtime negative gates personally operated; positive publication acceptance unverified",
+  "changes": [
+    "Actual interactive session required; no purpose-job substitution",
+    "Nonblocking shared mode/packet keys and explicit packet then commitment then sharing NOWAIT locks; 55P03 maps retryable503",
+    "Original public choice or genuine current fan/creator ShareGrant; current shareable mode and immutable snapshot",
+    "Exact confirmed capture, no refund or pending refund obligation, no open dispute; current consumed acceptance metadata"
+  ],
+  "verification": {
+    "backendTypecheck": "PASS",
+    "scopedLint": "PASS",
+    "sqlPlanning": {
+      "role": "creator_runtime",
+      "postgres": "17",
+      "statements": 6,
+      "analyze": false,
+      "businessWrites": 0,
+      "result": "PASS"
+    },
+    "diagnosticCorrection": "Initial pg named-export import failed before connecting; corrected to its default CommonJS export and repeated successfully.",
+    "web": {
+      "origin": "http://localhost:3004",
+      "viewport": "390x844",
+      "actor": "existing synthetic development fan two",
+      "creatorCreation": "Actual setup form created clearly labeled Development W4 creator and continued to proof step",
+      "proof": "No account/proof code/request fabricated or submitted; signing disabled",
+      "draftAI": "Actual draft-only AI and disabled external fan publication observed",
+      "requests": "Actual pending creator rejected: current verification and recovery required",
+      "return": "Setup preserved pending profile on a real return visit",
+      "privatePersistedAssertions": [
+        "pending creator profile exists",
+        "no passkeys",
+        "no commerce ledger"
+      ],
+      "appearance": "Night observed on creator pages; earlier filename light label corrected before publication",
+      "currentApiRegression": "Personally restarted canonical API4104 on current source, reloaded setup and returned to Requests; pending state and genuine verification-required refusal preserved"
+    }
+  },
+  "limits": [
+    "Genuine creator proof/passkey and Stripe sandbox unavailable",
+    "No successful paid/public/private-share/group publication or revocation/concurrency acceptance",
+    "Owner permission precedes media/signing; viewer final source-signature lease remains separate",
+    "Future0070/0076/0081/0082 SQL remains unregistered/unapplied",
+    "No new unit tests, fake identity/consent/receipts or SQL business writes"
+  ],
+  "files": [
+    {
+      "path": "apps/backend/src/modules/commerce/publication.ts",
+      "sha256": "3e2ae3eae646e71ce4b270c4b27220fff6bec6ab6c73397bf2530b5a1291b558"
+    },
+    {
+      "path": "artifacts/workstreams/W4/runtime/2026-10-02/publication-permission/creator-draft-ai-night.png",
+      "sha256": "b4e0b6f66b2428f2be27768f3bd9b15ee7066aeebc1ae135ebb829b12719c52c"
+    },
+    {
+      "path": "artifacts/workstreams/W4/runtime/2026-10-02/publication-permission/creator-proof-gate-night.png",
+      "sha256": "1da73189533767172e6b811321f210aa7258125a104c6aaf49be20b965ac5d20"
+    },
+    {
+      "path": "artifacts/workstreams/W4/runtime/2026-10-02/publication-permission/creator-requests-current-night.png",
+      "sha256": "d6d12252152f551b1854a1e441fd3123ddbc3a655b6788e349b6d0b2c2454915"
+    },
+    {
+      "path": "artifacts/workstreams/W4/runtime/2026-10-02/publication-permission/creator-requests-gate-night.png",
+      "sha256": "67cf70abada42fcc97c4d5247180e97e220c0944b4d8a37a3d426b6438ae66ed"
+    },
+    {
+      "path": "artifacts/workstreams/W4/runtime/2026-10-02/publication-permission/creator-return-night.png",
+      "sha256": "9971eee7a64c0208fab434d3363aac282d8284568438dfb2a7631c359f552928"
+    }
+  ]
+}

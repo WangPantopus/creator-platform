@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "at": "2026-10-02T09:12:25.904283+00:00",
+  "host": "Yingpengs-Mac-Studio.local",
+  "base": "5e39b41d8e369f51fb033e5197864072513f58a3",
+  "actor": "fictional Maya / development actor one",
+  "creatorId": "97152450-4093-4b15-9148-b12c16053956",
+  "database": "owned creator_w2 / loopback55442",
+  "role": "creator_runtime",
+  "poolMax": 1,
+  "poolConnectionTimeoutMs": 300,
+  "sourceSha256": {
+    "service.ts": "3f277f127c38ae12a38c4c30a82e9347da3e2e5b8041681a3297cc095bc4a513",
+    "growth-adapter.ts": "1aefd683ec7d2f3fa567133805a9718fbf3420e88cbef5e83ab99a9c0cf93f5d"
+  },
+  "actualReadBefore": {
+    "outcome": "nested pool acquisition timeout",
+    "sampleMs": 345
+  },
+  "actualReadAfter": {
+    "outcome": "success",
+    "sampleMs": 39,
+    "draftRevision": 15,
+    "termsVersion": "development-synthetic-unreviewed"
+  },
+  "heldClientCallsites": [
+    "Studio read",
+    "publish",
+    "rollback",
+    "activation facts"
+  ],
+  "verification": {
+    "typecheck": "passed",
+    "scopedLint": "passed",
+    "format": "passed",
+    "existingBackendSuite": {
+      "passed": 18,
+      "failed": 0,
+      "skipped": 0,
+      "T11": {
+        "pairs": 10000,
+        "queries": 30000,
+        "durationMs": 101881,
+        "limitMs": 300000
+      }
+    }
+  },
+  "providerCalls": 0,
+  "durableWrites": 0,
+  "p95Claim": false,
+  "limits": [
+    "Only the real persisted Studio read was personally operated before/after.",
+    "Publish/rollback/activation held-client changes checked in source; no provider/production positive acceptance.",
+    "Operator-only temporary check removed; no new unit tests."
+  ]
+}

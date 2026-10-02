@@ -1,0 +1,3 @@
+{"resource":"fifo","result":"media_integrity_invalid","elapsedMs":10}
+{"resource":"cancelled descriptor read","result":"diagnostic_job_cancelled"}
+{"resource":"synthetic diagnostic wav","bytes":176478,"sha256":"6ea19f9c21aad4a67e55f3e126f2d0b558b13515d001bb69bde1424b4fe71033"}

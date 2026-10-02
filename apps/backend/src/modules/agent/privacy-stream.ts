@@ -9,6 +9,10 @@ import type { PrivacyExportStream } from "../trust/privacy-export.js";
 /** Consumer of W8's immutable3240da0 PrivacyExportStream, returned
  * by PrivacyHook.run. The coordinator owns durable storage/verification/ack. */
 export type AgentPrivacyExportStream = PrivacyExportStream;
+export type AgentAccountingExportBoundary = {
+  assertCurrent(client: PoolClient): Promise<{ reference: string }>;
+  assertCustody(client: PoolClient): Promise<boolean>;
+};
 
 /** One MVCC source snapshot across every authoritative owned creator. One
  * pending chunk provides backpressure; closing the iterator rolls back. */
@@ -17,6 +21,7 @@ export function agentExportStream(
   scopes: readonly CreatorScope[],
   assertCurrent: () => Promise<void>,
   parentSignal?: AbortSignal,
+  accounting?: AgentAccountingExportBoundary,
 ): AgentPrivacyExportStream {
   const snapshotRef = `agent-export:${randomUUID()}`;
   const controller = new AbortController();
@@ -97,6 +102,7 @@ export function agentExportStream(
     try {
       signal.throwIfAborted();
       await assertCurrent();
+      await service.repository.assertRuntimeRole();
       client = await service.repository.pool.connect();
       await client.query("BEGIN ISOLATION LEVEL REPEATABLE READ");
       await client.query(
@@ -104,11 +110,22 @@ export function agentExportStream(
       );
       // Current W2 lineage hooks must be composed before a full-domain stream
       // could omit an account's fan relationships or acknowledge thread data.
-      invariant(
-        !(await generationJournalInstalled(client)),
-        "thread_accounting_privacy_unconfigured",
-        "Register complete fan-accounting privacy before exporting this installed lineage schema.",
-      );
+      const lineage = await generationJournalInstalled(client);
+      let boundaryReference: string | undefined;
+      if (lineage) {
+        invariant(
+          accounting,
+          "thread_accounting_privacy_unconfigured",
+          "Register complete fan-accounting privacy before exporting this installed lineage schema.",
+        );
+        await accounting.assertCustody(client);
+        boundaryReference = (await accounting.assertCurrent(client)).reference;
+        invariant(
+          boundaryReference,
+          "accounting_boundary_incomplete",
+          "The finalized conversation export artifact is required.",
+        );
+      }
       await write('{"schemaVersion":2,"creatorExports":[');
       let first = true;
       for (const scope of [...scopes].sort((a, b) =>
@@ -142,6 +159,15 @@ export function agentExportStream(
       await flush();
       signal.throwIfAborted();
       await assertCurrent();
+      if (lineage) {
+        await accounting!.assertCustody(client);
+        invariant(
+          (await accounting!.assertCurrent(client)).reference ===
+            boundaryReference,
+          "accounting_boundary_changed",
+          "The finalized conversation accounting export changed before source exhaustion.",
+        );
+      }
       await client.query("COMMIT");
       complete = true;
     } catch (error) {

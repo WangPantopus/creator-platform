@@ -192,6 +192,8 @@ public enum QelvoraCopy {
     "writtenBy": "Written by {name}",
     "monthlyLimitLegend": "Monthly limit for requests and memberships",
     "limitReminders": "Reminders at 50% and 100% of your limit are on. Lowering a limit is immediate.",
+    "limitRemindersOff": "Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.",
+    "limitRemindersUnknown": "Lowering a limit is immediate.",
     "noLimit": "No limit",
     "navChat": "Chat",
     "navPosts": "Posts",
@@ -883,7 +885,11 @@ public enum QelvoraCopy {
     "growthRetainedFanAggregates": "Closed fan aggregates contain no fan identifier or private text; removed creator snapshots are deleted.",
     "growthErrorQuietHoursPair": "Both quiet-hour boundaries are required",
     "growthErrorTimeZone": "Choose a valid time zone, such as America/Los_Angeles.",
-    "growthErrorQuietHoursFormat": "Enter a time in HH:mm, from 00:00 to 23:59."
+    "growthErrorQuietHoursFormat": "Enter a time in HH:mm, from 00:00 to 23:59.",
+    "accountUnavailableTitle": "We can't reach your account right now",
+    "accountUnavailableBody": "Your session is kept on this device. Try again in a moment.",
+    "pageUnavailableTitle": "This page didn't load",
+    "pageUnavailableBody": "Nothing you saved was changed. Try again in a moment."
   ]
   private static let variables = try! NSRegularExpression(pattern: #"\{([^}]+)\}"#)
   public static func text(_ key: String, values: [String: String] = [:]) -> String {
