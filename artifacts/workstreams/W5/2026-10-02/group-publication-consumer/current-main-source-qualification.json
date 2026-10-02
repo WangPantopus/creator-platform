@@ -1,0 +1,19 @@
+{
+  "source": "70d79521559a0f817f0e5d48952874a731a4535b",
+  "capturedMain": "b6c073aef97b2ea7c06847b4baa9914d9bce06b7",
+  "ownerSourceUnchanged": {
+    "plans": "5a7925ef91fee53386136708a28eb1818b5ae8c4",
+    "viewAuthority": "84a035328150746e6a94cbce8e511de87b469109"
+  },
+  "checks": {
+    "backendTypecheck": "passed",
+    "webTypecheck": "passed",
+    "generateCheck": "passed: 101 operations",
+    "scopedLintFormat": "passed"
+  },
+  "productionBuild": "prior actual2949 receipt remains tied to that source; current shared owner dependencies need current-source build",
+  "database": "owned creator_w5 now61 through separate actual backup/restore/atomic operator qualification at98024f7b; no group purposes activated",
+  "positiveGroupAcceptance": false,
+  "nativeOperationAtThisSource": false,
+  "releaseReady": false
+}
