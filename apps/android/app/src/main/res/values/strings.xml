@@ -388,6 +388,13 @@
   <string name="growth_the_author_label_and_verification_link_stay_on_the_default" formatted="false">The author label and verification link stay on the default export.</string>
   <string name="growth_s_reply" formatted="false">{value1}\'s reply</string>
   <string name="growth_download_labeled_image" formatted="false">Download labeled image</string>
+  <string name="growth_back_to_reply" formatted="false">Back to reply</string>
+  <string name="growth_reply_image_export_help" formatted="false">The complete reply is split into labeled images when needed. Multiple images download together as a ZIP, with a complete text copy.</string>
+  <string name="growth_preparing_reply_images" formatted="false">Preparing images…</string>
+  <string name="growth_reply_image_progress" formatted="false">Prepared {page} images…</string>
+  <string name="growth_reply_image_page" formatted="false">Page {page}</string>
+  <string name="growth_reply_images_ready" formatted="false">Your download is ready. Check your browser’s downloads.</string>
+  <string name="growth_reply_image_export_failed" formatted="false">The complete image export could not be prepared. Retry, or download the complete text.</string>
   <string name="growth_your_first72_hours" formatted="false">Your first 72 hours</string>
   <string name="growth_your_first_digest_appears_after_the72_hour_observation_window" formatted="false">Your first digest appears after the 72-hour observation window closes.</string>
   <string name="growth_publish_your_ai_to_start" formatted="false">Publish your AI to start</string>

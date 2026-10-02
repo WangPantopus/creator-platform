@@ -4247,6 +4247,83 @@
         }
       }
     },
+    "Back to reply": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back to reply"
+          }
+        }
+      }
+    },
+    "The complete reply is split into labeled images when needed. Multiple images download together as a ZIP, with a complete text copy.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The complete reply is split into labeled images when needed. Multiple images download together as a ZIP, with a complete text copy."
+          }
+        }
+      }
+    },
+    "Preparing images…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparing images…"
+          }
+        }
+      }
+    },
+    "Prepared {page} images…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepared {page} images…"
+          }
+        }
+      }
+    },
+    "Page {page}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Page {page}"
+          }
+        }
+      }
+    },
+    "Your download is ready. Check your browser’s downloads.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your download is ready. Check your browser’s downloads."
+          }
+        }
+      }
+    },
+    "The complete image export could not be prepared. Retry, or download the complete text.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The complete image export could not be prepared. Retry, or download the complete text."
+          }
+        }
+      }
+    },
     "Your first 72 hours": {
       "extractionState": "manual",
       "localizations": {

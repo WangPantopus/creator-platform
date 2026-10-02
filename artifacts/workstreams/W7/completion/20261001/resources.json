@@ -126,7 +126,7 @@
     "nativeProcessesRunning": false
   },
   "currentHost": {
-    "recordedAt": "2026-10-02T10:49:33.884282+00:00",
+    "recordedAt": "2026-10-02T11:27:55.759852+00:00",
     "note": "W7 moved from the old iMac (Intel, macOS 26, Xcode 26.5) to Yingpeng's Mac Studio (Apple M2 Max, macOS 27.0 26A428, Xcode 27.0 27A266a, iOS 27.0 simulator runtime). Every iMac-era resource listed elsewhere in this file (container creator-platform-w7-document-20261001, simulator CE855FD5-A4AA-4C62-A63B-5E80D2E1DFF1, /private/tmp/creator-platform-w7-completion-20261001 caches, ~/.config/creator-platform/{secrets,cleanup-20261001,w7-completion-20261001}) is absent from this machine and was not copied. Those entries are historical iMac custody only.",
     "checkout": "/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545",
     "postgres": {
@@ -136,7 +136,7 @@
       "address": "127.0.0.1:55447",
       "database": "creator_w7",
       "superuserPasswordFile": "~/.config/creator-platform/w7-macstudio-20261001/pg-superuser-password (mode 0600, never printed)",
-      "state": "Stopped normally;40 active migrations through0043; separated nonowner roles; actual UI one fan/one optional feedback,0 verified creators. No pending schema applied.",
+      "state": "Stopped normally after share-export recovery;40 active migrations through0043; no new schema applied.",
       "recoveredIMacData": "not restored; the iMac backup holds 0 creators/relationships/shares and is not on this machine"
     },
     "reservedPorts": {
@@ -185,18 +185,18 @@
     },
     "nativeBuild": "Signed shipping iOS and Android shipping/original checks pass; actual clients Settings and navigation observed, Android Home action200% Light/Night. Original18 Swift/110 comparisons pass. Both own devices normally stopped, exact UUID/inode leases released; companion stopped. No new tests/references/tolerances.",
     "api": {
-      "source": "2dceb35e plus reviewed account boundary; last tiny creator-delivery custody selection edit not yet restarted",
-      "log": "/private/tmp/creator-platform-w7-active-20261001/account-notification-api-reviewed.log",
-      "lastPid": 44633,
-      "lastSession": 25014,
-      "state": "Stopped normally after actual native/web acceptance. Tiny final creator-delivery custody selection source edit compiled/reviewed; its positive affected provider path remains externally blocked."
+      "source": "5fc1a8ac811779cb13dae7ef485cb675cfeaccaa compiled backend with newly generated copy",
+      "log": "/private/tmp/creator-platform-w7-active-20261001/share-images-api.log",
+      "lastPid": 44338,
+      "lastSession": 37554,
+      "state": "Stopped normally after actual readiness and share-unavailable operation; no provider/purpose fabricated."
     },
     "web": {
-      "mode": "Shipping production .next-w7-account-20261002, loopback3007",
-      "acceptance": "Personally observed signed-out settings and retained destination at sign-in entry; actual editable rejection/save/reload verified separately with development identity; approved HTTPS needed for authenticated production",
-      "lastPid": 38871,
-      "lastParentSession": 91059,
-      "state": "Stopped normally after production signed-out destination operation; production build retained."
+      "mode": "Shipping production .next-w7-images-20261002, loopback3007",
+      "acceptance": "Actual unavailable-share export and recovery,410 no artifact; successful full-image download requires genuine approved share/origin and remains unobserved.",
+      "lastPid": 42433,
+      "lastParentSession": 64965,
+      "state": "Stopped normally after actual share export/recovery Light/Night; browser closed; fresh build retained."
     },
     "pushConfiguration": {
       "CreatorPushEnabled": false,
@@ -212,6 +212,7 @@
       "growthWorker": "growth_worker direct LOGIN, NOINHERIT",
       "realCoreAndGrowthReadiness": "passed; protected trust/purpose authorities remain unconfigured"
     },
-    "accountNotifications": "Unregistered pending SQL and owner port; actual40-migration catalogue refuses503. No allowed W7 slot free, no migration above0060 activated, no purpose/Actor/provider fabricated."
+    "accountNotifications": "Unregistered pending SQL and owner port; actual40-migration catalogue refuses503. No allowed W7 slot free, no migration above0060 activated, no purpose/Actor/provider fabricated.",
+    "shareImages": "Browser-local complete-image source compiled; genuine permitted rendering/download and revocation-during-render acceptance remain open."
   }
 }

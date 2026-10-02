@@ -18,7 +18,8 @@
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "parse5": "^8.0.0",
-    "@qelvora/api": "workspace:*"
+    "@qelvora/api": "workspace:*",
+    "fflate": "0.8.3"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
