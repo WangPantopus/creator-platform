@@ -125,3 +125,24 @@ Acquire an actual owned simulator slot before launch, and stop/release it after
 operation. The helper refuses a busy machine-wide build slot without touching
 its owner or starting a child. A native sign-in case does not accept media,
 calling or physical-device behavior.
+
+Publication is a separate noninteractive worker:
+
+```sh
+node --import tsx apps/backend/src/workers/start.ts publication
+```
+
+It needs `PUBLICATION_WORKER_DATABASE_URL` for the dedicated non-owner
+`creator_publication_worker` login and the same private `MEDIA_STORAGE_ROOT`.
+It uses W8's actual held loopback restoration check for both discovery and
+issuance, then W8's purpose denial projection before W1 issues the sealed scope.
+W5 consumes that original scope and stored act; W6 checks immutable processed
+and credential-file hashes. It never borrows an owner Actor or signs again.
+Production hosts must inject their genuine restoration authority into
+`startPublicationWorker`; this executable's development helper rejects production.
+
+W8 must first activate and verify the exact0071/0073/0074/0075/0076 custody and
+purpose grants. The first57-entry wave does not contain them: actual startup on
+that database refuses `publication_schema_unconfigured`, and no publication is
+accepted. Quote, public/group packet fulfillment, live and displayed audience
+count purpose projections require their own genuine adapters and remain unavailable.
