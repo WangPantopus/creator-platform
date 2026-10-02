@@ -193,3 +193,12 @@ Trust starts before feature composition, so its conversation hook resolves a def
 ## W1 consumes corrected held names without changing history — October 2
 
 W1 reviewed W8's complete corrected fb1cbcaa ordering and matched the exact held packet SHA2338f48e and unchanged four-source wave SHA2d72120d. Held factory pins now use0159 generation,0167 signature fence,0170 public AI,0183 terminal and0184 terminal negatives; generation negatives require the exact0177 name. Actual W3 translation metadata63402a4d is consumed with its0168 allocation and unchanged original SQL path/hash. The previously personally qualified actual W8d12db34c terminal-negative SQL is now present unchanged in this combined checkout. No old ledger aliases, SQL edits, source-hash changes or new activation are created. W4 discovered embedded historical ledger guards in its held audience SQL; a metadata move alone cannot make those executables ready. All further held SQL requires actual owner dependency and function-body review.
+
+
+## W1 removes obsolete core-to-Growth role membership — October 2
+
+Personally operated closed57→61 rollout and separate fresh61 catalogue checks both refused0087. W1 isolated the actual cause: its retained creator_runtime role was NOINHERIT yet remained a member of growth_runtime. NOINHERIT does not remove SET ROLE authority. W1 deliberately revoked only this obsolete membership in its owned closed cluster, preserving all other role attributes and business/history data; the initial original wave had rolled back. Both refusal receipts remain recorded, and a new private backup plus separate restore matched all six custody digests after repair. The operator now refuses the same forbidden core role attributes/membership/settings before DDL. This is an explicit security repair; original-membership preservation is not claimed across it.
+
+## W1 drains shutdown once under overlapping signals — October 2
+
+W3's actual SIGINT operation exposed duplicate pg pool.end calls in the composed root host. W1 now shares one in-flight SIGINT/SIGTERM cleanup, awaits every feature close and attempts all remaining cleanup even after an individual failure, with sanitized stage-only errors and a failing exit status. Growth's own close also retains one promise and closes its worker pool if its timer drain fails. No raw provider/database failure enters logs. Current source checks pass; the actual combined process will be operated before shutdown acceptance is claimed.

@@ -317,14 +317,31 @@ server.listen(
       `Interactive API listening on ${config.port}; identity mode ${config.identityAdapter ?? "unconfigured"}.\n`,
     ),
 );
+let shutdownInFlight: Promise<void> | undefined;
 const shutdown = () => {
-  void (async () => {
-    await features.growth?.close();
-    for (const close of features.close) await close();
-    if (configured) await configured.close();
-    else await new Promise<void>((resolve) => server.close(() => resolve()));
-    await growthAPIPool?.end();
-    process.exit(0);
+  // Shell, watcher and OS signals can overlap. One shared cleanup must own
+  // every worker/pool so a second signal cannot interrupt the first drain.
+  shutdownInFlight ??= (async () => {
+    let failed = false;
+    const close = async (name: string, action: () => unknown) => {
+      try {
+        await action();
+      } catch {
+        failed = true;
+        console.error(`Shutdown could not close ${name}.`);
+      }
+    };
+    await close("Growth worker", () => features.growth?.close());
+    for (const action of features.close) await close("feature workers", action);
+    await close("configured backend", () =>
+      configured
+        ? configured.close()
+        : new Promise<void>((resolve, reject) =>
+            server.close((error) => (error ? reject(error) : resolve())),
+          ),
+    );
+    await close("Growth API pool", () => growthAPIPool?.end());
+    process.exit(failed ? 1 : 0);
   })();
 };
 process.on("SIGTERM", shutdown);
