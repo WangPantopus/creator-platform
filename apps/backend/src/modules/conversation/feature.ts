@@ -804,6 +804,29 @@ export function conversationFeature(
           ),
         );
       });
+      router.get(root + "/intro-offer", async (req, res) => {
+        res.setHeader("Cache-Control", "no-store");
+        invariant(
+          feature.lineage,
+          "intro_offer_unavailable",
+          "Your intro offer is unavailable. Try again.",
+        );
+        res.json(await feature.lineage.pendingIntroOffer(await scopeFor(req)));
+      });
+      router.post(root + "/intro-offer/acknowledgement", async (req, res) => {
+        invariant(
+          feature.lineage,
+          "intro_offer_unavailable",
+          "Your intro offer is unavailable. Try again.",
+        );
+        const body = z.strictObject({ offerId: IdSchema }).parse(req.body);
+        res.json(
+          await feature.lineage.acknowledgeIntroOffer(
+            await scopeFor(req),
+            body.offerId,
+          ),
+        );
+      });
       router.post(root + "/messages/:id/corrections", async (req, res) => {
         invariant(
           feature.corrections,
