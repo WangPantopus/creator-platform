@@ -250,7 +250,7 @@ export function contentPublicProjection(
       }
     }
     if (publicState) {
-      const projection = await growth.projectContent({
+      const projection: unknown = await growth.projectContent({
         id: current.id,
         creatorId: current.creatorId,
         version: current.version,
@@ -267,7 +267,12 @@ export function contentPublicProjection(
       });
       // An erasure fence or a same/newer withdrawal wins under W7's lock.
       // A no-op must not complete W5's public-distribution effect as published.
-      if (!projection.published)
+      if (
+        typeof projection !== "object" ||
+        projection === null ||
+        !("published" in projection) ||
+        projection.published !== true
+      )
         throw new DomainError(
           "content_version_unavailable",
           copy.growthErrorContentVersionUnavailable,

@@ -905,7 +905,56 @@
       "path": "apps/backend/migrations/0201_w8_worker_migration_metadata.sql",
       "sourceSha256": "2fce1ce5aa6c9f571067d999e2a62ac8d71b8e147b97393e7e87091227159e6f",
       "state": "reserved_unapplied",
-      "reason": "Distinct metadata-only SELECT(version,checksum) for the actual isolated creator_publication_worker and creator_call_callback_worker after0158/0176. Same held original worker source/ledger/definition/role/ACL/currentness bookends remain required. No whole-ledger SELECT, timestamps, write, grant option, membership, private content, provider/effect or family/signing authority. Closed rolled-back SQL/ACL qualification and eight drift refusals preserve full custody; actual source/owner integration, activation and positive ingress acceptance remain pending."
+      "reason": "Distinct metadata-only SELECT(version,checksum) for actual isolated original publication/callback worker logins. Closed rolled-back SQL/ACL qualification and eight actual drift refusals preserve full six-hash custody. No role creation, whole-ledger SELECT, write/grant option/private content/provider permission. Exact registered source/owner integration and positive ingress remain pending; held, not activation."
+    },
+    {
+      "id": "0202",
+      "owner": "W4",
+      "version": "0202_w4_fulfillment_original_hash",
+      "path": "apps/backend/src/modules/commerce/schema-fulfillment-original-hash.sql",
+      "state": "reserved_unapplied",
+      "reason": "Distinct bounded original request hash validator after genuine0199 original-recipient viewer issuer. Exact source/NoLogin role/function/current viewer/session/client/PID/fullXID/plan/revision/original-member and C10 review pending. No arbitrary UUID oracle or raw viewer/runtime question, fan-answer or disclosure columns. Original0199 source remains immutable; no activation/positive viewing inferred."
+    },
+    {
+      "id": "0203",
+      "owner": "W3",
+      "version": "0203_w3_terminal_only_finalization",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_terminal_only_finalization.sql",
+      "sourceSha256": "8de1897f2e70f763382984459274eb7616ad7149b457811fffd90fb8b7df2e8c",
+      "state": "reserved_unapplied",
+      "reason": "Distinct terminal-only original-cursor finalization proposal. Original0193/0110 bytes remain frozen and held. Isolated creator_w3_terminal_output and generation_terminal_output(uuid,uuid) cannot receive or use the original generation_scope_matches bridge. Requires actual W1 ninth typed terminal contract with originalScopeBridge=false, independently reviewed installed definition/effective catalogue, real W2/W4 settlement, held restoration/negative currentness and separate COMMIT acceptance. Exact owner source/custody review and closed installation qualification remain pending; no activation, output text/provider/financial permission or positive settlement receipt."
+    },
+    {
+      "id": "0204",
+      "owner": "W4",
+      "version": "0204_w4_fulfillment_publication_consumer",
+      "path": "apps/backend/src/modules/commerce/schema-fulfillment-publication-consumer.sql",
+      "state": "reserved_unapplied",
+      "reason": "Distinct original bounded publication-worker plan/original metadata consumer. Actual W1 early preparation issuer is required before any positive/body read or creator/key lock; exact source remains pending. No fabricated Actor/session, viewer0199 reuse or inferred callback/provider permission."
+    },
+    {
+      "id": "0205",
+      "owner": "W8",
+      "version": "0205_w8_fulfillment_publication_denial",
+      "path": "apps/backend/migrations/0205_w8_fulfillment_publication_denial.sql",
+      "state": "reserved_unapplied",
+      "reason": "All-original Trust negatives under the actual W1 early private publication preparation and0204 worker consumer; precise nonce/client/PID/fullXID/plan/revision/original-members and current restoration required. Source pending; no viewer scope substitution, provider receipt, body access or positive publication."
+    },
+    {
+      "id": "0206",
+      "owner": "W3",
+      "version": "0206_w3_privacy_cursor_export",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_privacy_cursor_export.sql",
+      "state": "reserved_unapplied",
+      "reason": "Distinct isolated creator_w3_privacy_export NOLOGIN purpose. One fixed READ COMMITTED cursor over actual original verified job/current task/token/immutable ownership and all genuine families; same core client/PID/fullXID, current restoration bookends, actual EOF/CLOSE and deferred COMMIT. Exact source/catalogue/complete owner review and closed qualification pending; no pair-GUC source authority, raw0087 ACL widening, fake subjobs or activation."
+    },
+    {
+      "id": "0207",
+      "owner": "W8",
+      "version": "0207_w8_development_feedback_lifecycle",
+      "path": "apps/backend/migrations/0207_w8_development_feedback_lifecycle.sql",
+      "state": "reserved_unapplied",
+      "reason": "Development-only finite feedback/IntroOffer expiry and actual withdrawal proposal following human authorization for necessary product policy. Exact notice/version, fixed seven-day feedback/event lifecycle, isolated NoLogin expiry/withdrawal role and original held W1/W3 callback contract require source/owner/C10 review and real saved-state acceptance. No invented fan consent, marketing/training/provider use, production/legal approval or expiry of unclassified historical identity events. Allocation only; source not yet implemented."
     }
   ]
 }
