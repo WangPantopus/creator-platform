@@ -83,6 +83,21 @@ final class W6RuntimeJourney: XCTestCase {
         XCTAssertTrue(app.staticTexts["@w6_local_fan"].waitForExistence(timeout: 15))
     }
 
+    func testActualRetainedSessionRecovery() {
+        let app = XCUIApplication(bundleIdentifier: "com.pantopus.qelvora")
+        app.launchArguments = ["--api-url", "http://127.0.0.1:4106", "--return-to", "/identity/account"]
+        app.launch()
+        XCTAssertTrue(app.staticTexts["We can't reach your account right now"].waitForExistence(timeout: 25))
+        XCTAssertTrue(app.staticTexts["Your session is kept on this device. Try again in a moment."].exists)
+        XCTAssertFalse(app.buttons["continue-with-pantopus"].exists)
+        capture(app, name: "W6-ios-real-cold-outage-retained")
+        app.buttons["Retry"].tap()
+        print("W6_ACTUAL_OFFLINE_RETRY_READY_FOR_API_RESTART")
+        XCTAssertTrue(app.staticTexts["@w6_local_fan"].waitForExistence(timeout: 90))
+        XCTAssertFalse(app.buttons["continue-with-pantopus"].exists)
+        capture(app, name: "W6-ios-real-automatic-same-account-recovery")
+    }
+
     func testActualFanSignIn() {
         let app = XCUIApplication(bundleIdentifier: "com.pantopus.qelvora")
         app.launchArguments = ["--api-url", "http://127.0.0.1:4106", "--return-to", "/identity/account"]
