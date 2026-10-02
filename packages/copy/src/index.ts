@@ -881,7 +881,11 @@ export const copy = {
   "growthRetainedFanAggregates": "Closed fan aggregates contain no fan identifier or private text; removed creator snapshots are deleted.",
   "growthErrorQuietHoursPair": "Both quiet-hour boundaries are required",
   "growthErrorTimeZone": "Choose a valid time zone, such as America/Los_Angeles.",
-  "growthErrorQuietHoursFormat": "Enter a time in HH:mm, from 00:00 to 23:59."
+  "growthErrorQuietHoursFormat": "Enter a time in HH:mm, from 00:00 to 23:59.",
+  "accountUnavailableTitle": "We can't reach your account right now",
+  "accountUnavailableBody": "Your session is kept on this device. Try again in a moment.",
+  "pageUnavailableTitle": "This page didn't load",
+  "pageUnavailableBody": "Nothing you saved was changed. Try again in a moment."
 } as const;
 export type CopyKey = keyof typeof copy;
 type Placeholders<T extends string> = T extends `${string}{${infer Key}}${infer Rest}` ? Key | Placeholders<Rest> : never;
