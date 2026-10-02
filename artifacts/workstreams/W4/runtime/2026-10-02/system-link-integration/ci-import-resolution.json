@@ -5,5 +5,6 @@
   "failure": "Turbopack cannot resolve ./commerce/fulfillment.js from packages/api/src/content.ts",
   "correction": "Use the existing source-only shared API .ts import convention. No expected result or gate was changed.",
   "actualProductionRebuild": "passed: Next16.3.7 default Turbopack production build in its own output, shared heavy lease released; original next-env restored",
-  "repeatCi": "in progress on1bf45051b14158756ddc953e0cb336e22fce7278"
+  "repeatCi": "Actual head a632cd7ad5af0e4dffc2385cc3b8497961fb23dc: web-and-backend and android-runtime passed; web-visual, ios-foundation and android-foundation queued. These are not native personal acceptance.",
+  "repeatCiRun": 37043552576
 }

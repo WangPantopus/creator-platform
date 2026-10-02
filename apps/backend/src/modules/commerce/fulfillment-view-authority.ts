@@ -7,9 +7,10 @@ import { DomainError } from "../../core/errors.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
 import type { Actor } from "../identity/adapter.js";
 import {
-  assertCurrentSession,
+  holdCurrentRequestSession,
   requestAuthority,
 } from "../identity/request-authority.js";
+import type { HeldCurrentRequestSession } from "../identity/request-authority.js";
 import { ContentAudience } from "../../../../../packages/api/src/content.js";
 import { CommerceFulfillmentPlanRef } from "../../../../../packages/api/src/commerce/fulfillment.js";
 import {
@@ -89,6 +90,7 @@ type Held = {
   client: PoolClient;
   actor: Actor;
   request: NonNullable<ReturnType<typeof requestAuthority.getStore>>;
+  session: HeldCurrentRequestSession;
   transaction: string;
   pid: number;
   nonce: string;
@@ -238,7 +240,8 @@ export class CommerceFulfillmentViewAuthority {
     if (
       !actor.adultEligible ||
       !request ||
-      request.accountId !== actor.accountId
+      request.accountId !== actor.accountId ||
+      request.actor !== actor
     )
       unavailable();
     await client.query("SAVEPOINT w4_fulfillment_view_client");
@@ -250,13 +253,17 @@ export class CommerceFulfillmentViewAuthority {
         account: string;
         session: string;
         isolation: string;
+        role: string;
+        login: string;
       }>(`SELECT pg_current_xact_id()::text AS transaction,pg_backend_pid() AS pid,
      current_setting('app.account_id',true) AS account,current_setting('app.identity_session_id',true) AS session,
-     current_setting('transaction_isolation') AS isolation`)
+     current_setting('transaction_isolation') AS isolation,current_user AS role,session_user AS login`)
     ).rows[0];
     if (
       !row ||
       row.isolation !== "read committed" ||
+      row.role !== "creator_runtime" ||
+      row.login !== row.role ||
       row.account !== actor.accountId ||
       row.session !== request.sessionId
     )
@@ -277,17 +284,11 @@ export class CommerceFulfillmentViewAuthority {
       !actor.adultEligible
     )
       unavailable();
-    // The actual interactive owner holds the original session before positives.
-    await assertCurrentSession(client, actor.accountId);
-    const existing = (
-      await client.query<{ session: string | null }>(
-        "SELECT nullif(current_setting('app.identity_session_id',true),'') AS session",
-      )
-    ).rows[0]?.session;
-    if (existing && existing !== request.sessionId) unavailable();
-    await client.query("SELECT set_config('app.identity_session_id',$1,true)", [
-      request.sessionId,
-    ]);
+    // Consume W1's actual middleware-issued actor and current adult proof,
+    // holding its original session before any domain positives. Later scope
+    // checks are metadata-only: they acquire no session lock or identity GUC.
+    const session = await holdCurrentRequestSession(client, actor.accountId);
+    if (session.actor !== actor) unavailable();
     const context = await this.context(client, actor);
     const nonce = (
       await client.query<{ nonce: string | null }>(
@@ -308,6 +309,7 @@ export class CommerceFulfillmentViewAuthority {
     this.scopes.set(scope, {
       client,
       actor,
+      session,
       ...context,
       nonce,
       tuple: Tuple.parse(tuple),
@@ -327,6 +329,8 @@ export class CommerceFulfillmentViewAuthority {
     const current = await this.context(client, held.actor);
     if (
       current.request !== held.request ||
+      current.request.actor !== held.session.actor ||
+      current.request.sessionId !== held.session.sessionId ||
       current.pid !== held.pid ||
       current.transaction !== held.transaction
     )

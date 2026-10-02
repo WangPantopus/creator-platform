@@ -691,6 +691,29 @@ export class CommerceFulfillmentPlans {
     });
   }
 
+  /** Reconcile an already-saved draft under W5's actual idempotency receipt.
+   * Empty draft text is valid, but the saved next revision must match every
+   * submitted field. This path consumes no signature and issues no delivery. */
+  async prepareDraftRetry(
+    client: PoolClient,
+    actor: Actor,
+    input: {
+      creatorId: string;
+      contentId: string;
+      planRef: CommerceFulfillmentPlanReference;
+      expectedVersion: number;
+      document: unknown;
+    },
+  ) {
+    const version = z.int().positive().parse(input.expectedVersion);
+    if (!Number.isSafeInteger(version + 1)) throw fulfillmentChanged();
+    return this.preparePublicationWithIntent(client, actor, input, "draft", {
+      expectedVersion: version,
+      document: PlanDocument.parse(input.document),
+      saved: true,
+    });
+  }
+
   /** Current committed receipt only; no signature reconsume or new recipient
    * delivery can be issued from this path. */
   async preparePublicationRetry(
@@ -717,6 +740,7 @@ export class CommerceFulfillmentPlans {
     staged?: {
       expectedVersion: number;
       document: z.infer<typeof PlanDocument>;
+      saved?: true;
     },
   ) {
     await this.assertCatalogue(client);
@@ -759,7 +783,9 @@ export class CommerceFulfillmentPlans {
     );
     const stored = await this.document(
       client,
-      staged ? { ...header, content_version: staged.expectedVersion } : header,
+      staged && !staged.saved
+        ? { ...header, content_version: staged.expectedVersion }
+        : header,
     );
     const document = staged?.document ?? PlanDocument.parse(stored.document);
     if (
@@ -774,6 +800,9 @@ export class CommerceFulfillmentPlans {
       document.kind !== "public_answer" ||
       document.quote !== null ||
       document.live != null ||
+      (staged?.saved &&
+        contentHash(PlanDocument.parse(stored.document)) !==
+          contentHash(document)) ||
       contentHash(document.audience) !== contentHash(header.audience) ||
       (!staged &&
         !document.text.trim() &&

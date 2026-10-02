@@ -4,6 +4,8 @@
 
 `CommerceFulfillmentViewAuthority` is the actual interactive metadata issuer for held `0199_w4_fulfillment_plan_read`. W8 owns registration and the separate `0200` all-original denial consumer. The original `0178` plan SQL remains byte-for-byte unchanged. This issuer is implemented, compiled and reviewed against an isolated PostgreSQL catalogue; it is unregistered, unmounted and has no positive viewer acceptance. It grants no answer body, source-body access, positive family scope or worker permission.
 
+Interactive bootstrap now consumes W1's real `holdCurrentRequestSession`, including the exact middleware Actor and current provider-confirmed adult timestamp. The same opaque held session and request/Actor/client/PID/full transaction remain bound to the viewer scope. Subsequent original-hash/negative/final scope checks are metadata-only and perform no session-row lock or identity setting change after positives. The original0199/0202 SQL and their reviewed checksums remain unchanged. This strengthens the issuer prerequisite; it does not activate a viewer or establish positive acceptance.
+
 The exact SQL SHA256 is `534f5c36b3d58eb2099f9a9a12452a60b287e4f1f3040c4ebeba99a3c8e96684`. The separate allocated `0202` bounded current original-input comparison is now implemented below. Neither a plan ID, tuple, nonce nor successful denial callback authorizes an answer.
 
 ## Actual consumer contract
