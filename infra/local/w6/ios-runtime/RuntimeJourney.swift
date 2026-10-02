@@ -155,11 +155,21 @@ final class W6RuntimeJourney: XCTestCase {
         welcome.tap()
         XCTAssertTrue(app.buttons["Development actor one"].waitForExistence(timeout: 15))
         app.buttons["Development actor one"].tap()
-        // This older shell renders only a fan handle; W1 owns its creator
-        // profile correction. The actual selected development actor is used.
+        // The creator handle was entered through the actual web onboarding.
         XCTAssertTrue(app.staticTexts["Your account"].waitForExistence(timeout: 15))
         launch(destination)
         assertUnavailable("W6-sdk-owner-media-unavailable")
+
+        launch("/identity/account")
+        XCTAssertTrue(app.buttons["Sign out"].waitForExistence(timeout: 15))
+        app.buttons["Sign out"].tap()
+        XCTAssertTrue(welcome.waitForExistence(timeout: 15))
+        if !welcome.isHittable { app.swipeUp() }
+        welcome.tap()
+        XCTAssertTrue(app.buttons["Development actor two"].waitForExistence(timeout: 15))
+        app.buttons["Development actor two"].tap()
+        XCTAssertTrue(app.staticTexts["@w6_local_fan"].waitForExistence(timeout: 15))
+        capture(app, name: "W6-sdk-restored-fan-account")
     }
 
     private func capture(_ app: XCUIApplication, name: String) {
