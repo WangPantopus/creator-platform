@@ -262,6 +262,7 @@ export async function createTrustRuntime(options: {
     readiness,
     telemetry,
     localDevelopment,
+    localActorSelection: false,
     crisisResources: options.crisisResources,
   });
   // Pass these into W1's configured backend. Restoration denial must cover

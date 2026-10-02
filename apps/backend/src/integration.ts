@@ -374,6 +374,8 @@ export async function createConfiguredBackend(input: {
   if (trust)
     host.use(async (req, res, next) => {
       if (await trust!.trafficReady()) return next();
+      res.setHeader("Cache-Control", "no-store");
+      res.setHeader("X-Content-Type-Options", "nosniff");
       if (["GET", "HEAD"].includes(req.method)) {
         if (req.path === "/v1/identity/capabilities")
           return res.json({
@@ -392,15 +394,13 @@ export async function createConfiguredBackend(input: {
         )
           return next();
       }
-      return res
-        .status(503)
-        .json({
-          error: {
-            code: "restoration_pending",
-            message:
-              "This restored environment is unavailable while recovery is verified.",
-          },
-        });
+      return res.status(503).json({
+        error: {
+          code: "restoration_pending",
+          message:
+            "This restored environment is unavailable while recovery is verified.",
+        },
+      });
     });
   host.use(application);
   const server = createServer(host);

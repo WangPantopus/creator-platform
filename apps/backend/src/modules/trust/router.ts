@@ -33,6 +33,8 @@ export type TrustRouterOptions = {
   readiness: Readiness;
   telemetry: TrustTelemetry;
   localDevelopment: boolean;
+  /** Legacy isolated harness selector only; canonical hosts use W1 sessions. */
+  localActorSelection?: boolean;
   crisisResources: {
     region: string;
     name: string;
@@ -115,6 +117,8 @@ export function createTrustRouter(options: TrustRouterOptions) {
   router.get("/v1/trust/capabilities", (_req, res) =>
     res.json({
       localDevelopment: options.localDevelopment,
+      localActorSelection:
+        options.localActorSelection ?? options.localDevelopment,
       identityMode: options.localDevelopment
         ? "synthetic_local"
         : "configured_adapter",
