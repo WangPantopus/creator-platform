@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import pg from "pg";
 import { recognizedAdoptionVersions } from "./migration-custody.js";
+import { assertWaveRoleSafety } from "./migration-wave-roles.js";
 
 if (!process.env.DATABASE_MIGRATION_URL)
   throw new Error(
@@ -51,7 +52,7 @@ try {
       "SELECT to_regclass('creator.schema_migration') AS relation",
     )
   ).rows[0]?.relation;
-  if (exists)
+  if (exists && localLegacy)
     await client.query(
       "ALTER TABLE creator.schema_migration ADD COLUMN IF NOT EXISTS checksum text",
     );
@@ -65,6 +66,38 @@ try {
   const historical = localLegacy
     ? new Set<string>()
     : await recognizedAdoptionVersions(applied);
+  const hasWave = files.some(
+    (file) => file.version === "0062_w6_creator_media_worker",
+  );
+  if (
+    hasWave &&
+    applied.length &&
+    files.some(
+      (file) =>
+        file.version >= "0044_" &&
+        !applied.some((row) => row.version === file.version),
+    )
+  )
+    throw new Error(
+      "Existing databases with pending wave migrations require scripts/activate-wave.ts and verified private backup/closed admission; no per-file rollout was attempted.",
+    );
+  if (hasWave) {
+    await client.query("BEGIN");
+    try {
+      await assertWaveRoleSafety(client, {
+        trust: applied.some(
+          (r) => r.version === "0053_w8_runtime_denial_projection",
+        ),
+        media: applied.some(
+          (r) => r.version === "0062_w6_creator_media_worker",
+        ),
+      });
+      await client.query("COMMIT");
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    }
+  }
   for (const row of applied)
     if (
       !files.some((file) => file.version === row.version) &&
@@ -137,6 +170,16 @@ try {
       throw error;
     }
     process.stdout.write(`Applied: ${version}\n`);
+  }
+  if (hasWave) {
+    await client.query("BEGIN");
+    try {
+      await assertWaveRoleSafety(client, { trust: true, media: true });
+      await client.query("COMMIT");
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    }
   }
 } finally {
   await client.query(
