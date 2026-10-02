@@ -361,6 +361,11 @@ export class PreparedGenerationRuntimeContext {
  * recipients and every applicable PUBLIC/owner RLS policy. A new wider policy
  * cannot hide behind an expected policy name. Used only against reviewed bytes. */
 export async function generationRetrievalCatalogue(pool: Pool) {
+  return generationConsumerCatalogue(pool, owner);
+}
+
+/** Shared read-only catalogue for W2's independently reviewed fixed consumers. */
+export async function generationConsumerCatalogue(pool: Pool, role: string) {
   const relations = (
     await pool.query(
       `SELECT n.nspname AS schema,c.relname AS relation,c.relkind,pg_get_userbyid(c.relowner) AS owner,
@@ -380,7 +385,7 @@ export async function generationRetrievalCatalogue(pool: Pool) {
        FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
        WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
        ORDER BY n.nspname,c.relname,c.relkind`,
-      [owner],
+      [role],
     )
   ).rows;
   const schemas = (
@@ -388,7 +393,7 @@ export async function generationRetrievalCatalogue(pool: Pool) {
       `SELECT nspname AS schema,has_schema_privilege($1,oid,'USAGE') AS usage,
        has_schema_privilege($1,oid,'CREATE') AS create FROM pg_namespace
        WHERE nspname !~ '^pg_' AND nspname<>'information_schema' ORDER BY nspname`,
-      [owner],
+      [role],
     )
   ).rows;
   return { relations, schemas };
