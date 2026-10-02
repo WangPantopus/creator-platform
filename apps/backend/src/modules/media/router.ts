@@ -379,6 +379,13 @@ export function createW6Router(dependencies: W6RouterDependencies) {
   router.post(`${root}/calls/:sessionId/join`, async (req, res) =>
     res.json(await session().join(await scope(req), id(req, "sessionId"))),
   );
+  router.post(`${root}/calls/:sessionId/redeem`, async (req, res) => {
+    const service = session();
+    const body = z.strictObject({ nonce: z.uuid() }).parse(req.body);
+    res.json(
+      await service.redeem(await scope(req), id(req, "sessionId"), body.nonce),
+    );
+  });
   router.post(`${root}/calls/:sessionId/consent`, async (req, res) =>
     callResponse(req, res, (current) =>
       session().consent(current, id(req, "sessionId"), req.body),

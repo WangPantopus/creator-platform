@@ -26,7 +26,7 @@ internal data class CallRoute(val creator: UUID, val fan: UUID, val session: UUI
     val path get() = "/v1/w6/threads/$creator/$fan/calls/$session"
     companion object { fun from(destination: String): CallRoute? = runCatching { val parts = destination.substringBefore('?').trim('/').split('/'); require(parts.size == 4 && parts[0] == "calls"); CallRoute(UUID.fromString(parts[1]), UUID.fromString(parts[2]), UUID.fromString(parts[3])) }.getOrNull() }
 }
-data class CallAdmission(val token: String, val url: String, val sessionId: String, val accountId: String, val expiresAt: String)
+data class CallAdmission(val token: String, val url: String, val nonce: String, val sessionId: String, val accountId: String, val expiresAt: String, val role: String)
 /** Genuine transport owns camera/audio, rendering, Telecom and foreground lifetime. No transport is registered by default. */
 interface NativeCallScreenTransport {
     @Composable fun Media()
@@ -96,8 +96,16 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
         try {
             val response = JSONObject(api.request(currentRoute.path + "/join", "POST", "{}".toByteArray()).toString(Charsets.UTF_8))
             if (!active || epoch != mediaEpoch) return
+            val admission = CallAdmission(response.getString("token"), response.getString("url"), response.getString("nonce"), response.getString("sessionId"), response.getString("accountId"), response.getString("expiresAt"), response.getString("role"))
+            require(UUID.fromString(admission.sessionId) == currentRoute.session && admission.accountId == model.session?.accountId && admission.role == role(value))
+            UUID.fromString(admission.nonce)
+            val expires = Instant.parse(admission.expiresAt)
+            require(expires.isAfter(Instant.now()))
+            val receipt = JSONObject(api.request(currentRoute.path + "/redeem", "POST", JSONObject().put("nonce", admission.nonce).toString().toByteArray()).toString(Charsets.UTF_8))
+            if (!active || epoch != mediaEpoch) return
+            require(receipt.get("admitted") == true && expires.isAfter(Instant.now()) && admission.accountId == model.session?.accountId)
             transport = adapter; camera = value.getString("mediaMode") == "video"
-            adapter.connect(CallAdmission(response.getString("token"), response.getString("url"), response.getString("sessionId"), response.getString("accountId"), response.getString("expiresAt"))) { if (active && epoch == mediaEpoch) localState = it }
+            adapter.connect(admission) { if (active && epoch == mediaEpoch) localState = it }
             if (!active || epoch != mediaEpoch) adapter.disconnect()
         } catch (cancelled: CancellationException) { adapter.disconnect(); throw cancelled }
         catch (_: Exception) { adapter.disconnect(); if (active && epoch == mediaEpoch) { transport = null; localState = "disconnected"; notice = QelvoraCopy.text("w6ConnectionFailedRejoinTheSameCall") } }
@@ -105,6 +113,7 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
     }
     LaunchedEffect(route, client) { while (true) { refresh(); delay(1000) } }
     DisposableEffect(route) { active = true; onDispose { active = false; disconnectMedia() } }
+    LaunchedEffect(model.session?.accountId) { disconnectMedia(); call = null; stale = true }
     Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         val value = call
         if (value == null) {
