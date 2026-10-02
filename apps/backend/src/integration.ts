@@ -71,6 +71,9 @@ const issuedRuntimes = new WeakMap<
     identity: BackendRuntime["identity"];
     restored: BackendRuntime["assertRestoredInTransaction"];
     denied: BackendRuntime["assertScopeAllowedInTransaction"];
+    creatorDenied: BackendRuntime["assertCreatorAllowedInTransaction"];
+    contentDenied: BackendRuntime["assertContentAllowedInTransaction"];
+    audience: BackendRuntime["audienceIdentity"];
   }>
 >();
 /** Genuine complete host graph only; clones or replaced authority callbacks
@@ -85,7 +88,10 @@ export function isConfiguredBackendRuntime(runtime: BackendRuntime): boolean {
     issued.conversation === runtime.conversation &&
     issued.identity === runtime.identity &&
     issued.restored === runtime.assertRestoredInTransaction &&
-    issued.denied === runtime.assertScopeAllowedInTransaction
+    issued.denied === runtime.assertScopeAllowedInTransaction &&
+    issued.creatorDenied === runtime.assertCreatorAllowedInTransaction &&
+    issued.contentDenied === runtime.assertContentAllowedInTransaction &&
+    issued.audience === runtime.audienceIdentity
   );
 }
 
@@ -440,6 +446,9 @@ export async function createConfiguredBackend(input: {
         identity: backendRuntime.identity,
         restored: backendRuntime.assertRestoredInTransaction,
         denied: backendRuntime.assertScopeAllowedInTransaction,
+        creatorDenied: backendRuntime.assertCreatorAllowedInTransaction,
+        contentDenied: backendRuntime.assertContentAllowedInTransaction,
+        audience: backendRuntime.audienceIdentity,
       }),
     );
     features = (await input.registerFeatures?.(backendRuntime)) ?? [];
