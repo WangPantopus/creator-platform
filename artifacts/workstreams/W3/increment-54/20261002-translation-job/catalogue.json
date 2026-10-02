@@ -1,0 +1,23 @@
+{
+  "observedAt": "2026-10-02T15:07:29.088Z",
+  "source": "63402a4ddca58a1f5e32d43e2a6b4f850ea0b3d0",
+  "catalogue": {
+    "database": "creator_w3_dev57_1790946508212",
+    "login": "creator_runtime",
+    "registered": 57,
+    "translation_job_installed": false,
+    "translation_job_registered": false,
+    "translation_issuer_registered": false,
+    "translation_denial_registered": false,
+    "original_closed": true
+  },
+  "sqlApplied": false,
+  "businessRowsWritten": false,
+  "jobAccepted": false,
+  "providerCalled": false,
+  "translationDisplayed": false,
+  "approvedPolicyConfigured": false,
+  "webOperatedAtThisSource": false,
+  "iOSOperatedAtThisSource": false,
+  "androidOperatedAtThisSource": false
+}

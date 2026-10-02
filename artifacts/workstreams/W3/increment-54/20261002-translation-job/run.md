@@ -1,0 +1,13 @@
+# Increment54 — distinct durable translation metadata
+
+W3 personally implemented source `63402a4ddca58a1f5e32d43e2a6b4f850ea0b3d0` on `codex/w3-translation-job-custody`. Actual held0083 SQL SHA256 `d54004e707764281ea576a92fc78c13e05689ad229c06d9964669629566a3ed8` defines the durable job family, exact immutable original/provenance metadata, original session/adult/acceptance, current consent/policy/finite expiry and separate worker lease/state. No translation body, generation row, signature fabrication, policy default, raw worker/runtime table grant or permissive RLS is created. The strict request accepts only source ID/version, canonical target language and idempotency key. Parsing returned metadata cannot issue authority.
+
+The actual owner-facing caller, acceptance COMMIT,111/112 scope, fixed-consumer, Team proof and C10 contract is [W3-translation-jobs.md](../../../../../docs/implementation/W3-translation-jobs.md). W1/W8/W2/W4 received this exact published producer for their separately owned dependencies. W3 retains personal ownership of the later original-read/display consumer and client integration.
+
+Backend TypeScript, affected Prettier, scoped ESLint and `git diff --check` passed. No new test code was written. The SQL was reviewed in source for explicit NULL/provenance, finite time, paired lease, terminal state, family FK and default ACL handling. It was not installed or semantically compiled in a database; no such result is claimed.
+
+The actual read-only [catalogue](catalogue.json) at15:07:29UTC used only the owned current copy `creator_w3_dev57_1790946508212`/creator_runtime. It confirms57 registered migrations, translation table absent and0083/111/112 unregistered, with original `creator_w3` still closed. No SQL, role changes, business rows, job acceptance, provider call or translated display occurred.
+
+No app screen changed or new web/iOS/Android journey was operated at this source. The immediately preceding compiled-host account/privacy/recovery operation belongs to increment53/source217ba827, not this producer. Positive translation is currently refused by absent genuine acceptance/worker/denial/accounting/cost/output ports and unapproved Q18/Q08/finite-retention policies. The human was asked for exact policy inputs without assuming existing reply consent, free pricing or reply-unit charging.
+
+This is a concrete dependency producer, not Package I or W3 completion. W3 continues terminal integration, exact owner source consumption, client fidelity and eventual personally operated populated three-client acceptance against one backend. W8 alone may register/activate the reviewed migrations.
