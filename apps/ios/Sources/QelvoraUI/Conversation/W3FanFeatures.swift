@@ -114,8 +114,8 @@ private struct W3ThreadScreen: View {
             }
             .onDisappear { model.setActive(false); Task { await model.presence(active: false) } }
             .sheet(isPresented: $privacy) { W3PrivacyScreen(client: model.client, root: model.root, session: session) }
-            .sheet(item: $source) { passage in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Original source").qText("meta"); Text(passage.title).qText("display-md"); Text(passage.text).qText("body").textSelection(.enabled) }.padding(16) } }
-            .sheet(item: $originalReply) { original in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Original AI reply · version \(original.version)").qText("meta"); Text(original.text).qText("body").textSelection(.enabled) }.padding(16) } }
+            .sheet(item: $source) { passage in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Original source").qText("caption", weight: .semibold); Text(passage.title).qText("display-md"); Text(passage.text).qText("body").textSelection(.enabled) }.padding(16) } }
+            .sheet(item: $originalReply) { original in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Original AI reply · version \(original.version)").qText("caption", weight: .semibold); Text(original.text).qText("body").textSelection(.enabled) }.padding(16) } }
             .alert("Source unavailable", isPresented: Binding(get: { !sourceFailure.isEmpty }, set: { if !$0 { sourceFailure = "" } })) { SwiftUI.Button("Close") { sourceFailure = "" } } message: { Text(sourceFailure) }
     }
     @ViewBuilder private func row(_ message: W3Message, page: W3Page) -> some View {
@@ -192,7 +192,7 @@ private struct W3FirstConversation: View {
             AuthorLabel(kind: .ai, name: creator?.name ?? "the creator")
             Text("Before your first message").qText("display-lg")
             VStack(alignment: .leading, spacing: 16) {
-                Text("WHO RUNS IT").qText("meta")
+                Text("WHO RUNS IT").qText("caption", weight: .semibold)
                 if let policy = caps?.providers {
                     Text("This AI is powered by " + policy.providers.map(\.name).joined(separator: ", ") + ".").qText("body")
                     ForEach(policy.providers, id: \.name) { provider in
@@ -200,8 +200,8 @@ private struct W3FirstConversation: View {
                         Text((provider.noTraining ? "Doesn't train on your messages." : "Review message use in these terms.") + " " + (provider.noRetention ? "Doesn't keep your messages." : "Review message retention in these terms.")).qText("caption")
                     }
                 } else { Text("AI providers and their verified processing terms are not configured yet.").qText("body") }
-                Text("WHO CAN READ IT").qText("meta"); Text(caps?.accessDisclosure ?? "Conversations can be read by the creator and their authorized team. Those accesses are logged.").qText("body")
-                Text("WHAT IT REMEMBERS").qText("meta"); Text("Only what you agree to. It asks first, and you can see and delete every memory in You.").qText("body")
+                Text("WHO CAN READ IT").qText("caption", weight: .semibold); Text(caps?.accessDisclosure ?? "Conversations can be read by the creator and their authorized team. Those accesses are logged.").qText("body")
+                Text("WHAT IT REMEMBERS").qText("caption", weight: .semibold); Text("Only what you agree to. It asks first, and you can see and delete every memory in You.").qText("body")
             }.padding(16).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusLg))
             if !failure.isEmpty { Notice(tone: .error, title: "Conversation unavailable", children: failure) }
             if session.destination.contains("context=") { Notice(title: "Post context unavailable", children: "This post context is not connected to the conversation service yet. Your destination is kept.") }
@@ -242,7 +242,7 @@ private struct W3PrivacyScreen: View {
             if memory == nil { Text(failure.isEmpty ? "Loading your memories…" : "Memories unavailable.").qText("body") }
             if memory?.items.isEmpty == true { Text("No memories. The AI asks before remembering.").qText("body") }
             ForEach(memory?.items ?? []) { item in VStack(alignment: .leading, spacing: 12) {
-                Text(item.state == "proposed" ? "Want me to remember this? Only if you say yes." : item.kind == "open_loop" ? "Open loop · " + item.state : "Remembered").qText("meta")
+                Text(item.state == "proposed" ? "Want me to remember this? Only if you say yes." : item.kind == "open_loop" ? "Open loop · " + item.state : "Remembered").qText("caption", weight: .semibold)
                 if editing == item.id { TextField("What you want remembered", text: $text, axis: .vertical).qText("body"); Button("Save proposal", variant: .secondary, disabled: busy || text.isEmpty) { Task { await decide(item, "edit") } } }
                 else { Text(item.text).qText("body").textSelection(.enabled) }
                 if item.sensitiveCategory != nil { Text("Sensitive item · agreement applies only to this exact memory.").qText("caption") }
