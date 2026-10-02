@@ -1,0 +1,30 @@
+{
+  "at": "2026-10-02T20:39:48.385631+00:00",
+  "sourceBase": "5e5b164e202253923b046474c40113ffbdaab683",
+  "personallyOperatedRequestsSource": "7a9640484a934c58630d6c2e4c4ea0b86726226f",
+  "ownedPorts": {
+    "3004": {
+      "listenerPresent": false
+    },
+    "4104": {
+      "listenerPresent": false
+    }
+  },
+  "ownedRunningContainers": [],
+  "privateFileContentsWithheld": true,
+  "nativeUiAlternativeAuthorized": false,
+  "nativeUiAlternativeExecuted": false,
+  "workstreamComplete": false,
+  "releaseReady": false,
+  "ownedSimulator": {
+    "udid": "BC8F4A5B-6F9E-4A89-813B-FF4DD8572271",
+    "name": "Creator Platform W4",
+    "state": "Shutdown"
+  },
+  "ownedAndroidSerialPresent": false,
+  "privateBackup": {
+    "present": true,
+    "mode": "0o600",
+    "sha256": "c1d7203d176b694431a2aae74e1bbd585385bf4b6d117dedd8d7d5a5e324e201"
+  }
+}
