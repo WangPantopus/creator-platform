@@ -89,6 +89,12 @@ async function audit() {
       media: ledger.some(
         (row) => row.version === "0062_w6_creator_media_worker",
       ),
+      content: ledger.some(
+        (row) => row.version === "0074_w8_content_runtime_denial",
+      ),
+      interactive: ledger.some(
+        (row) => row.version === "0082_w8_interactive_denial_try_fence",
+      ),
     });
     const security = await waveSecurityCustody(client);
     const sequence = await waveSequenceCustody(client);

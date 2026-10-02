@@ -1,0 +1,9 @@
+# Canonical 61 closed-target reconciliation
+
+W8 PR159 normally merged the original four-purpose privacy continuation. W6's independently upgraded preserved57 target still has connection limit0 and the actual owner closure marker. Against the merged canonical61 registry, its original read-only reconciler refused `Unsafe migration purpose-role custody: definer source/ACL packet`. The reconciler supplied only original trust/media installed flags, omitting the ledger-derived0074 content and0082 interactive flags required to include the three actual continuation function definitions and ACLs.
+
+The narrow correction supplies those two flags from the actual ledger. Personally rerunning the original owner audit now inventories61 original ledger rows, three purpose roles, ten pinned functions and the actual security/sequence hashes in [the receipt](closed-inventory.json). It rolls back its read-only transaction and reports `trafficReady:false`. No registry, SQL, ACL, role, ledger history or closure was changed. No alias purpose or administrative connection substitutes for a worker login or held issuer.
+
+An additional existing57 restore target with limit-1 and no closure marker is refused by the original audit. This checks the actual closure refusal; it is not a missing-ledger, activation or preserved-upgrade positive. The initial private diagnostic attempts failed TypeScript module/dependency resolution before audit execution; only the subsequently executed owner audit and explicit database closure readback are counted.
+
+Backend build, affected lint, formatting and diff checks pass. No new unit tests. This read-only inventory neither reopens the preserved target nor establishes real provider, accounting, retention, worker publication or full privacy acceptance. Current launched web/Android/iOS repetition is recorded separately in the enclosing increment when completed.
