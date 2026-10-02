@@ -677,6 +677,27 @@
       "version": "0104_w2_generation_retrieval_context",
       "state": "reserved_unapplied",
       "reason": "Actual bounded actorless retrieval/current creator/style projection under genuine W1 worker nonce, unchanged0096 and real0098/0102 current audience/origin fences. Exact signature/dispatcher/private role/source/C10 review pending; no activation or extra LOGIN worker surface."
+    },
+    {
+      "id": "0105",
+      "owner": "W2",
+      "version": "0105_w2_generation_terminal_journal",
+      "state": "reserved_unapplied",
+      "reason": "Actual original-attempt terminal journal seal/all-attempt immutable receipt under reviewed0099/0100. Exact source, retention/restoration and negative accounting custody pending; missing/unknown never no_request."
+    },
+    {
+      "id": "0106",
+      "owner": "W4",
+      "version": "0106_w4_generation_terminal_settlement",
+      "state": "reserved_unapplied",
+      "reason": "Genuine terminal scope and original weighted reservation/rule/cursor plus W2 actual all-attempt receipt. Exact owner source/idempotent settlement/assertSettled review pending; no caller amounts or recreated positive scope."
+    },
+    {
+      "id": "0107",
+      "owner": "W4",
+      "version": "0107_w4_generation_accounting_correction",
+      "state": "reserved_unapplied",
+      "reason": "Distinct late immutable original-attempt accounting correction and original-reservation financial reconciliation after durable terminal state. No input/job/provider resurrection; exact purpose/source/retention/restoration review pending."
     }
   ]
 }
