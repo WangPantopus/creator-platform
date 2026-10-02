@@ -20,6 +20,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.pantopus.qelvora.generated.QelvoraCopy
 import com.pantopus.qelvora.identity.FanFeatureRegistration
 import com.pantopus.qelvora.identity.FanSession
 import com.pantopus.qelvora.identity.SecureSessionStorage
@@ -35,14 +36,30 @@ import kotlinx.serialization.json.*
 import com.pantopus.qelvora.generated.QelvoraCopy
 import java.time.Instant
 
-private class ContentFailure(val status:Int,message:String,val code:String?=null):Exception(message) {
+private class ContentFailure(val status:Int,val code:String?=null):Exception() {
     val accountChanged get()=code in listOf("content_account_changed","session_account_changed","session_changed")
     val authorityDenied get()=status in listOf(401,403) || accountChanged
+}
+private fun contentFailureCopy(failure: Exception, action: Boolean = false): String {
+    val error = failure as? ContentFailure
+    val key = when {
+        error?.accountChanged == true -> "w5ContentAccountChanged"
+        error?.status == 401 -> "w5ContentSessionEnded"
+        error?.code in listOf("reply_changed", "consent_changed", "thanks_changed") -> "w5ContentChanged"
+        error?.code == "idempotency_conflict" -> "w5ContentDuplicateChanged"
+        error?.code == "reply_withdrawn" -> "w5ContentReplyWithdrawn"
+        error?.code == "fan_profile_required" -> "w5ContentFanProfileRequired"
+        error?.status in listOf(403, 404) || error?.code?.endsWith("_unconfigured") == true -> "w5ContentAccessUnavailable"
+        action && error?.code == "invalid_request" -> "w5ContentInvalidRequest"
+        action -> "w5ContentActionUnconfirmed"
+        else -> "w5ContentRefreshUnavailable"
+    }
+    return QelvoraCopy.text(key)
 }
 private class ContentClient(context: Context, private val baseURL: String) {
     private val storage = SecureSessionStorage(context)
     suspend fun request(path: String, body: JsonObject? = null, expectedAccountId:String? = null): JsonElement = withContext(Dispatchers.IO) {
-        val token = storage.read() ?: throw ContentFailure(401,"Your session ended. Continue with Pantopus again.")
+        val token = storage.read() ?: throw ContentFailure(401)
         val connection = URL(baseURL.trimEnd('/') + "/v1/content/" + path).openConnection() as HttpURLConnection
         try {
             connection.connectTimeout = 10000; connection.readTimeout = 15000; connection.useCaches = false
@@ -52,12 +69,11 @@ private class ContentClient(context: Context, private val baseURL: String) {
             if (body != null) { connection.doOutput = true; connection.setRequestProperty("Content-Type", "application/json"); connection.outputStream.use { it.write(body.toString().toByteArray()) } }
             val status = connection.responseCode
             val data = (if (status in 200..299) connection.inputStream else connection.errorStream)?.bufferedReader()?.use { it.readText() }.orEmpty()
-            val value = Json.parseToJsonElement(data)
             if (status !in 200..299) {
-                val failure=value.jsonObject["error"]?.jsonObject
-                throw ContentFailure(status,failure?.get("message")?.jsonPrimitive?.content ?: "Content is unavailable. Refresh current access.",failure?.get("code")?.jsonPrimitive?.contentOrNull)
+                val code = runCatching { Json.parseToJsonElement(data).jsonObject["error"]?.jsonObject?.get("code")?.jsonPrimitive?.contentOrNull }.getOrNull()
+                throw ContentFailure(status, code)
             }
-            value
+            Json.parseToJsonElement(data)
         } finally { connection.disconnect() }
     }
 }
@@ -68,7 +84,7 @@ private data class ContentReplyPolicy(val limit: Int, val confirmedDays: Int?, v
     companion object {
         fun read(value: JsonObject, accountId: String, creatorId: String): ContentReplyPolicy {
             if (value.text("accountId") != accountId || value.text("creatorId") != creatorId)
-                throw ContentFailure(403, "The signed-in account changed. Refresh before continuing.", "content_account_changed")
+                throw ContentFailure(403, "content_account_changed")
             fun integer(key: String): Int? {
                 val raw = value[key] ?: error("Missing reply policy")
                 if (raw is JsonNull) return null
@@ -151,7 +167,7 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
             val statuses=mutableListOf<String>()
             val view=try{api.request("$creatorId/$contentId", expectedAccountId=before.text("accountId")).jsonObject}catch(cancelled:kotlinx.coroutines.CancellationException){throw cancelled}catch(failure:Exception){
                 if(failure is ContentFailure && (failure.status==401 || failure.accountChanged))throw failure
-                statuses.add(failure.message?:"Reconnect to refresh content. Your input is kept.");null
+                statuses.add(contentFailureCopy(failure));null
             }
             val depth=if(before.text("accountId")==viewerAccountId)replyDepth else 1
             var page:JsonObject?=null;var currentReplies:List<JsonObject> = emptyList();var repliesAvailable=false
@@ -185,8 +201,8 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
             }
             val after=api.request("$creatorId/mute", expectedAccountId=before.text("accountId")).jsonObject
             if(generation!=loadGeneration)return
-            if(before.text("accountId")!=after.text("accountId")){clearAuthority();error="The signed-in account changed. Refresh before continuing.";return}
-            val currentMuted = after["muted"]?.jsonPrimitive?.booleanOrNull ?: throw ContentFailure(503, "Note preferences are unavailable. Refresh current access.")
+            if(before.text("accountId")!=after.text("accountId")){clearAuthority();error=QelvoraCopy.text("w5ContentAccountChanged");return}
+            val currentMuted = after["muted"]?.jsonPrimitive?.booleanOrNull ?: throw ContentFailure(503, "note_preferences_unconfigured")
             val changed=viewerAccountId!=before.text("accountId")
             if(changed){replyText="";thanksText="";share=false;identity=false;retryKeys.clear();signature=null;replyDepth=1}
             viewerAccountId=before.text("accountId");muted=currentMuted;content=view;replies=currentReplies;cursor=page?.get("nextCursor")?.jsonPrimitive?.contentOrNull;thanks=mine;replyAccess=repliesAvailable;thanksAccess=thanksAvailable;replyPolicy=policy
@@ -198,7 +214,7 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
             suspendAccess()
             content=null;replies=emptyList();thanks=null;cursor=null
             if(failure is ContentFailure && failure.authorityDenied){clearAuthority()}
-            error=failure.message?:"Reconnect to refresh current access. Your input is kept."
+            error=contentFailureCopy(failure)
         } finally { loading = false }
     }
     suspend fun mutate(path: String, body: JsonObject, resetThanks: Boolean = false, clearReply: Boolean = false) {
@@ -211,7 +227,7 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
         val command=if(body["idempotencyKey"]==null)body else JsonObject(fields+ ("idempotencyKey" to JsonPrimitive(retryKeys.getOrPut(fingerprint){UUID.randomUUID().toString()})))
         try { client?.request("$creatorId/$path", command, expectedAccountId=viewerAccountId) ?: error("The content service is not connected."); retryKeys.remove(fingerprint); if (clearReply) replyText = ""; load(resetThanks) }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-        catch (failure: Exception) { if(failure is ContentFailure && failure.status in 400..499)retryKeys.remove(fingerprint); if(failure is ContentFailure && failure.authorityDenied)clearAuthority(); error = failure.message ?: "This action could not complete. Your input is kept." }
+        catch (failure: Exception) { if(failure is ContentFailure && failure.status in 400..499)retryKeys.remove(fingerprint); if(failure is ContentFailure && failure.authorityDenied)clearAuthority(); error = contentFailureCopy(failure, action = true) }
         finally { busy = false }
     }
     LaunchedEffect(client, contentId) {
@@ -236,10 +252,10 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
         onDispose { lifecycle.removeObserver(observer); loadGeneration++; suspendAccess() }
     }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        if (error.isNotEmpty()) Notice("error", "Content status", error)
+        if (error.isNotEmpty()) Notice("error", QelvoraCopy.text("w5ContentStatus"), error)
         if (!currentAccess) {
-            QText("Checking current access. Your input is kept during a connection interruption.", "body")
-            Button("Check current access", ButtonVariant.SECONDARY, disabled=busy) { scope.launch { load(false) } }
+            QText(QelvoraCopy.text("w5ContentCheckingAccess"), "body")
+            Button(QelvoraCopy.text("w5ContentCheckCurrentAccess"), ButtonVariant.SECONDARY, disabled=busy) { scope.launch { load(false) } }
         } else {
         val current = content
         if (current == null) {
