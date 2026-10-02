@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { PoolClient } from "pg";
 import { invariant } from "../../core/errors.js";
 import { licenseRow, type CreatorScope } from "./repository.js";
 import type { AgentService } from "./service.js";
@@ -182,4 +183,182 @@ export async function relayAgentEvents(input: {
     delivered++;
   }
   return { delivered };
+}
+
+export interface PublicAgentPurposeAuthority {
+  /** Actual current approved processor/purpose policy, held through this read.
+   * This does not infer a fan's separate first-message consent. */
+  current(
+    client: PoolClient,
+    scope: CreatorScope,
+    versionId: string,
+  ): Promise<boolean>;
+}
+export interface PublicCreatorAIProjection {
+  current(creatorId: string): Promise<{
+    state: "published" | "paused" | "unpublished" | "revoked";
+    mode: "expert" | "companion" | "expert_and_companion";
+    topics: string[];
+    sourceSummary: string;
+  } | null>;
+}
+
+/** W2-owned public metadata producer. The host resolves actual W1 ownership;
+ * a public creator ID is never authority to query private AI tables elsewhere.
+ * This read cannot insert a workspace or resurrect a deleted creator. */
+export function agentPublicProjection(
+  service: AgentService,
+  ownerScope: (creatorId: string) => Promise<CreatorScope | null>,
+  purpose: PublicAgentPurposeAuthority,
+): PublicCreatorAIProjection {
+  invariant(
+    typeof purpose?.current === "function",
+    "public_agent_purpose_unconfigured",
+    "Actual current public AI processor/purpose authority is required.",
+  );
+  const currentPurpose = purpose.current.bind(purpose);
+  return {
+    async current(creatorId) {
+      z.uuid().parse(creatorId);
+      const scope = await ownerScope(creatorId);
+      if (!scope) return null;
+      invariant(
+        !scope.development && scope.creatorId === creatorId,
+        "public_agent_owner_invalid",
+        "Public metadata requires current canonical creator ownership.",
+      );
+      await service.repository.assertRuntimeRole();
+      const client = await service.repository.pool.connect();
+      try {
+        await client.query("BEGIN");
+        await client.query(
+          "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
+          [scope.creatorId, scope.accountId],
+        );
+        const creator = (
+          await client.query<{ verification: string }>(
+            "SELECT verification FROM creator.creator_profile WHERE id=$1 AND account_id=$2 FOR SHARE",
+            [scope.creatorId, scope.accountId],
+          )
+        ).rows[0];
+        const deleted = await client.query(
+          "SELECT 1 FROM creator.ai_tombstone WHERE creator_id=$1",
+          [scope.creatorId],
+        );
+        const workspace = (
+          await client.query<{
+            live_version_id: string | null;
+            paused: boolean;
+            deleted_at: Date | null;
+          }>(
+            "SELECT live_version_id,paused,deleted_at FROM creator.ai_workspace WHERE creator_id=$1 FOR SHARE",
+            [scope.creatorId],
+          )
+        ).rows[0];
+        const unavailable = (state: "paused" | "unpublished" | "revoked") => ({
+          state,
+          mode: "expert" as const,
+          topics: [],
+          sourceSummary: "",
+        });
+        const finish = async <T>(value: T) => {
+          await client.query("COMMIT");
+          return value;
+        };
+        if (!creator || deleted.rowCount || workspace?.deleted_at)
+          return await finish(null);
+        if (creator.verification !== "verified")
+          return await finish(unavailable("revoked"));
+        if (!workspace?.live_version_id)
+          return await finish(unavailable("unpublished"));
+        if (workspace.paused) return await finish(unavailable("paused"));
+        await client.query(
+          "SELECT creator_id FROM creator.ai_license WHERE creator_id=$1 FOR SHARE",
+          [scope.creatorId],
+        );
+        if (
+          !(await service.currentLicense(
+            scope,
+            await licenseRow(client, creatorId),
+            client,
+          ))
+        )
+          return await finish(unavailable("revoked"));
+        const version = (
+          await client.query<{
+            id: string;
+            state: string;
+            mode: "expert" | "companion" | "blend";
+            cap: number;
+            pipeline_hash: string;
+            published_at: Date | null;
+            source_set: { id: string; revision: number; hash: string }[];
+          }>(
+            "SELECT id,state,configuration->>'mode' AS mode,(configuration->>'dailyCostCapMicros')::bigint AS cap,pipeline_hash,published_at,source_set FROM creator.ai_version WHERE creator_id=$1 AND id=$2 FOR SHARE",
+            [creatorId, workspace.live_version_id],
+          )
+        ).rows[0];
+        if (
+          !version ||
+          version.state !== "live" ||
+          !version.published_at ||
+          version.pipeline_hash !== service.pipeline.fingerprint ||
+          !service.pipeline.model?.pricingConfigured ||
+          Number(version.cap) <= 0 ||
+          !["expert", "companion", "blend"].includes(version.mode)
+        )
+          return await finish(unavailable("unpublished"));
+        if (!(await currentPurpose(client, scope, version.id)))
+          return await finish(unavailable("revoked"));
+        const sources = (
+          await client.query<{
+            id: string;
+            revision: number;
+            content_hash: string;
+            title: string;
+            public: boolean;
+            ready: boolean;
+          }>(
+            "SELECT id,revision,content_hash,title,audience->>'kind'='public' AS public,state='approved' AND index_state='ready' AND (expires_at IS NULL OR expires_at>now()) AS ready FROM creator.ai_source WHERE creator_id=$1 AND id=ANY($2::uuid[]) ORDER BY id FOR SHARE",
+            [creatorId, version.source_set.map((source) => source.id)],
+          )
+        ).rows;
+        if (
+          !version.source_set.every((expected) =>
+            sources.some(
+              (source) =>
+                source.id === expected.id &&
+                source.revision === expected.revision &&
+                source.content_hash === expected.hash &&
+                source.ready,
+            ),
+          )
+        )
+          return await finish(unavailable("unpublished"));
+        if (!(await currentPurpose(client, scope, version.id)))
+          return await finish(unavailable("revoked"));
+        const publicSources = sources.filter((source) => source.public);
+        return await finish({
+          state: "published" as const,
+          mode:
+            version.mode === "blend"
+              ? ("expert_and_companion" as const)
+              : version.mode,
+          topics: [
+            ...new Set(
+              publicSources
+                .map((source) => source.title.trim().slice(0, 80))
+                .filter(Boolean),
+            ),
+          ].slice(0, 30),
+          sourceSummary: `${publicSources.length} approved public ${publicSources.length === 1 ? "source" : "sources"}`,
+        });
+      } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+      } finally {
+        client.release();
+      }
+    },
+  };
 }

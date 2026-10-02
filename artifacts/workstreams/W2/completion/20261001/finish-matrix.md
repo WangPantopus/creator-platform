@@ -1,5 +1,7 @@
 # Current W2 scope and R01–R14
 
+**October 2 public projection:** [W2-owned producer](../20261001-mac-studio/public-projection/README.md) now implements W7’s current public AI metadata port with canonical license/purpose/current publication checks. Positive approved-publication/host/feed/digest operation remains open; no R10 closure is claimed.
+
 **October 2 accounting custody:** [new increment](../20261001-mac-studio/accounting-retention/README.md) implements complete family export and retained-accounting/expiry custody, with actual-job boundaries required. Existing backend 18/18 pass; unchanged T-11 58,293 ms. Studio owner export and private revision-15 backup were personally verified. R07 remains open for canonical registration, real authority/policy, positive complete jobs and large-family purge; all nine packages/R01–R14 and production gates remain preserved.
 
 **Populated Studio draft:** fictional expert configuration now persists 20 approved/fixed examples, criteria/rules, synthetic exclusion canary and $5 daily cap (revision 15; no usage/evaluations/versions). Personally fixed/verified add/remove/save keyboard continuations; focus receipt records the exact scope. Existing backend 18/18 pass, T-11 80,787 ms with original workload and limit. Provider publication/native acceptance remain open.
