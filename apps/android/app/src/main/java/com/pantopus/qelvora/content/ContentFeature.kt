@@ -35,7 +35,7 @@ import kotlinx.serialization.json.*
 
 private class ContentFailure(val status:Int,message:String):Exception(message)
 private class ContentClient(context: Context, private val baseURL: String) {
-    private val storage = SecureSessionStorage(context)
+    private val storage = SecureSessionStorage(context, baseURL)
     suspend fun request(path: String, body: JsonObject? = null, expectedAccountId:String? = null): JsonElement = withContext(Dispatchers.IO) {
         val token = storage.read() ?: throw ContentFailure(401,"Your session ended. Continue with Pantopus again.")
         val connection = URL(baseURL.trimEnd('/') + "/v1/content/" + path).openConnection() as HttpURLConnection

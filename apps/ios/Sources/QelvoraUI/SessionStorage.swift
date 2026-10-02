@@ -1,20 +1,61 @@
 import Foundation
 import Security
+import CryptoKit
 
 /// Only the session credential is persisted. Private screen/cache state is account-scoped and purged.
 public actor SecureSessionStorage {
     private let service: String
-    public init(service: String = Bundle.main.bundleIdentifier ?? "creator-platform-development") { self.service = service }
-    public func read() async throws -> String? { try await SessionCredentialStore.shared.read(service: service) }
-    public func save(_ token: String?, replacing expectedToken: String? = nil) async throws { try await SessionCredentialStore.shared.save(token, service: service, expectedToken: expectedToken) }
+    private let legacyService: String
+    private let configured: Bool
+    public init(issuer: URL?, service: String = Bundle.main.bundleIdentifier ?? "creator-platform-development") {
+        let origin = Self.origin(issuer)
+        legacyService = service
+        configured = origin != nil
+        let scope = origin.map { SHA256.hash(data: Data($0.utf8)).map { String(format: "%02x", $0) }.joined() } ?? "unconfigured"
+        self.service = service + ".identity-session." + scope
+    }
+    public func read() async throws -> String? {
+        guard configured else { return nil }
+        return try await SessionCredentialStore.shared.read(service: service, legacyService: legacyService)
+    }
+    public func save(_ token: String?, replacing expectedToken: String? = nil) async throws {
+        guard configured || token == nil else { throw URLError(.badURL) }
+        try await SessionCredentialStore.shared.save(token, service: service, legacyService: legacyService, expectedToken: expectedToken)
+    }
+    private static func origin(_ issuer: URL?) -> String? {
+        guard let issuer, var value = URLComponents(url: issuer, resolvingAgainstBaseURL: false),
+              let scheme = value.scheme?.lowercased(), let host = value.host?.lowercased(),
+              !host.isEmpty, value.user == nil, value.password == nil, value.query == nil, value.fragment == nil,
+              value.percentEncodedPath.isEmpty || value.percentEncodedPath == "/",
+              value.port == nil || (1...65_535).contains(value.port!) else { return nil }
+        var permitted = scheme == "https"
+        #if DEBUG
+        permitted = permitted || (scheme == "http" && ["localhost", "127.0.0.1"].contains(host))
+        #endif
+        guard permitted else { return nil }
+        value.scheme = scheme; value.host = host; value.path = ""
+        if value.port == (scheme == "https" ? 443 : 80) { value.port = nil }
+        return value.url?.absoluteString
+    }
 }
 
 /// All feature clients share this fence when persistent storage fails.
 private actor SessionCredentialStore {
     static let shared = SessionCredentialStore()
     private var blockedServices: Set<String> = []
+    private var clearedLegacyServices: Set<String> = []
 
-    func read(service: String) throws -> String? {
+    private func clearLegacy(_ service: String) throws {
+        guard !clearedLegacyServices.contains(service) else { return }
+        // Old credentials have no provable issuer. Require sign-in rather than migrate them.
+        let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service, kSecAttrAccount as String: "identity-session"]
+        let status = SecItemDelete(query as CFDictionary)
+        guard status == errSecSuccess || status == errSecItemNotFound else { throw URLError(.userAuthenticationRequired) }
+        clearedLegacyServices.insert(service)
+    }
+
+    func read(service: String, legacyService: String) throws -> String? {
+        try clearLegacy(legacyService)
         guard !blockedServices.contains(service) else { return nil }
         let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service, kSecAttrAccount as String: "identity-session", kSecReturnData as String: true, kSecMatchLimit as String: kSecMatchLimitOne]
         var item: CFTypeRef?
@@ -27,9 +68,10 @@ private actor SessionCredentialStore {
         }
         return token
     }
-    func save(_ token: String?, service: String, expectedToken: String?) throws {
+    func save(_ token: String?, service: String, legacyService: String, expectedToken: String?) throws {
+        try clearLegacy(legacyService)
         if let expectedToken {
-            guard try read(service: service) == expectedToken else { throw URLError(.userAuthenticationRequired) }
+            guard try read(service: service, legacyService: legacyService) == expectedToken else { throw URLError(.userAuthenticationRequired) }
         }
         // Block every client before a clear or replacement, including failed writes.
         blockedServices.insert(service)

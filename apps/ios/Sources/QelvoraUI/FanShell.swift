@@ -22,7 +22,7 @@ public final class FanSession: ObservableObject {
     public init(baseURL: URL?, destination: String = "/home") {
         self.destination = ApplicationDestination.isPermitted(destination) ? destination : "/home"
         self.baseURL = baseURL
-        storage = SecureSessionStorage()
+        storage = SecureSessionStorage(issuer: baseURL)
         if let baseURL { let credentials = storage; api = CreatorAPIClient(baseURL: baseURL, token: { try await credentials.read() }) } else { api = nil }
     }
     public func loadArrival() async {
@@ -44,7 +44,7 @@ public final class FanSession: ObservableObject {
         do { token = try await storage.read() }
         catch {
             guard current == generation, !Task.isCancelled else { return }
-            if await purge() { error = QelvoraCopy.text("identitySessionReadFailed") }
+            if await purge() { self.error = QelvoraCopy.text("identitySessionReadFailed") }
             return
         }
         guard current == generation, !Task.isCancelled else { return }
@@ -69,8 +69,9 @@ public final class FanSession: ObservableObject {
         guard let api else { error = QelvoraCopy.text("pantopusUnavailable"); return }
         do {
             let capabilities = try await api.identityCapabilities()
+            guard capabilities.signInAvailable else { error = QelvoraCopy.text("pantopusUnavailable"); return }
             #if DEBUG
-            if capabilities.mode == .development { actors = capabilities.developmentActors ?? []; choosingDevelopmentActor = true; return }
+            if capabilities.mode == .development, let available = capabilities.developmentActors, !available.isEmpty { actors = available; choosingDevelopmentActor = true; return }
             #endif
             error = "Pantopus account authorization is not connected for this native app. Your destination is kept."
         } catch { self.error = "Sign-in is unavailable. Reconnect and try again." }
@@ -85,7 +86,7 @@ public final class FanSession: ObservableObject {
             guard await purge(), !Task.isCancelled else { return }
             let installing = generation
             do { try await storage.save(result.token) }
-            catch { guard installing == generation else { return }; if await purge() { error = QelvoraCopy.text("identitySessionSaveFailed") }; return }
+            catch { guard installing == generation else { return }; if await purge() { self.error = QelvoraCopy.text("identitySessionSaveFailed") }; return }
             guard installing == generation else { return }
             destination = result.returnTo; choosingDevelopmentActor = false
             await refresh()
@@ -114,7 +115,7 @@ public final class FanSession: ObservableObject {
             // Persist a completed rotation even if its foreground read was cancelled.
             guard current == generation else { return }
             do { try await storage.save(result.token, replacing: previous) }
-            catch { guard current == generation else { return }; if await purge() { error = QelvoraCopy.text("identitySessionSaveFailed") }; return }
+            catch { guard current == generation else { return }; if await purge() { self.error = QelvoraCopy.text("identitySessionSaveFailed") }; return }
             guard current == generation else { return }
             generation += 1; rotatingCredential = false; await refresh()
         }
@@ -234,7 +235,7 @@ struct NativeHandleForm: View {
                     VStack(alignment: .leading, spacing: 24) {
                         HStack {
                             SwiftUI.Button { model.destination = "/you" } label: { QelvoraGlyph(name: "back", size: 22).frame(width: 44, height: 44) }.buttonStyle(.plain).accessibilityLabel("Back")
-                            Spacer(); Text(model.session?.mode == .development ? "DEVELOPMENT SIGN-IN" : "SIGNED IN WITH PANTOPUS").qText("meta")
+                            Spacer(); Text(model.session?.mode == .development ? "DEVELOPMENT SIGN-IN" : "SIGNED IN WITH PANTOPUS").qText("caption", weight: .semibold)
                         }
                         Text("How creators will know you").qText("display-lg").accessibilityAddTraits(.isHeader)
                         VStack(alignment: .leading, spacing: 8) {
@@ -244,7 +245,7 @@ struct NativeHandleForm: View {
                         }
                         if model.session?.fan != nil {
                             VStack(alignment: .leading, spacing: 10) {
-                                Text("A LINE ABOUT YOU · OPTIONAL").qText("meta")
+                                Text("A LINE ABOUT YOU · OPTIONAL").qText("caption", weight: .semibold)
                                 TextEditor(text: $intro).qText("body").scrollContentBackground(.hidden).frame(minHeight: 90).accessibilityLabel("A line about you, optional").onChange(of: intro) { _, value in if value.count > 240 { intro = String(value.prefix(240)) } }
                                 Text("You choose, per creator, whether their AI may use this.").qText("caption").foregroundStyle(qColor("ink-muted", scheme))
                             }.padding(16).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: 16)).overlay(RoundedRectangle(cornerRadius: 16).stroke(qColor("line", scheme), lineWidth: 1))

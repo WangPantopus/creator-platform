@@ -36,7 +36,7 @@ import kotlinx.serialization.json.Json
 
 data class ArrivalContext(val source: String, val title: String, val creatorName: String)
 class FanSession(private val context: Context, private val baseURL: String?, returnTo: String) {
-    private val storage = SecureSessionStorage(context)
+    private val storage = SecureSessionStorage(context, baseURL)
     fun currentToken(): String? = storage.read()
     val api = baseURL?.let { CreatorAPIClient(it) { storage.read() } }
     var session by mutableStateOf<APISession?>(null); private set
@@ -87,7 +87,15 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     fun removeArrival() { arrival = null; removedArrivalFor = destination.substringBefore('?'); destination = removedArrivalFor!! }
     suspend fun beginSignIn() {
         if (busy) return; busy = true
-        try { if (localPurgeFailed && !purge()) return; val client = api ?: error("unconfigured"); val capability = client.identityCapabilities(); if (BuildConfig.DEBUG && capability.mode == APIIdentityCapabilitiesMode.DEVELOPMENT) { actors = capability.developmentActors.orEmpty(); choosingActor = true } else error = "Pantopus account authorization is not connected for this native app. Your destination is kept." }
+        try {
+            if (localPurgeFailed && !purge()) return
+            val client = api ?: error("unconfigured")
+            val capability = client.identityCapabilities()
+            val available = capability.developmentActors.orEmpty()
+            if (!capability.signInAvailable) error = QelvoraCopy.text("pantopusUnavailable")
+            else if (BuildConfig.DEBUG && capability.mode == APIIdentityCapabilitiesMode.DEVELOPMENT && available.isNotEmpty()) { actors = available; choosingActor = true }
+            else error = "Pantopus account authorization is not connected for this native app. Your destination is kept."
+        }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (_: Exception) { error = QelvoraCopy.text("pantopusUnavailable") }
         finally { busy = false }
@@ -123,8 +131,15 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     suspend fun refreshCredentials() {
         if (busy) return; val client = api ?: return; busy = true; rotatingCredential = true; generation++; val current = generation
         try {
-            val result = client.refreshSession(); if (current != generation) return
-            try { storage.save(result.token) } catch (_: Exception) { if (purge()) error = QelvoraCopy.text("identitySessionSaveFailed"); return }
+            val previous = currentToken() ?: run { purge(); return }
+            // A foreground cancellation must not discard a completed one-use rotation.
+            val persisted = withContext(NonCancellable) {
+                val result = client.refreshSession()
+                if (current != generation) return@withContext false
+                try { storage.save(result.token, replacing = previous); true }
+                catch (_: Exception) { if (purge()) error = QelvoraCopy.text("identitySessionSaveFailed"); false }
+            }
+            if (!persisted || current != generation) return
             generation++; rotatingCredential = false; refresh()
         }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }

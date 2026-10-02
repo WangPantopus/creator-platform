@@ -16,6 +16,14 @@ These decisions resolve timing/copy, not genuine identity, legal terms, native S
 
 ## Required decisions and confirmation points
 
+### W1 credential issuer and recovery — October 1 completion run
+
+Stored native session credentials bind to one canonical root API origin (scheme, lowercased host and effective port). Keychain/Keystore namespaces separate issuers; Android encryption also authenticates the origin. The previous unbound credential cannot prove its issuer, so the upgrade requires reauthorization rather than migrating it. Existing device-only custody, purge fences and one-use rotation remain; Android persists a completed bounded rotation through foreground cancellation. Actual device isolation/purge/foreground acceptance remains outstanding.
+
+Web refresh transport/non-401 failures preserve the saved credential and registered destination on an explicit recovery page. A completed rotation is persisted even if its following session read fails. Personally operated production-bundle local development journeys verify outage Retry and a cancelled real refresh UPDATE followed by Retry. This verifies recovery behavior, not production identity or release origin configuration.
+
+Participant RLS receives transaction-local `app.identity_session_id` only after `assertCurrentSession` validates and holds the actual request session. The value clears with its transaction and adds no worker session/Actor fallback. Actual non-owner diagnostics cover current, expired and mismatched sessions. Background work requires a separate purpose issuer, durable tuple proof and held domain restrictions; an interactive account ID is never sufficient.
+
 | ID | Decision / unresolved input | Owner | Needed before | Work that continues meanwhile |
 | --- | --- | --- | --- | --- |
 | Q01 | Production Pantopus identity/session/eligibility/deletion contract and access to a proper development identity environment | W1/W8 | Real account acceptance and external pilot | Adapter, secure continuation, role flows, explicit isolated development actors, all other features |

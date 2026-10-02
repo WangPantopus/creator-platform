@@ -1,5 +1,17 @@
 # W1 continuation — September 30, 2026
 
+## October 1 — Codex completion run in progress
+
+W1 uses isolated `00c0` / `codex/w1-completion-20261001`, PR66 `85e34bbb` plus main `4edd3d39`. API4111/web3011 and retained database55441 are running; secrets are outside Git. No subagents or new unit tests. [Current evidence](../../../artifacts/workstreams/W1/resume/2026-10-01-codex-completion/run.md).
+
+Implemented and compiled: native issuer-bound credential custody across all clients, closed sign-in capability recovery, iOS caught-error compile repairs and Android cancellation-safe rotation. Shipping normally signed iOS and Android builds pass. W1's subsequent two invalid native `meta` typography calls are corrected to canonical caption/semibold and await the next build. Native builds/installs/launches are supporting evidence; issuer isolation/purge/foreground and native journeys remain unaccepted. Own devices are now shut down and leases released.
+
+Personally verified production-bundle web recovery: owned DB outage → unavailable account → restart → Retry returns the saved account. Actual expired access plus a cancelled blocked refresh UPDATE → restore-unavailable page preserving credential/destination → Retry performs real rotation and returns Account. This uses local HTTP/development backend and is not release configuration. Held-session diagnostics verify app.identity_session_id is set only after current FOR SHARE session validation, clears with the transaction, denies expired/mismatched accounts and adds no worker fallback. Original nine backend contracts pass; nine DB integration cases skipped.
+
+PR59 d5e3ec65 combines the origin fix, exact PR53 ReferenceScaleWindow and main084a61a2. Original local visual suite13/13 and hosted PR web visual pass with no image/limit/timeout change; web/backend and Android PR checks pass. iOS and duplicate push jobs are queued, so landing remains pending. The macOS27/arm64 runner matches evidenced strict source rendering. W8 trust8931b62c/0053 and purpose worker authority still need W1 review/composition. No verified creator or genuine passkey/provider success is invented.
+
+Direct human all-peer communication authorization is verified; technical coordination is active. W1 personally retains all implementation/acceptance obligations. Full seven-group H01–H20 completion and release readiness remain open.
+
 ## October 1 (evening) — Mac Studio runtime restoration and handoff
 
 A Claude session restored a fresh W1 runtime on the Mac Studio (canonical 40-migration database, API 4111, web 3011, iOS 27 simulator), operated the mobile web identity journey in Mobile Safari, fixed the PR42 format failure (merged forward to PR51), and opened PR59 (Playwright `visualWebURL` CI fix), PR62 (development actors incl. under-18) and PR66 (outage-truthful sessions, adult-only notice, phone viewport fixes). Native builds/journeys were not run. [Run record](../../../artifacts/workstreams/W1/resume/2026-10-01-claude-runtime/run.md) · [continuation handoff](../handoffs/W1-continuation-2026-10-01-claude.md) · [copy-paste prompt](../prompts/W1-continuation-2026-10-01-claude.md).

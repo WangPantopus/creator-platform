@@ -1,0 +1,33 @@
+# W1 Codex completion run — in progress
+
+Source base: PR66 `85e34bbb041c3bd2f31b59c7cb38265a85332f51` plus local merge of main `4edd3d39`, on isolated `codex/w1-completion-20261001`. This increment is not full W1 acceptance.
+
+Environment: Mac Studio/macOS27/Xcode27/iOS27, Node24/pnpm12.5.1/JDK21. W1 development API4111/web3011/Postgres55441 retain canonical data. Private configuration stays outside Git. Synthetic actors are labelled; no production identity, genuine creator proof, passkey or paid provider outcome is claimed. No new unit tests or subagents.
+
+## Personally operated web
+
+Chrome: Welcome → Continue with Pantopus → labelled development actor one → Home, with retained fan profile. Then the production Next16.3.7 bundle `.next-w1-completion-prod` on3011 uses the same genuinely issued development session; no cookie/assertion injection. Local HTTP and absent configured public origin qualify this as production-bundle recovery verification, not release configuration. Viewport390×844; saved screenshots export609×1319 pixels. Final account and refresh-recovery screens use Night.
+
+Owned database stopped → Account reload showed unavailable recovery preserving the saved session → owned database restarted → personally clicked Retry → same account returned without reload/sign-in. Existing `retry()` works in the production error boundary. Screens: `web-production-account-outage.jpg`, `web-production-account-retry-recovered-phone.jpg`.
+
+Expired-access/failed-refresh operation: expire the actual owned development actor-one access windows (retain refresh windows), hold their session rows, then cancel only the actual creator_runtime refresh UPDATE blocked by that diagnostic transaction. No provider or credential was substituted. `/api/auth/restore?returnTo=%2Fidentity%2Faccount` reached the recovery page: “Your session is kept on this device.” Release the owned row lock → personally click Retry → real session rotation → original Account destination with @w1_actor_one. Screens: `web-production-refresh-unavailable-phone.jpg`, `web-production-refresh-retry-recovered-phone.jpg`. Existing credentials are never printed or saved in evidence. All temporary fault transactions are rolled back. Earlier stale browser-handle observations were not acceptance; rebinding the exact owned tab exposed the live page.
+
+## Native implementation and compilation
+
+Shipping normally signed iOS Debug build first failed three caught-error/state shadowing lines in FanShell. Corrected build passes, and subsequent issuer-bound shipping build passes (`/private/tmp/w1-completion-ios-issuer-build.log`). Canonical XcodeGen project generation produces effective CreatorAPIURL=http://127.0.0.1:4111 and CreatorLinkHost=localhost; explicit DEBUG `--api-url` is required for local HTTP. Actual own iPhone17 simulator F802B3F6-9B90-4CE9-9A62-62A16E2A54AC launches, primary framebuffer1206×2622. It is now shut down and its slot released.
+
+Shipping Android Debug build passes47s; issuer-bound build passes20s. Current APK was installed/launched on owned Qelvora_W1_API34 emulator-5554 (API34 arm64 Google APIs, two cores/2048MiB/no snapshots), via explicit DEBUG API http://10.0.2.2:4111 and return /you. Earlier emulator5576 was also owned and shut down. Initial Android Studio device screen was personally opened through Continue to the two-actor chooser; selecting an actor and all new-storage journeys remain unaccepted. Device Hub control times out; stale Android Studio binding later targeted its main inspector. Emulator5554 is now shut down, slot2 and the UI lease released. No build/install/screenshot substitutes for native journey acceptance.
+
+W3's actual iOS account crash exposed invalid `meta` text styles. W1 corrected its two FanShell uses to canonical caption/semibold; this small follow-up requires the next shipping build. W3 and W4 own their corresponding fixes. No token/reference was changed.
+
+Issuer binding canonicalizes scheme/host/default port and requires a root origin. HTTPS is mandatory outside DEBUG; DEBUG permits only existing loopback hosts. Credentials use separate Keychain/Keystore namespaces, and Android GCM authenticates the issuer as AAD. Unbound legacy credentials require reauthorization. All consumers explicitly supply the issuer. Existing process-wide purge fences and compare-and-swap rotation remain. Android holds the bounded rotation/persistence through foreground cancellation. Actual issuer isolation, purge failure and foreground/device matrix remain open.
+
+## Held session and checks
+
+`assertCurrentSession` publishes transaction-local app.identity_session_id only after the real request session is validated and held FOR SHARE. Actual operated development-session diagnostic with the non-owner runtime confirms binding, transaction clearing, expired-session denial, account-mismatch denial and no session fallback without a request. No interactive Actor/session is invented for a worker. Backend typecheck and the original nine contract cases pass; nine database integration cases were skipped and are not reported as passes. Earlier affected web typecheck/lint/format, shipping builds and the full existing visual suite13/13 pass.
+
+## CI and coordination
+
+PR59 published d5e3ec65 includes exact PR53 d207f504 and current main084a61a2, retaining every original image/comparison limit/timeout. Hosted PR web visual and web/backend/Android jobs pass; iOS and duplicate push jobs remain queued, so no merge/pass is inferred. CI rationale is separately committed in the CI bootstrap worktree. Original failed Intel source-render pixels/timeouts are retained.
+
+Direct human all-peer messaging authorization was verified in the original W8 chat; technical coordination is active without implementation/acceptance delegation. W8 trust helper8931b62c and participant-bounded0053 remain pending personal integration/review. W1 purpose-scoped worker authority, Ops onboarding, real proof/signing, all H01–H20 and release acceptance remain open. Status distinguishes implemented, compiled, integrated, personally verified and release-ready.

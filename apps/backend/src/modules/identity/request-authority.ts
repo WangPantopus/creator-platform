@@ -30,4 +30,10 @@ export async function assertCurrentSession(
       "Your session ended. Continue with Pantopus again.",
       401,
     );
+  // Participant-bounded RLS may use this ID only after the actual request
+  // session has been checked and held through the domain transaction. It is
+  // transaction-local, never an account substitute or a worker credential.
+  await client.query("SELECT set_config('app.identity_session_id',$1,true)", [
+    authority.sessionId,
+  ]);
 }

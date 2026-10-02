@@ -46,6 +46,13 @@ export async function configureGrowthForBackend(
     connectionTimeoutMillis: 5000,
     statement_timeout: 5000,
   });
+  // Idle connection loss is reported by the pool, outside the tick's promise.
+  // pg removes that client; later ticks still claim and recheck real leases.
+  worker.on("error", () => {
+    console.warn(
+      "Growth worker database connection lost; leased work requires reconnecting.",
+    );
+  });
   try {
     const runtime = await createGrowthRuntime({
       runtimePool: input.pool,

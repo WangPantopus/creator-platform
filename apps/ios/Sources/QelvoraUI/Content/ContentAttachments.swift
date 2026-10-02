@@ -96,8 +96,8 @@ private final class ContentMediaRedirectGuard: NSObject, URLSessionTaskDelegate,
 private actor ContentMediaTransport {
     let baseURL: URL
     let accountId: String
-    private let storage = SecureSessionStorage()
-    init(baseURL: URL, accountId: String) { self.baseURL = baseURL; self.accountId = accountId }
+    private let storage: SecureSessionStorage
+    init(baseURL: URL, accountId: String) { self.baseURL = baseURL; storage = SecureSessionStorage(issuer: baseURL); self.accountId = accountId }
     func request(_ path: String, post: Bool = false, range: Range<Int>? = nil, total: Int? = nil) async throws -> Data {
         guard UUID(uuidString: accountId) != nil,
               baseURL.scheme == "https" || (baseURL.scheme == "http" && ["localhost", "127.0.0.1"].contains(baseURL.host ?? "")),
