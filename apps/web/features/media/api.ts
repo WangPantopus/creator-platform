@@ -93,13 +93,25 @@ export async function mediaRequest<T>(
       ])
     : request.signal;
   signal?.throwIfAborted();
-  const response = await fetch(`/api/w6/${path}`, {
-    ...request,
-    credentials: "same-origin",
-    cache: "no-store",
-    headers,
-    signal,
-  });
+  let response: Response;
+  try {
+    response = await fetch(`/api/w6/${path}`, {
+      ...request,
+      credentials: "same-origin",
+      cache: "no-store",
+      headers,
+      signal,
+    });
+  } catch (failure) {
+    signal?.throwIfAborted();
+    if (failure instanceof TypeError)
+      throw new MediaRequestError(
+        copy.w6MediaIsUnavailableTryAgain,
+        503,
+        "media_transport_unavailable",
+      );
+    throw failure;
+  }
   signal?.throwIfAborted();
   if (!response.ok) {
     const error = (await response.json().catch(() => null)) as {

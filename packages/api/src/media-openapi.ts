@@ -77,6 +77,31 @@ const creator = "/v1/w6/creators/{creatorId}/media";
 const thread = "/v1/w6/threads/{creatorId}/{fanId}/creator-media";
 const audience = "/v1/w6/creators/{creatorId}/audience-media";
 export const mediaPaths = {
+  "/v1/w6/calls/{sessionId}/route": {
+    parameters: [path("sessionId"), expectedAccountHeader],
+    get: {
+      ...operation("readAccountCallRoute", "CallCallRoute"),
+      description:
+        "Resolve one exact call for the actual current account after held session, restoration, participant denial, Access and current captured-booking checks. Returns navigation IDs only, with no call admission, provider, worker or financial authority. Unconfigured purposes stay unavailable.",
+    },
+  },
+  "/v1/w6/threads/{creatorId}/{fanId}/calls/{sessionId}/redeem": {
+    parameters: [
+      path("creatorId"),
+      path("fanId"),
+      path("sessionId"),
+      expectedAccountHeader,
+    ],
+    post: {
+      ...operation(
+        "redeemCallAdmission",
+        "CallAdmissionReceipt",
+        "CallAdmissionRedemption",
+      ),
+      description:
+        "Consume the actual unused, unexpired admission nonce for this call and current authenticated account before connecting transport. Ended calls and invalid or reused admission are refused with the current service's 403 error. This receipt does not establish single-use provider-token enforcement.",
+    },
+  },
   "/v1/w6/creators/{creatorId}/media-policy": {
     parameters: [path("creatorId")],
     get: {

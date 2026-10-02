@@ -6,7 +6,7 @@ import type {
 } from "../conversation/privacy.js";
 import {
   privacyTaskAuthority,
-  privacyTaskAuthorityInTransaction,
+  restoredPrivacyTaskAuthorityInTransaction,
   type PrivacyTaskInput,
 } from "./privacy-authority.js";
 import type { PoolClient } from "pg";
@@ -16,6 +16,7 @@ import type { PoolClient } from "pg";
 export function conversationPrivacyAuthority(
   runtime: Pool,
   coordinator: Pool,
+  assertRestoredInTransaction?: (client: PoolClient) => Promise<void>,
 ): ConversationPrivacyAuthority & {
   fenceTaskInTransaction(
     client: PoolClient,
@@ -25,15 +26,33 @@ export function conversationPrivacyAuthority(
   const verify = privacyTaskAuthority(coordinator);
   return {
     async fenceTaskInTransaction(client, job) {
-      await privacyTaskAuthorityInTransaction(client, job);
+      await restoredPrivacyTaskAuthorityInTransaction(
+        client,
+        job,
+        assertRestoredInTransaction,
+      );
     },
     async families(job) {
+      await verify(job);
       const client = await runtime.connect();
+      let released = false;
+      const abort = () => {
+        if (!released) {
+          released = true;
+          client.release(true);
+        }
+      };
+      job.signal!.addEventListener("abort", abort, { once: true });
       try {
+        job.signal!.throwIfAborted();
         await client.query("BEGIN");
         // Discovery is lifecycle work too. Lock the real job/task before any
         // family reads and keep its deferred currentness check through COMMIT.
-        const owned = await privacyTaskAuthorityInTransaction(client, job);
+        const owned = await restoredPrivacyTaskAuthorityInTransaction(
+          client,
+          job,
+          assertRestoredInTransaction,
+        );
         await client.query("SELECT set_config('app.account_id',$1,true)", [
           job.accountId,
         ]);
@@ -64,7 +83,11 @@ export function conversationPrivacyAuthority(
           );
           for (const creatorId of owned)
             for (const fan of fans) {
-              await verify(job);
+              await restoredPrivacyTaskAuthorityInTransaction(
+                client,
+                job,
+                assertRestoredInTransaction,
+              );
               await client.query(
                 "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true)",
                 [creatorId, fan.id],
@@ -87,19 +110,32 @@ export function conversationPrivacyAuthority(
               );
             }
         }
-        await verify(job);
-        job.signal?.throwIfAborted();
+        await restoredPrivacyTaskAuthorityInTransaction(
+          client,
+          job,
+          assertRestoredInTransaction,
+        );
+        job.signal!.throwIfAborted();
         await client.query("COMMIT");
+        job.signal!.throwIfAborted();
         return families;
       } catch (error) {
-        await client.query("ROLLBACK");
+        if (!released) await client.query("ROLLBACK");
         throw error;
       } finally {
-        client.release();
+        job.signal!.removeEventListener("abort", abort);
+        if (!released) {
+          released = true;
+          client.release();
+        }
       }
     },
     async assertFamily(client, job, family) {
-      const owned = await privacyTaskAuthorityInTransaction(client, job);
+      const owned = await restoredPrivacyTaskAuthorityInTransaction(
+        client,
+        job,
+        assertRestoredInTransaction,
+      );
       invariant(
         (!job.creatorId || job.creatorId === family.creatorId) &&
           (!job.threadId || job.threadId === family.threadId),
