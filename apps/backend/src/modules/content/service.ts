@@ -2096,14 +2096,26 @@ export class ContentService {
       ).rows[0];
       invariant(fan, "fan_profile_required", "Set up your fan profile first.");
       let threadId: string | null = null;
+      let contentTarget: Index | null = null;
       if (!input.withdrawn) {
-        if (input.targetKind === "content")
-          await this.authorizeRead(
+        if (input.targetKind === "content") {
+          contentTarget = await this.index(
             client,
+            creatorId,
+            input.targetId,
+            false,
             actor,
-            await this.index(client, creatorId, input.targetId, false, actor),
           );
-        else {
+          invariant(
+            (await this.eligibleBeforePacket(client, actor, contentTarget)) &&
+              (await this.preparePacketPositive(client, actor, contentTarget)),
+            "content_unavailable",
+            "This content is unavailable to this audience.",
+          );
+          await client.query("SELECT set_config('app.content_id',$1,true)", [
+            contentTarget.id,
+          ]);
+        } else {
           threadId =
             (await this.dependencies.thanksMessage?.(
               client,
@@ -2118,7 +2130,7 @@ export class ContentService {
           );
         }
       }
-      return this.command(
+      const receipt = await this.command(
         client,
         actor,
         "thanks",
@@ -2201,6 +2213,17 @@ export class ContentService {
           return result;
         },
       );
+      // The final W4/W1 signature source fence must follow every command,
+      // unique-key and business-row lock/write, including idempotency storage.
+      // A replay also checks current eligibility. Denial rolls back all writes;
+      // after this gate only the in-memory receipt and COMMIT remain.
+      if (contentTarget)
+        invariant(
+          await this.packetEligible(client, actor, contentTarget),
+          "content_unavailable",
+          "This content is unavailable to this audience.",
+        );
+      return receipt;
     });
   }
   async thanksFeed(actor: Actor, creatorId: string) {
