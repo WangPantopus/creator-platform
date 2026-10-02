@@ -4,7 +4,7 @@ import { ContentAudience } from "../../../../../packages/api/src/content.js";
 import type { Actor } from "../identity/adapter.js";
 import { assertCurrentSession } from "../identity/request-authority.js";
 import { contentHash } from "../../core/canonical.js";
-import { invariant } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
 
 const Tuple = z.strictObject({
   creatorId: z.uuid(),
@@ -211,14 +211,26 @@ export async function createCommercePublicPacketReader(input: {
       )
     ).rows[0]?.mode;
     if (!mode) return false;
-    await client.query(
-      "SELECT pg_advisory_xact_lock_shared(hashtextextended($1,0))",
-      [`commerce.mode:${mode}`],
-    );
-    await client.query(
-      "SELECT pg_advisory_xact_lock_shared(hashtextextended($1,0))",
-      [`commerce.public-packet:${tuple.packetId}`],
-    );
+    // A page can hold several packet fences while a writer changes a batch in
+    // another order. Never wait below the page's earlier content/domain locks.
+    // Contention is retryable unavailability, not an eligible empty response.
+    for (const key of [
+      `commerce.mode:${mode}`,
+      `commerce.public-packet:${tuple.packetId}`,
+    ]) {
+      const held = (
+        await client.query<{ held: boolean }>(
+          "SELECT pg_try_advisory_xact_lock_shared(hashtextextended($1,0)) AS held",
+          [key],
+        )
+      ).rows[0]?.held;
+      if (held !== true)
+        throw new DomainError(
+          "public_packet_read_unavailable",
+          "This public request is changing. Try again.",
+          503,
+        );
+    }
     const heldMode = (
       await client.query<{ mode: string | null }>(
         "SELECT creator.commerce_public_packet_mode($1,$2,$3,$4,$5::jsonb) AS mode",

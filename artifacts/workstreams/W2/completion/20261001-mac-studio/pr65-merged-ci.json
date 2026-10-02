@@ -1,0 +1,142 @@
+{
+  "headRefOid": "109dd3ccb534dc542fb465dedd074c69a04a6041",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T06:28:39Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36973548550/job/110732423084",
+      "name": "web-and-backend",
+      "startedAt": "2026-10-02T06:26:26Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T06:28:39Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36973542120/job/110732402826",
+      "name": "web-and-backend",
+      "startedAt": "2026-10-02T06:26:21Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36973548550/job/110732423266",
+      "name": "web-visual",
+      "startedAt": "2026-10-02T06:26:24Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36973542120/job/110732402944",
+      "name": "web-visual",
+      "startedAt": "2026-10-02T06:26:19Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36973548550/job/110732423378",
+      "name": "ios-foundation",
+      "startedAt": "2026-10-02T06:26:24Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36973542120/job/110732403017",
+      "name": "ios-foundation",
+      "startedAt": "2026-10-02T06:26:19Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36973548550/job/110732423308",
+      "name": "android-foundation",
+      "startedAt": "2026-10-02T06:26:24Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36973542120/job/110732403037",
+      "name": "android-foundation",
+      "startedAt": "2026-10-02T06:26:19Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T06:31:20Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36973548550/job/110732423425",
+      "name": "android-runtime",
+      "startedAt": "2026-10-02T06:26:26Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T06:30:40Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36973542120/job/110732402946",
+      "name": "android-runtime",
+      "startedAt": "2026-10-02T06:26:21Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    }
+  ],
+  "host": "Yingpengs-Mac-Studio.local",
+  "mergedAt": "2026-10-02T06:34:58Z",
+  "mergeCommit": "6e9fb6c6eb84c60160f928c52c72fda42ecfe985",
+  "mergeMethod": "normal merge, exact head matched, no admin override",
+  "mainRulesets": [],
+  "mainBranchProtection": "404: branch not protected",
+  "pendingMacChecksArePassed": false,
+  "mainRuntimeVerification": {
+    "observedAt": "2026-10-02T06:44:00Z",
+    "source": "6e9fb6c6eb84c60160f928c52c72fda42ecfe985",
+    "actualMainCheckout": true,
+    "apiRestarted": true,
+    "apiPort": 4102,
+    "webPort": 3002,
+    "databasePort": 55442,
+    "actor": "fictional Maya, development actor one",
+    "theme": "light",
+    "viewport": {
+      "width": 1280,
+      "height": 900
+    },
+    "draftRevision": 15,
+    "examples": 20,
+    "licenseTerms": "development-synthetic-unreviewed",
+    "usage": 0,
+    "evaluations": 0,
+    "versions": 0,
+    "providerRefusalFocused": true,
+    "noticeTop": 0,
+    "noticeBottom": 110,
+    "horizontalOverflow": false,
+    "limits": [
+      "Provider remains absent; publication/cited delivery not verified.",
+      "Main does not yet contain the newer W1 unavailable-session recovery.",
+      "Main hosted CI may still be queued; no queued job is asserted passed."
+    ]
+  }
+}
