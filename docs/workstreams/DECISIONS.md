@@ -227,3 +227,7 @@ Actual source review confirmed that the old generic consumer proof required term
 ### W1 — retain the original core terminal compatibility bridge (October 2)
 
 Review of unchanged183 SQL line295 caught an error in c9812b25: the core terminal authority already has a legitimate original matcher compatibility grant. W1 now requires exact privilege equality to each fixed owner contract: the core183 bridge must be present;188/189 journal/settlement leaves must lack it. All terminal consumers still require the terminal matcher. No SQL, grant, scope issuance or ledger change occurs. Types, scoped lint, existing contracts and backend production build pass; unregistered positive purpose and live full-graph acceptance remain open.
+
+### W1 — announce route errors once while retaining focus and Retry (October 2)
+
+Personal web outage operation exposed nested app alerts: the focusable recovery wrapper and the existing error Notice both declared alert. The wrapper now retains programmatic focus without repeating the Notice alert. Installed Next16.3.7 error-file documentation confirms the stable retry callback re-fetches the segment; no guessed reset substitution is made. Existing typecheck and scoped lint pass. Actual development Account recovered through Retry after a real API stop/restart without another sign-in; production-build Retry and assistive-technology acceptance remain open.
