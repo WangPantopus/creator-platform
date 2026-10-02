@@ -89,5 +89,20 @@
     "packages/api/src/commerce/contracts.ts": "16a129aff4314a365faf769dc32eb98e19d40ef768a977a925f543027182319a",
     "packages/api/src/openapi.ts": "6856f77de5e776f14f3c8d6978c15fc144be900e6d172c64ce8dfa457e9e368c",
     "packages/copy/src/index.ts": "7e450ce6fa014b1ffc5905e7ae541034fe8ab39fb849328e3d4b33548d7b9159"
+  },
+  "currentStudioPushLifecycle": {
+    "recordedAt": "2026-10-02T16:02:15.103017+00:00",
+    "sourceParent": "b7d21b0c6363af679dabccd29828424130ec0ef2",
+    "sourceSHA256": {
+      "apps/android/app/build.gradle.kts": "b52efa1d8b15df7b973fa02a90595c3acade12d44fa3c8c2b005d6d108d3ef25",
+      "apps/android/app/src/main/java/com/pantopus/qelvora/ui/GrowthPreferences.kt": "c7c315a699908e75a03bea3eb9520d9af7ef80e34c8fd7fbf9bca0445f9e1377",
+      "apps/android/app/src/main/java/com/pantopus/qelvora/ui/GrowthPush.kt": "bb956bf33508f6a078602a54c6c82ad69b0cc94471ebb8c6f9812134d5af295c",
+      "apps/android/app/src/main/java/com/pantopus/qelvora/ui/GrowthNotificationWorker.kt": "55a5a4b63e6f2938989971ea1100a4518f17511e13bc7b859c4cf763c84b8b95",
+      "apps/android/app/src/main/java/com/pantopus/qelvora/ui/GrowthReplyDocument.kt": "97d2df210697f25bcafbc557e8931897f948057eede10147886270241ce299d4",
+      "apps/web/app/api/auth/continue/route.ts": "0254a5c5a7a1c2ade938aaee09ced2e510e0c8691a5d106ee53d572df9ecd703"
+    },
+    "authOwnerSource": "587300ab0da004ec8bc95c17b7dcae30f6d63716",
+    "wholeNewMainReviewed": false,
+    "fullCombinedReviewComplete": false
   }
 }

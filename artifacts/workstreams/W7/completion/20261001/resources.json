@@ -126,7 +126,7 @@
     "nativeProcessesRunning": false
   },
   "currentHost": {
-    "recordedAt": "2026-10-02T14:31:41.202148+00:00",
+    "recordedAt": "2026-10-02T16:02:15.103017+00:00",
     "note": "W7 moved from the old iMac (Intel, macOS 26, Xcode 26.5) to Yingpeng's Mac Studio (Apple M2 Max, macOS 27.0 26A428, Xcode 27.0 27A266a, iOS 27.0 simulator runtime). Every iMac-era resource listed elsewhere in this file (container creator-platform-w7-document-20261001, simulator CE855FD5-A4AA-4C62-A63B-5E80D2E1DFF1, /private/tmp/creator-platform-w7-completion-20261001 caches, ~/.config/creator-platform/{secrets,cleanup-20261001,w7-completion-20261001}) is absent from this machine and was not copied. Those entries are historical iMac custody only.",
     "checkout": "/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545",
     "postgres": {
@@ -136,7 +136,7 @@
       "address": "127.0.0.1:55447",
       "database": "creator_w7",
       "superuserPasswordFile": "~/.config/creator-platform/w7-macstudio-20261001/pg-superuser-password (mode 0600, never printed)",
-      "state": "Stopped normally after share-export recovery;40 active migrations through0043; no new schema applied.",
+      "state": "Stopped normally; original40 migrations unchanged; no SQL activation.",
       "recoveredIMacData": "not restored; the iMac backup holds 0 creators/relationships/shares and is not on this machine"
     },
     "reservedPorts": {
@@ -149,13 +149,13 @@
       "udid": "FAB31883-2F36-4E50-83B3-D9654B60FF00",
       "runtime": "iOS 27.0",
       "points": "390x844",
-      "state": "Stopped normally; signed account-copy shipping dylib fdd1fe5d installed and actual saved Settings/Home\u2192Notifications observed. Exact slot1 released. Populated/provider/privacy acceptance remains open."
+      "state": "Stopped normally after actual current Save/Reload and warm/retry/cold Night unavailable-share operation; unchanged984 signed binary verified; exactslot1 released."
     },
     "androidAvd": {
       "name": "Qelvora_W7_API34",
       "image": "system-images;android-34;google_apis;arm64-v8a",
       "display": "1170x2532 @480dpi = 390x844 dp",
-      "state": "Stopped normally; shipping APK01754237 installed and actual Home action200% Light/Night, Notifications and saved Settings observed. Own font scale restored1.0; exact slot2 released. Shared Requests wrap preserved pending reviewed W1 source integration."
+      "state": "Stopped normally after final shipping APK b991accb Save/Reload, visible Save acknowledgment and warm/retry/cold Night share refusal; exactslot2 released."
     },
     "swiftBuildScratch": "/private/tmp/claude-501/... session scratchpad (disposable; not a dependency)",
     "sharedMachineBudget": "Adopted W1's 2026-10-01 budget: one heavy native build machine-wide via mkdir /private/tmp/creator-platform-heavy-build.lock (+owner file); at most two creator-platform emulators via /private/tmp/creator-platform-emulator-slot-{1,2}; at most three booted simulators via /private/tmp/creator-platform-simulator-slot-{1,2,3}; explicit UDID/serial only. Three earlier local swift test passes in this session ran before the budget message.",
@@ -310,6 +310,43 @@
         "real protected export storage/current owner protocols"
       ],
       "sourceEvidence": "artifacts/workstreams/W7/studio-runtime/20261002/privacy-held.md"
+    },
+    "pushLifecycleRuntime": {
+      "state": "All own services/devices stopped normally; exact owned leases released; no peer resource touched",
+      "parentSource": "b7d21b0c6363af679dabccd29828424130ec0ef2",
+      "apiPort": 4107,
+      "webPort": 3007,
+      "apiLastPid": 19297,
+      "apiExit": 0,
+      "webLastPid": 84652,
+      "webExit": 143,
+      "androidAPK_SHA256": "b991accb3246bb1c49ea65a09da47bf71281199d1897766a150580d28bc00e03",
+      "iosSource": "Unchanged984 shipping app; reinstalled and actually operated",
+      "newTests": false,
+      "newSQLActivated": false,
+      "providerOperated": false,
+      "privacyJobOperated": false,
+      "cleanup": {
+        "stoppedAt": "2026-10-02T16:00:13.546011+00:00",
+        "peerResourcesTouched": false,
+        "released": [
+          "creator-platform-emulator-slot-2",
+          "creator-platform-simulator-slot-1"
+        ],
+        "simulator": "FAB31883-2F36-4E50-83B3-D9654B60FF00 shutdown",
+        "emulator": "emulator-5580 killed explicitly; absent from adb",
+        "apiLastPid": 19297,
+        "webLastPid": 84652,
+        "postgres": "creator-platform-w7-macstudio-20261001 normally stopped, volume retained",
+        "browser": "own tab4 closed",
+        "apiExit": 0,
+        "webExit": 143,
+        "softwareEmulatorExit": 0,
+        "idbCompanionExit": 0,
+        "previousWebWrapperExit": 143,
+        "leaseCustody": "Exact captured owner token+directory device/inode matched before unlink/rmdir"
+      },
+      "evidence": "artifacts/workstreams/W7/studio-runtime/20261002/push-lifecycle.md"
     }
   }
 }
