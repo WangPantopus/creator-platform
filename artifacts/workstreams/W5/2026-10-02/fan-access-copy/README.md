@@ -1,0 +1,9 @@
+# Fan access copy and current-account denials
+
+Source0756143665aa6cef945ddf19425b3ab43beedeb1. During actual held Trust operation a signed-in fan with200canonical session was asked to Continue with Pantopus after503content authority unavailable. The fan view now requests sign-in only after an actual401, and treats all canonical account-change codes (including409session_account_changed/session_changed) as authority changes that clear remote rows/cursor and local account-bound inputs.403access changes no longer instruct a pointless sign-in.
+
+Personally operated normal kilnfire profile against owned API41055 and web30055 on the actual57 schema. At390×844 and1280×900 in Light/Night, canonical session stayed200account…0002 while preference returned503scope_denial_unconfigured (0074inactive). UI concealed content, retained Check current access and omitted Continue with Pantopus. Scroll width matched each viewport. Adjacent captures and sanitized observations identify the source.
+
+Implemented/runnable/integrated: web source, actual held Trust host and normal session above. Verified: this scoped outage/missing-authority copy and layout, web/backend types, scoped lint/format/diff checks. Positive signed content and actual401/account-switch journeys on this increment are not verified. Release-ready:no. Creator remains DEVELOPMENT-ONLY SEEDED VERIFIED without proof/passkey; no private content/signature/reply/consent/provider receipt was fabricated.
+
+Only the owned API was paused for40seconds and always resumed in finally. The captured view during the pause remained concealed with Check current access and no sign-in prompt; it was already concealed by the missing0074 authority before the pause. This does not establish positive content or unsent-editor retention. After resume, the same canonical account returned200 and the view still reported the missing authority.
