@@ -9,7 +9,8 @@ DO $$ DECLARE role_name text; login boolean; oid_value oid; relation text; BEGIN
    EXECUTE format('CREATE ROLE %I %s NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOBYPASSRLS',role_name,CASE WHEN login THEN 'LOGIN' ELSE 'NOLOGIN' END);
   END IF;
   SELECT oid INTO oid_value FROM pg_roles WHERE rolname=role_name AND rolcanlogin=login
-   AND NOT rolsuper AND NOT rolcreatedb AND NOT rolcreaterole AND NOT rolinherit AND NOT rolbypassrls;
+   AND NOT rolsuper AND NOT rolcreatedb AND NOT rolcreaterole AND NOT rolinherit AND NOT rolbypassrls
+   AND NOT rolreplication AND (rolconfig IS NULL OR cardinality(rolconfig)=0);
   IF oid_value IS NULL OR EXISTS(SELECT 1 FROM pg_auth_members WHERE member=oid_value OR roleid=oid_value)
    OR EXISTS(SELECT 1 FROM pg_namespace WHERE nspowner=oid_value)
    OR EXISTS(SELECT 1 FROM pg_class WHERE relowner=oid_value)
@@ -20,7 +21,8 @@ DO $$ DECLARE role_name text; login boolean; oid_value oid; relation text; BEGIN
       to_regprocedure('creator.pending_publication_tasks(integer)'),
       to_regprocedure('creator.begin_publication_scope(uuid,uuid,integer,uuid,uuid,text,text)'),
       to_regprocedure('creator.publication_scope_matches(uuid,uuid,integer)'),
-      to_regprocedure('creator.end_publication_scope()')]::oid[],NULL))))) THEN
+      to_regprocedure('creator.end_publication_scope()'),
+      to_regprocedure('creator.require_publication_scope_cleanup()')]::oid[],NULL))))) THEN
    RAISE EXCEPTION 'Unsafe existing publication purpose role';
   END IF;
   FOREACH relation IN ARRAY ARRAY['thread','message','generation','memory','fan_profile','identity_session','access_grant'] LOOP
@@ -47,6 +49,20 @@ CREATE TABLE creator.publication_worker_scope (
  publisher_account_id uuid NOT NULL, signed_act_id uuid, command_hash text NOT NULL CHECK(command_hash~'^[a-f0-9]{64}$'),
  command jsonb NOT NULL, created_at timestamptz NOT NULL DEFAULT clock_timestamp()
 );
+-- A scope's exact command may exist only inside its issuing transaction.
+-- The deferred constraint rejects even a direct worker COMMIT without cleanup.
+CREATE FUNCTION creator.require_publication_scope_cleanup() RETURNS trigger
+LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path=pg_catalog AS $$
+BEGIN
+ IF EXISTS(SELECT 1 FROM creator.publication_worker_scope WHERE id=NEW.id) THEN
+  RAISE EXCEPTION 'Publication scope must end before commit' USING ERRCODE='23514';
+ END IF;
+ RETURN NULL;
+END $$;
+CREATE CONSTRAINT TRIGGER require_publication_scope_cleanup
+ AFTER INSERT ON creator.publication_worker_scope DEFERRABLE INITIALLY DEFERRED
+ FOR EACH ROW EXECUTE FUNCTION creator.require_publication_scope_cleanup();
+
 CREATE INDEX publication_scope_expiry ON creator.publication_worker_scope(created_at);
 ALTER TABLE creator.publication_worker_scope ENABLE ROW LEVEL SECURITY;
 ALTER TABLE creator.publication_worker_scope FORCE ROW LEVEL SECURITY;
@@ -185,7 +201,6 @@ BEGIN
    CASE WHEN proof->'mediaEvidence'='[]'::jsonb THEN '{}'::jsonb ELSE jsonb_build_object('mediaEvidence',proof->'mediaEvidence') END);
  IF command_text::jsonb IS DISTINCT FROM expected OR
    (s IS NOT NULL AND (proof->>'commandHash' IS DISTINCT FROM h OR proof->'command' IS DISTINCT FROM expected)) THEN RETURN false; END IF;
- DELETE FROM creator.publication_worker_scope WHERE created_at<clock_timestamp()-interval '1 day';
  INSERT INTO creator.publication_worker_scope(transaction_id,backend_pid,login_name,creator_id,content_id,version,publisher_account_id,signed_act_id,command_hash,command)
  VALUES(pg_current_xact_id(),pg_backend_pid(),session_user,c,o,v,p,s,h,expected) RETURNING id INTO nonce;
  PERFORM set_config('publication.scope_id',nonce::text,true);
@@ -238,6 +253,9 @@ GRANT UPDATE(state,published_at) ON creator.content_index TO creator_publication
 GRANT UPDATE(published_at) ON creator.content_publication TO creator_publication_worker;
 GRANT INSERT(creator_id,content_id,version,type) ON creator.content_effect TO creator_publication_worker;
 RESET ROLE;
+ALTER FUNCTION creator.require_publication_scope_cleanup() OWNER TO creator_publication_authority;
+REVOKE ALL ON FUNCTION creator.require_publication_scope_cleanup() FROM PUBLIC;
+
 ALTER FUNCTION creator.publication_task_proof(uuid,uuid,integer,uuid,uuid,text,text,boolean) OWNER TO creator_publication_authority;
 ALTER FUNCTION creator.read_publication_task(uuid,uuid,integer,uuid,uuid) OWNER TO creator_publication_authority;
 ALTER FUNCTION creator.pending_publication_tasks(integer) OWNER TO creator_publication_authority;

@@ -8,7 +8,8 @@ DO $$ DECLARE role_oid oid; relation text; BEGIN
   CREATE ROLE creator_signature_read_authority NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOBYPASSRLS;
  END IF;
  SELECT oid INTO role_oid FROM pg_roles WHERE rolname='creator_signature_read_authority'
-  AND NOT rolcanlogin AND NOT rolsuper AND NOT rolcreatedb AND NOT rolcreaterole AND NOT rolinherit AND NOT rolbypassrls;
+  AND NOT rolcanlogin AND NOT rolsuper AND NOT rolcreatedb AND NOT rolcreaterole AND NOT rolinherit AND NOT rolbypassrls
+  AND NOT rolreplication AND (rolconfig IS NULL OR cardinality(rolconfig)=0);
  IF role_oid IS NULL OR EXISTS(SELECT 1 FROM pg_auth_members WHERE member=role_oid OR roleid=role_oid)
   OR EXISTS(SELECT 1 FROM pg_namespace WHERE nspowner=role_oid)
   OR EXISTS(SELECT 1 FROM pg_class WHERE relowner=role_oid)
@@ -67,7 +68,8 @@ DO $$ DECLARE relation text; BEGIN
 END $$;
 
 -- VOLATILE + READ COMMITTED is intentional: each plain metadata query after a
--- waiting advisory lease takes a fresh snapshot. STABLE would retain stale proof.
+-- successful try lease takes a fresh snapshot. Contention is retryable; this
+-- late gate must never wait below already held business/domain locks.
 -- The W4 evidence function remains the sole bounded source/packet projection.
 CREATE FUNCTION creator.hold_public_packet_signature_read(c uuid,p uuid,i uuid,v integer,a jsonb,ids uuid[]) RETURNS boolean
 LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path=pg_catalog AS $$
@@ -81,9 +83,11 @@ DECLARE signer uuid; actual_ids uuid[]; BEGIN
     AND s.revoked_at IS NULL AND s.expires_at>clock_timestamp()) THEN RETURN false; END IF;
  SELECT cp.account_id INTO signer FROM creator.creator_profile cp WHERE cp.id=c;
  IF signer IS NULL THEN RETURN false; END IF;
- PERFORM pg_advisory_xact_lock_shared(hashtextextended('identity.signature-account:'||signer::text,0));
+ IF NOT pg_try_advisory_xact_lock_shared(hashtextextended('identity.signature-account:'||signer::text,0)) THEN
+  RAISE EXCEPTION 'Signature metadata is updating' USING ERRCODE='55P03';
+ END IF;
  -- The held session cannot be revoked while its earlier row lease is held,
- -- but wall-clock expiry can advance while this advisory lease waits.
+ -- but wall-clock expiry can advance during the preceding business work.
  IF NOT EXISTS(SELECT 1 FROM creator.identity_session s
   WHERE s.id=nullif(current_setting('app.identity_session_id',true),'')::uuid
    AND s.account_id=nullif(current_setting('app.account_id',true),'')::uuid

@@ -42,7 +42,8 @@ export async function createSignatureReadFence(input: {
         WHERE n.nspname='creator' AND p.proname='hold_public_packet_signature_read'
         AND p.prosecdef AND p.provolatile='v' AND r.rolname='creator_signature_read_authority'
         AND NOT r.rolcanlogin AND NOT r.rolsuper AND NOT r.rolinherit AND NOT r.rolbypassrls
-        AND NOT r.rolcreatedb AND NOT r.rolcreaterole AND 'search_path=pg_catalog'=ANY(p.proconfig)
+        AND NOT r.rolcreatedb AND NOT r.rolcreaterole AND NOT r.rolreplication
+        AND (r.rolconfig IS NULL OR cardinality(r.rolconfig)=0) AND 'search_path=pg_catalog'=ANY(p.proconfig)
         AND NOT pg_has_role(current_user,r.oid,'MEMBER') AND has_function_privilege(current_user,p.oid,'EXECUTE')
         AND NOT has_schema_privilege(r.oid,'creator','CREATE')
         AND NOT EXISTS(SELECT 1 FROM pg_auth_members WHERE member=r.oid OR roleid=r.oid)
@@ -129,17 +130,32 @@ export async function createSignatureReadFence(input: {
       accountId: actor.accountId,
       sessionId: authority.sessionId,
     });
-    const result = await client.query<{ allowed: boolean }>(
-      "SELECT creator.hold_public_packet_signature_read($1,$2,$3,$4,$5::jsonb,$6::uuid[]) AS allowed",
-      [
-        tuple.creatorId,
-        tuple.packetId,
-        tuple.contentId,
-        tuple.contentVersion,
-        JSON.stringify(tuple.audience),
-        [...new Set(tuple.signedActIds)].sort(),
-      ],
-    );
-    return result.rows[0]?.allowed === true;
+    try {
+      const result = await client.query<{ allowed: boolean }>(
+        "SELECT creator.hold_public_packet_signature_read($1,$2,$3,$4,$5::jsonb,$6::uuid[]) AS allowed",
+        [
+          tuple.creatorId,
+          tuple.packetId,
+          tuple.contentId,
+          tuple.contentVersion,
+          JSON.stringify(tuple.audience),
+          [...new Set(tuple.signedActIds)].sort(),
+        ],
+      );
+      return result.rows[0]?.allowed === true;
+    } catch (error) {
+      if (
+        error &&
+        typeof error === "object" &&
+        "code" in error &&
+        ["55P03", "57014"].includes(String(error.code))
+      )
+        throw new DomainError(
+          "signature_read_busy",
+          "Signed information is updating. Try again.",
+          503,
+        );
+      throw error;
+    }
   };
 }
