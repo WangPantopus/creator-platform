@@ -18,7 +18,6 @@ import com.pantopus.qelvora.ui.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.net.URL
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -46,7 +45,6 @@ private fun callClock(milliseconds: Long): String = "${maxOf(0, milliseconds) / 
 @Composable
 fun NativeCallScreen(baseURL: String?, model: FanSession) {
     val route = remember(model.destination) { CallRoute.from(model.destination) }
-    val client = remember(baseURL, model) { baseURL?.let { NativeMediaClient(URL(it)) { model.currentToken() ?: error(QelvoraCopy.text("w6SignInAgain")) } } }
     var call by remember(route) { mutableStateOf<JSONObject?>(null) }
     var notice by remember(route) { mutableStateOf<String?>(null) }
     var stale by remember(route) { mutableStateOf(true) }
@@ -69,12 +67,13 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
     fun disconnectMedia() { mediaEpoch++; val current = transport; transport = null; localState = "disconnected"; current?.disconnect() }
     fun role(value: JSONObject): String? = when (model.session?.accountId) { value.getString("creatorAccountId") -> "creator"; value.getString("fanAccountId") -> "fan"; else -> null }
     suspend fun refresh() {
-        val api = client ?: return; val currentRoute = route ?: return
+        val api = NativeCallRequest.capture(baseURL, model) ?: return; val currentRoute = route ?: return
         if (busy || fetching) return; fetching = true
         val account = model.session?.accountId
         if (account == null) { automaticRefresh = false; fetching = false; return }
         try {
-            val value = JSONObject(api.request(currentRoute.path, expectedAccountId = account).toString(Charsets.UTF_8))
+            val value = JSONObject(api.request(currentRoute.path).toString(Charsets.UTF_8))
+            require(UUID.fromString(value.getString("id")) == currentRoute.session)
             if (!active || account != model.session?.accountId) return
             if (value.getInt("version") >= (call?.getInt("version") ?: 0)) call = value
             stale = false
@@ -92,18 +91,21 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
         finally { fetching = false }
     }
     suspend fun action(name: String, body: JSONObject = JSONObject()) {
-        val value = call ?: return; val api = client ?: return; val currentRoute = route ?: return
+        val value = call ?: return; val api = NativeCallRequest.capture(baseURL, model) ?: return; val currentRoute = route ?: return
         if (busy || stale || role(value) == null) return; busy = true; notice = null
         try {
             body.put("expectedVersion", value.getInt("version")).put("idempotencyKey", UUID.randomUUID().toString())
-            call = JSONObject(api.request(currentRoute.path + "/" + name, "POST", body.toString().toByteArray()).toString(Charsets.UTF_8))
+            val returned = JSONObject(api.request(currentRoute.path + "/" + name, "POST", body.toString().toByteArray()).toString(Charsets.UTF_8))
+            if (!active || !api.current()) return
+            require(UUID.fromString(returned.getString("id")) == currentRoute.session)
+            call = returned
             if (name == "end") { disconnectMedia(); leaving = false }
         } catch (cancelled: CancellationException) { throw cancelled }
-        catch (_: Exception) { notice = QelvoraCopy.text("w6ThisActionCouldNotCompleteRefreshTheCallBeforeTrying"); stale = true }
+        catch (_: Exception) { if (active && api.current()) { notice = QelvoraCopy.text("w6ThisActionCouldNotCompleteRefreshTheCallBeforeTrying"); stale = true } }
         finally { busy = false }
     }
     suspend fun join() {
-        val value = call ?: return; val api = client ?: return; val currentRoute = route ?: return
+        val value = call ?: return; val api = NativeCallRequest.capture(baseURL, model) ?: return; val currentRoute = route ?: return
         if (!active || busy || stale || role(value) == null || (transport != null && localState != "disconnected")) return
         val adapter = NativeCallTransports.create?.invoke(currentRoute.session)
         if (adapter == null) { notice = QelvoraCopy.text("w6CallingIsNotConnectedYetYourBookingIsUnchanged"); return }
@@ -116,25 +118,25 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
                 if (active && epoch == mediaEpoch) notice = QelvoraCopy.text(if (wantsCamera) "w6CameraOrMicrophoneAccessIsOffOrUnavailableCheckYour" else "w6MicrophoneAccessIsOffAllowItInSettingsThenTry")
                 return
             }
-            if (!active || epoch != mediaEpoch || account != model.session?.accountId) return
+            if (!active || epoch != mediaEpoch || !api.current() || account != model.session?.accountId) return
             val response = JSONObject(api.request(currentRoute.path + "/join", "POST", "{}".toByteArray()).toString(Charsets.UTF_8))
-            if (!active || epoch != mediaEpoch) return
+            if (!active || epoch != mediaEpoch || !api.current()) return
             val admission = CallAdmission(response.getString("token"), response.getString("url"), response.getString("nonce"), response.getString("sessionId"), response.getString("accountId"), response.getString("expiresAt"), response.getString("role"))
             require(UUID.fromString(admission.sessionId) == currentRoute.session && admission.accountId == model.session?.accountId && admission.role == role(value))
             UUID.fromString(admission.nonce)
             val expires = Instant.parse(admission.expiresAt)
             require(expires.isAfter(Instant.now()))
             val receipt = JSONObject(api.request(currentRoute.path + "/redeem", "POST", JSONObject().put("nonce", admission.nonce).toString().toByteArray()).toString(Charsets.UTF_8))
-            if (!active || epoch != mediaEpoch) return
+            if (!active || epoch != mediaEpoch || !api.current()) return
             require(receipt.get("admitted") == true && expires.isAfter(Instant.now()) && admission.accountId == model.session?.accountId)
             transport = adapter; camera = wantsCamera
-            adapter.connect(admission, camera) { if (active && epoch == mediaEpoch) localState = it }
-            if (!active || epoch != mediaEpoch) adapter.disconnect()
+            adapter.connect(admission, camera) { if (active && epoch == mediaEpoch && api.current()) localState = it }
+            if (!active || epoch != mediaEpoch || !api.current()) adapter.disconnect()
         } catch (cancelled: CancellationException) { adapter.disconnect(); throw cancelled }
-        catch (_: Exception) { adapter.disconnect(); if (active && epoch == mediaEpoch) { transport = null; localState = "disconnected"; notice = QelvoraCopy.text("w6ConnectionFailedRejoinTheSameCall") } }
+        catch (_: Exception) { adapter.disconnect(); if (active && epoch == mediaEpoch && api.current()) { transport = null; localState = "disconnected"; notice = QelvoraCopy.text("w6ConnectionFailedRejoinTheSameCall") } }
         finally { busy = false }
     }
-    LaunchedEffect(route, client, model.session?.accountId, foreground, refreshVersion) {
+    LaunchedEffect(route, baseURL, model.session?.accountId, model.session?.sessionId, foreground, refreshVersion) {
         if (!foreground) return@LaunchedEffect
         automaticRefresh = true; pollDelay = 1000L
         while (automaticRefresh) { refresh(); if (automaticRefresh) delay(pollDelay) }
@@ -220,6 +222,6 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
             }
         }
         notice?.let { BasicText(it, style = qText("caption").copy(color = qColor("ink-muted"))) }
-        Button(QelvoraCopy.text("w6RefreshCall"), ButtonVariant.QUIET, disabled = busy || fetching || client == null || route == null) { refreshVersion++ }
+        Button(QelvoraCopy.text("w6RefreshCall"), ButtonVariant.QUIET, disabled = busy || fetching || baseURL == null || route == null) { refreshVersion++ }
     }
 }
