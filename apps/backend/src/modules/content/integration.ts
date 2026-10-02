@@ -72,6 +72,7 @@ export function composeContentHost(input: {
   };
   paidAudienceCount?: NonNullable<ContentDependencies["audienceCount"]>;
   tenure?: Parameters<typeof createContentTenureHost>[0];
+  publicationSource?: ContentDependencies["publicationSource"];
   packetRead?: {
     prepare: NonNullable<ContentDependencies["preparePublicPacketRead"]>;
     preparePositive: NonNullable<
@@ -100,6 +101,9 @@ export function composeContentHost(input: {
     Required<Pick<ContentDependencies, "assertAllowed">> = {
     ...input.dependencies,
     ...(input.tenure ? createContentTenureHost(input.tenure) : {}),
+    ...(input.publicationSource
+      ? { publicationSource: input.publicationSource }
+      : {}),
     ...(input.packetRead
       ? {
           preparePublicPacketRead: input.packetRead.prepare,
