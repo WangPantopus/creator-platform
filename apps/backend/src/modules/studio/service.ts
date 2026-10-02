@@ -214,8 +214,17 @@ export class StudioService {
           [creatorId],
         )
       ).rows;
+      // The navigation badge counts creator work, independent of page/filter.
+      // Waiting-for-fan requests do not need a creator decision yet.
+      const requests = (
+        await client.query<{ count: number }>(
+          "SELECT count(*)::int AS count FROM creator.commerce_packet p LEFT JOIN creator.commerce_commitment c ON c.packet_id=p.id WHERE p.creator_id=$1 AND (c.state IN('due','in_progress') OR p.state='submitted')",
+          [creatorId],
+        )
+      ).rows[0]!.count;
       return {
         items: rows.slice(0, input.limit),
+        requests,
         capacity,
         nextCursor:
           rows.length > input.limit ? rows[input.limit - 1]!.id : null,
