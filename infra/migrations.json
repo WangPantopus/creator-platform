@@ -698,6 +698,20 @@
       "version": "0107_w4_generation_accounting_correction",
       "state": "reserved_unapplied",
       "reason": "Distinct late immutable original-attempt accounting correction and original-reservation financial reconciliation after durable terminal state. No input/job/provider resurrection; exact purpose/source/retention/restoration review pending."
+    },
+    {
+      "id": "0108",
+      "owner": "W1",
+      "version": "0108_w1_generation_accounting_subject",
+      "state": "reserved_unapplied",
+      "reason": "Distinct already-terminal original-generation/grant/reservation/participant/outcome/cursor metadata-only accounting subject. Exact genuine W2 immutable receipt/W4 owner custody and held restoration review pending; no input/lease/job/provider or transition authority."
+    },
+    {
+      "id": "0109",
+      "owner": "W8",
+      "version": "0109_w8_generation_accounting_denial",
+      "state": "reserved_unapplied",
+      "reason": "Separate retained-accounting current negative/retention/restoration projection for actual0108 subject and original0097 correction provenance. Concrete immutable owner source pending; no original positive permission or inferred zero/settlement."
     }
   ]
 }
