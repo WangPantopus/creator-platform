@@ -1,0 +1,63 @@
+{
+  "label": "actual labelled synthetic canonical host; held restoration and content negatives",
+  "held": {
+    "label": "actual held closure checks; labelled synthetic; not original recovery",
+    "idleClient": "25P01",
+    "openHeld": true,
+    "newClosureWithinHeldTransaction": false,
+    "retainedSnapshot": false,
+    "explicitRestoredFlag": false,
+    "wrongDatabase": false,
+    "unsafeConfigurationsRefused": 3
+  },
+  "web": {
+    "label": "real launched web against actual synthetic canonical backend",
+    "actualCanonicalBrowserSignIn": true,
+    "openUnblockedEmptyFamily": {
+      "status": 200,
+      "items": 0
+    },
+    "savedBlock": {
+      "status": 403,
+      "code": "scope_revoked"
+    },
+    "closedContent": {
+      "status": 503,
+      "code": "restoration_pending"
+    },
+    "closedPublicHelp": 200,
+    "syntheticMarkerCleanup": 200,
+    "originalRecovery": false,
+    "providerMeasurements": false
+  },
+  "missingPort": {
+    "label": "actual canonical runtime, omitted held restoration port",
+    "restoration": {
+      "status": 503,
+      "code": "restoration_pending"
+    },
+    "content": {
+      "status": 503,
+      "code": "restoration_pending"
+    }
+  },
+  "savedState": {
+    "ledgerRows": 40,
+    "activeBlock": 1,
+    "case": 1,
+    "publications": 0
+  },
+  "verification": {
+    "backendTypecheck": "passed",
+    "noNewUnitTests": true,
+    "browserScreenshotPersonallyViewed": true
+  },
+  "limitations": [
+    "local development closure only; no restored iMac reconciliation",
+    "no genuine creator proof or publication issuance",
+    "no original fan packet projection yet",
+    "no native authenticated interaction in this increment",
+    "no real provider in-flight measurement"
+  ],
+  "releaseReady": false
+}

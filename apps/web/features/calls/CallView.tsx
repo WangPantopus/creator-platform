@@ -36,6 +36,8 @@ export function CallView({
   const [localState, setLocalState] = useState("disconnected");
   const [remoteMedia, setRemoteMedia] = useState<MediaStream | null>(null);
   const [summaryNote, setSummaryNote] = useState("");
+  const [refreshVersion, setRefreshVersion] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
   const video = useRef<HTMLVideoElement | null>(null);
   const stream = useRef<MediaStream | null>(null);
   const remote = useRef<HTMLVideoElement | null>(null);
@@ -74,11 +76,19 @@ export function CallView({
   useEffect(() => {
     let active = true;
     let fetching = false;
+    let retry = true;
+    let delay = 1000;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const controller = new AbortController();
     const refresh = async () => {
-      if (fetching) return;
+      if (fetching || !active || document.visibilityState === "hidden") return;
       fetching = true;
+      setRefreshing(true);
       try {
-        const value = await mediaRequest<CallSession>(root);
+        const value = await mediaRequest<CallSession>(root, {
+          expectedAccountId: actorAccountId ?? undefined,
+          signal: controller.signal,
+        });
         if (active) {
           setSession((prior) =>
             prior && prior.id === value.id && prior.version > value.version
@@ -87,35 +97,66 @@ export function CallView({
           );
           setStale(false);
           setFetchError(null);
+          // Receipts may still gain a reconciled outcome/summary after closure.
+          delay = ["ended", "cancelled"].includes(value.state) ? 30000 : 1000;
         }
       } catch (e) {
         if (active) {
           if (
             e instanceof MediaRequestError &&
-            [401, 403, 404].includes(e.status)
+            [401, 403, 404, 409].includes(e.status)
           ) {
             disconnectMedia();
             setSession(null);
+            retry = false;
           }
+          if (
+            e instanceof MediaRequestError &&
+            [
+              "calls_unconfigured",
+              "call_control_unconfigured",
+              "call_provider_unconfigured",
+              "call_admission_unverified",
+              "call_control_role_invalid",
+            ].includes(e.code ?? "")
+          )
+            retry = false;
+          delay = Math.min(delay * 2, 30000);
           setStale(true);
           setFetchError(
-            e instanceof Error ? e.message : copy.w6TheCallIsUnavailable,
+            e instanceof MediaRequestError &&
+              ["media_unavailable", "media_transport_unavailable"].includes(
+                e.code ?? "",
+              )
+              ? copy.w6ReconnectToRefreshThisCallActionsAreUnavailableUntilAccess
+              : e instanceof Error
+                ? e.message
+                : copy.w6TheCallIsUnavailable,
           );
         }
       } finally {
         fetching = false;
+        if (active) {
+          setRefreshing(false);
+          if (retry) timer = setTimeout(() => void refresh(), delay);
+        }
       }
     };
-    void refresh();
-    const timer = setInterval(() => {
+    const foreground = () => {
+      if (!retry || document.visibilityState === "hidden") return;
+      clearTimeout(timer);
       void refresh();
-    }, 1000);
+    };
+    void refresh();
+    document.addEventListener("visibilitychange", foreground);
     return () => {
       active = false;
-      clearInterval(timer);
+      clearTimeout(timer);
+      document.removeEventListener("visibilitychange", foreground);
+      controller.abort();
       disconnectMedia();
     };
-  }, [root]);
+  }, [root, actorAccountId, refreshVersion]);
   useEffect(() => {
     if (session && ["ending", "ended", "cancelled"].includes(session.state)) {
       disconnectMedia();
@@ -168,11 +209,45 @@ export function CallView({
     setBusy(true);
     const epoch = ++mediaEpoch.current;
     try {
-      const token = await mediaRequest<{ token: string; url: string }>(
-        `${root}/join`,
-        { method: "POST", body: "{}" },
+      const token = await mediaRequest<{
+        token: string;
+        url: string;
+        nonce: string;
+        sessionId: string;
+        accountId: string;
+        expiresAt: string;
+        role: "creator" | "fan";
+      }>(`${root}/join`, {
+        method: "POST",
+        body: "{}",
+        expectedAccountId: actorAccountId ?? undefined,
+      });
+      if (epoch !== mediaEpoch.current) return;
+      const nonce =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
+      if (
+        token.sessionId !== sessionId ||
+        token.accountId !== actorAccountId ||
+        token.role !== role ||
+        !nonce.test(token.nonce) ||
+        !Number.isFinite(Date.parse(token.expiresAt)) ||
+        Date.parse(token.expiresAt) <= Date.now()
+      )
+        throw new Error(copy.w6ConnectionFailedRejoinTheSameCall);
+      const admission = await mediaRequest<{ admitted: boolean }>(
+        `${root}/redeem`,
+        {
+          method: "POST",
+          body: JSON.stringify({ nonce: token.nonce }),
+          expectedAccountId: actorAccountId ?? undefined,
+        },
       );
       if (epoch !== mediaEpoch.current) return;
+      if (
+        admission.admitted !== true ||
+        Date.parse(token.expiresAt) <= Date.now()
+      )
+        throw new Error(copy.w6ConnectionFailedRejoinTheSameCall);
       transport.current = adapter;
       await adapter.connect({
         ...token,
@@ -280,6 +355,15 @@ export function CallView({
         <p className="w6-notice" role="status">
           {fetchError ?? copy.w6CheckingTheBookingAndParticipantAccess}
         </p>
+        {fetchError && (
+          <button
+            className="qv-btn qv-btn--secondary"
+            disabled={refreshing}
+            onClick={() => setRefreshVersion((value) => value + 1)}
+          >
+            {copy.w6RefreshCall}
+          </button>
+        )}
         <a
           className="qv-btn qv-btn--secondary"
           href={`/api/auth/continue?returnTo=${encodeURIComponent(`/calls/${creatorId}/${fanId}/${sessionId}`)}`}
