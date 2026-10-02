@@ -32,7 +32,7 @@ public struct NativeComponentPreview: View {
         case "EtaLine": return AnyView(EtaLine(ahead: 3))
         case "RequestStatus": return AnyView(RequestStatus(steps: [.init(id: "sent", label: "Sent to Maya", time: "OCT 4", state: .done), .init(id: "decision", label: "Waiting for Maya's decision", time: "31 H LEFT", state: .current), .init(id: "reply", label: "Reply delivered", state: .todo)], outcome: QelvoraCopy.text("declined", values: ["name": "Maya"])))
         case "Receipt": return AnyView(Receipt(rows: [.init(id: "mode", label: "Mode", value: "Written reply"), .init(id: "paid", label: "Paid", value: "$25.00"), .init(id: "date", label: "Delivered", value: "OCT 4, 2026")]))
-        case "SpendLimit": return AnyView(SpendLimit())
+        case "SpendLimit": return AnyView(SpendLimit(remindersOn: true))
         case "QueueCard": return AnyView(VStack { QueueCard(handle: "@kilnfire", mode: "Written reply", price: "$25", due: "DECIDE BY OCT 5", summary: "A satin white glaze is crawling at the rim.", shared: "Summary + photo", draftReady: true); QueueCard(kind: .commitment, handle: "@kilnfire", mode: "Written reply", price: "$25", due: "2 H", summary: "Accepted reply is due.", overdue: true) })
         case "CapacityHeader": return AnyView(CapacityHeader(rows: [.init(mode: "Written replies", used: 7, limit: 10), .init(mode: "Voice notes", used: 3, limit: 4)], line: "New requests open Monday."))
         case "LabelPreview": return AnyView(VStack { LabelPreview(); LabelPreview(kind: .humanCreator); LabelPreview(kind: .team) })

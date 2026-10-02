@@ -1,0 +1,95 @@
+$ next build
+▲ Next.js 16.3.7 (Turbopack)
+✓ Running next.config.ts took 91ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 15.2s
+  Running TypeScript ...
+  Finished TypeScript in 18.9s ...
+  Collecting page data using 15 workers ...
+  Generating static pages using 15 workers (0/31) ...
+  Generating static pages using 15 workers (7/31) 
+  Generating static pages using 15 workers (15/31) 
+  Generating static pages using 15 workers (23/31) 
+✓ Generating static pages using 15 workers (31/31) in 851ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ○ /_not-found
+├ ƒ /api/auth/complete
+├ ƒ /api/auth/continue
+├ ƒ /api/auth/restore
+├ ƒ /api/commerce-approvals/[...path]
+├ ƒ /api/commerce/[...path]
+├ ƒ /api/content/[...path]
+├ ƒ /api/conversations/[...path]
+├ ƒ /api/growth-development
+├ ƒ /api/growth/[...path]
+├ ƒ /api/platform/[...path]
+├ ƒ /api/studio/[...path]
+├ ƒ /api/studio/ai/[...path]
+├ ƒ /api/trust/[...path]
+├ ƒ /api/w6/[...path]
+├ ƒ /auth/continue
+├ ƒ /auth/development
+├ ƒ /calls/[creatorId]/[fanId]/[sessionId]
+├ ƒ /chat/[handle]
+├ ƒ /commerce/[screen]
+├ ƒ /content/[creatorId]/[contentId]
+├ ƒ /creators/[handle]
+├ ƒ /creators/[handle]/chat
+├ ƒ /creators/[handle]/posts/[id]
+├ ƒ /creators/maya
+├ ○ /design
+├ ○ /design/components
+├ ƒ /design/components/[name]
+├ ○ /design/screens
+├ ƒ /design/screens/[group]/[id]
+├ ○ /design/studies/comprehension
+├ ƒ /discover
+├ ƒ /growth-development
+├ ƒ /home
+├ ƒ /identity/account
+├ ƒ /invite/[id]
+├ ○ /media/ai-voice
+├ ƒ /media/voice
+├ ƒ /notifications
+├ ƒ /notifications/settings
+├ ƒ /onboarding/handle
+├ ○ /ops
+├ ○ /ops/audits
+├ ƒ /ops/cases/[id]
+├ ○ /ops/metrics
+├ ƒ /share/[id]
+├ ƒ /share/[id]/image
+├ ƒ /sitemap.xml
+├ ○ /status
+├ ƒ /studio/[creatorId]/[[...screen]]
+├ ƒ /studio/activation
+├ ƒ /studio/ai/[[...section]]
+├ ƒ /studio/calls/[creatorId]/[fanId]/[commitmentId]
+├ ƒ /studio/impact
+├ ƒ /studio/insights
+├ ○ /studio/launch
+├ ƒ /studio/measurement
+├ ƒ /studio/setup
+├ ƒ /studio/workspace
+├ ○ /support
+├ ○ /support/access
+├ ○ /support/feedback
+├ ○ /support/privacy
+├ ƒ /threads/[creatorId]/[fanId]
+├ ƒ /threads/[creatorId]/[fanId]/citations/[passageId]
+├ ƒ /threads/[creatorId]/[fanId]/messages/[messageId]
+├ ○ /trust
+├ ○ /trust/crisis
+├ ○ /trust/terms
+├ ƒ /unsubscribe/[token]
+├ ƒ /verify/[id]
+└ ƒ /you
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

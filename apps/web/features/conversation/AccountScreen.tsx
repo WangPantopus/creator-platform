@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import { Button, Notice, TabBar } from "@qelvora/ui-web";
+import { copy } from "@qelvora/copy";
 import type {
   ConversationPage,
   MemoryItem,
@@ -41,27 +42,62 @@ export function AccountScreen({
   useEffect(() => {
     if (creatorId && fanId) return;
     let active = true;
-    setLoading(true);
-    setError(null);
-    void request<Account>(cursor ? `account?cursor=${cursor}` : "account")
-      .then((value) => {
-        if (active) setAccount(value);
-      })
-      .catch((error) => {
-        if (active) {
-          if (
-            error instanceof ConversationError &&
-            [401, 403, 404].includes(error.status)
-          )
-            setAccount(null);
-          setError(error.message);
-        }
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
+    let revision = 0;
+    let controller: AbortController | undefined;
+    const conceal = () => {
+      revision++;
+      controller?.abort();
+      setAccount(null);
+      setLoading(false);
+    };
+    const refresh = () => {
+      conceal();
+      if (document.visibilityState !== "visible") return;
+      if (!navigator.onLine) {
+        setError("Reconnect to open your account.");
+        return;
+      }
+      const currentRevision = revision;
+      controller = new AbortController();
+      setLoading(true);
+      setError(null);
+      void request<Account>(
+        cursor ? `account?cursor=${cursor}` : "account",
+        undefined,
+        controller.signal,
+      )
+        .then((value) => {
+          if (active && revision === currentRevision) setAccount(value);
+        })
+        .catch((error) => {
+          if (active && revision === currentRevision)
+            setError(
+              error instanceof Error
+                ? error.message
+                : "Reconnect to open your account.",
+            );
+        })
+        .finally(() => {
+          if (active && revision === currentRevision) setLoading(false);
+        });
+    };
+    const offline = () => {
+      conceal();
+      setError("Reconnect to open your account.");
+    };
+    window.addEventListener("focus", refresh);
+    window.addEventListener("online", refresh);
+    window.addEventListener("offline", offline);
+    document.addEventListener("visibilitychange", refresh);
+    refresh();
     return () => {
       active = false;
+      revision++;
+      controller?.abort();
+      window.removeEventListener("focus", refresh);
+      window.removeEventListener("online", refresh);
+      window.removeEventListener("offline", offline);
+      document.removeEventListener("visibilitychange", refresh);
     };
   }, [request, cursor, attempt, creatorId, fanId]);
   if (creatorId && fanId)
@@ -73,7 +109,7 @@ export function AccountScreen({
       />
     );
   return (
-    <main className="conversation-account">
+    <main className="conversation-account" aria-busy={loading}>
       <div className="account-title">
         <h1>{account ? `@${account.fan.handle}` : "You"}</h1>
         <p className="conversation-quiet">
@@ -155,6 +191,7 @@ export function AccountScreen({
       </section>
       <section id="conversations">
         <h2>Me and privacy</h2>
+        <p className="conversation-quiet">{copy.conversationAccess}</p>
         {account?.threads.length === 0 && <p>No conversations yet.</p>}
         {account?.threads.map((thread) => (
           <article key={thread.id}>

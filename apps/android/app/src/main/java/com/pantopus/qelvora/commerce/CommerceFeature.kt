@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.pantopus.qelvora.identity.FanSession
 import com.pantopus.qelvora.identity.FanFeatureRegistration
 import com.pantopus.qelvora.ui.*
@@ -131,8 +132,10 @@ object CommerceFanFeature {
         if (current == null) { CommerceText(if (busy) "Loading commerce…" else "This information is unavailable", "display-md") }
         else when (screen) {
             "spending" -> {
-                CommerceText("Spending and time", "display-md"); CommerceText(commerceMoney(current.exposure?.captured ?: 0, current.policy.currency), "spend-total"); CommerceText("Charged this UTC calendar month", "caption")
-                current.exposure?.month?.let { CommerceText("$it · UTC", "meta") }
+                CommerceText("Spending and time", "display-md")
+                BasicText(commerceMoney(current.exposure?.captured ?: 0, current.policy.currency), style = qText("data-lg").copy(fontSize = 44.sp, lineHeight = 48.sp, color = qColor("ink")))
+                CommerceText("Charged this UTC calendar month", "caption")
+                current.exposure?.month?.let { CommerceText("$it · UTC", "data-sm") }
                 val limit = current.limits.firstOrNull { it.currency == current.policy.currency }
                 CommercePanel {
                     CommerceRow("Current limit", limit?.let { if (it.explicit_none) "No limit" else commerceMoney(it.amount?.toLongOrNull() ?: 0, it.currency) } ?: "Choose before your first paid action")
@@ -140,7 +143,7 @@ object CommerceFanFeature {
                     current.exposure?.refunded?.let { CommerceRow("Refunds recorded", commerceMoney(it, current.policy.currency)) }
                     limit?.effective_at?.let { CommerceText("Your increase takes effect ${commerceWhen(it)}.", "caption") }
                 }
-                SpendLimit(options = listOf("Choose an amount", "No limit"), selected = choice, onSelect = { choice = it })
+                SpendLimit(options = listOf("Choose an amount", "No limit"), selected = choice, remindersOn = limit?.reminders_on, onSelect = { choice = it })
                 if (choice == "Choose an amount") CommerceField("Monthly amount in ${current.policy.currency}", amount, { amount = it })
                 Button(if (reminders) "Reminders at 50% and 100% · on" else "Reminders at 50% and 100% · off", ButtonVariant.QUIET, block = true) { reminders = !reminders }
                 CommerceText("Increases take 24 hours. Decreases are immediate and affect new requests. Existing obligations remain.", "caption")
@@ -178,6 +181,9 @@ object CommerceFanFeature {
                 val name = current.creators.firstOrNull { it.id == packet.creator_id }?.display_name ?: "the creator"
                 CommerceText(packet.snapshot.title, "display-md"); RequestStatus(reqId = commerceID(packet.id), mode = packet.snapshot.title, price = commerceMoney(packet.snapshot.amount, packet.snapshot.currency), outcome = commerceOutcome(packet))
                 CommerceRow("Decision deadline", commerceWhen(packet.decision_at)); CommerceRow("Bank authorization expires", commerceWhen(packet.hold_expires_at)); value.commitment?.let { CommerceRow("Delivery deadline", commerceWhen(it.due_at)) }
+                value.callTransport?.let { transport ->
+                    Notice(title = "System · call status", children = if (transport.state == "closed_unresolved") "The call room closed after neither participant joined during the arrival window. The service outcome remains unresolved. Recorded ${commerceWhen(transport.recordedAt)}. Check the current receipt for billing status." else "Current call status is unavailable. Your recorded receipt remains available.")
+                }
                 if (packet.state == "more_info") {
                     CommerceText(packet.question ?: "The creator asked for more information."); CommerceField("Your answer", info, { info = it }, 4)
                     Button("Send answer", ButtonVariant.SECONDARY, block = true, disabled = busy || info.isBlank()) { scope.launch { mutate("packets/${packet.id}/info", buildJsonObject { put("version", packet.version); put("text", info) }, "Your answer is saved.") } }
@@ -186,7 +192,13 @@ object CommerceFanFeature {
                 if (packet.payment_state in listOf("unknown", "requires_action")) Notice(title = "Payment processing", children = "The provider must confirm payment. No completion is inferred from this screen.")
                 if (value.commitment?.delivered_at != null && value.commitment.state in listOf("delivered", "refunded", "resolved")) {
                     val signedActId = value.commitment.evidence?.signedActId ?: value.commitment.accept_act_id
-                    val label = if (value.commitment.evidence?.authorKind == "approved_draft") "Prepared by AI · approved by $name" else "${packet.snapshot.title} · personally fulfilled by $name"
+                    val label = when (value.commitment.evidence?.authorKind) {
+                        "approved_draft" -> "Prepared by AI · approved by $name"
+                        "human_creator" -> "${packet.snapshot.title} · personally fulfilled by $name"
+                        "human_call" -> "Personal call · provider-confirmed outcome"
+                        "system" -> "System delivery notice"
+                        else -> "Delivery recorded"
+                    }
                     val refund = value.ledger.filter { it.kind == "refund" && it.currency == packet.snapshot.currency }.sumOf { it.amount.toLong() }
                     val rows = listOf("Charged" to commerceMoney(packet.snapshot.amount, packet.snapshot.currency), "Delivered" to commerceWhen(value.commitment.delivered_at)) + if (refund > 0) listOf("Refund confirmed" to commerceMoney(refund, packet.snapshot.currency)) else emptyList()
                     if (signedActId != null) Receipt(name = name, reqId = commerceID(packet.id), title = packet.snapshot.title, rows = rows, label = label, onVerify = { session.destination = "/verify/$signedActId" })
@@ -200,7 +212,10 @@ object CommerceFanFeature {
                 current.memberships.forEach { member -> CommercePanel { CommerceText(member.name, "title"); CommerceRow("Status", member.state); CommerceRow("Access until", commerceWhen(member.period_end)); CommerceRow("Billing provider", member.provider) } }
                 val accountId=session.session?.accountId
                 if(current.capabilities.storePurchasesAvailable && api!=null && accountId!=null) StoreMembershipPane(context,accountId,api,current.tiers.filter {it.state=="active"}.mapNotNull {it.catalog.google}) {refresh()}
-                else Notice(title = "Purchase and restore unavailable", children = "Store products must be configured and verified by the server before access is granted.")
+                else {
+                    Notice(title = "Purchase and restore unavailable", children = "Store products must be configured and verified by the server before access is granted.")
+                    if(current.memberships.any {it.provider=="google"}) key(accountId) {StoreSubscriptionManagement(context)}
+                }
                 CommerceText("Unused memberships cancelled within seven days qualify for a full refund. Later refunds follow the remaining paid period; store refunds follow that store's process.", "caption")
             }
             "pass" -> {

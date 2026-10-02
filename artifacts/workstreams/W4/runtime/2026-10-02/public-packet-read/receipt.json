@@ -1,0 +1,38 @@
+{
+  "recordedAt": "2026-10-02T07:14:05.260996+00:00",
+  "migration": "0070_w4_public_packet_read",
+  "sqlSha256": "0b11d09a2dcd11cbbe715d1dccf90185270e277fea7ce6f8eabe27a36e30d4b8",
+  "state": "implemented source proposal; unregistered, unapplied, unmounted; not runtime accepted",
+  "validation": [
+    "Exact DDL compiled with content media prerequisite inside outer rollback on owned review clone",
+    "Unscoped mode function returned NULL and unscoped evidence returned no rows",
+    "Runtime has no membership in metadata role",
+    "Full inner evidence query plans under creator_commerce_public_read with column-only grants and exact published-tuple policies",
+    "Final backend typecheck, changed-file lint and formatting pass including six trigger readiness checks and separate bounded-page positive preparation",
+    "Actual PG17 non-owner mode/packet advisory metadata probe: try-shared refuses both held exclusive keys and acquires both after release; no business rows touched"
+  ],
+  "authoritiesRequired": [
+    "W8 0076 exact original-participant negative authority before content locks",
+    "W1 actual signed-source shared lease with exclusive withdrawal/key/profile fences, acquired last",
+    "W5 early metadata preparation and actual audience-before-final-reader integration",
+    "For lists/multiple proofs: all candidate content/quote/audience and W4 preparePositive mode/packet fences before the first final signature gate"
+  ],
+  "behavior": [
+    "Retains actual account/session and exact same-client transaction tuple binding",
+    "Separate owner publication permission and viewer permission",
+    "Current captured/delivered commitment and genuine capture ledger required; pending/confirmed refund or dispute denies",
+    "Current original public consent or explicit share grant and mode sharing required; revocation cannot revive",
+    "Exact consumed creator publication command/version and actual acceptance/delivery signatures required",
+    "Actual group service requires durable SYSTEM message and exact published group evidence; no publication inference from a draft",
+    "Shared mode then packet fence; no packet FOR SHARE row locks underneath; final source lease last",
+    "No private packet disclosure, fan identity, credential bytes, assertion or payment reference returned",
+    "Separate preparePositive holds every mode/packet fence before final read; final read takes no session/domain/advisory lock, and further preparation in that transaction is rejected",
+    "All-page mode/packet contention throws retryable503 without waiting below earlier content/domain locks or returning a successful empty page"
+  ],
+  "notVerified": [
+    "Positive original creator/fan/viewer journeys",
+    "Concurrent sharing/refund/mode/key/withdrawal/deletion races",
+    "Provider, paid receipt, group fulfillment, guaranteed review or qualified-read producer acceptance",
+    "Canonical fresh-install/preserved-data activation"
+  ]
+}

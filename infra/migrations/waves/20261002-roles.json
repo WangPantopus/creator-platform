@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "postgresMajor": 17,
+  "sourceWave": "20261002",
+  "functions": [
+    {
+      "name": "creator.discover_media_jobs(text, integer)",
+      "sha256": "d2dbff89dd7fcfab01371aa725563fe74e584bc9cd378c730b2897f7c02d9295",
+      "owner": "creator_media_discovery",
+      "grants": [
+        "creator_media_discovery=X/creator_media_discovery",
+        "creator_media_worker=X/creator_media_discovery"
+      ]
+    },
+    {
+      "name": "creator_trust.denial_projection(uuid, uuid, uuid, uuid)",
+      "sha256": "60101e93637847ff5b89c85ad8cca549109d37920b4d6e5c7122c020e3950e7c",
+      "owner": "creator_trust_denial",
+      "grants": ["creator_trust_denial=X/creator_trust_denial"]
+    },
+    {
+      "name": "creator_trust.lock_denial_change()",
+      "sha256": "82a6a103e36ff604a39eb6b8c4ab5d43f6184ae77aa9a241956fa90aa176d57e",
+      "owner": "creator_trust_denial",
+      "grants": ["creator_trust_denial=X/creator_trust_denial"]
+    },
+    {
+      "name": "creator_trust.media_worker_denial(text, uuid, uuid, uuid)",
+      "sha256": "fef13034dbd91d22b305c271c78a7854cad8b1633d960e323dcbb1a673d0f877",
+      "owner": "creator_trust_denial",
+      "grants": [
+        "creator_media_worker=X/creator_trust_denial",
+        "creator_trust_denial=X/creator_trust_denial"
+      ]
+    },
+    {
+      "name": "creator_trust.runtime_audience_denial(uuid, uuid)",
+      "sha256": "e0524aed0fbf710030bb2afbfb0b146939c5d160a229f234814244177ec925a8",
+      "owner": "creator_trust_denial",
+      "grants": [
+        "creator_runtime=X/creator_trust_denial",
+        "creator_trust_denial=X/creator_trust_denial"
+      ]
+    },
+    {
+      "name": "creator_trust.runtime_creator_denial(uuid)",
+      "sha256": "1b9921307af4abfb73baf3fec0aaccca6459b5c9ee9bc42de22e5d6c2dd46d70",
+      "owner": "creator_trust_denial",
+      "grants": [
+        "creator_runtime=X/creator_trust_denial",
+        "creator_trust_denial=X/creator_trust_denial"
+      ]
+    },
+    {
+      "name": "creator_trust.runtime_thread_denial(uuid, uuid)",
+      "sha256": "b305ccf0c7bcea9311e76f3ef59d758cafff64378ece159ac51e83b904fffaae",
+      "owner": "creator_trust_denial",
+      "grants": [
+        "creator_runtime=X/creator_trust_denial",
+        "creator_trust_denial=X/creator_trust_denial"
+      ]
+    }
+  ]
+}

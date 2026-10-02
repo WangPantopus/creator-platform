@@ -1,0 +1,174 @@
+{
+  "observedAt": "2026-10-01T10:26:08.132853+00:00",
+  "sourceCommit": "3867b74ff3d80d041dd0552ae5c33422a17c09ea",
+  "baseCommit": "2f0319dbb6979878c5a9019e68503506902f9ea0",
+  "worktree": "/Users/yingpengwang/.codex/worktrees/6438/creator-platform",
+  "branch": "codex/w6-isolated-recovery-20261001",
+  "pr": "https://github.com/WangPantopus/creator-platform/pull/19",
+  "prState": "draft",
+  "wholeWorkstreamComplete": false,
+  "newTestCasesFilesSuitesHarnesses": 0,
+  "subagents": 0,
+  "paidAiRequests": 0,
+  "checks": {
+    "localCompleteCheck": {
+      "status": "passed",
+      "databaseTests": 18,
+      "databaseDurationSeconds": 270.41,
+      "actual10kPairBudgetChanged": false,
+      "productionBuilds": "passed"
+    },
+    "precedingConcurrentCheck": {
+      "status": "failed",
+      "passed": 17,
+      "failed": 1,
+      "failure": "Original T11 10,000-pair case exceeded 300 seconds during simultaneous native/visual builds; preserved unchanged"
+    },
+    "android": {
+      "status": "passed",
+      "cases": 19,
+      "snapshots": 8,
+      "delivery": 9,
+      "generatedContracts": 2,
+      "durationSeconds": 545,
+      "skips": 0
+    },
+    "iosModuleBuild": {
+      "status": "passed",
+      "architectures": ["arm64", "x86_64"],
+      "signing": false,
+      "deviceAcceptance": false
+    },
+    "swift": {
+      "functionalPassed": 15,
+      "snapshotCasesFailed": 3,
+      "strictImageFailures": 110,
+      "snapshotDurationSeconds": 98.419,
+      "allCasesDurationSeconds": 98.58,
+      "referencesChangedAgainstMain": false
+    },
+    "web": {
+      "passed": 11,
+      "failed": 2,
+      "durationMinutes": 11.5,
+      "failures": [
+        "Welcome Light: one perceptual pixel",
+        "Handle Light: one perceptual pixel"
+      ],
+      "thresholdsOrReferencesChanged": false
+    },
+    "ci": {
+      "run": 36846723576,
+      "headSha": "3867b74ff3d80d041dd0552ae5c33422a17c09ea",
+      "backendWeb": "passed",
+      "backendCases": 18,
+      "backendDurationSeconds": 40.22,
+      "androidRuntime": "passed",
+      "iosFoundation": "queued",
+      "androidFoundation": "queued",
+      "webVisual": "queued"
+    }
+  },
+  "observedUi": {
+    "source": "3867b74ff3d80d041dd0552ae5c33422a17c09ea",
+    "mode": "Explicit loopback development host; development API with non-owner role",
+    "viewport": [390, 844],
+    "themes": ["light", "night"],
+    "keyboardRecord": "observed pending permission request in both themes",
+    "keyboardCancel": "observed Record focus and 0:00 restored in both themes",
+    "actualAudioCaptured": false,
+    "uploadSignPublishPlaybackAccepted": false,
+    "productionNavigationAttempt": "Configured HTTP application origin was rejected by production HTTPS guard; browser navigation was blocked. Guard preserved; no production acceptance claimed."
+  },
+  "runtime": {
+    "activeMigrationCount": 40,
+    "reservedW6MigrationsActivated": false,
+    "capabilities": {
+      "mediaAvailable": false,
+      "creatorMediaAvailable": false,
+      "creatorMediaAudienceAvailable": false,
+      "callsAvailable": false,
+      "aiAudioAvailable": false,
+      "reason": "media_unconfigured"
+    },
+    "role": {
+      "name": "creator_runtime",
+      "superuser": false,
+      "bypassRls": false,
+      "creatorRelationsOwned": 0
+    },
+    "androidReadOnlyInventory": [
+      {
+        "port": 5037,
+        "devices": []
+      },
+      {
+        "port": 5051,
+        "devices": []
+      },
+      {
+        "port": 5044,
+        "devices": [
+          {
+            "kind": "emulator",
+            "state": "device"
+          }
+        ]
+      }
+    ],
+    "physicalIphoneObserved": false,
+    "nativeUiAutomationAvailable": false,
+    "iosReadOnlyInventory": {
+      "commandExit": 0,
+      "physicalDeviceCandidates": 0,
+      "simulatorEntries": 15,
+      "deviceIdentifiersRetained": false
+    }
+  },
+  "resources": {
+    "containerName": "creator-platform-w6-isolated-20261001",
+    "exactContainerId": "c8c4ace141a0d95e8517d83aa187445f260a325bf9ea8c8b685e7f78e90bf70c",
+    "exclusiveVolume": "creator-platform-w6-isolated-20261001",
+    "databasePort": 55436,
+    "runtimeDatabase": "creator_w6_isolated_runtime_test",
+    "status": "normally stopped, exit0; volume and databases retained; all five leased TCP ports have no listener",
+    "privateTemporaryKeysRemoved": true,
+    "ownedDeviceLeases": 0,
+    "peerResourcesChanged": false,
+    "cleanupObservedAt": "2026-10-01T10:30:31.572819+00:00"
+  },
+  "logs": {
+    "serial": {
+      "path": "/tmp/qelvora-w6-resume-20261001/reconciled-serial-check.log",
+      "sha256": "6bcaa35f5bbf6178b0c3388621681fdf2642a3dda93bab6caf1be7bdaae42506"
+    },
+    "concurrent": {
+      "path": "/tmp/qelvora-w6-resume-20261001/reconciled-check.log",
+      "sha256": "a9290d8b3f505a0b5b690dfef48217afa4310fcef7546f44efe3e4362aedba1e"
+    },
+    "android": {
+      "path": "/tmp/qelvora-w6-resume-20261001/android-reconciled.log",
+      "sha256": "fa2f586adabb5092a22bb5231a215ed358407e138f6e362f6ce135a0cb7427d9"
+    },
+    "ios": {
+      "path": "/tmp/qelvora-w6-resume-20261001/ios-library-reconciled.log",
+      "sha256": "4297eec64ba6cd968032825f92d90a3a704eda76fd9d1548b2052787c762e1bb"
+    },
+    "swift": {
+      "path": "/tmp/qelvora-w6-resume-20261001/swift-reconciled.log",
+      "sha256": "84c12dc8c723230fa29fe7e642b2953c1b7b6a9b8b025b661258d660a6071cbc"
+    },
+    "web": {
+      "path": "/tmp/qelvora-w6-resume-20261001/web-visual-reconciled.log",
+      "sha256": "1b9c14da87fd115d252737403b2ae944b19d41e83858cdc428fdd997ef414634"
+    },
+    "ciBackend": {
+      "path": "/tmp/qelvora-w6-resume-20261001/current-ci-backend.log",
+      "sha256": "786d48bc13aee8e62d6cfb33b43a772d977052e053399533d424edf86efd08e1"
+    },
+    "migrations": {
+      "path": "/tmp/qelvora-w6-resume-20261001/runtime-migrations.log",
+      "sha256": "59d1d596271960f3248b45ea2153bf250ff9e45e35735acf294d5197f7effc4e"
+    }
+  }
+}
