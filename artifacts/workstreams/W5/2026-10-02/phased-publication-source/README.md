@@ -12,6 +12,10 @@ The controller port matches W4's proposed sealed owner graph: `prepare(client, a
 
 Only metadata and COMMIT follow the real final gate. No fan/thread Actor is manufactured, and the delivered-packet viewer source graph is not used as owner authority. Quote-source projection remains unavailable pending its genuine original-fan authority and retraction producer.
 
+Replay source `6adea1cd26d514d5751d31838c730f4e8353e1e1` personally adds a bounded `onReplay` callback used only by publication. After validating the actual idempotency request hash, it reacquires the current content lock, checks the version/state and original author/signature receipt, verifies the stored source tuple and exact processed media evidence, and reruns current publication validation including W4's staged packet permission. The existing final source gate still runs last. Replays neither consume the signature again nor create domain/idempotency writes. Unpublished, archived or changed revisions cannot return the old receipt as a current grant. Text-only replay does not require the future media-evidence column.
+
+Backend type checking and targeted lint/format checks passed at replay source. Actual paid/signed replay and contention acceptance remain unverified until W4's genuine controller and the required canonical authority wave are configured.
+
 Runnable: backend type checking and targeted lint/format checks passed at this source. The actual held W5 development host launched with its real Trust composition; its current scope remains unavailable because the required future denial projection has not been activated.
 
 Integrated: W1's actual post-write challenge hook is consumed and the W5 policy calls it. W4 was sent the exact matching consumer port. W4's actual sealed controller and W1's original-acceptance signer gate are not configured here yet, and no reserved SQL was activated. Their absence refuses packet review/signing/publication; it cannot create a positive receipt.
