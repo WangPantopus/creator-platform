@@ -143,7 +143,7 @@ object CommerceFanFeature {
                     current.exposure?.refunded?.let { CommerceRow("Refunds recorded", commerceMoney(it, current.policy.currency)) }
                     limit?.effective_at?.let { CommerceText("Your increase takes effect ${commerceWhen(it)}.", "caption") }
                 }
-                SpendLimit(options = listOf("Choose an amount", "No limit"), selected = choice, onSelect = { choice = it })
+                SpendLimit(options = listOf("Choose an amount", "No limit"), selected = choice, remindersOn = limit?.reminders_on, onSelect = { choice = it })
                 if (choice == "Choose an amount") CommerceField("Monthly amount in ${current.policy.currency}", amount, { amount = it })
                 Button(if (reminders) "Reminders at 50% and 100% · on" else "Reminders at 50% and 100% · off", ButtonVariant.QUIET, block = true) { reminders = !reminders }
                 CommerceText("Increases take 24 hours. Decreases are immediate and affect new requests. Existing obligations remain.", "caption")
