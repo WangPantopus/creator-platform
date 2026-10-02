@@ -11022,6 +11022,28 @@
           }
         }
       }
+    },
+    "Development identity": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Development identity"
+          }
+        }
+      }
+    },
+    "Synthetic local account. Pantopus production sign-in is not connected.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synthetic local account. Pantopus production sign-in is not connected."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

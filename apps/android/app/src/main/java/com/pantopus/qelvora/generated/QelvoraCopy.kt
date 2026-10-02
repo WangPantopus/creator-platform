@@ -1017,7 +1017,9 @@ object QelvoraCopy {
     "growthSpendingLimitReached" to "You've reached {percent}% of your monthly limit.",
     "w1CallLookupTitle" to "Your call",
     "w1CallLookupChecking" to "Checking the booking and your current access…",
-    "w1CallLookupUnavailable" to "This call could not be opened. Retry, or open Requests to check its current status."
+    "w1CallLookupUnavailable" to "This call could not be opened. Retry, or open Requests to check its current status.",
+    "identityDevelopmentTitle" to "Development identity",
+    "identityDevelopmentBody" to "Synthetic local account. Pantopus production sign-in is not connected."
   )
   private val variables = Regex("""\{([^}]+)\}""")
   fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }

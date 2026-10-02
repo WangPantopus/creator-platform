@@ -239,3 +239,27 @@ Personally inspected and normally integrated W8 a5383ea2 ancestry. Identity, med
 ### W1 — recover one-ID call destinations through current account authority (October 2)
 
 All three shipping clients now recognize the canonical `/calls/:sessionId` destination. They request only the genuine W6 account-bound navigation operation, validate the returned exact call ID and family, then enter the existing independently authorized call screen. Native lookups bind the original issuer credential, account, session, destination and cancellation state; a departed or rotated response cannot navigate. Web mounts both short and existing full call routes inside the actual identity/media cancellation boundary, preserves the sign-in/restore destination and refuses invalid selectors. The shared Next dynamic segment is reused so adding the short route cannot conflict with the existing long route. No Fan enrollment exception, participant default, provider admission, policy or migration activation is added. Missing metadata remains an explicit Retry/Open Requests state. Shared copy uses the existing component and typography system. Current web types and scoped lint pass; shipping compilation and personal refusal/positive journey evidence follow.
+
+
+### W1 October 2 — actual call fallback, Requests and native Notice
+
+One-ID navigation resolves only through the current authenticated account and original cancellation boundary; navigation metadata never admits a call. Personally operating its fallback exposed the missing canonical web Requests route. Mount the existing Requests feature under the same real session boundary and preserve the sign-in destination rather than inventing request/price rows. Development accounts stay explicitly labelled on both lookup and canonical Requests. The actual unavailable Commerce result is accepted only as truthful failure handling, not positive commerce acceptance.
+
+A genuine iOS largest-text screenshot exposed Notice title/body truncation. Preserve width-sensitive wrapping and give both Text views their vertical intrinsic size; normal shipping compilation/signature and all3 existing native snapshot checks pass at unchanged references/tolerances; personal largest-text operation remains required. PR21 macOS SwiftPM additionally needs its existing platform-aware capitalization helper for availability fields. Original snapshots, thresholds and hosted runner pins stay unchanged. The observed Android API34 image ZIP failure receives exactly the existing once-only retry for that known archive error; other errors remain fatal, and both runtime package manifests must exist. No security/SDK integrity/test gate is relaxed.
+
+
+### W1 October 2 — current main53133967 reconciliation
+
+Normal main integration preserves W1 strict request/session custody, terminal catalogue checks, canonical61 and all corrected0151–0201 held allocations. Resolve the older main privacy adapter in favor of actual same-client task/restoration/cancellation bookends; keep both dated W8 reports and exact closed0201 qualification. W5 current Note tenure/mute UI is personally source-reviewed, uses genuine current account/creator tuple and validated paid-history metadata, defaults to4000 while higher policy is unavailable, and preserves over-limit input for shortening. Its owner personal receipts do not become W1 acceptance. Canonical12/102 generation, web/backend types, scoped lint and original backend contracts qualify this integration; new native personal acceptance remains open.
+
+
+### W1 October2 — original Actor custody and ninth terminal executable
+
+Remove remaining Database scope-derived adult Actors by retaining AccessService's actual original caller object privately. Requests must also match the actual current session Actor and held client through restriction and COMMIT bookends. Preserve separately scoped host callbacks without granting request bootstrap to them. A copied account tuple is metadata, not an Actor. Actual18 existing checks pass on separate disposable PostgreSQL17/71.03s including startup and normal cleanup; no retained data/role credentials are touched.
+
+Extend the finite terminal registry by exactly one reviewed W3 terminal-only owner/signature/source contract (0203, SQL8de1897f, originalScopeBridge=false, max9). The original immutable0193/0110 source and input authority stay intact. W3's missingBEGIN factory bug is recorded and will be consumed only after its actual owner correction. No current terminal/provider/financial success or activation follows from types or existing tests.
+
+
+### W1 October2 — actual W6 purpose custody composition
+
+Personally reviewed actualW6 550e0562: exact original registered SQL/definition/role/ACL and same-client catalogue bookends govern media and callback purposes; held0201 reads only version/checksum and remains unactivated. Consume genuine held request Actors in CreatorIdentityAuthority/AudienceIdentityAuthority before positive profile leases. Runtime identity retains exact creator/content denial and audience references. Root composes prepared InteractiveCallControl before constructing original media denials, while preserving the complete W1 Growth separate-pool, canonical Home/Pass, review, privacy owners, original actors and shutdown graph. No bare function presence, optional replacement callback, worker Actor or metadata-only reservation advertises readiness. Backend types/scoped lint/original9 contracts pass on the combined source; current app/positive purpose acceptance remains open.

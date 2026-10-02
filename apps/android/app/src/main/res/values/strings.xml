@@ -1019,4 +1019,6 @@
   <string name="w1_call_lookup_title" formatted="false">Your call</string>
   <string name="w1_call_lookup_checking" formatted="false">Checking the booking and your current access…</string>
   <string name="w1_call_lookup_unavailable" formatted="false">This call could not be opened. Retry, or open Requests to check its current status.</string>
+  <string name="identity_development_title" formatted="false">Development identity</string>
+  <string name="identity_development_body" formatted="false">Synthetic local account. Pantopus production sign-in is not connected.</string>
 </resources>
