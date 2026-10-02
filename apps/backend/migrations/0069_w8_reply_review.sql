@@ -10,7 +10,7 @@ GRANT USAGE ON SCHEMA creator,creator_trust TO creator_trust_reply_projection;
 GRANT SELECT(id,account_id) ON creator.fan_profile TO creator_trust_reply_projection;
 GRANT SELECT(id,account_id,display_name,verification,recovery_required) ON creator.creator_profile TO creator_trust_reply_projection;
 GRANT SELECT(id,account_id,revoked_at,expires_at) ON creator.identity_session TO creator_trust_reply_projection;
-GRANT SELECT(id,creator_id,kind,state,withdrawn_at) ON creator.content_index TO creator_trust_reply_projection;
+GRANT SELECT(id,creator_id,version,kind,state,withdrawn_at) ON creator.content_index TO creator_trust_reply_projection;
 GRANT SELECT(content_id,creator_id,version,signed_act_id,author_kind,published_at) ON creator.content_publication TO creator_trust_reply_projection;
 GRANT SELECT(id,content_id,creator_id,fan_id,version,text,created_at,withdrawn_at),UPDATE(version)
  ON creator.content_reply TO creator_trust_reply_projection;
