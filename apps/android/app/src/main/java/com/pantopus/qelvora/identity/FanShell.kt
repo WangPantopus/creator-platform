@@ -40,6 +40,8 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     fun currentToken(): String? = storage.read()
     val api = baseURL?.let { CreatorAPIClient(it) { storage.read() } }
     var session by mutableStateOf<APISession?>(null); private set
+    var hasSavedCredential by mutableStateOf(false); private set
+    var checkingSession by mutableStateOf(baseURL != null); private set
     var destination by mutableStateOf(if (ApplicationDestination.isPermitted(returnTo)) returnTo else "/home")
     var error by mutableStateOf("")
     var busy by mutableStateOf(false)
@@ -50,13 +52,14 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     var arrival by mutableStateOf<ArrivalContext?>(null); private set
     private var generation = 0
     private var rotatingCredential = false
+    private var refreshingSession = false
     private var removedArrivalFor: String? = null
     suspend fun purge(): Boolean = withContext(NonCancellable) {
         if (purgingPrivateState) return@withContext false
         val pushCredential = runCatching { currentToken() }.getOrNull()
         purgingPrivateState = true; localPurgeFailed = true
         try {
-            generation++; session = null; actors = emptyList(); choosingActor = false; error = ""
+            generation++; session = null; hasSavedCredential = false; checkingSession = false; actors = emptyList(); choosingActor = false; error = ""
             GrowthPush.clearSession(context, pushCredential)
             var cleared = true
             try { storage.save(null) } catch (_: Exception) { cleared = false }
@@ -67,15 +70,28 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         } finally { purgingPrivateState = false }
     }
     suspend fun refresh() {
-        if (rotatingCredential || purgingPrivateState) return
-        val client = api ?: return; val current = generation
-        val token = try { currentToken() } catch (_: Exception) { if (current == generation && purge()) error = QelvoraCopy.text("identitySessionReadFailed"); return }
-        if (current != generation) return
-        if (token == null) { if (session != null) purge(); return }
-        try { val value = client.identitySession(); if (current != generation) return; if (session?.accountId != null && session?.accountId != value.accountId) { if (purge()) error = "The account changed. Continue with Pantopus again."; return }; session = value; error = "" }
-        catch (failure: CreatorAPIError) { if (current != generation) return; if (failure.status == 401) { if (!busy) refreshCredentials() else { if (purge()) error = "Your session ended. Continue with Pantopus again." } } else error = message(failure) }
-        catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+        if (rotatingCredential || refreshingSession || purgingPrivateState) return
+        val client = api ?: run { checkingSession = false; return }
+        val current = generation
+        refreshingSession = true; checkingSession = true
+        try {
+            val token = try { currentToken() } catch (_: Exception) { if (current == generation && purge()) error = QelvoraCopy.text("identitySessionReadFailed"); return }
+            if (current != generation) return
+            hasSavedCredential = token != null
+            if (token == null) { if (session != null) purge(); return }
+            val value = client.identitySession()
+            if (current != generation) return
+            if (session?.accountId != null && session?.accountId != value.accountId) { if (purge()) error = "The account changed. Continue with Pantopus again."; return }
+            session = value; error = ""
+        } catch (failure: CreatorAPIError) {
+            if (current != generation) return
+            if (failure.status == 401) {
+                if (!busy) { refreshingSession = false; refreshCredentials() }
+                else { if (purge()) error = "Your session ended. Continue with Pantopus again." }
+            } else error = message(failure)
+        } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (_: Exception) { if (current == generation) error = "Reconnect to refresh your account. Actions are unavailable while offline." }
+        finally { refreshingSession = false; checkingSession = false }
     }
     suspend fun loadArrival() {
         val snapshot = destination; arrival = null; val origin = baseURL ?: return
@@ -167,7 +183,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
     }
     LaunchedEffect(returnTo, destinationDelivery) { model.open(returnTo) }
     LaunchedEffect(model.destination) { model.loadArrival() }
-    LaunchedEffect(model, foreground) { if (foreground) { model.refresh(); while (true) { delay(4000); if (!model.choosingActor && !model.busy) model.refresh() } } }
+    LaunchedEffect(model, foreground) { if (foreground) { model.refresh(); while (true) { delay(4000); if (!model.choosingActor && !model.busy && (model.session != null || model.hasSavedCredential)) model.refresh() } } }
     LaunchedEffect(model.session) { GrowthPush.refresh(context) }
     LaunchedEffect(notificationID, destinationDelivery, model.session?.accountId) {
         val id = notificationID ?: return@LaunchedEffect
@@ -190,6 +206,12 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                 Button("Cancel", ButtonVariant.QUIET) { model.choosingActor = false }
             }
             model.session == null && features.any { it.matches(model.destination) && it.allowsSignedOut(model.destination) } -> key(model.destination, destinationDelivery) { features.first { it.matches(model.destination) && it.allowsSignedOut(model.destination) }.screen(model) }
+            model.session == null && model.hasSavedCredential -> Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                BasicText(QelvoraCopy.text(if (model.checkingSession && model.error.isEmpty()) "growthLoading" else "accountUnavailableTitle"), style = qText("display-md").copy(color = qColor("ink")), modifier = Modifier.semantics { heading() })
+                BasicText(QelvoraCopy.text("accountUnavailableBody"), style = qText("body").copy(color = qColor("ink-muted")))
+                Button(QelvoraCopy.text("retry"), ButtonVariant.SECONDARY, block = true, disabled = model.busy || model.checkingSession) { scope.launch { model.refresh() } }
+            }
+            model.session == null && model.checkingSession -> BasicText(QelvoraCopy.text("growthLoading"), style = qText("body").copy(color = qColor("ink")), modifier = Modifier.padding(16.dp))
             model.session == null -> Welcome(returnTo = model.destination, showContext = model.arrival != null, contextSource = model.arrival?.source, contextTitle = model.arrival?.title, bodyCopy = model.arrival?.let { "Every message says who wrote it: ${it.creatorName}'s AI, ${it.creatorName}, or their team. You'll always know which." } ?: "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext = model::removeArrival, onContinue = { scope.launch { model.beginSignIn() } })
             model.session?.fan == null && features.any { it.matches(model.destination) && it.allowsSignedOut(model.destination) } -> key(model.session?.accountId, model.destination) { features.first { it.matches(model.destination) && it.allowsSignedOut(model.destination) }.screen(model) }
             model.session?.fan == null || model.destination == "/onboarding/handle" -> HandleForm(model)
