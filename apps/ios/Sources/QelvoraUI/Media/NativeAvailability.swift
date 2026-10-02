@@ -88,7 +88,8 @@ private struct NativeAvailability: View {
             try Task.checkCancellation()
             guard scene == .active, Date() < started.addingTimeInterval(5), value == nil || (value?.creatorId == creator && (value?.version ?? 0) > 0 && (value?.windows.count ?? 0) <= 64) else { throw URLError(.badServerResponse) }
             freshUntil = started.addingTimeInterval(5); fresh = true
-            if replace || !loaded {
+            if notice == QelvoraCopy.text("w6AvailabilityCouldNotBeLoaded") { notice = nil }
+            if replace || !loaded || (!dirty && command == nil && value?.version != current?.version) {
                 current = value; zone = value?.timeZone ?? TimeZone.current.identifier; windows = value?.windows ?? []; loaded = true; notice = nil
             }
         } catch is CancellationError { return }
