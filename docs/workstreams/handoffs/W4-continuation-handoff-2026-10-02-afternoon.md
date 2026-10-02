@@ -1,5 +1,15 @@
 # W4 primary continuation handoff — October 2, 2026 afternoon
 
+## Founder-requested resource cleanup — read before restart
+
+After PR191 merged, the founder authorized permanent disposal of W4 resources that do not affect future work. Both obsolete W4 checkouts were verified clean and contained in the pushed/merged handoff before removal: `w4-store-recovery-refresh` was removed through Codex archive (small Git recovery snapshot retained), and `workstream-4-commerce-lifecycle-d07a78` through `git worktree remove`; its exact head matches pushed/merged PR64. Four stopped, exclusively owned review containers and their nonshared volumes were deleted: privacy live-restore, upgrade, fresh-wave and generation-review. **These review resources no longer exist; recreate isolated qualification copies when needed.** Docker images are shared with other streams and retained.
+
+The active `f402/creator-platform` checkout remains as the successor's documented workspace. All source/evidence remains tracked and pushed. Its ignored dependency installations, four Next outputs, backend dist, local Android Gradle cache, generated Xcode project and TypeScript build cache were removed, as were private `ios-derived` and `android-build`. The checkout fell from approximately1.4GiB to246MiB and private scratch from1.4GiB to30MiB. Allocated folder sizes can include shared hardlinks/APFS extents; they are not a claim of exclusive host bytes reclaimed.
+
+**Before using the existing launch commands, run `pnpm install --frozen-lockfile` from the checkout. Regenerate Xcode with `xcodegen generate --spec apps/ios/project.yml`, then normally build/sign/install; rebuild Android/Next/backend outputs as required.** Private build output paths in historical receipts are intentionally gone. Shared pnpm/Gradle/Xcode/SDK/toolchain installations were not purged; native simulator/AVD data is retained for the real return journeys. No new runtime verification is inferred from cleanup.
+
+The stopped canonical61 Docker container/volume, stable private API/web configuration, original/current database backups, proof evidence, operational helper scripts and committed screenshots are preserved. Current backup SHA remains `c1d7203d176b694431a2aae74e1bbd585385bf4b6d117dedd8d7d5a5e324e201`. The current cleanup branch supersedes the prior handoff branch for the resource addendum; inspect its containing commit/PR. See [sanitized deletion and preservation receipt](../../../artifacts/workstreams/W4/runtime/2026-10-02/resource-cleanup/receipt.json). No peers' resources were touched.
+
 This is the successor checkpoint requested by the founder. The original **nine packages and R01–R15 remain assigned and incomplete**. This checkpoint preserves implemented source and personally operated development acceptance; it does not mark the workstream complete or release-ready. Read this document before older handoffs: their forty/fifty-seven migration counts, pending synthetic review and old PR tables are historical.
 
 ## Read in order
