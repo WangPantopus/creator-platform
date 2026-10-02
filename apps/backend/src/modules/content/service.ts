@@ -131,6 +131,11 @@ export interface ContentDependencies {
     packetId: string,
   ) => Promise<boolean>;
   /** W4 viewer permission is distinct from creator publication authority. */
+  preparePublicPacketRead?: (
+    client: PoolClient,
+    actor: Actor,
+    input: { creatorId: string; contentId: string },
+  ) => Promise<void>;
   publicPacketRead?: (
     client: PoolClient,
     actor: Actor,
@@ -506,7 +511,30 @@ export class ContentService {
     );
     return result;
   }
-  async index(client: PoolClient, creatorId: string, id: string, lock = false) {
+  /** W4 resolves only packet-family metadata and holds original-fan negatives
+   * before W5 object locks. Its final reader must validate this exact client,
+   * current content/version and its own opaque preparation; this is no grant.
+   */
+  async prepareReadInTransaction(
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+    contentId: string,
+  ) {
+    await this.dependencies.preparePublicPacketRead?.(client, actor, {
+      creatorId,
+      contentId,
+    });
+  }
+  async index(
+    client: PoolClient,
+    creatorId: string,
+    id: string,
+    lock = false,
+    reader?: Actor,
+  ) {
+    if (reader)
+      await this.prepareReadInTransaction(client, reader, creatorId, id);
     // Fan RLS deliberately cannot FOR SHARE an index row. Shared object locks
     // fence reads against all W5 mutations without widening its UPDATE policy.
     await client.query(
@@ -555,17 +583,21 @@ export class ContentService {
       if (!consent?.share_text || consent.version !== row.quote_consent_version)
         return false;
     }
-    if (
-      row.packet_id &&
-      !(await this.dependencies.publicPacketRead?.(client, actor, {
+    // Complete actual audience authority before the final W4 source fence.
+    // No later view enrichment may acquire new identity locks for this read.
+    if (!(await this.audienceEligible(client, actor, row))) return false;
+    return (
+      !row.packet_id ||
+      (await this.dependencies.publicPacketRead?.(client, actor, {
         creatorId: row.creator_id,
         packetId: row.packet_id,
         contentId: row.id,
         contentVersion: row.version,
         audience: row.audience,
-      }))
-    )
-      return false;
+      })) === true
+    );
+  }
+  private async audienceEligible(client: PoolClient, actor: Actor, row: Index) {
     if (row.audience.kind === "public") return true;
     const fan = (
       await client.query(
@@ -626,6 +658,7 @@ export class ContentService {
     client: PoolClient,
     actor: Actor,
     row: Index,
+    authoring = true,
   ): Promise<ContentView> {
     const revision = (
       await client.query(
@@ -692,13 +725,14 @@ export class ContentService {
       signedActId: publication?.signed_act_id ?? null,
       publishedAt: row.published_at?.toISOString() ?? null,
       document,
-      audienceCount: document.showAudienceCount
-        ? ((await this.dependencies.audienceCount?.(
-            client,
-            row.creator_id,
-            document.audience,
-          )) ?? null)
-        : null,
+      audienceCount:
+        authoring && document.showAudienceCount
+          ? ((await this.dependencies.audienceCount?.(
+              client,
+              row.creator_id,
+              document.audience,
+            )) ?? null)
+          : null,
       sourceState:
         source?.type === "source_revoke"
           ? source.state === "done"
@@ -1346,9 +1380,15 @@ export class ContentService {
   }
   async get(actor: Actor, creatorId: string, id: string, studio = false) {
     return this.transaction(actor, creatorId, async (client) => {
-      const row = await this.index(client, creatorId, id);
+      const row = await this.index(
+        client,
+        creatorId,
+        id,
+        false,
+        studio ? undefined : actor,
+      );
       await this.authorizeRead(client, actor, row, studio);
-      return this.view(client, actor, row);
+      return this.view(client, actor, row, studio);
     });
   }
   /** Internal W7 proof port. Read the actual stored evidence, never reconstruct
@@ -1356,6 +1396,7 @@ export class ContentService {
    */
   async publicationProof(actor: Actor, creatorId: string, id: string) {
     return this.transaction(actor, creatorId, async (client) => {
+      await this.prepareReadInTransaction(client, actor, creatorId, id);
       await this.authorizeOwnedMedia(client, actor, creatorId);
       const role = await this.role(client, actor, creatorId, ["publisher"]);
       const row = await this.index(client, creatorId, id);
@@ -1432,12 +1473,29 @@ export class ContentService {
         )
       ).rows;
       const items: ContentView[] = [];
+      // Resolve every bounded page family's negatives before the first content
+      // lock. Never prepare a second family after a prior row's source fence.
+      if (!studio)
+        for (const row of rows.slice(0, page.limit))
+          await this.prepareReadInTransaction(client, actor, creatorId, row.id);
       for (const row of rows.slice(0, page.limit)) {
-        if (!studio && !(await this.eligible(client, actor, row))) continue;
+        let current: Index;
+        try {
+          current = await this.index(client, creatorId, row.id);
+        } catch (error) {
+          if (
+            error instanceof DomainError &&
+            error.code === "content_unavailable" &&
+            error.status === 404
+          )
+            continue;
+          throw error;
+        }
+        if (!studio && !(await this.eligible(client, actor, current))) continue;
         await client.query("SELECT set_config('app.content_id',$1,true)", [
-          row.id,
+          current.id,
         ]);
-        const view = await this.view(client, actor, row);
+        const view = await this.view(client, actor, current, studio);
         if (
           !page.query ||
           `${view.document.title} ${view.document.text}`
@@ -1457,7 +1515,7 @@ export class ContentService {
     const input = ReplyToNote.parse(raw);
     return this.transaction(actor, creatorId, async (client) => {
       await this.assertReplyReviewInstalled(client);
-      const row = await this.index(client, creatorId, id);
+      const row = await this.index(client, creatorId, id, false, actor);
       await this.authorizeRead(client, actor, row);
       invariant(
         row.kind === "note",
@@ -1993,7 +2051,7 @@ export class ContentService {
           await this.authorizeRead(
             client,
             actor,
-            await this.index(client, creatorId, input.targetId),
+            await this.index(client, creatorId, input.targetId, false, actor),
           );
         else {
           threadId =
