@@ -24,7 +24,10 @@ import {
   consumeCreatorSignedAct,
   type SignedSubjectPolicy,
 } from "../identity/subjects.js";
-import { createSignatureReadFence } from "../identity/signature-read-fence.js";
+import {
+  createSignatureReadFence,
+  SIGNATURE_READ_FENCE_MIGRATION,
+} from "../identity/signature-read-fence.js";
 import {
   assertThreadScope,
   type AccessService,
@@ -43,7 +46,7 @@ import {
   FULFILLMENT_CATALOGUE_SHA256,
 } from "./fulfillment-catalogue.js";
 
-export const FULFILLMENT_PLAN_MIGRATION = "0094_w4_fulfillment_plan_custody";
+export const FULFILLMENT_PLAN_MIGRATION = "0178_w4_fulfillment_plan_custody";
 // Updated only from the reviewed owned proposal; W8 registers this exact file.
 export const FULFILLMENT_PLAN_SCHEMA_SHA256 =
   "d728ec3d71f3b9fd11c49b3f2faf91624e7b03868d5ab4b462b0730fddae4aa1";
@@ -108,6 +111,7 @@ type Recipient = {
   messageId?: string;
 };
 type Held = Context & {
+  intent: "draft" | "committed";
   header: Header;
   reference: CommerceFulfillmentPlanReference;
   documentHash: string;
@@ -164,7 +168,7 @@ export class CommerceFulfillmentPlans {
       typeof input.assertScopeAllowedInTransaction !== "function" ||
       input.migration.version !== FULFILLMENT_PLAN_MIGRATION ||
       input.migration.checksum !== FULFILLMENT_PLAN_SCHEMA_SHA256 ||
-      input.signatureMigration.version !== "0081_w1_signature_read_fence" ||
+      input.signatureMigration.version !== SIGNATURE_READ_FENCE_MIGRATION ||
       input.signatureMigration.checksum !== SIGNATURE_SCHEMA_SHA256 ||
       !Number.isSafeInteger(input.minimumRecipients) ||
       input.minimumRecipients < 2 ||
@@ -226,7 +230,7 @@ export class CommerceFulfillmentPlans {
       AND NOT r.rolsuper AND NOT r.rolbypassrls AND NOT r.rolcreatedb AND NOT r.rolcreaterole AND NOT r.rolreplication
       AND NOT pg_has_role(current_user,'creator_owner','MEMBER'))
      AND EXISTS(SELECT FROM creator.schema_migration WHERE version=$1 AND checksum=$2)
-     AND EXISTS(SELECT FROM creator.schema_migration WHERE version='0081_w1_signature_read_fence' AND checksum=$3)
+     AND EXISTS(SELECT FROM creator.schema_migration WHERE version='0167_w1_signature_read_fence' AND checksum=$3)
      AND (SELECT count(*)=6 FROM pg_trigger t JOIN pg_proc f ON f.oid=t.tgfoid
       WHERE NOT t.tgisinternal AND t.tgenabled='O' AND t.tgtype=25
        AND t.tgname='fence_signature_metadata_write' AND f.proname='fence_signature_metadata_write'
@@ -467,6 +471,7 @@ export class CommerceFulfillmentPlans {
       source.creator_id,
       source.packet_id,
       source.mode,
+      source.state === "delivered" ? ["delivered"] : ["due", "in_progress"],
     );
     if (
       originalCommerceServiceHash(current) !==
@@ -640,6 +645,59 @@ export class CommerceFulfillmentPlans {
       planRef: CommerceFulfillmentPlanReference;
     },
   ) {
+    return this.preparePublicationWithIntent(client, actor, input, "draft");
+  }
+
+  /** The immutable plan binds the next saved revision. Resolve its original
+   * recipients before W5 takes document/media owner locks; its actual save must
+   * precede finalizeDraftPublication, and only COMMIT may follow that gate. */
+  async prepareDraft(
+    client: PoolClient,
+    actor: Actor,
+    input: {
+      creatorId: string;
+      contentId: string;
+      planRef: CommerceFulfillmentPlanReference;
+      expectedVersion: number;
+      document: unknown;
+    },
+  ) {
+    const version = z.int().positive().parse(input.expectedVersion);
+    if (!Number.isSafeInteger(version + 1)) throw fulfillmentChanged();
+    return this.preparePublicationWithIntent(client, actor, input, "draft", {
+      expectedVersion: version,
+      document: PlanDocument.parse(input.document),
+    });
+  }
+
+  /** Current committed receipt only; no signature reconsume or new recipient
+   * delivery can be issued from this path. */
+  async preparePublicationRetry(
+    client: PoolClient,
+    actor: Actor,
+    input: {
+      creatorId: string;
+      contentId: string;
+      planRef: CommerceFulfillmentPlanReference;
+    },
+  ) {
+    return this.preparePublicationWithIntent(client, actor, input, "committed");
+  }
+
+  private async preparePublicationWithIntent(
+    client: PoolClient,
+    actor: Actor,
+    input: {
+      creatorId: string;
+      contentId: string;
+      planRef: CommerceFulfillmentPlanReference;
+    },
+    intent: "draft" | "committed",
+    staged?: {
+      expectedVersion: number;
+      document: z.infer<typeof PlanDocument>;
+    },
+  ) {
     await this.assertCatalogue(client);
     const context = await this.initializeContext(client, actor),
       ref = CommerceFulfillmentPlanRef.parse(input.planRef);
@@ -655,7 +713,8 @@ export class CommerceFulfillmentPlans {
       !header ||
       header.created_by !== actor.accountId ||
       header.source_hash !== ref.hash ||
-      header.minimum_recipients !== this.minimumRecipients
+      header.minimum_recipients !== this.minimumRecipients ||
+      (staged && header.content_version !== staged.expectedVersion + 1)
     )
       throw fulfillmentChanged();
     const members = (
@@ -675,21 +734,34 @@ export class CommerceFulfillmentPlans {
       input.creatorId,
       members.map((m) => m.packet_id),
       "group_answer",
+      intent === "committed" ? ["delivered"] : ["due", "in_progress"],
     );
-    const stored = await this.document(client, header);
-    const document = PlanDocument.parse(stored.document);
+    const stored = await this.document(
+      client,
+      staged ? { ...header, content_version: staged.expectedVersion } : header,
+    );
+    const document = staged?.document ?? PlanDocument.parse(stored.document);
     if (
-      stored.state !== "draft" ||
+      stored.state !== (intent === "draft" ? "draft" : "published") ||
+      (intent === "draft"
+        ? stored.signed_act_id !== null
+        : !stored.signed_act_id ||
+          stored.author_account_id !== actor.accountId) ||
       document.scheduledAt !== null ||
       contentHash(document.planRef) !== contentHash(ref) ||
       document.packetId !== null ||
       document.kind !== "public_answer" ||
+      document.quote !== null ||
+      document.live != null ||
       contentHash(document.audience) !== contentHash(header.audience) ||
-      (!document.text.trim() && !document.media.some((m) => m.kind === "voice"))
+      (!staged &&
+        !document.text.trim() &&
+        !document.media.some((m) => m.kind === "voice"))
     )
       throw fulfillmentChanged();
     const value: Held = {
       ...context,
+      intent,
       header,
       reference: Object.freeze(ref),
       documentHash: contentHash(document),
@@ -702,8 +774,18 @@ export class CommerceFulfillmentPlans {
         (o) => o.source.packet_id === member.packet_id,
       )!;
       if (
-        contentHash(this.member(member.plan_id, original.source)) !==
-        contentHash(member)
+        contentHash(
+          this.member(
+            member.plan_id,
+            intent === "draft"
+              ? original.source
+              : {
+                  ...original.source,
+                  packet_version: original.source.packet_version - 1,
+                  commitment_version: original.source.commitment_version - 1,
+                },
+          ),
+        ) !== contentHash(member)
       )
         throw fulfillmentChanged();
       const proof = Object.freeze({ [recipientBrand]: true as const });
@@ -713,6 +795,16 @@ export class CommerceFulfillmentPlans {
         source: original.source,
         scope: original.scope,
       };
+      if (intent === "committed") {
+        const delivery = await this.existingDelivery(
+          client,
+          value,
+          recipient,
+          stored.signed_act_id!,
+          true,
+        );
+        recipient.messageId = delivery;
+      }
       value.recipients.push(recipient);
       this.recipients.set(proof, { client, held: value, recipient });
     }
@@ -759,7 +851,9 @@ export class CommerceFulfillmentPlans {
     ).rows[0]?.hash;
     if (hash !== value.reference.hash) throw fulfillmentChanged();
     value.positive = true;
-    return Object.freeze(value.recipients.map((r) => r.proof));
+    return Object.freeze(
+      value.intent === "draft" ? value.recipients.map((r) => r.proof) : [],
+    );
   }
 
   /** W3 must qualify the genuine owner and consume this method on its actual
@@ -874,7 +968,11 @@ export class CommerceFulfillmentPlans {
     publicationSignedActId: string,
   ) {
     const value = await this.publication(client, actor);
-    if (!value.positive || value.recipients.some((r) => !r.messageId))
+    if (
+      value.intent !== "draft" ||
+      !value.positive ||
+      value.recipients.some((r) => !r.messageId)
+    )
       throw fulfillmentChanged();
     await this.assertCatalogue(client);
     // All domain, frame, outbox, idempotency and constraint work precedes this.
@@ -951,6 +1049,253 @@ export class CommerceFulfillmentPlans {
         ],
       );
       if (link.rowCount !== 1) throw fulfillmentChanged();
+    }
+  }
+
+  /** W5 review has no challenge, consumption or delivery. All its positive
+   * document/media/audience work precedes this last original-source gate. */
+  async finalizePublicationReview(client: PoolClient, actor: Actor) {
+    await this.finalizePreparedDraft(client, actor);
+  }
+
+  async finalizeDraftPublication(client: PoolClient, actor: Actor) {
+    await this.finalizePreparedDraft(client, actor);
+  }
+
+  /** W1 has already written this actual challenge. Only COMMIT may follow. */
+  async finalizePublicationChallenge(
+    client: PoolClient,
+    actor: Actor,
+    challengeId: string,
+  ) {
+    await this.finalizePreparedDraft(
+      client,
+      actor,
+      z.uuid().parse(challengeId),
+    );
+  }
+
+  private async finalizePreparedDraft(
+    client: PoolClient,
+    actor: Actor,
+    challengeId?: string,
+  ) {
+    const value = await this.publication(client, actor);
+    if (
+      value.intent !== "draft" ||
+      !value.positive ||
+      value.recipients.some((r) => r.messageId)
+    )
+      throw fulfillmentChanged();
+    await this.assertCatalogue(client);
+    await this.finalSigner(client, value);
+    value.finalized = true;
+    const document = await this.document(client, value.header);
+    if (
+      document.state !== "draft" ||
+      document.signed_act_id !== null ||
+      contentHash(PlanDocument.parse(document.document)) !== value.documentHash
+    )
+      throw fulfillmentChanged();
+    for (const r of value.recipients) {
+      const current = await readOriginalCommerceService(
+        client,
+        actor.accountId,
+        value.header.creator_id,
+        r.member.packet_id,
+        "group_answer",
+      );
+      if (
+        originalCommerceServiceHash(current) !==
+        originalCommerceServiceHash(r.source)
+      )
+        throw fulfillmentChanged();
+    }
+    if (challengeId) {
+      const row = (
+        await client.query<{ command: unknown; content_hash: string }>(
+          `SELECT command,content_hash FROM creator.signed_challenge WHERE id=$1
+         AND account_id=$2 AND creator_id=$3 AND subject_id=$4 AND act_type='reply'
+         AND used_at IS NULL AND expires_at>clock_timestamp()`,
+          [
+            challengeId,
+            actor.accountId,
+            value.header.creator_id,
+            value.header.content_id,
+          ],
+        )
+      ).rows[0];
+      if (
+        !row ||
+        contentHash(row.command) !== row.content_hash ||
+        !this.matchesPublicationCommand(value, row.command)
+      )
+        throw fulfillmentChanged();
+    }
+  }
+
+  private matchesPublicationCommand(value: Held, command: unknown) {
+    const parsed = z
+      .strictObject({
+        actType: z.literal("reply"),
+        subjectId: z.uuid(),
+        content: z.strictObject({
+          kind: z.literal("content_publication"),
+          creatorId: z.uuid(),
+          version: z.int().positive(),
+          document: PlanDocument,
+          mediaEvidence: z.array(z.unknown()).optional(),
+        }),
+      })
+      .safeParse(command);
+    return (
+      parsed.success &&
+      parsed.data.subjectId === value.header.content_id &&
+      parsed.data.content.creatorId === value.header.creator_id &&
+      parsed.data.content.version === value.header.content_version &&
+      contentHash(parsed.data.content.document) === value.documentHash
+    );
+  }
+
+  private async existingDelivery(
+    client: PoolClient,
+    value: Held,
+    recipient: Recipient,
+    signedActId: string,
+    holdMessage = false,
+  ) {
+    // Before the last signer only: restore this genuine recipient's RLS family
+    // and retain its neutral message row. The late check below is MVCC metadata
+    // over creator-owned immutable associations; it performs no caller change.
+    if (holdMessage) {
+      assertThreadScope(recipient.scope);
+      await client.query(
+        "SELECT set_config('app.account_id',$1,true),set_config('app.creator_id',$2,true),set_config('app.fan_id',$3,true)",
+        [
+          recipient.scope.actorAccountId,
+          recipient.scope.creatorId,
+          recipient.scope.fanId,
+        ],
+      );
+      const neutral = await client
+        .query(
+          `SELECT m.id FROM creator.message m JOIN creator.commerce_group_delivery d
+         ON d.message_id=m.id AND d.thread_id=m.thread_id
+          AND d.creator_id=m.creator_id AND d.fan_id=m.fan_id
+         WHERE d.plan_id=$1 AND d.plan_revision=$2 AND d.packet_id=$3
+          AND d.publication_signed_act_id=$4 AND d.content_id=$5 AND d.content_version=$6
+          AND d.creator_id=$7 AND d.fan_id=$8 AND d.thread_id=$9
+          AND m.author_kind='system' AND m.author_account_id IS NULL
+          AND m.signed_act_id IS NULL AND m.signed_content_hash IS NULL
+          AND m.text='Answered publicly.' AND m.delivery_state='delivered'
+         FOR SHARE OF m NOWAIT`,
+          [
+            value.reference.id,
+            value.reference.revision,
+            recipient.member.packet_id,
+            signedActId,
+            value.header.content_id,
+            value.header.content_version,
+            value.header.creator_id,
+            recipient.member.fan_id,
+            recipient.member.thread_id,
+          ],
+        )
+        .catch((error: unknown) => {
+          if ((error as { code?: string }).code === "55P03")
+            throw fulfillmentChanged();
+          throw error;
+        });
+      if (neutral.rowCount !== 1) throw fulfillmentChanged();
+    }
+    const row = (
+      await client.query<{ message_id: string }>(
+        `SELECT d.message_id FROM creator.commerce_group_delivery d
+       JOIN creator.commerce_commitment c ON c.id=$4 AND c.packet_id=d.packet_id
+        AND c.creator_id=d.creator_id AND c.fan_id=d.fan_id
+        AND c.delivered_message_id=d.message_id AND c.state='delivered'
+       WHERE d.plan_id=$1 AND d.plan_revision=$2 AND d.packet_id=$3
+        AND d.publication_signed_act_id=$5 AND d.content_id=$6 AND d.content_version=$7
+        AND d.creator_id=$8 AND d.fan_id=$9 AND d.thread_id=$10`,
+        [
+          value.reference.id,
+          value.reference.revision,
+          recipient.member.packet_id,
+          recipient.member.commitment_id,
+          signedActId,
+          value.header.content_id,
+          value.header.content_version,
+          value.header.creator_id,
+          recipient.member.fan_id,
+          recipient.member.thread_id,
+        ],
+      )
+    ).rows[0];
+    if (!row) throw fulfillmentChanged();
+    return row.message_id;
+  }
+
+  /** W5's already committed response is fenced again, without consuming a
+   * signature, generating a System message or rewriting financial delivery. */
+  async finalizePublicationRetry(
+    client: PoolClient,
+    actor: Actor,
+    publicationSignedActId: string,
+  ) {
+    const value = await this.publication(client, actor);
+    if (
+      value.intent !== "committed" ||
+      !value.positive ||
+      value.recipients.some((r) => !r.messageId)
+    )
+      throw fulfillmentChanged();
+    await this.assertCatalogue(client);
+    await this.finalSigner(client, value);
+    value.finalized = true;
+    const document = await this.document(client, value.header);
+    if (
+      document.state !== "published" ||
+      document.signed_act_id !== publicationSignedActId ||
+      document.author_account_id !== actor.accountId ||
+      contentHash(PlanDocument.parse(document.document)) !== value.documentHash
+    )
+      throw fulfillmentChanged();
+    const command = await this.signedCommand(
+      client,
+      actor.accountId,
+      value.header.creator_id,
+      publicationSignedActId,
+    );
+    if (!this.matchesPublicationCommand(value, command))
+      throw fulfillmentChanged();
+    const media = (command as SignedActCommand).content as {
+      mediaEvidence?: unknown[];
+    };
+    if (
+      contentHash(media.mediaEvidence ?? []) !==
+      contentHash(document.media_evidence ?? [])
+    )
+      throw fulfillmentChanged();
+    for (const r of value.recipients) {
+      const current = await readOriginalCommerceService(
+        client,
+        actor.accountId,
+        value.header.creator_id,
+        r.member.packet_id,
+        "group_answer",
+        ["delivered"],
+      );
+      if (
+        originalCommerceServiceHash(current) !==
+          originalCommerceServiceHash(r.source) ||
+        (await this.existingDelivery(
+          client,
+          value,
+          r,
+          publicationSignedActId,
+        )) !== r.messageId
+      )
+        throw fulfillmentChanged();
     }
   }
 
