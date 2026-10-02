@@ -9,11 +9,13 @@
     "packetId": "^/commerce/",
     "offer": "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$",
     "messageId": "^/support$",
+    "kind": "^/support$",
     "quote": "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$",
     "packet": "^/studio/[a-f0-9-]{36}/publish$",
     "objectId": "^/media/voice$"
   },
   "literalQueryValues": {
-    "offer": "1"
+    "offer": "1",
+    "kind": "verification"
   }
 }
