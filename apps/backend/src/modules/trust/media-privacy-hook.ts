@@ -1,9 +1,9 @@
-import type { Pool } from "pg";
+import type { Pool, PoolClient } from "pg";
 import { invariant } from "../../core/errors.js";
 import type { PrivacyHook } from "./contracts.js";
 import {
   privacyTaskAuthority,
-  privacyTaskAuthorityInTransaction,
+  restoredPrivacyTaskAuthorityInTransaction,
 } from "./privacy-authority.js";
 import { conversationPrivacyAuthority } from "./conversation-privacy-authority.js";
 import { z } from "zod";
@@ -14,6 +14,7 @@ type Job = Parameters<PrivacyHook["run"]>[0];
 export function mediaPrivacyHook(input: {
   runtime: Pool;
   coordinator: Pool;
+  assertRestoredInTransaction?: (client: PoolClient) => Promise<void>;
   exportArchive?: (
     job: Job,
     families: readonly unknown[],
@@ -35,12 +36,25 @@ export function mediaPrivacyHook(input: {
       );
       const families = await authority.families(job);
       const client = await input.runtime.connect();
+      let released = false;
+      const abort = () => {
+        if (!released) {
+          released = true;
+          client.release(true);
+        }
+      };
+      job.signal!.addEventListener("abort", abort, { once: true });
       const data: unknown[] = [];
       let binaryCount = 0;
       let callCount = 0;
       try {
+        job.signal!.throwIfAborted();
         await client.query("BEGIN");
-        await privacyTaskAuthorityInTransaction(client, job);
+        await restoredPrivacyTaskAuthorityInTransaction(
+          client,
+          job,
+          input.assertRestoredInTransaction,
+        );
         for (const family of families) {
           await authority.assertFamily(client, job, family);
           const pair = [family.creatorId, family.fanId];
@@ -84,7 +98,11 @@ export function mediaPrivacyHook(input: {
             ],
           ] as const;
           for (const [name, sql] of sources) {
-            await verify(job);
+            await restoredPrivacyTaskAuthorityInTransaction(
+              client,
+              job,
+              input.assertRestoredInTransaction,
+            );
             const rows = (await client.query(sql + " LIMIT 1001", pair)).rows;
             invariant(
               rows.length <= 1000,
@@ -105,14 +123,23 @@ export function mediaPrivacyHook(input: {
             "This media export needs a protected streaming artifact.",
           );
         }
-        await verify(job);
-        job.signal?.throwIfAborted();
+        await restoredPrivacyTaskAuthorityInTransaction(
+          client,
+          job,
+          input.assertRestoredInTransaction,
+        );
+        job.signal!.throwIfAborted();
         await client.query("COMMIT");
+        job.signal!.throwIfAborted();
       } catch (error) {
-        await client.query("ROLLBACK");
+        if (!released) await client.query("ROLLBACK");
         throw error;
       } finally {
-        client.release();
+        job.signal!.removeEventListener("abort", abort);
+        if (!released) {
+          released = true;
+          client.release();
+        }
       }
       const archiveRequired = binaryCount > 0 || callCount > 0;
       invariant(
