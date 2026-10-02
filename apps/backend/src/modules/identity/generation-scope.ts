@@ -121,6 +121,7 @@ export class GenerationIdentityAuthority {
     private readonly configuration: Readonly<{
       assertAllowed: GenerationRestriction;
       assertDiscoveryAllowed: (client: PoolClient) => Promise<void>;
+      consumers: readonly GenerationPurposeConsumer[];
     }>,
   ) {}
 
@@ -157,8 +158,9 @@ export class GenerationIdentityAuthority {
         "Current generation purpose authority is not configured.",
         503,
       );
+    let consumers: GenerationPurposeConsumer[];
     try {
-      const consumers = z
+      consumers = z
         .array(consumerSchema)
         .max(32)
         .parse(input.consumers ?? []);
@@ -332,7 +334,30 @@ export class GenerationIdentityAuthority {
     return new GenerationIdentityAuthority(input.pool, {
       assertAllowed: input.assertAllowed,
       assertDiscoveryAllowed: input.assertDiscoveryAllowed,
+      consumers: Object.freeze(
+        consumers.map((consumer) =>
+          Object.freeze({
+            ...consumer,
+            migration: Object.freeze({ ...consumer.migration }),
+          }),
+        ),
+      ),
     });
+  }
+
+  /** Preparation only: a distinct purpose may use an executable only when
+   * this exact worker credential already qualified its actual definition. */
+  assertConsumerRegistered(consumer: GenerationPurposeConsumer): void {
+    if (
+      !this.configuration.consumers.some(
+        (registered) => canonical(registered) === canonical(consumer),
+      )
+    )
+      throw new DomainError(
+        "generation_scope_unconfigured",
+        "The exact worker purpose consumer is not registered.",
+        503,
+      );
   }
 
   private assertWorker(): void {

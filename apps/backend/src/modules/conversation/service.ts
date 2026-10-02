@@ -41,6 +41,7 @@ import type { ConversationLineage } from "./lineage.js";
 import type { PreparedGenerationJournal } from "../agent/generation-journal.js";
 import type { GenerationCostReconciliation } from "../commerce/generation-allowance.js";
 import type { Actor } from "../identity/adapter.js";
+import { confirmAcceptedGeneration } from "../identity/generation-scope.js";
 
 type ThreadRow = {
   control: ThreadControl;
@@ -194,6 +195,9 @@ export class ConversationService {
     lineage?: ConversationLineage;
     journal?: PreparedGenerationJournal;
     reconciliation?: GenerationCostReconciliation;
+    /** A connected provider runtime requires W1's actual original fan-session
+     * acceptance confirmation. This flag grants no worker or read authority. */
+    generationAcceptanceRequired?: true;
   } = {};
   configureDelivery(delivery: typeof this.delivery) {
     delivery.lineage?.assertPool(this.db.pool);
@@ -776,6 +780,8 @@ export class ConversationService {
                   scope.fanId,
                 ],
               );
+            if (this.delivery.generationAcceptanceRequired)
+              await confirmAcceptedGeneration(scope, client, generationId);
             await this.delivery.journal?.initializeGeneration(
               scope,
               client,

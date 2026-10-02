@@ -100,6 +100,7 @@ export function createConversationRuntime(input: {
     : undefined;
   input.conversation.configureDelivery({
     wellbeing,
+    ...(generator ? { generationAcceptanceRequired: true as const } : {}),
     ...(input.policy ? { policyVersion: input.policy.version } : {}),
     ...(input.allowance ? { allowance: input.allowance } : {}),
     ...(input.generationCostReconciliation

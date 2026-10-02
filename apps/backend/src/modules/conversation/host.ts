@@ -181,6 +181,21 @@ export async function composeConversationHost(
   if (!producers.licenseVerifier) missing.push("license verifier (W2)");
   if (!runtime.access.threadScopeInTransactionAvailable)
     missing.push("in-transaction denial (W8)");
+  // Source files and migration-number allocations are not activated custody.
+  // The original acceptance marker and current worker/input/admission/terminal
+  // purposes must all be canonical before the connected runtime can turn on.
+  for (const version of [
+    "0072_w1_generation_worker_scope",
+    "0093_w8_generation_worker_denial",
+    "0095_w3_generation_purpose_consumers",
+    "0096_w2_generation_input_consumers",
+    "0097_w2_generation_attempt_admission",
+    "0099_w1_generation_terminal_scope",
+    "0100_w8_generation_terminal_denial",
+    "0110_w3_generation_terminal_finalization",
+  ])
+    if (!(await registeredChecksum(version)))
+      missing.push(`registered ${version}`);
 
   let journal: PreparedGenerationJournal | undefined;
   const journalChecksum = await registeredChecksum(migrations.journal);
