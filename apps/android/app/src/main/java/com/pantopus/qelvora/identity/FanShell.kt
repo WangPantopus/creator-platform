@@ -45,7 +45,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     private var rotatingCredential = false
     private var refreshingSession = false
     private var removedArrivalFor: String? = null
-    private suspend fun purge() { generation++; session = null; hasSavedCredential = false; checkingSession = false; actors = emptyList(); choosingActor = false; error = ""; storage.save(null); com.pantopus.qelvora.conversation.W3FanFeatures.clearPrivateState(context) }
+    private suspend fun purge() { generation++; session = null; hasSavedCredential = false; checkingSession = false; actors = emptyList(); error = ""; storage.save(null); com.pantopus.qelvora.conversation.W3FanFeatures.clearPrivateState(context) }
     suspend fun refresh() {
         if (rotatingCredential || refreshingSession) return
         val client = api ?: run { checkingSession = false; return }
@@ -55,21 +55,17 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
             val token = currentToken()
             if (current != generation) return
             hasSavedCredential = token != null
-            if (token == null) { session = null; return }
-            try {
-                val value = client.identitySession()
-                if (current != generation) return
-                if (session?.accountId != null && session?.accountId != value.accountId) {
-                    purge(); error = "The account changed. Continue with Pantopus again."; return
-                }
-                session = value; error = ""
-            } catch (failure: CreatorAPIError) {
-                if (current != generation) return
-                if (failure.status == 401) {
-                    if (!busy) { refreshingSession = false; refreshCredentials() }
-                    else { purge(); error = "Your session ended. Continue with Pantopus again." }
-                } else error = message(failure)
-            }
+            if (token == null) { if (session != null) purge(); return }
+            val value = client.identitySession()
+            if (current != generation) return
+            if (session?.accountId != null && session?.accountId != value.accountId) { purge(); error = "The account changed. Continue with Pantopus again."; return }
+            session = value; error = ""
+        } catch (failure: CreatorAPIError) {
+            if (current != generation) return
+            if (failure.status == 401) {
+                if (!busy) { refreshingSession = false; refreshCredentials() }
+                else { purge(); error = "Your session ended. Continue with Pantopus again." }
+            } else error = message(failure)
         } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (_: Exception) { if (current == generation) error = "Reconnect to refresh your account. Actions are unavailable while offline." }
         finally { refreshingSession = false; checkingSession = false }
@@ -132,7 +128,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
     val model = remember(baseURL) { FanSession(context, baseURL, returnTo) }; val scope = rememberCoroutineScope()
     LaunchedEffect(returnTo) { model.open(returnTo) }
     LaunchedEffect(model.destination) { model.loadArrival() }
-    LaunchedEffect(model) { model.refresh(); while (true) { delay(4000); if (!model.choosingActor && !model.busy) model.refresh() } }
+    LaunchedEffect(model) { model.refresh(); while (true) { delay(4000); if (!model.busy && !model.choosingActor && (model.session != null || model.hasSavedCredential)) model.refresh() } }
     Column(Modifier.fillMaxSize().background(qColor("ground")).windowInsetsPadding(WindowInsets.safeDrawing)) {
         if (model.error.isNotEmpty()) Notice("error", "Account status", model.error)
         when {

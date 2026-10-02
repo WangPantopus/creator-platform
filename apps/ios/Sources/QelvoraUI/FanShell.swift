@@ -49,19 +49,20 @@ public final class FanSession: ObservableObject {
             let token = try await storage.read()
             guard current == generation, !Task.isCancelled else { return }
             hasSavedCredential = token != nil
-            guard token != nil else { session = nil; return }
+            guard token != nil else { if session != nil { await purge() }; return }
             let value = try await api.identitySession()
             guard current == generation, !Task.isCancelled else { return }
             if let previous = session, previous.accountId != value.accountId { await purge(); error = "The account changed. Continue with Pantopus again."; return }
             session = value; error = ""
         } catch let failure as CreatorAPIError {
-            guard current == generation else { return }
+            guard current == generation, !Task.isCancelled else { return }
             if failure.status == 401 {
                 if !busy { refreshingSession = false; await refreshCredentials() }
                 else { await purge(); error = "Your session ended. Continue with Pantopus again." }
             }
             else { error = Self.message(failure) }
-        } catch { guard current == generation else { return }; self.error = "Reconnect to refresh your account. Actions are unavailable while offline." }
+        } catch is CancellationError { return }
+        catch { guard current == generation, !Task.isCancelled else { return }; self.error = "Reconnect to refresh your account. Actions are unavailable while offline." }
     }
     public func beginSignIn() async {
         guard !busy else { return }; busy = true; defer { busy = false }
@@ -105,7 +106,7 @@ public final class FanSession: ObservableObject {
         catch let failure as CreatorAPIError { guard current == generation else { return }; if failure.status == 401 { await purge() }; error = Self.message(failure) }
         catch { self.error = "Session refresh could not complete. Reconnect and try again." }
     }
-    public func purge() async { generation += 1; session = nil; hasSavedCredential = false; checkingSession = false; actors = []; choosingDevelopmentActor = false; error = ""; URLCache.shared.removeAllCachedResponses(); try? await storage.save(nil); await W3FanFeatures.clearPrivateState() }
+    public func purge() async { generation += 1; session = nil; hasSavedCredential = false; checkingSession = false; actors = []; error = ""; URLCache.shared.removeAllCachedResponses(); try? await storage.save(nil); await W3FanFeatures.clearPrivateState() }
     public func open(_ target: String) { guard ApplicationDestination.isPermitted(target) else { error = "This link is unavailable. Open the object from the app."; return }; removedArrivalFor = nil; destination = target }
     static func message(_ error: Error) -> String { if let failure = error as? CreatorAPIError, let result = try? JSONDecoder().decode(APIError.self, from: failure.body) { return result.error.message }; return "This action could not complete. Reconnect and try again." }
 }
@@ -175,7 +176,13 @@ public struct FanAppShell: View {
                 }
             }
         }.foregroundStyle(qColor("ink", scheme)).background(qColor("ground", scheme))
-            .task { await model.refresh(); while !Task.isCancelled { try? await Task.sleep(for: .seconds(4)); if !model.choosingDevelopmentActor && !model.busy { await model.refresh() } } }
+            .task {
+                await model.refresh()
+                while !Task.isCancelled {
+                    do { try await Task.sleep(for: .seconds(4)) } catch { return }
+                    if !model.busy && !model.choosingDevelopmentActor && (model.session != nil || model.hasSavedCredential) { await model.refresh() }
+                }
+            }
             .task(id: model.destination) { await model.loadArrival() }
             .onOpenURL { url in
                 guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false), components.user == nil, components.password == nil, components.fragment == nil else { model.error = "This link is unavailable."; return }

@@ -6,7 +6,7 @@
 import type { Pool, PoolClient } from "pg";
 import type { z } from "zod";
 import { contentHash } from "../../core/canonical.js";
-import { invariant } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
 import {
   DEVELOPMENT_LICENSE_TERMS,
   developmentProofReference,
@@ -76,6 +76,16 @@ function currentCreator(
 export class DevelopmentLicenseVerifier implements LicenseVerifier {
   readonly synthetic = true as const;
   private constructor(private readonly pool: Pool) {}
+  /** Host composition must qualify this guarded instance on its actual pool.
+   * A synthetic flag or a verifier retained from another database is insufficient. */
+  assertPool(pool: Pool): void {
+    if (pool !== this.pool)
+      throw new DomainError(
+        "development_license_pool_mismatch",
+        "Synthetic license authority belongs to a different database pool.",
+        503,
+      );
+  }
   static create(pool: Pool, host: SyntheticDevelopmentHost) {
     assertSyntheticDevelopmentHost(host);
     return Object.freeze(new DevelopmentLicenseVerifier(pool));
