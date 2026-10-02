@@ -1,0 +1,62 @@
+{
+  "sourceCommit": "0756143665aa6cef945ddf19425b3ab43beedeb1",
+  "releaseReady": false,
+  "observations": [
+    {
+      "theme": "light",
+      "height": 844,
+      "value": {
+        "viewport": 390,
+        "scrollWidth": 390,
+        "sessionStatus": 200,
+        "accountId": "10000000-0000-4000-8000-000000000002",
+        "preferenceStatus": 503,
+        "code": "scope_denial_unconfigured",
+        "text": "Home\nYour account\nContent status\nCurrent scope authority is not configured.\n\nChecking current access. Your input stays in this tab during a connection interruption.\n\nCheck current access",
+        "links": ["Home", "Your account"]
+      }
+    },
+    {
+      "theme": "dark",
+      "height": 844,
+      "value": {
+        "viewport": 390,
+        "scrollWidth": 390,
+        "sessionStatus": 200,
+        "accountId": "10000000-0000-4000-8000-000000000002",
+        "preferenceStatus": 503,
+        "code": "scope_denial_unconfigured",
+        "text": "Home\nYour account\nContent status\nCurrent scope authority is not configured.\n\nChecking current access. Your input stays in this tab during a connection interruption.\n\nCheck current access",
+        "links": ["Home", "Your account"]
+      }
+    },
+    {
+      "theme": "light",
+      "height": 900,
+      "value": {
+        "viewport": 1280,
+        "scrollWidth": 1280,
+        "sessionStatus": 200,
+        "accountId": "10000000-0000-4000-8000-000000000002",
+        "preferenceStatus": 503,
+        "code": "scope_denial_unconfigured",
+        "text": "Home\nYour account\nContent status\nCurrent scope authority is not configured.\n\nChecking current access. Your input stays in this tab during a connection interruption.\n\nCheck current access",
+        "links": ["Home", "Your account"]
+      }
+    },
+    {
+      "theme": "dark",
+      "height": 900,
+      "value": {
+        "viewport": 1280,
+        "scrollWidth": 1280,
+        "sessionStatus": 200,
+        "accountId": "10000000-0000-4000-8000-000000000002",
+        "preferenceStatus": 503,
+        "code": "scope_denial_unconfigured",
+        "text": "Home\nYour account\nContent status\nCurrent scope authority is not configured.\n\nChecking current access. Your input stays in this tab during a connection interruption.\n\nCheck current access",
+        "links": ["Home", "Your account"]
+      }
+    }
+  ]
+}

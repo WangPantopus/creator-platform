@@ -1068,6 +1068,13 @@ data class APICallCallRevision(
 )
 
 @Serializable
+data class APICallCallRoute(
+  val `sessionId`: String,
+  val `creatorId`: String,
+  val `fanId`: String
+)
+
+@Serializable
 data class APICallCallSummaryNote(
   val `note`: String,
   val `expectedVersion`: Long,
@@ -1678,6 +1685,39 @@ object APIContentWithdrawResultWithdrawnSerializer : KSerializer<APIContentWithd
     return APIContentWithdrawResultWithdrawn
   }
   override fun serialize(encoder: Encoder, value: APIContentWithdrawResultWithdrawn) { encoder.encodeBoolean(true) }
+}
+
+@Serializable
+data class APINoteReplyPolicy(
+  val `accountId`: String,
+  val `creatorId`: String,
+  val `limit`: JsonElement,
+  @Required
+  val `confirmedDays`: Long? = null,
+  @Required
+  val `milestone`: JsonElement? = null,
+  @Required
+  val `basis`: APINoteReplyPolicyBasis? = null,
+  val `historyComplete`: APINoteReplyPolicyHistoryComplete,
+  val `longerRepliesActive`: Boolean,
+  val `checkedAt`: String
+)
+
+@Serializable
+enum class APINoteReplyPolicyBasis {
+  @SerialName("confirmed_stripe_paid_periods") CONFIRMED_STRIPE_PAID_PERIODS,
+  @SerialName("confirmed_paid_periods") CONFIRMED_PAID_PERIODS
+}
+
+@Serializable(with = APINoteReplyPolicyHistoryCompleteSerializer::class)
+object APINoteReplyPolicyHistoryComplete { const val value: Boolean = false }
+object APINoteReplyPolicyHistoryCompleteSerializer : KSerializer<APINoteReplyPolicyHistoryComplete> {
+  override val descriptor = PrimitiveSerialDescriptor("APINoteReplyPolicyHistoryComplete", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APINoteReplyPolicyHistoryComplete {
+    if (decoder.decodeBoolean() != false) throw SerializationException("Expected false")
+    return APINoteReplyPolicyHistoryComplete
+  }
+  override fun serialize(encoder: Encoder, value: APINoteReplyPolicyHistoryComplete) { encoder.encodeBoolean(false) }
 }
 
 @Serializable
@@ -3079,6 +3119,12 @@ enum class APIConversationConversationAuthorship {
 }
 
 @Serializable
+data class APIConversationConversationCallControl(
+  val `idempotencyKey`: String,
+  val `expectedEpoch`: Long
+)
+
+@Serializable
 data class APIConversationConversationCorrectionCommand(
   val `actType`: APIConversationConversationCorrectionCommandActType,
   val `subjectId`: String,
@@ -4154,6 +4200,39 @@ object APIContentContentWithdrawResultWithdrawnSerializer : KSerializer<APIConte
 }
 
 @Serializable
+data class APIContentNoteReplyPolicy(
+  val `accountId`: String,
+  val `creatorId`: String,
+  val `limit`: JsonElement,
+  @Required
+  val `confirmedDays`: Long? = null,
+  @Required
+  val `milestone`: JsonElement? = null,
+  @Required
+  val `basis`: APIContentNoteReplyPolicyBasis? = null,
+  val `historyComplete`: APIContentNoteReplyPolicyHistoryComplete,
+  val `longerRepliesActive`: Boolean,
+  val `checkedAt`: String
+)
+
+@Serializable
+enum class APIContentNoteReplyPolicyBasis {
+  @SerialName("confirmed_stripe_paid_periods") CONFIRMED_STRIPE_PAID_PERIODS,
+  @SerialName("confirmed_paid_periods") CONFIRMED_PAID_PERIODS
+}
+
+@Serializable(with = APIContentNoteReplyPolicyHistoryCompleteSerializer::class)
+object APIContentNoteReplyPolicyHistoryComplete { const val value: Boolean = false }
+object APIContentNoteReplyPolicyHistoryCompleteSerializer : KSerializer<APIContentNoteReplyPolicyHistoryComplete> {
+  override val descriptor = PrimitiveSerialDescriptor("APIContentNoteReplyPolicyHistoryComplete", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APIContentNoteReplyPolicyHistoryComplete {
+    if (decoder.decodeBoolean() != false) throw SerializationException("Expected false")
+    return APIContentNoteReplyPolicyHistoryComplete
+  }
+  override fun serialize(encoder: Encoder, value: APIContentNoteReplyPolicyHistoryComplete) { encoder.encodeBoolean(false) }
+}
+
+@Serializable
 data class APIContentPrivateNoteReply(
   val `safetyState`: APIContentPrivateNoteReplySafetyState,
   val `safetyReviewAvailable`: Boolean,
@@ -4596,6 +4675,7 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
   suspend fun withdrawContentReply(creatorId: String, id: String, xQelvoraExpectedAccount: String? = null, body: APIContentVersionCommand): APIContentWithdrawResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies/${segment(id)}/withdraw", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun contentPreference(creatorId: String): APIContentPreference = json.decodeFromString(request("/v1/content/${segment(creatorId)}/mute", "GET", authenticated = true))
   suspend fun muteContent(creatorId: String, xQelvoraExpectedAccount: String? = null, body: APIContentMuteCommand): APIContentMuteCommand = json.decodeFromString(request("/v1/content/${segment(creatorId)}/mute", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun noteReplyPolicy(creatorId: String): APINoteReplyPolicy = json.decodeFromString(request("/v1/content/${segment(creatorId)}/reply-policy", "GET", authenticated = true))
   suspend fun myContentThanks(creatorId: String): APIContentThanksView = json.decodeFromString(request("/v1/content/${segment(creatorId)}/thanks", "GET", authenticated = true))
   suspend fun saveContentThanks(creatorId: String, xQelvoraExpectedAccount: String? = null, body: APIThanksCommand): APIContentRevisionResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/thanks", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun studioThanksFeed(creatorId: String): APIContentThanksFeed = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio/thanks", "GET", authenticated = true))
@@ -4664,6 +4744,7 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
   suspend fun handback(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/handback", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply): APIMessage = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/human-replies", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput): APIConversationConversationRecordingResult = json.decodeFromString(request("/v1/conversations/${segment(creatorId)}/${segment(fanId)}/recordings", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun readAccountCallRoute(sessionId: String, xQelvoraExpectedAccount: String? = null): APICallCallRoute = json.decodeFromString(request("/v1/w6/calls/${segment(sessionId)}/route", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun redeemCallAdmission(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = null, body: APICallAdmissionRedemption): APICallAdmissionReceipt = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/calls/${segment(sessionId)}/redeem", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun readCreatorMediaPolicy(creatorId: String, objectId: String, purpose: ReadCreatorMediaPolicyPurpose): APIMediaCreatorMediaPolicyView = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media-policy", "GET", authenticated = true, query = listOf("objectId" to objectId, "purpose" to json.decodeFromString<String>(json.encodeToString(purpose)))))
   suspend fun readAudienceCreatorMedia(creatorId: String, assetId: String, xQelvoraExpectedAccount: String? = null): APIMediaCreatorMediaAsset = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/audience-media/${segment(assetId)}", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))

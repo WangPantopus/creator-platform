@@ -1,5 +1,31 @@
 # W8 contract, migration and runtime register
 
+## Focused negative-authority integration — 2026-10-02
+
+PR89 is being finalized against main after the initial activation merged. Its remaining source adds held public-creator and creator/fan negative ports, the separate genuine Team-triage negative path, and the reviewed development-pool role guard. The canonical Database now receives the composed in-transaction restriction callback; the raw optional input previously omitted Trust's check. Main's stricter privacy catalogue checks are preserved. Conversation lifecycle restoration/cancellation remains in the separate privacy continuation, rather than being partially copied into this increment. Existing dated web, native and independently saved-state evidence qualifies its original synthetic targets; this merge/typecheck does not requalify changed owner journeys or activate the held SQL. Full proof, positive publication, C10, accessibility, recovery and release gates remain open.
+
+## Held original-worker migration metadata — 2026-10-02
+
+[Closed0201 SQL/ACL review](../../../artifacts/workstreams/W8/worker-migration-metadata/20261002-mac-studio/README.md) qualifies only canonical ledger version/checksum reads for the existing isolated publication/callback worker logins. Eight real drift refusals roll back; all six original61 custody hashes remain unchanged. The held source creates no roles or active migration entry. Actual registered source/ledger/definition/role/ACL and currentness checks on the same original worker client remain required. No provider effect, password-login acceptance, activation, full C10 or release is claimed. All W8 qualification clients are stopped; private restored target remains closed.
+
+Reserved0087: `privacyTaskAuthorityInTransaction(client, actualPrivacyHookJob)` requires the genuine worker signal/token and same-client BEGIN. Call before journal/family/domain locks; producer must check the same signal before pages and the separate COMMIT. `conversationPrivacyAuthority().fenceTaskInTransaction(client,job)` exposes the early port; `assertFamily` now uses the held capability too. The bounded metadata-only definer locks current job→task NOWAIT, checks current task at COMMIT and erases its nonce, including an early-trigger refusal. Missing/unregistered custody fails503.
+
+Reserved0089: `trustCreatorFanRestrictionInTransaction()` and `BackendRuntime.holdCreatorFanNegativeAuthority(client,actualActor,{creatorId,fanId}):Promise<void>` combine held restoration, canonical session and actual fan/owner negatives before positive tenure/content leases. Known denial403, missing authority/contention503. No Team/packet/ThreadScope constructed. Actual fan negative-gate pass and saved-block403 verified; creator/paid positivity open.
+
+Future0092 W6 provider callback ingress and0093 W8 durable generation-worker negative projection are metadata reservations only, awaiting exact authenticated producer/lease/C10 contracts. No accountless callback Actor or fake initiating scope.
+
+## Team/public creator negative ports — 2026-10-02
+
+Reserved0084 is the separate real Team-triage candidate negative check used by `trustScopeRestrictionInTransaction()` for non-participants. Positive W1/W4 Team/current-family/Approval leases remain required. Reserved0086 exports `trustPublicCreatorDenial()` and canonical `holdPublicCreatorNegativeAuthority(client,creatorId)`, combining actual held restoration with a genuine visitor or explicitly empty anonymous context. [Personally reviewed exact W1dce780db0085 plus actual closed57 proposal/cleanup/grant checks](../../../artifacts/workstreams/W8/public-team-denial/20261002-mac-studio/README.md) leave all future ledger rows unregistered. No actual Team approval, creator proof, License or public AI permission is inferred.
+
+Additional allocation custody (not activation):0082 interactive tries;0083 W3 translation purpose;0084 Team negatives;0085 W1 public-AI metadata;0086 public-creator negatives;0087 W8 held privacy-task fence;0088 W5 policy-dependent reply cap;0089 W8 actual creator/fan negatives;0090 W4 spending-notice custody;0091 W8 current-account negative purpose. W8's sole activation branch will record these reservations and the exact ready-wave order. No client may invent a packet/thread/Actor or replay SQL to compensate for missing registration.
+
+
+## Interactive denial contention correction — 2026-10-02
+
+Reserved additive0082 now supplies nonblocking exact-family negative gates through the existing held restriction exports. Applied0053 stays unchanged. [Actual web/saved-block and two-connection evidence](../../../artifacts/workstreams/W8/interactive-denial/20261002-mac-studio/README.md) verifies retryable503 on contention, genuine session/participant refusals, preserved saved block403 and usable caller transaction after refusal. Canonical ledger remains40 in this labelled purpose-review target. Native authenticated, real in-flight generation, canonical activation and complete R1–R10/release acceptance remain open.
+
+
 ## Original-fan packet denial source — 2026-10-02
 
 W8 supplies reserved0076 original-fan/viewer/owner/publisher negative projection and `holdPublicPacketNegativeAuthority(client, actualActor, tuple)`. Unapplied0073 now runs packet negatives first and includes the schema-USAGE grant verified with the actual publication login. [Exact DDL/negative evidence](../../../artifacts/workstreams/W8/packet-denial/20261002-mac-studio/README.md) records zero fabricated publications, canonical57 unchanged and real non-owner refusals. Contention returns retryable unavailable, never successful empty permission. Actual signed packet, original-fan change and composed/native journeys remain open; this is not activation or release acceptance.
@@ -41,6 +67,7 @@ W6's worker uses its existing `media.*` family fence and the caller-held dedicat
 Allocations beyond the original wave:0061 W4 payout custody;0062 W6 worker (final proposal hash `abf169bb75c9bdc8aff771ac1d929f6a09a7211e6340b84b36d5700daa38a82a`);0063–0066 W7 proposals, pending revised relationship/checkpoint security custody;0067 W2 retained-counter expiry;0068 W4 paid coverage. These allocations are not application authorization. W3 published revised0058/0059 preserving0044 at each step; review those exact bytes before activation.0048 remains blocked on real accounting/export/delete/expiry composition and durable conversation-before-agent privacy receipts.
 
 **Mac Studio coordination, 2026-10-01 (current):**
+
 - **Registry:** W8 owns the single activation PR for reserved migrations. W3, W4, W5 and W6 agreed not to edit `infra/migrations.json` and to verify on their own DBs once the branch is pushed. Activation runs in ascending waves; IDs that aren't ready are renumbered above the wave (metadata only).
 - **0058/0059:** both replace 0044's `require_signed_message` without the approved_draft exact-version personal-Approval branch. 0060 recomposes that branch, but applying 0058→0060 as separate runner transactions leaves a weakened window. Before activating 0058–0060, choose one: revised 0058/0059 bytes that keep the 0044 branch, a single-transaction wave, or a traffic-closed rollout.
 - **0048:** needs C10 accounting registration first.
@@ -65,9 +92,7 @@ Allocations beyond the original wave:0061 W4 payout custody;0062 W6 worker (fina
 
 **Native runtime recovery and Metrics source:** owned Android host-graphics/temp-directory retry preserves the same AVD/app data and passes the four unchanged original UI flows after an actual unobstructed shipping Help launch. Netsim fallback remains explicit, not Bluetooth/isolation acceptance. Native private Report arrivals stay at Welcome; current W1 auth/native input/system-sheet gates remain. W8 edits only owned Metrics TSX/CSS to wrap the fixed mono route text; actual390 Light/Night no-overflow/main keyboard focus and1280 desktop verified. No test/golden/SQL/authority change; [evidence](../../../artifacts/workstreams/W8/takeover/20260930/metrics-phone-overflow.json).
 
-
 **Current native/WAL custody:** [Actual launches](../../../artifacts/workstreams/W8/takeover/20260930/native-launched/receipt.json) reserve only fresh W8 simulator27D0D594-A376-425D-966F-914ED2D3A4A0 and Android CreatorPlatform_W8_Resume_20260930/console5568/ADBdevice5569/server5048/network-instance8 command. iOS public Light/Night pixels and existing author-label flow pass; private/authenticated/native system interactions remain open, and the exact existing selector proposal awaits human exception. Android boot/install/Help render is blocked by system ANR; no ready acceptance. f64f165 local API runs the existing non-owner15-second WAL observer and supervisor UI with archiving off; keys/SQL/jobs preserved.0059 recording and0047 media sources are reserved/unapplied, requiring actual held private-purpose/retention/purge/signing composition. No peer message, checkout/device/engine, test/golden or provider change.
-
 
 **Launched-app merge gate:** the human renewed continuation and requires actual browser/app/emulator/simulator end-to-end acceptance. Existing required checks remain preserved; compilation/unit passes alone do not establish readiness. The [open-PR observation](../../../artifacts/workstreams/W8/takeover/20260930/open-pr-readiness.json) establishes no merge-ready PR.
 

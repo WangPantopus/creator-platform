@@ -40,6 +40,67 @@ type Consumers = Omit<
   "runtimePool" | "coordinatorPool"
 >;
 
+/** Check every reachable membership, including NOINHERIT/SET ROLE paths. An
+ * explicit composite API login may inherit only the two request roles; it must
+ * not acquire a worker, owner or additional direct domain privilege. */
+async function assertDevelopmentPoolRole(
+  pool: pg.Pool,
+  expected: string,
+  members: readonly string[] = [],
+) {
+  const result = await pool.query<{
+    role: string;
+    login: boolean;
+    inherits: boolean;
+    unsafe: boolean;
+    runtime: boolean;
+    growth: boolean;
+    direct: boolean;
+  }>(
+    `WITH RECURSIVE roles(oid) AS (
+       SELECT oid FROM pg_roles WHERE rolname=current_user
+       UNION SELECT m.roleid FROM pg_auth_members m JOIN roles r ON r.oid=m.member
+     ) SELECT current_user AS role,
+       (SELECT rolcanlogin FROM pg_roles WHERE rolname=current_user) AS login,
+       (SELECT rolinherit FROM pg_roles WHERE rolname=current_user) AS inherits,
+       EXISTS(SELECT 1 FROM roles x JOIN pg_roles r ON r.oid=x.oid
+         WHERE r.rolname<>ALL($1::text[]) OR r.rolsuper OR r.rolbypassrls OR
+           r.rolcreatedb OR r.rolcreaterole OR r.rolreplication OR
+           EXISTS(SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+             WHERE n.nspname IN ('creator','creator_trust','growth') AND c.relowner=r.oid) OR
+           EXISTS(SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
+             WHERE n.nspname IN ('creator','creator_trust','growth') AND p.proowner=r.oid) OR
+           EXISTS(SELECT 1 FROM pg_namespace n WHERE n.nspname IN ('creator','creator_trust','growth') AND n.nspowner=r.oid)) AS unsafe,
+       pg_has_role(current_user,'creator_runtime','USAGE') AS runtime,
+       CASE WHEN to_regrole('growth_runtime') IS NULL THEN false
+         ELSE pg_has_role(current_user,'growth_runtime','USAGE') END AS growth,
+       EXISTS(SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace,
+         LATERAL aclexplode(c.relacl) a WHERE n.nspname IN ('creator','creator_trust','growth')
+         AND a.grantee=(SELECT oid FROM pg_roles WHERE rolname=current_user)) OR
+       EXISTS(SELECT 1 FROM pg_attribute c JOIN pg_class t ON t.oid=c.attrelid JOIN pg_namespace n ON n.oid=t.relnamespace,
+         LATERAL aclexplode(c.attacl) a WHERE n.nspname IN ('creator','creator_trust','growth')
+         AND a.grantee=(SELECT oid FROM pg_roles WHERE rolname=current_user)) OR
+       EXISTS(SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace,
+         LATERAL aclexplode(p.proacl) a WHERE n.nspname IN ('creator','creator_trust','growth')
+         AND a.grantee=(SELECT oid FROM pg_roles WHERE rolname=current_user)) AS direct`,
+    [[expected, ...members]],
+  );
+  const role = result.rows[0];
+  if (
+    !role ||
+    role.role !== expected ||
+    !role.login ||
+    role.unsafe ||
+    (members.length > 0 &&
+      (!role.inherits || !role.runtime || !role.growth || role.direct))
+  )
+    throw new DomainError(
+      "unsafe_development_database_role",
+      "Development trust requires reviewed, separate non-owner database roles.",
+      503,
+    );
+}
+
 /** Canonical development-host composition. Existing database roles and synthetic
  * Ops memberships must be provisioned by the isolated database operator. */
 export async function createDevelopmentTrust(
@@ -63,6 +124,19 @@ export async function createDevelopmentTrust(
       "Development trust requires explicit local configuration and canonical development sessions.",
     );
   const core = new URL(runtime.pool.options.connectionString ?? "");
+  const coreRole = env.TRUST_CORE_DATABASE_ROLE ?? "creator_runtime";
+  if (
+    !/^[a-z][a-z0-9_]{0,62}$/.test(coreRole) ||
+    core.username !== coreRole ||
+    [
+      "growth_runtime",
+      "creator_trust_runtime",
+      "creator_trust_worker",
+    ].includes(coreRole)
+  )
+    throw new Error(
+      "Provide the exact reviewed development core database role.",
+    );
   const connection = (name: string, role: string) => {
     const value = env[name];
     if (!value)
@@ -75,8 +149,7 @@ export async function createDevelopmentTrust(
       url.hostname !== core.hostname ||
       url.port !== core.port ||
       url.pathname !== core.pathname ||
-      url.username !== role ||
-      core.username !== "creator_runtime"
+      url.username !== role
     )
       throw new Error(
         "Development trust pools must use separate non-owner roles on the same loopback database.",
@@ -104,6 +177,15 @@ export async function createDevelopmentTrust(
     statement_timeout: 5000,
   });
   try {
+    await assertDevelopmentPoolRole(
+      runtime.pool,
+      coreRole,
+      coreRole === "creator_runtime"
+        ? []
+        : ["creator_runtime", "growth_runtime"],
+    );
+    await assertDevelopmentPoolRole(apiPool, "creator_trust_runtime");
+    await assertDevelopmentPoolRole(workerPool, "creator_trust_worker");
     const projection = await runtime.pool.query(
       "SELECT to_regprocedure('creator_trust.runtime_thread_denial(uuid,uuid)') AS function",
     );

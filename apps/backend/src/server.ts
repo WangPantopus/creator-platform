@@ -17,6 +17,8 @@ import { composeMediaHost, runtimeMediaDenials } from "./modules/media/host.js";
 import { createDevelopmentTrust } from "./modules/trust/development.js";
 import { agentFeature } from "./modules/agent/feature.js";
 import { DomainError } from "./core/errors.js";
+import { InteractiveCallControl } from "./modules/session/interactive-control.js";
+import { AccountCallMetadata } from "./modules/session/account-call-metadata.js";
 
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
@@ -47,6 +49,7 @@ const configured =
           ? { trust: createDevelopmentTrust }
           : {}),
         registerFeatures: async (runtime) => {
+          const accountCalls = await AccountCallMetadata.prepare(runtime);
           const mediaEnvironment = readMediaEnvironment();
           const mediaDenials = runtimeMediaDenials(runtime);
           // The development host consumes W8's 0082 held try-fence. A code
@@ -90,6 +93,15 @@ const configured =
           );
           features.close.push(() => host.close());
           const { commerce, conversation, agent } = host;
+          // Preparing the genuine graph does not configure a provider, worker
+          // purpose or arrival policy. The calls feature remains unmounted
+          // until those separate producers exist; no request Actor is invented.
+          const callControl = await InteractiveCallControl.prepare(runtime);
+          process.stdout.write(
+            callControl
+              ? "Call control: prepared; calling awaits provider, worker and policy composition.\n"
+              : "Call control: unavailable; canonical held request authority is not activated.\n",
+          );
           runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
           const contentHost = composeContentHost({
             pool: runtime.pool,
@@ -162,7 +174,7 @@ const configured =
               pool: runtime.pool,
               development: config.identityAdapter === "development",
             }),
-            mediaHost?.feature() ?? mediaFeature({}),
+            mediaHost?.feature(accountCalls) ?? mediaFeature({ accountCalls }),
             ...(commerce ? [commerce.feature] : []),
             ...(content ? content.features : []),
             ...(features.growth ? [features.growth.feature] : []),
