@@ -18,32 +18,57 @@ async function projectedDenial(
   client: PoolClient,
   actor: Actor,
   sql: string,
-  values: string[],
+  values: (string | null)[],
 ) {
   if (!actor.adultEligible)
     throw new DomainError(
       "adult_eligibility_required",
       "Adult eligibility is required.",
     );
-  // The caller already owns this transaction and its genuine request scope.
-  // Never substitute the creator/fan account for a non-participant caller.
-  const current = await client.query<{ account: string }>(
-    "SELECT nullif(current_setting('app.account_id',true),'') AS account",
-  );
-  if (current.rows[0]?.account !== actor.accountId)
-    throw new DomainError("scope_unavailable", "This scope is unavailable.");
-  const result = await denialQuery(client, sql, values);
-  if (result !== "allowed" && result !== "denied")
+  const authority = requestAuthority.getStore();
+  if (!authority || authority.accountId !== actor.accountId)
     throw new DomainError(
-      "scope_denial_unavailable",
-      "Current scope authority is unavailable.",
-      503,
+      "content_session_required",
+      "Continue with Pantopus for this action.",
+      401,
     );
-  if (result === "denied")
-    throw new DomainError("scope_revoked", "This scope is closed.");
+  // Call before positive family/domain locks. The canonical caller holds its
+  // genuine session first; this reentrant check never substitutes an owner or
+  // creates worker request authority. SAVEPOINT rejects an idle client and
+  // releases any partial try-lock acquisition on denied/unavailable results.
+  await client.query("SAVEPOINT w8_interactive_denial");
+  try {
+    await assertCurrentSession(client, actor.accountId);
+    await client.query("SELECT set_config('app.identity_session_id',$1,true)", [
+      authority.sessionId,
+    ]);
+    const current = await client.query<{ account: string }>(
+      "SELECT nullif(current_setting('app.account_id',true),'') AS account",
+    );
+    if (current.rows[0]?.account !== actor.accountId)
+      throw new DomainError("scope_unavailable", "This scope is unavailable.");
+    const result = await denialQuery(client, sql, values);
+    if (result !== "allowed" && result !== "denied")
+      throw new DomainError(
+        "scope_denial_unavailable",
+        "Current scope authority is unavailable. Try again.",
+        503,
+      );
+    if (result === "denied")
+      throw new DomainError("scope_revoked", "This scope is closed.");
+  } catch (error) {
+    await client.query("ROLLBACK TO SAVEPOINT w8_interactive_denial");
+    throw error;
+  } finally {
+    await client.query("RELEASE SAVEPOINT w8_interactive_denial");
+  }
 }
 
-async function denialQuery(client: PoolClient, sql: string, values: string[]) {
+async function denialQuery(
+  client: PoolClient,
+  sql: string,
+  values: (string | null)[],
+) {
   try {
     return (await client.query<{ denial: string }>(sql, values)).rows[0]
       ?.denial;
@@ -63,7 +88,8 @@ async function denialQuery(client: PoolClient, sql: string, values: string[]) {
   }
 }
 
-/** 0053 answers only for the actual thread participant on this held client. */
+/** 0082 tries the exact negative keys before reusing0053's pinned predicates.
+ * Only the genuine current participant is eligible for this negative gate. */
 export function trustScopeRestrictionInTransaction(): ScopeRestrictionInTransaction {
   return async (actor, creatorId, threadId, participants, client) => {
     if (
@@ -75,7 +101,7 @@ export function trustScopeRestrictionInTransaction(): ScopeRestrictionInTransact
     await projectedDenial(
       client,
       actor,
-      "SELECT creator_trust.runtime_thread_denial($1,$2) AS denial",
+      "SELECT creator_trust.interactive_denial('thread',$1,$2) AS denial",
       [creatorId, threadId],
     );
   };
@@ -89,7 +115,7 @@ export function trustAudienceRestrictionInTransaction(): AudienceRestriction {
     await projectedDenial(
       client,
       actor,
-      "SELECT creator_trust.runtime_audience_denial($1,$2) AS denial",
+      "SELECT creator_trust.interactive_denial('audience',$1,$2) AS denial",
       [creatorId, participants.fanId],
     );
   };
@@ -100,8 +126,8 @@ export function trustCreatorRestrictionInTransaction() {
     projectedDenial(
       client,
       actor,
-      "SELECT creator_trust.runtime_creator_denial($1) AS denial",
-      [creatorId],
+      "SELECT creator_trust.interactive_denial('creator',$1,$2) AS denial",
+      [creatorId, null],
     );
 }
 
@@ -109,24 +135,11 @@ export function trustCreatorRestrictionInTransaction() {
  * account substitution, object permission or background request scope. */
 export function trustContentRestrictionInTransaction() {
   return async (client: PoolClient, actor: Actor, creatorId: string) => {
-    const current = requestAuthority.getStore();
-    if (!current || current.accountId !== actor.accountId)
-      throw new DomainError(
-        "content_session_required",
-        "Continue with Pantopus for this content.",
-        401,
-      );
-    await assertCurrentSession(client, actor.accountId);
-    // Older canonical session helpers do not yet bind this GUC. The value comes
-    // solely from the genuine session just held above, never from the request.
-    await client.query("SELECT set_config('app.identity_session_id',$1,true)", [
-      current.sessionId,
-    ]);
     await projectedDenial(
       client,
       actor,
-      "SELECT creator_trust.runtime_content_denial($1) AS denial",
-      [creatorId],
+      "SELECT creator_trust.interactive_denial('content',$1,$2) AS denial",
+      [creatorId, null],
     );
   };
 }
