@@ -85,7 +85,7 @@ export class DevelopmentLicenseVerifier implements LicenseVerifier {
     request: z.infer<typeof LicenseRequest>,
   ): Promise<License> {
     invariant(
-      scope.development,
+      scope.development === true,
       "license_verification_unconfigured",
       "Synthetic licenses exist only for development creators.",
     );
@@ -121,6 +121,7 @@ export class DevelopmentLicenseVerifier implements LicenseVerifier {
   }
   async isCurrent(scope: CreatorScope, license: License) {
     return (
+      scope.development === true &&
       this.matches(scope.creatorId, license) &&
       currentCreator(
         await this.creator(this.pool, scope.creatorId),
@@ -135,7 +136,8 @@ export class DevelopmentLicenseVerifier implements LicenseVerifier {
     license: License,
     client: PoolClient,
   ) {
-    if (!this.matches(scope.creatorId, license)) return false;
+    if (scope.development !== true || !this.matches(scope.creatorId, license))
+      return false;
     const stored = (
       await client.query<{ document: License }>(
         "SELECT document FROM creator.ai_license WHERE creator_id=$1 FOR SHARE",
