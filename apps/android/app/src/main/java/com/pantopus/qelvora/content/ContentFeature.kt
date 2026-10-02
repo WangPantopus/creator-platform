@@ -32,6 +32,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.*
+import com.pantopus.qelvora.generated.QelvoraCopy
+import java.time.Instant
 
 private class ContentFailure(val status:Int,message:String,val code:String?=null):Exception(message) {
     val accountChanged get()=code in listOf("content_account_changed","session_account_changed","session_changed")
@@ -62,6 +64,33 @@ private class ContentClient(context: Context, private val baseURL: String) {
 private fun JsonObject.text(key: String): String = this[key]?.jsonPrimitive?.contentOrNull.orEmpty()
 private fun JsonObject.flag(key: String): Boolean = this[key]?.jsonPrimitive?.booleanOrNull ?: false
 private fun JsonObject.number(key: String): Int = this[key]?.jsonPrimitive?.intOrNull ?: 0
+private data class ContentReplyPolicy(val limit: Int, val confirmedDays: Int?, val milestone: Int?) {
+    companion object {
+        fun read(value: JsonObject, accountId: String, creatorId: String): ContentReplyPolicy {
+            if (value.text("accountId") != accountId || value.text("creatorId") != creatorId)
+                throw ContentFailure(403, "The signed-in account changed. Refresh before continuing.", "content_account_changed")
+            fun integer(key: String): Int? {
+                val raw = value[key] ?: error("Missing reply policy")
+                if (raw is JsonNull) return null
+                check(!raw.jsonPrimitive.isString)
+                return raw.jsonPrimitive.intOrNull ?: error("Invalid reply policy")
+            }
+            val days = integer("confirmedDays"); val milestone = integer("milestone"); val limit = integer("limit") ?: error("Missing reply limit")
+            val active = value["longerRepliesActive"]?.jsonPrimitive?.booleanOrNull ?: error("Missing reply policy")
+            check(value["longerRepliesActive"]?.jsonPrimitive?.isString == false)
+            check(value["historyComplete"]?.jsonPrimitive?.booleanOrNull == false && value["historyComplete"]?.jsonPrimitive?.isString == false)
+            check(days == null || days >= 0)
+            val expectedMilestone = when { days == null || days < 50 -> null; days >= 365 -> 365; days >= 100 -> 100; else -> 50 }
+            val expectedLimit = when { !active || expectedMilestone == null -> 4000; expectedMilestone == 365 -> 12000; expectedMilestone == 100 -> 8000; else -> 6000 }
+            val basis = value["basis"]?.jsonPrimitive?.contentOrNull
+            check(basis == null || basis in listOf("confirmed_stripe_paid_periods", "confirmed_paid_periods"))
+            check(days == null || basis != null)
+            check(milestone == expectedMilestone && limit == expectedLimit)
+            Instant.parse(value.text("checkedAt"))
+            return ContentReplyPolicy(limit, days, milestone)
+        }
+    }
+}
 
 @Composable
 private fun QText(text: String, token: String, modifier: Modifier = Modifier) {
@@ -79,7 +108,7 @@ private fun ContentChoice(label: String, checked: Boolean, disabled: Boolean, ch
 }
 @Composable
 private fun ContentInput(label: String, value: String, max: Int, change: (String) -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { QText(label, "caption"); BasicTextField(value, { change(it.take(max)) }, Modifier.fillMaxWidth().heightIn(min = 64.dp).background(qColor("surface")).padding(12.dp).semantics { contentDescription = label }, textStyle = qText("body").copy(color = qColor("ink"))) }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { QText(label, "caption"); BasicTextField(value, { if (it.length <= max || it.length < value.length) change(it) }, Modifier.fillMaxWidth().heightIn(min = 64.dp).background(qColor("surface")).padding(12.dp).semantics { contentDescription = label }, textStyle = qText("body").copy(color = qColor("ink"))) }
 }
 
 @Composable
@@ -101,11 +130,13 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
     var muted by remember { mutableStateOf<Boolean?>(null) }
     var replyAccess by remember { mutableStateOf(false) }
     var thanksAccess by remember { mutableStateOf(false) }
+    var replyPolicy by remember { mutableStateOf<ContentReplyPolicy?>(null) }
+    val replyLimit = replyPolicy?.limit ?: 4000
     var loading by remember { mutableStateOf(false) }
     var checkedAt by remember { mutableLongStateOf(0L) }
     var replyDepth by remember { mutableIntStateOf(1) }
     val retryKeys=remember { mutableMapOf<String,String>() }
-    fun suspendAccess() { currentAccess = false; replyAccess = false; thanksAccess = false; signature = null; signatureStatus = "" }
+    fun suspendAccess() { currentAccess = false; replyAccess = false; thanksAccess = false; replyPolicy = null; signature = null; signatureStatus = "" }
     fun clearAuthority() {
         suspendAccess(); content = null; replies = emptyList(); thanks = null; cursor = null
         viewerAccountId = null; muted = null; replyText = ""; thanksText = ""; share = false; identity = false; retryKeys.clear()
@@ -145,13 +176,20 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
                 if(failure is ContentFailure && failure.authorityDenied)throw failure
                 statuses.add("Thanks is unavailable. Your input is kept; refresh before saving.")
             }
+            var policy: ContentReplyPolicy? = null
+            try {
+                policy = ContentReplyPolicy.read(api.request("$creatorId/reply-policy", expectedAccountId=before.text("accountId")).jsonObject, before.text("accountId"), creatorId)
+            }catch(cancelled:kotlinx.coroutines.CancellationException){throw cancelled}catch(failure:Exception){
+                if(failure is ContentFailure && failure.authorityDenied)throw failure
+                statuses.add(QelvoraCopy.text("contentReplyPolicyUnavailable"))
+            }
             val after=api.request("$creatorId/mute", expectedAccountId=before.text("accountId")).jsonObject
             if(generation!=loadGeneration)return
             if(before.text("accountId")!=after.text("accountId")){clearAuthority();error="The signed-in account changed. Refresh before continuing.";return}
             val currentMuted = after["muted"]?.jsonPrimitive?.booleanOrNull ?: throw ContentFailure(503, "Note preferences are unavailable. Refresh current access.")
             val changed=viewerAccountId!=before.text("accountId")
             if(changed){replyText="";thanksText="";share=false;identity=false;retryKeys.clear();signature=null;replyDepth=1}
-            viewerAccountId=before.text("accountId");muted=currentMuted;content=view;replies=currentReplies;cursor=page?.get("nextCursor")?.jsonPrimitive?.contentOrNull;thanks=mine;replyAccess=repliesAvailable;thanksAccess=thanksAvailable
+            viewerAccountId=before.text("accountId");muted=currentMuted;content=view;replies=currentReplies;cursor=page?.get("nextCursor")?.jsonPrimitive?.contentOrNull;thanks=mine;replyAccess=repliesAvailable;thanksAccess=thanksAvailable;replyPolicy=policy
             if(thanksAvailable && (resetThanks||changed)){thanksText=mine?.text("text").orEmpty();share=mine?.flag("shareWithCreatorDigest")?:false;identity=mine?.flag("showIdentity")?:false}
             error=statuses.joinToString("\n")
             checkedAt = cycleStartedAt; currentAccess = lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED) && SystemClock.elapsedRealtime() - cycleStartedAt < 5000
@@ -166,6 +204,7 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
     suspend fun mutate(path: String, body: JsonObject, resetThanks: Boolean = false, clearReply: Boolean = false) {
         if (busy || !currentAccess || viewerAccountId==null) return
         if ((path=="thanks" && !thanksAccess) || (path=="$contentId/replies" && !replyAccess)) return
+        if (path=="$contentId/replies" && replyText.trim().length > replyLimit) return
         busy = true
         val fields=body.toMutableMap();fields.remove("idempotencyKey")
         val fingerprint=path+JsonObject(fields.toSortedMap()).toString()
@@ -238,8 +277,12 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
             }
             if (document.text("kind") == "note") {
                 QText("Your private replies", "display-md", modifier = Modifier.semantics { heading() }); QText("Only you, the creator, and their permitted team can read your replies. A Note is a broadcast.", "caption")
-                ContentInput("Reply privately", replyText, 4000) { replyText = it }
-                Button("Send private reply", ButtonVariant.SECONDARY, block = true, disabled = busy || !replyAccess || replyText.isBlank()) { scope.launch { mutate("$contentId/replies", buildJsonObject { put("text", replyText); put("idempotencyKey", UUID.randomUUID().toString()) }, clearReply = true) } }
+                replyPolicy?.let { policy -> if (policy.milestone != null && policy.confirmedDays != null) QText(QelvoraCopy.text("contentConfirmedTenure", mapOf("days" to policy.confirmedDays.toString())), "caption") }
+                if (replyPolicy == null) QText(QelvoraCopy.text("contentReplyPolicyUnavailable"), "caption")
+                ContentInput("Reply privately", replyText, replyLimit) { replyText = it }
+                QText(QelvoraCopy.text("contentReplyLimit", mapOf("used" to replyText.length.toString(), "limit" to replyLimit.toString())), "caption")
+                if (replyText.length > replyLimit) QText(QelvoraCopy.text("contentReplyOverLimit"), "caption")
+                Button("Send private reply", ButtonVariant.SECONDARY, block = true, disabled = busy || !replyAccess || replyText.isBlank() || replyText.trim().length > replyLimit) { scope.launch { mutate("$contentId/replies", buildJsonObject { put("text", replyText); put("idempotencyKey", UUID.randomUUID().toString()) }, clearReply = true) } }
                 replies.filter { it.text("contentId") == contentId }.forEach { reply ->
                     key(reply.text("id")) { Column(Modifier.background(qColor("surface")).padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         QText(reply.text("text"), "body")
