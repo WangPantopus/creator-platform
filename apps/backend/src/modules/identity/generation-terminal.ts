@@ -11,6 +11,8 @@ import { requestAuthority } from "./request-authority.js";
 
 export const GENERATION_TERMINAL_MIGRATION =
   "0099_w1_generation_terminal_scope";
+export const GENERATION_TERMINAL_DENIAL_MIGRATION =
+  "0100_w8_generation_terminal_denial";
 const Hash = z.string().regex(/^[a-f0-9]{64}$/u);
 const Instant = z.iso
   .datetime({ offset: true })
@@ -230,7 +232,8 @@ export class GenerationTerminalAuthority {
         input.generation instanceof GenerationIdentityAuthority &&
           input.migration.version === GENERATION_TERMINAL_MIGRATION &&
           Hash.safeParse(input.migration.checksum).success &&
-          /^0100_w8_[a-z_]+$/u.test(input.denialMigration.version) &&
+          input.denialMigration.version ===
+            GENERATION_TERMINAL_DENIAL_MIGRATION &&
           Hash.safeParse(input.denialMigration.checksum).success &&
           Hash.safeParse(input.denialDefinitionChecksum).success &&
           typeof input.assertRestoredInTransaction === "function" &&
@@ -256,6 +259,8 @@ export class GenerationTerminalAuthority {
             AND NOT r.rolsuper AND NOT r.rolbypassrls AND NOT r.rolinherit AND NOT r.rolcreatedb
             AND NOT r.rolcreaterole AND NOT r.rolreplication AND (r.rolconfig IS NULL OR cardinality(r.rolconfig)=0)
             AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid OR roleid=r.oid)
+            AND NOT EXISTS(SELECT FROM pg_db_role_setting WHERE setrole=r.oid
+             AND setdatabase IN(0,(SELECT oid FROM pg_database WHERE datname=current_database())))
             AND NOT EXISTS(SELECT FROM pg_namespace WHERE nspowner=r.oid)
             AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=r.oid))
            AND (SELECT count(*)=6 FROM pg_proc WHERE proowner=(SELECT oid FROM pg_roles WHERE rolname=$5))
@@ -263,12 +268,13 @@ export class GenerationTerminalAuthority {
             AND relkind='r' AND relrowsecurity AND relforcerowsecurity AND pg_get_userbyid(relowner)='creator_owner')
            AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
             WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
-             AND c.relkind IN('r','p','v','m','f') AND c.oid<>to_regclass('creator.generation_terminal_scope')
-             AND has_table_privilege($5,c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER'))
+             AND c.oid<>to_regclass('creator.generation_terminal_scope')
+             AND CASE WHEN c.relkind IN('r','p','v','m','f')
+              THEN has_table_privilege($5,c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') ELSE false END)
            AND NOT has_table_privilege($5,'creator.generation_terminal_scope','UPDATE,TRUNCATE,REFERENCES,TRIGGER')
            AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
-            WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema' AND c.relkind='S'
-             AND has_sequence_privilege($5,c.oid,'USAGE,SELECT,UPDATE'))
+            WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
+             AND CASE WHEN c.relkind='S' THEN has_sequence_privilege($5,c.oid,'USAGE,SELECT,UPDATE') ELSE false END)
            AND NOT EXISTS(SELECT FROM pg_namespace n WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
             AND has_schema_privilege($5,n.oid,'CREATE'))
            AND NOT EXISTS(SELECT FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
@@ -284,8 +290,8 @@ export class GenerationTerminalAuthority {
            AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
             JOIN pg_attribute a ON a.attrelid=c.oid AND a.attnum>0 AND NOT a.attisdropped
             CROSS JOIN unnest(ARRAY['SELECT','INSERT','UPDATE','REFERENCES']) AS privilege
-            WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema' AND c.relkind IN('r','p','v','m','f')
-             AND has_column_privilege($5,c.oid,a.attnum,privilege)
+            WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
+             AND CASE WHEN c.relkind IN('r','p','v','m','f') THEN has_column_privilege($5,c.oid,a.attnum,privilege) ELSE false END
              AND NOT coalesce(($6::jsonb->(n.nspname||'.'||c.relname)->privilege) ? a.attname,false))
            AND NOT has_column_privilege($5,'creator.message','text','SELECT')
            AND NOT has_column_privilege($5,'creator.memory','text','SELECT')

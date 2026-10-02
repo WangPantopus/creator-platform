@@ -192,10 +192,17 @@ export async function composeConversationHost(
     "0097_w2_generation_attempt_admission",
     "0099_w1_generation_terminal_scope",
     "0100_w8_generation_terminal_denial",
+    "0105_w2_generation_terminal_journal",
     "0110_w3_generation_terminal_finalization",
   ])
     if (!(await registeredChecksum(version)))
       missing.push(`registered ${version}`);
+  // The legacy interactive generator cannot substitute for the new genuine
+  // worker/output/journal/settlement graph, even if its SQL is later registered.
+  // Remove this refusal only when that actual composition replaces the legacy
+  // generator below; allocations and prepared readers alone cannot enable it.
+  if (requested)
+    missing.push("current generation worker composition (W3/W1/W2/W4)");
 
   let journal: PreparedGenerationJournal | undefined;
   const journalChecksum = await registeredChecksum(migrations.journal);
