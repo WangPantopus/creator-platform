@@ -899,4 +899,8 @@
   <string name="w6_availability_account_changed" formatted="false">Your account changed. Reopen availability to continue.</string>
   <string name="account_unavailable_title" formatted="false">We can\'t reach your account right now</string>
   <string name="account_unavailable_body" formatted="false">Your session is kept on this device. Try again in a moment.</string>
+  <string name="limit_reminders_off" formatted="false">Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.</string>
+  <string name="limit_reminders_unknown" formatted="false">Lowering a limit is immediate.</string>
+  <string name="page_unavailable_title" formatted="false">This page didn\'t load</string>
+  <string name="page_unavailable_body" formatted="false">Nothing you saved was changed. Try again in a moment.</string>
 </resources>

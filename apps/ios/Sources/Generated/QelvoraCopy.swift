@@ -898,7 +898,11 @@ public enum QelvoraCopy {
     "w6RefreshWillReplaceAvailabilityChanges": "Replace your unsaved changes with the saved availability?",
     "w6AvailabilityAccountChanged": "Your account changed. Reopen availability to continue.",
     "accountUnavailableTitle": "We can't reach your account right now",
-    "accountUnavailableBody": "Your session is kept on this device. Try again in a moment."
+    "accountUnavailableBody": "Your session is kept on this device. Try again in a moment.",
+    "limitRemindersOff": "Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.",
+    "limitRemindersUnknown": "Lowering a limit is immediate.",
+    "pageUnavailableTitle": "This page didn't load",
+    "pageUnavailableBody": "Nothing you saved was changed. Try again in a moment."
   ]
   private static let variables = try! NSRegularExpression(pattern: #"\{([^}]+)\}"#)
   public static func text(_ key: String, values: [String: String] = [:]) -> String {

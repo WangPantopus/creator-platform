@@ -898,7 +898,11 @@ object QelvoraCopy {
     "w6RefreshWillReplaceAvailabilityChanges" to "Replace your unsaved changes with the saved availability?",
     "w6AvailabilityAccountChanged" to "Your account changed. Reopen availability to continue.",
     "accountUnavailableTitle" to "We can't reach your account right now",
-    "accountUnavailableBody" to "Your session is kept on this device. Try again in a moment."
+    "accountUnavailableBody" to "Your session is kept on this device. Try again in a moment.",
+    "limitRemindersOff" to "Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.",
+    "limitRemindersUnknown" to "Lowering a limit is immediate.",
+    "pageUnavailableTitle" to "This page didn't load",
+    "pageUnavailableBody" to "Nothing you saved was changed. Try again in a moment."
   )
   private val variables = Regex("""\{([^}]+)\}""")
   fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }

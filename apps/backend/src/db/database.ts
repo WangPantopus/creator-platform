@@ -5,7 +5,10 @@ import {
 } from "../modules/access/scope.js";
 import { DomainError } from "../core/errors.js";
 import { assertCurrentSession } from "../modules/identity/request-authority.js";
-import type { ScopeRestriction } from "../modules/access/scope.js";
+import type {
+  ScopeRestriction,
+  ScopeRestrictionInTransaction,
+} from "../modules/access/scope.js";
 
 export type ThreadLockMode = "read" | "write";
 
@@ -18,7 +21,11 @@ export class Database {
       parameters: readonly unknown[];
     }) => void,
     private readonly assertAllowed?: ScopeRestriction,
+    private readonly assertAllowedInTransaction?: ScopeRestrictionInTransaction,
   ) {}
+  get threadScopeInTransactionAvailable() {
+    return typeof this.assertAllowedInTransaction === "function";
+  }
   async assertRuntimeRole(): Promise<void> {
     const result = await this.pool.query<{
       rolsuper: boolean;
@@ -77,24 +84,63 @@ export class Database {
         [scope.creatorId, scope.fanId, scope.actorAccountId],
       );
       await assertCurrentSession(client, scope.actorAccountId);
-      // Issued scopes are not durable authority. Recheck role/verification before
-      // any scoped read or mutation, including a queued request using an old scope.
-      const authority = await client.query<{ fan_account_id: string }>(
-        `SELECT f.account_id AS fan_account_id FROM creator.thread t JOIN creator.creator_profile c ON c.id=t.creator_id JOIN creator.fan_profile f ON f.id=t.fan_id
+      const authoritySql = `SELECT f.account_id AS fan_account_id FROM creator.thread t JOIN creator.creator_profile c ON c.id=t.creator_id JOIN creator.fan_profile f ON f.id=t.fan_id
          WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 AND c.account_id=$6 AND t.deleted_at IS NULL AND (
          ($5='fan' AND f.account_id=$4) OR ($5='creator' AND c.account_id=$4 AND c.verification='verified') OR
-         ($5='triage' AND c.verification='verified' AND EXISTS(SELECT 1 FROM creator.team_membership tm WHERE tm.creator_id=c.id AND tm.account_id=$4 AND tm.revoked_at IS NULL AND 'triage'=ANY(tm.roles))))
-         FOR ${threadLock} OF t`,
-        [
-          scope.threadId,
-          scope.creatorId,
-          scope.fanId,
-          scope.actorAccountId,
-          scope.authority,
-          scope.creatorAccountId,
-        ],
+         ($5='triage' AND c.verification='verified' AND EXISTS(SELECT 1 FROM creator.team_membership tm WHERE tm.creator_id=c.id AND tm.account_id=$4 AND tm.revoked_at IS NULL AND 'triage'=ANY(tm.roles))))`;
+      const parameters = [
+        scope.threadId,
+        scope.creatorId,
+        scope.fanId,
+        scope.actorAccountId,
+        scope.authority,
+        scope.creatorAccountId,
+      ];
+      let negativeFanAccount: string | undefined;
+      if (this.assertAllowedInTransaction) {
+        // Resolve only current participant metadata before taking any positive
+        // family row lock. Blocking denial writers take their keys first.
+        negativeFanAccount = (
+          await client.query<{ fan_account_id: string }>(
+            authoritySql,
+            parameters,
+          )
+        ).rows[0]?.fan_account_id;
+        if (!negativeFanAccount)
+          throw new DomainError(
+            "thread_unavailable",
+            "This conversation is unavailable.",
+            404,
+          );
+        try {
+          await this.assertAllowedInTransaction(
+            { accountId: scope.actorAccountId, adultEligible: true },
+            scope.creatorId,
+            scope.threadId,
+            {
+              fanAccountId: negativeFanAccount,
+              creatorAccountId: scope.creatorAccountId,
+            },
+            client,
+          );
+        } finally {
+          await client.query(
+            "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true),set_config('app.account_id',$3,true)",
+            [scope.creatorId, scope.fanId, scope.actorAccountId],
+          );
+        }
+      }
+      // Issued scopes and the earlier metadata snapshot are not durable positive
+      // authority. Revalidate the actual family/role under its row lease.
+      const authority = await client.query<{ fan_account_id: string }>(
+        `${authoritySql} FOR ${threadLock} OF t`,
+        parameters,
       );
-      if (!authority.rowCount)
+      if (
+        !authority.rowCount ||
+        (negativeFanAccount !== undefined &&
+          authority.rows[0]!.fan_account_id !== negativeFanAccount)
+      )
         throw new DomainError(
           "thread_unavailable",
           "This conversation is unavailable.",
@@ -128,6 +174,31 @@ export class Database {
           scope.actorAccountId,
         ]);
         if (!creator.rowCount)
+          throw new DomainError(
+            "thread_unavailable",
+            "This conversation is unavailable.",
+            404,
+          );
+      }
+      if (negativeFanAccount !== undefined && scope.authority !== "fan") {
+        // Keep the pre-resolved original fan binding current through commit.
+        // This is the same narrow read-only profile lease used by Access; no
+        // fan-scoped domain work runs with this temporary account binding.
+        let currentFan;
+        try {
+          await client.query("SELECT set_config('app.account_id',$1,true)", [
+            negativeFanAccount,
+          ]);
+          currentFan = await client.query(
+            "SELECT 1 FROM creator.fan_profile WHERE id=$1 AND account_id=$2 FOR SHARE",
+            [scope.fanId, negativeFanAccount],
+          );
+        } finally {
+          await client.query("SELECT set_config('app.account_id',$1,true)", [
+            scope.actorAccountId,
+          ]);
+        }
+        if (currentFan.rowCount !== 1)
           throw new DomainError(
             "thread_unavailable",
             "This conversation is unavailable.",

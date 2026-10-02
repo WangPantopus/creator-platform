@@ -90,6 +90,9 @@ function message(row: MessageRow): Message {
 }
 
 export class ConversationService {
+  isFor(database: Database, access: AccessService) {
+    return this.db === database && this.access === access;
+  }
   private approvals?: Pick<
     CommerceApprovals,
     "prepareDelivery" | "recordDelivery"
