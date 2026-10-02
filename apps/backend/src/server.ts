@@ -14,6 +14,10 @@ import { createContentStudio } from "./modules/content/integration.js";
 import { mediaFeature } from "./modules/media/registration.js";
 import { createAgentDomain } from "./modules/agent/integration.js";
 import { agentFeature } from "./modules/agent/feature.js";
+import {
+  createDevelopmentTrust,
+  developmentTrustActors,
+} from "./modules/trust/development.js";
 
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
@@ -32,7 +36,13 @@ const configured =
         identity: new DevelopmentIdentityAdapter(
           config.allowedOrigin,
           process.env.NODE_ENV,
+          process.env.TRUST_LOCAL_DEVELOPMENT === "true"
+            ? developmentTrustActors
+            : [],
         ),
+        ...(process.env.TRUST_LOCAL_DEVELOPMENT === "true"
+          ? { trust: (runtime) => createDevelopmentTrust(runtime) }
+          : {}),
         guardrails: {
           checkSentence: async () => {
             throw new Error("AI generation is unconfigured.");
