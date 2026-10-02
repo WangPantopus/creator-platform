@@ -27,6 +27,7 @@ export class Database {
       request: NonNullable<ReturnType<typeof requestAuthority.getStore>>;
       lockMode: ThreadLockMode;
       pending: number;
+      finalizer?: () => Promise<void>;
     }
   >();
   constructor(
@@ -80,6 +81,27 @@ export class Database {
     } finally {
       binding.pending--;
     }
+  }
+  /** Lifecycle ordering only; this creates no domain/signature permission.
+   * Register the actual owner gate inside the original held callback. Ordinary
+   * session checks and all business work finish first; after the awaited gate,
+   * Database executes only COMMIT (or ROLLBACK on refusal). One last gate per
+   * transaction prevents a later registration from replacing an owner's gate.
+   */
+  finalizeHeldThreadBeforeCommit(
+    scope: ThreadScope,
+    client: PoolClient,
+    finalizer: () => Promise<void>,
+  ): void {
+    this.assertHeldThread(scope, client);
+    const binding = this.held.get(client)!;
+    if (binding.finalizer || typeof finalizer !== "function")
+      throw new DomainError(
+        "held_finalizer_conflict",
+        "Finish this conversation through its original final gate.",
+        503,
+      );
+    binding.finalizer = finalizer;
   }
   async assertRuntimeRole(): Promise<void> {
     const result = await this.pool.query<{
@@ -323,11 +345,22 @@ export class Database {
             "Finish the authorized conversation work before commit.",
             503,
           );
+        if (heldRequest)
+          await assertHeldCurrentRequestSession(heldRequest, client);
+        const finalizer = this.held.get(scopedClient)?.finalizer;
+        if (finalizer) {
+          await finalizer();
+          // JS-only unfinished-work check; no SQL or GUC follows the last gate.
+          if ((this.held.get(scopedClient)?.pending ?? 0) !== 0)
+            throw new DomainError(
+              "held_work_pending",
+              "Finish the authorized final gate before commit.",
+              503,
+            );
+        }
       } finally {
         this.held.delete(scopedClient);
       }
-      if (heldRequest)
-        await assertHeldCurrentRequestSession(heldRequest, client);
       await client.query("COMMIT");
       return value;
     } catch (error) {
