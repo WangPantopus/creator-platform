@@ -1,5 +1,22 @@
 # W8 resume prompt — complete the workstream
 
+## Current domain cursor and three-client acceptance — 2026-10-02
+
+[Personally operated web/iOS/Android and independently saved state](../../../artifacts/workstreams/W8/privacy-domain-worker/20261002-mac-studio/app-acceptance/README.md) at48d69e36 qualifies the actual held task/restoration/cancellation composition and one fixed Identity cursor. Same new synthetic export8e411c31 across Light/Night: Trust/Identity/Media/genuine empty Agent complete, four blocked tasks, blocked parent/no download. Canonical61 candidate remains separate from main57 activation; Media coherent export, nonempty Agent196, all-eight C10/purge/provider/recovery/release remain open. Own devices/services normally stopped, exact leases released, new private checkpoint retained; no new unit tests. Synthetic proof saved one actual approval/effect, but Identity's proof read omits submitted postUrl; W1 has the exact correction and the original immutable evidence is preserved without a full proof claim.
+
+Focused PR89 merged53133967 (head780adc81) and PR142 mergedb6f12e24 (headfd4782ac). Current fast/compile checks passed; queued foundation and cancelled obsolete runs were not called passes. Held0201 metadata PR169 mergedb6738326 without activation.
+
+
+Actual0103 increment acceptance now includes [web plus normally shipped Android/iOS and independent saved-state readback](../../../artifacts/workstreams/W8/privacy-domain-fence/20261002-mac-studio/app-acceptance/README.md) at ccc4474b. Same new synthetic account-export hash across clients, Light/Night Trust blocked with no receipt/data/download. Missing activation never becomes an empty success. Existing Agent receipt is a separately identified unqualified lifecycle gap; W2 is correcting it. All own devices/services/slots are stopped/released, next-env restored and private0600 checkpoint retained. Actual activated task/COMMIT/expiry/owner/purge and full C10/recovery/release remain open. Additional held allocations:0111 W1 translation issuer,0112 W8 original translation negatives,0113 W2 distinct all-owned export snapshot;0087 scope ACL/owner stay isolated.
+
+
+## Private privacy worker COMMIT fence — 2026-10-02
+
+Reserved0103 now separates actual Trust/Growth worker lifecycle custody from0087. [Personally executed closed SQL/compiler/catalogue review](../../../artifacts/workstreams/W8/privacy-domain-fence/20261002-mac-studio/README.md) preserves canonical57, absent activation and zero scopes. All three functions have zero diagnostics; six permission refusals and eight rolled-back drift refusals are recorded. Both full guards refuse unregistered0103. Trust's real hook requires the current job/signal and held restoration before domain reads/deletes and COMMIT. [Owner contract](../../operations/W8-domain-privacy-fence.md) exports the actual same-client port; W7 is integrating a single-cursor consistent snapshot under read committed. No full privacy/COMMIT, original recovery or release acceptance is claimed.
+
+Terminal denial is published as draft [PR145](https://github.com/WangPantopus/creator-platform/pull/145), exact source d12db34c/pin8714bc0c. The current privacy-fence branch remains separate from this terminal stack. Actual worker/job/app acceptance follows source verification; canonical SQL/history and0087 remain unchanged.
+
+
 ## Actual current privacy and scoped Ops — 2026-10-02
 
 [Real web/Android/iOS operation and independent saved-state evidence](../../../artifacts/workstreams/W8/privacy-reconciliation/20261002-mac-studio/app-acceptance/README.md) at backend/webc3c0a6d1 verifies the same synthetic export in both appearances, explicit blocked core0087/configuration dependencies and no download. Actual Ops purpose-limited access and recorded Close cold-reload resolved; DB verifies reviewer/access/one decision/version2/zero external effects. Queue1280×900/220sidebar and390/no overflow plus keyboard skip-link observed. No all-eight C10/owner COMMIT, accessibility200%/screen reader, provider, original recovery or release completion.
