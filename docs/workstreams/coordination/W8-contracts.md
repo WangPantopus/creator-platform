@@ -1,5 +1,9 @@
 # W8 contract, migration and runtime register
 
+## Held original-worker migration metadata — 2026-10-02
+
+[Closed0201 SQL/ACL review](../../../artifacts/workstreams/W8/worker-migration-metadata/20261002-mac-studio/README.md) qualifies only canonical ledger version/checksum reads for the existing isolated publication/callback worker logins. Eight real drift refusals roll back; all six original61 custody hashes remain unchanged. The held source creates no roles or active migration entry. Actual registered source/ledger/definition/role/ACL and currentness checks on the same original worker client remain required. No provider effect, password-login acceptance, activation, full C10 or release is claimed. All W8 qualification clients are stopped; private restored target remains closed.
+
 ## Original-fan packet denial source — 2026-10-02
 
 W8 supplies reserved0076 original-fan/viewer/owner/publisher negative projection and `holdPublicPacketNegativeAuthority(client, actualActor, tuple)`. Unapplied0073 now runs packet negatives first and includes the schema-USAGE grant verified with the actual publication login. [Exact DDL/negative evidence](../../../artifacts/workstreams/W8/packet-denial/20261002-mac-studio/README.md) records zero fabricated publications, canonical57 unchanged and real non-owner refusals. Contention returns retryable unavailable, never successful empty permission. Actual signed packet, original-fan change and composed/native journeys remain open; this is not activation or release acceptance.

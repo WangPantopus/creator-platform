@@ -628,6 +628,15 @@
       "version": "0097_w2_generation_attempt_admission",
       "state": "reserved_unapplied",
       "reason": "Actual pre-network all-attempt journal admission under exact W1 durable worker proof and reviewed consumer allowlist. Accounting retention policy and C10 custody remain explicit dependencies."
+    },
+    {
+      "id": "0201",
+      "owner": "W8",
+      "version": "0201_w8_worker_migration_metadata",
+      "path": "apps/backend/migrations/0201_w8_worker_migration_metadata.sql",
+      "sourceSha256": "2fce1ce5aa6c9f571067d999e2a62ac8d71b8e147b97393e7e87091227159e6f",
+      "state": "reserved_unapplied",
+      "reason": "Distinct metadata-only SELECT(version,checksum) for the actual isolated creator_publication_worker and creator_call_callback_worker after0158/0176. Same held original worker source/ledger/definition/role/ACL/currentness bookends remain required. No whole-ledger SELECT, timestamps, write, grant option, membership, private content, provider/effect or family/signing authority. Exact rolled-back SQL/ACL/refusal qualification pending; not activation or positive ingress acceptance."
     }
   ]
 }
