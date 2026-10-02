@@ -117,8 +117,18 @@ class StoreMembershipCoordinator(context:Context,private val accountId:String,pr
         Button("${product.detail.name} · $price / month",ButtonVariant.SECONDARY,block=true,disabled=coordinator.busy) {coordinator.purchase(context,product)}
     }
     Button("Restore purchases",ButtonVariant.QUIET,disabled=coordinator.busy) {scope.launch {coordinator.restore()}}
-    Button("Manage in Google Play",ButtonVariant.QUIET) {
-        runCatching { context.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse("https://play.google.com/store/account/subscriptions")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
-    }
+    StoreSubscriptionManagement(context,disabled=coordinator.busy)
     if(coordinator.status.isNotEmpty()) Notice(title="Store status",children=coordinator.status)
+}
+
+/** Opening store settings never grants access or infers a cancellation. */
+@Composable internal fun StoreSubscriptionManagement(context:Context,disabled:Boolean=false) {
+    var unavailable by remember {mutableStateOf(false)}
+    Button("Manage in Google Play",ButtonVariant.QUIET,disabled=disabled) {
+        unavailable=false
+        try {
+            context.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse("https://play.google.com/store/account/subscriptions")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        } catch(_:RuntimeException) {unavailable=true}
+    }
+    if(unavailable) Notice(title="Store settings unavailable",children="Open Play Store, then Payments & subscriptions, then Subscriptions to manage your membership.")
 }
