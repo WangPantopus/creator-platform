@@ -58,6 +58,14 @@ export function conversationPrivacyExportStream(
   let wake: (() => void) | undefined;
   let rejectWrite: ((error: unknown) => void) | undefined;
   let resolveDone!: () => void;
+  let client: PoolClient | undefined;
+  let clientReleased = false;
+  const releaseClient = (destroy = false) => {
+    if (client && !clientReleased) {
+      clientReleased = true;
+      client.release(destroy);
+    }
+  };
   const done = new Promise<void>((resolve) => {
     resolveDone = resolve;
   });
@@ -68,6 +76,7 @@ export function conversationPrivacyExportStream(
   };
   const abort = () => {
     rejectWrite?.(signal.reason);
+    releaseClient(true);
     notify();
   };
   signal.addEventListener("abort", abort, { once: true });
@@ -110,7 +119,6 @@ export function conversationPrivacyExportStream(
     }
   };
   const produce = async () => {
-    let client: PoolClient | undefined;
     try {
       await assertCurrent();
       client = await input.pool.connect();
@@ -272,15 +280,18 @@ export function conversationPrivacyExportStream(
         signal.throwIfAborted();
         await input.authority.assertFamily(client, job, family);
       }
+      await fenceConversationPrivacyTask(input.authority, client, job);
       signal.throwIfAborted();
       await client.query("COMMIT");
+      signal.throwIfAborted();
       committed = true;
     } catch (error) {
       failed = true;
       failure = error;
-      if (client) await client.query("ROLLBACK").catch(() => undefined);
+      if (client && !clientReleased)
+        await client.query("ROLLBACK").catch(() => undefined);
     } finally {
-      client?.release();
+      releaseClient();
       signal.removeEventListener("abort", abort);
       resolveDone();
       notify();
