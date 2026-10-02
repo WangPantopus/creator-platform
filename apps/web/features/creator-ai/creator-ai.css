@@ -574,6 +574,24 @@ details[open] > summary:before {
     flex: 1;
   }
 }
+@media (max-width: 260px) {
+  .w2-phone-nav {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(44px, 1fr));
+  }
+  .w2-main {
+    padding-bottom: calc(152px + env(safe-area-inset-bottom));
+  }
+  .w2-confirmation {
+    bottom: calc(132px + env(safe-area-inset-bottom));
+  }
+  html:has(.w2-studio) {
+    scroll-padding-block: 16px calc(132px + env(safe-area-inset-bottom));
+  }
+  .w2-main :is(input, textarea, select, button, a, summary) {
+    scroll-margin-block: 16px calc(132px + env(safe-area-inset-bottom));
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .w2-studio * {
     animation: none !important;

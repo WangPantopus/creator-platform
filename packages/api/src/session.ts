@@ -73,6 +73,12 @@ export const EndCallSchema = z.strictObject({
   fanChoice: z.enum(["end_by_choice", "technical_problem"]).optional(),
   idempotencyKey: z.string().min(8).max(128),
 });
+/** The nonce belongs to the actual current session/account. Redemption is
+ * application admission; the provider separately enforces its token custody. */
+export const AdmissionRedemptionSchema = z.strictObject({ nonce: z.uuid() });
+export const AdmissionReceiptSchema = z.strictObject({
+  admitted: z.literal(true),
+});
 export type CallConsentPurpose = z.infer<typeof CallConsentPurposeSchema>;
 export const CallSummaryNoteSchema = z.strictObject({
   note: z.string().trim().max(8000),
