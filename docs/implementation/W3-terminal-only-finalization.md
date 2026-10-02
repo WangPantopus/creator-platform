@@ -21,6 +21,14 @@ effective catalogue checksums. These checksums are mandatory configuration;
 reading them from an unreviewed installation is not approval. The packet and
 its nested migration metadata are frozen at preparation.
 
+Factory qualification leases the actual worker client and opens a bounded
+read-only READ COMMITTED transaction before W1's SAVEPOINT-based catalogue
+proof. It clears interactive/scope GUCs locally, applies statement/lock/idle
+timeouts, and always rolls back before releasing the client. A failed BEGIN or
+rollback destroys that connection; an uncertain transaction is never returned
+to the pool. This qualification transaction issues no generation or terminal
+scope and performs no settlement or COMMIT.
+
 Immediately before and after the fixed SQL transition, the consumer checks
 current identity catalogue, exact role attributes, memberships, settings,
 function owner/definition/ACL, effective columns/policies/schemas, and genuine
