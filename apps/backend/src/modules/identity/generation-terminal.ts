@@ -172,6 +172,137 @@ const MetadataColumns: Readonly<
  * context, memory proposal, positive input read or provider admission is issued.
  * W2/W3/W4 fixed consumers receive this actual held client and branded object.
  */
+type TerminalCatalogue = Readonly<{
+  migration: Readonly<{ version: string; checksum: string }>;
+  denialMigration: Readonly<{ version: string; checksum: string }>;
+  denialDefinitionChecksum: string;
+  definitions: Readonly<Record<Definition, string>>;
+}>;
+
+/** Reuse the complete reviewed factory proof on the caller's current client.
+ * Construction-time approval cannot survive a live owner/ACL/function drift. */
+async function assertTerminalCatalogue(
+  query: Pick<Pool, "query">,
+  input: TerminalCatalogue,
+): Promise<void> {
+  const ready = (
+    await query.query<{ ready: boolean }>(
+      `SELECT session_user='creator_generation_worker' AND current_user=session_user
+       AND (SELECT count(*)=2 FROM creator.schema_migration
+        WHERE (version=$1 AND checksum=$2) OR (version=$3 AND checksum=$4))
+       AND EXISTS(SELECT FROM pg_roles r WHERE r.rolname=$5 AND NOT r.rolcanlogin
+        AND NOT r.rolsuper AND NOT r.rolbypassrls AND NOT r.rolinherit AND NOT r.rolcreatedb
+        AND NOT r.rolcreaterole AND NOT r.rolreplication AND (r.rolconfig IS NULL OR cardinality(r.rolconfig)=0)
+        AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid OR roleid=r.oid)
+        AND NOT EXISTS(SELECT FROM pg_db_role_setting WHERE setrole=r.oid
+         AND setdatabase IN(0,(SELECT oid FROM pg_database WHERE datname=current_database())))
+        AND NOT EXISTS(SELECT FROM pg_namespace WHERE nspowner=r.oid)
+        AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=r.oid))
+       AND (SELECT count(*)=6 FROM pg_proc WHERE proowner=(SELECT oid FROM pg_roles WHERE rolname=$5))
+       AND EXISTS(SELECT FROM pg_class WHERE oid=to_regclass('creator.generation_terminal_scope')
+        AND relkind='r' AND relrowsecurity AND relforcerowsecurity AND pg_get_userbyid(relowner)='creator_owner')
+       AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+        WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
+         AND c.oid<>to_regclass('creator.generation_terminal_scope')
+         AND CASE WHEN c.relkind IN('r','p','v','m','f')
+          THEN has_table_privilege($5,c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') ELSE false END)
+       AND NOT has_table_privilege($5,'creator.generation_terminal_scope','UPDATE,TRUNCATE,REFERENCES,TRIGGER')
+       AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+        WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
+         AND CASE WHEN c.relkind='S' THEN has_sequence_privilege($5,c.oid,'USAGE,SELECT,UPDATE') ELSE false END)
+       AND NOT EXISTS(SELECT FROM pg_namespace n WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
+        AND has_schema_privilege($5,n.oid,'CREATE'))
+       AND NOT EXISTS(SELECT FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
+        WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
+         AND p.proowner<>(SELECT oid FROM pg_roles WHERE rolname=$5)
+         AND p.oid NOT IN(to_regprocedure('creator.generation_scope_matches(uuid,uuid)'),
+          to_regprocedure('creator_trust.generation_terminal_denial(uuid)'))
+         AND ((p.prosecdef AND has_function_privilege($5,p.oid,'EXECUTE'))
+          OR EXISTS(SELECT FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a
+           WHERE a.grantee=(SELECT oid FROM pg_roles WHERE rolname=$5) AND a.privilege_type='EXECUTE')))
+       AND NOT EXISTS(SELECT FROM pg_attribute a WHERE a.attrelid=to_regclass('creator.generation_terminal_scope')
+        AND a.attnum>0 AND NOT a.attisdropped AND has_column_privilege(session_user,a.attrelid,a.attnum,'SELECT,INSERT,UPDATE,REFERENCES'))
+       AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+        JOIN pg_attribute a ON a.attrelid=c.oid AND a.attnum>0 AND NOT a.attisdropped
+        CROSS JOIN unnest(ARRAY['SELECT','INSERT','UPDATE','REFERENCES']) AS privilege
+        WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
+         AND CASE WHEN c.relkind IN('r','p','v','m','f') THEN has_column_privilege($5,c.oid,a.attnum,privilege) ELSE false END
+         AND NOT coalesce(($6::jsonb->(n.nspname||'.'||c.relname)->privilege) ? a.attname,false))
+       AND NOT has_column_privilege($5,'creator.message','text','SELECT')
+       AND NOT has_column_privilege($5,'creator.memory','text','SELECT')
+       AND NOT has_column_privilege($5,'creator.identity_session','token_hash','SELECT')
+       AND NOT has_column_privilege($5,'creator.identity_session','upstream_cipher','SELECT')
+       AND NOT has_column_privilege($5,'creator.ai_version','configuration','SELECT')
+       AND NOT has_column_privilege($5,'creator.ai_workspace','interview','SELECT')
+       AND NOT has_column_privilege($5,'creator.signed_act','assertion','SELECT')
+       AND NOT has_column_privilege($5,'creator.passkey_credential','public_key','SELECT')
+       AND EXISTS(SELECT FROM pg_proc p WHERE p.oid=to_regprocedure('creator_trust.generation_terminal_denial(uuid)')
+        AND p.prosecdef AND p.provolatile='v' AND p.proconfig=ARRAY['search_path=pg_catalog']
+        AND pg_get_userbyid(p.proowner)='creator_trust_denial'
+        AND NOT EXISTS(SELECT FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a
+         WHERE a.grantee=0 AND a.privilege_type='EXECUTE'))
+       AND has_function_privilege($5,to_regprocedure('creator_trust.generation_terminal_denial(uuid)'),'EXECUTE')
+       AND NOT has_function_privilege(session_user,to_regprocedure('creator_trust.generation_terminal_denial(uuid)'),'EXECUTE')
+       AND EXISTS(SELECT FROM pg_trigger WHERE tgname='generation_terminal_transition' AND tgenabled='O'
+        AND tgrelid=to_regclass('creator.generation') AND tgfoid=to_regprocedure('creator.capture_generation_terminal()'))
+       AND EXISTS(SELECT FROM pg_trigger WHERE tgname='require_generation_terminal_cleanup' AND tgenabled='O'
+        AND tgrelid=to_regclass('creator.generation_terminal_scope') AND tgdeferrable AND tginitdeferred
+        AND tgfoid=to_regprocedure('creator.require_generation_terminal_cleanup()')) AS ready`,
+      [
+        input.migration.version,
+        input.migration.checksum,
+        input.denialMigration.version,
+        input.denialMigration.checksum,
+        Owner,
+        JSON.stringify(MetadataColumns),
+      ],
+    )
+  ).rows[0]?.ready;
+  if (ready !== true)
+    throw new DomainError(
+      "generation_terminal_unconfigured",
+      "Current original settlement catalogue is unavailable.",
+      503,
+    );
+  const denial = (
+    await query.query<{ definition: string }>(
+      "SELECT pg_get_functiondef(to_regprocedure('creator_trust.generation_terminal_denial(uuid)')) AS definition",
+    )
+  ).rows[0]?.definition;
+  if (
+    !denial ||
+    createHash("sha256").update(denial).digest("hex") !==
+      input.denialDefinitionChecksum
+  )
+    throw new DomainError(
+      "generation_terminal_unconfigured",
+      "Current original settlement catalogue is unavailable.",
+      503,
+    );
+  for (const signature of Definitions) {
+    const proof = (
+      await query.query<{ ready: boolean; definition: string }>(
+        `SELECT p.prosecdef AND p.provolatile IN('s','v') AND p.prokind='f'
+         AND p.proconfig=ARRAY['search_path=pg_catalog'] AND pg_get_userbyid(p.proowner)=$2
+         AND NOT EXISTS(SELECT FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a
+          WHERE a.grantee=0 AND a.privilege_type='EXECUTE') AS ready,
+         pg_get_functiondef(p.oid) AS definition FROM pg_proc p WHERE p.oid=to_regprocedure($1)`,
+        [signature, Owner],
+      )
+    ).rows[0];
+    if (
+      proof?.ready !== true ||
+      createHash("sha256").update(proof.definition).digest("hex") !==
+        Hash.parse(input.definitions[signature])
+    )
+      throw new DomainError(
+        "generation_terminal_unconfigured",
+        "Current original settlement catalogue is unavailable.",
+        503,
+      );
+  }
+}
+
 export class GenerationTerminalAuthority {
   private readonly issued = new WeakMap<
     GenerationTerminalScope,
@@ -180,6 +311,8 @@ export class GenerationTerminalAuthority {
   private constructor(
     private readonly pool: Pool,
     private readonly configuration: Readonly<{
+      catalogue: TerminalCatalogue;
+      generation: GenerationIdentityAuthority;
       assertRestoredInTransaction: (client: PoolClient) => Promise<void>;
       /** Real prepared journal + original cost/reservation owner ports. Unknown
        * cost retains the original ceiling; absence never means zero/no_request. */
@@ -250,116 +383,30 @@ export class GenerationTerminalAuthority {
           owner: Owner,
           definitionChecksum: Hash.parse(input.definitions[signature]),
         });
-      const ready = (
-        await input.pool.query<{ ready: boolean }>(
-          `SELECT session_user='creator_generation_worker' AND current_user=session_user
-           AND (SELECT count(*)=2 FROM creator.schema_migration
-            WHERE (version=$1 AND checksum=$2) OR (version=$3 AND checksum=$4))
-           AND EXISTS(SELECT FROM pg_roles r WHERE r.rolname=$5 AND NOT r.rolcanlogin
-            AND NOT r.rolsuper AND NOT r.rolbypassrls AND NOT r.rolinherit AND NOT r.rolcreatedb
-            AND NOT r.rolcreaterole AND NOT r.rolreplication AND (r.rolconfig IS NULL OR cardinality(r.rolconfig)=0)
-            AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid OR roleid=r.oid)
-            AND NOT EXISTS(SELECT FROM pg_db_role_setting WHERE setrole=r.oid
-             AND setdatabase IN(0,(SELECT oid FROM pg_database WHERE datname=current_database())))
-            AND NOT EXISTS(SELECT FROM pg_namespace WHERE nspowner=r.oid)
-            AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=r.oid))
-           AND (SELECT count(*)=6 FROM pg_proc WHERE proowner=(SELECT oid FROM pg_roles WHERE rolname=$5))
-           AND EXISTS(SELECT FROM pg_class WHERE oid=to_regclass('creator.generation_terminal_scope')
-            AND relkind='r' AND relrowsecurity AND relforcerowsecurity AND pg_get_userbyid(relowner)='creator_owner')
-           AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
-            WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
-             AND c.oid<>to_regclass('creator.generation_terminal_scope')
-             AND CASE WHEN c.relkind IN('r','p','v','m','f')
-              THEN has_table_privilege($5,c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') ELSE false END)
-           AND NOT has_table_privilege($5,'creator.generation_terminal_scope','UPDATE,TRUNCATE,REFERENCES,TRIGGER')
-           AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
-            WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
-             AND CASE WHEN c.relkind='S' THEN has_sequence_privilege($5,c.oid,'USAGE,SELECT,UPDATE') ELSE false END)
-           AND NOT EXISTS(SELECT FROM pg_namespace n WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
-            AND has_schema_privilege($5,n.oid,'CREATE'))
-           AND NOT EXISTS(SELECT FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
-            WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
-             AND p.proowner<>(SELECT oid FROM pg_roles WHERE rolname=$5)
-             AND p.oid NOT IN(to_regprocedure('creator.generation_scope_matches(uuid,uuid)'),
-              to_regprocedure('creator_trust.generation_terminal_denial(uuid)'))
-             AND ((p.prosecdef AND has_function_privilege($5,p.oid,'EXECUTE'))
-              OR EXISTS(SELECT FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a
-               WHERE a.grantee=(SELECT oid FROM pg_roles WHERE rolname=$5) AND a.privilege_type='EXECUTE')))
-           AND NOT EXISTS(SELECT FROM pg_attribute a WHERE a.attrelid=to_regclass('creator.generation_terminal_scope')
-            AND a.attnum>0 AND NOT a.attisdropped AND has_column_privilege(session_user,a.attrelid,a.attnum,'SELECT,INSERT,UPDATE,REFERENCES'))
-           AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
-            JOIN pg_attribute a ON a.attrelid=c.oid AND a.attnum>0 AND NOT a.attisdropped
-            CROSS JOIN unnest(ARRAY['SELECT','INSERT','UPDATE','REFERENCES']) AS privilege
-            WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
-             AND CASE WHEN c.relkind IN('r','p','v','m','f') THEN has_column_privilege($5,c.oid,a.attnum,privilege) ELSE false END
-             AND NOT coalesce(($6::jsonb->(n.nspname||'.'||c.relname)->privilege) ? a.attname,false))
-           AND NOT has_column_privilege($5,'creator.message','text','SELECT')
-           AND NOT has_column_privilege($5,'creator.memory','text','SELECT')
-           AND NOT has_column_privilege($5,'creator.identity_session','token_hash','SELECT')
-           AND NOT has_column_privilege($5,'creator.identity_session','upstream_cipher','SELECT')
-           AND NOT has_column_privilege($5,'creator.ai_version','configuration','SELECT')
-           AND NOT has_column_privilege($5,'creator.ai_workspace','interview','SELECT')
-           AND NOT has_column_privilege($5,'creator.signed_act','assertion','SELECT')
-           AND NOT has_column_privilege($5,'creator.passkey_credential','public_key','SELECT')
-           AND EXISTS(SELECT FROM pg_proc p WHERE p.oid=to_regprocedure('creator_trust.generation_terminal_denial(uuid)')
-            AND p.prosecdef AND p.provolatile='v' AND p.proconfig=ARRAY['search_path=pg_catalog']
-            AND pg_get_userbyid(p.proowner)='creator_trust_denial'
-            AND NOT EXISTS(SELECT FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a
-             WHERE a.grantee=0 AND a.privilege_type='EXECUTE'))
-           AND has_function_privilege($5,to_regprocedure('creator_trust.generation_terminal_denial(uuid)'),'EXECUTE')
-           AND NOT has_function_privilege(session_user,to_regprocedure('creator_trust.generation_terminal_denial(uuid)'),'EXECUTE')
-           AND EXISTS(SELECT FROM pg_trigger WHERE tgname='generation_terminal_transition' AND tgenabled='O'
-            AND tgrelid=to_regclass('creator.generation') AND tgfoid=to_regprocedure('creator.capture_generation_terminal()'))
-           AND EXISTS(SELECT FROM pg_trigger WHERE tgname='require_generation_terminal_cleanup' AND tgenabled='O'
-            AND tgrelid=to_regclass('creator.generation_terminal_scope') AND tgdeferrable AND tginitdeferred
-            AND tgfoid=to_regprocedure('creator.require_generation_terminal_cleanup()')) AS ready`,
-          [
-            input.migration.version,
-            input.migration.checksum,
-            input.denialMigration.version,
-            input.denialMigration.checksum,
-            Owner,
-            JSON.stringify(MetadataColumns),
-          ],
-        )
-      ).rows[0]?.ready;
-      if (ready !== true) unavailable();
-      const denial = (
-        await input.pool.query<{ definition: string }>(
-          "SELECT pg_get_functiondef(to_regprocedure('creator_trust.generation_terminal_denial(uuid)')) AS definition",
-        )
-      ).rows[0]?.definition;
-      if (
-        !denial ||
-        createHash("sha256").update(denial).digest("hex") !==
-          input.denialDefinitionChecksum
-      )
-        unavailable();
-      for (const signature of Definitions) {
-        const proof = (
-          await input.pool.query<{ ready: boolean; definition: string }>(
-            `SELECT p.prosecdef AND p.provolatile IN('s','v') AND p.prokind='f'
-             AND p.proconfig=ARRAY['search_path=pg_catalog'] AND pg_get_userbyid(p.proowner)=$2
-             AND NOT EXISTS(SELECT FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a
-              WHERE a.grantee=0 AND a.privilege_type='EXECUTE') AS ready,
-             pg_get_functiondef(p.oid) AS definition FROM pg_proc p WHERE p.oid=to_regprocedure($1)`,
-            [signature, Owner],
-          )
-        ).rows[0];
-        if (
-          proof?.ready !== true ||
-          createHash("sha256").update(proof.definition).digest("hex") !==
-            Hash.parse(input.definitions[signature])
-        )
-          unavailable();
-      }
+      await assertTerminalCatalogue(input.pool, input);
     } catch {
       unavailable();
     }
     return new GenerationTerminalAuthority(input.pool, {
+      generation: input.generation,
+      catalogue: Object.freeze({
+        migration: input.migration,
+        denialMigration: input.denialMigration,
+        denialDefinitionChecksum: input.denialDefinitionChecksum,
+        definitions: input.definitions,
+      }),
       assertRestoredInTransaction: input.assertRestoredInTransaction,
       assertSettledInTransaction: input.assertSettledInTransaction,
     });
+  }
+
+  private async assertCatalogue(client: PoolClient): Promise<void> {
+    try {
+      await this.configuration.generation.assertCatalogueInTransaction(client);
+      await assertTerminalCatalogue(client, this.configuration.catalogue);
+    } catch {
+      this.unconfigured();
+    }
   }
 
   private assertWorker(): void {
@@ -379,6 +426,7 @@ export class GenerationTerminalAuthority {
        set_config('generation.scope_nonce','',true),set_config('generation.terminal_nonce','',true)`,
     );
     await this.configuration.assertRestoredInTransaction(client);
+    await this.assertCatalogue(client);
   }
 
   private failure(error: unknown): never {
@@ -425,6 +473,7 @@ export class GenerationTerminalAuthority {
         .max(n)
         .parse(result.rows.map((r) => r.id));
       await this.configuration.assertRestoredInTransaction(client);
+      await this.assertCatalogue(client);
       await client.query("COMMIT");
       return Object.freeze(ids);
     } catch (error) {
@@ -550,6 +599,7 @@ export class GenerationTerminalAuthority {
       await this.configuration.assertRestoredInTransaction(client);
       await this.authorizeInTransaction(scope, client, true);
       await client.query("SELECT creator.end_generation_terminal()");
+      await this.assertCatalogue(client);
       this.issued.delete(scope);
       await client.query("COMMIT");
       return value;
@@ -574,6 +624,7 @@ export class GenerationTerminalAuthority {
       "generation_terminal_required",
       "Use the original settlement transaction and scope.",
     );
+    await this.assertCatalogue(client);
     const row = (
       await client.query<{
         allowed: boolean;

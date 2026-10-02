@@ -202,3 +202,12 @@ Personally operated closed57→61 rollout and separate fresh61 catalogue checks 
 ## W1 drains shutdown once under overlapping signals — October 2
 
 W3's actual SIGINT operation exposed duplicate pg pool.end calls in the composed root host. W1 now shares one in-flight SIGINT/SIGTERM cleanup, awaits every feature close and attempts all remaining cleanup even after an individual failure, with sanitized stage-only errors and a failing exit status. Growth's own close also retains one promise and closes its worker pool if its timer drain fails. No raw provider/database failure enters logs. Current source checks pass; the actual combined process will be operated before shutdown acceptance is claimed.
+
+
+## W1 current generation and terminal catalogue on the held client — October 2
+
+Factory approval is a construction prerequisite, not continuing authority. Both original generation and terminal issuers now retain frozen review packets and reuse their complete factory catalogue on the actual explicit transaction before operations and at commit bookends. Generation rechecks the current worker/owner, registered source and every fixed consumer definition; terminal additionally rechecks its exact six definitions, W8 denial definition, trigger/role/ACL/column custody. The terminal issuer calls the genuine original generation issuer's current catalogue proof on that same client. The metadata proof creates no scope/input/provider or settlement permission; actual opaque issuance, current negatives and original owner settlement still apply. Missing future registry authority remains unavailable. Source checks and existing contracts pass; no positive future job or live drift acceptance is inferred.
+
+## W1 personally qualifies canonical61 while keeping traffic closed — October 2
+
+After the separately recorded obsolete-membership repair, W1 made a fresh private backup and separate closed restore with six matching custody digests, then used the official atomic four-source wave. All57 prior checksums/timestamps,27 original rows,161 original tables and the original sequence are preserved. The distinct fresh61 install matches the upgraded catalogue and security digest. Original, backup restore and fresh qualification databases remain closed. Only0074/0082/0087/0103 are added; no higher held purpose, real provider outcome or release admission is inferred. The earlier rejected upgrade/fresh catalogue receipts remain recorded.
