@@ -35,7 +35,11 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-    override fun onNewIntent(intent: Intent) { super.onNewIntent(intent); setIntent(intent); destination.value = returnTarget(intent) }
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent); setIntent(intent)
+        val launcherResume = intent.action == Intent.ACTION_MAIN && intent.hasCategory(Intent.CATEGORY_LAUNCHER) && intent.data == null && (!BuildConfig.DEBUG || !intent.hasExtra("return_to"))
+        if (!launcherResume) destination.value = returnTarget(intent)
+    }
     private fun returnTarget(intent: Intent): String {
         if (BuildConfig.DEBUG) intent.getStringExtra("return_to")?.let { return it }
         val uri = intent.data ?: return "/home"

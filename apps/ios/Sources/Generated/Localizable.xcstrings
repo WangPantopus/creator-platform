@@ -2091,6 +2091,28 @@
         }
       }
     },
+    "Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate."
+          }
+        }
+      }
+    },
+    "Lowering a limit is immediate.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lowering a limit is immediate."
+          }
+        }
+      }
+    },
     "No limit": {
       "extractionState": "manual",
       "localizations": {

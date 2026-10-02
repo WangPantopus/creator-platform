@@ -85,6 +85,9 @@ export class AccessService {
   get threadScopeInTransactionAvailable() {
     return typeof this.assertAllowedInTransaction === "function";
   }
+  isForPool(pool: Pool) {
+    return this.pool === pool;
+  }
   async openThread(
     actor: Actor,
     creatorId: string,
@@ -207,7 +210,27 @@ export class AccessService {
         "This conversation is unavailable.",
         404,
       );
+    const participants = {
+      fanAccountId: pair.fanAccountId,
+      creatorAccountId: pair.creatorAccountId,
+    };
     if (heldClient) {
+      // Hold negative keys before positive thread/profile/team row locks. The
+      // metadata pointer above is not permission; all positives are rechecked.
+      try {
+        await this.assertAllowedInTransaction!(
+          actor,
+          creatorId,
+          thread.id,
+          participants,
+          client,
+        );
+      } finally {
+        await client.query(
+          "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true),set_config('app.account_id',$3,true)",
+          [creatorId, fanId, actor.accountId],
+        );
+      }
       const currentThread = await client.query(
         `SELECT 1 FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND deleted_at IS NULL FOR ${lockMode === "write" ? "UPDATE" : "SHARE"}`,
         [thread.id, creatorId, fanId],
@@ -254,26 +277,7 @@ export class AccessService {
         );
       }
     }
-    const participants = {
-      fanAccountId: pair.fanAccountId,
-      creatorAccountId: pair.creatorAccountId,
-    };
-    if (heldClient) {
-      try {
-        await this.assertAllowedInTransaction!(
-          actor,
-          creatorId,
-          thread.id,
-          participants,
-          client,
-        );
-      } finally {
-        await client.query(
-          "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true),set_config('app.account_id',$3,true)",
-          [creatorId, fanId, actor.accountId],
-        );
-      }
-    } else {
+    if (!heldClient) {
       await this.assertAllowed?.(actor, creatorId, thread.id, participants);
     }
     if (authority !== "fan" && auditOpen)

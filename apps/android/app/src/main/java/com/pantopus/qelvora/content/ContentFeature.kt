@@ -194,7 +194,8 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
             if(current.text("displayText")!=document.text("text")) { QText(if(current["signedActId"]?.jsonPrimitive?.contentOrNull != null) "Signed original" else "Original text","label");QText(document.text("text"),"body") }
             val media = document["media"]?.jsonArray
             val publicationVersion = current["version"]?.jsonPrimitive?.intOrNull
-            if (baseURL != null && viewerAccountId != null && media != null && media.size <= 6 && publicationVersion != null && publicationVersion > 0) {
+            if (baseURL != null && viewerAccountId != null && media != null && publicationVersion != null && publicationVersion > 0) {
+                if (media.size <= 10) {
                 media.forEach { value ->
                     val attachment = value.jsonObject
                     val actualVersion = attachment["version"]?.jsonPrimitive?.intOrNull
@@ -205,6 +206,7 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
                         }
                     } else QText("Attachment information is unavailable. Refresh current access.", "caption")
                 }
+                } else QText("Attachment information is unavailable. Refresh current access.", "caption")
             }
             if (document.text("kind") == "note") {
                 QText("Your private replies", "display-md", modifier = Modifier.semantics { heading() }); QText("Only you, the creator, and their permitted team can read your replies. A Note is a broadcast.", "caption")
