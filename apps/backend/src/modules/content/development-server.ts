@@ -22,6 +22,7 @@ import { createAgentRouter } from "../agent/router.js";
 import { DomainError } from "../../core/errors.js";
 import { composeContentHost } from "./integration.js";
 import { configureGrowthForBackend } from "../growth/configured.js";
+import { canonicalContentFollows } from "../growth/integration.js";
 import { canonicalConversationHome } from "../growth/home.js";
 import { createConversationRuntime } from "../conversation/runtime.js";
 
@@ -201,6 +202,7 @@ const backend = await createConfiguredBackend({
             growth: {
               service: growth.service,
               signing: runtime.identity.signing,
+              follows: { follows: canonicalContentFollows() },
             },
           }
         : {}),
