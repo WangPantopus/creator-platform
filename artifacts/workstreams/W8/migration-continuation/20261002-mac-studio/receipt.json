@@ -5,7 +5,6 @@
   "environment": "labelled synthetic owned Mac Studio cluster; original iMac material absent",
   "packetSha256": "2d72120d1be136081acb5d324f19dae44660d6e423e932cc962664596ab4c3e2",
   "rolePacketSha256": "c24a5bea3e45a2f2cf8397f0d26877175544eb0d67cb18e1af17225fddcea980",
-  "heldMappingSha256": "9efbb69e476ad39a895e5aa5db0468ad8bd98061c308f0ba9c4e35fa61e90ba7",
   "backup": {
     "sha256": "fc5c840f772f978ccefe770b814bd5f6c4cdb856ae8f8c5bc3d2bd5202cc22b0",
     "bytes": 723911,
@@ -146,13 +145,17 @@
     {
       "step": "drift operator",
       "failure": "First18 guards refused; two mutation statements failed42809/42704 before reaching guard. Corrected real trigger recreation and policy name; final20 mutations all refused by guard and rolled back."
+    },
+    {
+      "step": "future held allocation dependency order",
+      "failure": "Initial map moved only lower holds and left translation issuer/negative and terminal/Agent consumers below moved producer tables/functions. W1 caught before activation; all47 held slots now preserve original producer order with explicit late-correction dependencies, source paths/bytes/history unchanged."
     }
   ],
   "sourceSQLBytesChanged": false,
   "canonical57SourceHistoryChanged": false,
   "proposedActive": 61,
-  "heldMappings": 36,
-  "newHeldCallDiscovery": "0150_w6_account_call_metadata",
+  "heldMappings": 47,
+  "newHeldCallDiscovery": "0197_w6_account_call_metadata (original0150 allocation)",
   "newUnitTests": 0,
   "verification": {
     "backendTypecheck": "passed",
@@ -182,5 +185,21 @@
     "bytes": 765260,
     "privateOutsideGit": true,
     "separateRestore": "not yet verified; predecessor57 restore independently verified"
+  },
+  "initialHeldMappingSha256": "9efbb69e476ad39a895e5aa5db0468ad8bd98061c308f0ba9c4e35fa61e90ba7",
+  "heldMappingSha256": "2338f48ea4b1008f47eef43ff7a835021e5e917669ad44f21179c69d03227c0a",
+  "heldOrderingCorrection": {
+    "reason": "Peer W1 review found split mapping left dependent104\u2013113 below moved producers. No SQL/applied history changed.",
+    "allHeldIds": "0151\u20130197",
+    "original83TranslationProducer": "0168",
+    "original111TranslationIssuer": "0194",
+    "original112TranslationNegative": "0195",
+    "original113AgentSnapshot": "0196",
+    "original99TerminalIssuer": "0183",
+    "original100TerminalNegative": "0184",
+    "original105Journal": "0188",
+    "original106Settlement": "0189",
+    "lateCorrectionOrder": "0190 subject \u21920191 negatives \u21920192 financial correction",
+    "state": "metadata only; additional unseen DDL dependencies need review before activation"
   }
 }
