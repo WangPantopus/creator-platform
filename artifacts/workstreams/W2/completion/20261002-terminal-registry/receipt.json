@@ -1,0 +1,58 @@
+{
+  "time": "2026-10-02T17:04:24.726358+00:00",
+  "host": "Yingpengs-Mac-Studio.local",
+  "sourceParent": "1c610fac7c7324281c6e1bdd7be43c3200adeed4",
+  "peerSource": "00fbdc5acf9e96726e1749aa0242b70d0232bc92",
+  "implementationFiles": [
+    {
+      "path": "apps/backend/src/modules/identity/generation-scope.ts",
+      "sha256": "a4e3e2757faa8fe74adb9e31829130bb7acf8d72958b096d7d68af5ce0431214",
+      "exactPublishedPeerBytes": true
+    },
+    {
+      "path": "apps/backend/src/modules/identity/generation-terminal.ts",
+      "sha256": "bd6454363dd4f9a3fe24af164dbbd3697001914ccc49fc3f1bbb383b47c221b2",
+      "exactPublishedPeerBytes": true
+    },
+    {
+      "path": "apps/backend/src/modules/agent/generation-terminal-journal.ts",
+      "sha256": "25abc57a6b62335ab1e0d5b1bc598273a83e04fb407011578fc79d484dbd3370",
+      "exactPublishedPeerBytes": true
+    }
+  ],
+  "unchangedOriginalSQL": {
+    "path": "apps/backend/src/modules/identity/schema-generation-terminal.sql",
+    "sha256": "fadbf62a3ddf06142c3a6ad30313503f9bebe7b6d64f67f8ba01ff13ce2398c7",
+    "registration": "unactivated/unregistered future source"
+  },
+  "actualClosedDatabase": "creator_w2_terminal_review_20261002",
+  "mode": "operator PostgreSQL metadata read; not actual worker login/factory/job/terminal receipt/settlement",
+  "actualMatcherPrivileges": [
+    {
+      "owner": "creator_generation_terminal_authority",
+      "generation": true,
+      "terminal": true
+    },
+    {
+      "owner": "creator_w2_generation_terminal_journal",
+      "generation": false,
+      "terminal": true
+    }
+  ],
+  "w4Owner": "absent on this W2 closed copy; not independently qualified here",
+  "checks": {
+    "backendTypecheck": "PASS",
+    "scopedESLint": "PASS",
+    "existingContractTests": {
+      "passed": 9,
+      "testMs": 57,
+      "newTests": 0
+    }
+  },
+  "changes": "Separate exact terminal-purpose contracts from generation-purpose registry; immutable issuer183 requires originalScopeBridge=true, terminal-only188/189 require false, exact published owner/signature/migrationSQLhash/definitionhash/current held-client catalogue remain required",
+  "limits": [
+    "No SQL/grant/ledger/activation changes",
+    "No positive genuine task/provider/weighted settlement or p95",
+    "Mac CI queues and prior exact-head checks do not qualify this uncommitted increment"
+  ]
+}
