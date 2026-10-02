@@ -1018,4 +1018,6 @@
   <string name="w1_call_lookup_unavailable" formatted="false">This call could not be opened. Retry, or open Requests to check its current status.</string>
   <string name="identity_development_title" formatted="false">Development identity</string>
   <string name="identity_development_body" formatted="false">Synthetic local account. Pantopus production sign-in is not connected.</string>
+  <string name="identity_proof_review_support" formatted="false">Request verification review</string>
+  <string name="identity_proof_review_support_body" formatted="false">Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified.</string>
 </resources>
