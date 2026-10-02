@@ -1,0 +1,169 @@
+{
+  "time": "2026-10-02T17:55:01.535561+00:00",
+  "host": "Yingpengs-Mac-Studio.local",
+  "appSource": "ecca4c4380ced8d51b07fa25734c6cc5b7c5d053",
+  "appSourceKind": "shipping Debug QelvoraApp scheme; no component catalog",
+  "apiSource": "ecca4c4380ced8d51b07fa25734c6cc5b7c5d053",
+  "api": 4102,
+  "database": "creator_w2",
+  "ledger": 57,
+  "primaryReconciledSource": "25689cae3b4023ff674f24569a560a91d4cde02f",
+  "originMainAtReconciliation": "f4e9c28a",
+  "actor": "Development actor two; existing fictional fan @w2_native_fan, account10000000-0000-4000-8000-000000000002",
+  "device": {
+    "udid": "BC8E18B6-620A-4191-8B27-AAB264458081",
+    "name": "Qelvora W2 iPhone17",
+    "os": "iOS27",
+    "points": [402, 874],
+    "pixels": [1206, 2622],
+    "scale": 3
+  },
+  "build": {
+    "xcodebuild": "PASS",
+    "codesignVerifyStrict": "PASS",
+    "installExactUDID": "PASS",
+    "executableSha256": "b3985f7216731951720a5002c7e9c3098d9d0cb42e9772877b6659461c507e99",
+    "heavyLease": "own wrapper acquired/released",
+    "warnings": "UnnecessaryEffectMarker warnings retained in private build log, not zero-warning proof"
+  },
+  "input": {
+    "authorization": "Human explicitly requested idb on this exact W2 simulator",
+    "driver": "installed idb-cli1.6.4 + idb_companion, private Unix socket",
+    "initialCompanion": "initial TCP listener was noticed and stopped; replaced by private local Unix socket before these journeys",
+    "method": "actual AX identifiers/labels; observed switch values; screenshot-grounded HID VoiceOver gesture and Dynamic Type slider drag; no host IDE or peer-device input"
+  },
+  "actions": [
+    "UI Continue with Pantopus, actual development picker, select Development actor two; canonical account loaded",
+    "Open You; actual handle/privacy disclosure/no conversations",
+    "Scroll and open Export or delete my data; actual unavailable endpoint and disabled export/deletion requiring fresh verification",
+    "Open Crisis help; actual immediate-danger guidance and unpaid-access disclosure; unavailable endpoint retained",
+    "Stop only W2 DB, cold-launch Night with retained account destination; recovery screen/no Welcome; Retry while down",
+    "Restart DB; first pg_isready exit2/noresponse retained, subsequent actual accepting; existing4-second refresh automatically restores same account",
+    "Repeat Light cold outage; actual down-state Retry and recovery observed; DBrestart automatically restores same account again",
+    "Enable actual VoiceOver switch0\u21921, dismiss actual OS gesture instructions, perform real next-element HID gesture; visible focus outline on development notice",
+    "Restore VoiceOver1\u21920",
+    "Enable actual Reduce Motion0\u21921 and Larger Accessibility Sizes0\u21921; slider HID sets actual OS accessibility-extra-large (read-only simctl confirmation)",
+    "Operate account scroll and fully visible Export action at actual larger text; all four tab targets189\u00d757.33, privacy358\u00d790.67 and safety270\u00d744 reachable",
+    "Restore original native content-size large, Larger Accessibility Sizes0, ReduceMotion0; terminate owned apps/companion; normally shut down BC8; release matching own slot2"
+  ],
+  "recoveryQualification": {
+    "Light": "cold retained session and automatic same-account recovery personally verified",
+    "Night": "cold retained session and automatic same-account recovery personally verified",
+    "postReadyManualRetry": "NOT verified: actual4s refresh removed Retry before attempted post-ready press; absent marker/assertion failures retained",
+    "requestLatency": "no accepted/first/full/takeover/invalidation p95 claimed"
+  },
+  "accessibility": {
+    "VoiceOver": "actual enabled switch and visible focus movement personally verified; first screenshot is OS instruction sheet; no full spoken/entire-workstream traversal claimed",
+    "text": "actual OS accessibility-extra-large, not asserted as an exact uniform200% font multiplier",
+    "reduceMotion": "actual OS switch enabled during account/privacy operation, then restored; no unsupported claim of every animation verified"
+  },
+  "defects": [
+    "Authenticated Home is Unavailable because W2 isolated development launcher omits genuine Growth registration",
+    "Trust privacy/crisis endpoint unavailable on W2 standalone launcher; export/deletion disabled, no job created",
+    "Full composed host requires owner-published graph and genuine separate Trust/Growth configuration, not fabricated Home rows/roles/policies"
+  ],
+  "failures": [
+    "Immediate launch AX snapshots showed previous Springboard/app before transition; later actual app/PID snapshots used",
+    "AX standard role AXButton versus press backend Button rejected first You press; corrected from actual error",
+    "scroll-visible reported element moved; no write, then real down-scroll used",
+    "VoiceOver expected AXValue0 guard saw press backend empty string; no write, actual unique-ID press and subsequent switch1 verified",
+    "Dynamic Type semantic set-value0.75 did not change actualOSsize; preserved, then actual observed slider drag used",
+    "idb launch of already-running app refused; supported foreground-if-running flag used",
+    "Post-ready Retry missing due actual4s polling; no manual success claimed"
+  ],
+  "prerequisites": {
+    "designatedOpenAIKey": "absent exact-path recheck; no credential search",
+    "originalArchive": "absent exact-path recheck"
+  },
+  "persistedOutcomes": "canonical development sign-in/session refresh only; no provider, translation/export/purge/generation job, consent/license/signature, W3 messages/memory or W4 money/grants written",
+  "resources": {
+    "simulator": "normally shut down; exact slot2 token5c2ad6b2-8dee-467f-95dc-0976852cf519/dev16777232/ino241333224 released",
+    "companion": "normal exit0",
+    "API": "alive after actual DBoutages",
+    "DB": "owned container restarted, actual accepting",
+    "protected": "no protected PantopusS1/emulator5558 or peer-device action"
+  },
+  "limits": [
+    "Frozen app/API ecca is actual operated source; current main f4e9 and current PR132 are distinct",
+    "No provider/cited fan/pub-rollback/positive purpose/nonempty196/all-eightC10/nativeAndroid/currentfullartboard acceptance",
+    "No full VoiceOver/TalkBack/reduced-motion suite/exact200percent/p95/release-readiness claim"
+  ],
+  "images": [
+    {
+      "path": "account-accessibility-xl-light.png",
+      "bytes": 230599,
+      "sha256": "28555054d5795643c62871c7276aee4b0befec8876574ac55ca57cc323b09e7b",
+      "pixels": [1206, 2622]
+    },
+    {
+      "path": "account-light.png",
+      "bytes": 215093,
+      "sha256": "87af1776cac44a64437aa2953524d1b13f639f57b2f67d2de9aeb99542ac2fd5",
+      "pixels": [1206, 2622]
+    },
+    {
+      "path": "account-privacy-accessibility-xl-light.png",
+      "bytes": 243776,
+      "sha256": "a43e902df4c906419b53111e4c6c75b46deefe61f2e056f2e81d49bbcbd0ea1d",
+      "pixels": [1206, 2622]
+    },
+    {
+      "path": "account-recovered-light.png",
+      "bytes": 215128,
+      "sha256": "8e2835eb086627e6b3a3223f701156cb6375b2730dd9e34f5899bfba64a26df8",
+      "pixels": [1206, 2622]
+    },
+    {
+      "path": "account-recovered-night.png",
+      "bytes": 217889,
+      "sha256": "9b3835935b37f3b00a7025cc2920d87d7e65d51ac2c9c66a1d4031f0979710be",
+      "pixels": [1206, 2622]
+    },
+    {
+      "path": "cold-outage-light.png",
+      "bytes": 144512,
+      "sha256": "6b24919358ba8d1137175384d06db4699538c66be41d6374d4673860dda7ece6",
+      "pixels": [1206, 2622]
+    },
+    {
+      "path": "cold-outage-night.png",
+      "bytes": 144350,
+      "sha256": "7eface2c4dfa8d01bf529f874e89b566cdee6f8fec695b9ced5fb458fcca7098",
+      "pixels": [1206, 2622]
+    },
+    {
+      "path": "privacy-accessibility-xl-light.png",
+      "bytes": 273210,
+      "sha256": "719f04327bc6c6afce634f23dff1896e208fa7b0ee0bb9a45d928f80fa88a4a4",
+      "pixels": [1206, 2622]
+    },
+    {
+      "path": "privacy-unconfigured-light.png",
+      "bytes": 257904,
+      "sha256": "30500fb950e99ae3bee10961f6c240ca5588c8f0a5e2c5fa8f20a2b1c418a5fb",
+      "pixels": [1206, 2622]
+    },
+    {
+      "path": "voiceover-first-instructions-light.png",
+      "bytes": 636593,
+      "sha256": "bbb47a65de58912c23a9a55b300a74eec07d8b47f0e012b5fda199c9605dcba5",
+      "pixels": [1206, 2622]
+    },
+    {
+      "path": "voiceover-next-light.png",
+      "bytes": 219196,
+      "sha256": "31a2e76e154461a651862fde15a2c133464a414be19e60e81ef38e3f9d21b336",
+      "pixels": [1206, 2622]
+    },
+    {
+      "path": "voiceover-next2-light.png",
+      "bytes": 220138,
+      "sha256": "c941e5931689bcc538edfab9cb42281e4cc406e7bd81bd5f6b88391a4caa1ca3",
+      "pixels": [1206, 2622]
+    }
+  ],
+  "sourceChecks": {
+    "backendTypecheckAfterF4Reconcile": "PASS",
+    "a1CI": "five completedSUCCESS/sixQUEUED, actualrunheads checked; does not qualify newer25689 head"
+  }
+}
