@@ -1,6 +1,6 @@
 {
-  "source": "70d79521559a0f817f0e5d48952874a731a4535b",
-  "capturedMain": "b6c073aef97b2ea7c06847b4baa9914d9bce06b7",
+  "source": "b5b3c74dae8370eebab30c939615742654eca1bc",
+  "capturedMain": "f899f7591525aec036988564dc644a8d0887d2fd",
   "ownerSourceUnchanged": {
     "plans": "5a7925ef91fee53386136708a28eb1818b5ae8c4",
     "viewAuthority": "84a035328150746e6a94cbce8e511de87b469109"
@@ -11,9 +11,30 @@
     "generateCheck": "passed: 101 operations",
     "scopedLintFormat": "passed"
   },
-  "productionBuild": "prior actual2949 receipt remains tied to that source; current shared owner dependencies need current-source build",
+  "productionBuild": "Actual Next production and shipping iOS/Android builds passed at 3b24991e09f04b2df62046e6f9b57c520ac271c3. Current reconciled source types/generation/scoped lint-format passed; prior builds are not relabeled current-source acceptance.",
   "database": "owned creator_w5 now61 through separate actual backup/restore/atomic operator qualification at98024f7b; no group purposes activated",
   "positiveGroupAcceptance": false,
   "nativeOperationAtThisSource": false,
-  "releaseReady": false
+  "releaseReady": false,
+  "priorQualification": {
+    "source": "70d79521559a0f817f0e5d48952874a731a4535b",
+    "capturedMain": "b6c073aef97b2ea7c06847b4baa9914d9bce06b7",
+    "ownerSourceUnchanged": {
+      "plans": "5a7925ef91fee53386136708a28eb1818b5ae8c4",
+      "viewAuthority": "84a035328150746e6a94cbce8e511de87b469109"
+    },
+    "checks": {
+      "backendTypecheck": "passed",
+      "webTypecheck": "passed",
+      "generateCheck": "passed: 101 operations",
+      "scopedLintFormat": "passed"
+    },
+    "productionBuild": "prior actual2949 receipt remains tied to that source; current shared owner dependencies need current-source build",
+    "database": "owned creator_w5 now61 through separate actual backup/restore/atomic operator qualification at98024f7b; no group purposes activated",
+    "positiveGroupAcceptance": false,
+    "nativeOperationAtThisSource": false,
+    "releaseReady": false
+  },
+  "operationEvidence": "../current61-operation/operation-record.json",
+  "followOwnerSource": "dc5bef938b62037b4f60f685c08aa6406b97b900"
 }
