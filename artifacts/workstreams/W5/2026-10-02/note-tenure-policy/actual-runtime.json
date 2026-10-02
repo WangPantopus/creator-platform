@@ -1,0 +1,51 @@
+{
+  "sourceCommit": "659038439b479a8e9617d6f3f28822ee37c13d25",
+  "reviewerOwnerSource": "b76a3b66",
+  "replyTenureSqlSha256": "b1ec7e9684e5f916253202cf8d6b484376fe3c74dbec63221500e68ecf7fe0ba",
+  "actualWebObservations": {
+    "observedAt": "2026-10-02T10:43:59.938Z",
+    "session": {
+      "status": 200,
+      "accountId": "10000000-0000-4000-8000-000000000002"
+    },
+    "policy": {
+      "status": 503,
+      "body": {
+        "error": {
+          "code": "scope_denial_unconfigured",
+          "message": "Current scope authority is not configured.",
+          "requestId": "0e085273-c30f-4b9a-b44b-1464dc9b3c3c",
+          "correlationId": "5435df6e-1405-4916-a4e8-1cdaa9470691"
+        }
+      }
+    },
+    "wrongAccount": {
+      "status": 403,
+      "body": {
+        "error": {
+          "code": "content_account_changed",
+          "message": "The signed-in account changed. Refresh before continuing; this request was not applied.",
+          "requestId": "903588a7-1497-41af-80f9-edd6351a568d",
+          "correlationId": "d0672467-d597-4c56-9f11-5d1040c86fdc"
+        }
+      }
+    }
+  },
+  "actualDatabase": {
+    "migrations": 57,
+    "replyTenureMigration": 0,
+    "memberships": 0,
+    "confirmedStripePeriods": 0,
+    "privateReplies": 0,
+    "publishedContent": 0,
+    "replyConstraint": "CHECK (((length(text) >= 1) AND (length(text) <= 4000)))"
+  },
+  "qualification": {
+    "genuineSigning": false,
+    "positivePaidTenure": false,
+    "positiveLongReply": false,
+    "positivePrivateReply": false,
+    "releaseReady": false
+  },
+  "creatorVerification": "DEVELOPMENT-ONLY SEEDED VERIFIED, SQL at 2026-10-01T20:44:26Z; no proof or passkey"
+}

@@ -1,0 +1,67 @@
+{
+  "host": "Yingpengs-Mac-Studio.local",
+  "observedAt": "2026-10-02T10:33:04.512109+00:00",
+  "reconciledMain": "7f47832d0ac5eb8ea192ab86a6bc4b302de4f66b",
+  "identitySource": "55058f90a4d22b72df4766fe928abc2e86d9f258",
+  "identitySQLSource": "dce780db943d79c3417ca0dbcac32c05c24c44cc",
+  "files": {
+    "apps/backend/src/modules/agent/growth-adapter.ts": "bf60bc9c6654cb3f18663602c083b07ca6c723468719fd8ea7391f72fac8ecd1",
+    "apps/backend/src/modules/agent/service.ts": "74cf43eeef99d39b32783a2a78f2716b94a88d499c85f939f85f57bd98b7c4b0",
+    "apps/backend/src/modules/agent/development-license.ts": "bd276dd0df48a7ff9220d6410912778abe0170c71851501fcfa9d69c6b81450a",
+    "apps/backend/src/modules/identity/public-ai-scope.ts": "7987ace95991de1593d5d4696cd45b7f328deb47dd282016f395f08316614aa5",
+    "apps/backend/src/modules/identity/schema-public-ai-scope.sql": "0325048ec855877e59430423850ec72360610a96328aaaef903139f512aa0606"
+  },
+  "checks": {
+    "backendTypeScript": "passed",
+    "scopedESLint": "passed",
+    "prettier": "passed",
+    "existingBackendTests": {
+      "passed": 18,
+      "failed": 0,
+      "T11": {
+        "pairs": 10000,
+        "queries": 30000,
+        "elapsedMs": 52154,
+        "limitMs": 300000
+      }
+    },
+    "newTests": 0
+  },
+  "personallyOperated": {
+    "actor": "actual creator_runtime nonowner role; max1 pool; no public scope or positive approval invented",
+    "device": "Mac Studio PostgreSQL17 loopback55442",
+    "theme": null,
+    "viewport": null,
+    "provider": "unconfigured; zero calls",
+    "unactivatedFactory": {
+      "code": "public_ai_unconfigured",
+      "httpStatus": 503,
+      "restrictionCallbackCalls": 0,
+      "durableWrites": 0
+    },
+    "unicodeReadOnlySQL": {
+      "postgresCharacters": 80,
+      "javaScriptCodeUnits": 160,
+      "installedZodAccepted": true,
+      "topicTruncation": "whole Unicode code points"
+    }
+  },
+  "implemented": [
+    "W1-issued immutable public scope/facts bound to actual same pool, client, transaction, visitor and nonce",
+    "no creator Actor or owner scope/GUC substitution",
+    "actual held public license verifier and required current purpose authority; no default approval",
+    "only frozen four-field metadata after exact live pipeline, prices, cap and source checks",
+    "no private configuration/source body query or workspace resurrection"
+  ],
+  "heldMigrations": [
+    "0085_w1_public_ai_metadata_scope",
+    "0086_w8_public_creator_denial"
+  ],
+  "limits": [
+    "current runtime remains40 migrations; no public metadata authority activated",
+    "production public-license and processor/purpose authority absent",
+    "no positive publication or W7 host operation",
+    "no genuine W3 outcome feed or closed72-hour digest verified",
+    "individual fan consent is separate; no provider calls, signatures or consent invented"
+  ]
+}

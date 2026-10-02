@@ -1,0 +1,37 @@
+{
+  "previousCommit": "118d6658460126876bd04f544b92a0f90717dcb6",
+  "source": {
+    "path": "apps/web/features/identity/setup.tsx",
+    "sha256": "4adddd3430a3d6490ff3fd1e677ccf0e67513edcc59130053b231070d8da9af5",
+    "gitBlob": "4a712e5b44488eceb09bfd4aa7176d5c4e1f4ad5"
+  },
+  "productionWebBuildId": "4qSt4g5U-w5n27XBkHKRe",
+  "actualBrowser": [
+    "Changed Your account while existing challenge stayed visible before repair; no submission performed.",
+    "Repaired saved challenge shows its canonical read-only account. Keyboard Use a different account hides saved code, clears unsent post/account and focuses the editable account field.",
+    "Entered a different unsent account, confirmed Create proof code enabled with no displayed old code. Reload restored the original saved account and same challenge. No new request submitted.",
+    "Final blocked manual read disables account/proof controls and focuses retry. Recovery restores the original bound account and Refresh verification status focus.",
+    "Final unavailable state captured at 1280x900 Light and 390x844 Night. Network fault cleared."
+  ],
+  "supportingChecks": {
+    "webTypecheck": "pass",
+    "changedSourceESLint": "pass",
+    "webProductionBuild": "pass"
+  },
+  "hostedCI": "Code Review discovery for PR16 returned Connect your GitHub account to continue. No CI pass claimed; merge blocked until connection and exact-head checks.",
+  "captures": [
+    {
+      "path": "account-binding-unavailable-desktop.jpg",
+      "sha256": "bfd20e2d593cdaeeec7dbaba7e4af7af8d3b248745a956406f2c044ae588ef3b"
+    },
+    {
+      "path": "account-binding-unavailable-night-phone.jpg",
+      "sha256": "602ed214b54a514b3ca5d5ce4daed194063dc4279ae53fb2f99f505038af6e75"
+    },
+    {
+      "path": "new-account-draft.jpg",
+      "sha256": "0b19424cb2a6ff8f83d57a56178779fb9d59f5226b5b821966800aae3a5d87b5"
+    }
+  ],
+  "limits": "Synthetic local accounts only. No proof submission/review/approval, passkey, native interaction, independent-client latency or production acceptance."
+}

@@ -12,6 +12,12 @@ import { agentExportStream } from "./privacy-stream.js";
 
 /** W1/W8 supply authoritative job and case projections; HTTP fields cannot mint these scopes. */
 export interface AgentTrustAuthority {
+  /** Actual W8 task, cancellation, restoration and COMMIT custody on the
+   * owner's held client, including genuinely empty families. */
+  assertPrivacyTaskInTransaction(
+    client: PoolClient,
+    input: Parameters<PrivacyHook["run"]>[0],
+  ): Promise<readonly string[]>;
   /** Actual completed W8 conversation task/artifact or disposition receipt,
    * revalidated on this job's held agent client. No registration flag suffices. */
   accountingBoundary?(
@@ -32,10 +38,12 @@ export interface AgentTrustAuthority {
 export function createAgentTrustAuthority(
   workerPool: Pool,
   ownerScope: (creatorId: string) => Promise<CreatorScope>,
+  assertPrivacyTaskInTransaction: AgentTrustAuthority["assertPrivacyTaskInTransaction"],
   accountingBoundary?: AgentTrustAuthority["accountingBoundary"],
 ): AgentTrustAuthority {
   const ownership = privacyOwnershipScope(workerPool);
   return {
+    assertPrivacyTaskInTransaction,
     ...(accountingBoundary ? { accountingBoundary } : {}),
     async privacyCreators(input) {
       z.uuid().parse(input.jobId);
@@ -167,6 +175,12 @@ export function agentPrivacyHook(
   return {
     domain: "agent",
     async run(input) {
+      invariant(
+        input.signal &&
+          typeof authority.assertPrivacyTaskInTransaction === "function",
+        "privacy_commit_fence_unavailable",
+        "The actual cancellable held-client Agent lifecycle authority is required.",
+      );
       const scopes = await authority.privacyCreators(input);
       invariant(
         scopes.length <= 100,
@@ -181,8 +195,28 @@ export function agentPrivacyHook(
       const assertBoundary = boundary
         ? (client: PoolClient) => boundary(input, client, scopes)
         : undefined;
+      const assertTask = async (client: PoolClient) => {
+        invariant(
+          typeof authority.assertPrivacyTaskInTransaction === "function",
+          "privacy_commit_fence_unavailable",
+          "The actual held lifecycle task and restoration authority are required.",
+        );
+        input.signal?.throwIfAborted();
+        const current = await authority.assertPrivacyTaskInTransaction(
+          client,
+          input,
+        );
+        invariant(
+          contentHash([...current].sort()) ===
+            contentHash(scopes.map((scope) => scope.creatorId).sort()),
+          "privacy_authority_changed",
+          "This held task's immutable creator ownership must match the original scopes.",
+        );
+        input.signal?.throwIfAborted();
+      };
       try {
-        await accountingClient.query("BEGIN ISOLATION LEVEL REPEATABLE READ");
+        await accountingClient.query("BEGIN ISOLATION LEVEL READ COMMITTED");
+        await assertTask(accountingClient);
         lineage = await lifecycle.assertAccountingClient(accountingClient);
         if (lineage) {
           invariant(
@@ -205,6 +239,7 @@ export function agentPrivacyHook(
           );
         }
         input.signal?.throwIfAborted();
+        await assertTask(accountingClient);
         await accountingClient.query("COMMIT");
       } catch (error) {
         await accountingClient.query("ROLLBACK");
@@ -263,6 +298,7 @@ export function agentPrivacyHook(
               service,
               scopes,
               assertCurrent,
+              assertTask,
               input.signal,
               assertBoundary
                 ? {
@@ -298,14 +334,31 @@ export function agentPrivacyHook(
           });
           const hash = createHash("sha256");
           let bytes = 0;
+          let client: PoolClient | undefined;
           try {
-            await service.exportTo(scope, async (part) => {
-              await assertCurrent();
-              hash.update(part);
-              bytes += Buffer.byteLength(part);
-              await sink.write(part);
-            });
+            client = await service.repository.pool.connect();
+            await client.query("BEGIN ISOLATION LEVEL REPEATABLE READ");
+            await assertTask(client);
+            await client.query(
+              "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
+              [scope.creatorId, scope.accountId],
+            );
+            const snapshotClient = client;
+            await service.exportInTransaction(
+              scope,
+              client,
+              async (part) => {
+                await assertTask(snapshotClient);
+                await assertCurrent();
+                hash.update(part);
+                bytes += Buffer.byteLength(part);
+                await sink.write(part);
+              },
+              input.signal!,
+            );
             await assertCurrent();
+            await assertTask(client);
+            await client.query("COMMIT");
             const sha256 = hash.digest("hex");
             const artifact = await sink.complete({ bytes, sha256 });
             invariant(
@@ -321,8 +374,11 @@ export function agentPrivacyHook(
               mediaType: "application/json",
             });
           } catch (error) {
+            await client?.query("ROLLBACK").catch(() => undefined);
             await sink.abort().catch(() => undefined);
             throw error;
+          } finally {
+            client?.release();
           }
         }
         return {
@@ -344,6 +400,7 @@ export function agentPrivacyHook(
               creatorId: scope.creatorId,
             }),
             assertCurrent,
+            assertTask,
             assertBoundary,
           ),
         );

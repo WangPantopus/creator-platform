@@ -192,8 +192,6 @@
   <string name="written_by" formatted="false">Written by {name}</string>
   <string name="monthly_limit_legend" formatted="false">Monthly limit for requests and memberships</string>
   <string name="limit_reminders" formatted="false">Reminders at 50% and 100% of your limit are on. Lowering a limit is immediate.</string>
-  <string name="limit_reminders_off" formatted="false">Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.</string>
-  <string name="limit_reminders_unknown" formatted="false">Lowering a limit is immediate.</string>
   <string name="no_limit" formatted="false">No limit</string>
   <string name="nav_chat" formatted="false">Chat</string>
   <string name="nav_posts" formatted="false">Posts</string>
@@ -646,6 +644,7 @@
   <string name="w6_this_file_could_not_be_processed_record_again" formatted="false">This file could not be processed. Record again.</string>
   <string name="w6_uploaded_processing_before_sharing" formatted="false">Uploaded · processing before sharing</string>
   <string name="w6_sign_in_to_a_configured_creator_account_to_upload_and" formatted="false">Sign in to a configured creator account to upload and sign. Your preview stays on this device until you upload it.</string>
+  <string name="w6_uploads_and_signing_are_unavailable_your_preview_stays_on_this_device" formatted="false">Uploads and signing are unavailable here. Your preview stays on this device.</string>
   <string name="w6_this_recording_limit_does_not_match_the_current_saved_content" formatted="false">This recording limit does not match the current saved content.</string>
   <string name="w6_media_is_unavailable_try_again" formatted="false">Media is unavailable. Try again.</string>
   <string name="w6_this_upload_does_not_belong_to_the_current_content_refresh" formatted="false">This upload does not belong to the current content. Refresh before continuing.</string>
@@ -886,8 +885,35 @@
   <string name="growth_error_quiet_hours_pair" formatted="false">Both quiet-hour boundaries are required</string>
   <string name="growth_error_time_zone" formatted="false">Choose a valid time zone, such as America/Los_Angeles.</string>
   <string name="growth_error_quiet_hours_format" formatted="false">Enter a time in HH:mm, from 00:00 to 23:59.</string>
+  <string name="w6_record_a_voice_reply" formatted="false">Record a voice reply</string>
+  <string name="w6_deliver_this_recording" formatted="false">Deliver this recording</string>
+  <string name="w6_recording_credentials_are_processing" formatted="false">Your signature is saved. Content credentials are processing before delivery.</string>
+  <string name="w6_recording_delivery_is_unconfirmed" formatted="false">Delivery is unconfirmed. Retry this same recording before starting another.</string>
+  <string name="w6_recording_delivered" formatted="false">Your signed recording was delivered to this conversation.</string>
+  <string name="w6_voice_reply_unavailable" formatted="false">Voice replies are unavailable for this conversation. Your text draft is kept.</string>
+  <string name="w6_selected_conversation_changed" formatted="false">This recording belongs to another conversation. Reopen the selected thread.</string>
+  <string name="w6_retry_recording_delivery" formatted="false">Retry this recording delivery</string>
+  <string name="w6_availability_save_is_unconfirmed" formatted="false">Saving is unconfirmed. Retry this same change before editing your windows.</string>
+  <string name="w6_retry_availability_save" formatted="false">Retry this availability save</string>
+  <string name="w6_refresh_will_replace_availability_changes" formatted="false">Replace your unsaved changes with the saved availability?</string>
+  <string name="w6_availability_account_changed" formatted="false">Your account changed. Reopen availability to continue.</string>
   <string name="account_unavailable_title" formatted="false">We can\'t reach your account right now</string>
   <string name="account_unavailable_body" formatted="false">Your session is kept on this device. Try again in a moment.</string>
+  <string name="limit_reminders_off" formatted="false">Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.</string>
+  <string name="limit_reminders_unknown" formatted="false">Lowering a limit is immediate.</string>
   <string name="page_unavailable_title" formatted="false">This page didn\'t load</string>
   <string name="page_unavailable_body" formatted="false">Nothing you saved was changed. Try again in a moment.</string>
+  <string name="w5_content_status" formatted="false">Content status</string>
+  <string name="w5_content_checking_access" formatted="false">Checking current access. Your input is kept during a connection interruption.</string>
+  <string name="w5_content_check_current_access" formatted="false">Check current access</string>
+  <string name="w5_content_access_unavailable" formatted="false">This content is unavailable. Check current access to try again.</string>
+  <string name="w5_content_refresh_unavailable" formatted="false">Content could not be refreshed. Reconnect and check current access. Your input is kept.</string>
+  <string name="w5_content_action_unconfirmed" formatted="false">We could not confirm this action. Check current access before retrying. Your input is kept.</string>
+  <string name="w5_content_session_ended" formatted="false">Your session ended. Continue with Pantopus again.</string>
+  <string name="w5_content_account_changed" formatted="false">The signed-in account changed. Refresh before continuing.</string>
+  <string name="w5_content_changed" formatted="false">This changed while you were viewing it. Refresh before trying again.</string>
+  <string name="w5_content_duplicate_changed" formatted="false">This retry differs from the earlier action. Refresh before trying again.</string>
+  <string name="w5_content_reply_withdrawn" formatted="false">This reply was withdrawn. It cannot be shared again.</string>
+  <string name="w5_content_fan_profile_required" formatted="false">Set up your fan profile before continuing.</string>
+  <string name="w5_content_invalid_request" formatted="false">Check your reply and sharing choices before trying again. Your input is kept.</string>
 </resources>
