@@ -1,0 +1,49 @@
+{
+  "observedAt": "2026-10-02T06:12:18.428831+00:00",
+  "host": "Yingpengs-Mac-Studio.local",
+  "baseSource": "d528910088c7ca8208063bf9ad692a4a5b97afe4",
+  "repairSourceSha256": "1d3bc8c67824a1aabd0b6871567ded0ef5083fe351de400ad85cb9acd76dbf68",
+  "apkSha256": "f40a49c189d788df21d55113a680e345e8fb4db248e0b87b2851608b3cc48abb",
+  "device": {
+    "avd": "Qelvora_W2_API34",
+    "serial": "emulator-5554",
+    "cores": 2,
+    "memoryMB": 2048,
+    "fontScale": 2.0,
+    "forcedDisplayDensity": null
+  },
+  "actors": {
+    "creator": "development actor one, fictional Maya",
+    "fan": "development actor two, fictional w2_native_fan"
+  },
+  "themes": [
+    "light",
+    "night"
+  ],
+  "actions": [
+    "Continue with Pantopus",
+    "choose development actor two",
+    "actual crash captured",
+    "repair canonical metadata token",
+    "normal rebuild/install",
+    "recover real persisted session",
+    "set font size through Settings UI",
+    "type fan handle through on-screen keyboard",
+    "tap Continue",
+    "read actual persisted fan/session",
+    "force-stop/cold relaunch Night",
+    "verify same account"
+  ],
+  "providerCalls": 0,
+  "newTests": 0,
+  "screenshots": {
+    "android-200-account-light.png": "f92777f767c18133ba60c4d4bedc60e6eb8cb78967d552ae14c0a08dbf3eb176",
+    "android-200-account-night-relaunch.png": "f18b8270bcbf735aa3fb5a98553904a733a58504083d7aadd568a6ac1c5533ec"
+  },
+  "limits": [
+    "iOS UI unavailable; launch-only",
+    "cited delivery/host/journal/provider not verified",
+    "TalkBack/reduced-motion/offline still open",
+    "full artboard fidelity and whole native text-scale journeys not claimed"
+  ]
+}
