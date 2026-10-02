@@ -263,7 +263,9 @@ export function callGrowthNotify(
     const eventId = stableID(`growth.call:${scope.creatorId}:${id}:${key}`);
     await relay.enqueueOnce("calls", eventId, scope.creatorId, async () => {
       const call = await sessions.read(scope, id);
-      const upcoming = ["scheduled", "waiting", "joining"].includes(call.state);
+      const upcoming = ["scheduled", "waiting", "connecting"].includes(
+        call.state,
+      );
       return {
         id: eventId,
         schemaVersion: 1,
@@ -307,11 +309,11 @@ export function callNotificationState(
       creatorName: scope.creatorName,
       authorKind: "system",
       safePreview: copy.growthCurrentCallUpdate,
-      destination: `/calls/${call.id}`,
+      destination: `/calls/${scope.creatorId}/${scope.fanId}/${call.id}`,
       status:
         call.state === "scheduled"
           ? "scheduled"
-          : ["waiting", "joining"].includes(call.state)
+          : ["waiting", "connecting"].includes(call.state)
             ? "joinable"
             : call.state,
     };

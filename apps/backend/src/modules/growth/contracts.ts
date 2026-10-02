@@ -30,7 +30,7 @@ export const Destination = z
   .string()
   .max(512)
   .regex(
-    /^\/(?:creators\/[a-z0-9_-]+(?:\/(?:posts\/[a-f0-9-]+|chat(?:\?context=[a-f0-9-]+)?))?|commerce\/(?:requests|spending|status\?packetId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})|requests\/[a-f0-9-]+|calls\/[a-f0-9-]+|notifications|studio\/(?:impact|insights)|you(?:\/spending)?|share\/[a-f0-9-]+)$/u,
+    /^\/(?:creators\/[a-z0-9_-]+(?:\/(?:posts\/[a-f0-9-]+|chat(?:\?context=[a-f0-9-]+)?))?|commerce\/(?:requests|spending|status\?packetId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})|requests\/[a-f0-9-]+|calls\/[a-f0-9-]{36}\/[a-f0-9-]{36}\/[a-f0-9-]{36}|notifications|studio\/(?:impact|insights)|you(?:\/spending)?|share\/[a-f0-9-]+)$/u,
   );
 /** Saved thread families are private Home destinations. Keep them out of the
  * public notification/share destination contract. Navigation grants no access. */
@@ -181,6 +181,9 @@ export interface HomeEntry {
   destination: string;
   updatedAt: string;
   kind: "thread" | "request" | "call";
+  /** Owner-issued directory position, never authority or a private preview.
+   * Used only to resume a partially consumed Home page; omitted from HTTP. */
+  cursor?: string;
 }
 export interface ShareSource {
   id: string;

@@ -22,6 +22,7 @@ import {
 } from "./modules/trust/development.js";
 import { contentPublicProjection } from "./modules/growth/content.js";
 import { canonicalConversationHomePage } from "./modules/growth/home.js";
+import { canonicalHomePage } from "./modules/growth/home-composition.js";
 import { canonicalPassAccess } from "./modules/growth/integration.js";
 import { DomainError } from "./core/errors.js";
 import { copy } from "@qelvora/copy";
@@ -175,21 +176,23 @@ try {
                   : runtime.assertActorAllowed(actor),
               owners: runtime.identity
                 ? {
-                    homePage: canonicalConversationHomePage(
-                      conversation.feature,
-                      runtime.access,
-                      runtime.database,
-                      runtime.identity.signing,
-                      async (creatorId) => {
-                        const row = (
-                          await runtime.pool.query(
-                            "SELECT handle FROM creator.creator_profile WHERE id=$1",
-                            [creatorId],
-                          )
-                        ).rows[0];
-                        return row?.handle ?? null;
-                      },
-                    ),
+                    homePage: canonicalHomePage({
+                      thread: canonicalConversationHomePage(
+                        conversation.feature,
+                        runtime.access,
+                        runtime.database,
+                        runtime.identity.signing,
+                        async (creatorId) => {
+                          const row = (
+                            await runtime.pool.query(
+                              "SELECT handle FROM creator.creator_profile WHERE id=$1",
+                              [creatorId],
+                            )
+                          ).rows[0];
+                          return row?.handle ?? null;
+                        },
+                      ),
+                    }),
                     ...(commerce
                       ? {
                           discoveryAccess: canonicalPassAccess(
@@ -216,7 +219,7 @@ try {
         })
       : undefined;
 } catch (error) {
-  await growthAPIPool?.end();
+  await Promise.allSettled([features.growth?.close(), growthAPIPool?.end()]);
   throw error;
 }
 features.growth?.start();

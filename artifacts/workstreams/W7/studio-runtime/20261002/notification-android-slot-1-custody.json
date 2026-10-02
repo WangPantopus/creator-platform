@@ -1,0 +1,12 @@
+{
+  "owner": "W7",
+  "token": "c582f367-4ca3-4c72-adb7-727facb9a2d0",
+  "device": "Qelvora_W7_API34",
+  "serial": "emulator-5580",
+  "purpose": "notification-ID-current-owner-cold-warm",
+  "start": "2026-10-02T09:11:52.897889+00:00",
+  "dev": 16777232,
+  "ino": 240328190,
+  "releasedAt": "2026-10-02T09:31:40.836839+00:00",
+  "state": "Owned device normally stopped; exact UUID/inode lease released; app data retained"
+}

@@ -29,6 +29,7 @@ import { Notifications, type DeliveryProvider } from "./notifications.js";
 import { GrowthErasure } from "./erasure.js";
 import { GrowthDeviceSessions } from "./device-session.js";
 import type { CreatorProjectionSource } from "./creator-projection.js";
+import { compareHomeActivity } from "./home-composition.js";
 
 const ShareSourceRecord = z.strictObject({
   id: z.uuid(),
@@ -571,7 +572,7 @@ export class GrowthService {
     const input = z
       .strictObject({
         postsCursor: z.string().min(1).max(1024).optional(),
-        threadsCursor: z.string().min(1).max(1024).optional(),
+        threadsCursor: z.string().min(1).max(6144).optional(),
       })
       .parse(raw);
     let threadCursor: string | undefined;
@@ -586,7 +587,7 @@ export class GrowthService {
             }),
             z.strictObject({
               accountId: z.uuid(),
-              ownerCursor: z.string().min(1).max(256),
+              ownerCursor: z.string().min(1).max(3072),
               kind: z.literal("threads-page"),
             }),
           ])
@@ -680,7 +681,7 @@ export class GrowthService {
     if (
       page.entries.length > 100 ||
       (page.nextCursor &&
-        (!z.string().min(1).max(256).safeParse(page.nextCursor).success ||
+        (!z.string().min(1).max(3072).safeParse(page.nextCursor).success ||
           page.nextCursor === threadCursor))
     )
       throw new DomainError(
@@ -690,11 +691,17 @@ export class GrowthService {
       );
     const entries = page.entries
       .filter((e) => Destination.safeParse(e.destination).success)
-      .sort(
-        (a, b) =>
-          Number(b.kind !== "thread") - Number(a.kind !== "thread") ||
-          b.updatedAt.localeCompare(a.updatedAt),
-      );
+      .sort(compareHomeActivity)
+      .map((entry) => ({
+        id: entry.id,
+        creatorId: entry.creatorId,
+        creatorName: entry.creatorName,
+        label: entry.label,
+        preview: entry.preview,
+        destination: entry.destination,
+        updatedAt: entry.updatedAt,
+        kind: entry.kind,
+      }));
     const posts = own.posts.slice(0, 30);
     const last = posts.at(-1);
     return {
