@@ -129,7 +129,7 @@ export function generationAccountingLifecycle(input: {
               : "thread_id=$2::uuid AND fan_id=$3::uuid";
         const rows: { cursor: string; document: unknown }[] = (
           await client.query<{ cursor: string; document: unknown }>(
-            `SELECT (${key}) COLLATE "C" AS cursor,to_jsonb(t) AS document FROM creator.${table} t WHERE creator_id=$1 AND ${predicate} AND ($4::text IS NULL OR (${key}) COLLATE "C">$4::text COLLATE "C") ORDER BY cursor LIMIT 50`,
+            `SELECT (${key}) COLLATE "C" AS cursor,to_jsonb(t)-'completion_capability_hash' AS document FROM creator.${table} t WHERE creator_id=$1 AND ${predicate} AND ($4::text IS NULL OR (${key}) COLLATE "C">$4::text COLLATE "C") ORDER BY cursor LIMIT 50`,
             [...bind(family), cursor],
           )
         ).rows;
@@ -404,10 +404,10 @@ export function generationAccountingLifecycle(input: {
             : "thread_id=$2::uuid AND fan_id=$3::uuid";
         const rows = (
           await client.query(
-            `SELECT * FROM creator.${table} WHERE creator_id=$1 AND ${predicate} LIMIT 2001`,
+            `SELECT to_jsonb(t)-'completion_capability_hash' AS document FROM creator.${table} t WHERE creator_id=$1 AND ${predicate} LIMIT 2001`,
             bind(family),
           )
-        ).rows;
+        ).rows.map((row) => row.document);
         invariant(
           rows.length <= 2000,
           "bounded_subjob_required",
