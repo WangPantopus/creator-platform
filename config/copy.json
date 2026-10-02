@@ -899,5 +899,18 @@
   "limitRemindersOff": "Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.",
   "limitRemindersUnknown": "Lowering a limit is immediate.",
   "pageUnavailableTitle": "This page didn't load",
-  "pageUnavailableBody": "Nothing you saved was changed. Try again in a moment."
+  "pageUnavailableBody": "Nothing you saved was changed. Try again in a moment.",
+  "w5ContentStatus": "Content status",
+  "w5ContentCheckingAccess": "Checking current access. Your input is kept during a connection interruption.",
+  "w5ContentCheckCurrentAccess": "Check current access",
+  "w5ContentAccessUnavailable": "This content is unavailable. Check current access to try again.",
+  "w5ContentRefreshUnavailable": "Content could not be refreshed. Reconnect and check current access. Your input is kept.",
+  "w5ContentActionUnconfirmed": "We could not confirm this action. Check current access before retrying. Your input is kept.",
+  "w5ContentSessionEnded": "Your session ended. Continue with Pantopus again.",
+  "w5ContentAccountChanged": "The signed-in account changed. Refresh before continuing.",
+  "w5ContentChanged": "This changed while you were viewing it. Refresh before trying again.",
+  "w5ContentDuplicateChanged": "This retry differs from the earlier action. Refresh before trying again.",
+  "w5ContentReplyWithdrawn": "This reply was withdrawn. It cannot be shared again.",
+  "w5ContentFanProfileRequired": "Set up your fan profile before continuing.",
+  "w5ContentInvalidRequest": "Check your reply and sharing choices before trying again. Your input is kept."
 }
