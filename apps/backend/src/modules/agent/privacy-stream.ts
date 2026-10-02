@@ -20,6 +20,7 @@ export function agentExportStream(
   service: AgentService,
   scopes: readonly CreatorScope[],
   assertCurrent: () => Promise<void>,
+  assertTaskInTransaction: (client: PoolClient) => Promise<void>,
   parentSignal?: AbortSignal,
   accounting?: AgentAccountingExportBoundary,
 ): AgentPrivacyExportStream {
@@ -31,6 +32,7 @@ export function agentExportStream(
     ...(parentSignal ? [parentSignal] : []),
   ]);
   const hash = createHash("sha256");
+  let heldClient: PoolClient | undefined;
   let bytes = 0;
   let count = 0;
   let started = false;
@@ -63,6 +65,12 @@ export function agentExportStream(
     if (!buffered) return;
     signal.throwIfAborted();
     await assertCurrent();
+    invariant(
+      heldClient,
+      "privacy_commit_fence_unavailable",
+      "Use the actual held export task.",
+    );
+    await assertTaskInTransaction(heldClient);
     const data = Buffer.from(buffer.subarray(0, buffered));
     buffered = 0;
     invariant(
@@ -105,6 +113,8 @@ export function agentExportStream(
       await service.repository.assertRuntimeRole();
       client = await service.repository.pool.connect();
       await client.query("BEGIN ISOLATION LEVEL REPEATABLE READ");
+      heldClient = client;
+      await assertTaskInTransaction(client);
       await client.query(
         "SET LOCAL statement_timeout='10s'; SET LOCAL lock_timeout='5s'",
       );
@@ -133,6 +143,7 @@ export function agentExportStream(
       )) {
         signal.throwIfAborted();
         await assertCurrent();
+        await assertTaskInTransaction(client);
         await client.query(
           "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
           [scope.creatorId, scope.accountId],
@@ -168,6 +179,7 @@ export function agentExportStream(
           "The finalized conversation accounting export changed before source exhaustion.",
         );
       }
+      await assertTaskInTransaction(client);
       await client.query("COMMIT");
       complete = true;
     } catch (error) {
@@ -176,6 +188,7 @@ export function agentExportStream(
       if (client) await client.query("ROLLBACK").catch(() => undefined);
     } finally {
       client?.release();
+      heldClient = undefined;
       signal.removeEventListener("abort", abort);
       resolveDone();
       notify();

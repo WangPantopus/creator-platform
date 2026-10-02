@@ -1,0 +1,41 @@
+{
+  "observedAt": "2026-10-02T13:20:07.192Z",
+  "checkedHead": "01474b5d4200790f2f3107fccb923a9cbdb6c521",
+  "keeperRun": 37007451797,
+  "checks": [
+    {
+      "name": "android-foundation",
+      "status": "queued",
+      "conclusion": ""
+    },
+    {
+      "name": "web-and-backend",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "android-runtime",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "web-visual",
+      "status": "queued",
+      "conclusion": ""
+    },
+    {
+      "name": "ios-foundation",
+      "status": "queued",
+      "conclusion": ""
+    }
+  ],
+  "merged": {
+    "headRefOid": "01474b5d4200790f2f3107fccb923a9cbdb6c521",
+    "mergeCommit": {
+      "oid": "b1ac10832ec1292aab6d93be537e37dddc6f24e5"
+    },
+    "mergedAt": "2026-10-02T13:20:06Z",
+    "state": "MERGED",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/92"
+  }
+}

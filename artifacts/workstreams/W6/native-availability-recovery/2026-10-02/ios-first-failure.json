@@ -1,0 +1,36 @@
+{
+  "source": "4edec8df",
+  "database": "creator_w6_wave_fresh_20261002",
+  "journey": "Actual iOS availability cold return",
+  "accepted": false,
+  "failure": "Missing canonical accountUnavailableBody copy key referenced by W1 recovery source",
+  "exception": "EXC_BREAKPOINT",
+  "frames": [
+    {
+      "symbol": "_assertionFailure(_:_:file:line:flags:)"
+    },
+    {
+      "sourceLine": 903,
+      "sourceFile": "QelvoraCopy.swift",
+      "symbol": "static QelvoraCopy.text(_:values:)"
+    },
+    {
+      "sourceLine": 143,
+      "sourceFile": "FanShell.swift",
+      "symbol": "closure #3 in closure #1 in FanAppShell.body.getter"
+    },
+    {
+      "symbol": "<deduplicated_symbol>"
+    },
+    {
+      "symbol": "_VariadicView.Tree.init(_:content:)"
+    },
+    {
+      "symbol": "VStack.init(alignment:spacing:content:)"
+    }
+  ],
+  "shippingBuild": "normal simulator signing passed",
+  "uiCaseSeconds": 38.522,
+  "uiFailures": 3,
+  "nextAction": "consume exact W1 canonical keys; regenerate, rebuild, repeat"
+}

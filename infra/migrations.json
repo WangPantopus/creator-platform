@@ -719,6 +719,15 @@
       "version": "0110_w3_generation_terminal_finalization",
       "state": "reserved_unapplied",
       "reason": "Genuine0099/0100 private terminal scope/client/XID original message+generation+cursor transition and durable frame only. Exact source/real acceptance provenance and W2/W4 owner settlement composition pending; no input/provider/financial permission."
+    },
+    {
+      "id": "0201",
+      "owner": "W8",
+      "version": "0201_w8_worker_migration_metadata",
+      "path": "apps/backend/migrations/0201_w8_worker_migration_metadata.sql",
+      "sourceSha256": "2fce1ce5aa6c9f571067d999e2a62ac8d71b8e147b97393e7e87091227159e6f",
+      "state": "reserved_unapplied",
+      "reason": "Distinct metadata-only SELECT(version,checksum) for the actual isolated creator_publication_worker and creator_call_callback_worker after0158/0176. Same held original worker source/ledger/definition/role/ACL/currentness bookends remain required. No whole-ledger SELECT, timestamps, write, grant option, membership, private content, provider/effect or family/signing authority. Closed rolled-back SQL/ACL qualification and eight drift refusals preserve full custody; actual source/owner integration, activation and positive ingress acceptance remain pending."
     }
   ]
 }

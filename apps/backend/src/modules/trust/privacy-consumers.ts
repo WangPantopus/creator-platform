@@ -1,4 +1,4 @@
-import type { Pool } from "pg";
+import type { Pool, PoolClient } from "pg";
 import type { PrivacyHook } from "./contracts.js";
 import { identityPrivacyHook } from "./identity-privacy-hook.js";
 import { conversationPrivacyAuthority } from "./conversation-privacy-authority.js";
@@ -15,7 +15,10 @@ import type { AgentService } from "../agent/service.js";
 import type { AgentLifecycle } from "../agent/lifecycle.js";
 import type { CommerceService } from "../commerce/service.js";
 import { commercePrivacyHook } from "../commerce/operations.js";
-import { privacyTaskAuthority } from "./privacy-authority.js";
+import {
+  privacyTaskAuthority,
+  privacyTaskAuthorityInTransaction,
+} from "./privacy-authority.js";
 import {
   createCommercePrivacyAuthority,
   type CommercePrivacyConfiguration,
@@ -38,6 +41,8 @@ export type ConversationPrivacyOwnerPorts = Omit<
 export function createPrivacyConsumers(input: {
   runtimePool: Pool;
   coordinatorPool: Pool;
+  /** Actual restoration on the owner's held client, as supplied by W8. */
+  assertRestoredInTransaction?: (client: PoolClient) => Promise<void>;
   conversationRetention?: ConversationPrivacyRetention;
   /** Prepared owner instances; the coordinator fixes the pool, actual task
    * authority and reviewed retention after spreading these owner ports. */
@@ -105,13 +110,28 @@ export function createPrivacyConsumers(input: {
       agentPrivacyHook(
         input.agent.service,
         input.agent.lifecycle,
-        createAgentTrustAuthority(input.coordinatorPool, async () => {
-          throw new DomainError(
-            "notice_authority_required",
-            "Privacy consumers cannot issue operations action scopes.",
-            503,
-          );
-        }),
+        createAgentTrustAuthority(
+          input.coordinatorPool,
+          async () => {
+            throw new DomainError(
+              "notice_authority_required",
+              "Privacy consumers cannot issue operations action scopes.",
+              503,
+            );
+          },
+          async (client, job) => {
+            if (!input.assertRestoredInTransaction)
+              throw new DomainError(
+                "privacy_restoration_unconfigured",
+                "Current restoration on the held Agent lifecycle client is required.",
+                503,
+              );
+            await input.assertRestoredInTransaction(client);
+            const owned = await privacyTaskAuthorityInTransaction(client, job);
+            await input.assertRestoredInTransaction(client);
+            return owned;
+          },
+        ),
         input.agent.artifacts,
       ),
     );

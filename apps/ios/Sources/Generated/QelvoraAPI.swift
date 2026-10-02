@@ -1725,6 +1725,27 @@ public enum APIMediaProcessedMediaEvidenceMimeType: String, Codable, Sendable {
   case `image_png` = "image/png"
 }
 
+public struct APIMediaThreadRecordingPolicy: Codable, Sendable {
+  public let `creatorId`: String
+  public let `fanId`: String
+  public let `threadId`: String
+  public let `purpose`: APIMediaThreadRecordingPolicyPurpose
+  public let `maxBytes`: Int
+  public let `maxDurationMs`: Int
+  public init(creatorId: String, fanId: String, threadId: String, purpose: APIMediaThreadRecordingPolicyPurpose, maxBytes: Int, maxDurationMs: Int) {
+    self.creatorId = creatorId
+    self.fanId = fanId
+    self.threadId = threadId
+    self.purpose = purpose
+    self.maxBytes = maxBytes
+    self.maxDurationMs = maxDurationMs
+  }
+}
+
+public enum APIMediaThreadRecordingPolicyPurpose: String, Codable, Sendable {
+  case `human_reply` = "human_reply"
+}
+
 public struct APIMediaUploadRequest: Codable, Sendable {
   public let `purpose`: APIMediaUploadRequestPurpose
   public let `mimeType`: APIMediaUploadRequestMimeType
@@ -1760,6 +1781,30 @@ public enum APIMediaUploadRequestMimeType: String, Codable, Sendable {
   case `audio_wav` = "audio/wav"
   case `image_jpeg` = "image/jpeg"
   case `image_png` = "image/png"
+}
+
+public struct APICallAdmissionReceipt: Codable, Sendable {
+  public let `admitted`: APICallAdmissionReceiptAdmitted
+  public init(admitted: APICallAdmissionReceiptAdmitted) {
+    self.admitted = admitted
+  }
+}
+
+public struct APICallAdmissionReceiptAdmitted: Codable, Sendable {
+  public let value: Bool = true
+  public init() {}
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == true else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expected true") }
+  }
+  public func encode(to encoder: Encoder) throws { var container = encoder.singleValueContainer(); try container.encode(true) }
+}
+
+public struct APICallAdmissionRedemption: Codable, Sendable {
+  public let `nonce`: String
+  public init(nonce: String) {
+    self.nonce = nonce
+  }
 }
 
 public struct APICallAvailabilityCommand: Codable, Sendable {
@@ -3101,6 +3146,79 @@ public struct APIContentWithdrawResultWithdrawn: Codable, Sendable {
     guard try container.decode(Bool.self) == true else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expected true") }
   }
   public func encode(to encoder: Encoder) throws { var container = encoder.singleValueContainer(); try container.encode(true) }
+}
+
+public struct APINoteReplyPolicy: Codable, Sendable {
+  public let `accountId`: String
+  public let `creatorId`: String
+  public let `limit`: APIJSONValue
+  public let `confirmedDays`: Int?
+  public let `milestone`: APIJSONValue?
+  public let `basis`: APINoteReplyPolicyBasis?
+  public let `historyComplete`: APINoteReplyPolicyHistoryComplete
+  public let `longerRepliesActive`: Bool
+  public let `checkedAt`: String
+  public init(accountId: String, creatorId: String, limit: APIJSONValue, confirmedDays: Int? = nil, milestone: APIJSONValue? = nil, basis: APINoteReplyPolicyBasis? = nil, historyComplete: APINoteReplyPolicyHistoryComplete, longerRepliesActive: Bool, checkedAt: String) {
+    self.accountId = accountId
+    self.creatorId = creatorId
+    self.limit = limit
+    self.confirmedDays = confirmedDays
+    self.milestone = milestone
+    self.basis = basis
+    self.historyComplete = historyComplete
+    self.longerRepliesActive = longerRepliesActive
+    self.checkedAt = checkedAt
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `accountId`
+    case `creatorId`
+    case `limit`
+    case `confirmedDays`
+    case `milestone`
+    case `basis`
+    case `historyComplete`
+    case `longerRepliesActive`
+    case `checkedAt`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.accountId = try container.decode(String.self, forKey: .accountId)
+    self.creatorId = try container.decode(String.self, forKey: .creatorId)
+    self.limit = try container.decode(APIJSONValue.self, forKey: .limit)
+    self.confirmedDays = try container.decode(Int?.self, forKey: .confirmedDays)
+    self.milestone = try container.decode(APIJSONValue?.self, forKey: .milestone)
+    self.basis = try container.decode(APINoteReplyPolicyBasis?.self, forKey: .basis)
+    self.historyComplete = try container.decode(APINoteReplyPolicyHistoryComplete.self, forKey: .historyComplete)
+    self.longerRepliesActive = try container.decode(Bool.self, forKey: .longerRepliesActive)
+    self.checkedAt = try container.decode(String.self, forKey: .checkedAt)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(accountId, forKey: .accountId)
+    try container.encode(creatorId, forKey: .creatorId)
+    try container.encode(limit, forKey: .limit)
+    try container.encode(confirmedDays, forKey: .confirmedDays)
+    try container.encode(milestone, forKey: .milestone)
+    try container.encode(basis, forKey: .basis)
+    try container.encode(historyComplete, forKey: .historyComplete)
+    try container.encode(longerRepliesActive, forKey: .longerRepliesActive)
+    try container.encode(checkedAt, forKey: .checkedAt)
+  }
+}
+
+public enum APINoteReplyPolicyBasis: String, Codable, Sendable {
+  case `confirmed_stripe_paid_periods` = "confirmed_stripe_paid_periods"
+  case `confirmed_paid_periods` = "confirmed_paid_periods"
+}
+
+public struct APINoteReplyPolicyHistoryComplete: Codable, Sendable {
+  public let value: Bool = false
+  public init() {}
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == false else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expected false") }
+  }
+  public func encode(to encoder: Encoder) throws { var container = encoder.singleValueContainer(); try container.encode(false) }
 }
 
 public struct APIPrivateNoteReply: Codable, Sendable {
@@ -5604,6 +5722,15 @@ public enum APIConversationConversationAuthorship: String, Codable, Sendable {
   case `system` = "system"
 }
 
+public struct APIConversationConversationCallControl: Codable, Sendable {
+  public let `idempotencyKey`: String
+  public let `expectedEpoch`: Int
+  public init(idempotencyKey: String, expectedEpoch: Int) {
+    self.idempotencyKey = idempotencyKey
+    self.expectedEpoch = expectedEpoch
+  }
+}
+
 public struct APIConversationConversationCorrectionCommand: Codable, Sendable {
   public let `actType`: APIConversationConversationCorrectionCommandActType
   public let `subjectId`: String
@@ -7789,6 +7916,79 @@ public struct APIContentContentWithdrawResultWithdrawn: Codable, Sendable {
   public func encode(to encoder: Encoder) throws { var container = encoder.singleValueContainer(); try container.encode(true) }
 }
 
+public struct APIContentNoteReplyPolicy: Codable, Sendable {
+  public let `accountId`: String
+  public let `creatorId`: String
+  public let `limit`: APIJSONValue
+  public let `confirmedDays`: Int?
+  public let `milestone`: APIJSONValue?
+  public let `basis`: APIContentNoteReplyPolicyBasis?
+  public let `historyComplete`: APIContentNoteReplyPolicyHistoryComplete
+  public let `longerRepliesActive`: Bool
+  public let `checkedAt`: String
+  public init(accountId: String, creatorId: String, limit: APIJSONValue, confirmedDays: Int? = nil, milestone: APIJSONValue? = nil, basis: APIContentNoteReplyPolicyBasis? = nil, historyComplete: APIContentNoteReplyPolicyHistoryComplete, longerRepliesActive: Bool, checkedAt: String) {
+    self.accountId = accountId
+    self.creatorId = creatorId
+    self.limit = limit
+    self.confirmedDays = confirmedDays
+    self.milestone = milestone
+    self.basis = basis
+    self.historyComplete = historyComplete
+    self.longerRepliesActive = longerRepliesActive
+    self.checkedAt = checkedAt
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `accountId`
+    case `creatorId`
+    case `limit`
+    case `confirmedDays`
+    case `milestone`
+    case `basis`
+    case `historyComplete`
+    case `longerRepliesActive`
+    case `checkedAt`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.accountId = try container.decode(String.self, forKey: .accountId)
+    self.creatorId = try container.decode(String.self, forKey: .creatorId)
+    self.limit = try container.decode(APIJSONValue.self, forKey: .limit)
+    self.confirmedDays = try container.decode(Int?.self, forKey: .confirmedDays)
+    self.milestone = try container.decode(APIJSONValue?.self, forKey: .milestone)
+    self.basis = try container.decode(APIContentNoteReplyPolicyBasis?.self, forKey: .basis)
+    self.historyComplete = try container.decode(APIContentNoteReplyPolicyHistoryComplete.self, forKey: .historyComplete)
+    self.longerRepliesActive = try container.decode(Bool.self, forKey: .longerRepliesActive)
+    self.checkedAt = try container.decode(String.self, forKey: .checkedAt)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(accountId, forKey: .accountId)
+    try container.encode(creatorId, forKey: .creatorId)
+    try container.encode(limit, forKey: .limit)
+    try container.encode(confirmedDays, forKey: .confirmedDays)
+    try container.encode(milestone, forKey: .milestone)
+    try container.encode(basis, forKey: .basis)
+    try container.encode(historyComplete, forKey: .historyComplete)
+    try container.encode(longerRepliesActive, forKey: .longerRepliesActive)
+    try container.encode(checkedAt, forKey: .checkedAt)
+  }
+}
+
+public enum APIContentNoteReplyPolicyBasis: String, Codable, Sendable {
+  case `confirmed_stripe_paid_periods` = "confirmed_stripe_paid_periods"
+  case `confirmed_paid_periods` = "confirmed_paid_periods"
+}
+
+public struct APIContentNoteReplyPolicyHistoryComplete: Codable, Sendable {
+  public let value: Bool = false
+  public init() {}
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == false else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expected false") }
+  }
+  public func encode(to encoder: Encoder) throws { var container = encoder.singleValueContainer(); try container.encode(false) }
+}
+
 public struct APIContentPrivateNoteReply: Codable, Sendable {
   public let `safetyState`: APIContentPrivateNoteReplySafetyState
   public let `safetyReviewAvailable`: Bool
@@ -8640,6 +8840,9 @@ public actor CreatorAPIClient {
   public func muteContent(creatorId: String, xQelvoraExpectedAccount: String? = nil, body: APIContentMuteCommand) async throws -> APIContentMuteCommand {
     try await request("/v1/content/\(segment(creatorId))/mute", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
   }
+  public func noteReplyPolicy(creatorId: String) async throws -> APINoteReplyPolicy {
+    try await request("/v1/content/\(segment(creatorId))/reply-policy", method: "GET", authenticated: true)
+  }
   public func myContentThanks(creatorId: String) async throws -> APIContentThanksView {
     try await request("/v1/content/\(segment(creatorId))/thanks", method: "GET", authenticated: true)
   }
@@ -8843,6 +9046,9 @@ public actor CreatorAPIClient {
   }
   public func deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput) async throws -> APIConversationConversationRecordingResult {
     try await request("/v1/conversations/\(segment(creatorId))/\(segment(fanId))/recordings", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
+  }
+  public func redeemCallAdmission(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = nil, body: APICallAdmissionRedemption) async throws -> APICallAdmissionReceipt {
+    try await request("/v1/w6/threads/\(segment(creatorId))/\(segment(fanId))/calls/\(segment(sessionId))/redeem", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
   }
   public func readCreatorMediaPolicy(creatorId: String, objectId: String, purpose: ReadCreatorMediaPolicyPurpose) async throws -> APIMediaCreatorMediaPolicyView {
     try await request("/v1/w6/creators/\(segment(creatorId))/media-policy", method: "GET", authenticated: true, query: [URLQueryItem(name: "objectId", value: objectId), URLQueryItem(name: "purpose", value: purpose.rawValue)])

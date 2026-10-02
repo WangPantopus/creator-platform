@@ -1,0 +1,39 @@
+{
+  "sourceCommit": "fb1cbcaab7926e96a361bfd7840ecf192efafefd",
+  "wave": "20261002-privacy",
+  "privateBackupAndSeparateRestore": true,
+  "sourceLedger": 57,
+  "upgradeLedger": 61,
+  "freshLedger": 61,
+  "originalRows": 26,
+  "originalTables": 161,
+  "oldLedgerPreserved": true,
+  "oldDataPreserved": true,
+  "oldRolesPreserved": true,
+  "originalSequencePreserved": true,
+  "sourceUntouched": true,
+  "exactWave": true,
+  "schemaMatches": true,
+  "allRoleSecurityMatches": true,
+  "roleAttributesMatch": true,
+  "upgradeSchemaSha256": "47ce91688f162cd5848cc6a44d738e85bb3aab0770c05c3be8f2cac0a1eafbe6",
+  "freshSchemaSha256": "47ce91688f162cd5848cc6a44d738e85bb3aab0770c05c3be8f2cac0a1eafbe6",
+  "upgradeSecuritySha256": "5b99fafdd59f4cc447ddd14a2e55f5f0daf2d48d7ba929348fb824b346fe5af8",
+  "freshSecuritySha256": "5b99fafdd59f4cc447ddd14a2e55f5f0daf2d48d7ba929348fb824b346fe5af8",
+  "releaseReady": false,
+  "positiveTaskOrApplicationVerified": false,
+  "liveActivated": false,
+  "packetSha256": "2d72120d1be136081acb5d324f19dae44660d6e423e932cc962664596ab4c3e2",
+  "heldMappingSha256": "2338f48ea4b1008f47eef43ff7a835021e5e917669ad44f21179c69d03227c0a",
+  "rolePacketSha256": "c24a5bea3e45a2f2cf8397f0d26877175544eb0d67cb18e1af17225fddcea980",
+  "backupBytes": 712692,
+  "failuresPreserved": [
+    "First fresh61 install ran before upgrade in a shared review cluster and added global purpose roles. The exact security-manifest preflight refused and rolled back. Repeated preserved-data upgrade on an independently initialized cluster; no SQL or expected result changed."
+  ],
+  "notVerified": [
+    "Live61 activation and real app return visits",
+    "Actual cancellable privacy tasks, COMMIT, expiry, artifact and ACK",
+    "Positive generation, fulfillment, provider or creator journeys",
+    "Full C10 retained-record/finite policy and release acceptance"
+  ]
+}

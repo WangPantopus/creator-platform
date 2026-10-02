@@ -9,6 +9,7 @@ import {
   PublishContent,
   ContentVersionCommand,
   ReplyToNote,
+  NoteReplyPolicy,
   QuoteConsent,
   ReactToReply,
   ThanksCommand,
@@ -26,6 +27,7 @@ import {
 } from "../identity/subjects.js";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
+import { baseNoteReplyPolicy } from "./tenure.js";
 import {
   ContentPublicationSources,
   type ContentPublicationSourceController,
@@ -116,6 +118,21 @@ export type ContentPublicationProof = {
   mediaReady: boolean;
 };
 export interface ContentDependencies {
+  /** Issue the genuine request scope before leasing the content pool client. */
+  prepareAudienceRequest?: (actor: Actor, creatorId: string) => Promise<void>;
+  /** Actual own-fan identity prepared after all packet negatives and before
+   * content/quote/membership/grant positives, retained on this exact client. */
+  prepareAudienceRead?: (
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+  ) => Promise<void>;
+  /** Uses only W4 currentTenure; server rechecks for every actual reply. */
+  replyPolicy?: (
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+  ) => Promise<NoteReplyPolicy>;
   /** Current producer state only. Missing adapters fail closed for their path. */
   follows?: (
     client: PoolClient,
@@ -168,7 +185,7 @@ export interface ContentDependencies {
     input: ContentPacketRead,
   ) => Promise<boolean>;
   /** W8 reviews the exact immutable reply. Missing/unavailable review leaves it quarantined. */
-  reviewReply?: (
+  reviewReply?: ((
     client: PoolClient,
     input: {
       replyId: string;
@@ -182,7 +199,10 @@ export interface ContentDependencies {
     state: "pending" | "allowed" | "flagged";
     reference: string;
     textHash: string;
-  }>;
+  }>) & {
+    /** Actual W8 callback capability, not host-supplied tenure permission. */
+    readonly maxTextLength?: number;
+  };
   /** Hold current W1 session and W8 creator/fan denial on the domain client,
    * before object locks. This callback cannot substitute a worker Actor. */
   assertAllowedInTransaction?: (
@@ -231,7 +251,7 @@ export interface ContentDependencies {
 }
 
 export function publicationCommand(
-  row: Index,
+  row: Pick<Index, "id" | "creator_id" | "version">,
   document: ContentBody,
   mediaEvidence: readonly ProcessedMediaEvidence[] = [],
 ): SignedActCommand {
@@ -552,6 +572,7 @@ export class ContentService {
       creatorId,
       contentId,
     });
+    await this.dependencies.prepareAudienceRead?.(client, actor, creatorId);
   }
   async index(
     client: PoolClient,
@@ -1514,6 +1535,8 @@ export class ContentService {
     );
   }
   async get(actor: Actor, creatorId: string, id: string, studio = false) {
+    if (!studio)
+      await this.dependencies.prepareAudienceRequest?.(actor, creatorId);
     return this.transaction(actor, creatorId, async (client) => {
       const row = await this.index(
         client,
@@ -1631,6 +1654,8 @@ export class ContentService {
   }
   async list(actor: Actor, creatorId: string, raw: unknown, studio = false) {
     const page = ContentPage.parse(raw);
+    if (!studio)
+      await this.dependencies.prepareAudienceRequest?.(actor, creatorId);
     return this.transaction(actor, creatorId, async (client) => {
       if (studio)
         await this.role(client, actor, creatorId, [
@@ -1653,9 +1678,14 @@ export class ContentService {
       const items: ContentView[] = [];
       // Resolve every bounded page family's negatives before the first content
       // lock. Never prepare a second family after a prior row's source fence.
-      if (!studio)
+      if (!studio) {
         for (const row of rows.slice(0, page.limit))
-          await this.prepareReadInTransaction(client, actor, creatorId, row.id);
+          await this.dependencies.preparePublicPacketRead?.(client, actor, {
+            creatorId,
+            contentId: row.id,
+          });
+        await this.dependencies.prepareAudienceRead?.(client, actor, creatorId);
+      }
       const currentRows: Index[] = [];
       for (const row of rows.slice(0, page.limit)) {
         let current: Index;
@@ -1714,10 +1744,25 @@ export class ContentService {
   }
   async reply(actor: Actor, creatorId: string, id: string, raw: unknown) {
     const input = ReplyToNote.parse(raw);
+    await this.dependencies.prepareAudienceRequest?.(actor, creatorId);
     return this.transaction(actor, creatorId, async (client) => {
       await this.assertReplyReviewInstalled(client);
-      const row = await this.index(client, creatorId, id, false, actor);
-      await this.authorizeRead(client, actor, row);
+      await this.prepareReadInTransaction(client, actor, creatorId, id);
+      const policy = await this.currentReplyPolicy(client, actor, creatorId);
+      if (input.text.length > policy.limit)
+        throw new DomainError(
+          "note_reply_limit",
+          `Your current private reply limit is ${policy.limit} characters.`,
+          409,
+        );
+      const row = await this.index(client, creatorId, id);
+      invariant(
+        (await this.eligibleBeforePacket(client, actor, row)) &&
+          (await this.preparePacketPositive(client, actor, row)),
+        "content_unavailable",
+        "This content is unavailable to this audience.",
+      );
+      await client.query("SELECT set_config('app.content_id',$1,true)", [id]);
       invariant(
         row.kind === "note",
         "note_required",
@@ -1730,7 +1775,7 @@ export class ContentService {
         )
       ).rows[0];
       invariant(fan, "fan_profile_required", "Set up your fan profile first.");
-      return this.command(
+      const receipt = await this.command(
         client,
         actor,
         "reply",
@@ -1772,7 +1817,45 @@ export class ContentService {
           return { ...reply, safetyState: decision.state };
         },
       );
+      // All reply/reviewer/idempotency writes precede a packet's final source
+      // gate. A revoked source or contention rolls back the complete receipt.
+      invariant(
+        await this.packetEligible(client, actor, row),
+        "content_unavailable",
+        "This content is unavailable to this audience.",
+      );
+      return receipt;
     });
+  }
+  private async currentReplyPolicy(
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+  ) {
+    const policy = NoteReplyPolicy.parse(
+      this.dependencies.replyPolicy
+        ? await this.dependencies.replyPolicy(client, actor, creatorId)
+        : baseNoteReplyPolicy(actor, creatorId),
+    );
+    invariant(
+      policy.accountId === actor.accountId && policy.creatorId === creatorId,
+      "content_account_changed",
+      "Reopen this Note with your current account.",
+    );
+    return this.dependencies.reviewReply &&
+      this.dependencies.reviewReply.maxTextLength === 12000
+      ? policy
+      : NoteReplyPolicy.parse({
+          ...policy,
+          limit: 4000,
+          longerRepliesActive: false,
+        });
+  }
+  async replyPolicy(actor: Actor, creatorId: string) {
+    await this.dependencies.prepareAudienceRequest?.(actor, creatorId);
+    return this.transaction(actor, creatorId, (client) =>
+      this.currentReplyPolicy(client, actor, creatorId),
+    );
   }
   private async reviewReplyText(
     client: PoolClient,
@@ -2238,6 +2321,8 @@ export class ContentService {
   }
   async thanks(actor: Actor, creatorId: string, raw: unknown) {
     const input = ThanksCommand.parse(raw);
+    if (!input.withdrawn && input.targetKind === "content")
+      await this.dependencies.prepareAudienceRequest?.(actor, creatorId);
     return this.transaction(actor, creatorId, async (client) => {
       const fan = (
         await client.query(
