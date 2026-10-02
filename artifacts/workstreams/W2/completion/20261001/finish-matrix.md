@@ -52,3 +52,8 @@ Owned runtime: creator_w2 on55442, API4102, web3002, current canonical ledger40.
 C05 configuration/evidence/licence, C08 rights/audience/provenance, C09 verified notices/refunds and C10 protected export/purge remain canonical. O01 cited first useful answer/O15 source-rights recovery and O08 memory/O10 wellbeing/O19 shadow-cost/O21 lifecycle retain their genuine producer/policy/native/performance boundaries. Historical first6134ms/full6182ms/cost2405 and earlier first7143/6281ms/full9039/8263ms remain failures or single observations as originally qualified.
 
 W8 reserved held0096_w2_generation_input_consumers and0097_w2_generation_attempt_admission for genuine W1 task-scope/NOLOGIN reviewed consumers. Source implementation proceeds with W1/W3/W4/W5; original live40 is unchanged and no job/Actor/approval/raw worker grant is invented.
+
+
+### 2026-10-02 — real 390-wide 200% Studio navigation
+
+Actual native Chrome 200% exposed More outside the 195-pixel CSS viewport despite no document overflow. W2-only CSS repair personally operated on exact `fc92a031`: all five 57×44 links fit in Light and Night; Night keyboard reached all five and the twentieth stored example’s 44-pixel label. Baseline 390×1300 gutter 16 and 1280×900 sidebar 248 retained in both themes. Native zoom reset to 100%; matching GUI lease released. [Sanitized receipt](../20261002-studio-200-navigation/README.md). Local web typecheck and formatting passed; exact-head CI and normal merge pending. Screen readers, native iOS, other artboards, provider paths and named p95 remain open. No persisted state or provider writes.

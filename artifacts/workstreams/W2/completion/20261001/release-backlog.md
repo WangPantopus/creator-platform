@@ -17,3 +17,8 @@ The [current matrix](finish-matrix.md) retains every nine-package/R01–R14/cont
 The actual live runtime remains40 migrations, Maya revision15/20examples/one source/0 usage-evaluation-version and a separate saved fictional native fan. Designated key/original iMac archive are absent. Reviewed production licence, processor/retention and Q16 gate their dependent production paths only. Current Android CUA operation passed the narrow recovery and resources were stopped/released; this is not whole native generation or screen-reader acceptance.
 
 W8 reserved held0096_w2_generation_input_consumers and0097_w2_generation_attempt_admission for genuine W1 task-scope/NOLOGIN reviewed consumers. Source implementation proceeds with W1/W3/W4/W5; original live40 is unchanged and no job/Actor/approval/raw worker grant is invented.
+
+
+### 2026-10-02 — real 390-wide 200% Studio navigation
+
+Actual native Chrome 200% exposed More outside the 195-pixel CSS viewport despite no document overflow. W2-only CSS repair personally operated on exact `fc92a031`: all five 57×44 links fit in Light and Night; Night keyboard reached all five and the twentieth stored example’s 44-pixel label. Baseline 390×1300 gutter 16 and 1280×900 sidebar 248 retained in both themes. Native zoom reset to 100%; matching GUI lease released. [Sanitized receipt](../20261002-studio-200-navigation/README.md). Local web typecheck and formatting passed; exact-head CI and normal merge pending. Screen readers, native iOS, other artboards, provider paths and named p95 remain open. No persisted state or provider writes.

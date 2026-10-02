@@ -11,3 +11,8 @@ Current proof: [public main check](../20261001-mac-studio/public-projection/merg
 Earlier iMac source/provider counts/cleanup/archive/PR40-pending assertions and every incremental receipt remain in [verbatim README history](README-history-20261002.md), [matrix history](finish-matrix-history-20261002.md), [backlog history](release-backlog-history-20261002.md); [manifest](current-record-reconciliation.json) pins their bytes/SHA256. They are dated evidence, not current runnable records.
 
 W8 reserved held0096_w2_generation_input_consumers and0097_w2_generation_attempt_admission for genuine W1 task-scope/NOLOGIN reviewed consumers. Source implementation proceeds with W1/W3/W4/W5; original live40 is unchanged and no job/Actor/approval/raw worker grant is invented.
+
+
+### 2026-10-02 — real 390-wide 200% Studio navigation
+
+Actual native Chrome 200% exposed More outside the 195-pixel CSS viewport despite no document overflow. W2-only CSS repair personally operated on exact `fc92a031`: all five 57×44 links fit in Light and Night; Night keyboard reached all five and the twentieth stored example’s 44-pixel label. Baseline 390×1300 gutter 16 and 1280×900 sidebar 248 retained in both themes. Native zoom reset to 100%; matching GUI lease released. [Sanitized receipt](../20261002-studio-200-navigation/README.md). Local web typecheck and formatting passed; exact-head CI and normal merge pending. Screen readers, native iOS, other artboards, provider paths and named p95 remain open. No persisted state or provider writes.
