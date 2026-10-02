@@ -125,11 +125,7 @@
     "reportStatus": 201,
     "savedCaseNumber": 3,
     "actualFormOperated": true,
-    "coldSavedCaseIdsVisible": [
-      1,
-      2,
-      3
-    ],
+    "coldSavedCaseIdsVisible": [1, 2, 3],
     "personallyViewed": true,
     "canonicalDevelopmentSignIn": true,
     "legacyDevelopmentTrustSessionUsed": false
@@ -137,11 +133,7 @@
   "android": {
     "reportSavedCaseNumber": 1,
     "canonicalDevelopmentSignIn": true,
-    "coldCaseIdsVisible": [
-      1,
-      2,
-      3
-    ],
+    "coldCaseIdsVisible": [1, 2, 3],
     "personallyViewed": true,
     "serial": "emulator-5568",
     "apkSha256": "5f52b247162d200dcb26e12cd129af096408d36ff8d2646429166b7397b48b0a",
@@ -151,11 +143,7 @@
     "reportSavedCaseNumber": 2,
     "canonicalDevelopmentSignIn": true,
     "reportOperationPassedSeconds": 31.158,
-    "coldCaseIdsVisible": [
-      1,
-      2,
-      3
-    ],
+    "coldCaseIdsVisible": [1, 2, 3],
     "personallyViewed": true,
     "actualSupportViewportChecked": true,
     "coldExecutableSha256": "2ddfe4e9515df9f8ab0f83442e88e1acbebf6d4bebd6161a4b57503a29348836",
