@@ -51,11 +51,12 @@ class MainActivity : ComponentActivity() {
         super.onSaveInstanceState(outState)
     }
     override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent); setIntent(intent)
+        super.onNewIntent(intent)
         val launcherResume = intent.action == Intent.ACTION_MAIN && intent.hasCategory(Intent.CATEGORY_LAUNCHER) && intent.data == null && (!BuildConfig.DEBUG || !intent.hasExtra("return_to"))
         // Repeated explicit links are new deliveries; launcher resumes keep
         // the current screen. The counter is navigation, never authority.
         if (!launcherResume) {
+            setIntent(intent)
             destination.value = returnTarget(intent)
             destinationDelivery.value++
         }
