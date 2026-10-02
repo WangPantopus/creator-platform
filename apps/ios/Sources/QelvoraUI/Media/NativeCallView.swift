@@ -189,8 +189,10 @@ private struct NativeCallDocument: Decodable, Sendable {
                         Button(QelvoraCopy.text("w6ViewRequestsForSettlement"), variant: .secondary) { open("/requests") }
                     }
                 } else {
-                    Text(QelvoraCopy.text("w6ThisCallIsUnavailable")).qText("display-md")
-                    Text(route == nil ? QelvoraCopy.text("w6OpenThisCallFromItsAuthorizedRequestLink") : QelvoraCopy.text("w6CheckingTheBookingAndParticipantAccess")).qText("body")
+                    Text(QelvoraCopy.text(route != nil && error == nil ? "w6OpeningYourCall" : "w6ThisCallIsUnavailable")).qText("display-md")
+                    if route == nil || error == nil {
+                        Text(route == nil ? QelvoraCopy.text("w6OpenThisCallFromItsAuthorizedRequestLink") : QelvoraCopy.text("w6CheckingTheBookingAndParticipantAccess")).qText("body")
+                    }
                 }
                 if let error { Text(error).qText("caption") }
                 Button(QelvoraCopy.text("w6RefreshCall"), variant: .quiet, disabled: busy || fetching || client == nil || route == nil) { refreshVersion += 1 }

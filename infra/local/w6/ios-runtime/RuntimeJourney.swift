@@ -237,6 +237,19 @@ final class W6RuntimeJourney: XCTestCase {
     }
     func testActualUnavailableCallDoesNotAdmit() {
         let app = XCUIApplication(bundleIdentifier: "com.pantopus.qelvora")
+        // Use the real account UI to renew an expired local credential before
+        // exercising the call gate. No bearer/session state is injected.
+        app.launchArguments = ["--api-url", "http://127.0.0.1:4106", "--return-to", "/identity/account"]
+        app.launch()
+        if app.buttons["continue-with-pantopus"].waitForExistence(timeout: 5) {
+            if !app.buttons["continue-with-pantopus"].isHittable { app.swipeUp() }
+            app.buttons["continue-with-pantopus"].tap()
+            XCTAssertTrue(app.buttons["Development actor two"].waitForExistence(timeout: 15))
+            app.buttons["Development actor two"].tap()
+        }
+        XCTAssertTrue(app.staticTexts["@w6_local_fan"].waitForExistence(timeout: 20))
+        capture(app, name: "W6-ios-real-call-account")
+        app.terminate()
         app.launchArguments = ["--api-url", "http://127.0.0.1:4106", "--return-to", "/calls/60000000-0000-4000-8000-000000000001/60000000-0000-4000-8000-000000000002/60000000-0000-4000-8000-000000000006"]
         app.launch()
         XCTAssertTrue(app.staticTexts["This call is unavailable"].waitForExistence(timeout: 15))
@@ -251,6 +264,8 @@ final class W6RuntimeJourney: XCTestCase {
         XCTAssertTrue(app.staticTexts["This call is unavailable"].exists)
         XCTAssertFalse(app.buttons["Enter the waiting room"].exists)
         capture(app, name: "W6-ios-real-call-refresh-unavailable")
+        app.terminate()
+        print("W6_ACTUAL_CALL_GATE_AND_OWN_APP_TERMINATION_FINISHED")
     }
 
 }

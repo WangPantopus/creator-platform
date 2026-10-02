@@ -155,8 +155,8 @@ fun NativeCallScreen(baseURL: String?, model: FanSession) {
     Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         val value = call
         if (value == null) {
-            BasicText(QelvoraCopy.text("w6ThisCallIsUnavailable"), style = qText("display-md").copy(color = qColor("ink")))
-            BasicText(if (route == null) QelvoraCopy.text("w6OpenThisCallFromItsAuthorizedRequestLink") else QelvoraCopy.text("w6CheckingTheBookingAndParticipantAccess"), style = qText("body").copy(color = qColor("ink")))
+            BasicText(QelvoraCopy.text(if (route != null && notice == null) "w6OpeningYourCall" else "w6ThisCallIsUnavailable"), style = qText("display-md").copy(color = qColor("ink")))
+            if (route == null || notice == null) BasicText(if (route == null) QelvoraCopy.text("w6OpenThisCallFromItsAuthorizedRequestLink") else QelvoraCopy.text("w6CheckingTheBookingAndParticipantAccess"), style = qText("body").copy(color = qColor("ink")))
         } else {
             val state = value.getString("state"); val live = state in listOf("connected", "reconnecting", "ending"); val ended = state in listOf("ended", "cancelled")
             val creator = value.getString("creatorName"); val duration = value.getLong("durationSeconds"); val connected = value.getLong("connectedMilliseconds")
