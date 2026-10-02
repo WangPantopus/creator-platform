@@ -77,7 +77,7 @@ export class CommerceCallEligibility {
         [id, pointer.packet_id, scope.creatorId, scope.fanId],
       );
       if (commitment.rowCount !== 1) return null;
-      return this.current(scope, id, client);
+      return await this.current(scope, id, client);
     } catch (error) {
       await client.query("ROLLBACK TO SAVEPOINT w4_current_call_booking");
       throw error;

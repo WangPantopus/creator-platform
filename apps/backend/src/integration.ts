@@ -230,7 +230,7 @@ export async function createConfiguredBackend(input: {
     pool,
     undefined,
     assertScopeAllowed,
-    input.assertScopeAllowedInTransaction,
+    assertScopeAllowedInTransaction,
   );
   try {
     await database.assertRuntimeRole();
