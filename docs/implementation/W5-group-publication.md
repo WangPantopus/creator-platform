@@ -9,9 +9,9 @@ The minimum recipient count remains W4's explicit founder configuration.
 
 W4 owner dependencies were taken byte for byte from
 `a632cd7ad5af0e4dffc2385cc3b8497961fb23dc`, including W3's personally confirmed
-main-compatible system-link implementation. `fulfillment-plans.ts` is updated
+main-compatible system-link implementation. `fulfillment-plans.ts` and `fulfillment-view-authority.ts` are updated
 byte for byte to W4 `84a035328150746e6a94cbce8e511de87b469109` for the genuine
-empty saved-draft retry. These dependencies retain their held SQL and catalogue
+empty saved-draft retry and actual W1 held request-session consumer. These dependencies retain their held SQL and catalogue
 pins; this change registers and activates no migrations.
 
 ## Actual transaction order

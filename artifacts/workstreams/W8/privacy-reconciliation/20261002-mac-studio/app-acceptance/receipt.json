@@ -1,0 +1,62 @@
+{
+  "recordedAt": "2026-10-02T13:42:45.523722+00:00",
+  "label": "Personally operated actual web and shipping Android/iOS on labelled synthetic data, same saved export; no all-C10/recovery/purpose/provider/release acceptance",
+  "backendRevision": "c3c0a6d1",
+  "webRevision": "c3c0a6d1",
+  "ledger": {
+    "canonicalMigrations": 57,
+    "future0087Applied": false
+  },
+  "native": {
+    "android": "Existing shipping APK, 2 actual cores,2026148KiB, no snapshot save, own5568",
+    "iOS": "Existing normal-signed shipping binary, ownA3DB, actual idb/simctl; no DeviceHub grant inferred"
+  },
+  "failuresPreserved": [
+    "Initial Signout wait failed: false actor-selector branch omitted normal logout; bcca658c corrected.",
+    "Appearance query failed C11 return validation, returning/home;446da2f8 preserves safe registered page.",
+    "Ops shared navigation lacks current Ops destination; W1 notified, canonical onboarding saved, operator then opened/ops.",
+    "Initial retry selector raced pending state; operator now waits actual retry response200.",
+    "Missing owner/fence retried to deadletter; one terminal domain invalidated current other tasks. c3c0a6d1 blocks configured dependency errors and waits active domains before parent deadletter.",
+    "First Android boot paused at crash-report consent; reporting disabled, own process restarted, no snapshot/data wipe.",
+    "iOS initial Night coordinate ran before final layout; final operator reads actual frame and waits real job detail. Decimal coordinate CLI failure corrected to integer observed frame."
+  ],
+  "checks": {
+    "backendTypes": "passed",
+    "webTypes": "passed",
+    "scopedPrettier": "passed",
+    "newUnitTests": false
+  },
+  "open": [
+    "All eight same-client current owner effects/purges (Trust/Agent complete states are not newly qualified103 authority).",
+    "Actual Commerce config/prepared conversation owner ports/Content/Growth key+artifact store.",
+    "0087 and further purpose wave fresh/preserved/app activation.",
+    "200% text/VoiceOver/TalkBack acceptance.",
+    "Original iMac newer-journal retained recovery and approved retention."
+  ],
+  "stopped": [
+    "OwnAndroid5568",
+    "OwniOSA3DB",
+    "OwnAPI4108",
+    "OwnWeb3008"
+  ],
+  "files": {
+    "web-operator-receipt.json": "820618dfbe40a8cb79a9a25a34b3f820044996f21d730ff13ad46f40ef787552",
+    "ops-case-operator-receipt.json": "8d2085769bb0ee1bb0c2fc3b77d8423b502c16f8ca4f6741ff39a63782a50567",
+    "saved-readback.json": "5c1d81815693a74a6678a115d3bb04a2dcca6a2ae058975b766832310b5beb47",
+    "ios-final-receipt.json": "39cffd25f19d83056d686af899a051c3e63200da4de50647606639ce6375ecb7",
+    "android-receipt.json": "cf046b3ef206ddfe9b1a67b26e1302a167d5b2013c24fc403daa9329e9077189",
+    "web-privacy-blocked-light.png": "f40ebd49e3501fde9f8e2359bd51f6c00b2b0ca356e4ff182f686bb80172e804",
+    "web-privacy-blocked-night.png": "2159ca9e9d13ab76a3e13a4e6543ebbaaa806fddfada20455059ab3cbee50cb1",
+    "web-privacy-phone-night.png": "8a379dcc1a1894c7b2064f9606681efc8cef7ecfa87bc7eac15b11a075e99d3b",
+    "ops-queue-desktop-light.png": "faa7b178dd8fc56b22d37aec068b2e01942842262649d8db310339b07c2d8b06",
+    "ops-queue-desktop-night.png": "6fdbcab8ff5bdafc3299c4907dc9897716bf30dc959ee9e4f82e3c25b9d759fe",
+    "ops-queue-phone-night.png": "a90637814bfe00b439249ed950742dcc2e2c315621e9f662663a4341836acc24",
+    "ops-case-desktop-night.png": "7346d136bf2475277c3afb43c6909fd3564ac3af019e7ace530553611d562c85",
+    "ops-case-phone-night.png": "eca482dd33da47b58b3abe24895498d015a25fb31dfd39663064a91c2f3d0b16",
+    "ops-case-resolved-phone-night.png": "4b08759cfda15f51c3a2439c634d7e3c8589abfaedca6cabeb325882ee32669c",
+    "ios-final-light.png": "7c13788356696484022a1ac0dcd70063640af19a6fb184f5a236cd30f2be346d",
+    "ios-final-night.png": "5cfd100bfdf126ed9aed8ecbf1d740575778a3585d67ca1775196565abc4a1e9",
+    "android-privacy-light.png": "272af38b4f7f4282245f713d44072e8b19f6551af291e12e332cdd451df3af23",
+    "android-privacy-night.png": "1c43e454ac445378cc4734060faab7ee2f49bb2f21cf3894df066fabf76ae132"
+  }
+}

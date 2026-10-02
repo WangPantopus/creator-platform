@@ -1,7 +1,10 @@
 import type { Pool } from "pg";
 import { invariant } from "../../core/errors.js";
 import type { PrivacyHook } from "./contracts.js";
-import { privacyTaskAuthority } from "./privacy-authority.js";
+import {
+  privacyTaskAuthority,
+  privacyTaskAuthorityInTransaction,
+} from "./privacy-authority.js";
 
 /** Export account records through existing W1 RLS; credentials and upstream
  * tokens never enter an artifact. Erasure awaits the reviewed retention policy. */
@@ -27,6 +30,7 @@ export function identityPrivacyHook(
       const client = await runtime.connect();
       try {
         await client.query("BEGIN");
+        await privacyTaskAuthorityInTransaction(client, input);
         await client.query("SELECT set_config('app.account_id',$1,true)", [
           input.accountId,
         ]);
@@ -88,6 +92,7 @@ export function identityPrivacyHook(
           }
         }
         await verify(input);
+        input.signal?.throwIfAborted();
         await client.query("COMMIT");
         return {
           receipt: {

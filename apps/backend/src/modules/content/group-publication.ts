@@ -77,7 +77,11 @@ export class ContentGroupPublication {
 
   private async context(client: PoolClient, actor: Actor) {
     const request = requestAuthority.getStore();
-    if (!actor.adultEligible || request?.accountId !== actor.accountId)
+    if (
+      !actor.adultEligible ||
+      request?.accountId !== actor.accountId ||
+      request.actor !== actor
+    )
       unavailable();
     const row = (
       await client.query<{

@@ -1,0 +1,70 @@
+{
+  "recordedAt": "2026-10-02T09:57:33.087245+00:00",
+  "label": "actual native and backend; synthetic canonical development identity/static seed message; no provider proof",
+  "backend": {
+    "parent": "940e2922",
+    "database": "creator_w8_purpose_20261002",
+    "canonicalLedger": 40,
+    "proposal0082": true,
+    "apiPort": 4108,
+    "nonOwnerPools": true
+  },
+  "iOS": {
+    "udid": "A3DBA471-82BB-43B6-9216-9A74BB5DB11C",
+    "operator": "external XCTest E2E, normal canonical development sign-in",
+    "elapsedSeconds": 33.776,
+    "actualReport": 2,
+    "coldNightOwnCase": true,
+    "coldNightAndroidCase": 3,
+    "appExecutableSha256": "2627e4f8e521081d49e0264ea5c27b893d6a4168ffd7527b8da360e4a737016f"
+  },
+  "android": {
+    "label": "actual shipping Android app and canonical development sign-in against real backend; synthetic data only",
+    "serial": "emulator-5568",
+    "signIn": "actual development actor one",
+    "perAIReportSubmitted": true,
+    "coldNightRetainedCase": true,
+    "savedCaseNumber": 3,
+    "newUnitTests": false,
+    "providerActionImplied": false,
+    "operatorCorrection": "Initial success-label wait looked offscreen; actual case had saved, inspected before resume, no duplicate report submitted.",
+    "apkSha256": "5f52b247162d200dcb26e12cd129af096408d36ff8d2646429166b7397b48b0a"
+  },
+  "savedCases": [
+    {
+      "kind": "ai_report",
+      "state": "open",
+      "number": 2,
+      "creator_id": "20000000-0000-4000-8000-000000000001",
+      "evidence_count": 1,
+      "reporter_account_id": "10000000-0000-4000-8000-000000000001",
+      "expected_message_reference": true
+    },
+    {
+      "kind": "ai_report",
+      "state": "open",
+      "number": 3,
+      "creator_id": "20000000-0000-4000-8000-000000000001",
+      "evidence_count": 1,
+      "reporter_account_id": "10000000-0000-4000-8000-000000000001",
+      "expected_message_reference": true
+    }
+  ],
+  "privateCheckpoint": {
+    "sha256": "b4dff262468ade0b486c8e9f9738c269b52942e7ba5188e6251089246cc84d11",
+    "bytes": 628973,
+    "restored": false
+  },
+  "newUnitTests": false,
+  "limitations": [
+    "Not canonical57 app acceptance; target remains40 plus labelled proposal DDL.",
+    "No genuine creator proof, Signed publication, external provider or in-flight generation fabricated.",
+    "C10, Ops design/accessibility and complete R1\u2013R10/release gates remain open.",
+    "Device Hub control unavailable; external platform E2E operators run outside Git."
+  ],
+  "operatorCorrections": [
+    "First scratch Xcode project copied Info.plist as a resource as well as generating it; corrected source exclusion, first build failed before UI run.",
+    "Android success label was initially offscreen; actual CASE-3 readback confirmed save, operator resumed without a duplicate send.",
+    "Bridge cleanup also matched its own shell text and interrupted its trailing formatter. Restricted the match to the idb_companion executable basename and repeated checks; peer processes/data unaffected."
+  ]
+}
