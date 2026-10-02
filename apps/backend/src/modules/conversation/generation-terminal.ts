@@ -161,7 +161,22 @@ export class PreparedGenerationConversationTerminal {
       }),
     );
     const client = await input.workerPool.connect();
+    let transactionStarted = false;
+    let discardClient = true;
     try {
+      // W1's catalogue proof deliberately requires a caller-held transaction.
+      // Qualification reads metadata only and must leave no scope or GUC state
+      // behind for the next worker borrowing this connection.
+      await client.query("BEGIN ISOLATION LEVEL READ COMMITTED READ ONLY");
+      transactionStarted = true;
+      discardClient = false;
+      await client.query(
+        `SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','1000',true),
+         set_config('idle_in_transaction_session_timeout','5000',true),
+         set_config('app.account_id','',true),set_config('app.identity_session_id','',true),
+         set_config('app.creator_id','',true),set_config('app.fan_id','',true),
+         set_config('generation.scope_nonce','',true)`,
+      );
       const hostDatabase = (
         await input.hostPool.query<{ databaseOid: number }>(
           'SELECT oid AS "databaseOid" FROM pg_database WHERE datname=current_database()',
@@ -178,9 +193,23 @@ export class PreparedGenerationConversationTerminal {
         "Use the same actual canonical database.",
       );
       await prepared.assertCustody(client);
+      // A failed qualification rollback must also refuse the factory result.
+      discardClient = true;
+      await client.query("ROLLBACK");
+      transactionStarted = false;
+      discardClient = false;
       return prepared;
     } finally {
-      client.release();
+      if (transactionStarted) {
+        try {
+          await client.query("ROLLBACK");
+        } catch {
+          // Preserve the qualification error, but never return uncertain
+          // transaction custody to the pool.
+          discardClient = true;
+        }
+      }
+      client.release(discardClient);
     }
   }
 
