@@ -66,6 +66,7 @@ export function composeContentHost(input: {
     follows?: ContentFollowReaders;
   };
   paidAudienceCount?: NonNullable<ContentDependencies["audienceCount"]>;
+  publicationSource?: ContentDependencies["publicationSource"];
   packetRead?: {
     prepare: NonNullable<ContentDependencies["preparePublicPacketRead"]>;
     preparePositive: NonNullable<
@@ -92,6 +93,9 @@ export function composeContentHost(input: {
   const dependencies: ContentDependencies &
     Required<Pick<ContentDependencies, "assertAllowed">> = {
     ...input.dependencies,
+    ...(input.publicationSource
+      ? { publicationSource: input.publicationSource }
+      : {}),
     ...(input.packetRead
       ? {
           preparePublicPacketRead: input.packetRead.prepare,
