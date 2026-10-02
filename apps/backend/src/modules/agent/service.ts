@@ -38,6 +38,9 @@ import { contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
 
 export interface LicenseVerifier {
+  /** True only for the labeled loopback development authority, which serves
+   * development creator scopes exclusively and never reviewed terms. */
+  readonly synthetic?: boolean;
   verify(
     scope: CreatorScope,
     request: z.infer<typeof LicenseRequest>,
@@ -88,6 +91,16 @@ export class AgentService {
     this.repository = repository;
     this.pipeline = pipeline;
   }
+  /** Development creators use only the synthetic authority; every other scope
+   * uses only a real verifier. Neither can authorize the other. */
+  private licensingServes(scope: CreatorScope) {
+    return scope.development === Boolean(this.licenseVerifier?.synthetic);
+  }
+  /** The configured verifier has already passed its host boundary. Never infer
+   * this qualification from a client flag, account ID or stored license text. */
+  get syntheticDevelopmentLicensing() {
+    return this.licenseVerifier?.synthetic === true;
+  }
   async currentLicense(
     scope: CreatorScope,
     license: License | null,
@@ -95,6 +108,7 @@ export class AgentService {
   ) {
     return license &&
       licensed(license) &&
+      this.licensingServes(scope) &&
       this.licenseVerifier &&
       (client
         ? await this.licenseVerifier.isCurrentInTransaction?.(
@@ -194,8 +208,12 @@ export class AgentService {
         const gates: string[] = [];
         if (creator.verification !== "verified")
           gates.push("Creator verification is pending.");
-        if (!(await this.currentLicense(scope, license)))
-          gates.push("An active, reviewed replica license is required.");
+        if (!(await this.currentLicense(scope, license, client)))
+          gates.push(
+            this.licenseVerifier?.synthetic && this.licensingServes(scope)
+              ? "Record the labeled development license. It is not a reviewed license."
+              : "An active, reviewed replica license is required.",
+          );
         if (this.pipeline.model && !this.pipeline.model.pricingConfigured)
           gates.push("Verified provider rates are required before publishing.");
         if (workspace.configuration.dailyCostCapMicros <= 0)
@@ -259,6 +277,9 @@ export class AgentService {
             model: Boolean(this.pipeline.model),
             embeddings: Boolean(this.pipeline.model),
             licensing: Boolean(this.licenseVerifier),
+            syntheticLicensing: Boolean(
+              this.licenseVerifier?.synthetic && this.licensingServes(scope),
+            ),
             audioInterview: false,
             aiVoice: false,
           },
@@ -384,7 +405,7 @@ export class AgentService {
   }
   async license(scope: CreatorScope, key: string, raw: unknown) {
     const input = LicenseRequest.parse(raw);
-    if (!this.licenseVerifier || scope.development)
+    if (!this.licenseVerifier || !this.licensingServes(scope))
       throw new DomainError(
         "license_verification_unconfigured",
         "Reviewed terms and W1 creator signing must be connected before licensing.",
@@ -849,7 +870,7 @@ export class AgentService {
       async (client, workspace, creator) => {
         exactRevision(workspace, input.expectedRevision);
         invariant(
-          creator.verification === "verified" && !scope.development,
+          creator.verification === "verified" && this.licensingServes(scope),
           "verification_required",
           "Only a currently verified creator can publish.",
         );
@@ -857,6 +878,7 @@ export class AgentService {
           await this.currentLicense(
             scope,
             await licenseRow(client, scope.creatorId),
+            client,
           ),
           "license_required",
           "An active reviewed license is required.",
@@ -994,7 +1016,7 @@ export class AgentService {
       { operation: "rollback", id },
       async (client, workspace, creator) => {
         invariant(
-          creator.verification === "verified" && !scope.development,
+          creator.verification === "verified" && this.licensingServes(scope),
           "verification_required",
           "Current creator verification is required.",
         );
@@ -1002,6 +1024,7 @@ export class AgentService {
           await this.currentLicense(
             scope,
             await licenseRow(client, scope.creatorId),
+            client,
           ),
           "license_required",
           "An active license is required.",

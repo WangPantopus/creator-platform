@@ -150,6 +150,24 @@ export class AudienceIdentityAuthority {
       "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true),set_config('app.account_id',$3,true)",
       [scope.creatorId, scope.fanId, scope.actorAccountId],
     );
+    // Hold genuine negative keys before positive profile/family leases.
+    try {
+      await this.configuration.assertAllowed(
+        { accountId: scope.actorAccountId, adultEligible: true },
+        scope.creatorId,
+        {
+          fanId: scope.fanId,
+          fanAccountId: scope.fanAccountId,
+          creatorAccountId: scope.creatorAccountId,
+        },
+        client,
+      );
+    } finally {
+      await client.query(
+        "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true),set_config('app.account_id',$3,true)",
+        [scope.creatorId, scope.fanId, scope.actorAccountId],
+      );
+    }
     // Public profile SELECT does not grant its owner-only UPDATE RLS required
     // by FOR SHARE. Lock only this already-resolved creator row under its
     // actual owner, then restore the audience account before any domain work.
@@ -177,22 +195,5 @@ export class AudienceIdentityAuthority {
       "audience_unavailable",
       "This content is unavailable.",
     );
-    try {
-      await this.configuration.assertAllowed(
-        { accountId: scope.actorAccountId, adultEligible: true },
-        scope.creatorId,
-        {
-          fanId: scope.fanId,
-          fanAccountId: scope.fanAccountId,
-          creatorAccountId: scope.creatorAccountId,
-        },
-        client,
-      );
-    } finally {
-      await client.query(
-        "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true),set_config('app.account_id',$3,true)",
-        [scope.creatorId, scope.fanId, scope.actorAccountId],
-      );
-    }
   }
 }

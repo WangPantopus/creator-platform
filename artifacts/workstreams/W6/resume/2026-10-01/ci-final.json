@@ -1,0 +1,37 @@
+{
+  "headSha": "3867b74ff3d80d041dd0552ae5c33422a17c09ea",
+  "status": "queued",
+  "conclusion": "",
+  "jobs": [
+    {
+      "name": "ios-foundation",
+      "status": "queued",
+      "conclusion": "",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36846723576/job/110318511954"
+    },
+    {
+      "name": "android-foundation",
+      "status": "queued",
+      "conclusion": "",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36846723576/job/110318512312"
+    },
+    {
+      "name": "web-visual",
+      "status": "queued",
+      "conclusion": "",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36846723576/job/110318512323"
+    },
+    {
+      "name": "web-and-backend",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36846723576/job/110318512354"
+    },
+    {
+      "name": "android-runtime",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36846723576/job/110318512509"
+    }
+  ]
+}

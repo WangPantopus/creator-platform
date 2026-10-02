@@ -2091,6 +2091,28 @@
         }
       }
     },
+    "Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate."
+          }
+        }
+      }
+    },
+    "Lowering a limit is immediate.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lowering a limit is immediate."
+          }
+        }
+      }
+    },
     "No limit": {
       "extractionState": "manual",
       "localizations": {
@@ -9578,6 +9600,50 @@
           "stringUnit": {
             "state": "translated",
             "value": "Enter a time in HH:mm, from 00:00 to 23:59."
+          }
+        }
+      }
+    },
+    "We can't reach your account right now": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We can't reach your account right now"
+          }
+        }
+      }
+    },
+    "Your session is kept on this device. Try again in a moment.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your session is kept on this device. Try again in a moment."
+          }
+        }
+      }
+    },
+    "This page didn't load": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This page didn't load"
+          }
+        }
+      }
+    },
+    "Nothing you saved was changed. Try again in a moment.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing you saved was changed. Try again in a moment."
           }
         }
       }

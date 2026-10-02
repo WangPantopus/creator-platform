@@ -75,7 +75,7 @@ export class MediaWorker {
       this.service.db.withThread(scope, async (client) => {
         const owned = (
           await client.query<{ state: string }>(
-            "SELECT state FROM creator.media_asset WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND version=$4 AND job_lease_until=$5 FOR UPDATE",
+            "SELECT state FROM creator.media_asset WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND version=$4 AND job_lease_until=$5 AND job_lease_until>now() FOR UPDATE",
             [
               claimed.id,
               scope.creatorId,
@@ -122,6 +122,7 @@ export class MediaWorker {
         const processed = await this.service.storage.read(
           claimed.id,
           "processed",
+          Number(claimed.max_bytes),
         );
         if (
           !claimed.signed_act_id ||
@@ -194,8 +195,9 @@ export class MediaWorker {
           staging,
           input_sha256: claimed.input_sha256,
           mime_type: claimed.mime_type,
-          bytes: claimed.bytes,
-          max_bytes: claimed.max_bytes,
+          // PostgreSQL bigint columns arrive as strings with the default driver.
+          bytes: Number(claimed.bytes),
+          max_bytes: Number(claimed.max_bytes),
           max_duration_ms: claimed.max_duration_ms,
         });
       const saved = await update(
@@ -224,9 +226,12 @@ export class MediaWorker {
         reason === "media_processor_unavailable" ||
         reason === "malware_scanner_unavailable";
       await update(
-        "UPDATE creator.media_asset SET state=CASE WHEN $4 THEN state ELSE 'rejected' END,failure_code=$5,job_lease_until=NULL,job_available_at=now()+interval '1 minute' WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND state NOT IN ('revoked','deleted')",
-        [configuration || claimed.manifest_pending, reason],
-        !configuration && !claimed.manifest_pending
+        "UPDATE creator.media_asset SET state=CASE WHEN $4 THEN state ELSE 'rejected' END,failure_code=$5,job_lease_until=NULL,job_available_at=now()+interval '1 minute' WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND state<>'deleted'",
+        [
+          configuration || claimed.manifest_pending || claimed.delete_pending,
+          reason,
+        ],
+        !configuration && !claimed.manifest_pending && !claimed.delete_pending
           ? () => this.service.storage.delete(claimed.id)
           : undefined,
       );
