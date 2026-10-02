@@ -1,5 +1,7 @@
 # W5 continuation — 2026-10-02, Mac Studio
 
+Resource cleanup after this checkpoint supersedes the old checkout/build/running-container pointers: read `artifacts/workstreams/W5/2026-10-02/resource-cleanup/README.md` and its receipt first. The human authorized removing disposable W5 worktrees/builds; start a fresh current-main checkout and rebuild. Useful data/credentials/devices are preserved.
+
 This is the successor checkpoint requested by the human. W5 is incomplete. The predecessor stopped at a coherent source/runtime boundary, not at whole-workstream acceptance. The final snapshot next to this document supersedes the checkpoint PR states below; recheck live main, heads and owner answers.
 
 ## Read first
@@ -17,7 +19,7 @@ Personally implement all W5 work. Subagents can only research read-only. Do not 
 
 ## Git/source boundary
 
-Owned worktree: `/Users/yingpengwang/.codex/worktrees/w5-studio-continuation/creator-platform`. Preserve it and its branches. All predecessor implementation/evidence branches were pushed. Use current main for a fresh `codex/w5-…` branch and your own worktree, or deliberately reuse this clean retained checkout with a fresh branch. Shared local refs move with peers: capture main SHA via GitHub, `git fetch origin <exactSHA>`, and merge that exact SHA; do not rely on moving `origin/main` or shared `FETCH_HEAD`.
+Historical owned worktree: `/Users/yingpengwang/.codex/worktrees/w5-studio-continuation/creator-platform`; it is intentionally removed after the clean published cleanup handoff. Preserve its published branches/history and create a fresh checkout. All predecessor implementation/evidence branches were pushed. Use current main for a fresh `codex/w5-…` branch and your own worktree, or deliberately reuse this clean retained checkout with a fresh branch. Shared local refs move with peers: capture main SHA via GitHub, `git fetch origin <exactSHA>`, and merge that exact SHA; do not rely on moving `origin/main` or shared `FETCH_HEAD`.
 
 Normal merged increments (receipts in `artifacts/workstreams/W5/2026-10-02/normal-merges/`):
 
@@ -49,7 +51,7 @@ Later W1 native storage/issuer integrations on main are source-qualified additio
 ## Machine/data custody
 
 - Missing `~/.config/creator-platform/cleanup-20261001` archives do not exist here. This database is fresh state, not archived recovery.
-- Owned Docker `creator-platform-w5-local`,127.0.0.1:55435, DBcreator_w5 retained running. Actual ledger61, first0001_foundation, last0103_w8_domain_privacy_task_fence. No held0151–0208 purpose activated. Do not use generic migration runners to activate reserved SQL.
+- Owned Docker `creator-platform-w5-local`,127.0.0.1:55435, DBcreator_w5 stopped normally with its data volume retained; run `docker start creator-platform-w5-local` before the API. Actual ledger61, first0001_foundation, last0103_w8_domain_privacy_task_fence. No held0151–0208 purpose activated. Do not use generic migration runners to activate reserved SQL.
 - Personally applied W8 main-reviewed atomic57→61 packet after fresh private custom dump AND actual independent restore, six custody hashes matched. All57 old ledger rows/checksums/timestamps and36 original business rows/161 tables were preserved. Primary returned only to its original development admission; restore remains traffic-closed. Evidence `privacy-main-adoption/`.
 - Backup `~/.config/creator-platform/w5-20261002/privacy-main/fresh-original57.dump`, mode0600. SHA `fa49700e18e3d7289d33b793acb05fbf72b104d5296f2c665bd2d5c6cfa55f0f`. Keep private files out of Git.
 - Actual restored DB `creator_w5_privacy_main_restore_20261002` CONNECTION LIMIT0. Primary has original -1 development connection limit. Other predecessor closed rehearsal databases and private receipts are preserved; do not delete them or globally mutate roles.

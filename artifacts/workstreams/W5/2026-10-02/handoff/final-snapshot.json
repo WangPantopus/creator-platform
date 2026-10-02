@@ -408,5 +408,6 @@
     "number": 190,
     "url": "https://github.com/WangPantopus/creator-platform/pull/190",
     "stateAtRecord": "OPEN; normal CI pending; recheck live state"
-  }
+  },
+  "laterHumanRequestedResourceCleanup": "../resource-cleanup/cleanup-receipt.json supersedes historical checkout/build/container pointers; fresh checkout and rebuild required, DB/data/secrets/backups/devices retained."
 }
