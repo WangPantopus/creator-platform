@@ -1,0 +1,19 @@
+{
+  "source": "b9468c1748ff8c609facb39d1022b48634e60cf6",
+  "personallyImplemented": true,
+  "personallyOperated": [
+    "Android Light100 Consent disclosure/scroll/disabled Start/Not now",
+    "Android Night200 reduced-motion disclosure/scroll/disabled Start/Not now",
+    "built-in web creator unavailable/actor-seven adult denial/actor-one restoration"
+  ],
+  "iOSOperated": false,
+  "providerVerified": false,
+  "noRetention": false,
+  "developmentQualificationOnly": true,
+  "generationAvailable": false,
+  "consentAvailable": false,
+  "providerKeyPresent": false,
+  "newTestCode": false,
+  "databaseLedgerRowsDuringOperation": 40,
+  "fullW3Complete": false
+}

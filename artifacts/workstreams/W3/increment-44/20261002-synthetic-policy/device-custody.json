@@ -1,0 +1,22 @@
+{
+  "source": "b9468c1748ff8c609facb39d1022b48634e60cf6",
+  "device": "emulator-5584",
+  "avd": "Qelvora_W3_API34",
+  "slot": "creator-platform-emulator-slot-1",
+  "cores": 2,
+  "memoryMB": 2048,
+  "snapshotSave": false,
+  "restored": {
+    "font": "2.0",
+    "night": "Night mode: no",
+    "animations": {
+      "window_animation_scale": "0",
+      "transition_animation_scale": "0",
+      "animator_duration_scale": "0"
+    }
+  },
+  "guestAbsent": true,
+  "ownedProcessExited": true,
+  "exactLeaseReleased": true,
+  "currentBootANRCount": 0
+}
