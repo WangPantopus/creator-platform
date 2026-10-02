@@ -33,6 +33,7 @@ import {
   type CreatorMediaPublicationBinding,
 } from "./storage.js";
 import { announceMediaJob } from "./jobs.js";
+import { verifiedCreatorMediaProvenance } from "./provenance.js";
 
 export type CreatorMediaReadScope = CreatorScope | ThreadScope | AudienceScope;
 export interface CreatorMediaAuthority {
@@ -123,34 +124,10 @@ function isAudience(scope: CreatorMediaReadScope): scope is AudienceScope {
 function account(scope: CreatorMediaReadScope) {
   return "accountId" in scope ? scope.accountId : scope.actorAccountId;
 }
-function verifiedProvenance(row: CreatorAssetRow) {
-  const provenance = row.provenance;
-  return Boolean(
-    row.signed_act_id &&
-      provenance?.c2paVerified === true &&
-      provenance.assetId === row.id &&
-      provenance.assetVersion === row.version &&
-      provenance.creatorId === row.creator_id &&
-      provenance.objectId === row.object_id &&
-      provenance.accountId === row.owner_account_id &&
-      provenance.signedActId === row.signed_act_id &&
-      provenance.processedMediaSha256 === row.output_sha256 &&
-      provenance.processedMediaBytes === Number(row.bytes) &&
-      provenance.processedMediaMimeType === row.mime_type &&
-      provenance.processedMediaDurationMs === row.duration_ms &&
-      typeof provenance.fileSha256 === "string" &&
-      /^[a-f0-9]{64}$/u.test(provenance.fileSha256) &&
-      typeof provenance.fileBytes === "number" &&
-      Number.isSafeInteger(provenance.fileBytes) &&
-      provenance.fileBytes > 0 &&
-      provenance.fileVariant === "credentialed" &&
-      provenance.fileBytes <= Number(row.max_bytes),
-  );
-}
 function playbackFile(row: CreatorAssetRow): PlaybackFile {
   if (row.provenance?.c2paVerified === true) {
     invariant(
-      verifiedProvenance(row),
+      verifiedCreatorMediaProvenance(row),
       "media_provenance_pending",
       "This media's exact content credentials are unavailable.",
     );
@@ -674,7 +651,7 @@ export class CreatorMediaService {
     )
       return false;
     const row = await this.row(scope, client, proof.assetId);
-    return verifiedProvenance(row);
+    return verifiedCreatorMediaProvenance(row);
   }
   /** W5 calls inside its already-authorized transaction/current object lock.
    * Current reuse association is distinct from the original C2PA recording act;
@@ -727,7 +704,7 @@ export class CreatorMediaService {
       );
       if (row.owner_account_id !== account(scope))
         invariant(
-          verifiedProvenance(row),
+          verifiedCreatorMediaProvenance(row),
           "media_provenance_pending",
           "This media is awaiting its signature and content credentials.",
         );
@@ -812,7 +789,8 @@ export class CreatorMediaService {
       const row = await this.row(scope, client, id);
       invariant(
         row.state === "ready" &&
-          (row.owner_account_id === account(scope) || verifiedProvenance(row)),
+          (row.owner_account_id === account(scope) ||
+            verifiedCreatorMediaProvenance(row)),
         "media_not_ready",
         "This media is unavailable.",
       );
@@ -861,7 +839,8 @@ export class CreatorMediaService {
         row.state === "ready" &&
           row.version === version &&
           row.access_epoch === accessEpoch &&
-          (row.owner_account_id === account(scope) || verifiedProvenance(row)),
+          (row.owner_account_id === account(scope) ||
+            verifiedCreatorMediaProvenance(row)),
         "media_version_changed",
         "This media is no longer available.",
       );
