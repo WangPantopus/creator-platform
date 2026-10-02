@@ -98,6 +98,7 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
     var signature by remember { mutableStateOf<String?>(null) }; var signatureStatus by remember { mutableStateOf("") }
     var viewerAccountId by remember{mutableStateOf<String?>(null)};var loadGeneration by remember{mutableIntStateOf(0)}
     var currentAccess by remember { mutableStateOf(false) }
+    var muted by remember { mutableStateOf<Boolean?>(null) }
     var replyAccess by remember { mutableStateOf(false) }
     var thanksAccess by remember { mutableStateOf(false) }
     var loading by remember { mutableStateOf(false) }
@@ -107,7 +108,7 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
     fun suspendAccess() { currentAccess = false; replyAccess = false; thanksAccess = false; signature = null; signatureStatus = "" }
     fun clearAuthority() {
         suspendAccess(); content = null; replies = emptyList(); thanks = null; cursor = null
-        viewerAccountId = null; replyText = ""; thanksText = ""; share = false; identity = false; retryKeys.clear()
+        viewerAccountId = null; muted = null; replyText = ""; thanksText = ""; share = false; identity = false; retryKeys.clear()
     }
     suspend fun load(resetThanks:Boolean=true) {
         if (loading) return; loading = true
@@ -147,9 +148,10 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
             val after=api.request("$creatorId/mute", expectedAccountId=before.text("accountId")).jsonObject
             if(generation!=loadGeneration)return
             if(before.text("accountId")!=after.text("accountId")){clearAuthority();error="The signed-in account changed. Refresh before continuing.";return}
+            val currentMuted = after["muted"]?.jsonPrimitive?.booleanOrNull ?: throw ContentFailure(503, "Note preferences are unavailable. Refresh current access.")
             val changed=viewerAccountId!=before.text("accountId")
             if(changed){replyText="";thanksText="";share=false;identity=false;retryKeys.clear();signature=null;replyDepth=1}
-            viewerAccountId=before.text("accountId");content=view;replies=currentReplies;cursor=page?.get("nextCursor")?.jsonPrimitive?.contentOrNull;thanks=mine;replyAccess=repliesAvailable;thanksAccess=thanksAvailable
+            viewerAccountId=before.text("accountId");muted=currentMuted;content=view;replies=currentReplies;cursor=page?.get("nextCursor")?.jsonPrimitive?.contentOrNull;thanks=mine;replyAccess=repliesAvailable;thanksAccess=thanksAvailable
             if(thanksAvailable && (resetThanks||changed)){thanksText=mine?.text("text").orEmpty();share=mine?.flag("shareWithCreatorDigest")?:false;identity=mine?.flag("showIdentity")?:false}
             error=statuses.joinToString("\n")
             checkedAt = cycleStartedAt; currentAccess = lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED) && SystemClock.elapsedRealtime() - cycleStartedAt < 5000
@@ -210,7 +212,7 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
             }}
             if (cursor != null) Button("Older replies", ButtonVariant.SECONDARY, disabled = busy || replyDepth >= 5) { scope.launch { if (!busy && replyDepth < 5) { busy = true; try { replyDepth++; load(false) } finally { busy = false } } } }
             if(thanks!=null && thanks?.flag("withdrawn")==false)Button("Withdraw Thanks",ButtonVariant.QUIET,disabled=busy || !thanksAccess){scope.launch{mutate("thanks",buildJsonObject{put("targetKind","content");put("targetId",contentId);put("text","");put("shareWithCreatorDigest",false);put("showIdentity",false);put("withdrawn",true);put("expectedVersion",thanks?.number("version")?:0);put("idempotencyKey",UUID.randomUUID().toString())},resetThanks=true)}}
-            Button("Unmute Notes from this creator",ButtonVariant.QUIET,disabled=busy){scope.launch{mutate("mute",buildJsonObject{put("muted",false)})}}
+            Button(if(muted==true) "Unmute Notes from this creator" else "Mute Notes from this creator",ButtonVariant.QUIET,disabled=busy || muted==null){scope.launch{val currentMuted=muted?:return@launch;mutate("mute",buildJsonObject{put("muted",!currentMuted)})}}
         }
         else {
             val document = current["document"]!!.jsonObject; val creator = current.text("creatorName")
@@ -253,7 +255,7 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
                     } }
                 }
                 if (cursor != null) Button("Older replies", ButtonVariant.SECONDARY, disabled = busy || replyDepth >= 5) { scope.launch { if (!busy && replyDepth < 5) { busy = true; try { replyDepth++; load(false) } finally { busy = false } } } }
-                Button("Mute Notes from this creator", ButtonVariant.QUIET, disabled = busy) { scope.launch { mutate("mute", buildJsonObject { put("muted", true) }) } }
+                Button(if(muted==true) "Unmute Notes from this creator" else "Mute Notes from this creator", ButtonVariant.QUIET, disabled = busy || muted==null) { scope.launch { val currentMuted=muted?:return@launch;mutate("mute", buildJsonObject { put("muted", !currentMuted) }) } }
             }
             QText("This helped", "display-md", modifier = Modifier.semantics { heading() }); ContentInput("Thanks · optional", thanksText, 2000) { thanksText = it }
             ContentChoice("Share this text with the creator’s digest", share, busy || !thanksAccess) { share = it; if (!it) identity = false }; ContentChoice("Include my handle", identity, busy || !thanksAccess || !share) { identity = it }

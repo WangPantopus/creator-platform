@@ -65,6 +65,7 @@ private struct ContentFanScreen: View {
     @State private var viewerAccountId:String?
     @State private var loadGeneration=0
     @State private var currentAccess = false
+    @State private var muted: Bool?
     @State private var replyAccess = false
     @State private var thanksAccess = false
     @State private var loading = false
@@ -111,7 +112,7 @@ private struct ContentFanScreen: View {
                             }.padding(16).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: 16))
                         }
                         if nextCursor != nil { Button("Older replies", variant: .secondary, disabled: busy || replyDepth >= 5) { Task { await older() } } }
-                        Button("Mute Notes from this creator", variant: .quiet, disabled: busy) { Task { if await mutate("mute", ["muted": true]) { await load(refreshThanks:false) } } }
+                        if let muted { Button(muted ? "Unmute Notes from this creator" : "Mute Notes from this creator", variant: .quiet, disabled: busy) { Task { if await mutate("mute", ["muted": !muted]) { await load(refreshThanks:false) } } } }
                     }
                     Text("This helped").qText("display-md").accessibilityAddTraits(.isHeader)
                     TextField("Thanks · optional", text: $thanksText, axis: .vertical).qText("body").lineLimit(2...6)
@@ -130,7 +131,7 @@ private struct ContentFanScreen: View {
                     }
                     if nextCursor != nil { Button("Older replies",variant:.secondary,disabled:busy || replyDepth >= 5) { Task { await older() } } }
                     if thanks != nil && thanks?.withdrawn == false { Button("Withdraw Thanks",variant:.quiet,disabled:busy || !thanksAccess) { Task { await saveThanks(withdraw:true) } } }
-                    Button("Unmute Notes from this creator",variant:.quiet,disabled:busy) { Task { if await mutate("mute",["muted":false]) { await load() } } }
+                    if let muted { Button(muted ? "Unmute Notes from this creator" : "Mute Notes from this creator",variant:.quiet,disabled:busy) { Task { if await mutate("mute",["muted": !muted]) { await load(refreshThanks:false) } } } }
                 }
                 }
             }.padding(16)
@@ -178,7 +179,7 @@ private struct ContentFanScreen: View {
     }
     @MainActor private func clearAuthority() {
         suspendAccess(); content = nil; replies = []; thanks = nil; nextCursor = nil
-        viewerAccountId = nil; replyText = ""; thanksText = ""; shareDigest = false; showIdentity = false; retryKeys = [:]
+        viewerAccountId = nil; muted = nil; replyText = ""; thanksText = ""; shareDigest = false; showIdentity = false; retryKeys = [:]
     }
     @MainActor private func load(refreshThanks: Bool = true) async {
         guard !loading else { return }; loading = true; defer { loading = false }
@@ -221,7 +222,7 @@ private struct ContentFanScreen: View {
             guard before.accountId==after.accountId else {clearAuthority();self.error="The signed-in account changed. Refresh before continuing.";return}
             let changed=viewerAccountId != before.accountId
             if changed {replyText="";thanksText="";shareDigest=false;showIdentity=false;retryKeys=[:];signature=nil;replyDepth=1}
-            viewerAccountId=before.accountId;content=view;replies=currentReplies;nextCursor=page?.nextCursor;thanks=mine;replyAccess=repliesAvailable;thanksAccess=thanksAvailable
+            viewerAccountId=before.accountId;muted=after.muted;content=view;replies=currentReplies;nextCursor=page?.nextCursor;thanks=mine;replyAccess=repliesAvailable;thanksAccess=thanksAvailable
             if thanksAvailable && (refreshThanks || changed) {thanksText=mine?.text ?? "";shareDigest=mine?.shareWithCreatorDigest ?? false;showIdentity=mine?.showIdentity ?? false}
             self.error=statuses.joined(separator: "\n")
             checkedAt = cycleStartedAt; currentAccess = scene == .active && ProcessInfo.processInfo.systemUptime - cycleStartedAt < 5
