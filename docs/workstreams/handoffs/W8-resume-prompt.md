@@ -1,5 +1,12 @@
 # W8 resume prompt — complete the workstream
 
+## Verification Support and corrected labelled proof — 2026-10-02
+
+[Real web form/cold reload and independent saved-state receipt](../../../artifacts/workstreams/W8/verification-support/20261002-mac-studio/README.md) at backendf558ca04/web87578f8c verifies a second new human-authorized synthetic creator: exact saved challenge/post in immutable evidence, one actual decision and complete identity effect, approved proof/verified creator/resolvedv3. Original missing-post case remains intact. The initial decision-run receipt was lost to a later cold-access operator race; only bounded observed state and cold read are recorded. No external ownership/provider or native proof-field claim.
+
+Support now honors exact bounded verification context and waits for the actual session before submission. Real390 query/refusal checks and typecheck/lint pass. W1 owns the pending setup link and canonical return registration. Own services normally stopped, no devices/slots, new private checkpoint retained. PR159 mergedb6c073ae, exacthead6694e48d; main61 activates only0074/0082/0087/0103, future0198–0207 remain held. Complete erasure, actual non-account immutable ownership producer/fences, full C10, provider/original recovery/accessibility/release remain open.
+
+
 ## Ready closed four-source privacy wave — 2026-10-02
 
 PR151 merged12ea10a6, exacthead91dcd4c6 after actual three-client cursor acceptance. Two web/backend and the current compile checks passed; one current Android runtime passed, its duplicate was still running at merge; six foundation jobs queued and one obsolete compile cancelled were not passes. [Actual receipt](../../../artifacts/workstreams/W8/privacy-domain-worker/20261002-mac-studio/app-acceptance/README.md) preserves the four completed/four blocked synthetic task result.
