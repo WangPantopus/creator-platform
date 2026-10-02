@@ -105,3 +105,6 @@ Corrected W8 held mapfb1cbca/SHA2338f48e consumed: own163 lineage/165 expiry/180
 Validated latest private715734-byte backup/SHA3997a822…1572 TOC/separate closed restore: all162 full-row tables99 rows/57 history/schema ACL/roles/membership/sequences match. First live comparison differed in canonical session touch; own API/web stopped for corrected snapshot, no peers stopped. Provider key and old archive last checked absent; no credential search.
 
 This independently extracted privacy fix is reviewed against main36f9505e; draft132 input/admission/retrieval/terminal work remains separate and unfinished.
+
+
+2026-10-02 current terminal consumer increment: W4 exact e080cf9407ca3d55ec03fb773e2c53ddd5b60869 class consumed unchanged; own188 descriptor/function/ACL/column/RLS currentness bookends every held read/seal rather than relying on163. W2 personally detected/restored3 actual rolled-back drift changes on own closed57, all generations/usage/receipts0; first wrong-column42703 retained. No registered factory/genuine scope/provider/financial lifecycle claim. Main590c7ec9 API4102/web3002 restored after validated715734B backup; actual shipping Android build37tasks/77s PASS, exact e2136252… APK not yet personally operated. Future source activation, actual native/provider/complete C10/translation/digest/p95 remain open.

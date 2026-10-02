@@ -1,0 +1,39 @@
+{
+  "time": "2026-10-02T16:30:33.142934+00:00",
+  "host": "Yingpengs-Mac-Studio.local",
+  "database": "creator_w2_terminal_review_20261002",
+  "source": "e080cf9407ca3d55ec03fb773e2c53ddd5b60869",
+  "mode": "actual rolled-back DDL + operator-selected worker catalogue; not actual worker login/registered prepared factory/scope/receipt/settlement",
+  "catalogueSha256": "ab1b22611677ce800a1d758b84016ff4edfd828ba8a7655b0511de4d3211d588",
+  "sealDefinitionSha256": "925097ea517ebcdace4f23e281f4575cbf76914636b0503afa2989afd4cd49b7",
+  "mutations": [
+    {
+      "case": "unexpectedBodyGrant",
+      "actualDDL": true,
+      "metadataSelectedAsWorkerViaOperatorAuthorization": true,
+      "detected": true,
+      "rolledBack": true,
+      "restored": true
+    },
+    {
+      "case": "executableSearchPath",
+      "actualDDL": true,
+      "metadataSelectedAsWorkerViaOperatorAuthorization": true,
+      "detected": true,
+      "rolledBack": true,
+      "restored": true
+    },
+    {
+      "case": "privateHelperRawExecute",
+      "actualDDL": true,
+      "metadataSelectedAsWorkerViaOperatorAuthorization": true,
+      "detected": true,
+      "rolledBack": true,
+      "restored": true
+    }
+  ],
+  "ledger": 57,
+  "generations": 0,
+  "usage": 0,
+  "receipts": 0
+}
