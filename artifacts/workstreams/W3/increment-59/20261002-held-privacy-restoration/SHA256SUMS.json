@@ -1,0 +1,46 @@
+{
+  "api.log": {
+    "bytes": 193,
+    "sha256": "d166a21d035549bf7d9c095c68ac9f91b4cb8428c38f3f542fcef753781886e0"
+  },
+  "catalogue.json": {
+    "bytes": 1297,
+    "sha256": "65a65b491ac85af9b2cdfab3fe3fa06c221418101b8a302bab43dc856f23936e"
+  },
+  "normal-stop-signal.json": {
+    "bytes": 202,
+    "sha256": "3b4cd875cf6bb5460acf343b7cb2ffc2dc7e8c2acf556e3f5f4170bccee0715e"
+  },
+  "owner-sources.json": {
+    "bytes": 554,
+    "sha256": "4b8b806f2f28e5a3dd0ea71a88bb7ee7c00323cf460c9c0088dfaf30a6826c18"
+  },
+  "purpose-observation.json": {
+    "bytes": 605,
+    "sha256": "6824f3cbfb819f1ec75f782c737a1bd5ddab03503b129dd322025ece3e5372e0"
+  },
+  "run.md": {
+    "bytes": 3622,
+    "sha256": "3ea4e47f6cc481e4f246ebe47e9bcfb8021efe2180cd566cf3faf78fc4482296"
+  },
+  "source-build-operation.json": {
+    "bytes": 2220,
+    "sha256": "d2f72ecab15d75aad8ddd00e934b649a5ed9ffd62f4f068f94124df34b4ab687"
+  },
+  "supervised-runtime.json": {
+    "bytes": 540,
+    "sha256": "7c1ea1a4107ea28016aa1e549678b89706fada0defb3b4b8c4c5697b347df0f1"
+  },
+  "web-conversation-scope-refusal.png": {
+    "bytes": 46335,
+    "sha256": "ec79545e508308895d4e915987652f4cd30c5d81e71e18a501dc9e7287cc240c"
+  },
+  "web-privacy-refusal-light.png": {
+    "bytes": 51883,
+    "sha256": "127d1f08586fb21bcce80af7c9f96874b54277a80909748b9e5cdd1db13f38cd"
+  },
+  "web-privacy-refusal-night.png": {
+    "bytes": 52440,
+    "sha256": "7f060e4eb0520f9c949bdd31494afad0777e74ed1ed7a01fa1de09d3766295da"
+  }
+}

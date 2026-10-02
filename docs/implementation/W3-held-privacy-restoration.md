@@ -33,3 +33,11 @@ Positive export, purge, cancellation/expiry races and populated C10 acceptance
 must be personally operated after genuine owner activation. Other owners'
 privacy composition updates remain separate source; this focused change fixes
 the conversation held-client boundary.
+
+The current development restoration producer also requires `read committed`.
+W3's complete streaming source uses one `repeatable read` MVCC transaction.
+That combination deliberately refuses streaming export: no compatible current
+restoration port is supplied here, and the isolation guard is not widened.
+W8 has been asked to resolve the genuine restoration/snapshot contract. An
+independent pool check or a weaker snapshot cannot be described as the current
+held authority or the original complete source snapshot.
