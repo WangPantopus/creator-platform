@@ -6,7 +6,7 @@ import { DomainError, invariant } from "../../core/errors.js";
 import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import { assertCurrentSession, requestAuthority } from "./request-authority.js";
 
-export const GENERATION_SCOPE_MIGRATION = "0072_w1_generation_worker_scope";
+export const GENERATION_SCOPE_MIGRATION = "0159_w1_generation_worker_scope";
 const Hash = z.string().regex(/^[a-f0-9]{64}$/u);
 const consumerSchema = z.strictObject({
   migration: z.strictObject({
@@ -24,6 +24,60 @@ const consumerSchema = z.strictObject({
 export type GenerationPurposeConsumer = Readonly<
   z.infer<typeof consumerSchema>
 >;
+const terminalConsumerSchema = consumerSchema.extend({
+  purpose: z.literal("generation_terminal"),
+});
+/** Explicit original settlement mode. This packet never grants generation
+ * input, lease, provider use or an original GenerationTaskScope. */
+export type GenerationTerminalPurposeConsumer = Readonly<
+  z.infer<typeof terminalConsumerSchema>
+>;
+const terminalContracts = [
+  {
+    owner: "creator_generation_terminal_authority",
+    originalScopeBridge: true,
+    version: "0183_w1_generation_terminal_scope",
+    checksum:
+      "fadbf62a3ddf06142c3a6ad30313503f9bebe7b6d64f67f8ba01ff13ce2398c7",
+    signatures: [
+      "creator.pending_generation_terminals(integer)",
+      "creator.begin_generation_terminal(uuid,uuid,text,uuid,integer,boolean)",
+      "creator.generation_terminal_matches(uuid,uuid,boolean)",
+      "creator.end_generation_terminal()",
+    ],
+  },
+  {
+    owner: "creator_w2_generation_terminal_journal",
+    originalScopeBridge: false,
+    version: "0188_w2_generation_terminal_journal",
+    checksum:
+      "7ab8974d065b1b9e5befa2ded26c6978876957fab0eee80b9632825bbac98477",
+    signatures: [
+      "creator.generation_agent_journal_receipt(uuid,uuid)",
+      "creator.generation_seal_agent_journal(uuid,uuid)",
+    ],
+  },
+  {
+    owner: "creator_w4_generation_terminal",
+    originalScopeBridge: false,
+    version: "0189_w4_generation_terminal_settlement",
+    checksum:
+      "a6e386de7506035d6bc0d10da644cb8ee2620824217b9c2c61a9a34cb7fa4fc9",
+    signatures: [
+      "creator.generation_settle_original_allowance(uuid,uuid)",
+      "creator.generation_original_allowance_receipt(uuid,uuid)",
+    ],
+  },
+] as const;
+function reviewedTerminalConsumer(consumer: GenerationTerminalPurposeConsumer) {
+  return terminalContracts.some(
+    (contract) =>
+      consumer.owner === contract.owner &&
+      consumer.migration.version === contract.version &&
+      consumer.migration.checksum === contract.checksum &&
+      contract.signatures.some((signature) => signature === consumer.signature),
+  );
+}
 const Instant = z.iso
   .datetime({ offset: true })
   .transform((value) => new Date(value).toISOString());
@@ -54,7 +108,7 @@ export type GenerationTaskScope = GenerationTask &
 
 export type GenerationRestriction = (
   client: PoolClient,
-  /** Host restoration only. SQL0093 separately holds the actual participant
+  /** Host restoration only. SQL0177 separately holds the actual participant
    * negatives using the private nonce, durable provenance and current lease. */
   task: Readonly<{ generationId: string; workerToken: string }>,
 ) => Promise<void>;
@@ -111,6 +165,174 @@ export async function confirmAcceptedGeneration(
  * Actor, ALS, source license, provider admission or private read/write grants.
  * W3/W2 must use explicit reviewed consumers on this exact client and scope.
  */
+type GenerationCatalogue = Readonly<{
+  migration: Readonly<{ version: string; checksum: string }>;
+  denialMigration: Readonly<{ version: string; checksum: string }>;
+  consumers: readonly GenerationPurposeConsumer[];
+  terminalConsumers: readonly GenerationTerminalPurposeConsumer[];
+}>;
+
+/** Current original role/schema and every registered fixed consumer. Metadata
+ * qualification issues no input, lease, provider or settlement permission. */
+async function assertGenerationCatalogue(
+  query: Pick<Pool, "query">,
+  input: GenerationCatalogue,
+): Promise<void> {
+  const consumers = [...input.consumers, ...input.terminalConsumers];
+  const installed = (
+    await query.query<{ installed: boolean }>(
+      `SELECT session_user='creator_generation_worker' AND current_user=session_user
+       AND to_regclass('creator.generation_worker_scope') IS NOT NULL
+       AND to_regprocedure('creator.begin_generation_scope(uuid,uuid)') IS NOT NULL
+       AND to_regprocedure('creator_trust.generation_worker_denial(uuid)') IS NOT NULL AS installed`,
+    )
+  ).rows[0]?.installed;
+  if (installed !== true) throw new Error("Generation authority is absent");
+  const ready = (
+    await query.query<{ ready: boolean }>(
+      `SELECT
+       (SELECT count(*)=2 FROM creator.schema_migration
+        WHERE (version=$1 AND checksum=$2) OR (version=$3 AND checksum=$4))
+       AND (SELECT count(*)=2 FROM pg_roles r
+        WHERE (r.rolname='creator_generation_worker' AND r.rolcanlogin
+         OR r.rolname='creator_generation_authority' AND NOT r.rolcanlogin)
+        AND NOT r.rolsuper AND NOT r.rolbypassrls AND NOT r.rolinherit
+        AND NOT r.rolcreatedb AND NOT r.rolcreaterole AND NOT r.rolreplication
+        AND (r.rolconfig IS NULL OR cardinality(r.rolconfig)=0)
+        AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid OR roleid=r.oid)
+        AND NOT EXISTS(SELECT FROM pg_namespace WHERE nspowner=r.oid)
+        AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=r.oid))
+       AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+        WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
+         AND c.relkind IN('r','p','v','m','f')
+         AND NOT(n.nspname='creator' AND c.relname='schema_migration')
+         AND (has_table_privilege(current_user,c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
+          OR has_any_column_privilege(current_user,c.oid,'SELECT,INSERT,UPDATE,REFERENCES')))
+       AND NOT EXISTS(SELECT FROM pg_proc WHERE proowner=(SELECT oid FROM pg_roles WHERE rolname=current_user))
+       AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+        WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
+         AND c.relkind='S' AND has_sequence_privilege(current_user,c.oid,'USAGE,SELECT,UPDATE'))
+       AND NOT EXISTS(SELECT FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
+        WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema' AND p.prosecdef
+         AND has_function_privilege(current_user,p.oid,'EXECUTE')
+         AND NOT(p.oid=ANY(ARRAY[
+          to_regprocedure('creator.pending_generation_tasks(integer)'),
+          to_regprocedure('creator.claim_generation_task(uuid,uuid)'),
+          to_regprocedure('creator.begin_generation_scope(uuid,uuid)'),
+          to_regprocedure('creator.generation_scope_matches(uuid,uuid)'),
+          to_regprocedure('creator.end_generation_scope()')]::oid[])
+          OR p.oid=ANY(ARRAY(SELECT to_regprocedure(c.signature)::oid
+           FROM jsonb_to_recordset($5::jsonb) AS c(signature text)))))
+       AND (SELECT count(*)=7 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+        WHERE n.nspname='creator' AND c.relkind='r' AND c.relname=ANY(ARRAY[
+         'generation','thread','creator_profile','fan_profile','message','processor_consent','generation_worker_scope'])
+        AND c.relrowsecurity AND c.relforcerowsecurity AND pg_get_userbyid(c.relowner)='creator_owner')
+       -- Canonical identity_session resolves an unknown bearer before any
+       -- account GUC exists. Preserve its reviewed catalogue shape; the
+       -- inaccessible purpose owner gets only four metadata columns and
+       -- every fixed function predicates the original account/session.
+       AND EXISTS(SELECT FROM pg_class WHERE oid=to_regclass('creator.identity_session')
+        AND relkind='r' AND pg_get_userbyid(relowner)='creator_owner'
+        AND NOT relrowsecurity AND NOT relforcerowsecurity)
+       AND NOT has_column_privilege('creator_generation_authority','creator.message','text','SELECT')
+       AND NOT has_column_privilege('creator_generation_authority','creator.memory','text','SELECT')
+       AND NOT has_column_privilege('creator_generation_authority','creator.identity_session','token_hash','SELECT')
+       AND NOT has_column_privilege('creator_generation_authority','creator.identity_session','upstream_cipher','SELECT')
+       AND NOT has_column_privilege('creator_generation_authority','creator.signed_act','assertion','SELECT')
+       AND NOT has_column_privilege('creator_generation_authority','creator.passkey_credential','public_key','SELECT')
+       AND NOT has_column_privilege('creator_generation_authority','creator.ai_version','configuration','SELECT')
+       AND NOT has_column_privilege('creator_generation_authority','creator.ai_version','compiled_prefix','SELECT')
+       AND NOT has_column_privilege('creator_generation_authority','creator.ai_workspace','interview','SELECT')
+       AND (SELECT count(*)=8 FROM pg_proc p
+        WHERE p.oid=ANY(ARRAY[
+         to_regprocedure('creator.confirm_generation_initiator(uuid)'),
+         to_regprocedure('creator.pending_generation_tasks(integer)'),
+         to_regprocedure('creator.generation_task_proof(uuid,uuid,boolean)'),
+         to_regprocedure('creator.claim_generation_task(uuid,uuid)'),
+         to_regprocedure('creator.begin_generation_scope(uuid,uuid)'),
+         to_regprocedure('creator.generation_scope_matches(uuid,uuid)'),
+         to_regprocedure('creator.end_generation_scope()'),
+         to_regprocedure('creator.require_generation_scope_cleanup()')]::oid[])
+         AND pg_get_userbyid(p.proowner)='creator_generation_authority' AND p.prosecdef
+         AND p.proconfig=ARRAY['search_path=pg_catalog'] AND p.provolatile IN('s','v')
+         AND NOT EXISTS(SELECT FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a WHERE a.grantee=0 AND a.privilege_type='EXECUTE'))
+       AND EXISTS(SELECT FROM pg_proc p WHERE p.oid=to_regprocedure('creator.capture_generation_initiator()')
+        AND pg_get_userbyid(p.proowner)='creator_generation_authority' AND NOT p.prosecdef
+        AND p.proconfig=ARRAY['search_path=pg_catalog'] AND p.provolatile='v')
+       AND (SELECT count(*)=9 FROM pg_proc WHERE proowner=(SELECT oid FROM pg_roles WHERE rolname='creator_generation_authority'))
+       AND EXISTS(SELECT FROM pg_trigger WHERE tgname='generation_initiator' AND tgenabled='O'
+        AND tgrelid=to_regclass('creator.generation') AND tgfoid=to_regprocedure('creator.capture_generation_initiator()'))
+       AND EXISTS(SELECT FROM pg_trigger WHERE tgname='require_generation_scope_cleanup' AND tgenabled='O'
+        AND tgrelid=to_regclass('creator.generation_worker_scope') AND tgdeferrable AND tginitdeferred)
+       AND EXISTS(SELECT FROM pg_proc p WHERE p.oid=to_regprocedure('creator_trust.generation_worker_denial(uuid)')
+        AND pg_get_userbyid(p.proowner)='creator_trust_denial' AND p.prosecdef AND p.provolatile='v'
+        AND p.proconfig=ARRAY['search_path=pg_catalog'])
+       AND has_function_privilege('creator_generation_authority',to_regprocedure('creator_trust.generation_worker_denial(uuid)'),'EXECUTE')
+       AND has_function_privilege(current_user,to_regprocedure('creator.pending_generation_tasks(integer)'),'EXECUTE')
+       AND has_function_privilege(current_user,to_regprocedure('creator.claim_generation_task(uuid,uuid)'),'EXECUTE')
+       AND has_function_privilege(current_user,to_regprocedure('creator.begin_generation_scope(uuid,uuid)'),'EXECUTE')
+       AND has_function_privilege(current_user,to_regprocedure('creator.generation_scope_matches(uuid,uuid)'),'EXECUTE')
+       AND has_function_privilege(current_user,to_regprocedure('creator.end_generation_scope()'),'EXECUTE') AS ready`,
+      [
+        input.migration.version,
+        input.migration.checksum,
+        input.denialMigration.version,
+        input.denialMigration.checksum,
+        JSON.stringify(consumers),
+      ],
+    )
+  ).rows[0]?.ready;
+  if (ready !== true) throw new Error("Generation authority is not reviewed");
+  for (const consumer of consumers) {
+    const proof = (
+      await query.query<{ ready: boolean; definition: string }>(
+        `SELECT
+         session_user='creator_generation_worker' AND current_user=session_user
+         AND EXISTS(SELECT FROM creator.schema_migration WHERE version=$2 AND checksum=$3)
+         AND p.prokind='f' AND p.prosecdef AND p.provolatile IN('s','v')
+         AND l.lanname IN('sql','plpgsql') AND p.proconfig=ARRAY['search_path=pg_catalog']
+         AND pg_get_userbyid(p.proowner)=$4
+         AND NOT r.rolcanlogin AND NOT r.rolsuper AND NOT r.rolbypassrls AND NOT r.rolinherit
+         AND NOT r.rolcreatedb AND NOT r.rolcreaterole AND NOT r.rolreplication
+         AND (r.rolconfig IS NULL OR cardinality(r.rolconfig)=0)
+         AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid OR roleid=r.oid)
+         AND NOT EXISTS(SELECT FROM pg_namespace WHERE nspowner=r.oid)
+         AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=r.oid)
+         AND NOT EXISTS(SELECT FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a
+          WHERE a.grantee=0 AND a.privilege_type='EXECUTE')
+         AND EXISTS(SELECT FROM aclexplode(p.proacl) a JOIN pg_roles worker ON worker.oid=a.grantee
+          WHERE worker.rolname=session_user AND a.privilege_type='EXECUTE' AND NOT a.is_grantable)
+         AND has_function_privilege(current_user,p.oid,'EXECUTE')
+         AND has_function_privilege($4,to_regprocedure($5),'EXECUTE')
+         AND has_function_privilege($4,
+          to_regprocedure('creator.generation_scope_matches(uuid,uuid)'),'EXECUTE')=$6::boolean
+         AS ready,pg_get_functiondef(p.oid) AS definition
+         FROM pg_proc p JOIN pg_roles r ON r.oid=p.proowner JOIN pg_language l ON l.oid=p.prolang
+         WHERE p.oid=to_regprocedure($1)`,
+        [
+          consumer.signature,
+          consumer.migration.version,
+          consumer.migration.checksum,
+          consumer.owner,
+          "purpose" in consumer
+            ? "creator.generation_terminal_matches(uuid,uuid,boolean)"
+            : "creator.generation_scope_matches(uuid,uuid)",
+          !("purpose" in consumer) ||
+            terminalContracts.find(
+              (contract) => contract.owner === consumer.owner,
+            )?.originalScopeBridge === true,
+        ],
+      )
+    ).rows[0];
+    if (
+      proof?.ready !== true ||
+      createHash("sha256").update(proof.definition).digest("hex") !==
+        consumer.definitionChecksum
+    )
+      throw new Error("Generation consumer executable differs from its review");
+  }
+}
+
 export class GenerationIdentityAuthority {
   private readonly issued = new WeakMap<
     GenerationTaskScope,
@@ -119,8 +341,11 @@ export class GenerationIdentityAuthority {
   private constructor(
     private readonly pool: Pool,
     private readonly configuration: Readonly<{
+      catalogue: GenerationCatalogue;
       assertAllowed: GenerationRestriction;
       assertDiscoveryAllowed: (client: PoolClient) => Promise<void>;
+      consumers: readonly GenerationPurposeConsumer[];
+      terminalConsumers: readonly GenerationTerminalPurposeConsumer[];
     }>,
   ) {}
 
@@ -133,21 +358,28 @@ export class GenerationIdentityAuthority {
       );
   }
 
-  static async create(input: {
+  static async create(configuration: {
     pool: Pool;
     migration: { version: string; checksum: string };
-    /** The actual W8 reviewed0093 receipt, not a claimed callback result. */
+    /** The actual W8 reviewed0177 receipt, not a claimed callback result. */
     denialMigration: { version: string; checksum: string };
     assertAllowed: GenerationRestriction;
     assertDiscoveryAllowed: (client: PoolClient) => Promise<void>;
     /** Only activated, individually reviewed narrow entrypoints. Empty by
      * default; a migration receipt alone does not authorize an executable. */
     consumers?: readonly GenerationPurposeConsumer[];
+    /** Separate fixed settlement registry. No original-scope grant is added. */
+    terminalConsumers?: readonly GenerationTerminalPurposeConsumer[];
   }): Promise<GenerationIdentityAuthority> {
+    const input = Object.freeze({
+      ...configuration,
+      migration: Object.freeze({ ...configuration.migration }),
+      denialMigration: Object.freeze({ ...configuration.denialMigration }),
+    });
     if (
       input.migration.version !== GENERATION_SCOPE_MIGRATION ||
       !Hash.safeParse(input.migration.checksum).success ||
-      !/^0093_w8_[a-z_]+$/u.test(input.denialMigration.version) ||
+      input.denialMigration.version !== "0177_w8_generation_worker_denial" ||
       !Hash.safeParse(input.denialMigration.checksum).success ||
       typeof input.assertAllowed !== "function" ||
       typeof input.assertDiscoveryAllowed !== "function"
@@ -157,171 +389,55 @@ export class GenerationIdentityAuthority {
         "Current generation purpose authority is not configured.",
         503,
       );
+    let consumers: GenerationPurposeConsumer[];
+    let terminalConsumers: GenerationTerminalPurposeConsumer[];
     try {
-      const consumers = z
+      consumers = z
         .array(consumerSchema)
         .max(32)
         .parse(input.consumers ?? []);
+      terminalConsumers = z
+        .array(terminalConsumerSchema)
+        .max(8)
+        .parse(input.terminalConsumers ?? []);
+      const combined = [...consumers, ...terminalConsumers];
       if (
-        new Set(consumers.map((consumer) => consumer.signature)).size !==
-          consumers.length ||
+        new Set(combined.map((consumer) => consumer.signature)).size !==
+          combined.length ||
         consumers.some(
           (consumer) =>
             consumer.owner === "creator_generation_authority" ||
             consumer.owner === "creator_generation_worker" ||
             consumer.migration.version === input.migration.version ||
-            consumer.migration.version === input.denialMigration.version,
-        )
+            consumer.migration.version === input.denialMigration.version ||
+            terminalContracts.some(
+              (contract) =>
+                consumer.owner === contract.owner ||
+                consumer.migration.version === contract.version ||
+                contract.signatures.some(
+                  (signature) => signature === consumer.signature,
+                ),
+            ),
+        ) ||
+        terminalConsumers.some(
+          (consumer) => !reviewedTerminalConsumer(consumer),
+        ) ||
+        (terminalConsumers.length > 0 &&
+          terminalContracts[0].signatures.some(
+            (signature) =>
+              !terminalConsumers.some(
+                (consumer) => consumer.signature === signature,
+              ),
+          ))
       )
         throw new Error(
           "Generation consumers require distinct reviewed custody",
         );
-      const installed = (
-        await input.pool.query<{ installed: boolean }>(
-          `SELECT session_user='creator_generation_worker' AND current_user=session_user
-           AND to_regclass('creator.generation_worker_scope') IS NOT NULL
-           AND to_regprocedure('creator.begin_generation_scope(uuid,uuid)') IS NOT NULL
-           AND to_regprocedure('creator_trust.generation_worker_denial(uuid)') IS NOT NULL AS installed`,
-        )
-      ).rows[0]?.installed;
-      if (installed !== true) throw new Error("Generation authority is absent");
-      const ready = (
-        await input.pool.query<{ ready: boolean }>(
-          `SELECT
-           (SELECT count(*)=2 FROM creator.schema_migration
-            WHERE (version=$1 AND checksum=$2) OR (version=$3 AND checksum=$4))
-           AND (SELECT count(*)=2 FROM pg_roles r
-            WHERE (r.rolname='creator_generation_worker' AND r.rolcanlogin
-             OR r.rolname='creator_generation_authority' AND NOT r.rolcanlogin)
-            AND NOT r.rolsuper AND NOT r.rolbypassrls AND NOT r.rolinherit
-            AND NOT r.rolcreatedb AND NOT r.rolcreaterole AND NOT r.rolreplication
-            AND (r.rolconfig IS NULL OR cardinality(r.rolconfig)=0)
-            AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid OR roleid=r.oid)
-            AND NOT EXISTS(SELECT FROM pg_namespace WHERE nspowner=r.oid)
-            AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=r.oid))
-           AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
-            WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
-             AND c.relkind IN('r','p','v','m','f')
-             AND NOT(n.nspname='creator' AND c.relname='schema_migration')
-             AND (has_table_privilege(current_user,c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
-              OR has_any_column_privilege(current_user,c.oid,'SELECT,INSERT,UPDATE,REFERENCES')))
-           AND NOT EXISTS(SELECT FROM pg_proc WHERE proowner=(SELECT oid FROM pg_roles WHERE rolname=current_user))
-           AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
-            WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
-             AND c.relkind='S' AND has_sequence_privilege(current_user,c.oid,'USAGE,SELECT,UPDATE'))
-           AND NOT EXISTS(SELECT FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
-            WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema' AND p.prosecdef
-             AND has_function_privilege(current_user,p.oid,'EXECUTE')
-             AND NOT(p.oid=ANY(ARRAY[
-              to_regprocedure('creator.pending_generation_tasks(integer)'),
-              to_regprocedure('creator.claim_generation_task(uuid,uuid)'),
-              to_regprocedure('creator.begin_generation_scope(uuid,uuid)'),
-              to_regprocedure('creator.generation_scope_matches(uuid,uuid)'),
-              to_regprocedure('creator.end_generation_scope()')]::oid[])
-              OR p.oid=ANY(ARRAY(SELECT to_regprocedure(c.signature)::oid
-               FROM jsonb_to_recordset($5::jsonb) AS c(signature text)))))
-           AND (SELECT count(*)=7 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
-            WHERE n.nspname='creator' AND c.relkind='r' AND c.relname=ANY(ARRAY[
-             'generation','thread','creator_profile','fan_profile','message','processor_consent','generation_worker_scope'])
-            AND c.relrowsecurity AND c.relforcerowsecurity AND pg_get_userbyid(c.relowner)='creator_owner')
-           -- Canonical identity_session resolves an unknown bearer before any
-           -- account GUC exists. Preserve its reviewed catalogue shape; the
-           -- inaccessible purpose owner gets only four metadata columns and
-           -- every fixed function predicates the original account/session.
-           AND EXISTS(SELECT FROM pg_class WHERE oid=to_regclass('creator.identity_session')
-            AND relkind='r' AND pg_get_userbyid(relowner)='creator_owner'
-            AND NOT relrowsecurity AND NOT relforcerowsecurity)
-           AND NOT has_column_privilege('creator_generation_authority','creator.message','text','SELECT')
-           AND NOT has_column_privilege('creator_generation_authority','creator.memory','text','SELECT')
-           AND NOT has_column_privilege('creator_generation_authority','creator.identity_session','token_hash','SELECT')
-           AND NOT has_column_privilege('creator_generation_authority','creator.identity_session','upstream_cipher','SELECT')
-           AND NOT has_column_privilege('creator_generation_authority','creator.signed_act','assertion','SELECT')
-           AND NOT has_column_privilege('creator_generation_authority','creator.passkey_credential','public_key','SELECT')
-           AND NOT has_column_privilege('creator_generation_authority','creator.ai_version','configuration','SELECT')
-           AND NOT has_column_privilege('creator_generation_authority','creator.ai_version','compiled_prefix','SELECT')
-           AND NOT has_column_privilege('creator_generation_authority','creator.ai_workspace','interview','SELECT')
-           AND (SELECT count(*)=8 FROM pg_proc p
-            WHERE p.oid=ANY(ARRAY[
-             to_regprocedure('creator.confirm_generation_initiator(uuid)'),
-             to_regprocedure('creator.pending_generation_tasks(integer)'),
-             to_regprocedure('creator.generation_task_proof(uuid,uuid,boolean)'),
-             to_regprocedure('creator.claim_generation_task(uuid,uuid)'),
-             to_regprocedure('creator.begin_generation_scope(uuid,uuid)'),
-             to_regprocedure('creator.generation_scope_matches(uuid,uuid)'),
-             to_regprocedure('creator.end_generation_scope()'),
-             to_regprocedure('creator.require_generation_scope_cleanup()')]::oid[])
-             AND pg_get_userbyid(p.proowner)='creator_generation_authority' AND p.prosecdef
-             AND p.proconfig=ARRAY['search_path=pg_catalog'] AND p.provolatile IN('s','v')
-             AND NOT EXISTS(SELECT FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a WHERE a.grantee=0 AND a.privilege_type='EXECUTE'))
-           AND EXISTS(SELECT FROM pg_proc p WHERE p.oid=to_regprocedure('creator.capture_generation_initiator()')
-            AND pg_get_userbyid(p.proowner)='creator_generation_authority' AND NOT p.prosecdef
-            AND p.proconfig=ARRAY['search_path=pg_catalog'] AND p.provolatile='v')
-           AND (SELECT count(*)=9 FROM pg_proc WHERE proowner=(SELECT oid FROM pg_roles WHERE rolname='creator_generation_authority'))
-           AND EXISTS(SELECT FROM pg_trigger WHERE tgname='generation_initiator' AND tgenabled='O'
-            AND tgrelid=to_regclass('creator.generation') AND tgfoid=to_regprocedure('creator.capture_generation_initiator()'))
-           AND EXISTS(SELECT FROM pg_trigger WHERE tgname='require_generation_scope_cleanup' AND tgenabled='O'
-            AND tgrelid=to_regclass('creator.generation_worker_scope') AND tgdeferrable AND tginitdeferred)
-           AND EXISTS(SELECT FROM pg_proc p WHERE p.oid=to_regprocedure('creator_trust.generation_worker_denial(uuid)')
-            AND pg_get_userbyid(p.proowner)='creator_trust_denial' AND p.prosecdef AND p.provolatile='v'
-            AND p.proconfig=ARRAY['search_path=pg_catalog'])
-           AND has_function_privilege('creator_generation_authority',to_regprocedure('creator_trust.generation_worker_denial(uuid)'),'EXECUTE')
-           AND has_function_privilege(current_user,to_regprocedure('creator.pending_generation_tasks(integer)'),'EXECUTE')
-           AND has_function_privilege(current_user,to_regprocedure('creator.claim_generation_task(uuid,uuid)'),'EXECUTE')
-           AND has_function_privilege(current_user,to_regprocedure('creator.begin_generation_scope(uuid,uuid)'),'EXECUTE')
-           AND has_function_privilege(current_user,to_regprocedure('creator.generation_scope_matches(uuid,uuid)'),'EXECUTE')
-           AND has_function_privilege(current_user,to_regprocedure('creator.end_generation_scope()'),'EXECUTE') AS ready`,
-          [
-            input.migration.version,
-            input.migration.checksum,
-            input.denialMigration.version,
-            input.denialMigration.checksum,
-            JSON.stringify(consumers),
-          ],
-        )
-      ).rows[0]?.ready;
-      if (ready !== true)
-        throw new Error("Generation authority is not reviewed");
-      for (const consumer of consumers) {
-        const proof = (
-          await input.pool.query<{ ready: boolean; definition: string }>(
-            `SELECT
-             session_user='creator_generation_worker' AND current_user=session_user
-             AND EXISTS(SELECT FROM creator.schema_migration WHERE version=$2 AND checksum=$3)
-             AND p.prokind='f' AND p.prosecdef AND p.provolatile IN('s','v')
-             AND l.lanname IN('sql','plpgsql') AND p.proconfig=ARRAY['search_path=pg_catalog']
-             AND pg_get_userbyid(p.proowner)=$4
-             AND NOT r.rolcanlogin AND NOT r.rolsuper AND NOT r.rolbypassrls AND NOT r.rolinherit
-             AND NOT r.rolcreatedb AND NOT r.rolcreaterole AND NOT r.rolreplication
-             AND (r.rolconfig IS NULL OR cardinality(r.rolconfig)=0)
-             AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid OR roleid=r.oid)
-             AND NOT EXISTS(SELECT FROM pg_namespace WHERE nspowner=r.oid)
-             AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=r.oid)
-             AND NOT EXISTS(SELECT FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a
-              WHERE a.grantee=0 AND a.privilege_type='EXECUTE')
-             AND EXISTS(SELECT FROM aclexplode(p.proacl) a JOIN pg_roles worker ON worker.oid=a.grantee
-              WHERE worker.rolname=session_user AND a.privilege_type='EXECUTE' AND NOT a.is_grantable)
-             AND has_function_privilege(current_user,p.oid,'EXECUTE')
-             AND has_function_privilege($4,to_regprocedure('creator.generation_scope_matches(uuid,uuid)'),'EXECUTE')
-             AS ready,pg_get_functiondef(p.oid) AS definition
-             FROM pg_proc p JOIN pg_roles r ON r.oid=p.proowner JOIN pg_language l ON l.oid=p.prolang
-             WHERE p.oid=to_regprocedure($1)`,
-            [
-              consumer.signature,
-              consumer.migration.version,
-              consumer.migration.checksum,
-              consumer.owner,
-            ],
-          )
-        ).rows[0];
-        if (
-          proof?.ready !== true ||
-          createHash("sha256").update(proof.definition).digest("hex") !==
-            consumer.definitionChecksum
-        )
-          throw new Error(
-            "Generation consumer executable differs from its review",
-          );
-      }
+      await assertGenerationCatalogue(input.pool, {
+        ...input,
+        consumers,
+        terminalConsumers,
+      });
     } catch {
       throw new DomainError(
         "generation_scope_unconfigured",
@@ -329,10 +445,66 @@ export class GenerationIdentityAuthority {
         503,
       );
     }
+    const frozenConsumers = Object.freeze(
+      consumers.map((consumer) =>
+        Object.freeze({
+          ...consumer,
+          migration: Object.freeze({ ...consumer.migration }),
+        }),
+      ),
+    );
+    const frozenTerminalConsumers = Object.freeze(
+      terminalConsumers.map((consumer) =>
+        Object.freeze({
+          ...consumer,
+          migration: Object.freeze({ ...consumer.migration }),
+        }),
+      ),
+    );
     return new GenerationIdentityAuthority(input.pool, {
+      catalogue: Object.freeze({
+        migration: Object.freeze({ ...input.migration }),
+        denialMigration: Object.freeze({ ...input.denialMigration }),
+        consumers: frozenConsumers,
+        terminalConsumers: frozenTerminalConsumers,
+      }),
       assertAllowed: input.assertAllowed,
       assertDiscoveryAllowed: input.assertDiscoveryAllowed,
+      consumers: frozenConsumers,
+      terminalConsumers: frozenTerminalConsumers,
     });
+  }
+
+  /** Preparation only: a distinct purpose may use an executable only when
+   * this exact worker credential already qualified its actual definition. */
+  assertConsumerRegistered(consumer: GenerationPurposeConsumer): void {
+    if (
+      !this.configuration.consumers.some(
+        (registered) => canonical(registered) === canonical(consumer),
+      )
+    )
+      throw new DomainError(
+        "generation_scope_unconfigured",
+        "The exact worker purpose consumer is not registered.",
+        503,
+      );
+  }
+
+  assertTerminalConsumerRegistered(
+    consumer: GenerationTerminalPurposeConsumer,
+  ): void {
+    if (
+      !terminalConsumerSchema.safeParse(consumer).success ||
+      !reviewedTerminalConsumer(consumer) ||
+      !this.configuration.terminalConsumers.some(
+        (registered) => canonical(registered) === canonical(consumer),
+      )
+    )
+      throw new DomainError(
+        "generation_terminal_unconfigured",
+        "The exact original settlement consumer is not registered.",
+        503,
+      );
   }
 
   private assertWorker(): void {
@@ -343,6 +515,22 @@ export class GenerationIdentityAuthority {
     );
   }
 
+  async assertCatalogueInTransaction(client: PoolClient): Promise<void> {
+    this.assertWorker();
+    // Refuse an implicit statement transaction; this is a caller-held proof.
+    await client.query("SAVEPOINT w1_generation_catalogue");
+    await client.query("RELEASE SAVEPOINT w1_generation_catalogue");
+    try {
+      await assertGenerationCatalogue(client, this.configuration.catalogue);
+    } catch {
+      throw new DomainError(
+        "generation_scope_unconfigured",
+        "The current reviewed generation catalogue is unavailable.",
+        503,
+      );
+    }
+  }
+
   private async begin(client: PoolClient): Promise<void> {
     await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
     await client.query(
@@ -351,6 +539,7 @@ export class GenerationIdentityAuthority {
        set_config('app.account_id','',true),set_config('app.identity_session_id','',true),
        set_config('app.creator_id','',true),set_config('app.fan_id','',true),set_config('generation.scope_nonce','',true)`,
     );
+    await this.assertCatalogueInTransaction(client);
   }
 
   private failure(error: unknown): never {
@@ -406,6 +595,7 @@ export class GenerationIdentityAuthority {
           .parse(rows.rows.map((row) => row.id)),
       );
       await this.configuration.assertDiscoveryAllowed(client);
+      await this.assertCatalogueInTransaction(client);
       await client.query("COMMIT");
       return ids;
     } catch (error) {
@@ -435,6 +625,7 @@ export class GenerationIdentityAuthority {
         )
       ).rows[0]?.proof;
       if (proof == null) {
+        await this.assertCatalogueInTransaction(client);
         await client.query("COMMIT");
         return null;
       }
@@ -464,6 +655,7 @@ export class GenerationIdentityAuthority {
         "The generation claim changed.",
       );
       await client.query("SELECT creator.end_generation_scope()");
+      await this.assertCatalogueInTransaction(client);
       await client.query("COMMIT");
       return task;
     } catch (error) {
@@ -530,6 +722,7 @@ export class GenerationIdentityAuthority {
       await this.authorizeInTransaction(scope, client);
       await client.query("SELECT creator.end_generation_scope()");
       this.issued.delete(scope);
+      await this.assertCatalogueInTransaction(client);
       await client.query("COMMIT");
       return value;
     } catch (error) {
@@ -554,6 +747,7 @@ export class GenerationIdentityAuthority {
       "generation_scope_required",
       "Use the current generation purpose transaction.",
     );
+    await this.assertCatalogueInTransaction(client);
     const current = (
       await client.query<{
         allowed: boolean;
