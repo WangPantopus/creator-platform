@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import type { Pool } from "pg";
+import type { Pool, PoolClient } from "pg";
 import { z } from "zod";
 import { privacyOwnershipScope } from "../trust/privacy-ownership.js";
 import type { EffectHook, PrivacyHook } from "../trust/contracts.js";
@@ -8,11 +8,17 @@ import type { AgentService } from "./service.js";
 import type { AgentLifecycle } from "./lifecycle.js";
 import { invariant } from "../../core/errors.js";
 import { contentHash } from "../../core/canonical.js";
-import { generationJournalInstalled } from "./generation-journal.js";
 import { agentExportStream } from "./privacy-stream.js";
 
 /** W1/W8 supply authoritative job and case projections; HTTP fields cannot mint these scopes. */
 export interface AgentTrustAuthority {
+  /** Actual completed W8 conversation task/artifact or disposition receipt,
+   * revalidated on this job's held agent client. No registration flag suffices. */
+  accountingBoundary?(
+    input: Parameters<PrivacyHook["run"]>[0],
+    client: PoolClient,
+    scopes: readonly CreatorScope[],
+  ): Promise<{ reference: string }>;
   privacyCreators(
     input: Parameters<PrivacyHook["run"]>[0],
   ): Promise<readonly CreatorScope[]>;
@@ -26,9 +32,11 @@ export interface AgentTrustAuthority {
 export function createAgentTrustAuthority(
   workerPool: Pool,
   ownerScope: (creatorId: string) => Promise<CreatorScope>,
+  accountingBoundary?: AgentTrustAuthority["accountingBoundary"],
 ): AgentTrustAuthority {
   const ownership = privacyOwnershipScope(workerPool);
   return {
+    ...(accountingBoundary ? { accountingBoundary } : {}),
     async privacyCreators(input) {
       z.uuid().parse(input.jobId);
       z.uuid().parse(input.accountId);
@@ -155,6 +163,7 @@ export function agentPrivacyHook(
   artifacts?: AgentExportArtifactSink,
   coordinatorStream = false,
 ): PrivacyHook {
+  const boundary = authority.accountingBoundary?.bind(authority);
   return {
     domain: "agent",
     async run(input) {
@@ -164,13 +173,42 @@ export function agentPrivacyHook(
         "privacy_scope_large",
         "Split this account operation into bounded creator jobs.",
       );
+      await service.repository.assertRuntimeRole();
+      input.signal?.throwIfAborted();
       const accountingClient = await service.repository.pool.connect();
+      let accountingReference: string | undefined;
+      let lineage = false;
+      const assertBoundary = boundary
+        ? (client: PoolClient) => boundary(input, client, scopes)
+        : undefined;
       try {
-        invariant(
-          !(await generationJournalInstalled(accountingClient)),
-          "thread_accounting_privacy_unconfigured",
-          "Register authoritative account fan relationships and thread-accounting export/deletion before acknowledging this request.",
-        );
+        await accountingClient.query("BEGIN ISOLATION LEVEL REPEATABLE READ");
+        lineage = await lifecycle.assertAccountingClient(accountingClient);
+        if (lineage) {
+          invariant(
+            assertBoundary,
+            "thread_accounting_privacy_unconfigured",
+            "Complete the actual conversation accounting task before acknowledging agent privacy.",
+          );
+          accountingReference = (await assertBoundary(accountingClient))
+            .reference;
+          invariant(
+            accountingReference,
+            "accounting_boundary_incomplete",
+            "The durable conversation accounting boundary is required.",
+          );
+          invariant(
+            (await assertBoundary(accountingClient)).reference ===
+              accountingReference,
+            "accounting_boundary_changed",
+            "The completed accounting boundary changed.",
+          );
+        }
+        input.signal?.throwIfAborted();
+        await accountingClient.query("COMMIT");
+      } catch (error) {
+        await accountingClient.query("ROLLBACK");
+        throw error;
       } finally {
         accountingClient.release();
       }
@@ -184,7 +222,12 @@ export function agentPrivacyHook(
           receipt: {
             domain: "agent",
             jobId: input.jobId,
-            threadData: "not_stored_by_agent",
+            threadData: lineage
+              ? "handled_by_conversation"
+              : "not_stored_by_agent",
+            ...(accountingReference
+              ? { accountingBoundaryReference: accountingReference }
+              : {}),
           },
           ...(input.kind === "export" ? { data: [] } : {}),
         };
@@ -212,14 +255,29 @@ export function agentPrivacyHook(
               domain: "agent",
               jobId: input.jobId,
               exportScopeCreators: scopes.length,
+              ...(accountingReference
+                ? { accountingBoundaryReference: accountingReference }
+                : {}),
             },
             stream: agentExportStream(
               service,
               scopes,
               assertCurrent,
               input.signal,
+              assertBoundary
+                ? {
+                    assertCurrent: assertBoundary,
+                    assertCustody: (client) =>
+                      lifecycle.assertAccountingClient(client),
+                  }
+                : undefined,
             ),
           };
+        invariant(
+          !lineage,
+          "thread_accounting_privacy_unconfigured",
+          "Installed accounting lineage requires the coordinator's complete held-snapshot export stream.",
+        );
         if (scopes.length)
           invariant(
             artifacts,
@@ -286,6 +344,7 @@ export function agentPrivacyHook(
               creatorId: scope.creatorId,
             }),
             assertCurrent,
+            assertBoundary,
           ),
         );
       return {
@@ -295,6 +354,7 @@ export function agentPrivacyHook(
           purgedCreators: receipts.length,
           receipts,
         },
+        retained: receipts.flatMap((receipt) => receipt.retained),
       };
     },
   };
