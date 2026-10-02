@@ -45,10 +45,7 @@ import {
   FULFILLMENT_CATALOGUE_QUERY,
   FULFILLMENT_CATALOGUE_SHA256,
 } from "./fulfillment-catalogue.js";
-import {
-  CommerceFulfillmentViewAuthority,
-  FULFILLMENT_VIEW_PLAN_CATALOGUE_SHA256,
-} from "./fulfillment-view-authority.js";
+import { CommerceFulfillmentViewAuthority } from "./fulfillment-view-authority.js";
 
 export const FULFILLMENT_PLAN_MIGRATION = "0178_w4_fulfillment_plan_custody";
 // Updated only from the reviewed owned proposal; W8 registers this exact file.
@@ -234,19 +231,13 @@ export class CommerceFulfillmentPlans {
     const catalogue = (
       await client.query<{ checksum: string }>(FULFILLMENT_CATALOGUE_QUERY)
     ).rows[0]?.checksum;
-    if (
-      catalogue !==
-      (this.viewAuthority
-        ? FULFILLMENT_VIEW_PLAN_CATALOGUE_SHA256
-        : FULFILLMENT_CATALOGUE_SHA256)
-    )
-      throw unavailable();
     if (this.viewAuthority)
       await CommerceFulfillmentViewAuthority.assertCurrentCatalogue(
         this.viewAuthority,
         this.database,
         client,
       );
+    else if (catalogue !== FULFILLMENT_CATALOGUE_SHA256) throw unavailable();
     const ready = (
       await client.query<{ ready: boolean }>(
         `SELECT

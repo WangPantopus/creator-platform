@@ -17,6 +17,11 @@ import {
   FULFILLMENT_VIEW_CATALOGUE_SHA256,
 } from "./fulfillment-view-catalogue.js";
 import { FULFILLMENT_CATALOGUE_QUERY } from "./fulfillment-catalogue.js";
+import {
+  assertFulfillmentOriginalHashCatalogue,
+  FULFILLMENT_ORIGINAL_HASH_MIGRATION,
+  FULFILLMENT_ORIGINAL_HASH_SCHEMA_SHA256,
+} from "./fulfillment-original-hash-catalogue.js";
 
 export const FULFILLMENT_VIEW_MIGRATION = "0199_w4_fulfillment_plan_read";
 export const FULFILLMENT_VIEW_SCHEMA_SHA256 =
@@ -26,6 +31,10 @@ const Catalogue =
   "f870ee07b5d12f65ac3abe45864a55ce9011af6967fc63cac91fff78f8a88d8e";
 export const FULFILLMENT_VIEW_PLAN_CATALOGUE_SHA256 =
   "12cda15c2b2078940e44cc667dfb0cac85284a34d846f6d0e0cb6a2defc763e7";
+const OriginalHashScopeCatalogue =
+  "5a13261bde3339d7bca347ec0689ecfbf6abc1629817354f6122ff25ad15cd50";
+const OriginalHashPlanCatalogue =
+  "4c8564303cc95803a61db1e23eee05da4f4bb2a7149ade12a2742cf0e190a121";
 const Definitions = Object.freeze({
   "creator.begin_commerce_fulfillment_view(uuid,uuid,integer,uuid,integer,text,jsonb)":
     "90b1bc70d66c2f3b716640f6492a9c45cb46ea6e0197608d72d75f7805052d4b",
@@ -139,6 +148,20 @@ export class CommerceFulfillmentViewAuthority {
   }
   private async assertCatalogue(client: PoolClient): Promise<void> {
     try {
+      // A distinct reviewed consumer may add only its exact fixed matcher ACL
+      // and bounded RLS policies. Unregistered DDL or a changed checksum cannot
+      // select the extended catalogue; the consumer's actual source is checked.
+      const originalHash = (
+        await client.query<{ checksum: string }>(
+          "SELECT checksum FROM creator.schema_migration WHERE version=$1",
+          [FULFILLMENT_ORIGINAL_HASH_MIGRATION],
+        )
+      ).rows[0];
+      if (originalHash) {
+        if (originalHash.checksum !== FULFILLMENT_ORIGINAL_HASH_SCHEMA_SHA256)
+          unavailable();
+        await assertFulfillmentOriginalHashCatalogue(client);
+      }
       const ready = (
         await client.query<{ ready: boolean }>(
           `SELECT
@@ -179,9 +202,15 @@ export class CommerceFulfillmentViewAuthority {
           await client.query<{ checksum: string }>(
             FULFILLMENT_VIEW_CATALOGUE_QUERY,
           )
-        ).rows[0]?.checksum !== FULFILLMENT_VIEW_CATALOGUE_SHA256 ||
+        ).rows[0]?.checksum !==
+          (originalHash
+            ? OriginalHashScopeCatalogue
+            : FULFILLMENT_VIEW_CATALOGUE_SHA256) ||
         (await client.query<{ checksum: string }>(FULFILLMENT_CATALOGUE_QUERY))
-          .rows[0]?.checksum !== FULFILLMENT_VIEW_PLAN_CATALOGUE_SHA256
+          .rows[0]?.checksum !==
+          (originalHash
+            ? OriginalHashPlanCatalogue
+            : FULFILLMENT_VIEW_PLAN_CATALOGUE_SHA256)
       )
         unavailable();
       for (const [signature, checksum] of Object.entries(Definitions)) {
