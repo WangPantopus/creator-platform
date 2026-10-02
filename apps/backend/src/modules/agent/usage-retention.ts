@@ -3,7 +3,8 @@ import { invariant } from "../../core/errors.js";
 import type { AgentRepository, CreatorScope } from "./repository.js";
 import type { PreparedGenerationJournal } from "./generation-journal.js";
 
-export const USAGE_RETENTION_MIGRATION = "0067_w2_usage_retention_expiry";
+// Held above the lineage prerequisite; original reserved SQL stays immutable.
+export const USAGE_RETENTION_MIGRATION = "0079_w2_usage_retention_expiry";
 
 /** W8 supplies current persisted job/lease and policy authority. Owning a
  * creator scope or knowing a policy name alone does not authorize expiry. */
