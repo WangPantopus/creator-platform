@@ -28,10 +28,12 @@ export function conversationPrivacyAuthority(
       await privacyTaskAuthorityInTransaction(client, job);
     },
     async families(job) {
-      const owned = await verify(job);
       const client = await runtime.connect();
       try {
         await client.query("BEGIN");
+        // Discovery is lifecycle work too. Lock the real job/task before any
+        // family reads and keep its deferred currentness check through COMMIT.
+        const owned = await privacyTaskAuthorityInTransaction(client, job);
         await client.query("SELECT set_config('app.account_id',$1,true)", [
           job.accountId,
         ]);
@@ -86,6 +88,7 @@ export function conversationPrivacyAuthority(
             }
         }
         await verify(job);
+        job.signal?.throwIfAborted();
         await client.query("COMMIT");
         return families;
       } catch (error) {
