@@ -3,7 +3,10 @@ import { randomBytes } from "node:crypto";
 import { readFile, writeFile, stat } from "node:fs/promises";
 import pg from "pg";
 import { createGrowthAPIPool } from "../../db/growth-api-pool.js";
-import { createConfiguredBackend } from "../../integration.js";
+import {
+  createConfiguredBackend,
+  type BackendRuntime,
+} from "../../integration.js";
 import { DevelopmentIdentityAdapter } from "../identity/development.js";
 import { ContentService } from "./service.js";
 import { contentFeature, contentSignedSubjects } from "./registration.js";
@@ -26,6 +29,8 @@ import { configureGrowthForBackend } from "../growth/configured.js";
 import { canonicalCoreContentFollows } from "../growth/core-follows.js";
 import { contentPublicProjection } from "../growth/content.js";
 import { createTrustReplyReviewer } from "../trust/reply-review.js";
+import { createDevelopmentTrust } from "../trust/development.js";
+import { createAgentDomain } from "../agent/integration.js";
 import { canonicalConversationHome } from "../growth/home.js";
 import { createConversationRuntime } from "../conversation/runtime.js";
 
@@ -110,6 +115,17 @@ if (agentDatabaseUrl) {
 } else if (process.env.GROWTH_ENABLED === "true")
   throw new Error("W5 Growth composition requires W5_AGENT_DATABASE_URL.");
 const model = modelFromEnvironment();
+const agentPoolFor = (runtime: BackendRuntime) => {
+  if (features.agentPool) return features.agentPool;
+  if (!agentDatabaseUrl) return runtime.pool;
+  features.agentPool = new pg.Pool({
+    connectionString: agentDatabaseUrl,
+    max: 2,
+    connectionTimeoutMillis: 5000,
+    statement_timeout: 5000,
+  });
+  return features.agentPool;
+};
 const backend = await createConfiguredBackend({
   config: {
     port: apiPort,
@@ -122,6 +138,10 @@ const backend = await createConfiguredBackend({
     passkeyOrigins: [webOrigin],
   },
   identity,
+  trust: (runtime) =>
+    createDevelopmentTrust(runtime, {
+      agent: createAgentDomain({ pool: agentPoolFor(runtime), model }),
+    }),
   guardrails: {
     checkSentence: async () => {
       throw new DomainError(
@@ -146,15 +166,7 @@ const backend = await createConfiguredBackend({
     if (growthPool) features.growthPool = growthPool;
     const conversation = createConversationRuntime(runtime);
     runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
-    const agentPool = agentDatabaseUrl
-      ? new pg.Pool({
-          connectionString: agentDatabaseUrl,
-          max: 2,
-          connectionTimeoutMillis: 5000,
-          statement_timeout: 5000,
-        })
-      : runtime.pool;
-    if (agentPool !== runtime.pool) features.agentPool = agentPool;
+    const agentPool = agentPoolFor(runtime);
     const repository = new AgentRepository(agentPool),
       agent = new AgentService(
         repository,
@@ -195,6 +207,12 @@ const backend = await createConfiguredBackend({
         : {},
     });
     features.growth = growth;
+    if (!runtime.assertContentAllowedInTransaction)
+      throw new DomainError(
+        "content_denial_unconfigured",
+        "Configure the current caller-held content denial authority.",
+        503,
+      );
     const composition = composeContentHost({
       pool: runtime.pool,
       owners: {
@@ -206,9 +224,13 @@ const backend = await createConfiguredBackend({
       },
       dependencies: {
         assertAllowed: runtime.assertCreatorAllowed,
+        assertAllowedInTransaction: runtime.assertContentAllowedInTransaction,
         reviewReply: createTrustReplyReviewer(),
       },
       sources: { service: sources, repository },
+      ...(runtime.audienceIdentity
+        ? { tenure: { audienceIdentity: runtime.audienceIdentity } }
+        : {}),
       ...(growth && runtime.identity
         ? {
             followReaders: {
