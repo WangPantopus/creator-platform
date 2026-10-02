@@ -1,5 +1,7 @@
 # W2 remaining delivery backlog — October 2, Mac Studio
 
+**Current synthetic-host guard:** genuine DevelopmentLicenseVerifier now exposes exact pool qualification; actual creator_runtime accepts its own pool and refuses a different pool with the same URL503 before any second connection/provider/write. [Source-qualified receipt](../20261001-mac-studio/synthetic-pool-qualification/README.md). This does not approve processor policy/consent/retention or activate generation. W3’s explicit verified:false synthetic qualification and genuine W1 generation-task consumers remain in progress.
+
 The [current matrix](finish-matrix.md) retains every nine-package/R01–R14/contract/opportunity obligation. [Earlier backlog](release-backlog-history-20261002.md) is verbatim dated history, not current host/data/PR state; [custody](current-record-reconciliation.json) pins its bytes.
 
 1. Finish the coherent current-main recovery PR: W1 exactea251 readiness and7400 native correction, own Android Light/Night cold+Night warm operation, existing checks/exact-head CI, normal merge and actual-main repeat. PR79 public authority and108 navigation are already normally merged; retain six queued Mac jobs as unpassed.

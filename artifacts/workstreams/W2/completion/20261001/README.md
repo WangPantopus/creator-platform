@@ -1,5 +1,7 @@
 # W2 completion records — current Mac Studio continuation
 
+**Current synthetic-host guard:** genuine DevelopmentLicenseVerifier now exposes exact pool qualification; actual creator_runtime accepts its own pool and refuses a different pool with the same URL503 before any second connection/provider/write. [Source-qualified receipt](../20261001-mac-studio/synthetic-pool-qualification/README.md). This does not approve processor policy/consent/retention or activate generation. W3’s explicit verified:false synthetic qualification and genuine W1 generation-task consumers remain in progress.
+
 [Current nine-package finish matrix](finish-matrix.md) and [remaining delivery backlog](release-backlog.md) are authoritative for current scope. Full W2 is incomplete. Source implemented, runnable isolated behavior, canonical integration, personal operation and release readiness are distinct in that matrix.
 
 Latest normally merged increments: PR79 de742442→7ce6e3e8 immutable visitor public AI projection; PR108 525b92aa→7f5fdf04 Studio44px navigation/keyboard recovery; PR104 4ce72a7e→7f47832d held-client licence reads; PR100 db0b6c1c→1d3571b5 language/translation; PR77 privacy source; PR99 development licence boundary; PR91 session recovery; PR65 synthetic development licence/focus; PR40 real pool outage recovery. Exact receipts retain queued jobs as unpassed.

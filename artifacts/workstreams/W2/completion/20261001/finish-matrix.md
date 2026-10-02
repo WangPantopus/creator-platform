@@ -1,5 +1,7 @@
 # W2 current finish matrix — Mac Studio, October 2
 
+**Current synthetic-host guard:** genuine DevelopmentLicenseVerifier now exposes exact pool qualification; actual creator_runtime accepts its own pool and refuses a different pool with the same URL503 before any second connection/provider/write. [Source-qualified receipt](../20261001-mac-studio/synthetic-pool-qualification/README.md). This does not approve processor policy/consent/retention or activate generation. W3’s explicit verified:false synthetic qualification and genuine W1 generation-task consumers remain in progress.
+
 This is the current nine-package/R01–R14 matrix. Earlier iMac counts, provider runs, archive and PR40-pending statements are preserved verbatim in [dated history](finish-matrix-history-20261002.md); they are not current runnable data. The [custody manifest](current-record-reconciliation.json) pins their original bytes and SHA256. The complete [successor assignment](../../../../../docs/workstreams/prompts/W2-resume-20261001.md) and [Mac Studio handoff](../../../../../docs/workstreams/handoffs/W2-creator-ai-20261001-mac-studio.md) remain binding.
 
 Current main d5184839 includes W2 PR40/65/77/79/91/99/100/104/108 and the current W4/W5 narrow gates. The W2 recovery branch consumes W1's exact readiness ea251610 and two-file native7400de38 correction; its normal PR/CI/merge is pending. Four fast exact-head jobs passed for79/108; six macOS jobs remain queued/unpassed. Source integration does not establish release readiness.
