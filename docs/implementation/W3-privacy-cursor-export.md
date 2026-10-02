@@ -79,3 +79,7 @@ prerequisites, independent install/catalogue receipts, real current owner
 composition and personally operated positive/negative leased-job verification.
 No real export, retention, deletion, native acceptance or completion of W3 is
 inferred from this implementation. No new test code is included.
+
+Owner review correction: original verified ownership is mandatory for **all export scopes**, including creator and thread. Old jobs with NULL ownership refuse. W8 must publish its actual job-capture and family-authority consumer for those scopes; current profile ownership alone never expands an originally authorized job. The fence rechecks each original owned creator and applies only the original job creator/thread filters to the complete family set.
+
+The complete PreparedUsageRetention source is consumed from W2 PR132 head725413029306da6ce80353a027492ecc9bae076d, with the real held0165 allocation and unchanged SQL checksum1c118f5ec90a5a3f3578e056af14d5e56b1379464977c4a79bd6c2b62be7f17e. This is no alias or historical SQL/ledger rewrite. Both owner seams and actual installation remain prerequisites.

@@ -107,7 +107,7 @@ BEGIN
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0206_w3_privacy_cursor_export')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0087_w8_privacy_task_commit_fence' AND checksum='33e619bfdea66355e1d8d2b90ed2d0389f21ae024fda63e1b984c99aede847ef')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0163_w2_usage_lineage' AND checksum='16dddc80bebe32979f822104d8f411e0f545b4e212da6dc147c72f959e660f17')
-  OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0079_w2_usage_retention_expiry' AND checksum='1c118f5ec90a5a3f3578e056af14d5e56b1379464977c4a79bd6c2b62be7f17e')
+  OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0165_w2_usage_retention_expiry' AND checksum='1c118f5ec90a5a3f3578e056af14d5e56b1379464977c4a79bd6c2b62be7f17e')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0056_w3_correction_feedback_lineage' AND checksum='1044700d59b9dbb2d2b36d890496de0be6fb3d53c4409504f3c7693906866c35')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0057_w3_feedback_consent' AND checksum='08cb6f37c12ca3131b2e307a237569aa4d104fc627566e619a39fa18a1814d11')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0059_w3_recording_association' AND checksum='b61d50d7f85c0ef468e00a8d2d6b737b4d405a9349810c552f7d9df7f527c42e')
@@ -132,13 +132,17 @@ BEGIN
  INTO j FROM creator_trust.privacy_job WHERE id=jid AND account_id=aid AND kind='export' AND scope=sc
   AND creator_id IS NOT DISTINCT FROM c AND thread_id IS NOT DISTINCT FROM t
   AND verified_at IS NOT NULL AND verification_ref<>'' AND state NOT IN('complete','dead_letter') FOR SHARE NOWAIT;
- IF NOT FOUND OR (sc='account' AND (j.ownership_ref IS NULL OR j.owned_creator_ids IS NULL
-  OR cardinality(j.owned_creator_ids)>100 OR cardinality(j.owned_creator_ids)<>(SELECT count(DISTINCT x) FROM unnest(j.owned_creator_ids) x)))
+ -- Every export scope must retain the real original verified ownership
+ -- snapshot. Old NULL creator/thread jobs refuse; current profile metadata
+ -- alone must never enlarge an originally fan-only authorized request.
+ IF NOT FOUND OR j.ownership_ref IS NULL OR j.ownership_ref='' OR j.owned_creator_ids IS NULL
+  OR cardinality(j.owned_creator_ids)>100
+  OR cardinality(j.owned_creator_ids)<>(SELECT count(DISTINCT x) FROM unnest(j.owned_creator_ids) x)
  THEN RAISE EXCEPTION 'Original verified export unavailable' USING ERRCODE='42501'; END IF;
  SELECT job_id,domain,lease_token,lease_until INTO task FROM creator_trust.privacy_task
   WHERE job_id=jid AND domain='conversation' AND state='running' AND lease_token=token AND lease_until>clock_timestamp() FOR SHARE NOWAIT;
  IF NOT FOUND THEN RAISE EXCEPTION 'Current original conversation export lease unavailable' USING ERRCODE='42501'; END IF;
- owned:=CASE WHEN sc='account' THEN j.owned_creator_ids ELSE ARRAY[]::uuid[] END;
+ owned:=j.owned_creator_ids;
  PERFORM id FROM creator.creator_profile WHERE id=ANY(owned) AND account_id=aid ORDER BY id FOR SHARE NOWAIT;
  IF (SELECT count(*) FROM creator.creator_profile WHERE id=ANY(owned) AND account_id=aid)<>cardinality(owned)
  THEN RAISE EXCEPTION 'Original creator ownership changed' USING ERRCODE='42501'; END IF;
