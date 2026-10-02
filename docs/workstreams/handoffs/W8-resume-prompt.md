@@ -1,5 +1,9 @@
 # W8 resume prompt — complete the workstream
 
+## Latest host cleanup direction — 2026-10-02
+
+[Permanent resource cleanup](W8-resource-cleanup-2026-10-02.md) supersedes old occupied-worktree/build statements below. W8 removed24 disposable build/cache/dependency paths (5.392GiB allocated before deletion), preserved private tools/results/configuration/backups, verified the retained native checkpoint hash and kept stopped database containers/volumes/compiler setup. The clean fully pushed W8 and60fb worktrees are removed after this cleanup documentation merges; create a fresh checkout and install/rebuild locked dependencies for continuation. No primary/peer/shared SDK/global cache/database/private-data cleanup or new acceptance is implied.
+
 ## Human-requested seamless handoff checkpoint — 2026-10-02
 
 Read the [complete successor prompt](W8-continuation-2026-10-02-codex.md) first. All source is committed/pushed: durable reply review draft #200/head10624047; private development store draft #201/heade8c2608a; finite feedback lifecycle draft #192/head2e1de9d7. They retain genuine application acceptance and activation work. Worker/terminal negative drafts #131/#145 also remain open. Old #83 is closed as superseded; no branch history was removed.
