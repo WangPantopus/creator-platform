@@ -1,0 +1,40 @@
+{
+  "observedAt": "2026-10-02T15:14:02.449Z",
+  "source": "4f485de1245f29701859be4529897fa05d3093d4",
+  "catalogue": {
+    "database": "creator_w3_dev57_1790946508212",
+    "login": "creator_runtime",
+    "registered": 57,
+    "lineage_registered": true,
+    "feedback_consent_registered": true,
+    "acceptance_installed": false,
+    "terminal_denial_installed": false,
+    "terminal_journal_installed": false,
+    "generation_scope_installed": false,
+    "terminal_scope_installed": false,
+    "finalization_installed": false,
+    "finalization_registered": false,
+    "original_closed": true
+  },
+  "readiness": {
+    "status": 503,
+    "body": {
+      "ready": false,
+      "capabilities": [
+        {
+          "name": "trust_runtime",
+          "required": true,
+          "state": "unavailable",
+          "code": "trust_unconfigured",
+          "checkedAt": "2026-10-02T15:14:02.442Z"
+        }
+      ]
+    }
+  },
+  "sqlApplied": false,
+  "terminalTransitionOperated": false,
+  "helpfulFeedbackOperated": false,
+  "introOfferOperated": false,
+  "approvedFeedbackPolicyConfigured": false,
+  "approvedIntroOfferPolicyConfigured": false
+}
