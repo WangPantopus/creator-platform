@@ -1,0 +1,2982 @@
+{
+  "referenceSource": "2f0319dbb6979878c5a9019e68503506902f9ea0",
+  "comparison": "decoded RGBA, without color normalization or threshold; diagnostic only",
+  "sets": {
+    "local3867b74": {
+      "captureCount": 110,
+      "images": [
+        {
+          "name": "testAuthorIdentitySurfaces.light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "c24a82db5166c90c611d69c1d089d3d2ff5929912abf4e351a9ed13b44942ddd",
+          "decodedRgbaSha256": "c10f0ebb826dfc42d0e8279d3836e9a2a258818bcc764ae0aeb5ae39305e275e",
+          "rawDifferentPixels": 31530,
+          "maxChannelDifference": 95
+        },
+        {
+          "name": "testAuthorIdentitySurfaces.night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "35edac11167d695617195f957ce37c243d5b47f0f0d3c690224fb8706144a27d",
+          "decodedRgbaSha256": "7534a5c213ed72065f87c786aafeb01616616d281b687fd3867f83954923002a",
+          "rawDifferentPixels": 693011,
+          "maxChannelDifference": 94
+        },
+        {
+          "name": "testComponentCatalogThemes.AccessLines-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "3383281d0a3b5886a7c94b6118075924257075ed7d04862f16db25809efae9b4",
+          "decodedRgbaSha256": "22acd0dc972ee822d6de3a980d845d1bdeb7c0e91a1391d7af486153e5e12e8c",
+          "rawDifferentPixels": 1625,
+          "maxChannelDifference": 77
+        },
+        {
+          "name": "testComponentCatalogThemes.AccessLines-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "de132f300ffc0dc09e7a145ace1b084714c80182509ca3f2c4e443d42ecaafb9",
+          "decodedRgbaSha256": "ea106628216799afe6f4a707d8274eb484e0e76a7935d1441fe2f09060f9bf55",
+          "rawDifferentPixels": 21817,
+          "maxChannelDifference": 73
+        },
+        {
+          "name": "testComponentCatalogThemes.AuditBanner-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "43e4cafcc337def67193765900a67d286705e7f1f958098b0ddacd2fb686b024",
+          "decodedRgbaSha256": "8528a2870bc7a7a0f25504a1b326eae928665c7ee00c837c13171bedb2f5170c",
+          "rawDifferentPixels": 616,
+          "maxChannelDifference": 62
+        },
+        {
+          "name": "testComponentCatalogThemes.AuditBanner-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "2b09bd5534d3a6e62b45d63510e6a8065942b87e71ad4785791368729f6cc7f1",
+          "decodedRgbaSha256": "4be1ae58c1e9193116e1f66cae99729ffd9998e332c0ef0485f0d0b5d6491d7f",
+          "rawDifferentPixels": 81756,
+          "maxChannelDifference": 63
+        },
+        {
+          "name": "testComponentCatalogThemes.AuthorLabel-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "b2e4ce24271b0c792a3d96c649451fbeed2f0f01e83533c7115f2133350e2ede",
+          "decodedRgbaSha256": "d002c226f37edfbe9f641b132dd3913e9cb293d61beefa40d6e2b20f698b3946",
+          "rawDifferentPixels": 17882,
+          "maxChannelDifference": 77
+        },
+        {
+          "name": "testComponentCatalogThemes.AuthorLabel-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "03d7f963d5ddc8a2c7f587a1dbaf5cc45b79cf2dd477b379e00d719fe99a86d7",
+          "decodedRgbaSha256": "3ca8de9ca5dab2e12299be1ee85819659cc255d8d6daaf289fd01da250161fa4",
+          "rawDifferentPixels": 25667,
+          "maxChannelDifference": 72
+        },
+        {
+          "name": "testComponentCatalogThemes.Avatar-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "0107c752a9e58e554868e5a9fe72d9bc17973b123b7f4213a4545bb6e58cbafb",
+          "decodedRgbaSha256": "cddf366cf209982a093fd81238a965c50f54e004910b3935a1cb695d6bfc8249",
+          "rawDifferentPixels": 54521,
+          "maxChannelDifference": 46
+        },
+        {
+          "name": "testComponentCatalogThemes.Avatar-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "83432ad579c2626ac9d88f9f7ff920599dba320c2cf4d30a9f65963b42088513",
+          "decodedRgbaSha256": "b830a635f88f3b2746048f3efcbbec25da7faac57ef2e09cad8ca79e3b968a0d",
+          "rawDifferentPixels": 50002,
+          "maxChannelDifference": 45
+        },
+        {
+          "name": "testComponentCatalogThemes.Button-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "e9adf6895a09a59abfd944d4a543d39a418d8b923b4279ab4769f860dffea33f",
+          "decodedRgbaSha256": "0f4994165a2c6624a6233592fd612d21c1b0ad595b1cc47395d84008aa5a2e53",
+          "rawDifferentPixels": 34603,
+          "maxChannelDifference": 62
+        },
+        {
+          "name": "testComponentCatalogThemes.Button-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "cd1baf50f308cda5994517992781b95177199d63a4a9866044547562c8c288ea",
+          "decodedRgbaSha256": "ed0fcab26fa45b8c442ccae46a0a0e52a5764fadcd60ce9def113625b8373f8f",
+          "rawDifferentPixels": 90374,
+          "maxChannelDifference": 77
+        },
+        {
+          "name": "testComponentCatalogThemes.CallChip-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "aedb607d23fa4dd97a517f7b66fbb90c4c64f2e49c6e292af55aa7bed99acaa6",
+          "decodedRgbaSha256": "6d792f8f5325798e84483712dfacf8feafbedb562967c46d41b235fcfd6d5f3b",
+          "rawDifferentPixels": 68778,
+          "maxChannelDifference": 94
+        },
+        {
+          "name": "testComponentCatalogThemes.CallChip-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "d0e10afd5724d72599a752ad9d2f1da6a745b4d38edc809dbc66024b603c6b2f",
+          "decodedRgbaSha256": "7588f3e87d35c1bea643b7f60485fd14973364d50881e7fd517d3cf3041267bd",
+          "rawDifferentPixels": 100880,
+          "maxChannelDifference": 91
+        },
+        {
+          "name": "testComponentCatalogThemes.CapacityHeader-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "ccbd54ae7daa6d43066fdedc48a19148b9773e4eedc8d4fd33bc26a0187e6d33",
+          "decodedRgbaSha256": "f687166e67a9c7ca1c57140aa31c16f2a03246a38fd77bd99283943d067bb6ea",
+          "rawDifferentPixels": 5132,
+          "maxChannelDifference": 111
+        },
+        {
+          "name": "testComponentCatalogThemes.CapacityHeader-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "a480d110d9e265814887c506d5054be1c23e14a1ebf59b9c9dd0f1da0d97e5af",
+          "decodedRgbaSha256": "b552ab35754b7f5e075021d4cb1c07b192f851c519f04a00f156554dc80055c1",
+          "rawDifferentPixels": 182113,
+          "maxChannelDifference": 100
+        },
+        {
+          "name": "testComponentCatalogThemes.CitationChip-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "f1f44d4a667808ea3c85d87fcdbb072c56dd66b544c5f94913d553288f3b1e1a",
+          "decodedRgbaSha256": "b1c9d283d9403333b251fa0c5b45b858bc2c3a844e97a6e73ce0e9af72e70254",
+          "rawDifferentPixels": 2305,
+          "maxChannelDifference": 71
+        },
+        {
+          "name": "testComponentCatalogThemes.CitationChip-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "63ff99788f1070e74cbe897595e9c5aa334e81bcc386815cc0e926687d18cce9",
+          "decodedRgbaSha256": "2fc9231874b00e7ca3a37cb681e535921be38c5332cae9a9437d53d1809c529c",
+          "rawDifferentPixels": 26324,
+          "maxChannelDifference": 72
+        },
+        {
+          "name": "testComponentCatalogThemes.Composer-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "8e57b39094b3fd745b2d9fdd7e0630e1b95fde73c5bf165fe994813db19a1b57",
+          "decodedRgbaSha256": "ca5e323dc1487518dfb2ce1a12de0fdb96d2dddd90331c01ed8824ffea39e2c4",
+          "rawDifferentPixels": 42992,
+          "maxChannelDifference": 85
+        },
+        {
+          "name": "testComponentCatalogThemes.Composer-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "9b5a8dfefc28afea4ff6348d9c782c29f84dcf0160fffb4dcac5911a5b17ffda",
+          "decodedRgbaSha256": "88c0891709af405cdbda268f8d89bc4bf91b9bf3f12d8288c7458a7d460e7aeb",
+          "rawDifferentPixels": 183188,
+          "maxChannelDifference": 73
+        },
+        {
+          "name": "testComponentCatalogThemes.ContextCard-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "d6a4bc1d052896b8dcc797f43b52727dfa352845e068d0182dc77237468da5cd",
+          "decodedRgbaSha256": "acfe4d265de7bd8f8ace40433015b1897bdd063c939bd8836d962a4a156d29f8",
+          "rawDifferentPixels": 703,
+          "maxChannelDifference": 85
+        },
+        {
+          "name": "testComponentCatalogThemes.ContextCard-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "3105655b11ccf7d77b96b3bfd26069aa84d8a4057911768edaa1354d12c9449b",
+          "decodedRgbaSha256": "ec79af96b69472e956e637409da965e75017e7ea4982a115eae2efac78f3d1be",
+          "rawDifferentPixels": 10977,
+          "maxChannelDifference": 72
+        },
+        {
+          "name": "testComponentCatalogThemes.Correction-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "1343b050ec08f42e6c24ba1f8fa053c6e713b0f1a87d710f784ae4cf0b43f392",
+          "decodedRgbaSha256": "7703c33d0af6126a469a2e61c59a712e25606534ba875c8683e5250bfcebf1db",
+          "rawDifferentPixels": 13590,
+          "maxChannelDifference": 77
+        },
+        {
+          "name": "testComponentCatalogThemes.Correction-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "3e3bc222547d3f0da5392897466b299420cbbbfeafd82fc407710981902fe9d2",
+          "decodedRgbaSha256": "c8fd0455a8ac2a1b324afddbfd5cc3fdd3a67576a94fa8fd523bfa7212479647",
+          "rawDifferentPixels": 244344,
+          "maxChannelDifference": 84
+        },
+        {
+          "name": "testComponentCatalogThemes.Countdown-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "b9f8daf8963be3bd95f8e36676708c3cf1e01996cece014012f5fa07eeb5ab73",
+          "decodedRgbaSha256": "3f262c85ac494e6ed3e9d5dc218b3e193bcc9f4a4e6a48ba38f7e9ca2ee81565",
+          "rawDifferentPixels": 3224,
+          "maxChannelDifference": 119
+        },
+        {
+          "name": "testComponentCatalogThemes.Countdown-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "73fd06a95740159f8888c69345d24b3306505546cc40b656cd74e8b02a347f89",
+          "decodedRgbaSha256": "3526cf3665f4e952ec9930dec5220940be140a462ac41fb0c424dcf5761e0ecf",
+          "rawDifferentPixels": 10389,
+          "maxChannelDifference": 118
+        },
+        {
+          "name": "testComponentCatalogThemes.Dialog-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "3a5b4e3dc5089a7b7bcabb4dc21ad55ecc1ab0c70ad43c5a546649b44eb609e2",
+          "decodedRgbaSha256": "0772a6b05267ef23bf5d91e3bf3d71c650f707fb7ff211a9241650f3202630ef",
+          "rawDifferentPixels": 16439,
+          "maxChannelDifference": 49
+        },
+        {
+          "name": "testComponentCatalogThemes.Dialog-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "4b9a37ace9d50dce452bf0eaf480522fe1adf72d3fef00c0ef39afa5cc0addac",
+          "decodedRgbaSha256": "adcf6f83f11384501b038adb941d1e76a4c36bc3c5471a5712ad40f66729e5d6",
+          "rawDifferentPixels": 34733,
+          "maxChannelDifference": 39
+        },
+        {
+          "name": "testComponentCatalogThemes.DigestItem-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "9dffc31b9fb5dda3ac3c37dea204525f82fdc65c8d94da322735df5f27ee3794",
+          "decodedRgbaSha256": "1ae32d6a1b43f2cfeb585d8b737a52398d454973d9a77a87e5b855cb7119d83c",
+          "rawDifferentPixels": 11971,
+          "maxChannelDifference": 97
+        },
+        {
+          "name": "testComponentCatalogThemes.DigestItem-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "658723a895014027648b401c9377356b53b551c0d8b8321dee6d2e1ab9379132",
+          "decodedRgbaSha256": "f80844e45ccef4b1dd82f516447f9647b237b247898b6d9fab366e1861583d7a",
+          "rawDifferentPixels": 321849,
+          "maxChannelDifference": 98
+        },
+        {
+          "name": "testComponentCatalogThemes.EmailFrame-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "a4d271f2f819239c0137cd49fc533d458152ccdd023ff2bfe38e8c2cbaff969a",
+          "decodedRgbaSha256": "37064d0f5d6fefe55302f03894a14e5d637f1d7c7885ebe2366d2de2862b89ba",
+          "rawDifferentPixels": 7208,
+          "maxChannelDifference": 89
+        },
+        {
+          "name": "testComponentCatalogThemes.EmailFrame-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "447174203e286d0e67124c00b80e33ca8761a4aa04a78abf06d227c1103adb0a",
+          "decodedRgbaSha256": "0442f7f7241db65d104b170de8edabdc7526b39c4efdf693a0742a7047a488ce",
+          "rawDifferentPixels": 197186,
+          "maxChannelDifference": 78
+        },
+        {
+          "name": "testComponentCatalogThemes.EmptyState-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "dab0c2be76af17d9fae7dd5c6e71ce53c93f73db351ffc3a0ab434a3831ee617",
+          "decodedRgbaSha256": "63b316ec821a357b768c564300daa6a759cba5aa2102ad60a1a2f3ebfea50edc",
+          "rawDifferentPixels": 890,
+          "maxChannelDifference": 64
+        },
+        {
+          "name": "testComponentCatalogThemes.EmptyState-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "90aada41be8aacb8c144010f05cda20672c15718d161b7e0a20df2e213396f38",
+          "decodedRgbaSha256": "81bef5fc0428ba737ed9871a0c85518f8e630fcb453882a454282e30e3c2750e",
+          "rawDifferentPixels": 17388,
+          "maxChannelDifference": 66
+        },
+        {
+          "name": "testComponentCatalogThemes.EtaLine-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "28ddb2c87d060c99a25c13c0caf4d1af619ca449b31ea1b8f9f583c945aa0da8",
+          "decodedRgbaSha256": "a48625669906ac0ff88b285a228028518f46744b1656805196035c4d332bbe2b",
+          "rawDifferentPixels": 497,
+          "maxChannelDifference": 62
+        },
+        {
+          "name": "testComponentCatalogThemes.EtaLine-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "928ce3bbe80b11415f9292156e655d3d311dd7a8f97ccb9a6fdfd29d94056092",
+          "decodedRgbaSha256": "6e9cfd30898bc1a6c446b6cfb176e83b7e350d8fa11dda886c766aa100a570f1",
+          "rawDifferentPixels": 8629,
+          "maxChannelDifference": 63
+        },
+        {
+          "name": "testComponentCatalogThemes.IdentityStrip-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "fed2ce53b5826d37c7b90e6141f77bf07c736f70b79f10a93e8d22b33c437f71",
+          "decodedRgbaSha256": "f4db0bd45ddfd67340175748ef4d40005efbb769820ac97d039f123b4b496009",
+          "rawDifferentPixels": 52726,
+          "maxChannelDifference": 79
+        },
+        {
+          "name": "testComponentCatalogThemes.IdentityStrip-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "c229c0d771cc843e03d7022d9dab8d1a97c59d23b69af5a66739994f2c32c58d",
+          "decodedRgbaSha256": "289a0266603c7208096e2f9e8d00994659dd4041a53b2f0352b630f7de6a7bdd",
+          "rawDifferentPixels": 216483,
+          "maxChannelDifference": 66
+        },
+        {
+          "name": "testComponentCatalogThemes.IncludeList-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "6358a8f0bf00b686d589336ab3b7725f1ee30ccb8554e1699e95ce27ab61b15a",
+          "decodedRgbaSha256": "d29a8ccbbb16f46eda90711ba990725926100b0e0065f2dd1f07a027065fbe4d",
+          "rawDifferentPixels": 1452,
+          "maxChannelDifference": 62
+        },
+        {
+          "name": "testComponentCatalogThemes.IncludeList-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "5ae13b6bf975fa2a8c582e47fdd8d2858e028afaf9f10eed5ab76bba89e2f55f",
+          "decodedRgbaSha256": "fe9fb6bc2a173d2d989a4c7c720bfde6239551a555ebb0000cba61ad97d927d1",
+          "rawDifferentPixels": 43172,
+          "maxChannelDifference": 63
+        },
+        {
+          "name": "testComponentCatalogThemes.InsteadMenu-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "81051c7828c57db3625bc3d55563238394ec6cba2a9382f305d49721f9baf7ad",
+          "decodedRgbaSha256": "6824d120d2c72de933ba12b075240f919798c1294cfd5be265c168c59b70f024",
+          "rawDifferentPixels": 2286,
+          "maxChannelDifference": 94
+        },
+        {
+          "name": "testComponentCatalogThemes.InsteadMenu-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "732cbc03c815acb306c753c751cccf5cac12b73e3f31f7115f04a8446df5614f",
+          "decodedRgbaSha256": "e85fc2b5d6c0b77283c54d2711593999c62c17296da1fd7c525b0b4c58c95f65",
+          "rawDifferentPixels": 46527,
+          "maxChannelDifference": 94
+        },
+        {
+          "name": "testComponentCatalogThemes.LabelPreview-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "022892c25345b447cd0a68b3971052e14e45e285c7ab7d00e702034138be589c",
+          "decodedRgbaSha256": "4147f6b1034af77d82a0a1b7fba84c2461ff3f4a8794d06b9189f00d96dd9ead",
+          "rawDifferentPixels": 8169,
+          "maxChannelDifference": 80
+        },
+        {
+          "name": "testComponentCatalogThemes.LabelPreview-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "daf44ae88e067bdd5cbd6b8ce3ad7d29753117878388040a88e87c0d88c7cb2f",
+          "decodedRgbaSha256": "db7100ed977736a18389bb9f82796d463f84096f1b87637e233f3f88040a3389",
+          "rawDifferentPixels": 21561,
+          "maxChannelDifference": 72
+        },
+        {
+          "name": "testComponentCatalogThemes.Mark-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "a14b54fbe71f2956c2a596edd08695ce649e4b7b0898866d9ab78fb516abb1ff",
+          "decodedRgbaSha256": "74119d49d533f30c711e2da0ed0c545e1d6524afcf908bb1a0425e4d0f11477a",
+          "rawDifferentPixels": 5131,
+          "maxChannelDifference": 84
+        },
+        {
+          "name": "testComponentCatalogThemes.Mark-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "d2f3dcd1fa7a01dad53c101aa45680a7a5d2bc488b813e69973e6146d9f70f38",
+          "decodedRgbaSha256": "8243e833148870c117032842f0f151a90b20a8b2ed7d07bb5a0f4d6fd3e1407e",
+          "rawDifferentPixels": 7120,
+          "maxChannelDifference": 86
+        },
+        {
+          "name": "testComponentCatalogThemes.MemoryChip-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "5389a8cc093a0ef898970598850f45ab2468a49536efae249809565b8cd1a549",
+          "decodedRgbaSha256": "ecc7ecd24804932e768cc81d7ed36493b5816fc616543a7d2503cb2a524fe6f2",
+          "rawDifferentPixels": 12489,
+          "maxChannelDifference": 71
+        },
+        {
+          "name": "testComponentCatalogThemes.MemoryChip-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "2736036e645846675b962d5010fa7937d07c9f5d28611675f9a5aebf16c01478",
+          "decodedRgbaSha256": "2ba0fc7720e91a324b5e715594d0e06cf22a010c70853c454503d67bd0811f28",
+          "rawDifferentPixels": 231711,
+          "maxChannelDifference": 72
+        },
+        {
+          "name": "testComponentCatalogThemes.Message-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "f519329ce2cddc30869c9b2b3ed6ce72fc46c964ec60bc7a627d73db4272c362",
+          "decodedRgbaSha256": "14756b29c299dc363afc07a60192a9e15c94d6b5d73be72c952bc903ac1bf562",
+          "rawDifferentPixels": 31916,
+          "maxChannelDifference": 97
+        },
+        {
+          "name": "testComponentCatalogThemes.Message-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "836c16318cecf2701bd891011a024686919837f5b1f600dabd0b5269e547c36b",
+          "decodedRgbaSha256": "5bd4e925a0fd7c855823158f4211b9113e079a9fd8aa3b99219a88dafdf9baa6",
+          "rawDifferentPixels": 694474,
+          "maxChannelDifference": 98
+        },
+        {
+          "name": "testComponentCatalogThemes.ModeList-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "2c2bb8ce9c60ba8cef2c7fa55757833ef9aed5fbd1e16a56301fb3269a2483f6",
+          "decodedRgbaSha256": "06c92efb9ee35cb16e92bec1fb3dbb649d76e990d80bc631a48d2e7da63a5b4a",
+          "rawDifferentPixels": 677,
+          "maxChannelDifference": 59
+        },
+        {
+          "name": "testComponentCatalogThemes.ModeList-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "b15d717c0f3affd3bfcb231b619d87da36fc6c84c58c0a8ec540c574ce25dd50",
+          "decodedRgbaSha256": "a69acc965249d517cdbb8f12650b1fbd47f85d69ef0f50e0250931c36fee3e73",
+          "rawDifferentPixels": 22550,
+          "maxChannelDifference": 67
+        },
+        {
+          "name": "testComponentCatalogThemes.Note-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "53b5f74db86c9a8f1e6436b27dc90676effdfda2e21f6cc97235bdae09abd9b0",
+          "decodedRgbaSha256": "056734b92461362f648b8f6921293e5b10b94de1601008945d482a9d90200f6f",
+          "rawDifferentPixels": 11335,
+          "maxChannelDifference": 74
+        },
+        {
+          "name": "testComponentCatalogThemes.Note-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "f160fd8a2b3ce6e7e9cd13daa4711d498b37c7123a7013fcc5e0ad24d7f9f8aa",
+          "decodedRgbaSha256": "5ffbf8e36020c4a1211dd0a581bf18a4dee8ae5d2da212a8c9f3986e81896699",
+          "rawDifferentPixels": 538906,
+          "maxChannelDifference": 77
+        },
+        {
+          "name": "testComponentCatalogThemes.Notice-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "2633440cc110ff38284645059e75ef380ea4bf9fc046b7d39c8b111b631e18e3",
+          "decodedRgbaSha256": "fa858be83c56f49a6f73b4cc7cc44cc42fd291363ab7d10c6f71af81f7849825",
+          "rawDifferentPixels": 5420,
+          "maxChannelDifference": 44
+        },
+        {
+          "name": "testComponentCatalogThemes.Notice-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "630e71c931a02ae7ad45045a96749645ab41b909e5433ade4a5b6ca64f0eb310",
+          "decodedRgbaSha256": "e3951b86c0818652c51336cb515980f7d634575d95f7baff040064d6aa68b135",
+          "rawDifferentPixels": 164483,
+          "maxChannelDifference": 49
+        },
+        {
+          "name": "testComponentCatalogThemes.NotificationRow-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "33efcf5f50c89564ec7b35daa35c00b9191464f10a2881adb2c9848524e70878",
+          "decodedRgbaSha256": "79a1d497b48f562487240cc1cbbf10b28fb9f244bf8d66ab6ae6d75c543af146",
+          "rawDifferentPixels": 5388,
+          "maxChannelDifference": 62
+        },
+        {
+          "name": "testComponentCatalogThemes.NotificationRow-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "b11e795dacf1a24692815db8a7f61283b02d18c16cd267bb5dca9f0f3c0236ee",
+          "decodedRgbaSha256": "5ba9618a254941a6c0053f4732c11976de0b6608ae291f23d4903a1ea702d4e8",
+          "rawDifferentPixels": 83495,
+          "maxChannelDifference": 63
+        },
+        {
+          "name": "testComponentCatalogThemes.QueueCard-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "f45890408ed1eaa03a549a731c05b078c08dda8b037317e77de6c1bb4dd5d93a",
+          "decodedRgbaSha256": "37a56aa55662faf95b6b26fb12736b0cd3aba93bac6c3d5f61ec5a5b5b3df900",
+          "rawDifferentPixels": 14295,
+          "maxChannelDifference": 119
+        },
+        {
+          "name": "testComponentCatalogThemes.QueueCard-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "aae02db0f5d56139a9b1b660a76730ed367da4efcb7b5be135cb00c9b7f6851f",
+          "decodedRgbaSha256": "5cc74295ff165ccd465b2d82d4018ce32f01da23a9f0352ea8b992ab1c9c44d2",
+          "rawDifferentPixels": 41110,
+          "maxChannelDifference": 118
+        },
+        {
+          "name": "testComponentCatalogThemes.ReactionChip-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "362ac08774c8b3a0f303184c2250a525223fb0374ea11bb9a6392cc1da1c6b26",
+          "decodedRgbaSha256": "db4bb8b990bd52008c18f337fd5116bd2c8d9e7343a4b719ff1e65bbd5425f4d",
+          "rawDifferentPixels": 2266,
+          "maxChannelDifference": 84
+        },
+        {
+          "name": "testComponentCatalogThemes.ReactionChip-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "adad4cd9f60354b12f72d4e6466b341dce9f579fcb9d44f67cf0487e7efef354",
+          "decodedRgbaSha256": "463b4d719d8eb5fa549d0308c559688395e686ebc27cc2f20f8650a7fcd70e7b",
+          "rawDifferentPixels": 28484,
+          "maxChannelDifference": 72
+        },
+        {
+          "name": "testComponentCatalogThemes.Receipt-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "ba3b8651d56b32d06034b0d08adad3b0f6948d3c5a9739489a35dd907147b85b",
+          "decodedRgbaSha256": "f8536fd79576e2dcc3a4e2212e03d32b276219cd1c92d88a7b0d983c4346cb8f",
+          "rawDifferentPixels": 5194,
+          "maxChannelDifference": 117
+        },
+        {
+          "name": "testComponentCatalogThemes.Receipt-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "306b92a8ca38c3b487dfc1e6ad56761a52dc0cb4ea879ad4161a39605f594ecb",
+          "decodedRgbaSha256": "4de7ac39fcb6739a11177449e2f934f547c2c658b0c41f8a774d3e9a039c3671",
+          "rawDifferentPixels": 27411,
+          "maxChannelDifference": 148
+        },
+        {
+          "name": "testComponentCatalogThemes.RequestStatus-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "b30479b8fb24d05a20ca580817072328ff2ad1aca292144f41b7614919e94ab6",
+          "decodedRgbaSha256": "6d4d8eb114b348e2ca87b21769ff7a1d158a09ac5e2f01e5913ddbb7a9ba644b",
+          "rawDifferentPixels": 1950,
+          "maxChannelDifference": 88
+        },
+        {
+          "name": "testComponentCatalogThemes.RequestStatus-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "10402ec52412f8c7f23e34708d9b585304102209eb2ca7d8f54a5ca227a3b226",
+          "decodedRgbaSha256": "2b60a8eee23733f502b666eead9287c9ae32add6010aa067837d509a600003f3",
+          "rawDifferentPixels": 23269,
+          "maxChannelDifference": 74
+        },
+        {
+          "name": "testComponentCatalogThemes.ReservedLabel-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "a86dd526b6776c06333c000faa6d8d6cb12f5ada9ba4cde1b58633b228952ce7",
+          "decodedRgbaSha256": "d48022c657d1821f04eb08e23a32735ae7338838af5b4389854db38a8116e55b",
+          "rawDifferentPixels": 2688,
+          "maxChannelDifference": 82
+        },
+        {
+          "name": "testComponentCatalogThemes.ReservedLabel-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "21f3b73fb380e019078a461c294ba7fe90e129dcd4ed7b122da90579fef67e0e",
+          "decodedRgbaSha256": "5b8e8297bed8ab499f5569f0a880540dd5bdad3dec3bb515fe2d8e4aacf8ed67",
+          "rawDifferentPixels": 29810,
+          "maxChannelDifference": 76
+        },
+        {
+          "name": "testComponentCatalogThemes.Seal-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "98bb6d324f13d167ce5eb127010fefde1df741a4828e7b3f88032482a3f80e7d",
+          "decodedRgbaSha256": "518b6989e68bcd918d3640e58704afa4c1e00635d6529821ad0734af0224b703",
+          "rawDifferentPixels": 46715,
+          "maxChannelDifference": 84
+        },
+        {
+          "name": "testComponentCatalogThemes.Seal-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "f1580eb9096d5168a32b1b0e90cf4d04834fcf4a4715262d4276197e9d97a8e3",
+          "decodedRgbaSha256": "6fc8ca236d5955ffb46e8f1b1becb39892bcf9cde9efe84b2d43a4320a35c166",
+          "rawDifferentPixels": 40608,
+          "maxChannelDifference": 86
+        },
+        {
+          "name": "testComponentCatalogThemes.Segmented-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "90633772cd29237b9bc45720529e777c76e8f0438af3362bceab0bcc44fa251f",
+          "decodedRgbaSha256": "ace9b10dd59513bc096c99a6d7dba5947a7cee2a3eb0f79e016436d714612b41",
+          "rawDifferentPixels": 455,
+          "maxChannelDifference": 97
+        },
+        {
+          "name": "testComponentCatalogThemes.Segmented-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "cc0468118c68aeb8cd8ac44123b48106d7f8149eb325bfc749ff0e1546dbfc15",
+          "decodedRgbaSha256": "186896a0e901d22323a0bd24ecb768d75d0f4bc344b29bd367bce181fb40c728",
+          "rawDifferentPixels": 58149,
+          "maxChannelDifference": 98
+        },
+        {
+          "name": "testComponentCatalogThemes.ShareCard-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "67bef317ccb229a415d49d1865c74f3febcc4969d24dfbe43d92055114453a57",
+          "decodedRgbaSha256": "5d46236d240f7f5edb0af9916df4ac15d0a7463744fc6231424a48408e4ed277",
+          "rawDifferentPixels": 7366,
+          "maxChannelDifference": 80
+        },
+        {
+          "name": "testComponentCatalogThemes.ShareCard-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "acc6bd676bff44c10ce71c4969e31c7a400a09b1bea6380cced27f54f8799b27",
+          "decodedRgbaSha256": "da9e9f56570e03828042f827dcb8ca7e98614570ce8965931c747becd2b0f578",
+          "rawDifferentPixels": 463234,
+          "maxChannelDifference": 76
+        },
+        {
+          "name": "testComponentCatalogThemes.Sheet-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "ebc2dc7d99caeea51f545f30c373b2fb3c2d7400fdcc7ba47b43611abbec66aa",
+          "decodedRgbaSha256": "6bb38b99b8f8199e247e4f5db64680737553693192f05b9a78ca3d9d81a9e962",
+          "rawDifferentPixels": 20127,
+          "maxChannelDifference": 117
+        },
+        {
+          "name": "testComponentCatalogThemes.Sheet-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "95533a65004af83cb42ad9672e7786b754fd6f78b38bf9dfddc45ab67f10a52c",
+          "decodedRgbaSha256": "e7fa83e21ebfe3dbca1df471e68f6cbc6b3e15ee0271b0c84ee9506367abb946",
+          "rawDifferentPixels": 42100,
+          "maxChannelDifference": 148
+        },
+        {
+          "name": "testComponentCatalogThemes.Sidebar-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "afeb8af8084b3d8e68f9a174293c901ef876544097f98490a048ffce0829f032",
+          "decodedRgbaSha256": "737a8a9e0dc54398637e48582d16824ad215f00096fee67d7b8c6103c14df38b",
+          "rawDifferentPixels": 1638,
+          "maxChannelDifference": 64
+        },
+        {
+          "name": "testComponentCatalogThemes.Sidebar-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "f2421e50e5058c502180325a39bb84105760cb19ac3d212392b1845145c75e3c",
+          "decodedRgbaSha256": "8c846f2f2c3eb6d11f3dbb4cb380e0e556d126ab1f4e3aa334e69fac8101a2e9",
+          "rawDifferentPixels": 59517,
+          "maxChannelDifference": 66
+        },
+        {
+          "name": "testComponentCatalogThemes.SignedMarker-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "7e07d642a8c5da8e0a51e2145183c7600935a5011fe0b24dd7808f3cb1c7fe1f",
+          "decodedRgbaSha256": "9de70d12494c6f5fede503fabcbb1cdf377acd8deb4b486a8900f3db2ec31549",
+          "rawDifferentPixels": 5595,
+          "maxChannelDifference": 97
+        },
+        {
+          "name": "testComponentCatalogThemes.SignedMarker-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "be010a539bc25cc9f81d48038467c2ee3e9bcf6277140daf7867a6565965c73f",
+          "decodedRgbaSha256": "ff53a323b01f0a87deca54a9f93a8e05ee70b18467c7fa68376368ccae367a57",
+          "rawDifferentPixels": 10125,
+          "maxChannelDifference": 98
+        },
+        {
+          "name": "testComponentCatalogThemes.SigningSheet-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "83b91b34b24c9871fc0186df3e662f94200642e03157d2021c59c42cc7d607d6",
+          "decodedRgbaSha256": "124800e97e1f1981bcf24c8063c912321965eccd0e4e4f8c3d46018170cbf6c3",
+          "rawDifferentPixels": 19373,
+          "maxChannelDifference": 97
+        },
+        {
+          "name": "testComponentCatalogThemes.SigningSheet-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "2ff0a9b2d256933d9b03860716609edbcc984a472f9b05334c3d4315648b919c",
+          "decodedRgbaSha256": "fbb2865964aebd84bd4245276c7d2b474827295aafc69fd358530169a8c3257c",
+          "rawDifferentPixels": 98859,
+          "maxChannelDifference": 98
+        },
+        {
+          "name": "testComponentCatalogThemes.Skeleton-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "7b926f180b73d735838adcc3a417c28317c0550e36d44fb88051c4f30136b9e4",
+          "decodedRgbaSha256": "b6bc77f8516aa5977853ffa92cf27c5867a2f6bb7ca378ccf62ffc2148f83170",
+          "rawDifferentPixels": 257,
+          "maxChannelDifference": 61
+        },
+        {
+          "name": "testComponentCatalogThemes.Skeleton-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "e01747baf89dbec0eb966e72daca9785ee46df13fea9955df4d0d3c08250c5d2",
+          "decodedRgbaSha256": "2e3b00da642670ee13dfeb8319d8ce0b803370a631c234b4bebfada7a4cc38df",
+          "rawDifferentPixels": 112972,
+          "maxChannelDifference": 60
+        },
+        {
+          "name": "testComponentCatalogThemes.SourceRow-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "004ac348c02929cd1cffda7f9124cb7cad878bfb5140936e6d68e3ca0feb05ca",
+          "decodedRgbaSha256": "a3e2ce9f1133da6e4d77f5e443e3b6cfd43635cb6d33fbd1f4aa22b409f76d3d",
+          "rawDifferentPixels": 2663,
+          "maxChannelDifference": 121
+        },
+        {
+          "name": "testComponentCatalogThemes.SourceRow-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "ab684151a5c7a8507a67f1e31235d9d5a239ab3a9a4d9cbba42f9532dc5324c6",
+          "decodedRgbaSha256": "08af31ea72eb47aa1d662c0e58f7abd355f62cda9bb1e671521cc21c17d41d91",
+          "rawDifferentPixels": 28628,
+          "maxChannelDifference": 104
+        },
+        {
+          "name": "testComponentCatalogThemes.SpendLimit-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "8b52221a959b6aeea72a85f0aabf1f3d449b0aa11d82581a2ed0ca7723f1399a",
+          "decodedRgbaSha256": "3c275a58a6e4e835e1449095c89e7e01f5c8fa5b8f89a5dc017b49a8c22a2eed",
+          "rawDifferentPixels": 1572,
+          "maxChannelDifference": 116
+        },
+        {
+          "name": "testComponentCatalogThemes.SpendLimit-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "a98884fc48b20654890d34668f2bb2dddeabaa761a1ace0a0d3a95c669f8b415",
+          "decodedRgbaSha256": "72ee910098b1e8511cf5fd2cf4457d187d38f7556cce833e5a98a780cdd4e576",
+          "rawDifferentPixels": 29843,
+          "maxChannelDifference": 111
+        },
+        {
+          "name": "testComponentCatalogThemes.StepIn-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "333020a67074293f761670f5b478c451c49ba358cfaa78cd388ab2f2dd1b3115",
+          "decodedRgbaSha256": "d0bdfb2c915f112cdcfe94e240ce83afeaffba0d532f14dff9817907448d73e1",
+          "rawDifferentPixels": 6385,
+          "maxChannelDifference": 64
+        },
+        {
+          "name": "testComponentCatalogThemes.StepIn-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "ebb7f183a095247cb411503dcde3c4fb374661ff2865ebf92d1916ddb6d75805",
+          "decodedRgbaSha256": "995048818c5c35f8adab63ea88abcd1d78029f3ceb5c397e80d1c50001d50b8d",
+          "rawDifferentPixels": 43602,
+          "maxChannelDifference": 66
+        },
+        {
+          "name": "testComponentCatalogThemes.StudioTabBar-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "bd9b3438d46676f491127282e50ec23fb160489802ba37b54aa802d3ce80dcde",
+          "decodedRgbaSha256": "bbb9776f6f0fa790bcf2b79e337b665e13d74139f7b0679fb6f6901c5d72358c",
+          "rawDifferentPixels": 504,
+          "maxChannelDifference": 216
+        },
+        {
+          "name": "testComponentCatalogThemes.StudioTabBar-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "ff0f89c8c1d799d1f0bc257a3d9100ac6015997acc8d682d6a8f4541dc2ff2fc",
+          "decodedRgbaSha256": "a91d6e577eb9fd99a98c445599ef990e154a0884d6154f022871ed0c7f112edb",
+          "rawDifferentPixels": 10814,
+          "maxChannelDifference": 215
+        },
+        {
+          "name": "testComponentCatalogThemes.SystemLine-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "ee2d6c414308b2c061856a34722d8a761ea2ce077746a3f61387365c6470a785",
+          "decodedRgbaSha256": "a272fa34a3f48bc11fb2866b83d2361fb36df26c5f4bf8820f316159915e71f0",
+          "rawDifferentPixels": 3726,
+          "maxChannelDifference": 83
+        },
+        {
+          "name": "testComponentCatalogThemes.SystemLine-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "91294d786a84c0d29d45df469b6e0dc2efbae17d5c665317d60160baebb784ca",
+          "decodedRgbaSha256": "8d1bb10af00dd75449055f93e86d7f863b7f68aa532ee8e9add317d03cfa0e2d",
+          "rawDifferentPixels": 29516,
+          "maxChannelDifference": 71
+        },
+        {
+          "name": "testComponentCatalogThemes.TabBar-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "a032b129bf61b8ec3a7764cffc871e86b57e1ff340514b851df634111a5d4cc2",
+          "decodedRgbaSha256": "7131b4142a84a746eb64619754d5d02d3126ac1112ff89f58d73263939d7f593",
+          "rawDifferentPixels": 291,
+          "maxChannelDifference": 45
+        },
+        {
+          "name": "testComponentCatalogThemes.TabBar-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "c8f824e1305a6c3fbdf9c79d9249b1ad760f2839880ae71152a34463fa5cf62f",
+          "decodedRgbaSha256": "178f2921441626244809392cde64cdf91bb7160c75532aac3e568d5d39db7ae2",
+          "rawDifferentPixels": 7071,
+          "maxChannelDifference": 47
+        },
+        {
+          "name": "testComponentCatalogThemes.TermsBlock-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "c6261f28d72d7c9046ae9630909ce03b406a4aa5936d3f55cf6352992ddb21f8",
+          "decodedRgbaSha256": "5eae3b74137ed233b158429977bcaa039f36b609507c9685ea9d8dbccee16ce3",
+          "rawDifferentPixels": 2170,
+          "maxChannelDifference": 117
+        },
+        {
+          "name": "testComponentCatalogThemes.TermsBlock-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "0ab69df15206e2e18c8552cf04d87eb24365ccc8595793772e9ffc68009cb1aa",
+          "decodedRgbaSha256": "d45a8b8b0669cc748ea5b4f1385e06221a58f2dd3b062488d3e498cdd59a39ce",
+          "rawDifferentPixels": 28909,
+          "maxChannelDifference": 148
+        },
+        {
+          "name": "testComponentCatalogThemes.TestConsole-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "ff0feed6d770dc327dd4fa93cb3c26919d5b2f1b8f9dc2569010ce5cb30aa4ba",
+          "decodedRgbaSha256": "d89045009c10eec2bad29a52ccb431b76f2ba9cddcb79da85b5b6dddf8fa35f2",
+          "rawDifferentPixels": 26661,
+          "maxChannelDifference": 104
+        },
+        {
+          "name": "testComponentCatalogThemes.TestConsole-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "4361e8f5fbdce1ffdd051fc09cd5464bc52990691b88876d4591bb7d54976c2b",
+          "decodedRgbaSha256": "014b07bac839422a29e70d51f2780c066dc73a229dbb5df1085f9d8130090bd2",
+          "rawDifferentPixels": 64901,
+          "maxChannelDifference": 85
+        },
+        {
+          "name": "testComponentCatalogThemes.ThreadHeader-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "6de558558eb4862add4221211a2071b67fbdb505db22398c819df84ff32ecdb5",
+          "decodedRgbaSha256": "bc7e2bcaf8545e92185526360fa71efadf1bcee2f16e96f5e9b908db210cedf9",
+          "rawDifferentPixels": 56474,
+          "maxChannelDifference": 113
+        },
+        {
+          "name": "testComponentCatalogThemes.ThreadHeader-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "a8d797668a17c74ab237ff216f23cca110eb7b122fc936eb8c42806b3bbfd2ff",
+          "decodedRgbaSha256": "dc69247ff8611f77f15fc753ffbddf458a1ec6d06067483e765223b9e718620d",
+          "rawDifferentPixels": 60746,
+          "maxChannelDifference": 110
+        },
+        {
+          "name": "testComponentCatalogThemes.Toast-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "317091a599da1d50ed037c51c102672049a1ba4e979b5d97bffc2075e1195f1b",
+          "decodedRgbaSha256": "dee45dcf8b4e1c75a98d39f3cccd92c4d510a86bd1709261d6c0d38c428a6a6b",
+          "rawDifferentPixels": 260,
+          "maxChannelDifference": 45
+        },
+        {
+          "name": "testComponentCatalogThemes.Toast-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "19be1e23a81f49de3e5e3f39400736b0b02b9bdd5607d7561704121876fb04f4",
+          "decodedRgbaSha256": "af32bf8780723484d1028bb03865031c810df22e76ded59c3ca2f2c81532281f",
+          "rawDifferentPixels": 7846,
+          "maxChannelDifference": 49
+        },
+        {
+          "name": "testComponentCatalogThemes.VersionList-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "f0dc97bdadb21e0aa3a4cba08d9e93f15d37358176f7d094666e20a6e2cbe6b7",
+          "decodedRgbaSha256": "f0589fc597e41ecc1030ab75fe8b1e0300737eadaeaf3e358dadd5aa1d544c04",
+          "rawDifferentPixels": 2199,
+          "maxChannelDifference": 86
+        },
+        {
+          "name": "testComponentCatalogThemes.VersionList-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "1b6b77284c2bd53bf027c50b31f3d7a632774af03bdf11a159a5b8bf0b9729c4",
+          "decodedRgbaSha256": "454aa7726d34c61bc983992d58755586cb18bbc26ca214a013808e9bde025136",
+          "rawDifferentPixels": 22180,
+          "maxChannelDifference": 67
+        },
+        {
+          "name": "testComponentCatalogThemes.VoiceNote-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "b96d37b194a555d6fe2c0d32153d693b2144d114081aa9ef81c10b9505c50bdd",
+          "decodedRgbaSha256": "658b44961a048ea71853242d19ae3c04d65b6e3a7479624828878120e78e4272",
+          "rawDifferentPixels": 37758,
+          "maxChannelDifference": 104
+        },
+        {
+          "name": "testComponentCatalogThemes.VoiceNote-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "284082353f7dd162f72898f4ea1a3725551be61ed0cba1ebf48827d09d91c2b6",
+          "decodedRgbaSha256": "cde2263623b65eccef53665060a0026ff2b155410c84c0a6b70d5dbe72524342",
+          "rawDifferentPixels": 408922,
+          "maxChannelDifference": 90
+        },
+        {
+          "name": "testWelcomeThemes.light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "f3bf9339e63aaa9fc948bdab0b37bd6a9154cef75e96b2471009b156017413da",
+          "decodedRgbaSha256": "9cf33319b3e46f09cc901e33c6c04f3147094cc48889c9d67c5c4049db579eba",
+          "rawDifferentPixels": 6563,
+          "maxChannelDifference": 85
+        },
+        {
+          "name": "testWelcomeThemes.night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "4f7605caddbbb64627a501e7d4fe1a906ca449c22ebfeeb53b97d13f1bcaa947",
+          "decodedRgbaSha256": "aa5b819d2d77f8b00b54fa424b210b8df4d613ba0cdc9623105607cbff40b7f4",
+          "rawDifferentPixels": 78736,
+          "maxChannelDifference": 66
+        }
+      ]
+    },
+    "headlessA124ad0": {
+      "captureCount": 110,
+      "images": [
+        {
+          "name": "testAuthorIdentitySurfaces.light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "f7183d1b67f1defe6e17cd44005c5ce6d348e6d7546b0c77befa8ab9b5255edd",
+          "decodedRgbaSha256": "112e5c9d4175d5db8df5b501eed1b00cff97ae137d27836ff02868561bc031be",
+          "rawDifferentPixels": 96123,
+          "maxChannelDifference": 222
+        },
+        {
+          "name": "testAuthorIdentitySurfaces.night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "557fb3fe1df63b9b4157e1686c087955ba3fd2862438171094c8330b89608220",
+          "decodedRgbaSha256": "b74302163e2257f5f130b00ca030fa1af5fc294c0e849d44aabeda071674c2f1",
+          "rawDifferentPixels": 704339,
+          "maxChannelDifference": 197
+        },
+        {
+          "name": "testComponentCatalogThemes.AccessLines-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "bf11585dc2c2f7c1808e6015c86aeddf700c32b86fa17861160260ae2dd365ff",
+          "decodedRgbaSha256": "028b028fc152e0f8d813157b7521de0b8a1d672035eaaa51284b8fbbc96ddfee",
+          "rawDifferentPixels": 47681,
+          "maxChannelDifference": 191
+        },
+        {
+          "name": "testComponentCatalogThemes.AccessLines-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "cd93d39dde12426e0faf8c5cfedff751b68093a84af3ce1048571b7c5857a780",
+          "decodedRgbaSha256": "c117d9d51b0ffc1029d18ed170791f85a24dad08359651d678c10d71079af3ac",
+          "rawDifferentPixels": 49595,
+          "maxChannelDifference": 190
+        },
+        {
+          "name": "testComponentCatalogThemes.AuditBanner-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "a20cd1ccca3ab5a504eab38c2d8cece3f7f25de1188a86fa84278b992c35dbd8",
+          "decodedRgbaSha256": "f1dd58d59e78544fd1b7bd4231a8ad86b282fab50cfd59136c38ae20a3e4a96d",
+          "rawDifferentPixels": 17515,
+          "maxChannelDifference": 191
+        },
+        {
+          "name": "testComponentCatalogThemes.AuditBanner-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "b308b96a131f0e98e7c99e399cd127156dda2e9dd4d12d8fb71d25f223f1050c",
+          "decodedRgbaSha256": "7a56c930c589756d7b21e0af6fd8e0ad30f5184c5643701b8e0bb78eb56fce33",
+          "rawDifferentPixels": 85644,
+          "maxChannelDifference": 194
+        },
+        {
+          "name": "testComponentCatalogThemes.AuthorLabel-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "387ce38e0e79c5e1c435cf8398b80eefbd82f1d618ce6ae939f1bbeddb05a2b2",
+          "decodedRgbaSha256": "89dc83d7a6a03c81576fb8fb35e3b0a9c416e70b5a0b7f54a022368c8c72ecac",
+          "rawDifferentPixels": 42559,
+          "maxChannelDifference": 193
+        },
+        {
+          "name": "testComponentCatalogThemes.AuthorLabel-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "f15fb27800169c466808783836936a09f9b3071dc3bbc3db12ec141a14710efa",
+          "decodedRgbaSha256": "4e2cef75ca209da72eb7d214e477a8387353c895a9facad609ce9198166a671f",
+          "rawDifferentPixels": 43823,
+          "maxChannelDifference": 192
+        },
+        {
+          "name": "testComponentCatalogThemes.Avatar-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "8f329f7353bef65f876e893f5190ae86bc62eeb13f5b776b0f6dbb324663d9f4",
+          "decodedRgbaSha256": "d4f17601d0e58543a2c0fed5fdaa9bfb83c89eff394111842580118296e16ed2",
+          "rawDifferentPixels": 28504,
+          "maxChannelDifference": 190
+        },
+        {
+          "name": "testComponentCatalogThemes.Avatar-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "ad6cb549ddd1124176fb9cadb99383262aab81392050fde13516c9b30da218dd",
+          "decodedRgbaSha256": "40f97b7dc0ac9d4660c9762649ec21a5829b8a4c608adb5ddc845b97325665e7",
+          "rawDifferentPixels": 33615,
+          "maxChannelDifference": 189
+        },
+        {
+          "name": "testComponentCatalogThemes.Button-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "9d3b909cd494b0d55408bc59341117a436dd726b7fcde743761bb77de68d48d1",
+          "decodedRgbaSha256": "f415d3fae3eaaf49472e040e4b58b4c6b97639545467b0227c1b0c2400c545e3",
+          "rawDifferentPixels": 66765,
+          "maxChannelDifference": 216
+        },
+        {
+          "name": "testComponentCatalogThemes.Button-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "21ff971235df6a13eacda6add13d8f40bf1f1af6c28af15a1977f0f69aff7203",
+          "decodedRgbaSha256": "a814132d90fd9e92b23256a6d97eb87baba98b0af93d319ad0931f672a180779",
+          "rawDifferentPixels": 107938,
+          "maxChannelDifference": 208
+        },
+        {
+          "name": "testComponentCatalogThemes.CallChip-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "f8692176b04d74bfae2554d4e11ec4763abd0bea718a20a490f6a26d7a0adab9",
+          "decodedRgbaSha256": "8239326eeedf8c51052a67f853ff33e043617584d45f4081b385469de9c88f57",
+          "rawDifferentPixels": 55750,
+          "maxChannelDifference": 195
+        },
+        {
+          "name": "testComponentCatalogThemes.CallChip-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "2e7550e479f478273e11dc167e4927b66af11052c9dd8b1d783716d95f102946",
+          "decodedRgbaSha256": "0199b53515c1bf746c20a86db21bea0fc2f7bfacaeed81021a6d9296fa5f6555",
+          "rawDifferentPixels": 93449,
+          "maxChannelDifference": 203
+        },
+        {
+          "name": "testComponentCatalogThemes.CapacityHeader-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "83d3398a6e63661f6ea6883599e922e835d4a2d829bef1a47aaad357eced38d4",
+          "decodedRgbaSha256": "d2b74e7b57d622f65eea3dd3d67148369b7ad14c925fefa5b99bd2ecc98d9462",
+          "rawDifferentPixels": 27404,
+          "maxChannelDifference": 191
+        },
+        {
+          "name": "testComponentCatalogThemes.CapacityHeader-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "d8c8f9adee56bb5c7d4f3afc3484996562d633ab7b4c4aebf1b396a2b75270f9",
+          "decodedRgbaSha256": "bb5ae1ebe5dcece5e84ba12b366e08028bb5b40002791e1182db471db96e55f3",
+          "rawDifferentPixels": 186917,
+          "maxChannelDifference": 195
+        },
+        {
+          "name": "testComponentCatalogThemes.CitationChip-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "09ba4a349795d2f1ae4bc8442bfa5622bb2a709880ae23fa2c9a613c0083637d",
+          "decodedRgbaSha256": "d25f56b1aaeba20057c34c0ff598a62aca954869545a9bdd4447b2d14bd23d6d",
+          "rawDifferentPixels": 26321,
+          "maxChannelDifference": 191
+        },
+        {
+          "name": "testComponentCatalogThemes.CitationChip-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "529ea199c9d77ed7643e3ec48c74a400063704bd65f8cdef97ade5e69171db6d",
+          "decodedRgbaSha256": "44c424fce9d3d0943bd33635f17e1fdb8ea74e9efa142832b9e0ce9c53452511",
+          "rawDifferentPixels": 40149,
+          "maxChannelDifference": 195
+        },
+        {
+          "name": "testComponentCatalogThemes.Composer-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "a11fb11571cbcac9cbb3084a93a0ba4d5bfb2e3f39cbfbe1e2ce80c340faf232",
+          "decodedRgbaSha256": "b05e9ab3388e5474ef8415b313902e712fce9310880305db92d84be6c5e6b54a",
+          "rawDifferentPixels": 113031,
+          "maxChannelDifference": 220
+        },
+        {
+          "name": "testComponentCatalogThemes.Composer-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "6661a638ad47a9afb757db225f30b7a411890cc2509c4fc9f087a4ad37fa4597",
+          "decodedRgbaSha256": "ef5e55e1d59867ef496d414a6b215118bf1cc7b081936f30fb4100389611df89",
+          "rawDifferentPixels": 209206,
+          "maxChannelDifference": 203
+        },
+        {
+          "name": "testComponentCatalogThemes.ContextCard-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "ab56d89c64a42427de030bd5e230163db2d5e902e6c4f93e55cdcf7fd4bcc23a",
+          "decodedRgbaSha256": "bf558604dc4473a47d3dad0797dbc4d870e273c1df9d61e05918addbcbfde8f0",
+          "rawDifferentPixels": 15903,
+          "maxChannelDifference": 193
+        },
+        {
+          "name": "testComponentCatalogThemes.ContextCard-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "e95b97e2a7e5610af6f7712064ba7e39f3a39be603c7fd75c29646f06b4151f4",
+          "decodedRgbaSha256": "28c600ca9eff14d803f1adef459dc220d2f666c7d9fcb1f51e1a5c0fb77d542a",
+          "rawDifferentPixels": 20325,
+          "maxChannelDifference": 192
+        },
+        {
+          "name": "testComponentCatalogThemes.Correction-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "ceb4bf5d8ac3bc8cb129fc159c20e66fe9810ea3addaf99857fc8464c7c44f04",
+          "decodedRgbaSha256": "a61d13d9565b2e9ff9c8a290d097edba140a3cca77835614df7eccd61c11b247",
+          "rawDifferentPixels": 42533,
+          "maxChannelDifference": 218
+        },
+        {
+          "name": "testComponentCatalogThemes.Correction-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "8509bd1f7c336d7d7c71421a50a0c439e5143a38b1e2916c98bf85cb56b995f5",
+          "decodedRgbaSha256": "4feaa71452a5ac2a43459b098a7d94fb8a95f11e9c6f9f5eda5257f340ec3c81",
+          "rawDifferentPixels": 248823,
+          "maxChannelDifference": 196
+        },
+        {
+          "name": "testComponentCatalogThemes.Countdown-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "2fb274f6be274c853b494c9e0d4b81b67433589e6e5bb7c50a1d3874326f878c",
+          "decodedRgbaSha256": "8015f71a0c329a6a2a38e63989ea647095bd3035fdba779b93bb3d64df957a91",
+          "rawDifferentPixels": 13369,
+          "maxChannelDifference": 208
+        },
+        {
+          "name": "testComponentCatalogThemes.Countdown-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "611c5175c27c60dc9efc0bf44009445899a3f08c4bc640003ca3319fdaba4e6a",
+          "decodedRgbaSha256": "c1d1564351a4f233e0af39c0315d7716af8e538824d7366450b7bceb82151694",
+          "rawDifferentPixels": 17183,
+          "maxChannelDifference": 198
+        },
+        {
+          "name": "testComponentCatalogThemes.Dialog-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "bf77e6888e1c6d86e7af83a14c443389adff92c923e9a2e381774693b982d85e",
+          "decodedRgbaSha256": "2835168297cc0f12847fb2c38da8d77945319b71ff9975a0676918e527d5561d",
+          "rawDifferentPixels": 41737,
+          "maxChannelDifference": 219
+        },
+        {
+          "name": "testComponentCatalogThemes.Dialog-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "b896278b54e537661c57c4add3a54729067566ac3c6ac899fbd0fecebfb040c3",
+          "decodedRgbaSha256": "dfd09d1567cf121d375e958925eac65312e10e03c59b0b1317a6c488e5813a3d",
+          "rawDifferentPixels": 32971,
+          "maxChannelDifference": 199
+        },
+        {
+          "name": "testComponentCatalogThemes.DigestItem-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "8fa673d46b72ced9124542358f707abb477c67304e03468fb51dda322b599efd",
+          "decodedRgbaSha256": "736b6a48500afb6e571c19e466be0c9639c6bda6f77d05baa42a9c7ee743f78c",
+          "rawDifferentPixels": 49706,
+          "maxChannelDifference": 217
+        },
+        {
+          "name": "testComponentCatalogThemes.DigestItem-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "7d49d94e51ea2e22e34f158ba5364f9fbd933905b0763d9c7070962b2a2f3a86",
+          "decodedRgbaSha256": "5b2515dd775ea5270613687e89c1b59c8f24c3730c2cf257be9b0b9ace41dc2c",
+          "rawDifferentPixels": 326331,
+          "maxChannelDifference": 196
+        },
+        {
+          "name": "testComponentCatalogThemes.EmailFrame-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "2718bcaab368c825455a83ea0ec52f643ca502943f03e746b6dadac98cee5cb3",
+          "decodedRgbaSha256": "061563b1074dc0c8975d034e92c5d001cfa22f3b3a509e442e8bb1f996632707",
+          "rawDifferentPixels": 65447,
+          "maxChannelDifference": 216
+        },
+        {
+          "name": "testComponentCatalogThemes.EmailFrame-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "0b88f25212e0373fdb45d5805c9b6836056f7947273959fe12791da263224f14",
+          "decodedRgbaSha256": "911232006bb05aa688212a4f29d4f5b7189dd75efa0fbe9f7a37ceb4932e5f71",
+          "rawDifferentPixels": 224480,
+          "maxChannelDifference": 200
+        },
+        {
+          "name": "testComponentCatalogThemes.EmptyState-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "dd9424f51fedfbe62c24fe5142e2ae887dabc8c9292d140176cc34a1562eacb5",
+          "decodedRgbaSha256": "d67522d59d0aca053c4e9382fd21c7388b426d5fb2ebf980bed3d589e1833ac4",
+          "rawDifferentPixels": 30250,
+          "maxChannelDifference": 203
+        },
+        {
+          "name": "testComponentCatalogThemes.EmptyState-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "4bccd28bd3d95dbd84a0a2fa6343ccc4c2ae55f7b55d073e1bd1033b725a022c",
+          "decodedRgbaSha256": "0afe3deccd6235c1a093527f924632e000eb11a26fb53cbc4406ecdc1a862f39",
+          "rawDifferentPixels": 34018,
+          "maxChannelDifference": 212
+        },
+        {
+          "name": "testComponentCatalogThemes.EtaLine-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "94f571d3ded117298941fa7cec0fec9e77bebff37a5f38fc687addcfa8629f40",
+          "decodedRgbaSha256": "8b70bdf1d217ef33d3f265d948a11bceb7da2b4227b781394feb9dbbb5c4bf71",
+          "rawDifferentPixels": 15389,
+          "maxChannelDifference": 192
+        },
+        {
+          "name": "testComponentCatalogThemes.EtaLine-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "9dc423601439796427967b8514d9f10ccd0c2f86aef1a20853ff3811a5246edf",
+          "decodedRgbaSha256": "b916cb36fc8bbf7787c8f76227f92d3cbf6463afbc7098eec6d8c3706a6a5b5d",
+          "rawDifferentPixels": 16405,
+          "maxChannelDifference": 192
+        },
+        {
+          "name": "testComponentCatalogThemes.IdentityStrip-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "e60f762a6ce541d7d8bc5e9c5a9b7ecc5a02d02de0b8093b41ca6be2089f73e8",
+          "decodedRgbaSha256": "244ba137978ae8be4fd369e6925014ac9202b8aa00443a813ce342764e0cf3de",
+          "rawDifferentPixels": 74945,
+          "maxChannelDifference": 222
+        },
+        {
+          "name": "testComponentCatalogThemes.IdentityStrip-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "58d01f696ef6c7f72e05c4dac0afd3fba4ece436fd2e25f9ea968cf176a2da2b",
+          "decodedRgbaSha256": "f5ac532b3ed5258161d3ca0299eb2229d6580db9c995ffa357f33089cd0efb77",
+          "rawDifferentPixels": 220733,
+          "maxChannelDifference": 195
+        },
+        {
+          "name": "testComponentCatalogThemes.IncludeList-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "4a3b94b6f91ecd86a4bb040c4f698918bcbedec92ac35f84a6b6331e14dfc27f",
+          "decodedRgbaSha256": "475a913c016ca1a4e7368041d700b6cbfc8cf971f977af03770fe052c02af0ba",
+          "rawDifferentPixels": 41889,
+          "maxChannelDifference": 215
+        },
+        {
+          "name": "testComponentCatalogThemes.IncludeList-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "63353a1232d23c2cc5c5fe3053ac6d2ce5bcfcaa84a51419c851ba40bfea02c8",
+          "decodedRgbaSha256": "70350c8dc3dce553f18ac26d26ee60f47a5ab36ac18828208d721da97cad7bc1",
+          "rawDifferentPixels": 67086,
+          "maxChannelDifference": 203
+        },
+        {
+          "name": "testComponentCatalogThemes.InsteadMenu-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "fa2a2bf3805b2db10a0548d09033885e11dbbb08e44482f18fac40f6437893d7",
+          "decodedRgbaSha256": "466999e662f5ceb264024b347635b4687334e867e6cd20834a3854237b3d0fc0",
+          "rawDifferentPixels": 80636,
+          "maxChannelDifference": 220
+        },
+        {
+          "name": "testComponentCatalogThemes.InsteadMenu-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "11d8afe9335f96a6cb538387c145a2603d3404fb0542e947ba900997fe76e619",
+          "decodedRgbaSha256": "2827bd8b7baba10ac2b4595fbcff5a3837e80e3695af8eb6b70a3e6dd67c7ba0",
+          "rawDifferentPixels": 92692,
+          "maxChannelDifference": 203
+        },
+        {
+          "name": "testComponentCatalogThemes.LabelPreview-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "ab0b67d67e57799af013840a5c6b8f7063b65c8afb0b4cf1823dbff3a781571e",
+          "decodedRgbaSha256": "3cd3ad109c68a5e6c5b69a3fe79be45fad6818aaeedc77591d3c9cda1e6a9796",
+          "rawDifferentPixels": 28956,
+          "maxChannelDifference": 193
+        },
+        {
+          "name": "testComponentCatalogThemes.LabelPreview-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "08b3480770edd6fac7026967fe508d6fd0882a01a92a284b051dd5ca0e7476dd",
+          "decodedRgbaSha256": "666f3d2fba4f810c2e8e06bdd8194837c85e5abba54e17b5ebdaa7ed6f58eeec",
+          "rawDifferentPixels": 35605,
+          "maxChannelDifference": 194
+        },
+        {
+          "name": "testComponentCatalogThemes.Mark-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "8c3ae09147bd1c08a5aa9b2587ab99a2ac74b48a8bef983fd5ad77cb8887c810",
+          "decodedRgbaSha256": "b4d8bcb5b08233ac88d3605a5d8130270047c9117c5e42c00b94a72ac80c2230",
+          "rawDifferentPixels": 7763,
+          "maxChannelDifference": 191
+        },
+        {
+          "name": "testComponentCatalogThemes.Mark-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "fe4580a2bd363c7ba74f071e3106cdcf3b1e3b0e24499e9faf5e6d16e4e2009b",
+          "decodedRgbaSha256": "836ef548ab1115e0f3ea628220b7d092bd8cb29c4a798894176dc9d5e1a14b2f",
+          "rawDifferentPixels": 8864,
+          "maxChannelDifference": 192
+        },
+        {
+          "name": "testComponentCatalogThemes.MemoryChip-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "3f50847886a134bdcdf028803ef5e8b0497de074e609a6853bc603b012b72eb0",
+          "decodedRgbaSha256": "b1202c0ee8cddaa9a4a6d1d2f6869acbf4c8660b90b0af49b9fa35d786db6ddd",
+          "rawDifferentPixels": 44398,
+          "maxChannelDifference": 220
+        },
+        {
+          "name": "testComponentCatalogThemes.MemoryChip-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "b7d65766e8ee393417dec014547e42b55d04758f3707eae1a6430a47ed5aa6d3",
+          "decodedRgbaSha256": "34d6884fc272cb883cc5c78d774d3555fa7ad1c401952b1be552647209547aeb",
+          "rawDifferentPixels": 238033,
+          "maxChannelDifference": 205
+        },
+        {
+          "name": "testComponentCatalogThemes.Message-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "2e58cd850b25076a7f3cabacde4afa7050d48e8735b4eb4b08363bb916f53c24",
+          "decodedRgbaSha256": "851e34fb49aa108c226dcb9adf6cc1e0d48a694b16621cf9853cede59288efa6",
+          "rawDifferentPixels": 116554,
+          "maxChannelDifference": 219
+        },
+        {
+          "name": "testComponentCatalogThemes.Message-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "3c4ba2043033a840d95a369f03fed1e270f6b1719bbf0f009e16a470fecbfcb8",
+          "decodedRgbaSha256": "af40558e82543016be2b94b3656dbbc91930deb13d5cc36b69ffd9408325d126",
+          "rawDifferentPixels": 712513,
+          "maxChannelDifference": 212
+        },
+        {
+          "name": "testComponentCatalogThemes.ModeList-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "d7502f65b4261556237fc43d286c7bdeb8750ac0516cb60d42f2b0ee15560b79",
+          "decodedRgbaSha256": "e25e63b1a818b43a6dabd81738396d8cdd52f9a0b0c50512b2b7b37cf475f87a",
+          "rawDifferentPixels": 27212,
+          "maxChannelDifference": 216
+        },
+        {
+          "name": "testComponentCatalogThemes.ModeList-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "b95432b5c68dc0e7408bd693943e00d0bf4dc51faec84f5e0269e2dfd3b34bee",
+          "decodedRgbaSha256": "954b53d7838077a1a71a38e71ddcb500e663d20cd8864da56984734a967b54eb",
+          "rawDifferentPixels": 38310,
+          "maxChannelDifference": 202
+        },
+        {
+          "name": "testComponentCatalogThemes.Note-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "a70896d8bfd5bef14989040fac4f45e56975d0c154a48bede83ec6e0740223e8",
+          "decodedRgbaSha256": "f6eebe23eb402bb99fd3989e232399411415b2452e663d7b970e4016c02916fd",
+          "rawDifferentPixels": 56641,
+          "maxChannelDifference": 203
+        },
+        {
+          "name": "testComponentCatalogThemes.Note-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "a657f6e7a6175460cb311b1106050ac76036ecaf9b340e2548d4a61a2bf0fa36",
+          "decodedRgbaSha256": "b1b6b8016e3d7f15419070df022590b5824f1b07ffd34fd905c0482c0c30b183",
+          "rawDifferentPixels": 544845,
+          "maxChannelDifference": 190
+        },
+        {
+          "name": "testComponentCatalogThemes.Notice-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "306467de3833c0dc1cb940e4b36150874644fda6cab393a2f17553c5a2bdd981",
+          "decodedRgbaSha256": "8c75e14002425be07e9f0b3256c74c09f7eb0c35c2b89d73012c8067d97e6625",
+          "rawDifferentPixels": 35877,
+          "maxChannelDifference": 208
+        },
+        {
+          "name": "testComponentCatalogThemes.Notice-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "e31013fcda90b9a9409f68c9e363d32eba4f48804f3c8d27c180ebce5184d36a",
+          "decodedRgbaSha256": "fb7aa27027744a210df6c91929c7669bb012e6333fa206263c77154977f38530",
+          "rawDifferentPixels": 174631,
+          "maxChannelDifference": 190
+        },
+        {
+          "name": "testComponentCatalogThemes.NotificationRow-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "8665c5768a8798b8b0ef47208ae7148ebb21ed33cb14b201e273a9b9a1b3fd90",
+          "decodedRgbaSha256": "0b978159610dde93f29e2baf4ce4ae04a03e4a4c286a44828c12e5af2b07af03",
+          "rawDifferentPixels": 84942,
+          "maxChannelDifference": 191
+        },
+        {
+          "name": "testComponentCatalogThemes.NotificationRow-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "c416fae455c6f72917e1a2e127c46cce173d830d4a9afea2b1426d1a090eee99",
+          "decodedRgbaSha256": "95f16f2c469e637999c563546e9d2a3aa7508b84f0fb722966851b4c5b19626a",
+          "rawDifferentPixels": 128013,
+          "maxChannelDifference": 194
+        },
+        {
+          "name": "testComponentCatalogThemes.QueueCard-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "1b7ac69566459222181bc4b678ba3f6b4a537bc0ba78cf454a00b187c393b6a2",
+          "decodedRgbaSha256": "f3516d4db84e27d2dc5af9c0d378f7f6cd8863a904697c8c075c4b144079cc6d",
+          "rawDifferentPixels": 61343,
+          "maxChannelDifference": 215
+        },
+        {
+          "name": "testComponentCatalogThemes.QueueCard-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "92b29d96b150f3890e9978b42dba28eac31f7e8229be548a25b5d1c1605194a5",
+          "decodedRgbaSha256": "cf5a351d6e07e6255a5710ea5b247843eadc0c0e7b90a4a426256fad8ada5e84",
+          "rawDifferentPixels": 69946,
+          "maxChannelDifference": 198
+        },
+        {
+          "name": "testComponentCatalogThemes.ReactionChip-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "f2b6c75b17112a50f8f29a8de5628e05fffb83d6320d2186e9765557b0039916",
+          "decodedRgbaSha256": "21bec5e96bfbb775e036ddd7d52677af58386092e812b8bc336f86a211f0a852",
+          "rawDifferentPixels": 13188,
+          "maxChannelDifference": 195
+        },
+        {
+          "name": "testComponentCatalogThemes.ReactionChip-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "c1acad8593da18bb2065112cfe0a124f04fc8112ab79f665930b713288359581",
+          "decodedRgbaSha256": "c5b2373800e978108ecbd90a839b782c7132682e979266ae1b5362230d2ee002",
+          "rawDifferentPixels": 32550,
+          "maxChannelDifference": 203
+        },
+        {
+          "name": "testComponentCatalogThemes.Receipt-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "f5c50948b7e74acb186056d018efd88b491ea2b0cd286c47ca1dea901bd36c82",
+          "decodedRgbaSha256": "37e69eab2bda79b7c87397422eacd774f6cf1b6fa2db045930daef0953dc3a18",
+          "rawDifferentPixels": 38467,
+          "maxChannelDifference": 210
+        },
+        {
+          "name": "testComponentCatalogThemes.Receipt-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "a1b800d3259c8d8a881ac8a371e2353c1075deda3f19d966e0d6740acfd23b28",
+          "decodedRgbaSha256": "72274df9c5df06db686fe57eb387f8438b345672bcb0f4397f7115e987eced52",
+          "rawDifferentPixels": 48332,
+          "maxChannelDifference": 203
+        },
+        {
+          "name": "testComponentCatalogThemes.RequestStatus-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "14dd5ef2ffa06aa8eb9e76df715c933dac32b94bcb355ff9f81c4ce368eeb596",
+          "decodedRgbaSha256": "28f65a095a3e054fd23269f24d8e5d291341f07aca67e1be110306301dee23a9",
+          "rawDifferentPixels": 36405,
+          "maxChannelDifference": 202
+        },
+        {
+          "name": "testComponentCatalogThemes.RequestStatus-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "0f234c96f6fa310b3120d2acb8dd406d1a019b6b43bc0fb56531e423a3c4df1c",
+          "decodedRgbaSha256": "bac5569a1695fcc8b7be3a3a7de60a937c59ff95d6e5ebd1368b6192a21c5e9a",
+          "rawDifferentPixels": 43347,
+          "maxChannelDifference": 194
+        },
+        {
+          "name": "testComponentCatalogThemes.ReservedLabel-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "176d990f778df721f9dc14d91b06ed78da50bf29ada4d4e8982bccef632c7e3c",
+          "decodedRgbaSha256": "f5cd2dfeaef0727b9823bbf951e69227c7cb68f38bb9deb1c99316a0c5068fcf",
+          "rawDifferentPixels": 36647,
+          "maxChannelDifference": 193
+        },
+        {
+          "name": "testComponentCatalogThemes.ReservedLabel-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "ec19d092427e05659a03a4062b18e9cf9ddd8c75254abc565b9848aa99411d42",
+          "decodedRgbaSha256": "cc27780f66fa04359c6c2ee897b8b864bb5c0ebcde3b77892f90bbeb71e6751f",
+          "rawDifferentPixels": 48932,
+          "maxChannelDifference": 194
+        },
+        {
+          "name": "testComponentCatalogThemes.Seal-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "d4825435628b05eb87aa46d5c7c12f7bdcc3c17ac0b6ebcbb84740f44dd502be",
+          "decodedRgbaSha256": "1e301d0b7871c2c7366bc72b9457fc9c0e634068084809a03057fb25ffbabada",
+          "rawDifferentPixels": 27170,
+          "maxChannelDifference": 191
+        },
+        {
+          "name": "testComponentCatalogThemes.Seal-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "928fd36f227aa7c2b5b10f7cf4802889dd36fd383fdc0550b36e168466b47b7e",
+          "decodedRgbaSha256": "b5d6e6ae28585c45a0b3b3a0b1d267175693a801a4f942b697546ea3f571feca",
+          "rawDifferentPixels": 28668,
+          "maxChannelDifference": 194
+        },
+        {
+          "name": "testComponentCatalogThemes.Segmented-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "e063e159d5f1937c91dfe2280e00aed64ee5d6d6a43c8d8f4777f17baa393a67",
+          "decodedRgbaSha256": "191ed45d7d8f87943a84c68cb03cccbec55bc2344025ac60fbeb3de8dcea4cfd",
+          "rawDifferentPixels": 11168,
+          "maxChannelDifference": 191
+        },
+        {
+          "name": "testComponentCatalogThemes.Segmented-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "63b039d88c73c83af8f0d17393601c1bcee5ec8c886820a77019f64b11cf5e80",
+          "decodedRgbaSha256": "77c267997f4ba8132a6661720793cbee9ced901ecb59bcd7a35b5cc6fc8d3cdb",
+          "rawDifferentPixels": 62040,
+          "maxChannelDifference": 192
+        },
+        {
+          "name": "testComponentCatalogThemes.ShareCard-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "e1c6be9dd023d4cf51c597cc0a57d4b5c5d2f1c0cb73c2a6d0dcc915b3e08b92",
+          "decodedRgbaSha256": "c7157db52f60fbab4eebf110d8c11112f0d0dcd8c979fb3ecfcc8b2876339de1",
+          "rawDifferentPixels": 51489,
+          "maxChannelDifference": 193
+        },
+        {
+          "name": "testComponentCatalogThemes.ShareCard-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "cea70f835de1221aedfd8db110e7008429e715b1a222bbc1c0f9fbb99098873b",
+          "decodedRgbaSha256": "518d37d03059187b14dce5e7504d43045fd285ad1b90ec97414aa44a0a33c4ff",
+          "rawDifferentPixels": 466581,
+          "maxChannelDifference": 192
+        },
+        {
+          "name": "testComponentCatalogThemes.Sheet-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "8c0c90331a35e788997bdde3d2509b7c9b632200269791b58661f29ec4155237",
+          "decodedRgbaSha256": "06ffcbe049b9ec40839e0a030c534ba53f0ce3f36506bd49783339424997eac5",
+          "rawDifferentPixels": 85281,
+          "maxChannelDifference": 220
+        },
+        {
+          "name": "testComponentCatalogThemes.Sheet-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "53557e6dd90f63c126bad62ca37dcc1d6e22843614f8fc90fd0877ba467d621a",
+          "decodedRgbaSha256": "f04cda536ddcbf7769c1c4eee3b06eca1dc115d52d2ae1469214d4fcaed85b11",
+          "rawDifferentPixels": 80532,
+          "maxChannelDifference": 198
+        },
+        {
+          "name": "testComponentCatalogThemes.Sidebar-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "686f8fff6a9d7a3451d7b7a5b559283ed3e34e06e861f1defc7cb80707da35df",
+          "decodedRgbaSha256": "673d51561278dc77038e5b0696e58fd9f29c414ebfa64de54317c9f49797b6da",
+          "rawDifferentPixels": 28811,
+          "maxChannelDifference": 216
+        },
+        {
+          "name": "testComponentCatalogThemes.Sidebar-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "0c445d5e0ff4e8d6b8906ce064ddd071ecb59df1467d775f1641ff7b862eb317",
+          "decodedRgbaSha256": "9c511e4dc4066ae9552924f0c915f98412e2f70837e46bdfbcac6255d5096fa1",
+          "rawDifferentPixels": 72741,
+          "maxChannelDifference": 194
+        },
+        {
+          "name": "testComponentCatalogThemes.SignedMarker-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "290d556d7eaab4025c8dfccaa55d5bb902e61a7363f4fee82c52e13522bf552d",
+          "decodedRgbaSha256": "2b510e164464b242c6cfb95b762b79ae2507908470e146be325d684e759e68dd",
+          "rawDifferentPixels": 18269,
+          "maxChannelDifference": 199
+        },
+        {
+          "name": "testComponentCatalogThemes.SignedMarker-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "be944f5ff0c9f15144b30e25fc25d1db0f6a69bee15ac2a8597806add7efe7c4",
+          "decodedRgbaSha256": "aaf3b89a88a401e48a542e8bb9492cfb9d740dc8d381281abc7119611313e133",
+          "rawDifferentPixels": 19022,
+          "maxChannelDifference": 195
+        },
+        {
+          "name": "testComponentCatalogThemes.SigningSheet-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "4f1d4105a2241442ab0a3188298620f006ede560790ba3eb80aa3d629aa3e153",
+          "decodedRgbaSha256": "5ae4d08bb0d20d2ad1bc72326d79c191e0c4759f5a7a5660372d3c38291ace95",
+          "rawDifferentPixels": 64748,
+          "maxChannelDifference": 215
+        },
+        {
+          "name": "testComponentCatalogThemes.SigningSheet-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "c4d8615e92347a9d7001bd639515c6005062d77d03161eda20c37c3bd5e32229",
+          "decodedRgbaSha256": "e33be69eea82a31fa491af2a290686fe8e161e86850797c020d53ef903192388",
+          "rawDifferentPixels": 123872,
+          "maxChannelDifference": 190
+        },
+        {
+          "name": "testComponentCatalogThemes.Skeleton-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "a9497b7720c4723f91c67e94fef9a8f7203f2e0edeb5a8a0562d72e8b4317f40",
+          "decodedRgbaSha256": "e1df93fa88aea13bfa63c3d4284dc164daf79fb359d1086bee03f3ccd5c7bf8c",
+          "rawDifferentPixels": 4175,
+          "maxChannelDifference": 183
+        },
+        {
+          "name": "testComponentCatalogThemes.Skeleton-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "a55ade1420d4640c1568f21a67b78f280c0cfaa7175868cada79f6d863e5d8ec",
+          "decodedRgbaSha256": "0172a2bbff34c965a92c9e5e3e76beaba211c73d289dab9fc4be1bf33898015f",
+          "rawDifferentPixels": 117243,
+          "maxChannelDifference": 178
+        },
+        {
+          "name": "testComponentCatalogThemes.SourceRow-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "30caee3e7637b1bfc2766f607770981ad94319803477d5d52a3b9e2be0f599f9",
+          "decodedRgbaSha256": "906772b1bb511f7e03cc093cb3a1c06e2455fda074a735b786fca5db29e66030",
+          "rawDifferentPixels": 31258,
+          "maxChannelDifference": 208
+        },
+        {
+          "name": "testComponentCatalogThemes.SourceRow-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "0a7cb4e78799b88491a527e63f45fc53d383b0b75564871e2d3c2df194f06544",
+          "decodedRgbaSha256": "71137bd07aaf363cf9f21a9d936162bb4cbcc215a5015930640a5c861b3372cf",
+          "rawDifferentPixels": 44771,
+          "maxChannelDifference": 190
+        },
+        {
+          "name": "testComponentCatalogThemes.SpendLimit-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "1511f06b6f6ca499d023f31dd9f45978f9fec63d60095949a6b7fbe2748cc3a7",
+          "decodedRgbaSha256": "069d65e6a8064290961f0e1ab8ddceb711bf600cf74e1583d264475e7f40ded6",
+          "rawDifferentPixels": 41852,
+          "maxChannelDifference": 221
+        },
+        {
+          "name": "testComponentCatalogThemes.SpendLimit-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "eb7fea0e038dfa575390f2eaaf3b1e901b33f018ac8a87172fe0e8c7079a5776",
+          "decodedRgbaSha256": "d47d66cff482ae572b702d33521e5171ac08cdbd24fab935c54e20c6088c5690",
+          "rawDifferentPixels": 52785,
+          "maxChannelDifference": 212
+        },
+        {
+          "name": "testComponentCatalogThemes.StepIn-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "23ab9a392acb120fd886eb9134bda71ffb406780ce19763e041e42d5317d05e8",
+          "decodedRgbaSha256": "6e64e96dc25de99b11dff9d47defc3c7d855eff6918e268a3d42aaeb7b2c1677",
+          "rawDifferentPixels": 25711,
+          "maxChannelDifference": 200
+        },
+        {
+          "name": "testComponentCatalogThemes.StepIn-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "96b7fbc2ba5330e4f7becd8270dad4627c4b0de3989a367541606737fd352bb4",
+          "decodedRgbaSha256": "e1ba40e88850fd57d1601a785a1e09afe370b572938431885c590c6bcebd240b",
+          "rawDifferentPixels": 52398,
+          "maxChannelDifference": 195
+        },
+        {
+          "name": "testComponentCatalogThemes.StudioTabBar-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "005e6fde73d0070111dc356f100b0d987905f177d535fb3e454055338e937cd3",
+          "decodedRgbaSha256": "8d9885023083dc151720442aaf50bd56135533618d25c3cdb689082622dd74c2",
+          "rawDifferentPixels": 12263,
+          "maxChannelDifference": 212
+        },
+        {
+          "name": "testComponentCatalogThemes.StudioTabBar-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "83c031e29a01a325c8663aeef9aa1f7eea6b04a51fb870739fb42e2c7fd24078",
+          "decodedRgbaSha256": "1637df168f96df721c38e78c771ee8a1940e6a2aa0412b1d6db7b63db3c27400",
+          "rawDifferentPixels": 17455,
+          "maxChannelDifference": 192
+        },
+        {
+          "name": "testComponentCatalogThemes.SystemLine-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "43f18b48d6ad9a6e704e51c5d341b33ca2570332c20cf7179d690026e6ff50dc",
+          "decodedRgbaSha256": "1ee7e930f854e125616c9de61f090b3652faed8ccb233c7c193e12e905c668a9",
+          "rawDifferentPixels": 22955,
+          "maxChannelDifference": 191
+        },
+        {
+          "name": "testComponentCatalogThemes.SystemLine-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "abef31361a864fff7dbddb954638fdab2e9a9114b09c816a3d9d840ab3039f87",
+          "decodedRgbaSha256": "9a258b6328f4094d65a424822ec3f9f87dce0b58a3342fa20ee77cf413202278",
+          "rawDifferentPixels": 38957,
+          "maxChannelDifference": 190
+        },
+        {
+          "name": "testComponentCatalogThemes.TabBar-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "1beae3667837e23a239b44be56cea4d6c7b15ee1599fdad37f7f1c7934b81731",
+          "decodedRgbaSha256": "04dfc5ef49985fe17e956facc610fee9cac6c7bdcfb952cc7c8f6383b1ac7c4a",
+          "rawDifferentPixels": 7901,
+          "maxChannelDifference": 212
+        },
+        {
+          "name": "testComponentCatalogThemes.TabBar-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "8755b6864203d593b9a377d29ac82bd79925f514bc9b7111c747e1105d34e0f7",
+          "decodedRgbaSha256": "b4a6cffd26ae546c09132a717808d18c6de6f310cb685ab6e2b23cf1981da0ee",
+          "rawDifferentPixels": 11314,
+          "maxChannelDifference": 192
+        },
+        {
+          "name": "testComponentCatalogThemes.TermsBlock-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "0d4749f831fad8d5b779ef31cb2d159ca7aaf54c7d4564f90f232bef07cf4e6c",
+          "decodedRgbaSha256": "6bcc1b339f8df9565b5db44ceac28379d1d6d8e6d464991f5229eb9c0349138e",
+          "rawDifferentPixels": 51725,
+          "maxChannelDifference": 203
+        },
+        {
+          "name": "testComponentCatalogThemes.TermsBlock-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "66c0ef92cc801474218020169b2505f738ceca60be81c571107d2ff1d2d7c50d",
+          "decodedRgbaSha256": "4ba241cf33a6431a8ab868ed42ef011ab47527cda2ba6c5073e3e197b2637d36",
+          "rawDifferentPixels": 58800,
+          "maxChannelDifference": 190
+        },
+        {
+          "name": "testComponentCatalogThemes.TestConsole-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "005d7a2d182489d828c83f73945d9966951ee43e9f312b5aee5bbd0ec550dfd3",
+          "decodedRgbaSha256": "f45f2547911bc5d8012735d8983e8152e74c82dd3a3b71ccad650e71459c00b7",
+          "rawDifferentPixels": 91914,
+          "maxChannelDifference": 205
+        },
+        {
+          "name": "testComponentCatalogThemes.TestConsole-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "f0f50e79b630216066500f48f87a128175a72c98068c1c3f7b4942b5d9189754",
+          "decodedRgbaSha256": "e9a166e1bcaf737b8e3c415757180c38f77f2ea1e34d0e8a8b75a62078a33be3",
+          "rawDifferentPixels": 104060,
+          "maxChannelDifference": 205
+        },
+        {
+          "name": "testComponentCatalogThemes.ThreadHeader-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "bb4dc67a5147b0a39e0674524ad18251762728b7de9d88cc7a85e8c2fc8bde96",
+          "decodedRgbaSha256": "839124007d25c24ab1a29606daa840a16c24bf4c86d6fec41b985306e8b5c79e",
+          "rawDifferentPixels": 44298,
+          "maxChannelDifference": 193
+        },
+        {
+          "name": "testComponentCatalogThemes.ThreadHeader-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "5cd0fc474d7ffc3717094ca1e88960605fee3d6fc6421ab3af2352b9f84042b3",
+          "decodedRgbaSha256": "9abb6b2530e5bc20d29db53867a93e86ae47afd40648e1c6194cd3b69a4979b7",
+          "rawDifferentPixels": 53777,
+          "maxChannelDifference": 194
+        },
+        {
+          "name": "testComponentCatalogThemes.Toast-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "ff2666ee70ec2805f206d222973b96e1407c39992f6527cce9c7b7ec2c65b62e",
+          "decodedRgbaSha256": "89b325dd7ee366686d12582926459075eacaf7152aaa4d2b08f72429d89c2fe2",
+          "rawDifferentPixels": 9167,
+          "maxChannelDifference": 200
+        },
+        {
+          "name": "testComponentCatalogThemes.Toast-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "29c1d5508744a959c82ca54db61f26d00bcc18684115baffe1418b76b6e746a4",
+          "decodedRgbaSha256": "291e164050ae64562f5cbb6e82c59fc6e7bd923934ad42cc434998eef70456fd",
+          "rawDifferentPixels": 13100,
+          "maxChannelDifference": 194
+        },
+        {
+          "name": "testComponentCatalogThemes.VersionList-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "cf7ef06e3fd764557a20cf7ddcf55b926daca193b8ae3490bfa1181686cda964",
+          "decodedRgbaSha256": "1053dd7c1646b03d5f1df35c208c924788168c97d3f49830e786926b2d5939bf",
+          "rawDifferentPixels": 29429,
+          "maxChannelDifference": 193
+        },
+        {
+          "name": "testComponentCatalogThemes.VersionList-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "dc502e173e31f40c72525a4746bda7ab4bb73992df0069c5eab2f8200209c8a1",
+          "decodedRgbaSha256": "fe168e44618891d107fc5c82da0fc6bc6e9145da838f05021fef4b64f446014d",
+          "rawDifferentPixels": 38569,
+          "maxChannelDifference": 190
+        },
+        {
+          "name": "testComponentCatalogThemes.VoiceNote-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "bd46eb808e14f6c3a7292083908d4035bc4978512b669775179f2c01495d1b78",
+          "decodedRgbaSha256": "7589dc51b7fed77b662b4dd810aaff30f6ab5c120c6793da9be42dbc517e27cc",
+          "rawDifferentPixels": 67711,
+          "maxChannelDifference": 215
+        },
+        {
+          "name": "testComponentCatalogThemes.VoiceNote-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "5e9761b7ae517cb73d6144dbd7a011124bff6e4251913e21e93250cef00a9db6",
+          "decodedRgbaSha256": "37a360586667aef5d601f41fc205184db0a3ef438ea2259ce127bf0205b5d179",
+          "rawDifferentPixels": 412916,
+          "maxChannelDifference": 196
+        },
+        {
+          "name": "testWelcomeThemes.light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "72ec810a577f47ee1bd5d279acb241b1468ec3e3bcb31becd104f3fc80114030",
+          "decodedRgbaSha256": "014e0d7e06f6fbd2e1b8c28e343c3ac7b9f7d0a32c5ded3eb78fd7aa5c99e42c",
+          "rawDifferentPixels": 110599,
+          "maxChannelDifference": 208
+        },
+        {
+          "name": "testWelcomeThemes.night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "b0b805ef725dae9acc68fee54339de545f630d0392cbfa9fc90a0471b5c2b59c",
+          "decodedRgbaSha256": "2a7c559a64a486447c223878721eb0892c6010f300d7d6ed14f81fbd44911a35",
+          "rawDifferentPixels": 138542,
+          "maxChannelDifference": 208
+        }
+      ]
+    },
+    "headlessA6df5e3": {
+      "captureCount": 109,
+      "images": [
+        {
+          "name": "testAuthorIdentitySurfaces.light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "89155d550f7b9330f072a6775569235c87c501bfbe1664427dca81cf14d26618",
+          "decodedRgbaSha256": "777d12b4cee91d3f6bd52c9fc0792a4cbb689db73b71cec9deead8056e11d40f",
+          "rawDifferentPixels": 45330,
+          "maxChannelDifference": 231
+        },
+        {
+          "name": "testAuthorIdentitySurfaces.night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "548df90f1696d959070fce893d48b901c42233e2d7226eadd41013b2553bb088",
+          "decodedRgbaSha256": "e3a510188d9007a6767ac0ae37b538c82d13da55b5a4255f6912c3ec40e5c8e4",
+          "rawDifferentPixels": 692770,
+          "maxChannelDifference": 217
+        },
+        {
+          "name": "testComponentCatalogThemes.AccessLines-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "bf11585dc2c2f7c1808e6015c86aeddf700c32b86fa17861160260ae2dd365ff",
+          "decodedRgbaSha256": "028b028fc152e0f8d813157b7521de0b8a1d672035eaaa51284b8fbbc96ddfee",
+          "rawDifferentPixels": 47681,
+          "maxChannelDifference": 191
+        },
+        {
+          "name": "testComponentCatalogThemes.AccessLines-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "cd93d39dde12426e0faf8c5cfedff751b68093a84af3ce1048571b7c5857a780",
+          "decodedRgbaSha256": "c117d9d51b0ffc1029d18ed170791f85a24dad08359651d678c10d71079af3ac",
+          "rawDifferentPixels": 49595,
+          "maxChannelDifference": 190
+        },
+        {
+          "name": "testComponentCatalogThemes.AuditBanner-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "a20cd1ccca3ab5a504eab38c2d8cece3f7f25de1188a86fa84278b992c35dbd8",
+          "decodedRgbaSha256": "f1dd58d59e78544fd1b7bd4231a8ad86b282fab50cfd59136c38ae20a3e4a96d",
+          "rawDifferentPixels": 17515,
+          "maxChannelDifference": 191
+        },
+        {
+          "name": "testComponentCatalogThemes.AuditBanner-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "b308b96a131f0e98e7c99e399cd127156dda2e9dd4d12d8fb71d25f223f1050c",
+          "decodedRgbaSha256": "7a56c930c589756d7b21e0af6fd8e0ad30f5184c5643701b8e0bb78eb56fce33",
+          "rawDifferentPixels": 85644,
+          "maxChannelDifference": 194
+        },
+        {
+          "name": "testComponentCatalogThemes.AuthorLabel-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "387ce38e0e79c5e1c435cf8398b80eefbd82f1d618ce6ae939f1bbeddb05a2b2",
+          "decodedRgbaSha256": "89dc83d7a6a03c81576fb8fb35e3b0a9c416e70b5a0b7f54a022368c8c72ecac",
+          "rawDifferentPixels": 42559,
+          "maxChannelDifference": 193
+        },
+        {
+          "name": "testComponentCatalogThemes.AuthorLabel-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "f15fb27800169c466808783836936a09f9b3071dc3bbc3db12ec141a14710efa",
+          "decodedRgbaSha256": "4e2cef75ca209da72eb7d214e477a8387353c895a9facad609ce9198166a671f",
+          "rawDifferentPixels": 43823,
+          "maxChannelDifference": 192
+        },
+        {
+          "name": "testComponentCatalogThemes.Avatar-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "8f329f7353bef65f876e893f5190ae86bc62eeb13f5b776b0f6dbb324663d9f4",
+          "decodedRgbaSha256": "d4f17601d0e58543a2c0fed5fdaa9bfb83c89eff394111842580118296e16ed2",
+          "rawDifferentPixels": 28504,
+          "maxChannelDifference": 190
+        },
+        {
+          "name": "testComponentCatalogThemes.Avatar-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "ad6cb549ddd1124176fb9cadb99383262aab81392050fde13516c9b30da218dd",
+          "decodedRgbaSha256": "40f97b7dc0ac9d4660c9762649ec21a5829b8a4c608adb5ddc845b97325665e7",
+          "rawDifferentPixels": 33615,
+          "maxChannelDifference": 189
+        },
+        {
+          "name": "testComponentCatalogThemes.Button-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "9d3b909cd494b0d55408bc59341117a436dd726b7fcde743761bb77de68d48d1",
+          "decodedRgbaSha256": "f415d3fae3eaaf49472e040e4b58b4c6b97639545467b0227c1b0c2400c545e3",
+          "rawDifferentPixels": 66765,
+          "maxChannelDifference": 216
+        },
+        {
+          "name": "testComponentCatalogThemes.Button-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "21ff971235df6a13eacda6add13d8f40bf1f1af6c28af15a1977f0f69aff7203",
+          "decodedRgbaSha256": "a814132d90fd9e92b23256a6d97eb87baba98b0af93d319ad0931f672a180779",
+          "rawDifferentPixels": 107938,
+          "maxChannelDifference": 208
+        },
+        {
+          "name": "testComponentCatalogThemes.CallChip-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "f8692176b04d74bfae2554d4e11ec4763abd0bea718a20a490f6a26d7a0adab9",
+          "decodedRgbaSha256": "8239326eeedf8c51052a67f853ff33e043617584d45f4081b385469de9c88f57",
+          "rawDifferentPixels": 55750,
+          "maxChannelDifference": 195
+        },
+        {
+          "name": "testComponentCatalogThemes.CallChip-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "2e7550e479f478273e11dc167e4927b66af11052c9dd8b1d783716d95f102946",
+          "decodedRgbaSha256": "0199b53515c1bf746c20a86db21bea0fc2f7bfacaeed81021a6d9296fa5f6555",
+          "rawDifferentPixels": 93449,
+          "maxChannelDifference": 203
+        },
+        {
+          "name": "testComponentCatalogThemes.CapacityHeader-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "83d3398a6e63661f6ea6883599e922e835d4a2d829bef1a47aaad357eced38d4",
+          "decodedRgbaSha256": "d2b74e7b57d622f65eea3dd3d67148369b7ad14c925fefa5b99bd2ecc98d9462",
+          "rawDifferentPixels": 27404,
+          "maxChannelDifference": 191
+        },
+        {
+          "name": "testComponentCatalogThemes.CapacityHeader-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "d8c8f9adee56bb5c7d4f3afc3484996562d633ab7b4c4aebf1b396a2b75270f9",
+          "decodedRgbaSha256": "bb5ae1ebe5dcece5e84ba12b366e08028bb5b40002791e1182db471db96e55f3",
+          "rawDifferentPixels": 186917,
+          "maxChannelDifference": 195
+        },
+        {
+          "name": "testComponentCatalogThemes.CitationChip-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "09ba4a349795d2f1ae4bc8442bfa5622bb2a709880ae23fa2c9a613c0083637d",
+          "decodedRgbaSha256": "d25f56b1aaeba20057c34c0ff598a62aca954869545a9bdd4447b2d14bd23d6d",
+          "rawDifferentPixels": 26321,
+          "maxChannelDifference": 191
+        },
+        {
+          "name": "testComponentCatalogThemes.CitationChip-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "529ea199c9d77ed7643e3ec48c74a400063704bd65f8cdef97ade5e69171db6d",
+          "decodedRgbaSha256": "44c424fce9d3d0943bd33635f17e1fdb8ea74e9efa142832b9e0ce9c53452511",
+          "rawDifferentPixels": 40149,
+          "maxChannelDifference": 195
+        },
+        {
+          "name": "testComponentCatalogThemes.Composer-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "a11fb11571cbcac9cbb3084a93a0ba4d5bfb2e3f39cbfbe1e2ce80c340faf232",
+          "decodedRgbaSha256": "b05e9ab3388e5474ef8415b313902e712fce9310880305db92d84be6c5e6b54a",
+          "rawDifferentPixels": 113031,
+          "maxChannelDifference": 220
+        },
+        {
+          "name": "testComponentCatalogThemes.Composer-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "6661a638ad47a9afb757db225f30b7a411890cc2509c4fc9f087a4ad37fa4597",
+          "decodedRgbaSha256": "ef5e55e1d59867ef496d414a6b215118bf1cc7b081936f30fb4100389611df89",
+          "rawDifferentPixels": 209206,
+          "maxChannelDifference": 203
+        },
+        {
+          "name": "testComponentCatalogThemes.ContextCard-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "ab56d89c64a42427de030bd5e230163db2d5e902e6c4f93e55cdcf7fd4bcc23a",
+          "decodedRgbaSha256": "bf558604dc4473a47d3dad0797dbc4d870e273c1df9d61e05918addbcbfde8f0",
+          "rawDifferentPixels": 15903,
+          "maxChannelDifference": 193
+        },
+        {
+          "name": "testComponentCatalogThemes.ContextCard-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "e95b97e2a7e5610af6f7712064ba7e39f3a39be603c7fd75c29646f06b4151f4",
+          "decodedRgbaSha256": "28c600ca9eff14d803f1adef459dc220d2f666c7d9fcb1f51e1a5c0fb77d542a",
+          "rawDifferentPixels": 20325,
+          "maxChannelDifference": 192
+        },
+        {
+          "name": "testComponentCatalogThemes.Correction-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "ceb4bf5d8ac3bc8cb129fc159c20e66fe9810ea3addaf99857fc8464c7c44f04",
+          "decodedRgbaSha256": "a61d13d9565b2e9ff9c8a290d097edba140a3cca77835614df7eccd61c11b247",
+          "rawDifferentPixels": 42533,
+          "maxChannelDifference": 218
+        },
+        {
+          "name": "testComponentCatalogThemes.Correction-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "8509bd1f7c336d7d7c71421a50a0c439e5143a38b1e2916c98bf85cb56b995f5",
+          "decodedRgbaSha256": "4feaa71452a5ac2a43459b098a7d94fb8a95f11e9c6f9f5eda5257f340ec3c81",
+          "rawDifferentPixels": 248823,
+          "maxChannelDifference": 196
+        },
+        {
+          "name": "testComponentCatalogThemes.Countdown-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "2fb274f6be274c853b494c9e0d4b81b67433589e6e5bb7c50a1d3874326f878c",
+          "decodedRgbaSha256": "8015f71a0c329a6a2a38e63989ea647095bd3035fdba779b93bb3d64df957a91",
+          "rawDifferentPixels": 13369,
+          "maxChannelDifference": 208
+        },
+        {
+          "name": "testComponentCatalogThemes.Countdown-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "611c5175c27c60dc9efc0bf44009445899a3f08c4bc640003ca3319fdaba4e6a",
+          "decodedRgbaSha256": "c1d1564351a4f233e0af39c0315d7716af8e538824d7366450b7bceb82151694",
+          "rawDifferentPixels": 17183,
+          "maxChannelDifference": 198
+        },
+        {
+          "name": "testComponentCatalogThemes.Dialog-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "cd73d61f1ca11c354055b63524c19feffe63e57c1615cd77e8f63ba462d61891",
+          "decodedRgbaSha256": "df31b2f4d99cb16c82861a700263823f544d233fa39bceb6190dc30768be763b",
+          "rawDifferentPixels": 15792,
+          "maxChannelDifference": 1
+        },
+        {
+          "name": "testComponentCatalogThemes.Dialog-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "09f15d0edcdf5dcb4a19b43222094f21cda80bf2877aa6fb832435add58a02e3",
+          "decodedRgbaSha256": "5a387ce3d5da8eb98aac213c390f29d9f9ed57f1f3ee8693c6f51e21bda30f3b",
+          "rawDifferentPixels": 18858,
+          "maxChannelDifference": 1
+        },
+        {
+          "name": "testComponentCatalogThemes.DigestItem-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "8fa673d46b72ced9124542358f707abb477c67304e03468fb51dda322b599efd",
+          "decodedRgbaSha256": "736b6a48500afb6e571c19e466be0c9639c6bda6f77d05baa42a9c7ee743f78c",
+          "rawDifferentPixels": 49706,
+          "maxChannelDifference": 217
+        },
+        {
+          "name": "testComponentCatalogThemes.DigestItem-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "7d49d94e51ea2e22e34f158ba5364f9fbd933905b0763d9c7070962b2a2f3a86",
+          "decodedRgbaSha256": "5b2515dd775ea5270613687e89c1b59c8f24c3730c2cf257be9b0b9ace41dc2c",
+          "rawDifferentPixels": 326331,
+          "maxChannelDifference": 196
+        },
+        {
+          "name": "testComponentCatalogThemes.EmailFrame-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "2718bcaab368c825455a83ea0ec52f643ca502943f03e746b6dadac98cee5cb3",
+          "decodedRgbaSha256": "061563b1074dc0c8975d034e92c5d001cfa22f3b3a509e442e8bb1f996632707",
+          "rawDifferentPixels": 65447,
+          "maxChannelDifference": 216
+        },
+        {
+          "name": "testComponentCatalogThemes.EmailFrame-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "0b88f25212e0373fdb45d5805c9b6836056f7947273959fe12791da263224f14",
+          "decodedRgbaSha256": "911232006bb05aa688212a4f29d4f5b7189dd75efa0fbe9f7a37ceb4932e5f71",
+          "rawDifferentPixels": 224480,
+          "maxChannelDifference": 200
+        },
+        {
+          "name": "testComponentCatalogThemes.EmptyState-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "dd9424f51fedfbe62c24fe5142e2ae887dabc8c9292d140176cc34a1562eacb5",
+          "decodedRgbaSha256": "d67522d59d0aca053c4e9382fd21c7388b426d5fb2ebf980bed3d589e1833ac4",
+          "rawDifferentPixels": 30250,
+          "maxChannelDifference": 203
+        },
+        {
+          "name": "testComponentCatalogThemes.EmptyState-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "4bccd28bd3d95dbd84a0a2fa6343ccc4c2ae55f7b55d073e1bd1033b725a022c",
+          "decodedRgbaSha256": "0afe3deccd6235c1a093527f924632e000eb11a26fb53cbc4406ecdc1a862f39",
+          "rawDifferentPixels": 34018,
+          "maxChannelDifference": 212
+        },
+        {
+          "name": "testComponentCatalogThemes.EtaLine-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "94f571d3ded117298941fa7cec0fec9e77bebff37a5f38fc687addcfa8629f40",
+          "decodedRgbaSha256": "8b70bdf1d217ef33d3f265d948a11bceb7da2b4227b781394feb9dbbb5c4bf71",
+          "rawDifferentPixels": 15389,
+          "maxChannelDifference": 192
+        },
+        {
+          "name": "testComponentCatalogThemes.EtaLine-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "9dc423601439796427967b8514d9f10ccd0c2f86aef1a20853ff3811a5246edf",
+          "decodedRgbaSha256": "b916cb36fc8bbf7787c8f76227f92d3cbf6463afbc7098eec6d8c3706a6a5b5d",
+          "rawDifferentPixels": 16405,
+          "maxChannelDifference": 192
+        },
+        {
+          "name": "testComponentCatalogThemes.IdentityStrip-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "e60f762a6ce541d7d8bc5e9c5a9b7ecc5a02d02de0b8093b41ca6be2089f73e8",
+          "decodedRgbaSha256": "244ba137978ae8be4fd369e6925014ac9202b8aa00443a813ce342764e0cf3de",
+          "rawDifferentPixels": 74945,
+          "maxChannelDifference": 222
+        },
+        {
+          "name": "testComponentCatalogThemes.IdentityStrip-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "58d01f696ef6c7f72e05c4dac0afd3fba4ece436fd2e25f9ea968cf176a2da2b",
+          "decodedRgbaSha256": "f5ac532b3ed5258161d3ca0299eb2229d6580db9c995ffa357f33089cd0efb77",
+          "rawDifferentPixels": 220733,
+          "maxChannelDifference": 195
+        },
+        {
+          "name": "testComponentCatalogThemes.IncludeList-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "4a3b94b6f91ecd86a4bb040c4f698918bcbedec92ac35f84a6b6331e14dfc27f",
+          "decodedRgbaSha256": "475a913c016ca1a4e7368041d700b6cbfc8cf971f977af03770fe052c02af0ba",
+          "rawDifferentPixels": 41889,
+          "maxChannelDifference": 215
+        },
+        {
+          "name": "testComponentCatalogThemes.IncludeList-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "63353a1232d23c2cc5c5fe3053ac6d2ce5bcfcaa84a51419c851ba40bfea02c8",
+          "decodedRgbaSha256": "70350c8dc3dce553f18ac26d26ee60f47a5ab36ac18828208d721da97cad7bc1",
+          "rawDifferentPixels": 67086,
+          "maxChannelDifference": 203
+        },
+        {
+          "name": "testComponentCatalogThemes.InsteadMenu-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "fa2a2bf3805b2db10a0548d09033885e11dbbb08e44482f18fac40f6437893d7",
+          "decodedRgbaSha256": "466999e662f5ceb264024b347635b4687334e867e6cd20834a3854237b3d0fc0",
+          "rawDifferentPixels": 80636,
+          "maxChannelDifference": 220
+        },
+        {
+          "name": "testComponentCatalogThemes.InsteadMenu-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "11d8afe9335f96a6cb538387c145a2603d3404fb0542e947ba900997fe76e619",
+          "decodedRgbaSha256": "2827bd8b7baba10ac2b4595fbcff5a3837e80e3695af8eb6b70a3e6dd67c7ba0",
+          "rawDifferentPixels": 92692,
+          "maxChannelDifference": 203
+        },
+        {
+          "name": "testComponentCatalogThemes.LabelPreview-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "ab0b67d67e57799af013840a5c6b8f7063b65c8afb0b4cf1823dbff3a781571e",
+          "decodedRgbaSha256": "3cd3ad109c68a5e6c5b69a3fe79be45fad6818aaeedc77591d3c9cda1e6a9796",
+          "rawDifferentPixels": 28956,
+          "maxChannelDifference": 193
+        },
+        {
+          "name": "testComponentCatalogThemes.LabelPreview-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "08b3480770edd6fac7026967fe508d6fd0882a01a92a284b051dd5ca0e7476dd",
+          "decodedRgbaSha256": "666f3d2fba4f810c2e8e06bdd8194837c85e5abba54e17b5ebdaa7ed6f58eeec",
+          "rawDifferentPixels": 35605,
+          "maxChannelDifference": 194
+        },
+        {
+          "name": "testComponentCatalogThemes.Mark-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "8c3ae09147bd1c08a5aa9b2587ab99a2ac74b48a8bef983fd5ad77cb8887c810",
+          "decodedRgbaSha256": "b4d8bcb5b08233ac88d3605a5d8130270047c9117c5e42c00b94a72ac80c2230",
+          "rawDifferentPixels": 7763,
+          "maxChannelDifference": 191
+        },
+        {
+          "name": "testComponentCatalogThemes.Mark-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "fe4580a2bd363c7ba74f071e3106cdcf3b1e3b0e24499e9faf5e6d16e4e2009b",
+          "decodedRgbaSha256": "836ef548ab1115e0f3ea628220b7d092bd8cb29c4a798894176dc9d5e1a14b2f",
+          "rawDifferentPixels": 8864,
+          "maxChannelDifference": 192
+        },
+        {
+          "name": "testComponentCatalogThemes.MemoryChip-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "3f50847886a134bdcdf028803ef5e8b0497de074e609a6853bc603b012b72eb0",
+          "decodedRgbaSha256": "b1202c0ee8cddaa9a4a6d1d2f6869acbf4c8660b90b0af49b9fa35d786db6ddd",
+          "rawDifferentPixels": 44398,
+          "maxChannelDifference": 220
+        },
+        {
+          "name": "testComponentCatalogThemes.MemoryChip-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "b7d65766e8ee393417dec014547e42b55d04758f3707eae1a6430a47ed5aa6d3",
+          "decodedRgbaSha256": "34d6884fc272cb883cc5c78d774d3555fa7ad1c401952b1be552647209547aeb",
+          "rawDifferentPixels": 238033,
+          "maxChannelDifference": 205
+        },
+        {
+          "name": "testComponentCatalogThemes.Message-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "2e58cd850b25076a7f3cabacde4afa7050d48e8735b4eb4b08363bb916f53c24",
+          "decodedRgbaSha256": "851e34fb49aa108c226dcb9adf6cc1e0d48a694b16621cf9853cede59288efa6",
+          "rawDifferentPixels": 116554,
+          "maxChannelDifference": 219
+        },
+        {
+          "name": "testComponentCatalogThemes.Message-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "3c4ba2043033a840d95a369f03fed1e270f6b1719bbf0f009e16a470fecbfcb8",
+          "decodedRgbaSha256": "af40558e82543016be2b94b3656dbbc91930deb13d5cc36b69ffd9408325d126",
+          "rawDifferentPixels": 712513,
+          "maxChannelDifference": 212
+        },
+        {
+          "name": "testComponentCatalogThemes.ModeList-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "d7502f65b4261556237fc43d286c7bdeb8750ac0516cb60d42f2b0ee15560b79",
+          "decodedRgbaSha256": "e25e63b1a818b43a6dabd81738396d8cdd52f9a0b0c50512b2b7b37cf475f87a",
+          "rawDifferentPixels": 27212,
+          "maxChannelDifference": 216
+        },
+        {
+          "name": "testComponentCatalogThemes.ModeList-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "b95432b5c68dc0e7408bd693943e00d0bf4dc51faec84f5e0269e2dfd3b34bee",
+          "decodedRgbaSha256": "954b53d7838077a1a71a38e71ddcb500e663d20cd8864da56984734a967b54eb",
+          "rawDifferentPixels": 38310,
+          "maxChannelDifference": 202
+        },
+        {
+          "name": "testComponentCatalogThemes.Note-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "a70896d8bfd5bef14989040fac4f45e56975d0c154a48bede83ec6e0740223e8",
+          "decodedRgbaSha256": "f6eebe23eb402bb99fd3989e232399411415b2452e663d7b970e4016c02916fd",
+          "rawDifferentPixels": 56641,
+          "maxChannelDifference": 203
+        },
+        {
+          "name": "testComponentCatalogThemes.Note-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "a657f6e7a6175460cb311b1106050ac76036ecaf9b340e2548d4a61a2bf0fa36",
+          "decodedRgbaSha256": "b1b6b8016e3d7f15419070df022590b5824f1b07ffd34fd905c0482c0c30b183",
+          "rawDifferentPixels": 544845,
+          "maxChannelDifference": 190
+        },
+        {
+          "name": "testComponentCatalogThemes.Notice-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "306467de3833c0dc1cb940e4b36150874644fda6cab393a2f17553c5a2bdd981",
+          "decodedRgbaSha256": "8c75e14002425be07e9f0b3256c74c09f7eb0c35c2b89d73012c8067d97e6625",
+          "rawDifferentPixels": 35877,
+          "maxChannelDifference": 208
+        },
+        {
+          "name": "testComponentCatalogThemes.Notice-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "e31013fcda90b9a9409f68c9e363d32eba4f48804f3c8d27c180ebce5184d36a",
+          "decodedRgbaSha256": "fb7aa27027744a210df6c91929c7669bb012e6333fa206263c77154977f38530",
+          "rawDifferentPixels": 174631,
+          "maxChannelDifference": 190
+        },
+        {
+          "name": "testComponentCatalogThemes.NotificationRow-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "8665c5768a8798b8b0ef47208ae7148ebb21ed33cb14b201e273a9b9a1b3fd90",
+          "decodedRgbaSha256": "0b978159610dde93f29e2baf4ce4ae04a03e4a4c286a44828c12e5af2b07af03",
+          "rawDifferentPixels": 84942,
+          "maxChannelDifference": 191
+        },
+        {
+          "name": "testComponentCatalogThemes.NotificationRow-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "c416fae455c6f72917e1a2e127c46cce173d830d4a9afea2b1426d1a090eee99",
+          "decodedRgbaSha256": "95f16f2c469e637999c563546e9d2a3aa7508b84f0fb722966851b4c5b19626a",
+          "rawDifferentPixels": 128013,
+          "maxChannelDifference": 194
+        },
+        {
+          "name": "testComponentCatalogThemes.QueueCard-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "1b7ac69566459222181bc4b678ba3f6b4a537bc0ba78cf454a00b187c393b6a2",
+          "decodedRgbaSha256": "f3516d4db84e27d2dc5af9c0d378f7f6cd8863a904697c8c075c4b144079cc6d",
+          "rawDifferentPixels": 61343,
+          "maxChannelDifference": 215
+        },
+        {
+          "name": "testComponentCatalogThemes.QueueCard-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "92b29d96b150f3890e9978b42dba28eac31f7e8229be548a25b5d1c1605194a5",
+          "decodedRgbaSha256": "cf5a351d6e07e6255a5710ea5b247843eadc0c0e7b90a4a426256fad8ada5e84",
+          "rawDifferentPixels": 69946,
+          "maxChannelDifference": 198
+        },
+        {
+          "name": "testComponentCatalogThemes.ReactionChip-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "f2b6c75b17112a50f8f29a8de5628e05fffb83d6320d2186e9765557b0039916",
+          "decodedRgbaSha256": "21bec5e96bfbb775e036ddd7d52677af58386092e812b8bc336f86a211f0a852",
+          "rawDifferentPixels": 13188,
+          "maxChannelDifference": 195
+        },
+        {
+          "name": "testComponentCatalogThemes.ReactionChip-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "c1acad8593da18bb2065112cfe0a124f04fc8112ab79f665930b713288359581",
+          "decodedRgbaSha256": "c5b2373800e978108ecbd90a839b782c7132682e979266ae1b5362230d2ee002",
+          "rawDifferentPixels": 32550,
+          "maxChannelDifference": 203
+        },
+        {
+          "name": "testComponentCatalogThemes.Receipt-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "f5c50948b7e74acb186056d018efd88b491ea2b0cd286c47ca1dea901bd36c82",
+          "decodedRgbaSha256": "37e69eab2bda79b7c87397422eacd774f6cf1b6fa2db045930daef0953dc3a18",
+          "rawDifferentPixels": 38467,
+          "maxChannelDifference": 210
+        },
+        {
+          "name": "testComponentCatalogThemes.Receipt-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "a1b800d3259c8d8a881ac8a371e2353c1075deda3f19d966e0d6740acfd23b28",
+          "decodedRgbaSha256": "72274df9c5df06db686fe57eb387f8438b345672bcb0f4397f7115e987eced52",
+          "rawDifferentPixels": 48332,
+          "maxChannelDifference": 203
+        },
+        {
+          "name": "testComponentCatalogThemes.RequestStatus-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "14dd5ef2ffa06aa8eb9e76df715c933dac32b94bcb355ff9f81c4ce368eeb596",
+          "decodedRgbaSha256": "28f65a095a3e054fd23269f24d8e5d291341f07aca67e1be110306301dee23a9",
+          "rawDifferentPixels": 36405,
+          "maxChannelDifference": 202
+        },
+        {
+          "name": "testComponentCatalogThemes.RequestStatus-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "0f234c96f6fa310b3120d2acb8dd406d1a019b6b43bc0fb56531e423a3c4df1c",
+          "decodedRgbaSha256": "bac5569a1695fcc8b7be3a3a7de60a937c59ff95d6e5ebd1368b6192a21c5e9a",
+          "rawDifferentPixels": 43347,
+          "maxChannelDifference": 194
+        },
+        {
+          "name": "testComponentCatalogThemes.ReservedLabel-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "176d990f778df721f9dc14d91b06ed78da50bf29ada4d4e8982bccef632c7e3c",
+          "decodedRgbaSha256": "f5cd2dfeaef0727b9823bbf951e69227c7cb68f38bb9deb1c99316a0c5068fcf",
+          "rawDifferentPixels": 36647,
+          "maxChannelDifference": 193
+        },
+        {
+          "name": "testComponentCatalogThemes.ReservedLabel-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "ec19d092427e05659a03a4062b18e9cf9ddd8c75254abc565b9848aa99411d42",
+          "decodedRgbaSha256": "cc27780f66fa04359c6c2ee897b8b864bb5c0ebcde3b77892f90bbeb71e6751f",
+          "rawDifferentPixels": 48932,
+          "maxChannelDifference": 194
+        },
+        {
+          "name": "testComponentCatalogThemes.Seal-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "d4825435628b05eb87aa46d5c7c12f7bdcc3c17ac0b6ebcbb84740f44dd502be",
+          "decodedRgbaSha256": "1e301d0b7871c2c7366bc72b9457fc9c0e634068084809a03057fb25ffbabada",
+          "rawDifferentPixels": 27170,
+          "maxChannelDifference": 191
+        },
+        {
+          "name": "testComponentCatalogThemes.Seal-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "928fd36f227aa7c2b5b10f7cf4802889dd36fd383fdc0550b36e168466b47b7e",
+          "decodedRgbaSha256": "b5d6e6ae28585c45a0b3b3a0b1d267175693a801a4f942b697546ea3f571feca",
+          "rawDifferentPixels": 28668,
+          "maxChannelDifference": 194
+        },
+        {
+          "name": "testComponentCatalogThemes.Segmented-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "e063e159d5f1937c91dfe2280e00aed64ee5d6d6a43c8d8f4777f17baa393a67",
+          "decodedRgbaSha256": "191ed45d7d8f87943a84c68cb03cccbec55bc2344025ac60fbeb3de8dcea4cfd",
+          "rawDifferentPixels": 11168,
+          "maxChannelDifference": 191
+        },
+        {
+          "name": "testComponentCatalogThemes.Segmented-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "63b039d88c73c83af8f0d17393601c1bcee5ec8c886820a77019f64b11cf5e80",
+          "decodedRgbaSha256": "77c267997f4ba8132a6661720793cbee9ced901ecb59bcd7a35b5cc6fc8d3cdb",
+          "rawDifferentPixels": 62040,
+          "maxChannelDifference": 192
+        },
+        {
+          "name": "testComponentCatalogThemes.ShareCard-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "e1c6be9dd023d4cf51c597cc0a57d4b5c5d2f1c0cb73c2a6d0dcc915b3e08b92",
+          "decodedRgbaSha256": "c7157db52f60fbab4eebf110d8c11112f0d0dcd8c979fb3ecfcc8b2876339de1",
+          "rawDifferentPixels": 51489,
+          "maxChannelDifference": 193
+        },
+        {
+          "name": "testComponentCatalogThemes.ShareCard-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "cea70f835de1221aedfd8db110e7008429e715b1a222bbc1c0f9fbb99098873b",
+          "decodedRgbaSha256": "518d37d03059187b14dce5e7504d43045fd285ad1b90ec97414aa44a0a33c4ff",
+          "rawDifferentPixels": 466581,
+          "maxChannelDifference": 192
+        },
+        {
+          "name": "testComponentCatalogThemes.Sheet-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "8c0c90331a35e788997bdde3d2509b7c9b632200269791b58661f29ec4155237",
+          "decodedRgbaSha256": "06ffcbe049b9ec40839e0a030c534ba53f0ce3f36506bd49783339424997eac5",
+          "rawDifferentPixels": 85281,
+          "maxChannelDifference": 220
+        },
+        {
+          "name": "testComponentCatalogThemes.Sheet-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "53557e6dd90f63c126bad62ca37dcc1d6e22843614f8fc90fd0877ba467d621a",
+          "decodedRgbaSha256": "f04cda536ddcbf7769c1c4eee3b06eca1dc115d52d2ae1469214d4fcaed85b11",
+          "rawDifferentPixels": 80532,
+          "maxChannelDifference": 198
+        },
+        {
+          "name": "testComponentCatalogThemes.Sidebar-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "686f8fff6a9d7a3451d7b7a5b559283ed3e34e06e861f1defc7cb80707da35df",
+          "decodedRgbaSha256": "673d51561278dc77038e5b0696e58fd9f29c414ebfa64de54317c9f49797b6da",
+          "rawDifferentPixels": 28811,
+          "maxChannelDifference": 216
+        },
+        {
+          "name": "testComponentCatalogThemes.Sidebar-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "0c445d5e0ff4e8d6b8906ce064ddd071ecb59df1467d775f1641ff7b862eb317",
+          "decodedRgbaSha256": "9c511e4dc4066ae9552924f0c915f98412e2f70837e46bdfbcac6255d5096fa1",
+          "rawDifferentPixels": 72741,
+          "maxChannelDifference": 194
+        },
+        {
+          "name": "testComponentCatalogThemes.SignedMarker-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "290d556d7eaab4025c8dfccaa55d5bb902e61a7363f4fee82c52e13522bf552d",
+          "decodedRgbaSha256": "2b510e164464b242c6cfb95b762b79ae2507908470e146be325d684e759e68dd",
+          "rawDifferentPixels": 18269,
+          "maxChannelDifference": 199
+        },
+        {
+          "name": "testComponentCatalogThemes.SignedMarker-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "be944f5ff0c9f15144b30e25fc25d1db0f6a69bee15ac2a8597806add7efe7c4",
+          "decodedRgbaSha256": "aaf3b89a88a401e48a542e8bb9492cfb9d740dc8d381281abc7119611313e133",
+          "rawDifferentPixels": 19022,
+          "maxChannelDifference": 195
+        },
+        {
+          "name": "testComponentCatalogThemes.SigningSheet-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "4f1d4105a2241442ab0a3188298620f006ede560790ba3eb80aa3d629aa3e153",
+          "decodedRgbaSha256": "5ae4d08bb0d20d2ad1bc72326d79c191e0c4759f5a7a5660372d3c38291ace95",
+          "rawDifferentPixels": 64748,
+          "maxChannelDifference": 215
+        },
+        {
+          "name": "testComponentCatalogThemes.SigningSheet-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "c4d8615e92347a9d7001bd639515c6005062d77d03161eda20c37c3bd5e32229",
+          "decodedRgbaSha256": "e33be69eea82a31fa491af2a290686fe8e161e86850797c020d53ef903192388",
+          "rawDifferentPixels": 123872,
+          "maxChannelDifference": 190
+        },
+        {
+          "name": "testComponentCatalogThemes.Skeleton-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "bbbe9fcee2de663b16e737164a9ab627d7f6e69441c02e97da3feb3f6b548a65",
+          "decodedRgbaSha256": "8c6236e6f17d6d945d847b27b657b717b8f132d01eaebb7abda7344604007f26",
+          "rawDifferentPixels": 112865,
+          "maxChannelDifference": 1
+        },
+        {
+          "name": "testComponentCatalogThemes.SourceRow-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "30caee3e7637b1bfc2766f607770981ad94319803477d5d52a3b9e2be0f599f9",
+          "decodedRgbaSha256": "906772b1bb511f7e03cc093cb3a1c06e2455fda074a735b786fca5db29e66030",
+          "rawDifferentPixels": 31258,
+          "maxChannelDifference": 208
+        },
+        {
+          "name": "testComponentCatalogThemes.SourceRow-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "0a7cb4e78799b88491a527e63f45fc53d383b0b75564871e2d3c2df194f06544",
+          "decodedRgbaSha256": "71137bd07aaf363cf9f21a9d936162bb4cbcc215a5015930640a5c861b3372cf",
+          "rawDifferentPixels": 44771,
+          "maxChannelDifference": 190
+        },
+        {
+          "name": "testComponentCatalogThemes.SpendLimit-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "1511f06b6f6ca499d023f31dd9f45978f9fec63d60095949a6b7fbe2748cc3a7",
+          "decodedRgbaSha256": "069d65e6a8064290961f0e1ab8ddceb711bf600cf74e1583d264475e7f40ded6",
+          "rawDifferentPixels": 41852,
+          "maxChannelDifference": 221
+        },
+        {
+          "name": "testComponentCatalogThemes.SpendLimit-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "eb7fea0e038dfa575390f2eaaf3b1e901b33f018ac8a87172fe0e8c7079a5776",
+          "decodedRgbaSha256": "d47d66cff482ae572b702d33521e5171ac08cdbd24fab935c54e20c6088c5690",
+          "rawDifferentPixels": 52785,
+          "maxChannelDifference": 212
+        },
+        {
+          "name": "testComponentCatalogThemes.StepIn-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "23ab9a392acb120fd886eb9134bda71ffb406780ce19763e041e42d5317d05e8",
+          "decodedRgbaSha256": "6e64e96dc25de99b11dff9d47defc3c7d855eff6918e268a3d42aaeb7b2c1677",
+          "rawDifferentPixels": 25711,
+          "maxChannelDifference": 200
+        },
+        {
+          "name": "testComponentCatalogThemes.StepIn-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "96b7fbc2ba5330e4f7becd8270dad4627c4b0de3989a367541606737fd352bb4",
+          "decodedRgbaSha256": "e1ba40e88850fd57d1601a785a1e09afe370b572938431885c590c6bcebd240b",
+          "rawDifferentPixels": 52398,
+          "maxChannelDifference": 195
+        },
+        {
+          "name": "testComponentCatalogThemes.StudioTabBar-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "005e6fde73d0070111dc356f100b0d987905f177d535fb3e454055338e937cd3",
+          "decodedRgbaSha256": "8d9885023083dc151720442aaf50bd56135533618d25c3cdb689082622dd74c2",
+          "rawDifferentPixels": 12263,
+          "maxChannelDifference": 212
+        },
+        {
+          "name": "testComponentCatalogThemes.StudioTabBar-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "83c031e29a01a325c8663aeef9aa1f7eea6b04a51fb870739fb42e2c7fd24078",
+          "decodedRgbaSha256": "1637df168f96df721c38e78c771ee8a1940e6a2aa0412b1d6db7b63db3c27400",
+          "rawDifferentPixels": 17455,
+          "maxChannelDifference": 192
+        },
+        {
+          "name": "testComponentCatalogThemes.SystemLine-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "43f18b48d6ad9a6e704e51c5d341b33ca2570332c20cf7179d690026e6ff50dc",
+          "decodedRgbaSha256": "1ee7e930f854e125616c9de61f090b3652faed8ccb233c7c193e12e905c668a9",
+          "rawDifferentPixels": 22955,
+          "maxChannelDifference": 191
+        },
+        {
+          "name": "testComponentCatalogThemes.SystemLine-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "abef31361a864fff7dbddb954638fdab2e9a9114b09c816a3d9d840ab3039f87",
+          "decodedRgbaSha256": "9a258b6328f4094d65a424822ec3f9f87dce0b58a3342fa20ee77cf413202278",
+          "rawDifferentPixels": 38957,
+          "maxChannelDifference": 190
+        },
+        {
+          "name": "testComponentCatalogThemes.TabBar-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "1beae3667837e23a239b44be56cea4d6c7b15ee1599fdad37f7f1c7934b81731",
+          "decodedRgbaSha256": "04dfc5ef49985fe17e956facc610fee9cac6c7bdcfb952cc7c8f6383b1ac7c4a",
+          "rawDifferentPixels": 7901,
+          "maxChannelDifference": 212
+        },
+        {
+          "name": "testComponentCatalogThemes.TabBar-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "8755b6864203d593b9a377d29ac82bd79925f514bc9b7111c747e1105d34e0f7",
+          "decodedRgbaSha256": "b4a6cffd26ae546c09132a717808d18c6de6f310cb685ab6e2b23cf1981da0ee",
+          "rawDifferentPixels": 11314,
+          "maxChannelDifference": 192
+        },
+        {
+          "name": "testComponentCatalogThemes.TermsBlock-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "0d4749f831fad8d5b779ef31cb2d159ca7aaf54c7d4564f90f232bef07cf4e6c",
+          "decodedRgbaSha256": "6bcc1b339f8df9565b5db44ceac28379d1d6d8e6d464991f5229eb9c0349138e",
+          "rawDifferentPixels": 51725,
+          "maxChannelDifference": 203
+        },
+        {
+          "name": "testComponentCatalogThemes.TermsBlock-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "66c0ef92cc801474218020169b2505f738ceca60be81c571107d2ff1d2d7c50d",
+          "decodedRgbaSha256": "4ba241cf33a6431a8ab868ed42ef011ab47527cda2ba6c5073e3e197b2637d36",
+          "rawDifferentPixels": 58800,
+          "maxChannelDifference": 190
+        },
+        {
+          "name": "testComponentCatalogThemes.TestConsole-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "005d7a2d182489d828c83f73945d9966951ee43e9f312b5aee5bbd0ec550dfd3",
+          "decodedRgbaSha256": "f45f2547911bc5d8012735d8983e8152e74c82dd3a3b71ccad650e71459c00b7",
+          "rawDifferentPixels": 91914,
+          "maxChannelDifference": 205
+        },
+        {
+          "name": "testComponentCatalogThemes.TestConsole-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "f0f50e79b630216066500f48f87a128175a72c98068c1c3f7b4942b5d9189754",
+          "decodedRgbaSha256": "e9a166e1bcaf737b8e3c415757180c38f77f2ea1e34d0e8a8b75a62078a33be3",
+          "rawDifferentPixels": 104060,
+          "maxChannelDifference": 205
+        },
+        {
+          "name": "testComponentCatalogThemes.ThreadHeader-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "bb4dc67a5147b0a39e0674524ad18251762728b7de9d88cc7a85e8c2fc8bde96",
+          "decodedRgbaSha256": "839124007d25c24ab1a29606daa840a16c24bf4c86d6fec41b985306e8b5c79e",
+          "rawDifferentPixels": 44298,
+          "maxChannelDifference": 193
+        },
+        {
+          "name": "testComponentCatalogThemes.ThreadHeader-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "5cd0fc474d7ffc3717094ca1e88960605fee3d6fc6421ab3af2352b9f84042b3",
+          "decodedRgbaSha256": "9abb6b2530e5bc20d29db53867a93e86ae47afd40648e1c6194cd3b69a4979b7",
+          "rawDifferentPixels": 53777,
+          "maxChannelDifference": 194
+        },
+        {
+          "name": "testComponentCatalogThemes.Toast-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "ff2666ee70ec2805f206d222973b96e1407c39992f6527cce9c7b7ec2c65b62e",
+          "decodedRgbaSha256": "89b325dd7ee366686d12582926459075eacaf7152aaa4d2b08f72429d89c2fe2",
+          "rawDifferentPixels": 9167,
+          "maxChannelDifference": 200
+        },
+        {
+          "name": "testComponentCatalogThemes.Toast-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "29c1d5508744a959c82ca54db61f26d00bcc18684115baffe1418b76b6e746a4",
+          "decodedRgbaSha256": "291e164050ae64562f5cbb6e82c59fc6e7bd923934ad42cc434998eef70456fd",
+          "rawDifferentPixels": 13100,
+          "maxChannelDifference": 194
+        },
+        {
+          "name": "testComponentCatalogThemes.VersionList-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "cf7ef06e3fd764557a20cf7ddcf55b926daca193b8ae3490bfa1181686cda964",
+          "decodedRgbaSha256": "1053dd7c1646b03d5f1df35c208c924788168c97d3f49830e786926b2d5939bf",
+          "rawDifferentPixels": 29429,
+          "maxChannelDifference": 193
+        },
+        {
+          "name": "testComponentCatalogThemes.VersionList-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "dc502e173e31f40c72525a4746bda7ab4bb73992df0069c5eab2f8200209c8a1",
+          "decodedRgbaSha256": "fe168e44618891d107fc5c82da0fc6bc6e9145da838f05021fef4b64f446014d",
+          "rawDifferentPixels": 38569,
+          "maxChannelDifference": 190
+        },
+        {
+          "name": "testComponentCatalogThemes.VoiceNote-light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "bd46eb808e14f6c3a7292083908d4035bc4978512b669775179f2c01495d1b78",
+          "decodedRgbaSha256": "7589dc51b7fed77b662b4dd810aaff30f6ab5c120c6793da9be42dbc517e27cc",
+          "rawDifferentPixels": 67711,
+          "maxChannelDifference": 215
+        },
+        {
+          "name": "testComponentCatalogThemes.VoiceNote-night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "5e9761b7ae517cb73d6144dbd7a011124bff6e4251913e21e93250cef00a9db6",
+          "decodedRgbaSha256": "37a360586667aef5d601f41fc205184db0a3ef438ea2259ce127bf0205b5d179",
+          "rawDifferentPixels": 412916,
+          "maxChannelDifference": 196
+        },
+        {
+          "name": "testWelcomeThemes.light.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "72ec810a577f47ee1bd5d279acb241b1468ec3e3bcb31becd104f3fc80114030",
+          "decodedRgbaSha256": "014e0d7e06f6fbd2e1b8c28e343c3ac7b9f7d0a32c5ded3eb78fd7aa5c99e42c",
+          "rawDifferentPixels": 110599,
+          "maxChannelDifference": 208
+        },
+        {
+          "name": "testWelcomeThemes.night.png",
+          "size": [780, 1688],
+          "iccBytes": 0,
+          "sha256": "b0b805ef725dae9acc68fee54339de545f630d0392cbfa9fc90a0471b5c2b59c",
+          "decodedRgbaSha256": "2a7c559a64a486447c223878721eb0892c6010f300d7d6ed14f81fbd44911a35",
+          "rawDifferentPixels": 138542,
+          "maxChannelDifference": 208
+        }
+      ]
+    }
+  }
+}

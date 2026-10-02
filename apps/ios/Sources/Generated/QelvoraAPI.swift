@@ -334,6 +334,8 @@ public struct APIAgentStatusWrite: Codable, Sendable {
   }
 }
 
+public typealias APICommerceCallTransportStatus = APIJSONValue
+
 public enum APICommerceCommitmentState: String, Codable, Sendable {
   case `due` = "due"
   case `in_progress` = "in_progress"

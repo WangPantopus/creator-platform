@@ -1,0 +1,37 @@
+{
+  "at": "2026-10-02T11:20:13.705625+00:00",
+  "baseMain": "d5184839c6d24bb714780d7290e266ce13e963bd",
+  "reason": "Replace stale current iMac/PR40/archive/resource assertions with actual Mac Studio scope; preserve every earlier source-qualified claim as history.",
+  "files": [
+    {
+      "source": "artifacts/workstreams/W2/completion/20261001/README.md",
+      "history": "artifacts/workstreams/W2/completion/20261001/README-history-20261002.md",
+      "originalBytes": 27907,
+      "sha256": "397de36545c611fba49602930efb9b010b946be1c7edad421c0c8301b98ded16"
+    },
+    {
+      "source": "artifacts/workstreams/W2/completion/20261001/finish-matrix.md",
+      "history": "artifacts/workstreams/W2/completion/20261001/finish-matrix-history-20261002.md",
+      "originalBytes": 35078,
+      "sha256": "0a824b8384a8a88dfd4df3a03c198168e7a193a3beec92d98204f7bc62c6d8c3"
+    },
+    {
+      "source": "artifacts/workstreams/W2/completion/20261001/release-backlog.md",
+      "history": "artifacts/workstreams/W2/completion/20261001/release-backlog-history-20261002.md",
+      "originalBytes": 23207,
+      "sha256": "daaefb5dcfb8294e15cf224016b9c5f680ee2bd47a1a938f0db5ccde71cbb9f2"
+    },
+    {
+      "source": "docs/workstreams/status/W2.md",
+      "history": "docs/workstreams/status/W2-history-20261002.md",
+      "originalBytes": 47732,
+      "sha256": "107e183b7c1d5a0cba2cd666da2c736d28f023ff7218544150f4679d9be514f0"
+    },
+    {
+      "source": "docs/workstreams/coordination/W2.md",
+      "history": "docs/workstreams/coordination/W2-history-20261002.md",
+      "originalBytes": 44735,
+      "sha256": "168a9a9a83b0ad13be6a28ca8bd9418547d7bd0f7d375e4066ce508881eb8194"
+    }
+  ]
+}

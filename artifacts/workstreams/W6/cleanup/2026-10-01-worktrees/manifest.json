@@ -1,0 +1,268 @@
+{
+  "recordedAt": "2026-10-01T20:20:58.606335+00:00",
+  "purpose": "Preserve remaining local W6 state before user-authorized worktree removal",
+  "worktrees": [
+    {
+      "id": "970d",
+      "path": "/Users/yingpengwang/.codex/worktrees/970d/creator-platform",
+      "head": "588f834f8634e91131cca45087089e6bde0cde3e",
+      "branch": "codex/w6-completion-20261001",
+      "pullRequest": 20,
+      "statusBeforePreservation": [
+        " M apps/ios/Package.resolved"
+      ],
+      "ignoredFiles": [
+        "apps/backend/.turbo/turbo-typecheck.log",
+        "apps/backend/dist/integration.mjs",
+        "apps/backend/dist/integration.mjs.map",
+        "apps/backend/dist/server.mjs",
+        "apps/backend/dist/server.mjs.map",
+        "apps/backend/dist/workers/start.mjs",
+        "apps/backend/dist/workers/start.mjs.map",
+        "apps/web/.turbo/turbo-typecheck.log",
+        "apps/web/tsconfig.tsbuildinfo",
+        "packages/api/.turbo/turbo-build.log",
+        "packages/api/.turbo/turbo-typecheck.log",
+        "packages/brand/.turbo/turbo-build.log",
+        "packages/brand/.turbo/turbo-typecheck.log",
+        "packages/copy/.turbo/turbo-build.log",
+        "packages/copy/.turbo/turbo-typecheck.log",
+        "packages/tokens/.turbo/turbo-build.log",
+        "packages/tokens/.turbo/turbo-typecheck.log",
+        "packages/ui-web/.turbo/turbo-typecheck.log",
+        "playwright-report/index.html"
+      ],
+      "retainedReportFiles": [
+        {
+          "path": "playwright-report/index.html",
+          "archiveEntry": "970d/playwright-report/index.html",
+          "sha256": "6f00adc1ea1a16c6eda28ad49203048167a627fb17fb1e0aea6a116cd9090456"
+        }
+      ],
+      "diskKiBBefore": 144592,
+      "commitsAbsentFromOrigin": 0
+    },
+    {
+      "id": "6438",
+      "path": "/Users/yingpengwang/.codex/worktrees/6438/creator-platform",
+      "head": "2831c07faeb1b868d43e56e078e3785093f9034c",
+      "branch": "codex/w6-isolated-recovery-20261001",
+      "pullRequest": 19,
+      "statusBeforePreservation": [],
+      "ignoredFiles": [
+        "apps/backend/.turbo/turbo-build.log",
+        "apps/backend/.turbo/turbo-typecheck.log",
+        "apps/backend/dist/integration.mjs",
+        "apps/backend/dist/integration.mjs.map",
+        "apps/backend/dist/server.mjs",
+        "apps/backend/dist/server.mjs.map",
+        "apps/backend/dist/workers/start.mjs",
+        "apps/backend/dist/workers/start.mjs.map",
+        "apps/web/.turbo/turbo-build.log",
+        "apps/web/.turbo/turbo-typecheck.log",
+        "apps/web/tsconfig.tsbuildinfo",
+        "packages/api/.turbo/turbo-build.log",
+        "packages/api/.turbo/turbo-typecheck.log",
+        "packages/brand/.turbo/turbo-build.log",
+        "packages/brand/.turbo/turbo-typecheck.log",
+        "packages/copy/.turbo/turbo-build.log",
+        "packages/copy/.turbo/turbo-typecheck.log",
+        "packages/tokens/.turbo/turbo-build.log",
+        "packages/tokens/.turbo/turbo-typecheck.log",
+        "packages/ui-web/.turbo/turbo-typecheck.log",
+        "playwright-report/data/1278250d56fe4d48328628330c140243c68a2558.md",
+        "playwright-report/data/16a537dd8d68c381685ec8ff0f6da95f9d1028ee.md",
+        "playwright-report/data/1d9e12fd101e4818329b4bbd918751f308bda2d2.png",
+        "playwright-report/data/336dbfb8af5b7ba6f3c6527b7d6d372e44c21d64.png",
+        "playwright-report/data/3d808010ddea472a049e6e975a524871a6ee05be.png",
+        "playwright-report/data/42fac90b118a193f95a9a1241e32d41ced1df112.png",
+        "playwright-report/data/5690009da080dd368865fdb15423ae835fe9857a.png",
+        "playwright-report/data/79f172be094c5f03bf92500ec5a765531295f9e9.png",
+        "playwright-report/data/7ca66841136a7442bc7f03ec82d3d710fdca95c3.png",
+        "playwright-report/data/8bab42157a1e14de8c1e1e71cce945ffde9c4d14.png",
+        "playwright-report/data/bec3006219fcbb59212cc49c800ff20bd8fce150.png",
+        "playwright-report/data/c72543509130fdc679ae5feb00ea061caf1a95df.png",
+        "playwright-report/index.html",
+        "test-results/.last-run.json",
+        "test-results/creator-home-light-implementation.png",
+        "test-results/creator-home-night-implementation.png",
+        "test-results/foundation-handle-preview--166be-es-approved-design-in-light/error-context.md",
+        "test-results/foundation-handle-preview--166be-es-approved-design-in-light/handle-preview-light-actual.png",
+        "test-results/foundation-handle-preview--166be-es-approved-design-in-light/handle-preview-light-diff.png",
+        "test-results/foundation-handle-preview--166be-es-approved-design-in-light/handle-preview-light-expected.png",
+        "test-results/foundation-welcome-catalog-matches-approved-design-in-light/error-context.md",
+        "test-results/foundation-welcome-catalog-matches-approved-design-in-light/welcome-light-actual.png",
+        "test-results/foundation-welcome-catalog-matches-approved-design-in-light/welcome-light-diff.png",
+        "test-results/foundation-welcome-catalog-matches-approved-design-in-light/welcome-light-expected.png",
+        "test-results/handle-preview-night-implementation.png",
+        "test-results/welcome-night-implementation.png"
+      ],
+      "retainedReportFiles": [
+        {
+          "path": "playwright-report/data/1278250d56fe4d48328628330c140243c68a2558.md",
+          "archiveEntry": "6438/playwright-report/data/1278250d56fe4d48328628330c140243c68a2558.md",
+          "sha256": "49fadfd31347f5bb629f64bbfed70d396ccc7e94280718f3d57df38a677585ba"
+        },
+        {
+          "path": "playwright-report/data/16a537dd8d68c381685ec8ff0f6da95f9d1028ee.md",
+          "archiveEntry": "6438/playwright-report/data/16a537dd8d68c381685ec8ff0f6da95f9d1028ee.md",
+          "sha256": "2d9d7edccd86ee1d9829a87844b34f9d8a90bb6f64dc3aa900a264ccc81756d0"
+        },
+        {
+          "path": "playwright-report/data/1d9e12fd101e4818329b4bbd918751f308bda2d2.png",
+          "archiveEntry": "6438/playwright-report/data/1d9e12fd101e4818329b4bbd918751f308bda2d2.png",
+          "sha256": "c208f54205720769f20ce171a6a88d8f00f5eb42c476779099035765812a0a92"
+        },
+        {
+          "path": "playwright-report/data/336dbfb8af5b7ba6f3c6527b7d6d372e44c21d64.png",
+          "archiveEntry": "6438/playwright-report/data/336dbfb8af5b7ba6f3c6527b7d6d372e44c21d64.png",
+          "sha256": "0f31887625d924e39f2f2fd894685223a334205bb32e8ddc13b60f9254083800"
+        },
+        {
+          "path": "playwright-report/data/3d808010ddea472a049e6e975a524871a6ee05be.png",
+          "archiveEntry": "6438/playwright-report/data/3d808010ddea472a049e6e975a524871a6ee05be.png",
+          "sha256": "001f6c3a23acb3b575fe6c8eccabc5b6ab1c7648c5deee0c645741231d34e352"
+        },
+        {
+          "path": "playwright-report/data/42fac90b118a193f95a9a1241e32d41ced1df112.png",
+          "archiveEntry": "6438/playwright-report/data/42fac90b118a193f95a9a1241e32d41ced1df112.png",
+          "sha256": "e3254d2c25cbd8c6443f7df568219657718d309ffd1edd9d5039a4e02c08bbff"
+        },
+        {
+          "path": "playwright-report/data/5690009da080dd368865fdb15423ae835fe9857a.png",
+          "archiveEntry": "6438/playwright-report/data/5690009da080dd368865fdb15423ae835fe9857a.png",
+          "sha256": "991869f1171871545b2ce879244d35f9aab84ef947e3fa44bcd602e5dac8b7f6"
+        },
+        {
+          "path": "playwright-report/data/79f172be094c5f03bf92500ec5a765531295f9e9.png",
+          "archiveEntry": "6438/playwright-report/data/79f172be094c5f03bf92500ec5a765531295f9e9.png",
+          "sha256": "e64f3227c9ec4301b56b5b260d0db9208d383e24036fdc1076cc24eb3d37e4da"
+        },
+        {
+          "path": "playwright-report/data/7ca66841136a7442bc7f03ec82d3d710fdca95c3.png",
+          "archiveEntry": "6438/playwright-report/data/7ca66841136a7442bc7f03ec82d3d710fdca95c3.png",
+          "sha256": "c0bcb9ed3a84d84762623adde7b1365c61d6d050d91e03f4f9c5a7e153714580"
+        },
+        {
+          "path": "playwright-report/data/8bab42157a1e14de8c1e1e71cce945ffde9c4d14.png",
+          "archiveEntry": "6438/playwright-report/data/8bab42157a1e14de8c1e1e71cce945ffde9c4d14.png",
+          "sha256": "4a1c953dc05b8cfffe0d854a1ffa62cf013a46577fb25c549edbd44df4d20512"
+        },
+        {
+          "path": "playwright-report/data/bec3006219fcbb59212cc49c800ff20bd8fce150.png",
+          "archiveEntry": "6438/playwright-report/data/bec3006219fcbb59212cc49c800ff20bd8fce150.png",
+          "sha256": "e37c662a53f45fc782d4c22ea84d2c4c661ba32c8fb1d42f10dc25713e0f118c"
+        },
+        {
+          "path": "playwright-report/data/c72543509130fdc679ae5feb00ea061caf1a95df.png",
+          "archiveEntry": "6438/playwright-report/data/c72543509130fdc679ae5feb00ea061caf1a95df.png",
+          "sha256": "538e197bea4c3af582a7a98d0652797e58dd65e3cd50e3533f521a30524a834e"
+        },
+        {
+          "path": "playwright-report/index.html",
+          "archiveEntry": "6438/playwright-report/index.html",
+          "sha256": "d6f291eddfbcf507512983fc6e93f25f09fb50c4baac79b9efc3f975a0c33127"
+        },
+        {
+          "path": "test-results/.last-run.json",
+          "archiveEntry": "6438/test-results/.last-run.json",
+          "sha256": "824d8842953fdec750659f7be91c7a2797121de525b19e3992fde56ab23524b5"
+        },
+        {
+          "path": "test-results/creator-home-light-implementation.png",
+          "archiveEntry": "6438/test-results/creator-home-light-implementation.png",
+          "sha256": "c0bcb9ed3a84d84762623adde7b1365c61d6d050d91e03f4f9c5a7e153714580"
+        },
+        {
+          "path": "test-results/creator-home-night-implementation.png",
+          "archiveEntry": "6438/test-results/creator-home-night-implementation.png",
+          "sha256": "0f31887625d924e39f2f2fd894685223a334205bb32e8ddc13b60f9254083800"
+        },
+        {
+          "path": "test-results/foundation-handle-preview--166be-es-approved-design-in-light/error-context.md",
+          "archiveEntry": "6438/test-results/foundation-handle-preview--166be-es-approved-design-in-light/error-context.md",
+          "sha256": "2d9d7edccd86ee1d9829a87844b34f9d8a90bb6f64dc3aa900a264ccc81756d0"
+        },
+        {
+          "path": "test-results/foundation-handle-preview--166be-es-approved-design-in-light/handle-preview-light-actual.png",
+          "archiveEntry": "6438/test-results/foundation-handle-preview--166be-es-approved-design-in-light/handle-preview-light-actual.png",
+          "sha256": "e3254d2c25cbd8c6443f7df568219657718d309ffd1edd9d5039a4e02c08bbff"
+        },
+        {
+          "path": "test-results/foundation-handle-preview--166be-es-approved-design-in-light/handle-preview-light-diff.png",
+          "archiveEntry": "6438/test-results/foundation-handle-preview--166be-es-approved-design-in-light/handle-preview-light-diff.png",
+          "sha256": "e64f3227c9ec4301b56b5b260d0db9208d383e24036fdc1076cc24eb3d37e4da"
+        },
+        {
+          "path": "test-results/foundation-handle-preview--166be-es-approved-design-in-light/handle-preview-light-expected.png",
+          "archiveEntry": "6438/test-results/foundation-handle-preview--166be-es-approved-design-in-light/handle-preview-light-expected.png",
+          "sha256": "991869f1171871545b2ce879244d35f9aab84ef947e3fa44bcd602e5dac8b7f6"
+        },
+        {
+          "path": "test-results/foundation-welcome-catalog-matches-approved-design-in-light/error-context.md",
+          "archiveEntry": "6438/test-results/foundation-welcome-catalog-matches-approved-design-in-light/error-context.md",
+          "sha256": "49fadfd31347f5bb629f64bbfed70d396ccc7e94280718f3d57df38a677585ba"
+        },
+        {
+          "path": "test-results/foundation-welcome-catalog-matches-approved-design-in-light/welcome-light-actual.png",
+          "archiveEntry": "6438/test-results/foundation-welcome-catalog-matches-approved-design-in-light/welcome-light-actual.png",
+          "sha256": "001f6c3a23acb3b575fe6c8eccabc5b6ab1c7648c5deee0c645741231d34e352"
+        },
+        {
+          "path": "test-results/foundation-welcome-catalog-matches-approved-design-in-light/welcome-light-diff.png",
+          "archiveEntry": "6438/test-results/foundation-welcome-catalog-matches-approved-design-in-light/welcome-light-diff.png",
+          "sha256": "e37c662a53f45fc782d4c22ea84d2c4c661ba32c8fb1d42f10dc25713e0f118c"
+        },
+        {
+          "path": "test-results/foundation-welcome-catalog-matches-approved-design-in-light/welcome-light-expected.png",
+          "archiveEntry": "6438/test-results/foundation-welcome-catalog-matches-approved-design-in-light/welcome-light-expected.png",
+          "sha256": "c208f54205720769f20ce171a6a88d8f00f5eb42c476779099035765812a0a92"
+        },
+        {
+          "path": "test-results/handle-preview-night-implementation.png",
+          "archiveEntry": "6438/test-results/handle-preview-night-implementation.png",
+          "sha256": "4a1c953dc05b8cfffe0d854a1ffa62cf013a46577fb25c549edbd44df4d20512"
+        },
+        {
+          "path": "test-results/welcome-night-implementation.png",
+          "archiveEntry": "6438/test-results/welcome-night-implementation.png",
+          "sha256": "538e197bea4c3af582a7a98d0652797e58dd65e3cd50e3533f521a30524a834e"
+        }
+      ],
+      "diskKiBBefore": 146704,
+      "commitsAbsentFromOrigin": 0
+    },
+    {
+      "id": "89d9",
+      "path": "/Users/yingpengwang/.codex/worktrees/89d9/creator-platform",
+      "head": "2e337a1afdf6d8bba3974427588e0b34b6d42d36",
+      "branch": null,
+      "pullRequest": null,
+      "statusBeforePreservation": [],
+      "ignoredFiles": [],
+      "retainedReportFiles": [],
+      "diskKiBBefore": 1900,
+      "commitsAbsentFromOrigin": 0
+    }
+  ],
+  "lockfile": {
+    "path": "apps/ios/Package.resolved",
+    "sourceSHA256": "9d2d4764e569259be9107b6d28d257f9cf0ffa0e2da0c9028d6277337cfb1318",
+    "snapshot": "ios-Package.resolved.snapshot.json",
+    "patch": "ios-Package.resolved.patch",
+    "disposition": "Recovery-only snapshot of resolver drift; not adopted as an application dependency change"
+  },
+  "reportsArchive": {
+    "path": "retained-browser-reports.zip",
+    "sha256": "cef90057dd642f4be5ce7871bcdfa23be1c2a5ac66deeb76f214f3213d210de2",
+    "bytes": 1493676
+  },
+  "otherW6Branch": {
+    "name": "codex/w6-media-recovery-20261001",
+    "head": "2f0319dbb6979878c5a9019e68503506902f9ea0",
+    "commitsAbsentFromOrigin": 0,
+    "disposition": "No unique source; already reachable from published history; no duplicate PR"
+  },
+  "sharedCheckout": "Preserved; its only untracked paths were .turbo cache files; no uncommitted W6 product source found",
+  "removalStatus": "Pending verified remote publication of this preservation commit"
+}
