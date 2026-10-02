@@ -5146,6 +5146,7 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
 }
 
 object ApplicationDestination {
+  fun requiresFanProfile(value: String): Boolean = !isPermitted(value) || !Regex("^/(?:identity/account|status|ops(?:/.*)?)$").matches(value.substringBefore('?'))
   fun isPermitted(value: String): Boolean {
     if (value.length > 2048 || value.contains('%') || value.contains('\\') || value.contains('#') || value.any { it.isWhitespace() }) return false
     val parts = value.split('?')

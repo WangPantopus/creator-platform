@@ -14,5 +14,6 @@
   },
   "literalQueryValues": {
     "offer": "1"
-  }
+  },
+  "fanHandleExemptPathPattern": "^/(?:identity/account|status|ops(?:/.*)?)$"
 }

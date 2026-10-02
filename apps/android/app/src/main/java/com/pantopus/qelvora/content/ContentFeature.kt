@@ -56,7 +56,7 @@ private fun contentFailureCopy(failure: Exception, action: Boolean = false): Str
     return QelvoraCopy.text(key)
 }
 private class ContentClient(context: Context, private val baseURL: String) {
-    private val storage = SecureSessionStorage(context)
+    private val storage = SecureSessionStorage(context, baseURL)
     suspend fun request(path: String, body: JsonObject? = null, expectedAccountId:String? = null): JsonElement = withContext(Dispatchers.IO) {
         val token = storage.read() ?: throw ContentFailure(401)
         val connection = URL(baseURL.trimEnd('/') + "/v1/content/" + path).openConnection() as HttpURLConnection

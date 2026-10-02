@@ -9801,6 +9801,9 @@ public actor CreatorAPIClient {
 }
 
 public enum ApplicationDestination {
+  public static func requiresFanProfile(_ value: String) -> Bool {
+    !isPermitted(value) || value.components(separatedBy: "?")[0].range(of: "^/(?:identity/account|status|ops(?:/.*)?)$", options: .regularExpression) == nil
+  }
   public static func isPermitted(_ value: String) -> Bool {
     if value.count > 2048 || value.contains("%") || value.contains("\\") || value.contains("#") || value.rangeOfCharacter(from: .whitespacesAndNewlines) != nil { return false }
     let parts = value.components(separatedBy: "?")

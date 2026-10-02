@@ -922,4 +922,11 @@
   <string name="w5_content_invalid_request" formatted="false">Check your reply and sharing choices before trying again. Your input is kept.</string>
   <string name="identity_choose_handle" formatted="false">Choose your handle</string>
   <string name="identity_edit_public_profile" formatted="false">Edit public profile</string>
+  <string name="identity_session_read_failed" formatted="false">This device could not read your session securely. Unlock it and try signing in again.</string>
+  <string name="identity_session_save_failed" formatted="false">This device could not save your session securely. Unlock it and try signing in again.</string>
+  <string name="identity_private_clear_failed" formatted="false">This device could not clear its saved private data. Private screens are closed. Unlock it and retry clearing before signing in again.</string>
+  <string name="identity_private_clear_retry" formatted="false">Retry clearing saved private data</string>
+  <string name="w1_call_lookup_title" formatted="false">Your call</string>
+  <string name="w1_call_lookup_checking" formatted="false">Checking the booking and your current access…</string>
+  <string name="w1_call_lookup_unavailable" formatted="false">This call could not be opened. Retry, or open Requests to check its current status.</string>
 </resources>
