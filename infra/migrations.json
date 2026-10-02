@@ -424,7 +424,8 @@
       "version": "0156_w8_reply_review",
       "path": "apps/backend/migrations/0069_w8_reply_review.sql",
       "state": "reserved_unapplied",
-      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Above initial reviewed wave; exact source and integration review pending in this activation PR.",
+      "sourceSha256": "65a86e17256a872bcbf640006274512a29e3bda31232838c68fe3aa5df2a958a",
+      "reason": "Held and unapplied. Revised original proposal has closed rollback SQL/catalogue qualification, ten actual drift refusals and an executable activation gate; genuine app queue/decision/delivery integration remains required. Original applied migration history and frozen held version map are unchanged.",
       "heldVersionHistory": [
         "0069_w8_reply_review",
         "0119_w8_reply_review"

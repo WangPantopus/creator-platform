@@ -28,6 +28,7 @@ const category: Record<string, string> = {
   verification: "Verification review",
   pause: "Pause or suspension",
   support: "Support request",
+  reply_review: "Private Note reply review",
 };
 const stateLabel: Record<string, string> = {
   open: "Open",

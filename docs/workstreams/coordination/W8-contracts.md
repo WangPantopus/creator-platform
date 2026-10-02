@@ -1,5 +1,11 @@
 # W8 contract, migration and runtime register
 
+## Reply reviewer continuation contract — 2026-10-02
+
+Export `prepareTrustReplyReviewer(runtime)` (the legacy `createTrustReplyReviewer` name is the same asynchronous prepared contract). Await it in `registerFeatures` after W1 has issued the genuine BackendRuntime; retain undefined when the exact active SQL/catalogue is unavailable. The callback accepts only W5’s actual held PoolClient and full `(replyId,creatorId,fanId,version,text,textHash)` tuple. It validates W1’s original request authority/session holder and same configured database plus restoration/current denials at both ends. It issues no Actor, ThreadScope, consent or publication authority. The12000 transport ceiling grants no paid-tenure permission. W5’s4000/current-tenure policy stays authoritative.
+
+The durable safety case is idempotent per reply/version/hash; private source text is read through purpose-leased Ops evidence only. Allowed/flagged require the matching immutable recorded reviewer decision in the actual case settlement transaction. Withdrawal, changed source, negative authority or missing active source refuses; unavailable production remains pending. Held0156 source65a86e17 requires the separate guarded migration wave and genuine app acceptance. No use of a privileged metadata qualification as an author/reviewer session.
+
 ## Ready closed four-source privacy wave — 2026-10-02
 
 PR151 merged12ea10a6, exacthead91dcd4c6 after actual three-client cursor acceptance. Two web/backend and the current compile checks passed; one current Android runtime passed, its duplicate was still running at merge; six foundation jobs queued and one obsolete compile cancelled were not passes. [Actual receipt](../../../artifacts/workstreams/W8/privacy-domain-worker/20261002-mac-studio/app-acceptance/README.md) preserves the four completed/four blocked synthetic task result.
