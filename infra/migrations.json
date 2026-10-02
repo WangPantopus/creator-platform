@@ -897,6 +897,15 @@
       "path": "apps/backend/migrations/0200_w8_fulfillment_view_denial.sql",
       "state": "reserved_unapplied",
       "reason": "Original-recipient Trust negatives; depends on actual0178 fulfillment plan and0199 genuine viewer metadata issuer. Exact concrete viewer/session/client/XID/plan/revision/original-recipient binding is pending owner source review. No fabricated family/Actor/nonce, NULL-packet permission, raw question/body or successful callback. Allocation only; current restoration and all-original negative custody remain required before positive viewing."
+    },
+    {
+      "id": "0201",
+      "owner": "W8",
+      "version": "0201_w8_worker_migration_metadata",
+      "path": "apps/backend/migrations/0201_w8_worker_migration_metadata.sql",
+      "sourceSha256": "2fce1ce5aa6c9f571067d999e2a62ac8d71b8e147b97393e7e87091227159e6f",
+      "state": "reserved_unapplied",
+      "reason": "Distinct metadata-only SELECT(version,checksum) for the actual isolated creator_publication_worker and creator_call_callback_worker after0158/0176. Same held original worker source/ledger/definition/role/ACL/currentness bookends remain required. No whole-ledger SELECT, timestamps, write, grant option, membership, private content, provider/effect or family/signing authority. Exact rolled-back SQL/ACL/refusal qualification pending; not activation or positive ingress acceptance."
     }
   ]
 }
