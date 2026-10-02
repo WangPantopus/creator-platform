@@ -1,0 +1,68 @@
+{
+  "label": "synthetic W8 migration rehearsals; original iMac recovery unavailable",
+  "backup": {
+    "label": "synthetic canonical40 clone backup; not original iMac recovery",
+    "rows": 25,
+    "tables": 145,
+    "backupBytes": 537452,
+    "separateRestoreVerified": true,
+    "privateBackup": true
+  },
+  "upgrade": {
+    "wave": "20261002",
+    "applied": [
+      "0044_w4_personal_approval",
+      "0045_w5_reply_review",
+      "0046_w6_call_availability",
+      "0047_w6_creator_media",
+      "0049_w4_generation_cost_settlement",
+      "0050_w3_account_relationship_index",
+      "0051_w5_media_publication",
+      "0053_w8_runtime_denial_projection",
+      "0054_w4_pass_purchase_effects",
+      "0055_w4_pass_pool_effects",
+      "0056_w3_correction_feedback_lineage",
+      "0057_w3_feedback_consent",
+      "0058_w3_correction_signature",
+      "0059_w3_recording_association",
+      "0060_w8_composed_signed_message",
+      "0061_w4_payout_custody",
+      "0062_w6_creator_media_worker"
+    ],
+    "priorLedgerRows": 40,
+    "ledgerRows": 57,
+    "priorHistoryPreserved": true,
+    "originalDataPreserved": true,
+    "originalRows": 25,
+    "originalTables": 145,
+    "oldRolesPreserved": true,
+    "afterSchemaSha256": "b65c2b944b14a1e89d1916611f7d168deb4132a23a709815fe913ef73a16f9ac",
+    "trafficClosed": true,
+    "releaseReady": false
+  },
+  "fresh": {
+    "label": "synthetic fresh install",
+    "ledgerRows": 57,
+    "allPinnedChecksums": true,
+    "catalogSha256": "f9303a29a9aabd6b04156c0d1745d16bd10acb2116c554ca32a739a247b9ae52",
+    "releaseReady": false
+  },
+  "connectionLimit": 0,
+  "scope": "SQL operator verification, not app/native/provider acceptance",
+  "remaining": [
+    "complete privilege-category recovery audit",
+    "adopted-W5 exception rehearsal",
+    "owner fresh/preserved upgrade checks",
+    "real web/iOS/Android integrated operation",
+    "C10 accounting and policy registration",
+    "original recovery material"
+  ],
+  "releaseReady": false,
+  "catalogComparison": {
+    "differences": [],
+    "transactionSearchPath": true,
+    "upgradeSha256": "0a56334549a30cd9a3de1e5db55324b75576b8a4d42e4778c98d54cef21f8b54",
+    "freshSha256": "0a56334549a30cd9a3de1e5db55324b75576b8a4d42e4778c98d54cef21f8b54",
+    "note": "Initial fresh fingerprint was captured outside BEGIN, so SET LOCAL search_path was ineffective. Repeat inside actual transactions uses the fixed pg_catalog path; no DDL or data repair."
+  }
+}
