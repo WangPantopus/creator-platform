@@ -220,7 +220,7 @@ public struct FanAppShell: View {
                 model.open(target)
             }
     }
-    private var tab: FanTab { FanTab.allCases.first(where: { model.destination == "/" + $0.rawValue.lowercased() }) ?? .home }
+    private var tab: FanTab { FanTab.allCases.first(where: { model.destination.components(separatedBy: "?")[0] == "/" + $0.rawValue.lowercased() }) ?? .home }
 }
 
 struct NativeHandleForm: View {

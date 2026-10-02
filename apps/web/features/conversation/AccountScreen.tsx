@@ -1,6 +1,7 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button, Notice, TabBar } from "@qelvora/ui-web";
+import { copy } from "@qelvora/copy";
 import type {
   ConversationPage,
   MemoryItem,
@@ -41,27 +42,62 @@ export function AccountScreen({
   useEffect(() => {
     if (creatorId && fanId) return;
     let active = true;
-    setLoading(true);
-    setError(null);
-    void request<Account>(cursor ? `account?cursor=${cursor}` : "account")
-      .then((value) => {
-        if (active) setAccount(value);
-      })
-      .catch((error) => {
-        if (active) {
-          if (
-            error instanceof ConversationError &&
-            [401, 403, 404].includes(error.status)
-          )
-            setAccount(null);
-          setError(error.message);
-        }
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
+    let revision = 0;
+    let controller: AbortController | undefined;
+    const conceal = () => {
+      revision++;
+      controller?.abort();
+      setAccount(null);
+      setLoading(false);
+    };
+    const refresh = () => {
+      conceal();
+      if (document.visibilityState !== "visible") return;
+      if (!navigator.onLine) {
+        setError("Reconnect to open your account.");
+        return;
+      }
+      const currentRevision = revision;
+      controller = new AbortController();
+      setLoading(true);
+      setError(null);
+      void request<Account>(
+        cursor ? `account?cursor=${cursor}` : "account",
+        undefined,
+        controller.signal,
+      )
+        .then((value) => {
+          if (active && revision === currentRevision) setAccount(value);
+        })
+        .catch((error) => {
+          if (active && revision === currentRevision)
+            setError(
+              error instanceof Error
+                ? error.message
+                : "Reconnect to open your account.",
+            );
+        })
+        .finally(() => {
+          if (active && revision === currentRevision) setLoading(false);
+        });
+    };
+    const offline = () => {
+      conceal();
+      setError("Reconnect to open your account.");
+    };
+    window.addEventListener("focus", refresh);
+    window.addEventListener("online", refresh);
+    window.addEventListener("offline", offline);
+    document.addEventListener("visibilitychange", refresh);
+    refresh();
     return () => {
       active = false;
+      revision++;
+      controller?.abort();
+      window.removeEventListener("focus", refresh);
+      window.removeEventListener("online", refresh);
+      window.removeEventListener("offline", offline);
+      document.removeEventListener("visibilitychange", refresh);
     };
   }, [request, cursor, attempt, creatorId, fanId]);
   if (creatorId && fanId)
@@ -73,7 +109,7 @@ export function AccountScreen({
       />
     );
   return (
-    <main className="conversation-account">
+    <main className="conversation-account" aria-busy={loading}>
       <div className="account-title">
         <h1>{account ? `@${account.fan.handle}` : "You"}</h1>
         <p className="conversation-quiet">
@@ -155,6 +191,7 @@ export function AccountScreen({
       </section>
       <section id="conversations">
         <h2>Me and privacy</h2>
+        <p className="conversation-quiet">{copy.conversationAccess}</p>
         {account?.threads.length === 0 && <p>No conversations yet.</p>}
         {account?.threads.map((thread) => (
           <article key={thread.id}>
@@ -232,17 +269,48 @@ function ConversationPrivacy({
   const [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
   const [text, setText] = useState("");
+  const revision = useRef(0);
+  const controller = useRef<AbortController | null>(null);
+  const conceal = useCallback(() => {
+    revision.current++;
+    controller.current?.abort();
+    setPage(null);
+    setMemory(null);
+    setAudit(null);
+    setUsage(null);
+    setPolicy(null);
+    setBusy(false);
+  }, []);
   const refresh = useCallback(async () => {
+    conceal();
+    if (document.visibilityState !== "visible") return;
+    if (!navigator.onLine) {
+      setError("Reconnect to view your privacy settings.");
+      return;
+    }
+    const currentRevision = revision.current;
+    const requestController = new AbortController();
+    controller.current = requestController;
+    setError(null);
     try {
       const [fresh, memories, entries, caps, time] = await Promise.all([
-        request<ConversationPage>(root),
-        request<MemoryView>(`${root}/memory`),
-        request<Audit[]>(`${root}/audit`),
-        request<{ providers: ProviderPolicy | null }>("capabilities"),
+        request<ConversationPage>(root, undefined, requestController.signal),
+        request<MemoryView>(
+          `${root}/memory`,
+          undefined,
+          requestController.signal,
+        ),
+        request<Audit[]>(`${root}/audit`, undefined, requestController.signal),
+        request<{ providers: ProviderPolicy | null }>(
+          "capabilities",
+          undefined,
+          requestController.signal,
+        ),
         request<
           import("../../../../packages/api/src/conversation/contracts").ConversationUsage
-        >(`${root}/usage`),
+        >(`${root}/usage`, undefined, requestController.signal),
       ]);
+      if (revision.current !== currentRevision) return;
       setPage(fresh);
       setMemory(memories);
       setAudit(entries);
@@ -250,14 +318,12 @@ function ConversationPrivacy({
       setUsage(time);
       setError(null);
     } catch (error) {
+      if (revision.current !== currentRevision) return;
+      requestController.abort();
       if (
         error instanceof ConversationError &&
         [401, 403, 404].includes(error.status)
       ) {
-        setPage(null);
-        setMemory(null);
-        setAudit(null);
-        setUsage(null);
         setEditing(null);
         setText("");
       }
@@ -267,26 +333,52 @@ function ConversationPrivacy({
           : "Reconnect to view your privacy settings.",
       );
     }
-  }, [root, request]);
+  }, [root, request, conceal]);
   useEffect(() => {
+    const offline = () => {
+      conceal();
+      setError("Reconnect to view your privacy settings.");
+    };
+    window.addEventListener("focus", refresh);
+    window.addEventListener("online", refresh);
+    window.addEventListener("offline", offline);
+    document.addEventListener("visibilitychange", refresh);
     void refresh();
-  }, [refresh]);
+    return () => {
+      conceal();
+      window.removeEventListener("focus", refresh);
+      window.removeEventListener("online", refresh);
+      window.removeEventListener("offline", offline);
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, [refresh, conceal]);
   const action = async (run: () => Promise<unknown>) => {
-    if (busy) return;
+    if (busy || !page || !memory) return;
+    const currentRevision = revision.current;
     setBusy(true);
     setError(null);
     try {
       await run();
+      if (revision.current !== currentRevision) return;
       setEditing(null);
       await refresh();
     } catch (error) {
+      if (revision.current !== currentRevision) return;
+      if (
+        error instanceof ConversationError &&
+        [401, 403, 404].includes(error.status)
+      ) {
+        conceal();
+        setEditing(null);
+        setText("");
+      }
       setError(
         error instanceof Error
           ? error.message
           : "This change could not be saved.",
       );
     } finally {
-      setBusy(false);
+      if (revision.current === currentRevision) setBusy(false);
     }
   };
   const decide = (item: MemoryItem, decision: string) =>
@@ -320,6 +412,9 @@ function ConversationPrivacy({
       )}
       <section id="memory">
         <h2>What {page?.creatorName ?? "this creator"}'s AI remembers</h2>
+        {!memory && (
+          <p>{error ? "Memories unavailable." : "Loading your memories…"}</p>
+        )}
         {memory?.items.length === 0 && (
           <p>No memories. The AI asks before remembering.</p>
         )}
@@ -420,6 +515,9 @@ function ConversationPrivacy({
       </section>
       <section>
         <h2>Time with this creator’s AI</h2>
+        {usage === null && (
+          <p>{error ? "Time history unavailable." : "Loading time history…"}</p>
+        )}
         {usage && (
           <article>
             <p>{usage.measurement} Days are shown in UTC.</p>

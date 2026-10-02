@@ -165,7 +165,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
     }
     LaunchedEffect(returnTo) { model.open(returnTo) }
     LaunchedEffect(model.destination) { model.loadArrival() }
-    LaunchedEffect(model, foreground) { if (foreground) { model.refresh(); while (true) { delay(4000); if (model.session != null) model.refresh() } } }
+    LaunchedEffect(model, foreground) { if (foreground) { model.refresh(); while (true) { delay(4000); if (model.currentToken() != null && !model.choosingActor && !model.busy) model.refresh() } } }
     Column(Modifier.fillMaxSize().background(qColor("ground")).windowInsetsPadding(WindowInsets.safeDrawing)) {
         if (model.error.isNotEmpty()) Notice("error", "Account status", model.error)
         if (model.localPurgeFailed) Button(QelvoraCopy.text("identityPrivateClearRetry"), ButtonVariant.SECONDARY, block = true, disabled = model.busy || model.purgingPrivateState) { scope.launch { model.purge() } }
@@ -198,7 +198,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                     else Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) { BasicText("This destination is not connected yet", style = qText("title").copy(color = qColor("ink"))); BasicText("Your account and arrival context are kept.", style = qText("body").copy(color = qColor("ink-muted"))); Button("Your account", ButtonVariant.SECONDARY) { model.destination = "/you" } }
                 }
                 val labels = listOf("navHome" to "/home", "navDiscover" to "/discover", "navRequests" to "/requests", "navYou" to "/you")
-                TabBar(labels.firstOrNull { it.second == model.destination }?.let { QelvoraCopy.text(it.first) } ?: QelvoraCopy.text("navHome")) { label -> model.destination = labels.first { QelvoraCopy.text(it.first) == label }.second }
+                TabBar(labels.firstOrNull { it.second == model.destination.substringBefore('?') }?.let { QelvoraCopy.text(it.first) } ?: QelvoraCopy.text("navHome")) { label -> model.destination = labels.first { QelvoraCopy.text(it.first) == label }.second }
             }
         }
     }
