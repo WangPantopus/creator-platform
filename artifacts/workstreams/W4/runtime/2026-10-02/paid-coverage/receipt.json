@@ -1,0 +1,94 @@
+{
+  "sourceBase": "c67ec73e",
+  "migration": {
+    "version": "0068_w4_paid_coverage",
+    "path": "apps/backend/src/modules/commerce/schema-paid-coverage.sql",
+    "sha256": "d60d2f8a50487f156b68aa03f784565bad1fa1d74ade2da72ae47be016f8816d",
+    "registered": false,
+    "installedInJourneyDatabase": false,
+    "registryOwner": "W8"
+  },
+  "implemented": [
+    "immutable native paid-interval and negative-observation journal",
+    "actual-account atomic grant and journal transaction with current trust hook",
+    "paid-only contiguous tenure from confirmed Stripe captures and qualified native intervals",
+    "count-only current paid audience projection with restricted metadata roles",
+    "boolean-only pending original receipt refund projection",
+    "complete keyset financial export collections and pool-cycle predicate repair"
+  ],
+  "checks": [
+    {
+      "name": "backend TypeScript",
+      "result": "pass"
+    },
+    {
+      "name": "changed Commerce ESLint",
+      "result": "pass"
+    },
+    {
+      "name": "exact latest DDL inside rollback on owned disposable clone",
+      "result": "pass"
+    },
+    {
+      "name": "count and refund inner queries planned with column-only roles",
+      "result": "pass"
+    },
+    {
+      "name": "native tenure query planned with creator_runtime",
+      "result": "pass"
+    },
+    {
+      "name": "legacy tenure query planned on untouched40-migration fan journey DB",
+      "result": "pass"
+    },
+    {
+      "name": "unknown/unowned narrow projections",
+      "result": "count unavailable and receipt held; no positive data created"
+    }
+  ],
+  "custody": {
+    "realAccountRetained": true,
+    "roles": ["creator_commerce_count", "creator_commerce_tenure"],
+    "rolePrivileges": "NOLOGIN, NOSUPERUSER, NOCREATEDB, NOCREATEROLE, NOINHERIT, NOBYPASSRLS; column-only SELECT; no runtime membership",
+    "newTables": "creator_owner; FORCE RLS; actual purchase fan INSERT, fan/current verified creator SELECT; append-only triggers",
+    "sensitiveProviderPayloadPersisted": false,
+    "retention": "mandatory reviewed policy version and current C10 registration callback; no default retention or activation claim"
+  },
+  "qualification": {
+    "apple": "verified matching sandbox JWS with positive signed price, actual purchase/expires interval; full bounded V2 history",
+    "google": "matching authenticated sandbox PROCESSED order with positive exact line total and unambiguous base/intro funded service interval; retained known orders refetched",
+    "interpretation": "conservative paid-period qualification; neither price nor order metadata is invented cash settlement",
+    "excluded": [
+      "free trials",
+      "zero price",
+      "unknown pricing or ambiguous proration",
+      "unpaid grace from tenure",
+      "provider age and spend",
+      "refunds including pending original receipt refunds",
+      "revoked or refunded proof restored by older response"
+    ],
+    "recovery": "fresh genuinely paid provider observation may resolve an earlier unconfirmed observation; irrevocable refund/revocation/unpaid observations remain excluded"
+  },
+  "acceptance": {
+    "stripeProviderJourney": false,
+    "appleProviderJourney": false,
+    "googleProviderJourney": false,
+    "verifiedCreatorCountJourney": false,
+    "fullPrivacyExportJourney": false,
+    "releaseReady": false,
+    "scope": "implementation and SQL metadata validation only; no fabricated creator, paid receipt, store purchase or positive audience"
+  },
+  "remaining": [
+    "W8 sole registry activation and C10 registration",
+    "genuine verified creator and paid provider proof",
+    "real Stripe sandbox and Apple/Google projects",
+    "complete provider history reconciliation for imported/expired Google token lineages; historyComplete remains false"
+  ],
+  "primarySources": [
+    "https://developer.apple.com/documentation/appstoreserverapi/jwstransactiondecodedpayload",
+    "https://developer.apple.com/documentation/appstoreserverapi/price",
+    "https://developer.apple.com/documentation/appstoreserverapi/recentsubscriptionstartdate",
+    "https://developers.google.com/android-publisher/api-ref/rest/v3/orders",
+    "https://developer.android.com/google/play/billing/lifecycle/subscriptions"
+  ]
+}
