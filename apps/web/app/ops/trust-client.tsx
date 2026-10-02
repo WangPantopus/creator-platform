@@ -128,6 +128,23 @@ export function TrustSession() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [returnTo, setReturnTo] = useState<string | null>(null);
+  const signOut = async () => {
+    setBusy(true);
+    try {
+      await trustApi("dev/logout", {});
+      invalidateSession();
+      const channel = new BroadcastChannel("trust-account");
+      channel.postMessage("changed");
+      channel.close();
+      setError("");
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : "Sign out unavailable.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
   useEffect(() => {
     const destination = IdentityContinueSchema.safeParse({
       returnTo: window.location.pathname + window.location.search,
@@ -195,6 +212,16 @@ export function TrustSession() {
               : "Continue with Pantopus"}
           </a>
         )}
+        {session.data && (
+          <button
+            className="qv-link-btn"
+            disabled={busy}
+            onClick={() => void signOut()}
+          >
+            Sign out
+          </button>
+        )}
+        {error && <p role="alert">{error}</p>}
       </div>
     );
   return (
@@ -249,23 +276,7 @@ export function TrustSession() {
       <button
         className="qv-link-btn"
         disabled={busy}
-        onClick={async () => {
-          setBusy(true);
-          try {
-            await trustApi("dev/logout", {});
-            invalidateSession();
-            const channel = new BroadcastChannel("trust-account");
-            channel.postMessage("changed");
-            channel.close();
-            setError("");
-          } catch (error) {
-            setError(
-              error instanceof Error ? error.message : "Sign out unavailable.",
-            );
-          } finally {
-            setBusy(false);
-          }
-        }}
+        onClick={() => void signOut()}
       >
         Sign out
       </button>
