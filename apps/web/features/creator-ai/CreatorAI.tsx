@@ -234,7 +234,11 @@ export function CreatorAI({
   const [message, setMessage] = useState("");
   const [confirmationVisible, setConfirmationVisible] = useState(false);
   const [busy, setBusy] = useState(false);
-  const completedActionFocus = useRef<HTMLElement | null>(null);
+  const completedActionFocus = useRef<{
+    control: HTMLElement | null;
+    fallback: HTMLElement | null;
+  } | null>(null);
+  const draftEvaluationLink = useRef<HTMLAnchorElement | null>(null);
   const [online, setOnline] = useState(true);
   const [story, setStory] = useState("");
   const [boundaries, setBoundaries] = useState("");
@@ -263,6 +267,12 @@ export function CreatorAI({
   const [preview, setPreview] = useState<Preview | null>(null);
   const [prompt, setPrompt] = useState("");
   const [example, setExample] = useState("");
+  const exampleInput = useRef<HTMLTextAreaElement | null>(null);
+  const exampleEditors = useRef(new Map<string, HTMLTextAreaElement>());
+  const pendingExampleFocus = useRef<{
+    id: string | null;
+    from: Element | null;
+  } | null>(null);
   const [paraphrase, setParaphrase] = useState("");
   const [rule, setRule] = useState("");
   const [sponsorBrand, setSponsorBrand] = useState("");
@@ -552,18 +562,33 @@ export function CreatorAI({
   }, [message]);
   useEffect(() => {
     if (busy) return;
-    const control = completedActionFocus.current;
+    const pending = completedActionFocus.current;
     completedActionFocus.current = null;
     // Disabling an in-flight button can leave keyboard focus on the body.
     // Restore only a surviving, enabled initiator, never a moved focus or a
     // failed action's Notice/dialog.
-    if (
-      control?.isConnected &&
-      !control.matches(":disabled") &&
-      document.activeElement === document.body
-    )
+    if (document.activeElement !== document.body) return;
+    const control =
+      pending?.control?.isConnected && !pending.control.matches(":disabled")
+        ? pending.control
+        : pending?.fallback;
+    if (control?.isConnected && !control.matches(":disabled"))
       control.focus({ preventScroll: true });
   }, [busy]);
+  useEffect(() => {
+    const pending = pendingExampleFocus.current;
+    pendingExampleFocus.current = null;
+    if (
+      !pending ||
+      (document.activeElement !== document.body &&
+        document.activeElement !== pending.from)
+    )
+      return;
+    const editor = pending.id
+      ? exampleEditors.current.get(pending.id)
+      : exampleInput.current;
+    editor?.focus();
+  }, [configuration?.examples]);
   useEffect(() => {
     if (!state || identitySignal?.aborted) return;
     storeDraft(`w2-source:${state.actorAccountId}:${state.creator.id}`, {
@@ -693,6 +718,7 @@ export function CreatorAI({
   const action = async (
     run: () => Promise<void | string>,
     success = "Saved.",
+    followup: HTMLElement | null = null,
   ) => {
     if (busy) return;
     const initiator =
@@ -707,7 +733,7 @@ export function CreatorAI({
       const outcome = await run();
       setMessage(outcome ?? success);
       await fetchState();
-      completedActionFocus.current = initiator;
+      completedActionFocus.current = { control: initiator, fallback: followup };
     } catch (e) {
       failAction(e instanceof Error ? e.message : "The action did not finish.");
     } finally {
@@ -1570,6 +1596,11 @@ export function CreatorAI({
                       {configuration.examples.map((item) => (
                         <div className="w2-example" key={item.id}>
                           <textarea
+                            ref={(editor) => {
+                              if (editor)
+                                exampleEditors.current.set(item.id, editor);
+                              else exampleEditors.current.delete(item.id);
+                            }}
                             rows={2}
                             aria-label="Your own reply example"
                             value={item.text}
@@ -1624,14 +1655,24 @@ export function CreatorAI({
                           </label>
                           <Button
                             variant="quiet"
-                            onClick={() =>
+                            onClick={() => {
+                              const index = configuration.examples.findIndex(
+                                (example) => example.id === item.id,
+                              );
+                              pendingExampleFocus.current = {
+                                id:
+                                  configuration.examples[index + 1]?.id ??
+                                  configuration.examples[index - 1]?.id ??
+                                  null,
+                                from: document.activeElement,
+                              };
                               edit({
                                 ...configuration,
                                 examples: configuration.examples.filter(
                                   (ex) => ex.id !== item.id,
                                 ),
-                              })
-                            }
+                              });
+                            }}
                           >
                             Remove example
                           </Button>
@@ -1639,6 +1680,7 @@ export function CreatorAI({
                       ))}
                       <Field label="Add your own reply">
                         <textarea
+                          ref={exampleInput}
                           rows={3}
                           value={example}
                           maxLength={2000}
@@ -1648,12 +1690,17 @@ export function CreatorAI({
                       <Button
                         disabled={!example.trim()}
                         onClick={() => {
+                          const id = crypto.randomUUID();
+                          pendingExampleFocus.current = {
+                            id,
+                            from: document.activeElement,
+                          };
                           edit({
                             ...configuration,
                             examples: [
                               ...configuration.examples,
                               {
-                                id: crypto.randomUUID(),
+                                id,
                                 text: example,
                                 fixed:
                                   configuration.examples.filter((e) => e.fixed)
@@ -1788,6 +1835,7 @@ export function CreatorAI({
                       void action(
                         save,
                         "Draft saved. Previous evaluation evidence is invalidated.",
+                        draftEvaluationLink.current,
                       )
                     }
                   >
@@ -1813,6 +1861,7 @@ export function CreatorAI({
                     </Button>
                   )}
                   <Link
+                    ref={draftEvaluationLink}
                     className="qv-btn qv-btn--quiet"
                     href="/studio/ai/test"
                     onClick={(e) => navigate(e, "/studio/ai/test")}

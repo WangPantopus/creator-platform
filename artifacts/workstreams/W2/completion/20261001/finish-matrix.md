@@ -1,5 +1,7 @@
 # Current W2 scope and R01–R14
 
+**Populated Studio draft:** fictional expert configuration now persists 20 approved/fixed examples, criteria/rules, synthetic exclusion canary and $5 daily cap (revision 15; no usage/evaluations/versions). Personally fixed/verified add/remove/save keyboard continuations; focus receipt records the exact scope. Existing backend 18/18 pass, T-11 80,787 ms with original workload and limit. Provider publication/native acceptance remain open.
+
 **Studio confirmation increment:** shared success Toast and keyboard initiator restoration were personally operated through canonical saves in Light/Night, 1280×900 and 390×900. The weekly update persists; exact PNG viewport captures and the original JPEG capture limitation are [recorded](../20261001-mac-studio/focus/README.md). PR65 final exact-head CI/merge remain pending; provider, full fidelity/accessibility and native generation acceptance remain open.
 
 **Current Mac Studio evidence:** PR40 is merged with actual DB outage/recovery acceptance. PR65 is reconciled with main and [its action-error focus is personally verified](../20261001-mac-studio/focus/README.md) in visible Chrome, Light/Night, 1280×900 and 390×900. Backend/web/API typechecks and scoped lint/format pass. Final-head hosted CI/normal merge and canonical W3 host wiring remain pending. The fresh canonical W2 runtime is active; saved Mac Studio backup checksum verified. The earlier iMac dataset/key are absent. R12 gains this narrow focus proof; full accessibility/fidelity and every other open boundary remain open.
