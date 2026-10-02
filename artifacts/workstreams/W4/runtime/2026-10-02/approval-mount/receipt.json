@@ -6,10 +6,11 @@
     "checksum": "4480936ea99adbc954f1e3444673772922c49e6dab8b9cce9351cf6d61c493fb"
   },
   "source": [
-    "Database separately holds actual configured denial callback on its current client through commit; existing session/family/role/outside checks retained",
+    "Database holds configured current-client negative authority after actual session and bounded participant metadata, BEFORE positive thread/profile/team leases; existing positive revalidation remains",
     "Approval requires exact0044 checksum, forced-RLS owned tables, current triggers and one graph with held Access/Database authority",
     "Signing preparation opens genuine current family scope on the same signing transaction before reading the saved draft",
-    "Exact W8 scope-restriction.ts source65268242 consumed; future purpose functions remain gated by their actual SQL authority"
+    "Exact W8 scope-restriction.ts source65268242 consumed; future purpose functions remain gated by their actual SQL authority",
+    "Held Access scope issuance uses the same negative-before-positive order; actual original participant accounts are revalidated under profile leases"
   ],
   "verified": [
     "Original40 refuses Approval mounting before0044",
@@ -21,7 +22,11 @@
     "Actual verified creator/passkey draft/approve/deliver/revoke flow",
     "Team draft authority under held original-participant negatives",
     "Runtime host activation and current creator proof/Ops composition",
-    "Positive publication, provider/payment acceptance"
+    "Positive publication, provider/payment acceptance",
+    "Actual original-participant block/deletion/role races on genuine creator/fan families"
   ],
-  "releaseReady": false
+  "releaseReady": false,
+  "operatorCorrections": [
+    "W1 review found initial7a86718f held callback after positive row locks could invert blocking0053 denial writers; source corrected before runtime composition, with original SQL unchanged"
+  ]
 }
