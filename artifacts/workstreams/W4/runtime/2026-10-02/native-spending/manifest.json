@@ -1,0 +1,68 @@
+{
+  "recordedAt": "2026-10-02T06:48:35.027796+00:00",
+  "environment": "W4 owned Android AVD CreatorPlatform_W4, API4104, canonical40 database; explicitly synthetic actor two",
+  "operator": "primary W4; actual CUA taps, system keyboard and swipes",
+  "source": "37139720 plus CommerceFeature native spending style correction",
+  "observedDefect": {
+    "platform": "Android",
+    "exception": "IllegalArgumentException: Unknown text style: spend-total",
+    "location": "CommerceFeature.kt amount through CommerceText/qText",
+    "correction": "Local mono44/48 amount style; canonical data-sm metadata; same undefined amount style corrected in iOS before operation"
+  },
+  "verified": [
+    "Actual Android sign-in as development actor two reached spending and initially crashed; fixed build installed and repeated successfully",
+    "Existing web-saved8USD current limit and pendingNone restored",
+    "Actual system keyboard typed7; Save applied immediate7 and cleared prior pending increase",
+    "Explicit No limit Save retained current7 and scheduled increase24h later",
+    "Requests, membership recovery, pass and access entered by actual taps; no memberships, unavailable purchases/restore, pass gated, no human modes/access claimed",
+    "Force-stop/relaunch in Night restored current7 and pendingNone from API",
+    "OwnedAPI stopped; actualRefresh showed account offline and retained current7",
+    "API restarted; actualRefresh removed offline notice and restored same current7/pendingNone"
+  ],
+  "builds": {
+    "android": "assembleDebug passed after correction; installed and personally operated",
+    "ios": "Corrected normal-signed QelvoraApp shipping build passed, installed and launched on owned BC8 simulator; CUA Device Hub bindings by actual bundle and path repeatedly timeout10005; no personal taps accepted"
+  },
+  "notVerified": [
+    "24h passage/activation",
+    "Native purchase/restore/cancellation/store system sheets and provider truth",
+    "Verified creator or paid receipt journey",
+    "Android retained unsaved input during offline mutation",
+    "iOS personal taps at this receipt"
+  ],
+  "remainingDefect": "Shared SpendLimit helper statically says reminders on while W4 actual opt-in is off; reported to W1 shared component owner for additive current-state prop",
+  "files": [
+    {
+      "path": "android-access-unavailable.jpg",
+      "sha256": "f2f5668527d19a7be71f0da9b7dd549c761e07a7b1784732abcde2f2be5f3704"
+    },
+    {
+      "path": "android-lower-seven.jpg",
+      "sha256": "206d2f60ff56d882379be6a6f431f05a3b51342ddc89ba5d496f4fa03e03b119"
+    },
+    {
+      "path": "android-membership-unavailable.jpg",
+      "sha256": "f6adb76b483ec868722c8097859bc0ec324a0ba35e227e59d15091deaba74b10"
+    },
+    {
+      "path": "android-night-return.jpg",
+      "sha256": "eeccaa38364a5f12f257ad8d59c53695742b8d685b375f97e08f6483d6f31435"
+    },
+    {
+      "path": "android-offline.jpg",
+      "sha256": "2e4a4499cc7df019f99a9d2c59fb7ab2b9661c950c5cf17b61caeb69b6891f65"
+    },
+    {
+      "path": "android-pass-gated.jpg",
+      "sha256": "e8f16a3ce5b7f0d5694c94bad6e4b051ba593b6c3ae85a0aff2e08036a57481b"
+    },
+    {
+      "path": "android-pending-none.jpg",
+      "sha256": "ad2d7fdd2ec3e9b936ae50e0c583375ce8cd3b05f214843a0d6858f489aa74de"
+    },
+    {
+      "path": "android-reconnected.jpg",
+      "sha256": "6f6028800c2c5222c695026c7205e434fe29da8c71d2afa9a5feaf2890935995"
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "baseRefOid": "109b4b4fb55df82449fa55ad5cc5087cf7531edc",
+  "headRefOid": "731e69e50b41dda9d6c8b2a41b9919f7e9b369cc",
+  "mergeable": "MERGEABLE",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T07:59:37Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36981318260/job/110756260359",
+      "name": "web-and-backend",
+      "startedAt": "2026-10-02T07:57:23Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T07:58:54Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36981240394/job/110756014260",
+      "name": "web-and-backend",
+      "startedAt": "2026-10-02T07:56:31Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36981318260/job/110756260390",
+      "name": "web-visual",
+      "startedAt": "2026-10-02T07:57:21Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36981240394/job/110756014199",
+      "name": "web-visual",
+      "startedAt": "2026-10-02T07:56:28Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36981318260/job/110756260332",
+      "name": "ios-foundation",
+      "startedAt": "2026-10-02T07:57:21Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36981240394/job/110756014018",
+      "name": "ios-foundation",
+      "startedAt": "2026-10-02T07:56:28Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36981318260/job/110756260455",
+      "name": "android-foundation",
+      "startedAt": "2026-10-02T07:57:21Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36981240394/job/110756014267",
+      "name": "android-foundation",
+      "startedAt": "2026-10-02T07:56:28Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T08:02:54Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36981318260/job/110756260148",
+      "name": "android-runtime",
+      "startedAt": "2026-10-02T07:57:23Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T08:01:21Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36981240394/job/110756014295",
+      "name": "android-runtime",
+      "startedAt": "2026-10-02T07:56:30Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    }
+  ],
+  "pr": 99,
+  "mergeCommit": "cf2cf8504318d89c611033136522603154b7cfe4",
+  "normalMerge": true,
+  "branchProtection": "HTTP404 unprotected",
+  "rulesets": [],
+  "queuedMacChecksPassed": false,
+  "mainVerification": {
+    "main": "cf2cf8504318d89c611033136522603154b7cfe4",
+    "role": "creator_runtime",
+    "poolMax": 1,
+    "heldClientDevelopmentLicense": "accepted",
+    "realScope": "refused",
+    "providerCalls": 0,
+    "durableWrites": 0
+  }
+}

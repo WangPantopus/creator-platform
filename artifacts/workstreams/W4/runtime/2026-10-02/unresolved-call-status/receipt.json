@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-02T11:19:03.055406+00:00",
+  "workstream": "W4",
+  "state": "implemented owner-consumer integration; real provider and personal iOS controls unavailable",
+  "changes": [
+    "Consumed W6 immutable closed-unresolved owner evidence; actual current request session and genuine participant family required",
+    "Sealed prepared adapter requires exact same Database/Access/Session graph and forced-RLS append-only evidence tables; no automatic provider activation",
+    "Only exact unresolved both-missed-arrival-grace transport fact is exposed; provider references, participant accounts and raw events remain private",
+    "Retained financial receipt is separately authorized and re-read after held-family evidence; intervening financial/commitment resolution drops stale status",
+    "Web/Android/iOS show System transport status separately from outcome and billing; fulfillment labels preserve approved draft, human creator, provider-confirmed human call and System distinctions"
+  ],
+  "ownerSourceCommits": [
+    "c7b07442a5887c8c992bd202881b789f792f5c24",
+    "472bd24597867fc4c4fd2ee84e01b16be165c22f",
+    "41e8564012bee8ce804687c338369d45208e50af",
+    "d5264dd09dbd3b2ba28b887bdc1a8708229d0453"
+  ],
+  "validation": {
+    "backendTypecheck": "PASS",
+    "webTypecheck": "PASS",
+    "ownedLint": "PASS",
+    "format": "PASS",
+    "generatedConsistency": "PASS: 12 shared resources, 98 operations; initial stale OpenAPI detected and regenerated",
+    "sqlPlanning": {
+      "role": "creator_runtime",
+      "postgres": 17,
+      "statements": 8,
+      "analyze": false,
+      "businessWrites": 0,
+      "result": "PASS"
+    },
+    "actualMetadataPermissions": "PASS: SELECT and forced RLS with non-owner runtime; no UPDATE/DELETE call_event",
+    "iosShippingBuild": "PASS: normal simulator signing, current source; heavy-build owner guard",
+    "androidShippingBuild": "PASS: current source assembleDebug, configured owned API; heavy-build owner guard",
+    "personallyOperatedWeb": {
+      "origin": "http://localhost:3004",
+      "api": "4104 restarted on current source",
+      "viewport": "390x844",
+      "appearance": "Night",
+      "account": "existing labeled development fan two; pending creator profile",
+      "observations": [
+        "Reload retained current7USD and original pending No limit deadline Oct2 23:44 local, reminders off and zero financial totals",
+        "Actual fan Requests remains empty",
+        "Actual membership purchase/restore remain provider-unavailable; restore disabled"
+      ]
+    },
+    "personalIosRetry": "Exact owned BC8 device booted, earlier signed build installed/launched, observed Device Hub bundle opened; CUA getApp timed out. No taps/typing/system sheet result. Idle owned device shut down and exact nonce/inode slot released."
+  },
+  "limits": [
+    "Only UnavailableCallProvider exists: no real closed-call event, grace, provider outcome, billing/refund, race or positive new status acceptance",
+    "Prepared call adapter not mounted without canonical held authority; schema presence cannot authorize it",
+    "Current iOS/Android builds are compilation, not personal operation of new status",
+    "No fabricated provider history, consent, creator verification, receipt or transaction",
+    "No new unit tests, schema/registry activation or business SQL writes",
+    "All nine packages and R01\u2013R15 remain assigned; no release readiness"
+  ],
+  "files": [
+    {
+      "path": "apps/backend/src/modules/commerce/call-transport.ts",
+      "sha256": "c00efe7335965114e8523196a2974cd99c852d77886a64e0d79107288b749f96"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/runtime.ts",
+      "sha256": "126167ab7e05ab79fdff0918623a9d047b7635f4ad2f917bca9bb7e9b1ce4b78"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/service.ts",
+      "sha256": "a729d190b1b0917d0ac61ca93bc6f17d138a53a07b3ba9cda42074e0027bdc75"
+    },
+    {
+      "path": "apps/backend/src/modules/session/unresolved-evidence.ts",
+      "sha256": "ad347f330c95d451a5f57e69c2ad3b372ddf6caceeaa4ed90ebbccc29aa3d48e"
+    },
+    {
+      "path": "packages/api/src/commerce/contracts.ts",
+      "sha256": "ed3c6ebe7be887283c1a033579f8b523305464b15348bc2078a7cb298fab89cd"
+    },
+    {
+      "path": "apps/web/features/commerce/CommerceScreen.tsx",
+      "sha256": "963ba933d9f1a281c686f190e41228279dd1131326c4b34eb355f7107d80d547"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/commerce/CommerceClient.kt",
+      "sha256": "c9ee4a8bbee92b9ccdb51788aa181699b1e5576008e3bacecf32d9a994072894"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/commerce/CommerceFeature.kt",
+      "sha256": "55dc6757641ee79c3e11cdcede4a181693f95dcf6c69f98121b1086327a30bab"
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Commerce/CommerceClient.swift",
+      "sha256": "7246508f0718fb4387761ea12dd41ec0b82c181c06683ca585d6d1020f8fccb0"
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Commerce/CommerceFeature.swift",
+      "sha256": "1b7595e4073902af1cf2b078f761915ec549942921d7a13d85ce9749d27b2046"
+    },
+    {
+      "path": "artifacts/workstreams/W4/runtime/2026-10-02/unresolved-call-status/fan-reload-night.png",
+      "sha256": "88d46b8cae46f1d5d825c4b0999305a4984f532fc7451c1a67e570e93266bc4e"
+    },
+    {
+      "path": "artifacts/workstreams/W4/runtime/2026-10-02/unresolved-call-status/membership-gate-night.png",
+      "sha256": "5a2270ed7f7ba14ed175b572710a095c7ef731f8537cdf2b9f7d8d7268654adc"
+    },
+    {
+      "path": "artifacts/workstreams/W4/runtime/2026-10-02/unresolved-call-status/fan-requests-night.png",
+      "sha256": "cee74ac496b25fde5d90d212b9233753196a2944bb6bbb13dd327184d2a74b91"
+    }
+  ]
+}
