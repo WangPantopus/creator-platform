@@ -45,7 +45,7 @@ class CommerceFailure(val status: Int, override val message: String) : Exception
 
 /** Shares canonical OS-encrypted session storage, never a local entitlement authority. */
 class CommerceClient(context: Context, private val baseURL: String, private val accountId: String? = null) {
-    private val storage = SecureSessionStorage(context)
+    private val storage = SecureSessionStorage(context, baseURL)
     private val json = Json { ignoreUnknownKeys = true }
     suspend fun request(path: String, body: JsonObject? = null): JsonElement = withContext(Dispatchers.IO) {
         val token = storage.read() ?: throw CommerceFailure(401, "Your session ended. Continue with Pantopus again.")

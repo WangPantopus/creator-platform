@@ -6,6 +6,27 @@ import { PrivacyDomains, type PrivacyHook } from "./contracts.js";
 import { assertPrivacyTaskCatalog } from "./privacy-catalog.js";
 
 export type PrivacyTaskInput = Parameters<PrivacyHook["run"]>[0];
+/** Current restoration and genuine lease on the same held lifecycle client.
+ * This port never creates request authority or substitutes a pool observation. */
+export async function restoredPrivacyTaskAuthorityInTransaction(
+  client: PoolClient,
+  input: PrivacyTaskInput,
+  assertRestoredInTransaction?: (client: PoolClient) => Promise<void>,
+): Promise<readonly string[]> {
+  if (!assertRestoredInTransaction || !input.signal)
+    throw new DomainError(
+      "privacy_commit_fence_unavailable",
+      "Current held lifecycle and restoration authority is required.",
+      503,
+    );
+  input.signal.throwIfAborted();
+  await assertRestoredInTransaction(client);
+  const owned = await privacyTaskAuthorityInTransaction(client, input);
+  await assertRestoredInTransaction(client);
+  input.signal.throwIfAborted();
+  return owned;
+}
+
 /** Same held-client lifecycle capability. The exact real task and its signal
  * come from the coordinator claim, never an interactive request or UUID alone.
  * 0087 locks current job/task metadata before domain locks and checks its actual

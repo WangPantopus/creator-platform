@@ -4,10 +4,20 @@ import { contentFeature, contentSignedSubjects } from "./registration.js";
 import { ContentSources } from "./sources.js";
 import { contentPublicProjection } from "../growth/content.js";
 import { createCommercePublicationPermission } from "../commerce/publication.js";
+import { assertCommercePublicationSource } from "../commerce/publication-source.js";
+export {
+  PreparedContentGenerationOrigins,
+  GENERATION_CONTENT_ORIGIN_MIGRATION,
+  GENERATION_CONTENT_ORIGIN_SIGNATURE,
+  type GenerationContentOriginSource,
+} from "./generation-origin.js";
 import { DomainError } from "../../core/errors.js";
 import { StudioService } from "../studio/service.js";
 import { studioFeature } from "../studio/registration.js";
-import { createContentTenureHost } from "./tenure.js";
+import {
+  createContentCreatorTenureHost,
+  createContentTenureHost,
+} from "./tenure.js";
 import {
   ContentPublicationWorker,
   type ContentPublicationDependencies,
@@ -23,6 +33,11 @@ export function createContentStudio(input: {
   dependencies: ContentDependencies &
     Required<Pick<ContentDependencies, "assertAllowed">>;
 }) {
+  if (input.dependencies.publicationSource)
+    assertCommercePublicationSource(
+      input.dependencies.publicationSource,
+      input.pool,
+    );
   const content = new ContentService(input.pool, input.dependencies);
   const studio = new StudioService(content, input.owners);
   return {
@@ -77,11 +92,13 @@ export function composeContentHost(input: {
   followReaders?: ContentFollowReaders;
   paidAudienceCount?: NonNullable<ContentDependencies["audienceCount"]>;
   tenure?: Parameters<typeof createContentTenureHost>[0];
+  creatorTenure?: Parameters<typeof createContentCreatorTenureHost>[0];
   /** Use W7's contentPublicProjection bound to this exact Content service.
    * This producer is neither a recipient grant nor a background purpose. */
   publicProjection?: NonNullable<ContentDependencies["effect"]>;
   publication?: ContentPublicationDependencies;
   publicationSource?: ContentDependencies["publicationSource"];
+  groupPublication?: ContentDependencies["groupPublication"];
   packetRead?: {
     prepare: NonNullable<ContentDependencies["preparePublicPacketRead"]>;
     preparePositive: NonNullable<
@@ -91,6 +108,21 @@ export function composeContentHost(input: {
   };
   assertScopeAllowedInTransaction?: import("../access/scope.js").ScopeRestrictionInTransaction;
 }) {
+  if (input.publicationSource)
+    assertCommercePublicationSource(input.publicationSource, input.pool);
+  if (input.dependencies.publicationSource)
+    assertCommercePublicationSource(
+      input.dependencies.publicationSource,
+      input.pool,
+    );
+  if (
+    input.publicationSource &&
+    input.dependencies.publicationSource &&
+    input.publicationSource !== input.dependencies.publicationSource
+  )
+    throw new Error(
+      "Content composition must retain one actual publication source.",
+    );
   if (input.growth && input.growth.service.db.runtime !== input.pool)
     throw new Error(
       "Content and Growth must share the configured runtime pool.",
@@ -109,7 +141,13 @@ export function composeContentHost(input: {
   const dependencies: ContentDependencies &
     Required<Pick<ContentDependencies, "assertAllowed">> = {
     ...input.dependencies,
+    ...(input.groupPublication
+      ? { groupPublication: input.groupPublication }
+      : {}),
     ...(input.tenure ? createContentTenureHost(input.tenure) : {}),
+    ...(input.creatorTenure
+      ? createContentCreatorTenureHost(input.creatorTenure)
+      : {}),
     ...(input.publicationSource
       ? { publicationSource: input.publicationSource }
       : {}),

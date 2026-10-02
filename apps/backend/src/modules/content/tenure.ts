@@ -1,5 +1,8 @@
 import type { PoolClient } from "pg";
-import { NoteReplyPolicy } from "../../../../../packages/api/src/content.js";
+import {
+  ContentTenureRecognition,
+  NoteReplyPolicy,
+} from "../../../../../packages/api/src/content.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import type { Actor } from "../identity/adapter.js";
 import type {
@@ -31,6 +34,166 @@ export function baseNoteReplyPolicy(actor: Actor, creatorId: string) {
     longerRepliesActive: false,
     checkedAt: new Date().toISOString(),
   });
+}
+
+/** Creator-side recognition retains the original publisher account. W8's
+ * exact pair negatives are prepared for the entire bounded page before the
+ * first role/content/membership positive. Team members get no borrowed owner
+ * or own-fan scope and receive no private membership recognition. */
+export function createContentCreatorTenureHost(input: {
+  holdCreatorFanNegativeAuthority: (
+    client: PoolClient,
+    actor: Actor,
+    tuple: { creatorId: string; fanId: string },
+  ) => Promise<void>;
+  paidCoverage?: PaidCoverageJournal;
+}) {
+  const pages = new WeakMap<
+    PoolClient,
+    {
+      transaction: string;
+      pid: number;
+      request: NonNullable<ReturnType<typeof requestAuthority.getStore>>;
+      actor: Actor;
+      creatorId: string;
+      owner: boolean;
+      fans: ReadonlySet<string>;
+    }
+  >();
+  async function context(client: PoolClient, actor: Actor) {
+    const request = requestAuthority.getStore();
+    invariant(
+      actor.adultEligible && request?.accountId === actor.accountId,
+      "content_session_required",
+      "Reopen Studio with your current account.",
+    );
+    const current = (
+      await client.query<{
+        account: string;
+        session: string;
+        transaction: string;
+        pid: number;
+      }>(
+        `SELECT current_setting('app.account_id',true) AS account,
+         current_setting('app.identity_session_id',true) AS session,
+         pg_current_xact_id()::text AS transaction,pg_backend_pid() AS pid`,
+      )
+    ).rows[0];
+    invariant(
+      current?.account === actor.accountId &&
+        current.session === request.sessionId,
+      "tenure_scope_required",
+      "Use the actual current Studio transaction.",
+    );
+    return { ...current, request };
+  }
+  const prepareCreatorTenure: NonNullable<
+    ContentDependencies["prepareCreatorTenure"]
+  > = async (client, actor, creatorId, fanIds) => {
+    const current = await context(client, actor),
+      old = pages.get(client);
+    invariant(
+      !old || old.transaction !== current.transaction,
+      "tenure_read_order_invalid",
+      "Prepare the complete reply page before its positive locks.",
+    );
+    const fans = [...new Set(fanIds)].sort();
+    invariant(
+      fans.length <= 51,
+      "tenure_page_too_large",
+      "Load a bounded reply page.",
+    );
+    const owner =
+      (
+        await client.query<{ owned: boolean }>(
+          "SELECT account_id=$2 AS owned FROM creator.creator_profile WHERE id=$1",
+          [creatorId, actor.accountId],
+        )
+      ).rows[0]?.owned === true;
+    if (owner)
+      for (const fanId of fans)
+        await input.holdCreatorFanNegativeAuthority(client, actor, {
+          creatorId,
+          fanId,
+        });
+    pages.set(client, {
+      transaction: current.transaction,
+      pid: current.pid,
+      request: current.request,
+      actor,
+      creatorId,
+      owner,
+      fans: new Set(fans),
+    });
+  };
+  async function retained(
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+    fanId: string,
+  ) {
+    const current = await context(client, actor),
+      page = pages.get(client);
+    invariant(
+      page?.transaction === current.transaction &&
+        page.pid === current.pid &&
+        page.request === current.request &&
+        page.actor === actor &&
+        page.creatorId === creatorId &&
+        page.fans.has(fanId),
+      "tenure_read_order_invalid",
+      "Refresh this reply page before reading membership recognition.",
+    );
+    return page;
+  }
+  const currentTenure = createCommerceTenureReader(
+    async (client, creatorId, fanId) => {
+      const page = pages.get(client);
+      invariant(
+        page,
+        "tenure_scope_required",
+        "Current creator/fan authority is required.",
+      );
+      const held = await retained(client, page.actor, creatorId, fanId);
+      invariant(
+        held.owner,
+        "tenure_scope_required",
+        "Only the actual creator can read this recognition.",
+      );
+    },
+    input.paidCoverage,
+  );
+  const creatorTenure: NonNullable<
+    ContentDependencies["creatorTenure"]
+  > = async (client, actor, creatorId, fanId) => {
+    const page = await retained(client, actor, creatorId, fanId);
+    if (!page.owner) return null;
+    const tenure = await currentTenure(client, creatorId, fanId);
+    const now = (
+      await client.query<{ checked_at: Date }>(
+        "SELECT clock_timestamp() AS checked_at",
+      )
+    ).rows[0]!.checked_at;
+    const since = tenure.since === null ? NaN : Date.parse(tenure.since);
+    if (!tenure.continuous || !Number.isFinite(since) || since > now.getTime())
+      return null;
+    const confirmedDays = Math.floor((now.getTime() - since) / 86_400_000);
+    return ContentTenureRecognition.parse({
+      confirmedDays,
+      milestone:
+        confirmedDays >= 365
+          ? 365
+          : confirmedDays >= 100
+            ? 100
+            : confirmedDays >= 50
+              ? 50
+              : null,
+      basis: tenure.basis,
+      historyComplete: false,
+      checkedAt: now.toISOString(),
+    });
+  };
+  return { prepareCreatorTenure, creatorTenure };
 }
 
 /** Own-fan recognition only. The actual W1 scope must be prepared before any

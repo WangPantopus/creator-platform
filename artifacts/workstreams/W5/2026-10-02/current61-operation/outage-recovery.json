@@ -1,0 +1,18 @@
+{
+  "outage": {
+    "pid": 1816,
+    "pausedAtUnix": 1790971126.29955,
+    "sourceCommit": "3b24991e09f04b2df62046e6f9b57c520ac271c3",
+    "action": "SIGSTOP only actual owned API listener after executable/cwd custody check",
+    "initialResumeAttemptUnix": 1790971400.458455,
+    "resumedAtUnix": 1790971502.939662,
+    "observedPauseSeconds": 376.6401119232178,
+    "resumeSignal": "SIGCONT via platform signal constant"
+  },
+  "concealedObservation": "Account status: Reconnect to check your account status. Composer and private Studio body hidden; Check connection and roles button visible.",
+  "recovery": {
+    "url": "http://localhost:30055/studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/compose/170f95f9-2da6-42af-afe0-b7c3d88aba23?theme=night",
+    "aria": "- alert\n- complementary:\n  - navigation \"Studio\":\n    - text: Maya Qelvora Studio\n    - link \"Notes\":\n      - /url: /studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/notes\n    - link \"Requests\":\n      - /url: /studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/requests\n    - link \"Threads\":\n      - /url: /studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/threads\n    - link \"My AI\":\n      - /url: /studio/ai\n    - link \"Offers\":\n      - /url: /commerce/offers\n    - link \"Publish\":\n      - /url: /studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/publish\n    - link \"Insights\":\n      - /url: /studio/insights\n    - link \"Earnings\":\n      - /url: /commerce/earnings\n    - link \"Team\":\n      - /url: /studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/team\n    - link \"More\":\n      - /url: /studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/more\n    - text: Creator workspace\n- main:\n  - link \"Qelvora Studio\":\n    - /url: /studio/workspace\n  - text: Maya\n  - button \"Refresh role\"\n  - link \"Cancel\":\n    - /url: /studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/notes\n  - strong: New Note\n  - text: TO\n  - group \"Audience\":\n    - button \"Followers\"\n    - button \"All members\" [pressed]\n    - button \"Tiers\"\n  - paragraph: It's labeled \u201cMaya \u00b7 to all members\u201d everywhere.\n  - text: Maya \u00b7 to members Your Note\n  - textbox \"Your Note\":\n    - /placeholder: Write in your own words\n    - text: W5 shell acceptance draft. Unsigned local development text.\n  - button \"Photo\"\n  - button \"Voice \u00b7 up to 60 s\"\n  - checkbox \"Let my AI use this Adds a source candidate for this same audience. Approve it separately in My AI.\"\n  - strong: Let my AI use this\n  - text: Adds a source candidate for this same audience. Approve it separately in My AI. Show audience size\n  - checkbox \"Show audience size\" [disabled]\n  - paragraph: Current audience size is unavailable.\n  - text: Use the fan's name token\n  - checkbox \"Use the fan's name token\"\n  - text: Schedule in your time zone\n  - textbox \"Schedule in your time zone\"\n  - button \"Save draft\"\n  - button \"Review and sign\"\n  - paragraph: SAVED \u00b7 REVISION 4"
+  },
+  "operatorCorrection": "Initial numeric resume signal used the wrong platform value. Corrected using signal.SIGCONT; API health returned configured foundation with ready=false; then clicked current-role refresh."
+}

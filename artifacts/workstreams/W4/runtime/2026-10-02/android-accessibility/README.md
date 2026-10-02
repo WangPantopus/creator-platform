@@ -1,0 +1,5 @@
+# Personally operated Android large-text regression
+
+The W4 primary operated the normally built shipping APK against the actual owned API and canonical57 development database through CUA. System Settings changed font size to its maximum, independently observed as2.0. Real touch scrolling and decimal soft-keyboard taps entered6.50 in Light; Save remained reachable. The unsaved amount was discarded. Actual account/request navigation and Manage membership showed the truthful missing-store state. A normal cold return in Night retained6USD, zero totals and the original pending No limit deadline.
+
+The owned system font was restored to1.0 through the real Quick Settings sheet. Normal shutdown returned0 and released exact GUI/emulator-slot2 leases. No SQL business-row write, payment, creator verification or receipt was fabricated. [Receipt](receipt.json) lists exact built APK/API source and the acceptance limits. TalkBack, reduced motion, iOS operation and positive store/group/provider journeys remain unverified.

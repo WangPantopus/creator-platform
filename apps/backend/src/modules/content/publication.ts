@@ -111,6 +111,12 @@ export class ContentPublicationWorker {
           )
         ).rows[0];
         const document = ContentDocument.parse(revision?.document);
+        if (document.planRef)
+          throw new DomainError(
+            "publication_fulfillment_unconfigured",
+            "Current fulfillment for this answer is unavailable.",
+            503,
+          );
         const evidence = z
           .array(ProcessedMediaEvidenceSchema)
           .max(10)

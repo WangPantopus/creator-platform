@@ -27,7 +27,6 @@ import {
 import { DomainError } from "../../core/errors.js";
 import { trustPrivacyHook } from "./own-privacy-hook.js";
 import { mediaPrivacyHook } from "./media-privacy-hook.js";
-import { growthPrivacyHook } from "../growth/lifecycle.js";
 import type { GrowthService } from "../growth/service.js";
 import { contentPrivacyHook } from "../content/privacy.js";
 
@@ -42,7 +41,7 @@ export type ConversationPrivacyOwnerPorts = Omit<
 export function createPrivacyConsumers(input: {
   runtimePool: Pool;
   coordinatorPool: Pool;
-  /** Actual restoration on the owner's held client, as supplied by W8. */
+  /** Real current restoration on the owner's held client, never a pool check. */
   assertRestoredInTransaction?: (client: PoolClient) => Promise<void>;
   conversationRetention?: ConversationPrivacyRetention;
   /** Prepared owner instances; the coordinator fixes the pool, actual task
@@ -69,7 +68,7 @@ export function createPrivacyConsumers(input: {
   };
   media?: Omit<
     Parameters<typeof mediaPrivacyHook>[0],
-    "runtime" | "coordinator"
+    "runtime" | "coordinator" | "assertRestoredInTransaction"
   >;
   additional?: PrivacyHook[];
 }) {
@@ -77,10 +76,15 @@ export function createPrivacyConsumers(input: {
   const conversationAuthority = conversationPrivacyAuthority(
     input.runtimePool,
     input.coordinatorPool,
+    input.assertRestoredInTransaction,
   );
   const hooks: PrivacyHook[] = [
-    trustPrivacyHook(input.coordinatorPool),
-    identityPrivacyHook(input.runtimePool, input.coordinatorPool),
+    trustPrivacyHook(input.coordinatorPool, input.assertRestoredInTransaction),
+    identityPrivacyHook(
+      input.runtimePool,
+      input.coordinatorPool,
+      input.assertRestoredInTransaction,
+    ),
     {
       domain: "conversation",
       async run(job) {
@@ -106,6 +110,7 @@ export function createPrivacyConsumers(input: {
       runtime: input.runtimePool,
       coordinator: input.coordinatorPool,
       ...input.media,
+      assertRestoredInTransaction: input.assertRestoredInTransaction,
     }),
   ];
   if (input.agent)
@@ -161,16 +166,15 @@ export function createPrivacyConsumers(input: {
     );
   }
   if (input.growth) {
-    const owner = growthPrivacyHook(input.growth, undefined, verify);
     hooks.push({
       domain: "growth",
       async run(job) {
         await verify(job);
-        // The owner receives the complete current task, including its lease,
-        // cancellation signal and immutable pre-deletion ownership binding.
-        const result = await owner.run(job);
-        await verify(job);
-        return result;
+        throw new DomainError(
+          "growth_held_authority_unavailable",
+          "Growth privacy requires its reviewed same-client task and COMMIT integration.",
+          503,
+        );
       },
     });
   }

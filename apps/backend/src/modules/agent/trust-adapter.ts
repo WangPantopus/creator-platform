@@ -322,7 +322,7 @@ export function agentPrivacyHook(
         if (scopes.length)
           invariant(
             artifacts,
-            "export_artifact_unconfigured",
+            "privacy_artifact_unconfigured",
             "Connect the protected export artifact store before completing this data request.",
           );
         const data = [];

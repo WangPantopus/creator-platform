@@ -7,6 +7,7 @@ import {
 } from "../../../../../packages/api/src/media.js";
 import { contentHash } from "../../core/canonical.js";
 import { invariant } from "../../core/errors.js";
+import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
 import type {
   PublicationIdentityAuthority,
   PublicationTaskScope,
@@ -37,6 +38,36 @@ const snapshotSchema = z.strictObject({
   currentAssociation: z.boolean(),
 });
 type Snapshot = z.infer<typeof snapshotSchema>;
+const sources = Object.freeze([
+  {
+    path: "apps/backend/src/modules/identity/schema-publication-scope.sql",
+    owner: "W1",
+    name: "w1_publication_worker_scope",
+    checksum:
+      "100e319216568ee1ed27081be0520dbfdb3b7019659946c2c5de1f6859d32cc1",
+  },
+  {
+    path: "apps/backend/migrations/0073_w8_publication_worker_denial.sql",
+    owner: "W8",
+    name: "w8_publication_worker_denial",
+    checksum:
+      "87f8766331b59a174e0cf7e837e3a3a9cdfd9d9a1662aa2b39ed9aa2dc308d80",
+  },
+  {
+    path: "apps/backend/src/modules/media/publication-scope.sql",
+    owner: "W6",
+    name: "w6_publication_media_scope",
+    checksum:
+      "86fa7a8b8de890490ae9fc735d58b3581f1e7d158e3c51baa4ffa51ec33cc1df",
+  },
+  {
+    path: "apps/backend/migrations/0201_w8_worker_migration_metadata.sql",
+    owner: "W8",
+    name: "w8_worker_migration_metadata",
+    checksum:
+      "2fce1ce5aa6c9f571067d999e2a62ac8d71b8e147b97393e7e87091227159e6f",
+  },
+]);
 
 export interface PublicationMedia {
   evidence(
@@ -53,18 +84,58 @@ export interface PublicationMedia {
 
 /** Joins W1's actual sealed publication transaction. No request Actor,
  * interactive CreatorScope, account GUC or background signing is constructed.
- * W8 must activate 0071+0073+0075 before this projection can return any asset.
+ * W8 holds the original0071/0073/0075 sources as0158/0160/0161.
+ * The actual approved minimum worker metadata purpose0201 is also required.
  */
 export function createPublicationMedia(input: {
   identity: PublicationIdentityAuthority;
   storage: PrivateMediaStorage;
 }): PublicationMedia {
+  const assertPurpose = async (client: PoolClient) => {
+    for (const source of sources)
+      await assertRegisteredMigration(client, source);
+    const result = await client.query<{ ready: boolean }>(
+      `SELECT current_user=session_user AND current_user='creator_publication_worker'
+       AND current_setting('transaction_isolation')='read committed'
+       AND r.rolcanlogin AND NOT r.rolinherit AND NOT r.rolsuper AND NOT r.rolcreatedb
+       AND NOT r.rolcreaterole AND NOT r.rolreplication AND NOT r.rolbypassrls AND r.rolconfig IS NULL
+       AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid OR roleid=r.oid)
+       AND NOT EXISTS(SELECT FROM pg_db_role_setting WHERE setrole=r.oid)
+       AND NOT EXISTS(SELECT FROM pg_namespace WHERE nspowner=r.oid)
+       AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=r.oid)
+       AND NOT EXISTS(SELECT FROM pg_proc WHERE proowner=r.oid)
+       AND NOT EXISTS(SELECT FROM pg_database WHERE datdba=r.oid)
+       AND EXISTS(SELECT FROM pg_proc p JOIN pg_roles a ON a.oid=p.proowner
+         WHERE p.oid=to_regprocedure('creator.publication_media_snapshot(uuid,uuid,integer,uuid)')
+           AND a.rolname='creator_publication_authority' AND NOT a.rolcanlogin AND NOT a.rolinherit AND NOT a.rolsuper
+           AND NOT a.rolcreatedb AND NOT a.rolcreaterole AND NOT a.rolreplication AND NOT a.rolbypassrls AND a.rolconfig IS NULL
+           AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=a.oid OR roleid=a.oid)
+           AND NOT EXISTS(SELECT FROM pg_db_role_setting WHERE setrole=a.oid)
+           AND p.prosecdef AND p.proconfig=ARRAY['search_path=pg_catalog','statement_timeout=5s']::text[]
+           AND encode(sha256(convert_to(pg_get_functiondef(p.oid),'UTF8')),'hex')='d501aa36c5a02bca5ceda22670a1e7779dca8a80032ae1a62d9c2ed775cc980f'
+           AND has_function_privilege(current_user,p.oid,'EXECUTE')
+           AND NOT EXISTS(SELECT FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) acl
+             WHERE acl.grantee=0 AND acl.privilege_type='EXECUTE'))
+       AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+         WHERE n.nspname='creator' AND c.relname IN('creator_media_asset','creator_media_publication')
+           AND (NOT c.relrowsecurity OR NOT c.relforcerowsecurity OR pg_get_userbyid(c.relowner)<>'creator_owner'
+             OR has_table_privilege(current_user,c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
+             OR has_any_column_privilege(current_user,c.oid,'SELECT,INSERT,UPDATE,REFERENCES')))
+       AS ready FROM pg_roles r WHERE r.rolname=current_user`,
+    );
+    invariant(
+      result.rows[0]?.ready === true,
+      "media_publication_unconfigured",
+      "Reviewed media publication authority is unavailable.",
+    );
+  };
   const snapshot = async (
     client: PoolClient,
     scope: PublicationTaskScope,
     id: string,
   ) => {
     await input.identity.authorizeInTransaction(scope, client);
+    await assertPurpose(client);
     invariant(
       scope.signedActId,
       "media_signature_required",
@@ -160,6 +231,7 @@ export function createPublicationMedia(input: {
         false,
       );
       await input.identity.authorizeInTransaction(scope, client);
+      await assertPurpose(client);
       return Date.parse(row.expiresAt) > Date.now();
     },
   });
