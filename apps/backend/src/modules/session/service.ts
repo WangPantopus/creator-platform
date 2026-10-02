@@ -1115,7 +1115,9 @@ export class SessionService {
         await withDeadline(this.provider.state(revoked.room_id), 5000),
       );
       invariant(
-        truth.closed && !truth.recording,
+        truth.closed &&
+          !truth.recording &&
+          truth.presentAccountIds.length === 0,
         "call_revocation_unconfirmed",
         "Call closure is awaiting provider confirmation.",
       );

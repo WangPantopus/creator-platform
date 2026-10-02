@@ -1,0 +1,148 @@
+{
+  "recordedAt": "2026-10-01T14:49:19.000617+00:00",
+  "branch": "codex/w3-emulator-sdk-recovery",
+  "base": "ef3619bb35579963c1c86fafa91ad09b3e18552c",
+  "workflow": ".github/workflows/ci.yml",
+  "workflowSha256": "a32b0dcfe4e7b2f8d82a62f66fad73ac5adc14991f3a59d783b5639d572cb41a",
+  "approvedPatchSha256": "16a4a5a592d95b939c0b9a13361f5addad595b6b7078e845313d750bf99631ec",
+  "lease": {
+    "owner": "W1",
+    "thread": "01a0f498-d09e-7ca1-87ff-481bacf6cb4b",
+    "scope": "Only android-runtime emulator SDK installation recovery",
+    "exactDiffReviewedAndApprovedBeforePublication": true,
+    "closeAtPublication": "W1 explicitly closes at this exact published diff; follow-up installer logic needs separately reviewed diff",
+    "noMacOSOrMergeWaiver": true
+  },
+  "failure": {
+    "priorHead": "8cbf47e35707da27768d3a30c1e57ae9ed2b3a25",
+    "phase": "latest emulator SDK install before boot/app/tests",
+    "message": "Error on ZipFile unknown archive",
+    "observedAlsoAtEarlierHead": "438ab04a0d1e88e7150beb71cac9191a043e340e",
+    "comparison": "Same-head PR job succeeded on emulator37.1.11/build15917651, completed4 existing tests,67tasks,3m18s"
+  },
+  "mechanism": {
+    "installer": "canonical ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install emulator --channel=0",
+    "maximumInstallAttempts": 2,
+    "retryCondition": "First installer fails and its captured actual log contains the exact observed archive error; all other failures terminate",
+    "logs": "First installer log is printed verbatim; retry output remains in hosted job log",
+    "verification": "Final installation must exit0 and installed emulator -no-window -noaudio -version must exit0 before existing pinned action",
+    "appBootAndTestRetries": 0,
+    "continueOnError": false,
+    "localSDKExecuted": false
+  },
+  "preserved": [
+    "All pinned action SHAs",
+    "API34/x86_64",
+    "KVM",
+    "Existing connectedDebugAndroidTest command and assertions",
+    "Signing",
+    "Always upload failure artifacts",
+    "All Mac labels and checks",
+    "User unstaged iOS Package.resolved bytes"
+  ],
+  "beforeLogs": [
+    {
+      "jobId": 110418981677,
+      "runId": 36877032778,
+      "conclusion": "failure",
+      "actualCheckout": "8cbf47e35707da27768d3a30c1e57ae9ed2b3a25",
+      "file": "before-push-android-runtime.log",
+      "sha256": "5c2d9f72d3846e854af5e7eb84e4d05ce3e27c989064c9d836a03f351b34e7cb",
+      "personallyRead": true
+    },
+    {
+      "jobId": 110419013174,
+      "runId": 36877042138,
+      "conclusion": "success",
+      "actualCheckout": "28110726e047cffdcd00f73aeb0324e689458e09",
+      "file": "before-pr-android-runtime.log",
+      "sha256": "b6dea0e27234b0592b9a6eb0566cdd89a6240e0a2b3679a85dc9535bf4a4268d",
+      "personallyRead": true
+    },
+    {
+      "jobId": 110419013397,
+      "runId": 36877042138,
+      "conclusion": "success",
+      "actualCheckout": "28110726e047cffdcd00f73aeb0324e689458e09",
+      "file": "before-pr-web-backend.log",
+      "sha256": "263d8bce0a4c7537b0ed46d805e35d1126321eb69ded7831e33ca99a9c025d6c",
+      "personallyRead": true
+    },
+    {
+      "jobId": 110418981843,
+      "runId": 36877032778,
+      "conclusion": "success",
+      "actualCheckout": "8cbf47e35707da27768d3a30c1e57ae9ed2b3a25",
+      "file": "before-push-web-backend.log",
+      "sha256": "508a9027978748765b01f3cecb23320add233aa7842effe44ad229c4391692c5",
+      "personallyRead": true
+    }
+  ],
+  "checksAtPublication": {
+    "bashSyntax": "pass, bash -n only",
+    "workflowWhitespace": "pass",
+    "newHostedInstallerBootAndTests": "not yet accepted at source publication; exact final-head job logs must govern"
+  },
+  "primarySources": [
+    "https://raw.githubusercontent.com/ReactiveCircus/android-emulator-runner/a421e43855164a8197daf9d8d40fe71c6996bb0d/README.md",
+    "https://raw.githubusercontent.com/ReactiveCircus/android-emulator-runner/a421e43855164a8197daf9d8d40fe71c6996bb0d/action.yml",
+    "https://raw.githubusercontent.com/ReactiveCircus/android-emulator-runner/a421e43855164a8197daf9d8d40fe71c6996bb0d/src/sdk-installer.ts",
+    "https://developer.android.com/tools/sdkmanager",
+    "https://raw.githubusercontent.com/ReactiveCircus/android-emulator-runner/a421e43855164a8197daf9d8d40fe71c6996bb0d/src/main.ts",
+    "https://raw.githubusercontent.com/ReactiveCircus/android-emulator-runner/a421e43855164a8197daf9d8d40fe71c6996bb0d/lib/main.js",
+    "https://android.googlesource.com/platform/external/qemu/%2B/emu-master-dev/android/emulator/main-emulator.cpp",
+    "https://developer.android.com/studio/run/emulator-commandline"
+  ],
+  "limits": [
+    "An emulator-build input alone cannot bypass sdk-installer.ts unconditional install that precedes its optional pinned-build branch.",
+    "A repeated cached bad archive can still fail; effectiveness requires actual hosted proof.",
+    "No local heavy runtime/build/SDK installation during confirmed human cleanup.",
+    "Existing hosted tests do not constitute full W3 first-conversation/privacy/production acceptance.",
+    "All required checks must be green for normal merge; no queued context counted as passed."
+  ],
+  "initialWorkflowSha256": "943596db0f7899b3d279945bf461c27fc4d001ef486cdcc7ae7fa6f18d6eae21",
+  "observedVerificationFailure": {
+    "head": "53c82158d8676e8f204fc8a079ed34c761a517fa",
+    "jobs": [
+      110427410043,
+      110427881679
+    ],
+    "sdkInstall": "both completed and unpacked100% without observed archive retry",
+    "phase": "new version check selected GUI qemu-system-x86_64 before pinned action",
+    "error": "libpulse.so.0: cannot open shared object file; exit127",
+    "appBootOrTestsRun": false,
+    "causedByThisIncrement": true,
+    "logs": [
+      {
+        "file": "gui-verification-failed-pr.log",
+        "sha256": "21461f5056e482a2835f252709cb77c5c6f701c0e1b05aad2f537b7e8adc821e"
+      },
+      {
+        "file": "gui-verification-failed-push.log",
+        "sha256": "9afa41c6db9984e7f76973c4144559d3a4a45c1b82a7959afdf290cf9d0c9cc3"
+      }
+    ]
+  },
+  "headlessFollowup": {
+    "diffFile": "W1-headless-followup.diff",
+    "diffSha256": "d803b2dccc36b110dcebdf84c8796c2503adb316b312554897d23a40a29006fc",
+    "fromHead": "53c82158d8676e8f204fc8a079ed34c761a517fa",
+    "onlySourceChange": "Add -no-window -noaudio to the retained fatal executable version verification, matching existing runner mode",
+    "W1SeparateReviewRequired": true,
+    "reviewState": "W1 personally reviewed exact one-line diff and Google launcher source; approved publication, closes upon exact-diff publication",
+    "effectiveness": "not accepted until actual new-head hosted executable, boot and completed tests",
+    "approvedBeforePublication": true
+  },
+  "sourceBaseline": "a92b04757378108e3a88b7c03f71e8a68e66c6ec",
+  "initialBaseCorrection": "Actual53c8215 parent is ef3619b (W2 documentation-only PR43), not ancestor a92b047 previously named as branch base. SDK/workflow/application source is identical across that documentation-only base delta.",
+  "latestReviewedIntegration": {
+    "main": "c1c615e6ece53bff4bc6a47d7f4d332757df1295",
+    "normalMerge": "39e382c6044da9d9cad46b86581bac9a8987f477",
+    "reviewed": "Complete W4 held financial-read guard source and W2 cleanup/pool-recovery receipts",
+    "effects": "Creator financial projections require actual held W8 creator-wide denial; baseline fan receipts remain separately scoped; no missing authority/provider is configured",
+    "incomingW3AndWorkflowDiffBytes": 0,
+    "leasedWorkflowBytesUnchanged": true,
+    "localBuildOrRuntime": false,
+    "currentHeadHostedProof": "Required independently after this source/evidence publication; earlier53/7f runs are not final-head passes"
+  }
+}

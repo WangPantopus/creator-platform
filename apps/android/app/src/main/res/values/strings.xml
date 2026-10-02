@@ -192,6 +192,8 @@
   <string name="written_by" formatted="false">Written by {name}</string>
   <string name="monthly_limit_legend" formatted="false">Monthly limit for requests and memberships</string>
   <string name="limit_reminders" formatted="false">Reminders at 50% and 100% of your limit are on. Lowering a limit is immediate.</string>
+  <string name="limit_reminders_off" formatted="false">Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.</string>
+  <string name="limit_reminders_unknown" formatted="false">Lowering a limit is immediate.</string>
   <string name="no_limit" formatted="false">No limit</string>
   <string name="nav_chat" formatted="false">Chat</string>
   <string name="nav_posts" formatted="false">Posts</string>
