@@ -1,6 +1,7 @@
 package com.pantopus.qelvora.conversation
 
 import android.net.Uri
+import android.os.SystemClock
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,6 +27,8 @@ import com.pantopus.qelvora.generated.*
 import com.pantopus.qelvora.identity.FanFeatureRegistration
 import com.pantopus.qelvora.identity.FanSession
 import com.pantopus.qelvora.ui.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -40,6 +43,7 @@ object W3FanFeatures {
     /** W1 calls this on sign-out/revocation alongside credential purge. */
     suspend fun clearPrivateState(context: android.content.Context) {
         ConversationRealtime.purge()
+        ConversationOfflineStorage.purge(context)
         ConversationResumeStorage(context).purge()
     }
     fun registration(baseURL: String?) = FanFeatureRegistration(matches = {
@@ -88,13 +92,27 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     var source by remember(root, accountId) { mutableStateOf<Pair<String,String>?>(null) }
     val lifecycleOwner = LocalLifecycleOwner.current
     var foreground by remember { mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
+    var offlineContext by remember(baseURL, root, accountId, session.session?.sessionId) { mutableStateOf<Long?>(null) }
+    var renewingOffline by remember(baseURL, root, accountId) { mutableStateOf(false) }
+    var offlineShowing by remember(baseURL, root, accountId) { mutableStateOf(false) }
+    var viewRun by remember(baseURL, root, accountId) { mutableStateOf(0) }
     val presenceId = remember(root) { UUID.randomUUID().toString() }
     val scope = rememberCoroutineScope()
     val scroll = rememberLazyListState()
     DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _,_ -> foreground = lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED) }
+        val observer = LifecycleEventObserver { _,_ ->
+            foreground = lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+            if (!foreground) {
+                viewRun++; offlineShowing = false; transportReady = false; offline = true
+                page = null; older = emptyList(); before = null; gate = null; source = null
+                offlineContext?.let { ConversationOfflineStorage.purge(it) }; offlineContext = null
+            }
+        }
         lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer); viewRun++
+            offlineContext?.let { ConversationOfflineStorage.purge(it) }; offlineContext = null
+        }
     }
     LaunchedEffect(root,foreground,privacy,page?.threadId) {
         if (page != null) {
@@ -103,27 +121,81 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             else while (true) { pulse(true);delay(20000) }
         }
     }
+    fun conceal() { page = null; older = emptyList(); before = null; gate = null; source = null }
+    suspend fun showOffline() {
+        val run = viewRun
+        val lease = offlineContext
+        offlineShowing = true
+        val snapshot = withContext(Dispatchers.IO) { lease?.let { ConversationOfflineStorage.read(it) } }
+        if (run != viewRun || !foreground || privacy || !offlineShowing) return
+        val current = page
+        if (snapshot == null || (current != null && (snapshot.page.cursor < current.cursor || snapshot.page.epoch < current.epoch || snapshot.page.revision < current.revision))) { conceal(); return }
+        page = snapshot.page; older = emptyList(); before = null; gate = null; source = null
+    }
+    suspend fun renewOffline() {
+        val current = page ?: return
+        val lease = offlineContext ?: return
+        val run = viewRun
+        if (!foreground || privacy || !transportReady || current.offTheRecord || !current.consentCurrent) return
+        val started = SystemClock.elapsedRealtime()
+        try {
+            val value = client.request("$root/offline")
+            val snapshot = client.json.decodeFromJsonElement<ConversationOfflineSnapshot>(value)
+            if (run != viewRun || !foreground || privacy || !transportReady || page?.cursor != snapshot.page.cursor || page?.epoch != snapshot.page.epoch || page?.revision != snapshot.page.revision) return
+            val saved = withContext(Dispatchers.IO) { ConversationOfflineStorage.save(value.toString().toByteArray(Charsets.UTF_8), lease, started) }
+            if (!saved && offlineContext == lease) offlineContext = null
+        } catch (failure: Exception) {
+            if (failure is CancellationException) throw failure
+            ConversationOfflineStorage.purge(lease); if (offlineContext == lease) offlineContext = null
+        }
+    }
     val fail: (Throwable) -> Unit = { failure ->
         if (failure is CancellationException) throw failure
         error = failure.message ?: "Reconnect to refresh. Your input is kept."
-        offline = true
-        if (failure is ConversationFailure && failure.status in listOf(401,403,404)) { page = null; older = emptyList(); before = null; draft = ""; pending = null; gate = null; source = null; privacy = false; transportReady = false; scope.launch { runCatching { resumeStorage.remove(accountId, storageScope) } } }
+        offline = true; transportReady = false
+        if (failure is ConversationFailure && failure.status in listOf(401,403,404)) { offlineShowing = false; offlineContext?.let { ConversationOfflineStorage.purge(it) }; offlineContext = null; page = null; older = emptyList(); before = null; draft = ""; pending = null; gate = null; source = null; privacy = false; transportReady = false; scope.launch { runCatching { resumeStorage.remove(accountId, storageScope) } } }
+        else scope.launch { showOffline() }
     }
     suspend fun refresh() {
+        val run = viewRun
+        if (!foreground || privacy) return
         try {
             if (!resumeActivated) {
                 try { resumeStorage.activate(accountId) } catch (failure: Exception) { if (failure is CancellationException) throw failure }
                 resumeActivated = true
             }
             val fresh = client.page(root)
+            if (run != viewRun || !foreground || privacy) return
             if (fresh.cursor >= (page?.cursor ?: 0) && fresh.epoch >= (page?.epoch ?: 0) && fresh.revision >= (page?.revision ?: 0)) {
-                page = fresh; if (before == null && older.isEmpty()) before = fresh.before
+                offlineShowing = false; page = fresh; if (before == null && older.isEmpty()) before = fresh.before
                 gate = ThreadDeliveryGate(fresh.threadId, fresh.cursor, fresh.epoch, fresh.generationSequences)
                 try { resumeStorage.save(accountId, storageScope, fresh.cursor, fresh.epoch) } catch (failure: Exception) { if (failure is CancellationException) throw failure }
                 offline = !transportReady; error = ""
                 pending?.let { item -> if (client.request("$root/messages/status", buildJsonObject { put("idempotencyKey", item.key) }).jsonObject["accepted"]?.jsonPrimitive?.boolean == true && pending?.key == item.key) { pending = null; if (draft.trim() == item.text) draft = "" } }
             }
-        } catch (failure: Throwable) { fail(failure) }
+        } catch (failure: Throwable) { if (run == viewRun) fail(failure) }
+    }
+    LaunchedEffect(baseURL, root, accountId, foreground, privacy) {
+        if (!foreground || privacy) {
+            viewRun++; offlineContext?.let { ConversationOfflineStorage.purge(it) }; offlineContext = null
+            offlineShowing = false; conceal(); return@LaunchedEffect
+        }
+        var nextRenew = 0L
+        renewingOffline = false
+        while (isActive) {
+            if (offlineShowing && offlineContext?.let { ConversationOfflineStorage.current(it) } != true) {
+                offlineContext?.let { ConversationOfflineStorage.purge(it) }; offlineContext = null; offlineShowing = false; conceal()
+            }
+            if (SystemClock.elapsedRealtime() >= nextRenew) {
+                nextRenew = SystemClock.elapsedRealtime() + 2000
+                if (offlineContext == null) offlineContext = ConversationOfflineStorage.activate(context,baseURL,accountId,session.session?.sessionId.orEmpty(),root)
+                if (!renewingOffline) {
+                    renewingOffline = true; val run = viewRun
+                    launch { try { renewOffline() } finally { if (run == viewRun) renewingOffline = false } }
+                }
+            }
+            delay(100)
+        }
     }
     suspend fun send(retry: Boolean = false) {
         val current = page ?: return
@@ -138,7 +210,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         } catch (failure: Throwable) { val uncertain = failure !is ConversationFailure || failure.status >= 500 || failure.status == 409; pending = item.copy(uncertain = uncertain, rejected = !uncertain); fail(failure) }
         finally { busy = false }
     }
-    LaunchedEffect(root, accountId, foreground, privacy) {
+    LaunchedEffect(baseURL, root, accountId, foreground, privacy) {
         transportReady = false; offline = true
         if (!foreground || privacy) return@LaunchedEffect
         var backoff = 1000L
@@ -170,6 +242,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 fail(failure)
                 if (failure is ConversationFailure && failure.status in listOf(401,403,404)) return@LaunchedEffect
             } finally { transportReady = false; offline = true }
+            showOffline()
             delay(backoff + Random.nextLong(0, backoff / 4 + 1))
             backoff = minOf(15000L, backoff * 2)
         }
@@ -196,9 +269,9 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             IdentityStrip(state = if (current.control == APIThreadControl.HUMAN_ACTIVE) IdentityState.HUMAN else if (current.control == APIThreadControl.AI_ACTIVE) IdentityState.AI else IdentityState.PAUSED, name = current.creatorName)
             LazyColumn(state = scroll, modifier = Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 item { BasicText("Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.", style = qText("caption").copy(color = qColor("ink"))) }
-                if (offline) item { Notice(title = "You're offline", children = "You're seeing the last loaded conversation. Reconnect to send.") }
+                if (offline) item { Notice(title = "You're offline", children = "Saved conversation is available briefly while its reading permission is current. Reconnect to send.") }
                 if (current.offTheRecord) item { SystemLine(text = "Off the record · the AI keeps no memory from this conversation.") }
-                if (before != null) item { Button("Earlier messages", variant = ButtonVariant.QUIET, disabled = busy) { scope.launch {
+                if (before != null) item { Button("Earlier messages", variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground) { scope.launch {
                     busy = true
                     try { val previous = client.page("$root?before=$before"); older = (previous.messages + older).distinctBy { it.id }.take(250); before = previous.before }
                     catch (failure: Throwable) { fail(failure) } finally { busy = false }

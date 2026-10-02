@@ -1,5 +1,5 @@
 import type { PoolClient } from "pg";
-import type { ThreadScope } from "../access/scope.js";
+import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import { requestAuthority } from "../identity/request-authority.js";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError } from "../../core/errors.js";
@@ -44,6 +44,7 @@ export class ConversationOfflineIssuer {
     page: ConversationPage,
     providerPolicyVersion: string,
   ): Promise<ConversationOfflineSnapshot> {
+    assertThreadScope(scope);
     const authority = requestAuthority.getStore();
     offlineInvariant(
       authority &&
@@ -66,10 +67,12 @@ export class ConversationOfflineIssuer {
     );
     const times = (
       await client.query<{ issued_at: Date; expires_at: Date }>(
-        `SELECT clock_timestamp() AS issued_at,
-       LEAST(clock_timestamp()+interval '5 seconds',expires_at) AS expires_at
-       FROM creator.identity_session WHERE id=$1 AND account_id=$2
-       AND revoked_at IS NULL AND expires_at>clock_timestamp() FOR SHARE`,
+        `WITH issued AS MATERIALIZED (SELECT clock_timestamp() AS at)
+       SELECT issued.at AS issued_at,
+       LEAST(issued.at+interval '5 seconds',session.expires_at) AS expires_at
+       FROM creator.identity_session session CROSS JOIN issued
+       WHERE session.id=$1 AND session.account_id=$2
+       AND session.revoked_at IS NULL AND session.expires_at>issued.at FOR SHARE OF session`,
         [authority.sessionId, authority.accountId],
       )
     ).rows[0];

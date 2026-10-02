@@ -3,7 +3,7 @@ import SwiftUI
 @MainActor
 public enum W3FanFeatures {
     /// W1 calls this at sign-out/account revocation alongside credential purge.
-    public static func clearPrivateState() async { await W3Realtime.shared.purge(); await W3ResumeStorage.shared.purge() }
+    public static func clearPrivateState() async { await W3Realtime.shared.purge(); await W3ResumeStorage.shared.purge(); await W3OfflineStorage.shared.purge() }
     public static func registration(baseURL: URL?) -> FanFeatureRegistration {
         FanFeatureRegistration(matches: { destination in
             let path = destination.components(separatedBy: "?")[0]
@@ -19,7 +19,7 @@ private struct W3ConversationDestination: View {
         if let baseURL, path.count == 3, path[0] == "threads", UUID(uuidString: path[1]) != nil, UUID(uuidString: path[2]) != nil {
             W3ThreadScreen(baseURL: baseURL, creatorId: path[1], fanId: path[2], session: session)
         } else if let baseURL, path.count == 3, path[0] == "creators", path[2] == "chat" {
-            W3FirstConversation(baseURL: baseURL, handle: path[1], accountId: session.session?.accountId ?? "signed-out", session: session)
+            W3FirstConversation(baseURL: baseURL, handle: path[1], accountId: session.session?.accountId ?? "signed-out", sessionId: session.session?.sessionId ?? "", session: session)
         } else if let baseURL, path == ["you"] {
             let query = URLComponents(string: session.destination)?.queryItems ?? []
             if ApplicationDestination.isPermitted(session.destination),
@@ -44,7 +44,7 @@ private struct W3ThreadScreen: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var scheme
     init(baseURL: URL, creatorId: String, fanId: String, session: FanSession) {
-        self.baseURL = baseURL; _model = StateObject(wrappedValue: W3ThreadModel(baseURL: baseURL, creatorId: creatorId, fanId: fanId, accountId: session.session?.accountId ?? "signed-out")); self.session = session
+        self.baseURL = baseURL; _model = StateObject(wrappedValue: W3ThreadModel(baseURL: baseURL, creatorId: creatorId, fanId: fanId, accountId: session.session?.accountId ?? "signed-out", sessionId: session.session?.sessionId ?? "")); self.session = session
     }
     var body: some View {
         VStack(spacing: 0) {
@@ -55,9 +55,9 @@ private struct W3ThreadScreen: View {
                     ScrollView {
                         LazyVStack(alignment: .leading, spacing: QelvoraTokens.space4) {
                             Text("Conversations with a creator’s AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.").qText("caption").padding(12).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusMd))
-                            if model.offline { Notice(tone: .offline, title: "You're offline", children: "You're seeing the last loaded conversation. Reconnect to send.") }
+                            if model.offline { Notice(tone: .offline, title: "You're offline", children: "You're seeing a saved conversation with a short reading lease. Reconnect to send.") }
                             if page.offTheRecord { SystemLine(children: "Off the record · the AI keeps no memory from this conversation.") }
-                            if model.before != nil { Button("Earlier messages", variant: .quiet, disabled: model.busy) { Task { await model.earlier() } } }
+                            if model.before != nil { Button("Earlier messages", variant: .quiet, disabled: model.busy || model.offline) { Task { await model.earlier() } } }
                             ForEach(model.older.filter { old in !page.messages.contains { $0.id == old.id } } + page.messages) { message in
                                 row(message, page: page).id(message.id)
                             }
