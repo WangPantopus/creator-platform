@@ -12403,7 +12403,7 @@
             "type": "boolean"
           },
           "remindersOn": {
-            "default": true,
+            "default": false,
             "type": "boolean"
           },
           "idempotencyKey": {

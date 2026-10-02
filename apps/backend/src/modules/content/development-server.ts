@@ -130,7 +130,10 @@ const backend = await createConfiguredBackend({
     commerceSignedSubjects,
     {
       name: "content",
+      requiresFinalization: true,
       prepare: (...args) => contentSignedSubjects(content).prepare(...args),
+      finalizeBeforeCommit: (...args) =>
+        contentSignedSubjects(content).finalizeBeforeCommit!(...args),
     },
   ],
   registerFeatures: async (runtime) => {
