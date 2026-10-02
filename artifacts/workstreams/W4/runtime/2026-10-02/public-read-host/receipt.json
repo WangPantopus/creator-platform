@@ -18,7 +18,8 @@
     "Backend typecheck and affected lint/format pass",
     "Original40 and fresh57 actual non-owner databases refuse unactivated public graph with503 before authority invocation",
     "Three exact membership/grant SQL statements plan under actual runtime role without ANALYZE/business writes",
-    "W1 revised0081 factory and SQL hashes match published owner values"
+    "W1 revised0081 factory and SQL hashes match published owner values",
+    "Personally restarted canonical API4104 at reconciled32e74a0e and reloaded the real fan web page: saved7USD/original pending No limit/reminders off persist; actual membership recovery remains unavailable without providers"
   ],
   "failureAndCorrection": [
     "Initial startup catalog check resolved an uninstalled Trust function via schema without USAGE and raised42501; changed to pg_proc/namespace/argument metadata. Both original40 and fresh57 now return truthful503"
@@ -68,6 +69,10 @@
     {
       "path": "apps/backend/migrations/0082_w8_interactive_denial_try_fence.sql",
       "sha256": "3742b1e6b7f367ca626176615c5362ecf002fe5fcc5a96ea941d35a4708e8686"
+    },
+    {
+      "path": "web-fan-return-light.png",
+      "sha256": "88d46b8cae46f1d5d825c4b0999305a4984f532fc7451c1a67e570e93266bc4e"
     }
   ]
 }
