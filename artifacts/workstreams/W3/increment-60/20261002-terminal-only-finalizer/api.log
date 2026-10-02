@@ -1,0 +1,17 @@
+/Users/yingpengwang/estimate-rescue/creator-platform/w3-fan-conversations-chat-55cfcc/apps/backend/src/modules/growth/database.ts:45
+      throw new DomainError(
+            ^
+
+DomainError: Actor persistence must not inherit ETL authority.
+    at GrowthDatabase.ready (/Users/yingpengwang/estimate-rescue/creator-platform/w3-fan-conversations-chat-55cfcc/apps/backend/src/modules/growth/database.ts:45:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async createGrowthRuntime (/Users/yingpengwang/estimate-rescue/creator-platform/w3-fan-conversations-chat-55cfcc/apps/backend/src/modules/growth/runtime.ts:44:3)
+    at async configureGrowthForBackend (/Users/yingpengwang/estimate-rescue/creator-platform/w3-fan-conversations-chat-55cfcc/apps/backend/src/modules/growth/configured.ts:53:21)
+    at async Object.registerFeatures (/Users/yingpengwang/estimate-rescue/creator-platform/w3-fan-conversations-chat-55cfcc/apps/backend/src/server.ts:73:29)
+    at async createConfiguredBackend (/Users/yingpengwang/estimate-rescue/creator-platform/w3-fan-conversations-chat-55cfcc/apps/backend/src/integration.ts:405:17)
+    at async <anonymous> (/Users/yingpengwang/estimate-rescue/creator-platform/w3-fan-conversations-chat-55cfcc/apps/backend/src/server.ts:35:7) {
+  code: 'unsafe_growth_membership',
+  status: 503
+}
+
+Node.js v24.13.0
