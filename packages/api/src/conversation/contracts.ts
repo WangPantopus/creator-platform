@@ -199,6 +199,37 @@ export const ConversationPageSchema = z.strictObject({
   feedbackPolicy: ReplyFeedbackPolicySchema.nullable().optional(),
 });
 export type ConversationPage = z.infer<typeof ConversationPageSchema>;
+/** A short server-issued read lease, never a credential or offline write grant. */
+export const ConversationOfflineLeaseSchema = z.strictObject({
+  issuer: z.url(),
+  accountId: IdSchema,
+  sessionBinding: z.string().regex(/^[a-f0-9]{64}$/u),
+  threadId: IdSchema,
+  creatorId: IdSchema,
+  fanId: IdSchema,
+  revision: z.number().int().nonnegative(),
+  epoch: z.number().int().nonnegative(),
+  cursor: z.number().int().nonnegative(),
+  policyVersion: z.literal("conversation-offline-five-seconds-v1"),
+  providerPolicyVersion: z.string().min(1).max(120),
+  issuedAt: z.iso.datetime(),
+  expiresAt: z.iso.datetime(),
+  messages: z
+    .array(
+      z.strictObject({ id: IdSchema, version: z.number().int().positive() }),
+    )
+    .max(50),
+});
+export type ConversationOfflineLease = z.infer<
+  typeof ConversationOfflineLeaseSchema
+>;
+export const ConversationOfflineSnapshotSchema = z.strictObject({
+  lease: ConversationOfflineLeaseSchema,
+  page: ConversationPageSchema,
+});
+export type ConversationOfflineSnapshot = z.infer<
+  typeof ConversationOfflineSnapshotSchema
+>;
 export const ConversationAccountPageSchema = z.strictObject({
   fan: z.strictObject({
     id: IdSchema,

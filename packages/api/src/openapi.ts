@@ -541,6 +541,13 @@ export function createOpenApi() {
           "ConversationConversationRecordingInput",
         ),
       },
+      "/v1/conversations/{creatorId}/{fanId}/offline": {
+        parameters: pair,
+        get: operation(
+          "leaseOfflineConversation",
+          "ConversationConversationOfflineSnapshot",
+        ),
+      },
       ...mediaPaths,
     },
     components: {

@@ -5831,6 +5831,373 @@ public struct APIConversationConversationMessageCorrection: Codable, Sendable {
   }
 }
 
+public struct APIConversationConversationOfflineLease: Codable, Sendable {
+  public let `issuer`: String
+  public let `accountId`: String
+  public let `sessionBinding`: String
+  public let `threadId`: String
+  public let `creatorId`: String
+  public let `fanId`: String
+  public let `revision`: Int
+  public let `epoch`: Int
+  public let `cursor`: Int
+  public let `policyVersion`: APIConversationConversationOfflineLeasePolicyVersion
+  public let `providerPolicyVersion`: String
+  public let `issuedAt`: String
+  public let `expiresAt`: String
+  public let `messages`: [APIConversationConversationOfflineLeaseMessagesItem]
+  public init(issuer: String, accountId: String, sessionBinding: String, threadId: String, creatorId: String, fanId: String, revision: Int, epoch: Int, cursor: Int, policyVersion: APIConversationConversationOfflineLeasePolicyVersion, providerPolicyVersion: String, issuedAt: String, expiresAt: String, messages: [APIConversationConversationOfflineLeaseMessagesItem]) {
+    self.issuer = issuer
+    self.accountId = accountId
+    self.sessionBinding = sessionBinding
+    self.threadId = threadId
+    self.creatorId = creatorId
+    self.fanId = fanId
+    self.revision = revision
+    self.epoch = epoch
+    self.cursor = cursor
+    self.policyVersion = policyVersion
+    self.providerPolicyVersion = providerPolicyVersion
+    self.issuedAt = issuedAt
+    self.expiresAt = expiresAt
+    self.messages = messages
+  }
+}
+
+public enum APIConversationConversationOfflineLeasePolicyVersion: String, Codable, Sendable {
+  case `conversation_offline_five_seconds_v1` = "conversation-offline-five-seconds-v1"
+}
+
+public struct APIConversationConversationOfflineLeaseMessagesItem: Codable, Sendable {
+  public let `id`: String
+  public let `version`: Int
+  public init(id: String, version: Int) {
+    self.id = id
+    self.version = version
+  }
+}
+
+public struct APIConversationConversationOfflineSnapshot: Codable, Sendable {
+  public let `lease`: APIConversationConversationOfflineSnapshotLease
+  public let `page`: APIConversationConversationOfflineSnapshotPage
+  public init(lease: APIConversationConversationOfflineSnapshotLease, page: APIConversationConversationOfflineSnapshotPage) {
+    self.lease = lease
+    self.page = page
+  }
+}
+
+public struct APIConversationConversationOfflineSnapshotLease: Codable, Sendable {
+  public let `issuer`: String
+  public let `accountId`: String
+  public let `sessionBinding`: String
+  public let `threadId`: String
+  public let `creatorId`: String
+  public let `fanId`: String
+  public let `revision`: Int
+  public let `epoch`: Int
+  public let `cursor`: Int
+  public let `policyVersion`: APIConversationConversationOfflineSnapshotLeasePolicyVersion
+  public let `providerPolicyVersion`: String
+  public let `issuedAt`: String
+  public let `expiresAt`: String
+  public let `messages`: [APIConversationConversationOfflineSnapshotLeaseMessagesItem]
+  public init(issuer: String, accountId: String, sessionBinding: String, threadId: String, creatorId: String, fanId: String, revision: Int, epoch: Int, cursor: Int, policyVersion: APIConversationConversationOfflineSnapshotLeasePolicyVersion, providerPolicyVersion: String, issuedAt: String, expiresAt: String, messages: [APIConversationConversationOfflineSnapshotLeaseMessagesItem]) {
+    self.issuer = issuer
+    self.accountId = accountId
+    self.sessionBinding = sessionBinding
+    self.threadId = threadId
+    self.creatorId = creatorId
+    self.fanId = fanId
+    self.revision = revision
+    self.epoch = epoch
+    self.cursor = cursor
+    self.policyVersion = policyVersion
+    self.providerPolicyVersion = providerPolicyVersion
+    self.issuedAt = issuedAt
+    self.expiresAt = expiresAt
+    self.messages = messages
+  }
+}
+
+public enum APIConversationConversationOfflineSnapshotLeasePolicyVersion: String, Codable, Sendable {
+  case `conversation_offline_five_seconds_v1` = "conversation-offline-five-seconds-v1"
+}
+
+public struct APIConversationConversationOfflineSnapshotLeaseMessagesItem: Codable, Sendable {
+  public let `id`: String
+  public let `version`: Int
+  public init(id: String, version: Int) {
+    self.id = id
+    self.version = version
+  }
+}
+
+public struct APIConversationConversationOfflineSnapshotPage: Codable, Sendable {
+  public let `threadId`: String
+  public let `creatorId`: String
+  public let `fanId`: String
+  public let `creatorName`: String
+  public let `fanHandle`: String
+  public let `control`: APIConversationConversationOfflineSnapshotPageControl
+  public let `epoch`: Int
+  public let `cursor`: Int
+  public let `revision`: Int
+  public let `generationSequences`: [String: Int]
+  public let `messages`: [APIConversationConversationOfflineSnapshotPageMessagesItem]
+  public let `before`: Int?
+  public let `offTheRecord`: Bool
+  public let `introShared`: Bool
+  public let `consentCurrent`: Bool
+  public let `canSend`: Bool
+  public let `unavailableReason`: String?
+  public let `feedbackPolicy`: APIConversationConversationOfflineSnapshotPageFeedbackPolicy?
+  public init(threadId: String, creatorId: String, fanId: String, creatorName: String, fanHandle: String, control: APIConversationConversationOfflineSnapshotPageControl, epoch: Int, cursor: Int, revision: Int, generationSequences: [String: Int], messages: [APIConversationConversationOfflineSnapshotPageMessagesItem], before: Int? = nil, offTheRecord: Bool, introShared: Bool, consentCurrent: Bool, canSend: Bool, unavailableReason: String? = nil, feedbackPolicy: APIConversationConversationOfflineSnapshotPageFeedbackPolicy? = nil) {
+    self.threadId = threadId
+    self.creatorId = creatorId
+    self.fanId = fanId
+    self.creatorName = creatorName
+    self.fanHandle = fanHandle
+    self.control = control
+    self.epoch = epoch
+    self.cursor = cursor
+    self.revision = revision
+    self.generationSequences = generationSequences
+    self.messages = messages
+    self.before = before
+    self.offTheRecord = offTheRecord
+    self.introShared = introShared
+    self.consentCurrent = consentCurrent
+    self.canSend = canSend
+    self.unavailableReason = unavailableReason
+    self.feedbackPolicy = feedbackPolicy
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `threadId`
+    case `creatorId`
+    case `fanId`
+    case `creatorName`
+    case `fanHandle`
+    case `control`
+    case `epoch`
+    case `cursor`
+    case `revision`
+    case `generationSequences`
+    case `messages`
+    case `before`
+    case `offTheRecord`
+    case `introShared`
+    case `consentCurrent`
+    case `canSend`
+    case `unavailableReason`
+    case `feedbackPolicy`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.threadId = try container.decode(String.self, forKey: .threadId)
+    self.creatorId = try container.decode(String.self, forKey: .creatorId)
+    self.fanId = try container.decode(String.self, forKey: .fanId)
+    self.creatorName = try container.decode(String.self, forKey: .creatorName)
+    self.fanHandle = try container.decode(String.self, forKey: .fanHandle)
+    self.control = try container.decode(APIConversationConversationOfflineSnapshotPageControl.self, forKey: .control)
+    self.epoch = try container.decode(Int.self, forKey: .epoch)
+    self.cursor = try container.decode(Int.self, forKey: .cursor)
+    self.revision = try container.decode(Int.self, forKey: .revision)
+    self.generationSequences = try container.decode([String: Int].self, forKey: .generationSequences)
+    self.messages = try container.decode([APIConversationConversationOfflineSnapshotPageMessagesItem].self, forKey: .messages)
+    self.before = try container.decode(Int?.self, forKey: .before)
+    self.offTheRecord = try container.decode(Bool.self, forKey: .offTheRecord)
+    self.introShared = try container.decode(Bool.self, forKey: .introShared)
+    self.consentCurrent = try container.decode(Bool.self, forKey: .consentCurrent)
+    self.canSend = try container.decode(Bool.self, forKey: .canSend)
+    self.unavailableReason = try container.decode(String?.self, forKey: .unavailableReason)
+    self.feedbackPolicy = try container.decodeIfPresent(APIConversationConversationOfflineSnapshotPageFeedbackPolicy.self, forKey: .feedbackPolicy)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(threadId, forKey: .threadId)
+    try container.encode(creatorId, forKey: .creatorId)
+    try container.encode(fanId, forKey: .fanId)
+    try container.encode(creatorName, forKey: .creatorName)
+    try container.encode(fanHandle, forKey: .fanHandle)
+    try container.encode(control, forKey: .control)
+    try container.encode(epoch, forKey: .epoch)
+    try container.encode(cursor, forKey: .cursor)
+    try container.encode(revision, forKey: .revision)
+    try container.encode(generationSequences, forKey: .generationSequences)
+    try container.encode(messages, forKey: .messages)
+    try container.encode(before, forKey: .before)
+    try container.encode(offTheRecord, forKey: .offTheRecord)
+    try container.encode(introShared, forKey: .introShared)
+    try container.encode(consentCurrent, forKey: .consentCurrent)
+    try container.encode(canSend, forKey: .canSend)
+    try container.encode(unavailableReason, forKey: .unavailableReason)
+    try container.encodeIfPresent(feedbackPolicy, forKey: .feedbackPolicy)
+  }
+}
+
+public enum APIConversationConversationOfflineSnapshotPageControl: String, Codable, Sendable {
+  case `ai_active` = "ai_active"
+  case `human_active` = "human_active"
+  case `ai_paused` = "ai_paused"
+  case `closed` = "closed"
+  case `blocked` = "blocked"
+}
+
+public struct APIConversationConversationOfflineSnapshotPageMessagesItem: Codable, Sendable {
+  public let `id`: String
+  public let `threadId`: String
+  public let `authorKind`: APIConversationConversationOfflineSnapshotPageMessagesItemAuthorKind
+  public let `text`: String
+  public let `deliveryState`: APIConversationConversationOfflineSnapshotPageMessagesItemDeliveryState
+  public let `controlEpoch`: Int
+  public let `sequence`: Int
+  public let `signedActId`: String?
+  public let `member`: String?
+  public let `authorAccountId`: String?
+  public let `citations`: [String]
+  public let `createdAt`: String
+  public let `offTheRecord`: Bool
+  public let `version`: Int
+  public let `agentVersion`: APIConversationConversationOfflineSnapshotPageMessagesItemAgentVersion?
+  public let `feedback`: APIConversationConversationOfflineSnapshotPageMessagesItemFeedback?
+  public let `recording`: APIJSONValue?
+  public let `correction`: APIConversationConversationOfflineSnapshotPageMessagesItemCorrection?
+  public init(id: String, threadId: String, authorKind: APIConversationConversationOfflineSnapshotPageMessagesItemAuthorKind, text: String, deliveryState: APIConversationConversationOfflineSnapshotPageMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, citations: [String], createdAt: String, offTheRecord: Bool, version: Int, agentVersion: APIConversationConversationOfflineSnapshotPageMessagesItemAgentVersion? = nil, feedback: APIConversationConversationOfflineSnapshotPageMessagesItemFeedback? = nil, recording: APIJSONValue? = nil, correction: APIConversationConversationOfflineSnapshotPageMessagesItemCorrection? = nil) {
+    self.id = id
+    self.threadId = threadId
+    self.authorKind = authorKind
+    self.text = text
+    self.deliveryState = deliveryState
+    self.controlEpoch = controlEpoch
+    self.sequence = sequence
+    self.signedActId = signedActId
+    self.member = member
+    self.authorAccountId = authorAccountId
+    self.citations = citations
+    self.createdAt = createdAt
+    self.offTheRecord = offTheRecord
+    self.version = version
+    self.agentVersion = agentVersion
+    self.feedback = feedback
+    self.recording = recording
+    self.correction = correction
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `threadId`
+    case `authorKind`
+    case `text`
+    case `deliveryState`
+    case `controlEpoch`
+    case `sequence`
+    case `signedActId`
+    case `member`
+    case `authorAccountId`
+    case `citations`
+    case `createdAt`
+    case `offTheRecord`
+    case `version`
+    case `agentVersion`
+    case `feedback`
+    case `recording`
+    case `correction`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.threadId = try container.decode(String.self, forKey: .threadId)
+    self.authorKind = try container.decode(APIConversationConversationOfflineSnapshotPageMessagesItemAuthorKind.self, forKey: .authorKind)
+    self.text = try container.decode(String.self, forKey: .text)
+    self.deliveryState = try container.decode(APIConversationConversationOfflineSnapshotPageMessagesItemDeliveryState.self, forKey: .deliveryState)
+    self.controlEpoch = try container.decode(Int.self, forKey: .controlEpoch)
+    self.sequence = try container.decode(Int.self, forKey: .sequence)
+    self.signedActId = try container.decode(String?.self, forKey: .signedActId)
+    self.member = try container.decode(String?.self, forKey: .member)
+    self.authorAccountId = try container.decodeIfPresent(String.self, forKey: .authorAccountId)
+    self.citations = try container.decode([String].self, forKey: .citations)
+    self.createdAt = try container.decode(String.self, forKey: .createdAt)
+    self.offTheRecord = try container.decode(Bool.self, forKey: .offTheRecord)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.agentVersion = try container.decodeIfPresent(APIConversationConversationOfflineSnapshotPageMessagesItemAgentVersion.self, forKey: .agentVersion)
+    self.feedback = try container.decodeIfPresent(APIConversationConversationOfflineSnapshotPageMessagesItemFeedback.self, forKey: .feedback)
+    self.recording = try container.decodeIfPresent(APIJSONValue.self, forKey: .recording)
+    self.correction = try container.decodeIfPresent(APIConversationConversationOfflineSnapshotPageMessagesItemCorrection.self, forKey: .correction)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(threadId, forKey: .threadId)
+    try container.encode(authorKind, forKey: .authorKind)
+    try container.encode(text, forKey: .text)
+    try container.encode(deliveryState, forKey: .deliveryState)
+    try container.encode(controlEpoch, forKey: .controlEpoch)
+    try container.encode(sequence, forKey: .sequence)
+    try container.encode(signedActId, forKey: .signedActId)
+    try container.encode(member, forKey: .member)
+    try container.encodeIfPresent(authorAccountId, forKey: .authorAccountId)
+    try container.encode(citations, forKey: .citations)
+    try container.encode(createdAt, forKey: .createdAt)
+    try container.encode(offTheRecord, forKey: .offTheRecord)
+    try container.encode(version, forKey: .version)
+    try container.encodeIfPresent(agentVersion, forKey: .agentVersion)
+    try container.encodeIfPresent(feedback, forKey: .feedback)
+    try container.encodeIfPresent(recording, forKey: .recording)
+    try container.encodeIfPresent(correction, forKey: .correction)
+  }
+}
+
+public enum APIConversationConversationOfflineSnapshotPageMessagesItemAuthorKind: String, Codable, Sendable {
+  case `fan` = "fan"
+  case `ai` = "ai"
+  case `approved_draft` = "approved_draft"
+  case `human_creator` = "human_creator"
+  case `human_call` = "human_call"
+  case `human_broadcast` = "human_broadcast"
+  case `human_reaction` = "human_reaction"
+  case `team` = "team"
+  case `system` = "system"
+}
+
+public enum APIConversationConversationOfflineSnapshotPageMessagesItemDeliveryState: String, Codable, Sendable {
+  case `accepted` = "accepted"
+  case `generating` = "generating"
+  case `delivered` = "delivered"
+  case `failed` = "failed"
+  case `interrupted` = "interrupted"
+}
+
+public struct APIConversationConversationOfflineSnapshotPageMessagesItemAgentVersion: Codable, Sendable {
+  public let `id`: String
+  public let `hash`: String
+  public init(id: String, hash: String) {
+    self.id = id
+    self.hash = hash
+  }
+}
+
+public enum APIConversationConversationOfflineSnapshotPageMessagesItemFeedback: String, Codable, Sendable {
+  case `helpful` = "helpful"
+  case `not_helpful` = "not_helpful"
+}
+
+public struct APIConversationConversationOfflineSnapshotPageMessagesItemCorrection: Codable, Sendable {
+  public let `originalMessageId`: String
+  public let `originalVersion`: Int
+  public init(originalMessageId: String, originalVersion: Int) {
+    self.originalMessageId = originalMessageId
+    self.originalVersion = originalVersion
+  }
+}
+
+public struct APIConversationConversationOfflineSnapshotPageFeedbackPolicy: Codable, Sendable {
+  public let `version`: String
+  public let `notice`: String
+  public init(version: String, notice: String) {
+    self.version = version
+    self.notice = notice
+  }
+}
+
 public struct APIConversationConversationPage: Codable, Sendable {
   public let `threadId`: String
   public let `creatorId`: String
@@ -8841,6 +9208,9 @@ public actor CreatorAPIClient {
   }
   public func deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput) async throws -> APIConversationConversationRecordingResult {
     try await request("/v1/conversations/\(segment(creatorId))/\(segment(fanId))/recordings", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
+  }
+  public func leaseOfflineConversation(creatorId: String, fanId: String) async throws -> APIConversationConversationOfflineSnapshot {
+    try await request("/v1/conversations/\(segment(creatorId))/\(segment(fanId))/offline", method: "GET", authenticated: true)
   }
   public func readCreatorMediaPolicy(creatorId: String, objectId: String, purpose: ReadCreatorMediaPolicyPurpose) async throws -> APIMediaCreatorMediaPolicyView {
     try await request("/v1/w6/creators/\(segment(creatorId))/media-policy", method: "GET", authenticated: true, query: [URLQueryItem(name: "objectId", value: objectId), URLQueryItem(name: "purpose", value: purpose.rawValue)])

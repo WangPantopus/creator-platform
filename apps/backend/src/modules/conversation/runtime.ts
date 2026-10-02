@@ -1,4 +1,5 @@
 import type { PoolClient } from "pg";
+import { ConversationOfflineIssuer } from "./offline.js";
 import type { ApprovedSentence } from "../agent/runtime.js";
 import type { Database } from "../../db/database.js";
 import type { AccessService, ThreadScope } from "../access/scope.js";
@@ -25,6 +26,7 @@ export function createConversationRuntime(input: {
   access: AccessService;
   conversation: ConversationService;
   policy?: ProviderPolicy;
+  offlineIssuer?: { origin: string; environment: string | undefined };
   generator?: ConversationGenerator;
   generatorFactory?: (memory: MemoryService) => ConversationGenerator;
   allowance?: ConversationAllowance;
@@ -142,6 +144,12 @@ export function createConversationRuntime(input: {
     input.corrections,
     input.assertReady,
     input.recordings,
+    input.offlineIssuer
+      ? new ConversationOfflineIssuer(
+          input.offlineIssuer.origin,
+          input.offlineIssuer.environment,
+        )
+      : undefined,
   );
   return {
     feature,
