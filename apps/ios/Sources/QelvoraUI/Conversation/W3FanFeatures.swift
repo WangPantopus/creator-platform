@@ -19,7 +19,7 @@ private struct W3ConversationDestination: View {
         if let baseURL, path.count == 3, path[0] == "threads", UUID(uuidString: path[1]) != nil, UUID(uuidString: path[2]) != nil {
             W3ThreadScreen(baseURL: baseURL, creatorId: path[1], fanId: path[2], session: session)
         } else if let baseURL, path.count == 3, path[0] == "creators", path[2] == "chat" {
-            W3FirstConversation(baseURL: baseURL, handle: path[1], accountId: session.session?.accountId ?? "signed-out", sessionId: session.session?.sessionId ?? "", session: session)
+            W3FirstConversation(baseURL: baseURL, handle: path[1], accountId: session.session?.accountId ?? "signed-out", session: session)
         } else if let baseURL, path == ["you"] {
             let query = URLComponents(string: session.destination)?.queryItems ?? []
             if ApplicationDestination.isPermitted(session.destination),
