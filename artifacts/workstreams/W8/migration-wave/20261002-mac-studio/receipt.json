@@ -51,7 +51,6 @@
   "scope": "SQL operator verification, not app/native/provider acceptance",
   "remaining": [
     "complete privilege-category recovery audit",
-    "adopted-W5 exception rehearsal",
     "owner fresh/preserved upgrade checks",
     "real web/iOS/Android integrated operation",
     "C10 accounting and policy registration",
@@ -140,5 +139,116 @@
       "originalLedgerRows": 40
     },
     "sourceSqlChanged": false
+  },
+  "publicCustodyCorrection": {
+    "probes": {
+      "label": "actual PG17 transactional unsafe-role probes; all changes rollback; no app acceptance",
+      "safeBaseline": {
+        "checkedRoles": 3,
+        "pinnedFunctions": 0,
+        "directCapabilities": 0,
+        "publicCapabilities": 295,
+        "pinnedPublicFunctions": 9
+      },
+      "publicFunctionSource": "refused",
+      "unexpectedPublicFunction": "refused",
+      "publicTable": "refused",
+      "publicColumn": "refused",
+      "publicDefault": "refused",
+      "publicSchemaCreate": "refused",
+      "publicDatabaseCreate": "refused",
+      "workerDatabaseCreate": "refused",
+      "publicTriggerBypass": "refused",
+      "bypass": "refused",
+      "membership": "refused",
+      "fullTableSelect": "refused",
+      "defaultGrant": "refused",
+      "grantOption": "refused",
+      "unregisteredDefiner": "refused",
+      "databaseRoleConfig": "refused",
+      "roleAttributesMembershipsUnchanged": true,
+      "ordinaryExistingWaveRunner": {
+        "exit": 1,
+        "explicitRefusal": true
+      },
+      "originalLedgerRows": 40
+    },
+    "fresh": {
+      "label": "synthetic fresh install",
+      "ledgerRows": 57,
+      "allPinnedChecksums": true,
+      "catalogSha256": "0a56334549a30cd9a3de1e5db55324b75576b8a4d42e4778c98d54cef21f8b54",
+      "releaseReady": false
+    },
+    "backendTypecheck": "passed with repository compiler options",
+    "publicFunctionPins": {
+      "baseline40": 9,
+      "canonical57": 23
+    },
+    "databasePolicy": "CONNECT/TEMPORARY only, no grant option; CREATE denied",
+    "originalSQLChanged": false
+  },
+  "adoptedLayoutRehearsal": {
+    "fixture": {
+      "label": "new synthetic SQL source-layout of published adopted48 profile; NOT original W5 adoption/recovery",
+      "originalSourcesExecutedOnce": 35,
+      "missingSourcesExecutedOnce": 6,
+      "aliasesDerivedFromActualNewDdlTimestamps": 7,
+      "ledgerRows": 48,
+      "completeCohortRecognized": true,
+      "oldTimestampFabricated": false
+    },
+    "fixtureQualification": "One failed fresh construction attempt rolled back on duplicate producer bookkeeping before the successful transaction. Counts of source applications refer to the successful committed constructor. New timestamps came from actual DDL; no historical timestamps were supplied. This is not historical adoption or recovery.",
+    "backup": {
+      "label": "synthetic constructed adopted48 layout backup; not original W5 or iMac recovery",
+      "rows": 0,
+      "tables": 147,
+      "backupBytes": 544013,
+      "separateRestoreVerified": true,
+      "privateBackup": true
+    },
+    "upgrade": {
+      "wave": "20261002",
+      "applied": [
+        "0044_w4_personal_approval",
+        "0046_w6_call_availability",
+        "0047_w6_creator_media",
+        "0049_w4_generation_cost_settlement",
+        "0050_w3_account_relationship_index",
+        "0051_w5_media_publication",
+        "0053_w8_runtime_denial_projection",
+        "0054_w4_pass_purchase_effects",
+        "0055_w4_pass_pool_effects",
+        "0056_w3_correction_feedback_lineage",
+        "0057_w3_feedback_consent",
+        "0058_w3_correction_signature",
+        "0059_w3_recording_association",
+        "0060_w8_composed_signed_message",
+        "0061_w4_payout_custody",
+        "0062_w6_creator_media_worker"
+      ],
+      "priorLedgerRows": 48,
+      "ledgerRows": 64,
+      "priorHistoryPreserved": true,
+      "originalDataPreserved": true,
+      "originalRows": 0,
+      "originalTables": 147,
+      "oldRolesPreserved": true,
+      "roleSafety": {
+        "checkedRoles": 3,
+        "pinnedFunctions": 7,
+        "directCapabilities": 82,
+        "publicCapabilities": 327,
+        "pinnedPublicFunctions": 23
+      },
+      "afterSchemaSha256": "b65c2b944b14a1e89d1916611f7d168deb4132a23a709815fe913ef73a16f9ac",
+      "trafficClosed": true,
+      "releaseReady": false
+    },
+    "ordinaryRunnerVerification": {
+      "alreadyApplied": 57,
+      "newlyApplied": 0
+    },
+    "historicalW5DatabaseTouched": false
   }
 }
