@@ -1,0 +1,19 @@
+{
+  "source": "aa7751d136c3f80be8c604e48392cdf04c3a76f5",
+  "androidShippingBuildPassed": true,
+  "apkSha256": "8360419e8894ada981a6372dc6a5f35a3eeb7dcdaad71c9f01b94a56b4fe403f",
+  "configuredAPI": "http://10.0.2.2:4112",
+  "normalDebugConfiguration": true,
+  "personallyOperatedCurrentBinary": false,
+  "builtAt": "2026-10-02T17:44:41.552613+00:00",
+  "iosShippingBuildPassed": true,
+  "iosNormalSigning": true,
+  "iosStrictCodesignPassed": true,
+  "iosBinarySha256": "9988e2df575e1b3c0cc128315cef25c0f051e1db726cf896dc2c49671e472fef",
+  "iosConfiguration": {
+    "CreatorAPIURL": "http://127.0.0.1:4112",
+    "CreatorLinkHost": "localhost"
+  },
+  "iosPersonallyOperated": false,
+  "productionWebBuildPassed": true
+}

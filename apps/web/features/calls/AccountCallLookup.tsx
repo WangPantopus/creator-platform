@@ -51,9 +51,21 @@ export function AccountCallLookup({ sessionId }: { sessionId: string }) {
       controller.abort();
     };
   }, [sessionId, session.accountId, session.sessionId, signal, attempt]);
-  if (route) return <CallView {...route} actorAccountId={session.accountId} />;
+  const development = session.mode === "development" && (
+    <Notice title={copy.identityDevelopmentTitle}>
+      {copy.identityDevelopmentBody}
+    </Notice>
+  );
+  if (route)
+    return (
+      <>
+        {development && <div className="qv w6-call">{development}</div>}
+        <CallView {...route} actorAccountId={session.accountId} />
+      </>
+    );
   return (
     <main className="qv w6-call">
+      {development}
       <h1>{copy.w1CallLookupTitle}</h1>
       {loading && <p role="status">{copy.w1CallLookupChecking}</p>}
       {unavailable && (
