@@ -19,10 +19,30 @@ const prepared = new WeakSet<InteractiveCallControl>();
 type DenialMigration = Readonly<{ version: string; checksum: string }>;
 const denialPath =
   "apps/backend/migrations/0082_w8_interactive_denial_try_fence.sql";
+const denialChecksum =
+  "3742b1e6b7f367ca626176615c5362ecf002fe5fcc5a96ea941d35a4708e8686";
+const denialVersion = /^\d{4}_w8_interactive_denial_try_fence$/u;
+declare const __QELVORA_REGISTERED_MIGRATIONS__:
+  | Readonly<Record<string, string>>
+  | undefined;
 
 /** Reservations and manually applied source SQL cannot activate admission. W8
  * may move the version in its ascending packet; the reviewed source path stays. */
 async function registeredDenial(): Promise<DenialMigration | undefined> {
+  // W7's shipping catalogue contains only executable, checked-out SQL hashes.
+  // A metadata-only version move preserves this exact reviewed source hash.
+  if (typeof __QELVORA_REGISTERED_MIGRATIONS__ !== "undefined") {
+    const entries = Object.entries(__QELVORA_REGISTERED_MIGRATIONS__).filter(
+      ([version]) => denialVersion.test(version),
+    );
+    if (!entries.length) return undefined;
+    invariant(
+      entries.length === 1 && entries[0]![1] === denialChecksum,
+      "call_control_migration_changed",
+      "Call control requires W8’s exact reviewed denial source.",
+    );
+    return Object.freeze({ version: entries[0]![0], checksum: entries[0]![1] });
+  }
   // Source TS and the built server bundle live at different depths. Locate the
   // nearest checked-in registry; a deployment without it stays unavailable.
   let root = dirname(fileURLToPath(import.meta.url));
@@ -58,8 +78,9 @@ async function registeredDenial(): Promise<DenialMigration | undefined> {
   invariant(
     entries.length === 1 &&
       entry.owner === "W8" &&
-      /^\d{4}_w8_interactive_denial_try_fence$/u.test(entry.version) &&
-      entry.sourceSha256 === checksum,
+      denialVersion.test(entry.version) &&
+      entry.sourceSha256 === checksum &&
+      checksum === denialChecksum,
     "call_control_migration_changed",
     "Call control requires W8’s executable reviewed denial migration.",
   );
