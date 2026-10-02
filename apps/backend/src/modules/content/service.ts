@@ -96,6 +96,13 @@ export type ContentSignatureWithdrawal = Readonly<{
   command: SignedActCommand;
   withdrawn: true;
 }>;
+export type ContentPacketRead = {
+  creatorId: string;
+  packetId: string;
+  contentId: string;
+  contentVersion: number;
+  audience: Audience;
+};
 export interface ContentDependencies {
   /** Current producer state only. Missing adapters fail closed for their path. */
   follows?: (
@@ -136,16 +143,16 @@ export interface ContentDependencies {
     actor: Actor,
     input: { creatorId: string; contentId: string },
   ) => Promise<void>;
+  /** Prepare every candidate's mode/packet positives before any source gate. */
+  preparePublicPacketReadPositive?: (
+    client: PoolClient,
+    actor: Actor,
+    input: ContentPacketRead,
+  ) => Promise<boolean>;
   publicPacketRead?: (
     client: PoolClient,
     actor: Actor,
-    input: {
-      creatorId: string;
-      packetId: string;
-      contentId: string;
-      contentVersion: number;
-      audience: Audience;
-    },
+    input: ContentPacketRead,
   ) => Promise<boolean>;
   /** W8 reviews the exact immutable reply. Missing/unavailable review leaves it quarantined. */
   reviewReply?: (
@@ -544,6 +551,7 @@ export class ContentService {
   async eligible(client: PoolClient, actor: Actor, row: Index) {
     return (
       (await this.eligibleBeforePacket(client, actor, row)) &&
+      (await this.preparePacketPositive(client, actor, row)) &&
       (await this.packetEligible(client, actor, row))
     );
   }
@@ -583,16 +591,37 @@ export class ContentService {
     // No later view enrichment may acquire new identity locks for this read.
     return this.audienceEligible(client, actor, row);
   }
+  private packetTuple(row: Index): ContentPacketRead {
+    return {
+      creatorId: row.creator_id,
+      packetId: row.packet_id!,
+      contentId: row.id,
+      contentVersion: row.version,
+      audience: row.audience,
+    };
+  }
+  private async preparePacketPositive(
+    client: PoolClient,
+    actor: Actor,
+    row: Index,
+  ) {
+    return (
+      !row.packet_id ||
+      (await this.dependencies.preparePublicPacketReadPositive?.(
+        client,
+        actor,
+        this.packetTuple(row),
+      )) === true
+    );
+  }
   private async packetEligible(client: PoolClient, actor: Actor, row: Index) {
     return (
       !row.packet_id ||
-      (await this.dependencies.publicPacketRead?.(client, actor, {
-        creatorId: row.creator_id,
-        packetId: row.packet_id,
-        contentId: row.id,
-        contentVersion: row.version,
-        audience: row.audience,
-      })) === true
+      (await this.dependencies.publicPacketRead?.(
+        client,
+        actor,
+        this.packetTuple(row),
+      )) === true
     );
   }
   private async audienceEligible(client: PoolClient, actor: Actor, row: Index) {
@@ -1500,10 +1529,17 @@ export class ContentService {
         if (studio || (await this.eligibleBeforePacket(client, actor, current)))
           permitted.push(current);
       }
-      // Every content/quote/audience positive lock is now held. Final W4
+      const packetPrepared: Index[] = [];
+      for (const current of permitted)
+        if (
+          studio ||
+          (await this.preparePacketPositive(client, actor, current))
+        )
+          packetPrepared.push(current);
+      // Every content/quote/audience/mode/packet positive lock is now held. Final W4
       // source gates and plain view reads cannot introduce a later identity or
       // domain lock from another candidate after the first source fence.
-      for (const current of permitted) {
+      for (const current of packetPrepared) {
         if (!studio && !(await this.packetEligible(client, actor, current)))
           continue;
         await client.query("SELECT set_config('app.content_id',$1,true)", [

@@ -66,6 +66,13 @@ export function composeContentHost(input: {
     follows?: ContentFollowReaders;
   };
   paidAudienceCount?: NonNullable<ContentDependencies["audienceCount"]>;
+  packetRead?: {
+    prepare: NonNullable<ContentDependencies["preparePublicPacketRead"]>;
+    preparePositive: NonNullable<
+      ContentDependencies["preparePublicPacketReadPositive"]
+    >;
+    read: NonNullable<ContentDependencies["publicPacketRead"]>;
+  };
   assertScopeAllowedInTransaction?: import("../access/scope.js").ScopeRestrictionInTransaction;
 }) {
   if (input.growth && input.growth.service.db.runtime !== input.pool)
@@ -85,6 +92,13 @@ export function composeContentHost(input: {
   const dependencies: ContentDependencies &
     Required<Pick<ContentDependencies, "assertAllowed">> = {
     ...input.dependencies,
+    ...(input.packetRead
+      ? {
+          preparePublicPacketRead: input.packetRead.prepare,
+          preparePublicPacketReadPositive: input.packetRead.preparePositive,
+          publicPacketRead: input.packetRead.read,
+        }
+      : {}),
     ...(input.growth?.follows ? { follows: input.growth.follows.follows } : {}),
     ...(input.growth?.follows?.count || input.paidAudienceCount
       ? {
