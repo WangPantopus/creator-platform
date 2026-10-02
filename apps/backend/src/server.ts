@@ -26,13 +26,16 @@ import { canonicalPassAccess } from "./modules/growth/integration.js";
 import { createGrowthAPIPool } from "./db/growth-api-pool.js";
 import { DomainError } from "./core/errors.js";
 import { domainPrivacyTaskAuthorityInTransaction } from "./modules/trust/domain-privacy-authority.js";
+import type { ConversationPrivacyOwnerPorts } from "./modules/trust/privacy-consumers.js";
+import { createTrustReplyReviewer } from "./modules/trust/reply-review.js";
 
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
 const config = readConfig();
 const features: {
   growth: Awaited<ReturnType<typeof configureGrowthForBackend>>;
-  close: (() => void)[];
+  conversationPrivacy?: ConversationPrivacyOwnerPorts;
+  close: (() => void | Promise<void>)[];
 } = { growth: null, close: [] };
 if (config.identityAdapter === "development" && !config.identitySessionKey)
   throw new Error(
@@ -65,6 +68,9 @@ try {
                 ) =>
                   createDevelopmentTrust(runtime, {
                     consumers: {
+                      // Trust starts first. Resolve only the actual prepared
+                      // conversation owners after the canonical host binds.
+                      conversation: () => features.conversationPrivacy,
                       additional:
                         process.env.GROWTH_ENABLED === "true"
                           ? [
@@ -126,6 +132,20 @@ try {
             );
             features.close.push(() => host.close());
             const { commerce, conversation, agent } = host;
+            features.conversationPrivacy = {
+              ...(conversation.feature.lineage
+                ? { lineage: conversation.feature.lineage }
+                : {}),
+              ...(conversation.feature.recordings
+                ? { recordings: conversation.feature.recordings }
+                : {}),
+              ...(commerce?.generationCostPrivacyReconciliation
+                ? {
+                    generationCostPrivacyReconciliation:
+                      commerce.generationCostPrivacyReconciliation,
+                  }
+                : {}),
+            };
             runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
             features.growth = await configureGrowthForBackend({
               ...runtime,
@@ -187,6 +207,7 @@ try {
               },
               dependencies: {
                 assertAllowed: runtime.assertCreatorAllowed,
+                reviewReply: createTrustReplyReviewer(),
                 assertAllowedInTransaction: async (
                   client,
                   actor,
