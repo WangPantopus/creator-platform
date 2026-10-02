@@ -7,6 +7,7 @@ import {
   randomBytes,
 } from "node:crypto";
 import { z } from "zod";
+import type { PoolClient } from "pg";
 import type { Actor } from "../identity/adapter.js";
 import { DomainError } from "../../core/errors.js";
 import { contentHash } from "../../core/canonical.js";
@@ -940,13 +941,27 @@ export class GrowthService {
   }
   async privacyDelete(
     accountId: string,
-    ownedCreatorIds: readonly string[] = [],
-    signal?: AbortSignal,
+    signal: AbortSignal,
+    assertAuthority: (client: PoolClient) => Promise<readonly string[]>,
   ) {
     await this.db.transaction(
       this.db.worker,
       async (client) => {
+        const ownedCreatorIds = await assertAuthority(client);
         await this.erasure.mark(client, accountId, ownedCreatorIds);
+        await assertAuthority(client);
+        const checkpointSchema = (
+          await client.query(
+            "SELECT to_regclass('growth.source_scan_checkpoint') IS NOT NULL AND (SELECT count(*)=2 FROM information_schema.columns WHERE table_schema='growth' AND table_name='source_scan_checkpoint' AND column_name IN ('generation','expires_at')) AS ready",
+          )
+        ).rows[0]?.ready;
+        if (checkpointSchema) {
+          // Generic directory pointers may reference this subject. Reset all
+          // pointers, keeping generations so pre-erasure scans cannot advance.
+          await client.query(
+            "UPDATE growth.source_scan_checkpoint SET encrypted_cursor=NULL,generation=generation+1,updated_at=now(),expires_at=now()",
+          );
+        }
         await client.query(
           "UPDATE growth.delivery SET state='suppressed' WHERE account_id=$1 AND state IN ('queued','leased')",
           [accountId],
@@ -1042,6 +1057,8 @@ export class GrowthService {
           "DELETE FROM growth.creator_public WHERE id=ANY($1::uuid[])",
           [ownedCreatorIds],
         );
+        // Losing the exact task lease rolls back the whole erasure transaction.
+        await assertAuthority(client);
       },
       signal,
     );
