@@ -85,6 +85,9 @@ export class AccessService {
   get threadScopeInTransactionAvailable() {
     return typeof this.assertAllowedInTransaction === "function";
   }
+  isForPool(pool: Pool) {
+    return this.pool === pool;
+  }
   async openThread(
     actor: Actor,
     creatorId: string,

@@ -1,0 +1,27 @@
+{
+  "recordedAt": "2026-10-02T08:52:17.764Z",
+  "operator": "Primary W4 actual non-owner runtime factory preparation on owned PostgreSQL17 databases; metadata startup only",
+  "migration": {
+    "version": "0044_w4_personal_approval",
+    "checksum": "4480936ea99adbc954f1e3444673772922c49e6dab8b9cce9351cf6d61c493fb"
+  },
+  "source": [
+    "Database separately holds actual configured denial callback on its current client through commit; existing session/family/role/outside checks retained",
+    "Approval requires exact0044 checksum, forced-RLS owned tables, current triggers and one graph with held Access/Database authority",
+    "Signing preparation opens genuine current family scope on the same signing transaction before reading the saved draft",
+    "Exact W8 scope-restriction.ts source65268242 consumed; future purpose functions remain gated by their actual SQL authority"
+  ],
+  "verified": [
+    "Original40 refuses Approval mounting before0044",
+    "Actual fresh57 non-owner factory prepares exact route and signing/delivery producer graph",
+    "Actual fresh57 rejects missing-held authority and wrong checksum before delivery configuration",
+    "Backend typecheck and scoped lint/format pass"
+  ],
+  "notVerified": [
+    "Actual verified creator/passkey draft/approve/deliver/revoke flow",
+    "Team draft authority under held original-participant negatives",
+    "Runtime host activation and current creator proof/Ops composition",
+    "Positive publication, provider/payment acceptance"
+  ],
+  "releaseReady": false
+}
