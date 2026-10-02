@@ -1,0 +1,32 @@
+{
+  "observedAt": "2026-10-02T13:52:20.456Z",
+  "source": "d140b13c6c8f73b10bbfb40ebde5c87583eb72c7",
+  "catalogue": {
+    "database": "creator_w3_dev57_1790946508212",
+    "login": "creator_runtime",
+    "registered": 57,
+    "acceptance_installed": false,
+    "generation_scope_installed": false,
+    "terminal_scope_installed": false,
+    "finalization_installed": false,
+    "finalization_registered": false,
+    "original_closed": true
+  },
+  "readiness": {
+    "status": 503,
+    "body": {
+      "ready": false,
+      "capabilities": [
+        {
+          "name": "trust_runtime",
+          "required": true,
+          "state": "unavailable",
+          "code": "trust_unconfigured",
+          "checkedAt": "2026-10-02T13:52:20.451Z"
+        }
+      ]
+    }
+  },
+  "sqlApplied": false,
+  "terminalTransitionOperated": false
+}
