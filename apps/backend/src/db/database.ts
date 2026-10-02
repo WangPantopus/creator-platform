@@ -4,7 +4,10 @@ import {
   type ThreadScope,
 } from "../modules/access/scope.js";
 import { DomainError } from "../core/errors.js";
-import { assertCurrentSession } from "../modules/identity/request-authority.js";
+import {
+  assertCurrentSession,
+  requestAuthority,
+} from "../modules/identity/request-authority.js";
 import type {
   ScopeRestriction,
   ScopeRestrictionInTransaction,
@@ -13,6 +16,15 @@ import type {
 export type ThreadLockMode = "read" | "write";
 
 export class Database {
+  private readonly held = new WeakMap<
+    PoolClient,
+    {
+      scope: ThreadScope;
+      sessionId: string;
+      lockMode: ThreadLockMode;
+      pending: number;
+    }
+  >();
   constructor(
     readonly pool: Pool,
     private readonly observeQuery?: (query: {
@@ -25,6 +37,43 @@ export class Database {
   ) {}
   get threadScopeInTransactionAvailable() {
     return typeof this.assertAllowedInTransaction === "function";
+  }
+  /** An owner callback must use this actual currently executing transaction,
+   * not a retained scope, released client or another session's callback. */
+  assertHeldThread(
+    scope: ThreadScope,
+    client: PoolClient,
+    lockMode?: ThreadLockMode,
+  ): void {
+    assertThreadScope(scope);
+    const binding = this.held.get(client);
+    const request = requestAuthority.getStore();
+    if (
+      binding?.scope !== scope ||
+      !request ||
+      request.sessionId !== binding.sessionId ||
+      request.accountId !== scope.actorAccountId ||
+      (lockMode !== undefined && binding.lockMode !== lockMode)
+    )
+      throw new DomainError(
+        "held_thread_required",
+        "Use the current authorized conversation transaction.",
+        503,
+      );
+  }
+  async withHeldThreadOperation<T>(
+    scope: ThreadScope,
+    client: PoolClient,
+    work: () => Promise<T>,
+  ): Promise<T> {
+    this.assertHeldThread(scope, client);
+    const binding = this.held.get(client)!;
+    binding.pending++;
+    try {
+      return await work();
+    } finally {
+      binding.pending--;
+    }
   }
   async assertRuntimeRole(): Promise<void> {
     const result = await this.pool.query<{
@@ -238,7 +287,31 @@ export class Database {
             },
           })
         : client;
-      const value = await work(scopedClient);
+      const request = requestAuthority.getStore();
+      if (!request || request.accountId !== scope.actorAccountId)
+        throw new DomainError(
+          "held_thread_required",
+          "Use the current authorized conversation transaction.",
+          503,
+        );
+      this.held.set(scopedClient, {
+        scope,
+        sessionId: request.sessionId,
+        lockMode,
+        pending: 0,
+      });
+      let value: T;
+      try {
+        value = await work(scopedClient);
+        if (this.held.get(scopedClient)!.pending !== 0)
+          throw new DomainError(
+            "held_work_pending",
+            "Finish the authorized conversation work before commit.",
+            503,
+          );
+      } finally {
+        this.held.delete(scopedClient);
+      }
       await client.query("COMMIT");
       return value;
     } catch (error) {

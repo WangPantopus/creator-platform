@@ -140,3 +140,8 @@ Missing production identity configuration must remain an honest product recovery
 ### W1 — late original-attempt usage after terminal delivery (October 2, 2026)
 
 A late real provider result belongs to the original pre-admission W2 completion capability. It may append an immutable correction/receipt wakeup against the original attempt and reservation after a terminal outcome; it must preserve prior accounting and cannot reopen generation, acquire text/lease/provider rights or mint an Actor/ThreadScope. Initial finalization remains0099/0100. W2 publishes actual fixed provenance/terminal-state checks, W4 supplies original-reservation idempotency, and W8 separately reviews accounting metadata/retention/restoration after denial or erasure. Unknown cost retains original custody until a qualified observed correction; no fake zero/no-request or invisible refund is inferred. Actual owner source/composition/acceptance remains required.
+
+
+### W1 — explicit usefulness and a durable intro opportunity (October 2, 2026)
+
+DI09 uses only the fan's actual consented helpful response to the exact delivered/interrupted AI lineage. A stable pending offer is account-wide and survives response loss; the UI's actual Save/Skip gets a separate durable acknowledgement. Existing outbox publication is not evidence a prompt was seen. A pre-existing intro suppresses the first opportunity, and saving an intro grants no per-creator provider consent. The current held session/client and approved account metadata policy are mandatory; absent policy leaves the feature unconfigured. W1 retains all-client implementation and acceptance.
