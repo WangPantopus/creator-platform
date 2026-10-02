@@ -1,5 +1,7 @@
 # W7 shipping runtime continuation — 2026-10-02
 
+Current [post-entry metadata consumer](post-entry.md) is compiled with its actual host seam; genuine W5 reader/purpose and W3 shipping consumers remain unbound. No post-context runtime acceptance is claimed.
+
 Current personally implemented [Weekly Impact/current-notice checkpoint](weekly-impact.md) and [genuine core Follow context correction](core-follow-context.md) preserve every original row and failure. Positive owner/Thanks/purpose/delivery/populated acceptance remains unobserved; own resources stopped. PR31 open/ready/unmerged, no higher SQL activation or new tests. W7 is not complete.
 
 W7 remains open. The primary personally implemented these fixes, built and operated the shipping clients. Every original acceptance row, all 19 notification kinds and all 13 Light/Night artboards remain binding. No new test code, reference, comparison threshold, runner label, approved authority or provider configuration was added.

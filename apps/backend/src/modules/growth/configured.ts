@@ -31,6 +31,10 @@ import {
   weeklyImpactNotificationState,
   type WeeklyImpactNoticeReader,
 } from "./impact-notifications.js";
+import {
+  canonicalPostEntryContext,
+  type CurrentPostEntryReader,
+} from "./entry-context.js";
 
 /** Canonical host seam. Owner callbacks are injected; absent producers never become fixtures. */
 export async function configureGrowthForBackend(
@@ -54,6 +58,8 @@ export async function configureGrowthForBackend(
     coreFollowMigration?: CoreFollowMigration;
     spendingNotices?: SpendingNotificationReader;
     weeklyImpactNotices?: WeeklyImpactNoticeReader;
+    /** W5's actual current recipient/public-entry purpose, never a public DTO fallback. */
+    postEntryReader?: CurrentPostEntryReader;
     experimentsEnabled?: boolean;
   },
   env: NodeJS.ProcessEnv = process.env,
@@ -152,6 +158,10 @@ export async function configureGrowthForBackend(
     });
     return {
       ...runtime,
+      postEntryContext: canonicalPostEntryContext(
+        runtime.service,
+        input.postEntryReader,
+      ),
       contentFollows: canonicalContentFollows(),
       coreContentFollows: canonicalCoreContentFollows(
         input.coreFollowMigration,

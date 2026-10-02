@@ -398,5 +398,30 @@
     "sha256": "1154ebada7f14707890e3334de674e1b0271ca5623130e5dc4d08d2b2b98057a",
     "bytes": 2731,
     "custody": "Actual primary-operated/raw result; limits and preserved failed attempts in weekly-impact.md/receipt; no private API/process/env logs uploaded"
+  },
+  "postEntryContext": {
+    "baseHead": "77ab2be5aa190d2abcc17858b24834e7ffb00269",
+    "files": [
+      {
+        "path": "post-entry-raw/post-entry-backend-build.log",
+        "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+        "bytes": 41
+      },
+      {
+        "path": "post-entry-raw/post-entry-lint.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "post-entry-raw/post-entry-existing-contracts.log",
+        "sha256": "c2b042f51e0d8af6cda2f28343d56ca3839ea5902617999eab56bdf8e9678ea5",
+        "bytes": 329
+      },
+      {
+        "path": "post-entry-raw/post-entry-format.log",
+        "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
+        "bytes": 66
+      }
+    ]
   }
 }

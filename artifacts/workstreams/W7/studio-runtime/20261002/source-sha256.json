@@ -98,5 +98,22 @@
       "androidDebugApkSha256": "5df649838e351b2a748e6d5681bb54fa229d32ef9af8f692b6a702b4fd03fe47"
     },
     "runtimeLimit": "API/native operated before final directory-starvation review; source-only unbound scheduling branch repaired/compiled afterwards. No directory collection runtime claim"
+  },
+  "postEntryContext": {
+    "baseHead": "77ab2be5aa190d2abcc17858b24834e7ffb00269",
+    "files": [
+      {
+        "path": "apps/backend/src/modules/growth/entry-context.ts",
+        "sha256": "2ffc994641ab78339c2e92724212136e9b9cf1f636195d85b966f6c4648537d8"
+      },
+      {
+        "path": "apps/backend/src/modules/growth/configured.ts",
+        "sha256": "39e542d46519d97f691f3b7c23365d5e66833188b093537fbf5e3d97604bab6a"
+      },
+      {
+        "path": "apps/backend/src/modules/growth/creator-projection.ts",
+        "sha256": "75dcbd3833cd44a99695a494d060c9f22cae792a75a986f019b66b30166bd549"
+      }
+    ]
   }
 }
