@@ -26,6 +26,10 @@ import {
 } from "../identity/subjects.js";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
+import {
+  ContentPublicationSources,
+  type ContentPublicationSourceController,
+} from "./publication-source.js";
 import type { SignedActCommand } from "@qelvora/api";
 import { consentEnvelope } from "../identity/consent.js";
 import {
@@ -131,6 +135,7 @@ export interface ContentDependencies {
     audience: Audience,
   ) => Promise<number | null>;
   mediaPublication?: ContentPublicationMedia;
+  publicationSource?: ContentPublicationSourceController;
   /** W1 withdrawal-only registry. Must verify this exact consumed act and
    * persist a durable audit for the actual publisher on this held client.
    * It cannot issue signing authority or disclose a new public command. */
@@ -261,10 +266,15 @@ export function reactionCommand(
 }
 
 export class ContentService {
+  readonly publicationSources: ContentPublicationSources;
   constructor(
     readonly pool: Pool,
     readonly dependencies: ContentDependencies = {},
-  ) {}
+  ) {
+    this.publicationSources = new ContentPublicationSources(
+      dependencies.publicationSource,
+    );
+  }
   private async consentRecord(
     client: PoolClient,
     actor: Actor,
@@ -1012,12 +1022,13 @@ export class ContentService {
     }
     if (document.packetId)
       invariant(
-        await this.dependencies.publicPacket?.(
-          client,
-          actor,
-          row.creator_id,
-          document.packetId,
-        ),
+        await this.publicationSources.permission(client, actor, {
+          creatorId: row.creator_id,
+          packetId: document.packetId,
+          contentId: row.id,
+          contentVersion: row.version,
+          audience: document.audience,
+        }),
         "public_packet_consent_required",
         "The current public request or accepted group conversion is required.",
       );
@@ -1062,6 +1073,7 @@ export class ContentService {
   }
   async review(actor: Actor, creatorId: string, id: string) {
     return this.transaction(actor, creatorId, async (client) => {
+      await this.publicationSources.prepare(client, actor, creatorId, id);
       await this.authorizeMedia(client, actor, creatorId);
       await this.role(client, actor, creatorId);
       const row = await this.index(client, creatorId, id),
@@ -1077,10 +1089,15 @@ export class ContentService {
         row,
         view.document,
       );
-      return {
+      const result = {
         command: publicationCommand(row, view.document, mediaEvidence),
         view,
       };
+      await this.publicationSources.finalize(client, actor, {
+        stage: "review",
+        publicationSignedActId: null,
+      });
+      return result;
     });
   }
   async publish(
@@ -1094,6 +1111,7 @@ export class ContentService {
       ? ContentVersionCommand.parse(raw)
       : PublishContent.parse(raw);
     return this.transaction(actor, creatorId, async (client) => {
+      await this.publicationSources.prepare(client, actor, creatorId, id);
       if (!team) await this.authorizeMedia(client, actor, creatorId);
       const role = await this.role(
         client,
@@ -1106,7 +1124,7 @@ export class ContentService {
         "team_identity_required",
         "Use creator signing for your own words.",
       );
-      return this.command(
+      const result = await this.command(
         client,
         actor,
         "publish",
@@ -1231,6 +1249,11 @@ export class ContentService {
           };
         },
       );
+      await this.publicationSources.finalize(client, actor, {
+        stage: "publication",
+        publicationSignedActId: result.signedActId,
+      });
+      return result;
     });
   }
   async lifecycle(
@@ -1450,6 +1473,7 @@ export class ContentService {
     id: string,
   ): Promise<ContentPublicationProof | null> {
     return this.transaction(actor, creatorId, async (client) => {
+      await this.publicationSources.prepare(client, actor, creatorId, id);
       await this.authorizeOwnedMedia(client, actor, creatorId);
       const role = await this.role(client, actor, creatorId, ["publisher"]);
       const row = await this.index(client, creatorId, id);
@@ -1472,7 +1496,7 @@ export class ContentService {
       // real phased owner fence and each source's retraction producer must be
       // composed before these proofs are available. Do not take late negative
       // leases below the creator/content positives or call a viewer as owner.
-      if (current.document.packetId || current.document.quote)
+      if (current.document.quote)
         throw new DomainError(
           "publication_source_authority_unconfigured",
           "Current publication source authority is not connected.",
@@ -1529,12 +1553,17 @@ export class ContentService {
           )
             mediaReady = false;
       }
-      return {
+      const result = {
         view: current,
         command,
         signedActId: publication.signed_act_id as string | null,
         mediaReady,
       };
+      await this.publicationSources.finalize(client, actor, {
+        stage: "review",
+        publicationSignedActId: result.signedActId,
+      });
+      return result;
     });
   }
   async list(actor: Actor, creatorId: string, raw: unknown, studio = false) {
