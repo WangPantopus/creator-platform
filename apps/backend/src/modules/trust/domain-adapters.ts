@@ -24,6 +24,7 @@ export function scopedTrustEvidence(options: {
   return async (actor, input) => {
     if (!input.creatorId && !input.requestId) return { items: [] };
     if (input.kind === "verification" && input.creatorId) {
+      await options.assertAllowed(actor.accountId, input.creatorId);
       const proof = await options.identity.proof(actor, input.creatorId);
       return {
         creatorId: input.creatorId,
@@ -302,6 +303,16 @@ export function agentPauseEffects(options: {
           409,
         );
       const scope = await options.ownerScope(current.creator_id);
+      if (
+        scope.creatorId !== current.creator_id ||
+        !current.subject_account_id ||
+        scope.accountId !== current.subject_account_id
+      )
+        throw new DomainError(
+          "creator_authority_changed",
+          "This case no longer identifies the current creator owner.",
+          409,
+        );
       const agent = await options.agent.pauseNotice(scope, {
         jobId: input.effectId,
         reason:
