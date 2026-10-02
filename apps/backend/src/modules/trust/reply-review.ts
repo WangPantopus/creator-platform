@@ -7,12 +7,16 @@ import {
   requestAuthority,
 } from "../identity/request-authority.js";
 
+/** Transport ceiling, not paid-tenure permission. W5 retains its current4000
+ * limit until its actual policy/schema and mounted reviewer support expansion. */
+export const TRUST_REPLY_REVIEW_MAX_TEXT_LENGTH = 12_000;
+
 const Reply = z.strictObject({
   replyId: z.uuid(),
   creatorId: z.uuid(),
   fanId: z.uuid(),
   version: z.number().int().positive(),
-  text: z.string().min(1).max(4000),
+  text: z.string().min(1).max(TRUST_REPLY_REVIEW_MAX_TEXT_LENGTH),
   textHash: z.string().regex(/^[0-9a-f]{64}$/u),
 });
 const Review = z.strictObject({
@@ -25,7 +29,10 @@ const Review = z.strictObject({
  * SQL creates an atomic idempotent queue item; only a recorded human decision
  * can produce allowed/flagged. No extra pool, snapshot copy or ThreadScope. */
 export function createTrustReplyReviewer() {
-  return async (client: PoolClient, raw: z.infer<typeof Reply>) => {
+  const reviewReply = async (
+    client: PoolClient,
+    raw: z.infer<typeof Reply>,
+  ) => {
     const input = Reply.parse(raw);
     const { textHash, ...tuple } = input;
     if (contentHash(tuple) !== textHash)
@@ -81,6 +88,9 @@ export function createTrustReplyReviewer() {
       throw trustReplyError(error);
     }
   };
+  return Object.assign(reviewReply, {
+    maxTextLength: TRUST_REPLY_REVIEW_MAX_TEXT_LENGTH,
+  });
 }
 
 /** Preserve actual negative authority across W5's unavailable-review fallback. */
