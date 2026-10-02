@@ -3146,6 +3146,12 @@ enum class APIConversationConversationCorrectionInputCommandContentKind {
 }
 
 @Serializable
+data class APIConversationConversationIntroOffer(
+  @Required
+  val `offerId`: String? = null
+)
+
+@Serializable
 data class APIConversationConversationMessage(
   val `id`: String,
   val `threadId`: String,
@@ -3761,6 +3767,26 @@ enum class APIConversationReplyFeedbackRating {
   @SerialName("helpful") HELPFUL,
   @SerialName("not_helpful") NOT_HELPFUL
 }
+
+@Serializable
+data class APIConversationReplyFeedbackResult(
+  @Required
+  val `rating`: APIConversationReplyFeedbackResultRating? = null,
+  @Required
+  val `introOffer`: APIConversationReplyFeedbackResultIntroOffer? = null
+)
+
+@Serializable
+enum class APIConversationReplyFeedbackResultRating {
+  @SerialName("helpful") HELPFUL,
+  @SerialName("not_helpful") NOT_HELPFUL
+}
+
+@Serializable
+data class APIConversationReplyFeedbackResultIntroOffer(
+  @Required
+  val `offerId`: String? = null
+)
 
 @Serializable
 data class APIConversationTeamReply(

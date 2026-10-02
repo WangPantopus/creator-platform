@@ -5741,6 +5741,24 @@ public enum APIConversationConversationCorrectionInputCommandContentKind: String
   case `conversation_correction` = "conversation_correction"
 }
 
+public struct APIConversationConversationIntroOffer: Codable, Sendable {
+  public let `offerId`: String?
+  public init(offerId: String? = nil) {
+    self.offerId = offerId
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `offerId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.offerId = try container.decode(String?.self, forKey: .offerId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(offerId, forKey: .offerId)
+  }
+}
+
 public struct APIConversationConversationMessage: Codable, Sendable {
   public let `id`: String
   public let `threadId`: String
@@ -7010,6 +7028,52 @@ public struct APIConversationReplyFeedbackPolicy: Codable, Sendable {
 public enum APIConversationReplyFeedbackRating: String, Codable, Sendable {
   case `helpful` = "helpful"
   case `not_helpful` = "not_helpful"
+}
+
+public struct APIConversationReplyFeedbackResult: Codable, Sendable {
+  public let `rating`: APIConversationReplyFeedbackResultRating?
+  public let `introOffer`: APIConversationReplyFeedbackResultIntroOffer?
+  public init(rating: APIConversationReplyFeedbackResultRating? = nil, introOffer: APIConversationReplyFeedbackResultIntroOffer? = nil) {
+    self.rating = rating
+    self.introOffer = introOffer
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `rating`
+    case `introOffer`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.rating = try container.decode(APIConversationReplyFeedbackResultRating?.self, forKey: .rating)
+    self.introOffer = try container.decode(APIConversationReplyFeedbackResultIntroOffer?.self, forKey: .introOffer)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(rating, forKey: .rating)
+    try container.encode(introOffer, forKey: .introOffer)
+  }
+}
+
+public enum APIConversationReplyFeedbackResultRating: String, Codable, Sendable {
+  case `helpful` = "helpful"
+  case `not_helpful` = "not_helpful"
+}
+
+public struct APIConversationReplyFeedbackResultIntroOffer: Codable, Sendable {
+  public let `offerId`: String?
+  public init(offerId: String? = nil) {
+    self.offerId = offerId
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `offerId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.offerId = try container.decode(String?.self, forKey: .offerId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(offerId, forKey: .offerId)
+  }
 }
 
 public struct APIConversationTeamReply: Codable, Sendable {
