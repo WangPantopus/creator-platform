@@ -695,7 +695,10 @@ export class CommerceService {
             );
           else if (increase)
             await client.query(
-              `UPDATE creator.commerce_spend_limit SET pending_amount=$3,pending_none=$4,effective_at=now()+interval '24 hours',reminders_on=$5,version=version+1 WHERE fan_id=$1 AND currency=$2`,
+              `UPDATE creator.commerce_spend_limit SET pending_amount=$3,pending_none=$4,
+               effective_at=CASE WHEN pending_none=$4 AND pending_amount IS NOT DISTINCT FROM $3::bigint
+                 AND effective_at>now() THEN effective_at ELSE now()+interval '24 hours' END,
+               reminders_on=$5,version=version+1 WHERE fan_id=$1 AND currency=$2`,
               [
                 fan.id,
                 body.currency,

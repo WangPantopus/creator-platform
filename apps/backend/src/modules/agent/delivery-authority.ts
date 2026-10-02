@@ -87,7 +87,7 @@ export async function assertAgentDelivery(
       {
         creatorId: scope.creatorId,
         accountId: scope.creatorAccountId,
-        development: false,
+        development: service.syntheticDevelopmentLicensing,
       },
       license,
       client,
