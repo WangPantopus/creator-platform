@@ -6,7 +6,7 @@ import { DomainError, invariant } from "../../core/errors.js";
 import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import { assertCurrentSession, requestAuthority } from "./request-authority.js";
 
-export const GENERATION_SCOPE_MIGRATION = "0072_w1_generation_worker_scope";
+export const GENERATION_SCOPE_MIGRATION = "0159_w1_generation_worker_scope";
 const Hash = z.string().regex(/^[a-f0-9]{64}$/u);
 const consumerSchema = z.strictObject({
   migration: z.strictObject({
@@ -54,7 +54,7 @@ export type GenerationTaskScope = GenerationTask &
 
 export type GenerationRestriction = (
   client: PoolClient,
-  /** Host restoration only. SQL0093 separately holds the actual participant
+  /** Host restoration only. SQL0177 separately holds the actual participant
    * negatives using the private nonce, durable provenance and current lease. */
   task: Readonly<{ generationId: string; workerToken: string }>,
 ) => Promise<void>;
@@ -137,7 +137,7 @@ export class GenerationIdentityAuthority {
   static async create(input: {
     pool: Pool;
     migration: { version: string; checksum: string };
-    /** The actual W8 reviewed0093 receipt, not a claimed callback result. */
+    /** The actual W8 reviewed0177 receipt, not a claimed callback result. */
     denialMigration: { version: string; checksum: string };
     assertAllowed: GenerationRestriction;
     assertDiscoveryAllowed: (client: PoolClient) => Promise<void>;
@@ -148,7 +148,7 @@ export class GenerationIdentityAuthority {
     if (
       input.migration.version !== GENERATION_SCOPE_MIGRATION ||
       !Hash.safeParse(input.migration.checksum).success ||
-      !/^0093_w8_[a-z_]+$/u.test(input.denialMigration.version) ||
+      input.denialMigration.version !== "0177_w8_generation_worker_denial" ||
       !Hash.safeParse(input.denialMigration.checksum).success ||
       typeof input.assertAllowed !== "function" ||
       typeof input.assertDiscoveryAllowed !== "function"

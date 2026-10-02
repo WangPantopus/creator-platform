@@ -5,7 +5,7 @@ import { DomainError, invariant } from "../../core/errors.js";
 import type { Actor } from "./adapter.js";
 import { requestAuthority } from "./request-authority.js";
 
-export const SIGNATURE_READ_FENCE_MIGRATION = "0081_w1_signature_read_fence";
+export const SIGNATURE_READ_FENCE_MIGRATION = "0167_w1_signature_read_fence";
 const Input = z.strictObject({
   creatorId: z.uuid(),
   packetId: z.uuid(),
