@@ -1,0 +1,45 @@
+{
+  "kind": "coordination observations, peer reports are not W8 personal app acceptance",
+  "pr131": "https://github.com/WangPantopus/creator-platform/pull/131",
+  "pr131Draft": true,
+  "workerSource": "37b87eac",
+  "workerSourceSha256": "d47b5916b0ac0c3cc33bd7d50bfdb663f39a9218dcff0b97d3a9dce7b6acc44c",
+  "originalSyntheticSourceReadback": {
+    "ledger": 40,
+    "privacyExportJobs": 1,
+    "privacyExportState": "blocked",
+    "privacyTasks": 8,
+    "complete": 6,
+    "blocked": 2,
+    "tombstones": 0,
+    "effects": 0,
+    "generations": 0
+  },
+  "boundedAppCopyReopening": "New labelled synthetic Trust/Report clone only; not original preserved recovery or all-eight-domain reconciliation",
+  "peerUpgradeReports": {
+    "W2": {
+      "ledgerBefore": 40,
+      "ledgerAfter": 57,
+      "originalRows": 42,
+      "originalTables": 145,
+      "actualOwnBackupAndSeparateRestoreReported": true
+    },
+    "W4": {
+      "ledgerBefore": 40,
+      "ledgerAfter": 57,
+      "originalRows": 22,
+      "originalTables": 145,
+      "actualOwnBackupAndSeparateRestoreReported": true
+    },
+    "W6": {
+      "ledgerBefore": 40,
+      "ledgerAfter": 57,
+      "originalRows": 4,
+      "originalTables": 145,
+      "actualOwnBackupAndSeparateRestoreReported": true
+    }
+  },
+  "futureActivation": false,
+  "humanRecoveryInputsStillAbsent": true,
+  "newUnitTests": false
+}

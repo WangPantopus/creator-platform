@@ -652,6 +652,13 @@
       "version": "0100_w8_generation_terminal_denial",
       "state": "reserved_unapplied",
       "reason": "Requires exact0099 private terminal contract; distinguish current completion from metadata/financial cleanup with restoration/freeze fences."
+    },
+    {
+      "id": "0101",
+      "owner": "W7",
+      "version": "0101_w7_core_follow_metadata",
+      "state": "reserved_unapplied",
+      "reason": "Initial narrow metadata review complete; requires revised genuine held-session/fan/context proof, strict all-role custody and actual unrelated-account/busy/denial/deletion verification. W7 may not self-allocate/apply above its human ceiling."
     }
   ]
 }
