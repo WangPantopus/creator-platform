@@ -33,7 +33,7 @@ export function providerUsagePurpose(
   execution?: ProviderExecution,
 ) {
   invariant(
-    !execution?.purpose ||
+    execution?.purpose === undefined ||
       execution.purpose === "reply" ||
       execution.purpose === "translation",
     "execution_purpose_invalid",

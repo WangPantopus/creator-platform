@@ -58,5 +58,24 @@
     "privateSourceRowsRead": 0,
     "liveRuntimeChanged": false,
     "W8Notified": true
+  },
+  "roleGuardFinalCheck": {
+    "source": "064fa55e4eaadd6b76c189e41e24fb041b30a3de",
+    "method": "actual assertWaveRoleSafety on owned installed57 target; BEGIN/savepoints/full ROLLBACK; no SQL replay",
+    "baseline": {
+      "roles": 3,
+      "pinnedFunctions": 7,
+      "directCapabilities": 82,
+      "publicCapabilities": 327,
+      "pinnedPublicFunctions": 23
+    },
+    "publicSelectOnPrivateAiSourceDrift": "refused",
+    "bypassRlsRoleDrift": "refused",
+    "allProbesRolledBack": true,
+    "durableGrantsChanged": false,
+    "privateSourceRowsRead": 0,
+    "liveRuntimeChanged": false,
+    "W8Notified": true,
+    "initialOperatorStaleSourceLabel": "corrected; exact-source probe repeated"
   }
 }

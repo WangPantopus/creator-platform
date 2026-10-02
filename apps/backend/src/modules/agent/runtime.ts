@@ -463,7 +463,8 @@ export class LiveAgentRuntime {
   ) {
     assertThreadScope(scope);
     invariant(
-      (execution?.purpose ?? "reply") === purpose,
+      (execution?.purpose === undefined ? "reply" : execution.purpose) ===
+        purpose,
       "execution_purpose_invalid",
       "The actual execution purpose must match this operation.",
     );
