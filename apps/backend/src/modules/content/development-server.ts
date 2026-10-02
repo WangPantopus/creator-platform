@@ -360,7 +360,10 @@ backend.server.listen(apiPort, "127.0.0.1", () =>
     `W5 API${apiPort} · persisted non-owner RLS · synthetic development actors · genuine W1 passkeys required; provider-dependent paths unavailable until configured.\n`,
   ),
 );
+let stopping = false;
 const stop = () => {
+  if (stopping) return;
+  stopping = true;
   void (async () => {
     await features.growth?.close();
     await features.growthPool?.end();

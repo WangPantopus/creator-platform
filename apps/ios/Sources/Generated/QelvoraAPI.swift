@@ -1875,11 +1875,185 @@ public struct APICallAvailabilityViewValueWindowsItem: Codable, Sendable {
   }
 }
 
+public struct APICallCallAdmission: Codable, Sendable {
+  public let `token`: String
+  public let `url`: String
+  public let `nonce`: String
+  public let `sessionId`: String
+  public let `accountId`: String
+  public let `expiresAt`: String
+  public let `role`: APICallCallAdmissionRole
+  public init(token: String, url: String, nonce: String, sessionId: String, accountId: String, expiresAt: String, role: APICallCallAdmissionRole) {
+    self.token = token
+    self.url = url
+    self.nonce = nonce
+    self.sessionId = sessionId
+    self.accountId = accountId
+    self.expiresAt = expiresAt
+    self.role = role
+  }
+}
+
+public enum APICallCallAdmissionRole: String, Codable, Sendable {
+  case `creator` = "creator"
+  case `fan` = "fan"
+}
+
 public enum APICallCallConsentPurpose: String, Codable, Sendable {
   case `recording` = "recording"
   case `summary` = "summary"
   case `content_reuse` = "content_reuse"
   case `ai_source` = "ai_source"
+}
+
+public struct APICallCallOffer: Codable, Sendable {
+  public let `id`: String
+  public let `commitmentId`: String
+  public let `version`: Int
+  public let `creatorTimeZone`: String
+  public let `fanTimeZone`: String
+  public let `expiresAt`: String
+  public let `state`: APICallCallOfferState
+  public let `selectedSessionId`: String?
+  public let `slots`: [APICallCallOfferSlotsItem]
+  public init(id: String, commitmentId: String, version: Int, creatorTimeZone: String, fanTimeZone: String, expiresAt: String, state: APICallCallOfferState, selectedSessionId: String? = nil, slots: [APICallCallOfferSlotsItem]) {
+    self.id = id
+    self.commitmentId = commitmentId
+    self.version = version
+    self.creatorTimeZone = creatorTimeZone
+    self.fanTimeZone = fanTimeZone
+    self.expiresAt = expiresAt
+    self.state = state
+    self.selectedSessionId = selectedSessionId
+    self.slots = slots
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `commitmentId`
+    case `version`
+    case `creatorTimeZone`
+    case `fanTimeZone`
+    case `expiresAt`
+    case `state`
+    case `selectedSessionId`
+    case `slots`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.commitmentId = try container.decode(String.self, forKey: .commitmentId)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.creatorTimeZone = try container.decode(String.self, forKey: .creatorTimeZone)
+    self.fanTimeZone = try container.decode(String.self, forKey: .fanTimeZone)
+    self.expiresAt = try container.decode(String.self, forKey: .expiresAt)
+    self.state = try container.decode(APICallCallOfferState.self, forKey: .state)
+    self.selectedSessionId = try container.decode(String?.self, forKey: .selectedSessionId)
+    self.slots = try container.decode([APICallCallOfferSlotsItem].self, forKey: .slots)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(commitmentId, forKey: .commitmentId)
+    try container.encode(version, forKey: .version)
+    try container.encode(creatorTimeZone, forKey: .creatorTimeZone)
+    try container.encode(fanTimeZone, forKey: .fanTimeZone)
+    try container.encode(expiresAt, forKey: .expiresAt)
+    try container.encode(state, forKey: .state)
+    try container.encode(selectedSessionId, forKey: .selectedSessionId)
+    try container.encode(slots, forKey: .slots)
+  }
+}
+
+public enum APICallCallOfferState: String, Codable, Sendable {
+  case `offered` = "offered"
+  case `selected` = "selected"
+  case `expired` = "expired"
+  case `cancelled` = "cancelled"
+}
+
+public struct APICallCallOfferSlotsItem: Codable, Sendable {
+  public let `id`: String
+  public let `startsAt`: String
+  public init(id: String, startsAt: String) {
+    self.id = id
+    self.startsAt = startsAt
+  }
+}
+
+public typealias APICallCallOffers = [APICallCallOffersValueItem]
+
+public struct APICallCallOffersValueItem: Codable, Sendable {
+  public let `id`: String
+  public let `commitmentId`: String
+  public let `version`: Int
+  public let `creatorTimeZone`: String
+  public let `fanTimeZone`: String
+  public let `expiresAt`: String
+  public let `state`: APICallCallOffersValueItemState
+  public let `selectedSessionId`: String?
+  public let `slots`: [APICallCallOffersValueItemSlotsItem]
+  public init(id: String, commitmentId: String, version: Int, creatorTimeZone: String, fanTimeZone: String, expiresAt: String, state: APICallCallOffersValueItemState, selectedSessionId: String? = nil, slots: [APICallCallOffersValueItemSlotsItem]) {
+    self.id = id
+    self.commitmentId = commitmentId
+    self.version = version
+    self.creatorTimeZone = creatorTimeZone
+    self.fanTimeZone = fanTimeZone
+    self.expiresAt = expiresAt
+    self.state = state
+    self.selectedSessionId = selectedSessionId
+    self.slots = slots
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `commitmentId`
+    case `version`
+    case `creatorTimeZone`
+    case `fanTimeZone`
+    case `expiresAt`
+    case `state`
+    case `selectedSessionId`
+    case `slots`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.commitmentId = try container.decode(String.self, forKey: .commitmentId)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.creatorTimeZone = try container.decode(String.self, forKey: .creatorTimeZone)
+    self.fanTimeZone = try container.decode(String.self, forKey: .fanTimeZone)
+    self.expiresAt = try container.decode(String.self, forKey: .expiresAt)
+    self.state = try container.decode(APICallCallOffersValueItemState.self, forKey: .state)
+    self.selectedSessionId = try container.decode(String?.self, forKey: .selectedSessionId)
+    self.slots = try container.decode([APICallCallOffersValueItemSlotsItem].self, forKey: .slots)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(commitmentId, forKey: .commitmentId)
+    try container.encode(version, forKey: .version)
+    try container.encode(creatorTimeZone, forKey: .creatorTimeZone)
+    try container.encode(fanTimeZone, forKey: .fanTimeZone)
+    try container.encode(expiresAt, forKey: .expiresAt)
+    try container.encode(state, forKey: .state)
+    try container.encode(selectedSessionId, forKey: .selectedSessionId)
+    try container.encode(slots, forKey: .slots)
+  }
+}
+
+public enum APICallCallOffersValueItemState: String, Codable, Sendable {
+  case `offered` = "offered"
+  case `selected` = "selected"
+  case `expired` = "expired"
+  case `cancelled` = "cancelled"
+}
+
+public struct APICallCallOffersValueItemSlotsItem: Codable, Sendable {
+  public let `id`: String
+  public let `startsAt`: String
+  public init(id: String, startsAt: String) {
+    self.id = id
+    self.startsAt = startsAt
+  }
 }
 
 public struct APICallCallRevision: Codable, Sendable {
@@ -1900,6 +2074,319 @@ public struct APICallCallRoute: Codable, Sendable {
     self.creatorId = creatorId
     self.fanId = fanId
   }
+}
+
+public struct APICallCallSession: Codable, Sendable {
+  public let `id`: String
+  public let `commitmentId`: String
+  public let `threadId`: String
+  public let `creatorId`: String
+  public let `fanId`: String
+  public let `creatorName`: String
+  public let `creatorAccountId`: String
+  public let `fanAccountId`: String
+  public let `mediaMode`: APICallCallSessionMediaMode
+  public let `scheduledAt`: String
+  public let `hardEndAt`: String
+  public let `durationSeconds`: Int
+  public let `graceSeconds`: Int
+  public let `reconnectBudgetSeconds`: Int
+  public let `connectedMilliseconds`: Int
+  public let `reconnectUsedMilliseconds`: Int
+  public let `reconnectExhaustedAt`: String?
+  public let `state`: APICallCallSessionState
+  public let `version`: Int
+  public let `serverNow`: String
+  public let `present`: [APICallCallSessionPresentItem]
+  public let `recordingState`: APICallCallSessionRecordingState
+  public let `consents`: [APICallCallSessionConsentsItem]
+  public let `outcome`: APICallCallSessionOutcome?
+  public let `reconciliation`: APICallCallSessionReconciliation
+  public let `conversationEpoch`: Int?
+  public let `packet`: APICallCallSessionPacket
+  public let `summary`: String?
+  public let `creatorSummaryNote`: String?
+  public let `summaryState`: APICallCallSessionSummaryState?
+  public let `summaryRevision`: Int?
+  public let `summarySources`: APICallCallSessionSummarySources?
+  public let `recordingOccurred`: Bool?
+  public init(id: String, commitmentId: String, threadId: String, creatorId: String, fanId: String, creatorName: String, creatorAccountId: String, fanAccountId: String, mediaMode: APICallCallSessionMediaMode, scheduledAt: String, hardEndAt: String, durationSeconds: Int, graceSeconds: Int, reconnectBudgetSeconds: Int, connectedMilliseconds: Int, reconnectUsedMilliseconds: Int, reconnectExhaustedAt: String? = nil, state: APICallCallSessionState, version: Int, serverNow: String, present: [APICallCallSessionPresentItem], recordingState: APICallCallSessionRecordingState, consents: [APICallCallSessionConsentsItem], outcome: APICallCallSessionOutcome? = nil, reconciliation: APICallCallSessionReconciliation, conversationEpoch: Int? = nil, packet: APICallCallSessionPacket, summary: String? = nil, creatorSummaryNote: String? = nil, summaryState: APICallCallSessionSummaryState? = nil, summaryRevision: Int? = nil, summarySources: APICallCallSessionSummarySources? = nil, recordingOccurred: Bool? = nil) {
+    self.id = id
+    self.commitmentId = commitmentId
+    self.threadId = threadId
+    self.creatorId = creatorId
+    self.fanId = fanId
+    self.creatorName = creatorName
+    self.creatorAccountId = creatorAccountId
+    self.fanAccountId = fanAccountId
+    self.mediaMode = mediaMode
+    self.scheduledAt = scheduledAt
+    self.hardEndAt = hardEndAt
+    self.durationSeconds = durationSeconds
+    self.graceSeconds = graceSeconds
+    self.reconnectBudgetSeconds = reconnectBudgetSeconds
+    self.connectedMilliseconds = connectedMilliseconds
+    self.reconnectUsedMilliseconds = reconnectUsedMilliseconds
+    self.reconnectExhaustedAt = reconnectExhaustedAt
+    self.state = state
+    self.version = version
+    self.serverNow = serverNow
+    self.present = present
+    self.recordingState = recordingState
+    self.consents = consents
+    self.outcome = outcome
+    self.reconciliation = reconciliation
+    self.conversationEpoch = conversationEpoch
+    self.packet = packet
+    self.summary = summary
+    self.creatorSummaryNote = creatorSummaryNote
+    self.summaryState = summaryState
+    self.summaryRevision = summaryRevision
+    self.summarySources = summarySources
+    self.recordingOccurred = recordingOccurred
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `commitmentId`
+    case `threadId`
+    case `creatorId`
+    case `fanId`
+    case `creatorName`
+    case `creatorAccountId`
+    case `fanAccountId`
+    case `mediaMode`
+    case `scheduledAt`
+    case `hardEndAt`
+    case `durationSeconds`
+    case `graceSeconds`
+    case `reconnectBudgetSeconds`
+    case `connectedMilliseconds`
+    case `reconnectUsedMilliseconds`
+    case `reconnectExhaustedAt`
+    case `state`
+    case `version`
+    case `serverNow`
+    case `present`
+    case `recordingState`
+    case `consents`
+    case `outcome`
+    case `reconciliation`
+    case `conversationEpoch`
+    case `packet`
+    case `summary`
+    case `creatorSummaryNote`
+    case `summaryState`
+    case `summaryRevision`
+    case `summarySources`
+    case `recordingOccurred`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.commitmentId = try container.decode(String.self, forKey: .commitmentId)
+    self.threadId = try container.decode(String.self, forKey: .threadId)
+    self.creatorId = try container.decode(String.self, forKey: .creatorId)
+    self.fanId = try container.decode(String.self, forKey: .fanId)
+    self.creatorName = try container.decode(String.self, forKey: .creatorName)
+    self.creatorAccountId = try container.decode(String.self, forKey: .creatorAccountId)
+    self.fanAccountId = try container.decode(String.self, forKey: .fanAccountId)
+    self.mediaMode = try container.decode(APICallCallSessionMediaMode.self, forKey: .mediaMode)
+    self.scheduledAt = try container.decode(String.self, forKey: .scheduledAt)
+    self.hardEndAt = try container.decode(String.self, forKey: .hardEndAt)
+    self.durationSeconds = try container.decode(Int.self, forKey: .durationSeconds)
+    self.graceSeconds = try container.decode(Int.self, forKey: .graceSeconds)
+    self.reconnectBudgetSeconds = try container.decode(Int.self, forKey: .reconnectBudgetSeconds)
+    self.connectedMilliseconds = try container.decode(Int.self, forKey: .connectedMilliseconds)
+    self.reconnectUsedMilliseconds = try container.decode(Int.self, forKey: .reconnectUsedMilliseconds)
+    self.reconnectExhaustedAt = try container.decodeIfPresent(String.self, forKey: .reconnectExhaustedAt)
+    self.state = try container.decode(APICallCallSessionState.self, forKey: .state)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.serverNow = try container.decode(String.self, forKey: .serverNow)
+    self.present = try container.decode([APICallCallSessionPresentItem].self, forKey: .present)
+    self.recordingState = try container.decode(APICallCallSessionRecordingState.self, forKey: .recordingState)
+    self.consents = try container.decode([APICallCallSessionConsentsItem].self, forKey: .consents)
+    self.outcome = try container.decode(APICallCallSessionOutcome?.self, forKey: .outcome)
+    self.reconciliation = try container.decode(APICallCallSessionReconciliation.self, forKey: .reconciliation)
+    self.conversationEpoch = try container.decodeIfPresent(Int.self, forKey: .conversationEpoch)
+    self.packet = try container.decode(APICallCallSessionPacket.self, forKey: .packet)
+    self.summary = try container.decode(String?.self, forKey: .summary)
+    self.creatorSummaryNote = try container.decodeIfPresent(String.self, forKey: .creatorSummaryNote)
+    self.summaryState = try container.decodeIfPresent(APICallCallSessionSummaryState.self, forKey: .summaryState)
+    self.summaryRevision = try container.decodeIfPresent(Int.self, forKey: .summaryRevision)
+    self.summarySources = try container.decodeIfPresent(APICallCallSessionSummarySources.self, forKey: .summarySources)
+    self.recordingOccurred = try container.decodeIfPresent(Bool.self, forKey: .recordingOccurred)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(commitmentId, forKey: .commitmentId)
+    try container.encode(threadId, forKey: .threadId)
+    try container.encode(creatorId, forKey: .creatorId)
+    try container.encode(fanId, forKey: .fanId)
+    try container.encode(creatorName, forKey: .creatorName)
+    try container.encode(creatorAccountId, forKey: .creatorAccountId)
+    try container.encode(fanAccountId, forKey: .fanAccountId)
+    try container.encode(mediaMode, forKey: .mediaMode)
+    try container.encode(scheduledAt, forKey: .scheduledAt)
+    try container.encode(hardEndAt, forKey: .hardEndAt)
+    try container.encode(durationSeconds, forKey: .durationSeconds)
+    try container.encode(graceSeconds, forKey: .graceSeconds)
+    try container.encode(reconnectBudgetSeconds, forKey: .reconnectBudgetSeconds)
+    try container.encode(connectedMilliseconds, forKey: .connectedMilliseconds)
+    try container.encode(reconnectUsedMilliseconds, forKey: .reconnectUsedMilliseconds)
+    try container.encodeIfPresent(reconnectExhaustedAt, forKey: .reconnectExhaustedAt)
+    try container.encode(state, forKey: .state)
+    try container.encode(version, forKey: .version)
+    try container.encode(serverNow, forKey: .serverNow)
+    try container.encode(present, forKey: .present)
+    try container.encode(recordingState, forKey: .recordingState)
+    try container.encode(consents, forKey: .consents)
+    try container.encode(outcome, forKey: .outcome)
+    try container.encode(reconciliation, forKey: .reconciliation)
+    try container.encodeIfPresent(conversationEpoch, forKey: .conversationEpoch)
+    try container.encode(packet, forKey: .packet)
+    try container.encode(summary, forKey: .summary)
+    try container.encodeIfPresent(creatorSummaryNote, forKey: .creatorSummaryNote)
+    try container.encodeIfPresent(summaryState, forKey: .summaryState)
+    try container.encodeIfPresent(summaryRevision, forKey: .summaryRevision)
+    try container.encodeIfPresent(summarySources, forKey: .summarySources)
+    try container.encodeIfPresent(recordingOccurred, forKey: .recordingOccurred)
+  }
+}
+
+public enum APICallCallSessionMediaMode: String, Codable, Sendable {
+  case `audio` = "audio"
+  case `video` = "video"
+}
+
+public enum APICallCallSessionState: String, Codable, Sendable {
+  case `scheduled` = "scheduled"
+  case `waiting` = "waiting"
+  case `connecting` = "connecting"
+  case `connected` = "connected"
+  case `reconnecting` = "reconnecting"
+  case `ending` = "ending"
+  case `ended` = "ended"
+  case `cancelled` = "cancelled"
+}
+
+public enum APICallCallSessionPresentItem: String, Codable, Sendable {
+  case `creator` = "creator"
+  case `fan` = "fan"
+}
+
+public enum APICallCallSessionRecordingState: String, Codable, Sendable {
+  case `off` = "off"
+  case `starting` = "starting"
+  case `on` = "on"
+  case `stopping` = "stopping"
+  case `blocked` = "blocked"
+}
+
+public struct APICallCallSessionConsentsItem: Codable, Sendable {
+  public let `id`: String
+  public let `actorAccountId`: String
+  public let `role`: APICallCallSessionConsentsItemRole
+  public let `purpose`: APICallCallSessionConsentsItemPurpose
+  public let `granted`: Bool
+  public let `at`: String
+  public let `revokedAt`: String?
+  public init(id: String, actorAccountId: String, role: APICallCallSessionConsentsItemRole, purpose: APICallCallSessionConsentsItemPurpose, granted: Bool, at: String, revokedAt: String? = nil) {
+    self.id = id
+    self.actorAccountId = actorAccountId
+    self.role = role
+    self.purpose = purpose
+    self.granted = granted
+    self.at = at
+    self.revokedAt = revokedAt
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `actorAccountId`
+    case `role`
+    case `purpose`
+    case `granted`
+    case `at`
+    case `revokedAt`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.actorAccountId = try container.decode(String.self, forKey: .actorAccountId)
+    self.role = try container.decode(APICallCallSessionConsentsItemRole.self, forKey: .role)
+    self.purpose = try container.decode(APICallCallSessionConsentsItemPurpose.self, forKey: .purpose)
+    self.granted = try container.decode(Bool.self, forKey: .granted)
+    self.at = try container.decode(String.self, forKey: .at)
+    self.revokedAt = try container.decode(String?.self, forKey: .revokedAt)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(actorAccountId, forKey: .actorAccountId)
+    try container.encode(role, forKey: .role)
+    try container.encode(purpose, forKey: .purpose)
+    try container.encode(granted, forKey: .granted)
+    try container.encode(at, forKey: .at)
+    try container.encode(revokedAt, forKey: .revokedAt)
+  }
+}
+
+public enum APICallCallSessionConsentsItemRole: String, Codable, Sendable {
+  case `creator` = "creator"
+  case `fan` = "fan"
+}
+
+public enum APICallCallSessionConsentsItemPurpose: String, Codable, Sendable {
+  case `recording` = "recording"
+  case `summary` = "summary"
+  case `content_reuse` = "content_reuse"
+  case `ai_source` = "ai_source"
+}
+
+public enum APICallCallSessionOutcome: String, Codable, Sendable {
+  case `completed` = "completed"
+  case `partial` = "partial"
+  case `creator_no_show` = "creator_no_show"
+  case `fan_no_show` = "fan_no_show"
+  case `technical_failure` = "technical_failure"
+}
+
+public enum APICallCallSessionReconciliation: String, Codable, Sendable {
+  case `pending` = "pending"
+  case `complete` = "complete"
+  case `blocked` = "blocked"
+}
+
+public struct APICallCallSessionPacket: Codable, Sendable {
+  public let `summary`: String
+  public let `attachmentIds`: [String]
+  public init(summary: String, attachmentIds: [String]) {
+    self.summary = summary
+    self.attachmentIds = attachmentIds
+  }
+}
+
+public enum APICallCallSessionSummaryState: String, Codable, Sendable {
+  case `absent` = "absent"
+  case `pending` = "pending"
+  case `ready` = "ready"
+  case `deleted` = "deleted"
+  case `blocked` = "blocked"
+}
+
+public struct APICallCallSessionSummarySources: Codable, Sendable {
+  public let `kind`: APICallCallSessionSummarySourcesKind
+  public let `commitmentId`: String
+  public let `noteRevision`: Int
+  public init(kind: APICallCallSessionSummarySourcesKind, commitmentId: String, noteRevision: Int) {
+    self.kind = kind
+    self.commitmentId = commitmentId
+    self.noteRevision = noteRevision
+  }
+}
+
+public enum APICallCallSessionSummarySourcesKind: String, Codable, Sendable {
+  case `packet_and_creator_note` = "packet_and_creator_note"
 }
 
 public struct APICallCallSummaryNote: Codable, Sendable {
@@ -9740,6 +10227,33 @@ public actor CreatorAPIClient {
   }
   public func deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput) async throws -> APIConversationConversationRecordingResult {
     try await request("/v1/conversations/\(segment(creatorId))/\(segment(fanId))/recordings", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
+  }
+  public func readCallSession(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = nil) async throws -> APICallCallSession {
+    try await request("/v1/w6/threads/\(segment(creatorId))/\(segment(fanId))/calls/\(segment(sessionId))", method: "GET", authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func joinCallSession(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = nil) async throws -> APICallCallAdmission {
+    try await request("/v1/w6/threads/\(segment(creatorId))/\(segment(fanId))/calls/\(segment(sessionId))/join", method: "POST", authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func setCallConsent(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = nil, body: APICallConsentCommand) async throws -> APICallCallSession {
+    try await request("/v1/w6/threads/\(segment(creatorId))/\(segment(fanId))/calls/\(segment(sessionId))/consent", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func endCallSession(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = nil, body: APICallEndCall) async throws -> APICallCallSession {
+    try await request("/v1/w6/threads/\(segment(creatorId))/\(segment(fanId))/calls/\(segment(sessionId))/end", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func saveCallSummaryNote(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = nil, body: APICallCallSummaryNote) async throws -> APICallCallSession {
+    try await request("/v1/w6/threads/\(segment(creatorId))/\(segment(fanId))/calls/\(segment(sessionId))/summary-note", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func deleteCallSummary(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = nil, body: APICallCallRevision) async throws -> APICallCallSession {
+    try await request("/v1/w6/threads/\(segment(creatorId))/\(segment(fanId))/calls/\(segment(sessionId))/delete-summary", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func cancelCallSession(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = nil, body: APICallCallRevision) async throws -> APICallCallSession {
+    try await request("/v1/w6/threads/\(segment(creatorId))/\(segment(fanId))/calls/\(segment(sessionId))/cancel", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func readCallOffers(creatorId: String, fanId: String, xQelvoraExpectedAccount: String? = nil) async throws -> APICallCallOffers {
+    try await request("/v1/w6/threads/\(segment(creatorId))/\(segment(fanId))/call-offers", method: "GET", authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func selectCallOffer(creatorId: String, fanId: String, offerId: String, xQelvoraExpectedAccount: String? = nil, body: APICallSelectTime) async throws -> APICallCallSession {
+    try await request("/v1/w6/threads/\(segment(creatorId))/\(segment(fanId))/call-offers/\(segment(offerId))/select", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
   }
   public func readAccountCallRoute(sessionId: String, xQelvoraExpectedAccount: String? = nil) async throws -> APICallCallRoute {
     try await request("/v1/w6/calls/\(segment(sessionId))/route", method: "GET", authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
