@@ -162,10 +162,18 @@ fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/
         finally { busy = false }
     }
     suspend fun jobDetail(id: String) {
+        if (client == null || busy) return
+        busy = true
         pendingExport = null
-        try { selectedJob = client?.request("privacy/jobs/$id"); error = "" }
+        try {
+            val detail = client.request("privacy/jobs/$id")
+            selectedJob = detail
+            jobs = jobs.map { if (it.text("id") == id) detail else it }
+            error = ""
+        }
         catch (cancelled: CancellationException) { throw cancelled }
         catch (failure: Exception) { selectedJob = null; error = failure.message ?: "Reconnect and try again." }
+        finally { busy = false }
     }
     suspend fun privacyCommand(action: String) {
         val input = buildJsonObject { put("kind", action); put("scope", scope); put("proof", if (verificationMethod == "current_session") "CURRENT_SESSION" else proof); put("idempotencyKey", key); if (scope != "account") put("creatorId", creatorId.lowercase()); if (scope == "thread") put("threadId", threadId.lowercase()) }
@@ -213,10 +221,10 @@ fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/
             val disabled = busy || !verificationConfigured || (if (local) proof != "LOCAL DEVELOPMENT" else verificationMethod != "current_session" && proof.isEmpty()) || (scope != "account" && !validTrustId(creatorId)) || (scope == "thread" && !validTrustId(threadId))
             Button("Request export", ButtonVariant.SECONDARY, block = true, disabled = disabled) { coroutine.launch { privacyCommand("export") } }
             Button("Request deletion", ButtonVariant.SECONDARY, block = true, disabled = disabled) { confirmDelete = true }
-            jobs.forEach { job -> Button(job.text("kind") + " · " + job.text("scope") + " · " + job.text("state"), ButtonVariant.QUIET, block = true) { coroutine.launch { jobDetail(job.text("id")) } } }
+            jobs.forEach { job -> Button(job.text("kind") + " · " + job.text("scope") + " · " + job.text("state").replace('_', ' '), ButtonVariant.QUIET, block = true, disabled = busy) { coroutine.launch { jobDetail(job.text("id")) } } }
             selectedJob?.let { job ->
                 TrustText("Job " + job.text("id"), "caption")
-                job["tasks"]?.jsonArray?.forEach { item -> val task = item.jsonObject; TrustText(task.text("domain") + ": " + task.text("state") + task.text("error_code").takeIf { it.isNotEmpty() }?.let { " · $it" }.orEmpty()) }
+                job["tasks"]?.jsonArray?.forEach { item -> val task = item.jsonObject; TrustText(task.text("domain") + ": " + task.text("state").replace('_', ' ') + task.text("error_code").takeIf { it.isNotEmpty() }?.let { " · " + it.replace('_', ' ') }.orEmpty()) }
                 job["retained"]?.jsonArray?.forEach { item -> val retained = item.jsonObject; TrustText("Retained: " + retained.text("category").replace('_',' '),"label"); TrustText(retained.text("reason")); retained.text("until").takeIf { it.isNotEmpty() }?.let { TrustText("Until $it","caption") } }
                 if (job.text("state") != "complete") Button("Retry incomplete domains", ButtonVariant.SECONDARY, block = true, disabled = busy) { coroutine.launch { if (perform("privacy/jobs/" + job.text("id") + "/retry", buildJsonObject {}) != null) { result = "Incomplete domains queued again."; jobDetail(job.text("id")) } } }
                 if (job.text("state") == "complete" && job.text("kind") == "export") Button("Save export", ButtonVariant.SECONDARY, block = true, disabled = busy) { coroutine.launch {
