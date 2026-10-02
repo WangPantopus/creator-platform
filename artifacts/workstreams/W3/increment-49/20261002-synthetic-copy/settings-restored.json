@@ -1,0 +1,18 @@
+{
+  "observedAt": "2026-10-02T14:03:27.566072+00:00",
+  "source": "ba228465ebce8ed1ed82ad39e6a5fa4a22d4d393",
+  "device": "emulator-5584",
+  "purpose": "restore settings after earlier actual guest disappearance; no acceptance journey",
+  "actualReadback": {
+    "fontScale": "2.0",
+    "nightMode": "no",
+    "animations": [
+      "0",
+      "0",
+      "0"
+    ]
+  },
+  "ownGuestShutdown": true,
+  "exactOwnLeaseReleased": true,
+  "peerGuestTouched": false
+}

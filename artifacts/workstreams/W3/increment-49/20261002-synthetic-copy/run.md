@@ -35,3 +35,5 @@ Screenshots: [You Light](android-current-you-light.png), [Me and privacy](androi
 ## Limits and continued work
 
 iOS has a successful normal signed shipping build, but the installed Xcode path has no Simulator application, attempted UI launch failed, and no iOS UI was operated. The missing OpenAI key and activated current generation/admission/terminal purposes still prevent Package A's actual cited answer and memory journey on all three clients. No p95, two-device durable stream, takeover race, worker recovery, recording, populated memory, export completion or full A–I acceptance is claimed. The copy's actual account edits are preserved; the original and earlier restores remain closed.
+
+At14:03:27UTC W3 completed a separate short controlled owned5584 boot solely to restore original settings. Actual readback was font2.0, Night=no, animations0/0/0. W3 gracefully shut that guest down, verified process/device absent and released only its matching newly acquired slot1 lease. The [restoration receipt](settings-restored.json) completes the pending settings cleanup above; it does not complete the interrupted cold recovery journey. Peer5554/slot2 was preserved.
