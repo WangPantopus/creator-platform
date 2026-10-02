@@ -47,12 +47,24 @@ final class W6RuntimeJourney: XCTestCase {
         XCTAssertEqual(app.textFields["availability-start-0"].value as? String, "2026-11-01T08:30:00.000Z")
         XCTAssertEqual(app.textFields["availability-start-1"].value as? String, "2026-11-01T09:30:00.000Z")
         capture(app, name: "W6-availability-owner-dst-windows")
+        func replace(_ field: XCUIElement, with value: String) {
+            field.tap()
+            let existing = field.value as? String ?? ""
+            field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: existing.count) + value)
+        }
+        replace(app.textFields["availability-zone"], with: "US/Pacific")
+        replace(app.textFields["availability-start-0"], with: "2026-11-01T01:30-07:00")
+        replace(app.textFields["availability-end-0"], with: "2026-11-01T01:45-07:00")
+        capture(app, name: "W6-availability-owner-minute-offset-alias")
         let save = app.buttons["Save availability"]
         for _ in 0..<4 { if save.isHittable { break }; app.swipeUp() }
         let enabled = XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true AND hittable == true"), object: save)
         XCTAssertEqual(XCTWaiter.wait(for: [enabled], timeout: 10), .completed)
         save.tap()
         XCTAssertTrue(app.staticTexts["Availability saved."].waitForExistence(timeout: 15))
+        app.swipeDown()
+        XCTAssertEqual(app.textFields["availability-zone"].value as? String, "America/Los_Angeles")
+        XCTAssertEqual(app.textFields["availability-start-0"].value as? String, "2026-11-01T08:30:00.000Z")
         capture(app, name: "W6-availability-owner-save")
         launch(destination)
         XCTAssertTrue(app.textFields["availability-zone"].waitForExistence(timeout: 15))

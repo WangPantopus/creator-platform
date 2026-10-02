@@ -896,7 +896,9 @@ public enum QelvoraCopy {
     "w6AvailabilitySaveIsUnconfirmed": "Saving is unconfirmed. Retry this same change before editing your windows.",
     "w6RetryAvailabilitySave": "Retry this availability save",
     "w6RefreshWillReplaceAvailabilityChanges": "Replace your unsaved changes with the saved availability?",
-    "w6AvailabilityAccountChanged": "Your account changed. Reopen availability to continue."
+    "w6AvailabilityAccountChanged": "Your account changed. Reopen availability to continue.",
+    "accountUnavailableTitle": "We can't reach your account right now",
+    "accountUnavailableBody": "Your session is kept on this device. Try again in a moment."
   ]
   private static let variables = try! NSRegularExpression(pattern: #"\{([^}]+)\}"#)
   public static func text(_ key: String, values: [String: String] = [:]) -> String {
