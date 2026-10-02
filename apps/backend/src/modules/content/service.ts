@@ -130,16 +130,31 @@ export interface ContentDependencies {
     creatorId: string,
     packetId: string,
   ) => Promise<boolean>;
+  /** W4 viewer permission is distinct from creator publication authority. */
+  publicPacketRead?: (
+    client: PoolClient,
+    actor: Actor,
+    input: {
+      creatorId: string;
+      packetId: string;
+      contentId: string;
+      contentVersion: number;
+      audience: Audience;
+    },
+  ) => Promise<boolean>;
   /** W8 reviews the exact immutable reply. Missing/unavailable review leaves it quarantined. */
-  reviewReply?: (input: {
-    replyId: string;
-    creatorId: string;
-    fanId: string;
-    version: number;
-    text: string;
-    textHash: string;
-  }) => Promise<{
-    state: "allowed" | "flagged";
+  reviewReply?: (
+    client: PoolClient,
+    input: {
+      replyId: string;
+      creatorId: string;
+      fanId: string;
+      version: number;
+      text: string;
+      textHash: string;
+    },
+  ) => Promise<{
+    state: "pending" | "allowed" | "flagged";
     reference: string;
     textHash: string;
   }>;
@@ -528,12 +543,13 @@ export class ContentService {
     }
     if (
       row.packet_id &&
-      !(await this.dependencies.publicPacket?.(
-        client,
-        actor,
-        row.creator_id,
-        row.packet_id,
-      ))
+      !(await this.dependencies.publicPacketRead?.(client, actor, {
+        creatorId: row.creator_id,
+        packetId: row.packet_id,
+        contentId: row.id,
+        contentVersion: row.version,
+        audience: row.audience,
+      }))
     )
       return false;
     if (row.audience.kind === "public") return true;
@@ -1449,19 +1465,20 @@ export class ContentService {
         { creatorId, id, ...input },
         async () => {
           const replyId = randomUUID();
-          const decision = await this.reviewReplyText(
-            replyId,
-            creatorId,
-            fan.id,
-            1,
-            input.text,
-          );
           const reply = (
             await client.query(
               "INSERT INTO creator.content_reply(id,content_id,creator_id,fan_id,text) VALUES($1,$2,$3,$4,$5) RETURNING id,version",
               [replyId, id, creatorId, fan.id, input.text],
             )
           ).rows[0];
+          const decision = await this.reviewReplyText(
+            client,
+            replyId,
+            creatorId,
+            fan.id,
+            reply.version,
+            input.text,
+          );
           await client.query(
             "INSERT INTO creator.content_reply_review(reply_id,content_id,creator_id,fan_id,reply_version,state,review_ref,text_hash) VALUES($1,$2,$3,$4,$5,$6,$7,$8)",
             [
@@ -1485,6 +1502,7 @@ export class ContentService {
     });
   }
   private async reviewReplyText(
+    client: PoolClient,
     replyId: string,
     creatorId: string,
     fanId: string,
@@ -1492,8 +1510,13 @@ export class ContentService {
     text: string,
   ) {
     const textHash = contentHash({ replyId, creatorId, fanId, version, text });
+    const pending = { state: "pending" as const, reference: null, textHash };
+    if (!this.dependencies.reviewReply) return pending;
+    // Roll back partial producer writes if unavailable. Successful queue and
+    // decision records commit or roll back with the actual source reply.
+    await client.query("SAVEPOINT w5_reply_review_producer");
     try {
-      const result = await this.dependencies.reviewReply?.({
+      const result = await this.dependencies.reviewReply(client, {
         replyId,
         creatorId,
         fanId,
@@ -1503,17 +1526,29 @@ export class ContentService {
       });
       if (
         result &&
-        ["allowed", "flagged"].includes(result.state) &&
+        ["pending", "allowed", "flagged"].includes(result.state) &&
         result.textHash === textHash &&
         typeof result.reference === "string" &&
-        result.reference.length > 0 &&
+        result.reference.trim().length > 0 &&
         result.reference.length <= 200
-      )
+      ) {
+        await client.query("RELEASE SAVEPOINT w5_reply_review_producer");
         return { ...result };
-    } catch {
-      /* Unavailable review must never admit an unreviewed reply. */
+      }
+    } catch (failure) {
+      await client.query("ROLLBACK TO SAVEPOINT w5_reply_review_producer");
+      await client.query("RELEASE SAVEPOINT w5_reply_review_producer");
+      if (
+        failure instanceof DomainError &&
+        failure.status >= 400 &&
+        failure.status < 500
+      )
+        throw failure;
+      return pending;
     }
-    return { state: "pending" as const, reference: null, textHash };
+    await client.query("ROLLBACK TO SAVEPOINT w5_reply_review_producer");
+    await client.query("RELEASE SAVEPOINT w5_reply_review_producer");
+    return pending;
   }
   async retryReplyReview(
     actor: Actor,
@@ -1560,6 +1595,7 @@ export class ContentService {
               safetyState: prior.state,
             };
           const decision = await this.reviewReplyText(
+            client,
             replyId,
             creatorId,
             reply.fan_id,
@@ -1967,6 +2003,12 @@ export class ContentService {
         input.idempotencyKey,
         { creatorId, ...input },
         async () => {
+          // A missing first row cannot be FOR UPDATE locked. Serialize the
+          // unique fan/target before checking its expected consent version.
+          await client.query(
+            "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+            [`content.thanks:${fan.id}:${input.targetKind}:${input.targetId}`],
+          );
           const prior = (
             await client.query(
               "SELECT * FROM creator.content_thanks WHERE fan_id=$1 AND target_kind=$2 AND target_id=$3 FOR UPDATE",
