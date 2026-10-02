@@ -1,0 +1,308 @@
+diff --git a/apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt b/apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt
+index c7ab3c0..6e3fe73 100644
+--- a/apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt
++++ b/apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt
+@@ -232,6 +232,66 @@ enum class APICommerceCommitmentState {
+   @SerialName("resolved") RESOLVED
+ }
+ 
++@Serializable
++data class APICommerceCreatorEarnings(
++  val `creatorId`: String,
++  val `observedAt`: String,
++  val `currencies`: List<APICommerceCreatorEarningsCurrenciesItem>,
++  val `ledger`: APICommerceCreatorEarningsLedger
++)
++
++@Serializable
++data class APICommerceCreatorEarningsCurrenciesItem(
++  val `currency`: String,
++  val `capturedMinor`: String,
++  val `requestMinor`: String,
++  val `membershipMinor`: String,
++  val `refundedMinor`: String,
++  @Required
++  val `transferredMinor`: String? = null,
++  @Required
++  val `reversedMinor`: String? = null,
++  val `pendingPayouts`: Long
++)
++
++@Serializable
++data class APICommerceCreatorEarningsLedger(
++  val `currency`: String,
++  val `entries`: List<APICommerceCreatorEarningsLedgerEntriesItem>,
++  @Required
++  val `nextCursor`: String? = null
++)
++
++@Serializable
++data class APICommerceCreatorEarningsLedgerEntriesItem(
++  val `id`: String,
++  @Required
++  val `packetId`: String? = null,
++  val `kind`: String,
++  val `amount`: String,
++  val `currency`: String,
++  val `createdAt`: String
++)
++
++@Serializable
++data class APICommerceCreatorLedgerPage(
++  val `currency`: String,
++  val `entries`: List<APICommerceCreatorLedgerPageEntriesItem>,
++  @Required
++  val `nextCursor`: String? = null
++)
++
++@Serializable
++data class APICommerceCreatorLedgerPageEntriesItem(
++  val `id`: String,
++  @Required
++  val `packetId`: String? = null,
++  val `kind`: String,
++  val `amount`: String,
++  val `currency`: String,
++  val `createdAt`: String
++)
++
+ typealias APICommerceCurrency = String
+ 
+ @Serializable
+@@ -4461,6 +4521,7 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
+     } finally { connection.disconnect() }
+   }
+   private fun segment(value: String): String = URLEncoder.encode(value, "UTF-8").replace("+", "%20")
++  suspend fun creatorEarningsLedger(creatorId: String, currency: String, cursor: String? = null): APICommerceCreatorLedgerPage = json.decodeFromString(request("/v1/commerce/creators/${segment(creatorId)}/earnings", "GET", authenticated = true, query = listOf("currency" to currency, "cursor" to cursor)))
+   suspend fun contentList(creatorId: String, cursor: String? = null, limit: Long? = null, state: String? = null, query: String? = null): APIContentList = json.decodeFromString(request("/v1/content/${segment(creatorId)}", "GET", authenticated = true, query = listOf("cursor" to cursor, "limit" to limit?.toString(), "state" to state, "query" to query)))
+   suspend fun studioContentList(creatorId: String, cursor: String? = null, limit: Long? = null, state: String? = null, query: String? = null): APIContentList = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio", "GET", authenticated = true, query = listOf("cursor" to cursor, "limit" to limit?.toString(), "state" to state, "query" to query)))
+   suspend fun studioLiveCatalog(creatorId: String): APIContentLiveCatalog = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio/live", "GET", authenticated = true))
+diff --git a/apps/ios/Sources/Generated/QelvoraAPI.swift b/apps/ios/Sources/Generated/QelvoraAPI.swift
+index 24068ad..ed23aca 100644
+--- a/apps/ios/Sources/Generated/QelvoraAPI.swift
++++ b/apps/ios/Sources/Generated/QelvoraAPI.swift
+@@ -344,6 +344,214 @@ public enum APICommerceCommitmentState: String, Codable, Sendable {
+   case `resolved` = "resolved"
+ }
+ 
++public struct APICommerceCreatorEarnings: Codable, Sendable {
++  public let `creatorId`: String
++  public let `observedAt`: String
++  public let `currencies`: [APICommerceCreatorEarningsCurrenciesItem]
++  public let `ledger`: APICommerceCreatorEarningsLedger
++  public init(creatorId: String, observedAt: String, currencies: [APICommerceCreatorEarningsCurrenciesItem], ledger: APICommerceCreatorEarningsLedger) {
++    self.creatorId = creatorId
++    self.observedAt = observedAt
++    self.currencies = currencies
++    self.ledger = ledger
++  }
++}
++
++public struct APICommerceCreatorEarningsCurrenciesItem: Codable, Sendable {
++  public let `currency`: String
++  public let `capturedMinor`: String
++  public let `requestMinor`: String
++  public let `membershipMinor`: String
++  public let `refundedMinor`: String
++  public let `transferredMinor`: String?
++  public let `reversedMinor`: String?
++  public let `pendingPayouts`: Int
++  public init(currency: String, capturedMinor: String, requestMinor: String, membershipMinor: String, refundedMinor: String, transferredMinor: String? = nil, reversedMinor: String? = nil, pendingPayouts: Int) {
++    self.currency = currency
++    self.capturedMinor = capturedMinor
++    self.requestMinor = requestMinor
++    self.membershipMinor = membershipMinor
++    self.refundedMinor = refundedMinor
++    self.transferredMinor = transferredMinor
++    self.reversedMinor = reversedMinor
++    self.pendingPayouts = pendingPayouts
++  }
++  private enum CodingKeys: String, CodingKey {
++    case `currency`
++    case `capturedMinor`
++    case `requestMinor`
++    case `membershipMinor`
++    case `refundedMinor`
++    case `transferredMinor`
++    case `reversedMinor`
++    case `pendingPayouts`
++  }
++  public init(from decoder: Decoder) throws {
++    let container = try decoder.container(keyedBy: CodingKeys.self)
++    self.currency = try container.decode(String.self, forKey: .currency)
++    self.capturedMinor = try container.decode(String.self, forKey: .capturedMinor)
++    self.requestMinor = try container.decode(String.self, forKey: .requestMinor)
++    self.membershipMinor = try container.decode(String.self, forKey: .membershipMinor)
++    self.refundedMinor = try container.decode(String.self, forKey: .refundedMinor)
++    self.transferredMinor = try container.decode(String?.self, forKey: .transferredMinor)
++    self.reversedMinor = try container.decode(String?.self, forKey: .reversedMinor)
++    self.pendingPayouts = try container.decode(Int.self, forKey: .pendingPayouts)
++  }
++  public func encode(to encoder: Encoder) throws {
++    var container = encoder.container(keyedBy: CodingKeys.self)
++    try container.encode(currency, forKey: .currency)
++    try container.encode(capturedMinor, forKey: .capturedMinor)
++    try container.encode(requestMinor, forKey: .requestMinor)
++    try container.encode(membershipMinor, forKey: .membershipMinor)
++    try container.encode(refundedMinor, forKey: .refundedMinor)
++    try container.encode(transferredMinor, forKey: .transferredMinor)
++    try container.encode(reversedMinor, forKey: .reversedMinor)
++    try container.encode(pendingPayouts, forKey: .pendingPayouts)
++  }
++}
++
++public struct APICommerceCreatorEarningsLedger: Codable, Sendable {
++  public let `currency`: String
++  public let `entries`: [APICommerceCreatorEarningsLedgerEntriesItem]
++  public let `nextCursor`: String?
++  public init(currency: String, entries: [APICommerceCreatorEarningsLedgerEntriesItem], nextCursor: String? = nil) {
++    self.currency = currency
++    self.entries = entries
++    self.nextCursor = nextCursor
++  }
++  private enum CodingKeys: String, CodingKey {
++    case `currency`
++    case `entries`
++    case `nextCursor`
++  }
++  public init(from decoder: Decoder) throws {
++    let container = try decoder.container(keyedBy: CodingKeys.self)
++    self.currency = try container.decode(String.self, forKey: .currency)
++    self.entries = try container.decode([APICommerceCreatorEarningsLedgerEntriesItem].self, forKey: .entries)
++    self.nextCursor = try container.decode(String?.self, forKey: .nextCursor)
++  }
++  public func encode(to encoder: Encoder) throws {
++    var container = encoder.container(keyedBy: CodingKeys.self)
++    try container.encode(currency, forKey: .currency)
++    try container.encode(entries, forKey: .entries)
++    try container.encode(nextCursor, forKey: .nextCursor)
++  }
++}
++
++public struct APICommerceCreatorEarningsLedgerEntriesItem: Codable, Sendable {
++  public let `id`: String
++  public let `packetId`: String?
++  public let `kind`: String
++  public let `amount`: String
++  public let `currency`: String
++  public let `createdAt`: String
++  public init(id: String, packetId: String? = nil, kind: String, amount: String, currency: String, createdAt: String) {
++    self.id = id
++    self.packetId = packetId
++    self.kind = kind
++    self.amount = amount
++    self.currency = currency
++    self.createdAt = createdAt
++  }
++  private enum CodingKeys: String, CodingKey {
++    case `id`
++    case `packetId`
++    case `kind`
++    case `amount`
++    case `currency`
++    case `createdAt`
++  }
++  public init(from decoder: Decoder) throws {
++    let container = try decoder.container(keyedBy: CodingKeys.self)
++    self.id = try container.decode(String.self, forKey: .id)
++    self.packetId = try container.decode(String?.self, forKey: .packetId)
++    self.kind = try container.decode(String.self, forKey: .kind)
++    self.amount = try container.decode(String.self, forKey: .amount)
++    self.currency = try container.decode(String.self, forKey: .currency)
++    self.createdAt = try container.decode(String.self, forKey: .createdAt)
++  }
++  public func encode(to encoder: Encoder) throws {
++    var container = encoder.container(keyedBy: CodingKeys.self)
++    try container.encode(id, forKey: .id)
++    try container.encode(packetId, forKey: .packetId)
++    try container.encode(kind, forKey: .kind)
++    try container.encode(amount, forKey: .amount)
++    try container.encode(currency, forKey: .currency)
++    try container.encode(createdAt, forKey: .createdAt)
++  }
++}
++
++public struct APICommerceCreatorLedgerPage: Codable, Sendable {
++  public let `currency`: String
++  public let `entries`: [APICommerceCreatorLedgerPageEntriesItem]
++  public let `nextCursor`: String?
++  public init(currency: String, entries: [APICommerceCreatorLedgerPageEntriesItem], nextCursor: String? = nil) {
++    self.currency = currency
++    self.entries = entries
++    self.nextCursor = nextCursor
++  }
++  private enum CodingKeys: String, CodingKey {
++    case `currency`
++    case `entries`
++    case `nextCursor`
++  }
++  public init(from decoder: Decoder) throws {
++    let container = try decoder.container(keyedBy: CodingKeys.self)
++    self.currency = try container.decode(String.self, forKey: .currency)
++    self.entries = try container.decode([APICommerceCreatorLedgerPageEntriesItem].self, forKey: .entries)
++    self.nextCursor = try container.decode(String?.self, forKey: .nextCursor)
++  }
++  public func encode(to encoder: Encoder) throws {
++    var container = encoder.container(keyedBy: CodingKeys.self)
++    try container.encode(currency, forKey: .currency)
++    try container.encode(entries, forKey: .entries)
++    try container.encode(nextCursor, forKey: .nextCursor)
++  }
++}
++
++public struct APICommerceCreatorLedgerPageEntriesItem: Codable, Sendable {
++  public let `id`: String
++  public let `packetId`: String?
++  public let `kind`: String
++  public let `amount`: String
++  public let `currency`: String
++  public let `createdAt`: String
++  public init(id: String, packetId: String? = nil, kind: String, amount: String, currency: String, createdAt: String) {
++    self.id = id
++    self.packetId = packetId
++    self.kind = kind
++    self.amount = amount
++    self.currency = currency
++    self.createdAt = createdAt
++  }
++  private enum CodingKeys: String, CodingKey {
++    case `id`
++    case `packetId`
++    case `kind`
++    case `amount`
++    case `currency`
++    case `createdAt`
++  }
++  public init(from decoder: Decoder) throws {
++    let container = try decoder.container(keyedBy: CodingKeys.self)
++    self.id = try container.decode(String.self, forKey: .id)
++    self.packetId = try container.decode(String?.self, forKey: .packetId)
++    self.kind = try container.decode(String.self, forKey: .kind)
++    self.amount = try container.decode(String.self, forKey: .amount)
++    self.currency = try container.decode(String.self, forKey: .currency)
++    self.createdAt = try container.decode(String.self, forKey: .createdAt)
++  }
++  public func encode(to encoder: Encoder) throws {
++    var container = encoder.container(keyedBy: CodingKeys.self)
++    try container.encode(id, forKey: .id)
++    try container.encode(packetId, forKey: .packetId)
++    try container.encode(kind, forKey: .kind)
++    try container.encode(amount, forKey: .amount)
++    try container.encode(currency, forKey: .currency)
++    try container.encode(createdAt, forKey: .createdAt)
++  }
++}
++
+ public typealias APICommerceCurrency = String
+ 
+ public struct APICommerceDecidePacket: Codable, Sendable {
+@@ -8335,6 +8543,9 @@ public actor CreatorAPIClient {
+     return CreatorAPIBinaryResponse(body: data, status: response.statusCode, contentType: response.value(forHTTPHeaderField: "Content-Type"), contentRange: response.value(forHTTPHeaderField: "Content-Range"), acceptRanges: response.value(forHTTPHeaderField: "Accept-Ranges"))
+   }
+   private func segment(_ value: String) -> String { value.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? "" }
++  public func creatorEarningsLedger(creatorId: String, currency: String, cursor: String? = nil) async throws -> APICommerceCreatorLedgerPage {
++    try await request("/v1/commerce/creators/\(segment(creatorId))/earnings", method: "GET", authenticated: true, query: [URLQueryItem(name: "currency", value: currency), URLQueryItem(name: "cursor", value: cursor)])
++  }
+   public func contentList(creatorId: String, cursor: String? = nil, limit: Int? = nil, state: String? = nil, query: String? = nil) async throws -> APIContentList {
+     try await request("/v1/content/\(segment(creatorId))", method: "GET", authenticated: true, query: [URLQueryItem(name: "cursor", value: cursor), URLQueryItem(name: "limit", value: limit.map { String($0) }), URLQueryItem(name: "state", value: state), URLQueryItem(name: "query", value: query)])
+   }
