@@ -163,5 +163,34 @@
     },
     "fullPRCombinedReviewComplete": false,
     "SQLActivated": false
+  },
+  "currentStudioWavePreparation": {
+    "sourceParent": "0f437fdedd61cc6849b0480b1dd34b883cce2a8e",
+    "catalogueOwnerSource": "a40fa23d2b28182ab6304e58509897ebcb763880",
+    "sourceSHA256": {
+      "apps/backend/scripts/build.mjs": "6f681442127b878f1edd9df50e4a41559ff7f75c0bb6223812263ce02148f301"
+    },
+    "packetSHA256": "9e21499af1c10ad488dbb6e7f6477c675f2c2511bfde5c7635f3adfef56919b9",
+    "all17WaveSQLSHA256": {
+      "apps/backend/src/modules/commerce/schema-approval.sql": "4480936ea99adbc954f1e3444673772922c49e6dab8b9cce9351cf6d61c493fb",
+      "apps/backend/src/modules/content/schema-reply-review.sql": "636763eac2f10091d0291007bd9252b80ccc5631b3930f19804a82ec064a6b06",
+      "apps/backend/src/modules/session/availability.sql": "47ec148a2821617aadba66264b12e55bf1a1219e597b2f906b5ec0683b4e9097",
+      "apps/backend/src/modules/media/creator-scope.sql": "3e76219129199d177d7a9667de8623bb0d1d4bd6dfa25a99f10bbbf88b1139db",
+      "apps/backend/src/modules/commerce/schema-generation-cost-settlement.sql": "00f4c2cc2962a0e9f14b0ba0ad57f23823fcc811042e8d6b8b9c6dc5394daffc",
+      "apps/backend/src/modules/conversation/migrations/pending_w3_account_index.sql": "189e19e001182efe6b28f4eed8c1633abf0945a9592b2209c950ac8de01e86e1",
+      "apps/backend/src/modules/content/schema-media-publication.sql": "f35526f24275d7b34bbbed7c12b98e3b1fd1d32b0c69b426d13370df0ca86e2e",
+      "apps/backend/migrations/0053_w8_runtime_denial_projection.sql": "4da2e2b56f51f70e39336c6c7d26646e1732703f2e3f39c35f700ff959237185",
+      "apps/backend/src/modules/commerce/schema-pass-purchase-effects.sql": "d6ead22cd6115df960dbe612b1de4a9473d2717a040cb66c6ba473da580827ca",
+      "apps/backend/src/modules/commerce/schema-pass-pool-effects.sql": "26be8430c4301b7eda9060c94e9034b7afa5fd57a9ad5bec128f26ac2aefa4ca",
+      "apps/backend/src/modules/conversation/migrations/pending_w3_message_lineage.sql": "1044700d59b9dbb2d2b36d890496de0be6fb3d53c4409504f3c7693906866c35",
+      "apps/backend/src/modules/conversation/migrations/pending_w3_feedback_consent.sql": "08cb6f37c12ca3131b2e307a237569aa4d104fc627566e619a39fa18a1814d11",
+      "apps/backend/src/modules/conversation/migrations/pending_w3_correction_signature.sql": "5c94b94a7287a5c4a149da454117c30be40367034b9930ac11e168e5b6a4b3e0",
+      "apps/backend/src/modules/conversation/migrations/pending_w3_recording_association.sql": "b61d50d7f85c0ef468e00a8d2d6b737b4d405a9349810c552f7d9df7f527c42e",
+      "apps/backend/migrations/0060_w8_composed_signed_message.sql": "43067f9a36218e49e84bc3597e466e73b2d288c12a446e2628e655a281dddecc",
+      "apps/backend/src/modules/commerce/schema-payout-custody.sql": "a2453c00868cd7a6fcaf30a1121884a73daa4942a2ac8b7214504d19285c1efd",
+      "apps/backend/src/modules/media/worker-scope.sql": "abf169bb75c9bdc8aff771ac1d929f6a09a7211e6340b84b36d5700daa38a82a"
+    },
+    "fullPRCombinedReviewComplete": false,
+    "SQLActivated": false
   }
 }

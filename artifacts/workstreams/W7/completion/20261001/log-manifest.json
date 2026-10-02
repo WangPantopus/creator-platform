@@ -1160,5 +1160,30 @@
     "contentSha256": "20080c7188011927a22886d2a73e89c739466ddd04451588ff0bc0dc2cfac7a8",
     "bytes": 1249,
     "kind": "Exact generated failure context bytes compressed, no normalization"
+  },
+  "../../studio-runtime/20261002/wave-preparation-raw/backup-restore.json": {
+    "sha256": "54bef932b2ca3ac72589ff4d1215dc25f69d60cc6b9823c13e4ee9d3246647ec",
+    "raw": true,
+    "privateContents": false
+  },
+  "../../studio-runtime/20261002/wave-preparation-raw/ci-parent.json": {
+    "sha256": "577bc9d614e0b23f5646f96f9651a3c6dd2276b7edcf7a58f861593558baf1ac",
+    "raw": true,
+    "privateContents": false
+  },
+  "../../studio-runtime/20261002/wave-preparation-raw/cleanup.json": {
+    "sha256": "819ce209cee649600f4a69299d6dd05408c8bcf5e0997003a1f52948148958cb",
+    "raw": true,
+    "privateContents": false
+  },
+  "../../studio-runtime/20261002/wave-preparation-raw/packet-baseline.json": {
+    "sha256": "5f20d90fdb92990b5af2de793d1cefc27766a032d2421e4e79641cec8b7d312b",
+    "raw": true,
+    "privateContents": false
+  },
+  "../../studio-runtime/20261002/wave-preparation-raw/personal-review.json": {
+    "sha256": "726048446225e6656b08686439d60b8d6ef7a367b309a23cb9566d66a559275a",
+    "raw": true,
+    "privateContents": false
   }
 }

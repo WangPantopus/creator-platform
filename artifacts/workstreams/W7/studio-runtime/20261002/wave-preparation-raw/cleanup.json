@@ -1,0 +1,24 @@
+{
+  "observedAt": "2026-10-02T17:14:51.470668+00:00",
+  "containers": {
+    "creator-platform-w7-macstudio-20261001": "exited",
+    "creator-platform-w7-wave-restore-20261002": "exited"
+  },
+  "volumesRetained": true,
+  "canonicalConnectionLimit": 0,
+  "restoreConnectionLimit": 0,
+  "trafficMarker": "creator-platform:restored-traffic-closed",
+  "privateFilesModes": {
+    "backup-manifest.private.json": "0o600",
+    "prepare.private.log": "0o600",
+    "globals-restore.private.sql": "0o600",
+    "receipt.private.json": "0o600",
+    "canonical40.dump": "0o600",
+    "globals.private.sql": "0o600",
+    "restore-container.env": "0o600"
+  },
+  "privateDirectoryMode": "0o700",
+  "privateContentsUploaded": false,
+  "servicesAndOwnedDevicesRemainStopped": true,
+  "newSQLApplied": 0
+}
