@@ -900,7 +900,9 @@ export const copy = {
   "limitRemindersOff": "Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.",
   "limitRemindersUnknown": "Lowering a limit is immediate.",
   "pageUnavailableTitle": "This page didn't load",
-  "pageUnavailableBody": "Nothing you saved was changed. Try again in a moment."
+  "pageUnavailableBody": "Nothing you saved was changed. Try again in a moment.",
+  "identityChooseHandle": "Choose your handle",
+  "identityEditPublicProfile": "Edit public profile"
 } as const;
 export type CopyKey = keyof typeof copy;
 type Placeholders<T extends string> = T extends `${string}{${infer Key}}${infer Rest}` ? Key | Placeholders<Rest> : never;

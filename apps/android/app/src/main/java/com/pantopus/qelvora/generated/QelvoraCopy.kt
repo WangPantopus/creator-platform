@@ -902,7 +902,9 @@ object QelvoraCopy {
     "limitRemindersOff" to "Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.",
     "limitRemindersUnknown" to "Lowering a limit is immediate.",
     "pageUnavailableTitle" to "This page didn't load",
-    "pageUnavailableBody" to "Nothing you saved was changed. Try again in a moment."
+    "pageUnavailableBody" to "Nothing you saved was changed. Try again in a moment.",
+    "identityChooseHandle" to "Choose your handle",
+    "identityEditPublicProfile" to "Edit public profile"
   )
   private val variables = Regex("""\{([^}]+)\}""")
   fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }

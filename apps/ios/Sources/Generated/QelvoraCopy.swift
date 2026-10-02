@@ -902,7 +902,9 @@ public enum QelvoraCopy {
     "limitRemindersOff": "Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.",
     "limitRemindersUnknown": "Lowering a limit is immediate.",
     "pageUnavailableTitle": "This page didn't load",
-    "pageUnavailableBody": "Nothing you saved was changed. Try again in a moment."
+    "pageUnavailableBody": "Nothing you saved was changed. Try again in a moment.",
+    "identityChooseHandle": "Choose your handle",
+    "identityEditPublicProfile": "Edit public profile"
   ]
   private static let variables = try! NSRegularExpression(pattern: #"\{([^}]+)\}"#)
   public static func text(_ key: String, values: [String: String] = [:]) -> String {

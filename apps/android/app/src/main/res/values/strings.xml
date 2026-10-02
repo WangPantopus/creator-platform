@@ -903,4 +903,6 @@
   <string name="limit_reminders_unknown" formatted="false">Lowering a limit is immediate.</string>
   <string name="page_unavailable_title" formatted="false">This page didn\'t load</string>
   <string name="page_unavailable_body" formatted="false">Nothing you saved was changed. Try again in a moment.</string>
+  <string name="identity_choose_handle" formatted="false">Choose your handle</string>
+  <string name="identity_edit_public_profile" formatted="false">Edit public profile</string>
 </resources>
