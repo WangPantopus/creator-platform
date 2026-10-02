@@ -16,7 +16,10 @@ import type { SessionService } from "../session/service.js";
 import type { AvailabilityService } from "../session/availability.js";
 import { visibleSession } from "../session/service.js";
 import { withDeadline } from "./deadline.js";
-import type { CallSession } from "../../../../../packages/api/src/session.js";
+import {
+  AdmissionRedemptionSchema,
+  type CallSession,
+} from "../../../../../packages/api/src/session.js";
 
 export type W6RouterDependencies = {
   scopeFor: (request: Request) => Promise<ThreadScope>;
@@ -84,6 +87,9 @@ export function createW6Router(dependencies: W6RouterDependencies) {
     assertExpectedAccount(req, current.actorAccountId);
     return current;
   };
+  router.get(`${root}/recording-policy`, async (req, res) =>
+    res.json(await media().recordingPolicy(await scope(req))),
+  );
   const id = (req: Request, key = "assetId") => z.uuid().parse(req.params[key]);
   const creatorMedia = () => {
     if (!dependencies.creatorMedia || !dependencies.creatorScopeFor)
@@ -376,6 +382,13 @@ export function createW6Router(dependencies: W6RouterDependencies) {
   router.post(`${root}/calls/:sessionId/join`, async (req, res) =>
     res.json(await session().join(await scope(req), id(req, "sessionId"))),
   );
+  router.post(`${root}/calls/:sessionId/redeem`, async (req, res) => {
+    const service = session();
+    const body = AdmissionRedemptionSchema.parse(req.body);
+    res.json(
+      await service.redeem(await scope(req), id(req, "sessionId"), body.nonce),
+    );
+  });
   router.post(`${root}/calls/:sessionId/consent`, async (req, res) =>
     callResponse(req, res, (current) =>
       session().consent(current, id(req, "sessionId"), req.body),
