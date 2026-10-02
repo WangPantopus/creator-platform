@@ -110,7 +110,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
     val model = remember(baseURL) { FanSession(context, baseURL, returnTo) }; val scope = rememberCoroutineScope()
     LaunchedEffect(returnTo) { model.open(returnTo) }
     LaunchedEffect(model.destination) { model.loadArrival() }
-    LaunchedEffect(model) { model.refresh(); while (true) { delay(4000); if (model.session != null) model.refresh() } }
+    LaunchedEffect(model) { model.refresh(); while (true) { delay(4000); if (!model.choosingActor && !model.busy) model.refresh() } }
     Column(Modifier.fillMaxSize().background(qColor("ground")).windowInsetsPadding(WindowInsets.safeDrawing)) {
         if (model.error.isNotEmpty()) Notice("error", "Account status", model.error)
         when {
