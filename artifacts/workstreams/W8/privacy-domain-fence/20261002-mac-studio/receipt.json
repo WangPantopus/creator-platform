@@ -133,11 +133,45 @@
   },
   "failedAttempts": [
     "Initial SQL-language registry helper creation refused creator schema access for creator_trust_owner. Entire transaction rolled back; changed helper to PL/pgSQL, retaining narrow final owner grants.",
-    "The scratch EOF assertion initially expected a psql FETCH command tag that psql does not print. Corrected operator to observe a separate empty FETCH response; all actual snapshot/EOF observations then passed."
+    "The scratch EOF assertion initially expected a psql FETCH command tag that psql does not print. Corrected operator to observe a separate empty FETCH response; all actual snapshot/EOF observations then passed.",
+    "Canonical host initially used harness runtime-wave-full.env rather than runtime-wave-app57.env; incomplete NODE_ENV/feature/DB configuration refused before listen.",
+    "Web initially omitted W8_API_URL, then W8_LOCAL_DEVELOPMENT transport flag. Actual app refused unavailable transport; explicit loopback profile corrected.",
+    "W3 acquired simulator-slot1 between inventory and claim. Failed W8 composite claim rolled back partial emulator lease, but startup erroneously continued to boot own A3DB. Own simulator immediately shut down; no peer device/lease changed. Now Android-only slot1 held while iOS waits on actual three-device budget.",
+    "First iOS operator accepted a partially clipped job button frame; tap did not open detail. Corrected to a fully visible measured frame, with settled scrolling; actual job metadata/hash and three blocked domains verified in both appearances."
   ],
   "actualWorkerLoginOrTaskCommit": false,
-  "appAcceptance": "pending",
+  "appAcceptance": "Personally operated actual web, Android emulator and iOS simulator against canonical real backend; same saved synthetic export/hash, Light/Night Trust103 blocked, no receipt/data/download. Independently read saved account/eight tasks.",
   "allEightC10": false,
   "originalRecovery": false,
-  "releaseReady": false
+  "releaseReady": false,
+  "android": {
+    "serial": "emulator-5568",
+    "avd": "CreatorPlatform_W8_API34",
+    "cpus": 2,
+    "memoryKiB": 2026148,
+    "apkSha256": "5f52b247162d200dcb26e12cd129af096408d36ff8d2646429166b7397b48b0a",
+    "stopped": true,
+    "slotReleased": true
+  },
+  "ios": {
+    "udid": "A3DBA471-82BB-43B6-9216-9A74BB5DB11C",
+    "normalShippingExecutableSha256": "2ddfe4e9515df9f8ab0f83442e88e1acbebf6d4bebd6161a4b57503a29348836",
+    "stopped": true,
+    "slotReleased": true
+  },
+  "actualAppRefusal": true,
+  "cleanup": {
+    "ownApi4108Stopped": true,
+    "ownWeb3008Stopped": true,
+    "nativeDevicesAndCompanionsStopped": true,
+    "ownSlotsReleased": true,
+    "nextEnvRestored": true,
+    "databaseVolumesRetained": true
+  },
+  "newPrivateCheckpoint": {
+    "sha256": "32a2b175d6616bd278c833b59381d5275b48fc5625953f92d062403dcd9b55b2",
+    "bytes": 723447,
+    "mode": "0600",
+    "separateRestoreVerified": false
+  }
 }

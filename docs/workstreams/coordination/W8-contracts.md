@@ -1,5 +1,22 @@
 # W8 contract, migration and runtime register
 
+## Corrected held dependency ordering and actual owner integration — 2026-10-02
+
+Focused draftPR159 publishes the closed four-source continuation; its original6771bfed future held map is superseded. W1 caught that moving only63–102 left dependent translation/terminal/Agent consumers before their producers. All47 held slots are now0151–0197, metadata only: original83→0168,111→0194,112→0195,113→0196;99→0183,100→0184,105→0188,106→0189; late subject108→0190 thennegative109→0191 thenfinancial107→0192. Actual map `infra/migrations/waves/20261002-privacy-held.json` SHA256 **2338f48ea4b1008f47eef43ff7a835021e5e917669ad44f21179c69d03227c0a** is authoritative. SQL files/bytes, canonical57 and selected74/82/87/103 are unchanged; unknown further DDL dependencies require review before any future wave. No fabricated ledger aliases.
+
+Combined integration source2423dd12 contains actual mergedW2 Agent166d9ee6 and personally reviewedW7 Growthb7d21b0c. [Exact source review](https://github.com/WangPantopus/creator-platform/blob/2423dd12/artifacts/workstreams/W8/privacy-domain-integration/20261002-mac-studio/README.md) verifies actual same-client restoration/task bookends, one fixed-source cursor and separate COMMIT; types/scopedlint pass. W1 server.ts remains untouched. W8 managed Growth key/worker URL are absent; no peer credentials or synthetic provider receipts were borrowed. Real composed61 web/Android/iOS/task/expiry/physical effects and fullC10/recovery/release remain pending. All own resources are stopped with private checkpoints retained. Continue actual Trust/owner acceptance and collect independent owner fresh/preserved-upgrade reviews.
+
+
+## Closed privacy continuation — 2026-10-02
+
+[Personally executed four-purpose SQL continuation](../../../artifacts/workstreams/W8/migration-continuation/20261002-mac-studio/README.md) is on `codex/w8-migration-continuation-20261002`, normal main merge2c9aa8ca. Actual private backup/separate restore and atomic57→61 preserve57 history/131 rows/roles/sequence; fresh61 schema/security/roles match. Eight functions have zero compiler diagnostics;20 actual drift mutations refuse and roll back. All four targets remain closed. Draft packet selects only0074/0082/0087/0103; no main/peer/app/task/C10/original recovery/release activation is claimed.
+
+Draft metadata-only held map moves36 lower unready reservations to0114–0149, preserves SQL paths/bytes/history and leaves0111–0113 unchanged.0150 is W6 distinct current-account single-call metadata discovery, source/issuance/current booking/negative custody pending. Next: consume actual merged W2 Agent correction and W7 Growth owner; operate a separate labelled development copy through all three clients and independently inspect genuine task/COMMIT/refusals; obtain owner fresh/preserved-upgrade reviews before finalizing. No new unit tests or paid calls. Own API/web/devices/build slots and database container are stopped; private closed61 checkpoint/volumes retained.
+
+
+Held metadata only:0083 carries W3 actual immutable translation job/consumer;0111 W1 private translation issuer and0112 W8 original-participant negatives await its exact source/currentness/policy.0113 is W2's separate NoLogin all-owned Agent export snapshot with its own scope and genuine job/token/XID/PID/immutable ownership; it must not widen0087 private scope ACL or isolated owner. Actual Agent empty fan/thread preflight also needs0087 same-client lifecycle/restoration before locks and COMMIT. W2 is adding this owner port. No registry activation, fabricated Actor/provenance/policy or complete C10 is authorized by these allocations.
+
+
 Reserved0103 source exports `domainPrivacyTaskAuthorityInTransaction(client, actualJob, domain, assertRestoredInTransaction)`; [exact dedicated owner/caller/currentness contract](../../operations/W8-domain-privacy-fence.md). Actual Trust/Growth worker roles are domain-bound, metadata/scope are private, the real signal and held restoration are mandatory and COMMIT is separately fenced.0087 is unchanged. W7 owns the one-cursor/read-committed consistent export and delete seam; outer pool verification does not satisfy this port. Actual activation and leased task/COMMIT/app/purge acceptance remain open.
 
 
