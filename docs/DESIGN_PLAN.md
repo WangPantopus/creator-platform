@@ -8,6 +8,8 @@ Read [BRIEF.md](BRIEF.md) before working on any phase.
 Status keys: `[ ]` not started · `[~]` in progress · `[x]` done. Record the
 link to each published artifact next to its item when it exists.
 
+W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan export](../artifacts/workstreams/W3/increment-66/20261002-privacy61-handoff/run.md). Personally operated web Light/Night390 with a genuine saved request and four explicit blocked domains; current native builds pass, current native UI and full A–I remain incomplete. [Successor handoff](workstreams/handoffs/W3-mac-studio-2026-10-02.md). No design/implementation completion checkbox is advanced from this partial acceptance.
+
 ## Where the work lives
 
 | Deliverable | Home | Mirror in this repo |
