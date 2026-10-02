@@ -1,0 +1,59 @@
+{
+  "recordedAt": "2026-10-02T06:07:28.450068+00:00",
+  "source": "ac982d6cef12aaeb0be924b1a89610b55f184d29",
+  "branch": "codex/w8-durable-reply-review",
+  "environment": "labelled experimental synthetic clone creator_w8_replyreview_20261002",
+  "canonicalLedgerRows": 40,
+  "experimentalDDL": ["final0053", "0045 proposal", "final0069"],
+  "migrationSha256": "008336be882c546b193b898b7176ea6f6417ec7fe4cee3fca81d18bfa65e0890",
+  "ownerSources": {
+    "W5HeldClient": "f4dd6a0e290a93d07cc76202ab1d0d283d0aa1c8",
+    "W1DevelopmentActors": "05208ebeb7140bd1272aef58c01877426a0bc1c1"
+  },
+  "ddl": "Complete experimental0053/0045/0069 DDL applied to a new synthetic clone. Non-owner query caught missing index.version SELECT; final SQL adds only that column, also applied to clone, and the exact negative probe then passed. Canonical registry/history unchanged; not original preserved-data recovery.",
+  "web": {
+    "environment": "labelled experimental synthetic clone",
+    "signIn": "actual canonical SessionService via web actor3",
+    "creatorAuthority": "existing synthetic seed verification; no external proof approval",
+    "passkeyBeginStatus": 403,
+    "errorCode": "fresh_proof_required",
+    "publication": "not attempted after real proof refusal",
+    "replySubmission": "not reached; remains a dependency"
+  },
+  "negativeIntegration": {
+    "environment": "labelled synthetic clone; negative integration only",
+    "canonicalSession": "resolved actual browser cookie through SessionService",
+    "missingRequestAuthority": 401,
+    "nonexistentSource": 403,
+    "alteredTupleHash": 409,
+    "corePrivateReviewSelect": "42501",
+    "coreDecisionInsert": "42501",
+    "coreOpsEvidenceExecute": "42501"
+  },
+  "database": {
+    "replyReviewForceRls": true,
+    "decisionForceRls": true,
+    "projectionRoleMemberships": 0,
+    "corePrivateReviewSelect": false,
+    "coreDecisionInsert": false,
+    "coreOpsEvidenceExecute": false,
+    "contentRows": 0,
+    "passkeyCredentials": 0
+  },
+  "checks": {
+    "backendTypecheck": "passed",
+    "webTypecheck": "passed",
+    "newUnitTests": 0
+  },
+  "unverified": [
+    "positive queue insertion/idempotency under an actual signed Note",
+    "Ops allow/flag and W5 retry/delivery of actual saved reply",
+    "authenticated iOS/Android reply journey",
+    "canonical migration activation",
+    "release/privacy/provider/recovery gates"
+  ],
+  "resourceState": "API4108,web3008,W8 container stopped; all native leases remain released; cloned/original data retained.",
+  "captures": {
+    "web-proof-required.png": "d9c9145d1de911b7213d6a402c1854da020561f6ea1c072960be7193c557d499"
+  }
+}

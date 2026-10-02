@@ -1,5 +1,13 @@
 # W8 contract, migration and runtime register
 
+## Exact Note reply review and new reservations — 2026-10-01
+
+`createTrustReplyReviewer()` from `modules/trust/reply-review.ts` returns `(client, input) => Promise<{state:pending|allowed|flagged,reference,textHash}>`. W5 invokes it after the actual reply INSERT and on actual retry, inside the same held transaction and its unavailable-result savepoint. Actual author/session/scope denial is401/403/410; changed tuple409. No separate pool or request-style ThreadScope. Hash is `contentHash({replyId,creatorId,fanId,version,text})`, not SHA256(text). Use genuine requestAuthority and READ COMMITTED.
+
+0069_w8_reply_review is reserved and experimental only. The exact tuple is unique; only recorded reviewer decisions can allow/flag. Private text remains in W5 source; leased Ops reads current exact source through its scoped function and audit. Privacy handles association/decision metadata without retaining a raw Note snapshot. Positive real-app/native acceptance is pending genuine approved creator proof; seed verification did not satisfy passkey enrollment.
+
+New reservations:0070 W4 public-packet viewer read;0071 W1 publication worker purpose;0072 W1 generation purpose only after its exact separate semantics are reviewed. 0073 is W8 publication-worker negative projection after0071. These are not activation or broad permission. Noninteractive producers must not substitute owner/fan Actors into the request projections. W8 reviews exact role/column grants/RLS/GUC/task lease and negative-authority coverage before the sole canonical activation PR. General retained-accounting/content/consent policy remains a human dependency; D-08 packet/commitment12months is not that policy.
+
 ## Canonical development trust increment — 2026-10-01
 
 Current source branch: `codex/w8-development-trust-runtime`. [Actual partial acceptance](../../../artifacts/workstreams/W8/development-trust/20261001-mac-studio/README.md) separates implemented source, experimental DDL, real app operation and release gates. PR17 is merged. W8 remains the sole registry activation owner;0053 is not active yet.
