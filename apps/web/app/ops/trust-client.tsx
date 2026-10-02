@@ -117,7 +117,10 @@ export function useTrust<T>(path: string) {
   return { data, error, loading, refresh };
 }
 export function TrustSession() {
-  const { data } = useTrust<{ localDevelopment: boolean }>("capabilities");
+  const { data } = useTrust<{
+    localDevelopment: boolean;
+    localActorSelection?: boolean;
+  }>("capabilities");
   const session = useTrust<{ accountId: string }>("session");
   const [actor, setActor] = useState("fan");
   const actorChoice = useRef<HTMLSelectElement | null>(null);
@@ -178,6 +181,22 @@ export function TrustSession() {
       </a>
     ) : null;
   if (!data?.localDevelopment) return continuation;
+  if (data.localActorSelection === false)
+    return (
+      <div className="trust-session">
+        <p>Synthetic local accounts · no provider or production identity</p>
+        {returnTo && (
+          <a
+            className="qv-link-btn"
+            href={`/api/auth/continue?returnTo=${encodeURIComponent(returnTo)}`}
+          >
+            {session.data
+              ? "Switch development account"
+              : "Continue with Pantopus"}
+          </a>
+        )}
+      </div>
+    );
   return (
     <div className="trust-session">
       {continuation}

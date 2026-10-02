@@ -196,6 +196,7 @@ export default function CasePage({
         <Link className="qv-link-btn" href="/ops">
           Back to cases
         </Link>
+        <TrustSession />
         {loading && <p role="status">Loading case…</p>}
         {!data && (
           <>
@@ -248,7 +249,6 @@ export default function CasePage({
               </button>
               <ErrorState error={actionError} />
             </form>
-            <TrustSession />
           </>
         )}
         {data && (
@@ -463,7 +463,6 @@ export default function CasePage({
               </p>
             )}
             <ErrorState error={actionError} />
-            <TrustSession />
           </form>
           {data.state === "action_pending" && (
             <form

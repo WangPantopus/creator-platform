@@ -1,6 +1,33 @@
 # W8 contract, migration and runtime register
 
+## Canonical development trust increment — 2026-10-01
+
+Current source branch: `codex/w8-development-trust-runtime`. [Actual partial acceptance](../../../artifacts/workstreams/W8/development-trust/20261001-mac-studio/README.md) separates implemented source, experimental DDL, real app operation and release gates. PR17 is merged. W8 remains the sole registry activation owner;0053 is not active yet.
+
+W1 owns `server.ts`. Its existing development `createConfiguredBackend` input can add these seven lines after consuming the reviewed branch and provisioning the actual0053 schema:
+
+```ts
+import { createDevelopmentTrust } from "./modules/trust/development.js";
+// In the existing createConfiguredBackend input:
+...(process.env.TRUST_LOCAL_DEVELOPMENT === "true"
+  ? {
+      trust: (runtime) => createDevelopmentTrust(runtime),
+    }
+  : {}),
+```
+
+Require `NODE_ENV=development`, canonical development identity/session custody, exact loopback web origin and core database, plus separate `TRUST_API_DATABASE_URL` (`creator_trust_runtime`) and `TRUST_WORKER_DATABASE_URL` (`creator_trust_worker`) on that same database. Supply an immutable `RELEASE_REVISION`. Defaults register real available privacy consumers; they do not imply all eight domains, protected storage, retention or provider readiness. Optional consumers and shared agent/settlement ports must come from their actual owners. The helper closes its own pools after worker drain.
+
+`developmentTrustActors` is a readonly `{id,label}[]`: accounts ending004/005/006, labelled Development Ops supervisor/support reviewer/verification reviewer respectively. W1 relabels matching canonical development actors through its adapter; these labels do not create sessions, Ops membership or production identities. Canonical Trust capability uses `localActorSelection:false`, keeping the legacy harness selector out of this host.
+
+Held-client exports from `modules/trust/scope-restriction.ts`: `trustScopeRestrictionInTransaction()`, `trustAudienceRestrictionInTransaction()`, `trustCreatorRestrictionInTransaction()`, `trustMediaWorkerDenial()`. Thread projection answers only when `app.account_id` is an actual participant. Audience and creator-owner checks have separate purposes. Core receives schema USAGE and only the three bounded projection EXECUTEs; private Trust SELECT and media-worker EXECUTE remain denied.0053's negative-metadata function owner is NOLOGIN/non-owner/NOBYPASSRLS with column-limited reads. All projections require READ COMMITTED; a retained REPEATABLE READ snapshot returns unavailable. Shared caller locks and exclusive negative-authority change locks last to transaction end; never hold a database transaction over a provider call.
+
+W6's worker uses its existing `media.*` family fence and the caller-held dedicated worker client. SQL `creator_trust.media_worker_denial(text,uuid,uuid,uuid)` takes kind, creator, nullable fan and actual asset owner; returns allowed/denied/unavailable.0062 grants only schema USAGE plus that EXECUTE to `creator_media_worker`; runtime cannot execute it. Missing ownership/authority fails closed. Fully revoked byte cleanup remains W6's separate negative-only path.
+
+Allocations beyond the original wave:0061 W4 payout custody;0062 W6 worker (final proposal hash `abf169bb75c9bdc8aff771ac1d929f6a09a7211e6340b84b36d5700daa38a82a`);0063–0066 W7 proposals, pending revised relationship/checkpoint security custody;0067 W2 retained-counter expiry;0068 W4 paid coverage. These allocations are not application authorization. W3 published revised0058/0059 preserving0044 at each step; review those exact bytes before activation.0048 remains blocked on real accounting/export/delete/expiry composition and durable conversation-before-agent privacy receipts.
+
 **Mac Studio coordination, 2026-10-01 (current):**
+
 - **Registry:** W8 owns the single activation PR for reserved migrations. W3, W4, W5 and W6 agreed not to edit `infra/migrations.json` and to verify on their own DBs once the branch is pushed. Activation runs in ascending waves; IDs that aren't ready are renumbered above the wave (metadata only).
 - **0058/0059:** both replace 0044's `require_signed_message` without the approved_draft exact-version personal-Approval branch. 0060 recomposes that branch, but applying 0058→0060 as separate runner transactions leaves a weakened window. Before activating 0058–0060, choose one: revised 0058/0059 bytes that keep the 0044 branch, a single-transaction wave, or a traffic-closed rollout.
 - **0048:** needs C10 accounting registration first.
@@ -25,9 +52,7 @@
 
 **Native runtime recovery and Metrics source:** owned Android host-graphics/temp-directory retry preserves the same AVD/app data and passes the four unchanged original UI flows after an actual unobstructed shipping Help launch. Netsim fallback remains explicit, not Bluetooth/isolation acceptance. Native private Report arrivals stay at Welcome; current W1 auth/native input/system-sheet gates remain. W8 edits only owned Metrics TSX/CSS to wrap the fixed mono route text; actual390 Light/Night no-overflow/main keyboard focus and1280 desktop verified. No test/golden/SQL/authority change; [evidence](../../../artifacts/workstreams/W8/takeover/20260930/metrics-phone-overflow.json).
 
-
 **Current native/WAL custody:** [Actual launches](../../../artifacts/workstreams/W8/takeover/20260930/native-launched/receipt.json) reserve only fresh W8 simulator27D0D594-A376-425D-966F-914ED2D3A4A0 and Android CreatorPlatform_W8_Resume_20260930/console5568/ADBdevice5569/server5048/network-instance8 command. iOS public Light/Night pixels and existing author-label flow pass; private/authenticated/native system interactions remain open, and the exact existing selector proposal awaits human exception. Android boot/install/Help render is blocked by system ANR; no ready acceptance. f64f165 local API runs the existing non-owner15-second WAL observer and supervisor UI with archiving off; keys/SQL/jobs preserved.0059 recording and0047 media sources are reserved/unapplied, requiring actual held private-purpose/retention/purge/signing composition. No peer message, checkout/device/engine, test/golden or provider change.
-
 
 **Launched-app merge gate:** the human renewed continuation and requires actual browser/app/emulator/simulator end-to-end acceptance. Existing required checks remain preserved; compilation/unit passes alone do not establish readiness. The [open-PR observation](../../../artifacts/workstreams/W8/takeover/20260930/open-pr-readiness.json) establishes no merge-ready PR.
 

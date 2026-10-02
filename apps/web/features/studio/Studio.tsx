@@ -36,6 +36,11 @@ import type {
 } from "../../../../packages/api/src/content";
 import { SignedActReview } from "../identity/signing";
 import { CreatorVoiceRecording } from "../media/VoiceRecorder";
+import { VoicePlayer } from "../media/VoicePlayer";
+import {
+  ConversationMessageSchema,
+  type ConversationMessage,
+} from "../../../../packages/api/src/conversation/contracts";
 import { PhotoAttachment } from "./PhotoAttachment";
 import { PostVoiceAttachment } from "./PostVoiceAttachment";
 import { ApprovedReply } from "./ApprovedReply";
@@ -1912,10 +1917,7 @@ function PacketDetail({ creator, id }: { creator: Creator; id: string }) {
     [command, setCommand] = useState<SignedActCommand | null>(null),
     [proposedMode, setProposedMode] = useState(""),
     [approveDraft, setApproveDraft] = useState(false),
-    [deliveries, setDeliveries] = useState<
-      | { id: string; text: string; authorKind: string; signedActId?: string }[]
-      | null
-    >(null),
+    [deliveries, setDeliveries] = useState<ConversationMessage[] | null>(null),
     action = useAction();
   const router = useRouter(),
     edited = useRef(false);
@@ -2203,12 +2205,19 @@ function PacketDetail({ creator, id }: { creator: Creator; id: string }) {
             </details>
             <div className="w5-card">
               {detail.commitment &&
+                ["written_reply", "voice_note"].includes(
+                  detail.packet.snapshot.mode,
+                ) &&
                 ["due", "in_progress"].includes(detail.commitment.state) && (
                   <>
-                    <h2>Fulfill with a delivered reply</h2>
+                    <h2>
+                      {detail.packet.snapshot.mode === "voice_note"
+                        ? "Fulfill with a delivered recording"
+                        : "Fulfill with a delivered reply"}
+                    </h2>
                     <p>
-                      W4 checks the exact signed message, promised mode and
-                      current commitment before recording delivery.
+                      Choose your signed reply or recording for this request. It
+                      must match the promised service.
                     </p>
                     <button
                       className="qv-btn qv-btn--secondary"
@@ -2216,12 +2225,16 @@ function PacketDetail({ creator, id }: { creator: Creator; id: string }) {
                       onClick={() =>
                         void action.run(async () => {
                           const result = await studioRequest<{
-                            items: typeof deliveries;
+                            items: unknown;
                           }>(
                             "studio",
                             `${creator.id}/packets/${id}/deliveries`,
                           );
-                          setDeliveries(result.items);
+                          setDeliveries(
+                            ConversationMessageSchema.array()
+                              .max(100)
+                              .parse(result.items),
+                          );
                         })
                       }
                     >
@@ -2238,7 +2251,18 @@ function PacketDetail({ creator, id }: { creator: Creator; id: string }) {
                           }
                           name={creator.display_name}
                         />
-                        <p>{message.text}</p>
+                        {message.recording?.state === "available" ? (
+                          <VoicePlayer
+                            asset={message.recording.asset}
+                            creatorId={creator.id}
+                            fanId={detail.packet.fan_id}
+                            creatorName={creator.display_name}
+                            time={message.createdAt}
+                            expectedAccountId={creator.viewerAccountId}
+                          />
+                        ) : (
+                          <p>{message.text}</p>
+                        )}
                         <button
                           className="qv-btn qv-btn--secondary"
                           disabled={action.busy}
@@ -2259,14 +2283,17 @@ function PacketDetail({ creator, id }: { creator: Creator; id: string }) {
                             })
                           }
                         >
-                          Use this delivered reply
+                          {detail.packet.snapshot.mode === "voice_note"
+                            ? "Use this delivered recording"
+                            : "Use this delivered reply"}
                         </button>
                       </article>
                     ))}
                     {deliveries?.length === 0 && (
                       <p>
-                        No signed delivered reply is available. Send your
-                        personal reply in the audited thread first.
+                        {detail.packet.snapshot.mode === "voice_note"
+                          ? "No current signed recording is available. Deliver your personal recording in the audited thread first."
+                          : "No signed delivered reply is available. Send your personal reply in the audited thread first."}
                       </p>
                     )}
                   </>
