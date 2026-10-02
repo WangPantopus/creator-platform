@@ -64,7 +64,7 @@ class GrowthMessagingService : FirebaseMessagingService() {
     override fun onRegistered(installationId: String) { GrowthPush.registered(this, installationId) }
     @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
     override fun onNewToken(token: String) { GrowthPush.refresh(this) }
-    override fun onMessageReceived(message: RemoteMessage) { GrowthPush.received(this, message.data["notificationId"]) }
+    override fun onMessageReceived(message: RemoteMessage) { GrowthPush.received(this, message.data["notificationId"], message.priority == RemoteMessage.PRIORITY_HIGH) }
 }
 
 object GrowthPush {
@@ -141,6 +141,8 @@ object GrowthPush {
     fun clearSession(context: Context, captured: String?) {
         generation++; lastSession = null; lastPermission = null; retryAfter = 0; pending = false; failed = false
         context.getSystemService(NotificationManager::class.java).cancelAll()
+        // Scheduling failure must never prevent W1 from erasing credentials.
+        if (captured != null) runCatching { GrowthNotificationWorker.cancelSession(context, sessionDigest(captured)) }
         if (!configured || captured == null || credential(context) != captured) return
         val order = runCatching { GrowthPushInstallation(context).next() }.getOrNull() ?: return
         scope.launch {
@@ -163,39 +165,49 @@ object GrowthPush {
         client.request("notifications/$id/read", "PUT", org.json.JSONObject(), captured)
         return destination
     }
-    fun received(context: Context, id: String?) {
-        if (!configured || id == null || !runCatching { UUID.fromString(id) }.isSuccess) return
+    private fun sessionDigest(value: String): String = java.security.MessageDigest.getInstance("SHA-256").digest(value.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }
+    fun received(context: Context, id: String?, highPriority: Boolean) {
+        if (!configured || id == null || !Regex("[a-fA-F0-9]{8}(?:-[a-fA-F0-9]{4}){3}-[a-fA-F0-9]{12}").matches(id) || !permitted(context)) return
+        val captured = credential(context) ?: return
+        // Enqueue within Firebase's callback. No credentials, payload content or
+        // payload destinations enter WorkManager's persistent input.
+        runCatching { GrowthNotificationWorker.enqueue(context, id, sessionDigest(captured), highPriority) }
+    }
+    internal suspend fun deliver(context: Context, id: String, binding: String, receivedAt: Long): Boolean = withContext(Dispatchers.Main.immediate) {
         val app = context.applicationContext
-        scope.launch {
-            val captured = credential(app) ?: return@launch
-            val current = generation
-            if (!permitted(app)) return@launch
-            try {
-                val client = GrowthClient(BuildConfig.CREATOR_API_URL) { credential(app) }
-                val item = client.request("notifications/$id", expectedSession = captured)
-                val preferences = client.request("preferences", expectedSession = captured)
-                val disabled = preferences.getJSONArray("disabledPushTypes")
-                val muted = preferences.getJSONArray("mutedCreators")
-                val now = java.time.ZonedDateTime.now(java.time.ZoneId.of(preferences.getString("timeZone")))
-                val minute = now.hour * 60 + now.minute
-                val quiet = if (preferences.isNull("quietStart") || preferences.isNull("quietEnd")) false else {
-                    val start = preferences.getInt("quietStart"); val end = preferences.getInt("quietEnd")
-                    if (start == end) true else if (start < end) minute in start until end else minute >= start || minute < end
-                }
-                if (!item.optBoolean("available", false) || !item.isNull("readAt") || quiet || !preferences.getBoolean("push") ||
-                    (!item.isNull("creatorId") && (0 until muted.length()).any { muted.getString(it) == item.getString("creatorId") }) ||
-                    (0 until disabled.length()).any { disabled.getString(it) == item.getString("type") } || current != generation || credential(app) != captured || !permitted(app)) return@launch
-                check(item.getString("id") == id)
-                val intent = Intent(app, MainActivity::class.java).setAction(TAP_ACTION).setData(Uri.fromParts("qelvora-notification", id, null)).putExtra(NOTIFICATION_ID, id)
-                val tap = PendingIntent.getActivity(app, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-                channel(app)
-                val notification = NotificationCompat.Builder(app, channelId).setSmallIcon(android.R.drawable.ic_dialog_info)
-                    .setContentTitle(item.getString("sender")).setContentText(if (preferences.getBoolean("hideSensitive")) QelvoraCopy.text("growthHiddenUpdate") else item.getString("preview"))
-                    .setContentIntent(tap).setAutoCancel(true).setVisibility(NotificationCompat.VISIBILITY_PRIVATE).build()
-                if (permitted(app)) NotificationManagerCompat.from(app).notify(id, 0, notification)
-            } catch (cancelled: CancellationException) { throw cancelled }
-            catch (_: Exception) { /* Private or withdrawn updates produce no notification. */ }
-        }
+        val captured = credential(app) ?: return@withContext false
+        val current = generation
+        fun allowed() = configured && current == generation && credential(app) == captured && sessionDigest(captured) == binding && permitted(app) && GrowthNotificationWorker.fresh(receivedAt)
+        if (!allowed()) return@withContext false
+        try {
+            val client = GrowthClient(BuildConfig.CREATOR_API_URL) { credential(app) }
+            val item = client.request("notifications/$id", expectedSession = captured)
+            val preferences = client.request("preferences", expectedSession = captured)
+            val disabled = preferences.getJSONArray("disabledPushTypes")
+            val muted = preferences.getJSONArray("mutedCreators")
+            val now = java.time.ZonedDateTime.now(java.time.ZoneId.of(preferences.getString("timeZone")))
+            val minute = now.hour * 60 + now.minute
+            val quiet = if (preferences.isNull("quietStart") || preferences.isNull("quietEnd")) false else {
+                val start = preferences.getInt("quietStart"); val end = preferences.getInt("quietEnd")
+                if (start == end) true else if (start < end) minute in start until end else minute >= start || minute < end
+            }
+            if (!item.optBoolean("available", false) || !item.isNull("readAt") || quiet || !preferences.getBoolean("push") ||
+                (!item.isNull("creatorId") && (0 until muted.length()).any { muted.getString(it) == item.getString("creatorId") }) ||
+                (0 until disabled.length()).any { disabled.getString(it) == item.getString("type") } || !allowed()) return@withContext false
+            check(item.getString("id") == id)
+            val intent = Intent(app, MainActivity::class.java).setAction(TAP_ACTION).setData(Uri.fromParts("qelvora-notification", id, null)).putExtra(NOTIFICATION_ID, id)
+            val tap = PendingIntent.getActivity(app, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            channel(app)
+            val notification = NotificationCompat.Builder(app, channelId).setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setContentTitle(item.getString("sender")).setContentText(if (preferences.getBoolean("hideSensitive")) QelvoraCopy.text("growthHiddenUpdate") else item.getString("preview"))
+                .setContentIntent(tap).setAutoCancel(true).setVisibility(NotificationCompat.VISIBILITY_PRIVATE).build()
+            currentCoroutineContext().ensureActive()
+            if (allowed()) NotificationManagerCompat.from(app).notify(id, 0, notification)
+            false
+        } catch (cancelled: CancellationException) { throw cancelled }
+        catch (failure: GrowthRequestFailure) { allowed() && (failure.status == 408 || failure.status == 429 || failure.status in 500..599) }
+        catch (_: java.io.IOException) { allowed() }
+        catch (_: Exception) { false /* Private, withdrawn or malformed updates produce no notification. */ }
     }
 }
 
