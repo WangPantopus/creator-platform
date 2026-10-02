@@ -240,6 +240,7 @@ export class TrustWorker {
       const unavailable = [
         "privacy_artifact_unconfigured",
         "privacy_commit_fence_unavailable",
+        "growth_held_authority_unavailable",
         "restoration_pending",
         "conversation_privacy_unavailable",
         "conversation_lineage_unavailable",

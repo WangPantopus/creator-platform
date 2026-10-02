@@ -28,7 +28,7 @@ export interface JournalPrivacyAuthority {
 
 // W8's final held registry allocation. The original SQL file/hash is unchanged;
 // an already applied old 0048 ledger needs separate adoption, never an alias.
-export const GENERATION_JOURNAL_MIGRATION = "0077_w2_usage_lineage";
+export const GENERATION_JOURNAL_MIGRATION = "0163_w2_usage_lineage";
 export async function generationJournalInstalled(client: PoolClient) {
   const row = (
     await client.query<{ count: string }>(

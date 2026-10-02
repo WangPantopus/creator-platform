@@ -79,23 +79,32 @@ const creatorId = process.env.W2_CREATOR_ID;
 const accountId = process.env.W2_DEVELOPMENT_ACCOUNT_ID;
 const controller = new AbortController();
 const worker = domain.ingestion;
-const timer = setInterval(() => {
-  if (creatorId && accountId)
-    void worker
-      .tick({ creatorId, accountId, development: true }, controller.signal)
-      .catch(() =>
-        process.stderr.write(
-          "W2 ingestion is unavailable; inspect scoped source state.\n",
-        ),
-      );
-}, 1000);
+// A missing provider is a startup prerequisite, not a job to retry every second.
+// The real worker still owns leases, authority, failures and provider receipts
+// once the host has both priced configuration and its fictional creator tuple.
+const timer =
+  model?.pricingConfigured && creatorId && accountId
+    ? setInterval(() => {
+        void worker
+          .tick({ creatorId, accountId, development: true }, controller.signal)
+          .catch(() =>
+            process.stderr.write(
+              "W2 ingestion is unavailable; inspect scoped source state.\n",
+            ),
+          );
+      }, 1000)
+    : undefined;
+if (!timer)
+  process.stdout.write(
+    "W2 ingestion is disabled: priced provider or fictional creator configuration is unavailable.\n",
+  );
 backend.server.listen(config.port, "127.0.0.1", () =>
   process.stdout.write(
     "W2 development API listening on loopback; external fan publication is disabled.\n",
   ),
 );
 const stop = () => {
-  clearInterval(timer);
+  if (timer) clearInterval(timer);
   controller.abort();
   conversations?.close();
   void backend.close().then(() => process.exit(0));
