@@ -886,4 +886,8 @@
   <string name="growth_error_quiet_hours_pair" formatted="false">Both quiet-hour boundaries are required</string>
   <string name="growth_error_time_zone" formatted="false">Choose a valid time zone, such as America/Los_Angeles.</string>
   <string name="growth_error_quiet_hours_format" formatted="false">Enter a time in HH:mm, from 00:00 to 23:59.</string>
+  <string name="account_unavailable_title" formatted="false">We can\'t reach your account right now</string>
+  <string name="account_unavailable_body" formatted="false">Your session is kept on this device. Try again in a moment.</string>
+  <string name="page_unavailable_title" formatted="false">This page didn\'t load</string>
+  <string name="page_unavailable_body" formatted="false">Nothing you saved was changed. Try again in a moment.</string>
 </resources>

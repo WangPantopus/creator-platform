@@ -9,7 +9,8 @@
     "Android saved-off caption remains off during unsaved on toggle, and becomes on only after Save",
     "Android saved-on caption remains on during unsaved off toggle, and becomes off only after Save",
     "Android on/off saves preserve exact original future pending activation and7USD current cap",
-    "Android force-stop/cold Night return preserves saved off caption,7USD cap and original pending activation"
+    "Android force-stop/cold Night return preserves saved off caption,7USD cap and original pending activation",
+    "Current main composition at 2f7141b1: personally reloaded the real web page and saved unchanged pending No limit; original Oct 2 23:44 local activation, 7 USD current cap and reminders off remain visible"
   ],
   "source": [
     "Preserve same pending value deadline in serialized setLimit UPDATE",
@@ -35,6 +36,11 @@
     {
       "path": "android-cold-return-off-night.png",
       "sha256": "0db8ed402a03c4fdad13b04808f3b23fc57a9aaf421ad129237cbc68cbefc817"
+    },
+    {
+      "path": "web-current-main-unchanged-save-night.png",
+      "sha256": "e665daf79f9e9fa39eb578dd0d9c0c1ec32ff8231b61f6459ad9e39c4f026d9d"
     }
-  ]
+  ],
+  "integrationRepeatAt": "2026-10-02T09:32:14.565Z"
 }
