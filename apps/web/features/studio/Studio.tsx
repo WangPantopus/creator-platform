@@ -593,6 +593,7 @@ export function Studio({
           <button
             ref={reconnectButton}
             type="button"
+            className="qv-btn qv-btn--secondary"
             aria-busy={loading}
             onClick={() => void refresh()}
           >
