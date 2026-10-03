@@ -4,6 +4,12 @@ October 2 successor reconciliation: PR21 now incorporates current main `af38420d
 
 October 2 focused main increment: actual Ops/Account/Status return handling and truthful no-fan Account are implemented and personally browser-operated at cac6be9c on an independently restored, labelled canonical57 development copy. Same actual expired session rotates and returns to audits; Ops denies without membership. Original W1 remains closed. Production build/types/canonical generation/scoped checks pass; native/full workstream acceptance remains open. [Exact bounded evidence](../../../artifacts/workstreams/W1/resume/2026-10-02-ops-return/run.md).
 
+## October 1 — native origin validation and build configuration source
+
+Application `73c9983e` validates complete release HTTPS/debug loopback API origins and rejects app-link ports. Canonical iOS project source now supplies empty-default API/link-host build settings to the keys read by the app; generated plist is untouched and still needs XcodeGen/build validation. Swift syntax/YAML/diff checks pass only. [Exact source and outstanding acceptance](../../../artifacts/workstreams/W1/resume/2026-10-01-native-uri/run.md). No external identity, association, provider or readiness is created; original references/API/generator inputs/authority remain unchanged.
+
+Current native type/build/project-generation/configuration/rename/app/CI acceptance remains open under cleanup. The native foundation guide now reflects actual shipping feature registrations and dates its original `5e104cd` supporting results. Credential issuer/origin isolation remains a separate source review: current namespaces use bundle/package identity with configurable client origins. All seven original groups/H01–H20 remain active, and the resource-resumption question is still pending.
+
 ## October 1 — native storage and private cleanup source
 
 Application `1e390c6e` personally repairs unchecked Keychain deletion/replacement and native cleanup failure paths. All feature credential clients share a process fence; private screens close before credential/W3 cleanup, failures remain visible with Retry, and another account cannot install until cleanup succeeds. Swift rotation requires the same stored credential; Android cleanup survives cancellation. Four canonical copy keys are generated with every prior value unchanged. Existing source checks pass for 12 resources/98 operations; all 110 iOS references match the parent. [Exact source review and limits](../../../artifacts/workstreams/W1/resume/2026-10-01-native-storage/run.md).

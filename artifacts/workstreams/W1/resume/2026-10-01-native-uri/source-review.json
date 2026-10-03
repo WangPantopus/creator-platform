@@ -1,0 +1,48 @@
+{
+  "applicationRevision": "73c9983e800569f280e03c4c0c1ed9523571a2db",
+  "parentRevision": "84968320a2fd5609b8d9b02589baeb80de02f6f4",
+  "mainSnapshot": "c1c615e6ece53bff4bc6a47d7f4d332757df1295",
+  "sourceFiles": {
+    "apps/android/app/src/main/java/com/pantopus/qelvora/MainActivity.kt": "216218b8912aa211544a43fe5bfa9b6f4bc2056f416853d733396f74b6d1b07a",
+    "apps/ios/App/QelvoraApp.swift": "6bc48e57192c2f6dfbeaf4c45e1dd4a49403e4ca137be6f4e0e27f4284ad7841",
+    "apps/ios/Sources/QelvoraUI/FanShell.swift": "1557a7e317f1943ef27036ff1e2729c45d025329e0c0c82ae7ce0a6a799a4795",
+    "apps/ios/project.yml": "74cd4ab1ff2b5085b38bcd1574266f2d7249ae799074c51cd2e71efba30b3239"
+  },
+  "swiftSyntaxOnly": {
+    "compiler": "Apple Swift6.3.2, x86_64-apple-macosx26.0",
+    "arguments": [
+      "-frontend",
+      "-parse",
+      "apps/ios/App/QelvoraApp.swift",
+      "apps/ios/Sources/QelvoraUI/FanShell.swift"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": "",
+    "typeChecking": false
+  },
+  "yamlSyntax": {
+    "tool": "system Ruby YAML.safe_load",
+    "file": "apps/ios/project.yml",
+    "exitCode": 0,
+    "defaultApiOrigin": "",
+    "defaultLinkHost": ""
+  },
+  "generatedPlist": "unchanged; XcodeGen generation not run under cleanup restriction",
+  "apiAndSharedInputsChanged": false,
+  "previousCanonicalCheckApplication": "1a722a8b8c37bcd9c0d1ced3aa0c5b75b710b2b5",
+  "currentConsumerBuilds": "not run",
+  "actualAppOrConfiguredOriginAcceptance": "not run",
+  "approvedExternalOriginsOrAssociationsInvented": false,
+  "testsReferenceAssertionsDependenciesMigrationsChanged": false,
+  "localRuntimeResourcesRecreated": false,
+  "CodeReviewCI": {
+    "tool": "mcp__code_review__pull_requests_checks",
+    "pullRequest": "https://github.com/WangPantopus/creator-platform/pull/49",
+    "isError": true,
+    "message": "Connect your GitHub account to continue",
+    "headRevisionReturned": null,
+    "accountReturned": null,
+    "passesClaimed": false
+  }
+}
