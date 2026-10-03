@@ -593,6 +593,7 @@ export function Studio({
           <button
             ref={reconnectButton}
             type="button"
+            className="qv-btn qv-btn--secondary"
             aria-busy={loading}
             onClick={() => void refresh()}
           >
@@ -665,7 +666,7 @@ export function Studio({
           ) : current === "publish" ? (
             <Library creator={creator} />
           ) : current === "team" ? (
-            <Team creator={creator} />
+            <Team creator={creator} suspended={suspended} />
           ) : current === "threads" ? (
             <Threads creator={creator} fanId={screen[1]} />
           ) : current === "thanks" ? (
@@ -3087,7 +3088,13 @@ function Library({ creator }: { creator: Creator }) {
     </section>
   );
 }
-function Team({ creator }: { creator: Creator }) {
+function Team({
+  creator,
+  suspended,
+}: {
+  creator: Creator;
+  suspended: boolean;
+}) {
   const [members, setMembers] = useState<
       {
         account_id: string;
@@ -3109,20 +3116,118 @@ function Team({ creator }: { creator: Creator }) {
       }[]
     >([]),
     [roles, setRoles] = useState<string[]>([]),
+    [teamCurrent, setTeamCurrent] = useState(false),
+    [reading, setReading] = useState(false),
+    [readError, setReadError] = useState(""),
     action = useAction();
+  const mounted = useRef(false),
+    previousFocus = useRef<HTMLElement | null>(null),
+    generation = useRef(0),
+    checkedUntil = useRef(0),
+    request = useRef<AbortController | null>(null);
   const load = useCallback(async () => {
-    const result = await studioRequest<{
-      members: typeof members;
-      invitations: typeof pendingInvites;
-    }>("studio", `${creator.id}/team`);
-    setMembers(result.members);
-    setPendingInvites(result.invitations);
-  }, [creator.id]);
+    if (!mounted.current || document.hidden || request.current) return;
+    const controller = new AbortController(),
+      current = generation.current,
+      started = performance.now();
+    request.current = controller;
+    setReading(true);
+    try {
+      const result = await studioRequest<{
+        members: typeof members;
+        invitations: typeof pendingInvites;
+      }>("studio", `${creator.id}/team`, undefined, creator.viewerAccountId, {
+        signal: AbortSignal.any([controller.signal, AbortSignal.timeout(4000)]),
+      });
+      if (!mounted.current || current !== generation.current) return;
+      if (document.hidden || performance.now() >= started + 5000)
+        throw new StudioFailure(
+          503,
+          "authority_expired",
+          "Check the current team again before continuing.",
+        );
+      setMembers(result.members);
+      setPendingInvites(result.invitations);
+      checkedUntil.current = started + 5000;
+      setTeamCurrent(true);
+      setReadError("");
+    } catch (failure) {
+      if (!mounted.current || current !== generation.current) return;
+      checkedUntil.current = 0;
+      setTeamCurrent(false);
+      setMembers([]);
+      setPendingInvites([]);
+      setReadError(
+        failure instanceof Error ? failure.message : "Team is unavailable.",
+      );
+    } finally {
+      if (request.current === controller) request.current = null;
+      if (mounted.current && current === generation.current) setReading(false);
+    }
+  }, [creator.id, creator.viewerAccountId]);
   useEffect(() => {
-    void action.run(load);
+    mounted.current = true;
+    const refresh = () => void load(),
+      conceal = () => {
+        generation.current++;
+        request.current?.abort();
+        request.current = null;
+        checkedUntil.current = 0;
+        setReading(false);
+        setTeamCurrent(false);
+        setMembers([]);
+        setPendingInvites([]);
+      },
+      visibility = () => {
+        if (document.hidden) conceal();
+        else refresh();
+      };
+    refresh();
+    const polling = setInterval(refresh, 4000),
+      expiry = setInterval(() => {
+        if (performance.now() >= checkedUntil.current) setTeamCurrent(false);
+      }, 250);
+    window.addEventListener("focus", refresh);
+    window.addEventListener("pageshow", refresh);
+    document.addEventListener("visibilitychange", visibility);
+    return () => {
+      mounted.current = false;
+      generation.current++;
+      request.current?.abort();
+      request.current = null;
+      checkedUntil.current = 0;
+      clearInterval(polling);
+      clearInterval(expiry);
+      window.removeEventListener("focus", refresh);
+      window.removeEventListener("pageshow", refresh);
+      document.removeEventListener("visibilitychange", visibility);
+    };
   }, [load]);
-  const { request: identityRequest } = useIdentityRequest();
+  useEffect(() => {
+    if (
+      teamCurrent &&
+      !suspended &&
+      !document.hidden &&
+      previousFocus.current?.isConnected
+    )
+      previousFocus.current.focus();
+  }, [teamCurrent, suspended]);
+  const { request: identityRequest, session } = useIdentityRequest();
+  const requireManagement = () => {
+    if (
+      !creator.owned ||
+      session.accountId !== creator.viewerAccountId ||
+      document.hidden ||
+      performance.now() >= checkedUntil.current
+    )
+      throw new StudioFailure(
+        403,
+        "current_creator_required",
+        "Check your current creator access before managing the team.",
+      );
+  };
   const identity = async (path: string, body: unknown) => {
+    requireManagement();
     const response = await identityRequest(path, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -3139,19 +3244,41 @@ function Team({ creator }: { creator: Creator }) {
     <section className="w5-team">
       <header className="w5-heading">
         <h1>Team</h1>
+        <button
+          type="button"
+          className="qv-btn qv-btn--secondary"
+          disabled={reading || action.busy}
+          aria-busy={reading}
+          onClick={() => void load()}
+        >
+          {reading ? "Checking team…" : "Refresh team"}
+        </button>
       </header>
       <Feedback action={action} />
-      <div className="w5-team-columns">
+      {!teamCurrent && (
+        <Notice tone={readError ? "offline" : "neutral"} title="Current team">
+          {readError || "Checking current members and invitations."}
+          {creator.owned && " Your invitation input is kept in this tab."}
+        </Notice>
+      )}
+      <div
+        className="w5-team-columns"
+        hidden={!teamCurrent}
+        inert={!teamCurrent}
+        onFocusCapture={(event) => {
+          if (teamCurrent && !suspended) previousFocus.current = event.target;
+        }}
+      >
         <div className="w5-card">
           <h2>Roles</h2>
           {members.map((m) => (
             <div className="w5-team-member" key={m.account_id}>
               <strong>{m.handle ? `@${m.handle}` : m.account_id}</strong>
               <p>{m.revoked_at ? "Removed" : m.roles.join(" · ")}</p>
-              {!m.revoked_at && (
+              {creator.owned && !m.revoked_at && (
                 <button
                   className="qv-btn qv-btn--quiet"
-                  disabled={action.busy}
+                  disabled={action.busy || reading}
                   onClick={() =>
                     void action.run(async () => {
                       await identity(
@@ -3181,84 +3308,108 @@ function Team({ creator }: { creator: Creator }) {
                     : "Expired"}{" "}
                   {time(i.expires_at)}
                 </p>
-                <button
-                  disabled={action.busy}
-                  onClick={() =>
-                    void action.run(async () => {
-                      await identity(
-                        `${creator.id}/team/${i.account_id}/remove`,
-                        {},
-                      );
-                      await load();
-                    })
-                  }
-                >
-                  Remove invitation
-                </button>
+                {creator.owned && (
+                  <button
+                    className="qv-btn qv-btn--quiet"
+                    disabled={action.busy || reading}
+                    onClick={() =>
+                      void action.run(async () => {
+                        await identity(
+                          `${creator.id}/team/${i.account_id}/remove`,
+                          {},
+                        );
+                        await load();
+                      })
+                    }
+                  >
+                    Remove invitation
+                  </button>
+                )}
               </article>
             ))}
-          <label className="w5-field">
-            Public fan handle
-            <input
-              value={account}
-              onChange={(e) => setAccount(e.target.value)}
-            />
-          </label>
-          {[
-            [
-              "triage",
-              "Triage",
-              "Reads and routes the queue. Replies as team.",
-            ],
-            ["drafter", "Drafting", "Prepares drafts. Never approves as you."],
-            [
-              "publisher",
-              "Publishing",
-              "Publishes content under team identity.",
-            ],
-            ["scheduler", "Scheduling", "Offers times from your hours."],
-          ].map(([role, label, description]) => (
-            <label className="w5-check" key={role}>
-              <input
-                type="checkbox"
-                checked={roles.includes(role!)}
-                onChange={(e) =>
-                  setRoles(
-                    e.target.checked
-                      ? [...roles, role!]
-                      : roles.filter((r) => r !== role),
-                  )
+          {!members.length &&
+            !pendingInvites.some((i) => !i.accepted_at && !i.revoked_at) && (
+              <p className="qv-help">No team members or pending invitations.</p>
+            )}
+          {creator.owned && (
+            <fieldset className="w5-team-invite" disabled={action.busy}>
+              <legend>Invite a team member</legend>
+              <label className="w5-field">
+                Public fan handle
+                <input
+                  value={account}
+                  onChange={(e) => setAccount(e.target.value)}
+                />
+              </label>
+              {[
+                [
+                  "triage",
+                  "Triage",
+                  "Reads and routes the queue. Replies as team.",
+                ],
+                [
+                  "drafter",
+                  "Drafting",
+                  "Prepares drafts. Never approves as you.",
+                ],
+                [
+                  "publisher",
+                  "Publishing",
+                  "Publishes content under team identity.",
+                ],
+                ["scheduler", "Scheduling", "Offers times from your hours."],
+              ].map(([role, label, description]) => (
+                <label className="w5-check" key={role}>
+                  <input
+                    type="checkbox"
+                    checked={roles.includes(role!)}
+                    onChange={(e) =>
+                      setRoles(
+                        e.target.checked
+                          ? [...roles, role!]
+                          : roles.filter((r) => r !== role),
+                      )
+                    }
+                  />
+                  <span>
+                    <strong>{label}</strong>
+                    <span className="qv-help">{description}</span>
+                  </span>
+                </label>
+              ))}
+              <button
+                className="qv-btn qv-btn--secondary"
+                disabled={action.busy || !account || !roles.length}
+                onClick={() =>
+                  void action.run(async () => {
+                    requireManagement();
+                    await studioRequest(
+                      "studio",
+                      `${creator.id}/team/invite`,
+                      {
+                        handle: account,
+                        roles,
+                      },
+                      creator.viewerAccountId,
+                    );
+                    action.setNotice(
+                      "Invitation created. Roles take effect only after the invited account accepts.",
+                    );
+                    setAccount("");
+                    setRoles([]);
+                    await load();
+                  })
                 }
-              />
-              <span>
-                <strong>{label}</strong>
-                <span className="qv-help">{description}</span>
-              </span>
-            </label>
-          ))}
-          <button
-            className="qv-btn qv-btn--secondary"
-            disabled={action.busy || !account || !roles.length}
-            onClick={() =>
-              void action.run(async () => {
-                await studioRequest(
-                  "studio",
-                  `${creator.id}/team/invite`,
-                  {
-                    handle: account,
-                    roles,
-                  },
-                  creator.viewerAccountId,
-                );
-                action.setNotice(
-                  "Invitation created. The invited account must accept it; no role is granted yet.",
-                );
-                await load();
-              })
-            }
-          >
-            Create invitation
-          </button>
+              >
+                Create invitation
+              </button>
+            </fieldset>
+          )}
+          {!creator.owned && (
+            <p className="qv-help">
+              Only the creator can invite members or remove access.
+            </p>
+          )}
         </div>
         <div className="w5-editor qv-on-maya">
           <h2>Only you</h2>
@@ -3269,7 +3420,9 @@ function Team({ creator }: { creator: Creator }) {
             Team words always carry the team label. Team replies never fulfill a
             personal commitment.
           </p>
-          <Link href="/identity/account">Verification and account</Link>
+          <Link className="qv-btn qv-btn--quiet" href="/identity/account">
+            Verification and account
+          </Link>
         </div>
       </div>
     </section>
@@ -3335,7 +3488,7 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
     threadMounted = useRef(false),
     threadGeneration = useRef(0),
     threadCheckedAt = useRef(0),
-    directoryPages = useRef(1),
+    directoryCursors = useRef<(string | null)[]>([null]),
     pendingTeam = useRef<typeof teamPending>(null);
   const teamStorage = `w5.team-reply:${creator.viewerAccountId}:${creator.id}:${fanId}`;
   const rememberTeam = useCallback(
@@ -3396,38 +3549,21 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
           setText(draft.text);
         }
       } else {
-        let value = await studioRequest<NonNullable<typeof entries>>(
+        const cursor = directoryCursors.current.at(-1);
+        const value = await studioRequest<NonNullable<typeof entries>>(
           "studio",
-          `${creator.id}/threads`,
+          `${creator.id}/threads${cursor ? `?${new URLSearchParams({ cursor })}` : ""}`,
           undefined,
           creator.viewerAccountId,
         );
-        let loadedPages = 1;
-        // Rebuild every displayed page from current audited authority. A poll
-        // must neither discard later pages nor retain unchecked private rows.
-        while (value.nextCursor && loadedPages < directoryPages.current) {
-          const next = await studioRequest<NonNullable<typeof entries>>(
-            "studio",
-            `${creator.id}/threads?cursor=${encodeURIComponent(value.nextCursor)}`,
-            undefined,
-            creator.viewerAccountId,
-          );
-          value = {
-            items: [...value.items, ...next.items].filter(
-              (entry, index, all) =>
-                all.findIndex((other) => other.fanId === entry.fanId) === index,
-            ),
-            nextCursor: next.nextCursor,
-          };
-          loadedPages++;
-        }
+        // Refresh one visible bounded page. Earlier private rows are discarded;
+        // retaining only their opaque cursors avoids cumulative lease expiry.
         if (!threadMounted.current || generation !== threadGeneration.current)
           return;
-        directoryPages.current = loadedPages;
         setEntries(value);
       }
       threadCheckedAt.current = started;
-      setThreadCurrent(performance.now() - started < 5000);
+      setThreadCurrent(!document.hidden && performance.now() - started < 5000);
     } catch (error) {
       if (threadMounted.current && generation === threadGeneration.current) {
         setThreadCurrent(false);
@@ -3471,19 +3607,29 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
       /* Corrupt metadata cannot select an actor or invent a receipt. */
     }
     void action.run(load);
-    const refresh = () => void action.run(load),
+    const refresh = () => {
+        if (!document.hidden) void action.run(load);
+      },
+      visibility = () => {
+        if (document.hidden) {
+          threadGeneration.current++;
+          setThreadCurrent(false);
+        } else refresh();
+      },
       polling = setInterval(refresh, 4000),
       expiry = setInterval(() => {
         if (performance.now() - threadCheckedAt.current >= 5000)
           setThreadCurrent(false);
       }, 500);
     window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", visibility);
     return () => {
       threadMounted.current = false;
       threadGeneration.current++;
       clearInterval(polling);
       clearInterval(expiry);
       window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", visibility);
     };
   }, [load, teamStorage, rememberTeam]);
   const sendTeam = async () => {
@@ -3567,6 +3713,13 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
     <section className="w5-threads">
       <header className="w5-heading">
         <h1>Threads</h1>
+        <button
+          className="qv-link-btn"
+          disabled={action.busy}
+          onClick={() => void action.run(load)}
+        >
+          Refresh conversations
+        </button>
       </header>
       <div className="w5-gutter">
         <AuditBanner />
@@ -3626,20 +3779,43 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
                   body="Current conversations will appear when fans reply to Notes or send requests."
                 />
               )}
-              {entries?.nextCursor && directoryPages.current < 50 && (
-                <button
-                  className="qv-btn qv-btn--secondary"
-                  disabled={action.busy}
-                  onClick={() =>
-                    void action.run(async () => {
-                      directoryPages.current++;
-                      await load();
-                    })
-                  }
-                >
-                  Load more conversations
-                </button>
-              )}
+              <div className="w5-actions">
+                {directoryCursors.current.length > 1 && (
+                  <button
+                    className="qv-btn qv-btn--secondary"
+                    disabled={action.busy}
+                    onClick={() =>
+                      void action.run(async () => {
+                        threadGeneration.current++;
+                        setThreadCurrent(false);
+                        setEntries(null);
+                        directoryCursors.current.pop();
+                        await load();
+                      })
+                    }
+                  >
+                    Previous conversations
+                  </button>
+                )}
+                {entries?.nextCursor && (
+                  <button
+                    className="qv-btn qv-btn--secondary"
+                    disabled={action.busy}
+                    onClick={() =>
+                      void action.run(async () => {
+                        if (!entries.nextCursor) return;
+                        threadGeneration.current++;
+                        setThreadCurrent(false);
+                        directoryCursors.current.push(entries.nextCursor);
+                        setEntries(null);
+                        await load();
+                      })
+                    }
+                  >
+                    Next conversations
+                  </button>
+                )}
+              </div>
             </>
           ) : (
             data && (

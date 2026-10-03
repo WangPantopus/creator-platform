@@ -1,5 +1,9 @@
 # W8 contract, migration and runtime register
 
+## Fixed publication output and minimum — 2026-10-03
+
+[Held0220 and refined0219](W8-next-allocations.md) record W3's exact proposed fixed system-link writer/proof and W4's original immutable minimum. The W3 writer takes actual nonce/token/publication/existing thread and returns genuine message/event/cursor/epoch for fixed sequence0 “Answered publicly.” Its six-UUID private matcher verifies actual issuance for isolated W4 without broadening message/event SELECT. W3 creates its actual own role and consumes only the fixed0219 one-recipient/family ports; W4 must not invent it for qualification. Actual recipients metadata/receipt now include original minimum_recipients/minimumRecipients; an explicit approved2–100 minimum must match that header. Source/definitions/typed original callers/complete combined catalogue and real output/cleanup/privacy/application qualification remain pending. Active61/frozen47 remain unchanged; these contracts issue no receipts, provider permission or activation.
+
 ## Discovery transport uncertainty — 2026-10-03
 
 The cancellation control uses the same actual configured runtime connection options,1500ms client/server/connect bounds and non-pipelined close. Source/control errors are retained privately. Uncertain cancellation closes the original session without later SQL, then discards it; safe cancellation still awaits original rollback. Bounded privacy_family_cancel_unavailable/privacy_family_rollback_unavailable codes remain retryable and survive worker reporting. [Actual transport-stall and rollback-failure qualifications](../../operations/W8-privacy-family-cancellation.md) use real original tasks on separate labelled copies and preserve original custody. They issue no family authority, receipt or application acceptance.
@@ -56,13 +60,11 @@ PR151 merged12ea10a6, exacthead91dcd4c6 after actual three-client cursor accepta
 
 PR159 remains the sole four-source57→61 activation continuation:0074/0082/0087/0103 exact original source bytes, closed atomic rollout with private fresh backup and independently executed separate six-hash restore. W1's reviewed early core-role preflight is included. Forty-seven prior held entries keep the exact frozen map; additional0198–0207 are held allocations/source dependencies only. The focused wave keeps main's uncomposed Growth refusal; reviewed W7 source integration is a separate increment. No all-eight C10, erasure, original recovery, provider or release completion is implied. Current W8 devices/services stopped; private data preserved.
 
-
 ## Corrected held dependency ordering and actual owner integration — 2026-10-02
 
 Focused draftPR159 publishes the closed four-source continuation; its original6771bfed future held map is superseded. W1 caught that moving only63–102 left dependent translation/terminal/Agent consumers before their producers. All47 held slots are now0151–0197, metadata only: original83→0168,111→0194,112→0195,113→0196;99→0183,100→0184,105→0188,106→0189; late subject108→0190 thennegative109→0191 thenfinancial107→0192. Actual map `infra/migrations/waves/20261002-privacy-held.json` SHA256 **2338f48ea4b1008f47eef43ff7a835021e5e917669ad44f21179c69d03227c0a** is authoritative. SQL files/bytes, canonical57 and selected74/82/87/103 are unchanged; unknown further DDL dependencies require review before any future wave. No fabricated ledger aliases.
 
 Combined integration source2423dd12 contains actual mergedW2 Agent166d9ee6 and personally reviewedW7 Growthb7d21b0c. [Exact source review](https://github.com/WangPantopus/creator-platform/blob/2423dd12/artifacts/workstreams/W8/privacy-domain-integration/20261002-mac-studio/README.md) verifies actual same-client restoration/task bookends, one fixed-source cursor and separate COMMIT; types/scopedlint pass. W1 server.ts remains untouched. W8 managed Growth key/worker URL are absent; no peer credentials or synthetic provider receipts were borrowed. Real composed61 web/Android/iOS/task/expiry/physical effects and fullC10/recovery/release remain pending. All own resources are stopped with private checkpoints retained. Continue actual Trust/owner acceptance and collect independent owner fresh/preserved-upgrade reviews.
-
 
 ## Closed privacy continuation — 2026-10-02
 
@@ -70,12 +72,9 @@ Combined integration source2423dd12 contains actual mergedW2 Agent166d9ee6 and p
 
 Draft metadata-only held map moves36 lower unready reservations to0114–0149, preserves SQL paths/bytes/history and leaves0111–0113 unchanged.0150 is W6 distinct current-account single-call metadata discovery, source/issuance/current booking/negative custody pending. Next: consume actual merged W2 Agent correction and W7 Growth owner; operate a separate labelled development copy through all three clients and independently inspect genuine task/COMMIT/refusals; obtain owner fresh/preserved-upgrade reviews before finalizing. No new unit tests or paid calls. Own API/web/devices/build slots and database container are stopped; private closed61 checkpoint/volumes retained.
 
-
 Held metadata only:0083 carries W3 actual immutable translation job/consumer;0111 W1 private translation issuer and0112 W8 original-participant negatives await its exact source/currentness/policy.0113 is W2's separate NoLogin all-owned Agent export snapshot with its own scope and genuine job/token/XID/PID/immutable ownership; it must not widen0087 private scope ACL or isolated owner. Actual Agent empty fan/thread preflight also needs0087 same-client lifecycle/restoration before locks and COMMIT. W2 is adding this owner port. No registry activation, fabricated Actor/provenance/policy or complete C10 is authorized by these allocations.
 
-
 Reserved0103 source exports `domainPrivacyTaskAuthorityInTransaction(client, actualJob, domain, assertRestoredInTransaction)`; [exact dedicated owner/caller/currentness contract](../../operations/W8-domain-privacy-fence.md). Actual Trust/Growth worker roles are domain-bound, metadata/scope are private, the real signal and held restoration are mandatory and COMMIT is separately fenced.0087 is unchanged. W7 owns the one-cursor/read-committed consistent export and delete seam; outer pool verification does not satisfy this port. Actual activation and leased task/COMMIT/app/purge acceptance remain open.
-
 
 Current held recovery correctionc3576b61: `assertScopeAllowedInTransaction`, `assertAudienceAllowed` and `assertCreatorAllowedInTransaction` always require `assertRestoredInTransaction` on their exact supplied client; omitted ports deny503. General pool recovery cannot substitute.
 
@@ -101,21 +100,17 @@ Reserved0084 is the separate real Team-triage candidate negative check used by `
 
 Additional allocation custody (not activation):0082 interactive tries;0083 W3 translation purpose;0084 Team negatives;0085 W1 public-AI metadata;0086 public-creator negatives;0087 W8 held privacy-task fence;0088 W5 policy-dependent reply cap;0089 W8 actual creator/fan negatives;0090 W4 spending-notice custody;0091 W8 current-account negative purpose. W8's sole activation branch will record these reservations and the exact ready-wave order. No client may invent a packet/thread/Actor or replay SQL to compensate for missing registration.
 
-
 ## Interactive denial contention correction — 2026-10-02
 
 Reserved additive0082 now supplies nonblocking exact-family negative gates through the existing held restriction exports. Applied0053 stays unchanged. [Actual web/saved-block and two-connection evidence](../../../artifacts/workstreams/W8/interactive-denial/20261002-mac-studio/README.md) verifies retryable503 on contention, genuine session/participant refusals, preserved saved block403 and usable caller transaction after refusal. Canonical ledger remains40 in this labelled purpose-review target. Native authenticated, real in-flight generation, canonical activation and complete R1–R10/release acceptance remain open.
-
 
 ## Original-fan packet denial source — 2026-10-02
 
 W8 supplies reserved0076 original-fan/viewer/owner/publisher negative projection and `holdPublicPacketNegativeAuthority(client, actualActor, tuple)`. Unapplied0073 now runs packet negatives first and includes the schema-USAGE grant verified with the actual publication login. [Exact DDL/negative evidence](../../../artifacts/workstreams/W8/packet-denial/20261002-mac-studio/README.md) records zero fabricated publications, canonical57 unchanged and real non-owner refusals. Contention returns retryable unavailable, never successful empty permission. Actual signed packet, original-fan change and composed/native journeys remain open; this is not activation or release acceptance.
 
-
 ## Held restoration/content integration — 2026-10-02
 
 W8 now exports canonical `assertRestoredInTransaction(client)` and `assertContentAllowedInTransaction(client, actualActor, creatorId)`, plus loopback-only `trustLocalRestorationInTransaction(env)`. The development helper supplies the actual held callback; missing ports deny503. [Personally operated web and held transaction evidence](../../../artifacts/workstreams/W8/held-restoration/20261002-mac-studio/README.md) verifies current closure, saved block/case and retained canonical40 ledger; no publication/proof/provider recovery is inferred. W1/W6 can compose these ports without owner substitution or a true/no-op callback. Native authenticated interaction, original recovery/C10 and packet-fan negatives remain open. No R1–R10 or release gate is declared complete.
-
 
 **Held content/publication denial — 2026-10-02:** reserved0073/0074 and `trustContentRestrictionInTransaction()` / `trustPublicationWorkerDenial()` are implemented on `codex/w8-purpose-denial-authority`, consuming W5's exactc56fe342 held-client seam. [Actual receipt](../../../artifacts/workstreams/W8/purpose-denial/20261002-mac-studio/README.md) has canonical real web block save and current content200→403, saved block/case, non-owner session/snapshot/role and unissued-worker refusals. Registry remains40. W1's0071 PUBLIC-only/wallclock correction is reviewed, final-wave installation/positive proof/publication/Team/native/provider/C10 acceptance remains open. W8 services stopped; data retained.
 
