@@ -3,7 +3,7 @@ import { z } from "zod";
 import { DomainError, invariant } from "../../core/errors.js";
 import { assertCurrentSession, requestAuthority } from "./request-authority.js";
 
-export const PUBLIC_AI_SCOPE_MIGRATION = "0085_w1_public_ai_metadata_scope";
+export const PUBLIC_AI_SCOPE_MIGRATION = "0170_w1_public_ai_metadata_scope";
 const Hash = z.string().regex(/^[a-f0-9]{64}$/u);
 const License = z.strictObject({
   state: z.enum(["active", "revoked", "suspended"]),

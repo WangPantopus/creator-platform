@@ -1,0 +1,21 @@
+{
+  "source": "90b3235aef2146f2176c89791304a396b217e5af",
+  "operation": "web",
+  "supervisorPid": 18139,
+  "commandPid": 18819,
+  "command": [
+    "pnpm",
+    "exec",
+    "next",
+    "dev",
+    "-p",
+    "3003"
+  ],
+  "startedAt": "2026-10-02T19:15:14.912537+00:00",
+  "exitStatusQualified": true,
+  "completedAt": "2026-10-02T19:16:01.416686+00:00",
+  "exitCode": 130,
+  "logSHA256": "e9c9ab3c38c7bee50124ba2a769ec0b507da917789f97dd368d9fbc89a8ca2ce",
+  "duplicatePoolCloseObserved": false,
+  "shutdownFailureObserved": false
+}

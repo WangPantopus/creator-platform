@@ -2616,6 +2616,12 @@ data class APIFanProfileInput(
 )
 
 @Serializable
+data class APIFanIntroInput(
+  val `intro`: String,
+  val `expectedVersion`: Long
+)
+
+@Serializable
 data class APIFanProfile(
   val `id`: String,
   val `handle`: String,
@@ -3149,7 +3155,8 @@ data class APIError(
 data class APIErrorError(
   val `code`: String,
   val `message`: String,
-  val `requestId`: String
+  val `requestId`: String,
+  val `correlationId`: String? = null
 )
 
 @Serializable
@@ -3607,6 +3614,12 @@ enum class APIConversationConversationCorrectionInputCommandContentKind {
 }
 
 @Serializable
+data class APIConversationConversationIntroOffer(
+  @Required
+  val `offerId`: String? = null
+)
+
+@Serializable
 data class APIConversationConversationMessage(
   val `id`: String,
   val `threadId`: String,
@@ -3688,6 +3701,193 @@ enum class APIConversationConversationMessageFeedback {
 data class APIConversationConversationMessageCorrection(
   val `originalMessageId`: String,
   val `originalVersion`: Long
+)
+
+@Serializable
+data class APIConversationConversationOfflineLease(
+  val `issuer`: String,
+  val `accountId`: String,
+  val `sessionBinding`: String,
+  val `threadId`: String,
+  val `creatorId`: String,
+  val `fanId`: String,
+  val `revision`: Long,
+  val `epoch`: Long,
+  val `cursor`: Long,
+  val `policyVersion`: APIConversationConversationOfflineLeasePolicyVersion,
+  val `providerPolicyVersion`: String,
+  val `issuedAt`: String,
+  val `expiresAt`: String,
+  val `messages`: List<APIConversationConversationOfflineLeaseMessagesItem>
+)
+
+@Serializable
+enum class APIConversationConversationOfflineLeasePolicyVersion {
+  @SerialName("conversation-offline-five-seconds-v1") CONVERSATION_OFFLINE_FIVE_SECONDS_V1
+}
+
+@Serializable
+data class APIConversationConversationOfflineLeaseMessagesItem(
+  val `id`: String,
+  val `version`: Long
+)
+
+@Serializable
+data class APIConversationConversationOfflineSnapshot(
+  val `lease`: APIConversationConversationOfflineSnapshotLease,
+  val `page`: APIConversationConversationOfflineSnapshotPage
+)
+
+@Serializable
+data class APIConversationConversationOfflineSnapshotLease(
+  val `issuer`: String,
+  val `accountId`: String,
+  val `sessionBinding`: String,
+  val `threadId`: String,
+  val `creatorId`: String,
+  val `fanId`: String,
+  val `revision`: Long,
+  val `epoch`: Long,
+  val `cursor`: Long,
+  val `policyVersion`: APIConversationConversationOfflineSnapshotLeasePolicyVersion,
+  val `providerPolicyVersion`: String,
+  val `issuedAt`: String,
+  val `expiresAt`: String,
+  val `messages`: List<APIConversationConversationOfflineSnapshotLeaseMessagesItem>
+)
+
+@Serializable
+enum class APIConversationConversationOfflineSnapshotLeasePolicyVersion {
+  @SerialName("conversation-offline-five-seconds-v1") CONVERSATION_OFFLINE_FIVE_SECONDS_V1
+}
+
+@Serializable
+data class APIConversationConversationOfflineSnapshotLeaseMessagesItem(
+  val `id`: String,
+  val `version`: Long
+)
+
+@Serializable
+data class APIConversationConversationOfflineSnapshotPage(
+  val `threadId`: String,
+  val `creatorId`: String,
+  val `fanId`: String,
+  val `creatorName`: String,
+  val `fanHandle`: String,
+  val `control`: APIConversationConversationOfflineSnapshotPageControl,
+  val `epoch`: Long,
+  val `cursor`: Long,
+  val `revision`: Long,
+  val `generationSequences`: Map<String, Long>,
+  val `messages`: List<APIConversationConversationOfflineSnapshotPageMessagesItem>,
+  @Required
+  val `before`: Long? = null,
+  val `offTheRecord`: Boolean,
+  val `introShared`: Boolean,
+  val `consentCurrent`: Boolean,
+  val `canSend`: Boolean,
+  @Required
+  val `unavailableReason`: String? = null,
+  val `feedbackPolicy`: APIConversationConversationOfflineSnapshotPageFeedbackPolicy? = null
+)
+
+@Serializable
+enum class APIConversationConversationOfflineSnapshotPageControl {
+  @SerialName("ai_active") AI_ACTIVE,
+  @SerialName("human_active") HUMAN_ACTIVE,
+  @SerialName("ai_paused") AI_PAUSED,
+  @SerialName("closed") CLOSED,
+  @SerialName("blocked") BLOCKED
+}
+
+@Serializable
+data class APIConversationConversationOfflineSnapshotPageMessagesItem(
+  val `id`: String,
+  val `threadId`: String,
+  val `authorKind`: APIConversationConversationOfflineSnapshotPageMessagesItemAuthorKind,
+  val `text`: String,
+  val `deliveryState`: APIConversationConversationOfflineSnapshotPageMessagesItemDeliveryState,
+  val `controlEpoch`: Long,
+  val `sequence`: Long,
+  @Required
+  val `signedActId`: String? = null,
+  @Required
+  val `member`: String? = null,
+  val `authorAccountId`: String? = null,
+  val `systemLink`: APIConversationConversationOfflineSnapshotPageMessagesItemSystemLink? = null,
+  val `citations`: List<String>,
+  val `createdAt`: String,
+  val `offTheRecord`: Boolean,
+  val `version`: Long,
+  val `agentVersion`: APIConversationConversationOfflineSnapshotPageMessagesItemAgentVersion? = null,
+  val `feedback`: APIConversationConversationOfflineSnapshotPageMessagesItemFeedback? = null,
+  val `recording`: JsonElement? = null,
+  val `correction`: APIConversationConversationOfflineSnapshotPageMessagesItemCorrection? = null
+)
+
+@Serializable
+enum class APIConversationConversationOfflineSnapshotPageMessagesItemAuthorKind {
+  @SerialName("fan") FAN,
+  @SerialName("ai") AI,
+  @SerialName("approved_draft") APPROVED_DRAFT,
+  @SerialName("human_creator") HUMAN_CREATOR,
+  @SerialName("human_call") HUMAN_CALL,
+  @SerialName("human_broadcast") HUMAN_BROADCAST,
+  @SerialName("human_reaction") HUMAN_REACTION,
+  @SerialName("team") TEAM,
+  @SerialName("system") SYSTEM
+}
+
+@Serializable
+enum class APIConversationConversationOfflineSnapshotPageMessagesItemDeliveryState {
+  @SerialName("accepted") ACCEPTED,
+  @SerialName("generating") GENERATING,
+  @SerialName("delivered") DELIVERED,
+  @SerialName("failed") FAILED,
+  @SerialName("interrupted") INTERRUPTED
+}
+
+@Serializable
+data class APIConversationConversationOfflineSnapshotPageMessagesItemSystemLink(
+  val `kind`: APIConversationConversationOfflineSnapshotPageMessagesItemSystemLinkKind,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `contentVersion`: Long,
+  val `label`: APIConversationConversationOfflineSnapshotPageMessagesItemSystemLinkLabel
+)
+
+@Serializable
+enum class APIConversationConversationOfflineSnapshotPageMessagesItemSystemLinkKind {
+  @SerialName("published_answer") PUBLISHED_ANSWER
+}
+
+@Serializable
+enum class APIConversationConversationOfflineSnapshotPageMessagesItemSystemLinkLabel {
+  @SerialName("Answered publicly.") ANSWERED_PUBLICLY_
+}
+
+@Serializable
+data class APIConversationConversationOfflineSnapshotPageMessagesItemAgentVersion(
+  val `id`: String,
+  val `hash`: String
+)
+
+@Serializable
+enum class APIConversationConversationOfflineSnapshotPageMessagesItemFeedback {
+  @SerialName("helpful") HELPFUL,
+  @SerialName("not_helpful") NOT_HELPFUL
+}
+
+@Serializable
+data class APIConversationConversationOfflineSnapshotPageMessagesItemCorrection(
+  val `originalMessageId`: String,
+  val `originalVersion`: Long
+)
+
+@Serializable
+data class APIConversationConversationOfflineSnapshotPageFeedbackPolicy(
+  val `version`: String,
+  val `notice`: String
 )
 
 @Serializable
@@ -4058,6 +4258,7 @@ enum class APIConversationMemoryProposalKind {
 @Serializable
 data class APIConversationProviderPolicy(
   val `version`: String,
+  val `reference`: String? = null,
   val `providers`: List<APIConversationProviderPolicyProvidersItem>,
   val `verified`: Boolean
 )
@@ -4114,6 +4315,26 @@ enum class APIConversationReplyFeedbackRating {
   @SerialName("helpful") HELPFUL,
   @SerialName("not_helpful") NOT_HELPFUL
 }
+
+@Serializable
+data class APIConversationReplyFeedbackResult(
+  @Required
+  val `rating`: APIConversationReplyFeedbackResultRating? = null,
+  @Required
+  val `introOffer`: APIConversationReplyFeedbackResultIntroOffer? = null
+)
+
+@Serializable
+enum class APIConversationReplyFeedbackResultRating {
+  @SerialName("helpful") HELPFUL,
+  @SerialName("not_helpful") NOT_HELPFUL
+}
+
+@Serializable
+data class APIConversationReplyFeedbackResultIntroOffer(
+  @Required
+  val `offerId`: String? = null
+)
 
 @Serializable
 data class APIConversationTeamReply(
@@ -5317,6 +5538,7 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
   suspend fun logout(): APIDone = json.decodeFromString(request("/v1/identity/logout", "POST", authenticated = true))
   suspend fun revokeSessions(): APIDone = json.decodeFromString(request("/v1/identity/revoke-sessions", "POST", authenticated = true))
   suspend fun saveFanProfile(body: APIFanProfileInput): APIFanProfile = json.decodeFromString(request("/v1/identity/fan-profile", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun saveFanIntro(body: APIFanIntroInput): APIFanProfile = json.decodeFromString(request("/v1/identity/fan-profile/intro", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun saveCreatorProfile(body: APICreatorProfileInput): APICreatorProfile = json.decodeFromString(request("/v1/identity/creator-profile", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun creatorProof(creatorId: String): APIProof = json.decodeFromString(request("/v1/identity/${segment(creatorId)}/proof", "GET", authenticated = true))
   suspend fun beginCreatorProof(creatorId: String, body: APIProofInput): APIProof = json.decodeFromString(request("/v1/identity/${segment(creatorId)}/proof", "POST", body = json.encodeToString(body), authenticated = true))
@@ -5340,6 +5562,7 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
   suspend fun handback(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/handback", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply): APIMessage = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/human-replies", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput): APIConversationConversationRecordingResult = json.decodeFromString(request("/v1/conversations/${segment(creatorId)}/${segment(fanId)}/recordings", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun leaseOfflineConversation(creatorId: String, fanId: String): APIConversationConversationOfflineSnapshot = json.decodeFromString(request("/v1/conversations/${segment(creatorId)}/${segment(fanId)}/offline", "GET", authenticated = true))
   suspend fun readCallSession(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = null): APICallCallSession = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/calls/${segment(sessionId)}", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun joinCallSession(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = null): APICallCallAdmission = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/calls/${segment(sessionId)}/join", "POST", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun setCallConsent(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = null, body: APICallConsentCommand): APICallCallSession = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/calls/${segment(sessionId)}/consent", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
@@ -5375,7 +5598,7 @@ object ApplicationDestination {
   fun isPermitted(value: String): Boolean {
     if (value.length > 2048 || value.contains('%') || value.contains('\\') || value.contains('#') || value.any { it.isWhitespace() }) return false
     val parts = value.split('?')
-    if (parts.size > 2 || !Regex("^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|ops(?:/(?:audits|metrics|cases/[a-f0-9-]{36}))?|status|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/(?:overview|sources|style|rules|test|versions|license|interview|onboard))?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post(?:/[a-f0-9-]{36})?|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$").matches(parts[0])) return false
+    if (parts.size > 2 || !Regex("^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|ops(?:/(?:audits|metrics|cases/[a-f0-9-]{36}))?|status|notifications(?:/(?:settings|[a-f0-9-]{36}))?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/(?:overview|sources|style|rules|test|versions|license|interview|onboard))?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post(?:/[a-f0-9-]{36})?|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$").matches(parts[0])) return false
     if (parts.size == 1) return true
     val scopes = mapOf("context" to "^/creators/", "creatorId" to "^(?:/commerce/|/support$|/you$|/media/voice$)", "fanId" to "^/you$", "packetId" to "^/commerce/", "offer" to "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId" to "^/support$", "quote" to "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet" to "^/studio/[a-f0-9-]{36}/publish$", "objectId" to "^/media/voice$", "kind" to "^/support$")
     val literalValues = mapOf("offer" to "1", "kind" to "verification")

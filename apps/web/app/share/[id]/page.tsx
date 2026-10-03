@@ -1,4 +1,5 @@
 import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
+import { Mark } from "@qelvora/ui-web";
 import {
   growthRequest,
   configuredOrigin,
@@ -10,6 +11,7 @@ export const metadata = { robots: { index: false, follow: false } };
 interface Shared {
   state: "valid" | "withdrawn";
   id: string;
+  verificationURL?: string | null;
   source?: {
     text: string;
     creatorName: string;
@@ -39,15 +41,32 @@ export default async function Share({
       );
     const source = data.source!;
     const origin = configuredOrigin(),
-      url = origin ? `${origin}/share/${id}` : `/share/${id}`;
+      url =
+        data.verificationURL ??
+        (origin ? `${origin}/share/${id}` : `/share/${id}`);
     return (
       <GrowthShell>
         <section
           className="growth-stack"
           style={{ background: "var(--surface-sunken)" }}
         >
-          <article className="growth-export qv-on-maya">
-            <strong>
+          <article
+            className={
+              source.authorKind === "approved_draft"
+                ? "growth-export growth-export--approved"
+                : "growth-export qv-on-maya"
+            }
+          >
+            <strong className="growth-mark">
+              <Mark
+                kind={
+                  source.authorKind === "approved_draft"
+                    ? "approved_draft"
+                    : "human_creator"
+                }
+                initial={source.creatorName.slice(0, 1)}
+                onMaya={source.authorKind !== "approved_draft"}
+              />
               {source.authorKind === "approved_draft"
                 ? growthFormat("growthPreparedByAiApprovedBy", {
                     value1: source.creatorName,
@@ -102,6 +121,16 @@ export default async function Share({
           <a className="qv-btn qv-btn--secondary" href={`/share/${id}/image`}>
             {growthCopy.growthDownloadLabeledImage}
           </a>
+          {data.verificationURL ? (
+            <a
+              className="qv-btn qv-btn--secondary"
+              href={`/share/${id}/export`}
+            >
+              {growthCopy.growthDownloadCompleteReply}
+            </a>
+          ) : (
+            <p className="growth-help">{growthCopy.growthImageNeedsOrigin}</p>
+          )}
         </section>
       </GrowthShell>
     );

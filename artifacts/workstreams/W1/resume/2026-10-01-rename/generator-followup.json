@@ -1,0 +1,163 @@
+{
+  "recordedAt": "2026-10-01T10:57:54.281Z",
+  "applicationSourceRevision": "5425598bfee787314b48e960a1bba852ef432459",
+  "generatorSourceRevision": "e51213adc24966fd303a6ec41875e1c59ebb1ff7",
+  "patch": "Current three-generator repair translated by the same canonical three brand spellings and applied to the disposable renamed source.",
+  "generatedFiles": 15,
+  "changedFiles": 0,
+  "before": [
+    {
+      "path": "packages/api/generated/openapi.json",
+      "sha256": "6b3ba683a5322962be93678e2a31e8d7339da33a1b613cd73707f819b11f167d",
+      "mtimeNanoseconds": "1790851395652905382"
+    },
+    {
+      "path": "packages/tokens/tokens.css",
+      "sha256": "596d7a31461c8a940b72599cda95e4e16fdf60cb468730e5481f1678b59c18bf",
+      "mtimeNanoseconds": "1790851395774287343"
+    },
+    {
+      "path": "packages/tokens/src/index.ts",
+      "sha256": "b4618b134c39a5d1ba631cf19e6a8a6ecb0078b23017d91eb0b7a2b60d30d096",
+      "mtimeNanoseconds": "1790851395774515165"
+    },
+    {
+      "path": "packages/brand/src/index.ts",
+      "sha256": "66da5d17c498021f150e5f206491cf5626dba28ab55805bb463b12c3762832a5",
+      "mtimeNanoseconds": "1790851395774708447"
+    },
+    {
+      "path": "packages/copy/src/index.ts",
+      "sha256": "228bf644c457c4e2f8b7effb10ce7345eecdd33e8022f06c4479dc881c411731",
+      "mtimeNanoseconds": "1790851395775058047"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/W1RenameTokens.swift",
+      "sha256": "f97281d3f4e0bcc3a0ee5160ebf0d64df003b4a2474ab01f218b3d48932ddd32",
+      "mtimeNanoseconds": "1790851395775262205"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/W1RenameCopy.swift",
+      "sha256": "f1097911f25ef55358c44ee53af07e3d34158bd99167dba558e99174706db962",
+      "mtimeNanoseconds": "1790851395775787743"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/Localizable.xcstrings",
+      "sha256": "4d3da0bcf7af8ef37b06f40179ec70b335cc5d70fb9086349586f9e9f1bd6e38",
+      "mtimeNanoseconds": "1790851395776909864"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/w1rename/generated/W1RenameTokens.kt",
+      "sha256": "cedc902f1a7434bb10de1a078f681b4ffd5db560952cb61bb75d1c4a8e17e27c",
+      "mtimeNanoseconds": "1790851395775452052"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/w1rename/generated/W1RenameCopy.kt",
+      "sha256": "3d187912dbd27343f49db5e1413809ca708d4bfe31031fdc5297d1d07e46a196",
+      "mtimeNanoseconds": "1790851395776077521"
+    },
+    {
+      "path": "apps/android/app/src/main/res/values/strings.xml",
+      "sha256": "164573a4b8a074ee895e7b4f77cf1e591f4a40a120262d56858c07b543e59808",
+      "mtimeNanoseconds": "1790851395777345846"
+    },
+    {
+      "path": "apps/ios/Sources/Resources/Glyphs.json",
+      "sha256": "c8d8c6e480edc258c9ce93290e8a8fa50235d27c4fea21667afe5cc6500ac82f",
+      "mtimeNanoseconds": "1790851395777539503"
+    },
+    {
+      "path": "apps/android/app/src/main/assets/Glyphs.json",
+      "sha256": "c8d8c6e480edc258c9ce93290e8a8fa50235d27c4fea21667afe5cc6500ac82f",
+      "mtimeNanoseconds": "1790851395777719082"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/W1RenameAPI.swift",
+      "sha256": "6b01300601a2d9213e8ce7aefeee273ca2e33c4f3c7873f7482c566a14697b6c",
+      "mtimeNanoseconds": "1790851395870148140"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/w1rename/generated/W1RenameAPI.kt",
+      "sha256": "5b7c99411d306312b015ff927fde21a40a08f0325420617a12c9af1e0b5249fc",
+      "mtimeNanoseconds": "1790851395870724935"
+    }
+  ],
+  "after": [
+    {
+      "path": "packages/api/generated/openapi.json",
+      "sha256": "6b3ba683a5322962be93678e2a31e8d7339da33a1b613cd73707f819b11f167d",
+      "mtimeNanoseconds": "1790851395652905382"
+    },
+    {
+      "path": "packages/tokens/tokens.css",
+      "sha256": "596d7a31461c8a940b72599cda95e4e16fdf60cb468730e5481f1678b59c18bf",
+      "mtimeNanoseconds": "1790851395774287343"
+    },
+    {
+      "path": "packages/tokens/src/index.ts",
+      "sha256": "b4618b134c39a5d1ba631cf19e6a8a6ecb0078b23017d91eb0b7a2b60d30d096",
+      "mtimeNanoseconds": "1790851395774515165"
+    },
+    {
+      "path": "packages/brand/src/index.ts",
+      "sha256": "66da5d17c498021f150e5f206491cf5626dba28ab55805bb463b12c3762832a5",
+      "mtimeNanoseconds": "1790851395774708447"
+    },
+    {
+      "path": "packages/copy/src/index.ts",
+      "sha256": "228bf644c457c4e2f8b7effb10ce7345eecdd33e8022f06c4479dc881c411731",
+      "mtimeNanoseconds": "1790851395775058047"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/W1RenameTokens.swift",
+      "sha256": "f97281d3f4e0bcc3a0ee5160ebf0d64df003b4a2474ab01f218b3d48932ddd32",
+      "mtimeNanoseconds": "1790851395775262205"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/W1RenameCopy.swift",
+      "sha256": "f1097911f25ef55358c44ee53af07e3d34158bd99167dba558e99174706db962",
+      "mtimeNanoseconds": "1790851395775787743"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/Localizable.xcstrings",
+      "sha256": "4d3da0bcf7af8ef37b06f40179ec70b335cc5d70fb9086349586f9e9f1bd6e38",
+      "mtimeNanoseconds": "1790851395776909864"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/w1rename/generated/W1RenameTokens.kt",
+      "sha256": "cedc902f1a7434bb10de1a078f681b4ffd5db560952cb61bb75d1c4a8e17e27c",
+      "mtimeNanoseconds": "1790851395775452052"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/w1rename/generated/W1RenameCopy.kt",
+      "sha256": "3d187912dbd27343f49db5e1413809ca708d4bfe31031fdc5297d1d07e46a196",
+      "mtimeNanoseconds": "1790851395776077521"
+    },
+    {
+      "path": "apps/android/app/src/main/res/values/strings.xml",
+      "sha256": "164573a4b8a074ee895e7b4f77cf1e591f4a40a120262d56858c07b543e59808",
+      "mtimeNanoseconds": "1790851395777345846"
+    },
+    {
+      "path": "apps/ios/Sources/Resources/Glyphs.json",
+      "sha256": "c8d8c6e480edc258c9ce93290e8a8fa50235d27c4fea21667afe5cc6500ac82f",
+      "mtimeNanoseconds": "1790851395777539503"
+    },
+    {
+      "path": "apps/android/app/src/main/assets/Glyphs.json",
+      "sha256": "c8d8c6e480edc258c9ce93290e8a8fa50235d27c4fea21667afe5cc6500ac82f",
+      "mtimeNanoseconds": "1790851395777719082"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/W1RenameAPI.swift",
+      "sha256": "6b01300601a2d9213e8ce7aefeee273ca2e33c4f3c7873f7482c566a14697b6c",
+      "mtimeNanoseconds": "1790851395870148140"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/w1rename/generated/W1RenameAPI.kt",
+      "sha256": "5b7c99411d306312b015ff927fde21a40a08f0325420617a12c9af1e0b5249fc",
+      "mtimeNanoseconds": "1790851395870724935"
+    }
+  ],
+  "qualification": "The current generator implementation emits identical bytes and preserves mtimes in the renamed workspace. The completed compiler outputs use those exact generated bytes; generators are build tools and are not shipped. No redundant native rebuild was added after this zero-output follow-up."
+}

@@ -1,0 +1,43 @@
+{
+  "recordedAt": "2026-10-01T13:26:51.152523+00:00",
+  "reviewedAtSourceRevision": "28874d9617cd2967db3be41bbb7f1d0904e62426",
+  "reviewKind": "Personally read full current SQL and canonical identity prepare/verify/consume/recovery source; bounded composition source review only",
+  "proposals": [
+    {
+      "id": "0044",
+      "path": "apps/backend/src/modules/commerce/schema-approval.sql",
+      "state": "reserved_unapplied",
+      "sourceSha256": "4480936ea99adbc954f1e3444673772922c49e6dab8b9cce9351cf6d61c493fb",
+      "registryPinMatches": true
+    },
+    {
+      "id": "0058",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_correction_signature.sql",
+      "state": "reserved_unapplied",
+      "sourceSha256": "89895cd1c9eabb3a85556c3efb912a201a2137564ed3299c0e7778cbef5f7911",
+      "registryPinMatches": true
+    },
+    {
+      "id": "0059",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_recording_association.sql",
+      "state": "reserved_unapplied",
+      "sourceSha256": "e8ba9219e8aca099de0de69220f52f86e56a16a16287b766c41b981af3ff88d2",
+      "registryPinMatches": true
+    },
+    {
+      "id": "0060",
+      "path": "apps/backend/migrations/0060_w8_composed_signed_message.sql",
+      "state": "reserved_unapplied",
+      "sourceSha256": "43067f9a36218e49e84bc3597e466e73b2d288c12a446e2628e655a281dddecc",
+      "registryPinMatches": true
+    }
+  ],
+  "findings": [
+    "0060 routes every approved_draft through the exact 0044 personal Approval tuple/version/text/hash/current creator and key epochs; correction/recording attachments are rejected for this author kind.",
+    "Delivered AI original, correction and recording immutable fields include the new approval/recording association fields.",
+    "Recording binds same-family ready processed media, exact six-field evidence/command, actual consumed unwithdrawn publication and a current creator/key; C2PA true is JSON boolean, not a truthy string.",
+    "Correction binds the exact delivered original/version/command and actual consumed unwithdrawn publication; canonical application consumption still separately holds current creator/key authority.",
+    "The legacy thread/text predicate remains. Applying 0058 or 0059 after 0044 without 0060 would replace the personal Approval branch; traffic must remain closed throughout reviewed ordered composition."
+  ],
+  "qualification": "All four proposals remain reserved_unapplied. No runner registration, SQL installation, migration/checksum mutation, grant, approval, purpose issuer, retention/provider acceptance or activation authorization is supplied by this review. The T-34 check used the 40 active registry entries and does not validate these unapplied proposals. Actual held private-purpose/signing/provider/retention and current-authority composition acceptance remain required."
+}

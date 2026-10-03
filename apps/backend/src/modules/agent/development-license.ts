@@ -15,6 +15,10 @@ import {
 } from "../../../../../packages/api/src/agent/contracts.js";
 import type { CreatorScope } from "./repository.js";
 import type { LicenseVerifier, PublicAILicenseContext } from "./service.js";
+import {
+  PreparedGenerationAgentInputs,
+  type GenerationAILicenseContext,
+} from "./generation-inputs.js";
 
 export { DEVELOPMENT_LICENSE_TERMS, developmentProofReference };
 export const DEVELOPMENT_JOURNAL_RETENTION =
@@ -183,6 +187,30 @@ export class DevelopmentLicenseVerifier implements LicenseVerifier {
         this.matches(context.scope.creatorId, {
           ...stored,
           permittedUses: [...stored.permittedUses],
+        }),
+    );
+  }
+  async isCurrentGenerationInTransaction(
+    context: GenerationAILicenseContext,
+    client: PoolClient,
+  ) {
+    invariant(
+      context.inputs instanceof PreparedGenerationAgentInputs,
+      "generation_inputs_required",
+      "Genuine current generation-purpose inputs are required.",
+    );
+    context.inputs.assertHostPool(this.pool);
+    await context.inputs.authorizeInTransaction(
+      context.facts,
+      context.scope,
+      client,
+    );
+    return Boolean(
+      context.scope.creatorId === context.facts.creatorId &&
+        context.scope.creatorAccountId === context.facts.creatorAccountId &&
+        this.matches(context.scope.creatorId, {
+          ...context.facts.license,
+          permittedUses: [...context.facts.license.permittedUses],
         }),
     );
   }

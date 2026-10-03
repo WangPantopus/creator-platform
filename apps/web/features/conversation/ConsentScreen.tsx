@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthorLabel, Button, Notice } from "@qelvora/ui-web";
+import { copy } from "@qelvora/copy";
 import type {
   ConversationPage,
   ProviderPolicy,
@@ -46,7 +47,7 @@ export function ConsentScreen({
   }, [request]);
   const begin = async () => {
     if (
-      !capabilities?.providers?.verified ||
+      !capabilities?.providers ||
       !capabilities.consentAvailable ||
       !capabilities.generationAvailable ||
       busy
@@ -86,6 +87,11 @@ export function ConsentScreen({
       <article>
         <section>
           <span className="qv-meta">WHO RUNS IT</span>
+          {capabilities?.providers?.verified === false && (
+            <Notice title={copy.conversationDevelopmentPolicyTitle}>
+              {copy.conversationDevelopmentPolicyNotice}
+            </Notice>
+          )}
           {capabilities?.providers ? (
             <>
               <p>

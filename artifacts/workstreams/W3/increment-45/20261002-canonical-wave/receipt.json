@@ -1,0 +1,19 @@
+{
+  "source": "282404ab02fdfecbad2b26ae537e452480ab5026",
+  "normalMainMerge": "5ec5cb07a5f5185e4dd68732f2562f32aec753a7",
+  "canonicalOperator": "apps/backend/scripts/activate-wave.ts",
+  "verification": {
+    "command": "scripts/migrate-trust.ts",
+    "exit": 0,
+    "alreadyApplied": 57,
+    "lastRegisteredVersion": "0062_w6_creator_media_worker"
+  },
+  "trafficClosed": true,
+  "apiRunning": false,
+  "webRunning": false,
+  "devicesRunning": false,
+  "generationAvailable": false,
+  "laterReservedPurposesApplied": false,
+  "newTestCode": false,
+  "w3Complete": false
+}

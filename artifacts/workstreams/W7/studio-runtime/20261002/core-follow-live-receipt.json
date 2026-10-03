@@ -1,0 +1,160 @@
+{
+  "recordedAt": "2026-10-02T13:26:55.630756+00:00",
+  "baseHead": "6354480b2b408ea361b2a4762fd7ca4bc6a1056b",
+  "primary": "W7 primary personally implemented/reviewed and inspected actual PostgreSQL17; no subagents or new tests/harness",
+  "state": "Actual closed empty qualification install; canonical runtime remains unregistered/unconfigured, not release accepted",
+  "definitionHashMode": "Exact UTF-8 text returned by actual PostgreSQL17.11 pg_get_functiondef, including terminal newline",
+  "functionDefinitionSha256": "1b09d91fe20b712f5452ca5d79fa352f94482283edeaaac4543558975c761a78",
+  "catalogue": {
+    "postgres": "17.11 (Debian 17.11-1.pgdg12+2)",
+    "migrations": 40,
+    "connection_limit": 0,
+    "admission": "creator-platform:restored-traffic-closed",
+    "creators": 0,
+    "fans": 0,
+    "follows": 0,
+    "purpose": "Actual final unregistered DDL only in independent empty traffic-closed qualification database; no migration0101, no shipping authority or Follow behavior accepted",
+    "functionDefinitionSha256": "1b09d91fe20b712f5452ca5d79fa352f94482283edeaaac4543558975c761a78",
+    "proposalSha256": "29c0261cdfce50be434d8b8b49c21e23df6057613d521c8e40a13c3928d63796",
+    "actualAdapterSchemaReady": false,
+    "missingMigrationReceipt": true
+  },
+  "coreFollowMigrationRequiredFields": [
+    "version",
+    "checksum",
+    "functionDefinitionSha256"
+  ],
+  "protections": [
+    "Exact live definition hash and PostgreSQL17 plus actual canonical migration checksum",
+    "Role global/current database settings and memberships; no owner of unrelated type/language/foreign/database/large object",
+    "Effective all non-system schema/table/column and sequence privileges, including PUBLIC; no unrelated namespace USAGE/CREATE or other usable definer function",
+    "Narrow session metadata and Follow columns only; no core Growth runtime/worker membership",
+    "Actual current canonical ALS/session held client; existing W1/W8 same-client family/negative custody required, no manufactured positive scope",
+    "Unregistered actual adapter schema query returns ready:false; no fabricated0101 ledger receipt"
+  ],
+  "checks": {
+    "finalBackendBuild": "exit0",
+    "finalESLint": "exit0",
+    "format": "exit0",
+    "originalContracts": "9 passed,exit0",
+    "sourceDiffCheck": "exit0",
+    "actualFinalProposalInstall": "exit0",
+    "newTestCode": false
+  },
+  "failuresPreserved": [
+    "Initial sequence guard evaluation error; full transaction rollback",
+    "Definition query refused after rolled-back install"
+  ],
+  "runtimeAcceptance": false,
+  "remaining": [
+    "W8 actual ordered registry and positive W1/W8 purpose/current caller composition",
+    "Human0044\u20130060 W7 activation ceiling preserved: no0101 ledger or canonical SQL activation",
+    "Actual eligible fan Follow/unfollow/revocation concurrent journey and all original W7 acceptance",
+    "Every exact-head Foundation job, Trust compilation and final combined personal review"
+  ],
+  "resource": {
+    "container": "creator-platform-w7-core-follow-custody-20261002",
+    "database": "creator_w7_core_follow_custody",
+    "port": 55448,
+    "volume": "13feec244f25a74f2b7b5a5ada20e8055827b6d1246c39b86f85637c055c3a85",
+    "state": "stopped,exit0,traffic-closed,connection-limit0",
+    "mainW7RuntimeDatabase": "untouched,stopped,40 active migrations,no metadata function/namespace"
+  },
+  "sources": [
+    {
+      "path": "apps/backend/src/modules/growth/core-follows.ts",
+      "sha256": "e31c673af82a391c2aabd6fdad30a51a1880c2ac0e7723049cb625e13480337b"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/migrations/pending_w7_core_follow_metadata.sql",
+      "sha256": "29c0261cdfce50be434d8b8b49c21e23df6057613d521c8e40a13c3928d63796"
+    }
+  ],
+  "raw": [
+    {
+      "path": "core-follow-live-raw/core-follow-custody-baseline.log",
+      "sha256": "59d1d596271960f3248b45ea2153bf250ff9e45e35735acf294d5197f7effc4e",
+      "bytes": 1277
+    },
+    {
+      "path": "core-follow-live-raw/core-follow-custody-baseline-catalogue.log",
+      "sha256": "2963b7a299361539d33698593e0ae73eb4eb0ff26e413cb4cc1a9aa36c7ff22e",
+      "bytes": 414
+    },
+    {
+      "path": "core-follow-live-raw/core-follow-custody-proposal-install.log",
+      "sha256": "65b40583776589f2422ca5b15bfb6c22f1a9205d5f5c5413663fb75222439403",
+      "bytes": 3237
+    },
+    {
+      "path": "core-follow-live-raw/core-follow-custody-proposal-install-retry.log",
+      "sha256": "9b4a03fa5a2004a0ba55d23bb4c8ea4790b812277646e372f3903dc603723d15",
+      "bytes": 166
+    },
+    {
+      "path": "core-follow-live-raw/core-follow-custody-final-baseline.log",
+      "sha256": "59d1d596271960f3248b45ea2153bf250ff9e45e35735acf294d5197f7effc4e",
+      "bytes": 1277
+    },
+    {
+      "path": "core-follow-live-raw/core-follow-custody-final-proposal-install.log",
+      "sha256": "9b4a03fa5a2004a0ba55d23bb4c8ea4790b812277646e372f3903dc603723d15",
+      "bytes": 166
+    },
+    {
+      "path": "core-follow-live-raw/core-follow-pg17-function.sql",
+      "sha256": "1b09d91fe20b712f5452ca5d79fa352f94482283edeaaac4543558975c761a78",
+      "bytes": 1333
+    },
+    {
+      "path": "core-follow-live-raw/core-follow-pg17-catalogue.json",
+      "sha256": "527e58fe2f7211cbedc62ab75281a80009cf4e576dde0a56c380e07e5a115d5f",
+      "bytes": 561
+    },
+    {
+      "path": "core-follow-live-raw/core-follow-pg17-final-function.sql",
+      "sha256": "1b09d91fe20b712f5452ca5d79fa352f94482283edeaaac4543558975c761a78",
+      "bytes": 1333
+    },
+    {
+      "path": "core-follow-live-raw/core-follow-pg17-final-catalogue.json",
+      "sha256": "eca979d7421d92ba52b758661d04eafcc4bf450c65464e327838316d721f5db3",
+      "bytes": 639
+    },
+    {
+      "path": "core-follow-live-raw/core-follow-live-build.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+      "bytes": 41
+    },
+    {
+      "path": "core-follow-live-raw/core-follow-live-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "core-follow-live-raw/core-follow-live-final-build.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+      "bytes": 41
+    },
+    {
+      "path": "core-follow-live-raw/core-follow-live-final-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "core-follow-live-raw/core-follow-live-existing-contracts.log",
+      "sha256": "2b9e4dbc004b58c7f95052c95510b3124e048ef5f83841c7f53e60dbd1c08624",
+      "bytes": 331
+    },
+    {
+      "path": "core-follow-live-raw/core-follow-live-format.log",
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
+      "bytes": 66
+    },
+    {
+      "path": "core-follow-live-raw/preserved-tool-outcomes.txt",
+      "sha256": "1f41f91da20e41f2f9e470b9ffcb699d66120490c17bf04601267ba40d3520fb",
+      "bytes": 536
+    }
+  ]
+}

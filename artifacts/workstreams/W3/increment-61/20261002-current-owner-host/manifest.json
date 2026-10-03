@@ -1,0 +1,18 @@
+{
+  "source": "bb5fe1460669044e4f5992250cd499ef99425d94",
+  "files": {
+    "api.json": "53ef4fbc9110b93c8bf941a49502ce7943b36695b654f4f0b88aaf4a9c41f453",
+    "api.log": "b80561597692fd734cf22edaec3452ed8a8c6ebe883500952bc604cc4fc4f4c6",
+    "catalogue.json": "0043fe7ed5b6f309c09b30e1c9b7f9214f9e58ab3d72ee0e0de675a0d7483eff",
+    "operation.json": "16472e1224c4c8cc84a360c0a2e9f195c967696cd81104c06f0a02dbfb334a07",
+    "run.md": "36ed76532aa20362e5f2a8da1c94b5db940d87790c90c248e81200d47f045571",
+    "signals.json": "55bdcd62f0f006b8d7db0577b01033281556acfcdbc7d41e843cc86bc4a785e5",
+    "source-build-checks.json": "78f2935741f98a9d5fc2807cd15225f21320fcd5d2c8bd3680be100c22fa9c7d",
+    "web-account-light.png": "ea2756b2f3c88e245b54346620f4827f02054dfe6b8280c31916994ad85beb74",
+    "web-account-night.png": "cdf7823283d71c4678d209cc8b2119eac0ac1b55b409f34c73b688270b3ac33d",
+    "web-privacy-light.png": "99739f8c4fe9b45feb01b038cbb44755bd2c2e866f1277404c9fa7c7af9e6114",
+    "web-privacy-night.png": "098517e3e0ddc47a0925d67c4b47b5b874c6dda8b5a5eace4aaa75cb8b37ff99",
+    "web.json": "cb5069f18de0250e49d2a8420e8b08001aa4e61c61687d6315ddb3171b66210f",
+    "web.log": "2c4b36050fa087e2394defa3dd83805c825cd74b1b49399807657a8ff406638d"
+  }
+}

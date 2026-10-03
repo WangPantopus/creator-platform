@@ -1,0 +1,28 @@
+{
+  "source": "f355db907b4beada09f4ad6f6d40e0af8d9a43ca",
+  "at": "2026-10-02T13:34:46.594650+00:00",
+  "device": "emulator-5584",
+  "actualProcessGone": true,
+  "actualDeviceGone": true,
+  "emulatorLogSha256": "590b4e75011d870a314f2434abebb6a4b8e94570b935a4f0826334351fe354a2",
+  "outageRecoveryQualified": false,
+  "originalSettings": {
+    "fontScale": "2.0",
+    "nightMode": "no",
+    "animations": [
+      "0",
+      "0",
+      "0"
+    ]
+  },
+  "lastAppliedSettings": {
+    "fontScale": "2.0",
+    "nightMode": "yes",
+    "animations": [
+      "0",
+      "0",
+      "0"
+    ]
+  },
+  "pendingRestore": "Restore own nightMode=no on next controlled boot; guest disappearance prevented readback. No ANR or crash cause inferred."
+}

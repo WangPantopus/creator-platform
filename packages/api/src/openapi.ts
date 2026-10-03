@@ -409,6 +409,9 @@ export function createOpenApi() {
       "/v1/identity/fan-profile": {
         post: operation("saveFanProfile", "FanProfile", "FanProfileInput"),
       },
+      "/v1/identity/fan-profile/intro": {
+        post: operation("saveFanIntro", "FanProfile", "FanIntroInput"),
+      },
       "/v1/identity/creator-profile": {
         post: operation(
           "saveCreatorProfile",
@@ -545,6 +548,13 @@ export function createOpenApi() {
           "deliverConversationRecording",
           "ConversationConversationRecordingResult",
           "ConversationConversationRecordingInput",
+        ),
+      },
+      "/v1/conversations/{creatorId}/{fanId}/offline": {
+        parameters: pair,
+        get: operation(
+          "leaseOfflineConversation",
+          "ConversationConversationOfflineSnapshot",
         ),
       },
       ...mediaPaths,

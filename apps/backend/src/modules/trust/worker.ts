@@ -272,6 +272,8 @@ export class TrustWorker {
           "export_stream_invalid",
           "export_stream_incomplete",
           "export_artifact_invalid",
+          "privacy_artifact_unconfigured",
+          "privacy_commit_fence_unavailable",
         ].includes(message)
           ? message
           : "domain_hook_error";

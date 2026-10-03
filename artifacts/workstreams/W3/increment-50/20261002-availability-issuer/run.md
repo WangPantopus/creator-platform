@@ -1,0 +1,7 @@
+# W3 native availability issuer integration repair
+
+Source `c91958a7e677575223a9156528b7e8b15d112285` failed its normal iOS shipping build because the newly merged NativeAvailability called `SecureSessionStorage()` without the issuer required by W3's existing session custody. W3 personally reproduced the compiler error and bound that closure to the exact configured API origin. This preserves the per-issuer session boundary rather than providing an unscoped fallback. The canonical native project already declares camera usage; W3 regenerated and retained its generated Info.plist disclosure.
+
+Implementation commits: `a0a0f8de` and `f355db907b4beada09f4ad6f6d40e0af8d9a43ca`. Both final shipping builds passed at exact `f355db90`, sequentially under the atomic heavy-build lease. Normal iOS signing was retained. The [receipt](builds.json) records exact binary and private log hashes, including the first failed build. No new test code was written.
+
+The final APK was personally installed and operated against the one development-copy backend for You, privacy and blocked consent in [increment49](../../increment-49/20261002-synthetic-copy/run.md). The later emulator disappearance prevents cold recovery acceptance. iOS UI launch was blocked by the missing Simulator app; no iOS operation is claimed. Saving positive creator availability remains unavailable while genuine media/interactive authority is absent. Compilation and account/refusal operations are not positive availability, call or complete W3 acceptance.

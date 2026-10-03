@@ -1,0 +1,180 @@
+{
+  "recordedAt": "2026-10-01T14:27:47.059715+00:00",
+  "workflowHead": "438ab04a0d1e88e7150beb71cac9191a043e340e",
+  "prSnapshot": {
+    "headRefOid": "438ab04a0d1e88e7150beb71cac9191a043e340e",
+    "isDraft": true,
+    "state": "OPEN",
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-01T14:13:24Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36873025288/job/110405324835",
+        "name": "web-and-backend",
+        "startedAt": "2026-10-01T14:11:23Z",
+        "status": "COMPLETED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-01T14:13:04Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36873016065/job/110405293777",
+        "name": "web-and-backend",
+        "startedAt": "2026-10-01T14:09:52Z",
+        "status": "COMPLETED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36873025288/job/110405325354",
+        "name": "web-visual",
+        "startedAt": "2026-10-01T14:00:55Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36873016065/job/110405293562",
+        "name": "web-visual",
+        "startedAt": "2026-10-01T14:00:51Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36873025288/job/110405325220",
+        "name": "ios-foundation",
+        "startedAt": "2026-10-01T14:00:55Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36873016065/job/110405294014",
+        "name": "ios-foundation",
+        "startedAt": "2026-10-01T14:00:51Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36873025288/job/110405325260",
+        "name": "android-foundation",
+        "startedAt": "2026-10-01T14:00:55Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36873016065/job/110405293863",
+        "name": "android-foundation",
+        "startedAt": "2026-10-01T14:00:51Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-01T14:12:58Z",
+        "conclusion": "FAILURE",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36873016065/job/110405294463",
+        "name": "android-runtime",
+        "startedAt": "2026-10-01T14:12:17Z",
+        "status": "COMPLETED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-01T14:17:03Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36873025288/job/110405325477",
+        "name": "android-runtime",
+        "startedAt": "2026-10-01T14:11:32Z",
+        "status": "COMPLETED",
+        "workflowName": "Foundation checks"
+      }
+    ]
+  },
+  "logs": [
+    {
+      "jobId": 110405294463,
+      "runId": 36873016065,
+      "file": "ci-438ab04-push-android-runtime.log",
+      "sha256": "321b86925a9ef060a715e2fc00a11c0ca330d571f8710abf580093c15dc3419e",
+      "actualCheckout": "438ab04a0d1e88e7150beb71cac9191a043e340e",
+      "personallyRead": true
+    },
+    {
+      "jobId": 110405324835,
+      "runId": 36873025288,
+      "file": "ci-438ab04-pr-web-backend.log",
+      "sha256": "e18072a8fc3f43a0ac35aee4abf956046803b73534c06c7eb93b86bae8a411c8",
+      "actualCheckout": "0e733115d65ee9e531e90d56160332cb2d78394f",
+      "personallyRead": true
+    },
+    {
+      "jobId": 110405293777,
+      "runId": 36873016065,
+      "file": "ci-438ab04-push-web-backend.log",
+      "sha256": "29ff63d9e4547ba02371f6a4ee6c0a74e736460b0d765a92b40712843b1577b4",
+      "actualCheckout": "438ab04a0d1e88e7150beb71cac9191a043e340e",
+      "personallyRead": true
+    },
+    {
+      "jobId": 110405325477,
+      "runId": 36873025288,
+      "file": "ci-438ab04-pr-android-runtime.log",
+      "sha256": "1d4155d8e7d4ec131fb0417722caf99560ac1fcb58f1fcc4c5d886fff3606350",
+      "actualCheckout": "0e733115d65ee9e531e90d56160332cb2d78394f",
+      "personallyRead": true
+    }
+  ],
+  "results": {
+    "webAndBackend": {
+      "bothJobs": "success",
+      "generation": "12 shared resources / 98 operations",
+      "typechecks": "7 packages",
+      "existingBackendTests": "18/18",
+      "existingSharedTests": "2/2",
+      "buildTasks": "6/6"
+    },
+    "prAndroidRuntime": {
+      "result": "success",
+      "existingTests": "4/4",
+      "build": "67 tasks; 4m 5s",
+      "runtime": "API34 hosted emulator"
+    },
+    "pushAndroidRuntime": {
+      "result": "failure",
+      "phase": "SDK emulator installation, before emulator boot or app/tests",
+      "message": "Error on ZipFile unknown archive",
+      "noAppFailureEstablished": true
+    },
+    "macOSJobs": "six queued, none passed"
+  },
+  "failedJobRetry": {
+    "jobId": 110405294463,
+    "attempted": true,
+    "response": "HTTP403: The workflow run containing this job is already running",
+    "retryNotAccepted": true
+  },
+  "limits": [
+    "These hosted results validate the stated 438ab04 checkpoint only, not a later integration/evidence head.",
+    "Existing hosted tests do not replace personally operated W3 acceptance.",
+    "No source, workflow, assertion or deadline changed to suppress the infrastructure failure.",
+    "No queued macOS pass or merge exception is inferred."
+  ]
+}

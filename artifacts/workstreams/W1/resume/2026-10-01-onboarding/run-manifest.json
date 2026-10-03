@@ -1,0 +1,204 @@
+{
+  "recordedAt": "2026-10-01T10:33:33.294Z",
+  "branch": "codex/w1-onboarding-timing-20261001",
+  "baseRevision": "5fdd92eeaa1b17d6d0b61e05d5a6a31f70060e18",
+  "sourceState": "Exact implementation file hashes below identify the uncommitted increment that was built and operated; the delivery commit also contains this record.",
+  "sourceFiles": [
+    {
+      "path": "apps/web/app/onboarding/handle/page.tsx",
+      "sha256": "7b32b53940592035da253a33daf186030bbdd539981e75c327806988837ee2de"
+    },
+    {
+      "path": "apps/web/features/identity/handle.tsx",
+      "sha256": "8edc1969c37910258a7bff281ab2dc5ce82d073680e2fbd755fb90619477b694"
+    },
+    {
+      "path": "apps/web/features/identity/setup.tsx",
+      "sha256": "436c18017a63fc98d53ee547d373ab1bfe9681de216a495d7d663387f6205238"
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/FanShell.swift",
+      "sha256": "3a3cc5b7170c27081e84f2a772aaf1c0d66c7b8462b648411e50cbd4d8b7b781"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanShell.kt",
+      "sha256": "2da0fe81d869052d832da081a3e454a12ec461e9ce59f6f4b33ce58094d6bfd7"
+    },
+    {
+      "path": "config/copy.json",
+      "sha256": "0e16fc327243b9273512c0fd29eb2ae5e6abecd0233da2530b88d13248dd367b"
+    },
+    {
+      "path": "packages/copy/src/index.ts",
+      "sha256": "228bf644c457c4e2f8b7effb10ce7345eecdd33e8022f06c4479dc881c411731"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/QelvoraCopy.swift",
+      "sha256": "b4cd6917d8b8e14846f65bbd1c47b5d75c8704dc40b8a6669e9ebd87cae9713f"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/Localizable.xcstrings",
+      "sha256": "4d3da0bcf7af8ef37b06f40179ec70b335cc5d70fb9086349586f9e9f1bd6e38"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt",
+      "sha256": "619f2be91296c705cb62aaea54415bf5a98e0ad24dc0ffad5d717f421e21f168"
+    },
+    {
+      "path": "apps/android/app/src/main/res/values/strings.xml",
+      "sha256": "6538841a25bd87fbfa6f97c947192096910ed6f119552b54fcc1687443321b03"
+    }
+  ],
+  "environment": {
+    "macOS": "26.7 (25G229)",
+    "node": "24.19.0",
+    "xcode": "26.5 (17F42)",
+    "swift": "6.3.2",
+    "java": "Temurin 21.0.12.1+1",
+    "gradle": "8.9",
+    "androidCompileSdk": 35,
+    "identity": "Explicit development-only synthetic actor; Pantopus production identity disconnected.",
+    "browser": "Codex in-app Chromium browser, one cookie jar",
+    "api": "loopback 4111",
+    "web": "localhost 3011",
+    "database": "creator_w1_onboarding_20261001",
+    "databaseRole": "creator_runtime, non-owner, NOSUPERUSER/NOBYPASSRLS/NOINHERIT",
+    "migrationCount": 40,
+    "historicalRestore": false,
+    "nativeUIControl": "disabled; no native app operation accepted",
+    "viewportPhone": {
+      "width": 390,
+      "height": 844
+    },
+    "viewportDesktop": {
+      "width": 1280,
+      "height": 900
+    },
+    "themes": ["Light", "Night"]
+  },
+  "builds": {
+    "artifacts": [
+      {
+        "name": "web",
+        "path": "apps/web/.next-w1-onboarding-build-20261001/BUILD_ID",
+        "sha256": "09bcbb5545afca0161722dfee731f8f625ab163db11d9bd360570f514af2762c",
+        "modifiedAt": "2026-10-01T10:31:41.622Z"
+      },
+      {
+        "name": "backend",
+        "path": "apps/backend/dist/server.mjs",
+        "sha256": "157c3145a82ba71d052501c301f179f6e0a774004cad381be9853f13e9fde71d",
+        "modifiedAt": "2026-10-01T10:25:54.458Z"
+      },
+      {
+        "name": "iosSimulatorExecutable",
+        "path": "artifacts/workstreams/W1/build/ios-20261001/Build/Products/Debug-iphonesimulator/QelvoraApp.app/QelvoraApp",
+        "sha256": "90981340777a73cceb88111a08e7bc7e9d8e2a01e1ce3ecc7f7116f89fb46cbb",
+        "modifiedAt": "2026-10-01T10:22:54.225Z"
+      },
+      {
+        "name": "androidDebugApk",
+        "path": "artifacts/workstreams/W1/build/android-20261001/app/outputs/apk/debug/app-debug.apk",
+        "sha256": "962783eadd1f123665267c3255a215480290ef79d3a8fa01482b44ce87361df0",
+        "modifiedAt": "2026-10-01T10:24:28.881Z"
+      }
+    ],
+    "webBuildId": "2zvOrNNBEhy9FQG_Qqqb_",
+    "supportingOnly": true,
+    "heavyBuilds": "Serial; native maximum two jobs/workers.",
+    "nativeDependencies": "Installed distributions were copied on write into W1-owned storage. Complete XcodeGen presets repaired the local tool layout. Swift compilation used a compatible local dependency resolution; the tracked Package.resolved was restored to HEAD and was not changed.",
+    "webBuildRecovery": "First production build incorrectly inherited NODE_ENV=development from the API environment and failed prerendering. Rerun with explicit NODE_ENV=production succeeded; no Next source workaround was added."
+  },
+  "checks": {
+    "backendBuild": "passed",
+    "webProductionBuild": "passed",
+    "webTypecheck": "passed",
+    "affectedWebEslint": "passed",
+    "affectedFormatting": "passed",
+    "canonicalGenerate": "passed: 12 shared resources and 96 OpenAPI operations",
+    "canonicalGenerateCheck": "passed",
+    "swiftPackageQelvoraUI": "passed before copy centralization; supporting evidence",
+    "shippingIosSimulator": "passed after final generated copy",
+    "shippingAndroidDebug": "passed after final generated copy",
+    "hostedCI": "Unavailable: Code Review requests a connected GitHub account; no returned current-head pass."
+  },
+  "browserObservations": [
+    "Fresh initial Handle has only a handle in Light and Night. Back returns to Account; initial edit returns to handle-only form.",
+    "Keyboard Continue saves the initial profile and returns to Account. Read-only aggregate immediately then recorded one profile with empty intro.",
+    "An existing profile displays its optional intro. Explicit edit/save and reload retain the synthetic intro.",
+    "Supported CDP request blocking of only the fan-profile endpoint makes the real request fail. Raw fetch error was observed and repaired with plain shared copy. The entered intro and Continue keyboard focus remain.",
+    "After clearing the request block, keyboard retry succeeds and returns to Account. Final Light failure/recovery captures follow shared copy centralization.",
+    "Setup estimate reads About 20 minutes in both desktop themes with no horizontal overflow."
+  ],
+  "captures": [
+    {
+      "file": "initial-handle-light.jpg",
+      "sha256": "02d068ff1327b424b3896615af2cf62c50dad902f9e4300a123b2763a42f83c4",
+      "capturedAt": "2026-10-01T09:55:56.724Z",
+      "inspected": true,
+      "content": "Synthetic local profile only; no real identity or private fan content."
+    },
+    {
+      "file": "initial-handle-night.jpg",
+      "sha256": "36a8cc9b68cc3974d6cd181a0bafb922caf086e4de4d0b430e1fb47e53b0eaf7",
+      "capturedAt": "2026-10-01T09:55:57.140Z",
+      "inspected": true,
+      "content": "Synthetic local profile only; no real identity or private fan content."
+    },
+    {
+      "file": "intro-save-unavailable-night.jpg",
+      "sha256": "63a8f92caf463b959246f4f9c648c5146f321857a860eee174d76c8ec4c95ffc",
+      "capturedAt": "2026-10-01T10:01:09.958Z",
+      "inspected": true,
+      "content": "Synthetic local profile only; no real identity or private fan content."
+    },
+    {
+      "file": "later-profile-intro-night.jpg",
+      "sha256": "d488c7582590d7b647735117c9c802428dc8c18342dd47a796793db63af858f6",
+      "capturedAt": "2026-10-01T10:09:40.913Z",
+      "inspected": true,
+      "content": "Synthetic local profile only; no real identity or private fan content."
+    },
+    {
+      "file": "setup-estimate-light-desktop.jpg",
+      "sha256": "78e66e751ce6925659ea8d5a994840b17db3c5912019fe0531fe4bc28a6c64e6",
+      "capturedAt": "2026-10-01T10:10:33.551Z",
+      "inspected": true,
+      "content": "Synthetic local profile only; no real identity or private fan content."
+    },
+    {
+      "file": "setup-estimate-night-desktop.jpg",
+      "sha256": "c540023a53b32406f6ab78684240016a1f7cbd484f535d8cf13ea84ba5c2abcd",
+      "capturedAt": "2026-10-01T10:10:33.811Z",
+      "inspected": true,
+      "content": "Synthetic local profile only; no real identity or private fan content."
+    },
+    {
+      "file": "intro-save-unavailable-light-final.jpg",
+      "sha256": "8a43bb8b269ea1dc6977b53a870725b9fa480a7aa270f1e40050ccbad6af83e6",
+      "capturedAt": "2026-10-01T10:26:31.761Z",
+      "inspected": true,
+      "content": "Synthetic local profile only; no real identity or private fan content."
+    },
+    {
+      "file": "profile-save-recovered-account-light.jpg",
+      "sha256": "8d25fc6f61041a0ef37537d6b6c6d4933523539ff1a57b45a4fd51452a127791",
+      "capturedAt": "2026-10-01T10:26:43.591Z",
+      "inspected": true,
+      "content": "Synthetic local profile only; no real identity or private fan content."
+    }
+  ],
+  "provenanceQualifications": "Initial/earlier Night captures precede shared-copy centralization; visible wording and onboarding behavior are unchanged. Final Light failure/recovery captures and all final compiler checks use the exact source hashes above. Browser operates the development app using that source, not the production output.",
+  "nonClaims": [
+    "No independent-session revocation/p95 measurement",
+    "No native installation, launch, interaction, secure-storage or physical-device acceptance",
+    "No genuine Pantopus identity, creator approval, WebAuthn assertion, legal signature, AI generation or processor consent",
+    "No consented-participant study acceptance",
+    "Later one-time intro offer after useful answer remains an actual W3/W1 integration gap",
+    "No original artboard or reference image changed"
+  ],
+  "databaseSummary": {
+    "file": "database-summary.json",
+    "sha256": "04c89ea494ae941249b75f274cc7024c6573ddd29974a55e396b1f0ea48f5d52"
+  }
+}

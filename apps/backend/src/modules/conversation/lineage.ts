@@ -6,11 +6,15 @@ import type { ApprovedSentence } from "../agent/runtime.js";
 import type { ConversationPrivacyFamily } from "./privacy.js";
 import type { ConversationRecordings } from "./recordings.js";
 import type { ConversationLineageProjection } from "./lineage-projection.js";
+import { writeConversationExportRows } from "./privacy-export-rows.js";
+import { IdentityIntroOffers } from "../identity/intro-offers.js";
 import { IdSchema } from "@qelvora/api";
 import {
   ConversationMessageSchema,
   ReplyFeedbackInputSchema,
   ReplyFeedbackPolicySchema,
+  ReplyFeedbackResultSchema,
+  ConversationIntroOfferSchema,
   type ReplyFeedbackPolicy,
   type ConversationMessage,
 } from "../../../../../packages/api/src/conversation/contracts.js";
@@ -38,6 +42,49 @@ export interface ReplyFeedbackAuthority {
 }
 
 export class ConversationLineage {
+  private introOffers?: IdentityIntroOffers;
+  configureIntroOffers(introOffers: IdentityIntroOffers) {
+    invariant(
+      !this.introOffers && introOffers instanceof IdentityIntroOffers,
+      "intro_offer_unconfigured",
+      "Intro offers require their actual prepared account authority.",
+    );
+    introOffers.assertPool(this.db.pool);
+    this.introOffers = introOffers;
+  }
+  async pendingIntroOffer(scope: ThreadScope) {
+    assertThreadScope(scope);
+    invariant(
+      scope.authority === "fan" && this.introOffers,
+      "intro_offer_unavailable",
+      "Your intro offer is unavailable. Try again.",
+    );
+    return this.db.withThread(scope, async (client) =>
+      ConversationIntroOfferSchema.parse(
+        await this.introOffers!.pendingInTransaction(scope, client),
+      ),
+    );
+  }
+  async acknowledgeIntroOffer(scope: ThreadScope, offerId: string) {
+    assertThreadScope(scope);
+    invariant(
+      scope.authority === "fan" && this.introOffers,
+      "intro_offer_unavailable",
+      "Your intro offer is unavailable. Try again.",
+    );
+    return this.db.withThread(
+      scope,
+      async (client) => {
+        await this.introOffers!.acknowledgeInTransaction(
+          scope,
+          client,
+          IdSchema.parse(offerId),
+        );
+        return { acknowledged: true as const };
+      },
+      "write",
+    );
+  }
   private recordings?: ConversationRecordings;
   configureRecordings(recordings: ConversationRecordings) {
     invariant(
@@ -148,6 +195,41 @@ export class ConversationLineage {
       "bounded_subjob_required",
       "This export needs a paginated lineage subjob.",
     );
+    return { messages, feedback };
+  }
+  /** Complete source for W3's held-snapshot export. The real leased family is
+   * rechecked before every page and again before source exhaustion. */
+  async exportMetadataTo(
+    client: PoolClient,
+    family: ConversationPrivacyFamily,
+    write: (part: string) => Promise<void>,
+    assertCurrent: () => Promise<void>,
+    signal: AbortSignal,
+  ) {
+    await write('{"messages":');
+    const messages = await writeConversationExportRows({
+      client,
+      family,
+      write,
+      assertCurrent,
+      signal,
+      table: "message",
+      key: "lpad(sequence::text,10,'0')||':'||id::text",
+      projection:
+        "id,agent_version_id,agent_version_hash,corrects_message_id,corrects_message_version,signed_command",
+    });
+    await write(',"feedback":');
+    const feedback = await writeConversationExportRows({
+      client,
+      family,
+      write,
+      assertCurrent,
+      signal,
+      table: "conversation_feedback",
+      key: "message_id::text||':'||account_id::text",
+      projection: `message_id,message_version,account_id,rating,agent_version_id,agent_version_hash,created_at,updated_at${this.feedbackConsentReady ? ",consent_policy_version,consented_at,expires_at" : ""}`,
+    });
+    await write("}");
     return { messages, feedback };
   }
   async prepareDeletion(
@@ -368,7 +450,10 @@ export class ConversationLineage {
               scope.actorAccountId,
             ],
           );
-          return { rating: null };
+          return ReplyFeedbackResultSchema.parse({
+            rating: null,
+            introOffer: null,
+          });
         }
         invariant(
           this.feedbackAuthority,
@@ -406,7 +491,21 @@ export class ConversationLineage {
             consent.expiresAt,
           ],
         );
-        return { rating: body.rating };
+        // Await the owner's operation inside this original write. A response
+        // only records eligibility; the actual Save/Skip has its own receipt.
+        const introOffer =
+          body.rating === "helpful" && this.introOffers
+            ? await this.introOffers.afterHelpfulInTransaction(scope, client, {
+                messageId,
+                messageVersion: body.messageVersion,
+                agentVersionId: body.agentVersion.id,
+                agentVersionHash: body.agentVersion.hash,
+              })
+            : null;
+        return ReplyFeedbackResultSchema.parse({
+          rating: body.rating,
+          introOffer,
+        });
       },
       "write",
     );

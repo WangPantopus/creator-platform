@@ -1,0 +1,19 @@
+{
+  "base": "76a8b28d",
+  "producer": "c4633a3300c732685b95eaa4c8d86d90ed98e705",
+  "viewSha256": "5912ce2ab055ba2a332095749577d81723f42a5a1ddd777cbca36e8646f2b912",
+  "personallyOperated": true,
+  "browser": "built-in tab6",
+  "viewport": [390, 844],
+  "blankUntilRetained": true,
+  "ariaInvalid": "true",
+  "expiredSaveRejected": true,
+  "sameAccountReauthenticated": true,
+  "savedAndReloaded": ["22:00", "08:15", "America/Los_Angeles"],
+  "restoredAndReloaded": ["22:00", "08:00", "America/Los_Angeles"],
+  "nightTextInspected": true,
+  "push": false,
+  "email": false,
+  "notificationDeliveryClaimed": false,
+  "fullW3Complete": false
+}

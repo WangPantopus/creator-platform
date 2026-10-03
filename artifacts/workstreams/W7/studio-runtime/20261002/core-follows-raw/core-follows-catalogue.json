@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-02T11:46:46.263Z",
+  "facts": {
+    "role": "creator_runtime",
+    "migrations": 40,
+    "function": null,
+    "namespace": null
+  },
+  "registration": "Absent; null comparison inputs are not a fabricated approval",
+  "result": {
+    "ready": false
+  },
+  "observed": "Readonly actual catalogue; no migration/role/source mutation; not product acceptance"
+}

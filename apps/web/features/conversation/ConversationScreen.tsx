@@ -24,8 +24,12 @@ import type {
   ConversationPage,
 } from "../../../../packages/api/src/conversation/contracts";
 import { useConversationRequest, ConversationError } from "./api";
-import { formatCopy } from "@qelvora/copy";
+import { copy, formatCopy } from "@qelvora/copy";
+import { useIdentityRequest } from "../identity/session-boundary";
+import { ConversationOfflineStorage } from "./offline-storage";
 import { VoicePlayer } from "../media/VoicePlayer";
+import { IntroOffer } from "../identity/intro-offer";
+import { ReplyFeedbackResultSchema } from "../../../../packages/api/src/conversation/contracts";
 import { ConversationSystemLinkSchema } from "../../../../packages/api/src/conversation/system-link";
 
 function SystemMessage({
@@ -107,6 +111,10 @@ export function ConversationScreen({
   accountId: string;
 }) {
   const request = useConversationRequest();
+  const identity = useIdentityRequest();
+  const offlineStorage = useRef<ConversationOfflineStorage | null>(null);
+  const offlineShowing = useRef(false);
+  const renewingOffline = useRef(false);
   const root = `${creatorId}/${fanId}`;
   const [page, setPage] = useState<ConversationPage | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
@@ -114,6 +122,7 @@ export function ConversationScreen({
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState<Pending | null>(null);
   const [busy, setBusy] = useState(false);
+  const [introOfferId, setIntroOfferId] = useState<string | null>(null);
   const [older, setOlder] = useState<ConversationMessage[]>([]);
   const [before, setBefore] = useState<number | null>(null);
   const current = useRef<ConversationPage | null>(null);
@@ -125,6 +134,81 @@ export function ConversationScreen({
   const lifecycle = useRef(0);
   const mounted = useRef(true);
   const transportReady = useRef(false);
+  const concealThread = useCallback(() => {
+    current.current = null;
+    gate.current = null;
+    setPage(null);
+    setOlder([]);
+    setBefore(null);
+    setOnline(false);
+  }, []);
+  const showOffline = useCallback(async () => {
+    offlineShowing.current = true;
+    const run = lifecycle.current;
+    const saved = await offlineStorage.current?.read();
+    if (
+      !mounted.current ||
+      lifecycle.current !== run ||
+      !offlineShowing.current
+    )
+      return;
+    const previous = current.current;
+    if (
+      !saved ||
+      (previous &&
+        (saved.page.cursor < previous.cursor ||
+          saved.page.epoch < previous.epoch ||
+          saved.page.revision < previous.revision))
+    ) {
+      concealThread();
+      return;
+    }
+    current.current = saved.page;
+    gate.current = null;
+    setPage(saved.page);
+    setOlder([]);
+    setBefore(null);
+    setOnline(false);
+  }, [concealThread]);
+  const renewOffline = useCallback(
+    async (expected: ConversationPage) => {
+      if (
+        renewingOffline.current ||
+        expected.offTheRecord ||
+        !expected.consentCurrent ||
+        document.visibilityState !== "visible" ||
+        !navigator.onLine ||
+        !offlineStorage.current
+      )
+        return;
+      const cache = offlineStorage.current;
+      const run = lifecycle.current,
+        started = performance.now();
+      renewingOffline.current = true;
+      try {
+        const snapshot = await request<{ page: ConversationPage }>(
+          `${root}/offline`,
+        );
+        if (
+          !mounted.current ||
+          run !== lifecycle.current ||
+          !current.current ||
+          snapshot.page.cursor !== current.current.cursor ||
+          snapshot.page.epoch !== current.current.epoch ||
+          snapshot.page.revision !== current.current.revision
+        )
+          return;
+        if (cache === offlineStorage.current)
+          await cache.save(snapshot, started);
+      } catch {
+        if (run === lifecycle.current && cache === offlineStorage.current)
+          cache.purge();
+      } finally {
+        if (run === lifecycle.current) renewingOffline.current = false;
+      }
+    },
+    [root, request],
+  );
   const refresh = useCallback(async () => {
     const revision = lifecycle.current;
     try {
@@ -145,7 +229,9 @@ export function ConversationScreen({
         fresh.epoch,
         fresh.generationSequences,
       );
+      offlineShowing.current = false;
       setPage(fresh);
+      void renewOffline(fresh);
       setOnline(navigator.onLine && transportReady.current);
       setFailure(null);
       setBefore((value) => value ?? fresh.before);
@@ -184,6 +270,9 @@ export function ConversationScreen({
         setDraft("");
         setPending(null);
         sessionStorage.removeItem(cursorKey);
+        offlineStorage.current?.purge();
+      } else {
+        void showOffline();
       }
       setFailure(
         error instanceof Error
@@ -191,16 +280,33 @@ export function ConversationScreen({
           : "This conversation is unavailable.",
       );
     }
-  }, [root, cursorKey, request]);
+  }, [root, cursorKey, request, renewOffline, showOffline]);
 
   useEffect(() => {
     mounted.current = true;
     lifecycle.current++;
     setPage(null);
+    setIntroOfferId(null);
     setOlder([]);
     setDraft("");
     setPending(null);
     setBefore(null);
+    const cache = new ConversationOfflineStorage(
+      accountId,
+      identity.session.sessionId,
+      root,
+      location.origin,
+    );
+    offlineStorage.current = cache;
+    renewingOffline.current = false;
+    const revoked = () => {
+      lifecycle.current++;
+      offlineShowing.current = false;
+      transportReady.current = false;
+      cache.purge();
+      concealThread();
+    };
+    identity.signal.addEventListener("abort", revoked, { once: true });
     try {
       for (const key of Object.keys(sessionStorage))
         if (
@@ -324,6 +430,7 @@ export function ConversationScreen({
           if (disposed || socket !== liveSocket) return;
           transportReady.current = false;
           setOnline(false);
+          void showOffline();
           if (document.visibilityState !== "visible") return;
           reconnect = setTimeout(() => void connect(), delay);
           delay = Math.min(delay * 2, 15000);
@@ -341,6 +448,7 @@ export function ConversationScreen({
     const offline = () => {
       transportReady.current = false;
       setOnline(false);
+      void showOffline();
       socket?.close();
     };
     const resume = () => {
@@ -359,6 +467,9 @@ export function ConversationScreen({
       } else {
         transportReady.current = false;
         setOnline(false);
+        cache.purge();
+        concealThread();
+        offlineShowing.current = false;
         clearTimeout(reconnect);
         socket?.close();
       }
@@ -370,6 +481,21 @@ export function ConversationScreen({
       if (navigator.onLine && document.visibilityState === "visible")
         void orderedRefresh();
     }, 15000);
+    const leaseRefresh = setInterval(() => {
+      if (
+        transportReady.current &&
+        current.current &&
+        document.visibilityState === "visible"
+      )
+        void renewOffline(current.current);
+    }, 2000);
+    const expiry = setInterval(() => {
+      if (offlineShowing.current && !cache.current) {
+        cache.purge();
+        concealThread();
+        offlineShowing.current = false;
+      }
+    }, 100);
     setOnline(false);
     void connect();
     return () => {
@@ -380,6 +506,12 @@ export function ConversationScreen({
       socket?.close();
       clearTimeout(reconnect);
       clearInterval(poll);
+      clearInterval(leaseRefresh);
+      clearInterval(expiry);
+      identity.signal.removeEventListener("abort", revoked);
+      cache.purge();
+      offlineStorage.current = null;
+      offlineShowing.current = false;
       window.removeEventListener("offline", offline);
       window.removeEventListener("online", resume);
       document.removeEventListener("visibilitychange", visible);
@@ -387,7 +519,20 @@ export function ConversationScreen({
       current.current = null;
       gate.current = null;
     };
-  }, [accountId, creatorId, fanId, cursorKey, refresh, request]);
+  }, [
+    accountId,
+    creatorId,
+    fanId,
+    cursorKey,
+    refresh,
+    request,
+    root,
+    identity.session.sessionId,
+    identity.signal,
+    concealThread,
+    renewOffline,
+    showOffline,
+  ]);
   useEffect(() => {
     const clientId = crypto.randomUUID();
     const pulse = () => {
@@ -520,17 +665,19 @@ export function ConversationScreen({
     const revision = lifecycle.current;
     setBusy(true);
     try {
-      const result = await request<{
-        rating: "helpful" | "not_helpful" | null;
-      }>(`${root}/messages/${message.id}/feedback`, {
-        messageVersion: message.version,
-        agentVersion: message.agentVersion,
-        rating,
-        ...(rating !== null
-          ? { consent: true, policyVersion: page!.feedbackPolicy!.version }
-          : {}),
-      });
+      const result = ReplyFeedbackResultSchema.parse(
+        await request<unknown>(`${root}/messages/${message.id}/feedback`, {
+          messageVersion: message.version,
+          agentVersion: message.agentVersion,
+          rating,
+          ...(rating !== null
+            ? { consent: true, policyVersion: page!.feedbackPolicy!.version }
+            : {}),
+        }),
+      );
       if (mounted.current && lifecycle.current === revision) {
+        if (result.introOffer?.offerId)
+          setIntroOfferId(result.introOffer.offerId);
         setOlder((items) =>
           items.map((item) =>
             item.id === message.id && item.version === message.version
@@ -589,7 +736,7 @@ export function ConversationScreen({
           </a>
           <Avatar
             initial={page.creatorName.charAt(0)}
-            live={page.control === "human_active"}
+            live={online && page.control === "human_active"}
           />
           <div>
             <strong>{page.creatorName}</strong>
@@ -619,6 +766,13 @@ export function ConversationScreen({
         />
       </div>
       <div className="conversation-body">
+        <IntroOffer
+          key={`${accountId}:${root}`}
+          root={root}
+          offeredId={introOfferId}
+          enabled={!!page.feedbackPolicy}
+          online={online && !busy}
+        />
         <p className="conversation-disclosure">
           Conversations with a creator’s AI can be read by that creator and
           their authorized team. Those accesses are logged. You can delete any
@@ -626,8 +780,8 @@ export function ConversationScreen({
         </p>
         {!online && (
           <Notice tone="offline" title="You're offline">
-            You're seeing the last loaded conversation. Reconnect to send. Your
-            input is kept on this screen.
+            You're seeing a saved conversation with a short reading lease.
+            Reconnect to send. Your input is kept on this screen.
           </Notice>
         )}
         {page.offTheRecord && (
@@ -637,7 +791,7 @@ export function ConversationScreen({
         )}
         {before && (
           <button
-            disabled={busy}
+            disabled={busy || !online}
             className="qv-btn qv-btn--quiet"
             onClick={() => void loadOlder()}
           >
@@ -736,6 +890,7 @@ export function ConversationScreen({
                 signedActId={message.signedActId ?? undefined}
                 actions={false}
                 live={
+                  online &&
                   !message.correction &&
                   message.authorKind === "human_creator" &&
                   page.control === "human_active"
@@ -780,7 +935,7 @@ export function ConversationScreen({
                 )}
                 {message.deliveryState === "failed" && (
                   <span className="qv-tag">
-                    Reply unavailable · your allowance was released
+                    {copy.conversationReplyUnavailable}
                   </span>
                 )}
               </Message>

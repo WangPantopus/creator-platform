@@ -1,8 +1,16 @@
 # W8 next additive migration custody — 2026-09-30
 
+## Fixed generation guardrail event — 2026-10-02
+
+Reserved0210 belongs to W2 at `apps/backend/src/modules/agent/migrations/pending_w2_generation_guardrail_event.sql`, canonical `0210_w2_generation_guardrail_event`. The owner requested the actual fixed `generation_record_agent_guardrail(uuid,uuid,text,text)` effect for its actorless prepared pipeline. It must consume the original W1 nonce/job and current W2 input/version on the same genuine client/PID/fullXID/login, with bounded category/context hash and exact idempotency. A separate reviewed NOLOGIN purpose may insert only the actual audit effect. No interactive Actor, raw worker table grant, private body, message/memory write, financial effect or no-op audit substitute is supplied. Exact source/signature/typed W1 issuer manifest, effective catalogue, restoration/negatives, C10/expiry and real operation remain review prerequisites. The61 active registry and frozen47-entry map are unchanged.
+
+The human's partial Q16 decision is now [recorded explicitly](../../operations/W8-retention-proposal.md): ordinary purge by day30 and detached known costs for twelve calendar months from original settlement. The unresolved-cost operator/maximum period remain missing; no invented default or financial completion is authorized.
+
 ## Current reservations — 2026-10-02
 
 The initial activation packet contains57 active entries through0062. IDs0063–0097 remain future, unapplied reservations in the registry.0094 is reserved to W4 immutable fulfillment-plan custody (actual packet/commitment list and signed opaque plan ID/hash/revision);0095 is reserved to W3 generation-purpose consumers bound to W1's actual private nonce/proof. W2 input consumers0096 and pre-network attempt admission0097 require the genuine W1 worker nonce/client and reviewed consumer allowlist. Terminal visible-prefix work needs a separate reviewed purpose. W7's `pending_w7_account_notifications.sql` remains unnumbered and outside this packet pending security review. These reservations grant no runtime permission or migration activation. Older allocation statements below are historical.
+
+**Historical pre-wave reservation statement; current initial57 custody above takes precedence:**
 
 **2026-10-02 allocation continuation (reserved, not activated):**0061 W4 payout custody;0062 W6 media worker;0063–0066 W7 relationship/checkpoint/Home/Thanks;0067 W2 usage expiry;0068 W4 paid coverage;0069 W8 exact reply review;0070 W4 actual-viewer public packet;0071 W1 publication worker;0072 W1 generation worker held without a final contract;0073 W8 publication negative;0074 W8 actual content session negative;0075 W6 publication media. Registry JSON activation/renumbering remains a single W8 wave.0048 cannot activate before real accounting export/delete/expiry registration and approved policy.0071 must preserve named0069 purposes by narrowing only PUBLIC policies;0073 binds only its actual full task metadata and grants no scope issuance.0053 pinned bytes remain unchanged.
 

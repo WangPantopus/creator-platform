@@ -1,0 +1,27 @@
+{
+  "source": "5d77763e304ef0691bed30a194f28d9e96e6b970",
+  "backendSource": "5d77763e304ef0691bed30a194f28d9e96e6b970",
+  "backendPort": 4103,
+  "webPort": 3003,
+  "database": "creator_w3",
+  "registeredLedgerRows": 40,
+  "ios": {
+    "shippingBuild": "passed",
+    "binarySha256": "6fae30f035fef4b000392d5a45451298cc28736f9ffc784e2bdc8860f887b1bf",
+    "personallyOperated": false
+  },
+  "android": {
+    "shippingBuild": "passed",
+    "apkSha256": "d190819d9a6059e0c8b30d765e53123e28495d4bc3548c1ca2a87a65d9507d07",
+    "personallyOperatedThisSource": false,
+    "boot": "refused before lease/process because two actual peer emulators were present"
+  },
+  "heavyBuild": {
+    "guardSha256": "f4732a96521bcc5c10efdeebbb02cfbefd03a49a76a4da9067dc1863d5d5cc27",
+    "iosThenAndroid": true,
+    "actualAcquisitions": 2,
+    "actualReleases": 2,
+    "overlap": false
+  },
+  "startup": "Fan generation: unavailable; missing provider model and credentials, in-transaction denial (W8), registered 0077_w2_usage_lineage, registered 0049_w4_generation_cost_settlement."
+}

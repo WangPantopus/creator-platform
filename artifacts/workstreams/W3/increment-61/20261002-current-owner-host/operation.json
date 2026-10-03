@@ -1,0 +1,59 @@
+{
+  "source": "bb5fe1460669044e4f5992250cd499ef99425d94",
+  "oneBackend": {
+    "port": 4103,
+    "source": "bb5fe1460669044e4f5992250cd499ef99425d94",
+    "database": "creator_w3_dev57_1790946508212"
+  },
+  "browser": {
+    "control": "supported built-in CUA Playwright",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "themes": [
+      "light",
+      "night"
+    ],
+    "visibility": "visible",
+    "horizontalOverflowObserved": false,
+    "actions": [
+      "recovered saved @kilnfire and original intro",
+      "read live $0.00 spending / 0 memberships",
+      "clicked Export or delete my data",
+      "selected One conversation",
+      "clicked Try again in Light and Night",
+      "returned to You in Night; saved account and intro recovered"
+    ],
+    "refusal": "Trust not connected; blank creator/thread/verification receipt; export disabled",
+    "exportOrDeletionSubmitted": false,
+    "generationOperated": false
+  },
+  "native": {
+    "newBuild": false,
+    "guestBoot": false,
+    "uiAcceptance": false,
+    "androidStudioCUAAttachment": {
+      "attempted": true,
+      "timedOut": true,
+      "code": -10005,
+      "approximateUTC": "2026-10-02T17:57Z",
+      "beforeGuestBoot": true
+    },
+    "previousAndroidADBInputExcludedFromSupportedCUAAcceptance": true,
+    "alternateIOSControlAuthorization": "pending"
+  },
+  "limits": [
+    "No populated conversation, provider call, terminal settlement, export or deletion",
+    "Shipping native binaries still executable e9c740ea; not this source",
+    "No all-three-client or latency acceptance",
+    "Original database remains closed; copy remains57; no SQL or role change",
+    "Key absent; provider unapproved; current owner worker graph absent"
+  ],
+  "stopped": {
+    "apiExitCode": 0,
+    "webExitCode": 130,
+    "ownedListenersAbsent": true,
+    "peerResourcesTouched": false
+  }
+}

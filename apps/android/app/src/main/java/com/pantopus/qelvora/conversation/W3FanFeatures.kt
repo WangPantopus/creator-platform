@@ -1,6 +1,10 @@
 package com.pantopus.qelvora.conversation
 
 import android.net.Uri
+import android.os.SystemClock
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,9 +18,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -28,7 +34,10 @@ import androidx.compose.ui.unit.dp
 import com.pantopus.qelvora.generated.*
 import com.pantopus.qelvora.identity.FanFeatureRegistration
 import com.pantopus.qelvora.identity.FanSession
+import com.pantopus.qelvora.identity.NativeIntroOffer
 import com.pantopus.qelvora.ui.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -38,11 +47,16 @@ import kotlinx.coroutines.flow.collect
 import kotlin.random.Random
 import kotlinx.serialization.json.*
 import java.util.UUID
+import com.pantopus.qelvora.commerce.CommerceClient
+import com.pantopus.qelvora.commerce.CommerceOverview
+import com.pantopus.qelvora.commerce.CommerceFailure
+import com.pantopus.qelvora.commerce.commerceMoney
 
 object W3FanFeatures {
     /** W1 calls this on sign-out/revocation alongside credential purge. */
     suspend fun clearPrivateState(context: android.content.Context) {
         ConversationRealtime.purge()
+        ConversationOfflineStorage.purge(context)
         ConversationResumeStorage(context).purge()
     }
     fun registration(baseURL: String?) = FanFeatureRegistration(matches = {
@@ -54,7 +68,15 @@ object W3FanFeatures {
             val valid = runCatching { UUID.fromString(parts[1]); UUID.fromString(parts[2]); true }.getOrDefault(false)
             if (valid) ConversationScreen(baseURL, parts[1], parts[2], session) else Notice(title = "Conversation unavailable", children = "Open this conversation from your account.")
         } else if (parts.size == 3 && parts[0] == "creators" && parts[2] == "chat") FirstConversation(baseURL, parts[1], session)
-        else if (Uri.parse(session.destination).path == "/you") ConversationAccount(baseURL, session)
+        else if (Uri.parse(session.destination).path == "/you") {
+            val destination = Uri.parse(session.destination)
+            val creatorId = destination.getQueryParameter("creatorId")
+            val fanId = destination.getQueryParameter("fanId")
+            if (ApplicationDestination.isPermitted(session.destination) && creatorId != null && fanId != null) {
+                val client = remember(baseURL, session.session?.accountId) { ConversationClient(baseURL, session::currentToken, session.session?.accountId) }
+                ConversationPrivacy(client, "$creatorId/$fanId", onBack = { session.open("/you") }, onData = { session.open("/support/privacy") }, onSupport = { session.open("/support") })
+            } else ConversationAccount(baseURL, session)
+        }
         else Notice(title = "Conversation unavailable", children = "Open this conversation from your account.")
     })
 }
@@ -79,17 +101,32 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     var offline by remember(root, accountId) { mutableStateOf(true) }
     var transportReady by remember(root, accountId) { mutableStateOf(false) }
     var busy by remember(root, accountId) { mutableStateOf(false) }
+    var introOfferId by remember(root, accountId) { mutableStateOf<String?>(null) }
     var privacy by remember(root, accountId) { mutableStateOf(false) }
     var source by remember(root, accountId) { mutableStateOf<Pair<String,String>?>(null) }
     val lifecycleOwner = LocalLifecycleOwner.current
     var foreground by remember { mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
+    var offlineContext by remember(baseURL, root, accountId, session.session?.sessionId) { mutableStateOf<Long?>(null) }
+    var renewingOffline by remember(baseURL, root, accountId) { mutableStateOf(false) }
+    var offlineShowing by remember(baseURL, root, accountId) { mutableStateOf(false) }
+    var viewRun by remember(baseURL, root, accountId) { mutableStateOf(0) }
     val presenceId = remember(root) { UUID.randomUUID().toString() }
     val scope = rememberCoroutineScope()
     val scroll = rememberLazyListState()
     DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _,_ -> foreground = lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED) }
+        val observer = LifecycleEventObserver { _,_ ->
+            foreground = lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+            if (!foreground) {
+                viewRun++; offlineShowing = false; transportReady = false; offline = true
+                page = null; older = emptyList(); before = null; gate = null; source = null
+                offlineContext?.let { ConversationOfflineStorage.purge(it) }; offlineContext = null
+            }
+        }
         lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer); viewRun++
+            offlineContext?.let { ConversationOfflineStorage.purge(it) }; offlineContext = null
+        }
     }
     LaunchedEffect(root,foreground,privacy,page?.threadId) {
         if (page != null) {
@@ -98,27 +135,81 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             else while (true) { pulse(true);delay(20000) }
         }
     }
+    fun conceal() { page = null; older = emptyList(); before = null; gate = null; source = null }
+    suspend fun showOffline() {
+        val run = viewRun
+        val lease = offlineContext
+        offlineShowing = true
+        val snapshot = withContext(Dispatchers.IO) { lease?.let { ConversationOfflineStorage.read(it) } }
+        if (run != viewRun || !foreground || privacy || !offlineShowing) return
+        val current = page
+        if (snapshot == null || (current != null && (snapshot.page.cursor < current.cursor || snapshot.page.epoch < current.epoch || snapshot.page.revision < current.revision))) { conceal(); return }
+        page = snapshot.page; older = emptyList(); before = null; gate = null; source = null
+    }
+    suspend fun renewOffline() {
+        val current = page ?: return
+        val lease = offlineContext ?: return
+        val run = viewRun
+        if (!foreground || privacy || !transportReady || current.offTheRecord || !current.consentCurrent) return
+        val started = SystemClock.elapsedRealtime()
+        try {
+            val value = client.request("$root/offline")
+            val snapshot = client.json.decodeFromJsonElement<ConversationOfflineSnapshot>(value)
+            if (run != viewRun || !foreground || privacy || !transportReady || page?.cursor != snapshot.page.cursor || page?.epoch != snapshot.page.epoch || page?.revision != snapshot.page.revision) return
+            val saved = withContext(Dispatchers.IO) { ConversationOfflineStorage.save(value.toString().toByteArray(Charsets.UTF_8), lease, started) }
+            if (!saved && offlineContext == lease) offlineContext = null
+        } catch (failure: Exception) {
+            if (failure is CancellationException) throw failure
+            ConversationOfflineStorage.purge(lease); if (offlineContext == lease) offlineContext = null
+        }
+    }
     val fail: (Throwable) -> Unit = { failure ->
         if (failure is CancellationException) throw failure
         error = failure.message ?: "Reconnect to refresh. Your input is kept."
-        offline = true
-        if (failure is ConversationFailure && failure.status in listOf(401,403,404)) { page = null; older = emptyList(); before = null; draft = ""; pending = null; gate = null; source = null; privacy = false; transportReady = false; scope.launch { runCatching { resumeStorage.remove(accountId, storageScope) } } }
+        offline = true; transportReady = false
+        if (failure is ConversationFailure && failure.status in listOf(401,403,404)) { offlineShowing = false; offlineContext?.let { ConversationOfflineStorage.purge(it) }; offlineContext = null; page = null; older = emptyList(); before = null; draft = ""; pending = null; gate = null; source = null; privacy = false; transportReady = false; scope.launch { runCatching { resumeStorage.remove(accountId, storageScope) } } }
+        else scope.launch { showOffline() }
     }
     suspend fun refresh() {
+        val run = viewRun
+        if (!foreground || privacy) return
         try {
             if (!resumeActivated) {
                 try { resumeStorage.activate(accountId) } catch (failure: Exception) { if (failure is CancellationException) throw failure }
                 resumeActivated = true
             }
             val fresh = client.page(root)
+            if (run != viewRun || !foreground || privacy) return
             if (fresh.cursor >= (page?.cursor ?: 0) && fresh.epoch >= (page?.epoch ?: 0) && fresh.revision >= (page?.revision ?: 0)) {
-                page = fresh; if (before == null && older.isEmpty()) before = fresh.before
+                offlineShowing = false; page = fresh; if (before == null && older.isEmpty()) before = fresh.before
                 gate = ThreadDeliveryGate(fresh.threadId, fresh.cursor, fresh.epoch, fresh.generationSequences)
                 try { resumeStorage.save(accountId, storageScope, fresh.cursor, fresh.epoch) } catch (failure: Exception) { if (failure is CancellationException) throw failure }
                 offline = !transportReady; error = ""
                 pending?.let { item -> if (client.request("$root/messages/status", buildJsonObject { put("idempotencyKey", item.key) }).jsonObject["accepted"]?.jsonPrimitive?.boolean == true && pending?.key == item.key) { pending = null; if (draft.trim() == item.text) draft = "" } }
             }
-        } catch (failure: Throwable) { fail(failure) }
+        } catch (failure: Throwable) { if (run == viewRun) fail(failure) }
+    }
+    LaunchedEffect(baseURL, root, accountId, foreground, privacy) {
+        if (!foreground || privacy) {
+            viewRun++; offlineContext?.let { ConversationOfflineStorage.purge(it) }; offlineContext = null
+            offlineShowing = false; conceal(); return@LaunchedEffect
+        }
+        var nextRenew = 0L
+        renewingOffline = false
+        while (isActive) {
+            if (offlineShowing && offlineContext?.let { ConversationOfflineStorage.current(it) } != true) {
+                offlineContext?.let { ConversationOfflineStorage.purge(it) }; offlineContext = null; offlineShowing = false; conceal()
+            }
+            if (SystemClock.elapsedRealtime() >= nextRenew) {
+                nextRenew = SystemClock.elapsedRealtime() + 2000
+                if (offlineContext == null) offlineContext = ConversationOfflineStorage.activate(context,baseURL,accountId,session.session?.sessionId.orEmpty(),root)
+                if (!renewingOffline) {
+                    renewingOffline = true; val run = viewRun
+                    launch { try { renewOffline() } finally { if (run == viewRun) renewingOffline = false } }
+                }
+            }
+            delay(100)
+        }
     }
     suspend fun send(retry: Boolean = false) {
         val current = page ?: return
@@ -133,7 +224,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         } catch (failure: Throwable) { val uncertain = failure !is ConversationFailure || failure.status >= 500 || failure.status == 409; pending = item.copy(uncertain = uncertain, rejected = !uncertain); fail(failure) }
         finally { busy = false }
     }
-    LaunchedEffect(root, accountId, foreground, privacy) {
+    LaunchedEffect(baseURL, root, accountId, foreground, privacy) {
         transportReady = false; offline = true
         if (!foreground || privacy) return@LaunchedEffect
         var backoff = 1000L
@@ -165,17 +256,18 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 fail(failure)
                 if (failure is ConversationFailure && failure.status in listOf(401,403,404)) return@LaunchedEffect
             } finally { transportReady = false; offline = true }
+            showOffline()
             delay(backoff + Random.nextLong(0, backoff / 4 + 1))
             backoff = minOf(15000L, backoff * 2)
         }
     }
     if (privacy) {
-        ConversationPrivacy(client, root, page?.creatorName ?: "the creator", onBack = { privacy = false }, onData = { session.open("/support/privacy") })
+        ConversationPrivacy(client, root, onBack = { privacy = false }, onData = { session.open("/support/privacy") }, onSupport = { session.open("/support") })
         return
     }
     source?.let { passage -> Dialog(onDismissRequest = { source = null }) {
         Column(Modifier.background(qColor("ground")).padding(16.dp)) {
-            BasicText("Original source", style = qText("meta").copy(color = qColor("ink")))
+            BasicText("Original source", style = qText("data-sm").copy(color = qColor("ink")))
             LazyColumn(Modifier.weight(1f, fill = false), verticalArrangement = Arrangement.spacedBy(16.dp)) { item { BasicText(passage.first, style = qText("display-md").copy(color = qColor("ink"))); SelectionContainer { BasicText(passage.second, style = qText("body").copy(color = qColor("ink"))) } } }
             Button("Close", variant = ButtonVariant.QUIET) { source = null }
         }
@@ -187,13 +279,17 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             Button("Refresh", variant = ButtonVariant.SECONDARY) { scope.launch { refresh() } }
             Button("Help and safety", variant = ButtonVariant.QUIET) { session.open("/support") }
         } else {
-            ThreadHeader(name = current.creatorName, subtitle = "Official AI", live = current.control == APIThreadControl.HUMAN_ACTIVE, onBack = { session.open("/you") }, onAbout = { privacy = true })
+            ThreadHeader(name = current.creatorName, subtitle = "Official AI", live = !offline && current.control == APIThreadControl.HUMAN_ACTIVE, onBack = { session.open("/you") }, onAbout = { privacy = true })
             IdentityStrip(state = if (current.control == APIThreadControl.HUMAN_ACTIVE) IdentityState.HUMAN else if (current.control == APIThreadControl.AI_ACTIVE) IdentityState.AI else IdentityState.PAUSED, name = current.creatorName)
             LazyColumn(state = scroll, modifier = Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                item(key = "intro-offer") {
+                    NativeIntroOffer(client, root, session, introOfferId, current.feedbackPolicy != null,
+                        enabled = !busy && !offline && foreground && !privacy && source == null)
+                }
                 item { BasicText("Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.", style = qText("caption").copy(color = qColor("ink"))) }
-                if (offline) item { Notice(title = "You're offline", children = "You're seeing the last loaded conversation. Reconnect to send.") }
+                if (offline) item { Notice(title = "You're offline", children = "Saved conversation is available briefly while its reading permission is current. Reconnect to send.") }
                 if (current.offTheRecord) item { SystemLine(text = "Off the record · the AI keeps no memory from this conversation.") }
-                if (before != null) item { Button("Earlier messages", variant = ButtonVariant.QUIET, disabled = busy) { scope.launch {
+                if (before != null) item { Button("Earlier messages", variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground) { scope.launch {
                     busy = true
                     try { val previous = client.page("$root?before=$before"); older = (previous.messages + older).distinctBy { it.id }.take(250); before = previous.before }
                     catch (failure: Throwable) { fail(failure) } finally { busy = false }
@@ -239,12 +335,14 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                                 if (!busy && !offline && foreground) {
                                     busy = true
                                     try {
-                                        client.request("$root/messages/${message.id}/feedback", buildJsonObject {
+                                        val response = client.request("$root/messages/${message.id}/feedback", buildJsonObject {
                                             put("messageVersion", message.version)
                                             put("agentVersion", buildJsonObject { put("id", version.id); put("hash", version.hash) })
                                             put("rating", rating?.let { JsonPrimitive(it) } ?: JsonNull)
                                             if (rating != null) { put("consent", true); put("policyVersion", policy.version) }
-                                        }); older = older.map { if (it.id == message.id) it.copy(feedback = rating) else it }; refresh()
+                                        })
+                                        introOfferId = response.jsonObject["introOffer"]?.takeUnless { it is JsonNull }?.jsonObject?.get("offerId")?.jsonPrimitive?.contentOrNull
+                                        older = older.map { if (it.id == message.id) it.copy(feedback = rating) else it }; refresh()
                                     } catch (failure: Throwable) { fail(failure) } finally { busy = false }
                                 }
                             } }
@@ -290,9 +388,9 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 Button("Report", variant = ButtonVariant.QUIET, onClick = onReport)
             }
             else if (kind != null) {
-                Message(kind = kind, children = message.text, name = name, member = message.member ?: "Authorized team member", delivery = if (message.deliveryState == APIMessageDeliveryState.GENERATING) if (message.text.isEmpty()) Delivery.ACCEPTED else Delivery.STREAMING else if (message.deliveryState == APIMessageDeliveryState.INTERRUPTED) Delivery.INTERRUPTED else null, live = message.correction == null && message.authorKind == APIMessageAuthorKind.HUMAN_CREATOR && control == APIThreadControl.HUMAN_ACTIVE, actions = false, onVerify = onVerify, citation = if (message.citations.isEmpty()) null else { { message.citations.forEach { id -> CitationChip(title = "Source", meta = "Read the original passage", onOpen = { onCitation(id) }) } } })
+                Message(kind = kind, children = message.text, name = name, member = message.member ?: "Authorized team member", delivery = if (message.deliveryState == APIMessageDeliveryState.GENERATING) if (message.text.isEmpty()) Delivery.ACCEPTED else Delivery.STREAMING else if (message.deliveryState == APIMessageDeliveryState.INTERRUPTED) Delivery.INTERRUPTED else null, live = connected && message.correction == null && message.authorKind == APIMessageAuthorKind.HUMAN_CREATOR && control == APIThreadControl.HUMAN_ACTIVE, actions = false, onVerify = onVerify, citation = if (message.citations.isEmpty()) null else { { message.citations.forEach { id -> CitationChip(title = "Source", meta = "Read the original passage", onOpen = { onCitation(id) }) } } })
                 if (message.correction != null) { BasicText(QelvoraCopy.text("correctionAuthor", mapOf("name" to name)), style = qText("label").copy(color = qColor("ink"))); Button("Original AI reply · version ${message.correction.originalVersion}", variant = ButtonVariant.QUIET, onClick = onOriginal) }
-                if (message.deliveryState == APIMessageDeliveryState.FAILED) BasicText("Reply unavailable · your allowance was released", style = qText("caption").copy(color = qColor("ink")))
+                if (message.deliveryState == APIMessageDeliveryState.FAILED) BasicText(QelvoraCopy.text("conversationReplyUnavailable"), style = qText("caption").copy(color = qColor("ink")))
                 if (message.authorKind != APIMessageAuthorKind.FAN) Button("Report", variant = ButtonVariant.QUIET, onClick = onReport)
                 if (message.authorKind == APIMessageAuthorKind.FAN) { if(message.offTheRecord) BasicText("Not used for memory",style=qText("caption").copy(color = qColor("ink"))) else Button("Don't remember this",variant=ButtonVariant.QUIET,disabled=onForget==null) { onForget?.invoke() } }
             } else {
@@ -304,50 +402,90 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     }
 }
 
-@Composable private fun ConversationPrivacy(client: ConversationClient, root: String, name: String, onBack: () -> Unit, onData: () -> Unit) {
-    var memory by remember(root) { mutableStateOf<ConversationMemories?>(null) }
-    var audit by remember(root) { mutableStateOf<List<ConversationAudit>>(emptyList()) }
-    var usage by remember(root) { mutableStateOf<ConversationUsage?>(null) }
-    var policy by remember(root) { mutableStateOf<ConversationCapabilities?>(null) }; var page by remember(root) { mutableStateOf<ConversationPage?>(null) }
+@Composable private fun ConversationPrivacy(client: ConversationClient, root: String, onBack: () -> Unit, onData: () -> Unit, onSupport: () -> Unit) {
+    var memory by remember(client, root) { mutableStateOf<ConversationMemories?>(null) }
+    var audit by remember(client, root) { mutableStateOf<List<ConversationAudit>?>(null) }
+    var usage by remember(client, root) { mutableStateOf<ConversationUsage?>(null) }
+    var policy by remember(client, root) { mutableStateOf<ConversationCapabilities?>(null) }; var page by remember(client, root) { mutableStateOf<ConversationPage?>(null) }
+    val name = page?.creatorName ?: "this creator"
     val uriHandler = LocalUriHandler.current
-    var error by remember(root) { mutableStateOf("") }; var busy by remember { mutableStateOf(false) }
-    var provenance by remember(root) { mutableStateOf<ConversationMessage?>(null) }
-    var editing by remember { mutableStateOf<String?>(null) }; var text by remember { mutableStateOf("") }
+    var error by remember(client, root) { mutableStateOf("") }; var busy by remember(client, root) { mutableStateOf(false) }
+    var provenance by remember(client, root) { mutableStateOf<ConversationMessage?>(null) }
+    var editing by remember(client, root) { mutableStateOf<String?>(null) }; var text by remember(client, root) { mutableStateOf("") }
+    var revision by remember(client, root) { mutableStateOf(0) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var foreground by remember(lifecycleOwner) { mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
     val scope = rememberCoroutineScope()
-    suspend fun refresh() { try { memory = client.json.decodeFromJsonElement(client.request("$root/memory")); audit = client.json.decodeFromJsonElement(client.request("$root/audit")); policy = client.json.decodeFromJsonElement(client.request("capabilities", publicRead = true)); page = client.page(root); usage = client.json.decodeFromJsonElement(client.request("$root/usage")); error = "" } catch (failure: Throwable) { if (failure is CancellationException) throw failure; if (failure is ConversationFailure && failure.status in listOf(401,403,404)) { memory = null; audit = emptyList(); page = null; usage = null; editing = null; text = ""; provenance = null }; error = failure.message ?: "Reconnect to refresh your privacy settings." } }
+    fun conceal() { revision += 1; memory = null; audit = null; policy = null; page = null; usage = null; provenance = null; busy = false }
+    fun current(ticket: Int) = revision == ticket && foreground
+    fun failed(failure: Throwable, fallback: String) {
+        if (failure is CancellationException) throw failure
+        if (failure is ConversationFailure && failure.status in listOf(401,403,404)) { conceal(); editing = null; text = "" }
+        error = failure.message ?: fallback
+    }
+    DisposableEffect(lifecycleOwner, client, root) {
+        val observer = LifecycleEventObserver { _, _ ->
+            val active = lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+            if (!active) conceal()
+            foreground = active
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer); conceal() }
+    }
+    suspend fun refresh() {
+        conceal()
+        if (!foreground) return
+        val ticket = revision; error = ""
+        try {
+            val freshMemory: ConversationMemories = client.json.decodeFromJsonElement(client.request("$root/memory"))
+            val freshAudit: List<ConversationAudit> = client.json.decodeFromJsonElement(client.request("$root/audit"))
+            val freshPolicy: ConversationCapabilities = client.json.decodeFromJsonElement(client.request("capabilities", publicRead = true))
+            val freshPage = client.page(root)
+            val freshUsage: ConversationUsage = client.json.decodeFromJsonElement(client.request("$root/usage"))
+            if (current(ticket)) { memory = freshMemory; audit = freshAudit; policy = freshPolicy; page = freshPage; usage = freshUsage }
+        } catch (failure: Throwable) { if (failure is CancellationException) throw failure; if (current(ticket)) failed(failure, "Reconnect to refresh your privacy settings.") }
+    }
+    suspend fun change(fallback: String, run: suspend () -> Unit) {
+        if (busy || !foreground || page == null || memory == null) return
+        val ticket = revision; busy = true
+        try { run(); if (current(ticket)) { editing = null; refresh() } }
+        catch (failure: Throwable) { if (failure is CancellationException) throw failure; if (current(ticket)) failed(failure, fallback) }
+        finally { if (revision == ticket) busy = false }
+    }
+    suspend fun source(item: ConversationMemory) {
+        val ticket = revision
+        try {
+            val message: ConversationMessage = client.json.decodeFromJsonElement(client.request("$root/messages/${item.provenanceMessageId}"))
+            if (current(ticket) && memory?.items?.any { it.id == item.id } == true) provenance = message
+        } catch (failure: Throwable) { if (failure is CancellationException) throw failure; if (current(ticket)) failed(failure, "This source message is unavailable.") }
+    }
     suspend fun decide(item: ConversationMemory, action: String) {
-        val snapshot = memory ?: return; if (busy) return; busy = true
-        try { client.request("$root/memory/${item.id}", buildJsonObject { put("action", action); put("expectedRevision", snapshot.revision); if (action == "edit") put("text", text) }); editing = null; refresh() }
-        catch (failure: Throwable) { if (failure is CancellationException) throw failure; error = failure.message ?: "This change could not be saved." } finally { busy = false }
+        val snapshot = memory ?: return
+        change("This change could not be saved.") { client.request("$root/memory/${item.id}", buildJsonObject { put("action", action); put("expectedRevision", snapshot.revision); if (action == "edit") put("text", text) }) }
     }
     suspend fun preferences(offTheRecord: Boolean, introShared: Boolean) {
-        if (busy) return
-        val revision = memory?.revision ?: return
-        busy = true
-        try { client.request("$root/preferences", buildJsonObject { put("offTheRecord",offTheRecord); put("introShared",introShared); put("expectedRevision",revision) }); refresh() }
-        catch (failure: Throwable) { if (failure is CancellationException) throw failure; error = failure.message ?: "This setting could not be saved." } finally { busy = false }
+        val snapshot = memory ?: return
+        change("This setting could not be saved.") { client.request("$root/preferences", buildJsonObject { put("offTheRecord",offTheRecord); put("introShared",introShared); put("expectedRevision",snapshot.revision) }) }
     }
     suspend fun consent() {
-        if (busy) return
         val currentPolicy = policy?.providers ?: return
-        busy = true
-        try { client.request("$root/consent", buildJsonObject { put("version",currentPolicy.version); put("accepted",page?.consentCurrent != true) }); refresh() }
-        catch (failure: Throwable) { if (failure is CancellationException) throw failure; error = failure.message ?: "Consent could not be saved." } finally { busy = false }
+        val accepted = page?.consentCurrent != true
+        change("Consent could not be saved.") { client.request("$root/consent", buildJsonObject { put("version",currentPolicy.version); put("accepted",accepted) }) }
     }
     provenance?.let { message -> Dialog(onDismissRequest={provenance=null}) { Column(Modifier.background(qColor("ground")).padding(16.dp)) {
         BasicText("Where this came from",style=qText("title").copy(color = qColor("ink")));BasicText(message.authorLabel(name),style=qText("label").copy(color = qColor("ink")))
         LazyColumn(Modifier.weight(1f,fill=false)) { item { SelectionContainer { BasicText(message.text,style=qText("body").copy(color = qColor("ink"))) } } }
         BasicText(message.createdAt,style=qText("data-sm").copy(color = qColor("ink")));Button("Close",variant=ButtonVariant.QUIET) {provenance=null}
     } } }
-    LaunchedEffect(root) { refresh() }
+    LaunchedEffect(client, root, foreground) { if (foreground) refresh() else conceal() }
     LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.fillMaxSize().background(qColor("ground"))) {
-        item { Button("Back", variant = ButtonVariant.QUIET, onClick = onBack); BasicText("Me and privacy", style = qText("title").copy(color = qColor("ink"))); if (error.isNotEmpty()) Notice(title = "Privacy status", children = error) }
-        item { BasicText("What $name's AI remembers", style = qText("display-md").copy(color = qColor("ink"))); if (memory?.items?.isEmpty() == true) BasicText("No memories. The AI asks before remembering.", style = qText("body").copy(color = qColor("ink"))) }
+        item { Button("Back", variant = ButtonVariant.QUIET, onClick = onBack); BasicText("Me and privacy", style = qText("title").copy(color = qColor("ink"))); if (error.isNotEmpty()) { Notice(title = "Privacy status", children = error); Button("Try again", variant = ButtonVariant.SECONDARY, disabled = busy) { scope.launch { refresh() } } } }
+        item { BasicText("What $name's AI remembers", style = qText("display-md").copy(color = qColor("ink"))); if (memory == null) BasicText(if (error.isEmpty()) "Loading your memories…" else "Memories unavailable.", style = qText("body").copy(color = qColor("ink"))); if (memory?.items?.isEmpty() == true) BasicText("No memories. The AI asks before remembering.", style = qText("body").copy(color = qColor("ink"))) }
         items(memory?.items.orEmpty(), key = { it.id }) { item -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            BasicText(if (item.state == "proposed") "Want me to remember this? Only if you say yes." else "Remembered · ${item.kind}", style = qText("meta").copy(color = qColor("ink")))
+            BasicText(if (item.state == "proposed") "Want me to remember this? Only if you say yes." else "Remembered · ${item.kind}", style = qText("data-sm").copy(color = qColor("ink")))
             if (editing == item.id) { BasicTextField(text, { text = it.take(2000) }, textStyle = qText("body").copy(color = qColor("ink")), cursorBrush = SolidColor(qColor("ink"))); Button("Save proposal", variant = ButtonVariant.SECONDARY, disabled = busy || text.isBlank()) { scope.launch { decide(item, "edit") } } } else BasicText(item.text, style = qText("body").copy(color = qColor("ink")))
             if (item.sensitiveCategory != null) BasicText("Sensitive item · agreeing applies only to this exact memory.", style = qText("caption").copy(color = qColor("ink")))
-            Button("View where this came from",variant=ButtonVariant.QUIET) { scope.launch { try { provenance=client.json.decodeFromJsonElement(client.request("$root/messages/${item.provenanceMessageId}")) } catch(failure:Throwable) { if(failure is CancellationException) throw failure;error=failure.message ?: "This source message is unavailable." } } }
+            Button("View where this came from",variant=ButtonVariant.QUIET) { scope.launch { source(item) } }
             Row { if (item.state == "proposed") Button("Remember", variant = ButtonVariant.SECONDARY, disabled = busy || memory?.offTheRecord == true) { scope.launch { decide(item, "accept") } }; Button("Edit", variant = ButtonVariant.QUIET, disabled = busy) { editing = item.id; text = item.text }; Button(if (item.state == "proposed") "Don't remember" else "Delete", variant = ButtonVariant.QUIET, disabled = busy) { scope.launch { decide(item, "delete") } } }
             if (item.kind == "open_loop" && item.state == "remembered") Button("Resolved", variant = ButtonVariant.QUIET, disabled = busy) { scope.launch { decide(item, "resolve") } }
         } }
@@ -357,17 +495,18 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             Button(if (memory?.offTheRecord == true) "Turn off off-the-record" else "Turn on off-the-record", variant = ButtonVariant.SECONDARY, disabled = busy || memory == null) { scope.launch { preferences(memory?.offTheRecord != true, memory?.introShared == true) } }
             Button(if (memory?.introShared == true) "Stop sharing my intro" else "Share my intro with this creator's AI", variant = ButtonVariant.QUIET, disabled = busy || memory == null) { scope.launch { preferences(memory?.offTheRecord == true,memory?.introShared != true) } }
             BasicText("AI providers", style = qText("display-md").copy(color = qColor("ink")))
+            if (policy?.providers?.verified == false) Notice(title=QelvoraCopy.text("conversationDevelopmentPolicyTitle"),children=QelvoraCopy.text("conversationDevelopmentPolicyNotice"))
             policy?.providers?.providers?.forEach { provider ->
                 Button(provider.name + " processing terms", variant = ButtonVariant.QUIET) { uriHandler.openUri(provider.termsUrl) }
                 BasicText((if(provider.noTraining) "Doesn't train on your messages." else "Review message use in these terms.") + " " + (if(provider.noRetention) "Doesn't keep your messages." else "Review message retention in these terms."), style = qText("caption").copy(color = qColor("ink")))
             }
-            if (policy?.providers == null) BasicText("AI providers and verified processing terms are not configured yet.", style = qText("body").copy(color = qColor("ink")))
-            Button(if(page?.consentCurrent == true) "Withdraw AI provider consent" else "Agree to these AI providers", variant = ButtonVariant.SECONDARY, disabled = busy || policy?.providers?.verified != true) { scope.launch { consent() } }
+            if (policy?.providers == null) BasicText("AI provider consent is unavailable or has been withdrawn.", style = qText("body").copy(color = qColor("ink")))
+            Button(if(page?.consentCurrent == true) "Withdraw AI provider consent" else "Agree to these AI providers", variant = ButtonVariant.SECONDARY, disabled = busy || (page?.consentCurrent != true && policy?.consentAvailable != true)) { scope.launch { consent() } }
         }
-        item { BasicText("Time with this creator's AI",style=qText("display-md").copy(color = qColor("ink")));usage?.let { time -> BasicText(time.measurement + " Days are shown in UTC.",style=qText("caption").copy(color = qColor("ink")));BasicText("This week · ${time.days.sumOf { it.seconds }.toInt()/60} minutes",style=qText("body").copy(color = qColor("ink")));time.days.forEach { day -> BasicText("${day.day} · ${day.seconds.toInt()/60} minutes",style=qText("body").copy(color = qColor("ink"))) };if(!time.modeAvailable) BasicText("Companion mode time signals await the verified AI mode configuration.",style=qText("caption").copy(color = qColor("ink"))) } }
-        item { BasicText("Who opened your conversations", style = qText("display-md").copy(color = qColor("ink"))); if (audit.isEmpty()) BasicText("No logged openings.", style = qText("body").copy(color = qColor("ink"))) }
-        items(audit, key = { it.id }) { entry -> BasicText((if (entry.role == "creator") "$name's account" else if (entry.role == "ops") "Authorized safety account" else "Authorized team · ${entry.role}") + "\nAccount " + entry.readerAccountId + "\n" + entry.readAt, style = qText("body").copy(color = qColor("ink"))) }
-        item { BasicText("This shows when an authorized account opened a conversation, not that a person read every message.", style = qText("caption").copy(color = qColor("ink"))); Button("Export or delete my data", variant = ButtonVariant.SECONDARY, block = true, onClick = onData) }
+        item { BasicText("Time with this creator's AI",style=qText("display-md").copy(color = qColor("ink"))); if (usage == null) BasicText(if (error.isEmpty()) "Loading time history…" else "Time history unavailable.", style = qText("body").copy(color = qColor("ink"))); usage?.let { time -> BasicText(time.measurement + " Days are shown in UTC.",style=qText("caption").copy(color = qColor("ink")));BasicText("This week · ${time.days.sumOf { it.seconds }.toInt()/60} minutes",style=qText("body").copy(color = qColor("ink")));time.days.forEach { day -> BasicText("${day.day} · ${day.seconds.toInt()/60} minutes",style=qText("body").copy(color = qColor("ink"))) };if(!time.modeAvailable) BasicText("Companion mode time signals await the verified AI mode configuration.",style=qText("caption").copy(color = qColor("ink"))) } }
+        item { BasicText("Who opened your conversations", style = qText("display-md").copy(color = qColor("ink"))); if (audit == null) BasicText(if (error.isEmpty()) "Loading opening history…" else "Opening history unavailable.", style = qText("body").copy(color = qColor("ink"))) else if (audit?.isEmpty() == true) BasicText("No logged openings.", style = qText("body").copy(color = qColor("ink"))) }
+        items(audit.orEmpty(), key = { it.id }) { entry -> BasicText((if (entry.role == "creator") "$name's account" else if (entry.role == "ops") "Authorized safety account" else "Authorized team · ${entry.role}") + "\nAccount " + entry.readerAccountId + "\n" + entry.readAt, style = qText("body").copy(color = qColor("ink"))) }
+        item { BasicText("This shows when an authorized account opened a conversation, not that a person read every message.", style = qText("caption").copy(color = qColor("ink"))); Button("Export or delete my data", variant = ButtonVariant.SECONDARY, block = true, onClick = onData); Button("Help and safety", variant = ButtonVariant.QUIET, onClick = onSupport) }
     }
 }
 
@@ -385,28 +524,56 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         try {
             require(Regex("[A-Za-z0-9_-]{1,100}").matches(handle))
             creator = growth.request("public/creators/$handle").getJSONObject("creator")
-            capabilities = client.json.decodeFromJsonElement(client.request("capabilities",publicRead = true))
+        } catch (failure: Throwable) { if (failure is CancellationException) throw failure; error = "This creator or the conversation service is unavailable." }
+        try {
+            capabilities = client.json.decodeFromJsonElement(client.request("capabilities", publicRead = true))
         } catch (failure: Throwable) { if (failure is CancellationException) throw failure; error = "This creator or the conversation service is unavailable." }
     }
     val name = creator?.optString("name").orEmpty().ifBlank { "the creator" }
-    LazyColumn(Modifier.fillMaxSize().widthIn(max = 390.dp).background(qColor("ground")),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(24.dp)) {
-        item { Button("Back",variant=ButtonVariant.QUIET) { session.open("/creators/$handle") }; AuthorLabel(kind=AuthorKind.AI,name=name); BasicText("Before your first message",style=qText("display-lg").copy(color = qColor("ink"))) }
+    LazyColumn(Modifier.fillMaxSize().widthIn(max = 390.dp).background(qColor("ground")), contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 36.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
         item {
-            BasicText("WHO RUNS IT",style=qText("meta").copy(color = qColor("ink")))
-            val policy = capabilities?.providers
-            if(policy == null) BasicText("AI providers and their verified processing terms are not configured yet.",style=qText("body").copy(color = qColor("ink")))
-            policy?.providers?.forEach { provider ->
-                BasicText("This AI is powered by ${provider.name}.",style=qText("body").copy(color = qColor("ink")))
-                Button(provider.name + " processing terms",variant=ButtonVariant.QUIET) { uriHandler.openUri(provider.termsUrl) }
-                BasicText((if(provider.noTraining) "Doesn't train on your messages." else "Review message use in these terms.") + " " + (if(provider.noRetention) "Doesn't keep your messages." else "Review message retention in these terms."),style=qText("caption").copy(color = qColor("ink")))
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                IconButton("back", "Back", qColor("ink")) { session.open("/creators/$handle") }
+                BasicText("1 OF 1", style = qText("data-sm").copy(color = qColor("ink-muted")))
             }
-            BasicText("WHO CAN READ IT",style=qText("meta").copy(color = qColor("ink"))); BasicText(capabilities?.accessDisclosure ?: "Conversations can be read by the creator and their authorized team. Those accesses are logged.",style=qText("body").copy(color = qColor("ink")))
-            BasicText("WHAT IT REMEMBERS",style=qText("meta").copy(color = qColor("ink"))); BasicText("Only what you agree to. It asks first, and you can see and delete every memory in You.",style=qText("body").copy(color = qColor("ink")))
+        }
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                AuthorLabel(kind = AuthorKind.AI, name = name)
+                BasicText("Before your first message", style = qText("display-lg").copy(color = qColor("ink")))
+            }
+        }
+        item {
+            val shape = RoundedCornerShape(QelvoraTokens.radiusLg)
+            Column(Modifier.fillMaxWidth().background(qColor("surface"), shape).clip(shape).border(QelvoraTokens.hairline, qColor("line"), shape)) {
+                Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    BasicText("WHO RUNS IT", style = qText("data-sm").copy(color = qColor("ink-muted")))
+                    val policy = capabilities?.providers
+                    if (policy?.verified == false) Notice(title=QelvoraCopy.text("conversationDevelopmentPolicyTitle"),children=QelvoraCopy.text("conversationDevelopmentPolicyNotice"))
+                    if (policy == null) BasicText("AI providers and their verified processing terms are not configured yet.", style = qText("body").copy(color = qColor("ink")))
+                    else BasicText("This AI is powered by ${policy.providers.joinToString(", ") { it.name }}.", style = qText("body").copy(color = qColor("ink")))
+                    policy?.providers?.forEach { provider ->
+                        Button(provider.name + " processing terms", variant = ButtonVariant.QUIET) { uriHandler.openUri(provider.termsUrl) }
+                        BasicText((if (provider.noTraining) "Doesn't train on your messages." else "Review message use in these terms.") + " " + (if (provider.noRetention) "Doesn't keep your messages." else "Review message retention in these terms."), style = qText("caption").copy(color = qColor("ink")))
+                    }
+                }
+                Hairline()
+                Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    BasicText("WHO CAN READ IT", style = qText("data-sm").copy(color = qColor("ink-muted")))
+                    BasicText(capabilities?.accessDisclosure ?: "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.", style = qText("body").copy(color = qColor("ink")))
+                }
+                Hairline()
+                Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    BasicText("WHAT IT REMEMBERS", style = qText("data-sm").copy(color = qColor("ink-muted")))
+                    BasicText("Only what you agree to. It asks first, and you can see and delete every memory in You.", style = qText("body").copy(color = qColor("ink")))
+                }
+            }
         }
         if(error.isNotEmpty()) item { Notice(title="Conversation unavailable",children=error) }
         if(contextPending) item { Notice(title="Post context unavailable",children="This post's context is not connected to the conversation service yet. Your destination is kept.") }
         item {
-            Button("Start with $name's AI",variant=ButtonVariant.AI,block=true,disabled=busy || creator == null || contextPending || capabilities?.generationAvailable != true || capabilities?.consentAvailable != true) { scope.launch {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Button("Start with $name's AI",variant=ButtonVariant.AI,size="lg",block=true,disabled=busy || creator == null || contextPending || capabilities?.generationAvailable != true || capabilities?.consentAvailable != true) { scope.launch {
                 val policy=capabilities?.providers ?: return@launch; busy=true
                 try {
                     val page=client.json.decodeFromJsonElement<ConversationPage>(client.request("begin",buildJsonObject { put("creatorId",creator!!.getString("id"));put("policyVersion",policy.version);put("accessNoticeAccepted",true);put("idempotencyKey",key) }))
@@ -414,19 +581,25 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 } catch(failure: Throwable) { if(failure is CancellationException) throw failure;error=failure.message ?: "Reconnect to try again. No message was sent." } finally {busy=false}
             } }
             Button("Not now",variant=ButtonVariant.QUIET,block=true) { session.open("/creators/$handle") }
+            }
         }
     }
 }
 
 @Composable private fun ConversationAccount(baseURL: String, session: FanSession) {
     val client=remember(baseURL,session.session?.accountId) { ConversationClient(baseURL,session::currentToken, session.session?.accountId) }
+    val context = LocalContext.current
+    val accountId = session.session?.accountId
+    val commerceClient = remember(context, baseURL, accountId) { CommerceClient(context, baseURL, accountId) }
+    var commerce by remember(client) { mutableStateOf<CommerceOverview?>(null) }
+    val scroll = rememberLazyListState()
     var account by remember(client) { mutableStateOf<JsonObject?>(null) };var error by remember(client) { mutableStateOf("") }
     var cursor by remember(client) { mutableStateOf<String?>(null) }; var loading by remember(client) { mutableStateOf(false) }
     var revision by remember(client) { mutableStateOf(0) }
     val lifecycleOwner = LocalLifecycleOwner.current
     var foreground by remember(lifecycleOwner) { mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
     val scope = rememberCoroutineScope()
-    fun conceal() { revision += 1; account = null; loading = false }
+    fun conceal() { revision += 1; account = null; commerce = null; loading = false }
     DisposableEffect(lifecycleOwner, client) {
         val observer = LifecycleEventObserver { _, _ ->
             val active = lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
@@ -443,21 +616,73 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         loading = true; cursor = before; error = ""
         try {
             val fresh = client.request("account" + (before?.let { "?cursor=$it" } ?: "")).jsonObject
-            if (revision == currentRevision && foreground) { account = fresh; cursor = before }
+            if (revision != currentRevision || !foreground || session.session?.accountId != accountId) return
+            account = fresh; cursor = before
+            val token = session.currentToken()
+            val overview = try { commerceClient.overview() } catch (failure: Throwable) {
+                if (failure is CancellationException) throw failure
+                if (failure is CommerceFailure && failure.status in listOf(401, 409)) {
+                    if (revision == currentRevision) conceal()
+                    throw failure
+                }
+                null
+            }
+            if (revision == currentRevision && foreground && session.session?.accountId == accountId && session.currentToken() == token && overview?.fan?.id == fresh["fan"]?.jsonObject?.get("id")?.jsonPrimitive?.content)
+                commerce = overview
         }
         catch(failure:Throwable) { if(failure is CancellationException) throw failure; if(revision == currentRevision && foreground) error=failure.message ?: "Reconnect to open You." }
         finally { if (revision == currentRevision) loading = false }
     }
     LaunchedEffect(client, foreground) { if (foreground) refresh(cursor) else conceal() }
     val fan=account?.get("fan")?.jsonObject
-    LazyColumn(Modifier.fillMaxSize().background(qColor("ground")),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(24.dp)) {
-        item { BasicText("You",style=qText("title").copy(color = qColor("ink"))); if(error.isNotEmpty()) Notice(title="Account unavailable",children=error) }
-        item { BasicText(fan?.get("handle")?.jsonPrimitive?.content?.let { "@$it" } ?: "Your account",style=qText("display-md").copy(color = qColor("ink")));BasicText(if (fan != null) fan["intro"]?.jsonPrimitive?.contentOrNull ?: "You haven’t added an intro yet." else if (error.isEmpty()) "Loading your account…" else "Your intro is unavailable.",style=qText("body").copy(color = qColor("ink")));Button("Handle and intro",variant=ButtonVariant.QUIET) { session.open("/identity/account") } }
-        item { Button("Memberships and requests",variant=ButtonVariant.SECONDARY,block=true) { session.open("/commerce/requests") };Button("Spend and time",variant=ButtonVariant.QUIET,block=true) { session.open("/commerce/spending") };Button("Notifications",variant=ButtonVariant.QUIET,block=true) { session.open("/notifications/settings") } }
+    val overview = commerce
+    val largeText = LocalDensity.current.fontScale >= 1.5f
+    val limit = overview?.limits?.firstOrNull { it.currency == overview.policy.currency }
+    val limitDetail = if (overview == null) "Currently unavailable" else if (limit == null) "Choose your limit" else if (limit.explicit_none) "No limit" else limit.amount?.toLongOrNull()?.let { "of your ${commerceMoney(it, limit.currency)} limit" } ?: "Limit unavailable"
+    val privacyIndex = if (error.isNotEmpty()) 5 else 4
+    LazyColumn(Modifier.fillMaxSize().widthIn(max = 390.dp).background(qColor("ground")), state = scroll, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 28.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                BasicText(fan?.get("handle")?.jsonPrimitive?.content?.let { "@$it" } ?: "You", style = qText("display-lg").copy(color = qColor("ink")))
+                BasicText(if (session.session?.mode == APISessionMode.DEVELOPMENT) "Synthetic local account · development" else "Signed in with Pantopus", style = qText("caption").copy(color = qColor("ink-muted")))
+            }
+        }
+        if(error.isNotEmpty()) item { Notice(title = "Account unavailable", children = error) }
+        item {
+            if (largeText) {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    AccountMetric("THIS MONTH", overview?.exposure?.let { commerceMoney(it.captured, it.currency) } ?: "—", limitDetail, Modifier.fillMaxWidth())
+                    AccountMetric("MEMBERSHIPS", overview?.memberships?.size?.toString() ?: "—", if(overview == null) "Currently unavailable" else "Saved memberships", Modifier.fillMaxWidth())
+                }
+            } else {
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Top) {
+                    AccountMetric("THIS MONTH", overview?.exposure?.let { commerceMoney(it.captured, it.currency) } ?: "—", limitDetail, Modifier.weight(1f))
+                    AccountMetric("MEMBERSHIPS", overview?.memberships?.size?.toString() ?: "—", if(overview == null) "Currently unavailable" else "Saved memberships", Modifier.weight(1f))
+                }
+            }
+        }
+        item {
+            Panel(Modifier.fillMaxWidth(), padding = 0.dp, gap = 0.dp) {
+                AccountRow("Me and privacy", "Memories, who opened your conversations, consents") { scope.launch { scroll.scrollToItem(privacyIndex) } }; Hairline()
+                AccountRow("Spending and time", "Your limit, receipts, time with each AI") { session.open("/commerce/spending") }; Hairline()
+                AccountRow("Memberships", "Manage your memberships") { session.open("/commerce/membership") }; Hairline()
+                AccountRow("Notifications", "Push and email, per creator, quiet hours") { session.open("/notifications/settings") }; Hairline()
+                AccountRow("Receipts", "Your purchases and deliveries") { session.open("/commerce/requests") }; Hairline()
+                AccountRow("Help and safety", "Report, block, crisis support") { session.open("/support") }
+            }
+        }
+        item {
+            BasicText("Your intro", style = qText("title").copy(color = qColor("ink")))
+            BasicText(if (fan != null) fan["intro"]?.jsonPrimitive?.contentOrNull ?: "You haven’t added an intro yet." else if (error.isEmpty()) "Loading your account…" else "Your intro is unavailable.", style = qText("body").copy(color = qColor("ink")))
+            Button("Edit handle and intro", variant = ButtonVariant.QUIET) { session.open("/identity/account") }
+        }
         item { BasicText("Me and privacy",style=qText("display-md").copy(color = qColor("ink")));BasicText(QelvoraCopy.text("conversationAccess"),style=qText("caption").copy(color = qColor("ink")));BasicText("Memory and conversation access by creator",style=qText("body").copy(color = qColor("ink"))) }
         if (account != null && account?.get("threads")?.jsonArray?.isEmpty() == true) item { BasicText("No conversations yet.",style=qText("body").copy(color = qColor("ink"))) }
         account?.get("threads")?.jsonArray?.forEach { element -> val thread=element.jsonObject
-            item { Button(thread["name"]!!.jsonPrimitive.content,variant=ButtonVariant.QUIET,block=true) { session.open("/threads/${thread["creatorId"]!!.jsonPrimitive.content}/${thread["fanId"]!!.jsonPrimitive.content}") } }
+            item {
+                Button(thread["name"]!!.jsonPrimitive.content,variant=ButtonVariant.QUIET,block=true) { session.open("/threads/${thread["creatorId"]!!.jsonPrimitive.content}/${thread["fanId"]!!.jsonPrimitive.content}") }
+                Button("Memory and access · " + thread["name"]!!.jsonPrimitive.content,variant=ButtonVariant.QUIET,block=true) { session.open("/you?creatorId=${thread["creatorId"]!!.jsonPrimitive.content}&fanId=${thread["fanId"]!!.jsonPrimitive.content}") }
+            }
         }
         item {
             if (loading) BasicText("Loading your conversations…",style=qText("caption").copy(color = qColor("ink")))
@@ -465,6 +690,24 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             if (cursor != null) Button("Back to first page",variant=ButtonVariant.QUIET,disabled=loading) { scope.launch { refresh() } }
             if (error.isNotEmpty()) Button("Try again",variant=ButtonVariant.QUIET,disabled=loading) { scope.launch { refresh(cursor) } }
         }
-        item { Button("Export or delete my data",variant=ButtonVariant.SECONDARY,block=true) { session.open("/support/privacy") };Button("Help and safety",variant=ButtonVariant.QUIET) { session.open("/support") } }
+        item { Button("Export or delete my data",variant=ButtonVariant.SECONDARY,block=true) { session.open("/support/privacy") } }
+    }
+}
+
+@Composable private fun AccountMetric(title: String, value: String, detail: String, modifier: Modifier) {
+    Panel(modifier, padding = 14.dp, gap = 4.dp) {
+        BasicText(title, style = qText("data-sm").copy(color = qColor("ink-muted")))
+        BasicText(value, style = qText("data-lg").copy(color = qColor("ink")))
+        BasicText(detail, style = qText("caption").copy(color = qColor("ink-muted")))
+    }
+}
+
+@Composable private fun AccountRow(title: String, detail: String, onClick: () -> Unit) {
+    Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).clickable(role = Role.Button, onClick = onClick).semantics(mergeDescendants = true) {}.padding(horizontal = 16.dp, vertical = 7.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            BasicText(title, style = qText("body-strong").copy(color = qColor("ink")))
+            BasicText(detail, style = qText("caption").copy(color = qColor("ink-muted")))
+        }
+        Box(Modifier.clearAndSetSemantics {}) { Glyph("chevron", 16.dp, qColor("ink")) }
     }
 }

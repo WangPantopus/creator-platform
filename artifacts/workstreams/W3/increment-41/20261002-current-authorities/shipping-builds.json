@@ -1,0 +1,23 @@
+{
+  "source": "641c9f116b0508399f1fc73d5aba3bc09cc43102",
+  "capturedAt": "2026-10-02T11:06:42.102392+00:00",
+  "iOSBuildExit": 0,
+  "androidBuildExit": 0,
+  "sequentialHeavyGuard": true,
+  "iOSOperated": false,
+  "androidCurrentSourceOperated": false,
+  "binaries": {
+    "iosExecutable": {
+      "path": "/Users/yingpengwang/Library/Caches/creator-platform-w3/ios-derived/Build/Products/Debug-iphonesimulator/QelvoraApp.app/QelvoraApp",
+      "sha256": "67660a58244b901e7f63fea17febe4c5fd2d589bf71d4d4bbb1ce26b348fdadb"
+    },
+    "androidAPK": {
+      "path": "/Users/yingpengwang/Library/Caches/creator-platform-w3/android-build/outputs/apk/debug/app-debug.apk",
+      "sha256": "ef7f140b2d22f9f4e01c08f2b421e8cdcef7f1f3eeb0ffb6647f5d2ea4905cf2"
+    }
+  },
+  "buildLogs": {
+    "w3-ios-metadata-build.log": "7eae51594a2a6f57857562f9bdd684c77e1f91f8d58a11f9b7cab8202eb00ff2",
+    "w3-android-metadata-build.log": "26a7ce1a4a2924db38c5fd6d7452c9c283bbbb59265f6edaf719b65c6890e9ed"
+  }
+}

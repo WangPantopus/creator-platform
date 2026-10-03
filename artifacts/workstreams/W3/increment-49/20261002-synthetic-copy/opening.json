@@ -1,0 +1,11 @@
+{
+  "observedAt": "2026-10-02T13:11:18.590Z",
+  "source": "c91958a7e677575223a9156528b7e8b15d112285",
+  "developmentDatabase": "creator_w3_dev57_1790946508212",
+  "originalTrafficClosed": true,
+  "copyLabel": "synthetic-development-copy",
+  "copyConnectionLimit": -1,
+  "privateRuntimeDatabasePathsUpdated": 3,
+  "ownerCredentialsUsedForApp": false,
+  "disposition": "bounded local synthetic development only; required missing features remain unavailable; original recovery/release unaccepted"
+}

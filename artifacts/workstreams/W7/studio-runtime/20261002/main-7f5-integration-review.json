@@ -1,0 +1,294 @@
+{
+  "reviewedAt": "2026-10-02T10:58:22.477056+00:00",
+  "primary": "W7 personally reviewed main source changes; no subagents",
+  "earlierReviewedMain": "66dfb1ee83dee45d3abd820a4a87227ef00cdd03",
+  "frozenReviewedMain": "7f5fdf04d733e3560dc029ff387f908d872b4d3d",
+  "W7Base": "c4633a3300c732685b95eaa4c8d86d90ed98e705",
+  "sourcePaths": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "f3603d3b8644b68a125b0c1fb6f76f9c0be15eac67f3797c312992e263ac442d"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/MainActivity.kt",
+      "sha256": "b828d12e53799e5e7f65f117f9575955fa1369b1f50c8e42c6cc9e6ee20077e8"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/commerce/CommerceFeature.kt",
+      "sha256": "a88d57146ebd95d8998c42540a0eb74954f874d5fa6e6e974c28063fcd093f80"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt",
+      "sha256": "43f01403a452608bfedc87e6ca9df55334ac2454852c8f0f8721240a95f58a10"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt",
+      "sha256": "464011e5e18d27244358482c50ae9c2a3efcb3e834f15a4c31ddb18d1f63494e"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeCallConnectionService.kt",
+      "sha256": "b032a0b98c97a27bc82babd761e6416011859198ffa388ce8de1ef404d82f920"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/AccessComponents.kt",
+      "sha256": "e465b9b7c5e4541d0ce8985e6f466e1a165501a31e53ba3067711cd1191101fc"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/ComponentPreview.kt",
+      "sha256": "5adc54b2464a10892449c2144c8f42b5e689bcbaac741384040b366a80ee8322"
+    },
+    {
+      "path": "apps/android/app/src/main/res/values/strings.xml",
+      "sha256": "833a9c9e2b1c9c71a9cd6d11555caa9621e41d52a29dd6958518adc8fa861eeb"
+    },
+    {
+      "path": "apps/backend/migrations/0076_w8_public_packet_denial.sql",
+      "sha256": "a5cd1023aef38fced663b6154cf8a87a0332c112e0030255a001110f43599daa"
+    },
+    {
+      "path": "apps/backend/migrations/0082_w8_interactive_denial_try_fence.sql",
+      "sha256": "3742b1e6b7f367ca626176615c5362ecf002fe5fcc5a96ea941d35a4708e8686"
+    },
+    {
+      "path": "apps/backend/src/db/database.ts",
+      "sha256": "8e07436c50fab616dc35862ba695a32fc99bf04afefe75fb557e521e67e5a0e5"
+    },
+    {
+      "path": "apps/backend/src/integration.ts",
+      "sha256": "a52b54474ead2f989f1f1ba94c25d3c3a99744a9f735893f589bd2afa1f7242e"
+    },
+    {
+      "path": "apps/backend/src/modules/access/scope.ts",
+      "sha256": "dbdb23753b7575ffa2260cc8a688dd76bd31e9a521337e1acf24ff006c79f286"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/generation-journal.ts",
+      "sha256": "587760904e7dcdc62f793bc4b5d2a640ba91178f6016a61eeb1815e1481d86e3"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/growth-adapter.ts",
+      "sha256": "1aefd683ec7d2f3fa567133805a9718fbf3420e88cbef5e83ab99a9c0cf93f5d"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/language.ts",
+      "sha256": "2f16eafcc44ede659b26b303eb54b14cd06f36a57a34994778ba7fdc0e43b509"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/pipeline.ts",
+      "sha256": "50c9a4d0e24ddf76ee46d495020a7f0fead3fb5e0d0a667487ca8c32abbc652a"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/provider-usage.ts",
+      "sha256": "f831cdf870e1f0b48c116dbec962568d3ce409d381359e99629bcdff5b3d54ef"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/runtime.ts",
+      "sha256": "0ab4e0814c6b6b444c6eafc29c392569eae4f05f6eea3f24b80167555f2e59fe"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/service.ts",
+      "sha256": "3f277f127c38ae12a38c4c30a82e9347da3e2e5b8041681a3297cc095bc4a513"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/translation.ts",
+      "sha256": "aff25eafc5f6932a63336bac16fa1fe5b3f3967badb9c276998a3923caa024e2"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/accounting.ts",
+      "sha256": "6b75ccf561eed003a7327dfa398ba80496e785a41478416f4163c18f5d96e16d"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/approval-registration.ts",
+      "sha256": "3176bd5447fe838f9e6195c9dea921f2a075b86597b472a50399c8a903d874a1"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/audience-memberships.ts",
+      "sha256": "367448e45f39243677e18b50b7276523603db5b4b008fc92762883603c2de049"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/audience.ts",
+      "sha256": "4e79f004c14bc690bb0a1ebe551af411fbf42388706e18a49a73c2ab5dbfc16c"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/content-audience.ts",
+      "sha256": "6e853db9f77269bc6ed2ff48ee53d413e73bf8f53128ee740b4185f2d8901242"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/fulfillment.ts",
+      "sha256": "ff1cbeeecc3546c9ed5b792904febd5dab48da6e010e32a493be300815264a83"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/home.ts",
+      "sha256": "f76b82abb6cd00995d9ad0b0fb04d2241a376ba7e2ea601213006ad2b3cbae75"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/packet-locks.ts",
+      "sha256": "f992f668a566e5fa8e291826b18d7004982e40ff3d1907652c0e9d571bb9166e"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/public-packet-host.ts",
+      "sha256": "1ca6ed03ebc980ea5a68d14467069e96213034b6a71646a3d4045ee4f5c4e9d2"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/publication.ts",
+      "sha256": "3e2ae3eae646e71ce4b270c4b27220fff6bec6ab6c73397bf2530b5a1291b558"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/runtime.ts",
+      "sha256": "9c926179da41285352c0557741bc4aae8cb1aab6a24bb9ad9857375b5c408c72"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/schema-home-request-metadata.sql",
+      "sha256": "4af3abb0065e69565a45da5309e0963774bb17dbebadeed70de6236ad23c436e"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/service.ts",
+      "sha256": "f675bd6c00ef0ae7adf46e48dbab7592865f71dc65195e31d2c209295c078a56"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/studio.ts",
+      "sha256": "a3f42570c5281815888ff9b77df2869c1c967ab07d88b2f1db54f556917c82f7"
+    },
+    {
+      "path": "apps/backend/src/modules/content/integration.ts",
+      "sha256": "86645ffd18b2bd6995485b6bae89e1dc6cacf95f6abc5a7cf0ae16b222c7bf6c"
+    },
+    {
+      "path": "apps/backend/src/modules/content/service.ts",
+      "sha256": "b6dbb805944cee15a7790adbf0d2dbdb40e3b2db51efa76ac679e1bb17e299af"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/service.ts",
+      "sha256": "e4eee7acc98ef1b7b7027cde61a600a863a23567f2b792a2b56c7315be64d984"
+    },
+    {
+      "path": "apps/backend/src/modules/identity/audience-scope.ts",
+      "sha256": "16cf852cc3be76ac89c391f2d8923c465f77d616368b33a3332d690ba1e0a088"
+    },
+    {
+      "path": "apps/backend/src/modules/identity/schema-signature-read-fence.sql",
+      "sha256": "157640de84f22d6d638d788dfe04314fd193efaed80a829f288bec7cbcb815b5"
+    },
+    {
+      "path": "apps/backend/src/modules/identity/signature-read-fence.ts",
+      "sha256": "863e9b076f857e8c148695084145d2cd88e91fd50057b4debd8a9f513536aaf1"
+    },
+    {
+      "path": "apps/backend/src/modules/media/creator-worker.ts",
+      "sha256": "2a5f607030abe70d1d2fcc4e44aeb3047f17410098bcc79cec8d254f3a8b3e9d"
+    },
+    {
+      "path": "apps/backend/src/modules/media/credentials.ts",
+      "sha256": "ba63da353d743830ff46936ad667952aabb38dcc0a21387ab4982d9da44ff4b9"
+    },
+    {
+      "path": "apps/backend/src/modules/media/files.ts",
+      "sha256": "657ad7c498eb6c74eea73734b77b134b8aaef9fd9fa453871de96003e78a0bd9"
+    },
+    {
+      "path": "apps/backend/src/modules/media/lifecycle.ts",
+      "sha256": "c1621a6bdddc70e2996d167538bae7172c87056fe379db40215d3a14538774bf"
+    },
+    {
+      "path": "apps/backend/src/modules/media/processor.ts",
+      "sha256": "e85ba5479ceb390b4f370b0bdce928c201aef7af53bf77d372a6b490ca8e3af2"
+    },
+    {
+      "path": "apps/backend/src/modules/media/storage.ts",
+      "sha256": "c92f47ef7c5e6fabf04062f18b869f4b67e368b488e2ebe4ef1d93db75f6177c"
+    },
+    {
+      "path": "apps/backend/src/modules/media/worker.ts",
+      "sha256": "07b1083077a3b816194a8f5f1967951339b54ccf1186b6e094f879edc9d3776c"
+    },
+    {
+      "path": "apps/backend/src/modules/session/service.ts",
+      "sha256": "9d74a58abaf0eef17190a8c49334efafab1c449a15d2e3bfc6f29094f60dad0c"
+    },
+    {
+      "path": "apps/backend/src/modules/session/worker.ts",
+      "sha256": "9d64ae335f7e1de3810d89a79dadaf6b958728a202a23b7f91e2328c389e5ffc"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/scope-restriction.ts",
+      "sha256": "25f57ba811528d4a9f33cbdb6240bd5a3c54fed5092bd13241266931052334ce"
+    },
+    {
+      "path": "apps/backend/src/server.ts",
+      "sha256": "de00518f08364631c89600dc8a07aca59d20f7591a7a3f9c750816d00c82bb8f"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/Localizable.xcstrings",
+      "sha256": "0d2b8d8984fa9e7aef043df1a8fa20cf0319272252c9b8b5df2f739949e0444f"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/QelvoraCopy.swift",
+      "sha256": "2a7ba5c6565ed141e0e46ca0575624dd90d046ba9b373220bc9e41e2b796d130"
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/AccessComponents.swift",
+      "sha256": "560072535b6cecbb3d96a9da56f25d8f01119fe76ceb601ac996c1733ded7d8e"
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/ComponentPreview.swift",
+      "sha256": "ae6ec675c975d69e924ca9ec56c22f3d3636e44fbf6df4f5dd0c7b20cab051d0"
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Conversation/W3FanFeatures.swift",
+      "sha256": "2519745e5de4af4547a03330864d1f55a66f6fb214c99bfd614c30782c5060bd"
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Media/NativeCallCoordinator.swift",
+      "sha256": "21b583448d46411220a72a88c601910fc20e6e067a45d6103ed959fc392a878a"
+    },
+    {
+      "path": "apps/web/features/commerce/CommerceScreen.tsx",
+      "sha256": "5f05ef06d4a4e3f5070c3db5fe7ead15921bb41a7987d940ec169f6c402ae591"
+    },
+    {
+      "path": "apps/web/features/conversation/AccountScreen.tsx",
+      "sha256": "3765075cd756de0f9a145b08b5d21acb32c0b66b370ad9caaf44714e03af0ec9"
+    },
+    {
+      "path": "apps/web/features/creator-ai/creator-ai.css",
+      "sha256": "8979811302fc7536437807652f0a5b88c687c65535556d229fd25c98302d149d"
+    },
+    {
+      "path": "apps/web/features/media/api.ts",
+      "sha256": "dcc1654fd06109fc663719393cb725b9df58585b85972ef1e5d41ae5c4480bdb"
+    },
+    {
+      "path": "apps/web/lib/design.tsx",
+      "sha256": "c58b9c49a71f68f1d74c5b9d16c07a8425a7d4b439e862fe54d28d0a04c26498"
+    },
+    {
+      "path": "config/copy.json",
+      "sha256": "a5ef379474ac63ae804d3aaab1f7bcb018c3600e9f7de4dbb6fc9e38de0ef598"
+    },
+    {
+      "path": "packages/copy/src/index.ts",
+      "sha256": "df76f60ba99749a8b77e8ad3d9bd2defded7ed5c3b6f863dac6bfbc3e28027b0"
+    },
+    {
+      "path": "packages/ui-web/src/components.ts",
+      "sha256": "fa91a6f09f78dd24d796b4414a679d45d430f75adbfd13936c828b3ba24a6aab"
+    },
+    {
+      "path": "packages/ui-web/src/contracts.ts",
+      "sha256": "60ad8e9953d3e93557241571f43c75300fad95f32aeb3137eb1fb6396d9446f3"
+    }
+  ],
+  "conflicts": {
+    "MainActivity.kt": "Retained W7 delivery generation and notification-ID lookup; already includes main launcher-return preservation",
+    "server.ts": "Retained actual separate Growth API pool, W7 Home/source/content seams; added exact reviewed main conditional publicPacketRead graph"
+  },
+  "checks": "backend build/shared generator pass; W7/host lint/nine existing contracts pass before merge commit; affected combined shipping rerun still required",
+  "activatedMigrations": [],
+  "dependencies": [
+    "Content/Growth held follows pool differs from W4 opaque core publicPacketRead pool; protected graph activation needs actual same-pool owner architecture",
+    "verified creator/signature/provider/public HTTPS/current purpose remain unavailable"
+  ],
+  "finalCombinedPRReview": "unfinished; this is main integration review only",
+  "releaseAccepted": false,
+  "workstreamComplete": false
+}

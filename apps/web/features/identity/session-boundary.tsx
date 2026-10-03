@@ -17,7 +17,7 @@ type IdentityScope = {
   session: Session;
 };
 const Scope = createContext<IdentityScope | null>(null);
-const sessionChannel = "qelvora-identity-status";
+export const sessionChannel = "qelvora-identity-status";
 
 /** Only an invalidation signal crosses tabs; credentials and private data never do. */
 export function announceSessionEnd() {

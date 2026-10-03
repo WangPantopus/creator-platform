@@ -46,6 +46,9 @@ export function createGrowthRouter(
           .min(0)
           .max(1000)
           .parse(req.query.offset ?? 0),
+        req.query.cursor === undefined
+          ? undefined
+          : z.string().min(1).max(2048).parse(req.query.cursor),
       ),
     ),
   );
@@ -92,6 +95,10 @@ export function createGrowthRouter(
       );
     res.json(value);
   });
+  router.get("/public/shares/:id/export", async (req, res) => {
+    res.setHeader("Cache-Control", "no-store");
+    res.json(await service.shareExport(uuid(req.params.id)));
+  });
   router.post("/unsubscribe", async (req, res) =>
     res.json(
       await service.unsubscribe(
@@ -101,7 +108,19 @@ export function createGrowthRouter(
     ),
   );
   router.get("/discovery-access", async (req, res) =>
-    res.json(await service.passDiscovery(await actorFor(req))),
+    res.json(
+      await service.passDiscovery(
+        await actorFor(req),
+        req.query.creators === undefined
+          ? undefined
+          : z
+              .string()
+              .max(3699)
+              .parse(req.query.creators)
+              .split(",")
+              .filter(Boolean),
+      ),
+    ),
   );
   router.post("/engagement/:kind/claim", async (req, res) =>
     res.json(
@@ -165,7 +184,7 @@ export function createGrowthRouter(
     res.json(await experiments.stop(await actorFor(req), uuid(req.params.id))),
   );
   router.get("/home", async (req, res) =>
-    res.json(await service.home(await actorFor(req))),
+    res.json(await service.home(await actorFor(req), req.query)),
   );
   router.put("/follow/:creatorId", async (req, res) =>
     res.json(
@@ -183,6 +202,11 @@ export function createGrowthRouter(
   );
   router.get("/notifications", async (req, res) =>
     res.json({ notifications: await service.inbox(await actorFor(req)) }),
+  );
+  router.get("/notifications/:id", async (req, res) =>
+    res.json(
+      await service.notification(await actorFor(req), uuid(req.params.id)),
+    ),
   );
   router.put("/notifications/:id/read", async (req, res) =>
     res.json(await service.markRead(await actorFor(req), uuid(req.params.id))),
@@ -203,7 +227,11 @@ export function createGrowthRouter(
   );
   router.delete("/devices/:id", async (req, res) =>
     res.json(
-      await service.revokeDevice(await actorFor(req), uuid(req.params.id)),
+      await service.revokeDevice(
+        await actorFor(req),
+        uuid(req.params.id),
+        req.body,
+      ),
     ),
   );
   router.post("/shares", async (req, res) =>
