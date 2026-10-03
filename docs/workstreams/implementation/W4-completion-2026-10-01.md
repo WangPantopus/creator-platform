@@ -1,3 +1,50 @@
+## Named current native read, full acceptance held — October 3, 20:28 UTC
+
+Current b39 signed Android product at documentary a64 personally reads You→Spending with original No limit/zero totals and unchanged38-table Commerce data. Supported CUA pane remains unavailable and the human-approved owned5564 ADB alternative is used. Night command acknowledges but the settled frame fails during closure; no unsent-input/recovery/enlarged/spoken/command/provider/C10 pass is claimed. Exact original settings are verified restored; normal emulator shutdown needs owned SIGTERM/SIGKILL, immediate serial absence fails, and fresh physical absence/exact release finishes10.4s past the hard deadline. The timing failure remains recorded and full native qualification remains open. [Exact source, private hashes and retained failures](../../../artifacts/workstreams/W4/runtime/2026-10-03/native-original-session/README.md).
+
+## Current original stack reuse and personal web qualification — October 3, 20:04 UTC
+
+All38 current open PRs are drafts with exactly one of eight existing owners, beginning with October1 #21; all seven peers are coordinated. W1 #296 joins W3 #299/#280 and W4 #236 as closed unmerged duplicates with independently preserved original scope. W2 #295's reviewed records merge into #21's stack, without a new main merge. W4 retains #213/#247/#262/#298/#301/#303 with their complete gates. [Full oldest-first dispositions and source custody](../../../artifacts/workstreams/W4/runtime/2026-10-03/open-pr-review/README.md).
+
+Current normal #21 parent integration into #29826e/#303b39 preserves the original root and 115-operation generator and consumes the actual Kotlin whole-response and Swift resource-budget repairs. Fresh web33-page, Android37-task, normally signed iOS and both signatures pass at b39. The byte-equal current web composition personally verifies normal fan No limit/$0, actual unsent6.50, corrected You navigation, public status, same-/other-account replacement and normal sign-out clearing, then genuine fan restoration. All38 Commerce tables/two rows retain their original fingerprint; finite own resources close normally. Current native, namespace/command races, timing/p95, spoken accessibility, providers/factory/privacy/publication/financial/approved minimum/full pins/sole COMMIT/C10 and six queued required Mac CI jobs remain open. [Web qualification](../../../artifacts/workstreams/W4/runtime/2026-10-03/commerce-original-session/README.md) and [native compilation and limits](../../../artifacts/workstreams/W4/runtime/2026-10-03/native-original-session/README.md).
+
+Fresh actual main/all16 retained branch audit confirms reviewed5c08634b, pushed-head equality, clean primary and unchanged workbook before this documentary update. No whole original package or R01–R15 row is complete.
+
+- [x] Assign every existing open/draft PR to its original owner and review all retained W4 scopes before new feature work.
+- [x] Consolidate complete #236 into #262 and independently verify original #296 preservation in #21.
+- [x] Personally qualify the named current web view/session cleanup at byte-equal #29826e/#303b39, preserving Commerce data and closing own resources.
+- [ ] Finish every retained PR's actual full acceptance and required current CI before merge; then continue the original nine packages/R01–R15.
+
+## Current existing-PR priority and source reuse — October 3, 2026 19:09 UTC
+
+All 40 current open PRs are drafts with exactly one of the eight existing owners; all seven peers are coordinated, beginning with the October 1 stack at #21. This pass closes W3 #299/#280 and W4 #236 unmerged with preserved source/history. #236's complete original publication scope is consolidated into #262 with a byte-identical worker merge tree and independent W2/W5 preservation reviews. W4 retains #213/#247/#262/#298/#301/#303, all held for their named complete gates. No new main merge occurs in this latest pass.
+
+Current Commerce web shipping (33 pages), Android shipping (37 tasks), normally signed iOS shipping and strict signatures pass for their exact recorded source. The verifier-path failure is preserved with its signature-only repair. Both Spending clients now distinguish a real command from a read-only refresh label; the exact Swift minimum also builds/signs. Named 44c Android input/theme/cold operation retains its restoration timing failure and spoken acceptance gap. Current native recovery/replacement/disposal, Kotlin whole-read deadline, public-document/cross-tab/Commerce command races, required queued CI and genuine provider/privacy/publication/C10 gates remain open. [Full dispositions, source hashes and limits](../../../artifacts/workstreams/W4/runtime/2026-10-03/open-pr-review/README.md).
+
+Main and all 16 retained W4 branches include reviewed `5c08634b` at the captured read-only audit and match actual pushed refs; the user workbook and history are preserved. No complete package or R01–R15 row is checked off.
+
+- [x] Assign every current open/draft PR to an existing owner and personally review retained W4 scopes.
+- [x] Consolidate the complete redundant #236 source into #262 and close #236 unmerged with preserved custody.
+- [ ] Finish each retained PR's genuine current acceptance and required CI before merge; then continue the original nine packages/R01–R15.
+
+## Original native outage and configuration input — October 3, 2026 16:54 UTC
+
+Personally operated exact9d iOS shipping bytes at1535c67c: original fan Requests→Spending, persisted No limit/zero charges, native decimal keyboard6.50 unsent, real API stop and automatic private concealment/retained-input notice. Recovery is held by the independently confirmed shared Docker daemon/forwarding outage; no post-operation durable fingerprint or restored-input pass is credited. Own API, simulator, GUI and pending Docker clients are physically closed; W7 is notified of early release. [Named private receipts and limitations](../../../artifacts/workstreams/W4/runtime/2026-10-03/native-original-session/README.md).
+
+Personally reviewed W8 e8587c8c and reused its genuine root observer/memory-only configuration pattern for unsent Spending input. Source excludes credentials, requests, action keys and private results, revalidates the original tuple and fresh overview before one-time restoration, and preserves actual new edits. Fresh Android build and personal Night/rotation/session disposal remain pending. W8 coordinates the single proposed infrastructure recovery; no shared restart or peer container mutation is performed here. No whole package/R01–R15 item is complete.
+
+## Native shipping compilation, personal operation pending — October 3, 2026 16:10 UTC
+
+Actual303/9d6f9331 shipping Android37 tasks85 seconds and normally signed iOS54 seconds exit0; APK/iOS deep strict signatures verify, full Debug executable and dylib hashes are retained independently. Four exact-head fast CI checks pass; six Mac jobs remain queued. Canonical heavy custody is normally released and physical absence checked; W7 follows. [Named compilation and private receipt hashes](../../../artifacts/workstreams/W4/runtime/2026-10-03/native-original-session/README.md).
+
+Personal current native original-session/outage/Retry/draft/scrolling acceptance is pending after W2’s GUI window. W8’s actual Android appearance recreation loses a bound unsent draft; this relevant Commerce gap remains open pending a personally reviewed in-memory source correction and current operation. No native/night/configuration/provider/spoken/C10 or complete package/R01–R15 item is accepted from compilation.
+
+## Native original-session consumer and existing graph reuse — October 3, 2026 15:45 UTC
+
+The native Commerce consumer now reuses actual W1 strict original-capture publishers127d6b05/81a401bd, regenerates this checkout’s115 operations and keys/disposes forms by the original account/session. Personally reviewed W8 routine-check display/readiness split preserves cached rows and scrolling while denying commands until readiness; true failures conceal rows and retain same-session input. Store verification stays on that same original client, with cancellation/disposal checks. [Source scope and outstanding qualification](../../../artifacts/workstreams/W4/runtime/2026-10-03/native-original-session/README.md).
+
+Parsing/generation/scoped source checks pass; fresh shipping compilation and personal composed native operation remain pending in the coordinated build/GUI queue. The fresh40 open PRs are all drafts, beginning21; complete W5 group-consumer source302 is personally read against the actual W4 recipient/delivery/final fence and W1 sole finalizer. Genuine minimum/catalogue/task/provider/positive/cleanup/C10 acceptance stays held. No whole package/R01–R15 item is complete.
+
 ## Corrected original commerce view — October 3, 2026 14:45 UTC
 
 - [x] Personally qualify the corrected original session consumer at named e79579ee: Night390 internal return, real unsaved decimal/outage/disabled Save/Retry/Refresh, genuine same/other-account old-view clearing and default1280 cold outage/recovery; preserve all38 commerce tables/two rows and release actual resources.
@@ -6,6 +53,16 @@
 - [ ] Complete all nine original packages/R01–R15 and current native/accessibility/provider/factory/financial acceptance. No full row is complete.
 
 [Named current commerce operation](../../../artifacts/workstreams/W4/runtime/2026-10-03/commerce-original-session/README.md) preserves previous source attribution and failures. Main/all16 active W4 branches contain reviewed5c08634b; workbook/history remain preserved. Existing210/294/300 are merged, with owner-reviewed292/297 consumed; the39 current open PRs are all drafts and retain their owner gates.
+
+## Successor checkpoint — October 3, 2026 afternoon
+
+- [x] Repair existing W4 original Content control deadlines and publish the reviewed source to all six retained drafts; preserve original producer bytes/history.
+- [x] Publish the actual #247 terminal signal consumer and #262 publication signal consumer with current scoped checks and unchanged existing contracts; record successful normal source builds without positive task/runtime inference.
+- [x] Coordinate the seven peers' oldest-first review and preserve duplicate source while reducing the backlog to37 drafts; synchronize all sixteen active W4 branches and main.
+- [ ] Finish the retained PRs' genuine current task/provider/financial/cleanup/sole-COMMIT/C10, required CI and current native/accessibility acceptance before merging.
+- [ ] Complete every original Commerce package/R01–R15. No full row is checked off.
+
+[Current source, evidence, remaining dependencies and successor actions](../handoffs/W4-continuation-handoff-2026-10-03-afternoon.md) supersede dated checkpoint facts below. The final original W5 a3 shared helper requires a real rollback receipt and is byte-exact in all six updated drafts; its matched checks and #2134e6d build pass without launch. The final handoff update adds only documentation after #303 source6a8fb1a4; native/web application bytes remain b39. The approximate60% effort estimate is a planning judgment; it supplies no package or release acceptance.
 
 ## Current signed iOS and original real deadline — October 3, 2026 13:06 UTC
 
