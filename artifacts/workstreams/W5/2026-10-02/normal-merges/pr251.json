@@ -1,0 +1,17 @@
+{
+  "pr": 251,
+  "url": "https://github.com/WangPantopus/creator-platform/pull/251",
+  "reviewHead": "ebd49a3c073d00058bf0cf9cbcfa3af29280f73b",
+  "capturedBase": "4e641cd2c3b3047d3209e5b91c45d0ee399619d5",
+  "mergeCommit": "59406e613992968e61997ae58e09d748707f68c5",
+  "mergedAt": "2026-10-03T05:52:27Z",
+  "expectedTree": "c1234a590673e5920a0f1e08a1ee0edb9b186784",
+  "actualTree": "c1234a590673e5920a0f1e08a1ee0edb9b186784",
+  "mode": "normal exact-head merge; no admin override",
+  "hostedChecks": "queued, not passes; current rulesets empty",
+  "personallyOperatedTeamSource": "a4fa861a1eab2f97599b596decc485914e2cdd69",
+  "personallyOperatedAccountActionSource": "f93d70d40a90fe82203436682d507187c67962a1",
+  "actualAPISource": "c7db9ea9cb9a47eb7cf73a67a5f398dad4fbd039",
+  "personalLimits": "current removed-member reads, revoked fan denial, exact retained-input/focus network recovery, actual200 reads, four viewport/theme views; real invitation/acceptance/removal remain at8e8a2a6d. Earlier later-blank observation and editable roles remain open",
+  "releaseReady": false
+}
