@@ -5247,6 +5247,15 @@ public struct APIFanProfileInput: Codable, Sendable {
   }
 }
 
+public struct APIFanIntroInput: Codable, Sendable {
+  public let `intro`: String
+  public let `expectedVersion`: Int
+  public init(intro: String, expectedVersion: Int) {
+    self.intro = intro
+    self.expectedVersion = expectedVersion
+  }
+}
+
 public struct APIFanProfile: Codable, Sendable {
   public let `id`: String
   public let `handle`: String
@@ -6085,10 +6094,12 @@ public struct APIErrorError: Codable, Sendable {
   public let `code`: String
   public let `message`: String
   public let `requestId`: String
-  public init(code: String, message: String, requestId: String) {
+  public let `correlationId`: String?
+  public init(code: String, message: String, requestId: String, correlationId: String? = nil) {
     self.code = code
     self.message = message
     self.requestId = requestId
+    self.correlationId = correlationId
   }
 }
 
@@ -6873,6 +6884,24 @@ public struct APIConversationConversationCorrectionInputCommandContent: Codable,
 
 public enum APIConversationConversationCorrectionInputCommandContentKind: String, Codable, Sendable {
   case `conversation_correction` = "conversation_correction"
+}
+
+public struct APIConversationConversationIntroOffer: Codable, Sendable {
+  public let `offerId`: String?
+  public init(offerId: String? = nil) {
+    self.offerId = offerId
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `offerId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.offerId = try container.decode(String?.self, forKey: .offerId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(offerId, forKey: .offerId)
+  }
 }
 
 public struct APIConversationConversationMessage: Codable, Sendable {
@@ -7859,6 +7888,52 @@ public struct APIConversationReplyFeedbackPolicy: Codable, Sendable {
 public enum APIConversationReplyFeedbackRating: String, Codable, Sendable {
   case `helpful` = "helpful"
   case `not_helpful` = "not_helpful"
+}
+
+public struct APIConversationReplyFeedbackResult: Codable, Sendable {
+  public let `rating`: APIConversationReplyFeedbackResultRating?
+  public let `introOffer`: APIConversationReplyFeedbackResultIntroOffer?
+  public init(rating: APIConversationReplyFeedbackResultRating? = nil, introOffer: APIConversationReplyFeedbackResultIntroOffer? = nil) {
+    self.rating = rating
+    self.introOffer = introOffer
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `rating`
+    case `introOffer`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.rating = try container.decode(APIConversationReplyFeedbackResultRating?.self, forKey: .rating)
+    self.introOffer = try container.decode(APIConversationReplyFeedbackResultIntroOffer?.self, forKey: .introOffer)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(rating, forKey: .rating)
+    try container.encode(introOffer, forKey: .introOffer)
+  }
+}
+
+public enum APIConversationReplyFeedbackResultRating: String, Codable, Sendable {
+  case `helpful` = "helpful"
+  case `not_helpful` = "not_helpful"
+}
+
+public struct APIConversationReplyFeedbackResultIntroOffer: Codable, Sendable {
+  public let `offerId`: String?
+  public init(offerId: String? = nil) {
+    self.offerId = offerId
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `offerId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.offerId = try container.decode(String?.self, forKey: .offerId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(offerId, forKey: .offerId)
+  }
 }
 
 public struct APIConversationTeamReply: Codable, Sendable {
@@ -10413,6 +10488,9 @@ public actor CreatorAPIClient {
   public func saveFanProfile(body: APIFanProfileInput) async throws -> APIFanProfile {
     try await request("/v1/identity/fan-profile", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
   }
+  public func saveFanIntro(body: APIFanIntroInput) async throws -> APIFanProfile {
+    try await request("/v1/identity/fan-profile/intro", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
+  }
   public func saveCreatorProfile(body: APICreatorProfileInput) async throws -> APICreatorProfile {
     try await request("/v1/identity/creator-profile", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
   }
@@ -10585,14 +10663,14 @@ public actor CreatorAPIClient {
 
 public enum ApplicationDestination {
   public static func requiresFanProfile(_ value: String) -> Bool {
-    !isPermitted(value) || value.components(separatedBy: "?")[0].range(of: "^/(?:identity/account|status|ops(?:/.*)?)$", options: .regularExpression) == nil
+    !isPermitted(value) || value.components(separatedBy: "?")[0].range(of: "^/(?:identity/account|status|ops(?:/.*)?|studio/(?:workspace|[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/team))$", options: .regularExpression) == nil
   }
   public static func isPermitted(_ value: String) -> Bool {
     if value.count > 2048 || value.contains("%") || value.contains("\\") || value.contains("#") || value.rangeOfCharacter(from: .whitespacesAndNewlines) != nil { return false }
     let parts = value.components(separatedBy: "?")
-    guard parts.count <= 2, parts[0].range(of: "^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|ops(?:/(?:audits|metrics|cases/[a-f0-9-]{36}))?|status|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/(?:overview|sources|style|rules|test|versions|license|interview|onboard))?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post(?:/[a-f0-9-]{36})?|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$", options: .regularExpression) != nil else { return false }
+    guard parts.count <= 2, parts[0].range(of: "^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|ops(?:/(?:audits|metrics|cases/[a-f0-9-]{36}))?|status|notifications(?:/(?:settings|[a-f0-9-]{36}))?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/(?:overview|sources|style|rules|test|versions|license|interview|onboard))?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post(?:/[a-f0-9-]{36})?|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$", options: .regularExpression) != nil else { return false }
     if parts.count == 1 { return true }
-    let scopes = ["context": "^/creators/", "creatorId": "^(?:/commerce/|/support$|/you$|/media/voice$)", "fanId": "^/you$", "packetId": "^/commerce/", "offer": "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId": "^/support$", "quote": "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet": "^/studio/[a-f0-9-]{36}/publish$", "objectId": "^/media/voice$", "kind": "^/support$"]
+    let scopes = ["context": "^/creators/", "creatorId": "^(?:/commerce/|/support$|/you$|/media/voice$)", "fanId": "^/you$", "packetId": "^/commerce/", "offer": "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId": "^/support$", "kind": "^/support$", "quote": "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet": "^/studio/[a-f0-9-]{36}/publish$", "objectId": "^/media/voice$"]
     let literalValues = ["offer": "1", "kind": "verification"]
     let fields = parts[1].components(separatedBy: "&")
     guard fields.count <= 2 else { return false }

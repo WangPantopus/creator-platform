@@ -1,0 +1,21 @@
+{
+  "source": "acc4817c267eb2af8b9ed20c0d9ce6f11e596718",
+  "observedAt": "2026-10-01T16:38:49.419463+00:00",
+  "androidFailure": {
+    "head": "c6bbdced653a328d66cf61dc181e6a336b72172e",
+    "runId": "36892037651",
+    "jobId": "110469778934",
+    "cause": "FileProvider.openFile nullable descriptor vs nonnull override",
+    "repair": "refuse null with FileNotFoundException; permissions/path restrictions preserved",
+    "verification": "awaits new exact-head build"
+  },
+  "privacySourceReview": {
+    "inboxCleanup": "restricted to actual deleted account recipients/captured owned creators; unrelated pending events preserved",
+    "relayCleanup": "remove affected last-recipient or captured-creator relays before stripping recipient from retained shared events",
+    "publicShareRead": "metadata identifies only negative account/creator fences; reacquire current row and actual owner status while erasure fenced",
+    "shareCreation": "canonical session/current grant reread and insert under negative account/creator fences; runtime creator GUC remains empty",
+    "runtime": "not operated; no local DB restarted; W4 actual share authority and W8 narrow mappings still unbound"
+  },
+  "newTestsOrSavedFlows": false,
+  "fullW7Acceptance": "open"
+}

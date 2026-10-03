@@ -5,7 +5,24 @@ import { GrowthShell, Failure, NoData } from "../../features/growth/shell";
 import type { Creator, Post } from "../../features/growth/types";
 import { BrowserPostValuePrompt } from "../../features/growth/engagement";
 export const dynamic = "force-dynamic";
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    postsCursor?: string | string[];
+    threadsCursor?: string | string[];
+  }>;
+}) {
+  const query = await searchParams;
+  const homeLink = (
+    postsCursor?: string | null,
+    threadsCursor?: string | null,
+  ) => {
+    const values = new URLSearchParams();
+    if (postsCursor) values.set("postsCursor", postsCursor);
+    if (threadsCursor) values.set("threadsCursor", threadsCursor);
+    return "/home" + (values.size ? "?" + values.toString() : "");
+  };
   let data: {
     entries: {
       id: string;
@@ -15,11 +32,21 @@ export default async function Home() {
       preview: string;
       destination: string;
     }[];
-    posts: { creator: Creator; post: Post }[];
+    posts: {
+      creator: Creator;
+      post: Pick<Post, "id" | "title" | "authorLabel"> & { preview: string };
+    }[];
     unread: number;
+    followingCount: number;
+    nextPostsCursor: string | null;
+    nextThreadsCursor: string | null;
   };
   try {
-    data = await growthRequest("home");
+    if (Array.isArray(query.postsCursor) || Array.isArray(query.threadsCursor))
+      throw new Error(growthCopy.growthThisDestinationIsNoLongerAvailable);
+    data = await growthRequest(
+      homeLink(query.postsCursor, query.threadsCursor).slice(1),
+    );
   } catch (error) {
     return (
       <GrowthShell>
@@ -57,9 +84,32 @@ export default async function Home() {
             </a>
           ))
         ) : data.posts.length === 0 ? (
-          <NoData title={growthCopy.growthPickACreatorToStart}>
-            <a href="/discover">{growthCopy.growthDiscoverCreators}</a>
+          <NoData
+            title={
+              data.followingCount === 0 &&
+              !query.postsCursor &&
+              !query.threadsCursor &&
+              !data.nextThreadsCursor
+                ? growthCopy.growthPickACreatorToStart
+                : growthCopy.growthNoUpdatesYet
+            }
+          >
+            {!query.postsCursor && !query.threadsCursor ? (
+              <a href="/discover">{growthCopy.growthDiscoverCreators}</a>
+            ) : null}
           </NoData>
+        ) : null}
+        {data.nextThreadsCursor ? (
+          <a
+            className="qv-btn qv-btn--secondary"
+            href={homeLink(
+              typeof query.postsCursor === "string" ? query.postsCursor : null,
+              data.nextThreadsCursor,
+            )}
+            aria-label={growthCopy.navMore + ": " + growthCopy.growthYourPeople}
+          >
+            {growthCopy.navMore + ": " + growthCopy.growthYourPeople}
+          </a>
         ) : null}
         {data.posts.length ? (
           <>
@@ -69,13 +119,31 @@ export default async function Home() {
               <article className="growth-card growth-card-body" key={post.id}>
                 <span className="growth-note-label">{post.authorLabel}</span>
                 <h3>{post.title}</h3>
-                <p className="growth-voice">{post.body}</p>
+                <p className="growth-voice">{post.preview}</p>
                 <a href={`/creators/${creator.handle}/posts/${post.id}`}>
                   {growthCopy.growthOpenPost}
                 </a>
               </article>
             ))}
+            {data.nextPostsCursor ? (
+              <a
+                className="qv-btn qv-btn--secondary"
+                href={homeLink(
+                  data.nextPostsCursor,
+                  typeof query.threadsCursor === "string"
+                    ? query.threadsCursor
+                    : null,
+                )}
+              >
+                {growthCopy.navMore}
+              </a>
+            ) : null}
           </>
+        ) : null}
+        {query.postsCursor || query.threadsCursor ? (
+          <a className="qv-btn qv-btn--quiet" href="/home">
+            {growthCopy.growthLatestFirst}
+          </a>
         ) : null}
       </div>
     </GrowthShell>

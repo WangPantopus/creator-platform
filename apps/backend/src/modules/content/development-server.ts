@@ -34,7 +34,7 @@ import { composeContentHost } from "./integration.js";
 import { configureGrowthForBackend } from "../growth/configured.js";
 import { canonicalCoreContentFollows } from "../growth/core-follows.js";
 import { contentPublicProjection } from "../growth/content.js";
-import { createTrustReplyReviewer } from "../trust/reply-review.js";
+import { prepareTrustReplyReviewer } from "../trust/reply-review.js";
 import { createDevelopmentTrust } from "../trust/development.js";
 import { createAgentDomain } from "../agent/integration.js";
 import { canonicalConversationHome } from "../growth/home.js";
@@ -206,15 +206,6 @@ const backend = await createConfiguredBackend({
               runtime.access,
               runtime.database,
               runtime.identity.signing,
-              async (creatorId) => {
-                const current = await (growthPool ?? runtime.pool).query<{
-                  handle: string;
-                }>(
-                  "SELECT handle FROM growth.creator_public WHERE id=$1 AND verified AND state='published'",
-                  [creatorId],
-                );
-                return current.rows[0]?.handle ?? null;
-              },
             ),
           }
         : {},
@@ -286,7 +277,7 @@ const backend = await createConfiguredBackend({
       dependencies: {
         assertAllowed: runtime.assertCreatorAllowed,
         assertAllowedInTransaction: runtime.assertContentAllowedInTransaction,
-        reviewReply: createTrustReplyReviewer(),
+        reviewReply: await prepareTrustReplyReviewer(runtime),
       },
       sources: { service: sources, repository },
       ...(groupPublication ? { groupPublication } : {}),

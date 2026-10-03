@@ -45,7 +45,9 @@ struct W3FeedbackInput: Encodable { let messageVersion: Int; let agentVersion: W
     enum CodingKeys: String, CodingKey { case messageVersion, agentVersion, rating, consent, policyVersion }
     func encode(to encoder: any Encoder) throws { var values = encoder.container(keyedBy: CodingKeys.self); try values.encode(messageVersion, forKey: .messageVersion); try values.encode(agentVersion, forKey: .agentVersion); if let rating { try values.encode(rating, forKey: .rating) } else { try values.encodeNil(forKey: .rating) }; try values.encodeIfPresent(consent, forKey: .consent); try values.encodeIfPresent(policyVersion, forKey: .policyVersion) }
 }
-struct W3FeedbackResult: Decodable, Sendable { let rating: String? }
+struct W3IntroOffer: Decodable, Sendable { let offerId: String? }
+struct W3IntroAcknowledgement: Decodable, Sendable { let acknowledged: Bool }
+struct W3FeedbackResult: Decodable, Sendable { let rating: String?; let introOffer: W3IntroOffer? }
 struct W3Provider: Decodable, Sendable { let name: String; let termsUrl: String; let noTraining: Bool; let noRetention: Bool }
 struct W3Policy: Decodable, Sendable { let version: String; let providers: [W3Provider]; let verified: Bool }
 struct W3Capabilities: Decodable, Sendable { let providers: W3Policy?; let consentAvailable: Bool; let generationAvailable: Bool; let accessDisclosure: String }
@@ -121,6 +123,8 @@ final class W3ThreadModel: ObservableObject {
     @Published var page: W3Page?; @Published var older: [W3Message] = []; @Published var before: Int?
     @Published var draft = ""; @Published var failure = ""; @Published var busy = false; @Published var offline = true
     @Published var pending: Pending?
+    @Published var introOfferId: String?
+    private var introOfferChecked = false
     let client: W3ConversationClient; let creatorId: String; let fanId: String
     private let accountId: String
     private var active = false
@@ -147,12 +151,21 @@ final class W3ThreadModel: ObservableObject {
             gate = ThreadDeliveryGate(threadID: fresh.threadId, cursor: fresh.cursor, epoch: fresh.epoch, generationSequences: fresh.generationSequences)
             await W3ResumeStorage.shared.save(accountId: accountId, scope: storageScope, cursor: fresh.cursor, epoch: fresh.epoch)
             offline = !transportReady; authorizationDenied = false; failure = ""
+            if fresh.feedbackPolicy == nil { introOfferId = nil; introOfferChecked = false }
+            else if !introOfferChecked {
+                do {
+                    let offer: W3IntroOffer = try await client.request(root + "/intro-offer")
+                    guard !Task.isCancelled else { return }
+                    introOfferId = offer.offerId.flatMap { UUID(uuidString: $0) == nil ? nil : $0 }
+                    introOfferChecked = true
+                } catch { if Task.isCancelled { return } }
+            }
             if let pending { let status: W3Status = try await client.request(root + "/messages/status", body: JSONEncoder().encode(W3StatusQuery(idempotencyKey: pending.key))); if status.accepted && self.pending?.key == pending.key { self.pending = nil; if draft.trimmingCharacters(in: .whitespacesAndNewlines) == pending.text { draft = "" } } }
         } catch { failed(error) }
     }
     func setActive(_ value: Bool) {
         active = value
-        if !value { transportReady = false; offline = true }
+        if !value { transportReady = false; offline = true; introOfferChecked = false }
     }
     func connect() async {
         let run = UUID(); connectionRun = run
@@ -227,18 +240,32 @@ final class W3ThreadModel: ObservableObject {
         busy = true; defer { busy = false }
         do {
             let body = try JSONEncoder().encode(W3FeedbackInput(messageVersion: message.version, agentVersion: version, rating: rating, consent: rating == nil ? nil : true, policyVersion: rating == nil ? nil : policy?.version))
-            let _: W3FeedbackResult = try await client.request(root + "/messages/" + message.id + "/feedback", body: body)
+            let result: W3FeedbackResult = try await client.request(root + "/messages/" + message.id + "/feedback", body: body)
+            guard active, !Task.isCancelled else { return }
+            if let id = result.introOffer?.offerId, UUID(uuidString: id) != nil { introOfferId = id }
+            introOfferChecked = false
             let refreshed: W3Message = try await client.request(root + "/messages/" + message.id)
             older = older.map { $0.id == refreshed.id ? refreshed : $0 }
             await refresh()
         } catch { failed(error) }
+    }
+    func acknowledgeIntroOffer(_ id: String) async -> Bool {
+        guard active, !busy, !offline, page?.feedbackPolicy != nil, introOfferId == id else { return false }
+        busy = true; defer { busy = false }
+        do {
+            let body = try JSONSerialization.data(withJSONObject: ["offerId": id])
+            let result: W3IntroAcknowledgement = try await client.request(root + "/intro-offer/acknowledgement", body: body)
+            guard active, !Task.isCancelled, result.acknowledged, introOfferId == id else { return false }
+            introOfferId = nil; introOfferChecked = true
+            return true
+        } catch { failed(error); return false }
     }
     private func failed(_ error: Error) {
         transportReady = false; offline = true
         if let id = activeLease { Task { await W3Realtime.shared.release(id) } }
         if let failure = error as? W3Failure {
             self.failure = failure.message
-            if [401,403,404].contains(failure.status) { authorizationDenied = true; page = nil; older = []; before = nil; draft = ""; pending = nil; gate = nil; resumeActivated = false; Task { await W3ResumeStorage.shared.remove(accountId: accountId, scope: storageScope) } }
+            if [401,403,404].contains(failure.status) { authorizationDenied = true; page = nil; older = []; before = nil; draft = ""; pending = nil; introOfferId = nil; introOfferChecked = false; gate = nil; resumeActivated = false; Task { await W3ResumeStorage.shared.remove(accountId: accountId, scope: storageScope) } }
         } else { offline = true; failure = "Reconnect to refresh. Your input is kept on this screen." }
     }
 }

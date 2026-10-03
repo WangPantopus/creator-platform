@@ -1,0 +1,104 @@
+{
+  "implementation": "55058f90a4d22b72df4766fe928abc2e86d9f258",
+  "integratedMain": "9dd89e46",
+  "integration": "b2d6f80479aad496c224dfd9631c60e9399833f3",
+  "environment": {
+    "host": "Mac Studio",
+    "webPort": 3011,
+    "apiPort": 4111,
+    "database": "creator_w1",
+    "canonicalMigrations": 40,
+    "identity": "labelled synthetic development",
+    "generationProvider": "unconfigured",
+    "trust": "disabled"
+  },
+  "web": {
+    "personallyOperated": true,
+    "theme": "Night",
+    "screenPixels": [
+      609,
+      1319
+    ],
+    "cssViewportAndBrowserZoom": "not measured in this increment",
+    "steps": [
+      "Reload genuine no-fan Account",
+      "Observe Choose your handle without fabricated @handle",
+      "Open actual Handle form without saving a profile"
+    ],
+    "screenshot": "web-current-account-choose-handle.png"
+  },
+  "android": {
+    "shippingBuild": "passed20s",
+    "source": "55058f90",
+    "apkSha256": "cbca696629416e95f48eca0704b5477acdb11766c7476d187389a0c423bab751",
+    "personallyOperated": true,
+    "device": "Qelvora_W1_API34",
+    "serial": "emulator-5554",
+    "os": "Android14/API34 Google APIs arm64",
+    "pixels": [
+      1080,
+      2400
+    ],
+    "density": 420,
+    "cores": 2,
+    "memoryMiB": 2048,
+    "fontScale": 2.0,
+    "fontScaleChangedUsing": "CUA actual OS Settings slider",
+    "fontScaleRestored": 1.0,
+    "themes": [
+      "Light",
+      "Night"
+    ],
+    "steps": [
+      "Restore retained same synthetic account from encrypted storage",
+      "Operate Home, Discover, Requests, You at normal size",
+      "Set OS font to largest actual2.0",
+      "Operate all four tabs at2.0; full labels fit two-column navigation",
+      "Requests truthfully reports Commerce unavailable; no paid success inferred",
+      "Cold Night launch restores same public handle with adaptive navigation"
+    ],
+    "screenshotMethod": "CUA Android Studio actual W1 mirror",
+    "newFinding": "Home Notifications header breaks Notification / s at2.0; reported to W7 owner",
+    "notAccepted": [
+      "Studio five-tab live creator flow",
+      "fontScale2.4 branch; actual device max2.0",
+      "TalkBack, full keyboard/reduced-motion matrix",
+      "complete native source after main integration"
+    ]
+  },
+  "ios": {
+    "shippingBuild": "normally signed pass",
+    "strictCodesign": "pass",
+    "binarySha256": "9b2d59666325f76b88356a86de44fb0304d8199349c454c173906fc70bf83d57",
+    "source": "55058f90",
+    "effectiveAPI": "http://127.0.0.1:4111",
+    "linkHost": "localhost",
+    "personallyOperated": false,
+    "controlFailure": "Supported Device Hub CUA lookup again timed out; simulator app not enabled",
+    "existingComponentComparison": "all Light/Night references pass without replacement;1existing test13.630s",
+    "comparisonQualification": "Swift compilation began at55058f90 and normal main merge completed while check ran; Navigation/component source stayed unchanged; this is supporting evidence, not shipping iOS interaction"
+  },
+  "androidExistingComponentComparison": {
+    "result": "passed",
+    "durationSeconds": 16,
+    "existingTests": [
+      "componentsLight",
+      "componentsNight"
+    ],
+    "referencesChanged": false
+  },
+  "checks": {
+    "webTypecheck": "pass",
+    "backendTypecheck": "pass",
+    "scopedLint": "pass",
+    "backendContracts": 9,
+    "backendIntegrationSkipped": 9,
+    "newUnitTests": false,
+    "subagents": false
+  },
+  "publicAI": {
+    "assertPool": "exact Pool object or503",
+    "positiveCurrentLicenseAndPurposeAcceptance": false
+  },
+  "releaseReady": false
+}

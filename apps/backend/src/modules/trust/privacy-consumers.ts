@@ -27,8 +27,10 @@ import {
 import { DomainError } from "../../core/errors.js";
 import { trustPrivacyHook } from "./own-privacy-hook.js";
 import { mediaPrivacyHook } from "./media-privacy-hook.js";
+import { growthPrivacyHook } from "../growth/lifecycle.js";
 import type { GrowthService } from "../growth/service.js";
 import { contentPrivacyHook } from "../content/privacy.js";
+import { domainPrivacyTaskAuthorityInTransaction } from "./domain-privacy-authority.js";
 
 export type ConversationPrivacyOwnerPorts = Omit<
   Parameters<typeof conversationPrivacyHook>[0],
@@ -166,17 +168,23 @@ export function createPrivacyConsumers(input: {
     );
   }
   if (input.growth) {
-    hooks.push({
-      domain: "growth",
-      async run(job) {
-        await verify(job);
-        throw new DomainError(
-          "growth_held_authority_unavailable",
-          "Growth privacy requires its reviewed same-client task and COMMIT integration.",
-          503,
+    const restore = input.assertRestoredInTransaction;
+    hooks.push(
+      growthPrivacyHook(input.growth, undefined, async (client, job) => {
+        if (!restore)
+          throw new DomainError(
+            "privacy_commit_fence_unavailable",
+            "Current held restoration authority is required.",
+            503,
+          );
+        return domainPrivacyTaskAuthorityInTransaction(
+          client,
+          job,
+          "growth",
+          restore,
         );
-      },
-    });
+      }),
+    );
   }
   if (input.content) {
     const owner = contentPrivacyHook(

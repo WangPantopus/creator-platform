@@ -3251,7 +3251,7 @@ function Team({
       previous.getClientRects().length
     ) {
       previous.focus();
-    } else if (requested) {
+    } else if (requested && document.activeElement === document.body) {
       const target =
         teamCurrent && creator.owned ? handleRef.current : retryRef.current;
       if (

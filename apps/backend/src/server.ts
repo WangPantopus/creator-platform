@@ -5,10 +5,9 @@ import { createConfiguredBackend } from "./integration.js";
 import { DevelopmentIdentityAdapter } from "./modules/identity/development.js";
 import { commerceSignedSubjects } from "./modules/commerce/registration.js";
 import { configureGrowthForBackend } from "./modules/growth/configured.js";
-import { canonicalCoreContentFollows } from "./modules/growth/core-follows.js";
-import { contentPublicProjection } from "./modules/growth/content.js";
 import { composeConversationHost } from "./modules/conversation/host.js";
 import { createCommerceStudio } from "./modules/commerce/studio.js";
+import { registeredCommerceApprovalMigration } from "./modules/commerce/approval-registration.js";
 import {
   composeContentHost,
   createContentStudio,
@@ -21,34 +20,28 @@ import {
   developmentTrustActors,
 } from "./modules/trust/development.js";
 import { agentFeature } from "./modules/agent/feature.js";
-import { DomainError } from "./core/errors.js";
+import { contentPublicProjection } from "./modules/growth/content.js";
+import { canonicalConversationHomePage } from "./modules/growth/home.js";
+import { canonicalHomePage } from "./modules/growth/home-composition.js";
+import { canonicalPassAccess } from "./modules/growth/integration.js";
 import { createGrowthAPIPool } from "./db/growth-api-pool.js";
+import { DomainError } from "./core/errors.js";
+import { domainPrivacyTaskAuthorityInTransaction } from "./modules/trust/domain-privacy-authority.js";
+import type { ConversationPrivacyOwnerPorts } from "./modules/trust/privacy-consumers.js";
+import { prepareTrustReplyReviewer } from "./modules/trust/reply-review.js";
+import { createDevelopmentFeedback } from "./modules/trust/development-feedback.js";
 import { InteractiveCallControl } from "./modules/session/interactive-control.js";
 import { AccountCallMetadata } from "./modules/session/account-call-metadata.js";
 
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
 const config = readConfig();
-function canonicalDevelopmentIdentity() {
-  const identity = new DevelopmentIdentityAdapter(
-    config.allowedOrigin,
-    process.env.NODE_ENV,
-  );
-  if (process.env.TRUST_LOCAL_DEVELOPMENT === "true") {
-    const labels = new Map(
-      developmentTrustActors.map((actor) => [actor.id, actor.label]),
-    );
-    // Labels describe existing synthetic accounts; the real Ops membership
-    // check and canonical session issuer still decide every permission.
-    for (const actor of identity.developmentActors)
-      actor.label = labels.get(actor.id) ?? actor.label;
-  }
-  return identity;
-}
 const features: {
   growth: Awaited<ReturnType<typeof configureGrowthForBackend>>;
+  conversationPrivacy?: ConversationPrivacyOwnerPorts;
+  start: (() => void)[];
   close: (() => void | Promise<void>)[];
-} = { growth: null, close: [] };
+} = { growth: null, start: [], close: [] };
 if (config.identityAdapter === "development" && !config.identitySessionKey)
   throw new Error(
     "Development identity requires an explicit IDENTITY_SESSION_KEY.",
@@ -60,7 +53,13 @@ try {
     config.identityAdapter === "development"
       ? await createConfiguredBackend({
           config,
-          identity: canonicalDevelopmentIdentity(),
+          identity: new DevelopmentIdentityAdapter(
+            config.allowedOrigin,
+            process.env.NODE_ENV,
+            process.env.TRUST_LOCAL_DEVELOPMENT === "true"
+              ? developmentTrustActors
+              : [],
+          ),
           guardrails: {
             checkSentence: async () => {
               throw new Error("AI generation is unconfigured.");
@@ -68,9 +67,74 @@ try {
           },
           signedSubjectPolicies: [commerceSignedSubjects],
           ...(process.env.TRUST_LOCAL_DEVELOPMENT === "true"
-            ? { trust: createDevelopmentTrust }
+            ? {
+                trust: (
+                  runtime: Parameters<typeof createDevelopmentTrust>[0],
+                ) =>
+                  createDevelopmentTrust(runtime, {
+                    consumers: {
+                      // Trust starts first. Resolve only the actual prepared
+                      // conversation owners after the canonical host binds.
+                      conversation: () => features.conversationPrivacy,
+                      additional:
+                        process.env.GROWTH_ENABLED === "true"
+                          ? [
+                              {
+                                domain: "growth",
+                                async run(job) {
+                                  // Trust is composed first; resolve the actual
+                                  // owner only after feature composition completes.
+                                  if (!features.growth)
+                                    throw new DomainError(
+                                      "privacy_commit_fence_unavailable",
+                                      "The actual Growth privacy owner is unavailable.",
+                                      503,
+                                    );
+                                  return features.growth.privacyHook.run(job);
+                                },
+                              },
+                            ]
+                          : [],
+                    },
+                  }),
+              }
             : {}),
           registerFeatures: async (runtime) => {
+            const feedback = await createDevelopmentFeedback(runtime);
+            if (feedback) {
+              const controller = new AbortController();
+              let timer: ReturnType<typeof setInterval> | undefined;
+              let pending: Promise<void> | undefined;
+              const run = () => {
+                if (controller.signal.aborted || pending) return;
+                pending = feedback
+                  .purgeExpired(controller.signal)
+                  .then(() => {})
+                  .catch(() => {
+                    if (!controller.signal.aborted)
+                      console.error(
+                        "Development feedback expiry is unavailable.",
+                      );
+                  })
+                  .finally(() => {
+                    pending = undefined;
+                  });
+              };
+              // Start only after the complete configured graph returns, outside
+              // request ALS. One original batch (at most 100 per relation) per
+              // minute cannot overlap or inherit interactive account authority.
+              features.start.push(() => {
+                run();
+                timer = setInterval(run, 60_000);
+                timer.unref();
+              });
+              features.close.push(async () => {
+                controller.abort();
+                if (timer) clearInterval(timer);
+                await pending;
+                await feedback.close();
+              });
+            }
             const accountCalls = await AccountCallMetadata.prepare(runtime);
             const callControl = await InteractiveCallControl.prepare(runtime);
             const mediaEnvironment = readMediaEnvironment();
@@ -90,38 +154,92 @@ try {
                     development: true,
                   })
                 : undefined;
-            features.growth = await configureGrowthForBackend({
-              ...runtime,
-              pool: growthAPIPool ?? runtime.pool,
-              assertAllowed: async (actor, creatorId) =>
-                creatorId
-                  ? runtime.assertCreatorAllowed(actor, creatorId)
-                  : runtime.assertActorAllowed(actor),
-            });
             // W3 composes conversations, Creator AI and commerce together so
             // fan generation uses one model, journal, allowance and trial path.
-            const host = await composeConversationHost(
-              runtime,
-              config,
-              mediaHost
+            const host = await composeConversationHost(runtime, config, {
+              ...(feedback
+                ? {
+                    feedbackAuthority: feedback.replyFeedbackAuthority,
+                    introOfferPolicy: feedback.introOfferPolicy,
+                    introOfferRetention: feedback.introOfferRetention,
+                  }
+                : {}),
+              ...(mediaHost
                 ? {
                     media: mediaHost.media,
                     bindRecordingPublication:
                       mediaHost.bindRecordingPublication,
                   }
-                : {},
-            );
+                : {}),
+            });
             features.close.push(() => host.close());
             const { commerce, conversation, agent } = host;
+            const approvalMigration =
+              await registeredCommerceApprovalMigration();
             // Preparing the genuine graph does not configure a provider, worker
-            // purpose or arrival policy. The calls feature remains unmounted
-            // until those separate producers exist; no request Actor is invented.
+            // purpose or arrival policy. Calls remain unmounted until those
+            // separate producers exist; no request Actor is invented.
             process.stdout.write(
               callControl
                 ? "Call control: prepared; calling awaits provider, worker and policy composition.\n"
                 : "Call control: unavailable; canonical held request authority is not activated.\n",
             );
+            features.conversationPrivacy = {
+              ...(conversation.feature.lineage
+                ? { lineage: conversation.feature.lineage }
+                : {}),
+              ...(conversation.feature.recordings
+                ? { recordings: conversation.feature.recordings }
+                : {}),
+              ...(commerce?.generationCostPrivacyReconciliation
+                ? {
+                    generationCostPrivacyReconciliation:
+                      commerce.generationCostPrivacyReconciliation,
+                  }
+                : {}),
+            };
             runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
+            features.growth = await configureGrowthForBackend({
+              ...runtime,
+              pool: growthAPIPool ?? runtime.pool,
+              privacyTaskAuthority: async (client, job) => {
+                if (!runtime.assertRestoredInTransaction)
+                  throw new DomainError(
+                    "privacy_commit_fence_unavailable",
+                    "Current held restoration authority is required.",
+                    503,
+                  );
+                return domainPrivacyTaskAuthorityInTransaction(
+                  client,
+                  job,
+                  "growth",
+                  runtime.assertRestoredInTransaction,
+                );
+              },
+              assertAllowed: async (actor, creatorId) =>
+                creatorId
+                  ? runtime.assertCreatorAllowed(actor, creatorId)
+                  : runtime.assertActorAllowed(actor),
+              owners: runtime.identity
+                ? {
+                    homePage: canonicalHomePage({
+                      thread: canonicalConversationHomePage(
+                        conversation.feature,
+                        runtime.access,
+                        runtime.database,
+                        runtime.identity.signing,
+                      ),
+                    }),
+                    ...(commerce
+                      ? {
+                          discoveryAccess: canonicalPassAccess(
+                            commerce.service,
+                          ),
+                        }
+                      : {}),
+                  }
+                : undefined,
+            });
             const contentHost = composeContentHost({
               pool: runtime.pool,
               owners: {
@@ -132,6 +250,7 @@ try {
               },
               dependencies: {
                 assertAllowed: runtime.assertCreatorAllowed,
+                reviewReply: await prepareTrustReplyReviewer(runtime),
                 assertAllowedInTransaction: async (
                   client,
                   actor,
@@ -154,19 +273,20 @@ try {
                   );
                 },
                 mediaPublication: mediaHost?.contentPublication,
+                // Canonical content retains creator_runtime and actual held
+                // scopes. Missing 0101 custody fails closed without Growth grants.
+                ...(features.growth
+                  ? { follows: features.growth.coreContentFollows }
+                  : {}),
               },
               ...(features.growth && runtime.identity
                 ? {
-                    // The original core client retains Content's held gates.
-                    // No registered0185 receipt is supplied: Follow stays closed.
-                    followReaders: { follows: canonicalCoreContentFollows() },
-                    publicProjection: async (actor, effect) => {
-                      return contentPublicProjection(
+                    publicProjection: async (actor, effect) =>
+                      contentPublicProjection(
                         features.growth!.service,
                         content.content,
                         runtime.identity!.signing,
-                      )(actor, effect);
-                    },
+                      )(actor, effect),
                   }
                 : {}),
               assertScopeAllowedInTransaction:
@@ -182,6 +302,16 @@ try {
                   pool: runtime.pool,
                   owners: contentHost.owners,
                   dependencies: contentHost.dependencies,
+                  ...(approvalMigration
+                    ? {
+                        approvals: {
+                          database: runtime.database,
+                          access: runtime.access,
+                          conversation: runtime.conversation,
+                          migration: approvalMigration,
+                        },
+                      }
+                    : {}),
                 })
               : createContentStudio({
                   pool: runtime.pool,
@@ -220,6 +350,7 @@ try {
   throw error;
 }
 features.growth?.start();
+for (const start of features.start) start();
 const server = configured?.server ?? createServer(createApp(config));
 server.listen(
   {
@@ -233,7 +364,8 @@ server.listen(
 );
 let shutdownInFlight: Promise<void> | undefined;
 const shutdown = () => {
-  // Overlapping watcher/OS signals share one drain of the original pools.
+  // Shell, watcher and OS signals can overlap. One shared cleanup must own
+  // every worker/pool so a second signal cannot interrupt the first drain.
   shutdownInFlight ??= (async () => {
     let failed = false;
     const close = async (name: string, action: () => unknown) => {

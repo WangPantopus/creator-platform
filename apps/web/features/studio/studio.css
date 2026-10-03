@@ -336,6 +336,9 @@
   display: grid;
   gap: var(--space-6);
 }
+.w5-team .w5-editor a {
+  color: inherit;
+}
 .w5-team-columns[hidden] {
   display: none;
 }

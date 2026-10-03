@@ -1,0 +1,182 @@
+{
+  "recordedAt": "2026-10-01T15:48:00.601639+00:00",
+  "accountHead": "a164fe8aa3f8948b7d51dbdb68c65e13bdc56de1",
+  "actualCheckout": "95cc51e3be56f6c5a4cb8ae8710b8b029202d4c3",
+  "job": {
+    "id": 110336889574,
+    "runId": 36852405181,
+    "status": "completed",
+    "conclusion": "failure",
+    "completedAt": "2026-10-01T15:37:35Z"
+  },
+  "environment": {
+    "macOS": "27.0 / 26A428",
+    "runnerImage": "xcode-27-arm64 / 20260928.0222.1",
+    "Xcode": "27.0 / 27A266a",
+    "capture": "backing1 / canvas780x1688"
+  },
+  "results": {
+    "swiftPackageBuild": "completed",
+    "existingNonImageTests": "15 passed",
+    "existingImageCases": 3,
+    "reportedSnapshotMismatches": 106,
+    "existingReferenceComparisons": 110,
+    "simulatorAppTests": "not run; subsequent steps skipped after package failure"
+  },
+  "originalLog": {
+    "file": "ci-a164fe8-pr-ios-foundation-failed.log",
+    "sha256": "2556b77a4b7058c124eca7df099277df2d064afd8787185c4c148a4058ab5231",
+    "personallyRead": true
+  },
+  "originalHostedArtifact": {
+    "id": 11174096642,
+    "zipSha256": "481f9b9a417932386345a1c22c32d7ee988ec0e3913ff88ffe70cd5561b795d0",
+    "zipBytes": 10309940
+  },
+  "selectedOriginals": [
+    {
+      "originalActualFile": "ci-a164fe8-ios-actual-mark-light.png",
+      "actualSha256": "8c3ae09147bd1c08a5aa9b2587ab99a2ac74b48a8bef983fd5ad77cb8887c810",
+      "unchangedReferenceFile": "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Mark-light.png",
+      "referenceSha256": "f3460f05f830f394b0f13d13d5c3c392bf15dde37d4a7ad377eff536fade7fbb",
+      "dimensions": "780x1688",
+      "personallyInspected": true
+    },
+    {
+      "originalActualFile": "ci-a164fe8-ios-actual-welcome-night.png",
+      "actualSha256": "b0b805ef725dae9acc68fee54339de545f630d0392cbfa9fc90a0471b5c2b59c",
+      "unchangedReferenceFile": "apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testWelcomeThemes.night.png",
+      "referenceSha256": "bf959e57b158234f1015469ba24b06b5f12d32f2b50c096681b238cbd9db5f78",
+      "dimensions": "780x1688",
+      "personallyInspected": false
+    }
+  ],
+  "unchangedSourceHashes": {
+    "apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift": "d96627435632d7fae92f8b1d4e10946543766b60dd65a1cb223732b8f09054c3",
+    "apps/ios/Sources/QelvoraUI/Theme.swift": "f4c5ea37a0bd93f9171509f708c9ebf14a1ba0a875d889dcec2b0d527d6c4132"
+  },
+  "observation": "Actual Mark.light title/italic seal visibly blurred against untouched reference; geometry/background broadly align. This observation does not establish a safe rendering repair or prove a W3 app failure.",
+  "ownerReceipt": {
+    "originalW1Thread": "01a0f498-d09e-7ca1-87ff-481bacf6cb4b",
+    "noNewHelperOrWorkflowLeaseGranted": true,
+    "historicalEnvironment": "macOS26/Intel differs from actual currentmacOS27/ARM",
+    "actualMergedIOSRunner": "xcode-27 remains valid; blanket historical three-pinned-job prose stale",
+    "noReviewedCandidateExists": true,
+    "activeOwnerSourcePacketSent": "01a0f6b3-1ccf-7ab2-b22a-39e62872bf79"
+  },
+  "currentPR24Snapshot": {
+    "headRefOid": "a164fe8aa3f8948b7d51dbdb68c65e13bdc56de1",
+    "isDraft": false,
+    "state": "OPEN",
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-01T11:00:49Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36852405181/job/110336889589",
+        "name": "web-and-backend",
+        "startedAt": "2026-10-01T10:58:23Z",
+        "status": "COMPLETED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-01T11:00:11Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36852390761/job/110336848903",
+        "name": "web-and-backend",
+        "startedAt": "2026-10-01T10:58:09Z",
+        "status": "COMPLETED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36852405181/job/110336889518",
+        "name": "web-visual",
+        "startedAt": "2026-10-01T10:58:11Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36852390761/job/110336849096",
+        "name": "web-visual",
+        "startedAt": "2026-10-01T10:58:04Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-01T15:37:35Z",
+        "conclusion": "FAILURE",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36852405181/job/110336889574",
+        "name": "ios-foundation",
+        "startedAt": "2026-10-01T15:34:52Z",
+        "status": "COMPLETED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36852390761/job/110336849060",
+        "name": "ios-foundation",
+        "startedAt": "2026-10-01T10:58:04Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36852405181/job/110336889605",
+        "name": "android-foundation",
+        "startedAt": "2026-10-01T10:58:11Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36852390761/job/110336848977",
+        "name": "android-foundation",
+        "startedAt": "2026-10-01T10:58:04Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-01T11:03:24Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36852405181/job/110336889215",
+        "name": "android-runtime",
+        "startedAt": "2026-10-01T10:58:14Z",
+        "status": "COMPLETED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-01T11:02:36Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36852390761/job/110336848665",
+        "name": "android-runtime",
+        "startedAt": "2026-10-01T10:58:05Z",
+        "status": "COMPLETED",
+        "workflowName": "Foundation checks"
+      }
+    ]
+  },
+  "limits": [
+    "Original references, thresholds, assertions, tests and workflow helper remain unchanged.",
+    "Failed image comparisons are not passing package or simulator acceptance.",
+    "Ready-for-review PR24 remains unmerged; five further Mac checks are queued.",
+    "Cleanup hold prevents heavy local build/device/SDK work.",
+    "No foundation owner-reviewed new repair candidate or helper/workflow lease is inferred.",
+    "This source/evidence receipt does not validate a subsequent W3 publication head."
+  ]
+}

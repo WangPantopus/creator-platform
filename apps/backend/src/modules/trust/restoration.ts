@@ -38,6 +38,7 @@ export function trustLocalRestorationInTransaction(
     // SAVEPOINT rejects a checked-out but idle client. Never open a transaction
     // here or borrow another pool: the caller owns its family and lifecycle.
     await client.query("SAVEPOINT w8_held_restoration");
+    let completed = false;
     try {
       const state = await client.query<{
         database: string;
@@ -51,6 +52,7 @@ export function trustLocalRestorationInTransaction(
          datconnlimit AS connections FROM pg_database WHERE datname=current_database()`,
       );
       const row = state.rows[0];
+      completed = true;
       return (
         state.rows.length === 1 &&
         row?.database === database &&
@@ -59,7 +61,10 @@ export function trustLocalRestorationInTransaction(
         row.connections !== 0
       );
     } finally {
-      await client.query("RELEASE SAVEPOINT w8_held_restoration");
+      // A failed response stays with the original transaction owner. Helper
+      // cleanup cannot settle an unknown read by sending more source SQL.
+      if (completed)
+        await client.query("RELEASE SAVEPOINT w8_held_restoration");
     }
   };
 }

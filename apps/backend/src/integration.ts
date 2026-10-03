@@ -41,6 +41,9 @@ export type BackendRuntime = {
     client: pg.PoolClient,
   ) => Promise<void>;
   assertRestoredInTransaction?: (client: pg.PoolClient) => Promise<void>;
+  assertGenerationWorkerRestoredInTransaction?: (
+    client: pg.PoolClient,
+  ) => Promise<void>;
   assertContentAllowedInTransaction?: (
     client: pg.PoolClient,
     actor: import("./modules/identity/adapter.js").Actor,
@@ -284,6 +287,9 @@ export async function createConfiguredBackend(input: {
     ? {
         sessions,
         profiles: new IdentityProfiles(pool, {
+          ...(assertAudienceAllowed
+            ? { assertInvitationAllowed: assertAudienceAllowed }
+            : {}),
           assertCreatorAllowed: async (actor, creatorId, client) => {
             if (!trust)
               throw new DomainError(
@@ -356,6 +362,17 @@ export async function createConfiguredBackend(input: {
               actor,
               creatorId,
             );
+          },
+          assertGenerationWorkerRestoredInTransaction: async (
+            client: pg.PoolClient,
+          ) => {
+            if (!trust)
+              throw new DomainError(
+                "trust_unconfigured",
+                "Current generation recovery authority is unavailable.",
+                503,
+              );
+            await trust.assertGenerationWorkerRestoredInTransaction(client);
           },
           holdPublicPacketNegativeAuthority: async (
             client: pg.PoolClient,

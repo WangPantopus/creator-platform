@@ -1,0 +1,24 @@
+{
+  "androidBuiltSHA256": "b991accb3246bb1c49ea65a09da47bf71281199d1897766a150580d28bc00e03",
+  "androidInstalledSHA256": "b991accb3246bb1c49ea65a09da47bf71281199d1897766a150580d28bc00e03",
+  "iosSourceUnchangedSince": "9841372c38f1afe17d27a35e06e92c550b246bae",
+  "providerOperated": false,
+  "populatedAcceptance": false,
+  "iosInstalledQelvoraAppSHA256": "20682ab35e9083853bbdd6013bb28ae748598ff15f92b2d49050df368b9c210d",
+  "iosInstalledQelvoraApp.debug.dylibSHA256": "77080b45db3f84fd327550dfe34edfe085dbe5995ccb5cb1f21ca00be2db5098",
+  "readiness": {
+    "status": 503,
+    "body": {
+      "ready": false,
+      "capabilities": [
+        {
+          "name": "trust_runtime",
+          "required": true,
+          "state": "unavailable",
+          "code": "trust_unconfigured",
+          "checkedAt": "2026-10-02T15:59:34.733Z"
+        }
+      ]
+    }
+  }
+}

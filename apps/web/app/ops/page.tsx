@@ -12,6 +12,7 @@ import {
   useTrust,
   caseLabel,
   openedLabel,
+  retryTrustReads,
 } from "./trust-client";
 
 const navigation: [QueueName, string][] = [
@@ -28,6 +29,7 @@ const category: Record<string, string> = {
   verification: "Verification review",
   pause: "Pause or suspension",
   support: "Support request",
+  reply_review: "Private Note reply review",
 };
 const stateLabel: Record<string, string> = {
   open: "Open",
@@ -43,7 +45,7 @@ export default function QueuePage() {
   const [number, setNumber] = useState("");
   const [search, setSearch] = useState("");
   const [cursor, setCursor] = useState<string | null>(null);
-  const { data, error, loading, refresh } = useTrust<{
+  const { data, error, loading } = useTrust<{
     items: CaseSummary[];
     counts: Partial<Record<QueueName, number>>;
     nextCursor: string | null;
@@ -97,7 +99,7 @@ export default function QueuePage() {
           Every case you open is logged. Fan message text appears only inside a
           case, never in lists or alerts.
         </p>
-        <ErrorState error={error} retry={() => void refresh()} />
+        <ErrorState error={error} retry={retryTrustReads} />
         {loading && <p role="status">Loading cases…</p>}
         {data && (
           <>

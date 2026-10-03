@@ -1,0 +1,62 @@
+{
+  "recordedAt": "2026-10-01T10:39:18.370Z",
+  "baseRevision": "560b2c1a5a9e12567c7409e5e1f44cbf46a5cb12",
+  "branch": "codex/w1-comprehension-focus-20261001",
+  "implementation": {
+    "path": "apps/web/features/identity/comprehension.tsx",
+    "sha256": "c5fcd0731c6e164199d7d57b37d3169b78270e2b72c1666cf38aff8147dc8cda",
+    "sourceState": "Exact implementation file hash identifies the uncommitted repair operated and built; delivery commit includes this record."
+  },
+  "browser": {
+    "route": "/design/studies/comprehension",
+    "origin": "http://localhost:3011",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "client": "Codex in-app Chromium browser",
+    "nativeUI": "disabled"
+  },
+  "observations": {
+    "before": "Four correct keyboard answers produced 4/4; disabling the answers left document.activeElement as BODY.",
+    "afterLight": "Four correct answers produced 4/4. Intermediate cards retained selected-answer focus. Completion focused Restart; Enter reset card 1 and score 0.",
+    "afterNightReducedMotion": "One correct and three incorrect answers produced 1/4, with Restart focused after completion. Enter reset card 1/score 0 and Tab reached the first answer.",
+    "overflow": false
+  },
+  "guard": "Only recover focus when the final activated answer owned focus and focus remains there or has fallen to BODY while the document is visible. Other focused controls and intermediate card progression retain their focus.",
+  "supportingChecks": {
+    "webTypecheck": "passed",
+    "affectedEslint": "passed",
+    "affectedPrettier": "passed",
+    "productionWebBuild": "passed",
+    "webBuildId": "ecnPyrXn94_90UaRtOL74",
+    "hostedCI": "Not yet available; Code Review requires a GitHub connection."
+  },
+  "captures": [
+    {
+      "file": "completed-focus-lost-night.jpg",
+      "sha256": "2d6b6170309fff6465e4390fa01d1899f3bb00d6231a86a3af29ec2c2a301665",
+      "capturedAt": "2026-10-01T10:22:57.170Z",
+      "inspected": true
+    },
+    {
+      "file": "completed-restart-focus-light.jpg",
+      "sha256": "ad3ef6317afa97233848c3d0aa31754b234b6dd76865cec0cfaf3ab8bd03d379",
+      "capturedAt": "2026-10-01T10:35:50.495Z",
+      "inspected": true
+    },
+    {
+      "file": "completed-restart-focus-night-reduced-motion.jpg",
+      "sha256": "7cada027f69d88ef762c6e221ca1e77c6929f05cf32cfb6a0de9e57d456c8451",
+      "capturedAt": "2026-10-01T10:36:21.453Z",
+      "inspected": true
+    }
+  ],
+  "nonClaims": [
+    "No native/screen-reader/device operation",
+    "No consented-participant T21 study or Q12 threshold acceptance",
+    "No original artboard/reference changes",
+    "No new test code",
+    "Production output is supporting compilation; browser operated actual development app source."
+  ]
+}

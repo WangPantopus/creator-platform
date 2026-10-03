@@ -2722,6 +2722,12 @@ data class APIFanProfileInput(
 )
 
 @Serializable
+data class APIFanIntroInput(
+  val `intro`: String,
+  val `expectedVersion`: Long
+)
+
+@Serializable
 data class APIFanProfile(
   val `id`: String,
   val `handle`: String,
@@ -3277,7 +3283,8 @@ data class APIError(
 data class APIErrorError(
   val `code`: String,
   val `message`: String,
-  val `requestId`: String
+  val `requestId`: String,
+  val `correlationId`: String? = null
 )
 
 @Serializable
@@ -3733,6 +3740,12 @@ data class APIConversationConversationCorrectionInputCommandContent(
 enum class APIConversationConversationCorrectionInputCommandContentKind {
   @SerialName("conversation_correction") CONVERSATION_CORRECTION
 }
+
+@Serializable
+data class APIConversationConversationIntroOffer(
+  @Required
+  val `offerId`: String? = null
+)
 
 @Serializable
 data class APIConversationConversationMessage(
@@ -4242,6 +4255,26 @@ enum class APIConversationReplyFeedbackRating {
   @SerialName("helpful") HELPFUL,
   @SerialName("not_helpful") NOT_HELPFUL
 }
+
+@Serializable
+data class APIConversationReplyFeedbackResult(
+  @Required
+  val `rating`: APIConversationReplyFeedbackResultRating? = null,
+  @Required
+  val `introOffer`: APIConversationReplyFeedbackResultIntroOffer? = null
+)
+
+@Serializable
+enum class APIConversationReplyFeedbackResultRating {
+  @SerialName("helpful") HELPFUL,
+  @SerialName("not_helpful") NOT_HELPFUL
+}
+
+@Serializable
+data class APIConversationReplyFeedbackResultIntroOffer(
+  @Required
+  val `offerId`: String? = null
+)
 
 @Serializable
 data class APIConversationTeamReply(
@@ -5518,6 +5551,7 @@ class CreatorAPIClient(private val baseURL: String, private val maximumResponseB
   suspend fun logout(): APIDone = json.decodeFromString(request("/v1/identity/logout", "POST", authenticated = true))
   suspend fun revokeSessions(): APIDone = json.decodeFromString(request("/v1/identity/revoke-sessions", "POST", authenticated = true))
   suspend fun saveFanProfile(body: APIFanProfileInput): APIFanProfile = json.decodeFromString(request("/v1/identity/fan-profile", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun saveFanIntro(body: APIFanIntroInput): APIFanProfile = json.decodeFromString(request("/v1/identity/fan-profile/intro", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun saveCreatorProfile(body: APICreatorProfileInput): APICreatorProfile = json.decodeFromString(request("/v1/identity/creator-profile", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun creatorProof(creatorId: String): APIProof = json.decodeFromString(request("/v1/identity/${segment(creatorId)}/proof", "GET", authenticated = true))
   suspend fun beginCreatorProof(creatorId: String, body: APIProofInput): APIProof = json.decodeFromString(request("/v1/identity/${segment(creatorId)}/proof", "POST", body = json.encodeToString(body), authenticated = true))
@@ -5577,13 +5611,13 @@ class CreatorAPIClient(private val baseURL: String, private val maximumResponseB
 }
 
 object ApplicationDestination {
-  fun requiresFanProfile(value: String): Boolean = !isPermitted(value) || !Regex("^/(?:identity/account|status|ops(?:/.*)?)$").matches(value.substringBefore('?'))
+  fun requiresFanProfile(value: String): Boolean = !isPermitted(value) || !Regex("^/(?:identity/account|status|ops(?:/.*)?|studio/(?:workspace|[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/team))$").matches(value.substringBefore('?'))
   fun isPermitted(value: String): Boolean {
     if (value.length > 2048 || value.contains('%') || value.contains('\\') || value.contains('#') || value.any { it.isWhitespace() }) return false
     val parts = value.split('?')
-    if (parts.size > 2 || !Regex("^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|ops(?:/(?:audits|metrics|cases/[a-f0-9-]{36}))?|status|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/(?:overview|sources|style|rules|test|versions|license|interview|onboard))?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post(?:/[a-f0-9-]{36})?|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$").matches(parts[0])) return false
+    if (parts.size > 2 || !Regex("^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|ops(?:/(?:audits|metrics|cases/[a-f0-9-]{36}))?|status|notifications(?:/(?:settings|[a-f0-9-]{36}))?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/(?:overview|sources|style|rules|test|versions|license|interview|onboard))?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post(?:/[a-f0-9-]{36})?|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$").matches(parts[0])) return false
     if (parts.size == 1) return true
-    val scopes = mapOf("context" to "^/creators/", "creatorId" to "^(?:/commerce/|/support$|/you$|/media/voice$)", "fanId" to "^/you$", "packetId" to "^/commerce/", "offer" to "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId" to "^/support$", "quote" to "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet" to "^/studio/[a-f0-9-]{36}/publish$", "objectId" to "^/media/voice$", "kind" to "^/support$")
+    val scopes = mapOf("context" to "^/creators/", "creatorId" to "^(?:/commerce/|/support$|/you$|/media/voice$)", "fanId" to "^/you$", "packetId" to "^/commerce/", "offer" to "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId" to "^/support$", "kind" to "^/support$", "quote" to "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet" to "^/studio/[a-f0-9-]{36}/publish$", "objectId" to "^/media/voice$")
     val literalValues = mapOf("offer" to "1", "kind" to "verification")
     val fields = parts[1].split('&')
     if (fields.size > 2) return false

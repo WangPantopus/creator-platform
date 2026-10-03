@@ -1,0 +1,7 @@
+# Original Home host reconciliation
+
+The original #29 increment normally incorporates #28's current producer and retains the distinct approved Growth API pool, canonical core Identity/Conversation/Content pool, original signing policies, held Content gates and original pool cleanup. Growth Home is composed after the genuine Conversation host exists and before listeners start. This changes no database purpose, role, migration or request authority.
+
+Retained private thread entries reuse the existing W7 `/threads/:creatorId/:fanId` destination and original #29 Home-only validation and shipping shell navigation. A fresh issued fan scope must still match the account directory's actual thread. A public creator handle and published Growth projection cannot authorize a private family, and their absence no longer hides an otherwise authorized retained family. Both existing Home host callers use the same owner. Navigation itself grants no access.
+
+This earlier increment retains its original bounded directory and signing read; the later paged Home and same-client signed-preview producers remain in the continuation stack. Source consistency, existing contracts, current runtime composition, populated retained/unpublished Home operation, privacy/revocation and shipping native navigation are separate qualifications. No later feature graph, synthetic signature, creator proof, scope or positive provider outcome is substituted.
