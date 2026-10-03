@@ -222,11 +222,18 @@ export function CreatorAI({
   const actorKey = useRef<string | null>(null);
   const fetchSequence = useRef(0);
   const sourceFileSequence = useRef(0);
-  const [error, setError] = useState("");
+  const [error, setErrorMessage] = useState("");
+  const stateReadFailure = useRef<string | null>(null);
+  const setError = useCallback((text: string) => {
+    stateReadFailure.current = null;
+    setErrorMessage(text);
+  }, []);
   // Counts failures of person-initiated actions. Background refreshes never
   // move focus while someone is typing.
   const [actionFailure, setActionFailure] = useState(0);
   const errorNotice = useRef<HTMLDivElement>(null);
+  const studioHeading = useRef<HTMLHeadingElement>(null);
+  const recoveredReadFocus = useRef<HTMLElement | null>(null);
   const failAction = (text: string) => {
     setError(text);
     setActionFailure((count) => count + 1);
@@ -260,6 +267,7 @@ export function CreatorAI({
     rightsEvidence: string;
     revision: number;
   } | null>(null);
+  const sourceReviewButtons = useRef(new Map<string, HTMLButtonElement>());
   const [olderVersions, setOlderVersions] = useState<Version[]>([]);
   const [historyEnd, setHistoryEnd] = useState(false);
   const [confirmed, setConfirmed] = useState<Record<string, boolean>>({});
@@ -422,6 +430,21 @@ export function CreatorAI({
             "Your creator session changed. Continue with Pantopus again.",
           );
         }
+        // A successful current-account read settles only its own outage notice.
+        // Provider/action refusals and unsaved-draft conflicts remain visible.
+        const readFailure = stateReadFailure.current;
+        stateReadFailure.current = null;
+        if (readFailure !== null) {
+          const focused = document.activeElement;
+          if (
+            focused instanceof HTMLElement &&
+            errorNotice.current?.contains(focused)
+          )
+            recoveredReadFocus.current = focused;
+          setErrorMessage((current) =>
+            current === readFailure ? "" : current,
+          );
+        }
         const nextActor = `${data.actorAccountId}:${data.creator.id}`;
         if (actorKey.current !== nextActor) {
           initial = true;
@@ -510,11 +533,15 @@ export function CreatorAI({
         }
         return data;
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Studio is unavailable.");
+        if (sequence !== fetchSequence.current || identitySignal?.aborted)
+          return null;
+        const text = e instanceof Error ? e.message : "Studio is unavailable.";
+        setError(text);
+        stateReadFailure.current = text;
         return null;
       }
     },
-    [request, identityAccount, identitySignal, endIdentity],
+    [request, identityAccount, identitySignal, endIdentity, setError],
   );
   useEffect(() => {
     void fetchState(true);
@@ -550,6 +577,21 @@ export function CreatorAI({
     });
     notice.focus({ preventScroll: true });
   }, [actionFailure]);
+  useEffect(() => {
+    const from = recoveredReadFocus.current;
+    recoveredReadFocus.current = null;
+    if (
+      error ||
+      !from ||
+      from.isConnected ||
+      document.activeElement !== document.body ||
+      dialog.current?.open
+    )
+      return;
+    const heading = studioHeading.current;
+    if (heading?.isConnected && heading.getClientRects().length)
+      heading.focus();
+  }, [error]);
   useEffect(() => {
     setConfirmationVisible(Boolean(message));
     if (!message) return;
@@ -638,7 +680,10 @@ export function CreatorAI({
   ]);
   useEffect(() => {
     if (
-      !state?.sources.some((s) => s.state === "processing") &&
+      !(
+        state?.capabilities.embeddings &&
+        state.sources.some((s) => s.state === "processing")
+      ) &&
       state?.evaluation?.state !== "running"
     )
       return;
@@ -654,7 +699,7 @@ export function CreatorAI({
         ?.querySelector<HTMLButtonElement>("#w2-confirm-cancel")
         ?.focus();
     } else if (!confirmation && dialog.current?.open) dialog.current.close();
-  }, [confirmation]);
+  }, [confirmation, setError]);
   useEffect(() => {
     if (!state || !["test", "versions"].includes(current)) return;
     let cancelled = false;
@@ -800,12 +845,16 @@ export function CreatorAI({
     "Team",
   ];
   const destination = (name: string) => {
-    if (["Notes", "Requests", "Threads"].includes(name)) {
+    if (
+      ["Notes", "Requests", "Threads", "Publish", "Team", "More"].includes(name)
+    ) {
       const currentCreator = creatorId ?? state?.creator.id;
       return currentCreator
         ? `/studio/${encodeURIComponent(currentCreator)}/${name.toLowerCase()}`
         : "/studio/workspace";
     }
+    if (name === "Offers") return "/commerce/offers";
+    if (name === "Earnings") return "/commerce/earnings";
     return name === "My AI" ? "/studio/ai" : `/studio/${name.toLowerCase()}`;
   };
   const controlsDisabled = busy || !online;
@@ -836,7 +885,9 @@ export function CreatorAI({
               ? "CREATOR STUDIO"
               : `MY AI${dirty ? " · UNSAVED DRAFT" : ""}`}
         </span>
-        <h1>{titleFor[current]}</h1>
+        <h1 ref={studioHeading} tabIndex={-1}>
+          {titleFor[current]}
+        </h1>
       </div>
       {![
         "overview",
@@ -894,6 +945,7 @@ export function CreatorAI({
               <Link
                 key={name}
                 href={destination(name)}
+                onClick={(e) => navigate(e, destination(name))}
                 className="qv-side__item"
               >
                 <span className="qv-side__icon">
@@ -1116,6 +1168,15 @@ export function CreatorAI({
                       <div className="qv-source">
                         <div className="qv-source__text">
                           <button
+                            ref={(button) => {
+                              if (button)
+                                sourceReviewButtons.current.set(
+                                  source.id,
+                                  button,
+                                );
+                              else
+                                sourceReviewButtons.current.delete(source.id);
+                            }}
                             className="w2-source-title"
                             onClick={() => void loadReview(source)}
                           >
@@ -1125,7 +1186,9 @@ export function CreatorAI({
                             {source.state === "candidate"
                               ? "Found · not used until you approve"
                               : source.state === "processing"
-                                ? `Processing · ${source.progress}%`
+                                ? state.capabilities.embeddings
+                                  ? `Processing · ${source.progress}%`
+                                  : "Indexing unavailable · import kept"
                                 : source.state === "revoked"
                                   ? "Revoked · no longer used"
                                   : source.state === "failed"
@@ -1201,13 +1264,14 @@ export function CreatorAI({
                                   : "Revoke"}
                         </Button>
                       </div>
-                      {source.state === "processing" && (
-                        <progress
-                          value={source.progress}
-                          max={100}
-                          aria-label={`Processing ${source.title}`}
-                        />
-                      )}
+                      {source.state === "processing" &&
+                        state.capabilities.embeddings && (
+                          <progress
+                            value={source.progress}
+                            max={100}
+                            aria-label={`Processing ${source.title}`}
+                          />
+                        )}
                       <details className="w2-source-review">
                         <summary>Rights and audience review</summary>
                         <p>{source.rightsEvidence}</p>
@@ -1271,32 +1335,55 @@ export function CreatorAI({
                         <Button
                           disabled={controlsDisabled}
                           onClick={() =>
-                            void action(async () => {
-                              const source = sourceRows.find(
-                                (s) => s.id === review.id,
-                              )!;
-                              await api(
-                                `sources/${review.id}`,
-                                {
-                                  expectedRevision: review.revision,
-                                  title: review.title,
-                                  text: review.text,
-                                  origin: source.origin,
-                                  originReference:
-                                    source.originReference ?? undefined,
-                                  audience: source.audience,
-                                  rightsEvidence: source.rightsEvidence,
-                                  expiresAt: source.expiresAt,
-                                },
-                                "PUT",
-                              );
-                              setReview(null);
-                            }, "Revision saved; review and approve it again.")
+                            void action(
+                              async () => {
+                                const source = sourceRows.find(
+                                  (s) => s.id === review.id,
+                                )!;
+                                await api(
+                                  `sources/${review.id}`,
+                                  {
+                                    expectedRevision: review.revision,
+                                    title: review.title,
+                                    text: review.text,
+                                    origin: source.origin,
+                                    originReference:
+                                      source.originReference ?? undefined,
+                                    audience: source.audience,
+                                    rightsEvidence: source.rightsEvidence,
+                                    expiresAt: source.expiresAt,
+                                  },
+                                  "PUT",
+                                );
+                                setReview(null);
+                              },
+                              "Revision saved; review and approve it again.",
+                              sourceReviewButtons.current.get(review.id) ??
+                                studioHeading.current,
+                            )
                           }
                         >
                           Save revision
                         </Button>
-                        <Button variant="quiet" onClick={() => setReview(null)}>
+                        <Button
+                          variant="quiet"
+                          onClick={() => {
+                            const opener =
+                              sourceReviewButtons.current.get(review.id) ??
+                              studioHeading.current;
+                            setReview(null);
+                            // Close removes this control; retain the original
+                            // source's place in the keyboard reading order.
+                            if (
+                              !identitySignal?.aborted &&
+                              !dialog.current?.open &&
+                              opener?.isConnected &&
+                              opener.getClientRects().length &&
+                              !opener.matches(":disabled")
+                            )
+                              opener.focus();
+                          }}
+                        >
                           Close source
                         </Button>
                       </div>
@@ -1337,37 +1424,41 @@ export function CreatorAI({
                       <form
                         onSubmit={(e: FormEvent) => {
                           e.preventDefault();
-                          void action(async () => {
-                            const audience =
-                              scopeKind === "public"
-                                ? { kind: "public" }
-                                : {
-                                    kind: scopeKind,
-                                    ids: scopeIds
-                                      .split(",")
-                                      .map((s) => s.trim())
-                                      .filter(Boolean),
-                                  };
-                            const result = await api("sources", {
-                              title,
-                              text,
-                              origin: sourceOrigin,
-                              audience,
-                              rightsEvidence: rights,
-                              expiresAt: expiry
-                                ? new Date(expiry).toISOString()
-                                : null,
-                            });
-                            if (result.duplicate)
-                              return "This source already exists; no duplicate was created.";
-                            else {
-                              setTitle("");
-                              setText("");
-                              setRights("");
-                              setSourceOrigin("manual_text");
-                              setSourceForm(false);
-                            }
-                          }, "Source saved as a candidate. Review before approving.");
+                          void action(
+                            async () => {
+                              const audience =
+                                scopeKind === "public"
+                                  ? { kind: "public" }
+                                  : {
+                                      kind: scopeKind,
+                                      ids: scopeIds
+                                        .split(",")
+                                        .map((s) => s.trim())
+                                        .filter(Boolean),
+                                    };
+                              const result = await api("sources", {
+                                title,
+                                text,
+                                origin: sourceOrigin,
+                                audience,
+                                rightsEvidence: rights,
+                                expiresAt: expiry
+                                  ? new Date(expiry).toISOString()
+                                  : null,
+                              });
+                              if (result.duplicate)
+                                return "This source already exists; no duplicate was created.";
+                              else {
+                                setTitle("");
+                                setText("");
+                                setRights("");
+                                setSourceOrigin("manual_text");
+                                setSourceForm(false);
+                              }
+                            },
+                            "Source saved as a candidate. Review before approving.",
+                            studioHeading.current,
+                          );
                         }}
                         className="w2-form"
                       >
@@ -2634,7 +2725,8 @@ export function CreatorAI({
         {["Notes", "Requests", "Threads", "My AI", "More"].map((name) => (
           <Link
             key={name}
-            href={name === "More" ? "/studio/ai/license" : destination(name)}
+            href={destination(name)}
+            onClick={(e) => navigate(e, destination(name))}
             aria-current={name === "My AI" ? "page" : undefined}
           >
             <Glyph name={name} size={name === "Notes" ? 17 : 22} />

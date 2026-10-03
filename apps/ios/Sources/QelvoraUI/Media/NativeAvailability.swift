@@ -32,7 +32,7 @@ struct NativeAvailabilityDestination: View {
     @ObservedObject var model: FanSession
     var body: some View {
         if let creator = availabilityCreator(model.destination), let account = model.session?.accountId {
-            NativeAvailability(creator: creator, account: account, baseURL: baseURL)
+            NativeAvailability(creator: creator, account: account, baseURL: baseURL, model: model, destination: model.destination)
                 .id("\(account):\(model.session?.sessionId ?? ""):\(creator)")
         } else { Text(QelvoraCopy.text("w6MediaAccessExpiredOrIsUnavailable")).qText("body") }
     }
@@ -43,6 +43,10 @@ private struct NativeAvailability: View {
     let creator: UUID
     let account: String
     let baseURL: URL?
+    @ObservedObject var model: FanSession
+    let destination: String
+    @State private var request: FanSessionRequestCapture?
+    @State private var generation = 0
     @Environment(\.colorScheme) private var scheme
     @Environment(\.scenePhase) private var scene
     @State private var current: SavedAvailability?
@@ -58,13 +62,26 @@ private struct NativeAvailability: View {
     @State private var confirmRefresh = false
     @State private var mutation: Task<Void, Never>?
     @FocusState private var editedField: String?
-    private var client: NativeMediaClient? {
-        baseURL.map { origin in NativeMediaClient(baseURL: origin, sessionToken: {
-            guard let value = try await SecureSessionStorage(issuer: origin).read() else { throw URLError(.userAuthenticationRequired) }
-            return value
-        }) }
+    private func clearCapture() {
+        generation += 1; request = nil; fresh = false; loaded = false
+        current = nil; command = nil; windows = []; zone = ""
     }
-    private var root: String { "/v1/w6/creators/\(creator.uuidString.lowercased())/call-availability" }
+    private func currentRequest(_ captured: FanSessionRequestCapture, epoch: Int) async -> Bool {
+        guard !Task.isCancelled, scene == .active, epoch == generation, request === captured else { return false }
+        let valid = await captured.isCurrent()
+        return valid && !Task.isCancelled && scene == .active && epoch == generation && request === captured
+    }
+    private func readCapture() async -> FanSessionRequestCapture? {
+        if let captured = request, await captured.isCurrent() { return captured }
+        if request != nil { clearCapture() }
+        guard let baseURL, baseURL.scheme == "https" || (baseURL.scheme == "http" && ["localhost", "127.0.0.1"].contains(baseURL.host ?? "")), baseURL.user == nil, baseURL.password == nil,
+              let captured = await model.captureRequest(from: destination, maximumResponseBytes: 1_048_576, timeoutSeconds: 4), captured.expectedAccountId == account, scene == .active else { return nil }
+        request = captured; return captured
+    }
+    private func failure(_ value: CreatorAPIError) -> NativeMediaRequestError {
+        struct Body: Decodable { struct Detail: Decodable { let code: String? }; let error: Detail }
+        return NativeMediaRequestError(status: value.status, code: (try? JSONDecoder().decode(Body.self, from: value.body))?.error.code)
+    }
     private var dirty: Bool {
         loaded && (zone != (current?.timeZone ?? TimeZone.current.identifier) || windows != (current?.windows ?? []))
     }
@@ -79,28 +96,39 @@ private struct NativeAvailability: View {
         return returned == sent || first.data == second.data
     }
     private func read(replace: Bool) async {
-        guard !busy, scene == .active, let client, let actor = UUID(uuidString: account) else { return }
+        guard !busy, scene == .active else { return }
+        guard let captured = await readCapture() else { fresh = false; return }
+        guard !busy, scene == .active else { return }
         busy = true; replacingSavedWindows = replace
         defer { busy = false; replacingSavedWindows = false }
-        let started = Date()
+        let started = Date(), epoch = generation
         do {
-            let value = try JSONDecoder().decode(SavedAvailability?.self, from: await client.request(path: root, expectedAccountId: actor, timeoutSeconds: 4))
+            guard await currentRequest(captured, epoch: epoch) else { return }
+            let receipt = try await captured.client.readCreatorCallAvailability(creatorId: creator.uuidString.lowercased(), xQelvoraExpectedAccount: captured.expectedAccountId)
+            guard await currentRequest(captured, epoch: epoch) else { return }
+            let value = try JSONDecoder().decode(SavedAvailability?.self, from: JSONEncoder().encode(receipt))
             try Task.checkCancellation()
             guard scene == .active, Date() < started.addingTimeInterval(5), value == nil || (value?.creatorId == creator && (value?.version ?? 0) > 0 && (value?.windows.count ?? 0) <= 64) else { throw URLError(.badServerResponse) }
             freshUntil = started.addingTimeInterval(5); fresh = true
-            if replace || !loaded {
+            if notice == QelvoraCopy.text("w6AvailabilityCouldNotBeLoaded") { notice = nil }
+            if replace || !loaded || (!dirty && command == nil && value?.version != current?.version) {
                 current = value; zone = value?.timeZone ?? TimeZone.current.identifier; windows = value?.windows ?? []; loaded = true; notice = nil
             }
         } catch is CancellationError { return }
-        catch let error as NativeMediaRequestError {
+        catch let refused as CreatorAPIError {
+            guard await currentRequest(captured, epoch: epoch) else { return }
+            let error = failure(refused)
             fresh = false
             if [401, 403, 404].contains(error.status) || error.code == "session_account_changed" { loaded = false; current = nil; command = nil; windows = []; zone = "" }
             notice = QelvoraCopy.text(error.code == "session_account_changed" ? "w6AvailabilityAccountChanged" : "w6AvailabilityCouldNotBeLoaded")
         }
-        catch { fresh = false; notice = QelvoraCopy.text("w6AvailabilityCouldNotBeLoaded") }
+        catch { guard await currentRequest(captured, epoch: epoch) else { return }; fresh = false; notice = QelvoraCopy.text("w6AvailabilityCouldNotBeLoaded") }
     }
     private func save() async {
-        guard !busy, loaded, scene == .active, let client, let actor = UUID(uuidString: account) else { return }
+        guard !busy, loaded, scene == .active, let captured = request else { return }
+        let epoch = generation
+        guard await currentRequest(captured, epoch: epoch) else { if request === captured && epoch == generation { clearCapture() }; return }
+        guard !busy, loaded, scene == .active else { return }
         busy = true; defer { busy = false }
         do {
             if command == nil {
@@ -113,8 +141,11 @@ private struct NativeAvailability: View {
                 command = AvailabilitySave(timeZone: zone, windows: normalized, expectedVersion: current?.version ?? 0, idempotencyKey: UUID().uuidString)
             }
             guard let sent = command else { return }
-            let bytes = try await client.request(path: root, method: "PUT", body: JSONEncoder().encode(sent), expectedAccountId: actor)
-            let value = try JSONDecoder().decode(SavedAvailability.self, from: bytes)
+            let original = APICallAvailabilityCommand(timeZone: sent.timeZone, windows: sent.windows.map { APICallAvailabilityCommandWindowsItem(startsAt: $0.startsAt, endsAt: $0.endsAt) }, expectedVersion: sent.expectedVersion, idempotencyKey: sent.idempotencyKey)
+            guard await currentRequest(captured, epoch: epoch) else { return }
+            let receipt = try await captured.client.saveCreatorCallAvailability(creatorId: creator.uuidString.lowercased(), xQelvoraExpectedAccount: captured.expectedAccountId, body: original)
+            guard await currentRequest(captured, epoch: epoch) else { return }
+            let value = try JSONDecoder().decode(SavedAvailability.self, from: JSONEncoder().encode(receipt))
             let normalized = sent.windows.sorted { instant($0.startsAt)! < instant($1.startsAt)! }
             guard value.creatorId == creator, value.version == sent.expectedVersion + 1, sameZone(value.timeZone, sent.timeZone),
                   value.windows.count == normalized.count, zip(value.windows, normalized).allSatisfy({ pair in instant(pair.0.startsAt) == instant(pair.1.startsAt) && instant(pair.0.endsAt) == instant(pair.1.endsAt) }) else { throw URLError(.badServerResponse) }
@@ -122,11 +153,13 @@ private struct NativeAvailability: View {
             guard scene == .active else { return }
             command = nil; current = value; zone = value.timeZone; windows = value.windows; freshUntil = Date().addingTimeInterval(5); fresh = true; notice = QelvoraCopy.text("w6AvailabilitySaved")
         } catch is CancellationError { return }
-        catch let error as NativeMediaRequestError {
+        catch let refused as CreatorAPIError {
+            guard await currentRequest(captured, epoch: epoch) else { return }
+            let error = failure(refused)
             if [400, 401, 403, 404, 409, 422].contains(error.status) { command = nil }
             if [401, 404].contains(error.status) || (error.status == 403 && !["availability_invalid", "time_zone_invalid", "availability_stale"].contains(error.code ?? "")) || error.code == "session_account_changed" { fresh = false; loaded = false; current = nil; windows = []; zone = "" }
             notice = error.code == "session_account_changed" ? QelvoraCopy.text("w6AvailabilityAccountChanged") : (command == nil ? QelvoraCopy.text("w6AvailabilityCouldNotBeSavedYourChangesAreKept") : QelvoraCopy.text("w6AvailabilitySaveIsUnconfirmed"))
-        } catch { notice = command == nil ? QelvoraCopy.text("w6AvailabilityCouldNotBeSavedYourChangesAreKept") : QelvoraCopy.text("w6AvailabilitySaveIsUnconfirmed") }
+        } catch { guard await currentRequest(captured, epoch: epoch) else { return }; notice = command == nil ? QelvoraCopy.text("w6AvailabilityCouldNotBeSavedYourChangesAreKept") : QelvoraCopy.text("w6AvailabilitySaveIsUnconfirmed") }
     }
     var body: some View {
         ScrollView {
@@ -159,8 +192,10 @@ private struct NativeAvailability: View {
             SwiftUI.Button(QelvoraCopy.text("cancel"), role: .cancel) {}
         }
         .task { while !Task.isCancelled { await read(replace: false); do { try await Task.sleep(for: .seconds(4)) } catch { return } } }
-        .task { while !Task.isCancelled { if Date() >= freshUntil { fresh = false }; do { try await Task.sleep(for: .milliseconds(250)) } catch { return } } }
-        .onChange(of: scene) { _, phase in if phase != .active { fresh = false } }
-        .onDisappear { fresh = false; mutation?.cancel(); mutation = nil }
+        .task { while !Task.isCancelled {
+            if let captured = request, !(await captured.isCurrent()), request === captured { mutation?.cancel(); clearCapture() }
+            if Date() >= freshUntil { fresh = false }; do { try await Task.sleep(for: .milliseconds(250)) } catch { return } } }
+        .onChange(of: scene) { _, phase in if phase != .active { generation += 1; fresh = false; mutation?.cancel() } }
+        .onDisappear { generation += 1; fresh = false; mutation?.cancel(); mutation = nil; request = nil }
     }
 }

@@ -67,6 +67,16 @@ export function createApp(
   dependencies: ApplicationDependencies = {},
 ) {
   const app = express();
+  // Preserve the actual middleware-issued Actor. Resolving the same token a
+  // second time creates a different object and breaks original ThreadScope
+  // custody; account equality cannot substitute for that identity.
+  const resolvedRequests = new WeakMap<
+    Request,
+    Readonly<{
+      token: string;
+      authority: NonNullable<ReturnType<typeof requestAuthority.getStore>>;
+    }>
+  >();
   app.disable("x-powered-by");
   if (dependencies.telemetry) app.use(dependencies.telemetry.middleware());
   app.use((_req, res, next) => {
@@ -91,13 +101,14 @@ export function createApp(
     app.use("/v1", async (req, _res, next) => {
       const token = req.headers.authorization?.match(/^Bearer ([^\s]+)$/u)?.[1];
       const expectedAccount = req.get("X-Expected-Account-Id");
+      const expectedSession = req.get("X-Expected-Session-Id");
       // Refresh and logout also accept an expired access window within refresh_until.
       const refreshing = [
         "/identity/refresh",
         "/identity/logout",
         "/identity/revoke-sessions",
       ].includes(req.path);
-      if (!token || (refreshing && !expectedAccount)) {
+      if (!token || (refreshing && !expectedAccount && !expectedSession)) {
         next();
         return;
       }
@@ -113,6 +124,15 @@ export function createApp(
           "Your account changed. Reopen this form before saving.",
           409,
         );
+      // The browser may replace its cookie with another session of the same
+      // account. An old view must not adopt that replacement's authority.
+      // Ordinary one-use token rotation retains this actual session ID.
+      if (expectedSession && expectedSession !== resolved.sessionId)
+        throw new DomainError(
+          "session_view_changed",
+          "Your session changed. Reopen this form before continuing.",
+          409,
+        );
       if (refreshing) {
         next();
         return;
@@ -121,15 +141,14 @@ export function createApp(
       // closed accounts. Its router enforces operation-specific authority.
       if (!dependencies.trustRouter || !/^\/trust(?:\/|$)/u.test(req.path))
         await dependencies.assertActorAllowed?.(resolved.actor);
-      requestAuthority.run(
-        Object.freeze({
-          accountId: resolved.actor.accountId,
-          sessionId: resolved.sessionId,
-          actor: resolved.actor,
-          adultVerifiedAt: resolved.adultVerifiedAt,
-        }),
-        next,
-      );
+      const authority = Object.freeze({
+        accountId: resolved.actor.accountId,
+        sessionId: resolved.sessionId,
+        actor: resolved.actor,
+        adultVerifiedAt: resolved.adultVerifiedAt,
+      });
+      resolvedRequests.set(req, Object.freeze({ token, authority }));
+      requestAuthority.run(authority, next);
     });
   if (dependencies.trustRouter) app.use(dependencies.trustRouter);
   else
@@ -217,6 +236,7 @@ export function createApp(
       createIdentityRouter(
         dependencies.platformIdentity,
         dependencies.assertActorAllowed,
+        (request) => actorFor(request),
       ),
     );
   const actorFor = async (req: Request) => {
@@ -239,7 +259,25 @@ export function createApp(
         "Continue with Pantopus to use this app.",
         401,
       );
-    const actor = await resolveActor(dependencies.identity, token);
+    const binding = resolvedRequests.get(req);
+    const authority = requestAuthority.getStore();
+    if (
+      dependencies.platformIdentity &&
+      (!binding ||
+        binding.token !== token ||
+        authority !== binding.authority ||
+        !authority.actor ||
+        authority.actor.accountId !== authority.accountId ||
+        authority.actor.adultEligible !== true)
+    )
+      throw new DomainError(
+        "current_request_actor_required",
+        "Reopen this action with your current signed-in account.",
+        401,
+      );
+    const actor = binding
+      ? binding.authority.actor!
+      : await resolveActor(dependencies.identity, token);
     await dependencies.assertActorAllowed?.(actor);
     return actor;
   };

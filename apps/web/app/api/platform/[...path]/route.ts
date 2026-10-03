@@ -11,8 +11,12 @@ import {
 // authority and the one-use rotation remain in PostgreSQL; no token is cached
 // after the request settles.
 const renewals = new Map<string, Promise<{ status: number; data: unknown }>>();
-async function renew(token: string, expectedAccount: string | null) {
-  const key = `${token}:${expectedAccount ?? ""}`;
+async function renew(
+  token: string,
+  expectedAccount: string | null,
+  expectedSession: string | null,
+) {
+  const key = `${token}:${expectedAccount ?? ""}:${expectedSession ?? ""}`;
   let pending = renewals.get(key);
   if (!pending) {
     pending = (async () => {
@@ -22,6 +26,9 @@ async function renew(token: string, expectedAccount: string | null) {
           "Content-Type": "application/json",
           ...(expectedAccount
             ? { "X-Expected-Account-Id": expectedAccount }
+            : {}),
+          ...(expectedSession
+            ? { "X-Expected-Session-Id": expectedSession }
             : {}),
         },
         body: "{}",
@@ -38,7 +45,7 @@ async function renew(token: string, expectedAccount: string | null) {
 }
 
 const allowed =
-  /^identity\/(?:session|refresh|logout|revoke-sessions|fan-profile(?:\/intro)?|creator-profile|capabilities|passkeys(?:\/(?:begin|register|revoke|recovery|[a-f0-9-]{36}\/cancel))?|[a-f0-9-]{36}\/proof|proof\/[a-f0-9-]{36}\/submit|[a-f0-9-]{36}\/team\/invite|team\/[a-f0-9-]{36}\/accept|[a-f0-9-]{36}\/team\/[a-f0-9-]{36}\/remove|signed-acts\/[a-f0-9-]{36}(?:\/cancel)?|[a-f0-9-]{36}\/signed-acts\/begin|signed-acts\/verify)$/u;
+  /^identity\/(?:session|refresh|logout|revoke-sessions|fan-profile(?:\/intro)?|creator-profile|capabilities|passkeys(?:\/(?:begin|register|revoke|recovery|[a-f0-9-]{36}\/cancel))?|[a-f0-9-]{36}\/proof|proof\/[a-f0-9-]{36}\/submit|[a-f0-9-]{36}\/team\/invite|team\/[a-f0-9-]{36}\/accept|[a-f0-9-]{36}\/team\/[a-f0-9-]{36}\/(?:remove|roles)|signed-acts\/[a-f0-9-]{36}(?:\/cancel)?|[a-f0-9-]{36}\/signed-acts\/begin|signed-acts\/verify)$/u;
 async function proxy(
   request: NextRequest,
   context: { params: Promise<{ path: string[] }> },
@@ -60,6 +67,7 @@ async function proxy(
   let renewedToken: string | undefined;
   try {
     const expectedAccount = request.headers.get("X-Expected-Account-Id");
+    const expectedSession = request.headers.get("X-Expected-Session-Id");
     if (
       !expectedAccount &&
       request.method === "POST" &&
@@ -85,6 +93,9 @@ async function proxy(
         ...(expectedAccount
           ? { "X-Expected-Account-Id": expectedAccount }
           : {}),
+        ...(expectedSession
+          ? { "X-Expected-Session-Id": expectedSession }
+          : {}),
         ...(request.method === "GET"
           ? {}
           : { "Content-Type": "application/json" }),
@@ -102,7 +113,7 @@ async function proxy(
     ) {
       const token = request.cookies.get(sessionCookie)?.value;
       if (token) {
-        const renewed = await renew(token, expectedAccount);
+        const renewed = await renew(token, expectedAccount, expectedSession);
         if (renewed.status === 200) {
           const credential = SessionTokenSchema.parse(renewed.data);
           // Deliver the rotation even if the following session read is
@@ -113,6 +124,9 @@ async function proxy(
               Authorization: `Bearer ${credential.token}`,
               ...(expectedAccount
                 ? { "X-Expected-Account-Id": expectedAccount }
+                : {}),
+              ...(expectedSession
+                ? { "X-Expected-Session-Id": expectedSession }
                 : {}),
             },
           });

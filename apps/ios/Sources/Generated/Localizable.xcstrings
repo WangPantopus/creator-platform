@@ -11022,6 +11022,72 @@
           }
         }
       }
+    },
+    "Development identity": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Development identity"
+          }
+        }
+      }
+    },
+    "Synthetic local account. Pantopus production sign-in is not connected.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synthetic local account. Pantopus production sign-in is not connected."
+          }
+        }
+      }
+    },
+    "Request verification review": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Request verification review"
+          }
+        }
+      }
+    },
+    "Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified."
+          }
+        }
+      }
+    },
+    "Calling is not connected yet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calling is not connected yet."
+          }
+        }
+      }
+    },
+    "Human call": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Human call"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

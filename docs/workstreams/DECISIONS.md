@@ -16,6 +16,10 @@ O19 / the native Studio portion of Q15 is decided: implement native daily creato
 
 The main-compatible two-file cold recovery correction7400de38 preserves saved credentials during a 5xx and keeps Retry/automatic restore available. Its narrow dependency set permits coherent main integration before the full issuer-storage stack lands. Its successful shipping builds and W2-operated outages are supporting/producer evidence; full W1 storage, rotation, persistent purge, issuer isolation and personal iOS acceptance remain separate obligations. Native Account may show a fan handle only when the real fan profile exists; authenticated security settings do not require inventing a fan profile.
 
+### W1 current owner Team role edits — October3 UTC
+
+Keep replacement inside the original identity membership/invitation family and use the actual middleware Actor, original expected-account mismatch header, opaque session and same-client restoration/creator denial before positive owner/member locks. Require a verified, recovered owner; Team membership cannot approve as creator. Compare reviewed role sets under existing locks, refuse stale edits and allow an already-current retry. Revoke outstanding unaccepted invitations on success/retry to prevent later restoration of old roles; retain accepted history. Existing tables have no history version, so do not invent one or claim ABA protection. The focused current-main producer preserves main's fan-profile allowlist, leaving the separate stacked intro endpoint untouched. Positive Team/UI/native/full H08 acceptance remains open. [Exact port and qualifications](../implementation/W1-team-role-update.md).
+
 These are implementation/release dependencies, not requests for the founder to answer everything before work can start. Owners prepare concrete options and evidence, continue independent work, and ask only when the choice becomes necessary. No pending choice is silently converted into a production default.
 
 ## Decisions already settled
@@ -57,7 +61,7 @@ Participant RLS receives transaction-local `app.identity_session_id` only after 
 | Q13 | Accepted off-the-record behavior amendment; semantic memory exclusion definition and scope; existing-memory context policy while off the record | W3/W2/W8 | Enabling the setting | Other memory/consent/deletion work; record precise behavior before implementation |
 | Q14 | Full library/live-content/community behavior mentioned by grants/architecture but not fully specified/designed | W5/W4/W7/W8 | Claiming full publishing/community scope delivered | Build defined post/library/audience primitives, retain explicit gap; do not invent a social network |
 | Q15 | Native creator Studio extension, additional locales, referral incentives and growth experiments | Listed owners in OPPORTUNITIES | Expanding beyond specified surfaces/business rules | Required fan-native and responsive Studio product |
-| Q16 | Account-wide deletion versus creator-product data removal in shared identity; external subscription consequences and reviewed retention exceptions | W1/W8/W4 | Public deletion flow and external accounts | Product-scoped export/delete pipeline and explicit final-boundary contract |
+| Q16 | Human approved2026-10-02 day30 ordinary product-data purge and twelve calendar months from original settlement for detached known AI costs; unresolved-cost operator/maximum period, shared identity boundary and external subscription/provider authority remain open. [Exact partial policy](../operations/W8-retention-proposal.md). | W1/W8/W4 | Public deletion flow and external accounts | Actual finite source/export/delete/expiry for the approved classes; preserve unknown ceilings and refuse their unresolved path |
 | Q17 | Passkey recovery/rotation policy and Android API26–27 signed-act availability | W1/W8 | Creator device support and recovery launch | Strong supported-device signing; safe unavailable state |
 | Q18 | Translation provider/consent and display semantics for human replies; original signed content remains accessible and immutable | W3/W2/W1/W8 | Enabling translation | Shared copy/localization readiness and original-language content |
 
@@ -239,3 +243,43 @@ Personally inspected and normally integrated W8 a5383ea2 ancestry. Identity, med
 ### W1 — recover one-ID call destinations through current account authority (October 2)
 
 All three shipping clients now recognize the canonical `/calls/:sessionId` destination. They request only the genuine W6 account-bound navigation operation, validate the returned exact call ID and family, then enter the existing independently authorized call screen. Native lookups bind the original issuer credential, account, session, destination and cancellation state; a departed or rotated response cannot navigate. Web mounts both short and existing full call routes inside the actual identity/media cancellation boundary, preserves the sign-in/restore destination and refuses invalid selectors. The shared Next dynamic segment is reused so adding the short route cannot conflict with the existing long route. No Fan enrollment exception, participant default, provider admission, policy or migration activation is added. Missing metadata remains an explicit Retry/Open Requests state. Shared copy uses the existing component and typography system. Current web types and scoped lint pass; shipping compilation and personal refusal/positive journey evidence follow.
+
+
+### W1 October 2 — actual call fallback, Requests and native Notice
+
+One-ID navigation resolves only through the current authenticated account and original cancellation boundary; navigation metadata never admits a call. Personally operating its fallback exposed the missing canonical web Requests route. Mount the existing Requests feature under the same real session boundary and preserve the sign-in destination rather than inventing request/price rows. Development accounts stay explicitly labelled on both lookup and canonical Requests. The actual unavailable Commerce result is accepted only as truthful failure handling, not positive commerce acceptance.
+
+A genuine iOS largest-text screenshot exposed Notice title/body truncation. Preserve width-sensitive wrapping and give both Text views their vertical intrinsic size; normal shipping compilation/signature and all3 existing native snapshot checks pass at unchanged references/tolerances; personal largest-text operation remains required. PR21 macOS SwiftPM additionally needs its existing platform-aware capitalization helper for availability fields. Original snapshots, thresholds and hosted runner pins stay unchanged. The observed Android API34 image ZIP failure receives exactly the existing once-only retry for that known archive error; other errors remain fatal, and both runtime package manifests must exist. No security/SDK integrity/test gate is relaxed.
+
+
+### W1 October 2 — current main53133967 reconciliation
+
+Normal main integration preserves W1 strict request/session custody, terminal catalogue checks, canonical61 and all corrected0151–0201 held allocations. Resolve the older main privacy adapter in favor of actual same-client task/restoration/cancellation bookends; keep both dated W8 reports and exact closed0201 qualification. W5 current Note tenure/mute UI is personally source-reviewed, uses genuine current account/creator tuple and validated paid-history metadata, defaults to4000 while higher policy is unavailable, and preserves over-limit input for shortening. Its owner personal receipts do not become W1 acceptance. Canonical12/102 generation, web/backend types, scoped lint and original backend contracts qualify this integration; new native personal acceptance remains open.
+
+
+### W1 October2 — original Actor custody and ninth terminal executable
+
+Remove remaining Database scope-derived adult Actors by retaining AccessService's actual original caller object privately. Requests must also match the actual current session Actor and held client through restriction and COMMIT bookends. Preserve separately scoped host callbacks without granting request bootstrap to them. A copied account tuple is metadata, not an Actor. Actual18 existing checks pass on separate disposable PostgreSQL17/71.03s including startup and normal cleanup; no retained data/role credentials are touched.
+
+Extend the finite terminal registry by exactly one reviewed W3 terminal-only owner/signature/source contract (0203, SQL8de1897f, originalScopeBridge=false, max9). The original immutable0193/0110 source and input authority stay intact. W3's missingBEGIN factory bug is recorded and will be consumed only after its actual owner correction. No current terminal/provider/financial success or activation follows from types or existing tests.
+
+
+### W1 October2 — actual W6 purpose custody composition
+
+Personally reviewed actualW6 550e0562: exact original registered SQL/definition/role/ACL and same-client catalogue bookends govern media and callback purposes; held0201 reads only version/checksum and remains unactivated. Consume genuine held request Actors in CreatorIdentityAuthority/AudienceIdentityAuthority before positive profile leases. Runtime identity retains exact creator/content denial and audience references. Root composes prepared InteractiveCallControl before constructing original media denials, while preserving the complete W1 Growth separate-pool, canonical Home/Pass, review, privacy owners, original actors and shutdown graph. No bare function presence, optional replacement callback, worker Actor or metadata-only reservation advertises readiness. Backend types/scoped lint/original9 contracts pass on the combined source; current app/positive purpose acceptance remains open.
+
+## Native spending navigation — October3 UTC
+
+Daily Spend is entered from You, so both shipping shells retain You as its selected tab. Other existing Commerce destinations select Requests. The prior generic fallback selected Home for `/commerce/spending` and request-detail routes despite retaining those actual destinations. This shell repair changes the selected navigation state; each owner screen continues to authorize its actual account/object and controls its Back destination. W4 owns its operated Spend Back repair. Current shipping rebuild/personal navigation verification remains required; original references are preserved.
+
+## iOS cold destination custody — October3 UTC
+
+Preserve a bounded canonical path and actual account UUID in the existing issuer-specific device-only Keychain namespace. Query parameters and private screen/draft bodies stay out of this record. Restore only after the real current session resolves the same account; an incoming destination takes precedence. Serialize writes with credential custody and reject stale model/revision/token writes. Clear destination metadata on sign-out or account replacement while always attempting credential deletion, and preserve it through guarded same-account rotation. A saved path is presentation context; current object authority remains mandatory.
+
+## Original browser session guard shared integration — October 3 UTC
+
+Preserve the original account/session/return view lifetime across all canonical identity requests. Same-account replacement cookies must receive409 before action dispatch rather than adopting the new session. Expected session/account headers are denial-only preconditions against real cookie/session resolution; ordinary token rotation retains the actual session ID. A focused producer imports the complete original boundary and exact core/platform guard hunks from69bafc18 while preserving current main routes. Domain owners integrate their genuine captured session into their own clients/BFFs. Source checks and personal current operation remain separately qualified; no credential, proof, consent or purpose is created.
+
+## Ordinary identity view disposal — October 3 UTC
+
+Cancel old requests and conceal in-memory private view state on every view disposal. Purging legitimate persisted same-session drafts additionally requires an actual session/account change or the canonical original-scope isSessionEnded observation. The latter is a read-only presentation marker set by the original end path before abort, not server revocation or positive authority. Ordinary departure and StrictMode cleanup remain cancellable without falsely claiming a session end; actual persisted session markers still prevent reuse after genuine replacement. W2 reproduced the prior consumer coupling through its actual Sources/My AI departure flow. Focused producer and affected consumers remain draft until the corrected complete graph is personally qualified.

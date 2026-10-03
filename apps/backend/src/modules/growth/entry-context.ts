@@ -4,6 +4,11 @@ import type { Actor } from "../identity/adapter.js";
 import { requestAuthority } from "../identity/request-authority.js";
 import { DomainError } from "../../core/errors.js";
 import { Destination } from "./contracts.js";
+import {
+  PostEntryContextSchema,
+  type PostEntryContext,
+} from "../../../../../packages/api/src/growth.js";
+export type { PostEntryContext } from "../../../../../packages/api/src/growth.js";
 import type { GrowthService } from "./service.js";
 
 /** W5's actual current recipient/public-entry purpose reads only metadata on
@@ -32,14 +37,6 @@ const Entry = z.strictObject({
   handle: z.string().regex(/^[a-z0-9_]{3,30}$/u),
   contentId: z.uuid(),
 });
-export interface PostEntryContext {
-  readonly source: "post";
-  readonly creatorId: string;
-  readonly contentId: string;
-  readonly version: number;
-  readonly title: string;
-  readonly destination: string;
-}
 
 /** A displayable immutable reference, never body, processor/reuse consent or
  * continuing private read authority. W3 must preserve the UUID through entry
@@ -92,15 +89,38 @@ export function canonicalPostEntryContext(
       current.state !== "published"
     )
       return null;
-    return Object.freeze({
-      source: "post" as const,
-      creatorId: post.creatorId,
-      contentId: post.contentId,
-      version: post.version,
-      title: post.title,
-      destination: Destination.parse(
-        `/creators/${current.handle}/posts/${post.contentId}`,
-      ),
+    // Finish on the actual owner reader again after the public projection read.
+    // A title/version changed or withdrawn during that read cannot be returned
+    // as the original reference; the owner also rechecks the held W1 session.
+    const final = await reader.current({
+      actor,
+      creatorId: creator.id,
+      contentId: entry.contentId,
     });
+    if (final === null) return null;
+    const fresh = PostReference.parse(final);
+    if (
+      fresh.creatorId !== post.creatorId ||
+      fresh.contentId !== post.contentId ||
+      fresh.version !== post.version ||
+      fresh.title !== post.title
+    )
+      throw new DomainError(
+        "growth_entry_context_changed",
+        copy.growthThisDestinationIsUnavailableReconnectAndTryAgain,
+        503,
+      );
+    return Object.freeze(
+      PostEntryContextSchema.parse({
+        source: "post" as const,
+        creatorId: post.creatorId,
+        contentId: post.contentId,
+        version: post.version,
+        title: post.title,
+        destination: Destination.parse(
+          `/creators/${current.handle}/posts/${post.contentId}`,
+        ),
+      }),
+    );
   };
 }

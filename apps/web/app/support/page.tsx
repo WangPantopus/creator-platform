@@ -6,20 +6,26 @@ import {
   ErrorState,
   TrustError,
   TrustSession,
+  type TrustSessionState,
   useTrust,
   useTrustSession,
   trustApi,
+  retryTrustReads,
   caseLabel,
   dateLabel,
 } from "../ops/trust-client";
 
 export default function SupportPage() {
+  const [sessionState, setSessionState] = useState<TrustSessionState>({
+    ready: false,
+    error: null,
+  });
   const { data, error, refresh } = useTrust<{
     items: (CaseSummary & { resolution_reason?: string })[];
-  }>("my-cases");
+  }>("my-cases", sessionState.ready);
   const inbox = useTrust<{
     items: { id: string; type: string; reason: string; created_at: string }[];
-  }>("inbox");
+  }>("inbox", sessionState.ready);
   const [kind, setKind] = useState("support");
   const [reason, setReason] = useState("");
   const [creatorId, setCreatorId] = useState("");
@@ -43,6 +49,7 @@ export default function SupportPage() {
     setBusy(false);
     setActionError(null);
     key.current = null;
+    setSessionState({ ready: false, error: null });
   });
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -51,6 +58,16 @@ export default function SupportPage() {
     const uuid =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (creator && uuid.test(creator)) setCreatorId(creator);
+    // Setup supplies presentation context only. The report API still verifies
+    // the current creator and snapshots its actual owner proof.
+    if (
+      params.get("kind") === "verification" &&
+      creator &&
+      uuid.test(creator) &&
+      !reportedMessage &&
+      !params.get("requestId")
+    )
+      setKind("verification");
     if (
       creator &&
       reportedMessage &&
@@ -82,12 +99,13 @@ export default function SupportPage() {
         appears only in its scoped case. If you are in immediate danger, contact
         local emergency services.
       </p>
-      <TrustSession />
-      <ErrorState error={error} retry={() => void refresh()} />
+      <TrustSession onSessionState={setSessionState} />
+      <ErrorState error={sessionState.error ?? error} retry={retryTrustReads} />
       <form
         className="trust-panel"
         onSubmit={async (event) => {
           event.preventDefault();
+          if (!sessionState.ready || busy) return;
           const current = epoch.current;
           setBusy(true);
           setActionError(null);
@@ -212,7 +230,10 @@ export default function SupportPage() {
             key.current = null;
           }}
         />
-        <button className="qv-btn qv-btn--secondary" disabled={busy}>
+        <button
+          className="qv-btn qv-btn--secondary"
+          disabled={busy || !sessionState.ready}
+        >
           {busy ? "Saving…" : "Send report"}
         </button>
         <ErrorState error={actionError} />
@@ -245,6 +266,7 @@ export default function SupportPage() {
               <form
                 onSubmit={async (event) => {
                   event.preventDefault();
+                  if (!sessionState.ready || busy) return;
                   const current = epoch.current;
                   setBusy(true);
                   key.current ??= crypto.randomUUID();
@@ -288,7 +310,10 @@ export default function SupportPage() {
                     key.current = null;
                   }}
                 />
-                <button className="qv-btn qv-btn--secondary" disabled={busy}>
+                <button
+                  className="qv-btn qv-btn--secondary"
+                  disabled={busy || !sessionState.ready}
+                >
                   Send appeal
                 </button>
               </form>

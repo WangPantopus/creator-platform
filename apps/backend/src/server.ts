@@ -10,7 +10,9 @@ import { createCommerceStudio } from "./modules/commerce/studio.js";
 import {
   composeContentHost,
   createContentStudio,
+  createCurrentContentPostEntryReader,
 } from "./modules/content/integration.js";
+import type { CurrentPostEntryReader } from "./modules/growth/entry-context.js";
 import { mediaFeature } from "./modules/media/registration.js";
 import { readMediaEnvironment } from "./modules/media/environment.js";
 import { composeMediaHost, runtimeMediaDenials } from "./modules/media/host.js";
@@ -30,7 +32,10 @@ import { canonicalPassAccess } from "./modules/growth/integration.js";
 import { createGrowthAPIPool } from "./db/growth-api-pool.js";
 import { DomainError } from "./core/errors.js";
 import { domainPrivacyTaskAuthorityInTransaction } from "./modules/trust/domain-privacy-authority.js";
-import type { ConversationPrivacyOwnerPorts } from "./modules/trust/privacy-consumers.js";
+import type {
+  AgentPrivacyOwnerPorts,
+  ConversationPrivacyOwnerPorts,
+} from "./modules/trust/privacy-consumers.js";
 import { createTrustReplyReviewer } from "./modules/trust/reply-review.js";
 import { InteractiveCallControl } from "./modules/session/interactive-control.js";
 import { AccountCallMetadata } from "./modules/session/account-call-metadata.js";
@@ -38,9 +43,21 @@ import { AccountCallMetadata } from "./modules/session/account-call-metadata.js"
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
 const config = readConfig();
+function canonicalDevelopmentIdentity() {
+  return new DevelopmentIdentityAdapter(
+    config.allowedOrigin,
+    process.env.NODE_ENV,
+    process.env.TRUST_LOCAL_DEVELOPMENT === "true"
+      ? developmentTrustActors
+      : [],
+  );
+}
+
 const features: {
   growth: Awaited<ReturnType<typeof configureGrowthForBackend>>;
   conversationPrivacy?: ConversationPrivacyOwnerPorts;
+  agentPrivacy?: AgentPrivacyOwnerPorts;
+  commerce?: import("./modules/commerce/service.js").CommerceService;
   close: (() => void | Promise<void>)[];
 } = { growth: null, close: [] };
 if (config.identityAdapter === "development" && !config.identitySessionKey)
@@ -54,13 +71,7 @@ try {
     config.identityAdapter === "development"
       ? await createConfiguredBackend({
           config,
-          identity: new DevelopmentIdentityAdapter(
-            config.allowedOrigin,
-            process.env.NODE_ENV,
-            process.env.TRUST_LOCAL_DEVELOPMENT === "true"
-              ? developmentTrustActors
-              : [],
-          ),
+          identity: canonicalDevelopmentIdentity(),
           guardrails: {
             checkSentence: async () => {
               throw new Error("AI generation is unconfigured.");
@@ -77,6 +88,10 @@ try {
                       // Trust starts first. Resolve only the actual prepared
                       // conversation owners after the canonical host binds.
                       conversation: () => features.conversationPrivacy,
+                      // Resolve the exact Agent graph mounted in Studio, after
+                      // its original service and lifecycle have been composed.
+                      agent: () => features.agentPrivacy,
+                      commerceOwner: () => features.commerce,
                       additional:
                         process.env.GROWTH_ENABLED === "true"
                           ? [
@@ -102,19 +117,15 @@ try {
             : {}),
           registerFeatures: async (runtime) => {
             const accountCalls = await AccountCallMetadata.prepare(runtime);
+            const callControl = await InteractiveCallControl.prepare(runtime);
             const mediaEnvironment = readMediaEnvironment();
-            const mediaDenials = runtimeMediaDenials(runtime);
+            const mediaDenials = callControl
+              ? runtimeMediaDenials(runtime, callControl)
+              : null;
             // The development host consumes W8's 0082 held try-fence. A code
             // callback alone cannot advertise media while its real producer is
             // absent. Registry activation and custody remain with W8.
-            const mediaAuthorityReady =
-              mediaEnvironment && mediaDenials
-                ? (
-                    await runtime.pool.query<{ ready: boolean }>(
-                      "SELECT to_regprocedure('creator_trust.interactive_denial(text,uuid,uuid)') IS NOT NULL AS ready",
-                    )
-                  ).rows[0]?.ready === true
-                : false;
+            const mediaAuthorityReady = Boolean(callControl);
             const mediaHost =
               mediaEnvironment && mediaDenials && mediaAuthorityReady
                 ? composeMediaHost({
@@ -155,10 +166,11 @@ try {
             });
             features.close.push(() => host.close());
             const { commerce, conversation, agent } = host;
+            features.agentPrivacy = agent;
+            features.commerce = commerce?.service;
             // Preparing the genuine graph does not configure a provider, worker
             // purpose or arrival policy. Calls remain unmounted until those
             // separate producers exist; no request Actor is invented.
-            const callControl = await InteractiveCallControl.prepare(runtime);
             process.stdout.write(
               callControl
                 ? "Call control: prepared; calling awaits provider, worker and policy composition.\n"
@@ -166,9 +178,24 @@ try {
             );
             features.conversationPrivacy = host.privacy;
             runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
+            // Growth and Content share publication/follow composition. Resolve
+            // the actual reader after the canonical Content service is bound,
+            // before listeners start; no request can borrow a projection DTO.
+            let postEntryReader: CurrentPostEntryReader | undefined;
             features.growth = await configureGrowthForBackend({
               ...runtime,
               pool: growthAPIPool ?? runtime.pool,
+              postEntryReader: {
+                current(input) {
+                  if (!postEntryReader)
+                    throw new DomainError(
+                      "growth_entry_context_unconfigured",
+                      "Current post context is unavailable. Reopen the post and try again.",
+                      503,
+                    );
+                  return postEntryReader.current(input);
+                },
+              },
               privacyTaskAuthority: async (client, job) => {
                 if (!runtime.assertRestoredInTransaction)
                   throw new DomainError(
@@ -285,6 +312,16 @@ try {
                   dependencies: contentHost.dependencies,
                 });
             contentHost.bindContent(content.content);
+            if (
+              features.growth &&
+              runtime.audienceIdentity &&
+              runtime.assertRestoredInTransaction &&
+              runtime.assertContentAllowedInTransaction
+            )
+              postEntryReader = createCurrentContentPostEntryReader(
+                runtime,
+                content.content,
+              );
             mediaHost?.bindContent(content.content);
             runtime.configureSignedSubjects(
               Array.isArray(content.signedSubjects)

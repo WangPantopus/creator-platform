@@ -14,8 +14,12 @@ import {
   type GenerationTaskScope,
 } from "../identity/generation-scope.js";
 import { AgentService } from "./service.js";
+import {
+  assertGenerationConsumerCustody,
+  type GenerationConsumerCustody,
+} from "./generation-consumer-catalogue.js";
 
-export const GENERATION_INPUT_MIGRATION = "0096_w2_generation_input_consumers";
+export const GENERATION_INPUT_MIGRATION = "0180_w2_generation_input_consumers";
 export const GENERATION_INPUT_SIGNATURE =
   "creator.generation_agent_inputs(uuid,uuid)";
 const owner = "creator_w2_generation_input";
@@ -96,6 +100,7 @@ export interface GenerationSourceOrigins {
     client: PoolClient,
     scope: GenerationTaskScope,
     sources: readonly GenerationAgentFacts["sources"][number][],
+    signal?: AbortSignal,
   ): Promise<void>;
 }
 export type GenerationAILicenseContext = Readonly<{
@@ -117,6 +122,7 @@ export class PreparedGenerationAgentInputs {
     private readonly identity: GenerationIdentityAuthority,
     private readonly service: AgentService,
     private readonly origins: GenerationSourceOrigins | undefined,
+    private readonly custody: GenerationConsumerCustody,
   ) {}
 
   assertHostPool(pool: Pool): void {
@@ -134,6 +140,8 @@ export class PreparedGenerationAgentInputs {
     /** Actual source-reviewed SQL install/function definition receipt, not a
      * hash read back from an unreviewed database and accepted as its own proof. */
     consumer: GenerationPurposeConsumer;
+    /** Independently reviewed effective permissions and RLS catalogue. */
+    catalogueChecksum: string;
     origins?: GenerationSourceOrigins;
   }): Promise<PreparedGenerationAgentInputs> {
     invariant(
@@ -158,17 +166,40 @@ export class PreparedGenerationAgentInputs {
       "generation_input_pool_mismatch",
       "The canonical host and distinct worker must use the same database endpoint.",
     );
-    const receipt = input.consumer;
+    const receipt = Object.freeze({
+      ...input.consumer,
+      migration: Object.freeze({ ...input.consumer.migration }),
+    });
+    input.identity.assertConsumerRegistered(receipt);
     invariant(
       receipt.signature === GENERATION_INPUT_SIGNATURE &&
         receipt.owner === owner &&
         receipt.migration.version === GENERATION_INPUT_MIGRATION &&
         Hash.safeParse(receipt.migration.checksum).success &&
-        Hash.safeParse(receipt.definitionChecksum).success,
+        Hash.safeParse(receipt.definitionChecksum).success &&
+        Hash.safeParse(input.catalogueChecksum).success,
       "generation_inputs_unconfigured",
       "The exact reviewed W2 generation input consumer is required.",
     );
+    const custody: GenerationConsumerCustody = Object.freeze({
+      owner,
+      consumers: Object.freeze([receipt]),
+      catalogueChecksum: input.catalogueChecksum,
+      callers: Object.freeze([
+        "creator_w2_generation_journal",
+        "creator_w2_generation_retrieval",
+        "creator_w2_generation_guardrail",
+        "creator_w2_generation_metadata",
+        "creator_w3_generation_output",
+      ]),
+      dependencies: Object.freeze([
+        "creator.generation_scope_matches(uuid,uuid)",
+        "creator.generation_allowance_audience(uuid,uuid)",
+        "creator.generation_content_origins(uuid,uuid,jsonb)",
+      ]),
+    });
     try {
+      await assertGenerationConsumerCustody(input.workerPool, custody);
       const installed = (
         await input.workerPool.query<{
           ready: boolean;
@@ -211,37 +242,59 @@ export class PreparedGenerationAgentInputs {
           receipt.definitionChecksum
       )
         throw new Error("Reviewed generation inputs are not installed");
-    } catch {
-      throw new DomainError(
+    } catch (cause) {
+      const failure = new DomainError(
         "generation_inputs_unconfigured",
         "The reviewed current generation input consumer is unavailable.",
         503,
       );
+      Object.defineProperty(failure, "cause", {
+        value: cause,
+        configurable: true,
+        writable: true,
+      });
+      throw failure;
     }
     return new PreparedGenerationAgentInputs(
       input.identity,
       input.service,
       input.origins,
+      custody,
     );
   }
 
   private async read(client: PoolClient, scope: GenerationTaskScope) {
+    // Only W1's genuinely issued current binding can supply this signal.
+    // Nested admission/licence/retrieval reads retain the original caller's
+    // cancellation without constructing a controller or widening authority.
+    const signal = this.identity.originalSignalInTransaction(scope, client);
+    signal?.throwIfAborted();
     await this.identity.authorizeInTransaction(scope, client);
+    signal?.throwIfAborted();
+    await assertGenerationConsumerCustody(client, this.custody, signal);
+    signal?.throwIfAborted();
     const raw = (
       await client.query<{ facts: unknown }>(
         "SELECT creator.generation_agent_inputs($1,$2) AS facts",
         [scope.generationId, scope.workerToken],
       )
     ).rows[0]?.facts;
+    signal?.throwIfAborted();
     let facts: z.infer<typeof Facts>;
     try {
       facts = Facts.parse(raw);
-    } catch {
-      throw new DomainError(
+    } catch (cause) {
+      const failure = new DomainError(
         "generation_inputs_unavailable",
         "Current compiled inputs are unavailable.",
         503,
       );
+      Object.defineProperty(failure, "cause", {
+        value: cause,
+        configurable: true,
+        writable: true,
+      });
+      throw failure;
     }
     invariant(
       facts.creatorId === scope.creatorId &&
@@ -276,9 +329,13 @@ export class PreparedGenerationAgentInputs {
         "generation_source_origin_unconfigured",
         "Current content publication and reuse authority is required.",
       );
-      await this.origins.assertCurrent(client, scope, contentOrigins);
+      await this.origins.assertCurrent(client, scope, contentOrigins, signal);
+      signal?.throwIfAborted();
     }
     await this.identity.authorizeInTransaction(scope, client);
+    signal?.throwIfAborted();
+    await assertGenerationConsumerCustody(client, this.custody, signal);
+    signal?.throwIfAborted();
     return frozen;
   }
 
@@ -289,6 +346,8 @@ export class PreparedGenerationAgentInputs {
     scope: GenerationTaskScope,
   ): Promise<GenerationAgentFacts> {
     const facts = await this.read(client, scope);
+    const signal = this.identity.originalSignalInTransaction(scope, client);
+    signal?.throwIfAborted();
     this.issued.set(facts, { scope, client, hash: contentHash(facts) });
     try {
       const context = Object.freeze({ inputs: this, scope, facts });
@@ -297,7 +356,9 @@ export class PreparedGenerationAgentInputs {
         "license_expired",
         "Current generation-purpose licence authority is required.",
       );
+      signal?.throwIfAborted();
       await this.authorizeInTransaction(facts, scope, client);
+      signal?.throwIfAborted();
       return facts;
     } catch (error) {
       this.issued.delete(facts);

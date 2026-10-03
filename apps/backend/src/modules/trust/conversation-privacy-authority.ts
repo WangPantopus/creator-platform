@@ -1,5 +1,6 @@
-import type { Pool } from "pg";
-import { invariant } from "../../core/errors.js";
+import { Client, type Pool } from "pg";
+import { DomainError, invariant } from "../../core/errors.js";
+import { querySettlementUncertain } from "../../core/query-settlement.js";
 import type {
   ConversationPrivacyAuthority,
   ConversationPrivacyFamily,
@@ -10,6 +11,7 @@ import {
   type PrivacyTaskInput,
 } from "./privacy-authority.js";
 import type { PoolClient } from "pg";
+import { assertOriginalPrivacyFamilyCatalog } from "./privacy-family-catalog.js";
 
 /** Enumerate metadata, then use existing pair RLS. No interactive ThreadScope,
  * runtime grant or denial bypass is issued to a client by this worker adapter. */
@@ -35,16 +37,96 @@ export function conversationPrivacyAuthority(
     async families(job) {
       await verify(job);
       const client = await runtime.connect();
-      let released = false;
-      const abort = () => {
-        if (!released) {
-          released = true;
-          client.release(true);
-        }
+      const signal = job.signal!;
+      let cancelling: Promise<void> | undefined;
+      let cancellationFailure: unknown;
+      let sourceTransportFailure: unknown;
+      let sourceCloseFailure: unknown;
+      let discardClient = false;
+      let pid: number | undefined;
+      let ending: Promise<void> | undefined;
+      const endSource = () =>
+        (ending ??= client.end().catch((cause: unknown) => {
+          sourceCloseFailure = cause;
+          discardClient = true;
+        }));
+      const sourceError = (error: Error) => {
+        sourceTransportFailure = error;
+        discardClient = true;
       };
-      job.signal!.addEventListener("abort", abort, { once: true });
+      client.on("error", sourceError);
+      const abort = () => {
+        if (cancelling) return;
+        discardClient = true;
+        // The PID comes only from this actual held client. Keep that client
+        // checked out until this separate control connection has settled, so
+        // cancellation cannot reach another operation or a later COMMIT.
+        cancelling = (async () => {
+          if (!pid) return;
+          const failures: unknown[] = [];
+          const control = new Client({
+            ...runtime.options,
+            connectionTimeoutMillis: 1500,
+            statement_timeout: 1500,
+            query_timeout: 1500,
+            // A timed-out single control query must close its socket rather
+            // than wait for a pipelined drain from a stalled transport.
+            pipeline: false,
+          });
+          const controlError = (error: Error) => failures.push(error);
+          control.on("error", controlError);
+          try {
+            await control.connect();
+            const cancelled = await control.query<{ cancelled: boolean }>(
+              "SELECT pg_cancel_backend($1) AS cancelled",
+              [pid],
+            );
+            invariant(
+              cancelled.rows[0]?.cancelled === true,
+              "privacy_family_cancel_unavailable",
+              "The actual discovery backend could not be cancelled.",
+            );
+          } catch (error) {
+            failures.push(error);
+          } finally {
+            try {
+              await control.end();
+            } catch (error) {
+              failures.push(error);
+            } finally {
+              control.removeListener("error", controlError);
+            }
+          }
+          if (failures.length)
+            throw new AggregateError(
+              failures,
+              "Original discovery control and close failures.",
+            );
+        })()
+          .catch((error: unknown) => {
+            cancellationFailure = error;
+            discardClient = true;
+          })
+          // A consumed cancel cannot recover a dropped source reply. End the
+          // exact original socket even when PID acquisition never completed.
+          .finally(endSource);
+      };
+      const settleCancellation = async () => {
+        signal.removeEventListener("abort", abort);
+        await cancelling;
+      };
+      signal.addEventListener("abort", abort, { once: true });
       try {
-        job.signal!.throwIfAborted();
+        signal.throwIfAborted();
+        const observed = (await client.query("SELECT pg_backend_pid() AS pid"))
+          .rows[0]?.pid;
+        invariant(
+          Number.isSafeInteger(observed) && observed > 0,
+          "privacy_family_cancel_unavailable",
+          "The actual discovery backend is required.",
+        );
+        pid = observed;
+        signal.throwIfAborted();
         await client.query("BEGIN");
         // Discovery is lifecycle work too. Lock the real job/task before any
         // family reads and keep its deferred currentness check through COMMIT.
@@ -81,7 +163,8 @@ export function conversationPrivacyAuthority(
             "bounded_subjob_required",
             "Creator conversation enumeration needs a bounded lifecycle subjob.",
           );
-          for (const creatorId of owned)
+          for (const creatorId of owned) {
+            if (job.creatorId && job.creatorId !== creatorId) continue;
             for (const fan of fans) {
               await restoredPrivacyTaskAuthorityInTransaction(
                 client,
@@ -94,8 +177,8 @@ export function conversationPrivacyAuthority(
               );
               const row = (
                 await client.query<ConversationPrivacyFamily>(
-                  'SELECT id AS "threadId",creator_id AS "creatorId",fan_id AS "fanId" FROM creator.thread WHERE creator_id=$1 AND fan_id=$2',
-                  [creatorId, fan.id],
+                  'SELECT id AS "threadId",creator_id AS "creatorId",fan_id AS "fanId" FROM creator.thread WHERE creator_id=$1 AND fan_id=$2 AND ($3::uuid IS NULL OR id=$3)',
+                  [creatorId, fan.id, job.threadId],
                 )
               ).rows[0];
               if (
@@ -109,29 +192,93 @@ export function conversationPrivacyAuthority(
                 "Split this request into bounded conversation families.",
               );
             }
+          }
         }
         await restoredPrivacyTaskAuthorityInTransaction(
           client,
           job,
           assertRestoredInTransaction,
         );
-        job.signal!.throwIfAborted();
+        await settleCancellation();
+        if (cancellationFailure)
+          throw new DomainError(
+            "privacy_family_cancel_unavailable",
+            "Discovery cancellation failed; this task cannot complete.",
+            503,
+          );
+        signal.throwIfAborted();
         await client.query("COMMIT");
-        job.signal!.throwIfAborted();
+        signal.throwIfAborted();
         return families;
       } catch (error) {
-        if (!released) await client.query("ROLLBACK");
+        // Await the actual query/cancel settlement before rollback and retain
+        // the original failure. A failed rollback destroys this own client.
+        await settleCancellation();
+        let rollbackFailure: unknown;
+        const uncertainQuery = querySettlementUncertain(error);
+        if (
+          discardClient ||
+          cancellationFailure ||
+          sourceTransportFailure ||
+          signal.aborted ||
+          uncertainQuery
+        ) {
+          // A transport/read timeout does not prove the server consumed SQL.
+          // Close this original session without issuing any later SQL; its
+          // server rollback ends the PID's transaction before pool release.
+          discardClient = true;
+          await endSource();
+        } else {
+          try {
+            await client.query("ROLLBACK");
+          } catch (cause) {
+            rollbackFailure = cause;
+            discardClient = true;
+            await endSource();
+          }
+        }
+        if (
+          cancellationFailure ||
+          rollbackFailure ||
+          sourceTransportFailure ||
+          sourceCloseFailure ||
+          uncertainQuery ||
+          signal.aborted
+        ) {
+          const failure = new DomainError(
+            cancellationFailure || signal.aborted
+              ? "privacy_family_cancel_unavailable"
+              : "privacy_family_rollback_unavailable",
+            "Discovery could not settle safely; this task cannot complete.",
+            503,
+          );
+          // Causes stay in-process for private operator diagnostics. The
+          // public transport retains only this bounded code/message.
+          Object.defineProperty(failure, "cause", {
+            value: new AggregateError(
+              [
+                error,
+                sourceTransportFailure,
+                sourceCloseFailure,
+                cancellationFailure,
+                rollbackFailure,
+                signal.aborted ? signal.reason : undefined,
+              ].filter((cause) => cause !== undefined),
+              "Original discovery and settlement failures.",
+            ),
+            configurable: true,
+          });
+          throw failure;
+        }
         throw error;
       } finally {
-        job.signal!.removeEventListener("abort", abort);
-        if (!released) {
-          released = true;
-          client.release();
-        }
+        await settleCancellation();
+        client.release(discardClient);
+        client.removeListener("error", sourceError);
       }
     },
     async assertFamily(client, job, family) {
-      const owned = await restoredPrivacyTaskAuthorityInTransaction(
+      await restoredPrivacyTaskAuthorityInTransaction(
         client,
         job,
         assertRestoredInTransaction,
@@ -142,22 +289,33 @@ export function conversationPrivacyAuthority(
         "privacy_scope_mismatch",
         "This family is outside the verified request.",
       );
-      await client.query(
-        "SELECT set_config('app.account_id',$1,true),set_config('app.creator_id',$2,true),set_config('app.fan_id',$3,true)",
-        [job.accountId, family.creatorId, family.fanId],
-      );
+      await assertOriginalPrivacyFamilyCatalog(client, job.signal);
+      job.signal?.throwIfAborted();
       const row = (
-        await client.query<{ account_id: string }>(
-          "SELECT f.account_id FROM creator.thread t JOIN creator.fan_profile f ON f.id=t.fan_id WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 FOR SHARE OF t,f",
-          [family.threadId, family.creatorId, family.fanId],
+        await client.query<{ matches: boolean }>(
+          "SELECT creator_trust.privacy_task_family_matches($1,$2,$3,$4,$5) AS matches",
+          [
+            job.jobId,
+            job.leaseToken,
+            family.threadId,
+            family.creatorId,
+            family.fanId,
+          ],
         )
       ).rows[0];
       invariant(
-        row &&
-          (row.account_id === job.accountId ||
-            owned.includes(family.creatorId)),
+        row?.matches === true,
         "privacy_family_unavailable",
         "This conversation does not belong to the verified request.",
+      );
+      await restoredPrivacyTaskAuthorityInTransaction(
+        client,
+        job,
+        assertRestoredInTransaction,
+      );
+      await client.query(
+        "SELECT set_config('app.account_id',$1,true),set_config('app.creator_id',$2,true),set_config('app.fan_id',$3,true)",
+        [job.accountId, family.creatorId, family.fanId],
       );
     },
   };

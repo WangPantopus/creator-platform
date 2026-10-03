@@ -1,6 +1,9 @@
 /** Isolated W2 launcher. Canonical W1 sessions and W3 conversations share the
  * actual runtime pool; missing licensing/policy/journal never enables delivery. */
-import { createConfiguredBackend } from "../../integration.js";
+import {
+  createConfiguredBackend,
+  type BackendRuntime,
+} from "../../integration.js";
 import { readConfig } from "../../config.js";
 import { DevelopmentIdentityAdapter } from "../identity/development.js";
 import { createConversationRuntime } from "../conversation/runtime.js";
@@ -8,6 +11,11 @@ import { modelFromEnvironment } from "./model.js";
 import { createAgentDomain } from "./integration.js";
 import { agentFeature } from "./feature.js";
 import { DevelopmentLicenseVerifier } from "./development-license.js";
+import { createDevelopmentTrust } from "../trust/development.js";
+import {
+  composeContentHost,
+  createContentStudio,
+} from "../content/integration.js";
 
 if (
   process.env.NODE_ENV !== "development" ||
@@ -41,6 +49,26 @@ const config = readConfig({
 });
 let domain: ReturnType<typeof createAgentDomain> | undefined;
 let conversations: ReturnType<typeof createConversationRuntime> | undefined;
+// Trust is prepared before feature registration. Both consume this exact
+// owner instance so privacy and pause effects cannot drift from Studio.
+const prepareDomain = (runtime: BackendRuntime) => {
+  if (domain) return domain;
+  const licenseVerifier =
+    process.env.W2_DEVELOPMENT_SYNTHETIC_LICENSING === "true"
+      ? DevelopmentLicenseVerifier.create(runtime.pool, {
+          environment: process.env.NODE_ENV,
+          enabled: process.env.W2_DEVELOPMENT_SYNTHETIC_LICENSING,
+          identityMode: identity.mode,
+          webOrigin,
+        })
+      : undefined;
+  domain = createAgentDomain({
+    pool: runtime.pool,
+    model,
+    ...(licenseVerifier ? { licenseVerifier } : {}),
+  });
+  return domain;
+};
 const backend = await createConfiguredBackend({
   config,
   identity,
@@ -49,27 +77,61 @@ const backend = await createConfiguredBackend({
       throw new Error("Licensed fan generation is unconfigured.");
     },
   },
+  ...(process.env.TRUST_LOCAL_DEVELOPMENT === "true"
+    ? {
+        trust: (runtime: BackendRuntime) =>
+          createDevelopmentTrust(runtime, {
+            // Restoration must bind to the same validated W2 endpoint used
+            // by readConfig, rather than an unrelated ambient DATABASE_URL.
+            env: { ...process.env, DATABASE_URL: dbUrl },
+            agent: prepareDomain(runtime),
+            consumers: {
+              assertRestoredInTransaction: runtime.assertRestoredInTransaction,
+            },
+          }),
+      }
+    : {}),
   registerFeatures: async (runtime) => {
     // Opt-in labeled licensing for fictional development creators only.
-    const licenseVerifier =
-      process.env.W2_DEVELOPMENT_SYNTHETIC_LICENSING === "true"
-        ? DevelopmentLicenseVerifier.create(runtime.pool, {
-            environment: process.env.NODE_ENV,
-            enabled: process.env.W2_DEVELOPMENT_SYNTHETIC_LICENSING,
-            identityMode: identity.mode,
-            webOrigin,
-          })
-        : undefined;
-    domain = createAgentDomain({
-      pool: runtime.pool,
-      model,
-      ...(licenseVerifier ? { licenseVerifier } : {}),
-    });
+    domain = prepareDomain(runtime);
     await domain.service.repository.assertRuntimeRole();
     conversations = createConversationRuntime(runtime);
-    runtime.configureSignedSubjects(conversations.signedSubjectPolicies);
+    const composition = composeContentHost({
+      pool: runtime.pool,
+      owners: {
+        conversation: runtime.conversation,
+        access: runtime.access,
+        agent: domain.service,
+        profiles: runtime.identity?.profiles,
+      },
+      dependencies: {
+        assertAllowed: runtime.assertCreatorAllowed,
+        assertAllowedInTransaction: runtime.assertContentAllowedInTransaction,
+      },
+      sources: {
+        service: domain.sources,
+        repository: domain.service.repository,
+      },
+      ...(runtime.assertScopeAllowedInTransaction
+        ? {
+            assertScopeAllowedInTransaction:
+              runtime.assertScopeAllowedInTransaction,
+          }
+        : {}),
+    });
+    const studio = createContentStudio({
+      pool: runtime.pool,
+      owners: composition.owners,
+      dependencies: composition.dependencies,
+    });
+    composition.bindContent(studio.content);
+    runtime.configureSignedSubjects([
+      ...conversations.signedSubjectPolicies,
+      studio.signedSubjects,
+    ]);
     return [
       conversations.registration,
+      ...studio.features,
       agentFeature({ domain, pool: runtime.pool, development: true }),
     ];
   },
@@ -79,23 +141,32 @@ const creatorId = process.env.W2_CREATOR_ID;
 const accountId = process.env.W2_DEVELOPMENT_ACCOUNT_ID;
 const controller = new AbortController();
 const worker = domain.ingestion;
-const timer = setInterval(() => {
-  if (creatorId && accountId)
-    void worker
-      .tick({ creatorId, accountId, development: true }, controller.signal)
-      .catch(() =>
-        process.stderr.write(
-          "W2 ingestion is unavailable; inspect scoped source state.\n",
-        ),
-      );
-}, 1000);
+// A missing provider is a startup prerequisite, not a job to retry every second.
+// The real worker still owns leases, authority, failures and provider receipts
+// once the host has both priced configuration and its fictional creator tuple.
+const timer =
+  model?.pricingConfigured && creatorId && accountId
+    ? setInterval(() => {
+        void worker
+          .tick({ creatorId, accountId, development: true }, controller.signal)
+          .catch(() =>
+            process.stderr.write(
+              "W2 ingestion is unavailable; inspect scoped source state.\n",
+            ),
+          );
+      }, 1000)
+    : undefined;
+if (!timer)
+  process.stdout.write(
+    "W2 ingestion is disabled: priced provider or fictional creator configuration is unavailable.\n",
+  );
 backend.server.listen(config.port, "127.0.0.1", () =>
   process.stdout.write(
     "W2 development API listening on loopback; external fan publication is disabled.\n",
   ),
 );
 const stop = () => {
-  clearInterval(timer);
+  if (timer) clearInterval(timer);
   controller.abort();
   conversations?.close();
   void backend.close().then(() => process.exit(0));

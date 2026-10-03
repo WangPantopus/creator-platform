@@ -19,6 +19,11 @@ import type { AvailabilityService } from "../session/availability.js";
 import { visibleSession } from "../session/service.js";
 import { withDeadline } from "./deadline.js";
 import {
+  CapabilitiesSchema,
+  MediaAssetSchema,
+  PlaybackTicketSchema,
+} from "../../../../../packages/api/src/media.js";
+import {
   AdmissionRedemptionSchema,
   type CallSession,
 } from "../../../../../packages/api/src/session.js";
@@ -45,28 +50,30 @@ export function createW6Router(dependencies: W6RouterDependencies) {
     next();
   });
   router.get("/capabilities", (_req, res) =>
-    res.json({
-      mediaAvailable: Boolean(dependencies.media),
-      creatorMediaAvailable: Boolean(
-        dependencies.creatorMedia && dependencies.creatorScopeFor,
-      ),
-      creatorMediaAudienceAvailable: Boolean(
-        dependencies.creatorMedia?.audienceIdentity &&
-          dependencies.audienceScopeFor,
-      ),
-      callsAvailable: Boolean(
-        dependencies.sessions &&
-          dependencies.actorFor &&
-          dependencies.sessions.provider.name !== "unconfigured" &&
-          dependencies.sessions.interactiveControlAvailable &&
-          dependencies.sessions.provider.supportsSingleUseAdmission,
-      ),
-      aiAudioAvailable: false,
-      callRecoveryAvailable: dependencies.accountCalls?.available === true,
-      reason: !dependencies.media
-        ? "media_unconfigured"
-        : "licensed_ai_audio_and_provider_verification_required",
-    }),
+    res.json(
+      CapabilitiesSchema.parse({
+        mediaAvailable: Boolean(dependencies.media),
+        creatorMediaAvailable: Boolean(
+          dependencies.creatorMedia && dependencies.creatorScopeFor,
+        ),
+        creatorMediaAudienceAvailable: Boolean(
+          dependencies.creatorMedia?.audienceIdentity &&
+            dependencies.audienceScopeFor,
+        ),
+        callsAvailable: Boolean(
+          dependencies.sessions &&
+            dependencies.actorFor &&
+            dependencies.sessions.provider.name !== "unconfigured" &&
+            dependencies.sessions.interactiveControlAvailable &&
+            dependencies.sessions.provider.supportsSingleUseAdmission,
+        ),
+        aiAudioAvailable: false,
+        callRecoveryAvailable: dependencies.accountCalls?.available === true,
+        reason: !dependencies.media
+          ? "media_unconfigured"
+          : "licensed_ai_audio_and_provider_verification_required",
+      }),
+    ),
   );
   router.use(express.json({ limit: "64kb" }));
   router.get("/calls/:sessionId/route", async (req, res) => {
@@ -332,7 +339,9 @@ export function createW6Router(dependencies: W6RouterDependencies) {
     res.status(201).json(await media().begin(await scope(req), req.body)),
   );
   router.get(`${root}/media/:assetId`, async (req, res) =>
-    res.json(await media().read(await scope(req), id(req))),
+    res.json(
+      MediaAssetSchema.parse(await media().read(await scope(req), id(req))),
+    ),
   );
   router.post(`${root}/media/:assetId/resume`, async (req, res) =>
     res.json(await media().resume(await scope(req), id(req))),
@@ -372,7 +381,11 @@ export function createW6Router(dependencies: W6RouterDependencies) {
     res.status(202).json({ state: "revoked", deletion: "pending" });
   });
   router.post(`${root}/media/:assetId/playback`, async (req, res) =>
-    res.json(await media().playback(await scope(req), id(req))),
+    res.json(
+      PlaybackTicketSchema.parse(
+        await media().playback(await scope(req), id(req)),
+      ),
+    ),
   );
   router.get(`${root}/media/:assetId/play`, async (req, res) => {
     const service = media();

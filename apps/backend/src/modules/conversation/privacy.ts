@@ -13,6 +13,14 @@ import type {
 } from "../commerce/generation-privacy.js";
 import { z } from "zod";
 import { conversationPrivacyExportStream } from "./privacy-export-stream.js";
+import { PreparedConversationPrivacyCursor } from "./privacy-export-cursor.js";
+import { PreparedGenerationProvenancePurge } from "./generation-provenance-privacy.js";
+import {
+  assertConversationPrivacyPool,
+  cancelConversationPrivacyBackend,
+  conversationPrivacyCause,
+  conversationPrivacyReadUncertain,
+} from "./privacy-cancellation.js";
 
 type Job = Parameters<PrivacyHook["run"]>[0];
 function financialJob(job: Job): GenerationPrivacyJob {
@@ -134,6 +142,12 @@ export type ConversationPrivacyInput = {
   lineage?: ConversationLineage;
   recordings?: ConversationRecordings;
   accounting?: ConversationAccountingLifecycle;
+  /** Distinct reviewed0206 source. Per-family readers cannot substitute for
+   * the one READ COMMITTED cursor snapshot required by the real0087 fence. */
+  exportCursor?: PreparedConversationPrivacyCursor;
+  /** Distinct0217 DELETE owner. Its actual zero page must precede removing
+   * ordinary generation/message/event parents on this held transaction. */
+  provenancePurge?: PreparedGenerationProvenancePurge;
   /** Exact prepared W4 port; original-policy evidence precedes journal purge.
    * Finite reviewed retention and expiry remain W8's separate responsibility. */
   generationCostPrivacyReconciliation?: GenerationCostPrivacyReconciliation;
@@ -194,7 +208,13 @@ export function conversationPrivacyHook(
         "conversation_retention_unavailable",
         "Conversation deletion needs the verified dispute-retention and allowance adapters.",
       );
-      if (job.kind === "export")
+      if (job.kind === "export") {
+        invariant(
+          input.exportCursor instanceof PreparedConversationPrivacyCursor,
+          "conversation_export_unconfigured",
+          "This complete export needs its actual prepared source cursor.",
+        );
+        input.exportCursor.assertRuntime(input);
         return {
           receipt: {
             schemaVersion: 2,
@@ -205,16 +225,58 @@ export function conversationPrivacyHook(
           },
           stream: conversationPrivacyExportStream(input, job, families, signal),
         };
+      }
+      assertConversationPrivacyPool(input.pool);
       const client = await input.pool.connect();
-      let released = false;
+      let discardClient = false;
+      let backendPid: number | undefined;
+      let cancelling: Promise<void> | undefined;
+      let destroying: Promise<void> | undefined;
+      let phase: "pid" | "begin" | "work" | "commit" = "pid";
+      let committed = false;
+      const cancellationFailures: unknown[] = [];
+      const transportFailures: unknown[] = [];
+      let failed = false;
+      let failure: unknown;
+      let result: Awaited<ReturnType<PrivacyHook["run"]>> | undefined;
+      const cleanupFailures: unknown[] = [];
+      const transportError = (error: Error) => {
+        transportFailures.push(error);
+        discardClient = true;
+      };
+      client.on("error", transportError);
+      const destroy = () => {
+        discardClient = true;
+        return (destroying ??= client.end().catch((error: unknown) => {
+          cleanupFailures.push(error);
+        }));
+      };
       const abort = () => {
-        if (!released) {
-          released = true;
-          client.release(true);
+        if (cancelling) return;
+        if (backendPid === undefined) {
+          // Before an observed PID, close only this exact held source. Never
+          // guess a backend or leave a delayed PID/BEGIN query uncancelled.
+          cancelling = destroy();
+          return;
         }
+        // This PID belongs to the still-held deletion client. Cancellation
+        // never releases its task locks or permits another pool borrower.
+        cancelling = cancelConversationPrivacyBackend(
+          input.pool,
+          backendPid,
+          client,
+        )
+          .catch((error: unknown) => {
+            cancellationFailures.push(error);
+            discardClient = true;
+          })
+          // A healthy cancel does not prove that a stalled transport delivered
+          // the original query's response. End the exact held source too.
+          .finally(destroy);
       };
       signal.addEventListener("abort", abort, { once: true });
       const accountingReceipts: Record<string, unknown>[] = [];
+      let removedGenerationProvenance = 0;
       const financialDispositions: {
         threadId: string;
         financialDispositionReference: string;
@@ -226,11 +288,38 @@ export function conversationPrivacyHook(
       }[] = [];
       try {
         signal.throwIfAborted();
-        await client.query("BEGIN");
+        backendPid = z
+          .int()
+          .positive()
+          .max(2147483647)
+          .parse(
+            (
+              await client.query<{ pid: number }>(
+                "SELECT pg_backend_pid() AS pid",
+              )
+            ).rows[0]?.pid,
+          );
+        phase = "begin";
+        signal.throwIfAborted();
+        await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
+        phase = "work";
         await client.query(
           "SET LOCAL statement_timeout='10s'; SET LOCAL lock_timeout='5s'",
         );
+        signal.throwIfAborted();
         await fenceConversationPrivacyTask(input.authority, client, job);
+        const provenanceInstalled = (
+          await client.query<{ installed: boolean }>(
+            "SELECT to_regclass('creator.generation_sentence_provenance') IS NOT NULL AS installed",
+          )
+        ).rows[0]?.installed;
+        invariant(
+          provenanceInstalled === false ||
+            input.provenancePurge instanceof PreparedGenerationProvenancePurge,
+          "conversation_provenance_purge_unavailable",
+          "Installed ordinary provenance needs its actual prepared original deletion owner.",
+        );
+        input.provenancePurge?.assertRuntime(input);
         const accountingInstalled = await generationJournalInstalled(client);
         const weightedInstalled = (
           await client.query<{ installed: boolean }>(
@@ -402,6 +491,21 @@ export function conversationPrivacyHook(
             accountingReceipts.push(accounting.receipt);
             retained.push(...accounting.retained);
           }
+          if (input.provenancePurge) {
+            const provenance = await input.provenancePurge.purgeFamily(
+              client,
+              job,
+              family,
+            );
+            invariant(
+              Number.isSafeInteger(
+                removedGenerationProvenance + provenance.removed,
+              ),
+              "bounded_subjob_required",
+              "Use a bounded original provenance deletion subjob.",
+            );
+            removedGenerationProvenance += provenance.removed;
+          }
           // Tombstoned thread remains as the minimal family identifier. Denial is
           // already immediate through W8; content and replay payloads are purged.
           signal.throwIfAborted();
@@ -498,15 +602,33 @@ export function conversationPrivacyHook(
         // This client's actual task remains current even for an empty family set.
         await fenceConversationPrivacyTask(input.authority, client, job);
         signal.throwIfAborted();
-        await client.query("COMMIT");
+        signal.removeEventListener("abort", abort);
+        await cancelling;
+        if (cancellationFailures.length || transportFailures.length)
+          throw new DomainError(
+            "conversation_delete_cancel_unavailable",
+            "The original deletion connection could not settle safely.",
+            503,
+          );
         signal.throwIfAborted();
-        return {
+        // All original family/financial/retention fences are already complete.
+        // A later abort cannot cancel COMMIT or erase its actual receipt.
+        phase = "commit";
+        const receipt = await client.query("COMMIT");
+        invariant(
+          receipt.command === "COMMIT",
+          "conversation_delete_commit_unavailable",
+          "The original deletion did not return a commit receipt.",
+        );
+        committed = true;
+        result = {
           receipt: {
             schemaVersion: 1,
             domain: "conversation",
             jobId: job.jobId,
             idempotencyKey: job.idempotencyKey,
             processedThreads: families.length,
+            ...(input.provenancePurge ? { removedGenerationProvenance } : {}),
             ...(accountingReceipts.length ? { accountingReceipts } : {}),
             ...(financialDispositions.length ? { financialDispositions } : {}),
             completedAt: new Date().toISOString(),
@@ -514,15 +636,93 @@ export function conversationPrivacyHook(
           retained,
         };
       } catch (error) {
-        if (!released) await client.query("ROLLBACK").catch(() => undefined);
-        throw error;
+        failed = true;
+        failure = error;
+        signal.removeEventListener("abort", abort);
+        // A delayed control query must finish and close before ROLLBACK.
+        // Even an aborted or disconnected task retains this client until its
+        // actual transaction has rolled back or its connection has ended.
+        await cancelling;
+        if (phase !== "work" || conversationPrivacyReadUncertain(error)) {
+          discardClient = true;
+          transportFailures.push(error);
+        }
+        if (
+          discardClient ||
+          cancellationFailures.length ||
+          transportFailures.length
+        ) {
+          // An uncertain cancel has not proved that the server consumed it.
+          // End this original session without queuing more cleanup SQL.
+          discardClient = true;
+        } else if (!committed) {
+          try {
+            await client.query("ROLLBACK");
+          } catch (rollbackFailure) {
+            discardClient = true;
+            cleanupFailures.push(rollbackFailure);
+          }
+        }
       } finally {
         signal.removeEventListener("abort", abort);
-        if (!released) {
-          released = true;
-          client.release();
+        await cancelling;
+        discardClient ||=
+          cancellationFailures.length > 0 || transportFailures.length > 0;
+        try {
+          if (discardClient) await destroy();
+        } catch (error) {
+          cleanupFailures.push(error);
+        } finally {
+          try {
+            client.release(discardClient);
+          } catch (error) {
+            cleanupFailures.push(error);
+          } finally {
+            client.removeListener("error", transportError);
+          }
         }
       }
+      if (
+        cancellationFailures.length ||
+        transportFailures.length ||
+        cleanupFailures.length
+      ) {
+        const error = new DomainError(
+          cancellationFailures.length
+            ? "conversation_delete_cancel_unavailable"
+            : committed
+              ? "conversation_delete_release_unavailable"
+              : "conversation_delete_rollback_unavailable",
+          committed
+            ? "Deletion committed but connection cleanup failed. Reconcile its actual receipt."
+            : "Deletion could not settle safely; this task cannot complete.",
+          503,
+        );
+        conversationPrivacyCause(
+          error,
+          new AggregateError(
+            [
+              ...new Set(
+                [
+                  ...(failed ? [failure] : []),
+                  ...transportFailures,
+                  ...cancellationFailures,
+                  ...cleanupFailures,
+                ].filter((cause) => cause !== undefined),
+              ),
+            ],
+            "Original deletion and settlement failures.",
+          ),
+        );
+        throw error;
+      }
+      if (failed) throw failure;
+      invariant(
+        result,
+        "conversation_delete_incomplete",
+        "Only the original completed deletion transaction can return a receipt.",
+      );
+      return result;
     },
   };
 }

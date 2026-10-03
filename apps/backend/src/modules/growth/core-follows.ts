@@ -3,7 +3,8 @@ import type { PoolClient } from "pg";
 import { z } from "zod";
 import { DomainError } from "../../core/errors.js";
 import {
-  assertCurrentSession,
+  assertHeldCurrentRequestSession,
+  holdCurrentRequestSession,
   requestAuthority,
 } from "../identity/request-authority.js";
 
@@ -43,6 +44,7 @@ export function canonicalCoreContentFollows(registered?: CoreFollowMigration) {
     if (!migration || !authority || authority.accountId !== accountId)
       throw unavailable();
     z.uuid().parse(authority.sessionId);
+    const held = await holdCurrentRequestSession(client, accountId);
     const context = (
       await client.query<{
         account_id: string;
@@ -72,7 +74,7 @@ export function canonicalCoreContentFollows(registered?: CoreFollowMigration) {
       !context.fan
     )
       throw unavailable();
-    await assertCurrentSession(client, accountId);
+    await assertHeldCurrentRequestSession(held, client);
     const session = await client.query<{ id: string | null }>(
       "SELECT current_setting('app.identity_session_id',true) AS id",
     );
@@ -159,6 +161,7 @@ export function canonicalCoreContentFollows(registered?: CoreFollowMigration) {
       )
     ).rows[0];
     if (typeof row?.following !== "boolean") throw unavailable();
+    await assertHeldCurrentRequestSession(held, client);
     return row.following;
   };
 }

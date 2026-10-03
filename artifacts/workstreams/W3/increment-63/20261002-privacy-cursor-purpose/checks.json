@@ -1,0 +1,71 @@
+[
+  {
+    "source": "4499bc829d7da17c088f997be7f36f1c739680a7",
+    "operation": "shipping-backend",
+    "command": [
+      "pnpm",
+      "run",
+      "build"
+    ],
+    "startedAt": "2026-10-02T18:56:17.551618+00:00",
+    "pid": 24228,
+    "exitCode": 0,
+    "completedAt": "2026-10-02T18:56:23.192204+00:00",
+    "logSHA256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+  },
+  {
+    "source": "4499bc829d7da17c088f997be7f36f1c739680a7",
+    "operation": "canonical-generation",
+    "command": [
+      "pnpm",
+      "generate:check"
+    ],
+    "startedAt": "2026-10-02T18:56:17.553832+00:00",
+    "pid": 24229,
+    "exitCode": 0,
+    "completedAt": "2026-10-02T18:56:23.192497+00:00",
+    "logSHA256": "a75f82a3ee402417109f2eab3040984b2cd4ea3c70f57586fe10836c04d1819e"
+  },
+  {
+    "source": "4499bc829d7da17c088f997be7f36f1c739680a7",
+    "operation": "scoped-eslint",
+    "command": [
+      "pnpm",
+      "exec",
+      "eslint",
+      "apps/backend/src/modules/conversation/host.ts",
+      "apps/backend/src/modules/conversation/privacy-export-cursor.ts",
+      "apps/backend/src/modules/conversation/privacy-export-cursor-rows.ts",
+      "apps/backend/src/modules/conversation/privacy-export-stream.ts",
+      "apps/backend/src/modules/conversation/privacy.ts",
+      "apps/backend/src/modules/trust/privacy-consumers.ts"
+    ],
+    "startedAt": "2026-10-02T18:56:17.556460+00:00",
+    "pid": 24230,
+    "exitCode": 0,
+    "completedAt": "2026-10-02T18:56:23.192581+00:00",
+    "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "4499bc829d7da17c088f997be7f36f1c739680a7",
+    "operation": "format",
+    "command": [
+      "pnpm",
+      "exec",
+      "prettier",
+      "--check",
+      "apps/backend/src/modules/conversation/host.ts",
+      "apps/backend/src/modules/conversation/privacy-export-cursor.ts",
+      "apps/backend/src/modules/conversation/privacy-export-cursor-rows.ts",
+      "apps/backend/src/modules/conversation/privacy-export-stream.ts",
+      "apps/backend/src/modules/conversation/privacy.ts",
+      "apps/backend/src/modules/trust/privacy-consumers.ts",
+      "docs/implementation/W3-privacy-cursor-export.md"
+    ],
+    "startedAt": "2026-10-02T18:56:17.560741+00:00",
+    "pid": 24231,
+    "exitCode": 0,
+    "completedAt": "2026-10-02T18:56:23.192662+00:00",
+    "logSHA256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+  }
+]

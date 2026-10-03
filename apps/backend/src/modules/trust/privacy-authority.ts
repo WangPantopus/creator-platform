@@ -1,9 +1,11 @@
 import type { Pool, PoolClient } from "pg";
 import { z } from "zod";
 import { DomainError, invariant } from "../../core/errors.js";
+import { querySettlementUncertain } from "../../core/query-settlement.js";
 import { requestAuthority } from "../identity/request-authority.js";
 import { PrivacyDomains, type PrivacyHook } from "./contracts.js";
 import { assertPrivacyTaskCatalog } from "./privacy-catalog.js";
+import { assertOriginalPrivacyFamilyCatalog } from "./privacy-family-catalog.js";
 
 export type PrivacyTaskInput = Parameters<PrivacyHook["run"]>[0];
 /** Current restoration and genuine lease on the same held lifecycle client.
@@ -80,8 +82,10 @@ export async function privacyTaskAuthorityInTransaction(
       503,
     );
   await client.query("SAVEPOINT w8_privacy_task_fence");
+  let owned: readonly string[];
   try {
-    await assertPrivacyTaskCatalog(client);
+    await assertPrivacyTaskCatalog(client, input.signal);
+    input.signal.throwIfAborted();
     const row = (
       await client.query<{ owned: string[] }>(
         "SELECT creator_trust.fence_privacy_task($1,$2,$3,$4,$5,$6,$7,$8) AS owned",
@@ -104,24 +108,61 @@ export async function privacyTaskAuthorityInTransaction(
         "The current lifecycle task is unavailable.",
         503,
       );
-    return z.array(z.uuid()).max(100).parse(row.owned);
+    if (domain === "conversation") {
+      // The immutable 0087 function keeps its original account-only result.
+      // Every-scope projection is a separately registered fixed purpose on
+      // this actual held original task, never a coordinator observation.
+      await assertOriginalPrivacyFamilyCatalog(client, input.signal);
+      input.signal.throwIfAborted();
+      const family = (
+        await client.query<{ owned: string[] }>(
+          "SELECT creator_trust.privacy_task_owned_creators($1,$2) AS owned",
+          [input.jobId, input.leaseToken],
+        )
+      ).rows[0];
+      input.signal.throwIfAborted();
+      if (!family)
+        throw new DomainError(
+          "privacy_original_family_unavailable",
+          "The original ownership projection is unavailable.",
+          503,
+        );
+      owned = z.array(z.uuid()).max(100).parse(family.owned);
+    } else owned = z.array(z.uuid()).max(100).parse(row.owned);
   } catch (error) {
-    await client.query("ROLLBACK TO SAVEPOINT w8_privacy_task_fence");
+    // The owner settles this exact transaction; nested cleanup cannot follow
+    // an actual task abort or an uncertain PostgreSQL response.
+    if (input.signal.aborted || querySettlementUncertain(error)) throw error;
+    try {
+      await client.query("ROLLBACK TO SAVEPOINT w8_privacy_task_fence");
+      await client.query("RELEASE SAVEPOINT w8_privacy_task_fence");
+    } catch (cause) {
+      throw new AggregateError(
+        [error, cause],
+        "Original task fence and savepoint restoration failures.",
+      );
+    }
     if (
       error &&
       typeof error === "object" &&
       "code" in error &&
       ["42883", "42501", "55P03", "40001"].includes(String(error.code))
-    )
-      throw new DomainError(
+    ) {
+      const failure = new DomainError(
         "privacy_commit_fence_unavailable",
         "Current lifecycle authority is unavailable. Try again.",
         503,
       );
+      Object.defineProperty(failure, "cause", {
+        value: error,
+        configurable: true,
+      });
+      throw failure;
+    }
     throw error;
-  } finally {
-    await client.query("RELEASE SAVEPOINT w8_privacy_task_fence");
   }
+  await client.query("RELEASE SAVEPOINT w8_privacy_task_fence");
+  return owned;
 }
 
 /** Worker-only negative/ownership metadata. A client UUID never grants a lifecycle scope. */
@@ -171,14 +212,15 @@ export function privacyTaskAuthority(pool: Pool) {
       "privacy_authority_changed",
       "The verified data request is no longer leased to this worker.",
     );
-    if (input.scope === "account") {
-      invariant(
-        job.ownership_ref && job.owned_creator_ids !== null,
-        "privacy_ownership_missing",
-        "The verified pre-deletion ownership snapshot is required.",
-      );
-      return z.array(z.uuid()).max(100).parse(job.owned_creator_ids);
-    }
-    return [];
+    invariant(
+      job.ownership_ref && job.owned_creator_ids !== null,
+      "privacy_ownership_missing",
+      "The verified original ownership snapshot is required.",
+    );
+    const owned = z.array(z.uuid()).max(100).parse(job.owned_creator_ids);
+    // This coordinator observation cannot extend 0087's held-client authority.
+    // A distinct reviewed purpose must consume non-account ownership on that
+    // original client; preserve 0087's existing non-account projection for now.
+    return input.scope === "account" ? owned : [];
   };
 }

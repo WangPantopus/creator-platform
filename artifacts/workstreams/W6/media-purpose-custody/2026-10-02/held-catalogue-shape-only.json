@@ -1,0 +1,43 @@
+{
+  "at": "2026-10-02T17:47:02.982Z",
+  "administrativeSelectedOriginalRoles": true,
+  "rolledBackAllHeldSQL": true,
+  "ledgerInserted": false,
+  "preparedIssuerOrEffectAccepted": false,
+  "description": "Actual SQL catalogue query compilation/shape only; registered-purpose checks deliberately remain unavailable because no held ledger/activation exists",
+  "callback": {
+    "rolname": "creator_call_callback_worker",
+    "rolcanlogin": true,
+    "rolsuper": false,
+    "rolbypassrls": false,
+    "rolcreatedb": false,
+    "rolcreaterole": false,
+    "rolreplication": false,
+    "rolinherit": false,
+    "rolconfig": null,
+    "member": false,
+    "role_settings": false,
+    "owns": false,
+    "issuer": true,
+    "append": true,
+    "sealed_functions": true,
+    "definitions": true,
+    "tables": true,
+    "commit_fence": true,
+    "binding_fences": true,
+    "incomplete_history": true,
+    "no_direct_tables": true,
+    "original": true
+  },
+  "publication": {
+    "ready": true
+  },
+  "control": {
+    "ready": true
+  },
+  "after": {
+    "migrations": 61,
+    "publication": null,
+    "callback": null
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "time": "2026-10-02T19:29:32.106789+00:00",
+  "purpose": "Actual canonical61 post-wave independent restore after exact source owner-only ACL representation repair on restored copy",
+  "database": "creator_w2",
+  "ledger": 61,
+  "dumpBytes": 759716,
+  "dumpSha256": "82d87445348e9b924ddee0ffdf3fd55b8e8ae5da59b978c0da8027111ec04172",
+  "tocEntries": 1633,
+  "privateMode": "0o600",
+  "privateTOCMode": "0o600",
+  "restoreDatabase": "creator_w2_trust_restore_20261002t192445z",
+  "restoreConnectionLimit": 0,
+  "fullCustodyMatches": {
+    "ledgerRows": 61,
+    "ledgerSha256": "647d0c5acdef285f0525fb96424dd2d067678240c7ba5c0bc59d1928b95c45d6",
+    "schemaSha256": "47ce91688f162cd5848cc6a44d738e85bb3aab0770c05c3be8f2cac0a1eafbe6",
+    "dataSha256": "485fc23315c04d16c6c2f986a3540b68b6dda2bd3991f1b83778a1c4afdbe73c",
+    "dataRows": 62,
+    "dataTables": 163,
+    "securitySha256": "07611ccf3078bd59636cfe4f7057bafcd9c636cdc6c5722b922bb071b82aa7e8",
+    "securityRecords": 14791,
+    "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+    "sequences": 1,
+    "rolesSha256": "6fc1c6c734f3b6e5e0bcf34e0524e0c929c9d11c40726814dae2c33b564b27f3",
+    "roleCount": 42
+  },
+  "initialRestoreFailure": "schemaSha256 mismatch: pg_restore replaced two explicit owner-only scope ACLs with implicit default owner-only ACLs; security/data/history/roles/sequence already matched",
+  "correctedRestoredCopyOnly": "Full schema catalogue difference contained only grants for creator_trust.privacy_commit_scope and domain_privacy_commit_scope. Reapplied ALL only to each existing actual owner under that owner, no PUBLIC/runtime/worker grant or live schema change. Actual reread all6 matched.",
+  "originalSourceStable": true,
+  "limits": "Backup/SQL closure proof, not app, original iMac, provider, full C10 or release acceptance"
+}

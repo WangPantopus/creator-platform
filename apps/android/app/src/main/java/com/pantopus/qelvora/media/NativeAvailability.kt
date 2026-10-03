@@ -21,17 +21,22 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.pantopus.qelvora.generated.QelvoraCopy
+import com.pantopus.qelvora.generated.CreatorAPIError
+import com.pantopus.qelvora.generated.APICallAvailabilityCommand
+import com.pantopus.qelvora.generated.APICallAvailabilityCommandWindowsItem
 import com.pantopus.qelvora.identity.FanSession
+import com.pantopus.qelvora.identity.FanSessionRequestCapture
 import com.pantopus.qelvora.ui.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.net.URL
+import java.net.URI
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.util.UUID
-import org.json.JSONArray
 import org.json.JSONObject
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 internal fun availabilityCreator(destination: String): UUID? {
     val parts = destination.removePrefix("/").split('/')
@@ -40,7 +45,7 @@ internal fun availabilityCreator(destination: String): UUID? {
 }
 private data class AvailabilityWindow(val startsAt: String, val endsAt: String)
 private data class AvailabilitySaved(val version: Int, val zone: String, val windows: List<AvailabilityWindow>)
-private data class AvailabilitySave(val version: Int, val zone: String, val windows: List<AvailabilityWindow>, val body: String)
+private data class AvailabilitySave(val version: Int, val zone: String, val windows: List<AvailabilityWindow>, val body: APICallAvailabilityCommand)
 
 /** Uses the actual account's creator scope. No local identity or call provider. */
 @Composable
@@ -55,8 +60,9 @@ internal fun NativeAvailabilityDestination(baseURL: String?, model: FanSession) 
 
 @Composable
 private fun NativeAvailability(baseURL: String?, model: FanSession, creator: UUID, account: String) {
-    val client = remember(baseURL, model) { baseURL?.let { NativeMediaClient(URL(it)) { model.currentToken() ?: error("session_required") } } }
-    val root = "/v1/w6/creators/$creator/call-availability"
+    val destination = remember(model) { model.destination }
+    var request by remember(model, destination) { mutableStateOf<FanSessionRequestCapture?>(null) }
+    var generation by remember { mutableIntStateOf(0) }
     val focus = LocalFocusManager.current
     var current by remember { mutableStateOf<AvailabilitySaved?>(null) }
     var zone by remember { mutableStateOf("") }
@@ -78,7 +84,7 @@ private fun NativeAvailability(baseURL: String?, model: FanSession, creator: UUI
         val text = bytes.toString(Charsets.UTF_8)
         if (text == "null") return null
         val value = JSONObject(text)
-        require(value.getString("creatorId") == creator.toString() && value.getInt("version") > 0)
+        require(value.getString("creatorId") == creator.toString() && value.getLong("version") in 1L..Int.MAX_VALUE.toLong())
         val rows = value.getJSONArray("windows"); require(rows.length() <= 64)
         return AvailabilitySaved(value.getInt("version"), value.getString("timeZone"), (0 until rows.length()).map {
             val row = rows.getJSONObject(it); AvailabilityWindow(row.getString("startsAt"), row.getString("endsAt"))
@@ -87,55 +93,101 @@ private fun NativeAvailability(baseURL: String?, model: FanSession, creator: UUI
     fun authorityLost(failure: NativeMediaRequestError) = failure.status in listOf(401, 404) ||
         (failure.status == 403 && failure.code !in listOf("availability_invalid", "time_zone_invalid", "availability_stale")) || failure.code == "session_account_changed"
     fun clear() { loaded = false; fresh = false; current = null; command = null; windows = emptyList(); zone = "" }
+    fun clearCapture() { generation++; request = null; clear() }
+    suspend fun currentRequest(captured: FanSessionRequestCapture, epoch: Int): Boolean {
+        if (!active || epoch != generation || request !== captured) return false
+        val valid = captured.isCurrent()
+        return valid && active && epoch == generation && request === captured
+    }
+    suspend fun readCapture(): FanSessionRequestCapture? {
+        request?.let { if (it.isCurrent()) return it }
+        if (request != null) clearCapture()
+        val origin = baseURL?.let(::URI) ?: return null
+        require(origin.scheme == "https" || (origin.scheme == "http" && origin.host in listOf("localhost", "127.0.0.1", "10.0.2.2")))
+        require(origin.userInfo == null)
+        val captured = model.captureRequest(destination, maximumResponseBytes = 1_048_576, timeoutMs = 4000) ?: return null
+        if (!active || captured.expectedAccountId != account) return null
+        request = captured; return captured
+    }
+    fun failure(value: CreatorAPIError) = NativeMediaRequestError(value.status, runCatching { JSONObject(value.body).optJSONObject("error")?.optString("code")?.takeIf { it.isNotEmpty() } }.getOrNull())
     suspend fun read(replace: Boolean) {
-        val api = client ?: return
-        if (busy || !active) return; busy = true; replacingSavedWindows = replace
+        if (busy || !active) return
+        val captured = try { readCapture() } catch (cancelled: CancellationException) { throw cancelled }
+        catch (_: Exception) { fresh = false; notice = QelvoraCopy.text("w6AvailabilityCouldNotBeLoaded"); return }
+        if (captured == null) { fresh = false; return }
+        if (busy || !active) return
+        val epoch = generation
+        busy = true; replacingSavedWindows = replace
         val started = android.os.SystemClock.elapsedRealtime()
         try {
-            val value = decode(api.request(root, expectedAccountId = account, timeoutMs = 4000))
+            if (!currentRequest(captured, epoch)) return
+            val receipt = captured.client.readCreatorCallAvailability(creator.toString(), captured.expectedAccountId)
+            if (!currentRequest(captured, epoch)) return
+            val value = decode(Json.encodeToString(receipt).toByteArray(Charsets.UTF_8))
             if (!active || android.os.SystemClock.elapsedRealtime() >= started + 5000) return
             freshUntil = started + 5000; fresh = true
-            if (replace || !loaded) { current = value; zone = value?.zone ?: ZoneId.systemDefault().id; windows = value?.windows.orEmpty(); loaded = true; notice = null }
+            if (notice == QelvoraCopy.text("w6AvailabilityCouldNotBeLoaded")) notice = null
+            // The polling effect outlives recompositions. Read the current state here;
+            // its initially captured `dirty` value cannot protect later edits.
+            val hasEdits = loaded && (zone != (current?.zone ?: ZoneId.systemDefault().id) || windows != current?.windows.orEmpty())
+            if (replace || !loaded || (!hasEdits && command == null && value?.version != current?.version)) { current = value; zone = value?.zone ?: ZoneId.systemDefault().id; windows = value?.windows.orEmpty(); loaded = true; notice = null }
         } catch (cancelled: CancellationException) { throw cancelled }
-        catch (failure: NativeMediaRequestError) { fresh = false; if (authorityLost(failure)) clear(); notice = QelvoraCopy.text(if (failure.code == "session_account_changed") "w6AvailabilityAccountChanged" else "w6AvailabilityCouldNotBeLoaded") }
-        catch (_: Exception) { fresh = false; notice = QelvoraCopy.text("w6AvailabilityCouldNotBeLoaded") }
+        catch (refused: CreatorAPIError) {
+            if (!currentRequest(captured, epoch)) return
+            val failure = failure(refused)
+            fresh = false; if (authorityLost(failure)) clear(); notice = QelvoraCopy.text(if (failure.code == "session_account_changed") "w6AvailabilityAccountChanged" else "w6AvailabilityCouldNotBeLoaded")
+        }
+        catch (_: Exception) { if (currentRequest(captured, epoch)) { fresh = false; notice = QelvoraCopy.text("w6AvailabilityCouldNotBeLoaded") } }
         finally { busy = false; replacingSavedWindows = false }
     }
     suspend fun save() {
-        val api = client ?: return
-        if (busy || !loaded || !active) return; busy = true
+        if (busy || !loaded || !active) return
+        val captured = request ?: return; val epoch = generation
+        if (!currentRequest(captured, epoch)) { if (request === captured && epoch == generation) clearCapture(); return }
+        if (busy || !loaded || !active) return
+        busy = true
         try {
             if (command == null) {
                 try { ZoneId.of(zone); windows.forEach { instant(it.startsAt); instant(it.endsAt) } }
                 catch (_: Exception) { notice = QelvoraCopy.text("w6UseISOTimesWithAnExplicitUTCOffsetForEach"); return }
                 val version = current?.version ?: 0
                 val normalized = windows.map { AvailabilityWindow(instant(it.startsAt).toString(), instant(it.endsAt).toString()) }
-                val rows = JSONArray(normalized.map { JSONObject().put("startsAt", it.startsAt).put("endsAt", it.endsAt) })
-                command = AvailabilitySave(version, zone, normalized, JSONObject().put("timeZone", zone).put("windows", rows).put("expectedVersion", version).put("idempotencyKey", UUID.randomUUID().toString()).toString())
+                val original = APICallAvailabilityCommand(zone, normalized.map { APICallAvailabilityCommandWindowsItem(it.startsAt, it.endsAt) }, version.toLong(), UUID.randomUUID().toString())
+                command = AvailabilitySave(version, zone, normalized, original)
             }
             val sent = command ?: return
-            val value = decode(api.request(root, "PUT", sent.body.toByteArray(), expectedAccountId = account)) ?: error("receipt_required")
+            if (!currentRequest(captured, epoch)) return
+            val receipt = captured.client.saveCreatorCallAvailability(creatorId = creator.toString(), xQelvoraExpectedAccount = captured.expectedAccountId, body = sent.body)
+            if (!currentRequest(captured, epoch)) return
+            val value = decode(Json.encodeToString(receipt).toByteArray(Charsets.UTF_8)) ?: error("receipt_required")
             val normalized = sent.windows.sortedBy { instant(it.startsAt) }
             require(value.version == sent.version + 1 && ZoneId.of(value.zone).rules == ZoneId.of(sent.zone).rules && value.windows.size == normalized.size &&
                 value.windows.zip(normalized).all { (a, b) -> instant(a.startsAt) == instant(b.startsAt) && instant(a.endsAt) == instant(b.endsAt) })
             if (!active) return
             command = null; current = value; zone = value.zone; windows = value.windows; freshUntil = android.os.SystemClock.elapsedRealtime() + 5000; fresh = true; notice = QelvoraCopy.text("w6AvailabilitySaved")
         } catch (cancelled: CancellationException) { throw cancelled }
-        catch (failure: NativeMediaRequestError) {
+        catch (refused: CreatorAPIError) {
+            if (!currentRequest(captured, epoch)) return
+            val failure = failure(refused)
             if (failure.status in listOf(400, 401, 403, 404, 409, 422)) command = null
             if (authorityLost(failure)) clear()
             notice = QelvoraCopy.text(if (failure.code == "session_account_changed") "w6AvailabilityAccountChanged" else if (command == null) "w6AvailabilityCouldNotBeSavedYourChangesAreKept" else "w6AvailabilitySaveIsUnconfirmed")
-        } catch (_: Exception) { notice = QelvoraCopy.text(if (command == null) "w6AvailabilityCouldNotBeSavedYourChangesAreKept" else "w6AvailabilitySaveIsUnconfirmed") }
+        } catch (_: Exception) { if (currentRequest(captured, epoch)) notice = QelvoraCopy.text(if (command == null) "w6AvailabilityCouldNotBeSavedYourChangesAreKept" else "w6AvailabilitySaveIsUnconfirmed") }
         finally { busy = false }
     }
     DisposableEffect(lifecycle) {
         active = lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
-        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_RESUME) active = true else if (event == Lifecycle.Event.ON_PAUSE || event == Lifecycle.Event.ON_STOP) { active = false; fresh = false } }
+        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_RESUME) active = true else if (event == Lifecycle.Event.ON_PAUSE || event == Lifecycle.Event.ON_STOP) { generation++; active = false; fresh = false } }
         lifecycle.addObserver(observer)
-        onDispose { lifecycle.removeObserver(observer); active = false; fresh = false }
+        onDispose { lifecycle.removeObserver(observer); generation++; active = false; fresh = false; request = null }
     }
-    LaunchedEffect(client, active) { while (active) { read(false); delay(4000) } }
-    LaunchedEffect(freshUntil) { delay((freshUntil - android.os.SystemClock.elapsedRealtime()).coerceAtLeast(0)); fresh = false }
+    LaunchedEffect(model, destination, active) { while (active) { read(false); delay(4000) } }
+    LaunchedEffect(model, destination) { while (true) {
+        val captured = request
+        if (captured != null && !captured.isCurrent() && request === captured) clearCapture()
+        if (android.os.SystemClock.elapsedRealtime() >= freshUntil) fresh = false
+        delay(250)
+    } }
     @Composable fun field(label: String, value: String, change: (String) -> Unit) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             BasicText(label, style = qText("caption").copy(color = qColor("ink-muted")))

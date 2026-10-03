@@ -13,6 +13,7 @@ import {
   PreparedGenerationJournal,
 } from "../agent/generation-journal.js";
 import type { LicenseVerifier } from "../agent/service.js";
+import { PreparedUsageRetention } from "../agent/usage-retention.js";
 import { DevelopmentLicenseVerifier } from "../agent/development-license.js";
 import type { ApprovedSentence } from "../agent/runtime.js";
 import { createCommerceRuntime } from "../commerce/runtime.js";
@@ -33,6 +34,7 @@ import {
   type IntroOfferPolicy,
 } from "../identity/intro-offers.js";
 import { ConversationRecordings } from "./recordings.js";
+import type { PreparedConversationPrivacyCursor } from "./privacy-export-cursor.js";
 import { createConversationRuntime } from "./runtime.js";
 import {
   DevelopmentConversationPolicy,
@@ -64,6 +66,8 @@ export type ConversationHostProducers = {
   feedbackAuthority?: ReplyFeedbackAuthority;
   /** W8: approved minimal account-level intro-offer use and retention. */
   introOfferPolicy?: IntroOfferPolicy;
+  /** W4: genuinely prepared original group fulfillment on this exact graph. */
+  fulfillmentPlans?: import("../commerce/fulfillment-plans.js").CommerceFulfillmentPlans;
   /** W2: the configured license authority for this host. */
   licenseVerifier?: LicenseVerifier;
   /** W2: the reviewed thread-accounting retention for the usage journal. */
@@ -71,6 +75,12 @@ export type ConversationHostProducers = {
     retentionPolicyVersion: string;
     assertPrivacyRegistered: () => Promise<void>;
   };
+  /** W2's actual prepared expiry producer plus W8's independently reviewed
+   *0206 custody. W8 fixes its real held-task authority when preparing exports. */
+  privacyCursor?: Omit<
+    Parameters<typeof PreparedConversationPrivacyCursor.prepare>[0],
+    "pool" | "authority" | "journal" | "lineage" | "recordings"
+  >;
   /** W6: the host's media runtime on this same database pool. */
   media?: MediaService;
   /** W6: fan reads of signed recordings ask W3 for the exact publication. */
@@ -212,6 +222,8 @@ export async function composeConversationHost(
     "0188_w2_generation_terminal_journal",
     "0189_w4_generation_terminal_settlement",
     "0203_w3_terminal_only_finalization",
+    "0215_w4_generation_safety_terminal_settlement",
+    "0218_w1_generation_terminal_discovery",
   ])
     if (!(await registeredChecksum(version)))
       missing.push(`registered ${version}`);
@@ -219,14 +231,26 @@ export async function composeConversationHost(
     missing.push("current generation worker composition (W3/W1/W2/W4)");
 
   let journal: PreparedGenerationJournal | undefined;
+  const originalUsageRetention = producers.privacyCursor?.usageRetention;
+  if (producers.privacyCursor)
+    invariant(
+      originalUsageRetention instanceof PreparedUsageRetention,
+      "accounting_retention_unconfigured",
+      "The original prepared accounting retention producer is required.",
+    );
   const journalChecksum = await registeredChecksum(migrations.journal);
   if (!journalChecksum) missing.push(`registered ${migrations.journal}`);
   else if (!producers.journalPolicy) missing.push("journal policy (W2)");
-  else if (requested)
+  else if (requested || producers.privacyCursor)
+    // Original privacy accounting is independent of provider/generation setup.
     journal = await PreparedGenerationJournal.prepare(runtime.pool, {
       migration: { version: migrations.journal, checksum: journalChecksum },
       ...producers.journalPolicy,
     });
+  // The Agent lifecycle and export cursor retain the same original expiry
+  // producer. A policy string or a matching URL cannot replace its custody.
+  const usageRetention = journal ? originalUsageRetention : undefined;
+  if (journal && usageRetention) usageRetention.assertJournal(journal);
   const costChecksum = await registeredChecksum(migrations.cost);
   if (!costChecksum) missing.push(`registered ${migrations.cost}`);
 
@@ -328,6 +352,7 @@ export async function composeConversationHost(
               licenseVerifier: producers.licenseVerifier!,
               audience,
               usageJournal: journal!,
+              ...(usageRetention ? { usageRetention } : {}),
               conversation: {
                 current: (scope) => memory.context(scope),
                 assertProcessorConsent: (scope) =>
@@ -391,6 +416,9 @@ export async function composeConversationHost(
     ...(lineage ? { lineage } : {}),
     ...(corrections ? { corrections } : {}),
     ...(recordings ? { recordings } : {}),
+    ...(producers.fulfillmentPlans
+      ? { fulfillmentPlans: producers.fulfillmentPlans }
+      : {}),
   });
   // Studio drafting, evaluation and ingestion use the same configured model.
   agent ??= createAgentDomain({
@@ -400,6 +428,7 @@ export async function composeConversationHost(
       ? { licenseVerifier: producers.licenseVerifier }
       : {}),
     ...(journal ? { usageJournal: journal } : {}),
+    ...(usageRetention ? { usageRetention } : {}),
   });
 
   const ingestion =
@@ -442,6 +471,14 @@ export async function composeConversationHost(
     privacy: {
       ...(lineage ? { lineage } : {}),
       ...(recordings ? { recordings } : {}),
+      ...(journal && producers.privacyCursor
+        ? {
+            cursorPreparation: {
+              ...producers.privacyCursor,
+              journal,
+            },
+          }
+        : {}),
     },
     fanGeneration: { available, missing },
     close() {

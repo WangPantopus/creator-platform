@@ -78,6 +78,13 @@
   flex-direction: column;
   gap: var(--space-5);
 }
+.w5-note-edit {
+  display: inline-flex;
+  align-items: center;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .w5-replies {
   padding: var(--space-6) var(--space-4) 0;
   display: flex;
@@ -332,6 +339,22 @@
 .w5-team .w5-editor a {
   color: inherit;
 }
+.w5-team-columns[hidden] {
+  display: none;
+}
+.w5-team-invite {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.w5-team-invite legend {
+  margin-bottom: var(--space-4);
+  font-weight: 600;
+}
 .w5-team-member {
   border-bottom: 1px solid var(--line);
   padding-bottom: var(--space-4);
@@ -359,9 +382,17 @@
 .w5-dialog > div {
   margin-bottom: var(--space-4);
 }
-.w5-studio .qv-meta,
-.w5-dialog .qv-meta {
+.w5-dialog .signed-act-review {
+  min-height: 0;
+}
+.w5-dialog .signed-act-preview .qv-signed {
+  display: none;
+}
+.w5-studio .qv-meta {
   white-space: nowrap;
+}
+.w5-dialog .qv-meta {
+  white-space: normal;
 }
 .w5-studio :focus-visible,
 .w5-dialog :focus-visible {
@@ -481,6 +512,8 @@
 }
 .w5-fan nav {
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   justify-content: space-between;
   margin-bottom: 24px;
 }

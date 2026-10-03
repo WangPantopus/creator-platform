@@ -1,7 +1,3 @@
-import { createHash } from "node:crypto";
-import { readFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { Client, type PoolClient } from "pg";
 import type { Database } from "../../db/database.js";
 import { DomainError, invariant } from "../../core/errors.js";
@@ -12,105 +8,87 @@ import {
   type ThreadScope,
 } from "../access/scope.js";
 import type { Actor } from "../identity/adapter.js";
-import { requestAuthority } from "../identity/request-authority.js";
+import {
+  requestAuthority,
+  assertHeldCurrentRequestSession,
+  holdCurrentRequestSession,
+} from "../identity/request-authority.js";
+import {
+  isConfiguredBackendRuntime,
+  type BackendRuntime,
+} from "../../integration.js";
+import { registeredMigration } from "../../db/reviewed-migration.js";
 import type { CallSession } from "../../../../../packages/api/src/session.js";
 
 const prepared = new WeakSet<InteractiveCallControl>();
+const factoryToken = Symbol("InteractiveCallControlFactory");
 type DenialMigration = Readonly<{ version: string; checksum: string }>;
-const denialPath =
-  "apps/backend/migrations/0082_w8_interactive_denial_try_fence.sql";
-const denialChecksum =
-  "3742b1e6b7f367ca626176615c5362ecf002fe5fcc5a96ea941d35a4708e8686";
-const denialVersion = /^\d{4}_w8_interactive_denial_try_fence$/u;
-declare const __QELVORA_REGISTERED_MIGRATIONS__:
-  | Readonly<Record<string, string>>
-  | undefined;
-
-/** Reservations and manually applied source SQL cannot activate admission. W8
- * may move the version in its ascending packet; the reviewed source path stays. */
-async function registeredDenial(): Promise<DenialMigration | undefined> {
-  // W7's shipping catalogue contains only executable, checked-out SQL hashes.
-  // A metadata-only version move preserves this exact reviewed source hash.
-  if (typeof __QELVORA_REGISTERED_MIGRATIONS__ !== "undefined") {
-    const entries = Object.entries(__QELVORA_REGISTERED_MIGRATIONS__).filter(
-      ([version]) => denialVersion.test(version),
-    );
-    if (!entries.length) return undefined;
-    invariant(
-      entries.length === 1 && entries[0]![1] === denialChecksum,
-      "call_control_migration_changed",
-      "Call control requires W8’s exact reviewed denial source.",
-    );
-    return Object.freeze({ version: entries[0]![0], checksum: entries[0]![1] });
-  }
-  // Source TS and the built server bundle live at different depths. Locate the
-  // nearest checked-in registry; a deployment without it stays unavailable.
-  let root = dirname(fileURLToPath(import.meta.url));
-  let source: string | undefined;
-  for (let depth = 0; depth < 8; depth++) {
-    try {
-      source = await readFile(join(root, "infra/migrations.json"), "utf8");
-      break;
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
-    }
-    const parent = dirname(root);
-    if (parent === root) break;
-    root = parent;
-  }
-  if (source === undefined) return undefined;
-  const registry = JSON.parse(source) as {
-    migrations: {
-      version: string;
-      owner?: string;
-      path: string;
-      sourceSha256?: string;
-    }[];
-  };
-  const entries = registry.migrations.filter(
-    (entry) => entry.path === denialPath,
-  );
-  if (entries.length === 0) return undefined;
-  const entry = entries[0]!;
-  const checksum = createHash("sha256")
-    .update(await readFile(join(root, denialPath)))
-    .digest("hex");
-  invariant(
-    entries.length === 1 &&
-      entry.owner === "W8" &&
-      denialVersion.test(entry.version) &&
-      entry.sourceSha256 === checksum &&
-      checksum === denialChecksum,
-    "call_control_migration_changed",
-    "Call control requires W8’s executable reviewed denial migration.",
-  );
-  return Object.freeze({ version: entry.version, checksum });
-}
+const denialSource = Object.freeze({
+  path: "apps/backend/migrations/0082_w8_interactive_denial_try_fence.sql",
+  owner: "W8",
+  name: "w8_interactive_denial_try_fence",
+  checksum: "3742b1e6b7f367ca626176615c5362ecf002fe5fcc5a96ea941d35a4708e8686",
+});
+const projectionSource = Object.freeze({
+  path: "apps/backend/migrations/0053_w8_runtime_denial_projection.sql",
+  owner: "W8",
+  name: "w8_runtime_denial_projection",
+  checksum: "4da2e2b56f51f70e39336c6c7d26646e1732703f2e3f39c35f700ff959237185",
+});
 const roleSQL = `SELECT current_user=session_user AND session_user='creator_runtime'
   AND current_setting('transaction_isolation')='read committed'
   AND r.rolcanlogin AND NOT r.rolinherit AND NOT r.rolsuper AND NOT r.rolbypassrls
   AND NOT r.rolcreatedb AND NOT r.rolcreaterole AND NOT r.rolreplication
   AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid OR roleid=r.oid)
   AND EXISTS(SELECT FROM creator.schema_migration WHERE version=$1 AND checksum=$2)
-  AND to_regprocedure('creator_trust.interactive_denial(text,uuid,uuid)') IS NOT NULL AS ready
+  AND EXISTS(SELECT FROM creator.schema_migration WHERE version=$3 AND checksum=$4)
+  AND r.rolconfig IS NULL AND NOT EXISTS(SELECT FROM pg_db_role_setting WHERE setrole=r.oid)
+  AND (SELECT count(*)=3 FROM pg_proc p JOIN pg_roles a ON a.oid=p.proowner
+    JOIN (VALUES
+      ('creator_trust.interactive_denial(text,uuid,uuid)','3f804cee38dbe31dfe9440ffff90a1d51af76db5a4e99d07971750b46641dbc6'),
+      ('creator_trust.try_interactive_denial_keys(uuid,uuid,uuid)','6252c1fc2b755b509760c8855cabe8953e6c742370233d5f7f54c5940da6e432'),
+      ('creator_trust.denial_projection(uuid,uuid,uuid,uuid)','60101e93637847ff5b89c85ad8cca549109d37920b4d6e5c7122c020e3950e7c')
+    ) expected(signature,checksum) ON p.oid=to_regprocedure(expected.signature)
+    WHERE a.rolname='creator_trust_denial' AND NOT a.rolcanlogin AND NOT a.rolinherit
+      AND NOT a.rolsuper AND NOT a.rolcreatedb AND NOT a.rolcreaterole AND NOT a.rolreplication AND NOT a.rolbypassrls
+      AND a.rolconfig IS NULL AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=a.oid OR roleid=a.oid)
+      AND NOT EXISTS(SELECT FROM pg_db_role_setting WHERE setrole=a.oid)
+      AND p.prosecdef AND p.proconfig=ARRAY['search_path=pg_catalog']::text[]
+      AND encode(sha256(convert_to(pg_get_functiondef(p.oid),'UTF8')),'hex')=expected.checksum
+      AND NOT EXISTS(SELECT FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) acl
+        WHERE acl.grantee=0 AND acl.privilege_type='EXECUTE')
+  ) AS ready
   FROM pg_roles r WHERE r.rolname=session_user`;
 
 /** Interactive request authority only. Neither a provider callback nor an
  * actorless SessionWorker can use this as post-call handback authority. */
 export class InteractiveCallControl {
   private constructor(
+    private readonly runtime: BackendRuntime,
     private readonly db: Database,
     private readonly access: AccessService,
     private readonly conversation: ConversationService,
     private readonly migration: DenialMigration,
+    private readonly projectionMigration: DenialMigration,
+    token: symbol,
   ) {
+    invariant(
+      token === factoryToken && isConfiguredBackendRuntime(runtime),
+      "call_control_unconfigured",
+      "Call control requires its original prepared host.",
+    );
     prepared.add(this);
   }
-  static async prepare(input: {
-    database: Database;
-    access: AccessService;
-    conversation: ConversationService;
-  }): Promise<InteractiveCallControl | undefined> {
+  static async prepare(
+    input: BackendRuntime,
+  ): Promise<InteractiveCallControl | undefined> {
+    if (
+      !isConfiguredBackendRuntime(input) ||
+      !input.identity ||
+      !input.assertRestoredInTransaction ||
+      !input.assertScopeAllowedInTransaction
+    )
+      return undefined;
     invariant(
       input.access instanceof AccessService &&
         input.conversation instanceof ConversationService &&
@@ -119,28 +97,78 @@ export class InteractiveCallControl {
       "call_control_pool_mismatch",
       "Calls require the canonical conversation and access producers.",
     );
-    const migration = await registeredDenial();
+    const migration = await registeredMigration(denialSource);
+    const projectionMigration = await registeredMigration(projectionSource);
     if (
       !migration ||
+      !projectionMigration ||
       !input.database.threadScopeInTransactionAvailable ||
       !input.access.threadScopeInTransactionAvailable ||
       (
         await input.database.pool.query<{ ready: boolean }>(roleSQL, [
           migration.version,
           migration.checksum,
+          projectionMigration.version,
+          projectionMigration.checksum,
         ])
       ).rows[0]?.ready !== true
     )
       return undefined;
     return new InteractiveCallControl(
+      input,
       input.database,
       input.access,
       input.conversation,
       migration,
+      projectionMigration,
+      factoryToken,
     );
   }
   isFor(database: Database) {
-    return prepared.has(this) && this.db === database;
+    return (
+      prepared.has(this) &&
+      this.db === database &&
+      isConfiguredBackendRuntime(this.runtime)
+    );
+  }
+  /** Current source/body/role custody on the original caller transaction.
+   * This attests negative gates only; it grants no participant or call access. */
+  async assertDenialAuthority(client: PoolClient) {
+    const endpoint = new Client(this.db.pool.options);
+    invariant(
+      this.isFor(this.db) &&
+        client instanceof Client &&
+        client.user === endpoint.user &&
+        client.host === endpoint.host &&
+        client.port === endpoint.port &&
+        client.database === endpoint.database,
+      "call_control_unconfigured",
+      "Current denial authority requires its original held client.",
+    );
+    await client.query("SAVEPOINT w6_denial_authority");
+    await client.query("RELEASE SAVEPOINT w6_denial_authority");
+    const migration = await registeredMigration(denialSource);
+    const projection = await registeredMigration(projectionSource);
+    invariant(
+      migration?.version === this.migration.version &&
+        migration.checksum === this.migration.checksum &&
+        projection?.version === this.projectionMigration.version &&
+        projection.checksum === this.projectionMigration.checksum,
+      "call_control_unconfigured",
+      "Current denial source changed. Reopen this action.",
+    );
+    const result = await client.query<{ ready: boolean }>(roleSQL, [
+      this.migration.version,
+      this.migration.checksum,
+      this.projectionMigration.version,
+      this.projectionMigration.checksum,
+    ]);
+    if (result.rows[0]?.ready !== true)
+      throw new DomainError(
+        "call_control_role_invalid",
+        "Current reviewed denial authority is unavailable.",
+        503,
+      );
   }
   async beforeAdmission(
     client: PoolClient,
@@ -153,7 +181,7 @@ export class InteractiveCallControl {
     const request = requestAuthority.getStore();
     const endpoint = new Client(this.db.pool.options);
     if (
-      !prepared.has(this) ||
+      !this.isFor(this.db) ||
       !(client instanceof Client) ||
       client.user !== endpoint.user ||
       client.host !== endpoint.host ||
@@ -179,12 +207,19 @@ export class InteractiveCallControl {
       );
     }
     try {
+      const held = await holdCurrentRequestSession(client, actor.accountId);
       const epoch = await this.checkHeldAdmission(
         client,
-        actor,
+        held.actor,
         scope,
         call,
         phase,
+      );
+      await assertHeldCurrentRequestSession(held, client);
+      invariant(
+        this.isFor(this.db),
+        "call_control_unconfigured",
+        "Call control authority changed.",
       );
       await client.query("RELEASE SAVEPOINT w6_call_admission_control");
       return epoch;
@@ -216,19 +251,7 @@ export class InteractiveCallControl {
       "call_control_family_changed",
       "The current call and conversation no longer match.",
     );
-    if (
-      (
-        await client.query<{ ready: boolean }>(roleSQL, [
-          this.migration.version,
-          this.migration.checksum,
-        ])
-      ).rows[0]?.ready !== true
-    )
-      throw new DomainError(
-        "call_control_role_invalid",
-        "Call control is awaiting its canonical request role and held denials.",
-        503,
-      );
+    await this.assertDenialAuthority(client);
     const currentScope = await this.access.openThreadInTransaction(
       client,
       actor,

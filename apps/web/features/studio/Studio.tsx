@@ -15,7 +15,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { brand } from "@qelvora/brand";
-import { copy } from "@qelvora/copy";
+import { copy, formatCopy } from "@qelvora/copy";
 import {
   AuthorLabel,
   AuditBanner,
@@ -37,6 +37,7 @@ import type {
   ContentView,
   PrivateNoteReply,
 } from "../../../../packages/api/src/content";
+import { ContentReplyList } from "../../../../packages/api/src/content";
 import { SignedActReview } from "../identity/signing";
 import { CreatorVoiceRecording } from "../media/VoiceRecorder";
 import { VoicePlayer } from "../media/VoicePlayer";
@@ -592,6 +593,7 @@ export function Studio({
           <button
             ref={reconnectButton}
             type="button"
+            className="qv-btn qv-btn--secondary"
             aria-busy={loading}
             onClick={() => void refresh()}
           >
@@ -664,7 +666,7 @@ export function Studio({
           ) : current === "publish" ? (
             <Library creator={creator} />
           ) : current === "team" ? (
-            <Team creator={creator} />
+            <Team creator={creator} suspended={suspended} />
           ) : current === "threads" ? (
             <Threads creator={creator} fanId={screen[1]} />
           ) : current === "thanks" ? (
@@ -737,6 +739,7 @@ function Feedback({ action }: { action: ReturnType<typeof useAction> }) {
   );
 }
 function Notes({ creator }: { creator: Creator }) {
+  const canReviewReplies = creator.owned || creator.roles.includes("triage");
   const [notes, setNotes] = useState<Page<ContentView>>({
       items: [],
       nextCursor: null,
@@ -747,24 +750,90 @@ function Notes({ creator }: { creator: Creator }) {
     }),
     [replyFilter, setReplyFilter] = useState("all"),
     [reaction, setReaction] = useState<PrivateNoteReply | null>(null),
+    [freshUntil, setFreshUntil] = useState(0),
     action = useAction();
+  const reads = useRef({ generation: 0, mounted: true });
+  const replyCursors = useRef<(string | null)[]>([null]);
   const load = useCallback(async () => {
-    const n = await studioRequest<Page<ContentView>>(
-      "content",
-      `${creator.id}/studio`,
-    );
+    const request = ++reads.current.generation;
+    const started = performance.now();
+    const cursor = replyCursors.current.at(-1);
+    // Revalidate only the visible bounded page. Re-fetching every previously
+    // loaded page can exhaust the five-second lease as the feed grows.
+    const [n, current] = await Promise.all([
+      studioRequest<Page<ContentView>>(
+        "content",
+        `${creator.id}/studio`,
+        undefined,
+        creator.viewerAccountId,
+      ),
+      canReviewReplies
+        ? studioRequest(
+            "content",
+            `${creator.id}/studio/replies?${new URLSearchParams({ filter: replyFilter, ...(cursor ? { cursor } : {}) })}`,
+            undefined,
+            creator.viewerAccountId,
+          ).then((value) => ContentReplyList.parse(value))
+        : Promise.resolve<Page<PrivateNoteReply>>({
+            items: [],
+            nextCursor: null,
+          }),
+    ]);
+    if (!reads.current.mounted || request !== reads.current.generation) return;
+    if (document.hidden || performance.now() >= started + 5000)
+      throw new Error("Current Note and reply access must be checked again.");
     setNotes(n);
-    if (creator.owned || creator.roles.includes("triage"))
-      setReplies(
-        await studioRequest<Page<PrivateNoteReply>>(
-          "content",
-          `${creator.id}/studio/replies?filter=${replyFilter}`,
-        ),
-      );
-  }, [creator.id, creator.owned, creator.roles, replyFilter]);
+    setReplies(current);
+    setFreshUntil(started + 5000);
+    setReaction((previous) =>
+      previous
+        ? (current.items.find(
+            (reply) =>
+              reply.id === previous.id &&
+              reply.version === previous.version &&
+              reply.safetyState === "allowed",
+          ) ?? null)
+        : null,
+    );
+  }, [canReviewReplies, creator.id, creator.viewerAccountId, replyFilter]);
   useEffect(() => {
-    void action.run(load);
+    reads.current.mounted = true;
+    let pending = false;
+    const refresh = async () => {
+      if (pending || document.hidden) return;
+      pending = true;
+      try {
+        await action.run(load);
+      } finally {
+        pending = false;
+      }
+    };
+    const visibility = () => {
+      if (document.hidden) {
+        reads.current.generation++;
+        setFreshUntil(0);
+      } else void refresh();
+    };
+    void refresh();
+    const interval = setInterval(() => void refresh(), 4000);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", visibility);
+    return () => {
+      reads.current.mounted = false;
+      reads.current.generation++;
+      clearInterval(interval);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", visibility);
+    };
   }, [load]);
+  useEffect(() => {
+    if (!freshUntil) return;
+    const timer = setTimeout(
+      () => setFreshUntil(0),
+      Math.max(0, freshUntil - performance.now()),
+    );
+    return () => clearTimeout(timer);
+  }, [freshUntil]);
   return (
     <section className="w5-notes">
       <header className="w5-heading">
@@ -779,218 +848,260 @@ function Notes({ creator }: { creator: Creator }) {
         )}
       </header>
       <Feedback action={action} />
-      <div className="w5-note-list">
-        {notes.items
-          .filter((n) => n.document.kind === "note")
-          .map((n) => (
-            <div key={n.id}>
-              {n.state === "draft" ? (
-                <article className="w5-card">
-                  <p className="qv-meta">Draft · not signed or sent</p>
-                  <p className="w5-content-text">{n.document.text}</p>
-                </article>
-              ) : (
-                <Note
-                  name={creator.display_name}
-                  audience={n.audienceLabel}
-                  time={time(n.publishedAt)}
-                  signedActId={n.signedActId ?? undefined}
-                  audienceSize={n.audienceCount ?? undefined}
-                  reply={false}
-                >
-                  {n.document.text}
-                </Note>
-              )}
-              <p className="qv-help">
-                {n.state === "published"
-                  ? "Broadcast"
-                  : contentStateLabel(n.state)}{" "}
-                ·{" "}
-                {n.sourceState === "not_requested"
-                  ? "Separate from AI sources"
-                  : "AI-source review required"}
-              </p>
-              {["draft", "scheduled", "media_pending"].includes(n.state) && (
-                <Link href={`/studio/${creator.id}/compose/${n.id}`}>
-                  Edit draft
-                </Link>
-              )}
-              {n.state === "media_pending" && (
+      {!freshUntil && (
+        <div className="w5-gutter">
+          <p role="status">Checking current Note and private reply access.</p>
+          <button
+            className="qv-btn qv-btn--secondary"
+            disabled={action.busy}
+            onClick={() => void action.run(load)}
+          >
+            Check current access
+          </button>
+        </div>
+      )}
+      <div hidden={!freshUntil} inert={!freshUntil}>
+        <div className="w5-note-list">
+          {notes.items
+            .filter((n) => n.document.kind === "note")
+            .map((n) => (
+              <div key={n.id}>
+                {n.state === "draft" ? (
+                  <article className="w5-card">
+                    <p className="qv-meta">Draft · not signed or sent</p>
+                    <p className="w5-content-text">{n.document.text}</p>
+                  </article>
+                ) : (
+                  <Note
+                    name={creator.display_name}
+                    audience={n.audienceLabel}
+                    time={time(n.publishedAt)}
+                    signedActId={n.signedActId ?? undefined}
+                    audienceSize={n.audienceCount ?? undefined}
+                    reply={false}
+                  >
+                    {n.document.text}
+                  </Note>
+                )}
                 <p className="qv-help">
-                  Signed. Delivery waits for verified media credentials. You can
-                  edit or withdraw this publication.
+                  {n.state === "published"
+                    ? "Broadcast"
+                    : contentStateLabel(n.state)}{" "}
+                  ·{" "}
+                  {n.sourceState === "not_requested"
+                    ? "Separate from AI sources"
+                    : "AI-source review required"}
                 </p>
-              )}
-            </div>
-          ))}
-        {!notes.items.some((n) => n.document.kind === "note") &&
-          !action.busy &&
-          !action.error && (
-            <EmptyState
-              title="Your first Note"
-              body="Write one Note for your audience. Each fan's reply stays private."
-            />
-          )}
-      </div>
-      {(creator.owned || creator.roles.includes("triage")) && (
-        <div className="w5-replies">
-          <div className="w5-replies-title">
-            <span className="qv-meta">
-              REPLIES ·{" "}
-              {action.busy
-                ? "loading"
-                : action.error
-                  ? "unavailable"
-                  : `${replies.items.length}${replies.nextCursor ? "+" : ""}`}
-            </span>
-            <span className="qv-help">
-              Only you and your triage team see these
-            </span>
-          </div>
-          <label className="w5-field">
-            Show replies
-            <select
-              value={replyFilter}
-              onChange={(e) => setReplyFilter(e.target.value)}
-            >
-              <option value="all">All reviewed replies</option>
-              <option value="unread">Unread</option>
-              <option value="reacted">Reacted</option>
-              <option value="flagged">Flagged</option>
-            </select>
-          </label>
-          {replies.items.map((r) => (
-            <article className="w5-reply" key={r.id}>
-              <div className="w5-row">
-                <strong>@{r.handle}</strong>
-                <time className="qv-meta">{time(r.createdAt)}</time>
+                {["draft", "scheduled", "media_pending"].includes(n.state) && (
+                  <Link
+                    href={`/studio/${creator.id}/compose/${n.id}`}
+                    className="qv-link-btn w5-note-edit"
+                  >
+                    Edit draft
+                  </Link>
+                )}
+                {n.state === "media_pending" && (
+                  <p className="qv-help">
+                    Signed. Delivery waits for verified media credentials. You
+                    can edit or withdraw this publication.
+                  </p>
+                )}
               </div>
-              <p>{r.text}</p>
-              {!r.read && (
+            ))}
+          {!notes.items.some((n) => n.document.kind === "note") &&
+            !action.busy &&
+            !action.error && (
+              <EmptyState
+                title="Your first Note"
+                body="Write one Note for your audience. Each fan's reply stays private."
+              />
+            )}
+        </div>
+        {canReviewReplies && (
+          <div className="w5-replies">
+            <div className="w5-replies-title">
+              <span className="qv-meta">
+                REPLIES ·{" "}
+                {action.busy
+                  ? "loading"
+                  : action.error
+                    ? "unavailable"
+                    : `${replies.items.length} on this page`}
+              </span>
+              <span className="qv-help">
+                Only you and your triage team see these
+              </span>
+            </div>
+            <label className="w5-field">
+              Show replies
+              <select
+                value={replyFilter}
+                onChange={(e) => {
+                  replyCursors.current = [null];
+                  setFreshUntil(0);
+                  setReplyFilter(e.target.value);
+                }}
+              >
+                <option value="all">All reviewed replies</option>
+                <option value="unread">Unread</option>
+                <option value="reacted">Reacted</option>
+                <option value="flagged">Flagged</option>
+              </select>
+            </label>
+            {replies.items.map((r) => (
+              <article className="w5-reply" key={r.id}>
+                <div className="w5-row">
+                  <strong>@{r.handle}</strong>
+                  <time className="qv-meta">{time(r.createdAt)}</time>
+                </div>
+                {r.tenure?.milestone && (
+                  <p className="qv-meta">
+                    {formatCopy("contentConfirmedTenure", {
+                      days: r.tenure.confirmedDays,
+                    })}
+                  </p>
+                )}
+                <p>{r.text}</p>
+                {!r.read && (
+                  <button
+                    className="qv-btn qv-btn--quiet"
+                    disabled={action.busy}
+                    onClick={() =>
+                      void action.run(async () => {
+                        await studioRequest(
+                          "content",
+                          `${creator.id}/replies/${r.id}/read`,
+                          { version: r.version, idempotencyKey: key() },
+                          creator.viewerAccountId,
+                        );
+                        await load();
+                      })
+                    }
+                  >
+                    Mark read
+                  </button>
+                )}
+                {r.safetyState === "flagged" ? (
+                  <p className="qv-help">
+                    Withheld from the feed · sent for safety review. Private
+                    text is not shown here.
+                  </p>
+                ) : r.reaction ? (
+                  <ReactionChip
+                    name={creator.display_name}
+                    signedActId={r.reaction.signedActId}
+                  />
+                ) : (
+                  <div className="w5-actions">
+                    <button
+                      className="qv-btn qv-btn--secondary"
+                      disabled={!creator.owned || action.busy}
+                      onClick={() => setReaction(r)}
+                    >
+                      React
+                    </button>
+                    {r.consent.shareText ? (
+                      <Link
+                        className="qv-btn qv-btn--quiet"
+                        href={`/studio/${creator.id}/compose?quote=${r.id}`}
+                      >
+                        Quote in a Note
+                      </Link>
+                    ) : (
+                      <button className="qv-btn qv-btn--quiet" disabled>
+                        Sharing consent required
+                      </button>
+                    )}
+                  </div>
+                )}
+              </article>
+            ))}
+            <nav className="w5-actions" aria-label="Private reply pages">
+              {replyCursors.current.length > 1 && (
                 <button
-                  className="qv-btn qv-btn--quiet"
+                  className="qv-btn qv-btn--secondary"
                   disabled={action.busy}
                   onClick={() =>
                     void action.run(async () => {
-                      await studioRequest(
-                        "content",
-                        `${creator.id}/replies/${r.id}/read`,
-                        { version: r.version, idempotencyKey: key() },
-                        creator.viewerAccountId,
-                      );
+                      replyCursors.current.pop();
+                      setFreshUntil(0);
+                      setReaction(null);
                       await load();
                     })
                   }
                 >
-                  Mark read
+                  Previous replies
                 </button>
               )}
-              {r.safetyState === "flagged" ? (
-                <p className="qv-help">
-                  Withheld from the feed · sent for safety review. Private text
-                  is not shown here.
-                </p>
-              ) : r.reaction ? (
-                <ReactionChip
-                  name={creator.display_name}
-                  signedActId={r.reaction.signedActId}
-                />
-              ) : (
-                <div className="w5-actions">
-                  <button
-                    className="qv-btn qv-btn--secondary"
-                    disabled={!creator.owned || action.busy}
-                    onClick={() => setReaction(r)}
-                  >
-                    React
-                  </button>
-                  {r.consent.shareText ? (
-                    <Link
-                      className="qv-btn qv-btn--quiet"
-                      href={`/studio/${creator.id}/compose?quote=${r.id}`}
-                    >
-                      Quote in a Note
-                    </Link>
-                  ) : (
-                    <button className="qv-btn qv-btn--quiet" disabled>
-                      Sharing consent required
-                    </button>
-                  )}
-                </div>
+              {replies.nextCursor && (
+                <button
+                  className="qv-btn qv-btn--secondary"
+                  disabled={action.busy}
+                  onClick={() =>
+                    void action.run(async () => {
+                      replyCursors.current.push(replies.nextCursor);
+                      setFreshUntil(0);
+                      setReaction(null);
+                      await load();
+                    })
+                  }
+                >
+                  Next replies
+                </button>
               )}
-            </article>
-          ))}
-          {replies.nextCursor && (
-            <button
-              className="qv-btn qv-btn--secondary"
-              disabled={action.busy}
-              onClick={() =>
-                void action.run(async () => {
-                  const page = await studioRequest<Page<PrivateNoteReply>>(
-                    "content",
-                    `${creator.id}/studio/replies?cursor=${replies.nextCursor}&filter=${replyFilter}`,
-                  );
-                  setReplies({
-                    items: [...replies.items, ...page.items],
-                    nextCursor: page.nextCursor,
-                  });
-                })
-              }
-            >
-              More replies
-            </button>
-          )}
-          {!replies.items.length && !action.busy && !action.error && (
-            <p className="qv-help">
-              Reviewed private replies appear here when fans reply to a
-              published Note. Replies waiting for safety review stay out of the
-              feed.
-            </p>
-          )}
-        </div>
-      )}
-      {reaction && (
-        <Modal
-          title="React to this private reply"
-          onClose={() => setReaction(null)}
-        >
-          <Message kind="fan">{reaction.text}</Message>
-          <SignedActReview
-            creatorId={creator.id}
-            command={{
-              actType: "reaction",
-              subjectId: reaction.id,
-              content: {
-                kind: "content_reaction",
-                creatorId: creator.id,
-                replyVersion: reaction.version,
-                reaction: "heart",
-              },
-            }}
-            creatorName={creator.display_name}
-            text="A heart reaction to this reply"
-            title="Review reaction"
-            rows={[
-              ["Fan sees", `${creator.display_name} reacted to your reply`],
-            ]}
-            onSigned={async (signedActId) => {
-              await studioRequest(
-                "content",
-                `${creator.id}/replies/${reaction.id}/reaction`,
-                {
-                  version: reaction.version,
-                  kind: "heart",
-                  signedActId,
-                  idempotencyKey: key(),
+            </nav>
+            {!replies.items.length && !action.busy && !action.error && (
+              <p className="qv-help">
+                Reviewed private replies appear here when fans reply to a
+                published Note. Replies waiting for safety review stay out of
+                the feed.
+              </p>
+            )}
+          </div>
+        )}
+        {reaction && (
+          <Modal
+            title="React to this private reply"
+            onClose={() => setReaction(null)}
+          >
+            <Message kind="fan">{reaction.text}</Message>
+            <SignedActReview
+              creatorId={creator.id}
+              command={{
+                actType: "reaction",
+                subjectId: reaction.id,
+                content: {
+                  kind: "content_reaction",
+                  creatorId: creator.id,
+                  replyVersion: reaction.version,
+                  reaction: "heart",
                 },
-                creator.viewerAccountId,
-              );
-              setReaction(null);
-              await load();
-            }}
-          />
-        </Modal>
-      )}
+              }}
+              creatorName={creator.display_name}
+              text="A heart reaction to this reply"
+              title="Review reaction"
+              rows={[
+                ["Fan sees", `${creator.display_name} reacted to your reply`],
+              ]}
+              onSigned={async (signedActId) => {
+                await studioRequest(
+                  "content",
+                  `${creator.id}/replies/${reaction.id}/reaction`,
+                  {
+                    version: reaction.version,
+                    kind: "heart",
+                    signedActId,
+                    idempotencyKey: key(),
+                  },
+                  creator.viewerAccountId,
+                );
+                setReaction(null);
+                await load();
+              }}
+            />
+          </Modal>
+        )}
+      </div>
     </section>
   );
 }
@@ -1051,6 +1162,7 @@ function Modal({
     <dialog
       ref={ref}
       className="qv w5-dialog"
+      aria-label={title}
       onCancel={(event) => {
         event.preventDefault();
         if (!closeDisabled) onClose();
@@ -1083,6 +1195,12 @@ const emptyBody = (kind: ContentBody["kind"] = "note"): ContentBody => ({
   quote: null,
   packetId: null,
 });
+const scheduleInput = (value: string | null) => {
+  if (!value) return "";
+  const date = new Date(value);
+  const part = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${part(date.getMonth() + 1)}-${part(date.getDate())}T${part(date.getHours())}:${part(date.getMinutes())}`;
+};
 function Compose({
   creator,
   id,
@@ -1126,6 +1244,9 @@ function Compose({
       idempotencyKey: string;
     } | null>(null),
     [schedule, setSchedule] = useState(""),
+    [draftChanged, setDraftChanged] = useState(false),
+    [currentDraft, setCurrentDraft] = useState<ContentView | null>(null),
+    noteInput = useRef<HTMLTextAreaElement>(null),
     [voiceObjectId, setVoiceObjectId] = useState<string | null>(null),
     voiceTrigger = useRef<HTMLButtonElement>(null),
     [photoObjectId, setPhotoObjectId] = useState<string | null>(null),
@@ -1138,6 +1259,16 @@ function Compose({
     setPendingPublication(null);
   };
   const draftReady = !id || saved?.id === id;
+  const useSavedDraft = (value: ContentView) => {
+    setDocument(value.document);
+    setSchedule(scheduleInput(value.document.scheduledAt));
+    setSaved({ id: value.id, version: value.version });
+    draftId.current = value.id;
+    operation.current = null;
+    setReview(null);
+    setDraftChanged(false);
+    setCurrentDraft(null);
+  };
   const loadDraft = async () => {
     if (!id) return;
     const value = await studioRequest<ContentView>(
@@ -1146,9 +1277,7 @@ function Compose({
       undefined,
       creator.viewerAccountId,
     );
-    setDocument({ ...value.document, scheduledAt: null });
-    setSaved({ id, version: value.version });
-    draftId.current = id;
+    useSavedDraft(value);
   };
   useEffect(() => {
     // Only opaque command references persist across a reload; no draft or fan text.
@@ -1173,6 +1302,7 @@ function Compose({
               `${creator.id}/${value.id}/studio`,
             );
             setDocument(view.document);
+            setSchedule(scheduleInput(view.document.scheduledAt));
             setSaved({ id: view.id, version: view.version });
             setReview({
               view,
@@ -1250,16 +1380,37 @@ function Compose({
       snapshot = JSON.stringify(body);
     if (operation.current?.body !== snapshot)
       operation.current = { body: snapshot, key: key() };
-    const result = await studioRequest<{ id: string; version: number }>(
-      "content",
-      `${creator.id}/drafts`,
-      { ...body, idempotencyKey: operation.current.key },
-      creator.viewerAccountId,
-    );
-    setSaved(result);
-    operation.current = null;
-    return result;
+    try {
+      const result = await studioRequest<{ id: string; version: number }>(
+        "content",
+        `${creator.id}/drafts`,
+        { ...body, idempotencyKey: operation.current.key },
+        creator.viewerAccountId,
+      );
+      setSaved(result);
+      setDraftChanged(false);
+      operation.current = null;
+      return result;
+    } catch (failure) {
+      if (
+        failure instanceof StudioFailure &&
+        failure.code === "content_changed"
+      ) {
+        setDraftChanged(true);
+        setReview(null);
+      }
+      throw failure;
+    }
   };
+  const plannedAnswer = !!document.planRef;
+  const chooseAudienceIds =
+    !plannedAnswer && ["tiers", "groups"].includes(document.audience.kind);
+  const chooseKind =
+    post &&
+    !plannedAnswer &&
+    !document.quote &&
+    !document.packetId &&
+    document.kind !== "public_answer";
   if (!draftReady)
     return (
       <section className="w5-compose">
@@ -1287,6 +1438,31 @@ function Compose({
         <span />
       </header>
       <Feedback action={action} />
+      {draftChanged && (
+        <div className="w5-gutter">
+          <p className="qv-help">
+            A newer revision is saved. Your local edits are kept. Review the
+            saved draft before choosing which revision to edit.
+          </p>
+          <button
+            className="qv-btn qv-btn--secondary"
+            disabled={action.busy}
+            onClick={() =>
+              void action.run(async () => {
+                const value = await studioRequest<ContentView>(
+                  "content",
+                  `${creator.id}/${draftId.current}/studio`,
+                  undefined,
+                  creator.viewerAccountId,
+                );
+                setCurrentDraft(value);
+              })
+            }
+          >
+            Review saved draft
+          </button>
+        </div>
+      )}
       {creator.verification !== "verified" && (
         <Notice title="Creator verification">
           Current creator status: {creator.verification.replaceAll("_", " ")}.
@@ -1305,14 +1481,16 @@ function Compose({
               key={kind}
               type="button"
               aria-pressed={document.audience.kind === kind}
-              onClick={() =>
+              disabled={plannedAnswer}
+              onClick={() => {
+                if (document.audience.kind === kind) return;
                 edit({
                   audience:
                     kind === "tiers" || kind === "groups"
                       ? { kind, ids: [] }
                       : { kind: kind as "public" | "followers" | "members" },
-                })
-              }
+                });
+              }}
             >
               {kind === "members"
                 ? "All members"
@@ -1320,7 +1498,7 @@ function Compose({
             </button>
           ))}
         </div>
-        {["tiers", "groups"].includes(document.audience.kind) && (
+        {chooseAudienceIds && (
           <fieldset className="w5-field">
             <legend>Select {document.audience.kind}</legend>
             {!catalog && (
@@ -1364,6 +1542,12 @@ function Compose({
             )}
           </fieldset>
         )}
+        {plannedAnswer && (
+          <p className="qv-help">
+            This answer keeps its original request audience. To change that
+            audience, revise the fulfillment plan in Requests.
+          </p>
+        )}
         <p className="qv-help">
           {creator.owned ? (
             <>
@@ -1380,14 +1564,17 @@ function Compose({
           )}
         </p>
       </div>
-      {post && !document.quote && !document.packetId && (
+      {chooseKind && (
         <div className="w5-gutter w5-field">
           <label htmlFor="content-kind">Library entry</label>
           <select
             id="content-kind"
             value={document.kind}
             onChange={(e) =>
-              edit({ kind: e.target.value as ContentBody["kind"], live: null })
+              edit({
+                kind: e.target.value as ContentBody["kind"],
+                live: null,
+              })
             }
           >
             <option value="post">Post</option>
@@ -1468,6 +1655,7 @@ function Compose({
           {post ? "Your post" : "Your Note"}
         </label>
         <textarea
+          ref={noteInput}
           id="note-text"
           autoFocus={!!id}
           rows={5}
@@ -1518,15 +1706,17 @@ function Compose({
         <input
           type="checkbox"
           checked={document.aiUseIntent}
-          disabled={!creator.owned && !document.aiUseIntent}
+          disabled={(plannedAnswer || !creator.owned) && !document.aiUseIntent}
           onChange={(e) => edit({ aiUseIntent: e.target.checked })}
         />
         <span>
           <strong>Let my AI use this</strong>
           <span className="qv-help">
-            {creator.owned
-              ? "Adds a source candidate for this same audience. Approve it separately in My AI."
-              : "The creator must confirm AI reuse for this revision. Team edits can remove that intent."}
+            {plannedAnswer
+              ? "AI reuse of this answer needs a separate current approval, which is unavailable."
+              : creator.owned
+                ? "Adds a source candidate for this same audience. Approve it separately in My AI."
+                : "The creator must confirm AI reuse for this revision. Team edits can remove that intent."}
           </span>
         </span>
       </label>
@@ -1650,8 +1840,88 @@ function Compose({
         </div>
         {saved && <p className="qv-meta">SAVED · REVISION {saved.version}</p>}
       </div>
+      {currentDraft && (
+        <Modal
+          title="Saved draft changed"
+          onClose={() => setCurrentDraft(null)}
+          restoreFocusTo={noteInput}
+        >
+          <p className="qv-meta">
+            {contentStateLabel(currentDraft.state)} · revision{" "}
+            {currentDraft.version}
+          </p>
+          <p>Audience: {currentDraft.audienceLabel}</p>
+          {currentDraft.document.title && (
+            <h3>{currentDraft.document.title}</h3>
+          )}
+          <label className="w5-field">
+            Saved {post ? "post" : "Note"}
+            <textarea readOnly rows={5} value={currentDraft.document.text} />
+          </label>
+          <p>
+            Schedule:{" "}
+            {currentDraft.document.scheduledAt
+              ? time(currentDraft.document.scheduledAt)
+              : "Not scheduled"}
+          </p>
+          <p>
+            AI reuse intent:{" "}
+            {currentDraft.document.aiUseIntent
+              ? "Requested · separate approval required"
+              : "Off"}
+          </p>
+          <p className="qv-help">
+            Loading this revision replaces your local edits. Keeping your edits
+            on this revision leaves them unsaved and invalidates the signing
+            preview. Saving checks the current revision again.
+          </p>
+          <div className="w5-actions">
+            <button
+              className="qv-btn qv-btn--secondary"
+              onClick={() => {
+                useSavedDraft(currentDraft);
+                action.setNotice(
+                  "Saved revision loaded. Review it before signing.",
+                );
+              }}
+            >
+              Load saved revision
+            </button>
+            <button
+              className="qv-btn qv-btn--secondary"
+              disabled={
+                currentDraft.state !== "draft" ||
+                !!currentDraft.document.planRef ||
+                !!document.planRef
+              }
+              onClick={() => {
+                setSaved({
+                  id: currentDraft.id,
+                  version: currentDraft.version,
+                });
+                operation.current = null;
+                setReview(null);
+                setDraftChanged(false);
+                setCurrentDraft(null);
+                action.setNotice(
+                  "Your local edits are kept on the current revision. Save when ready.",
+                );
+              }}
+            >
+              Keep my edits on this revision
+            </button>
+            <button
+              className="qv-btn qv-btn--quiet"
+              onClick={() => setCurrentDraft(null)}
+            >
+              Keep editing without changes
+            </button>
+          </div>
+        </Modal>
+      )}
       {review && canPublish && (
         <Modal
+          restoreFocusTo={noteInput}
           title={
             document.scheduledAt
               ? "Review scheduled publication"
@@ -2550,34 +2820,106 @@ function Library({ creator }: { creator: Creator }) {
       items: [],
       nextCursor: null,
     }),
-    [editing, setEditing] = useState<string | null | undefined>(undefined),
+    [editing, setEditing] = useState<
+      { id?: string; post: boolean } | undefined
+    >(undefined),
     [filter, setFilter] = useState(""),
     [query, setQuery] = useState(""),
+    [reading, setReading] = useState(true),
+    [readError, setReadError] = useState<string | null>(null),
     action = useAction();
+  const searchKey = JSON.stringify([
+    creator.id,
+    creator.viewerAccountId,
+    filter,
+    query,
+  ]);
+  const reads = useRef({
+    generation: 0,
+    mounted: true,
+    controller: null as AbortController | null,
+    searchKey,
+  });
   const load = useCallback(
-    async () =>
-      setPage(
-        await studioRequest(
+    async (cursor?: string) => {
+      if (reads.current.searchKey !== searchKey) return;
+      const generation = ++reads.current.generation;
+      reads.current.controller?.abort();
+      const controller = new AbortController();
+      reads.current.controller = controller;
+      setReading(true);
+      setReadError(null);
+      try {
+        const next = await studioRequest<Page<ContentView>>(
           "content",
-          `${creator.id}/studio?${new URLSearchParams({ ...(filter ? { state: filter } : {}), ...(query ? { query } : {}) })}`,
-        ),
-      ),
-    [creator.id, filter, query],
+          `${creator.id}/studio?${new URLSearchParams({ ...(cursor ? { cursor } : {}), ...(filter ? { state: filter } : {}), ...(query ? { query } : {}) })}`,
+          undefined,
+          creator.viewerAccountId,
+          { signal: controller.signal },
+        );
+        if (
+          !reads.current.mounted ||
+          generation !== reads.current.generation ||
+          reads.current.searchKey !== searchKey
+        )
+          return;
+        setPage((previous) =>
+          cursor
+            ? {
+                items: [...previous.items, ...next.items].filter(
+                  (item, index, all) =>
+                    all.findIndex((other) => other.id === item.id) === index,
+                ),
+                nextCursor: next.nextCursor,
+              }
+            : next,
+        );
+      } catch (error) {
+        if (
+          reads.current.mounted &&
+          generation === reads.current.generation &&
+          !controller.signal.aborted
+        )
+          setReadError(
+            error instanceof Error
+              ? error.message
+              : "Your current library could not be read.",
+          );
+      } finally {
+        if (reads.current.mounted && generation === reads.current.generation)
+          setReading(false);
+      }
+    },
+    [creator.id, creator.viewerAccountId, filter, query, searchKey],
   );
   useEffect(() => {
-    void action.run(load);
-    if (new URLSearchParams(location.search).has("packet")) setEditing(null);
-  }, [load]);
+    reads.current.mounted = true;
+    reads.current.searchKey = searchKey;
+    setPage({ items: [], nextCursor: null });
+    setReading(true);
+    setReadError(null);
+    // A new search supersedes the old read even while a mutation is pending.
+    // Keep read cancellation separate from the command/retry boundary.
+    const timer = setTimeout(() => void load(), 200);
+    if (new URLSearchParams(location.search).has("packet"))
+      setEditing({ post: true });
+    return () => {
+      clearTimeout(timer);
+      reads.current.mounted = false;
+      reads.current.generation++;
+      reads.current.controller?.abort();
+    };
+  }, [load, searchKey]);
   if (editing !== undefined)
     return (
       <Compose
-        key={`${creator.viewerAccountId}:${creator.id}:${editing ?? "new"}`}
+        key={`${creator.viewerAccountId}:${creator.id}:${editing.id ?? "new"}`}
         creator={creator}
-        id={editing ?? undefined}
-        post
+        id={editing.id}
+        post={editing.post}
         onDone={() => {
           setEditing(undefined);
-          void action.run(load);
+          void load();
         }}
       />
     );
@@ -2587,12 +2929,25 @@ function Library({ creator }: { creator: Creator }) {
         <h1>Publish</h1>
         <button
           className="qv-btn qv-btn--secondary"
-          onClick={() => setEditing(null)}
+          onClick={() => setEditing({ post: true })}
         >
           New post
         </button>
       </header>
       <Feedback action={action} />
+      {readError && (
+        <Notice tone="error" title="Library unavailable">
+          {readError}
+          <button
+            className="qv-btn qv-btn--secondary"
+            disabled={reading}
+            onClick={() => void load()}
+          >
+            Retry current search
+          </button>
+        </Notice>
+      )}
+      {reading && <p role="status">Checking your current library…</p>}
       <p className="qv-help">
         Audience controls who can see it. AI-source approval is separate.
       </p>
@@ -2600,6 +2955,7 @@ function Library({ creator }: { creator: Creator }) {
         Search your library
         <input
           type="search"
+          maxLength={180}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -2622,6 +2978,15 @@ function Library({ creator }: { creator: Creator }) {
           ))}
         </select>
       </label>
+      <div className="w5-actions">
+        <button
+          className="qv-link-btn"
+          disabled={reading || action.busy}
+          onClick={() => void load()}
+        >
+          Refresh library
+        </button>
+      </div>
       {page.items.map((item) => (
         <article key={item.id} className="w5-card">
           <h2>
@@ -2651,7 +3016,12 @@ function Library({ creator }: { creator: Creator }) {
           <div className="w5-actions">
             <button
               className="qv-btn qv-btn--secondary"
-              onClick={() => setEditing(item.id)}
+              onClick={() =>
+                setEditing({
+                  id: item.id,
+                  post: item.document.kind !== "note",
+                })
+              }
             >
               Edit and review again
             </button>
@@ -2690,33 +3060,27 @@ function Library({ creator }: { creator: Creator }) {
           </div>
         </article>
       ))}
-      {!page.items.length && !action.busy && !action.error && (
-        <EmptyState
-          title={
-            query || filter ? "No matching items" : "Your library is empty"
-          }
-          body={
-            query || filter
-              ? "Try another search or choose All states."
-              : "Save a draft, choose its audience, and review its exact publication."
-          }
-        />
-      )}
+      {!page.items.length &&
+        !reading &&
+        !readError &&
+        !action.busy &&
+        !action.error && (
+          <EmptyState
+            title={
+              query || filter ? "No matching items" : "Your library is empty"
+            }
+            body={
+              query || filter
+                ? "Try another search or choose All states."
+                : "Save a draft, choose its audience, and review its exact publication."
+            }
+          />
+        )}
       {page.nextCursor && (
         <button
           className="qv-btn qv-btn--secondary"
-          onClick={() =>
-            void action.run(async () => {
-              const next = await studioRequest<Page<ContentView>>(
-                "content",
-                `${creator.id}/studio?${new URLSearchParams({ cursor: page.nextCursor!, ...(filter ? { state: filter } : {}), ...(query ? { query } : {}) })}`,
-              );
-              setPage({
-                items: [...page.items, ...next.items],
-                nextCursor: next.nextCursor,
-              });
-            })
-          }
+          disabled={reading || action.busy}
+          onClick={() => void load(page.nextCursor!)}
         >
           More content
         </button>
@@ -2724,13 +3088,13 @@ function Library({ creator }: { creator: Creator }) {
     </section>
   );
 }
-function Team({ creator }: { creator: Creator }) {
-  const [readState, setReadState] = useState<
-    "loading" | "ready" | "unavailable"
-  >("loading");
-  const retryRef = useRef<HTMLButtonElement>(null);
-  const handleRef = useRef<HTMLInputElement>(null);
-  const retryFocusRequested = useRef(false);
+function Team({
+  creator,
+  suspended,
+}: {
+  creator: Creator;
+  suspended: boolean;
+}) {
   const [members, setMembers] = useState<
       {
         account_id: string;
@@ -2752,46 +3116,118 @@ function Team({ creator }: { creator: Creator }) {
       }[]
     >([]),
     [roles, setRoles] = useState<string[]>([]),
+    [teamCurrent, setTeamCurrent] = useState(false),
+    [reading, setReading] = useState(false),
+    [readError, setReadError] = useState(""),
     action = useAction();
+  const mounted = useRef(false),
+    previousFocus = useRef<HTMLElement | null>(null),
+    generation = useRef(0),
+    checkedUntil = useRef(0),
+    request = useRef<AbortController | null>(null);
   const load = useCallback(async () => {
-    setReadState("loading");
+    if (!mounted.current || document.hidden || request.current) return;
+    const controller = new AbortController(),
+      current = generation.current,
+      started = performance.now();
+    request.current = controller;
+    setReading(true);
     try {
       const result = await studioRequest<{
         members: typeof members;
         invitations: typeof pendingInvites;
-      }>("studio", `${creator.id}/team`);
+      }>("studio", `${creator.id}/team`, undefined, creator.viewerAccountId, {
+        signal: AbortSignal.any([controller.signal, AbortSignal.timeout(4000)]),
+      });
+      if (!mounted.current || current !== generation.current) return;
+      if (document.hidden || performance.now() >= started + 5000)
+        throw new StudioFailure(
+          503,
+          "authority_expired",
+          "Check the current team again before continuing.",
+        );
       setMembers(result.members);
       setPendingInvites(result.invitations);
-      setReadState("ready");
-    } catch (error) {
-      setReadState("unavailable");
-      throw error;
+      checkedUntil.current = started + 5000;
+      setTeamCurrent(true);
+      setReadError("");
+    } catch (failure) {
+      if (!mounted.current || current !== generation.current) return;
+      checkedUntil.current = 0;
+      setTeamCurrent(false);
+      setMembers([]);
+      setPendingInvites([]);
+      setReadError(
+        failure instanceof Error ? failure.message : "Team is unavailable.",
+      );
+    } finally {
+      if (request.current === controller) request.current = null;
+      if (mounted.current && current === generation.current) setReading(false);
     }
-  }, [creator.id]);
+  }, [creator.id, creator.viewerAccountId]);
   useEffect(() => {
-    void action.run(load);
+    mounted.current = true;
+    const refresh = () => void load(),
+      conceal = () => {
+        generation.current++;
+        request.current?.abort();
+        request.current = null;
+        checkedUntil.current = 0;
+        setReading(false);
+        setTeamCurrent(false);
+        setMembers([]);
+        setPendingInvites([]);
+      },
+      visibility = () => {
+        if (document.hidden) conceal();
+        else refresh();
+      };
+    refresh();
+    const polling = setInterval(refresh, 4000),
+      expiry = setInterval(() => {
+        if (performance.now() >= checkedUntil.current) setTeamCurrent(false);
+      }, 250);
+    window.addEventListener("focus", refresh);
+    window.addEventListener("pageshow", refresh);
+    document.addEventListener("visibilitychange", visibility);
+    return () => {
+      mounted.current = false;
+      generation.current++;
+      request.current?.abort();
+      request.current = null;
+      checkedUntil.current = 0;
+      clearInterval(polling);
+      clearInterval(expiry);
+      window.removeEventListener("focus", refresh);
+      window.removeEventListener("pageshow", refresh);
+      document.removeEventListener("visibilitychange", visibility);
+    };
   }, [load]);
   useEffect(() => {
-    if (readState === "loading") return;
-    const requested = retryFocusRequested.current;
-    retryFocusRequested.current = false;
     if (
-      requested &&
-      document.visibilityState === "visible" &&
-      document.activeElement === document.body
-    ) {
-      const target =
-        readState === "ready" ? handleRef.current : retryRef.current;
-      if (
-        target?.isConnected &&
-        !target.closest("[hidden], [inert]") &&
-        target.getClientRects().length
-      )
-        target.focus();
-    }
-  }, [readState]);
-  const { request: identityRequest } = useIdentityRequest();
+      teamCurrent &&
+      !suspended &&
+      !document.hidden &&
+      previousFocus.current?.isConnected
+    )
+      previousFocus.current.focus();
+  }, [teamCurrent, suspended]);
+  const { request: identityRequest, session } = useIdentityRequest();
+  const requireManagement = () => {
+    if (
+      !creator.owned ||
+      session.accountId !== creator.viewerAccountId ||
+      document.hidden ||
+      performance.now() >= checkedUntil.current
+    )
+      throw new StudioFailure(
+        403,
+        "current_creator_required",
+        "Check your current creator access before managing the team.",
+      );
+  };
   const identity = async (path: string, body: unknown) => {
+    requireManagement();
     const response = await identityRequest(path, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -2808,83 +3244,74 @@ function Team({ creator }: { creator: Creator }) {
     <section className="w5-team">
       <header className="w5-heading">
         <h1>Team</h1>
+        <button
+          type="button"
+          className="qv-btn qv-btn--secondary"
+          disabled={reading || action.busy}
+          aria-busy={reading}
+          onClick={() => void load()}
+        >
+          {reading ? "Checking team…" : "Refresh team"}
+        </button>
       </header>
-      {readState === "ready" ? (
-        <Feedback action={action} />
-      ) : (
-        <>
-          <Notice
-            tone={readState === "loading" ? "neutral" : "error"}
-            title={copy.identityTeamAccessTitle}
-          >
-            <p>{action.error || copy.identityTeamAccessLoading}</p>
-            <p>{copy.identityTeamAccessRequired}</p>
-            <button
-              ref={retryRef}
-              className="qv-btn qv-btn--secondary"
-              aria-busy={action.busy}
-              aria-disabled={action.busy}
-              onClick={(event) => {
-                if (action.busy) return;
-                retryFocusRequested.current =
-                  document.activeElement === event.currentTarget;
-                void action.run(load);
-              }}
-            >
-              {copy.retry}
-            </button>
-          </Notice>
-          {action.notice && (
-            <p role="status" className="qv-help">
-              {action.notice}
-            </p>
-          )}
-        </>
+      <Feedback action={action} />
+      {!teamCurrent && (
+        <Notice tone={readError ? "offline" : "neutral"} title="Current team">
+          {readError || "Checking current members and invitations."}
+          {creator.owned && " Your invitation input is kept in this tab."}
+        </Notice>
       )}
-      <div className="w5-team-columns">
+      <div
+        className="w5-team-columns"
+        hidden={!teamCurrent}
+        inert={!teamCurrent}
+        onFocusCapture={(event) => {
+          if (teamCurrent && !suspended) previousFocus.current = event.target;
+        }}
+      >
         <div className="w5-card">
           <h2>Roles</h2>
-          {readState === "ready" &&
-            members.map((m) => (
-              <div className="w5-team-member" key={m.account_id}>
-                <strong>{m.handle ? `@${m.handle}` : m.account_id}</strong>
-                <p>{m.revoked_at ? "Removed" : m.roles.join(" · ")}</p>
-                {!m.revoked_at && (
+          {members.map((m) => (
+            <div className="w5-team-member" key={m.account_id}>
+              <strong>{m.handle ? `@${m.handle}` : m.account_id}</strong>
+              <p>{m.revoked_at ? "Removed" : m.roles.join(" · ")}</p>
+              {creator.owned && !m.revoked_at && (
+                <button
+                  className="qv-btn qv-btn--quiet"
+                  disabled={action.busy || reading}
+                  onClick={() =>
+                    void action.run(async () => {
+                      await identity(
+                        `${creator.id}/team/${m.account_id}/remove`,
+                        {},
+                      );
+                      await load();
+                    })
+                  }
+                >
+                  Remove access
+                </button>
+              )}
+            </div>
+          ))}
+          {pendingInvites
+            .filter((i) => !i.accepted_at && !i.revoked_at)
+            .map((i) => (
+              <article key={i.id}>
+                <strong>
+                  Invitation · {i.handle ? `@${i.handle}` : i.account_id}
+                </strong>
+                <p>
+                  {i.roles.join(" · ")} ·{" "}
+                  {new Date(i.expires_at).getTime() > Date.now()
+                    ? "Expires"
+                    : "Expired"}{" "}
+                  {time(i.expires_at)}
+                </p>
+                {creator.owned && (
                   <button
                     className="qv-btn qv-btn--quiet"
-                    disabled={action.busy}
-                    onClick={() =>
-                      void action.run(async () => {
-                        await identity(
-                          `${creator.id}/team/${m.account_id}/remove`,
-                          {},
-                        );
-                        await load();
-                      })
-                    }
-                  >
-                    Remove access
-                  </button>
-                )}
-              </div>
-            ))}
-          {readState === "ready" &&
-            pendingInvites
-              .filter((i) => !i.accepted_at && !i.revoked_at)
-              .map((i) => (
-                <article key={i.id}>
-                  <strong>
-                    Invitation · {i.handle ? `@${i.handle}` : i.account_id}
-                  </strong>
-                  <p>
-                    {i.roles.join(" · ")} ·{" "}
-                    {new Date(i.expires_at).getTime() > Date.now()
-                      ? "Expires"
-                      : "Expired"}{" "}
-                    {time(i.expires_at)}
-                  </p>
-                  <button
-                    disabled={action.busy}
+                    disabled={action.busy || reading}
                     onClick={() =>
                       void action.run(async () => {
                         await identity(
@@ -2897,77 +3324,92 @@ function Team({ creator }: { creator: Creator }) {
                   >
                     Remove invitation
                   </button>
-                </article>
+                )}
+              </article>
+            ))}
+          {!members.length &&
+            !pendingInvites.some((i) => !i.accepted_at && !i.revoked_at) && (
+              <p className="qv-help">No team members or pending invitations.</p>
+            )}
+          {creator.owned && (
+            <fieldset className="w5-team-invite" disabled={action.busy}>
+              <legend>Invite a team member</legend>
+              <label className="w5-field">
+                Public fan handle
+                <input
+                  value={account}
+                  onChange={(e) => setAccount(e.target.value)}
+                />
+              </label>
+              {[
+                [
+                  "triage",
+                  "Triage",
+                  "Reads and routes the queue. Replies as team.",
+                ],
+                [
+                  "drafter",
+                  "Drafting",
+                  "Prepares drafts. Never approves as you.",
+                ],
+                [
+                  "publisher",
+                  "Publishing",
+                  "Publishes content under team identity.",
+                ],
+                ["scheduler", "Scheduling", "Offers times from your hours."],
+              ].map(([role, label, description]) => (
+                <label className="w5-check" key={role}>
+                  <input
+                    type="checkbox"
+                    checked={roles.includes(role!)}
+                    onChange={(e) =>
+                      setRoles(
+                        e.target.checked
+                          ? [...roles, role!]
+                          : roles.filter((r) => r !== role),
+                      )
+                    }
+                  />
+                  <span>
+                    <strong>{label}</strong>
+                    <span className="qv-help">{description}</span>
+                  </span>
+                </label>
               ))}
-          <label className="w5-field">
-            Public fan handle
-            <input
-              ref={handleRef}
-              value={account}
-              onChange={(e) => setAccount(e.target.value)}
-            />
-          </label>
-          {[
-            [
-              "triage",
-              "Triage",
-              "Reads and routes the queue. Replies as team.",
-            ],
-            ["drafter", "Drafting", "Prepares drafts. Never approves as you."],
-            [
-              "publisher",
-              "Publishing",
-              "Publishes content under team identity.",
-            ],
-            ["scheduler", "Scheduling", "Offers times from your hours."],
-          ].map(([role, label, description]) => (
-            <label className="w5-check" key={role}>
-              <input
-                type="checkbox"
-                checked={roles.includes(role!)}
-                onChange={(e) =>
-                  setRoles(
-                    e.target.checked
-                      ? [...roles, role!]
-                      : roles.filter((r) => r !== role),
-                  )
+              <button
+                className="qv-btn qv-btn--secondary"
+                disabled={action.busy || !account || !roles.length}
+                onClick={() =>
+                  void action.run(async () => {
+                    requireManagement();
+                    await studioRequest(
+                      "studio",
+                      `${creator.id}/team/invite`,
+                      {
+                        handle: account,
+                        roles,
+                      },
+                      creator.viewerAccountId,
+                    );
+                    action.setNotice(
+                      "Invitation created. Roles take effect only after the invited account accepts.",
+                    );
+                    setAccount("");
+                    setRoles([]);
+                    await load();
+                  })
                 }
-              />
-              <span>
-                <strong>{label}</strong>
-                <span className="qv-help">{description}</span>
-              </span>
-            </label>
-          ))}
-          <button
-            className="qv-btn qv-btn--secondary"
-            disabled={
-              action.busy ||
-              readState !== "ready" ||
-              creator.verification !== "verified" ||
-              !account ||
-              !roles.length
-            }
-            onClick={() =>
-              void action.run(async () => {
-                await studioRequest(
-                  "studio",
-                  `${creator.id}/team/invite`,
-                  {
-                    handle: account,
-                    roles,
-                  },
-                  creator.viewerAccountId,
-                );
-                action.setNotice(
-                  "Invitation created. The invited account must accept it; no role is granted yet.",
-                );
-                await load();
-              })
-            }
-          >
-            Create invitation
-          </button>
+              >
+                Create invitation
+              </button>
+            </fieldset>
+          )}
+          {!creator.owned && (
+            <p className="qv-help">
+              Only the creator can invite members or remove access.
+            </p>
+          )}
         </div>
         <div className="w5-editor qv-on-maya">
           <h2>Only you</h2>
@@ -2978,7 +3420,9 @@ function Team({ creator }: { creator: Creator }) {
             Team words always carry the team label. Team replies never fulfill a
             personal commitment.
           </p>
-          <Link href="/identity/account">Verification and account</Link>
+          <Link className="qv-btn qv-btn--quiet" href="/identity/account">
+            Verification and account
+          </Link>
         </div>
       </div>
     </section>
@@ -3044,7 +3488,7 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
     threadMounted = useRef(false),
     threadGeneration = useRef(0),
     threadCheckedAt = useRef(0),
-    directoryPages = useRef(1),
+    directoryCursors = useRef<(string | null)[]>([null]),
     pendingTeam = useRef<typeof teamPending>(null);
   const teamStorage = `w5.team-reply:${creator.viewerAccountId}:${creator.id}:${fanId}`;
   const rememberTeam = useCallback(
@@ -3105,38 +3549,21 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
           setText(draft.text);
         }
       } else {
-        let value = await studioRequest<NonNullable<typeof entries>>(
+        const cursor = directoryCursors.current.at(-1);
+        const value = await studioRequest<NonNullable<typeof entries>>(
           "studio",
-          `${creator.id}/threads`,
+          `${creator.id}/threads${cursor ? `?${new URLSearchParams({ cursor })}` : ""}`,
           undefined,
           creator.viewerAccountId,
         );
-        let loadedPages = 1;
-        // Rebuild every displayed page from current audited authority. A poll
-        // must neither discard later pages nor retain unchecked private rows.
-        while (value.nextCursor && loadedPages < directoryPages.current) {
-          const next = await studioRequest<NonNullable<typeof entries>>(
-            "studio",
-            `${creator.id}/threads?cursor=${encodeURIComponent(value.nextCursor)}`,
-            undefined,
-            creator.viewerAccountId,
-          );
-          value = {
-            items: [...value.items, ...next.items].filter(
-              (entry, index, all) =>
-                all.findIndex((other) => other.fanId === entry.fanId) === index,
-            ),
-            nextCursor: next.nextCursor,
-          };
-          loadedPages++;
-        }
+        // Refresh one visible bounded page. Earlier private rows are discarded;
+        // retaining only their opaque cursors avoids cumulative lease expiry.
         if (!threadMounted.current || generation !== threadGeneration.current)
           return;
-        directoryPages.current = loadedPages;
         setEntries(value);
       }
       threadCheckedAt.current = started;
-      setThreadCurrent(performance.now() - started < 5000);
+      setThreadCurrent(!document.hidden && performance.now() - started < 5000);
     } catch (error) {
       if (threadMounted.current && generation === threadGeneration.current) {
         setThreadCurrent(false);
@@ -3180,19 +3607,29 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
       /* Corrupt metadata cannot select an actor or invent a receipt. */
     }
     void action.run(load);
-    const refresh = () => void action.run(load),
+    const refresh = () => {
+        if (!document.hidden) void action.run(load);
+      },
+      visibility = () => {
+        if (document.hidden) {
+          threadGeneration.current++;
+          setThreadCurrent(false);
+        } else refresh();
+      },
       polling = setInterval(refresh, 4000),
       expiry = setInterval(() => {
         if (performance.now() - threadCheckedAt.current >= 5000)
           setThreadCurrent(false);
       }, 500);
     window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", visibility);
     return () => {
       threadMounted.current = false;
       threadGeneration.current++;
       clearInterval(polling);
       clearInterval(expiry);
       window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", visibility);
     };
   }, [load, teamStorage, rememberTeam]);
   const sendTeam = async () => {
@@ -3276,6 +3713,13 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
     <section className="w5-threads">
       <header className="w5-heading">
         <h1>Threads</h1>
+        <button
+          className="qv-link-btn"
+          disabled={action.busy}
+          onClick={() => void action.run(load)}
+        >
+          Refresh conversations
+        </button>
       </header>
       <div className="w5-gutter">
         <AuditBanner />
@@ -3335,20 +3779,43 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
                   body="Current conversations will appear when fans reply to Notes or send requests."
                 />
               )}
-              {entries?.nextCursor && directoryPages.current < 50 && (
-                <button
-                  className="qv-btn qv-btn--secondary"
-                  disabled={action.busy}
-                  onClick={() =>
-                    void action.run(async () => {
-                      directoryPages.current++;
-                      await load();
-                    })
-                  }
-                >
-                  Load more conversations
-                </button>
-              )}
+              <div className="w5-actions">
+                {directoryCursors.current.length > 1 && (
+                  <button
+                    className="qv-btn qv-btn--secondary"
+                    disabled={action.busy}
+                    onClick={() =>
+                      void action.run(async () => {
+                        threadGeneration.current++;
+                        setThreadCurrent(false);
+                        setEntries(null);
+                        directoryCursors.current.pop();
+                        await load();
+                      })
+                    }
+                  >
+                    Previous conversations
+                  </button>
+                )}
+                {entries?.nextCursor && (
+                  <button
+                    className="qv-btn qv-btn--secondary"
+                    disabled={action.busy}
+                    onClick={() =>
+                      void action.run(async () => {
+                        if (!entries.nextCursor) return;
+                        threadGeneration.current++;
+                        setThreadCurrent(false);
+                        directoryCursors.current.push(entries.nextCursor);
+                        setEntries(null);
+                        await load();
+                      })
+                    }
+                  >
+                    Next conversations
+                  </button>
+                )}
+              </div>
             </>
           ) : (
             data && (

@@ -1,20 +1,33 @@
 "use client";
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { PrivacyJobView } from "../../../../backend/src/modules/trust/contracts";
 import {
   ErrorState,
   TrustError,
   TrustSession,
+  type TrustSessionState,
   useTrust,
   useTrustSession,
   trustApi,
+  retryTrustReads,
   dateLabel,
 } from "../../ops/trust-client";
 
-function Job({ id }: { id: string }) {
-  const { data, error, refresh } = useTrust<PrivacyJobView>(
+function Job({
+  id,
+  available,
+  readEnabled,
+  onReadError,
+}: {
+  id: string;
+  available: boolean;
+  readEnabled: boolean;
+  onReadError: (id: string, error: TrustError | null) => void;
+}) {
+  const { data, error, loading, refresh } = useTrust<PrivacyJobView>(
     `privacy/jobs/${id}`,
+    readEnabled,
   );
   const [actionError, setError] = useState<TrustError | null>(null);
   const [busy, setBusy] = useState(false);
@@ -22,10 +35,13 @@ function Job({ id }: { id: string }) {
     setError(null);
     setBusy(false);
   });
+  useEffect(() => {
+    onReadError(id, error);
+    return () => onReadError(id, null);
+  }, [id, error, onReadError]);
   return (
     <article className="trust-job">
-      <ErrorState error={error} retry={() => void refresh()} />
-      {data && (
+      {data && available && (
         <>
           <p className="qv-mono">
             {data.kind} · {data.state}
@@ -53,6 +69,7 @@ function Job({ id }: { id: string }) {
           <div className="ops-search">
             <button
               className="qv-btn qv-btn--secondary"
+              disabled={!available || loading || busy}
               onClick={() => void refresh()}
             >
               Check progress
@@ -60,8 +77,9 @@ function Job({ id }: { id: string }) {
             {data.state !== "complete" && (
               <button
                 className="qv-btn qv-btn--secondary"
-                disabled={busy}
+                disabled={!available || loading || busy}
                 onClick={async () => {
+                  if (!available || loading || busy) return;
                   const current = epoch.current;
                   setBusy(true);
                   try {
@@ -123,14 +141,44 @@ function Job({ id }: { id: string }) {
   );
 }
 export default function PrivacyPage() {
-  const { data, error, refresh } = useTrust<{ items: PrivacyJobView[] }>(
-    "privacy/jobs",
-  );
+  const [sessionState, setSessionState] = useState<TrustSessionState>({
+    ready: false,
+    error: null,
+  });
   const capability = useTrust<{
     localDevelopment: boolean;
     actorVerification: string;
     verificationMethod?: string;
   }>("capabilities");
+  // A read failure blocks actions, but must not toggle its own request gate.
+  // Only the original session/capability checks enable private reads again.
+  const privateReadsEnabled = sessionState.ready && !capability.error;
+  const { data, error, loading, refresh } = useTrust<{
+    items: PrivacyJobView[];
+  }>("privacy/jobs", privateReadsEnabled);
+  const [jobErrors, setJobErrors] = useState<Record<string, TrustError>>({});
+  const onReadError = useCallback((id: string, error: TrustError | null) => {
+    setJobErrors((current) => {
+      if (current[id] === error || (!error && !current[id])) return current;
+      const next = { ...current };
+      if (error) next[id] = error;
+      else delete next[id];
+      return next;
+    });
+  }, []);
+  const readError =
+    capability.error ??
+    sessionState.error ??
+    error ??
+    Object.values(jobErrors)[0] ??
+    null;
+  const readsReady = sessionState.ready && !loading && !readError;
+  const verificationReady =
+    readsReady &&
+    !capability.loading &&
+    !!capability.data &&
+    !capability.error &&
+    capability.data.actorVerification === "configured";
   const [kind, setKind] = useState("export");
   const [scope, setScope] = useState("account");
   const [creatorId, setCreator] = useState("");
@@ -152,8 +200,14 @@ export default function PrivacyPage() {
     setError(null);
     setResult("");
     key.current = null;
+    setSessionState({ ready: false, error: null });
+    setJobErrors({});
   });
+  useEffect(() => {
+    if (!verificationReady) dialog.current?.close();
+  }, [verificationReady]);
   const run = async () => {
+    if (!verificationReady || busy) return;
     const current = epoch.current;
     setBusy(true);
     setError(null);
@@ -224,7 +278,7 @@ export default function PrivacyPage() {
           Google Play subscriptions
         </a>
       </nav>
-      <TrustSession />
+      <TrustSession onSessionState={setSessionState} />
       {capability.data?.verificationMethod === "current_session" && (
         <p>
           <a href="/api/auth/continue?returnTo=%2Fsupport%2Fprivacy">
@@ -233,11 +287,17 @@ export default function PrivacyPage() {
           before requesting or downloading your data.
         </p>
       )}
-      <ErrorState error={error} retry={() => void refresh()} />
+      <ErrorState error={readError} retry={retryTrustReads} />
+      {capability.loading && (
+        <p className="qv-help" role="status">
+          Loading…
+        </p>
+      )}
       <form
         className="trust-panel"
         onSubmit={(event) => {
           event.preventDefault();
+          if (!verificationReady || busy) return;
           if (kind === "delete") dialog.current?.showModal();
           else void run();
         }}
@@ -245,6 +305,7 @@ export default function PrivacyPage() {
         <label htmlFor="privacy-kind">Request</label>
         <select
           id="privacy-kind"
+          disabled={capability.loading}
           value={kind}
           onChange={(event) => {
             setKind(event.target.value);
@@ -257,6 +318,7 @@ export default function PrivacyPage() {
         <label htmlFor="privacy-scope">Scope</label>
         <select
           id="privacy-scope"
+          disabled={capability.loading}
           value={scope}
           onChange={(event) => {
             setScope(event.target.value);
@@ -272,6 +334,7 @@ export default function PrivacyPage() {
             <label htmlFor="privacy-creator">Creator reference</label>
             <input
               id="privacy-creator"
+              disabled={capability.loading}
               required
               value={creatorId}
               onChange={(event) => {
@@ -286,6 +349,7 @@ export default function PrivacyPage() {
             <label htmlFor="privacy-thread">Conversation reference</label>
             <input
               id="privacy-thread"
+              disabled={capability.loading}
               required
               value={threadId}
               onChange={(event) => {
@@ -295,23 +359,25 @@ export default function PrivacyPage() {
             />
           </>
         )}
-        {capability.data?.verificationMethod !== "current_session" && (
-          <>
-            <label htmlFor="privacy-proof">
-              {capability.data?.localDevelopment
-                ? "Type LOCAL DEVELOPMENT for this synthetic account"
-                : "Account verification receipt"}
-            </label>
-            <input
-              id="privacy-proof"
-              required
-              autoComplete="off"
-              value={proof}
-              onChange={(event) => setProof(event.target.value)}
-            />
-          </>
-        )}
-        {!capability.data?.localDevelopment && (
+        {capability.data &&
+          capability.data.verificationMethod !== "current_session" && (
+            <>
+              <label htmlFor="privacy-proof">
+                {capability.data?.localDevelopment
+                  ? "Type LOCAL DEVELOPMENT for this synthetic account"
+                  : "Account verification receipt"}
+              </label>
+              <input
+                id="privacy-proof"
+                disabled={capability.loading}
+                required
+                autoComplete="off"
+                value={proof}
+                onChange={(event) => setProof(event.target.value)}
+              />
+            </>
+          )}
+        {capability.data && !capability.data.localDevelopment && (
           <p className="qv-help">
             {capability.data?.verificationMethod === "current_session"
               ? "Your sign-in must be recent. Continue with Pantopus again if asked to verify your account."
@@ -320,12 +386,7 @@ export default function PrivacyPage() {
         )}
         <button
           className="qv-btn qv-btn--secondary"
-          disabled={
-            busy ||
-            !capability.data ||
-            !!capability.error ||
-            capability.data.actorVerification !== "configured"
-          }
+          disabled={busy || !verificationReady}
         >
           {busy
             ? "Saving…"
@@ -338,9 +399,15 @@ export default function PrivacyPage() {
       </form>
       <section className="trust-panel">
         <h2>Request progress</h2>
-        {data?.items.length === 0 && <p>No data requests yet.</p>}
+        {readsReady && data?.items.length === 0 && <p>No data requests yet.</p>}
         {data?.items.map((job) => (
-          <Job key={job.id} id={job.id} />
+          <Job
+            key={job.id}
+            id={job.id}
+            available={readsReady}
+            readEnabled={privateReadsEnabled}
+            onReadError={onReadError}
+          />
         ))}
       </section>
       <dialog className="trust-dialog" ref={dialog}>
@@ -359,7 +426,7 @@ export default function PrivacyPage() {
         <div className="actions">
           <button
             className="qv-btn qv-btn--secondary"
-            disabled={busy}
+            disabled={busy || !verificationReady}
             onClick={() => void run()}
           >
             Request deletion

@@ -1,5 +1,19 @@
 import { z } from "zod";
 
+/** Public composition state only. Protected media still requires current access. */
+export const CapabilitiesSchema = z.strictObject({
+  mediaAvailable: z.boolean(),
+  creatorMediaAvailable: z.boolean(),
+  creatorMediaAudienceAvailable: z.boolean(),
+  callsAvailable: z.boolean(),
+  aiAudioAvailable: z.literal(false),
+  callRecoveryAvailable: z.boolean(),
+  reason: z.enum([
+    "media_unconfigured",
+    "licensed_ai_audio_and_provider_verification_required",
+  ]),
+});
+
 /** W6 namespaced C02/C10 contracts; no client-supplied authorship or grants. */
 export const MediaPurposeSchema = z.enum([
   "fan_attachment",
@@ -92,12 +106,13 @@ export const PlaybackFileSchema = z.strictObject({
   bytes: z.number().int().positive().max(268_435_456),
 });
 export type PlaybackFile = z.infer<typeof PlaybackFileSchema>;
-export type PlaybackTicket = {
-  url: string;
-  expiresAt: string;
-  asset: MediaAsset;
-  playbackFile: PlaybackFile;
-};
+export const PlaybackTicketSchema = z.strictObject({
+  url: z.url(),
+  expiresAt: z.iso.datetime(),
+  asset: MediaAssetSchema,
+  playbackFile: PlaybackFileSchema,
+});
+export type PlaybackTicket = z.infer<typeof PlaybackTicketSchema>;
 
 /** Creator-owned objects use real W5 content/W2 source or interview IDs, never a fabricated fan thread. */
 export const CreatorMediaPurposeSchema = z.enum([

@@ -10,10 +10,12 @@
     "messageId": "^/support$",
     "quote": "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$",
     "packet": "^/studio/[a-f0-9-]{36}/publish$",
-    "objectId": "^/media/voice$"
+    "objectId": "^/media/voice$",
+    "kind": "^/support$"
   },
   "literalQueryValues": {
-    "offer": "1"
+    "offer": "1",
+    "kind": "verification"
   },
   "fanHandleExemptPathPattern": "^/(?:identity/account|status|ops(?:/.*)?)$"
 }

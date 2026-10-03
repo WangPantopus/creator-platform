@@ -67,7 +67,7 @@ object W3FanFeatures {
         else if (parts.size == 3 && parts[0] == "threads") {
             val valid = runCatching { UUID.fromString(parts[1]); UUID.fromString(parts[2]); true }.getOrDefault(false)
             if (valid) ConversationScreen(baseURL, parts[1], parts[2], session) else Notice(title = "Conversation unavailable", children = "Open this conversation from your account.")
-        } else if (parts.size == 3 && parts[0] == "creators" && parts[2] == "chat") FirstConversation(baseURL, parts[1], session)
+        } else if (parts.size == 3 && parts[0] == "creators" && parts[2] == "chat") key(session.session?.accountId, session.session?.sessionId, session.destination) { FirstConversation(baseURL, parts[1], session) }
         else if (Uri.parse(session.destination).path == "/you") {
             val destination = Uri.parse(session.destination)
             val creatorId = destination.getQueryParameter("creatorId")
@@ -273,15 +273,46 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         }
     } }
     val current = page
-    Column(Modifier.fillMaxSize().widthIn(max = 390.dp).background(qColor("ground"))) {
+    BoxWithConstraints(Modifier.fillMaxSize().widthIn(max = 390.dp)) {
+    // Keep the actual conversation and its privacy notice reachable when
+    // enlarged text or the keyboard leaves too little room for fixed controls.
+    val scrollControls = LocalDensity.current.fontScale >= 1.5f || maxHeight < 480.dp
+    Column(Modifier.fillMaxSize().background(qColor("ground"))) {
         if (current == null) {
             Notice(title = "Conversation unavailable", children = if (error.isEmpty()) "Loading your messages…" else error)
             Button("Refresh", variant = ButtonVariant.SECONDARY) { scope.launch { refresh() } }
             Button("Help and safety", variant = ButtonVariant.QUIET) { session.open("/support") }
         } else {
-            ThreadHeader(name = current.creatorName, subtitle = "Official AI", live = !offline && current.control == APIThreadControl.HUMAN_ACTIVE, onBack = { session.open("/you") }, onAbout = { privacy = true })
-            IdentityStrip(state = if (current.control == APIThreadControl.HUMAN_ACTIVE) IdentityState.HUMAN else if (current.control == APIThreadControl.AI_ACTIVE) IdentityState.AI else IdentityState.PAUSED, name = current.creatorName)
+            val header: @Composable () -> Unit = {
+                ThreadHeader(name = current.creatorName, subtitle = "Official AI", live = !offline && current.control == APIThreadControl.HUMAN_ACTIVE, onBack = { session.open("/you") }, onAbout = { privacy = true })
+                IdentityStrip(state = if (current.control == APIThreadControl.HUMAN_ACTIVE) IdentityState.HUMAN else if (current.control == APIThreadControl.AI_ACTIVE) IdentityState.AI else IdentityState.PAUSED, name = current.creatorName)
+            }
+            val messageLabel = if (current.control == APIThreadControl.HUMAN_ACTIVE) "Message ${current.creatorName}" else "Message ${current.creatorName}'s AI"
+            val input: @Composable (Modifier) -> Unit = { modifier ->
+                BasicTextField(value = draft, onValueChange = { draft = it.take(2000) }, modifier = modifier.heightIn(min = 48.dp, max = 160.dp).semantics { contentDescription = messageLabel }.background(qColor("surface")).padding(12.dp), textStyle = qText("body").copy(color = qColor("ink")), cursorBrush = SolidColor(qColor("ink")), maxLines = 5)
+            }
+            val sendButton: @Composable () -> Unit = {
+                Button("Send", variant = if (current.control == APIThreadControl.HUMAN_ACTIVE) ButtonVariant.MAYA else ButtonVariant.AI, block = scrollControls, disabled = !current.canSend || offline || !foreground || busy || pending != null || current.generationSequences.isNotEmpty() || draft.isBlank()) { scope.launch { send() } }
+            }
+            val privacyControls: @Composable () -> Unit = {
+                Button("Me and privacy", variant = ButtonVariant.QUIET) { privacy = true }
+                Button("Get support", variant = ButtonVariant.QUIET) { session.open("/support") }
+            }
+            val composer: @Composable () -> Unit = {
+                Column(Modifier.imePadding().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    if (!current.canSend) Notice(title = "AI unavailable", children = current.unavailableReason ?: "Messaging is unavailable.")
+                    if (scrollControls) {
+                        BasicText(messageLabel, style = qText("label").copy(color = qColor("ink")))
+                        input(Modifier.fillMaxWidth())
+                        sendButton()
+                    } else Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { input(Modifier.weight(1f)); sendButton() }
+                    Button("Ask ${current.creatorName} to step in", variant = ButtonVariant.MAYA, block = true) { session.open("/commerce/packet?creatorId=$creatorId") }
+                    if (scrollControls) Column { privacyControls() } else Row { privacyControls() }
+                }
+            }
+            if (!scrollControls) header()
             LazyColumn(state = scroll, modifier = Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                if (scrollControls) item { Column { header() } }
                 item(key = "intro-offer") {
                     NativeIntroOffer(client, root, session, introOfferId, current.feedbackPolicy != null,
                         enabled = !busy && !offline && foreground && !privacy && source == null)
@@ -295,7 +326,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                     catch (failure: Throwable) { fail(failure) } finally { busy = false }
                 } } }
                 items(older.filter { old -> current.messages.none { it.id == old.id } } + current.messages, key = { it.id }) { message ->
-                    if (message.recording == null) ConversationMessageRow(message, current.creatorName, current.control, connected = !offline, original = (older + current.messages).firstOrNull { it.id == message.correction?.originalMessageId && it.version == message.correction.originalVersion && it.authorKind == APIMessageAuthorKind.AI }, onOriginal = { message.correction?.let { correction -> scope.launch { try { val original = client.json.decodeFromJsonElement<ConversationMessage>(client.request("$root/messages/${correction.originalMessageId}")); if (original.id != correction.originalMessageId || original.version != correction.originalVersion || original.authorKind != APIMessageAuthorKind.AI) throw ConversationFailure(409, "The original reply changed."); source = "Original AI reply · version ${original.version}" to original.text } catch (failure: Throwable) { fail(failure) } } } }, onVerify = { message.signedActId?.let { session.open("/verify/$it") } }, onReport = { session.open("/support?creatorId=$creatorId" + if (message.authorKind == APIMessageAuthorKind.AI) "&messageId=${message.id}" else "") }, onForget = if (busy || offline) null else { { scope.launch { busy=true;try { client.request("$root/messages/${message.id}/dont-remember",buildJsonObject { put("expectedRevision",current.revision) });refresh() } catch(failure:Throwable) { fail(failure) } finally {busy=false} } } }, onCitation = { id -> scope.launch { try { val passage = client.request("$root/citations/$id").jsonObject; source = passage["title"]?.jsonPrimitive?.content.orEmpty() to passage["text"]?.jsonPrimitive?.content.orEmpty() } catch (failure: Throwable) { fail(failure) } } })
+                    if (message.recording == null) ConversationMessageRow(message, current.creatorName, current.control, creatorId = current.creatorId, onLink = { session.open(it) }, connected = !offline && foreground, original = (older + current.messages).firstOrNull { it.id == message.correction?.originalMessageId && it.version == message.correction.originalVersion && it.authorKind == APIMessageAuthorKind.AI }, onOriginal = { message.correction?.let { correction -> scope.launch { try { val original = client.json.decodeFromJsonElement<ConversationMessage>(client.request("$root/messages/${correction.originalMessageId}")); if (original.id != correction.originalMessageId || original.version != correction.originalVersion || original.authorKind != APIMessageAuthorKind.AI) throw ConversationFailure(409, "The original reply changed."); source = "Original AI reply · version ${original.version}" to original.text } catch (failure: Throwable) { fail(failure) } } } }, onVerify = { message.signedActId?.let { session.open("/verify/$it") } }, onReport = { session.open("/support?creatorId=$creatorId" + if (message.authorKind == APIMessageAuthorKind.AI) "&messageId=${message.id}" else "") }, onForget = if (busy || offline) null else { { scope.launch { busy=true;try { client.request("$root/messages/${message.id}/dont-remember",buildJsonObject { put("expectedRevision",current.revision) });refresh() } catch(failure:Throwable) { fail(failure) } finally {busy=false} } } }, onCitation = { id -> scope.launch { try { val passage = client.request("$root/citations/$id").jsonObject; source = passage["title"]?.jsonPrimitive?.content.orEmpty() to passage["text"]?.jsonPrimitive?.content.orEmpty() } catch (failure: Throwable) { fail(failure) } } })
                     message.recording?.let { recording ->
                         val asset = recording.asset
                         if (recording.state == "available" && asset != null &&
@@ -304,8 +335,8 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                             asset.purpose == APIMediaMediaAssetPurpose.HUMAN_REPLY &&
                             message.authorKind == APIMessageAuthorKind.HUMAN_CREATOR && message.signedActId != null &&
                             asset.signedActId == message.signedActId) {
-                            ConversationRecordingPlayer(baseURL, accountId, creatorId, fanId, asset, current.creatorName, message.createdAt,
-                                active = foreground && !privacy && source == null, token = session::currentToken,
+                            ConversationRecordingPlayer(baseURL, session, session.destination, accountId, creatorId, fanId, asset, current.creatorName, message.createdAt,
+                                active = foreground && !privacy && source == null,
                                 onVerify = { session.open("/verify/${message.signedActId}") })
                         } else {
                             BasicText(message.authorLabel(current.creatorName), style = qText("label").copy(color = qColor("ink")))
@@ -357,25 +388,26 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 }
                 pending?.let { pendingItem -> item { Message(kind = MessageKind.FAN, children = pendingItem.text, name = current.creatorName, delivery = if (pendingItem.rejected) Delivery.FAILED else if (pendingItem.uncertain) null else Delivery.PENDING); if (pendingItem.uncertain) { BasicText("Acceptance hasn't been confirmed. Retry checks the same message without a duplicate.", style = qText("caption").copy(color = qColor("ink"))); Button("Retry", variant = ButtonVariant.QUIET, disabled = busy || offline) { scope.launch { send(true) } } } else if (pendingItem.rejected) { BasicText("Not sent", style = qText("caption").copy(color = qColor("ink"))); Button("Keep editing", variant = ButtonVariant.QUIET) { draft = pendingItem.text; pending = null } } } }
                 if (error.isNotEmpty()) item { Notice(title = "Conversation status", children = error) }
+                if (scrollControls) item { composer() }
             }
-            Column(Modifier.imePadding().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                if (!current.canSend) Notice(title = "AI unavailable", children = current.unavailableReason ?: "Messaging is unavailable.")
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    BasicTextField(value = draft, onValueChange = { draft = it.take(2000) }, modifier = Modifier.weight(1f).heightIn(min = 48.dp, max = 160.dp).semantics { contentDescription = if (current.control == APIThreadControl.HUMAN_ACTIVE) "Message ${current.creatorName}" else "Message ${current.creatorName}'s AI" }.background(qColor("surface")).padding(12.dp), textStyle = qText("body").copy(color = qColor("ink")), cursorBrush = SolidColor(qColor("ink")), maxLines = 5)
-                    Button("Send", variant = if (current.control == APIThreadControl.HUMAN_ACTIVE) ButtonVariant.MAYA else ButtonVariant.AI, disabled = !current.canSend || offline || !foreground || busy || pending != null || current.generationSequences.isNotEmpty() || draft.isBlank()) { scope.launch { send() } }
-                }
-                Button("Ask ${current.creatorName} to step in", variant = ButtonVariant.MAYA, block = true) { session.open("/commerce/packet?creatorId=$creatorId") }
-                Row { Button("Me and privacy", variant = ButtonVariant.QUIET) { privacy = true }; Button("Get support", variant = ButtonVariant.QUIET) { session.open("/support") } }
-            }
+            if (!scrollControls) composer()
         }
+    }
     }
 }
 
-@Composable private fun ConversationMessageRow(message: ConversationMessage, name: String, control: APIThreadControl, connected: Boolean, original: ConversationMessage?, onOriginal: () -> Unit, onVerify: () -> Unit, onReport: () -> Unit, onForget: (() -> Unit)?, onCitation: (String) -> Unit) {
+@Composable private fun ConversationMessageRow(message: ConversationMessage, name: String, control: APIThreadControl, creatorId: String, onLink: (String) -> Unit, connected: Boolean, original: ConversationMessage?, onOriginal: () -> Unit, onVerify: () -> Unit, onReport: () -> Unit, onForget: (() -> Unit)?, onCitation: (String) -> Unit) {
     val kind = when (message.authorKind) { APIMessageAuthorKind.FAN -> MessageKind.FAN; APIMessageAuthorKind.AI -> MessageKind.AI; APIMessageAuthorKind.TEAM -> MessageKind.TEAM; APIMessageAuthorKind.HUMAN_CREATOR -> MessageKind.HUMAN_CREATOR; APIMessageAuthorKind.APPROVED_DRAFT -> MessageKind.APPROVED_DRAFT; else -> null }
     SelectionContainer {
         Column(Modifier.semantics { contentDescription = message.authorLabel(name) }) {
-            if (message.authorKind == APIMessageAuthorKind.SYSTEM) SystemLine(text = message.text)
+            if (message.authorKind == APIMessageAuthorKind.SYSTEM) {
+                val destination = message.publicAnswerDestination(creatorId)
+                if (destination != null) Box(Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                    .clickable(enabled = connected, role = Role.Button) { onLink(destination) }
+                    .semantics(mergeDescendants = true) { contentDescription = "System update: Answered publicly. Open answer" },
+                    contentAlignment = Alignment.Center) { SystemLine(text = message.text) }
+                else SystemLine(text = message.text)
+            }
             else if (message.correction != null && original != null) {
                 Correction(text = message.text, name = name, aiText = original.text, onVerify = onVerify)
                 Button("Report", variant = ButtonVariant.QUIET, onClick = onReport)
@@ -513,6 +545,49 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     val key = remember(handle) { UUID.randomUUID().toString() }
     val scope = rememberCoroutineScope(); val uriHandler = LocalUriHandler.current
     val contextPending = Uri.parse(session.destination).getQueryParameter("context") != null
+    val target = session.destination
+    val accountId = session.session?.accountId
+    val sessionId = session.session?.sessionId
+    var postContext by remember { mutableStateOf<APIGrowthPostEntryContextResponseContext?>(null) }
+    var contextSessionId by remember { mutableStateOf<String?>(null) }
+    var contextDestination by remember { mutableStateOf("") }
+    var contextFailure by remember { mutableStateOf("") }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var foreground by remember(lifecycleOwner) { mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, _ ->
+            foreground = lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+            if (!foreground) postContext = null
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer); postContext = null }
+    }
+    LaunchedEffect(baseURL, target, accountId, sessionId, foreground) {
+        postContext = null; contextFailure = ""
+        if (!foreground || !contextPending) return@LaunchedEffect
+        while (isActive) {
+            postContext = null; contextFailure = ""
+            val values = Uri.parse(target).getQueryParameters("context")
+            val id = values.singleOrNull()?.let { raw -> runCatching { UUID.fromString(raw).also { require(it.toString().equals(raw, ignoreCase = true)) } }.getOrNull() }
+            val capture = if (id != null && ApplicationDestination.isPermitted(target)) session.captureRequest(target, maximumResponseBytes = 8192, timeoutMs = 5000) else null
+            if (capture == null || capture.expectedAccountId != accountId) {
+                contextFailure = QelvoraCopy.text("growthThisDestinationIsUnavailableReconnectAndTryAgain")
+            } else try {
+                if (!capture.isCurrent()) return@LaunchedEffect
+                val page = capture.client.readPostEntryContext(handle, id.toString(), capture.expectedAccountId)
+                val post = page.context
+                if (!foreground || !capture.isCurrent()) return@LaunchedEffect
+                require(UUID.fromString(post.creatorId).toString().equals(post.creatorId, ignoreCase = true))
+                require(UUID.fromString(post.contentId) == id && post.version in 1..2147483647L && post.title.length <= 180)
+                require(post.destination == "/creators/$handle/posts/$id")
+                contextSessionId = capture.sessionId; contextDestination = capture.destination; postContext = post
+            } catch (failure: Throwable) {
+                if (failure is CancellationException) throw failure
+                if (foreground && capture.isCurrent()) contextFailure = QelvoraCopy.text("growthThisDestinationIsUnavailableReconnectAndTryAgain")
+            }
+            delay(4000)
+        }
+    }
     LaunchedEffect(handle) {
         try {
             require(Regex("[A-Za-z0-9_-]{1,100}").matches(handle))
@@ -563,15 +638,29 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             }
         }
         if(error.isNotEmpty()) item { Notice(title="Conversation unavailable",children=error) }
-        if(contextPending) item { Notice(title="Post context unavailable",children="This post's context is not connected to the conversation service yet. Your destination is kept.") }
+        if(contextPending) item {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                postContext?.takeIf { foreground && !session.checkingSession && contextSessionId == sessionId && contextDestination == target && it.creatorId == creator?.optString("id") }?.let { post ->
+                    ContextCard(QelvoraCopy.text("growthFromAPost"), post.title) { session.open("/creators/$handle/chat") }
+                }
+                Notice(title="Post context unavailable",children=contextFailure.ifEmpty { "This post's conversation context is not connected yet. Remove the post context to continue to the current AI provider review." })
+                Button(QelvoraCopy.text("removeContext"), variant=ButtonVariant.QUIET, block=true) { session.open("/creators/$handle/chat") }
+            }
+        }
         item {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Button("Start with $name's AI",variant=ButtonVariant.AI,size="lg",block=true,disabled=busy || creator == null || contextPending || capabilities?.generationAvailable != true || capabilities?.consentAvailable != true) { scope.launch {
-                val policy=capabilities?.providers ?: return@launch; busy=true
+            Button("Start with $name's AI",variant=ButtonVariant.AI,size="lg",block=true,disabled=busy || !foreground || session.checkingSession || creator == null || contextPending || capabilities?.generationAvailable != true || capabilities?.consentAvailable != true) { scope.launch {
+                if (busy || !foreground || contextPending || session.destination != target || capabilities?.generationAvailable != true || capabilities?.consentAvailable != true) return@launch
+                val policy=capabilities?.providers ?: return@launch
+                val selectedCreator=creator ?: return@launch
+                val capture=session.captureRequest(target, maximumResponseBytes=1_000_000, timeoutMs=15_000) ?: return@launch
+                if (capture.expectedAccountId != accountId || capture.sessionId != sessionId || !capture.isCurrent() || !foreground || session.destination != target) return@launch
+                busy=true
                 try {
-                    val page=client.json.decodeFromJsonElement<ConversationPage>(client.request("begin",buildJsonObject { put("creatorId",creator!!.getString("id"));put("policyVersion",policy.version);put("accessNoticeAccepted",true);put("idempotencyKey",key) }))
+                    val page=capture.client.beginConversation(capture.expectedAccountId, capture.sessionId, APIConversationBeginConversation(selectedCreator.getString("id"),policy.version,APIConversationBeginConversationAccessNoticeAccepted,key))
+                    if (!foreground || !capture.isCurrent() || page.creatorId != selectedCreator.getString("id") || runCatching { UUID.fromString(page.fanId) }.isFailure) return@launch
                     session.open("/threads/${page.creatorId}/${page.fanId}")
-                } catch(failure: Throwable) { if(failure is CancellationException) throw failure;error=failure.message ?: "Reconnect to try again. No message was sent." } finally {busy=false}
+                } catch(failure: Throwable) { if(failure is CancellationException) throw failure;if(foreground && capture.isCurrent()) error="Reconnect to try again. No message was sent." } finally {busy=false}
             } }
             Button("Not now",variant=ButtonVariant.QUIET,block=true) { session.open("/creators/$handle") }
             }

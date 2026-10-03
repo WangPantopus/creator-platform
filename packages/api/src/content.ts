@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CommerceFulfillmentPlanRef } from "./commerce/fulfillment.ts";
 
 /** C08 v1. Audience and AI-source permission are independent, server checked. */
 export const ContentAudience = z.discriminatedUnion("kind", [
@@ -48,6 +49,9 @@ export const ContentDocument = z
       .strictObject({ replyId: z.uuid(), consentVersion: z.int().positive() })
       .nullable(),
     packetId: z.uuid().nullable(),
+    // Omitted stays omitted: adding a default changes historical signed C08s.
+    // Recipients and current consent remain W4-owned; this is a reference only.
+    planRef: CommerceFulfillmentPlanRef.nullable().optional(),
     live: z
       .strictObject({
         sessionId: z.uuid(),
@@ -58,6 +62,20 @@ export const ContentDocument = z
       .nullable()
       .optional(),
   })
+  .refine(
+    (v) =>
+      !v.planRef ||
+      (v.kind === "public_answer" &&
+        v.packetId === null &&
+        v.quote === null &&
+        !v.live &&
+        v.scheduledAt === null &&
+        (v.audience.kind === "public" ||
+          (v.audience.kind === "groups" &&
+            v.audience.ids.length === 1 &&
+            v.audience.ids[0] === v.planRef.id))),
+    "A fulfillment plan needs its exact public or matched-group answer.",
+  )
   .refine(
     (v) => v.kind !== "note" || v.audience.kind !== "public",
     "Notes need an explicit relationship audience.",
@@ -158,6 +176,7 @@ export const ContentReplyPage = ContentPage.pick({
   cursor: true,
   limit: true,
 }).extend({
+  contentId: z.uuid().optional(),
   filter: z.enum(["all", "unread", "reacted", "flagged"]).default("all"),
 });
 export const ContentReplyReviewResult = z.strictObject({
@@ -198,6 +217,28 @@ export const ContentView = z.strictObject({
   quotedText: z.string().nullable(),
   quotedHandle: z.string().nullable(),
 });
+export const ContentTenureRecognition = z
+  .strictObject({
+    confirmedDays: z.int().nonnegative(),
+    milestone: z
+      .union([z.literal(50), z.literal(100), z.literal(365)])
+      .nullable(),
+    basis: z.enum(["confirmed_stripe_paid_periods", "confirmed_paid_periods"]),
+    historyComplete: z.literal(false),
+    checkedAt: z.iso.datetime({ offset: true }),
+  })
+  .refine(
+    (tenure) =>
+      tenure.milestone ===
+      (tenure.confirmedDays >= 365
+        ? 365
+        : tenure.confirmedDays >= 100
+          ? 100
+          : tenure.confirmedDays >= 50
+            ? 50
+            : null),
+  );
+export type ContentTenureRecognition = z.infer<typeof ContentTenureRecognition>;
 export const PrivateNoteReply = z.strictObject({
   safetyState: z.enum(["pending", "allowed", "flagged"]),
   safetyReviewAvailable: z.boolean(),
@@ -209,6 +250,7 @@ export const PrivateNoteReply = z.strictObject({
   text: z.string(),
   version: z.int().positive(),
   createdAt: z.iso.datetime({ offset: true }),
+  tenure: ContentTenureRecognition.nullable().optional(),
   consent: z.strictObject({
     shareText: z.boolean(),
     showHandle: z.boolean(),

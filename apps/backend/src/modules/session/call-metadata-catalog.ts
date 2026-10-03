@@ -113,10 +113,11 @@ const columns = Object.entries({
   names.map((column) => ({ relation, column })),
 );
 
-/** Recheck exact SQL/definition/isolated role and every direct/default/PUBLIC
- * capability on the held client. No catalogue result is cached across a call.
- * Only the definer's five read-only column sets and one executable function
- * are allowed; no table/document grants, memberships or extra owned objects. */
+/** Recheck exact SQL/definition/isolated role and its direct purpose grants on
+ * the held client. No catalogue result is cached across a call. The definer
+ * receives five read-only column sets and one explicit executable grant;
+ * unrelated effective app-schema definers are refused, including PUBLIC.
+ * PostgreSQL built-ins and general invoker/RLS helpers remain inherited. */
 export async function assertCallMetadataCatalog(
   client: PoolClient,
   migration: CallMetadataMigration,
@@ -151,6 +152,9 @@ export async function assertCallMetadataCatalog(
     AND NOT EXISTS(SELECT FROM pg_proc WHERE proowner=(SELECT oid FROM role) AND oid<>(SELECT oid FROM purpose))
     AND NOT EXISTS(SELECT FROM pg_proc p CROSS JOIN LATERAL aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) acl
       WHERE acl.grantee=(SELECT oid FROM role) AND p.oid<>(SELECT oid FROM purpose))
+    AND NOT EXISTS(SELECT FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
+      WHERE n.nspname IN('creator','creator_trust','growth') AND p.prosecdef
+        AND p.oid<>(SELECT oid FROM purpose) AND has_function_privilege((SELECT oid FROM role),p.oid,'EXECUTE'))
     AND NOT EXISTS(SELECT FROM pg_class c CROSS JOIN LATERAL aclexplode(coalesce(c.relacl,acldefault(CASE WHEN c.relkind='S' THEN 's'::"char" ELSE 'r'::"char" END,c.relowner))) acl
       WHERE c.relkind IN('r','p','v','m','S','f') AND (acl.grantee=(SELECT oid FROM role) OR (acl.grantee=0 AND c.relnamespace IN(SELECT oid FROM pg_namespace WHERE nspname IN('creator','creator_trust','growth')))))
     AND (SELECT count(*) FROM actual)=(SELECT count(*) FROM expected)
