@@ -7,6 +7,7 @@ import {
   type CallOfferView,
 } from "../../../../packages/api/src/session";
 import { mediaRequest, MediaRequestError } from "../media/api";
+import { useIdentityRequest } from "../identity/session-boundary";
 import "../media/media.css";
 /** An offer link carries a destination, never a booking or payment authority. */
 type SelectionProps = {
@@ -25,9 +26,16 @@ function selectionNotice(error: unknown, fallback: string) {
     : error.message;
 }
 export function SelectTime(props: SelectionProps) {
+  const identity = useIdentityRequest();
+  const boundary = useRef({ signal: identity.signal, revision: 0 });
+  if (boundary.current.signal !== identity.signal)
+    boundary.current = {
+      signal: identity.signal,
+      revision: boundary.current.revision + 1,
+    };
   return (
     <SelectionForm
-      key={`${props.actorAccountId}/${props.creatorId}/${props.fanId}/${props.offerId}`}
+      key={`${identity.session.accountId}/${identity.session.sessionId}/${boundary.current.revision}/${props.actorAccountId}/${props.creatorId}/${props.fanId}/${props.offerId}`}
       {...props}
     />
   );
@@ -39,6 +47,25 @@ function SelectionForm({
   actorAccountId,
   canSelect,
 }: SelectionProps) {
+  const opening = useRef(useIdentityRequest()).current;
+  function offerRequest<T>(path: string, init: RequestInit) {
+    opening.signal.throwIfAborted();
+    if (opening.session.accountId !== actorAccountId)
+      throw new MediaRequestError(
+        "Your account changed. Reopen this content to continue.",
+        409,
+        "session_account_changed",
+      );
+    return mediaRequest<T>(path, {
+      ...init,
+      expectedAccountId: opening.session.accountId,
+      expectedSessionId: opening.session.sessionId,
+      signal: AbortSignal.any([
+        opening.signal,
+        ...(init.signal ? [init.signal] : []),
+      ]),
+    });
+  }
   const root = `threads/${creatorId}/${fanId}/call-offers`;
   const [offer, setOffer] = useState<CallOfferView | null>(null);
   const [chosen, setChosen] = useState<string | null>(null);
@@ -83,14 +110,21 @@ function SelectionForm({
       setStale(true);
     }
     async function refresh() {
-      if (!active || request || selecting.current || document.hidden) return;
+      if (
+        !active ||
+        request ||
+        selecting.current ||
+        document.hidden ||
+        opening.signal.aborted
+      )
+        return;
       const started = performance.now();
       const attempt = epoch;
       const pending = new AbortController();
       request = pending;
       try {
         const values = CallOffersSchema.parse(
-          await mediaRequest<unknown>(root, {
+          await offerRequest<unknown>(root, {
             expectedAccountId: actorAccountId,
             signal: AbortSignal.any([
               controller.signal,
@@ -99,7 +133,13 @@ function SelectionForm({
             ]),
           }),
         );
-        if (!active || document.hidden || attempt !== epoch) return;
+        if (
+          !active ||
+          document.hidden ||
+          attempt !== epoch ||
+          opening.signal.aborted
+        )
+          return;
         if (performance.now() - started >= 5000)
           throw new Error(copy.w6TheTimesCouldNotBeLoadedReconnectAndTryAgain);
         const next = values.find((value) => value.id === offerId) ?? null;
@@ -134,7 +174,12 @@ function SelectionForm({
         setLoaded(true);
         delay = 30000;
       } catch (error) {
-        if (active && !document.hidden && attempt === epoch) {
+        if (
+          active &&
+          !document.hidden &&
+          attempt === epoch &&
+          !opening.signal.aborted
+        ) {
           currentOffer.current = null;
           deadline.current = null;
           setOffer(null);
@@ -151,7 +196,13 @@ function SelectionForm({
         }
       } finally {
         if (request === pending) request = null;
-        if (active && attempt === epoch && retry && !document.hidden)
+        if (
+          active &&
+          attempt === epoch &&
+          retry &&
+          !document.hidden &&
+          !opening.signal.aborted
+        )
           timer = setTimeout(() => void refresh(), delay);
       }
     }
@@ -178,6 +229,11 @@ function SelectionForm({
       }
     }, 500);
     void refresh();
+    const sessionEnded = () => {
+      retry = false;
+      conceal();
+    };
+    opening.signal.addEventListener("abort", sessionEnded);
     window.addEventListener("pagehide", conceal);
     window.addEventListener("pageshow", foreground);
     document.addEventListener("visibilitychange", foreground);
@@ -193,6 +249,7 @@ function SelectionForm({
       if (lifetime.current === controller) lifetime.current = null;
       window.removeEventListener("pagehide", conceal);
       window.removeEventListener("pageshow", foreground);
+      opening.signal.removeEventListener("abort", sessionEnded);
       document.removeEventListener("visibilitychange", foreground);
     };
   }, [root, offerId, actorAccountId, revision]);
@@ -204,6 +261,7 @@ function SelectionForm({
       !observed ||
       !boundary ||
       boundary.signal.aborted ||
+      opening.signal.aborted ||
       !expires ||
       Date.now() >= expires.wall ||
       performance.now() >= expires.elapsed ||
@@ -223,12 +281,14 @@ function SelectionForm({
     command.current = pending;
     selecting.current = true;
     const signal = AbortSignal.any([
+      opening.signal,
       boundary.signal,
       pending.signal,
       AbortSignal.timeout(10000),
     ]);
     const mounted = () =>
       !boundary.signal.aborted &&
+      !opening.signal.aborted &&
       !pending.signal.aborted &&
       !document.hidden &&
       lifetime.current === boundary &&
@@ -240,7 +300,7 @@ function SelectionForm({
     try {
       const started = performance.now();
       const values = CallOffersSchema.parse(
-        await mediaRequest<unknown>(root, {
+        await offerRequest<unknown>(root, {
           expectedAccountId: actorAccountId,
           signal,
         }),
@@ -274,7 +334,7 @@ function SelectionForm({
           key: crypto.randomUUID(),
         };
       const session = CallSessionSchema.parse(
-        await mediaRequest<unknown>(`${root}/${observed.id}/select`, {
+        await offerRequest<unknown>(`${root}/${observed.id}/select`, {
           method: "POST",
           expectedAccountId: actorAccountId,
           signal,
