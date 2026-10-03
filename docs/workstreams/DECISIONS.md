@@ -58,3 +58,7 @@ The immediate planning work raises no blocking question: these owners can start 
 ## Native spending navigation — October3 UTC
 
 Daily Spend is entered from You, so both shipping shells retain You as its selected tab. Other existing Commerce destinations select Requests. The prior generic fallback selected Home for `/commerce/spending` and request-detail routes despite retaining those actual destinations. This shell repair changes the selected navigation state; each owner screen continues to authorize its actual account/object and controls its Back destination. W4 owns its operated Spend Back repair. Current shipping rebuild/personal navigation verification remains required; original references are preserved.
+
+## iOS cold destination custody — October3 UTC
+
+Preserve a bounded canonical path and actual account UUID in the existing issuer-specific device-only Keychain namespace. Query parameters and private screen/draft bodies stay out of this record. Restore only after the real current session resolves the same account; an incoming destination takes precedence. Serialize writes with credential custody and reject stale model/revision/token writes. Clear destination metadata on sign-out or account replacement while always attempting credential deletion, and preserve it through guarded same-account rotation. A saved path is presentation context; current object authority remains mandatory.
