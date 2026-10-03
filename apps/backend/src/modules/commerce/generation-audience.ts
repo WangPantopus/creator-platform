@@ -195,7 +195,22 @@ export class CommerceGenerationAudience {
     private readonly identity: GenerationIdentityAuthority,
     private readonly receipt: GenerationPurposeConsumer,
     private readonly database: Readonly<{ name: string; oid: number }>,
+    private readonly hostPool: Pool,
   ) {}
+
+  /** Classification/retrieval must use the prepared audience's original
+   * identity authority and canonical host, not another same-endpoint graph.
+   */
+  assertComposition(
+    identity: GenerationIdentityAuthority,
+    hostPool: Pool,
+  ): void {
+    invariant(
+      identity === this.identity && hostPool === this.hostPool,
+      "generation_audience_composition_mismatch",
+      "Use this audience's original generation authority and canonical host.",
+    );
+  }
 
   static async prepare(input: {
     identity: GenerationIdentityAuthority;
@@ -241,6 +256,7 @@ export class CommerceGenerationAudience {
       "generation_audience_unconfigured",
       "Use the exact reviewed W4 generation audience consumer.",
     );
+    input.identity.assertConsumerRegistered(receipt);
     const hostDatabase = (
       await input.database.pool.query<{ name: string; oid: number }>(
         "SELECT current_database() AS name,(SELECT oid FROM pg_database WHERE datname=current_database()) AS oid",
@@ -251,6 +267,7 @@ export class CommerceGenerationAudience {
       input.identity,
       receipt,
       Object.freeze(hostDatabase),
+      input.database.pool,
     );
     const client = await input.workerPool.connect();
     try {
@@ -300,7 +317,7 @@ export class CommerceGenerationAudience {
             AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=(SELECT oid FROM role) OR roleid=(SELECT oid FROM role))
             AND NOT EXISTS(SELECT FROM pg_db_role_setting WHERE setrole=(SELECT oid FROM role))
             AND NOT EXISTS(SELECT FROM entry e CROSS JOIN LATERAL aclexplode(coalesce(e.proacl,acldefault('f',e.proowner))) acl
-             JOIN pg_roles r ON r.oid=acl.grantee WHERE r.rolname IN('creator_w2_generation_input','creator_w2_generation_retrieval')
+             JOIN pg_roles r ON r.oid=acl.grantee WHERE r.rolname IN('creator_w2_generation_input','creator_w2_generation_retrieval','creator_w2_generation_metadata')
               AND (r.rolcanlogin OR r.rolinherit OR r.rolsuper OR r.rolcreatedb OR r.rolcreaterole OR r.rolreplication OR r.rolbypassrls OR r.rolconfig IS NOT NULL
                OR EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid OR roleid=r.oid)
                OR EXISTS(SELECT FROM pg_db_role_setting WHERE setrole=r.oid)
@@ -322,7 +339,7 @@ export class CommerceGenerationAudience {
             AND NOT EXISTS(SELECT FROM entry e CROSS JOIN LATERAL aclexplode(coalesce(e.proacl,acldefault('f',e.proowner))) acl
              WHERE acl.privilege_type<>'EXECUTE' OR acl.is_grantable OR acl.grantor<>e.proowner
               OR acl.grantee NOT IN(SELECT oid FROM pg_roles WHERE rolname IN(
-               $3,'creator_generation_worker','creator_w2_generation_input','creator_w2_generation_retrieval')))
+               $3,'creator_generation_worker','creator_w2_generation_input','creator_w2_generation_retrieval','creator_w2_generation_metadata')))
             AND has_function_privilege(current_user,to_regprocedure($4),'EXECUTE')
             AND has_function_privilege($3,to_regprocedure('creator.generation_scope_matches(uuid,uuid)'),'EXECUTE')
             AND NOT EXISTS(SELECT FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
