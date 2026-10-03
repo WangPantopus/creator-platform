@@ -30,7 +30,7 @@ private struct ContentReplyPolicy: Decodable, Sendable {
 }
 private struct ContentReceipt: Decodable, Sendable { let version: Int? }
 private struct ContentFailure: Error { var status: Int = 0; var code: String? = nil
-    var accountChanged: Bool { ["content_account_changed", "session_account_changed", "session_changed"].contains(code ?? "") }
+    var accountChanged: Bool { ["content_account_changed", "session_account_changed", "session_changed", "session_view_changed"].contains(code ?? "") }
     var authorityDenied: Bool { status == 401 || status == 403 || accountChanged }
 }
 private struct ContentErrorEnvelope: Decodable { struct Failure: Decodable { let code: String? }; let error: Failure }
@@ -50,23 +50,33 @@ private func contentFailureCopy(_ error: Error, action: Bool = false) -> String 
     return QelvoraCopy.text(key)
 }
 
-private actor ContentClient {
-    let baseURL: URL
-    private let storage: SecureSessionStorage
-    init(baseURL: URL) { self.baseURL = baseURL; storage = SecureSessionStorage(issuer: baseURL) }
-    func request<T: Decodable & Sendable>(_ path: String, body: Data? = nil, expectedAccountId:String? = nil) async throws -> T {
-        guard let token = try await storage.read() else { throw ContentFailure(status: 401) }
-        guard let url = URL(string: "v1/content/" + path, relativeTo: baseURL) else { throw URLError(.badURL) }
-        var request = URLRequest(url: url); request.httpMethod = body == nil ? "GET" : "POST"; request.httpBody = body
-        request.cachePolicy = .reloadIgnoringLocalCacheData; request.timeoutInterval = 15
-        if let expectedAccountId {request.setValue(expectedAccountId,forHTTPHeaderField:"x-qelvora-expected-account")}
-        request.setValue("Bearer " + token, forHTTPHeaderField: "Authorization"); request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        let (data, response) = try await URLSession.shared.data(for: request)
-        guard let response = response as? HTTPURLResponse, (200..<300).contains(response.statusCode) else {
-            let failure = try? JSONDecoder().decode(ContentErrorEnvelope.self, from: data).error
-            throw ContentFailure(status: (response as? HTTPURLResponse)?.statusCode ?? 0, code: failure?.code)
+/// One actual W1 capture spans a complete read cycle or immutable action.
+/// Credentials, response bounds and session denial pins remain issuer-owned.
+@MainActor private struct ContentClient {
+    let original: FanSessionRequestCapture
+    func isCurrent() async -> Bool { await original.isCurrent() }
+    func request<T: Decodable & Sendable>(_ path: String, body: Data? = nil, expectedAccountId:String? = nil, query: [URLQueryItem] = []) async throws -> T {
+        try Task.checkCancellation()
+        if let expectedAccountId, expectedAccountId != original.expectedAccountId {
+            throw ContentFailure(status: 403, code: "content_account_changed")
         }
-        return try JSONDecoder().decode(T.self, from: data)
+        guard await isCurrent() else { throw CancellationError() }
+        do {
+            let response = try await original.contentBytes("/v1/content/" + path, body: body, query: query)
+            try Task.checkCancellation()
+            guard await isCurrent() else { throw CancellationError() }
+            let value = try JSONDecoder().decode(T.self, from: response.body)
+            guard await isCurrent() else { throw CancellationError() }
+            return value
+        } catch {
+            try Task.checkCancellation()
+            guard await isCurrent() else { throw CancellationError() }
+            if let failure = error as? CreatorAPIError {
+                let detail = try? JSONDecoder().decode(ContentErrorEnvelope.self, from: failure.body).error
+                throw ContentFailure(status: failure.status, code: detail?.code)
+            }
+            throw error
+        }
     }
 }
 
@@ -79,9 +89,9 @@ public enum ContentFanFeature {
         _ = ContentMediaCache.prepare()
         return FanFeatureRegistration(matches: matches, screen: { session in
             let destination = session.destination
-            guard matches(destination) else { return AnyView(EmptyView()) }
+            guard matches(destination), let account = session.session else { return AnyView(EmptyView()) }
             let parts = destination.split(separator: "/")
-            return AnyView(ContentFanScreen(baseURL: baseURL, creatorId: String(parts[1]), contentId: String(parts[2]), session: session).id(destination))
+            return AnyView(ContentFanScreen(baseURL: baseURL, creatorId: String(parts[1]), contentId: String(parts[2]), accountId: account.accountId, sessionId: account.sessionId, destination: destination, session: session).id("\(account.accountId):\(account.sessionId):\(destination)"))
         })
     }
 }
@@ -90,6 +100,9 @@ private struct ContentFanScreen: View {
     let baseURL: URL?
     let creatorId: String
     let contentId: String
+    let accountId: String
+    let sessionId: String
+    let destination: String
     @ObservedObject var session: FanSession
     @State private var content: ContentViewValue?
     @State private var replies: [ContentReply] = []
@@ -219,7 +232,7 @@ private struct ContentFanScreen: View {
         if let baseURL, let viewerAccountId, content.version > 0 {
             if content.document.media.count <= 10 {
                 ForEach(content.document.media) { attachment in
-                    NativeContentAttachmentView(session: session, destination: session.destination, baseURL: baseURL, accountId: viewerAccountId, creatorId: creatorId, objectId: content.id, contentKind: content.document.kind, creatorName: content.creatorName, attachment: attachment)
+                    NativeContentAttachmentView(session: session, destination: destination, baseURL: baseURL, accountId: viewerAccountId, creatorId: creatorId, objectId: content.id, contentKind: content.document.kind, creatorName: content.creatorName, attachment: attachment)
                         .id("\(viewerAccountId):\(content.id):\(content.version):\(attachment.id)")
                 }
             } else {
@@ -236,32 +249,52 @@ private struct ContentFanScreen: View {
         replyCursors = [nil]
         viewerAccountId = nil; muted = nil; replyText = ""; thanksText = ""; shareDigest = false; showIdentity = false; retryKeys = [:]
     }
+    private var originalViewCurrent: Bool {
+        active && scene == .active && session.destination == destination &&
+        session.session?.accountId == accountId && session.session?.sessionId == sessionId &&
+        !session.checkingSession && !session.busy && session.error.isEmpty &&
+        !session.purgingPrivateState && !session.localPurgeFailed
+    }
+    @MainActor private func captureClient() async throws -> ContentClient {
+        try Task.checkCancellation()
+        guard baseURL != nil, originalViewCurrent,
+              let original = await session.captureRequest(from: destination, maximumResponseBytes: 4_194_304, timeoutSeconds: 5),
+              original.expectedAccountId == accountId, original.sessionId == sessionId,
+              originalViewCurrent else {
+            throw ContentFailure(status: 503, code: "content_session_unconfigured")
+        }
+        return ContentClient(original: original)
+    }
     @MainActor private func load(refreshThanks: Bool = true) async {
         guard active, !Task.isCancelled, !loading else { return }; loading = true; defer { loading = false }
-        guard let baseURL else { suspendAccess(); error = QelvoraCopy.text("w5ContentRefreshUnavailable"); return }
+        guard baseURL != nil else { suspendAccess(); error = QelvoraCopy.text("w5ContentRefreshUnavailable"); return }
         let creatorId = self.creatorId, contentId = self.contentId
         let cycleStartedAt = ProcessInfo.processInfo.systemUptime
         loadGeneration+=1;let generation=loadGeneration
-        let client=ContentClient(baseURL:baseURL)
         do {
-            let before:ContentPreference=try await client.request(creatorId+"/mute")
+            let client = try await captureClient()
+            let before:ContentPreference=try await client.request(creatorId+"/mute", expectedAccountId: accountId)
+            guard before.accountId == accountId else { throw ContentFailure(status: 403, code: "content_account_changed") }
             var view:ContentViewValue?;var statuses:[String]=[]
             do {view=try await client.request(creatorId+"/"+contentId, expectedAccountId: before.accountId)} catch {
+                if error is CancellationError { throw error }
                 if let failure=error as? ContentFailure, failure.status==401 || failure.accountChanged {throw error}
                 statuses.append(contentFailureCopy(error))
             }
             let cursor = before.accountId == viewerAccountId ? replyCursors.last ?? nil : nil
             var page:ContentReplyPage?;var currentReplies:[ContentReply]=[];var repliesAvailable=false
             do {
-                let query = "contentId=" + contentId + (cursor.map { "&cursor=" + $0 } ?? "")
-                let fresh:ContentReplyPage=try await client.request(creatorId+"/replies?"+query, expectedAccountId: before.accountId)
+                let query = [URLQueryItem(name: "contentId", value: contentId)] + (cursor.map { [URLQueryItem(name: "cursor", value: $0)] } ?? [])
+                let fresh:ContentReplyPage=try await client.request(creatorId+"/replies", expectedAccountId: before.accountId, query: query)
                 page=fresh;currentReplies=fresh.items;repliesAvailable=true
             } catch {
+                if error is CancellationError { throw error }
                 if (error as? ContentFailure)?.authorityDenied == true {throw error}
                 statuses.append("Private replies are unavailable. Refresh to try again.")
             }
             var mine:ContentThanks?;var thanksAvailable=false
-            do {mine=try await client.request(creatorId+"/thanks?targetKind=content&targetId="+contentId, expectedAccountId: before.accountId);thanksAvailable=true} catch {
+            do {mine=try await client.request(creatorId+"/thanks", expectedAccountId: before.accountId, query: [URLQueryItem(name: "targetKind", value: "content"), URLQueryItem(name: "targetId", value: contentId)]);thanksAvailable=true} catch {
+                if error is CancellationError { throw error }
                 if (error as? ContentFailure)?.authorityDenied == true {throw error}
                 statuses.append("Thanks is unavailable. Your input is kept; refresh before saving.")
             }
@@ -271,11 +304,12 @@ private struct ContentFanScreen: View {
                 try current.validate(accountId: before.accountId, creatorId: creatorId)
                 policy = current
             } catch {
+                if error is CancellationError { throw error }
                 if (error as? ContentFailure)?.authorityDenied == true { throw error }
                 statuses.append(QelvoraCopy.text("contentReplyPolicyUnavailable"))
             }
             let after:ContentPreference=try await client.request(creatorId+"/mute", expectedAccountId: before.accountId)
-            guard active, !Task.isCancelled, generation==loadGeneration else{return}
+            guard active, !Task.isCancelled, generation==loadGeneration, originalViewCurrent, await client.isCurrent() else{return}
             guard before.accountId==after.accountId else {clearAuthority();self.error=QelvoraCopy.text("w5ContentAccountChanged");return}
             let changed=viewerAccountId != before.accountId
             if changed {replyText="";thanksText="";shareDigest=false;showIdentity=false;retryKeys=[:];signature=nil;replyCursors=[nil]}
@@ -292,22 +326,35 @@ private struct ContentFanScreen: View {
         }
     }
     @MainActor private func mutate(_ path: String, _ body: [String: Any]) async -> Bool {
-        guard !busy, currentAccess, let baseURL,let viewerAccountId else { return false }; busy = true; defer { busy = false }
+        guard !busy, currentAccess, originalViewCurrent, ProcessInfo.processInfo.systemUptime - checkedAt < 5, let viewerAccountId, viewerAccountId == accountId else { return false }; busy = true; defer { busy = false }
         var command=body
         var fingerprint:String?
         if command["idempotencyKey"] != nil {
             command.removeValue(forKey:"idempotencyKey")
-            if let data=try? JSONSerialization.data(withJSONObject:command,options:.sortedKeys),let json=String(data:data,encoding:.utf8) { fingerprint=path+json;command["idempotencyKey"]=retryKeys[fingerprint!] ?? UUID().uuidString;retryKeys[fingerprint!]=command["idempotencyKey"] as? String }
+            if let data=try? JSONSerialization.data(withJSONObject:command,options:.sortedKeys),let json=String(data:data,encoding:.utf8) { fingerprint=accountId+":"+sessionId+":"+path+json;command["idempotencyKey"]=retryKeys[fingerprint!] ?? UUID().uuidString;retryKeys[fingerprint!]=command["idempotencyKey"] as? String }
         }
-        do { let _: ContentReceipt = try await ContentClient(baseURL: baseURL).request(creatorId + "/" + path, body: JSONSerialization.data(withJSONObject: command), expectedAccountId:viewerAccountId); if let fingerprint { retryKeys.removeValue(forKey:fingerprint) }; error = ""; return true }
-        catch { if let fingerprint,let failure=error as? ContentFailure,failure.status>=400 && failure.status<500 { retryKeys.removeValue(forKey:fingerprint) }; if (error as? ContentFailure)?.authorityDenied == true { clearAuthority() }; self.error = contentFailureCopy(error, action: true); return false }
+        do {
+            let client = try await captureClient()
+            let _: ContentReceipt = try await client.request(creatorId + "/" + path, body: JSONSerialization.data(withJSONObject: command), expectedAccountId:viewerAccountId)
+            guard originalViewCurrent, await client.isCurrent() else { return false }
+            if let fingerprint { retryKeys.removeValue(forKey:fingerprint) }; error = ""; return true
+        } catch {
+            guard active, !Task.isCancelled else { return false }
+            if error is CancellationError { suspendAccess(); return false }
+            if let fingerprint,let failure=error as? ContentFailure,failure.status>=400 && failure.status<500 { retryKeys.removeValue(forKey:fingerprint) }
+            if (error as? ContentFailure)?.authorityDenied == true { clearAuthority() }
+            self.error = contentFailureCopy(error, action: true); return false
+        }
     }
-    @MainActor private func sendReply() async { guard replyAccess, replyText.trimmingCharacters(in: .whitespacesAndNewlines).utf16.count <= replyLimit else {return}; if await mutate(contentId + "/replies", ["text": replyText, "idempotencyKey": UUID().uuidString]) { replyText = ""; await load(refreshThanks: false) } }
+    @MainActor private func sendReply() async { guard replyAccess, replyText.trimmingCharacters(in: .whitespacesAndNewlines).utf16.count <= replyLimit else {return}; let originalText = replyText; if await mutate(contentId + "/replies", ["text": originalText, "idempotencyKey": UUID().uuidString]) { if replyText == originalText { replyText = "" }; await load(refreshThanks: false) } }
     @MainActor private func withdraw(_ reply:ContentReply) async { if await mutate("replies/"+reply.id+"/withdraw",["version":reply.version,"idempotencyKey":UUID().uuidString]) { await load(refreshThanks:false) } }
     @MainActor private func consent(_ reply: ContentReply, text: Bool, handle: Bool) async { if await mutate("replies/" + reply.id + "/consent", ["version": reply.consent.version, "shareText": text, "showHandle": handle, "idempotencyKey": UUID().uuidString]) { await load(refreshThanks: false) } }
     @MainActor private func saveThanks(withdraw: Bool) async {
         guard thanksAccess else {return}
-        if await mutate("thanks", ["targetKind": "content", "targetId": contentId, "text": withdraw ? "" : thanksText, "shareWithCreatorDigest": !withdraw && shareDigest, "showIdentity": !withdraw && showIdentity, "withdrawn": withdraw, "expectedVersion": thanks?.version ?? 0, "idempotencyKey": UUID().uuidString]) { await load() }
+        let originalText = thanksText, originalShare = shareDigest, originalIdentity = showIdentity
+        if await mutate("thanks", ["targetKind": "content", "targetId": contentId, "text": withdraw ? "" : originalText, "shareWithCreatorDigest": !withdraw && originalShare, "showIdentity": !withdraw && originalIdentity, "withdrawn": withdraw, "expectedVersion": thanks?.version ?? 0, "idempotencyKey": UUID().uuidString]) {
+            await load(refreshThanks: thanksText == originalText && shareDigest == originalShare && showIdentity == originalIdentity)
+        }
     }
     @ViewBuilder private var replyPageControls: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -333,8 +380,15 @@ private struct ContentFanScreen: View {
         await load(refreshThanks: false)
     }
     @MainActor private func verify() async {
-        guard currentAccess, let signature, let api = session.api else { return }
-        do { let proof = try await api.publicSignature(signedActId: signature); guard self.signature == signature, currentAccess else { return }; signatureStatus = proof.creatorName + " · " + proof.status.rawValue.replacingOccurrences(of: "_", with: " ") + "\n" + proof.explanation }
-        catch { guard self.signature == signature, currentAccess else { return }; signatureStatus = "This signature is private or unavailable. Current content access does not grant public verification access." }
+        guard currentAccess, originalViewCurrent, let signature else { return }
+        do {
+            let api = try await captureClient()
+            let proof = try await api.original.client.publicSignature(signedActId: signature)
+            guard self.signature == signature, currentAccess, originalViewCurrent, await api.isCurrent() else { return }
+            signatureStatus = proof.creatorName + " · " + proof.status.rawValue.replacingOccurrences(of: "_", with: " ") + "\n" + proof.explanation
+        } catch {
+            guard !Task.isCancelled, self.signature == signature, currentAccess, originalViewCurrent else { return }
+            signatureStatus = "This signature is private or unavailable. Current content access does not grant public verification access."
+        }
     }
 }
