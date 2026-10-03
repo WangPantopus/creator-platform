@@ -1,3 +1,9 @@
+### Independent interactive viewer and actual0200 review — October 3, 2026 UTC
+
+Personally qualified unchanged0178/0199/0202 with W8's actual0200 on the closed canonical61 copy: six actual PL functions/cleanup compile cleanly;12 real permission/policy/function/role drifts and five unregistered/ACL refusals restore; NULL returns unavailable. All six custody fingerprints match with no fabricated ledger/scope/business rows. Logical-name owner catalogues and61 purpose pins are independently requalified. The actual W4 guard requires executable registration and calls the real W8 producer guard for the exact200 extension; its own factory metadata review rolls back. Canonical runtime still refuses503, with61 ledger/login unchanged.
+
+Backend build/types/scoped lint/format/diff pass; full operator JSON stays private. Actual issuer/callback/positive viewing, W5 final permissions/signatures/source and finite C10 remain open. [Personal source qualification and limits](../../../artifacts/workstreams/W4/runtime/2026-10-03/fulfillment-view-denial/README.md). All nine packages and R01–R15 remain incomplete.
+
 ### Current audience composition and actual0211 caller review — October 3, 2026 UTC
 
 The W4 audience factory retains its original canonical host Pool, requires the exact executable in W1's real consumer registry and exposes assertComposition(identity, hostPool) for exact same-object composition. Personally reviewed W2 published2a093f82's fixed NOLOGIN metadata caller; only that exact caller is added to the original ACL/unsafe-role checks. Original0182 SQL/function bytes remain unchanged, and unknown function/table/column/PUBLIC privileges still refuse.
