@@ -1,5 +1,24 @@
 # W6 browser recording signature lifetime — October 3, 2026 UTC
 
+## Retained PR289 reconciliation — 18:12 UTC
+
+Product1cad1cdcc7f2e2ca9a7cba12732a89c142cab5f4 normally incorporates the complete
+W1b0c15d51 producer/consumer graph. The two original identity files were byte-
+identical to the pre-reconciliation282 versions; W6 retained the fully reviewed
+canonical boundary and namespace guard at both conflicts. Unique SignRecording
+source remains unchanged. This replaces obsolete literal cross-tab ending and
+ordinary-disposal cleanup, preserving newer-session identical values.
+
+Current combined web types and all13 merged app-path lint/format/diff pass.
+Backend tree is byte-identical to checked calls producta257e331; no new backend
+acceptance is inferred. No new shipping build/install/runtime operation exists.
+Old c194 build and earlier actual entry/cancellation receipts below retain their
+own pins. Existing289 is stacked on296, with prerequisite qualification and
+current combined shipping/E2E/CI pending. A genuine human ready recording is
+absent, so the changed signer, accepted passkey, uncertain-act retry and actual
+publication/playback remain unoperated. All W6 resources stay closed; no new
+tests, synthetic human audio, sample key or authority/purpose activation.
+
 ## Current original-session consumer integration — 13:22 UTC
 
 W6 personally read W1's exact original69 and focused producer
