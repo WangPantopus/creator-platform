@@ -13,7 +13,7 @@ export class GrowthActionError extends Error {
   }
 }
 
-/** Private Growth forms use W1's actual issued session lifetime. The account
+/** Private Growth forms use W1's actual issued session lifetime. Account/session
  * headers are mismatch preconditions; the server still resolves authority. */
 export function useGrowthSession() {
   const identity = useIdentityRequest();
