@@ -81,6 +81,17 @@ async function bridge(
       );
     }
   }
+  const expectedSession = request.headers.get("X-Expected-Session-Id");
+  if (expectedSession && expectedSession !== session?.sessionId)
+    return Response.json(
+      {
+        error: {
+          code: "session_view_changed",
+          message: "Your session changed. Reopen Studio before continuing.",
+        },
+      },
+      { status: 409 },
+    );
   const creatorId = development
     ? process.env.W2_CREATOR_ID
     : session?.creator?.id;
@@ -193,6 +204,9 @@ async function bridge(
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
           ...(accountId ? { "X-Expected-Account-Id": accountId } : {}),
+          ...(expectedSession
+            ? { "X-Expected-Session-Id": expectedSession }
+            : {}),
           ...(request.headers.get("Idempotency-Key")
             ? { "Idempotency-Key": request.headers.get("Idempotency-Key")! }
             : {}),
