@@ -31,7 +31,12 @@ import {
   StudioTabBar,
 } from "@qelvora/ui-web";
 import type { SignedActCommand } from "@qelvora/api";
-import { validReturnTarget, MessageSchema, DoneSchema } from "@qelvora/api";
+import {
+  validReturnTarget,
+  MessageSchema,
+  DoneSchema,
+  TeamRolesUpdateInputSchema,
+} from "@qelvora/api";
 import type {
   ContentBody,
   ContentView,
@@ -3138,6 +3143,9 @@ function Team({
     action = useAction();
   const mounted = useRef(false),
     previousFocus = useRef<HTMLElement | null>(null),
+    roleTrigger = useRef<HTMLButtonElement | null>(null),
+    roleReturn = useRef(false),
+    teamRefresh = useRef<HTMLButtonElement | null>(null),
     generation = useRef(0),
     checkedUntil = useRef(0),
     request = useRef<AbortController | null>(null);
@@ -3229,6 +3237,23 @@ function Team({
       previousFocus.current.focus();
   }, [teamCurrent, suspended]);
   const { request: identityRequest, session } = useIdentityRequest();
+  useEffect(() => {
+    if (
+      roleReturn.current &&
+      !roleEdit &&
+      teamCurrent &&
+      !action.busy &&
+      !reading &&
+      !suspended &&
+      !document.hidden
+    ) {
+      roleReturn.current = false;
+      const target = roleTrigger.current?.isConnected
+        ? roleTrigger.current
+        : teamRefresh.current;
+      target?.focus();
+    }
+  }, [roleEdit, teamCurrent, suspended, action.busy, reading]);
   const requireManagement = () => {
     if (
       !creator.owned ||
@@ -3306,12 +3331,19 @@ function Team({
         "Check this member's current roles and review them before saving.",
       );
     try {
+      const command = TeamRolesUpdateInputSchema.safeParse({
+        expectedRoles: reviewed.expectedRoles,
+        roles: reviewed.roles,
+      });
+      if (!command.success)
+        throw new StudioFailure(
+          409,
+          "team_roles_changed",
+          "The reviewed role set is unavailable. Refresh and review this member again.",
+        );
       const result = await identity(
         `${creator.id}/team/${reviewed.accountId}/roles`,
-        {
-          expectedRoles: reviewed.expectedRoles,
-          roles: reviewed.roles,
-        },
+        command.data,
       );
       if (!DoneSchema.safeParse(result).success)
         throw new StudioFailure(
@@ -3319,6 +3351,7 @@ function Team({
           "response_unknown",
           "The role-change response was interrupted. Check the current team or retry this exact change.",
         );
+      roleReturn.current = true;
       setRoleEdit(null);
       action.setNotice("Role change saved. Current access is being checked.");
     } catch (failure) {
@@ -3337,6 +3370,7 @@ function Team({
       <header className="w5-heading">
         <h1>Team</h1>
         <button
+          ref={teamRefresh}
           type="button"
           className="qv-btn qv-btn--secondary"
           disabled={reading || action.busy}
@@ -3371,15 +3405,17 @@ function Team({
                 <div className="w5-actions">
                   <button
                     className="qv-btn qv-btn--secondary"
+                    aria-label={`Edit roles for ${m.handle ? `@${m.handle}` : m.account_id}`}
                     disabled={
                       action.busy ||
                       reading ||
                       Boolean(roleEdit) ||
                       creator.verification !== "verified"
                     }
-                    onClick={() =>
+                    onClick={(event) =>
                       void action.run(async () => {
                         requireManagement();
+                        roleTrigger.current = event.currentTarget;
                         setRoleEdit({
                           accountId: m.account_id,
                           label: m.handle ? `@${m.handle}` : m.account_id,
@@ -3503,6 +3539,7 @@ function Team({
                 <button
                   className="qv-btn qv-btn--quiet"
                   onClick={() => {
+                    roleReturn.current = true;
                     setRoleEdit(null);
                     setTeamCurrent(false);
                     void load();
