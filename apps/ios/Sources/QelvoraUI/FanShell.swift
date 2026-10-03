@@ -236,7 +236,9 @@ public final class FanSession: ObservableObject {
             let identityClient = CreatorAPIClient(baseURL: baseURL, session: URLSession(configuration: configuration), maximumResponseBytes: 65_536, timeoutSeconds: 4, token: { token })
             let value = try await identityClient.identitySession()
             guard current == generation, !Task.isCancelled else { return }
-            guard try await storage.read() == token else {
+            let observedCredential = try await storage.read()
+            guard current == generation, !Task.isCancelled else { return }
+            guard observedCredential == token else {
                 confirmedCredential = nil; session = nil
                 error = "Your session changed. Refresh your account before continuing."
                 return
@@ -250,8 +252,10 @@ public final class FanSession: ObservableObject {
             #endif
         } catch let failure as CreatorAPIError {
             guard current == generation, !Task.isCancelled else { return }
+            let observedCredential = try? await storage.read()
+            guard current == generation, !Task.isCancelled else { return }
             confirmedCredential = nil
-            guard (try? await storage.read()) == token else {
+            guard observedCredential == token else {
                 session = nil; error = "Your session changed. Refresh your account before continuing."; return
             }
             if failure.status == 401 {
