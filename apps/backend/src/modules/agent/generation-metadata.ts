@@ -87,6 +87,10 @@ export class PreparedGenerationAgentMetadata {
     );
     input.identity.assertPool(input.workerPool);
     input.inputs.assertHostPool(input.service.repository.pool);
+    input.audience.assertComposition(
+      input.identity,
+      input.service.repository.pool,
+    );
     const receipt = Object.freeze({
       ...input.consumer,
       migration: Object.freeze({ ...input.consumer.migration }),

@@ -55,6 +55,18 @@ export type GenerationProviderAttempt = Readonly<{
 }>;
 type Admitted = Readonly<{ id: string }>;
 type Category = "reply" | "guardrail" | "memory";
+/** Nonsecret reference to one actually committed original provider admission.
+ * Its private WeakMap binding, never these copied fields, supplies provenance. */
+export type GenerationProviderCall = Readonly<{
+  usageId: string;
+  generationId: string;
+  workerToken: string;
+  modelFingerprint: string;
+}>;
+export type GenerationAdmissionBookend = (
+  client: PoolClient,
+  scope: GenerationTaskScope,
+) => Promise<void>;
 
 /** Accounting consumer only. It does not supply terminal/output/memory write
  * permission or enable a host without the actual W1/W3/W4 terminal composition.
@@ -62,6 +74,10 @@ type Category = "reply" | "guardrail" | "memory";
  */
 export class PreparedGenerationProviderAccounting {
   private readonly attempts = new WeakSet<GenerationProviderAttempt>();
+  private readonly calls = new WeakMap<
+    GenerationProviderCall,
+    GenerationProviderAttempt
+  >();
   private readonly admissions = new WeakMap<
     Admitted,
     {
@@ -338,6 +354,60 @@ export class PreparedGenerationProviderAccounting {
     };
   }
 
+  private issuedCall(
+    admitted: Admitted,
+    task: GenerationTask,
+    attempt: GenerationProviderAttempt,
+  ): GenerationProviderCall {
+    const call = Object.freeze({
+      usageId: admitted.id,
+      generationId: task.generationId,
+      workerToken: task.workerToken,
+      modelFingerprint: this.model.fingerprint,
+    });
+    this.calls.set(call, attempt);
+    return call;
+  }
+
+  assertCall(
+    call: GenerationProviderCall,
+    attempt: GenerationProviderAttempt,
+    task: GenerationTask,
+  ): void {
+    invariant(
+      this.calls.get(call) === attempt &&
+        this.attempts.has(attempt) &&
+        call.generationId === task.generationId &&
+        call.workerToken === task.workerToken &&
+        attempt.generationId === task.generationId &&
+        attempt.workerToken === task.workerToken &&
+        attempt.creatorId === task.creatorId &&
+        call.modelFingerprint === this.model.fingerprint &&
+        attempt.modelFingerprint === this.model.fingerprint,
+      "generation_provider_call_required",
+      "Use the original privately issued committed provider admission.",
+    );
+  }
+
+  private async admit(
+    task: GenerationTask,
+    attempt: GenerationProviderAttempt,
+    category: Category,
+    bookend?: GenerationAdmissionBookend,
+  ): Promise<Admitted> {
+    return this.identity.withGeneration(task, async (client, scope) => {
+      await bookend?.(client, scope);
+      const admitted = await this.openInTransaction(
+        client,
+        scope,
+        attempt,
+        category,
+      );
+      await bookend?.(client, scope);
+      return admitted;
+    });
+  }
+
   private async finish(admitted: Admitted, usage: Usage): Promise<void> {
     const custody = this.admissions.get(admitted);
     invariant(
@@ -414,13 +484,14 @@ export class PreparedGenerationProviderAccounting {
     category: Category,
     signal: AbortSignal,
     call: () => Promise<T>,
+    bookend?: GenerationAdmissionBookend,
+    onAdmission?: (call: GenerationProviderCall) => void,
   ): Promise<T> {
     signal.throwIfAborted();
-    const admitted = await this.identity.withGeneration(task, (client, scope) =>
-      this.openInTransaction(client, scope, attempt, category),
-    );
+    const admitted = await this.admit(task, attempt, category, bookend);
     let usage = this.unknownUsage();
     try {
+      onAdmission?.(this.issuedCall(admitted, task, attempt));
       signal.throwIfAborted();
       const result = await call();
       usage = result.usage;
@@ -440,13 +511,14 @@ export class PreparedGenerationProviderAccounting {
     attempt: GenerationProviderAttempt,
     signal: AbortSignal,
     call: () => AsyncIterable<StreamProposal>,
+    bookend?: GenerationAdmissionBookend,
+    onAdmission?: (call: GenerationProviderCall) => void,
   ): AsyncIterable<StreamProposal> {
     signal.throwIfAborted();
-    const admitted = await this.identity.withGeneration(task, (client, scope) =>
-      this.openInTransaction(client, scope, attempt, "reply"),
-    );
+    const admitted = await this.admit(task, attempt, "reply", bookend);
     let usage = this.unknownUsage();
     try {
+      onAdmission?.(this.issuedCall(admitted, task, attempt));
       signal.throwIfAborted();
       for await (const proposal of call()) {
         if ("usage" in proposal) usage = proposal.usage;

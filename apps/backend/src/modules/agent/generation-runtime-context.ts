@@ -4,6 +4,7 @@ import { z } from "zod";
 import {
   AgentAudience,
   DraftConfig,
+  type Usage,
 } from "../../../../../packages/api/src/agent/contracts.js";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
@@ -18,6 +19,7 @@ import { PreparedGenerationAgentInputs } from "./generation-inputs.js";
 import {
   PreparedGenerationProviderAccounting,
   type GenerationProviderAttempt,
+  type GenerationAdmissionBookend,
 } from "./generation-provider-usage.js";
 import type { AgentModel } from "./model.js";
 import { compile } from "./pipeline.js";
@@ -92,6 +94,8 @@ export class PreparedGenerationRuntimeContext {
       acceptedHash: string;
       sourceMessageId: string;
       compiledHash: string;
+      attempt: GenerationProviderAttempt;
+      usage: Usage;
     }
   >();
   private readonly issued = new WeakMap<
@@ -112,6 +116,24 @@ export class PreparedGenerationRuntimeContext {
     private readonly accounting: PreparedGenerationProviderAccounting,
     private readonly custody: GenerationConsumerCustody,
   ) {}
+
+  assertComposition(input: {
+    identity: GenerationIdentityAuthority;
+    service: AgentService;
+    inputs: PreparedGenerationAgentInputs;
+    context: PreparedGenerationConversationContext;
+    accounting: PreparedGenerationProviderAccounting;
+  }): void {
+    invariant(
+      input.identity === this.identity &&
+        input.service === this.service &&
+        input.inputs === this.inputs &&
+        input.context === this.context &&
+        input.accounting === this.accounting,
+      "generation_retrieval_composition_mismatch",
+      "Use this retrieval consumer's actual canonical producers.",
+    );
+  }
 
   static async prepare(input: {
     identity: GenerationIdentityAuthority;
@@ -233,6 +255,7 @@ export class PreparedGenerationRuntimeContext {
     task: GenerationTask,
     attempt: GenerationProviderAttempt,
     signal: AbortSignal,
+    bookend?: GenerationAdmissionBookend,
   ): Promise<GenerationQueryEmbedding> {
     const accepted = await this.identity.withGeneration(
       task,
@@ -262,6 +285,7 @@ export class PreparedGenerationRuntimeContext {
       "reply",
       signal,
       () => this.model.embed([accepted.text], signal),
+      bookend,
     );
     const vector = z
       .array(z.array(z.number().finite()).min(16).max(4096))
@@ -276,8 +300,29 @@ export class PreparedGenerationRuntimeContext {
       acceptedHash: accepted.acceptedHash,
       sourceMessageId: accepted.sourceMessageId,
       compiledHash: accepted.compiledHash,
+      attempt,
+      usage: Object.freeze({ ...result.usage }),
     });
     return embedding;
+  }
+
+  embeddingUsage(
+    embedding: GenerationQueryEmbedding,
+    task: GenerationTask,
+    attempt: GenerationProviderAttempt,
+  ): Usage {
+    const query = this.embeddings.get(embedding);
+    invariant(
+      query?.attempt === attempt &&
+        embedding.generationId === task.generationId &&
+        embedding.workerToken === task.workerToken &&
+        query.sourceMessageId === task.fanMessageId &&
+        query.compiledHash === attempt.compiledHash,
+      "generation_query_embedding_required",
+      "Diagnostic usage requires this actual turn's original issued embedding.",
+    );
+    // Already durably charged. This copy is diagnostic, never another journal.
+    return { ...query.usage };
   }
 
   private async read(
