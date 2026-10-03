@@ -1,5 +1,11 @@
 # Actual terminal discovery/recovery and W3 context boundary — October 3, 2026 UTC
 
+## Original terminal cancellation context — October 3, 2026, 22:42 UTC
+
+The existing PR consumes W1's actual terminal owner from `188bbf07da76d285ec8061932f20cf9ff8a03b72` byte-exact. Its synchronous getter requires the genuine issued terminal scope and the same original client, and returns only the optional original signal. W4 checks that signal before and after each complete awaited terminal authorization, journal seal/currentness check, catalogue operation and financial SQL query in settlement and final receipt verification. Startup preparation has no issued terminal scope and remains outside this signal path.
+
+TypeScript, scoped lint/format, diff checks and all nine unchanged backend contracts pass. These checks establish source compatibility only. The complete callback is awaited; no whole-callback deadline or stalled external operation is qualified. All financial SQL, source/catalogue pins, journal/receipt ordering and W1's restoration, cleanup and sole COMMIT remain unchanged. No genuine positive terminal, provider, financial, C10 or activation acceptance follows from this source repair. The PR remains draft.
+
 ## Existing PR review: actual W5 profile source and sequence ACL reuse
 
 Current247 normally includes reviewed main `72d0a557360a381b765cee98f96b3bbe3ee99588`, which retains W2's distinct0223 and W5's separate0224 as reserved/unapplied. W4 consumes all five actual W5 source files byte-identical to `cf567643b3981fc77958c201ef545c5bd95f74b5`: origin/profile guard, integration export, shared optional finite metadata read budget, and original09d3df2f policy SQL. The genuine W5 preparation requires the issuer-registered consumer, independent restrictive-expression/effective-catalogue receipts and its original held client; both read bookends repeat the bounded owner metadata check and preserve identity LAST. The shared catalogue option leaves existing caller defaults and metadata fields unchanged. W4 adds the actual W5 source dependency to its existing complete guard, preserving all original SQL and absent complete acceptance pins.
