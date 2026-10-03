@@ -222,8 +222,8 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                             asset.purpose == APIMediaMediaAssetPurpose.HUMAN_REPLY &&
                             message.authorKind == APIMessageAuthorKind.HUMAN_CREATOR && message.signedActId != null &&
                             asset.signedActId == message.signedActId) {
-                            ConversationRecordingPlayer(baseURL, accountId, creatorId, fanId, asset, current.creatorName, message.createdAt,
-                                active = foreground && !privacy && source == null, token = session::currentToken,
+                            ConversationRecordingPlayer(baseURL, session, session.destination, accountId, creatorId, fanId, asset, current.creatorName, message.createdAt,
+                                active = foreground && !privacy && source == null,
                                 onVerify = { session.open("/verify/${message.signedActId}") })
                         } else {
                             BasicText(message.authorLabel(current.creatorName), style = qText("label").copy(color = qColor("ink")))
