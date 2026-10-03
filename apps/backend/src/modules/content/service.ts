@@ -21,6 +21,7 @@ import {
 import type { Actor } from "../identity/adapter.js";
 import { identityTransaction } from "../identity/transaction.js";
 import { assertCurrentSession } from "../identity/request-authority.js";
+import { withRequestContextRestore } from "../identity/request-context.js";
 import {
   consumeCreatorSignedAct,
   setSignatureVisibility,
@@ -440,17 +441,17 @@ export class ContentService {
     await client.query("SELECT set_config('app.account_id',$1,true)", [
       owner.account_id,
     ]);
-    let currentCreator;
-    try {
-      currentCreator = await client.query(
-        "SELECT 1 FROM creator.creator_profile WHERE id=$1 AND account_id=$2 AND verification='verified' AND NOT recovery_required FOR SHARE",
-        [creatorId, owner.account_id],
-      );
-    } finally {
-      await client.query("SELECT set_config('app.account_id',$1,true)", [
-        actor.accountId,
-      ]);
-    }
+    const currentCreator = await withRequestContextRestore(
+      () =>
+        client.query(
+          "SELECT 1 FROM creator.creator_profile WHERE id=$1 AND account_id=$2 AND verification='verified' AND NOT recovery_required FOR SHARE",
+          [creatorId, owner.account_id],
+        ),
+      () =>
+        client.query("SELECT set_config('app.account_id',$1,true)", [
+          actor.accountId,
+        ]),
+    );
     invariant(
       currentCreator.rowCount === 1,
       "creator_role_required",
