@@ -117,6 +117,7 @@ export async function mediaRequest<T>(
     const error = (await response.json().catch(() => null)) as {
       error?: { message?: string; code?: string };
     } | null;
+    signal?.throwIfAborted();
     if (
       response.status === 409 &&
       error?.error?.code === "session_account_changed"

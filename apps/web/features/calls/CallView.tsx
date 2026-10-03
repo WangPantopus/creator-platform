@@ -2,27 +2,63 @@
 import { copy, formatCopy } from "@qelvora/copy";
 import { useEffect, useRef, useState } from "react";
 import { CallChip, Countdown } from "@qelvora/ui-web";
-import type {
-  CallSession,
-  CallConsentPurpose,
+import {
+  CallSessionSchema,
+  CallAdmissionSchema,
+  AdmissionReceiptSchema,
+  type CallSession,
+  type CallConsentPurpose,
 } from "../../../../packages/api/src/session";
 import { mediaRequest, MediaRequestError } from "../media/api";
+import { useIdentityRequest } from "../identity/session-boundary";
 import { webCallTransport, type WebCallTransport } from "./transport";
 import "../media/media.css";
 
 const clock = (ms: number) =>
   `${String(Math.floor(ms / 60_000)).padStart(2, "0")}:${String(Math.floor(ms / 1000) % 60).padStart(2, "0")}`;
-export function CallView({
-  creatorId,
-  fanId,
-  sessionId,
-  actorAccountId,
-}: {
+type CallViewProps = {
   creatorId: string;
   fanId: string;
   sessionId: string;
   actorAccountId: string | null;
-}) {
+};
+export function CallView(props: CallViewProps) {
+  const identity = useIdentityRequest();
+  const boundary = useRef({ signal: identity.signal, revision: 0 });
+  const [restored, setRestored] = useState(0);
+  if (boundary.current.signal !== identity.signal) {
+    boundary.current = {
+      signal: identity.signal,
+      revision: boundary.current.revision + 1,
+    };
+  }
+  useEffect(() => {
+    const restore = (event: PageTransitionEvent) => {
+      if (event.persisted) setRestored((value) => value + 1);
+    };
+    window.addEventListener("pageshow", restore);
+    return () => window.removeEventListener("pageshow", restore);
+  }, []);
+  return (
+    <CallSessionView
+      key={`${identity.session.accountId}/${identity.session.sessionId}/${boundary.current.revision}/${restored}/${props.actorAccountId}/${props.creatorId}/${props.fanId}/${props.sessionId}`}
+      {...props}
+    />
+  );
+}
+function CallSessionView({
+  creatorId,
+  fanId,
+  sessionId,
+  actorAccountId,
+}: CallViewProps) {
+  const identity = useIdentityRequest();
+  const opening = useRef(identity).current;
+  const lifetime = useRef<AbortController | null>(null);
+  const mutation = useRef<AbortController | null>(null);
+  const projection = useRef<CallSession | null>(null);
+  const changingMedia = useRef(false);
+  const joining = useRef(false);
   const root = `threads/${creatorId}/${fanId}/calls/${sessionId}`;
   const [session, setSession] = useState<CallSession | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -56,6 +92,86 @@ export function CallView({
     setRemoteMedia(null);
     setLocalState("disconnected");
   }
+  function currentView(owner = lifetime.current) {
+    return (
+      owner !== null &&
+      owner === lifetime.current &&
+      !owner.signal.aborted &&
+      !opening.signal.aborted &&
+      opening.session.accountId === actorAccountId
+    );
+  }
+  async function callRequest(path: string, init: RequestInit = {}) {
+    const owner = lifetime.current;
+    if (!currentView(owner))
+      throw new DOMException("Call view ended", "AbortError");
+    const signal = AbortSignal.any([
+      owner!.signal,
+      opening.signal,
+      AbortSignal.timeout(10_000),
+      ...(init.signal ? [init.signal] : []),
+    ]);
+    const result = await mediaRequest<unknown>(path, {
+      ...init,
+      expectedAccountId: opening.session.accountId,
+      signal,
+    });
+    signal.throwIfAborted();
+    if (!currentView(owner))
+      throw new DOMException("Call view ended", "AbortError");
+    return result;
+  }
+  function adoptSession(input: unknown) {
+    if (!currentView()) throw new DOMException("Call view ended", "AbortError");
+    const value = CallSessionSchema.parse(input);
+    const prior = projection.current;
+    if (
+      value.id !== sessionId ||
+      value.creatorId !== creatorId ||
+      value.fanId !== fanId ||
+      ![value.creatorAccountId, value.fanAccountId].includes(
+        opening.session.accountId,
+      ) ||
+      (prior &&
+        (prior.commitmentId !== value.commitmentId ||
+          prior.threadId !== value.threadId ||
+          prior.creatorAccountId !== value.creatorAccountId ||
+          prior.fanAccountId !== value.fanAccountId))
+    )
+      throw new Error(
+        copy.w6ThisActionCouldNotCompleteRefreshTheCallBeforeTrying,
+      );
+    if (
+      prior &&
+      (prior.version > value.version ||
+        (prior.version === value.version &&
+          Date.parse(prior.serverNow) > Date.parse(value.serverNow)))
+    ) {
+      setSession(prior);
+      return prior;
+    }
+    projection.current = value;
+    setSession(value);
+    return value;
+  }
+  useEffect(() => {
+    const owner = new AbortController();
+    lifetime.current = owner;
+    const close = () => {
+      owner.abort();
+      mutation.current?.abort();
+      disconnectMedia();
+    };
+    window.addEventListener("pagehide", close);
+    opening.signal.addEventListener("abort", close);
+    if (opening.signal.aborted) close();
+    return () => {
+      window.removeEventListener("pagehide", close);
+      opening.signal.removeEventListener("abort", close);
+      close();
+      if (lifetime.current === owner) lifetime.current = null;
+    };
+  }, []);
   const connected =
     session?.state === "connected" && localState === "connected";
   useEffect(() => {
@@ -85,23 +201,18 @@ export function CallView({
       fetching = true;
       setRefreshing(true);
       try {
-        const value = await mediaRequest<CallSession>(root, {
-          expectedAccountId: actorAccountId ?? undefined,
+        const result = await callRequest(root, {
           signal: controller.signal,
         });
-        if (active) {
-          setSession((prior) =>
-            prior && prior.id === value.id && prior.version > value.version
-              ? prior
-              : value,
-          );
+        if (active && currentView()) {
+          const value = adoptSession(result);
           setStale(false);
           setFetchError(null);
           // Receipts may still gain a reconciled outcome/summary after closure.
           delay = ["ended", "cancelled"].includes(value.state) ? 30000 : 1000;
         }
       } catch (e) {
-        if (active) {
+        if (active && currentView()) {
           if (
             e instanceof MediaRequestError &&
             [401, 403, 404, 409].includes(e.status)
@@ -136,7 +247,7 @@ export function CallView({
         }
       } finally {
         fetching = false;
-        if (active) {
+        if (active && currentView()) {
           setRefreshing(false);
           if (retry) timer = setTimeout(() => void refresh(), delay);
         }
@@ -164,9 +275,13 @@ export function CallView({
   }, [session?.state]);
   async function preflight() {
     if (
+      !currentView() ||
       !session ||
       !role ||
       busy ||
+      joining.current ||
+      changingMedia.current ||
+      mutation.current ||
       stale ||
       transport.current ||
       ["ending", "ended", "cancelled"].includes(session.state)
@@ -180,7 +295,7 @@ export function CallView({
         audio: true,
         video: session?.mediaMode === "video",
       });
-      if (epoch !== mediaEpoch.current) {
+      if (!currentView() || epoch !== mediaEpoch.current) {
         current.getTracks().forEach((track) => track.stop());
         return;
       }
@@ -189,7 +304,7 @@ export function CallView({
       setCamera(session?.mediaMode === "video");
       if (video.current) video.current.srcObject = current;
     } catch {
-      if (epoch !== mediaEpoch.current) return;
+      if (!currentView() || epoch !== mediaEpoch.current) return;
       setError(copy.w6CameraOrMicrophoneAccessIsOffOrUnavailableCheckYour);
     }
   }
@@ -198,7 +313,16 @@ export function CallView({
       video.current.srcObject = stream.current;
   }, [previewing]);
   async function join() {
-    if (!role || busy || stale) return;
+    if (
+      !currentView() ||
+      !role ||
+      busy ||
+      stale ||
+      joining.current ||
+      changingMedia.current ||
+      mutation.current
+    )
+      return;
     if (transport.current && localState !== "disconnected") return;
     setError(null);
     const adapter = webCallTransport();
@@ -206,43 +330,32 @@ export function CallView({
       setError(copy.w6CallingIsNotConnectedYetYourBookingIsUnchanged);
       return;
     }
+    joining.current = true;
     setBusy(true);
     const epoch = ++mediaEpoch.current;
     try {
-      const token = await mediaRequest<{
-        token: string;
-        url: string;
-        nonce: string;
-        sessionId: string;
-        accountId: string;
-        expiresAt: string;
-        role: "creator" | "fan";
-      }>(`${root}/join`, {
-        method: "POST",
-        body: "{}",
-        expectedAccountId: actorAccountId ?? undefined,
-      });
-      if (epoch !== mediaEpoch.current) return;
-      const nonce =
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
+      const token = CallAdmissionSchema.parse(
+        await callRequest(`${root}/join`, {
+          method: "POST",
+          body: "{}",
+        }),
+      );
+      if (!currentView() || epoch !== mediaEpoch.current) return;
       if (
         token.sessionId !== sessionId ||
         token.accountId !== actorAccountId ||
         token.role !== role ||
-        !nonce.test(token.nonce) ||
         !Number.isFinite(Date.parse(token.expiresAt)) ||
         Date.parse(token.expiresAt) <= Date.now()
       )
         throw new Error(copy.w6ConnectionFailedRejoinTheSameCall);
-      const admission = await mediaRequest<{ admitted: boolean }>(
-        `${root}/redeem`,
-        {
+      const admission = AdmissionReceiptSchema.parse(
+        await callRequest(`${root}/redeem`, {
           method: "POST",
           body: JSON.stringify({ nonce: token.nonce }),
-          expectedAccountId: actorAccountId ?? undefined,
-        },
+        }),
       );
-      if (epoch !== mediaEpoch.current) return;
+      if (!currentView() || epoch !== mediaEpoch.current) return;
       if (
         admission.admitted !== true ||
         Date.parse(token.expiresAt) <= Date.now()
@@ -254,16 +367,19 @@ export function CallView({
         microphone: stream.current,
         camera,
         onRemote: (value) => {
-          if (epoch === mediaEpoch.current) setRemoteMedia(value);
+          if (currentView() && epoch === mediaEpoch.current)
+            setRemoteMedia(value);
         },
         onState: (value) => {
-          if (epoch === mediaEpoch.current) setLocalState(value);
+          if (currentView() && epoch === mediaEpoch.current)
+            setLocalState(value);
         },
       });
-      if (epoch !== mediaEpoch.current) await adapter.disconnect();
+      if (!currentView() || epoch !== mediaEpoch.current)
+        await adapter.disconnect();
     } catch (e) {
       await adapter.disconnect().catch(() => undefined);
-      if (epoch !== mediaEpoch.current) return;
+      if (!currentView() || epoch !== mediaEpoch.current) return;
       transport.current = null;
       setLocalState("disconnected");
       setError(
@@ -272,77 +388,132 @@ export function CallView({
           : copy.w6ConnectionFailedRejoinTheSameCall,
       );
     } finally {
-      setBusy(false);
+      joining.current = false;
+      if (currentView()) setBusy(false);
+    }
+  }
+  async function mutate(
+    action: "consent" | "end" | "summary-note" | "delete-summary",
+    body: Record<string, unknown>,
+    fallback: string,
+  ) {
+    if (
+      !currentView() ||
+      mutation.current ||
+      joining.current ||
+      changingMedia.current ||
+      busy ||
+      stale
+    )
+      return false;
+    const owner = lifetime.current;
+    const attempt = new AbortController();
+    mutation.current = attempt;
+    setError(null);
+    setBusy(true);
+    try {
+      adoptSession(
+        await callRequest(`${root}/${action}`, {
+          method: "POST",
+          body: JSON.stringify(body),
+          signal: attempt.signal,
+        }),
+      );
+      return true;
+    } catch (e) {
+      if (currentView(owner) && mutation.current === attempt)
+        setError(e instanceof Error ? e.message : fallback);
+      return false;
+    } finally {
+      if (mutation.current === attempt) {
+        mutation.current = null;
+        if (currentView(owner)) setBusy(false);
+      }
     }
   }
   async function consent(purpose: CallConsentPurpose, granted: boolean) {
-    if (!session || !role || busy || stale) return;
-    setError(null);
-    setBusy(true);
-    try {
-      setSession(
-        await mediaRequest<CallSession>(`${root}/consent`, {
-          method: "POST",
-          body: JSON.stringify({
-            purpose,
-            granted,
-            expectedVersion: session.version,
-            idempotencyKey: crypto.randomUUID(),
-          }),
-        }),
-      );
-    } catch (e) {
-      setError(e instanceof Error ? e.message : copy.w6ConsentCouldNotBeSaved);
-    } finally {
-      setBusy(false);
-    }
+    if (!session || !role) return;
+    await mutate(
+      "consent",
+      {
+        purpose,
+        granted,
+        expectedVersion: session.version,
+        idempotencyKey: crypto.randomUUID(),
+      },
+      copy.w6ConsentCouldNotBeSaved,
+    );
   }
   async function end(choice: "end_by_choice" | "technical_problem") {
-    if (!session || !role || busy || stale) return;
-    setError(null);
-    setBusy(true);
-    try {
-      setSession(
-        await mediaRequest<CallSession>(`${root}/end`, {
-          method: "POST",
-          body: JSON.stringify({
-            expectedVersion: session.version,
-            ...(role === "fan" ? { fanChoice: choice } : {}),
-            idempotencyKey: crypto.randomUUID(),
-          }),
-        }),
-      );
-      await transport.current?.disconnect();
+    if (!session || !role) return;
+    if (
+      await mutate(
+        "end",
+        {
+          expectedVersion: session.version,
+          ...(role === "fan" ? { fanChoice: choice } : {}),
+          idempotencyKey: crypto.randomUUID(),
+        },
+        copy.w6TheCallCouldNotBeEndedTryAgain,
+      )
+    ) {
+      if (!currentView()) return;
+      disconnectMedia();
       setLeaving(false);
-    } catch (e) {
-      setError(
-        e instanceof Error ? e.message : copy.w6TheCallCouldNotBeEndedTryAgain,
-      );
-    } finally {
-      setBusy(false);
     }
   }
   async function summaryAction(action: "summary-note" | "delete-summary") {
-    if (!session || !role || busy || stale) return;
-    setError(null);
+    if (!session || !role) return;
+    await mutate(
+      action,
+      {
+        expectedVersion: session.version,
+        idempotencyKey: crypto.randomUUID(),
+        ...(action === "summary-note" ? { note: summaryNote } : {}),
+      },
+      copy.w6TheSummaryCouldNotBeChanged,
+    );
+  }
+  async function changeMedia(kind: "microphone" | "camera") {
+    const adapter = transport.current;
+    const epoch = mediaEpoch.current;
+    if (
+      !currentView() ||
+      !adapter ||
+      changingMedia.current ||
+      joining.current ||
+      mutation.current ||
+      busy ||
+      stale
+    )
+      return;
+    const enabled = kind === "microphone" ? muted : !camera;
+    changingMedia.current = true;
     setBusy(true);
     try {
-      setSession(
-        await mediaRequest<CallSession>(`${root}/${action}`, {
-          method: "POST",
-          body: JSON.stringify({
-            expectedVersion: session.version,
-            idempotencyKey: crypto.randomUUID(),
-            ...(action === "summary-note" ? { note: summaryNote } : {}),
-          }),
-        }),
-      );
-    } catch (e) {
-      setError(
-        e instanceof Error ? e.message : copy.w6TheSummaryCouldNotBeChanged,
-      );
+      await adapter[kind](enabled);
+      if (
+        !currentView() ||
+        epoch !== mediaEpoch.current ||
+        adapter !== transport.current
+      )
+        return;
+      if (kind === "microphone") setMuted(!enabled);
+      else setCamera(enabled);
+    } catch {
+      if (
+        currentView() &&
+        epoch === mediaEpoch.current &&
+        adapter === transport.current
+      )
+        setError(
+          kind === "microphone"
+            ? copy.w6MicrophoneChangeFailed
+            : copy.w6CameraChangeFailed,
+        );
     } finally {
-      setBusy(false);
+      changingMedia.current = false;
+      if (currentView()) setBusy(false);
     }
   }
   if (!session)
@@ -582,10 +753,7 @@ export function CallView({
             className="qv-btn qv-btn--secondary"
             disabled={busy || stale || !transport.current}
             onClick={() => {
-              void transport.current
-                ?.microphone(muted)
-                .then(() => setMuted(!muted))
-                .catch(() => setError(copy.w6MicrophoneChangeFailed));
+              void changeMedia("microphone");
             }}
           >
             {muted ? copy.w6Unmute : copy.w6Mute}
@@ -599,10 +767,7 @@ export function CallView({
               session.mediaMode !== "video"
             }
             onClick={() => {
-              void transport.current
-                ?.camera(!camera)
-                .then(() => setCamera(!camera))
-                .catch(() => setError(copy.w6CameraChangeFailed));
+              void changeMedia("camera");
             }}
           >
             {copy.w6Camera}
