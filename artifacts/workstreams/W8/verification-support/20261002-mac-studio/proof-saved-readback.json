@@ -1,0 +1,35 @@
+{
+  "labelledSynthetic": true,
+  "externalOwnershipVerified": false,
+  "providerReceipt": false,
+  "states": {
+    "label_matches": true,
+    "verification": "verified",
+    "proof_state": "approved",
+    "proof_reviewed": true,
+    "original_saved_post_matches": true,
+    "exact_case_link": true,
+    "synthetic_decision_label": true,
+    "case_state": "resolved",
+    "outcome": "verify_creator",
+    "version": 3,
+    "queue": "verification",
+    "original_subject_matches": true,
+    "decisions": 1
+  },
+  "effects": [
+    {
+      "type": "identity.verify_creator",
+      "state": "complete",
+      "attempts": 1,
+      "error_code": null,
+      "receipt_present": true,
+      "done": true,
+      "not_leased": true
+    }
+  ],
+  "evidence": {
+    "count": 1,
+    "exact_stored_challenge_matches": true
+  }
+}

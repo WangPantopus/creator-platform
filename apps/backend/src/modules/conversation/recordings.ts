@@ -381,6 +381,58 @@ export class ConversationRecordings {
     }
     return result;
   }
+  /** W6's media authority asks, on its caller's held client, whether this
+   * exact signed recording is delivered in this scope's own thread family.
+   * Only one delivered creator message with the same processed evidence and
+   * signed command qualifies; an asset hash or signature alone never does. */
+  async currentPublication(
+    scope: ThreadScope,
+    recording: Readonly<{
+      asset: Readonly<{
+        id: string;
+        version: number;
+        sha256: string;
+        bytes: number;
+        mimeType: string;
+        durationMs: number | null;
+      }>;
+      command: unknown;
+      signedActId: string;
+    }>,
+    client: PoolClient,
+  ): Promise<boolean> {
+    assertThreadScope(scope);
+    const rows = (
+      await client.query<{
+        recording_evidence: unknown;
+        signed_command: unknown;
+      }>(
+        "SELECT recording_evidence,signed_command FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND recording_asset_id=$4 AND signed_act_id=$5 AND author_kind='human_creator' AND delivery_state='delivered' LIMIT 2",
+        [
+          scope.threadId,
+          scope.creatorId,
+          scope.fanId,
+          IdSchema.parse(recording.asset.id),
+          IdSchema.parse(recording.signedActId),
+        ],
+      )
+    ).rows;
+    if (rows.length !== 1) return false;
+    const stored = ProcessedMediaEvidenceSchema.safeParse(
+      rows[0]!.recording_evidence,
+    );
+    const { asset } = recording;
+    return (
+      stored.success &&
+      stored.data.assetId === asset.id &&
+      stored.data.version === asset.version &&
+      stored.data.sha256 === asset.sha256 &&
+      stored.data.bytes === asset.bytes &&
+      stored.data.mimeType === asset.mimeType &&
+      stored.data.durationMs === asset.durationMs &&
+      contentHash(rows[0]!.signed_command) === contentHash(recording.command)
+    );
+  }
   /** W8 checks its actual leased family on this same client before this read. */
   async exportMetadata(client: PoolClient, family: ConversationPrivacyFamily) {
     const rows = (

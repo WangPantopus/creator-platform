@@ -1,0 +1,63 @@
+{
+  "source": "ccc4474b57b1dd4e0d1b1d1157c6ef4a77e7e07d",
+  "label": "Actual labelled synthetic web export, missing103 refusal; no C10 completion",
+  "errors": [],
+  "savedStatus": 202,
+  "jobHash": "18f952ad8b653e0dab774ef8b3076182f7656b79765b01d80a97a5e9471b1b76",
+  "state": "blocked",
+  "tasks": [
+    {
+      "domain": "agent",
+      "state": "complete",
+      "errorCode": null,
+      "receiptPresent": true
+    },
+    {
+      "domain": "commerce",
+      "state": "blocked",
+      "errorCode": "domain_hook_unavailable",
+      "receiptPresent": false
+    },
+    {
+      "domain": "content",
+      "state": "blocked",
+      "errorCode": "domain_hook_unavailable",
+      "receiptPresent": false
+    },
+    {
+      "domain": "conversation",
+      "state": "blocked",
+      "errorCode": "conversation_lineage_unavailable",
+      "receiptPresent": false
+    },
+    {
+      "domain": "growth",
+      "state": "blocked",
+      "errorCode": "domain_hook_unavailable",
+      "receiptPresent": false
+    },
+    {
+      "domain": "identity",
+      "state": "blocked",
+      "errorCode": "privacy_commit_fence_unavailable",
+      "receiptPresent": false
+    },
+    {
+      "domain": "media",
+      "state": "blocked",
+      "errorCode": "privacy_commit_fence_unavailable",
+      "receiptPresent": false
+    },
+    {
+      "domain": "trust",
+      "state": "blocked",
+      "errorCode": "privacy_commit_fence_unavailable",
+      "receiptPresent": false
+    }
+  ],
+  "downloadVisible": false,
+  "phone": {
+    "width": 390,
+    "scroll": 390
+  }
+}

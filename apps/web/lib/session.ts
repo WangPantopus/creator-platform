@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { SessionSchema } from "@qelvora/api";
+import { sessionUnavailableDigest } from "./session-digest";
 
 // Cookies are shared across ports on a hostname. Isolate explicitly configured
 // loopback development apps so a peer worktree cannot replace/end this session.
@@ -58,18 +59,40 @@ export async function platformFetch(
     signal: AbortSignal.timeout(10000),
   });
 }
+/**
+ * A saved session could not be checked because the platform did not answer.
+ * Pages must not present this as signed out: the cookie stays and the root
+ * error boundary offers a retry.
+ */
+export class SessionUnavailableError extends Error {
+  // Error boundaries match this digest; Next keeps an existing digest.
+  readonly digest = sessionUnavailableDigest;
+  constructor() {
+    super("The saved session could not be checked.");
+    this.name = "SessionUnavailableError";
+  }
+}
 export async function currentSession(returnTo?: string, resumeHandle = false) {
-  let expired = false;
+  const saved = (await cookies()).has(sessionCookie);
+  let response: Response;
   try {
-    const response = await platformFetch("/v1/identity/session");
-    if (response.ok) return SessionSchema.parse(await response.json());
-    expired = response.status === 401;
+    response = await platformFetch("/v1/identity/session");
   } catch {
+    if (saved) throw new SessionUnavailableError();
     return null;
   }
+  if (response.ok) return SessionSchema.parse(await response.json());
+  const expired = response.status === 401;
+  if (
+    saved &&
+    (response.status >= 500 ||
+      response.status === 408 ||
+      response.status === 429)
+  )
+    throw new SessionUnavailableError();
   // Server Components cannot set a rotated cookie. A bounded Route Handler
   // performs restoration before returning to the registered destination.
-  if (expired && returnTo && (await cookies()).has(sessionCookie))
+  if (expired && returnTo && saved)
     redirect(
       `/api/auth/restore?returnTo=${encodeURIComponent(returnTo)}${resumeHandle ? "&resumeHandle=1" : ""}`,
     );

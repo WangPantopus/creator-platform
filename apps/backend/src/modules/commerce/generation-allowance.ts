@@ -8,6 +8,12 @@ import {
 } from "../access/commerce.js";
 import { contentHash } from "../../core/canonical.js";
 import { z } from "zod";
+import { ReviewedGenerationCostRule } from "./attributed-cost-policy.js";
+import {
+  ORIGINAL_COST_MIGRATION,
+  ORIGINAL_COST_SCHEMA_SHA256,
+  assertOriginalCostCustody,
+} from "./original-cost-custody.js";
 import {
   assertGenerationPrivacyFamily,
   type GenerationCostPrivacyReconciliation,
@@ -45,6 +51,9 @@ export type GenerationCostReceipt = {
 export interface GenerationCostPolicy {
   /** Version must include the reviewed weighting and reservation ceiling rules. */
   version: string;
+  /** Captured at real acceptance by held0106, never a late backfill. */
+  originalRule?: Readonly<z.infer<typeof ReviewedGenerationCostRule>>;
+  originalRuleMigration?: { version: string; checksum: string };
   reserveUnits(scope: ThreadScope): number;
   /** W2-owned immutable generation/attempt journal receipt, converted using the
    * ORIGINAL reservation policy. Only durable reads in this transaction; no
@@ -77,7 +86,18 @@ export class CommerceGenerationAllowance implements GenerationAllowance {
   private constructor(
     private readonly policy: GenerationCostPolicy,
     private readonly database: string,
+    private readonly captureOriginalRule: boolean,
+    private readonly hostPool: Pool,
   ) {}
+  assertComposition(pool: Pool, access: AccessService) {
+    invariant(
+      pool === this.hostPool &&
+        access.isForPool(pool) &&
+        access.isGenerationAllowance(this),
+      "generation_terminal_allowance_mismatch",
+      "Original settlement requires the exact configured canonical allowance owner.",
+    );
+  }
   /** Only this successfully prepared instance can issue its port. Each call
    * proves identity against the same canonical AccessService and bypasses the
    * legacy fixed-unit method entirely; missing configuration retains the hold. */
@@ -348,21 +368,59 @@ export class CommerceGenerationAllowance implements GenerationAllowance {
     const database = (
       await pool.query<{ name: string }>("SELECT current_database() AS name")
     ).rows[0]!.name;
+    const captureOriginalRule =
+      (
+        await pool.query<{ ready: boolean }>(
+          `SELECT EXISTS(SELECT FROM information_schema.columns WHERE table_schema='creator'
+         AND table_name='commerce_allowance_reservation' AND column_name='cost_rule' AND data_type='jsonb') AS ready`,
+        )
+      ).rows[0]?.ready === true;
+    const originalRule = policy.originalRule
+      ? Object.freeze(ReviewedGenerationCostRule.parse(policy.originalRule))
+      : undefined;
+    if (captureOriginalRule) {
+      const migration = policy.originalRuleMigration;
+      invariant(
+        migration?.version === ORIGINAL_COST_MIGRATION &&
+          migration.checksum === ORIGINAL_COST_SCHEMA_SHA256 &&
+          originalRule?.version === policy.version,
+        "original_cost_rule_unconfigured",
+        "New admissions require their actual original approved cost rule and registered custody.",
+      );
+      const client = await pool.connect();
+      try {
+        await assertOriginalCostCustody(client);
+      } finally {
+        client.release();
+      }
+    }
     return new CommerceGenerationAllowance(
       Object.freeze({
         ...policy,
         migration: Object.freeze({ ...policy.migration }),
+        ...(originalRule ? { originalRule } : {}),
+        ...(policy.originalRuleMigration
+          ? {
+              originalRuleMigration: Object.freeze({
+                ...policy.originalRuleMigration,
+              }),
+            }
+          : {}),
       }),
       database,
+      captureOriginalRule,
+      pool,
     );
   }
   async reserve(scope: ThreadScope, client: PoolClient, generationId: string) {
+    if (this.captureOriginalRule) await assertOriginalCostCustody(client);
     const reservation = await reserveCostAllowance(
       client,
       scope,
       `generation:${generationId}`,
       this.policy.reserveUnits(scope),
       this.policy.version,
+      this.captureOriginalRule ? this.policy.originalRule : undefined,
     );
     invariant(
       reservation.state === "reserved",

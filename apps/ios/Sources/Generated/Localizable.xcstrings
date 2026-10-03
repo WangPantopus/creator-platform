@@ -265,6 +265,50 @@
         }
       }
     },
+    "Membership · at least {days} continuous days": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Membership · at least {days} continuous days"
+          }
+        }
+      }
+    },
+    "{used} / {limit} characters": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{used} / {limit} characters"
+          }
+        }
+      }
+    },
+    "This draft is over your current limit. Shorten it to send; your words are kept.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This draft is over your current limit. Shorten it to send; your words are kept."
+          }
+        }
+      }
+    },
+    "Current membership recognition is unavailable. The reply limit stays at 4,000 characters.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Current membership recognition is unavailable. The reply limit stays at 4,000 characters."
+          }
+        }
+      }
+    },
     "Paid partnership: {name} is paid by {brand}.": {
       "extractionState": "manual",
       "localizations": {
@@ -7063,6 +7107,17 @@
         }
       }
     },
+    "Uploads and signing are unavailable here. Your preview stays on this device.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uploads and signing are unavailable here. Your preview stays on this device."
+          }
+        }
+      }
+    },
     "This recording limit does not match the current saved content.": {
       "extractionState": "manual",
       "localizations": {
@@ -7400,6 +7455,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Camera or microphone access is off or unavailable. Check your device settings and try again."
+          }
+        }
+      }
+    },
+    "Calling is not connected yet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calling is not connected yet."
           }
         }
       }
@@ -7862,6 +7928,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Call receipt"
+          }
+        }
+      }
+    },
+    "Human call": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Human call"
           }
         }
       }
@@ -9655,6 +9732,468 @@
           "stringUnit": {
             "state": "translated",
             "value": "Enter a time in HH:mm, from 00:00 to 23:59."
+          }
+        }
+      }
+    },
+    "Record a voice reply": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record a voice reply"
+          }
+        }
+      }
+    },
+    "Deliver this recording": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deliver this recording"
+          }
+        }
+      }
+    },
+    "Your signature is saved. Content credentials are processing before delivery.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your signature is saved. Content credentials are processing before delivery."
+          }
+        }
+      }
+    },
+    "Delivery is unconfirmed. Retry this same recording before starting another.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delivery is unconfirmed. Retry this same recording before starting another."
+          }
+        }
+      }
+    },
+    "Your signed recording was delivered to this conversation.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your signed recording was delivered to this conversation."
+          }
+        }
+      }
+    },
+    "Voice replies are unavailable for this conversation. Your text draft is kept.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voice replies are unavailable for this conversation. Your text draft is kept."
+          }
+        }
+      }
+    },
+    "This recording belongs to another conversation. Reopen the selected thread.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This recording belongs to another conversation. Reopen the selected thread."
+          }
+        }
+      }
+    },
+    "Retry this recording delivery": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry this recording delivery"
+          }
+        }
+      }
+    },
+    "Saving is unconfirmed. Retry this same change before editing your windows.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saving is unconfirmed. Retry this same change before editing your windows."
+          }
+        }
+      }
+    },
+    "Retry this availability save": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry this availability save"
+          }
+        }
+      }
+    },
+    "Replace your unsaved changes with the saved availability?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Replace your unsaved changes with the saved availability?"
+          }
+        }
+      }
+    },
+    "Your account changed. Reopen availability to continue.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your account changed. Reopen availability to continue."
+          }
+        }
+      }
+    },
+    "We can't reach your account right now": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We can't reach your account right now"
+          }
+        }
+      }
+    },
+    "Your session is kept on this device. Try again in a moment.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your session is kept on this device. Try again in a moment."
+          }
+        }
+      }
+    },
+    "Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate."
+          }
+        }
+      }
+    },
+    "Lowering a limit is immediate.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lowering a limit is immediate."
+          }
+        }
+      }
+    },
+    "This page didn't load": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This page didn't load"
+          }
+        }
+      }
+    },
+    "Nothing you saved was changed. Try again in a moment.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing you saved was changed. Try again in a moment."
+          }
+        }
+      }
+    },
+    "Content status": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Content status"
+          }
+        }
+      }
+    },
+    "Checking current access. Your input is kept during a connection interruption.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking current access. Your input is kept during a connection interruption."
+          }
+        }
+      }
+    },
+    "Check current access": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check current access"
+          }
+        }
+      }
+    },
+    "This content is unavailable. Check current access to try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This content is unavailable. Check current access to try again."
+          }
+        }
+      }
+    },
+    "Content could not be refreshed. Reconnect and check current access. Your input is kept.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Content could not be refreshed. Reconnect and check current access. Your input is kept."
+          }
+        }
+      }
+    },
+    "We could not confirm this action. Check current access before retrying. Your input is kept.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We could not confirm this action. Check current access before retrying. Your input is kept."
+          }
+        }
+      }
+    },
+    "Your session ended. Continue with Pantopus again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your session ended. Continue with Pantopus again."
+          }
+        }
+      }
+    },
+    "The signed-in account changed. Refresh before continuing.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The signed-in account changed. Refresh before continuing."
+          }
+        }
+      }
+    },
+    "This changed while you were viewing it. Refresh before trying again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This changed while you were viewing it. Refresh before trying again."
+          }
+        }
+      }
+    },
+    "This retry differs from the earlier action. Refresh before trying again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This retry differs from the earlier action. Refresh before trying again."
+          }
+        }
+      }
+    },
+    "This reply was withdrawn. It cannot be shared again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This reply was withdrawn. It cannot be shared again."
+          }
+        }
+      }
+    },
+    "Set up your fan profile before continuing.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set up your fan profile before continuing."
+          }
+        }
+      }
+    },
+    "Check your reply and sharing choices before trying again. Your input is kept.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check your reply and sharing choices before trying again. Your input is kept."
+          }
+        }
+      }
+    },
+    "Choose your handle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose your handle"
+          }
+        }
+      }
+    },
+    "Edit public profile": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit public profile"
+          }
+        }
+      }
+    },
+    "This device could not read your session securely. Unlock it and try signing in again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This device could not read your session securely. Unlock it and try signing in again."
+          }
+        }
+      }
+    },
+    "This device could not save your session securely. Unlock it and try signing in again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This device could not save your session securely. Unlock it and try signing in again."
+          }
+        }
+      }
+    },
+    "This device could not clear its saved private data. Private screens are closed. Unlock it and retry clearing before signing in again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This device could not clear its saved private data. Private screens are closed. Unlock it and retry clearing before signing in again."
+          }
+        }
+      }
+    },
+    "Retry clearing saved private data": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry clearing saved private data"
+          }
+        }
+      }
+    },
+    "Your call": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your call"
+          }
+        }
+      }
+    },
+    "Checking the booking and your current access…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking the booking and your current access…"
+          }
+        }
+      }
+    },
+    "This call could not be opened. Retry, or open Requests to check its current status.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This call could not be opened. Retry, or open Requests to check its current status."
+          }
+        }
+      }
+    },
+    "Request verification review": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Request verification review"
+          }
+        }
+      }
+    },
+    "Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified."
           }
         }
       }

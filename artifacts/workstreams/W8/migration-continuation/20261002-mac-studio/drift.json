@@ -1,0 +1,141 @@
+{
+  "results": [
+    {
+      "label": "denial role membership",
+      "refused": true,
+      "phase": "guard",
+      "code": "catalogue_refusal"
+    },
+    {
+      "label": "private role membership",
+      "refused": true,
+      "phase": "guard",
+      "code": "catalogue_refusal"
+    },
+    {
+      "label": "denial relation grant",
+      "refused": true,
+      "phase": "guard",
+      "code": "catalogue_refusal"
+    },
+    {
+      "label": "private extra content column",
+      "refused": true,
+      "phase": "guard",
+      "code": "catalogue_refusal"
+    },
+    {
+      "label": "missing immutable lease column",
+      "refused": true,
+      "phase": "guard",
+      "code": "catalogue_refusal"
+    },
+    {
+      "label": "private table raw core grant",
+      "refused": true,
+      "phase": "guard",
+      "code": "catalogue_refusal"
+    },
+    {
+      "label": "private table raw worker grant",
+      "refused": true,
+      "phase": "guard",
+      "code": "catalogue_refusal"
+    },
+    {
+      "label": "private PUBLIC grant",
+      "refused": true,
+      "phase": "guard",
+      "code": "catalogue_refusal"
+    },
+    {
+      "label": "private FORCE RLS disabled",
+      "refused": true,
+      "phase": "guard",
+      "code": "catalogue_refusal"
+    },
+    {
+      "label": "private commit trigger disabled",
+      "refused": true,
+      "phase": "guard",
+      "code": "catalogue_refusal"
+    },
+    {
+      "label": "private scope type changed",
+      "refused": true,
+      "phase": "guard",
+      "code": "catalogue_refusal"
+    },
+    {
+      "label": "private scope nullable",
+      "refused": true,
+      "phase": "guard",
+      "code": "catalogue_refusal"
+    },
+    {
+      "label": "private schema CREATE",
+      "refused": true,
+      "phase": "guard",
+      "code": "catalogue_refusal"
+    },
+    {
+      "label": "private owner setting",
+      "refused": true,
+      "phase": "guard",
+      "code": "catalogue_refusal"
+    },
+    {
+      "label": "private caller bypass RLS",
+      "refused": true,
+      "phase": "guard",
+      "code": "catalogue_refusal"
+    },
+    {
+      "label": "private default privilege",
+      "refused": true,
+      "phase": "guard",
+      "code": "catalogue_refusal"
+    },
+    {
+      "label": "function PUBLIC execute",
+      "refused": true,
+      "phase": "guard",
+      "code": "catalogue_refusal"
+    },
+    {
+      "label": "function source configuration",
+      "refused": true,
+      "phase": "guard",
+      "code": "catalogue_refusal"
+    },
+    {
+      "label": "private trigger early",
+      "refused": true,
+      "phase": "guard",
+      "code": "catalogue_refusal"
+    },
+    {
+      "label": "denial metadata policy broadened",
+      "refused": true,
+      "phase": "guard",
+      "code": "catalogue_refusal"
+    }
+  ],
+  "refused": 20,
+  "allMutationsRolledBack": true,
+  "securityUnchanged": true,
+  "ledgerRows": 61,
+  "final": {
+    "original": {
+      "checkedRoles": 3,
+      "pinnedFunctions": 10,
+      "directCapabilities": 93,
+      "publicCapabilities": 331,
+      "pinnedPublicFunctions": 23
+    },
+    "privacy": {
+      "checkedPrivatePurposes": 2,
+      "administratorSelectedCatalogueReview": true
+    }
+  }
+}

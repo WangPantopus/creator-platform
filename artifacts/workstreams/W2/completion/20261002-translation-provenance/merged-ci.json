@@ -1,0 +1,170 @@
+{
+  "baseRefOid": "496c25236f1a791f0e1227c56e0380fc17df26c6",
+  "headRefOid": "637a188fbc5d6e0cc46036fe9a67eec96664e185",
+  "mergeStateStatus": "UNSTABLE",
+  "mergeable": "MERGEABLE",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T18:31:42Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37047608035/job/110973238915",
+      "name": "web-and-backend",
+      "startedAt": "2026-10-02T18:29:11Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T18:33:28Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37047602012/job/110973249981",
+      "name": "web-and-backend",
+      "startedAt": "2026-10-02T18:30:52Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37047608035/job/110973239334",
+      "name": "web-visual",
+      "startedAt": "2026-10-02T18:29:08Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37047602012/job/110973250042",
+      "name": "web-visual",
+      "startedAt": "2026-10-02T18:29:10Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37047608035/job/110973239139",
+      "name": "ios-foundation",
+      "startedAt": "2026-10-02T18:29:08Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37047602012/job/110973250229",
+      "name": "ios-foundation",
+      "startedAt": "2026-10-02T18:29:10Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37047608035/job/110973239239",
+      "name": "android-foundation",
+      "startedAt": "2026-10-02T18:29:08Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37047602012/job/110973250097",
+      "name": "android-foundation",
+      "startedAt": "2026-10-02T18:29:10Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T18:35:15Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37047608035/job/110973239393",
+      "name": "android-runtime",
+      "startedAt": "2026-10-02T18:29:41Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T18:35:03Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37047602012/job/110973249820",
+      "name": "android-runtime",
+      "startedAt": "2026-10-02T18:29:31Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    }
+  ],
+  "pr": 172,
+  "mergedNormally": true,
+  "mergedAt": "2026-10-02T18:36:48Z",
+  "mergeCommit": "3dc3e0b670c4f5bde133d7a7e939c6bc3956ad8e",
+  "rulesets": [],
+  "branchProtection": "HTTP404 branch not protected",
+  "exactRunHeads": {
+    "37047608035": "637a188fbc5d6e0cc46036fe9a67eec96664e185",
+    "37047602012": "637a188fbc5d6e0cc46036fe9a67eec96664e185"
+  },
+  "mainVerification": {
+    "source": "3dc3e0b670c4f5bde133d7a7e939c6bc3956ad8e",
+    "backendTypes": "PASS",
+    "health": {
+      "httpStatus": 200,
+      "body": {
+        "status": "ok",
+        "ready": false,
+        "foundationReady": true,
+        "identity": "configured",
+        "identityMode": "development",
+        "generation": "unconfigured",
+        "registeredFeatures": [
+          "conversation",
+          "creator-ai"
+        ],
+        "readinessEndpoint": "/health/ready",
+        "database": "configured",
+        "featureEnabled": true
+      }
+    },
+    "readiness": {
+      "httpStatus": 503,
+      "body": {
+        "ready": false,
+        "capabilities": [
+          {
+            "name": "trust_runtime",
+            "required": true,
+            "state": "unavailable",
+            "code": "trust_unconfigured",
+            "checkedAt": "2026-10-02T18:41:59.898Z"
+          }
+        ]
+      }
+    },
+    "sourceHashes": [
+      {
+        "path": "apps/backend/src/modules/agent/translation.ts",
+        "sha256": "d1493f1d9b25eaa20d9d70a1318e503a1b287ec4eb0af1a3f966391c77288ab9"
+      },
+      {
+        "path": "apps/backend/src/modules/agent/runtime.ts",
+        "sha256": "2b2715e3a9fa8a68d8e5253f9a504b9a7d4f15470632c09272ecd306cb5d33e3"
+      },
+      {
+        "path": "apps/backend/src/modules/agent/development-server.ts",
+        "sha256": "765211c93c542710022be7a44134e65569346b03fa9d96eec9dd6228fa539597"
+      }
+    ]
+  },
+  "limits": "Four exact-head fast successes; six macOS jobs queued/unverified. Real merged main API remains unconfigured. Separate Trust increment not yet merged."
+}

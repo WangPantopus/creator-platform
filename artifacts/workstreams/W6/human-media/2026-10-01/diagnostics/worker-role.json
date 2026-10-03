@@ -1,0 +1,14 @@
+{
+  "environment": "owned disposable creator_w6",
+  "registry": "local-only0062 validation; W8 activation pending",
+  "role": {
+    "role": "creator_media_worker",
+    "runtime_member": false,
+    "discovery_member": false,
+    "thread_read": false,
+    "publication_insert": false,
+    "act_update": false,
+    "asset_delete": false
+  },
+  "discovered": 0
+}

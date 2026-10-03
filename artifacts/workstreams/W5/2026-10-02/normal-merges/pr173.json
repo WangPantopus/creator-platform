@@ -1,0 +1,115 @@
+{
+  "headRefOid": "b4173e20773e9f2bcae0ac2d9acdc14f4d10e766",
+  "mergeCommit": {
+    "oid": "7a2e08fa4f602e9075d1394d55fbaad963dec7d2"
+  },
+  "mergedAt": "2026-10-02T20:16:27Z",
+  "state": "MERGED",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T20:11:32Z",
+      "conclusion": "CANCELLED",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37058808405/job/111010025627",
+      "name": "web-and-backend",
+      "startedAt": "2026-10-02T20:10:00Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T20:12:34Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37058810481/job/111010025823",
+      "name": "web-and-backend",
+      "startedAt": "2026-10-02T20:10:00Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T20:10:46Z",
+      "conclusion": "CANCELLED",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37058808405/job/111010025387",
+      "name": "web-visual",
+      "startedAt": "2026-10-02T20:09:57Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37058810481/job/111010026126",
+      "name": "web-visual",
+      "startedAt": "2026-10-02T20:09:58Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T20:10:46Z",
+      "conclusion": "CANCELLED",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37058808405/job/111010025691",
+      "name": "ios-foundation",
+      "startedAt": "2026-10-02T20:09:58Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37058810481/job/111010026302",
+      "name": "ios-foundation",
+      "startedAt": "2026-10-02T20:09:58Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T20:10:46Z",
+      "conclusion": "CANCELLED",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37058808405/job/111010025490",
+      "name": "android-foundation",
+      "startedAt": "2026-10-02T20:09:57Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37058810481/job/111010026197",
+      "name": "android-foundation",
+      "startedAt": "2026-10-02T20:09:58Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T20:11:18Z",
+      "conclusion": "CANCELLED",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37058808405/job/111010025521",
+      "name": "android-runtime",
+      "startedAt": "2026-10-02T20:10:00Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T20:14:23Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37058810481/job/111010026120",
+      "name": "android-runtime",
+      "startedAt": "2026-10-02T20:10:00Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    }
+  ],
+  "checkedBase": "7b0537ac3dbc727aed3778432faa275d09cd6088",
+  "checkedCombinedTree": "d15f56608ae8aa823513f13985e2200b65df0c38",
+  "locallyCheckedCombinedCommit": "718192a57f19ce9437fbd8b7ad80d2080ac23d7c",
+  "postMergeTreeMatched": true,
+  "limits": "Current combined main backend/web types and source checks passed; exact PR Linux/Android runtime success. Personally operated source3b249 unsigned web+Android and shipping builds remain bounded to that commit. Genuine group purpose activation, founder minimum, real payments/signing/delivery and full fan/C10/native group acceptance remain unavailable."
+}

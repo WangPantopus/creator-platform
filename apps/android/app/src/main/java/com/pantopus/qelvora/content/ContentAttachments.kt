@@ -58,7 +58,7 @@ private data class AudienceAsset(val id: String, val creatorId: String, val obje
     }
 }
 private class ContentMediaTransport(context: Context, private val base: URL, private val accountId: String) {
-    private val storage = SecureSessionStorage(context)
+    private val storage = SecureSessionStorage(context, base.toString())
     init {
         require(base.protocol == "https" || (base.protocol == "http" && base.host in listOf("localhost", "127.0.0.1", "10.0.2.2")))
         require(base.userInfo == null && UUID.fromString(accountId).toString() == accountId)

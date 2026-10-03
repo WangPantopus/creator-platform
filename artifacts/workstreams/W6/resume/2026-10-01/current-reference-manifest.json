@@ -1,0 +1,886 @@
+{
+  "referenceSource": "2f0319dbb6979878c5a9019e68503506902f9ea0",
+  "count": 110,
+  "images": [
+    {
+      "name": "testAuthorIdentitySurfaces.light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "ba318d5f30eb80031ae1d703160a279415f41f2b1805533f14055e0b6cf11892",
+      "decodedRgbaSha256": "43b73c0d80378f1c2fd08626a57f5eb37158c56bb3d80531d1b1ff31d6d56f83"
+    },
+    {
+      "name": "testAuthorIdentitySurfaces.night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "cc461b5f7e2516b47909d9ff2b7aa30edf70e7ddc33bdae6a6fb7ac8da24c4d4",
+      "decodedRgbaSha256": "1f8afb7888f877064571da27832d4f598b136947be388d48cc9ce1da06639591"
+    },
+    {
+      "name": "testComponentCatalogThemes.AccessLines-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "4b0a4edf3aa2c67a6f1ad11ed47e7e616220e64972cfd88af1030bfce65cd784",
+      "decodedRgbaSha256": "dc6dc6c0763ce89276ef59281cb98f3e302d92cc2e7dd3c5d7257d3f25cbc80f"
+    },
+    {
+      "name": "testComponentCatalogThemes.AccessLines-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "96393e2d76a4ee9ab80dd9d38e54cdd7bafc633c9a163f7ea2874847cb0e95b3",
+      "decodedRgbaSha256": "b1f02e288f9428e00649e6eef8144cfb5497f3e19eabc401759c4700cfdbb21b"
+    },
+    {
+      "name": "testComponentCatalogThemes.AuditBanner-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "7fc2936c10ba6fe044ec5bf5be5c7d38b5aeb3f11f3092a8b8cf676002d389b3",
+      "decodedRgbaSha256": "353e6157e95d578f09a0a0e60c446e565103cd6cf376b9b69b9ff85ce2348d10"
+    },
+    {
+      "name": "testComponentCatalogThemes.AuditBanner-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "ddecb066f9619dc54e0e7aa6ad2c33f2e3c3d8200ec7f12930f67409a9ec6db2",
+      "decodedRgbaSha256": "f5afd121a4417d9a7c3d9391a3a5e24633e26dbd4096101cf55c677d0ebe5f4c"
+    },
+    {
+      "name": "testComponentCatalogThemes.AuthorLabel-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "d448cd75318c741b0c516a0a5d276446524c1e2062ce5ea0fb6a560e5d488d86",
+      "decodedRgbaSha256": "d77af8f154785805a2975f677b02adff67c44fc9e66c82f6e843dbb574ab84cd"
+    },
+    {
+      "name": "testComponentCatalogThemes.AuthorLabel-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "e5998b185fc420a47a0d07afdb05b4d9c978659aa592d00662ccde327a5b5fdc",
+      "decodedRgbaSha256": "5e333b9610fce5132d716f7113eca18552212eb69a22b8239457a1efbcb9087b"
+    },
+    {
+      "name": "testComponentCatalogThemes.Avatar-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "317edf4eb1cd25d1afd90cdf0c4374d8b5239592e5c296e61d78d2009a957724",
+      "decodedRgbaSha256": "c6a164912fd0d6025c4a23dd4d1df1367478f00eae554c7f48ecad5263dd377e"
+    },
+    {
+      "name": "testComponentCatalogThemes.Avatar-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "300e18c32e969559252a6b95edb359e4159fd4f2df1ace47f57ffc2d98330a41",
+      "decodedRgbaSha256": "9bf63acd77f3f07687f6a1aa8f2e28596d5e226608d934cc8f10856f8296f5c0"
+    },
+    {
+      "name": "testComponentCatalogThemes.Button-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "020546c667440d5bd4f9296db771e0b567f04e1fceed65d0710db25859d1dd35",
+      "decodedRgbaSha256": "31687089a8e1b308dea5c03205b0e9bd89862aac545b226790e71c36e8c439ae"
+    },
+    {
+      "name": "testComponentCatalogThemes.Button-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "2259aaec5149550828ef2e3cebe1c1794a6e368f3fd6eac4efb59622b5461e74",
+      "decodedRgbaSha256": "7f682264d13a9c4a17e54255ebe368581ac7bf798264884f00fe0dfd26ec8e22"
+    },
+    {
+      "name": "testComponentCatalogThemes.CallChip-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "8096d07c4a87f92e162cf35002d4bd0c5b983ba265ab083f9e346225b52c9287",
+      "decodedRgbaSha256": "351476137cd3813ba99aa62178ac6bab5e6967076e8e1124728e8b8ced151844"
+    },
+    {
+      "name": "testComponentCatalogThemes.CallChip-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "1090ab059843973cb67ca081c2b3f9ba72aecf1b262d6bcdd56b2eac1c687af8",
+      "decodedRgbaSha256": "c5cb04292aa321022f6fb7988f7246e9cf791b10ed02f8fa95abfd69a174e45f"
+    },
+    {
+      "name": "testComponentCatalogThemes.CapacityHeader-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "b8a14fb1ac6eec2cc5428855f885ed9817987343c857761206f308215366304a",
+      "decodedRgbaSha256": "421f747dfef4725a02d4488ccbcd29bb40b45470a7bc3fd0fd1a1bfc1da049ca"
+    },
+    {
+      "name": "testComponentCatalogThemes.CapacityHeader-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "e81888da4768feb4e7f32029f508be258a4add7937f5a2e4faa6744e229c349b",
+      "decodedRgbaSha256": "c2a2b9df465dc44d3348b94b210b872c67f7762dea83f1d440dfd286eb5dddf8"
+    },
+    {
+      "name": "testComponentCatalogThemes.CitationChip-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "edca614627ae7564d4a677d4e2e0c178fa4692d73aaa68d9f5f03d8b9c7b75bd",
+      "decodedRgbaSha256": "2acb8c300289b0ac5e0769edf85ca36a4c333b5cc059a7a6e89bbdc4e56ddd98"
+    },
+    {
+      "name": "testComponentCatalogThemes.CitationChip-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "c4ce2fee0a6e5f6c9d60a3a18ca9f4d45fa455b816e7bacc62b65e6a54419364",
+      "decodedRgbaSha256": "37b927b9dc8112e34e53f05c14841b4882821ace24c4dcbc6b652fbddf685d15"
+    },
+    {
+      "name": "testComponentCatalogThemes.Composer-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "194137b653398fcbef6ad7b6783bb8b322df08c9c666e1fec5a4f3b869cc195c",
+      "decodedRgbaSha256": "e74e34b778d3a56ac4ceeb156ccec751a4ff3e7f9b283e99c58f4c3e9e382e0c"
+    },
+    {
+      "name": "testComponentCatalogThemes.Composer-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "4a8be135e1499db5fb89cf9121bc93351314b10d013492a16f2956f013f9db31",
+      "decodedRgbaSha256": "21ce03777e5660b25f0979495ae30c0ff150c5293d8ef8e2fe6af51a5554dc1f"
+    },
+    {
+      "name": "testComponentCatalogThemes.ContextCard-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "adb3c3c15630d487ef489ff408ae7f10ffb275536c3091ff7e86189060618c3a",
+      "decodedRgbaSha256": "ce1ba07a873416554164a9d4abcdb4fa446b821d694f21871cf4bbca0416a6e1"
+    },
+    {
+      "name": "testComponentCatalogThemes.ContextCard-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "2b5bee22c7276502ddeb15dfee87bfeefac47962b02137b4fc04e25d5fed6bf4",
+      "decodedRgbaSha256": "7e9d1ad95e067a5f3abc4e71407253d9248214714e220ba70748f84ce796a307"
+    },
+    {
+      "name": "testComponentCatalogThemes.Correction-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "a6f61275d075fcebdb206e4727487cfe580999bc44d0c89d9b6696ebeb2c61df",
+      "decodedRgbaSha256": "35e9987e2593143fb1a0e57dae83cf469419dfb3e016509d2ab5c162b30462d5"
+    },
+    {
+      "name": "testComponentCatalogThemes.Correction-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "5e50ed170f66918a730e4aea74848a5cb04351c73f16f4e1ab40bd83b0842fad",
+      "decodedRgbaSha256": "421c026dabd63cc2f2ceb165f6c92026eb08de39c1bfef12e4a2d73846584cec"
+    },
+    {
+      "name": "testComponentCatalogThemes.Countdown-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "635c63a62a4dde54705bd8b93a92c7cf2b0986f547c5c82673a45fe870b9ecd6",
+      "decodedRgbaSha256": "b985fedebe19db2796ab0c97a9f863eebc915dac37688afc3c798e059f5670d3"
+    },
+    {
+      "name": "testComponentCatalogThemes.Countdown-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "b62bb48f25cb39e798cb9d5f8ae4916ff0b20acf5a80c1bae583d6d841914b0c",
+      "decodedRgbaSha256": "b312e41aa4dcb97619db5360ecc34429fcbfa86de6c55be556058244cc7a5eaf"
+    },
+    {
+      "name": "testComponentCatalogThemes.Dialog-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "03761e85bb267047511325a878a477dc30d9f10a3c3ed9ecf2a6889842d097ef",
+      "decodedRgbaSha256": "f683bb20adca949bbb5dce717c3407117780d82a1839b8d1a21e1e65d4d20a12"
+    },
+    {
+      "name": "testComponentCatalogThemes.Dialog-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "fbdcd195e6027a55061fe5875d41bb7c09f2799d566936a1d71052fa607891a9",
+      "decodedRgbaSha256": "4a30bc6f0dfc96c9b0c36ccddfab076b030514f43ef39c7aef1016ac4aa88be4"
+    },
+    {
+      "name": "testComponentCatalogThemes.DigestItem-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "381fd2b789949b4f11f52ad32b57ea00d3e4b6444962a5492b1deb8869569858",
+      "decodedRgbaSha256": "410db7a5f2db3e893eefe7f5c4ac6c7ea00b09ae1af6e615ae6346c888d1c461"
+    },
+    {
+      "name": "testComponentCatalogThemes.DigestItem-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "63df49f0b5b5e99191c6f0604cafbbfe50178f6f8b01e63ada313f987549acce",
+      "decodedRgbaSha256": "31af0056efe44c9fe28200385c7e525d3ae6453d436bbbe2fc7c34cd57949254"
+    },
+    {
+      "name": "testComponentCatalogThemes.EmailFrame-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "53ceaf4bbe2413a1ae1f37ae110dedaff4cdafe85e205641fc0b74e1f01f1206",
+      "decodedRgbaSha256": "cc658aa01723fa107e383f80f0b6ed6f27baf9822c571dc3e0c5594c6cecd4e3"
+    },
+    {
+      "name": "testComponentCatalogThemes.EmailFrame-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "ba6a86d5aedbd0f7877d047a7916ffa503b9fabadbb9c1e40d694a702ba89ddb",
+      "decodedRgbaSha256": "662ada4570538e428ed50867c806980619b22c0270d21185c174e3d62bd10058"
+    },
+    {
+      "name": "testComponentCatalogThemes.EmptyState-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "376647bb88e4fda91d23a595266b70774b2d9607cb4ce896a942e04c6c4c14b4",
+      "decodedRgbaSha256": "8af7a666b76f57b3c1a454ce3f8829720bb9b3f1f81a82fc62f67f79135b4bab"
+    },
+    {
+      "name": "testComponentCatalogThemes.EmptyState-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "2dd449e21438c3af0234b9e8b36a364fb595ca77ad0328e5bed7de9bd259f86d",
+      "decodedRgbaSha256": "ed34b6187da93cf23d845ca9a4e96821ce8530331a018c25d25625ef07fbb05d"
+    },
+    {
+      "name": "testComponentCatalogThemes.EtaLine-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "b76b6ef583be97277612f3c814855e8b64f9ad07e6796e54e19e80b0270bce52",
+      "decodedRgbaSha256": "07db720a2acebabfe9a2fbb5e5f09557c86de17382fffaecc1abb779c2eb3826"
+    },
+    {
+      "name": "testComponentCatalogThemes.EtaLine-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "a8b01217771e01da0f4212d79c762fabb1ff3b2e9238b3a8f8f935fb940b034f",
+      "decodedRgbaSha256": "2dc0f55aa050b3162e9b078affc6b17137e9ad1c3bfa9b0178eecef0c1465467"
+    },
+    {
+      "name": "testComponentCatalogThemes.IdentityStrip-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "3c01e7db05502153537a1d9fee5dc010671fe059b0f377d34ff7b0d5ada42895",
+      "decodedRgbaSha256": "9506fb29a416a0f35e96718acf88fd3fb8870a3772fdcbdbaa981ee359e57e5a"
+    },
+    {
+      "name": "testComponentCatalogThemes.IdentityStrip-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "e41d530c8aba6f4339ef5c6b3c628bd3d6c5f33b154aebcb0c89064f71aa12b8",
+      "decodedRgbaSha256": "3089feed86c9de79d701c04531bcbd065c588939672083ce25d531bec269faca"
+    },
+    {
+      "name": "testComponentCatalogThemes.IncludeList-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "03e81a9ffc08117cc0b670bc2babfa252e077f12b320b27ecf65b1a4ba189cf0",
+      "decodedRgbaSha256": "bff8796b3eee20bddb441a669bf296fa0e0c489506ef8d8b8d991882363af88e"
+    },
+    {
+      "name": "testComponentCatalogThemes.IncludeList-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "3e2ed629c993d4a2087a11285ca11379072919e06a1dfeb4420cc22c8a56bcba",
+      "decodedRgbaSha256": "d6e70420473a6ac1a4294f3271616a0e6ec220a7043aedf8361ac25af11b7feb"
+    },
+    {
+      "name": "testComponentCatalogThemes.InsteadMenu-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "0789e6f2e516b0566a371bbfd1ca0af3b9ff75e42b71643094b7e2db1cb961ee",
+      "decodedRgbaSha256": "9035d0ab0fec526576d7f35b083efa0554eb717bccb0ab0b6b068c1ac2ccd96e"
+    },
+    {
+      "name": "testComponentCatalogThemes.InsteadMenu-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "20408506bc1b3821d87812d5af072356e93cb351a331c10f4d50d2dc21a5ef1d",
+      "decodedRgbaSha256": "eca7cd150be33cb5b3a363d387f544961d209b8c955354685291b45bf755f32b"
+    },
+    {
+      "name": "testComponentCatalogThemes.LabelPreview-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "30c4eb91bbb04b2d8ac308ade871baebbd17b82ff9aac92b7fba90ff89e2962b",
+      "decodedRgbaSha256": "ffd0061ce3c1dbf37553c2c7648bc39358bb13cac7269194102df9019ab1d9be"
+    },
+    {
+      "name": "testComponentCatalogThemes.LabelPreview-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "d759bb221c7a0bd36ea32ce98c582bed8076255e4c8950fcdbb646e69675a794",
+      "decodedRgbaSha256": "402e07c72277ea076f4f999d18ba9a90c0ac7704a7dd4c3ae23600a25e47ddad"
+    },
+    {
+      "name": "testComponentCatalogThemes.Mark-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "f3460f05f830f394b0f13d13d5c3c392bf15dde37d4a7ad377eff536fade7fbb",
+      "decodedRgbaSha256": "d9256373892bd6f9473d361edf66dec3e6b9b68a73b8813968180804616d9a5e"
+    },
+    {
+      "name": "testComponentCatalogThemes.Mark-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "b8322a98e3e38b5a8c58004b9fc7f737e1aac811782d892235045af2e0487a94",
+      "decodedRgbaSha256": "477cdac20734ffeb7577de55b174115e83d73f578ba49e903794dba1541c9f21"
+    },
+    {
+      "name": "testComponentCatalogThemes.MemoryChip-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "4de03126ad88e0087d943b708a05f2433719cb40c2017bd6b8010feccc81861a",
+      "decodedRgbaSha256": "9a2c213500190d081d7e656b0dbf29b1d2e249709ab3bbffc62b08e03976873b"
+    },
+    {
+      "name": "testComponentCatalogThemes.MemoryChip-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "7001caddd2b0753d99ebc49365dffe9cef7c7c78c1179d0f76bc72436c567530",
+      "decodedRgbaSha256": "7d7a24e736a978cfae5870a1646fa2ae9db1aaa51b1c1f9b0b7cc904ea8d3fc7"
+    },
+    {
+      "name": "testComponentCatalogThemes.Message-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "f669839c6a36bb23daa2ef88fa3edf876b1e92c7ef56a8b00728df166b1af6b4",
+      "decodedRgbaSha256": "812968c49360062d3473d1af5486d3cf55dd6661280bee006b01298ccb3b97d4"
+    },
+    {
+      "name": "testComponentCatalogThemes.Message-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "861cb0b293c70a3fb46617f92872ca8c5b0af199d4032f609050b4dfd4058e88",
+      "decodedRgbaSha256": "2489e087775aedc9b15207b604fd143cf078f3aeacba94c45e52edcfd56357dc"
+    },
+    {
+      "name": "testComponentCatalogThemes.ModeList-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "fc60c9d68cefdf5f62e6fff7b4f79b69ffba399b330b4d048dc3ff417264c380",
+      "decodedRgbaSha256": "09e4c3f40c19e025f19c2747d1ae51bde3ee8f6d6da747f1326025e692186245"
+    },
+    {
+      "name": "testComponentCatalogThemes.ModeList-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "560d600718970ff5ed03be6441c426d5efbb01e4748c1b8de545912862635e22",
+      "decodedRgbaSha256": "ad556baa37bf804032b5df95cbb6ab1eb2ee032d0644901d120d91c9dfcdb862"
+    },
+    {
+      "name": "testComponentCatalogThemes.Note-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "51def05404d5e405533bd4abc67e1368635d2bc71a2fa7243fa9100093958499",
+      "decodedRgbaSha256": "a850cfeb36e22a12b713495ed439a65f7bbbe4b1a966d6af658f023a42584448"
+    },
+    {
+      "name": "testComponentCatalogThemes.Note-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "f61197da11ca5938c7b321eca367557e387764376a3f759a3fc0d88e29ad20d9",
+      "decodedRgbaSha256": "129ce32960abdcdfb14404820ca898ffb6763790544ea1bdd0f6999fe858b541"
+    },
+    {
+      "name": "testComponentCatalogThemes.Notice-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "dd529e3eb09a5c903f498f571e74de00e97f2a192a78b3121277a184881a744e",
+      "decodedRgbaSha256": "a6e5f87aca97ca6a06b4f57db614b330f876b2fc735a386226b62e607493ec12"
+    },
+    {
+      "name": "testComponentCatalogThemes.Notice-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "955f31c90014f9046493288f1ca61b03d507b476474d5400d72610594736ec0f",
+      "decodedRgbaSha256": "14bfc188b792fb683c13197ba778282251477bbd129dd87ad89abddd4eb85419"
+    },
+    {
+      "name": "testComponentCatalogThemes.NotificationRow-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "4597820b7449c9eb91625fcde6d2124fb89b21ca2b4ec8f705f894a487c3c3d1",
+      "decodedRgbaSha256": "24b60eb2203193b2462f87e16ffa80dc3729dc2bc6dcec61ebefbd09804621eb"
+    },
+    {
+      "name": "testComponentCatalogThemes.NotificationRow-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "7aed54d97ae26b1a8fc2b9ac489b35a4bc32ce77c6532ae61731dfe8fbe2f6e2",
+      "decodedRgbaSha256": "d9eba53501570965c6c5239ff17855f4e7f57fd328b8baa60a410f4ae5b3eb9e"
+    },
+    {
+      "name": "testComponentCatalogThemes.QueueCard-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "0c781446ec3dda198c67e8f29b446ee5554c2ce449459aee0ec641660bc267a1",
+      "decodedRgbaSha256": "42991e71134964efded01fb0d61c6d4dc6656998025a9202837efab57c1beb28"
+    },
+    {
+      "name": "testComponentCatalogThemes.QueueCard-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "1e0c71a496a9d7c9b38ec63ad42ba59235a6da488362282090cf5573dc2aee87",
+      "decodedRgbaSha256": "ad9bd87112004c47a18567d25ad92a0efa2d1843dba92197cbea2aa7986fe07d"
+    },
+    {
+      "name": "testComponentCatalogThemes.ReactionChip-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "f8801706eaf05ba0538d3c9286b8921352356c6cd13acbb691a5f87134021a51",
+      "decodedRgbaSha256": "fe01bb03e6864494f12928c75fd3b2c2587171004ab8d41b41e88636d8481913"
+    },
+    {
+      "name": "testComponentCatalogThemes.ReactionChip-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "c8614dc830936f7a697ee900661fa1ca486e1c8e134281e58ef4e4e245bbaab7",
+      "decodedRgbaSha256": "bdcfbe9876740c024d3310554363b5d56115bc563c48e2f2b80184d4f657d145"
+    },
+    {
+      "name": "testComponentCatalogThemes.Receipt-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "4c62f87ec2e19bdf72b9988e8ae19d9018794955effdb38f8f20d9acf9b34a86",
+      "decodedRgbaSha256": "21231cf388c5bad390bc6dff231dabff4681e42f8a6d1324edf20322205245ae"
+    },
+    {
+      "name": "testComponentCatalogThemes.Receipt-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "dbb14ad1c604aa728852c3e62df5336388b2484cf982561b874aa716c30c9d65",
+      "decodedRgbaSha256": "974358abfe0f84b4c83f64115d8f7ab52fef3f1ddfd5514dbcd2ed60aa3b9863"
+    },
+    {
+      "name": "testComponentCatalogThemes.RequestStatus-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "f5e9686f8ebdc6da887b26ce0ecd4bb5f724b72d049b046762f8ceb15af2d703",
+      "decodedRgbaSha256": "54cd38a813ce2a7b5281e65af0eba1de37de84a4ca8b26f2a6793661ad5a81c9"
+    },
+    {
+      "name": "testComponentCatalogThemes.RequestStatus-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "022311cb983bfdd8c9f8515a931b634315dbc03f0f7546f55041a789af165722",
+      "decodedRgbaSha256": "6e60da6840d7d78aba111cfb7b99c88ec7f7c7fe647da499b15ed68e321df626"
+    },
+    {
+      "name": "testComponentCatalogThemes.ReservedLabel-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "d6aff71031d5082034e56fb9ff0153940386d4471515123c20232e479243439a",
+      "decodedRgbaSha256": "c7995382eeb251126a0bf59c026f839a7cc8c8d9d9269a9a18903c654fd45f42"
+    },
+    {
+      "name": "testComponentCatalogThemes.ReservedLabel-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "baebfee12440f2848dc6f82e8249218b0b141256c69b5ee567b5606343bfe8ca",
+      "decodedRgbaSha256": "8355f6df8659fe6ce5af6ffb93257ff45df8638d1f8ad906282df274da9798bf"
+    },
+    {
+      "name": "testComponentCatalogThemes.Seal-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "2ab7ab465f1edf17d2765415b3e91996452bf465663c1313fa08970e8fb63253",
+      "decodedRgbaSha256": "b58c5149d473f3f987c2e4f256af1f39fb1204971e4ce26f53a9369e8e733d1b"
+    },
+    {
+      "name": "testComponentCatalogThemes.Seal-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "909f829629cf61f60a1fba7206ca818cc7eab050b801a2fda0dc5700768088db",
+      "decodedRgbaSha256": "fd4207d2912f1a28c7a45c6bf10c76de3af5eec1b0a8947788d1be45941646ee"
+    },
+    {
+      "name": "testComponentCatalogThemes.Segmented-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "50b5fa925ef2f755b82e9e4e93aa5085ead381ad2d039d450af549cfb888a561",
+      "decodedRgbaSha256": "76a501259f8151f0fe3e563c4f3aae0b95231dfa1572b3154aeda10212e84a44"
+    },
+    {
+      "name": "testComponentCatalogThemes.Segmented-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "9a920cb1cac5b6221112f48ec2ea034ad20b80edefea4003252e65c6ac242a00",
+      "decodedRgbaSha256": "7b64ff4e9b81a0aa054452125523f434c2ffceedf8bed34a1418d8478e211169"
+    },
+    {
+      "name": "testComponentCatalogThemes.ShareCard-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "d2331157e714b74a6f7f32ac87ca9b432be01a352d8fadf98ea6e293e1966937",
+      "decodedRgbaSha256": "c3b010c1bd99685780a9953ba8eb1e2f7f2f06c6c2a46bf53d656cbd4c43f872"
+    },
+    {
+      "name": "testComponentCatalogThemes.ShareCard-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "3d05e0e41be88c2d2b2664307d24a027d9059b64a7a5dbb1f0f5e12709bf861e",
+      "decodedRgbaSha256": "d85b2d88a8d73b254e25afa72b88546e579dc333b01686bbaba9cae6a6d98c3c"
+    },
+    {
+      "name": "testComponentCatalogThemes.Sheet-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "b54ff2baa43a91f8e2e68637aa56c5322eacdd8b4e7262118085eb572eb8708f",
+      "decodedRgbaSha256": "ec9e703f676a89f287e4edc3d1e3e4376b7a71acd9204d027ea55bf883e16e12"
+    },
+    {
+      "name": "testComponentCatalogThemes.Sheet-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "9454f339c9f64c8dcda432d88197b43578ff990942b7a917c1360d56777d9f74",
+      "decodedRgbaSha256": "db42030031c60dca3410cefe240c7f18944431d7e4709bcae0e84c4e7ef18cb0"
+    },
+    {
+      "name": "testComponentCatalogThemes.Sidebar-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "7b5ae8347e1f826924ad201c3ff90a9b00a000d36b8b6c002fbb68e3805107d5",
+      "decodedRgbaSha256": "613d56d3c64ca37118f8f720888959d1091ecd6c9b706ecdf2e8def95e8fe387"
+    },
+    {
+      "name": "testComponentCatalogThemes.Sidebar-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "3dfa7933107cbd57a4d41b4e1f95394df31b910ff88b0ee4d606a4d966d1c1af",
+      "decodedRgbaSha256": "69d825ebb4407f9e2b561d013e37e0a04edbae14d5a1308366f6acdf72dea2a6"
+    },
+    {
+      "name": "testComponentCatalogThemes.SignedMarker-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "22df28e3c049667d026343a5b4bd42cc5e354224ca34bef98e37a3d7f451817b",
+      "decodedRgbaSha256": "8542023f393d4a8a6246e0d70cf9263a42cf05e517b9b5ba08780a5019b3a16b"
+    },
+    {
+      "name": "testComponentCatalogThemes.SignedMarker-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "877c56edec02dc1508aeae2e4b9919c8855114f7a64ccfe3b53f78b71b030bcd",
+      "decodedRgbaSha256": "02c318c6a708548b8d6246b020c9c9198e4f5ce663eb674339effc18f75da546"
+    },
+    {
+      "name": "testComponentCatalogThemes.SigningSheet-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "d07a19238ffa5123d466efbd36d195c0673bc76d5fe7beb21f162ef875e2494f",
+      "decodedRgbaSha256": "1cf74d5054330060900c9a797d25eebcdc249b6078e77d63ca99c54b28410077"
+    },
+    {
+      "name": "testComponentCatalogThemes.SigningSheet-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "53563e1ab16d65e779afc7486700b97a18966a35de11fdec9914e06b6b89093c",
+      "decodedRgbaSha256": "26b7d1070eeae97bc9aaeee8779b9165e924c1760dc7902d4d8abe8655843603"
+    },
+    {
+      "name": "testComponentCatalogThemes.Skeleton-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "bf6cce6eeb6b053000fdcd33a26943a94f959e1e1ed8e00f7d4ea8f53274ca64",
+      "decodedRgbaSha256": "d6fabc33683b313b32ce5847dce59bc17b46f79cd9f4b15269c83e58cfe05a86"
+    },
+    {
+      "name": "testComponentCatalogThemes.Skeleton-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "47d83e47f4fca64db4d1b90c659647f94b584fca775dc8a6e82e39349265ff66",
+      "decodedRgbaSha256": "39a9ee774102120216796bf58853724e15702b91b763f5e8564ddee3da8bab92"
+    },
+    {
+      "name": "testComponentCatalogThemes.SourceRow-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "cb2d9b8ff67af448b3c6141e3492ea8cb1fc11117b74339a40b372688b384f27",
+      "decodedRgbaSha256": "90debe77df455c7bcdc925666934fc8c124208e9ce12372b3ff3ca3fda25ecb6"
+    },
+    {
+      "name": "testComponentCatalogThemes.SourceRow-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "8b3577b37f57e94ed7ad7f28c48a203a7e1cfa1ddf6b9d056ec3b1855c2a5019",
+      "decodedRgbaSha256": "e6956481b08748b9e81f1b356cf50d68bd6a5eac163ef852a7f8506983ada359"
+    },
+    {
+      "name": "testComponentCatalogThemes.SpendLimit-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "256a46f5b2416d5709c6265710b5b8ebd752d4111c42c37bad588a61cba8a43a",
+      "decodedRgbaSha256": "7e489c45301e397e136894677682098d9ab01716df57c15e4d930e6a89bfbb9e"
+    },
+    {
+      "name": "testComponentCatalogThemes.SpendLimit-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "c47423e791833d77ab70aef59285b29d9cc12aa0a3cb533950b2af94aa011a45",
+      "decodedRgbaSha256": "b3b6eb5431af3cc1f7eeaf60a9a8c842ee71fd4b6f604412bfb2433f4f128b5d"
+    },
+    {
+      "name": "testComponentCatalogThemes.StepIn-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "ec099b292e370bd9bd000d522ce68d8de27025ec50ad4d69e5aaf293fbb4441e",
+      "decodedRgbaSha256": "ff5a44018e949c6ae827efa15c70c7185896d5ab2dae10f789bea81fc813f513"
+    },
+    {
+      "name": "testComponentCatalogThemes.StepIn-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "864d03d94b9cc0ceba5d56a24932f5a54db8f7cbfce53f62489cd49f9776cf97",
+      "decodedRgbaSha256": "4d57e669f20187236ed03473f10624de392cf92dc908d6ce3cde30d137f0f77f"
+    },
+    {
+      "name": "testComponentCatalogThemes.StudioTabBar-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "ef4404386af1e02be99a6947a3206fe09adb46112c38df93798bca808f65aa39",
+      "decodedRgbaSha256": "c65afc3606ad8193d7bfdad7807a88c23ce710218aa597b9336d3e2e28b2b98f"
+    },
+    {
+      "name": "testComponentCatalogThemes.StudioTabBar-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "8838d82ba55567626b0dad5a2748180c9305abb50da73a18927b2beec19f469f",
+      "decodedRgbaSha256": "3c8a2910074d43c2725d4e2797d433322a5227a4bf2d86f598f212b8a50456aa"
+    },
+    {
+      "name": "testComponentCatalogThemes.SystemLine-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "89ff312bfe50bdd9d40cf32db0ce07cd1b79ad32faa100bea3ca7b9adcd42b25",
+      "decodedRgbaSha256": "bb147fc0627544a3c3262348f81b128c9f8c8fe53bcb116c4c4b37b27f178689"
+    },
+    {
+      "name": "testComponentCatalogThemes.SystemLine-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "ff590164c1ceb12eba55f96fe35081edffc250c78816709b3fa8e449331ed28b",
+      "decodedRgbaSha256": "cd71ed9427e3ede82d6823f2d2e9b0e8adb9a1a2b2d8d5509c87c2f2024edce6"
+    },
+    {
+      "name": "testComponentCatalogThemes.TabBar-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "f12c93c44ef76a5fef00407cf531273b89f8f161acd3ae0b7f64c884ed160066",
+      "decodedRgbaSha256": "74a27f2c0d9a12fc804dd8c0934a03ba50be55dcbf079fe35e6f03d207efb1f0"
+    },
+    {
+      "name": "testComponentCatalogThemes.TabBar-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "841ca93ef9a45fec6913a18a0d820d2e2386a797c97d065353be154c52faba07",
+      "decodedRgbaSha256": "bc2ab7c064c268861a1c575e75001a343b8a3c711a19a3bbc9ec4ad8004f1c11"
+    },
+    {
+      "name": "testComponentCatalogThemes.TermsBlock-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "757537a4d53df327fbd8b10ba7ce9a2fea09395fbc006b53d16a9a1159b983c0",
+      "decodedRgbaSha256": "5d81f75ffaada57167acde9929f211ceb753e8969bbc3ea0180bc9dcf289b300"
+    },
+    {
+      "name": "testComponentCatalogThemes.TermsBlock-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "4845f8c872b3cd4769be97dfc23934160f460e8e60ecd2e0201da6b4d2e3221d",
+      "decodedRgbaSha256": "2346ead034556b4f426dbc3c06e62eee0d3b2c3538041e2eb9599f9588786077"
+    },
+    {
+      "name": "testComponentCatalogThemes.TestConsole-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "cc221bb3fd79d6c61224acf7145728211d20db205fbcaa27df2e879d0879475e",
+      "decodedRgbaSha256": "8fb00d56171674d54acfb82f5c2c4999253461109efa0099bff36e8f44950c09"
+    },
+    {
+      "name": "testComponentCatalogThemes.TestConsole-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "266f100e944571c176eecfef4368f7acaee3af167786b3ca0ae3886e624bddd1",
+      "decodedRgbaSha256": "8f3aa14feb52d78b1a4877d9afd3ae2e282426968b566d3dfe8a0eb61f52cd91"
+    },
+    {
+      "name": "testComponentCatalogThemes.ThreadHeader-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "bf2b89f1c7338650eb939dbf38b5dbf07a82e32cde464b916749d513428b6858",
+      "decodedRgbaSha256": "8a0206e5c618f2522dae28e9c18e245bb55e5a6b8b917976d6608a550d63052f"
+    },
+    {
+      "name": "testComponentCatalogThemes.ThreadHeader-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "b0d77cfcfb258ae229aa00557f8ee5976e84af86f4f4fdffcf94659a23a93c6c",
+      "decodedRgbaSha256": "1cd40ab9f69e8004516c4cd95637e956508593497140932f56ab5a0915979539"
+    },
+    {
+      "name": "testComponentCatalogThemes.Toast-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "047af89ebbdf48f7054a9d31677cd9ca39760057d6230580d0c5bd7567bfd269",
+      "decodedRgbaSha256": "65afff16870c154b72e8064579b4f50151b9cb6583ef192fc6bb6129e899ff5a"
+    },
+    {
+      "name": "testComponentCatalogThemes.Toast-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "95bf327c89061bdd346cf1d8a8816a40dfd84342e376af7bfd2a371ee5d55589",
+      "decodedRgbaSha256": "38dc66264a3ea5530f167c32614fb1529f2a3c4160739ce6180d31b6979e2c39"
+    },
+    {
+      "name": "testComponentCatalogThemes.VersionList-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "359baaee82ba5345d855144153b91c70ff01e7dfb6ede6e61192e44514eadeeb",
+      "decodedRgbaSha256": "3ab853fe8abbc63c3da401b5be1835bc047a4cc4a4977a5cecd67454a3c34194"
+    },
+    {
+      "name": "testComponentCatalogThemes.VersionList-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "3ef64d45a7acdb3908ac45bd9b9aab0bf0b905a782d875b46a99e522020d9d22",
+      "decodedRgbaSha256": "46f720493d88feb4352919cb808241b69862168b547349c1d04f365b8ef9169b"
+    },
+    {
+      "name": "testComponentCatalogThemes.VoiceNote-light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "71a5dc4fcc457e5cbbd171a4fb899850c3a609b14932ce72d30a8979eb87eead",
+      "decodedRgbaSha256": "aac905b32a11b406716f4b118db375f037368e5864ab363ee44306276764cdb6"
+    },
+    {
+      "name": "testComponentCatalogThemes.VoiceNote-night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "6bb568d344bac5c55e6a79b5b26af15d8721277978d25a6046a7651d0dc40510",
+      "decodedRgbaSha256": "f6a2b9892a66d705e4421d1d953f1b039703a1dbe917f132f733ec7d336c22ef"
+    },
+    {
+      "name": "testWelcomeThemes.light.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "b7b3b094e96f6712c088593bfdb63fdad567d1d0989974003b3413d91b0f7382",
+      "decodedRgbaSha256": "63f722f0d0a856efa03a95d133351fbf535cd3acf8be0fc8678bcbe500e03d8a"
+    },
+    {
+      "name": "testWelcomeThemes.night.png",
+      "size": [780, 1688],
+      "mode": "RGBA",
+      "iccBytes": 3368,
+      "sha256": "bf959e57b158234f1015469ba24b06b5f12d32f2b50c096681b238cbd9db5f78",
+      "decodedRgbaSha256": "bf4dc168ca2d051fcb4f0538e00424be320056130de1517eac6c916a0a87a005"
+    }
+  ]
+}

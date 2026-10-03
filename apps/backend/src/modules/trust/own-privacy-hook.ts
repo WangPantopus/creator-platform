@@ -1,13 +1,40 @@
-import type { Pool } from "pg";
+import type { Pool, PoolClient } from "pg";
 import type { PrivacyHook } from "./contracts.js";
+import { domainPrivacyTaskAuthorityInTransaction } from "./domain-privacy-authority.js";
+import { DomainError } from "../../core/errors.js";
 
-export function trustPrivacyHook(pool: Pool): PrivacyHook {
+export function trustPrivacyHook(
+  pool: Pool,
+  assertRestoredInTransaction?: (client: PoolClient) => Promise<void>,
+): PrivacyHook {
   return {
     domain: "trust",
     async run(input) {
+      if (!assertRestoredInTransaction || !input.signal)
+        throw new DomainError(
+          "privacy_commit_fence_unavailable",
+          "The current held lifecycle and restoration authority is required.",
+          503,
+        );
+      input.signal.throwIfAborted();
       const client = await pool.connect();
+      let released = false;
+      const abort = () => {
+        if (!released) {
+          released = true;
+          client.release(true);
+        }
+      };
+      input.signal.addEventListener("abort", abort, { once: true });
       try {
+        input.signal.throwIfAborted();
         await client.query("BEGIN");
+        await domainPrivacyTaskAuthorityInTransaction(
+          client,
+          input,
+          "trust",
+          assertRestoredInTransaction,
+        );
         const matches = `reporter_account_id=$1 AND ($2::uuid IS NULL OR creator_id=$2) AND ($3::uuid IS NULL OR EXISTS(SELECT 1 FROM creator_trust.case_evidence e WHERE e.case_id=creator_trust.safety_case.id AND e.snapshot->>'thread_id'=$3::text))`;
         const parameters = [input.accountId, input.creatorId, input.threadId];
         const cases = (
@@ -160,7 +187,15 @@ export function trustPrivacyHook(pool: Pool): PrivacyHook {
             );
           }
         }
+        await domainPrivacyTaskAuthorityInTransaction(
+          client,
+          input,
+          "trust",
+          assertRestoredInTransaction,
+        );
+        input.signal.throwIfAborted();
         await client.query("COMMIT");
+        input.signal.throwIfAborted();
         const retained: {
           category: string;
           until: string | null;
@@ -196,10 +231,11 @@ export function trustPrivacyHook(pool: Pool): PrivacyHook {
           retained: input.kind === "delete" ? retained : [],
         };
       } catch (error) {
-        await client.query("ROLLBACK");
+        if (!released) await client.query("ROLLBACK");
         throw error;
       } finally {
-        client.release();
+        input.signal.removeEventListener("abort", abort);
+        if (!released) client.release();
       }
     },
   };

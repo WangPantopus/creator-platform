@@ -1,0 +1,51 @@
+{
+  "operator": "primary W4",
+  "shippingSource": "142f7208d2ea1e099a0662b25698c31018abfab6",
+  "apiSource": "65f9dc16130f8a0ecb5b36c5be42e27d0e9bded7",
+  "canonicalMigrations": 57,
+  "shippingApkSha256": "1bac0828abe06be574cd52572e8f0bdd83338047a652a85fe0efa3d5d59a7f81",
+  "verifiedAtUtc": "2026-10-02T15:13:58.693531+00:00",
+  "surface": "Real Android shipping app on owned emulator-5564 via official Android Studio embedded mirror; every tap/typing observation used CUA.",
+  "identity": "Clearly labeled development actor two; actual local API.",
+  "personallyVerified": [
+    "Cold Night return showed saved6USD, zero charged/held/refunded, reminders off and original pending No limit increase displayed Oct3 2026 05:42.",
+    "Tapping Monthly amount opened the real decimal numeric keyboard; four real key taps produced6.00 in Night.",
+    "Cold Light return retained original saved6USD/pending deadline/reminders/zero totals.",
+    "Real decimal numeric keyboard taps produced6.50 in Light.",
+    "Another force-stop and normal shipping launch discarded the unsaved draft and retained saved6USD/original pending increase."
+  ],
+  "mutations": "Decimal values were unsaved drafts. No Save tap, new financial/provider transaction or changed pending deadline.",
+  "limits": [
+    "24-hour increase has not matured; no completed increase acceptance claimed.",
+    "iOS personally operating through CUA remains blocked by DeviceHub timeouts; proposed alternative driver awaits explicit human answer.",
+    "No creator, passkey, payment, store sheet or provider positive acceptance claimed."
+  ],
+  "shutdown": {
+    "ownEmulatorNormalExit": 0,
+    "exactGuiAndAndroidSlot2LeasesReleased": true,
+    "peerResourcesChanged": false
+  },
+  "releaseReady": false,
+  "evidence": [
+    {
+      "file": "01-night-return.png",
+      "sha256": "4d5b44239e30caf4555a301607943b8729f6249016f66ce6c6755af2208786a7"
+    },
+    {
+      "file": "02-night-decimal-keyboard.png",
+      "sha256": "3ef532eda1930198211d52fbf85cf08425376ecdd66caa44cf93b0fb78ce89be"
+    },
+    {
+      "file": "03-light-cold-return.png",
+      "sha256": "a5f1cd6e6c14c8558bf681d3cf157c767a6588b5f25398893addefc37909b06a"
+    },
+    {
+      "file": "04-light-decimal-keyboard.png",
+      "sha256": "4b94daad8e72f6a8946888923ed163a0aaf9b88ce538b05764d2358adedb62d8"
+    },
+    {
+      "file": "05-light-return-preserved.png",
+      "sha256": "02ce1e793a562cf7f94fd1226ff1e372ef54495eac92833a76104f378f7876d7"
+    }
+  ]
+}
