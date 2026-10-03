@@ -593,6 +593,7 @@ export function Studio({
           <button
             ref={reconnectButton}
             type="button"
+            className="qv-btn qv-btn--secondary"
             aria-busy={loading}
             onClick={() => void refresh()}
           >
@@ -3485,7 +3486,7 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
     threadMounted = useRef(false),
     threadGeneration = useRef(0),
     threadCheckedAt = useRef(0),
-    directoryPages = useRef(1),
+    directoryCursors = useRef<(string | null)[]>([null]),
     pendingTeam = useRef<typeof teamPending>(null);
   const teamStorage = `w5.team-reply:${creator.viewerAccountId}:${creator.id}:${fanId}`;
   const rememberTeam = useCallback(
@@ -3546,38 +3547,21 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
           setText(draft.text);
         }
       } else {
-        let value = await studioRequest<NonNullable<typeof entries>>(
+        const cursor = directoryCursors.current.at(-1);
+        const value = await studioRequest<NonNullable<typeof entries>>(
           "studio",
-          `${creator.id}/threads`,
+          `${creator.id}/threads${cursor ? `?${new URLSearchParams({ cursor })}` : ""}`,
           undefined,
           creator.viewerAccountId,
         );
-        let loadedPages = 1;
-        // Rebuild every displayed page from current audited authority. A poll
-        // must neither discard later pages nor retain unchecked private rows.
-        while (value.nextCursor && loadedPages < directoryPages.current) {
-          const next = await studioRequest<NonNullable<typeof entries>>(
-            "studio",
-            `${creator.id}/threads?cursor=${encodeURIComponent(value.nextCursor)}`,
-            undefined,
-            creator.viewerAccountId,
-          );
-          value = {
-            items: [...value.items, ...next.items].filter(
-              (entry, index, all) =>
-                all.findIndex((other) => other.fanId === entry.fanId) === index,
-            ),
-            nextCursor: next.nextCursor,
-          };
-          loadedPages++;
-        }
+        // Refresh one visible bounded page. Earlier private rows are discarded;
+        // retaining only their opaque cursors avoids cumulative lease expiry.
         if (!threadMounted.current || generation !== threadGeneration.current)
           return;
-        directoryPages.current = loadedPages;
         setEntries(value);
       }
       threadCheckedAt.current = started;
-      setThreadCurrent(performance.now() - started < 5000);
+      setThreadCurrent(!document.hidden && performance.now() - started < 5000);
     } catch (error) {
       if (threadMounted.current && generation === threadGeneration.current) {
         setThreadCurrent(false);
@@ -3621,19 +3605,29 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
       /* Corrupt metadata cannot select an actor or invent a receipt. */
     }
     void action.run(load);
-    const refresh = () => void action.run(load),
+    const refresh = () => {
+        if (!document.hidden) void action.run(load);
+      },
+      visibility = () => {
+        if (document.hidden) {
+          threadGeneration.current++;
+          setThreadCurrent(false);
+        } else refresh();
+      },
       polling = setInterval(refresh, 4000),
       expiry = setInterval(() => {
         if (performance.now() - threadCheckedAt.current >= 5000)
           setThreadCurrent(false);
       }, 500);
     window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", visibility);
     return () => {
       threadMounted.current = false;
       threadGeneration.current++;
       clearInterval(polling);
       clearInterval(expiry);
       window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", visibility);
     };
   }, [load, teamStorage, rememberTeam]);
   const sendTeam = async () => {
@@ -3717,6 +3711,13 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
     <section className="w5-threads">
       <header className="w5-heading">
         <h1>Threads</h1>
+        <button
+          className="qv-link-btn"
+          disabled={action.busy}
+          onClick={() => void action.run(load)}
+        >
+          Refresh conversations
+        </button>
       </header>
       <div className="w5-gutter">
         <AuditBanner />
@@ -3776,20 +3777,43 @@ function Threads({ creator, fanId }: { creator: Creator; fanId?: string }) {
                   body="Current conversations will appear when fans reply to Notes or send requests."
                 />
               )}
-              {entries?.nextCursor && directoryPages.current < 50 && (
-                <button
-                  className="qv-btn qv-btn--secondary"
-                  disabled={action.busy}
-                  onClick={() =>
-                    void action.run(async () => {
-                      directoryPages.current++;
-                      await load();
-                    })
-                  }
-                >
-                  Load more conversations
-                </button>
-              )}
+              <div className="w5-actions">
+                {directoryCursors.current.length > 1 && (
+                  <button
+                    className="qv-btn qv-btn--secondary"
+                    disabled={action.busy}
+                    onClick={() =>
+                      void action.run(async () => {
+                        threadGeneration.current++;
+                        setThreadCurrent(false);
+                        setEntries(null);
+                        directoryCursors.current.pop();
+                        await load();
+                      })
+                    }
+                  >
+                    Previous conversations
+                  </button>
+                )}
+                {entries?.nextCursor && (
+                  <button
+                    className="qv-btn qv-btn--secondary"
+                    disabled={action.busy}
+                    onClick={() =>
+                      void action.run(async () => {
+                        if (!entries.nextCursor) return;
+                        threadGeneration.current++;
+                        setThreadCurrent(false);
+                        directoryCursors.current.push(entries.nextCursor);
+                        setEntries(null);
+                        await load();
+                      })
+                    }
+                  >
+                    Next conversations
+                  </button>
+                )}
+              </div>
             </>
           ) : (
             data && (
