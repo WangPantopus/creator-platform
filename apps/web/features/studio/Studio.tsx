@@ -3373,7 +3373,7 @@ function Team({ creator }: { creator: Creator }) {
                       creator.viewerAccountId,
                     );
                     action.setNotice(
-                      "Invitation created. The invited account must accept it; no role is granted yet.",
+                      "Invitation created. Roles take effect only after the invited account accepts.",
                     );
                     setAccount("");
                     setRoles([]);
