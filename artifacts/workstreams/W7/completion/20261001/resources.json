@@ -849,20 +849,21 @@
       "evidence": "Routine screenshots/hash/log/diagnostic evidence remains private under successor scratch."
     },
     "prReview20261003": {
-      "source": "35da106bfcc138899d9e36b6be75d85ec7c2fffa",
+      "source": "ee6f6f63dc3981b15eff8538b218826fdbba6990",
       "reviewedMain": "6a9f10a850fb4769c667f89a6304505dd6a04728",
       "integration": "3ead5472953f875b83b6ccad370cac3c82b2c97b",
-      "sourcePathsPersonallyReadAtCheckpoint": 100,
-      "sourcePathsTotal": 100,
+      "sourcePathsPersonallyReadAtCheckpoint": 101,
+      "sourcePathsTotal": 101,
       "fullCombinedReviewComplete": false,
       "pr31": "open draft/unmerged",
-      "existingWorkspace": "pass;9 backend contracts/9 PostgreSQL cases skipped",
-      "existingVisual": "13pass/2.8min unchanged references; own test servers closed",
-      "native": "c211 Swift18/signed iOS/strict signature/Android47 pass;35da shared Segmented repair not yet built or operated; last actual shipping operation483",
-      "ownerInventory": "46initial;13closed-unmerged;283/285documentation-only merged08:42UTC; later284distinct owner increment; all7published dispositions and main five-file documentation delta personally read",
+      "existingWorkspace": "e5 pass;9 backend contracts/9 PostgreSQL cases skipped",
+      "existingVisual": "ee6 unchanged full13pass/2.9min; first12pass/Thread Light17pixels delta5 failure preserved, unchanged focused2pass",
+      "native": "ee6 signed iOS/strict signature and Swift18/110 unchanged comparisons pass; current e5 installed hashes match, aggregate Sections hides category AX; revised ee6 actual operation pending; Android source unchanged from c21147-task pass",
+      "ownerInventory": "46 initial;13closed-unmerged;283/285 documentation merged; all seven audits reconciled; all11 paths284 read with discard failure owner repair; all6 paths286 and surrounding effects read with no blocking finding",
       "authority": "no new SQL; original0044\u20130060 ceiling/unanswered17-entry packet/genuine inputs remain absent",
       "originalAcceptance": "all original unfinished rows and historical failures preserved; W7 incomplete",
-      "latestExactHeadCI": "35da all5 Foundation plus Trust queued; later pushed head requires its own exact jobs"
+      "latestExactHeadCI": "ee6 Foundation queued; Trust in progress/queued; older e5 backend/android-runtime/Trust pass with three Mac jobs queued",
+      "resources": "APIexit0/productionwebexit1/own PG stopped;40 migrations/0creators/0other clients/cap0; FABShutdown/5580absent; exact heavy/GUI/simulator released; no new SQL/stale backup"
     }
   },
   "previousTransfer": {
