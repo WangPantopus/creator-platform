@@ -143,6 +143,8 @@ public final class FanSession: ObservableObject {
         guard let credential = try? await storage.read(), credential == confirmedCredential else { return nil }
         let configuration = URLSessionConfiguration.ephemeral
         configuration.urlCache = nil; configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        configuration.timeoutIntervalForRequest = timeoutSeconds
+        configuration.timeoutIntervalForResource = timeoutSeconds
         let capture = FanSessionRequestCapture(owner: self,
             client: CreatorAPIClient(baseURL: baseURL, session: URLSession(configuration: configuration), maximumResponseBytes: maximumResponseBytes, timeoutSeconds: timeoutSeconds, expectedAccountId: active.accountId, expectedSessionId: active.sessionId, token: { credential }),
             accountId: active.accountId, sessionId: active.sessionId, destination: target,
