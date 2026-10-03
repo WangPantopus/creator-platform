@@ -1,0 +1,41 @@
+{
+  "guardSource": "064fa55e4eaadd6b76c189e41e24fb041b30a3de",
+  "metadataOnly": true,
+  "sqlReplayed": false,
+  "receipts": [
+    {
+      "database": "creator_w5",
+      "ledgerRows": 57,
+      "safety": {
+        "checkedRoles": 3,
+        "pinnedFunctions": 7,
+        "directCapabilities": 82,
+        "publicCapabilities": 327,
+        "pinnedPublicFunctions": 23
+      }
+    },
+    {
+      "database": "creator_w5_wave_20261002",
+      "ledgerRows": 57,
+      "safety": {
+        "checkedRoles": 3,
+        "pinnedFunctions": 7,
+        "directCapabilities": 82,
+        "publicCapabilities": 327,
+        "pinnedPublicFunctions": 23
+      }
+    },
+    {
+      "database": "creator_w5_fresh57_20261002",
+      "ledgerRows": 57,
+      "safety": {
+        "checkedRoles": 3,
+        "pinnedFunctions": 7,
+        "directCapabilities": 82,
+        "publicCapabilities": 327,
+        "pinnedPublicFunctions": 23
+      }
+    }
+  ],
+  "checkedConsumerSource": "698aac934b6dfd1f3bdf7c1acfc0d2876e3764f7"
+}

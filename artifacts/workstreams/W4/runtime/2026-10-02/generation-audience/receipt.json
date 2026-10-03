@@ -1,0 +1,103 @@
+{
+  "operator": "primary W4; personally implemented and reviewed",
+  "baseSource": "65f9dc16130f8a0ecb5b36c5be42e27d0e9bded7",
+  "status": {
+    "implemented": true,
+    "catalogueAndSqlVerified": true,
+    "registered": false,
+    "integratedWorker": false,
+    "positiveRuntimeVerified": false,
+    "releaseReady": false
+  },
+  "sourceSqlSha256": "91e56109c91c9437104d68a00ccf1c7f5cc3ea0180db8d3535becb8d72f1bb2c",
+  "actualFunctionDefinitionSha256": "19880cbdf7c0a7afdeb29fb1abb0b41f7e342940e233dec01849817846db7567",
+  "w1Source": "dcb77f23833f8a79761ee072b018e7aa78d765b7",
+  "w1Original0072SqlSha256": "7de41bf10228219d69480e302bac7d69626d8d848d8276bb1fe54e49112a5627",
+  "postgresSqlCompiler": {
+    "diagnosticCount": 0,
+    "tool": "official PostgreSQL17 plpgsql_check2.10.11; isolated owned proposal database"
+  },
+  "catalogue": {
+    "operator": "primary W4",
+    "mode": "actual isolated canonical57; catalogue-only read; proposals unregistered",
+    "businessRowsCreated": 0,
+    "scopeRowsCreated": 0,
+    "ledgerRowsFabricated": 0,
+    "catalogue": {
+      "ready": true,
+      "activated": false,
+      "definitionChecksum": "19880cbdf7c0a7afdeb29fb1abb0b41f7e342940e233dec01849817846db7567",
+      "expectedPolicyCount": 25,
+      "expectedColumnGrantCount": 65
+    },
+    "rawDenials": [
+      {
+        "name": "private_scope",
+        "sqlstate": "42501"
+      },
+      {
+        "name": "financial_reservation",
+        "sqlstate": "42501"
+      },
+      {
+        "name": "unactivated_entrypoint",
+        "sqlstate": "55000"
+      }
+    ]
+  },
+  "manualSchemaFaults": {
+    "mode": "primary manual schema-only custody fault injection; isolated owned fresh57; no issuer or business scope",
+    "before": {
+      "ready": true,
+      "activated": false
+    },
+    "checks": [
+      {
+        "name": "wider_row_policy",
+        "ready": false,
+        "activated": false
+      },
+      {
+        "name": "extra_column_write",
+        "ready": false,
+        "activated": false
+      },
+      {
+        "name": "login_role",
+        "ready": false,
+        "activated": false
+      },
+      {
+        "name": "public_entrypoint",
+        "ready": false,
+        "activated": false
+      }
+    ],
+    "after": {
+      "ready": true,
+      "activated": false
+    },
+    "custody": {
+      "canonical_migration_count": 57,
+      "proposed_ledger_count": 0,
+      "scope_count": 0,
+      "generation_count": 0,
+      "reservation_count": 0,
+      "membership_count": 0,
+      "pass_count": 0
+    }
+  },
+  "checks": {
+    "backendBuild": "pass",
+    "scopedLint": "pass",
+    "scopedFormat": "pass",
+    "generatedConsistency": "pass",
+    "newUnitTests": 0
+  },
+  "limits": [
+    "Proposals physically reviewed only on an isolated fresh57 database; no fabricated migration rows.",
+    "No generation task, reservation, membership, pass, receipt, consent or verified creator was created.",
+    "Actual worker composition, licensed input/retrieval and positive allowance audience remain pending.",
+    "No financial mutation, spend/release, provider admission or release-ready claim."
+  ]
+}

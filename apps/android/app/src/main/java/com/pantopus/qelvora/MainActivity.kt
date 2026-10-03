@@ -16,13 +16,16 @@ import com.pantopus.qelvora.identity.fanFeatures
 
 class MainActivity : ComponentActivity() {
     private val destination = mutableStateOf("/home")
+    private val destinationDelivery = mutableStateOf(0L)
     private var debugAPIURL: String? = null
     private var debugAppearance: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         destination.value = returnTarget(intent)
-        val configured = BuildConfig.CREATOR_API_URL.takeIf { it.startsWith("https://") }
-        debugAPIURL = if (BuildConfig.DEBUG) debugURL(if (intent.hasExtra("api_url")) intent.getStringExtra("api_url") else savedInstanceState?.getString("debug_api_url")) else null
+        destinationDelivery.value = savedInstanceState?.getLong("destination_delivery") ?: 0L
+        val configured = apiOrigin(BuildConfig.CREATOR_API_URL)
+            ?: if (BuildConfig.DEBUG) apiOrigin(BuildConfig.CREATOR_API_URL, loopback = true) else null
+        debugAPIURL = if (BuildConfig.DEBUG) apiOrigin(if (intent.hasExtra("api_url")) intent.getStringExtra("api_url") else savedInstanceState?.getString("debug_api_url"), loopback = true) else null
         debugAppearance = if (BuildConfig.DEBUG) (if (intent.hasExtra("appearance")) intent.getStringExtra("appearance") else savedInstanceState?.getString("debug_appearance"))?.takeIf { it in listOf("light", "night") } else null
         val local = debugAPIURL
         setContent {
@@ -35,11 +38,12 @@ class MainActivity : ComponentActivity() {
                 }
             }
             QelvoraTheme(night = night) {
-                if (BuildConfig.DEBUG && intent.getBooleanExtra("catalog", false)) NativeFoundationCatalog(intent.getStringExtra("component")) else FanAppShell(this, local ?: configured, destination.value, fanFeatures(this, local ?: configured))
+                if (BuildConfig.DEBUG && intent.getBooleanExtra("catalog", false)) NativeFoundationCatalog(intent.getStringExtra("component")) else FanAppShell(this, local ?: configured, destination.value, fanFeatures(this, local ?: configured), destinationDelivery.value)
             }
         }
     }
     override fun onSaveInstanceState(outState: Bundle) {
+        outState.putLong("destination_delivery", destinationDelivery.value)
         if (BuildConfig.DEBUG) {
             debugAPIURL?.let { outState.putString("debug_api_url", it) }
             debugAppearance?.let { outState.putString("debug_appearance", it) }
@@ -47,15 +51,28 @@ class MainActivity : ComponentActivity() {
         super.onSaveInstanceState(outState)
     }
     override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent); setIntent(intent)
+        super.onNewIntent(intent)
         val launcherResume = intent.action == Intent.ACTION_MAIN && intent.hasCategory(Intent.CATEGORY_LAUNCHER) && intent.data == null && (!BuildConfig.DEBUG || !intent.hasExtra("return_to"))
-        if (!launcherResume) destination.value = returnTarget(intent)
+        // Repeated explicit links are new deliveries; launcher resumes keep
+        // the current screen. The counter is navigation, never authority.
+        if (!launcherResume) {
+            setIntent(intent)
+            destination.value = returnTarget(intent)
+            destinationDelivery.value++
+        }
     }
-    private fun debugURL(value: String?): String? = value?.takeIf { runCatching { URI(it).let { url -> url.scheme in listOf("http", "https") && url.userInfo == null && url.host in listOf("localhost", "127.0.0.1", "10.0.2.2") } }.getOrDefault(false) }
     private fun returnTarget(intent: Intent): String {
         if (BuildConfig.DEBUG) intent.getStringExtra("return_to")?.let { return it }
         val uri = intent.data ?: return "/home"
-        if (uri.scheme != "qelvora" || uri.host != "app" || uri.encodedUserInfo != null || uri.fragment != null) return "/unavailable"
+        if (uri.scheme != "qelvora" || uri.host != "app" || uri.port != -1 || uri.encodedUserInfo != null || uri.fragment != null) return "/unavailable"
         return uri.encodedPath.orEmpty() + (uri.encodedQuery?.let { "?$it" } ?: "")
+    }
+    private fun apiOrigin(value: String?, loopback: Boolean = false): String? = value?.takeIf {
+        runCatching {
+            val origin = URI(it)
+            origin.host?.isNotEmpty() == true && origin.userInfo == null && origin.rawQuery == null && origin.rawFragment == null &&
+                origin.rawPath in listOf("", "/") && (origin.port == -1 || origin.port in 1..65535) &&
+                if (loopback) origin.scheme in listOf("http", "https") && origin.host in listOf("localhost", "127.0.0.1", "10.0.2.2") else origin.scheme == "https"
+        }.getOrDefault(false)
     }
 }

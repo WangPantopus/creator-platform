@@ -1,0 +1,66 @@
+{
+  "isolatedOnly": true,
+  "plans": [
+    {
+      "name": "packetHash",
+      "explainWithoutAnalyze": true,
+      "purposeRole": true
+    },
+    {
+      "name": "existingPublicPolicy",
+      "explainWithoutAnalyze": true,
+      "purposeRole": true
+    }
+  ],
+  "schemaSha256": "167b04e53310b6cba5dfa61cafba58f69242836698611a4d2c7e4136132583f5",
+  "canonicalRequestExpressionMatches": true,
+  "mutations": [
+    {
+      "name": "privateAssertionGrant",
+      "actualMetadataMutation": true,
+      "detected": true,
+      "restored": true,
+      "rolledBack": true
+    },
+    {
+      "name": "restrictivePacketPolicyDropped",
+      "actualMetadataMutation": true,
+      "detected": true,
+      "restored": true,
+      "rolledBack": true
+    },
+    {
+      "name": "hashHelperSearchPath",
+      "actualMetadataMutation": true,
+      "detected": true,
+      "restored": true,
+      "rolledBack": true
+    }
+  ],
+  "compilerDiagnosticCount": 0,
+  "definitions": {
+    "creator.commerce_fulfillment_originals_match(uuid)": "7cec5bbaf4bb23fe8a4d60c4f8a3f9804c8fe0808275ababb7961673260226be"
+  },
+  "functionCatalogue": "a26ce60f5353600d3e83f333cd62a7125ac3dbe10390bf8c6566e96d67b6c995",
+  "helperDefinitionSha256": "f9d99fec672a6b7d9e40f5cf20f3ab4dccab10acf70b845ba25597be76d502e7",
+  "roleCatalogue": "a93941351bbfc4d328c5442cf6463725c77458acee62102732ab17b9241217eb",
+  "viewRoleCatalogue": "f870ee07b5d12f65ac3abe45864a55ce9011af6967fc63cac91fff78f8a88d8e",
+  "viewScopeCatalogue": "5a13261bde3339d7bca347ec0689ecfbf6abc1629817354f6122ff25ad15cd50",
+  "planCatalogue": "4c8564303cc95803a61db1e23eee05da4f4bb2a7149ade12a2742cf0e190a121",
+  "unregisteredRefusal": true,
+  "administratorSelectedRuntime": true,
+  "counts": {
+    "migrations": 57,
+    "plans": 0,
+    "deliveries": 0,
+    "rolled_back": true
+  },
+  "positiveOriginalVerified": false,
+  "reviewedBy": "primary W4",
+  "registrationOwner": "W8",
+  "registered": false,
+  "mounted": false,
+  "releaseReady": false,
+  "actualNullPolicyRefused": true,
+  "privateOperatorFailureCorrected": "42501 fan_profile policy metadata access; bounded metadata-only grants added without changed expectations"
+}

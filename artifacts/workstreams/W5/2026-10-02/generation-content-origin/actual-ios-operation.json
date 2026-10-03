@@ -1,0 +1,23 @@
+{
+  "observedAt": "2026-10-02T13:32:49.929582+00:00",
+  "source": "2fb6d465441bbfb3e401f41ad921cfa090470413",
+  "udid": "78C3590E-6D36-4A73-9E46-D23563EF0134",
+  "shippingAppId": "com.pantopus.qelvora",
+  "apiURL": "http://127.0.0.1:41055",
+  "appearance": "light",
+  "launchPID": 1196,
+  "installedDebugDylibSHA256": "b74a0bba2ff3a37778974e848e043532879f47ca51c1e35bb549ad214c17a83e",
+  "supportedUIObservations": [
+    {
+      "entry": "cua.getApp(Device Hub)",
+      "result": "Computer Use server error -10005: timeoutReached"
+    },
+    {
+      "entry": "Actual Xcode > Open Developer Tool > Device Hub, followed by cua.getApp(com.apple.dt.Devices)",
+      "result": "Computer Use server error -10005: timeoutReached"
+    }
+  ],
+  "qualification": "Actual build/install/launch verified, personally operated iOS fan content UI unverified; no alternative input driver or fabricated acceptance.",
+  "ownedSimulatorShutdown": true,
+  "ownedSimulatorAndGUILeasesReleased": true
+}

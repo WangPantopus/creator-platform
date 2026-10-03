@@ -1,0 +1,31 @@
+{
+  "at": "2026-10-01T14:15:34.493403+00:00",
+  "baseline": "4c2ea26867d27ba7466e0ac7446216fe0a49b24f",
+  "branch": "codex/w4-call-refund-custody-20261001",
+  "sourceHashes": {
+    "apps/backend/src/modules/commerce/service.ts": "73439b275b65cbdf62f0e0511ff5109c0efb09599fbca7496b71e71d791c0a3f",
+    "apps/backend/src/modules/commerce/fulfillment.ts": "2be3b48f2e5a3de79777c10ed30d438d88913b69cc669a59ef7e1ee2790460ef"
+  },
+  "change": "The real immutable W6 outcome, resolution, saved original refund effect/body/key and both command responses commit in one transaction. Provider runEffect occurs only after commit.",
+  "custody": [
+    "An actual issued ThreadScope is mandatory; its real thread is locked before command replay and commitment locks. No Actor issuer, worker purpose, case authority or held-denial producer is introduced.",
+    "The current creator profile is locked narrowly under the genuine scope owner GUC, then the actual caller account is restored before domain work. Creator/thread/booked participant/media/duration bindings are rechecked.",
+    "Recorded integer clocks are validated before BigInt conversion. Only completed call evidence is human_call; negative/resolution outcomes are system. No missing/partial/both-absent evidence is promoted to fulfillment.",
+    "Refunds preserve the original session cause/body and captured balance. All pending/done nonfailed obligations contribute to the balance guard; unknown cash remains held.",
+    "Legacy completed resolution command responses without effect IDs resume their saved original refund through the same idempotent refund cause, without rewriting history.",
+    "Resolution events refer to the resulting commitment version after any queued refund mutation."
+  ],
+  "checks": {
+    "earlyAtomicRevision": "Scoped format/lint/backend typecheck passed before the final participant/profile/authorship refinements.",
+    "finalRevision": "git diff --check passed; final compilation/CI and actual SQL/app/provider acceptance pending.",
+    "dependencyCleanup": "The scoped checker automatically reinstalled deleted ignored dependencies from the existing store. It completed. Only regenerated node_modules in this W4 checkout were removed again; shared store and peers were untouched."
+  },
+  "runtime": "No new local runtime/database/native build or provider call during renewed cleanup. No final SQL/call/refund/race/restart acceptance is claimed.",
+  "limitations": [
+    "Genuine W6 provider and current W8 purpose/held denial remain required; the branded thread scope is not by itself proof of current worker authority.",
+    "Current payout eligibility permits delivered commitments only. Resolved fan_no_show/partial proceeds remain held; reviewed terminal-call payout timing/source policy is still needed rather than falsely marking these outcomes delivered.",
+    "No final native/VoiceOver/TalkBack evidence or visual claim; no UI/reference assets changed.",
+    "No migration/registry/applied bytes, test suites/cases/assertions or coverage changed."
+  ],
+  "releaseReady": false
+}

@@ -11,7 +11,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { brand } from "@qelvora/brand";
 import { SessionSchema } from "@qelvora/api";
-import { AuthorLabel, Avatar, Mark, Notice, Skeleton } from "@qelvora/ui-web";
+import {
+  AuthorLabel,
+  Avatar,
+  Mark,
+  Notice,
+  Skeleton,
+  Toast,
+} from "@qelvora/ui-web";
 import type {
   Configuration,
   EvaluationCase,
@@ -20,7 +27,11 @@ import type {
   Version,
   VersionComparison,
 } from "../../../../packages/api/src/agent/contracts";
-import { DraftConfig as ConfigurationSchema } from "../../../../packages/api/src/agent/contracts";
+import {
+  DEVELOPMENT_LICENSE_TERMS,
+  DraftConfig as ConfigurationSchema,
+  developmentProofReference,
+} from "../../../../packages/api/src/agent/contracts";
 import "./creator-ai.css";
 
 type ErrorBody = { error?: { code: string; message: string } };
@@ -212,8 +223,22 @@ export function CreatorAI({
   const fetchSequence = useRef(0);
   const sourceFileSequence = useRef(0);
   const [error, setError] = useState("");
+  // Counts failures of person-initiated actions. Background refreshes never
+  // move focus while someone is typing.
+  const [actionFailure, setActionFailure] = useState(0);
+  const errorNotice = useRef<HTMLDivElement>(null);
+  const failAction = (text: string) => {
+    setError(text);
+    setActionFailure((count) => count + 1);
+  };
   const [message, setMessage] = useState("");
+  const [confirmationVisible, setConfirmationVisible] = useState(false);
   const [busy, setBusy] = useState(false);
+  const completedActionFocus = useRef<{
+    control: HTMLElement | null;
+    fallback: HTMLElement | null;
+  } | null>(null);
+  const draftEvaluationLink = useRef<HTMLAnchorElement | null>(null);
   const [online, setOnline] = useState(true);
   const [story, setStory] = useState("");
   const [boundaries, setBoundaries] = useState("");
@@ -242,6 +267,12 @@ export function CreatorAI({
   const [preview, setPreview] = useState<Preview | null>(null);
   const [prompt, setPrompt] = useState("");
   const [example, setExample] = useState("");
+  const exampleInput = useRef<HTMLTextAreaElement | null>(null);
+  const exampleEditors = useRef(new Map<string, HTMLTextAreaElement>());
+  const pendingExampleFocus = useRef<{
+    id: string | null;
+    from: Element | null;
+  } | null>(null);
   const [paraphrase, setParaphrase] = useState("");
   const [rule, setRule] = useState("");
   const [sponsorBrand, setSponsorBrand] = useState("");
@@ -509,6 +540,54 @@ export function CreatorAI({
       setPreview(null);
   }, [dirty, preview, state?.revision]);
   useEffect(() => {
+    const notice = errorNotice.current;
+    if (!actionFailure || !notice) return;
+    // The design system never animates scrolling. Make the focused recovery
+    // notice visible immediately, including for reduced-motion users.
+    notice.scrollIntoView({
+      block: "start",
+      behavior: "instant",
+    });
+    notice.focus({ preventScroll: true });
+  }, [actionFailure]);
+  useEffect(() => {
+    setConfirmationVisible(Boolean(message));
+    if (!message) return;
+    // The design system's Toast confirms successful actions without moving
+    // focus. Keep the inline receipt after its four-second display expires.
+    const timer = window.setTimeout(() => setConfirmationVisible(false), 4000);
+    return () => window.clearTimeout(timer);
+  }, [message]);
+  useEffect(() => {
+    if (busy) return;
+    const pending = completedActionFocus.current;
+    completedActionFocus.current = null;
+    // Disabling an in-flight button can leave keyboard focus on the body.
+    // Restore only a surviving, enabled initiator, never a moved focus or a
+    // failed action's Notice/dialog.
+    if (document.activeElement !== document.body) return;
+    const control =
+      pending?.control?.isConnected && !pending.control.matches(":disabled")
+        ? pending.control
+        : pending?.fallback;
+    if (control?.isConnected && !control.matches(":disabled"))
+      control.focus({ preventScroll: true });
+  }, [busy]);
+  useEffect(() => {
+    const pending = pendingExampleFocus.current;
+    pendingExampleFocus.current = null;
+    if (
+      !pending ||
+      (document.activeElement !== document.body &&
+        document.activeElement !== pending.from)
+    )
+      return;
+    const editor = pending.id
+      ? exampleEditors.current.get(pending.id)
+      : exampleInput.current;
+    editor?.focus();
+  }, [configuration?.examples]);
+  useEffect(() => {
     if (!state || identitySignal?.aborted) return;
     storeDraft(`w2-source:${state.actorAccountId}:${state.creator.id}`, {
       title,
@@ -637,8 +716,14 @@ export function CreatorAI({
   const action = async (
     run: () => Promise<void | string>,
     success = "Saved.",
+    followup: HTMLElement | null = null,
   ) => {
     if (busy) return;
+    const initiator =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    completedActionFocus.current = null;
     setBusy(true);
     setError("");
     setMessage("");
@@ -646,8 +731,9 @@ export function CreatorAI({
       const outcome = await run();
       setMessage(outcome ?? success);
       await fetchState();
+      completedActionFocus.current = { control: initiator, fallback: followup };
     } catch (e) {
-      setError(e instanceof Error ? e.message : "The action did not finish.");
+      failAction(e instanceof Error ? e.message : "The action did not finish.");
     } finally {
       setBusy(false);
     }
@@ -714,12 +800,16 @@ export function CreatorAI({
     "Team",
   ];
   const destination = (name: string) => {
-    if (["Notes", "Requests", "Threads"].includes(name)) {
+    if (
+      ["Notes", "Requests", "Threads", "Publish", "Team", "More"].includes(name)
+    ) {
       const currentCreator = creatorId ?? state?.creator.id;
       return currentCreator
         ? `/studio/${encodeURIComponent(currentCreator)}/${name.toLowerCase()}`
         : "/studio/workspace";
     }
+    if (name === "Offers") return "/commerce/offers";
+    if (name === "Earnings") return "/commerce/earnings";
     return name === "My AI" ? "/studio/ai" : `/studio/${name.toLowerCase()}`;
   };
   const controlsDisabled = busy || !online;
@@ -808,6 +898,7 @@ export function CreatorAI({
               <Link
                 key={name}
                 href={destination(name)}
+                onClick={(e) => navigate(e, destination(name))}
                 className="qv-side__item"
               >
                 <span className="qv-side__icon">
@@ -830,8 +921,14 @@ export function CreatorAI({
       <main className={`w2-main w2-${current}`}>
         {state?.development && (
           <div className="w2-development" role="note">
-            Development identity · pending verification · external fan
-            publication disabled
+            Development identity ·{" "}
+            {state.creator.verification === "verified"
+              ? "fictional verified creator"
+              : "pending verification"}
+            {state.capabilities.syntheticLicensing
+              ? " · synthetic license only"
+              : ""}{" "}
+            · external fan publication disabled
           </div>
         )}
         {!online && (
@@ -842,7 +939,12 @@ export function CreatorAI({
         )}
         {!["test", "license"].includes(current) && studioHeader}
         {error && (
-          <div role="alert">
+          <div
+            role="alert"
+            ref={errorNotice}
+            tabIndex={-1}
+            className="w2-action-alert"
+          >
             <Notice tone="error" title="Action needs attention">
               {error}
             </Notice>
@@ -859,10 +961,11 @@ export function CreatorAI({
             )}
           </div>
         )}
-        {message && (
-          <p className="w2-status" role="status">
-            {message}
-          </p>
+        {message && <p className="w2-status">{message}</p>}
+        {message && confirmationVisible && (
+          <div className="w2-confirmation">
+            <Toast>{message}</Toast>
+          </div>
         )}
         {!state && !error && (
           <div aria-label="Loading creator AI">
@@ -1287,7 +1390,7 @@ export function CreatorAI({
                               // Permit selecting the same file after fixing it.
                               e.target.value = "";
                               if (file.size > 1_000_000) {
-                                setError(
+                                failAction(
                                   "This file is too large. Split it into files up to 1 MB.",
                                 );
                                 return;
@@ -1304,7 +1407,7 @@ export function CreatorAI({
                                   }).decode(bytes);
                                   if (!currentRead()) return;
                                   if (content.length > 250_000) {
-                                    setError(
+                                    failAction(
                                       "Split this source into files with at most 250,000 characters.",
                                     );
                                     return;
@@ -1317,7 +1420,7 @@ export function CreatorAI({
                                 })
                                 .catch(() => {
                                   if (currentRead())
-                                    setError(
+                                    failAction(
                                       "This file could not be read as UTF-8 text. Save it as UTF-8 and try again.",
                                     );
                                 });
@@ -1496,6 +1599,11 @@ export function CreatorAI({
                       {configuration.examples.map((item) => (
                         <div className="w2-example" key={item.id}>
                           <textarea
+                            ref={(editor) => {
+                              if (editor)
+                                exampleEditors.current.set(item.id, editor);
+                              else exampleEditors.current.delete(item.id);
+                            }}
                             rows={2}
                             aria-label="Your own reply example"
                             value={item.text}
@@ -1550,14 +1658,24 @@ export function CreatorAI({
                           </label>
                           <Button
                             variant="quiet"
-                            onClick={() =>
+                            onClick={() => {
+                              const index = configuration.examples.findIndex(
+                                (example) => example.id === item.id,
+                              );
+                              pendingExampleFocus.current = {
+                                id:
+                                  configuration.examples[index + 1]?.id ??
+                                  configuration.examples[index - 1]?.id ??
+                                  null,
+                                from: document.activeElement,
+                              };
                               edit({
                                 ...configuration,
                                 examples: configuration.examples.filter(
                                   (ex) => ex.id !== item.id,
                                 ),
-                              })
-                            }
+                              });
+                            }}
                           >
                             Remove example
                           </Button>
@@ -1565,6 +1683,7 @@ export function CreatorAI({
                       ))}
                       <Field label="Add your own reply">
                         <textarea
+                          ref={exampleInput}
                           rows={3}
                           value={example}
                           maxLength={2000}
@@ -1574,12 +1693,17 @@ export function CreatorAI({
                       <Button
                         disabled={!example.trim()}
                         onClick={() => {
+                          const id = crypto.randomUUID();
+                          pendingExampleFocus.current = {
+                            id,
+                            from: document.activeElement,
+                          };
                           edit({
                             ...configuration,
                             examples: [
                               ...configuration.examples,
                               {
-                                id: crypto.randomUUID(),
+                                id,
                                 text: example,
                                 fixed:
                                   configuration.examples.filter((e) => e.fixed)
@@ -1714,6 +1838,7 @@ export function CreatorAI({
                       void action(
                         save,
                         "Draft saved. Previous evaluation evidence is invalidated.",
+                        draftEvaluationLink.current,
                       )
                     }
                   >
@@ -1739,6 +1864,7 @@ export function CreatorAI({
                     </Button>
                   )}
                   <Link
+                    ref={draftEvaluationLink}
                     className="qv-btn qv-btn--quiet"
                     href="/studio/ai/test"
                     onClick={(e) => navigate(e, "/studio/ai/test")}
@@ -2235,9 +2361,14 @@ export function CreatorAI({
                   {studioHeader}
                   <Panel
                     title={
-                      state.license
-                        ? `LICENSE · ${state.license.state}`
-                        : "LICENSE · REVIEWED TERMS REQUIRED"
+                      state.license?.counselVersion ===
+                      DEVELOPMENT_LICENSE_TERMS
+                        ? `DEVELOPMENT LICENSE · NOT REVIEWED · ${state.license.state}`
+                        : state.license
+                          ? `LICENSE · ${state.license.state}`
+                          : state.capabilities.syntheticLicensing
+                            ? "DEVELOPMENT LICENSE · NOT RECORDED"
+                            : "LICENSE · REVIEWED TERMS REQUIRED"
                     }
                   >
                     <span>
@@ -2255,7 +2386,12 @@ export function CreatorAI({
                     </span>
                     {state.license ? (
                       <>
-                        <p>Reviewed terms: {state.license.counselVersion}</p>
+                        <p>
+                          {state.license.counselVersion ===
+                          DEVELOPMENT_LICENSE_TERMS
+                            ? "Synthetic terms for a fictional development creator. Counsel has not reviewed them, nothing was signed, and real fans, payments and AI voice stay off."
+                            : `Reviewed terms: ${state.license.counselVersion}`}
+                        </p>
                         <p>
                           Term ends{" "}
                           {new Date(state.license.termEndsAt).toLocaleString()}
@@ -2264,6 +2400,45 @@ export function CreatorAI({
                           Permitted uses:{" "}
                           {state.license.permittedUses.join(", ")}
                         </p>
+                      </>
+                    ) : state.capabilities.syntheticLicensing ? (
+                      <>
+                        <p className="qv-help">
+                          This loopback host can record a labeled development
+                          license so a fictional creator’s AI can be tested end
+                          to end. It is not a reviewed license, carries no
+                          signature and never applies to real fans.
+                        </p>
+                        <Button
+                          disabled={
+                            controlsDisabled ||
+                            state.creator.verification !== "verified"
+                          }
+                          onClick={() =>
+                            void action(async () => {
+                              await api("license", {
+                                proofReference: developmentProofReference(
+                                  state.creator.id,
+                                ),
+                                counselVersion: DEVELOPMENT_LICENSE_TERMS,
+                                permittedUses: [
+                                  "sponsored_mentions",
+                                  "text_ai",
+                                ],
+                                termEndsAt: new Date(
+                                  Date.now() + 90 * 86_400_000,
+                                ).toISOString(),
+                              });
+                            }, "Development license recorded for 90 days.")
+                          }
+                        >
+                          Record development license
+                        </Button>
+                        {state.creator.verification !== "verified" && (
+                          <span className="qv-help">
+                            Creator verification is pending.
+                          </span>
+                        )}
                       </>
                     ) : (
                       <p className="qv-help">
@@ -2464,7 +2639,8 @@ export function CreatorAI({
         {["Notes", "Requests", "Threads", "My AI", "More"].map((name) => (
           <Link
             key={name}
-            href={name === "More" ? "/studio/ai/license" : destination(name)}
+            href={destination(name)}
+            onClick={(e) => navigate(e, destination(name))}
             aria-current={name === "My AI" ? "page" : undefined}
           >
             <Glyph name={name} size={name === "Notes" ? 17 : 22} />

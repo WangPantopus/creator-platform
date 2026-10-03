@@ -1,0 +1,17 @@
+{
+  "phase": "freshIndependentRestore",
+  "restoredDatabase": "creator_w5_privacy_main_restore_20261002",
+  "sourceLedgerRows": 57,
+  "businessRows": 36,
+  "tables": 161,
+  "allSixCustodyHashesMatch": true,
+  "backupSha256": "fa49700e18e3d7289d33b793acb05fbf72b104d5296f2c665bd2d5c6cfa55f0f",
+  "ledgerSha256": "2b6f7b224f46cffa47da3ebddbf52207cb05d26a2964fdf4d92aab4dc0ac297b",
+  "schemaSha256": "cfbc894fd59dc3981ab4fa31d2ff7154e2865b452a71b79afd483abe94557ea3",
+  "dataSha256": "d8ff1d7d7dd42a04e2c5154d9c183ca80ec6db824de7534011b2496f1ede73d4",
+  "rolesSha256": "123403ba7928db12891c4edad598693c1f80c5dd22b64cfe9f5e937a88258ada",
+  "securitySha256": "c52f89e7be1b96dc2f0f64b5b4162f3df0c03fb84c755b756c0c80e8bba1c416",
+  "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+  "trafficClosed": true,
+  "releaseReady": false
+}

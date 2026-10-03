@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { copy, formatCopy } from "@qelvora/copy";
 import {
   AuthorLabel,
   EmptyState,
@@ -11,7 +12,9 @@ import {
 import type {
   ContentView,
   PrivateNoteReply,
+  NoteReplyPolicy,
 } from "../../../../packages/api/src/content";
+import { NoteReplyPolicy as NoteReplyPolicySchema } from "../../../../packages/api/src/content";
 import {
   configureStudioRequests,
   studioRequest,
@@ -28,6 +31,13 @@ type Thanks = {
   withdrawn: boolean;
 };
 type ReplyPage = { items: PrivateNoteReply[]; nextCursor: string | null };
+const accountChanged = (failure: unknown) =>
+  failure instanceof StudioFailure &&
+  [
+    "content_account_changed",
+    "session_account_changed",
+    "session_changed",
+  ].includes(failure.code);
 export function FanContent({
   creatorId,
   contentId,
@@ -42,12 +52,14 @@ export function FanContent({
   );
   const [content, setContent] = useState<ContentView | null>(null),
     [current, setCurrent] = useState(false),
+    [signInRequired, setSignInRequired] = useState(false),
     [replies, setReplies] = useState<PrivateNoteReply[]>([]),
     [cursor, setCursor] = useState<string | null>(null);
   const [text, setText] = useState(""),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [muted, setMuted] = useState(false);
+  const [replyPolicy, setReplyPolicy] = useState<NoteReplyPolicy | null>(null);
   const [thanks, setThanks] = useState<Thanks | null>(null),
     [thanksText, setThanksText] = useState(""),
     [share, setShare] = useState(false),
@@ -60,6 +72,7 @@ export function FanContent({
     busyRef = useRef(false),
     depth = useRef(1);
   const resetInputs = useCallback(() => {
+    setReplyPolicy(null);
     setText("");
     setThanksText("");
     setShare(false);
@@ -79,14 +92,18 @@ export function FanContent({
       } catch (failure) {
         if (generation === loading.current) {
           setCurrent(false);
+          setSignInRequired(
+            failure instanceof StudioFailure && failure.status === 401,
+          );
           if (
             failure instanceof StudioFailure &&
-            [401, 403].includes(failure.status)
+            ([401, 403].includes(failure.status) || accountChanged(failure))
           ) {
             setContent(null);
             setReplies([]);
             setThanks(null);
             setViewer(null);
+            setCursor(null);
             resetInputs();
           }
           setError((failure as Error).message);
@@ -127,6 +144,15 @@ export function FanContent({
           return { ...page, items };
         })(),
         Promise.resolve(before),
+        (async () =>
+          NoteReplyPolicySchema.parse(
+            await studioRequest(
+              "content",
+              `${creatorId}/reply-policy`,
+              undefined,
+              before.accountId,
+            ),
+          ))(),
       ]);
       try {
         results[3] = {
@@ -148,27 +174,37 @@ export function FanContent({
             r.status === "rejected" &&
             r.reason instanceof StudioFailure &&
             (r.reason.status === 401 ||
-              r.reason.code === "content_account_changed" ||
+              accountChanged(r.reason) ||
               (i > 0 && r.reason.status === 403)),
         )
       ) {
         setCurrent(false);
+        setSignInRequired(
+          results.some(
+            (r) =>
+              r.status === "rejected" &&
+              r.reason instanceof StudioFailure &&
+              r.reason.status === 401,
+          ),
+        );
         setContent(null);
         setReplies([]);
         setThanks(null);
         setViewer(null);
+        setCursor(null);
         setText("");
         setThanksText("");
         setShare(false);
         setIdentity(false);
         dirtyThanks.current = false;
         setError(
-          "Your session or current access changed. Sign in again to refresh.",
+          "Your session or current access changed. Check current access before continuing.",
         );
         return;
       }
 
       const [view, mine, page, pref] = results;
+      setSignInRequired(false);
       if (pref.status !== "fulfilled") {
         setCurrent(false);
         setError("Current access could not be confirmed. Your input is kept.");
@@ -207,6 +243,14 @@ export function FanContent({
         setCursor(null);
       }
       if (pref.status === "fulfilled") setMuted(pref.value.muted);
+      const policy = results[4];
+      if (
+        policy.status === "fulfilled" &&
+        policy.value.accountId === before.accountId &&
+        policy.value.creatorId === creatorId
+      )
+        setReplyPolicy(policy.value);
+      else setReplyPolicy(null);
       const failure = results.find((r) => r.status === "rejected");
       setError(failure?.status === "rejected" ? failure.reason.message : "");
       checkedAt.current = cycleStartedAt;
@@ -243,15 +287,19 @@ export function FanContent({
       await load();
     } catch (failure) {
       setError((failure as Error).message);
+      setSignInRequired(
+        failure instanceof StudioFailure && failure.status === 401,
+      );
       if (
         failure instanceof StudioFailure &&
-        [401, 403].includes(failure.status)
+        ([401, 403].includes(failure.status) || accountChanged(failure))
       ) {
         setCurrent(false);
         setContent(null);
         setReplies([]);
         setThanks(null);
         setViewer(null);
+        setCursor(null);
         resetInputs();
       }
     } finally {
@@ -292,6 +340,7 @@ export function FanContent({
       dirtyThanks.current = false;
     });
   const ownReplies = replies.filter((r) => r.contentId === contentId);
+  const replyLimit = replyPolicy?.limit ?? 4000;
   return (
     <main className="w5-fan" aria-busy={busy}>
       <nav>
@@ -314,7 +363,7 @@ export function FanContent({
           Check current access
         </button>
       )}
-      {!current && !viewer && (
+      {!current && signInRequired && (
         <Link
           href={`/auth/continue?returnTo=${encodeURIComponent(`/content/${creatorId}/${contentId}`)}`}
         >
@@ -418,14 +467,41 @@ export function FanContent({
                 }}
               >
                 <label htmlFor="private-reply">Reply privately</label>
+                {replyPolicy?.milestone !== null &&
+                  replyPolicy?.confirmedDays != null && (
+                    <p className="qv-help">
+                      {formatCopy("contentConfirmedTenure", {
+                        days: replyPolicy.confirmedDays,
+                      })}
+                    </p>
+                  )}
+                {!replyPolicy && (
+                  <p className="qv-help">
+                    {copy.contentReplyPolicyUnavailable}
+                  </p>
+                )}
                 <textarea
                   id="private-reply"
                   value={text}
                   onChange={(e) => setText(e.target.value)}
-                  maxLength={4000}
+                  maxLength={replyLimit}
+                  aria-describedby="private-reply-limit"
                   required
                 />
-                <button disabled={busy || !text.trim()}>
+                <p id="private-reply-limit" className="qv-help">
+                  {formatCopy("contentReplyLimit", {
+                    used: text.length,
+                    limit: replyLimit,
+                  })}
+                </p>
+                {text.length > replyLimit && (
+                  <p role="status">{copy.contentReplyOverLimit}</p>
+                )}
+                <button
+                  disabled={
+                    busy || !text.trim() || text.trim().length > replyLimit
+                  }
+                >
                   Send private reply
                 </button>
               </form>

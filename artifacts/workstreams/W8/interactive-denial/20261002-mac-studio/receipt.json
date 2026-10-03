@@ -1,0 +1,126 @@
+{
+  "recordedAt": "2026-10-02T09:26:50.776536+00:00",
+  "sourceParent": "65268242",
+  "environment": {
+    "host": "Mac Studio",
+    "database": "creator_w8_purpose_20261002",
+    "label": "synthetic experimental purpose review",
+    "canonicalLedger": 40,
+    "canonicalActivation": false,
+    "web": "http://localhost:3008",
+    "api": "http://127.0.0.1:4108",
+    "nonOwnerRuntime": true
+  },
+  "sources": {
+    "apps/backend/migrations/0082_w8_interactive_denial_try_fence.sql": {
+      "sha256": "3742b1e6b7f367ca626176615c5362ecf002fe5fcc5a96ea941d35a4708e8686"
+    },
+    "apps/backend/migrations/0053_w8_runtime_denial_projection.sql": {
+      "sha256": "4da2e2b56f51f70e39336c6c7d26646e1732703f2e3f39c35f700ff959237185"
+    },
+    "apps/backend/src/modules/trust/scope-restriction.ts": {
+      "sha256": "25f57ba811528d4a9f33cbdb6240bd5a3c54fed5092bd13241266931052334ce"
+    }
+  },
+  "interactive-probe": {
+    "label": "actual saved browser session and held non-owner denial; synthetic only",
+    "actualCanonicalSession": true,
+    "idleClient": "25P01",
+    "unblockedContent": "allowed",
+    "nonOwnerCreator": {
+      "code": "scope_denial_unavailable",
+      "status": 503
+    },
+    "actualAudienceNegative": "allowed",
+    "savedBlock": {
+      "code": "scope_revoked",
+      "status": 403
+    },
+    "actualParticipantBlock": {
+      "code": "scope_revoked",
+      "status": 403
+    },
+    "otherParticipant": {
+      "code": "scope_denial_unavailable",
+      "status": 503
+    },
+    "afterRefusalTransactionUsable": true,
+    "concurrentNegativeWriter": {
+      "code": "scope_denial_unavailable",
+      "status": 503
+    },
+    "tryFenceElapsedMs": 2.6335410000000365,
+    "retainedSnapshot": {
+      "code": "scope_denial_unavailable",
+      "status": 503
+    },
+    "wrongBoundActor": {
+      "code": "scope_unavailable",
+      "status": 403
+    },
+    "missingRequest": {
+      "code": "content_session_required",
+      "status": 401
+    },
+    "runtimePrivateCapabilities": {
+      "privatekeys": false,
+      "privateprojection": false,
+      "privatetrust": false
+    },
+    "savedState": {
+      "blocks": 1,
+      "publications": 0,
+      "ledger": 40
+    },
+    "providerGenerationAcceptance": false
+  },
+  "interactive-web-concurrency": {
+    "label": "real launched canonical web support and content BFF against actual backend",
+    "viewport": {
+      "width": 1280,
+      "height": 900
+    },
+    "concurrentNegativeWriter": {
+      "status": 503,
+      "code": "scope_denial_unavailable",
+      "elapsedMs": 65.0971669999999
+    },
+    "savedBlockAfterRollback": 403,
+    "providerGenerationAcceptance": false
+  },
+  "restoration-browser": {
+    "label": "real launched web against actual synthetic canonical backend",
+    "actualCanonicalBrowserSignIn": true,
+    "openUnblockedEmptyFamily": {
+      "status": 200,
+      "items": 0
+    },
+    "savedBlock": {
+      "status": 403,
+      "code": "scope_revoked"
+    },
+    "closedContent": {
+      "status": 503,
+      "code": "restoration_pending"
+    },
+    "closedPublicHelp": 200,
+    "syntheticMarkerCleanup": 200,
+    "originalRecovery": false,
+    "providerMeasurements": false
+  },
+  "supportingChecks": {
+    "backendTypecheck": "passed",
+    "newUnitTests": false
+  },
+  "operatorCorrections": [
+    "Scratch probe initially looked up the unsuffixed cookie; corrected to actual port-scoped canonical cookie.",
+    "Scratch probe incorrectly expected actor two to own creator two; actual ownership metadata showed otherwise. Corrected assertion confirms non-owner refusal."
+  ],
+  "limitations": [
+    "Native authenticated acceptance pending.",
+    "Not real in-flight provider generation or a latency distribution.",
+    "No genuine proof, signature, publication or worker task fabricated.",
+    "Original iMac recovery material remains absent.",
+    "Exact canonical activation and future-wave role/function pins remain separate."
+  ]
+}
