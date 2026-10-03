@@ -57,6 +57,23 @@ export class VoiceRecorder {
         throw new Error(
           copy.w6RecordingIsUnavailableInThisBrowserUseASupportedBrowser,
         );
+      // A denied browser permission can still leave device enumeration pending.
+      // Use its real current status before capture; unsupported queries retain
+      // the browser's original permission prompt and cancellation generation.
+      let permission: PermissionStatus | undefined;
+      try {
+        permission = await navigator.permissions?.query({
+          name: "microphone" as PermissionName,
+        });
+      } catch {
+        permission = undefined;
+      }
+      if (generation !== this.generation) return;
+      if (permission?.state === "denied")
+        throw new DOMException(
+          "Microphone access is denied.",
+          "NotAllowedError",
+        );
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: { echoCancellation: true, noiseSuppression: true },
         video: false,
