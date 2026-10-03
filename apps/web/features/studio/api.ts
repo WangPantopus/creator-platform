@@ -11,7 +11,10 @@ export class StudioFailure extends Error {
 }
 // Retry only when the user repeats an action. Keep the original command key after
 // an unknown response; raw input remains in memory, never browser storage.
-const pendingCommands = new Map<string, string>();
+const pendingCommands = new Map<
+  string,
+  { idempotencyKey: string; accountId: string; sessionId: string }
+>();
 let identityScope: {
   accountId: string;
   sessionId: string;
@@ -24,9 +27,24 @@ let identityScope: {
 let previousIdentity: { accountId: string; sessionId: string } | null = null;
 const identityStorage = "w5.original-session";
 let sessionEnds: BroadcastChannel | undefined;
-function purgeStudioState() {
-  pendingCommands.clear();
+function purgeStudioState(original?: { accountId: string; sessionId: string }) {
+  if (original) {
+    // A delayed genuine end may belong to a departed view. Its negative
+    // cleanup cannot erase a newer session's immutable uncertain command.
+    for (const [fingerprint, command] of pendingCommands)
+      if (
+        command.accountId === original.accountId &&
+        command.sessionId === original.sessionId
+      )
+        pendingCommands.delete(fingerprint);
+  } else pendingCommands.clear();
   try {
+    if (
+      original &&
+      sessionStorage.getItem(identityStorage) !==
+        JSON.stringify([original.accountId, original.sessionId])
+    )
+      return;
     for (const key of Object.keys(sessionStorage))
       if (
         key.startsWith("w5.pendingPublication:") ||
@@ -47,10 +65,14 @@ export function configureStudioRequests(
   // Keep the canonical negative invalidation while navigating to Account.
   // Neither this message nor the presentation marker supplies authority.
   if (!sessionEnds && typeof BroadcastChannel !== "undefined") {
-    sessionEnds = new BroadcastChannel(sessionChannel);
-    sessionEnds.onmessage = (event) => {
-      if (event.data === "ended") purgeStudioState();
-    };
+    try {
+      sessionEnds = new BroadcastChannel(sessionChannel);
+      sessionEnds.onmessage = (event) => {
+        if (event.data === "ended") purgeStudioState();
+      };
+    } catch {
+      // Optional notification cannot prevent the genuine request lifetime.
+    }
   }
   if (
     previousIdentity &&
@@ -73,7 +95,7 @@ export function configureStudioRequests(
   };
   identityScope = scope;
   const ended = () => {
-    if (scope.isSessionEnded()) purgeStudioState();
+    if (scope.isSessionEnded()) purgeStudioState(scope);
   };
   scope.signal.addEventListener("abort", ended, { once: true });
   if (scope.signal.aborted) ended();
@@ -134,8 +156,14 @@ export async function studioRequest<T>(
       scope.sessionId,
       command,
     ]);
-    const original = pendingCommands.get(fingerprint) ?? String(idempotencyKey);
-    pendingCommands.set(fingerprint, original);
+    const original =
+      pendingCommands.get(fingerprint)?.idempotencyKey ??
+      String(idempotencyKey);
+    pendingCommands.set(fingerprint, {
+      idempotencyKey: original,
+      accountId: scope.accountId,
+      sessionId: scope.sessionId,
+    });
     body = { ...command, idempotencyKey: original };
   }
   try {
