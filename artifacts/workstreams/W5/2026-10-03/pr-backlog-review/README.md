@@ -10,7 +10,7 @@ app acceptance. This record is not an approval to merge those PRs or a handoff.
 ## Captured source and custody
 
 Captured remote main is `41471fd24fe43dd41d6114e67ba00ba1a6a0783b`.
-The [inventory](inventory.json) contains all46 open/draft PRs from one
+The private inventory contains all46 open/draft PRs from one
 oldest-first GitHub response, their full head/base SHAs, owner and source paths
 against the captured review base. Every exact head was fetched into a private
 review ref. None of these complete heads is an ancestor of captured main;
@@ -21,7 +21,11 @@ head. Queued, in-progress, old-head and missing results are not passes.
 
 No W5 PR is open in that snapshot. Nine W5 PRs personally completed during this
 successor session are genuinely merged and each merge is an ancestor of the
-captured main. The `merged-*.json` files independently recheck that disposition:
+captured main. Private `merged-*.json` captures independently recheck that
+disposition. Routine JSON captures are preserved at
+`~/.config/creator-platform/w5-20261003/pr-backlog-review/`, with byte/hash checks
+before removing their newly introduced audit-branch copies. Pre-existing source
+history and dated proof remain preserved. The concise merge references are:
 
 | PR                                                               | Main merge                                 | Reusable increment                                                  |
 | ---------------------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------- |
@@ -76,7 +80,7 @@ merges or closures of peer PRs. Their reports do not become W5 personal evidence
 W3's complete [source disposition](https://github.com/WangPantopus/creator-platform/blob/b935d5a9787999acaf76c935e1db9e6ad7426fc8/docs/workstreams/coordination/W3-pr-review-2026-10-03.md)
 was personally read by W5. GitHub independently confirms all twelve71/72/81/85/
 97/144/149/153/155/163/170/250 are now closed and unmerged; the exact closure
-heads and times are in [the follow-up capture](w3-closures.json). Source is
+heads and times are in the private `w3-closures.json` capture. Source is
 consolidated/superseded in existing draft63 and its focused successors, with
 branches/history retained. Open count is now34. Original acceptance stays open.
 W8's [published six-PR review](https://github.com/WangPantopus/creator-platform/blob/527137b5df435745715f5b0748f888ca39cbcce6/docs/workstreams/coordination/W8-pr-review-20261003.md)
@@ -95,16 +99,22 @@ W2 retains132/279 for genuine composition and same-client metadata preparation;
 its transport primitive results are not complete financial detachment. W4 returned
 206/213/236 to draft, retains247/262 for held composition and is repeating210's
 actual routing. W6 retains282 after bounded refusal/account/outage observations;
-positive offers and expiry remain unqualified. W7 reported its sole31 as retained;
-W5 read its current coordination record, including outstanding populated/provider/
-Impact acceptance. W7 is reusing W1's older29 saved-Home private-thread validation
-in the existing31. Fixes stay with these existing PRs rather than being rebuilt
+positive offers and expiry remain unqualified. W5 subsequently personally read
+[W7's full review](https://github.com/WangPantopus/creator-platform/blob/dcb9a39f133ee4ad365e44dd86a00324b3ac3a12/docs/workstreams/coordination/W7-pr-review-20261003.md).
+Its sole31 remains a draft with populated/provider/Impact and combined acceptance
+open. Source4bf9d17a reuses W1's older29 saved-Home private-thread validation in
+the existing31. Fixes stay with these existing PRs rather than being rebuilt
 by W5. No retained owner PR is declared merge-ready by this reconciliation.
 
 The follow-up live response still has34 open PRs and the same remote main. Heads
 that moved since the initial inventory require their own new review and checks;
 the original inventory is preserved as a timestamped capture. W5 can now resume
 its existing consumer work while the owners qualify their retained PRs.
+Subsequent206 was independently confirmed CLOSED/unmerged at original head
+`3de14bf335f8ade673efa5ec79d0c30d73690b77`; W4/W7 attribute its source
+consolidation to W1's combined74. W5's new documentation-only283 is separate from
+the original inventory. Closing206 and adding283 leaves34 open at that later
+checkpoint; neither changes main or completes Approval acceptance.
 
 W5 personally read21/22's actual web/source deltas and28's complete Team delta
 against26, then compared current main Team. Merged251 already supplies serial
