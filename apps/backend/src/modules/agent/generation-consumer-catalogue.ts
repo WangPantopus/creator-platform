@@ -93,11 +93,17 @@ export async function assertGenerationConsumerCustody(
       custody.catalogueChecksum
     )
       throw new Error("Changed effective consumer catalogue");
-  } catch {
-    throw new DomainError(
+  } catch (cause) {
+    const failure = new DomainError(
       "generation_consumer_custody_changed",
       "The reviewed fixed generation executable and permission catalogue are unavailable.",
       503,
     );
+    Object.defineProperty(failure, "cause", {
+      value: cause,
+      configurable: true,
+      writable: true,
+    });
+    throw failure;
   }
 }

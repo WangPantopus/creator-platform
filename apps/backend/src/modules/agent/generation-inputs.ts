@@ -241,12 +241,18 @@ export class PreparedGenerationAgentInputs {
           receipt.definitionChecksum
       )
         throw new Error("Reviewed generation inputs are not installed");
-    } catch {
-      throw new DomainError(
+    } catch (cause) {
+      const failure = new DomainError(
         "generation_inputs_unconfigured",
         "The reviewed current generation input consumer is unavailable.",
         503,
       );
+      Object.defineProperty(failure, "cause", {
+        value: cause,
+        configurable: true,
+        writable: true,
+      });
+      throw failure;
     }
     return new PreparedGenerationAgentInputs(
       input.identity,
@@ -268,12 +274,18 @@ export class PreparedGenerationAgentInputs {
     let facts: z.infer<typeof Facts>;
     try {
       facts = Facts.parse(raw);
-    } catch {
-      throw new DomainError(
+    } catch (cause) {
+      const failure = new DomainError(
         "generation_inputs_unavailable",
         "Current compiled inputs are unavailable.",
         503,
       );
+      Object.defineProperty(failure, "cause", {
+        value: cause,
+        configurable: true,
+        writable: true,
+      });
+      throw failure;
     }
     invariant(
       facts.creatorId === scope.creatorId &&

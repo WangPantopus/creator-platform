@@ -2,6 +2,7 @@ import type { Pool, PoolClient } from "pg";
 import { invariant } from "../../core/errors.js";
 import type { AgentRepository, CreatorScope } from "./repository.js";
 import type { PreparedGenerationJournal } from "./generation-journal.js";
+import { agentPrivacyTransaction } from "./privacy-transaction.js";
 
 // Held above the lineage prerequisite; original reserved SQL stays immutable.
 export const USAGE_RETENTION_MIGRATION = "0165_w2_usage_retention_expiry";
@@ -114,19 +115,21 @@ export class PreparedUsageRetention {
     repository: AgentRepository,
     scope: CreatorScope,
     batchSize = 200,
+    signal: AbortSignal,
   ) {
     invariant(
       repository.pool === this.pool &&
+        signal instanceof AbortSignal &&
         Number.isSafeInteger(batchSize) &&
         batchSize > 0 &&
         batchSize <= 2000,
       "accounting_expiry_unconfigured",
       "Use the prepared repository pool and a bounded expiry batch.",
     );
-    await repository.assertRuntimeRole();
-    const client = await this.pool.connect();
-    try {
-      await client.query("BEGIN");
+    signal.throwIfAborted();
+    return agentPrivacyTransaction(this.pool, signal, async (client) => {
+      await repository.assertRuntimeRoleInTransaction(client);
+      signal.throwIfAborted();
       await client.query(
         "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
         [scope.creatorId, scope.accountId],
@@ -172,18 +175,12 @@ export class PreparedUsageRetention {
         )
       ).rows[0]!;
       await this.authority.assertExpiry(client, scope, this.policyVersion);
-      await client.query("COMMIT");
       return {
         policyVersion: this.policyVersion,
         expiredIds: expired.rows.map((row) => row.id),
         moreDueKnown: remaining.known,
         unresolvedDueUnknown: remaining.unknown,
       };
-    } catch (error) {
-      await client.query("ROLLBACK");
-      throw error;
-    } finally {
-      client.release();
-    }
+    });
   }
 }

@@ -1,3 +1,4 @@
+import { assertGenerationProfileBound } from "./generation-profile-bound.js";
 import type { Pool, PoolClient } from "pg";
 import { z } from "zod";
 import { DraftConfig } from "../../../../../packages/api/src/agent/contracts.js";
@@ -118,6 +119,7 @@ export class PreparedGenerationAgentMetadata {
       ]),
     });
     await assertGenerationConsumerCustody(input.workerPool, custody);
+    await assertGenerationProfileBound(input.workerPool);
     return new PreparedGenerationAgentMetadata(
       input.identity,
       input.service,
@@ -149,6 +151,7 @@ export class PreparedGenerationAgentMetadata {
   ): Promise<GenerationAgentMetadata> {
     await this.identity.authorizeInTransaction(scope, client);
     await assertGenerationConsumerCustody(client, this.custody);
+    await assertGenerationProfileBound(client);
     const facts = await this.inputs.currentInTransaction(client, scope);
     const audience = await this.audience.currentInTransaction(client, scope);
     const value = Metadata.parse(
@@ -181,6 +184,7 @@ export class PreparedGenerationAgentMetadata {
     await this.audience.authorizeInTransaction(audience, scope, client);
     await this.identity.authorizeInTransaction(scope, client);
     await assertGenerationConsumerCustody(client, this.custody);
+    await assertGenerationProfileBound(client);
     Object.freeze(value.audience.tierIds);
     Object.freeze(value.audience.groupIds);
     Object.freeze(value.audience);
