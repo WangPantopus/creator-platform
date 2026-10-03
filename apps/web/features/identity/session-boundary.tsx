@@ -24,12 +24,22 @@ const Scope = createContext<IdentityScope | null>(null);
 export const sessionChannel = "qelvora-identity-status";
 
 /** Only an invalidation signal crosses tabs; credentials and private data never do. */
-export function announceSessionEnd() {
-  discardPrivateSessionBuffers();
+export function announceSessionEnd(original: {
+  accountId: string;
+  sessionId: string;
+}) {
+  discardPrivateSessionBuffers(original);
   if (typeof BroadcastChannel === "undefined") return;
-  const channel = new BroadcastChannel(sessionChannel);
-  channel.postMessage("ended");
-  channel.close();
+  try {
+    const channel = new BroadcastChannel(sessionChannel);
+    try {
+      channel.postMessage("ended");
+    } finally {
+      channel.close();
+    }
+  } catch {
+    // Optional cross-tab notification cannot prevent the actual local end.
+  }
 }
 
 /** Unmount private drafts on revocation or account switch, including return from bfcache. */
@@ -149,13 +159,18 @@ function IdentitySessionView({
         checking = false;
       }
     };
-    const channel =
-      typeof BroadcastChannel === "undefined"
-        ? null
-        : new BroadcastChannel(sessionChannel);
+    let channel: BroadcastChannel | null = null;
+    try {
+      if (typeof BroadcastChannel !== "undefined")
+        channel = new BroadcastChannel(sessionChannel);
+    } catch {
+      // The genuine bounded session reread still detects invalidation.
+    }
     if (channel)
       channel.onmessage = (event) => {
-        if (active && event.data === "ended") end(owner.signal);
+        // A delayed negative hint from an older session cannot end a newer
+        // genuine view. Only the existing canonical reread decides that.
+        if (active && event.data === "ended") void check();
       };
     const timer = setInterval(check, 4000);
     window.addEventListener("focus", check);
