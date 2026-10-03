@@ -34,7 +34,8 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.util.UUID
 
-private fun trustReady(model: FanSession): Boolean = model.session != null && !model.checkingSession && !model.busy && model.error.isEmpty() && !model.purgingPrivateState && !model.localPurgeFailed
+private fun trustVisible(model: FanSession): Boolean = model.session != null && !model.busy && model.error.isEmpty() && !model.purgingPrivateState && !model.localPurgeFailed
+private fun trustReady(model: FanSession): Boolean = trustVisible(model) && !model.checkingSession
 
 private data class TrustPendingExport(val bytes: ByteArray, val capture: FanSessionRequestCapture)
 
@@ -87,6 +88,7 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
     val coroutine = rememberCoroutineScope()
     val route = model.destination
     val privateReady = trustReady(model)
+    val privateVisible = trustVisible(model)
     var operation by remember { mutableStateOf<Job?>(null) }
     var refreshOperation by remember { mutableStateOf<Job?>(null) }
     var workEpoch by remember { mutableStateOf(0) }
@@ -125,11 +127,11 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
     fun suspendPrivateResults() {
         workEpoch++; busy = false
         pendingExport = null; confirmDelete = false; result = ""; error = ""
-        local = false; verificationConfigured = false; verificationMethod = ""
     }
     fun clearPrivateResults() {
         suspendPrivateResults()
         cases = emptyList(); notices = emptyList(); jobs = emptyList(); history = emptyList(); selectedJob = null
+        local = false; verificationConfigured = false; verificationMethod = ""
     }
     fun beginWork(): Int { workEpoch++; busy = true; return workEpoch }
     fun finishWork(epoch: Int) { if (workEpoch == epoch) busy = false }
@@ -269,14 +271,14 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
         Button("Crisis help", ButtonVariant.QUIET) { navigate("/trust/crisis") }
         if (busy) TrustText("Loading…")
         if (error.isNotEmpty()) Notice("error", "Could not complete", error)
-        if (privateReady && result.isNotEmpty()) Notice(title = "Saved", children = result)
-        if (!privateReady && !route.startsWith("/trust")) Notice(title = "Account unavailable", children = "Refresh your account before continuing. Unsaved input stays in this account view.")
+        if (privateVisible && result.isNotEmpty()) Notice(title = "Saved", children = result)
+        if (!privateVisible && !route.startsWith("/trust")) Notice(title = "Account unavailable", children = "Refresh your account before continuing. Unsaved input stays in this account view.")
         if (route.startsWith("/trust")) {
             TrustCrisisHelp(context,help)
         } else if (route.contains("access")) {
             TrustText("These records show when an authorized operations account opened your case evidence and its purpose. Opening a case does not mean someone read every word.")
-            if (privateReady && history.isEmpty() && !busy) TrustText("No case accesses yet.","caption")
-            history.takeIf { privateReady }.orEmpty().forEach { item -> TrustText(item.text("action").replace('_',' ') + " · " + item.text("created_at"),"caption"); TrustText(item.text("purpose")) }
+            if (privateVisible && history.isEmpty() && !busy) TrustText("No case accesses yet.","caption")
+            history.takeIf { privateVisible }.orEmpty().forEach { item -> TrustText(item.text("action").replace('_',' ') + " · " + item.text("created_at"),"caption"); TrustText(item.text("purpose")) }
         } else if (route.contains("feedback")) {
             TrustText("Your answers help evaluate usefulness and clear authorship. They do not affect access, ranking or payment. Feedback is retained for 90 days and included in account deletion.")
             TrustText("Was the conversation useful?" + (useful?.let { if(it) " Yes" else " No" } ?: " Choose an answer"),"label")
@@ -302,12 +304,12 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
             val disabled = busy || !privateReady || !verificationConfigured || (if (local) proof != "LOCAL DEVELOPMENT" else verificationMethod != "current_session" && proof.isEmpty()) || (scope != "account" && !validTrustId(creatorId)) || (scope == "thread" && !validTrustId(threadId))
             Button("Request export", ButtonVariant.SECONDARY, block = true, disabled = disabled) { launchPrivate { privacyCommand("export") } }
             Button("Request deletion", ButtonVariant.SECONDARY, block = true, disabled = disabled) { confirmDelete = true }
-            jobs.takeIf { privateReady }.orEmpty().forEach { job -> key(job.text("id")) {
+            jobs.takeIf { privateVisible }.orEmpty().forEach { job -> key(job.text("id")) {
                 TrustText("Requested " + job.text("created_at"), "caption")
                 val label = job.text("kind") + ", " + job.text("scope") + ", " + job.text("state").replace('_', ' ') + ", requested " + job.text("created_at") + ", job " + job.text("id")
                 Button(job.text("kind") + " · " + job.text("scope") + " · " + job.text("state").replace('_', ' '), ButtonVariant.QUIET, block = true, disabled = busy || !privateReady, modifier = Modifier.semantics { contentDescription = label }) { launchPrivate { jobDetail(job.text("id")) } }
             } }
-            selectedJob?.takeIf { privateReady }?.let { job ->
+            selectedJob?.takeIf { privateVisible }?.let { job ->
                 TrustText("Job " + job.text("id"), "caption")
                 job["tasks"]?.jsonArray?.forEach { item -> val task = item.jsonObject; TrustText(task.text("domain") + ": " + task.text("state").replace('_', ' ') + task.text("error_code").takeIf { it.isNotEmpty() }?.let { " · " + it.replace('_', ' ') }.orEmpty()) }
                 job["retained"]?.jsonArray?.forEach { item -> val retained = item.jsonObject; TrustText("Retained: " + retained.text("category").replace('_',' '),"label"); TrustText(retained.text("reason")); retained.text("until").takeIf { it.isNotEmpty() }?.let { TrustText("Until $it","caption") } }
@@ -346,14 +348,14 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
                 perform("reports", input)?.let { result = "CASE-" + it.text("number") + " is saved. No provider action is implied."; reason = ""; load() }
             } }
             TrustText("Your cases", "title")
-            cases.takeIf { privateReady }.orEmpty().forEach { item ->
+            cases.takeIf { privateVisible }.orEmpty().forEach { item ->
                 TrustText("CASE-" + item.text("number") + " · " + item.text("kind").replace('_', ' ') + " · " + item.text("state"), "body-strong")
                 if (item.text("state") == "resolved") Button("Appeal CASE-" + item.text("number"), ButtonVariant.SECONDARY, disabled = busy || !privateReady || reason.trim().length < 12) { launchPrivate {
                     if (perform("cases/" + item.text("id") + "/appeals", buildJsonObject { put("version", item["version"]!!); put("reason", reason); put("idempotencyKey", key) }) != null) { result = "Your appeal is saved for a different reviewer."; reason = ""; load() }
                 } }
             }
             TrustText("Trust inbox", "title")
-            notices.takeIf { privateReady }.orEmpty().forEach { item -> TrustText(item.text("type").replace('_', ' '), "label"); TrustText(item.text("reason")) }
+            notices.takeIf { privateVisible }.orEmpty().forEach { item -> TrustText(item.text("type").replace('_', ' '), "label"); TrustText(item.text("reason")) }
         }
         Button("Refresh", ButtonVariant.SECONDARY, block = true, disabled = busy || model.checkingSession || model.busy) { refreshOperation?.cancel(); refreshOperation = coroutine.launch { model.refresh() } }
     }
