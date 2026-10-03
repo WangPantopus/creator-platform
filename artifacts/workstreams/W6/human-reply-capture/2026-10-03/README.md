@@ -1,5 +1,7 @@
 # W6 original human-reply capture — October 3, 2026 UTC
 
+PR254 normally merged exact head `38357605dd64ea2661cad911b8b6fdc88014d21e` at `0e0d02ad476f6e88112b6fc68d11efe95fe7f0eb` on2026-10-03T04:56:57Z. All eleven hosted checks were still QUEUED at the last current-head inspection; none is counted as pass. The next owned conversation-fit branch starts from that fetched main, and shared main was safely fast-forwarded with its untracked workbook preserved.
+
 Personally implemented native source `073b9f7c903b00e6898bc3718729602a7c5d4458` and backend repairs `51bb6afb`/`4bef433e`. Active branch `codex/w6-human-reply-capture-20261003` integrates fetched main `f6a2f39c0010918d6d2395cfd48c68bb75112268` through PR252 at `d0d33283e46b86335fce84fa290e43db2901aae4`. Shared main was safely fast-forwarded to that same fetched main at the human's request; its untracked research workbook remains. Peer and historical branches, global stash and protected secondary proposed61 checkout were not changed.
 
 ## Implementation
