@@ -132,3 +132,22 @@ device/inode/raw-owner GUI/device custody released; W3 received the next window.
 All eight successor-owned branches were updated and pushed with exact captured
 remote main `0e0d02ad476f6e88112b6fc68d11efe95fe7f0eb`. Predecessor and peer
 checkouts were preserved. The full nine-package assignment is still incomplete.
+
+At source `6497599ec1381f80e7c0bac00c76b74b03db13c2`, incorporating W6
+main0e0d02ad, both normal shipping builds passed. iOS strict deep codesign also
+passed. Executable SHA256:
+`37c803a09ee8b560958283477350edbe62566dc018bdbb3ed5fed39c17206290`;
+debug dylib SHA256:
+`edd64515407184f022c574ccd3c7abb531a2ec80cfed1d27672ed057f82f4bfd`;
+Android APK SHA256:
+`676ca3dc1d672b89e03ccdcfb3c58bc128688360cd481d74cba1736f29950d28`.
+Canonical generation114 operations/12 resources and backend/web types passed
+at this same branch source. These new artifacts have compilation qualification;
+the personal device observations above remain at fc9fdfb1/eb605a15.
+
+Captured main `0a445ec2506b016f981aff46adaec5cdf281f875` adds W4's reviewed
+Spend/Requests tab-return fix and W6's reviewed enlarged Android conversation
+layout. It is integrated into this branch; an attempted fresh heavy build
+returned75 while W1 held the slot. That refusal is not a build pass. Current
+artifact operation and genuine signed/private, provider and paid acceptance
+remain unverified. No later-commit release readiness is claimed.
