@@ -20,7 +20,7 @@ DO $$ BEGIN
   OR to_regprocedure('creator.prepare_commerce_fulfillment_publication(uuid,uuid,integer,uuid,uuid)') IS NULL
   OR to_regprocedure('creator_trust.fulfillment_publication_denial(uuid)') IS NULL
   OR to_regprocedure('creator.fence_signature_metadata_write()') IS NULL
- THEN RAISE EXCEPTION 'Original0158/0204/0205 source required'; END IF;
+ THEN RAISE EXCEPTION 'Original0158/0167/0204/0205 source required'; END IF;
  IF (SELECT count(*) FROM pg_trigger t JOIN pg_proc p ON p.oid=t.tgfoid
   WHERE NOT t.tgisinternal AND t.tgenabled='O' AND t.tgtype=25
    AND t.tgname='fence_signature_metadata_write' AND pg_get_userbyid(p.proowner)='creator_owner'
@@ -201,6 +201,10 @@ END $$;
 CREATE FUNCTION creator.publication_preparation_original_family_bound(c uuid,p uuid,f uuid,t uuid)
 RETURNS boolean LANGUAGE sql VOLATILE SECURITY DEFINER SET search_path=pg_catalog AS $$
  SELECT session_user='creator_publication_worker' AND current_setting('transaction_isolation')='read committed'
+  AND nullif(current_setting('app.account_id',true),'') IS NULL
+  AND nullif(current_setting('app.identity_session_id',true),'') IS NULL
+  AND nullif(current_setting('app.creator_id',true),'') IS NULL
+  AND nullif(current_setting('app.fan_id',true),'') IS NULL
   AND c IS NOT NULL AND p IS NOT NULL AND f IS NOT NULL AND t IS NOT NULL
   AND EXISTS(SELECT FROM creator.publication_preparation x
    JOIN creator.publication_worker_scope issued ON issued.id=x.publication_nonce
@@ -214,6 +218,34 @@ RETURNS boolean LANGUAGE sql VOLATILE SECURITY DEFINER SET search_path=pg_catalo
     AND issued.command_hash=x.command_hash AND issued.command=x.command
     AND family->>'creator_id'=c::text AND family->>'packet_id'=p::text
     AND family->>'fan_id'=f::text AND family->>'thread_id'=t::text)
+$$;
+
+-- Fixed metadata-only213 RLS bindings. No arbitrary JSON key, NULL wildcard,
+-- original recipient list or private preparation token crosses this port.
+CREATE FUNCTION creator.publication_preparation_original_metadata_bound(k text,i uuid)
+RETURNS boolean LANGUAGE sql VOLATILE SECURITY DEFINER SET search_path=pg_catalog AS $$
+ SELECT session_user='creator_publication_worker' AND current_setting('transaction_isolation')='read committed'
+  AND nullif(current_setting('app.account_id',true),'') IS NULL
+  AND nullif(current_setting('app.identity_session_id',true),'') IS NULL
+  AND nullif(current_setting('app.creator_id',true),'') IS NULL
+  AND nullif(current_setting('app.fan_id',true),'') IS NULL
+  AND k IS NOT NULL AND i IS NOT NULL
+  AND k IN('creator','fan','mode','commitment','acceptance','creator_account','fan_account','packet','plan')
+  AND EXISTS(SELECT FROM creator.publication_preparation x
+   JOIN creator.publication_worker_scope issued ON issued.id=x.publication_nonce
+   CROSS JOIN LATERAL jsonb_array_elements(x.original_families) family
+   WHERE x.phase IN('bound','finalizing') AND x.fulfillment_nonce IS NOT NULL
+    AND x.backend_pid=pg_backend_pid() AND x.transaction_id=pg_current_xact_id() AND x.login_name=session_user
+    AND x.expires_at>clock_timestamp() AND issued.id=nullif(current_setting('publication.scope_id',true),'')::uuid
+    AND issued.backend_pid=x.backend_pid AND issued.transaction_id=x.transaction_id AND issued.login_name=x.login_name
+    AND issued.creator_id=x.creator_id AND issued.content_id=x.content_id AND issued.version=x.version
+    AND issued.publisher_account_id=x.publisher_account_id AND issued.signed_act_id=x.signed_act_id
+    AND issued.command_hash=x.command_hash AND issued.command=x.command
+    AND CASE k WHEN 'creator' THEN family->>'creator_id' WHEN 'fan' THEN family->>'fan_id'
+     WHEN 'mode' THEN family->>'mode_id' WHEN 'commitment' THEN family->>'commitment_id'
+     WHEN 'acceptance' THEN family->>'acceptance_id' WHEN 'creator_account' THEN family->>'creator_account_id'
+     WHEN 'fan_account' THEN family->>'fan_account_id' WHEN 'packet' THEN family->>'packet_id'
+     WHEN 'plan' THEN x.original_plan->>'planId' END=i::text)
 $$;
 
 CREATE FUNCTION creator.prepared_publication_matches(n uuid,t uuid) RETURNS boolean
@@ -308,6 +340,7 @@ DO $$ DECLARE f regprocedure; BEGIN
   'creator.bind_prepared_publication(uuid,uuid,text,text)'::regprocedure,
   'creator.publication_preparation_originals(uuid,uuid)'::regprocedure,
   'creator.publication_preparation_original_family_bound(uuid,uuid,uuid,uuid)'::regprocedure,
+  'creator.publication_preparation_original_metadata_bound(text,uuid)'::regprocedure,
   'creator.prepared_publication_matches(uuid,uuid)'::regprocedure,
   'creator.finish_prepared_publication(uuid,uuid)'::regprocedure]) LOOP
   EXECUTE format('ALTER FUNCTION %s OWNER TO creator_publication_authority',f);

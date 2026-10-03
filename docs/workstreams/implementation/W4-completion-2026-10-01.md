@@ -1,3 +1,9 @@
+### Current audience composition and actual0211 caller review — October 3, 2026 UTC
+
+The W4 audience factory retains its original canonical host Pool, requires the exact executable in W1's real consumer registry and exposes assertComposition(identity, hostPool) for exact same-object composition. Personally reviewed W2 published2a093f82's fixed NOLOGIN metadata caller; only that exact caller is added to the original ACL/unsafe-role checks. Original0182 SQL/function bytes remain unchanged, and unknown function/table/column/PUBLIC privileges still refuse.
+
+Actual isolated canonical61 rollback qualification passes both original audience/metadata compiler checks, seven real metadata drift refusals and five raw/missing-purpose/unregistered refusals, preserving all six custody digests. The review container is stopped; no ledger/scope/business rows fabricated. Backend build/types/scoped lint/format/diff pass. Actual W2 consumption, real prepared composition/worker/provider/positive generation and C10/activation remain open. [Exact owner evidence](../../../artifacts/workstreams/W4/runtime/2026-10-03/generation-metadata-audience/README.md).
+
 ### Independent publication metadata owner qualification — October 3, 2026 UTC
 
 The primary personally qualified unchanged0178/0158/0204 plus actual W8 PR2120205 on an isolated fresh canonical61 copy. Eight actual PL/pgSQL functions compile with zero diagnostics; seven unregistered/ACL refusals and six rolled-back metadata drifts pass. All six ledger/schema/data/roles/security/sequence custody comparisons match. Initial seven-function review counter failure and two owned-loopback endpoint failures are retained with the successful repeats. No ledger/business rows or authority were fabricated, and the review container is stopped.

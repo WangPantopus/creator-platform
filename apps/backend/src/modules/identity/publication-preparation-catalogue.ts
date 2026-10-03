@@ -10,7 +10,7 @@ export const publicationPreparationSource = Object.freeze({
   name: "w1_publication_preparation",
   path: "apps/backend/src/modules/identity/schema-publication-preparation.sql",
   owner: "W1",
-  checksum: "2dd70a0a3552afe2ae24244fb4f0a2082a5890712834b4c7ac2fee468717cc19",
+  checksum: "eb393fac0e580c3b7c58e4586ebd98539f99b696aacc9db1756ea5523c059c07",
 });
 
 export const publicationPreparationCatalogueQuery = `WITH roles AS (
@@ -43,7 +43,8 @@ export const publicationPreparationCatalogueQuery = `WITH roles AS (
    FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) g)) ORDER BY p.oid::regprocedure::text COLLATE "C")
   FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
   WHERE CASE WHEN n.nspname !~ '^pg_' AND n.nspname<>'information_schema' AND p.prokind IN('f','p') THEN
-   p.proowner IN(SELECT oid FROM roles) OR EXISTS(SELECT FROM roles r WHERE has_function_privilege(r.oid,p.oid,'EXECUTE')) ELSE false END),
+   p.proowner IN(SELECT oid FROM roles) OR p.oid=to_regprocedure('creator.fence_signature_metadata_write()')
+    OR EXISTS(SELECT FROM roles r WHERE has_function_privilege(r.oid,p.oid,'EXECUTE')) ELSE false END),
  'relations',(SELECT jsonb_agg(jsonb_build_object('name',o.relname,'owner',pg_get_userbyid(o.relowner),'kind',o.relkind,
   'rls',o.relrowsecurity,'forced',o.relforcerowsecurity,'partition',o.relispartition,
   'columns',(SELECT jsonb_agg(jsonb_build_object('number',a.attnum,'name',a.attname,'type',format_type(a.atttypid,a.atttypmod),
@@ -83,11 +84,11 @@ export const publicationPreparationCatalogueQuery = `WITH roles AS (
   ORDER BY r.rolname COLLATE "C",n.nspname COLLATE "C") FROM roles r CROSS JOIN pg_namespace n WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema')
 ) AS catalogue`;
 
-// This fingerprint captures actual0158/0160/0178/0204/0205/0208 in a closed
-// rolled-back clone. Actual213 is still missing: fulfillment finalization
+// This fingerprint captures actual0157/0158/0160/0167/0176/0178/0201/0204/0205/0208
+// in a closed rolled-back clone. Actual213 is still missing: fulfillment finalization
 // refuses, and adding its real grants requires combined requalification.
 export const publicationPreparationCatalogueChecksum =
-  "8d28251bcfd795e603c8dc962c6660f8aad5fe67d148ab0e928af654085b661c";
+  "db11105f6a196d91fb4ab97a4a71706d5d6a885b0a0358c94b5cbcb3622b3af9";
 
 function unavailable(): never {
   throw new DomainError(
@@ -131,6 +132,20 @@ export async function assertPublicationPreparationCatalogue(
         owner: "W1",
         checksum:
           "100e319216568ee1ed27081be0520dbfdb3b7019659946c2c5de1f6859d32cc1",
+      },
+      {
+        name: "w1_signature_read_fence",
+        path: "apps/backend/src/modules/identity/schema-signature-read-fence.sql",
+        owner: "W1",
+        checksum:
+          "157640de84f22d6d638d788dfe04314fd193efaed80a829f288bec7cbcb815b5",
+      },
+      {
+        name: "w8_worker_migration_metadata",
+        path: "apps/backend/migrations/0201_w8_worker_migration_metadata.sql",
+        owner: "W8",
+        checksum:
+          "2fce1ce5aa6c9f571067d999e2a62ac8d71b8e147b97393e7e87091227159e6f",
       },
       {
         name: "w8_publication_worker_denial",

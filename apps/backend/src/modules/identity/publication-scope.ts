@@ -89,6 +89,10 @@ export class PublicationIdentityAuthority {
     Readonly<{
       client: PoolClient;
       preparation: PublicationPreparation;
+      command: string;
+      transaction: string;
+      pid: number;
+      nonce: string;
     }>
   >();
   constructor(
@@ -109,21 +113,22 @@ export class PublicationIdentityAuthority {
   }
 
   async assertRole(): Promise<void> {
-    const result = await this.pool.query<{ allowed: boolean }>(
-      `SELECT current_user='creator_publication_worker' AND session_user=current_user
-        AND NOT r.rolsuper AND NOT r.rolbypassrls AND NOT r.rolinherit
-        AND NOT r.rolreplication AND (r.rolconfig IS NULL OR cardinality(r.rolconfig)=0)
-        AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid)
-        AND to_regprocedure('creator.prepare_publication_task(uuid,uuid,integer,uuid,uuid)') IS NOT NULL
-        AND to_regprocedure('creator.finish_prepared_publication(uuid,uuid)') IS NOT NULL
-        AND to_regprocedure('creator_trust.publication_worker_denial(uuid,uuid)') IS NOT NULL
-        AS allowed FROM pg_roles r WHERE r.rolname=current_user`,
-    );
-    invariant(
-      result.rows[0]?.allowed === true,
-      "publication_worker_role_required",
-      "Use the activated, separate non-owner publication worker connection.",
-    );
+    this.assertWorker();
+    const client = await this.pool.connect();
+    try {
+      await client.query("BEGIN ISOLATION LEVEL READ COMMITTED READ ONLY");
+      await client.query("SET LOCAL statement_timeout='5s'");
+      await client.query("SET LOCAL lock_timeout='1s'");
+      await this.configuration.assertDiscoveryAllowed(client);
+      await assertPublicationPreparationCatalogue(client);
+      await this.configuration.assertPreparationAllowed(client);
+    } finally {
+      try {
+        await client.query("ROLLBACK");
+      } finally {
+        client.release(true);
+      }
+    }
   }
 
   private assertWorker() {
@@ -248,6 +253,10 @@ export class PublicationIdentityAuthority {
   async withPublication<T>(
     input: PublicationTask,
     work: (client: PoolClient, scope: PublicationTaskScope) => Promise<T>,
+    beforeFinalSignatureRead?: (
+      client: PoolClient,
+      scope: PublicationTaskScope,
+    ) => Promise<void>,
   ): Promise<T> {
     this.assertWorker();
     await this.assertRole();
@@ -301,12 +310,23 @@ export class PublicationIdentityAuthority {
         [publicationScopeBrand]: true as const,
         kind: "publication" as const,
       });
-      this.issued.set(scope, Object.freeze({ client, preparation }));
+      const context = await this.context(client);
+      this.issued.set(
+        scope,
+        Object.freeze({
+          client,
+          preparation,
+          command: canonical(command),
+          ...context,
+        }),
+      );
       const value = await work(client, scope);
       await this.authorizeInTransaction(scope, client);
       await this.configuration.assertAllowed(client, task);
       await assertPublicationPreparationCatalogue(client);
       await this.configuration.assertPreparationAllowed(client);
+      await beforeFinalSignatureRead?.(client, scope);
+      await this.authorizeInTransaction(scope, client);
       // Invalidate the JS port before the joint SQL finalizer. The SQL ends204
       // before actual213, then ends0158/208 before its last current domain read.
       // No owner/catalogue/restore callback or DB read may follow it, only COMMIT.
@@ -345,6 +365,15 @@ export class PublicationIdentityAuthority {
       "publication_scope_required",
       "A current issued publication scope is required.",
     );
+    const held = this.issued.get(scope)!;
+    const context = await this.context(client);
+    invariant(
+      context.transaction === held.transaction &&
+        context.pid === held.pid &&
+        context.nonce === held.nonce,
+      "publication_scope_expired",
+      "The original publication client or transaction changed.",
+    );
     const result = await client.query<{ allowed: boolean }>(
       "SELECT creator.prepared_publication_matches($1,$2) AS allowed",
       [
@@ -367,5 +396,56 @@ export class PublicationIdentityAuthority {
   ): Promise<PublicationPreparation> {
     await this.authorizeInTransaction(scope, client);
     return this.issued.get(scope)!.preparation;
+  }
+  private async context(client: PoolClient) {
+    const row = (
+      await client.query<{
+        transaction: unknown;
+        pid: unknown;
+        nonce: unknown;
+      }>(
+        "SELECT pg_current_xact_id()::text AS transaction,pg_backend_pid() AS pid,current_setting('publication.scope_id',true) AS nonce",
+      )
+    ).rows[0];
+    return {
+      transaction: z
+        .string()
+        .regex(/^[0-9]+$/u)
+        .parse(row?.transaction),
+      pid: z.number().int().positive().parse(row?.pid),
+      nonce: IdSchema.parse(row?.nonce),
+    };
+  }
+
+  /** Copy the complete original command captured by this issuer, never a caller
+   * document or a structural authority lookalike. Copying grants no new scope. */
+  async originalInTransaction(scope: PublicationTaskScope, client: PoolClient) {
+    await this.authorizeInTransaction(scope, client);
+    const command = SignedActCommandSchema.parse(
+      JSON.parse(this.issued.get(scope)!.command),
+    );
+    const content = z
+      .object({
+        kind: z.literal("content_publication"),
+        creatorId: IdSchema,
+        version: z.number().int().positive(),
+        document: ContentDocument,
+        mediaEvidence: z.array(ProcessedMediaEvidenceSchema).max(10).optional(),
+      })
+      .parse(command.content);
+    invariant(
+      content.creatorId === scope.creatorId &&
+        content.version === scope.version &&
+        command.subjectId === scope.contentId &&
+        contentHash(command) === scope.commandHash,
+      "publication_command_changed",
+      "The complete original publication command is required.",
+    );
+    return {
+      document: content.document,
+      mediaEvidence: content.mediaEvidence ?? [],
+      transaction: this.issued.get(scope)!.transaction,
+      pid: this.issued.get(scope)!.pid,
+    };
   }
 }
