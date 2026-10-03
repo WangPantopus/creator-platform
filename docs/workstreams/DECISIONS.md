@@ -307,3 +307,7 @@ Require a max1 original generation pool with actual finite acquisition/read budg
 ### W1 October3 — retain guard transport causes before settlement
 
 Generation, terminal and cursor catalogue guards preserve their original private causes inside the same bounded public503. Cursor savepoint restoration runs only after successful metadata checks; any failure escapes directly to original transaction custody. A purpose-wrapped read timeout must close the held connection without later SQL. Existing backend types, scoped lint and nine contracts pass; the actual ten transport cases qualify the connection boundary only. Original SQL, consumer permissions and missing positive cursor catalogue remain unchanged.
+
+### W1 October3 — standard private Error causes
+
+DomainError accepts optional native ErrorOptions, preserving existing code/message/status calls. Generation connection and catalogue guards use that standard constructor instead of an enumerable cause assignment. Actual delayed transport operations verify nonenumerable wrapper causes while private inspection still retains original failures. Backend types, scoped lint and existing9 contracts pass; no public response or purpose permission is expanded.
