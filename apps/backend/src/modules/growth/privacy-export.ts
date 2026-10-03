@@ -2,6 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import type { PoolClient } from "pg";
 import type { GrowthService } from "./service.js";
 import type { GrowthPrivacyHeldAuthority } from "./lifecycle.js";
+import { GrowthHeldClient } from "./held-client.js";
 
 /** Structural consumer of W8's published 3240da0 PrivacyExportStream port.
  * The protected W8 coordinator owns lease checks, storage and download authority. */
@@ -158,20 +159,13 @@ export function growthAccountExport(
   async function* read() {
     signal.throwIfAborted();
     let client: PoolClient | undefined;
-    let released = false;
-    const destroy = () => {
-      if (client && !released) {
-        released = true;
-        // Cancellation/abandonment destroys only this dedicated worker client,
-        // rolling back the held task and all domain locks.
-        client.release(true);
-      }
-    };
+    let held: GrowthHeldClient | undefined;
+    let failure: unknown;
+    let sourceComplete = false;
     try {
       client = await service.db.worker.connect();
-      signal.addEventListener("abort", destroy, { once: true });
-      signal.throwIfAborted();
-      await client.query("BEGIN ISOLATION LEVEL READ COMMITTED READ WRITE");
+      held = new GrowthHeldClient(client, signal);
+      await held.begin("BEGIN ISOLATION LEVEL READ COMMITTED READ WRITE");
       await client.query(
         "SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','2000',true)",
       );
@@ -246,14 +240,20 @@ export function growthAccountExport(
       await assertAuthority(client);
       // W8's deferred trigger checks the exact binding and wall-clock lease
       // during this separate COMMIT. No completion survives a refused commit.
-      await client.query("COMMIT");
+      await held.commit();
       signal.throwIfAborted();
       sha256 = hash.digest("hex");
-      complete = true;
+      sourceComplete = true;
+    } catch (error) {
+      failure = error;
+      throw error;
     } finally {
-      signal.removeEventListener("abort", destroy);
-      destroy();
+      // This dedicated export client is always destroyed, including early
+      // iterator return. No incomplete source survives cleanup or is reused.
+      await held?.close({ destroy: true, failure });
     }
+    signal.throwIfAborted();
+    complete = sourceComplete;
   }
   return {
     snapshotRef,

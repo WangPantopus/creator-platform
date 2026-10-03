@@ -3,6 +3,7 @@ import type { Pool, PoolClient } from "pg";
 import type { Actor } from "../identity/adapter.js";
 import { DomainError } from "../../core/errors.js";
 import { assertCurrentSession } from "../identity/request-authority.js";
+import { GrowthHeldClient } from "./held-client.js";
 
 export class GrowthDatabase {
   actorFence?: (
@@ -113,34 +114,21 @@ export class GrowthDatabase {
   ): Promise<T> {
     signal?.throwIfAborted();
     const client = await pool.connect();
-    let released = false;
-    const abort = () => {
-      if (!released) {
-        released = true;
-        client.release(true);
-      }
-    };
-    signal?.addEventListener("abort", abort, { once: true });
+    const held = new GrowthHeldClient(client, signal);
+    let failure: unknown;
     try {
-      signal?.throwIfAborted();
-      await client.query("BEGIN");
+      await held.begin();
       await client.query(
         "SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','2000',true)",
       );
       const value = await work(client);
-      signal?.throwIfAborted();
-      await client.query("COMMIT");
-      signal?.throwIfAborted();
+      await held.commit();
       return value;
     } catch (error) {
-      if (!released) await client.query("ROLLBACK").catch(() => {});
+      failure = error;
       throw error;
     } finally {
-      signal?.removeEventListener("abort", abort);
-      if (!released) {
-        released = true;
-        client.release();
-      }
+      await held.close({ failure });
     }
   }
   /** Device transfer removes former bindings through worker-only negative
@@ -157,8 +145,10 @@ export class GrowthDatabase {
         503,
       );
     const worker = await this.worker.connect();
+    const held = new GrowthHeldClient(worker);
+    let failure: unknown;
     try {
-      await worker.query("BEGIN");
+      await held.begin();
       await worker.query(
         "SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','2000',true)",
       );
@@ -171,14 +161,14 @@ export class GrowthDatabase {
         ]);
         await assertCurrentSession(runtime, actor.accountId);
         const result = await work(worker);
-        await worker.query("COMMIT");
+        await held.commit();
         return result;
       });
     } catch (error) {
-      await worker.query("ROLLBACK").catch(() => {});
+      failure = error;
       throw error;
     } finally {
-      worker.release();
+      await held.close({ failure });
     }
   }
 
