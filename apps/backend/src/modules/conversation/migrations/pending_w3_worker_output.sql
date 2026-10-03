@@ -135,8 +135,9 @@ BEGIN
  tid:=(task->>'threadId')::uuid;cid:=(task->>'creatorId')::uuid;fid:=(task->>'fanId')::uuid;mid:=(task->>'aiMessageId')::uuid;
  IF n IS NULL OR n<1 OR n>1024 OR sentence IS NULL OR length(sentence)<1 OR length(sentence)>10000
   OR approved IS NULL OR jsonb_typeof(approved)<>'object' OR octet_length(approved::text)>32768
-  OR (SELECT count(*) FROM jsonb_object_keys(approved))<>10
-  OR NOT approved ?& ARRAY['versionId','versionHash','pipelineHash','contextHash','fanMessageId','epoch','contextRevision','providerUsageId','citations','passages']
+  OR (SELECT count(*) FROM jsonb_object_keys(approved))<>11
+  OR NOT approved ?& ARRAY['kind','versionId','versionHash','pipelineHash','contextHash','fanMessageId','epoch','contextRevision','providerUsageId','citations','passages']
+  OR jsonb_typeof(approved->'kind') IS DISTINCT FROM 'string' OR approved->>'kind' NOT IN('sentence','fallback','crisis')
   OR EXISTS(SELECT FROM unnest(ARRAY['versionId','versionHash','pipelineHash','contextHash','fanMessageId','providerUsageId']) k
    WHERE jsonb_typeof(approved->k) IS DISTINCT FROM 'string')
   OR (approved->>'versionHash' ~ '^[a-f0-9]{64}$') IS NOT TRUE
@@ -148,6 +149,15 @@ BEGIN
   OR jsonb_typeof(approved->'citations') IS DISTINCT FROM 'array' OR jsonb_array_length(approved->'citations')>20
   OR jsonb_typeof(approved->'passages') IS DISTINCT FROM 'array' OR jsonb_array_length(approved->'passages')>20 THEN
   RAISE EXCEPTION 'Use bounded exact approved sentence provenance' USING ERRCODE='22023';
+ END IF;
+ -- Preserve the genuine W2 outcome in durable provenance. Frame.kind stays
+ -- the existing sentence transport discriminator; it is no chargeability proof.
+ -- Crisis is fixed platform safety, never inferred from arbitrary prose. W4's
+ -- genuine typed terminal successor must preserve free fan allowance and real
+ -- attributed classifier cost before any such run may activate.
+ IF approved->>'kind' IN('fallback','crisis') AND (jsonb_array_length(approved->'citations')<>0 OR jsonb_array_length(approved->'passages')<>0)
+  OR (approved->>'kind'='crisis' AND sentence<>'I’m an AI. If you’re in immediate danger, contact local emergency services now. In the U.S. or Canada, call or text 988. You can also reach out to someone you trust nearby.') THEN
+  RAISE EXCEPTION 'Use genuine fixed uncited platform safety or fallback outcome' USING ERRCODE='42501';
  END IF;
  PERFORM (approved->>'providerUsageId')::uuid;
  version_id:=(approved->>'versionId')::uuid;
