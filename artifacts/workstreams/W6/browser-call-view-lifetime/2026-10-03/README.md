@@ -1,5 +1,54 @@
 # Original browser call view and session — 3 October 2026
 
+## Corrected shared lifetime operation — 13:53 UTC
+
+W6 personally read and normally integrated W1's original `6a84ab33` and
+`b0281ee5dee71f0142394062b2db8f77928747e7` into exact source
+`82bfea49660477b82052a854d652738dddc3466e`. The genuine shared producer now
+distinguishes observed session end from ordinary view disposal. W6 call/signing
+views have no persisted draft buffer to purge; their original abort continues
+to cancel in-memory requests and physical resources. This observation supplies
+no authority or revocation. Both held web branches consume the same producer;
+signing's merge is `914cd8628354b564509aa9ba6b2147ddff073629`.
+
+Web types, relevant source lint/format and unchanged generation12/115 pass.
+Two initial lint invocations named nonexistent paths and failed before checking;
+the corrected invocation passed. A fresh normal production web build passes
+13:49:50.074–13:49:57.071Z under the canonical guard. Its exact lease has
+nonce6456b815-66d0-47c1-a1e8-f3cd17ba0b8b, dev16777232/inode244363818 and
+normal release. Build log SHA256 is
+`223b4d465976d605d85019489df020e8b7704b4b51a5ec06af11f9d36f4e75f2`.
+Backend/packages/config have no delta from the previously operated f0 source;
+the reused actual bundle remains
+`f1b73ce1ff7c354bb9e7b6dbe55a37524d193ae8d03d11cdb304fabfa8847a1d`.
+
+Normal owned shipping Chromium personally repeated genuine fan issuer/unused
+offer refusal, actual Requests navigation/Back with the same issuer session,
+same-account replacement409/session_view_changed and creator replacement409/
+session_account_changed with old-view concealment. Actual browser offline/
+online repeats refusal/recovery. W6 viewed Night390×844; all issued credentials
+were logged out200, with no page errors. This does not verify W2 persisted
+Sources drafts, signed offers, Select POST, passkeys, scheduling, live controls
+or genuine media. Remaining creator offer/signing source gaps require personal
+repair;282 remains draft and no whole package is completed.
+
+Selected read-only state at13:53:19.687Z remains canonical61/Note5, three deleted
+photos and messages/thread-media/publications/offers/calls/admissions0. The
+protected upgrade target retains connection-limit0 and its original closure.
+Runtime nonce59fc085f-d19d-457f-b2e3-6bb96daed946,
+dev16777232/inode244365507 closed13:53:43.428419Z after exact owner bytes,
+dev/inode, commands/PIDs, sole listeners and Next process-group checks.
+API9170, web wrapper9518/group9851 and TLS9860 stopped normally;
+ports3006/3106/4106/55446 closed, original PG preserved/exited and owned browser/
+leases released. No native device was started; peer emulator/simulator untouched.
+Private browser/state/closure SHA256s:
+`e68b2f4a114faed7a043851464d8895fafa36946dc580e6f0e65164be6b9ce7a`,
+`733bdf37e1e7cdf3defd82005f3e8ec4bcb1529b98299a7f8fd024d2ade25adc`,
+`e367051490600d8f67f9b86db270208448a210ace9b542fcc20bf59caafeb0b6`.
+The first hash-reader named a nonexistent state filename and failed after
+closure; the actual final-state file above was subsequently read and hashed.
+Routine operational files remain private.
+
 ## Current integrated offer operation — 13:00 UTC
 
 W7's remaining SelectTime finding is personally repaired at `d3f22174`, with
@@ -43,7 +92,7 @@ was never changed. The subsequent runtime lease is independent of peer builds.
 Actual owned API stop/Reload shows media_unavailable/reconnect guidance. Cold
 reload retains the session at the account-unavailable Retry screen; restarting
 the same actual API and Retry restores the correct unconfigured offer notice.
-Open Requests reaches truthful commerce_unconfigured, not a populated queue.
+Open Requests reaches truthful commerce-unavailable copy, not a populated queue.
 Real Account Refresh200 sends the original account/session headers, rotates its
 actual cookie and retains the session. Actual fan→creator issuer replacement
 makes the old fan form receive409/session_account_changed and conceal; fresh
