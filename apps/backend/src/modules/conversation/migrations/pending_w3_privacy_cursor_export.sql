@@ -38,7 +38,7 @@ CREATE POLICY w3_cursor_export_metadata ON creator.creator_profile FOR SELECT TO
 CREATE POLICY w3_cursor_export_lock ON creator.creator_profile FOR UPDATE TO creator_w3_privacy_export USING(true) WITH CHECK(false);
 GRANT SELECT(actor_account_id,created_at,creator_id,fan_id,generation_id,retention_policy_version,sealed_at,state,thread_id) ON creator.ai_generation_admission TO creator_w3_privacy_export;
 CREATE POLICY w3_cursor_export_metadata ON creator.ai_generation_admission FOR SELECT TO creator_w3_privacy_export USING(true);
-GRANT SELECT(attempt_id,closed_at,created_at,creator_hold_id,creator_id,fan_id,generation_id,provider_admissions,state,thread_id) ON creator.ai_generation_attempt TO creator_w3_privacy_export;
+GRANT SELECT(admission_model_fingerprint,admission_version_hash,attempt_id,closed_at,created_at,creator_hold_id,creator_id,fan_id,generation_id,provider_admissions,state,thread_id) ON creator.ai_generation_attempt TO creator_w3_privacy_export;
 CREATE POLICY w3_cursor_export_metadata ON creator.ai_generation_attempt FOR SELECT TO creator_w3_privacy_export USING(true);
 GRANT SELECT(attempt_ids,cost_micros,creator_id,fan_id,generation_id,id,receipt_hash,recorded_at,revision,state,thread_id,usage_ids) ON creator.ai_generation_receipt TO creator_w3_privacy_export;
 CREATE POLICY w3_cursor_export_metadata ON creator.ai_generation_receipt FOR SELECT TO creator_w3_privacy_export USING(true);
@@ -108,15 +108,38 @@ BEGIN
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0087_w8_privacy_task_commit_fence' AND checksum='33e619bfdea66355e1d8d2b90ed2d0389f21ae024fda63e1b984c99aede847ef')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0163_w2_usage_lineage' AND checksum='16dddc80bebe32979f822104d8f411e0f545b4e212da6dc147c72f959e660f17')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0165_w2_usage_retention_expiry' AND checksum='1c118f5ec90a5a3f3578e056af14d5e56b1379464977c4a79bd6c2b62be7f17e')
+  OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0181_w2_generation_attempt_admission' AND checksum='eab8c8e07b8a1e6ba4384f5300560bd46853bf98509faade5a1b555e130c75ee')
+  OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0188_w2_generation_terminal_journal' AND checksum='7ab8974d065b1b9e5befa2ded26c6978876957fab0eee80b9632825bbac98477')
+  OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0210_w2_generation_guardrail_event' AND checksum='0c0fc7fee7182f3e77695222e51cce910268f7844437a5e974f68af5927a3382')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0056_w3_correction_feedback_lineage' AND checksum='1044700d59b9dbb2d2b36d890496de0be6fb3d53c4409504f3c7693906866c35')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0057_w3_feedback_consent' AND checksum='08cb6f37c12ca3131b2e307a237569aa4d104fc627566e619a39fa18a1814d11')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0059_w3_recording_association' AND checksum='b61d50d7f85c0ef468e00a8d2d6b737b4d405a9349810c552f7d9df7f527c42e')
  THEN RAISE EXCEPTION 'Registered original export prerequisites unavailable' USING ERRCODE='42501'; END IF;
- -- Every complete W2 column is fixed and granted. Future columns refuse the
- -- export until the original owner reviews a new complete projection.
- IF EXISTS(SELECT FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid JOIN pg_namespace n ON n.oid=c.relnamespace
-  WHERE n.nspname='creator' AND c.relname=ANY(ARRAY['ai_generation_admission','ai_generation_attempt','ai_generation_receipt','ai_usage','ai_event'])
-  AND a.attnum>0 AND NOT a.attisdropped AND NOT has_column_privilege(current_user,c.oid,a.attnum,'SELECT'))
+ -- Current0181 admission fingerprints are ordinary accounting provenance.
+ -- Its private completion capability digest is the sole explicit omission:
+ -- this purpose must have no effective access to it, including table grants.
+ IF NOT EXISTS(SELECT FROM pg_attribute WHERE attrelid=to_regclass('creator.ai_usage')
+   AND attname='completion_capability_hash' AND attnum>0 AND NOT attisdropped
+   AND atttypid='pg_catalog.bytea'::regtype AND atttypmod=-1 AND attndims=0
+   AND NOT attnotnull AND attgenerated='' AND attidentity='' AND NOT atthasdef)
+  OR has_column_privilege(current_user,'creator.ai_usage','completion_capability_hash','SELECT,INSERT,UPDATE,REFERENCES')
+ THEN RAISE EXCEPTION 'Private completion custody must remain inaccessible' USING ERRCODE='42501'; END IF;
+ -- Fixed independently reviewed current W2 projection. Missing, ungranted,
+ -- or unknown columns refuse even if somebody granted the unknown column.
+ IF EXISTS(WITH reviewed(table_name,column_names) AS (VALUES
+   ('ai_generation_admission',ARRAY['actor_account_id','created_at','creator_id','fan_id','generation_id','retention_policy_version','sealed_at','state','thread_id']),
+   ('ai_generation_attempt',ARRAY['admission_model_fingerprint','admission_version_hash','attempt_id','closed_at','created_at','creator_hold_id','creator_id','fan_id','generation_id','provider_admissions','state','thread_id']),
+   ('ai_generation_receipt',ARRAY['attempt_ids','cost_micros','creator_id','fan_id','generation_id','id','receipt_hash','recorded_at','revision','state','thread_id','usage_ids']),
+   ('ai_usage',ARRAY['accounting_disposition_reference','accounting_retained_until','accounting_retention_reason','accounting_retention_version','attempt_id','cache_write_input_tokens','cached_input_tokens','call_ordinal','category','completed_at','cost_micros','created_at','creator_hold_id','creator_id','duration_ms','fan_id','generation_id','id','input_tokens','model','output_tokens','provider','provider_state','purpose','thread_id','version_hash']),
+   ('ai_event',ARRAY['created_at','creator_id','id','payload','published_at','revision','type'])
+  ) SELECT FROM reviewed e LEFT JOIN pg_class c ON c.oid=to_regclass('creator.'||e.table_name)
+  WHERE c.oid IS NULL OR c.relkind<>'r' OR has_table_privilege(current_user,c.oid,'SELECT')
+   OR EXISTS(SELECT FROM unnest(e.column_names) expected(column_name)
+    LEFT JOIN pg_attribute a ON a.attrelid=c.oid AND a.attname=expected.column_name AND a.attnum>0 AND NOT a.attisdropped
+    WHERE a.attnum IS NULL OR NOT has_column_privilege(current_user,c.oid,a.attnum,'SELECT'))
+   OR EXISTS(SELECT FROM pg_attribute a WHERE a.attrelid=c.oid AND a.attnum>0 AND NOT a.attisdropped
+    AND NOT a.attname=ANY(e.column_names)
+    AND NOT(e.table_name='ai_usage' AND a.attname='completion_capability_hash')))
  THEN RAISE EXCEPTION 'Complete reviewed accounting projection required' USING ERRCODE='42501'; END IF;
  IF EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
   WHERE ((n.nspname='creator' AND c.relname=ANY(ARRAY['thread','message','memory','memory_exclusion','thread_audit','event',
@@ -189,7 +212,7 @@ LANGUAGE sql STABLE SECURITY DEFINER SET search_path=pg_catalog AS $$
  FROM families f JOIN creator.ai_generation_admission t ON t.creator_id=f."creatorId" AND t.thread_id=f."threadId" AND t.fan_id=f."fanId"
  UNION ALL
  SELECT f."threadId",f."creatorId",f."fanId",2,(generation_id::text||':'||attempt_id::text),
-  (SELECT to_jsonb(projected) FROM (SELECT creator_id,generation_id,attempt_id,thread_id,fan_id,state,provider_admissions,creator_hold_id,created_at,closed_at) projected)
+  (SELECT to_jsonb(projected) FROM (SELECT creator_id,generation_id,attempt_id,thread_id,fan_id,state,provider_admissions,creator_hold_id,created_at,closed_at,admission_version_hash,admission_model_fingerprint) projected)
  FROM families f JOIN creator.ai_generation_attempt t ON t.creator_id=f."creatorId" AND t.thread_id=f."threadId" AND t.fan_id=f."fanId"
  UNION ALL
  SELECT f."threadId",f."creatorId",f."fanId",3,(id::text),
@@ -202,7 +225,9 @@ LANGUAGE sql STABLE SECURITY DEFINER SET search_path=pg_catalog AS $$
  UNION ALL
  SELECT f."threadId",f."creatorId",f."fanId",5,(id::text),
   (SELECT to_jsonb(projected) FROM (SELECT id,creator_id,type,revision,payload,created_at,published_at) projected)
- FROM families f JOIN creator.ai_event t ON t.creator_id=f."creatorId" AND t.type='ai.generation_receipt' AND t.payload->>'threadId'=f."threadId"::text AND t.payload->>'fanId'=f."fanId"::text
+ FROM families f JOIN creator.ai_event t ON t.creator_id=f."creatorId"
+  AND (t.type='ai.generation_receipt' OR (t.type='ai.guardrail' AND t.payload->>'purpose'='generation_guardrail'))
+  AND t.payload->>'threadId'=f."threadId"::text AND t.payload->>'fanId'=f."fanId"::text
  UNION ALL
  SELECT f."threadId",f."creatorId",f."fanId",6,(lpad(sequence::text,10,'0')||':'||id::text),
   (SELECT to_jsonb(projected) FROM (SELECT id,agent_version_id,agent_version_hash,corrects_message_id,corrects_message_version,signed_command) projected)
