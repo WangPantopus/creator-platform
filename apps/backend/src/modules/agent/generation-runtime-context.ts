@@ -233,12 +233,18 @@ export class PreparedGenerationRuntimeContext {
         contentHash(catalogue) !== input.catalogueChecksum
       )
         throw new Error("Unreviewed retrieval custody");
-    } catch {
-      throw new DomainError(
+    } catch (cause) {
+      const failure = new DomainError(
         "generation_retrieval_unconfigured",
         "Reviewed current stored-source retrieval is unavailable.",
         503,
       );
+      Object.defineProperty(failure, "cause", {
+        value: cause,
+        configurable: true,
+        writable: true,
+      });
+      throw failure;
     }
     return new PreparedGenerationRuntimeContext(
       input.identity,
@@ -276,6 +282,7 @@ export class PreparedGenerationRuntimeContext {
           compiledHash: facts.version.compiledHash,
         };
       },
+      signal,
     );
     // Admission commits before actual provider I/O; reported usage persists even
     // for invalid vectors/cancellation. No caller text or synthetic vector enters.

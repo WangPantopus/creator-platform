@@ -10,6 +10,7 @@ import {
   type GenerationTaskScope,
 } from "../identity/generation-scope.js";
 import { PreparedGenerationConversationContext } from "../conversation/generation-context.js";
+import { generationTransaction } from "../identity/generation-transaction.js";
 import { PreparedGenerationAgentInputs } from "./generation-inputs.js";
 import { PreparedGenerationJournal } from "./generation-journal.js";
 import { AgentService } from "./service.js";
@@ -223,12 +224,18 @@ export class PreparedGenerationProviderAccounting {
         )
           throw new Error("Unreviewed accounting executable");
       }
-    } catch {
-      throw new DomainError(
+    } catch (cause) {
+      const failure = new DomainError(
         "generation_provider_unconfigured",
         "Reviewed canonical provider admission and completion custody is not installed.",
         503,
       );
+      Object.defineProperty(failure, "cause", {
+        value: cause,
+        configurable: true,
+        writable: true,
+      });
+      throw failure;
     }
     return new PreparedGenerationProviderAccounting(
       input.identity,
@@ -393,19 +400,24 @@ export class PreparedGenerationProviderAccounting {
     task: GenerationTask,
     attempt: GenerationProviderAttempt,
     category: Category,
+    signal: AbortSignal,
     bookend?: GenerationAdmissionBookend,
   ): Promise<Admitted> {
-    return this.identity.withGeneration(task, async (client, scope) => {
-      await bookend?.(client, scope);
-      const admitted = await this.openInTransaction(
-        client,
-        scope,
-        attempt,
-        category,
-      );
-      await bookend?.(client, scope);
-      return admitted;
-    });
+    return this.identity.withGeneration(
+      task,
+      async (client, scope) => {
+        await bookend?.(client, scope);
+        const admitted = await this.openInTransaction(
+          client,
+          scope,
+          attempt,
+          category,
+        );
+        await bookend?.(client, scope);
+        return admitted;
+      },
+      signal,
+    );
   }
 
   private async finish(admitted: Admitted, usage: Usage): Promise<void> {
@@ -424,9 +436,10 @@ export class PreparedGenerationProviderAccounting {
       2147483647,
       Math.max(0, Math.round(performance.now() - custody.started)),
     );
-    const client = await this.workerPool.connect();
-    try {
-      await client.query("BEGIN");
+    // An incurred obligation must finish after cancellation/revocation. The
+    // original transaction helper owns commit and awaited cleanup, without a
+    // cancelled generation signal or renewed read/admission authority.
+    await generationTransaction(this.workerPool, undefined, async (client) => {
       await client.query("SET LOCAL statement_timeout='4s'");
       await client.query("SET LOCAL lock_timeout='250ms'");
       const clean = (
@@ -466,15 +479,35 @@ export class PreparedGenerationProviderAccounting {
         "The original admitted usage must persist its actual reported charge.",
       );
       await assertGenerationConsumerCustody(client, this.custody);
-      await client.query("COMMIT");
-      custody.completed = true;
-      custody.capability = "";
-      this.admissions.delete(admitted);
-    } catch (error) {
-      await client.query("ROLLBACK");
-      throw error;
-    } finally {
-      client.release();
+    });
+    custody.completed = true;
+    custody.capability = "";
+    this.admissions.delete(admitted);
+  }
+
+  private async finishRetainingFailure(
+    admitted: Admitted,
+    usage: Usage,
+    sourceFailure?: { cause: unknown },
+  ): Promise<void> {
+    try {
+      await this.finish(admitted, usage);
+    } catch (completionFailure) {
+      if (!sourceFailure) throw completionFailure;
+      const unavailable = new DomainError(
+        "generation_usage_completion_unavailable",
+        "The incurred usage could not be recorded. Reconcile its original admission.",
+        503,
+      );
+      Object.defineProperty(unavailable, "cause", {
+        value: new AggregateError(
+          [sourceFailure.cause, completionFailure],
+          "Original provider and incurred usage completion failures.",
+        ),
+        configurable: true,
+        writable: true,
+      });
+      throw unavailable;
     }
   }
 
@@ -488,8 +521,9 @@ export class PreparedGenerationProviderAccounting {
     onAdmission?: (call: GenerationProviderCall) => void,
   ): Promise<T> {
     signal.throwIfAborted();
-    const admitted = await this.admit(task, attempt, category, bookend);
+    const admitted = await this.admit(task, attempt, category, signal, bookend);
     let usage = this.unknownUsage();
+    let sourceFailure: { cause: unknown } | undefined;
     try {
       onAdmission?.(this.issuedCall(admitted, task, attempt));
       signal.throwIfAborted();
@@ -497,12 +531,13 @@ export class PreparedGenerationProviderAccounting {
       usage = result.usage;
       return result;
     } catch (error) {
+      sourceFailure = { cause: error };
       if (error instanceof ProviderResponseError) usage = error.usage;
       throw error;
     } finally {
       // No current read authority is required to record an already incurred
       // charge after cancellation or invalid output. Missing usage stays unknown.
-      await this.finish(admitted, usage);
+      await this.finishRetainingFailure(admitted, usage, sourceFailure);
     }
   }
 
@@ -515,8 +550,9 @@ export class PreparedGenerationProviderAccounting {
     onAdmission?: (call: GenerationProviderCall) => void,
   ): AsyncIterable<StreamProposal> {
     signal.throwIfAborted();
-    const admitted = await this.admit(task, attempt, "reply", bookend);
+    const admitted = await this.admit(task, attempt, "reply", signal, bookend);
     let usage = this.unknownUsage();
+    let sourceFailure: { cause: unknown } | undefined;
     try {
       onAdmission?.(this.issuedCall(admitted, task, attempt));
       signal.throwIfAborted();
@@ -525,10 +561,11 @@ export class PreparedGenerationProviderAccounting {
         yield proposal;
       }
     } catch (error) {
+      sourceFailure = { cause: error };
       if (error instanceof ProviderResponseError) usage = error.usage;
       throw error;
     } finally {
-      await this.finish(admitted, usage);
+      await this.finishRetainingFailure(admitted, usage, sourceFailure);
     }
   }
 }
