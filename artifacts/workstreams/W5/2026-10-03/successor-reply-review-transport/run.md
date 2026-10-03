@@ -1,5 +1,42 @@
 # Reply review original settlement — October 3, 2026
 
+## Actual original rollback receipt ata3d10d1a
+
+W7's source review found that Content verified BEGIN/COMMIT receipt commands but
+returned a successfully resolved ROLLBACK without checking its command. W5
+personally implemented `a3d10d1a3e66e9362599e781991d84cd1d4cd7d6` on existing
+PR304. Only an actual ROLLBACK command clears transaction custody. An unexpected
+command follows the existing failure path: mark discard, await that original
+client's close, release discarded and report the settlement error. The actual
+shorter original control budget, uncertainty classifier, caller transaction and
+task/Actor authority remain unchanged.
+
+Backend types, scoped lint/format/diff and all nine existing backend contracts
+pass; no new test code exists. The exact-source shipping backend build exits0
+in4.646seconds with normally released canonical heavy custody.
+
+Personally operated this actual helper through installed pg and a transparent
+private TCP relay on43435, using real read-only creator_runtime connections to
+owned canonical61. The normal original connection returned actual wire commands
+BEGIN and ROLLBACK and remained reusable. Withholding only genuine backend
+ROLLBACK responses caused settlement failure in101.071ms at the actual100ms
+budget and1501.889ms at4000ms with the retained1500ms ceiling. After each unknown
+outcome the original backend PID was absent and a replacement pool read succeeded.
+No response tag, callback, server outcome, business task or permission was forged.
+The unexpected-command branch is source-qualified, not a fabricated-wire test.
+
+Before/after all six ledger/schema/roles/security/sequences/data hashes match for
+both original61 and closed57 restore. The original57 private dump still matches;
+the relay listener is absent. Fresh0600 source/operation/custody/build receipts
+are in `~/.config/creator-platform/w5-20261003/rollback-receipt-current/` and
+`current-pr-backlog/build-backend-a3d10.json`. Historical receipts were preserved.
+
+Implemented/runnable/integrated: actual original-client cleanup and current
+source checks/build; PR304 and W1 prerequisite remain unmerged. Verified: only
+the named metadata operations above. Genuine0156 product review, signed Note,
+two independent fans, reaction, native operation, C10 and full CI remain open.
+Release-ready:false; no complete original package is checked off.
+
 ## Current original owner callback at5e13d3d1
 
 Ordinary exact merge `5e13d3d15f2046d7db6ebc027c5b0a0175769cf1` consumes
