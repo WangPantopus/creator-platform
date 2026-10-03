@@ -1,5 +1,50 @@
 # Original media discard lifetime — October 3, 2026
 
+## Rebuilt repair personally verified — 2026-10-03T22:06:42.197128+00:00
+
+Frozen product `12e346e92360b4631731254b44e0d64bc5e12bb5` passes fresh backend22:02:40.829Z and web
+22:02:46.340Z shipping builds; the exact normal heavy lease released. Personally
+operated the production Studio with a genuine original W1 issuer/account/SID
+81e7aed4-f962-4182-9f9d-7f3486d0b1e6 and actual unchanged canonical61.
+
+Actual45-byte corrupt photo68500cb0-c982-42b5-9192-71d90369fc4a has inputSHA256
+073ccb8a9779b3c48dcbb08fb6b3b8e0bdbb663ec29524897f0af44123a25c3e.
+Its real DELETE202 receipt was held beyond the normal processing-poll interval;
+original backend observation records no processing GET after the held receipt.
+The explicit alt label remains exactly addressable with typed contents. Releasing
+only the original canonical bytes clears the file/alt without a stale error.
+
+Actual50-byte corrupt photodb418743-5064-4889-bf14-598d781461e6 has inputSHA256
+1b523d143d351b1d37ffa9ec99b8aa22be195095717212e98f97e6444c6b3661.
+All real original transport acknowledgements were dropped. The actual transport
+error retained the exact file and alt through the unchanged stable label. An
+explicit same-asset/original-session Discard then received the genuine202 and
+cleared file/alt/error; this remained settled through a subsequent genuine W1
+session-read200. No fabricated HTTP body/authority was supplied by the gateway.
+Personally viewed Night390x844 held-removal and Light1280x900 unknown-receipt
+layouts. Page errors0. These are specific label/removal/layout observations,
+not full accessibility, ready-photo processing, human or publication acceptance.
+
+Real dedicated0062 worker completed all12 photo rows deleted/version2, no jobs;
+all exact storage directories absent. Note21 draft/61 migrations/business0;
+protected upgrade connection-limit0/owner closure preserved. Work directory
+provisioned before worker startup. Genuine browser logout/context/server/lease,
+API/Next/TLS/worker/scanner/child/socket and3006/3106/4106/55446 closed. Original
+PG preserved/exited; exact runtime dcaa2ffc-c717-4c72-8819-0eb7959dc67e/
+dev16777232/inode245252869 released at2026-10-03T22:06:42.197128+00:00. No native/peer mutation.
+Earlier65b account-departure evidence remains on that source. Delayed host-save,
+voice/human/signature/publication/production/provider/hardware gates stay open.
+
+Private evidence SHA256:
+
+- shipping-build.json: `aa7561a814e13e77b117d43852db754b0b80734ea9b4bd820f13d7fb623030b9`.
+- browser-result.json: `88a5c34ad8f9cbeceea7414eead33d2462bdcd61a75731b7dc73f040f584b8de`.
+- original-response-events.jsonl: `67a7772350c4daecc9c99a10c6328ec0a53069041a59ceb652ae46039f424746`.
+- original-request-metadata.jsonl: `8b4a397ae7c4c78047d819f55de44171673fb6b9a98a350daf5960ee6eb583fd`.
+- final-state.json: `0b7f79075e1784e9a1977edc9c9c68712bd9074c4275b833f923315356e01858`.
+- storage-closure.json: `cd5435998bc870ffe3c6be35effdd1dec51492c905fceeeb25a823d9dacfac63`.
+- closure.json: `838e034d8f6888d3425e612d26951757aca25e1156e13280d6340cf7511328c5`.
+
 ## Actual DELETE acknowledgement loss and observed repair — 21:58 UTC
 
 Frozen305 source65b51b54f4aa6ac9a95da11f6c9caa48a469f2e6 is byte-identical to

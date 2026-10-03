@@ -1,5 +1,19 @@
 # Owned resource headroom — October 3, 2026
 
+## Later owned headroom cleanup — 21:46 UTC
+
+Only11 reviewed idle W6 intermediate/precompiled-module/index-cache directories
+in the original current5f594, successor iOS and playback Swift private builds
+were removed under fresh exact owner/nonce/dev/inode leases. Every37 current
+signed-app/APK product file and163 earlier product files retained hashes/dev/
+inodes; source/Products/SDK checkouts/repositories/signing/scanning tools/DB/
+backups/peers were preserved. All exact cleanup leases released normally.
+Observed host free space varied while other owners built; no exclusive reclaimed
+byte claim. At21:46:16 it was4.636GiB before the genuine65b backend/web guard.
+Subsequent12e guard observed5.559GiB. No build was launched below4GiB by W6.
+Private reviewed/closure receipts remain outside Git; this is resource custody,
+not application acceptance. All later application resources also closed.
+
 After the real Studio increment closed16:27:42Z, Docker readonly inspection
 hung before the next runtime lease/start. Exact own inspector19664/parent19654
 was checked and cancelled; original acquirer exited1. No new container, app,
