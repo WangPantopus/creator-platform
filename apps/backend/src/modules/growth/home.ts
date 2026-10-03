@@ -53,14 +53,15 @@ const Directory = z.object({
   order: z.enum(["activity", "directory"]).optional(),
 });
 
-/** Minimal private Home read through fresh issued fan scopes. The host can
+/** Retained families use the existing private thread destination. Their issued
+ * scope, rather than public profile publication, authorizes the read.
+ * Minimal private Home read through fresh issued fan scopes. The host can
  * compose this with W4 request/W6 call entries; no analytics receives text. */
 export function canonicalConversationHomePage(
   conversation: ConversationHomeDirectory,
   access: AccessService,
   database: Database,
   signing: Pick<SignedActService, "matchesThreadAct">,
-  handleFor: (creatorId: string) => Promise<string | null>,
 ): NonNullable<GrowthOwners["homePage"]> {
   return async (actor, cursor) => {
     const directory = Directory.parse(
@@ -122,8 +123,6 @@ export function canonicalConversationHomePage(
             copy.growthErrorPrivateReplyUnavailable,
             503,
           );
-        const handle = await handleFor(scope.creatorId);
-        if (!handle || !/^[a-z0-9_]{3,30}$/u.test(handle)) continue;
         const row = await database.withThread(
           scope,
           async (client) => {
