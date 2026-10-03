@@ -16,22 +16,12 @@ import type {
   PublicationTaskScope,
 } from "../identity/publication-scope.js";
 import { publicationCommand } from "./service.js";
+import type { PublicationMedia } from "../media/publication.js";
 
 /** Structurally matches W6's actual PublicationMedia export. The host supplies
  * that owner implementation using the same W1 issuer; no Actor is constructed.
  */
-export interface ContentScheduledMedia {
-  evidence(
-    client: PoolClient,
-    scope: PublicationTaskScope,
-    attachment: ContentBody["media"][number],
-  ): Promise<ProcessedMediaEvidence>;
-  ready(
-    client: PoolClient,
-    scope: PublicationTaskScope,
-    evidence: ProcessedMediaEvidence,
-  ): Promise<boolean>;
-}
+export type ContentScheduledMedia = PublicationMedia;
 
 export type ContentPublicationDependencies = {
   identity: PublicationIdentityAuthority;
@@ -73,9 +63,13 @@ export class ContentPublicationWorker {
   constructor(private readonly dependencies: ContentPublicationDependencies) {}
 
   async run(task: PublicationTask) {
+    let finalMediaRequired = false;
     return this.dependencies.identity.withPublication(
       task,
       async (client, scope) => {
+        // Capture only W1's complete original stored command on the actual
+        // issued client/PID/full transaction, before W5's object positives.
+        await this.dependencies.media?.prepare(client, scope);
         const acquired = await client.query<{ acquired: boolean }>(
           "SELECT pg_try_advisory_xact_lock(hashtextextended($1,0)) AS acquired",
           [`content:${scope.contentId}`],
@@ -175,24 +169,31 @@ export class ContentPublicationWorker {
             "media_signature_required",
             "Media requires its exact signed publication.",
           );
-          const current: ProcessedMediaEvidence[] = [];
+          const current = new Map<string, ProcessedMediaEvidence>();
           for (const attachment of [...document.media].sort((a, b) =>
             a.assetId.localeCompare(b.assetId),
           )) {
-            current.push(
+            current.set(
+              attachment.assetId,
               ProcessedMediaEvidenceSchema.parse(
                 await media.evidence(client, scope, attachment),
               ),
             );
           }
           invariant(
-            contentHash(current) === contentHash(evidence),
+            current.size === evidence.length &&
+              evidence.every(
+                (item) =>
+                  current.has(item.assetId) &&
+                  contentHash(current.get(item.assetId)) === contentHash(item),
+              ),
             "media_version_changed",
             "The publication's processed media changed.",
           );
           for (const item of evidence)
             if (!(await media.ready(client, scope, item)))
               return { state: "media_pending" as const };
+          finalMediaRequired = true;
         } else
           invariant(
             row.state !== "media_pending",
@@ -225,6 +226,10 @@ export class ContentPublicationWorker {
             [scope.creatorId, scope.contentId, scope.version, type],
           );
         return { state: "published" as const };
+      },
+      async (client, scope) => {
+        if (finalMediaRequired)
+          await this.dependencies.media!.finalize(client, scope);
       },
     );
   }
