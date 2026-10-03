@@ -8,7 +8,9 @@ export async function generationConsumerCatalogue(
 ) {
   if (
     options.queryTimeout !== undefined &&
-    (!Number.isSafeInteger(options.queryTimeout) || options.queryTimeout < 1)
+    (!Number.isSafeInteger(options.queryTimeout) ||
+      options.queryTimeout < 1 ||
+      options.queryTimeout > 5000)
   )
     throw new Error("The original catalogue response budget is invalid.");
   const query = async (text: string, values: unknown[]) => {
