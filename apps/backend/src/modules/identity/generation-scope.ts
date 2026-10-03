@@ -74,6 +74,14 @@ const terminalContracts = [
       "creator.generation_original_allowance_receipt(uuid,uuid)",
     ],
   },
+  {
+    owner: "creator_w3_terminal_output",
+    originalScopeBridge: false,
+    version: "0203_w3_terminal_only_finalization",
+    checksum:
+      "8de1897f2e70f763382984459274eb7616ad7149b457811fffd90fb8b7df2e8c",
+    signatures: ["creator.generation_terminal_output(uuid,uuid)"],
+  },
 ] as const;
 function reviewedTerminalConsumer(consumer: GenerationTerminalPurposeConsumer) {
   return terminalContracts.some(
@@ -420,7 +428,7 @@ export class GenerationIdentityAuthority {
         .parse(input.consumers ?? []);
       terminalConsumers = z
         .array(terminalConsumerSchema)
-        .max(8)
+        .max(9)
         .parse(input.terminalConsumers ?? []);
       const combined = [...consumers, ...terminalConsumers];
       if (
