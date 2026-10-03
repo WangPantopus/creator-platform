@@ -114,7 +114,10 @@ private fun QText(text: String, token: String, modifier: Modifier = Modifier) {
 
 object ContentFanFeature {
     private fun matches(destination: String): Boolean { val parts = destination.split('/').filter { it.isNotEmpty() }; return parts.size == 3 && parts[0] == "content" && parts.drop(1).all { runCatching { UUID.fromString(it) }.isSuccess } }
-    fun registration(context: Context, baseURL: String?) = FanFeatureRegistration(matches = ::matches, screen = { model -> ContentScreen(context, baseURL, model) })
+    fun registration(context: Context, baseURL: String?): FanFeatureRegistration {
+        ContentMediaCache.prepare(context.cacheDir)
+        return FanFeatureRegistration(matches = ::matches, screen = { model -> ContentScreen(context, baseURL, model) })
+    }
 }
 
 @Composable
