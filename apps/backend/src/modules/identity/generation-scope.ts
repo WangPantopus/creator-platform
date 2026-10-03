@@ -11,7 +11,10 @@ import {
 import { registeredMigration } from "../../db/reviewed-migration.js";
 import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import { assertCurrentSession, requestAuthority } from "./request-authority.js";
-import { generationTransaction } from "./generation-transaction.js";
+import {
+  assertGenerationPoolCustody,
+  generationTransaction,
+} from "./generation-transaction.js";
 
 export const GENERATION_SCOPE_MIGRATION = "0159_w1_generation_worker_scope";
 const Hash = z.string().regex(/^[a-f0-9]{64}$/u);
@@ -402,6 +405,7 @@ export class GenerationIdentityAuthority {
     /** Separate fixed settlement registry. No original-scope grant is added. */
     terminalConsumers?: readonly GenerationTerminalPurposeConsumer[];
   }): Promise<GenerationIdentityAuthority> {
+    assertGenerationPoolCustody(configuration.pool);
     const input = Object.freeze({
       ...configuration,
       migration: Object.freeze({ ...configuration.migration }),

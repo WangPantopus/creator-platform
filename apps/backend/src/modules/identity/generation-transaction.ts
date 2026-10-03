@@ -1,6 +1,50 @@
 import { Client, type Pool, type PoolClient } from "pg";
 import { DomainError, invariant } from "../../core/errors.js";
 
+/** Purpose guards retain private transport causes. Inspect a bounded graph;
+ * an exhausted bound also cannot prove that a later rollback is safe. */
+function hasUncertainReadResponse(error: unknown): boolean {
+  const pending: unknown[] = [error];
+  const visited = new Set<unknown>();
+  let inspected = 0;
+  while (pending.length) {
+    if (++inspected > 32) return true;
+    const current = pending.pop();
+    if (!(current instanceof Error) || visited.has(current)) continue;
+    visited.add(current);
+    if (current.message === "Query read timeout") return true;
+    if (current.cause !== undefined) pending.push(current.cause);
+    if (current instanceof AggregateError && Array.isArray(current.errors)) {
+      if (current.errors.length > 32 - inspected) return true;
+      pending.push(...current.errors);
+    }
+  }
+  return false;
+}
+
+/** No generation process is currently configured. A future original worker
+ * must have a finite one-connection acquisition/read budget and no pipelined
+ * drain that could postpone destruction of an uncertain original session. */
+export function assertGenerationPoolCustody(pool: Pool): void {
+  const { max, connectionTimeoutMillis, query_timeout, pipeline } =
+    pool.options;
+  if (
+    max !== 1 ||
+    !Number.isSafeInteger(connectionTimeoutMillis) ||
+    connectionTimeoutMillis! < 1 ||
+    connectionTimeoutMillis! > 5000 ||
+    !Number.isSafeInteger(query_timeout) ||
+    query_timeout! < 1 ||
+    query_timeout! > 5000 ||
+    pipeline === true
+  )
+    throw new DomainError(
+      "generation_pool_unconfigured",
+      "The bounded original generation connection is unavailable.",
+      503,
+    );
+}
+
 /** Custody for the original generation or terminal pool. Cancellation supplies
  * no purpose permission: its PID comes only from this checked-out connection.
  * This function owns BEGIN and COMMIT. The caller performs every authority
@@ -11,8 +55,25 @@ export async function generationTransaction<T>(
   signal: AbortSignal | undefined,
   work: (client: PoolClient) => Promise<T>,
 ): Promise<T> {
+  assertGenerationPoolCustody(pool);
   signal?.throwIfAborted();
-  const client = await pool.connect();
+  let client: PoolClient;
+  try {
+    client = await pool.connect();
+  } catch (error) {
+    const failure = new DomainError(
+      signal?.aborted
+        ? "generation_acquisition_cancelled"
+        : "generation_connection_unavailable",
+      "The bounded original generation connection is unavailable.",
+      503,
+    );
+    failure.cause = new AggregateError(
+      signal?.aborted ? [signal.reason, error] : [error],
+      "Original generation connection acquisition failed.",
+    );
+    throw failure;
+  }
   let pid: number | undefined;
   let cancelling: Promise<void> | undefined;
   const cancellationFailures: unknown[] = [];
@@ -30,7 +91,16 @@ export async function generationTransaction<T>(
   };
   client.on("error", sourceError);
   const abort = () => {
-    if (!pid || cancelling) return;
+    if (cancelling) return;
+    if (!pid) {
+      // There is an actual held source but no observed PID yet. Close that
+      // exact non-pipelined socket; never guess a PID or submit later SQL.
+      discard = true;
+      cancelling = client.end().catch((error: unknown) => {
+        cancellationFailures.push(error);
+      });
+      return;
+    }
     // Keep the source checked out until the separate, bounded control socket
     // closes. A delayed cancel must never reach a later user of this PID.
     cancelling = (async () => {
@@ -70,6 +140,7 @@ export async function generationTransaction<T>(
       discard = true;
     });
   };
+  signal?.addEventListener("abort", abort, { once: true });
   const settle = async () => {
     signal?.removeEventListener("abort", abort);
     await cancelling;
@@ -84,7 +155,6 @@ export async function generationTransaction<T>(
       "The original generation backend is required.",
     );
     pid = observed;
-    signal?.addEventListener("abort", abort, { once: true });
     signal?.throwIfAborted();
     phase = "begin";
     await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
@@ -113,8 +183,7 @@ export async function generationTransaction<T>(
     failure = error;
     await settle();
     const uncertainResponse =
-      phase !== "work" ||
-      (error instanceof Error && error.message === "Query read timeout");
+      phase !== "work" || hasUncertainReadResponse(error);
     if (uncertainResponse) transportFailures.push(error);
     if (
       uncertainResponse ||
