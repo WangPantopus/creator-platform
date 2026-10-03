@@ -665,7 +665,7 @@ export function Studio({
           ) : current === "publish" ? (
             <Library creator={creator} />
           ) : current === "team" ? (
-            <Team creator={creator} />
+            <Team creator={creator} suspended={suspended} />
           ) : current === "threads" ? (
             <Threads creator={creator} fanId={screen[1]} />
           ) : current === "thanks" ? (
@@ -3087,7 +3087,13 @@ function Library({ creator }: { creator: Creator }) {
     </section>
   );
 }
-function Team({ creator }: { creator: Creator }) {
+function Team({
+  creator,
+  suspended,
+}: {
+  creator: Creator;
+  suspended: boolean;
+}) {
   const [members, setMembers] = useState<
       {
         account_id: string;
@@ -3114,6 +3120,7 @@ function Team({ creator }: { creator: Creator }) {
     [readError, setReadError] = useState(""),
     action = useAction();
   const mounted = useRef(false),
+    previousFocus = useRef<HTMLElement | null>(null),
     generation = useRef(0),
     checkedUntil = useRef(0),
     request = useRef<AbortController | null>(null);
@@ -3195,6 +3202,15 @@ function Team({ creator }: { creator: Creator }) {
       document.removeEventListener("visibilitychange", visibility);
     };
   }, [load]);
+  useEffect(() => {
+    if (
+      teamCurrent &&
+      !suspended &&
+      !document.hidden &&
+      previousFocus.current?.isConnected
+    )
+      previousFocus.current.focus();
+  }, [teamCurrent, suspended]);
   const { request: identityRequest, session } = useIdentityRequest();
   const requireManagement = () => {
     if (
@@ -3248,6 +3264,9 @@ function Team({ creator }: { creator: Creator }) {
         className="w5-team-columns"
         hidden={!teamCurrent}
         inert={!teamCurrent}
+        onFocusCapture={(event) => {
+          if (teamCurrent && !suspended) previousFocus.current = event.target;
+        }}
       >
         <div className="w5-card">
           <h2>Roles</h2>
