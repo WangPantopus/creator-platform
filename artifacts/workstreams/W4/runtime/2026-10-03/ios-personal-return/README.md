@@ -1,5 +1,15 @@
 # W4 personally operated iOS return — October 3, 2026 UTC
 
+## Current signed return after real limit maturation — 13:06 UTC
+
+The main132 normally signed rebuild has executable SHA2566fe43d37c6d4c38f7af7b5a128fd2b34984f84cbde0dae53e90e697e82f141df; native bytes remain unchanged through reviewed main34e5b75c. Strict deep signature verification passes. The actual main34 API ran from the existing compiled bundle: all215 tracked source-map contents independently match immutable main34, with no held W1 PR296 source substituted. The personal DeviceHub CUA window used only retained W4 BC8 and exact fresh GUI/slot3 leases.
+
+Normal original actor-two session recovery, Light Requests→Spending→BackRequests, Night You→Spending→BackYou and Night Requests→Spending→BackRequests pass. The actual decimal keypad accepts unsaved6.50. Normal termination/relaunch retains the direct destination and original account; choosing an amount reveals an empty field, verifying draft discard. Spending reads the normally matured No limit with pending fields cleared, reminders off and zero totals. All38 commerce tables/two rows match matured fingerprint8bc3d065 before/after; no Save, payment, proof or approval replay.
+
+Maximum Text Size11 with Reduce Motion exposes a truncated shared identity banner and a vertically stacked footer. Actual content scroll reaches the AI summary, but full largest-text control reachability and spoken accessibility remain unqualified. The finding and private captures were sent to W1/W7; W7's later local wrapper is not in this binary and supplies no borrowed acceptance. Text3, Light, Reduce Motion off and VoiceOver off were visibly restored. Normal own BC8 shutdown completed and exact state Shutdown was independently reread; own API exited0, exact token/device/inode leases were released13:06UTC and W8 was notified next.
+
+Ten routine screenshots and full JSON remain private; current iOS receipt SHA256016fa0a841c25aa48d3ad027f37f00e3ada5eb9693a78215bb75f41ed4adfd96. The [real original deadline qualification](../original-limit-maturation/README.md) supersedes the historical pending6USD observations below. This narrowly qualifies the exercised current iOS paths; Android internal Night/200%, authorized spoken accessibility, creator/provider/store/signing/group and all nine packages/R01–R15 remain incomplete.
+
 ### Personally verified combined Spending return — October 3, 2026 UTC
 
 Current PR230 source e607ba6e includes W4 Back0c97fec1 and W1's exact shell-tab fixef01b423, plus latest reviewed main68142326. The normal shipping iOS build passes and strict deep signature verification passes; executable SHA256 `3f887b1c15ccacb913f70412a33c775c2858a47b3474b9ebbfa98a21ad817fe8`. Actual API remains0bc66cc9 at4104.
