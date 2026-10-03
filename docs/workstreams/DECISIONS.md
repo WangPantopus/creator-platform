@@ -44,26 +44,26 @@ Web refresh transport/non-401 failures preserve the saved credential and registe
 
 Participant RLS receives transaction-local `app.identity_session_id` only after `assertCurrentSession` validates and holds the actual request session. The value clears with its transaction and adds no worker session/Actor fallback. Actual non-owner diagnostics cover current, expired and mismatched sessions. Background work requires a separate purpose issuer, durable tuple proof and held domain restrictions; an interactive account ID is never sufficient.
 
-| ID | Decision / unresolved input | Owner | Needed before | Work that continues meanwhile |
-| --- | --- | --- | --- | --- |
-| Q01 | Production Pantopus identity/session/eligibility/deletion contract and access to a proper development identity environment | W1/W8 | Real account acceptance and external pilot | Adapter, secure continuation, role flows, explicit isolated development actors, all other features |
-| Q02 | Model/embedding/classifier providers and tiers, actual processor names, contractual retention/training terms, credentials and quotas | W2/W8 | Real AI/processor-consent acceptance and public launch | Full pipeline/configuration/evaluation, unavailable UI, bounded provider interfaces |
-| Q03 | Payment platform/Connect account topology, payout markets, tax/fee/refund operation and sandbox access | W4/W8 | Provider settlement and external paid use | State machines, ledger, UI, price configuration and reconciliation structure |
-| Q04 | Native asynchronous paid written/voice replies, store programs/storefronts, current distribution matrix | W4/W8 with business/counsel | Enabling those native purchase actions | Web payments, shared requests/receipts, native membership IAP and permitted call flows after validation |
-| Q05 | Final license/replica terms, permitted territories/uses, attestation and estate/incapacity handling | W2/W8 with counsel | External creator signing and licensed voice | Structured lifecycle/enforcement and draft Studio UI |
-| Q06 | Call account/provider commercial readiness; build prompt names LiveKit while older architecture retains evaluation | W6/W8 | Real calls and release | Session clocks/outcomes, scheduling contracts, UI/native adapters |
-| Q07 | Voice provider, creator voice-model ownership, consent/retention/deletion, supported marking/watermark output | W2/W6/W8 | Enabling AI voice after pilot | Human voice pipeline and disabled licensed AI-voice configuration |
-| Q08 | Prices, currency/regions, tier capabilities, pass amount/slot configuration, public-price discount, credit eligibility/caps/redemption, cost budgets | W4/W2/W7 | Public offer and economic release acceptance | Configurable mechanics and labeled sandbox amounts; no invented final prices |
-| Q09 | Final brand/domain/RP ID, app IDs, sender domains and store identities | W1/W8 | External passkey registration, public links and irreversible store identity | Qelvora token/rename support, local-only identities, config indirection |
-| Q10 | Hosting/region, production projects, APNs/FCM/email credentials, store accounts/signing, provider sandbox access | W8 with relevant owner | External staging/release verification | Reproducible local configuration and deployable artifacts |
-| Q11 | Physical iPhone/Android availability and supported OS/device release matrix | W8/W1/W6 | Background calls/push/audio/passkeys/store release sign-off | Simulator/emulator builds and all reproducible UI/API workflows |
-| Q12 | T-21 authorship comprehension bar; T-32 style/usefulness study interpretation; cohort pilot measurement bars and sample/windows | W8/W2/W7 | Pilot study evaluation | Instrumentation, consented study plan and real flow preparation |
-| Q13 | Accepted off-the-record behavior amendment; semantic memory exclusion definition and scope; existing-memory context policy while off the record | W3/W2/W8 | Enabling the setting | Other memory/consent/deletion work; record precise behavior before implementation |
-| Q14 | Full library/live-content/community behavior mentioned by grants/architecture but not fully specified/designed | W5/W4/W7/W8 | Claiming full publishing/community scope delivered | Build defined post/library/audience primitives, retain explicit gap; do not invent a social network |
-| Q15 | Native creator Studio extension, additional locales, referral incentives and growth experiments | Listed owners in OPPORTUNITIES | Expanding beyond specified surfaces/business rules | Required fan-native and responsive Studio product |
-| Q16 | Human approved2026-10-02 day30 ordinary product-data purge and twelve calendar months from original settlement for detached known AI costs; unresolved-cost operator/maximum period, shared identity boundary and external subscription/provider authority remain open. [Exact partial policy](../operations/W8-retention-proposal.md). | W1/W8/W4 | Public deletion flow and external accounts | Actual finite source/export/delete/expiry for the approved classes; preserve unknown ceilings and refuse their unresolved path |
-| Q17 | Passkey recovery/rotation policy and Android API26–27 signed-act availability | W1/W8 | Creator device support and recovery launch | Strong supported-device signing; safe unavailable state |
-| Q18 | Translation provider/consent and display semantics for human replies; original signed content remains accessible and immutable | W3/W2/W1/W8 | Enabling translation | Shared copy/localization readiness and original-language content |
+| ID  | Decision / unresolved input                                                                                                                                                                                                                                                                                                             | Owner                          | Needed before                                                               | Work that continues meanwhile                                                                                                  |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Q01 | Production Pantopus identity/session/eligibility/deletion contract and access to a proper development identity environment                                                                                                                                                                                                              | W1/W8                          | Real account acceptance and external pilot                                  | Adapter, secure continuation, role flows, explicit isolated development actors, all other features                             |
+| Q02 | Model/embedding/classifier providers and tiers, actual processor names, contractual retention/training terms, credentials and quotas                                                                                                                                                                                                    | W2/W8                          | Real AI/processor-consent acceptance and public launch                      | Full pipeline/configuration/evaluation, unavailable UI, bounded provider interfaces                                            |
+| Q03 | Payment platform/Connect account topology, payout markets, tax/fee/refund operation and sandbox access                                                                                                                                                                                                                                  | W4/W8                          | Provider settlement and external paid use                                   | State machines, ledger, UI, price configuration and reconciliation structure                                                   |
+| Q04 | Native asynchronous paid written/voice replies, store programs/storefronts, current distribution matrix                                                                                                                                                                                                                                 | W4/W8 with business/counsel    | Enabling those native purchase actions                                      | Web payments, shared requests/receipts, native membership IAP and permitted call flows after validation                        |
+| Q05 | Final license/replica terms, permitted territories/uses, attestation and estate/incapacity handling                                                                                                                                                                                                                                     | W2/W8 with counsel             | External creator signing and licensed voice                                 | Structured lifecycle/enforcement and draft Studio UI                                                                           |
+| Q06 | Call account/provider commercial readiness; build prompt names LiveKit while older architecture retains evaluation                                                                                                                                                                                                                      | W6/W8                          | Real calls and release                                                      | Session clocks/outcomes, scheduling contracts, UI/native adapters                                                              |
+| Q07 | Voice provider, creator voice-model ownership, consent/retention/deletion, supported marking/watermark output                                                                                                                                                                                                                           | W2/W6/W8                       | Enabling AI voice after pilot                                               | Human voice pipeline and disabled licensed AI-voice configuration                                                              |
+| Q08 | Prices, currency/regions, tier capabilities, pass amount/slot configuration, public-price discount, credit eligibility/caps/redemption, cost budgets                                                                                                                                                                                    | W4/W2/W7                       | Public offer and economic release acceptance                                | Configurable mechanics and labeled sandbox amounts; no invented final prices                                                   |
+| Q09 | Final brand/domain/RP ID, app IDs, sender domains and store identities                                                                                                                                                                                                                                                                  | W1/W8                          | External passkey registration, public links and irreversible store identity | Qelvora token/rename support, local-only identities, config indirection                                                        |
+| Q10 | Hosting/region, production projects, APNs/FCM/email credentials, store accounts/signing, provider sandbox access                                                                                                                                                                                                                        | W8 with relevant owner         | External staging/release verification                                       | Reproducible local configuration and deployable artifacts                                                                      |
+| Q11 | Physical iPhone/Android availability and supported OS/device release matrix                                                                                                                                                                                                                                                             | W8/W1/W6                       | Background calls/push/audio/passkeys/store release sign-off                 | Simulator/emulator builds and all reproducible UI/API workflows                                                                |
+| Q12 | T-21 authorship comprehension bar; T-32 style/usefulness study interpretation; cohort pilot measurement bars and sample/windows                                                                                                                                                                                                         | W8/W2/W7                       | Pilot study evaluation                                                      | Instrumentation, consented study plan and real flow preparation                                                                |
+| Q13 | Accepted off-the-record behavior amendment; semantic memory exclusion definition and scope; existing-memory context policy while off the record                                                                                                                                                                                         | W3/W2/W8                       | Enabling the setting                                                        | Other memory/consent/deletion work; record precise behavior before implementation                                              |
+| Q14 | Full library/live-content/community behavior mentioned by grants/architecture but not fully specified/designed                                                                                                                                                                                                                          | W5/W4/W7/W8                    | Claiming full publishing/community scope delivered                          | Build defined post/library/audience primitives, retain explicit gap; do not invent a social network                            |
+| Q15 | Native creator Studio extension, additional locales, referral incentives and growth experiments                                                                                                                                                                                                                                         | Listed owners in OPPORTUNITIES | Expanding beyond specified surfaces/business rules                          | Required fan-native and responsive Studio product                                                                              |
+| Q16 | Human approved2026-10-02 day30 ordinary product-data purge and twelve calendar months from original settlement for detached known AI costs; unresolved-cost operator/maximum period, shared identity boundary and external subscription/provider authority remain open. [Exact partial policy](../operations/W8-retention-proposal.md). | W1/W8/W4                       | Public deletion flow and external accounts                                  | Actual finite source/export/delete/expiry for the approved classes; preserve unknown ceilings and refuse their unresolved path |
+| Q17 | Passkey recovery/rotation policy and Android API26–27 signed-act availability                                                                                                                                                                                                                                                           | W1/W8                          | Creator device support and recovery launch                                  | Strong supported-device signing; safe unavailable state                                                                        |
+| Q18 | Translation provider/consent and display semantics for human replies; original signed content remains accessible and immutable                                                                                                                                                                                                          | W3/W2/W1/W8                    | Enabling translation                                                        | Shared copy/localization readiness and original-language content                                                               |
 
 The source's legal statements are not independently certified by this planning pass. Owners verify current platform requirements and obtain the specified legal/business decisions; they do not weaken product protections while waiting.
 
@@ -71,17 +71,17 @@ The source's legal statements are not independently certified by this planning p
 
 The [design inventory](research/design-inventory.md) is the detailed register. It identifies missing compositions/variants despite the existence of 64 artboards. Minimum gap groups:
 
-| Gap group | Primary | Required design resolution |
-| --- | --- | --- |
-| Creator verification/onboarding/interview/passkey enrollment and recovery | W1/W2 | Step sequence, resume/pending/rejected/error states, exact signing/cancel/retry |
-| Source import/processing/rights/expiry and publish/rollback states | W2 | Progress/failure/retry, review evidence and incomplete configuration |
-| Memory detail/off-the-record/export/delete/consent progress | W3 | Sensitive-item decisions, provenance, deletion exceptions and accessible confirmation |
-| Membership manage/restore/cancel/refund, tier/group editors and changed request offers | W4 | Platform-specific payment transition and recovery states, no web/store price juxtaposition |
-| Full Publish/library/live/community, quote/public group composition | W5 | Audience/source controls, scheduling/empty/error/revoked states and fan consent |
-| Call waiting/reconnect/no-show/early/technical outcomes, permissions and audio routes | W6 | Both parties' clear state, clocks, settlement copy and accessible controls |
-| Preferences/quiet hours, creator launch kit, missing notification states and growth additions | W7 | Use existing identity/copy rules and component system; avoid unapproved alternative designs |
-| Support/appeals/status/privacy/help and complete ops actions | W8 | Scoped case workflow and truthful public recovery information |
-| Native feature compositions, large text/keyboard, tablet/adaptive/landscape and every empty/error state | Each screen owner; W1 primitives | Exact reference at normal size plus usable platform adaptations |
+| Gap group                                                                                               | Primary                          | Required design resolution                                                                  |
+| ------------------------------------------------------------------------------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------- |
+| Creator verification/onboarding/interview/passkey enrollment and recovery                               | W1/W2                            | Step sequence, resume/pending/rejected/error states, exact signing/cancel/retry             |
+| Source import/processing/rights/expiry and publish/rollback states                                      | W2                               | Progress/failure/retry, review evidence and incomplete configuration                        |
+| Memory detail/off-the-record/export/delete/consent progress                                             | W3                               | Sensitive-item decisions, provenance, deletion exceptions and accessible confirmation       |
+| Membership manage/restore/cancel/refund, tier/group editors and changed request offers                  | W4                               | Platform-specific payment transition and recovery states, no web/store price juxtaposition  |
+| Full Publish/library/live/community, quote/public group composition                                     | W5                               | Audience/source controls, scheduling/empty/error/revoked states and fan consent             |
+| Call waiting/reconnect/no-show/early/technical outcomes, permissions and audio routes                   | W6                               | Both parties' clear state, clocks, settlement copy and accessible controls                  |
+| Preferences/quiet hours, creator launch kit, missing notification states and growth additions           | W7                               | Use existing identity/copy rules and component system; avoid unapproved alternative designs |
+| Support/appeals/status/privacy/help and complete ops actions                                            | W8                               | Scoped case workflow and truthful public recovery information                               |
+| Native feature compositions, large text/keyboard, tablet/adaptive/landscape and every empty/error state | Each screen owner; W1 primitives | Exact reference at normal size plus usable platform adaptations                             |
 
 A gap entry records requirement/source, owner, affected platforms, proposed reuse of existing components, reference/capture, decision and reviewer, and acceptance evidence. Routine missing loading/error states can follow existing component patterns; a changed layout/meaning or newly invented workflow needs explicit design resolution. Do not edit the reference to conceal an implementation mismatch.
 
@@ -90,7 +90,6 @@ A gap entry records requirement/source, owner, affected platforms, proposed reus
 Resolve exact typed boundaries before parallel consumers diverge: `Approval` owner and invalidation, `ShareGrant` dual consent/revocation, stable current-authorization/grant versions, allowance transaction participation, packet-vs-thread audit, call acceptance timing, immutable signed original versus translated display, Note fan-out ordering, domain-wide outbox beyond the thread log, and privacy job completion receipts. See [CONTRACTS](CONTRACTS.md) and backend research for proposed ownership.
 
 The immediate planning work raises no blocking question: these owners can start useful, reversible implementation with the established decisions. A release may remain blocked for specific inputs even while its feature development is complete; record that distinction explicitly.
-
 
 ### W1 — separate Growth/content API pool (October 2, 2026)
 
@@ -110,18 +109,15 @@ Reserved 0081 uses one signer-account shared advisory lease after the actual cur
 
 The definer is explicitly VOLATILE and requires READ COMMITTED, so metadata reads after a waiting lease get current snapshots ([PostgreSQL 17 volatility](https://www.postgresql.org/docs/17/xfunc-volatility.html)). AFTER row triggers execute at statement end within the writer transaction ([PostgreSQL 17 triggers](https://www.postgresql.org/docs/17/trigger-definition.html)). Lock errors roll back. The proposals pass installation and negative checks on a separate closed empty57-migration clone; W8 review/activation and actual concurrency/positive acceptance remain required. Both purpose migrations create missing roles conditionally and reject unsafe existing roles without resetting passwords or widening private permissions. 0071 explicitly resets the inherited migration role before role creation. Native Account/support/settings selects You based on the operated Home-highlight defect; component reference styles remain unchanged.
 
-
 ### W1 October 2 — native retained-session recovery
 
 A cold offline identity read keeps the issuer-bound credential but has no current session projection. Showing Welcome implied sign-out during the operated Android outage. Both shells now show the same canonical recovery title/body/Retry used by web, preserve the original destination and retry while foreground. Public signed-out destinations remain accessible through their explicit registrations. Missing credentials, rejected refresh credentials and failed private cleanup retain their separate paths. A guarded single refresh excludes duplicate poll/Retry reads; an actual completed rotation performs its own fresh read. Current Android recovery and subsequent real rotation are personally verified. Normal iOS signing/build passes; iOS operation is still required.
-
 
 ### W1 current authority and separate API custody — October 2, 2026
 
 W1's Database receives the composed held denial port used by Access; configuring W8 trust alone must not omit denials from subsequent domain transactions. Genuine session/participant resolution precedes negative keys, then positive family/role leases and currentness recheck. Original immutable denial SQL is unchanged; a separately reviewed nonblocking wrapper is needed for consumers entering below earlier family locks. Source and existing checks do not establish concurrency acceptance.
 
 Growth/content follow reads use a real separate API login inheriting only canonical core and Growth roles; core identity/conversation keeps its direct NOINHERIT login. W1 privately provisions that role on its owned database with effective inherited privilege checks and no direct private grants. The stored session signing key is retained during source restarts so existing real development sessions keep their original issuer and freshness. Trust and provider availability continue to report their actual configuration.
-
 
 ### Public metadata, scope lifetime and late signature contention — October 2, 2026
 
@@ -133,23 +129,19 @@ Purpose scope rows are transaction-only. Deferred cleanup constraints reject a c
 
 `55058f90`: shared fan/Studio navigation retains the supplied standard row but allocates extra rows at large text sizes. Complete labels and minimum48-point/dp targets are preserved; text is never shrunk or truncated to fit the standard columns. Largest-size inline glyph/label rows avoid narrow word breaking. Personally operated Android at actual200% confirms all four destinations, while native Studio, maximum iOS and assistive technology remain separately unaccepted. Account now renders an @handle only when the current session actually has one; the unset state offers the existing Choose your handle action. Public-AI consumers also pin the exact issuing Pool object so metadata authority from another graph cannot certify the current service.
 
-
 ### W1 — original-work settlement and unavailable sign-in (October 2, 2026)
 
 Terminal writes invalidate generation input permission, so0099 uses separate original-work custody, a fresh terminal nonce/token and exact durable participant/session/cursor/lease metadata. Completion requires current original positive eligibility; reconciliation separately handles real expiry/revocation/takeover without acquiring text or provider rights. Actual W2 journal and W4 original reservation assertions must bookend commit; unknown cost cannot become zero. Immutable checked consumer retention and effective catalogue column/sequence/executable denials prevent preparation drift. The source stays held until real owner negatives/consumers are composed and original-work acceptance succeeds.
 
 Missing production identity configuration must remain an honest product recovery state. A validated relative303 returns to Welcome with canonical unavailable/Retry/Back while preserving the original safe destination; it does not derive an origin from request Host/forwarded headers or loosen HTTPS. Actual local production browser operation verifies this failure state only.
 
-
 ### W1 — late original-attempt usage after terminal delivery (October 2, 2026)
 
 A late real provider result belongs to the original pre-admission W2 completion capability. It may append an immutable correction/receipt wakeup against the original attempt and reservation after a terminal outcome; it must preserve prior accounting and cannot reopen generation, acquire text/lease/provider rights or mint an Actor/ThreadScope. Initial finalization remains0099/0100. W2 publishes actual fixed provenance/terminal-state checks, W4 supplies original-reservation idempotency, and W8 separately reviews accounting metadata/retention/restoration after denial or erasure. Unknown cost retains original custody until a qualified observed correction; no fake zero/no-request or invisible refund is inferred. Actual owner source/composition/acceptance remains required.
 
-
 ### W1 — explicit usefulness and a durable intro opportunity (October 2, 2026)
 
 DI09 uses only the fan's actual consented helpful response to the exact delivered/interrupted AI lineage. A stable pending offer is account-wide and survives response loss; the UI's actual Save/Skip gets a separate durable acknowledgement. Existing outbox publication is not evidence a prompt was seen. A pre-existing intro suppresses the first opportunity, and saving an intro grants no per-creator provider consent. The current held session/client and approved account metadata policy are mandatory; absent policy leaves the feature unconfigured. W1 retains all-client implementation and acceptance.
-
 
 ### October 2 — original terminal construction custody
 
@@ -181,23 +173,19 @@ One-ID metadata bootstrap requires a current genuine request before its family i
 
 The personally operated native public verification displayed a technical route identifier, and source inspection found Status/Ops still behind a fan-handle gate despite web's corrected guard. Canonical navigation now generates the same narrow Account/Status/Ops exemption for web, Swift and Kotlin; invalid destinations never qualify and explicit Handle enrollment stays explicit. This removes a persona dependency without granting any Ops membership. Public verification uses a clear shared heading and accessible page title, while exact act hashes remain available where they help inspect an actual signature. Earlier screenshots retain the original finding. Shipping rebuild/current personal acceptance are separately required.
 
-
 ## W1 core Content, separate Growth projection and held privacy — October 2
 
 Canonical Content must retain its actual creator_runtime pool and service. The root host now consumes W7's reviewed separate publicProjection port rather than passing a Growth service from another pool into the strict Content composition seam. Follower metadata comes from the actual held core reader and stays unavailable while its migration is unregistered; a separate-pool Boolean or role inheritance cannot substitute for held authority. The projection still rechecks the original publisher, exact current Content version, signing and media proof.
 
 Growth privacy uses W8's genuine leased domain-task/restoration authority on the actual Growth worker client before domain locks and at export/delete bookends. An ownership snapshot, coordinator pool check or unknown job grants nothing. The cursor completes only after exhaustion and an accepted commit; cancellation destroys only its dedicated client. The existing prepared conversation/Agent consumers and W1 actor/adult/session capability are preserved. Normal source integration is distinct from actual migration activation, provider outcomes and W1's personal all-client acceptance.
 
-
 ## W1 root host consumes prepared privacy and review producers — October 2
 
 Trust starts before feature composition, so its conversation hook resolves a deferred port to the actual canonical host's prepared lineage, recordings and optional original financial reconciliation. A missing owner remains unavailable; a missing retention/accounting policy still blocks deletion. No unprepared instance, public summary, invented job or successful no-op substitutes for an owner. Content also consumes the reviewed same-client reply-review producer, keeping exact text/version and current author verification inside its held write. Missing review infrastructure leaves the reply pending and unavailable rather than marking it allowed. Host cleanup now awaits actual asynchronous close callbacks.
 
-
 ## W1 consumes corrected held names without changing history — October 2
 
 W1 reviewed W8's complete corrected fb1cbcaa ordering and matched the exact held packet SHA2338f48e and unchanged four-source wave SHA2d72120d. Held factory pins now use0159 generation,0167 signature fence,0170 public AI,0183 terminal and0184 terminal negatives; generation negatives require the exact0177 name. Actual W3 translation metadata63402a4d is consumed with its0168 allocation and unchanged original SQL path/hash. The previously personally qualified actual W8d12db34c terminal-negative SQL is now present unchanged in this combined checkout. No old ledger aliases, SQL edits, source-hash changes or new activation are created. W4 discovered embedded historical ledger guards in its held audience SQL; a metadata move alone cannot make those executables ready. All further held SQL requires actual owner dependency and function-body review.
-
 
 ## W1 removes obsolete core-to-Growth role membership — October 2
 
@@ -206,7 +194,6 @@ Personally operated closed57→61 rollout and separate fresh61 catalogue checks 
 ## W1 drains shutdown once under overlapping signals — October 2
 
 W3's actual SIGINT operation exposed duplicate pg pool.end calls in the composed root host. W1 now shares one in-flight SIGINT/SIGTERM cleanup, awaits every feature close and attempts all remaining cleanup even after an individual failure, with sanitized stage-only errors and a failing exit status. Growth's own close also retains one promise and closes its worker pool if its timer drain fails. No raw provider/database failure enters logs. Current source checks pass; the actual combined process will be operated before shutdown acceptance is claimed.
-
 
 ## W1 current generation and terminal catalogue on the held client — October 2
 
@@ -244,18 +231,15 @@ Personally inspected and normally integrated W8 a5383ea2 ancestry. Identity, med
 
 All three shipping clients now recognize the canonical `/calls/:sessionId` destination. They request only the genuine W6 account-bound navigation operation, validate the returned exact call ID and family, then enter the existing independently authorized call screen. Native lookups bind the original issuer credential, account, session, destination and cancellation state; a departed or rotated response cannot navigate. Web mounts both short and existing full call routes inside the actual identity/media cancellation boundary, preserves the sign-in/restore destination and refuses invalid selectors. The shared Next dynamic segment is reused so adding the short route cannot conflict with the existing long route. No Fan enrollment exception, participant default, provider admission, policy or migration activation is added. Missing metadata remains an explicit Retry/Open Requests state. Shared copy uses the existing component and typography system. Current web types and scoped lint pass; shipping compilation and personal refusal/positive journey evidence follow.
 
-
 ### W1 October 2 — actual call fallback, Requests and native Notice
 
 One-ID navigation resolves only through the current authenticated account and original cancellation boundary; navigation metadata never admits a call. Personally operating its fallback exposed the missing canonical web Requests route. Mount the existing Requests feature under the same real session boundary and preserve the sign-in destination rather than inventing request/price rows. Development accounts stay explicitly labelled on both lookup and canonical Requests. The actual unavailable Commerce result is accepted only as truthful failure handling, not positive commerce acceptance.
 
 A genuine iOS largest-text screenshot exposed Notice title/body truncation. Preserve width-sensitive wrapping and give both Text views their vertical intrinsic size; normal shipping compilation/signature and all3 existing native snapshot checks pass at unchanged references/tolerances; personal largest-text operation remains required. PR21 macOS SwiftPM additionally needs its existing platform-aware capitalization helper for availability fields. Original snapshots, thresholds and hosted runner pins stay unchanged. The observed Android API34 image ZIP failure receives exactly the existing once-only retry for that known archive error; other errors remain fatal, and both runtime package manifests must exist. No security/SDK integrity/test gate is relaxed.
 
-
 ### W1 October 2 — current main53133967 reconciliation
 
 Normal main integration preserves W1 strict request/session custody, terminal catalogue checks, canonical61 and all corrected0151–0201 held allocations. Resolve the older main privacy adapter in favor of actual same-client task/restoration/cancellation bookends; keep both dated W8 reports and exact closed0201 qualification. W5 current Note tenure/mute UI is personally source-reviewed, uses genuine current account/creator tuple and validated paid-history metadata, defaults to4000 while higher policy is unavailable, and preserves over-limit input for shortening. Its owner personal receipts do not become W1 acceptance. Canonical12/102 generation, web/backend types, scoped lint and original backend contracts qualify this integration; new native personal acceptance remains open.
-
 
 ### W1 October2 — original Actor custody and ninth terminal executable
 
@@ -263,11 +247,9 @@ Remove remaining Database scope-derived adult Actors by retaining AccessService'
 
 Extend the finite terminal registry by exactly one reviewed W3 terminal-only owner/signature/source contract (0203, SQL8de1897f, originalScopeBridge=false, max9). The original immutable0193/0110 source and input authority stay intact. W3's missingBEGIN factory bug is recorded and will be consumed only after its actual owner correction. No current terminal/provider/financial success or activation follows from types or existing tests.
 
-
 ### W1 October2 — actual W6 purpose custody composition
 
 Personally reviewed actualW6 550e0562: exact original registered SQL/definition/role/ACL and same-client catalogue bookends govern media and callback purposes; held0201 reads only version/checksum and remains unactivated. Consume genuine held request Actors in CreatorIdentityAuthority/AudienceIdentityAuthority before positive profile leases. Runtime identity retains exact creator/content denial and audience references. Root composes prepared InteractiveCallControl before constructing original media denials, while preserving the complete W1 Growth separate-pool, canonical Home/Pass, review, privacy owners, original actors and shutdown graph. No bare function presence, optional replacement callback, worker Actor or metadata-only reservation advertises readiness. Backend types/scoped lint/original9 contracts pass on the combined source; current app/positive purpose acceptance remains open.
-
 
 ### W1 October 2 — genuine held finalization and issuer capture lifetime
 
@@ -277,11 +259,9 @@ Native credential namespaces bind the actual normalized API issuer. Unprovable l
 
 Proof projection returns the actual saved post URL, including explicit null, so Ops does not misdescribe submitted evidence. The pending-proof support link preserves only the current creator UUID and literal verification kind through the existing canonical destination limits. A support destination is presentation context and confers no approval. W1 personally created and cold-read an explicitly local development creator profile but has no actual external proof or decision; founder-controlled provider URL is needed for the next step. No synthetic identity is presented as verified production identity.
 
-
 ### W1 October 2 — operated responsive Studio and canonical exits
 
 The required responsive Studio uses the current creator family for Team/Publish/daily work and its existing Commerce routes for Offers/Earnings. Phone My AI More must expose the actual complete creator menu; sending More only to License hides required Team/account/support destinations. Preserve W2's existing dirty-draft guard on every affected desktop and phone exit. Route repair grants no authority: personally operated Team Retry retains its current-verification/recovery refusal and disabled invitation. Actual locally authored source candidate persists through cold read but remains unapproved while identity is pending. O19/Q15 daily native Studio implementation remains active and distinct from this responsive-web acceptance.
-
 
 ### W1 October2 — coherent takeover and focused evidence
 
@@ -304,6 +284,7 @@ Generation and terminal authority own their original transaction settlement. Bin
 ## iOS cold destination custody — October3 UTC
 
 Preserve a bounded canonical path and actual account UUID in the existing issuer-specific device-only Keychain namespace. Query parameters and private screen/draft bodies stay out of this record. Restore only after the real current session resolves the same account; an incoming destination takes precedence. Serialize writes with credential custody and reject stale model/revision/token writes. Clear destination metadata on sign-out or account replacement while always attempting credential deletion, and preserve it through guarded same-account rotation. A saved path is presentation context; current object authority remains mandatory.
+
 ### W1 October3 — bounded original checkout and nested transport causes
 
 Require a max1 original generation pool with actual finite acquisition/read budgets1–5000ms and no pipeline before preparation or transaction. Install cancellation as soon as the source is checked out; before an actual PID is observed, destroy only that held socket. A queued abort cannot cancel another holder. Inspect at most32 retained Error/cause/AggregateError entries for uncertain read responses, conservatively refusing later SQL if the bound is exhausted. Actual PostgreSQL operation passes ten cancellation, checkout and delayed-response cases with six unchanged closed qualification fingerprints. No worker purpose, provider permission, financial effect or consent is activated; the current API remains generation-unconfigured. All nine existing backend contracts, backend types and scoped lint pass.
@@ -316,21 +297,17 @@ Generation, terminal and cursor catalogue guards preserve their original private
 
 DomainError accepts optional native ErrorOptions, preserving existing code/message/status calls. Generation connection and catalogue guards use that standard constructor instead of an enumerable cause assignment. Actual delayed transport operations verify nonenumerable wrapper causes while private inspection still retains original failures. Backend types, scoped lint and existing9 contracts pass; no public response or purpose permission is expanded.
 
-
 ### W1 original publication connection settlement — October3 UTC
 
 Keep the publication pool distinct from core/generation/terminal authority. An uncertain response does not justify submitting another rollback: close and await the exact source, discard once, and preserve the original private cause. Successful candidate discovery must have a ROLLBACK receipt before returning its task, with one family per transaction. Genuine208 finalization retains all owner/restoration/signature bookends; successful finalization leaves only COMMIT and its actual receipt. Standard nonenumerable Error.cause supports private transport classification without changing public responses. Thirteen real read-only PostgreSQL scenarios and all six closed preservation fingerprints qualify cleanup; they do not establish whole graph/C10/positive publication or activation.
-
 
 ### W1 typed financial terminal replacement — October3 UTC
 
 The actual additive W4 successor0215 closes the worker EXECUTE grants on the immutable0189 raw financial pair. W1 replaces that registered pair with only creator_w4_generation_safety_terminal's two exact typed functions and real5aba1bff SQL pin; it keeps the same finite nine-function terminal packet bound. The superseded owner/version/signatures stay explicitly forbidden as generic generation consumers, so an old packet cannot be relabelled to bypass the typed provenance/all-attempt-cost gate. Original source bytes are preserved. W4 source/factory/catalogue are personally read, but complete combined catalogue/current factory/C10 and genuine terminal/financial operation remain held and unqualified. Types/scoped lint and nine existing backend contracts pass; no purpose activation or fabricated disposition follows.
 
-
 ### W1 bounded original terminal cursor observation — October3 UTC
 
 Issue only strict immutable original candidate ID/cursor observations through the existing generation-terminal transaction custodian. Register exactly one additional fixed0218 consumer with its actual source83a56963/executable36036c26 pins, raising the finite bound from nine to ten. Its NoLogin metadata owner bridges only unchanged0183 pending discovery and must lack both generation and terminal matchers. The original reconciliation scope independently rechecks the observed cursor, current family and lease. Whole-caller approval remains explicitly absent rather than inferred from minimal compilation or startup readback. Actual metadata queries/column-only ACL/compiler/non-worker refusal pass in one closed rollback with all six custody fingerprints unchanged; types/scoped lint/nine existing contracts pass. Source is held, unapplied and unwired.
-
 
 ### W1 original Team state and current owner integration — October3 UTC
 
@@ -339,3 +316,7 @@ During normal PR28 reconciliation through main d918c859, retain W5's current-acc
 ## iOS cold destination custody — October3 UTC
 
 Preserve a bounded canonical path and actual account UUID in the existing issuer-specific device-only Keychain namespace. Query parameters and private screen/draft bodies stay out of this record. Restore only after the real current session resolves the same account; an incoming destination takes precedence. Serialize writes with credential custody and reject stale model/revision/token writes. Clear destination metadata on sign-out or account replacement while always attempting credential deletion, and preserve it through guarded same-account rotation. A saved path is presentation context; current object authority remains mandatory.
+
+### W1 captured-main route reconciliation — October3 UTC
+
+Keep the continuation's canonical `/requests` mount of the original Commerce Requests reader, including current-session identity boundary and strict theme-only query validation. Main's W4 redirect fixes its formerly missing entry; the continuation already has a guarded mount, so importing that redirect would discard its arrival and account boundary. The existing owner reader still derives and authorizes actual account data. Retain current native Growth push handling and the separately stacked intro endpoint while adding main's Team port. This is source reconciliation; W4's operated redirect receipt and W1's own route operation remain distinct.
