@@ -63,6 +63,7 @@ fun VoiceRecordingScreen(maxDurationMs: Long = 60_000) {
         } else if (requestPending) Button(QelvoraCopy.text("w6CancelPermissionRequest"), ButtonVariant.SECONDARY) { requestPending = false; grantedPending = false; permissions.cancel() }
         else Button(if (snapshot.state == "preview") QelvoraCopy.text("w6RecordAgain") else QelvoraCopy.text("w6Record"), ButtonVariant.SECONDARY, disabled = permissions.inFlight) {
             if (!mounted || !lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return@Button
+            recorder.discard()
             requestPending = true; grantedPending = false
             scope.launch {
                 try {
