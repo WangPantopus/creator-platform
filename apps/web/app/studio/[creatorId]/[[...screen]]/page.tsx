@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { IdSchema, ReturnTargetSchema } from "@qelvora/api";
 import { IdentitySessionBoundary } from "../../../../features/identity/session-boundary";
 import { IdentityWelcome } from "../../../../features/identity/welcome";
+import { MediaSession } from "../../../../features/media/session";
 import { currentSession } from "../../../../lib/session";
 import { Studio } from "../../../../features/studio/Studio";
 export default async function Page({
@@ -21,7 +22,9 @@ export default async function Page({
       initial={session}
       returnTo={returnTo}
     >
-      <Studio creatorId={creatorId} screen={screen ?? []} />
+      <MediaSession>
+        <Studio creatorId={creatorId} screen={screen ?? []} />
+      </MediaSession>
     </IdentitySessionBoundary>
   );
 }
