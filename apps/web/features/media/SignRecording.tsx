@@ -221,7 +221,10 @@ function RecordingSignature({
     check(attempt);
     const response = await original.request(path, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "X-Expected-Session-Id": original.session.sessionId,
+      },
       body: JSON.stringify(body),
       signal: attempt.signal,
     });
@@ -248,6 +251,7 @@ function RecordingSignature({
         method: "POST",
         body: JSON.stringify(proof.body),
         expectedAccountId: original.session.accountId,
+        expectedSessionId: original.session.sessionId,
         signal: AbortSignal.any([attempt.signal, AbortSignal.timeout(10_000)]),
       },
     );
@@ -321,6 +325,7 @@ function RecordingSignature({
       const command = SignedActCommandSchema.parse(
         await mediaRequest<unknown>(`${family}/signing-command`, {
           expectedAccountId: original.session.accountId,
+          expectedSessionId: original.session.sessionId,
           signal: AbortSignal.any([
             attempt.signal,
             AbortSignal.timeout(10_000),
@@ -375,7 +380,10 @@ function RecordingSignature({
         void original
           .request(`signed-acts/${attempt.challengeId}/cancel`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              "X-Expected-Session-Id": original.session.sessionId,
+            },
             body: "{}",
             signal: AbortSignal.any([
               cleanup.signal,
