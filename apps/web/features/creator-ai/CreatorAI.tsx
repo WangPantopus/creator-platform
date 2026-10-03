@@ -638,7 +638,10 @@ export function CreatorAI({
   ]);
   useEffect(() => {
     if (
-      !state?.sources.some((s) => s.state === "processing") &&
+      !(
+        state?.capabilities.embeddings &&
+        state.sources.some((s) => s.state === "processing")
+      ) &&
       state?.evaluation?.state !== "running"
     )
       return;
@@ -1130,7 +1133,9 @@ export function CreatorAI({
                             {source.state === "candidate"
                               ? "Found · not used until you approve"
                               : source.state === "processing"
-                                ? `Processing · ${source.progress}%`
+                                ? state.capabilities.embeddings
+                                  ? `Processing · ${source.progress}%`
+                                  : "Indexing unavailable · import kept"
                                 : source.state === "revoked"
                                   ? "Revoked · no longer used"
                                   : source.state === "failed"
@@ -1206,13 +1211,14 @@ export function CreatorAI({
                                   : "Revoke"}
                         </Button>
                       </div>
-                      {source.state === "processing" && (
-                        <progress
-                          value={source.progress}
-                          max={100}
-                          aria-label={`Processing ${source.title}`}
-                        />
-                      )}
+                      {source.state === "processing" &&
+                        state.capabilities.embeddings && (
+                          <progress
+                            value={source.progress}
+                            max={100}
+                            aria-label={`Processing ${source.title}`}
+                          />
+                        )}
                       <details className="w2-source-review">
                         <summary>Rights and audience review</summary>
                         <p>{source.rightsEvidence}</p>
