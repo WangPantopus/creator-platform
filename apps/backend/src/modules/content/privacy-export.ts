@@ -5,6 +5,7 @@ import { contentHash } from "../../core/canonical.js";
 import { DomainError } from "../../core/errors.js";
 import { requestAuthority } from "../identity/request-authority.js";
 import type { PrivacyHook } from "../trust/contracts.js";
+import { ContentHeldClient } from "./held-client-cleanup.js";
 import { contentPrivacyExportCustody } from "./privacy-export-custody.js";
 
 export const CONTENT_PRIVACY_EXPORT_MIGRATION =
@@ -49,12 +50,18 @@ const projection = z.strictObject({
   effects: records,
   tombstones: records,
 });
-function unavailable(): DomainError {
-  return new DomainError(
+function unavailable(cause?: unknown): DomainError {
+  const failure = new DomainError(
     "content_privacy_purpose_unavailable",
     "Current Content export authority is unavailable.",
     503,
   );
+  if (cause !== undefined)
+    Object.defineProperty(failure, "cause", {
+      value: cause,
+      configurable: true,
+    });
+  return failure;
 }
 function equal(actual: unknown, expected: unknown) {
   if (contentHash(actual) !== contentHash(expected)) throw unavailable();
@@ -71,16 +78,27 @@ export class ContentPrivacyExport {
   private constructor(private readonly pool: Pool) {}
 
   static async prepare(pool: Pool): Promise<ContentPrivacyExport> {
-    if (!(pool instanceof pg.Pool) || requestAuthority.getStore())
+    if (
+      !(pool instanceof pg.Pool) ||
+      requestAuthority.getStore() ||
+      !Number.isFinite(pool.options.connectionTimeoutMillis) ||
+      (pool.options.connectionTimeoutMillis ?? 0) <= 0 ||
+      (pool.options.connectionTimeoutMillis ?? 0) > 5000
+    )
       throw unavailable();
     const owner = new ContentPrivacyExport(pool);
     const client = await pool.connect();
+    const held = new ContentHeldClient(client, AbortSignal.timeout(6000));
+    let failure: unknown;
     try {
-      await owner.assertCatalog(client);
+      await held.run(() => owner.assertCatalog(client));
       issued.add(owner);
       return owner;
+    } catch (error) {
+      failure = error;
+      throw error;
     } finally {
-      client.release();
+      await held.settle(failure);
     }
   }
 
@@ -117,65 +135,46 @@ export class ContentPrivacyExport {
       (input.scope === "thread" && (!input.creatorId || !input.threadId))
     )
       throw unavailable();
-    const signal = input.signal;
+    const signal = AbortSignal.any([input.signal, AbortSignal.timeout(45_000)]);
     signal.throwIfAborted();
-    let client: PoolClient | undefined;
-    let released = false;
-    let rejectAbort: (reason: unknown) => void = () => {};
-    const aborted = new Promise<never>((_, reject) => {
-      rejectAbort = reject;
-    });
-    const release = (destroy: boolean) => {
-      if (client && !released) {
-        released = true;
-        client.release(destroy);
-      }
-    };
-    const abort = () => {
-      // Destroy only this task's checked-out client. A late checkout is also
-      // destroyed below; cancellation cannot leave a queued task doing work.
-      release(true);
-      rejectAbort(signal.reason ?? unavailable());
-    };
-    signal.addEventListener("abort", abort, { once: true });
-    const pending = this.pool.connect().then((connected) => {
-      client = connected;
-      if (signal.aborted) {
-        release(true);
-        signal.throwIfAborted();
-      }
-      return connected;
-    });
+    // The prepared pool has a bounded checkout. If cancellation arrives while
+    // queued, acquire and close that late client before this operation settles.
+    const client = await this.pool.connect();
+    const held = new ContentHeldClient(client, signal);
+    let failure: unknown;
     try {
-      client = await Promise.race([pending, aborted]);
-      await client.query("BEGIN");
-      await client.query(
-        "SET LOCAL statement_timeout='5s'; SET LOCAL lock_timeout='1s'; SET LOCAL idle_in_transaction_session_timeout='5s'",
+      await held.begin();
+      await held.run(() =>
+        client.query(
+          "SET LOCAL statement_timeout='5s'; SET LOCAL lock_timeout='1s'; SET LOCAL idle_in_transaction_session_timeout='5s'",
+        ),
       );
       // Negative/restoration task authority precedes all domain body reads.
-      await Promise.race([authority(client, input), aborted]);
-      await this.assertCatalog(client);
+      await held.run(() => authority(client, input));
+      await held.run(() => this.assertCatalog(client));
       signal.throwIfAborted();
-      const result = await client.query<{ data: unknown }>(
-        "SELECT creator.content_privacy_export($1,$2,$3,$4,$5,$6) AS data",
-        [
-          input.jobId,
-          input.accountId,
-          input.scope,
-          input.creatorId,
-          input.threadId,
-          input.leaseToken,
-        ],
+      const result = await held.run(() =>
+        client.query<{ data: unknown }>(
+          "SELECT creator.content_privacy_export($1,$2,$3,$4,$5,$6) AS data",
+          [
+            input.jobId,
+            input.accountId,
+            input.scope,
+            input.creatorId,
+            input.threadId,
+            input.leaseToken,
+          ],
+        ),
       );
       const data = projection.parse(result.rows[0]?.data);
       const counts = Object.fromEntries(
         Object.entries(data).map(([name, values]) => [name, values.length]),
       );
-      await Promise.race([authority(client, input), aborted]);
+      await held.run(() => authority(client, input));
       signal.throwIfAborted();
       // Both the genuine W8 task fence and Content's independently bound
       // lease trigger execute here. No SQL follows this separate COMMIT.
-      await client.query("COMMIT");
+      await held.commit();
       signal.throwIfAborted();
       return {
         receipt: {
@@ -188,8 +187,7 @@ export class ContentPrivacyExport {
         data,
       };
     } catch (error) {
-      if (client && !released)
-        await client.query("ROLLBACK").catch(() => release(true));
+      failure = error;
       if (
         error &&
         typeof error === "object" &&
@@ -198,11 +196,10 @@ export class ContentPrivacyExport {
           String(error.code),
         )
       )
-        throw unavailable();
+        throw unavailable(error);
       throw error;
     } finally {
-      signal.removeEventListener("abort", abort);
-      release(false);
+      await held.settle(failure);
     }
   }
 
@@ -352,7 +349,7 @@ export class ContentPrivacyExport {
       );
     } catch (error) {
       if (error instanceof DomainError) throw error;
-      throw unavailable();
+      throw unavailable(error);
     }
   }
 }
