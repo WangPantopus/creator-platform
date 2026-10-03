@@ -4,6 +4,7 @@ import "@qelvora/tokens/tokens.css";
 import "@qelvora/ui-web/styles.css";
 import "./globals.css";
 import { Theme } from "./theme";
+import { PrivateSessionCleanup } from "../features/identity/PrivateSessionCleanup";
 export const metadata: Metadata = {
   title: brand.name,
   description: "An authorized AI, with real creator presence.",
@@ -17,6 +18,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <Theme />
+        <PrivateSessionCleanup />
         {children}
       </body>
     </html>
