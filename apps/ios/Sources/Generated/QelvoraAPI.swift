@@ -1046,6 +1046,40 @@ public struct APICommerceVersionCommand: Codable, Sendable {
   }
 }
 
+public struct APIMediaCapabilities: Codable, Sendable {
+  public let `mediaAvailable`: Bool
+  public let `creatorMediaAvailable`: Bool
+  public let `creatorMediaAudienceAvailable`: Bool
+  public let `callsAvailable`: Bool
+  public let `aiAudioAvailable`: APIMediaCapabilitiesAiAudioAvailable
+  public let `callRecoveryAvailable`: Bool
+  public let `reason`: APIMediaCapabilitiesReason
+  public init(mediaAvailable: Bool, creatorMediaAvailable: Bool, creatorMediaAudienceAvailable: Bool, callsAvailable: Bool, aiAudioAvailable: APIMediaCapabilitiesAiAudioAvailable, callRecoveryAvailable: Bool, reason: APIMediaCapabilitiesReason) {
+    self.mediaAvailable = mediaAvailable
+    self.creatorMediaAvailable = creatorMediaAvailable
+    self.creatorMediaAudienceAvailable = creatorMediaAudienceAvailable
+    self.callsAvailable = callsAvailable
+    self.aiAudioAvailable = aiAudioAvailable
+    self.callRecoveryAvailable = callRecoveryAvailable
+    self.reason = reason
+  }
+}
+
+public struct APIMediaCapabilitiesAiAudioAvailable: Codable, Sendable {
+  public let value: Bool = false
+  public init() {}
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == false else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expected false") }
+  }
+  public func encode(to encoder: Encoder) throws { var container = encoder.singleValueContainer(); try container.encode(false) }
+}
+
+public enum APIMediaCapabilitiesReason: String, Codable, Sendable {
+  case `media_unconfigured` = "media_unconfigured"
+  case `licensed_ai_audio_and_provider_verification_required` = "licensed_ai_audio_and_provider_verification_required"
+}
+
 public struct APIMediaCreatorMediaAsset: Codable, Sendable {
   public let `id`: String
   public let `purpose`: APIMediaCreatorMediaAssetPurpose
@@ -9953,16 +9987,26 @@ public struct CreatorAPIBinaryResponse: Sendable {
   public let acceptRanges: String?
 }
 
+private final class CreatorAPIRedirectGuard: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
+  func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping @Sendable (URLRequest?) -> Void) { completionHandler(nil) }
+}
+
 public actor CreatorAPIClient {
   private let baseURL: URL
   private let session: URLSession
   private let token: @Sendable () async throws -> String?
-  public init(baseURL: URL, session: URLSession = .shared, token: @escaping @Sendable () async throws -> String?) { self.baseURL = baseURL; self.session = session; self.token = token }
+  private let maximumResponseBytes: Int
+  private let timeoutSeconds: TimeInterval
+  public init(baseURL: URL, session: URLSession = .shared, maximumResponseBytes: Int = 268_435_456, timeoutSeconds: TimeInterval = 30, token: @escaping @Sendable () async throws -> String?) {
+    self.baseURL = baseURL; self.session = session; self.maximumResponseBytes = maximumResponseBytes; self.timeoutSeconds = timeoutSeconds; self.token = token
+  }
   private func request<Response: Decodable & Sendable>(_ path: String, method: String, body: Data? = nil, authenticated: Bool, query: [URLQueryItem] = [], headers: [String: String] = [:], contentType: String = "application/json") async throws -> Response {
     let response = try await requestBytes(path, method: method, body: body, authenticated: authenticated, query: query, headers: headers, accept: "application/json", contentType: contentType)
     return try JSONDecoder().decode(Response.self, from: response.body)
   }
   private func requestBytes(_ path: String, method: String, body: Data? = nil, authenticated: Bool, query: [URLQueryItem] = [], headers: [String: String] = [:], accept: String = "application/octet-stream", contentType: String = "application/octet-stream") async throws -> CreatorAPIBinaryResponse {
+    try Task.checkCancellation()
+    guard (1...268_435_456).contains(maximumResponseBytes), timeoutSeconds > 0, timeoutSeconds <= 30 else { throw URLError(.badURL) }
     guard var url = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else { throw URLError(.badURL) }
     url.percentEncodedPath = path
     if !query.isEmpty {
@@ -9971,13 +10015,23 @@ public actor CreatorAPIClient {
     }
     guard let target = url.url else { throw URLError(.badURL) }
     var request = URLRequest(url: target)
-    request.httpMethod = method; request.httpBody = body
+    request.httpMethod = method; request.httpBody = body; request.timeoutInterval = timeoutSeconds
     request.setValue(accept, forHTTPHeaderField: "Accept")
     if body != nil { request.setValue(contentType, forHTTPHeaderField: "Content-Type") }
     for (name, value) in headers { request.setValue(value, forHTTPHeaderField: name) }
     if authenticated, let value = try await token() { request.setValue("Bearer \(value)", forHTTPHeaderField: "Authorization") }
-    let (data, response) = try await session.data(for: request)
+    try Task.checkCancellation()
+    let (bytes, response) = try await session.bytes(for: request, delegate: CreatorAPIRedirectGuard())
     guard let response = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
+    let maximum = (200..<300).contains(response.statusCode) ? maximumResponseBytes : min(maximumResponseBytes, 8192)
+    if response.expectedContentLength > Int64(maximum) { throw URLError(.dataLengthExceedsMaximum) }
+    var data = Data()
+    for try await byte in bytes {
+      try Task.checkCancellation()
+      guard data.count < maximum else { throw URLError(.dataLengthExceedsMaximum) }
+      data.append(byte)
+    }
+    try Task.checkCancellation()
     guard (200..<300).contains(response.statusCode) else { throw CreatorAPIError(status: response.statusCode, body: data) }
     return CreatorAPIBinaryResponse(body: data, status: response.statusCode, contentType: response.value(forHTTPHeaderField: "Content-Type"), contentRange: response.value(forHTTPHeaderField: "Content-Range"), acceptRanges: response.value(forHTTPHeaderField: "Accept-Ranges"))
   }
@@ -10228,6 +10282,9 @@ public actor CreatorAPIClient {
   public func deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput) async throws -> APIConversationConversationRecordingResult {
     try await request("/v1/conversations/\(segment(creatorId))/\(segment(fanId))/recordings", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
   }
+  public func readMediaCapabilities() async throws -> APIMediaCapabilities {
+    try await request("/v1/w6/capabilities", method: "GET", authenticated: false)
+  }
   public func readCallSession(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = nil) async throws -> APICallCallSession {
     try await request("/v1/w6/threads/\(segment(creatorId))/\(segment(fanId))/calls/\(segment(sessionId))", method: "GET", authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
   }
@@ -10273,11 +10330,11 @@ public actor CreatorAPIClient {
   public func playAudienceCreatorMedia(creatorId: String, assetId: String, ticket: String, range: String? = nil, xQelvoraExpectedAccount: String? = nil, expectedAccountId: String? = nil) async throws -> CreatorAPIBinaryResponse {
     try await requestBytes("/v1/w6/creators/\(segment(creatorId))/audience-media/\(segment(assetId))/play", method: "GET", authenticated: true, query: [URLQueryItem(name: "ticket", value: ticket), URLQueryItem(name: "expectedAccountId", value: expectedAccountId)], headers: ["Range": range, "x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
   }
-  public func readCreatorCallAvailability(creatorId: String) async throws -> APICallAvailabilityView {
-    try await request("/v1/w6/creators/\(segment(creatorId))/call-availability", method: "GET", authenticated: true)
+  public func readCreatorCallAvailability(creatorId: String, xQelvoraExpectedAccount: String? = nil) async throws -> APICallAvailabilityView {
+    try await request("/v1/w6/creators/\(segment(creatorId))/call-availability", method: "GET", authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
   }
-  public func saveCreatorCallAvailability(creatorId: String, body: APICallAvailabilityCommand) async throws -> APICallAvailability {
-    try await request("/v1/w6/creators/\(segment(creatorId))/call-availability", method: "PUT", body: JSONEncoder().encode(body), authenticated: true)
+  public func saveCreatorCallAvailability(creatorId: String, xQelvoraExpectedAccount: String? = nil, body: APICallAvailabilityCommand) async throws -> APICallAvailability {
+    try await request("/v1/w6/creators/\(segment(creatorId))/call-availability", method: "PUT", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
   }
   public func beginCreatorMedia(creatorId: String, body: APIMediaCreatorMediaUploadRequest) async throws -> APIMediaCreatorMediaUploadTicket {
     try await request("/v1/w6/creators/\(segment(creatorId))/media", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
