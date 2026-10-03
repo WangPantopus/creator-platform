@@ -3240,8 +3240,8 @@ function Team({ creator }: { creator: Creator }) {
       <Feedback action={action} />
       {!teamCurrent && (
         <Notice tone={readError ? "offline" : "neutral"} title="Current team">
-          {readError || "Checking current members and invitations."} Your
-          invitation input is kept in this tab.
+          {readError || "Checking current members and invitations."}
+          {creator.owned && " Your invitation input is kept in this tab."}
         </Notice>
       )}
       <div
