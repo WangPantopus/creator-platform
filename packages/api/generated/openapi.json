@@ -8532,6 +8532,85 @@
         }
       }
     },
+    "/v1/w6/capabilities": {
+      "get": {
+        "operationId": "readMediaCapabilities",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaCapabilities"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request refused or integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "Public service composition state only. These flags grant no media, call, publication or account authority."
+      }
+    },
     "/v1/w6/threads/{creatorId}/{fanId}/calls/{sessionId}": {
       "parameters": [
         {
@@ -10414,6 +10493,16 @@
           "in": "path",
           "name": "creatorId",
           "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "in": "header",
+          "name": "x-qelvora-expected-account",
+          "required": false,
+          "description": "Pin to the original account. Must match the actual current session; never grants authority.",
           "schema": {
             "type": "string",
             "format": "uuid"
@@ -13888,6 +13977,48 @@
         "required": [
           "version",
           "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "MediaCapabilities": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "mediaAvailable": {
+            "type": "boolean"
+          },
+          "creatorMediaAvailable": {
+            "type": "boolean"
+          },
+          "creatorMediaAudienceAvailable": {
+            "type": "boolean"
+          },
+          "callsAvailable": {
+            "type": "boolean"
+          },
+          "aiAudioAvailable": {
+            "type": "boolean",
+            "const": false
+          },
+          "callRecoveryAvailable": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "media_unconfigured",
+              "licensed_ai_audio_and_provider_verification_required"
+            ]
+          }
+        },
+        "required": [
+          "mediaAvailable",
+          "creatorMediaAvailable",
+          "creatorMediaAudienceAvailable",
+          "callsAvailable",
+          "aiAudioAvailable",
+          "callRecoveryAvailable",
+          "reason"
         ],
         "additionalProperties": false
       },
