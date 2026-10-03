@@ -19,6 +19,10 @@ public enum QelvoraCopy {
     "longSession": "You've been talking with {name}'s AI for a while. It's an AI, and it will be here when you're back.",
     "noteAudience": "{name} · to {audience}",
     "noteReplies": "Only {name} and her team see replies to Notes.",
+    "contentConfirmedTenure": "Membership · at least {days} continuous days",
+    "contentReplyLimit": "{used} / {limit} characters",
+    "contentReplyOverLimit": "This draft is over your current limit. Shorten it to send; your words are kept.",
+    "contentReplyPolicyUnavailable": "Current membership recognition is unavailable. The reply limit stays at 4,000 characters.",
     "sponsorDisclosure": "Paid partnership: {name} is paid by {brand}.",
     "processorConsent": "Before your first message, {name}'s AI is powered by {providers}. They don't keep or train on your messages.",
     "sensitiveMemory": "Want me to remember this? Only if you say yes.",
@@ -676,6 +680,7 @@ public enum QelvoraCopy {
     "w6ReloadSavedWindows": "Reload saved windows",
     "w6TheCallIsUnavailable": "The call is unavailable.",
     "w6CameraOrMicrophoneAccessIsOffOrUnavailableCheckYour": "Camera or microphone access is off or unavailable. Check your device settings and try again.",
+    "w6CallServiceUnavailable": "Calling is not connected yet.",
     "w6CallingIsNotConnectedYetYourBookingIsUnchanged": "Calling is not connected yet. Your booking is unchanged.",
     "w6ConnectionFailedRejoinTheSameCall": "Connection failed. Rejoin the same call.",
     "w6ConsentCouldNotBeSaved": "Consent could not be saved.",
@@ -720,6 +725,7 @@ public enum QelvoraCopy {
     "w6SummaryQueuedAvailableWhenItsProviderCompletes": "Summary queued · available when its provider completes.",
     "w6DeleteThisSummary": "Delete this summary",
     "w6CallReceipt": "Call receipt",
+    "w6CallInProgress": "Human call",
     "w6RecordingOccurredCheckTheConsentHistory": "Recording occurred · check the consent history",
     "w6NoRecordingWasConfirmed": "No recording was confirmed",
     "w6ViewTheReconciledReceipt": "View the reconciled receipt",
@@ -915,7 +921,18 @@ public enum QelvoraCopy {
     "w5ContentDuplicateChanged": "This retry differs from the earlier action. Refresh before trying again.",
     "w5ContentReplyWithdrawn": "This reply was withdrawn. It cannot be shared again.",
     "w5ContentFanProfileRequired": "Set up your fan profile before continuing.",
-    "w5ContentInvalidRequest": "Check your reply and sharing choices before trying again. Your input is kept."
+    "w5ContentInvalidRequest": "Check your reply and sharing choices before trying again. Your input is kept.",
+    "identityChooseHandle": "Choose your handle",
+    "identityEditPublicProfile": "Edit public profile",
+    "identitySessionReadFailed": "This device could not read your session securely. Unlock it and try signing in again.",
+    "identitySessionSaveFailed": "This device could not save your session securely. Unlock it and try signing in again.",
+    "identityPrivateClearFailed": "This device could not clear its saved private data. Private screens are closed. Unlock it and retry clearing before signing in again.",
+    "identityPrivateClearRetry": "Retry clearing saved private data",
+    "w1CallLookupTitle": "Your call",
+    "w1CallLookupChecking": "Checking the booking and your current access…",
+    "w1CallLookupUnavailable": "This call could not be opened. Retry, or open Requests to check its current status.",
+    "identityProofReviewSupport": "Request verification review",
+    "identityProofReviewSupportBody": "Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified."
   ]
   private static let variables = try! NSRegularExpression(pattern: #"\{([^}]+)\}"#)
   public static func text(_ key: String, values: [String: String] = [:]) -> String {

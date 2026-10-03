@@ -18,8 +18,22 @@ import java.util.UUID
     val member: String? = null, val offTheRecord: Boolean, val version: Long,
     val agentVersion: ConversationAgentVersion? = null, val feedback: String? = null,
     val correction: ConversationCorrection? = null,
-    val recording: ConversationRecording? = null
+    val recording: ConversationRecording? = null,
+    val authorAccountId: String? = null,
+    val systemLink: ConversationSystemLink? = null
 )
+@Serializable data class ConversationSystemLink(val kind: String, val creatorId: String, val contentId: String, val contentVersion: Long, val label: String)
+fun ConversationMessage.publicAnswerDestination(creatorId: String): String? {
+    val link = systemLink ?: return null
+    if (authorKind != APIMessageAuthorKind.SYSTEM || deliveryState != APIMessageDeliveryState.DELIVERED ||
+        signedActId != null || authorAccountId != null || text != "Answered publicly." ||
+        link.kind != "published_answer" || link.label != text || link.creatorId != creatorId || link.contentVersion <= 0) return null
+    val valid = runCatching {
+        UUID.fromString(link.creatorId).toString().equals(link.creatorId, ignoreCase = true) &&
+        UUID.fromString(link.contentId).toString().equals(link.contentId, ignoreCase = true)
+    }.getOrDefault(false)
+    return if (valid) "/content/${link.creatorId}/${link.contentId}" else null
+}
 @Serializable data class ConversationCorrection(val originalMessageId: String, val originalVersion: Long)
 @Serializable data class ConversationAgentVersion(val id: String, val hash: String)
 @Serializable data class ConversationFeedbackPolicy(val version: String, val notice: String)

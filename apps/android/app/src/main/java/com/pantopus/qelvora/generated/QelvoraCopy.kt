@@ -19,6 +19,10 @@ object QelvoraCopy {
     "longSession" to "You've been talking with {name}'s AI for a while. It's an AI, and it will be here when you're back.",
     "noteAudience" to "{name} · to {audience}",
     "noteReplies" to "Only {name} and her team see replies to Notes.",
+    "contentConfirmedTenure" to "Membership · at least {days} continuous days",
+    "contentReplyLimit" to "{used} / {limit} characters",
+    "contentReplyOverLimit" to "This draft is over your current limit. Shorten it to send; your words are kept.",
+    "contentReplyPolicyUnavailable" to "Current membership recognition is unavailable. The reply limit stays at 4,000 characters.",
     "sponsorDisclosure" to "Paid partnership: {name} is paid by {brand}.",
     "processorConsent" to "Before your first message, {name}'s AI is powered by {providers}. They don't keep or train on your messages.",
     "sensitiveMemory" to "Want me to remember this? Only if you say yes.",
@@ -676,6 +680,7 @@ object QelvoraCopy {
     "w6ReloadSavedWindows" to "Reload saved windows",
     "w6TheCallIsUnavailable" to "The call is unavailable.",
     "w6CameraOrMicrophoneAccessIsOffOrUnavailableCheckYour" to "Camera or microphone access is off or unavailable. Check your device settings and try again.",
+    "w6CallServiceUnavailable" to "Calling is not connected yet.",
     "w6CallingIsNotConnectedYetYourBookingIsUnchanged" to "Calling is not connected yet. Your booking is unchanged.",
     "w6ConnectionFailedRejoinTheSameCall" to "Connection failed. Rejoin the same call.",
     "w6ConsentCouldNotBeSaved" to "Consent could not be saved.",
@@ -720,6 +725,7 @@ object QelvoraCopy {
     "w6SummaryQueuedAvailableWhenItsProviderCompletes" to "Summary queued · available when its provider completes.",
     "w6DeleteThisSummary" to "Delete this summary",
     "w6CallReceipt" to "Call receipt",
+    "w6CallInProgress" to "Human call",
     "w6RecordingOccurredCheckTheConsentHistory" to "Recording occurred · check the consent history",
     "w6NoRecordingWasConfirmed" to "No recording was confirmed",
     "w6ViewTheReconciledReceipt" to "View the reconciled receipt",
@@ -915,7 +921,18 @@ object QelvoraCopy {
     "w5ContentDuplicateChanged" to "This retry differs from the earlier action. Refresh before trying again.",
     "w5ContentReplyWithdrawn" to "This reply was withdrawn. It cannot be shared again.",
     "w5ContentFanProfileRequired" to "Set up your fan profile before continuing.",
-    "w5ContentInvalidRequest" to "Check your reply and sharing choices before trying again. Your input is kept."
+    "w5ContentInvalidRequest" to "Check your reply and sharing choices before trying again. Your input is kept.",
+    "identityChooseHandle" to "Choose your handle",
+    "identityEditPublicProfile" to "Edit public profile",
+    "identitySessionReadFailed" to "This device could not read your session securely. Unlock it and try signing in again.",
+    "identitySessionSaveFailed" to "This device could not save your session securely. Unlock it and try signing in again.",
+    "identityPrivateClearFailed" to "This device could not clear its saved private data. Private screens are closed. Unlock it and retry clearing before signing in again.",
+    "identityPrivateClearRetry" to "Retry clearing saved private data",
+    "w1CallLookupTitle" to "Your call",
+    "w1CallLookupChecking" to "Checking the booking and your current access…",
+    "w1CallLookupUnavailable" to "This call could not be opened. Retry, or open Requests to check its current status.",
+    "identityProofReviewSupport" to "Request verification review",
+    "identityProofReviewSupportBody" to "Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified."
   )
   private val variables = Regex("""\{([^}]+)\}""")
   fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }

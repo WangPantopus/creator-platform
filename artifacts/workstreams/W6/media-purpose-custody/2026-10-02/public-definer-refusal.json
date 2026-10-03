@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-02T18:00:51.539Z",
+  "purpose": "actual isolated PUBLIC definer catalogue clause only",
+  "administratorSelectedCatalogueOnly": true,
+  "preparedPurposeAccepted": false,
+  "activation": false,
+  "ledgerRowsAdded": 0,
+  "allDDLReverted": true,
+  "before": {
+    "safe": true
+  },
+  "effective": {
+    "public_executable": true
+  },
+  "drift": {
+    "safe": false
+  },
+  "after": {
+    "probe": null,
+    "purpose": null,
+    "migrations": 61
+  }
+}

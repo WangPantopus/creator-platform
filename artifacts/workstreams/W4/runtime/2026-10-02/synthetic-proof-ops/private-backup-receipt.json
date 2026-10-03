@@ -1,0 +1,8 @@
+{
+  "privateBackupPreserved": true,
+  "format": "PostgreSQL custom",
+  "sha256": "c1d7203d176b694431a2aae74e1bbd585385bf4b6d117dedd8d7d5a5e324e201",
+  "sourceSchemaMigrations": 61,
+  "syntheticFixturePreserved": true,
+  "privateContentsWithheld": true
+}

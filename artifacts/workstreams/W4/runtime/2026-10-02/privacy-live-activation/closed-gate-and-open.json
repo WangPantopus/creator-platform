@@ -1,0 +1,19 @@
+{
+  "source": "4aaaf9e476883635ff4a65e08be27732b46602e1",
+  "completeFreshAndPreservedCustodyVerified": true,
+  "runningCanonicalApiRecovery503Verified": true,
+  "errorCode": "restoration_pending",
+  "personallyClickedBrowserRetry": true,
+  "browserReasonRetained": true,
+  "browserSubmissionDisabled": true,
+  "closedReportSaved": false,
+  "closedOpsCases": 0,
+  "financialRows": 0,
+  "verifiedCreatorsBeforeProofAcceptance": 0,
+  "pendingProofsPreserved": 1,
+  "unfinishedPrivateScopes": 0,
+  "controlledDevelopmentTrafficReopened": true,
+  "businessRowsModifiedByOperator": false,
+  "positiveCreatorAcceptance": false,
+  "releaseReady": false
+}

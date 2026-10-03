@@ -188,6 +188,50 @@
         }
       }
     },
+    "Membership · at least {days} continuous days": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Membership · at least {days} continuous days"
+          }
+        }
+      }
+    },
+    "{used} / {limit} characters": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{used} / {limit} characters"
+          }
+        }
+      }
+    },
+    "This draft is over your current limit. Shorten it to send; your words are kept.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This draft is over your current limit. Shorten it to send; your words are kept."
+          }
+        }
+      }
+    },
+    "Current membership recognition is unavailable. The reply limit stays at 4,000 characters.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Current membership recognition is unavailable. The reply limit stays at 4,000 characters."
+          }
+        }
+      }
+    },
     "Paid partnership: {name} is paid by {brand}.": {
       "extractionState": "manual",
       "localizations": {
@@ -7338,6 +7382,17 @@
         }
       }
     },
+    "Calling is not connected yet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calling is not connected yet."
+          }
+        }
+      }
+    },
     "Calling is not connected yet. Your booking is unchanged.": {
       "extractionState": "manual",
       "localizations": {
@@ -7796,6 +7851,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Call receipt"
+          }
+        }
+      }
+    },
+    "Human call": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Human call"
           }
         }
       }
@@ -9930,6 +9996,127 @@
           "stringUnit": {
             "state": "translated",
             "value": "Check your reply and sharing choices before trying again. Your input is kept."
+          }
+        }
+      }
+    },
+    "Choose your handle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose your handle"
+          }
+        }
+      }
+    },
+    "Edit public profile": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit public profile"
+          }
+        }
+      }
+    },
+    "This device could not read your session securely. Unlock it and try signing in again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This device could not read your session securely. Unlock it and try signing in again."
+          }
+        }
+      }
+    },
+    "This device could not save your session securely. Unlock it and try signing in again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This device could not save your session securely. Unlock it and try signing in again."
+          }
+        }
+      }
+    },
+    "This device could not clear its saved private data. Private screens are closed. Unlock it and retry clearing before signing in again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This device could not clear its saved private data. Private screens are closed. Unlock it and retry clearing before signing in again."
+          }
+        }
+      }
+    },
+    "Retry clearing saved private data": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry clearing saved private data"
+          }
+        }
+      }
+    },
+    "Your call": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your call"
+          }
+        }
+      }
+    },
+    "Checking the booking and your current access…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking the booking and your current access…"
+          }
+        }
+      }
+    },
+    "This call could not be opened. Retry, or open Requests to check its current status.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This call could not be opened. Retry, or open Requests to check its current status."
+          }
+        }
+      }
+    },
+    "Request verification review": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Request verification review"
+          }
+        }
+      }
+    },
+    "Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified."
           }
         }
       }
