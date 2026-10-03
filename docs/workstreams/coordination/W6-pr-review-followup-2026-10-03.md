@@ -1,5 +1,50 @@
 # W6 PR review follow-up — October 3, 2026
 
+## Completed ownership/reuse disposition pass — 18:19 UTC
+
+Fresh GitHub capture18:19:10Z has40 open/all40 draft, oldest21. W4 consolidated
+236 into262, closed236 unmerged18:10:31Z and retained its fullc797 source by
+normal ancestry. W6 verified that ancestry and actual GitHub closure. Together
+with W3's299/280 this reduces the renewed43 backlog by three duplicate closures;
+there is no backlog main merge or whole-workstream acceptance.
+
+Every retained PR has an explicit owner and hold/reuse disposition below. Every
+captured head still has queued checks; none has a complete current-head green
+set or all relevant actual application acceptance. Owners repair existing PRs
+and qualify their own journeys; W6 resumes independent personal qualification
+of its retained increments after this pass. No new duplicate PR is created.
+
+| Owner | Current retained PRs, oldest first      | Current action/acceptance limit                                                                                                                                                                                                                                                                                  |
+| ----- | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| W1    | 21,22,26,28,29,35,42,48,49,51,66,74,296 | Updated oldest bodies and verifies generation without changing outputs. Retains unique35 signing producer and ordered dated49/51 custody. W6 identified a post-actor-read generation gap in native390 refresh and sent the exact source to W1/W3; original producer repair/current native qualification pending. |
+| W2    | 132,279,295                             | 295 consumes original namespace guard;132/279 retain distinct policy migration bindings. Real original generation/expiry/family/C10 and current cross-tab qualification pending.                                                                                                                                 |
+| W3    | 36,63,182                               | 36 consumes original native capture transport;63 supersedes closed299/280. W6 sent the shared native refresh gap and private load continuation-fence review. Own shipping/runtime/positive/privacy/publication gates pending;182 remains immutable comparison custody.                                           |
+| W4    | 213,247,262,298,301,303                 | 262 now targets main and preserves236 source, removing the parent conflict. Current303 note source unchanged; iOS SDK resolution/runtime work continues. Original provider/financial/task/COMMIT/C10 and current relevant acceptance pending.                                                                    |
+| W5    | 288,293,302,304                         | 288 consumes full296, current shipping/contracts pass separately from E2E. 302 consumes retained262; same-original media/LAST ordering was source-reviewed. 304 wrapped-abort repair reused; genuine role/native/task/reply-review acceptance pending.                                                           |
+| W6    | 282,284,289,305                         | All unique increments retained. 282/289/305 consume complete296;284 requires actual latest adoption/encode-error/current-preview qualification. Four fast checks succeed at each actual retained head; six Mac jobs remain queued (289 also retains cancelled obsolete jobs). No current merge candidate.        |
+| W7    | 31                                      | Unique composed source retained; own missing SDK cache repair/current shipping/runtime/full review and positive/accessibility/CI qualification pending.                                                                                                                                                          |
+| W8    | 131,145,192,200,201,242                 | 131 restoration uncertainty fix propagated to145; complete three-file source delta read by W6. 200 retains201's prior ACK repair while201's protected storage stays distinct. Original policy/catalogues/task/C10/registry activation remain W8-owned and held.                                                  |
+
+W6 retained heads are282/9a0a983f1064ed6a1815b6de66c520f779b6a61c,
+284/bf2a95f19c185786b2617895ff5c00712e76d63b,
+289/473cd8bb08ddf1209f5df428a2f8df5b76ad3b69 and
+305/130f4a2b0b1873fd100b85621cd98a1e66b2e051. Their bodies distinguish exact
+current source checks from earlier installed/shipping/runtime evidence.
+282/289/305 base296;284 base main. All six active W6 branches again contain
+freshly fetched main5c08634b. Shared/peer/protected/historical refs are untouched.
+
+After W8's supported engine recovery, W6 independently inspected its original
+PG fullID/image/volume/loopback port and normal exited0 state. Fresh owned lease
+a46e2464-b985-4817-9c58-dc221038317e/dev16777232/inode244733927 covered only55446.
+Actual read-only18:16:17Z selected counts/content/media/threads and protected
+target exactly match the16:26:54Z pre-outage closing receipt:61 migrations,
+Note14, three deleted/version2 photos, business rows0 and protected connection-
+limit0/owner closure. This is selected-state equality, not full restore/catalogue
+or application acceptance. No API/worker/client/device/app traffic started.
+Original PG stopped again/exited0, all four ports closed and exact lease released
+18:16:52Z. Private state receiptSHA256c83424ab59b1c7a6209b440db2960e7842613ef442a48a6e40883e2b2c958055;
+closure0f5a4427d7a51eb7f22c907b5a2cd89a2e87f6348f156981f925a13e67cb41e7.
+
 ## Renewed backlog pass — 18:00 UTC
 
 The human again prioritizes every existing open/draft PR before new feature
