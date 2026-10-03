@@ -375,7 +375,8 @@ public struct FanAppShell: View {
     }
     private var tab: FanTab {
         let path = model.destination.components(separatedBy: "?")[0]
-        if path.hasPrefix("/identity/") || path == "/support" || path.hasPrefix("/support/") || path == "/notifications/settings" { return .you }
+        if path.hasPrefix("/identity/") || path == "/support" || path.hasPrefix("/support/") || path == "/notifications/settings" || path == "/commerce/spending" { return .you }
+        if path.hasPrefix("/commerce/") { return .requests }
         return FanTab.allCases.first { tab in
             let root = "/" + tab.rawValue.lowercased()
             return path == root || path.hasPrefix(root + "/")
