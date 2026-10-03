@@ -360,8 +360,20 @@ export class CommerceFulfillmentPublicationWorker {
         actual.cursor !== output.cursor
       )
         unavailable();
-      this.issuedRecipients.delete(recipient);
     }
+    // The fixed W4 owner rechecks every original receipt/proof, then calls
+    // W3's private ending port. No W3 read follows removal of its bindings.
+    const ended = await client.query<{ removed: number }>(
+      "SELECT creator.fulfillment_publication_worker_end_system_links($1,$2) AS removed",
+      [held.preparation.nonce, held.preparation.token],
+    );
+    invariant(
+      ended.rowCount === 1 && ended.rows[0]?.removed === held.delivered.size,
+      "fulfillment_publication_ending_changed",
+      "The complete original System output must end before publication commits.",
+    );
+    for (const recipient of held.recipients)
+      this.issuedRecipients.delete(recipient);
     this.held.delete(scope);
   }
 }

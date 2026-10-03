@@ -348,6 +348,32 @@ BEGIN
   'minimumRecipients',header.minimum_recipients,'deliveries',deliveries);
 END $$;
 
+-- Fixed W4 ending bridge. The raw worker cannot call W3's private ending
+-- port. Recheck the complete original receipt/proofs before removing bindings;
+-- only a count comparison follows W3 cleanup, then W1 owns the final fence.
+CREATE FUNCTION creator.fulfillment_publication_worker_end_system_links(n uuid,t uuid) RETURNS integer
+LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path=pg_catalog AS $$
+DECLARE receipt jsonb; expected integer; removed integer;
+BEGIN
+ IF session_user<>'creator_publication_worker' OR n IS NULL OR t IS NULL
+  OR current_setting('transaction_isolation')<>'read committed'
+  OR nullif(current_setting('app.account_id',true),'') IS NOT NULL
+  OR nullif(current_setting('app.identity_session_id',true),'') IS NOT NULL
+  OR nullif(current_setting('app.creator_id',true),'') IS NOT NULL
+  OR nullif(current_setting('app.fan_id',true),'') IS NOT NULL THEN
+  RAISE EXCEPTION 'The actual original publication ending is required' USING ERRCODE='42501'; END IF;
+ receipt:=creator.fulfillment_publication_worker_receipt(n,t);
+ IF jsonb_typeof(receipt->'deliveries') IS DISTINCT FROM 'array' THEN
+  RAISE EXCEPTION 'The complete original delivery receipt is required' USING ERRCODE='42501'; END IF;
+ expected:=jsonb_array_length(receipt->'deliveries');
+ IF expected NOT BETWEEN 2 AND 100 THEN
+  RAISE EXCEPTION 'The bounded complete original group is required' USING ERRCODE='42501'; END IF;
+ removed:=creator.end_publication_worker_system_links(n,t);
+ IF removed IS DISTINCT FROM expected THEN
+  RAISE EXCEPTION 'The complete original System ending changed' USING ERRCODE='42501'; END IF;
+ RETURN removed;
+END $$;
+
 -- Additive worker branch; the original interactive predicate below is byte-preserved.
 CREATE OR REPLACE FUNCTION creator.commerce_group_delivery_exact() RETURNS trigger
 LANGUAGE plpgsql SET search_path=pg_catalog AS $$
@@ -390,11 +416,14 @@ ALTER FUNCTION creator.fulfillment_publication_worker_record_delivery(uuid,uuid,
 REVOKE ALL ON FUNCTION creator.fulfillment_publication_worker_record_delivery(uuid,uuid,uuid,uuid,uuid) FROM PUBLIC;
 ALTER FUNCTION creator.fulfillment_publication_worker_receipt(uuid,uuid) OWNER TO creator_fulfillment_publication_worker;
 REVOKE ALL ON FUNCTION creator.fulfillment_publication_worker_receipt(uuid,uuid) FROM PUBLIC;
+ALTER FUNCTION creator.fulfillment_publication_worker_end_system_links(uuid,uuid) OWNER TO creator_fulfillment_publication_worker;
+REVOKE ALL ON FUNCTION creator.fulfillment_publication_worker_end_system_links(uuid,uuid) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION creator.fulfillment_publication_worker_family_matches(uuid,uuid,uuid,uuid) TO creator_publication_worker;
 GRANT EXECUTE ON FUNCTION creator.fulfillment_publication_worker_recipient(uuid,uuid,uuid,uuid) TO creator_publication_worker;
 GRANT EXECUTE ON FUNCTION creator.fulfillment_publication_worker_recipients(uuid,uuid) TO creator_publication_worker;
 GRANT EXECUTE ON FUNCTION creator.fulfillment_publication_worker_record_delivery(uuid,uuid,uuid,uuid,uuid) TO creator_publication_worker;
 GRANT EXECUTE ON FUNCTION creator.fulfillment_publication_worker_receipt(uuid,uuid) TO creator_publication_worker;
+GRANT EXECUTE ON FUNCTION creator.fulfillment_publication_worker_end_system_links(uuid,uuid) TO creator_publication_worker;
 -- Actual W3 successor creates its separate output owner and grants only
 -- family_matches/recipient to that owner; no missing-writer fallback is issued.
 COMMIT;

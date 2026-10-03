@@ -5,6 +5,11 @@ import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
 import { requestAuthority } from "../identity/request-authority.js";
 import { FULFILLMENT_PUBLICATION_ORIGINAL_SOURCES } from "./fulfillment-publication-original-catalogue.js";
 import { fulfillmentPublicationDenialPurposeCatalogue } from "../trust/fulfillment-publication-denial-catalog.js";
+import {
+  assertPublicationWorkerOutputCatalogue,
+  publicationWorkerOutputCatalogueQuery,
+  publicationWorkerOutputSource,
+} from "../conversation/publication-worker-output.js";
 
 /** Metadata inspection for the immutable original worker and its separate W3
  * writer. Reading this catalogue grants no permission. The complete published
@@ -20,7 +25,7 @@ export const FULFILLMENT_PUBLICATION_WORKER_CATALOGUE_QUERY = `WITH roles AS (
  'creator_profile','fan_profile','team_membership','passkey_credential','signed_act','signed_act_consumption','signed_publication','signed_verification',
  'commerce_fulfillment_publication_scope','commerce_fulfillment_plan','commerce_fulfillment_member','commerce_group_delivery',
  'commerce_packet','commerce_commitment','commerce_mode','commerce_ledger','commerce_effect','commerce_share_grant',
- 'thread','message','event','commerce_event')
+ 'thread','message','event','commerce_event','publication_worker_system_binding')
 ) SELECT jsonb_build_object(
  'roles',(SELECT jsonb_agg(to_jsonb(r)-'oid' ORDER BY r.rolname COLLATE "C") FROM roles r),
  'memberships',(SELECT jsonb_agg(jsonb_build_object('role',pg_get_userbyid(m.roleid),'member',pg_get_userbyid(m.member),
@@ -96,22 +101,27 @@ export async function fulfillmentPublicationWorkerPurposeCatalogue(
     )
   ).rows[0]?.catalogue;
   const denial = await fulfillmentPublicationDenialPurposeCatalogue(client);
+  const output = (
+    await client.query<{ catalogue: unknown }>(
+      publicationWorkerOutputCatalogueQuery,
+    )
+  ).rows[0]?.catalogue;
   // A failed read can remain in flight. Preserve it for the genuine owner;
   // only confirmed successful reads enqueue normal savepoint restoration.
   await client.query("ROLLBACK TO SAVEPOINT w4_publication_worker_catalogue");
   await client.query("RELEASE SAVEPOINT w4_publication_worker_catalogue");
-  return { catalogue, denial };
+  return { catalogue, denial, output };
 }
 
 export const FULFILLMENT_PUBLICATION_WORKER_SOURCE = Object.freeze({
   name: "w4_fulfillment_publication_worker",
   path: "apps/backend/src/modules/commerce/schema-fulfillment-publication-worker.sql",
   owner: "W4",
-  checksum: "b4168af68883406bb53eaa1df2b9863643694284e301b1231d4d0391fc832780",
+  checksum: "1e65d539ea81e7cfd4d003b792940b19aa111eb0f06dbca950b20ce8c31259f2",
 });
 
-// The actual separate W3 writer/proof source has not yet been published and
-// the complete combined owner graph has not been independently qualified.
+// The actual W3 writer/proof/ending source is consumed. The complete combined
+// owner graph and original ending/COMMIT still need independent qualification.
 // Keep this absent; neither startup metadata nor a caller supplies a pin.
 const reviewedCompleteOwnerCatalogue: string | undefined = undefined;
 
@@ -135,15 +145,19 @@ export async function assertFulfillmentPublicationWorkerCatalogue(
     for (const source of [
       ...FULFILLMENT_PUBLICATION_ORIGINAL_SOURCES,
       FULFILLMENT_PUBLICATION_WORKER_SOURCE,
+      publicationWorkerOutputSource,
     ])
       await assertRegisteredMigration(client, source);
     if (!reviewedCompleteOwnerCatalogue) unavailable();
+    await assertPublicationWorkerOutputCatalogue(client);
     const ready = (
       await client.query<{ ready: boolean }>(
         `SELECT current_user=session_user AND session_user='creator_publication_worker'
           AND current_setting('transaction_isolation')='read committed'
           AND to_regprocedure('creator.publication_worker_system_link(uuid,uuid,uuid,uuid)') IS NOT NULL
           AND to_regprocedure('creator.publication_worker_system_link_matches(uuid,uuid,uuid,uuid,uuid,uuid)') IS NOT NULL
+          AND to_regprocedure('creator.end_publication_worker_system_links(uuid,uuid)') IS NOT NULL
+          AND to_regprocedure('creator.fulfillment_publication_worker_end_system_links(uuid,uuid)') IS NOT NULL
           AND EXISTS(SELECT FROM pg_database d WHERE d.datname=current_database()
             AND d.datconnlimit<>0 AND shobj_description(d.oid,'pg_database')
               IS DISTINCT FROM 'creator-platform:restored-traffic-closed') AS ready`,
