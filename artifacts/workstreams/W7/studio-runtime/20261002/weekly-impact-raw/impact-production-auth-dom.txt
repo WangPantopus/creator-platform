@@ -1,0 +1,8 @@
+- main:
+  - generic: Qelvora
+  - heading "Her AI answers you now. She answers in person when you ask." [level=1]
+  - paragraph: "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which."
+  - link "Continue with Pantopus" [active]:
+    - /url: /api/auth/continue?returnTo=%2Fstudio%2Fimpact
+  - paragraph: One Pantopus account signs you in to every Pantopus app. New here? You'll create it in the next step.
+- alert

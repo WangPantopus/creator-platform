@@ -1,0 +1,135 @@
+{
+  "at": "2026-10-01T17:32:51.779344+00:00",
+  "source": "ea25161059998c8e08c6f8a7a2e0eb208f025b13",
+  "privacySource": "bac1e9b1b6134992ae2f9618170d652280b070f0",
+  "nativeAndWebBuildSource": "303395901d590d85f9510fe72f4f866ae97903cd",
+  "nativeAndWebSourceBytesEqualCurrentHead": true,
+  "reviewedMain": "c1c615e6ece53bff4bc6a47d7f4d332757df1295",
+  "scopeComplete": false,
+  "delegated": false,
+  "newTestsOrSavedFlows": false,
+  "privacy": {
+    "change": "Growth now requires current W8 task lease and cancellation authority; removes non-leased JSON export/delete fallback; fixed captured ownership rechecked before source reads/commit/EOF/finish. Deletion rolls back on lost authority. Runtime readiness requires leased authority.",
+    "buildExitStatus": 0,
+    "lintAndFormattingExitStatus": 0,
+    "actualProtectedOperation": "unavailable: development host has no canonical Trust graph or real protected privacy task",
+    "narrowAndLargeScopes": "OPEN: account-only ownership bounded100; unsupported narrow path still503"
+  },
+  "native": {
+    "toolchain": "Xcode26.5 build17F42",
+    "signedBuild": "BUILD SUCCEEDED marker; process exit status not retrieved because its original execution session metadata was discarded",
+    "codesignStrictExitStatus": 0,
+    "swiftSession": 87853,
+    "swiftExitStatus": 0,
+    "existingTests": 18,
+    "failures": 0,
+    "originalImageComparisons": 110,
+    "comparison": "exact dimensions;99.85% pixels within8 channel units; calibrated sRGB/2x capture",
+    "nativeReferenceFilesChanged": false,
+    "device": "CE855FD5-A4AA-4C62-A63B-5E80D2E1DFF1",
+    "freshDevice": true,
+    "bootExitStatus": 0,
+    "bootSeconds": 60,
+    "bootTimingAcceptance": false,
+    "launchFailure": {
+      "attemptedBundleId": "com.qelvora.creator",
+      "exitStatus": 4,
+      "error": "FBSOpenApplicationServiceErrorDomain; incorrect bundle identifier",
+      "resetOrUninstall": false
+    },
+    "correctBundleId": "com.pantopus.qelvora",
+    "lightLaunchExitStatus": 0,
+    "nightLaunchExitStatus": 0,
+    "personallyObserved": "Cold share00000000-0000-4000-8000-000000000007 unavailable in Light/Night; no body or export action. Native input/long granted PDF/sheet acceptance remains OPEN.",
+    "images": [
+      "ios-document-share-unavailable-light.png",
+      "ios-document-share-unavailable-night.png"
+    ]
+  },
+  "web": {
+    "productionBuildExitStatus": 0,
+    "mode": "explicitly loopback production Next16.3.7",
+    "personallyObserved": "Empty Discover; signed-out Home requires sign-in and retains /home context; nonexistent share unavailable. Development sign-in is correctly refused by production web, no manufactured production cookie.",
+    "image": "web-leased-privacy-share-unavailable.jpg",
+    "positiveSharingAcceptance": false,
+    "initialStartMistake": "Next bound all interfaces by default; own process41718 promptly stopped, loopback restart42059 used."
+  },
+  "restore": {
+    "archivePreserved": true,
+    "archiveFormat": "pg_dumpall, multiple database sections",
+    "archiveSha256": "83221699a1daec1cd715bebe477913b0f7aadd476c7a2f93420d4ad6f3d1b216",
+    "firstAttempt": {
+      "exitStatus": 2,
+      "cause": "wrong role argument fell back to root; no SQL import"
+    },
+    "targetedRestoreExitStatus": 0,
+    "roleRecoveryExitStatus": 0,
+    "originalManagedKeysAndRoleMembershipsRetained": true,
+    "privateSqlUploaded": false,
+    "genuineDataCounts": {
+      "migrations": 40,
+      "creators": 0,
+      "fans": 1,
+      "relationships": 0,
+      "growthShares": 0,
+      "growthCreatorProjections": 0
+    },
+    "newFixtureAuthorityOrConsent": false,
+    "proposedSqlApplied": false
+  },
+  "readiness": {
+    "beforeSource": "bac1e9b1b6134992ae2f9618170d652280b070f0",
+    "beforeStatus": 404,
+    "beforeResponse": "readiness-leased-privacy.json",
+    "afterSource": "ea25161059998c8e08c6f8a7a2e0eb208f025b13",
+    "afterStatus": 503,
+    "afterResponse": "readiness-fallback.json",
+    "canonicalW8ReadinessUntouched": true,
+    "newBuildExitStatus": 0,
+    "existingContracts": 9,
+    "failures": 0
+  },
+  "hostedCI": {
+    "checkedAt": "2026-10-01T17:32:51.779344+00:00",
+    "source": "303395901d590d85f9510fe72f4f866ae97903cd",
+    "foundationRun": 36893571912,
+    "jobs": [
+      {
+        "name": "android-foundation",
+        "id": 110474879134,
+        "status": "queued",
+        "conclusion": ""
+      },
+      {
+        "name": "android-runtime",
+        "id": 110474879368,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "web-and-backend",
+        "id": 110474879520,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "web-visual",
+        "id": 110474879655,
+        "status": "queued",
+        "conclusion": ""
+      },
+      {
+        "name": "ios-foundation",
+        "id": 110474879826,
+        "status": "queued",
+        "conclusion": ""
+      }
+    ],
+    "trustRun": 36893558473,
+    "trustConclusion": "success",
+    "fullLogs": "gh refuses logs while run is queued; retrieval failure preserved in this receipt",
+    "currentHeadCI": "not yet published; all required exact-head passes remain a merge gate",
+    "queuedMacExceptionReused": false
+  },
+  "resources": "Own API/web/device/container normally stopped; own device/container/volume/build outputs retained. Peer W4 resource untouched."
+}

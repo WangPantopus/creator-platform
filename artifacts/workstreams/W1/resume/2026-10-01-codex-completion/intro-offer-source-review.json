@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-02T13:41:15.924299+00:00",
+  "sourceParent": "29b87c0438e1eeb4f526d4ea86c3e7571d982e40",
+  "files": {
+    "apps/backend/src/db/database.ts": "a678ccc571a69d44cead1ad47b5b9ac19d4959a188fb31b7e3b19c1d68d15b6b",
+    "apps/backend/src/modules/identity/intro-offers.ts": "0fd389d5a7389a7e0c008bd05e24e4882d70f031adc601a618545408a8c68135"
+  },
+  "scope": "DI09 current held fan helpful event and durable once/account pending/acknowledgement boundary",
+  "checks": {
+    "backendTypes": "passed",
+    "scopedESLint": "passed",
+    "scopedPrettier": "passed",
+    "originalBackendContracts": "9 passed;9 DB integrations skipped",
+    "actualSQLPlans": "3 passed on isolated canonical57 PostgreSQL17 review under creator_runtime"
+  },
+  "actualBusinessWrites": 0,
+  "newUnitTests": 0,
+  "sourceDecisions": [
+    "Only an explicit same-transaction helpful write, exact AI reply/version/agent lineage, actual consent and future expiry qualify.",
+    "Pending stable offer survives lost response; explicit UI disposition uses a separate acknowledgement kind, not outbox publication.",
+    "Existing account key uses try lease to avoid waiting below family/profile locks.",
+    "Current held client/scope/session and unfinished callback work are guarded before commit."
+  ],
+  "limitations": [
+    "Genuine feedback/offer retention policy is absent; no always-true port was configured.",
+    "No owner callback, web/iOS/Android presentation or positive/negative/restart/concurrency journey is accepted.",
+    "Original retained57 remains closed and unchanged by this review."
+  ],
+  "timings": {
+    "measuredContractRunMilliseconds": 1200,
+    "actualQueryPlanTimingMeasured": false
+  }
+}

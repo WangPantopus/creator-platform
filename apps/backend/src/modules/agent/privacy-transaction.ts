@@ -2,7 +2,42 @@ import { Client, type Pool, type PoolClient } from "pg";
 import { DomainError, invariant } from "../../core/errors.js";
 import { querySettlementUncertain } from "../../core/query-settlement.js";
 
-const boundedQuery = (text: string) => ({ text, query_timeout: 5000 });
+/** Cancellation uses the original pool's shorter positive acquisition budget. */
+export function agentPrivacyConnectionTimeout(pool: Pool): number {
+  const configured = pool.options.connectionTimeoutMillis;
+  const original =
+    typeof configured === "number" || typeof configured === "string"
+      ? Number(configured)
+      : NaN;
+  return Number.isFinite(original) && original > 0
+    ? Math.min(original, 1500)
+    : 1500;
+}
+
+/** A per-query pg option replaces its connection budget. Keep a shorter
+ * positive original budget, including pg's numeric environment form. */
+export function agentPrivacyQueryTimeout(
+  client: PoolClient,
+  ceiling = 5000,
+): number {
+  const configured = (
+    client as PoolClient & {
+      connectionParameters?: { query_timeout?: unknown };
+    }
+  ).connectionParameters?.query_timeout;
+  const original =
+    typeof configured === "number" || typeof configured === "string"
+      ? Number(configured)
+      : NaN;
+  return Number.isFinite(original) && original > 0
+    ? Math.min(original, ceiling)
+    : ceiling;
+}
+
+const boundedQuery = (client: PoolClient, text: string) => ({
+  text,
+  query_timeout: agentPrivacyQueryTimeout(client),
+});
 
 /** A private cause can wrap an uncertain response. It never grants task authority. */
 export function uncertainAgentReadResponse(failure: unknown): boolean {
@@ -61,9 +96,9 @@ export async function agentPrivacyTransaction<T>(
       if (pid !== undefined) {
         const control = new Client({
           ...pool.options,
-          connectionTimeoutMillis: 1500,
+          connectionTimeoutMillis: agentPrivacyConnectionTimeout(pool),
           statement_timeout: 1500,
-          query_timeout: 1500,
+          query_timeout: agentPrivacyQueryTimeout(client, 1500),
           pipeline: false,
         });
         const onControlError = (error: Error) => cleanup.push(error);
@@ -101,7 +136,7 @@ export async function agentPrivacyTransaction<T>(
   try {
     signal.throwIfAborted();
     const actual = (
-      await client.query(boundedQuery("SELECT pg_backend_pid() AS pid"))
+      await client.query(boundedQuery(client, "SELECT pg_backend_pid() AS pid"))
     ).rows[0]?.pid;
     invariant(
       Number.isSafeInteger(actual) && actual > 0,
@@ -111,7 +146,9 @@ export async function agentPrivacyTransaction<T>(
     pid = actual;
     signal.throwIfAborted();
     phase = "begin";
-    await client.query(boundedQuery(`BEGIN ISOLATION LEVEL ${isolation}`));
+    await client.query(
+      boundedQuery(client, `BEGIN ISOLATION LEVEL ${isolation}`),
+    );
     phase = "work";
     await client.query(
       "SET LOCAL statement_timeout='10s'; SET LOCAL lock_timeout='5s'",
@@ -124,7 +161,7 @@ export async function agentPrivacyTransaction<T>(
     // The actual final task fence is inside work. Close cancellation before the
     // sole COMMIT; a late abort cannot contradict a committed server receipt.
     phase = "commit";
-    const receipt = await client.query(boundedQuery("COMMIT"));
+    const receipt = await client.query(boundedQuery(client, "COMMIT"));
     invariant(
       receipt.command === "COMMIT",
       "privacy_commit_unavailable",
@@ -141,7 +178,7 @@ export async function agentPrivacyTransaction<T>(
       uncertainAgentReadResponse(error);
     if (!discard) {
       try {
-        await client.query(boundedQuery("ROLLBACK"));
+        await client.query(boundedQuery(client, "ROLLBACK"));
       } catch (error) {
         cleanup.push(error);
         discard = true;

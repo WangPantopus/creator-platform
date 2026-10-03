@@ -62,6 +62,7 @@ export function attachRealtime(
   report("observe", "realtime_subscriptions_pending", 0);
   report("observe", "realtime_subscriptions_active", 0);
   const ticketTokens = new WeakMap<IncomingMessage, string>();
+  server.once("close", () => conversations.closeFrameNotifications());
   server.on("upgrade", (request, socket, head) => {
     void authenticate(request)
       .then(() => {
@@ -72,9 +73,10 @@ export function attachRealtime(
           report("observe", "realtime_connections_active", ++active);
           const subscriptions = new Map<
             string,
-            { scope: ThreadScope; cursor: number }
+            { scope: ThreadScope; cursor: number; stopListening: () => void }
           >();
           let busy = false;
+          let replayPending = false;
           let subscriptionsPending = 0;
           let mutations: Promise<void> = Promise.resolve();
           connection.on("message", (data) => {
@@ -117,11 +119,16 @@ export function attachRealtime(
                       subscribed,
                     );
                   }
+                  const prior = subscriptions.get(scope.threadId);
                   subscriptions.set(scope.threadId, {
                     scope,
                     cursor: input.cursor,
+                    stopListening:
+                      prior?.stopListening ??
+                      conversations.watchFrames(scope.threadId, drain),
                   });
                   report("increment", "realtime_subscriptions_accepted", 1);
+                  drain();
                 });
               })
               .catch(() => {
@@ -133,9 +140,18 @@ export function attachRealtime(
                 report("observe", "realtime_subscriptions_pending", --pending);
               });
           });
-          const timer = setInterval(() => {
-            if (busy || connection.readyState !== WebSocket.OPEN) return;
+          const drain = () => {
+            if (connection.readyState !== WebSocket.OPEN) return;
+            replayPending = true;
+            if (busy) return;
+            replayPending = false;
             busy = true;
+            const deadline = setTimeout(() => {
+              if (connection.readyState !== WebSocket.OPEN) return;
+              report("increment", "realtime_authority_deadline_closed", 1);
+              connection.close(1008, "Reconnect with current authority");
+            }, 2000);
+            deadline.unref();
             const batchStart = performance.now();
             let batchStopped = false;
             void (async () => {
@@ -149,10 +165,14 @@ export function attachRealtime(
                     subscription.scope.fanId,
                     false,
                   );
-                  for (const frame of await conversations.replay(
+                  const frames = await conversations.replay(
                     subscription.scope,
                     subscription.cursor,
-                  )) {
+                  );
+                  // Drain a full durable page without waiting for another
+                  // notification, including after a long disconnected period.
+                  if (frames.length === 256) replayPending = true;
+                  for (const frame of frames) {
                     if (connection.bufferedAmount > 1024 * 1024) {
                       report("increment", "realtime_backpressure_closed", 1);
                       connection.close(1013, "Reconnect with your cursor");
@@ -209,17 +229,26 @@ export function attachRealtime(
                 connection.close(1008, "Conversation unavailable");
               })
               .finally(() => {
+                clearTimeout(deadline);
                 report(
                   "timing",
                   "realtime_batch_ms",
                   performance.now() - batchStart,
                 );
                 busy = false;
+                if (replayPending && connection.readyState === WebSocket.OPEN)
+                  queueMicrotask(drain);
               });
-          }, 100);
+          };
+          // Notification wakeups drive frame delivery. This bounded maintenance
+          // pass revalidates idle authority and recovers a missed wakeup.
+          const timer = setInterval(drain, 2000);
+          timer.unref();
           connection.on("close", () => {
             clearInterval(timer);
             subscribed -= subscriptions.size;
+            for (const subscription of subscriptions.values())
+              subscription.stopListening();
             subscriptions.clear();
             report("observe", "realtime_subscriptions_active", subscribed);
             report("observe", "realtime_connections_active", --active);

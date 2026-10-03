@@ -1,0 +1,83 @@
+[
+  {
+    "source": "90b3235aef2146f2176c89791304a396b217e5af",
+    "operation": "shipping-backend",
+    "command": [
+      "pnpm",
+      "run",
+      "build"
+    ],
+    "startedAt": "2026-10-02T19:14:57.439121+00:00",
+    "pid": 16484,
+    "exitCode": 0,
+    "completedAt": "2026-10-02T19:15:03.057875+00:00",
+    "logSHA256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+  },
+  {
+    "source": "90b3235aef2146f2176c89791304a396b217e5af",
+    "operation": "canonical-generation",
+    "command": [
+      "pnpm",
+      "generate:check"
+    ],
+    "startedAt": "2026-10-02T19:14:57.440837+00:00",
+    "pid": 16485,
+    "exitCode": 1,
+    "completedAt": "2026-10-02T19:15:03.058338+00:00",
+    "logSHA256": "0b7499c1b38543fad2389cefcb30c26b9ddd7055d99a47214e694139f34ecc8a"
+  },
+  {
+    "source": "90b3235aef2146f2176c89791304a396b217e5af",
+    "operation": "scoped-eslint",
+    "command": [
+      "pnpm",
+      "exec",
+      "eslint",
+      "apps/backend/src/server.ts",
+      "apps/backend/src/db/database.ts",
+      "apps/backend/src/modules/identity/generation-scope.ts",
+      "apps/backend/src/modules/conversation/service.ts",
+      "apps/backend/src/modules/conversation/feature.ts",
+      "apps/web/features/conversation/ConversationScreen.tsx",
+      "apps/backend/src/modules/conversation/host.ts",
+      "apps/backend/src/modules/conversation/privacy-export-cursor.ts",
+      "apps/backend/src/modules/conversation/privacy-export-cursor-rows.ts",
+      "apps/backend/src/modules/conversation/privacy-export-stream.ts",
+      "apps/backend/src/modules/conversation/privacy.ts",
+      "apps/backend/src/modules/trust/privacy-consumers.ts"
+    ],
+    "startedAt": "2026-10-02T19:14:57.442352+00:00",
+    "pid": 16486,
+    "exitCode": 0,
+    "completedAt": "2026-10-02T19:15:03.058439+00:00",
+    "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "90b3235aef2146f2176c89791304a396b217e5af",
+    "operation": "format",
+    "command": [
+      "pnpm",
+      "exec",
+      "prettier",
+      "--check",
+      "apps/backend/src/server.ts",
+      "apps/backend/src/db/database.ts",
+      "apps/backend/src/modules/identity/generation-scope.ts",
+      "apps/backend/src/modules/conversation/service.ts",
+      "apps/backend/src/modules/conversation/feature.ts",
+      "apps/web/features/conversation/ConversationScreen.tsx",
+      "apps/backend/src/modules/conversation/host.ts",
+      "apps/backend/src/modules/conversation/privacy-export-cursor.ts",
+      "apps/backend/src/modules/conversation/privacy-export-cursor-rows.ts",
+      "apps/backend/src/modules/conversation/privacy-export-stream.ts",
+      "apps/backend/src/modules/conversation/privacy.ts",
+      "apps/backend/src/modules/trust/privacy-consumers.ts",
+      "docs/implementation/W3-privacy-cursor-export.md"
+    ],
+    "startedAt": "2026-10-02T19:14:57.443909+00:00",
+    "pid": 16487,
+    "exitCode": 0,
+    "completedAt": "2026-10-02T19:15:03.058537+00:00",
+    "logSHA256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+  }
+]

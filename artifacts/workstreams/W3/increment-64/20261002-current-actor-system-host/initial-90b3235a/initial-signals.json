@@ -1,0 +1,20 @@
+[
+  {
+    "operation": "api",
+    "source": "90b3235aef2146f2176c89791304a396b217e5af",
+    "pid": 18840,
+    "port": 4103,
+    "signal": "SIGINT",
+    "checkedCommand": "/Users/yingpengwang/.nvm/versions/node/v24.13.0/bin/node --require /Users/yingpengwang/estimate-rescue/creator-platform/w3-fan-conversations-chat-55cfcc/node_modules/.pnpm/tsx@4.20.6/node_modules/tsx/dist/preflight.cjs --import file:///Users/yingpengwang/estimate-rescue/creator-platform/w3-fan-conversations-chat-55cfcc/node_modules/.pnpm/tsx@4.20.6/node_modules/tsx/dist/loader.mjs src/server.ts",
+    "at": "2026-10-02T19:16:01.274577+00:00"
+  },
+  {
+    "operation": "web",
+    "source": "90b3235aef2146f2176c89791304a396b217e5af",
+    "pid": 18841,
+    "port": 3003,
+    "signal": "SIGINT",
+    "checkedCommand": "next-server (v16.3.7)",
+    "at": "2026-10-02T19:16:01.380567+00:00"
+  }
+]

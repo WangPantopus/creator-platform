@@ -1,0 +1,260 @@
+Fetching https://github.com/livekit/webrtc-xcframework.git from cache
+Updating https://github.com/pointfreeco/swift-custom-dump
+Updating https://github.com/pointfreeco/swift-issue-reporting
+Fetching https://github.com/livekit/livekit-uniffi-xcframework.git from cache
+Updating https://github.com/pointfreeco/swift-snapshot-testing.git
+Fetching https://github.com/livekit/client-sdk-swift.git from cache
+Updating https://github.com/swiftlang/swift-syntax
+Updated https://github.com/pointfreeco/swift-snapshot-testing.git (0.49s)
+Fetched https://github.com/livekit/client-sdk-swift.git from cache (0.50s)
+Computing version for https://github.com/livekit/client-sdk-swift.git
+Fetched https://github.com/livekit/livekit-uniffi-xcframework.git from cache (0.50s)
+Updated https://github.com/pointfreeco/swift-custom-dump (0.77s)
+Updated https://github.com/pointfreeco/swift-issue-reporting (0.79s)
+Fetched https://github.com/livekit/webrtc-xcframework.git from cache (0.80s)
+Updated https://github.com/swiftlang/swift-syntax (0.93s)
+Computed https://github.com/livekit/client-sdk-swift.git at 2.17.0 (1.23s)
+Computing version for https://github.com/pointfreeco/swift-snapshot-testing.git
+Computed https://github.com/pointfreeco/swift-snapshot-testing.git at 1.19.6 (0.50s)
+Computing version for https://github.com/livekit/livekit-uniffi-xcframework.git
+Computed https://github.com/livekit/livekit-uniffi-xcframework.git at 0.1.9 (0.78s)
+Computing version for https://github.com/livekit/webrtc-xcframework.git
+Computed https://github.com/livekit/webrtc-xcframework.git at 150.7871.2 (0.50s)
+Computing version for https://github.com/swiftlang/swift-syntax
+Computed https://github.com/swiftlang/swift-syntax at 604.0.0 (0.70s)
+Computing version for https://github.com/pointfreeco/swift-custom-dump
+Computed https://github.com/pointfreeco/swift-custom-dump at 1.7.3 (0.43s)
+Computing version for https://github.com/pointfreeco/swift-issue-reporting
+Computed https://github.com/pointfreeco/swift-issue-reporting at 2.1.1 (0.58s)
+Creating working copy for https://github.com/livekit/livekit-uniffi-xcframework.git
+Working copy of https://github.com/livekit/livekit-uniffi-xcframework.git resolved at 0.1.9
+Creating working copy for https://github.com/livekit/client-sdk-swift.git
+Working copy of https://github.com/livekit/client-sdk-swift.git resolved at 2.17.0
+Creating working copy for https://github.com/livekit/webrtc-xcframework.git
+Working copy of https://github.com/livekit/webrtc-xcframework.git resolved at 150.7871.2
+Fetching binary artifact https://github.com/livekit/livekit-uniffi-xcframework/releases/download/0.1.9/RustLiveKitUniFFI.xcframework.zip from cache
+Fetching binary artifact https://github.com/livekit/webrtc-xcframework/releases/download/150.7871.02/LiveKitWebRTC.xcframework.zip from cache
+Fetched https://github.com/livekit/livekit-uniffi-xcframework/releases/download/0.1.9/RustLiveKitUniFFI.xcframework.zip from cache (1.33s)
+Fetched https://github.com/livekit/webrtc-xcframework/releases/download/150.7871.02/LiveKitWebRTC.xcframework.zip from cache (2.95s)
+warning: 'ios': found 110 file(s) which are unhandled; explicitly declare them as resources or exclude from the target
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testAuthorIdentitySurfaces.light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testAuthorIdentitySurfaces.night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AccessLines-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AccessLines-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuditBanner-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuditBanner-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuthorLabel-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.AuthorLabel-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Avatar-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Avatar-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Button-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Button-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CallChip-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CallChip-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CapacityHeader-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CapacityHeader-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CitationChip-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.CitationChip-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Composer-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Composer-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ContextCard-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ContextCard-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Correction-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Correction-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Countdown-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Countdown-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Dialog-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Dialog-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.DigestItem-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.DigestItem-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmailFrame-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmailFrame-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmptyState-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EmptyState-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EtaLine-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.EtaLine-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IdentityStrip-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IdentityStrip-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IncludeList-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.IncludeList-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.InsteadMenu-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.InsteadMenu-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.LabelPreview-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.LabelPreview-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Mark-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Mark-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.MemoryChip-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.MemoryChip-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Message-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Message-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ModeList-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ModeList-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Note-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Note-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Notice-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Notice-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.NotificationRow-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.NotificationRow-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.QueueCard-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.QueueCard-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReactionChip-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReactionChip-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Receipt-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Receipt-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.RequestStatus-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.RequestStatus-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReservedLabel-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ReservedLabel-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Seal-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Seal-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Segmented-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Segmented-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ShareCard-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ShareCard-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sheet-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sheet-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sidebar-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Sidebar-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SignedMarker-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SignedMarker-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SigningSheet-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SigningSheet-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Skeleton-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Skeleton-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SourceRow-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SourceRow-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SpendLimit-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SpendLimit-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StepIn-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StepIn-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StudioTabBar-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.StudioTabBar-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SystemLine-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.SystemLine-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TabBar-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TabBar-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TermsBlock-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TermsBlock-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TestConsole-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.TestConsole-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ThreadHeader-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.ThreadHeader-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Toast-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.Toast-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VersionList-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VersionList-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VoiceNote-light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testComponentCatalogThemes.VoiceNote-night.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testWelcomeThemes.light.png
+    /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Tests/QelvoraUITests/__Snapshots__/NativeSnapshotTests/testWelcomeThemes.night.png
+Building for debugging...
+[Computing dependencies]
+[Pre-planning 1 / 364]
+[Planning 1 / 364]
+[Planning deferred tasks]
+[Starting]
+[26 / 145] QelvoraNative_QelvoraUI
+[31 / 146]
+[53 / 134]
+[54 / 134]
+[57 / 132] LiveKitNanopb
+[57 / 137] LiveKitNanopb
+[60 / 142] LiveKitUniFFI
+[60 / 142] LKObjCHelpers
+[62 / 206]
+[77 / 206]
+[83 / 206] LiveKitUniFFI
+[89 / 206] LiveKitNanopb
+[91 / 206]
+[93 / 206]
+[94 / 206]
+[95 / 206]
+[101 / 206]
+[107 / 206]
+[110 / 206]
+[112 / 206]
+[118 / 206]
+[123 / 217]
+[131 / 217]
+[135 / 217]
+[142 / 217]
+[149 / 217]
+[151 / 217]
+[154 / 217]
+[159 / 217]
+[163 / 217] CLiveKitProto
+[167 / 217]
+[171 / 217] CLiveKitProto
+[177 / 218]
+[178 / 218] LiveKit
+[181 / 242]
+[184 / 242]
+[188 / 242]
+[189 / 242]
+[192 / 242] LiveKit
+[194 / 242] LiveKit
+[200 / 242] LiveKit
+[201 / 242] LiveKit
+[202 / 242] LiveKit-product
+[203 / 242] LiveKit-product
+[204 / 242] QelvoraUI
+[205 / 243] LiveKit
+[206 / 243] QelvoraUI
+[208 / 256] QelvoraUI
+[208 / 256] LiveKit
+/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Trust.swift:23:93: warning: no 'async' operations occur within 'await' expression [#UnnecessaryEffectMarker]
+ 21 |     public let baseURL: URL
+ 22 |     public let token: @Sendable () async throws -> String?
+ 23 |     public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    |                                                                                             `- warning: no 'async' operations occur within 'await' expression [#UnnecessaryEffectMarker]
+ 24 |     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
+ 25 |         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
+
+/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Trust.swift:76:128: warning: no 'async' operations occur within 'await' expression [#UnnecessaryEffectMarker]
+ 74 |     @State private var feedbackConsent = false
+ 75 |     @Environment(\.colorScheme) private var scheme
+ 76 |     public init(baseURL: URL?, destination: String = "/support", token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) {
+    |                                                                                                                                `- warning: no 'async' operations occur within 'await' expression [#UnnecessaryEffectMarker]
+ 77 |         client = baseURL.map { TrustClient(baseURL: $0, token: token) }; _route = State(initialValue: destination)
+ 78 |         let query = URLComponents(string: destination)?.queryItems ?? []
+
+[#UnnecessaryEffectMarker]: <https://docs.swift.org/compiler/documentation/diagnostics/unnecessary-effect-marker>
+[210 / 256] QelvoraUI
+[211 / 256] QelvoraUI
+[212 / 255] QelvoraUI
+[218 / 255] QelvoraUI
+/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Trust.swift:23:93: warning: no 'async' operations occur within 'await' expression [#UnnecessaryEffectMarker]
+ 21 |     public let baseURL: URL
+ 22 |     public let token: @Sendable () async throws -> String?
+ 23 |     public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    |                                                                                             `- warning: no 'async' operations occur within 'await' expression [#UnnecessaryEffectMarker]
+ 24 |     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
+ 25 |         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
+
+/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Trust.swift:76:128: warning: no 'async' operations occur within 'await' expression [#UnnecessaryEffectMarker]
+ 74 |     @State private var feedbackConsent = false
+ 75 |     @Environment(\.colorScheme) private var scheme
+ 76 |     public init(baseURL: URL?, destination: String = "/support", token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) {
+    |                                                                                                                                `- warning: no 'async' operations occur within 'await' expression [#UnnecessaryEffectMarker]
+ 77 |         client = baseURL.map { TrustClient(baseURL: $0, token: token) }; _route = State(initialValue: destination)
+ 78 |         let query = URLComponents(string: destination)?.queryItems ?? []
+
+[#UnnecessaryEffectMarker]: <https://docs.swift.org/compiler/documentation/diagnostics/unnecessary-effect-marker>
+[220 / 256] qelvora-native-snapshots-product
+[222 / 258] qelvora-native-snapshots-product
+[224 / 258] QelvoraUI
+[227 / 258] QelvoraUI
+[228 / 258] QelvoraUI
+error: SwiftCompile normal arm64 /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Media/NativeAvailability.swift failed with a nonzero exit code. Command line:     cd /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps
+    builtin-SwiftPerFileCompile NativeAvailability.swift
+/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Media/NativeAvailability.swift:138:80: error: value of type 'TextField<Text>' has no member 'textInputAutocapitalization'
+136 |                 if fresh && scene == .active {
+137 |                     Text(QelvoraCopy.text("w6YourTimeZone")).qText("caption")
+138 |                     TextField(QelvoraCopy.text("w6YourTimeZone"), text: $zone).textInputAutocapitalization(.never).autocorrectionDisabled().textFieldStyle(.roundedBorder).disabled(replacingSavedWindows || command != nil).focused($editedField, equals: "zone").submitLabel(.done).onSubmit { editedField = nil }.accessibilityIdentifier("availability-zone")
+    |                                                                                `- error: value of type 'TextField<Text>' has no member 'textInputAutocapitalization'
+139 |                     ForEach(windows.indices, id: \.self) { index in
+140 |                         VStack(alignment: .leading, spacing: 8) {
+Failed frontend command:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend -frontend -c /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/out/Intermediates.noindex/QelvoraNative.build/Debug/QelvoraUI-t.build/DerivedSources/resource_bundle_accessor.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/Generated/QelvoraAPI.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/Generated/QelvoraCopy.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/Generated/QelvoraTokens.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/AccessComponents.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Catalog.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Commerce/CommerceClient.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Commerce/CommerceFeature.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Commerce/StoreMembership.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Commerce/StoreMembershipPane.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/ComponentPreview.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Content/ContentAttachments.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Content/ContentFeature.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Controls.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Conversation.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Conversation/W3ConversationClient.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Conversation/W3FanFeatures.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Conversation/W3Realtime.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Conversation/W3Recording.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Conversation/W3ResumeStorage.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/CredentialSettings.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/DeliveryProtocol.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/FanShell.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Glyph.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Growth.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/GrowthPreferences.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/GrowthPush.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/GrowthReplyDocument.swift -primary-file /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Identity.swift -primary-file /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Media/LiveKitNativeCallTransport.swift -primary-file /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Media/NativeAvailability.swift -primary-file /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Media/NativeCallCoordinator.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Media/NativeCallOffers.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Media/NativeCallView.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Media/NativeMediaClient.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Media/NativeVoiceRecorder.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Media/W6FanFeatures.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Navigation.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Overlays.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/PasskeyCeremony.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/SessionStorage.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/StudioComponents.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Theme.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/ThreadComponents.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Trust.swift /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/Sources/QelvoraUI/Welcome.swift -supplementary-output-file-map /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/out/Intermediates.noindex/QelvoraNative.build/Debug/QelvoraUI-t.build/Objects-normal/arm64/supplementaryOutputs-20 -target arm64-apple-macos14.0 -disable-cross-import-overlay-search -swift-module-cross-import StoreKit /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/StoreKit.framework/Modules/StoreKit.swiftcrossimport/SwiftUI.swiftoverlay -swift-module-cross-import StoreKit /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk/System/Library/Frameworks/StoreKit.framework/Modules/StoreKit.swiftcrossimport/SwiftUI.swiftoverlay -swift-module-cross-import UserNotifications /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/UserNotifications.framework/Modules/UserNotifications.swiftcrossimport/AppIntents.swiftoverlay -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/swift/host/plugins/libFoundationMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/bin/swift-plugin-server\#FoundationMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/swift/host/plugins/libObservationMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/bin/swift-plugin-server\#ObservationMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/swift/host/plugins/libPreviewsMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/bin/swift-plugin-server\#PreviewsMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/swift/host/plugins/libSwiftMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/bin/swift-plugin-server\#SwiftMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/swift/host/plugins/libSwiftUIMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/bin/swift-plugin-server\#SwiftUIMacros -disable-implicit-swift-modules -Xcc -fno-implicit-modules -Xcc -fno-implicit-module-maps -explicit-swift-module-map-file /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/out/Intermediates.noindex/QelvoraNative.build/Debug/QelvoraUI-t.build/Objects-normal/arm64/QelvoraUI-dependencies-1.json -Xllvm -aarch64-use-tbi -enable-objc-interop -stack-check -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk -I /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/out/Products/Debug -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib -F /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/out/Products/Debug/PackageFrameworks -F /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/out/Products/Debug -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks -module-cache-path /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/out/Intermediates.noindex/SwiftExplicitPrecompiledModules -no-color-diagnostics -Xcc -fno-color-diagnostics -enable-testing -g -debug-info-format\=dwarf -dwarf-version\=4 -swift-version 6 -Onone -D SWIFT_PACKAGE -D DEBUG -D SWIFT_MODULE_RESOURCE_BUNDLE_AVAILABLE -D Xcode -serialize-debugging-options -enable-experimental-feature DebugDescriptionMacro -empty-abi-descriptor -validate-clang-modules-once -clang-build-session-file /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/out/ModuleCache.noindex/Session.modulevalidation -Xcc -working-directory -Xcc /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps -enable-anonymous-context-mangled-names -file-compilation-dir /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps -Xcc -fmodule-map-file\=/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/out/Intermediates.noindex/GeneratedModuleMaps/LKObjCHelpers.modulemap -Xcc -fmodule-map-file\=/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/out/Intermediates.noindex/GeneratedModuleMaps/CLiveKitProto.modulemap -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -Xcc -ivfsstatcache -Xcc /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/out/SDKStatCaches.noindex/macosx27.0-26A425-a0facfad118c1a7a18f0aad9463f65497231f6df4def33e022ae2eb8f782df1a.sdkstatcache -Xcc -fmodules-prune-interval\=86400 -Xcc -fmodules-prune-after\=345600 -Xcc -I/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/checkouts/client-sdk-swift/Sources/LKObjCHelpers/include -Xcc -I/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/checkouts/client-sdk-swift/Sources/CLiveKitProto/include -Xcc -I/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/out/Products/Debug/include -Xcc -I/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/out/Intermediates.noindex/QelvoraNative.build/Debug/QelvoraUI-t.build/DerivedSources-normal/arm64 -Xcc -I/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/out/Intermediates.noindex/QelvoraNative.build/Debug/QelvoraUI-t.build/DerivedSources/arm64 -Xcc -I/Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/out/Intermediates.noindex/QelvoraNative.build/Debug/QelvoraUI-t.build/DerivedSources -Xcc -DSWIFT_PACKAGE -Xcc -DDEBUG\=1 -no-auto-bridging-header-chaining -module-name QelvoraUI -package-name ios -const-gather-protocols-file /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/out/Intermediates.noindex/QelvoraNative.build/Debug/QelvoraUI-t.build/Objects-normal/arm64/QelvoraUI_const_extract_protocols.json -disable-clang-spi -clang-target arm64-apple-macos27.0 -target-sdk-version 27.0 -target-sdk-name macosx27.0 -in-process-plugin-server-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/libSwiftInProcPluginServer.dylib -parse-as-library -o /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/out/Intermediates.noindex/QelvoraNative.build/Debug/QelvoraUI-t.build/Objects-normal/arm64/Identity.o -o /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/out/Intermediates.noindex/QelvoraNative.build/Debug/QelvoraUI-t.build/Objects-normal/arm64/LiveKitNativeCallTransport.o -o /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/out/Intermediates.noindex/QelvoraNative.build/Debug/QelvoraUI-t.build/Objects-normal/arm64/NativeAvailability.o -o /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/out/Intermediates.noindex/QelvoraNative.build/Debug/QelvoraUI-t.build/Objects-normal/arm64/NativeCallCoordinator.o -debug-module-path /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/out/Intermediates.noindex/QelvoraNative.build/Debug/QelvoraUI-t.build/Objects-normal/arm64/QelvoraUI.swiftmodule -index-unit-output-path /QelvoraNative.build/Debug/QelvoraUI-t.build/Objects-normal/arm64/Identity.o -index-unit-output-path /QelvoraNative.build/Debug/QelvoraUI-t.build/Objects-normal/arm64/LiveKitNativeCallTransport.o -index-unit-output-path /QelvoraNative.build/Debug/QelvoraUI-t.build/Objects-normal/arm64/NativeAvailability.o -index-unit-output-path /QelvoraNative.build/Debug/QelvoraUI-t.build/Objects-normal/arm64/NativeCallCoordinator.o -index-store-path /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/ios/.build/out -index-system-modules
+error: Build failed
+error: fatalError

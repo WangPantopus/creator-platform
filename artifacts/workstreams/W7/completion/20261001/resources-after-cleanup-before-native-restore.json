@@ -1,0 +1,82 @@
+{
+  "updatedAt": "2026-10-01T15:47:13.141159+00:00",
+  "owner": "W7 primary",
+  "chatId": "01a0f6b7-6ddb-7d32-9efd-603858f6f60f",
+  "checkout": "/Users/yingpengwang/.codex/worktrees/0546/creator-platform",
+  "branch": "codex/w7-completion-20261001",
+  "base": "2f0319dbb6979878c5a9019e68503506902f9ea0",
+  "scopeComplete": false,
+  "resources": {
+    "api": {
+      "address": "127.0.0.1:4107",
+      "pid": null,
+      "session": null,
+      "identity": "explicit development",
+      "generation": "unconfigured",
+      "source": "Combined shipping bundle: strict W5 proof, bounded Home, complete sharing export; public HTTPS origin and canonical source directory remain unconfigured",
+      "compiledSource": "44c4c2247fb44700b48a140f0199d2c04ddb6034",
+      "state": "Stopped. Latest session12606 exited1 after PostgreSQL unexpected postmaster exit; last compiled shipping source44c4c22. No listener observed on4107."
+    },
+    "web": {
+      "address": "127.0.0.1:3007",
+      "pid": null,
+      "session": null,
+      "mode": "Next development shipping source",
+      "state": "Stopped. Session52803 exited143; no listener observed on3007. Discover empty/search rendered before connection-refused category follow-up."
+    },
+    "postgres": {
+      "container": "creator-platform-w7-completion-20261001",
+      "volume": "creator-platform-w7-completion-20261001",
+      "address": "127.0.0.1:55447",
+      "database": "creator_w7_takeover_20260930",
+      "recovery": "Original encrypted takeover database restored with retained original keys; runtime LOGIN roles recovered from retained configuration and original role memberships restored.",
+      "state": "No matching W7 container remains at current inspection; removed during repo cleanup. Retained original recovery archive is preserved."
+    },
+    "disposableChecks": {
+      "container": "creator-platform-w7-foundation-20261001",
+      "address": "127.0.0.1:55457",
+      "database": "creator_w7_foundation_test",
+      "status": "Idle retry passed all18 existing checks unchanged, including10000 pairs/30000 assertions. Earlier role mismatch and300000ms timeout preserved.",
+      "state": "No matching W7 container remains at current inspection; removed during repo cleanup. Retained original recovery archive is preserved."
+    },
+    "ios": {
+      "udid": "8C9C41C2-EA3B-4D62-9440-91D499CFD2E4",
+      "name": "W7 Completion20261001",
+      "runtime": "iOS26.5",
+      "state": "Previously normally shut down; owned device directory now absent after repo cleanup. Latest44c4c22 signed generic simulator build and18 Swift/110 image checks passed before removal; actual44c4c22 device operation remains unperformed."
+    },
+    "android": {
+      "adbPort": 5047,
+      "consolePort": 5570,
+      "adbDevicePort": 5571,
+      "state": "Previously normally stopped; temporary SDK, build cache and AVD now absent after repo cleanup. Latest operated source989c79f;44c4c22 Android build/operation remain unperformed.",
+      "avd": "W7_Completion_20261001",
+      "serial": "emulator-5570",
+      "avdPath": "/private/tmp/creator-platform-w7-completion-20261001/android-user/avd/W7_Completion_20261001.avd"
+    },
+    "temporaryRoot": "/private/tmp/creator-platform-w7-completion-20261001",
+    "privateConfigurationDirectory": "/Users/yingpengwang/.config/creator-platform/w7-completion-20261001"
+  },
+  "retainedRecovery": {
+    "directory": "/Users/yingpengwang/.config/creator-platform/cleanup-20261001",
+    "backupSha256": "83221699a1daec1cd715bebe477913b0f7aadd476c7a2f93420d4ad6f3d1b216",
+    "androidKeySha256": "4d70a4b9d5db5589a0b66a9894c680bf6ae9fd788ed8de2ae3b357200546ecce",
+    "altered": false
+  },
+  "independentWork": "Strict W5 publication proof and stale withdrawal; bounded canonical Home/Discover and current displayed-page W4 pass metadata; complete labeled text export; rotating encrypted worker checkpoint; closed Thanks collector with250-row keyset pages and20 consented quotes. Four additive SQL proposals remain unallocated/unregistered/unapplied. Actual producer authority, global installed recency, narrow privacy mapping and populated/provider acceptance remain open.",
+  "externalInputs": "Approved identity/verified creator/signing authority, APNs/FCM/email transport and public HTTPS origin not supplied; requested once. No production acceptance claimed.",
+  "reviewedMain": "257b3b6105c86f82a114a73e9945ec69155e07c6",
+  "combinedSource": "bccfb0dc81317661f457c30736c158792509eb50",
+  "removedBuildResources": {
+    "android-sdk": true,
+    "gradle-home": true,
+    "android-build": true,
+    "ios-derived": true,
+    "ios-packages": true,
+    "swift-checks": true,
+    "android-user/avd/W7_Completion_20261001.avd": true
+  },
+  "iosDeviceDirectoryExists": false,
+  "localRuntimeConstraint": "Clarification pending: direct08:17UTC cleanup request in W5 predates direct09:06UTC W7 instruction allowing minimal restoration; cleanup subsequently removed current owned resources. Source and hosted CI continue; no new local runtime/heavy build while resolving this conflict.",
+  "removedSourceDependencies": true
+}

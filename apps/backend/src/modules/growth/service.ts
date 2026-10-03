@@ -1,4 +1,4 @@
-import { copy } from "@qelvora/copy";
+import { copy, formatCopy } from "@qelvora/copy";
 import {
   createHash,
   createHmac,
@@ -7,6 +7,7 @@ import {
   randomBytes,
 } from "node:crypto";
 import { z } from "zod";
+import type { PoolClient, QueryResultRow } from "pg";
 import type { Actor } from "../identity/adapter.js";
 import { DomainError } from "../../core/errors.js";
 import { contentHash } from "../../core/canonical.js";
@@ -22,24 +23,68 @@ import {
   type PublicCreator,
   type GrowthOwners,
   type PublicContent,
-  type ShareSource,
 } from "./contracts.js";
 import type { GrowthDatabase } from "./database.js";
 import { Notifications, type DeliveryProvider } from "./notifications.js";
 import { GrowthErasure } from "./erasure.js";
+import { GrowthDeviceSessions } from "./device-session.js";
+import type { CreatorProjectionSource } from "./creator-projection.js";
+import { compareHomeActivity } from "./home-composition.js";
+
+const ShareSourceRecord = z.strictObject({
+  id: z.uuid(),
+  creatorId: z.uuid(),
+  creatorName: z.string().min(1).max(80),
+  version: z.int().positive(),
+  text: z.string().min(1).max(100000),
+  authorKind: z.enum(["human_creator", "approved_draft"]),
+  signedActId: z.uuid(),
+  signedAt: z.iso.datetime(),
+  contentHash: z.string().regex(/^[a-f0-9]{64}$/u),
+  handle: z
+    .string()
+    .regex(/^[a-z0-9_]{3,30}$/u)
+    .nullable(),
+  correction: z.string().max(20000).nullable(),
+});
 
 export class GrowthService {
   readonly notifications: Notifications;
   readonly erasure: GrowthErasure;
+  readonly devices: GrowthDeviceSessions;
   constructor(
     readonly db: GrowthDatabase,
     readonly owners: GrowthOwners,
     private readonly secret: Buffer,
     provider?: DeliveryProvider,
+    private readonly verificationOrigin?: string,
+    private readonly creatorSource?: CreatorProjectionSource,
   ) {
+    if (verificationOrigin) {
+      const origin = new URL(verificationOrigin);
+      if (
+        origin.protocol !== "https:" ||
+        origin.username ||
+        origin.password ||
+        origin.pathname !== "/" ||
+        origin.search ||
+        origin.hash
+      )
+        throw new Error(
+          "Growth requires an HTTPS verification origin without credentials or a path.",
+        );
+      this.verificationOrigin = origin.origin;
+    }
     if (secret.length !== 32)
       throw new Error("Growth requires a 32-byte encryption/aggregation key");
     this.erasure = new GrowthErasure(secret);
+    this.devices = new GrowthDeviceSessions(
+      db,
+      (value) => this.seal(value),
+      (value) => this.open(value),
+      (accountId, installationId) =>
+        "t:" + this.pseudonym("device-tombstone", accountId, installationId),
+    );
     db.actorFence = async (client, accountId, creatorId) => {
       if (
         !(await this.erasure.subjects(
@@ -94,17 +139,130 @@ export class GrowthService {
       );
     });
   }
+  /** Serialize before reading canonical state so an older concurrent producer
+   * cannot overwrite a pause, recovery or revocation with a higher version. */
+  async refreshCreator(id: string) {
+    if (!this.creatorSource) return;
+    z.uuid().parse(id);
+    const candidates = new Set([id]);
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const result = await this.db.transaction(
+        this.db.worker,
+        async (client) => {
+          // Acquire all known creator fences in the same order as erasure. A newly
+          // discovered collision is retried after releasing these locks.
+          await this.erasure.lockCreatorSubjects(client, [...candidates]);
+          if (!(await this.erasure.creator(client, id)))
+            return { done: true as const };
+          const current = await this.creatorSource!.current(id);
+          const prior = (
+            await client.query<{ version: number; document: PublicCreator }>(
+              "SELECT version,document FROM growth.creator_public WHERE id=$1 FOR UPDATE",
+              [id],
+            )
+          ).rows[0];
+          if (!current) {
+            // References can outlive the owner row. Keep an opaque, hidden negative
+            // record until W8 erases those references; release the reusable handle.
+            await client.query(
+              "UPDATE growth.creator_public SET version=version+1,handle='~'||id::text,state='revoked',document=jsonb_build_object('id',id,'state','revoked'),updated_at=clock_timestamp() WHERE id=$1 AND document<>jsonb_build_object('id',id,'state','revoked')",
+              [id],
+            );
+            return { done: true as const };
+          }
+          const collision = (
+            await client.query<{ id: string }>(
+              "SELECT id FROM growth.creator_public WHERE handle=$1 AND id<>$2",
+              [current.handle, id],
+            )
+          ).rows[0];
+          if (collision && !candidates.has(collision.id))
+            return { retry: collision.id };
+          // W1's canonical public handle directory, rather than the cache, decides
+          // who owns a reused handle. A concurrent rename causes a bounded retry.
+          if ((await this.creatorSource!.resolve(current.handle)) !== id)
+            return { retry: id };
+          if (collision)
+            await client.query(
+              "UPDATE growth.creator_public SET version=version+1,handle='~'||id::text,state='unpublished',document=jsonb_build_object('id',id,'state','unpublished'),updated_at=clock_timestamp() WHERE id=$1 AND handle=$2",
+              [collision.id, current.handle],
+            );
+          if (prior) {
+            if (
+              contentHash(prior.document) ===
+              contentHash({
+                ...current,
+                version: prior.version,
+                updatedAt: prior.document.updatedAt,
+              })
+            )
+              return { done: true as const };
+          }
+          const item = CreatorProjection.parse({
+            ...current,
+            version: (prior?.version ?? 0) + 1,
+            updatedAt: new Date().toISOString(),
+          });
+          await client.query(
+            "INSERT INTO growth.creator_public(id,version,handle,state,document,updated_at) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT(id) DO UPDATE SET version=excluded.version,handle=excluded.handle,state=excluded.state,document=excluded.document,updated_at=excluded.updated_at",
+            [id, item.version, item.handle, item.state, item, item.updatedAt],
+          );
+          return { done: true as const };
+        },
+      );
+      if ("done" in result) return;
+      candidates.add(result.retry);
+    }
+    throw new DomainError(
+      "creator_projection_unavailable",
+      copy.growthThisDestinationIsUnavailableReconnectAndTryAgain,
+      503,
+    );
+  }
+  private async refreshPublicCreators(ids: readonly string[]) {
+    if (!this.creatorSource) return;
+    for (const id of [...new Set(ids)]) await this.refreshCreator(id);
+  }
+  /** A refreshed negative row can expose another candidate in a bounded page.
+   * Refresh that candidate too; never return an unchecked replacement row. */
+  private async currentPublicRows<T extends QueryResultRow>(
+    query: () => Promise<T[]>,
+    creatorId: (row: T) => string,
+  ): Promise<T[]> {
+    let rows = await query();
+    if (!this.creatorSource) return rows;
+    const refreshed = new Set<string>();
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const ids = [...new Set(rows.map(creatorId))].filter(
+        (id) => !refreshed.has(id),
+      );
+      if (!ids.length) return rows;
+      await this.refreshPublicCreators(ids);
+      for (const id of ids) refreshed.add(id);
+      rows = await query();
+    }
+    if (rows.every((row) => refreshed.has(creatorId(row)))) return rows;
+    throw new DomainError(
+      "creator_projection_unavailable",
+      copy.growthThisDestinationIsUnavailableReconnectAndTryAgain,
+      503,
+    );
+  }
   async projectContent(input: unknown) {
     const item = ContentProjection.parse(input);
-    if (item.state === "withdrawn")
-      return this.withdrawContent(item.creatorId, item.id, item.version);
+    if (item.state === "withdrawn") {
+      await this.withdrawContent(item.creatorId, item.id, item.version);
+      return { published: false };
+    }
+    await this.refreshCreator(item.creatorId);
     if (item.authorKind !== "team" && !item.signedActId)
       throw new DomainError(
         "signed_content_required",
         copy.growthErrorSignedContentRequired,
       );
-    await this.db.transaction(this.db.worker, async (client) => {
-      if (!(await this.erasure.creator(client, item.creatorId))) return;
+    return this.db.transaction(this.db.worker, async (client) => {
+      if (!(await this.erasure.creator(client, item.creatorId)))
+        return { published: false };
       await client.query(
         "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
         [`growth.content:${item.id}`],
@@ -125,7 +283,7 @@ export class GrowthService {
         prior?.version > item.version ||
         (prior?.version === item.version && prior.state === "withdrawn")
       )
-        return;
+        return { published: false };
       if (prior?.version === item.version) {
         if (contentHash(prior.document) !== contentHash(item))
           throw new DomainError(
@@ -133,7 +291,7 @@ export class GrowthService {
             copy.growthErrorEntryIdConflict,
             409,
           );
-        return;
+        return { published: true };
       }
       await client.query(
         `INSERT INTO growth.content_public(id,creator_id,version,state,document,published_at) VALUES($1,$2,$3,$4,$5,$6)
@@ -147,6 +305,7 @@ export class GrowthService {
           item.publishedAt,
         ],
       );
+      return { published: true };
     });
   }
   /** W5 withdraws without changing the immutable content version. Negative
@@ -158,6 +317,12 @@ export class GrowthService {
     z.int().positive().parse(version);
     await this.db.transaction(this.db.worker, async (client) => {
       if (!(await this.erasure.creator(client, creatorId))) return;
+      // A negative event can arrive before the first positive projection.
+      // Its opaque parent cannot be served as a public creator or grant access.
+      await client.query(
+        "INSERT INTO growth.creator_public(id,version,handle,state,document,updated_at) VALUES($1,1,'~'||$1::text,'revoked',jsonb_build_object('id',$1::uuid,'state','revoked'),clock_timestamp()) ON CONFLICT(id) DO NOTHING",
+        [creatorId],
+      );
       await client.query(
         "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
         [`growth.content:${id}`],
@@ -186,31 +351,86 @@ export class GrowthService {
       );
     });
   }
-  async discover(query: string, category: string, offset = 0) {
+  async discover(query: string, category: string, offset = 0, cursor?: string) {
     const q = z.string().max(120).parse(query),
       cat = z.string().max(60).parse(category);
-    const result = await this.db.runtime.query(
-      `SELECT document FROM growth.creator_public WHERE state IN ('published','paused') AND document->>'verified'='true'
+    const pageOffset = z.int().min(0).max(1000).parse(offset);
+    let after: string | null = null;
+    if (cursor) {
+      try {
+        const page = z
+          .strictObject({
+            kind: z.literal("discover-page"),
+            query: z.literal(q),
+            category: z.literal(cat),
+            after: z.string().regex(/^[a-z0-9_]{3,30}$/u),
+          })
+          .parse(
+            JSON.parse(this.open(z.string().min(1).max(2048).parse(cursor))),
+          );
+        if (pageOffset !== 0)
+          throw new Error("discover_cursor_offset_conflict");
+        after = page.after;
+      } catch {
+        throw new DomainError(
+          "discover_cursor_invalid",
+          copy.growthThisDestinationIsUnavailableReconnectAndTryAgain,
+          400,
+        );
+      }
+    }
+    const sql = `SELECT handle,document FROM growth.creator_public WHERE state IN ('published','paused') AND document->>'verified'='true'
       AND ($1='' OR (document->>'name') ILIKE $2 OR (document->>'biography') ILIKE $2 OR (document->>'topics') ILIKE $2)
-      AND ($3='' OR document->>'category'=$3) ORDER BY handle LIMIT 31 OFFSET $4`,
-      [
-        q,
-        `%${q.replace(/[\\%_]/gu, "\\$&")}%`,
-        cat,
-        z.int().min(0).max(1000).parse(offset),
-      ],
+      AND ($3='' OR document->>'category'=$3) AND ($5::text IS NULL OR handle>$5)
+      ORDER BY handle LIMIT 31 OFFSET $4`;
+    const values = [
+      q,
+      `%${q.replace(/[\\%_]/gu, "\\$&")}%`,
+      cat,
+      pageOffset,
+      after,
+    ];
+    const rows = await this.currentPublicRows(
+      async () => (await this.db.runtime.query(sql, values)).rows,
+      (row) => row.document.id as string,
     );
     return {
-      creators: result.rows
-        .slice(0, 30)
-        .map((r) => r.document as PublicCreator),
-      hasMore: result.rows.length > 30,
+      creators: rows.slice(0, 30).map((r) => r.document as PublicCreator),
+      hasMore: rows.length > 30,
+      nextCursor:
+        rows.length > 30
+          ? this.seal(
+              JSON.stringify({
+                kind: "discover-page",
+                query: q,
+                category: cat,
+                after: rows[29]!.handle,
+              }),
+            )
+          : null,
     };
   }
-  async passDiscovery(actor: Actor) {
-    const view = PassDiscovery.parse(await this.owners.discoveryAccess(actor));
-    if (!view.enabled) return { enabled: false, markers: [] };
+  async passDiscovery(actor: Actor, requestedIds?: readonly string[]) {
+    const ids =
+      requestedIds === undefined
+        ? (
+            await this.db.runtime.query(
+              "SELECT id FROM growth.creator_public WHERE state IN ('published','paused') AND document->>'verified'='true' ORDER BY handle LIMIT 30",
+            )
+          ).rows.map((row) => row.id as string)
+        : [...new Set(z.array(z.uuid()).max(100).parse(requestedIds))];
+    await this.refreshPublicCreators(ids);
     const publicIds = (
+      await this.db.runtime.query(
+        "SELECT id FROM growth.creator_public WHERE id=ANY($1::uuid[]) AND state IN ('published','paused') AND document->>'verified'='true'",
+        [ids],
+      )
+    ).rows.map((row) => row.id as string);
+    const view = PassDiscovery.parse(
+      await this.owners.discoveryAccess(actor, publicIds),
+    );
+    if (!view.enabled) return { enabled: false, markers: [] };
+    const currentPublicIds = (
       await this.db.runtime.query(
         "SELECT id FROM growth.creator_public WHERE id=ANY($1::uuid[]) AND state IN ('published','paused') AND document->>'verified'='true'",
         [view.markers.map((marker) => marker.creatorId)],
@@ -218,8 +438,10 @@ export class GrowthService {
     ).rows.map((row) => row.id);
     return {
       ...view,
-      markers: view.markers.filter((marker) =>
-        publicIds.includes(marker.creatorId),
+      markers: view.markers.filter(
+        (marker) =>
+          publicIds.includes(marker.creatorId) &&
+          currentPublicIds.includes(marker.creatorId),
       ),
     };
   }
@@ -230,25 +452,35 @@ export class GrowthService {
       .max(160)
       .regex(/^(?:|\/creators\/[a-z0-9_]{3,30}(?:\/posts\/[a-f0-9-]{36})?)$/u)
       .parse(after);
-    const result = await this.db.runtime.query(
-      `SELECT path,updated_at FROM (
-        SELECT '/creators/'||handle AS path,updated_at FROM growth.creator_public WHERE state='published' AND document->>'verified'='true'
+    const rows = await this.currentPublicRows(
+      async () =>
+        (
+          await this.db.runtime.query(
+            `SELECT creator_id,path,updated_at FROM (
+        SELECT id AS creator_id,'/creators/'||handle AS path,updated_at FROM growth.creator_public WHERE state='published' AND document->>'verified'='true'
         UNION ALL
-        SELECT '/creators/'||c.handle||'/posts/'||p.id AS path,GREATEST(c.updated_at,p.published_at) AS updated_at FROM growth.content_public p JOIN growth.creator_public c ON c.id=p.creator_id WHERE p.state='published' AND c.state='published' AND c.document->>'verified'='true'
+        SELECT c.id AS creator_id,'/creators/'||c.handle||'/posts/'||p.id AS path,GREATEST(c.updated_at,p.published_at) AS updated_at FROM growth.content_public p JOIN growth.creator_public c ON c.id=p.creator_id WHERE p.state='published' AND c.state='published' AND c.document->>'verified'='true'
       ) pages WHERE path>$1 ORDER BY path LIMIT 501`,
-      [cursor],
+            [cursor],
+          )
+        ).rows,
+      (row) => row.creator_id as string,
     );
-    const pages = result.rows.slice(0, 500).map((row) => ({
+    const pages = rows.slice(0, 500).map((row) => ({
       path: row.path as string,
       updatedAt: new Date(row.updated_at).toISOString(),
     }));
     return {
       pages,
-      nextCursor:
-        result.rows.length > 500 ? pages[pages.length - 1]!.path : null,
+      nextCursor: rows.length > 500 ? pages[pages.length - 1]!.path : null,
     };
   }
   async creator(handle: string) {
+    if (this.creatorSource) {
+      const id = await this.creatorSource.resolve(handle);
+      if (!id) return null;
+      await this.refreshCreator(id);
+    }
     const result = await this.db.runtime.query(
       "SELECT document FROM growth.creator_public WHERE handle=$1 AND state IN ('published','paused') AND document->>'verified'='true'",
       [handle],
@@ -256,6 +488,7 @@ export class GrowthService {
     return (result.rows[0]?.document ?? null) as PublicCreator | null;
   }
   async posts(creatorId: string) {
+    await this.refreshCreator(creatorId);
     const result = await this.db.runtime.query(
       "SELECT p.document FROM growth.content_public p JOIN growth.creator_public c ON c.id=p.creator_id WHERE p.creator_id=$1 AND p.state='published' AND c.state='published' AND c.document->>'verified'='true' ORDER BY p.published_at DESC LIMIT 30",
       [creatorId],
@@ -273,28 +506,37 @@ export class GrowthService {
     return post ? { creator, post } : null;
   }
   async follow(actor: Actor, creatorId: string, value: boolean) {
-    const result = await this.db.runtime.query(
-      "SELECT id FROM growth.creator_public WHERE id=$1 AND state IN ('published','paused')",
-      [creatorId],
+    z.uuid().parse(creatorId);
+    // Removal is always allowed under the actual fan session, including when
+    // the creator has since paused, lost verification or disappeared.
+    if (value) await this.refreshCreator(creatorId);
+    await this.db.actor(
+      actor,
+      null,
+      async (client) => {
+        if (value) {
+          const result = await client.query(
+            "SELECT id FROM growth.creator_public WHERE id=$1 AND state IN ('published','paused') AND document->>'verified'='true'",
+            [creatorId],
+          );
+          if (!result.rowCount)
+            throw new DomainError(
+              "creator_unavailable",
+              copy.growthThisCreatorIsUnavailable,
+              404,
+            );
+          await client.query(
+            "INSERT INTO growth.follow(account_id,creator_id) VALUES($1,$2) ON CONFLICT DO NOTHING",
+            [actor.accountId, creatorId],
+          );
+        } else
+          await client.query(
+            "DELETE FROM growth.follow WHERE account_id=$1 AND creator_id=$2",
+            [actor.accountId, creatorId],
+          );
+      },
+      creatorId,
     );
-    if (!result.rowCount)
-      throw new DomainError(
-        "creator_unavailable",
-        copy.growthThisCreatorIsUnavailable,
-        404,
-      );
-    await this.db.actor(actor, null, async (client) => {
-      if (value)
-        await client.query(
-          "INSERT INTO growth.follow(account_id,creator_id) VALUES($1,$2) ON CONFLICT DO NOTHING",
-          [actor.accountId, creatorId],
-        );
-      else
-        await client.query(
-          "DELETE FROM growth.follow WHERE account_id=$1 AND creator_id=$2",
-          [actor.accountId, creatorId],
-        );
-    });
     return { following: value };
   }
   async following(actor: Actor, creatorId: string) {
@@ -310,22 +552,107 @@ export class GrowthService {
     }));
   }
   async preferenceCreators(actor: Actor) {
-    return this.db.actor(
-      actor,
-      null,
-      async (client) =>
-        (
-          await client.query(
-            `SELECT DISTINCT c.id,c.document->>'name' AS name FROM growth.creator_public c WHERE c.state IN ('published','paused') AND (c.id IN (SELECT creator_id FROM growth.follow WHERE account_id=$1 UNION SELECT creator_id FROM growth.notification WHERE account_id=$1) OR c.id IN (SELECT jsonb_array_elements_text(document->'mutedCreators')::uuid FROM growth.preference WHERE account_id=$1)) ORDER BY name LIMIT 500`,
-            [actor.accountId],
-          )
-        ).rows,
+    return this.currentPublicRows(
+      () =>
+        this.db.actor(
+          actor,
+          null,
+          async (client) =>
+            (
+              await client.query(
+                `SELECT DISTINCT c.id,c.document->>'name' AS name FROM growth.creator_public c WHERE c.state IN ('published','paused') AND (c.id IN (SELECT creator_id FROM growth.follow WHERE account_id=$1 UNION SELECT creator_id FROM growth.notification WHERE account_id=$1) OR c.id IN (SELECT jsonb_array_elements_text(document->'mutedCreators')::uuid FROM growth.preference WHERE account_id=$1)) ORDER BY name LIMIT 500`,
+                [actor.accountId],
+              )
+            ).rows,
+        ),
+      (row) => row.id as string,
     );
   }
-  async home(actor: Actor) {
+  async home(actor: Actor, raw: unknown = {}) {
+    const input = z
+      .strictObject({
+        postsCursor: z.string().min(1).max(1024).optional(),
+        threadsCursor: z.string().min(1).max(6144).optional(),
+      })
+      .parse(raw);
+    let threadCursor: string | undefined;
+    if (input.threadsCursor) {
+      try {
+        const value = z
+          .union([
+            z.strictObject({
+              accountId: z.uuid(),
+              threadId: z.uuid(),
+              kind: z.literal("threads"),
+            }),
+            z.strictObject({
+              accountId: z.uuid(),
+              ownerCursor: z.string().min(1).max(3072),
+              kind: z.literal("threads-page"),
+            }),
+          ])
+          .parse(JSON.parse(this.open(input.threadsCursor)));
+        if (value.accountId !== actor.accountId)
+          throw new Error("cursor_account_changed");
+        threadCursor =
+          value.kind === "threads" ? value.threadId : value.ownerCursor;
+      } catch {
+        throw new DomainError(
+          "home_cursor_invalid",
+          copy.growthThisDestinationIsNoLongerAvailable,
+          400,
+        );
+      }
+    }
+    let before: { accountId: string; publishedAt: string; id: string } | null =
+      null;
+    if (input.postsCursor) {
+      try {
+        before = z
+          .strictObject({
+            accountId: z.uuid(),
+            publishedAt: z.iso.datetime(),
+            id: z.uuid(),
+          })
+          .parse(JSON.parse(this.open(input.postsCursor)));
+        if (before.accountId !== actor.accountId)
+          throw new Error("cursor_account_changed");
+      } catch {
+        throw new DomainError(
+          "home_cursor_invalid",
+          copy.growthThisDestinationIsNoLongerAvailable,
+          400,
+        );
+      }
+    }
+    const postsQuery = () =>
+      this.db.actor(
+        actor,
+        null,
+        async (client) =>
+          (
+            await client.query(
+              `SELECT p.id,p.document,c.document AS creator,to_char(p.published_at AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS cursor_time
+         FROM growth.content_public p JOIN growth.creator_public c ON c.id=p.creator_id
+         WHERE EXISTS(SELECT 1 FROM growth.follow f WHERE f.account_id=$1 AND f.creator_id=p.creator_id)
+         AND p.state='published' AND c.state='published' AND c.document->>'verified'='true'
+         AND ($2::timestamptz IS NULL OR (p.published_at,p.id)<($2::timestamptz,$3::uuid))
+         ORDER BY p.published_at DESC,p.id DESC LIMIT 31`,
+              [
+                actor.accountId,
+                before?.publishedAt ?? null,
+                before?.id ?? null,
+              ],
+            )
+          ).rows,
+      );
+    const currentPosts = await this.currentPublicRows(
+      postsQuery,
+      (row) => row.creator.id as string,
+    );
     const own = await this.db.actor(actor, null, async (client) => {
       const follows = await client.query(
-        "SELECT creator_id FROM growth.follow WHERE account_id=$1",
+        "SELECT count(*)::int AS count FROM growth.follow WHERE account_id=$1",
         [actor.accountId],
       );
       const unread = await client.query(
@@ -333,28 +660,90 @@ export class GrowthService {
         [actor.accountId],
       );
       return {
-        ids: follows.rows.map((r) => r.creator_id as string),
+        followingCount: follows.rows[0].count as number,
         unread: unread.rows[0].count,
+        posts: currentPosts,
       };
     });
-    const entries = (await this.owners.home(actor))
-      .filter((e) => Destination.safeParse(e.destination).success)
-      .sort(
-        (a, b) =>
-          Number(b.kind !== "thread") - Number(a.kind !== "thread") ||
-          b.updatedAt.localeCompare(a.updatedAt),
+    if (threadCursor && !this.owners.homePage)
+      throw new DomainError(
+        "home_cursor_unavailable",
+        copy.growthThisDestinationIsNoLongerAvailable,
+        503,
       );
-    const result = await this.db.runtime.query(
-      "SELECT p.document,c.document AS creator FROM growth.content_public p JOIN growth.creator_public c ON c.id=p.creator_id WHERE p.creator_id=ANY($1::uuid[]) AND p.state='published' AND c.state='published' AND c.document->>'verified'='true' ORDER BY p.published_at DESC LIMIT 30",
-      [own.ids],
-    );
+    const page = this.owners.homePage
+      ? await this.owners.homePage(actor, threadCursor)
+      : {
+          entries: await this.owners.home(actor),
+          nextCursor: null,
+          order: "directory" as const,
+        };
+    if (
+      page.entries.length > 100 ||
+      (page.nextCursor &&
+        (!z.string().min(1).max(3072).safeParse(page.nextCursor).success ||
+          page.nextCursor === threadCursor))
+    )
+      throw new DomainError(
+        "home_scope_invalid",
+        copy.growthErrorPrivateReplyUnavailable,
+        503,
+      );
+    const entries = page.entries
+      .filter((e) => Destination.safeParse(e.destination).success)
+      .sort(compareHomeActivity)
+      .map((entry) => ({
+        id: entry.id,
+        creatorId: entry.creatorId,
+        creatorName: entry.creatorName,
+        label: entry.label,
+        preview: entry.preview,
+        destination: entry.destination,
+        updatedAt: entry.updatedAt,
+        kind: entry.kind,
+      }));
+    const posts = own.posts.slice(0, 30);
+    const last = posts.at(-1);
     return {
       entries,
-      posts: result.rows.map((r) => ({
-        post: r.document as PublicContent,
-        creator: r.creator as PublicCreator,
-      })),
-      following: own.ids,
+      posts: posts.map((r) => {
+        const post = r.document as PublicContent;
+        const characters = Array.from(post.body);
+        return {
+          post: {
+            id: post.id,
+            creatorId: post.creatorId,
+            version: post.version,
+            title: post.title,
+            authorLabel: post.authorLabel,
+            preview:
+              characters.slice(0, 480).join("") +
+              (characters.length > 480 ? "…" : ""),
+          },
+          creator: r.creator as PublicCreator,
+        };
+      }),
+      followingCount: own.followingCount,
+      threadOrder: page.order ?? "directory",
+      nextThreadsCursor: page.nextCursor
+        ? this.seal(
+            JSON.stringify({
+              accountId: actor.accountId,
+              ownerCursor: page.nextCursor,
+              kind: "threads-page",
+            }),
+          )
+        : null,
+      nextPostsCursor:
+        own.posts.length > 30 && last
+          ? this.seal(
+              JSON.stringify({
+                accountId: actor.accountId,
+                publishedAt: last.cursor_time,
+                id: last.id,
+              }),
+            )
+          : null,
       unread: own.unread,
     };
   }
@@ -387,7 +776,7 @@ export class GrowthService {
           )
         ).rows,
     );
-    return this.notifications.listCurrent(rows);
+    return this.notifications.listCurrent(rows, actor);
   }
   async markRead(actor: Actor, id: string) {
     return this.db.actor(actor, null, async (client) => {
@@ -404,6 +793,27 @@ export class GrowthService {
       return { read: true };
     });
   }
+  async notification(actor: Actor, id: string) {
+    const rows = await this.db.actor(
+      actor,
+      null,
+      async (client) =>
+        (
+          await client.query(
+            "SELECT * FROM growth.notification WHERE id=$1 AND account_id=$2",
+            [id, actor.accountId],
+          )
+        ).rows,
+    );
+    const current = (await this.notifications.listCurrent(rows, actor))[0];
+    if (!current)
+      throw new DomainError(
+        "notification_unavailable",
+        copy.growthErrorNotificationUnavailable,
+        404,
+      );
+    return current;
+  }
   async registerDevice(actor: Actor, input: unknown) {
     const value = z
       .strictObject({
@@ -411,32 +821,197 @@ export class GrowthService {
         platform: z.enum(["ios", "android"]),
         token: z.string().min(16).max(4096),
         permission: z.enum(["granted", "denied"]),
+        registrationRevision: z
+          .number()
+          .int()
+          .min(1)
+          .max(Number.MAX_SAFE_INTEGER),
       })
       .parse(input);
-    return this.db.actor(actor, null, async (client) => {
-      const hash = createHash("sha256").update(value.token).digest("hex");
-      const result = await client.query(
-        `INSERT INTO growth.device(account_id,installation_id,platform,token_hash,encrypted_token,permission,revoked_at) VALUES($1,$2,$3,$4,$5,$6,CASE WHEN $6='denied' THEN now() ELSE NULL END)
-        ON CONFLICT(account_id,installation_id) DO UPDATE SET token_hash=excluded.token_hash,encrypted_token=excluded.encrypted_token,permission=excluded.permission,revoked_at=excluded.revoked_at,updated_at=now() RETURNING id`,
-        [
+    const hash = createHash("sha256").update(value.token).digest("hex");
+    return this.db.fencedWorkerActor(
+      actor,
+      async (client) => {
+        // Serialize only matching physical registration pointers. Never use
+        // a previous account identifier as positive runtime authority.
+        for (const key of [
+          `growth.device:installation:${value.installationId}`,
+          `growth.device:token:${hash}`,
+        ].sort())
+          await client.query(
+            "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+            [key],
+          );
+        const previous = await client.query(
+          "SELECT account_id,installation_id,platform,permission,token_hash,encrypted_token FROM growth.device WHERE installation_id=$1 OR token_hash=$2 LIMIT 257",
+          [value.installationId, hash],
+        );
+        if (previous.rowCount! > 256)
+          throw new DomainError(
+            "device_registration_unavailable",
+            copy.growthErrorGrowthAuthorityRequired,
+            503,
+          );
+        await this.erasure.lockSubjects(client, [
           actor.accountId,
-          value.installationId,
-          value.platform,
-          hash,
-          this.seal(value.token),
-          value.permission,
-        ],
-      );
-      return { id: result.rows[0].id };
-    });
+          ...previous.rows.map((row) => row.account_id),
+        ]);
+        this.devices.assertRegistrationRevision(
+          actor.accountId,
+          value,
+          previous.rows,
+        );
+        if (!(await this.erasure.subjects(client, [actor.accountId])))
+          throw new DomainError(
+            "growth_data_erased",
+            copy.growthErrorGrowthDataErased2,
+            410,
+          );
+      },
+      async (client) => {
+        // Retire former bindings without losing their installation high-water
+        // marks. Non-hex hashes cannot collide with real registration hashes.
+        const former = await client.query(
+          "SELECT id,account_id,installation_id,platform,token_hash,encrypted_token FROM growth.device WHERE (installation_id=$1 OR token_hash=$2) AND (account_id<>$3 OR installation_id<>$1) FOR UPDATE",
+          [value.installationId, hash, actor.accountId],
+        );
+        for (const row of former.rows) {
+          const revision = Math.max(
+            this.devices.revision(row),
+            row.installation_id === value.installationId
+              ? value.registrationRevision
+              : 1,
+          );
+          const tombstone = this.devices.tombstone(
+            row.account_id,
+            row.installation_id,
+            row.platform,
+            revision,
+          );
+          await client.query(
+            "UPDATE growth.device SET token_hash=$2,encrypted_token=$3,permission='denied',revoked_at=clock_timestamp(),updated_at=clock_timestamp() WHERE id=$1",
+            [row.id, tombstone.hash, tombstone.encrypted],
+          );
+        }
+        const denied =
+          value.permission === "denied"
+            ? this.devices.tombstone(
+                actor.accountId,
+                value.installationId,
+                value.platform,
+                value.registrationRevision,
+              )
+            : null;
+        const result = await client.query(
+          `INSERT INTO growth.device(account_id,installation_id,platform,token_hash,encrypted_token,permission,revoked_at) VALUES($1,$2,$3,$4,$5,$6,CASE WHEN $6='denied' THEN now() ELSE NULL END)
+        ON CONFLICT(account_id,installation_id) DO UPDATE SET platform=excluded.platform,token_hash=excluded.token_hash,encrypted_token=excluded.encrypted_token,permission=excluded.permission,revoked_at=excluded.revoked_at,updated_at=now() RETURNING id`,
+          [
+            actor.accountId,
+            value.installationId,
+            value.platform,
+            denied?.hash ?? hash,
+            denied?.encrypted ??
+              this.devices.capture(
+                actor.accountId,
+                value.token,
+                value.installationId,
+                value.platform,
+                value.registrationRevision,
+              ),
+            value.permission,
+          ],
+        );
+        return { id: result.rows[0].id };
+      },
+    );
   }
-  async revokeDevice(actor: Actor, id: string) {
-    await this.db.actor(actor, null, async (client) => {
-      await client.query(
-        "UPDATE growth.device SET revoked_at=now(),permission='denied' WHERE account_id=$1 AND (id=$2 OR installation_id=$2)",
-        [actor.accountId, id],
-      );
-    });
+  async revokeDevice(actor: Actor, id: string, input?: unknown) {
+    const value = z
+      .strictObject({
+        registrationRevision: z
+          .number()
+          .int()
+          .min(1)
+          .max(Number.MAX_SAFE_INTEGER),
+        platform: z.enum(["ios", "android"]),
+      })
+      .parse(input ?? {});
+    const revision = value.registrationRevision;
+    await this.db.fencedWorkerActor(
+      actor,
+      async (client) => {
+        // Ordered revocation uses the installation ID, matching registration.
+        await client.query(
+          "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+          [`growth.device:installation:${id}`],
+        );
+        const previous = await client.query(
+          "SELECT account_id FROM growth.device WHERE installation_id=$1 LIMIT 257",
+          [id],
+        );
+        if (previous.rowCount! > 256)
+          throw new DomainError(
+            "device_registration_unavailable",
+            copy.growthErrorGrowthAuthorityRequired,
+            503,
+          );
+        await this.erasure.lockSubjects(client, [
+          actor.accountId,
+          ...previous.rows.map((row) => row.account_id),
+        ]);
+        if (!(await this.erasure.subjects(client, [actor.accountId])))
+          throw new DomainError(
+            "growth_data_erased",
+            copy.growthErrorGrowthDataErased2,
+            410,
+          );
+      },
+      async (client) => {
+        const current = await client.query(
+          "SELECT account_id,installation_id,platform,token_hash,encrypted_token FROM growth.device WHERE installation_id=$1 FOR UPDATE",
+          [id],
+        );
+        for (const row of current.rows) {
+          const priorRevision = this.devices.revision(row);
+          if (
+            revision < priorRevision ||
+            (row.account_id !== actor.accountId && revision === priorRevision)
+          )
+            throw new DomainError(
+              "device_registration_stale",
+              copy.growthThisActionIsUnavailableToThisAccount,
+              409,
+            );
+          if (
+            row.account_id === actor.accountId &&
+            row.platform !== value.platform
+          )
+            throw new DomainError(
+              "device_registration_stale",
+              copy.growthThisActionIsUnavailableToThisAccount,
+              409,
+            );
+        }
+        const tombstone = this.devices.tombstone(
+          actor.accountId,
+          id,
+          value.platform,
+          revision,
+        );
+        // Even a revoke arriving before the first registration establishes
+        // a durable high-water mark. Other accounts' current rows survive.
+        await client.query(
+          "INSERT INTO growth.device(account_id,installation_id,platform,token_hash,encrypted_token,permission,revoked_at) VALUES($1,$2,$3,$4,$5,'denied',clock_timestamp()) ON CONFLICT(account_id,installation_id) DO UPDATE SET token_hash=excluded.token_hash,encrypted_token=excluded.encrypted_token,permission='denied',revoked_at=clock_timestamp(),updated_at=clock_timestamp()",
+          [
+            actor.accountId,
+            id,
+            value.platform,
+            tombstone.hash,
+            tombstone.encrypted,
+          ],
+        );
+      },
+    );
     return { revoked: true };
   }
   /** W1 supplies a verified email binding. There is no client-authored verification flag. */
@@ -462,73 +1037,211 @@ export class GrowthService {
     return { unsubscribeToken: token };
   }
   async unsubscribe(token: string) {
-    await this.db.worker.query(
-      "UPDATE growth.email SET unsubscribed_at=now() WHERE unsubscribe_hash=$1",
-      [createHash("sha256").update(token).digest("hex")],
-    );
+    const hash = createHash("sha256").update(token).digest("hex");
+    const binding = (
+      await this.db.worker.query(
+        "SELECT account_id FROM growth.email WHERE unsubscribe_hash=$1",
+        [hash],
+      )
+    ).rows[0];
+    if (binding)
+      await this.db.transaction(this.db.worker, async (client) => {
+        if (!(await this.erasure.subjects(client, [binding.account_id])))
+          return;
+        await client.query(
+          "UPDATE growth.email SET unsubscribed_at=coalesce(unsubscribed_at,now()) WHERE account_id=$1 AND unsubscribe_hash=$2",
+          [binding.account_id, hash],
+        );
+      });
     return { unsubscribed: true };
   }
-  /** Only a signature-verified provider webhook calls this. */
-  async bounce(accountId: string) {
-    await this.db.worker.query(
-      "UPDATE growth.email SET bounced_at=now() WHERE account_id=$1",
-      [accountId],
-    );
-  }
-  async createShare(actor: Actor, grantId: string) {
-    const source = await this.owners.shareSource(actor, grantId);
-    if (!source)
-      throw new DomainError(
-        "sharing_unavailable",
-        copy.growthErrorSharingUnavailable,
+  /** Only a signature-verified provider webhook calls this with its actual
+   * recipient. A delayed bounce cannot suppress a replacement email binding. */
+  async bounce(accountId: string, address: string) {
+    z.uuid().parse(accountId);
+    const bouncedAddress = z.email().parse(address);
+    await this.db.transaction(this.db.worker, async (client) => {
+      if (!(await this.erasure.subjects(client, [accountId]))) return;
+      const current = (
+        await client.query(
+          "SELECT encrypted_address FROM growth.email WHERE account_id=$1",
+          [accountId],
+        )
+      ).rows[0];
+      if (!current || this.open(current.encrypted_address) !== bouncedAddress)
+        return;
+      await client.query(
+        "UPDATE growth.email SET bounced_at=coalesce(bounced_at,now()) WHERE account_id=$1 AND encrypted_address=$2",
+        [accountId, current.encrypted_address],
       );
-    const current = await this.owners.shareStatus(grantId, source);
-    if (!current.valid)
-      throw new DomainError(
-        "sharing_unavailable",
-        copy.growthErrorSharingUnavailable,
-      );
-    // Canonical W1/W4/W5 adapter attests exact delivered version, creator permission and fan choice.
-    return this.db.actor(actor, null, async (client) => {
-      const result = await client.query(
-        "INSERT INTO growth.share(account_id,grant_id,source_version,source) VALUES($1,$2,$3,$4) ON CONFLICT(grant_id,source_version) DO NOTHING RETURNING id",
-        [actor.accountId, grantId, source.version, source],
-      );
-      if (result.rowCount) return { id: result.rows[0].id };
-      const prior = await client.query(
-        "SELECT id,source FROM growth.share WHERE grant_id=$1 AND source_version=$2",
-        [grantId, source.version],
-      );
-      if (
-        !prior.rowCount ||
-        contentHash(prior.rows[0].source) !== contentHash(source)
-      )
-        throw new DomainError(
-          "share_version_conflict",
-          copy.growthErrorShareVersionConflict,
-          409,
-        );
-      return { id: prior.rows[0].id };
     });
   }
+  async createShare(actor: Actor, grantId: string) {
+    z.uuid().parse(grantId);
+    const supplied = await this.owners.shareSource(actor, grantId);
+    if (!supplied)
+      throw new DomainError(
+        "sharing_unavailable",
+        copy.growthErrorSharingUnavailable,
+      );
+    const source = ShareSourceRecord.parse(supplied);
+    // Canonical W1/W4/W5 adapter attests exact delivered version, creator permission and fan choice.
+    return this.db.actor(
+      actor,
+      null,
+      async (client) => {
+        // Hold the account/creator negative erasure fences through the final
+        // owner read and persistence, while the canonical session is current.
+        const current = await this.owners.shareStatus(grantId, source);
+        if (!current.valid)
+          throw new DomainError(
+            "sharing_unavailable",
+            copy.growthErrorSharingUnavailable,
+          );
+        const result = await client.query(
+          "INSERT INTO growth.share(account_id,grant_id,source_version,source) VALUES($1,$2,$3,$4) ON CONFLICT(grant_id,source_version) DO NOTHING RETURNING id",
+          [actor.accountId, grantId, source.version, source],
+        );
+        if (result.rowCount) return { id: result.rows[0].id };
+        const prior = await client.query(
+          "SELECT id,source FROM growth.share WHERE grant_id=$1 AND source_version=$2",
+          [grantId, source.version],
+        );
+        if (
+          !prior.rowCount ||
+          contentHash(prior.rows[0].source) !== contentHash(source)
+        )
+          throw new DomainError(
+            "share_version_conflict",
+            copy.growthErrorShareVersionConflict,
+            409,
+          );
+        return { id: prior.rows[0].id };
+      },
+      source.creatorId,
+    );
+  }
   async share(id: string) {
-    const result = await this.db.worker.query(
-      "SELECT id,grant_id,source FROM growth.share WHERE id=$1",
-      [id],
-    );
-    if (!result.rowCount) return null;
-    const source = result.rows[0].source as ShareSource;
-    const status = await this.owners.shareStatus(
-      result.rows[0].grant_id,
-      source,
-    );
-    return status.valid
-      ? {
-          id,
-          source: { ...source, correction: status.correction },
-          state: "valid" as const,
-        }
-      : { id, state: "withdrawn" as const };
+    z.uuid().parse(id);
+    return this.db.transaction(this.db.worker, async (client) => {
+      // Read only negative scope metadata before taking the erasure fences.
+      // Acquire them before any row lock to preserve deletion's lock order.
+      const binding = (
+        await client.query<{
+          account_id: string;
+          creator_id: string;
+        }>(
+          "SELECT account_id,source->>'creatorId' AS creator_id FROM growth.share WHERE id=$1",
+          [id],
+        )
+      ).rows[0];
+      if (!binding) return null;
+      const accountId = z.uuid().parse(binding.account_id);
+      const creatorId = z.uuid().parse(binding.creator_id);
+      if (!(await this.erasure.subjects(client, [accountId], [creatorId])))
+        return { id, state: "withdrawn" as const };
+      const row = (
+        await client.query<{
+          grant_id: string;
+          source: unknown;
+        }>(
+          "SELECT grant_id,source FROM growth.share WHERE id=$1 AND account_id=$2 AND source->>'creatorId'=$3",
+          [id, accountId, creatorId],
+        )
+      ).rows[0];
+      if (!row) return { id, state: "withdrawn" as const };
+      const source = ShareSourceRecord.parse(row.source);
+      const status = await this.owners.shareStatus(row.grant_id, source);
+      return status.valid
+        ? {
+            id,
+            source: {
+              ...source,
+              correction: z
+                .string()
+                .max(20000)
+                .nullable()
+                .parse(status.correction),
+            },
+            verificationURL: this.verificationOrigin
+              ? `${this.verificationOrigin}/share/${id}`
+              : null,
+            state: "valid" as const,
+          }
+        : { id, state: "withdrawn" as const };
+    });
+  }
+  async shareExport(id: string) {
+    // Recheck the canonical grant/source on the export action, rather than
+    // exporting the potentially stale content a client already displayed.
+    const share = await this.share(z.uuid().parse(id));
+    if (!share || share.state !== "valid")
+      throw new DomainError(
+        "share_unavailable",
+        copy.growthCardUnavailable,
+        410,
+      );
+    if (!share.verificationURL)
+      throw new DomainError(
+        "share_origin_unconfigured",
+        copy.growthImageNeedsOrigin,
+        503,
+      );
+    const source = share.source;
+    if (
+      source.text.length > 100000 ||
+      source.creatorName.length > 80 ||
+      !["human_creator", "approved_draft"].includes(source.authorKind)
+    )
+      throw new DomainError(
+        "share_source_unavailable",
+        copy.growthCardUnavailable,
+        503,
+      );
+    const author =
+      source.authorKind === "approved_draft"
+        ? formatCopy("growthPreparedByAiApprovedBy", {
+            value1: source.creatorName,
+          })
+        : source.handle
+          ? formatCopy("growthSharedReplyTo", {
+              name: source.creatorName,
+              handle: source.handle,
+            })
+          : formatCopy("growthSharedPersonalReply", {
+              name: source.creatorName,
+            });
+    return {
+      id: share.id,
+      version: source.version,
+      sourceHash: source.contentHash,
+      authorLabel: author,
+      authorKind: source.authorKind,
+      verificationURL: share.verificationURL,
+      text: [
+        author,
+        "",
+        source.text,
+        "",
+        formatCopy("growthSignedByVersion", {
+          name: source.creatorName,
+          version: source.version,
+        }),
+        formatCopy("growthVerifyThisImmutableVersion", {
+          value1: source.version,
+          value2: share.verificationURL,
+        }),
+        ...(source.correction
+          ? [
+              "",
+              formatCopy("growthSNoteOnThisReply", {
+                value1: source.creatorName,
+                value2: source.correction,
+              }),
+            ]
+          : []),
+      ].join("\n"),
+    };
   }
   async createInvite(actor: Actor, input: unknown) {
     const value = z
@@ -567,6 +1280,16 @@ export class GrowthService {
     });
   }
   async invite(id: string) {
+    if (this.creatorSource) {
+      const row = (
+        await this.db.worker.query<{ creator_id: string }>(
+          "SELECT creator_id FROM growth.invite WHERE id=$1 AND revoked_at IS NULL AND expires_at>now()",
+          [id],
+        )
+      ).rows[0];
+      if (!row) return null;
+      await this.refreshCreator(row.creator_id);
+    }
     const result = await this.db.worker.query(
       "SELECT i.context_id,c.document FROM growth.invite i JOIN growth.creator_public c ON c.id=i.creator_id WHERE i.id=$1 AND i.revoked_at IS NULL AND i.expires_at>now() AND c.state='published' AND c.document->>'verified'='true'",
       [id],
@@ -940,13 +1663,27 @@ export class GrowthService {
   }
   async privacyDelete(
     accountId: string,
-    ownedCreatorIds: readonly string[] = [],
-    signal?: AbortSignal,
+    signal: AbortSignal,
+    assertAuthority: (client: PoolClient) => Promise<readonly string[]>,
   ) {
     await this.db.transaction(
       this.db.worker,
       async (client) => {
+        const ownedCreatorIds = await assertAuthority(client);
         await this.erasure.mark(client, accountId, ownedCreatorIds);
+        await assertAuthority(client);
+        const checkpointSchema = (
+          await client.query(
+            "SELECT to_regclass('growth.source_scan_checkpoint') IS NOT NULL AND (SELECT count(*)=2 FROM information_schema.columns WHERE table_schema='growth' AND table_name='source_scan_checkpoint' AND column_name IN ('generation','expires_at')) AS ready",
+          )
+        ).rows[0]?.ready;
+        if (checkpointSchema) {
+          // Generic directory pointers may reference this subject. Reset all
+          // pointers, keeping generations so pre-erasure scans cannot advance.
+          await client.query(
+            "UPDATE growth.source_scan_checkpoint SET encrypted_cursor=NULL,generation=generation+1,updated_at=now(),expires_at=now()",
+          );
+        }
         await client.query(
           "UPDATE growth.delivery SET state='suppressed' WHERE account_id=$1 AND state IN ('queued','leased')",
           [accountId],
@@ -974,11 +1711,16 @@ export class GrowthService {
           );
         }
         await client.query(
-          "UPDATE growth.event_inbox SET envelope=jsonb_set(envelope,'{recipients}',coalesce((SELECT jsonb_agg(r) FROM jsonb_array_elements(envelope->'recipients') r WHERE r->>'accountId'<>$1),'[]'::jsonb)) WHERE envelope->'recipients' @> jsonb_build_array(jsonb_build_object('accountId',$1::text))",
-          [accountId],
-        );
-        await client.query(
-          "UPDATE growth.event_inbox e SET envelope='{\"erased\":true}'::jsonb WHERE NOT EXISTS(SELECT 1 FROM growth.notification n WHERE n.event_id=e.id)",
+          // Only this verified subject's envelopes are affected. An unrelated
+          // event awaiting its first notification is not an erased event.
+          `UPDATE growth.event_inbox SET envelope=CASE
+           WHEN envelope->>'creatorId'=ANY($2::text[])
+             OR NOT EXISTS(SELECT 1 FROM jsonb_array_elements(envelope->'recipients') r WHERE r->>'accountId'<>$1)
+           THEN '{"erased":true}'::jsonb
+           ELSE jsonb_set(envelope,'{recipients}',coalesce((SELECT jsonb_agg(r) FROM jsonb_array_elements(envelope->'recipients') r WHERE r->>'accountId'<>$1),'[]'::jsonb)) END
+           WHERE envelope->>'creatorId'=ANY($2::text[])
+             OR envelope->'recipients' @> jsonb_build_array(jsonb_build_object('accountId',$1::text))`,
+          [accountId, ownedCreatorIds],
         );
         await client.query("DELETE FROM growth.invite WHERE created_by=$1", [
           accountId,
@@ -1015,12 +1757,16 @@ export class GrowthService {
             [ownedCreatorIds],
           );
         await client.query(
-          "UPDATE growth.producer_relay SET envelope=jsonb_set(envelope,'{recipients}',coalesce((SELECT jsonb_agg(r) FROM jsonb_array_elements(envelope->'recipients') r WHERE r->>'accountId'<>$1),'[]'::jsonb)) WHERE envelope->'recipients' @> jsonb_build_array(jsonb_build_object('accountId',$1::text))",
-          [accountId],
+          // Delete this creator's relays or this account's last-recipient
+          // relays before stripping it from the remaining shared envelopes.
+          `DELETE FROM growth.producer_relay WHERE creator_id=ANY($2::uuid[])
+           OR (envelope->'recipients' @> jsonb_build_array(jsonb_build_object('accountId',$1::text))
+             AND NOT EXISTS(SELECT 1 FROM jsonb_array_elements(envelope->'recipients') r WHERE r->>'accountId'<>$1))`,
+          [accountId, ownedCreatorIds],
         );
         await client.query(
-          "DELETE FROM growth.producer_relay WHERE creator_id=ANY($1::uuid[]) OR envelope->'recipients'='[]'::jsonb",
-          [ownedCreatorIds],
+          "UPDATE growth.producer_relay SET envelope=jsonb_set(envelope,'{recipients}',coalesce((SELECT jsonb_agg(r) FROM jsonb_array_elements(envelope->'recipients') r WHERE r->>'accountId'<>$1),'[]'::jsonb)) WHERE envelope->'recipients' @> jsonb_build_array(jsonb_build_object('accountId',$1::text))",
+          [accountId],
         );
         await client.query(
           "DELETE FROM growth.producer_cursor WHERE creator_id=ANY($1::uuid[])",
@@ -1042,6 +1788,8 @@ export class GrowthService {
           "DELETE FROM growth.creator_public WHERE id=ANY($1::uuid[])",
           [ownedCreatorIds],
         );
+        // Losing the exact task lease rolls back the whole erasure transaction.
+        await assertAuthority(client);
       },
       signal,
     );

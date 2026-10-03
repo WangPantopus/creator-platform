@@ -1,0 +1,62 @@
+{
+  "observedAt": "2026-10-01T18:39:41.100058+00:00",
+  "source": "be61eb4ad5fc05009dc7c66f2acbe782e361a36e",
+  "reviewedMain": "c1c615e6ece53bff4bc6a47d7f4d332757df1295",
+  "scopeComplete": false,
+  "personalImplementation": true,
+  "delegated": false,
+  "newTestsOrSavedFlows": false,
+  "signedPreview": {
+    "source": "d4ef4768dfa7268fed7077c63bd8e4918d6d0bc3",
+    "checksSession": 66569,
+    "exitCode": 0,
+    "existingBackendContracts": 9,
+    "proof": "Exact complete text/correction command hash, actual creator author, current scoped W1 verification on the held thread client. Rich approval/recording requires its current canonical command and remains unavailable/pending without it.",
+    "genuineOwnerOperation": "unavailable; no verified creator/signed records in retained data"
+  },
+  "providerDevice": {
+    "source": "be61eb4ad5fc05009dc7c66f2acbe782e361a36e",
+    "checksSession": 10238,
+    "exitCode": 0,
+    "build": true,
+    "lint": true,
+    "format": true,
+    "existingBackendContracts": 9,
+    "pushBatchDevices": 1,
+    "claims": "One push lease immediately before work; durable per-token terminal receipts allow later devices to advance. Progress does not consume the failure budget. Current unexpired delivery row is held FOR NO KEY UPDATE during submission; unknown receipts never become automatic resends.",
+    "email": "Actual bounded leased delivery IDs bind per-digest receipts in the existing provider ledger. Sending receipts commit before transport submission. Invalid/missing acceptance, timeout or lost response stays unknown; known accepted receipts survive a failed delivery-state commit without resending. No email address/body stored in the receipt.",
+    "registration": "Physical installation/token locks precede sorted negative account fences. Actual current session remains held through atomic old-binding removal and new registration. Platform is refreshed on rotation.",
+    "optOut": "Unsubscribe and actual current-address bounce suppression use the dispatch erasure fence. A rotated unsubscribe token or stale-address bounce cannot suppress a replacement binding.",
+    "knownFailures": [
+      "Initial session96169 exited1 at ESLint no-control-regex; no backend build ran in that attempt.",
+      "Session78119 exited1 at ESLint prefer-const; preserved failed lint log. Final source repairs both."
+    ],
+    "operation": "Source/checks only. No APNs, FCM or email send; genuine provider/device permission, rotation/account change, partial outcomes, restart and reconciliation acceptance remain open.",
+    "limits": [
+      "Registration refuses more than256 distinct account aliases for one physical pointer; no unbounded lock list.",
+      "Installation lookup relies on existing schema and SQL timeout; no installation-index rollout or large-device latency claim.",
+      "Unknown external outcomes still require actual provider reconciliation; no exactly-once claim.",
+      "The approved HTTPS origin, genuine providers, devices and signature-verified bounce ingress remain unconfigured."
+    ]
+  },
+  "primaryResponseContracts": [
+    "https://firebase.google.com/docs/cloud-messaging/send/v1-api",
+    "https://firebase.google.com/docs/cloud-messaging/error-codes",
+    "https://developer.apple.com/documentation/usernotifications/handling-notification-responses-from-apns"
+  ],
+  "ci": {
+    "latestPublishedSource": "7f0c0f1e11e2af45011f7681ba4bbc7bc65783a5",
+    "trustRun": 36900487114,
+    "trust": "success",
+    "foundationRun": 36900409624,
+    "webBackend": "success",
+    "androidRuntime": "success",
+    "webVisual": "queued",
+    "iosFoundation": "queued",
+    "androidFoundation": "queued",
+    "currentSource": "not yet published; fresh exact-head CI required",
+    "prior3033959Foundation": "Canceled by subsequent owned branch publication; pre-cancellation successes/queues remain preserved."
+  },
+  "resourceBoundary": "All owned DB/API/web/device runtimes remain stopped; peer W4 container untouched. No new native restoration for source-only provider work.",
+  "remaining": "Entire original W7 matrix remains binding: all19 actual notification lifecycles, populated public/native/design journeys, complete W4/W6 Home composition/global recency, genuine sharing/credit/insights/activation/retention, approved opportunities and protected narrow/large privacy operation. No completion or merge readiness is claimed."
+}

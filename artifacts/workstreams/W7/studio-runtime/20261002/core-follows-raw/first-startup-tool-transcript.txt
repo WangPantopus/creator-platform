@@ -1,0 +1,8 @@
+Transcribed from personal tool output, not a direct command log. No catalogue receipt was produced by this failed first read.
+
+Error: Connection terminated unexpectedly
+    at /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/node_modules/.pnpm/pg-pool@3.14.0_pg@8.23.0/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async file:///Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/backend/[eval1]:1:460
+
+The dependent docker-stop command did not run after that failure; the primary explicitly verified owned pg_isready, repeated the readonly catalogue successfully and then stopped the owned container. No service or peer resource was touched.

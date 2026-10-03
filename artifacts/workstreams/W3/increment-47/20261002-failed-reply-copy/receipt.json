@@ -1,0 +1,31 @@
+{
+  "source": "8ceed6971ed11ba24e909a526fc97edef2132843",
+  "recordedAt": "2026-10-02T12:40:14.849007+00:00",
+  "checks": {
+    "generationCheck": true,
+    "webTypecheck": true,
+    "affectedESLint": true,
+    "prettierCheck": true,
+    "diffCheck": true
+  },
+  "shippingBuilds": {
+    "ios": {
+      "exit": 0,
+      "normalSimulatorSigning": true,
+      "sha256": "ae5854f970fe5e69b19ff3dcdefe11ed022ecd7f5e11cda1e4c0d7c4630a4080",
+      "logSha256": "3defb313f4e3c58eba50bf1665550f9a871610bc1aa022ace6e72adabe6c5bf9"
+    },
+    "android": {
+      "exit": 0,
+      "sha256": "499bb0e96906cf6fec7616d5c86135fa898421a9a9d530bcad954740473e4242",
+      "logSha256": "1e36caa3f6583ccbb7dc55a069da707473c01b065ddef70245efa891409193a1"
+    }
+  },
+  "heavyBuildsSequential": true,
+  "devicesBooted": false,
+  "failedReplyPersonallyOperated": false,
+  "financialOutcomeInferred": false,
+  "newTestCode": false,
+  "trafficClosed": true,
+  "w3Complete": false
+}

@@ -21,6 +21,7 @@ import {
 import type { EffectHook } from "../trust/contracts.js";
 import type { PreparedGenerationJournal } from "./generation-journal.js";
 import type { PreparedUsageRetention } from "./usage-retention.js";
+import type { PreparedAgentPrivacyExport } from "./privacy-export-snapshot.js";
 
 /** The configured host supplies canonical authorities and approved providers.
  * Missing producers remain explicit; constructing Studio never enables fan delivery. */
@@ -35,6 +36,7 @@ export function createAgentDomain(input: {
   exports?: AgentExportArtifactSink;
   /** Opt-in owner producer for W8's actual configured stream coordinator/store. */
   coordinatorExportStream?: boolean;
+  privacyExportSnapshot?: PreparedAgentPrivacyExport;
   usageJournal?: PreparedGenerationJournal;
   usageRetention?: PreparedUsageRetention;
   settleDeparture?: (
@@ -75,6 +77,7 @@ export function createAgentDomain(input: {
           input.trust,
           input.exports,
           input.coordinatorExportStream,
+          input.privacyExportSnapshot,
         )
       : undefined,
     effects:
@@ -103,7 +106,9 @@ export function createAgentDomain(input: {
       trust: Boolean(input.trust && input.settleDeparture),
       exports: Boolean(input.exports),
       exportStreamProducer: Boolean(
-        input.trust && input.coordinatorExportStream,
+        input.trust &&
+          input.coordinatorExportStream &&
+          input.privacyExportSnapshot,
       ),
       usageJournal: Boolean(input.usageJournal),
     },

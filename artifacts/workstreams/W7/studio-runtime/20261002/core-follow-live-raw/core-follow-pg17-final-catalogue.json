@@ -1,0 +1,14 @@
+{
+  "postgres": "17.11 (Debian 17.11-1.pgdg12+2)",
+  "migrations": 40,
+  "connection_limit": 0,
+  "admission": "creator-platform:restored-traffic-closed",
+  "creators": 0,
+  "fans": 0,
+  "follows": 0,
+  "purpose": "Actual final unregistered DDL only in independent empty traffic-closed qualification database; no migration0101, no shipping authority or Follow behavior accepted",
+  "functionDefinitionSha256": "1b09d91fe20b712f5452ca5d79fa352f94482283edeaaac4543558975c761a78",
+  "proposalSha256": "29c0261cdfce50be434d8b8b49c21e23df6057613d521c8e40a13c3928d63796",
+  "actualAdapterSchemaReady": false,
+  "missingMigrationReceipt": true
+}

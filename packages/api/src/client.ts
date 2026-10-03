@@ -25,6 +25,7 @@ import {
   SessionTokenSchema,
   DoneSchema,
   FanProfileInputSchema,
+  FanIntroInputSchema,
   FanProfileSchema,
   CreatorProfileInputSchema,
   CreatorProfileSchema,
@@ -113,6 +114,13 @@ export class CreatorApiClient {
       "/v1/identity/fan-profile",
       FanProfileSchema,
       FanProfileInputSchema.parse(body),
+    );
+  }
+  saveFanIntro(body: z.input<typeof FanIntroInputSchema>) {
+    return this.request(
+      "/v1/identity/fan-profile/intro",
+      FanProfileSchema,
+      FanIntroInputSchema.parse(body),
     );
   }
   saveCreatorProfile(body: z.input<typeof CreatorProfileInputSchema>) {

@@ -1,0 +1,67 @@
+{
+  "observedAt": "2026-10-02T13:36:49.228Z",
+  "runtimeSource": "f355db907b4beada09f4ad6f6d40e0af8d9a43ca",
+  "sameDatabase": true,
+  "roles": [
+    {
+      "setting": "DATABASE_URL",
+      "database": "creator_w3_dev57_1790946508212",
+      "login": "creator_runtime",
+      "role": "creator_runtime",
+      "can_login": true,
+      "superuser": false,
+      "bypass_rls": false,
+      "inherits": false,
+      "create_database": false,
+      "create_role": false,
+      "replication": false,
+      "memberships": 1,
+      "owned_schemas": 0,
+      "owned_relations": 0
+    },
+    {
+      "setting": "GROWTH_API_DATABASE_URL",
+      "database": "creator_w3_dev57_1790946508212",
+      "login": "w3_growth_api",
+      "role": "w3_growth_api",
+      "can_login": true,
+      "superuser": false,
+      "bypass_rls": false,
+      "inherits": true,
+      "create_database": false,
+      "create_role": false,
+      "replication": false,
+      "memberships": 2,
+      "owned_schemas": 0,
+      "owned_relations": 0
+    },
+    {
+      "setting": "GROWTH_WORKER_DATABASE_URL",
+      "database": "creator_w3_dev57_1790946508212",
+      "login": "growth_worker",
+      "role": "growth_worker",
+      "can_login": true,
+      "superuser": false,
+      "bypass_rls": false,
+      "inherits": false,
+      "create_database": false,
+      "create_role": false,
+      "replication": false,
+      "memberships": 0,
+      "owned_schemas": 0,
+      "owned_relations": 0
+    }
+  ],
+  "databases": [
+    {
+      "database": "creator_w3",
+      "connection_limit": 0,
+      "marker": "creator-platform:restored-traffic-closed"
+    },
+    {
+      "database": "creator_w3_dev57_1790946508212",
+      "connection_limit": -1,
+      "marker": "creator-platform:synthetic-development-copy"
+    }
+  ]
+}

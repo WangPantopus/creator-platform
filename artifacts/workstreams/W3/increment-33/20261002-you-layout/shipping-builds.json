@@ -1,0 +1,50 @@
+{
+  "source": "7282c795863f89b352bea59aaa958dff76616104",
+  "backend": {
+    "source": "d4a5c749bd90b17585726fd6301c494090acc0c4",
+    "url": "http://127.0.0.1:4103",
+    "database": "creator_w3",
+    "development": true
+  },
+  "ios": {
+    "build": "xcodegen + xcodebuild shipping QelvoraApp, Debug, exact W3 simulator destination, ad-hoc simulator signing",
+    "simulator": "E375E748-AE89-4701-AB12-44EA240D61A8",
+    "binary": "/Users/yingpengwang/Library/Caches/creator-platform-w3/ios-derived/Build/Products/Debug-iphonesimulator/QelvoraApp.app/QelvoraApp",
+    "sha256": "28506c7da5f4d0416a0366b568058e704e3fa939055f12f7d1fc25540c1fdac2",
+    "result": "BUILD SUCCEEDED",
+    "operated": false,
+    "limit": "Device Hub control interface timed out; no iOS button or large-text acceptance claimed"
+  },
+  "android": {
+    "build": ":app:assembleDebug --no-daemon --max-workers=3 -Pandroid.sdkDownload=false; W3 cache build directory",
+    "serial": "emulator-5584",
+    "avd": "Qelvora_W3_API34",
+    "apk": "/Users/yingpengwang/Library/Caches/creator-platform-w3/android-build/outputs/apk/debug/app-debug.apk",
+    "sha256": "04481e770e142a237b4f9dad821e95a6f95f7f7eb4fac4ac6028657636b4c92d",
+    "result": "BUILD SUCCESSFUL",
+    "viewport": {
+      "pixels": "1170x2532",
+      "density": 480,
+      "dpWidth": 390
+    },
+    "operation": "Light default text privacy row; Night system font_scale2.0 privacy row; same persisted kilnfire; restored original settings and shut down",
+    "operations": [
+      {
+        "source": "030406b5505372c4aafa28f495b70e9163a00eff",
+        "theme": "Light",
+        "text": "original unset font_scale",
+        "action": "Tapped Me and privacy; actual empty directory"
+      },
+      {
+        "source": "7282c795863f89b352bea59aaa958dff76616104",
+        "theme": "Night",
+        "text": "actual system font_scale=2.0",
+        "action": "Tapped Me and privacy; actual readable disclosure and empty directory"
+      }
+    ]
+  },
+  "heavyBuildGuard": {
+    "source": "94258f0e",
+    "method": "atomic scripts/with-heavy-build-lock.mjs; one actual heavy build at a time; exact owner/inode release"
+  }
+}

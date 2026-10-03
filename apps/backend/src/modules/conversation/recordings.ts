@@ -24,6 +24,7 @@ import {
 } from "../../../../../packages/api/src/conversation/contracts.js";
 import { ProcessedMediaEvidenceSchema } from "../../../../../packages/api/src/media.js";
 import type { ConversationPrivacyFamily } from "./privacy.js";
+import { writeConversationExportRows } from "./privacy-export-rows.js";
 
 const recordingSource = Object.freeze({
   path: "apps/backend/src/modules/conversation/migrations/pending_w3_recording_association.sql",
@@ -465,5 +466,24 @@ export class ConversationRecordings {
       "This export needs a paginated recording association subjob.",
     );
     return rows;
+  }
+  async exportMetadataTo(
+    client: PoolClient,
+    family: ConversationPrivacyFamily,
+    write: (part: string) => Promise<void>,
+    assertCurrent: () => Promise<void>,
+    signal: AbortSignal,
+  ) {
+    return writeConversationExportRows({
+      client,
+      family,
+      write,
+      assertCurrent,
+      signal,
+      table: "message",
+      key: "lpad(sequence::text,10,'0')||':'||id::text",
+      projection: "id,recording_asset_id,recording_evidence,signed_act_id",
+      predicate: "recording_asset_id IS NOT NULL",
+    });
   }
 }

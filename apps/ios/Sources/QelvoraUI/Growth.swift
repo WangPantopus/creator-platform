@@ -1,6 +1,9 @@
 import Foundation
 import SwiftUI
 import UserNotifications
+#if os(iOS)
+import UIKit
+#endif
 
 public struct GrowthCreator: Codable, Identifiable, Sendable {
   public let id: String
@@ -27,7 +30,10 @@ public struct GrowthPost: Codable, Identifiable, Sendable {
   public let authorLabel: String
   public let aiContextEligible: Bool
 }
-private struct Directory: Decodable { let creators: [GrowthCreator] }
+private struct Directory: Decodable {
+  let creators: [GrowthCreator]
+  let nextCursor: String?
+}
 private struct GrowthPassAccess: Decodable {
   struct Marker: Decodable {
     let creatorId: String
@@ -55,12 +61,21 @@ private struct GrowthHome: Decodable {
     let kind: String
   }
   struct Update: Decodable {
+    struct Post: Decodable {
+      let id: String
+      let title: String
+      let authorLabel: String
+      let preview: String
+    }
     let creator: GrowthCreator
-    let post: GrowthPost
+    let post: Post
   }
   let entries: [Entry]
   let posts: [Update]
   let unread: Int
+  let followingCount: Int?
+  let nextPostsCursor: String?
+  let nextThreadsCursor: String?
 }
 private struct GrowthInvitation: Decodable {
   let creator: GrowthCreator
@@ -76,7 +91,30 @@ private struct GrowthSharedReply: Decodable {
   }
   let state: String
   let source: Source?
+  let verificationURL: String?
 }
+struct GrowthReplyExport: Decodable, Identifiable, Sendable, Equatable {
+  let id: String
+  let text: String
+  let version: Int
+  let sourceHash: String
+  let authorLabel: String
+  let authorKind: String
+  let verificationURL: String
+}
+#if os(iOS)
+private struct GrowthReplyShareSheet: UIViewControllerRepresentable {
+  let artifact: GrowthReplyDocument
+  func makeCoordinator() -> GrowthReplyDocument { artifact }
+  func makeUIViewController(context: Context) -> UIActivityViewController {
+    UIActivityViewController(activityItems: [artifact.source.text, artifact.file], applicationActivities: nil)
+  }
+  func updateUIViewController(_ controller: UIActivityViewController, context: Context) {}
+  static func dismantleUIViewController(_ controller: UIActivityViewController, coordinator: GrowthReplyDocument) {
+    coordinator.remove()
+  }
+}
+#endif
 private struct NotificationPage: Decodable { let notifications: [GrowthNotification] }
 private struct GrowthNotification: Decodable, Identifiable {
   let id: String
@@ -108,7 +146,7 @@ public struct GrowthClient: Sendable {
     self.baseURL = baseURL
     self.token = token ?? { try await SecureSessionStorage(issuer: baseURL).read() }
   }
-  func request<T: Decodable>(_ path: String, method: String = "GET", body: Data? = nil) async throws
+  func request<T: Decodable>(_ path: String, method: String = "GET", body: Data? = nil, expectedSession: String? = nil) async throws
     -> T
   {
     guard let url = URL(string: "/v1/growth/" + path, relativeTo: baseURL) else {
@@ -120,7 +158,9 @@ public struct GrowthClient: Sendable {
     request.timeoutInterval = 10
     request.cachePolicy = .reloadIgnoringLocalCacheData
     request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-    if !path.hasPrefix("public/"), let value = try await token() {
+    let value = path.hasPrefix("public/") ? nil : try await token()
+    if let expectedSession, value != expectedSession { throw GrowthRequestFailure(status: 401) }
+    if let value {
       request.setValue("Bearer " + value, forHTTPHeaderField: "Authorization")
     }
     let (data, response) = try await URLSession.shared.data(for: request)
@@ -128,16 +168,32 @@ public struct GrowthClient: Sendable {
     guard (200..<300).contains(http.statusCode) else {
       throw GrowthRequestFailure(status: http.statusCode)
     }
+    if expectedSession != nil, try await token() != value { throw GrowthRequestFailure(status: 401) }
     return try JSONDecoder().decode(T.self, from: data)
   }
-  public func registerDevice(installationID: UUID, token value: Data, granted: Bool) async throws {
+  public func registerDevice(installationID: UUID, token value: Data, granted: Bool, registrationRevision: Int, expectedSession: String) async throws {
     struct Ack: Decodable { let id: String }
     let body = try JSONSerialization.data(withJSONObject: [
       "installationId": installationID.uuidString.lowercased(), "platform": "ios",
       "token": value.map { String(format: "%02x", $0) }.joined(),
       "permission": granted ? "granted" : "denied",
+      "registrationRevision": registrationRevision,
     ])
-    let _: Ack = try await request("devices", method: "PUT", body: body)
+    let _: Ack = try await request("devices", method: "PUT", body: body, expectedSession: expectedSession)
+  }
+  public func revokeDevice(installationID: UUID, registrationRevision: Int, expectedSession: String) async throws {
+    struct Ack: Decodable { let revoked: Bool }
+    let body = try JSONSerialization.data(withJSONObject: ["registrationRevision": registrationRevision, "platform": "ios"])
+    let _: Ack = try await request("devices/" + installationID.uuidString.lowercased(), method: "DELETE", body: body, expectedSession: expectedSession)
+  }
+  func notificationDestination(id: UUID, expectedSession: String) async throws -> String {
+    struct Current: Decodable { let id: String; let available: Bool; let destination: String }
+    let current: Current = try await request("notifications/" + id.uuidString.lowercased(), expectedSession: expectedSession)
+    guard UUID(uuidString: current.id) == id, current.available else { throw GrowthRequestFailure(status: 404) }
+    guard ApplicationDestination.isPermitted(current.destination) else { throw URLError(.badServerResponse) }
+    struct Ack: Decodable { let read: Bool }
+    let _: Ack = try await request("notifications/" + id.uuidString.lowercased() + "/read", method: "PUT", body: Data("{}".utf8), expectedSession: expectedSession)
+    return current.destination
   }
 }
 
@@ -146,15 +202,33 @@ public struct GrowthFanFeature: View {
   private let client: GrowthClient?
   private let destination: String
   private let signIn: (String) -> Void
+  private let navigate: ((String) -> Void)?
   @State private var route: String
+  @FocusState private var discoverSearchFocused: Bool
   @State private var query = ""
   @State private var category = "For you"
   @State private var section = "Chat"
   @State private var home: GrowthHome?
+  @State private var homePostsCursor: String?
+  @State private var homeThreadsCursor: String?
+  @State private var homePageRevision = 0
+  @AccessibilityFocusState private var homeHeadingFocused: Bool
+  @State private var pagingHome = false
+  @State private var homeRequestID = UUID()
   @State private var invitation: GrowthInvitation?
   @State private var shared: GrowthSharedReply?
+  @State private var replyExport: GrowthReplyDocument?
+  @State private var sharingReply = false
   @State private var following = false
   @State private var creators: [GrowthCreator] = []
+  @State private var discoverCursor: String?
+  @State private var discoverNextCursor: String?
+  @State private var discoverQuery = ""
+  @State private var discoverCategory = ""
+  @State private var discoverRequestID = UUID()
+  @State private var discoverPageRevision = 0
+  @State private var pagingDiscover = false
+  @AccessibilityFocusState private var discoverHeadingFocused: Bool
   @State private var pass: GrowthPassAccess?
   @State private var creator: GrowthCreator?
   @State private var posts: [GrowthPost] = []
@@ -167,12 +241,14 @@ public struct GrowthFanFeature: View {
   public init(
     baseURL: URL?, destination: String = "/discover",
     token: (@Sendable () async throws -> String?)? = nil,
+    onNavigate: ((String) -> Void)? = nil,
     onSignIn: @escaping (String) -> Void = { _ in }
   ) {
     client = baseURL.map { GrowthClient(baseURL: $0, token: token) }
     self.destination = destination
     _route = State(initialValue: destination)
     signIn = onSignIn
+    navigate = onNavigate
   }
   public static func registration(baseURL: URL?) -> FanFeatureRegistration {
     FanFeatureRegistration(
@@ -185,6 +261,7 @@ public struct GrowthFanFeature: View {
         AnyView(
           GrowthFanFeature(
             baseURL: baseURL, destination: session.destination,
+            onNavigate: { session.open($0) },
             onSignIn: { target in
               session.open(target)
               Task { await session.beginSignIn() }
@@ -198,41 +275,58 @@ public struct GrowthFanFeature: View {
   }
   public var body: some View {
     VStack(spacing: 0) {
+      ScrollViewReader { reader in
       ScrollView {
         VStack(alignment: .leading, spacing: 16) {
           if route == "/notifications/settings" {
             GrowthNotificationSettings(client: client)
           } else if route == "/discover" {
-            Text(QelvoraCopy.text("navDiscover")).qText("display-lg")
+            Text(QelvoraCopy.text("navDiscover")).qText("display-lg").accessibilityAddTraits(.isHeader).accessibilityFocused($discoverHeadingFocused)
             TextField(QelvoraCopy.text("growthSearchCreators"), text: $query,
               prompt: Text(QelvoraCopy.text("growthSearchCreatorsCraftsOrQuestions")).foregroundStyle(qColor("ink-muted", scheme)))
-              .foregroundStyle(qColor("ink", scheme)).padding(12)
+              .textFieldStyle(.plain)
+              .qText("body").foregroundStyle(qColor("ink", scheme)).padding(12).frame(minHeight: 48)
+              .accessibilityLabel(QelvoraCopy.text("growthSearchCreators"))
               .background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: 12))
               .overlay { RoundedRectangle(cornerRadius: 12).stroke(qColor("line", scheme), lineWidth: 1) }
-              .submitLabel(.search).onSubmit { Task { await load() } }
+              .focused($discoverSearchFocused)
+              .contentShape(Rectangle())
+              .onTapGesture { discoverSearchFocused = true }
+              .submitLabel(.search).onSubmit { discoverSearchFocused = false; Task { await load() } }
             Segmented(items: growthCategories.map(growthLabel), active: growthLabel(category)) { value in
               category = growthCategories.first(where: { growthLabel($0) == value }) ?? category
               Task { await load() }
             }
             ForEach(creators) { value in
               SwiftUI.Button {
-                route = "/creators/" + value.handle
+                open("/creators/" + value.handle)
               } label: {
                 creatorCard(value)
               }.buttonStyle(.plain)
             }
+            if let cursor = discoverNextCursor {
+              Button(QelvoraCopy.text("growthMoreCreators"), variant: .secondary, block: true) {
+                Task { await pageDiscover(cursor) }
+              }.disabled(loading || pagingDiscover)
+            }
+            if discoverCursor != nil {
+              Button(QelvoraCopy.text("growthFirstPage"), variant: .quiet, block: true) {
+                Task { await pageDiscover(nil) }
+              }.disabled(loading || pagingDiscover)
+            }
+            if pagingDiscover { ProgressView().accessibilityLabel(QelvoraCopy.text("growthLoading")) }
             if creators.isEmpty && !loading && error.isEmpty {
               EmptyState(title: QelvoraCopy.text("growthNoCreatorsFound"), body: QelvoraCopy.text("growthTryAnotherNeedOrBrowseACategory"))
             }
-          } else if route == "/notifications" {
+          } else if route.hasPrefix("/notifications") {
             Text(QelvoraCopy.text("growthNotifications")).qText("display-lg")
-            Button(QelvoraCopy.text("growthSettings"), variant: .quiet) { route = "/notifications/settings" }
-            if notifications.isEmpty && !loading && error.isEmpty {
+            Button(QelvoraCopy.text("growthSettings"), variant: .quiet) { open("/notifications/settings") }
+            if route == "/notifications" && notifications.isEmpty && !loading && error.isEmpty {
               EmptyState(title: QelvoraCopy.text("growthNoUpdatesYet"), body: QelvoraCopy.text("growthYourInAppRecordCannotBeTurnedOff"))
             }
-            ForEach(notifications) { item in
+            ForEach(route == "/notifications" ? notifications : []) { item in
               SwiftUI.Button {
-                Task { await openNotification(item) }
+                openNotification(item)
               } label: {
                 VStack(alignment: .leading, spacing: 6) {
                   Text(item.sender).qText("label")
@@ -242,14 +336,14 @@ public struct GrowthFanFeature: View {
             }
           } else if route == "/home", let home {
             HStack {
-              Text(QelvoraCopy.text("growthYourPeople")).qText("display-lg")
+              Text(QelvoraCopy.text("growthYourPeople")).qText("display-lg").accessibilityAddTraits(.isHeader).accessibilityFocused($homeHeadingFocused)
               Spacer()
-              Button(QelvoraCopy.text("growthNotifications"), variant: .quiet) { route = "/notifications" }
+              Button(QelvoraCopy.text("growthNotifications"), variant: .quiet) { open("/notifications") }
             }
-            GrowthPostValuePrompt(client: client) { route = $0 }
+            GrowthPostValuePrompt(client: client) { open($0) }
             ForEach(home.entries) { entry in
               SwiftUI.Button {
-                route = entry.destination
+                open(entry.destination)
               } label: {
                 VStack(alignment: .leading, spacing: 8) {
                   Text(entry.creatorName).qText("title")
@@ -258,41 +352,65 @@ public struct GrowthFanFeature: View {
                 }.padding(16)
               }.buttonStyle(.plain)
             }
+            if let cursor = home.nextThreadsCursor {
+              Button(QelvoraCopy.text("navMore") + ": " + QelvoraCopy.text("growthYourPeople"), variant: .secondary, block: true) {
+                Task { await pageHome(homePostsCursor, threadsCursor: cursor) }
+              }.disabled(pagingHome)
+            }
             ForEach(home.posts, id: \.post.id) { update in
               SwiftUI.Button {
-                route = "/creators/" + update.creator.handle + "/posts/" + update.post.id
+                open("/creators/" + update.creator.handle + "/posts/" + update.post.id)
               } label: {
                 VStack(alignment: .leading, spacing: 8) {
                   Text(update.post.authorLabel).qText("label")
                   Text(update.post.title).qText("title")
-                  Text(update.post.body).qText("voice-md")
+                  Text(update.post.preview).qText("voice-md")
                 }.padding(16)
               }.buttonStyle(.plain)
             }
+            if let cursor = home.nextPostsCursor {
+              Button(QelvoraCopy.text("navMore"), variant: .secondary, block: true) {
+                Task { await pageHome(cursor, threadsCursor: homeThreadsCursor) }
+              }.disabled(pagingHome)
+            }
+            if pagingHome { ProgressView().accessibilityLabel(QelvoraCopy.text("growthLoading")) }
+            if homePostsCursor != nil || homeThreadsCursor != nil {
+              Button(QelvoraCopy.text("growthLatestFirst"), variant: .quiet, block: true) {
+                Task { await pageHome(nil) }
+              }.disabled(pagingHome)
+            }
             if home.entries.isEmpty && home.posts.isEmpty {
               EmptyState(
-                title: QelvoraCopy.text("growthPickACreatorToStart"), body: QelvoraCopy.text("growthFindACreatorWhoseWorkYouCareAbout")
-              ) { Button(QelvoraCopy.text("navDiscover"), variant: .secondary) { route = "/discover" } }
+                title: QelvoraCopy.text(home.followingCount == 0 && homePostsCursor == nil && homeThreadsCursor == nil && home.nextThreadsCursor == nil ? "growthPickACreatorToStart" : "growthNoUpdatesYet"), body: QelvoraCopy.text("growthFindACreatorWhoseWorkYouCareAbout")
+              ) { Button(QelvoraCopy.text("navDiscover"), variant: .secondary) { open("/discover") } }
             }
           } else if route.hasPrefix("/invite/"), let invitation {
             Seal(initial: String(invitation.creator.name.prefix(1)), size: 56)
             Text(QelvoraCopy.text("growthInvitedYouIn", values: ["name": invitation.creator.name])).qText("display-lg")
             Text(QelvoraCopy.text("growthAFirstConversationOfAbout24HoursNoCardNeeded")).qText("body")
             Button(QelvoraCopy.text("growthAcceptInvitation"), variant: .ai, block: true) {
-              route = invitation.destination
+              open(invitation.destination)
             }
           } else if route.hasPrefix("/share/"), let shared {
             if shared.state == "valid", let source = shared.source {
-              Text(
-                source.authorKind == "approved_draft"
-                  ? QelvoraCopy.text("approvedAuthor", values: ["name": source.creatorName])
-                  : QelvoraCopy.text("growthPersonalReply2", values: ["name": source.creatorName])
-              ).qText("label")
-              Text(source.text).qText("voice-md")
-              Text(QelvoraCopy.text("growthSignedByVersion", values: ["name": source.creatorName, "version": String(source.version)]))
-                .qText("caption")
+              VStack(alignment: .leading, spacing: 16) {
+                AuthorLabel(kind: source.authorKind == "approved_draft" ? .approvedDraft : .humanCreator, name: source.creatorName, onMaya: source.authorKind != "approved_draft")
+                Text(source.text).qText(source.authorKind == "approved_draft" ? "body" : "voice-md")
+                Text(QelvoraCopy.text("growthSignedByVersion", values: ["name": source.creatorName, "version": String(source.version)]))
+                  .qText("caption")
+              }.padding(16).frame(maxWidth: .infinity, alignment: .leading)
+                .foregroundStyle(qColor(source.authorKind == "approved_draft" ? "ai-ink" : "on-maya", scheme))
+                .background(qColor(source.authorKind == "approved_draft" ? "ai-surface" : "maya-surface", scheme))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
               if let correction = source.correction {
                 Notice(title: QelvoraCopy.text("growthCorrection"), children: correction)
+              }
+              if shared.verificationURL != nil {
+                Button(QelvoraCopy.text("growthShareCompleteReply"), variant: .secondary, block: true, disabled: sharingReply) {
+                  Task { await exportSharedReply() }
+                }
+              } else {
+                Notice(title: QelvoraCopy.text("growthUnavailable"), children: QelvoraCopy.text("growthImageNeedsOrigin"))
               }
             } else {
               EmptyState(
@@ -307,7 +425,7 @@ public struct GrowthFanFeature: View {
               ).qText("body")
               if let context = posts.first {
                 ContextCard(source: QelvoraCopy.text("growthFromAPost"), title: context.title) {
-                  route = "/creators/" + creator.handle + "/chat"
+                  open("/creators/" + creator.handle + "/chat")
                 }
               }
               Notice(
@@ -317,7 +435,7 @@ public struct GrowthFanFeature: View {
             } else if route.contains("/posts/") {
               HStack(spacing: 10) {
                 SwiftUI.Button {
-                  route = "/creators/" + creator.handle
+                  open("/creators/" + creator.handle)
                 } label: {
                   QelvoraGlyph(name: "back", color: qColor("ink", scheme))
                     .frame(width: 44, height: 44)
@@ -339,7 +457,7 @@ public struct GrowthFanFeature: View {
                     Text(QelvoraCopy.text("growthAskAboutThisPostTheContextStaysWithYourConversation"))
                       .qText("body").foregroundStyle(qColor("ink", scheme))
                     Button(QelvoraCopy.text("growthAskSAiAboutThis2", values: ["name": creator.name]), variant: .ai, block: true) {
-                      route = "/creators/" + creator.handle + "/chat?context=" + post.id
+                      open("/creators/" + creator.handle + "/chat?context=" + post.id)
                     }
                   }.padding(16).frame(maxWidth: .infinity, alignment: .leading)
                     .background(
@@ -359,7 +477,7 @@ public struct GrowthFanFeature: View {
               Button(
                 QelvoraCopy.text("messageAI", values: ["name": creator.name]), block: true,
                 disabled: creator.state != "published"
-              ) { route = "/creators/" + creator.handle + "/chat" }
+              ) { open("/creators/" + creator.handle + "/chat") }
               Button(
                 following ? QelvoraCopy.text("growthFollowingUnfollow") : QelvoraCopy.text("growthFollow"), variant: .secondary, block: true
               ) { Task { await follow(creator) } }
@@ -375,7 +493,7 @@ public struct GrowthFanFeature: View {
                 Text(QelvoraCopy.text("growthFrom3", values: ["name": creator.name])).qText("title")
                 ForEach(posts) { post in
                   SwiftUI.Button {
-                    route = "/creators/" + creator.handle + "/posts/" + post.id
+                    open("/creators/" + creator.handle + "/posts/" + post.id)
                   } label: {
                     VStack(alignment: .leading, spacing: 8) {
                       Text(post.authorLabel).qText("label")
@@ -411,12 +529,19 @@ public struct GrowthFanFeature: View {
             if requiresSignIn { Button(QelvoraCopy.text("continueWithPantopus"), block: true) { signIn(route) } }
             Button(QelvoraCopy.text("growthTryAgain"), variant: .secondary) { Task { await load() } }
           }
-        }.padding(16)
+        }.padding(16).id("growth-home-top")
+      }.onChange(of: homePageRevision) { _, _ in
+        reader.scrollTo("growth-home-top", anchor: .top)
+        homeHeadingFocused = true
+      }.onChange(of: discoverPageRevision) { _, _ in
+        reader.scrollTo("growth-home-top", anchor: .top)
+        discoverHeadingFocused = true
+      }
       }
       if !hasSession {
         TabBar(active: route == "/discover" ? .discover : .home) { tab in
           if tab == .home || tab == .discover {
-            route = "/" + tab.rawValue.lowercased()
+            open("/" + tab.rawValue.lowercased())
           } else {
             signIn("/" + tab.rawValue.lowercased())
           }
@@ -427,6 +552,12 @@ public struct GrowthFanFeature: View {
     ) { _, target in route = target }.task(id: route) {
       await load()
     }
+    #if os(iOS)
+    .sheet(item: $replyExport) { artifact in GrowthReplyShareSheet(artifact: artifact) }
+    #endif
+  }
+  private func open(_ target: String) {
+    if let navigate { navigate(target) } else { route = target }
   }
   private func creatorCard(_ value: GrowthCreator) -> some View {
     VStack(alignment: .leading, spacing: 0) {
@@ -455,6 +586,11 @@ public struct GrowthFanFeature: View {
     }.background(qColor("surface", scheme)).clipShape(RoundedRectangle(cornerRadius: 16))
   }
   private func load() async {
+    let loadID = UUID()
+    let loadedRoute = route
+    replyExport = nil
+    homeRequestID = UUID()
+    discoverRequestID = loadID
     guard let client else {
       error = QelvoraCopy.text("growthTheGrowthServiceIsNotConfigured")
       return
@@ -463,7 +599,7 @@ public struct GrowthFanFeature: View {
     error = ""
     requiresSignIn = false
     hasSession = (try? await client.token()) != nil
-    defer { loading = false }
+    defer { if discoverRequestID == loadID { loading = false } }
     do {
       creator = nil
       posts = []
@@ -471,19 +607,10 @@ public struct GrowthFanFeature: View {
       invitation = nil
       shared = nil
       if route == "/discover" {
-        var parameters = URLComponents()
-        parameters.queryItems = [
-          URLQueryItem(name: "q", value: query),
-          URLQueryItem(name: "category", value: category == "For you" ? "" : category),
-        ]
-        let data: Directory = try await client.request(
-          "public/creators?" + (parameters.percentEncodedQuery ?? ""))
-        creators = data.creators
-        pass = nil
-        if hasSession {
-          pass = try? await client.request("discovery-access")
-        }
+        try await loadDirectory(nil, reset: true, requestID: loadID)
       } else if route == "/home" {
+        homePostsCursor = nil
+        homeThreadsCursor = nil
         home = try await client.request("home")
       } else if route.hasPrefix("/invite/") {
         invitation = try await client.request("public/invites/" + String(route.dropFirst(8)))
@@ -492,6 +619,12 @@ public struct GrowthFanFeature: View {
       } else if route == "/notifications" {
         let data: NotificationPage = try await client.request("notifications")
         notifications = data.notifications
+      } else if route.hasPrefix("/notifications/"), route != "/notifications/settings" {
+        guard let id = UUID(uuidString: String(route.dropFirst(15))) else { throw GrowthRequestFailure(status: 404) }
+        guard let captured = try await client.token() else { throw GrowthRequestFailure(status: 401) }
+        let target = try await client.notificationDestination(id: id, expectedSession: captured)
+        guard !Task.isCancelled, route == loadedRoute, discoverRequestID == loadID, try await client.token() == captured else { return }
+        open(target)
       } else if route.hasPrefix("/creators/") {
         let parts = route.split(separator: "/")
         guard parts.count >= 2 else { return }
@@ -523,7 +656,7 @@ public struct GrowthFanFeature: View {
           ((try? await client.request("follow/" + creator.id)) as FollowState?)?.following ?? false
       }
     } catch {
-      if Task.isCancelled { return }
+      if Task.isCancelled || route != loadedRoute || discoverRequestID != loadID { return }
       creator = nil
       posts = []
       creators = []
@@ -531,11 +664,106 @@ public struct GrowthFanFeature: View {
       record(error)
     }
   }
+  private func loadDirectory(_ cursor: String?, reset: Bool = false, requestID: UUID) async throws {
+    guard let client, route == "/discover" else { return }
+    discoverRequestID = requestID
+    let search = reset ? query : discoverQuery
+    let filter = reset ? (category == "For you" ? "" : category) : discoverCategory
+    pagingDiscover = true
+    pass = nil
+    defer { if discoverRequestID == requestID { pagingDiscover = false } }
+    var parameters = URLComponents()
+    parameters.queryItems = [URLQueryItem(name: "q", value: search), URLQueryItem(name: "category", value: filter)]
+    if let cursor { parameters.queryItems?.append(URLQueryItem(name: "cursor", value: cursor)) }
+    let currentSession = try? await client.token()
+    let data: Directory = try await client.request("public/creators?" + (parameters.percentEncodedQuery ?? ""))
+    var access: GrowthPassAccess?
+    if let currentSession, !data.creators.isEmpty {
+      var accessParameters = URLComponents()
+      accessParameters.queryItems = [URLQueryItem(name: "creators", value: data.creators.map(\.id).joined(separator: ","))]
+      access = try? await client.request("discovery-access?" + (accessParameters.percentEncodedQuery ?? ""), expectedSession: currentSession)
+    }
+    guard !Task.isCancelled, route == "/discover", discoverRequestID == requestID else { return }
+    if (try? await client.token()) != currentSession { access = nil }
+    creators = data.creators
+    pass = access
+    discoverCursor = cursor
+    discoverNextCursor = data.nextCursor
+    discoverQuery = search
+    discoverCategory = filter
+    discoverPageRevision += 1
+    error = ""
+  }
+  private func pageDiscover(_ cursor: String?) async {
+    guard route == "/discover", !pagingDiscover, !loading else { return }
+    let requestID = UUID()
+    do { try await loadDirectory(cursor, requestID: requestID) }
+    catch {
+      guard !Task.isCancelled, route == "/discover", discoverRequestID == requestID else { return }
+      pass = nil
+      record(error)
+    }
+  }
+  private func pageHome(_ cursor: String?, threadsCursor: String? = nil) async {
+    guard let client, route == "/home", !pagingHome else { return }
+    pagingHome = true
+    let requestID = UUID()
+    homeRequestID = requestID
+    defer { pagingHome = false }
+    do {
+      guard let currentSession = try await client.token() else { throw GrowthRequestFailure(status: 401) }
+      var components = URLComponents()
+      components.queryItems = [cursor.map { URLQueryItem(name: "postsCursor", value: $0) }, threadsCursor.map { URLQueryItem(name: "threadsCursor", value: $0) }].compactMap { $0 }
+      let path = "home" + (components.percentEncodedQuery.flatMap { $0.isEmpty ? nil : "?" + $0 } ?? "")
+      let page: GrowthHome = try await client.request(path, expectedSession: currentSession)
+      guard !Task.isCancelled, route == "/home", homeRequestID == requestID else { return }
+      home = page
+      homePostsCursor = cursor
+      homeThreadsCursor = threadsCursor
+      homePageRevision += 1
+      error = ""
+    } catch {
+      guard !Task.isCancelled, route == "/home", homeRequestID == requestID else { return }
+      requiresSignIn = (error as? GrowthRequestFailure)?.status == 401
+      if let status = (error as? GrowthRequestFailure)?.status, [401, 403, 410].contains(status) { home = nil }
+      self.error = (error as? GrowthRequestFailure)?.message ?? QelvoraCopy.text("growthTheServiceIsUnavailableReconnectAndTryAgain")
+    }
+  }
   private func record(_ failure: Error) {
     requiresSignIn = (failure as? GrowthRequestFailure)?.status == 401
     error =
       (failure as? GrowthRequestFailure)?.message
       ?? QelvoraCopy.text("growthThisDestinationIsUnavailableReconnectAndTryAgain")
+  }
+  private func exportSharedReply() async {
+    guard let client, route.hasPrefix("/share/"), !sharingReply else { return }
+    let target = route
+    sharingReply = true
+    defer { sharingReply = false }
+    do {
+      let artifact: GrowthReplyExport = try await client.request("public/shares/" + String(target.dropFirst(7)) + "/export")
+      guard !Task.isCancelled, route == target, artifact.id == String(target.dropFirst(7)) else { return }
+      let rendering = Task.detached(priority: .userInitiated) { try GrowthReplyDocument.create(artifact) }
+      let document = try await withTaskCancellationHandler {
+        try await rendering.value
+      } onCancel: {
+        rendering.cancel()
+      }
+      defer { if replyExport?.id != document.id { document.remove() } }
+      guard !Task.isCancelled, route == target else { return }
+      // Rendering can be lengthy. Permission/correction must still match before
+      // a file is handed to the system sheet; no locally cached grant is reused.
+      let current: GrowthReplyExport = try await client.request("public/shares/" + artifact.id + "/export")
+      guard !Task.isCancelled, route == target, current == artifact else {
+        throw GrowthRequestFailure(status: 410)
+      }
+      replyExport = document
+      error = ""
+    } catch {
+      guard !Task.isCancelled, route == target else { return }
+      if (error as? GrowthRequestFailure)?.status == 410 { shared = nil }
+      record(error)
+    }
   }
   private func follow(_ creator: GrowthCreator) async {
     guard let client else { return }
@@ -548,14 +776,13 @@ public struct GrowthFanFeature: View {
       error = ""
     } catch { if !Task.isCancelled { record(error) } }
   }
-  private func openNotification(_ item: GrowthNotification) async {
-    guard let client else { return }
-    do {
-      struct Ack: Decodable { let read: Bool }
-      let _: Ack = try await client.request(
-        "notifications/" + item.id + "/read", method: "PUT", body: Data("{}".utf8))
-      route = item.destination
-    } catch { if !Task.isCancelled { record(error) } }
+  private func openNotification(_ item: GrowthNotification) {
+    guard let id = UUID(uuidString: item.id) else { record(GrowthRequestFailure(status: 404)); return }
+    open("/notifications/" + id.uuidString.lowercased())
+  }
+  private func openDestination(_ target: String) {
+    if let navigate { navigate(target) }
+    else { route = target }
   }
 }
 
