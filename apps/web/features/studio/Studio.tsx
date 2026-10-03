@@ -738,6 +738,7 @@ function Feedback({ action }: { action: ReturnType<typeof useAction> }) {
   );
 }
 function Notes({ creator }: { creator: Creator }) {
+  const canReviewReplies = creator.owned || creator.roles.includes("triage");
   const [notes, setNotes] = useState<Page<ContentView>>({
       items: [],
       nextCursor: null,
@@ -751,34 +752,32 @@ function Notes({ creator }: { creator: Creator }) {
     [freshUntil, setFreshUntil] = useState(0),
     action = useAction();
   const reads = useRef({ generation: 0, mounted: true });
-  const replyPages = useRef(1);
+  const replyCursors = useRef<(string | null)[]>([null]);
   const load = useCallback(async () => {
     const request = ++reads.current.generation;
     const started = performance.now();
-    const n = await studioRequest<Page<ContentView>>(
-      "content",
-      `${creator.id}/studio`,
-      undefined,
-      creator.viewerAccountId,
-    );
-    const current: Page<PrivateNoteReply> = { items: [], nextCursor: null };
-    if (creator.owned || creator.roles.includes("triage")) {
-      let cursor: string | null = null;
-      for (let page = 0; page < replyPages.current; page++) {
-        const replyPage = ContentReplyList.parse(
-          await studioRequest(
+    const cursor = replyCursors.current.at(-1);
+    // Revalidate only the visible bounded page. Re-fetching every previously
+    // loaded page can exhaust the five-second lease as the feed grows.
+    const [n, current] = await Promise.all([
+      studioRequest<Page<ContentView>>(
+        "content",
+        `${creator.id}/studio`,
+        undefined,
+        creator.viewerAccountId,
+      ),
+      canReviewReplies
+        ? studioRequest(
             "content",
-            `${creator.id}/studio/replies?filter=${replyFilter}${cursor ? `&cursor=${cursor}` : ""}`,
+            `${creator.id}/studio/replies?${new URLSearchParams({ filter: replyFilter, ...(cursor ? { cursor } : {}) })}`,
             undefined,
             creator.viewerAccountId,
-          ),
-        );
-        current.items.push(...replyPage.items);
-        current.nextCursor = replyPage.nextCursor;
-        cursor = replyPage.nextCursor;
-        if (!cursor) break;
-      }
-    }
+          ).then((value) => ContentReplyList.parse(value))
+        : Promise.resolve<Page<PrivateNoteReply>>({
+            items: [],
+            nextCursor: null,
+          }),
+    ]);
     if (!reads.current.mounted || request !== reads.current.generation) return;
     if (document.hidden || performance.now() >= started + 5000)
       throw new Error("Current Note and reply access must be checked again.");
@@ -795,13 +794,7 @@ function Notes({ creator }: { creator: Creator }) {
           ) ?? null)
         : null,
     );
-  }, [
-    creator.id,
-    creator.owned,
-    creator.roles,
-    creator.viewerAccountId,
-    replyFilter,
-  ]);
+  }, [canReviewReplies, creator.id, creator.viewerAccountId, replyFilter]);
   useEffect(() => {
     reads.current.mounted = true;
     let pending = false;
@@ -923,7 +916,7 @@ function Notes({ creator }: { creator: Creator }) {
               />
             )}
         </div>
-        {(creator.owned || creator.roles.includes("triage")) && (
+        {canReviewReplies && (
           <div className="w5-replies">
             <div className="w5-replies-title">
               <span className="qv-meta">
@@ -932,7 +925,7 @@ function Notes({ creator }: { creator: Creator }) {
                   ? "loading"
                   : action.error
                     ? "unavailable"
-                    : `${replies.items.length}${replies.nextCursor ? "+" : ""}`}
+                    : `${replies.items.length} on this page`}
               </span>
               <span className="qv-help">
                 Only you and your triage team see these
@@ -943,7 +936,7 @@ function Notes({ creator }: { creator: Creator }) {
               <select
                 value={replyFilter}
                 onChange={(e) => {
-                  replyPages.current = 1;
+                  replyCursors.current = [null];
                   setFreshUntil(0);
                   setReplyFilter(e.target.value);
                 }}
@@ -1022,20 +1015,40 @@ function Notes({ creator }: { creator: Creator }) {
                 )}
               </article>
             ))}
-            {replies.nextCursor && replyPages.current < 50 && (
-              <button
-                className="qv-btn qv-btn--secondary"
-                disabled={action.busy}
-                onClick={() =>
-                  void action.run(async () => {
-                    replyPages.current++;
-                    await load();
-                  })
-                }
-              >
-                More replies
-              </button>
-            )}
+            <nav className="w5-actions" aria-label="Private reply pages">
+              {replyCursors.current.length > 1 && (
+                <button
+                  className="qv-btn qv-btn--secondary"
+                  disabled={action.busy}
+                  onClick={() =>
+                    void action.run(async () => {
+                      replyCursors.current.pop();
+                      setFreshUntil(0);
+                      setReaction(null);
+                      await load();
+                    })
+                  }
+                >
+                  Previous replies
+                </button>
+              )}
+              {replies.nextCursor && (
+                <button
+                  className="qv-btn qv-btn--secondary"
+                  disabled={action.busy}
+                  onClick={() =>
+                    void action.run(async () => {
+                      replyCursors.current.push(replies.nextCursor);
+                      setFreshUntil(0);
+                      setReaction(null);
+                      await load();
+                    })
+                  }
+                >
+                  Next replies
+                </button>
+              )}
+            </nav>
             {!replies.items.length && !action.busy && !action.error && (
               <p className="qv-help">
                 Reviewed private replies appear here when fans reply to a
