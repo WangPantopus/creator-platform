@@ -286,7 +286,21 @@ export async function createConfiguredBackend(input: {
   const platformIdentity = sessions
     ? {
         sessions,
-        profiles: new IdentityProfiles(pool),
+        profiles: new IdentityProfiles(pool, {
+          assertCreatorAllowed: async (actor, creatorId, client) => {
+            if (!trust)
+              throw new DomainError(
+                "trust_unconfigured",
+                "Current creator denial authority is unavailable.",
+                503,
+              );
+            await trust.assertCreatorAllowedInTransaction(
+              actor,
+              creatorId,
+              client,
+            );
+          },
+        }),
         passkeys: new PasskeyService(
           pool,
           input.config.rpId,
