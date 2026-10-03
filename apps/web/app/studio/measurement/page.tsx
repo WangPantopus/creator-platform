@@ -18,7 +18,7 @@ export default async function Measurement() {
       throw new GrowthUnavailable(
         401,
         "session_required",
-        growthCopy.growthSignInToContinue,
+        growthCopy.growthContinueWithPantopusToOpenYourAccountSCurrentState,
       );
     const init = { headers: { "X-Expected-Account-Id": session.accountId } };
     const data = await growthRequest<{

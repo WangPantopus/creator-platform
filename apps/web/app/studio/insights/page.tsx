@@ -16,7 +16,7 @@ export default async function Insights() {
       throw new GrowthUnavailable(
         401,
         "session_required",
-        growthCopy.growthSignInToContinue,
+        growthCopy.growthContinueWithPantopusToOpenYourAccountSCurrentState,
       );
     const init = { headers: { "X-Expected-Account-Id": session.accountId } };
     const { clusters } = await growthRequest<{ clusters: Cluster[] }>(

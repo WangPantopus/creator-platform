@@ -15,7 +15,7 @@ export default async function Launch() {
             new GrowthUnavailable(
               401,
               "session_required",
-              copy.growthSignInToContinue,
+              copy.growthContinueWithPantopusToOpenYourAccountSCurrentState,
             )
           }
           returnTo="/studio/launch"

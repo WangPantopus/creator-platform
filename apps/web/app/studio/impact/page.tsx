@@ -23,7 +23,7 @@ export default async function Impact() {
       throw new GrowthUnavailable(
         401,
         "session_required",
-        growthCopy.growthSignInToContinue,
+        growthCopy.growthContinueWithPantopusToOpenYourAccountSCurrentState,
       );
     const init = { headers: { "X-Expected-Account-Id": session.accountId } };
     const { impact } = await growthRequest<{ impact: Impact | null }>(

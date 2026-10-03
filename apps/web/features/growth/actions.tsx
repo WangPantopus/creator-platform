@@ -118,6 +118,7 @@ export function Inbox({
   items: InboxItem[];
   timeZone?: string;
 }) {
+  const { request, signal } = useGrowthSession();
   const [error, setError] = useState("");
   const dateKey = (value: string | Date) => {
     const parts = Object.fromEntries(
@@ -173,9 +174,13 @@ export function Inbox({
               onClick={async (event) => {
                 event.preventDefault();
                 try {
-                  await mutate(`notifications/${item.id}/read`, {}, "PUT");
+                  await request(`notifications/${item.id}/read`, {
+                    method: "PUT",
+                    body: "{}",
+                  });
                   window.location.assign(`/notifications/${item.id}`);
                 } catch (e) {
+                  if (signal.aborted) return;
                   setError(
                     e instanceof Error
                       ? e.message

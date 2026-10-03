@@ -6,6 +6,7 @@ import {
   GrowthUnavailable,
 } from "../../../features/growth/server";
 import { GrowthShell, Failure } from "../../../features/growth/shell";
+import { currentSession } from "../../../lib/session";
 
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
@@ -20,6 +21,7 @@ export default async function NotificationArrival({
   const { id } = await params;
   const validId =
     /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/u.test(id);
+  const session = validId ? await currentSession(`/notifications/${id}`) : null;
   let target: string;
   try {
     if (!validId)
@@ -28,11 +30,19 @@ export default async function NotificationArrival({
         "notification_unavailable",
         copy.growthThisDestinationIsNoLongerAvailable,
       );
+    if (!session)
+      throw new GrowthUnavailable(
+        401,
+        "session_required",
+        copy.growthContinueWithPantopusToOpenYourAccountSCurrentState,
+      );
     const current = await growthRequest<{
       id: string;
       available: boolean;
       destination: string;
-    }>(`notifications/${id}`);
+    }>(`notifications/${id}`, {
+      headers: { "X-Expected-Account-Id": session.accountId },
+    });
     if (
       current.id !== id ||
       current.available !== true ||

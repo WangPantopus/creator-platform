@@ -3,6 +3,7 @@ import { copy as growthCopy } from "@qelvora/copy";
 import { useEffect, useRef, useState } from "react";
 import { mutate, GrowthActionError } from "./actions";
 import { growthText as text } from "./copy";
+import { useGrowthSession } from "./session";
 
 /** Owner-recorded value + server-side caps determine whether this optional prompt exists. */
 export function BrowserPostValuePrompt() {
@@ -33,6 +34,7 @@ export function PostValuePrompt({
   kind?: "install" | "return";
   platform?: "web" | "ios" | "android";
 }) {
+  const { request, signal } = useGrowthSession();
   const claim = useRef<string | null>(null);
   const [target, setTarget] = useState<string | null>(null),
     [busy, setBusy] = useState(false),
@@ -40,7 +42,10 @@ export function PostValuePrompt({
   useEffect(() => {
     let active = true;
     claim.current ??= crypto.randomUUID();
-    void mutate(`engagement/${kind}/claim`, { platform, id: claim.current })
+    void request<{ eligible: boolean; target: string | null }>(
+      `engagement/${kind}/claim`,
+      { method: "POST", body: JSON.stringify({ platform, id: claim.current }) },
+    )
       .then((result) => {
         if (active) setTarget(result.eligible ? result.target : null);
       })
@@ -48,20 +53,20 @@ export function PostValuePrompt({
     return () => {
       active = false;
     };
-  }, [kind, platform]);
+  }, [kind, platform, request]);
   if (!target) return null;
   async function choose(choice: "later" | "declined" | "accepted") {
     setBusy(true);
     setError("");
     try {
-      await mutate(
-        `engagement/${kind}/choice`,
-        { id: claim.current, choice },
-        "PUT",
-      );
+      await request(`engagement/${kind}/choice`, {
+        method: "PUT",
+        body: JSON.stringify({ id: claim.current, choice }),
+      });
       if (choice === "accepted") window.location.assign(target!);
       else setTarget(null);
     } catch {
+      if (signal.aborted) return;
       setError(text("unavailable"));
     } finally {
       setBusy(false);
