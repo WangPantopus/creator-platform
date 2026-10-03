@@ -952,6 +952,10 @@
   <string name="w5_native_team_member" formatted="false">Team workspace</string>
   <string name="w5_native_team_verification_required" formatted="false">Current creator verification is required before opening Team.</string>
   <string name="w5_native_team_invitation" formatted="false">Invitation from {name} · {roles} · expires {expires}</string>
+  <string name="w5_native_team_accept" formatted="false">Accept invitation</string>
+  <string name="w5_native_team_accepted" formatted="false">The invitation acceptance was confirmed.</string>
+  <string name="w5_native_team_acceptance_unknown" formatted="false">The response was interrupted. Check current Team access, then retry this exact invitation. Nothing is sent automatically.</string>
+  <string name="w5_native_team_retry_acceptance" formatted="false">Retry exact invitation acceptance</string>
   <string name="w5_native_team_back" formatted="false">Studio workspace</string>
   <string name="w5_native_team_identity_rule" formatted="false">Team words always carry the team label. Team replies never fulfill a personal commitment.</string>
   <string name="w5_native_team_no_members" formatted="false">No Team members.</string>

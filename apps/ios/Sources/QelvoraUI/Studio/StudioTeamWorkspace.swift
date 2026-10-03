@@ -22,6 +22,13 @@ private struct NativeTeamEdit {
     var confirmed = false
 }
 
+private struct NativeTeamAcceptance {
+    let invitation: APIStudioSessionInvitationsItem
+    let capture: FanSessionRequestCapture
+    var unknown = false
+    var confirmed = false
+}
+
 /// Client display lifetime only. Every permission still belongs to the actual
 /// Studio/Identity producer. Nothing here issues an Actor or a signing scope.
 @MainActor private final class NativeTeamState: ObservableObject {
@@ -33,6 +40,7 @@ private struct NativeTeamEdit {
     @Published private(set) var saving = false
     @Published private(set) var error = ""
     @Published private(set) var edit: NativeTeamEdit?
+    @Published private(set) var acceptance: NativeTeamAcceptance?
     private(set) var accountId: String?
     private(set) var sessionId: String?
     private weak var session: FanSession?
@@ -48,6 +56,7 @@ private struct NativeTeamEdit {
     private var now: TimeInterval { ProcessInfo.processInfo.systemUptime }
     var ready: Bool { session?.checkingSession == false && session?.busy == false && session?.error.isEmpty == true }
     var mayManage: Bool { ready && current && now < checkedUntil && creator?.owned == true && creator?.verification == "verified" }
+    var mayAccept: Bool { ready && current && now < checkedUntil && creatorId == nil && !saving && !reading }
     var currentEditRoles: [String]? {
         guard let edit, let member = team?.members.first(where: { $0.account_id == edit.accountId && $0.revoked_at == nil }) else { return nil }
         return member.roles.map(\.rawValue).sorted()
@@ -75,7 +84,7 @@ private struct NativeTeamEdit {
     }
     private func conceal(discardEdit: Bool = false) {
         checkedUntil = 0; current = false; directory = nil; creator = nil; team = nil; capture = nil
-        if discardEdit { edit = nil }
+        if discardEdit { edit = nil; acceptance = nil }
     }
     private func matches(_ snapshot: Int) -> Bool {
         active && generation == snapshot && !Task.isCancelled && session?.destination == destination &&
@@ -143,7 +152,7 @@ private struct NativeTeamEdit {
                 checkedUntil = started + 5; current = true
                 // An actual current read can display a committed desired set,
                 // but it never invents acknowledgement of an unknown command.
-                if edit?.unknown != true && edit?.confirmed != true { error = "" }
+                if edit?.unknown != true && edit?.confirmed != true && acceptance?.unknown != true && acceptance?.confirmed != true { error = "" }
             } catch {
                 guard matches(snapshot) else { return }
                 let denied = error is NativeTeamDenied || (error as? CreatorAPIError).map { [401, 403, 404].contains($0.status) } == true
@@ -155,9 +164,47 @@ private struct NativeTeamEdit {
     private func validate(_ value: APIStudioSession, request: FanSessionRequestCapture) throws {
         guard value.creators.count <= 50, value.invitations.count <= 50,
               Set(value.creators.map(\.id)).count == value.creators.count,
+              Set(value.invitations.map(\.id)).count == value.invitations.count,
+              value.invitations.allSatisfy({ UUID(uuidString: $0.id) != nil && UUID(uuidString: $0.creatorId) != nil && !$0.roles.isEmpty }),
               value.creators.allSatisfy({ $0.viewerAccountId == request.expectedAccountId && UUID(uuidString: $0.id) != nil }),
               request.expectedAccountId == accountId, request.sessionId == sessionId else { throw NativeTeamDenied() }
     }
+    func accept(_ invitation: APIStudioSessionInvitationsItem) {
+        guard mayAccept, acceptance == nil, let capture,
+              directory?.invitations.contains(where: { $0.id == invitation.id && $0.creatorId == invitation.creatorId }) == true else { return }
+        acceptance = NativeTeamAcceptance(invitation: invitation, capture: capture)
+        retryAcceptance()
+    }
+    func closeAcceptance() { if !saving { acceptance = nil; error = "" } }
+    func retryAcceptance() {
+        guard mayAccept, let command = acceptance, !command.confirmed else { return }
+        let snapshot = generation
+        saving = true
+        writeTask = Task { [weak self] in
+            guard let self else { return }
+            defer { if generation == snapshot { saving = false; writeTask = nil; refresh() } }
+            do {
+                guard await matches(snapshot, request: command.capture), mayAcceptDuringWrite else {
+                    if matches(snapshot) { conceal(discardEdit: ready); error = teamCopy(ready ? "AccountChanged" : "Unavailable") }
+                    return
+                }
+                var pending = command; pending.unknown = true; acceptance = pending
+                _ = try await command.capture.client.acceptTeamInvitation(invitationId: command.invitation.id)
+                guard await matches(snapshot, request: command.capture), acceptance?.invitation.id == command.invitation.id else { return }
+                var done = command; done.unknown = false; done.confirmed = true; acceptance = done
+                error = teamCopy("Accepted")
+            } catch {
+                guard await matches(snapshot, request: command.capture), acceptance?.invitation.id == command.invitation.id else { return }
+                if let failure = error as? CreatorAPIError, [401, 403, 404].contains(failure.status) {
+                    conceal(discardEdit: true); self.error = teamCopy("Denied")
+                } else {
+                    var pending = command; pending.unknown = true; acceptance = pending
+                    self.error = teamCopy("AcceptanceUnknown")
+                }
+            }
+        }
+    }
+    private var mayAcceptDuringWrite: Bool { ready && current && now < checkedUntil && creatorId == nil }
     func openEditor(_ member: APIStudioTeamMembersItem) {
         guard mayManage, !saving, edit == nil, member.revoked_at == nil, !member.roles.isEmpty, member.account_id != accountId,
               let capture, team?.members.contains(where: { $0.account_id == member.account_id && $0.revoked_at == nil }) == true else { return }
@@ -273,7 +320,20 @@ private struct NativeTeamExpired: Error {}
             }
         }
         ForEach(directory.invitations, id: \.id) { invitation in
-            Text(teamCopy("Invitation", ["name": invitation.creatorName, "roles": invitation.roles.map(\.rawValue).joined(separator: ", "), "expires": invitation.expiresAt])).qText("body")
+            VStack(alignment: .leading, spacing: 8) {
+                Text(teamCopy("Invitation", ["name": invitation.creatorName, "roles": invitation.roles.map(\.rawValue).joined(separator: ", "), "expires": invitation.expiresAt])).qText("body")
+                Button(teamCopy("Accept"), variant: .secondary, block: true, disabled: !state.mayAccept || state.acceptance != nil) { state.accept(invitation) }
+            }
+        }
+        if let command = state.acceptance {
+            Text(teamCopy("Invitation", ["name": command.invitation.creatorName, "roles": command.invitation.roles.map(\.rawValue).joined(separator: ", "), "expires": command.invitation.expiresAt])).qText("body")
+            if command.unknown {
+                Text(teamCopy("AcceptanceUnknown")).qText("body")
+            }
+            if !command.confirmed {
+                Button(teamCopy(command.unknown ? "RetryAcceptance" : "Accept"), variant: .secondary, block: true, disabled: !state.mayAccept) { state.retryAcceptance() }
+            }
+            Button(QelvoraCopy.text("close"), variant: .quiet, block: true, disabled: state.saving) { state.closeAcceptance() }
         }
     }
     @ViewBuilder private func teamView(_ creator: APIStudioSessionCreatorsItem, _ team: APIStudioTeam) -> some View {

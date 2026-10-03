@@ -41,6 +41,10 @@ private data class TeamEdit(
     val expected: List<String>, val desired: List<String>,
     val unknown: Boolean = false, val confirmed: Boolean = false,
 )
+private data class TeamAcceptance(
+    val invitation: APIStudioSessionInvitationsItem, val capture: FanSessionRequestCapture,
+    val unknown: Boolean = false, val confirmed: Boolean = false,
+)
 private class TeamDenied : Exception()
 private class TeamExpired : Exception()
 
@@ -60,6 +64,7 @@ private class NativeTeamState(
     var saving by mutableStateOf(false); private set
     var error by mutableStateOf(""); private set
     var edit by mutableStateOf<TeamEdit?>(null); private set
+    var acceptance by mutableStateOf<TeamAcceptance?>(null); private set
     private var capture: FanSessionRequestCapture? = null
     private var active = false
     private var generation = 0
@@ -68,6 +73,8 @@ private class NativeTeamState(
     private var writeJob: Job? = null
     val ready: Boolean get() = !session.checkingSession && !session.busy && session.error.isEmpty()
     val mayManage: Boolean get() = ready && current && SystemClock.elapsedRealtime() < checkedUntil && creator?.owned == true && creator?.verification == "verified"
+    private val mayAcceptDuringWrite: Boolean get() = ready && current && SystemClock.elapsedRealtime() < checkedUntil && creatorId == null
+    val mayAccept: Boolean get() = mayAcceptDuringWrite && !saving && !reading
     val currentEditRoles: List<String>? get() = edit?.let { command -> team?.members?.firstOrNull { it.account_id == command.accountId && it.revoked_at == null }?.roles?.map { it.name }?.sorted() }
     val editIsStale: Boolean get() = edit?.let { command -> currentEditRoles?.let { it != command.expected.sorted() && it != command.desired.sorted() } ?: true } ?: false
     val canSave: Boolean get() = mayManage && !saving && !reading && edit?.desired?.isNotEmpty() == true && edit?.confirmed == false && !editIsStale && currentEditRoles != null
@@ -80,7 +87,7 @@ private class NativeTeamState(
     }
     private fun conceal(discardEdit: Boolean = false) {
         checkedUntil = 0; current = false; directory = null; creator = null; team = null; capture = null
-        if (discardEdit) edit = null
+        if (discardEdit) { edit = null; acceptance = null }
     }
     private fun matches(snapshot: Int): Boolean = active && generation == snapshot && session.destination == destination &&
         session.session?.accountId == accountId && session.session?.sessionId == sessionId && !session.purgingPrivateState && !session.localPurgeFailed
@@ -144,7 +151,7 @@ private class NativeTeamState(
                 checkedUntil = started + 5_000; current = true
                 // A real desired set is visible after a fresh read. It does not
                 // manufacture acknowledgement of an interrupted role command.
-                if (edit?.unknown != true && edit?.confirmed != true) error = ""
+                if (edit?.unknown != true && edit?.confirmed != true && acceptance?.unknown != true && acceptance?.confirmed != true) error = ""
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (failure: Exception) {
                 if (matches(snapshot)) {
@@ -156,7 +163,41 @@ private class NativeTeamState(
     }
     private fun validate(value: APIStudioSession, request: FanSessionRequestCapture) {
         if (value.creators.size > 50 || value.invitations.size > 50 || value.creators.map { it.id }.toSet().size != value.creators.size ||
+            value.invitations.map { it.id }.toSet().size != value.invitations.size || value.invitations.any { !uuid(it.id) || !uuid(it.creatorId) || it.roles.isEmpty() } ||
             value.creators.any { it.viewerAccountId != request.expectedAccountId || !uuid(it.id) } || request.expectedAccountId != accountId || request.sessionId != sessionId) throw TeamDenied()
+    }
+    fun accept(invitation: APIStudioSessionInvitationsItem) {
+        val request = capture ?: return
+        if (!mayAccept || acceptance != null || directory?.invitations?.none { it.id == invitation.id && it.creatorId == invitation.creatorId } != false) return
+        acceptance = TeamAcceptance(invitation, request)
+        retryAcceptance()
+    }
+    fun closeAcceptance() { if (!saving) { acceptance = null; error = "" } }
+    fun retryAcceptance() {
+        val command = acceptance ?: return
+        if (!mayAccept || command.confirmed) return
+        val snapshot = generation
+        saving = true
+        writeJob = scope.launch {
+            try {
+                if (!matches(snapshot, command.capture) || !mayAcceptDuringWrite) {
+                    if (matches(snapshot)) { conceal(discardEdit = ready); error = teamCopy(if (ready) "AccountChanged" else "Unavailable") }
+                    return@launch
+                }
+                acceptance = command.copy(unknown = true)
+                command.capture.client.acceptTeamInvitation(command.invitation.id)
+                if (!matches(snapshot, command.capture) || acceptance?.invitation?.id != command.invitation.id) return@launch
+                acceptance = command.copy(confirmed = true, unknown = false); error = teamCopy("Accepted")
+            } catch (cancelled: CancellationException) { throw cancelled }
+            catch (failure: Exception) {
+                if (!matches(snapshot, command.capture) || acceptance?.invitation?.id != command.invitation.id) return@launch
+                if ((failure as? CreatorAPIError)?.status in listOf(401, 403, 404)) {
+                    conceal(discardEdit = true); error = teamCopy("Denied")
+                } else {
+                    acceptance = command.copy(unknown = true); error = teamCopy("AcceptanceUnknown")
+                }
+            } finally { if (generation == snapshot) { saving = false; writeJob = null; refresh() } }
+        }
     }
     fun openEditor(member: APIStudioTeamMembersItem) {
         val request = capture ?: return
@@ -256,7 +297,20 @@ fun StudioTeamWorkspace(
                         else TextLine(teamCopy("VerificationRequired"))
                     }
                 }
-                directory.invitations.forEach { invitation -> TextLine(teamCopy("Invitation", mapOf("name" to invitation.creatorName, "roles" to invitation.roles.joinToString { it.name.lowercase() }, "expires" to invitation.expiresAt))) }
+                directory.invitations.forEach { invitation ->
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        TextLine(teamCopy("Invitation", mapOf("name" to invitation.creatorName, "roles" to invitation.roles.joinToString { it.name.lowercase() }, "expires" to invitation.expiresAt)))
+                        Button(teamCopy("Accept"), ButtonVariant.SECONDARY, block = true, disabled = !state.mayAccept || state.acceptance != null) { state.accept(invitation) }
+                    }
+                }
+                state.acceptance?.let { command ->
+                    TextLine(teamCopy("Invitation", mapOf("name" to command.invitation.creatorName, "roles" to command.invitation.roles.joinToString { it.name.lowercase() }, "expires" to command.invitation.expiresAt)))
+                    if (command.unknown) {
+                        TextLine(teamCopy("AcceptanceUnknown"))
+                    }
+                    if (!command.confirmed) Button(teamCopy(if (command.unknown) "RetryAcceptance" else "Accept"), ButtonVariant.SECONDARY, block = true, disabled = !state.mayAccept, onClick = state::retryAcceptance)
+                    Button(QelvoraCopy.text("close"), ButtonVariant.QUIET, block = true, disabled = state.saving, onClick = state::closeAcceptance)
+                }
             } else if (creator != null && team != null) {
                 TextLine(creator.display_name, strong = true); TextLine(teamCopy("IdentityRule"))
                 if (team.members.isEmpty()) TextLine(teamCopy("NoMembers"))

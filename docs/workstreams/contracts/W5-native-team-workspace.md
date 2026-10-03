@@ -64,10 +64,20 @@ Both controls and state methods refuse selection changes while that review is
 stale; choosing the newly observed set cannot bypass explicit review.
 
 This slice supplies workspace/Team reads, current member roles and role editing.
-Pending workspace invitations are displayed from the actual producer. Invitation
-acceptance, invitation creation/removal, the broader daily Studio, personal
-signing and other native domain workflows remain separate implementation and
-acceptance work. Existing web Team acceptance is not transferred here.
+Pending workspace invitations come from the actual producer; IDs and creator IDs
+must be canonical UUIDs, distinct and have a nonempty typed role set. The directory
+offers generated `acceptTeamInvitation` using only the original selected invitation
+ID and genuine captured client. The actual server owns expiry/account/revocation
+and idempotent accepted-at checks. The command locks before dispatch; an unknown
+response keeps its exact invitation/capture for explicit retry, even if a later
+current directory no longer lists it. Absence never confirms acceptance. Only a
+current successful generated Done response marks it confirmed. Temporary checking
+conceals the body while preserving the pending original command; actual denial,
+account/session departure or disposal clears it. No automatic replay or credential
+reconstruction. Public constructor/callbacks remain unchanged.
+
+Invitation creation/removal, the broader daily Studio, personal signing and other
+native domain workflows remain separate implementation and acceptance work. Existing web Team acceptance is not transferred here.
 
 Implemented and generated source can be reviewed independently. Shipping root
 integration, current native compilation/builds and personally operated

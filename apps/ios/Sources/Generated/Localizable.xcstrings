@@ -10319,6 +10319,39 @@
         }
       }
     },
+    "The invitation acceptance was confirmed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The invitation acceptance was confirmed."
+          }
+        }
+      }
+    },
+    "The response was interrupted. Check current Team access, then retry this exact invitation. Nothing is sent automatically.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The response was interrupted. Check current Team access, then retry this exact invitation. Nothing is sent automatically."
+          }
+        }
+      }
+    },
+    "Retry exact invitation acceptance": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry exact invitation acceptance"
+          }
+        }
+      }
+    },
     "Team words always carry the team label. Team replies never fulfill a personal commitment.": {
       "extractionState": "manual",
       "localizations": {
