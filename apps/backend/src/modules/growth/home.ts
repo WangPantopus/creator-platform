@@ -183,7 +183,7 @@ export function canonicalConversationHomePage(
           creatorName: scope.creatorName,
           label,
           preview,
-          destination: `/creators/${handle}/chat`,
+          destination: `/threads/${scope.creatorId}/${scope.fanId}`,
           updatedAt:
             entry.activityAt ??
             new Date(

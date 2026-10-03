@@ -1,4 +1,5 @@
 import { copy } from "@qelvora/copy";
+import { ReturnTargetSchema } from "@qelvora/api";
 import { z } from "zod";
 import type { Actor } from "../identity/adapter.js";
 import type { NotificationReadCustody } from "./notification-custody.js";
@@ -32,6 +33,21 @@ export const Destination = z
   .regex(
     /^\/(?:creators\/[a-z0-9_-]+(?:\/(?:posts\/[a-f0-9-]+|chat(?:\?context=[a-f0-9-]+)?))?|commerce\/(?:requests|spending|status\?packetId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})|requests\/[a-f0-9-]+|calls\/[a-f0-9-]{36}\/[a-f0-9-]{36}\/[a-f0-9-]{36}|notifications|studio\/(?:impact|insights)|you(?:\/spending)?|share\/[a-f0-9-]+)$/u,
   );
+/** Saved families are private Home destinations. Keep them out of public
+ * notification/share destinations; the route never grants family access. */
+export const HomeThreadDestination = ReturnTargetSchema.max(512).refine(
+  (value) => {
+    const parts = value.split("/");
+    return (
+      parts.length === 4 &&
+      parts[0] === "" &&
+      parts[1] === "threads" &&
+      z.uuid().safeParse(parts[2]).success &&
+      z.uuid().safeParse(parts[3]).success
+    );
+  },
+  "A registered private conversation destination is required",
+);
 const EventFields = {
   id: z.uuid(),
   aggregateId: z.uuid(),

@@ -2,7 +2,7 @@ import { copy } from "@qelvora/copy";
 import { z } from "zod";
 import { DomainError } from "../../core/errors.js";
 import type { GrowthOwners, HomeEntry } from "./contracts.js";
-import { Destination } from "./contracts.js";
+import { Destination, HomeThreadDestination } from "./contracts.js";
 
 type Kind = HomeEntry["kind"];
 type Source = NonNullable<GrowthOwners["homePage"]>;
@@ -19,17 +19,25 @@ const Cursor = z.strictObject({
   }),
   done: z.array(z.enum(kinds)).max(3),
 });
-const Entry = z.strictObject({
-  id: z.uuid(),
-  creatorId: z.uuid(),
-  creatorName: z.string().max(200),
-  label: z.string().max(200),
-  preview: z.string().max(1000),
-  destination: Destination,
-  updatedAt: z.iso.datetime().regex(/T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?Z$/u),
-  kind: z.enum(kinds),
-  cursor: Position,
-});
+const Entry = z
+  .strictObject({
+    id: z.uuid(),
+    creatorId: z.uuid(),
+    creatorName: z.string().max(200),
+    label: z.string().max(200),
+    preview: z.string().max(1000),
+    destination: z.union([Destination, HomeThreadDestination]),
+    updatedAt: z.iso.datetime().regex(/T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?Z$/u),
+    kind: z.enum(kinds),
+    cursor: Position,
+  })
+  .refine(
+    (entry) =>
+      !entry.destination.startsWith("/threads/") ||
+      (entry.kind === "thread" &&
+        entry.destination.split("/")[2] === entry.creatorId),
+    "A saved family destination must match its Home creator",
+  );
 
 /** Compare UTC microsecond directory clocks consistently across owners. */
 export function compareHomeActivity(a: HomeEntry, b: HomeEntry) {
