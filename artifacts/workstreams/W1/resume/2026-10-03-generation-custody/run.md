@@ -1,0 +1,15 @@
+# W1 original generation transaction custody — October3 UTC
+
+W1 personally implemented the original generation and distinct terminal pool cleanup over54bb4ccd, retaining original0159/0179/0183 source bytes, task/nonce/PID/fullXID/deadlines and all existing catalogue/restoration/final bookends. Optional AbortSignal parameters supply cancellation only. The actual checked-out PID is captured internally. A separate bounded control socket settles before COMMIT or pool release. Transport/cancellation uncertainty closes the original socket without later SQL; failed rollback discards the client. Genuine private scope bindings are invalidated on every callback exit.
+
+Backend type checking, scoped lint and all nine existing backend contracts pass. No new unit test or original reference was added or changed.
+
+W1 personally ran actual PostgreSQL transport operation on its retained closed publication qualification database in `creator-platform-w1-cc`, connection limit0 throughout. The connection used its existing private owner control credentials for transport qualification only; no worker purpose was activated or impersonated. Each transaction was read-only and introduced no business fixtures.
+
+- Actual in-flight `pg_sleep` cancelled through the internally captured original PID; SQL57014 returned, rollback settled and the same connection had no assigned transaction when reused.
+- Abort between SQL statements refused COMMIT after the actual control connection settled.
+- Actual separately controlled termination of the held source refused COMMIT and the next checkout used a different PID.
+- An already-aborted signal never ran the callback and left no waiting checkout.
+- An unaffected read-only transaction committed and returned its actual receipt.
+
+All six before/after closed-database fingerprints matched: schema, business data, roles, migration ledger, relation security and sequences. Private harness/configuration/diagnostics stay outside Git. These results qualify actual connection custody, not positive generation, provider, terminal settlement, financial effects or finite consent. Combined0212/0216 and terminal consumers still require independent source/catalogue/drift/C10 qualification before activation.

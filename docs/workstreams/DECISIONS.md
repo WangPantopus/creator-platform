@@ -292,3 +292,7 @@ Keep original0158/0071 and0204/0205 immutable. A packetless public answer must a
 ## Native spending navigation — October3 UTC
 
 Daily Spend is entered from You, so both shipping shells retain You as its selected tab. Other existing Commerce destinations select Requests. The prior generic fallback selected Home for `/commerce/spending` and request-detail routes despite retaining those actual destinations. This shell repair changes the selected navigation state; each owner screen continues to authorize its actual account/object and controls its Back destination. W4 owns its operated Spend Back repair. Current shipping rebuild/personal navigation verification remains required; original references are preserved.
+
+## Original generation connection custody — October3 UTC
+
+Generation and terminal authority own their original transaction settlement. Bind cancellation to the PID read from that checked-out connection, retain it until the separate bounded control socket settles, and destroy uncertain transports or failed rollbacks. A signal grants no purpose permission and cannot supply a PID or alter an original lease. Close cancellation before atomic COMMIT so delayed cancellation cannot reach that commit or a later pool user, and return the actual commit receipt once accepted. Scope invalidation and all original authority bookends precede settlement. Actual transport qualification on W1's closed database is distinct from positive worker/business/consent acceptance.
