@@ -438,7 +438,7 @@ public struct FanAppShell: View {
                     ViewThatFits(in: .vertical) {
                         shellNotices.fixedSize(horizontal: false, vertical: true)
                         ScrollView { shellNotices }
-                    }.frame(maxHeight: max(0, frame.size.height / 3), alignment: .top)
+                    }.frame(maxHeight: max(0, frame.size.height / 3), alignment: .top).clipped()
                 } else {
                     shellNotices
                 }
