@@ -55,3 +55,42 @@ and the two named primitive outcomes only. Release-ready:false. Actual signed
 Note, recorded Ops review, two-fan privacy, duplicate/withdrawal/reaction,
 current browser/native acceptance and finite C10 remain open. All nine W5
 packages remain incomplete. No heavy/API/browser/device lease is held.
+
+## Wrapped cancellation review and exact repair
+
+W6 and W8 personally identify a source gap in the first revision: Trust wraps
+the actual AbortError/TimeoutError as a DomainError with a private cause, while
+Content checked only the outer name and the shared classifier checked only
+transport messages/codes. The earlier ca591d95 primitives do not qualify that
+missing case or a positive product review.
+
+Personally implemented at `28c133d7e3ad65739852e02d83d496cfe19c2d7e`:
+the existing bounded cause/AggregateError traversal also recognizes actual
+AbortError/TimeoutError names. Content uses that single classifier before
+savepoint cleanup. The held-client owner also receives the same conservative
+classification. No callback, task, Actor, reviewed decision or authority is
+introduced; completed PostgreSQL57014 remains a settled failure.
+
+Exact-source backend build/types, affected lint/format/diff and all nine
+existing contracts pass. Personally operated actual Node timer cancellation,
+its elapsed TimeoutError reason and explicit AbortSignal cancellation through
+the original Trust error leaf: all retain their original nonenumerable cause,
+public503 and uncertain=true. Private0600 receipt SHA256
+`12e6433e6fca693f08b3cf4109f083705fc796daedba6f8c4eb1fedd1f29de1f`.
+These are host cancellation primitives only, with no database client or task.
+
+The original read-only canonical61 PostgreSQL operation is repeated at this
+exact source, preserving the earlier receipt. Actual client read timeout
+63.086ms is uncertain=true; original settlement completes and independent
+readback300ms later finds its PID absent. Actual server57014 at43.761ms remains
+uncertain=false with safe rollback and its healthy pooled PID. Both original
+causes stay private/nonenumerable; actual creator_runtime/database/61 ledger
+remain and the pool closes normally. Private0600 receipt SHA256
+`5c78bf62a5924983f11a828a8a75dc73440349f7f814be0304c56410fa397b72`.
+Normal finite check wrapper releases the canonical heavy guard; no lease is held.
+
+Verified: the stated source checks and actual host/PostgreSQL primitives.
+The private product helper, genuine0156 review/task, signed Note, two-fan
+privacy, current native application and finite C10 are still unverified.
+PR304 remains draft for those gates; all nine packages remain incomplete and
+release-ready:false. No primitive is promoted into application acceptance.
