@@ -1069,6 +1069,32 @@
       "path": "apps/backend/src/modules/conversation/migrations/pending_w3_publication_worker_output.sql",
       "state": "reserved_unapplied",
       "reason": "Distinct actual W3-proposed neutral publication system-link purpose. Isolated NoLogin NoInherit NoBypassRLS creator_w3_publication_output owns creator.publication_worker_system_link(uuid,uuid,uuid,uuid) RETURNS TABLE(message_id uuid,event_id uuid,cursor integer,epoch integer) for actual original W1 preparation nonce/token/publication/existing recipient thread. Fixed sequence0 frame says Answered publicly. Private creator.publication_worker_system_link_matches(uuid,uuid,uuid,uuid,uuid,uuid) RETURNS boolean verifies actual message/event issuance PID/fullXID/login/current original preparation/epoch/cursor/frame for internal W3 and actual isolated W4 creator_fulfillment_publication_worker only. Actual W3 reviewed SQL creates its own role and consumes only actual0219 one-recipient projection/family matcher. No Actor/ThreadScope, caller text, guessed message/event, fabricated W3 role/source, raw208 scope grant, broadened message/event SELECT for xmin, or provider/financial/signature effect. Requires actual W1 preparation/current original task/restoration, original W4 input/consent/signature/full families/minimum and W8 original205 negatives, same-client writer/proof/delivery bookends and sole W1 final cleanup/COMMIT. Exact owner SQL/definitions/typed callers/full combined effective catalogue/compiler/drift/cancellation/C10/real output/physical privacy/application acceptance remain pending. Allocation only; no source pin, activation or receipt."
+    },
+    {
+      "id": "0221",
+      "owner": "W3",
+      "version": "0221_w3_generation_context_profile_bound",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_generation_context_profile_bound.sql",
+      "sourceSha256": "b0fe4643e110a4a6b752ae44847543c7cb8897bdd2a56c2daa58574b9c58536e",
+      "state": "reserved_unapplied",
+      "reason": "Distinct additive restrictive fan_profile SELECT boundary for existing creator_generation_conversation_context requested by W3. Actual published d95f5936 bytes independently read/hash-checked; original0095/0179 remain immutable. Restrictive scope binds genuine original W1 nonce/client/PID/fullXID/login/read operation/five-second task family and current intro_shared, non-off-the-record epoch/revision/no-exclusion predicates, without Actor GUCs or new grants/roles. This prevents PUBLIC permissive policies from OR-bypassing the purpose filter; fixed original context function and typed task authority remain mandatory. Exact runtime/source registration and independently qualified complete combined policy/ACL/function/caller catalogue, closed compiler/refusal/drift, fresh/preserved wave, cancellation/C10 and genuine task/application review remain pending. Source custody only; no accepted catalogue, executable activation, private body, provider permission or positive claim."
+    },
+    {
+      "id": "0222",
+      "owner": "W4",
+      "version": "0222_w4_generation_audience_profile_fence",
+      "path": "apps/backend/src/modules/commerce/schema-generation-audience-profile-fence.sql",
+      "state": "reserved_unapplied",
+      "reason": "Distinct additive restrictive creator_profile/fan_profile SELECT boundaries for existing creator_w4_generation_audience requested by W4 after its closed original-scope metadata observations. Preserve original0182 bytes and fixed generation audience function, every original W1 nonce/client/PID/fullXID/login/task creator/fan/accounts/current original predicate and same-client restoration/negative bookend. No new role/scope/business row, Actor GUC, grants, permission or original policy weakening; PUBLIC permissive profile policy cannot OR-bypass this existing purpose role boundary. Actual published057076b4 SQL and current runtime delta independently read/hash-checked. Exact typed callers and independent complete effective catalogue/compiler/refusal/drift/fresh-preserved wave/cancellation/C10/genuine task review remain pending. Published source custody only; no accepted catalogue, activation or raw-worker/private-body/provider authority.",
+      "sourceSha256": "11d3d327f22082166d85f17179fe7a8cf94bcd9161714c8055b07537ff639e9d"
+    },
+    {
+      "id": "0223",
+      "owner": "W2",
+      "version": "0223_w2_generation_profile_bound",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_generation_profile_bound.sql",
+      "state": "reserved_unapplied",
+      "reason": "Distinct additive restrictive creator_profile SELECT boundaries requested by W2 for both existing creator_w2_generation_metadata and creator_w2_generation_retrieval. Preserve original0211/0187 source bytes, fixed metadata/retrieval functions, genuine W1 nonce/client/PID/fullXID/login/read task/family/profile ownership and all original current input/restoration/negative/final bookends. PUBLIC permissive profile policies must not OR-bypass either original purpose role. No role, membership, grants, business/scope row, Actor GUC or permission is added. Exact owner SQL/policy expressions/current registered runtime guard and independently reviewed complete effective catalogue/compiler/refusal/drift/fresh-preserved wave/cancellation/C10/genuine original task qualification remain pending. Allocation only; no source pin, accepted catalogue, activation, private body/raw-worker/provider permission or positive receipt."
     }
   ]
 }
