@@ -1,0 +1,15 @@
+{
+  "pullRequest": "https://github.com/WangPantopus/creator-platform/pull/222",
+  "reviewedHead": "19c5167ff0efb643a31cb0019a44945c84f2bf12",
+  "capturedBase": "9e9710439ac858e148460bcc03ee8460f534ae8f",
+  "checkedMergeTree": "90bf3502a0ec51e03174862f1f23ab43bf3e8199",
+  "actualMergeCommit": "16676260cce8e659ef9ceafd88cef5eae1ac0550",
+  "mergedAt": "2026-10-03T03:42:56Z",
+  "method": "normal merge, exact head match, no admin override",
+  "hostedChecksAtMerge": "all observed current-head Foundation jobs QUEUED; none counted as passed",
+  "sourceChecks": "current web/backend types, scoped ESLint, Prettier/diff and generated111 operations passed; production Next build passed at1add6a6f",
+  "personalWebSource": "1add6a6f711cac41279f8ed846dc0f02459ea481",
+  "personalApiSource": "c6850d6e3c2fa7359d1af4957694aba0303b06f4",
+  "personalScope": "production390/1280 Light/Night, actual unmatched/matching search and unsigned revision19 Note editor, offline concealment and retained-query Retry recovery",
+  "unverified": "populated More, committed once-only retry, genuine signing/private/group/paid/media/AI/live acceptance and complete W5 release readiness"
+}
