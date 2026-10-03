@@ -1,0 +1,24 @@
+{
+  "reviewedMapCommit": "fb1cbcaab7926e96a361bfd7840ecf192efafefd",
+  "reviewedMapPath": "infra/migrations/waves/20261002-privacy-held.json",
+  "reviewedMapSha256": "2338f48ea4b1008f47eef43ff7a835021e5e917669ad44f21179c69d03227c0a",
+  "state": "held_unapplied",
+  "factories": [
+    {
+      "version": "0172_w5_reply_tenure_cap",
+      "path": "apps/backend/src/modules/content/schema-note-reply-tenure.sql",
+      "sha256": "b1ec7e9684e5f916253202cf8d6b484376fe3c74dbec63221500e68ecf7fe0ba"
+    },
+    {
+      "version": "0186_w5_generation_content_origin",
+      "path": "apps/backend/src/modules/content/schema-generation-origin.sql",
+      "sha256": "2f1c4b30133a0c8707b16b15c1e42a9daf539cb5edeeb48ad6a835352a4f444d"
+    }
+  ],
+  "sqlBytesAndPathsUnchanged": true,
+  "historicalSqlCommentsUnchanged": true,
+  "migrationRegistryUnchanged": true,
+  "databaseActivated": false,
+  "checks": ["backend TypeScript", "scoped ESLint", "scoped Prettier"],
+  "limits": "Source factory metadata only. No alias ledger, SQL installation, real purpose call, signing, tenure or release acceptance."
+}

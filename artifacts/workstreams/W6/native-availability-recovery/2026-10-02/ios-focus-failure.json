@@ -1,0 +1,14 @@
+{
+  "source": "7596461c",
+  "database": "creator_w6_wave_fresh_20261002",
+  "actualUI": true,
+  "crashRepaired": true,
+  "accepted": false,
+  "uiCaseSeconds": 39.619,
+  "uiFailures": 1,
+  "failure": "Actual textField tap/type lost keyboard focus while background read disabled editing",
+  "persistedAvailabilityVersion": 1,
+  "resultCollection": "stalled after failed case; normal owned driver termination requested",
+  "repairSource": "45a9a2b5",
+  "nextAction": "rebuild and repeat same real journey"
+}

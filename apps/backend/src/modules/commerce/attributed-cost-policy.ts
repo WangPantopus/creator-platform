@@ -53,6 +53,7 @@ export function attributedGenerationCostPolicy(input: {
   currentVersion: string;
   approvedRules: readonly unknown[];
   migration: GenerationCostPolicy["migration"];
+  originalRuleMigration?: GenerationCostPolicy["originalRuleMigration"];
 }): GenerationCostPolicy {
   invariant(
     typeof input.journal.current === "function" &&
@@ -130,6 +131,14 @@ export function attributedGenerationCostPolicy(input: {
   };
   return Object.freeze({
     version: active.version,
+    originalRule: active,
+    ...(input.originalRuleMigration
+      ? {
+          originalRuleMigration: Object.freeze({
+            ...input.originalRuleMigration,
+          }),
+        }
+      : {}),
     migration: Object.freeze({ ...input.migration }),
     reserveUnits: () => active.ceilingUnits,
     async current(

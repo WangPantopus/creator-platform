@@ -1,13 +1,17 @@
-import type { Pool } from "pg";
+import type { Pool, PoolClient } from "pg";
 import { invariant } from "../../core/errors.js";
 import type { PrivacyHook } from "./contracts.js";
-import { privacyTaskAuthority } from "./privacy-authority.js";
+import {
+  privacyTaskAuthority,
+  restoredPrivacyTaskAuthorityInTransaction,
+} from "./privacy-authority.js";
 
 /** Export account records through existing W1 RLS; credentials and upstream
  * tokens never enter an artifact. Erasure awaits the reviewed retention policy. */
 export function identityPrivacyHook(
   runtime: Pool,
   coordinator: Pool,
+  assertRestoredInTransaction?: (client: PoolClient) => Promise<void>,
 ): PrivacyHook {
   const verify = privacyTaskAuthority(coordinator);
   return {
@@ -25,8 +29,22 @@ export function identityPrivacyHook(
         "Relationship requests require a reviewed mapping of scoped identity proofs.",
       );
       const client = await runtime.connect();
+      let released = false;
+      const abort = () => {
+        if (!released) {
+          released = true;
+          client.release(true);
+        }
+      };
+      input.signal!.addEventListener("abort", abort, { once: true });
       try {
+        input.signal!.throwIfAborted();
         await client.query("BEGIN");
+        await restoredPrivacyTaskAuthorityInTransaction(
+          client,
+          input,
+          assertRestoredInTransaction,
+        );
         await client.query("SELECT set_config('app.account_id',$1,true)", [
           input.accountId,
         ]);
@@ -74,35 +92,79 @@ export function identityPrivacyHook(
               "SELECT id,mode,created_at,expires_at,revoked_at FROM creator.identity_session WHERE account_id=$1",
             ],
           ] as const;
-          for (const [name, sql] of sources) {
-            await verify(input);
-            const rows = (
-              await client.query(sql + " LIMIT 1001", [input.accountId])
-            ).rows;
-            invariant(
-              rows.length <= 1000,
-              "bounded_subjob_required",
-              "This identity export requires bounded subjobs; no truncated artifact was produced.",
+          // One fixed cursor gives all ten account projections the same MVCC
+          // snapshot. Separate held task/restore bookends remain current under
+          // READ COMMITTED; a retained repeatable-read snapshot is not authority.
+          const projection = sources
+            .map(([name, sql]) => {
+              data[name] = [];
+              return `SELECT '${name}'::text AS source,to_jsonb(item) AS row FROM (${sql} LIMIT 1001) item`;
+            })
+            .join(" UNION ALL ");
+          await client.query(
+            `DECLARE w8_identity_export NO SCROLL CURSOR FOR ${projection}`,
+            [input.accountId],
+          );
+          for (;;) {
+            await restoredPrivacyTaskAuthorityInTransaction(
+              client,
+              input,
+              assertRestoredInTransaction,
             );
-            data[name] = rows;
+            const page = await client.query<{ source: string; row: unknown }>(
+              "FETCH FORWARD 16 FROM w8_identity_export",
+            );
+            input.signal!.throwIfAborted();
+            if (page.rows.length === 0) break;
+            for (const item of page.rows) {
+              const rows = data[item.source];
+              invariant(
+                rows,
+                "identity_export_source_changed",
+                "The fixed identity export source is unavailable.",
+              );
+              rows.push(item.row);
+              invariant(
+                rows.length <= 1000,
+                "bounded_subjob_required",
+                "This identity export requires bounded subjobs; no truncated artifact was produced.",
+              );
+            }
+            invariant(
+              Buffer.byteLength(JSON.stringify(data)) <= 3_000_000,
+              "bounded_subjob_required",
+              "This identity export needs a protected streaming artifact.",
+            );
           }
+          await client.query("CLOSE w8_identity_export");
         }
-        await verify(input);
+        await restoredPrivacyTaskAuthorityInTransaction(
+          client,
+          input,
+          assertRestoredInTransaction,
+        );
+        input.signal!.throwIfAborted();
         await client.query("COMMIT");
+        input.signal!.throwIfAborted();
         return {
           receipt: {
             domain: "identity",
             jobId: input.jobId,
             complete: true,
+            snapshot: "single-cursor-read-committed",
             scope: input.scope,
           },
           data,
         };
       } catch (error) {
-        await client.query("ROLLBACK");
+        if (!released) await client.query("ROLLBACK");
         throw error;
       } finally {
-        client.release();
+        input.signal!.removeEventListener("abort", abort);
+        if (!released) {
+          released = true;
+          client.release();
+        }
       }
     },
   };

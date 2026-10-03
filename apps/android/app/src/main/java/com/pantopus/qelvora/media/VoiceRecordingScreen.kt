@@ -2,10 +2,6 @@ package com.pantopus.qelvora.media
 
 import com.pantopus.qelvora.generated.QelvoraCopy
 
-import android.Manifest
-import android.content.pm.PackageManager
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -24,6 +20,8 @@ import com.pantopus.qelvora.ui.Button
 import com.pantopus.qelvora.ui.ButtonVariant
 import com.pantopus.qelvora.ui.qColor
 import com.pantopus.qelvora.ui.qText
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 
 @Composable
 fun VoiceRecordingScreen(maxDurationMs: Long = 60_000) {
@@ -33,20 +31,12 @@ fun VoiceRecordingScreen(maxDurationMs: Long = 60_000) {
     val snapshot by recorder.snapshot.collectAsState()
     var mounted by remember(recorder, lifecycle) { mutableStateOf(true) }
     var requestPending by remember(recorder) { mutableStateOf(false) }
-    var permissionInFlight by remember(recorder) { mutableStateOf(false) }
     var grantedPending by remember(recorder) { mutableStateOf(false) }
+    val permissions = rememberNativeMediaDevicePermissions()
+    val scope = rememberCoroutineScope()
     fun startWhenResumed() {
         if (mounted && requestPending && grantedPending && lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
             requestPending = false; grantedPending = false; recorder.start()
-        }
-    }
-    val permission = key(recorder) {
-        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            permissionInFlight = false
-            if (mounted && requestPending) {
-                if (granted) { grantedPending = true; startWhenResumed() }
-                else { requestPending = false; recorder.deny() }
-            }
         }
     }
     DisposableEffect(recorder, lifecycle) {
@@ -55,12 +45,12 @@ fun VoiceRecordingScreen(maxDurationMs: Long = 60_000) {
             when (event) {
                 Lifecycle.Event.ON_RESUME -> startWhenResumed()
                 Lifecycle.Event.ON_PAUSE -> { recorder.pause(QelvoraCopy.text("w6RecordingPausedWhileYouLeftThisScreen")); recorder.pausePreview() }
-                Lifecycle.Event.ON_STOP -> { requestPending = false; grantedPending = false }
+                Lifecycle.Event.ON_STOP -> { requestPending = false; grantedPending = false; permissions.cancel() }
                 else -> Unit
             }
         }
         lifecycle.addObserver(observer)
-        onDispose { mounted = false; requestPending = false; grantedPending = false; lifecycle.removeObserver(observer); recorder.close() }
+        onDispose { mounted = false; requestPending = false; grantedPending = false; permissions.cancel(); lifecycle.removeObserver(observer); recorder.close() }
     }
     Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).padding(QelvoraTokens.space4), verticalArrangement = Arrangement.spacedBy(QelvoraTokens.space5)) {
         BasicText(QelvoraCopy.text("w6YourOwnVoice"), style = qText("display-md").copy(color = qColor("ink")))
@@ -70,11 +60,20 @@ fun VoiceRecordingScreen(maxDurationMs: Long = 60_000) {
         if (snapshot.state in listOf("recording", "paused")) {
             Button(if (snapshot.state == "recording") QelvoraCopy.text("w6Pause") else QelvoraCopy.text("w6Resume"), ButtonVariant.SECONDARY) { if (snapshot.state == "recording") recorder.pause() else recorder.resume() }
             Button(QelvoraCopy.text("w6StopAndPreview"), ButtonVariant.SECONDARY) { recorder.stop() }
-        } else if (requestPending) Button(QelvoraCopy.text("w6CancelPermissionRequest"), ButtonVariant.SECONDARY) { requestPending = false; grantedPending = false }
-        else Button(if (snapshot.state == "preview") QelvoraCopy.text("w6RecordAgain") else QelvoraCopy.text("w6Record"), ButtonVariant.SECONDARY, disabled = permissionInFlight) {
+        } else if (requestPending) Button(QelvoraCopy.text("w6CancelPermissionRequest"), ButtonVariant.SECONDARY) { requestPending = false; grantedPending = false; permissions.cancel() }
+        else Button(if (snapshot.state == "preview") QelvoraCopy.text("w6RecordAgain") else QelvoraCopy.text("w6Record"), ButtonVariant.SECONDARY, disabled = permissions.inFlight) {
             if (!mounted || !lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return@Button
-            if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) recorder.start()
-            else { requestPending = true; grantedPending = false; permissionInFlight = true; permission.launch(Manifest.permission.RECORD_AUDIO) }
+            requestPending = true; grantedPending = false
+            scope.launch {
+                try {
+                    val granted = permissions.request(camera = false)
+                    if (mounted && requestPending) {
+                        if (granted) { grantedPending = true; startWhenResumed() }
+                        else { requestPending = false; recorder.deny() }
+                    }
+                } catch (cancelled: CancellationException) { throw cancelled }
+                catch (_: Exception) { if (mounted && requestPending) { requestPending = false; recorder.deny() } }
+            }
         }
         if (snapshot.state == "preview") {
             Button(QelvoraCopy.text("w6PlayPrivatePreview"), ButtonVariant.SECONDARY) { recorder.playPreview() }

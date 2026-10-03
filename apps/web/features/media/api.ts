@@ -6,7 +6,11 @@ import type {
   CreatorMediaPurpose,
   CreatorMediaUploadTicket,
 } from "../../../../packages/api/src/media";
-import { CreatorMediaPolicyViewSchema } from "../../../../packages/api/src/media";
+import {
+  CreatorMediaPolicyViewSchema,
+  CreatorMediaAssetSchema,
+  MediaAssetSchema,
+} from "../../../../packages/api/src/media";
 
 /** Current saved-object projection only. Upload rechecks the same real policy. */
 export async function readCreatorMediaPolicy(input: {
@@ -89,13 +93,25 @@ export async function mediaRequest<T>(
       ])
     : request.signal;
   signal?.throwIfAborted();
-  const response = await fetch(`/api/w6/${path}`, {
-    ...request,
-    credentials: "same-origin",
-    cache: "no-store",
-    headers,
-    signal,
-  });
+  let response: Response;
+  try {
+    response = await fetch(`/api/w6/${path}`, {
+      ...request,
+      credentials: "same-origin",
+      cache: "no-store",
+      headers,
+      signal,
+    });
+  } catch (failure) {
+    signal?.throwIfAborted();
+    if (failure instanceof TypeError)
+      throw new MediaRequestError(
+        copy.w6MediaIsUnavailableTryAgain,
+        503,
+        "media_transport_unavailable",
+      );
+    throw failure;
+  }
   signal?.throwIfAborted();
   if (!response.ok) {
     const error = (await response.json().catch(() => null)) as {
@@ -137,6 +153,7 @@ export function uploadRecording(input: RecordingUploadInput) {
     ...input,
     family: `threads/${input.creatorId}/${input.fanId}/media`,
     declaration: { purpose: input.purpose },
+    parseAsset: (value) => MediaAssetSchema.parse(value),
   });
 }
 export function uploadCreatorMedia(
@@ -167,12 +184,14 @@ export function uploadCreatorMedia(
     onTicket: verify,
     family: `creators/${input.creatorId}/media`,
     declaration: { objectId: input.objectId, purpose: input.purpose },
+    parseAsset: (value) => CreatorMediaAssetSchema.parse(value),
   });
 }
 type BinaryTicket<A> = Omit<UploadTicket, "asset"> & { asset: A };
 async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
   family: string;
   declaration: Record<string, string>;
+  parseAsset: (value: unknown) => A;
   blob: Blob;
   durationMs?: number;
   expectedAccountId?: string;
@@ -183,11 +202,44 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
   onTicket: (ticket: BinaryTicket<A>) => void;
 }): Promise<A> {
   const family = input.family;
+  const openingIdentity = identity;
+  const expectedAccountId =
+    input.expectedAccountId ?? openingIdentity?.accountId;
+  if (
+    expectedAccountId === undefined ||
+    (openingIdentity && openingIdentity.accountId !== expectedAccountId)
+  )
+    throw new MediaRequestError(
+      "Your account changed. Reopen this content to continue.",
+      409,
+      "session_account_changed",
+    );
+  const signal = openingIdentity
+    ? AbortSignal.any([input.signal, openingIdentity.signal])
+    : input.signal;
   const request = <T>(path: string, init: RequestInit = {}) =>
     mediaRequest<T>(path, {
       ...init,
-      expectedAccountId: input.expectedAccountId,
+      expectedAccountId,
+      signal,
     });
+  const parseAsset = (value: unknown): A => {
+    const asset = input.parseAsset(value);
+    if (
+      asset.purpose !== input.declaration.purpose ||
+      ("creatorId" in asset &&
+        (asset.creatorId !== family.split("/")[1] ||
+          asset.objectId !== input.declaration.objectId ||
+          asset.ownerAccountId !== expectedAccountId)) ||
+      (asset.state === "uploading" &&
+        (asset.mimeType !== input.blob.type ||
+          asset.durationMs !== (input.durationMs ?? null) ||
+          asset.sha256 !== digest ||
+          asset.bytes !== input.blob.size))
+    )
+      throw new Error(copy.w6ThisUploadDoesNotBelongToTheCurrentContentRefresh);
+    return asset;
+  };
   if (
     !Number.isSafeInteger(input.blob.size) ||
     input.blob.size <= 0 ||
@@ -206,7 +258,7 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
         input.durationMs > 3_600_000))
   )
     throw new Error(copy.w6ChooseASupportedFileWithinTheContentSMediaLimit);
-  input.signal.throwIfAborted();
+  signal.throwIfAborted();
   const digest = Array.from(
     new Uint8Array(
       await crypto.subtle.digest("SHA-256", await input.blob.arrayBuffer()),
@@ -214,7 +266,7 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
   )
     .map((value) => value.toString(16).padStart(2, "0"))
     .join("");
-  input.signal.throwIfAborted();
+  signal.throwIfAborted();
   let ticket =
     input.resumed ??
     (await request<BinaryTicket<A>>(family, {
@@ -230,7 +282,18 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
       signal: input.signal,
     }));
   const validateTicket = () => {
+    ticket.asset = parseAsset(ticket.asset);
+    const url = new URL(ticket.url);
     if (
+      !["http:", "https:"].includes(url.protocol) ||
+      url.pathname !== `/v1/w6/${family}/${ticket.asset.id}/upload` ||
+      url.username !== "" ||
+      url.password !== "" ||
+      url.hash !== "" ||
+      url.searchParams.getAll("ticket").length !== 1 ||
+      !url.searchParams.get("ticket") ||
+      [...url.searchParams.keys()].some((key) => key !== "ticket") ||
+      !Number.isFinite(Date.parse(ticket.expiresAt)) ||
       (ticket.asset.state === "uploading" &&
         (ticket.asset.sha256 !== digest ||
           ticket.asset.bytes !== input.blob.size)) ||
@@ -247,9 +310,9 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
   const assetId = ticket.asset.id;
   input.onTicket(ticket);
   // A finish response may be lost after the worker has already claimed or processed the asset.
-  const current = await request<A>(`${family}/${ticket.asset.id}`, {
-    signal: input.signal,
-  });
+  const current = parseAsset(
+    await request<unknown>(`${family}/${ticket.asset.id}`),
+  );
   if (current.id !== assetId)
     throw new Error(copy.w6TheSavedUploadCouldNotBeConfirmed);
   if (
@@ -284,17 +347,19 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
     }
     const url = new URL(ticket.url);
     const next = Math.min(input.blob.size, offset + ticket.chunkBytes);
-    const asset = await request<A>(
-      `${family}/${ticket.asset.id}/upload${url.search}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/octet-stream",
-          "Upload-Offset": String(offset),
+    const asset = parseAsset(
+      await request<unknown>(
+        `${family}/${ticket.asset.id}/upload${url.search}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/octet-stream",
+            "Upload-Offset": String(offset),
+          },
+          body: input.blob.slice(offset, next),
+          signal: input.signal,
         },
-        body: input.blob.slice(offset, next),
-        signal: input.signal,
-      },
+      ),
     );
     if (asset.id !== assetId || asset.uploadedBytes !== next)
       throw new Error(
@@ -303,9 +368,13 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
     offset = asset.uploadedBytes;
     input.progress(offset / input.blob.size);
   }
-  return request<A>(`${family}/${ticket.asset.id}/finish`, {
-    method: "POST",
-    body: "{}",
-    signal: input.signal,
-  });
+  const finished = parseAsset(
+    await request<unknown>(`${family}/${ticket.asset.id}/finish`, {
+      method: "POST",
+      body: "{}",
+    }),
+  );
+  if (finished.id !== assetId)
+    throw new Error(copy.w6TheSavedUploadCouldNotBeConfirmed);
+  return finished;
 }

@@ -1,0 +1,31 @@
+{
+  "time": "2026-10-02T18:00:20.481027+00:00",
+  "purpose": "quiesced live canonical57 milestone after personal shipping iOS sessions",
+  "database": "creator_w2",
+  "ledger": 57,
+  "dumpBytes": 716006,
+  "dumpSha256": "a406cb5c4849d06331378a6e832ccb91e58c7033df33cd1cdfa8ba5ab5665d0b",
+  "tocEntries": 1572,
+  "privateMode": "0o600",
+  "privateTOCMode": "0o600",
+  "restoreDatabase": "creator_w2_ios_restore_20261002t180016z",
+  "restoreConnectionLimit": 0,
+  "fullCustodyMatches": {
+    "ledgerRows": 57,
+    "ledgerSha256": "b9710dfd946e53b0d5478e4fe5889cc7a24532db7f914bbcd697cf6e17d2fe0a",
+    "schemaSha256": "fc7b456d1b7d45cf6b11d67e26b1e446feb86c01a19f8eacc53cbf2ec1649b97",
+    "dataSha256": "bf21d248ed120db41bec1df9e8598315f7bf16daa6927b7cb9fa15ab401431c3",
+    "dataRows": 44,
+    "dataTables": 161,
+    "securitySha256": "10ba24720ad08624cb82c19d3724f7b952f9e869a398bd590982e2b3865d0839",
+    "securityRecords": 14686,
+    "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+    "sequences": 1,
+    "rolesSha256": "6fc1c6c734f3b6e5e0bcf34e0524e0c929c9d11c40726814dae2c33b564b27f3",
+    "roleCount": 42
+  },
+  "originalSourceStable": true,
+  "resources": "Only own W2 API quiesced, owned live DB unchanged; closed target with exact actual owner/database ACLs; no peer resource action",
+  "limits": "Backup/recovery proof, not provider, purpose activation, all-eight C10 or release acceptance",
+  "firstAttempt": "Refused before dump/create/restore because a guessed creator_owner database-owner assertion disagreed with actual postgres. Corrected to copy the actual source owner/ACL grantor; no live mutations."
+}

@@ -1,0 +1,57 @@
+{
+  "at": "2026-10-02T18:40:30.320491+00:00",
+  "readOnlyAdministrativeInspection": true,
+  "appDatabaseIsPrivateCandidateNotCanonicalActivation": true,
+  "webAndAndroidSource": "d1b763335ba18065dfe2a2fed33d2304aa06f2d1",
+  "iosSource": "4310ff9b",
+  "actualBackendRelease": "7f6c7a807dfb7afc0349af6c70248be78960fdd0",
+  "ownerRegistryProducer": "a5383ea2b01ceabc76dbc2e73227631cbbea5310",
+  "state": {
+    "calls": 0,
+    "media": 0,
+    "content": [
+      {
+        "id": "c0ea866e-8e7d-4ea5-be51-8e22724764f9",
+        "kind": "note",
+        "state": "draft",
+        "version": 1
+      }
+    ],
+    "threads": [
+      {
+        "id": "60000000-0000-4000-8000-000000000004",
+        "epoch": 0,
+        "control": "human_active"
+      }
+    ],
+    "database": "creator_w6_privacy_app_20261002",
+    "admissions": 0,
+    "migrations": 61,
+    "call_events": 0,
+    "availability": [
+      {
+        "version": 6,
+        "windows": [
+          {
+            "endsAt": "2026-11-01T08:53:00.000Z",
+            "startsAt": "2026-11-01T08:30:00.000Z"
+          },
+          {
+            "endsAt": "2026-11-01T09:50:00.000Z",
+            "startsAt": "2026-11-01T09:30:00.000Z"
+          }
+        ],
+        "time_zone": "America/Los_Angeles",
+        "creator_id": "60000000-0000-4000-8000-000000000001",
+        "updated_at": "2026-10-02T18:34:52.388409+00:00",
+        "creator_account_id": "10000000-0000-4000-8000-000000000001"
+      }
+    ],
+    "call_effects": 0,
+    "creator_media": 0,
+    "runtime_memberships": 0,
+    "content_publications": 0,
+    "account_call_metadata": null,
+    "held_0197_0201_ledger": 0
+  }
+}

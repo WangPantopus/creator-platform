@@ -1,0 +1,44 @@
+{
+  "operatedBy": "W4 primary through CUA in official Android Studio mirror",
+  "date": "2026-10-02",
+  "device": "owned CreatorPlatform_W4 / emulator-5564, API34",
+  "apkSource": "00cfad792d64bf18b53e64cc444d1157d08ab343",
+  "apkSha256": "5a81e430f6e600dd6c64f4a4ea6ae9352bbb7f3c77c970b6a541b493d4d4af3a",
+  "apiSource": "65f9dc16130f8a0ecb5b36c5be42e27d0e9bded7",
+  "database": "owned canonical57; no future proposal activated",
+  "installSuccess": true,
+  "actualActions": [
+    "Real notification-shade drags, Android Settings search and soft-keyboard taps; selected Font size maximum",
+    "Read-only device configuration confirmed font_scale2.0",
+    "Light Spending scroll, selected Choose an amount, focused amount, actual decimal soft keyboard typed6.50, hid keyboard",
+    "Save limit fully visible after scrolling; not pressed for this unsaved regression draft",
+    "Tapped You, Memberships and requests, scrolled to Manage membership and tapped it",
+    "Actual No memberships / Purchase and restore unavailable state readable at2.0",
+    "Normally stopped only own package and launched Night return; actual current6USD, zero held/refunds and original pending increase Oct3 05:42 retained",
+    "Real system Quick Settings font sheet restored1.0; read-only configuration confirmed",
+    "Verified own AVD name, normal emulator kill, process exited0 and exact nonce/inode GUI/slot2 leases released"
+  ],
+  "persistedResult": {
+    "currentUsd": 6,
+    "chargedUsd": 0,
+    "heldUsd": 0,
+    "refundedUsd": 0,
+    "pendingNoLimitUtc": "2026-10-03 05:42",
+    "reminders": "off; no new consent"
+  },
+  "notVerified": [
+    "TalkBack or reduced-motion acceptance",
+    "A new saved amount at2.0 (draft deliberately discarded)",
+    "Matured24-hour increase",
+    "Positive store purchase/restore/management sheet",
+    "Creator/capture/consent/System group delivery/provider/signature",
+    "iOS personal taps"
+  ],
+  "screenshots": [
+    "light-200-decimal.png",
+    "light-200-save-reachable.png",
+    "light-200-management-unavailable.png",
+    "night-200-persisted.png"
+  ],
+  "resourcesReleased": true
+}

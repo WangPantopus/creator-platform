@@ -1,0 +1,10 @@
+{
+  "isolatedOnly": true,
+  "registered": false,
+  "checksum": "1633fd9d7c9ac644ec0298db24eaaf39be1c3a964cec2bbc59fb7eb04beec34b",
+  "runtimeCatalogue": true,
+  "originalGroupQueryPlan": true,
+  "originalReviewQueryPlan": true,
+  "planHashQueryPlan": true,
+  "businessRowsCreated": 0
+}

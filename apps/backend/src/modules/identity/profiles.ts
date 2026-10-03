@@ -20,6 +20,19 @@ export interface VerificationDecision {
   decision: "approved" | "rejected" | "revoked";
   reason: string;
 }
+/** The original saved proof projection, shared by create, submit and read.
+ * Review evidence must distinguish an unsubmitted challenge from its saved
+ * post; no case or historical evidence is rewritten by this projection. */
+export interface CreatorProofProjection {
+  id: string;
+  code: string;
+  platform: "instagram" | "youtube";
+  accountUrl: string;
+  postUrl: string | null;
+  expiresAt: Date;
+  state: "challenge" | "pending" | "approved" | "rejected" | "revoked";
+  reason: string | null;
+}
 export class IdentityProfiles {
   constructor(private readonly pool: Pool) {}
   async view(actor: Actor) {
@@ -116,8 +129,8 @@ export class IdentityProfiles {
     return identityTransaction(this.pool, actor.accountId, async (client) => {
       await this.requireCreator(client, actor, creatorId);
       const code = randomBytes(6).toString("hex").toUpperCase();
-      const result = await client.query(
-        'INSERT INTO creator.creator_proof(account_id,creator_id,code,platform,account_url,expires_at) VALUES($1,$2,$3,$4,$5,now()+interval \'24 hours\') RETURNING id,code,platform,account_url AS "accountUrl",expires_at AS "expiresAt",state,reason',
+      const result = await client.query<CreatorProofProjection>(
+        'INSERT INTO creator.creator_proof(account_id,creator_id,code,platform,account_url,expires_at) VALUES($1,$2,$3,$4,$5,now()+interval \'24 hours\') RETURNING id,code,platform,account_url AS "accountUrl",post_url AS "postUrl",expires_at AS "expiresAt",state,reason',
         [actor.accountId, creatorId, code, body.platform, url.href],
       );
       return result.rows[0];
@@ -160,8 +173,8 @@ export class IdentityProfiles {
         "proof_submission_changed",
         "This proof is already awaiting review. Create a new challenge to submit a different post.",
       );
-      const result = await client.query(
-        'UPDATE creator.creator_proof SET post_url=$1,state=\'pending\',submitted_at=coalesce(submitted_at,now()) WHERE id=$2 RETURNING id,code,platform,account_url AS "accountUrl",expires_at AS "expiresAt",state,reason',
+      const result = await client.query<CreatorProofProjection>(
+        'UPDATE creator.creator_proof SET post_url=$1,state=\'pending\',submitted_at=coalesce(submitted_at,now()) WHERE id=$2 RETURNING id,code,platform,account_url AS "accountUrl",post_url AS "postUrl",expires_at AS "expiresAt",state,reason',
         [url.href, proofId],
       );
       return result.rows[0];
@@ -170,8 +183,8 @@ export class IdentityProfiles {
   async proof(actor: Actor, creatorId: string) {
     return identityTransaction(this.pool, actor.accountId, async (client) => {
       await this.requireCreator(client, actor, creatorId);
-      const result = await client.query(
-        'SELECT id,code,platform,account_url AS "accountUrl",expires_at AS "expiresAt",state,reason FROM creator.creator_proof WHERE creator_id=$1 AND account_id=$2 ORDER BY expires_at DESC LIMIT 1',
+      const result = await client.query<CreatorProofProjection>(
+        'SELECT id,code,platform,account_url AS "accountUrl",post_url AS "postUrl",expires_at AS "expiresAt",state,reason FROM creator.creator_proof WHERE creator_id=$1 AND account_id=$2 ORDER BY expires_at DESC LIMIT 1',
         [creatorId, actor.accountId],
       );
       if (!result.rows[0])
