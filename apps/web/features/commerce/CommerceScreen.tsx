@@ -1155,7 +1155,7 @@ function CommerceAccountScreen({
                     key={`${currency}:${limit?.version ?? 0}`}
                     currency={currency}
                     limit={limit}
-                    busy={busy}
+                    busy={busy || !identityAvailable}
                     save={(body) => void command("spend-limit", body)}
                   />
                   {limit?.effective_at && (
