@@ -36,6 +36,11 @@ export async function generationTransaction<T>(
   work: (client: PoolClient) => Promise<T>,
 ): Promise<T> {
   assertGenerationPoolCustody(pool);
+  const controlConnectionTimeout = Math.min(
+    pool.options.connectionTimeoutMillis!,
+    1500,
+  );
+  const controlQueryTimeout = Math.min(pool.options.query_timeout!, 1500);
   signal?.throwIfAborted();
   let client: PoolClient;
   try {
@@ -88,9 +93,9 @@ export async function generationTransaction<T>(
     cancelling = (async () => {
       const control = new Client({
         ...pool.options,
-        connectionTimeoutMillis: 1500,
-        statement_timeout: 1500,
-        query_timeout: 1500,
+        connectionTimeoutMillis: controlConnectionTimeout,
+        statement_timeout: controlQueryTimeout,
+        query_timeout: controlQueryTimeout,
         pipeline: false,
       });
       control.on("error", (error: Error) => {
