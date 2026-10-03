@@ -5,6 +5,7 @@ import type { PoolClient } from "pg";
 import { z } from "zod";
 import { contentHash } from "../../core/canonical.js";
 import { lockCommitmentPacket } from "./packet-locks.js";
+import { withRequestContextRestore } from "../identity/request-context.js";
 
 /** W7 supplies audience-qualified durable read evidence; this is never a client route. */
 export interface QualifiedRead {
@@ -430,15 +431,14 @@ export class ExtendedCommerce {
       "Credit amounts must be explicitly configured in minor units.",
     );
     return this.service.account(actor, async (client) => {
-      let receipt: QualifiedRead | null;
-      try {
-        receipt = await this.qualifiedReads!.prepare(client, actor, readId);
-      } finally {
-        await client.query(
-          "SELECT set_config('app.account_id',$1,true),set_config('app.creator_id','',true),set_config('app.fan_id','',true)",
-          [actor.accountId],
-        );
-      }
+      const receipt = await withRequestContextRestore(
+        () => this.qualifiedReads!.prepare(client, actor, readId),
+        () =>
+          client.query(
+            "SELECT set_config('app.account_id',$1,true),set_config('app.creator_id','',true),set_config('app.fan_id','',true)",
+            [actor.accountId],
+          ),
+      );
       invariant(
         receipt,
         "qualified_read_unavailable",
@@ -574,19 +574,14 @@ export class ExtendedCommerce {
         );
       // The actual W7 source gate is last even for dedupe, ineligible or
       // exhausted-cap paths. No new domain lock or journal follows it.
-      let authorized;
-      try {
-        authorized = await this.qualifiedReads!.authorize(
-          client,
-          actor,
-          evidence,
-        );
-      } finally {
-        await client.query(
-          "SELECT set_config('app.account_id',$1,true),set_config('app.creator_id',$2,true),set_config('app.fan_id',$3,true)",
-          [actor.accountId, evidence.creatorId, evidence.fanId],
-        );
-      }
+      const authorized = await withRequestContextRestore(
+        () => this.qualifiedReads!.authorize(client, actor, evidence),
+        () =>
+          client.query(
+            "SELECT set_config('app.account_id',$1,true),set_config('app.creator_id',$2,true),set_config('app.fan_id',$3,true)",
+            [actor.accountId, evidence.creatorId, evidence.fanId],
+          ),
+      );
       invariant(
         authorized === true,
         "qualified_read_unavailable",
