@@ -1,10 +1,11 @@
 import type { SessionEvidence } from "../../../../../packages/api/src/session.js";
 import type { ThreadScope } from "../access/scope.js";
-import { assertThreadScope } from "../access/scope.js";
+import { threadScopeActor } from "../access/scope.js";
 import type { CommerceService } from "./service.js";
 import { contentHash } from "../../core/canonical.js";
 import { invariant } from "../../core/errors.js";
 import { lockCommitmentPacket } from "./packet-locks.js";
+import { withRequestContextRestore } from "../identity/request-context.js";
 
 type CallResolution = {
   packetId: string;
@@ -21,8 +22,7 @@ export class CommerceFulfillment {
     evidence: SessionEvidence,
     key: string,
   ): Promise<void> {
-    assertThreadScope(scope);
-    const actor = { accountId: scope.actorAccountId, adultEligible: true };
+    const actor = threadScopeActor(scope);
     const resolution = await this.service.account(actor, async (client) => {
       await client.query(
         "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true)",
@@ -45,17 +45,17 @@ export class CommerceFulfillment {
       await client.query("SELECT set_config('app.account_id',$1,true)", [
         scope.creatorAccountId,
       ]);
-      let owner;
-      try {
-        owner = await client.query(
-          "SELECT id FROM creator.creator_profile WHERE id=$1 AND account_id=$2 FOR SHARE",
-          [scope.creatorId, scope.creatorAccountId],
-        );
-      } finally {
-        await client.query("SELECT set_config('app.account_id',$1,true)", [
-          actor.accountId,
-        ]);
-      }
+      const owner = await withRequestContextRestore(
+        () =>
+          client.query(
+            "SELECT id FROM creator.creator_profile WHERE id=$1 AND account_id=$2 FOR SHARE",
+            [scope.creatorId, scope.creatorAccountId],
+          ),
+        () =>
+          client.query("SELECT set_config('app.account_id',$1,true)", [
+            actor.accountId,
+          ]),
+      );
       invariant(
         owner.rowCount === 1,
         "session_creator_changed",

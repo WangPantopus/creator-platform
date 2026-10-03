@@ -10,6 +10,8 @@ import { consumeSignedAct } from "../identity/signed-acts.js";
 import { SignedActCommandSchema } from "@qelvora/api";
 import type { z } from "zod";
 import type { OfferTimesSchema } from "../../../../../packages/api/src/session.js";
+import { querySettlementUncertain } from "../../core/query-settlement.js";
+import { withRequestContextRestore } from "../identity/request-context.js";
 
 export function callOfferCommand(
   threadId: string,
@@ -59,31 +61,44 @@ export class CommerceCallEligibility {
       "Current call booking authority is unavailable.",
     );
     await client.query("SAVEPOINT w4_current_call_booking");
-    try {
-      const pointer = (
-        await client.query<{ packet_id: string }>(
-          "SELECT c.packet_id FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id AND p.creator_id=c.creator_id AND p.fan_id=c.fan_id WHERE c.id=$1 AND c.creator_id=$2 AND c.fan_id=$3 AND p.thread_id=$4",
-          [id, scope.creatorId, scope.fanId, scope.threadId],
-        )
-      ).rows[0];
-      if (!pointer) return null;
-      const packet = await client.query(
-        "SELECT id FROM creator.commerce_packet WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND thread_id=$4 FOR SHARE NOWAIT",
-        [pointer.packet_id, scope.creatorId, scope.fanId, scope.threadId],
-      );
-      if (packet.rowCount !== 1) return null;
-      const commitment = await client.query(
-        "SELECT id FROM creator.commerce_commitment WHERE id=$1 AND packet_id=$2 AND creator_id=$3 AND fan_id=$4 FOR SHARE NOWAIT",
-        [id, pointer.packet_id, scope.creatorId, scope.fanId],
-      );
-      if (commitment.rowCount !== 1) return null;
-      return await this.current(scope, id, client);
-    } catch (error) {
-      await client.query("ROLLBACK TO SAVEPOINT w4_current_call_booking");
-      throw error;
-    } finally {
-      await client.query("RELEASE SAVEPOINT w4_current_call_booking");
-    }
+    return withRequestContextRestore(
+      async () => {
+        try {
+          const pointer = (
+            await client.query<{ packet_id: string }>(
+              "SELECT c.packet_id FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id AND p.creator_id=c.creator_id AND p.fan_id=c.fan_id WHERE c.id=$1 AND c.creator_id=$2 AND c.fan_id=$3 AND p.thread_id=$4",
+              [id, scope.creatorId, scope.fanId, scope.threadId],
+            )
+          ).rows[0];
+          if (!pointer) return null;
+          const packet = await client.query(
+            "SELECT id FROM creator.commerce_packet WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND thread_id=$4 FOR SHARE NOWAIT",
+            [pointer.packet_id, scope.creatorId, scope.fanId, scope.threadId],
+          );
+          if (packet.rowCount !== 1) return null;
+          const commitment = await client.query(
+            "SELECT id FROM creator.commerce_commitment WHERE id=$1 AND packet_id=$2 AND creator_id=$3 AND fan_id=$4 FOR SHARE NOWAIT",
+            [id, pointer.packet_id, scope.creatorId, scope.fanId],
+          );
+          if (commitment.rowCount !== 1) return null;
+          return await this.current(scope, id, client);
+        } catch (failure) {
+          // An unknown response must escape to the original transaction owner
+          // without queuing another command on that same client.
+          if (querySettlementUncertain(failure)) throw failure;
+          try {
+            await client.query("ROLLBACK TO SAVEPOINT w4_current_call_booking");
+          } catch (cleanup) {
+            throw new AggregateError(
+              [failure, cleanup],
+              "Original call eligibility and savepoint rollback failed.",
+            );
+          }
+          throw failure;
+        }
+      },
+      () => client.query("RELEASE SAVEPOINT w4_current_call_booking"),
+    );
   }
   async current(
     scope: ThreadScope,
