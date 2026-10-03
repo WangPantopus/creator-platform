@@ -37,6 +37,18 @@ public final class FanSessionRequestCapture {
             throw error
         }
     }
+    /// Commerce uses this same genuine capture, never reconstructed credentials.
+    public func commerceBytes(_ path: String, body: Data? = nil) async throws -> CreatorAPIBinaryResponse {
+        guard await isCurrent(), let owner, !owner.checkingSession, !owner.busy, owner.error.isEmpty else { throw URLError(.userAuthenticationRequired) }
+        do {
+            let response = try await client.commerceBytes(path, expectedAccountId: expectedAccountId, expectedSessionId: sessionId, body: body)
+            guard await isCurrent(), !owner.checkingSession, !owner.busy, owner.error.isEmpty else { throw CancellationError() }
+            return response
+        } catch {
+            guard await isCurrent(), !owner.checkingSession, !owner.busy, owner.error.isEmpty else { throw CancellationError() }
+            throw error
+        }
+    }
 }
 
 @MainActor

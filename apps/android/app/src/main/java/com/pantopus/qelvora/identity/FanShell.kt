@@ -61,6 +61,19 @@ class FanSessionRequestCapture private constructor(
             throw failure
         }
     }
+    /** Commerce retains this same genuine capture, issuer and bounded client. */
+    @androidx.annotation.MainThread
+    suspend fun commerceBytes(path: String, body: ByteArray? = null): CreatorAPIBinaryResponse {
+        check(isCurrent() && trustReady()) { "Refresh your account before continuing." }
+        try {
+            val response = client.commerceBytes(path, expectedAccountId, sessionId, body)
+            if (!isCurrent() || !trustReady()) throw kotlinx.coroutines.CancellationException("Your original account view changed.")
+            return response
+        } catch (failure: Exception) {
+            if (!isCurrent() || !trustReady()) throw kotlinx.coroutines.CancellationException("Your original account view changed.")
+            throw failure
+        }
+    }
     companion object {
         internal fun issue(issuer: Any, client: CreatorAPIClient, accountId: String,
                            sessionId: String, destination: String,

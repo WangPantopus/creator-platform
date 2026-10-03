@@ -5399,6 +5399,13 @@ class CreatorAPIClient(private val baseURL: String, private val maximumResponseB
       headers = mapOf("X-Expected-Account-Id" to expectedAccountId, "X-Expected-Session-Id" to expectedSessionId),
       accept = if (binary) "application/octet-stream" else "application/json", contentType = "application/json")
   }
+  /** W4 JSON transport on this original client, with denial-only session pins. */
+  suspend fun commerceBytes(path: String, expectedAccountId: String, expectedSessionId: String, body: ByteArray? = null): CreatorAPIBinaryResponse {
+    require(path.matches(Regex("^/v1/commerce/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*$")) && expectedAccountId.isNotEmpty() && expectedSessionId.isNotEmpty() && (body?.size ?: 0) <= 1_048_576)
+    return requestBytes(path, if (body == null) "GET" else "POST", body, authenticated = true,
+      headers = mapOf("X-Expected-Account-Id" to expectedAccountId, "X-Expected-Session-Id" to expectedSessionId, "x-commerce-account-id" to expectedAccountId),
+      accept = "application/json", contentType = "application/json")
+  }
   private suspend fun request(path: String, method: String, body: String? = null, authenticated: Boolean, query: List<Pair<String, String?>> = emptyList(), headers: Map<String, String> = emptyMap()): String =
     requestBytes(path, method, body?.toByteArray(Charsets.UTF_8), authenticated, query, headers, "application/json", "application/json").body.toString(Charsets.UTF_8)
   private suspend fun requestBytes(path: String, method: String, body: ByteArray? = null, authenticated: Boolean, query: List<Pair<String, String?>> = emptyList(), headers: Map<String, String> = emptyMap(), accept: String = "application/octet-stream", contentType: String = "application/octet-stream"): CreatorAPIBinaryResponse = withContext(Dispatchers.IO) {

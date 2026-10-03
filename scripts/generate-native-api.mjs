@@ -219,6 +219,14 @@ public actor CreatorAPIClient {
       headers: ["X-Expected-Account-Id": expectedAccountId, "X-Expected-Session-Id": expectedSessionId],
       accept: binary ? "application/octet-stream" : "application/json", contentType: "application/json")
   }
+  /// W4 JSON transport retains the original client and denial-only session pins.
+  public func commerceBytes(_ path: String, expectedAccountId: String, expectedSessionId: String, body: Data? = nil) async throws -> CreatorAPIBinaryResponse {
+    guard path.range(of: #"^/v1/commerce/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*$"#, options: .regularExpression) != nil,
+          !expectedAccountId.isEmpty, !expectedSessionId.isEmpty, (body?.count ?? 0) <= 1_048_576 else { throw URLError(.badURL) }
+    return try await requestBytes(path, method: body == nil ? "GET" : "POST", body: body, authenticated: true,
+      headers: ["X-Expected-Account-Id": expectedAccountId, "X-Expected-Session-Id": expectedSessionId, "x-commerce-account-id": expectedAccountId],
+      accept: "application/json", contentType: "application/json")
+  }
   private func request<Response: Decodable & Sendable>(_ path: String, method: String, body: Data? = nil, authenticated: Bool, query: [URLQueryItem] = [], headers: [String: String] = [:], contentType: String = "application/json") async throws -> Response {
     let response = try await requestBytes(path, method: method, body: body, authenticated: authenticated, query: query, headers: headers, accept: "application/json", contentType: contentType)
     return try JSONDecoder().decode(Response.self, from: response.body)
@@ -267,6 +275,13 @@ class CreatorAPIClient(private val baseURL: String, private val maximumResponseB
     return requestBytes(path, if (body == null) "GET" else "POST", body, authenticated = true,
       headers = mapOf("X-Expected-Account-Id" to expectedAccountId, "X-Expected-Session-Id" to expectedSessionId),
       accept = if (binary) "application/octet-stream" else "application/json", contentType = "application/json")
+  }
+  /** W4 JSON transport on this original client, with denial-only session pins. */
+  suspend fun commerceBytes(path: String, expectedAccountId: String, expectedSessionId: String, body: ByteArray? = null): CreatorAPIBinaryResponse {
+    require(path.matches(Regex("^/v1/commerce/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*$")) && expectedAccountId.isNotEmpty() && expectedSessionId.isNotEmpty() && (body?.size ?: 0) <= 1_048_576)
+    return requestBytes(path, if (body == null) "GET" else "POST", body, authenticated = true,
+      headers = mapOf("X-Expected-Account-Id" to expectedAccountId, "X-Expected-Session-Id" to expectedSessionId, "x-commerce-account-id" to expectedAccountId),
+      accept = "application/json", contentType = "application/json")
   }
   private suspend fun request(path: String, method: String, body: String? = null, authenticated: Boolean, query: List<Pair<String, String?>> = emptyList(), headers: Map<String, String> = emptyMap()): String =
     requestBytes(path, method, body?.toByteArray(Charsets.UTF_8), authenticated, query, headers, "application/json", "application/json").body.toString(Charsets.UTF_8)
