@@ -20,6 +20,16 @@ The canonical `mediaFeature` receives W1's fresh actor/thread authority and open
 
 `CreatorMediaWorker` runs only in W8's bounded ingestion pool. Its `{creatorId,ownerAccountId}` scope is a family reference, not a credential. A mandatory transaction callback must verify the current worker task and restore non-owner scoped RLS on every operation, including revocation cleanup. Random job tokens, version/current-state checks and lease expiration fence external results. Configured scanner/parser/signing failures remain retryable; deletion failures preserve revoked state. Scanner/parser code is shared with the existing thread worker.
 
+Thread `MediaWorker` likewise requires the dedicated ingestion transaction and
+the original discovered family, with no interactive `ThreadScope` fallback.
+`MediaWorkerDatabase.transaction` retains the same worker-role client through
+received BEGIN/COMMIT or bounded close/discard. It reuses existing held-client
+settlement and wrapped-cancellation classification, requires finite checkout
+and preserves shorter source timeouts. Its45second transport budget supplies
+no task authority or lease extension. Unknown SQL cannot enter rollback/reuse;
+original callbacks remain awaited. No0062 policy, Trust denial, row lease or
+registry change. [Current source and runtime limits](../../artifacts/workstreams/W6/ingestion-settlement/2026-10-03/README.md).
+
 W8 must compose `createCreatorMediaPrivacyHook` with the existing thread/call lifecycle under one media-domain task. Both require current privacy-job/task/family transactions instead of HTTP/session authority. Keyset pages cover all assets; streamed archives must be consumed to exhaustion and return an explicit verified protected reference. Descriptors distinguish declared/processed/delivered hashes and partial uploads; the protected adapter inspects every actual retained variant. Tombstones precede bounded cleanup, active leases must drain, recording deletion requires a real reference plus closed/recording-off truth, and metadata completion requires approved retention receipts. These ports do not configure an archive, retention, provider or complete whole-account export.
 
 `media-openapi.ts` exports the additive routes for W1's canonical OpenAPI composition. It describes actual201/202 responses, binary chunk/ticket/header semantics and current authorized range playback. W1 personally owns shared binary/query/header/native generation. W6 consumed W1's `dd5a64c9d5cdcdcd968a75a3d0e5a03cea51d564` as a narrow producer projection: media OpenAPI/feature registration, same-issuer guard, exact shared origin helper/BFF bridge and generic binary/query/header generator. This branch now generates all44 operations, including the original31. Unrelated newer content/conversation/server runtime was not imported. Backend/web checks and macOS QelvoraUI compilation pass; actual native transport/provider/hardware acceptance remains open.
