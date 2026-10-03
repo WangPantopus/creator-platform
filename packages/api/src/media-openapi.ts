@@ -76,6 +76,7 @@ const fan = [path("creatorId"), path("fanId"), path("assetId")];
 const creator = "/v1/w6/creators/{creatorId}/media";
 const thread = "/v1/w6/threads/{creatorId}/{fanId}/creator-media";
 const audience = "/v1/w6/creators/{creatorId}/audience-media";
+const recording = "/v1/w6/threads/{creatorId}/{fanId}/media/{assetId}";
 const call = "/v1/w6/threads/{creatorId}/{fanId}/calls/{sessionId}";
 const callParameters = [
   path("creatorId"),
@@ -85,6 +86,25 @@ const callParameters = [
 ];
 const offers = "/v1/w6/threads/{creatorId}/{fanId}/call-offers";
 export const mediaPaths = {
+  [recording]: {
+    parameters: [...fan, expectedAccountHeader],
+    get: operation("readThreadMedia", "MediaMediaAsset"),
+  },
+  [`${recording}/playback`]: {
+    parameters: [...fan, expectedAccountHeader],
+    post: operation("threadMediaPlayback", "MediaPlaybackTicket"),
+  },
+  [`${recording}/play`]: {
+    parameters: fan,
+    get: {
+      ...playback("playThreadMedia"),
+      parameters: [
+        ...playback("playThreadMedia").parameters,
+        expectedAccountHeader,
+        expectedAccountQuery,
+      ],
+    },
+  },
   "/v1/w6/capabilities": {
     get: {
       ...operation("readMediaCapabilities", "MediaCapabilities"),
