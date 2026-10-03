@@ -138,6 +138,19 @@ export const TeamInviteSchema = z.strictObject({
   accountId: z.uuid(),
   roles: z.array(TeamRoleSchema).min(1).max(4),
 });
+const UniqueTeamRoles = z
+  .array(TeamRoleSchema)
+  .min(1)
+  .max(4)
+  .refine(
+    (roles) => new Set(roles).size === roles.length,
+    "Use distinct roles",
+  );
+/** Compare the roles actually reviewed by the creator before replacing them. */
+export const TeamRolesUpdateInputSchema = z.strictObject({
+  expectedRoles: UniqueTeamRoles,
+  roles: UniqueTeamRoles,
+});
 export const TeamInvitationSchema = z.strictObject({
   id: z.uuid(),
   creatorId: z.uuid(),
@@ -195,6 +208,7 @@ export const identitySchemas = {
   ProofSubmit: ProofSubmitSchema,
   Proof: ProofSchema,
   TeamInvite: TeamInviteSchema,
+  TeamRolesUpdateInput: TeamRolesUpdateInputSchema,
   TeamInvitation: TeamInvitationSchema,
   PasskeyOptions: PasskeyOptionsSchema,
   PasskeyRegistration: PasskeyRegistrationSchema,
