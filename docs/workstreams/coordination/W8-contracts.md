@@ -1,5 +1,19 @@
 # W8 contract, migration and runtime register
 
+## Distinct publication original comparison allocation — 2026-10-02
+
+Held0213 reserves W4's `schema-fulfillment-publication-original-hash.sql` and version `0213_w4_fulfillment_publication_original_hash`. Its fixed actorless comparison must consume only actual bound0204 plus genuine W1 early0208 on the original held worker nonce/client/PID/fullXID/login/task/token. Complete2–100 original input/financial/consent/evidence comparison, same-client restoration,0205 negatives, positive gates and final bookends must remain distinct. Only bounded boolean/evidence may return; no question/input, recipient/frame write or inferred provider receipt. Interactive0199/0202 are not publication aliases. W4 supplies exact fixed signatures/source and combined effective catalogue for independent review; W1 alone owns final cleanup/COMMIT. This reservation grants no executable activation or genuine application acceptance.
+
+## Distinct generation metadata and approved output allocations — 2026-10-02
+
+Held0211 is W2's fixed `creator.generation_agent_metadata(uuid,uuid)` at `agent/migrations/pending_w2_generation_agent_metadata.sql`. Classification needs the actual current public creator name and audience before embedding. The new isolated purpose must consume W1's genuine private task scope and original0180/0182 inputs, validate the actual compiled hash and typed compile prefix, and preserve original0180/0187 source bytes. A prompt-derived name or an early fabricated vector cannot supply that authority.
+
+Held0212 is W3's separate output writer at `conversation/migrations/pending_w3_worker_output.sql`. It must consume W2's genuine WeakMap-branded `ApprovedGenerationSentence` and call `assertApprovedInTransaction(client, originalGenerationTaskScope, sentence)` on the same held client before ordered durable frame/outbox delivery. W1 alone owns COMMIT. Original0179 context and0203 terminal scopes stay separate. Both allocations require exact original issuer/current restoration/negative/source bookends, complete effective-purpose review, real cancellation and C10 handling before activation. Owner SQL and exact writer signatures remain pending; no raw worker grants or application acceptance are supplied by these records.
+
+## Actual original-family publication denial — 2026-10-02
+
+Held0205 now provides W4's exact `creator_trust.fulfillment_publication_denial(n uuid) RETURNS text`, owned by the new isolated `creator_trust_fulfillment_publication_denial`. Only the actual0204 NOLOGIN metadata producer may execute it. The [full invocation/currentness/cleanup contract and closed qualification](../../operations/W8-fulfillment-publication-denial.md) preserves original0053/0178/0204 and the47-entry map. The source guard is exported from `trust/fulfillment-publication-denial-catalog.ts`; actual original208 host lifecycle/restoration and independently qualified combined catalogue remain required. No Actor, viewer reuse, raw document or financial/provider receipt is supplied.0199/0200 viewing remains a separate source gap.
+
 ## Human-requested seamless handoff checkpoint — 2026-10-02
 
 Read the [complete successor prompt](../handoffs/W8-continuation-2026-10-02-codex.md) first. All source is committed/pushed: durable reply review draft #200/head10624047; private development store draft #201/heade8c2608a; finite feedback lifecycle draft #192/head2e1de9d7. They retain genuine application acceptance and activation work. Worker/terminal negative drafts #131/#145 also remain open. Old #83 is closed as superseded; no branch history was removed.
