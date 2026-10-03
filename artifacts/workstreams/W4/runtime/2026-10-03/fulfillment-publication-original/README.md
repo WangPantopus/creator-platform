@@ -1,5 +1,11 @@
 # W4 actual actorless original comparison — October 3, 2026 UTC
 
+### Independent sequence-default ACL correction
+
+W1's independent review found that a reachable sequence with NULL `relacl` was described using table-default privileges. Current236 selects PostgreSQL's actual `acldefault('S',owner)` for sequences and preserves `acldefault('r',owner)` for table relations. On the closed canonical61 copy, the actual eleven original sources plus a rollback-only sequence metadata probe reproduce the old table-default projection and confirm the corrected grantor/role/privilege/grantable fields exactly match PostgreSQL's sequence default. An explicit sequence USAGE grant changes the catalogue and rollback restores it; the sequence probe is then removed by rollback without consuming a sequence value. Existing baseline metadata is unchanged. All six custody comparisons match; no business/scope/ledger rows are fabricated.
+
+The successful private receipt SHA256 is `210c427d438db8fd953dc94c55d68208aa889e31912bd0a03e108d914d59c042`. Two initial private comparison failures are retained: inconsistent search-path context and an alias-ordering expression, with six matching custody checks on each. Backend build/types, scoped lint/format and diff pass. This qualifies the metadata projection only; the complete accepted pin remains absent and genuine factory/output/financial/cleanup/COMMIT/C10, hosted checks and activation remain open. Existing262 must consume this parent and repeat its own sequence projection.
+
 ### Existing PR review: complete reachable relation metadata
 
 The backlog review reproduced an omitted worker-only policy: changing `publication_worker_effect` on `creator.content_effect` to `WITH CHECK(true)` did not change the original eleven-source catalogue or combined thirteen-source worker catalogue. The exact original eleven-source fingerprint `906621df4ca2d3f2c327a8b18f12b4757a15f8e438e7c4e9c9230af1c1ab5cde` was reproduced before that probe. RLS changes were already detected through W8's generic permissions metadata; the missing policy/detail coverage is distinct. Private initial receipt SHA256 `b6d3ac24037998073efced6852153138b92b684e5828efdfde2618eb6e62ab22` retains the actual undetected outcome and six unchanged custody comparisons.
