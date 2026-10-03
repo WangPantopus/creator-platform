@@ -38,11 +38,50 @@ Implemented: immutable Content route and canceled/disappeared read guards.
 Runnable: both shipping builds, strict iOS codesign and existing source checks.
 Integrated: actual native session/router and the owned backend composition.
 Verified: the original crash and bounded unsigned refusal at the old sources
-above. Personal fixed-binary You/Content return, Android operation and populated
-signed/private acceptance remain pending. No later-source acceptance is inferred.
+above, plus the personally operated fixed iOS journey below. Android personal
+operation and populated signed/private acceptance remain pending. No
+later-source acceptance is inferred.
 Release-ready: false; all nine packages remain incomplete. No virtual
 authenticator, fabricated proof/signature or peer device/input permission was used.
 
-W5's own devices were shut down and exact GUI/device leases released after the
-bounded original operation. The shared GUI queue is W2, W3, then rebuilt W5;
-W5 holds no device/GUI/heavy lease while waiting.
+## Personally operated fixed shipping artifact
+
+At2026-10-03T02:44–02:48Z, W5 atomically held its own GUI/simulator slot2
+(tokenf6829d2a) and installed the exact50146fac signed shipping artifact above
+on its preserved78C3590E simulator. Actual API source was
+`8d8e4e832d144cf827f00f1e0d2e77b8ae26acf5`, foundationReady=true,
+ready=false, canonical61, correctly configured127.0.0.1:41055. The native
+source tree at8d8e4e83 is byte-identical to50146fac; the actual artifact and
+operation remain qualified to50146fac.
+
+Supported CUA Device Hub input personally reached Content's actual unsigned
+refusal, then tapped You: the actual app retained @kilnfire without the original
+crash. A Night cold launch with the correct API/saved Content target retained
+the labelled development session and refused the unsigned Note. During an actual
+twenty-second pause of only the owned API PID13433, Refresh concealed content
+and showed the reconnect/current-access state. The guaranteed resume trap
+restored the actual API; supported CUA Check current access recovered the
+unsigned refusal. Tapping You succeeded again in Night. The fixed processes
+remained running through these actual journeys. No genuine signed/private body,
+reply/reaction, passkey or verification acceptance is claimed.
+
+Private simulator captures are
+/private/tmp/creator-w5-successor-native-shots/ios-50146fac-{light-you-return,night-cold-refusal,night-api-interruption,night-you-return}.png.
+Actual supported AX state and screenshots were personally inspected, including
+the interruption's failure/reconnect copy.
+
+The exact shipping Android50146fac APK above installed and launched with the
+actual10.0.2.2:41055 API and saved Content target. Its owned AVD booted first
+on5586 under2 cores/2048MB/no-snapshot-save, then was stopped. Supported Android
+Studio selection launched the same actual W5 AVD as5554; no peer AVD started.
+The actual guest Welcome screen was visible, but supported CUA guest-coordinate
+input failed with noWindowsAvailable. Hardware Input/Tab did not reach guest
+controls. This is install/launch/control-failure evidence, not personal Android
+journey acceptance. Private capture:
+/private/tmp/creator-w5-successor-native-shots/android-50146fac-supported-control-block.png.
+No adb input, alternate input tool or peer permission was used.
+
+Only W5's own simulator and actual W5 AVD were stopped; their data remains.
+Exact GUI/device leases were released, and physical Android retirement was
+confirmed. W8 received the next queued window. Peer devices/containers were
+untouched. W5 holds no device/GUI/heavy lease after this operation.
