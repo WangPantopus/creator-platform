@@ -9,6 +9,7 @@ import type {
 import {
   ErrorState,
   TrustSession,
+  type TrustSessionState,
   useTrust,
   caseLabel,
   openedLabel,
@@ -41,6 +42,10 @@ const stateLabel: Record<string, string> = {
   appealed: "Appealed",
 };
 export default function QueuePage() {
+  const [sessionState, setSessionState] = useState<TrustSessionState>({
+    ready: false,
+    error: null,
+  });
   const [queue, setQueue] = useState<QueueName>("safety");
   const [number, setNumber] = useState("");
   const [search, setSearch] = useState("");
@@ -51,6 +56,7 @@ export default function QueuePage() {
     nextCursor: string | null;
   }>(
     `cases?queue=${queue}${search ? `&number=${search}` : ""}${cursor ? `&cursor=${cursor}` : ""}`,
+    sessionState.ready,
   );
   return (
     <div className="ops-shell ops-queue">
@@ -87,7 +93,7 @@ export default function QueuePage() {
         </a>
         <Link href="/ops/metrics">Service metrics</Link>
         <Link href="/status">Service status</Link>
-        <TrustSession />
+        <TrustSession onSessionState={setSessionState} />
       </nav>
       <main className="ops-main" id="ops-main" tabIndex={-1}>
         <h1>
@@ -99,7 +105,10 @@ export default function QueuePage() {
           Every case you open is logged. Fan message text appears only inside a
           case, never in lists or alerts.
         </p>
-        <ErrorState error={error} retry={retryTrustReads} />
+        <ErrorState
+          error={sessionState.error ?? error}
+          retry={retryTrustReads}
+        />
         {loading && <p role="status">Loading cases…</p>}
         {data && (
           <>
