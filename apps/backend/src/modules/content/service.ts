@@ -2056,12 +2056,7 @@ export class ContentService {
       // An unknown original DB response or actual cancellation must reach the
       // transaction owner. Never enqueue savepoint cleanup after it or turn it
       // into a successful quarantined reply. W8 retains the private cause.
-      if (
-        querySettlementUncertain(failure) ||
-        (failure instanceof Error &&
-          ["AbortError", "TimeoutError"].includes(failure.name))
-      )
-        throw failure;
+      if (querySettlementUncertain(failure)) throw failure;
       try {
         await client.query("ROLLBACK TO SAVEPOINT w5_reply_review_producer");
         await client.query("RELEASE SAVEPOINT w5_reply_review_producer");
