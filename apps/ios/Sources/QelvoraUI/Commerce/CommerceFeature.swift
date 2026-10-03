@@ -31,7 +31,10 @@ struct CommerceFeature: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 HStack {
-                    if screen != "requests" { Button("Back", variant: .quiet) { screen = "requests"; detail = nil } }
+                    if screen != "requests" { Button("Back", variant: .quiet) {
+                        if screen == "spending", URLComponents(string: session.destination)?.path == "/commerce/spending" { session.open("/you") }
+                        else { screen = "requests"; detail = nil }
+                    } }
                     Spacer(); Text(title.uppercased()).qText("data-sm"); Spacer()
                     Button("Refresh", variant: .quiet, disabled: busy) { Task { await refresh() } }
                 }
