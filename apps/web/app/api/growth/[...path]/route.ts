@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { growthContracts } from "@qelvora/api";
 import { sameRequestOrigin } from "../../../../lib/request-origin";
 import {
   growthRequest,
@@ -12,10 +13,17 @@ async function handle(
   { params }: { params: Promise<{ path: string[] }> },
 ) {
   const path = (await params).path.join("/");
-  if (!allowed.test(path))
+  const postContext =
+    /^creators\/[a-z0-9_]{3,30}\/posts\/[a-f0-9-]{36}\/context$/u.test(path);
+  if (!allowed.test(path) && !postContext)
     return NextResponse.json(
       { error: { message: "This endpoint is unavailable." } },
       { status: 404 },
+    );
+  if (postContext && (request.method !== "GET" || request.nextUrl.search))
+    return NextResponse.json(
+      { error: { message: "This endpoint is unavailable." } },
+      { status: 405, headers: { Allow: "GET", "Cache-Control": "no-store" } },
     );
   if (request.method !== "GET" && !sameRequestOrigin(request))
     return NextResponse.json(
@@ -28,7 +36,9 @@ async function handle(
       ...(request.headers.get("X-Expected-Account-Id")
         ? {
             headers: {
-              "X-Expected-Account-Id": request.headers.get(
+              [postContext
+                ? "x-qelvora-expected-account"
+                : "X-Expected-Account-Id"]: request.headers.get(
                 "X-Expected-Account-Id",
               )!,
             },
@@ -38,9 +48,14 @@ async function handle(
         ? { body: await request.text() }
         : {}),
     });
-    return NextResponse.json(result, {
-      headers: { "Cache-Control": "no-store" },
-    });
+    return NextResponse.json(
+      postContext
+        ? growthContracts.PostEntryContextResponseSchema.parse(result)
+        : result,
+      {
+        headers: { "Cache-Control": "no-store" },
+      },
+    );
   } catch (error) {
     return NextResponse.json(
       {

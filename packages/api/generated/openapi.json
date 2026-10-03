@@ -5558,6 +5558,118 @@
         ]
       }
     },
+    "/v1/growth/creators/{handle}/posts/{id}/context": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "handle",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]{3,30}$"
+          }
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "in": "header",
+          "name": "x-qelvora-expected-account",
+          "required": false,
+          "description": "Pin to the original current account; grants no permission.",
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "readPostEntryContext",
+        "security": [
+          {
+            "PantopusSession": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GrowthPostEntryContextResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Session ended",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Action refused",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unavailable object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "operationId": "health",
@@ -30821,6 +30933,99 @@
           "items",
           "nextCursor",
           "coverage"
+        ],
+        "additionalProperties": false
+      },
+      "GrowthPostEntryContextResponse": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "context": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "type": "string",
+                "const": "post"
+              },
+              "creatorId": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "contentId": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "version": {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 2147483647
+              },
+              "title": {
+                "type": "string",
+                "maxLength": 180
+              },
+              "destination": {
+                "type": "string",
+                "pattern": "^\\/creators\\/[a-z0-9_]{3,30}\\/posts\\/[0-9a-f-]{36}$"
+              }
+            },
+            "required": [
+              "source",
+              "creatorId",
+              "contentId",
+              "version",
+              "title",
+              "destination"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "context"
+        ],
+        "additionalProperties": false
+      },
+      "GrowthPostEntryContext": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "const": "post"
+          },
+          "creatorId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "contentId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "version": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 2147483647
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 180
+          },
+          "destination": {
+            "type": "string",
+            "pattern": "^\\/creators\\/[a-z0-9_]{3,30}\\/posts\\/[0-9a-f-]{36}$"
+          }
+        },
+        "required": [
+          "source",
+          "creatorId",
+          "contentId",
+          "version",
+          "title",
+          "destination"
         ],
         "additionalProperties": false
       }

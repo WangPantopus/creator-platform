@@ -10607,6 +10607,55 @@ public enum APIStudioStudioThreadEntriesCoverage: String, Codable, Sendable {
   case `notes_and_requests` = "notes_and_requests"
 }
 
+public struct APIGrowthPostEntryContextResponse: Codable, Sendable {
+  public let `context`: APIGrowthPostEntryContextResponseContext
+  public init(context: APIGrowthPostEntryContextResponseContext) {
+    self.context = context
+  }
+}
+
+public struct APIGrowthPostEntryContextResponseContext: Codable, Sendable {
+  public let `source`: APIGrowthPostEntryContextResponseContextSource
+  public let `creatorId`: String
+  public let `contentId`: String
+  public let `version`: Int
+  public let `title`: String
+  public let `destination`: String
+  public init(source: APIGrowthPostEntryContextResponseContextSource, creatorId: String, contentId: String, version: Int, title: String, destination: String) {
+    self.source = source
+    self.creatorId = creatorId
+    self.contentId = contentId
+    self.version = version
+    self.title = title
+    self.destination = destination
+  }
+}
+
+public enum APIGrowthPostEntryContextResponseContextSource: String, Codable, Sendable {
+  case `post` = "post"
+}
+
+public struct APIGrowthPostEntryContext: Codable, Sendable {
+  public let `source`: APIGrowthPostEntryContextSource
+  public let `creatorId`: String
+  public let `contentId`: String
+  public let `version`: Int
+  public let `title`: String
+  public let `destination`: String
+  public init(source: APIGrowthPostEntryContextSource, creatorId: String, contentId: String, version: Int, title: String, destination: String) {
+    self.source = source
+    self.creatorId = creatorId
+    self.contentId = contentId
+    self.version = version
+    self.title = title
+    self.destination = destination
+  }
+}
+
+public enum APIGrowthPostEntryContextSource: String, Codable, Sendable {
+  case `post` = "post"
+}
+
 public enum ReadCreatorMediaPolicyPurpose: String, Codable, Sendable {
   case `source_audio` = "source_audio"
   case `interview_audio` = "interview_audio"
@@ -10822,6 +10871,9 @@ public actor CreatorAPIClient {
   }
   public func sendStudioReplyDraft(creatorId: String, fanId: String, xQelvoraExpectedAccount: String? = nil, body: APIStudioSendReplyDraft) async throws -> APIMessage {
     try await request("/v1/studio/\(segment(creatorId))/threads/\(segment(fanId))/send-draft", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func readPostEntryContext(handle: String, id: String, xQelvoraExpectedAccount: String? = nil) async throws -> APIGrowthPostEntryContextResponse {
+    try await request("/v1/growth/creators/\(segment(handle))/posts/\(segment(id))/context", method: "GET", authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
   }
   public func health() async throws -> APIHealth {
     try await request("/health", method: "GET", authenticated: false)
