@@ -2796,34 +2796,106 @@ function Library({ creator }: { creator: Creator }) {
       items: [],
       nextCursor: null,
     }),
-    [editing, setEditing] = useState<string | null | undefined>(undefined),
+    [editing, setEditing] = useState<
+      { id?: string; post: boolean } | undefined
+    >(undefined),
     [filter, setFilter] = useState(""),
     [query, setQuery] = useState(""),
+    [reading, setReading] = useState(true),
+    [readError, setReadError] = useState<string | null>(null),
     action = useAction();
+  const searchKey = JSON.stringify([
+    creator.id,
+    creator.viewerAccountId,
+    filter,
+    query,
+  ]);
+  const reads = useRef({
+    generation: 0,
+    mounted: true,
+    controller: null as AbortController | null,
+    searchKey,
+  });
   const load = useCallback(
-    async () =>
-      setPage(
-        await studioRequest(
+    async (cursor?: string) => {
+      if (reads.current.searchKey !== searchKey) return;
+      const generation = ++reads.current.generation;
+      reads.current.controller?.abort();
+      const controller = new AbortController();
+      reads.current.controller = controller;
+      setReading(true);
+      setReadError(null);
+      try {
+        const next = await studioRequest<Page<ContentView>>(
           "content",
-          `${creator.id}/studio?${new URLSearchParams({ ...(filter ? { state: filter } : {}), ...(query ? { query } : {}) })}`,
-        ),
-      ),
-    [creator.id, filter, query],
+          `${creator.id}/studio?${new URLSearchParams({ ...(cursor ? { cursor } : {}), ...(filter ? { state: filter } : {}), ...(query ? { query } : {}) })}`,
+          undefined,
+          creator.viewerAccountId,
+          { signal: controller.signal },
+        );
+        if (
+          !reads.current.mounted ||
+          generation !== reads.current.generation ||
+          reads.current.searchKey !== searchKey
+        )
+          return;
+        setPage((previous) =>
+          cursor
+            ? {
+                items: [...previous.items, ...next.items].filter(
+                  (item, index, all) =>
+                    all.findIndex((other) => other.id === item.id) === index,
+                ),
+                nextCursor: next.nextCursor,
+              }
+            : next,
+        );
+      } catch (error) {
+        if (
+          reads.current.mounted &&
+          generation === reads.current.generation &&
+          !controller.signal.aborted
+        )
+          setReadError(
+            error instanceof Error
+              ? error.message
+              : "Your current library could not be read.",
+          );
+      } finally {
+        if (reads.current.mounted && generation === reads.current.generation)
+          setReading(false);
+      }
+    },
+    [creator.id, creator.viewerAccountId, filter, query, searchKey],
   );
   useEffect(() => {
-    void action.run(load);
-    if (new URLSearchParams(location.search).has("packet")) setEditing(null);
-  }, [load]);
+    reads.current.mounted = true;
+    reads.current.searchKey = searchKey;
+    setPage({ items: [], nextCursor: null });
+    setReading(true);
+    setReadError(null);
+    // A new search supersedes the old read even while a mutation is pending.
+    // Keep read cancellation separate from the command/retry boundary.
+    const timer = setTimeout(() => void load(), 200);
+    if (new URLSearchParams(location.search).has("packet"))
+      setEditing({ post: true });
+    return () => {
+      clearTimeout(timer);
+      reads.current.mounted = false;
+      reads.current.generation++;
+      reads.current.controller?.abort();
+    };
+  }, [load, searchKey]);
   if (editing !== undefined)
     return (
       <Compose
-        key={`${creator.viewerAccountId}:${creator.id}:${editing ?? "new"}`}
+        key={`${creator.viewerAccountId}:${creator.id}:${editing.id ?? "new"}`}
         creator={creator}
-        id={editing ?? undefined}
-        post
+        id={editing.id}
+        post={editing.post}
         onDone={() => {
           setEditing(undefined);
-          void action.run(load);
+          void load();
         }}
       />
     );
@@ -2833,12 +2905,25 @@ function Library({ creator }: { creator: Creator }) {
         <h1>Publish</h1>
         <button
           className="qv-btn qv-btn--secondary"
-          onClick={() => setEditing(null)}
+          onClick={() => setEditing({ post: true })}
         >
           New post
         </button>
       </header>
       <Feedback action={action} />
+      {readError && (
+        <Notice tone="error" title="Library unavailable">
+          {readError}
+          <button
+            className="qv-btn qv-btn--secondary"
+            disabled={reading}
+            onClick={() => void load()}
+          >
+            Retry current search
+          </button>
+        </Notice>
+      )}
+      {reading && <p role="status">Checking your current library…</p>}
       <p className="qv-help">
         Audience controls who can see it. AI-source approval is separate.
       </p>
@@ -2846,6 +2931,7 @@ function Library({ creator }: { creator: Creator }) {
         Search your library
         <input
           type="search"
+          maxLength={180}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -2868,6 +2954,15 @@ function Library({ creator }: { creator: Creator }) {
           ))}
         </select>
       </label>
+      <div className="w5-actions">
+        <button
+          className="qv-link-btn"
+          disabled={reading || action.busy}
+          onClick={() => void load()}
+        >
+          Refresh library
+        </button>
+      </div>
       {page.items.map((item) => (
         <article key={item.id} className="w5-card">
           <h2>
@@ -2897,7 +2992,12 @@ function Library({ creator }: { creator: Creator }) {
           <div className="w5-actions">
             <button
               className="qv-btn qv-btn--secondary"
-              onClick={() => setEditing(item.id)}
+              onClick={() =>
+                setEditing({
+                  id: item.id,
+                  post: item.document.kind !== "note",
+                })
+              }
             >
               Edit and review again
             </button>
@@ -2936,33 +3036,27 @@ function Library({ creator }: { creator: Creator }) {
           </div>
         </article>
       ))}
-      {!page.items.length && !action.busy && !action.error && (
-        <EmptyState
-          title={
-            query || filter ? "No matching items" : "Your library is empty"
-          }
-          body={
-            query || filter
-              ? "Try another search or choose All states."
-              : "Save a draft, choose its audience, and review its exact publication."
-          }
-        />
-      )}
+      {!page.items.length &&
+        !reading &&
+        !readError &&
+        !action.busy &&
+        !action.error && (
+          <EmptyState
+            title={
+              query || filter ? "No matching items" : "Your library is empty"
+            }
+            body={
+              query || filter
+                ? "Try another search or choose All states."
+                : "Save a draft, choose its audience, and review its exact publication."
+            }
+          />
+        )}
       {page.nextCursor && (
         <button
           className="qv-btn qv-btn--secondary"
-          onClick={() =>
-            void action.run(async () => {
-              const next = await studioRequest<Page<ContentView>>(
-                "content",
-                `${creator.id}/studio?${new URLSearchParams({ cursor: page.nextCursor!, ...(filter ? { state: filter } : {}), ...(query ? { query } : {}) })}`,
-              );
-              setPage({
-                items: [...page.items, ...next.items],
-                nextCursor: next.nextCursor,
-              });
-            })
-          }
+          disabled={reading || action.busy}
+          onClick={() => void load(page.nextCursor!)}
         >
           More content
         </button>
