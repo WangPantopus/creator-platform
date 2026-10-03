@@ -1,5 +1,17 @@
 # Studio media original session — October 3, 2026
 
+**18:00 backlog reconciliation:** Existing PR305 is stacked on canonical W1
+PR296. Product67630ef08baf74c9bb23a30e885f38db3c074cdf normally merges the complete
+bebb1e7b producer/consumer graph and b0c15d51 namespace-marker guard. W6 read
+both actual deltas; this avoids ordinary same-session disposal purging drafts
+and an old inactive snapshot deleting identical replacement-session values.
+Against296 the sole unique product diff is the Studio MediaSession mount.
+The actual build/runtime evidence below remains attributed to6fddd756; the new
+combined graph has not been shipping-built or operated. At previous4b2052d0,
+four fast hosted checks succeeded/six Mac checks remained queued. New-head CI,
+W1 dependency acceptance and relevant personal current operation remain pending;
+PR305 stays draft/unmerged. No services/devices or application rows changed.
+
 Product source `6fddd7568efbc75e47c408ca1fb8ada55fee92ce` starts from fetched
 main `5c08634b7542fef95dd6c176030a785845250c62`. W6 personally implemented
 and operated the increment. The actual Studio page previously mounted W1's
