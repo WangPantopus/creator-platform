@@ -7,6 +7,7 @@ import {
   assertGenerationProfileBound,
   GENERATION_PROFILE_BOUND_SOURCE,
 } from "../agent/generation-profile-bound.js";
+import { GENERATION_CONTENT_ORIGIN_PROFILE_FENCE_SOURCE } from "../content/generation-origin-profile.js";
 
 /** Logical-name metadata pattern from the actual independently reviewed W1/W4
  * publication catalogue. Includes both legacy and typed financial callers,
@@ -60,7 +61,7 @@ export const GENERATION_SAFETY_TERMINAL_CATALOGUE_QUERY = `WITH roles AS (
   'grants',(SELECT jsonb_agg(jsonb_build_object('role',CASE WHEN g.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(g.grantee) END,
    'grantor',pg_get_userbyid(g.grantor),'privilege',g.privilege_type,'grantable',g.is_grantable)
    ORDER BY CASE WHEN g.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(g.grantee) END COLLATE "C",g.privilege_type)
-   FROM aclexplode(coalesce(o.relacl,acldefault('r',o.relowner))) g),
+   FROM aclexplode(coalesce(o.relacl,CASE WHEN o.relkind='S' THEN acldefault('S',o.relowner) ELSE acldefault('r',o.relowner) END)) g),
   'policies',(SELECT jsonb_agg(jsonb_build_object('name',p.polname,'command',p.polcmd,'permissive',p.polpermissive,
    'roles',ARRAY(SELECT CASE WHEN r=0 THEN 'PUBLIC' ELSE pg_get_userbyid(r) END FROM unnest(p.polroles) r
     ORDER BY CASE WHEN r=0 THEN 'PUBLIC' ELSE pg_get_userbyid(r) END COLLATE "C"),
@@ -289,6 +290,7 @@ export const GENERATION_SAFETY_TERMINAL_SOURCES = Object.freeze(
         "b0fe4643e110a4a6b752ae44847543c7cb8897bdd2a56c2daa58574b9c58536e",
     },
     GENERATION_PROFILE_BOUND_SOURCE,
+    GENERATION_CONTENT_ORIGIN_PROFILE_FENCE_SOURCE,
   ].map((source) => Object.freeze(source)),
 );
 
