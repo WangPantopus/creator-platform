@@ -64,6 +64,7 @@ export class PreparedContentGenerationOrigins {
   private constructor(
     private readonly identity: GenerationIdentityAuthority,
     private readonly profileFenceDefinitionChecksum: string,
+    private readonly catalogueChecksum: string,
   ) {}
 
   static async prepare(input: {
@@ -76,6 +77,8 @@ export class PreparedContentGenerationOrigins {
     signatureFenceDefinitionChecksum: string;
     /** Independently qualified pg_get_expr of the separately registered fence. */
     profileFenceDefinitionChecksum: string;
+    /** Independently reviewed effective schema/table/column/RLS permissions. */
+    catalogueChecksum: string;
   }): Promise<PreparedContentGenerationOrigins> {
     invariant(
       input.identity instanceof GenerationIdentityAuthority,
@@ -95,12 +98,14 @@ export class PreparedContentGenerationOrigins {
         Hash.safeParse(input.metadataDefinitionChecksum).success &&
         Hash.safeParse(input.signatureFenceDefinitionChecksum).success &&
         Hash.safeParse(input.profileFenceDefinitionChecksum).success &&
+        Hash.safeParse(input.catalogueChecksum).success &&
         Number.isFinite(input.workerPool.options.connectionTimeoutMillis) &&
         (input.workerPool.options.connectionTimeoutMillis ?? 0) > 0 &&
         (input.workerPool.options.connectionTimeoutMillis ?? 0) <= 5000,
       "generation_content_origin_unconfigured",
       "Exact reviewed origin and signature writer receipts are required.",
     );
+    input.identity.assertConsumerRegistered(input.consumer);
     const client = await input.workerPool.connect().catch((error: unknown) => {
       throw originUnavailable(error);
     });
@@ -114,7 +119,11 @@ export class PreparedContentGenerationOrigins {
         ),
       );
       await held.run(() =>
-        assertOriginProfileFence(client, input.profileFenceDefinitionChecksum),
+        assertOriginProfileFence(
+          client,
+          input.profileFenceDefinitionChecksum,
+          input.catalogueChecksum,
+        ),
       );
       const proof = (
         await held.run(() =>
@@ -225,6 +234,7 @@ export class PreparedContentGenerationOrigins {
     return new PreparedContentGenerationOrigins(
       input.identity,
       input.profileFenceDefinitionChecksum,
+      input.catalogueChecksum,
     );
   }
 
@@ -234,7 +244,11 @@ export class PreparedContentGenerationOrigins {
     sources: readonly GenerationContentOriginSource[],
   ): Promise<void> {
     await this.identity.authorizeInTransaction(scope, client);
-    await assertOriginProfileFence(client, this.profileFenceDefinitionChecksum);
+    await assertOriginProfileFence(
+      client,
+      this.profileFenceDefinitionChecksum,
+      this.catalogueChecksum,
+    );
     const selected = z.array(Source).min(1).max(1000).parse(sources);
     invariant(
       new Set(selected.map((source) => source.id)).size === selected.length,
@@ -329,7 +343,11 @@ export class PreparedContentGenerationOrigins {
       "An approved source no longer matches its current public publication.",
     );
     this.finalized.set(scope, { client, tupleHash });
-    await assertOriginProfileFence(client, this.profileFenceDefinitionChecksum);
+    await assertOriginProfileFence(
+      client,
+      this.profileFenceDefinitionChecksum,
+      this.catalogueChecksum,
+    );
     await this.identity.authorizeInTransaction(scope, client);
   }
 }

@@ -1,5 +1,7 @@
 # W5 original generation origin profile restriction
 
+The consumer additionally requires the actual issuer's registered original consumer receipt and an independently reviewed effective table/column/RLS/schema catalogue checksum. It compares that catalogue on the same original client at preparation and both read bookends. The shared metadata reader now accepts an optional finite read deadline; W5 supplies5000ms to each of its two actual queries, while existing callers and returned fields retain their default behavior. This adds no accepted catalogue hash or activation. Backend typecheck, scoped lint/format and diff checks pass for this additional source.
+
 Base is captured main `6a9f10a850fb4769c667f89a6304505dd6a04728`, normally merged into the owned branch. The separate SQL was first published at `c43b49b8366618e8cb208c3068283c1c200aa9df`. Its SHA256 is `09d3df2f3549d0267dce2fe049789e575b1c8f212ee887d2d5396f110bafc047`. Original0186 SQL remains byte-identical at `2f1c4b30133a0c8707b16b15c1e42a9daf539cb5edeeb48ad6a835352a4f444d`.
 
 The additive restrictive creator_profile SELECT policy applies only to the existing isolated creator_w5_generation_origin owner. It retains the original private read task, nonce, PID, full transaction, login, five-second scope and original creator/account pair. It creates no role, grant, scope, task, Actor or positive publication authority. The original function still performs its genuine generation_scope_matches checks; the policy does not re-enter the issuer after the signature family.

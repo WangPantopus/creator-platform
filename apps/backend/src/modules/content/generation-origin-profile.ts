@@ -1,6 +1,8 @@
 import { createHash } from "node:crypto";
 import type { PoolClient, QueryConfig } from "pg";
 import { DomainError } from "../../core/errors.js";
+import { contentHash } from "../../core/canonical.js";
+import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
 import { registeredMigration } from "../../db/reviewed-migration.js";
 
 /** Separate additive source custody. A reservation cannot activate this fence. */
@@ -31,6 +33,7 @@ export function originUnavailable(cause?: unknown): DomainError {
 export async function assertOriginProfileFence(
   client: PoolClient,
   definitionChecksum: string,
+  catalogueChecksum: string,
 ): Promise<void> {
   try {
     const migration = await registeredMigration(
@@ -70,6 +73,16 @@ export async function assertOriginProfileFence(
       typeof proof.definition !== "string" ||
       createHash("sha256").update(proof.definition).digest("hex") !==
         definitionChecksum
+    )
+      throw originUnavailable();
+    if (
+      contentHash(
+        await generationConsumerCatalogue(
+          client,
+          "creator_w5_generation_origin",
+          5000,
+        ),
+      ) !== catalogueChecksum
     )
       throw originUnavailable();
   } catch (error) {
