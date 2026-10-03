@@ -39,7 +39,7 @@ export function IdentitySessionBoundary({
 }) {
   return (
     <IdentitySessionView
-      key={`${initial.accountId}:${initial.sessionId}`}
+      key={`${initial.accountId}:${initial.sessionId}:${returnTo}`}
       initial={initial}
       returnTo={returnTo}
     >
@@ -64,7 +64,11 @@ function IdentitySessionView({
   const sessionId = initial.sessionId;
   const controller = useRef<AbortController | null>(null);
   if (!controller.current) controller.current = new AbortController();
-  const [signal, setSignal] = useState(controller.current.signal);
+  const [lifetime, setLifetime] = useState(() => ({
+    signal: controller.current!.signal,
+    revision: 0,
+  }));
+  const signal = lifetime.signal;
   const end = useCallback(
     (original: AbortSignal) => {
       if (original.aborted || controller.current?.signal !== original) return;
@@ -83,7 +87,11 @@ function IdentitySessionView({
     if (controller.current!.signal.aborted)
       controller.current = new AbortController();
     const owner = controller.current!;
-    setSignal(owner.signal);
+    setLifetime((previous) =>
+      previous.signal === owner.signal
+        ? previous
+        : { signal: owner.signal, revision: previous.revision + 1 },
+    );
     let active = true;
     let checking = false;
     const check = async () => {
@@ -154,7 +162,10 @@ function IdentitySessionView({
   }, [accountId, sessionId, end]);
   if (!valid) return null;
   return (
-    <Scope.Provider value={{ accountId, signal, end: endOriginal, session }}>
+    <Scope.Provider
+      key={lifetime.revision}
+      value={{ accountId, signal, end: endOriginal, session }}
+    >
       {error && (
         <Notice title="Account status" tone="offline">
           {error}
