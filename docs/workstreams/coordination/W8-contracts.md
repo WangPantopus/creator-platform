@@ -1,5 +1,9 @@
 # W8 contract, migration and runtime register
 
+## Actual development expiry signal — 2026-10-03
+
+[Existing draft192](../../operations/W8-development-feedback.md) requires the actual worker AbortSignal outside request ALS and holds its original worker client until awaited COMMIT or close/settlement. Read-committed isolation precedes all metadata reads; finite host and catalogue budgets do not issue a task or replace the caller's signal. Unknown responses and actual aborts send no helper cleanup SQL, while healthy policy refusals can roll back. The original configured graph, finite policy/current clock, restoration/source/catalogue bookends and immutable0207 remain mandatory. Four real PostgreSQL primitives are distinct from original task, physical purge and application acceptance; no activation or accepted receipt is supplied.
+
 ## Restrictive original-purpose profile boundaries — 2026-10-03
 
 [Held0221–0224](W8-next-allocations.md) reserve distinct additive restrictive profile SELECT policies for the existing W3 context, W4 audience, two W2 metadata/retrieval roles and W5 original-content origin. All published SQL/current runtime guards are independently read/hash-checked. Original0095/0179/0182/0211/0187/0102/0186 bytes, functions, scope issuers and all original task/client/PID/fullXID/login/family/restoration/negative/COMMIT gates remain intact. PUBLIC permissive policies must not OR-bypass the role-specific boundary. W5's separate predicate preserves original signature-family order; original scope checks and final genuine identity remain required. Independent whole policy/ACL/function/caller catalogue and closed compiler/drift/refusal/fresh-preserved/task/C10 qualification remain required; no accepted catalogue, new role/grant, activation or raw-worker/provider permission is supplied. Active61/frozen47 remain unchanged.
