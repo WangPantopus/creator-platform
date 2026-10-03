@@ -10,35 +10,14 @@ import {
   type MediaAsset,
 } from "../../../../packages/api/src/media";
 import { useConversationRequest } from "../conversation/api";
-import {
-  sessionChannel,
-  useIdentityRequest,
-} from "../identity/session-boundary";
+import { useIdentityRequest } from "../identity/session-boundary";
 import { VoiceRecording } from "../media/VoiceRecorder";
 import { mediaRequest } from "../media/api";
-
-const storagePrefix = "w6.recording-delivery:";
-const identityStorage = "w6.recording-delivery-session";
-let sessionEnds: BroadcastChannel | undefined;
-function purgeRecordingRetries() {
-  try {
-    for (const key of Object.keys(sessionStorage))
-      if (key.startsWith(storagePrefix)) sessionStorage.removeItem(key);
-    sessionStorage.removeItem(identityStorage);
-  } catch {
-    // Optional presentation storage never supplies request authority.
-  }
-}
-function watchSessionEnd() {
-  // Reuse the producer's once-per-document negative observer. It remains
-  // available after component departure to Account; no second lifetime is issued.
-  if (!sessionEnds && typeof BroadcastChannel !== "undefined") {
-    sessionEnds = new BroadcastChannel(sessionChannel);
-    sessionEnds.onmessage = (event) => {
-      if (event.data === "ended") purgeRecordingRetries();
-    };
-  }
-}
+import {
+  purgeRecordingRetries,
+  recordingRetryStoragePrefix as storagePrefix,
+  recordingRetryIdentityStorage as identityStorage,
+} from "../media/recording-retry-storage";
 
 /** A human recording is signed by W1, credentialed by W6, then associated by
  * W3. The remembered command is retry metadata; it supplies no authority. */
@@ -62,8 +41,7 @@ export function ConversationVoiceReply({
   onDelivered: () => void;
 }) {
   const request = useRef(useConversationRequest()).current;
-  const { signal, session, isSessionEnded } =
-    useRef(useIdentityRequest()).current;
+  const { signal, session } = useRef(useIdentityRequest()).current;
   const [available, setAvailable] = useState(false);
   const [limit, setLimit] = useState<number | null>(null);
   const [asset, setAsset] = useState<MediaAsset | null>(null);
@@ -117,7 +95,6 @@ export function ConversationVoiceReply({
     session.sessionId,
   ]);
   useEffect(() => {
-    watchSessionEnd();
     try {
       const marker = JSON.stringify([session.accountId, session.sessionId]);
       if (!signal.aborted && session.accountId === expectedAccountId) {
@@ -160,7 +137,6 @@ export function ConversationVoiceReply({
       setBusy(false);
       setError("");
       setDelivered(false);
-      if (isSessionEnded()) purgeRecordingRetries();
     };
     signal.addEventListener("abort", dispose, { once: true });
     if (signal.aborted) dispose();
@@ -171,7 +147,6 @@ export function ConversationVoiceReply({
     session.accountId,
     session.sessionId,
     expectedAccountId,
-    isSessionEnded,
   ]);
   useEffect(() => {
     onPendingChange(pending || busy);
