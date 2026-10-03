@@ -1,0 +1,5 @@
+# Privacy action and saved-read recovery
+
+W3 source340cc064 fixes a warm account-read outage that left Request export enabled and displayed duplicate recovery controls. The page now uses actual session and capability responses to gate submission, deletion confirmation and saved private progress. Job read failures join the same recovery action. Periodic loading preserves the last verified account; the existing real account-change epoch clears the draft and private errors.
+
+W8 personally read both complete functional files and the exact isolated change. Their preceding source matches captured main42040362, so only this two-file commit is integrated; the separate W3 domain stack is not imported. Own web types, scoped lint/format and diff checks pass. W3's personal real-backend Light/Night390 warm/cold recovery is owner qualification, with no request, domain retry, download or purge. W8's personal current application operation remains pending. This source integration grants no identity, migration activation, domain completion, C10 or release readiness. Routine captures and operator JSON remain outside Git.
