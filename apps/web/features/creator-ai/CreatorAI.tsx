@@ -33,7 +33,6 @@ import {
   developmentProofReference,
 } from "../../../../packages/api/src/agent/contracts";
 import "./creator-ai.css";
-import { sessionChannel } from "../identity/session-boundary";
 
 type ErrorBody = { error?: { code: string; message: string } };
 type CreatorAIIdentity = Readonly<{
@@ -84,39 +83,27 @@ function storeDraft(key: string, value: unknown) {
     /* Private browsing may disable storage; server drafts still work. */
   }
 }
-function purgeStoredDrafts(accountId?: string, sessionId?: string) {
+type DraftKind = "w2-source" | "w2-interview" | "w2-config";
+function draftStorageKey(
+  kind: DraftKind,
+  accountId: string,
+  creatorId: string,
+  sessionId?: string,
+) {
+  return `${kind}:${accountId}:${sessionId ? `${sessionId}:` : ""}${creatorId}`;
+}
+function purgeStoredDrafts(accountId: string, sessionId: string) {
   try {
-    // A still-mounted older tab must not erase a newer genuine session's
-    // buffers after that newer tab has replaced this presentation marker.
-    if (
-      accountId &&
-      sessionId &&
-      readDraft(`w2-session:${accountId}`) !== sessionId
-    )
-      return;
+    // Each genuine session owns distinct keys. A delayed original end never
+    // checks then deletes shared keys belonging to a replacement session.
     const prefixes = ["w2-source", "w2-interview", "w2-config"].map(
-      (kind) => `${kind}:${accountId ? `${accountId}:` : ""}`,
+      (kind) => `${kind}:${accountId}:${sessionId}:`,
     );
-    const sessionKey = accountId ? `w2-session:${accountId}` : null;
     for (const key of Object.keys(localStorage))
-      if (
-        prefixes.some((prefix) => key.startsWith(prefix)) ||
-        (sessionKey ? key === sessionKey : key.startsWith("w2-session:"))
-      )
+      if (prefixes.some((prefix) => key.startsWith(prefix)))
         localStorage.removeItem(key);
   } catch {
     /* Unavailable storage cannot restore a draft. */
-  }
-}
-let draftSessionEnds: BroadcastChannel | undefined;
-function watchDraftSessionEnd() {
-  // The negative canonical notification must still clear this app's buffers
-  // after navigating to Account. It never supplies identity or authority.
-  if (!draftSessionEnds && typeof BroadcastChannel !== "undefined") {
-    draftSessionEnds = new BroadcastChannel(sessionChannel);
-    draftSessionEnds.onmessage = (event) => {
-      if (event.data === "ended") purgeStoredDrafts();
-    };
   }
 }
 function Button({
@@ -346,21 +333,50 @@ export function CreatorAI({
   const identitySignal = identity?.signal;
   const endIdentity = identity?.end;
   const isSessionEnded = identity?.isSessionEnded;
+  const legacyDraftSession = useRef<{
+    accountId: string;
+    sessionId: string;
+    allowed: boolean;
+  } | null>(null);
   const canUseDraft = useCallback(
-    () =>
-      !identitySignal?.aborted &&
-      (!identityAccount ||
-        !identitySession ||
-        readDraft(`w2-session:${identityAccount}`) === identitySession),
-    [identityAccount, identitySession, identitySignal],
+    () => !identitySignal?.aborted,
+    [identitySignal],
+  );
+  const readStoredDraft = useCallback(
+    (kind: DraftKind, accountId: string, creatorId: string) => {
+      if (!canUseDraft() || (identityAccount && accountId !== identityAccount))
+        return null;
+      const key = draftStorageKey(kind, accountId, creatorId, identitySession);
+      const current = readDraft(key);
+      if (current !== null || !identitySession) return current;
+      const legacy = legacyDraftSession.current;
+      const markerKey = `w2-session:${accountId}`;
+      // Only a continuing original session may adopt its pre-migration buffer.
+      // This optional presentation marker never supplies request authority.
+      if (
+        !legacy?.allowed ||
+        legacy.accountId !== accountId ||
+        legacy.sessionId !== identitySession ||
+        readDraft(markerKey) !== identitySession
+      )
+        return null;
+      const previous = readDraft(draftStorageKey(kind, accountId, creatorId));
+      if (!canUseDraft() || readDraft(markerKey) !== identitySession)
+        return null;
+      if (previous !== null) storeDraft(key, previous);
+      return previous;
+    },
+    [canUseDraft, identityAccount, identitySession],
   );
   const writeDraft = useCallback(
-    (key: string, value: unknown) => {
-      // Storage is shared by tabs. An older view awaiting canonical invalidation
-      // cannot read, overwrite or clear a replacement session's local buffers.
-      if (canUseDraft()) storeDraft(key, value);
+    (kind: DraftKind, accountId: string, creatorId: string, value: unknown) => {
+      if (canUseDraft() && (!identityAccount || accountId === identityAccount))
+        storeDraft(
+          draftStorageKey(kind, accountId, creatorId, identitySession),
+          value,
+        );
     },
-    [canUseDraft],
+    [canUseDraft, identityAccount, identitySession],
   );
   const request = useCallback(
     async (path: string, init: RequestInit = {}) => {
@@ -430,8 +446,15 @@ export function CreatorAI({
       !isSessionEnded
     )
       return;
-    watchDraftSessionEnd();
-    const sessionKey = `w2-session:${identityAccount}`;
+    if (
+      legacyDraftSession.current?.accountId !== identityAccount ||
+      legacyDraftSession.current.sessionId !== identitySession
+    )
+      legacyDraftSession.current = {
+        accountId: identityAccount,
+        sessionId: identitySession,
+        allowed: readDraft(`w2-session:${identityAccount}`) === identitySession,
+      };
     const dispose = () => {
       ++fetchSequence.current;
       ++sourceFileSequence.current;
@@ -444,11 +467,8 @@ export function CreatorAI({
     };
     if (identitySignal.aborted) dispose();
     else {
-      // Access-token rotation retains the server session ID. Fresh sign-in
-      // creates another ID, so a draft left on an unmounted page cannot return.
-      if (readDraft(sessionKey) !== identitySession)
-        purgeStoredDrafts(identityAccount);
-      storeDraft(sessionKey, identitySession);
+      // Ordinary view disposal retains this genuine session's own namespace.
+      // Canonical identity cleanup owns the legacy presentation marker.
       identitySignal.addEventListener("abort", dispose, { once: true });
     }
     return () => identitySignal.removeEventListener("abort", dispose);
@@ -508,7 +528,9 @@ export function CreatorAI({
             current === readFailure ? "" : current,
           );
         }
-        const nextActor = `${data.actorAccountId}:${data.creator.id}`;
+        const nextActor = identitySession
+          ? `${data.actorAccountId}:${identitySession}:${data.creator.id}`
+          : `${data.actorAccountId}:${data.creator.id}`;
         if (actorKey.current !== nextActor) {
           initial = true;
           ++sourceFileSequence.current;
@@ -550,7 +572,11 @@ export function CreatorAI({
           setStory(data.interview.story);
           setBoundaries(data.interview.boundaries);
           setStatusText(data.status?.text ?? "");
-          const cached = readDraft(`w2-source:${nextActor}`);
+          const cached = readStoredDraft(
+            "w2-source",
+            data.actorAccountId,
+            data.creator.id,
+          );
           if (cached && typeof cached === "object") {
             const source = cached as {
               title: string;
@@ -569,7 +595,11 @@ export function CreatorAI({
             setExpiry(source.expiry ?? "");
             setSourceOrigin(source.sourceOrigin ?? "manual_text");
           }
-          const interview = readDraft(`w2-interview:${nextActor}`);
+          const interview = readStoredDraft(
+            "w2-interview",
+            data.actorAccountId,
+            data.creator.id,
+          );
           if (interview && typeof interview === "object") {
             const stored = interview as {
               story: string;
@@ -578,7 +608,11 @@ export function CreatorAI({
             setStory(stored.story);
             setBoundaries(stored.boundaries);
           }
-          const draft = readDraft(`w2-config:${nextActor}`) as {
+          const draft = readStoredDraft(
+            "w2-config",
+            data.actorAccountId,
+            data.creator.id,
+          ) as {
             revision?: number;
             configuration?: unknown;
           } | null;
@@ -607,10 +641,12 @@ export function CreatorAI({
     [
       request,
       identityAccount,
+      identitySession,
       identitySignal,
       endIdentity,
       setError,
       canUseDraft,
+      readStoredDraft,
     ],
   );
   useEffect(() => {
@@ -701,7 +737,7 @@ export function CreatorAI({
   }, [configuration?.examples]);
   useEffect(() => {
     if (!state || identitySignal?.aborted) return;
-    writeDraft(`w2-source:${state.actorAccountId}:${state.creator.id}`, {
+    writeDraft("w2-source", state.actorAccountId, state.creator.id, {
       title,
       text,
       rights,
@@ -725,7 +761,7 @@ export function CreatorAI({
   ]);
   useEffect(() => {
     if (!state || identitySignal?.aborted) return;
-    writeDraft(`w2-interview:${state.actorAccountId}:${state.creator.id}`, {
+    writeDraft("w2-interview", state.actorAccountId, state.creator.id, {
       story,
       boundaries,
     });
@@ -739,7 +775,7 @@ export function CreatorAI({
   ]);
   useEffect(() => {
     if (state && dirty && configuration && !identitySignal?.aborted)
-      writeDraft(`w2-config:${state.actorAccountId}:${state.creator.id}`, {
+      writeDraft("w2-config", state.actorAccountId, state.creator.id, {
         revision: draftRevision.current,
         configuration,
       });
@@ -872,7 +908,7 @@ export function CreatorAI({
     );
     dirtyRef.current = false;
     draftRevision.current = null;
-    writeDraft(`w2-config:${state.actorAccountId}:${state.creator.id}`, null);
+    writeDraft("w2-config", state.actorAccountId, state.creator.id, null);
     setDirty(false);
   };
   const actSource = async (source: Source, operation: string) => {
@@ -2013,7 +2049,9 @@ export function CreatorAI({
                         draftRevision.current = null;
                         setDirty(false);
                         writeDraft(
-                          `w2-config:${state.actorAccountId}:${state.creator.id}`,
+                          "w2-config",
+                          state.actorAccountId,
+                          state.creator.id,
                           null,
                         );
                         setMessage("Saved draft reloaded.");
