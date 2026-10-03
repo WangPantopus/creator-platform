@@ -67,10 +67,12 @@ export async function generationTransaction<T>(
         : "generation_connection_unavailable",
       "The bounded original generation connection is unavailable.",
       503,
-    );
-    failure.cause = new AggregateError(
-      signal?.aborted ? [signal.reason, error] : [error],
-      "Original generation connection acquisition failed.",
+      {
+        cause: new AggregateError(
+          signal?.aborted ? [signal.reason, error] : [error],
+          "Original generation connection acquisition failed.",
+        ),
+      },
     );
     throw failure;
   }
@@ -231,17 +233,19 @@ export async function generationTransaction<T>(
         ? "The generation committed but its connection cleanup failed. Reconcile its actual receipt."
         : "The original generation transaction could not settle safely.",
       503,
-    );
-    unavailable.cause = new AggregateError(
-      [
-        ...(failed ? [failure] : []),
-        ...transportFailures,
-        ...cancellationFailures,
-        ...cleanupFailures,
-      ],
-      committed
-        ? "Committed generation connection cleanup failures."
-        : "Original generation and settlement failures.",
+      {
+        cause: new AggregateError(
+          [
+            ...(failed ? [failure] : []),
+            ...transportFailures,
+            ...cancellationFailures,
+            ...cleanupFailures,
+          ],
+          committed
+            ? "Committed generation connection cleanup failures."
+            : "Original generation and settlement failures.",
+        ),
+      },
     );
     throw unavailable;
   }

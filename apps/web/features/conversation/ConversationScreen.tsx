@@ -112,6 +112,7 @@ export function ConversationScreen({
 }) {
   const request = useConversationRequest();
   const identity = useIdentityRequest();
+  const isSessionEnded = identity.isSessionEnded;
   const offlineStorage = useRef<ConversationOfflineStorage | null>(null);
   const offlineShowing = useRef(false);
   const renewingOffline = useRef(false);
@@ -303,8 +304,24 @@ export function ConversationScreen({
       lifecycle.current++;
       offlineShowing.current = false;
       transportReady.current = false;
+      renewingOffline.current = false;
+      latestPending.current = null;
       cache.purge();
       concealThread();
+      setDraft("");
+      setPending(null);
+      setIntroOfferId(null);
+      setBusy(false);
+      setFailure(null);
+      // View disposal cancels requests; only the original canonical end
+      // observation authorizes session-end cleanup of this stored cursor.
+      if (isSessionEnded()) {
+        try {
+          sessionStorage.removeItem(cursorKey);
+        } catch {
+          /* Storage can be disabled. */
+        }
+      }
     };
     identity.signal.addEventListener("abort", revoked, { once: true });
     try {
@@ -497,7 +514,8 @@ export function ConversationScreen({
       }
     }, 100);
     setOnline(false);
-    void connect();
+    if (identity.signal.aborted) revoked();
+    else void connect();
     return () => {
       disposed = true;
       mounted.current = false;
@@ -529,6 +547,7 @@ export function ConversationScreen({
     root,
     identity.session.sessionId,
     identity.signal,
+    isSessionEnded,
     concealThread,
     renewOffline,
     showOffline,

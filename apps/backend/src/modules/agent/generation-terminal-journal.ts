@@ -234,12 +234,18 @@ export class PreparedGenerationTerminalJournal {
         this.custody.catalogueChecksum
       )
         throw new Error("Unreviewed original journal catalogue");
-    } catch {
-      throw new DomainError(
+    } catch (cause) {
+      const failure = new DomainError(
         "generation_terminal_journal_unconfigured",
         "Reviewed original terminal journal custody is unavailable.",
         503,
       );
+      Object.defineProperty(failure, "cause", {
+        value: cause,
+        configurable: true,
+        writable: true,
+      });
+      throw failure;
     }
   }
 

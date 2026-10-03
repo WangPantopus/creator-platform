@@ -12,6 +12,7 @@ import type { GrowthService } from "./service.js";
 import { Retention } from "./retention.js";
 import { Engagement } from "./engagement.js";
 import { GrowthExperiments } from "./experiments.js";
+import type { PostEntryContext } from "./entry-context.js";
 
 /** W1 mounts this router before its 404, supplies the canonical session resolver. */
 export function createGrowthRouter(
@@ -21,6 +22,10 @@ export function createGrowthRouter(
     retention?: Retention;
     engagement?: Engagement;
     experiments?: GrowthExperiments;
+    postEntryContext?: (
+      actor: Actor,
+      input: unknown,
+    ) => Promise<PostEntryContext | null>;
   } = {},
 ) {
   const router = Router();
@@ -122,6 +127,33 @@ export function createGrowthRouter(
       ),
     ),
   );
+  router.get("/creators/:handle/posts/:id/context", async (req, res) => {
+    const actor = await actorFor(req);
+    const expectedAccount = req.get("x-qelvora-expected-account");
+    if (expectedAccount && uuid(expectedAccount) !== actor.accountId)
+      throw new DomainError(
+        "growth_entry_session_required",
+        copy.growthErrorGrowthAuthorityRequired,
+        401,
+      );
+    if (!options.postEntryContext)
+      throw new DomainError(
+        "growth_entry_context_unconfigured",
+        copy.growthThisDestinationIsUnavailableReconnectAndTryAgain,
+        503,
+      );
+    const context = await options.postEntryContext(actor, {
+      handle: String(req.params.handle),
+      contentId: uuid(req.params.id),
+    });
+    if (!context)
+      throw new DomainError(
+        "post_unavailable",
+        copy.growthThisPostIsUnavailable,
+        404,
+      );
+    res.json({ context });
+  });
   router.post("/engagement/:kind/claim", async (req, res) =>
     res.json(
       await engagement.claimPrompt(

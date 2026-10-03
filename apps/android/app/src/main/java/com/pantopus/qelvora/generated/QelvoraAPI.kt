@@ -16,10 +16,19 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.ensureActive
-import java.net.HttpURLConnection
-import java.net.URL
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.IOException
 import java.net.URLEncoder
+import java.util.concurrent.TimeUnit
 
 typealias APIAgentAgentAudience = JsonElement
 
@@ -5567,6 +5576,41 @@ enum class APIStudioStudioThreadEntriesCoverage {
 }
 
 @Serializable
+data class APIGrowthPostEntryContextResponse(
+  val `context`: APIGrowthPostEntryContextResponseContext
+)
+
+@Serializable
+data class APIGrowthPostEntryContextResponseContext(
+  val `source`: APIGrowthPostEntryContextResponseContextSource,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `version`: Long,
+  val `title`: String,
+  val `destination`: String
+)
+
+@Serializable
+enum class APIGrowthPostEntryContextResponseContextSource {
+  @SerialName("post") POST
+}
+
+@Serializable
+data class APIGrowthPostEntryContext(
+  val `source`: APIGrowthPostEntryContextSource,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `version`: Long,
+  val `title`: String,
+  val `destination`: String
+)
+
+@Serializable
+enum class APIGrowthPostEntryContextSource {
+  @SerialName("post") POST
+}
+
+@Serializable
 enum class ReadCreatorMediaPolicyPurpose {
   @SerialName("source_audio") SOURCE_AUDIO,
   @SerialName("interview_audio") INTERVIEW_AUDIO,
@@ -5578,40 +5622,97 @@ enum class ReadCreatorMediaPolicyPurpose {
 class CreatorAPIError(val status: Int, val body: String): Exception("API request refused ($status)")
 data class CreatorAPIBinaryResponse(val body: ByteArray, val status: Int, val contentType: String?, val contentRange: String?, val acceptRanges: String?)
 
-class CreatorAPIClient(private val baseURL: String, private val maximumResponseBytes: Int = 268_435_456, private val timeoutMs: Int = 30_000, private val token: suspend () -> String?) {
+// Existing app dependency; share connection/thread pools across captured clients.
+private object CreatorAPITransport {
+  val client = OkHttpClient.Builder().followRedirects(false).followSslRedirects(false).retryOnConnectionFailure(false).build()
+}
+
+class CreatorAPIClient(private val baseURL: String, private val maximumResponseBytes: Int = 268_435_456, private val timeoutMs: Int = 30_000, private val expectedAccountId: String? = null, private val expectedSessionId: String? = null, private val token: suspend () -> String?) {
   private val json = Json { ignoreUnknownKeys = false }
+  /** W8 private transport on this original client, with denial-only pins. */
+  suspend fun trustBytes(path: String, expectedAccountId: String, expectedSessionId: String, body: ByteArray? = null, binary: Boolean = false): CreatorAPIBinaryResponse {
+    require(path.matches(Regex("^/v1/trust/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*$")) && expectedAccountId.isNotEmpty() && expectedSessionId.isNotEmpty() && (body?.size ?: 0) <= 1_048_576)
+    return requestBytes(path, if (body == null) "GET" else "POST", body, authenticated = true,
+      headers = mapOf("X-Expected-Account-Id" to expectedAccountId, "X-Expected-Session-Id" to expectedSessionId),
+      accept = if (binary) "application/octet-stream" else "application/json", contentType = "application/json")
+  }
+  /** W4 JSON transport on this original client, with denial-only session pins. */
+  suspend fun commerceBytes(path: String, expectedAccountId: String, expectedSessionId: String, body: ByteArray? = null): CreatorAPIBinaryResponse {
+    require(path.matches(Regex("^/v1/commerce/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*$")) && expectedAccountId.isNotEmpty() && expectedSessionId.isNotEmpty() && (body?.size ?: 0) <= 1_048_576)
+    return requestBytes(path, if (body == null) "GET" else "POST", body, authenticated = true,
+      headers = mapOf("X-Expected-Account-Id" to expectedAccountId, "X-Expected-Session-Id" to expectedSessionId, "x-commerce-account-id" to expectedAccountId),
+      accept = "application/json", contentType = "application/json")
+  }
+  /** W5 JSON transport on this original client, with denial-only session pins. */
+  suspend fun contentBytes(path: String, expectedAccountId: String, expectedSessionId: String, body: ByteArray? = null, query: List<Pair<String, String?>> = emptyList()): CreatorAPIBinaryResponse {
+    require(path.matches(Regex("^/v1/content/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*$")) && expectedAccountId.isNotEmpty() && expectedSessionId.isNotEmpty() && (body?.size ?: 0) <= 1_048_576 && query.size <= 4 && query.map { it.first }.toSet().size == query.size && query.all { it.first in setOf("contentId", "cursor", "targetKind", "targetId") && (it.second?.toByteArray(Charsets.UTF_8)?.size ?: 0) <= 1024 })
+    return requestBytes(path, if (body == null) "GET" else "POST", body, authenticated = true, query = query,
+      headers = mapOf("X-Expected-Account-Id" to expectedAccountId, "X-Expected-Session-Id" to expectedSessionId),
+      accept = "application/json", contentType = "application/json")
+  }
   private suspend fun request(path: String, method: String, body: String? = null, authenticated: Boolean, query: List<Pair<String, String?>> = emptyList(), headers: Map<String, String> = emptyMap()): String =
     requestBytes(path, method, body?.toByteArray(Charsets.UTF_8), authenticated, query, headers, "application/json", "application/json").body.toString(Charsets.UTF_8)
-  private suspend fun requestBytes(path: String, method: String, body: ByteArray? = null, authenticated: Boolean, query: List<Pair<String, String?>> = emptyList(), headers: Map<String, String> = emptyMap(), accept: String = "application/octet-stream", contentType: String = "application/octet-stream"): CreatorAPIBinaryResponse = withContext(Dispatchers.IO) {
-    kotlinx.coroutines.currentCoroutineContext().ensureActive()
+  private suspend fun requestBytes(path: String, method: String, body: ByteArray? = null, authenticated: Boolean, query: List<Pair<String, String?>> = emptyList(), headers: Map<String, String> = emptyMap(), accept: String = "application/octet-stream", contentType: String = "application/octet-stream"): CreatorAPIBinaryResponse {
     require(maximumResponseBytes in 1..268_435_456 && timeoutMs in 1..30_000)
-    val encodedQuery = query.filter { it.second != null }.joinToString("&") { segment(it.first) + "=" + segment(it.second!!) }
-    val connection = URL(baseURL.trimEnd('/') + path + (if (encodedQuery.isEmpty()) "" else "?" + encodedQuery)).openConnection() as HttpURLConnection
-    try {
-      connection.requestMethod = method
-      connection.instanceFollowRedirects = false; connection.useCaches = false
-      connection.connectTimeout = minOf(15000, timeoutMs); connection.readTimeout = timeoutMs
-      connection.setRequestProperty("Accept", accept)
-      headers.forEach { (name, value) -> connection.setRequestProperty(name, value) }
-      if (authenticated) token()?.let { connection.setRequestProperty("Authorization", "Bearer $it") }
-      if (body != null) { connection.doOutput = true; connection.setRequestProperty("Content-Type", contentType); connection.outputStream.use { it.write(body) } }
-      val status = connection.responseCode
-      val maximum = if (status in 200..299) maximumResponseBytes else minOf(maximumResponseBytes, 8192)
-      check(connection.contentLengthLong <= maximum.toLong())
-      val payload = (if (status in 200..299) connection.inputStream else connection.errorStream)?.use { stream ->
-        val output = java.io.ByteArrayOutputStream()
-        val buffer = ByteArray(8192)
-        while (true) {
-          kotlinx.coroutines.currentCoroutineContext().ensureActive()
-          val count = stream.read(buffer); if (count < 0) break
-          check(output.size() + count <= maximum); output.write(buffer, 0, count)
+    // One original budget includes token loading, dispatch and the complete body.
+    // Cancellation closes this exact Call; a coroutine timer alone cannot stop blocking reads.
+    return try { withTimeout(timeoutMs.toLong()) {
+      val request = withContext(Dispatchers.IO) {
+        kotlinx.coroutines.currentCoroutineContext().ensureActive()
+        val encodedQuery = query.filter { it.second != null }.joinToString("&") { segment(it.first) + "=" + segment(it.second!!) }
+        val builder = Request.Builder().url(baseURL.trimEnd('/') + path + (if (encodedQuery.isEmpty()) "" else "?" + encodedQuery)).header("Accept", accept)
+        headers.forEach { (name, value) -> builder.header(name, value) }
+        // Captured original pins are denial preconditions, never identity.
+        if (authenticated) {
+          expectedAccountId?.let { builder.header("X-Expected-Account-Id", it) }
+          expectedSessionId?.let { builder.header("X-Expected-Session-Id", it) }
+          token()?.let { builder.header("Authorization", "Bearer $it") }
         }
-        output.toByteArray()
-      } ?: byteArrayOf()
+        val requestBody = body?.toRequestBody(contentType.toMediaType())
+          ?: if (method in setOf("POST", "PUT", "PATCH", "PROPPATCH", "REPORT")) byteArrayOf().toRequestBody(null) else null
+        kotlinx.coroutines.currentCoroutineContext().ensureActive()
+        builder.method(method, requestBody).build()
+      }
+      val call = CreatorAPITransport.client.newBuilder()
+        .connectTimeout(minOf(15000, timeoutMs).toLong(), TimeUnit.MILLISECONDS)
+        .readTimeout(timeoutMs.toLong(), TimeUnit.MILLISECONDS)
+        .writeTimeout(timeoutMs.toLong(), TimeUnit.MILLISECONDS)
+        .callTimeout(timeoutMs.toLong(), TimeUnit.MILLISECONDS)
+        .build().newCall(request)
+      suspendCancellableCoroutine { continuation ->
+        continuation.invokeOnCancellation { call.cancel() }
+        call.enqueue(object : Callback {
+          override fun onFailure(call: Call, error: IOException) { continuation.resumeWith(Result.failure(error)) }
+          override fun onResponse(call: Call, response: Response) {
+            try {
+              val result = response.use {
+                val status = response.code
+                val maximum = if (status in 200..299) maximumResponseBytes else minOf(maximumResponseBytes, 8192)
+                check((response.body?.contentLength() ?: -1) <= maximum.toLong())
+                val payload = response.body?.byteStream()?.use { stream ->
+                  val output = java.io.ByteArrayOutputStream()
+                  val buffer = ByteArray(8192)
+                  while (true) {
+                    if (!continuation.isActive) throw java.io.InterruptedIOException("API request cancelled")
+                    val count = stream.read(buffer); if (count < 0) break
+                    check(output.size() + count <= maximum); output.write(buffer, 0, count)
+                  }
+                  output.toByteArray()
+                } ?: byteArrayOf()
+                if (!continuation.isActive) throw java.io.InterruptedIOException("API request cancelled")
+                if (status !in 200..299) throw CreatorAPIError(status, payload.toString(Charsets.UTF_8))
+                CreatorAPIBinaryResponse(payload, status, response.header("Content-Type"), response.header("Content-Range"), response.header("Accept-Ranges"))
+              }
+              continuation.resumeWith(Result.success(result))
+            } catch (error: Exception) { continuation.resumeWith(Result.failure(error)) }
+          }
+        })
+      }
+    } } catch (expired: kotlinx.coroutines.TimeoutCancellationException) {
+      // A genuine parent cancellation must keep its original cancellation meaning.
       kotlinx.coroutines.currentCoroutineContext().ensureActive()
-      if (status !in 200..299) throw CreatorAPIError(status, payload.toString(Charsets.UTF_8))
-      CreatorAPIBinaryResponse(payload, status, connection.getHeaderField("Content-Type"), connection.getHeaderField("Content-Range"), connection.getHeaderField("Accept-Ranges"))
-    } finally { connection.disconnect() }
+      throw java.net.SocketTimeoutException("API request timed out").apply { initCause(expired) }
+    }
   }
   private fun segment(value: String): String = URLEncoder.encode(value, "UTF-8").replace("+", "%20")
   suspend fun creatorEarningsLedger(creatorId: String, currency: String, cursor: String? = null): APICommerceCreatorLedgerPage = json.decodeFromString(request("/v1/commerce/creators/${segment(creatorId)}/earnings", "GET", authenticated = true, query = listOf("currency" to currency, "cursor" to cursor)))
@@ -5664,6 +5765,7 @@ class CreatorAPIClient(private val baseURL: String, private val maximumResponseB
   suspend fun studioReplyDraft(creatorId: String, fanId: String): APIStudioReplyDraft = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads/${segment(fanId)}/draft", "GET", authenticated = true))
   suspend fun saveStudioReplyDraft(creatorId: String, fanId: String, xQelvoraExpectedAccount: String? = null, body: APIStudioSaveReplyDraft): APIStudioDraftVersion = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads/${segment(fanId)}/draft", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun sendStudioReplyDraft(creatorId: String, fanId: String, xQelvoraExpectedAccount: String? = null, body: APIStudioSendReplyDraft): APIMessage = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads/${segment(fanId)}/send-draft", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun readPostEntryContext(handle: String, id: String, xQelvoraExpectedAccount: String? = null): APIGrowthPostEntryContextResponse = json.decodeFromString(request("/v1/growth/creators/${segment(handle)}/posts/${segment(id)}/context", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun health(): APIHealth = json.decodeFromString(request("/health", "GET", authenticated = false))
   suspend fun identityCapabilities(): APIIdentityCapabilities = json.decodeFromString(request("/v1/identity/capabilities", "GET", authenticated = false))
   suspend fun continueWithPantopus(body: APIIdentityContinue): APIIdentityRedirect = json.decodeFromString(request("/v1/identity/continue", "POST", body = json.encodeToString(body), authenticated = false))
@@ -5697,6 +5799,7 @@ class CreatorAPIClient(private val baseURL: String, private val maximumResponseB
   suspend fun takeover(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/takeover", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun handback(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/handback", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply): APIMessage = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/human-replies", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun beginConversation(xExpectedAccountId: String? = null, xExpectedSessionId: String? = null, body: APIConversationBeginConversation): APIConversationConversationPage = json.decodeFromString(request("/v1/conversations/begin", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("X-Expected-Account-Id" to xExpectedAccountId, "X-Expected-Session-Id" to xExpectedSessionId).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput): APIConversationConversationRecordingResult = json.decodeFromString(request("/v1/conversations/${segment(creatorId)}/${segment(fanId)}/recordings", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun leaseOfflineConversation(creatorId: String, fanId: String): APIConversationConversationOfflineSnapshot = json.decodeFromString(request("/v1/conversations/${segment(creatorId)}/${segment(fanId)}/offline", "GET", authenticated = true))
   suspend fun readThreadMedia(creatorId: String, fanId: String, assetId: String, xQelvoraExpectedAccount: String? = null): APIMediaMediaAsset = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/media/${segment(assetId)}", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))

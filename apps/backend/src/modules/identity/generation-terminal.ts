@@ -12,6 +12,10 @@ import {
   assertGenerationPoolCustody,
   generationTransaction,
 } from "./generation-transaction.js";
+import {
+  assertGenerationTerminalDiscoveryCatalogue,
+  generationTerminalDiscoveryConsumer,
+} from "./generation-terminal-discovery.js";
 
 export const GENERATION_TERMINAL_MIGRATION =
   "0183_w1_generation_terminal_scope";
@@ -47,6 +51,14 @@ const terminalTask = z.strictObject({
   originalMessageState: z.enum(["accepted", "generating"]),
 });
 const terminalBrand: unique symbol = Symbol("GenerationTerminalScope");
+const terminalCandidateSchema = z.strictObject({
+  generationId: z.uuid(),
+  lastSequence: z.int().min(0).max(2_147_483_647),
+});
+/** Observation only. withTerminal rechecks this exact original cursor. */
+export type GenerationTerminalCandidate = Readonly<
+  z.infer<typeof terminalCandidateSchema>
+>;
 export type GenerationTerminalScope = Readonly<
   z.infer<typeof terminalTask> & {
     [terminalBrand]: true;
@@ -335,8 +347,8 @@ export class GenerationTerminalAuthority {
       "generation_terminal_unconfigured",
       "Reviewed generation settlement authority is unavailable.",
       503,
+      { cause },
     );
-    if (cause !== undefined) failure.cause = cause;
     throw failure;
   }
   static async create(configuration: {
@@ -365,8 +377,8 @@ export class GenerationTerminalAuthority {
         "generation_terminal_unconfigured",
         "The original generation settlement custody is not installed.",
         503,
+        { cause },
       );
-      failure.cause = cause;
       throw failure;
     };
     try {
@@ -487,6 +499,48 @@ export class GenerationTerminalAuthority {
         await this.configuration.assertRestoredInTransaction(client);
         await this.assertCatalogue(client);
         return Object.freeze(ids);
+      });
+    } catch (error) {
+      return this.failure(error);
+    }
+  }
+
+  async pendingTerminalCursors(
+    limit = 20,
+    signal?: AbortSignal,
+  ): Promise<readonly GenerationTerminalCandidate[]> {
+    this.assertWorker();
+    const n = z.int().min(1).max(64).parse(limit);
+    try {
+      this.configuration.generation.assertTerminalConsumerRegistered(
+        generationTerminalDiscoveryConsumer,
+      );
+      return await generationTransaction(this.pool, signal, async (client) => {
+        await this.begin(client);
+        await assertGenerationTerminalDiscoveryCatalogue(client);
+        const result = await client.query<{
+          generationId: unknown;
+          lastSequence: unknown;
+        }>(
+          'SELECT generation_id AS "generationId",last_sequence AS "lastSequence" FROM creator.pending_generation_terminal_cursors($1)',
+          [n],
+        );
+        const candidates = z
+          .array(terminalCandidateSchema)
+          .max(n)
+          .parse(result.rows);
+        invariant(
+          new Set(candidates.map((candidate) => candidate.generationId))
+            .size === candidates.length,
+          "generation_terminal_discovery_changed",
+          "The original terminal candidate metadata changed.",
+        );
+        await this.configuration.assertRestoredInTransaction(client);
+        await this.assertCatalogue(client);
+        await assertGenerationTerminalDiscoveryCatalogue(client);
+        return Object.freeze(
+          candidates.map((candidate) => Object.freeze(candidate)),
+        );
       });
     } catch (error) {
       return this.failure(error);

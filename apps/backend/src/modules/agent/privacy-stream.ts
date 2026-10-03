@@ -119,7 +119,6 @@ export function agentExportStream(
     try {
       signal.throwIfAborted();
       await assertCurrent();
-      await service.repository.assertRuntimeRole();
       invariant(
         source,
         "privacy_export_unconfigured",
@@ -131,6 +130,8 @@ export function agentExportStream(
         signal,
         async (client) => {
           heldClient = client;
+          await service.repository.assertRuntimeRoleInTransaction(client);
+          signal.throwIfAborted();
           await assertTaskInTransaction(client);
           await client.query(
             "SET LOCAL statement_timeout='10s'; SET LOCAL lock_timeout='5s'; SET LOCAL work_mem='1MB'",

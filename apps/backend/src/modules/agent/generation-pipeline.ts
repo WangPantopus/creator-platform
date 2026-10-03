@@ -396,47 +396,58 @@ export class PreparedGenerationPipeline {
     let run: Run | undefined;
     try {
       signal.throwIfAborted();
-      run = await this.identity.withGeneration(task, async (client, scope) => {
-        const conversation = await this.context.currentInTransaction(
-          client,
-          scope,
-        );
-        // W3 handles immediate safety before financial/provider acceptance.
-        // Never start/restart a paid run over durable partial output.
-        invariant(
-          !needsImmediateSafety(conversation.acceptedText),
-          "generation_safety_route_required",
-          "Use the original free conversation safety route before provider or allowance work.",
-        );
-        invariant(
-          scope.lastSequence === 0,
-          "generation_partial_output_terminal_required",
-          "Seal the original partial output as interrupted before accepting another model run.",
-        );
-        const facts = await this.inputs.currentInTransaction(client, scope);
-        const metadata = await this.metadata.currentInTransaction(
-          client,
-          scope,
-        );
-        const attempt = await this.accounting.beginInTransaction(client, scope);
-        await this.inputs.authorizeInTransaction(facts, scope, client);
-        await this.metadata.assertCurrentInTransaction(client, scope, metadata);
-        await this.context.assertCurrentInTransaction(
-          client,
-          scope,
-          conversation,
-        );
-        return {
-          task: Object.freeze({ ...task }),
-          signal,
-          conversation,
-          facts,
-          metadata,
-          attempt,
-          nextSequence: 0,
-          live: true,
-        };
-      });
+      run = await this.identity.withGeneration(
+        task,
+        async (client, scope) => {
+          const conversation = await this.context.currentInTransaction(
+            client,
+            scope,
+          );
+          // W3 handles immediate safety before financial/provider acceptance.
+          // Never start/restart a paid run over durable partial output.
+          invariant(
+            !needsImmediateSafety(conversation.acceptedText),
+            "generation_safety_route_required",
+            "Use the original free conversation safety route before provider or allowance work.",
+          );
+          invariant(
+            scope.lastSequence === 0,
+            "generation_partial_output_terminal_required",
+            "Seal the original partial output as interrupted before accepting another model run.",
+          );
+          const facts = await this.inputs.currentInTransaction(client, scope);
+          const metadata = await this.metadata.currentInTransaction(
+            client,
+            scope,
+          );
+          const attempt = await this.accounting.beginInTransaction(
+            client,
+            scope,
+          );
+          await this.inputs.authorizeInTransaction(facts, scope, client);
+          await this.metadata.assertCurrentInTransaction(
+            client,
+            scope,
+            metadata,
+          );
+          await this.context.assertCurrentInTransaction(
+            client,
+            scope,
+            conversation,
+          );
+          return {
+            task: Object.freeze({ ...task }),
+            signal,
+            conversation,
+            facts,
+            metadata,
+            attempt,
+            nextSequence: 0,
+            live: true,
+          };
+        },
+        signal,
+      );
       const current = run;
       const bookend = (client: PoolClient, scope: GenerationTaskScope) =>
         this.current(client, scope, current);
@@ -456,15 +467,19 @@ export class PreparedGenerationPipeline {
           proof,
           current.replyCall,
         );
-        await output.deliver(task, approved);
-        await this.identity.withGeneration(task, async (client, scope) => {
-          invariant(
-            scope.lastSequence === approved.sequence,
-            "generation_output_not_committed",
-            "The actual original writer must commit this exact ordered cursor.",
-          );
-          await this.assertApprovedInTransaction(client, scope, approved);
-        });
+        await output.deliver(task, approved, signal);
+        await this.identity.withGeneration(
+          task,
+          async (client, scope) => {
+            invariant(
+              scope.lastSequence === approved.sequence,
+              "generation_output_not_committed",
+              "The actual original writer must commit this exact ordered cursor.",
+            );
+            await this.assertApprovedInTransaction(client, scope, approved);
+          },
+          signal,
+        );
         firstApprovedMs ??= Math.round(performance.now() - started);
         emitted++;
       };
@@ -488,8 +503,10 @@ export class PreparedGenerationPipeline {
           })),
           signal,
           beforeSentence: () =>
-            this.identity.withGeneration(task, (client, scope) =>
-              bookend(client, scope),
+            this.identity.withGeneration(
+              task,
+              (client, scope) => bookend(client, scope),
+              signal,
             ),
           onSentence: emit,
         },
@@ -540,6 +557,7 @@ export class PreparedGenerationPipeline {
                 );
                 return value;
               },
+              signal,
             );
             current.embedding = embedding;
             current.retrieval = retrieved;
@@ -557,22 +575,26 @@ export class PreparedGenerationPipeline {
             };
           },
           finish: (event) =>
-            this.identity.withGeneration(task, async (client, scope) => {
-              await bookend(client, scope);
-              if (event.blocked) {
-                invariant(
-                  event.category,
-                  "generation_guardrail_category_required",
-                  "An actual blocked category is required.",
-                );
-                await this.guardrail.recordInTransaction(client, scope, {
-                  category: event.category,
-                  versionHash: event.versionHash,
-                  contextHash: event.contextHash,
-                });
-              }
-              await bookend(client, scope);
-            }),
+            this.identity.withGeneration(
+              task,
+              async (client, scope) => {
+                await bookend(client, scope);
+                if (event.blocked) {
+                  invariant(
+                    event.category,
+                    "generation_guardrail_category_required",
+                    "An actual blocked category is required.",
+                  );
+                  await this.guardrail.recordInTransaction(client, scope, {
+                    category: event.category,
+                    versionHash: event.versionHash,
+                    contextHash: event.contextHash,
+                  });
+                }
+                await bookend(client, scope);
+              },
+              signal,
+            ),
         },
       );
       if (emitted === 0 && result.category === "crisis") {
@@ -595,15 +617,19 @@ export class PreparedGenerationPipeline {
           },
           current.classifierCall,
         );
-        await output.deliver(task, approved);
-        await this.identity.withGeneration(task, async (client, scope) => {
-          invariant(
-            scope.lastSequence === approved.sequence,
-            "generation_output_not_committed",
-            "The original safety output must commit its exact ordered cursor.",
-          );
-          await this.assertApprovedInTransaction(client, scope, approved);
-        });
+        await output.deliver(task, approved, signal);
+        await this.identity.withGeneration(
+          task,
+          async (client, scope) => {
+            invariant(
+              scope.lastSequence === approved.sequence,
+              "generation_output_not_committed",
+              "The original safety output must commit its exact ordered cursor.",
+            );
+            await this.assertApprovedInTransaction(client, scope, approved);
+          },
+          signal,
+        );
         firstApprovedMs ??= Math.round(performance.now() - started);
         emitted++;
       }
