@@ -2973,6 +2973,28 @@ enum class APITeamInviteRolesItem {
 }
 
 @Serializable
+data class APITeamRolesUpdateInput(
+  val `expectedRoles`: List<APITeamRolesUpdateInputExpectedRolesItem>,
+  val `roles`: List<APITeamRolesUpdateInputRolesItem>
+)
+
+@Serializable
+enum class APITeamRolesUpdateInputExpectedRolesItem {
+  @SerialName("triage") TRIAGE,
+  @SerialName("drafter") DRAFTER,
+  @SerialName("publisher") PUBLISHER,
+  @SerialName("scheduler") SCHEDULER
+}
+
+@Serializable
+enum class APITeamRolesUpdateInputRolesItem {
+  @SerialName("triage") TRIAGE,
+  @SerialName("drafter") DRAFTER,
+  @SerialName("publisher") PUBLISHER,
+  @SerialName("scheduler") SCHEDULER
+}
+
+@Serializable
 data class APITeamInvitation(
   val `id`: String,
   val `creatorId`: String,
@@ -5443,6 +5465,7 @@ class CreatorAPIClient(private val baseURL: String, private val maximumResponseB
   suspend fun inviteTeamMember(creatorId: String, body: APITeamInvite): APITeamInvitation = json.decodeFromString(request("/v1/identity/${segment(creatorId)}/team/invite", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun acceptTeamInvitation(invitationId: String): APIDone = json.decodeFromString(request("/v1/identity/team/${segment(invitationId)}/accept", "POST", authenticated = true))
   suspend fun removeTeamMember(creatorId: String, accountId: String): APIDone = json.decodeFromString(request("/v1/identity/${segment(creatorId)}/team/${segment(accountId)}/remove", "POST", authenticated = true))
+  suspend fun updateTeamMemberRoles(creatorId: String, accountId: String, xExpectedAccountId: String, body: APITeamRolesUpdateInput): APIDone = json.decodeFromString(request("/v1/identity/${segment(creatorId)}/team/${segment(accountId)}/roles", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("X-Expected-Account-Id" to xExpectedAccountId).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun cancelSignedAct(challengeId: String): APIDone = json.decodeFromString(request("/v1/identity/signed-acts/${segment(challengeId)}/cancel", "POST", authenticated = true))
   suspend fun publicSignature(signedActId: String): APIPublicSignature = json.decodeFromString(request("/v1/identity/signed-acts/${segment(signedActId)}", "GET", authenticated = false))
   suspend fun beginSignedAct(creatorId: String, body: APIBeginSignedAct): APISignedChallenge = json.decodeFromString(request("/v1/identity/${segment(creatorId)}/signed-acts/begin", "POST", body = json.encodeToString(body), authenticated = true))
