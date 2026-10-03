@@ -83,13 +83,21 @@ private class NativeTeamState(
     }
     private fun matches(snapshot: Int): Boolean = active && generation == snapshot && session.destination == destination &&
         session.session?.accountId == accountId && session.session?.sessionId == sessionId && !session.purgingPrivateState && !session.localPurgeFailed
+    private suspend fun matches(snapshot: Int, request: FanSessionRequestCapture): Boolean {
+        currentCoroutineContext().ensureActive()
+        if (!matches(snapshot)) return false
+        val currentCapture = request.isCurrent()
+        // Storage may suspend independently of this component's view lifetime.
+        currentCoroutineContext().ensureActive()
+        return currentCapture && matches(snapshot)
+    }
     suspend fun expire() {
         currentCoroutineContext().ensureActive()
         if (!active) return
         val snapshot = generation
         if (!matches(snapshot)) { deactivate(); return }
         val request = capture
-        if (request != null && !request.isCurrent()) {
+        if (request != null && !matches(snapshot, request)) {
             if (matches(snapshot)) { conceal(discardEdit = true); error = teamCopy("AccountChanged") }
             return
         }
@@ -102,12 +110,12 @@ private class NativeTeamState(
         readJob = scope.launch {
             try {
                 val request = session.captureRequest(destination, maximumResponseBytes = 262_144, timeoutMs = 4_000)
-                if (request == null || !matches(snapshot) || !request.isCurrent()) {
+                if (request == null || !matches(snapshot, request)) {
                     if (matches(snapshot)) { conceal(); error = teamCopy("Unavailable") }
                     return@launch
                 }
                 val first = request.client.studioSession()
-                if (!matches(snapshot) || !request.isCurrent()) return@launch
+                if (!matches(snapshot, request)) return@launch
                 validate(first, request)
                 var selected: APIStudioSessionCreatorsItem? = null
                 var members: APIStudioTeam? = null
@@ -116,9 +124,9 @@ private class NativeTeamState(
                     if (!uuid(creatorId) || found.verification != "verified" || (!found.owned && found.roles.isEmpty())) throw TeamDenied()
                     members = request.client.studioTeam(creatorId)
                     if (members.members.size > 50 || members.invitations.size > 50 || members.members.map { it.account_id }.toSet().size != members.members.size || members.members.any { !uuid(it.account_id) }) throw TeamDenied()
-                    if (!matches(snapshot) || !request.isCurrent() || SystemClock.elapsedRealtime() >= started + 5_000) throw TeamExpired()
+                    if (!matches(snapshot, request) || SystemClock.elapsedRealtime() >= started + 5_000) throw TeamExpired()
                     val last = request.client.studioSession()
-                    if (!matches(snapshot) || !request.isCurrent()) return@launch
+                    if (!matches(snapshot, request)) return@launch
                     validate(last, request)
                     val final = last.creators.firstOrNull { it.id == creatorId } ?: throw TeamDenied()
                     if (final.owned != found.owned || final.verification != found.verification || final.roles.map { it.name }.sorted() != found.roles.map { it.name }.sorted()) throw TeamDenied()
@@ -128,7 +136,7 @@ private class NativeTeamState(
                     }
                     selected = final
                 }
-                if (!matches(snapshot) || !request.isCurrent() || SystemClock.elapsedRealtime() >= started + 5_000) throw TeamExpired()
+                if (!matches(snapshot, request) || SystemClock.elapsedRealtime() >= started + 5_000) throw TeamExpired()
                 directory = first; creator = selected; team = members; capture = request
                 checkedUntil = started + 5_000; current = true
                 // A real desired set is visible after a fresh read. It does not
@@ -173,16 +181,16 @@ private class NativeTeamState(
         saving = true
         writeJob = scope.launch {
             try {
-                if (!matches(snapshot) || !mayManage || !command.capture.isCurrent()) {
+                if (!matches(snapshot, command.capture) || !mayManage) {
                     if (matches(snapshot)) { conceal(discardEdit = true); error = teamCopy("AccountChanged") }
                     return@launch
                 }
                 command.capture.client.updateTeamMemberRoles(id, command.accountId, command.capture.expectedAccountId, body)
-                if (!matches(snapshot) || !command.capture.isCurrent() || edit?.accountId != command.accountId) return@launch
+                if (!matches(snapshot, command.capture) || edit?.accountId != command.accountId) return@launch
                 edit = command.copy(confirmed = true, unknown = false); error = teamCopy("Saved")
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (failure: Exception) {
-                if (!matches(snapshot) || !command.capture.isCurrent() || edit?.accountId != command.accountId) return@launch
+                if (!matches(snapshot, command.capture) || edit?.accountId != command.accountId) return@launch
                 if ((failure as? CreatorAPIError)?.status in listOf(401, 403, 404)) {
                     conceal(discardEdit = true); error = teamCopy("Denied")
                 } else {

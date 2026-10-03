@@ -81,11 +81,16 @@ private struct NativeTeamEdit {
         session?.session?.accountId == accountId && session?.session?.sessionId == sessionId &&
         session?.purgingPrivateState == false && session?.localPurgeFailed == false
     }
+    private func matches(_ snapshot: Int, request: FanSessionRequestCapture) async -> Bool {
+        guard matches(snapshot), await request.isCurrent() else { return false }
+        // Secure credential reads may suspend while this component is disposed.
+        return matches(snapshot)
+    }
     func expire() async {
         guard active else { return }
         let snapshot = generation
         if !matches(snapshot) { deactivate(); return }
-        if let capture, !(await capture.isCurrent()) {
+        if let capture, !(await matches(snapshot, request: capture)) {
             guard matches(snapshot) else { return }
             conceal(discardEdit: true); error = teamCopy("AccountChanged"); return
         }
@@ -99,12 +104,12 @@ private struct NativeTeamEdit {
             guard let self else { return }
             defer { if generation == snapshot { reading = false; readTask = nil } }
             do {
-                guard let request = await session.captureRequest(from: destination, maximumResponseBytes: 262_144, timeoutSeconds: 4), matches(snapshot), await request.isCurrent() else {
+                guard let request = await session.captureRequest(from: destination, maximumResponseBytes: 262_144, timeoutSeconds: 4), await matches(snapshot, request: request) else {
                     if matches(snapshot) { conceal(); error = teamCopy("Unavailable") }
                     return
                 }
                 let first = try await request.client.studioSession()
-                guard matches(snapshot), await request.isCurrent() else { return }
+                guard await matches(snapshot, request: request) else { return }
                 try validate(first, request: request)
                 var selected: APIStudioSessionCreatorsItem?
                 var members: APIStudioTeam?
@@ -117,9 +122,9 @@ private struct NativeTeamEdit {
                     guard let teamValue = members, teamValue.members.count <= 50, teamValue.invitations.count <= 50,
                           Set(teamValue.members.map(\.account_id)).count == teamValue.members.count,
                           teamValue.members.allSatisfy({ UUID(uuidString: $0.account_id) != nil }) else { throw NativeTeamDenied() }
-                    guard matches(snapshot), await request.isCurrent(), now < started + 5 else { throw NativeTeamExpired() }
+                    guard await matches(snapshot, request: request), now < started + 5 else { throw NativeTeamExpired() }
                     let last = try await request.client.studioSession()
-                    guard matches(snapshot), await request.isCurrent() else { return }
+                    guard await matches(snapshot, request: request) else { return }
                     try validate(last, request: request)
                     guard let final = last.creators.first(where: { $0.id == creatorId }),
                           final.owned == found.owned, final.verification == found.verification,
@@ -130,7 +135,7 @@ private struct NativeTeamEdit {
                               membership.roles.map(\.rawValue).sorted() == final.roles.map(\.rawValue).sorted() else { throw NativeTeamDenied() }
                     }
                 }
-                guard matches(snapshot), await request.isCurrent(), now < started + 5 else { throw NativeTeamExpired() }
+                guard await matches(snapshot, request: request), now < started + 5 else { throw NativeTeamExpired() }
                 directory = first; creator = selected; team = members; capture = request
                 checkedUntil = started + 5; current = true
                 // An actual current read can display a committed desired set,
@@ -179,17 +184,17 @@ private struct NativeTeamEdit {
             guard let self else { return }
             defer { if generation == snapshot { saving = false; writeTask = nil; refresh() } }
             do {
-                guard matches(snapshot), mayManage, await command.capture.isCurrent() else {
+                guard await matches(snapshot, request: command.capture), mayManage else {
                     if matches(snapshot) { conceal(discardEdit: true); error = teamCopy("AccountChanged") }
                     return
                 }
                 _ = try await command.capture.client.updateTeamMemberRoles(creatorId: creatorId, accountId: command.accountId,
                     xExpectedAccountId: command.capture.expectedAccountId, body: body)
-                guard matches(snapshot), await command.capture.isCurrent(), edit?.accountId == command.accountId else { return }
+                guard await matches(snapshot, request: command.capture), edit?.accountId == command.accountId else { return }
                 var done = command; done.confirmed = true; done.unknown = false; edit = done
                 error = teamCopy("Saved")
             } catch {
-                guard matches(snapshot), await command.capture.isCurrent(), edit?.accountId == command.accountId else { return }
+                guard await matches(snapshot, request: command.capture), edit?.accountId == command.accountId else { return }
                 if let failure = error as? CreatorAPIError, [401, 403, 404].contains(failure.status) {
                     conceal(discardEdit: true); self.error = teamCopy("Denied")
                 } else {
