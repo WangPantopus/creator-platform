@@ -1,3 +1,28 @@
+## Current signed iOS and original real deadline — October 3, 2026 13:06 UTC
+
+- [x] Personally operate current signed iOS original-account Requests/You Spending Back in named Light/Night paths, actual decimal6.50 unsaved input and normal cold discard; preserve all38 commerce tables/two rows and release the actual bounded own resources.
+- [x] Observe the original24-hour spending increase mature at its real deadline through normal Refresh; verify one stored version increment, repeated Refresh/cold stability and only the limit row changing.
+- [ ] Finish current Android internal Night Back/200%, iOS largest-text controls and authorized complete spoken accessibility; current Text11 shared-banner truncation is preserved and owner-coordinated.
+- [ ] Qualify the dependent original commerce session consumer298 with corrected actual W1 producer296, current CI, remaining artboards and actual commerce command race; review W3's specific commerce privacy export/composition findings.
+- [ ] Complete all nine original packages/R01–R15, including genuine factory/provider/financial/cleanup/sole COMMIT/C10. No full row is complete.
+
+[Current signed iOS evidence](../../../artifacts/workstreams/W4/runtime/2026-10-03/ios-personal-return/README.md) and [real deadline qualification](../../../artifacts/workstreams/W4/runtime/2026-10-03/original-limit-maturation/README.md) supersede the dated pending records without deleting them. All14 then-active W4 branches/shared main normally include reviewedb4d3099a and match pushed heads; workbook/history are preserved. Later draft298 remains held for its actual producer and current consumer gates.
+
+## Current native repeat and retained todo — October 3, 2026 12:26 UTC
+
+- [x] Personally qualify current Android Light Requests return, Night direct You return and actual unsaved decimal/cold discard while preserving the original38-table commerce state; release the bounded own device/GUI window normally.
+- [ ] Personally operate the current signed iOS rebuild; finish current Android internal Night Back,200% text and authorized spoken accessibility.
+- [ ] Complete every original commerce package/R01–R15, genuine factory/provider/financial/cleanup/sole COMMIT/C10 and full client acceptance. Retained213/236/247/262 remain draft; no full row is complete.
+
+All13 active W4 branches/shared main include source-reviewed9e7667c6; local/pushed heads, original native/backend/SQL/registry bytes and user workbook are preserved. [Exact current Android observations](../../../artifacts/workstreams/W4/runtime/2026-10-03/android-personal-return/README.md) and [existing-PR reuse/current heads](../../../artifacts/workstreams/W4/runtime/2026-10-03/open-pr-review/README.md) supersede dated pending captures below without removing them.
+
+## Qualified existing navigation and preserved todo — October 3, 2026 11:07 UTC
+
+Existing210 merged exact037f9a37 into reviewed10f6cfc8, producing main132bc055. Four exact-head fast jobs pass. All six Mac jobs were queued at the10:54 merge; the refreshed state has three queued PR jobs and three cancelled push jobs at11:06:43UTC, neither counted as passes. Personal unchanged-source web account/outage/Retry/Light/Night390/1280 navigation and four38-table custody comparisons qualify only that change. All12 active W4 branches normally include captured132bc055, match pushed heads and preserve native/backend/SQL source plus the user workbook. Four retained W4 drafts stay held; the fresh35-PR inventory includes W5/W6's distinct288/289. [Current heads, source reuse, receipts, queue and limits](../../../artifacts/workstreams/W4/runtime/2026-10-03/open-pr-review/README.md) supersede dated captures below.
+
+- [x] Reuse, personally qualify and merge existing owned Studio/Commerce return navigation in210.
+- [ ] Complete every original commerce package/R01–R15, including genuine authorities/provider/output/financial/cleanup/C10 and current native accessibility. Current Android build/resource metadata is preparation; personal current Night/TalkBack remains pending after W2, then W7.
+
 ## Current existing-PR review and preserved todo — October 3, 2026 UTC
 
 All46 initial PRs have owner/source/dependency dispositions;13 redundant originals are closed/unmerged with their source/history and outstanding acceptance preserved. Existing236/262 now repair the omitted worker policy and actual sequence-default ACL projection, with personally verified rollback custody. Existing247 reuses W2 and W5's actual source once: its27-source review has46 zero-row plans,28 SQL refusals plus unregistered W5 guard503,51 restored metadata drifts and all six custody comparisons. Original0157 static diagnostics, complete accepted pins and genuine original task/factory/provider/output/financial/cleanup/sole COMMIT/C10 remain open. No retained W4 runtime PR is merged or full package/R01–R15 row checked off from this audit.
