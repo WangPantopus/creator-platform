@@ -108,7 +108,7 @@ export async function fulfillmentPublicationOriginalPurposeCatalogue(
 // Primary closed canonical61 qualification of the eleven actual source files,
 // including W1 published12a5ba86 and this real213. No startup-derived pin.
 export const FULFILLMENT_PUBLICATION_ORIGINAL_CATALOGUE_SHA256 =
-  "80f1af201d3c1799718bd60103aa96682cb351deecff89e238341929d2bd25ae";
+  "c27a954386cd5307007525e2289ae0341d717135c7c39e2c064bc83558dd5269";
 export const FULFILLMENT_PUBLICATION_ORIGINAL_SOURCES = Object.freeze(
   [
     {
@@ -186,7 +186,7 @@ export const FULFILLMENT_PUBLICATION_ORIGINAL_SOURCES = Object.freeze(
       path: "apps/backend/src/modules/identity/schema-publication-preparation.sql",
       owner: "W1",
       checksum:
-        "eb393fac0e580c3b7c58e4586ebd98539f99b696aacc9db1756ea5523c059c07",
+        "b0a47eac2a722b4f29c87875c474ba73d148e840b10bcf9e75af9ec467a2dda3",
     },
   ].map((source) => Object.freeze(source)),
 );
