@@ -1,0 +1,11 @@
+# Actual privacy task and creator/fan fences
+
+These are labelled synthetic review databases and real canonical app sessions, with forty canonical ledger rows retained. No future migration is registered.
+
+The real web UI submitted an account export (HTTP202). The actual coordinator claim supplied its real task, lease token and cancellation signal to the outside-Git E2E operator. Reserved0087 locked the actual job and task on the same non-owner domain client, before any domain locks. A current commit succeeded; takeover NOWAIT refused55P03; early SET CONSTRAINTS refused23514; the actual naturally expired lease refused COMMIT23514 after its worker signal aborted. Transient scope rows were zero. No lease timestamp/token/state was fabricated. The probe issued no export/purge receipt; the UI and readback show incomplete domains. Its timeout can leave the real task running with an expired lease until the next coordinator claim; this is retained actual state, not a successful recovery.
+
+The metadata-only NOLOGIN fence role has no task receipt, message or domain content read. Core has only the callable exact capability, no raw Trust/scope SELECT. PUBLIC and the Trust worker have no EXECUTE. The deferred check permits only a separate COMMIT query, preventing SET CONSTRAINTS from turning the wall-clock check into an earlier check. The real job.signal remains mandatory before each page and before COMMIT in the owner producer.
+
+Reserved0089 checks the actual creator/fan and genuine current owner-or-fan session without an invented packet or thread. The real actor-two session retained its saved block403, passed the unblocked creator/fan negative projection, refused an unrelated fan503, and refused an actual concurrent block writer503 in3.071333ms. Every positive content/tenure permission remains the owner's responsibility. No paid tenure was fabricated.
+
+The first scratch browser expected200 despite the actual saved202; no duplicate was sent. An expired old cookie was refused401, and normal canonical sign-in supplied the fresh session. Screenshots were personally viewed. New unit tests were not written; backend typecheck/lint passed. Services stopped after verification; data retained. This is not initial57-wave app acceptance, all-eight-domain C10, provider generation, verified creator or full release acceptance.

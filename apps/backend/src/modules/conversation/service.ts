@@ -4,7 +4,7 @@ import type { ConversationAllowance } from "./allowance.js";
 import type { ApprovedSentence } from "../agent/runtime.js";
 import { randomUUID } from "node:crypto";
 import { formatCopy } from "@qelvora/copy";
-import type { PoolClient } from "pg";
+import { Client, type PoolClient } from "pg";
 import {
   ControlCommandSchema,
   HumanReplySchema,
@@ -23,13 +23,14 @@ import {
   type ThreadScope,
 } from "../access/scope.js";
 import { consumeSignedAct } from "../identity/signed-acts.js";
-import { invariant } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
 import { idempotent } from "../../core/idempotency.js";
 import { appendFrame } from "../../core/outbox.js";
 import type { GuardrailProvider } from "../agent/providers.js";
 import type { ConversationWellbeing } from "./wellbeing.js";
 import {
   ConversationMessageSchema,
+  ConversationCallControlSchema,
   TeamReplySchema,
   type ConversationTimeline,
 } from "../../../../../packages/api/src/conversation/contracts.js";
@@ -38,6 +39,12 @@ import { contentHash } from "../../core/canonical.js";
 import type { ConversationLineage } from "./lineage.js";
 import type { PreparedGenerationJournal } from "../agent/generation-journal.js";
 import type { GenerationCostReconciliation } from "../commerce/generation-allowance.js";
+import type { Actor } from "../identity/adapter.js";
+import {
+  CommerceFulfillmentPlans,
+  type CommerceGroupRecipient,
+} from "../commerce/fulfillment-plans.js";
+import { ConversationSystemLinkSchema } from "../../../../../packages/api/src/conversation/system-link.js";
 
 type ThreadRow = {
   control: ThreadControl;
@@ -90,6 +97,161 @@ function message(row: MessageRow): Message {
 }
 
 export class ConversationService {
+  private fulfillmentPlans?: CommerceFulfillmentPlans;
+  configureFulfillmentPlans(plans: CommerceFulfillmentPlans): void {
+    CommerceFulfillmentPlans.assertRuntime(plans, this.db, this.access);
+    invariant(
+      !this.fulfillmentPlans,
+      "fulfillment_already_configured",
+      "Original fulfillment is already configured.",
+    );
+    this.fulfillmentPlans = plans;
+  }
+
+  /** W5 owns this transaction. Consume only W4's actual positive recipient on
+   * its original held client; never open another transaction or rebuild a scope.
+   * W4's final publication fence must run after this and every other domain
+   * effect. Only COMMIT may follow that fence. */
+  async appendSystemLink(
+    client: PoolClient,
+    recipient: CommerceGroupRecipient,
+  ): Promise<Readonly<{ message: Message; frame: Frame }>> {
+    const plans = this.fulfillmentPlans;
+    if (!plans)
+      throw new DomainError(
+        "system_link_unconfigured",
+        "Original public-answer delivery is unavailable.",
+        503,
+      );
+    CommerceFulfillmentPlans.assertRuntime(plans, this.db, this.access);
+    const scope = await plans.recipientScope(client, recipient);
+    assertThreadScope(scope);
+    invariant(
+      scope.authority === "creator" &&
+        scope.actorAccountId === scope.creatorAccountId,
+      "system_link_creator_required",
+      "The original creator publication is required.",
+    );
+    const original = await plans.recipientLink(client, recipient);
+    const systemLink = ConversationSystemLinkSchema.parse({
+      kind: "published_answer",
+      creatorId: scope.creatorId,
+      contentId: original.contentId,
+      contentVersion: original.contentVersion,
+      label: original.text,
+    });
+    // A plan may include multiple families. Restore only the actual owner-
+    // issued scope's RLS coordinates, never a synthetic recipient Actor.
+    await client.query(
+      "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true),set_config('app.account_id',$3,true)",
+      [scope.creatorId, scope.fanId, scope.actorAccountId],
+    );
+    // W4 already obtained this exact existing-thread UPDATE lease before W5's
+    // document locks. This re-read never creates a thread or changes control.
+    const thread = await this.lockThread(client, scope);
+    const stored = await this.insertMessage(
+      client,
+      scope,
+      "system",
+      systemLink.label,
+      thread.control_epoch,
+      "delivered",
+    );
+    const frame = await appendFrame(client, scope, {
+      epoch: thread.control_epoch,
+      kind: "delivered",
+      messageId: stored.id,
+      authorKind: "system",
+      text: stored.text,
+      generationId: null,
+      sequence: 0,
+      systemLink,
+    });
+    // The actual W4 insert trigger checks family, neutral authorship, genuine
+    // signed publication and publication time; it also records the original
+    // commitment and durable Commerce event on this same transaction.
+    await plans.recordDelivery(client, recipient, stored.id);
+    return Object.freeze({
+      message: Object.freeze({ ...stored, systemLink }),
+      frame: Object.freeze(frame),
+    });
+  }
+
+  /** Called only inside the caller's actual scoped read transaction. A saved
+   * delivery association provides minimal historical link metadata; opening
+   * it still uses the current W5 viewer. No title/body/fan/plan is projected. */
+  async enrichSystemLinksInTransaction<T extends Message>(
+    scope: ThreadScope,
+    client: PoolClient,
+    messages: readonly T[],
+  ): Promise<T[]> {
+    assertThreadScope(scope);
+    const plans = this.fulfillmentPlans;
+    const selected = messages.filter(
+      (m) =>
+        m.threadId === scope.threadId &&
+        m.authorKind === "system" &&
+        m.deliveryState === "delivered" &&
+        m.signedActId === null &&
+        m.authorAccountId == null &&
+        m.text === "Answered publicly.",
+    );
+    if (!plans || selected.length === 0) return [...messages];
+    invariant(
+      messages.length <= 100,
+      "system_link_projection_bounded",
+      "Refresh this conversation to read its links.",
+    );
+    CommerceFulfillmentPlans.assertRuntime(plans, this.db, this.access);
+    await plans.assertCurrentCatalogueInTransaction(client);
+    const rows = (
+      await client.query<{
+        message_id: string;
+        creator_id: string;
+        content_id: string;
+        content_version: number;
+      }>(
+        `SELECT g.message_id,g.creator_id,g.content_id,g.content_version
+         FROM creator.commerce_group_delivery g
+         JOIN creator.commerce_fulfillment_plan p
+          ON p.id=g.plan_id AND p.revision=g.plan_revision
+           AND p.creator_id=g.creator_id AND p.content_id=g.content_id
+           AND p.content_version=g.content_version
+         JOIN creator.message m
+          ON m.id=g.message_id AND m.thread_id=g.thread_id
+           AND m.creator_id=g.creator_id AND m.fan_id=g.fan_id
+         WHERE g.thread_id=$1 AND g.creator_id=$2 AND g.fan_id=$3
+          AND g.message_id=ANY($4::uuid[]) AND m.author_kind='system'
+          AND m.delivery_state='delivered' AND m.text='Answered publicly.'
+          AND m.author_account_id IS NULL AND m.signed_act_id IS NULL
+          AND m.signed_content_hash IS NULL LIMIT 100`,
+        [
+          scope.threadId,
+          scope.creatorId,
+          scope.fanId,
+          selected.map((m) => m.id),
+        ],
+      )
+    ).rows;
+    const links = new Map(
+      rows.map((r) => [
+        r.message_id,
+        ConversationSystemLinkSchema.parse({
+          kind: "published_answer",
+          creatorId: r.creator_id,
+          contentId: r.content_id,
+          contentVersion: r.content_version,
+          label: "Answered publicly.",
+        }),
+      ]),
+    );
+    return messages.map((m) =>
+      links.has(m.id) ? { ...m, systemLink: links.get(m.id)! } : m,
+    );
+  }
+  isFor(database: Database, access: AccessService) {
+    return this.db === database && this.access === access;
+  }
   private approvals?: Pick<
     CommerceApprovals,
     "prepareDelivery" | "recordDelivery"
@@ -570,9 +732,14 @@ export class ConversationService {
             offTheRecord: row.off_the_record,
           }),
         );
-        const messages = this.delivery.lineage
+        const enriched = this.delivery.lineage
           ? await this.delivery.lineage.enrich(scope, client, selected)
           : selected;
+        const messages = await this.enrichSystemLinksInTransaction(
+          scope,
+          client,
+          enriched,
+        );
         return {
           threadId: scope.threadId,
           creatorId: scope.creatorId,
@@ -1068,61 +1235,184 @@ export class ConversationService {
     );
     return this.db.withThread(
       scope,
-      (client) =>
-        idempotent(
+      (client) => this.changeControlOnClient(client, scope, to, body),
+      "write",
+    );
+  }
+  /** Genuine W6 authenticated request composition. No nested pool/transaction,
+   * retained ThreadScope, provider callback, worker Actor or commit is supplied.
+   * The caller owns COMMIT and must propagate a refused transition. */
+  async changeControlInTransaction(
+    client: PoolClient,
+    actor: Actor,
+    family: Readonly<{ creatorId: string; fanId: string }>,
+    to: "human_active" | "ai_active",
+    raw: unknown,
+  ): Promise<Frame> {
+    const body = ConversationCallControlSchema.parse(raw);
+    invariant(
+      to === "human_active" || to === "ai_active",
+      "call_control_invalid",
+      "Calls require a current creator takeover or handback.",
+    );
+    const endpoint = new Client(this.db.pool.options);
+    if (
+      !this.access.isForPool(this.db.pool) ||
+      !(client instanceof Client) ||
+      endpoint.user !== "creator_runtime" ||
+      client.user !== endpoint.user ||
+      client.host !== endpoint.host ||
+      client.port !== endpoint.port ||
+      client.database !== endpoint.database
+    )
+      throw new DomainError(
+        "call_control_pool_mismatch",
+        "Call control requires this canonical conversation database client.",
+        503,
+      );
+    try {
+      await client.query("SAVEPOINT w3_held_call_control");
+    } catch {
+      throw new DomainError(
+        "call_control_transaction_required",
+        "Call control requires the actual held request transaction.",
+        503,
+      );
+    }
+    try {
+      const role = (
+        await client.query<{ ready: boolean }>(
+          `SELECT current_user=session_user AND session_user='creator_runtime'
+           AND current_setting('transaction_isolation')='read committed'
+           AND r.rolcanlogin AND NOT r.rolinherit AND NOT r.rolsuper AND NOT r.rolbypassrls
+           AND NOT r.rolcreatedb AND NOT r.rolcreaterole AND NOT r.rolreplication
+           AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid OR roleid=r.oid) AS ready
+           FROM pg_roles r WHERE r.rolname=session_user`,
+        )
+      ).rows[0];
+      invariant(
+        role?.ready === true,
+        "call_control_role_invalid",
+        "Use the canonical interactive request role for call control.",
+      );
+      // W1 current session and W8 negatives precede its positive family lease.
+      // The actor comes from the authenticated request, never job metadata.
+      const scope = await this.access.openThreadInTransaction(
+        client,
+        actor,
+        family.creatorId,
+        family.fanId,
+        false,
+        "write",
+      );
+      invariant(
+        scope.authority === "creator",
+        "creator_required",
+        "Only the creator can change this conversation’s speaker.",
+      );
+      const frame = await this.changeControlOnClient(client, scope, to, body);
+      const current = await this.access.openThreadInTransaction(
+        client,
+        actor,
+        family.creatorId,
+        family.fanId,
+        false,
+        "write",
+      );
+      invariant(
+        current.authority === "creator" &&
+          current.threadId === scope.threadId &&
+          current.actorAccountId === scope.actorAccountId &&
+          current.creatorAccountId === scope.creatorAccountId &&
+          current.fanAccountId === scope.fanAccountId,
+        "call_control_changed",
+        "Current creator call authority ended or changed.",
+      );
+      await client.query("RELEASE SAVEPOINT w3_held_call_control");
+      return frame;
+    } catch (error) {
+      await client.query("ROLLBACK TO SAVEPOINT w3_held_call_control");
+      await client.query("RELEASE SAVEPOINT w3_held_call_control");
+      throw error;
+    }
+  }
+  private async changeControlOnClient(
+    client: PoolClient,
+    scope: ThreadScope,
+    to: "human_active" | "ai_active" | "ai_paused",
+    body: { idempotencyKey: string; expectedEpoch?: number },
+  ): Promise<Frame> {
+    assertThreadScope(scope);
+    invariant(
+      scope.authority === "creator",
+      "creator_required",
+      "Only the creator can change this conversation’s speaker.",
+    );
+    return idempotent(
+      client,
+      scope,
+      `control:${to}`,
+      body.idempotencyKey,
+      body,
+      async () => {
+        const thread = await this.lockThread(client, scope);
+        invariant(
+          !["closed", "blocked"].includes(thread.control),
+          "thread_closed",
+          "This conversation is closed.",
+        );
+        if (body.expectedEpoch !== undefined) {
+          if (thread.control_epoch !== body.expectedEpoch)
+            throw new DomainError(
+              "call_control_changed",
+              "The conversation’s speaker changed. Refresh before continuing the call.",
+              409,
+            );
+          invariant(
+            to !== "ai_active" || thread.control === "human_active",
+            "call_handback_required",
+            "Only the current creator takeover can hand back after a call.",
+          );
+        }
+        invariant(
+          thread.control !== to,
+          "control_unchanged",
+          "The conversation already has this speaker.",
+        );
+        await this.interruptGenerations(client, scope);
+        const epoch = thread.control_epoch + 1;
+        await client.query(
+          "UPDATE creator.thread SET control=$1,control_epoch=$2 WHERE id=$3 AND creator_id=$4 AND fan_id=$5",
+          [to, epoch, scope.threadId, scope.creatorId, scope.fanId],
+        );
+        await this.delivery.wellbeing?.boundary(scope, client);
+        const text = formatCopy(
+          to === "human_active"
+            ? "takeover"
+            : to === "ai_active"
+              ? "handback"
+              : "aiPaused",
+          { name: scope.creatorName },
+        );
+        const system = await this.insertMessage(
           client,
           scope,
-          `control:${to}`,
-          body.idempotencyKey,
-          body,
-          async () => {
-            const thread = await this.lockThread(client, scope);
-            invariant(
-              !["closed", "blocked"].includes(thread.control),
-              "thread_closed",
-              "This conversation is closed.",
-            );
-            invariant(
-              thread.control !== to,
-              "control_unchanged",
-              "The conversation already has this speaker.",
-            );
-            await this.interruptGenerations(client, scope);
-            const epoch = thread.control_epoch + 1;
-            await client.query(
-              "UPDATE creator.thread SET control=$1,control_epoch=$2 WHERE id=$3 AND creator_id=$4 AND fan_id=$5",
-              [to, epoch, scope.threadId, scope.creatorId, scope.fanId],
-            );
-            await this.delivery.wellbeing?.boundary(scope, client);
-            const text = formatCopy(
-              to === "human_active"
-                ? "takeover"
-                : to === "ai_active"
-                  ? "handback"
-                  : "aiPaused",
-              { name: scope.creatorName },
-            );
-            const system = await this.insertMessage(
-              client,
-              scope,
-              "system",
-              text,
-              epoch,
-              "delivered",
-            );
-            return appendFrame(client, scope, {
-              epoch,
-              kind: "control",
-              control: to,
-              messageId: system.id,
-              authorKind: "system",
-              text,
-              generationId: null,
-              sequence: 0,
-            });
-          },
-        ),
-      "write",
+          "system",
+          text,
+          epoch,
+          "delivered",
+        );
+        return appendFrame(client, scope, {
+          epoch,
+          kind: "control",
+          control: to,
+          messageId: system.id,
+          authorKind: "system",
+          text,
+          generationId: null,
+          sequence: 0,
+        });
+      },
     );
   }
   async humanReply(scope: ThreadScope, raw: unknown): Promise<Message> {

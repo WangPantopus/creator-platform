@@ -1,0 +1,13 @@
+{
+  "source": "b6c073aef97b2ea7c06847b4baa9914d9bce06b7",
+  "apiStarted": false,
+  "errorCode": "reviewed_migration_unavailable",
+  "cause": "The active 0082 executable registry entry lacks sourceSha256. All four newly active entries lack their executable source pins. SQL hashes and database ledger checksums remain correct.",
+  "browserReportRefused": true,
+  "browserInputRetained": true,
+  "serverRecovery503Verified": false,
+  "opsCasesBeforeAttempt": 0,
+  "financialRowsBeforeAttempt": 0,
+  "restoredTrafficMarkerClosed": true,
+  "releaseReady": false
+}

@@ -1,0 +1,30 @@
+{
+  "time": "2026-10-02T19:21:14.212096+00:00",
+  "purpose": "quiesced live canonical57 milestone after personal real Studio and Trust export/crisis web journeys",
+  "database": "creator_w2",
+  "ledger": 57,
+  "dumpBytes": 718069,
+  "dumpSha256": "0dca0a4a5561a4ec35f7aa6ceb539d4accb3b6d37d188df5e6d28d510f835505",
+  "tocEntries": 1572,
+  "privateMode": "0o600",
+  "privateTOCMode": "0o600",
+  "restoreDatabase": "creator_w2_trust_restore_20261002t192111z",
+  "restoreConnectionLimit": 0,
+  "fullCustodyMatches": {
+    "ledgerRows": 57,
+    "ledgerSha256": "b9710dfd946e53b0d5478e4fe5889cc7a24532db7f914bbcd697cf6e17d2fe0a",
+    "schemaSha256": "fc7b456d1b7d45cf6b11d67e26b1e446feb86c01a19f8eacc53cbf2ec1649b97",
+    "dataSha256": "8bdb7b243699fdb465c2c0556969863f88a9a042009e9f0216f00035310978d4",
+    "dataRows": 62,
+    "dataTables": 161,
+    "securitySha256": "10ba24720ad08624cb82c19d3724f7b952f9e869a398bd590982e2b3865d0839",
+    "securityRecords": 14686,
+    "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+    "sequences": 1,
+    "rolesSha256": "6fc1c6c734f3b6e5e0bcf34e0524e0c929c9d11c40726814dae2c33b564b27f3",
+    "roleCount": 42
+  },
+  "originalSourceStable": true,
+  "resources": "Only own W2 API quiesced, owned live DB unchanged; closed target with exact actual owner/database ACLs; no peer resource action",
+  "limits": "Backup/recovery proof, not provider, purpose activation, all-eight C10 or release acceptance"
+}

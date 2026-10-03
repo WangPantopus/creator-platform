@@ -260,9 +260,14 @@ export class ConversationFeature {
       .slice(0, 50)
       .reverse()
       .map((row) => ConversationMessageSchema.parse(row));
-    const messages = this.lineage
+    const enriched = this.lineage
       ? await this.lineage.enrich(scope, client, selected)
       : selected;
+    const messages = await this.conversations.enrichSystemLinksInTransaction(
+      scope,
+      client,
+      enriched,
+    );
     const generations = (
       await client.query<{ id: string; last_sequence: number }>(
         "SELECT id,last_sequence FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND state IN('queued','generating') LIMIT 8",
@@ -686,9 +691,16 @@ export function conversationFeature(
             ).rows[0];
             if (!source) return undefined;
             const message = ConversationMessageSchema.parse(source);
-            return feature.lineage
-              ? (await feature.lineage.enrich(scope, client, [message]))[0]
-              : message;
+            const enriched = feature.lineage
+              ? await feature.lineage.enrich(scope, client, [message])
+              : [message];
+            return (
+              await feature.conversations.enrichSystemLinksInTransaction(
+                scope,
+                client,
+                enriched,
+              )
+            )[0];
           },
           "read",
         );

@@ -20,6 +20,7 @@ import type { ConversationLineage } from "./lineage.js";
 import type { ConversationRecordings } from "./recordings.js";
 import type { ConversationCorrections } from "./corrections.js";
 import type { GenerationCostReconciliation } from "../commerce/generation-allowance.js";
+import type { CommerceFulfillmentPlans } from "../commerce/fulfillment-plans.js";
 
 export function createConversationRuntime(input: {
   database: Database;
@@ -43,6 +44,7 @@ export function createConversationRuntime(input: {
   lineage?: ConversationLineage;
   corrections?: ConversationCorrections;
   recordings?: ConversationRecordings;
+  fulfillmentPlans?: CommerceFulfillmentPlans;
   assertReady?: (scope: ThreadScope, client: PoolClient) => Promise<void>;
   assertApproved?: (
     scope: ThreadScope,
@@ -76,6 +78,8 @@ export function createConversationRuntime(input: {
     input.recordings.assertRuntime(input.database, input.access);
     input.lineage!.configureRecordings(input.recordings);
   }
+  if (input.fulfillmentPlans)
+    input.conversation.configureFulfillmentPlans(input.fulfillmentPlans);
   const memory = new MemoryService(input.database, input.semantics);
   const wellbeing = new ConversationWellbeing(input.database, input.mode);
   const generator = input.generator ?? input.generatorFactory?.(memory);

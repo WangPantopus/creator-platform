@@ -47,6 +47,7 @@ struct CommercePacket: Decodable, Identifiable, Sendable {
     let commitment_state: String?; let delivered_at: String?
 }
 struct CommerceDetail: Decodable, Sendable {
+    struct CallTransport: Decodable, Sendable { let state: String; let authorKind: String; let recordedAt: String? }
     struct Ledger: Decodable, Sendable { let kind: String; let amount: String; let currency: String }
     struct Commitment: Decodable, Sendable {
         struct Evidence: Decodable, Sendable { let signedActId: String?; let authorKind: String? }
@@ -54,15 +55,15 @@ struct CommerceDetail: Decodable, Sendable {
         let accept_act_id: String?; let evidence: Evidence?
     }
     struct Share: Decodable, Sendable { let version: Int; let fan_choice: Bool; let revoked_at: String? }
-    let packet: CommercePacket; let commitment: Commitment?; let share: Share?; let ledger: [Ledger]
+    let packet: CommercePacket; let commitment: Commitment?; let share: Share?; let ledger: [Ledger]; let callTransport: CallTransport?
 }
 struct CommerceFailure: Error { let message: String; let status: Int }
 private struct CommerceErrorEnvelope: Decodable { struct Failure: Decodable { let message: String }; let error: Failure }
 
 /// Uses the same OS credential store as FanSession. Domain state is never stored locally.
 actor CommerceClient {
-    private let baseURL: URL; private let accountId: String?; private let credentials = SecureSessionStorage()
-    init(baseURL: URL, accountId: String? = nil) { self.baseURL = baseURL; self.accountId = accountId }
+    private let baseURL: URL; private let accountId: String?; private let credentials: SecureSessionStorage
+    init(baseURL: URL, accountId: String? = nil) { self.baseURL = baseURL; credentials = SecureSessionStorage(issuer: baseURL); self.accountId = accountId }
     func request<T: Decodable & Sendable>(_ path: String, body: Data? = nil) async throws -> T {
         guard let token = try await credentials.read() else { throw CommerceFailure(message: "Your session ended. Continue with Pantopus again.", status: 401) }
         var request = URLRequest(url: baseURL.appendingPathComponent("v1/commerce/" + path))

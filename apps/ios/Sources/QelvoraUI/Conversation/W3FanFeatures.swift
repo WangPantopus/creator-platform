@@ -3,7 +3,7 @@ import SwiftUI
 @MainActor
 public enum W3FanFeatures {
     /// W1 calls this at sign-out/account revocation alongside credential purge.
-    public static func clearPrivateState() async { await W3Realtime.shared.purge(); await W3ResumeStorage.shared.purge(); await W3OfflineStorage.shared.purge() }
+    public static func clearPrivateState() async throws { await W3Realtime.shared.purge(); try await W3ResumeStorage.shared.purge(); await W3OfflineStorage.shared.purge() }
     public static func registration(baseURL: URL?) -> FanFeatureRegistration {
         FanFeatureRegistration(matches: { destination in
             let path = destination.components(separatedBy: "?")[0]
@@ -122,7 +122,16 @@ private struct W3ThreadScreen: View {
             .alert("Source unavailable", isPresented: Binding(get: { !sourceFailure.isEmpty }, set: { if !$0 { sourceFailure = "" } })) { SwiftUI.Button("Close") { sourceFailure = "" } } message: { Text(sourceFailure) }
     }
     @ViewBuilder private func row(_ message: W3Message, page: W3Page) -> some View {
-        if message.authorKind == .system { SystemLine(children: message.text) }
+        if message.authorKind == .system {
+            if let destination = message.publicAnswerDestination(creatorId: page.creatorId) {
+                SwiftUI.Button { session.open(destination) } label: {
+                    SystemLine(children: message.text).frame(minHeight: 48).contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(model.offline || scenePhase != .active)
+                .accessibilityLabel("System update: Answered publicly. Open answer")
+            } else { SystemLine(children: message.text) }
+        }
         else if message.recording != nil { recordingRow(message, page: page) }
         else if let correction = message.correction, let original = (model.older + page.messages).first(where: { $0.id == correction.originalMessageId && $0.version == correction.originalVersion && $0.authorKind == .ai }) {
             Correction(aiText: original.text, children: message.text, name: page.creatorName, onVerify: { if let act = message.signedActId { session.open("/verify/" + act) } })

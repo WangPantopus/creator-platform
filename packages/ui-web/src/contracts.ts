@@ -311,6 +311,8 @@ export interface ReceiptProps {
 export interface SpendLimitProps {
   /** Default ["$30", "$60", "$120", "No limit"]. */
   options?: string[];
+  /** Current saved reminder state. Omit when it is unavailable. */
+  remindersOn?: boolean | null;
 }
 
 /* ---------- studio ---------- */

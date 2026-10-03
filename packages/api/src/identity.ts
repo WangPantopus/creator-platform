@@ -111,6 +111,7 @@ export const ProofSchema = z.strictObject({
   code: z.string(),
   platform: z.enum(["instagram", "youtube"]),
   accountUrl: z.string(),
+  postUrl: z.string().nullable(),
   expiresAt: z.iso.datetime(),
   state: z.enum(["challenge", "pending", "approved", "rejected", "revoked"]),
   reason: z.string().nullable(),

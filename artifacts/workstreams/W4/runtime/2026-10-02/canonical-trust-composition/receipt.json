@@ -1,0 +1,63 @@
+{
+  "phase": "development composition preparation",
+  "source": "b633c439ddc737daef72086bcee7fad4d38a53f1",
+  "localBackendTypes": "passed",
+  "localWebTypes": "passed",
+  "generatedOperations": 101,
+  "hostedFulfillmentHead": "5a7925ef91fee53386136708a28eb1818b5ae8c4",
+  "hostedWebBackend": "two successful checks",
+  "hostedAndroidRuntime": "two successful checks",
+  "hostedNativeAndVisual": "six queued jobs; no pass inferred",
+  "databasePreparation": {
+    "source": "b633c439ddc737daef72086bcee7fad4d38a53f1",
+    "canonicalLedger": 57,
+    "financialRows": 0,
+    "existingOpsMemberships": 0,
+    "verifiedCreatorsBefore": 0,
+    "privateBackupSha256": "ea681c3559c65acaa6852fda14694ec3750265cdf13cc78910db112087a63e1a",
+    "separateNonOwnerTrustConnectionsPrepared": true,
+    "roleAttributesUnchanged": true,
+    "noBusinessWrites": true,
+    "creatorJourneyVerified": false
+  },
+  "labelledOpsFixture": {
+    "label": "W4 SYNTHETIC DEVELOPMENT OPS MEMBERSHIP",
+    "source": "infra/local/seed-w8.sql:Ops membership statement only",
+    "privateBackupPreserved": true,
+    "preexistingMemberships": 0,
+    "createdMemberships": 3,
+    "expiresWithinOneDay": true,
+    "noCreatorVerificationOrProofRowsWritten": true,
+    "noStorePaymentReceiptRowsWritten": true,
+    "notProductionAuthority": true
+  },
+  "normalCreatorProofAndOpsJourney": "not yet operated",
+  "externalOwnershipVerified": false,
+  "releaseReady": false,
+  "mergedFulfillment": {
+    "head": "3bcc4206ff57899cc0e954bc7d778749ae580723",
+    "merge": "513a8f9c2d4c837640b20a6615f4e669f537cb10",
+    "hostedWebBackend": "two successful checks",
+    "hostedAndroidRuntime": "two successful checks",
+    "hostedNativeAndVisual": "six queued jobs"
+  },
+  "actualPersonalWeb": {
+    "freshCanonicalFanSignIn": true,
+    "savedLimitUsd": 6,
+    "exposureAndCapturedHeldRefundTotals": 0,
+    "reminders": false,
+    "originalPendingNoneDeadlinePreserved": true,
+    "separateFixtureCreatorProfileSavedNormally": true,
+    "realDevelopmentChallengeGeneratedAndKeptPrivate": true,
+    "labelledSyntheticPostSubmittedNormally": true,
+    "displayedVerification": "pending",
+    "signingDisabled": true,
+    "opsCaseAndApprovalOperated": false,
+    "externalOwnershipVerified": false
+  },
+  "mergedProofOwner": {
+    "head": "76286f32da36be2b79ee456bcde1ab27fe93062f",
+    "merge": "09288da65feee510b5f83408e76af7a544ead076",
+    "postUrlProjectionAddedWithoutHistoricalEvidenceMutation": true
+  }
+}
