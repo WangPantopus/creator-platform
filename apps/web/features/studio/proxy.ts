@@ -37,6 +37,7 @@ export function studioProxy(
         { status: 403 },
       );
     const expectedAccount = request.headers.get("x-qelvora-expected-account");
+    const expectedSession = request.headers.get("X-Expected-Session-Id");
     if (domain === "commerce-approvals" && !expectedAccount)
       return Response.json(
         {
@@ -66,6 +67,9 @@ export function studioProxy(
             "Content-Type": "application/json",
             ...(expectedAccount
               ? { "x-qelvora-expected-account": expectedAccount }
+              : {}),
+            ...(expectedSession
+              ? { "X-Expected-Session-Id": expectedSession }
               : {}),
             ...(domain === "commerce-approvals"
               ? { "x-commerce-account-id": expectedAccount! }

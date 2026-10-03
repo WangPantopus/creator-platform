@@ -37,6 +37,7 @@ const accountChanged = (failure: unknown) =>
     "content_account_changed",
     "session_account_changed",
     "session_changed",
+    "session_view_changed",
   ].includes(failure.code);
 export function FanContent({
   creatorId,
@@ -45,10 +46,16 @@ export function FanContent({
   creatorId: string;
   contentId: string;
 }) {
-  const { session, signal } = useIdentityRequest();
+  const { session, signal, end } = useIdentityRequest();
   useEffect(
-    () => configureStudioRequests({ accountId: session.accountId, signal }),
-    [session.accountId, signal],
+    () =>
+      configureStudioRequests({
+        accountId: session.accountId,
+        sessionId: session.sessionId,
+        signal,
+        end,
+      }),
+    [session.accountId, session.sessionId, signal, end],
   );
   const [content, setContent] = useState<ContentView | null>(null),
     [current, setCurrent] = useState(false),
