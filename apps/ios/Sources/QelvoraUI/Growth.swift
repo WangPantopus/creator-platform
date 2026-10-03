@@ -236,6 +236,8 @@ public struct GrowthFanFeature: View {
   @State private var invitation: GrowthInvitation?
   @State private var shared: GrowthSharedReply?
   @State private var replyExport: GrowthReplyDocument?
+  @State private var replyExportTask: Task<Void, Never>?
+  @State private var replyExportRequest = UUID()
   @State private var sharingReply = false
   @State private var following = false
   @State private var creators: [GrowthCreator] = []
@@ -421,7 +423,7 @@ public struct GrowthFanFeature: View {
               }
               if shared.verificationURL != nil {
                 Button(QelvoraCopy.text("growthShareCompleteReply"), variant: .secondary, block: true, disabled: sharingReply) {
-                  Task { await exportSharedReply() }
+                  startReplyExport()
                 }
               } else {
                 Notice(title: QelvoraCopy.text("growthUnavailable"), children: QelvoraCopy.text("growthImageNeedsOrigin"))
@@ -565,6 +567,8 @@ public struct GrowthFanFeature: View {
       of: destination
     ) { _, target in route = target }.task(id: route) {
       await load()
+    }.onDisappear {
+      cancelReplyExport()
     }
     #if os(iOS)
     .sheet(item: $replyExport) { artifact in GrowthReplyShareSheet(artifact: artifact) }
@@ -602,7 +606,7 @@ public struct GrowthFanFeature: View {
   private func load() async {
     let loadID = UUID()
     let loadedRoute = route
-    replyExport = nil
+    cancelReplyExport()
     homeRequestID = UUID()
     discoverRequestID = loadID
     guard let client else {
@@ -749,14 +753,35 @@ public struct GrowthFanFeature: View {
       (failure as? GrowthRequestFailure)?.message
       ?? QelvoraCopy.text("growthThisDestinationIsUnavailableReconnectAndTryAgain")
   }
-  private func exportSharedReply() async {
-    guard let client, route.hasPrefix("/share/"), !sharingReply else { return }
+  private func cancelReplyExport() {
+    replyExportRequest = UUID()
+    replyExportTask?.cancel()
+    replyExportTask = nil
+    sharingReply = false
+    replyExport?.remove()
+    replyExport = nil
+  }
+  private func startReplyExport() {
+    guard replyExportTask == nil, !sharingReply else { return }
+    let request = UUID()
+    replyExportRequest = request
+    // Button work has no automatic SwiftUI task lifetime. Retain it so route,
+    // session and foreground removal can cancel rendering and discard its file.
+    replyExportTask = Task {
+      await exportSharedReply(request: request)
+      if replyExportRequest == request { replyExportTask = nil }
+    }
+  }
+  private func exportSharedReply(request: UUID) async {
+    guard let client, route.hasPrefix("/share/"), !sharingReply,
+      replyExportRequest == request else { return }
     let target = route
     sharingReply = true
-    defer { sharingReply = false }
+    defer { if replyExportRequest == request { sharingReply = false } }
     do {
       let artifact: GrowthReplyExport = try await client.request("public/shares/" + String(target.dropFirst(7)) + "/export")
-      guard !Task.isCancelled, route == target, artifact.id == String(target.dropFirst(7)) else { return }
+      guard !Task.isCancelled, route == target, replyExportRequest == request,
+        artifact.id == String(target.dropFirst(7)) else { return }
       let rendering = Task.detached(priority: .userInitiated) { try GrowthReplyDocument.create(artifact) }
       let document = try await withTaskCancellationHandler {
         try await rendering.value
@@ -764,17 +789,18 @@ public struct GrowthFanFeature: View {
         rendering.cancel()
       }
       defer { if replyExport?.id != document.id { document.remove() } }
-      guard !Task.isCancelled, route == target else { return }
+      guard !Task.isCancelled, route == target, replyExportRequest == request else { return }
       // Rendering can be lengthy. Permission/correction must still match before
       // a file is handed to the system sheet; no locally cached grant is reused.
       let current: GrowthReplyExport = try await client.request("public/shares/" + artifact.id + "/export")
-      guard !Task.isCancelled, route == target, current == artifact else {
+      guard !Task.isCancelled, route == target, replyExportRequest == request,
+        current == artifact else {
         throw GrowthRequestFailure(status: 410)
       }
       replyExport = document
       error = ""
     } catch {
-      guard !Task.isCancelled, route == target else { return }
+      guard !Task.isCancelled, route == target, replyExportRequest == request else { return }
       if (error as? GrowthRequestFailure)?.status == 410 { shared = nil }
       record(error)
     }

@@ -16,8 +16,12 @@ struct GrowthReplyDocument: Identifiable, Sendable {
   static func create(_ source: GrowthReplyExport) throws -> GrowthReplyDocument {
     guard renderLock.try() else { throw GrowthRequestFailure(status: 503) }
     defer { renderLock.unlock() }
-    guard UUID(uuidString: source.id) != nil, source.version > 0,
-      source.text.utf16.count <= 128000, source.authorLabel.utf16.count <= 512,
+    guard UUID(uuidString: source.id) != nil,
+      (1...9_007_199_254_740_991).contains(source.version),
+      !source.text.isEmpty, source.text.utf16.count <= 128000,
+      !source.authorLabel.isEmpty, source.authorLabel.utf16.count <= 512,
+      source.sourceHash.range(of: "^[a-f0-9]{64}$", options: .regularExpression) != nil,
+      source.verificationURL.utf16.count <= 2048,
       ["human_creator", "approved_draft"].contains(source.authorKind),
       let verification = URL(string: source.verificationURL), verification.scheme == "https",
       verification.host != nil, verification.user == nil, verification.password == nil,
