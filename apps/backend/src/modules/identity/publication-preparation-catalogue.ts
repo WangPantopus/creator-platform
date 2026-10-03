@@ -90,11 +90,12 @@ export const publicationPreparationCatalogueQuery = `WITH roles AS (
 export const publicationPreparationCatalogueChecksum =
   "e2f1060d4c01d54391efbfe7f4517b2c3a47273df2f302ff22c83c175b1a1788";
 
-function unavailable(): never {
+function unavailable(cause?: unknown): never {
   throw new DomainError(
     "publication_preparation_unavailable",
     "The original publication authority is unavailable. Try again later.",
     503,
+    { cause },
   );
 }
 
@@ -104,17 +105,17 @@ export async function publicationPreparationPurposeCatalogue(
   client: PoolClient,
 ) {
   await client.query("SAVEPOINT w1_publication_catalogue");
-  try {
-    await client.query("SET LOCAL search_path=pg_catalog");
-    return (
-      await client.query<{ catalogue: unknown }>(
-        publicationPreparationCatalogueQuery,
-      )
-    ).rows[0]?.catalogue;
-  } finally {
-    await client.query("ROLLBACK TO SAVEPOINT w1_publication_catalogue");
-    await client.query("RELEASE SAVEPOINT w1_publication_catalogue");
-  }
+  await client.query("SET LOCAL search_path=pg_catalog");
+  const catalogue = (
+    await client.query<{ catalogue: unknown }>(
+      publicationPreparationCatalogueQuery,
+    )
+  ).rows[0]?.catalogue;
+  // Restore only after a successful response. Uncertain transport must escape
+  // to the original transaction custodian without submitting any later SQL.
+  await client.query("ROLLBACK TO SAVEPOINT w1_publication_catalogue");
+  await client.query("RELEASE SAVEPOINT w1_publication_catalogue");
+  return catalogue;
 }
 
 /** Active executable registry + exact original bytes + same held purpose
@@ -176,7 +177,7 @@ export async function assertPublicationPreparationCatalogue(
         publicationPreparationCatalogueChecksum
     )
       unavailable();
-  } catch {
-    unavailable();
+  } catch (cause) {
+    unavailable(cause);
   }
 }

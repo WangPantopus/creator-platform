@@ -46,6 +46,8 @@ export async function startPublicationWorker(
     connectionString: env.PUBLICATION_WORKER_DATABASE_URL,
     max: 1,
     connectionTimeoutMillis: 5000,
+    query_timeout: 5000,
+    pipeline: false,
     idleTimeoutMillis: 30000,
   });
   let stopping = false;
