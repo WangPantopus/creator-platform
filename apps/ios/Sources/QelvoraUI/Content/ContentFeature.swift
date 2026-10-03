@@ -218,7 +218,7 @@ private struct ContentFanScreen: View {
         if let baseURL, let viewerAccountId, content.version > 0 {
             if content.document.media.count <= 10 {
                 ForEach(content.document.media) { attachment in
-                    NativeContentAttachmentView(baseURL: baseURL, accountId: viewerAccountId, creatorId: creatorId, objectId: content.id, contentKind: content.document.kind, creatorName: content.creatorName, attachment: attachment)
+                    NativeContentAttachmentView(session: session, destination: session.destination, baseURL: baseURL, accountId: viewerAccountId, creatorId: creatorId, objectId: content.id, contentKind: content.document.kind, creatorName: content.creatorName, attachment: attachment)
                         .id("\(viewerAccountId):\(content.id):\(content.version):\(attachment.id)")
                 }
             } else {
