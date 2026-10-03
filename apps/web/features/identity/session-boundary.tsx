@@ -249,6 +249,7 @@ export function useIdentityRequest() {
     signal: scope.signal,
     session: scope.session,
     end: scope.end,
+    isSessionEnded: scope.isSessionEnded,
     request,
   };
 }
