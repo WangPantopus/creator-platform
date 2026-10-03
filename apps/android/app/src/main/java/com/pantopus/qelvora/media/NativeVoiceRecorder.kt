@@ -16,12 +16,28 @@ import android.os.Looper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.LinkOption
 import java.util.UUID
 
 data class RecordingSnapshot(val state: String = "idle", val durationMs: Long = 0, val file: File? = null, val reason: String? = null)
 
 /** Private AAC/M4A recording; never labels local microphone capture as a verified creator act. */
 class NativeVoiceRecorder(private val context: Context, val maxDurationMs: Long) {
+    private companion object {
+        private var cachePrepared = false
+        private val privateRecordingName = Regex("voice-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.m4a")
+        @Synchronized
+        fun prepareCache(cache: File) {
+            if (cachePrepared) return
+            // Only the first recorder in this process can own no live preview.
+            // Later navigation must not scavenge another recorder's bytes.
+            cachePrepared = true
+            cache.listFiles()?.forEach { file ->
+                if (privateRecordingName.matches(file.name) && Files.isRegularFile(file.toPath(), LinkOption.NOFOLLOW_LINKS)) file.delete()
+            }
+        }
+    }
     private val mutable = MutableStateFlow(RecordingSnapshot())
     val snapshot: StateFlow<RecordingSnapshot> = mutable
     private var recorder: MediaRecorder? = null
@@ -42,7 +58,7 @@ class NativeVoiceRecorder(private val context: Context, val maxDurationMs: Long)
             if (duration >= maxDurationMs) stop() else handler.postDelayed(this, 100)
         }
     }
-    init { require(maxDurationMs > 0); manager.registerAudioDeviceCallback(routeCallback, handler) }
+    init { require(maxDurationMs > 0); prepareCache(context.cacheDir); manager.registerAudioDeviceCallback(routeCallback, handler) }
     @Suppress("DEPRECATION")
     fun start() {
         if (closed) return
@@ -62,7 +78,13 @@ class NativeVoiceRecorder(private val context: Context, val maxDurationMs: Long)
             mutable.value = RecordingSnapshot("recording", file = file); handler.post(tick)
         } catch (_: Exception) { recorder?.release(); recorder = null; file.delete(); mutable.value = RecordingSnapshot("failed", reason = QelvoraCopy.text("w6TheMicrophoneIsUnavailableTryAgain")) }
     }
-    fun deny() { mutable.value = RecordingSnapshot("denied", reason = QelvoraCopy.text("w6MicrophoneAccessIsOffAllowItInSettingsThenTry")) }
+    fun deny() {
+        if (closed) return
+        // A permission denial can follow Record again while a private preview
+        // still exists. Release its player and bytes before dropping the file.
+        discard()
+        mutable.value = RecordingSnapshot("denied", reason = QelvoraCopy.text("w6MicrophoneAccessIsOffAllowItInSettingsThenTry"))
+    }
     fun pause(reason: String? = null) {
         if (mutable.value.state != "recording") return
         accumulated += android.os.SystemClock.elapsedRealtime() - activeAt
