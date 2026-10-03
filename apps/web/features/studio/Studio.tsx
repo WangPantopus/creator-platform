@@ -2801,7 +2801,9 @@ function Library({ creator }: { creator: Creator }) {
       items: [],
       nextCursor: null,
     }),
-    [editing, setEditing] = useState<string | null | undefined>(undefined),
+    [editing, setEditing] = useState<
+      { id?: string; post: boolean } | undefined
+    >(undefined),
     [filter, setFilter] = useState(""),
     [query, setQuery] = useState(""),
     [reading, setReading] = useState(true),
@@ -2880,7 +2882,8 @@ function Library({ creator }: { creator: Creator }) {
     // A new search supersedes the old read even while a mutation is pending.
     // Keep read cancellation separate from the command/retry boundary.
     const timer = setTimeout(() => void load(), 200);
-    if (new URLSearchParams(location.search).has("packet")) setEditing(null);
+    if (new URLSearchParams(location.search).has("packet"))
+      setEditing({ post: true });
     return () => {
       clearTimeout(timer);
       reads.current.mounted = false;
@@ -2891,10 +2894,10 @@ function Library({ creator }: { creator: Creator }) {
   if (editing !== undefined)
     return (
       <Compose
-        key={`${creator.viewerAccountId}:${creator.id}:${editing ?? "new"}`}
+        key={`${creator.viewerAccountId}:${creator.id}:${editing.id ?? "new"}`}
         creator={creator}
-        id={editing ?? undefined}
-        post
+        id={editing.id}
+        post={editing.post}
         onDone={() => {
           setEditing(undefined);
           void load();
@@ -2907,7 +2910,7 @@ function Library({ creator }: { creator: Creator }) {
         <h1>Publish</h1>
         <button
           className="qv-btn qv-btn--secondary"
-          onClick={() => setEditing(null)}
+          onClick={() => setEditing({ post: true })}
         >
           New post
         </button>
@@ -2994,7 +2997,12 @@ function Library({ creator }: { creator: Creator }) {
           <div className="w5-actions">
             <button
               className="qv-btn qv-btn--secondary"
-              onClick={() => setEditing(item.id)}
+              onClick={() =>
+                setEditing({
+                  id: item.id,
+                  post: item.document.kind !== "note",
+                })
+              }
             >
               Edit and review again
             </button>
