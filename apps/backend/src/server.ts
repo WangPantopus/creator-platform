@@ -32,7 +32,10 @@ import { canonicalPassAccess } from "./modules/growth/integration.js";
 import { createGrowthAPIPool } from "./db/growth-api-pool.js";
 import { DomainError } from "./core/errors.js";
 import { domainPrivacyTaskAuthorityInTransaction } from "./modules/trust/domain-privacy-authority.js";
-import type { ConversationPrivacyOwnerPorts } from "./modules/trust/privacy-consumers.js";
+import type {
+  AgentPrivacyOwnerPorts,
+  ConversationPrivacyOwnerPorts,
+} from "./modules/trust/privacy-consumers.js";
 import { createTrustReplyReviewer } from "./modules/trust/reply-review.js";
 import { InteractiveCallControl } from "./modules/session/interactive-control.js";
 import { AccountCallMetadata } from "./modules/session/account-call-metadata.js";
@@ -53,6 +56,7 @@ function canonicalDevelopmentIdentity() {
 const features: {
   growth: Awaited<ReturnType<typeof configureGrowthForBackend>>;
   conversationPrivacy?: ConversationPrivacyOwnerPorts;
+  agentPrivacy?: AgentPrivacyOwnerPorts;
   commerce?: import("./modules/commerce/service.js").CommerceService;
   close: (() => void | Promise<void>)[];
 } = { growth: null, close: [] };
@@ -84,6 +88,9 @@ try {
                       // Trust starts first. Resolve only the actual prepared
                       // conversation owners after the canonical host binds.
                       conversation: () => features.conversationPrivacy,
+                      // Resolve the exact Agent graph mounted in Studio, after
+                      // its original service and lifecycle have been composed.
+                      agent: () => features.agentPrivacy,
                       commerceOwner: () => features.commerce,
                       additional:
                         process.env.GROWTH_ENABLED === "true"
@@ -159,6 +166,7 @@ try {
             });
             features.close.push(() => host.close());
             const { commerce, conversation, agent } = host;
+            features.agentPrivacy = agent;
             features.commerce = commerce?.service;
             // Preparing the genuine graph does not configure a provider, worker
             // purpose or arrival policy. Calls remain unmounted until those
