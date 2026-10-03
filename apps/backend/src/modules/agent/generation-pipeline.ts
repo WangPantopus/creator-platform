@@ -373,6 +373,8 @@ export class PreparedGenerationPipeline {
      * Each callback must finish its W1-held append and both approval bookends. */
     deliver: (sentence: ApprovedGenerationSentence) => Promise<void>,
   ): Promise<PipelineResult> {
+    const started = performance.now();
+    let firstApprovedMs: number | null = null;
     const key = task.generationId + ":" + task.workerToken;
     invariant(
       !this.running.has(key),
@@ -452,6 +454,7 @@ export class PreparedGenerationPipeline {
           );
           await this.assertApprovedInTransaction(client, scope, approved);
         });
+        firstApprovedMs ??= Math.round(performance.now() - started);
         emitted++;
       };
       const result = await this.service.pipeline.runWithPorts(
@@ -590,6 +593,7 @@ export class PreparedGenerationPipeline {
           );
           await this.assertApprovedInTransaction(client, scope, approved);
         });
+        firstApprovedMs ??= Math.round(performance.now() - started);
         emitted++;
       }
       invariant(
@@ -597,7 +601,15 @@ export class PreparedGenerationPipeline {
         "generation_output_missing",
         "Every approved sentence requires its actual ordered durable writer.",
       );
-      return result;
+      // The shared engine also serves previews. This worker measures from its
+      // original preflight through the durable append and current-cursor
+      // readback, including classifier safety/fallback delivery. Terminal
+      // settlement and client receipt are separate end-to-end measurements.
+      return {
+        ...result,
+        durationMs: Math.round(performance.now() - started),
+        firstApprovedMs,
+      };
     } finally {
       if (run) run.live = false;
       this.running.delete(key);
