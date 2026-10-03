@@ -1,3 +1,7 @@
+### Genuine held0219 publication worker source — October 3, 2026 UTC
+
+Implemented W8's actual allocated0219 isolated worker and genuine same-W1-client/PID/full-XID TypeScript factory with original recipients, separately owned fixed System output, immutable canonical delivery and complete receipt before W1's sole joint finalizer. No minimum default is inferred. Personal closed-copy independent checks pass13 empty plans/14 ACL-unregistered refusals/15 restored drifts/all six canonical61 digests. Of28 compiler inspections,26 are clean and two correctly retain missing actual W3 proof42883; no fake proof/role was installed. Earlier ambiguous parameter/profile-policy/system-column ACL failures are preserved. Complete owner pin remains absent, so construction/activation/positive delivery stay closed. Backend build/types/scoped lint/format pass; all nine packages/R01–R15 remain incomplete. [Exact source and qualification limits](../../../artifacts/workstreams/W4/runtime/2026-10-03/fulfillment-publication-worker/README.md).
+
 ### Actual prepared-stage original comparison requalification — October 3, 2026 UTC
 
 ### Actual publication metadata timeout custody — October 3, 2026 UTC
