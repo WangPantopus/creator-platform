@@ -128,7 +128,9 @@ export async function privacyTaskAuthorityInTransaction(
       owned = z.array(z.uuid()).max(100).parse(family.owned);
     } else owned = z.array(z.uuid()).max(100).parse(row.owned);
   } catch (error) {
-    if (querySettlementUncertain(error)) throw error;
+    // The owner settles this exact transaction; nested cleanup cannot follow
+    // an actual task abort or an uncertain PostgreSQL response.
+    if (input.signal.aborted || querySettlementUncertain(error)) throw error;
     try {
       await client.query("ROLLBACK TO SAVEPOINT w8_privacy_task_fence");
       await client.query("RELEASE SAVEPOINT w8_privacy_task_fence");

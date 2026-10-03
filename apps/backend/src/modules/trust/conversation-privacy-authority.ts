@@ -41,19 +41,29 @@ export function conversationPrivacyAuthority(
       let cancelling: Promise<void> | undefined;
       let cancellationFailure: unknown;
       let sourceTransportFailure: unknown;
+      let sourceCloseFailure: unknown;
       let discardClient = false;
       let pid: number | undefined;
+      let ending: Promise<void> | undefined;
+      const endSource = () =>
+        (ending ??= client.end().catch((cause: unknown) => {
+          sourceCloseFailure = cause;
+          discardClient = true;
+        }));
       const sourceError = (error: Error) => {
         sourceTransportFailure = error;
         discardClient = true;
       };
       client.on("error", sourceError);
       const abort = () => {
-        if (!pid || cancelling) return;
+        if (cancelling) return;
+        discardClient = true;
         // The PID comes only from this actual held client. Keep that client
         // checked out until this separate control connection has settled, so
         // cancellation cannot reach another operation or a later COMMIT.
         cancelling = (async () => {
+          if (!pid) return;
+          const failures: unknown[] = [];
           const control = new Client({
             ...runtime.options,
             connectionTimeoutMillis: 1500,
@@ -63,10 +73,8 @@ export function conversationPrivacyAuthority(
             // than wait for a pipelined drain from a stalled transport.
             pipeline: false,
           });
-          control.on("error", (error: Error) => {
-            cancellationFailure = error;
-            discardClient = true;
-          });
+          const controlError = (error: Error) => failures.push(error);
+          control.on("error", controlError);
           try {
             await control.connect();
             const cancelled = await control.query<{ cancelled: boolean }>(
@@ -78,18 +86,36 @@ export function conversationPrivacyAuthority(
               "privacy_family_cancel_unavailable",
               "The actual discovery backend could not be cancelled.",
             );
+          } catch (error) {
+            failures.push(error);
           } finally {
-            await control.end();
+            try {
+              await control.end();
+            } catch (error) {
+              failures.push(error);
+            } finally {
+              control.removeListener("error", controlError);
+            }
           }
-        })().catch((error: unknown) => {
-          cancellationFailure = error;
-          discardClient = true;
-        });
+          if (failures.length)
+            throw new AggregateError(
+              failures,
+              "Original discovery control and close failures.",
+            );
+        })()
+          .catch((error: unknown) => {
+            cancellationFailure = error;
+            discardClient = true;
+          })
+          // A consumed cancel cannot recover a dropped source reply. End the
+          // exact original socket even when PID acquisition never completed.
+          .finally(endSource);
       };
       const settleCancellation = async () => {
         signal.removeEventListener("abort", abort);
         await cancelling;
       };
+      signal.addEventListener("abort", abort, { once: true });
       try {
         signal.throwIfAborted();
         const observed = (await client.query("SELECT pg_backend_pid() AS pid"))
@@ -100,7 +126,6 @@ export function conversationPrivacyAuthority(
           "The actual discovery backend is required.",
         );
         pid = observed;
-        signal.addEventListener("abort", abort, { once: true });
         signal.throwIfAborted();
         await client.query("BEGIN");
         // Discovery is lifecycle work too. Lock the real job/task before any
@@ -191,36 +216,37 @@ export function conversationPrivacyAuthority(
         await settleCancellation();
         let rollbackFailure: unknown;
         const uncertainQuery = querySettlementUncertain(error);
-        if (cancellationFailure || sourceTransportFailure || uncertainQuery) {
+        if (
+          discardClient ||
+          cancellationFailure ||
+          sourceTransportFailure ||
+          signal.aborted ||
+          uncertainQuery
+        ) {
           // A transport/read timeout does not prove the server consumed SQL.
           // Close this original session without issuing any later SQL; its
           // server rollback ends the PID's transaction before pool release.
           discardClient = true;
-          await client.end().catch((cause: unknown) => {
-            rollbackFailure = cause;
-          });
+          await endSource();
         } else {
           try {
             await client.query("ROLLBACK");
           } catch (cause) {
             rollbackFailure = cause;
             discardClient = true;
-            await client.end().catch((endFailure: unknown) => {
-              rollbackFailure = new AggregateError(
-                [cause, endFailure],
-                "Discovery rollback and connection closure failures.",
-              );
-            });
+            await endSource();
           }
         }
         if (
           cancellationFailure ||
           rollbackFailure ||
           sourceTransportFailure ||
-          uncertainQuery
+          sourceCloseFailure ||
+          uncertainQuery ||
+          signal.aborted
         ) {
           const failure = new DomainError(
-            cancellationFailure
+            cancellationFailure || signal.aborted
               ? "privacy_family_cancel_unavailable"
               : "privacy_family_rollback_unavailable",
             "Discovery could not settle safely; this task cannot complete.",
@@ -233,8 +259,10 @@ export function conversationPrivacyAuthority(
               [
                 error,
                 sourceTransportFailure,
+                sourceCloseFailure,
                 cancellationFailure,
                 rollbackFailure,
+                signal.aborted ? signal.reason : undefined,
               ].filter((cause) => cause !== undefined),
               "Original discovery and settlement failures.",
             ),
