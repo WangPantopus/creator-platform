@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import type { PoolClient } from "pg";
 import { IdSchema } from "@qelvora/api";
 import type { Database } from "../../db/database.js";
+import { registeredMigration } from "../../db/reviewed-migration.js";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import { idempotent } from "../../core/idempotency.js";
@@ -24,10 +25,18 @@ import {
 import { ProcessedMediaEvidenceSchema } from "../../../../../packages/api/src/media.js";
 import type { ConversationPrivacyFamily } from "./privacy.js";
 
-const checksum =
-  "e8ba9219e8aca099de0de69220f52f86e56a16a16287b766c41b981af3ff88d2";
-const correctionChecksum =
-  "89895cd1c9eabb3a85556c3efb912a201a2137564ed3299c0e7778cbef5f7911";
+const recordingSource = Object.freeze({
+  path: "apps/backend/src/modules/conversation/migrations/pending_w3_recording_association.sql",
+  owner: "W3",
+  name: "w3_recording_association",
+  checksum: "b61d50d7f85c0ef468e00a8d2d6b737b4d405a9349810c552f7d9df7f527c42e",
+});
+const correctionSource = Object.freeze({
+  path: "apps/backend/src/modules/conversation/migrations/pending_w3_correction_signature.sql",
+  owner: "W3",
+  name: "w3_correction_signature",
+  checksum: "5c94b94a7287a5c4a149da454117c30be40367034b9930ac11e168e5b6a4b3e0",
+});
 const unavailableCodes = new Set([
   "media_participant_required",
   "media_revoked",
@@ -75,6 +84,15 @@ export class ConversationRecordings {
       "Media and conversation association must use the same actual pool.",
     );
     if (!input.access.threadScopeInTransactionAvailable) return undefined;
+    const recording = await registeredMigration(recordingSource);
+    const correction = await registeredMigration(correctionSource);
+    if (
+      !recording ||
+      !correction ||
+      input.migrationVersion !== recording.version ||
+      input.correctionMigrationVersion !== correction.version
+    )
+      return undefined;
     const schema = (
       await input.database.pool.query(
         "SELECT to_regclass('creator.schema_migration') AS migration,to_regclass('creator.media_asset') AS media",
@@ -85,9 +103,9 @@ export class ConversationRecordings {
       "SELECT version FROM creator.schema_migration WHERE (version=$1 AND checksum=$2) OR (version=$3 AND checksum=$4)",
       [
         input.migrationVersion,
-        checksum,
+        recording.checksum,
         input.correctionMigrationVersion,
-        correctionChecksum,
+        correction.checksum,
       ],
     );
     if (installed.rowCount !== 2) return undefined;
