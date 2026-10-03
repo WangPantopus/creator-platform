@@ -317,13 +317,21 @@ public struct FanAppShell: View {
             } else if model.session == nil, let feature = features.first(where: { $0.matches(model.destination) && $0.allowsSignedOut(model.destination) }) {
                 feature.screen(model).id(model.destination + destinationDelivery.uuidString)
             } else if model.session == nil, model.hasSavedCredential {
-                VStack(alignment: .leading, spacing: 16) {
+                ScrollView { VStack(alignment: .leading, spacing: 16) {
                     Text(QelvoraCopy.text(model.checkingSession && model.error.isEmpty ? "growthLoading" : "accountUnavailableTitle")).qText("display-md").accessibilityAddTraits(.isHeader)
                     Text(QelvoraCopy.text("accountUnavailableBody")).qText("body").foregroundStyle(qColor("ink-muted", scheme))
                     Button(QelvoraCopy.text("retry"), variant: .secondary, block: true, disabled: model.busy || model.checkingSession) { Task { await model.refresh() } }
-                }.padding(16).frame(maxWidth: .infinity, alignment: .leading)
+                    if features.contains(where: { $0.matches("/trust/crisis") && $0.allowsSignedOut("/trust/crisis") }) {
+                        Button("Crisis help", variant: .quiet, block: true) { model.open("/trust/crisis") }
+                    }
+                }.padding(16).frame(maxWidth: .infinity, alignment: .leading) }
             } else if model.session == nil, model.checkingSession {
-                ProgressView(QelvoraCopy.text("growthLoading")).padding(16)
+                VStack(spacing: 16) {
+                    ProgressView(QelvoraCopy.text("growthLoading"))
+                    if features.contains(where: { $0.matches("/trust/crisis") && $0.allowsSignedOut("/trust/crisis") }) {
+                        Button("Crisis help", variant: .quiet, block: true) { model.open("/trust/crisis") }
+                    }
+                }.padding(16)
             } else if model.session == nil {
                 Welcome(returnTo: model.destination, showContext: model.arrival != nil, contextSource: model.arrival?.source, contextTitle: model.arrival?.title, bodyCopy: model.arrival.map { "Every message says who wrote it: " + $0.creatorName + "'s AI, " + $0.creatorName + ", or their team. You'll always know which." } ?? "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext: model.removeArrival, onContinue: { Task { await model.beginSignIn() } }).id(model.arrival?.title)
             } else if model.session?.fan == nil, let feature = features.first(where: { $0.matches(model.destination) && $0.allowsSignedOut(model.destination) }) {
