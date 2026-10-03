@@ -49,6 +49,7 @@ public final class FanSession: ObservableObject {
     private var destinationGeneration = 0
     private var rotatingCredential = false
     private var refreshingSession = false
+    private var validationWaiters: [UUID: CheckedContinuation<Void, Never>] = [:]
     private var removedArrivalFor: String?
     public init(baseURL: URL?, destination: String = "/home") {
         self.destination = ApplicationDestination.isPermitted(destination) ? destination : "/home"
@@ -62,6 +63,26 @@ public final class FanSession: ObservableObject {
     /// replacement, purge, cancellation or a changed stored credential.
     public func captureRequest(from target: String, maximumResponseBytes: Int = 268_435_456, timeoutSeconds: TimeInterval = 30) async -> FanSessionRequestCapture? {
         guard (1...268_435_456).contains(maximumResponseBytes), timeoutSeconds > 0, timeoutSeconds <= 30 else { return nil }
+        guard session != nil, destination == target, !purgingPrivateState,
+              !localPurgeFailed, !Task.isCancelled else { return nil }
+        let requestedGeneration = generation, requestedNavigation = destinationGeneration
+        // A foreground read can arrive during the shell's real session refresh.
+        // Wait for that validation, rather than reporting a signed-out account.
+        // Navigation, replacement, purge and cancellation still invalidate it.
+        if checkingSession {
+            let waiter = UUID()
+            await withTaskCancellationHandler {
+                await withCheckedContinuation { continuation in
+                    guard checkingSession, !Task.isCancelled else { continuation.resume(); return }
+                    validationWaiters[waiter] = continuation
+                }
+            } onCancel: {
+                Task { @MainActor [weak self] in
+                    self?.validationWaiters.removeValue(forKey: waiter)?.resume()
+                }
+            }
+        }
+        guard requestedGeneration == generation, requestedNavigation == destinationGeneration else { return nil }
         guard let baseURL, let active = session, destination == target, !busy,
               !purgingPrivateState, !localPurgeFailed, !checkingSession,
               !rotatingCredential, !Task.isCancelled else { return nil }
@@ -85,6 +106,11 @@ public final class FanSession: ObservableObject {
         guard matches(), let credential = try? await storage.read() else { return false }
         return matches() && credential == capture.credential
     }
+    private func finishValidationWaiters() {
+        let waiting = Array(validationWaiters.values)
+        validationWaiters.removeAll()
+        for continuation in waiting { continuation.resume() }
+    }
     public func loadArrival() async {
         let snapshot = destination; arrival = nil
         guard snapshot.components(separatedBy: "?")[0] != removedArrivalFor else { return }
@@ -101,7 +127,7 @@ public final class FanSession: ObservableObject {
         guard !rotatingCredential, !refreshingSession, !purgingPrivateState, !Task.isCancelled else { return }
         guard let api else { checkingSession = false; return }
         refreshingSession = true; checkingSession = true
-        defer { refreshingSession = false; checkingSession = false }
+        defer { refreshingSession = false; checkingSession = false; finishValidationWaiters() }
         let current = generation
         let token: String?
         do { token = try await storage.read() }
@@ -212,6 +238,7 @@ public final class FanSession: ObservableObject {
         purgingPrivateState = true; localPurgeFailed = true
         defer { purgingPrivateState = false }
         generation += 1; session = nil; hasSavedCredential = false; checkingSession = false; actors = []; choosingDevelopmentActor = false; error = ""
+        finishValidationWaiters()
         #if os(iOS)
         GrowthPushCoordinator.shared.update(session: nil, baseURL: baseURL, owner: self)
         #endif
