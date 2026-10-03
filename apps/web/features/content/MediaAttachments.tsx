@@ -9,6 +9,11 @@ import {
 } from "../../../../packages/api/src/media";
 import { mediaRequest } from "../media/api";
 import { CreatorVoicePlayer } from "../media/VoicePlayer";
+import {
+  playbackDeadline,
+  playbackUnexpired,
+  type PlaybackDeadline,
+} from "../media/playback-deadline";
 
 type Attachment = ContentView["document"]["media"][number];
 export function ContentAttachments({
@@ -52,6 +57,7 @@ function CurrentAttachment({
   const generation = useRef(0),
     checkedAt = useRef(0),
     photoProof = useRef<PlaybackFile | null>(null),
+    photoDeadline = useRef<PlaybackDeadline | null>(null),
     photoRequest = useRef<AbortController | null>(null);
   const family = `creators/${content.creatorId}/audience-media`;
   const matches = useCallback(
@@ -64,6 +70,15 @@ function CurrentAttachment({
       value.state === "ready" &&
       value.bytes > 0 &&
       value.provenance?.c2paVerified === true &&
+      value.provenance.schemaVersion === 1 &&
+      value.provenance.kind ===
+        (attachment.kind === "voice"
+          ? "human_recording"
+          : "human_publication_media") &&
+      value.provenance.transform ===
+        (attachment.kind === "voice" ? "aac_m4a" : "png") &&
+      Number.isFinite(Date.parse(value.expiresAt)) &&
+      Date.parse(value.expiresAt) > Date.now() &&
       value.provenance.assetId === value.id &&
       value.provenance.assetVersion === value.version &&
       value.provenance.creatorId === value.creatorId &&
@@ -95,6 +110,7 @@ function CurrentAttachment({
     setAsset(null);
     setPhoto(null);
     photoProof.current = null;
+    photoDeadline.current = null;
     setError("");
     setBusy(false);
     if (!active) return;
@@ -105,6 +121,15 @@ function CurrentAttachment({
         setAsset(null);
         setPhoto(null);
         photoProof.current = null;
+        photoDeadline.current = null;
+      }
+      if (photoDeadline.current && !playbackUnexpired(photoDeadline.current)) {
+        setPhoto(null);
+        photoProof.current = null;
+        photoDeadline.current = null;
+        setError(
+          "This photo link expired. Load it again to check current access.",
+        );
       }
     }, 500);
     const read = async () => {
@@ -146,6 +171,7 @@ function CurrentAttachment({
           ) {
             setPhoto(null);
             photoProof.current = null;
+            photoDeadline.current = null;
           }
           setError("");
         }
@@ -154,6 +180,7 @@ function CurrentAttachment({
           setAsset(null);
           setPhoto(null);
           photoProof.current = null;
+          photoDeadline.current = null;
           setError(
             failure instanceof Error
               ? failure.message
@@ -203,11 +230,18 @@ function CurrentAttachment({
       );
       const url = new URL(ticket.url),
         path = `${family}/${attachment.assetId}/play`;
+      const lifetime = playbackDeadline(
+        ticket.expiresAt,
+        ticket.asset.expiresAt,
+      );
       if (
         !matches(ticket.asset) ||
         ticket.asset.bytes !== asset.bytes ||
         ticket.asset.mimeType !== asset.mimeType ||
         ticket.asset.durationMs !== asset.durationMs ||
+        ticket.asset.ownerAccountId !== asset.ownerAccountId ||
+        ticket.asset.signedActId !== asset.signedActId ||
+        ticket.asset.expiresAt !== asset.expiresAt ||
         ticket.playbackFile.variant !== "credentialed" ||
         ticket.asset.provenance?.fileVariant !== "credentialed" ||
         ticket.asset.provenance.fileSha256 !== ticket.playbackFile.sha256 ||
@@ -216,7 +250,11 @@ function CurrentAttachment({
         asset.provenance.fileBytes !== ticket.playbackFile.bytes ||
         Date.parse(ticket.expiresAt) <= Date.now() ||
         url.pathname !== `/v1/w6/${path}` ||
-        !url.searchParams.has("ticket") ||
+        url.username !== "" ||
+        url.password !== "" ||
+        url.hash !== "" ||
+        !url.searchParams.get("ticket") ||
+        [...url.searchParams.keys()].length !== 1 ||
         [...url.searchParams.keys()].some((name) => name !== "ticket")
       )
         throw new Error(
@@ -226,9 +264,11 @@ function CurrentAttachment({
       if (
         !abort.signal.aborted &&
         revision === generation.current &&
+        playbackUnexpired(lifetime) &&
         performance.now() - checkedAt.current < 5000
       ) {
         photoProof.current = ticket.playbackFile;
+        photoDeadline.current = lifetime;
         setPhoto(`/api/w6/${path}${url.search}`);
       }
     } catch (failure) {
@@ -270,6 +310,16 @@ function CurrentAttachment({
             src={photo}
             alt={attachment.alt}
             style={{ display: "block", maxWidth: "100%", height: "auto" }}
+            onLoad={() => {
+              if (!playbackUnexpired(photoDeadline.current)) {
+                setPhoto(null);
+                photoProof.current = null;
+                photoDeadline.current = null;
+                setError(
+                  "This photo link expired. Load it again to check current access.",
+                );
+              }
+            }}
             onError={() => {
               setPhoto(null);
               setError(
