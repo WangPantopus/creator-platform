@@ -14,6 +14,9 @@ type IdentityScope = {
   accountId: string;
   signal: AbortSignal;
   end: () => void;
+  /** Presentation cleanup only: ordinary view disposal cancels requests but
+   * does not imply that this view's account session ended. */
+  isSessionEnded: () => boolean;
   session: Session;
 };
 const Scope = createContext<IdentityScope | null>(null);
@@ -63,6 +66,7 @@ function IdentitySessionView({
   const accountId = initial.accountId;
   const sessionId = initial.sessionId;
   const controller = useRef<AbortController | null>(null);
+  const endedLifetimes = useRef(new WeakSet<AbortSignal>());
   if (!controller.current) controller.current = new AbortController();
   const [lifetime, setLifetime] = useState(() => ({
     signal: controller.current!.signal,
@@ -72,6 +76,7 @@ function IdentitySessionView({
   const end = useCallback(
     (original: AbortSignal) => {
       if (original.aborted || controller.current?.signal !== original) return;
+      endedLifetimes.current.add(original);
       controller.current.abort();
       setValid(false);
       location.replace(
@@ -81,6 +86,10 @@ function IdentitySessionView({
     [returnTo],
   );
   const endOriginal = useCallback(() => end(signal), [end, signal]);
+  const isSessionEnded = useCallback(
+    () => endedLifetimes.current.has(signal),
+    [signal],
+  );
   useEffect(() => {
     // Development effect restarts need a fresh lifetime. Old consumers retain
     // their aborted signal; they cannot end or update this replacement view.
@@ -164,7 +173,7 @@ function IdentitySessionView({
   return (
     <Scope.Provider
       key={lifetime.revision}
-      value={{ accountId, signal, end: endOriginal, session }}
+      value={{ accountId, signal, end: endOriginal, isSessionEnded, session }}
     >
       {error && (
         <Notice title="Account status" tone="offline">
@@ -240,6 +249,7 @@ export function useIdentityRequest() {
     signal: scope.signal,
     session: scope.session,
     end: scope.end,
+    isSessionEnded: scope.isSessionEnded,
     request,
   };
 }
