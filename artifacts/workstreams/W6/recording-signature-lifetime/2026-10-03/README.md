@@ -28,7 +28,7 @@ W7 read the complete five-file media delta without a narrow source blocker;
 that source review does not supply a signer-family positive.
 
 The unchanged common producer/consumer bytes were really composed and personally
-operated on the [separate f0 offer runtime](../../browser-call-view-lifetime/2026-10-03/README.md):
+operated on the [separate f0 offer runtime](https://github.com/WangPantopus/creator-platform/blob/09b400af678fc6f5b72e7bbb320aea6cb0467c8f/artifacts/workstreams/W6/browser-call-view-lifetime/2026-10-03/README.md):
 old-view same-account409/concealment, new backend/platform original-session409,
 real product Account refresh/sign-out, account switch and warm/cold recovery.
 Those actual refusals do not reach SignRecording. No c194 runtime/device was
