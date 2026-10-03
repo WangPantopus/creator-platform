@@ -1925,6 +1925,7 @@ function Compose({
       )}
       {review && canPublish && (
         <Modal
+          restoreFocusTo={noteInput}
           title={
             document.scheduledAt
               ? "Review scheduled publication"
