@@ -335,8 +335,8 @@ export class GenerationTerminalAuthority {
       "generation_terminal_unconfigured",
       "Reviewed generation settlement authority is unavailable.",
       503,
+      { cause },
     );
-    if (cause !== undefined) failure.cause = cause;
     throw failure;
   }
   static async create(configuration: {
@@ -365,8 +365,8 @@ export class GenerationTerminalAuthority {
         "generation_terminal_unconfigured",
         "The original generation settlement custody is not installed.",
         503,
+        { cause },
       );
-      failure.cause = cause;
       throw failure;
     };
     try {

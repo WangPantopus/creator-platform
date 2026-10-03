@@ -63,8 +63,8 @@ function unavailable(cause?: unknown): never {
     "generation_output_cursor_unconfigured",
     "The reviewed original output cursor is unavailable.",
     503,
+    { cause },
   );
-  if (cause !== undefined) failure.cause = cause;
   throw failure;
 }
 

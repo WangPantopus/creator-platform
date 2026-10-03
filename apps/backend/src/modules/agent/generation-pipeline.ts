@@ -467,7 +467,7 @@ export class PreparedGenerationPipeline {
           proof,
           current.replyCall,
         );
-        await output.deliver(task, approved);
+        await output.deliver(task, approved, signal);
         await this.identity.withGeneration(
           task,
           async (client, scope) => {
@@ -617,7 +617,7 @@ export class PreparedGenerationPipeline {
           },
           current.classifierCall,
         );
-        await output.deliver(task, approved);
+        await output.deliver(task, approved, signal);
         await this.identity.withGeneration(
           task,
           async (client, scope) => {

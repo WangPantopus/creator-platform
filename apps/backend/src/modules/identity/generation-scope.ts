@@ -478,8 +478,8 @@ export class GenerationIdentityAuthority {
         "generation_scope_unconfigured",
         "The reviewed generation purpose authority is not installed.",
         503,
+        { cause },
       );
-      failure.cause = cause;
       throw failure;
     }
     const frozenConsumers = Object.freeze(
@@ -564,8 +564,8 @@ export class GenerationIdentityAuthority {
         "generation_scope_unconfigured",
         "The current reviewed generation catalogue is unavailable.",
         503,
+        { cause },
       );
-      failure.cause = cause;
       throw failure;
     }
   }
