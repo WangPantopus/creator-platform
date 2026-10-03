@@ -189,6 +189,7 @@ export class PreparedGenerationAgentInputs {
         "creator_w2_generation_retrieval",
         "creator_w2_generation_guardrail",
         "creator_w2_generation_metadata",
+        "creator_w3_generation_output",
       ]),
       dependencies: Object.freeze([
         "creator.generation_scope_matches(uuid,uuid)",
