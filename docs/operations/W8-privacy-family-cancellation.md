@@ -2,6 +2,8 @@
 
 ## Original task fence and dropped source reply — 2026-10-03
 
+The narrow control-cause follow-up retains simultaneous original control connect/query/error-event and end failures together, removes the settled control listener, and preserves the existing always-end-source/refusal behavior. W2 independently identified the masking risk during full source review. Backend types/scoped lint/format/diff verification covers this follow-up; the personal real-PG qualifications below belong to their recorded source hash, with no new fault-operation claim.
+
 The focused follow-up preserves original0087 SQL and its owned-creator return. An actual task abort or privately wrapped uncertain PostgreSQL read prevents nested savepoint ROLLBACK/RELEASE; the owner settles the retained transaction. Settled failures still restore the savepoint, preserving both failures if cleanup fails. Bounded private cause inspection classifies cleanup only and supplies no authority.
 
 Discovery now installs its abort listener before the actual PID query and BEGIN. It awaits cancellation and control close, then closes the exact original source even after a healthy cancellation. A consumed cancel cannot recover a dropped source reply. Close/discard completes before pool release; uncertain reads issue no later SQL. Non-enumerable aggregate causes retain original, source/control/close/rollback and actual abort failures. This supersedes the historical aborted-client reuse result below.
