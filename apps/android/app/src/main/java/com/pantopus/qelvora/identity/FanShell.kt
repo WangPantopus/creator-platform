@@ -43,16 +43,31 @@ private val requestCaptureIssuer = Any()
 class FanSessionRequestCapture private constructor(
     val client: CreatorAPIClient, val expectedAccountId: String,
     val sessionId: String, val destination: String,
+    private val trustReady: () -> Boolean,
     private val current: suspend () -> Boolean,
 ) {
     @androidx.annotation.MainThread
     suspend fun isCurrent(): Boolean { currentCoroutineContext().ensureActive(); return current() }
+    /** Keep the original issuer/client, bounds and cancellable operation. */
+    @androidx.annotation.MainThread
+    suspend fun trustBytes(path: String, body: ByteArray? = null, binary: Boolean = false): CreatorAPIBinaryResponse {
+        check(isCurrent() && trustReady()) { "Refresh your account before continuing." }
+        try {
+            val response = client.trustBytes(path, expectedAccountId, sessionId, body, binary)
+            if (!isCurrent() || !trustReady()) throw kotlinx.coroutines.CancellationException("Your original account view changed.")
+            return response
+        } catch (failure: Exception) {
+            if (!isCurrent() || !trustReady()) throw kotlinx.coroutines.CancellationException("Your original account view changed.")
+            throw failure
+        }
+    }
     companion object {
         internal fun issue(issuer: Any, client: CreatorAPIClient, accountId: String,
                            sessionId: String, destination: String,
+                           trustReady: () -> Boolean,
                            current: suspend () -> Boolean): FanSessionRequestCapture {
             check(issuer === requestCaptureIssuer)
-            return FanSessionRequestCapture(client, accountId, sessionId, destination, current)
+            return FanSessionRequestCapture(client, accountId, sessionId, destination, trustReady, current)
         }
     }
 }
@@ -94,7 +109,8 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
             destination == from && session?.accountId == active.accountId && session?.sessionId == active.sessionId &&
             !purgingPrivateState && !localPurgeFailed && !rotatingCredential
         val capture = FanSessionRequestCapture.issue(requestCaptureIssuer,
-            CreatorAPIClient(origin, maximumResponseBytes = maximumResponseBytes, timeoutMs = timeoutMs) { credential }, active.accountId, active.sessionId, from) {
+            CreatorAPIClient(origin, maximumResponseBytes = maximumResponseBytes, timeoutMs = timeoutMs) { credential }, active.accountId, active.sessionId, from,
+            trustReady = { !checkingSession && !refreshingSession && !busy && error.isEmpty() }) {
             currentCoroutineContext().ensureActive()
             matches() && runCatching { storage.read() }.getOrNull() == credential && matches()
         }
