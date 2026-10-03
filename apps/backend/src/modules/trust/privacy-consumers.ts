@@ -24,7 +24,7 @@ import {
   createCommercePrivacyAuthority,
   type CommercePrivacyConfiguration,
 } from "../commerce/privacy-purpose.js";
-import { DomainError } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
 import { trustPrivacyHook } from "./own-privacy-hook.js";
 import { mediaPrivacyHook } from "./media-privacy-hook.js";
 import type { GrowthService } from "../growth/service.js";
@@ -34,6 +34,14 @@ export type ConversationPrivacyOwnerPorts = Omit<
   Parameters<typeof conversationPrivacyHook>[0],
   "pool" | "authority" | "retention"
 >;
+
+export type AgentPrivacyOwnerPorts = Readonly<{
+  service: AgentService;
+  lifecycle: AgentLifecycle;
+  artifacts?: AgentExportArtifactSink;
+  /** Genuine reviewed single-source cursor on this host's original pool. */
+  privacyExportSnapshot?: PreparedAgentPrivacyExport;
+}>;
 
 /** Install actual owner hooks, leaving unavailable providers/policies explicit.
  * Domain services use their own non-owner pools; the coordinator never obtains
@@ -49,13 +57,9 @@ export function createPrivacyConsumers(input: {
   conversation?:
     | ConversationPrivacyOwnerPorts
     | (() => ConversationPrivacyOwnerPorts | undefined);
-  agent?: {
-    service: AgentService;
-    lifecycle: AgentLifecycle;
-    artifacts?: AgentExportArtifactSink;
-    /** Genuine reviewed single-source cursor, with this host's restoration/task ports. */
-    privacyExportSnapshot?: PreparedAgentPrivacyExport;
-  };
+  /** Trust starts before W1 binds the actual canonical Agent owner graph.
+   * Resolve that graph once per original claimed task, never a substitute. */
+  agent?: AgentPrivacyOwnerPorts | (() => AgentPrivacyOwnerPorts | undefined);
   commerce?: CommerceService;
   /** Exact registered job fence/function custody; absent configuration never issues a financial export scope. */
   commercePrivacy?: CommercePrivacyConfiguration;
@@ -114,37 +118,57 @@ export function createPrivacyConsumers(input: {
     }),
   ];
   if (input.agent)
-    hooks.push(
-      agentPrivacyHook(
-        input.agent.service,
-        input.agent.lifecycle,
-        createAgentTrustAuthority(
-          input.coordinatorPool,
-          async () => {
-            throw new DomainError(
-              "notice_authority_required",
-              "Privacy consumers cannot issue operations action scopes.",
-              503,
-            );
-          },
-          async (client, job) => {
-            if (!input.assertRestoredInTransaction)
+    hooks.push({
+      domain: "agent",
+      async run(job) {
+        const owner =
+          typeof input.agent === "function" ? input.agent() : input.agent;
+        if (!owner)
+          throw new DomainError(
+            "agent_privacy_unavailable",
+            "The actual Agent privacy owner is not composed yet.",
+            503,
+          );
+        invariant(
+          owner.service.repository.pool === input.runtimePool,
+          "privacy_export_pool_mismatch",
+          "Use the actual canonical Agent owner on this host's original pool.",
+        );
+        owner.privacyExportSnapshot?.assertHostPool(input.runtimePool);
+        return agentPrivacyHook(
+          owner.service,
+          owner.lifecycle,
+          createAgentTrustAuthority(
+            input.coordinatorPool,
+            async () => {
               throw new DomainError(
-                "privacy_restoration_unconfigured",
-                "Current restoration on the held Agent lifecycle client is required.",
+                "notice_authority_required",
+                "Privacy consumers cannot issue operations action scopes.",
                 503,
               );
-            await input.assertRestoredInTransaction(client);
-            const owned = await privacyTaskAuthorityInTransaction(client, job);
-            await input.assertRestoredInTransaction(client);
-            return owned;
-          },
-        ),
-        input.agent.artifacts,
-        Boolean(input.agent.privacyExportSnapshot),
-        input.agent.privacyExportSnapshot,
-      ),
-    );
+            },
+            async (client, job) => {
+              if (!input.assertRestoredInTransaction)
+                throw new DomainError(
+                  "privacy_restoration_unconfigured",
+                  "Current restoration on the held Agent lifecycle client is required.",
+                  503,
+                );
+              await input.assertRestoredInTransaction(client);
+              const owned = await privacyTaskAuthorityInTransaction(
+                client,
+                job,
+              );
+              await input.assertRestoredInTransaction(client);
+              return owned;
+            },
+          ),
+          owner.artifacts,
+          Boolean(owner.privacyExportSnapshot),
+          owner.privacyExportSnapshot,
+        ).run(job);
+      },
+    });
   if (input.commerce) {
     const purpose = createCommercePrivacyAuthority(
       input.commerce.pool,

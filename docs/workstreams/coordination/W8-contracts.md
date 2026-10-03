@@ -1,5 +1,9 @@
 # W8 contract, migration and runtime register
 
+## Actual post-graph Agent privacy port — 2026-10-03
+
+`AgentPrivacyOwnerPorts` in `trust/privacy-consumers.ts` accepts the actual service/lifecycle/prepared0196 source directly or a W1 resolver. Resolve once per original claimed task; undefined is a blocked dependency. The service repository and actual source must use the exact canonical host Pool object. W8 fixes original coordinator ownership/task/restoration after resolving the owner. W2's same-repository lifecycle assertion and the actual completed same-job Conversation accounting boundary remain required before full0163 Agent ACK. No source-registration boolean, fallback Agent, caller JSON receipt or separate-pool proof substitutes for them. Source201 still needs genuine integration and personal web/Android/iOS export/download acceptance.
+
 ## Distinct publication original comparison allocation — 2026-10-02
 
 Held0213 reserves W4's `schema-fulfillment-publication-original-hash.sql` and version `0213_w4_fulfillment_publication_original_hash`. Its fixed actorless comparison must consume only actual bound0204 plus genuine W1 early0208 on the original held worker nonce/client/PID/fullXID/login/task/token. Complete2–100 original input/financial/consent/evidence comparison, same-client restoration,0205 negatives, positive gates and final bookends must remain distinct. Only bounded boolean/evidence may return; no question/input, recipient/frame write or inferred provider receipt. Interactive0199/0202 are not publication aliases. W4 supplies exact fixed signatures/source and combined effective catalogue for independent review; W1 alone owns final cleanup/COMMIT. This reservation grants no executable activation or genuine application acceptance.

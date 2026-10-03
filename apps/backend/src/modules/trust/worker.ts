@@ -248,6 +248,8 @@ export class TrustWorker {
         "growth_held_authority_unavailable",
         "restoration_pending",
         "conversation_privacy_unavailable",
+        "agent_privacy_unavailable",
+        "privacy_export_pool_mismatch",
         "conversation_lineage_unavailable",
         "conversation_recordings_unavailable",
         "conversation_accounting_unavailable",
