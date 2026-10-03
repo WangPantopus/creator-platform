@@ -1,0 +1,121 @@
+{
+  "recordedAt": "2026-10-02T10:30:55.896405+00:00",
+  "label": "actual canonical synthetic web request/session and current coordinator task; proposals only",
+  "sourceParent": "7e0bfd28",
+  "sources": {
+    "apps/backend/migrations/0087_w8_privacy_task_commit_fence.sql": "33e619bfdea66355e1d8d2b90ed2d0389f21ae024fda63e1b984c99aede847ef",
+    "apps/backend/migrations/0089_w8_creator_fan_denial.sql": "0a738e0a29c77e65274931d4054b5db26a340b8c10a498e8c016457ab1a22860"
+  },
+  "privacy": {
+    "label": "actual UI-created export and real coordinator claim; metadata fence only, no purge/export receipt",
+    "genuineTask": true,
+    "canonicalLedger": 40,
+    "ownedCount": 0,
+    "idempotentOwnedCount": 0,
+    "takeoverRefused": "55P03",
+    "currentCommit": true,
+    "earlyTriggerRefused": "23514",
+    "observedLeaseSeconds": 59.986266,
+    "actualWorkerSignalAborted": true,
+    "expiredCommitRefused": "23514"
+  },
+  "capabilities": {
+    "rawTrustCore": false,
+    "rawScopeCore": false,
+    "privateReceiptFence": false,
+    "privateMessageFence": false,
+    "workerFunction": false,
+    "coreFunction": true,
+    "publicFunction": false,
+    "scopeRows": 0
+  },
+  "savedRequest": {
+    "job": {
+      "kind": "export",
+      "scope": "account",
+      "state": "blocked",
+      "verified": true
+    },
+    "tasks": [
+      {
+        "domain": "commerce",
+        "state": "blocked",
+        "receiptAbsent": true,
+        "errorCode": "domain_hook_unavailable"
+      },
+      {
+        "domain": "agent",
+        "state": "blocked",
+        "receiptAbsent": true,
+        "errorCode": "domain_hook_unavailable"
+      },
+      {
+        "domain": "conversation",
+        "state": "running",
+        "receiptAbsent": true,
+        "errorCode": null
+      },
+      {
+        "domain": "content",
+        "state": "blocked",
+        "receiptAbsent": true,
+        "errorCode": "domain_hook_unavailable"
+      },
+      {
+        "domain": "identity",
+        "state": "blocked",
+        "receiptAbsent": true,
+        "errorCode": "domain_hook_unavailable"
+      },
+      {
+        "domain": "growth",
+        "state": "blocked",
+        "receiptAbsent": true,
+        "errorCode": "domain_hook_unavailable"
+      },
+      {
+        "domain": "media",
+        "state": "blocked",
+        "receiptAbsent": true,
+        "errorCode": "domain_hook_unavailable"
+      },
+      {
+        "domain": "trust",
+        "state": "blocked",
+        "receiptAbsent": true,
+        "errorCode": "domain_hook_unavailable"
+      }
+    ],
+    "scopeRows": 0
+  },
+  "creatorFan": {
+    "label": "actual saved browser session and held non-owner denial; synthetic only",
+    "actualCanonicalSession": true,
+    "blocked": {
+      "code": "scope_revoked",
+      "status": 403
+    },
+    "actualFanUnblocked": true,
+    "otherFan": {
+      "code": "scope_denial_unavailable",
+      "status": 503
+    },
+    "concurrentWriter": {
+      "code": "scope_denial_unavailable",
+      "status": 503
+    },
+    "elapsedMs": 3.0713329999999814,
+    "genuineCreatorPositive": false,
+    "paidTenure": false
+  },
+  "corrections": [
+    "Actual privacy POST202 was incorrectly expected200 by the scratch operator; resumed the saved job UI without a duplicate submission.",
+    "Old saved browser session expired401; actual canonical re-authentication preceded the creator/fan positive negative-gate check."
+  ],
+  "limitations": [
+    "No complete privacy export/delete/purge receipt; probe intentionally checks custody only.",
+    "Canonical ledger40 retained; future87/89 unregistered.",
+    "No genuine creator/Team/Signed permission, paid tenure or provider accepted.",
+    "Initial57 canonical app acceptance and full R1\u2013R10 remain open."
+  ]
+}

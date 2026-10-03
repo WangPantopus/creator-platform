@@ -27,6 +27,8 @@ import {
   trustCreatorRestrictionInTransaction,
   trustContentRestrictionInTransaction,
   trustPublicPacketDenial,
+  trustPublicCreatorDenial,
+  trustCreatorFanRestrictionInTransaction,
   type TrustPublicPacketTuple,
 } from "../modules/trust/scope-restriction.js";
 import type { ScopeRestriction } from "../modules/access/scope.js";
@@ -286,6 +288,8 @@ export async function createTrustRuntime(options: {
   const restrictCreator = trustCreatorRestrictionInTransaction();
   const restrictContent = trustContentRestrictionInTransaction();
   const restrictPacket = trustPublicPacketDenial();
+  const restrictPublicCreator = trustPublicCreatorDenial();
+  const restrictCreatorFan = trustCreatorFanRestrictionInTransaction();
   const assertRestored = async () => {
     if (!(await restored()))
       throw new DomainError(
@@ -352,28 +356,37 @@ export async function createTrustRuntime(options: {
       await assertRestoredInTransaction(client);
       return restrictPacket(client, actor, tuple);
     },
+    holdPublicCreatorNegativeAuthority: async (
+      client: PoolClient,
+      creatorId: string,
+    ) => {
+      await assertRestoredInTransaction(client);
+      return restrictPublicCreator(client, creatorId);
+    },
+    holdCreatorFanNegativeAuthority: async (
+      client: PoolClient,
+      actor: Actor,
+      tuple: { creatorId: string; fanId: string },
+    ) => {
+      await assertRestoredInTransaction(client);
+      await restrictCreatorFan(client, actor, tuple);
+    },
     assertScopeAllowedInTransaction: async (
       ...scope: Parameters<typeof restrictInTransaction>
     ) => {
-      if (options.restoreReadyInTransaction)
-        await assertRestoredInTransaction(scope[4]);
-      else await assertRestored();
+      await assertRestoredInTransaction(scope[4]);
       await restrictInTransaction(...scope);
     },
     assertAudienceAllowed: async (
       ...scope: Parameters<typeof restrictAudience>
     ) => {
-      if (options.restoreReadyInTransaction)
-        await assertRestoredInTransaction(scope[3]);
-      else await assertRestored();
+      await assertRestoredInTransaction(scope[3]);
       await restrictAudience(...scope);
     },
     assertCreatorAllowedInTransaction: async (
       ...scope: Parameters<typeof restrictCreator>
     ) => {
-      if (options.restoreReadyInTransaction)
-        await assertRestoredInTransaction(scope[2]);
-      else await assertRestored();
+      await assertRestoredInTransaction(scope[2]);
       await restrictCreator(...scope);
     },
     privacyOwnershipScope: privacyOwnershipScope(options.workerPool),

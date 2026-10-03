@@ -14,6 +14,7 @@ import type { CreatorScope } from "../identity/creator-scope.js";
 import type { AudienceScope } from "../identity/audience-scope.js";
 import type { SessionService } from "../session/service.js";
 import type { Actor } from "../identity/adapter.js";
+import type { AccountCallMetadata } from "../session/account-call-metadata.js";
 import type { AvailabilityService } from "../session/availability.js";
 import { visibleSession } from "../session/service.js";
 import { withDeadline } from "./deadline.js";
@@ -31,6 +32,7 @@ export type W6RouterDependencies = {
   creatorScopeFor?: (request: Request) => Promise<CreatorScope>;
   audienceScopeFor?: (request: Request) => Promise<AudienceScope>;
   sessions?: SessionService;
+  accountCalls?: AccountCallMetadata;
   availability?: AvailabilityService;
 };
 /** W1 mounts before its terminal404/error handler. No identity inference in W6. */
@@ -60,12 +62,30 @@ export function createW6Router(dependencies: W6RouterDependencies) {
           dependencies.sessions.provider.supportsSingleUseAdmission,
       ),
       aiAudioAvailable: false,
+      callRecoveryAvailable: dependencies.accountCalls?.available === true,
       reason: !dependencies.media
         ? "media_unconfigured"
         : "licensed_ai_audio_and_provider_verification_required",
     }),
   );
   router.use(express.json({ limit: "64kb" }));
+  router.get("/calls/:sessionId/route", async (req, res) => {
+    const sessionId = z.uuid().parse(req.params.sessionId);
+    if (!dependencies.accountCalls?.available)
+      throw new DomainError(
+        "call_metadata_unconfigured",
+        "Current-account call recovery is unavailable.",
+        503,
+      );
+    const selector = req.headers["x-qelvora-expected-account"];
+    if (selector !== undefined && typeof selector !== "string")
+      throw new DomainError(
+        "session_account_invalid",
+        "Reopen this call with your current account.",
+        400,
+      );
+    res.json(await dependencies.accountCalls.read(sessionId, selector));
+  });
   const root = "/threads/:creatorId/:fanId";
   const media = () => {
     if (!dependencies.media)

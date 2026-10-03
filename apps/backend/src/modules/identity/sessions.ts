@@ -183,17 +183,29 @@ export class SessionService implements PantopusIdentityAdapter {
         401,
       );
     let actor: Actor;
+    let adultVerifiedAt: string;
     try {
       actor = await resolveActor(
         this.upstream,
         this.decrypt(row.upstream_cipher),
       );
+      // This is the time of this actual current upstream confirmation, not
+      // session creation, refresh time or caller-supplied adult provenance.
+      adultVerifiedAt = new Date().toISOString();
     } catch (error) {
+      if (
+        !(error instanceof DomainError) ||
+        (error.status !== 401 && error.code !== "adult_eligibility_required")
+      )
+        throw new DomainError(
+          "identity_unavailable",
+          "Account authorization is unavailable. Reconnect and try again. Your session is kept.",
+          503,
+        );
       await this.pool.query(
         "UPDATE creator.identity_session SET revoked_at=now() WHERE id=$1",
         [row.id],
       );
-      void error;
       throw new DomainError(
         "authorization_ended",
         "Your authorization could not be confirmed. Continue with Pantopus again.",
@@ -216,6 +228,7 @@ export class SessionService implements PantopusIdentityAdapter {
       sessionId: row.id,
       expiresAt: row.expires_at.toISOString(),
       authenticatedAt: row.created_at,
+      adultVerifiedAt,
     };
   }
   async refresh(token: string) {

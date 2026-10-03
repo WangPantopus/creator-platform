@@ -22,6 +22,8 @@ import {
   WaveRoleSafetyError,
 } from "./migration-wave-roles.js";
 
+import { assertPrivacyWaveRoleSafety } from "./migration-privacy-roles.js";
+
 type Source = { version: string; path: string; checksum: string };
 type Packet = {
   schemaVersion: number;
@@ -41,27 +43,53 @@ function check(condition: unknown, message: string): asserts condition {
 
 async function activate() {
   check(
-    process.env.W8_MIGRATION_WAVE === "20261002",
-    "Select the reviewed W8_MIGRATION_WAVE=20261002.",
+    ["20261002", "20261002-privacy"].includes(
+      process.env.W8_MIGRATION_WAVE ?? "",
+    ),
+    "Select a reviewed W8_MIGRATION_WAVE (20261002 or 20261002-privacy).",
   );
   const connection = process.env.DATABASE_MIGRATION_URL;
   check(
     connection,
     "Provide a separate DATABASE_MIGRATION_URL; never a runtime credential.",
   );
+  const continuation = process.env.W8_MIGRATION_WAVE === "20261002-privacy";
   const packet = JSON.parse(
     await readFile(
-      new URL("infra/migrations/waves/20261002.json", repositoryRoot),
+      new URL(
+        `infra/migrations/waves/${process.env.W8_MIGRATION_WAVE}.json`,
+        repositoryRoot,
+      ),
       "utf8",
     ),
   ) as Packet;
   check(
     packet.schemaVersion === 1 &&
-      packet.id === "20261002" &&
-      packet.baseline.length === 40 &&
-      packet.wave.length > 0,
+      packet.id === process.env.W8_MIGRATION_WAVE &&
+      packet.baseline.length === (continuation ? 57 : 40) &&
+      packet.wave.length === (continuation ? 4 : 17),
     "Reviewed migration packet is unavailable.",
   );
+  if (continuation) {
+    const initial = JSON.parse(
+      await readFile(
+        new URL("infra/migrations/waves/20261002.json", repositoryRoot),
+        "utf8",
+      ),
+    ) as Packet;
+    check(
+      canonical(packet.baseline) ===
+        canonical([...initial.baseline, ...initial.wave]) &&
+        canonical(packet.wave.map((s) => s.version)) ===
+          canonical([
+            "0074_w8_content_runtime_denial",
+            "0082_w8_interactive_denial_try_fence",
+            "0087_w8_privacy_task_commit_fence",
+            "0103_w8_domain_privacy_task_fence",
+          ]),
+      "Continuation must preserve the exact canonical57 and four reviewed purposes.",
+    );
+  }
   const registry = JSON.parse(
     await readFile(new URL("infra/migrations.json", repositoryRoot), "utf8"),
   ) as { migrations: { version: string; path: string }[] };
@@ -188,7 +216,22 @@ async function activate() {
         (r) => r.version === "0053_w8_runtime_denial_projection",
       ),
       media: before.some((r) => r.version === "0062_w6_creator_media_worker"),
+      content: before.some(
+        (r) => r.version === "0074_w8_content_runtime_denial",
+      ),
+      interactive: before.some(
+        (r) => r.version === "0082_w8_interactive_denial_try_fence",
+      ),
     });
+    if (continuation)
+      await assertPrivacyWaveRoleSafety(client, {
+        privacy: before.some(
+          (r) => r.version === "0087_w8_privacy_task_commit_fence",
+        ),
+        domain: before.some(
+          (r) => r.version === "0103_w8_domain_privacy_task_fence",
+        ),
+      });
     const tables = await waveDataTables(client);
     const beforeData = await waveDataDigest(client, tables);
     const beforeRoles = await waveRoleCustody(client);
@@ -212,7 +255,7 @@ async function activate() {
           (r) => r.version === s.version && r.checksum === s.checksum,
         ),
       ),
-      "Apply or explicitly adopt the complete canonical40 baseline first.",
+      "Apply or explicitly adopt the complete reviewed baseline first.",
     );
     for (const row of before) {
       const source = sources.find((s) => s.version === row.version);
@@ -266,7 +309,15 @@ async function activate() {
     const roleSafety = await assertWaveRoleSafety(client, {
       trust: true,
       media: true,
+      content: continuation,
+      interactive: continuation,
     });
+    const privacyRoleSafety = continuation
+      ? await assertPrivacyWaveRoleSafety(client, {
+          privacy: true,
+          domain: true,
+        })
+      : undefined;
     check(
       afterData.sha256 === beforeData.sha256 &&
         afterData.rows === beforeData.rows,
@@ -315,6 +366,7 @@ async function activate() {
         securityRecords: afterSecurity.records,
         afterSecuritySha256: afterSecurity.sha256,
         roleSafety,
+        privacyRoleSafety,
         afterSchemaSha256,
         trafficClosed: true,
         releaseReady: false,

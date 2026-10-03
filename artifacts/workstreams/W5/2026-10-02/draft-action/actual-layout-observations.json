@@ -1,0 +1,106 @@
+[
+  {
+    "requestedWidth": 390,
+    "requestedTheme": "light",
+    "observed": {
+      "value": {
+        "url": "http://localhost:30055/studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/notes?theme=light",
+        "theme": "light",
+        "width": 390,
+        "scrollWidth": 390,
+        "hidden": false,
+        "action": {
+          "height": 44,
+          "width": 73.953125,
+          "color": "rgb(27, 26, 24)",
+          "display": "inline-flex",
+          "textDecoration": "underline",
+          "href": "/studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/compose/170f95f9-2da6-42af-afe0-b7c3d88aba23"
+        }
+      }
+    },
+    "shot": {
+      "path": "aabb3f-draft-action-390-light-current.png",
+      "sha256": "1c9de38c03b3ce9f1b29cd5a55847e5e311badff0ee5140ec823f3663860cba9",
+      "personallyViewed": true
+    }
+  },
+  {
+    "requestedWidth": 390,
+    "requestedTheme": "night",
+    "observed": {
+      "value": {
+        "url": "http://localhost:30055/studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/notes?theme=night",
+        "theme": "night",
+        "width": 390,
+        "scrollWidth": 390,
+        "hidden": false,
+        "action": {
+          "height": 44,
+          "width": 73.953125,
+          "color": "rgb(236, 230, 218)",
+          "display": "inline-flex",
+          "textDecoration": "underline",
+          "href": "/studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/compose/170f95f9-2da6-42af-afe0-b7c3d88aba23"
+        }
+      }
+    },
+    "shot": {
+      "path": "aabb3f-draft-action-390-night-current.png",
+      "sha256": "078b61d0906805f82d58163b2e979e53ed30acdeec058ab626d283cba7cb0a72",
+      "personallyViewed": true
+    }
+  },
+  {
+    "requestedWidth": 1280,
+    "requestedTheme": "light",
+    "observed": {
+      "value": {
+        "url": "http://localhost:30055/studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/notes?theme=light",
+        "theme": "light",
+        "width": 1280,
+        "scrollWidth": 1280,
+        "hidden": false,
+        "action": {
+          "height": 44,
+          "width": 73.953125,
+          "color": "rgb(27, 26, 24)",
+          "display": "inline-flex",
+          "textDecoration": "underline",
+          "href": "/studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/compose/170f95f9-2da6-42af-afe0-b7c3d88aba23"
+        }
+      }
+    },
+    "shot": {
+      "path": "aabb3f-draft-action-1280-light-current.png",
+      "sha256": "055275c08615acfe0a5190ef92373f7013d515e547e4a3b48a78b59a8b17c614",
+      "personallyViewed": true
+    }
+  },
+  {
+    "requestedWidth": 1280,
+    "requestedTheme": "night",
+    "observed": {
+      "value": {
+        "url": "http://localhost:30055/studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/notes?theme=night",
+        "theme": "night",
+        "width": 1280,
+        "scrollWidth": 1280,
+        "hidden": false,
+        "action": {
+          "height": 44,
+          "width": 73.953125,
+          "color": "rgb(236, 230, 218)",
+          "display": "inline-flex",
+          "textDecoration": "underline",
+          "href": "/studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/compose/170f95f9-2da6-42af-afe0-b7c3d88aba23"
+        }
+      }
+    },
+    "shot": {
+      "path": "aabb3f-draft-action-1280-night-current.png",
+      "sha256": "709979ebfcfbc55d3d15cd99035817cfa73d7742a138da4b9e8695cbbf9a0f10",
+      "personallyViewed": true
+    }
+  }
+]

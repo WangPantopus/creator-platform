@@ -1,0 +1,78 @@
+{
+  "readAt": "2026-10-02T15:48:23.237Z",
+  "candidateProducer": "6771bfed2ac07d34bfb04ef66d4d909f014ba7da",
+  "canonicalActivationAccepted": false,
+  "packetSourcesVerified": 61,
+  "syntheticLocalData": true,
+  "backup": {
+    "bytes": 713531,
+    "sha256": "b31514ed5940ae5f52282de567ef2cf8b974b27691d0af4e625de4c88a2e9c16"
+  },
+  "baseline": {
+    "ledgerRows": 57,
+    "ledgerSha256": "db131a355c4879d1efc36f506948a2e3f8593970c972243257679d6700bcc564",
+    "schemaSha256": "fc7b456d1b7d45cf6b11d67e26b1e446feb86c01a19f8eacc53cbf2ec1649b97",
+    "dataSha256": "e257e21ca15731640b46cbefab814548c56be707160e67219cb539238730217f",
+    "businessRows": 33,
+    "securitySha256": "c7b41ec3c52173c2d1ab74d18723cadad3bb1cc954b3ce1216091076814fd8d6",
+    "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+    "rolesSha256": "ee63a1b1c31d4c5f9fd6e5fa693b47aeddec2f79f9e9269b1085a28250554739"
+  },
+  "separateRestore": {
+    "ledgerSha256": "db131a355c4879d1efc36f506948a2e3f8593970c972243257679d6700bcc564",
+    "schemaSha256": "fc7b456d1b7d45cf6b11d67e26b1e446feb86c01a19f8eacc53cbf2ec1649b97",
+    "dataSha256": "e257e21ca15731640b46cbefab814548c56be707160e67219cb539238730217f",
+    "securitySha256": "c7b41ec3c52173c2d1ab74d18723cadad3bb1cc954b3ce1216091076814fd8d6",
+    "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+    "rolesSha256": "ee63a1b1c31d4c5f9fd6e5fa693b47aeddec2f79f9e9269b1085a28250554739"
+  },
+  "upgrade": {
+    "wave": "20261002-privacy",
+    "applied": [
+      "0074_w8_content_runtime_denial",
+      "0082_w8_interactive_denial_try_fence",
+      "0087_w8_privacy_task_commit_fence",
+      "0103_w8_domain_privacy_task_fence"
+    ],
+    "priorLedgerRows": 57,
+    "ledgerRows": 61,
+    "priorHistoryPreserved": true,
+    "originalDataPreserved": true,
+    "originalRows": 33,
+    "originalTables": 161,
+    "oldRolesPreserved": true,
+    "originalSequencesPreserved": true,
+    "originalSequences": 1,
+    "verifiedBackupSecurity": true,
+    "securityRecords": 14780,
+    "afterSecuritySha256": "82ca8057182aecaa3d6c84f343e48263002d6b19c41191e627055d5ddd462a4e",
+    "roleSafety": {
+      "checkedRoles": 3,
+      "pinnedFunctions": 10,
+      "directCapabilities": 93,
+      "publicCapabilities": 331,
+      "pinnedPublicFunctions": 23
+    },
+    "privacyRoleSafety": {
+      "checkedPrivatePurposes": 2,
+      "administratorSelectedCatalogueReview": true
+    },
+    "afterSchemaSha256": "47ce91688f162cd5848cc6a44d738e85bb3aab0770c05c3be8f2cac0a1eafbe6",
+    "trafficClosed": true,
+    "releaseReady": false
+  },
+  "fresh": {
+    "ledgerRows": 61,
+    "schemaSha256": "47ce91688f162cd5848cc6a44d738e85bb3aab0770c05c3be8f2cac0a1eafbe6",
+    "securitySha256": "82ca8057182aecaa3d6c84f343e48263002d6b19c41191e627055d5ddd462a4e",
+    "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+    "rolesSha256": "a7c9e98718184c86466d5ed8a0bfcdd22842953edd045c6bd21b6591b9d883f8"
+  },
+  "preservedOriginal57Rows": true,
+  "baselineSchemaLedgerDataSequencesUntouched": true,
+  "allRoleAttributesAndMembershipsFreshMatch": true,
+  "freshPreservedSchemaSecurityMatch": true,
+  "appJourneysAccepted": false,
+  "publicationAccepted": false,
+  "trafficReopened": false
+}
