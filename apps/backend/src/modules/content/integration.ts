@@ -19,6 +19,7 @@ export {
   GENERATION_CONTENT_ORIGIN_SIGNATURE,
   type GenerationContentOriginSource,
 } from "./generation-origin.js";
+export { GENERATION_CONTENT_ORIGIN_PROFILE_FENCE_SOURCE } from "./generation-origin-profile.js";
 import { DomainError } from "../../core/errors.js";
 import { StudioService } from "../studio/service.js";
 import { studioFeature } from "../studio/registration.js";
