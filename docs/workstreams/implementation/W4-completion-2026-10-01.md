@@ -1,3 +1,7 @@
+### Successor Studio return and nonpaid draft — October 2, 2026 evening
+
+Personally saved/reloaded/edited one labelled synthetic Creator Notes membership draft with no product or price; preserved the existing approval. Offers now returns to the current owned Studio Requests instead of fan Requests and the logo returns to workspace. Actual empty creator Requests loaded at desktop and390 phone width; unavailable Earnings retains its closed gate. Web types/scoped lint/format pass. Both native rebuilds pass with normal iOS signing, but repeated Android System UI ANR prevented complete operation; own emulator and exact leases released. [Current receipt and limitations](../../../artifacts/workstreams/W4/runtime/2026-10-02/studio-return-navigation/README.md). All nine packages/R01–R15 remain assigned.
+
 ### Founder-requested safe resource cleanup — October 2, 2026
 
 All37 existing W4 PRs verified merged; current handoff source equals pushed659bf1f3. Removed two obsolete clean/remote-contained worktrees, four exclusive stopped review databases/volumes and rebuildable W4 dependencies/outputs/caches. Active source checkout, canonical61/private config/backup hash/native device state/evidence and shared tooling remain. Restart now requires `pnpm install --frozen-lockfile`, XcodeGen regeneration and normal native builds. [Actual cleanup receipt](../../../artifacts/workstreams/W4/runtime/2026-10-02/resource-cleanup/receipt.json). No new runtime acceptance or completion inferred; all nine packages/R01–R15 remain assigned.
