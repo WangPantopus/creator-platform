@@ -1,3 +1,16 @@
+## Current original stack reuse and personal web qualification — October 3, 20:04 UTC
+
+All38 current open PRs are drafts with exactly one of eight existing owners, beginning with October1 #21; all seven peers are coordinated. W1 #296 joins W3 #299/#280 and W4 #236 as closed unmerged duplicates with independently preserved original scope. W2 #295's reviewed records merge into #21's stack, without a new main merge. W4 retains #213/#247/#262/#298/#301/#303 with their complete gates. [Full oldest-first dispositions and source custody](../../../artifacts/workstreams/W4/runtime/2026-10-03/open-pr-review/README.md).
+
+Current normal #21 parent integration into #29826e/#303b39 preserves the original root and 115-operation generator and consumes the actual Kotlin whole-response and Swift resource-budget repairs. Fresh web33-page, Android37-task, normally signed iOS and both signatures pass at b39. The byte-equal current web composition personally verifies normal fan No limit/$0, actual unsent6.50, corrected You navigation, public status, same-/other-account replacement and normal sign-out clearing, then genuine fan restoration. All38 Commerce tables/two rows retain their original fingerprint; finite own resources close normally. Current native, namespace/command races, timing/p95, spoken accessibility, providers/factory/privacy/publication/financial/approved minimum/full pins/sole COMMIT/C10 and six queued required Mac CI jobs remain open. [Web qualification](../../../artifacts/workstreams/W4/runtime/2026-10-03/commerce-original-session/README.md) and [native compilation and limits](../../../artifacts/workstreams/W4/runtime/2026-10-03/native-original-session/README.md).
+
+Fresh actual main/all16 retained branch audit confirms reviewed5c08634b, pushed-head equality, clean primary and unchanged workbook before this documentary update. No whole original package or R01–R15 row is complete.
+
+- [x] Assign every existing open/draft PR to its original owner and review all retained W4 scopes before new feature work.
+- [x] Consolidate complete #236 into #262 and independently verify original #296 preservation in #21.
+- [x] Personally qualify the named current web view/session cleanup at byte-equal #29826e/#303b39, preserving Commerce data and closing own resources.
+- [ ] Finish every retained PR's actual full acceptance and required current CI before merge; then continue the original nine packages/R01–R15.
+
 ## Current existing-PR priority and source reuse — October 3, 2026 19:09 UTC
 
 All 40 current open PRs are drafts with exactly one of the eight existing owners; all seven peers are coordinated, beginning with the October 1 stack at #21. This pass closes W3 #299/#280 and W4 #236 unmerged with preserved source/history. #236's complete original publication scope is consolidated into #262 with a byte-identical worker merge tree and independent W2/W5 preservation reviews. W4 retains #213/#247/#262/#298/#301/#303, all held for their named complete gates. No new main merge occurs in this latest pass.

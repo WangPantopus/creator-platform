@@ -1,5 +1,28 @@
 # Existing PR review — October 3, 2026 UTC
 
+## Current oldest-first disposition — October 3, 20:04 UTC
+
+Fresh inventory has **38 open PRs, all drafts**, beginning #21, #22, #26, #28, #29 and #31 from October 1. Every PR has one of the eight existing owners; all seven peer owners retain their source and personal acceptance custody. Four redundant drafts are closed unmerged with source/history preserved: W3 #299/#280, W4 #236 and W1 #296. W4 independently verifies all22 original #296 functional paths byte-equal the original #21 publisher; W1 independently preserves its full records. W2 #295 merges reviewed records into the #21 stack; it is not a main merge or product acceptance. No new main merge occurs in this latest pass. Earlier qualified session main merges #210/#294/#297/#300/#292 remain separate dated results.
+
+| Owner | Retained open/draft PRs                                    |
+| ----- | ---------------------------------------------------------- |
+| W1    | #21, #22, #26, #28, #29, #35, #42, #48, #49, #51, #66, #74 |
+| W2    | #132, #279                                                 |
+| W3    | #36, #63, #182                                             |
+| W4    | #213, #247, #262, #298, #301, #303                         |
+| W5    | #288, #293, #302, #304                                     |
+| W6    | #282, #284, #289, #305                                     |
+| W7    | #31                                                        |
+| W8    | #131, #145, #192, #200, #201, #242                         |
+
+W4 #298 normally consumes complete original #21 at `26e5140e`; #303 consumes that composition at `b39d914e`. Both original SDK budget findings are resolved by their actual canonical publisher, regenerated for this checkout's 115 operations. Fresh Android37-task, normally signed iOS and web33-page shipping builds plus both signatures pass at b39. Current web/shared/configuration/lock bytes equal #29826e. Personally operated current web reads the genuine preserved fan, unsent6.50, public status and corrected You link; normal same-/other-account replacements and Support sign-out clear the old Commerce view/draft, and normal fan restoration returns persisted No limit/zero totals. All38 Commerce tables/two rows remain unchanged. Own finite API/Next/tabs close normally with physical absence/exact heavy release. Current native operation, namespace interleavings, command races, timing/p95, spoken accessibility, genuine provider/factory/privacy/publication/financial/sole COMMIT/full pins/approved minimum and whole C10 remain open. All six retained W4 PRs remain draft.
+
+At actual #29826e and #303b39, four fast CI checks succeed and six required Mac checks remain queued; later document heads require their own checks. Original #213/#247/#262/#301 full scopes and gaps below remain preserved, including unbounded external/sink callbacks and held SQL. Owner operation or empty/refusal/catalogue observations do not transfer to W4 positive lifecycle acceptance. Current missing original source/pin findings stay with the genuine owning publisher; no migration activation, registry edit or forged terminal result is made.
+
+Remote main and primary are `5c08634b7542fef95dd6c176030a785845250c62`. Fresh read-only remote audit verifies all16 retained W4 branches include it and match actual pushed refs, with primary/current tracked files clean and the original workbook unchanged before this documentary update. Branch receipt SHA256 `85d7e07e209a9c6a361671024572bd12e78152cc1e091b331f3c3234c1397032`; inventory `0e81191d017254d4c89d9a6f1da95b203ebde19cf33b08ddbe287190cc3e2eea`; #296 preservation `5a91362e18655ccb09c2361d0cfcb33094c36effba31e683552047020e569849`. Normal history/source reuse preserves all work; no reset/rebase/force push or unfinished peer-branch rewrite occurs. All nine original packages and R01–R15 remain incomplete.
+
+[Current web source/build/personal evidence](../commerce-original-session/README.md) and [current native composition/build/limits](../native-original-session/README.md) retain exact private hashes and failures. Routine logs/screens/JSON remain private.
+
 ## Current oldest-first disposition — October 3, 19:04 UTC
 
 The fresh complete inventory contains **40 open PRs, all drafts**, beginning #21, #22, #26, #28, #29 and #31 from October 1. Every PR has exactly one existing workstream owner. All seven peer owners have renewed their dispositions; their runtime observations remain their acceptance custody. This pass closes three redundant drafts unmerged: W3 #299 and #280, and W4 #236. Source and history remain preserved. There is no new main merge in this latest pass. Earlier qualified session merges #210, #294, #297, #300 and #292 are separate dated results.
