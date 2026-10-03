@@ -91,8 +91,8 @@ public struct Segmented: View {
             }
         }.padding(QelvoraTokens.token("space-1"))
             .background(qColor("surface-sunken", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.token("radius-lg")))
-            .accessibilityLabel(label)
             .accessibilityElement(children: .contain)
+            .accessibilityLabel(label)
     }
 }
 
