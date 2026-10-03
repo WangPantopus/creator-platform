@@ -610,7 +610,7 @@ export function FanContent({
           </section>
         )}
         {(replyCursors.current.length > 1 || cursor) && (
-          <nav aria-label="Your private reply pages">
+          <nav className="w5-actions" aria-label="Your private reply pages">
             {replyCursors.current.length > 1 && (
               <button
                 disabled={busy || checking}
