@@ -1,0 +1,115 @@
+{
+  "headRefOid": "d3c950c655fee34163ce0896f7e12360e4d05b27",
+  "mergeCommit": {
+    "oid": "27f0a1d22438ef81dd5f8f429f663a4d099850d5"
+  },
+  "mergedAt": "2026-10-02T17:36:40Z",
+  "state": "MERGED",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T16:45:48Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37035853751/job/110933758123",
+      "name": "web-and-backend",
+      "startedAt": "2026-10-02T16:43:29Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T16:45:59Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37035848384/job/110933740102",
+      "name": "web-and-backend",
+      "startedAt": "2026-10-02T16:43:27Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37035853751/job/110933758438",
+      "name": "web-visual",
+      "startedAt": "2026-10-02T16:43:27Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37035848384/job/110933740404",
+      "name": "web-visual",
+      "startedAt": "2026-10-02T16:43:24Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37035853751/job/110933758639",
+      "name": "ios-foundation",
+      "startedAt": "2026-10-02T16:43:27Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37035848384/job/110933740317",
+      "name": "ios-foundation",
+      "startedAt": "2026-10-02T16:43:24Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37035853751/job/110933758398",
+      "name": "android-foundation",
+      "startedAt": "2026-10-02T16:43:27Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37035848384/job/110933740572",
+      "name": "android-foundation",
+      "startedAt": "2026-10-02T16:43:24Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T16:48:46Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37035853751/job/110933758458",
+      "name": "android-runtime",
+      "startedAt": "2026-10-02T16:43:29Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T16:50:30Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37035848384/job/110933740364",
+      "name": "android-runtime",
+      "startedAt": "2026-10-02T16:44:03Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    }
+  ],
+  "checkedBase": "f4e9c28ab8fd23440904c44954c4d54729a90d5b",
+  "checkedCombinedTree": "9da4ee3382f422656436f56483834a8ef6c1b0e8",
+  "locallyCheckedCombinedCommit": "c28c8a159b06a02e95ffeb67c419b69ea3aa0c70",
+  "postMergeTreeMatched": true,
+  "limits": "Backend/web types pass on checked combined current-main source. Native source unchanged from actual d3 head; Linux and Android runtime CI passed, macOS jobs queued. Personally built later exact Content sources in C08 binaries, but no positive native UI, real signed Note, current paid tenure or whole-W5 release claim."
+}

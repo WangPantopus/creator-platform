@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "host": "Yingpengs-Mac-Studio.local",
+  "validatedAt": "2026-10-02T10:01:59.244077+00:00",
+  "privateBackupName": "creator_w2-20261002T093940Z.pgdump",
+  "privateMode": "0o600",
+  "backupMtimeUTC": "2026-10-02T09:36:54.485228+00:00",
+  "bytes": 541338,
+  "sha256": "ca891454a0c7c8097db188fee3026b520c46c78ec2708819bca38b2eb4286c24",
+  "dump": "passed",
+  "list": "passed",
+  "TOCentries": 1277,
+  "actualSeparateRestore": "creator_w2_rehearsal_translation_20261002",
+  "exitOnRestoreError": true,
+  "restore": "passed",
+  "readback": {
+    "migrations": 40,
+    "draftRevision": 15,
+    "examples": 20,
+    "usage": 0,
+    "evaluations": 0,
+    "versions": 0,
+    "allFanProfiles": 2,
+    "activeSessions": 3
+  },
+  "limits": [
+    "Raw dump/list remain private, never committed.",
+    "Initial count used nonexistent styleExamples key and returned null; canonical examples field then returned20.",
+    "No original iMac archive/provider key recovery inferred."
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "database": "creator_w6_human_media_20261001",
+  "canonicalRegistryAccepted": false,
+  "readAt": "2026-10-02T07:59:36.377Z",
+  "availability": [
+    {
+      "creator_id": "60000000-0000-4000-8000-000000000001",
+      "version": 5,
+      "time_zone": "America/Los_Angeles",
+      "windows": [
+        {
+          "endsAt": "2026-11-01T08:45:00.000Z",
+          "startsAt": "2026-11-01T08:30:00.000Z"
+        },
+        {
+          "endsAt": "2026-11-01T10:15:00.000Z",
+          "startsAt": "2026-11-01T09:30:00.000Z"
+        }
+      ],
+      "updated_at": "2026-10-02T07:58:47.846Z"
+    }
+  ],
+  "ledger": [
+    {
+      "operation": "session.availability",
+      "count": 5
+    }
+  ]
+}

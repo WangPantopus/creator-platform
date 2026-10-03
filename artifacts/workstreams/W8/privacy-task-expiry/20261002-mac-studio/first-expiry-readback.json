@@ -1,0 +1,34 @@
+{
+  "source": "616698f3d9a034ba0fb4ffc3d4dff36465c011d0",
+  "labelledSynthetic": true,
+  "operatorFaultInjection": true,
+  "providerDenial": false,
+  "jobHash": "214e3cb35c5aa5accaa5fb8b278163781a572a86d9e27add8d7b1b2e81856610",
+  "fault": {
+    "labelledSynthetic": true,
+    "operatorFaultInjection": true,
+    "providerDenial": false,
+    "source": "616698f3d9a034ba0fb4ffc3d4dff36465c011d0",
+    "phases": [
+      "actual_matching_lease_shortened",
+      "actual_hook_separate_COMMIT_delayed",
+      "actual_hook_refused"
+    ],
+    "realWorkerClaim": true,
+    "delayMs": 4001.038333000004,
+    "sqlState": "23514",
+    "elapsedMs": 4057.5937090000007
+  },
+  "task": {
+    "state": "complete",
+    "error_code": null,
+    "attempts": 2,
+    "receipt_present": true,
+    "data_present": true,
+    "no_live_lease": true
+  },
+  "scopes": {
+    "core_scopes": 0,
+    "domain_scopes": 0
+  }
+}

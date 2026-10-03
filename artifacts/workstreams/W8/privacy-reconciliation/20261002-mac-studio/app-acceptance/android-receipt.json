@@ -1,0 +1,20 @@
+{
+  "label": "Actual retained canonical Android session and same saved synthetic export, not C10/release acceptance",
+  "backendRevision": "c3c0a6d1",
+  "errors": [],
+  "newUnitTests": false,
+  "light": {
+    "sameSavedWebJob": true,
+    "jobHash": "649bc3e462d36903335da55aff16dc402544298ee8f5b10c6683224587b18e62",
+    "identityFenceBlocked": true,
+    "mediaFenceBlocked": true,
+    "downloadOffered": false
+  },
+  "night": {
+    "sameSavedWebJob": true,
+    "jobHash": "649bc3e462d36903335da55aff16dc402544298ee8f5b10c6683224587b18e62",
+    "identityFenceBlocked": true,
+    "mediaFenceBlocked": true,
+    "downloadOffered": false
+  }
+}

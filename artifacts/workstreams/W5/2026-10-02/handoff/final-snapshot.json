@@ -1,0 +1,413 @@
+{
+  "recordedAt": "2026-10-02T20:28:03.636539+00:00",
+  "capturedMain": "5e5b164e202253923b046474c40113ffbdaab683",
+  "qualifiedCombinedSource": "734d9b165ede722b9d6cad92e99c92ed2657911a",
+  "handoffBranch": "codex/w5-handoff-20261002",
+  "handoffWorktree": "/Users/yingpengwang/.codex/worktrees/w5-studio-continuation/creator-platform",
+  "mergedW5Prs": [
+    {
+      "headRefOid": "c11c7939fdd89615e6f31f09ea6a23f3777be5ee",
+      "mergeCommit": {
+        "oid": "0f7a86da1751e93d4de4ebe43f8224aab31086fd"
+      },
+      "mergedAt": "2026-10-02T18:49:11Z",
+      "number": 130,
+      "state": "MERGED",
+      "title": "Show confirmed membership recognition in current private replies",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/130"
+    },
+    {
+      "headRefOid": "833593b3aa5fe07f77c7abcafda83e4abd3e6c18",
+      "mergeCommit": {
+        "oid": "356bc06b6efaf7148de84e2ec9bd3e099ceab387"
+      },
+      "mergedAt": "2026-10-02T19:15:32Z",
+      "number": 133,
+      "state": "MERGED",
+      "title": "Require genuine packet source and publication projection receipts",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/133"
+    },
+    {
+      "headRefOid": "98024f7b8f028bdebea9bcdb5dc1141e7f372d43",
+      "mergeCommit": {
+        "oid": "02dcd5ec5e24d999bdfdd1d98d6727293da1be6d"
+      },
+      "mergedAt": "2026-10-02T19:31:43Z",
+      "number": 138,
+      "state": "MERGED",
+      "title": "Check AI content origins through genuine generation purpose",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/138"
+    },
+    {
+      "headRefOid": "fef0f8204fc3c79d7a37703d5ea017a13388dc63",
+      "mergeCommit": {
+        "oid": "f899f7591525aec036988564dc644a8d0887d2fd"
+      },
+      "mergedAt": "2026-10-02T20:07:02Z",
+      "number": 164,
+      "state": "MERGED",
+      "title": "Refuse planned public answers without the fulfillment owner",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/164"
+    },
+    {
+      "headRefOid": "04606f7ead825445be90a74b35e7ca0390be4a52",
+      "mergeCommit": {
+        "oid": "0d958dfd44a69c92c4fad44e550e658d0418a42e"
+      },
+      "mergedAt": "2026-10-02T18:51:45Z",
+      "number": 168,
+      "state": "MERGED",
+      "title": "Bind Content privacy exports to a real held purpose",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/168"
+    },
+    {
+      "headRefOid": "b4173e20773e9f2bcae0ac2d9acdc14f4d10e766",
+      "mergeCommit": {
+        "oid": "7a2e08fa4f602e9075d1394d55fbaad963dec7d2"
+      },
+      "mergedAt": "2026-10-02T20:16:27Z",
+      "number": 173,
+      "state": "MERGED",
+      "title": "Compose original group publication and durable answer links",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/173"
+    },
+    {
+      "headRefOid": "54972e114a31a685c633c70a187de68631ec3a78",
+      "mergeCommit": {
+        "oid": "7b0537ac3dbc727aed3778432faa275d09cd6088"
+      },
+      "mergedAt": "2026-10-02T20:15:43Z",
+      "number": 181,
+      "state": "MERGED",
+      "title": "Use current follow-purpose custody and held request session",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/181"
+    },
+    {
+      "headRefOid": "18954dc552eb26fa4840648ec8782d1d98258ac3",
+      "mergeCommit": {
+        "oid": "4f2132ebfb359139ab62c17699a4d918e1a8ef92"
+      },
+      "mergedAt": "2026-10-02T20:24:16Z",
+      "number": 187,
+      "state": "MERGED",
+      "title": "Fit Studio draft action to shared touch target",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/187"
+    },
+    {
+      "headRefOid": "ce1c494706f7e4b040657695922202078a62f755",
+      "mergeCommit": {
+        "oid": "5e5b164e202253923b046474c40113ffbdaab683"
+      },
+      "mergedAt": "2026-10-02T20:25:54Z",
+      "number": 188,
+      "state": "MERGED",
+      "title": "Guard planned projection and repeated W5 shutdown",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/188"
+    }
+  ],
+  "openOwnerPrsAtCheckpoint": [
+    {
+      "baseRefName": "main",
+      "headRefOid": "7329022a89b55f34b1ace8ed83a95371065c0f68",
+      "isDraft": true,
+      "number": 189,
+      "title": "Capture original privacy ownership and refuse inactive narrower scopes",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/189"
+    },
+    {
+      "baseRefName": "codex/w3-privacy-cursor-review-base",
+      "headRefOid": "22faa61b6f47edf284803ee9064a863d48704a00",
+      "isDraft": true,
+      "number": 182,
+      "title": "W3: preserve original ownership in complete RC privacy export",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/182"
+    },
+    {
+      "baseRefName": "main",
+      "headRefOid": "6659f5cc44ed80353b5879f4eda2f906d7d76bbd",
+      "isDraft": true,
+      "number": 170,
+      "title": "Add held W3 terminal-only finalization with current custody checks",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/170"
+    },
+    {
+      "baseRefName": "codex/w3-idempotent-host-shutdown",
+      "headRefOid": "77b66eee1cfb24defd66993944511a19ab9f6410",
+      "isDraft": true,
+      "number": 167,
+      "title": "Fence conversation privacy restoration through held commit",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/167"
+    },
+    {
+      "baseRefName": "codex/w3-generation-host",
+      "headRefOid": "2fd53a7455476f27c8ad0f155d62dcc6ab8a9066",
+      "isDraft": true,
+      "number": 163,
+      "title": "Deliver original public-answer System links on the held publication",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/163"
+    },
+    {
+      "baseRefName": "codex/w3-generation-host",
+      "headRefOid": "2ce5d3f42aeb3244e8ea5e6a2f990c31842ab4d0",
+      "isDraft": true,
+      "number": 155,
+      "title": "Define durable translation jobs with exact original provenance",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/155"
+    },
+    {
+      "baseRefName": "codex/w3-generation-host",
+      "headRefOid": "6e44d5d5e7a75ff51b005cc5e1e4d68f121ffc09",
+      "isDraft": true,
+      "number": 153,
+      "title": "Repair compiled conversation host registry custody",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/153"
+    },
+    {
+      "baseRefName": "codex/w3-generation-host",
+      "headRefOid": "da343960e1a236b833f42ca9de8c57000610cea1",
+      "isDraft": true,
+      "number": 149,
+      "title": "Bind explicit helpful feedback to current intro-offer decisions",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/149"
+    },
+    {
+      "baseRefName": "codex/w8-privacy-reconciliation",
+      "headRefOid": "8714bc0cb769b4c2d9066c4798e0dafaedfd3b10",
+      "isDraft": true,
+      "number": 145,
+      "title": "Bind terminal trust denials to original generation custody",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/145"
+    },
+    {
+      "baseRefName": "codex/w3-generation-host",
+      "headRefOid": "8ca7f1b7f7597a8bc622c2a4c2eb33802dbfe470",
+      "isDraft": true,
+      "number": 144,
+      "title": "Bind generation acceptance and finalization to original purpose custody",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/144"
+    },
+    {
+      "baseRefName": "main",
+      "headRefOid": "725413029306da6ce80353a027492ecc9bae076d",
+      "isDraft": true,
+      "number": 132,
+      "title": "Bind Creator AI worker inputs, provider admission and retrieval to genuine purpose custody",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/132"
+    },
+    {
+      "baseRefName": "codex/w8-purpose-denial-authority",
+      "headRefOid": "34c2b5cc38aa53960ff86b1863ec6eadb2e8ba40",
+      "isDraft": true,
+      "number": 131,
+      "title": "Bind generation negatives to the genuine private worker nonce",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/131"
+    },
+    {
+      "baseRefName": "codex/w3-native-metadata-fidelity",
+      "headRefOid": "7ecaacf44c0b3eca2cd2c142841f2ff20ca04744",
+      "isDraft": true,
+      "number": 97,
+      "title": "Match You account layouts and reflow metrics for larger text",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/97"
+    },
+    {
+      "baseRefName": "codex/w3-ios-you-fidelity",
+      "headRefOid": "25f60b0096e0ef0439907a5eb856cce652c41aff",
+      "isDraft": true,
+      "number": 85,
+      "title": "Use canonical native metadata typography on W3 screens",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/85"
+    },
+    {
+      "baseRefName": "codex/w8-development-trust-runtime",
+      "headRefOid": "b76a3b66eb1df866c3fe0e7fdb519e6b3a1875ca",
+      "isDraft": true,
+      "number": 83,
+      "title": "Queue exact private Note replies for recorded Ops decisions",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/83"
+    },
+    {
+      "baseRefName": "codex/w3-ios-you-fidelity",
+      "headRefOid": "d77faaaeac34c86deafb1edeec6fff9e97e30b33",
+      "isDraft": true,
+      "number": 81,
+      "title": "Bound encrypted offline conversation reads to current five-second leases",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/81"
+    },
+    {
+      "baseRefName": "codex/w1-session-truth-20261001",
+      "headRefOid": "e240d2b39b8c0db23f79e944413a1e445565bf5a",
+      "isDraft": false,
+      "number": 74,
+      "title": "Harden issuer custody, recovery and integrated platform authority",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/74"
+    },
+    {
+      "baseRefName": "codex/w3-privacy-revalidation",
+      "headRefOid": "f44eceea40d701f0bf719999c2eec108bcb97f50",
+      "isDraft": true,
+      "number": 72,
+      "title": "Use committed notifications for conversation replay",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/72"
+    },
+    {
+      "baseRefName": "codex/w3-privacy-revalidation",
+      "headRefOid": "ba2c15cc0f24b76d9b653cb6c32fdc459a0dabca",
+      "isDraft": true,
+      "number": 71,
+      "title": "Fit iOS You to the supplied account layout",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/71"
+    },
+    {
+      "baseRefName": "codex/w1-handoff-20261001",
+      "headRefOid": "85e34bbb041c3bd2f31b59c7cb38265a85332f51",
+      "isDraft": false,
+      "number": 66,
+      "title": "Keep sessions truthful during outages and fit identity screens to phones",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/66"
+    },
+    {
+      "baseRefName": "main",
+      "headRefOid": "be506c9e5fd2235f6ae12b2a67e178364860cd02",
+      "isDraft": true,
+      "number": 63,
+      "title": "Compose guarded conversations with current producer and privacy contracts",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/63"
+    },
+    {
+      "baseRefName": "codex/w1-native-uri-20261001",
+      "headRefOid": "07a8b48a6a3918276b65db413a7b862f15d5a136",
+      "isDraft": false,
+      "number": 51,
+      "title": "Publish W1 handoff and preserve source before worktree cleanup",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/51"
+    },
+    {
+      "baseRefName": "codex/w1-native-storage-20261001",
+      "headRefOid": "2136b6dd3c5937682c9c104aaee4b2d339ace2eb",
+      "isDraft": true,
+      "number": 49,
+      "title": "Validate native API origins and supply iOS host configuration",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/49"
+    },
+    {
+      "baseRefName": "codex/w1-native-verification-20261001",
+      "headRefOid": "45d7d26513c62e8b4cd3c66f8f6a575ead0a53ea",
+      "isDraft": true,
+      "number": 48,
+      "title": "Handle native storage failures and foreground session refresh",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/48"
+    },
+    {
+      "baseRefName": "codex/w1-signing-authority-20261001",
+      "headRefOid": "6fd130d574552f6714c149abda997ca5d45ea2b0",
+      "isDraft": true,
+      "number": 42,
+      "title": "Connect Signed links to public verification across clients",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/42"
+    },
+    {
+      "baseRefName": "main",
+      "headRefOid": "09c9f387720f2e962212b4cbbd797331c0cde930",
+      "isDraft": false,
+      "number": 36,
+      "title": "Revalidate privacy snapshots and recover retained Android sessions",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/36"
+    },
+    {
+      "baseRefName": "codex/w1-home-host-20261001",
+      "headRefOid": "d2b3b95dab25c0f8642080cef1593e2376783fbb",
+      "isDraft": true,
+      "number": 35,
+      "title": "Hold current creator authority through assertion verification",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/35"
+    },
+    {
+      "baseRefName": "main",
+      "headRefOid": "c95c37efde96315e8e8fa06af25dac924f758c97",
+      "isDraft": false,
+      "number": 31,
+      "title": "Bind growth entry and push to current canonical state",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/31"
+    },
+    {
+      "baseRefName": "codex/w1-team-state-20261001",
+      "headRefOid": "f17620c3265838202b97f97bf12b5bb011419f2f",
+      "isDraft": true,
+      "number": 29,
+      "title": "Connect canonical Home and preserve native saved-thread navigation",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/29"
+    },
+    {
+      "baseRefName": "codex/w1-generation-efficiency-20261001",
+      "headRefOid": "a65aa012ee3a28533924038575c2191563f3a39b",
+      "isDraft": true,
+      "number": 28,
+      "title": "Gate Team actions on current access reads",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/28"
+    },
+    {
+      "baseRefName": "codex/w1-comprehension-focus-20261001",
+      "headRefOid": "ffb6b02b35a3684c0e3ab4e0c84dce58e00eb3ef",
+      "isDraft": true,
+      "number": 26,
+      "title": "Preserve unchanged generated resources and verify portable rename",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/26"
+    },
+    {
+      "baseRefName": "codex/w1-onboarding-timing-20261001",
+      "headRefOid": "5a1efef0e8c6aaec020873f21a11edf20c7489b3",
+      "isDraft": true,
+      "number": 22,
+      "title": "Restore Restart focus after authorship practice completion",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/22"
+    },
+    {
+      "baseRefName": "main",
+      "headRefOid": "f4fb436a3a0990b6867ea025b6e4d50a95fe4ed0",
+      "isDraft": false,
+      "number": 21,
+      "title": "Defer intro collection beyond initial onboarding",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/21"
+    }
+  ],
+  "database": {
+    "container": "creator-platform-w5-local",
+    "port": 55435,
+    "name": "creator_w5",
+    "actualLedgerCount": 61,
+    "actualFirst": "0001_foundation",
+    "actualLast": "0103_w8_domain_privacy_task_fence",
+    "originalDevelopmentConnectionLimit": -1,
+    "independentlyRestoredDatabase": "creator_w5_privacy_main_restore_20261002",
+    "actualRestoreConnectionLimit": 0,
+    "missingRecoveryArchivesAssumed": false,
+    "heldPurposeMigrationActivated": false
+  },
+  "resources": {
+    "ownAPI41055": "stopped",
+    "ownWeb30055": "stopped",
+    "ownBrowser47905": "stopped after explicitly closing both actual profiles; initial SIGTERM left HTTP listener alive, so only the custody-checked owned server was terminated",
+    "ownSimulator": "78C3590E-6D36-4A73-9E46-D23563EF0134 shut down",
+    "ownEmulator": "CreatorPlatform_W5_API34 shut down; no current lease",
+    "ownHeavyOrGuiOrDeviceLease": "none",
+    "peerAtLastObservation": "W2 5554/slot2/gui; W6 5582/slot1 and3E02 simulator/slot3. Recheck current custody; never touch peers.",
+    "actualOwnListenersAfterCleanup": "No listeners on41055/30055/47905"
+  },
+  "acceptanceBoundaries": {
+    "implemented": "All personally authored current increments committed; group creator consumer and guarded owner composition source are on main.",
+    "runnable": "Exact combined backend/web types and generated101 passed; actual Next and shipping native builds remain tied to3b24991e.",
+    "integrated": "Normal merged source receipts preserve exact remote checks and actual post-merge tree equality. Held owner tasks/review/source/count/tenure activation and providers remain pending.",
+    "verified": "Bounded unsigned web390/1280 Light/Night saved audience/return/wrong-role/outage, shipping Android Light/Night cold refusal, web44px keyboard action, actual repeated host shutdown. Exact evidence files/source SHAs are in handoff.",
+    "releaseReady": false
+  },
+  "identity": "DEVELOPMENT-ONLY SEEDED VERIFIED at2026-10-01T20:44:26Z; no proof/passkey/acceptance.",
+  "next": "Read handoff, recheck actual current main and live owner PRs/successors, then personally consume actual204/205/208 and finish the nine packages. The separate handoff-doc PR must use normal checks; its later live state supersedes this checkpoint.",
+  "resourceCleanupRecheckedAt": "2026-10-02T20:29:41.144836+00:00",
+  "documentationPullRequest": {
+    "number": 190,
+    "url": "https://github.com/WangPantopus/creator-platform/pull/190",
+    "stateAtRecord": "OPEN; normal CI pending; recheck live state"
+  },
+  "laterHumanRequestedResourceCleanup": "../resource-cleanup/cleanup-receipt.json supersedes historical checkout/build/container pointers; fresh checkout and rebuild required, DB/data/secrets/backups/devices retained."
+}

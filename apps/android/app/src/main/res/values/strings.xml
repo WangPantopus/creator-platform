@@ -19,6 +19,10 @@
   <string name="long_session" formatted="false">You\'ve been talking with {name}\'s AI for a while. It\'s an AI, and it will be here when you\'re back.</string>
   <string name="note_audience" formatted="false">{name} · to {audience}</string>
   <string name="note_replies" formatted="false">Only {name} and her team see replies to Notes.</string>
+  <string name="content_confirmed_tenure" formatted="false">Membership · at least {days} continuous days</string>
+  <string name="content_reply_limit" formatted="false">{used} / {limit} characters</string>
+  <string name="content_reply_over_limit" formatted="false">This draft is over your current limit. Shorten it to send; your words are kept.</string>
+  <string name="content_reply_policy_unavailable" formatted="false">Current membership recognition is unavailable. The reply limit stays at 4,000 characters.</string>
   <string name="sponsor_disclosure" formatted="false">Paid partnership: {name} is paid by {brand}.</string>
   <string name="processor_consent" formatted="false">Before your first message, {name}\'s AI is powered by {providers}. They don\'t keep or train on your messages.</string>
   <string name="sensitive_memory" formatted="false">Want me to remember this? Only if you say yes.</string>
@@ -644,6 +648,7 @@
   <string name="w6_this_file_could_not_be_processed_record_again" formatted="false">This file could not be processed. Record again.</string>
   <string name="w6_uploaded_processing_before_sharing" formatted="false">Uploaded · processing before sharing</string>
   <string name="w6_sign_in_to_a_configured_creator_account_to_upload_and" formatted="false">Sign in to a configured creator account to upload and sign. Your preview stays on this device until you upload it.</string>
+  <string name="w6_uploads_and_signing_are_unavailable_your_preview_stays_on_this_device" formatted="false">Uploads and signing are unavailable here. Your preview stays on this device.</string>
   <string name="w6_this_recording_limit_does_not_match_the_current_saved_content" formatted="false">This recording limit does not match the current saved content.</string>
   <string name="w6_media_is_unavailable_try_again" formatted="false">Media is unavailable. Try again.</string>
   <string name="w6_this_upload_does_not_belong_to_the_current_content_refresh" formatted="false">This upload does not belong to the current content. Refresh before continuing.</string>
@@ -675,6 +680,7 @@
   <string name="w6_reload_saved_windows" formatted="false">Reload saved windows</string>
   <string name="w6_the_call_is_unavailable" formatted="false">The call is unavailable.</string>
   <string name="w6_camera_or_microphone_access_is_off_or_unavailable_check_your" formatted="false">Camera or microphone access is off or unavailable. Check your device settings and try again.</string>
+  <string name="w6_call_service_unavailable" formatted="false">Calling is not connected yet.</string>
   <string name="w6_calling_is_not_connected_yet_your_booking_is_unchanged" formatted="false">Calling is not connected yet. Your booking is unchanged.</string>
   <string name="w6_connection_failed_rejoin_the_same_call" formatted="false">Connection failed. Rejoin the same call.</string>
   <string name="w6_consent_could_not_be_saved" formatted="false">Consent could not be saved.</string>
@@ -719,6 +725,7 @@
   <string name="w6_summary_queued_available_when_its_provider_completes" formatted="false">Summary queued · available when its provider completes.</string>
   <string name="w6_delete_this_summary" formatted="false">Delete this summary</string>
   <string name="w6_call_receipt" formatted="false">Call receipt</string>
+  <string name="w6_call_in_progress" formatted="false">Human call</string>
   <string name="w6_recording_occurred_check_the_consent_history" formatted="false">Recording occurred · check the consent history</string>
   <string name="w6_no_recording_was_confirmed" formatted="false">No recording was confirmed</string>
   <string name="w6_view_the_reconciled_receipt" formatted="false">View the reconciled receipt</string>
@@ -884,4 +891,46 @@
   <string name="growth_error_quiet_hours_pair" formatted="false">Both quiet-hour boundaries are required</string>
   <string name="growth_error_time_zone" formatted="false">Choose a valid time zone, such as America/Los_Angeles.</string>
   <string name="growth_error_quiet_hours_format" formatted="false">Enter a time in HH:mm, from 00:00 to 23:59.</string>
+  <string name="w6_record_a_voice_reply" formatted="false">Record a voice reply</string>
+  <string name="w6_deliver_this_recording" formatted="false">Deliver this recording</string>
+  <string name="w6_recording_credentials_are_processing" formatted="false">Your signature is saved. Content credentials are processing before delivery.</string>
+  <string name="w6_recording_delivery_is_unconfirmed" formatted="false">Delivery is unconfirmed. Retry this same recording before starting another.</string>
+  <string name="w6_recording_delivered" formatted="false">Your signed recording was delivered to this conversation.</string>
+  <string name="w6_voice_reply_unavailable" formatted="false">Voice replies are unavailable for this conversation. Your text draft is kept.</string>
+  <string name="w6_selected_conversation_changed" formatted="false">This recording belongs to another conversation. Reopen the selected thread.</string>
+  <string name="w6_retry_recording_delivery" formatted="false">Retry this recording delivery</string>
+  <string name="w6_availability_save_is_unconfirmed" formatted="false">Saving is unconfirmed. Retry this same change before editing your windows.</string>
+  <string name="w6_retry_availability_save" formatted="false">Retry this availability save</string>
+  <string name="w6_refresh_will_replace_availability_changes" formatted="false">Replace your unsaved changes with the saved availability?</string>
+  <string name="w6_availability_account_changed" formatted="false">Your account changed. Reopen availability to continue.</string>
+  <string name="account_unavailable_title" formatted="false">We can\'t reach your account right now</string>
+  <string name="account_unavailable_body" formatted="false">Your session is kept on this device. Try again in a moment.</string>
+  <string name="limit_reminders_off" formatted="false">Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.</string>
+  <string name="limit_reminders_unknown" formatted="false">Lowering a limit is immediate.</string>
+  <string name="page_unavailable_title" formatted="false">This page didn\'t load</string>
+  <string name="page_unavailable_body" formatted="false">Nothing you saved was changed. Try again in a moment.</string>
+  <string name="w5_content_status" formatted="false">Content status</string>
+  <string name="w5_content_checking_access" formatted="false">Checking current access. Your input is kept during a connection interruption.</string>
+  <string name="w5_content_check_current_access" formatted="false">Check current access</string>
+  <string name="w5_content_access_unavailable" formatted="false">This content is unavailable. Check current access to try again.</string>
+  <string name="w5_content_refresh_unavailable" formatted="false">Content could not be refreshed. Reconnect and check current access. Your input is kept.</string>
+  <string name="w5_content_action_unconfirmed" formatted="false">We could not confirm this action. Check current access before retrying. Your input is kept.</string>
+  <string name="w5_content_session_ended" formatted="false">Your session ended. Continue with Pantopus again.</string>
+  <string name="w5_content_account_changed" formatted="false">The signed-in account changed. Refresh before continuing.</string>
+  <string name="w5_content_changed" formatted="false">This changed while you were viewing it. Refresh before trying again.</string>
+  <string name="w5_content_duplicate_changed" formatted="false">This retry differs from the earlier action. Refresh before trying again.</string>
+  <string name="w5_content_reply_withdrawn" formatted="false">This reply was withdrawn. It cannot be shared again.</string>
+  <string name="w5_content_fan_profile_required" formatted="false">Set up your fan profile before continuing.</string>
+  <string name="w5_content_invalid_request" formatted="false">Check your reply and sharing choices before trying again. Your input is kept.</string>
+  <string name="identity_choose_handle" formatted="false">Choose your handle</string>
+  <string name="identity_edit_public_profile" formatted="false">Edit public profile</string>
+  <string name="identity_session_read_failed" formatted="false">This device could not read your session securely. Unlock it and try signing in again.</string>
+  <string name="identity_session_save_failed" formatted="false">This device could not save your session securely. Unlock it and try signing in again.</string>
+  <string name="identity_private_clear_failed" formatted="false">This device could not clear its saved private data. Private screens are closed. Unlock it and retry clearing before signing in again.</string>
+  <string name="identity_private_clear_retry" formatted="false">Retry clearing saved private data</string>
+  <string name="w1_call_lookup_title" formatted="false">Your call</string>
+  <string name="w1_call_lookup_checking" formatted="false">Checking the booking and your current access…</string>
+  <string name="w1_call_lookup_unavailable" formatted="false">This call could not be opened. Retry, or open Requests to check its current status.</string>
+  <string name="identity_proof_review_support" formatted="false">Request verification review</string>
+  <string name="identity_proof_review_support_body" formatted="false">Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified.</string>
 </resources>
