@@ -53,6 +53,7 @@ function canonicalDevelopmentIdentity() {
 const features: {
   growth: Awaited<ReturnType<typeof configureGrowthForBackend>>;
   conversationPrivacy?: ConversationPrivacyOwnerPorts;
+  commerce?: import("./modules/commerce/service.js").CommerceService;
   close: (() => void | Promise<void>)[];
 } = { growth: null, close: [] };
 if (config.identityAdapter === "development" && !config.identitySessionKey)
@@ -83,6 +84,7 @@ try {
                       // Trust starts first. Resolve only the actual prepared
                       // conversation owners after the canonical host binds.
                       conversation: () => features.conversationPrivacy,
+                      commerceOwner: () => features.commerce,
                       additional:
                         process.env.GROWTH_ENABLED === "true"
                           ? [
@@ -157,6 +159,7 @@ try {
             });
             features.close.push(() => host.close());
             const { commerce, conversation, agent } = host;
+            features.commerce = commerce?.service;
             // Preparing the genuine graph does not configure a provider, worker
             // purpose or arrival policy. Calls remain unmounted until those
             // separate producers exist; no request Actor is invented.

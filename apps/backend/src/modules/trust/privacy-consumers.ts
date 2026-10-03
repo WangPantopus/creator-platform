@@ -70,6 +70,9 @@ export function createPrivacyConsumers(input: {
     privacyExportSnapshot?: PreparedAgentPrivacyExport;
   };
   commerce?: CommerceService;
+  /** Trust starts before the canonical Commerce graph. Resolve only its
+   * actual service at task execution; no eager replacement owner is created. */
+  commerceOwner?: () => CommerceService | undefined;
   /** Exact registered job fence/function custody; absent configuration never issues a financial export scope. */
   commercePrivacy?: CommercePrivacyConfiguration;
   commerceArtifacts?: import("../commerce/financial-export.js").FinancialExportSink;
@@ -182,25 +185,39 @@ export function createPrivacyConsumers(input: {
         input.agent.privacyExportSnapshot,
       ),
     );
-  if (input.commerce) {
-    const purpose = createCommercePrivacyAuthority(
-      input.commerce.pool,
-      input.commercePrivacy,
-    );
-    const authority = {
-      async withPrivacyJob<T>(
-        job: Parameters<PrivacyHook["run"]>[0],
-        work: Parameters<typeof purpose.withPrivacyJob<T>>[1],
-      ) {
+  invariant(
+    !(input.commerce && input.commerceOwner),
+    "commerce_privacy_owner_ambiguous",
+    "Commerce privacy requires one original owner graph.",
+  );
+  if (input.commerce || input.commerceOwner) {
+    hooks.push({
+      domain: "commerce",
+      async run(job) {
+        const service = input.commerceOwner
+          ? input.commerceOwner()
+          : input.commerce;
+        if (!service)
+          throw new DomainError(
+            "domain_hook_unavailable",
+            "The original Commerce privacy owner is unavailable.",
+            503,
+          );
+        const purpose = createCommercePrivacyAuthority(
+          service.pool,
+          input.commercePrivacy,
+          input.assertRestoredInTransaction,
+        );
         await verify(job);
-        const result = await purpose.withPrivacyJob(job, work);
+        const result = await commercePrivacyHook(
+          service,
+          purpose,
+          input.commerceArtifacts,
+        ).run(job);
         await verify(job);
         return result;
       },
-    };
-    hooks.push(
-      commercePrivacyHook(input.commerce, authority, input.commerceArtifacts),
-    );
+    });
   }
   if (input.growth) {
     const restore = input.assertRestoredInTransaction;
