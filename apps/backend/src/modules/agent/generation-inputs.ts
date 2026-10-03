@@ -100,6 +100,7 @@ export interface GenerationSourceOrigins {
     client: PoolClient,
     scope: GenerationTaskScope,
     sources: readonly GenerationAgentFacts["sources"][number][],
+    signal?: AbortSignal,
   ): Promise<void>;
 }
 export type GenerationAILicenseContext = Readonly<{
@@ -263,14 +264,22 @@ export class PreparedGenerationAgentInputs {
   }
 
   private async read(client: PoolClient, scope: GenerationTaskScope) {
+    // Only W1's genuinely issued current binding can supply this signal.
+    // Nested admission/licence/retrieval reads retain the original caller's
+    // cancellation without constructing a controller or widening authority.
+    const signal = this.identity.originalSignalInTransaction(scope, client);
+    signal?.throwIfAborted();
     await this.identity.authorizeInTransaction(scope, client);
-    await assertGenerationConsumerCustody(client, this.custody);
+    signal?.throwIfAborted();
+    await assertGenerationConsumerCustody(client, this.custody, signal);
+    signal?.throwIfAborted();
     const raw = (
       await client.query<{ facts: unknown }>(
         "SELECT creator.generation_agent_inputs($1,$2) AS facts",
         [scope.generationId, scope.workerToken],
       )
     ).rows[0]?.facts;
+    signal?.throwIfAborted();
     let facts: z.infer<typeof Facts>;
     try {
       facts = Facts.parse(raw);
@@ -320,10 +329,13 @@ export class PreparedGenerationAgentInputs {
         "generation_source_origin_unconfigured",
         "Current content publication and reuse authority is required.",
       );
-      await this.origins.assertCurrent(client, scope, contentOrigins);
+      await this.origins.assertCurrent(client, scope, contentOrigins, signal);
+      signal?.throwIfAborted();
     }
     await this.identity.authorizeInTransaction(scope, client);
-    await assertGenerationConsumerCustody(client, this.custody);
+    signal?.throwIfAborted();
+    await assertGenerationConsumerCustody(client, this.custody, signal);
+    signal?.throwIfAborted();
     return frozen;
   }
 
@@ -334,6 +346,8 @@ export class PreparedGenerationAgentInputs {
     scope: GenerationTaskScope,
   ): Promise<GenerationAgentFacts> {
     const facts = await this.read(client, scope);
+    const signal = this.identity.originalSignalInTransaction(scope, client);
+    signal?.throwIfAborted();
     this.issued.set(facts, { scope, client, hash: contentHash(facts) });
     try {
       const context = Object.freeze({ inputs: this, scope, facts });
@@ -342,7 +356,9 @@ export class PreparedGenerationAgentInputs {
         "license_expired",
         "Current generation-purpose licence authority is required.",
       );
+      signal?.throwIfAborted();
       await this.authorizeInTransaction(facts, scope, client);
+      signal?.throwIfAborted();
       return facts;
     } catch (error) {
       this.issued.delete(facts);
