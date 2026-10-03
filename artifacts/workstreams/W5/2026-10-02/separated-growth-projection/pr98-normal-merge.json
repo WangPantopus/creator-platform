@@ -1,0 +1,26 @@
+{
+  "base": "d91c56c43c61c57b8e1fba8c8b6edb494dcf2a4c",
+  "checkedHead": "ea463d162ccf1be5e68b9dc9f40abefa6768c277",
+  "combinedAndActualMergedTree": "535d3c757158c03cb5214c4e4bc007d9ccbe6b27",
+  "keeperRun": 37020603189,
+  "exactHeadStates": {
+    "android-runtime": "success",
+    "web-and-backend": "success",
+    "web-visual": "queued",
+    "ios-foundation": "queued",
+    "android-foundation": "queued"
+  },
+  "TrustCompile37020602630": "passed on exact head",
+  "compiledBackendPackageConfigScriptTreesUnchanged": true,
+  "webTree": "identical to personally operated/production-built PR150 main",
+  "normalMerge": {
+    "mergeCommit": {
+      "oid": "36f9505eca1315486928694a097b3168097fb345"
+    },
+    "mergedAt": "2026-10-02T14:48:14Z",
+    "state": "MERGED",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/98"
+  },
+  "at": "2026-10-02T14:48:17.211548+00:00",
+  "limits": "Future0069 review queue unactivated; no genuine signed Note, Ops approval or fan isolation accepted. Queued Mac checks not counted passed. No bypass/new tests."
+}

@@ -59,6 +59,11 @@ private struct W3ThreadScreen: View {
                 ScrollViewReader { proxy in
                     ScrollView {
                         LazyVStack(alignment: .leading, spacing: QelvoraTokens.space4) {
+                            if let offerId = model.introOfferId, session.session?.fan != nil, page.feedbackPolicy != nil {
+                                IntroOffer(offerId: offerId, session: session,
+                                    enabled: scenePhase == .active && !privacy && source == nil && originalReply == nil && !model.offline && !model.busy,
+                                    acknowledge: model.acknowledgeIntroOffer).id(offerId)
+                            }
                             Text("Conversations with a creator’s AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.").qText("caption").padding(12).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusMd))
                             if model.offline { Notice(tone: .offline, title: "You're offline", children: "You're seeing a saved conversation with a short reading lease. Reconnect to send.") }
                             if page.offTheRecord { SystemLine(children: "Off the record · the AI keeps no memory from this conversation.") }
@@ -127,7 +132,16 @@ private struct W3ThreadScreen: View {
             .alert("Source unavailable", isPresented: Binding(get: { !sourceFailure.isEmpty }, set: { if !$0 { sourceFailure = "" } })) { SwiftUI.Button("Close") { sourceFailure = "" } } message: { Text(sourceFailure) }
     }
     @ViewBuilder private func row(_ message: W3Message, page: W3Page) -> some View {
-        if message.authorKind == .system { SystemLine(children: message.text) }
+        if message.authorKind == .system {
+            if let destination = message.publicAnswerDestination(creatorId: page.creatorId) {
+                SwiftUI.Button { session.open(destination) } label: {
+                    SystemLine(children: message.text).frame(minHeight: 48).contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(model.offline || scenePhase != .active)
+                .accessibilityLabel("System update: Answered publicly. Open answer")
+            } else { SystemLine(children: message.text) }
+        }
         else if message.recording != nil { recordingRow(message, page: page) }
         else if let correction = message.correction, let original = (model.older + page.messages).first(where: { $0.id == correction.originalMessageId && $0.version == correction.originalVersion && $0.authorKind == .ai }) {
             Correction(aiText: original.text, children: message.text, name: page.creatorName, onVerify: { if let act = message.signedActId { session.open("/verify/" + act) } })

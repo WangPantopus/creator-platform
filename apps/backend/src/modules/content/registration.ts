@@ -100,6 +100,8 @@ export function contentSignedSubjects(
         row,
         document,
       );
+      if (document.planRef)
+        await service.publicationSources.groupPositive(client, actor);
       return publicationCommand(row, document, mediaEvidence);
     },
   };
@@ -223,6 +225,14 @@ export function contentFeature(service: ContentService): FeatureRegistration {
       router.get("/:creatorId/mute", async (req, res) =>
         res.json(
           await service.preference(
+            await actorFor(req),
+            z.uuid().parse(req.params.creatorId),
+          ),
+        ),
+      );
+      router.get("/:creatorId/reply-policy", async (req, res) =>
+        res.json(
+          await service.replyPolicy(
             await actorFor(req),
             z.uuid().parse(req.params.creatorId),
           ),

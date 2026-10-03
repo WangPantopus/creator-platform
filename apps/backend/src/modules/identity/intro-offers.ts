@@ -132,7 +132,7 @@ export class IdentityIntroOffers {
         AND f.thread_id=$2 AND f.creator_id=$3 AND f.fan_id=$4 AND f.rating='helpful'
         AND f.consent_policy_version IS NOT NULL AND f.consented_at IS NOT NULL AND f.expires_at>clock_timestamp()
         AND m.version=f.message_version AND m.agent_version_id=f.agent_version_id AND m.agent_version_hash=f.agent_version_hash
-        AND m.author_kind='ai' AND m.delivery_state IN('delivered','interrupted') AND length(trim(p.intro))=0
+        AND m.author_kind='ai' AND m.delivery_state IN('delivered','interrupted')
        ORDER BY e.created_at,e.id LIMIT 1 FOR SHARE OF e,f,m NOWAIT`,
         [scope.actorAccountId, scope.threadId, scope.creatorId, scope.fanId],
       )
@@ -243,24 +243,12 @@ export class IdentityIntroOffers {
     );
     const prior = existing.rows[0];
     if (prior) {
-      if (
-        fan.filled &&
-        !prior.acknowledged &&
-        prior.kind === "fan_intro_offer"
-      ) {
-        this.database.assertHeldThread(scope, client, "write");
-        await client.query(
-          "INSERT INTO creator.identity_event(account_id,kind,aggregate_id,version) VALUES($1,'fan_intro_offer_acknowledged',$2,1)",
-          [scope.actorAccountId, prior.id],
-        );
-      }
       await this.assertOfferAllowed(scope, client, policy);
-      return Object.freeze({
-        offerId:
-          !fan.filled && prior.kind === "fan_intro_offer" && !prior.acknowledged
-            ? prior.id
-            : null,
-      });
+      // Only an explicit disposition may acknowledge the original offer.
+      // A filled intro can mean a lost Save response, not a dismissed UI.
+      return prior.kind === "fan_intro_offer" && !prior.acknowledged
+        ? this.readPending(scope, client)
+        : Object.freeze({ offerId: null });
     }
     this.database.assertHeldThread(scope, client, "write");
     const event = await client.query<{ id: string }>(
@@ -328,6 +316,12 @@ export class IdentityIntroOffers {
       "Your intro offer is unavailable.",
     );
     if (!result.rows[0]!.acknowledged) {
+      const pending = await this.readPending(scope, client);
+      invariant(
+        pending.offerId === offerId,
+        "intro_offer_unavailable",
+        "Your current intro offer is unavailable. Reopen the original conversation.",
+      );
       this.database.assertHeldThread(scope, client, "write");
       await client.query(
         "INSERT INTO creator.identity_event(account_id,kind,aggregate_id,version) VALUES($1,'fan_intro_offer_acknowledged',$2,1)",

@@ -1,11 +1,14 @@
 import type { Pool, PoolClient } from "pg";
 import {
   assertThreadScope,
+  threadScopeActor,
   type ThreadScope,
 } from "../modules/access/scope.js";
 import { DomainError } from "../core/errors.js";
 import {
   assertCurrentSession,
+  holdCurrentRequestSession,
+  assertHeldCurrentRequestSession,
   requestAuthority,
 } from "../modules/identity/request-authority.js";
 import type {
@@ -21,8 +24,10 @@ export class Database {
     {
       scope: ThreadScope;
       sessionId: string;
+      request: NonNullable<ReturnType<typeof requestAuthority.getStore>>;
       lockMode: ThreadLockMode;
       pending: number;
+      finalizer?: () => Promise<void>;
     }
   >();
   constructor(
@@ -51,6 +56,8 @@ export class Database {
     if (
       binding?.scope !== scope ||
       !request ||
+      request !== binding.request ||
+      request.actor !== threadScopeActor(scope) ||
       request.sessionId !== binding.sessionId ||
       request.accountId !== scope.actorAccountId ||
       (lockMode !== undefined && binding.lockMode !== lockMode)
@@ -74,6 +81,27 @@ export class Database {
     } finally {
       binding.pending--;
     }
+  }
+  /** Lifecycle ordering only; this creates no domain/signature permission.
+   * Register the actual owner gate inside the original held callback. Ordinary
+   * session checks and all business work finish first; after the awaited gate,
+   * Database executes only COMMIT (or ROLLBACK on refusal). One last gate per
+   * transaction prevents a later registration from replacing an owner's gate.
+   */
+  finalizeHeldThreadBeforeCommit(
+    scope: ThreadScope,
+    client: PoolClient,
+    finalizer: () => Promise<void>,
+  ): void {
+    this.assertHeldThread(scope, client);
+    const binding = this.held.get(client)!;
+    if (binding.finalizer || typeof finalizer !== "function")
+      throw new DomainError(
+        "held_finalizer_conflict",
+        "Finish this conversation through its original final gate.",
+        503,
+      );
+    binding.finalizer = finalizer;
   }
   async assertRuntimeRole(): Promise<void> {
     const result = await this.pool.query<{
@@ -114,6 +142,7 @@ export class Database {
     lockMode: ThreadLockMode = "write",
   ): Promise<T> {
     assertThreadScope(scope);
+    const actor = threadScopeActor(scope);
     if (lockMode !== "read" && lockMode !== "write")
       throw new DomainError(
         "thread_lock_invalid",
@@ -132,6 +161,15 @@ export class Database {
         "SELECT set_config('app.creator_id',$1,true), set_config('app.fan_id',$2,true), set_config('app.account_id',$3,true)",
         [scope.creatorId, scope.fanId, scope.actorAccountId],
       );
+      const heldRequest = requestAuthority.getStore()
+        ? await holdCurrentRequestSession(client, actor.accountId)
+        : null;
+      if (heldRequest && heldRequest.actor !== actor)
+        throw new DomainError(
+          "thread_request_actor_changed",
+          "Reopen this conversation with your current account.",
+          401,
+        );
       await assertCurrentSession(client, scope.actorAccountId);
       const authoritySql = `SELECT f.account_id AS fan_account_id FROM creator.thread t JOIN creator.creator_profile c ON c.id=t.creator_id JOIN creator.fan_profile f ON f.id=t.fan_id
          WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 AND c.account_id=$6 AND t.deleted_at IS NULL AND (
@@ -163,7 +201,7 @@ export class Database {
           );
         try {
           await this.assertAllowedInTransaction(
-            { accountId: scope.actorAccountId, adultEligible: true },
+            actor,
             scope.creatorId,
             scope.threadId,
             {
@@ -178,6 +216,8 @@ export class Database {
             [scope.creatorId, scope.fanId, scope.actorAccountId],
           );
         }
+        if (heldRequest)
+          await assertHeldCurrentRequestSession(heldRequest, client);
       }
       // Issued scopes and the earlier metadata snapshot are not durable positive
       // authority. Revalidate the actual family/role under its row lease.
@@ -266,15 +306,12 @@ export class Database {
             404,
           );
       }
-      await this.assertAllowed?.(
-        { accountId: scope.actorAccountId, adultEligible: true },
-        scope.creatorId,
-        scope.threadId,
-        {
-          fanAccountId: authority.rows[0]!.fan_account_id,
-          creatorAccountId: scope.creatorAccountId,
-        },
-      );
+      await this.assertAllowed?.(actor, scope.creatorId, scope.threadId, {
+        fanAccountId: authority.rows[0]!.fan_account_id,
+        creatorAccountId: scope.creatorAccountId,
+      });
+      if (heldRequest)
+        await assertHeldCurrentRequestSession(heldRequest, client);
       // Instrument the actual SQL method, so a future assembler query cannot omit its family predicate silently.
       const scopedClient = this.observeQuery
         ? new Proxy(client, {
@@ -295,6 +332,7 @@ export class Database {
         this.held.set(scopedClient, {
           scope,
           sessionId: request.sessionId,
+          request,
           lockMode,
           pending: 0,
         });
@@ -307,6 +345,19 @@ export class Database {
             "Finish the authorized conversation work before commit.",
             503,
           );
+        if (heldRequest)
+          await assertHeldCurrentRequestSession(heldRequest, client);
+        const finalizer = this.held.get(scopedClient)?.finalizer;
+        if (finalizer) {
+          await finalizer();
+          // JS-only unfinished-work check; no SQL or GUC follows the last gate.
+          if ((this.held.get(scopedClient)?.pending ?? 0) !== 0)
+            throw new DomainError(
+              "held_work_pending",
+              "Finish the authorized final gate before commit.",
+              503,
+            );
+        }
       } finally {
         this.held.delete(scopedClient);
       }

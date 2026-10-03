@@ -7,27 +7,68 @@ import type {
   TranslationJobBinding,
 } from "./provider-usage.js";
 
+const Hash = z.string().regex(/^[a-f0-9]{64}$/u);
+
+/** These fields describe the actual original. Parsing them is never a
+ * substitute for W3's held source read, W1's signed-act authority or a current
+ * authenticated team membership. Team authors cannot claim a creator act. */
+export const HumanTranslationProvenance = z
+  .discriminatedUnion("kind", [
+    z.strictObject({
+      kind: z.literal("creator_signed"),
+      authorKind: z.enum([
+        "human_creator",
+        "approved_draft",
+        "human_broadcast",
+      ]),
+      authorAccountId: z.uuid(),
+      signedActId: z.uuid(),
+      signedContentHash: Hash,
+      signedActType: z.enum([
+        "reply",
+        "approved_draft",
+        "broadcast",
+        "correction",
+      ]),
+      signedSubjectId: z.uuid(),
+      approvalId: z.uuid().nullable(),
+    }),
+    z.strictObject({
+      kind: z.literal("team_authenticated"),
+      authorKind: z.literal("team"),
+      authorAccountId: z.uuid(),
+    }),
+  ])
+  .superRefine((source, context) => {
+    if (
+      source.kind === "creator_signed" &&
+      ((source.authorKind === "approved_draft") !==
+        (source.approvalId !== null) ||
+        (source.authorKind === "approved_draft" &&
+          source.signedActType !== "approved_draft") ||
+        (source.authorKind === "human_broadcast" &&
+          source.signedActType !== "broadcast") ||
+        (source.authorKind === "human_creator" &&
+          !["reply", "correction"].includes(source.signedActType)))
+    )
+      context.addIssue({
+        code: "custom",
+        message: "The exact original authorship, approval and act must match.",
+      });
+  });
+
 export const HumanTranslationOriginal = z.strictObject({
   messageId: z.uuid(),
   /** Immutable source message.version, not the thread's control revision. */
   version: z.number().int().positive(),
-  authorKind: z.enum([
-    "human_creator",
-    "approved_draft",
-    "team",
-    "human_broadcast",
-  ]),
   text: z.string().min(1).max(10000),
-  signedAct: z.strictObject({
-    id: z.uuid(),
-    contentHash: z.string().regex(/^[a-f0-9]{64}$/u),
-    authorAccountId: z.uuid(),
-  }),
+  sourceProvenance: HumanTranslationProvenance,
 });
 export type HumanTranslationOriginal = z.infer<typeof HumanTranslationOriginal>;
-/** W3 verifies the genuine W1 signed act, current purpose/processor consent,
- * readable immutable message and scope/control barriers on this SAME client.
- * It supplies no HTTP-selected original, signature or authority. */
+/** W3 verifies the actual creator act or authenticated team author, current
+ * purpose/processor consent, readable immutable message and scope/control
+ * barriers on this SAME client. It supplies no HTTP-selected original,
+ * signature, team membership or authority. */
 export interface HumanTranslationSourcePort {
   currentInTransaction(
     scope: ThreadScope,

@@ -1,0 +1,12 @@
+{
+  "source": "be479e3b0b7ec2499654231e26cec837195eb403",
+  "files": {
+    "generation-worker.log": "a0aea0a4c9de3274a19fc1e9c9be30801b383c97286f7371e856e0848da1190e",
+    "purpose-observation.json": "52ab4c034ca3865ff44b442ef1cf3552e74758175f9edaf694beb25819db84a1",
+    "purpose.log": "59b40b5fc32c7f18fc132ef4cebb38f78ba5d7244baa9596bf407ac2fadaeb24",
+    "run.md": "6a2fbf129599360976fa3b6951bb178ef54cfd520474b55d200304cf6d447844",
+    "supervised.json": "9417039ed4e123e3e254c177894f6961d8691cf2f2709fcafe58d26fbe267717"
+  },
+  "unitTestsWritten": false,
+  "positiveFactoryQualification": false
+}

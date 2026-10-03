@@ -738,6 +738,50 @@
         }
       }
     },
+    "Membership · at least {days} continuous days": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Membership · at least {days} continuous days"
+          }
+        }
+      }
+    },
+    "{used} / {limit} characters": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{used} / {limit} characters"
+          }
+        }
+      }
+    },
+    "This draft is over your current limit. Shorten it to send; your words are kept.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This draft is over your current limit. Shorten it to send; your words are kept."
+          }
+        }
+      }
+    },
+    "Current membership recognition is unavailable. The reply limit stays at 4,000 characters.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Current membership recognition is unavailable. The reply limit stays at 4,000 characters."
+          }
+        }
+      }
+    },
     "Paid partnership: {name} is paid by {brand}.": {
       "extractionState": "manual",
       "localizations": {
@@ -10546,6 +10590,501 @@
           "stringUnit": {
             "state": "translated",
             "value": "Lowering a limit is immediate."
+          }
+        }
+      }
+    },
+    "Signature verification": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signature verification"
+          }
+        }
+      }
+    },
+    "Choose your handle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose your handle"
+          }
+        }
+      }
+    },
+    "Edit public profile": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit public profile"
+          }
+        }
+      }
+    },
+    "Tell creators’ AIs about yourself once": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tell creators’ AIs about yourself once"
+          }
+        }
+      }
+    },
+    "Add a short intro in your own words. You choose, per creator, whether their AI may use it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add a short intro in your own words. You choose, per creator, whether their AI may use it."
+          }
+        }
+      }
+    },
+    "A line about you · optional": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A line about you · optional"
+          }
+        }
+      }
+    },
+    "Save intro": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save intro"
+          }
+        }
+      }
+    },
+    "Skip": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip"
+          }
+        }
+      }
+    },
+    "Finish": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finish"
+          }
+        }
+      }
+    },
+    "Your intro is saved. Reconnect to finish dismissing this offer.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your intro is saved. Reconnect to finish dismissing this offer."
+          }
+        }
+      }
+    },
+    "Your choice is kept on this screen. Reconnect to finish dismissing this offer.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your choice is kept on this screen. Reconnect to finish dismissing this offer."
+          }
+        }
+      }
+    },
+    "Your intro could not be saved. Your input is kept. Reconnect and try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your intro could not be saved. Your input is kept. Reconnect and try again."
+          }
+        }
+      }
+    },
+    "This offer could not be dismissed. Reconnect and try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This offer could not be dismissed. Reconnect and try again."
+          }
+        }
+      }
+    },
+    "Finishing…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finishing…"
+          }
+        }
+      }
+    },
+    "Content status": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Content status"
+          }
+        }
+      }
+    },
+    "Checking current access. Your input is kept during a connection interruption.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking current access. Your input is kept during a connection interruption."
+          }
+        }
+      }
+    },
+    "Check current access": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check current access"
+          }
+        }
+      }
+    },
+    "This content is unavailable. Check current access to try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This content is unavailable. Check current access to try again."
+          }
+        }
+      }
+    },
+    "Content could not be refreshed. Reconnect and check current access. Your input is kept.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Content could not be refreshed. Reconnect and check current access. Your input is kept."
+          }
+        }
+      }
+    },
+    "We could not confirm this action. Check current access before retrying. Your input is kept.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We could not confirm this action. Check current access before retrying. Your input is kept."
+          }
+        }
+      }
+    },
+    "Your session ended. Continue with Pantopus again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your session ended. Continue with Pantopus again."
+          }
+        }
+      }
+    },
+    "The signed-in account changed. Refresh before continuing.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The signed-in account changed. Refresh before continuing."
+          }
+        }
+      }
+    },
+    "This changed while you were viewing it. Refresh before trying again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This changed while you were viewing it. Refresh before trying again."
+          }
+        }
+      }
+    },
+    "This retry differs from the earlier action. Refresh before trying again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This retry differs from the earlier action. Refresh before trying again."
+          }
+        }
+      }
+    },
+    "This reply was withdrawn. It cannot be shared again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This reply was withdrawn. It cannot be shared again."
+          }
+        }
+      }
+    },
+    "Set up your fan profile before continuing.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set up your fan profile before continuing."
+          }
+        }
+      }
+    },
+    "Check your reply and sharing choices before trying again. Your input is kept.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check your reply and sharing choices before trying again. Your input is kept."
+          }
+        }
+      }
+    },
+    "Back to reply": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back to reply"
+          }
+        }
+      }
+    },
+    "The complete reply is split into labeled images when needed. Multiple images download together as a ZIP, with a complete text copy.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The complete reply is split into labeled images when needed. Multiple images download together as a ZIP, with a complete text copy."
+          }
+        }
+      }
+    },
+    "Preparing images…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparing images…"
+          }
+        }
+      }
+    },
+    "Prepared {page} images…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepared {page} images…"
+          }
+        }
+      }
+    },
+    "Page {page}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Page {page}"
+          }
+        }
+      }
+    },
+    "Your download is ready. Check your browser’s downloads.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your download is ready. Check your browser’s downloads."
+          }
+        }
+      }
+    },
+    "The complete image export could not be prepared. Retry, or download the complete text.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The complete image export could not be prepared. Retry, or download the complete text."
+          }
+        }
+      }
+    },
+    "This week: {people} people helped and {thanks} thanks.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This week: {people} people helped and {thanks} thanks."
+          }
+        }
+      }
+    },
+    "You've reached {percent}% of your monthly limit.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You've reached {percent}% of your monthly limit."
+          }
+        }
+      }
+    },
+    "Your call": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your call"
+          }
+        }
+      }
+    },
+    "Checking the booking and your current access…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking the booking and your current access…"
+          }
+        }
+      }
+    },
+    "This call could not be opened. Retry, or open Requests to check its current status.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This call could not be opened. Retry, or open Requests to check its current status."
+          }
+        }
+      }
+    },
+    "Development identity": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Development identity"
+          }
+        }
+      }
+    },
+    "Synthetic local account. Pantopus production sign-in is not connected.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synthetic local account. Pantopus production sign-in is not connected."
+          }
+        }
+      }
+    },
+    "Request verification review": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Request verification review"
+          }
+        }
+      }
+    },
+    "Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified."
+          }
+        }
+      }
+    },
+    "Calling is not connected yet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calling is not connected yet."
+          }
+        }
+      }
+    },
+    "Human call": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Human call"
           }
         }
       }

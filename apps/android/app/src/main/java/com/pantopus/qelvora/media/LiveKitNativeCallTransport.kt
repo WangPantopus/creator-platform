@@ -25,6 +25,8 @@ class LiveKitNativeCallTransport(context: Context, private val sessionId: UUID) 
     private val context = context.applicationContext
     private val events = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private var room: Room? = null
+    private val controls = mutableSetOf<Deferred<Unit>>()
+    private var draining: Deferred<Unit>? = null
     private var epoch = 0
     private var cameraAllowed = false
     private var collector: Job? = null
@@ -83,12 +85,30 @@ class LiveKitNativeCallTransport(context: Context, private val sessionId: UUID) 
             throw error
         }
     }
-    override suspend fun microphone(enabled: Boolean) { check(room?.localParticipant?.setMicrophoneEnabled(enabled) == true) }
-    override suspend fun camera(enabled: Boolean) { check(cameraAllowed); check(room?.localParticipant?.setCameraEnabled(enabled) == true) }
+    private suspend fun control(enabled: Boolean, camera: Boolean) {
+        val current = room ?: error("Call media disconnected")
+        check(!camera || cameraAllowed)
+        val generation = epoch
+        val task = events.async(start = CoroutineStart.LAZY) {
+            check(if (camera) current.localParticipant.setCameraEnabled(enabled) else current.localParticipant.setMicrophoneEnabled(enabled))
+        }
+        controls.add(task); task.start()
+        try { task.await(); currentCoroutineContext().ensureActive(); check(generation == epoch && room === current) }
+        finally { task.cancel(); controls.remove(task) }
+    }
+    override suspend fun microphone(enabled: Boolean) = control(enabled, false)
+    override suspend fun camera(enabled: Boolean) = control(enabled, true)
+    internal suspend fun disconnectAndDrain() { disconnect(); draining?.await() }
     override fun disconnect() {
         epoch++; collector?.cancel(); collector = null
         val current = room; room = null; video = null; remote.clear(); cameraAllowed = false
         renderers.keys.toList().forEach { releaseRenderer(it) }
-        current?.disconnect(); current?.release()
+        val pending = controls.toList(); controls.clear(); pending.forEach { it.cancel() }
+        val prior = draining
+        draining = events.async(NonCancellable) {
+            prior?.await()
+            pending.forEach { try { it.await() } catch (_: CancellationException) {} }
+            current?.disconnect(); current?.release()
+        }
     }
 }

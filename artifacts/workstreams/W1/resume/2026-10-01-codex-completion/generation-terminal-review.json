@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-02T13:05:28.082013+00:00",
+  "sourceParent": "61db88ebba0ddcd420fa4e49144b77033dfc7dbd",
+  "sourceFiles": {
+    "apps/backend/src/modules/identity/generation-terminal.ts": "ce0cf0af5eb29ab87dcb319fa345586025cc82d29468df9ab39472dfc87add1f",
+    "apps/backend/src/modules/identity/schema-generation-terminal.sql": "fadbf62a3ddf06142c3a6ad30313503f9bebe7b6d64f67f8ba01ff13ce2398c7",
+    "apps/backend/src/modules/identity/generation-scope.ts": "eebec15d06b7e611c7c8b1ebb2bf76fa7de09c09ab0c8dfb16b8be3a3c751f7e"
+  },
+  "migration": "0099_w1_generation_terminal_scope",
+  "activation": "held; not in canonical registry or ledger",
+  "reviewEnvironment": {
+    "container": "creator-platform-w1-purpose-review-20261002",
+    "database": "creator_w1_review_revision8",
+    "postgresMajor": 17,
+    "canonicalMigrations": 57,
+    "hostPorts": 0,
+    "businessGenerations": 0,
+    "retainedReadScopes": 0,
+    "retainedTerminalScopes": 0,
+    "terminalOrDenialActivationReceipts": 0,
+    "traffic": "isolated empty database, real worker TCP password probes under temporary CONNECTION LIMIT 1; returned to CONNECTION LIMIT 0"
+  },
+  "functionDefinitionChecksums": {
+    "creator.begin_generation_terminal(uuid,uuid,text,uuid,integer,boolean)": "b2631b4b917f2406fff50fb5beaaab8d0eb96e9512534d251d56ffb4e363b691",
+    "creator.capture_generation_terminal()": "b61df43e7edd74a33f80be0965169c4295c739d0364c18d017f48a86aa6283c4",
+    "creator.end_generation_terminal()": "ce3e9f466d859d7f46091b601bbd0b84357a9ee2a3157a3ca3e8e39f75a1aacc",
+    "creator.generation_terminal_matches(uuid,uuid,boolean)": "c3f8423b34d38f4f5fdb74804ecffd7b4aa659d243d50a0524be88318ff6c8ad",
+    "creator.pending_generation_terminals(integer)": "34fdf0905679881077e5e1479649781a15335e6ce4a4dc90ba7d2839b82f53be",
+    "creator.require_generation_terminal_cleanup()": "c9df9677830afe0e1d6b2ac33ec3efd288319bdc909a5eb381946987b5bdcd62"
+  },
+  "actualWorkerProbes": [
+    {
+      "case": "actual_worker_empty_terminal",
+      "passed": true,
+      "exitCode": 0,
+      "output": "BEGIN\nt\n0\nt\nt\n\nCOMMIT"
+    },
+    {
+      "case": "private_body_denied",
+      "passed": true,
+      "exitCode": 3,
+      "output": null
+    },
+    {
+      "case": "private_terminal_ledger_denied",
+      "passed": true,
+      "exitCode": 3,
+      "output": null
+    },
+    {
+      "case": "bounded_discovery_denied",
+      "passed": true,
+      "exitCode": 3,
+      "output": null
+    }
+  ],
+  "catalogueQuery": {
+    "planning": "passed",
+    "unactivatedReadiness": false
+  },
+  "checks": {
+    "backendTypes": "passed",
+    "scopedESLint": "passed",
+    "scopedPrettier": "passed",
+    "databaseSpecificRoleConfiguration": "factory rejects global/current-database role settings; catalogue query replanned"
+  },
+  "failures": [
+    "Initial return flow after mapping retryable database errors failed TS2366; explicit never return corrected, subsequent types pass.",
+    "Initial proposal used completed_at >= scope clock time; corrected before final review install to transaction_timestamp() <= completed_at <= clock_timestamp(), preserving actual same-transaction now()."
+  ],
+  "limitations": [
+    "No business fixture or fake denial helper was introduced.",
+    "No actual original-generation terminal, provider cost/journal/reservation, revocation race or positive purpose activation is accepted.",
+    "W8 exact0100 denial definition and original W2/W3/W4 consumers/settlement assertion remain required.",
+    "Owned retained40 app database/runtime is unchanged."
+  ],
+  "timings": {
+    "measured": false
+  }
+}

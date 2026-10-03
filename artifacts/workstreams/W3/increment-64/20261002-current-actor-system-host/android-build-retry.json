@@ -1,0 +1,22 @@
+{
+  "source": "7327e6460d305f5a7d021b97bf9594b31577da90",
+  "operation": "android shipping build",
+  "command": [
+    "node",
+    "/private/tmp/w3-heavy-build-lock.mjs",
+    "--owner",
+    "W3 increment64 7327e646 android",
+    "--",
+    "./gradlew",
+    ":app:assembleDebug",
+    "--no-daemon",
+    "--max-workers=3",
+    "-Pandroid.sdkDownload=false",
+    "-PcreatorBuildDir=/Users/yingpengwang/Library/Caches/creator-platform-w3/android-build"
+  ],
+  "startedAt": "2026-10-02T19:20:08.513427+00:00",
+  "pid": 38064,
+  "exitCode": 0,
+  "completedAt": "2026-10-02T19:20:44.489041+00:00",
+  "logSHA256": "826f241aa0ceb04e6af6fe62e624b7eaed76649bd652244ab960a252e2242795"
+}

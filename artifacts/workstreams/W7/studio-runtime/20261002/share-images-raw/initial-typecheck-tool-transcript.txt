@@ -1,0 +1,10 @@
+Transcribed verbatim from personal tool output; not a direct command log. Initial typecheck and production typegen left an obsolete development validator.
+
+.next/dev/types/validator.ts(683,39): error TS2307: Cannot find module '../../../app/share/[id]/image/route.js' or its corresponding type declarations.
+.next/types/validator.ts(683,39): error TS2307: Cannot find module '../../app/share/[id]/image/route.js' or its corresponding type declarations.
+
+Generating route types...
+✓ Types generated successfully
+.next/dev/types/validator.ts(683,39): error TS2307: Cannot find module '../../../app/share/[id]/image/route.js' or its corresponding type declarations.
+
+The stopped development validator directory was archived to the owned private pre-image-dev-types directory; fresh production types/build passed. No source check or contract was loosened.

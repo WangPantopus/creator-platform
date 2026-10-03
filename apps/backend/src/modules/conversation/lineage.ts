@@ -8,6 +8,7 @@ import type { ConversationRecordings } from "./recordings.js";
 import type { ConversationLineageProjection } from "./lineage-projection.js";
 import { IdentityIntroOffers } from "../identity/intro-offers.js";
 import { writeConversationExportRows } from "./privacy-export-rows.js";
+import { IdentityIntroOffers } from "../identity/intro-offers.js";
 import { IdSchema } from "@qelvora/api";
 import {
   ConversationMessageSchema,

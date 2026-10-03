@@ -1,5 +1,24 @@
 # Trust operation and recovery
 
+## Actual development61 checkpoint and restore — 2026-10-02
+
+[Real three-client privacy and independent saved-state/restore receipt](../../artifacts/workstreams/W8/privacy-domain-integration/20261002-mac-studio/app-acceptance/README.md) qualifies the labelled synthetic increment only. Source5057343a completes Trust/identity/media and genuine empty-fan Agent; other four domains remain blocked and no download is offered. Own API/web/devices/container are stopped; private checkpoint is retained. Source and separate restored database `creator_w8_privacy61_app_20261002` / `creator_w8_privacy61_app_restore_20261002` are owner-closed with connection limit0. Their61 history/153 rows/schema/roles/security/sequence match after exact original owner-ACL representation replay. Original iMac recovery/journal, managed Growth configuration, real purge/expiry, provider/hardware/policy/release acceptance remain open.
+
+PostgreSQL17 pg_dump can restore the isolated0087/0103 scope tables with implicit default owner ACLs instead of the source's explicit owner ACL. The first raw-schema mismatch must be preserved as a failed qualification. Do not relax catalog guards or edit pg_catalog. Only after independently proving that these **two empty private scope tables' same-owner ACL representation is the sole difference**, replay supported `GRANT ALL PRIVILEGES` as each exact isolated owner on its own scope table, with the target closed/no other clients. Independently compare the complete catalog, data/history/role/effective-security/sequence again. Any other difference refuses; no public/runtime/worker grant, closure removal or traffic-ready claim. The actual scratch operator/metadata and dumps remain private outside Git. The first888.254s interval includes restore/custody inspection, not an original-data RTO or WAL RPO.
+
+
+
+## Closed privacy continuation — 2026-10-02 (draft)
+
+The reviewed candidate is `infra/migrations/waves/20261002-privacy.json`: exact canonical57 plus0074/0082/0087/0103, in ascending order and one transaction. Select `W8_MIGRATION_WAVE=20261002-privacy` with the same private backup/manifest and separate administrator requirements below. The operator accepts only this four-purpose continuation. It checks original denial/media role custody plus three additional fixed function definitions/ACLs, eight extra metadata columns/two policies, and the shared complete0087/0103 private-role/scope/trigger catalogue guards. Administrator-selected session identities are catalogue review only; they never substitute for actual worker password login, lease, signal, COMMIT or application acceptance. Preexisting unregistered role/object capabilities refuse. Private scopes must have the exact types/nullability/primary-key/deferred-trigger shape and be empty. Original SQL bytes/57 history remain unchanged.
+
+[Actual closed synthetic backup, separate restore,57→61 upgrade, fresh61 and20 rolled-back drift refusals](../../artifacts/workstreams/W8/migration-continuation/20261002-mac-studio/README.md) qualify the SQL operator only. All review/upgrade/restore/fresh targets remain closed. Main and peer databases are not activated by this receipt. Real web/Android/iOS, genuine task/expiry/COMMIT, each owner's fresh/preserved-upgrade, all-eight C10 and original recovery are still required. For a preserved canonical40 source, use the previously approved initial57 revision/operator first; this continuation requires the entire57 baseline and does not bypass the initial guard or invent history.
+
+All47 unfinished reservations are metadata-only moved to0151–0197 in `infra/migrations/waves/20261002-privacy-held.json`; source paths/bytes, old SQL filenames and existing applied history remain unchanged. The initial split map was superseded after W1 found dependent issuers before their moved tables. Original0083/0111/0112 are now0168/0194/0195, original0113 is0196, and original0150 single-call metadata is0197. Original0099/0100/0105/0106 are0183/0184/0188/0189; late accounting0183+0188 feeds0190 subject→0191 negatives→0192 financial correction. Owners must review the exact complete map and actual source purpose/version; unknown additional DDL dependencies still need review before activation. Allocation is not permission or source approval. Canonical0087 private owner/ACL are not widened.
+
+
+Preserved targets follow [the R6 reconciliation procedure](W8-preserved-reconciliation.md). `scripts/reconcile-restored-trust.ts` inventories an actual named/owner-closed target read-only and always returns trafficReady false. It does not clear closure, issue provider effects or certify all eight domains.
+
 ## Simulator credential custody
 
 Build a launched iOS simulator app normally under the shared heavy-build guard, with `CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=-`. Disabling signing can compile but omit Xcode's actual simulated `application-identifier` entitlement, causing canonical complete200 followed by Keychain failure and no authenticated session. Merely ad-hoc resigning that binary does not restore the omitted simulated entitlement. Verify the normally built shipping app through actual sign-in/cold return and saved backend state. No production signing key is fabricated by this simulator build.
@@ -13,8 +32,6 @@ Stop the target's applications/workers, owner-close its database marker, set `CO
 
 [Current synthetic rehearsal](../../artifacts/workstreams/W8/migration-wave/20261002-mac-studio/README.md) is SQL verification only. It is not original preserved-data recovery. The default fresh runner remains `scripts/migrate-trust.ts`; it refuses any existing ledger with pending wave migrations, which must use the private-backup atomic operator. Exact initial purpose-role custody is checked before/after both paths. Fresh empty install and fully applied verification remain available.
 
-
-<!-- Earlier source and operation notes retained as dated history. -->
 
 Optional local request-role composition: keep core `creator_runtime` by default. `TRUST_CORE_DATABASE_ROLE` must exactly match the URL username of an explicitly provisioned LOGIN INHERIT role with only `creator_runtime,growth_runtime` memberships, no direct domain relation/column/function grants and no owner/worker/admin attributes or reachable memberships. Same exact loopback database and separate Trust runtime/worker URLs remain required. `runtime-composite.env` and disabled negative-probe `runtime-unsafe-composite.env` are private0600 W8 profiles; never print them. W1's root design instead uses a separate `GROWTH_API_DATABASE_URL` for Growth/Content and keeps its core NOINHERIT. [Actual receipt](../../artifacts/workstreams/W8/development-trust/20261002-composite/README.md).
 
