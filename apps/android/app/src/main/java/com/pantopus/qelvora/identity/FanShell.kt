@@ -190,10 +190,20 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         finally { busy = false }
     }
     suspend fun saveHandle(handle: String, intro: String) {
-        if (busy) return; val client = api ?: return; busy = true
-        try { client.saveFanProfile(APIFanProfileInput(handle, intro)); refresh(); if (session?.fan != null && destination == "/onboarding/handle") destination = "/you" }
+        val capture = captureRequest(destination, maximumResponseBytes = 65_536, timeoutMs = 10_000) ?: return
+        if (!capture.isCurrent() || busy) return
+        busy = true
+        try {
+            if (!capture.isCurrent()) return
+            capture.client.saveFanProfile(APIFanProfileInput(handle, intro))
+            if (!capture.isCurrent()) return
+            refresh()
+            if (capture.isCurrent() && session?.fan != null && destination == "/onboarding/handle") destination = "/you"
+        }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-        catch (failure: Exception) { error = message(failure) }
+        catch (failure: Exception) {
+            if (capture.isCurrent()) error = if (failure is CreatorAPIError) message(failure) else QelvoraCopy.text(if (failure is kotlinx.serialization.SerializationException) "identityInputKeptUnreadable" else "identityInputKeptUnavailable")
+        }
         finally { busy = false }
     }
     /** Preserves the current handle and never writes using a switched credential. */
