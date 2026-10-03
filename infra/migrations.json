@@ -959,6 +959,23 @@
       "path": "apps/backend/migrations/0207_w8_development_feedback_lifecycle.sql",
       "state": "reserved_unapplied",
       "reason": "Development-only finite feedback/IntroOffer expiry and actual withdrawal proposal following human authorization for necessary product policy. Exact notice/version, fixed seven-day feedback/event lifecycle, isolated NoLogin expiry/withdrawal role and original held W1/W3 callback contract require source/owner/C10 review and real saved-state acceptance. No invented fan consent, marketing/training/provider use, production/legal approval or expiry of unclassified historical identity events. Allocation only; source not yet implemented."
+    },
+    {
+      "id": "0208",
+      "owner": "W1",
+      "version": "0208_w1_publication_preparation",
+      "path": "apps/backend/src/modules/identity/schema-publication-preparation.sql",
+      "state": "reserved_unapplied",
+      "reason": "Actual W1 early private preparation before publication task/body/positive creator or key locks; original task/token/client/PID/fullXID and original publication-worker scope nonce, joint W4/W1 final SQL cleanup before only COMMIT. Exact owner source and signatures pending; no fabricated actor/session, old-scope bridge, provider grant or activation."
+    },
+    {
+      "id": "0209",
+      "owner": "W8",
+      "version": "0209_w8_all_scope_privacy_ownership",
+      "path": "apps/backend/migrations/0209_w8_all_scope_privacy_ownership.sql",
+      "sourceSha256": "6fa4006cb8c2f6901c7006595d08196573daef33f06aa6cec866a546ffcd2f01",
+      "state": "reserved_unapplied",
+      "reason": "Additive original0027 ownership constraint continuation and isolated metadata-only registered-source readiness. New verified jobs capture immutable full original ownership for every scope. Original0027/0087 bytes, roles and history stay unchanged; old NULL snapshots fail closed. Actual held non-account family projection is a separate pending purpose; closed SQL/catalogue review and actual unavailable web acceptance do not activate this source or qualify full C10."
     }
   ]
 }

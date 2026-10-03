@@ -1054,12 +1054,87 @@ data class APICallAvailabilityViewValueWindowsItem(
 )
 
 @Serializable
+data class APICallCallAdmission(
+  val `token`: String,
+  val `url`: String,
+  val `nonce`: String,
+  val `sessionId`: String,
+  val `accountId`: String,
+  val `expiresAt`: String,
+  val `role`: APICallCallAdmissionRole
+)
+
+@Serializable
+enum class APICallCallAdmissionRole {
+  @SerialName("creator") CREATOR,
+  @SerialName("fan") FAN
+}
+
+@Serializable
 enum class APICallCallConsentPurpose {
   @SerialName("recording") RECORDING,
   @SerialName("summary") SUMMARY,
   @SerialName("content_reuse") CONTENT_REUSE,
   @SerialName("ai_source") AI_SOURCE
 }
+
+@Serializable
+data class APICallCallOffer(
+  val `id`: String,
+  val `commitmentId`: String,
+  val `version`: Long,
+  val `creatorTimeZone`: String,
+  val `fanTimeZone`: String,
+  val `expiresAt`: String,
+  val `state`: APICallCallOfferState,
+  @Required
+  val `selectedSessionId`: String? = null,
+  val `slots`: List<APICallCallOfferSlotsItem>
+)
+
+@Serializable
+enum class APICallCallOfferState {
+  @SerialName("offered") OFFERED,
+  @SerialName("selected") SELECTED,
+  @SerialName("expired") EXPIRED,
+  @SerialName("cancelled") CANCELLED
+}
+
+@Serializable
+data class APICallCallOfferSlotsItem(
+  val `id`: String,
+  val `startsAt`: String
+)
+
+typealias APICallCallOffers = List<APICallCallOffersValueItem>
+
+@Serializable
+data class APICallCallOffersValueItem(
+  val `id`: String,
+  val `commitmentId`: String,
+  val `version`: Long,
+  val `creatorTimeZone`: String,
+  val `fanTimeZone`: String,
+  val `expiresAt`: String,
+  val `state`: APICallCallOffersValueItemState,
+  @Required
+  val `selectedSessionId`: String? = null,
+  val `slots`: List<APICallCallOffersValueItemSlotsItem>
+)
+
+@Serializable
+enum class APICallCallOffersValueItemState {
+  @SerialName("offered") OFFERED,
+  @SerialName("selected") SELECTED,
+  @SerialName("expired") EXPIRED,
+  @SerialName("cancelled") CANCELLED
+}
+
+@Serializable
+data class APICallCallOffersValueItemSlotsItem(
+  val `id`: String,
+  val `startsAt`: String
+)
 
 @Serializable
 data class APICallCallRevision(
@@ -1073,6 +1148,147 @@ data class APICallCallRoute(
   val `creatorId`: String,
   val `fanId`: String
 )
+
+@Serializable
+data class APICallCallSession(
+  val `id`: String,
+  val `commitmentId`: String,
+  val `threadId`: String,
+  val `creatorId`: String,
+  val `fanId`: String,
+  val `creatorName`: String,
+  val `creatorAccountId`: String,
+  val `fanAccountId`: String,
+  val `mediaMode`: APICallCallSessionMediaMode,
+  val `scheduledAt`: String,
+  val `hardEndAt`: String,
+  val `durationSeconds`: Long,
+  val `graceSeconds`: Long,
+  val `reconnectBudgetSeconds`: Long,
+  val `connectedMilliseconds`: Long,
+  val `reconnectUsedMilliseconds`: Long,
+  val `reconnectExhaustedAt`: String? = null,
+  val `state`: APICallCallSessionState,
+  val `version`: Long,
+  val `serverNow`: String,
+  val `present`: List<APICallCallSessionPresentItem>,
+  val `recordingState`: APICallCallSessionRecordingState,
+  val `consents`: List<APICallCallSessionConsentsItem>,
+  @Required
+  val `outcome`: APICallCallSessionOutcome? = null,
+  val `reconciliation`: APICallCallSessionReconciliation,
+  val `conversationEpoch`: Long? = null,
+  val `packet`: APICallCallSessionPacket,
+  @Required
+  val `summary`: String? = null,
+  val `creatorSummaryNote`: String? = null,
+  val `summaryState`: APICallCallSessionSummaryState? = null,
+  val `summaryRevision`: Long? = null,
+  val `summarySources`: APICallCallSessionSummarySources? = null,
+  val `recordingOccurred`: Boolean? = null
+)
+
+@Serializable
+enum class APICallCallSessionMediaMode {
+  @SerialName("audio") AUDIO,
+  @SerialName("video") VIDEO
+}
+
+@Serializable
+enum class APICallCallSessionState {
+  @SerialName("scheduled") SCHEDULED,
+  @SerialName("waiting") WAITING,
+  @SerialName("connecting") CONNECTING,
+  @SerialName("connected") CONNECTED,
+  @SerialName("reconnecting") RECONNECTING,
+  @SerialName("ending") ENDING,
+  @SerialName("ended") ENDED,
+  @SerialName("cancelled") CANCELLED
+}
+
+@Serializable
+enum class APICallCallSessionPresentItem {
+  @SerialName("creator") CREATOR,
+  @SerialName("fan") FAN
+}
+
+@Serializable
+enum class APICallCallSessionRecordingState {
+  @SerialName("off") OFF,
+  @SerialName("starting") STARTING,
+  @SerialName("on") ON,
+  @SerialName("stopping") STOPPING,
+  @SerialName("blocked") BLOCKED
+}
+
+@Serializable
+data class APICallCallSessionConsentsItem(
+  val `id`: String,
+  val `actorAccountId`: String,
+  val `role`: APICallCallSessionConsentsItemRole,
+  val `purpose`: APICallCallSessionConsentsItemPurpose,
+  val `granted`: Boolean,
+  val `at`: String,
+  @Required
+  val `revokedAt`: String? = null
+)
+
+@Serializable
+enum class APICallCallSessionConsentsItemRole {
+  @SerialName("creator") CREATOR,
+  @SerialName("fan") FAN
+}
+
+@Serializable
+enum class APICallCallSessionConsentsItemPurpose {
+  @SerialName("recording") RECORDING,
+  @SerialName("summary") SUMMARY,
+  @SerialName("content_reuse") CONTENT_REUSE,
+  @SerialName("ai_source") AI_SOURCE
+}
+
+@Serializable
+enum class APICallCallSessionOutcome {
+  @SerialName("completed") COMPLETED,
+  @SerialName("partial") PARTIAL,
+  @SerialName("creator_no_show") CREATOR_NO_SHOW,
+  @SerialName("fan_no_show") FAN_NO_SHOW,
+  @SerialName("technical_failure") TECHNICAL_FAILURE
+}
+
+@Serializable
+enum class APICallCallSessionReconciliation {
+  @SerialName("pending") PENDING,
+  @SerialName("complete") COMPLETE,
+  @SerialName("blocked") BLOCKED
+}
+
+@Serializable
+data class APICallCallSessionPacket(
+  val `summary`: String,
+  val `attachmentIds`: List<String>
+)
+
+@Serializable
+enum class APICallCallSessionSummaryState {
+  @SerialName("absent") ABSENT,
+  @SerialName("pending") PENDING,
+  @SerialName("ready") READY,
+  @SerialName("deleted") DELETED,
+  @SerialName("blocked") BLOCKED
+}
+
+@Serializable
+data class APICallCallSessionSummarySources(
+  val `kind`: APICallCallSessionSummarySourcesKind,
+  val `commitmentId`: String,
+  val `noteRevision`: Long
+)
+
+@Serializable
+enum class APICallCallSessionSummarySourcesKind {
+  @SerialName("packet_and_creator_note") PACKET_AND_CREATOR_NOTE
+}
 
 @Serializable
 data class APICallCallSummaryNote(
@@ -5158,6 +5374,15 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
   suspend fun handback(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/handback", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply): APIMessage = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/human-replies", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput): APIConversationConversationRecordingResult = json.decodeFromString(request("/v1/conversations/${segment(creatorId)}/${segment(fanId)}/recordings", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun readCallSession(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = null): APICallCallSession = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/calls/${segment(sessionId)}", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun joinCallSession(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = null): APICallCallAdmission = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/calls/${segment(sessionId)}/join", "POST", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun setCallConsent(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = null, body: APICallConsentCommand): APICallCallSession = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/calls/${segment(sessionId)}/consent", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun endCallSession(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = null, body: APICallEndCall): APICallCallSession = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/calls/${segment(sessionId)}/end", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun saveCallSummaryNote(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = null, body: APICallCallSummaryNote): APICallCallSession = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/calls/${segment(sessionId)}/summary-note", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun deleteCallSummary(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = null, body: APICallCallRevision): APICallCallSession = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/calls/${segment(sessionId)}/delete-summary", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun cancelCallSession(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = null, body: APICallCallRevision): APICallCallSession = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/calls/${segment(sessionId)}/cancel", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun readCallOffers(creatorId: String, fanId: String, xQelvoraExpectedAccount: String? = null): APICallCallOffers = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/call-offers", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun selectCallOffer(creatorId: String, fanId: String, offerId: String, xQelvoraExpectedAccount: String? = null, body: APICallSelectTime): APICallCallSession = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/call-offers/${segment(offerId)}/select", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun readAccountCallRoute(sessionId: String, xQelvoraExpectedAccount: String? = null): APICallCallRoute = json.decodeFromString(request("/v1/w6/calls/${segment(sessionId)}/route", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun redeemCallAdmission(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = null, body: APICallAdmissionRedemption): APICallAdmissionReceipt = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/calls/${segment(sessionId)}/redeem", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun readCreatorMediaPolicy(creatorId: String, objectId: String, purpose: ReadCreatorMediaPolicyPurpose): APIMediaCreatorMediaPolicyView = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media-policy", "GET", authenticated = true, query = listOf("objectId" to objectId, "purpose" to json.decodeFromString<String>(json.encodeToString(purpose)))))

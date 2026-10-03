@@ -12,6 +12,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
+import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.semantics.contentDescription
@@ -266,7 +268,36 @@ class FanFeatureRegistration(val matches: (String) -> Boolean, val allowsSignedO
 
 @Composable
 fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/home", features: List<FanFeatureRegistration> = emptyList(), destinationDelivery: Long = 0L, notificationID: String? = null, onNotificationConsumed: () -> Unit = {}) {
-    val model = remember(baseURL) { FanSession(context, baseURL, returnTo) }; val scope = rememberCoroutineScope()
+    // This root owns one navigation snapshot. Save the actual route at the
+    // lifecycle save, not a mirror that can lag feature-local navigation.
+    // Credentials, session authority and feature payloads are never serialized.
+    val permittedReturn = returnTo.takeIf(ApplicationDestination::isPermitted) ?: "/home"
+    val registry = (context as? ComponentActivity)?.savedStateRegistry
+    val model = remember(baseURL) {
+        val saved = registry?.consumeRestoredStateForKey("qelvora.fan.navigation")
+        val restored = saved?.getString("destination")?.takeIf {
+            ApplicationDestination.isPermitted(returnTo) && saved.getString("origin") == baseURL &&
+                saved.getString("return") == permittedReturn && saved.getLong("delivery") == destinationDelivery &&
+                ApplicationDestination.isPermitted(it)
+        }
+        FanSession(context, baseURL, restored ?: returnTo)
+    }
+    val currentReturn by rememberUpdatedState(permittedReturn)
+    val currentDelivery by rememberUpdatedState(destinationDelivery)
+    DisposableEffect(model, registry) {
+        registry?.registerSavedStateProvider("qelvora.fan.navigation") {
+            Bundle().apply {
+                putString("origin", baseURL)
+                putString("return", currentReturn)
+                putLong("delivery", currentDelivery)
+                putString("destination", model.destination.takeIf(ApplicationDestination::isPermitted) ?: "/home")
+            }
+        }
+        onDispose { registry?.unregisterSavedStateProvider("qelvora.fan.navigation") }
+    }
+    var appliedReturn by remember(baseURL) { mutableStateOf(returnTo) }
+    var appliedDelivery by remember(baseURL) { mutableStateOf(destinationDelivery) }
+    val scope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
     var foreground by remember(lifecycleOwner) { mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
     DisposableEffect(lifecycleOwner) {
@@ -274,7 +305,12 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
-    LaunchedEffect(returnTo, destinationDelivery) { model.open(returnTo) }
+    LaunchedEffect(returnTo, destinationDelivery) {
+        // A new explicit delivery takes priority; an unchanged initial intent
+        // must not overwrite the route restored for this origin.
+        if (!ApplicationDestination.isPermitted(returnTo) || appliedReturn != returnTo || appliedDelivery != destinationDelivery) model.open(returnTo)
+        appliedReturn = returnTo; appliedDelivery = destinationDelivery
+    }
     LaunchedEffect(model.destination) { model.loadArrival() }
     LaunchedEffect(model, foreground) { if (foreground) { model.refresh(); while (true) { delay(4000); if (!model.choosingActor && !model.busy && (model.session != null || model.hasSavedCredential)) model.refresh() } } }
     LaunchedEffect(model.session) { GrowthPush.refresh(context) }

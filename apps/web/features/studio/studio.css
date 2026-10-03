@@ -78,6 +78,13 @@
   flex-direction: column;
   gap: var(--space-5);
 }
+.w5-note-edit {
+  display: inline-flex;
+  align-items: center;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .w5-replies {
   padding: var(--space-6) var(--space-4) 0;
   display: flex;
