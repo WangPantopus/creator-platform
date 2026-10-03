@@ -456,6 +456,7 @@ public struct FanAppShell: View {
                             Text("Your account").qText("display-md")
                             if let handle = model.session?.fan?.handle { Text("@" + handle).qText("body") }
                             Button(QelvoraCopy.text(model.session?.fan == nil ? "identityChooseHandle" : "identityEditPublicProfile"), variant: .secondary, block: true) { model.destination = "/onboarding/handle" }
+                            Button(QelvoraCopy.text("w5NativeTeamWorkspace"), variant: .secondary, block: true, disabled: model.busy || model.checkingSession || model.purgingPrivateState || model.localPurgeFailed || !model.error.isEmpty) { model.open("/studio/workspace") }
                             Button("Sign out", variant: .secondary, block: true) { Task { await model.logout() } }
                             Button("Refresh session", variant: .secondary, block: true, disabled: model.busy) { Task { await model.refreshCredentials() } }
                             Button("Sign out on all devices", variant: .quiet, block: true) { Task { await model.logout(all: true) } }
@@ -503,7 +504,7 @@ public struct FanAppShell: View {
     }
     private var tab: FanTab {
         let path = model.destination.components(separatedBy: "?")[0]
-        if path.hasPrefix("/identity/") || path == "/support" || path.hasPrefix("/support/") || path == "/notifications/settings" || path == "/commerce/spending" { return .you }
+        if path.hasPrefix("/identity/") || path == "/support" || path.hasPrefix("/support/") || path == "/notifications/settings" || path == "/commerce/spending" || StudioTeamFeature.matches(path) { return .you }
         if path.hasPrefix("/commerce/") { return .requests }
         return FanTab.allCases.first { tab in
             let root = "/" + tab.rawValue.lowercased()
