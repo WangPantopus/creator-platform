@@ -76,7 +76,8 @@ public enum ContentFanFeature {
         return parts.count == 3 && parts[0] == "content" && UUID(uuidString: String(parts[1])) != nil && UUID(uuidString: String(parts[2])) != nil
     }
     @MainActor public static func registration(baseURL: URL?) -> FanFeatureRegistration {
-        FanFeatureRegistration(matches: matches, screen: { session in
+        _ = ContentMediaCache.prepare()
+        return FanFeatureRegistration(matches: matches, screen: { session in
             let destination = session.destination
             guard matches(destination) else { return AnyView(EmptyView()) }
             let parts = destination.split(separator: "/")
