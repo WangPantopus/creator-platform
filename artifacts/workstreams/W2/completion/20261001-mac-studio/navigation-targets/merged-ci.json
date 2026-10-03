@@ -1,0 +1,167 @@
+{
+  "headRefOid": "525b92aac86ce51a166db506eca1705ea83d8b64",
+  "mergeCommit": {
+    "oid": "7f5fdf04d733e3560dc029ff387f908d872b4d3d"
+  },
+  "mergedAt": "2026-10-02T10:41:36Z",
+  "number": 108,
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T10:36:47Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36996210123/job/110803397015",
+      "name": "web-and-backend",
+      "startedAt": "2026-10-02T10:34:27Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T10:36:46Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36996205250/job/110803378846",
+      "name": "web-and-backend",
+      "startedAt": "2026-10-02T10:34:23Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36996210123/job/110803396691",
+      "name": "web-visual",
+      "startedAt": "2026-10-02T10:34:24Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36996205250/job/110803378628",
+      "name": "web-visual",
+      "startedAt": "2026-10-02T10:34:21Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36996210123/job/110803396873",
+      "name": "ios-foundation",
+      "startedAt": "2026-10-02T10:34:25Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36996205250/job/110803378944",
+      "name": "ios-foundation",
+      "startedAt": "2026-10-02T10:34:21Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36996210123/job/110803396560",
+      "name": "android-foundation",
+      "startedAt": "2026-10-02T10:34:24Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36996205250/job/110803378777",
+      "name": "android-foundation",
+      "startedAt": "2026-10-02T10:34:21Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T10:39:24Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36996210123/job/110803396902",
+      "name": "android-runtime",
+      "startedAt": "2026-10-02T10:34:26Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T10:39:31Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/36996205250/job/110803378908",
+      "name": "android-runtime",
+      "startedAt": "2026-10-02T10:34:24Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    }
+  ],
+  "schemaVersion": 1,
+  "observedAt": "2026-10-02T11:04:39.135945+00:00",
+  "host": "Yingpengs-Mac-Studio.local",
+  "mainVerification": {
+    "navigationSourceMain": "7f5fdf04d733e3560dc029ff387f908d872b4d3d",
+    "operatedCheckoutBase": "5b597230b27c156baa0badb5b2db495817309eea",
+    "checkoutAddedOnly": "W1 readiness/native recovery; no web changes",
+    "webTypecheck": "passed on actual 7f5fdf04",
+    "browser": "visible Chrome / actual fictional Maya session",
+    "viewport": [
+      1280,
+      900
+    ],
+    "theme": "Night",
+    "populatedExamples": 20,
+    "sidebarPx": 248,
+    "targetsPx": [
+      44,
+      44,
+      44,
+      44,
+      44,
+      44,
+      44,
+      44,
+      44
+    ],
+    "horizontalOverflow": false,
+    "keyboardShortViewport": [
+      900,
+      450
+    ],
+    "active": "Team",
+    "activeRect": {
+      "top": 350,
+      "bottom": 394,
+      "height": 44
+    },
+    "sidebarScrollTop": 128,
+    "browser200Percent": "unverified",
+    "screenReader": "unverified"
+  },
+  "captures": {
+    "main-style-night-desktop.png": {
+      "bytes": 108464,
+      "sha256": "f9d61b7b7ab42e0c21ec2ba036a1ccea798f61702e2f649d4b04c8a354d4e96a"
+    },
+    "main-short-night-keyboard.png": {
+      "bytes": 42847,
+      "sha256": "3ea62bfe7e2b53a81dc44a6de2788771795d6d85f48af1e5e818f915b1a8c7b5"
+    }
+  },
+  "limits": [
+    "Four exact-head fast checks passed; six macOS jobs remain queued/unpassed at this read.",
+    "Only Night desktop and short keyboard main repeat; the full Light/Night phone/desktop matrix belongs to the branch-qualified original receipt.",
+    "Full W2 and production publication remain incomplete."
+  ]
+}

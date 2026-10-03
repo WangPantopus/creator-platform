@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "postgresMajor": 17,
+  "sourceWave": "20261002-privacy",
+  "functions": [
+    {
+      "name": "creator_trust.interactive_denial(text, uuid, uuid)",
+      "owner": "creator_trust_denial",
+      "sha256": "3f804cee38dbe31dfe9440ffff90a1d51af76db5a4e99d07971750b46641dbc6",
+      "grants": [
+        "creator_runtime=X/creator_trust_denial",
+        "creator_trust_denial=X/creator_trust_denial"
+      ]
+    },
+    {
+      "name": "creator_trust.runtime_content_denial(uuid)",
+      "owner": "creator_trust_denial",
+      "sha256": "d4819e1289d4e65a590b3a2ffdd7a556708aeeea27b32fd9f4b8946b776b81ea",
+      "grants": [
+        "creator_runtime=X/creator_trust_denial",
+        "creator_trust_denial=X/creator_trust_denial"
+      ]
+    },
+    {
+      "name": "creator_trust.try_interactive_denial_keys(uuid, uuid, uuid)",
+      "owner": "creator_trust_denial",
+      "sha256": "6252c1fc2b755b509760c8855cabe8953e6c742370233d5f7f54c5940da6e432",
+      "grants": ["creator_trust_denial=X/creator_trust_denial"]
+    }
+  ]
+}

@@ -3,7 +3,10 @@ import pg from "pg";
 import type { IdentityRuntime } from "../identity/router.js";
 import { DomainError } from "../../core/errors.js";
 import { unavailableOwners, type GrowthOwners } from "./contracts.js";
-import { canonicalCreatorOwner } from "./integration.js";
+import {
+  canonicalCreatorOwner,
+  canonicalContentFollows,
+} from "./integration.js";
 import { createGrowthRuntime } from "./runtime.js";
 import type {
   GrowthPrivacyScope,
@@ -93,6 +96,7 @@ export async function configureGrowthForBackend(
     });
     return {
       ...runtime,
+      contentFollows: canonicalContentFollows(),
       async close() {
         await runtime.stop();
         await worker.end();

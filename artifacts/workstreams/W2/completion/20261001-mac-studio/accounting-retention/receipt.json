@@ -1,0 +1,88 @@
+{
+  "observedAt": "2026-10-02T05:37:40.598872+00:00",
+  "host": "Yingpengs-Mac-Studio.local",
+  "baseSource": "73a6361df4b93459cd60b6e0e90061ee46156760",
+  "sourceSha256": {
+    "integration.ts": "bef91e2f19ecdc63f18824bc5237de444d985e5f8cf187a09c4a3be9380d9be8",
+    "journal-privacy.ts": "877a7b827a1d1c52ee9b7980b9a35affc9f5b94d0caa8a09b4e823cb58f93019",
+    "lifecycle.ts": "044fa5d60189585889f98cad76b296e3cbae3de667f959834e3a1190666a539d",
+    "privacy-stream.ts": "2e898331d80b4f1c4e077cd521a634ac72f33c53d935cab9ba512fd5adf7c15a",
+    "trust-adapter.ts": "bc3560f807b4862f07a7a75a2d1b0691325a64e13732ef75a619aa9a358fa61a",
+    "usage-retention.ts": "687ae7cc0b2c3435f562e17a91b719dbab85d21ad5ea4722f988953351332ab7",
+    "migrations/0067_w2_usage_retention_expiry.sql": "1c118f5ec90a5a3f3578e056af14d5e56b1379464977c4a79bd6c2b62be7f17e"
+  },
+  "actor": "fictional Maya/kilnfire_w2; canonical development actor one",
+  "runtime": {
+    "database": "creator_w2",
+    "databasePort": 55442,
+    "apiPort": 4102,
+    "webPort": 3002,
+    "role": "creator_runtime NOINHERIT FORCE RLS"
+  },
+  "provider": {
+    "configured": false,
+    "calls": 0,
+    "keyFilePresent": false,
+    "accountingPolicyApproved": false
+  },
+  "checks": {
+    "backend": {
+      "passed": 18,
+      "failed": 0,
+      "skipped": 0,
+      "T11": {
+        "pairs": 10000,
+        "scopedQueries": 30000,
+        "limitMs": 300000,
+        "durationMs": 58293
+      }
+    },
+    "typescript": "passed",
+    "scopedLint": "passed",
+    "format": "passed",
+    "newUnitTests": 0
+  },
+  "disposableSqlRehearsal": {
+    "database": "creator_w2_rehearsal_r15_20261002 on W2 check container",
+    "migrationRegistration": false,
+    "transaction": "fully rolled back",
+    "incompletePlan": "constraint refused",
+    "linkedRetentionPlan": "constraint refused",
+    "expiryBatchLimit": 1,
+    "expiredKnownRows": 1,
+    "preserved": [
+      "due unknown cost",
+      "future known cost",
+      "current cap-day known cost",
+      "remaining due known cost"
+    ],
+    "runtimeVisibleOwnRowsAfterSelection": 4,
+    "otherCreatorVisibleRows": 0,
+    "durableNewColumns": 0,
+    "durableUsageRows": 0
+  },
+  "canonicalNegativeCheck": "PreparedUsageRetention refused accounting_retention_schema_unconfigured before any registration or expiry callback",
+  "privateArtifacts": {
+    "backup": {
+      "name": "creator_w2-20261002T050938Z.pgdump",
+      "bytes": 541029,
+      "sha256": "8de5afc9bf2dfe6197befbdd762f7aacb33acb47b7fea180c11f3312e0d984f2",
+      "tocEntries": 1277,
+      "restore": "successful in private disposable database; 40 migrations, revision 15, 20 approved/fixed examples, 1 source, 1 synthetic license, 0 usage/evaluations/versions"
+    },
+    "creatorExport": {
+      "bytes": 20907,
+      "sha256": "24dd188db09c93468560c910492aa30e4a9ef7d521d913e0f163a0481cc9e65d",
+      "schemaVersion": 2,
+      "download": "personally initiated through canonical Studio UI; Finder copied exact owned download into private directory; raw export not committed"
+    }
+  },
+  "limits": [
+    "0048 and 0067 not canonically activated",
+    "actual W8 accounting job/task lease and artifact/disposition boundary not yet composed",
+    "general accounting retention duration/purpose remains a human dependency",
+    "whole-job positive export/delete/expiry not personally verified",
+    "large-family object purge remains fail-closed above 2000; exportMetadataTo streams complete paged families",
+    "provider/index/evaluation/publication and native fan delivery remain unverified"
+  ]
+}

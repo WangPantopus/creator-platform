@@ -1,0 +1,246 @@
+{
+  "observedAt": "2026-10-02T13:35:11.480798+00:00",
+  "nativePermissionSource": "531ca06bccdbe0ec061c0ea59e5f59ba516f9e0e",
+  "webRecoveryConsumedOwnerSource": "61db88ebba0ddcd420fa4e49144b77033dfc7dbd",
+  "webRecoveryOwnCommit": "823b4356",
+  "integratedMain": "b1ac1083",
+  "apiRevisionDuringFinalUnavailableCallJourneys": "1a7f5dd1ce254fd8ea54031a02cda6d0960fe0ce",
+  "failedCaptureCleanupAndDuplicateDeclarationCommit": "fc743a96f0a2b3fcc6bb02016ca45097fb41e921",
+  "sourceSha256": {
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeCallScreen.kt": "df66aba0c4fab7794a5ffe7a946fa2a3c80a5c72a635677f2659c9ce97ebb30d",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeMediaDevicePermissions.kt": "6829022617f29e184a6c1880659c02845d3fefe2a8bec8c21425a117837f4091",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/VoiceRecordingScreen.kt": "f23f3ea5d5d7df9bd1997cb65a976c7d322474cee0dcb444743a6eaac7ea7567",
+    "apps/ios/Sources/QelvoraUI/Media/LiveKitNativeCallTransport.swift": "7cc49fdf8f80ab81004588a9ee30e6e36a67cd592d1a136968bc5a1c04657e6d",
+    "apps/ios/Sources/QelvoraUI/Media/NativeCallView.swift": "84b4686a1adc85625fa29eefe4bb0afd20c4e6e328bb0d146cdd943dc3eeed06",
+    "apps/ios/Sources/QelvoraUI/Media/NativeMediaDevicePermissions.swift": "e48dd371ad8fc70ff9912d9f9359f6ff314024b157a5c153179363c301e53aef",
+    "apps/ios/Sources/QelvoraUI/Media/NativeVoiceRecorder.swift": "8fd15b33fdd142623a29d9c2a9515df692f01f642d52d524cdf93d8903c2c3c9",
+    "apps/backend/src/modules/content/integration.ts": "e55b2ecaed728e3a36848dcacec602c74733d8dc2cf4c98d27e7b1dd8daea847",
+    "apps/web/app/api/auth/continue/route.ts": "0254a5c5a7a1c2ade938aaee09ced2e510e0c8691a5d106ee53d572df9ecd703",
+    "apps/web/features/identity/welcome.tsx": "e08a0065184a160c2263e9c0416b6026dc62602a2d0bc08efa303700560c5626",
+    "infra/local/w6/ios-runtime/RuntimeJourney.swift": "6ddda2cb6bc9b6afd890189662015ffb0ed92927ce4c22622976379e4b929cec"
+  },
+  "backend": {
+    "database": "creator_w6_canonical_fresh_20261002",
+    "canonicalMigrations": 57,
+    "availabilityRows": 0,
+    "callSessionRows": 0,
+    "callAdmissionRows": 0,
+    "mediaRows": 0,
+    "creatorMediaRows": 0,
+    "publicationRows": 0,
+    "callProjectionStatus": 503,
+    "mediaAndCalling": "unavailable: future held purpose authority is absent",
+    "registryEdited": false
+  },
+  "android": {
+    "normalShippingApplication": "com.pantopus.qelvora",
+    "sourceScope": "531ca06b native Kotlin files; unchanged in subsequent reconciliation",
+    "apkSha256": "520e0e54f1a85d37e983c817fd1cbee57688428b36aaff8861ef5eb41e3bad9d",
+    "apiURL": "http://127.0.0.1:4106 via actual adb reverse",
+    "device": "emulator-5582 / API34 arm64 / 2 cores / 2048 MB / no snapshot save / no window",
+    "uiInput": "actual serial-specific adb and uiautomator; actual OS permission controls",
+    "theme": "Night",
+    "fontScale": 1.0,
+    "actualJourneys": [
+      "Record \u2192 real OS Don\u2019t allow \u2192 Settings denial / no file",
+      "Record \u2192 real OS While using the app \u2192 elapsed real MediaRecorder capture",
+      "Stop and preview \u2192 real MediaPlayer play/pause \u2192 discard \u2192 cache empty",
+      "Record again \u2192 Home \u2192 paused / explicit Resume \u2192 stop / discard",
+      "Home while actual permission dialog pending \u2192 allow old OS dialog in launcher \u2192 no file / cold authorized API return idle; in-place recovery not claimed",
+      "Actual fan call route \u2192 unavailable \u2192 Refresh call \u2192 unavailable; no join / OS camera prompt / call admission"
+    ],
+    "privateCaptureDiagnostic": {
+      "format": "actual MediaRecorder AAC/M4A; emulated input, not a verified human voice",
+      "durationSeconds": 37.226667,
+      "bytes": 458854,
+      "sampleRate": 48000,
+      "channels": 1,
+      "meanVolumeDb": -3.0,
+      "maxVolumeDb": 0.0,
+      "uploaded": false,
+      "rawRecordingCommitted": false
+    },
+    "normalOwnedEmulatorExitCode": 0
+  },
+  "ios": {
+    "normalShippingApplication": "com.pantopus.qelvora",
+    "uiDriver": "opt-in XCUITest actual application/OS UI; no credentials injected or network responses substituted; no new unit tests",
+    "device": "3E02BBA8-75B0-4D3B-BE37-E636C9E71687 / iOS27 / iPhone17e",
+    "theme": "Night",
+    "textSize": "retained accessibility-large; not an exact 200% / VoiceOver claim",
+    "actualOsDenialSeconds": 14.29,
+    "denialRepeatProcess": "TEST EXECUTE SUCCEEDED; diagnostics disabled after preserved stalled diagnostic collection",
+    "actualOsApprovalFailureSeconds": 23.111,
+    "approvalOutcome": "Actual microphone-unavailable UI with no Pause/private preview; no successful capture accepted",
+    "orphanFailure": {
+      "bytes": 28,
+      "sha256": "476bd5777f710b71b5fa02f340fc2752d2abf07a81f3bfdb7ef9a567a8b74398",
+      "observed": "Failed actual iOS capture left a 28-byte orphan header; no accepted preview",
+      "cleanup": "Removed this exact owned failed-attempt file before repaired-app repeat"
+    },
+    "repairedActualFailure": "same real OS approval and actual unavailable capture; rebuilt app ran successfully; app container has zero voice-*.m4a",
+    "repairedExecutableSha256": "9a063e35eeefa4ca01afff6d262535e17e328ccb8c26fbbc7f4f390e98c16a76",
+    "callFinalApiFailureSeconds": 8.307,
+    "callOutcome": "actual fan call unavailable; actual Refresh; no waiting-room admission or OS prompt",
+    "physicalHardware": false
+  },
+  "web": {
+    "browser": "actual headed Chrome153 with Playwright UI; no mocked media/network",
+    "viewport": "390x844",
+    "productionBuild": "Next16.3.7 webpack: compile6.8seconds + TypeScript4.9seconds",
+    "actualProductionRecovery": [
+      "Continue with Pantopus \u2192 canonical unavailable notice with Retry / Back",
+      "Retry \u2192 same unavailable recovery",
+      "Back \u2192 Welcome preserving /media/voice"
+    ],
+    "productionIdentity": "unaccepted; actual HTTP localhost origin still refused by HTTPS policy",
+    "privateRecorder": "real getUserMedia fails with no audio input; Record / 0:00 / no preview / upload unavailable",
+    "browserPermissionFault": "actual CDP denied setting in the correct browser context confirmed; with input0 real getUserMedia still reports microphone unavailable. A distinct browser denial copy path is not accepted. Earlier invalid descriptor/default-context and selector timeout preserved.",
+    "actualDevelopmentFanCall": "product Development actor two sign-in \u2192 real call projection503 \u2192 unavailable, including after current API restart; no join/admission"
+  },
+  "machineAudioInputs": 0,
+  "checks": {
+    "androidShippingBuild": "BUILD SUCCESSFUL in14s",
+    "swiftShippingAndRealUI": "build plus actual OS/app journeys succeeded; capture outcome is failure only",
+    "productionWebBuild": true,
+    "backendTypecheckAfterMainDuplicateRepair": true,
+    "newUnitTests": 0,
+    "canonicalTestsOrGoldensAltered": false
+  },
+  "priorDelivery": {
+    "headRefOid": "a2dbf8c9fd8360ad97983a9093638e21374e05ac",
+    "mergeCommit": {
+      "oid": "4d6470b6ce037351cbb8f19c829a0900ada47e24"
+    },
+    "mergedAt": "2026-10-02T12:39:16Z",
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-02T12:34:40Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37007192075/job/110838337328",
+        "name": "web-and-backend",
+        "startedAt": "2026-10-02T12:32:12Z",
+        "status": "COMPLETED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-02T12:33:57Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37007187005/job/110838307934",
+        "name": "web-and-backend",
+        "startedAt": "2026-10-02T12:32:06Z",
+        "status": "COMPLETED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-02T12:32:49Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37007192284/job/110838194200",
+        "name": "compile",
+        "startedAt": "2026-10-02T12:31:45Z",
+        "status": "COMPLETED",
+        "workflowName": "Trust release compilation"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37007192075/job/110838337395",
+        "name": "web-visual",
+        "startedAt": "2026-10-02T12:32:09Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37007187005/job/110838308054",
+        "name": "web-visual",
+        "startedAt": "2026-10-02T12:32:04Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37007192075/job/110838337558",
+        "name": "ios-foundation",
+        "startedAt": "2026-10-02T12:32:09Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37007187005/job/110838307861",
+        "name": "ios-foundation",
+        "startedAt": "2026-10-02T12:32:04Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37007192075/job/110838337046",
+        "name": "android-foundation",
+        "startedAt": "2026-10-02T12:32:09Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37007187005/job/110838307969",
+        "name": "android-foundation",
+        "startedAt": "2026-10-02T12:32:04Z",
+        "status": "QUEUED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-02T12:37:54Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37007192075/job/110838337754",
+        "name": "android-runtime",
+        "startedAt": "2026-10-02T12:32:11Z",
+        "status": "COMPLETED",
+        "workflowName": "Foundation checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-02T12:36:38Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37007187005/job/110838307734",
+        "name": "android-runtime",
+        "startedAt": "2026-10-02T12:32:06Z",
+        "status": "COMPLETED",
+        "workflowName": "Foundation checks"
+      }
+    ]
+  },
+  "cleanup": {
+    "owned_emulator": "emulator-5582 absent after normal emu kill",
+    "owned_simulator": "3E02BBA8-75B0-4D3B-BE37-E636C9E71687 Shutdown",
+    "exact_custody_checked": "receipt equals owner; directory dev/inode matches; no peer owner changed",
+    "released": [
+      "creator-platform-emulator-slot-1",
+      "creator-platform-simulator-slot-2"
+    ]
+  },
+  "remaining": [
+    "canonical future purpose wave / 0082 activation by W8 sole registry owner",
+    "real human microphone; actual upload/process/passkey/C2PA/publish/fan play/seek on all clients",
+    "production trusted signer and approved retention",
+    "LiveKit Cloud credentials / genuine durable CallCustody / complete history / confirmed token revocation / replay-resistant admission",
+    "C06/C07 policy and worker purpose/authority / money remains W4",
+    "CallKit/Telecom/incoming/background/audio-session composition / physical hardware / complete accessibility / licensed AI audio"
+  ]
+}

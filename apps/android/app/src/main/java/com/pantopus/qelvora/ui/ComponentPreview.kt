@@ -43,7 +43,7 @@ fun NativeComponentPreview(name: String) {
             "EtaLine" -> EtaLine(ahead = 3)
             "RequestStatus" -> RequestStatus(steps = listOf(RequestStep("Sent to Maya", "OCT 4", RequestStepState.DONE), RequestStep("Waiting for Maya's decision", "31 H LEFT", RequestStepState.CURRENT), RequestStep("Reply delivered")), outcome = copy("declined", "name" to "Maya"))
             "Receipt" -> Receipt(rows = listOf("Mode" to "Written reply", "Paid" to "$25.00", "Delivered" to "OCT 4, 2026"))
-            "SpendLimit" -> SpendLimit()
+            "SpendLimit" -> SpendLimit(remindersOn = true)
             "QueueCard" -> { QueueCard(summary = "A satin white glaze is crawling at the rim.", shared = "Summary + photo", draftReady = true); QueueCard(QueueKind.COMMITMENT, due = "2 H", summary = "Accepted reply is due.", overdue = true) }
             "CapacityHeader" -> CapacityHeader(listOf(CapacityRow("Written replies", 7, 10), CapacityRow("Voice notes", 3, 4)), "New requests open Monday.")
             "LabelPreview" -> { LabelPreview(); LabelPreview(AuthorKind.HUMAN_CREATOR); LabelPreview(AuthorKind.TEAM) }

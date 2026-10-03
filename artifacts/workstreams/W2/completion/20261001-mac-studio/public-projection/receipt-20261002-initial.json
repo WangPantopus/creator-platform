@@ -1,0 +1,28 @@
+{
+  "host": "Yingpengs-Mac-Studio.local",
+  "observedAt": "2026-10-02T05:48:13.041086+00:00",
+  "baseSource": "7a7474c9",
+  "source": "apps/backend/src/modules/agent/growth-adapter.ts",
+  "sha256": "368d8723b4bde6e73e06f7a6bcbbf3859ecee09ace41adedae74b540556bd5f2",
+  "checks": {
+    "typescript": "passed",
+    "scopedESLint": "passed",
+    "prettier": "passed",
+    "newTests": 0
+  },
+  "implemented": [
+    "W2-owned NOINHERIT public metadata reads without workspace creation",
+    "canonical owner and current held transactional license",
+    "actual required processor/purpose authority",
+    "exact live evaluated pipeline and provider rates/cap",
+    "current revision/hash/index/expiry for every published source",
+    "only public approved titles and public-source count leave producer"
+  ],
+  "limits": [
+    "positive reviewed-license/purpose/publication proof unavailable",
+    "W7 consumer and actual host composition still pending",
+    "no fan consent inferred",
+    "no genuine W3 outcome feed or closed 72-hour digest verified",
+    "no raw fan/source/style/private boundary content released"
+  ]
+}

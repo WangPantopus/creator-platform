@@ -1,0 +1,28 @@
+{
+  "source": "4e3b2cee",
+  "ownerSource": "064fa55e4eaadd6b76c189e41e24fb041b30a3de",
+  "metadataOnly": true,
+  "readAt": "2026-10-02T09:10:46.118Z",
+  "databases": [
+    {
+      "database": "creator_w6_wave_fresh_20261002",
+      "checkedRoles": 3,
+      "pinnedFunctions": 7,
+      "directCapabilities": 82,
+      "publicCapabilities": 327,
+      "pinnedPublicFunctions": 23,
+      "ledger_rows": 57,
+      "passed": true
+    },
+    {
+      "database": "creator_w6_wave_upgrade_20261002",
+      "checkedRoles": 3,
+      "pinnedFunctions": 7,
+      "directCapabilities": 82,
+      "publicCapabilities": 327,
+      "pinnedPublicFunctions": 23,
+      "ledger_rows": 57,
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+# Stored publication completion
+
+W5 application: `302356d3`; owner issuer: W1 `fc58865483ac81b28da5caa1d0373e983d61da09`, consumed as `85085420` with only its two identity-purpose files. W1's unrelated documentation conflicts were kept at the existing W5 branch state.
+
+`ContentPublicationWorker` consumes the real separate `PublicationIdentityAuthority`; it creates no Actor, login session, signature, consent or media provenance. Each bounded task holds the issuer's denial/identity authority, the current content advisory lock and exact row/version. It checks the stored publication publisher, consumed act, canonical command hash and immutable media evidence. W6's published `4e4e6aed` `PublicationMedia` structurally matches the explicit media port. Current quote, packet, live and displayed-count projections require their actual purpose producer; an absent producer cannot publish those paths.
+
+Ready media scheduled for the future becomes scheduled. Due content publishes with its existing signature, publication timestamp, and durable published/source-candidate effects in one transaction. W4's packet fulfillment port runs only after the actual published transition in that same held transaction, so a producer failure rolls everything back. Retries serialize on current content; no second publication event is generated. The development host's synthetic creator-session sweep was removed.
+
+Implemented: actorless consumer, host composition and serialized sweep export. Runnable: backend typecheck, scoped lint and formatting passed. Integrated: canonical W1 issuer source is present; actual host denial configuration, W6 media purpose projection and W4 extra-purpose fulfillment are not mounted. Verified: static checks only for this increment. Release-ready: no; positive completion, outage/retry/withdrawal and durable downstream acceptance remain unverified.
+
+Reserved 0071 remains a proposal and is not registered or applied; W8 review/activation of 0073 and 0075 is also pending. The current local database still has no genuine W5 signed publication. The creator is DEVELOPMENT-ONLY SEEDED VERIFIED with no proof/passkey, which is not acceptance. No new tests, signing fixture or migration activation was introduced.

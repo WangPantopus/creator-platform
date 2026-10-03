@@ -1,5 +1,7 @@
 # Preserved W5 migration adoption
 
+Published as [merged PR15](https://github.com/WangPantopus/creator-platform/pull/15), main `ad369bd5a0935c09da2687bf69a6a2d0f0a6da18`, reviewed source `5d1adc831eac7501d322a93e9ce8f2901d3d6973`. [Actual merge verification](../../artifacts/workstreams/W8/takeover/20260930/pr15-merged.json) confirms no application/native/test/CI/active-registry change relative to its main parent.
+
 The `w5-20260930` operator profile reconciles the exact published 35-row W5 ledger without rewriting its history. It is implemented by `apps/backend/scripts/adopt-w5-migrations.ts`, using the pinned profile in `infra/migrations/adoptions/w5-20260930.json`. The normal canonical runner does not perform this adoption automatically.
 
 W8 restored a read-only backup of the actual preserved database into its own traffic-closed database. Its schema matched an independently created reference from the 35 original SQL files. The upgrade preserved all 35 ledger records, including timestamps, and all 277 original rows across 136 tables. Its final schema matched a separate fresh canonical reference. [Actual operator evidence](../../artifacts/workstreams/W8/takeover/20260930/w5-adoption-operator.json) distinguishes this rehearsal from an upgrade of the original W5 database, which remains unchanged.

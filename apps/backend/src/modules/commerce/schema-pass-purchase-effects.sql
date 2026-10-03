@@ -1,6 +1,7 @@
 -- W8 custody: 0054_w4_pass_purchase_effects, reserved_unapplied at3240da0.
 -- Original quote/effect/cash journals; no synthetic packet or second ledger.
 BEGIN;
+SET LOCAL ROLE creator_owner;
 CREATE TABLE creator.commerce_pass_billing_account (
  fan_id uuid PRIMARY KEY REFERENCES creator.fan_profile(id),
  retention_policy_version text NOT NULL CHECK(length(retention_policy_version) BETWEEN 1 AND 200),

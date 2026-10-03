@@ -146,9 +146,7 @@ export class VoiceRecorder {
         state: denied ? "denied" : "failed",
         reason: denied
           ? copy.w6MicrophoneAccessIsOffAllowItInYourBrowserSettings
-          : error instanceof Error
-            ? error.message
-            : copy.w6TheMicrophoneIsUnavailable,
+          : copy.w6TheMicrophoneIsUnavailableTryAgain,
       });
     }
   }

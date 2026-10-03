@@ -1,5 +1,7 @@
 # Resume prompt — finish W6 from the committed handoff
 
+> Superseded for execution policy and current state by the [October 1 successor prompt](W6-resume-20261001.md) and [consolidated handoff](../handoffs/W6-2026-10-01-consolidated.md). The latest user direction permits scoped coverage, prohibits new unit tests, requires launched web/Android/iOS end-to-end verification, and authorizes ready PRs and merges. Older blanket testing/process holds below are historical.
+
 Copy this entire prompt to the next primary implementation agent. It is an instruction to continue and finish the entire W6 workstream from the current implementation, not to plan a replacement or perform only a review.
 
 You are now the directly assigned primary owner of **W6 — Calls, voice, and media** in `creator-platform`. The founder is handing you all remaining work. Continue from **`origin/codex/w6-calls-media-handoff`**. The branch includes shared prerequisite commit `1a94db352799c9563d15a74514201a6ea9c7f9c6` and a separate W6 implementation/evidence/handoff commit; its original ancestor is `ba2ee4fe9cc029cb5252b2c0ad2f9c582f925892`. Read the branch history and use the latest W6 handoff commit as your starting point. That old ancestor by itself omits the apps and W6 work. Do not restart from scratch, replace the existing architecture with a scaffold, or discard existing changes.
