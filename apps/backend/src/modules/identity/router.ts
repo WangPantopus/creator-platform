@@ -26,6 +26,7 @@ export function bearer(req: Request) {
 export function createIdentityRouter(
   runtime: IdentityRuntime,
   assertAllowed?: (actor: Actor) => Promise<void>,
+  currentActor?: (request: Request) => Promise<Actor>,
 ) {
   const router = Router();
   const session = async (token: string) => {
@@ -41,7 +42,9 @@ export function createIdentityRouter(
     });
   };
   const actor = async (req: Request): Promise<Actor> =>
-    runtime.sessions.resolveSession(bearer(req));
+    currentActor
+      ? currentActor(req)
+      : runtime.sessions.resolveSession(bearer(req));
   router.post("/complete", async (req, res) => {
     const result = await runtime.sessions.complete(req.body);
     try {
@@ -166,6 +169,23 @@ export function createIdentityRouter(
       ),
     ),
   );
+  router.post("/:creatorId/team/:accountId/roles", async (req, res) => {
+    const current = await actor(req);
+    if (IdSchema.parse(req.get("X-Expected-Account-Id")) !== current.accountId)
+      throw new DomainError(
+        "session_account_changed",
+        "Your account changed. Reopen this team before saving roles.",
+        409,
+      );
+    res.json(
+      await runtime.profiles.updateMemberRoles(
+        current,
+        IdSchema.parse(req.params.creatorId),
+        IdSchema.parse(req.params.accountId),
+        req.body,
+      ),
+    );
+  });
   router.post("/signed-acts/:challengeId/cancel", async (req, res) =>
     res.json(
       await runtime.signing.cancel(

@@ -226,6 +226,7 @@ export function createApp(
       createIdentityRouter(
         dependencies.platformIdentity,
         dependencies.assertActorAllowed,
+        (request) => actorFor(request),
       ),
     );
   const actorFor = async (req: Request) => {
