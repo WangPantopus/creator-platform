@@ -1,0 +1,66 @@
+{
+  "recordedAt": "2026-10-02T13:55:31.035140+00:00",
+  "label": "Closed empty owned proposal review only; administrator-selected SQL role probes, no actual worker password/positive task/provider/recovery acceptance",
+  "W1source": "39c274a3dfa16e35b1f070635fc32e57aa014c70",
+  "W1sqlSha256": "fadbf62a3ddf06142c3a6ad30313503f9bebe7b6d64f67f8ba01ff13ce2398c7",
+  "W8sqlSha256": "393920665d8860ee53ee6ef740ba0ad4a6921aceddcbf33f6419727e846532af",
+  "catalogue": {
+    "generations": 0,
+    "workerScopes": 0,
+    "terminalScopes": 0,
+    "canonicalMigrations": 57,
+    "activatedTerminalMigrations": 0,
+    "connectionLimit": 0,
+    "closed": true,
+    "definitionSha256": "fc465b04641c205007bc532f0e7f3e95450f1fb82bf0b66811d3a27c42923a22",
+    "compilerDiagnostics": 0,
+    "workerExecute": false,
+    "terminalExecute": true,
+    "runtimeExecute": false
+  },
+  "probes": [
+    {
+      "name": "worker_direct_denial",
+      "observed": "42501",
+      "matchesExpected": true,
+      "exitCode": 3
+    },
+    {
+      "name": "worker_private_terminal_scope",
+      "observed": "42501",
+      "matchesExpected": true,
+      "exitCode": 3
+    },
+    {
+      "name": "worker_private_message",
+      "observed": "42501",
+      "matchesExpected": true,
+      "exitCode": 3
+    },
+    {
+      "name": "empty_original_terminal_candidate",
+      "observed": "t",
+      "matchesExpected": true,
+      "exitCode": 0
+    }
+  ],
+  "compiler": {
+    "package": "postgresql-17-plpgsql-check",
+    "packageVersion": "2.10.11-1.pgdg12+1",
+    "extensionVersion": "2.10",
+    "source": "https://github.com/okbob/plpgsql_check",
+    "installedOnly": "Owned proposal database; canonical app DB unchanged"
+  },
+  "manualPlans": {
+    "originalSnapshot": "passed under actual NoLogin denial metadata role",
+    "positiveMetadata": "passed under actual NoLogin denial metadata role",
+    "queryExecutedBusinessRows": false
+  },
+  "failures": [
+    "Initial typed %ROWTYPE declaration required creator-schema USAGE at Trust-owner compile time; replaced with record, no owner grant widened.",
+    "Initial installed proposal definition4b1e15ae... replaced only in unregistered closed review with runtime role/settings/ACL guard; final definition hash is catalogue value."
+  ],
+  "activation": false,
+  "realGenerationAccepted": false,
+  "providerCostOrRecoveryFabricated": false
+}

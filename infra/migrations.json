@@ -765,11 +765,14 @@
       "owner": "W8",
       "version": "0184_w8_generation_terminal_denial",
       "state": "reserved_unapplied",
-      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Requires exact0099 private terminal contract; distinguish current completion from metadata/financial cleanup with restoration/freeze fences.",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Requires exact0099 private terminal contract; distinguish current completion from metadata/financial cleanup with restoration/freeze fences. Actual0099 original nonce/task/client/XID/PID/cursor negatives; terminal NoLogin-only EXECUTE, closed empty SQL/compiler/ACL review complete. Genuine activation/worker/job/provider/original settlement/current denial race acceptance pending.",
       "heldVersionHistory": [
         "0100_w8_generation_terminal_denial",
         "0147_w8_generation_terminal_denial"
-      ]
+      ],
+      "path": "apps/backend/migrations/0100_w8_generation_terminal_denial.sql",
+      "sourceCommit": "d12db34c7c83dd9df9cdd830557e3dcc0c5a6bdb",
+      "sourceSha256": "393920665d8860ee53ee6ef740ba0ad4a6921aceddcbf33f6419727e846532af"
     },
     {
       "id": "0185",
