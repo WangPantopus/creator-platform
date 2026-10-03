@@ -62,3 +62,29 @@ sources; genuine populated navigation, audited opens, takeover/handback, team
 delivery and correction acceptance remain open. Later main/source integration
 does not inherit these personal observations. No new tests, synthetic thread,
 approval, signature or held-purpose activation was introduced.
+
+## Integrated current production observation
+
+The normal production Next build, web types, scoped ESLint and format checks
+passed at `c7db9ea9cb9a47eb7cf73a67a5f398dad4fbd039`, including captured
+main `afde5068cdd76cd3f9dc1653a82441ac95c1f64d`. W5 restarted its owned
+API from that same source with the committed launcher and canonical61 database.
+Foundation readiness was true; full readiness remained false with development
+identity and unconfigured generation. These are not verified identity or provider
+acceptance.
+
+W5 personally inspected the real empty Threads directory at390/1280 Light/Night
+from that immutable production output. The actual390 Night browser network
+outage concealed Studio and exposed a342×48px recovery action. Returning online,
+focusing Check connection and roles and pressing Enter restored the current
+empty directory; actual session, identity, queue and Threads reads returned200.
+Refresh conversations also returned to that current empty page. The ordinary
+four-second authority polling continued during this operation.
+
+Private captures are
+/private/tmp/creator-w5-shell-operator/shots/production-c7db9ea9-threads-{390,1280}-{light,night}.png
+and production-c7db9ea9-threads-offline-concealed.png. All were personally viewed.
+Keyboard ArrowDown/Enter on the real filter still left All selected; a changed
+filter and populated paging remain unverified. No later source inherits these
+observations. Audited populated opens, actual takeover/handback, team replies,
+corrections and genuine signing remain open. Release-ready: false.
