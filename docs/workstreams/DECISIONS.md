@@ -10,6 +10,14 @@ These are implementation/release dependencies, not requests for the founder to a
 
 Node.js/TypeScript backend, Next.js web, native Swift iOS and Kotlin Android; standalone creator-platform now and Pantopus integration later; exact supplied appearance; replaceable Qelvora name; full build with membership first, human voice before AI voice, pass after sufficient roster; no new test code/coverage in this phase; actual browser/simulator/emulator verification. Older source references to Expo, a thin unselling native shell, five lifetime trial messages, auto-reply after twenty approvals, or a proof-only build do not reopen those choices.
 
+## W1 source conflicts resolved — October 1, 2026
+
+Under the founder's explicit authorization to decide routine UX/security details, W1 follows behavioral-source precedence for DI09 and the interview-duration conflict. Product Design S-F1/S-F5 defers the optional intro offer until after the first useful answer; initial Handle therefore collects only a pseudonymous handle. Existing profiles retain the optional intro editor through You/Account, and per-creator AI use remains a separate explicit choice. Initial profile creation sends an empty intro; hidden input cannot silently become consent. The real later one-time thread offer remains an uncompleted W3/W1 integration, with no generation or participant result inferred.
+
+Product Design S-C14, Second Review A10 and BRIEF S-C14 consistently specify about 20 minutes for the optional voice/text interview. The live setup rail uses that estimate. It adds no timer, required-duration gate or promise of completion, and imported-source-only setup remains valid under the producer's policy. The artboard's 15-minute sample label and all original references remain unchanged.
+
+These decisions resolve timing/copy, not genuine identity, legal terms, native Studio scope, screen-reader/device acceptance or Q12 study thresholds. Actual browser and compiler evidence is recorded with the implementation; native control is currently disabled.
+
 ## Required decisions and confirmation points
 
 | ID  | Decision / unresolved input                                                                                                                                                                                                                                                                                                             | Owner                          | Needed before                                                               | Work that continues meanwhile                                                                                                  |
@@ -66,6 +74,18 @@ Daily Spend is entered from You, so both shipping shells retain You as its selec
 ## iOS cold destination custody — October3 UTC
 
 Preserve a bounded canonical path and actual account UUID in the existing issuer-specific device-only Keychain namespace. Query parameters and private screen/draft bodies stay out of this record. Restore only after the real current session resolves the same account; an incoming destination takes precedence. Serialize writes with credential custody and reject stale model/revision/token writes. Clear destination metadata on sign-out or account replacement while always attempting credential deletion, and preserve it through guarded same-account rotation. A saved path is presentation context; current object authority remains mandatory.
+
+## Profile save departure and account custody — October3 UTC
+
+The existing onboarding PR receives the review-discovered profile lifetime repair. Web saves own a per-form AbortController, cancel on unmount and recheck that controller plus the original identity signal after parsing the response before navigation or state updates. Both shipping native profile saves reuse the existing issuer-bound FanSessionRequestCapture, with an immutable original credential, account/session and destination generation,64KiB response ceiling and ten-second timeout. Check currentness before mutation and after its parsed result and session reload; departed/away-and-back, rotated, replaced, purged or cancelled captures cannot navigate or present an old error. Server authorization remains the real original session; the capture is a client lifetime fence and grants no authority. Current failed-save input is retained with canonical unavailable/unreadable copy. Existing checks and personal current shipping qualification are required; no new unit suite or manufactured account is introduced.
+
+### Original browser identity view lifetime — October3 UTC
+
+The canonical identity request preserves the caller's cancellation signal through actual401 session rechecks and409 body parsing, checking it before ending the view. Rechecks bind both the original account and session. Each account/session owns a keyed private view; ordinary unmount aborts its exact signal and development effect restarts issue a fresh lifetime, leaving old consumers cancelled. End callbacks bind that original signal, so a stale response cannot redirect a replacement view. Server sessions and mismatch preconditions retain their existing authority contract. Web types, scoped lint/format and diff checks pass on the combined source; current personal boundary checks and existing auth/foundation checks remain separately recorded qualifications. No credential, permission, consent or new unit suite is introduced.
+
+### Original browser session mismatch precondition — October3 UTC
+
+W5's independent PR21 review identified a same-account replacement gap: the browser may send a newly signed-in cookie before the four-second identity poll, while the original view still has the same account. The canonical identity helper now sends its original session ID as a denial-only precondition alongside its original account. The actual platform proxy forwards both, including any bounded session restoration; genuine core session resolution compares the expected session before dispatching the action. A mismatch returns409 and ends that original view. The header cannot establish identity or authority. Ordinary credential rotation retains the actual session ID and remains compatible; fixed-token native requests retain their existing contract. Source checks and operation against an actually rebuilt API are required separately; neither source review nor a previous API binary qualifies this change.
 
 ## Original browser session guard shared integration — October 3 UTC
 
