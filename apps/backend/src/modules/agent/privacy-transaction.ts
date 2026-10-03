@@ -1,26 +1,12 @@
 import { Client, type Pool, type PoolClient } from "pg";
 import { DomainError, invariant } from "../../core/errors.js";
+import { querySettlementUncertain } from "../../core/query-settlement.js";
 
 const boundedQuery = (text: string) => ({ text, query_timeout: 5000 });
 
 /** A private cause can wrap an uncertain response. It never grants task authority. */
 export function uncertainAgentReadResponse(failure: unknown): boolean {
-  const pending: unknown[] = [failure];
-  const seen = new Set<Error>();
-  let inspected = 0;
-  while (pending.length) {
-    if (++inspected > 32) return true;
-    const error = pending.pop();
-    if (!(error instanceof Error) || seen.has(error)) continue;
-    seen.add(error);
-    if (error.message === "Query read timeout") return true;
-    pending.push(error.cause);
-    if (error instanceof AggregateError) {
-      if (error.errors.length > 32 - inspected) return true;
-      pending.push(...error.errors);
-    }
-  }
-  return false;
+  return querySettlementUncertain(failure);
 }
 
 /** The caller supplies every actual W8 task, ownership and restoration fence.
