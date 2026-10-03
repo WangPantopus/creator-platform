@@ -45,6 +45,7 @@ public final class GrowthPushCoordinator: ObservableObject {
     @Published private(set) var message = ""
     @Published private(set) var pendingTap: Tap?
     private var session: APISession?
+    private weak var owner: FanSession?
     private var baseURL: URL?
     private var deviceToken: Data?
     private var generation = 0
@@ -59,10 +60,13 @@ public final class GrowthPushCoordinator: ObservableObject {
               let baseURL, let parts = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else { return false }
         return parts.scheme == "https" && parts.host != nil && parts.user == nil && parts.password == nil && parts.query == nil && parts.fragment == nil && ["", "/"].contains(parts.path)
     }
-    func update(session: APISession?, baseURL: URL?) {
-        let changed = self.session?.sessionId != session?.sessionId || self.session?.accountId != session?.accountId || self.baseURL != baseURL
-        self.session = session; self.baseURL = baseURL
-        guard changed else { return }
+    func update(session: APISession?, baseURL: URL?, owner: FanSession) {
+        let changed = self.session?.sessionId != session?.sessionId || self.session?.accountId != session?.accountId || self.baseURL != baseURL || self.owner !== owner
+        self.session = session; self.baseURL = baseURL; self.owner = owner
+        guard changed else {
+            if acknowledged == nil && enabled { refreshPermission() }
+            return
+        }
         generation += 1; acknowledged = nil; message = ""
         if session == nil {
             UIApplication.shared.unregisterForRemoteNotifications()
@@ -109,22 +113,28 @@ public final class GrowthPushCoordinator: ObservableObject {
         case .notDetermined: permission = .notDetermined; granted = false
         @unknown default: permission = .unknown; granted = false
         }
-        guard let session, let baseURL else { return }
+        guard let session, let owner else { return }
         if granted { UIApplication.shared.registerForRemoteNotifications() }
         else { UIApplication.shared.unregisterForRemoteNotifications(); UNUserNotificationCenter.current().removeAllDeliveredNotifications() }
         let binding = Binding(account: session.accountId, session: session.sessionId, token: deviceToken, granted: granted)
         guard acknowledged != binding else { return }
         if granted && binding.token == nil { return } // Wait for the genuine UIApplicationDelegate token.
         do {
-            guard let credential = try await SecureSessionStorage(issuer: baseURL).read(), snapshot == generation else { return }
+            // Keep the original shell account/session/credential together.
+            // Reading storage separately could bind a replacement account's
+            // credential to the previous session metadata during sign-in.
+            guard let capture = await owner.captureRequest(from: owner.destination),
+                  capture.expectedAccountId == binding.account, capture.sessionId == binding.session,
+                  let credential = await capture.growthCredential(), snapshot == generation,
+                  let client = owner.growthClient(for: capture) else { return }
             let installation = try GrowthPushInstallation.next()
-            let client = GrowthClient(baseURL: baseURL)
             if let token = binding.token {
                 try await client.registerDevice(installationID: installation.id, token: token, granted: granted, registrationRevision: installation.revision, expectedSession: credential)
             } else if !granted {
                 try await client.revokeDevice(installationID: installation.id, registrationRevision: installation.revision, expectedSession: credential)
             } else { return }
-            guard snapshot == generation, deviceToken == binding.token else { dirty = true; return }
+            guard snapshot == generation, deviceToken == binding.token,
+                  await capture.isCurrent() else { dirty = true; return }
             acknowledged = binding; message = ""
         } catch {
             guard snapshot == generation else { dirty = true; return }

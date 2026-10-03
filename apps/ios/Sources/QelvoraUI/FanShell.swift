@@ -118,7 +118,7 @@ public final class FanSession: ObservableObject {
             if let previous = session, previous.accountId != value.accountId { if await purge() { error = "The account changed. Continue with Pantopus again." }; return }
             session = value; error = ""
             #if os(iOS)
-            GrowthPushCoordinator.shared.update(session: value, baseURL: baseURL)
+            GrowthPushCoordinator.shared.update(session: value, baseURL: baseURL, owner: self)
             #endif
         } catch let failure as CreatorAPIError {
             guard current == generation, !Task.isCancelled else { return }
@@ -212,7 +212,7 @@ public final class FanSession: ObservableObject {
         defer { purgingPrivateState = false }
         generation += 1; session = nil; hasSavedCredential = false; checkingSession = false; actors = []; choosingDevelopmentActor = false; error = ""
         #if os(iOS)
-        GrowthPushCoordinator.shared.update(session: nil, baseURL: baseURL)
+        GrowthPushCoordinator.shared.update(session: nil, baseURL: baseURL, owner: self)
         #endif
         URLCache.shared.removeAllCachedResponses()
         var cleared = true

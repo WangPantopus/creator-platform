@@ -6,31 +6,8 @@ import { useRouter } from "next/navigation";
 import type { InboxItem, Cluster } from "./types";
 import { glyphs } from "@qelvora/ui-web";
 import { useGrowthSession, GrowthActionError } from "./session";
+import { useGrowthPublicSession } from "./public-session";
 export { GrowthActionError } from "./session";
-export async function mutate(
-  path: string,
-  body: unknown,
-  method = "POST",
-  expectedAccountId?: string,
-) {
-  const response = await fetch(`/api/growth/${path}`, {
-    method,
-    headers: {
-      "Content-Type": "application/json",
-      ...(expectedAccountId
-        ? { "X-Expected-Account-Id": expectedAccountId }
-        : {}),
-    },
-    ...(method !== "DELETE" ? { body: JSON.stringify(body) } : {}),
-  });
-  const result = await response.json();
-  if (!response.ok)
-    throw new GrowthActionError(
-      response.status,
-      result.error?.message ?? growthCopy.growthThisActionCouldNotBeCompleted,
-    );
-  return result;
-}
 export function Follow({
   creatorId,
   handle,
@@ -40,24 +17,25 @@ export function Follow({
   handle: string;
   following?: boolean;
 }) {
+  const { request, revision } = useGrowthPublicSession(`follow:${creatorId}`);
   const [value, setValue] = useState(following),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [signIn, setSignIn] = useState(false);
   useEffect(() => {
     let active = true;
-    void fetch(`/api/growth/follow/${creatorId}`)
-      .then(async (response) => {
-        if (response.ok) {
-          const result = await response.json();
-          if (active) setValue(result.following === true);
-        }
+    setValue(false);
+    setError("");
+    setSignIn(false);
+    void request<{ following: boolean }>(`follow/${creatorId}`)
+      .then((result) => {
+        if (active) setValue(result.following === true);
       })
       .catch(() => {});
     return () => {
       active = false;
     };
-  }, [creatorId]);
+  }, [creatorId, request, revision]);
   return (
     <div>
       <button
@@ -68,9 +46,13 @@ export function Follow({
           setError("");
           setSignIn(false);
           try {
-            await mutate(`follow/${creatorId}`, { following: !value }, "PUT");
+            await request(`follow/${creatorId}`, {
+              method: "PUT",
+              body: JSON.stringify({ following: !value }),
+            });
             setValue(!value);
           } catch (e) {
+            if (e instanceof DOMException && e.name === "AbortError") return;
             setSignIn(e instanceof GrowthActionError && e.status === 401);
             setError(
               e instanceof Error

@@ -1,9 +1,10 @@
 "use client";
 import { copy as growthCopy } from "@qelvora/copy";
 import { useEffect, useRef, useState } from "react";
-import { mutate, GrowthActionError } from "./actions";
+import { GrowthActionError } from "./session";
 import { growthText as text } from "./copy";
 import { useGrowthSession } from "./session";
+import { useGrowthPublicSession } from "./public-session";
 
 /** Owner-recorded value + server-side caps determine whether this optional prompt exists. */
 export function BrowserPostValuePrompt() {
@@ -114,10 +115,18 @@ export function VoluntaryInvite({
   handle: string;
   contextId?: string | null;
 }) {
+  const { request, revision } = useGrowthPublicSession(
+    `invite:${handle}:${contextId ?? ""}`,
+  );
   const [link, setLink] = useState<{ id: string; url: string } | null>(null),
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState(""),
     [signIn, setSignIn] = useState(false);
+  useEffect(() => {
+    setLink(null);
+    setMessage("");
+    setSignIn(false);
+  }, [revision, handle, contextId]);
   return (
     <div className="growth-stack">
       <button
@@ -128,12 +137,17 @@ export function VoluntaryInvite({
           setMessage("");
           setSignIn(false);
           try {
-            const result = await mutate("referrals", { handle, contextId });
+            const result = await request<{ id: string }>("referrals", {
+              method: "POST",
+              body: JSON.stringify({ handle, contextId }),
+            });
             setLink({
               id: result.id,
               url: new URL(`/invite/${result.id}`, window.location.origin).href,
             });
           } catch (error) {
+            if (error instanceof DOMException && error.name === "AbortError")
+              return;
             setSignIn(
               error instanceof GrowthActionError && error.status === 401,
             );
@@ -157,10 +171,15 @@ export function VoluntaryInvite({
             onClick={async () => {
               setBusy(true);
               try {
-                await mutate(`invites/${link.id}`, null, "DELETE");
+                await request(`invites/${link.id}`, { method: "DELETE" });
                 setLink(null);
                 setMessage(text("inviteRevoked"));
               } catch (error) {
+                if (
+                  error instanceof DOMException &&
+                  error.name === "AbortError"
+                )
+                  return;
                 setMessage(
                   error instanceof Error ? error.message : text("unavailable"),
                 );
@@ -194,11 +213,20 @@ export function EntryConsent({
   source: "creator_link" | "post" | "invite" | "share";
   objectId?: string | null;
 }) {
+  const { request, revision } = useGrowthPublicSession(
+    `entry:${source}:${handle}:${objectId ?? ""}`,
+  );
   const id = useRef<string | null>(null),
     [saved, setSaved] = useState(false),
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState(""),
     [signIn, setSignIn] = useState(false);
+  useEffect(() => {
+    id.current = null;
+    setSaved(false);
+    setMessage("");
+    setSignIn(false);
+  }, [revision, handle, source, objectId]);
   const returnTo =
     source === "invite"
       ? `/invite/${objectId}`
@@ -218,17 +246,22 @@ export function EntryConsent({
           setBusy(true);
           setSignIn(false);
           try {
-            await mutate("entry", {
-              id: id.current,
-              handle,
-              source,
-              objectId,
-              surface: "web",
-              consent: true,
+            await request("entry", {
+              method: "POST",
+              body: JSON.stringify({
+                id: id.current,
+                handle,
+                source,
+                objectId,
+                surface: "web",
+                consent: true,
+              }),
             });
             setSaved(true);
             setMessage(text("entrySaved"));
           } catch (error) {
+            if (error instanceof DOMException && error.name === "AbortError")
+              return;
             setSignIn(
               error instanceof GrowthActionError && error.status === 401,
             );
