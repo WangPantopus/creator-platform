@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-02T15:27:07.654851+00:00",
+  "releasedExactOwnedLeases": [
+    {
+      "slot": "creator-platform-emulator-slot-2",
+      "token": "c5b75745-d3b6-4535-9b28-c9889660287f",
+      "device": "emulator-5582",
+      "dev": 16777232,
+      "ino": 241065743
+    },
+    {
+      "slot": "creator-platform-simulator-slot-2",
+      "token": "4497700a-29ed-40aa-afa3-bd2f5bb9a1b3",
+      "device": "3E02BBA8-75B0-4D3B-BE37-E636C9E71687",
+      "dev": 16777232,
+      "ino": 241075711
+    }
+  ],
+  "androidOwnedSerialAbsent": true,
+  "iosOwnedDeviceShutdown": true,
+  "peerDevicesUntouched": true
+}

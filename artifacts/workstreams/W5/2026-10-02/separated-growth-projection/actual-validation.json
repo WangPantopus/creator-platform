@@ -1,0 +1,60 @@
+{
+  "source": "1d11c8608184f1238067c967989511331e79d6f7",
+  "base": "36f9505eca1315486928694a097b3168097fb345",
+  "ownerReference": "W7 actual immutable9841372c38f1afe17d27a35e06e92c550b246bae:content/integration.ts publicProjection and growth/content.ts producer",
+  "validation": {
+    "backendTypeScript": "passed",
+    "scopedESLint": "passed",
+    "formatting": "passed",
+    "diffWhitespace": "passed"
+  },
+  "actualHost": {
+    "health": {
+      "status": "ok",
+      "ready": false,
+      "foundationReady": true,
+      "identity": "configured",
+      "identityMode": "development",
+      "generation": "unconfigured",
+      "registeredFeatures": [
+        "conversation",
+        "content",
+        "studio",
+        "commerce",
+        "growth",
+        "agent"
+      ],
+      "readinessEndpoint": "/health/ready",
+      "database": "configured",
+      "featureEnabled": true
+    },
+    "readinessStatus": 503,
+    "readiness": {
+      "ready": false,
+      "capabilities": [
+        {
+          "name": "trust_runtime",
+          "required": true,
+          "state": "unavailable",
+          "code": "trust_unconfigured",
+          "checkedAt": "2026-10-02T14:54:10.164Z"
+        }
+      ]
+    },
+    "mode": "Owned preserved canonical57/development composite runtime; optional new projection producer not bound by current legacy host."
+  },
+  "statuses": {
+    "implemented": "Optional bound separate-pool projection and canonical-core follow-reader bundle; optional CurrentThanksTarget deadline signal.",
+    "runnable": "Existing actual W5 host starts with foundationReadytrue/readyfalse.",
+    "integrated": "New producer port not yet wired into W5 separate-pool host; W7 canonical host wiring remains PR31. No server.ts edit.",
+    "verified": "Types/lint/format and actual legacy-host startup only.",
+    "releaseReady": false
+  },
+  "limits": [
+    "No configured projection, genuine signature, current publisher proof, delivery receipt, follower count or weekly Impact authority is claimed by adding a callback.",
+    "Content/Growth legacy same-pool guard and downstream durable-reference check retained. Published/withdrawn refuses before Content bound.",
+    "contentThanksWindow and contentThanksPermission signatures unchanged. Optional AbortSignal is not a grant.",
+    "Creator verified state DEVELOPMENT-ONLY SEEDED/no proof or passkey; future migrations unactivated; no new tests."
+  ],
+  "at": "2026-10-02T14:56:29.743753+00:00"
+}

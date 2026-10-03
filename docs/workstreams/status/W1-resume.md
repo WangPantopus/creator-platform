@@ -1,5 +1,9 @@
 # W1 continuation — September 30, 2026
 
+October 2 successor reconciliation: PR21 now incorporates current main `af38420d7aa5b07df009a01a4be3e8026f753d2a`, preserving the merged issuer-bound native producer, held-session finalization, proof Support and canonical Studio navigation. Only dated W1 documentation conflicted; both records are retained below. Current-source checks and personal web/native onboarding qualification are in progress. Queued hosted jobs remain non-passes. W1 original61 and the separately labelled development61 copy remain closed; no current runtime or native acceptance is inferred. The entire original seven-group/H01–H20 assignment remains incomplete.
+
+October 2 focused main increment: actual Ops/Account/Status return handling and truthful no-fan Account are implemented and personally browser-operated at cac6be9c on an independently restored, labelled canonical57 development copy. Same actual expired session rotates and returns to audits; Ops denies without membership. Original W1 remains closed. Production build/types/canonical generation/scoped checks pass; native/full workstream acceptance remains open. [Exact bounded evidence](../../../artifacts/workstreams/W1/resume/2026-10-02-ops-return/run.md).
+
 ## October 1 — current public integrity and held-read integration
 
 Application `4fda909e` normally integrates main `c1c615e6` through all eight W1 branches, including W4's held creator financial-read guard. No genuine held producer is invented or bound; owner money remains unavailable without it. Current canonical resource/native API checks pass for 12 outputs/98 operations. [Current source/branch qualification](../../../artifacts/workstreams/W1/resume/2026-10-01-main-ef3619b/run.md).

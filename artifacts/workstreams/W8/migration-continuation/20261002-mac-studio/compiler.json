@@ -1,0 +1,38 @@
+{
+  "functions": [
+    {
+      "name": "creator_trust.domain_privacy_migration_registered(text, text)",
+      "diagnostics": 0
+    },
+    {
+      "name": "creator_trust.fence_domain_privacy_task(uuid, uuid, text, text, uuid, uuid, text, uuid)",
+      "diagnostics": 0
+    },
+    {
+      "name": "creator_trust.fence_privacy_task(uuid, uuid, text, text, uuid, uuid, text, uuid)",
+      "diagnostics": 0
+    },
+    {
+      "name": "creator_trust.finish_domain_privacy_task_scope()",
+      "diagnostics": 0
+    },
+    {
+      "name": "creator_trust.finish_privacy_task_scope()",
+      "diagnostics": 0
+    },
+    {
+      "name": "creator_trust.interactive_denial(text, uuid, uuid)",
+      "diagnostics": 0
+    },
+    {
+      "name": "creator_trust.runtime_content_denial(uuid)",
+      "diagnostics": 0
+    },
+    {
+      "name": "creator_trust.try_interactive_denial_keys(uuid, uuid, uuid)",
+      "diagnostics": 0
+    }
+  ],
+  "diagnostics": 0,
+  "extensionAndReviewRolledBack": true
+}

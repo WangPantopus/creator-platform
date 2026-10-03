@@ -2,7 +2,12 @@ import type { Pool, PoolClient } from "pg";
 import { IdSchema } from "@qelvora/api";
 import type { Actor } from "./adapter.js";
 import { identityTransaction } from "./transaction.js";
-import { assertCurrentSession, requestAuthority } from "./request-authority.js";
+import {
+  assertCurrentSession,
+  requestAuthority,
+  holdCurrentRequestSession,
+  assertHeldCurrentRequestSession,
+} from "./request-authority.js";
 import { invariant } from "../../core/errors.js";
 
 const audienceScopeBrand: unique symbol = Symbol("AudienceScope");
@@ -145,11 +150,31 @@ export class AudienceIdentityAuthority {
 
   private async authorize(scope: AudienceScope, client: PoolClient) {
     this.assertRequest(scope.actorAccountId);
+    const held = await holdCurrentRequestSession(client, scope.actorAccountId);
     await assertCurrentSession(client, scope.actorAccountId);
     await client.query(
       "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true),set_config('app.account_id',$3,true)",
       [scope.creatorId, scope.fanId, scope.actorAccountId],
     );
+    // Hold genuine negative keys before positive profile/family leases.
+    try {
+      await this.configuration.assertAllowed(
+        held.actor,
+        scope.creatorId,
+        {
+          fanId: scope.fanId,
+          fanAccountId: scope.fanAccountId,
+          creatorAccountId: scope.creatorAccountId,
+        },
+        client,
+      );
+      await assertHeldCurrentRequestSession(held, client);
+    } finally {
+      await client.query(
+        "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true),set_config('app.account_id',$3,true)",
+        [scope.creatorId, scope.fanId, scope.actorAccountId],
+      );
+    }
     // Public profile SELECT does not grant its owner-only UPDATE RLS required
     // by FOR SHARE. Lock only this already-resolved creator row under its
     // actual owner, then restore the audience account before any domain work.
@@ -177,22 +202,5 @@ export class AudienceIdentityAuthority {
       "audience_unavailable",
       "This content is unavailable.",
     );
-    try {
-      await this.configuration.assertAllowed(
-        { accountId: scope.actorAccountId, adultEligible: true },
-        scope.creatorId,
-        {
-          fanId: scope.fanId,
-          fanAccountId: scope.fanAccountId,
-          creatorAccountId: scope.creatorAccountId,
-        },
-        client,
-      );
-    } finally {
-      await client.query(
-        "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true),set_config('app.account_id',$3,true)",
-        [scope.creatorId, scope.fanId, scope.actorAccountId],
-      );
-    }
   }
 }

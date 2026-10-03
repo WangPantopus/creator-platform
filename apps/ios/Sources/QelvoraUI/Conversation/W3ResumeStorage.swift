@@ -44,5 +44,8 @@ actor W3ResumeStorage {
         guard var state = read(), state.account == digest(accountId) else { return }
         state.entries.removeValue(forKey: digest(scope)); write(state)
     }
-    func purge() { SecItemDelete(query as CFDictionary) }
+    func purge() throws {
+        let status = SecItemDelete(query as CFDictionary)
+        guard status == errSecSuccess || status == errSecItemNotFound else { throw URLError(.userAuthenticationRequired) }
+    }
 }

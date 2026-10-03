@@ -1,0 +1,28 @@
+{
+  "at": "2026-10-02T18:00:51.856Z",
+  "purpose": "Unactivated held SQL catalogue query compilation and missing-ledger refusal only",
+  "administrativeSessionAuthorization": true,
+  "sourceChecksum": "8f4cebbdee2649a97b2e8e7e31173cbe4563dd6f951dd677f51cd61b50befc1a",
+  "newLedgerRows": 0,
+  "before": {
+    "role_exists": false,
+    "purpose": null,
+    "migrations": 61
+  },
+  "definition": {
+    "checksum": "7307cc97902322401cccbc94c02c682fb579756150378fdbbc216ae75848715b"
+  },
+  "catalogue": {
+    "queryExecuted": true,
+    "errorCode": "call_metadata_unconfigured",
+    "refused": true
+  },
+  "emptyRequest": {
+    "count": 0
+  },
+  "after": {
+    "role_exists": false,
+    "purpose": null,
+    "migrations": 61
+  }
+}

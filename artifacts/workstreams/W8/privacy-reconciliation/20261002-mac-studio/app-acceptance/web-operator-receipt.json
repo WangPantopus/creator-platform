@@ -1,0 +1,93 @@
+{
+  "label": "real labelled synthetic canonical web privacy and Ops, no full C10/activation/release claim",
+  "errors": [],
+  "privacyPreviouslySaved": true,
+  "privacy": {
+    "retryStatus": 200,
+    "jobHash": "649bc3e462d36903335da55aff16dc402544298ee8f5b10c6683224587b18e62",
+    "state": "blocked",
+    "tasks": [
+      {
+        "domain": "agent",
+        "state": "complete",
+        "errorCode": null,
+        "receiptPresent": true
+      },
+      {
+        "domain": "commerce",
+        "state": "blocked",
+        "errorCode": "domain_hook_unavailable",
+        "receiptPresent": false
+      },
+      {
+        "domain": "content",
+        "state": "blocked",
+        "errorCode": "domain_hook_unavailable",
+        "receiptPresent": false
+      },
+      {
+        "domain": "conversation",
+        "state": "blocked",
+        "errorCode": "conversation_lineage_unavailable",
+        "receiptPresent": false
+      },
+      {
+        "domain": "growth",
+        "state": "blocked",
+        "errorCode": "domain_hook_unavailable",
+        "receiptPresent": false
+      },
+      {
+        "domain": "identity",
+        "state": "blocked",
+        "errorCode": "privacy_commit_fence_unavailable",
+        "receiptPresent": false
+      },
+      {
+        "domain": "media",
+        "state": "blocked",
+        "errorCode": "privacy_commit_fence_unavailable",
+        "receiptPresent": false
+      },
+      {
+        "domain": "trust",
+        "state": "complete",
+        "errorCode": null,
+        "receiptPresent": true
+      }
+    ],
+    "downloadVisible": false,
+    "phone": {
+      "width": 390,
+      "scroll": 390,
+      "nav": null,
+      "theme": "night"
+    }
+  },
+  "ops": {
+    "desktop": {
+      "width": 1280,
+      "scroll": 1280,
+      "nav": 220,
+      "theme": "light"
+    },
+    "cases": 3,
+    "night": {
+      "width": 1280,
+      "scroll": 1280,
+      "nav": 220,
+      "theme": "night"
+    },
+    "keyboard": {
+      "tag": "A",
+      "label": "Skip to case content"
+    },
+    "phone": {
+      "width": 390,
+      "scroll": 390,
+      "nav": 390,
+      "theme": "night"
+    },
+    "caseAccessPrompt": true
+  }
+}

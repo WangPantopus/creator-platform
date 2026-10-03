@@ -44,6 +44,8 @@ export function createCommerceRouter(input: {
       passEnabled: input.extended?.pass?.configured ?? false,
       passPurchaseAvailable: input.extended?.passPurchases?.configured ?? false,
       payoutsAvailable: input.extended?.settlement?.configured ?? false,
+      voiceFulfillmentAvailable:
+        input.service?.voiceFulfillmentAvailable ?? false,
       payoutOnboardingAvailable:
         input.extended?.settlement?.onboardingConfigured ?? false,
       creatorEarningsAvailable:
@@ -93,6 +95,8 @@ export function createCommerceRouter(input: {
         ...value.capabilities,
         storePurchasesAvailable: input.extended?.storeConfigured ?? false,
         membershipAvailable: input.extended?.billing?.configured ?? false,
+        voiceFulfillmentAvailable:
+          input.service?.voiceFulfillmentAvailable ?? false,
         passPurchaseAvailable:
           input.extended?.passPurchases?.configured ?? false,
         creatorEarningsAvailable:
@@ -407,6 +411,32 @@ export function createCommerceRouter(input: {
   router.post("/packets/:packetId/deliver", async (req, res) =>
     res.json(
       await service().deliver(
+        await actorFor(req),
+        id(req.params.packetId),
+        req.body,
+      ),
+    ),
+  );
+  router.post("/creators/:creatorId/fulfillment-plans", async (req, res) =>
+    res.json(
+      await service().createFulfillmentPlan(
+        await actorFor(req),
+        id(req.params.creatorId),
+        req.body,
+      ),
+    ),
+  );
+  router.get("/packets/:packetId/review-attestation", async (req, res) =>
+    res.json(
+      await service().reviewAttestationCommand(
+        await actorFor(req),
+        id(req.params.packetId),
+      ),
+    ),
+  );
+  router.post("/packets/:packetId/review-attestation", async (req, res) =>
+    res.json(
+      await service().attestReview(
         await actorFor(req),
         id(req.params.packetId),
         req.body,

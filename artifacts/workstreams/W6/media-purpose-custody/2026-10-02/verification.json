@@ -1,0 +1,52 @@
+{
+  "at": "2026-10-02T18:41:14.900417+00:00",
+  "source": "d1b763335ba18065dfe2a2fed33d2304aa06f2d1",
+  "noNewUnitTests": true,
+  "checks": {
+    "backendBuild": "pass",
+    "webTypes": "pass",
+    "scopedLint": "pass",
+    "generation": "pass",
+    "existingPGAndContractChecks": {
+      "passed": 18,
+      "durationSeconds": 174.75
+    },
+    "productionWebBuild": "pass",
+    "androidShippingBuild": {
+      "pass": true,
+      "durationSeconds": 24,
+      "apkSha256": "473d4a1fe99e008de2a8d109ba590291d5b99aa5e4a8316d5fada9b63e2b1cd0"
+    },
+    "iosShippingBuild": {
+      "pass": true,
+      "source": "4310ff9b",
+      "strictDeepCodesign": "pass",
+      "directActualUIOperation": "idb axbridge",
+      "XCTestRunThisIncrement": false,
+      "executableSha256": "2f9ff1073895f969aae3dd948ffe96738c42568c38891a3d0736d805f971308b"
+    },
+    "scopedFormatting": "pass"
+  },
+  "privateLogHashes": {
+    "media-purpose-final-backend-build.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "media-purpose-final-web-types.log": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92",
+    "media-purpose-final-existing-contracts.log": "1da7e87484361879061dfc54d8981ca02f35ccb65501975427b0219527674eba",
+    "media-purpose-final-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "media-purpose-final-generation.log": "1dc06110c0cb04a55f72f69ea6f1ee8ad6552681a5d3efbc20ef258d36f449a5",
+    "media-purpose-production-web-build.log": "3cbfb9145d7ded12d55decbe5ebc9d869420ecdc46d22d5e75d56735a68901e0",
+    "android-purpose-custody-dirty-fix-build.log": "bb812835b3dc05d02986548704b5b2b94c81e1723b97f805b3d60021c67ab4c7",
+    "media-purpose-final-format.log": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+  },
+  "cleanup": {
+    "androidDevice": "emulator-5582",
+    "androidOwnedEmulatorExitCode": 0,
+    "iosDevice": "3E02BBA8-75B0-4D3B-BE37-E636C9E71687",
+    "ownAppAndIdbCompanionStopped": true,
+    "ownedSimulatorShutdown": true,
+    "bothSlot1LeasesReleasedWithNonceDeviceInodeGuards": true,
+    "contractContainerStopped": true,
+    "heavyBuildLeaseReleased": true,
+    "ownedAPI4106AndWeb3006StoppedAfterActualRepeat": true,
+    "ownedDatabaseContainerStopped": true
+  }
+}
