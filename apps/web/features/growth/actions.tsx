@@ -92,8 +92,6 @@ export function Inbox({
   items: InboxItem[];
   timeZone?: string;
 }) {
-  const { request, signal } = useGrowthSession();
-  const [error, setError] = useState("");
   const dateKey = (value: string | Date) => {
     const parts = Object.fromEntries(
       new Intl.DateTimeFormat("en", {
@@ -124,11 +122,6 @@ export function Inbox({
   }, {});
   return (
     <>
-      {error ? (
-        <p role="alert" className="growth-error">
-          {error}
-        </p>
-      ) : null}
       {Object.entries(groups).map(([group, entries]) => (
         <section key={group}>
           <p className="growth-meta">
@@ -145,23 +138,6 @@ export function Inbox({
               className={`qv qv-notif growth-notification ${item.readAt ? "" : "is-unread"}`}
               key={item.id}
               href={`/notifications/${item.id}`}
-              onClick={async (event) => {
-                event.preventDefault();
-                try {
-                  await request(`notifications/${item.id}/read`, {
-                    method: "PUT",
-                    body: "{}",
-                  });
-                  window.location.assign(`/notifications/${item.id}`);
-                } catch (e) {
-                  if (signal.aborted) return;
-                  setError(
-                    e instanceof Error
-                      ? e.message
-                      : growthCopy.growthCouldNotOpenUpdate,
-                  );
-                }
-              }}
             >
               <span
                 aria-hidden="true"

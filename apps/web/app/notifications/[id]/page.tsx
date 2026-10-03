@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { validReturnTarget } from "@qelvora/api";
 import { copy } from "@qelvora/copy";
 import {
@@ -7,6 +6,8 @@ import {
 } from "../../../features/growth/server";
 import { GrowthShell, Failure } from "../../../features/growth/shell";
 import { currentSession } from "../../../lib/session";
+import { IdentitySessionBoundary } from "../../../features/identity/session-boundary";
+import { OpenNotification } from "../../../features/growth/notification-arrival";
 
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
@@ -22,7 +23,6 @@ export default async function NotificationArrival({
   const validId =
     /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/u.test(id);
   const session = validId ? await currentSession(`/notifications/${id}`) : null;
-  let target: string;
   try {
     if (!validId)
       throw new GrowthUnavailable(
@@ -53,7 +53,17 @@ export default async function NotificationArrival({
         "notification_unavailable",
         copy.growthThisDestinationIsNoLongerAvailable,
       );
-    target = current.destination;
+    return (
+      <IdentitySessionBoundary
+        key={session.sessionId}
+        initial={session}
+        returnTo={`/notifications/${id}`}
+      >
+        <GrowthShell>
+          <OpenNotification id={id} />
+        </GrowthShell>
+      </IdentitySessionBoundary>
+    );
   } catch (error) {
     return (
       <GrowthShell>
@@ -64,6 +74,4 @@ export default async function NotificationArrival({
       </GrowthShell>
     );
   }
-  // Next redirect throws; it must remain outside the lookup/recovery catch.
-  redirect(target);
 }
