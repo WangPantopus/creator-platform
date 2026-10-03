@@ -4,6 +4,7 @@ import { DomainError, invariant } from "../../core/errors.js";
 import { requestAuthority } from "../identity/request-authority.js";
 import { PrivacyDomains, type PrivacyHook } from "./contracts.js";
 import { assertPrivacyTaskCatalog } from "./privacy-catalog.js";
+import { assertOriginalPrivacyFamilyCatalog } from "./privacy-family-catalog.js";
 
 export type PrivacyTaskInput = Parameters<PrivacyHook["run"]>[0];
 /** Current restoration and genuine lease on the same held lifecycle client.
@@ -104,6 +105,26 @@ export async function privacyTaskAuthorityInTransaction(
         "The current lifecycle task is unavailable.",
         503,
       );
+    if (domain === "conversation") {
+      // The immutable 0087 function keeps its original account-only result.
+      // Every-scope projection is a separately registered fixed purpose on
+      // this actual held original task, never a coordinator observation.
+      await assertOriginalPrivacyFamilyCatalog(client);
+      const family = (
+        await client.query<{ owned: string[] }>(
+          "SELECT creator_trust.privacy_task_owned_creators($1,$2) AS owned",
+          [input.jobId, input.leaseToken],
+        )
+      ).rows[0];
+      input.signal.throwIfAborted();
+      if (!family)
+        throw new DomainError(
+          "privacy_original_family_unavailable",
+          "The original ownership projection is unavailable.",
+          503,
+        );
+      return z.array(z.uuid()).max(100).parse(family.owned);
+    }
     return z.array(z.uuid()).max(100).parse(row.owned);
   } catch (error) {
     await client.query("ROLLBACK TO SAVEPOINT w8_privacy_task_fence");
