@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { PoolClient } from "pg";
 import type { Database } from "../../db/database.js";
+import { registeredMigration } from "../../db/reviewed-migration.js";
 import { invariant } from "../../core/errors.js";
 import { idempotent } from "../../core/idempotency.js";
 import { appendFrame } from "../../core/outbox.js";
@@ -15,8 +16,12 @@ import {
   ConversationCorrectionInputSchema,
 } from "../../../../../packages/api/src/conversation/contracts.js";
 
-const checksum =
-  "89895cd1c9eabb3a85556c3efb912a201a2137564ed3299c0e7778cbef5f7911";
+const correctionSource = Object.freeze({
+  path: "apps/backend/src/modules/conversation/migrations/pending_w3_correction_signature.sql",
+  owner: "W3",
+  name: "w3_correction_signature",
+  checksum: "5c94b94a7287a5c4a149da454117c30be40367034b9930ac11e168e5b6a4b3e0",
+});
 type Command = ReturnType<typeof ConversationCorrectionCommandSchema.parse>;
 
 /** A correction is a new creator-signed attachment to an exact AI original.
@@ -33,6 +38,9 @@ export class ConversationCorrections {
     migrationVersion: string;
   }) {
     if (!input.access.threadScopeInTransactionAvailable) return undefined;
+    const migration = await registeredMigration(correctionSource);
+    if (!migration || input.migrationVersion !== migration.version)
+      return undefined;
     const installed = (
       await input.database.pool.query(
         "SELECT to_regclass('creator.schema_migration') AS migration,to_regclass('creator.conversation_feedback') AS lineage",
@@ -41,7 +49,7 @@ export class ConversationCorrections {
     if (!installed?.migration || !installed.lineage) return undefined;
     const registered = await input.database.pool.query(
       "SELECT 1 FROM creator.schema_migration WHERE version=$1 AND checksum=$2",
-      [input.migrationVersion, checksum],
+      [input.migrationVersion, migration.checksum],
     );
     if (registered.rowCount !== 1) return undefined;
     const exact = await input.database.pool.query(

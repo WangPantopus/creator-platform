@@ -1,0 +1,17 @@
+# W1 successor personal operation — October 2
+
+All twelve active original W1 stack branches were normally merged with fetched main af38420d and matched their pushed remote heads. Main subsequently advanced to 54b5db1f through W5 draft recovery. That increment is now normally integrated into all twelve active branches. Historical merged branches are retained. The shared main checkout was never switched, reset, cleaned or stashed.
+
+The retained original canonical61 remains traffic-closed at connection limit0. Read-only preflight independently compared both closed databases' actual61 ledger with current source, checked zero other clients and actual isolated core role custody. Only the explicitly labelled development61 copy was guarded-opened to32 clients. No held SQL, grant or ledger alias was installed. Original restoration custody and peer resources remain intact.
+
+The API was freshly rebuilt and launched from e2a04e1f on4112; web3012 serves the owned completion checkout. Actual health reports foundationReady=true, ready=false, development identity, and commerce_approvals among registered features. This does not establish a positive Approval, provider, publication or worker purpose.
+
+Personally operated current web through supported CUA: Pantopus continuation → existing development actor → preserved Account destination; Refresh session displayed Session refreshed. Then signed out on all devices while an independently signed-in shipping iOS session existed.
+
+Normal shipping iOS was built at da4ba1f1 with Xcode27/iOS27, two jobs, normal signing, strict codesign verification and effective API http://127.0.0.1:4112/link host localhost. Its iOS source was unchanged by backend-only e2a04e1f. Fresh owned iPhone17 simulator5D82BB46-25AF-4DA2-82C4-35DD6444991B was installed and launched. Supported CUA controls Xcode27 Device Hub, rather than the unavailable old Simulator app surface.
+
+Personally operated that shipping binary: Welcome → Continue with Pantopus → existing actor one → Home → You → identity Account. Web all-device logout returned iOS to Welcome with Your session ended. Continue with Pantopus again. The next observed denial was17.5 seconds after the web action; this is an observation upper bound including inspection delay, not a server latency measurement or p95. Selected a different existing development actor in the iOS chooser; Account showed its different retained profile. Operated native Refresh session, normally terminated/relaunched the app and observed authenticated Home from persisted storage. No bearer, cookie or actor was injected.
+
+Personal iOS operation found that the six distinct You menu rows all announced Your account. Source inspection identified an overriding accessibilityLabel on their containing VStack; remove only that override so each existing combined row retains its visible title and detail. The repaired binary still requires rebuild and personal operation. This finding is not full VoiceOver acceptance.
+
+These are explicit local development observations. Current Android, production refresh5xx/Retry, induced OS storage/cleanup failure, cancellation during exchange, issuer isolation, private W3 purge, authorized one-ID call, genuine proof/passkey/license/Signed, complete native daily Studio, all artboards/accessibility and release acceptance remain open. The original seven groups and H01–H20 remain active. No screenshots, credential receipts or private content are committed.
