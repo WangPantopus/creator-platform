@@ -62,7 +62,13 @@ class NativeVoiceRecorder(private val context: Context, val maxDurationMs: Long)
             mutable.value = RecordingSnapshot("recording", file = file); handler.post(tick)
         } catch (_: Exception) { recorder?.release(); recorder = null; file.delete(); mutable.value = RecordingSnapshot("failed", reason = QelvoraCopy.text("w6TheMicrophoneIsUnavailableTryAgain")) }
     }
-    fun deny() { mutable.value = RecordingSnapshot("denied", reason = QelvoraCopy.text("w6MicrophoneAccessIsOffAllowItInSettingsThenTry")) }
+    fun deny() {
+        if (closed) return
+        // A permission denial can follow Record again while a private preview
+        // still exists. Release its player and bytes before dropping the file.
+        discard()
+        mutable.value = RecordingSnapshot("denied", reason = QelvoraCopy.text("w6MicrophoneAccessIsOffAllowItInSettingsThenTry"))
+    }
     fun pause(reason: String? = null) {
         if (mutable.value.state != "recording") return
         accumulated += android.os.SystemClock.elapsedRealtime() - activeAt
