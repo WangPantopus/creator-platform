@@ -12,6 +12,50 @@
         }
       }
     },
+    "The service is unavailable. Your input has been kept; try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The service is unavailable. Your input has been kept; try again."
+          }
+        }
+      }
+    },
+    "The service returned an unreadable response. Your input has been kept; try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The service returned an unreadable response. Your input has been kept; try again."
+          }
+        }
+      }
+    },
+    "Could not save. Try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not save. Try again."
+          }
+        }
+      }
+    },
+    "About 20 minutes for your interview": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About 20 minutes for your interview"
+          }
+        }
+      }
+    },
     "Her AI answers you now. She answers in person when you ask.": {
       "extractionState": "manual",
       "localizations": {

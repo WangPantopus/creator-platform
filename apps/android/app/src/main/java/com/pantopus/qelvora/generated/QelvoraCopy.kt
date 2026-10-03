@@ -3,6 +3,10 @@ package com.pantopus.qelvora.generated
 object QelvoraCopy {
   val strings = mapOf(
     "continueWithPantopus" to "Continue with Pantopus",
+    "identityInputKeptUnavailable" to "The service is unavailable. Your input has been kept; try again.",
+    "identityInputKeptUnreadable" to "The service returned an unreadable response. Your input has been kept; try again.",
+    "identityProfileSaveFailed" to "Could not save. Try again.",
+    "creatorInterviewEstimate" to "About 20 minutes for your interview",
     "welcomeTitle" to "Her AI answers you now. She answers in person when you ask.",
     "welcomeBody" to "Every message says who wrote it: Maya's AI, Maya herself, or her team. You'll always know which.",
     "pantopusAccount" to "One Pantopus account signs you in to every Pantopus app. New here? You'll create it in the next step.",
