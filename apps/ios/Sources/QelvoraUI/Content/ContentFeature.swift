@@ -76,12 +76,19 @@ public enum ContentFanFeature {
         return parts.count == 3 && parts[0] == "content" && UUID(uuidString: String(parts[1])) != nil && UUID(uuidString: String(parts[2])) != nil
     }
     @MainActor public static func registration(baseURL: URL?) -> FanFeatureRegistration {
-        FanFeatureRegistration(matches: matches, screen: { session in AnyView(ContentFanScreen(baseURL: baseURL, session: session).id(session.destination)) })
+        FanFeatureRegistration(matches: matches, screen: { session in
+            let destination = session.destination
+            guard matches(destination) else { return AnyView(EmptyView()) }
+            let parts = destination.split(separator: "/")
+            return AnyView(ContentFanScreen(baseURL: baseURL, creatorId: String(parts[1]), contentId: String(parts[2]), session: session).id(destination))
+        })
     }
 }
 
 private struct ContentFanScreen: View {
     let baseURL: URL?
+    let creatorId: String
+    let contentId: String
     @ObservedObject var session: FanSession
     @State private var content: ContentViewValue?
     @State private var replies: [ContentReply] = []
@@ -104,12 +111,11 @@ private struct ContentFanScreen: View {
     @State private var replyAccess = false
     @State private var thanksAccess = false
     @State private var loading = false
+    @State private var active = true
     @State private var checkedAt: TimeInterval = 0
     @State private var retryKeys: [String: String] = [:]
     @Environment(\.colorScheme) private var scheme
     @Environment(\.scenePhase) private var scene
-    private var creatorId: String { String(session.destination.split(separator: "/")[1]) }
-    private var contentId: String { String(session.destination.split(separator: "/")[2]) }
     private var replyLimit: Int { replyPolicy?.limit ?? 4000 }
     var body: some View {
         ScrollView {
@@ -187,6 +193,7 @@ private struct ContentFanScreen: View {
                 // five-second authority expiry still conceals stale content.
                 let remaining = max(0.25, 2 - (ProcessInfo.processInfo.systemUptime - refreshStarted))
                 try? await Task.sleep(for: .seconds(remaining))
+                guard !Task.isCancelled else { return }
                 refreshStarted = ProcessInfo.processInfo.systemUptime
                 if !busy { await load(refreshThanks: false) }
             }
@@ -201,6 +208,8 @@ private struct ContentFanScreen: View {
             if value == .active { Task { await load(refreshThanks: false) } }
             else { suspendAccess() }
         }
+        .onAppear { active = true }
+        .onDisappear { active = false; loadGeneration += 1; clearAuthority() }
         .sheet(isPresented: Binding(get: { signature != nil }, set: { if !$0 { signature = nil; signatureStatus = "" } })) {
             VStack(spacing: 16) { Text("Signature").qText("display-md"); Text(signatureStatus.isEmpty ? "Checking current signature…" : signatureStatus).qText("body"); Button("Done", variant: .secondary) { signature = nil; signatureStatus = "" } }.padding(24).task { await verify() }
         }
@@ -226,7 +235,7 @@ private struct ContentFanScreen: View {
         viewerAccountId = nil; muted = nil; replyText = ""; thanksText = ""; shareDigest = false; showIdentity = false; retryKeys = [:]
     }
     @MainActor private func load(refreshThanks: Bool = true) async {
-        guard !loading else { return }; loading = true; defer { loading = false }
+        guard active, !Task.isCancelled, !loading else { return }; loading = true; defer { loading = false }
         guard let baseURL else { suspendAccess(); error = QelvoraCopy.text("w5ContentRefreshUnavailable"); return }
         let creatorId = self.creatorId, contentId = self.contentId
         let cycleStartedAt = ProcessInfo.processInfo.systemUptime
@@ -271,7 +280,7 @@ private struct ContentFanScreen: View {
                 statuses.append(QelvoraCopy.text("contentReplyPolicyUnavailable"))
             }
             let after:ContentPreference=try await client.request(creatorId+"/mute", expectedAccountId: before.accountId)
-            guard generation==loadGeneration else{return}
+            guard active, !Task.isCancelled, generation==loadGeneration else{return}
             guard before.accountId==after.accountId else {clearAuthority();self.error=QelvoraCopy.text("w5ContentAccountChanged");return}
             let changed=viewerAccountId != before.accountId
             if changed {replyText="";thanksText="";shareDigest=false;showIdentity=false;retryKeys=[:];signature=nil;replyDepth=1}
@@ -280,7 +289,7 @@ private struct ContentFanScreen: View {
             self.error=statuses.joined(separator: "\n")
             checkedAt = cycleStartedAt; currentAccess = scene == .active && ProcessInfo.processInfo.systemUptime - cycleStartedAt < 5
         } catch {
-            guard generation==loadGeneration else{return}
+            guard active, !Task.isCancelled, generation==loadGeneration else{return}
             suspendAccess()
             content=nil;replies=[];thanks=nil;nextCursor=nil
             if (error as? ContentFailure)?.authorityDenied == true {clearAuthority()}
