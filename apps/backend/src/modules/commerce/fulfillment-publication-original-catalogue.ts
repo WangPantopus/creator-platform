@@ -12,12 +12,17 @@ export const FULFILLMENT_PUBLICATION_ORIGINAL_CATALOGUE_QUERY = `WITH roles AS (
  SELECT oid,rolname,rolcanlogin,rolinherit,rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls,rolconfig
  FROM pg_roles WHERE rolname IN('creator_publication_authority','creator_publication_worker','creator_fulfillment_publication_metadata','creator_trust_fulfillment_publication_denial','creator_fulfillment_publication_original_hash')
 ), relations AS (
- SELECT c.oid,c.relname,c.relowner,c.relkind,c.relrowsecurity,c.relforcerowsecurity,c.relispartition,c.relacl
- FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='creator'
- AND c.relname IN('publication_preparation','publication_worker_scope','content_index','content_revision','content_publication',
+ SELECT c.oid,n.nspname AS schema,c.relname,c.relowner,c.relkind,c.relrowsecurity,c.relforcerowsecurity,c.relispartition,c.relacl
+ FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
+ AND ((n.nspname='creator' AND c.relname IN('publication_preparation','publication_worker_scope','content_index','content_revision','content_publication',
  'creator_profile','fan_profile','team_membership','passkey_credential','signed_act','signed_act_consumption','signed_publication','signed_verification',
  'commerce_fulfillment_publication_scope','commerce_fulfillment_plan','commerce_fulfillment_member','commerce_group_delivery',
- 'commerce_packet','commerce_commitment','commerce_mode','commerce_ledger','commerce_effect','commerce_share_grant')
+ 'commerce_packet','commerce_commitment','commerce_mode','commerce_ledger','commerce_effect','commerce_share_grant'))
+  OR c.relowner IN(SELECT oid FROM roles)
+  OR EXISTS(SELECT FROM roles r WHERE CASE WHEN c.relkind IN('r','p','v','m','f') THEN
+   has_table_privilege(r.oid,c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
+    OR has_any_column_privilege(r.oid,c.oid,'SELECT,INSERT,UPDATE,REFERENCES')
+   WHEN c.relkind='S' THEN has_sequence_privilege(r.oid,c.oid,'SELECT,UPDATE,USAGE') ELSE false END))
 ) SELECT jsonb_build_object(
  'roles',(SELECT jsonb_agg(to_jsonb(r)-'oid' ORDER BY r.rolname COLLATE "C") FROM roles r),
  'memberships',(SELECT jsonb_agg(jsonb_build_object('role',pg_get_userbyid(m.roleid),'member',pg_get_userbyid(m.member),
@@ -40,10 +45,10 @@ export const FULFILLMENT_PUBLICATION_ORIGINAL_CATALOGUE_QUERY = `WITH roles AS (
    FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) g)) ORDER BY p.oid::regprocedure::text COLLATE "C")
   FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
   WHERE CASE WHEN n.nspname !~ '^pg_' AND n.nspname<>'information_schema' AND p.prokind IN('f','p') THEN
-   p.proowner IN(SELECT oid FROM roles) OR p.oid=ANY(ARRAY[to_regprocedure('creator.fence_signature_metadata_write()'),
+   p.proowner IN(SELECT oid FROM roles) OR EXISTS(SELECT FROM pg_trigger t WHERE t.tgfoid=p.oid AND t.tgrelid IN(SELECT oid FROM relations)) OR p.oid=ANY(ARRAY[to_regprocedure('creator.fence_signature_metadata_write()'),
      to_regprocedure('creator.fence_public_packet_write()'),to_regprocedure('creator.fence_public_mode_write()')])
     OR EXISTS(SELECT FROM roles r WHERE has_function_privilege(r.oid,p.oid,'EXECUTE')) ELSE false END),
- 'relations',(SELECT jsonb_agg(jsonb_build_object('name',o.relname,'owner',pg_get_userbyid(o.relowner),'kind',o.relkind,
+ 'relations',(SELECT jsonb_agg(jsonb_build_object('schema',o.schema,'name',o.relname,'owner',pg_get_userbyid(o.relowner),'kind',o.relkind,
   'rls',o.relrowsecurity,'forced',o.relforcerowsecurity,'partition',o.relispartition,
   'columns',(SELECT jsonb_agg(jsonb_build_object('number',a.attnum,'name',a.attname,'type',format_type(a.atttypid,a.atttypmod),
    'required',a.attnotnull,'identity',a.attidentity,'generated',a.attgenerated,'default',pg_get_expr(d.adbin,d.adrelid),
@@ -55,7 +60,7 @@ export const FULFILLMENT_PUBLICATION_ORIGINAL_CATALOGUE_QUERY = `WITH roles AS (
   'grants',(SELECT jsonb_agg(jsonb_build_object('role',CASE WHEN g.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(g.grantee) END,
    'grantor',pg_get_userbyid(g.grantor),'privilege',g.privilege_type,'grantable',g.is_grantable)
    ORDER BY CASE WHEN g.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(g.grantee) END COLLATE "C",g.privilege_type)
-   FROM aclexplode(coalesce(o.relacl,acldefault('r',o.relowner))) g),
+   FROM aclexplode(coalesce(o.relacl,CASE WHEN o.relkind='S' THEN acldefault('S',o.relowner) ELSE acldefault('r',o.relowner) END)) g),
   'policies',(SELECT jsonb_agg(jsonb_build_object('name',p.polname,'command',p.polcmd,'permissive',p.polpermissive,
    'roles',ARRAY(SELECT CASE WHEN r=0 THEN 'PUBLIC' ELSE pg_get_userbyid(r) END FROM unnest(p.polroles) r
     ORDER BY CASE WHEN r=0 THEN 'PUBLIC' ELSE pg_get_userbyid(r) END COLLATE "C"),
@@ -65,7 +70,7 @@ export const FULFILLMENT_PUBLICATION_ORIGINAL_CATALOGUE_QUERY = `WITH roles AS (
   'indexes',(SELECT jsonb_agg(jsonb_build_object('name',i.relname,'valid',x.indisvalid,'ready',x.indisready,'live',x.indislive,
    'definition',pg_get_indexdef(i.oid)) ORDER BY i.relname) FROM pg_index x JOIN pg_class i ON i.oid=x.indexrelid WHERE x.indrelid=o.oid),
   'triggers',(SELECT jsonb_agg(jsonb_build_object('name',t.tgname,'enabled',t.tgenabled,'definition',pg_get_triggerdef(t.oid)) ORDER BY t.tgname)
-   FROM pg_trigger t WHERE t.tgrelid=o.oid AND NOT t.tgisinternal)) ORDER BY o.relname COLLATE "C") FROM relations o),
+   FROM pg_trigger t WHERE t.tgrelid=o.oid AND NOT t.tgisinternal)) ORDER BY o.schema COLLATE "C",o.relname COLLATE "C") FROM relations o),
  'effectivePrivileges',(SELECT jsonb_agg(jsonb_build_object('role',r.rolname,'schema',n.nspname,'relation',c.relname,'kind',c.relkind,
   'table',ARRAY(SELECT privilege FROM unnest(ARRAY['SELECT','INSERT','UPDATE','DELETE','TRUNCATE','REFERENCES','TRIGGER']) privilege
    WHERE CASE WHEN c.relkind IN('r','p','v','m','f') THEN has_table_privilege(r.oid,c.oid,privilege) ELSE false END ORDER BY privilege),
@@ -88,27 +93,26 @@ export async function fulfillmentPublicationOriginalPurposeCatalogue(
   client: PoolClient,
 ) {
   await client.query("SAVEPOINT w4_publication_original_catalogue");
-  try {
-    await client.query("SET LOCAL search_path=pg_catalog");
-    const catalogue = (
-      await client.query<{ catalogue: unknown }>(
-        FULFILLMENT_PUBLICATION_ORIGINAL_CATALOGUE_QUERY,
-      )
-    ).rows[0]?.catalogue;
-    const denial = await fulfillmentPublicationDenialPurposeCatalogue(client);
-    return { catalogue, denial };
-  } finally {
-    await client.query(
-      "ROLLBACK TO SAVEPOINT w4_publication_original_catalogue",
-    );
-    await client.query("RELEASE SAVEPOINT w4_publication_original_catalogue");
-  }
+  await client.query("SET LOCAL search_path=pg_catalog");
+  const catalogue = (
+    await client.query<{ catalogue: unknown }>(
+      FULFILLMENT_PUBLICATION_ORIGINAL_CATALOGUE_QUERY,
+    )
+  ).rows[0]?.catalogue;
+  const denial = await fulfillmentPublicationDenialPurposeCatalogue(client);
+  // Failed reads may still be in flight. Only the genuine transaction owner
+  // decides rollback versus destruction; never enqueue helper SQL after them.
+  await client.query("ROLLBACK TO SAVEPOINT w4_publication_original_catalogue");
+  await client.query("RELEASE SAVEPOINT w4_publication_original_catalogue");
+  return { catalogue, denial };
 }
 
-// Primary closed canonical61 qualification of the eleven actual source files,
-// including W1 published12a5ba86 and this real213. No startup-derived pin.
-export const FULFILLMENT_PUBLICATION_ORIGINAL_CATALOGUE_SHA256 =
-  "80f1af201d3c1799718bd60103aa96682cb351deecff89e238341929d2bd25ae";
+// The earlier eleven-source pin omitted the worker's content_effect policy.
+// Expanded relation and trigger metadata needs independent complete owner
+// qualification. Neither a startup read nor this source repair supplies a pin.
+export const FULFILLMENT_PUBLICATION_ORIGINAL_CATALOGUE_SHA256:
+  | string
+  | undefined = undefined;
 export const FULFILLMENT_PUBLICATION_ORIGINAL_SOURCES = Object.freeze(
   [
     {
@@ -116,7 +120,7 @@ export const FULFILLMENT_PUBLICATION_ORIGINAL_SOURCES = Object.freeze(
       path: "apps/backend/src/modules/commerce/schema-fulfillment-publication-original-hash.sql",
       owner: "W4",
       checksum:
-        "b1fdfba3880d01d49b7ccff4a2181e373547e970f3190bf2385e3d1ee1bd728b",
+        "a03d24d6ac09ebb2e28bc6f60dc66cf1edfffc4bc6524da743618fc79f1eed23",
     },
     {
       name: "w1_publication_worker_scope",
@@ -186,17 +190,20 @@ export const FULFILLMENT_PUBLICATION_ORIGINAL_SOURCES = Object.freeze(
       path: "apps/backend/src/modules/identity/schema-publication-preparation.sql",
       owner: "W1",
       checksum:
-        "eb393fac0e580c3b7c58e4586ebd98539f99b696aacc9db1756ea5523c059c07",
+        "b0a47eac2a722b4f29c87875c474ba73d148e840b10bcf9e75af9ec467a2dda3",
     },
   ].map((source) => Object.freeze(source)),
 );
 
-function unavailable(): never {
-  throw new DomainError(
+function unavailable(cause?: unknown): never {
+  const error = new DomainError(
     "fulfillment_publication_original_unavailable",
     "The original publication inputs cannot be checked. Try again later.",
     503,
   );
+  if (cause !== undefined)
+    Object.defineProperty(error, "cause", { value: cause, configurable: true });
+  throw error;
 }
 
 /** Exact executable/source/ledger and full owner/producer metadata custody on
@@ -210,6 +217,7 @@ export async function assertCommerceFulfillmentPublicationOriginalCatalogue(
   try {
     for (const source of FULFILLMENT_PUBLICATION_ORIGINAL_SOURCES)
       await assertRegisteredMigration(client, source);
+    if (!FULFILLMENT_PUBLICATION_ORIGINAL_CATALOGUE_SHA256) unavailable();
     const ready = (
       await client.query<{ ready: boolean }>(
         `SELECT current_user=session_user AND session_user='creator_publication_worker'
@@ -226,7 +234,7 @@ export async function assertCommerceFulfillmentPublicationOriginalCatalogue(
       ) !== FULFILLMENT_PUBLICATION_ORIGINAL_CATALOGUE_SHA256
     )
       unavailable();
-  } catch {
-    unavailable();
+  } catch (cause) {
+    unavailable(cause);
   }
 }

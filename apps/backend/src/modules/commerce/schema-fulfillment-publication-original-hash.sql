@@ -209,8 +209,10 @@ BEGIN
       AND c.state IN('due','in_progress') AND c.due_at>clock_timestamp())
      OR (held.finalizing AND p.version=original.packet_version+1 AND c.version=original.commitment_version+1
       AND c.state='delivered' AND c.delivered_at IS NOT NULL AND c.delivered_at<=c.due_at
-      AND c.evidence->>'fulfillmentKind'='published_group_answer' AND c.evidence->>'contentId'=held.content_id::text
-      AND c.evidence->>'contentVersion'=held.version::text AND c.evidence->>'signedActId'=held.signed_act_id::text
+      AND c.evidence=jsonb_build_object('kind','group_answer',
+       'planRef',jsonb_build_object('id',header.id,'revision',header.revision,'hash',header.source_hash),
+       'contentId',held.content_id,'contentVersion',held.version,'messageId',c.delivered_message_id,
+       'publicationSignedActId',held.signed_act_id,'authorKind','system')
       AND EXISTS(SELECT FROM creator.commerce_group_delivery d WHERE d.plan_id=header.id AND d.plan_revision=header.revision
        AND d.packet_id=p.id AND d.creator_id=p.creator_id AND d.fan_id=p.fan_id AND d.thread_id=p.thread_id
        AND d.content_id=held.content_id AND d.content_version=held.version AND d.publication_signed_act_id=held.signed_act_id
