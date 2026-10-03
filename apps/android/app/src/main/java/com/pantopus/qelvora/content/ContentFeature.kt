@@ -284,7 +284,7 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
                     if (actualVersion != null && actualVersion > 0 && attachment["version"]?.jsonPrimitive?.isString == false) {
                         val actual = ContentAttachmentValue(attachment.text("kind"), attachment.text("assetId"), actualVersion, attachment.text("sha256"), attachment["alt"]?.jsonPrimitive?.contentOrNull)
                         key(viewerAccountId, current.text("id"), publicationVersion, actual.id, actual.version, actual.sha256) {
-                            NativeContentAttachment(context, baseURL, viewerAccountId!!, creatorId, current.text("id"), document.text("kind"), creator, actual)
+                            NativeContentAttachment(context, model, model.destination, baseURL, viewerAccountId!!, creatorId, current.text("id"), document.text("kind"), creator, actual)
                         }
                     } else QText("Attachment information is unavailable. Refresh current access.", "caption")
                 }
