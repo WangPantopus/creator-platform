@@ -18,7 +18,11 @@ import type { AccountCallMetadata } from "../session/account-call-metadata.js";
 import type { AvailabilityService } from "../session/availability.js";
 import { visibleSession } from "../session/service.js";
 import { withDeadline } from "./deadline.js";
-import { CapabilitiesSchema } from "../../../../../packages/api/src/media.js";
+import {
+  CapabilitiesSchema,
+  MediaAssetSchema,
+  PlaybackTicketSchema,
+} from "../../../../../packages/api/src/media.js";
 import {
   AdmissionRedemptionSchema,
   type CallSession,
@@ -335,7 +339,9 @@ export function createW6Router(dependencies: W6RouterDependencies) {
     res.status(201).json(await media().begin(await scope(req), req.body)),
   );
   router.get(`${root}/media/:assetId`, async (req, res) =>
-    res.json(await media().read(await scope(req), id(req))),
+    res.json(
+      MediaAssetSchema.parse(await media().read(await scope(req), id(req))),
+    ),
   );
   router.post(`${root}/media/:assetId/resume`, async (req, res) =>
     res.json(await media().resume(await scope(req), id(req))),
@@ -375,7 +381,11 @@ export function createW6Router(dependencies: W6RouterDependencies) {
     res.status(202).json({ state: "revoked", deletion: "pending" });
   });
   router.post(`${root}/media/:assetId/playback`, async (req, res) =>
-    res.json(await media().playback(await scope(req), id(req))),
+    res.json(
+      PlaybackTicketSchema.parse(
+        await media().playback(await scope(req), id(req)),
+      ),
+    ),
   );
   router.get(`${root}/media/:assetId/play`, async (req, res) => {
     const service = media();
