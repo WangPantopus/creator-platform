@@ -1,5 +1,17 @@
 # W4 personally operated iOS return — October 3, 2026 UTC
 
+### Personally verified combined Spending return — October 3, 2026 UTC
+
+Current PR230 source e607ba6e includes W4 Back0c97fec1 and W1's exact shell-tab fixef01b423, plus latest reviewed main68142326. The normal shipping iOS build passes and strict deep signature verification passes; executable SHA256 `3f887b1c15ccacb913f70412a33c775c2858a47b3474b9ebbfa98a21ad817fe8`. Actual API remains0bc66cc9 at4104.
+
+The primary personally operated this binary through CUA on the exact owned W4 simulator. Cold development-session return reached normal empty Requests; internal Spending kept Requests selected and Back returned Requests. You's direct Spending kept You selected and Back returned You in Light and Night. The actual decimal pad accepted an unsaved6.50; normal termination/relaunch recovered the same labelled session, and choosing an amount showed an empty field. Saved6USD, original pendingOctober3 05:42UTC, remindersoff and all zero totals were preserved. No Save was submitted. A fresh DeviceHub binding and current binary resolved the earlier cold navigation/controller failure for these steps; the earlier failure below remains retained.
+
+Light was restored, exact simulator shutdown verified, and token/device/inode GUI and slot3 leases normally released. Current Android, creator/provider/store/passkey and full accessibility journeys remain separate. Full routine receipt stays private, SHA256 `11f77e8269418cffbc4256dcf9e5dff9c1b4ec78eb80aae4775d152f496ecef7`.
+
+- [Current direct Spending with You selected](combined-spending-you.png)
+- [Current Back reaching You](combined-back-you.png)
+- [Current Night Spending with You selected](combined-spending-night.png)
+
 The primary personally used the authorized CUA DeviceHub controller on owned Creator Platform W4, BC8F4A5B-6F9E-4A89-813B-FF4DD8572271. The normally signed app was built from7514ddd5, executable SHA256 `0718de254d873a13881b8a83748a3c61ebe839bb4a7284ac7f934e0d43467b3a`; native sources had no changes through main8489cc13. The actual API was0bc66cc9 at4104; the checkout during operation wasc903f298. These are distinct source facts.
 
 Normal Continue with Pantopus and the real development chooser selected existing Development actor two. Requests Open/Delivered/Closed were empty. Spending showed the preserved6USD cap, zero charged/held/refunded totals, original pending No limit deadline October3 05:42UTC and reminders off. Actual decimal keyboard taps accepted an unsaved6.50 draft; Save was not submitted. Returning through You recreated the screen with the persisted state. Membership management displayed the truthful unavailable store message. No payment, purchase, elapsed24hour increase, real external ownership or genuine passkey was inferred.
