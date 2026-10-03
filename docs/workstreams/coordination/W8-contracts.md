@@ -1,5 +1,9 @@
 # W8 contract, migration and runtime register
 
+## Distinct publication original comparison allocation — 2026-10-02
+
+Held0213 reserves W4's `schema-fulfillment-publication-original-hash.sql` and version `0213_w4_fulfillment_publication_original_hash`. Its fixed actorless comparison must consume only actual bound0204 plus genuine W1 early0208 on the original held worker nonce/client/PID/fullXID/login/task/token. Complete2–100 original input/financial/consent/evidence comparison, same-client restoration,0205 negatives, positive gates and final bookends must remain distinct. Only bounded boolean/evidence may return; no question/input, recipient/frame write or inferred provider receipt. Interactive0199/0202 are not publication aliases. W4 supplies exact fixed signatures/source and combined effective catalogue for independent review; W1 alone owns final cleanup/COMMIT. This reservation grants no executable activation or genuine application acceptance.
+
 ## Distinct generation metadata and approved output allocations — 2026-10-02
 
 Held0211 is W2's fixed `creator.generation_agent_metadata(uuid,uuid)` at `agent/migrations/pending_w2_generation_agent_metadata.sql`. Classification needs the actual current public creator name and audience before embedding. The new isolated purpose must consume W1's genuine private task scope and original0180/0182 inputs, validate the actual compiled hash and typed compile prefix, and preserve original0180/0187 source bytes. A prompt-derived name or an early fabricated vector cannot supply that authority.
