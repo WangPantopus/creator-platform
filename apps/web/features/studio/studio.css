@@ -363,9 +363,17 @@
 .w5-dialog > div {
   margin-bottom: var(--space-4);
 }
-.w5-studio .qv-meta,
-.w5-dialog .qv-meta {
+.w5-dialog .signed-act-review {
+  min-height: 0;
+}
+.w5-dialog .signed-act-preview .qv-signed {
+  display: none;
+}
+.w5-studio .qv-meta {
   white-space: nowrap;
+}
+.w5-dialog .qv-meta {
+  white-space: normal;
 }
 .w5-studio :focus-visible,
 .w5-dialog :focus-visible {
