@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import type { PoolClient } from "pg";
-import { invariant } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
+import { releaseAgentHeldClient } from "./held-client-cleanup.js";
 import type { AgentService } from "./service.js";
 import type { CreatorScope } from "./repository.js";
 import { generationJournalInstalled } from "./generation-journal.js";
@@ -43,6 +44,8 @@ export function agentExportStream(
   let exhausted = false;
   let failure: unknown;
   let failed = false;
+  let cleanupFailure: unknown;
+  let cleanupFailed = false;
   let pending:
     | { sequence: number; data: Uint8Array; ack: () => void }
     | undefined;
@@ -52,6 +55,10 @@ export function agentExportStream(
   const done = new Promise<void>((resolve) => {
     resolveDone = resolve;
   });
+  const awaitCleanup = async () => {
+    await done;
+    if (cleanupFailed) throw cleanupFailure;
+  };
   const notify = () => {
     const current = wake;
     wake = undefined;
@@ -110,18 +117,31 @@ export function agentExportStream(
   };
   const produce = async () => {
     let client: PoolClient | undefined;
+    let transactionStarted = false;
+    let discard = false;
+    let transportError: Error | undefined;
+    const onError = (error: Error) => {
+      transportError ??= error;
+      discard = true;
+      controller.abort(error);
+    };
     try {
       signal.throwIfAborted();
       await assertCurrent();
       await service.repository.assertRuntimeRole();
       client = await service.repository.pool.connect();
+      client.on("error", onError);
       invariant(
         source,
         "privacy_export_unconfigured",
         "The reviewed complete export source is required; paginated READ COMMITTED reads cannot attest one coherent snapshot.",
       );
       source.prepared.assertHostPool(service.repository.pool);
+      discard = true;
       await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
+      transactionStarted = true;
+      if (transportError) throw transportError;
+      discard = false;
       heldClient = client;
       await assertTaskInTransaction(client);
       await client.query(
@@ -175,14 +195,40 @@ export function agentExportStream(
       }
       await source.prepared.finishInTransaction(client, snapshot);
       await assertTaskInTransaction(client);
+      discard = true;
       await client.query("COMMIT");
+      transactionStarted = false;
+      if (transportError) throw transportError;
+      discard = false;
       complete = true;
     } catch (error) {
       failed = true;
       failure = error;
-      if (client) await client.query("ROLLBACK").catch(() => undefined);
+      // An uncertain cancellation must not reach later SQL, including rollback.
+      discard ||=
+        transportError !== undefined ||
+        (error instanceof DomainError &&
+          error.code === "privacy_export_cancel_unavailable");
     } finally {
-      client?.release();
+      try {
+        if (client)
+          await releaseAgentHeldClient(client, {
+            rollback: transactionStarted,
+            destroy: discard,
+            failure,
+          });
+        if (transportError && !failed) {
+          failed = true;
+          failure = transportError;
+        }
+      } catch (error) {
+        failed = true;
+        failure = error;
+        cleanupFailed = true;
+        cleanupFailure = error;
+      }
+      client?.removeListener("error", onError);
+      if (failed) complete = false;
       heldClient = undefined;
       signal.removeEventListener("abort", abort);
       resolveDone();
@@ -220,7 +266,7 @@ export function agentExportStream(
           controller.abort(
             new Error("Export consumption stopped before source exhaustion"),
           );
-        await done;
+        await awaitCleanup();
       }
     },
   };
