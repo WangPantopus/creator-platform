@@ -291,7 +291,11 @@ export class AgentService {
         )
           gates.push("Approve and finish indexing at least one source.");
         if (sources.some((s) => s.state === "processing"))
-          gates.push("Source processing is still running.");
+          gates.push(
+            this.pipeline.model
+              ? "Source processing is still running."
+              : "Source indexing is unavailable. Approved imports are kept.",
+          );
         if (
           !evaluation ||
           evaluation.state !== "passed" ||
