@@ -5,7 +5,7 @@ import { sameRequestOrigin } from "../../lib/request-origin";
 const uuid = "[a-f0-9-]{36}";
 const allow = {
   content: new RegExp(
-    `^(?:${uuid}(?:/(?:studio(?:/(?:replies|thanks|live|scheduled/run|effects/run))?|drafts|replies|mute|thanks|replies/${uuid}/(?:consent|reaction|withdraw|review|read)|${uuid}(?:/(?:studio|review|publish|team-publish|unpublish|archive|replies))?))?)$`,
+    `^(?:${uuid}(?:/(?:studio(?:/(?:replies|thanks|live|scheduled/run|effects/run))?|drafts|replies|mute|reply-policy|thanks|replies/${uuid}/(?:consent|reaction|withdraw|review|read)|${uuid}(?:/(?:studio|review|publish|team-publish|unpublish|archive|replies))?))?)$`,
     "u",
   ),
   studio: new RegExp(

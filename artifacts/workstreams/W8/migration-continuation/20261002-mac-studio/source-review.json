@@ -1,0 +1,26 @@
+{
+  "initial": {
+    "checkedRoles": 3,
+    "pinnedFunctions": 7,
+    "directCapabilities": 82,
+    "publicCapabilities": 327,
+    "pinnedPublicFunctions": 23
+  },
+  "privateBefore": {
+    "checkedPrivatePurposes": 0,
+    "administratorSelectedCatalogueReview": true
+  },
+  "after": {
+    "checkedRoles": 3,
+    "pinnedFunctions": 10,
+    "directCapabilities": 93,
+    "publicCapabilities": 331,
+    "pinnedPublicFunctions": 23
+  },
+  "privateAfter": {
+    "checkedPrivatePurposes": 2,
+    "administratorSelectedCatalogueReview": true
+  },
+  "rolledBack": true,
+  "ledgerRows": 57
+}

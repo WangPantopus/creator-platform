@@ -1,0 +1,54 @@
+{
+  "recordedAt": "2026-10-02T11:47:19Z",
+  "applicationRevision": "dcb77f23833f8a79761ee072b018e7aa78d765b7",
+  "acceptanceIssuerRevision": "901cb25a2670a9e9bece043e2a9df456bec2cb07",
+  "generationSourceSha256": "590d381f72b66262f7c77bd8010332fe9249395e9aac8c0b4851db92a6decfd1",
+  "generationSqlSha256": "7de41bf10228219d69480e302bac7d69626d8d848d8276bb1fe54e49112a5627",
+  "environment": {
+    "machine": "Mac Studio",
+    "os": "macOS 27.0, build 26A428",
+    "database": "PostgreSQL 17 with pgvector",
+    "ownedContainer": "creator-platform-w1-purpose-review-20261002",
+    "reviewDatabase": "creator_w1_review_revision7",
+    "resources": "1 CPU, 512 MiB; no published host ports",
+    "base": "canonical 57 plus exact unactivated 0072 proposal",
+    "viewportThemeDevice": "not applicable: SQL catalogue and privilege review",
+    "provider": "unconfigured"
+  },
+  "personallyPerformed": [
+    "Installed exact 0072 DDL on the empty closed review database; COMMIT succeeded.",
+    "Prepared and explained exact current factory and consumer catalogue queries as the actual creator_generation_worker LOGIN.",
+    "Executed unactivated factory metadata qualification: ready=false.",
+    "Called bounded pending discovery with 64: zero IDs.",
+    "Began a read for an unknown generated job/token: NULL, with successful cleanup/COMMIT.",
+    "Checked matches without a current scope: false.",
+    "Attempted message.text read as worker: permission denied.",
+    "Attempted discovery bound65 as worker: denied.",
+    "Inspected actual FORCE RLS, session catalogue shape, deferred cleanup trigger and zero persisted business/scope/activation counts."
+  ],
+  "persistedOutcome": {
+    "businessGenerations": 0,
+    "retainedScopes": 0,
+    "activated0072Or0093Receipts": 0,
+    "denial0093Installed": false,
+    "forcedRlsMetadataTables": 7,
+    "identitySession": "canonical non-RLS bearer resolution; purpose owner receives only id/account_id/expires_at/revoked_at",
+    "cleanupTrigger": "enabled, deferrable and initially deferred",
+    "appDatabase": "original retained40 migrations/data unchanged"
+  },
+  "failuresAndRepairs": [
+    "Initial factory expected eight FORCE-RLS tables; actual canonical catalogue has seven. Corrected source explicitly qualifies the original session table design without changing SQL or bearer resolution.",
+    "Initial recording integration lacked the owner's Modal focus ref and embedded recorder heading behavior; type/lint checks caught both, and the exact consumer dependencies were repaired.",
+    "A first shipping Android build acquisition returned75 because a peer held the shared build lock. No peer owner or build was changed."
+  ],
+  "timings": {
+    "existingContracts": "9 passed in50ms; run1.32s; 9 database integration cases skipped",
+    "sqlReview": "not measured"
+  },
+  "limits": [
+    "No genuine positive generation, licence, source passage, memory/output write, provider admission or delivery was accepted.",
+    "0093 and owner purpose consumers remain absent; proposed migration is not in the executable canonical registry.",
+    "SQL parse/privilege review does not establish current shipping app or personally operated native acceptance.",
+    "Visible-prefix recovery, translation authority, current consumer activation and release readiness remain open."
+  ]
+}

@@ -29,7 +29,7 @@ const Observation = z.discriminatedUnion("kind", [
   }),
 ]);
 export type StorePaidObservation = z.infer<typeof Observation>;
-export const PAID_COVERAGE_MIGRATION_VERSION = "0068_w4_paid_coverage";
+export const PAID_COVERAGE_MIGRATION_VERSION = "0155_w4_paid_coverage";
 
 /** Prepared immutable provider metadata, distinct from cash and access grants.
  * A refund, revocation or unpaid period is retained: an older restore cannot

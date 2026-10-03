@@ -18,23 +18,6 @@ export class GrowthErasure {
       );
     }
   }
-  /** Acquire before BEGIN so a repeatable-read snapshot cannot predate an
-   * erasure that held the same fence. The caller MUST destroy this dedicated
-   * connection on completion/cancellation; never return session locks to a pool. */
-  async lockExportSnapshot(
-    client: PoolClient,
-    accountId: string,
-    creatorIds: readonly string[],
-  ) {
-    const keys = [
-      this.key("account", accountId),
-      ...creatorIds.map((id) => this.key("creator", id)),
-    ];
-    for (const key of [...new Set(keys)].sort())
-      await client.query("SELECT pg_advisory_lock(hashtextextended($1,0))", [
-        `growth.erasure:${key}`,
-      ]);
-  }
   async mark(
     client: PoolClient,
     accountId: string,
@@ -77,6 +60,16 @@ export class GrowthErasure {
       )
     ).rowCount;
   }
+  /** Observe a negative account fence without holding it while another owner
+   * obtains its own purpose/denial gates. This is not positive read authority. */
+  async accountRetained(client: PoolClient, accountId: string) {
+    return !(
+      await client.query(
+        "SELECT 1 FROM growth.erasure_fence WHERE subject_key=$1",
+        [this.key("account", accountId)],
+      )
+    ).rowCount;
+  }
   /** Negative fences only. Device transfer may remove an erased account's
    * old registration, but must never recreate any of its data. */
   async lockSubjects(client: PoolClient, accountIds: readonly string[]) {
@@ -97,6 +90,8 @@ export class GrowthErasure {
     client: PoolClient,
     event: GrowthEvent,
   ): Promise<GrowthEvent | null> {
+    if (event.creatorId === null)
+      return (await this.subjects(client, [event.accountId])) ? event : null;
     const creator = this.key("creator", event.creatorId);
     const accounts = event.recipients.map((r) =>
       this.key("account", r.accountId),
@@ -120,7 +115,9 @@ export class GrowthErasure {
     await this.lock(
       client,
       events.flatMap((event) => [
-        this.key("creator", event.creatorId),
+        ...(event.creatorId === null
+          ? []
+          : [this.key("creator", event.creatorId)]),
         ...event.recipients.map((r) => this.key("account", r.accountId)),
       ]),
     );

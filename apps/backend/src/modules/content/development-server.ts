@@ -2,13 +2,23 @@
 import { randomBytes } from "node:crypto";
 import { readFile, writeFile, stat } from "node:fs/promises";
 import pg from "pg";
-import { createConfiguredBackend } from "../../integration.js";
+import { createGrowthAPIPool } from "../../db/growth-api-pool.js";
+import {
+  createConfiguredBackend,
+  type BackendRuntime,
+} from "../../integration.js";
 import { DevelopmentIdentityAdapter } from "../identity/development.js";
 import { ContentService } from "./service.js";
 import { contentFeature, contentSignedSubjects } from "./registration.js";
 import { StudioService } from "../studio/service.js";
 import { studioFeature } from "../studio/registration.js";
 import { CommerceService } from "../commerce/service.js";
+import {
+  CommerceFulfillmentPlans,
+  FULFILLMENT_PLAN_MIGRATION,
+  FULFILLMENT_PLAN_SCHEMA_SHA256,
+} from "../commerce/fulfillment-plans.js";
+import { SIGNATURE_READ_FENCE_MIGRATION } from "../identity/signature-read-fence.js";
 import {
   commerceFeature,
   commerceSignedSubjects,
@@ -22,6 +32,11 @@ import { createAgentRouter } from "../agent/router.js";
 import { DomainError } from "../../core/errors.js";
 import { composeContentHost } from "./integration.js";
 import { configureGrowthForBackend } from "../growth/configured.js";
+import { canonicalCoreContentFollows } from "../growth/core-follows.js";
+import { contentPublicProjection } from "../growth/content.js";
+import { createTrustReplyReviewer } from "../trust/reply-review.js";
+import { createDevelopmentTrust } from "../trust/development.js";
+import { createAgentDomain } from "../agent/integration.js";
 import { canonicalConversationHome } from "../growth/home.js";
 import { createConversationRuntime } from "../conversation/runtime.js";
 
@@ -83,11 +98,19 @@ const sessionKey = (await readFile(sessionKeyFile, "utf8")).trim();
 const currency = process.env.COMMERCE_CURRENCY;
 if (!currency)
   throw new Error("Explicit development commerce currency is required.");
+const groupMinimumText = process.env.W5_GROUP_MINIMUM_RECIPIENTS;
+if (
+  groupMinimumText !== undefined &&
+  (!/^(?:[2-9]|[1-9][0-9]|100)$/u.test(groupMinimumText) ||
+    Number(groupMinimumText) > 100)
+)
+  throw new Error("W5 group minimum must be the explicit founder choice2–100.");
 let content: ContentService;
 let studio: StudioService;
 const features: {
   growth: Awaited<ReturnType<typeof configureGrowthForBackend>>;
   agentPool?: pg.Pool;
+  growthPool?: pg.Pool;
 } = { growth: null };
 const agentDatabaseUrl = process.env.W5_AGENT_DATABASE_URL;
 if (agentDatabaseUrl) {
@@ -105,6 +128,17 @@ if (agentDatabaseUrl) {
 } else if (process.env.GROWTH_ENABLED === "true")
   throw new Error("W5 Growth composition requires W5_AGENT_DATABASE_URL.");
 const model = modelFromEnvironment();
+const agentPoolFor = (runtime: BackendRuntime) => {
+  if (features.agentPool) return features.agentPool;
+  if (!agentDatabaseUrl) return runtime.pool;
+  features.agentPool = new pg.Pool({
+    connectionString: agentDatabaseUrl,
+    max: 2,
+    connectionTimeoutMillis: 5000,
+    statement_timeout: 5000,
+  });
+  return features.agentPool;
+};
 const backend = await createConfiguredBackend({
   config: {
     port: apiPort,
@@ -117,6 +151,10 @@ const backend = await createConfiguredBackend({
     passkeyOrigins: [webOrigin],
   },
   identity,
+  trust: (runtime) =>
+    createDevelopmentTrust(runtime, {
+      agent: createAgentDomain({ pool: agentPoolFor(runtime), model }),
+    }),
   guardrails: {
     checkSentence: async () => {
       throw new DomainError(
@@ -137,17 +175,11 @@ const backend = await createConfiguredBackend({
     },
   ],
   registerFeatures: async (runtime) => {
+    const growthPool = await createGrowthAPIPool(url);
+    if (growthPool) features.growthPool = growthPool;
     const conversation = createConversationRuntime(runtime);
     runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
-    const agentPool = agentDatabaseUrl
-      ? new pg.Pool({
-          connectionString: agentDatabaseUrl,
-          max: 2,
-          connectionTimeoutMillis: 5000,
-          statement_timeout: 5000,
-        })
-      : runtime.pool;
-    if (agentPool !== runtime.pool) features.agentPool = agentPool;
+    const agentPool = agentPoolFor(runtime);
     const repository = new AgentRepository(agentPool),
       agent = new AgentService(
         repository,
@@ -162,6 +194,7 @@ const backend = await createConfiguredBackend({
     );
     const growth = await configureGrowthForBackend({
       ...runtime,
+      pool: growthPool ?? runtime.pool,
       assertAllowed: (actor, creatorId) =>
         creatorId
           ? runtime.assertCreatorAllowed(actor, creatorId)
@@ -174,7 +207,9 @@ const backend = await createConfiguredBackend({
               runtime.database,
               runtime.identity.signing,
               async (creatorId) => {
-                const current = await runtime.pool.query<{ handle: string }>(
+                const current = await (growthPool ?? runtime.pool).query<{
+                  handle: string;
+                }>(
                   "SELECT handle FROM growth.creator_public WHERE id=$1 AND verified AND state='published'",
                   [creatorId],
                 );
@@ -185,6 +220,60 @@ const backend = await createConfiguredBackend({
         : {},
     });
     features.growth = growth;
+    if (!runtime.assertContentAllowedInTransaction)
+      throw new DomainError(
+        "content_denial_unconfigured",
+        "Configure the current caller-held content denial authority.",
+        503,
+      );
+    let groupPublication:
+      | import("./group-publication.js").ContentGroupPublicationOwners
+      | undefined;
+    if (groupMinimumText !== undefined) {
+      if (!runtime.assertScopeAllowedInTransaction)
+        throw new DomainError(
+          "fulfillment_plans_unconfigured",
+          "Current original-recipient denial authority is unavailable.",
+          503,
+        );
+      try {
+        const plans = await CommerceFulfillmentPlans.prepare({
+          database: runtime.database,
+          access: runtime.access,
+          assertScopeAllowedInTransaction:
+            runtime.assertScopeAllowedInTransaction,
+          minimumRecipients: Number(groupMinimumText),
+          migration: {
+            version: FULFILLMENT_PLAN_MIGRATION,
+            checksum: FULFILLMENT_PLAN_SCHEMA_SHA256,
+          },
+          signatureMigration: {
+            version: SIGNATURE_READ_FENCE_MIGRATION,
+            checksum:
+              "157640de84f22d6d638d788dfe04314fd193efaed80a829f288bec7cbcb815b5",
+          },
+        });
+        groupPublication = {
+          database: runtime.database,
+          access: runtime.access,
+          plans,
+          conversations: runtime.conversation,
+        };
+      } catch (error) {
+        if (
+          !(error instanceof DomainError) ||
+          error.status !== 503 ||
+          ![
+            "fulfillment_plans_unconfigured",
+            "signature_read_unconfigured",
+          ].includes(error.code)
+        )
+          throw error;
+        process.stderr.write(
+          `W5 group publication unavailable: ${error.code}.\n`,
+        );
+      }
+    }
     const composition = composeContentHost({
       pool: runtime.pool,
       owners: {
@@ -194,14 +283,38 @@ const backend = await createConfiguredBackend({
         agent,
         profiles: runtime.identity?.profiles,
       },
-      dependencies: { assertAllowed: runtime.assertCreatorAllowed },
+      dependencies: {
+        assertAllowed: runtime.assertCreatorAllowed,
+        assertAllowedInTransaction: runtime.assertContentAllowedInTransaction,
+        reviewReply: createTrustReplyReviewer(),
+      },
       sources: { service: sources, repository },
+      ...(groupPublication ? { groupPublication } : {}),
+      ...(runtime.audienceIdentity
+        ? { tenure: { audienceIdentity: runtime.audienceIdentity } }
+        : {}),
+      ...(runtime.holdCreatorFanNegativeAuthority
+        ? {
+            creatorTenure: {
+              holdCreatorFanNegativeAuthority:
+                runtime.holdCreatorFanNegativeAuthority,
+            },
+          }
+        : {}),
       ...(growth && runtime.identity
         ? {
-            growth: {
-              service: growth.service,
-              signing: runtime.identity.signing,
+            followReaders: {
+              // No W8 activation receipt exists on the fresh canonical57 DB.
+              // The actual producer stays unavailable; never read Growth from
+              // a different transaction and treat its Boolean as held access.
+              follows: canonicalCoreContentFollows(),
             },
+            publicProjection: (actor, effect) =>
+              contentPublicProjection(
+                growth.service,
+                content,
+                runtime.identity!.signing,
+              )(actor, effect),
           }
         : {}),
       ...(runtime.assertScopeAllowedInTransaction
@@ -247,9 +360,13 @@ backend.server.listen(apiPort, "127.0.0.1", () =>
     `W5 API${apiPort} · persisted non-owner RLS · synthetic development actors · genuine W1 passkeys required; provider-dependent paths unavailable until configured.\n`,
   ),
 );
+let stopping = false;
 const stop = () => {
+  if (stopping) return;
+  stopping = true;
   void (async () => {
     await features.growth?.close();
+    await features.growthPool?.end();
     await features.agentPool?.end();
     await backend.close();
     process.exit(0);

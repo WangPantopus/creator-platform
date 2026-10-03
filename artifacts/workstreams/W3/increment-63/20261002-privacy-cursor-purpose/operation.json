@@ -1,0 +1,76 @@
+{
+  "source": "4499bc829d7da17c088f997be7f36f1c739680a7",
+  "recordedAt": "2026-10-02T19:03:18.780393+00:00",
+  "allocation": "0206_w3_privacy_cursor_export",
+  "registry": [
+    {
+      "ref": "HEAD",
+      "sourceSHA256": "18601c900c79e55b3020d810cbca6a5233f9dd3e3ce9982307ac9046928c531f",
+      "activeEntries": 57,
+      "privacyWaveActive": false
+    },
+    {
+      "ref": "origin/main",
+      "sourceSHA256": "be8854088549fc2e66fe881b694fb3e24400e56b6f7c62881ef5deb4906f3e84",
+      "activeEntries": 57,
+      "privacyWaveActive": false
+    },
+    {
+      "ref": "9865e346",
+      "sourceSHA256": "18601c900c79e55b3020d810cbca6a5233f9dd3e3ce9982307ac9046928c531f",
+      "activeEntries": 57,
+      "privacyWaveActive": false
+    },
+    {
+      "ref": "53133967",
+      "sourceSHA256": "18601c900c79e55b3020d810cbca6a5233f9dd3e3ce9982307ac9046928c531f",
+      "activeEntries": 57,
+      "privacyWaveActive": false
+    }
+  ],
+  "sourceRegisteredOrApplied": false,
+  "livePurposeRoleOrFunctionPresent": false,
+  "liveLeasedJobQualification": false,
+  "browser": {
+    "control": "supported built-in CUA",
+    "staleTab": "old connection-refused data page was blocked by navigation policy; supported fresh-tab recovery in same browser",
+    "initialViewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "subsequentViewport": {
+      "width": 390,
+      "height": 844
+    },
+    "themes": [
+      "light",
+      "night"
+    ],
+    "actions": [
+      "recovered saved account and intro",
+      "actual privacy link",
+      "One conversation selection",
+      "actual Try again in each appearance",
+      "returned to @kilnfire in Light with original intro and live spending/membership values"
+    ],
+    "horizontalOverflowObservedAt390": false,
+    "requestExportDisabled": true,
+    "receiptOrJobInvented": false,
+    "exportSubmitted": false
+  },
+  "native": {
+    "sourceChanged": false,
+    "buildOrGuestStarted": false,
+    "uiOperation": false,
+    "supportedCUAAcceptance": false
+  },
+  "shutdown": {
+    "apiExitCode": 0,
+    "nextSIGINTExitCode": 130,
+    "ownedListenersAbsent": true,
+    "duplicatePoolClose": false,
+    "peerResourcesTouched": false
+  },
+  "noNewTestCode": true,
+  "w3Complete": false
+}

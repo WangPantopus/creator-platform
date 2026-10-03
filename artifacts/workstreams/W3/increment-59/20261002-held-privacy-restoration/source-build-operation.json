@@ -1,0 +1,65 @@
+{
+  "source": "a4a6a45d68e020f53a65e7983635736d4fce4e1d",
+  "observedAt": "2026-10-02T17:26:28.927486+00:00",
+  "checks": {
+    "backendTypes": "passed",
+    "normalBackendBuild": "passed",
+    "scopedESLint": "passed",
+    "Prettier": "passed",
+    "diff": "passed",
+    "newTestCode": false
+  },
+  "compiledBundle": {
+    "sha256": "aeb2b0ff7b09832b68eece9ff85b747da9ab41f08a38b6d27aa84adad1c72603",
+    "executed": false
+  },
+  "actualRuntime": {
+    "launcher": "pnpm exec tsx src/server.ts",
+    "source": "a4a6a45d68e020f53a65e7983635736d4fce4e1d",
+    "apiPort": 4103,
+    "webPort": 3003,
+    "database": "creator_w3_dev57_1790946508212",
+    "singleBackend": true,
+    "normalAPIExit": 0,
+    "normalWebExit": 0,
+    "ownedPortsAbsent": true
+  },
+  "actualWeb": {
+    "inputMethod": "Supported built-in-browser CUA",
+    "phone": [
+      390,
+      844
+    ],
+    "visible": true,
+    "scrollWidth": 390,
+    "LightAndNight": true,
+    "actions": [
+      "Saved account and original intro loaded",
+      "Clicked actual export/delete",
+      "Selected One conversation scope",
+      "Clicked actual Try again",
+      "Observed current unavailability and disabled export"
+    ],
+    "privacyJobRequested": false,
+    "exportPerformed": false,
+    "deletePerformed": false
+  },
+  "native": {
+    "newNativeBuildRequired": "No native source changed in this increment. Previous shipping binary e9 is distinct and was not operated against this source.",
+    "iOSBindingRetry": "Supported cua.getApp(com.apple.dt.Devices) again timed out -10005 before any device start.",
+    "iosDeviceStarted": false,
+    "androidDeviceStarted": false,
+    "supportedNativeAcceptance": false,
+    "alternatePermission": "Existing request unanswered; no bypass or inferred grant."
+  },
+  "unavailable": {
+    "0087Purpose": true,
+    "preparedLineageRetention": true,
+    "RRCompatibleRestoration": "Current development producer accepts only read committed; W3 streaming MVCC source uses repeatable read. Genuine combination refuses; W8 notified, neither guard nor snapshot weakened.",
+    "OpenAIKeyAbsent": true
+  },
+  "schemaActivated": false,
+  "roleChanged": false,
+  "positiveC10Acceptance": false,
+  "fullW3Complete": false
+}

@@ -1,0 +1,38 @@
+{
+  "revision": "7038da02",
+  "state": "compiled; new canonical guards/headings not yet personally operated",
+  "ios": {
+    "shippingTarget": "QelvoraApp",
+    "configuration": "Debug",
+    "destination": "F802B3F6-9B90-4CE9-9A62-62A16E2A54AC",
+    "build": "succeeded",
+    "normalSigning": true,
+    "strictCodeSign": "passed",
+    "binarySha256": "15df53eae45a2e32703545bd691a634c182d54e65730bf1c1f3e685b736295eb",
+    "effectiveApi": "http://127.0.0.1:4112",
+    "effectiveLinkHost": "localhost",
+    "personallyOperated": false
+  },
+  "android": {
+    "shippingTarget": ":app:assembleDebug",
+    "configuration": "Debug",
+    "build": "succeeded",
+    "durationSeconds": 20,
+    "apkSha256": "28b3c0b0bfc09f7359af6a769ddac492314653e618ee273a4df39482d14c4ceb",
+    "effectiveBuildApi": "http://10.0.2.2:4112",
+    "personallyOperated": false
+  },
+  "supportingChecks": [
+    "web and backend types passed",
+    "scoped lint passed",
+    "canonical generation passed:12 resources/100 operations",
+    "two existing shared generation/rename checks passed"
+  ],
+  "resources": "heavy build lock released; no W1 device/GUI lease; original and bounded copy remain closed",
+  "limitations": [
+    "no iOS taps",
+    "no actual approved DI09 offer",
+    "no genuine Signed positive",
+    "no release domain or production-provider acceptance"
+  ]
+}

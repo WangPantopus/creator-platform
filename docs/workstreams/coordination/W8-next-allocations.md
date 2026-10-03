@@ -4,7 +4,7 @@
 
 The initial activation packet contains57 active entries through0062. IDs0063–0097 remain future, unapplied reservations in the registry.0094 is reserved to W4 immutable fulfillment-plan custody (actual packet/commitment list and signed opaque plan ID/hash/revision);0095 is reserved to W3 generation-purpose consumers bound to W1's actual private nonce/proof. W2 input consumers0096 and pre-network attempt admission0097 require the genuine W1 worker nonce/client and reviewed consumer allowlist. Terminal visible-prefix work needs a separate reviewed purpose. W7's `pending_w7_account_notifications.sql` remains unnumbered and outside this packet pending security review. These reservations grant no runtime permission or migration activation. Older allocation statements below are historical.
 
-<!-- Earlier source and operation notes retained as dated history. -->
+**Historical pre-wave reservation statement; current initial57 custody above takes precedence:**
 
 **2026-10-02 allocation continuation (reserved, not activated):**0061 W4 payout custody;0062 W6 media worker;0063–0066 W7 relationship/checkpoint/Home/Thanks;0067 W2 usage expiry;0068 W4 paid coverage;0069 W8 exact reply review;0070 W4 actual-viewer public packet;0071 W1 publication worker;0072 W1 generation worker held without a final contract;0073 W8 publication negative;0074 W8 actual content session negative;0075 W6 publication media. Registry JSON activation/renumbering remains a single W8 wave.0048 cannot activate before real accounting export/delete/expiry registration and approved policy.0071 must preserve named0069 purposes by narrowing only PUBLIC policies;0073 binds only its actual full task metadata and grants no scope issuance.0053 pinned bytes remain unchanged.
 

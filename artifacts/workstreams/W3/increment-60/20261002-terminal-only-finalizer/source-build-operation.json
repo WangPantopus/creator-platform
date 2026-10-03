@@ -1,0 +1,51 @@
+{
+  "source": "8d4ed7bfb4c562716d3374a878369ef396cf0452",
+  "base": "782fe1d9",
+  "branch": "codex/w3-terminal-current-finalizer",
+  "recordedAt": "2026-10-02T17:50:03.064759+00:00",
+  "ownerAllocation": "0203_w3_terminal_only_finalization",
+  "originalHeldSource": {
+    "commit": "8ca7f1b7",
+    "sha256": "8b0fc5aa120ad1f737118ed250424ccb9af471eb48f397b1c15a81aebaf6199a",
+    "unchanged": true,
+    "activated": false
+  },
+  "distinctSource": {
+    "path": "apps/backend/src/modules/conversation/migrations/pending_w3_terminal_only_finalization.sql",
+    "sha256": "8de1897f2e70f763382984459274eb7616ad7149b457811fffd90fb8b7df2e8c",
+    "owner": "creator_w3_terminal_output",
+    "signature": "creator.generation_terminal_output(uuid,uuid)",
+    "originalScopeBridge": false
+  },
+  "checks": [
+    {
+      "command": "pnpm run build (apps/backend)",
+      "exitCode": 0,
+      "includes": "tsc --noEmit; shipping esbuild build"
+    },
+    {
+      "command": "pnpm exec eslint apps/backend/src/modules/conversation/generation-terminal.ts",
+      "exitCode": 0
+    },
+    {
+      "command": "pnpm exec prettier --check apps/backend/src/modules/conversation/generation-terminal.ts",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  ],
+  "compiledBundle": {
+    "path": "apps/backend/dist/server.mjs",
+    "sha256": "38df98bb1bf1f1b79e172705190c6f6931dd41498001a421fcd10d879cd16287",
+    "executed": false
+  },
+  "actualRuntime": "source server.ts and workers/start.ts generation, supervised directly",
+  "nativeBuildOrOperation": false,
+  "webUiChangedOrOperated": false,
+  "testCodeAdded": false,
+  "databaseMutation": false,
+  "positiveTerminalQualification": false,
+  "w3Complete": false
+}

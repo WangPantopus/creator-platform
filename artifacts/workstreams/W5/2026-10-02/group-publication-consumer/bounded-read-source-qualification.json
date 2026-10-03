@@ -1,0 +1,24 @@
+{
+  "source": "1182572acb509793c9ddc059a71db03bfb0faf97",
+  "w4PlansExactSource": "5a7925ef91fee53386136708a28eb1818b5ae8c4",
+  "implemented": [
+    "actual bounded creator read batch for saved return and mixed pages, including empty drafts",
+    "all original negatives and genuine read scopes precede planned documents; W5 page positives then batch positives, exact response then actual last batch finalizer",
+    "private actual batch proof and exact actor/request/client/PID/full-xid/tuple checks; no recipient proof or mutation capability",
+    "body-free index guard prevents fan tier fallback even when revision RLS hides plan metadata"
+  ],
+  "runnable": {
+    "backendTypes": "passed",
+    "webTypes": "passed",
+    "scopedLint": "passed",
+    "scopedFormat": "passed",
+    "generation": "passed: 101 operations",
+    "webProductionBuild": "web and API dependency source is byte-identical to qualified2949dc7e; actual production build receipt remains tied to that original source"
+  },
+  "integrated": "actual owner optional composition; current main0d958dfd retained with strict Content purpose export",
+  "verified": "source and owner-byte qualification only; no positive original group data or app operation at this source",
+  "releaseReady": false,
+  "sqlRegistrationOrActivation": false,
+  "businessRecordsProduced": false,
+  "nativeOperation": false
+}

@@ -109,6 +109,7 @@ export class AgentLifecycle {
     scope: CreatorScope,
     jobId: string,
     assertAuthorized: () => Promise<void>,
+    assertTaskInTransaction: (client: PoolClient) => Promise<void>,
     accountingBoundary?: (client: PoolClient) => Promise<{ reference: string }>,
   ) {
     invariant(
@@ -122,6 +123,7 @@ export class AgentLifecycle {
     const client = await this.repository.pool.connect();
     try {
       await client.query("BEGIN");
+      await assertTaskInTransaction(client);
       await client.query(
         "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
         [scope.creatorId, scope.accountId],
@@ -131,6 +133,7 @@ export class AgentLifecycle {
         [`agent.purge:${scope.creatorId}`],
       );
       await assertAuthorized();
+      await assertTaskInTransaction(client);
       const lineage = await this.assertAccountingClient(client);
       let boundaryReference: string | undefined;
       if (lineage) {
@@ -147,6 +150,7 @@ export class AgentLifecycle {
         );
       }
       const assertDetached = async () => {
+        await assertTaskInTransaction(client);
         if (!lineage) return;
         for (const table of [
           "ai_generation_receipt",
@@ -240,11 +244,13 @@ export class AgentLifecycle {
           "ai_regression",
           "ai_command",
           "ai_event",
-        ])
+        ]) {
+          await assertTaskInTransaction(client);
           await client.query(
             `DELETE FROM creator.${table} WHERE creator_id=$1`,
             [scope.creatorId],
           );
+        }
         await client.query(
           "DELETE FROM creator.ai_workspace WHERE creator_id=$1",
           [scope.creatorId],
@@ -285,6 +291,7 @@ export class AgentLifecycle {
         );
       }
       await assertAuthorized();
+      await assertTaskInTransaction(client);
       await client.query("COMMIT");
       return {
         ...receipt,

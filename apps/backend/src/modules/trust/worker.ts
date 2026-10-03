@@ -85,7 +85,8 @@ export class TrustWorker {
     ]);
     await this.pool.query(`UPDATE creator_trust.privacy_job j SET state=CASE
       WHEN NOT EXISTS(SELECT 1 FROM creator_trust.privacy_task t WHERE t.job_id=j.id AND t.state<>'complete') THEN 'complete'
-      WHEN EXISTS(SELECT 1 FROM creator_trust.privacy_task t WHERE t.job_id=j.id AND t.state='dead_letter') THEN 'dead_letter'
+      WHEN EXISTS(SELECT 1 FROM creator_trust.privacy_task t WHERE t.job_id=j.id AND t.state='dead_letter')
+        AND NOT EXISTS(SELECT 1 FROM creator_trust.privacy_task t WHERE t.job_id=j.id AND t.state IN('pending','running','retry')) THEN 'dead_letter'
       WHEN EXISTS(SELECT 1 FROM creator_trust.privacy_task t WHERE t.job_id=j.id AND t.state='blocked') THEN 'blocked'
       WHEN EXISTS(SELECT 1 FROM creator_trust.privacy_task t WHERE t.job_id=j.id AND t.state='retry') THEN 'retry'
       ELSE 'running' END,
@@ -167,6 +168,10 @@ export class TrustWorker {
           leaseToken: task.lease_token,
           signal,
         };
+        // Missing historical ownership cannot be reconstructed by a hook after
+        // identity deletion. This coordinator check only refuses work; each
+        // owner still needs its own authority on the actual held client.
+        await privacyTaskAuthority(this.pool)(job);
         const result = await hook.run(job);
         signal.throwIfAborted();
         receipt(result.receipt);
@@ -236,6 +241,20 @@ export class TrustWorker {
         client.release();
       }
     } catch (error) {
+      const unavailable = [
+        "privacy_artifact_unconfigured",
+        "privacy_commit_fence_unavailable",
+        "privacy_ownership_missing",
+        "growth_held_authority_unavailable",
+        "restoration_pending",
+        "conversation_privacy_unavailable",
+        "conversation_lineage_unavailable",
+        "conversation_recordings_unavailable",
+        "conversation_accounting_unavailable",
+        "conversation_retention_unavailable",
+        "identity_retention_unconfigured",
+        "identity_scope_adapter_required",
+      ];
       const message =
         error instanceof DomainError
           ? error.code
@@ -245,6 +264,7 @@ export class TrustWorker {
       const code =
         error instanceof Error &&
         [
+          ...unavailable,
           "hook_timeout",
           "artifact_too_large",
           "receipt_invalid",
@@ -253,6 +273,7 @@ export class TrustWorker {
           "export_stream_incomplete",
           "export_artifact_invalid",
           "privacy_artifact_unconfigured",
+          "privacy_commit_fence_unavailable",
         ].includes(message)
           ? message
           : "domain_hook_error";
@@ -262,7 +283,7 @@ export class TrustWorker {
           task.job_id,
           task.domain,
           task.lease_token,
-          code === "privacy_artifact_unconfigured"
+          unavailable.includes(code)
             ? "blocked"
             : task.attempts >= 8
               ? "dead_letter"
@@ -271,8 +292,7 @@ export class TrustWorker {
           Math.min(3600, 2 ** task.attempts * 5),
         ],
       );
-      if (code !== "privacy_artifact_unconfigured")
-        this.observe("privacy_retry", 1);
+      if (!unavailable.includes(code)) this.observe("privacy_retry", 1);
     }
   }
   private async claimEffects(): Promise<Effect[]> {

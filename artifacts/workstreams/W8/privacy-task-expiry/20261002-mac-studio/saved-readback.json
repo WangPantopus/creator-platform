@@ -1,0 +1,144 @@
+{
+  "source": "616698f3d9a034ba0fb4ffc3d4dff36465c011d0",
+  "jobHash": "f5b1dc68facdb329a12a35fd847114817f13b91ce0ea350757232b8f7a4d51b9",
+  "labelledSynthetic": true,
+  "originalRecovery": false,
+  "fullC10": false,
+  "job": {
+    "kind": "export",
+    "scope": "account",
+    "state": "blocked",
+    "actual_actor_match": true,
+    "actual_verification_present": true,
+    "actual_ownership_present": true,
+    "completed": false,
+    "domains": 8
+  },
+  "tasks": [
+    {
+      "domain": "agent",
+      "state": "complete",
+      "error_code": null,
+      "receipt_present": true,
+      "data_present": true,
+      "lease_not_live": true,
+      "attempts": 1
+    },
+    {
+      "domain": "commerce",
+      "state": "blocked",
+      "error_code": "domain_hook_unavailable",
+      "receipt_present": false,
+      "data_present": false,
+      "lease_not_live": true,
+      "attempts": 1
+    },
+    {
+      "domain": "content",
+      "state": "blocked",
+      "error_code": "domain_hook_unavailable",
+      "receipt_present": false,
+      "data_present": false,
+      "lease_not_live": true,
+      "attempts": 1
+    },
+    {
+      "domain": "conversation",
+      "state": "blocked",
+      "error_code": "conversation_lineage_unavailable",
+      "receipt_present": false,
+      "data_present": false,
+      "lease_not_live": true,
+      "attempts": 1
+    },
+    {
+      "domain": "growth",
+      "state": "blocked",
+      "error_code": "domain_hook_unavailable",
+      "receipt_present": false,
+      "data_present": false,
+      "lease_not_live": true,
+      "attempts": 1
+    },
+    {
+      "domain": "identity",
+      "state": "complete",
+      "error_code": null,
+      "receipt_present": true,
+      "data_present": true,
+      "lease_not_live": true,
+      "attempts": 1
+    },
+    {
+      "domain": "media",
+      "state": "complete",
+      "error_code": null,
+      "receipt_present": true,
+      "data_present": true,
+      "lease_not_live": true,
+      "attempts": 1
+    },
+    {
+      "domain": "trust",
+      "state": "complete",
+      "error_code": null,
+      "receipt_present": true,
+      "data_present": true,
+      "lease_not_live": true,
+      "attempts": 2
+    }
+  ],
+  "counts": {
+    "agent": {
+      "receiptComplete": false,
+      "receiptFamilyCount": null,
+      "arrays": {}
+    },
+    "identity": {
+      "receiptComplete": true,
+      "receiptFamilyCount": null,
+      "arrays": {
+        "fan": 1,
+        "events": 0,
+        "proofs": 0,
+        "creator": 0,
+        "passkeys": 0,
+        "sessions": 26,
+        "signedActs": 0,
+        "invitations": 0,
+        "teamMemberships": 0,
+        "signedPublications": 0
+      }
+    },
+    "media": {
+      "receiptComplete": true,
+      "receiptFamilyCount": 2,
+      "arrays": {
+        "families": 2
+      }
+    },
+    "trust": {
+      "receiptComplete": false,
+      "receiptFamilyCount": null,
+      "arrays": {
+        "cases": 3,
+        "blocks": 0,
+        "events": 4,
+        "notices": 1,
+        "accesses": 16,
+        "evidence": 3,
+        "feedback": 0,
+        "requests": 6,
+        "casesAboutYou": 0
+      }
+    }
+  },
+  "expected": {
+    "ledger_rows": 61,
+    "actual_fan_relationships": 2,
+    "actual_owned_creators": 0,
+    "transient_core_scopes": 0,
+    "transient_domain_scopes": 0
+  },
+  "mediaFamiliesMatchActualRelationshipCount": true
+}

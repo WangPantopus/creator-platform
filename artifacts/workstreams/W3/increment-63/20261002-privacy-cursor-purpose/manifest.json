@@ -1,0 +1,24 @@
+{
+  "source": "4499bc829d7da17c088f997be7f36f1c739680a7",
+  "files": {
+    "api.json": "f57cb46830a86e5bab0bc40d493d91484ea3dda330073107f3f692f5de988bc2",
+    "api.log": "b80561597692fd734cf22edaec3452ed8a8c6ebe883500952bc604cc4fc4f4c6",
+    "canonical-generation.log": "a75f82a3ee402417109f2eab3040984b2cd4ea3c70f57586fe10836c04d1819e",
+    "catalogue.json": "b16d203eee7c72fa9d527126215e797308520db3e153247dc00a8859b5f57e2f",
+    "checks.json": "62af935c94390cd5e45a7f92812718378c4e6e0843cda8c27f1f2d3e675a5ffc",
+    "format.log": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
+    "operation.json": "d5286799ee7f4ec8b1cbca2048ec3eca6a4c214face051c4ba4a44e3905eb29c",
+    "run.md": "7a16eb9fde46efe5f30bfe50223898e61b8e98e3f621885ebb1961b7e3be2afc",
+    "scoped-eslint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "shipping-backend.log": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+    "signals.json": "013795687d7672d28817a738bf19549e32d5318449557305071d500488e8c8e6",
+    "source-projections.json": "4d39483d2dc5fc47283251a6d5134b269a9c47a215bf7cd31202c0798f74cd02",
+    "sql-parse.json": "862f42b4641495b1f75436dd58fa7c499637e39f1f064d8b115645331b06e1aa",
+    "web-account-initial-1280.png": "52042d28427895e4f68eab48bd038c7aa40cbbed8ac34570235a550a99222d4d",
+    "web-account-light.png": "ea2756b2f3c88e245b54346620f4827f02054dfe6b8280c31916994ad85beb74",
+    "web-privacy-light.png": "99739f8c4fe9b45feb01b038cbb44755bd2c2e866f1277404c9fa7c7af9e6114",
+    "web-privacy-night.png": "098517e3e0ddc47a0925d67c4b47b5b874c6dda8b5a5eace4aaa75cb8b37ff99",
+    "web.json": "ae2e82fb74bd9225afa86e63f469606258700473ee4af3f66e139bb8f0d5d08d",
+    "web.log": "d3311e9c5d58dae37fabb0e4f0cf0aae1f0f7bae70b89c3d6b2d37d06af9d4ff"
+  }
+}

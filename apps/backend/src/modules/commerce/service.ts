@@ -28,6 +28,7 @@ import type { Database } from "../../db/database.js";
 import type { PaymentProvider, Intent } from "../payments/provider.js";
 import { CreditWallet, type CreditRules } from "./accounting.js";
 import type { CommerceVoiceFulfillment } from "./voice-fulfillment.js";
+import { CommerceFulfillmentPlans } from "./fulfillment-plans.js";
 import { CommerceCallTransport } from "./call-transport.js";
 import type { CallTransportStatus } from "../../../../../packages/api/src/commerce/contracts.js";
 
@@ -171,17 +172,66 @@ export class CommerceService {
     private readonly trialAdmission?: CommerceTrialAdmission,
     private readonly assertCreatorReadAllowed?: CommerceCreatorReadAuthority,
     private readonly voiceFulfillment?: CommerceVoiceFulfillment,
+    private readonly fulfillmentPlans?: CommerceFulfillmentPlans,
   ) {
     voiceFulfillment?.assertRuntime(db, access);
+    if (fulfillmentPlans)
+      CommerceFulfillmentPlans.assertRuntime(fulfillmentPlans, db, access);
   }
   get voiceFulfillmentAvailable() {
     return Boolean(this.voiceFulfillment);
   }
   private fulfillmentAvailable(kind: string) {
+    // A policy string cannot promise a group publication. Its genuine W3
+    // System-link/W5 publication composition is a separate required producer.
+    if (kind === "group_answer") return false;
     return (
       kind === "written_reply" ||
       (Boolean(this.policy.fulfillmentModes?.includes(kind)) &&
-        (kind !== "voice_note" || this.voiceFulfillmentAvailable))
+        (kind !== "voice_note" || this.voiceFulfillmentAvailable) &&
+        (kind !== "guaranteed_review" || Boolean(this.fulfillmentPlans)))
+    );
+  }
+  get reviewFulfillmentAvailable() {
+    return Boolean(this.fulfillmentPlans);
+  }
+  private requireFulfillmentPlans() {
+    if (!this.fulfillmentPlans)
+      throw new DomainError(
+        "fulfillment_plans_unconfigured",
+        "Original group and review fulfillment authority is unavailable.",
+        503,
+      );
+    return this.fulfillmentPlans;
+  }
+  createFulfillmentPlan(actor: Actor, creatorId: string, input: unknown) {
+    return this.requireFulfillmentPlans().create(actor, creatorId, input);
+  }
+  async reviewAttestationCommand(actor: Actor, packetId: string) {
+    const scope = await this.packetScope(actor, packetId);
+    invariant(
+      scope.authority === "creator",
+      "creator_required",
+      "Only the creator can attest review of this original request.",
+    );
+    return this.requireFulfillmentPlans().reviewQuote(
+      actor,
+      scope.creatorId,
+      packetId,
+    );
+  }
+  async attestReview(actor: Actor, packetId: string, input: unknown) {
+    const scope = await this.packetScope(actor, packetId);
+    invariant(
+      scope.authority === "creator",
+      "creator_required",
+      "Only the creator can attest review of this original request.",
+    );
+    return this.requireFulfillmentPlans().attestReview(
+      actor,
+      scope.creatorId,
+      packetId,
+      input,
     );
   }
   get creatorFinancialReadAvailable() {

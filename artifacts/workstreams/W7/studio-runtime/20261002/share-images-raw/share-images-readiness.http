@@ -1,0 +1,11 @@
+HTTP/1.1 503 Service Unavailable
+X-Request-Id: d953ec0a-7a5e-48ac-83d4-cfbf413e5fa4
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Content-Length: 162
+ETag: W/"a2-OhuEJxlFpoblA1INvtJs26USKE4"
+Date: Fri, 02 Oct 2026 11:20:11 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"ready":false,"capabilities":[{"name":"trust_runtime","required":true,"state":"unavailable","code":"trust_unconfigured","checkedAt":"2026-10-02T11:20:11.401Z"}]}

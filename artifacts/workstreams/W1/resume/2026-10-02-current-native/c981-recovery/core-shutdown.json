@@ -1,0 +1,18 @@
+{
+  "sourceRevision": "c9812b25",
+  "verifiedOwnedListeningProcess": true,
+  "signals": [
+    "SIGINT",
+    "SIGTERM"
+  ],
+  "signalsDispatchElapsedMs": 0.018,
+  "handlerOverlapProven": false,
+  "growthEnabled": false,
+  "supervisedExitPending": false,
+  "peerResourcesTouched": false,
+  "supervisedExitCode": 0,
+  "duplicatePoolEndObserved": false,
+  "sanitizedCleanupFailureObserved": false,
+  "personallyDispatchedSignals": true,
+  "limitation": "Growth was disabled on this first source-qualified operation; full composed Growth shutdown follows."
+}
