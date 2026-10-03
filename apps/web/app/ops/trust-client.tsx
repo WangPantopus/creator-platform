@@ -127,9 +127,16 @@ export function useTrust<T>(path: string) {
 }
 export function TrustSession({
   capabilityError = null,
+  onSessionState,
 }: {
   /** A containing page may already present the same capability failure. */
   capabilityError?: TrustError | null;
+  /** A containing privacy page presents one read failure and gates its actions
+   * on the real session response. Periodic loading is not an account change. */
+  onSessionState?: (state: {
+    ready: boolean;
+    error: TrustError | null;
+  }) => void;
 } = {}) {
   const capability = useTrust<{
     localDevelopment: boolean;
@@ -137,6 +144,14 @@ export function TrustSession({
   }>("capabilities");
   const { data } = capability;
   const session = useTrust<{ accountId: string }>("session");
+  useEffect(() => {
+    if (capability.error || session.error)
+      onSessionState?.({
+        ready: false,
+        error: capability.error ?? session.error,
+      });
+    else if (session.data) onSessionState?.({ ready: true, error: null });
+  }, [capability.error, session.error, session.data, onSessionState]);
   const [actor, setActor] = useState("fan");
   const actorChoice = useRef<HTMLSelectElement | null>(null);
   const observedAccount = useRef<string | null>(null);
@@ -227,11 +242,14 @@ export function TrustSession({
       </a>
     ) : null;
   if (capability.error)
-    return capability.error.code === capabilityError?.code ? null : (
+    return onSessionState ||
+      capability.error.code === capabilityError?.code ? null : (
       <ErrorState error={capability.error} retry={retryTrustReads} />
     );
   if (session.error && session.error.status !== 401)
-    return <ErrorState error={session.error} retry={retryTrustReads} />;
+    return onSessionState ? null : (
+      <ErrorState error={session.error} retry={retryTrustReads} />
+    );
   if (!data?.localDevelopment) return continuation;
   if (data.localActorSelection === false)
     return (

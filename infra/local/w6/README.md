@@ -84,6 +84,7 @@ Launch web without Turbo environment filtering:
 
 ```sh
 QELVORA_API_URL=http://127.0.0.1:4106 WEB_ORIGIN=http://localhost:3006 \
+  W3_WEBSOCKET_URL=ws://127.0.0.1:4106/v1/realtime \
   pnpm --filter @qelvora/web exec next dev --webpack --port 3006
 ```
 
