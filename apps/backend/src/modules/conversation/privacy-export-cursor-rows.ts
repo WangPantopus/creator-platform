@@ -28,6 +28,7 @@ const Names = [
   "events",
   "exclusions",
   "generations",
+  "generation_sentence_provenance",
 ] as const;
 const Author = z.enum([
   "fan",
@@ -71,12 +72,20 @@ export async function writeConversationPrivacyCursor(input: {
   let accountingBytes = 0;
   let accounting = false;
   let accountingReceipt: unknown;
+  let provenanceHash = createHash("sha256");
+  let provenanceBytes = 0;
+  let provenance = false;
+  let provenanceReceipt: unknown;
   const write = async (part: string) => {
     input.signal.throwIfAborted();
     await input.write(part);
     if (accounting) {
       accountingHash.update(part, "utf8");
       accountingBytes += Buffer.byteLength(part, "utf8");
+    }
+    if (provenance) {
+      provenanceHash.update(part, "utf8");
+      provenanceBytes += Buffer.byteLength(part, "utf8");
     }
   };
   const open = async (rank: number) => {
@@ -88,7 +97,11 @@ export async function writeConversationPrivacyCursor(input: {
     } else if (rank <= 5) await write(`,${JSON.stringify(Names[rank])}:[`);
     else if (rank === 6) await write(',"lineage":{"messages":[');
     else if (rank === 7) await write(',"feedback":[');
-    else await write(`,${JSON.stringify(Names[rank])}:[`);
+    else if (rank === 18) {
+      await write(`,${JSON.stringify(Names[rank])}:`);
+      provenance = true;
+      await write("[");
+    } else await write(`,${JSON.stringify(Names[rank])}:[`);
     collection = rank;
     lastKey = undefined;
   };
@@ -106,10 +119,18 @@ export async function writeConversationPrivacyCursor(input: {
         sha256: accountingHash.digest("hex"),
       };
     } else if (collection === 7) await write("}");
+    else if (collection === 18) {
+      provenance = false;
+      provenanceReceipt = {
+        count: counts[18],
+        bytes: provenanceBytes,
+        sha256: provenanceHash.digest("hex"),
+      };
+    }
   };
   const finishFamily = async () => {
     if (!current) return;
-    while (collection < 17) {
+    while (collection < Names.length - 1) {
       await close();
       await open(collection + 1);
     }
@@ -120,8 +141,9 @@ export async function writeConversationPrivacyCursor(input: {
         lineage: { messages: counts[6], feedback: counts[7] },
         recordings: counts[8],
         ...Object.fromEntries(
-          Names.slice(9).map((name, i) => [name, counts[i + 9]]),
+          Names.slice(9, 18).map((name, i) => [name, counts[i + 9]]),
         ),
+        generation_sentence_provenance: provenanceReceipt,
       })}}`,
     );
   };
@@ -149,10 +171,13 @@ export async function writeConversationPrivacyCursor(input: {
         );
         await finishFamily();
         current = header;
-        counts = Array<number>(18).fill(0);
+        counts = Array<number>(Names.length).fill(0);
         accountingHash = createHash("sha256");
         accountingBytes = 0;
         accountingReceipt = undefined;
+        provenanceHash = createHash("sha256");
+        provenanceBytes = 0;
+        provenanceReceipt = undefined;
         await write(`${familyIndex === 0 ? "" : ","}{"thread":${row.document}`);
         await open(1);
       } else {
