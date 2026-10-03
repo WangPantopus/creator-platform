@@ -335,6 +335,7 @@ export class PreparedAgentPrivacyExport {
     let cancellationFailure: unknown;
     const abort = () => {
       cancelling = (async () => {
+        const failures: unknown[] = [];
         const control = new Client({
           ...this.pool.options,
           connectionTimeoutMillis: 1500,
@@ -343,7 +344,7 @@ export class PreparedAgentPrivacyExport {
           pipeline: false,
         });
         const onError = (error: Error) => {
-          cancellationFailure ??= error;
+          failures.push(error);
         };
         control.on("error", onError);
         try {
@@ -357,13 +358,22 @@ export class PreparedAgentPrivacyExport {
             "privacy_export_cancel_unavailable",
             "The actual source backend could not be cancelled.",
           );
+        } catch (error) {
+          failures.push(error);
         } finally {
           try {
             await control.end();
+          } catch (error) {
+            failures.push(error);
           } finally {
             control.removeListener("error", onError);
           }
         }
+        if (failures.length)
+          throw new AggregateError(
+            failures,
+            "Agent export cancellation failed",
+          );
       })().catch((error: unknown) => {
         cancellationFailure = error;
       });
@@ -380,12 +390,23 @@ export class PreparedAgentPrivacyExport {
       signal.removeEventListener("abort", abort);
       await cancelling;
     }
-    if (cancellationFailure)
-      throw new DomainError(
+    if (cancellationFailure) {
+      const failure = new DomainError(
         "privacy_export_cancel_unavailable",
         "Source cancellation failed; this export cannot complete.",
         503,
       );
+      Object.defineProperty(failure, "cause", {
+        value: new AggregateError(
+          [queryFailure, cancellationFailure].filter(
+            (cause) => cause !== undefined,
+          ),
+          "Agent export query and cancellation failed",
+        ),
+        configurable: true,
+      });
+      throw failure;
+    }
     signal.throwIfAborted();
     if (queryFailure) throw queryFailure;
     invariant(
