@@ -13,12 +13,18 @@ export const fulfillmentPublicationDenialMigration = Object.freeze({
 const catalogueChecksum =
   "8a58811f1184b529fb2709dcbca80780261dbae2aa8f14459bf337165c5529ce";
 
-function unavailable(): never {
-  throw new DomainError(
+function unavailable(cause?: unknown): never {
+  const failure = new DomainError(
     "fulfillment_publication_denial_unavailable",
     "The original publication recipients cannot be checked. Try again later.",
     503,
   );
+  if (cause !== undefined)
+    Object.defineProperty(failure, "cause", {
+      value: cause,
+      configurable: true,
+    });
+  throw failure;
 }
 
 /** Closed metadata review only. No original preparation, task, body or positive
@@ -27,6 +33,7 @@ export async function fulfillmentPublicationDenialPurposeCatalogue(
   client: PoolClient,
 ) {
   await client.query("SAVEPOINT w8_fulfillment_publication_catalog");
+  let completed = false;
   try {
     await client.query("SET LOCAL search_path=pg_catalog");
     const permissions = await generationConsumerCatalogue(client, purpose);
@@ -111,12 +118,19 @@ export async function fulfillmentPublicationDenialPurposeCatalogue(
          ORDER BY c.relname COLLATE "C"`,
       )
     ).rows;
+    completed = true;
     return { permissions, role, dependencies, executables, relations };
   } finally {
-    await client.query(
-      "ROLLBACK TO SAVEPOINT w8_fulfillment_publication_catalog",
-    );
-    await client.query("RELEASE SAVEPOINT w8_fulfillment_publication_catalog");
+    // Only complete reads can restore this savepoint. The actual owner keeps
+    // custody of any failed or uncertain query and its original private cause.
+    if (completed) {
+      await client.query(
+        "ROLLBACK TO SAVEPOINT w8_fulfillment_publication_catalog",
+      );
+      await client.query(
+        "RELEASE SAVEPOINT w8_fulfillment_publication_catalog",
+      );
+    }
   }
 }
 
@@ -130,8 +144,8 @@ export async function assertFulfillmentPublicationDenialPurposeCatalog(
       ) !== catalogueChecksum
     )
       unavailable();
-  } catch {
-    unavailable();
+  } catch (cause) {
+    unavailable(cause);
   }
 }
 
@@ -180,7 +194,7 @@ export async function assertFulfillmentPublicationDenialCatalog(
     ).rows[0]?.ready;
     if (ready !== true) unavailable();
     await assertFulfillmentPublicationDenialPurposeCatalog(client);
-  } catch {
-    unavailable();
+  } catch (cause) {
+    unavailable(cause);
   }
 }
