@@ -41,8 +41,7 @@ export function ConversationVoiceReply({
   onDelivered: () => void;
 }) {
   const request = useRef(useConversationRequest()).current;
-  const { signal, session, isSessionEnded } =
-    useRef(useIdentityRequest()).current;
+  const { signal, session } = useRef(useIdentityRequest()).current;
   const [available, setAvailable] = useState(false);
   const [limit, setLimit] = useState<number | null>(null);
   const [asset, setAsset] = useState<MediaAsset | null>(null);
@@ -138,7 +137,6 @@ export function ConversationVoiceReply({
       setBusy(false);
       setError("");
       setDelivered(false);
-      if (isSessionEnded()) purgeRecordingRetries();
     };
     signal.addEventListener("abort", dispose, { once: true });
     if (signal.aborted) dispose();
@@ -149,7 +147,6 @@ export function ConversationVoiceReply({
     session.accountId,
     session.sessionId,
     expectedAccountId,
-    isSessionEnded,
   ]);
   useEffect(() => {
     onPendingChange(pending || busy);

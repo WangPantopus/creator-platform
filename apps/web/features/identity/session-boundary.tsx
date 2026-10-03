@@ -9,6 +9,7 @@ import {
 } from "react";
 import { SessionSchema, type Session } from "@qelvora/api";
 import { Notice } from "@qelvora/ui-web";
+import { discardPrivateSessionBuffers } from "./private-session-buffers";
 
 type IdentityScope = {
   accountId: string;
@@ -24,6 +25,7 @@ export const sessionChannel = "qelvora-identity-status";
 
 /** Only an invalidation signal crosses tabs; credentials and private data never do. */
 export function announceSessionEnd() {
+  discardPrivateSessionBuffers();
   if (typeof BroadcastChannel === "undefined") return;
   const channel = new BroadcastChannel(sessionChannel);
   channel.postMessage("ended");
@@ -77,13 +79,14 @@ function IdentitySessionView({
     (original: AbortSignal) => {
       if (original.aborted || controller.current?.signal !== original) return;
       endedLifetimes.current.add(original);
+      discardPrivateSessionBuffers({ accountId, sessionId });
       controller.current.abort();
       setValid(false);
       location.replace(
         `/auth/continue?returnTo=${encodeURIComponent(returnTo)}`,
       );
     },
-    [returnTo],
+    [accountId, sessionId, returnTo],
   );
   const endOriginal = useCallback(() => end(signal), [end, signal]);
   const isSessionEnded = useCallback(
