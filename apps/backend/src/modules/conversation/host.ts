@@ -222,6 +222,8 @@ export async function composeConversationHost(
     "0188_w2_generation_terminal_journal",
     "0189_w4_generation_terminal_settlement",
     "0203_w3_terminal_only_finalization",
+    "0215_w4_generation_safety_terminal_settlement",
+    "0218_w1_generation_terminal_discovery",
   ])
     if (!(await registeredChecksum(version)))
       missing.push(`registered ${version}`);
