@@ -92,12 +92,17 @@ async function assertReviewedExport(
     )
       throw new Error("Inactive export executable source");
     await assertAgentPrivacyExportPurposeCatalogue(database, review);
-  } catch {
-    throw new DomainError(
+  } catch (cause) {
+    const failure = new DomainError(
       "privacy_export_unconfigured",
       "Reviewed current all-source export custody is unavailable.",
       503,
     );
+    Object.defineProperty(failure, "cause", {
+      value: cause,
+      configurable: true,
+    });
+    throw failure;
   }
 }
 
@@ -211,12 +216,17 @@ export async function assertAgentPrivacyExportPurposeCatalogue(
       review.catalogueChecksum
     )
       throw new Error("Unreviewed export source permissions");
-  } catch {
-    throw new DomainError(
+  } catch (cause) {
+    const failure = new DomainError(
       "privacy_export_unconfigured",
       "Reviewed current all-source export custody is unavailable.",
       503,
     );
+    Object.defineProperty(failure, "cause", {
+      value: cause,
+      configurable: true,
+    });
+    throw failure;
   }
 }
 
@@ -313,16 +323,19 @@ export class PreparedAgentPrivacyExport {
     sql: string,
   ) {
     signal.throwIfAborted();
+    const pidQuery = {
+      text: "SELECT pg_backend_pid() AS pid",
+      query_timeout: 5000,
+    };
     const pid = z
       .int()
       .positive()
-      .parse(
-        (await client.query("SELECT pg_backend_pid() AS pid")).rows[0]?.pid,
-      );
+      .parse((await client.query(pidQuery)).rows[0]?.pid);
     let cancelling: Promise<void> | undefined;
     let cancellationFailure: unknown;
     const abort = () => {
       cancelling = (async () => {
+        const failures: unknown[] = [];
         const control = new Client({
           ...this.pool.options,
           connectionTimeoutMillis: 1500,
@@ -331,7 +344,7 @@ export class PreparedAgentPrivacyExport {
           pipeline: false,
         });
         const onError = (error: Error) => {
-          cancellationFailure ??= error;
+          failures.push(error);
         };
         control.on("error", onError);
         try {
@@ -345,13 +358,22 @@ export class PreparedAgentPrivacyExport {
             "privacy_export_cancel_unavailable",
             "The actual source backend could not be cancelled.",
           );
+        } catch (error) {
+          failures.push(error);
         } finally {
           try {
             await control.end();
+          } catch (error) {
+            failures.push(error);
           } finally {
             control.removeListener("error", onError);
           }
         }
+        if (failures.length)
+          throw new AggregateError(
+            failures,
+            "Agent export cancellation failed",
+          );
       })().catch((error: unknown) => {
         cancellationFailure = error;
       });
@@ -368,12 +390,23 @@ export class PreparedAgentPrivacyExport {
       signal.removeEventListener("abort", abort);
       await cancelling;
     }
-    if (cancellationFailure)
-      throw new DomainError(
+    if (cancellationFailure) {
+      const failure = new DomainError(
         "privacy_export_cancel_unavailable",
         "Source cancellation failed; this export cannot complete.",
         503,
       );
+      Object.defineProperty(failure, "cause", {
+        value: new AggregateError(
+          [queryFailure, cancellationFailure].filter(
+            (cause) => cause !== undefined,
+          ),
+          "Agent export query and cancellation failed",
+        ),
+        configurable: true,
+      });
+      throw failure;
+    }
     signal.throwIfAborted();
     if (queryFailure) throw queryFailure;
     invariant(
