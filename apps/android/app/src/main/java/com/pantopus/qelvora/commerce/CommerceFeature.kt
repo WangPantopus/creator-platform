@@ -2,6 +2,7 @@ package com.pantopus.qelvora.commerce
 
 import android.content.Context
 import android.net.Uri
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.background
@@ -35,14 +36,71 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.serialization.json.*
 
+private data class SpendingDraftOwner(val origin: String, val accountId: String, val sessionId: String, val route: String)
+private data class SpendingFormDraft(val amount: String, val choice: String?, val reminders: Boolean)
+
+/** Original-session configuration memory only. No storage, saved state,
+ * credential, session model, idempotency key, request or private result. */
+private class SpendingConfigurationDrafts : ViewModel() {
+    private var parked: Pair<SpendingDraftOwner, SpendingFormDraft>? = null
+    fun park(owner: SpendingDraftOwner, draft: SpendingFormDraft) { parked = owner to draft }
+    fun clear() { parked = null }
+    fun take(owner: SpendingDraftOwner?): SpendingFormDraft? {
+        val value = parked; clear()
+        return value?.takeIf { owner != null && it.first == owner }?.second
+    }
+    fun observe(origin: String?, route: String, accountId: String?, sessionId: String?, checking: Boolean,
+                savedCredential: Boolean, purging: Boolean, purgeFailed: Boolean, choosingActor: Boolean) {
+        val owner = parked?.first ?: return
+        if (origin != owner.origin || route != owner.route || purging || purgeFailed || choosingActor ||
+            (accountId != null && (accountId != owner.accountId || sessionId != owner.sessionId)) ||
+            (accountId == null && !checking && !savedCredential)) clear()
+    }
+    override fun onCleared() { clear() }
+    companion object {
+        val factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                check(modelClass == SpendingConfigurationDrafts::class.java)
+                return SpendingConfigurationDrafts() as T
+            }
+        }
+    }
+}
+private fun spendingConfigurationDrafts(context: Context): SpendingConfigurationDrafts? =
+    (context as? ComponentActivity)?.let { ViewModelProvider(it, SpendingConfigurationDrafts.factory)["qelvora.commerce.configuration.spending", SpendingConfigurationDrafts::class.java] }
+private fun spendingDraftOwner(baseURL: String?, model: FanSession): SpendingDraftOwner? =
+    baseURL?.let { origin -> model.session?.let { SpendingDraftOwner(origin, it.accountId, it.sessionId, model.destination) } }
+
+@Composable
+private fun spendingConfigurationBoundary(context: Context, baseURL: String?, model: FanSession) {
+    val memory = remember(context) { spendingConfigurationDrafts(context) }
+    val accountId = model.session?.accountId; val sessionId = model.session?.sessionId
+    val route = model.destination; val checking = model.checkingSession; val saved = model.hasSavedCredential
+    val purging = model.purgingPrivateState; val failed = model.localPurgeFailed; val choosing = model.choosingActor
+    SideEffect { memory?.observe(baseURL, route, accountId, sessionId, checking, saved, purging, failed, choosing) }
+}
+
 object CommerceFanFeature {
-    fun registration(context: Context, baseURL: String?) = FanFeatureRegistration({ destination -> val path = destination.substringBefore("?"); path == "/requests" || (path.startsWith("/commerce/") && path.substringAfterLast("/") in listOf("requests", "spending", "access", "packet", "checkout", "status", "pass", "membership")) || (path.startsWith("/creators/") && path.endsWith("/access")) }) { session -> key(session.session?.accountId, session.session?.sessionId) { CommerceFeature(context, baseURL, session) } }
+    fun registration(context: Context, baseURL: String?) = FanFeatureRegistration(
+        matches = { destination -> val path = destination.substringBefore("?"); path == "/requests" || (path.startsWith("/commerce/") && path.substringAfterLast("/") in listOf("requests", "spending", "access", "packet", "checkout", "status", "pass", "membership")) || (path.startsWith("/creators/") && path.endsWith("/access")) },
+        rootObserver = { model -> spendingConfigurationBoundary(context, baseURL, model) },
+        screen = { session -> key(session.session?.accountId, session.session?.sessionId) { CommerceFeature(context, baseURL, session) } },
+    )
 }
 
 @Composable private fun CommerceFeature(context: Context, baseURL: String?, session: FanSession) {
+    val activity = context as? ComponentActivity
+    val draftMemory = remember(context) { spendingConfigurationDrafts(context) }
+    val draftOwner = spendingDraftOwner(baseURL, session)
+    var draftRestorationAttempted by remember { mutableStateOf(false) }
+    var spendingEdited by remember { mutableStateOf(false) }
+    var commandInFlight by remember { mutableStateOf(false) }
     val originalAccount = remember { session.session?.accountId }
     val originalSession = remember { session.session?.sessionId }
     val originalDestination = remember { session.destination }
@@ -83,6 +141,11 @@ object CommerceFanFeature {
     }
     DisposableEffect(Unit) {
         onDispose {
+            if (activity?.isChangingConfigurations == true && screen == "spending" && spendingEdited &&
+                draftOwner != null && draftOwner == spendingDraftOwner(baseURL, session) &&
+                !session.purgingPrivateState && !session.localPurgeFailed && !session.choosingActor && !commandInFlight) {
+                draftMemory?.park(draftOwner, SpendingFormDraft(amount, choice, reminders))
+            } else draftMemory?.clear()
             disposed = true
             data = null; detail = null; access = null; accessReceivedAt = null; commerceAvailable = false
             amount = ""; choice = null; reminders = false; summary = ""; info = ""; selectedMode = null
@@ -120,11 +183,11 @@ object CommerceFanFeature {
         catch (error: Exception) { report(error) } finally { busy = false }
     }
     suspend fun mutate(path: String, values: JsonObject, message: String) {
-        if (busy || !privateReady() || !commerceAvailable) return; val client = api ?: return; busy = true
+        if (busy || !privateReady() || !commerceAvailable) return; val client = api ?: return; busy = true; commandInFlight = true
         try {
             val signature = path + values.toString(); val key = keys.getOrPut(signature) { UUID.randomUUID().toString() }
             client.request(path, JsonObject(values + ("idempotencyKey" to JsonPrimitive(key)))); if (!privateReady()) return; notice = message; failure = ""; refresh(allowBusy = true)
-        } catch (error: Exception) { report(error) } finally { busy = false }
+        } catch (error: Exception) { report(error) } finally { busy = false; commandInFlight = false }
     }
     suspend fun retry() {
         if (busy || !originalViewCurrent() || session.busy || session.checkingSession || session.purgingPrivateState || session.localPurgeFailed) return
@@ -138,6 +201,18 @@ object CommerceFanFeature {
             arrived = true
             creator = arrival.getQueryParameter("creatorId") ?: data?.creators?.firstOrNull { arrivalPath.startsWith("/creators/${it.handle}/") }?.id ?: creator
             if (screen == "status") arrival.getQueryParameter("packetId")?.let { id -> try { val value = api?.detail(id); if (privateReady()) detail = value } catch (error: Exception) { report(error) } }
+        }
+    }
+    LaunchedEffect(ready, commerceAvailable) {
+        // Read the actual saved limit first. Otherwise that initial overview
+        // could overwrite a restored unsent form with the server's default.
+        if (privateReady() && commerceAvailable && !draftRestorationAttempted) {
+            draftRestorationAttempted = true
+            val restored = draftMemory?.take(draftOwner)
+            if (restored != null && !spendingEdited && !commandInFlight) {
+                screen = "spending"; amount = restored.amount; choice = restored.choice; reminders = restored.reminders
+                spendingEdited = true
+            }
         }
     }
     LaunchedEffect(screen, creator, data?.fan?.id, foreground, ready) {
@@ -188,9 +263,9 @@ object CommerceFanFeature {
                     current.exposure?.refunded?.let { CommerceRow("Refunds recorded", commerceMoney(it, current.policy.currency)) }
                     limit?.effective_at?.let { CommerceText("Your increase takes effect ${commerceWhen(it)}.", "caption") }
                 }
-                SpendLimit(options = listOf("Choose an amount", "No limit"), selected = choice, remindersOn = limit?.reminders_on, onSelect = { choice = it })
-                if (choice == "Choose an amount") CommerceField("Monthly amount in ${current.policy.currency}", amount, { amount = it }, keyboardType = KeyboardType.Decimal)
-                Button(if (reminders) "Reminders at 50% and 100% · on" else "Reminders at 50% and 100% · off", ButtonVariant.QUIET, block = true) { reminders = !reminders }
+                SpendLimit(options = listOf("Choose an amount", "No limit"), selected = choice, remindersOn = limit?.reminders_on, onSelect = { spendingEdited = true; choice = it })
+                if (choice == "Choose an amount") CommerceField("Monthly amount in ${current.policy.currency}", amount, { spendingEdited = true; amount = it }, keyboardType = KeyboardType.Decimal)
+                Button(if (reminders) "Reminders at 50% and 100% · on" else "Reminders at 50% and 100% · off", ButtonVariant.QUIET, block = true) { spendingEdited = true; reminders = !reminders }
                 CommerceText("Increases take 24 hours. Decreases are immediate and affect new requests. Existing obligations remain.", "caption")
                 Button(if (busy) "Saving…" else "Save limit", ButtonVariant.SECONDARY, block = true, disabled = commandDisabled || choice == null) { scope.launch {
                     try { val value = if (choice == "No limit") null else commerceMinor(amount, current.policy.currency); mutate("spend-limit", buildJsonObject { put("currency", current.policy.currency); put("amount", value?.let { JsonPrimitive(it) } ?: JsonNull); put("explicitNone", choice == "No limit"); put("remindersOn", reminders) }, "Your spending choice is saved.") } catch (error: Exception) { report(error) }
