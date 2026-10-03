@@ -21,7 +21,7 @@ const Owner = "creator_w3_privacy_export";
 export const CONVERSATION_PRIVACY_CURSOR_MIGRATION =
   "0206_w3_privacy_cursor_export";
 export const CONVERSATION_PRIVACY_CURSOR_SOURCE_SHA256 =
-  "73474526575ecbdec8b5452039f953d5af35357f5ba1922d300394791b94aa06";
+  "853448317abfd015adf29f3a85eefd704da09912010433e0946f5a27b2fb24bb";
 const Signatures = [
   "creator.fence_conversation_privacy_export(uuid,uuid,text,uuid,uuid,uuid)",
   "creator.conversation_privacy_export_rows(uuid,uuid)",
@@ -199,6 +199,20 @@ export class PreparedConversationPrivacyCursor {
         `SELECT session_user='creator_runtime' AND current_user=session_user
          AND current_setting('transaction_isolation')='read committed'
          AND EXISTS(SELECT FROM creator.schema_migration WHERE version=$1 AND checksum=$2)
+         AND EXISTS(SELECT FROM creator.schema_migration WHERE version='0181_w2_generation_attempt_admission'
+          AND checksum='eab8c8e07b8a1e6ba4384f5300560bd46853bf98509faade5a1b555e130c75ee')
+         AND EXISTS(SELECT FROM creator.schema_migration WHERE version='0188_w2_generation_terminal_journal'
+          AND checksum='7ab8974d065b1b9e5befa2ded26c6978876957fab0eee80b9632825bbac98477')
+         AND has_column_privilege($3,'creator.ai_generation_attempt','admission_version_hash','SELECT')
+         AND has_column_privilege($3,'creator.ai_generation_attempt','admission_model_fingerprint','SELECT')
+         AND NOT has_column_privilege($3,'creator.ai_usage','completion_capability_hash','SELECT,INSERT,UPDATE,REFERENCES')
+         AND EXISTS(SELECT FROM pg_attribute WHERE attrelid=to_regclass('creator.ai_usage')
+          AND attname='completion_capability_hash' AND attnum>0 AND NOT attisdropped
+          AND atttypid='pg_catalog.bytea'::regtype AND atttypmod=-1 AND attndims=0
+          AND NOT attnotnull AND attgenerated='' AND attidentity='' AND NOT atthasdef)
+         AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+          WHERE n.nspname='creator' AND c.relname=ANY(ARRAY['ai_generation_admission','ai_generation_attempt',
+           'ai_generation_receipt','ai_usage','ai_event']) AND has_table_privilege($3,c.oid,'SELECT'))
          AND EXISTS(SELECT FROM pg_roles WHERE rolname=session_user AND NOT rolinherit AND NOT rolsuper
           AND NOT rolbypassrls AND NOT rolcreatedb AND NOT rolcreaterole AND NOT rolreplication AND rolconfig IS NULL)
          AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=(SELECT oid FROM pg_roles WHERE rolname=session_user))
