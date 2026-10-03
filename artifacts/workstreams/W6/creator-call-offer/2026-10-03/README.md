@@ -1,5 +1,111 @@
 # Creator call-offer and genuine recording retry lifetime — 3 October 2026
 
+## Current shipping and personal application qualification — 21:03 UTC
+
+Frozen product `5f5943bc5e0b2b9295c1bb7645181de282346b08` normally incorporates
+original W1 PR21 `85ac12317f9f027cf8828ea7fb1148f687ec2e0c`, including the
+complete original115-operation native generator/confirmed-credential capture
+and `50a7a6c3` entire-resource identity timeout. W6 personally read the original
+producer deltas; all unique call/media/OS/offer/signing source remains. The later
+notes are documentation only. PR296 was closed with its source preserved and
+children retargeted to original21. No Actor/scope/task/purpose is invented.
+
+All current shipping stages exit0, sequentially under exact exclusive guards:
+
+| Stage                          | UTC start–end             | Log SHA256                                                         |
+| ------------------------------ | ------------------------- | ------------------------------------------------------------------ |
+| Backend                        | 20:03:49.580–20:03:53.738 | `22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5` |
+| Production web                 | 20:03:53.749–20:04:02.870 | `ee86ac61262d17b54e042abb0c352df5b5fb31926733fea48e12fcec4a77566f` |
+| Original pinned iOS resolution | 20:22:46.521–20:22:55.233 | `eff58bdcc544c5a43a07152a956f0e8e1bed18c109847d0b700872f02dc5ed0a` |
+| iOS                            | 20:22:55.247–20:25:00.262 | `4b0342908091a2190f8e41d876697bc396ebd30870660f5c385c545ecd877b55` |
+| Android                        | 20:25:00.279–20:25:52.951 | `7bd5633a35f07e57a431f75e770afe3346e6947f250fb12eba8d56f652907af8` |
+
+Strict/deep iOS signature verification exits0. Successful native guard
+nonce2db3f5b6-c6ce-4d2b-95bc-8f9b0cbe5eea/dev16777232/inode244997210 normally
+released20:25:53.144Z. Earlier iOS attempts genuinely exited65 for missing pinned
+SDK artifact metadata/stale private build state; their guards released and
+receipts remain. The final official resolution uses a fresh owned SourcePackages/
+DerivedData directory and the exact unchanged seven-pin lock SHA256
+`0528fa1786d7c5af35be3162a42562b8791c70a248e3027591ccf3467d8f37eb`.
+No dependency/version/source/signing upgrade repairs the failed cache.
+
+Actual bundle SHA256 `d439ac6814fefccfc59c722250c6083227f079782e4b96ac04cc7b5f9f023891`;
+installed Android APK `4470744c8fb546bf323988793cf8e3d70ad89c46bc9b2a3163e66eed050d726f`;
+installed iOS executable/debug dylib
+`1b3964cc00c83b54b1906e4bb041a21434e2ee707f17a5d3a15337eab8fd6a2d` /
+`3061c431fe3e56e787e1eadb9e830918b8228ef3dcb812971ac6044852c8b472`.
+Installation hashes were read from both actual app containers, not inferred from
+compiler output. These are simulator/emulator shipping compositions.
+
+W6 personally operated production web with genuine original development issuer:
+unused creator offer context/list503 `calls_unconfigured`, corrected Requests
+navigation and its actual commerce refusal, original reload, same-account
+replacement409 and other-account replacement409 concealing the old view,
+settled offline refusal and same-original online recovery, Night390×844 and
+Light1280×900. Wrong initial selector/viewport method and unsettled snapshots
+were preserved locally and corrected by actual repeated operation. Final browser
+logout200, no page errors. No empty/paid Requests queue is inferred.
+
+Both actual installed native apps made the original one-ID999 call lookup with
+genuine fan account100…002 and their original SID headers, returning503 and
+“Calling is not connected yet.” Actual session Refresh200 and product Logout200
+were operated on each. Real issuer chooser/continuation/completion then switched
+each to development account100…001; repeated one-ID lookups sent new original
+SIDs `0217b15f-2b40-4ad2-98f1-0b4a741b755b` (iOS) and
+`463df731-1af3-4090-b6c7-94b369ff9a9c` (Android), again503. Final product Logout200
+closed both selected native sessions. No storage/token/role was injected.
+
+The actual API stopped20:36:03.410812Z: iOS showed account-offline/actions-blocked
+state and recovered after the same actual backend restarted. Android Night
+font_scale2.0 call/refusal and all four tabs were inspected. iOS Night/max Dynamic
+Type account controls required actual scrolling; signed-out Welcome required
+three completed swipes to expose Continue at y378.7–561.0, then actual sign-in
+succeeded. Android's initial Continue refusal recovered through an actual retry
+and genuine chooser; that first observation is retained, without declaring its
+cause or full sign-in accessibility passed. Original Light/large settings were
+restored; Android's original font_scale2.0 was retained. Full accessibility and
+all positive call/offer/signing/provider/OS/media acceptance remain open.
+
+Read-only actual state20:56:03.808Z: canonical61, Note19/draft, seven photos
+already deletedv2/no jobs, messages/thread-media/publications/offers/calls/
+admissions0. Seeded human_active/epoch0 is not a W3 handback. The separately
+upgraded target retains connection-limit0/owner closure and was not connected.
+
+Owned emulator5582/AVD Qelvora_W6_Media_API34 actually had2 CPUs and
+MemTotal1,511,076KiB; nonce2d0a0d8f-8ba2-4dbd-b946-35958bea69d6,
+slot1 dev16777232/inode245025790. Owned simulator55E27B56-428E-4DB4-AE26-011939EFA632
+used noncec2f21749-a66c-43b8-8d29-7a20714bde29/slot1 inode245025793. Exact device
+and directory/AVD configuration/command/group/sole-port custody was checked.
+Native physical closure20:57:37.418128Z: emulator/companion PIDs35064/35153 absent,
+simulator Shutdown,5582/5583/8582/59106 closed, owned guest XML removed by exact
+inode and both slot leases released. Apps/devices/configuration remain preserved.
+No peer/unknown slot2/GUI/browser3 was touched. Before building,28 exact idle W6
+intermediate directories across seven older private Android builds reclaimed
+1,617,604KiB under reviewed nonce/device/inode leases; every APK/hash/inode and
+prior signed c408 app was preserved. No global free-space exclusivity is claimed.
+
+Browser/context/server/lease closed after actual logout200 at20:57:58Z. Own
+API51308/Next91166+child91181/TLS91193 normally stopped;3006/3106/4106 are closed.
+**Database closure remains unresolved:** Docker's control API stalled on the
+original fullID inspection; the own reader/closer were terminated. A normal stop
+of exact previously verified W6 container
+`e1d9f59f5ceaad36ee1b821a2860e23a92dd1928d70dfddd36027b5b2a33a5a7`
+timed out15s, and55446 still accepts TCP. Runtime lease
+noncec4ec80a7-adae-4e70-80ea-3df69bdf95e4/dev16777232/inode244981878 remains.
+No database client/probe/app traffic remains; W8 coordinates shared engine
+recovery. No reset/prune/peer mutation or complete runtime-closure claim.
+
+Private browser/operation/request/state/native-closure/stop-attempt receipts:
+`022eb20fc4e18baaf38bf45d829b90bb3450e70ac9cac19fbab6686dbb733e42`,
+`053cc22539aff2933a79e4ec9815756d91673d0955700517a65059265ed3a0e5`,
+`917e5b5483bb0d89032f0b6de9a56802f27546497a305ea4d9097f605f16cfb7`,
+`920a95c9938867f880200c16fafba49a6e4715a3cdc1d50a4e734a1fc8578f0f`,
+`e957b905d877d5db1d0a84df4874abd283da1b99af87dcd8d83cede15ab612fc`,
+`38a53f3dcaa8ebf7aa215836c239f7cb98969220942398ad2f2341059ca72f4d`.
+Routine dumps/screenshots stay private. Existing282 stays draft: original21
+prerequisite, incomplete current CI and genuine offer/signing/provider positives
+remain. No new tests/coverage or W6 completion is asserted.
+
 ## Canonical native producer integration — 19:24 UTC
 
 W6 personally read the complete current native producer deltas from W1's
