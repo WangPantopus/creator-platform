@@ -1,5 +1,13 @@
 # Native Trust account custody
 
+## Existing source reuse — 2026-10-03
+
+W8 personally reviewed W3's exact9f Support session-readiness repair and reused its minimum while preserving200's original captured `useTrustRequest` transport. Actual periodic TrustSession readiness now gates case/inbox reads, report and appeal submission; genuine account replacement resets the mounted state, while a transient outage retains unsent input. W3's real390 Light/Night outage/recovery and second-tab observation remains owner evidence; W8's current production web build and personal operation are pending.
+
+The shared producer minimum from W3's49bf merge is reused exactly in `purpose-catalogue.ts` and `reviewed-migration.ts`. Both original catalogue queries/results remain unchanged; optional actual response deadline/signal support retains the positive safe-integer5000ms ceiling. Genuine source-await and original ledger read bookends preserve cancellation without supplying a replacement client or authority. Original held-source qualification and protected tasks remain separate gates.
+
+W1's exact50a two-line iOS correction gives captured requests the original URLSession request/resource deadline. W7's fully reviewed388 large-text shell-notice repair is adapted only to W8's existing115-operation root: the bounded accessible status region leaves destination/navigation space, and development actor choices scroll. No Intro/Push feature is copied. Swift parsing, backend/web types, scoped lint, formatting and whitespace checks pass. Android source remains identical to the signed79b build; current iOS shipping and personally operated native draft/outage/cold-help/enlarged-text behavior remain pending. The prior failed SDK and UI observations stay preserved.
+
 ## Retained source integration — 19:10 UTC, 2026-10-03
 
 W8 personally reviews and reuses W3's exact `fbc6375c` two-file Trust correction. Every asynchronous load checks the original work epoch and account readiness before assigning private capability, job, detail, access, case or inbox state. Public Help checks cancellation and the original load epoch. This closes the source gap in obsolete responses; current shipping and actual stale-response operation remain pending.
