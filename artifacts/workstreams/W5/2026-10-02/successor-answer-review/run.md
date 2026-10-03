@@ -51,6 +51,9 @@ Private personally inspected images:
 `/private/tmp/creator-w5-shell-operator/shots/production-68f2e6e-review-{390,1280}-{light,night}-refusal.png`.
 The initial read-only DB invocation failed before connecting because the
 container's unset POSTGRES_USER selected absent root; it made no DB change.
+The corrected actual postgres read-only transaction independently confirmed
+revision21, draft, members, schedule17:30Z and zero signed acts/publications;
+it rolled back after inspection.
 Later source-only integration is qualified separately and does not transfer
 these app observations. Planned controls/populated tier preservation, real
 creator proof, human Touch ID signing and positive private/group/paid/media/AI/
