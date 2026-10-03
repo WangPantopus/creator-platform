@@ -1,5 +1,5 @@
-import type { Pool } from "pg";
-import { invariant } from "../../core/errors.js";
+import { Client, type Pool } from "pg";
+import { DomainError, invariant } from "../../core/errors.js";
 import type {
   ConversationPrivacyAuthority,
   ConversationPrivacyFamily,
@@ -35,16 +35,57 @@ export function conversationPrivacyAuthority(
     async families(job) {
       await verify(job);
       const client = await runtime.connect();
-      let released = false;
+      const signal = job.signal!;
+      let cancelling: Promise<void> | undefined;
+      let cancellationFailure: unknown;
+      let discardClient = false;
+      let pid: number | undefined;
       const abort = () => {
-        if (!released) {
-          released = true;
-          client.release(true);
-        }
+        if (!pid || cancelling) return;
+        // The PID comes only from this actual held client. Keep that client
+        // checked out until this separate control connection has settled, so
+        // cancellation cannot reach another operation or a later COMMIT.
+        cancelling = (async () => {
+          const control = new Client({
+            ...runtime.options,
+            connectionTimeoutMillis: 1500,
+            statement_timeout: 1500,
+          });
+          try {
+            await control.connect();
+            const cancelled = await control.query<{ cancelled: boolean }>(
+              "SELECT pg_cancel_backend($1) AS cancelled",
+              [pid],
+            );
+            invariant(
+              cancelled.rows[0]?.cancelled === true,
+              "privacy_family_cancel_unavailable",
+              "The actual discovery backend could not be cancelled.",
+            );
+          } finally {
+            await control.end();
+          }
+        })().catch((error: unknown) => {
+          cancellationFailure = error;
+          discardClient = true;
+        });
       };
-      job.signal!.addEventListener("abort", abort, { once: true });
+      const settleCancellation = async () => {
+        signal.removeEventListener("abort", abort);
+        await cancelling;
+      };
       try {
-        job.signal!.throwIfAborted();
+        signal.throwIfAborted();
+        const observed = (await client.query("SELECT pg_backend_pid() AS pid"))
+          .rows[0]?.pid;
+        invariant(
+          Number.isSafeInteger(observed) && observed > 0,
+          "privacy_family_cancel_unavailable",
+          "The actual discovery backend is required.",
+        );
+        pid = observed;
+        signal.addEventListener("abort", abort, { once: true });
+        signal.throwIfAborted();
         await client.query("BEGIN");
         // Discovery is lifecycle work too. Lock the real job/task before any
         // family reads and keep its deferred currentness check through COMMIT.
@@ -115,19 +156,36 @@ export function conversationPrivacyAuthority(
           job,
           assertRestoredInTransaction,
         );
-        job.signal!.throwIfAborted();
+        await settleCancellation();
+        if (cancellationFailure)
+          throw new DomainError(
+            "privacy_family_cancel_unavailable",
+            "Discovery cancellation failed; this task cannot complete.",
+            503,
+          );
+        signal.throwIfAborted();
         await client.query("COMMIT");
-        job.signal!.throwIfAborted();
+        signal.throwIfAborted();
         return families;
       } catch (error) {
-        if (!released) await client.query("ROLLBACK");
+        // Await the actual query/cancel settlement before rollback and retain
+        // the original failure. A failed rollback destroys this own client.
+        await settleCancellation();
+        try {
+          await client.query("ROLLBACK");
+        } catch {
+          discardClient = true;
+        }
+        if (cancellationFailure)
+          throw new DomainError(
+            "privacy_family_cancel_unavailable",
+            "Discovery cancellation failed; this task cannot complete.",
+            503,
+          );
         throw error;
       } finally {
-        job.signal!.removeEventListener("abort", abort);
-        if (!released) {
-          released = true;
-          client.release();
-        }
+        await settleCancellation();
+        client.release(discardClient);
       }
     },
     async assertFamily(client, job, family) {
