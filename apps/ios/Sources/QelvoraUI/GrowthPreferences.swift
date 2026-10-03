@@ -11,6 +11,7 @@ private let growthNotificationKinds = ["ai_reply", "approved_draft", "personal_r
 
 struct GrowthNotificationSettings: View {
     private enum Field: Hashable { case from, until, timeZone }
+    private enum Operation { case loading, saving }
     let client: GrowthClient?
     @State private var value: GrowthPreferences?
     @State private var formSession: String?
@@ -18,7 +19,8 @@ struct GrowthNotificationSettings: View {
     @State private var from = ""
     @State private var until = ""
     @State private var message = ""
-    @State private var busy = false
+    @State private var operation: Operation?
+    private var busy: Bool { operation != nil }
     @State private var errors: [Field: String] = [:]
     @FocusState private var focused: Field?
     @Environment(\.colorScheme) private var scheme
@@ -48,10 +50,10 @@ struct GrowthNotificationSettings: View {
                         preferenceToggle(QelvoraCopy.text("growthEmail"), value: allowed(\.disabledEmailTypes, kind), accessibilityLabel: QelvoraCopy.text("growthNotificationChannel", values: ["kind": label, "channel": QelvoraCopy.text("growthEmail")]))
                     }.accessibilityElement(children: .contain)
                 }
-                Button(busy ? QelvoraCopy.text("growthSaving") : QelvoraCopy.text("growthSavePreferences"), variant: .secondary, block: true, disabled: busy) {Task {await save()}}
+                Button(operation == .saving ? QelvoraCopy.text("growthSaving") : QelvoraCopy.text("growthSavePreferences"), variant: .secondary, block: true, disabled: busy) {Task {await save()}}
             } else if message.isEmpty {ProgressView()}
             if !message.isEmpty {Text(message).qText("body").accessibilityAddTraits(.updatesFrequently)}
-            Button(QelvoraCopy.text("growthReloadSettings"), variant: .quiet, disabled: busy) {Task {await load()}}
+            Button(QelvoraCopy.text(operation == .loading ? "growthLoading" : "growthReloadSettings"), variant: .quiet, disabled: busy) {Task {await load()}}
         }
         .disabled(busy)
         .onChange(of: from) { _, _ in clearError(.from); clearError(.until) }
@@ -115,8 +117,8 @@ struct GrowthNotificationSettings: View {
     private func load() async {
         guard !busy else { return }
         guard let client else { message = QelvoraCopy.text("growthTheGrowthServiceIsNotConfigured"); return }
-        busy = true
-        defer { busy = false }
+        operation = .loading
+        defer { operation = nil }
         do {
             guard let captured = try await client.token() else { throw GrowthRequestFailure(status: 401) }
             let preferences: GrowthPreferences = try await client.request("preferences", expectedSession: captured)
@@ -154,8 +156,8 @@ struct GrowthNotificationSettings: View {
             focused = invalid
             return
         }
-        busy = true
-        defer { busy = false }
+        operation = .saving
+        defer { operation = nil }
         current.quietStart = minute(from)
         current.quietEnd = minute(until)
         do {

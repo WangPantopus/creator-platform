@@ -28,6 +28,7 @@ import org.json.JSONObject
 import java.util.TimeZone
 
 private val growthKinds = listOf("ai_reply", "approved_draft", "personal_reply", "request_status", "call_reminder", "answered_publicly", "content_match", "announcement", "creator_offer", "slot_change", "new_packet", "commitment_due", "guardrail", "pool_share", "note", "reaction", "public_answer", "spending_reminder", "weekly_impact")
+private enum class GrowthPreferenceOperation { LOADING, SAVING }
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
@@ -39,7 +40,8 @@ internal fun GrowthNotificationSettings(client: GrowthClient?, token: () -> Stri
     var until by remember { mutableStateOf("") }
     var zone by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
-    var busy by remember { mutableStateOf(false) }
+    var operation by remember { mutableStateOf<GrowthPreferenceOperation?>(null) }
+    val busy = operation != null
     var reload by remember { mutableIntStateOf(0) }
     var errors by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     val fromFocus = remember { FocusRequester() }
@@ -59,7 +61,7 @@ internal fun GrowthNotificationSettings(client: GrowthClient?, token: () -> Stri
     fun time(current: JSONObject, key: String): String {if (current.isNull(key)) return "";val minute = current.getInt(key);return "%02d:%02d".format(java.util.Locale.ROOT, minute / 60, minute % 60)}
     fun minute(text: String): Any {if (text.isEmpty()) return JSONObject.NULL;require(Regex("[0-2][0-9]:[0-5][0-9]").matches(text));val parts = text.split(':').map {it.toInt()};require(parts[0] < 24);return parts[0] * 60 + parts[1]}
     LaunchedEffect(client, reload) {
-        busy = true
+        operation = GrowthPreferenceOperation.LOADING
         try {
             requireNotNull(client)
             val captured = token() ?: throw GrowthRequestFailure(401)
@@ -80,7 +82,7 @@ internal fun GrowthNotificationSettings(client: GrowthClient?, token: () -> Stri
             message = ""
         } catch (cancelled: CancellationException) { throw cancelled }
         catch (_: Exception) { message = QelvoraCopy.text("growthSettingsNeedACurrentSignedInAccountAndNetworkConnection") }
-        finally { busy = false }
+        finally { operation = null }
     }
     LaunchedEffect(message) {
         if (message.isNotEmpty()) {
@@ -107,7 +109,7 @@ internal fun GrowthNotificationSettings(client: GrowthClient?, token: () -> Stri
                     Button(QelvoraCopy.text("growthLabelWithState", mapOf("label" to label, "state" to if (contains(key, kind)) QelvoraCopy.text("growthOff") else QelvoraCopy.text("growthOn"))), ButtonVariant.QUIET, disabled = busy) {toggle(key, kind)}
                 }
             }
-            Button(if (busy) QelvoraCopy.text("growthSaving") else QelvoraCopy.text("growthSavePreferences"), ButtonVariant.SECONDARY, disabled = busy, block = true) {
+            Button(if (operation == GrowthPreferenceOperation.SAVING) QelvoraCopy.text("growthSaving") else QelvoraCopy.text("growthSavePreferences"), ButtonVariant.SECONDARY, disabled = busy, block = true) {
                 if (!busy) {
                     message = ""
                     val next = linkedMapOf<String, String>()
@@ -131,7 +133,7 @@ internal fun GrowthNotificationSettings(client: GrowthClient?, token: () -> Stri
                             target.second.bringIntoView()
                         }
                     } else {
-                        busy = true
+                        operation = GrowthPreferenceOperation.SAVING
                         val body = JSONObject(current.toString()).put("quietStart", minute(from)).put("quietEnd", minute(until)).put("timeZone", zone)
                         scope.launch {
                             try {
@@ -143,7 +145,7 @@ internal fun GrowthNotificationSettings(client: GrowthClient?, token: () -> Stri
                                 message = QelvoraCopy.text("growthPreferencesSavedYourInAppRecordRemainsAvailable")
                             } catch (cancelled: CancellationException) { throw cancelled }
                             catch (_: Exception) { message = QelvoraCopy.text("growthPreferencesWereNotSaved") }
-                            finally { busy = false }
+                            finally { operation = null }
                         }
                     }
                 }
@@ -151,7 +153,7 @@ internal fun GrowthNotificationSettings(client: GrowthClient?, token: () -> Stri
         }
         if (message.isNotEmpty()) BasicText(message, style = qText("body").copy(color = ink),
             modifier = Modifier.bringIntoViewRequester(messageView).semantics { liveRegion = LiveRegionMode.Polite })
-        Button(QelvoraCopy.text("growthReloadSettings"), ButtonVariant.QUIET, disabled = busy) {reload++}
+        Button(QelvoraCopy.text(if (operation == GrowthPreferenceOperation.LOADING) "growthLoading" else "growthReloadSettings"), ButtonVariant.QUIET, disabled = busy) {reload++}
     }
 }
 
