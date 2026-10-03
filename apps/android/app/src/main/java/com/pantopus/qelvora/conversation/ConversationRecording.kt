@@ -23,7 +23,7 @@ import java.time.Instant
 import java.util.UUID
 
 @Serializable data class ConversationRecording(val state: String, val asset: APIMediaMediaAsset? = null)
-private data class LoadedRecording(val bytes: ByteArray, val proof: APIMediaPlaybackFile, val checkedAt: Long)
+private data class LoadedRecording(val bytes: ByteArray, val proof: APIMediaPlaybackFile, val checkedAt: Long, val expiresAt: Instant)
 
 /** Every request retains the same actual W1 capture and immutable typed client. */
 private class RecordingClient(private val base: URI, private val capture: FanSessionRequestCapture, private val creatorId: String, private val fanId: String) {
@@ -70,7 +70,8 @@ private class RecordingClient(private val base: URI, private val capture: FanSes
         val proof = Json.decodeFromJsonElement<APIMediaPlaybackFile>(Json.encodeToJsonElement(ticket.playbackFile)); val url = URI(ticket.url)
         val path = "/v1/w6/threads/$creatorId/$fanId/media/${asset.id}/play"
         require(matches(issued, asset) && matchesFile(issued, proof) && matchesFile(asset, proof))
-        require(Instant.parse(ticket.expiresAt).isAfter(Instant.now()) && url.scheme == base.scheme && url.host == base.host && url.port == base.port && url.userInfo == null && url.fragment == null && url.rawPath == path)
+        val expiry = Instant.parse(ticket.expiresAt)
+        require(expiry.isAfter(Instant.now()) && url.scheme == base.scheme && url.host == base.host && url.port == base.port && url.userInfo == null && url.fragment == null && url.rawPath == path)
         require(url.rawQuery != null && Regex("^ticket=[A-Za-z0-9_.-]+$").matches(url.rawQuery))
         val token = url.rawQuery.substring(7)
         val bytes = ByteArray(proof.bytes.toInt()); val hash = MessageDigest.getInstance("SHA-256")
@@ -87,7 +88,9 @@ private class RecordingClient(private val base: URI, private val capture: FanSes
                 } finally { result.body.fill(0) }
             }
             check(hash.digest().joinToString("") { "%02x".format(it.toInt() and 255) } == proof.sha256)
-            LoadedRecording(bytes, proof, assertCurrent(asset, proof))
+            val checkedAt = assertCurrent(asset, proof)
+            check(expiry.isAfter(Instant.now()))
+            LoadedRecording(bytes, proof, checkedAt, expiry)
         } catch (failure: Throwable) { bytes.fill(0); throw failure }
     }
 }
@@ -121,11 +124,16 @@ internal fun ConversationRecordingPlayer(baseURL: String, session: FanSession, d
     var load by remember(key) { mutableStateOf<Job?>(null) }
     var revision by remember(key) { mutableStateOf(0L) }
     var checkedAt by remember(key) { mutableLongStateOf(0L) }
+    var expiresAt by remember(key) { mutableStateOf<Instant?>(null) }
     val currentActive by rememberUpdatedState(active)
-    fun fresh() = android.os.SystemClock.elapsedRealtime() - checkedAt < 5000
+    fun unexpired(ticketExpiry: Instant?): Boolean {
+        val now = Instant.now()
+        return ticketExpiry?.isAfter(now) == true && runCatching { Instant.parse(asset.expiresAt).isAfter(now) }.getOrDefault(false)
+    }
+    fun fresh() = android.os.SystemClock.elapsedRealtime() - checkedAt < 5000 && unexpired(expiresAt)
     fun discardBytes() {
         player?.release(); player = null; source?.close(); source = null; proof = null
-        prepared = false; playing = false; position = 0; checkedAt = 0
+        prepared = false; playing = false; position = 0; checkedAt = 0; expiresAt = null
     }
     fun clear() { revision += 1; load?.cancel(); load = null; loading = false; discardBytes(); client = null }
     DisposableEffect(key, session, destination) { onDispose { clear() } }
@@ -173,7 +181,7 @@ internal fun ConversationRecordingPlayer(baseURL: String, session: FanSession, d
                     val started = api.assertCurrent(asset, file)
                     ensureActive()
                     if (!currentActive || revision != attempt || client !== api || player !== current) return@launch
-                    check(api.isCurrent() && android.os.SystemClock.elapsedRealtime() - started < 5000)
+                    check(api.isCurrent() && android.os.SystemClock.elapsedRealtime() - started < 5000 && unexpired(expiresAt))
                     if (seek != null) {
                         val end = minOf(current.duration.toLong(), asset.durationMs ?: 0); check(end > 0)
                         current.seekTo((current.currentPosition.toLong() + seek).coerceIn(0L, end).toInt())
@@ -184,8 +192,8 @@ internal fun ConversationRecordingPlayer(baseURL: String, session: FanSession, d
                 if (seek != null) return@launch
                 val audio = api.audio(asset); pendingBytes = audio.bytes; ensureActive()
                 if (!currentActive || revision != attempt || client !== api) return@launch
-                check(api.isCurrent() && android.os.SystemClock.elapsedRealtime() - audio.checkedAt < 5000)
-                val data = RecordingDataSource(audio.bytes); source = data; pendingBytes = null; proof = audio.proof; checkedAt = audio.checkedAt
+                check(api.isCurrent() && android.os.SystemClock.elapsedRealtime() - audio.checkedAt < 5000 && unexpired(audio.expiresAt))
+                val data = RecordingDataSource(audio.bytes); source = data; pendingBytes = null; proof = audio.proof; checkedAt = audio.checkedAt; expiresAt = audio.expiresAt
                 val next = MediaPlayer(); player = next
                 next.setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_SPEECH).build())
                 next.setDataSource(data)
