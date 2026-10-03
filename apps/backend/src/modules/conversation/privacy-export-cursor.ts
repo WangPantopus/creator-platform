@@ -10,7 +10,11 @@ import { requestAuthority } from "../identity/request-authority.js";
 import type { PrivacyHook } from "../trust/contracts.js";
 import { ConversationLineage } from "./lineage.js";
 import { ConversationRecordings } from "./recordings.js";
-import { cancelConversationPrivacyBackend } from "./privacy-cancellation.js";
+import {
+  assertConversationPrivacyPool,
+  cancelConversationPrivacyBackend,
+  conversationPrivacyCause,
+} from "./privacy-cancellation.js";
 import {
   fenceConversationPrivacyTask,
   type ConversationPrivacyAuthority,
@@ -73,6 +77,7 @@ export class PreparedConversationPrivacyCursor {
       families: string;
       exhausted: boolean;
       closed: boolean;
+      backendPid: number;
     }
   >();
 
@@ -160,15 +165,16 @@ export class PreparedConversationPrivacyCursor {
         catalogueChecksum: input.custody.catalogueChecksum,
       }),
     );
+    assertConversationPrivacyPool(input.pool);
     const client = await input.pool.connect();
     let started = false;
     let discard = true;
     let failed = false;
     let failure: unknown;
-    let transportFailure: unknown;
+    const transportFailures: unknown[] = [];
     const cleanupFailures: unknown[] = [];
     const sourceError = (error: Error) => {
-      transportFailure ??= error;
+      transportFailures.push(error);
       discard = true;
     };
     client.on("error", sourceError);
@@ -180,16 +186,14 @@ export class PreparedConversationPrivacyCursor {
         "SET LOCAL statement_timeout='5s'; SET LOCAL lock_timeout='1s'; SET LOCAL idle_in_transaction_session_timeout='5s'",
       );
       await prepared.assertCatalogue(client);
-      discard = true;
-      await client.query("ROLLBACK");
-      started = false;
-      if (transportFailure !== undefined) throw transportFailure;
-      discard = false;
     } catch (error) {
       failed = true;
       failure = error;
+      // Failed metadata can wrap an uncertain response. Destroy this exact
+      // source conservatively; never retry a failed qualification rollback.
+      discard = true;
     } finally {
-      if (started && transportFailure === undefined) {
+      if (started && !discard && transportFailures.length === 0) {
         try {
           await client.query("ROLLBACK");
         } catch (error) {
@@ -197,7 +201,7 @@ export class PreparedConversationPrivacyCursor {
           cleanupFailures.push(error);
         }
       }
-      discard ||= transportFailure !== undefined;
+      discard ||= transportFailures.length > 0;
       try {
         if (discard) await client.end();
       } catch (error) {
@@ -212,16 +216,27 @@ export class PreparedConversationPrivacyCursor {
         }
       }
     }
-    if (transportFailure !== undefined && !failed) {
-      failed = true;
-      failure = transportFailure;
-    }
-    if (cleanupFailures.length)
-      throw new AggregateError(
-        [...(failed ? [failure] : []), ...cleanupFailures],
-        "Export cursor qualification cleanup failed.",
+    if (failed || transportFailures.length || cleanupFailures.length) {
+      const error = new DomainError(
+        "conversation_export_source_unavailable",
+        "The original export source could not settle safely.",
+        503,
       );
-    if (failed) throw failure;
+      conversationPrivacyCause(
+        error,
+        new AggregateError(
+          [
+            ...new Set([
+              ...(failed ? [failure] : []),
+              ...transportFailures,
+              ...cleanupFailures,
+            ]),
+          ],
+          "Original export cursor qualification and cleanup failures.",
+        ),
+      );
+      throw error;
+    }
     return prepared;
   }
 
@@ -432,6 +447,13 @@ export class PreparedConversationPrivacyCursor {
       "Use one complete original cursor on this held transaction.",
     );
     await this.assertCurrent(client, job, families);
+    const backendPid = z
+      .int()
+      .positive()
+      .max(2147483647)
+      .parse(
+        (await client.query("SELECT pg_backend_pid() AS pid")).rows[0]?.pid,
+      );
     await client.query(
       `DECLARE w3_conversation_privacy_export NO SCROLL CURSOR WITHOUT HOLD FOR
        SELECT thread_id,creator_id,fan_id,collection,row_key,document::text AS document
@@ -445,6 +467,7 @@ export class PreparedConversationPrivacyCursor {
       families: familiesKey(families),
       exhausted: false,
       closed: false,
+      backendPid,
     });
     await this.assertCurrent(client, job, families);
   }
@@ -457,13 +480,14 @@ export class PreparedConversationPrivacyCursor {
     signal: AbortSignal,
   ): Promise<QueryResult<ConversationPrivacyCursorRow>> {
     signal.throwIfAborted();
-    const pid = z
-      .int()
-      .positive()
-      .max(2147483647)
-      .parse(
-        (await client.query("SELECT pg_backend_pid() AS pid")).rows[0]?.pid,
-      );
+    // This PID was actually observed while opening this private cursor on
+    // this same retained source. No pre-FETCH PID query can outlive page abort.
+    const pid = this.cursors.get(client)?.backendPid;
+    invariant(
+      pid,
+      "conversation_export_source_unavailable",
+      "The actual retained cursor backend is required.",
+    );
     let cancelling: Promise<void> | undefined;
     let cancellationFailure: unknown;
     const abort = () => {
@@ -497,14 +521,17 @@ export class PreparedConversationPrivacyCursor {
         "Source cancellation failed; this export cannot complete.",
         503,
       );
-      error.cause = new AggregateError(
-        [
-          ...new Set([
-            ...(queryFailed ? [queryFailure] : []),
-            cancellationFailure,
-          ]),
-        ],
-        "Original FETCH and cancellation failed.",
+      conversationPrivacyCause(
+        error,
+        new AggregateError(
+          [
+            ...new Set([
+              ...(queryFailed ? [queryFailure] : []),
+              cancellationFailure,
+            ]),
+          ],
+          "Original FETCH and cancellation failed.",
+        ),
       );
       throw error;
     }
