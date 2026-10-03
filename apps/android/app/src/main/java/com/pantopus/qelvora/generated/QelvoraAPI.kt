@@ -954,6 +954,73 @@ enum class APIMediaPlaybackFileVariant {
 }
 
 @Serializable
+data class APIMediaPlaybackTicket(
+  val `url`: String,
+  val `expiresAt`: String,
+  val `asset`: APIMediaPlaybackTicketAsset,
+  val `playbackFile`: APIMediaPlaybackTicketPlaybackFile
+)
+
+@Serializable
+data class APIMediaPlaybackTicketAsset(
+  val `id`: String,
+  val `threadId`: String,
+  val `purpose`: APIMediaPlaybackTicketAssetPurpose,
+  val `state`: APIMediaPlaybackTicketAssetState,
+  val `version`: Long,
+  val `mimeType`: String,
+  val `bytes`: Long,
+  val `uploadedBytes`: Long,
+  @Required
+  val `durationMs`: Long? = null,
+  val `sha256`: String,
+  val `waveform`: List<Double>,
+  @Required
+  val `signedActId`: String? = null,
+  val `expiresAt`: String,
+  @Required
+  val `failureCode`: String? = null,
+  @Required
+  val `provenance`: Map<String, JsonElement>? = null
+)
+
+@Serializable
+enum class APIMediaPlaybackTicketAssetPurpose {
+  @SerialName("fan_attachment") FAN_ATTACHMENT,
+  @SerialName("source_audio") SOURCE_AUDIO,
+  @SerialName("interview_audio") INTERVIEW_AUDIO,
+  @SerialName("post_photo") POST_PHOTO,
+  @SerialName("human_note") HUMAN_NOTE,
+  @SerialName("human_reply") HUMAN_REPLY,
+  @SerialName("call_recording") CALL_RECORDING,
+  @SerialName("ai_audio") AI_AUDIO
+}
+
+@Serializable
+enum class APIMediaPlaybackTicketAssetState {
+  @SerialName("uploading") UPLOADING,
+  @SerialName("quarantined") QUARANTINED,
+  @SerialName("processing") PROCESSING,
+  @SerialName("ready") READY,
+  @SerialName("rejected") REJECTED,
+  @SerialName("revoked") REVOKED,
+  @SerialName("deleted") DELETED
+}
+
+@Serializable
+data class APIMediaPlaybackTicketPlaybackFile(
+  val `variant`: APIMediaPlaybackTicketPlaybackFileVariant,
+  val `sha256`: String,
+  val `bytes`: Long
+)
+
+@Serializable
+enum class APIMediaPlaybackTicketPlaybackFileVariant {
+  @SerialName("processed") PROCESSED,
+  @SerialName("credentialed") CREDENTIALED
+}
+
+@Serializable
 data class APIMediaProcessedMediaEvidence(
   val `assetId`: String,
   val `version`: Long,
@@ -5384,6 +5451,9 @@ class CreatorAPIClient(private val baseURL: String, private val maximumResponseB
   suspend fun handback(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/handback", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply): APIMessage = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/human-replies", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput): APIConversationConversationRecordingResult = json.decodeFromString(request("/v1/conversations/${segment(creatorId)}/${segment(fanId)}/recordings", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun readThreadMedia(creatorId: String, fanId: String, assetId: String, xQelvoraExpectedAccount: String? = null): APIMediaMediaAsset = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/media/${segment(assetId)}", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun threadMediaPlayback(creatorId: String, fanId: String, assetId: String, xQelvoraExpectedAccount: String? = null): APIMediaPlaybackTicket = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/media/${segment(assetId)}/playback", "POST", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun playThreadMedia(creatorId: String, fanId: String, assetId: String, ticket: String, range: String? = null, xQelvoraExpectedAccount: String? = null, expectedAccountId: String? = null): CreatorAPIBinaryResponse = requestBytes("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/media/${segment(assetId)}/play", "GET", authenticated = true, query = listOf("ticket" to ticket, "expectedAccountId" to expectedAccountId), headers = listOf("Range" to range, "x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap())
   suspend fun readMediaCapabilities(): APIMediaCapabilities = json.decodeFromString(request("/v1/w6/capabilities", "GET", authenticated = false))
   suspend fun readCallSession(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = null): APICallCallSession = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/calls/${segment(sessionId)}", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun joinCallSession(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = null): APICallCallAdmission = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/calls/${segment(sessionId)}/join", "POST", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
