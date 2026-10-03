@@ -62,3 +62,7 @@ A gap entry records requirement/source, owner, affected platforms, proposed reus
 Resolve exact typed boundaries before parallel consumers diverge: `Approval` owner and invalidation, `ShareGrant` dual consent/revocation, stable current-authorization/grant versions, allowance transaction participation, packet-vs-thread audit, call acceptance timing, immutable signed original versus translated display, Note fan-out ordering, domain-wide outbox beyond the thread log, and privacy job completion receipts. See [CONTRACTS](CONTRACTS.md) and backend research for proposed ownership.
 
 The immediate planning work raises no blocking question: these owners can start useful, reversible implementation with the established decisions. A release may remain blocked for specific inputs even while its feature development is complete; record that distinction explicitly.
+
+## Native spending navigation — October3 UTC
+
+Daily Spend is entered from You, so both shipping shells retain You as its selected tab. Other existing Commerce destinations select Requests. The prior generic fallback selected Home for `/commerce/spending` and request-detail routes despite retaining those actual destinations. This shell repair changes the selected navigation state; each owner screen continues to authorize its actual account/object and controls its Back destination. W4 owns its operated Spend Back repair. Current shipping rebuild/personal navigation verification remains required; original references are preserved.
