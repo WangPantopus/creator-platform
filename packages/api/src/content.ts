@@ -176,6 +176,7 @@ export const ContentReplyPage = ContentPage.pick({
   cursor: true,
   limit: true,
 }).extend({
+  contentId: z.uuid().optional(),
   filter: z.enum(["all", "unread", "reacted", "flagged"]).default("all"),
 });
 export const ContentReplyReviewResult = z.strictObject({
