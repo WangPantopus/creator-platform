@@ -38,8 +38,14 @@ export function conversationPrivacyAuthority(
       const signal = job.signal!;
       let cancelling: Promise<void> | undefined;
       let cancellationFailure: unknown;
+      let sourceTransportFailure: unknown;
       let discardClient = false;
       let pid: number | undefined;
+      const sourceError = (error: Error) => {
+        sourceTransportFailure = error;
+        discardClient = true;
+      };
+      client.on("error", sourceError);
       const abort = () => {
         if (!pid || cancelling) return;
         // The PID comes only from this actual held client. Keep that client
@@ -50,6 +56,14 @@ export function conversationPrivacyAuthority(
             ...runtime.options,
             connectionTimeoutMillis: 1500,
             statement_timeout: 1500,
+            query_timeout: 1500,
+            // A timed-out single control query must close its socket rather
+            // than wait for a pipelined drain from a stalled transport.
+            pipeline: false,
+          });
+          control.on("error", (error: Error) => {
+            cancellationFailure = error;
+            discardClient = true;
           });
           try {
             await control.connect();
@@ -171,21 +185,49 @@ export function conversationPrivacyAuthority(
         // Await the actual query/cancel settlement before rollback and retain
         // the original failure. A failed rollback destroys this own client.
         await settleCancellation();
-        try {
-          await client.query("ROLLBACK");
-        } catch {
+        let rollbackFailure: unknown;
+        if (cancellationFailure) {
+          // A transport timeout does not prove the server consumed the cancel.
+          // Close this original session without issuing any later SQL; its
+          // server rollback ends the PID's transaction before pool release.
           discardClient = true;
+          await client.end().catch((cause: unknown) => {
+            rollbackFailure = cause;
+          });
+        } else {
+          try {
+            await client.query("ROLLBACK");
+          } catch (cause) {
+            rollbackFailure = cause;
+            discardClient = true;
+          }
         }
-        if (cancellationFailure)
-          throw new DomainError(
-            "privacy_family_cancel_unavailable",
-            "Discovery cancellation failed; this task cannot complete.",
+        if (cancellationFailure || rollbackFailure || sourceTransportFailure) {
+          const failure = new DomainError(
+            cancellationFailure
+              ? "privacy_family_cancel_unavailable"
+              : "privacy_family_rollback_unavailable",
+            "Discovery could not settle safely; this task cannot complete.",
             503,
           );
+          // Causes stay in-process for private operator diagnostics. The
+          // public transport retains only this bounded code/message.
+          failure.cause = new AggregateError(
+            [
+              error,
+              sourceTransportFailure,
+              cancellationFailure,
+              rollbackFailure,
+            ].filter((cause) => cause !== undefined),
+            "Original discovery and settlement failures.",
+          );
+          throw failure;
+        }
         throw error;
       } finally {
         await settleCancellation();
         client.release(discardClient);
+        client.removeListener("error", sourceError);
       }
     },
     async assertFamily(client, job, family) {
