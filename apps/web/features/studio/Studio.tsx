@@ -738,6 +738,7 @@ function Feedback({ action }: { action: ReturnType<typeof useAction> }) {
   );
 }
 function Notes({ creator }: { creator: Creator }) {
+  const canReviewReplies = creator.owned || creator.roles.includes("triage");
   const [notes, setNotes] = useState<Page<ContentView>>({
       items: [],
       nextCursor: null,
@@ -765,7 +766,7 @@ function Notes({ creator }: { creator: Creator }) {
         undefined,
         creator.viewerAccountId,
       ),
-      creator.owned || creator.roles.includes("triage")
+      canReviewReplies
         ? studioRequest(
             "content",
             `${creator.id}/studio/replies?${new URLSearchParams({ filter: replyFilter, ...(cursor ? { cursor } : {}) })}`,
@@ -793,13 +794,7 @@ function Notes({ creator }: { creator: Creator }) {
           ) ?? null)
         : null,
     );
-  }, [
-    creator.id,
-    creator.owned,
-    creator.roles,
-    creator.viewerAccountId,
-    replyFilter,
-  ]);
+  }, [canReviewReplies, creator.id, creator.viewerAccountId, replyFilter]);
   useEffect(() => {
     reads.current.mounted = true;
     let pending = false;
@@ -921,7 +916,7 @@ function Notes({ creator }: { creator: Creator }) {
               />
             )}
         </div>
-        {(creator.owned || creator.roles.includes("triage")) && (
+        {canReviewReplies && (
           <div className="w5-replies">
             <div className="w5-replies-title">
               <span className="qv-meta">
