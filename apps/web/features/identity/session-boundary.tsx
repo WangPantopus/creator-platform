@@ -9,22 +9,37 @@ import {
 } from "react";
 import { SessionSchema, type Session } from "@qelvora/api";
 import { Notice } from "@qelvora/ui-web";
+import { discardPrivateSessionBuffers } from "./private-session-buffers";
 
 type IdentityScope = {
   accountId: string;
   signal: AbortSignal;
   end: () => void;
+  /** Presentation cleanup only: ordinary view disposal cancels requests but
+   * does not imply that this view's account session ended. */
+  isSessionEnded: () => boolean;
   session: Session;
 };
 const Scope = createContext<IdentityScope | null>(null);
 export const sessionChannel = "qelvora-identity-status";
 
 /** Only an invalidation signal crosses tabs; credentials and private data never do. */
-export function announceSessionEnd() {
+export function announceSessionEnd(original: {
+  accountId: string;
+  sessionId: string;
+}) {
+  discardPrivateSessionBuffers(original);
   if (typeof BroadcastChannel === "undefined") return;
-  const channel = new BroadcastChannel(sessionChannel);
-  channel.postMessage("ended");
-  channel.close();
+  try {
+    const channel = new BroadcastChannel(sessionChannel);
+    try {
+      channel.postMessage("ended");
+    } finally {
+      channel.close();
+    }
+  } catch {
+    // Optional cross-tab notification cannot prevent the actual local end.
+  }
 }
 
 /** Unmount private drafts on revocation or account switch, including return from bfcache. */
@@ -63,6 +78,7 @@ function IdentitySessionView({
   const accountId = initial.accountId;
   const sessionId = initial.sessionId;
   const controller = useRef<AbortController | null>(null);
+  const endedLifetimes = useRef(new WeakSet<AbortSignal>());
   if (!controller.current) controller.current = new AbortController();
   const [lifetime, setLifetime] = useState(() => ({
     signal: controller.current!.signal,
@@ -72,15 +88,21 @@ function IdentitySessionView({
   const end = useCallback(
     (original: AbortSignal) => {
       if (original.aborted || controller.current?.signal !== original) return;
+      endedLifetimes.current.add(original);
+      discardPrivateSessionBuffers({ accountId, sessionId });
       controller.current.abort();
       setValid(false);
       location.replace(
         `/auth/continue?returnTo=${encodeURIComponent(returnTo)}`,
       );
     },
-    [returnTo],
+    [accountId, sessionId, returnTo],
   );
   const endOriginal = useCallback(() => end(signal), [end, signal]);
+  const isSessionEnded = useCallback(
+    () => endedLifetimes.current.has(signal),
+    [signal],
+  );
   useEffect(() => {
     // Development effect restarts need a fresh lifetime. Old consumers retain
     // their aborted signal; they cannot end or update this replacement view.
@@ -137,13 +159,18 @@ function IdentitySessionView({
         checking = false;
       }
     };
-    const channel =
-      typeof BroadcastChannel === "undefined"
-        ? null
-        : new BroadcastChannel(sessionChannel);
+    let channel: BroadcastChannel | null = null;
+    try {
+      if (typeof BroadcastChannel !== "undefined")
+        channel = new BroadcastChannel(sessionChannel);
+    } catch {
+      // The genuine bounded session reread still detects invalidation.
+    }
     if (channel)
       channel.onmessage = (event) => {
-        if (active && event.data === "ended") end(owner.signal);
+        // A delayed negative hint from an older session cannot end a newer
+        // genuine view. Only the existing canonical reread decides that.
+        if (active && event.data === "ended") void check();
       };
     const timer = setInterval(check, 4000);
     window.addEventListener("focus", check);
@@ -164,7 +191,7 @@ function IdentitySessionView({
   return (
     <Scope.Provider
       key={lifetime.revision}
-      value={{ accountId, signal, end: endOriginal, session }}
+      value={{ accountId, signal, end: endOriginal, isSessionEnded, session }}
     >
       {error && (
         <Notice title="Account status" tone="offline">
@@ -240,6 +267,7 @@ export function useIdentityRequest() {
     signal: scope.signal,
     session: scope.session,
     end: scope.end,
+    isSessionEnded: scope.isSessionEnded,
     request,
   };
 }

@@ -206,15 +206,6 @@ const backend = await createConfiguredBackend({
               runtime.access,
               runtime.database,
               runtime.identity.signing,
-              async (creatorId) => {
-                const current = await (growthPool ?? runtime.pool).query<{
-                  handle: string;
-                }>(
-                  "SELECT handle FROM growth.creator_public WHERE id=$1 AND verified AND state='published'",
-                  [creatorId],
-                );
-                return current.rows[0]?.handle ?? null;
-              },
             ),
           }
         : {},

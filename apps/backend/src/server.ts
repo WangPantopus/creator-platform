@@ -228,15 +228,6 @@ try {
                         runtime.access,
                         runtime.database,
                         runtime.identity.signing,
-                        async (creatorId) => {
-                          const row = (
-                            await runtime.pool.query<{ handle: string }>(
-                              "SELECT handle FROM creator.creator_profile WHERE id=$1",
-                              [creatorId],
-                            )
-                          ).rows[0];
-                          return row?.handle ?? null;
-                        },
                       ),
                     }),
                     ...(commerce
