@@ -309,54 +309,63 @@ export function CreatorAI({
   const endIdentity = identity?.end;
   const request = useCallback(
     async (path: string, init: RequestInit = {}) => {
-      identitySignal?.throwIfAborted();
+      const original = identitySignal
+        ? AbortSignal.any([
+            identitySignal,
+            ...(init.signal ? [init.signal] : []),
+          ])
+        : init.signal;
+      original?.throwIfAborted();
       const headers = new Headers(init.headers);
       if (identityAccount)
         headers.set("X-Expected-Account-Id", identityAccount);
+      // The captured view supplies a denial-only precondition. The genuine
+      // cookie-resolved session remains the backend's identity authority.
+      if (identitySession)
+        headers.set("X-Expected-Session-Id", identitySession);
       const response = await fetch(path, {
         ...init,
         headers,
         cache: "no-store",
-        ...(identitySignal
-          ? {
-              signal: AbortSignal.any([
-                identitySignal,
-                ...(init.signal ? [init.signal] : []),
-              ]),
-            }
-          : {}),
+        ...(original ? { signal: original } : {}),
       });
+      original?.throwIfAborted();
       if (identitySignal && endIdentity && identityAccount) {
         if (response.status === 401) {
           const current = await fetch("/api/platform/identity/session", {
             cache: "no-store",
-            signal: AbortSignal.any([
-              identitySignal,
-              AbortSignal.timeout(4000),
-            ]),
+            signal: AbortSignal.any([original!, AbortSignal.timeout(4000)]),
           });
+          original?.throwIfAborted();
+          const session = current.ok
+            ? SessionSchema.parse(await current.json())
+            : undefined;
+          original?.throwIfAborted();
           if (
             current.status === 401 ||
-            (current.ok &&
-              SessionSchema.parse(await current.json()).accountId !==
-                identityAccount)
+            (session &&
+              (session.accountId !== identityAccount ||
+                session.sessionId !== identitySession))
           )
             endIdentity();
         } else if (response.status === 409) {
           const code = ((await response.clone().json()) as ErrorBody).error
             ?.code;
+          original?.throwIfAborted();
           if (
-            ["session_account_changed", "studio_actor_changed"].includes(
-              code ?? "",
-            )
+            [
+              "session_account_changed",
+              "session_view_changed",
+              "studio_actor_changed",
+            ].includes(code ?? "")
           )
             endIdentity();
         }
-        identitySignal.throwIfAborted();
+        original?.throwIfAborted();
       }
       return response;
     },
-    [identityAccount, identitySignal, endIdentity],
+    [identityAccount, identitySession, identitySignal, endIdentity],
   );
   useEffect(() => {
     if (!identitySignal || !identityAccount || !identitySession) return;
