@@ -1,5 +1,13 @@
 # W4 actual actorless original comparison — October 3, 2026 UTC
 
+### Canonical delivery evidence correction — October 3, 2026 UTC
+
+The primary found that the new finalizing comparator expected `fulfillmentKind` and `signedActId`, while the actual original delivery writer stores the complete `{kind, planRef, contentId, contentVersion, messageId, publicationSignedActId, authorKind}` descriptor. Current213 now compares that whole exact canonical descriptor, including the original immutable plan reference and actual System message. Original0178 and its interactive producer bytes remain unchanged.
+
+The independent eleven-source rollback repeat passes all21 actual PL compiler checks,16 no-scope plans,8 ACL/unregistered refusals,13 restored catalogue drifts and all six original canonical61 custody digests. Current213 SQL SHA256 is `a03d24d6ac09ebb2e28bc6f60dc66cf1edfffc4bc6524da743618fc79f1eed23`; function definition is `6b0286762295804d7af6ba7d49798ecbdf36557dc1569b97f5d028b598e92442`; the exact eleven-source catalogue is `906621df4ca2d3f2c327a8b18f12b4757a15f8e438e7c4e9c9230af1c1ab5cde`. Private repeat receipt SHA256 is `ae54ded8e6f7b4dde0606df0ece4471cbe4a548ab8b5bd94e0a22095132d0c6a`.
+
+This corrects a source mismatch; no genuine positive delivery, complete worker factory, activation or finite C10 acceptance is inferred. Earlier sources and receipts below retain their historical hashes and limits.
+
 ### Current early-before-body source qualification — October 3, 2026 UTC
 
 W1 published c0d0952f retains the actual204 header and complete17-key families before reading an answer body, invokes the real213 comparison on its prepared stage, and preserves that original snapshot at bind. The private projection requires the actual live negatives-ready204 row, exact worker/PID/full XID/login/header and earliest expiry; it has no issued0158 nonce at this stage. Finalizing continues to require the actual bound0158 and never reopens ended204.

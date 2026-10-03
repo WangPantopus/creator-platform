@@ -106,9 +106,10 @@ export async function fulfillmentPublicationOriginalPurposeCatalogue(
 }
 
 // Primary closed canonical61 qualification of the eleven actual source files,
-// including W1 published12a5ba86 and this real213. No startup-derived pin.
+// including W1 publishedc0d0952f and the canonical delivery-evidence213 repair.
+// No startup-derived pin.
 export const FULFILLMENT_PUBLICATION_ORIGINAL_CATALOGUE_SHA256 =
-  "c27a954386cd5307007525e2289ae0341d717135c7c39e2c064bc83558dd5269";
+  "906621df4ca2d3f2c327a8b18f12b4757a15f8e438e7c4e9c9230af1c1ab5cde";
 export const FULFILLMENT_PUBLICATION_ORIGINAL_SOURCES = Object.freeze(
   [
     {
@@ -116,7 +117,7 @@ export const FULFILLMENT_PUBLICATION_ORIGINAL_SOURCES = Object.freeze(
       path: "apps/backend/src/modules/commerce/schema-fulfillment-publication-original-hash.sql",
       owner: "W4",
       checksum:
-        "b1fdfba3880d01d49b7ccff4a2181e373547e970f3190bf2385e3d1ee1bd728b",
+        "a03d24d6ac09ebb2e28bc6f60dc66cf1edfffc4bc6524da743618fc79f1eed23",
     },
     {
       name: "w1_publication_worker_scope",

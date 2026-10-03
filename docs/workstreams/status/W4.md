@@ -1,5 +1,9 @@
 ### Actual prepared-stage original comparison requalification — October 3, 2026 UTC
 
+### Actual canonical publication delivery evidence — October 3, 2026 UTC
+
+The new213 final comparator now checks the whole original group-delivery evidence descriptor produced by the actual existing writer, including exact planRef/System message/publication act, replacing the mismatched new field names. Original0178 and interactive producer bytes remain unchanged. Independent eleven-source rollback review passes21 actual compiler checks,16 no-scope plans,8 ACL/unregistered refusals,13 restored drifts and all six canonical61 custody digests. Current source/catalogue and private receipt hashes are in the [brief evidence](../../../artifacts/workstreams/W4/runtime/2026-10-03/fulfillment-publication-original/README.md). Genuine worker/final delivery/activation/finite C10 and all nine packages/R01–R15 remain incomplete.
+
 Personally reviewed W1 publishedc0d0952f: actual204 original header/families are retained and real213 runs before answer body access; binding compares rather than overwrites that snapshot. The prepared private projection retains exact worker/PID/full XID/login/earliest expiry; finalizing keeps genuine0158 and never reopens204. Independently repeated all eleven sources on the closed canonical61 clone:21 PL functions/16 empty plans/eight refusals/13 restored drifts pass, with all six custody fingerprints unchanged. W4 source208 and full combined catalogue pins are updated to the actual repeat; initial review/finding remain preserved. Full factory/System/delivery/final COMMIT/C10/activation/positive acceptance and all nine packages/R01–R15 remain incomplete. [Exact source hashes and limits](../../../artifacts/workstreams/W4/runtime/2026-10-03/fulfillment-publication-original/README.md). Routine JSON stays private.
 
 ### Actual actorless original comparison and ordering gap — October 3, 2026 UTC
