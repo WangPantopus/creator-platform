@@ -1,5 +1,32 @@
 # Native Team domain source and compilation
 
+## Current invitation acceptance source ataa7e78fd
+
+Product `aa7e78fd99c308f4ed9f66c68e4810b0226fe0b9` adds the missing genuine
+workspace invitation acceptance in both native Team components. It uses the
+actual directory's canonical invitation/creator IDs and original issuer-bound
+FanSessionRequestCapture, then generated115 `acceptTeamInvitation`. The original
+backend owns account, expiry, revocation and accepted-at idempotency. No new API,
+DTO, credentials, issuer, authority or signing receipt was introduced. Public
+constructor/navigation callbacks remain stable for W1's shipping registration.
+
+The selected invitation/capture lock before dispatch. A current strict generated
+Done response alone confirms acceptance. Unknown responses preserve the exact
+invitation for explicit retry even when a later current directory no longer lists
+it; absence is never acknowledgement. Other acceptance actions stay disabled
+while a command is pending. Temporary account checks conceal and preserve it;
+hard denial, changed identity or disposal clear it. Nothing replays automatically.
+A selection that could not dispatch can be explicitly accepted after recovery.
+
+At aa7e78fd, Swift parsing, canonical115/12 generation consistency, canonical
+copy formatting and diff checks pass. The four new copy keys were generated into
+all shared resources. No unit/UI/E2E test code was written. These are source
+checks only: current Kotlin/native shipping compilation, actual W1 root mount,
+Light/Night saved return, denied/expired/revoked/duplicate/interrupted acceptance,
+actual durable records and personally operated native app remain unverified.
+Invitation creation/removal and the broader original Team package remain open.
+Release-ready:false; no whole package is complete.
+
 ## Current minimum producer at72799700
 
 Ordinary exact merge `72799700d1e2dd76d5eb002770f55c1b2be0ea3e` consumes
