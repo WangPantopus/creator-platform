@@ -70,6 +70,10 @@ const sources = Object.freeze([
 ]);
 
 export interface PublicationMedia {
+  prepare(
+    client: PoolClient,
+    taskAuthority: PublicationTaskScope,
+  ): Promise<void>;
   evidence(
     client: PoolClient,
     taskAuthority: PublicationTaskScope,
@@ -80,6 +84,10 @@ export interface PublicationMedia {
     taskAuthority: PublicationTaskScope,
     evidence: ProcessedMediaEvidence,
   ): Promise<boolean>;
+  finalize(
+    client: PoolClient,
+    taskAuthority: PublicationTaskScope,
+  ): Promise<void>;
 }
 
 /** Joins W1's actual sealed publication transaction. No request Actor,
@@ -91,6 +99,36 @@ export function createPublicationMedia(input: {
   identity: PublicationIdentityAuthority;
   storage: PrivateMediaStorage;
 }): PublicationMedia {
+  const prepared = new WeakMap<
+    PublicationTaskScope,
+    {
+      client: PoolClient;
+      transaction: string;
+      pid: number;
+      originalHash: string;
+      attachments: Map<string, ContentBody["media"][number]>;
+      evidence: Map<string, ProcessedMediaEvidence>;
+      ready: Map<string, string>;
+      finalized: boolean;
+    }
+  >();
+  const current = async (client: PoolClient, scope: PublicationTaskScope) => {
+    const held = prepared.get(scope);
+    invariant(
+      held?.client === client && !held.finalized,
+      "media_publication_preparation_required",
+      "Prepare media on its original publication task and client.",
+    );
+    const original = await input.identity.originalInTransaction(scope, client);
+    invariant(
+      held.transaction === original.transaction &&
+        held.pid === original.pid &&
+        held.originalHash === contentHash(original),
+      "media_publication_transaction_changed",
+      "The original publication transaction or content changed.",
+    );
+    return held;
+  };
   const assertPurpose = async (client: PoolClient) => {
     for (const source of sources)
       await assertRegisteredMigration(client, source);
@@ -134,7 +172,12 @@ export function createPublicationMedia(input: {
     scope: PublicationTaskScope,
     id: string,
   ) => {
-    await input.identity.authorizeInTransaction(scope, client);
+    const held = await current(client, scope);
+    invariant(
+      held.evidence.has(id),
+      "media_version_changed",
+      "Use only this original signed publication's media.",
+    );
     await assertPurpose(client);
     invariant(
       scope.signedActId,
@@ -169,70 +212,170 @@ export function createPublicationMedia(input: {
       mimeType: row.mimeType,
       durationMs: row.durationMs,
     });
+  const verifiedBytes = async (
+    row: Snapshot,
+    proof: ProcessedMediaEvidence,
+  ) => {
+    if (
+      contentHash(evidenceOf(row)) !== contentHash(proof) ||
+      row.manifestPending ||
+      !verifiedCreatorMediaProvenance({
+        id: row.id,
+        version: row.version,
+        purpose: row.purpose,
+        creator_id: row.creatorId,
+        object_id: row.objectId,
+        owner_account_id: row.ownerAccountId,
+        signed_act_id: row.signedActId,
+        output_sha256: row.sha256,
+        bytes: row.bytes,
+        mime_type: row.mimeType,
+        duration_ms: row.durationMs,
+        max_bytes: row.maxBytes,
+        provenance: row.provenance,
+      })
+    )
+      return false;
+    await readMediaFile(
+      input.storage.file(row.id, "processed"),
+      row.maxBytes,
+      { bytes: row.bytes, sha256: row.sha256 },
+      false,
+    );
+    await readMediaFile(
+      input.storage.file(row.id, "output"),
+      row.maxBytes,
+      {
+        bytes: row.provenance!.fileBytes as number,
+        sha256: row.provenance!.fileSha256 as string,
+      },
+      false,
+    );
+    return Date.parse(row.expiresAt) > Date.now();
+  };
   return Object.freeze<PublicationMedia>({
+    async prepare(client, scope) {
+      const original = await input.identity.originalInTransaction(
+        scope,
+        client,
+      );
+      await assertPurpose(client);
+      invariant(
+        !prepared.has(scope),
+        "media_publication_preparation_required",
+        "Prepare each original publication task only once.",
+      );
+      const attachments = new Map(
+        original.document.media.map((item) => [item.assetId, item]),
+      );
+      const evidence = new Map(
+        original.mediaEvidence.map((item) => [item.assetId, item]),
+      );
+      invariant(
+        attachments.size === original.document.media.length &&
+          evidence.size === original.mediaEvidence.length &&
+          attachments.size === evidence.size &&
+          [...attachments].every(([id, attachment]) => {
+            const item = evidence.get(id);
+            return (
+              item &&
+              item.version === attachment.version &&
+              item.sha256 === attachment.sha256
+            );
+          }),
+        "media_version_changed",
+        "The complete original signed media and attachments are required.",
+      );
+      prepared.set(scope, {
+        client,
+        transaction: original.transaction,
+        pid: original.pid,
+        originalHash: contentHash(original),
+        attachments,
+        evidence,
+        ready: new Map(),
+        finalized: false,
+      });
+    },
     async evidence(client, scope, attachment) {
+      const held = await current(client, scope);
+      const original = held.attachments.get(attachment.assetId);
+      invariant(
+        original && contentHash(original) === contentHash(attachment),
+        "media_version_changed",
+        "The complete original attachment is required.",
+      );
       const row = await snapshot(client, scope, attachment.assetId);
       invariant(
         row.version === attachment.version &&
           row.sha256 === attachment.sha256 &&
           (attachment.kind === "photo"
             ? row.purpose === "post_photo" && row.mimeType === "image/png"
-            : ["human_note", "post_audio"].includes(row.purpose) &&
+            : attachment.kind === "voice" &&
+              ["human_note", "post_audio"].includes(row.purpose) &&
               row.mimeType === "audio/mp4") &&
           (row.purpose !== "human_note" ||
             (row.durationMs !== null && row.durationMs <= 60000)),
         "media_version_changed",
         "This publication's exact media changed.",
       );
-      return evidenceOf(row);
+      const proof = evidenceOf(row);
+      invariant(
+        contentHash(proof) === contentHash(held.evidence.get(row.id)),
+        "media_version_changed",
+        "The original signed processed media is required.",
+      );
+      return proof;
     },
     async ready(client, scope, expected) {
+      const held = await current(client, scope);
       const proof = ProcessedMediaEvidenceSchema.parse(expected);
+      const original = held.evidence.get(proof.assetId);
+      invariant(
+        original && contentHash(original) === contentHash(proof),
+        "media_version_changed",
+        "Use the complete original signed media evidence.",
+      );
+      held.ready.delete(proof.assetId);
       const row = await snapshot(client, scope, proof.assetId);
-      if (
-        contentHash(evidenceOf(row)) !== contentHash(proof) ||
-        row.manifestPending
-      )
-        return false;
-      if (
-        !verifiedCreatorMediaProvenance({
-          id: row.id,
-          version: row.version,
-          purpose: row.purpose,
-          creator_id: row.creatorId,
-          object_id: row.objectId,
-          owner_account_id: row.ownerAccountId,
-          signed_act_id: row.signedActId,
-          output_sha256: row.sha256,
-          bytes: row.bytes,
-          mime_type: row.mimeType,
-          duration_ms: row.durationMs,
-          max_bytes: row.maxBytes,
-          provenance: row.provenance,
-        })
-      )
-        return false;
       // Share-locks from the projection hold the actual asset through commit.
       // Verify both immutable processed bytes and the distinct served variant;
       // no credential tool, signer, repair or alternate file is run here.
-      await readMediaFile(
-        input.storage.file(row.id, "processed"),
-        row.maxBytes,
-        { bytes: row.bytes, sha256: row.sha256 },
-        false,
-      );
-      await readMediaFile(
-        input.storage.file(row.id, "output"),
-        row.maxBytes,
-        {
-          bytes: row.provenance!.fileBytes as number,
-          sha256: row.provenance!.fileSha256 as string,
-        },
-        false,
-      );
+      if (!(await verifiedBytes(row, proof))) return false;
       await input.identity.authorizeInTransaction(scope, client);
       await assertPurpose(client);
-      return Date.parse(row.expiresAt) > Date.now();
+      if (Date.parse(row.expiresAt) <= Date.now()) return false;
+      held.ready.set(row.id, contentHash(row));
+      return true;
+    },
+    async finalize(client, scope) {
+      const held = await current(client, scope);
+      invariant(
+        held.ready.size === held.evidence.size,
+        "media_publication_unavailable",
+        "Every original publication asset requires its real positive check.",
+      );
+      // This is the last media/file bookend, after W5's writes/effects and
+      // restoration callback, before W1's cleanup and LAST signature read.
+      let earliestExpiry = Infinity;
+      for (const [id, proof] of [...held.evidence].sort(([a], [b]) =>
+        a.localeCompare(b),
+      )) {
+        const row = await snapshot(client, scope, id);
+        earliestExpiry = Math.min(earliestExpiry, Date.parse(row.expiresAt));
+        invariant(
+          contentHash(row) === held.ready.get(id) &&
+            (await verifiedBytes(row, proof)),
+          "media_publication_unavailable",
+          "The actual media metadata, provenance or bytes changed before commit.",
+        );
+      }
+      invariant(
+        earliestExpiry > Date.now(),
+        "media_publication_unavailable",
+        "The publication media expired before the final signature check.",
+      );
+      held.finalized = true;
     },
   });
 }
