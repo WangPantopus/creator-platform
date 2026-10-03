@@ -44,6 +44,19 @@ export function trustPrivacyHook(
           )
         ).rows;
         const ids = cases.map((c) => c.id as string);
+        const replyReviewInstalled = (
+          await client.query(
+            "SELECT to_regclass('creator_trust.reply_review') AS relation",
+          )
+        ).rows[0]?.relation;
+        const replyReviews = replyReviewInstalled
+          ? (
+              await client.query(
+                "SELECT r.case_id,r.reply_id,r.creator_id,r.reply_version,r.text_hash,r.created_at,d.id AS decision_id,d.case_version,d.state,d.created_at AS decided_at FROM creator_trust.reply_review r LEFT JOIN creator_trust.reply_review_decision d ON d.case_id=r.case_id WHERE r.account_id=$1 AND r.case_id=ANY($2::uuid[]) ORDER BY r.created_at,r.case_id,d.case_version LIMIT 2001",
+                [input.accountId, ids],
+              )
+            ).rows
+          : [];
         // Subject accounts receive only their own case metadata and addressed
         // notices. Another fan's report reason or evidence is never exported.
         const subjectCases = (
@@ -88,7 +101,8 @@ export function trustPrivacyHook(
           cases.length > 2000 ||
           subjectCases.length > 2000 ||
           notices.length > 2000 ||
-          feedback.length > 2000
+          feedback.length > 2000 ||
+          replyReviews.length > 2000
         )
           throw new Error("bounded_subjob_required");
         let exported: Record<string, unknown> | undefined;
@@ -142,6 +156,7 @@ export function trustPrivacyHook(
             feedback,
             blocks,
             requests,
+            replyReviews,
           };
           if (
             Buffer.byteLength(JSON.stringify(exported)) >
@@ -164,6 +179,11 @@ export function trustPrivacyHook(
             "DELETE FROM creator_trust.case_evidence WHERE case_id=ANY($1::uuid[]) AND case_id NOT IN(SELECT id FROM creator_trust.safety_case WHERE kind='dispute')",
             [ids],
           );
+          if (replyReviewInstalled)
+            await client.query(
+              "DELETE FROM creator_trust.reply_review WHERE account_id=$1 AND case_id=ANY($2::uuid[])",
+              [input.accountId, ids],
+            );
           await client.query(
             "UPDATE creator_trust.case_event SET reason=NULL WHERE case_id=ANY($1::uuid[]) AND case_id NOT IN(SELECT id FROM creator_trust.safety_case WHERE kind='dispute')",
             [ids],
