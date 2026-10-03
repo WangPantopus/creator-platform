@@ -8,7 +8,7 @@ private struct TrustCase: Decodable, Identifiable { let id: String; let number: 
 private struct TrustNotice: Decodable, Identifiable { let id: String; let type: String; let reason: String }
 private struct TrustTask: Decodable, Identifiable { let domain: String; let state: String; let error_code: String?; var id: String { domain } }
 private struct TrustRetained: Decodable, Identifiable { let domain: String?; let category: String; let until: String?; let reason: String; var id: String { (domain ?? "trust") + ":" + category } }
-private struct TrustJob: Decodable, Identifiable { let id: String; let kind: String; let scope: String; let state: String; let tasks: [TrustTask]?; let retained: [TrustRetained]? }
+private struct TrustJob: Decodable, Identifiable { let id: String; let kind: String; let scope: String; let state: String; let created_at: String; let tasks: [TrustTask]?; let retained: [TrustRetained]? }
 private struct TrustExport: Transferable { let data: Data; static var transferRepresentation: some TransferRepresentation { DataRepresentation(exportedContentType: .json) { $0.data } } }
 private struct TrustCapability: Decodable { let localDevelopment: Bool; let actorVerification: String; let verificationMethod: String? }
 private struct TrustAccess: Decodable { let case_id: String; let action: String; let purpose: String; let created_at: String }
@@ -73,6 +73,7 @@ public struct TrustFanFeature: View {
     @State private var feedbackComment = ""
     @State private var feedbackConsent = false
     @Environment(\.colorScheme) private var scheme
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     public init(baseURL: URL?, destination: String = "/support", token: (@Sendable () async throws -> String?)? = nil) {
         client = baseURL.map { TrustClient(baseURL: $0, token: token) }; _route = State(initialValue: destination)
         let query = URLComponents(string: destination)?.queryItems ?? []
@@ -96,9 +97,7 @@ public struct TrustFanFeature: View {
         ScrollView { VStack(alignment: .leading, spacing: 16) {
             Text(title).qText("display-md")
             Text("Reports are available without paid access. Case evidence is limited to what you report.").qText("body")
-            HStack { Button("Support", variant: .quiet) { route = "/support" }; Button("Your data", variant: .quiet) { route = "/support/privacy" } }
-            HStack { Button("Access history", variant: .quiet) { route = "/support/access" }; Button("Feedback", variant: .quiet) { route = "/support/feedback" } }
-            Button("Crisis help", variant: .quiet) { route = "/trust/crisis" }
+            navigation
             if busy { ProgressView().accessibilityLabel("Loading") }
             if !error.isEmpty { Notice(tone: .error, title: "Could not complete", children: error) }
             if !result.isEmpty { Notice(title: "Saved", children: result) }
@@ -111,6 +110,21 @@ public struct TrustFanFeature: View {
             SwiftUI.Button("Request deletion", role: .destructive) { Task { await privacyCommand("delete") } }
             SwiftUI.Button("Keep data", role: .cancel) {}
         } message: { Text("Access closes immediately. Purging waits for every domain. Retained records are disclosed in job progress. Store subscriptions must be canceled separately.") }
+    }
+    @ViewBuilder private var navigation: some View {
+        if dynamicTypeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 8) {
+                Button("Support", variant: .quiet, block: true) { route = "/support" }
+                Button("Your data", variant: .quiet, block: true) { route = "/support/privacy" }
+                Button("Access history", variant: .quiet, block: true) { route = "/support/access" }
+                Button("Feedback", variant: .quiet, block: true) { route = "/support/feedback" }
+                Button("Crisis help", variant: .quiet, block: true) { route = "/trust/crisis" }
+            }
+        } else {
+            HStack { Button("Support", variant: .quiet) { route = "/support" }; Button("Your data", variant: .quiet) { route = "/support/privacy" } }
+            HStack { Button("Access history", variant: .quiet) { route = "/support/access" }; Button("Feedback", variant: .quiet) { route = "/support/feedback" } }
+            Button("Crisis help", variant: .quiet) { route = "/trust/crisis" }
+        }
     }
     private var support: some View { VStack(alignment: .leading, spacing: 16) {
         Picker("Report type", selection: $kind) { Text("Support request").tag("support"); Text("Report AI message").tag("ai_report"); Text("Abuse report").tag("abuse"); Text("Block creator").tag("block"); Text("Crisis help").tag("crisis") }.pickerStyle(.menu)
@@ -154,7 +168,12 @@ public struct TrustFanFeature: View {
         else { Text("Fresh account verification must be connected before requesting data changes.").qText("caption") }
         Button("Request export", variant: .secondary, block: true, disabled: privacyDisabled) { Task { await privacyCommand("export") } }
         Button("Request deletion", variant: .secondary, block: true, disabled: privacyDisabled) { confirmingDelete = true }
-        ForEach(jobs) { job in Button(job.kind + " · " + job.scope + " · " + job.state.replacingOccurrences(of: "_", with: " "), variant: .quiet, block: true, disabled: busy) { Task { await jobDetail(job.id) } } }
+        ForEach(jobs) { job in
+            Text("Requested " + job.created_at).qText("caption")
+            Button(job.kind + " · " + job.scope + " · " + job.state.replacingOccurrences(of: "_", with: " "), variant: .quiet, block: true, disabled: busy) { Task { await jobDetail(job.id) } }
+                .accessibilityLabel(job.kind + ", " + job.scope + ", " + job.state.replacingOccurrences(of: "_", with: " ") + ", requested " + job.created_at + ", job " + job.id)
+                .accessibilityIdentifier("privacy-job-" + job.id)
+        }
         if let selectedJob { jobProgress(selectedJob) }
     } }
     @ViewBuilder private func jobProgress(_ job: TrustJob) -> some View {
