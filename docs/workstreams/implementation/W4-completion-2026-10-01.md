@@ -1,3 +1,9 @@
+## Native shipping compilation, personal operation pending — October 3, 2026 16:10 UTC
+
+Actual303/9d6f9331 shipping Android37 tasks85 seconds and normally signed iOS54 seconds exit0; APK/iOS deep strict signatures verify, full Debug executable and dylib hashes are retained independently. Four exact-head fast CI checks pass; six Mac jobs remain queued. Canonical heavy custody is normally released and physical absence checked; W7 follows. [Named compilation and private receipt hashes](../../../artifacts/workstreams/W4/runtime/2026-10-03/native-original-session/README.md).
+
+Personal current native original-session/outage/Retry/draft/scrolling acceptance is pending after W2’s GUI window. W8’s actual Android appearance recreation loses a bound unsent draft; this relevant Commerce gap remains open pending a personally reviewed in-memory source correction and current operation. No native/night/configuration/provider/spoken/C10 or complete package/R01–R15 item is accepted from compilation.
+
 ## Native original-session consumer and existing graph reuse — October 3, 2026 15:45 UTC
 
 The native Commerce consumer now reuses actual W1 strict original-capture publishers127d6b05/81a401bd, regenerates this checkout’s115 operations and keys/disposes forms by the original account/session. Personally reviewed W8 routine-check display/readiness split preserves cached rows and scrolling while denying commands until readiness; true failures conceal rows and retain same-session input. Store verification stays on that same original client, with cancellation/disposal checks. [Source scope and outstanding qualification](../../../artifacts/workstreams/W4/runtime/2026-10-03/native-original-session/README.md).
