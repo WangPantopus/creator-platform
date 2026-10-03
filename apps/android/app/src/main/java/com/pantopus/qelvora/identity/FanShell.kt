@@ -351,12 +351,20 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                 Button("Cancel", ButtonVariant.QUIET) { model.choosingActor = false }
             }
             model.session == null && features.any { it.matches(model.destination) && it.allowsSignedOut(model.destination) } -> key(model.destination, destinationDelivery) { features.first { it.matches(model.destination) && it.allowsSignedOut(model.destination) }.screen(model) }
-            model.session == null && model.hasSavedCredential -> Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            model.session == null && model.hasSavedCredential -> Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 BasicText(QelvoraCopy.text(if (model.checkingSession && model.error.isEmpty()) "growthLoading" else "accountUnavailableTitle"), style = qText("display-md").copy(color = qColor("ink")), modifier = Modifier.semantics { heading() })
                 BasicText(QelvoraCopy.text("accountUnavailableBody"), style = qText("body").copy(color = qColor("ink-muted")))
                 Button(QelvoraCopy.text("retry"), ButtonVariant.SECONDARY, block = true, disabled = model.busy || model.checkingSession) { scope.launch { model.refresh() } }
+                if (features.any { it.matches("/trust/crisis") && it.allowsSignedOut("/trust/crisis") }) {
+                    Button("Crisis help", ButtonVariant.QUIET, block = true) { model.open("/trust/crisis") }
+                }
             }
-            model.session == null && model.checkingSession -> BasicText(QelvoraCopy.text("growthLoading"), style = qText("body").copy(color = qColor("ink")), modifier = Modifier.padding(16.dp))
+            model.session == null && model.checkingSession -> Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                BasicText(QelvoraCopy.text("growthLoading"), style = qText("body").copy(color = qColor("ink")))
+                if (features.any { it.matches("/trust/crisis") && it.allowsSignedOut("/trust/crisis") }) {
+                    Button("Crisis help", ButtonVariant.QUIET, block = true) { model.open("/trust/crisis") }
+                }
+            }
             model.session == null -> Welcome(returnTo = model.destination, showContext = model.arrival != null, contextSource = model.arrival?.source, contextTitle = model.arrival?.title, bodyCopy = model.arrival?.let { "Every message says who wrote it: ${it.creatorName}'s AI, ${it.creatorName}, or their team. You'll always know which." } ?: "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext = model::removeArrival, onContinue = { scope.launch { model.beginSignIn() } })
             model.session?.fan == null && features.any { it.matches(model.destination) && it.allowsSignedOut(model.destination) } -> key(model.session?.accountId, model.destination) { features.first { it.matches(model.destination) && it.allowsSignedOut(model.destination) }.screen(model) }
             (model.session?.fan == null && ApplicationDestination.requiresFanProfile(model.destination)) || model.destination == "/onboarding/handle" -> HandleForm(model)
