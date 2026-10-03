@@ -74,6 +74,19 @@ class FanSessionRequestCapture private constructor(
             throw failure
         }
     }
+    /** Content retains this same genuine capture, issuer and bounded client. */
+    @androidx.annotation.MainThread
+    suspend fun contentBytes(path: String, body: ByteArray? = null, query: List<Pair<String, String?>> = emptyList()): CreatorAPIBinaryResponse {
+        check(isCurrent() && trustReady()) { "Refresh your account before continuing." }
+        try {
+            val response = client.contentBytes(path, expectedAccountId, sessionId, body, query)
+            if (!isCurrent() || !trustReady()) throw kotlinx.coroutines.CancellationException("Your original account view changed.")
+            return response
+        } catch (failure: Exception) {
+            if (!isCurrent() || !trustReady()) throw kotlinx.coroutines.CancellationException("Your original account view changed.")
+            throw failure
+        }
+    }
     companion object {
         internal fun issue(issuer: Any, client: CreatorAPIClient, accountId: String,
                            sessionId: String, destination: String,
@@ -106,6 +119,8 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     private var destinationGeneration = 0
     private var rotatingCredential = false
     private var refreshingSession = false
+    // Confirmed by the genuine canonical read, never by a stored account marker.
+    private var confirmedCredential: String? = null
     private var removedArrivalFor: String? = null
     /** No default/global storage reconstruction. Away-and-back navigation also
      * invalidates an earlier capture, even when account and token are equal. */
@@ -115,14 +130,15 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         if (maximumResponseBytes !in 1..268_435_456 || timeoutMs !in 1..30_000) return null
         val origin = baseURL ?: return null
         val active = session ?: return null
-        if (busy || purgingPrivateState || localPurgeFailed || checkingSession || rotatingCredential || destination != from) return null
+        if (busy || purgingPrivateState || localPurgeFailed || checkingSession || rotatingCredential || error.isNotEmpty() || destination != from) return null
         val snapshot = generation; val navigation = destinationGeneration
         val credential = runCatching { storage.read() }.getOrNull() ?: return null
+        if (credential != confirmedCredential) return null
         fun matches(): Boolean = snapshot == generation && navigation == destinationGeneration &&
             destination == from && session?.accountId == active.accountId && session?.sessionId == active.sessionId &&
-            !purgingPrivateState && !localPurgeFailed && !rotatingCredential
+            credential == confirmedCredential && !purgingPrivateState && !localPurgeFailed && !rotatingCredential
         val capture = FanSessionRequestCapture.issue(requestCaptureIssuer,
-            CreatorAPIClient(origin, maximumResponseBytes = maximumResponseBytes, timeoutMs = timeoutMs) { credential }, active.accountId, active.sessionId, from,
+            CreatorAPIClient(origin, maximumResponseBytes = maximumResponseBytes, timeoutMs = timeoutMs, expectedAccountId = active.accountId, expectedSessionId = active.sessionId) { credential }, active.accountId, active.sessionId, from,
             trustReady = { !checkingSession && !refreshingSession && !busy && error.isEmpty() }) {
             currentCoroutineContext().ensureActive()
             matches() && runCatching { storage.read() }.getOrNull() == credential && matches()
@@ -134,7 +150,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         val pushCredential = runCatching { currentToken() }.getOrNull()
         purgingPrivateState = true; localPurgeFailed = true
         try {
-            generation++; session = null; hasSavedCredential = false; checkingSession = false; actors = emptyList(); choosingActor = false; error = ""
+            generation++; confirmedCredential = null; session = null; hasSavedCredential = false; checkingSession = false; actors = emptyList(); choosingActor = false; error = ""
             GrowthPush.clearSession(context, pushCredential)
             var cleared = true
             try { storage.save(null) } catch (_: Exception) { cleared = false }
@@ -146,7 +162,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     }
     suspend fun refresh() {
         if (rotatingCredential || refreshingSession || purgingPrivateState) return
-        val client = api ?: run { checkingSession = false; return }
+        val origin = baseURL ?: run { checkingSession = false; return }
         val current = generation
         refreshingSession = true; checkingSession = true
         try {
@@ -158,15 +174,28 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
             hasSavedCredential = token != null
             if (token == null) { if (session != null) purge(); return }
             try {
+                // Keep the actual issuer and captured credential. Canonical
+                // identity reads use a short I/O budget, not the domain default.
+                val client = CreatorAPIClient(origin, maximumResponseBytes = 65_536, timeoutMs = 4_000) { token }
                 val value = client.identitySession()
+                currentCoroutineContext().ensureActive()
                 if (current != generation) return
+                if (currentToken() != token) {
+                    confirmedCredential = null; session = null
+                    error = "Your session changed. Refresh your account before continuing."
+                    return
+                }
                 if (session?.accountId != null && session?.accountId != value.accountId) {
                     if (purge()) error = "The account changed. Continue with Pantopus again."
                     return
                 }
-                session = value; error = ""
+                confirmedCredential = token; session = value; error = ""
             } catch (failure: CreatorAPIError) {
                 if (current != generation) return
+                confirmedCredential = null
+                if (runCatching { currentToken() }.getOrNull() != token) {
+                    session = null; error = "Your session changed. Refresh your account before continuing."; return
+                }
                 if (failure.status == 401) {
                     if (!busy) {
                         // A completed rotation performs its own guarded fresh read.
@@ -176,7 +205,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
                 } else error = message(failure)
             } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
             catch (_: Exception) {
-                if (current == generation) error = "Reconnect to refresh your account. Actions are unavailable while offline."
+                if (current == generation) { confirmedCredential = null; error = "Reconnect to refresh your account. Actions are unavailable while offline." }
             }
         } finally { refreshingSession = false; checkingSession = false }
     }
@@ -237,23 +266,20 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     }
     /** Preserves the current handle and never writes using a switched credential. */
     suspend fun saveIntro(intro: String, accountId: String, sessionId: String): Boolean {
-        val origin = baseURL ?: return false
         val current = session ?: return false
         val fan = current.fan ?: return false
         if (busy || current.accountId != accountId || current.sessionId != sessionId) return false
-        val snapshot = generation
-        val credential = currentToken() ?: return false
+        val capture = captureRequest(destination, maximumResponseBytes = 65_536, timeoutMs = 10_000) ?: return false
+        if (!capture.isCurrent()) return false
         busy = true
         try {
             val text = intro.trim()
-            val client = CreatorAPIClient(origin) { credential }
-            val saved = client.saveFanIntro(APIFanIntroInput(text, fan.version))
-            currentCoroutineContext().ensureActive()
-            if (snapshot != generation || session?.accountId != accountId || session?.sessionId != sessionId || currentToken() != credential || saved.id != fan.id || saved.intro != text) return false
+            val saved = capture.client.saveFanIntro(APIFanIntroInput(text, fan.version))
+            if (!capture.isCurrent() || saved.id != fan.id || saved.intro != text) return false
             refresh()
-            return snapshot == generation && session?.accountId == accountId && session?.sessionId == sessionId
+            return capture.isCurrent()
         } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-        catch (failure: Exception) { if (snapshot == generation) error = message(failure); return false }
+        catch (failure: Exception) { if (capture.isCurrent()) error = message(failure); return false }
         finally { busy = false }
     }
     /** Navigation only. Reject responses for a departed destination, account or credential. */
@@ -304,7 +330,12 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     private fun message(failure: Exception): String = if (failure is CreatorAPIError) runCatching { Json.decodeFromString<APIError>(failure.body).error.message }.getOrDefault("This action could not complete. Reconnect and try again.") else "This action could not complete. Reconnect and try again."
 }
 
-class FanFeatureRegistration(val matches: (String) -> Boolean, val allowsSignedOut: (String) -> Boolean = { false }, val screen: @Composable (FanSession) -> Unit)
+class FanFeatureRegistration(
+    val matches: (String) -> Boolean,
+    val allowsSignedOut: (String) -> Boolean = { false },
+    val rootObserver: @Composable (FanSession) -> Unit = {},
+    val screen: @Composable (FanSession) -> Unit,
+)
 
 @Composable
 fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/home", features: List<FanFeatureRegistration> = emptyList(), destinationDelivery: Long = 0L, notificationID: String? = null, onNotificationConsumed: () -> Unit = {}) {
@@ -322,6 +353,9 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
         }
         FanSession(context, baseURL, restored ?: returnTo)
     }
+    // Observe genuine boundaries while a restored/private feature is unmounted.
+    // Feature observers issue no session authority and serialize no private data.
+    features.forEach { it.rootObserver(model) }
     val currentReturn by rememberUpdatedState(permittedReturn)
     val currentDelivery by rememberUpdatedState(destinationDelivery)
     DisposableEffect(model, registry) {
@@ -375,15 +409,23 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                 Button("Cancel", ButtonVariant.QUIET) { model.choosingActor = false }
             }
             model.session == null && features.any { it.matches(model.destination) && it.allowsSignedOut(model.destination) } -> key(model.destination, destinationDelivery) { features.first { it.matches(model.destination) && it.allowsSignedOut(model.destination) }.screen(model) }
-            model.session == null && model.hasSavedCredential -> Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            model.session == null && model.hasSavedCredential -> Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 BasicText(QelvoraCopy.text(if (model.checkingSession && model.error.isEmpty()) "growthLoading" else "accountUnavailableTitle"), style = qText("display-md").copy(color = qColor("ink")), modifier = Modifier.semantics { heading() })
                 BasicText(QelvoraCopy.text("accountUnavailableBody"), style = qText("body").copy(color = qColor("ink-muted")))
                 Button(QelvoraCopy.text("retry"), ButtonVariant.SECONDARY, block = true, disabled = model.busy || model.checkingSession) { scope.launch { model.refresh() } }
+                if (features.any { it.matches("/trust/crisis") && it.allowsSignedOut("/trust/crisis") }) {
+                    Button("Crisis help", ButtonVariant.QUIET, block = true) { model.open("/trust/crisis") }
+                }
             }
-            model.session == null && model.checkingSession -> BasicText(QelvoraCopy.text("growthLoading"), style = qText("body").copy(color = qColor("ink")), modifier = Modifier.padding(16.dp))
+            model.session == null && model.checkingSession -> Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                BasicText(QelvoraCopy.text("growthLoading"), style = qText("body").copy(color = qColor("ink")))
+                if (features.any { it.matches("/trust/crisis") && it.allowsSignedOut("/trust/crisis") }) {
+                    Button("Crisis help", ButtonVariant.QUIET, block = true) { model.open("/trust/crisis") }
+                }
+            }
             model.session == null -> Welcome(returnTo = model.destination, showContext = model.arrival != null, contextSource = model.arrival?.source, contextTitle = model.arrival?.title, bodyCopy = model.arrival?.let { "Every message says who wrote it: ${it.creatorName}'s AI, ${it.creatorName}, or their team. You'll always know which." } ?: "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext = model::removeArrival, onContinue = { scope.launch { model.beginSignIn() } })
-            model.session?.fan == null && features.any { it.matches(model.destination) && it.allowsSignedOut(model.destination) } -> key(model.session?.accountId, model.destination) { features.first { it.matches(model.destination) && it.allowsSignedOut(model.destination) }.screen(model) }
-            (model.session?.fan == null && ApplicationDestination.requiresFanProfile(model.destination)) || model.destination == "/onboarding/handle" -> HandleForm(model)
+            model.session?.fan == null && features.any { it.matches(model.destination) && it.allowsSignedOut(model.destination) } -> key(model.session?.accountId, model.session?.sessionId, model.destination) { features.first { it.matches(model.destination) && it.allowsSignedOut(model.destination) }.screen(model) }
+            (model.session?.fan == null && ApplicationDestination.requiresFanProfile(model.destination)) || model.destination == "/onboarding/handle" -> key(model.session?.accountId, model.session?.sessionId) { HandleForm(model) }
             else -> {
                 if (model.session?.mode == APISessionMode.DEVELOPMENT) Notice(title = "Development identity", children = "Synthetic account · actual local API.")
                 Box(Modifier.weight(1f).fillMaxWidth()) {
@@ -399,7 +441,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                         Button("Your data", ButtonVariant.QUIET, block = true) { model.open("/support/privacy") }
                         Button("Notification settings", ButtonVariant.QUIET, block = true) { model.open("/notifications/settings") }
                         if (model.session?.creator != null && context is android.app.Activity) CredentialSettings(context, model)
-                    } else if (feature != null) key(model.session?.accountId, model.destination, destinationDelivery) { feature.screen(model) }
+                    } else if (feature != null) key(model.session?.accountId, model.session?.sessionId, model.destination, destinationDelivery) { feature.screen(model) }
                     else Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) { BasicText("This destination is not connected yet", style = qText("title").copy(color = qColor("ink"))); BasicText("Your account and arrival context are kept.", style = qText("body").copy(color = qColor("ink-muted"))); Button("Your account", ButtonVariant.SECONDARY) { model.destination = "/you" } }
                 }
                 val labels = listOf("navHome" to "/home", "navDiscover" to "/discover", "navRequests" to "/requests", "navYou" to "/you")
@@ -414,7 +456,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
 
 @Composable
 private fun HandleForm(model: FanSession) {
-    var handle by remember(model.session?.accountId) { mutableStateOf(model.session?.fan?.handle.orEmpty()) }; var intro by remember(model.session?.accountId) { mutableStateOf(model.session?.fan?.intro.orEmpty()) }; val scope = rememberCoroutineScope()
+    var handle by remember(model.session?.accountId, model.session?.sessionId) { mutableStateOf(model.session?.fan?.handle.orEmpty()) }; var intro by remember(model.session?.accountId, model.session?.sessionId) { mutableStateOf(model.session?.fan?.intro.orEmpty()) }; val scope = rememberCoroutineScope()
     BoxWithConstraints(Modifier.fillMaxSize().imePadding()) {
         val available = maxHeight
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).heightIn(min = available).padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 36.dp), verticalArrangement = Arrangement.SpaceBetween) {
