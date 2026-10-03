@@ -123,6 +123,16 @@ export const CallOfferSchema = z.strictObject({
   ),
 });
 export const CallOffersSchema = z.array(CallOfferSchema);
+/** Exact receipt from the original W4-authorized offer transaction. */
+export const CallOfferReceiptSchema = z.strictObject({
+  id: z.uuid(),
+  version: z.literal(1),
+  slots: CallOfferSchema.shape.slots,
+  expiresAt: CallOfferSchema.shape.expiresAt,
+  creatorTimeZone: z.string(),
+  fanTimeZone: z.string(),
+  acceptance: z.literal("accepted_by_commerce"),
+});
 /** The persisted call projection is authoritative. Client clocks and SDK events
  * never manufacture connected time, outcomes, recording or settlement. */
 export const CallSessionSchema = z.strictObject({
@@ -185,14 +195,15 @@ export type SessionState = z.infer<typeof SessionStateSchema>;
 export type SessionOutcome = z.infer<typeof SessionOutcomeSchema>;
 export type CallRole = "creator" | "fan";
 /** C06 presentation only. Price/capture/acceptance remain W4's canonical projection. */
-export type CallOfferContext = {
-  commitmentId: string;
-  threadId: string;
-  authorizationVersion: number;
-  creatorName: string;
-  durationSeconds: number;
-  mediaMode: "audio" | "video";
-};
+export const CallOfferContextSchema = z.strictObject({
+  commitmentId: z.uuid(),
+  threadId: z.uuid(),
+  authorizationVersion: z.number().int().positive(),
+  creatorName: z.string(),
+  durationSeconds: z.number().int().positive(),
+  mediaMode: z.enum(["audio", "video"]),
+});
+export type CallOfferContext = z.infer<typeof CallOfferContextSchema>;
 export type CallOfferView = {
   id: string;
   commitmentId: string;

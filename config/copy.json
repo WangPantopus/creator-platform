@@ -687,6 +687,8 @@
   "w6ConsentCouldNotBeSaved": "Consent could not be saved.",
   "w6TheCallCouldNotBeEndedTryAgain": "The call could not be ended. Try again.",
   "w6TheSummaryCouldNotBeChanged": "The summary could not be changed.",
+  "w6CallActionUnconfirmed": "This call action is unconfirmed. Retry the same action before making another change.",
+  "w6RetryCallAction": "Retry this call action",
   "w6ThisCallIsUnavailable": "This call is unavailable",
   "w6OpeningYourCall": "Opening your call",
   "w6CheckingTheBookingAndParticipantAccess": "Checking the booking and participant access.",

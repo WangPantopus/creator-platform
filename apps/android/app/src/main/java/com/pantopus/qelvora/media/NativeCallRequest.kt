@@ -58,9 +58,9 @@ internal class NativeCallRequest private constructor(private val capture: FanSes
         requireCurrent(); return document(value, route, selected = true)
     }
     companion object {
-        suspend fun capture(baseURL: String?, model: FanSession): NativeCallRequest? {
+        suspend fun capture(baseURL: String?, model: FanSession, maximumResponseBytes: Int = 268_435_456, timeoutMs: Int = 30_000): NativeCallRequest? {
             if (baseURL == null) return null
-            return model.captureRequest(model.destination)?.let(::NativeCallRequest)
+            return model.captureRequest(model.destination, maximumResponseBytes, timeoutMs)?.let(::NativeCallRequest)
         }
     }
 }

@@ -8,21 +8,16 @@ import {
 } from "@qelvora/api";
 import { Message, Notice, SigningSheet } from "@qelvora/ui-web";
 import { assertPasskey, passkeysAvailable } from "./passkey";
+import { useIdentityRequest } from "./session-boundary";
 
-async function post(path: string, body: unknown) {
-  const response = await fetch(`/api/platform/identity/${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-    cache: "no-store",
-  });
-  const value = await response.json();
-  if (!response.ok)
-    throw new Error(
-      value.error?.message ?? "Signing is unavailable. Nothing was sent.",
-    );
+function immutable<T>(value: T): T {
+  if (value && typeof value === "object") {
+    for (const nested of Object.values(value)) immutable(nested);
+    Object.freeze(value);
+  }
   return value;
 }
+type Phase = "idle" | "signing" | "publishing" | "unknown";
 /** The domain supplies its canonical command and exact review projection. Publication
  * must consume the returned signature in that domain's transaction. */
 export function SignedActReview({
@@ -35,6 +30,7 @@ export function SignedActReview({
   title,
   rows,
   onSigned,
+  beforeSign,
 }: {
   creatorId: string;
   fanId?: string;
@@ -48,90 +44,229 @@ export function SignedActReview({
     signedActId: string,
     exactCommand: SignedActCommand,
   ) => Promise<void>;
+  /** The domain may recheck its genuine captured projection before signing. */
+  beforeSign?: (signal: AbortSignal) => Promise<void>;
 }) {
-  const [phase, setPhase] = useState<
-    "idle" | "signing" | "publishing" | "unknown"
-  >("idle");
+  const identity = useIdentityRequest();
+  const [phase, setPhase] = useState<Phase>("idle");
+  const phaseNow = useRef<Phase>("idle");
   const [error, setError] = useState("");
   const [available, setAvailable] = useState(false);
   const busy = phase !== "idle";
   const operation = useRef<AbortController | null>(null);
-  const version = JSON.stringify(command);
+  const cancellation = useRef<AbortController | null>(null);
+  const mounted = useRef(false);
+  const host = useRef<HTMLElement | null>(null);
+  const activeIdentity = useRef(identity.signal);
+  activeIdentity.current = identity.signal;
+  const version = JSON.stringify([
+    creatorId,
+    fanId ?? null,
+    command,
+    creatorName,
+    text,
+    approvedDraft,
+    title,
+    rows,
+  ]);
   const current = useRef(version);
   current.current = version;
+  const visible = () =>
+    !document.hidden &&
+    !!host.current?.isConnected &&
+    !host.current.closest("[hidden], [inert], dialog:not([open])") &&
+    host.current.getClientRects().length > 0 &&
+    getComputedStyle(host.current).visibility === "visible";
   useEffect(() => {
+    mounted.current = true;
     setAvailable(passkeysAvailable());
-    return () => {
+    const leave = () => {
       operation.current?.abort();
+      cancellation.current?.abort();
+    };
+    const visibility = () => {
+      if (document.hidden) leave();
+    };
+    window.addEventListener("pagehide", leave);
+    document.addEventListener("visibilitychange", visibility);
+    return () => {
+      mounted.current = false;
+      leave();
+      window.removeEventListener("pagehide", leave);
+      document.removeEventListener("visibilitychange", visibility);
     };
   }, []);
   useEffect(() => {
     operation.current?.abort();
-  }, [version]);
+    cancellation.current?.abort();
+    if (phaseNow.current === "signing") {
+      phaseNow.current = "idle";
+      setPhase("idle");
+      setError("The act changed. Review it and sign again.");
+    }
+  }, [version, identity.signal]);
   const sign = async () => {
-    if (busy) return;
+    if (
+      phaseNow.current !== "idle" ||
+      operation.current ||
+      !mounted.current ||
+      identity.signal.aborted ||
+      !visible()
+    )
+      return;
+    phaseNow.current = "signing";
     setPhase("signing");
     setError("");
     const controller = new AbortController();
+    const operationDeadline = setTimeout(() => controller.abort(), 300000);
     operation.current = controller;
     const snapshot = version;
+    const originalIdentity = identity.signal;
+    const sameView = () =>
+      mounted.current &&
+      activeIdentity.current === originalIdentity &&
+      !originalIdentity.aborted;
+    const assertOriginal = (signal: AbortSignal) => {
+      signal.throwIfAborted();
+      if (!sameView() || current.current !== snapshot || !visible())
+        throw new DOMException(
+          "The original signing view ended.",
+          "AbortError",
+        );
+    };
+    const post = async (path: string, body: unknown, signal: AbortSignal) => {
+      assertOriginal(signal);
+      const response = await identity.request(path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        signal,
+      });
+      assertOriginal(signal);
+      const value = await response.json();
+      assertOriginal(signal);
+      if (!response.ok)
+        throw new Error(
+          value.error?.message ??
+            "Signing is unavailable. Nothing was published.",
+        );
+      return value;
+    };
     let challengeId: string | undefined;
     let publishing = false;
+    let challengeDeadline: ReturnType<typeof setTimeout> | undefined;
     try {
-      const request = BeginSignedActSchema.parse({
-        ...(fanId ? { fanId } : {}),
-        command,
-      });
+      assertOriginal(controller.signal);
+      const [originalCreator, originalFan, originalCommand] = JSON.parse(
+        snapshot,
+      ) as [string, string | null, SignedActCommand, ...unknown[]];
+      const request = immutable(
+        BeginSignedActSchema.parse({
+          ...(originalFan ? { fanId: originalFan } : {}),
+          command: originalCommand,
+        }),
+      );
+      await beforeSign?.(
+        AbortSignal.any([controller.signal, originalIdentity]),
+      );
+      assertOriginal(controller.signal);
       const challenge = SignedChallengeSchema.parse(
-        await post(`${creatorId}/signed-acts/begin`, request),
+        await post(
+          `${originalCreator}/signed-acts/begin`,
+          request,
+          controller.signal,
+        ),
       );
       challengeId = challenge.challengeId;
+      assertOriginal(controller.signal);
+      if (challenge.publicKey.timeout <= 0)
+        throw new Error("Signing is unavailable. No publication was started.");
+      const budget = Math.min(challenge.publicKey.timeout, 300000);
+      const wallDeadline = Date.now() + budget;
+      const elapsedDeadline = performance.now() + budget;
+      challengeDeadline = setTimeout(() => controller.abort(), budget);
+      const assertChallenge = () => {
+        assertOriginal(controller.signal);
+        if (Date.now() >= wallDeadline || performance.now() >= elapsedDeadline)
+          throw new Error("Signing expired. Review it and sign again.");
+      };
       const assertion = await assertPasskey(
         challenge.publicKey,
-        controller.signal,
+        AbortSignal.any([controller.signal, originalIdentity]),
       );
-      if (controller.signal.aborted || current.current !== snapshot)
-        throw new Error(
-          "The act changed. Review it and sign again. Nothing was sent.",
-        );
+      assertChallenge();
       const signature = SignedActResultSchema.parse(
-        await post("signed-acts/verify", { challengeId, assertion }),
+        await post(
+          "signed-acts/verify",
+          { challengeId, assertion },
+          controller.signal,
+        ),
       );
-      if (controller.signal.aborted || current.current !== snapshot)
-        throw new Error(
-          "The act changed. Review it and sign again. Nothing was sent.",
-        );
+      assertChallenge();
       // After publication begins, cancellation cannot undo the owner's transaction.
       // A lost response needs owner reconciliation before a second act is attempted.
       publishing = true;
-      operation.current = null;
+      phaseNow.current = "publishing";
       setPhase("publishing");
       await onSigned(signature.signedActId, request.command);
-      setPhase("idle");
+      if (sameView()) {
+        const changed = current.current !== snapshot;
+        phaseNow.current = changed ? "unknown" : "idle";
+        setPhase(phaseNow.current);
+        if (changed)
+          setError(
+            "The review changed while publication finished. Check the original act's status before signing again.",
+          );
+      }
     } catch (failure) {
       if (publishing) {
-        setPhase("unknown");
-        setError(
-          "Publication could not be confirmed. Check this act's status before trying again.",
-        );
+        if (sameView()) {
+          phaseNow.current = "unknown";
+          setPhase("unknown");
+          setError(
+            "Publication could not be confirmed. Check this act's status before trying again.",
+          );
+        }
       } else {
-        setPhase("idle");
-        setError(
-          controller.signal.aborted
-            ? "Signing cancelled. Nothing was sent."
-            : failure instanceof Error
-              ? failure.message
-              : "Signing could not complete. Nothing was sent.",
-        );
-        if (challengeId)
-          await post(`signed-acts/${challengeId}/cancel`, {}).catch(() => {});
+        // Manual cancellation can cancel this original challenge only while
+        // the same visible account/review remains. Abandoned views never
+        // cancel through a replacement identity.
+        if (
+          challengeId &&
+          sameView() &&
+          current.current === snapshot &&
+          visible()
+        ) {
+          const cleanup = new AbortController();
+          cancellation.current = cleanup;
+          try {
+            await post(`signed-acts/${challengeId}/cancel`, {}, cleanup.signal);
+          } catch {
+            // The original challenge expires; no cleanup success is invented.
+          } finally {
+            if (cancellation.current === cleanup) cancellation.current = null;
+          }
+        }
+        if (sameView() && current.current === snapshot) {
+          phaseNow.current = "idle";
+          setPhase("idle");
+          setError(
+            controller.signal.aborted
+              ? "Signing cancelled. No publication was started."
+              : failure instanceof Error
+                ? failure.message
+                : "Signing could not complete. No publication was started.",
+          );
+        }
       }
     } finally {
-      operation.current = null;
+      clearTimeout(operationDeadline);
+      clearTimeout(challengeDeadline);
+      if (operation.current === controller) operation.current = null;
     }
   };
   return (
-    <section className="signed-act-review">
+    <section className="signed-act-review" ref={host}>
       <div className="signed-act-preview">
         <Message
           kind={approvedDraft ? "approved_draft" : "human_creator"}

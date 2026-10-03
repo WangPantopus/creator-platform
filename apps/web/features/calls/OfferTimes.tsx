@@ -1,11 +1,17 @@
 "use client";
 import { copy, formatCopy } from "@qelvora/copy";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SignedActReview } from "../identity/signing";
-import type { CallOfferContext } from "../../../../packages/api/src/session";
+import {
+  CallOfferContextSchema,
+  CallOfferReceiptSchema,
+  OfferTimesSchema,
+  type CallOfferContext,
+} from "../../../../packages/api/src/session";
 import type { SignedActCommand } from "@qelvora/api";
 import { mediaRequest } from "../media/api";
 import { AvailabilityEditor } from "./AvailabilityEditor";
+import { useIdentityRequest } from "../identity/session-boundary";
 import "../media/media.css";
 /** W4 supplies exact signed acceptance and catalog; entering times cannot create a second payment decision. */
 export function OfferTimes({
@@ -32,6 +38,48 @@ export function OfferTimes({
   signedStartsAt?: string[];
   context?: CallOfferContext;
 }) {
+  const opening = useRef(useIdentityRequest()).current;
+  const host = useRef<HTMLElement | null>(null);
+  const lifetime = useRef<AbortController | null>(null);
+  const sending = useRef(false);
+  useEffect(() => {
+    const controller = new AbortController();
+    lifetime.current = controller;
+    const cancel = () => controller.abort();
+    opening.signal.addEventListener("abort", cancel);
+    window.addEventListener("pagehide", cancel);
+    return () => {
+      controller.abort();
+      opening.signal.removeEventListener("abort", cancel);
+      window.removeEventListener("pagehide", cancel);
+      if (lifetime.current === controller) lifetime.current = null;
+    };
+  }, [opening]);
+  function currentView() {
+    opening.signal.throwIfAborted();
+    if (
+      !lifetime.current ||
+      lifetime.current.signal.aborted ||
+      document.hidden ||
+      !host.current?.isConnected ||
+      host.current.closest("[hidden], [inert], dialog:not([open])")
+    )
+      throw new DOMException("Original offer view closed", "AbortError");
+  }
+  function request<T>(path: string, init: RequestInit = {}) {
+    currentView();
+    return mediaRequest<T>(path, {
+      ...init,
+      expectedAccountId: opening.session.accountId,
+      expectedSessionId: opening.session.sessionId,
+      signal: AbortSignal.any([
+        opening.signal,
+        lifetime.current!.signal,
+        AbortSignal.timeout(10000),
+        ...(init.signal ? [init.signal] : []),
+      ]),
+    });
+  }
   const [creatorTimeZone, setCreatorZone] = useState(
     suppliedCreatorZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
   );
@@ -45,7 +93,7 @@ export function OfferTimes({
   const [sent, setSent] = useState(false);
   const publication = useRef<{
     signedActId: string;
-    body: Record<string, unknown>;
+    body: ReturnType<typeof OfferTimesSchema.parse>;
   } | null>(null);
   const revision = context?.authorizationVersion ?? authorizationVersion;
   const startsAt = times.filter(Boolean);
@@ -62,18 +110,33 @@ export function OfferTimes({
       return false;
     }
   })();
-  const ready =
-    !!context &&
+  const normalized = (() => {
+    try {
+      const timestamp = (value: string) => {
+        if (!explicit.test(value)) throw new Error("Explicit offset required");
+        const parsed = OfferTimesSchema.shape.expiresAt.parse(
+          value.replace(/(T\d{2}:\d{2})(Z|[+-]\d{2}:\d{2})$/u, "$1:00$2"),
+        );
+        return new Date(parsed).toISOString();
+      };
+      return {
+        startsAt: startsAt.map(timestamp),
+        expiresAt: timestamp(expiresAt),
+      };
+    } catch {
+      return null;
+    }
+  })();
+  const timesReady =
     !!revision &&
     zonesValid &&
-    startsAt.length === 3 &&
-    startsAt.every(
-      (at) => explicit.test(at) && Number.isFinite(Date.parse(at)),
-    ) &&
-    new Set(startsAt.map(Date.parse)).size === startsAt.length &&
-    explicit.test(expiresAt) &&
-    Date.parse(expiresAt) > Date.now() &&
-    Date.parse(expiresAt) < Math.min(...startsAt.map(Date.parse));
+    normalized &&
+    normalized.startsAt.length === 3 &&
+    new Set(normalized.startsAt).size === normalized.startsAt.length &&
+    Date.parse(normalized.expiresAt) > Date.now() &&
+    Date.parse(normalized.expiresAt) <
+      Math.min(...normalized.startsAt.map(Date.parse));
+  const ready = !!context && timesReady;
   const command: SignedActCommand | null = ready
     ? {
         actType: "accept",
@@ -82,10 +145,10 @@ export function OfferTimes({
           kind: "commerce_call_offer",
           commitmentId,
           authorizationVersion: revision,
-          startsAt,
+          startsAt: normalized!.startsAt,
           creatorTimeZone,
           fanTimeZone,
-          expiresAt,
+          expiresAt: normalized!.expiresAt,
         },
       }
     : null;
@@ -98,36 +161,110 @@ export function OfferTimes({
           (time, i) => Date.parse(time) === Date.parse(signedStartsAt[i]!),
         ),
   );
-  async function publish(id: string) {
-    if (publication.current?.signedActId !== id)
+  async function verifyContext(signal: AbortSignal) {
+    currentView();
+    if (
+      !context ||
+      !command ||
+      !timesReady ||
+      !normalized ||
+      Date.parse(normalized.expiresAt) <= Date.now()
+    )
+      throw new Error(
+        copy.w6ReviewAndSignTheAcceptedCallRequestBeforeOfferingTimes,
+      );
+    const actual = CallOfferContextSchema.parse(
+      await request<unknown>(
+        `threads/${creatorId}/${fanId}/call-offers/context/${commitmentId}`,
+        { signal },
+      ),
+    );
+    currentView();
+    if (JSON.stringify(actual) !== JSON.stringify(context))
+      throw new Error(copy.w6TheCapturedCallCouldNotBeLoaded);
+  }
+  async function publish(id: string, exactCommand?: SignedActCommand) {
+    if (sending.current) return;
+    currentView();
+    if (publication.current && publication.current.signedActId !== id)
+      throw new Error(
+        copy.w6PublicationIsUnconfirmedRetryThisExactSignedCommandOrReload,
+      );
+    if (!publication.current) {
+      if (
+        !timesReady ||
+        !normalized ||
+        Date.parse(normalized.expiresAt) <= Date.now() ||
+        (context &&
+          (!exactCommand ||
+            JSON.stringify(exactCommand) !== JSON.stringify(command)))
+      )
+        throw new Error(
+          copy.w6ReviewAndSignTheAcceptedCallRequestBeforeOfferingTimes,
+        );
       publication.current = {
         signedActId: id,
-        body: {
+        body: OfferTimesSchema.parse({
           commitmentId,
-          startsAt,
+          startsAt: normalized.startsAt,
           creatorTimeZone,
           fanTimeZone,
-          expiresAt,
+          expiresAt: normalized.expiresAt,
           expectedAuthorizationVersion: revision,
           signedActId: id,
           idempotencyKey: crypto.randomUUID(),
-        },
+        }),
       };
+    }
+    const original = publication.current;
+    const controller = lifetime.current;
+    sending.current = true;
     setBusy(true);
     setError(null);
     try {
-      await mediaRequest(`threads/${creatorId}/${fanId}/call-offers`, {
-        method: "POST",
-        body: JSON.stringify(publication.current.body),
-      });
+      const receipt = CallOfferReceiptSchema.parse(
+        await request<unknown>(`threads/${creatorId}/${fanId}/call-offers`, {
+          method: "POST",
+          body: JSON.stringify(original.body),
+        }),
+      );
+      currentView();
+      if (lifetime.current !== controller || publication.current !== original)
+        return;
+      if (
+        receipt.creatorTimeZone !== original.body.creatorTimeZone ||
+        receipt.fanTimeZone !== original.body.fanTimeZone ||
+        receipt.expiresAt !== original.body.expiresAt ||
+        receipt.slots.length !== original.body.startsAt.length ||
+        new Set(receipt.slots.map((slot) => slot.id)).size !==
+          receipt.slots.length ||
+        !receipt.slots.every(
+          (slot, index) => slot.startsAt === original.body.startsAt[index],
+        )
+      )
+        throw new Error(
+          copy.w6PublicationIsUnconfirmedRetryThisExactSignedCommandOrReload,
+        );
       setSent(true);
     } catch (failure) {
-      setError(
-        copy.w6PublicationIsUnconfirmedRetryThisExactSignedCommandOrReload,
-      );
+      if (
+        !opening.signal.aborted &&
+        !controller?.signal.aborted &&
+        lifetime.current === controller
+      )
+        setError(
+          copy.w6PublicationIsUnconfirmedRetryThisExactSignedCommandOrReload,
+        );
       throw failure;
     } finally {
-      setBusy(false);
+      if (
+        !opening.signal.aborted &&
+        !controller?.signal.aborted &&
+        lifetime.current === controller
+      ) {
+        sending.current = false;
+        setBusy(false);
+      }
     }
   }
   async function send() {
@@ -155,11 +292,18 @@ export function OfferTimes({
         throw new Error(copy.w6EachTimeNeedsAnExplicitUTCOffsetForExample2026);
       await publish(signedActId);
     } catch (e) {
-      setError(e instanceof Error ? e.message : copy.w6TheOfferCouldNotBeSaved);
+      if (
+        !opening.signal.aborted &&
+        lifetime.current &&
+        !lifetime.current.signal.aborted
+      )
+        setError(
+          e instanceof Error ? e.message : copy.w6TheOfferCouldNotBeSaved,
+        );
     }
   }
   return (
-    <main className="w6-call w6-offer">
+    <main className="w6-call w6-offer" ref={host}>
       <span className="qv-meta">{copy.w6STUDIOCALLREQUEST}</span>
       <h1>{sent ? copy.w6TimesOffered : copy.w6OfferThreeTimes}</h1>
       {!context && (!creatorTimeZone || !fanTimeZone) ? (
@@ -253,7 +397,12 @@ export function OfferTimes({
       </p>
       <details>
         <summary>{copy.w6EditYourAvailability}</summary>
-        <AvailabilityEditor creatorId={creatorId} fanId={fanId} />
+        <AvailabilityEditor
+          creatorId={creatorId}
+          fanId={fanId}
+          accountId={opening.session.accountId}
+          signal={opening.signal}
+        />
       </details>
       {error && (
         <p role="status" className="w6-notice">
@@ -263,6 +412,7 @@ export function OfferTimes({
       <div className="w6-bottom">
         {context && !sent && command && !publication.current && (
           <SignedActReview
+            beforeSign={verifyContext}
             creatorId={creatorId}
             fanId={fanId}
             command={command}
@@ -282,7 +432,7 @@ export function OfferTimes({
               [copy.w6OfferExpires, expiresAt],
               [copy.w6Request, commitmentId],
             ]}
-            onSigned={async (id) => publish(id)}
+            onSigned={publish}
           />
         )}
         {context && !ready && !sent && !publication.current && (
