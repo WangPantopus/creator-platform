@@ -3,6 +3,9 @@ import Foundation
 public enum QelvoraCopy {
   public static let strings: [String: String] = [
     "continueWithPantopus": "Continue with Pantopus",
+    "identityTeamAccessTitle": "Current team access",
+    "identityTeamAccessLoading": "Checking team access…",
+    "identityTeamAccessRequired": "Refresh team access before creating or changing invitations.",
     "welcomeTitle": "Her AI answers you now. She answers in person when you ask.",
     "welcomeBody": "Every message says who wrote it: Maya's AI, Maya herself, or her team. You'll always know which.",
     "pantopusAccount": "One Pantopus account signs you in to every Pantopus app. New here? You'll create it in the next step.",

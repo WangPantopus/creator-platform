@@ -3141,7 +3141,10 @@ function Team({
     [reading, setReading] = useState(false),
     [readError, setReadError] = useState(""),
     action = useAction();
-  const mounted = useRef(false),
+  const retryRef = useRef<HTMLButtonElement>(null),
+    handleRef = useRef<HTMLInputElement>(null),
+    retryFocusRequested = useRef(false),
+    mounted = useRef(false),
     previousFocus = useRef<HTMLElement | null>(null),
     roleTrigger = useRef<HTMLButtonElement | null>(null),
     roleReturn = useRef(false),
@@ -3228,15 +3231,35 @@ function Team({
     };
   }, [load]);
   useEffect(() => {
+    if (reading) return;
+    const requested = retryFocusRequested.current;
+    retryFocusRequested.current = false;
+    if (suspended || document.hidden) return;
+    if (document.activeElement !== document.body) return;
+    const previous = previousFocus.current;
     if (
       teamCurrent &&
-      !suspended &&
-      !document.hidden &&
-      previousFocus.current?.isConnected
-    )
-      previousFocus.current.focus();
-  }, [teamCurrent, suspended]);
-  const { request: identityRequest, session } = useIdentityRequest();
+      previous?.isConnected &&
+      !previous.closest("[hidden], [inert]") &&
+      previous.getClientRects().length
+    ) {
+      previous.focus();
+    } else if (requested) {
+      const target =
+        teamCurrent && creator.owned ? handleRef.current : retryRef.current;
+      if (
+        target?.isConnected &&
+        !target.closest("[hidden], [inert]") &&
+        target.getClientRects().length
+      )
+        target.focus();
+    }
+  }, [teamCurrent, reading, suspended, creator.owned]);
+  const {
+    request: identityRequest,
+    session,
+    signal: identitySignal,
+  } = useIdentityRequest();
   useEffect(() => {
     if (
       roleReturn.current &&
@@ -3248,10 +3271,16 @@ function Team({
       !document.hidden
     ) {
       roleReturn.current = false;
+      if (document.activeElement !== document.body) return;
       const target = roleTrigger.current?.isConnected
         ? roleTrigger.current
         : teamRefresh.current;
-      target?.focus();
+      if (
+        target?.isConnected &&
+        !target.closest("[hidden], [inert]") &&
+        target.getClientRects().length
+      )
+        target.focus();
     }
   }, [roleEdit, teamCurrent, suspended, action.busy, reading]);
   const requireManagement = () => {
@@ -3271,6 +3300,7 @@ function Team({
   };
   const identity = async (path: string, body: unknown) => {
     requireManagement();
+    const current = generation.current;
     let response: Response;
     try {
       response = await identityRequest(path, {
@@ -3295,6 +3325,17 @@ function Team({
         "The response was interrupted. Check the current team or retry the exact reviewed action.",
       );
     }
+    if (
+      !mounted.current ||
+      identitySignal.aborted ||
+      document.hidden ||
+      current !== generation.current
+    )
+      throw new StudioFailure(
+        503,
+        "response_unknown",
+        "The response arrived after this view changed. Check the current team before continuing.",
+      );
     if (!response.ok)
       throw new StudioFailure(
         response.status,
@@ -3382,9 +3423,28 @@ function Team({
       </header>
       <Feedback action={action} />
       {!teamCurrent && (
-        <Notice tone={readError ? "offline" : "neutral"} title="Current team">
-          {readError || "Checking current members and invitations."}
-          {creator.owned && " Your invitation input is kept in this tab."}
+        <Notice
+          tone={readError ? "offline" : "neutral"}
+          title={copy.identityTeamAccessTitle}
+        >
+          <p>{readError || copy.identityTeamAccessLoading}</p>
+          <p>{copy.identityTeamAccessRequired}</p>
+          {creator.owned && <p>Your invitation input is kept in this tab.</p>}
+          <button
+            ref={retryRef}
+            type="button"
+            className="qv-btn qv-btn--secondary"
+            aria-busy={reading}
+            aria-disabled={reading || action.busy}
+            onClick={(event) => {
+              if (reading || action.busy) return;
+              retryFocusRequested.current =
+                document.activeElement === event.currentTarget;
+              void load();
+            }}
+          >
+            {copy.retry}
+          </button>
         </Notice>
       )}
       <div
@@ -3596,6 +3656,7 @@ function Team({
               <label className="w5-field">
                 Public fan handle
                 <input
+                  ref={handleRef}
                   value={account}
                   onChange={(e) => setAccount(e.target.value)}
                 />
@@ -3621,7 +3682,13 @@ function Team({
               ))}
               <button
                 className="qv-btn qv-btn--secondary"
-                disabled={action.busy || !account || !roles.length}
+                disabled={
+                  action.busy ||
+                  reading ||
+                  creator.verification !== "verified" ||
+                  !account ||
+                  !roles.length
+                }
                 onClick={() =>
                   void action.run(async () => {
                     requireManagement();

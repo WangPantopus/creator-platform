@@ -3,6 +3,9 @@
 <resources>
   <string name="app_name">Qelvora</string>
   <string name="continue_with_pantopus" formatted="false">Continue with Pantopus</string>
+  <string name="identity_team_access_title" formatted="false">Current team access</string>
+  <string name="identity_team_access_loading" formatted="false">Checking team access…</string>
+  <string name="identity_team_access_required" formatted="false">Refresh team access before creating or changing invitations.</string>
   <string name="welcome_title" formatted="false">Her AI answers you now. She answers in person when you ask.</string>
   <string name="welcome_body" formatted="false">Every message says who wrote it: Maya\'s AI, Maya herself, or her team. You\'ll always know which.</string>
   <string name="pantopus_account" formatted="false">One Pantopus account signs you in to every Pantopus app. New here? You\'ll create it in the next step.</string>

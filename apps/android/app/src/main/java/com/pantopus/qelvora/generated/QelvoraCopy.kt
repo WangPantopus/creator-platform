@@ -3,6 +3,9 @@ package com.pantopus.qelvora.generated
 object QelvoraCopy {
   val strings = mapOf(
     "continueWithPantopus" to "Continue with Pantopus",
+    "identityTeamAccessTitle" to "Current team access",
+    "identityTeamAccessLoading" to "Checking team access…",
+    "identityTeamAccessRequired" to "Refresh team access before creating or changing invitations.",
     "welcomeTitle" to "Her AI answers you now. She answers in person when you ask.",
     "welcomeBody" to "Every message says who wrote it: Maya's AI, Maya herself, or her team. You'll always know which.",
     "pantopusAccount" to "One Pantopus account signs you in to every Pantopus app. New here? You'll create it in the next step.",

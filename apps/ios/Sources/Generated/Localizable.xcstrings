@@ -12,6 +12,39 @@
         }
       }
     },
+    "Current team access": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Current team access"
+          }
+        }
+      }
+    },
+    "Checking team access…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking team access…"
+          }
+        }
+      }
+    },
+    "Refresh team access before creating or changing invitations.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Refresh team access before creating or changing invitations."
+          }
+        }
+      }
+    },
     "Her AI answers you now. She answers in person when you ask.": {
       "extractionState": "manual",
       "localizations": {
