@@ -24,12 +24,18 @@ export const originalPrivacyBindingDefinition =
 const catalogueChecksum =
   "90200a538329f88c8f98f9caa53d1561dd7b51d43b32a01c5a285af858da8279";
 
-function unavailable(): never {
-  throw new DomainError(
+function unavailable(cause?: unknown): never {
+  const failure = new DomainError(
     "privacy_original_family_unavailable",
     "Original data-request family authority is unavailable.",
     503,
   );
+  if (cause !== undefined)
+    Object.defineProperty(failure, "cause", {
+      value: cause,
+      configurable: true,
+    });
+  throw failure;
 }
 
 /** Closed metadata review only. No original preparation, task, body or positive
@@ -38,6 +44,7 @@ export async function originalPrivacyFamilyPurposeCatalogue(
   client: PoolClient,
 ) {
   await client.query("SAVEPOINT w8_original_family_catalog");
+  let completed = false;
   try {
     await client.query("SET LOCAL search_path=pg_catalog");
     const permissions = await generationConsumerCatalogue(client, purpose);
@@ -128,6 +135,7 @@ export async function originalPrivacyFamilyPurposeCatalogue(
          ORDER BY n.nspname COLLATE "C",c.relname COLLATE "C"`,
       )
     ).rows;
+    completed = true;
     return {
       permissions,
       issuerPermissions,
@@ -139,8 +147,12 @@ export async function originalPrivacyFamilyPurposeCatalogue(
       relations,
     };
   } finally {
-    await client.query("ROLLBACK TO SAVEPOINT w8_original_family_catalog");
-    await client.query("RELEASE SAVEPOINT w8_original_family_catalog");
+    // A failed read may still be in flight. Its owner must settle or destroy
+    // the held connection; never submit helper cleanup behind that read.
+    if (completed) {
+      await client.query("ROLLBACK TO SAVEPOINT w8_original_family_catalog");
+      await client.query("RELEASE SAVEPOINT w8_original_family_catalog");
+    }
   }
 }
 
@@ -154,8 +166,8 @@ export async function assertOriginalPrivacyFamilyPurposeCatalog(
         catalogueChecksum
     )
       unavailable();
-  } catch {
-    unavailable();
+  } catch (cause) {
+    unavailable(cause);
   }
 }
 
@@ -214,8 +226,8 @@ export async function originalPrivacyFamilyRegisteredExtension(
       signature: originalPrivacyBindingSignature,
       sha256: originalPrivacyBindingDefinition,
     };
-  } catch {
-    unavailable();
+  } catch (cause) {
+    unavailable(cause);
   }
 }
 

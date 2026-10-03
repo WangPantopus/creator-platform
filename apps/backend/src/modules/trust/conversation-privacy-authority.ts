@@ -1,5 +1,6 @@
 import { Client, type Pool } from "pg";
 import { DomainError, invariant } from "../../core/errors.js";
+import { querySettlementUncertain } from "../../core/query-settlement.js";
 import type {
   ConversationPrivacyAuthority,
   ConversationPrivacyFamily,
@@ -189,8 +190,9 @@ export function conversationPrivacyAuthority(
         // the original failure. A failed rollback destroys this own client.
         await settleCancellation();
         let rollbackFailure: unknown;
-        if (cancellationFailure) {
-          // A transport timeout does not prove the server consumed the cancel.
+        const uncertainQuery = querySettlementUncertain(error);
+        if (cancellationFailure || sourceTransportFailure || uncertainQuery) {
+          // A transport/read timeout does not prove the server consumed SQL.
           // Close this original session without issuing any later SQL; its
           // server rollback ends the PID's transaction before pool release.
           discardClient = true;
@@ -203,9 +205,20 @@ export function conversationPrivacyAuthority(
           } catch (cause) {
             rollbackFailure = cause;
             discardClient = true;
+            await client.end().catch((endFailure: unknown) => {
+              rollbackFailure = new AggregateError(
+                [cause, endFailure],
+                "Discovery rollback and connection closure failures.",
+              );
+            });
           }
         }
-        if (cancellationFailure || rollbackFailure || sourceTransportFailure) {
+        if (
+          cancellationFailure ||
+          rollbackFailure ||
+          sourceTransportFailure ||
+          uncertainQuery
+        ) {
           const failure = new DomainError(
             cancellationFailure
               ? "privacy_family_cancel_unavailable"
@@ -215,15 +228,18 @@ export function conversationPrivacyAuthority(
           );
           // Causes stay in-process for private operator diagnostics. The
           // public transport retains only this bounded code/message.
-          failure.cause = new AggregateError(
-            [
-              error,
-              sourceTransportFailure,
-              cancellationFailure,
-              rollbackFailure,
-            ].filter((cause) => cause !== undefined),
-            "Original discovery and settlement failures.",
-          );
+          Object.defineProperty(failure, "cause", {
+            value: new AggregateError(
+              [
+                error,
+                sourceTransportFailure,
+                cancellationFailure,
+                rollbackFailure,
+              ].filter((cause) => cause !== undefined),
+              "Original discovery and settlement failures.",
+            ),
+            configurable: true,
+          });
           throw failure;
         }
         throw error;
