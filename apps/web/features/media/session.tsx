@@ -10,11 +10,12 @@ export function MediaSession({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const release = configureMediaRequests({
       accountId: session.accountId,
+      sessionId: session.sessionId,
       signal,
       end,
     });
     setReady(true);
     return release;
-  }, [session.accountId, signal, end]);
+  }, [session.accountId, session.sessionId, signal, end]);
   return ready ? children : <p role="status">Checking your current account…</p>;
 }
