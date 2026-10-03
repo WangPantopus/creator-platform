@@ -1,5 +1,13 @@
 # Private Trust and Growth privacy transactions
 
+## Personally qualified genuine Trust worker settlement — October 3, 2026 14:06 UTC
+
+Eight distinct probes use actual `TrustWorker` claims of an existing original account-export task on fresh labelled disposable canonical61 copies. No job, Actor, consent, ownership, lease token or task signal is constructed by the operator. The healthy original Trust role completes its real domain COMMIT and coordinator ACK; an actual runtime-role call refuses and normally restores/releases its savepoint. This is a domain worker qualification, not a completed application export or all-eight C10.
+
+Real loopback transport withholds catalogue73 bytes, restoration215 bytes, fence110 bytes, rollback6 bytes and COMMIT18 bytes. Each failed task retains no ACK/data/live lease/private scope, sends zero later source SQL, closes before discard/release and independently observes its PID gone. The actual five-second host budget refuses a held catalogue reply at5028ms; this is measured host refusal, not an in-flight generation/provider denial within five seconds. Lost COMMIT acknowledgement remains a refusal requiring actual reconciliation. The initial rollback operator expected a translated code; the actual primary PostgreSQL42501 and read timeout were both retained. That failed assertion is preserved and a fresh corrected rollback probe passes.
+
+Independent closed readback verifies all nine probe copies are closed/scope-free, all stable original jobs,63 other tasks, five complete cases including dates, memberships and five metadata custodies unchanged. The one deliberately requeued Trust task records its real complete/blocked/retry outcome; copy business-data preservation is not claimed. The separate original matches all six at three fresh custody reads. Private traces, body data and JSON remain outside Git. Source hashes are domain fence8b3858652fd489cbe5a9180c4b911909633388f3fcf5694a3a7e1dab63d136b3, own hook48cf50c4094375a0c1d84baee31f3d6a3d18d8bcf65c602fdc316b53d967e73c and reused transactionf0409d16b0ba3e941ed45e9ab5588b3858a86cd8b48b4c3d4ed7ab0527fbfee7 at actual56c9e039. No SQL/grant/renewal/paid call occurs; current three-client workflow, original-family/source/EOF/protected storage/ACK reconciliation, full C10/release/pilot remain open and200 stays draft.
+
 ## Original Trust source settlement repair — October 3, 2026
 
 Current W8 source removes nested savepoint cleanup after an actual task abort or uncertain domain catalogue/restoration/fence response. Settled refusals still restore and release the savepoint; a cleanup failure retains both original and cleanup causes without later helper SQL. Original0103 SQL, catalogue, task tuple and same-client restoration bookends remain unchanged.
