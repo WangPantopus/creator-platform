@@ -125,7 +125,10 @@ object CommerceFanFeature {
     }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = if (screen == "packet") 20.dp else 16.dp).padding(top = 20.dp, bottom = 36.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            if (screen != "requests") Button("Back", ButtonVariant.QUIET) { screen = "requests"; detail = null }
+            if (screen != "requests") Button("Back", ButtonVariant.QUIET) {
+                if (screen == "spending" && arrivalPath == "/commerce/spending") session.open("/you")
+                else { screen = "requests"; detail = null }
+            }
             Button("Refresh", ButtonVariant.QUIET, disabled = busy) { scope.launch { refresh() } }
         }
         if (failure.isNotEmpty()) Notice("error", "Connection status", failure)
