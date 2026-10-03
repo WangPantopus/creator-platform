@@ -139,11 +139,38 @@ export function feedbackUnavailable(cause?: unknown) {
 
 // Installed pg supports this response deadline; its declaration omits it.
 function catalogueQuery(
+  client: PoolClient,
   text: string,
   values: unknown[] = [],
   queryTimeout = 5000,
 ): QueryConfig & { query_timeout: number } {
-  return { text, values, query_timeout: queryTimeout };
+  // Installed pg's explicit per-query option overrides the original client's
+  // default. Its public declaration omits these actual connection parameters.
+  const parameters = (
+    client as PoolClient & {
+      connectionParameters?: { query_timeout?: unknown };
+    }
+  ).connectionParameters;
+  if (!parameters) throw feedbackUnavailable();
+  const original = parameters.query_timeout;
+  if (
+    original !== undefined &&
+    original !== null &&
+    original !== false &&
+    original !== 0 &&
+    (typeof original !== "number" ||
+      !Number.isSafeInteger(original) ||
+      original < 1)
+  )
+    throw feedbackUnavailable();
+  return {
+    text,
+    values,
+    query_timeout:
+      typeof original === "number" && original > 0
+        ? Math.min(original, queryTimeout)
+        : queryTimeout,
+  };
 }
 
 /** The executable active registry, not a reservation or hand-installed function,
@@ -172,12 +199,13 @@ export async function assertDevelopmentFeedbackPurposeCatalog(
   try {
     signal?.throwIfAborted();
     await client.query(
-      catalogueQuery("SAVEPOINT w8_feedback_catalog", [], 1500),
+      catalogueQuery(client, "SAVEPOINT w8_feedback_catalog", [], 1500),
     );
     signal?.throwIfAborted();
     const ready = (
       await client.query<{ ready: boolean }>(
         catalogueQuery(
+          client,
           `WITH purpose AS (
       SELECT oid FROM pg_roles WHERE rolname=$1 AND NOT rolcanlogin AND NOT rolinherit
        AND NOT rolsuper AND NOT rolcreatedb AND NOT rolcreaterole AND NOT rolreplication
@@ -291,6 +319,7 @@ export async function assertDevelopmentFeedbackPurposeCatalog(
     const registered = (
       await client.query<{ ready: boolean }>(
         catalogueQuery(
+          client,
           "SELECT creator_trust.development_feedback_registered($1,$2) AS ready",
           [developmentFeedbackVersion, developmentFeedbackSource.checksum],
         ),
@@ -309,11 +338,21 @@ export async function assertDevelopmentFeedbackPurposeCatalog(
       try {
         signal?.throwIfAborted();
         await client.query(
-          catalogueQuery("ROLLBACK TO SAVEPOINT w8_feedback_catalog", [], 1500),
+          catalogueQuery(
+            client,
+            "ROLLBACK TO SAVEPOINT w8_feedback_catalog",
+            [],
+            1500,
+          ),
         );
         signal?.throwIfAborted();
         await client.query(
-          catalogueQuery("RELEASE SAVEPOINT w8_feedback_catalog", [], 1500),
+          catalogueQuery(
+            client,
+            "RELEASE SAVEPOINT w8_feedback_catalog",
+            [],
+            1500,
+          ),
         );
       } catch (cause) {
         failure = !failed
