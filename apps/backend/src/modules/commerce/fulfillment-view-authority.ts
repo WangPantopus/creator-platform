@@ -5,6 +5,11 @@ import type { Database } from "../../db/database.js";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError } from "../../core/errors.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
+import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
+import {
+  assertFulfillmentViewDenialCatalog,
+  fulfillmentViewDenialMigration,
+} from "../trust/fulfillment-view-denial-catalog.js";
 import type { Actor } from "../identity/adapter.js";
 import {
   holdCurrentRequestSession,
@@ -29,11 +34,13 @@ export const FULFILLMENT_VIEW_SCHEMA_SHA256 =
   "534f5c36b3d58eb2099f9a9a12452a60b287e4f1f3040c4ebeba99a3c8e96684";
 const Owner = "creator_fulfillment_view_authority";
 const Catalogue =
-  "f870ee07b5d12f65ac3abe45864a55ce9011af6967fc63cac91fff78f8a88d8e";
+  "67559cedf4cda751989297e8bec2c9743e1bb45db214772c093407f27a4768a9";
 export const FULFILLMENT_VIEW_PLAN_CATALOGUE_SHA256 =
   "12cda15c2b2078940e44cc667dfb0cac85284a34d846f6d0e0cb6a2defc763e7";
 const OriginalHashScopeCatalogue =
-  "5a13261bde3339d7bca347ec0689ecfbf6abc1629817354f6122ff25ad15cd50";
+  "f380ae82f3d6accf0c3dfcd6b511f465e0f11693078a274e53843a3425498b02";
+const DenialScopeCatalogue =
+  "bca40c1e4e4b7f521a9bb07e5a7304aa47d2a5faade396eca04806a2c1b6b690";
 const OriginalHashPlanCatalogue =
   "4c8564303cc95803a61db1e23eee05da4f4bb2a7149ade12a2742cf0e190a121";
 const Definitions = Object.freeze({
@@ -127,7 +134,12 @@ export class CommerceFulfillmentViewAuthority {
     const authority = new CommerceFulfillmentViewAuthority(input.database);
     const client = await input.database.pool.connect();
     try {
+      await client.query("BEGIN");
       await authority.assertCatalogue(client);
+      await client.query("ROLLBACK");
+    } catch (error) {
+      await client.query("ROLLBACK").catch(() => undefined);
+      throw error;
     } finally {
       client.release();
     }
@@ -149,91 +161,7 @@ export class CommerceFulfillmentViewAuthority {
     await authority.assertCatalogue(client);
   }
   private async assertCatalogue(client: PoolClient): Promise<void> {
-    try {
-      // A distinct reviewed consumer may add only its exact fixed matcher ACL
-      // and bounded RLS policies. Unregistered DDL or a changed checksum cannot
-      // select the extended catalogue; the consumer's actual source is checked.
-      const originalHash = (
-        await client.query<{ checksum: string }>(
-          "SELECT checksum FROM creator.schema_migration WHERE version=$1",
-          [FULFILLMENT_ORIGINAL_HASH_MIGRATION],
-        )
-      ).rows[0];
-      if (originalHash) {
-        if (originalHash.checksum !== FULFILLMENT_ORIGINAL_HASH_SCHEMA_SHA256)
-          unavailable();
-        await assertFulfillmentOriginalHashCatalogue(client);
-      }
-      const ready = (
-        await client.query<{ ready: boolean }>(
-          `SELECT
-       session_user='creator_runtime' AND current_user=session_user
-       AND EXISTS(SELECT FROM creator.schema_migration WHERE version=$1 AND checksum=$2)
-       AND EXISTS(SELECT FROM creator.schema_migration WHERE version='0178_w4_fulfillment_plan_custody'
-        AND checksum='d728ec3d71f3b9fd11c49b3f2faf91624e7b03868d5ab4b462b0730fddae4aa1')
-       AND EXISTS(SELECT FROM pg_roles r WHERE r.rolname=$3 AND NOT r.rolcanlogin
-        AND NOT r.rolsuper AND NOT r.rolinherit AND NOT r.rolbypassrls AND NOT r.rolcreatedb
-        AND NOT r.rolcreaterole AND NOT r.rolreplication AND (r.rolconfig IS NULL OR cardinality(r.rolconfig)=0)
-        AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid OR roleid=r.oid)
-        AND NOT EXISTS(SELECT FROM pg_db_role_setting WHERE setrole=r.oid)
-        AND NOT EXISTS(SELECT FROM pg_namespace WHERE nspowner=r.oid)
-        AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=r.oid))
-       AND (SELECT count(*)=5 FROM pg_proc WHERE proowner=(SELECT oid FROM pg_roles WHERE rolname=$3))
-       AND EXISTS(SELECT FROM pg_class WHERE oid=to_regclass('creator.commerce_fulfillment_view_scope')
-        AND relrowsecurity AND relforcerowsecurity AND pg_get_userbyid(relowner)='creator_owner')
-       AND NOT has_any_column_privilege(current_user,'creator.commerce_fulfillment_view_scope','SELECT,INSERT,UPDATE,REFERENCES')
-       AND NOT has_table_privilege(current_user,'creator.commerce_fulfillment_view_scope','SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
-       AND NOT has_column_privilege($3,'creator.commerce_packet','question','SELECT')
-       AND NOT has_column_privilege($3,'creator.commerce_packet','fan_answer','SELECT')
-       AND NOT has_column_privilege($3,'creator.content_revision','document','SELECT')
-       AND NOT has_column_privilege($3,'creator.identity_session','token_hash','SELECT')
-       AND NOT has_column_privilege($3,'creator.identity_session','upstream_cipher','SELECT')
-       AND NOT has_column_privilege($3,'creator.passkey_credential','public_key','SELECT')
-       AND NOT has_column_privilege($3,'creator.signed_act','assertion','SELECT') AS ready`,
-          [FULFILLMENT_VIEW_MIGRATION, FULFILLMENT_VIEW_SCHEMA_SHA256, Owner],
-        )
-      ).rows[0]?.ready;
-      if (
-        ready !== true ||
-        contentHash(await generationConsumerCatalogue(client, Owner)) !==
-          Catalogue
-      )
-        unavailable();
-      if (
-        (
-          await client.query<{ checksum: string }>(
-            FULFILLMENT_VIEW_CATALOGUE_QUERY,
-          )
-        ).rows[0]?.checksum !==
-          (originalHash
-            ? OriginalHashScopeCatalogue
-            : FULFILLMENT_VIEW_CATALOGUE_SHA256) ||
-        (await client.query<{ checksum: string }>(FULFILLMENT_CATALOGUE_QUERY))
-          .rows[0]?.checksum !==
-          (originalHash
-            ? OriginalHashPlanCatalogue
-            : FULFILLMENT_VIEW_PLAN_CATALOGUE_SHA256)
-      )
-        unavailable();
-      for (const [signature, checksum] of Object.entries(Definitions)) {
-        const row = (
-          await client.query<{ ready: boolean; definition: string }>(
-            `SELECT p.prosecdef AND p.provolatile='v'
-         AND p.proconfig=ARRAY['search_path=pg_catalog'] AND pg_get_userbyid(p.proowner)=$2
-         AND NOT EXISTS(SELECT FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a WHERE a.grantee=0 AND a.privilege_type='EXECUTE') AS ready,
-         pg_get_functiondef(p.oid) AS definition FROM pg_proc p WHERE p.oid=to_regprocedure($1)`,
-            [signature, Owner],
-          )
-        ).rows[0];
-        if (
-          row?.ready !== true ||
-          createHash("sha256").update(row.definition).digest("hex") !== checksum
-        )
-          unavailable();
-      }
-    } catch {
-      unavailable();
-    }
+    await assertCommerceFulfillmentViewCatalogue(client);
   }
   private async context(client: PoolClient, actor: Actor) {
     const request = requestAuthority.getStore();
@@ -384,5 +312,131 @@ export class CommerceFulfillmentViewAuthority {
     ]);
     await this.assertCatalogue(client);
     this.scopes.delete(scope);
+  }
+}
+
+/** Current executable and metadata custody only; no request, recipient or
+ * body capability is issued. Run before the final domain/signature gate. */
+export async function assertCommerceFulfillmentViewCatalogue(
+  client: PoolClient,
+): Promise<void> {
+  try {
+    for (const source of [
+      {
+        name: "w4_fulfillment_plan_read",
+        path: "apps/backend/src/modules/commerce/schema-fulfillment-plan-read.sql",
+        owner: "W4",
+        checksum: FULFILLMENT_VIEW_SCHEMA_SHA256,
+      },
+      {
+        name: "w4_fulfillment_plan_custody",
+        path: "apps/backend/src/modules/commerce/schema-fulfillment-plans.sql",
+        owner: "W4",
+        checksum:
+          "d728ec3d71f3b9fd11c49b3f2faf91624e7b03868d5ab4b462b0730fddae4aa1",
+      },
+    ])
+      await assertRegisteredMigration(client, source);
+    // A distinct reviewed consumer may add only its exact fixed matcher ACL
+    // and bounded RLS policies. Unregistered DDL or a changed checksum cannot
+    // select the extended catalogue; the consumer's actual source is checked.
+    const originalHash = (
+      await client.query<{ checksum: string }>(
+        "SELECT checksum FROM creator.schema_migration WHERE version=$1",
+        [FULFILLMENT_ORIGINAL_HASH_MIGRATION],
+      )
+    ).rows[0];
+    if (originalHash) {
+      if (originalHash.checksum !== FULFILLMENT_ORIGINAL_HASH_SCHEMA_SHA256)
+        unavailable();
+      await assertFulfillmentOriginalHashCatalogue(client);
+    }
+    const denial = (
+      await client.query<{ checksum: string }>(
+        "SELECT checksum FROM creator.schema_migration WHERE version=$1",
+        [fulfillmentViewDenialMigration.version],
+      )
+    ).rows[0];
+    if (denial) {
+      if (
+        !originalHash ||
+        denial.checksum !== fulfillmentViewDenialMigration.checksum
+      )
+        unavailable();
+      // The owner catalogue covers the original scope/plan. W8 independently
+      // pins the new producer's role, effective permissions and executable body.
+      await assertFulfillmentViewDenialCatalog(client);
+    }
+    const ready = (
+      await client.query<{ ready: boolean }>(
+        `SELECT
+       session_user='creator_runtime' AND current_user=session_user
+       AND EXISTS(SELECT FROM creator.schema_migration WHERE version=$1 AND checksum=$2)
+       AND EXISTS(SELECT FROM creator.schema_migration WHERE version='0178_w4_fulfillment_plan_custody'
+        AND checksum='d728ec3d71f3b9fd11c49b3f2faf91624e7b03868d5ab4b462b0730fddae4aa1')
+       AND EXISTS(SELECT FROM pg_roles r WHERE r.rolname=$3 AND NOT r.rolcanlogin
+        AND NOT r.rolsuper AND NOT r.rolinherit AND NOT r.rolbypassrls AND NOT r.rolcreatedb
+        AND NOT r.rolcreaterole AND NOT r.rolreplication AND (r.rolconfig IS NULL OR cardinality(r.rolconfig)=0)
+        AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid OR roleid=r.oid)
+        AND NOT EXISTS(SELECT FROM pg_db_role_setting WHERE setrole=r.oid)
+        AND NOT EXISTS(SELECT FROM pg_namespace WHERE nspowner=r.oid)
+        AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=r.oid))
+       AND (SELECT count(*)=5 FROM pg_proc WHERE proowner=(SELECT oid FROM pg_roles WHERE rolname=$3))
+       AND EXISTS(SELECT FROM pg_class WHERE oid=to_regclass('creator.commerce_fulfillment_view_scope')
+        AND relrowsecurity AND relforcerowsecurity AND pg_get_userbyid(relowner)='creator_owner')
+       AND NOT has_any_column_privilege(current_user,'creator.commerce_fulfillment_view_scope','SELECT,INSERT,UPDATE,REFERENCES')
+       AND NOT has_table_privilege(current_user,'creator.commerce_fulfillment_view_scope','SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
+       AND NOT has_column_privilege($3,'creator.commerce_packet','question','SELECT')
+       AND NOT has_column_privilege($3,'creator.commerce_packet','fan_answer','SELECT')
+       AND NOT has_column_privilege($3,'creator.content_revision','document','SELECT')
+       AND NOT has_column_privilege($3,'creator.identity_session','token_hash','SELECT')
+       AND NOT has_column_privilege($3,'creator.identity_session','upstream_cipher','SELECT')
+       AND NOT has_column_privilege($3,'creator.passkey_credential','public_key','SELECT')
+       AND NOT has_column_privilege($3,'creator.signed_act','assertion','SELECT') AS ready`,
+        [FULFILLMENT_VIEW_MIGRATION, FULFILLMENT_VIEW_SCHEMA_SHA256, Owner],
+      )
+    ).rows[0]?.ready;
+    if (
+      ready !== true ||
+      contentHash(await generationConsumerCatalogue(client, Owner)) !==
+        Catalogue
+    )
+      unavailable();
+    if (
+      (
+        await client.query<{ checksum: string }>(
+          FULFILLMENT_VIEW_CATALOGUE_QUERY,
+        )
+      ).rows[0]?.checksum !==
+        (denial
+          ? DenialScopeCatalogue
+          : originalHash
+            ? OriginalHashScopeCatalogue
+            : FULFILLMENT_VIEW_CATALOGUE_SHA256) ||
+      (await client.query<{ checksum: string }>(FULFILLMENT_CATALOGUE_QUERY))
+        .rows[0]?.checksum !==
+        (originalHash
+          ? OriginalHashPlanCatalogue
+          : FULFILLMENT_VIEW_PLAN_CATALOGUE_SHA256)
+    )
+      unavailable();
+    for (const [signature, checksum] of Object.entries(Definitions)) {
+      const row = (
+        await client.query<{ ready: boolean; definition: string }>(
+          `SELECT p.prosecdef AND p.provolatile='v'
+         AND p.proconfig=ARRAY['search_path=pg_catalog'] AND pg_get_userbyid(p.proowner)=$2
+         AND NOT EXISTS(SELECT FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a WHERE a.grantee=0 AND a.privilege_type='EXECUTE') AS ready,
+         pg_get_functiondef(p.oid) AS definition FROM pg_proc p WHERE p.oid=to_regprocedure($1)`,
+          [signature, Owner],
+        )
+      ).rows[0];
+      if (
+        row?.ready !== true ||
+        createHash("sha256").update(row.definition).digest("hex") !== checksum
+      )
+        unavailable();
+    }
+  } catch {
+    unavailable();
   }
 }
