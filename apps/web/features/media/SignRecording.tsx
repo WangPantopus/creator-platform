@@ -42,9 +42,15 @@ type Operation = {
  * the view and its exact signed-act retry, rather than adopting it. */
 export function SignRecording(props: Props) {
   const identity = useIdentityRequest();
+  const lifetime = useRef({ signal: identity.signal, revision: 0 });
+  if (lifetime.current.signal !== identity.signal)
+    lifetime.current = {
+      signal: identity.signal,
+      revision: lifetime.current.revision + 1,
+    };
   return (
     <RecordingSignature
-      key={`${identity.session.accountId}/${identity.session.sessionId}/${props.creatorId}/${props.fanId}/${JSON.stringify(props.asset)}`}
+      key={`${lifetime.current.revision}/${identity.session.accountId}/${identity.session.sessionId}/${props.creatorId}/${props.fanId}/${JSON.stringify(props.asset)}`}
       {...props}
       identity={identity}
     />
