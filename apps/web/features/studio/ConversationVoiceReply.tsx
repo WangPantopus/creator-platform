@@ -85,8 +85,9 @@ export function ConversationVoiceReply({
         abort.signal,
       ),
       mediaRequest(`threads/${creatorId}/${fanId}/recording-policy`, {
-        signal: abort.signal,
+        signal: AbortSignal.any([abort.signal, signal]),
         expectedAccountId,
+        expectedSessionId: session.sessionId,
       }),
     ])
       .then(([value, raw]) => {
@@ -97,16 +98,24 @@ export function ConversationVoiceReply({
           policy.threadId !== threadId
         )
           throw new Error(copy.w6SelectedConversationChanged);
-        if (!abort.signal.aborted) {
+        if (!abort.signal.aborted && !signal.aborted) {
           setLimit(policy.maxDurationMs);
           setAvailable(value.recordingDeliveryAvailable === true);
         }
       })
       .catch(() => {
-        if (!abort.signal.aborted) setAvailable(false);
+        if (!abort.signal.aborted && !signal.aborted) setAvailable(false);
       });
     return () => abort.abort();
-  }, [request, creatorId, fanId, threadId, expectedAccountId]);
+  }, [
+    request,
+    creatorId,
+    fanId,
+    threadId,
+    expectedAccountId,
+    signal,
+    session.sessionId,
+  ]);
   useEffect(() => {
     watchSessionEnd();
     try {
