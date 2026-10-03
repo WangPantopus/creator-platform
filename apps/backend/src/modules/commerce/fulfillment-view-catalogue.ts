@@ -14,13 +14,13 @@ export const FULFILLMENT_VIEW_CATALOGUE_QUERY = `WITH owned AS (
    'validated',c.convalidated,'deferrable',c.condeferrable,'deferred',c.condeferred) ORDER BY c.conname)
    FROM pg_constraint c WHERE c.conrelid=o.oid),
   'grants',(SELECT jsonb_agg(jsonb_build_object('role',CASE WHEN a.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(a.grantee) END,
-   'privilege',a.privilege_type,'grantable',a.is_grantable) ORDER BY a.grantee,a.privilege_type)
+   'privilege',a.privilege_type,'grantable',a.is_grantable) ORDER BY CASE WHEN a.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(a.grantee) END COLLATE "C",a.privilege_type)
    FROM aclexplode(coalesce(o.relacl,acldefault('r',o.relowner))) a),
   'columnGrants',(SELECT jsonb_agg(jsonb_build_object('column',a.attname,'role',CASE WHEN g.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(g.grantee) END,
-   'privilege',g.privilege_type,'grantable',g.is_grantable) ORDER BY a.attnum,g.grantee,g.privilege_type)
+   'privilege',g.privilege_type,'grantable',g.is_grantable) ORDER BY a.attnum,CASE WHEN g.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(g.grantee) END COLLATE "C",g.privilege_type)
    FROM pg_attribute a CROSS JOIN LATERAL aclexplode(a.attacl) g WHERE a.attrelid=o.oid AND a.attnum>0 AND NOT a.attisdropped)) ORDER BY o.relname) FROM owned o),
  'policies',(SELECT jsonb_agg(jsonb_build_object('relation',o.relname,'name',p.polname,'command',p.polcmd,'permissive',p.polpermissive,
-  'roles',(SELECT jsonb_agg(CASE WHEN r=0 THEN 'PUBLIC' ELSE pg_get_userbyid(r) END ORDER BY r) FROM unnest(p.polroles) r),
+  'roles',(SELECT jsonb_agg(CASE WHEN r=0 THEN 'PUBLIC' ELSE pg_get_userbyid(r) END ORDER BY CASE WHEN r=0 THEN 'PUBLIC' ELSE pg_get_userbyid(r) END COLLATE "C") FROM unnest(p.polroles) r),
   'using',pg_get_expr(p.polqual,p.polrelid),'check',pg_get_expr(p.polwithcheck,p.polrelid)) ORDER BY o.relname,p.polname)
   FROM pg_policy p JOIN owned o ON o.oid=p.polrelid),
  'triggers',(SELECT jsonb_agg(jsonb_build_object('relation',o.relname,'name',t.tgname,'enabled',t.tgenabled,'type',t.tgtype,
@@ -28,7 +28,7 @@ export const FULFILLMENT_VIEW_CATALOGUE_QUERY = `WITH owned AS (
   FROM pg_trigger t JOIN owned o ON o.oid=t.tgrelid JOIN pg_proc f ON f.oid=t.tgfoid WHERE NOT t.tgisinternal),
  'functions',(SELECT jsonb_agg(jsonb_build_object('name',f.proname,'owner',pg_get_userbyid(f.proowner),'securityDefiner',f.prosecdef,
   'definition',pg_get_functiondef(f.oid),'grants',(SELECT jsonb_agg(jsonb_build_object('role',CASE WHEN a.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(a.grantee) END,
-   'privilege',a.privilege_type,'grantable',a.is_grantable) ORDER BY a.grantee,a.privilege_type) FROM aclexplode(coalesce(f.proacl,acldefault('f',f.proowner))) a)) ORDER BY f.proname)
+   'privilege',a.privilege_type,'grantable',a.is_grantable) ORDER BY CASE WHEN a.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(a.grantee) END COLLATE "C",a.privilege_type) FROM aclexplode(coalesce(f.proacl,acldefault('f',f.proowner))) a)) ORDER BY f.proname)
   FROM pg_proc f JOIN pg_namespace n ON n.oid=f.pronamespace WHERE n.nspname='creator' AND f.proname IN('begin_commerce_fulfillment_view','commerce_fulfillment_view_matches','commerce_fulfillment_view_originals',
    'end_commerce_fulfillment_view','require_fulfillment_view_cleanup','commerce_fulfillment_view_metadata_bound'))
 ,
@@ -41,4 +41,4 @@ export const FULFILLMENT_VIEW_CATALOGUE_QUERY = `WITH owned AS (
  SELECT encode(sha256(convert_to(value::text,'UTF8')),'hex') AS checksum FROM metadata`;
 
 export const FULFILLMENT_VIEW_CATALOGUE_SHA256 =
-  "b7a9cbb52541e90dad02bad4c3e04d140649f2cca1647e7dafdc5e3ddd64161a";
+  "f92eb0f14b82014ede12c011acedb7e983bbd99ec4fb68de175f5e4b4cf826bc";
