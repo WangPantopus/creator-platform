@@ -57,27 +57,45 @@ struct CommerceDetail: Decodable, Sendable {
     struct Share: Decodable, Sendable { let version: Int; let fan_choice: Bool; let revoked_at: String? }
     let packet: CommercePacket; let commitment: Commitment?; let share: Share?; let ledger: [Ledger]; let callTransport: CallTransport?
 }
-struct CommerceFailure: Error { let message: String; let status: Int }
-private struct CommerceErrorEnvelope: Decodable { struct Failure: Decodable { let message: String }; let error: Failure }
+struct CommerceFailure: Error { let message: String; let status: Int; var code: String? = nil }
+private struct CommerceErrorEnvelope: Decodable { struct Failure: Decodable { let message: String; let code: String? }; let error: Failure }
 
-/// Uses the same OS credential store as FanSession. Domain state is never stored locally.
-actor CommerceClient {
-    private let baseURL: URL; private let accountId: String?; private let credentials: SecureSessionStorage
-    init(baseURL: URL, accountId: String? = nil) { self.baseURL = baseURL; credentials = SecureSessionStorage(issuer: baseURL); self.accountId = accountId }
+/// The genuine issuer supplies the original client and cancellable view capture.
+/// Expected IDs only refuse replacement; they supply no financial authority.
+@MainActor struct CommerceClient {
+    private let model: FanSession
+    private let accountId: String
+    private let sessionId: String
+    private let destination: String
+    init(model: FanSession, accountId: String, sessionId: String, destination: String) {
+        self.model = model; self.accountId = accountId; self.sessionId = sessionId; self.destination = destination
+    }
+    private var ready: Bool {
+        model.session?.accountId == accountId && model.session?.sessionId == sessionId && model.destination == destination &&
+        !model.checkingSession && !model.busy && model.error.isEmpty && !model.purgingPrivateState && !model.localPurgeFailed
+    }
     func request<T: Decodable & Sendable>(_ path: String, body: Data? = nil) async throws -> T {
-        guard let token = try await credentials.read() else { throw CommerceFailure(message: "Your session ended. Continue with Pantopus again.", status: 401) }
-        var request = URLRequest(url: baseURL.appendingPathComponent("v1/commerce/" + path))
-        request.httpMethod = body == nil ? "GET" : "POST"; request.httpBody = body; request.timeoutInterval = 15
-        request.cachePolicy = .reloadIgnoringLocalCacheData
-        request.setValue("Bearer " + token, forHTTPHeaderField: "Authorization")
-        if let accountId { request.setValue(accountId, forHTTPHeaderField: "x-commerce-account-id") }
-        if body != nil { request.setValue("application/json", forHTTPHeaderField: "Content-Type") }
-        let (data, response) = try await URLSession.shared.data(for: request)
-        guard let response = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
-        guard (200..<300).contains(response.statusCode) else {
-            throw CommerceFailure(message: (try? JSONDecoder().decode(CommerceErrorEnvelope.self, from: data).error.message) ?? "This action is unavailable. Your input is kept.", status: response.statusCode)
+        try Task.checkCancellation()
+        guard ready, let original = await model.captureRequest(from: destination, maximumResponseBytes: 4_194_304, timeoutSeconds: 15),
+              original.expectedAccountId == accountId, original.sessionId == sessionId, ready else {
+            throw CommerceFailure(message: "Refresh your account before continuing. Your input is kept.", status: 503)
         }
-        return try JSONDecoder().decode(T.self, from: data)
+        do {
+            let response = try await original.commerceBytes("/v1/commerce/" + path, body: body)
+            try Task.checkCancellation()
+            guard await original.isCurrent(), ready else { throw CancellationError() }
+            let value = try JSONDecoder().decode(T.self, from: response.body)
+            guard await original.isCurrent(), ready else { throw CancellationError() }
+            return value
+        } catch {
+            try Task.checkCancellation()
+            guard await original.isCurrent(), ready else { throw CancellationError() }
+            if let failure = error as? CreatorAPIError {
+                let detail = try? JSONDecoder().decode(CommerceErrorEnvelope.self, from: failure.body).error
+                throw CommerceFailure(message: detail?.message ?? "This action is unavailable. Your input is kept.", status: failure.status, code: detail?.code)
+            }
+            throw error
+        }
     }
 }
 
