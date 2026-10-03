@@ -222,11 +222,18 @@ export function CreatorAI({
   const actorKey = useRef<string | null>(null);
   const fetchSequence = useRef(0);
   const sourceFileSequence = useRef(0);
-  const [error, setError] = useState("");
+  const [error, setErrorMessage] = useState("");
+  const stateReadFailure = useRef<string | null>(null);
+  const setError = useCallback((text: string) => {
+    stateReadFailure.current = null;
+    setErrorMessage(text);
+  }, []);
   // Counts failures of person-initiated actions. Background refreshes never
   // move focus while someone is typing.
   const [actionFailure, setActionFailure] = useState(0);
   const errorNotice = useRef<HTMLDivElement>(null);
+  const studioHeading = useRef<HTMLHeadingElement>(null);
+  const recoveredReadFocus = useRef<HTMLElement | null>(null);
   const failAction = (text: string) => {
     setError(text);
     setActionFailure((count) => count + 1);
@@ -422,6 +429,21 @@ export function CreatorAI({
             "Your creator session changed. Continue with Pantopus again.",
           );
         }
+        // A successful current-account read settles only its own outage notice.
+        // Provider/action refusals and unsaved-draft conflicts remain visible.
+        const readFailure = stateReadFailure.current;
+        stateReadFailure.current = null;
+        if (readFailure !== null) {
+          const focused = document.activeElement;
+          if (
+            focused instanceof HTMLElement &&
+            errorNotice.current?.contains(focused)
+          )
+            recoveredReadFocus.current = focused;
+          setErrorMessage((current) =>
+            current === readFailure ? "" : current,
+          );
+        }
         const nextActor = `${data.actorAccountId}:${data.creator.id}`;
         if (actorKey.current !== nextActor) {
           initial = true;
@@ -510,11 +532,15 @@ export function CreatorAI({
         }
         return data;
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Studio is unavailable.");
+        if (sequence !== fetchSequence.current || identitySignal?.aborted)
+          return null;
+        const text = e instanceof Error ? e.message : "Studio is unavailable.";
+        setError(text);
+        stateReadFailure.current = text;
         return null;
       }
     },
-    [request, identityAccount, identitySignal, endIdentity],
+    [request, identityAccount, identitySignal, endIdentity, setError],
   );
   useEffect(() => {
     void fetchState(true);
@@ -550,6 +576,21 @@ export function CreatorAI({
     });
     notice.focus({ preventScroll: true });
   }, [actionFailure]);
+  useEffect(() => {
+    const from = recoveredReadFocus.current;
+    recoveredReadFocus.current = null;
+    if (
+      error ||
+      !from ||
+      from.isConnected ||
+      document.activeElement !== document.body ||
+      dialog.current?.open
+    )
+      return;
+    const heading = studioHeading.current;
+    if (heading?.isConnected && heading.getClientRects().length)
+      heading.focus();
+  }, [error]);
   useEffect(() => {
     setConfirmationVisible(Boolean(message));
     if (!message) return;
@@ -657,7 +698,7 @@ export function CreatorAI({
         ?.querySelector<HTMLButtonElement>("#w2-confirm-cancel")
         ?.focus();
     } else if (!confirmation && dialog.current?.open) dialog.current.close();
-  }, [confirmation]);
+  }, [confirmation, setError]);
   useEffect(() => {
     if (!state || !["test", "versions"].includes(current)) return;
     let cancelled = false;
@@ -843,7 +884,9 @@ export function CreatorAI({
               ? "CREATOR STUDIO"
               : `MY AI${dirty ? " · UNSAVED DRAFT" : ""}`}
         </span>
-        <h1>{titleFor[current]}</h1>
+        <h1 ref={studioHeading} tabIndex={-1}>
+          {titleFor[current]}
+        </h1>
       </div>
       {![
         "overview",
