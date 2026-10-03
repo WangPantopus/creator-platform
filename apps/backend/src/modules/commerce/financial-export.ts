@@ -444,10 +444,16 @@ export async function exportCommerceFinancial(
     );
     assertCommercePrivacyScope(scope, service.pool, input);
     await writer.assertCurrent();
+    assertCommercePrivacyScope(scope, service.pool, input);
     const artifact = await writer.complete({
       recordCounts: counts,
       sha256: hash.digest("hex"),
     });
+    // A late writer response must not escape the original cancellation into
+    // a receipt. Keep this check inside the writer's actual abort catch.
+    assertCommercePrivacyScope(scope, service.pool, input);
+    await writer.assertCurrent();
+    assertCommercePrivacyScope(scope, service.pool, input);
     return {
       receipt: {
         jobId: input.jobId,
