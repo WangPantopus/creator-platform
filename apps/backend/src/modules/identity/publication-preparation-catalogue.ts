@@ -10,7 +10,7 @@ export const publicationPreparationSource = Object.freeze({
   name: "w1_publication_preparation",
   path: "apps/backend/src/modules/identity/schema-publication-preparation.sql",
   owner: "W1",
-  checksum: "4afa4bc72f265bfb1415aa0f701435475f88ed46bbd6cd539bfd333695ba0fa6",
+  checksum: "2dd70a0a3552afe2ae24244fb4f0a2082a5890712834b4c7ac2fee468717cc19",
 });
 
 export const publicationPreparationCatalogueQuery = `WITH roles AS (

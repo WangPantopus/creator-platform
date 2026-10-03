@@ -19,7 +19,15 @@ DO $$ BEGIN
  IF to_regprocedure('creator.begin_publication_scope(uuid,uuid,integer,uuid,uuid,text,text)') IS NULL
   OR to_regprocedure('creator.prepare_commerce_fulfillment_publication(uuid,uuid,integer,uuid,uuid)') IS NULL
   OR to_regprocedure('creator_trust.fulfillment_publication_denial(uuid)') IS NULL
+  OR to_regprocedure('creator.fence_signature_metadata_write()') IS NULL
  THEN RAISE EXCEPTION 'Original0158/0204/0205 source required'; END IF;
+ IF (SELECT count(*) FROM pg_trigger t JOIN pg_proc p ON p.oid=t.tgfoid
+  WHERE NOT t.tgisinternal AND t.tgenabled='O' AND t.tgtype=25
+   AND t.tgname='fence_signature_metadata_write' AND pg_get_userbyid(p.proowner)='creator_owner'
+   AND t.tgrelid=ANY(ARRAY['creator.creator_profile'::regclass,'creator.passkey_credential'::regclass,
+    'creator.signed_act'::regclass,'creator.signed_act_consumption'::regclass,
+    'creator.signed_publication'::regclass,'creator.signed_verification'::regclass]))<>6 THEN
+  RAISE EXCEPTION 'All original signature metadata write fences required'; END IF;
 END $$;
 SET LOCAL ROLE creator_owner;
 CREATE TABLE creator.publication_preparation (
@@ -49,7 +57,6 @@ CREATE POLICY publication_preparation_owner ON creator.publication_preparation
   AND transaction_id=pg_current_xact_id() AND login_name=session_user);
 GRANT SELECT,INSERT,UPDATE,DELETE ON creator.publication_preparation TO creator_publication_authority;
 GRANT SELECT(version,checksum) ON creator.schema_migration TO creator_publication_authority;
-GRANT SELECT(version,checksum) ON creator.schema_migration TO creator_publication_worker;
 -- PostgreSQL requires an UPDATE privilege/policy for a row-locking read.
 -- WITH CHECK false forbids an actual revision edit under this purpose.
 GRANT UPDATE(content_id) ON creator.content_revision TO creator_publication_authority;
@@ -90,6 +97,10 @@ DECLARE header record; owner_account uuid; stored_hash text; n uuid; t uuid; f u
  original_expiry timestamptz=clock_timestamp()+interval '5 minutes'; family_expiry timestamptz;
 BEGIN
  IF session_user<>'creator_publication_worker' OR current_setting('transaction_isolation')<>'read committed'
+  OR nullif(current_setting('app.account_id',true),'') IS NOT NULL
+  OR nullif(current_setting('app.identity_session_id',true),'') IS NOT NULL
+  OR nullif(current_setting('app.creator_id',true),'') IS NOT NULL
+  OR nullif(current_setting('app.fan_id',true),'') IS NOT NULL
   OR c IS NULL OR o IS NULL OR v IS NULL OR v<1 OR p IS NULL
   OR nullif(current_setting('publication.scope_id',true),'') IS NOT NULL
   OR EXISTS(SELECT FROM creator.publication_preparation)
@@ -185,6 +196,26 @@ BEGIN
  IF NOT FOUND THEN RAISE EXCEPTION 'Original bound preparation ended' USING ERRCODE='42501'; END IF;
 END $$;
 
+-- Private213 RLS predicate. Derive the one original held tuple internally;
+-- never accept or export a private nonce/token, GUC alias or original body.
+CREATE FUNCTION creator.publication_preparation_original_family_bound(c uuid,p uuid,f uuid,t uuid)
+RETURNS boolean LANGUAGE sql VOLATILE SECURITY DEFINER SET search_path=pg_catalog AS $$
+ SELECT session_user='creator_publication_worker' AND current_setting('transaction_isolation')='read committed'
+  AND c IS NOT NULL AND p IS NOT NULL AND f IS NOT NULL AND t IS NOT NULL
+  AND EXISTS(SELECT FROM creator.publication_preparation x
+   JOIN creator.publication_worker_scope issued ON issued.id=x.publication_nonce
+   CROSS JOIN LATERAL jsonb_array_elements(x.original_families) family
+   WHERE x.creator_id=c AND x.phase IN('bound','finalizing') AND x.fulfillment_nonce IS NOT NULL
+    AND x.backend_pid=pg_backend_pid() AND x.transaction_id=pg_current_xact_id() AND x.login_name=session_user
+    AND x.expires_at>clock_timestamp() AND issued.id=nullif(current_setting('publication.scope_id',true),'')::uuid
+    AND issued.backend_pid=x.backend_pid AND issued.transaction_id=x.transaction_id AND issued.login_name=x.login_name
+    AND issued.creator_id=x.creator_id AND issued.content_id=x.content_id AND issued.version=x.version
+    AND issued.publisher_account_id=x.publisher_account_id AND issued.signed_act_id=x.signed_act_id
+    AND issued.command_hash=x.command_hash AND issued.command=x.command
+    AND family->>'creator_id'=c::text AND family->>'packet_id'=p::text
+    AND family->>'fan_id'=f::text AND family->>'thread_id'=t::text)
+$$;
+
 CREATE FUNCTION creator.prepared_publication_matches(n uuid,t uuid) RETURNS boolean
 LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path=pg_catalog AS $$
 DECLARE held creator.publication_preparation%ROWTYPE;
@@ -199,11 +230,13 @@ END $$;
 
 CREATE FUNCTION creator.finish_prepared_publication(n uuid,t uuid) RETURNS boolean
 LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path=pg_catalog AS $$
-DECLARE held creator.publication_preparation%ROWTYPE; allowed boolean;
+DECLARE held creator.publication_preparation%ROWTYPE; allowed boolean; owner_account uuid; signer uuid;
 BEGIN
  IF NOT creator.prepared_publication_matches(n,t) THEN
   RAISE EXCEPTION 'Original bound publication required' USING ERRCODE='42501'; END IF;
  SELECT * INTO held FROM creator.publication_preparation x WHERE x.nonce=n AND x.token=t;
+ SELECT account_id INTO owner_account FROM creator.creator_profile WHERE id=held.creator_id;
+ IF owner_account IS NULL THEN RAISE EXCEPTION 'Original publication creator missing' USING ERRCODE='42501'; END IF;
  -- The exact immutable revision has already been checked against the original
  -- signed command while204 is present. Hold its row before ending body access.
  PERFORM 1 FROM creator.content_revision r WHERE r.creator_id=held.creator_id AND r.content_id=held.content_id
@@ -225,6 +258,13 @@ BEGIN
  IF NOT FOUND OR held.expires_at<=clock_timestamp()
   OR creator_trust.publication_worker_denial(held.creator_id,held.publisher_account_id) IS DISTINCT FROM 'allowed' THEN
   RAISE EXCEPTION 'Original publication currentness ended' USING ERRCODE='42501'; END IF;
+ -- Execute original deferred cleanup before the last current read, and retain
+ -- the actual0167 write/read account fence without waiting below domain locks.
+ SET CONSTRAINTS ALL IMMEDIATE;
+ FOR signer IN SELECT DISTINCT account FROM unnest(ARRAY[owner_account,held.publisher_account_id]) account ORDER BY account LOOP
+  IF NOT pg_try_advisory_xact_lock_shared(hashtextextended('identity.signature-account:'||signer::text,0)) THEN
+   RAISE EXCEPTION 'Signature metadata is updating' USING ERRCODE='55P03'; END IF;
+ END LOOP;
  -- LAST current domain/signature read: immutable revision stays locked; the
  -- current version, publisher, creator/key and exact consumed signed command
  -- cannot be replaced by a cached body proof after cleanup. Only RETURN/COMMIT.
@@ -238,7 +278,13 @@ BEGIN
   LEFT JOIN creator.signed_verification verification ON verification.id=sa.id AND verification.account_id=sa.account_id AND verification.creator_id=sa.creator_id
   WHERE i.id=held.content_id AND i.creator_id=held.creator_id AND i.version=held.version AND i.kind=held.kind
    AND i.packet_id IS NOT DISTINCT FROM held.packet_id AND i.state IN('scheduled','media_pending','published') AND i.withdrawn_at IS NULL
-   AND cp.verification='verified' AND NOT cp.recovery_required AND pub.author_account_id=held.publisher_account_id
+   AND i.audience=held.command->'content'->'document'->'audience'
+   AND pub.media_evidence=coalesce(held.command->'content'->'mediaEvidence','[]'::jsonb)
+   AND i.scheduled_at IS NOT DISTINCT FROM nullif(held.command->'content'->'document'->>'scheduledAt','')::timestamptz
+   AND (i.state<>'published' OR (i.published_at IS NOT NULL AND pub.published_at=i.published_at))
+   AND held.expires_at>clock_timestamp()
+   AND NOT EXISTS(SELECT FROM creator.content_tombstone WHERE account_id IN(owner_account,held.publisher_account_id))
+   AND cp.account_id=owner_account AND cp.verification='verified' AND NOT cp.recovery_required AND pub.author_account_id=held.publisher_account_id
    AND pub.signed_act_id IS NOT DISTINCT FROM held.signed_act_id
    AND EXISTS(SELECT FROM pg_database db WHERE db.datname=current_database() AND db.datconnlimit<>0
     AND shobj_description(db.oid,'pg_database') IS DISTINCT FROM 'creator-platform:restored-traffic-closed')
@@ -261,6 +307,7 @@ DO $$ DECLARE f regprocedure; BEGIN
   'creator.prepare_publication_task(uuid,uuid,integer,uuid,uuid)'::regprocedure,
   'creator.bind_prepared_publication(uuid,uuid,text,text)'::regprocedure,
   'creator.publication_preparation_originals(uuid,uuid)'::regprocedure,
+  'creator.publication_preparation_original_family_bound(uuid,uuid,uuid,uuid)'::regprocedure,
   'creator.prepared_publication_matches(uuid,uuid)'::regprocedure,
   'creator.finish_prepared_publication(uuid,uuid)'::regprocedure]) LOOP
   EXECUTE format('ALTER FUNCTION %s OWNER TO creator_publication_authority',f);

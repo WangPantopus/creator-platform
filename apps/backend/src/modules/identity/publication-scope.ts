@@ -134,6 +134,15 @@ export class PublicationIdentityAuthority {
     );
   }
 
+  /** Preparation must use this issuer's exact separate publication pool. */
+  assertHostPool(pool: Pool): void {
+    invariant(
+      pool === this.pool,
+      "publication_pool_changed",
+      "Use the original configured publication data service.",
+    );
+  }
+
   private async prepare(
     client: PoolClient,
     candidate: z.infer<typeof candidateSchema>,
