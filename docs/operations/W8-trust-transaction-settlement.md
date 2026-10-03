@@ -1,5 +1,11 @@
 # Trust transaction settlement — October 3, 2026 UTC
 
+## Original reply-review error cause — 15:38 UTC
+
+The genuine `trustReplyError` adapter preserves the original non-DomainError as a private, nonenumerable cause while retaining its current public status and message. W5 identified that dropping a real PostgreSQL read-timeout cause could let its consumer attempt savepoint cleanup after an uncertain query. Its consumer repair remains separately owned; this adapter supplies no reply, decision or permission.
+
+W8's private operator used the existing non-owner runtime against the same local PostgreSQL host's maintenance database. An actual read timeout at67ms remains uncertain through the adapter; a completed server cancellation at39ms remains settled. Both preserve the original private cause. The exact clients close with no subsequent SQL, and fresh independent connections observe both original PIDs absent. Fresh before/after reads preserve all six custodies of both the closed original and the closed disposable application copy. Installed privacy scope tables are empty; an absent domain scope table is recorded as absent. No original signed Note, held reply-review task, case decision, delivery or release acceptance follows.
+
 ## Personally operated current signed iOS — 13:30 UTC
 
 W8 personally operated the fresh signed3b iOS artifact against actual shipping-root8c423d937c01fdcabace94848c8eaf45a57c8fa6. The installed executable independently matches the recorded04a4bea7 hash. Actual You → Privacy presents eight saved original jobs with creation times/immutable IDs; the newest994e4ee0 export presents all eight saved task states. Warm backend stop followed by actual native Refresh conceals jobs/details and disables requests; same-source restart and actual Refresh recover the original list/detail. Automatic concealment before Refresh was not qualified. W3's later direct observation finds stale native details before Refresh and remains a current source gap.
