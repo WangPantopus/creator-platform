@@ -5,7 +5,7 @@ import { sameRequestOrigin } from "../../../../lib/request-origin";
 
 const uuid = "[a-f0-9-]{36}";
 const permitted = new RegExp(
-  `^(?:capabilities|account|realtime-ticket|begin|${uuid}/${uuid}(?:/(?:events|memory(?:/${uuid})?|preferences|consent|presence|usage|messages|audit|fan-replies|team-replies|recordings|citations/${uuid}|messages/${uuid}(?:/dont-remember|/feedback|/corrections)?|messages/status(?:/[^/]{8,128})?))?)$`,
+  `^(?:capabilities|account|realtime-ticket|begin|${uuid}/${uuid}(?:/(?:events|offline|intro-offer(?:/acknowledgement)?|memory(?:/${uuid})?|preferences|consent|presence|usage|messages|audit|fan-replies|team-replies|recordings|citations/${uuid}|messages/${uuid}(?:/dont-remember|/feedback|/corrections)?|messages/status(?:/[^/]{8,128})?))?)$`,
   "u",
 );
 async function proxy(
@@ -34,6 +34,20 @@ async function proxy(
       { status: 400 },
     );
   try {
+    const expectedSessionHeader = req.headers.get("X-Expected-Session-Id");
+    const expectedSession = expectedSessionHeader
+      ? IdSchema.safeParse(expectedSessionHeader)
+      : undefined;
+    if (expectedSession && !expectedSession.success)
+      return Response.json(
+        {
+          error: {
+            code: "session_view_required",
+            message: "Reopen this page with your current session.",
+          },
+        },
+        { status: 400, headers: { "Cache-Control": "no-store" } },
+      );
     if (joined !== "capabilities") {
       const expectedAccount = IdSchema.safeParse(
         req.headers.get("X-Expected-Account-Id"),
@@ -56,15 +70,26 @@ async function proxy(
           status: current.status,
           headers: { "Cache-Control": "no-store" },
         });
-      if (
-        SessionSchema.parse(await current.json()).accountId !==
-        expectedAccount.data
-      )
+      const original = SessionSchema.parse(await current.json());
+      if (original.accountId !== expectedAccount.data)
         return Response.json(
           {
             error: {
               code: "session_account_changed",
               message: "Your account changed. Reopen this page to continue.",
+            },
+          },
+          { status: 409, headers: { "Cache-Control": "no-store" } },
+        );
+      if (
+        expectedSession?.success &&
+        original.sessionId !== expectedSession.data
+      )
+        return Response.json(
+          {
+            error: {
+              code: "session_view_changed",
+              message: "Your session changed. Reopen this page to continue.",
             },
           },
           { status: 409, headers: { "Cache-Control": "no-store" } },
@@ -82,6 +107,9 @@ async function proxy(
                 "X-Expected-Account-Id": req.headers.get(
                   "X-Expected-Account-Id",
                 )!,
+                ...(expectedSession?.success
+                  ? { "X-Expected-Session-Id": expectedSession.data }
+                  : {}),
               }
             : {}),
           ...(req.method === "GET"
@@ -131,7 +159,7 @@ async function proxy(
             "Reconnect to refresh this conversation. Your input has been kept.",
         },
       },
-      { status: 503 },
+      { status: 503, headers: { "Cache-Control": "no-store" } },
     );
   }
 }

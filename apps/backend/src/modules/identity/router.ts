@@ -73,6 +73,9 @@ export function createIdentityRouter(
   router.post("/fan-profile", async (req, res) =>
     res.json(await runtime.profiles.saveFan(await actor(req), req.body)),
   );
+  router.post("/fan-profile/intro", async (req, res) =>
+    res.json(await runtime.profiles.saveFanIntro(await actor(req), req.body)),
+  );
   router.post("/creator-profile", async (req, res) =>
     res.json(await runtime.profiles.saveCreator(await actor(req), req.body)),
   );

@@ -9,6 +9,7 @@ import {
   type PrivacyArtifactStore,
 } from "./privacy-export.js";
 import { DomainError } from "../../core/errors.js";
+import { trustTransaction } from "./transaction.js";
 
 type Task = {
   job_id: string;
@@ -147,9 +148,11 @@ export class TrustWorker {
   private async runTask(task: Task) {
     const hook = this.privacyHooks.find((h) => h.domain === task.domain);
     if (!hook) {
-      await this.pool.query(
-        "UPDATE creator_trust.privacy_task SET state='blocked',error_code='domain_hook_unavailable',lease_until=NULL WHERE job_id=$1 AND domain=$2 AND lease_token=$3",
-        [task.job_id, task.domain, task.lease_token],
+      await trustTransaction(this.pool, (client) =>
+        client.query(
+          "UPDATE creator_trust.privacy_task SET state='blocked',error_code='domain_hook_unavailable',lease_until=NULL WHERE job_id=$1 AND domain=$2 AND lease_token=$3 AND state='running'",
+          [task.job_id, task.domain, task.lease_token],
+        ),
       );
       return;
     }
@@ -201,9 +204,9 @@ export class TrustWorker {
         throw new Error("export_artifact_missing");
       const size = Buffer.byteLength(JSON.stringify(result));
       if (size > 4 * 1024 * 1024) throw new Error("artifact_too_large");
-      const client = await this.pool.connect();
-      try {
-        await client.query("BEGIN");
+      // Acknowledgment has its own real host budget within the original lease.
+      // A lost COMMIT response must not downgrade a durable completed task.
+      await trustTransaction(this.pool, async (client) => {
         const fenced = await client.query(
           "SELECT 1 FROM creator_trust.privacy_task WHERE job_id=$1 AND domain=$2 AND lease_token=$3 AND state='running' AND lease_until>clock_timestamp() FOR UPDATE",
           [task.job_id, task.domain, task.lease_token],
@@ -233,24 +236,25 @@ export class TrustWorker {
             ],
           );
         }
-        await client.query("COMMIT");
-      } catch (error) {
-        await client.query("ROLLBACK");
-        throw error;
-      } finally {
-        client.release();
-      }
+      });
     } catch (error) {
       const unavailable = [
         "privacy_artifact_unconfigured",
         "privacy_commit_fence_unavailable",
         "privacy_ownership_missing",
+        "privacy_original_family_unavailable",
         "growth_held_authority_unavailable",
         "restoration_pending",
         "conversation_privacy_unavailable",
+        "agent_privacy_unavailable",
+        "agent_lifecycle_composition_mismatch",
+        "privacy_export_pool_mismatch",
         "conversation_lineage_unavailable",
         "conversation_recordings_unavailable",
         "conversation_accounting_unavailable",
+        "conversation_provenance_purge_unavailable",
+        "conversation_provenance_purge_pool_unconfigured",
+        "conversation_provenance_purge_owner_changed",
         "conversation_retention_unavailable",
         "identity_retention_unconfigured",
         "identity_scope_adapter_required",
@@ -268,31 +272,47 @@ export class TrustWorker {
           "hook_timeout",
           "privacy_family_cancel_unavailable",
           "privacy_family_rollback_unavailable",
+          "conversation_delete_cancel_unavailable",
+          "conversation_delete_rollback_unavailable",
+          "conversation_delete_release_unavailable",
+          "conversation_provenance_purge_cleanup_unavailable",
+          "conversation_provenance_purge_receipt_unavailable",
+          "conversation_export_cancel_unavailable",
+          "conversation_export_rollback_unavailable",
+          "conversation_export_release_unavailable",
           "artifact_too_large",
           "receipt_invalid",
           "export_artifact_missing",
           "export_stream_invalid",
           "export_stream_incomplete",
           "export_artifact_invalid",
+          "privacy_artifact_unconfigured",
+          "privacy_commit_fence_unavailable",
+          "trust_connection_budget_unavailable",
+          "trust_transaction_unavailable",
+          "trust_client_settlement_unavailable",
         ].includes(message)
           ? message
           : "domain_hook_error";
-      await this.pool.query(
-        "UPDATE creator_trust.privacy_task SET state=$4,error_code=$5,lease_until=NULL,available_at=now()+make_interval(secs=>$6) WHERE job_id=$1 AND domain=$2 AND lease_token=$3",
-        [
-          task.job_id,
-          task.domain,
-          task.lease_token,
-          unavailable.includes(code)
-            ? "blocked"
-            : task.attempts >= 8
-              ? "dead_letter"
-              : "retry",
-          code,
-          Math.min(3600, 2 ** task.attempts * 5),
-        ],
+      const saved = await trustTransaction(this.pool, (client) =>
+        client.query(
+          "UPDATE creator_trust.privacy_task SET state=$4,error_code=$5,lease_until=NULL,available_at=now()+make_interval(secs=>$6) WHERE job_id=$1 AND domain=$2 AND lease_token=$3 AND state='running'",
+          [
+            task.job_id,
+            task.domain,
+            task.lease_token,
+            unavailable.includes(code)
+              ? "blocked"
+              : task.attempts >= 8
+                ? "dead_letter"
+                : "retry",
+            code,
+            Math.min(3600, 2 ** task.attempts * 5),
+          ],
+        ),
       );
-      if (!unavailable.includes(code)) this.observe("privacy_retry", 1);
+      if (saved.rowCount && !unavailable.includes(code))
+        this.observe("privacy_retry", 1);
     }
   }
   private async claimEffects(): Promise<Effect[]> {
@@ -309,9 +329,11 @@ export class TrustWorker {
   private async runEffect(effect: Effect) {
     const hook = this.effectHooks.find((h) => h.type === effect.type);
     if (!hook) {
-      await this.pool.query(
-        "UPDATE creator_trust.effect SET state='blocked',error_code='effect_hook_unavailable',lease_until=NULL WHERE id=$1 AND lease_token=$2",
-        [effect.id, effect.lease_token],
+      await trustTransaction(this.pool, (client) =>
+        client.query(
+          "UPDATE creator_trust.effect SET state='blocked',error_code='effect_hook_unavailable',lease_until=NULL WHERE id=$1 AND lease_token=$2 AND state='running'",
+          [effect.id, effect.lease_token],
+        ),
       );
       return;
     }
@@ -329,9 +351,7 @@ export class TrustWorker {
         45_000,
       );
       receipt(result.receipt);
-      const client = await this.pool.connect();
-      try {
-        await client.query("BEGIN");
+      await trustTransaction(this.pool, async (client) => {
         const done = await client.query(
           "UPDATE creator_trust.effect SET state='complete',receipt=$3,lease_until=NULL,error_code=NULL WHERE id=$1 AND lease_token=$2 AND state='running' AND lease_until>clock_timestamp() RETURNING case_id",
           [effect.id, effect.lease_token, JSON.stringify(result.receipt)],
@@ -363,28 +383,32 @@ export class TrustWorker {
                 ],
               );
         }
-        await client.query("COMMIT");
-      } catch (error) {
-        await client.query("ROLLBACK");
-        throw error;
-      } finally {
-        client.release();
-      }
+      });
     } catch (error) {
       const code =
         error instanceof Error &&
-        ["hook_timeout", "receipt_invalid"].includes(error.message)
-          ? error.message
-          : "effect_hook_error";
-      await this.pool.query(
-        "UPDATE creator_trust.effect SET state=$3,error_code=$5,lease_until=NULL,available_at=now()+make_interval(secs=>$4) WHERE id=$1 AND lease_token=$2",
         [
-          effect.id,
-          effect.lease_token,
-          effect.attempts >= 8 ? "dead_letter" : "retry",
-          Math.min(3600, 2 ** effect.attempts * 5),
-          code,
-        ],
+          "hook_timeout",
+          "receipt_invalid",
+          "trust_connection_budget_unavailable",
+          "trust_transaction_unavailable",
+          "trust_client_settlement_unavailable",
+        ].includes(error instanceof DomainError ? error.code : error.message)
+          ? error instanceof DomainError
+            ? error.code
+            : error.message
+          : "effect_hook_error";
+      await trustTransaction(this.pool, (client) =>
+        client.query(
+          "UPDATE creator_trust.effect SET state=$3,error_code=$5,lease_until=NULL,available_at=now()+make_interval(secs=>$4) WHERE id=$1 AND lease_token=$2 AND state='running'",
+          [
+            effect.id,
+            effect.lease_token,
+            effect.attempts >= 8 ? "dead_letter" : "retry",
+            Math.min(3600, 2 ** effect.attempts * 5),
+            code,
+          ],
+        ),
       );
     }
   }

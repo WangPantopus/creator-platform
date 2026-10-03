@@ -6,6 +6,7 @@ import {
   ErrorState,
   TrustError,
   TrustSession,
+  type TrustSessionState,
   useTrust,
   useTrustSession,
   trustApi,
@@ -16,14 +17,17 @@ import {
 function Job({
   id,
   available,
+  readEnabled,
   onReadError,
 }: {
   id: string;
   available: boolean;
+  readEnabled: boolean;
   onReadError: (id: string, error: TrustError | null) => void;
 }) {
   const { data, error, loading, refresh } = useTrust<PrivacyJobView>(
     `privacy/jobs/${id}`,
+    readEnabled,
   );
   const [actionError, setError] = useState<TrustError | null>(null);
   const [busy, setBusy] = useState(false);
@@ -137,18 +141,21 @@ function Job({
   );
 }
 export default function PrivacyPage() {
-  const { data, error, loading, refresh } = useTrust<{
-    items: PrivacyJobView[];
-  }>("privacy/jobs");
+  const [sessionState, setSessionState] = useState<TrustSessionState>({
+    ready: false,
+    error: null,
+  });
   const capability = useTrust<{
     localDevelopment: boolean;
     actorVerification: string;
     verificationMethod?: string;
   }>("capabilities");
-  const [sessionState, setSessionState] = useState<{
-    ready: boolean;
-    error: TrustError | null;
-  }>({ ready: false, error: null });
+  // A read failure blocks actions, but must not toggle its own request gate.
+  // Only the original session/capability checks enable private reads again.
+  const privateReadsEnabled = sessionState.ready && !capability.error;
+  const { data, error, loading, refresh } = useTrust<{
+    items: PrivacyJobView[];
+  }>("privacy/jobs", privateReadsEnabled);
   const [jobErrors, setJobErrors] = useState<Record<string, TrustError>>({});
   const onReadError = useCallback((id: string, error: TrustError | null) => {
     setJobErrors((current) => {
@@ -196,6 +203,9 @@ export default function PrivacyPage() {
     setSessionState({ ready: false, error: null });
     setJobErrors({});
   });
+  useEffect(() => {
+    if (!verificationReady) dialog.current?.close();
+  }, [verificationReady]);
   const run = async () => {
     if (!verificationReady || busy) return;
     const current = epoch.current;
@@ -395,6 +405,7 @@ export default function PrivacyPage() {
             key={job.id}
             id={job.id}
             available={readsReady}
+            readEnabled={privateReadsEnabled}
             onReadError={onReadError}
           />
         ))}

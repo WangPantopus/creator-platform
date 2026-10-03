@@ -56,7 +56,11 @@ export function PreferenceForm({
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false),
     [requiresSignIn, setRequiresSignIn] = useState(false),
-    [invalid, setInvalid] = useState({ quietHours: false, timeZone: false });
+    [invalid, setInvalid] = useState({
+      quietHours: false,
+      quietFormat: false,
+      timeZone: false,
+    });
   const fromInput = useRef<HTMLInputElement>(null),
     untilInput = useRef<HTMLInputElement>(null),
     zoneInput = useRef<HTMLInputElement>(null),
@@ -69,6 +73,10 @@ export function PreferenceForm({
         "quietStart" in patch || "quietEnd" in patch
           ? false
           : current.quietHours,
+      quietFormat:
+        "quietStart" in patch || "quietEnd" in patch
+          ? false
+          : current.quietFormat,
       timeZone: "timeZone" in patch ? false : current.timeZone,
     }));
   };
@@ -79,18 +87,35 @@ export function PreferenceForm({
         event.preventDefault();
         if (busy) return;
         setMessage("");
-        const quietHours =
-          (value.quietStart === null) !== (value.quietEnd === null);
+        // Native time controls and browser autofill can change their visible
+        // values before React's change event. Save the actual controls once,
+        // then validate and submit that same snapshot.
+        const start = fromInput.current?.value ?? time(value.quietStart);
+        const end = untilInput.current?.value ?? time(value.quietEnd);
+        const quietFormat = [start, end].some(
+          (input) =>
+            input !== "" && !/^(?:[01]\d|2[0-3]):[0-5]\d$/u.test(input),
+        );
+        const quietHours = quietFormat || (start === "") !== (end === "");
+        const submitted = {
+          ...value,
+          quietStart: minutes(start),
+          quietEnd: minutes(end),
+          timeZone: zoneInput.current?.value ?? value.timeZone,
+        };
         let timeZone = false;
         try {
-          new Intl.DateTimeFormat("en", { timeZone: value.timeZone });
+          new Intl.DateTimeFormat("en", { timeZone: submitted.timeZone });
         } catch {
           timeZone = true;
         }
-        setInvalid({ quietHours, timeZone });
+        // Keep the rejected visible snapshot editable too. Rendering an error
+        // must not restore an older controlled value over a cleared boundary.
+        setValue(submitted);
+        setInvalid({ quietHours, quietFormat, timeZone });
         if (quietHours || timeZone) {
           const input = quietHours
-            ? value.quietStart === null
+            ? start === "" || quietFormat
               ? fromInput
               : untilInput
             : zoneInput;
@@ -100,7 +125,7 @@ export function PreferenceForm({
         setBusy(true);
         setRequiresSignIn(false);
         try {
-          await mutate("preferences", value, "PUT");
+          await mutate("preferences", submitted, "PUT");
           setMessage(
             growthCopy.growthPreferencesSavedYourInAppRecordRemainsAvailable,
           );
@@ -178,7 +203,9 @@ export function PreferenceForm({
         </label>
         {invalid.quietHours && (
           <p id={`${errorId}-quiet`} role="alert" className="growth-error">
-            {growthCopy.growthErrorQuietHoursPair}
+            {invalid.quietFormat
+              ? growthCopy.growthErrorQuietHoursFormat
+              : growthCopy.growthErrorQuietHoursPair}
           </p>
         )}
         <label>

@@ -1,0 +1,35 @@
+{
+  "at": "2026-10-02T14:31:00Z",
+  "sourceAndroid": "53145b80ec7cb3d2238fc02b34a65ce63063f3ee",
+  "sourceIOS": "f16d1764d41a3d210e13d07cbd25b310f9fdd3b2",
+  "environment": "Mac Studio, JDK21.0.10, AndroidSDK35, Xcode27/iOS27 runtime",
+  "android": {
+    "shippingDebugBuild": "pass",
+    "seconds": 27,
+    "apkSha256": "ea47e0637a901a6d51b5342a7f783b3d5e0b3794d284561983744ae7279f35d6",
+    "effectiveApi": "http://10.0.2.2:4112",
+    "personallyOperatedAtThisBinary": false
+  },
+  "ios": {
+    "canonicalXcodeGen": "pass; camera description generated from project.yml",
+    "normallySignedShippingSimulatorBuild": "pass",
+    "strictDeepCodesign": "pass, valid on disk/designated requirement",
+    "binarySha256": "be3dd5d730ccdcff7bfdaf4fc695f13026406ead3ef8758018f040f81e7da01b",
+    "effectiveApi": "http://127.0.0.1:4112",
+    "effectiveLinkHost": "localhost",
+    "targetUDID": "F802B3F6-9B90-4CE9-9A62-62A16E2A54AC",
+    "targetState": "Shutdown",
+    "personallyOperatedAtThisBinary": false
+  },
+  "failure": {
+    "initialIOSSource": "53145b80",
+    "result": "build65: NativeAvailability.swift63 missing required SecureSessionStorage issuer",
+    "correction": "actual configured origin passed into secure storage, committedf16d1764; rebuild passes"
+  },
+  "buildCustody": "each actual build uses own single-heavy lock; both exact leases normally released",
+  "limits": [
+    "These builds support current runnable source; they do not establish personal native journey acceptance",
+    "No production domain/provider/entitlement or hardware capability inferred",
+    "Original and bounded development DBs remain closed; no native/GUI lease held"
+  ]
+}

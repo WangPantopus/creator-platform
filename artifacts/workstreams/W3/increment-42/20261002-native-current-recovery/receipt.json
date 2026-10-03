@@ -1,0 +1,45 @@
+{
+  "source": "6db5c73dc6826a6612e44a3be0c2cccdd8f9c2f0",
+  "branch": "codex/w3-generation-host",
+  "personallyOperated": true,
+  "platform": "Android",
+  "device": "emulator-5584",
+  "api": "http://10.0.2.2:4103",
+  "sameBackend": "creator-platform-w3-20261001 / creator_w3",
+  "viewportDP": [390, 844],
+  "screens": [
+    "Light 100% You",
+    "Light 100% unreviewed Consent and disabled Start / actual Not now",
+    "Night 200% You",
+    "Night 200% cold API outage",
+    "Night 200% automatic same-account recovery",
+    "Night 200% Requests and return to You",
+    "Night 200% unreviewed Consent provider section"
+  ],
+  "coldOutage": {
+    "savedSessionRetained": true,
+    "accountActionsWithheld": true,
+    "welcomeShown": false,
+    "recoveredHandle": "kilnfire",
+    "manualRetryOperated": false,
+    "automaticCanonicalRefreshOperated": true
+  },
+  "currentBootANRCount": 0,
+  "policyCorrection": {
+    "privateConfigurationOnly": true,
+    "previousVerified": true,
+    "correctedVerified": false,
+    "label": "development-unreviewed-openai-20261001",
+    "noRetention": false,
+    "positiveProviderConsentClaimed": false
+  },
+  "startupMissing": [
+    "named provider policy",
+    "provider model and credentials",
+    "in-transaction denial (W8)",
+    "registered 0077_w2_usage_lineage",
+    "registered 0049_w4_generation_cost_settlement"
+  ],
+  "iOSOperated": false,
+  "fullW3Complete": false
+}

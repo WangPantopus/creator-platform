@@ -1,0 +1,183 @@
+{
+  "recordedAt": "2026-10-01T15:25:43.218273+00:00",
+  "branchChecks": [
+    {
+      "branch": "codex/w1-resume-20261001",
+      "revision": "5944484f2b4f46124ba01ba868a341db2a3ed71b",
+      "checks": [
+        {
+          "existingCommand": [
+            "scripts/generate-shared.mjs",
+            "--check"
+          ],
+          "exitCode": 0,
+          "output": "Verified 12 shared web, Swift and Kotlin resources."
+        },
+        {
+          "existingCommand": [
+            "scripts/generate-native-api.mjs",
+            "--check"
+          ],
+          "exitCode": 0,
+          "output": "Verified Swift/Kotlin API models and 98 operations from OpenAPI."
+        }
+      ]
+    },
+    {
+      "branch": "codex/w1-onboarding-timing-20261001",
+      "revision": "75267e07852603a7947e5125f3d1ddb665876921",
+      "checks": [
+        {
+          "existingCommand": [
+            "scripts/generate-shared.mjs",
+            "--check"
+          ],
+          "exitCode": 0,
+          "output": "Verified 12 shared web, Swift and Kotlin resources."
+        },
+        {
+          "existingCommand": [
+            "scripts/generate-native-api.mjs",
+            "--check"
+          ],
+          "exitCode": 0,
+          "output": "Verified Swift/Kotlin API models and 98 operations from OpenAPI."
+        }
+      ]
+    },
+    {
+      "branch": "codex/w1-comprehension-focus-20261001",
+      "revision": "5a1efef0e8c6aaec020873f21a11edf20c7489b3",
+      "checks": [
+        {
+          "existingCommand": [
+            "scripts/generate-shared.mjs",
+            "--check"
+          ],
+          "exitCode": 0,
+          "output": "Verified 12 shared web, Swift and Kotlin resources."
+        },
+        {
+          "existingCommand": [
+            "scripts/generate-native-api.mjs",
+            "--check"
+          ],
+          "exitCode": 0,
+          "output": "Verified Swift/Kotlin API models and 98 operations from OpenAPI."
+        }
+      ]
+    },
+    {
+      "branch": "codex/w1-generation-efficiency-20261001",
+      "revision": "ffb6b02b35a3684c0e3ab4e0c84dce58e00eb3ef",
+      "checks": [
+        {
+          "existingCommand": [
+            "scripts/generate-shared.mjs",
+            "--check"
+          ],
+          "exitCode": 0,
+          "output": "Verified 12 shared web, Swift and Kotlin resources."
+        },
+        {
+          "existingCommand": [
+            "scripts/generate-native-api.mjs",
+            "--check"
+          ],
+          "exitCode": 0,
+          "output": "Verified Swift/Kotlin API models and 98 operations from OpenAPI."
+        }
+      ]
+    },
+    {
+      "branch": "codex/w1-team-state-20261001",
+      "revision": "a65aa012ee3a28533924038575c2191563f3a39b",
+      "checks": [
+        {
+          "existingCommand": [
+            "scripts/generate-shared.mjs",
+            "--check"
+          ],
+          "exitCode": 0,
+          "output": "Verified 12 shared web, Swift and Kotlin resources."
+        },
+        {
+          "existingCommand": [
+            "scripts/generate-native-api.mjs",
+            "--check"
+          ],
+          "exitCode": 0,
+          "output": "Verified Swift/Kotlin API models and 98 operations from OpenAPI."
+        }
+      ]
+    },
+    {
+      "branch": "codex/w1-home-host-20261001",
+      "revision": "f17620c3265838202b97f97bf12b5bb011419f2f",
+      "checks": [
+        {
+          "existingCommand": [
+            "scripts/generate-shared.mjs",
+            "--check"
+          ],
+          "exitCode": 0,
+          "output": "Verified 12 shared web, Swift and Kotlin resources."
+        },
+        {
+          "existingCommand": [
+            "scripts/generate-native-api.mjs",
+            "--check"
+          ],
+          "exitCode": 0,
+          "output": "Verified Swift/Kotlin API models and 98 operations from OpenAPI."
+        }
+      ]
+    },
+    {
+      "branch": "codex/w1-signing-authority-20261001",
+      "revision": "d2b3b95dab25c0f8642080cef1593e2376783fbb",
+      "checks": [
+        {
+          "existingCommand": [
+            "scripts/generate-shared.mjs",
+            "--check"
+          ],
+          "exitCode": 0,
+          "output": "Verified 12 shared web, Swift and Kotlin resources."
+        },
+        {
+          "existingCommand": [
+            "scripts/generate-native-api.mjs",
+            "--check"
+          ],
+          "exitCode": 0,
+          "output": "Verified Swift/Kotlin API models and 98 operations from OpenAPI."
+        }
+      ]
+    },
+    {
+      "branch": "codex/w1-native-verification-20261001",
+      "revision": "74b19ae55885d51b8d07c186411519440de6c854",
+      "checks": [
+        {
+          "existingCommand": [
+            "scripts/generate-shared.mjs",
+            "--check"
+          ],
+          "exitCode": 0,
+          "output": "Verified 12 shared web, Swift and Kotlin resources."
+        },
+        {
+          "existingCommand": [
+            "scripts/generate-native-api.mjs",
+            "--check"
+          ],
+          "exitCode": 0,
+          "output": "Verified Swift/Kotlin API models and 98 operations from OpenAPI."
+        }
+      ]
+    }
+  ],
+  "qualification": "Existing canonical byte-consistency checks only. No new tests/scripts, package install, consumer/compiler build, app runtime or device. Actual app/rename/CI acceptance remains pending.",
+  "mainSnapshot": "c1c615e6ece53bff4bc6a47d7f4d332757df1295"
+}

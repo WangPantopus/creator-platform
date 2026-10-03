@@ -3,6 +3,7 @@ import type { Pool, PoolClient } from "pg";
 import {
   CreatorProfileInputSchema,
   FanProfileInputSchema,
+  FanIntroInputSchema,
   ProofInputSchema,
   ProofSubmitSchema,
   TeamInviteSchema,
@@ -107,6 +108,31 @@ export class IdentityProfiles {
         return result.rows[0];
       }),
     );
+  }
+  async saveFanIntro(actor: Actor, input: unknown) {
+    const body = FanIntroInputSchema.parse(input);
+    return identityTransaction(this.pool, actor.accountId, async (client) => {
+      await client.query(
+        "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+        [actor.accountId],
+      );
+      const saved = await client.query(
+        "UPDATE creator.fan_profile SET intro=$2,version=version+1 WHERE account_id=$1 AND version=$3 RETURNING id,handle,intro,version",
+        [actor.accountId, body.intro, body.expectedVersion],
+      );
+      if (saved.rows[0]) return saved.rows[0];
+      const current = await client.query(
+        "SELECT id,handle,intro,version FROM creator.fan_profile WHERE account_id=$1",
+        [actor.accountId],
+      );
+      // A lost Save response can be retried without overwriting a later edit.
+      if (current.rows[0]?.intro === body.intro) return current.rows[0];
+      throw new DomainError(
+        "fan_profile_changed",
+        "Your profile changed. Reopen your intro to review it. Your input is kept.",
+        409,
+      );
+    });
   }
   async requireCreator(client: PoolClient, actor: Actor, creatorId: string) {
     const result = await client.query(

@@ -42,7 +42,9 @@ export class PasskeyService {
     invariant(
       proof.rowCount,
       "fresh_proof_required",
-      "Fresh external creator proof is required for credential recovery.",
+      creator.recovery_started_at
+        ? "Fresh external creator proof is required for credential recovery."
+        : "Approved external creator proof is required before registering a signing passkey.",
     );
     return creator;
   }

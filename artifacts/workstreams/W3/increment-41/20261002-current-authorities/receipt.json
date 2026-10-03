@@ -1,0 +1,65 @@
+{
+  "source": "641c9f116b0508399f1fc73d5aba3bc09cc43102",
+  "branch": "codex/w3-generation-host",
+  "capturedAt": "2026-10-02T11:08:05.682264+00:00",
+  "mainIntegrated": "5b597230b27c156baa0badb5b2db495817309eea",
+  "privacyReconciliation": "72e2937c242ff07e156f2475f2f4d5e67d14b052",
+  "producers": {
+    "W8": "bfe831bdee7f609f5bcf789cf9eecf455c3a5393",
+    "W2": "91c101e4b86bd0d8cab3af4ec3fa4333cfe69588",
+    "W1Navigation": "55058f90a4d22b72df4766fe928abc2e86d9f258",
+    "W3PrivacyConsumer": "4c3b832a04b606b2aa2ced6c08bce54f6a28cd98",
+    "W3NativeConsent": "948e20a6d7e9f1db2f58a9eb5a2dbb2f4bfc7e69"
+  },
+  "checks": {
+    "backendTypecheck": true,
+    "webTypecheck": true,
+    "generatedCheck": true,
+    "affectedLint": true,
+    "affectedFormatting": true,
+    "diffCheck": true
+  },
+  "runtime": {
+    "apiPort": 4103,
+    "webPort": 3003,
+    "database": "creator_w3",
+    "container": "creator-platform-w3-20261001",
+    "registeredMigrations": 40,
+    "lastMigration": "0043_w8_relationship_backfill",
+    "GrowthEnabled": true,
+    "fanGenerationAvailable": false,
+    "missing": [
+      "provider model and credentials",
+      "in-transaction denial (W8)",
+      "registered 0077_w2_usage_lineage",
+      "registered 0049_w4_generation_cost_settlement"
+    ]
+  },
+  "personallyOperated": {
+    "web": {
+      "builtInTab": "6",
+      "savedFan": "kilnfire",
+      "profileReturned": true,
+      "discoveryNoEligibleCreators": true,
+      "privacyRequestEnabled": false,
+      "notificationSaveVisible": "Preferences saved. Your in-app record remains available.",
+      "notificationReloadQuietHours": [
+        "22:00",
+        "08:00"
+      ],
+      "notificationTimezone": "America/Los_Angeles",
+      "phoneViewport": [
+        390,
+        844
+      ],
+      "initialDesktopViewport": [
+        1280,
+        720
+      ]
+    },
+    "iosCurrentSource": false,
+    "androidCurrentSource": false
+  },
+  "nativePending": "Current binaries built; both emulator slots occupied by peer streams. iOS input permission/documented CUA remains unresolved. No peer-operated evidence borrowed.",
+  "scopeComplete": false
+}

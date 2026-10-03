@@ -1,0 +1,269 @@
+{
+  "recordedAt": "2026-10-02T10:49:33.559612+00:00",
+  "baseHead": "2dceb35e1b35ccbbd1563b31c386b3ecfa358906",
+  "sources": [
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt",
+      "sha256": "d3caf24c9fb827c32276538c5962934400f423ce628d629baaf1961358eaf4f8"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/Growth.kt",
+      "sha256": "036f827d06502d000f3e5bcfe487eb2aab2174603f30ff4138c802834db8eaab"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/GrowthPush.kt",
+      "sha256": "16a08af23d2ef8f903a531750f8e528c2ae8559c245ad220b8c3e232e4384e5c"
+    },
+    {
+      "path": "apps/android/app/src/main/res/values/strings.xml",
+      "sha256": "193cd669ba7f751081166bf779c857662e1254ef15a6ffc40983ca71a49cb3ee"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/configured.ts",
+      "sha256": "1908e0541f4c5b9b25ccf2fad946c848463e1ba0ec13d68c4111e1f57fd2568e"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/contracts.ts",
+      "sha256": "b9da970318fb39655194a6bedc4d346cc79cc099c7405ea7e7bd0e52f1a53922"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/erasure.ts",
+      "sha256": "cef736dea700553f7ca38c7b601e38700d7091057a18f33804b00ecdee49ec97"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/notifications.ts",
+      "sha256": "7530ec0c2518fdd1db3409e01754b5fd5f2dcd9b720fc048e35bab8e71ebeaab"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/relay.ts",
+      "sha256": "089140d8e9c713d5958912ee09a0447577669ab39325b515cdd9e17ec509d084"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/service.ts",
+      "sha256": "1c4be856e52f94a0d3d60fcbf82f04b94bd21df771fe15472f6c7bba27893195"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/Localizable.xcstrings",
+      "sha256": "421c2973c1232e295ed96e2718e773f1a39fba1e26d7347854180b732f9f10f4"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/QelvoraCopy.swift",
+      "sha256": "1a8fc97b799943c3c61e4bbbf522a0f58f7d94e7144ea212d3765ad2f371ec0a"
+    },
+    {
+      "path": "apps/web/features/growth/preferences.tsx",
+      "sha256": "5912ce2ab055ba2a332095749577d81723f42a5a1ddd777cbca36e8646f2b912"
+    },
+    {
+      "path": "config/copy.json",
+      "sha256": "17b9ddaf9de7a17203c50913606c5d8e5e51b3648ffbba49ee84031a704636d7"
+    },
+    {
+      "path": "packages/copy/src/index.ts",
+      "sha256": "1f1571bbfd119d4d26bf15b1dce6ae22efd0c80aa6ddebc9c3a003ef5acd11d6"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/account-notifications.ts",
+      "sha256": "1d49fc3baf0024bad9a075361136ea680354e76ab338a4f2892f35d53c0f7849"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/notification-custody.ts",
+      "sha256": "486380b42e7d5a5113852e3c53458a1ab77e2f978f61dc025a8b0c97dbdd907e"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/migrations/pending_w7_account_notifications.sql",
+      "sha256": "c428f5fc75fa324575058d0a2945bc453ee7632d782e7ca67c8229723be2819f"
+    }
+  ],
+  "files": [
+    {
+      "path": "account-quiet-rejected.png",
+      "bytes": 38744,
+      "sha256": "eae05f47125cd1b4e789d7e76271985215b84f23c047a9936e4f52a46235d380"
+    },
+    {
+      "path": "account-quiet-reload.png",
+      "bytes": 27329,
+      "sha256": "9a24f3f9dfab6fb7a8efbfb328299625d0fc22ff673e422fe1f0c8a722212801"
+    },
+    {
+      "path": "account-quiet-reload-full.txt",
+      "bytes": 8116,
+      "sha256": "f8f1fa7dcd8c533260776f6d0061aee3db4625da4ce2ca35d3cbd986b34ac703"
+    },
+    {
+      "path": "account-web-production-settings.png",
+      "bytes": 12363,
+      "sha256": "896261024b9f1af6d320b52a8621e1e73c351f3b0f929e81268a03b85a077d9e"
+    },
+    {
+      "path": "account-web-production-settings.txt",
+      "bytes": 709,
+      "sha256": "d41e94fac24ba1eb779bc09fc545ada262c75b0d24b825011b277b5940b32e96"
+    },
+    {
+      "path": "account-web-production-continuation.png",
+      "bytes": 30192,
+      "sha256": "a5f71af92e4398dbaef2909086a499ee5f605cb729f391c3334b42311bc8a916"
+    },
+    {
+      "path": "account-web-production-continuation.txt",
+      "bytes": 855,
+      "sha256": "e734123b4ff725c0cac2dffb5414714bc1ab81dafe772bd62c79e3399556a3eb"
+    },
+    {
+      "path": "account-android-start.png",
+      "bytes": 158386,
+      "sha256": "6bcc3bb538c925244ad1cd07fb88e58c1f31a00e148b3a9da928565179fdb81c"
+    },
+    {
+      "path": "account-android-start.xml",
+      "bytes": 12376,
+      "sha256": "87527dd7d7f4095942bf2dbc9dfedbe842b792a5b7d5e5cac9593751ab4a6919"
+    },
+    {
+      "path": "account-android-home-200-night.png",
+      "bytes": 160654,
+      "sha256": "3e1199d1679d118602b5897a0d3437be45ddeedd033aafd02d7000a1478f4846"
+    },
+    {
+      "path": "account-android-home-200-night.xml",
+      "bytes": 12376,
+      "sha256": "87527dd7d7f4095942bf2dbc9dfedbe842b792a5b7d5e5cac9593751ab4a6919"
+    },
+    {
+      "path": "account-android-notifications-200.png",
+      "bytes": 148186,
+      "sha256": "adc9503516c12dd456ad0ff26cf29368bf41f019c89fe143181c0ca08cf07ed6"
+    },
+    {
+      "path": "account-android-notifications-200.xml",
+      "bytes": 11375,
+      "sha256": "b27121b757432cb53c84cbdb717bfd43358063c4e09b9236a3ab19d9edfca246"
+    },
+    {
+      "path": "account-android-settings.png",
+      "bytes": 184199,
+      "sha256": "d6438bd18f73fe424667c2532bf82c54cf95c68471e92e9814d570ad97255e8d"
+    },
+    {
+      "path": "account-android-settings.xml",
+      "bytes": 15955,
+      "sha256": "beed30fa7af923bb82302a6468fcfcdc9582d2f71d65fcac92cfafd2ad796b77"
+    },
+    {
+      "path": "account-ios-settings.png",
+      "bytes": 226617,
+      "sha256": "8330537fbd095a2d2e96b1eeb14454514d1d19a5bb7110f9cc70d78807bd4da7"
+    },
+    {
+      "path": "account-ios-settings-ui.json",
+      "bytes": 32158,
+      "sha256": "388bdc3125efcf24c3a23beb6c9568756c475d6bf0f31fa961c2c5edcebc5d28"
+    },
+    {
+      "path": "account-ios-home-ui.json",
+      "bytes": 4600,
+      "sha256": "0c4cea006c2243ef3ac033b23e0213961255663939ab8663985f235446c989c1"
+    },
+    {
+      "path": "account-ios-notifications.png",
+      "bytes": 144315,
+      "sha256": "5d9f97bf285d6d72375725bac26ca90e1933f56a97218d0411b9f535aa395e0a"
+    },
+    {
+      "path": "account-ios-notifications-ui.json",
+      "bytes": 4104,
+      "sha256": "8d06a125368473c56e5f615967f4468107df644e5ab3fba5fa19e9dda2ec2f09"
+    },
+    {
+      "path": "account-notification-readiness-corrected.json",
+      "bytes": 293,
+      "sha256": "083e7143705a0e4fc12acb38f1de85821f1faaf16b1e8c84453e6870fdb94de4"
+    },
+    {
+      "path": "account-notification-health-ready-reviewed.json",
+      "bytes": 162,
+      "sha256": "846c1989492b033e5a101805a1d6f981143009f32aa4c6bb8f27060b597c47ad"
+    },
+    {
+      "path": "account-notification-backend-build-reviewed.log",
+      "bytes": 41,
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    {
+      "path": "account-notification-lint-reviewed.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "account-notification-contracts-reviewed.log",
+      "bytes": 328,
+      "sha256": "84df1013c5cb3187c3d4c929572c24ce9d0acc1714ec5feaf5fb6adee6448b9b"
+    },
+    {
+      "path": "account-source-format.log",
+      "bytes": 66,
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    {
+      "path": "account-header-android-build.log",
+      "bytes": 3167,
+      "sha256": "51da2fe7eaba20449ba60b41ddc36aae130082fb06bd23d0b1be22fb99cc4fca"
+    },
+    {
+      "path": "account-notification-ios-build.log",
+      "bytes": 853,
+      "sha256": "821369657d49f82538ba578bd5ee312e46cd73c52d910cd7b79651fd652951fd"
+    },
+    {
+      "path": "account-notification-ios-build-corrected.log",
+      "bytes": 79719,
+      "sha256": "567ebbfd09f64c49046517f0f01e756db52c100cdc767878d072c34a56abc6f2"
+    },
+    {
+      "path": "account-web-production-build.log",
+      "bytes": 2697,
+      "sha256": "670c25f5cab3a5958fc7eba00b27351a34be3cd6dfab8d5a9cdc261a33ccf427"
+    },
+    {
+      "path": "account-swift-existing-checks.log",
+      "bytes": 43630,
+      "sha256": "c64be706ec660602b6122ceafcd833d259994121ac1a595799aab949f58d7d4a"
+    }
+  ],
+  "checks": {
+    "backendBuild": "pass",
+    "eslint": "pass",
+    "existingContracts": "9 pass",
+    "format": "pass",
+    "AndroidShippingAndOriginalChecks": "pass",
+    "signedIOSShippingBuild": "pass after retained wrong-project-path failure",
+    "productionWebBuild": "pass",
+    "SwiftOriginalChecks": "18 checks /110 original comparisons pass"
+  },
+  "personallyObserved": {
+    "webDevelopment": "real sign-in to same settings destination; incomplete-pair error keeps Until empty/aria-invalid; corrected save acknowledgment and actual reload22:30\u201308:15 America/Los_Angeles, push/email off",
+    "productionWeb": "built and launched production app; signed-out settings and retained destination at sign-in entry only; approved HTTPS required for authenticated production",
+    "Android": "own installed shipping APK, Home header/action at200% Light/Night; actual Notifications tap; saved Settings at100%; old shared Requests label wraps in this pre-W1-integration source, preserved",
+    "iOS": "own signed app installed/cold Settings; actual Home\u2192Notifications; saved controls; empty inbox is not populated acceptance",
+    "accountSchema": "actual existing40-migration worker catalogue returns503 growth_account_notification_migration_required; no DDL/event/provider synthesized",
+    "requiredReadiness": "503 trust_unconfigured"
+  },
+  "nativeHashes": {
+    "androidAPK": "0175423741d056cb937eb7eb288f17448e8d05632dc48d4a80210302e5da8eda",
+    "iosShippingDylib": "fdd1fe5dee935101d4aade71c2e1fb24f038c618e693371ed8b42943fe8e3226"
+  },
+  "heldDependencies": [
+    "W8 allowed migration allocation/registry and actual purpose authorities",
+    "W4 current spending notice reader and genuine outbox producer",
+    "approved verified creator/signature/public HTTPS/APNs/FCM/email configuration",
+    "full populated owner journeys and original acceptance"
+  ],
+  "privateValueScan": "pass",
+  "accountSchemaActivated": false,
+  "providerAccepted": false,
+  "releaseAccepted": false,
+  "workstreamComplete": false,
+  "services": "Owned API/web/PostgreSQL normally stopped; native devices/leases/own companion already stopped"
+}

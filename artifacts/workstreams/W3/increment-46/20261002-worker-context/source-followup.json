@@ -1,0 +1,14 @@
+{
+  "source": "ec2b0c614bfa4b7adca06ec0f4da15a1dc2a95d9",
+  "contextModuleSha256": "f9ce1852d88e1e8fb349e0c918e7dd5f40234a4bd87065fb2f90f59492872693",
+  "change": "Malformed or absent current context returns503 generation_context_unavailable rather than a client validation error",
+  "backendTypecheck": true,
+  "affectedESLint": true,
+  "prettierCheck": true,
+  "diffCheck": true,
+  "catalogEvidenceSource": "32f9f6c64c478190bf69718329228314f7b06b72",
+  "SQLChanged": false,
+  "SQLApplied": false,
+  "workerIssued": false,
+  "applicationAcceptance": false
+}

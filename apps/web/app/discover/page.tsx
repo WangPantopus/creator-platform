@@ -5,25 +5,48 @@ import { GrowthShell, Failure, NoData } from "../../features/growth/shell";
 import type { Creator } from "../../features/growth/types";
 import { Connection } from "../../features/growth/actions";
 import { PassMarker, PassAccessProvider } from "../../features/growth/pass";
+import { currentSession } from "../../lib/session";
 export const dynamic = "force-dynamic";
 export default async function Discover({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; category?: string }>;
+  searchParams: Promise<{
+    q?: string | string[];
+    category?: string | string[];
+    cursor?: string | string[];
+  }>;
 }) {
-  const { q = "", category = "" } = await searchParams;
-  let data: { creators: Creator[]; hasMore: boolean };
+  const { q = "", category = "", cursor } = await searchParams;
+  let data: {
+    creators: Creator[];
+    hasMore: boolean;
+    nextCursor: string | null;
+  };
+  if (Array.isArray(q) || Array.isArray(category) || Array.isArray(cursor))
+    return (
+      <GrowthShell active="Discover">
+        <Failure
+          error={new Error(growthCopy.growthThisDestinationIsNoLongerAvailable)}
+        />
+      </GrowthShell>
+    );
+  const pageLink = (value?: string | null) => {
+    const parameters = new URLSearchParams({ q, category });
+    if (value) parameters.set("cursor", value);
+    return "/discover?" + parameters.toString();
+  };
   try {
     data = await growthRequest(
-      `public/creators?q=${encodeURIComponent(q)}&category=${encodeURIComponent(category)}`,
+      `public/creators?${new URLSearchParams({ q, category, ...(cursor ? { cursor } : {}) })}`,
     );
   } catch (error) {
     return (
       <GrowthShell active="Discover">
-        <Failure error={error} />
+        <Failure error={error} returnTo={pageLink()} />
       </GrowthShell>
     );
   }
+  const session = await currentSession();
   return (
     <GrowthShell active="Discover">
       <Connection />
@@ -64,7 +87,10 @@ export default async function Discover({
           ))}
         </nav>
       </form>
-      <PassAccessProvider>
+      <PassAccessProvider
+        creatorIds={data.creators.map((creator) => creator.id)}
+        accountId={session?.accountId}
+      >
         <div className="growth-stack">
           {data.creators.length ? (
             data.creators.map((c) => (
@@ -109,10 +135,18 @@ export default async function Discover({
               growthCopy.growthPublicCreatorInformationAlphabeticalOrderOfficialMeansTheCreatorAuthorized
             }
           </p>
-          {data.hasMore ? (
-            <p className="growth-help">
-              {growthCopy.growthRefineYourSearchToSeeMoreCreators}
-            </p>
+          {data.nextCursor ? (
+            <a
+              className="qv-btn qv-btn--secondary"
+              href={pageLink(data.nextCursor)}
+            >
+              {growthCopy.growthMoreCreators}
+            </a>
+          ) : null}
+          {cursor ? (
+            <a className="qv-btn qv-btn--quiet" href={pageLink()}>
+              {growthCopy.growthFirstPage}
+            </a>
           ) : null}
         </div>
       </PassAccessProvider>

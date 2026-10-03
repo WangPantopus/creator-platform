@@ -1,0 +1,49 @@
+{
+  "executable": "d0d44540cef9c6a4e3e7e51529e8f773e343a7e5",
+  "files": [
+    {
+      "path": "api.json",
+      "sha256": "f186f984d0248c348ba84844e2e3e9e02ce0eedb5dbd9e477996087e1a371b5a"
+    },
+    {
+      "path": "api.log",
+      "sha256": "b80561597692fd734cf22edaec3452ed8a8c6ebe883500952bc604cc4fc4f4c6"
+    },
+    {
+      "path": "canonical-generation.log",
+      "sha256": "a75f82a3ee402417109f2eab3040984b2cd4ea3c70f57586fe10836c04d1819e"
+    },
+    {
+      "path": "checks.json",
+      "sha256": "03704f2117227fde54e0e73c8381b13e964a6ae3b40cd8e4e9ecf47f7ef58499"
+    },
+    {
+      "path": "format.log",
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    {
+      "path": "operation.json",
+      "sha256": "0be8a4233c81552800e938af9e9354a75c10459ec8110d5b9ff408592f331e62"
+    },
+    {
+      "path": "run.md",
+      "sha256": "febf37766c97fa17b3200977057277f85ba4ca86a5d38563c129c3ecbfbbe241"
+    },
+    {
+      "path": "scoped-eslint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "shipping-backend.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    {
+      "path": "source-projections.json",
+      "sha256": "97ed52f45f03feb21d4fbb9b14ecf7516a29753c4a130422c503bd69e76078d9"
+    },
+    {
+      "path": "sql-parse.json",
+      "sha256": "80a8c59c6127f6521cac78a824a30fefe19f54f3e009b8fc59855ba452c0573f"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "source": "a4a6a45d68e020f53a65e7983635736d4fce4e1d",
+  "observedAt": "2026-10-02T17:22:25.003Z",
+  "heldTransaction": "Actual core login / BEGIN READ ONLY / ROLLBACK",
+  "metadata": {
+    "database": "creator_w3_dev57_1790946508212",
+    "login": "creator_runtime",
+    "registered": 57,
+    "privacypurposeregistered": false,
+    "privacyfunctionpresent": false
+  },
+  "catalogue": {
+    "available": false,
+    "code": "privacy_commit_fence_unavailable",
+    "status": 503
+  },
+  "privacyJobSupplied": false,
+  "leaseIssued": false,
+  "sqlApplied": false,
+  "positivePrivacyQualification": false
+}

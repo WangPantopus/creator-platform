@@ -106,14 +106,18 @@ export async function registeredMigration(
 export async function assertRegisteredMigration(
   client: Pick<PoolClient, "query">,
   expected: ReviewedMigration,
+  signal?: AbortSignal,
 ): Promise<void> {
+  signal?.throwIfAborted();
   const migration = await registeredMigration(expected);
+  signal?.throwIfAborted();
   if (!migration) throw unavailable();
   try {
     const result = await client.query<{ ready: boolean }>(
       "SELECT EXISTS(SELECT FROM creator.schema_migration WHERE version=$1 AND checksum=$2) AS ready",
       [migration.version, migration.checksum],
     );
+    signal?.throwIfAborted();
     if (result.rows[0]?.ready !== true) throw unavailable();
   } catch (error) {
     if ((error as { code?: string }).code === "42501") throw unavailable();

@@ -1,0 +1,7 @@
+# Increment 43 — editable rejected quiet hours
+
+Base host `76a8b28d`, exact W7 view producer `c4633a3300c732685b95eaa4c8d86d90ed98e705`. W3 personally applied only the preferences view diff: retain the submitted controlled state before rendering validation errors, so clearing Until is not overwritten with its old value. No spending SQL or reserved schema was consumed. The exact file hash is in receipt.json.
+
+The primary personally used built-in browser tab6 at390×844 on API4103/web3003 and the same creator_w3 database. Clearing Until then clicking Save kept the field empty, displayed “Both quiet-hour boundaries are required” and aria-invalid=true, with focus returned to the invalid input. The initial repaired save was refused by expired session; no success or persistence is credited to that attempt. The primary followed the real Continue with Pantopus development actor one flow back to settings, repeated blank-field rejection, entered08:15, and actually saved. The success copy appeared; a real reload retained22:00/08:15 and America/Los_Angeles. Night was opened through the app's theme URL; its current screenshot was personally inspected and showed light cream text and readable controls. The original22:00/08:00 pair was then saved and reloaded successfully. Push/email remained off.
+
+Web Next route generation/typecheck, affected ESLint/Prettier and diff checks passed. Native files are unchanged in this increment; there is no additional native journey or notification transport claim. The host remains closed for generation and full W3 A–I is incomplete.

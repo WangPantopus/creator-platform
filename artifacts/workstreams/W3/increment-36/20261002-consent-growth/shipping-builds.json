@@ -1,0 +1,45 @@
+{
+  "source": "acda9978606803dcb5d3744488b06d115332e43b",
+  "backendPort": 4103,
+  "webPort": 3003,
+  "database": "creator_w3",
+  "registeredLedgerRows": 40,
+  "ios": {
+    "shippingBuild": "passed",
+    "binarySha256": "5d3809b22a4b852a5c6f087415cb147265d577a85f4a07b735bd6ada597b66cd",
+    "personallyOperated": false
+  },
+  "android": {
+    "shippingBuild": "passed",
+    "apkSha256": "936fa6b52774f600065c55c4ed8069e9d2a944a2270ac4f99b637cae1ffac39c",
+    "personallyOperated": true,
+    "serial": "emulator-5584",
+    "avd": "Qelvora_W3_API34",
+    "viewportDp": 390,
+    "fontScales": [
+      1.0,
+      2.0
+    ],
+    "appearances": [
+      "light",
+      "night"
+    ],
+    "initialAndRestoredFontScale": 2.0,
+    "anrEventsForOwnedApp": 0,
+    "shutdownAndExactLeaseReleased": true
+  },
+  "heavyBuild": {
+    "guardSha256": "f4732a96521bcc5c10efdeebbb02cfbefd03a49a76a4da9067dc1863d5d5cc27",
+    "iosThenAndroid": true,
+    "actualAcquisitions": 2,
+    "actualReleases": 2,
+    "overlap": false
+  },
+  "web": {
+    "notificationSettingsSaveSuccessShown": true,
+    "quietHoursRetainedAfterReload": false,
+    "timeZoneRetained": "America/Los_Angeles",
+    "lastReload": "actual session expired, sign-in shown"
+  },
+  "generationAvailable": false
+}

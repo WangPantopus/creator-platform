@@ -6,8 +6,11 @@ import { ProcessedMediaEvidenceSchema } from "../../../../../packages/api/src/me
 import { canonical, contentHash } from "../../core/canonical.js";
 import { invariant } from "../../core/errors.js";
 import { requestAuthority } from "./request-authority.js";
-import { assertPublicationPreparation } from "./publication-preparation.js";
-import { assertFulfillmentPublicationDenialCatalog } from "../trust/fulfillment-publication-denial-catalog.js";
+import { assertPublicationPreparationCatalogue } from "./publication-preparation-catalogue.js";
+import {
+  assertPublicationPoolCustody,
+  publicationTransaction,
+} from "./publication-transaction.js";
 
 const taskSchema = z
   .object({
@@ -30,6 +33,23 @@ export type PublicationRestriction = (
   client: PoolClient,
   task: PublicationTask,
 ) => Promise<void>;
+const preparationBrand: unique symbol = Symbol("PublicationPreparation");
+/** Owner ports receive this only from the genuine issuer on its held client.
+ * Private preparation tokens never appear in a task, request or serialized DTO. */
+export type PublicationPreparation = Readonly<{
+  [preparationBrand]: true;
+  nonce: string;
+  token: string;
+  fulfillmentNonce: string | null;
+}>;
+const preparationSchema = z
+  .object({
+    nonce: IdSchema,
+    token: IdSchema,
+    fulfillment_nonce: IdSchema.nullable(),
+    proof: z.unknown(),
+  })
+  .strict();
 
 const proofSchema = z.object({
   creatorId: IdSchema,
@@ -64,15 +84,15 @@ function proofCommand(proof: z.infer<typeof proofSchema>) {
 }
 
 /** A separate noninteractive purpose issuer. Neither an Actor nor a request
- * session can authorize it. W8 must activate reviewed 0071 plus its held denial
- * projection before construction/use; no development or missing-port fallback.
+ * session can authorize it. Actual0208 and both original-family owners must be
+ * reviewed/activated with their combined catalogue before use. No fallback.
  */
 export class PublicationIdentityAuthority {
   private readonly issued = new WeakMap<
     object,
     Readonly<{
       client: PoolClient;
-      preparation: string;
+      preparation: PublicationPreparation;
       command: string;
       transaction: string;
       pid: number;
@@ -84,44 +104,34 @@ export class PublicationIdentityAuthority {
     private readonly configuration: Readonly<{
       assertAllowed: PublicationRestriction;
       assertDiscoveryAllowed: (client: PoolClient) => Promise<void>;
+      assertPreparationAllowed: (client: PoolClient) => Promise<void>;
     }>,
   ) {
+    assertPublicationPoolCustody(pool);
     invariant(
       typeof configuration.assertAllowed === "function" &&
-        typeof configuration.assertDiscoveryAllowed === "function",
+        typeof configuration.assertDiscoveryAllowed === "function" &&
+        typeof configuration.assertPreparationAllowed === "function",
       "publication_denial_unconfigured",
       "Publication workers require their current purpose denial authority.",
     );
   }
 
   async assertRole(): Promise<void> {
-    const client = await this.pool.connect();
-    try {
-      await assertPublicationPreparation(client);
-    } finally {
-      client.release();
-    }
-  }
-
-  private async prepare(
-    client: PoolClient,
-    task: z.infer<typeof candidateSchema>,
-  ) {
-    // The genuine W8 catalogue is required before original204's private
-    // negatives/body boundary. A future combined208 wave needs its separately
-    // qualified catalogue; never learn or accept the current metadata here.
-    await assertFulfillmentPublicationDenialCatalog(client);
-    const result = await client.query<{ preparation: unknown }>(
-      "SELECT creator.prepare_publication_task($1,$2,$3,$4,$5) AS preparation",
-      [
-        task.creatorId,
-        task.contentId,
-        task.version,
-        task.publisherAccountId,
-        task.signedActId,
-      ],
+    this.assertWorker();
+    await publicationTransaction(
+      this.pool,
+      undefined,
+      async (client) => {
+        await client.query("SET LOCAL statement_timeout='5s'");
+        await client.query("SET LOCAL lock_timeout='1s'");
+        await this.configuration.assertDiscoveryAllowed(client);
+        await assertPublicationPreparationCatalogue(client);
+        await this.configuration.assertPreparationAllowed(client);
+      },
+      "ROLLBACK",
+      true,
     );
-    return IdSchema.parse(result.rows[0]?.preparation);
   }
 
   private assertWorker() {
@@ -132,6 +142,43 @@ export class PublicationIdentityAuthority {
     );
   }
 
+  /** Preparation must use this issuer's exact separate publication pool. */
+  assertHostPool(pool: Pool): void {
+    invariant(
+      pool === this.pool,
+      "publication_pool_changed",
+      "Use the original configured publication data service.",
+    );
+  }
+
+  private async prepare(
+    client: PoolClient,
+    candidate: z.infer<typeof candidateSchema>,
+  ) {
+    await assertPublicationPreparationCatalogue(client);
+    await this.configuration.assertPreparationAllowed(client);
+    const result = await client.query(
+      "SELECT * FROM creator.prepare_publication_task($1,$2,$3,$4,$5)",
+      [
+        candidate.creatorId,
+        candidate.contentId,
+        candidate.version,
+        candidate.publisherAccountId,
+        candidate.signedActId,
+      ],
+    );
+    const prepared = preparationSchema.parse(result.rows[0]);
+    return {
+      proof: proofSchema.parse(prepared.proof),
+      preparation: Object.freeze({
+        [preparationBrand]: true as const,
+        nonce: prepared.nonce,
+        token: prepared.token,
+        fulfillmentNonce: prepared.fulfillment_nonce,
+      }),
+    };
+  }
+
   /** Metadata enumeration grants no publication authority. Every returned task
    * is independently rechecked under current denial/identity locks before work.
    * Unsigned hashes come from a bounded, authorized current Team post projection.
@@ -140,71 +187,66 @@ export class PublicationIdentityAuthority {
     this.assertWorker();
     await this.assertRole();
     const boundedLimit = z.number().int().min(1).max(20).parse(limit);
-    const client = await this.pool.connect();
-    try {
-      await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
-      await client.query(
-        "SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','2000',true)",
-      );
-      await this.configuration.assertDiscoveryAllowed(client);
-      const rows = await client.query<{ candidate: unknown }>(
-        "SELECT candidate FROM creator.pending_publication_tasks($1)",
-        [boundedLimit],
-      );
-      const candidates = rows.rows.map((row) =>
-        candidateSchema.parse(row.candidate),
-      );
-      await client.query("COMMIT");
-      const tasks: PublicationTask[] = [];
-      for (const candidate of candidates) {
-        // One family per transaction avoids accumulating denial locks in
-        // unrelated account/creator order during global discovery.
-        await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
+    const candidates = await publicationTransaction(
+      this.pool,
+      undefined,
+      async (client) => {
         await client.query(
           "SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','2000',true)",
         );
         await this.configuration.assertDiscoveryAllowed(client);
-        const preparation = await this.prepare(client, candidate);
-        const result = await client.query<{ proof: unknown }>(
-          "SELECT creator.read_prepared_publication_task($1) AS proof",
-          [preparation],
+        const rows = await client.query<{ candidate: unknown }>(
+          "SELECT candidate FROM creator.pending_publication_tasks($1)",
+          [boundedLimit],
         );
-        if (result.rows[0]?.proof == null) {
-          await client.query("ROLLBACK");
-          continue;
-        }
-        const proof = proofSchema.parse(result.rows[0].proof),
-          commandHash = contentHash(proofCommand(proof));
-        invariant(
-          proof.signedActId === null ||
-            (proof.commandHash === commandHash &&
-              contentHash(proof.command) === commandHash),
-          "publication_command_changed",
-          "The stored publication command changed.",
+        return rows.rows.map((row) => candidateSchema.parse(row.candidate));
+      },
+      "ROLLBACK",
+    );
+    const tasks: PublicationTask[] = [];
+    for (const candidate of candidates) {
+      // One family per transaction preserves original denial lock order.
+      try {
+        const task = await publicationTransaction(
+          this.pool,
+          undefined,
+          async (client) => {
+            await client.query(
+              "SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','2000',true)",
+            );
+            await this.configuration.assertDiscoveryAllowed(client);
+            const { proof } = await this.prepare(client, candidate),
+              commandHash = contentHash(proofCommand(proof));
+            invariant(
+              proof.signedActId === null ||
+                (proof.commandHash === commandHash &&
+                  contentHash(proof.command) === commandHash),
+              "publication_command_changed",
+              "The stored publication command changed.",
+            );
+            return Object.freeze(
+              taskSchema.parse({
+                creatorId: proof.creatorId,
+                contentId: proof.contentId,
+                version: proof.version,
+                publisherAccountId: proof.publisherAccountId,
+                signedActId: proof.signedActId,
+                commandHash,
+              }),
+            );
+          },
+          "ROLLBACK",
         );
-        tasks.push(
-          Object.freeze(
-            taskSchema.parse({
-              creatorId: proof.creatorId,
-              contentId: proof.contentId,
-              version: proof.version,
-              publisherAccountId: proof.publisherAccountId,
-              signedActId: proof.signedActId,
-              commandHash,
-            }),
-          ),
-        );
-        // Discovery grants no issuance or domain write. Roll back the actual
-        // early preparation, including original204's private negatives.
-        await client.query("ROLLBACK");
+        // A task becomes visible only after the actual discovery rollback
+        // receipt. No private204/208 preparation or negative lock is committed.
+        tasks.push(task);
+      } catch (error) {
+        // A denied candidate is skipped only when its original rollback settled.
+        // Transport, cleanup, registry and restoration failures stop discovery.
+        if ((error as { code?: string } | null)?.code !== "42501") throw error;
       }
-      return Object.freeze(tasks);
-    } catch (error) {
-      await client.query("ROLLBACK");
-      throw error;
-    } finally {
-      client.release();
     }
+    return Object.freeze(tasks);
   }
 
   async withPublication<T>(
@@ -218,90 +260,89 @@ export class PublicationIdentityAuthority {
     this.assertWorker();
     await this.assertRole();
     const task = Object.freeze(taskSchema.parse(input));
-    const client = await this.pool.connect();
-    let scope: PublicationTaskScope | undefined;
-    try {
-      await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
-      await client.query(
-        "SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','2000',true)",
-      );
-      // This actual held-client callback includes W8 restoration currentness.
-      // The SQL issuer separately requires its purpose-specific DB denial.
-      await this.configuration.assertAllowed(client, task);
-      const preparation = await this.prepare(client, task);
-      const result = await client.query<{ proof: unknown }>(
-        "SELECT creator.read_prepared_publication_task($1) AS proof",
-        [preparation],
-      );
-      const proof = proofSchema.parse(result.rows[0]?.proof);
-      invariant(
-        proof.creatorId === task.creatorId &&
-          proof.contentId === task.contentId &&
-          proof.version === task.version &&
-          proof.publisherAccountId === task.publisherAccountId &&
-          proof.signedActId === task.signedActId,
-        "publication_task_changed",
-        "The stored publication task changed.",
-      );
-      const command = proofCommand(proof);
-      invariant(
-        contentHash(command) === task.commandHash &&
-          (task.signedActId === null
-            ? proof.command === null
-            : proof.commandHash === task.commandHash &&
-              contentHash(proof.command) === task.commandHash),
-        "publication_command_changed",
-        "The exact stored publication command is required.",
-      );
-      const issued = await client.query<{ allowed: boolean }>(
-        "SELECT creator.begin_prepared_publication_scope($1,$2,$3) AS allowed",
-        [preparation, task.commandHash, canonical(command)],
-      );
-      invariant(
-        issued.rows[0]?.allowed === true,
-        "publication_unavailable",
-        "This publication task is unavailable.",
-      );
-      scope = Object.freeze({
-        ...task,
-        [publicationScopeBrand]: true as const,
-        kind: "publication" as const,
-      });
-      const context = await this.context(client);
-      this.issued.set(
-        scope,
-        Object.freeze({
-          client,
-          preparation,
-          command: canonical(command),
-          ...context,
-        }),
-      );
-      const value = await work(client, scope);
-      await this.configuration.assertAllowed(client, task);
-      await assertFulfillmentPublicationDenialCatalog(client);
-      await beforeFinalSignatureRead?.(client, scope);
-      const final = await client.query<{ allowed: boolean }>(
-        "SELECT creator.finalize_prepared_publication_scope($1) AS allowed",
-        [preparation],
-      );
-      invariant(
-        final.rows[0]?.allowed === true,
-        "publication_scope_expired",
-        "The original publication changed before commit.",
-      );
-      this.issued.delete(scope);
-      // No matcher, callback, cleanup, settings, domain read or write follows
-      // original0208's final fresh signature gate. Only COMMIT is sent to SQL.
-      await client.query("COMMIT");
-      return value;
-    } catch (error) {
-      await client.query("ROLLBACK");
-      throw error;
-    } finally {
-      if (scope) this.issued.delete(scope);
-      client.release();
-    }
+    return publicationTransaction(this.pool, undefined, async (client) => {
+      let scope: PublicationTaskScope | undefined;
+      try {
+        await client.query(
+          "SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','2000',true)",
+        );
+        // This actual held-client callback includes W8 restoration currentness.
+        // The SQL issuer separately requires its purpose-specific DB denial.
+        await this.configuration.assertAllowed(client, task);
+        const { proof, preparation } = await this.prepare(client, task);
+        invariant(
+          proof.creatorId === task.creatorId &&
+            proof.contentId === task.contentId &&
+            proof.version === task.version &&
+            proof.publisherAccountId === task.publisherAccountId &&
+            proof.signedActId === task.signedActId,
+          "publication_task_changed",
+          "The stored publication task changed.",
+        );
+        const command = proofCommand(proof);
+        invariant(
+          contentHash(command) === task.commandHash &&
+            (task.signedActId === null
+              ? proof.command === null
+              : proof.commandHash === task.commandHash &&
+                contentHash(proof.command) === task.commandHash),
+          "publication_command_changed",
+          "The exact stored publication command is required.",
+        );
+        const issued = await client.query<{ allowed: boolean }>(
+          "SELECT creator.bind_prepared_publication($1,$2,$3,$4) AS allowed",
+          [
+            preparation.nonce,
+            preparation.token,
+            task.commandHash,
+            canonical(command),
+          ],
+        );
+        invariant(
+          issued.rows[0]?.allowed === true,
+          "publication_unavailable",
+          "This publication task is unavailable.",
+        );
+        scope = Object.freeze({
+          ...task,
+          [publicationScopeBrand]: true as const,
+          kind: "publication" as const,
+        });
+        const context = await this.context(client);
+        this.issued.set(
+          scope,
+          Object.freeze({
+            client,
+            preparation,
+            command: canonical(command),
+            ...context,
+          }),
+        );
+        const value = await work(client, scope);
+        await this.authorizeInTransaction(scope, client);
+        await this.configuration.assertAllowed(client, task);
+        await assertPublicationPreparationCatalogue(client);
+        await this.configuration.assertPreparationAllowed(client);
+        await beforeFinalSignatureRead?.(client, scope);
+        await this.authorizeInTransaction(scope, client);
+        // Invalidate the JS port before the joint SQL finalizer. The SQL ends204
+        // before actual213, then ends0158/208 before its last current domain read.
+        // No owner/catalogue/restore callback or DB read may follow it, only COMMIT.
+        this.issued.delete(scope);
+        const finished = await client.query<{ allowed: boolean }>(
+          "SELECT creator.finish_prepared_publication($1,$2) AS allowed",
+          [preparation.nonce, preparation.token],
+        );
+        invariant(
+          finished.rows[0]?.allowed === true,
+          "publication_unavailable",
+          "The original publication task cannot be finalized.",
+        );
+        return value;
+      } finally {
+        if (scope) this.issued.delete(scope);
+      }
+    });
   }
 
   /** W6 joins only the exact client and still-active SQL transaction issued
@@ -313,23 +354,26 @@ export class PublicationIdentityAuthority {
     client: PoolClient,
   ): Promise<void> {
     this.assertWorker();
-    const held = this.issued.get(scope);
     invariant(
-      held?.client === client,
+      this.issued.get(scope)?.client === client,
       "publication_scope_required",
       "A current issued publication scope is required.",
     );
+    const held = this.issued.get(scope)!;
     const context = await this.context(client);
     invariant(
-      context.pid === held.pid &&
-        context.transaction === held.transaction &&
+      context.transaction === held.transaction &&
+        context.pid === held.pid &&
         context.nonce === held.nonce,
       "publication_scope_expired",
-      "The original publication transaction changed.",
+      "The original publication client or transaction changed.",
     );
     const result = await client.query<{ allowed: boolean }>(
-      "SELECT creator.publication_scope_matches($1,$2,$3) AS allowed",
-      [scope.creatorId, scope.contentId, scope.version],
+      "SELECT creator.prepared_publication_matches($1,$2) AS allowed",
+      [
+        this.issued.get(scope)!.preparation.nonce,
+        this.issued.get(scope)!.preparation.token,
+      ],
     );
     invariant(
       result.rows[0]?.allowed === true,
@@ -338,6 +382,15 @@ export class PublicationIdentityAuthority {
     );
   }
 
+  /** Private owner-only binding. A copied/retained scope or another client
+   * cannot retrieve or reuse the original nonce/token or fulfillment nonce. */
+  async preparationInTransaction(
+    scope: PublicationTaskScope,
+    client: PoolClient,
+  ): Promise<PublicationPreparation> {
+    await this.authorizeInTransaction(scope, client);
+    return this.issued.get(scope)!.preparation;
+  }
   private async context(client: PoolClient) {
     const row = (
       await client.query<{

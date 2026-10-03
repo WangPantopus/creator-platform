@@ -1,0 +1,39 @@
+{
+  "at": "2026-10-02T17:07:26.793017+00:00",
+  "backendSourceRevision": "00fbdc5acf9e96726e1749aa0242b70d0232bc92",
+  "webSourceRevision": "0387b5c9",
+  "verifiedOwnedListeningProcess": true,
+  "personallyDispatchedSignals": [
+    "SIGINT",
+    "SIGTERM"
+  ],
+  "dispatchElapsedMs": 0.274,
+  "handlerOverlapProven": false,
+  "growthEnabled": true,
+  "actualPrivateGrowthInputs": true,
+  "distinctGrowthAPIPool": true,
+  "originalDatabaseStayedClosed": true,
+  "supervisedExitPending": false,
+  "peerResourcesTouched": false,
+  "supervisedExitCode": 0,
+  "duplicatePoolEndObserved": false,
+  "sanitizedCleanupFailureObserved": false,
+  "webRecoveryPersonallyOperated": true,
+  "sameActualAccountSessionPreserved": true,
+  "credentialRotationPersonallyOperated": true,
+  "credentialRotated": true,
+  "expiryAdvanced": true,
+  "noFanProfileCreated": true,
+  "noOpsMembershipInvented": true,
+  "newSignInRequiredForRetry": false,
+  "webViewport": {
+    "width": 1325,
+    "height": 873
+  },
+  "provider": "Explicit labelled local development identity; real Pantopus production provider unavailable",
+  "limits": [
+    "Signals were both dispatched to the verified real process; handler overlap is not proved.",
+    "This is development web operation; production-build Retry remains open.",
+    "Native operation and positive future-purpose/provider/proof outcomes remain open."
+  ]
+}

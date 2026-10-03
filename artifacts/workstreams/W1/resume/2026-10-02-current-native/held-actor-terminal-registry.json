@@ -1,0 +1,21 @@
+{
+  "sourceBase": "cff873733588f68987088a59be6d66e1ba3cd6fb",
+  "sourceChanges": [
+    "apps/backend/src/db/database.ts",
+    "apps/backend/src/modules/access/scope.ts",
+    "apps/backend/src/modules/identity/generation-scope.ts"
+  ],
+  "separateDisposablePostgreSQL17": true,
+  "canonicalOrDevelopmentDatabaseUsed": false,
+  "newTestsAdded": false,
+  "existingSuiteExitCode": 0,
+  "ownContainerNormallyStopped": true,
+  "ownDisposableContainerRemoved": true,
+  "elapsedSeconds": 71.03,
+  "sourceSha256": {
+    "apps/backend/src/db/database.ts": "4d4d9c097561d2758491c098403efd3a6ccb81d3279410d835abdd11e3c62389",
+    "apps/backend/src/modules/access/scope.ts": "9996978b9a859cad170f16d737f63a611760a5421496fd91c71ed8657b47324a",
+    "apps/backend/src/modules/identity/generation-scope.ts": "a2ad673ad693ad2d4b6ad08af1edbff46c84541e1c3f20566a6d786233cda223"
+  },
+  "all18ExistingChecksPassed": true
+}

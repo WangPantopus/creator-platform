@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import java.net.HttpURLConnection
 import java.net.URL
+import java.io.IOException
 import java.util.UUID
 
 @Serializable data class ConversationMessage(
@@ -55,8 +56,8 @@ fun ConversationMessage.authorLabel(name: String): String = if (correction != nu
     val unavailableReason: String? = null, val feedbackPolicy: ConversationFeedbackPolicy? = null
 )
 @Serializable data class ConversationProvider(val name: String, val termsUrl: String, val noTraining: Boolean, val noRetention: Boolean)
-@Serializable data class ConversationPolicy(val version: String, val providers: List<ConversationProvider>, val verified: Boolean)
-@Serializable data class ConversationCapabilities(val providers: ConversationPolicy? = null, val consentAvailable: Boolean, val generationAvailable: Boolean, val accessDisclosure: String)
+@Serializable data class ConversationPolicy(val version: String, val providers: List<ConversationProvider>, val verified: Boolean, val reference: String? = null)
+@Serializable data class ConversationCapabilities(val providers: ConversationPolicy? = null, val consentAvailable: Boolean, val generationAvailable: Boolean, val accessDisclosure: String, val developmentSynthetic: Boolean = false)
 @Serializable data class ConversationMemory(val id: String, val kind: String, val text: String, val provenanceMessageId: String, val sensitiveCategory: String? = null, val state: String, val editedByFan: Boolean, val createdAt: String)
 @Serializable data class ConversationMemories(val revision: Long, val offTheRecord: Boolean, val introShared: Boolean, val items: List<ConversationMemory>)
 @Serializable data class ConversationAudit(val id: String, val readerAccountId: String, val role: String, val readAt: String)
@@ -96,6 +97,9 @@ class ConversationClient(private val baseURL: String, private val token: () -> S
                 throw ConversationFailure(if (error?.get("code")?.jsonPrimitive?.content == "session_account_changed") 401 else status, error?.get("message")?.jsonPrimitive?.content ?: "This conversation is unavailable. Your input is kept.")
             }
             value ?: throw ConversationFailure(503, "Reconnect to refresh this conversation.")
+        } catch (failure: IOException) {
+            coroutineContext.ensureActive()
+            throw ConversationFailure(503, "Reconnect to refresh. Your input is kept.")
         } finally { connection.disconnect() }
     }
     suspend fun page(path: String): ConversationPage = json.decodeFromJsonElement(request(path))

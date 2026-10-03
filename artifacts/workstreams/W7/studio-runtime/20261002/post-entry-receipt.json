@@ -1,0 +1,68 @@
+{
+  "recordedAt": "2026-10-02T13:10:59.482065+00:00",
+  "baseHead": "77ab2be5aa190d2abcc17858b24834e7ffb00269",
+  "primary": "W7 personally implemented and reviewed; no subagents or new test code",
+  "state": "Compiled current metadata consumer; genuine W5 reader and shipping post-context acceptance remain unbound",
+  "contract": {
+    "factory": "canonicalPostEntryContext(growth, reader?)",
+    "hostInput": "configureGrowthForBackend.postEntryReader?: CurrentPostEntryReader",
+    "hostOutput": "postEntryContext(actor, {handle,contentId}) -> immutable PostEntryContext|null",
+    "ownerInput": "current({actor,creatorId,contentId}) -> {creatorId,contentId,version,title}|null",
+    "purpose": "Actual W5 current recipient/public-entry metadata on genuine held owner client; current publication, source withdrawal and recipient denial before and after; no public projection, Follow or publisher-proof replacement",
+    "output": "source:post,creatorId,contentId,version,title,destination; immutable display reference only; no body, processor consent, signing command or continuing private authority",
+    "freshness": "Actual ALS account/adult actor; verified published creator before and after; exact creator/content tuple; W3 rereads before displaying and obtains separate generation consent/purpose/lineage",
+    "missing": "Unconfigured reader503; missing/revoked/unpublished current creator or owner metadata returnsnull"
+  },
+  "compatibility": "Accept W2 actual immutable readonly topic list and copy it into W7 output",
+  "checks": {
+    "backendBuild": "exit0",
+    "eslint": "exit0",
+    "format": "exit0",
+    "originalContracts": "9 existing contracts passed, exit0",
+    "sourceDiffCheck": "exit0",
+    "newTests": false
+  },
+  "observedRuntime": false,
+  "remaining": [
+    "Actual W5 current reader/purpose issuer and host binding",
+    "W3 consumer entry/sign-in UUID preservation across all three shipping clients",
+    "Actual permitted metadata, withdrawal, denial, paused creator, sign-out and cold/warm launch journeys",
+    "Every original W7 acceptance row; all exact-head Foundation/Trust gates and final combined review"
+  ],
+  "sources": [
+    {
+      "path": "apps/backend/src/modules/growth/entry-context.ts",
+      "sha256": "2ffc994641ab78339c2e92724212136e9b9cf1f636195d85b966f6c4648537d8"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/configured.ts",
+      "sha256": "39e542d46519d97f691f3b7c23365d5e66833188b093537fbf5e3d97604bab6a"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/creator-projection.ts",
+      "sha256": "75dcbd3833cd44a99695a494d060c9f22cae792a75a986f019b66b30166bd549"
+    }
+  ],
+  "raw": [
+    {
+      "path": "post-entry-raw/post-entry-backend-build.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+      "bytes": 41
+    },
+    {
+      "path": "post-entry-raw/post-entry-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "post-entry-raw/post-entry-existing-contracts.log",
+      "sha256": "c2b042f51e0d8af6cda2f28343d56ca3839ea5902617999eab56bdf8e9678ea5",
+      "bytes": 329
+    },
+    {
+      "path": "post-entry-raw/post-entry-format.log",
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
+      "bytes": 66
+    }
+  ]
+}

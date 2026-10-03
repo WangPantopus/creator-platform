@@ -1,0 +1,77 @@
+{
+  "recordedAt": "2026-10-01T13:26:51.152523+00:00",
+  "applicationSourceRevision": "28874d9617cd2967db3be41bbb7f1d0904e62426",
+  "parentRevision": "8cd558064b3a1ba3d7d64b4387e74f1546af890f",
+  "branch": "codex/w1-signing-authority-20261001",
+  "sourceFiles": [
+    {
+      "path": "apps/backend/src/modules/identity/signed-acts.ts",
+      "sha256": "c3e6393e3f34c951f33db018149f0a206972be21b7629e028891b545626274b6"
+    }
+  ],
+  "backendProduct": {
+    "path": "apps/backend/dist/server.mjs",
+    "sha256": "7bda01ff3bbb977d2a4760f86378a4833995311e4f33375a56e6d16902fccac3",
+    "bytes": 1173728
+  },
+  "sourceReview": {
+    "before": "Creator verification/recovery state read without a profile lock after challenge lock; a concurrent proof revocation could commit before assertion verification finished. Publication still separately rechecked current authority.",
+    "after": "Owned unique-account profile read with FOR SHARE before signed challenge and passkey locks; matching current verified creator and no recovery required, held through COMMIT. Same number of owner queries; preserved challenge/replay, role/credential, exact bytes, RP/origin and required UV checks.",
+    "recoveryOrdering": "PasskeyService.recover locks/updates owned profile before credentials and challenges. Matching that order avoids introducing an opposite profile/challenge lock cycle.",
+    "relevantPreservedFiles": [
+      "modules/identity/transaction.ts",
+      "modules/identity/request-authority.ts",
+      "modules/identity/passkeys.ts",
+      "modules/identity/profiles.ts",
+      "modules/identity/subjects.ts"
+    ],
+    "schemaRlsRoleProviderApiOrGeneratedChange": false
+  },
+  "supportingChecks": {
+    "backendBuild": "passed (TypeScript and bundled executable)",
+    "affectedEslintPrettierDiff": "passed",
+    "existingPostgresCheck": {
+      "file": "apps/backend/tests/postgres.integration.test.ts",
+      "filter": "T-34 refuses team and stolen-session named acts",
+      "result": "1 passed / 8 skipped, 9 existing cases in file",
+      "durationSeconds": 2.35,
+      "caseAndSetupMilliseconds": 1234,
+      "privateLogSha256": "aeadfa735781312b6b1d09e674d812d96a228e74a98caea9a9752cb0bc536a51",
+      "qualification": "Unchanged original cryptographic signing/role/exact-content/replay assertions in an isolated disposable existing-check cluster. Not an operated WebAuthn/native ceremony, recovery-race measurement or full 9-case pass."
+    },
+    "newTestCode": false,
+    "clientRebuild": "Not required: no web/native/shared/resource/contract changes relative to 8cd5580; previous products remain their exact source-qualified receipts."
+  },
+  "checkEnvironment": {
+    "container": "creator-platform-w1-check-20261001",
+    "imageDigest": "sha256:cf134a767f474095eeba57e0117be8e568e011a63f33fbf252f14c9b760f8e6f",
+    "loopbackPort": 55452,
+    "memoryBytes": 402653184,
+    "cpus": 1,
+    "data": "Separate 192 MiB tmpfs; no interactive or peer cluster/credentials reused",
+    "runtimeRole": "creator_runtime NOSUPERUSER/NOBYPASSRLS/NOINHERIT; verified after original check",
+    "remainingFixtureDatabases": 0,
+    "cleanup": "Owned check container stopped/removed after successful unchanged check; port 55452 unused. No private genuine identity, license, approval or provider result fabricated."
+  },
+  "actualAcceptance": {
+    "genuinePasskeyOrConcurrentRevocationInteraction": false,
+    "browser": "Current localhost control remains blocked; no new journey",
+    "native": "Native input APIs disabled; no alternate automation",
+    "currentHeadHostedCI": "Not verified; Code Review requires GitHub connection",
+    "releaseReady": false
+  },
+  "idleResourceRelease": {
+    "api4111": "Verified owned PID15147 stopped; session completed. Last loaded Home code552e252 is historical, not a signing-fix live-journey claim.",
+    "web3011": "Verified owned PID19377 stopped; integrated output retained, production HTTPS guard unchanged.",
+    "postgres55451": "Labelled W1 container stopped; named volume and both logical W1 databases retained.",
+    "check55452": "Separate disposable owned check container removed; fixture DB had already been dropped by original check.",
+    "allFourPorts": "No loopback listener after cleanup",
+    "sharedDocker": "Left running for peers; no engine stop/prune",
+    "browserCleanup": "Viewport override reset; blank owned tabs3/4 closed. Closing connection-error tabs1/2 is refused by URL policy, so they remain; no bypass or claim that their fault/media state was reset."
+  },
+  "remainingActions": [
+    "Restore supported browser/native input and genuine approved HTTPS/RP/app/identity configuration",
+    "Personally operate assertion/revocation/recovery ordering and exact named-act denial/publication/reconciliation",
+    "Read satisfactory current-head Code Review checks before any ready merge"
+  ]
+}

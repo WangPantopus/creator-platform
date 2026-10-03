@@ -1,0 +1,170 @@
+{
+  "executable": "7327e6460d305f5a7d021b97bf9594b31577da90",
+  "recordedAt": "2026-10-02T19:28:37.387612+00:00",
+  "files": [
+    {
+      "path": "android-build-retry.json",
+      "sha256": "d3fb8d2553cebb63e54469c48354b356d81c29ea0ce383b9edcf0b8838d95e27"
+    },
+    {
+      "path": "android-build-retry.log",
+      "sha256": "826f241aa0ceb04e6af6fe62e624b7eaed76649bd652244ab960a252e2242795"
+    },
+    {
+      "path": "android-build.json",
+      "sha256": "e8331544d7e19766ca8c79dbad397763c64c5ed946161e4b34b51cd7c6cd6bdb"
+    },
+    {
+      "path": "android-build.log",
+      "sha256": "579fab07d2ce6340b2133ab3db7a1f5f9fcf6dfa70155a8592c653937bd12886"
+    },
+    {
+      "path": "android-device-custody.json",
+      "sha256": "f38a9b111312ecbdaee50b5fa3970c02b2d25a268729d5a680a91764acc1c7d4"
+    },
+    {
+      "path": "android-emulator.log",
+      "sha256": "20b2f84c124ce7a992f54fc0b783ec9aaf16770597f4a0f536294112241900c2"
+    },
+    {
+      "path": "android-install-launch.json",
+      "sha256": "64faf16484ea03728e448c1d17d966cb293be29808c28628988fad73189092a4"
+    },
+    {
+      "path": "api.json",
+      "sha256": "3b65b2bdec2d983dc139d7ae55fa4f93e243246b750aa3152e2e1c25a23eeead"
+    },
+    {
+      "path": "api.log",
+      "sha256": "b80561597692fd734cf22edaec3452ed8a8c6ebe883500952bc604cc4fc4f4c6"
+    },
+    {
+      "path": "canonical-generation.log",
+      "sha256": "a75f82a3ee402417109f2eab3040984b2cd4ea3c70f57586fe10836c04d1819e"
+    },
+    {
+      "path": "catalogue.json",
+      "sha256": "4fea8faaad22a59978e6c2f828a97d1dc005150ca90bd6d068903ab765f3496d"
+    },
+    {
+      "path": "checks.json",
+      "sha256": "a18f391c17d74f542181d5514694de0e9ba6bcaa1ff343a967b924fb15c2bb98"
+    },
+    {
+      "path": "ci-observations.json",
+      "sha256": "cae818241f57c232fecaacca07186375a8bed5f092a6a4ab09315593a4640005"
+    },
+    {
+      "path": "format.log",
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    {
+      "path": "initial-90b3235a/android-build.json",
+      "sha256": "6d6561aa3c4c517c5a7233cbecea0ba53dc5c94f0c89035d04121c638498bf65"
+    },
+    {
+      "path": "initial-90b3235a/android-build.log",
+      "sha256": "6688b6dd6d0569e608f8f5f3a1dc0fe93d8d553b5f13a9e6a4bde37e39357ee1"
+    },
+    {
+      "path": "initial-90b3235a/api.json",
+      "sha256": "e8f6d366f9fdd4cb24416a87690c7b17ac8163f69713ee97466e5e24c7855d85"
+    },
+    {
+      "path": "initial-90b3235a/api.log",
+      "sha256": "b80561597692fd734cf22edaec3452ed8a8c6ebe883500952bc604cc4fc4f4c6"
+    },
+    {
+      "path": "initial-90b3235a/canonical-generation.log",
+      "sha256": "0b7499c1b38543fad2389cefcb30c26b9ddd7055d99a47214e694139f34ecc8a"
+    },
+    {
+      "path": "initial-90b3235a/checks.json",
+      "sha256": "8a54c6234d06ff0014781178c7bc5f00c10e1b1113a00e2e398424e9637d3d44"
+    },
+    {
+      "path": "initial-90b3235a/format.log",
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    {
+      "path": "initial-90b3235a/initial-signals.json",
+      "sha256": "80d2322f0d01d138b27e71970d56f418d459a495dc78c13b017ec85781b0dcdb"
+    },
+    {
+      "path": "initial-90b3235a/scoped-eslint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "initial-90b3235a/shipping-backend.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    {
+      "path": "initial-90b3235a/web.json",
+      "sha256": "41ee13c0366b0444453d4f19531e9c2f5ae54ff4e5aee20239cb3d329c1af2db"
+    },
+    {
+      "path": "initial-90b3235a/web.log",
+      "sha256": "e9c9ab3c38c7bee50124ba2a769ec0b507da917789f97dd368d9fbc89a8ca2ce"
+    },
+    {
+      "path": "ios-build.json",
+      "sha256": "5fe65772c7d0f8980ae3f5fbd4c3516972a8eff905ad43a100d9ee164b300f3e"
+    },
+    {
+      "path": "ios-build.log",
+      "sha256": "25ec5dbad525c499eca58850c79acb6dd807f964c2ca80ca827206d3484ccfa6"
+    },
+    {
+      "path": "ios-xcodebuild.log",
+      "sha256": "3839f5bcf005433ee104752755ba811ce92aa9907fbaeeda0c2702d438f28789"
+    },
+    {
+      "path": "operation.json",
+      "sha256": "0c4dcbca3b5b62e9ed17b283f162c9040bfc6165910fd1f046aa43b8153db67f"
+    },
+    {
+      "path": "run.md",
+      "sha256": "339c20ceaf4f1e8f14e8119c20a175077328fcff4d8382a1a40a8789d9500d4e"
+    },
+    {
+      "path": "scoped-eslint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "shipping-backend.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    {
+      "path": "signals.json",
+      "sha256": "0fe905ef83d04a5b6ebca00d307be01ed870017b210a7cb6b1dd616ccee28f42"
+    },
+    {
+      "path": "web-privacy-light.png",
+      "sha256": "99739f8c4fe9b45feb01b038cbb44755bd2c2e866f1277404c9fa7c7af9e6114"
+    },
+    {
+      "path": "web-privacy-night.png",
+      "sha256": "098517e3e0ddc47a0925d67c4b47b5b874c6dda8b5a5eace4aaa75cb8b37ff99"
+    },
+    {
+      "path": "web-you-light.png",
+      "sha256": "ea2756b2f3c88e245b54346620f4827f02054dfe6b8280c31916994ad85beb74"
+    },
+    {
+      "path": "web-you-return-settled.png",
+      "sha256": "ea2756b2f3c88e245b54346620f4827f02054dfe6b8280c31916994ad85beb74"
+    },
+    {
+      "path": "web-you-return.png",
+      "sha256": "0f506505d8fb32d8bc53a702204c724e4e9f02c873ebbc559b770dcc95eeacf9"
+    },
+    {
+      "path": "web.json",
+      "sha256": "02ccecd8ec4d8b62660016de99058a41aaa8e7de4a914b4a3f19d86cb55edc08"
+    },
+    {
+      "path": "web.log",
+      "sha256": "9edf0ff22f3cf2c0795141533ad124ad88b2a6bb0d8b74c5856e8837e42324d8"
+    }
+  ]
+}

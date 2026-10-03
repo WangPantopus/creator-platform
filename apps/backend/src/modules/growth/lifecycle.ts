@@ -3,19 +3,21 @@ import type { PrivacyHook } from "../trust/contracts.js";
 import type { GrowthService } from "./service.js";
 import { DomainError } from "../../core/errors.js";
 import { z } from "zod";
+import type { PoolClient } from "pg";
 import {
   growthAccountExport,
   type GrowthPrivacyExportStream,
 } from "./privacy-export.js";
 
-type GrowthPrivacyInput = Parameters<PrivacyHook["run"]>[0] & {
-  leaseToken?: string;
-  signal?: AbortSignal;
-};
-/** W8's privacyTaskAuthority verifies the exact live task, binding and captured
- * ownership. The legacy account/job snapshot callback alone cannot grant a lease. */
+type GrowthPrivacyInput = Parameters<PrivacyHook["run"]>[0];
+/** W8 verifies the exact live task, binding, restoration and captured ownership
+ * on the domain worker's actual held transaction before any domain locks. */
 export type GrowthPrivacyTaskAuthority = (
+  client: PoolClient,
   input: GrowthPrivacyInput & { leaseToken: string; signal: AbortSignal },
+) => Promise<readonly string[]>;
+export type GrowthPrivacyHeldAuthority = (
+  client: PoolClient,
 ) => Promise<readonly string[]>;
 export type GrowthPrivacyHook = Omit<PrivacyHook, "run"> & {
   run(input: GrowthPrivacyInput): Promise<
@@ -25,7 +27,8 @@ export type GrowthPrivacyHook = Omit<PrivacyHook, "run"> & {
   >;
 };
 
-/** Resolve a durable verified job snapshot, never client-supplied creator IDs or post-delete absence. */
+/** Deprecated host contract: a stored ownership snapshot cannot authorize work.
+ * Hosts must supply the current leased-task authority below. */
 export type GrowthPrivacyScope = (input: {
   jobId: string;
   accountId: string;
@@ -35,6 +38,8 @@ export function growthPrivacyHook(
   scope?: GrowthPrivacyScope,
   taskAuthority?: GrowthPrivacyTaskAuthority,
 ): GrowthPrivacyHook {
+  // Retain the positional host signature without invoking the non-leased port.
+  void scope;
   return {
     domain: "growth",
     run: async (input) => {
@@ -44,39 +49,43 @@ export function growthPrivacyHook(
           copy.growthErrorGrowthScopeAdapterRequired,
           503,
         );
-      let resolved: readonly string[] | null | undefined;
-      if (input.leaseToken || input.signal) {
-        if (!input.leaseToken || !input.signal || !taskAuthority)
-          throw new DomainError(
-            "growth_privacy_task_authority_required",
-            copy.growthErrorGrowthAccountScopeRequired,
-            503,
-          );
-        input.signal.throwIfAborted();
-        resolved = await taskAuthority({
-          ...input,
-          leaseToken: input.leaseToken,
-          signal: input.signal,
-        });
-        input.signal.throwIfAborted();
-      } else
-        resolved = await scope?.({
-          jobId: input.jobId,
-          accountId: input.accountId,
-        });
-      if (!resolved)
+      if (!input.leaseToken || !input.signal || !taskAuthority)
         throw new DomainError(
-          "growth_account_scope_required",
+          "growth_privacy_task_authority_required",
           copy.growthErrorGrowthAccountScopeRequired,
           503,
         );
-      const ownedCreators = z.array(z.uuid()).max(100).parse(resolved);
+      const currentTask = Object.freeze({
+        ...input,
+        leaseToken: input.leaseToken,
+        signal: input.signal,
+      });
+      input.signal.throwIfAborted();
+      let ownership: string | undefined;
+      const assertAuthority: GrowthPrivacyHeldAuthority = async (client) => {
+        currentTask.signal.throwIfAborted();
+        const current = z
+          .array(z.uuid())
+          .max(100)
+          .parse(await taskAuthority(client, currentTask));
+        const captured = [...new Set(current)].sort();
+        const binding = captured.join(",");
+        if (ownership !== undefined && binding !== ownership)
+          throw new DomainError(
+            "growth_privacy_ownership_changed",
+            copy.growthErrorGrowthAccountScopeRequired,
+            503,
+          );
+        ownership = binding;
+        currentTask.signal.throwIfAborted();
+        return captured;
+      };
       if (input.kind === "delete")
         return {
           receipt: await service.privacyDelete(
             input.accountId,
-            ownedCreators,
             input.signal,
+            assertAuthority,
           ),
           retained: [
             {
@@ -96,164 +105,14 @@ export function growthPrivacyHook(
             },
           ],
         };
-      if (input.signal && input.leaseToken)
-        return {
-          receipt: { domain: "growth", format: "growth-account-export-v1" },
-          stream: growthAccountExport(
-            service,
-            input.accountId,
-            ownedCreators,
-            input.signal,
-          ),
-          retained: [],
-        };
-      const data = await service.db.transaction(
-        service.db.worker,
-        async (client) => {
-          const result: Record<string, unknown> = {};
-          async function collect(
-            table: string,
-            column: string,
-            value: unknown,
-          ) {
-            const rows = (
-              await client.query(
-                `SELECT * FROM growth.${table} WHERE ${column}=$1 LIMIT 10001`,
-                [value],
-              )
-            ).rows;
-            if (rows.length > 10000)
-              throw new DomainError(
-                "growth_export_stream_required",
-                copy.growthErrorGrowthExportStreamRequired,
-                503,
-              );
-            return rows;
-          }
-          for (const table of [
-            "follow",
-            "preference",
-            "notification",
-            "share",
-            "metric",
-            "feedback",
-            "prompt_choice",
-            "entry_attribution",
-          ])
-            result[table] = await collect(table, "account_id", input.accountId);
-          result.invites = await collect(
-            "invite",
-            "created_by",
-            input.accountId,
-          );
-          result.activation = await collect(
-            "activation_job",
-            "creator_account_id",
-            input.accountId,
-          );
-          result.devices = (
-            await client.query(
-              "SELECT installation_id,platform,permission,revoked_at,updated_at FROM growth.device WHERE account_id=$1 LIMIT 10001",
-              [input.accountId],
-            )
-          ).rows;
-          if ((result.devices as unknown[]).length > 10000)
-            throw new DomainError(
-              "growth_export_stream_required",
-              copy.growthErrorGrowthExportStreamRequired,
-              503,
-            );
-          const email = (
-            await client.query(
-              "SELECT encrypted_address,verified_at,bounced_at,unsubscribed_at FROM growth.email WHERE account_id=$1",
-              [input.accountId],
-            )
-          ).rows[0];
-          if (email)
-            result.email = {
-              address: service.open(email.encrypted_address),
-              verifiedAt: email.verified_at,
-              bouncedAt: email.bounced_at,
-              unsubscribedAt: email.unsubscribed_at,
-            };
-          result.delivery = (
-            await client.query(
-              "SELECT d.id,d.notification_id,d.channel,d.state,d.attempts,d.available_at FROM growth.delivery d WHERE d.account_id=$1 LIMIT 10001",
-              [input.accountId],
-            )
-          ).rows;
-          if ((result.delivery as unknown[]).length > 10000)
-            throw new DomainError(
-              "growth_export_stream_required",
-              copy.growthErrorGrowthExportStreamRequired,
-              503,
-            );
-          const subjectKey = service.privacySubjectKey(input.accountId);
-          result.insightSignals = (
-            await client.query(
-              "SELECT id,creator_id,topic_key,window_start,unresolved,version FROM growth.insight_signal WHERE subject_key=$1 LIMIT 10001",
-              [subjectKey],
-            )
-          ).rows;
-          result.thanks = (
-            await client.query(
-              "SELECT creator_id,window_start,quote->>'id' AS id,quote->>'text' AS text,quote->>'displayName' AS display_name FROM growth.impact CROSS JOIN LATERAL jsonb_array_elements(consented_thanks) quote WHERE quote->>'subjectKey'=$1 LIMIT 10001",
-              [subjectKey],
-            )
-          ).rows;
-          if (
-            (result.insightSignals as unknown[]).length > 10000 ||
-            (result.thanks as unknown[]).length > 10000
-          )
-            throw new DomainError(
-              "growth_export_stream_required",
-              copy.growthErrorGrowthExportStreamRequired,
-              503,
-            );
-          result.creators = [];
-          for (const creatorId of ownedCreators) {
-            const creator: Record<string, unknown> = { id: creatorId };
-            for (const table of [
-              "content_public",
-              "insight_snapshot",
-              "insight_window",
-              "recommendation",
-              "instagram_reply",
-              "experiment",
-            ])
-              creator[table] = await collect(table, "creator_id", creatorId);
-            // Export creator aggregates without other fans' saved quote text or
-            // identity. Their current sharing permission is not proven here.
-            creator.impact = (
-              await client.query(
-                "SELECT creator_id,window_start,unique_fans,ai_conversations,personal_replies,notes,thanks_count FROM growth.impact WHERE creator_id=$1 LIMIT 10001",
-                [creatorId],
-              )
-            ).rows;
-            if ((creator.impact as unknown[]).length > 10000)
-              throw new DomainError(
-                "growth_export_stream_required",
-                copy.growthErrorGrowthExportStreamRequired,
-                503,
-              );
-            creator.profile =
-              (
-                await client.query(
-                  "SELECT document FROM growth.creator_public WHERE id=$1",
-                  [creatorId],
-                )
-              ).rows[0]?.document ?? null;
-            (result.creators as unknown[]).push(creator);
-          }
-          return result;
-        },
-      );
-      // Return only to W8's authorized privacy worker; never logs/telemetry.
-      // The current worker persists bounded JSONB, so this is not encrypted
-      // export-storage or streaming acceptance.
       return {
-        receipt: { domain: "growth", exported: true },
-        data,
+        receipt: { domain: "growth", format: "growth-account-export-v1" },
+        stream: growthAccountExport(
+          service,
+          input.accountId,
+          input.signal,
+          assertAuthority,
+        ),
         retained: [],
       };
     },

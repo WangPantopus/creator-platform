@@ -1,0 +1,12 @@
+{
+  "name": "w7_api",
+  "rolsuper": false,
+  "rolbypassrls": false,
+  "rolcreatedb": false,
+  "rolcreaterole": false,
+  "rolinherit": true,
+  "core": true,
+  "growth": true,
+  "worker": false,
+  "owns": false
+}
