@@ -1,4 +1,4 @@
-import type { Pool, PoolClient } from "pg";
+import { Client, type Pool, type PoolClient } from "pg";
 import type { PrivacyHook } from "../trust/contracts.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import { copy } from "@qelvora/copy";
@@ -217,14 +217,47 @@ export function conversationPrivacyHook(
         };
       }
       const client = await input.pool.connect();
-      let released = false;
-      const abort = () => {
-        if (!released) {
-          released = true;
-          client.release(true);
-        }
+      let discardClient = false;
+      let backendPid: number | undefined;
+      let cancelling: Promise<void> | undefined;
+      let cancellationFailure: unknown;
+      const transportError = () => {
+        discardClient = true;
       };
-      signal.addEventListener("abort", abort, { once: true });
+      client.on("error", transportError);
+      const abort = () => {
+        if (backendPid === undefined || cancelling) return;
+        // This PID belongs to the still-held deletion client. Cancellation
+        // never releases its task locks or permits another pool borrower.
+        cancelling = (async () => {
+          const control = new Client({
+            ...input.pool.options,
+            password: input.pool.options.password,
+            connectionTimeoutMillis: 1500,
+            statement_timeout: 1500,
+            query_timeout: 1500,
+          });
+          control.on("error", (error) => {
+            cancellationFailure ??= error;
+          });
+          try {
+            await control.connect();
+            const result = await control.query<{ cancelled: boolean }>(
+              "SELECT pg_cancel_backend($1) AS cancelled",
+              [backendPid],
+            );
+            invariant(
+              result.rows[0]?.cancelled === true,
+              "conversation_delete_cancel_unavailable",
+              "The actual held deletion backend could not be cancelled.",
+            );
+          } finally {
+            await control.end();
+          }
+        })().catch((error: unknown) => {
+          cancellationFailure ??= error;
+        });
+      };
       const accountingReceipts: Record<string, unknown>[] = [];
       const financialDispositions: {
         threadId: string;
@@ -241,6 +274,20 @@ export function conversationPrivacyHook(
         await client.query(
           "SET LOCAL statement_timeout='10s'; SET LOCAL lock_timeout='5s'",
         );
+        signal.throwIfAborted();
+        backendPid = z
+          .int()
+          .positive()
+          .max(2147483647)
+          .parse(
+            (
+              await client.query<{ pid: number }>(
+                "SELECT pg_backend_pid() AS pid",
+              )
+            ).rows[0]?.pid,
+          );
+        signal.addEventListener("abort", abort, { once: true });
+        signal.throwIfAborted();
         await fenceConversationPrivacyTask(input.authority, client, job);
         const accountingInstalled = await generationJournalInstalled(client);
         const weightedInstalled = (
@@ -525,13 +572,36 @@ export function conversationPrivacyHook(
           retained,
         };
       } catch (error) {
-        if (!released) await client.query("ROLLBACK").catch(() => undefined);
+        signal.removeEventListener("abort", abort);
+        // A delayed control query must finish and close before ROLLBACK.
+        // Even an aborted or disconnected task retains this client until its
+        // actual transaction has rolled back or its connection has ended.
+        await cancelling;
+        const failures = [error];
+        if (cancellationFailure !== undefined) {
+          discardClient = true;
+          failures.push(cancellationFailure);
+        }
+        try {
+          await client.query("ROLLBACK");
+        } catch (rollbackFailure) {
+          discardClient = true;
+          failures.push(rollbackFailure);
+        }
+        if (failures.length > 1)
+          throw new AggregateError(
+            failures,
+            "Conversation deletion cleanup failed.",
+          );
         throw error;
       } finally {
         signal.removeEventListener("abort", abort);
-        if (!released) {
-          released = true;
-          client.release();
+        await cancelling;
+        try {
+          if (discardClient) await client.end();
+        } finally {
+          client.removeListener("error", transportError);
+          client.release(discardClient);
         }
       }
     },
