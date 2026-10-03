@@ -1,5 +1,25 @@
 # Native Team domain source and compilation
 
+## Renewed existing-PR review at249d3b36
+
+The current PR293 source review found that native role choices remained editable
+while the current role set was neither the original reviewed nor desired set.
+Product `249d3b36c2f8c7a8601e9e33799c9cb98001086d` closes that gap in both
+the SwiftUI/Compose controls and their state methods. A stale selection now
+requires the existing explicit Review current roles action; that action keeps
+the desired selection and adopts only the actual current set. No new command,
+credential, route, producer or test code was introduced.
+
+Swift source parsing and diff checks pass. Current shipping builds and personal
+native operation remain pending; the historical77cad82e compilation below does
+not qualify249d. W1 retains the genuine shipping Team registration, profile and
+original session producer. The standalone components remain unmounted. This is
+unique retained source, not a verified duplicate to close. Current required CI,
+Light/Night, saved return, role/account/session denial, open-view revocation,
+stale/duplicate/interrupted actions and durable records remain open.
+Implemented: the narrow source repair. Runnable/integrated/verified: bounded by
+the missing root and current build/app qualification. Release-ready:false.
+
 Product source `77cad82ebc10d76cce5de049cb991376331790ef` is an independent
 branch from captured remote main `132bc0550a077b9ffe4dad6d2a8d7bc3e0e25e80`.
 The complete [constructor contract](../../../../../docs/workstreams/contracts/W5-native-team-workspace.md)

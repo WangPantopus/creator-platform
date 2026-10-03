@@ -55,6 +55,8 @@ There is no automatic replay or invented idempotency/signature key. If current
 membership is neither reviewed nor desired, explicit Review current roles adopts
 the actual current set while preserving desired choices. A current desired set
 is a real read observation, not acknowledgement of an unknown command.
+Both controls and state methods refuse selection changes while that review is
+stale; choosing the newly observed set cannot bypass explicit review.
 
 This slice supplies workspace/Team reads, current member roles and role editing.
 Pending workspace invitations are displayed from the actual producer. Invitation
