@@ -1,0 +1,11 @@
+# Original Agent privacy read deadlines — October 3, 2026 UTC
+
+Review of existing W2 #279 found that its 5,000 ms per-query metadata/control overrides replaced a shorter original PostgreSQL connection query budget. The same issue affected the original export PID read and cancellation control query. The repair reads the actual original client's positive budget, including pg's numeric string representation, and uses the shorter budget with the existing 5,000 / 1,500 ms ceilings. A disabled or absent original query timeout still receives the existing finite ceiling. The cancellation control connection also preserves a shorter original connection acquisition budget.
+
+The actual held client remains responsible for PID, BEGIN, work, final fencing, sole COMMIT and physical close before discard. The repository metadata check stays on that same client. No new Task, scope, pool, purpose, positive catalogue or lifecycle authority is created. Original snapshot/expiry SQL and the distinct baseline 0079 / held 0165 purposes are unchanged.
+
+Backend types, scoped lint, final formatting and the existing nine contract tests pass (85 ms). The first formatting check failed and was corrected. Frozen offline dependency restoration uses pnpm 12.5.1 with the committed lock.
+
+The first real ordinary-role PostgreSQL primitive probe refused `ECONNREFUSED` at the owned new disposable 55449 endpoint: the preceding Docker inspect/start had not settled. Docker's context read returned `desktop-linux`; desktop status and server version each exceeded an eight-second diagnostic deadline. No runtime pass is claimed. The sole engine owner was notified; root's main container, API, devices and leases remain quiesced. The old retired check container is not recreated. Real withheld-response/short-budget/close-before-release qualification, current-head CI, owner review and normal main integration remain pending.
+
+The earlier #279 head `7c007cd8bc42f82b0c69efa35ad46c1c3a4e426e` has four fast SUCCESS jobs and six Mac QUEUED jobs, with actual completed logs read. Those results do not qualify this newer source. The complete W2 assignment continues; a source fix or unavailable runtime prerequisite does not establish all-eight privacy, finite C10, provider or release acceptance.

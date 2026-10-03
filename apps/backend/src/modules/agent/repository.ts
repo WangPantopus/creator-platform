@@ -2,6 +2,7 @@ import type { Pool, PoolClient } from "pg";
 import { DomainError, invariant } from "../../core/errors.js";
 import { contentHash } from "../../core/canonical.js";
 import type { PreparedGenerationJournal } from "./generation-journal.js";
+import { agentPrivacyQueryTimeout } from "./privacy-transaction.js";
 import {
   assertCurrentSession,
   requestAuthority,
@@ -50,7 +51,7 @@ export class AgentRepository {
   /** Fresh metadata on the original transaction owner's bounded source. This
    * must not await the interactive cache's separate pool query. */
   assertRuntimeRoleInTransaction(client: PoolClient): Promise<void> {
-    return this.checkRuntimeRole(client, 5000);
+    return this.checkRuntimeRole(client, agentPrivacyQueryTimeout(client));
   }
   private async checkRuntimeRole(
     query: Pick<Pool, "query"> = this.pool,
