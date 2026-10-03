@@ -2,6 +2,7 @@ import type { Pool, PoolClient } from "pg";
 import { DomainError, invariant } from "../../core/errors.js";
 import { contentHash } from "../../core/canonical.js";
 import type { PreparedGenerationJournal } from "./generation-journal.js";
+import { agentPrivacyQueryTimeout } from "./privacy-transaction.js";
 import {
   assertCurrentSession,
   requestAuthority,
@@ -47,7 +48,15 @@ export class AgentRepository {
     });
     return this.storageReady;
   }
-  private async checkRuntimeRole() {
+  /** Fresh metadata on the original transaction owner's bounded source. This
+   * must not await the interactive cache's separate pool query. */
+  assertRuntimeRoleInTransaction(client: PoolClient): Promise<void> {
+    return this.checkRuntimeRole(client, agentPrivacyQueryTimeout(client));
+  }
+  private async checkRuntimeRole(
+    query: Pick<Pool, "query"> = this.pool,
+    queryTimeout?: number,
+  ) {
     const required = [
       "ai_workspace",
       "ai_source",
@@ -68,8 +77,8 @@ export class AgentRepository {
       "ai_tombstone",
     ];
     const role = (
-      await this.pool.query<{ ready: boolean }>(
-        `SELECT NOT (r.rolsuper OR r.rolbypassrls OR r.rolcreaterole OR r.rolcreatedb OR r.rolinherit)
+      await query.query<{ ready: boolean }>({
+        text: `SELECT NOT (r.rolsuper OR r.rolbypassrls OR r.rolcreaterole OR r.rolcreatedb OR r.rolinherit)
           AND has_schema_privilege(current_user,'creator','USAGE')
           AND (SELECT count(*)=$2::integer FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
             WHERE n.nspname='creator' AND c.relname=ANY($1::text[]) AND c.relkind='r')
@@ -78,8 +87,9 @@ export class AgentRepository {
               AND (pg_has_role(current_user,c.relowner,'MEMBER') OR NOT c.relrowsecurity OR NOT c.relforcerowsecurity
                 OR NOT has_table_privilege(current_user,c.oid,'SELECT')))
           AS ready FROM pg_roles r WHERE r.rolname=current_user`,
-        [required, required.length],
-      )
+        values: [required, required.length],
+        ...(queryTimeout === undefined ? {} : { query_timeout: queryTimeout }),
+      })
     ).rows[0];
     if (!role?.ready)
       throw new DomainError(

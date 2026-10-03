@@ -1,0 +1,22 @@
+{
+  "recordedAt": "2026-10-02T06:35:01.772104+00:00",
+  "source": "0e5da123dfa3de2b5b1ed822183efb98e1a8888e",
+  "buildLockHelper": "W1 94258f0e:scripts/with-heavy-build-lock.mjs",
+  "api": "http://127.0.0.1:4103",
+  "androidApiAlias": "http://10.0.2.2:4103",
+  "backendRuntimeSource": "d4a5c749",
+  "builds": {
+    "ios": {
+      "exit": 0,
+      "sha256": "fe83b5688a5afbe8ff6b9ad0e87ee4cd95391939202cc2036105ebcdf1fa383f",
+      "artifact": "/Users/yingpengwang/Library/Caches/creator-platform-w3/ios-derived/Build/Products/Debug-iphonesimulator/QelvoraApp.app/QelvoraApp",
+      "log": "/private/tmp/w3-ios-metadata-build.log"
+    },
+    "android": {
+      "exit": 0,
+      "sha256": "fdc015d3be4b5cf298120328eaeb0893981569f60fae87a550cd1dbf4d2555e4",
+      "artifact": "/Users/yingpengwang/Library/Caches/creator-platform-w3/android-build/outputs/apk/debug/app-debug.apk",
+      "log": "/private/tmp/w3-android-metadata-build.log"
+    }
+  }
+}

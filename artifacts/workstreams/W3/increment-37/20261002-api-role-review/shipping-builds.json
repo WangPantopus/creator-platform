@@ -1,0 +1,20 @@
+{
+  "source": "7d0a9906384b5b4f3e4ee70d948c061718953629",
+  "ios": {
+    "shippingBuild": "passed",
+    "binarySha256": "301432eab63ffc8f2575a7da36298aacccff5547402cb74d8ac1709820c0b5e0",
+    "personallyOperatedThisSource": false
+  },
+  "android": {
+    "shippingBuild": "passed",
+    "apkSha256": "cdd5ba95470124588f72fa2a7f28e047c28cf684fdcb5ab716d420514215c287",
+    "personallyOperatedThisSource": false
+  },
+  "heavyBuild": {
+    "iosThenAndroid": true,
+    "actualAcquisitions": 2,
+    "actualReleases": 2,
+    "overlap": false
+  },
+  "newTestsWritten": false
+}

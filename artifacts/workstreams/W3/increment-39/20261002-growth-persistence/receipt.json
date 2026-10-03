@@ -1,0 +1,59 @@
+{
+  "source": "e8a59099e546f3e44443924c7101f1e859f41a43",
+  "producerSource": "099c7c530060fd524879e86942d7b092a53f98f1",
+  "apiPort": 4103,
+  "webPort": 3003,
+  "database": "creator_w3",
+  "registeredLedgerRows": 40,
+  "web": {
+    "personallyOperated": true,
+    "width": 390,
+    "appearances": ["light", "night"],
+    "quietStart": "22:00",
+    "quietEnd": "08:00",
+    "timeZone": "America/Los_Angeles",
+    "saveSuccessObserved": true,
+    "retainedAfterReload": true,
+    "partialBoundaryRejected": true,
+    "partialRejectionRestoredPriorVisiblePair": true,
+    "canonicalCategoryLabelsObserved": 19
+  },
+  "ios": {
+    "shippingBuild": "passed",
+    "binarySha256": "c6caa2fbe6931da99a2cd420e690e12fb13e023a98a85b3ddf908bd8618de054",
+    "personallyOperatedThisSource": false
+  },
+  "android": {
+    "shippingBuild": "passed",
+    "apkSha256": "a4d1f5afb1f422990156df5ca689da7762d6b490d29ceb4bf6da9d9baa891a80",
+    "personallyOperatedThisSource": true,
+    "deviceOperation": "actual shipping APK; personally saved changed pair, web readback, web restoration and Android cold reread",
+    "avd": "Qelvora_W3_API34",
+    "serial": "emulator-5584",
+    "slot": "creator-platform-emulator-slot-1",
+    "widthDp": 390,
+    "appearances": ["light", "night"],
+    "textScales": [1, 2],
+    "initialWebPair": ["22:00", "08:00"],
+    "androidSavedPair": ["22:15", "08:15"],
+    "webReadbackMatched": true,
+    "restoredWebPair": ["22:00", "08:00"],
+    "androidColdReadMatchedRestoration": true,
+    "timeZone": "America/Los_Angeles",
+    "night200SaveSuccessObserved": true,
+    "appANREventsSinceBoot": 0,
+    "fontScaleRestored": 1,
+    "ownedGuestStopped": true,
+    "exactOwnedLeaseReleased": true,
+    "unsavedInputMisfocusCorrectedBeforeSave": true,
+    "sharedRequestsTabWrapsAt200": true
+  },
+  "heavyBuild": {
+    "iosThenAndroid": true,
+    "actualAcquisitions": 2,
+    "actualReleases": 2,
+    "overlap": false
+  },
+  "generationAvailable": false,
+  "newTestsWritten": false
+}

@@ -1,0 +1,51 @@
+{
+  "recordedAt": "2026-10-01T21:00:17.333157+00:00",
+  "question": "Why do hosted ios-foundation runs fail the original native image comparisons while local runs pass?",
+  "rootCause": "Hosted macOS runners attach a 1x virtual display. The capture helper read window.backingScaleFactor (1.0), so AppKit/SwiftUI rasterized text at 1x; the 2x scaleEffect canvas then magnified blurred 1x glyphs. Layout, positions and dimensions were already identical.",
+  "hostedEvidence": {
+    "mainRun": 36881231276,
+    "mainJob": 110433204498,
+    "mainArtifact": 11187255811,
+    "runnerImage": "xcode-27-arm64 20260928.0222.1",
+    "xcode": "27.0 (27A266a)",
+    "loggedBacking": 1.0,
+    "failedComparisons": 106,
+    "w7Run7f71": {
+      "run": 36908886586,
+      "runner": "macos-26-intel",
+      "xcode": "26.5 (17F42)",
+      "failedComparisons": 93
+    }
+  },
+  "localEnvironment": {
+    "machine": "Mac Studio, Apple M2 Max",
+    "macOS": "27.0 (26A428)",
+    "xcode": "27.0 (27A266a)",
+    "displayBacking": 2.0
+  },
+  "reproduction": {
+    "method": "Temporary uncommitted NSWindow subclass forcing backingScaleFactor=1 with the unchanged helper",
+    "failures": 106,
+    "comparedWithHostedArtifact": 106,
+    "byteIdenticalToHosted": 106,
+    "localManifestSha256": "daf11e8dc3f661302c5f6f3f316a5ada46e83b57c30b69c6ac8cd4137dca897a",
+    "hostedManifestSha256": "daf11e8dc3f661302c5f6f3f316a5ada46e83b57c30b69c6ac8cd4137dca897a"
+  },
+  "fix": {
+    "commit": "c2d3ece2",
+    "source": "Adopted W4 PR #53 helper verbatim (ReferenceScaleWindow reports 2x; bitmap maps two pixels per point)",
+    "localResult": "18 checks, 0 failures; all 110 original comparisons within the unchanged exact-dimension 99.85%-within-8 contract",
+    "variantWithoutPrepareLayer": {
+      "outputsByteIdenticalToHeadAt2x": 110,
+      "of": 110,
+      "runtimeSeconds": 27,
+      "pr53RuntimeSeconds": 168,
+      "note": "The retained prepareLayer redraw is redundant once the window reports 2x; left in place to match PR #53 exactly."
+    },
+    "referencesChanged": false,
+    "thresholdChanged": false,
+    "workflow": "ios-foundation restored to main's xcode-27 runner; the macos-26-intel/Xcode 26.5 switch rested on a misdiagnosis",
+    "hostedConfirmation": "pending: ios-foundation on c2d3ece2 was still queued at handoff"
+  },
+  "webVisual": "Main's web-visual failed loading playwright.config.ts (ReferenceError: visualWebURL is not defined). c2d3ece2 carries W1 PR #59's exact fix; hosted confirmation pending."
+}

@@ -8,8 +8,13 @@ import { invariant } from "../../core/errors.js";
 import type { ThreadScope } from "../access/scope.js";
 import { createAgentDomain } from "../agent/integration.js";
 import { modelFromEnvironment } from "../agent/model.js";
-import { PreparedGenerationJournal } from "../agent/generation-journal.js";
+import {
+  GENERATION_JOURNAL_MIGRATION,
+  PreparedGenerationJournal,
+} from "../agent/generation-journal.js";
 import type { LicenseVerifier } from "../agent/service.js";
+import { PreparedUsageRetention } from "../agent/usage-retention.js";
+import { DevelopmentLicenseVerifier } from "../agent/development-license.js";
 import type { ApprovedSentence } from "../agent/runtime.js";
 import { createCommerceRuntime } from "../commerce/runtime.js";
 import { readCommerceEnvironment } from "../commerce/environment.js";
@@ -23,11 +28,21 @@ import { ProviderPolicySchema } from "../../../../../packages/api/src/conversati
 import { conversationAgentGenerator } from "./agent-generator.js";
 import { ConversationCorrections } from "./corrections.js";
 import { ConversationLineage } from "./lineage.js";
+import type { ReplyFeedbackAuthority } from "./lineage.js";
+import {
+  IdentityIntroOffers,
+  type IntroOfferPolicy,
+} from "../identity/intro-offers.js";
 import { ConversationRecordings } from "./recordings.js";
+import type { PreparedConversationPrivacyCursor } from "./privacy-export-cursor.js";
 import { createConversationRuntime } from "./runtime.js";
+import {
+  DevelopmentConversationPolicy,
+  SYNTHETIC_PROVIDER_REFERENCE,
+} from "./development-policy.js";
 
 const migrations = {
-  journal: "0048_w2_usage_lineage",
+  journal: GENERATION_JOURNAL_MIGRATION,
   cost: "0049_w4_generation_cost_settlement",
   lineage: "0056_w3_correction_feedback_lineage",
   feedbackConsent: "0057_w3_feedback_consent",
@@ -47,6 +62,10 @@ const DevelopmentEconomicsSchema = z.strictObject({
 
 /** Inputs supplied by their owners. Absent inputs keep their paths off. */
 export type ConversationHostProducers = {
+  /** W8: actual feedback notice/consent/expiry; no development substitute. */
+  feedbackAuthority?: ReplyFeedbackAuthority;
+  /** W8: approved minimal account-level intro-offer use and retention. */
+  introOfferPolicy?: IntroOfferPolicy;
   /** W4: genuinely prepared original group fulfillment on this exact graph. */
   fulfillmentPlans?: import("../commerce/fulfillment-plans.js").CommerceFulfillmentPlans;
   /** W2: the configured license authority for this host. */
@@ -56,6 +75,12 @@ export type ConversationHostProducers = {
     retentionPolicyVersion: string;
     assertPrivacyRegistered: () => Promise<void>;
   };
+  /** W2's actual prepared expiry producer plus W8's independently reviewed
+   *0206 custody. W8 fixes its real held-task authority when preparing exports. */
+  privacyCursor?: Omit<
+    Parameters<typeof PreparedConversationPrivacyCursor.prepare>[0],
+    "pool" | "authority" | "journal" | "lineage" | "recordings"
+  >;
   /** W6: the host's media runtime on this same database pool. */
   media?: MediaService;
   /** W6: fan reads of signed recordings ask W3 for the exact publication. */
@@ -141,7 +166,36 @@ export async function composeConversationHost(
         JSON.parse(await readFile(env.W3_PROVIDER_POLICY_FILE, "utf8")),
       )
     : undefined;
-  if (!policy?.verified) missing.push("named provider policy");
+  let developmentPolicy: DevelopmentConversationPolicy | undefined;
+  if (
+    requested &&
+    producers.licenseVerifier instanceof DevelopmentLicenseVerifier
+  ) {
+    invariant(
+      !policy?.verified,
+      "synthetic_policy_unreviewed_required",
+      "Synthetic development policy must remain unreviewed. It cannot represent provider approval.",
+    );
+    if (
+      policy?.reference === SYNTHETIC_PROVIDER_REFERENCE &&
+      runtime.identity?.sessions
+    )
+      developmentPolicy = DevelopmentConversationPolicy.prepare({
+        pool: runtime.pool,
+        policy,
+        verifier: producers.licenseVerifier,
+        sessions: runtime.identity.sessions,
+        reference: env.W2_PROVIDER_POLICY_REFERENCE,
+        host: {
+          environment: env.NODE_ENV,
+          enabled: env.W2_DEVELOPMENT_SYNTHETIC_LICENSING,
+          identityMode: config.identityAdapter,
+          webOrigin: config.allowedOrigin,
+        },
+      });
+  }
+  if (!policy?.verified && !developmentPolicy)
+    missing.push("named provider policy");
   const economics =
     requested && env.W3_DEVELOPMENT_ECONOMICS_FILE
       ? DevelopmentEconomicsSchema.parse(
@@ -155,16 +209,48 @@ export async function composeConversationHost(
   if (!producers.licenseVerifier) missing.push("license verifier (W2)");
   if (!runtime.access.threadScopeInTransactionAvailable)
     missing.push("in-transaction denial (W8)");
+  // Held source allocations are not active custody. The legacy interactive
+  // generator below cannot replace the actual scoped worker/settlement graph.
+  for (const version of [
+    "0159_w1_generation_worker_scope",
+    "0177_w8_generation_worker_denial",
+    "0179_w3_generation_purpose_consumers",
+    "0180_w2_generation_input_consumers",
+    "0181_w2_generation_attempt_admission",
+    "0183_w1_generation_terminal_scope",
+    "0184_w8_generation_terminal_denial",
+    "0188_w2_generation_terminal_journal",
+    "0189_w4_generation_terminal_settlement",
+    "0203_w3_terminal_only_finalization",
+    "0215_w4_generation_safety_terminal_settlement",
+    "0218_w1_generation_terminal_discovery",
+  ])
+    if (!(await registeredChecksum(version)))
+      missing.push(`registered ${version}`);
+  if (requested)
+    missing.push("current generation worker composition (W3/W1/W2/W4)");
 
   let journal: PreparedGenerationJournal | undefined;
+  const originalUsageRetention = producers.privacyCursor?.usageRetention;
+  if (producers.privacyCursor)
+    invariant(
+      originalUsageRetention instanceof PreparedUsageRetention,
+      "accounting_retention_unconfigured",
+      "The original prepared accounting retention producer is required.",
+    );
   const journalChecksum = await registeredChecksum(migrations.journal);
   if (!journalChecksum) missing.push(`registered ${migrations.journal}`);
   else if (!producers.journalPolicy) missing.push("journal policy (W2)");
-  else if (requested)
+  else if (requested || producers.privacyCursor)
+    // Original privacy accounting is independent of provider/generation setup.
     journal = await PreparedGenerationJournal.prepare(runtime.pool, {
       migration: { version: migrations.journal, checksum: journalChecksum },
       ...producers.journalPolicy,
     });
+  // The Agent lifecycle and export cursor retain the same original expiry
+  // producer. A policy string or a matching URL cannot replace its custody.
+  const usageRetention = journal ? originalUsageRetention : undefined;
+  if (journal && usageRetention) usageRetention.assertJournal(journal);
   const costChecksum = await registeredChecksum(migrations.cost);
   if (!costChecksum) missing.push(`registered ${migrations.cost}`);
 
@@ -210,12 +296,20 @@ export async function composeConversationHost(
   const lineage = await ConversationLineage.prepare({
     database: runtime.database,
     migrationVersion: migrations.lineage,
+    feedbackAuthority: producers.feedbackAuthority,
     feedbackMigration: await registeredChecksum(
       migrations.feedbackConsent,
     ).then((checksum) =>
       checksum ? { version: migrations.feedbackConsent, checksum } : undefined,
     ),
   });
+  if (lineage && producers.feedbackAuthority && producers.introOfferPolicy)
+    lineage.configureIntroOffers(
+      await IdentityIntroOffers.prepare({
+        database: runtime.database,
+        assertOfferAllowed: producers.introOfferPolicy,
+      }),
+    );
   const corrections = lineage
     ? await ConversationCorrections.prepare({
         database: runtime.database,
@@ -258,6 +352,7 @@ export async function composeConversationHost(
               licenseVerifier: producers.licenseVerifier!,
               audience,
               usageJournal: journal!,
+              ...(usageRetention ? { usageRetention } : {}),
               conversation: {
                 current: (scope) => memory.context(scope),
                 assertProcessorConsent: (scope) =>
@@ -269,13 +364,36 @@ export async function composeConversationHost(
             bound = conversationAgentGenerator(runtime.database, agent);
             return bound.generator;
           },
-          assertReady: (scope: ThreadScope, client: PoolClient) =>
-            current().assertReady(scope, client),
+          assertReady: (scope: ThreadScope, client: PoolClient) => {
+            invariant(
+              !developmentPolicy ||
+                developmentPolicy.allowsAccounts(
+                  scope.actorAccountId,
+                  scope.fanAccountId,
+                  scope.creatorAccountId,
+                ),
+              "synthetic_accounts_required",
+              "Use configured fictional development accounts.",
+            );
+            return current().assertReady(scope, client);
+          },
           assertApproved: (
             scope: ThreadScope,
             client: PoolClient,
             sentence: ApprovedSentence,
-          ) => current().assertApproved(scope, client, sentence),
+          ) => {
+            invariant(
+              !developmentPolicy ||
+                developmentPolicy.allowsAccounts(
+                  scope.actorAccountId,
+                  scope.fanAccountId,
+                  scope.creatorAccountId,
+                ),
+              "synthetic_accounts_required",
+              "Use configured fictional development accounts.",
+            );
+            return current().assertApproved(scope, client, sentence);
+          },
           citation: (scope: ThreadScope, id: string) =>
             current().citation(scope, id),
           generationCostReconciliation: commerce.generationCostReconciliation,
@@ -285,6 +403,15 @@ export async function composeConversationHost(
   const conversation = createConversationRuntime({
     ...runtime,
     ...(policy ? { policy } : {}),
+    ...(developmentPolicy ? { developmentPolicy } : {}),
+    ...(env.W3_OFFLINE_ISSUER_ORIGIN
+      ? {
+          offlineIssuer: {
+            origin: env.W3_OFFLINE_ISSUER_ORIGIN,
+            environment: env.NODE_ENV,
+          },
+        }
+      : {}),
     ...generation,
     ...(lineage ? { lineage } : {}),
     ...(corrections ? { corrections } : {}),
@@ -301,6 +428,7 @@ export async function composeConversationHost(
       ? { licenseVerifier: producers.licenseVerifier }
       : {}),
     ...(journal ? { usageJournal: journal } : {}),
+    ...(usageRetention ? { usageRetention } : {}),
   });
 
   const ingestion =
@@ -333,13 +461,25 @@ export async function composeConversationHost(
   if (requested)
     process.stdout.write(
       available
-        ? "Fan generation: available (development configuration).\n"
+        ? "Fan generation: available (development configuration; unreviewed policy; fictional accounts only).\n"
         : `Fan generation: unavailable; missing ${missing.join(", ") || "configured runtime"}.\n`,
     );
   return {
     commerce,
     conversation,
     agent,
+    privacy: {
+      ...(lineage ? { lineage } : {}),
+      ...(recordings ? { recordings } : {}),
+      ...(journal && producers.privacyCursor
+        ? {
+            cursorPreparation: {
+              ...producers.privacyCursor,
+              journal,
+            },
+          }
+        : {}),
+    },
     fanGeneration: { available, missing },
     close() {
       if (timer) clearInterval(timer);

@@ -1,0 +1,110 @@
+{
+  "recordedAt": "2026-10-01T11:01:00.208Z",
+  "applicationSourceRevision": "5425598bfee787314b48e960a1bba852ef432459",
+  "generatorSourceRevision": "e51213adc24966fd303a6ec41875e1c59ebb1ff7",
+  "method": "Fresh independent shared-object Git clone of the exact W1 application revision; canonical dry-run and real rename to W1Rename in that disposable copy. No peer checkout or live brand changed.",
+  "rename": {
+    "temporaryName": "W1Rename",
+    "textFilesAndPathsChanged": 799,
+    "originalBrand": {
+      "name": "Qelvora",
+      "slug": "qelvora",
+      "environmentPrefix": "QELVORA",
+      "studioName": "Qelvora Studio",
+      "iosBundleId": "com.pantopus.qelvora",
+      "androidApplicationId": "com.pantopus.qelvora"
+    },
+    "temporaryBrand": {
+      "name": "W1Rename",
+      "slug": "w1rename",
+      "environmentPrefix": "W1RENAME",
+      "studioName": "W1Rename Studio",
+      "iosBundleId": "com.pantopus.w1rename",
+      "androidApplicationId": "com.pantopus.w1rename"
+    },
+    "pantopusPreserved": true
+  },
+  "dependencies": {
+    "node": "24.19.0",
+    "packageManager": "pnpm 11.19.0 available locally; repository requests 12.5.1",
+    "install": "Frozen lockfile, offline, 374 packages reused, zero downloaded; lifecycle scripts ignored.",
+    "xcode": "26.5 (17F42)",
+    "swift": "6.3.2",
+    "java": "Temurin 21.0.12.1+1",
+    "androidSdk": 35,
+    "gradle": "8.9",
+    "nativeResolution": "Xcode resolved xctest-dynamic-overlay1.13.1 / snapshot-testing1.19.6 / swift-syntax604.0.0 using W1-owned source-package cache; live tracked lockfile preserved."
+  },
+  "supportingChecks": {
+    "generation": "passed: 12 resources / 96 OpenAPI operations",
+    "strictGenerationCheck": "passed",
+    "backendBuild": "passed",
+    "productionWebBuild": "passed",
+    "iosSimulatorShippingBuild": "passed, generic Simulator destination, normal signing, two jobs",
+    "iosBundleSignatureVerification": "passed strict on-disk signature verification",
+    "androidShippingDebugBuild": "passed, offline/no-daemon/two workers; 37 tasks executed, 3m38s",
+    "currentGeneratorFollowup": "passed; all 15 renamed output byte hashes and mtimes unchanged"
+  },
+  "productMetadata": {
+    "webBuildId": "mXhBMZuwMQzCpChZG-KF4",
+    "iosBundleId": "com.pantopus.w1rename",
+    "iosDisplayName": "W1Rename",
+    "androidApplicationId": "com.pantopus.w1rename",
+    "androidLabel": "W1Rename",
+    "androidActivity": "com.pantopus.w1rename.MainActivity",
+    "androidMinSdk": 26,
+    "androidTargetSdk": 35
+  },
+  "products": [
+    {
+      "name": "backend",
+      "observedPath": "/private/tmp/creator-platform-w1-rename-20261001/apps/backend/dist/server.mjs",
+      "sha256": "a5b66259d91285e7f8f25e6e288a570b70edfdebb24b41c63773a13705d10a9e",
+      "modifiedAt": "2026-10-01T10:43:59.316Z",
+      "retention": "Digest retained; disposable product removed after evidence."
+    },
+    {
+      "name": "webBuildId",
+      "observedPath": "/private/tmp/creator-platform-w1-rename-20261001/apps/web/.next-w1-rename-build/BUILD_ID",
+      "sha256": "69c2f1bfd6b41dae54a1dc39e5305258f552a7bc2f92348c83cea7326e593689",
+      "modifiedAt": "2026-10-01T10:44:18.415Z",
+      "retention": "Digest retained; disposable product removed after evidence."
+    },
+    {
+      "name": "iosSimulatorExecutable",
+      "observedPath": "/Users/yingpengwang/.codex/worktrees/0516/creator-platform/artifacts/workstreams/W1/build/rename-ios-20261001/Build/Products/Debug-iphonesimulator/W1RenameApp.app/W1RenameApp",
+      "sha256": "70d206bca36c8116c3ab1f39629a063803266020a001d2a91d242488911983f8",
+      "modifiedAt": "2026-10-01T10:50:18.318Z",
+      "retention": "Digest retained; disposable product removed after evidence."
+    },
+    {
+      "name": "androidDebugApk",
+      "observedPath": "/Users/yingpengwang/.codex/worktrees/0516/creator-platform/artifacts/workstreams/W1/build/rename-android-20261001/app/outputs/apk/debug/app-debug.apk",
+      "sha256": "0ab2cb1165495050f10287218b04de171cc5e24acda394ec3bdbc91340b8a376",
+      "modifiedAt": "2026-10-01T10:55:27.024Z",
+      "retention": "Digest retained; disposable product removed after evidence."
+    }
+  ],
+  "assetCustody": {
+    "file": "asset-custody.json",
+    "sha256": "a36176ec6802313f45143542a4b3afbb30de9cf70edafde5517fa657b29f7075",
+    "assetsPreserved": 1111,
+    "originalIosReferencesPreserved": 110
+  },
+  "generatorFollowup": {
+    "file": "generator-followup.json",
+    "sha256": "bd86c25d8a209b7d4b6ed5d62d7b1c72a4f44e81483abbbe6e3ea8a76f334fb7"
+  },
+  "resourceUse": "Heavy backend/web/iOS/Android builds serial. API4111/web3011 and owned database container stopped. No simulator/emulator/ADB namespace created or controlled; shared Docker engine retained.",
+  "nonClaims": [
+    "No native install, launch, operation, accessibility, secure-storage or physical-device acceptance",
+    "No final brand/domain/RP/native external identity approval or store submission",
+    "No model, payment, voice, call or identity provider enabled/called",
+    "No test code or original golden/artboard change",
+    "No hosted CI pass or workstream completion"
+  ],
+  "retention": "Disposable source and renamed build products removed. Private logs remain outside Git; main final build products, private database volume/runtime/keys and reusable owned tools remain.",
+  "resourceRelease": {
+    "file": "resource-release.json"
+  }
+}

@@ -1,11 +1,17 @@
 import type { ConversationSocketTickets } from "./realtime-tickets.js";
 import { randomUUID } from "node:crypto";
+import { ConversationOfflineIssuer } from "./offline.js";
+import type { PoolClient } from "pg";
 import { Router } from "express";
 import type { FeatureRegistration } from "../../app.js";
 import type { Database } from "../../db/database.js";
 import type { Actor } from "../identity/adapter.js";
 import { assertCurrentSession } from "../identity/request-authority.js";
-import type { AccessService, ThreadScope } from "../access/scope.js";
+import {
+  assertThreadScope,
+  type AccessService,
+  type ThreadScope,
+} from "../access/scope.js";
 import { invariant, DomainError } from "../../core/errors.js";
 import type { ConversationService } from "./service.js";
 import type { MemoryService } from "./memory.js";
@@ -32,6 +38,11 @@ import type { CommerceService } from "../commerce/service.js";
 import type { ConversationLineage } from "./lineage.js";
 import type { ConversationRecordings } from "./recordings.js";
 import type { ConversationCorrections } from "./corrections.js";
+import { DevelopmentConversationPolicy } from "./development-policy.js";
+import {
+  conversationHomeCursor,
+  readConversationHomeCursor,
+} from "./home-cursor.js";
 
 export const accessDisclosure =
   "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.";
@@ -66,24 +77,67 @@ export class ConversationFeature {
       client: import("pg").PoolClient,
     ) => Promise<void>,
     readonly recordings?: ConversationRecordings,
+    readonly offlineIssuer?: ConversationOfflineIssuer,
+    private readonly developmentPolicy?: DevelopmentConversationPolicy,
   ) {
     this.policy = policy ? ProviderPolicySchema.parse(policy) : null;
+    invariant(
+      !developmentPolicy ||
+        (developmentPolicy instanceof DevelopmentConversationPolicy &&
+          this.policy &&
+          developmentPolicy.isFor(db.pool, this.policy)),
+      "synthetic_policy_authority_required",
+      "The development policy requires its actual configured conversation host.",
+    );
+  }
+  policyAvailable(subject?: Actor | ThreadScope): boolean {
+    if (this.policy?.verified) return true;
+    if (
+      !this.policy ||
+      !this.developmentPolicy?.isFor(this.db.pool, this.policy)
+    )
+      return false;
+    if (!subject) return true;
+    if ("threadId" in subject) {
+      assertThreadScope(subject);
+      return this.developmentPolicy.allowsAccounts(
+        subject.actorAccountId,
+        subject.fanAccountId,
+        subject.creatorAccountId,
+      );
+    }
+    return (
+      subject.adultEligible &&
+      this.developmentPolicy.allowsAccounts(subject.accountId)
+    );
   }
   capabilities() {
     return {
       providers: this.policy,
-      consentAvailable: Boolean(this.policy?.verified),
+      developmentSynthetic: Boolean(
+        this.developmentPolicy && this.policyAvailable(),
+      ),
+      consentAvailable:
+        this.policyAvailable() &&
+        (!this.developmentPolicy ||
+          Boolean(this.generationAvailable && this.assertReady)),
       generationAvailable:
         this.generationAvailable &&
-        Boolean(this.policy?.verified && this.assertReady) &&
+        Boolean(this.policyAvailable() && this.assertReady) &&
         this.access.threadScopeInTransactionAvailable,
       firstConversationAvailable:
         Boolean(this.firstConversation?.firstConversationAvailable) &&
         this.generationAvailable &&
-        Boolean(this.policy?.verified && this.assertReady) &&
+        Boolean(this.policyAvailable() && this.assertReady) &&
         this.access.threadScopeInTransactionAvailable,
       correctionsAvailable: Boolean(this.corrections),
       recordingDeliveryAvailable: Boolean(this.recordings),
+      offlineAvailable: Boolean(
+        this.offlineIssuer &&
+          this.assertReady &&
+          this.policy?.verified &&
+          this.access.threadScopeInTransactionAvailable,
+      ),
       accessDisclosure,
     };
   }
@@ -95,9 +149,11 @@ export class ConversationFeature {
       "Adult eligibility is required.",
     );
     invariant(
-      this.policy?.verified && body.policyVersion === this.policy.version,
+      this.policy &&
+        this.policyAvailable(actor) &&
+        body.policyVersion === this.policy.version,
       "providers_unconfigured",
-      "AI providers and their verified terms are not configured yet.",
+      "AI provider policy is unavailable for this account.",
     );
     invariant(
       this.capabilities().generationAvailable,
@@ -174,6 +230,11 @@ export class ConversationFeature {
         "fan_required",
         "Only the fan can begin this conversation.",
       );
+      invariant(
+        this.policyAvailable(current),
+        "synthetic_accounts_required",
+        "Development conversations are available only to the configured fictional accounts.",
+      );
       // This exact transaction retains current license/source/budget locks.
       // Failure rolls back the thread, consent and any one-time trial together.
       await this.assertReady!(current, client);
@@ -224,91 +285,135 @@ export class ConversationFeature {
   async page(scope: ThreadScope, before?: number): Promise<ConversationPage> {
     return this.db.withThread(
       scope,
-      async (client) => {
-        const t = (
-          await client.query(
-            "SELECT t.*,cp.display_name,fp.handle FROM creator.thread t JOIN creator.creator_profile cp ON cp.id=t.creator_id JOIN creator.fan_profile fp ON fp.id=t.fan_id WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 AND t.deleted_at IS NULL FOR SHARE OF t",
-            [scope.threadId, scope.creatorId, scope.fanId],
-          )
-        ).rows[0];
-        invariant(t, "thread_unavailable", "This conversation is unavailable.");
-        const rows = (
-          await client.query(
-            `SELECT id,thread_id AS "threadId",author_kind AS "authorKind",text,delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,signed_act_id AS "signedActId",author_account_id AS "authorAccountId",citations,created_at::text AS "createdAt",team_member AS member,off_the_record AS "offTheRecord",version FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND ($4::integer IS NULL OR sequence<$4) ORDER BY sequence DESC LIMIT 51`,
-            [scope.threadId, scope.creatorId, scope.fanId, before ?? null],
-          )
-        ).rows;
-        const hasOlder = rows.length > 50;
-        const selected = rows
-          .slice(0, 50)
-          .reverse()
-          .map((row) => ConversationMessageSchema.parse(row));
-        const enriched = this.lineage
-          ? await this.lineage.enrich(scope, client, selected)
-          : selected;
-        const messages =
-          await this.conversations.enrichSystemLinksInTransaction(
-            scope,
-            client,
-            enriched,
-          );
-        const generations = (
-          await client.query<{ id: string; last_sequence: number }>(
-            "SELECT id,last_sequence FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND state IN('queued','generating') LIMIT 8",
-            [scope.threadId, scope.creatorId, scope.fanId],
-          )
-        ).rows;
-        const currentConsent = Boolean(
-          this.policy?.verified &&
-            t.processor_consent_version === this.policy.version,
-        );
-        const capabilities = await capabilitySnapshot(client, scope);
-        const hasAccess =
-          capabilities.capabilities.includes("ai_message") &&
-          capabilities.allowance.available > 0;
-        const canSend =
-          t.control === "human_active" ||
-          (currentConsent &&
-            this.generationAvailable &&
-            t.control === "ai_active" &&
-            hasAccess);
-        return {
-          threadId: scope.threadId,
-          creatorId: scope.creatorId,
-          fanId: scope.fanId,
-          creatorName: t.display_name,
-          fanHandle: t.handle,
-          control: t.control,
-          epoch: t.control_epoch,
-          cursor: t.event_cursor,
-          revision: t.revision,
-          generationSequences: Object.fromEntries(
-            generations.map((g) => [g.id, g.last_sequence]),
-          ),
-          messages,
-          before: hasOlder ? messages[0]!.sequence : null,
-          offTheRecord: t.off_the_record,
-          introShared: t.intro_shared,
-          consentCurrent: currentConsent,
-          canSend,
-          unavailableReason: canSend
-            ? null
-            : !currentConsent
-              ? "Review the AI providers before messaging."
-              : !this.generationAvailable
-                ? "AI messaging is not connected yet."
-                : t.control !== "ai_active"
-                  ? "AI messaging is paused in this conversation."
-                  : !hasAccess
-                    ? "Your AI access or allowance is unavailable. You can still ask the creator to step in."
-                    : null,
-          feedbackPolicy: this.lineage
-            ? await this.lineage.policy(scope, client)
-            : null,
-        };
-      },
+      (client) => this.pageInTransaction(scope, client, before),
       "read",
     );
+  }
+  private async pageInTransaction(
+    scope: ThreadScope,
+    client: PoolClient,
+    before?: number,
+  ): Promise<ConversationPage> {
+    const t = (
+      await client.query(
+        "SELECT t.*,cp.display_name,fp.handle FROM creator.thread t JOIN creator.creator_profile cp ON cp.id=t.creator_id JOIN creator.fan_profile fp ON fp.id=t.fan_id WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 AND t.deleted_at IS NULL FOR SHARE OF t",
+        [scope.threadId, scope.creatorId, scope.fanId],
+      )
+    ).rows[0];
+    invariant(t, "thread_unavailable", "This conversation is unavailable.");
+    const rows = (
+      await client.query(
+        `SELECT id,thread_id AS "threadId",author_kind AS "authorKind",text,delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,signed_act_id AS "signedActId",author_account_id AS "authorAccountId",citations,created_at::text AS "createdAt",team_member AS member,off_the_record AS "offTheRecord",version FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND ($4::integer IS NULL OR sequence<$4) ORDER BY sequence DESC LIMIT 51`,
+        [scope.threadId, scope.creatorId, scope.fanId, before ?? null],
+      )
+    ).rows;
+    const hasOlder = rows.length > 50;
+    const selected = rows
+      .slice(0, 50)
+      .reverse()
+      .map((row) => ConversationMessageSchema.parse(row));
+    const enriched = this.lineage
+      ? await this.lineage.enrich(scope, client, selected)
+      : selected;
+    const messages = await this.conversations.enrichSystemLinksInTransaction(
+      scope,
+      client,
+      enriched,
+    );
+    const generations = (
+      await client.query<{ id: string; last_sequence: number }>(
+        "SELECT id,last_sequence FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND state IN('queued','generating') LIMIT 8",
+        [scope.threadId, scope.creatorId, scope.fanId],
+      )
+    ).rows;
+    const currentConsent = Boolean(
+      this.policy &&
+        this.policyAvailable(scope) &&
+        t.processor_consent_version === this.policy.version,
+    );
+    const capabilities = await capabilitySnapshot(client, scope);
+    const hasAccess =
+      capabilities.capabilities.includes("ai_message") &&
+      capabilities.allowance.available > 0;
+    const canSend =
+      t.control === "human_active" ||
+      (currentConsent &&
+        this.generationAvailable &&
+        t.control === "ai_active" &&
+        hasAccess);
+    return {
+      threadId: scope.threadId,
+      creatorId: scope.creatorId,
+      fanId: scope.fanId,
+      creatorName: t.display_name,
+      fanHandle: t.handle,
+      control: t.control,
+      epoch: t.control_epoch,
+      cursor: t.event_cursor,
+      revision: t.revision,
+      generationSequences: Object.fromEntries(
+        generations.map((g) => [g.id, g.last_sequence]),
+      ),
+      messages,
+      before: hasOlder ? messages[0]!.sequence : null,
+      offTheRecord: t.off_the_record,
+      introShared: t.intro_shared,
+      consentCurrent: currentConsent,
+      canSend,
+      unavailableReason: canSend
+        ? null
+        : !currentConsent
+          ? "Review the AI providers before messaging."
+          : !this.generationAvailable
+            ? "AI messaging is not connected yet."
+            : t.control !== "ai_active"
+              ? "AI messaging is paused in this conversation."
+              : !hasAccess
+                ? "Your AI access or allowance is unavailable. You can still ask the creator to step in."
+                : null,
+      feedbackPolicy: this.lineage
+        ? await this.lineage.policy(scope, client)
+        : null,
+    };
+  }
+  async offline(actor: Actor, creatorId: string, fanId: string) {
+    if (!this.offlineIssuer || !this.assertReady || !this.policy?.verified)
+      throw new DomainError(
+        "offline_unavailable",
+        "Offline reading is not connected yet.",
+        503,
+      );
+    const client = await this.db.pool.connect();
+    try {
+      await client.query("BEGIN");
+      const scope = await this.access.openThreadInTransaction(
+        client,
+        actor,
+        creatorId,
+        fanId,
+        false,
+        "read",
+      );
+      invariant(
+        scope.authority === "fan",
+        "fan_required",
+        "Only the fan can save this conversation.",
+      );
+      await this.assertReady(scope, client);
+      const snapshot = await this.offlineIssuer.issue(
+        scope,
+        client,
+        await this.pageInTransaction(scope, client),
+        this.policy.version,
+      );
+      await client.query("COMMIT");
+      return snapshot;
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
   }
   async preferences(scope: ThreadScope, raw: unknown) {
     invariant(
@@ -350,13 +455,23 @@ export class ConversationFeature {
     const body = ConsentInputSchema.parse(raw);
     if (body.accepted)
       invariant(
-        this.policy?.verified && body.version === this.policy.version,
+        this.policy &&
+          this.policyAvailable(scope) &&
+          body.version === this.policy.version,
         "providers_changed",
         "Review the currently configured providers.",
       );
     await this.db.withThread(
       scope,
       async (client) => {
+        if (body.accepted && this.developmentPolicy) {
+          invariant(
+            this.assertReady,
+            "synthetic_license_unavailable",
+            "Development consent requires the current stored development license.",
+          );
+          await this.assertReady(scope, client);
+        }
         await client.query(
           "SELECT id FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 FOR UPDATE",
           [scope.threadId, scope.creatorId, scope.fanId],
@@ -391,6 +506,106 @@ export class ConversationFeature {
       "write",
     );
     return this.page(scope);
+  }
+  /** Globally ordered account metadata. Installation is additive and explicitly
+   * gated; older hosts retain their reachable UUID directory, without claiming
+   * activity order. Private previews are read only through fresh pair scopes. */
+  async accountForHome(actor: Actor, cursor?: string) {
+    const ready =
+      (
+        await this.db.pool.query(`SELECT
+        EXISTS(SELECT FROM pg_attribute WHERE attrelid='creator.conversation_relationship'::regclass AND attname='activity_at' AND attnotnull AND NOT attisdropped)
+        AND to_regclass('creator.conversation_relationship_activity_page') IS NOT NULL
+        AND EXISTS(SELECT FROM pg_trigger WHERE tgrelid='creator.message'::regclass AND tgname='record_relationship_activity' AND tgenabled='O') AS ready`)
+      ).rows[0]?.ready === true;
+    if (!ready) {
+      if (cursor && !IdSchema.safeParse(cursor).success)
+        throw new DomainError(
+          "account_activity_unavailable",
+          "Refresh your conversations before paging.",
+          503,
+        );
+      return {
+        ...(await this.account(actor, cursor)),
+        order: "directory" as const,
+      };
+    }
+    const before = cursor ? readConversationHomeCursor(cursor) : null;
+    const client = await this.db.pool.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query("SELECT set_config('app.account_id',$1,true)", [
+        actor.accountId,
+      ]);
+      await assertCurrentSession(client, actor.accountId);
+      const fan = (
+        await client.query<{
+          id: string;
+          handle: string;
+          intro: string | null;
+        }>(
+          "SELECT id,handle,intro FROM creator.fan_profile WHERE account_id=$1",
+          [actor.accountId],
+        )
+      ).rows[0];
+      invariant(
+        fan,
+        "fan_profile_required",
+        "Choose your handle before opening You.",
+      );
+      if (before) {
+        const known = await client.query(
+          "SELECT thread_id FROM creator.conversation_relationship WHERE account_id=$1 AND fan_id=$2 AND thread_id=$3",
+          [actor.accountId, fan.id, before.threadId],
+        );
+        if (!known.rowCount)
+          throw new DomainError(
+            "account_cursor_unavailable",
+            "Refresh your conversations before paging.",
+            404,
+          );
+      }
+      const threads = (
+        await client.query<{
+          id: string;
+          creatorId: string;
+          fanId: string;
+          name: string;
+          activityAt: string;
+        }>(
+          `SELECT r.thread_id AS id,r.creator_id AS "creatorId",r.fan_id AS "fanId",cp.display_name AS name,
+         to_char(r.activity_at AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "activityAt"
+         FROM creator.conversation_relationship r JOIN creator.creator_profile cp ON cp.id=r.creator_id
+         WHERE r.account_id=$1 AND r.fan_id=$2 AND ($3::timestamptz IS NULL OR (r.activity_at,r.thread_id)<($3::timestamptz,$4::uuid))
+         ORDER BY r.activity_at DESC,r.thread_id DESC LIMIT 51`,
+          [
+            actor.accountId,
+            fan.id,
+            before?.activityAt ?? null,
+            before?.threadId ?? null,
+          ],
+        )
+      ).rows;
+      await assertCurrentSession(client, actor.accountId);
+      await client.query("COMMIT");
+      return {
+        fan,
+        threads: threads.slice(0, 50),
+        nextCursor:
+          threads.length > 50
+            ? conversationHomeCursor({
+                threadId: threads[49]!.id,
+                activityAt: threads[49]!.activityAt,
+              })
+            : null,
+        order: "activity" as const,
+      };
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
   }
   async account(actor: Actor, cursor?: string) {
     const before = IdSchema.optional().parse(cursor);
@@ -508,6 +723,16 @@ export function conversationFeature(
             (req.method === "GET" && !req.path.endsWith("/events")),
         );
       const root = "/v1/conversations/:creatorId/:fanId";
+      router.get(root + "/offline", async (req, res) => {
+        res.setHeader("Cache-Control", "no-store");
+        res.json(
+          await feature.offline(
+            await actorFor(req),
+            IdSchema.parse(req.params.creatorId),
+            IdSchema.parse(req.params.fanId),
+          ),
+        );
+      });
       router.post(root + "/presence", async (req, res) => {
         invariant(
           feature.wellbeing,
@@ -581,6 +806,29 @@ export function conversationFeature(
             scope,
             IdSchema.parse(req.params.id),
             req.body,
+          ),
+        );
+      });
+      router.get(root + "/intro-offer", async (req, res) => {
+        res.setHeader("Cache-Control", "no-store");
+        invariant(
+          feature.lineage,
+          "intro_offer_unavailable",
+          "Your intro offer is unavailable. Try again.",
+        );
+        res.json(await feature.lineage.pendingIntroOffer(await scopeFor(req)));
+      });
+      router.post(root + "/intro-offer/acknowledgement", async (req, res) => {
+        invariant(
+          feature.lineage,
+          "intro_offer_unavailable",
+          "Your intro offer is unavailable. Try again.",
+        );
+        const body = z.strictObject({ offerId: IdSchema }).parse(req.body);
+        res.json(
+          await feature.lineage.acknowledgeIntroOffer(
+            await scopeFor(req),
+            body.offerId,
           ),
         );
       });
@@ -715,7 +963,7 @@ export function conversationFeature(
               body,
               expected,
             );
-          } else if (feature.routeSafety && feature.policy?.verified) {
+          } else if (feature.routeSafety && feature.policyAvailable(scope)) {
             const abort = new AbortController();
             res.on("close", () => {
               if (!res.writableEnded) abort.abort();
@@ -746,7 +994,7 @@ export function conversationFeature(
         }
         if (
           !prior &&
-          (!feature.generationAvailable || !feature.policy?.verified)
+          (!feature.generationAvailable || !feature.policyAvailable(scope))
         )
           throw new DomainError(
             "model_unconfigured",

@@ -1,0 +1,72 @@
+{
+  "recordedAt": "2026-10-02T16:12:42.890421+00:00",
+  "parent": "ee940199a566a5981dc642c6a5c283b95e73c571",
+  "ownerSource": "fb1cbcaab7926e96a361bfd7840ecf192efafefd",
+  "heldMapSHA256": "2338f48ea4b1008f47eef43ff7a835021e5e917669ad44f21179c69d03227c0a",
+  "privacyPacketSHA256": "2d72120d1be136081acb5d324f19dae44660d6e423e932cc962664596ab4c3e2",
+  "proposedW7Allocations": [
+    {
+      "owner": "W7",
+      "old": "0063_w7_relationship_activity",
+      "previousProposed": "0114_w7_relationship_activity",
+      "new": "0151_w7_relationship_activity",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w7_relationship_activity.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W7",
+      "old": "0064_w7_source_scan_checkpoint",
+      "previousProposed": "0115_w7_source_scan_checkpoint",
+      "new": "0152_w7_source_scan_checkpoint",
+      "path": "apps/backend/src/modules/growth/migrations/pending_w7_source_scan_checkpoint.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W7",
+      "old": "0065_w7_home_page_index",
+      "previousProposed": "0116_w7_home_page_index",
+      "new": "0153_w7_home_page_index",
+      "path": "apps/backend/src/modules/growth/migrations/pending_w7_home_page_index.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W7",
+      "old": "0066_w7_thanks_window_index",
+      "previousProposed": "0117_w7_thanks_window_index",
+      "new": "0154_w7_thanks_window_index",
+      "path": "apps/backend/src/modules/content/migrations/pending_w7_thanks_window_index.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W7",
+      "old": "0101_w7_core_follow_metadata",
+      "previousProposed": "0148_w7_core_follow_metadata",
+      "new": "0185_w7_core_follow_metadata",
+      "path": null,
+      "originalDependencies": []
+    }
+  ],
+  "sqlUnchangedSHA256": {
+    "apps/backend/src/modules/conversation/migrations/pending_w7_relationship_activity.sql": "85a36b0ca931e1f65b79f80c911ee0ffc66c3c55682e88ee6f1bbc788b11a866",
+    "apps/backend/src/modules/growth/migrations/pending_w7_source_scan_checkpoint.sql": "533f31d49939feff6b0926511141333340c05982771d6f35a72cd0e5f7ca41c7",
+    "apps/backend/src/modules/growth/migrations/pending_w7_home_page_index.sql": "2e53d6f7b11cbe9fdae39fba17c4d99462ca1dfef62c3b804b9ec5ea51463321",
+    "apps/backend/src/modules/content/migrations/pending_w7_thanks_window_index.sql": "ca984477d1d00bf23e706958492c4b9898d6e15e54a134286a21646093edf336",
+    "apps/backend/src/modules/growth/migrations/pending_w7_core_follow_metadata.sql": "29c0261cdfce50be434d8b8b49c21e23df6057613d521c8e40a13c3928d63796"
+  },
+  "sourceSHA256": "eabe1358a938e4c36b72ae0349f4db111a2336bf04f644fbe6262734bb031a7a",
+  "checks": {
+    "productionBackendBuild": 0,
+    "lint": 0,
+    "originalContracts": "9 pass;9 PostgreSQL cases skipped"
+  },
+  "newTests": false,
+  "SQLActivated": false,
+  "registryChanged": false,
+  "appliedHistoryChanged": false,
+  "runtimeObserved": false,
+  "fullCombinedReviewComplete": false,
+  "logContentSHA256": "9c0bfd5cf5bb7466bec8217bcc889bee4847ad451462967f1782a7dd06532ca7",
+  "logGzipSHA256": "f064f04b1ef7bb44b2522260a60446aab57ca8fc9276d35f75da994aeaa81286",
+  "resourcesStarted": false,
+  "scopeComplete": false
+}

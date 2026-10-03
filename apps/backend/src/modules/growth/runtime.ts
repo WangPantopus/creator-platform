@@ -17,6 +17,18 @@ import {
   type GrowthPrivacyTaskAuthority,
 } from "./lifecycle.js";
 import { registerGrowth } from "./integration.js";
+import type { CreatorProjectionSource } from "./creator-projection.js";
+import { WeeklyImpact, type WeeklyImpactSource } from "./weekly-impact.js";
+import {
+  canonicalPostEntryContext,
+  type CurrentPostEntryReader,
+} from "./entry-context.js";
+import {
+  rotatingGrowthSources,
+  databaseGrowthSourceCheckpoint,
+  type GrowthSourceDirectory,
+  type GrowthSourceCheckpoint,
+} from "./sources.js";
 
 /** Same runtime mounts in W1's canonical app and supplies W8's account-job hook. */
 export async function createGrowthRuntime(input: {
@@ -24,10 +36,20 @@ export async function createGrowthRuntime(input: {
   workerPool: Pool;
   secret: Buffer;
   owners: GrowthOwners;
+  creatorSource?: CreatorProjectionSource;
   provider?: DeliveryProvider;
+  verificationOrigin?: string;
   sources?: GrowthEventSources;
+  sourceScan?: {
+    directory: GrowthSourceDirectory;
+    checkpoint?: GrowthSourceCheckpoint;
+    namespace?: string;
+    pageSize?: number;
+  };
   activationSource?: ActivationSource;
   thanksPermission?: ThanksPermission;
+  weeklyImpactSource?: WeeklyImpactSource;
+  postEntryReader?: CurrentPostEntryReader;
   privacyScope?: GrowthPrivacyScope;
   privacyTaskAuthority?: GrowthPrivacyTaskAuthority;
   installURLs?: Partial<Record<"ios" | "android", string>>;
@@ -40,6 +62,8 @@ export async function createGrowthRuntime(input: {
     value: number,
   ) => void;
 }) {
+  if (input.sources && input.sourceScan)
+    throw new Error("growth_source_configuration_conflict");
   const db = new GrowthDatabase(input.runtimePool, input.workerPool);
   await db.ready();
   const schema = await input.workerPool.query(
@@ -52,32 +76,87 @@ export async function createGrowthRuntime(input: {
     input.owners,
     input.secret,
     input.provider,
+    input.verificationOrigin,
+    input.creatorSource,
   );
+  const checkpointSchema = (
+    await input.workerPool.query(
+      "SELECT to_regclass('growth.source_scan_checkpoint') IS NOT NULL AND (SELECT count(*)=2 FROM information_schema.columns WHERE table_schema='growth' AND table_name='source_scan_checkpoint' AND column_name IN ('generation','expires_at')) AS ready",
+    )
+  ).rows[0]?.ready;
+  const creatorCheckpoint =
+    checkpointSchema && input.creatorSource
+      ? databaseGrowthSourceCheckpoint(service, "creator-directory-v1")
+      : null;
+  const sourceFactory = input.sourceScan
+    ? rotatingGrowthSources(
+        input.sourceScan.directory,
+        input.sourceScan.checkpoint ??
+          databaseGrowthSourceCheckpoint(service, input.sourceScan.namespace),
+        input.sourceScan.pageSize,
+      )
+    : input.sources;
   const retention = new Retention(service, input.thanksPermission);
+  const weeklyImpact = new WeeklyImpact(service, retention);
   const relay = new GrowthRelay(service);
   const engagement = new Engagement(service, input.installURLs);
   const experiments = new GrowthExperiments(service, input.experimentsEnabled);
+  const postEntryContext = canonicalPostEntryContext(
+    service,
+    input.postEntryReader,
+  );
   let running: Promise<void> | null = null,
     timer: ReturnType<typeof setTimeout> | null = null,
     stopped = true;
   let sourceCount: number | null =
-    typeof input.sources === "function" ? null : (input.sources?.length ?? 0);
+    typeof sourceFactory === "function" ? null : (sourceFactory?.length ?? 0);
   let sourceReadiness:
     | "unconfigured"
     | "pending"
     | "available"
-    | "unavailable" = input.sources ? "pending" : "unconfigured";
+    | "unavailable" = sourceFactory ? "pending" : "unconfigured";
+  let creatorCursor: string | null = null;
+  let creatorReadiness:
+    | "unconfigured"
+    | "pending"
+    | "available"
+    | "unavailable" = input.creatorSource ? "pending" : "unconfigured";
   async function tick() {
+    if (checkpointSchema) {
+      try {
+        await input.workerPool.query(
+          "UPDATE growth.source_scan_checkpoint SET encrypted_cursor=NULL,generation=generation+1,updated_at=now() WHERE expires_at<=clock_timestamp() AND encrypted_cursor IS NOT NULL",
+        );
+      } catch {
+        input.observe?.("growth_worker_failure", 1);
+      }
+    }
+    if (input.creatorSource) {
+      try {
+        if (creatorCheckpoint) creatorCursor = await creatorCheckpoint.load();
+        const ids = await input.creatorSource.page(creatorCursor, 25);
+        for (const id of ids) await service.refreshCreator(id);
+        const next = ids.length === 25 ? ids[24]! : null;
+        if (creatorCheckpoint)
+          await creatorCheckpoint.save(next, creatorCursor);
+        creatorCursor = next;
+        creatorReadiness = "available";
+      } catch {
+        // Do not advance on failure or block already leased delivery recovery.
+        creatorReadiness = "unavailable";
+        input.observe?.("growth_worker_failure", 1);
+      }
+    }
     let sources: readonly import("./relay.js").GrowthEventSource[] = [];
     try {
       sources =
-        typeof input.sources === "function"
-          ? await input.sources()
-          : (input.sources ?? []);
+        typeof sourceFactory === "function"
+          ? await sourceFactory()
+          : (sourceFactory ?? []);
       if (sources.length > 100)
         throw new Error("producer_scope_batch_exceeded");
       sourceCount = sources.length;
-      sourceReadiness = input.sources ? "available" : "unconfigured";
+      sourceReadiness = sourceFactory ? "available" : "unconfigured";
     } catch {
       // Enumeration failure must not prevent existing leased inbox/delivery
       // recovery. Those paths recheck current owner state independently.
@@ -93,6 +172,12 @@ export async function createGrowthRuntime(input: {
         sourceReadiness = "unavailable";
         input.observe?.("growth_worker_failure", 1);
       }
+    }
+    try {
+      await weeklyImpact.tick(input.weeklyImpactSource);
+    } catch {
+      // An unavailable owner aggregate cannot block other inbox/delivery work.
+      input.observe?.("growth_worker_failure", 1);
     }
     const relayed = await relay.drain();
     input.observe?.("growth_relay_claimed", relayed.claimed);
@@ -116,10 +201,17 @@ export async function createGrowthRuntime(input: {
   return {
     service,
     retention,
+    weeklyImpact,
     relay,
     engagement,
     experiments,
-    feature: registerGrowth(service, { retention, engagement, experiments }),
+    postEntryContext,
+    feature: registerGrowth(service, {
+      retention,
+      engagement,
+      experiments,
+      postEntryContext,
+    }),
     privacyHook: growthPrivacyHook(
       service,
       input.privacyScope,
@@ -139,13 +231,15 @@ export async function createGrowthRuntime(input: {
     },
     readiness: () => ({
       persistence: "available" as const,
+      creatorProjection: creatorReadiness,
+      creatorPublicAI: input.creatorSource?.publicAIConfigured ?? false,
+      creatorScanDurable: Boolean(creatorCheckpoint),
       producerSources: sourceCount,
       producerReadiness: sourceReadiness,
       deliveryProvider: Boolean(input.provider),
       activationSource: Boolean(input.activationSource),
-      privacyOwnership: Boolean(
-        input.privacyScope || input.privacyTaskAuthority,
-      ),
+      weeklyImpactSource: Boolean(input.weeklyImpactSource),
+      privacyOwnership: Boolean(input.privacyTaskAuthority),
       privacyStreaming: Boolean(input.privacyTaskAuthority),
       experimentsEnabled: input.experimentsEnabled ?? false,
     }),

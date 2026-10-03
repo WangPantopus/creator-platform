@@ -1,0 +1,25 @@
+{
+  "recordedAt": "2026-10-01T11:40:12.588Z",
+  "provenance": "Read-only aggregate on fresh W1-only interactive state; no approval, invitation, role, key or act fabricated.",
+  "state": {
+    "database": "creator_w1_resume_20261001",
+    "profiles": 2,
+    "pending_creators": 2,
+    "verified_creators": 0,
+    "local_challenges": 1,
+    "submitted_proofs": 0,
+    "reviewed_proofs": 0,
+    "invitations": 0,
+    "memberships": 0,
+    "keys": 0,
+    "signed_acts": 0
+  },
+  "role": {
+    "rolname": "creator_runtime",
+    "rolsuper": false,
+    "rolbypassrls": false,
+    "rolinherit": false,
+    "rolcreatedb": false,
+    "rolcreaterole": false
+  }
+}

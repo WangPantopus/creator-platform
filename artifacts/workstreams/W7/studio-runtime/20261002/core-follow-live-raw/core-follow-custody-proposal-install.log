@@ -1,0 +1,61 @@
+BEGIN
+DO
+SET
+GRANT
+GRANT
+RESET
+SET
+GRANT
+REVOKE
+GRANT
+GRANT
+GRANT
+CREATE POLICY
+CREATE POLICY
+RESET
+SET
+CREATE FUNCTION
+REVOKE
+GRANT
+RESET
+SET
+REVOKE
+RESET
+ERROR:  "pg_toast_16757" is not a sequence
+CONTEXT:  SQL expression "function_id IS NULL
+   OR EXISTS(SELECT FROM pg_namespace n WHERE has_schema_privilege(owner_id,n.oid,'CREATE'))
+   OR EXISTS(SELECT FROM pg_namespace n WHERE n.nspowner=owner_id)
+   OR EXISTS(SELECT FROM pg_class c WHERE c.relowner=owner_id)
+   OR EXISTS(SELECT FROM pg_type t WHERE t.typowner=owner_id)
+   OR EXISTS(SELECT FROM pg_language l WHERE l.lanowner=owner_id)
+   OR EXISTS(SELECT FROM pg_foreign_server s WHERE s.srvowner=owner_id)
+   OR EXISTS(SELECT FROM pg_foreign_data_wrapper w WHERE w.fdwowner=owner_id)
+   OR EXISTS(SELECT FROM pg_database d WHERE d.datdba=owner_id OR has_database_privilege(owner_id,d.oid,'CREATE'))
+   OR EXISTS(SELECT FROM pg_largeobject_metadata o WHERE o.lomowner=owner_id)
+   OR EXISTS(SELECT FROM pg_proc p WHERE p.proowner=owner_id AND p.oid<>function_id)
+   OR EXISTS(SELECT FROM pg_namespace n WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
+     AND n.nspname NOT IN('public','creator','growth','creator_growth_metadata') AND has_schema_privilege(owner_id,n.oid,'USAGE'))
+   OR EXISTS(SELECT FROM pg_class rel JOIN pg_namespace n ON n.oid=rel.relnamespace
+     WHERE rel.relkind='S' AND n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
+     AND has_sequence_privilege(owner_id,rel.oid,'USAGE,SELECT,UPDATE'))
+   OR EXISTS(SELECT FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
+     WHERE p.oid<>function_id AND p.prosecdef AND n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
+     AND has_schema_privilege(owner_id,n.oid,'USAGE') AND has_function_privilege(owner_id,p.oid,'EXECUTE'))
+   OR EXISTS(SELECT FROM pg_proc p,
+     LATERAL aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a
+     WHERE p.oid=function_id AND a.privilege_type='EXECUTE'
+       AND a.grantee NOT IN(owner_id,'creator_runtime'::regrole::oid))
+   OR EXISTS(SELECT FROM pg_attribute col JOIN pg_class rel ON rel.oid=col.attrelid
+     JOIN pg_namespace n ON n.oid=rel.relnamespace
+     WHERE col.attnum>0 AND NOT col.attisdropped AND rel.relkind IN('r','p','v','m','f')
+       AND n.nspname !~ '^pg_' AND n.nspname<>'information_schema' AND (
+       (has_column_privilege(owner_id,rel.oid,col.attnum,'SELECT') AND NOT (
+         (n.nspname='creator' AND rel.relname='identity_session' AND col.attname IN('id','account_id','revoked_at','expires_at'))
+         OR(n.nspname='growth' AND rel.relname='follow' AND col.attname IN('account_id','creator_id'))))
+       OR has_column_privilege(owner_id,rel.oid,col.attnum,'INSERT,REFERENCES')
+       OR(has_column_privilege(owner_id,rel.oid,col.attnum,'UPDATE') AND NOT (
+         n.nspname='growth' AND rel.relname='follow' AND col.attname='created_at'))))
+   OR EXISTS(SELECT FROM pg_class rel JOIN pg_namespace n ON n.oid=rel.relnamespace
+     WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema' AND rel.relkind IN('r','p','v','m','f')
+       AND has_table_privilege(owner_id,rel.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER'))"
+PL/pgSQL function inline_code_block line 4 at IF

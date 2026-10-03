@@ -98,7 +98,8 @@ a.qv-stepin {
   text-decoration: none;
 }
 .identity-handle {
-  min-height: 844px;
+  /* Same reference height as Welcome, never taller than the visible area. */
+  min-height: min(844px, 100svh);
   padding: 16px 20px 36px;
   display: flex;
   flex-direction: column;
@@ -278,7 +279,9 @@ a.qv-stepin {
 .identity-welcome {
   width: 100%;
   max-width: 390px;
-  min-height: 844px;
+  /* Keep the 390x844 reference composition, but never push the primary
+     action below the visible area when browser toolbars are expanded. */
+  min-height: min(844px, 100svh);
   box-sizing: border-box;
   margin: 0 auto;
   display: flex;
@@ -374,6 +377,15 @@ a.qv-stepin {
   align-items: center;
   gap: 12px;
 }
+.verification-title > svg {
+  flex: none;
+}
+.verification-title h1,
+.verification-rows dt,
+.verification-rows dd {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
 .verification-rows {
   margin: 0;
   background: var(--surface);
@@ -381,7 +393,7 @@ a.qv-stepin {
   border-radius: var(--radius-lg);
   padding: 16px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
   gap: 10px;
   font-size: 14px;
 }
@@ -393,6 +405,7 @@ a.qv-stepin {
   font: 11px/17px var(--font-mono);
   overflow-wrap: anywhere;
   color: var(--ink-muted);
+  white-space: pre-wrap;
 }
 .proof-code > span {
   white-space: nowrap;

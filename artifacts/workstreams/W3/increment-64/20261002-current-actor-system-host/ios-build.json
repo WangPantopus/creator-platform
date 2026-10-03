@@ -1,0 +1,18 @@
+{
+  "source": "7327e6460d305f5a7d021b97bf9594b31577da90",
+  "operation": "ios shipping build",
+  "command": [
+    "node",
+    "/private/tmp/w3-heavy-build-lock.mjs",
+    "--owner",
+    "W3 increment64 7327e646 ios",
+    "--",
+    "python3",
+    "/private/tmp/w3-current-integration-64/final/ios-command.py"
+  ],
+  "startedAt": "2026-10-02T19:16:59.347266+00:00",
+  "pid": 25527,
+  "exitCode": 0,
+  "completedAt": "2026-10-02T19:17:29.059290+00:00",
+  "logSHA256": "25ec5dbad525c499eca58850c79acb6dd807f964c2ca80ca827206d3484ccfa6"
+}

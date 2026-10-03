@@ -12,6 +12,7 @@ import type { GrowthService } from "./service.js";
 import { Retention } from "./retention.js";
 import { Engagement } from "./engagement.js";
 import { GrowthExperiments } from "./experiments.js";
+import type { PostEntryContext } from "./entry-context.js";
 
 /** W1 mounts this router before its 404, supplies the canonical session resolver. */
 export function createGrowthRouter(
@@ -21,6 +22,10 @@ export function createGrowthRouter(
     retention?: Retention;
     engagement?: Engagement;
     experiments?: GrowthExperiments;
+    postEntryContext?: (
+      actor: Actor,
+      input: unknown,
+    ) => Promise<PostEntryContext | null>;
   } = {},
 ) {
   const router = Router();
@@ -46,6 +51,9 @@ export function createGrowthRouter(
           .min(0)
           .max(1000)
           .parse(req.query.offset ?? 0),
+        req.query.cursor === undefined
+          ? undefined
+          : z.string().min(1).max(2048).parse(req.query.cursor),
       ),
     ),
   );
@@ -92,6 +100,10 @@ export function createGrowthRouter(
       );
     res.json(value);
   });
+  router.get("/public/shares/:id/export", async (req, res) => {
+    res.setHeader("Cache-Control", "no-store");
+    res.json(await service.shareExport(uuid(req.params.id)));
+  });
   router.post("/unsubscribe", async (req, res) =>
     res.json(
       await service.unsubscribe(
@@ -101,8 +113,47 @@ export function createGrowthRouter(
     ),
   );
   router.get("/discovery-access", async (req, res) =>
-    res.json(await service.passDiscovery(await actorFor(req))),
+    res.json(
+      await service.passDiscovery(
+        await actorFor(req),
+        req.query.creators === undefined
+          ? undefined
+          : z
+              .string()
+              .max(3699)
+              .parse(req.query.creators)
+              .split(",")
+              .filter(Boolean),
+      ),
+    ),
   );
+  router.get("/creators/:handle/posts/:id/context", async (req, res) => {
+    const actor = await actorFor(req);
+    const expectedAccount = req.get("x-qelvora-expected-account");
+    if (expectedAccount && uuid(expectedAccount) !== actor.accountId)
+      throw new DomainError(
+        "growth_entry_session_required",
+        copy.growthErrorGrowthAuthorityRequired,
+        401,
+      );
+    if (!options.postEntryContext)
+      throw new DomainError(
+        "growth_entry_context_unconfigured",
+        copy.growthThisDestinationIsUnavailableReconnectAndTryAgain,
+        503,
+      );
+    const context = await options.postEntryContext(actor, {
+      handle: String(req.params.handle),
+      contentId: uuid(req.params.id),
+    });
+    if (!context)
+      throw new DomainError(
+        "post_unavailable",
+        copy.growthThisPostIsUnavailable,
+        404,
+      );
+    res.json({ context });
+  });
   router.post("/engagement/:kind/claim", async (req, res) =>
     res.json(
       await engagement.claimPrompt(
@@ -165,7 +216,7 @@ export function createGrowthRouter(
     res.json(await experiments.stop(await actorFor(req), uuid(req.params.id))),
   );
   router.get("/home", async (req, res) =>
-    res.json(await service.home(await actorFor(req))),
+    res.json(await service.home(await actorFor(req), req.query)),
   );
   router.put("/follow/:creatorId", async (req, res) =>
     res.json(
@@ -183,6 +234,11 @@ export function createGrowthRouter(
   );
   router.get("/notifications", async (req, res) =>
     res.json({ notifications: await service.inbox(await actorFor(req)) }),
+  );
+  router.get("/notifications/:id", async (req, res) =>
+    res.json(
+      await service.notification(await actorFor(req), uuid(req.params.id)),
+    ),
   );
   router.put("/notifications/:id/read", async (req, res) =>
     res.json(await service.markRead(await actorFor(req), uuid(req.params.id))),
@@ -203,7 +259,11 @@ export function createGrowthRouter(
   );
   router.delete("/devices/:id", async (req, res) =>
     res.json(
-      await service.revokeDevice(await actorFor(req), uuid(req.params.id)),
+      await service.revokeDevice(
+        await actorFor(req),
+        uuid(req.params.id),
+        req.body,
+      ),
     ),
   );
   router.post("/shares", async (req, res) =>

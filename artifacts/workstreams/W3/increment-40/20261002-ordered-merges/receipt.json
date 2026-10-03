@@ -1,0 +1,85 @@
+{
+  "operatedBuildSource": "39a7dcc1293b7fb8628a8e4ccb305fadadf80766",
+  "reconciledMain": "d10ab9975bb6b3b9564cfaa41cf404d48b459b78",
+  "normalMergeOrder": [
+    {
+      "pr": 45,
+      "head": "b36022a79654ad6b205e33d14dc8af1291cfe93d",
+      "completedPRRun": 36974888770,
+      "event": "pull_request",
+      "runHeadMatched": true,
+      "allTenPushAndPRChecks": "SUCCESS",
+      "actualCompletedPRLogRead": true,
+      "logSha256": "5d13448a70640cc9cdd842b0115ab8e340982cedc95be2c5cf4309a92256962a",
+      "normalMerge": "5858839cf678cb7cec24bdcf98243e87b26f9f12",
+      "mergedAt": "2026-10-02T10:25:24Z"
+    },
+    {
+      "pr": 24,
+      "head": "5c33e70e761f40c164627c438217bdfa2fec89f6",
+      "completedPRRun": 36975800397,
+      "event": "pull_request",
+      "runHeadMatched": true,
+      "allTenPushAndPRChecks": "SUCCESS",
+      "actualCompletedPRLogRead": true,
+      "logSha256": "088286a2097baa8805b877081fa89a721cc716aeef12d7acdeab2f0879ddd7ce",
+      "normalMerge": "d10ab9975bb6b3b9564cfaa41cf404d48b459b78",
+      "mergedAt": "2026-10-02T10:25:49Z"
+    }
+  ],
+  "activeMigrationRows": 40,
+  "activeMigrationLast": "0043_w8_relationship_backfill",
+  "checks": {
+    "backendTypecheck": "passed",
+    "webTypecheckAfterOwnedRouteTypeRegeneration": "passed",
+    "generationChecks": "passed",
+    "lint": "passed",
+    "format": "passed"
+  },
+  "shippingBuilds": {
+    "ios": {
+      "result": "passed",
+      "binarySha256": "55c64b71cec60e4764fbc306ee4bfb728d68cc15247a4dd1da3b40581f3a5511",
+      "personallyOperatedThisSource": false
+    },
+    "android": {
+      "result": "passed",
+      "apkSha256": "d5fcee199fa7626507c8302c7f735d244625a999e218d41be5a6732b3fe3d844",
+      "personallyOperatedThisSource": true
+    }
+  },
+  "web": {
+    "personallyOperated": true,
+    "width": 390,
+    "accountReturned": true,
+    "privacyRequestDisabled": true,
+    "ownedAPIOutageConcealedAccount": true,
+    "actualRetryRecoveredProfile": true
+  },
+  "android": {
+    "sameBackend": true,
+    "appearances": ["light", "night"],
+    "textScales": [1, 2],
+    "actualPickerActor": 1,
+    "actualAccountIntroRead": true,
+    "actualPrivacyEntryAndScrollOperated": true,
+    "actualControlParentsDisabled": true,
+    "actualLauncherReturnDuringOwnedAPIOutageConcealedHandleAndIntro": true,
+    "actualTryAgainRecoveredProfile": true,
+    "night200RefreshOperated": true,
+    "firstNightHierarchyAttempt": "null root; old XML rejected as evidence; fresh named dump and actual operation used instead",
+    "sharedRequestsLabelWrapAt200": true
+  },
+  "runtime": {
+    "apiPort": 4103,
+    "webPort": 3003,
+    "database": "creator_w3",
+    "developmentIdentity": true,
+    "growthEnabledInThisPR36RevalidationProcess": false,
+    "privateGrowthConfigModified": false,
+    "trustActivated": false,
+    "generationPositiveClaim": false
+  },
+  "newTestsWritten": false,
+  "fullW3Complete": false
+}

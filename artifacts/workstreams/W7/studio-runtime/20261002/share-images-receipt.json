@@ -1,0 +1,162 @@
+{
+  "recordedAt": "2026-10-02T11:27:55.759852+00:00",
+  "baseHead": "5fc1a8ac811779cb13dae7ef485cb675cfeaccaa",
+  "state": "Personally implemented, compiled and operated missing-share recovery only; no successful authorized export acceptance",
+  "sourcePaths": [
+    {
+      "path": "apps/web/app/share/[id]/image/page.tsx",
+      "sha256": "3ab5db1e59d70ccf60fa235ef4bf6c2e8645350e4eef2a6b8cec8906aec5be0c"
+    },
+    {
+      "path": "apps/web/app/share/[id]/image/source/route.ts",
+      "sha256": "1b04382aa47bf0e384f14c759739e645dc8a076c9e9767b9f7cb92c8279d0a31"
+    },
+    {
+      "path": "apps/web/features/growth/reply-export.ts",
+      "sha256": "624f85d551c9f9877f5087250a52ef3c6784dd40972098ca00d891acabfa4d04"
+    },
+    {
+      "path": "apps/web/features/growth/reply-images.ts",
+      "sha256": "9660a7a2471c9a57d5e81dcac7b572f79f1fe6e910ac582a1e065f8b99335e4a"
+    },
+    {
+      "path": "apps/web/features/growth/share-images.tsx",
+      "sha256": "79e06f657a077bcefa9617b65a40e68d64911944946d1c7997ca866dde403be2"
+    },
+    {
+      "path": "apps/web/package.json",
+      "sha256": "664ac01fdc914ff6b1d9f152b6d85787e030a1107a1d46af1bec4cbbd5bb2daf"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "1ddfc33a8057b4c065b506bbd660ddd0155fed53a5c9533c472711f6220b4cff"
+    },
+    {
+      "path": "config/copy.json",
+      "sha256": "6bca708c0c8324d13e379f78d103e3a4c6fde5de76ba849c825c9cfe41a7c44a"
+    },
+    {
+      "path": "packages/copy/src/index.ts",
+      "sha256": "a6dfe9e8ffac13c1e4706892a9acb28e639e46ebcf98517653bf8e81b8f65ab6"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/QelvoraCopy.swift",
+      "sha256": "629c08921aaad7667898f26a8c63f363971af45d726bbfdd3609d989fdfa65e4"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/Localizable.xcstrings",
+      "sha256": "329cc964d8b3abeabc0968019a6df888ede02a005cb46a18cdeb7f48b6f8bcce"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt",
+      "sha256": "cd00cf324facdabf557ca3e277c58975c1efba034ad7af1791e2cb2f531b5ce4"
+    },
+    {
+      "path": "apps/android/app/src/main/res/values/strings.xml",
+      "sha256": "c8e1461c0abb442f70ab9c5d4f7d5af96305535347a5bae5530a5aa258d58bd6"
+    }
+  ],
+  "removed": "apps/web/app/share/[id]/image/route.tsx (900-character refusal and server OG renderer)",
+  "architecture": {
+    "renderer": "browser-local canvas using same-origin licensed fonts and OS Unicode fallback",
+    "completeText": "current existing public/shares/:id/export artifact, including current correction",
+    "singlePage": "PNG,1080x1440",
+    "multiplePages": "numbered PNGs plus complete reply.txt and verification.json; bounded ZipPassThrough archive",
+    "limits": "128000 UTF16 text,512 label,2048 HTTPS URL,8192 pages,128MiB artifact,90s action; no partial artifact on failure",
+    "authority": "fresh actual export before rendering and exact seven-field comparison after rendering",
+    "lifecycle": "single tab render guard; actual hidden/pagehide/unmount abort and local resource disposal; no persistent browser cache or remote reply font lookup",
+    "release": "actual approved HTTPS origin and genuine W4/W5/signature/consent remain unavailable"
+  },
+  "checks": {
+    "productionWebBuild": "exit0, fresh .next-w7-images-20261002, personally launched3007",
+    "backendBuild": "exit0",
+    "webTypecheck": "exit0 after archiving stale stopped dev-generated types",
+    "lint": "exit0",
+    "sharedGenerator": "exit0,12 original outputs",
+    "existingContracts": "exit0,9 tests; no new tests",
+    "native": "New shared copy generated, no new native behavior; original signed iOS/Android operations at c463 preserved separately, not combined-head acceptance"
+  },
+  "personalRuntime": {
+    "apiPid": 44338,
+    "webPid": 42433,
+    "api": "actual40-migration own DB, compiled server,4107; ready503trust_unconfigured",
+    "web": "shipping production3007; actual missing export shows current card unavailable, Try again reaches same share recovery",
+    "dataRoute": "actual410/no-store/nosniff/noindex/same-origin; only error, no artifact data",
+    "LightNight": "actual390x844 AX/raw JPEG captured; metadata extension corrected to JPEG without altering bytes; negative recovery only",
+    "successfulDownloads": "not observed; no permitted actual share/origin; no synthetic fixture or provider",
+    "cleanup": "both verified owned PIDs normally SIGTERM; own PG stopped; own browser closed; no native device or heavy lease used"
+  },
+  "exactHeadCI": {
+    "head": "5fc1a8ac811779cb13dae7ef485cb675cfeaccaa",
+    "Trust": "36998427729success",
+    "Foundation": "36998429038web-and-backend and android-runtime success; android-foundation,ios-foundation,web-visual queued at last observation, not passes",
+    "merge": "PR31 ready/open/unmerged; every changed-head gate and final combined review remains required"
+  },
+  "raw": [
+    {
+      "path": "share-images-raw/initial-typecheck-tool-transcript.txt",
+      "sha256": "5d56348bd020ce435a3268dd2a1a629db41c19cbf4dd14ab4636ac7f3191aad1",
+      "bytes": 854
+    },
+    {
+      "path": "share-images-raw/share-images-backend-build.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+      "bytes": 41
+    },
+    {
+      "path": "share-images-raw/share-images-existing-contracts.log",
+      "sha256": "31ebb78af96de6f9f6323bb0d838c77d81c65ba471187ecaef7886935bd0ec2d",
+      "bytes": 328
+    },
+    {
+      "path": "share-images-raw/share-images-generated-check.log",
+      "sha256": "783d7687fc7ed684f97dba116550e9768a96fef4e1b17fef8ea5bc74a393c317",
+      "bytes": 52
+    },
+    {
+      "path": "share-images-raw/share-images-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "share-images-raw/share-images-production-build.log",
+      "sha256": "03bfcd0174d3376d7735cf734cc3aa004631d108db234cd5da20e0a2a3cd0884",
+      "bytes": 2731
+    },
+    {
+      "path": "share-images-raw/share-images-readiness.http",
+      "sha256": "4dfdae28d981f931c8abf86386d075910d154bf4f8107005bfd0fc7aeae94cba",
+      "bytes": 469
+    },
+    {
+      "path": "share-images-raw/share-images-unavailable-light.ax.txt",
+      "sha256": "205b29686288dd3393f6ecdd45ed449d3d93f1e3ab6833f950c3a3b5ccc46e9a",
+      "bytes": 756
+    },
+    {
+      "path": "share-images-raw/share-images-unavailable-light.jpg",
+      "sha256": "98aa1756bf7b16763ff640030af27be55b3df78d23f4499e3b9412514d1f9466",
+      "bytes": 11016
+    },
+    {
+      "path": "share-images-raw/share-images-unavailable-night.ax.txt",
+      "sha256": "9ac7a4b8d4c687860b9dcd20064fde3b425ee6ffd3a53c778bf76fd6a63f3c89",
+      "bytes": 792
+    },
+    {
+      "path": "share-images-raw/share-images-unavailable-night.jpg",
+      "sha256": "40bc2a005d3ad573de62adc069b8660334d39dfc770cafc6f0c82ff584155dd6",
+      "bytes": 10809
+    },
+    {
+      "path": "share-images-raw/share-images-unavailable-source.http",
+      "sha256": "42d162577383b8e7d3eb321d35e1359d2dfc9741e544fdd8ddd68153ba38e801",
+      "bytes": 446
+    },
+    {
+      "path": "share-images-raw/share-images-web-typecheck.log",
+      "sha256": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92",
+      "bytes": 15
+    }
+  ]
+}

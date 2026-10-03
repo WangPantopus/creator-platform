@@ -1,0 +1,15 @@
+{
+  "observedAt": "2026-10-02T14:24:00.700Z",
+  "migrations": {
+    "active": 40,
+    "latest": "0043_w8_relationship_backfill"
+  },
+  "creators": {
+    "creators": 0,
+    "verified": 0
+  },
+  "metadata": {
+    "core_metadata_namespace_present": false
+  },
+  "sqlActivatedByW7ThisCheckpoint": false
+}

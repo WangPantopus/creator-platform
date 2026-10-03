@@ -1,0 +1,90 @@
+{
+  "at": "2026-10-02T14:19:46.350Z",
+  "W8source": "d12db34c",
+  "review": "W1 personally installed actual74/82/100 into its owned empty closed canonical57 proposal DB; no activation",
+  "definitions": {
+    "creator.begin_generation_terminal(uuid,uuid,text,uuid,integer,boolean)": "b2631b4b917f2406fff50fb5beaaab8d0eb96e9512534d251d56ffb4e363b691",
+    "creator.capture_generation_terminal()": "b61df43e7edd74a33f80be0965169c4295c739d0364c18d017f48a86aa6283c4",
+    "creator.end_generation_terminal()": "ce3e9f466d859d7f46091b601bbd0b84357a9ee2a3157a3ca3e8e39f75a1aacc",
+    "creator.generation_terminal_matches(uuid,uuid,boolean)": "c3f8423b34d38f4f5fdb74804ecffd7b4aa659d243d50a0524be88318ff6c8ad",
+    "creator.pending_generation_terminals(integer)": "34fdf0905679881077e5e1479649781a15335e6ce4a4dc90ba7d2839b82f53be",
+    "creator.require_generation_terminal_cleanup()": "c9df9677830afe0e1d6b2ac33ec3efd288319bdc909a5eb381946987b5bdcd62",
+    "creator_trust.generation_terminal_denial(uuid)": "fc465b04641c205007bc532f0e7f3e95450f1fb82bf0b66811d3a27c42923a22"
+  },
+  "generations": 0,
+  "scopes": 0,
+  "canonicalLedger": 57,
+  "terminalActivation": 0,
+  "closed": true,
+  "sourceFiles": {
+    "generation-terminal.ts": "388c150200953cb4a14c17a5298b6f2cc77ceadd36007f0e005cf380bd754962",
+    "generation-terminal-custody.ts": "b3d6467064890f3d570b779d973e8eae872647779347018c5be61431fe19f5f6"
+  },
+  "sql": {
+    "migration": {
+      "version": "0099_w1_generation_terminal_scope",
+      "checksum": "fadbf62a3ddf06142c3a6ad30313503f9bebe7b6d64f67f8ba01ff13ce2398c7"
+    },
+    "denialMigration": {
+      "version": "0100_w8_generation_terminal_denial",
+      "checksum": "393920665d8860ee53ee6ef740ba0ad4a6921aceddcbf33f6419727e846532af"
+    },
+    "denialDefinitionChecksum": "fc465b04641c205007bc532f0e7f3e95450f1fb82bf0b66811d3a27c42923a22",
+    "definitions": {
+      "creator.begin_generation_terminal(uuid,uuid,text,uuid,integer,boolean)": "b2631b4b917f2406fff50fb5beaaab8d0eb96e9512534d251d56ffb4e363b691",
+      "creator.capture_generation_terminal()": "b61df43e7edd74a33f80be0965169c4295c739d0364c18d017f48a86aa6283c4",
+      "creator.end_generation_terminal()": "ce3e9f466d859d7f46091b601bbd0b84357a9ee2a3157a3ca3e8e39f75a1aacc",
+      "creator.generation_terminal_matches(uuid,uuid,boolean)": "c3f8423b34d38f4f5fdb74804ecffd7b4aa659d243d50a0524be88318ff6c8ad",
+      "creator.pending_generation_terminals(integer)": "34fdf0905679881077e5e1479649781a15335e6ce4a4dc90ba7d2839b82f53be",
+      "creator.require_generation_terminal_cleanup()": "c9df9677830afe0e1d6b2ac33ec3efd288319bdc909a5eb381946987b5bdcd62"
+    }
+  },
+  "actualTcpPasswordProbes": [
+    {
+      "name": "actual_worker_login",
+      "actualTcpPasswordLogin": true,
+      "exitCode": 0,
+      "observed": "t",
+      "passed": true
+    },
+    {
+      "name": "worker_direct_denial",
+      "actualTcpPasswordLogin": true,
+      "exitCode": 3,
+      "observed": "42501",
+      "passed": true
+    },
+    {
+      "name": "worker_private_terminal_scope",
+      "actualTcpPasswordLogin": true,
+      "exitCode": 3,
+      "observed": "42501",
+      "passed": true
+    },
+    {
+      "name": "worker_private_body",
+      "actualTcpPasswordLogin": true,
+      "exitCode": 3,
+      "observed": "42501",
+      "passed": true
+    },
+    {
+      "name": "unknown_terminal_no_scope",
+      "actualTcpPasswordLogin": true,
+      "exitCode": 0,
+      "observed": "BEGIN\nt\n0\nt\n\nCOMMIT",
+      "passed": true
+    }
+  ],
+  "catalogueQuery": "exact current query executes/plans and returns ready=false; CASE guards precede type-specific privilege helpers",
+  "failures": [
+    "First startup socket was not ready; no SQL installed",
+    "100 refused missing actual74/82 dependencies and rolled back; installed reviewed74/82 in order then actual100; no registry/ledger change"
+  ],
+  "limitations": [
+    "No business generation, fake scope or settlement callback",
+    "No positive terminal/provider/financial/recovery/race acceptance",
+    "Actual W8 held worker restoration and W2/W4 settlement composition remain required",
+    "Original retained57/canonical app/peer data unchanged"
+  ]
+}

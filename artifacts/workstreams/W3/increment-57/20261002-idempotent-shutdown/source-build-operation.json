@@ -1,0 +1,74 @@
+{
+  "source": "38a0cd591f062f6f5357d4fab3a7804232044f93",
+  "branch": "codex/w3-idempotent-host-shutdown",
+  "base": "d2bba3b9",
+  "ownerSource": "a7ce54d172633647b2854708c9365fd4911f2249",
+  "files": {
+    "apps/backend/src/server.ts": "072f184b3cccac4f44ca246f148efc2f3517cbc30816160f24c42b7983a661b4",
+    "apps/backend/src/modules/growth/configured.ts": "a96a8ef7691ad0e46f14c0f91d281c26a5f69291778f921b865c0199054d4fcd"
+  },
+  "rootShutdownTailByteIdenticalToOwner": true,
+  "rootShutdownTailSHA256": "0ba2366560e4d992e5c4b753107f569965266b2effdbf0b4b2f22a6957bf0a50",
+  "checks": {
+    "backendTypecheck": "passed",
+    "scopedESLint": "passed",
+    "prettier": "passed",
+    "diffCheck": "passed",
+    "normalBackendBuild": "passed",
+    "newTestCodeWritten": false
+  },
+  "compiledBundle": {
+    "path": "apps/backend/dist/server.mjs",
+    "bytes": 1759327,
+    "sha256": "c17a3b032bccaca76e02e19a1ef140f1301040e23c5110c11db4c765b544876f",
+    "executed": false
+  },
+  "nativeSourcesChanged": false,
+  "nativeBuildsRun": false,
+  "iosApplicationOperatedThisIncrement": false,
+  "androidApplicationOperatedThisIncrement": false,
+  "sqlApplied": false,
+  "rolesChangedByW3": false,
+  "generationAvailable": false,
+  "web": {
+    "backend": "127.0.0.1:4103",
+    "origin": "localhost:3003",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "visibility": "visible"
+    },
+    "account": "kilnfire",
+    "outageConcealed": true,
+    "manualRetryRecovered": true,
+    "threadReconnectAccepted": false
+  },
+  "shutdown": {
+    "priorFailureSource": "22f9fc1b26c23568c043c4a31234df5a32a37061",
+    "firstRunExitStatusQualified": false,
+    "supervisedPasses": 2,
+    "signalOrders": [
+      [
+        "SIGINT",
+        "SIGTERM"
+      ],
+      [
+        "SIGTERM",
+        "SIGINT"
+      ]
+    ],
+    "serviceExitCodes": [
+      0,
+      0
+    ],
+    "duplicatePoolCloseObserved": false,
+    "cleanupFailureObserved": false
+  },
+  "cleanup": {
+    "apiStopped": true,
+    "webStopped": true,
+    "ownedGuestLaunched": false,
+    "databaseRetained": true
+  }
+}

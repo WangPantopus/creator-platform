@@ -4,13 +4,22 @@ import { contentFeature, contentSignedSubjects } from "./registration.js";
 import { ContentSources } from "./sources.js";
 import { contentPublicProjection } from "../growth/content.js";
 import { createCommercePublicationPermission } from "../commerce/publication.js";
+export {
+  createCurrentContentPostEntryReader,
+  type CurrentContentPostEntryReader,
+} from "./post-entry.js";
 import { assertCommercePublicationSource } from "../commerce/publication-source.js";
+export {
+  ContentFulfillmentPublicationWorker,
+  type ContentFulfillmentPublicationConfiguration,
+} from "./fulfillment-publication.js";
 export {
   PreparedContentGenerationOrigins,
   GENERATION_CONTENT_ORIGIN_MIGRATION,
   GENERATION_CONTENT_ORIGIN_SIGNATURE,
   type GenerationContentOriginSource,
 } from "./generation-origin.js";
+export { GENERATION_CONTENT_ORIGIN_PROFILE_FENCE_SOURCE } from "./generation-origin-profile.js";
 import { DomainError } from "../../core/errors.js";
 import { StudioService } from "../studio/service.js";
 import { studioFeature } from "../studio/registration.js";

@@ -10,6 +10,11 @@ import {
   type GenerationTaskScope,
 } from "../identity/generation-scope.js";
 import { SIGNATURE_READ_FENCE_MIGRATION } from "../identity/signature-read-fence.js";
+import { ContentHeldClient } from "./held-client-cleanup.js";
+import {
+  assertOriginProfileFence,
+  originUnavailable,
+} from "./generation-origin-profile.js";
 
 export const GENERATION_CONTENT_ORIGIN_MIGRATION =
   "0186_w5_generation_content_origin";
@@ -56,7 +61,11 @@ export class PreparedContentGenerationOrigins {
     GenerationTaskScope,
     { client: PoolClient; tupleHash: string }
   >();
-  private constructor(private readonly identity: GenerationIdentityAuthority) {}
+  private constructor(
+    private readonly identity: GenerationIdentityAuthority,
+    private readonly profileFenceDefinitionChecksum: string,
+    private readonly catalogueChecksum: string,
+  ) {}
 
   static async prepare(input: {
     identity: GenerationIdentityAuthority;
@@ -66,6 +75,12 @@ export class PreparedContentGenerationOrigins {
     signatureMigration: { version: string; checksum: string };
     metadataDefinitionChecksum: string;
     signatureFenceDefinitionChecksum: string;
+    /** Independently qualified pg_get_expr of the separately registered fence. */
+    profileFenceDefinitionChecksum: string;
+    /** Independently reviewed effective schema/table/column/RLS permissions. */
+    catalogueChecksum: string;
+    /** The caller's original cancellation; supplies no task or authority. */
+    signal?: AbortSignal;
   }): Promise<PreparedContentGenerationOrigins> {
     invariant(
       input.identity instanceof GenerationIdentityAuthority,
@@ -83,19 +98,50 @@ export class PreparedContentGenerationOrigins {
         input.signatureMigration.version === SIGNATURE_READ_FENCE_MIGRATION &&
         Hash.safeParse(input.signatureMigration.checksum).success &&
         Hash.safeParse(input.metadataDefinitionChecksum).success &&
-        Hash.safeParse(input.signatureFenceDefinitionChecksum).success,
+        Hash.safeParse(input.signatureFenceDefinitionChecksum).success &&
+        Hash.safeParse(input.profileFenceDefinitionChecksum).success &&
+        Hash.safeParse(input.catalogueChecksum).success &&
+        Number.isFinite(input.workerPool.options.connectionTimeoutMillis) &&
+        (input.workerPool.options.connectionTimeoutMillis ?? 0) > 0 &&
+        (input.workerPool.options.connectionTimeoutMillis ?? 0) <= 5000,
       "generation_content_origin_unconfigured",
       "Exact reviewed origin and signature writer receipts are required.",
     );
+    input.identity.assertConsumerRegistered(input.consumer);
+    input.signal?.throwIfAborted();
+    const client = await input.workerPool.connect().catch((error: unknown) => {
+      throw originUnavailable(error);
+    });
+    const signal = AbortSignal.any([
+      ...(input.signal ? [input.signal] : []),
+      AbortSignal.timeout(6000),
+    ]);
+    const held = new ContentHeldClient(client, signal);
+    let failure: unknown;
     try {
+      await held.begin();
+      await held.run(() =>
+        client.query(
+          "SET LOCAL statement_timeout='5s'; SET LOCAL lock_timeout='1s'; SET LOCAL idle_in_transaction_session_timeout='5s'",
+        ),
+      );
+      await held.run(() =>
+        assertOriginProfileFence(
+          client,
+          input.profileFenceDefinitionChecksum,
+          input.catalogueChecksum,
+          signal,
+        ),
+      );
       const proof = (
-        await input.workerPool.query<{
-          ready: boolean;
-          definition: string;
-          metadata_definition: string;
-          fence_definition: string;
-        }>(
-          `SELECT session_user='creator_generation_worker' AND current_user=session_user
+        await held.run(() =>
+          client.query<{
+            ready: boolean;
+            definition: string;
+            metadata_definition: string;
+            fence_definition: string;
+          }>(
+            `SELECT session_user='creator_generation_worker' AND current_user=session_user
            AND (SELECT count(*)=2 FROM creator.schema_migration WHERE
             (version=$2 AND checksum=$3) OR (version=$5 AND checksum=$6))
            AND p.prokind='f' AND p.prosecdef AND p.provolatile='v'
@@ -141,9 +187,10 @@ export class PreparedContentGenerationOrigins {
             'creator.ai_version'::regclass,'creator.ai_workspace'::regclass]) private_relation
             WHERE has_any_column_privilege($4,private_relation,'SELECT,INSERT,UPDATE,REFERENCES')
              OR has_table_privilege($4,private_relation,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER'))
-           AND (SELECT count(*)=4 FROM pg_class WHERE oid=ANY(ARRAY[
+           AND (SELECT count(*)=5 FROM pg_class WHERE oid=ANY(ARRAY[
             'creator.content_index'::regclass,'creator.content_revision'::regclass,
-            'creator.content_publication'::regclass,'creator.generation_worker_scope'::regclass])
+            'creator.content_publication'::regclass,'creator.generation_worker_scope'::regclass,
+            'creator.creator_profile'::regclass])
             AND relrowsecurity AND relforcerowsecurity AND pg_get_userbyid(relowner)='creator_owner')
            AND (SELECT count(*)=3 FROM pg_attribute WHERE attrelid='creator.content_revision'::regclass
             AND NOT attisdropped AND ((attname='ai_reuse_public_text' AND atttypid='boolean'::regtype)
@@ -166,14 +213,15 @@ export class PreparedContentGenerationOrigins {
            pg_get_functiondef(to_regprocedure('creator.derive_content_origin_metadata()')) AS metadata_definition,
            pg_get_functiondef(to_regprocedure('creator.fence_signature_metadata_write()')) AS fence_definition
            FROM pg_proc p JOIN pg_roles r ON r.oid=p.proowner WHERE p.oid=to_regprocedure($1)`,
-          [
-            input.consumer.signature,
-            input.consumer.migration.version,
-            input.consumer.migration.checksum,
-            owner,
-            input.signatureMigration.version,
-            input.signatureMigration.checksum,
-          ],
+            [
+              input.consumer.signature,
+              input.consumer.migration.version,
+              input.consumer.migration.checksum,
+              owner,
+              input.signatureMigration.version,
+              input.signatureMigration.checksum,
+            ],
+          ),
         )
       ).rows[0];
       const hash = (text: string) =>
@@ -185,22 +233,34 @@ export class PreparedContentGenerationOrigins {
         hash(proof.fence_definition) !== input.signatureFenceDefinitionChecksum
       )
         throw new Error("Origin custody differs from reviewed source");
-    } catch {
-      throw new DomainError(
-        "generation_content_origin_unconfigured",
-        "The reviewed current content origin reader is not activated.",
-        503,
-      );
+    } catch (error) {
+      failure = error;
+      throw originUnavailable(error);
+    } finally {
+      await held.settle(failure);
     }
-    return new PreparedContentGenerationOrigins(input.identity);
+    return new PreparedContentGenerationOrigins(
+      input.identity,
+      input.profileFenceDefinitionChecksum,
+      input.catalogueChecksum,
+    );
   }
 
   async assertCurrent(
     client: PoolClient,
     scope: GenerationTaskScope,
     sources: readonly GenerationContentOriginSource[],
+    signal?: AbortSignal,
   ): Promise<void> {
+    signal?.throwIfAborted();
     await this.identity.authorizeInTransaction(scope, client);
+    signal?.throwIfAborted();
+    await assertOriginProfileFence(
+      client,
+      this.profileFenceDefinitionChecksum,
+      this.catalogueChecksum,
+      signal,
+    );
     const selected = z.array(Source).min(1).max(1000).parse(sources);
     invariant(
       new Set(selected.map((source) => source.id)).size === selected.length,
@@ -240,12 +300,14 @@ export class PreparedContentGenerationOrigins {
     );
     let current: z.infer<typeof Origin>[];
     try {
+      signal?.throwIfAborted();
       const raw = (
         await client.query<{ origins: unknown }>(
           "SELECT creator.generation_content_origins($1,$2,$3::jsonb) AS origins",
           [scope.generationId, scope.workerToken, JSON.stringify(distinct)],
         )
       ).rows[0]?.origins;
+      signal?.throwIfAborted();
       current = z.array(Origin).min(1).max(1000).parse(raw);
     } catch (error) {
       if (
@@ -253,17 +315,19 @@ export class PreparedContentGenerationOrigins {
         typeof error === "object" &&
         "code" in error &&
         String(error.code) === "42501"
-      )
-        throw new DomainError(
+      ) {
+        const denied = new DomainError(
           "generation_content_origin_denied",
           "This content origin is unavailable.",
           403,
         );
-      throw new DomainError(
-        "generation_content_origin_unavailable",
-        "Current content origins are unavailable. Try again.",
-        503,
-      );
+        Object.defineProperty(denied, "cause", {
+          value: error,
+          configurable: true,
+        });
+        throw denied;
+      }
+      throw originUnavailable(error);
     }
     const byTuple = new Map(
       current.map((origin) => [
@@ -276,6 +340,7 @@ export class PreparedContentGenerationOrigins {
         "SELECT extract(epoch FROM clock_timestamp())::double precision AS epoch_seconds",
       )
     ).rows[0]?.epoch_seconds;
+    signal?.throwIfAborted();
     invariant(
       typeof currentTime === "number" &&
         Number.isFinite(currentTime) &&
@@ -293,6 +358,13 @@ export class PreparedContentGenerationOrigins {
       "An approved source no longer matches its current public publication.",
     );
     this.finalized.set(scope, { client, tupleHash });
+    await assertOriginProfileFence(
+      client,
+      this.profileFenceDefinitionChecksum,
+      this.catalogueChecksum,
+      signal,
+    );
     await this.identity.authorizeInTransaction(scope, client);
+    signal?.throwIfAborted();
   }
 }

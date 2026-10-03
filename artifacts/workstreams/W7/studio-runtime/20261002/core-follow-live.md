@@ -1,0 +1,13 @@
+# Actual core Follow function custody — 2026-10-02
+
+W1 identified that the migration file checksum did not detect a changed live function definition. W7 personally added required `CoreFollowMigration.functionDefinitionSha256`: the actual PostgreSQL17 `pg_get_functiondef` hash must match on the genuine held caller client. A proposed CREATE statement hash does not qualify it.
+
+An independent W7-owned empty PostgreSQL17.11 database was created with CONNECTION LIMIT0 and the restoration traffic-closed database marker. Its40 canonical baseline migrations were installed, then the unnumbered proposal DDL was installed solely for catalog qualification, with no0101 ledger or runtime authority. The actual function definition is preserved verbatim; its UTF-8 SHA256 is `1b09d91fe20b712f5452ca5d79fa352f94482283edeaaac4543558975c761a78`. The final SQL/source hashes are recorded separately. Creators, fans and follows are all0. The actual adapter schema query returns ready:false because the canonical migration receipt is absent. This does not establish Follow product acceptance.
+
+The source checks global/current-database role configuration, ownership and membership; all non-system schema/table/column and sequence rights, including effective PUBLIC grants; unrelated namespace usage/create and other usable definer functions; and exact function ACL, configuration and dedicated namespace. Only the existing narrow session metadata and Follow columns are allowed. Actual W1/W8 family/current-negative custody and a genuine current canonical session remain prerequisites.
+
+The initial install failed because PostgreSQL evaluated a sequence privilege function on a non-sequence relation. The full transaction rolled back. A guarded CASE repaired it; final empty-baseline/proposal installation passes. Both the failed install and rejected definition lookup are preserved. Backend build, ESLint, format and nine existing contracts pass; no new tests or harness were written.
+
+The qualification database is stopped and remains traffic-closed. The original W7 runtime database was untouched and stays stopped with40 migrations and no metadata function/namespace. The proposal is still unnumbered/unregistered and unapplied to the canonical product runtime; no W7 SQL slot above the human0044–0060 ceiling was activated. W1/W8 composition and genuine populated Follow/concurrency acceptance remain open. PR31 is ready/open/unmerged, and every original requirement and exact-head gate remains binding. W7 is not complete.
+
+[Actual definition, catalog, source and failure receipt](core-follow-live-receipt.json).

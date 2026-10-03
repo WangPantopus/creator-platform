@@ -1,0 +1,23 @@
+{
+  "providers": {
+    "version": "development-unreviewed-openai-20261001",
+    "reference": "synthetic-review-only-unapproved-processor-20261001",
+    "providers": [
+      {
+        "name": "OpenAI",
+        "termsUrl": "https://openai.com/policies/services-agreement/",
+        "noTraining": true,
+        "noRetention": false
+      }
+    ],
+    "verified": false
+  },
+  "developmentSynthetic": true,
+  "consentAvailable": false,
+  "generationAvailable": false,
+  "firstConversationAvailable": false,
+  "correctionsAvailable": false,
+  "recordingDeliveryAvailable": false,
+  "offlineAvailable": false,
+  "accessDisclosure": "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time."
+}

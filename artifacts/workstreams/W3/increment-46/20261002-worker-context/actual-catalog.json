@@ -1,0 +1,42 @@
+{
+  "operation": "actual read-only catalog/count observation; no purpose SQL applied",
+  "source": "32f9f6c64c478190bf69718329228314f7b06b72",
+  "database": "creator_w3",
+  "traffic_closed": true,
+  "ledgerRows": 57,
+  "lastRegisteredVersion": "0062_w6_creator_media_worker",
+  "purposes": [
+    {
+      "version": "0072_w1_generation_worker_scope",
+      "applied": false
+    },
+    {
+      "version": "0093_w8_generation_worker_denial",
+      "applied": false
+    },
+    {
+      "version": "0095_w3_generation_purpose_consumers",
+      "applied": false
+    },
+    {
+      "version": "0096_w2_generation_input_consumers",
+      "applied": false
+    }
+  ],
+  "contextInstalled": false,
+  "counts": {
+    "creator.thread": 0,
+    "creator.message": 0,
+    "creator.generation": 0,
+    "creator.memory": 0,
+    "creator.memory_exclusion": 0,
+    "creator_trust.privacy_job": 0,
+    "creator_trust.privacy_task": 0,
+    "creator_trust.tombstone": 0,
+    "creator.commerce_effect": 0
+  },
+  "workerIssued": false,
+  "privateContextRead": false,
+  "providerCalled": false,
+  "applicationAcceptance": false
+}

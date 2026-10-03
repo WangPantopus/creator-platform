@@ -1,0 +1,73 @@
+{
+  "recordedAt": "2026-10-02T08:21:14.452103+00:00",
+  "state": "Partial shipping development acceptance; W7 not complete",
+  "sourceParent": "23945c32b9867bb0e8ad8a959168c13dbee1920d",
+  "sourceBinding": "source-sha256.json; uncommitted fixes at observation time",
+  "personallyImplementedAndOperated": true,
+  "newTestCode": false,
+  "referenceOrToleranceChanges": false,
+  "ios": {
+    "udid": "FAB31883-2F36-4E50-83B3-D9654B60FF00",
+    "shippingDylibSHA256": "75d0063483027f60d861fdc332d6fb3604ec35678716dbb0f1299fca51737153",
+    "installedHashEqualsBuilt": true,
+    "signing": "Normal simulator signing enabled, identity -; no production identity or APNs authority",
+    "quietHoursSavedAndColdRestored": [
+      "21:00",
+      "07:00",
+      "America/Los_Angeles"
+    ],
+    "push": false,
+    "email": false,
+    "state": "Stopped and exact slot3 released; data retained"
+  },
+  "android": {
+    "serial": "emulator-5580",
+    "avd": "Qelvora_W7_API34",
+    "apkSHA256": "15978e25cb27ae0ce85d4d767e63460c62fdca44a84d37a85181025e86de10c2",
+    "quietHoursSavedAndColdRestored": [
+      "22:00",
+      "07:00",
+      "America/Los_Angeles"
+    ],
+    "push": false,
+    "email": false,
+    "slot": 1,
+    "state": "Stopped with explicit adb emu kill; exact slot1 UUID/inode released; data retained",
+    "additionalObservedJourneys": [
+      "Discover category/search ceramics retained across actual API stop/restart/Try again",
+      "Missing share warm custom-scheme delivery and cold custom-scheme launch show unavailable without export"
+    ]
+  },
+  "existingChecks": {
+    "sharedGeneration": "pass, 12 generated resources",
+    "sharedTests": "2 pass, existing",
+    "backend": "build/typecheck/lint pass",
+    "backendContracts": "9 pass; 9 PostgreSQL cases skipped",
+    "ios": "shipping build pass; 18 original checks and 110 original comparisons pass on final source",
+    "android": "shipping build pass, 26 seconds, 37 tasks",
+    "productionWeb": "initial NODE_ENV development prerender failure preserved; corrected production build pass"
+  },
+  "parentCI": {
+    "head": "23945c32b9867bb0e8ad8a959168c13dbee1920d",
+    "foundationRun": 36974460736,
+    "trustRun": 36974459427,
+    "Trust": "success",
+    "web-and-backend": "success",
+    "web-visual": "success",
+    "ios-foundation": "success",
+    "android-foundation": "queued",
+    "android-runtime": "success",
+    "mergeGateComplete": false
+  },
+  "population": {
+    "actualAppCreatedDevelopmentFans": 1,
+    "verifiedCreators": 0,
+    "populatedProductAcceptance": false
+  },
+  "blockedInputs": [
+    "verified creator/signature authority",
+    "approved public HTTPS origin",
+    "APNs/FCM/email/native project configuration",
+    "protected-host privacy inputs"
+  ]
+}

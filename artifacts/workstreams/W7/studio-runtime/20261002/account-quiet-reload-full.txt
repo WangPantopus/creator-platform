@@ -1,0 +1,218 @@
+Browser tab: 1, Title: "Qelvora", URL: "http://127.0.0.1:3007/notifications/settings".
+1 AXWebArea Qelvora, URL: 127.0.0.1:3007/notifications/settings
+	2 container
+		3 heading Notification settings, Value: 1
+			4 text Notification settings
+		5 text Your in-app notification record cannot be turned off. Push and email are optional. Email delivery is grouped daily for creators and weekly for fans.
+		6 checkbox (settable, integer) Description: Push notifications, Value: 0
+		7 checkbox (settable, integer) Description: Email digest, Value: 0
+		8 checkbox (settable, integer) Description: Hide sensitive previews, Value: 1
+		9 container Quiet hours
+			10 text Quiet hours
+			11 container
+				12 text From
+				13 time field (settable) From, Value: 22:30
+					14 container
+						15 stepper
+						16 stepper
+						17 stepper
+					18 pop up button Show time picker Show time picker
+			19 container
+				20 text Until
+				21 time field (settable) Until, Value: 08:15
+					22 container
+						23 stepper
+						24 stepper
+						25 stepper
+					26 pop up button Show time picker Show time picker
+			27 container
+				28 text Time zone
+				29 text field (settable) Time zone, Value: America/Los_Angeles
+			30 text Leave both times empty for no quiet hours. Matching times pause optional delivery all day.
+		31 container Updates from creators
+			32 text Updates from creators
+			33 text Creators you follow or receive updates from appear here.
+		34 container Notification types
+			35 text Notification types
+			36 container AI replies
+				37 text AI replies
+				38 container
+					39 checkbox (settable, integer) Push AI replies, Value: 1
+					40 text Push
+				41 container
+					42 checkbox (settable, integer) Email AI replies, Value: 1
+					43 text Email
+			44 container Approved AI drafts
+				45 text Approved AI drafts
+				46 container
+					47 checkbox (settable, integer) Push Approved AI drafts, Value: 1
+					48 text Push
+				49 container
+					50 checkbox (settable, integer) Email Approved AI drafts, Value: 1
+					51 text Email
+			52 container Personal replies and voice notes
+				53 text Personal replies and voice notes
+				54 container
+					55 checkbox (settable, integer) Push Personal replies and voice notes, Value: 1
+					56 text Push
+				57 container
+					58 checkbox (settable, integer) Email Personal replies and voice notes, Value: 1
+					59 text Email
+			60 container Request status updates
+				61 text Request status updates
+				62 container
+					63 checkbox (settable, integer) Push Request status updates, Value: 1
+					64 text Push
+				65 container
+					66 checkbox (settable, integer) Email Request status updates, Value: 1
+					67 text Email
+			68 container Call reminders
+				69 text Call reminders
+				70 container
+					71 checkbox (settable, integer) Push Call reminders, Value: 1
+					72 text Push
+				73 container
+					74 checkbox (settable, integer) Email Call reminders, Value: 1
+					75 text Email
+			76 container Your question answered publicly
+				77 text Your question answered publicly
+				78 container
+					79 checkbox (settable, integer) Push Your question answered publicly, Value: 1
+					80 text Push
+				81 container
+					82 checkbox (settable, integer) Email Your question answered publicly, Value: 1
+					83 text Email
+			84 container Posts about what you asked
+				85 text Posts about what you asked
+				86 container
+					87 checkbox (settable, integer) Push Posts about what you asked, Value: 1
+					88 text Push
+				89 container
+					90 checkbox (settable, integer) Email Posts about what you asked, Value: 1
+					91 text Email
+			92 container Creator announcements
+				93 text Creator announcements
+				94 container
+					95 checkbox (settable, integer) Push Creator announcements, Value: 1
+					96 text Push
+				97 container
+					98 checkbox (settable, integer) Email Creator announcements, Value: 1
+					99 text Email
+			100 container Offers from creators
+				101 text Offers from creators
+				102 container
+					103 checkbox (settable, integer) Push Offers from creators, Value: 1
+					104 text Push
+				105 container
+					106 checkbox (settable, integer) Email Offers from creators, Value: 1
+					107 text Email
+			108 container Pass slot changes
+				109 text Pass slot changes
+				110 container
+					111 checkbox (settable, integer) Push Pass slot changes, Value: 1
+					112 text Push
+				113 container
+					114 checkbox (settable, integer) Email Pass slot changes, Value: 1
+					115 text Email
+			116 container New requests
+				117 text New requests
+				118 container
+					119 checkbox (settable, integer) Push New requests, Value: 1
+					120 text Push
+				121 container
+					122 checkbox (settable, integer) Email New requests, Value: 1
+					123 text Email
+			124 container Commitment reminders
+				125 text Commitment reminders
+				126 container
+					127 checkbox (settable, integer) Push Commitment reminders, Value: 1
+					128 text Push
+				129 container
+					130 checkbox (settable, integer) Email Commitment reminders, Value: 1
+					131 text Email
+			132 container Safety events and reports
+				133 text Safety events and reports
+				134 container
+					135 checkbox (settable, integer) Push Safety events and reports, Value: 1
+					136 text Push
+				137 container
+					138 checkbox (settable, integer) Email Safety events and reports, Value: 1
+					139 text Email
+			140 container Pass pool updates
+				141 text Pass pool updates
+				142 container
+					143 checkbox (settable, integer) Push Pass pool updates, Value: 1
+					144 text Push
+				145 container
+					146 checkbox (settable, integer) Email Pass pool updates, Value: 1
+					147 text Email
+			148 container New Notes
+				149 text New Notes
+				150 container
+					151 checkbox (settable, integer) Push New Notes, Value: 1
+					152 text Push
+				153 container
+					154 checkbox (settable, integer) Email New Notes, Value: 1
+					155 text Email
+			156 container Reactions to your replies
+				157 text Reactions to your replies
+				158 container
+					159 checkbox (settable, integer) Push Reactions to your replies, Value: 1
+					160 text Push
+				161 container
+					162 checkbox (settable, integer) Email Reactions to your replies, Value: 1
+					163 text Email
+			164 container New public answers
+				165 text New public answers
+				166 container
+					167 checkbox (settable, integer) Push New public answers, Value: 1
+					168 text Push
+				169 container
+					170 checkbox (settable, integer) Email New public answers, Value: 1
+					171 text Email
+			172 container Spending reminders
+				173 text Spending reminders
+				174 container
+					175 checkbox (settable, integer) Push Spending reminders, Value: 1
+					176 text Push
+				177 container
+					178 checkbox (settable, integer) Email Spending reminders, Value: 1
+					179 text Email
+			180 container Weekly impact digests
+				181 text Weekly impact digests
+				182 container
+					183 checkbox (settable, integer) Push Weekly impact digests, Value: 1
+					184 text Push
+				185 container
+					186 checkbox (settable, integer) Email Weekly impact digests, Value: 1
+					187 text Email
+		188 button Save preferences
+		189 heading Optional feedback, Value: 2
+			190 text Optional feedback
+		191 text Choose a topic and rating. No conversation text is collected.
+		192 container
+			193 text Topic
+			194 pop up button (collapsed, settable) Topic, Value: Notifications, Secondary Actions: Expand
+				195 menu
+					196 Finding creators
+					197 Usefulness
+					198 (selected) Notifications
+					199 Leaving
+		200 container
+			201 text Rating
+			202 pop up button (collapsed, settable) Rating, Value: Skip rating, Secondary Actions: Expand
+				203 menu
+					204 (selected) Skip rating
+					205 1 out of 5
+					206 2 out of 5
+					207 3 out of 5
+					208 4 out of 5
+					209 5 out of 5
+		210 button Send feedback
+		211 container Main
+			212 link Description: Home, Value: 127.0.0.1:3007/home
+			213 link Description: Discover, Value: 127.0.0.1:3007/discover
+			214 link Description: Requests, Value: 127.0.0.1:3007/requests
+			215 link Description: You, Value: 127.0.0.1:3007/you
+
+The focused UI element is 1 AXWebArea Qelvora, URL: 127.0.0.1:3007/notifications/settings
