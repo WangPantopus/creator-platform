@@ -207,8 +207,10 @@ public actor CreatorAPIClient {
   private let token: @Sendable () async throws -> String?
   private let maximumResponseBytes: Int
   private let timeoutSeconds: TimeInterval
-  public init(baseURL: URL, session: URLSession = .shared, maximumResponseBytes: Int = 268_435_456, timeoutSeconds: TimeInterval = 30, token: @escaping @Sendable () async throws -> String?) {
-    self.baseURL = baseURL; self.session = session; self.maximumResponseBytes = maximumResponseBytes; self.timeoutSeconds = timeoutSeconds; self.token = token
+  private let expectedAccountId: String?
+  private let expectedSessionId: String?
+  public init(baseURL: URL, session: URLSession = .shared, maximumResponseBytes: Int = 268_435_456, timeoutSeconds: TimeInterval = 30, expectedAccountId: String? = nil, expectedSessionId: String? = nil, token: @escaping @Sendable () async throws -> String?) {
+    self.baseURL = baseURL; self.session = session; self.maximumResponseBytes = maximumResponseBytes; self.timeoutSeconds = timeoutSeconds; self.expectedAccountId = expectedAccountId; self.expectedSessionId = expectedSessionId; self.token = token
   }
   /// W8 private transport through this original client; pins only refuse a
   /// changed genuine session. Public help uses the separate anonymous path.
@@ -218,6 +220,24 @@ public actor CreatorAPIClient {
     return try await requestBytes(path, method: body == nil ? "GET" : "POST", body: body, authenticated: true,
       headers: ["X-Expected-Account-Id": expectedAccountId, "X-Expected-Session-Id": expectedSessionId],
       accept: binary ? "application/octet-stream" : "application/json", contentType: "application/json")
+  }
+  /// W4 JSON transport retains the original client and denial-only session pins.
+  public func commerceBytes(_ path: String, expectedAccountId: String, expectedSessionId: String, body: Data? = nil) async throws -> CreatorAPIBinaryResponse {
+    guard path.range(of: #"^/v1/commerce/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*$"#, options: .regularExpression) != nil,
+          !expectedAccountId.isEmpty, !expectedSessionId.isEmpty, (body?.count ?? 0) <= 1_048_576 else { throw URLError(.badURL) }
+    return try await requestBytes(path, method: body == nil ? "GET" : "POST", body: body, authenticated: true,
+      headers: ["X-Expected-Account-Id": expectedAccountId, "X-Expected-Session-Id": expectedSessionId, "x-commerce-account-id": expectedAccountId],
+      accept: "application/json", contentType: "application/json")
+  }
+  /// W5 JSON transport retains the original client and denial-only session pins.
+  public func contentBytes(_ path: String, expectedAccountId: String, expectedSessionId: String, body: Data? = nil, query: [URLQueryItem] = []) async throws -> CreatorAPIBinaryResponse {
+    guard path.range(of: #"^/v1/content/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*$"#, options: .regularExpression) != nil,
+          !expectedAccountId.isEmpty, !expectedSessionId.isEmpty, (body?.count ?? 0) <= 1_048_576,
+          query.count <= 4, Set(query.map(\\.name)).count == query.count,
+          query.allSatisfy({ ["contentId", "cursor", "targetKind", "targetId"].contains($0.name) && ($0.value?.utf8.count ?? 0) <= 1024 }) else { throw URLError(.badURL) }
+    return try await requestBytes(path, method: body == nil ? "GET" : "POST", body: body, authenticated: true, query: query,
+      headers: ["X-Expected-Account-Id": expectedAccountId, "X-Expected-Session-Id": expectedSessionId],
+      accept: "application/json", contentType: "application/json")
   }
   private func request<Response: Decodable & Sendable>(_ path: String, method: String, body: Data? = nil, authenticated: Bool, query: [URLQueryItem] = [], headers: [String: String] = [:], contentType: String = "application/json") async throws -> Response {
     let response = try await requestBytes(path, method: method, body: body, authenticated: authenticated, query: query, headers: headers, accept: "application/json", contentType: contentType)
@@ -238,6 +258,12 @@ public actor CreatorAPIClient {
     request.setValue(accept, forHTTPHeaderField: "Accept")
     if body != nil { request.setValue(contentType, forHTTPHeaderField: "Content-Type") }
     for (name, value) in headers { request.setValue(value, forHTTPHeaderField: name) }
+    // Genuine capture pins only refuse a changed request; credentials remain
+    // the server's actual authority. Uncaptured canonical reads have no pins.
+    if authenticated {
+      if let expectedAccountId { request.setValue(expectedAccountId, forHTTPHeaderField: "X-Expected-Account-Id") }
+      if let expectedSessionId { request.setValue(expectedSessionId, forHTTPHeaderField: "X-Expected-Session-Id") }
+    }
     if authenticated, let value = try await token() { request.setValue("Bearer \\(value)", forHTTPHeaderField: "Authorization") }
     try Task.checkCancellation()
     let (bytes, response) = try await session.bytes(for: request, delegate: CreatorAPIRedirectGuard())
@@ -259,7 +285,7 @@ public actor CreatorAPIClient {
 kotlin += `class CreatorAPIError(val status: Int, val body: String): Exception("API request refused ($status)")
 data class CreatorAPIBinaryResponse(val body: ByteArray, val status: Int, val contentType: String?, val contentRange: String?, val acceptRanges: String?)
 
-class CreatorAPIClient(private val baseURL: String, private val maximumResponseBytes: Int = 268_435_456, private val timeoutMs: Int = 30_000, private val token: suspend () -> String?) {
+class CreatorAPIClient(private val baseURL: String, private val maximumResponseBytes: Int = 268_435_456, private val timeoutMs: Int = 30_000, private val expectedAccountId: String? = null, private val expectedSessionId: String? = null, private val token: suspend () -> String?) {
   private val json = Json { ignoreUnknownKeys = false }
   /** W8 private transport on this original client, with denial-only pins. */
   suspend fun trustBytes(path: String, expectedAccountId: String, expectedSessionId: String, body: ByteArray? = null, binary: Boolean = false): CreatorAPIBinaryResponse {
@@ -267,6 +293,20 @@ class CreatorAPIClient(private val baseURL: String, private val maximumResponseB
     return requestBytes(path, if (body == null) "GET" else "POST", body, authenticated = true,
       headers = mapOf("X-Expected-Account-Id" to expectedAccountId, "X-Expected-Session-Id" to expectedSessionId),
       accept = if (binary) "application/octet-stream" else "application/json", contentType = "application/json")
+  }
+  /** W4 JSON transport on this original client, with denial-only session pins. */
+  suspend fun commerceBytes(path: String, expectedAccountId: String, expectedSessionId: String, body: ByteArray? = null): CreatorAPIBinaryResponse {
+    require(path.matches(Regex("^/v1/commerce/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*$")) && expectedAccountId.isNotEmpty() && expectedSessionId.isNotEmpty() && (body?.size ?: 0) <= 1_048_576)
+    return requestBytes(path, if (body == null) "GET" else "POST", body, authenticated = true,
+      headers = mapOf("X-Expected-Account-Id" to expectedAccountId, "X-Expected-Session-Id" to expectedSessionId, "x-commerce-account-id" to expectedAccountId),
+      accept = "application/json", contentType = "application/json")
+  }
+  /** W5 JSON transport on this original client, with denial-only session pins. */
+  suspend fun contentBytes(path: String, expectedAccountId: String, expectedSessionId: String, body: ByteArray? = null, query: List<Pair<String, String?>> = emptyList()): CreatorAPIBinaryResponse {
+    require(path.matches(Regex("^/v1/content/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*$")) && expectedAccountId.isNotEmpty() && expectedSessionId.isNotEmpty() && (body?.size ?: 0) <= 1_048_576 && query.size <= 4 && query.map { it.first }.toSet().size == query.size && query.all { it.first in setOf("contentId", "cursor", "targetKind", "targetId") && (it.second?.toByteArray(Charsets.UTF_8)?.size ?: 0) <= 1024 })
+    return requestBytes(path, if (body == null) "GET" else "POST", body, authenticated = true, query = query,
+      headers = mapOf("X-Expected-Account-Id" to expectedAccountId, "X-Expected-Session-Id" to expectedSessionId),
+      accept = "application/json", contentType = "application/json")
   }
   private suspend fun request(path: String, method: String, body: String? = null, authenticated: Boolean, query: List<Pair<String, String?>> = emptyList(), headers: Map<String, String> = emptyMap()): String =
     requestBytes(path, method, body?.toByteArray(Charsets.UTF_8), authenticated, query, headers, "application/json", "application/json").body.toString(Charsets.UTF_8)
@@ -281,6 +321,11 @@ class CreatorAPIClient(private val baseURL: String, private val maximumResponseB
       connection.connectTimeout = minOf(15000, timeoutMs); connection.readTimeout = timeoutMs
       connection.setRequestProperty("Accept", accept)
       headers.forEach { (name, value) -> connection.setRequestProperty(name, value) }
+      // Captured original pins are denial preconditions, never identity.
+      if (authenticated) {
+        expectedAccountId?.let { connection.setRequestProperty("X-Expected-Account-Id", it) }
+        expectedSessionId?.let { connection.setRequestProperty("X-Expected-Session-Id", it) }
+      }
       if (authenticated) token()?.let { connection.setRequestProperty("Authorization", "Bearer $it") }
       if (body != null) { connection.doOutput = true; connection.setRequestProperty("Content-Type", contentType); connection.outputStream.use { it.write(body) } }
       val status = connection.responseCode

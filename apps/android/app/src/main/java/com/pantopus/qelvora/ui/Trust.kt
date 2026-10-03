@@ -252,39 +252,48 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
         if (client == null) { error = "The trust service is not configured."; return }
         val epoch = beginWork()
         var failure: Exception? = null
+        suspend fun checkLoad(accountRequired: Boolean = true) {
+            currentCoroutineContext().ensureActive()
+            if (workEpoch != epoch || (accountRequired && !trustReady(model))) throw CancellationException("Your original account view changed.")
+        }
         try {
-            try { val value = client.request("help"); currentCoroutineContext().ensureActive(); help = value }
+            try { val value = client.request("help"); checkLoad(false); help = value }
             catch (cancelled: CancellationException) { throw cancelled }
-            catch (current: Exception) { failure = current }
-            if (!trustReady(model)) return
+            catch (current: Exception) { checkLoad(false); failure = current }
+            checkLoad()
             if (route.contains("privacy")) {
                 try {
                     val capability = client.request("capabilities")
+                    checkLoad()
                     local = capability["localDevelopment"]?.jsonPrimitive?.booleanOrNull == true
                     verificationConfigured = capability.text("actorVerification") == "configured"
                     verificationMethod = capability.text("verificationMethod")
                 } catch (cancelled: CancellationException) { throw cancelled }
-                catch (current: Exception) { local = false; verificationConfigured = false; verificationMethod = ""; failure = failure ?: current }
+                catch (current: Exception) { checkLoad(); local = false; verificationConfigured = false; verificationMethod = ""; failure = failure ?: current }
             }
             try {
                 val client = capturedClient()
+                checkLoad()
                 if (route.startsWith("/trust") || route.contains("feedback")) { }
-                else if (route.contains("access")) history = client.request("access-history").items()
+                else if (route.contains("access")) { val page = client.request("access-history"); checkLoad(); history = page.items() }
                 else if (route.contains("privacy")) {
                     pendingExport = null
-                    jobs = client.request("privacy/jobs").items()
+                    val page = client.request("privacy/jobs")
+                    checkLoad()
+                    jobs = page.items()
                     val selectedId = selectedJob?.text("id")
                     if (selectedId != null && jobs.any { it.text("id") == selectedId }) {
                         val detail = client.request("privacy/jobs/$selectedId")
+                        checkLoad()
                         selectedJob = detail
                         jobs = jobs.map { if (it.text("id") == selectedId) detail else it }
                     } else selectedJob = null
                 }
-                else { cases = client.request("my-cases").items(); notices = client.request("inbox").items() }
+                else { val page = client.request("my-cases"); checkLoad(); val inbox = client.request("inbox"); checkLoad(); cases = page.items(); notices = inbox.items() }
             } catch (cancelled: CancellationException) { throw cancelled }
-            catch (current: Exception) { cases = emptyList(); notices = emptyList(); jobs = emptyList(); history = emptyList(); selectedJob = null; pendingExport = null; failure = failure ?: current }
-            currentCoroutineContext().ensureActive()
-            if (trustReady(model) && workEpoch == epoch) error = failure?.let { it.message ?: "Reconnect and try again." } ?: ""
+            catch (current: Exception) { checkLoad(); cases = emptyList(); notices = emptyList(); jobs = emptyList(); history = emptyList(); selectedJob = null; pendingExport = null; failure = failure ?: current }
+            checkLoad()
+            error = failure?.let { it.message ?: "Reconnect and try again." } ?: ""
         } finally { finishWork(epoch) }
     }
     suspend fun perform(path: String, input: JsonObject): JsonObject? {
