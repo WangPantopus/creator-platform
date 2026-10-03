@@ -3448,10 +3448,12 @@ public struct APIContentReplyListItemsItemReaction: Codable, Sendable {
 public struct APIContentReplyPage: Codable, Sendable {
   public let `cursor`: String?
   public let `limit`: Int
+  public let `contentId`: String?
   public let `filter`: APIContentReplyPageFilter
-  public init(cursor: String? = nil, limit: Int, filter: APIContentReplyPageFilter) {
+  public init(cursor: String? = nil, limit: Int, contentId: String? = nil, filter: APIContentReplyPageFilter) {
     self.cursor = cursor
     self.limit = limit
+    self.contentId = contentId
     self.filter = filter
   }
 }
@@ -5661,6 +5663,29 @@ public struct APITeamInvite: Codable, Sendable {
 }
 
 public enum APITeamInviteRolesItem: String, Codable, Sendable {
+  case `triage` = "triage"
+  case `drafter` = "drafter"
+  case `publisher` = "publisher"
+  case `scheduler` = "scheduler"
+}
+
+public struct APITeamRolesUpdateInput: Codable, Sendable {
+  public let `expectedRoles`: [APITeamRolesUpdateInputExpectedRolesItem]
+  public let `roles`: [APITeamRolesUpdateInputRolesItem]
+  public init(expectedRoles: [APITeamRolesUpdateInputExpectedRolesItem], roles: [APITeamRolesUpdateInputRolesItem]) {
+    self.expectedRoles = expectedRoles
+    self.roles = roles
+  }
+}
+
+public enum APITeamRolesUpdateInputExpectedRolesItem: String, Codable, Sendable {
+  case `triage` = "triage"
+  case `drafter` = "drafter"
+  case `publisher` = "publisher"
+  case `scheduler` = "scheduler"
+}
+
+public enum APITeamRolesUpdateInputRolesItem: String, Codable, Sendable {
   case `triage` = "triage"
   case `drafter` = "drafter"
   case `publisher` = "publisher"
@@ -9061,10 +9086,12 @@ public struct APIContentContentReplyListItemsItemReaction: Codable, Sendable {
 public struct APIContentContentReplyPage: Codable, Sendable {
   public let `cursor`: String?
   public let `limit`: Int
+  public let `contentId`: String?
   public let `filter`: APIContentContentReplyPageFilter
-  public init(cursor: String? = nil, limit: Int, filter: APIContentContentReplyPageFilter) {
+  public init(cursor: String? = nil, limit: Int, contentId: String? = nil, filter: APIContentContentReplyPageFilter) {
     self.cursor = cursor
     self.limit = limit
+    self.contentId = contentId
     self.filter = filter
   }
 }
@@ -10587,11 +10614,11 @@ public actor CreatorAPIClient {
   public func saveContent(creatorId: String, xQelvoraExpectedAccount: String? = nil, body: APISaveContent) async throws -> APIContentResult {
     try await request("/v1/content/\(segment(creatorId))/drafts", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
   }
-  public func contentReplies(creatorId: String, cursor: String? = nil, limit: Int? = nil, filter: String? = nil) async throws -> APIContentReplyList {
-    try await request("/v1/content/\(segment(creatorId))/replies", method: "GET", authenticated: true, query: [URLQueryItem(name: "cursor", value: cursor), URLQueryItem(name: "limit", value: limit.map { String($0) }), URLQueryItem(name: "filter", value: filter)])
+  public func contentReplies(creatorId: String, cursor: String? = nil, limit: Int? = nil, filter: String? = nil, contentId: String? = nil) async throws -> APIContentReplyList {
+    try await request("/v1/content/\(segment(creatorId))/replies", method: "GET", authenticated: true, query: [URLQueryItem(name: "cursor", value: cursor), URLQueryItem(name: "limit", value: limit.map { String($0) }), URLQueryItem(name: "filter", value: filter), URLQueryItem(name: "contentId", value: contentId)])
   }
-  public func studioContentReplies(creatorId: String, cursor: String? = nil, limit: Int? = nil, filter: String? = nil) async throws -> APIContentReplyList {
-    try await request("/v1/content/\(segment(creatorId))/studio/replies", method: "GET", authenticated: true, query: [URLQueryItem(name: "cursor", value: cursor), URLQueryItem(name: "limit", value: limit.map { String($0) }), URLQueryItem(name: "filter", value: filter)])
+  public func studioContentReplies(creatorId: String, cursor: String? = nil, limit: Int? = nil, filter: String? = nil, contentId: String? = nil) async throws -> APIContentReplyList {
+    try await request("/v1/content/\(segment(creatorId))/studio/replies", method: "GET", authenticated: true, query: [URLQueryItem(name: "cursor", value: cursor), URLQueryItem(name: "limit", value: limit.map { String($0) }), URLQueryItem(name: "filter", value: filter), URLQueryItem(name: "contentId", value: contentId)])
   }
   public func contentReplyConsent(creatorId: String, id: String, xQelvoraExpectedAccount: String? = nil, body: APIQuoteConsent) async throws -> APIContentConsentResult {
     try await request("/v1/content/\(segment(creatorId))/replies/\(segment(id))/consent", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
@@ -10784,6 +10811,9 @@ public actor CreatorAPIClient {
   }
   public func removeTeamMember(creatorId: String, accountId: String) async throws -> APIDone {
     try await request("/v1/identity/\(segment(creatorId))/team/\(segment(accountId))/remove", method: "POST", authenticated: true)
+  }
+  public func updateTeamMemberRoles(creatorId: String, accountId: String, xExpectedAccountId: String, body: APITeamRolesUpdateInput) async throws -> APIDone {
+    try await request("/v1/identity/\(segment(creatorId))/team/\(segment(accountId))/roles", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["X-Expected-Account-Id": xExpectedAccountId].compactMapValues { $0 })
   }
   public func cancelSignedAct(challengeId: String) async throws -> APIDone {
     try await request("/v1/identity/signed-acts/\(segment(challengeId))/cancel", method: "POST", authenticated: true)

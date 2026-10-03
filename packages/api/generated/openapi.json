@@ -722,6 +722,14 @@
           "schema": {
             "type": "string"
           }
+        },
+        {
+          "in": "query",
+          "name": "contentId",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
         }
       ],
       "get": {
@@ -835,6 +843,14 @@
         {
           "in": "query",
           "name": "filter",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "contentId",
           "required": false,
           "schema": {
             "type": "string"
@@ -7419,6 +7435,127 @@
             "PantopusSession": []
           }
         ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Done"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Session ended",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Action refused",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unavailable object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/identity/{creatorId}/team/{accountId}/roles": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "creatorId",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "in": "path",
+          "name": "accountId",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "in": "header",
+          "name": "X-Expected-Account-Id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "updateTeamMemberRoles",
+        "security": [
+          {
+            "PantopusSession": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamRolesUpdateInput"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Success",
@@ -18265,6 +18402,11 @@
             "minimum": 1,
             "maximum": 50
           },
+          "contentId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
           "filter": {
             "default": "all",
             "type": "string",
@@ -21763,6 +21905,45 @@
         },
         "required": [
           "accountId",
+          "roles"
+        ],
+        "additionalProperties": false
+      },
+      "TeamRolesUpdateInput": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "expectedRoles": {
+            "minItems": 1,
+            "maxItems": 4,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "triage",
+                "drafter",
+                "publisher",
+                "scheduler"
+              ]
+            }
+          },
+          "roles": {
+            "minItems": 1,
+            "maxItems": 4,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "triage",
+                "drafter",
+                "publisher",
+                "scheduler"
+              ]
+            }
+          }
+        },
+        "required": [
+          "expectedRoles",
           "roles"
         ],
         "additionalProperties": false
@@ -28128,6 +28309,11 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 50
+          },
+          "contentId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           },
           "filter": {
             "default": "all",
