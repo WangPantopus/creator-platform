@@ -349,13 +349,14 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                         Button("Help and reports", ButtonVariant.QUIET, block = true) { model.open("/support") }
                         Button("Your data", ButtonVariant.QUIET, block = true) { model.open("/support/privacy") }
                         Button("Notification settings", ButtonVariant.QUIET, block = true) { model.open("/notifications/settings") }
+                        if (model.session?.creator != null) Button(QelvoraCopy.text("growthYourWeekImpact"), ButtonVariant.QUIET, block = true) { model.open("/studio/impact") }
                         if (model.session?.creator != null && context is android.app.Activity) CredentialSettings(context, model)
                     } else if (feature != null) key(model.session?.accountId, model.destination, destinationDelivery) { feature.screen(model) }
                     else Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) { BasicText("This destination is not connected yet", style = qText("title").copy(color = qColor("ink"))); BasicText("Your account and arrival context are kept.", style = qText("body").copy(color = qColor("ink-muted"))); Button("Your account", ButtonVariant.SECONDARY) { model.destination = "/you" } }
                 }
                 val labels = listOf("navHome" to "/home", "navDiscover" to "/discover", "navRequests" to "/requests", "navYou" to "/you")
                 val path = model.destination.substringBefore('?')
-                val accountDestination = path.startsWith("/identity/") || path == "/support" || path.startsWith("/support/") || path == "/notifications/settings"
+                val accountDestination = path.startsWith("/identity/") || path == "/support" || path.startsWith("/support/") || path == "/notifications/settings" || path == "/studio/impact"
                 val selectedTab = if (accountDestination) "navYou" else labels.firstOrNull { path == it.second || path.startsWith(it.second + "/") }?.first ?: "navHome"
                 TabBar(QelvoraCopy.text(selectedTab)) { label -> model.destination = labels.first { QelvoraCopy.text(it.first) == label }.second }
             }

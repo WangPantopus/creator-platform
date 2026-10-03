@@ -332,6 +332,27 @@
 .growth-invite .growth-help {
   color: var(--on-maya-muted);
 }
+.growth-impact-counts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--maya-line);
+}
+.growth-impact-counts strong {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 400;
+}
+.growth-impact-counts p {
+  color: var(--on-maya-muted);
+  font-size: 13px;
+}
+@media (max-width: 360px) {
+  .growth-impact-counts {
+    grid-template-columns: 1fr;
+  }
+}
 @media (max-width: 900px) {
   .growth-studio {
     display: block;

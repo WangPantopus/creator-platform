@@ -221,6 +221,13 @@ public final class FanSession: ObservableObject {
         if !cleared { error = QelvoraCopy.text("identityPrivateClearFailed") }
         return cleared
     }
+    func growthClient(for capture: FanSessionRequestCapture) -> GrowthClient? {
+        guard capture.owner === self, let baseURL else { return nil }
+        return GrowthClient(baseURL: baseURL, token: {
+            guard await capture.isCurrent() else { throw GrowthRequestFailure(status: 401) }
+            return capture.credential
+        })
+    }
     #if os(iOS)
     func openNotification(_ id: UUID) async -> Bool {
         guard let baseURL, let capture = await captureRequest(from: destination) else { return false }
@@ -313,6 +320,7 @@ public struct FanAppShell: View {
                             Button("Help and reports", variant: .quiet, block: true) { model.open("/support") }
                             Button("Your data", variant: .quiet, block: true) { model.open("/support/privacy") }
                             Button("Notification settings", variant: .quiet, block: true) { model.open("/notifications/settings") }
+                            if model.session?.creator != nil { Button(QelvoraCopy.text("growthYourWeekImpact"), variant: .quiet, block: true) { model.open("/studio/impact") } }
                             #if os(iOS)
                             if model.session?.creator != nil { CredentialSettings(model: model) }
                             #endif
@@ -354,7 +362,7 @@ public struct FanAppShell: View {
     }
     private var tab: FanTab {
         let path = model.destination.components(separatedBy: "?")[0]
-        if path.hasPrefix("/identity/") || path == "/support" || path.hasPrefix("/support/") || path == "/notifications/settings" { return .you }
+        if path.hasPrefix("/identity/") || path == "/support" || path.hasPrefix("/support/") || path == "/notifications/settings" || path == "/studio/impact" { return .you }
         return FanTab.allCases.first { tab in
             let root = "/" + tab.rawValue.lowercased()
             return path == root || path.hasPrefix(root + "/")

@@ -18,16 +18,16 @@ export default async function Impact() {
       <GrowthShell>
         <section className="growth-stack growth-invite qv-on-maya">
           <span className="growth-meta">{growthCopy.growthYourWeekImpact}</span>
-          <h1>{growthCopy.growthThePeopleYouHelpedThisWeek}</h1>
+          <h1>
+            {impact
+              ? growthFormat("growthImpactPeopleHelped", {
+                  people: impact.unique_fans.toLocaleString("en-US"),
+                })
+              : growthCopy.growthThePeopleYouHelpedThisWeek}
+          </h1>
           {impact ? (
             <>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 28,
-                }}
-              >
+              <div className="growth-impact-counts">
                 {[
                   [impact.ai_conversations, growthCopy.growthAiConversations],
                   [impact.personal_replies, growthCopy.growthPersonalReplies],
@@ -35,19 +35,18 @@ export default async function Impact() {
                   [impact.notes, growthCopy.navNotes],
                 ].map(([n, label]) => (
                   <div key={String(label)}>
-                    <strong
-                      style={{
-                        fontSize: 44,
-                        fontFamily: "var(--font-serif)",
-                        fontWeight: 400,
-                      }}
-                    >
-                      {n}
+                    <strong>
+                      {typeof n === "number" ? n.toLocaleString("en-US") : n}
                     </strong>
                     <p>{label}</p>
                   </div>
                 ))}
               </div>
+              {impact.consented_thanks.length > 0 && (
+                <h2 className="growth-meta">
+                  {growthCopy.growthImpactThankYou}
+                </h2>
+              )}
               {impact.consented_thanks.map((thanks, index) => (
                 <blockquote key={index} className="growth-voice">
                   “{thanks.text}”
@@ -62,12 +61,11 @@ export default async function Impact() {
                   { value1: impact.window_start.slice(0, 10) },
                 )}
               </p>
+              <p className="growth-help">{growthCopy.growthImpactWeekCounts}</p>
             </>
           ) : (
             <NoData title={growthCopy.growthNoUpdatesYet}>
-              {
-                growthCopy.growthAWeeklyDigestAppearsWhenTheActivityAndConsentedThanks
-              }
+              {growthCopy.growthImpactNotAvailable}
             </NoData>
           )}
         </section>

@@ -4544,6 +4544,50 @@
         }
       }
     },
+    "You helped {people} people this week.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You helped {people} people this week."
+          }
+        }
+      }
+    },
+    "A THANK-YOU, SHARED WITH PERMISSION": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A THANK-YOU, SHARED WITH PERMISSION"
+          }
+        }
+      }
+    },
+    "Counts are for this week only. Fans are never named here without their consent.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Counts are for this week only. Fans are never named here without their consent."
+          }
+        }
+      }
+    },
+    "No weekly digest is available yet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No weekly digest is available yet."
+          }
+        }
+      }
+    },
     "The people you helped this week.": {
       "extractionState": "manual",
       "localizations": {
