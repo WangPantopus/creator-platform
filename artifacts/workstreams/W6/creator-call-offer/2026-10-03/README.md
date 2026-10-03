@@ -1,5 +1,26 @@
 # Creator call-offer and genuine recording retry lifetime — 3 October 2026
 
+## Remaining closure resolved and current CI failure — 21:15 UTC
+
+W8 independently reports its authorized supported engine recovery. W6 then
+personally matched the exact original fullID/image/named volume/loopback55446
+binding and observed container exited. API/Next/TLS/old reader PIDs are absent;
+3006/3106/4106/55446 closed, browser lease absent. Exact original runtime lease
+c4ec80a7/dev16777232/inode244981878 released21:14:56.070450Z. Closure receipt
+SHA256 `e9ee6c071bdac9d72ea90f7b610a41ca9843daf33fd5e62a64a0fe6db6f1350a`.
+Earlier stop timeout is preserved; no post-recovery app/container start or full
+saved-data/restore acceptance follows. Native closure remains20:57:37.
+
+Current documentation head e428 has three SUCCESS, one FAILURE and six QUEUED.
+Actual Android job111292918893/run37153802808 fails dependency resolution on
+Google Maven502 for existing Compose BOM2024.10.01, before compile/app operation;
+14 dependent errors share that cause. Its other same-head Android run passes.
+LogSHA256 `74ac2aad5d008700e461dde6bc048240ba5b048a5b97fc756780b1fd8e3da3eb`.
+Whole failed-run and exact databaseId-job reruns are refused while the workflow
+is running. No dependency/runner-label/workflow change, cancellation or waiver.
+Later note heads need their own current CI; this failure is not silently erased
+or counted as pass. Existing282 remains draft with the same genuine-positive gates.
+
 ## Current shipping and personal application qualification — 21:03 UTC
 
 Frozen product `5f5943bc5e0b2b9295c1bb7645181de282346b08` normally incorporates

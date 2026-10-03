@@ -1,5 +1,16 @@
 # W6 PR review follow-up — October 3, 2026
 
+## Current W6 closure and CI qualification — 21:15 UTC
+
+Original current-call PG closure is personally verified after attributed W8
+engine recovery: exact container/image/volume/binding, exited, all4 ports/PIDs
+closed and c4 lease released21:14:56. No post-recovery app/data acceptance.
+282/e428 has three SUCCESS/one Android FAILURE/six QUEUED; real Google Maven502
+before compile/runtime, other same-head Android success. Supported failed-run/
+job reruns are refused while workflow active; no cancellation/waiver/label edit.
+All retained positive/dependency/current-CI gates and38-draft dispositions stand.
+[Exact source/failure/closure](../../../artifacts/workstreams/W6/creator-call-offer/2026-10-03/README.md).
+
 ## Current retained-head qualification — 21:03 UTC
 
 Fresh GitHub inventory still38/all draft, oldest21/85ac. Full ownership/reuse
