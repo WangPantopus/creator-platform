@@ -1,7 +1,7 @@
 import type { AgentRepository, CreatorScope } from "./repository.js";
 import { bump, event, licenseRow } from "./repository.js";
 import type { LiveAgentRuntime } from "./runtime.js";
-import { invariant } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
 import { generationJournalInstalled } from "./generation-journal.js";
 import type { PoolClient } from "pg";
 import type { PreparedUsageRetention } from "./usage-retention.js";
@@ -13,6 +13,16 @@ export class AgentLifecycle {
     private readonly runtime: LiveAgentRuntime | null,
     private readonly usageRetention?: PreparedUsageRetention,
   ) {}
+  /** Original post-graph privacy composition must retain this exact repository;
+   * a matching connection URL or copied service shape is not its custody. */
+  assertRepository(repository: AgentRepository): void {
+    if (repository !== this.repository)
+      throw new DomainError(
+        "agent_lifecycle_composition_mismatch",
+        "Use this lifecycle's actual original Agent repository.",
+        503,
+      );
+  }
   async assertAccountingClient(client: PoolClient) {
     const installed = await generationJournalInstalled(client);
     if (installed) {
