@@ -3,6 +3,7 @@ import type { Pool } from "pg";
 import { z } from "zod";
 import type { ThanksPermission } from "../growth/retention.js";
 import type { CurrentThanksTarget } from "./integration.js";
+import { GrowthHeldClient } from "../growth/held-client.js";
 type ThanksWindowRow = {
   id: string;
   version: number;
@@ -97,18 +98,22 @@ export async function contentThanksWindow(
     throw new Error("thanks_window_not_closed");
   signal?.throwIfAborted();
   const client = await worker.connect();
-  // Cancellation destroys this snapshot connection, never another worker's session.
-  let released = false;
-  const cancel = () => {
-    if (!released) {
-      released = true;
-      client.release(true);
-    }
+  const held = new GrowthHeldClient(client, signal);
+  let failure: unknown;
+  let result: {
+    thanksCount: number;
+    thanks: Array<{
+      id: string;
+      version: number;
+      fanAccountId: string;
+      text: string;
+      displayName: string | null;
+      textConsent: true;
+      identityConsent: boolean;
+    }>;
   };
-  signal?.addEventListener("abort", cancel, { once: true });
   try {
-    signal?.throwIfAborted();
-    await client.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
+    await held.begin("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
     await client.query("SET LOCAL statement_timeout = '30s'");
     let cursor: { createdAt: string; id: string } | null = null;
     let thanksCount = 0;
@@ -196,12 +201,17 @@ export async function contentThanksWindow(
       cursor = next;
     }
     signal?.throwIfAborted();
-    await client.query("COMMIT");
+    await held.commit();
     signal?.throwIfAborted();
-    return { thanksCount, thanks };
+    result = { thanksCount, thanks };
+  } catch (error) {
+    failure = error;
+    throw error;
   } finally {
-    signal?.removeEventListener("abort", cancel);
-    // Destroy on success too: no read transaction can escape on a failed COMMIT.
-    cancel();
+    // Retain this original snapshot until physical shutdown settles, including
+    // success. No completion can escape a failed COMMIT or transport cleanup.
+    await held.close({ destroy: true, failure });
   }
+  signal?.throwIfAborted();
+  return result;
 }
