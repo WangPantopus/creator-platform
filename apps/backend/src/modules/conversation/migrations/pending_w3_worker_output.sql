@@ -40,6 +40,7 @@ CREATE TABLE creator.generation_sentence_provenance (
  content_hash text NOT NULL CHECK(content_hash ~ '^[a-f0-9]{64}$'),
  approval jsonb NOT NULL CHECK(jsonb_typeof(approval)='object' AND octet_length(approval::text)<=32768),
  created_at timestamptz NOT NULL DEFAULT clock_timestamp(),
+ transaction_id xid8 NOT NULL,
  PRIMARY KEY(generation_id,sequence),UNIQUE(event_id),
  FOREIGN KEY(thread_id,creator_id,fan_id) REFERENCES creator.thread(id,creator_id,fan_id),
  FOREIGN KEY(message_id,thread_id) REFERENCES creator.message(id,thread_id)
@@ -72,8 +73,8 @@ GRANT SELECT(id,thread_id,creator_id,fan_id,author_kind,author_account_id,text,c
 GRANT SELECT(id,thread_id,creator_id,fan_id,cursor,type,payload,actor_account_id),
  INSERT(thread_id,creator_id,fan_id,cursor,type,payload,actor_account_id)
  ON creator.event TO creator_w3_generation_output;
-GRANT SELECT(generation_id,sequence,thread_id,creator_id,fan_id,message_id,event_id,content_hash,approval,created_at),
- INSERT(generation_id,sequence,thread_id,creator_id,fan_id,message_id,event_id,content_hash,approval)
+GRANT SELECT(generation_id,sequence,thread_id,creator_id,fan_id,message_id,event_id,content_hash,approval,created_at,transaction_id),
+ INSERT(generation_id,sequence,thread_id,creator_id,fan_id,message_id,event_id,content_hash,approval,transaction_id)
  ON creator.generation_sentence_provenance TO creator_w3_generation_output;
 DO $$ DECLARE t text; family text; BEGIN
  FOREACH t IN ARRAY ARRAY['generation','message','event','generation_sentence_provenance'] LOOP
@@ -117,7 +118,8 @@ CREATE POLICY w3_generation_output_provenance ON creator.generation_sentence_pro
   AND generation_sentence_provenance.creator_id=(s.task->>'creatorId')::uuid
   AND generation_sentence_provenance.fan_id=(s.task->>'fanId')::uuid
   AND generation_sentence_provenance.message_id=(s.task->>'aiMessageId')::uuid
-  AND generation_sentence_provenance.sequence=(s.task->>'lastSequence')::integer+1));
+  AND generation_sentence_provenance.sequence=(s.task->>'lastSequence')::integer+1
+  AND generation_sentence_provenance.transaction_id=pg_current_xact_id_if_assigned()));
 
 CREATE FUNCTION creator.generation_worker_output(g uuid,w uuid,n integer,sentence text,approved jsonb) RETURNS jsonb
 LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path=pg_catalog AS $$
@@ -235,8 +237,8 @@ BEGIN
   'messageId',mid,'authorKind','ai','text',sentence,'generationId',g,'sequence',n);
  INSERT INTO creator.event(thread_id,creator_id,fan_id,cursor,type,payload,actor_account_id)
  VALUES(tid,cid,fid,cursor,'sentence',frame,(task->>'initiatingAccountId')::uuid) RETURNING id INTO event_id;
- INSERT INTO creator.generation_sentence_provenance(generation_id,sequence,thread_id,creator_id,fan_id,message_id,event_id,content_hash,approval)
- VALUES(g,n,tid,cid,fid,mid,event_id,content_hash,approved);
+ INSERT INTO creator.generation_sentence_provenance(generation_id,sequence,thread_id,creator_id,fan_id,message_id,event_id,content_hash,approval,transaction_id)
+ VALUES(g,n,tid,cid,fid,mid,event_id,content_hash,approved,pg_current_xact_id());
  IF NOT creator.generation_scope_matches(g,w) OR creator.generation_agent_inputs(g,w) IS DISTINCT FROM facts THEN
   RAISE EXCEPTION 'Original generation or compiled input ended before output' USING ERRCODE='42501';
  END IF;

@@ -21,7 +21,7 @@ const Owner = "creator_w3_privacy_export";
 export const CONVERSATION_PRIVACY_CURSOR_MIGRATION =
   "0206_w3_privacy_cursor_export";
 export const CONVERSATION_PRIVACY_CURSOR_SOURCE_SHA256 =
-  "329e4758e7f9ceef5de318b0fde53cffc6a487f189a907dcc39ed7d404ea1021";
+  "1b202f4c1c5092cf6573123729ee918e4813d3d935980850fe49b97f006e0e11";
 const Signatures = [
   "creator.fence_conversation_privacy_export(uuid,uuid,text,uuid,uuid,uuid)",
   "creator.conversation_privacy_export_rows(uuid,uuid)",
@@ -206,7 +206,7 @@ export class PreparedConversationPrivacyCursor {
          AND EXISTS(SELECT FROM creator.schema_migration WHERE version='0210_w2_generation_guardrail_event'
           AND checksum='0c0fc7fee7182f3e77695222e51cce910268f7844437a5e974f68af5927a3382')
          AND EXISTS(SELECT FROM creator.schema_migration WHERE version='0212_w3_generation_worker_output'
-          AND checksum='088c651c8eefd3718acadf7c4c4f0ae4284f8f07f10d2476869de61b9d989c72')
+          AND checksum='c0ebe6adc3981b2cbb26f81f4e09c1724f633cff88bf2cc7443bdc58c5056378')
          AND has_column_privilege($3,'creator.ai_generation_attempt','admission_version_hash','SELECT')
          AND has_column_privilege($3,'creator.ai_generation_attempt','admission_model_fingerprint','SELECT')
          AND NOT has_column_privilege($3,'creator.ai_usage','completion_capability_hash','SELECT,INSERT,UPDATE,REFERENCES')

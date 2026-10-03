@@ -69,7 +69,7 @@ CREATE POLICY w3_cursor_export_metadata ON creator.memory_exclusion FOR SELECT T
 GRANT SELECT(accepted_at,ai_message_id,completed_at,context_revision,creator_id,epoch,failure_code,fan_id,fan_message_id,first_visible_at,grant_id,id,last_sequence,reservation_id,state,thread_id) ON creator.generation TO creator_w3_privacy_export;
 CREATE POLICY w3_cursor_export_metadata ON creator.generation FOR SELECT TO creator_w3_privacy_export USING(true);
 -- Ordinary original-family output provenance, never retained accounting.
-GRANT SELECT(generation_id,sequence,thread_id,creator_id,fan_id,message_id,event_id,content_hash,approval,created_at)
+GRANT SELECT(generation_id,sequence,thread_id,creator_id,fan_id,message_id,event_id,content_hash,approval,created_at,transaction_id)
  ON creator.generation_sentence_provenance TO creator_w3_privacy_export;
 CREATE POLICY w3_cursor_export_metadata ON creator.generation_sentence_provenance FOR SELECT TO creator_w3_privacy_export USING(true);
 GRANT UPDATE(id) ON creator.thread TO creator_w3_privacy_export;
@@ -115,7 +115,7 @@ BEGIN
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0181_w2_generation_attempt_admission' AND checksum='eab8c8e07b8a1e6ba4384f5300560bd46853bf98509faade5a1b555e130c75ee')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0188_w2_generation_terminal_journal' AND checksum='7ab8974d065b1b9e5befa2ded26c6978876957fab0eee80b9632825bbac98477')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0210_w2_generation_guardrail_event' AND checksum='0c0fc7fee7182f3e77695222e51cce910268f7844437a5e974f68af5927a3382')
-  OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0212_w3_generation_worker_output' AND checksum='088c651c8eefd3718acadf7c4c4f0ae4284f8f07f10d2476869de61b9d989c72')
+  OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0212_w3_generation_worker_output' AND checksum='c0ebe6adc3981b2cbb26f81f4e09c1724f633cff88bf2cc7443bdc58c5056378')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0056_w3_correction_feedback_lineage' AND checksum='1044700d59b9dbb2d2b36d890496de0be6fb3d53c4409504f3c7693906866c35')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0057_w3_feedback_consent' AND checksum='08cb6f37c12ca3131b2e307a237569aa4d104fc627566e619a39fa18a1814d11')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0059_w3_recording_association' AND checksum='b61d50d7f85c0ef468e00a8d2d6b737b4d405a9349810c552f7d9df7f527c42e')
@@ -128,7 +128,7 @@ BEGIN
   OR has_table_privilege(current_user,'creator.generation_sentence_provenance','SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
   OR EXISTS(WITH expected(column_name,type_name,ordinal) AS (VALUES
    ('generation_id','uuid',1),('sequence','int4',2),('thread_id','uuid',3),('creator_id','uuid',4),('fan_id','uuid',5),
-   ('message_id','uuid',6),('event_id','uuid',7),('content_hash','text',8),('approval','jsonb',9),('created_at','timestamptz',10)
+   ('message_id','uuid',6),('event_id','uuid',7),('content_hash','text',8),('approval','jsonb',9),('created_at','timestamptz',10),('transaction_id','xid8',11)
   ) SELECT FROM expected e FULL JOIN (SELECT * FROM pg_attribute WHERE attrelid=to_regclass('creator.generation_sentence_provenance')
     AND attnum>0 AND NOT attisdropped) a ON a.attname=e.column_name
    WHERE e.column_name IS NULL OR a.attnum IS NULL OR a.attnum<>e.ordinal
@@ -320,7 +320,7 @@ LANGUAGE sql STABLE SECURITY DEFINER SET search_path=pg_catalog AS $$
  FROM families f JOIN creator.generation t ON t.creator_id=f."creatorId" AND t.thread_id=f."threadId" AND t.fan_id=f."fanId"
  UNION ALL
  SELECT f."threadId",f."creatorId",f."fanId",18,(generation_id::text||':'||lpad(sequence::text,10,'0')),
-  (SELECT to_jsonb(projected) FROM (SELECT generation_id,sequence,thread_id,creator_id,fan_id,message_id,event_id,content_hash,approval,created_at) projected)
+  (SELECT to_jsonb(projected) FROM (SELECT generation_id,sequence,thread_id,creator_id,fan_id,message_id,event_id,content_hash,approval,created_at,transaction_id) projected)
  FROM families f JOIN creator.generation_sentence_provenance t ON t.creator_id=f."creatorId" AND t.thread_id=f."threadId" AND t.fan_id=f."fanId"
 $$;
 CREATE FUNCTION creator.finish_conversation_privacy_export_scope()
