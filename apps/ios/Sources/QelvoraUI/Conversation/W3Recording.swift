@@ -97,12 +97,18 @@ private final class W3RecordingClient {
       creatorId: creatorId, fanId: fanId,
       assetId: asset.id, xQelvoraExpectedAccount: capture.expectedAccountId)
     try await requireCurrent()
-    let proof = ticket.playbackFile
+    // OpenAPI's nested DTOs carry the original response. Round-trip the same
+    // values into the canonical shared asset/file models; no authority is made.
+    let decoder = JSONDecoder()
+    let issued = try decoder.decode(
+      APIMediaMediaAsset.self, from: JSONEncoder().encode(ticket.asset))
+    let proof = try decoder.decode(
+      APIMediaPlaybackFile.self, from: JSONEncoder().encode(ticket.playbackFile))
     let expiry =
       ISO8601DateFormatter().date(from: ticket.expiresAt)
       ?? ISO8601DateFormatter.fractional.date(from: ticket.expiresAt)
     let path = "/v1/w6/threads/\(creatorId)/\(fanId)/media/\(asset.id)/play"
-    guard matches(ticket.asset, asset), matchesFile(ticket.asset, proof), matchesFile(asset, proof),
+    guard matches(issued, asset), matchesFile(issued, proof), matchesFile(asset, proof),
       let expiry, expiry > Date(), let url = URL(string: ticket.url),
       url.scheme == baseURL.scheme, url.host == baseURL.host, url.port == baseURL.port,
       url.user == nil, url.password == nil, url.fragment == nil,

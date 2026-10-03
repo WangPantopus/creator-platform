@@ -65,9 +65,11 @@ private class RecordingClient(private val base: URI, private val capture: FanSes
         require(uuid(asset.id) && qualified(asset)); requireCurrent()
         val ticket = capture.client.threadMediaPlayback(creatorId, fanId, asset.id, capture.expectedAccountId)
         requireCurrent()
-        val proof = ticket.playbackFile; val url = URI(ticket.url)
+        // Convert only the same original typed response's nested DTOs.
+        val issued = Json.decodeFromJsonElement<APIMediaMediaAsset>(Json.encodeToJsonElement(ticket.asset))
+        val proof = Json.decodeFromJsonElement<APIMediaPlaybackFile>(Json.encodeToJsonElement(ticket.playbackFile)); val url = URI(ticket.url)
         val path = "/v1/w6/threads/$creatorId/$fanId/media/${asset.id}/play"
-        require(matches(ticket.asset, asset) && matchesFile(ticket.asset, proof) && matchesFile(asset, proof))
+        require(matches(issued, asset) && matchesFile(issued, proof) && matchesFile(asset, proof))
         require(Instant.parse(ticket.expiresAt).isAfter(Instant.now()) && url.scheme == base.scheme && url.host == base.host && url.port == base.port && url.userInfo == null && url.fragment == null && url.rawPath == path)
         require(url.rawQuery != null && Regex("^ticket=[A-Za-z0-9_.-]+$").matches(url.rawQuery))
         val token = url.rawQuery.substring(7)
