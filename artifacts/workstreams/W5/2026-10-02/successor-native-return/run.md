@@ -151,3 +151,17 @@ layout. It is integrated into this branch; an attempted fresh heavy build
 returned75 while W1 held the slot. That refusal is not a build pass. Current
 artifact operation and genuine signed/private, provider and paid acceptance
 remain unverified. No later-commit release readiness is claimed.
+
+After W1 normally released its slot, both sequential shipping builds passed at
+`cdbc5163feb4cbec1eac612cc5e537cb6d5eb4f0`, with captured main0a445ec2.
+iOS strict deep signature verification passed. Executable SHA256:
+`ea512884f62832216057c04b79f33694502ec8819b2314fb12f3403bd568d772`;
+debug dylib SHA256:
+`752136dfa0e528703c3f2664e49c647e9bb5f3e55b7551ecae66648644eb30c4`;
+Android APK SHA256:
+`46c3b304a0afa3b52e00b5a4468054bb8e3058050083b6e85e165bb4eedf684f`.
+The previous occupied-slot refusals remain historical failures to start a build.
+Backend/web types passed on the combined native8546e39c source; cdbc changes
+only this record. No personal later-artifact acceptance is transferred from
+fc9fdfb1/eb605a15. This increment can ship as the bounded route/cancellation
+repair; full W5 verification and release readiness remain open.
