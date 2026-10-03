@@ -94,6 +94,7 @@ private class ContentMediaTransport(private val capture: FanSessionRequestCaptur
     }
     suspend fun download(context: Context, ticket: String, asset: AudienceAsset, proof: PlaybackFile, deadline: PlaybackDeadline): File {
         requireCurrent(); require(proof.matches(asset) && deadline.current())
+        check(ContentMediaCache.prepare(context.cacheDir))
         val file = File.createTempFile("w5-content-", if (asset.mimeType == "image/png") ".png" else ".m4a", context.cacheDir)
         try {
             withContext(Dispatchers.IO) {
