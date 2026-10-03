@@ -8,7 +8,7 @@ private struct TrustCase: Decodable, Identifiable { let id: String; let number: 
 private struct TrustNotice: Decodable, Identifiable { let id: String; let type: String; let reason: String }
 private struct TrustTask: Decodable, Identifiable { let domain: String; let state: String; let error_code: String?; var id: String { domain } }
 private struct TrustRetained: Decodable, Identifiable { let domain: String?; let category: String; let until: String?; let reason: String; var id: String { (domain ?? "trust") + ":" + category } }
-private struct TrustJob: Decodable, Identifiable { let id: String; let kind: String; let scope: String; let state: String; let tasks: [TrustTask]?; let retained: [TrustRetained]? }
+private struct TrustJob: Decodable, Identifiable { let id: String; let kind: String; let scope: String; let state: String; let created_at: String; let tasks: [TrustTask]?; let retained: [TrustRetained]? }
 private struct TrustExport: Transferable { let data: Data; static var transferRepresentation: some TransferRepresentation { DataRepresentation(exportedContentType: .json) { $0.data } } }
 private struct TrustCapability: Decodable { let localDevelopment: Bool; let actorVerification: String; let verificationMethod: String? }
 private struct TrustAccess: Decodable { let case_id: String; let action: String; let purpose: String; let created_at: String }
@@ -154,7 +154,12 @@ public struct TrustFanFeature: View {
         else { Text("Fresh account verification must be connected before requesting data changes.").qText("caption") }
         Button("Request export", variant: .secondary, block: true, disabled: privacyDisabled) { Task { await privacyCommand("export") } }
         Button("Request deletion", variant: .secondary, block: true, disabled: privacyDisabled) { confirmingDelete = true }
-        ForEach(jobs) { job in Button(job.kind + " · " + job.scope + " · " + job.state.replacingOccurrences(of: "_", with: " "), variant: .quiet, block: true, disabled: busy) { Task { await jobDetail(job.id) } } }
+        ForEach(jobs) { job in
+            Text("Requested " + job.created_at).qText("caption")
+            Button(job.kind + " · " + job.scope + " · " + job.state.replacingOccurrences(of: "_", with: " "), variant: .quiet, block: true, disabled: busy) { Task { await jobDetail(job.id) } }
+                .accessibilityLabel(job.kind + ", " + job.scope + ", " + job.state.replacingOccurrences(of: "_", with: " ") + ", requested " + job.created_at + ", job " + job.id)
+                .accessibilityIdentifier("privacy-job-" + job.id)
+        }
         if let selectedJob { jobProgress(selectedJob) }
     } }
     @ViewBuilder private func jobProgress(_ job: TrustJob) -> some View {
