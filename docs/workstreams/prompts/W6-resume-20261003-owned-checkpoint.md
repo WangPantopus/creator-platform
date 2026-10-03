@@ -43,11 +43,11 @@ October2 deleted devices/builds are not usable resources.
 
 The human prioritizes **all existing open/draft PRs oldest-first from21** before
 new duplicate feature work. The ownership/reuse pass is complete; continue
-qualification on retained originals. Renewed43→37 through source-preserved
-duplicate closures299/280/236/296/293 and docs-only295 merged into the21
+qualification on retained originals. Renewed43→36 through source-preserved
+duplicate closures299/280/236/296/293/304 and docs-only295 merged into the21
 dependency branch. That is not a main merge. W1 retains21,22,26,28,29,35,42,48,
 49,51,66,74; W2 132,279; W3 36,63,182; W4 213,247,262,298,301,303;
-W5 288,302,304; W6 282,284,289,305; W7 31; W8 131,145,192,200,201,242.
+W5 288,302; W6 282,284,289,305; W7 31; W8 131,145,192,200,201,242.
 Use the handoff's seven human-authorized existing chat IDs to coordinate current
 owners and avoid duplication; do not create user-owned successor chats or
 delegate implementation. Preserve unique35 and49/51 history and safe child
@@ -64,6 +64,13 @@ never use the536 installed receipt as current5a. W8 confirmed201/753eb, despite
 11 SUCCESS, must remain draft pending genuine original-task/effect/protected
 completion/restart/download/C10.282/3f4d and289/dc39 still have queued checks;
 305 documentation heads require fresh CI. No new backlog main merge occurred.
+
+Read final W5 handoff288/51e5105a and its W5-successor-2026-10-03.md before
+Studio/media/worker changes.304 is now closed unmerged; all three original
+production files are independently byte-equal in retained W1 74/dc461fc7.
+W6 has not imported/operated those new files; old29f operation remains on its
+original composition. No source consolidation, paused native WIP or helper
+wire observation supplies genuine task/media/private-fan/C10 acceptance.
 
 Preserve the delivered actual observations. Photo12e was freshly shipping-built
 and personally operated with genuine original W1 issuer/account/SID. Held/lost
