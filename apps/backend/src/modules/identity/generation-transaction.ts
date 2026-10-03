@@ -3,8 +3,8 @@ import { DomainError, invariant } from "../../core/errors.js";
 
 /** Custody for the original generation or terminal pool. Cancellation supplies
  * no purpose permission: its PID comes only from this checked-out connection.
- * The caller performs BEGIN, every authority bookend and scope cleanup; this
- * function alone commits after cancellation has settled.
+ * This function owns BEGIN and COMMIT. The caller performs every authority
+ * bookend and scope cleanup before cancellation settles and commit begins.
  */
 export async function generationTransaction<T>(
   pool: Pool,
@@ -15,11 +15,17 @@ export async function generationTransaction<T>(
   const client = await pool.connect();
   let pid: number | undefined;
   let cancelling: Promise<void> | undefined;
-  let cancellationFailure: unknown;
-  let transportFailure: unknown;
+  const cancellationFailures: unknown[] = [];
+  const transportFailures: unknown[] = [];
+  const cleanupFailures: unknown[] = [];
+  let failure: unknown;
+  let failed = false;
+  let value: T | undefined;
+  let committed = false;
+  let phase: "pid" | "begin" | "work" | "commit" = "pid";
   let discard = false;
   const sourceError = (error: Error) => {
-    transportFailure = error;
+    transportFailures.push(error);
     discard = true;
   };
   client.on("error", sourceError);
@@ -36,7 +42,7 @@ export async function generationTransaction<T>(
         pipeline: false,
       });
       control.on("error", (error: Error) => {
-        cancellationFailure = error;
+        cancellationFailures.push(error);
         discard = true;
       });
       try {
@@ -50,11 +56,17 @@ export async function generationTransaction<T>(
           "generation_cancel_unavailable",
           "The original generation backend could not be cancelled.",
         );
+      } catch (error) {
+        cancellationFailures.push(error);
+        discard = true;
       } finally {
-        await control.end();
+        await control.end().catch((error: unknown) => {
+          cancellationFailures.push(error);
+          discard = true;
+        });
       }
     })().catch((error: unknown) => {
-      cancellationFailure = error;
+      cancellationFailures.push(error);
       discard = true;
     });
   };
@@ -74,9 +86,12 @@ export async function generationTransaction<T>(
     pid = observed;
     signal?.addEventListener("abort", abort, { once: true });
     signal?.throwIfAborted();
-    const value = await work(client);
+    phase = "begin";
+    await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
+    phase = "work";
+    value = await work(client);
     await settle();
-    if (cancellationFailure || transportFailure)
+    if (cancellationFailures.length || transportFailures.length)
       throw new DomainError(
         "generation_transaction_unavailable",
         "The original generation transaction could not settle safely.",
@@ -85,46 +100,82 @@ export async function generationTransaction<T>(
     signal?.throwIfAborted();
     // Cancellation is closed before this atomic commit. Later aborts cannot
     // cancel COMMIT or discard its actual receipt as if it never happened.
-    await client.query("COMMIT");
-    return value;
+    phase = "commit";
+    const receipt = await client.query("COMMIT");
+    invariant(
+      receipt.command === "COMMIT",
+      "generation_commit_unavailable",
+      "The original generation commit did not return a commit receipt.",
+    );
+    committed = true;
   } catch (error) {
+    failed = true;
+    failure = error;
     await settle();
-    let rollbackFailure: unknown;
-    if (cancellationFailure || transportFailure) {
+    const uncertainResponse =
+      phase !== "work" ||
+      (error instanceof Error && error.message === "Query read timeout");
+    if (uncertainResponse) transportFailures.push(error);
+    if (
+      uncertainResponse ||
+      cancellationFailures.length ||
+      transportFailures.length
+    ) {
       // A transport failure cannot prove that the server consumed a cancel.
       // Close the original socket without submitting any subsequent SQL.
       discard = true;
-      await client.end().catch((cause: unknown) => {
-        rollbackFailure = cause;
-      });
     } else {
       try {
         await client.query("ROLLBACK");
       } catch (cause) {
-        rollbackFailure = cause;
+        cleanupFailures.push(cause);
         discard = true;
       }
     }
-    if (cancellationFailure || transportFailure || rollbackFailure) {
-      const failure = new DomainError(
-        cancellationFailure
-          ? "generation_cancel_unavailable"
-          : "generation_rollback_unavailable",
-        "The original generation transaction could not settle safely.",
-        503,
-      );
-      failure.cause = new AggregateError(
-        [error, transportFailure, cancellationFailure, rollbackFailure].filter(
-          (cause) => cause !== undefined,
-        ),
-        "Original generation and settlement failures.",
-      );
-      throw failure;
-    }
-    throw error;
   } finally {
     await settle();
-    client.release(discard);
+    // Await destruction for every uncertain transport or failed rollback,
+    // before release. Preserve end/release failures alongside the first cause.
+    if (discard)
+      await client.end().catch((error: unknown) => {
+        cleanupFailures.push(error);
+      });
+    try {
+      client.release(discard);
+    } catch (error) {
+      cleanupFailures.push(error);
+    }
     client.removeListener("error", sourceError);
   }
+  if (
+    cancellationFailures.length ||
+    transportFailures.length ||
+    cleanupFailures.length
+  ) {
+    const unavailable = new DomainError(
+      cancellationFailures.length
+        ? "generation_cancel_unavailable"
+        : committed
+          ? "generation_release_unavailable"
+          : "generation_rollback_unavailable",
+      committed
+        ? "The generation committed but its connection cleanup failed. Reconcile its actual receipt."
+        : "The original generation transaction could not settle safely.",
+      503,
+    );
+    unavailable.cause = new AggregateError(
+      [
+        ...(failed ? [failure] : []),
+        ...transportFailures,
+        ...cancellationFailures,
+        ...cleanupFailures,
+      ],
+      committed
+        ? "Committed generation connection cleanup failures."
+        : "Original generation and settlement failures.",
+    );
+    throw unavailable;
+  }
+  if (failed) throw failure;
+  return value as T;
 }

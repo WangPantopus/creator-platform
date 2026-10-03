@@ -563,7 +563,6 @@ export class GenerationIdentityAuthority {
   }
 
   private async begin(client: PoolClient): Promise<void> {
-    await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
     await client.query(
       `SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','1000',true),
        set_config('idle_in_transaction_session_timeout','5000',true),
