@@ -1,5 +1,7 @@
 # W8 remaining environment and acceptance inputs
 
+**Human decision update,2026-10-02:** Q16 day30 ordinary product-data purge and twelve calendar months from original settlement for detached known AI costs are now approved in [the exact partial policy](W8-retention-proposal.md). The unresolved-cost operator/maximum period remain missing. Actual finite owner source, retained shared dependencies, binary erasure and all-eight receipts still require implementation and personal acceptance; this decision is not migration or release readiness. The human also authorized searching existing private Growth configuration and creating labelled development configuration if needed; original iMac keys/ciphertext remain unrecovered.
+
 **Mac Studio host, 2026-10-01 — first missing input:** copy the iMac's private W8 recovery material to this host, under the same paths and modes (directories 0700, files 0600):
 - `~/.config/creator-platform/cleanup-20261001/` (`manifest.json`, `creator-platform-w8-resume-20260930.sql.gz` with SHA-256 `fe09be66…2581f71`, and `creator-platform-w8-foundation-20260930-takeover.sql.gz` with SHA-256 `037c1b4d…0ef4`);
 - `~/.config/creator-platform/w8-local/`;
