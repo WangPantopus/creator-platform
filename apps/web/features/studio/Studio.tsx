@@ -3420,7 +3420,9 @@ function Team({
             Team words always carry the team label. Team replies never fulfill a
             personal commitment.
           </p>
-          <Link href="/identity/account">Verification and account</Link>
+          <Link className="qv-btn qv-btn--quiet" href="/identity/account">
+            Verification and account
+          </Link>
         </div>
       </div>
     </section>
