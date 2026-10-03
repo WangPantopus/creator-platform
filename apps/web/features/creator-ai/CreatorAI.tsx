@@ -84,8 +84,16 @@ function storeDraft(key: string, value: unknown) {
     /* Private browsing may disable storage; server drafts still work. */
   }
 }
-function purgeStoredDrafts(accountId?: string) {
+function purgeStoredDrafts(accountId?: string, sessionId?: string) {
   try {
+    // A still-mounted older tab must not erase a newer genuine session's
+    // buffers after that newer tab has replaced this presentation marker.
+    if (
+      accountId &&
+      sessionId &&
+      readDraft(`w2-session:${accountId}`) !== sessionId
+    )
+      return;
     const prefixes = ["w2-source", "w2-interview", "w2-config"].map(
       (kind) => `${kind}:${accountId ? `${accountId}:` : ""}`,
     );
@@ -407,7 +415,7 @@ export function CreatorAI({
       // The canonical boundary disposes private React state on navigation and
       // effect restart too. Only its original genuine session end deletes the
       // stored buffers that the same continuing session may recover.
-      if (isSessionEnded()) purgeStoredDrafts(identityAccount);
+      if (isSessionEnded()) purgeStoredDrafts(identityAccount, identitySession);
     };
     if (identitySignal.aborted) dispose();
     else {
