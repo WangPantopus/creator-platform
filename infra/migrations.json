@@ -1013,6 +1013,31 @@
       "path": "apps/backend/src/modules/commerce/schema-fulfillment-publication-original-hash.sql",
       "state": "reserved_unapplied",
       "reason": "Distinct actorless publication original-input/financial/consent/evidence comparison purpose requested by W4. Separate isolated NoLogin owner consumes only actual bound0204 and genuine W1 early0208 publication authority on the original held worker client/nonce/PID/fullXID/login/current task/token. Complete bounded2-100 originals, exact plan/revision/hash/audience and unchanged private inputs/versions/signatures/consents/capture evidence must be rechecked with current restoration and all-original0205 negatives before positive body/signature gates and at final bookends. Fixed comparison returns only bounded boolean/evidence, never raw question/input or fabricated settlement/provider facts. Exact owner signatures/source/typed issuer/effective combined catalogue/compiler/C10/cancellation/cleanup/sole W1 COMMIT review pending. Separate from interactive0199/0202 and metadata0204; no Actor/ThreadScope alias, recipient/frame writes, raw worker grants, activation or provider permission."
+    },
+    {
+      "id": "0214",
+      "owner": "W8",
+      "version": "0214_w8_original_privacy_family",
+      "path": "apps/backend/migrations/0214_w8_original_privacy_family.sql",
+      "state": "reserved_unapplied",
+      "reason": "Distinct fixed original privacy task/family metadata purpose. Additive creator_trust.privacy_task_original_binding(uuid,text,uuid) under original creator_privacy_fence reads only its existing private PID/fullXID/session/job/domain/token binding and current lease; no raw0087scope ACL, original function or table change. New isolated NoLogin creator_privacy_family consumes only that fixed bridge, original ownership_ref/owned_creator_ids and bounded actual thread/fan account metadata. Fixed original owned-creator projection and privacy_task_family_matches(uuid,uuid,uuid,uuid,uuid) boolean cover account/creator/thread conversation tasks on the same original held client with restoration/task/EOF/COMMIT bookends. Requires actual0209/current executable source and independently reviewed complete combined catalogue/known callers. No current-profile ownership inference, account-only empty fallback, Actor/body/provider/financial permission, deletion receipt or activation. Source/signature qualification and personal application acceptance pending."
+    },
+    {
+      "id": "0215",
+      "owner": "W4",
+      "version": "0215_w4_generation_safety_terminal_settlement",
+      "path": "apps/backend/src/modules/commerce/schema-generation-safety-terminal-settlement.sql",
+      "state": "reserved_unapplied",
+      "reason": "Distinct typed original terminal allowance settlement requested by W4: isolated NoLogin creator_w4_generation_safety_terminal, fixed creator.generation_settle_typed_original_allowance(uuid,uuid) and creator.generation_typed_original_allowance_receipt(uuid,uuid) returning bounded jsonb. Must consume genuine original W1 finalized terminal matcher/private task/client/PID/fullXID/reservation/grant/pair/initiating account/cursor and complete W3 durable approved kind/XID/provenance plus actual W2 all-attempt known/unknown cost journal. Crisis classification can avoid fan consumption only with real durable classifier evidence; ordinary outputs preserve original ceiling/rules and provider cost is never zeroed or inferred from text. Original0106/0105 bytes remain immutable. Ordinary provenance/phase data need actual finite C10 export/purge; detached known costs retain approved twelve calendar months from original settlement. Unknown costs remain unavailable pending responsible operator/maximum period and genuine custody. Exact source/signatures/caller catalogue/cancellation/final cleanup/sole W1 COMMIT and real acceptance pending. Allocation only; no activation or financial/provider receipt."
+    },
+    {
+      "id": "0216",
+      "owner": "W1",
+      "version": "0216_w1_generation_output_cursor",
+      "path": "apps/backend/src/modules/identity/schema-generation-output-cursor.sql",
+      "sourceSha256": "a4f01c5f1eb1e19d79437b17cce872def1366965ba27c8c46b0d5f9bb73da436",
+      "state": "reserved_unapplied",
+      "reason": "Distinct actual W1 output cursor continuation published45cf4f02. Isolated creator_generation_cursor_authority owns private refresh_generation_output_cursor(uuid,uuid,integer,uuid) for the actual W3 writer only and readonly generation_output_cursor_view(uuid,uuid,integer,integer) for generation worker only. Actual W3 fullXID typed provenance plus original own+1 durable event/job/thread/lease metadata authorizes updating only original private scope task.lastSequence; original nonce/PID/fullXID/intent/createdAt/deadline and0159/0179 SQL stay immutable. Genuine JS refresh invalidates old view and uses latest private view at final bookend. No fabricated output, scope grant or updated deadline. Actual combined catalogue is unavailable until independently reviewed SQL/caller/drift/C10/cancellation/sole W1 COMMIT and genuine owner output qualification. Exact published source pin is custody metadata only, not activation or provider/financial permission."
     }
   ]
 }
