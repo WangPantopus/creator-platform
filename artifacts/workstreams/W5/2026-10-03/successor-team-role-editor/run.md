@@ -1,5 +1,59 @@
 # Current Team role consumer — bounded personal operation
 
+## Current independent fan operation and Composer repair
+
+At `49070ca369ada7239919c5760e4c645bc16b4268`, personally operated the
+committed isolated API launcher and Next development web against original
+canonical61. Actual web and backend shipping builds also passed separately;
+the operated browser was the development runtime. PR288 consumes actual W1
+`d2f541c3`; its remaining executable delta is the W5 Studio consumer.
+
+The real creator changed @kilnfire triage to drafter+triage. A transparent relay
+withheld only the actual successful response after backend commit. Explicit
+Retry sent the identical command SHA256
+`0ea5115f25974a654f6dae41e47937844a036df4c94f2d38f5fbf51d44340d0d`.
+Read-only membership xmin87474 remained unchanged after that retry. Four actual
+role POSTs returned200 across this operation. Current Team390/1280 Light/Night
+had viewport-equal scroll widths; Edit roles measured48px. An actual checked
+API pause concealed Studio and recovery restored the unsent Drafting-unchecked
+selection and checkbox focus without a role command.
+
+A fresh supported-CUA Chrome Incognito window began signed out and signed in
+through the genuine development fan-one flow, independently from the IAB
+creator. The fan entered unsaved draft text. A separate creator view changed
+drafter+triage to scheduler+triage; the open fan view cleared the text and
+disabled Save, but incorrectly retained an empty editable Composer and draft
+preparation copy. This is a discovered failure, not complete role-denial
+acceptance. The historical capture filename
+`independent-fan-open-view-role-denied.png` does not establish that acceptance.
+The original creator editor also refused its stale expectation until explicit
+Review current roles. Actual UI restored triage, final read-only xmin88703.
+The fan's saved Team URL then showed current-role denial with no management
+records. No content was saved, signed or published.
+
+All owned browser tabs and the Incognito window physically closed. API/web/relay
+listeners were independently absent after shutdown at22:27:32Z. API and relay
+wrapper exits were-2, web0; no API-wrapper exit0 is claimed. Exact GUI and heavy
+custody released. Private0600 screenshots, finite network metadata, membership
+readbacks and the explicit failed-screen limit are retained under
+`~/.config/creator-platform/w5-20261003/team-490-current/`.
+
+Personally implemented `c7dd8f2f89cf319f0082b9563ef9f548be646c2a` on existing
+PR288. Current owner/drafter/publisher role is checked separately from creator
+verification. A role without drafting now receives Content editing unavailable
+and Return to Notes; draft/catalogue reads and editing controls are absent.
+Unverified owners retain the existing local-writing experience with remote
+actions gated. Web types, scoped lint/format/diff and the actual production
+webpack build pass atc7dd; build exit0 in25.246seconds, Next environment restored
+and canonical heavy guard released. Current-fix personal app operation remains
+pending behind the already coordinated W3/W7 windows.
+
+Implemented/runnable: the above consumer and exact source checks/builds.
+Integrated: actual W1 source, with its prerequisite and PR288 still unmerged.
+Verified: only the named real490 observations; the c7dd repair has build/source
+qualification, not app acceptance yet. Native/signing/full CI and whole Team
+acceptance remain open. Release-ready:false; all nine packages remain incomplete.
+
 ## Current personal operation atf712531f
 
 Existing PR288 is now stacked on preserved original W1 PR21. Source
