@@ -20,6 +20,7 @@ import { commercePrivacyHook } from "../commerce/operations.js";
 import {
   privacyTaskAuthority,
   privacyTaskAuthorityInTransaction,
+  restoredPrivacyTaskAuthorityInTransaction,
 } from "./privacy-authority.js";
 import {
   createCommercePrivacyAuthority,
@@ -32,6 +33,7 @@ import { mediaPrivacyHook } from "./media-privacy-hook.js";
 import { growthPrivacyHook } from "../growth/lifecycle.js";
 import type { GrowthService } from "../growth/service.js";
 import { contentPrivacyHook } from "../content/privacy.js";
+import type { ContentPrivacyExport } from "../content/privacy-export.js";
 import { domainPrivacyTaskAuthorityInTransaction } from "./domain-privacy-authority.js";
 
 export type ConversationPrivacyOwnerPorts = Omit<
@@ -76,6 +78,10 @@ export function createPrivacyConsumers(input: {
     purposePool: Pool;
     retention?: Parameters<typeof contentPrivacyHook>[1];
     revokeSources?: Parameters<typeof contentPrivacyHook>[2];
+    /** Genuine prepared W5 owner, bound to this exact non-owner pool. The
+     * coordinator supplies original task/restoration authority below; neither
+     * its returned IDs nor this port expand non-account family ownership. */
+    exporter?: ContentPrivacyExport;
   };
   media?: Omit<
     Parameters<typeof mediaPrivacyHook>[0],
@@ -220,6 +226,13 @@ export function createPrivacyConsumers(input: {
       input.content.purposePool,
       input.content.retention,
       input.content.revokeSources,
+      (client, job) =>
+        restoredPrivacyTaskAuthorityInTransaction(
+          client,
+          job,
+          input.assertRestoredInTransaction,
+        ),
+      input.content.exporter,
     );
     hooks.push({
       domain: "content",
