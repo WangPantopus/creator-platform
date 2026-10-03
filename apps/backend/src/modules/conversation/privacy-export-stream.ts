@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import type { PoolClient } from "pg";
 import { canonical } from "../../core/canonical.js";
-import { invariant } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
 import type { PrivacyHook } from "../trust/contracts.js";
 import type { PrivacyExportStream } from "../trust/privacy-export.js";
 import {
@@ -66,16 +66,29 @@ export function conversationPrivacyExportStream(
   let client: PoolClient | undefined;
   let clientReleased = false;
   let discardClient = false;
+  let transportFailure: unknown;
+  const cleanupFailures: unknown[] = [];
+  const sourceError = (error: Error) => {
+    transportFailure ??= error;
+    discardClient = true;
+  };
   const releaseClient = async (destroy = false) => {
     if (client && !clientReleased) {
       clientReleased = true;
-      if (destroy)
-        await client.end().catch((error: unknown) => {
-          failed = true;
-          failure ??= error;
-        });
-      cursor.forget(client);
-      client.release(destroy);
+      try {
+        if (destroy) await client.end();
+      } catch (error) {
+        cleanupFailures.push(error);
+      } finally {
+        cursor.forget(client);
+        try {
+          client.release(destroy);
+        } catch (error) {
+          cleanupFailures.push(error);
+        } finally {
+          client.removeListener("error", sourceError);
+        }
+      }
     }
   };
   const done = new Promise<void>((resolve) => {
@@ -141,6 +154,7 @@ export function conversationPrivacyExportStream(
     try {
       await assertCurrent();
       client = await input.pool.connect();
+      client.on("error", sourceError);
       signal.throwIfAborted();
       await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
       await client.query(
@@ -171,17 +185,45 @@ export function conversationPrivacyExportStream(
     } catch (error) {
       failed = true;
       failure = error;
-      if (client && !clientReleased)
-        await client.query("ROLLBACK").catch(() => {
-          discardClient = true;
-        });
+      if (client && !clientReleased) {
+        discardClient ||=
+          cursor.requiresDestruction(client) || transportFailure !== undefined;
+        if (!discardClient) {
+          try {
+            await client.query("ROLLBACK");
+          } catch (error) {
+            discardClient = true;
+            cleanupFailures.push(error);
+          }
+        }
+      }
     } finally {
       try {
         await releaseClient(discardClient);
       } catch (error) {
-        failed = true;
-        failure ??= error;
+        cleanupFailures.push(error);
       } finally {
+        if (transportFailure !== undefined || cleanupFailures.length) {
+          const error = new DomainError(
+            "conversation_export_rollback_unavailable",
+            "Export could not settle safely; this task cannot complete.",
+            503,
+          );
+          error.cause = new AggregateError(
+            [
+              ...new Set(
+                [
+                  ...(failed ? [failure] : []),
+                  transportFailure,
+                  ...cleanupFailures,
+                ].filter((cause) => cause !== undefined),
+              ),
+            ],
+            "Original export and settlement failures.",
+          );
+          failed = true;
+          failure = error;
+        }
         signal.removeEventListener("abort", abort);
         resolveDone();
         notify();

@@ -1,4 +1,4 @@
-import { Client, type Pool, type PoolClient, type QueryResult } from "pg";
+import type { Pool, PoolClient, QueryResult } from "pg";
 import { createHash } from "node:crypto";
 import { z } from "zod";
 import { canonical, contentHash } from "../../core/canonical.js";
@@ -10,6 +10,7 @@ import { requestAuthority } from "../identity/request-authority.js";
 import type { PrivacyHook } from "../trust/contracts.js";
 import { ConversationLineage } from "./lineage.js";
 import { ConversationRecordings } from "./recordings.js";
+import { cancelConversationPrivacyBackend } from "./privacy-cancellation.js";
 import {
   fenceConversationPrivacyTask,
   type ConversationPrivacyAuthority,
@@ -63,6 +64,7 @@ export type ConversationPrivacyCursorRow = z.infer<
  * issues neither an interactive scope nor a job. Independently reviewed
  * installation receipts are mandatory; database-derived hashes are no approval. */
 export class PreparedConversationPrivacyCursor {
+  private readonly uncertainClients = new WeakSet<PoolClient>();
   private readonly cursors = new WeakMap<
     PoolClient,
     {
@@ -161,6 +163,15 @@ export class PreparedConversationPrivacyCursor {
     const client = await input.pool.connect();
     let started = false;
     let discard = true;
+    let failed = false;
+    let failure: unknown;
+    let transportFailure: unknown;
+    const cleanupFailures: unknown[] = [];
+    const sourceError = (error: Error) => {
+      transportFailure ??= error;
+      discard = true;
+    };
+    client.on("error", sourceError);
     try {
       await client.query("BEGIN ISOLATION LEVEL READ COMMITTED READ ONLY");
       started = true;
@@ -172,18 +183,46 @@ export class PreparedConversationPrivacyCursor {
       discard = true;
       await client.query("ROLLBACK");
       started = false;
+      if (transportFailure !== undefined) throw transportFailure;
       discard = false;
-      return prepared;
+    } catch (error) {
+      failed = true;
+      failure = error;
     } finally {
-      if (started) {
+      if (started && transportFailure === undefined) {
         try {
           await client.query("ROLLBACK");
-        } catch {
+        } catch (error) {
           discard = true;
+          cleanupFailures.push(error);
         }
       }
-      client.release(discard);
+      discard ||= transportFailure !== undefined;
+      try {
+        if (discard) await client.end();
+      } catch (error) {
+        cleanupFailures.push(error);
+      } finally {
+        try {
+          client.release(discard);
+        } catch (error) {
+          cleanupFailures.push(error);
+        } finally {
+          client.removeListener("error", sourceError);
+        }
+      }
     }
+    if (transportFailure !== undefined && !failed) {
+      failed = true;
+      failure = transportFailure;
+    }
+    if (cleanupFailures.length)
+      throw new AggregateError(
+        [...(failed ? [failure] : []), ...cleanupFailures],
+        "Export cursor qualification cleanup failed.",
+      );
+    if (failed) throw failure;
+    return prepared;
   }
 
   private async assertCatalogue(client: PoolClient): Promise<void> {
@@ -426,35 +465,15 @@ export class PreparedConversationPrivacyCursor {
         (await client.query("SELECT pg_backend_pid() AS pid")).rows[0]?.pid,
       );
     let cancelling: Promise<void> | undefined;
-    let cancellationFailed = false;
+    let cancellationFailure: unknown;
     const abort = () => {
-      cancelling = (async () => {
-        const control = new Client({
-          ...this.pool.options,
-          connectionTimeoutMillis: 1500,
-          statement_timeout: 1500,
-          query_timeout: 1500,
-        });
-        control.on("error", () => {
-          cancellationFailed = true;
-        });
-        try {
-          await control.connect();
-          const result = await control.query<{ cancelled: boolean }>(
-            "SELECT pg_cancel_backend($1) AS cancelled",
-            [pid],
-          );
-          invariant(
-            result.rows[0]?.cancelled === true,
-            "conversation_export_cancel_unavailable",
-            "The actual held source backend could not be cancelled.",
-          );
-        } finally {
-          await control.end();
-        }
-      })().catch(() => {
-        cancellationFailed = true;
-      });
+      if (cancelling) return;
+      cancelling = cancelConversationPrivacyBackend(this.pool, pid).catch(
+        (error: unknown) => {
+          cancellationFailure = error;
+          this.uncertainClients.add(client);
+        },
+      );
     };
     signal.addEventListener("abort", abort, { once: true });
     let result: QueryResult<ConversationPrivacyCursorRow> | undefined;
@@ -472,11 +491,27 @@ export class PreparedConversationPrivacyCursor {
       signal.removeEventListener("abort", abort);
       await cancelling;
     }
-    if (cancellationFailed)
-      throw new DomainError(
+    if (cancellationFailure !== undefined) {
+      const error = new DomainError(
         "conversation_export_cancel_unavailable",
         "Source cancellation failed; this export cannot complete.",
         503,
+      );
+      error.cause = new AggregateError(
+        [
+          ...new Set([
+            ...(queryFailed ? [queryFailure] : []),
+            cancellationFailure,
+          ]),
+        ],
+        "Original FETCH and cancellation failed.",
+      );
+      throw error;
+    }
+    if (signal.aborted && queryFailed)
+      throw new AggregateError(
+        [...new Set([queryFailure, signal.reason])],
+        "Original FETCH and source abort failed.",
       );
     signal.throwIfAborted();
     if (queryFailed) throw queryFailure;
@@ -533,5 +568,10 @@ export class PreparedConversationPrivacyCursor {
 
   forget(client: PoolClient): void {
     this.cursors.delete(client);
+    this.uncertainClients.delete(client);
+  }
+
+  requiresDestruction(client: PoolClient): boolean {
+    return this.uncertainClients.has(client);
   }
 }
