@@ -1,5 +1,32 @@
 # Original publication media integration — October 3, 2026
 
+Frozen existing305 product `7ca3e8f29ac8da7ec4d623d22221cd08304f5dd9`
+passed fresh backend shipping22:32:18.509–22:32:23.367Z, exit0. Build-log SHA256
+`22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5`;
+actual entrypoint hashes/dev/inode remain in the private shipping receipt.
+The normal heavy lease released. Free space was7,944,499,200 bytes before build;
+actual inventory showed one unrelated simulator, no emulator/other heavy
+process. No peer device was touched; no W6 web/native rebuild was needed for
+this backend-only product delta.
+
+Personally ran the actual shipped publication entrypoint with the original
+private loopback-development environment/canonical61 name and the genuinely
+absent separate publication connection. It refused with
+`publication_worker_unconfigured`, exit1 at22:33:54.135Z, before pool/task
+creation. No callback, task, scope, credential or response was fabricated.
+This qualifies configuration refusal only, not genuine publication operation.
+Exact process nonce c9aa08e8-7fd5-42df-a8ca-b128fd55ba4b/PID70356 exited and
+its lease closed. At22:34:47.001568Z the original PG/image/volume/binding remained
+exited/PID0, all3006/3106/4106/55446 closed and the heavy lease absent. No
+database traffic, native/GUI resource or held migration was started.
+
+Private receipt SHA256:
+
+- Shipping: `4fd4d5322dfaa3ab32318069976e50534410d9a3a7fccc773bb82ca18ae3b148`.
+- Executable refusal: `43982acbc93507c7102293fe2f5a736e8305320ba4bc65a356448ba7319c7cee`.
+- Closure: `0c812e191925474dd463756cc35623d619172fcc280182182872439aedc714b8`.
+- Imported original source custody: `3e56a1ba03970fec7f80c9d13fa9e225d3c6c70a1cd58b9c7334ddf3b821dc63`.
+
 Personally implemented W6 media cancellation bookends using W1's genuine
 original signal port. Preparation retains the same signal/client/PID/full XID
 and complete original signed command; every awaited continuation checks the
@@ -26,8 +53,8 @@ not borrowed as W6 publication acceptance.
 Backend types, scoped lint, formatting, unchanged generated 12 resources/115
 operations and diff checks pass. Initial types correctly refused the missing
 fourth DomainError options argument; exact canonical producer cause support
-resolved that composition gap. No new tests or coverage work. Shipping and
-actual executable refusal qualification will be recorded at the frozen commit.
+resolved that composition gap. No new tests or coverage work. The fresh build
+and actual executable refusal above remain separate from positive acceptance.
 
 Expanded accepted original catalogue pin remains undefined; worker publication
 remains closed. `infra/migrations.json` is unchanged:0208 and0213 already exist
