@@ -1,5 +1,9 @@
 # W8 contract, migration and runtime register
 
+## Original Content LAST signature reader — 2026-10-03
+
+[Held0225](W8-next-allocations.md) pins W1's independently read89-line original ordinary Content signature reader at SHA256734a806c1e2252d7c5c7c418856f3b448933d993326ef471bb3351eed1367e41. Its isolated boolean purpose consumes the actual W5 creator/content/consumed act/canonical command hash/audience after original same-client domain and negative checks; unchanged0167 mutation fences and original0157 packet separation remain mandatory. The nonwaiting signer-family lease is LAST. Complete effective catalogue and original typed owner cleanup/COMMIT, drift/refusal/cancellation/withdrawal/revocation/C10/application qualification remain pending. Active61/prior76/frozen47 are preserved; reserved metadata installs no SQL/grants or accepted pin.
+
 ## Actual development expiry signal — 2026-10-03
 
 [Existing draft192](../../operations/W8-development-feedback.md) requires the actual worker AbortSignal outside request ALS and holds its original worker client until awaited COMMIT or close/settlement. Read-committed isolation precedes all metadata reads; finite host and catalogue budgets do not issue a task or replace the caller's signal. Unknown responses and actual aborts send no helper cleanup SQL, while healthy policy refusals can roll back. The original configured graph, finite policy/current clock, restoration/source/catalogue bookends and immutable0207 remain mandatory. Four real PostgreSQL primitives are distinct from original task, physical purge and application acceptance; no activation or accepted receipt is supplied.
