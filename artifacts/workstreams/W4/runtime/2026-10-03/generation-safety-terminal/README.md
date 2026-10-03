@@ -1,5 +1,9 @@
 # Actual typed safety settlement — October 3, 2026 UTC
 
+The metadata helper restores/releases its savepoint only after successful reads. A failed query submits no later helper SQL. The bounded public DomainError retains its original private nonenumerable Error.cause so the genuine W1 transaction owner can distinguish a healthy SQL refusal from an uncertain transport/timeout.
+
+Personal closed-copy qualification used a real borrowed pg client with a15ms configured query read timeout. The actual metadata SELECT timed out; actual server statements contain SAVEPOINT/search_path/metadata only and no subsequent ROLLBACK TO/RELEASE. Source closure was awaited before removal, and all six original canonical61 custody digests match. The reviewed private receipt SHA256 is `738ef45046b4ebe2e95c035ce9ac6ceb5599526304ac1123433c274a54598fc3`. This qualifies the helper failure path only; the genuine factory/complete terminal lifecycle remains unverified. SQL and frozen twelve-source catalogue bytes/pins below are unchanged.
+
 Current corrected source releases fan usage when no actual output was delivered, matching [the original failed-generation workflow](../../../../../../docs/workstreams/W3-conversations.md). A delivered interrupted prefix still counts its real work; the complete original known provider cost/reference remains intact. Unknown costs retain the hold. This corrects the earlier new-source empty-failure consumption defect; original0106 stays unchanged.
 
 The metadata factory now listens for errors on the exact borrowed client before BEGIN. Any failed review or uncertain BEGIN conservatively awaits source closure and removes that client without another transaction query. A successful confirmed review rolls back; failed rollback also closes/removes the source. Original, transport, end and release failures remain available through an AggregateError with the original first cause; no secondary cleanup failure is silently dropped.

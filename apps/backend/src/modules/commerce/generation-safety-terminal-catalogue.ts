@@ -83,17 +83,17 @@ export async function generationSafetyTerminalPurposeCatalogue(
   client: PoolClient,
 ) {
   await client.query("SAVEPOINT w4_safety_terminal_catalogue");
-  try {
-    await client.query("SET LOCAL search_path=pg_catalog");
-    return (
-      await client.query<{ catalogue: unknown }>(
-        GENERATION_SAFETY_TERMINAL_CATALOGUE_QUERY,
-      )
-    ).rows[0]?.catalogue;
-  } finally {
-    await client.query("ROLLBACK TO SAVEPOINT w4_safety_terminal_catalogue");
-    await client.query("RELEASE SAVEPOINT w4_safety_terminal_catalogue");
-  }
+  await client.query("SET LOCAL search_path=pg_catalog");
+  const catalogue = (
+    await client.query<{ catalogue: unknown }>(
+      GENERATION_SAFETY_TERMINAL_CATALOGUE_QUERY,
+    )
+  ).rows[0]?.catalogue;
+  // A failed query may leave the original transport in flight. Do not submit
+  // another query here; the genuine transaction owner decides how to close it.
+  await client.query("ROLLBACK TO SAVEPOINT w4_safety_terminal_catalogue");
+  await client.query("RELEASE SAVEPOINT w4_safety_terminal_catalogue");
+  return catalogue;
 }
 
 export const GENERATION_SAFETY_TERMINAL_CATALOGUE_SHA256 =
@@ -190,12 +190,21 @@ export const GENERATION_SAFETY_TERMINAL_SOURCES = Object.freeze(
 export async function assertGenerationSafetyTerminalCatalogue(
   client: PoolClient,
 ) {
-  const unavailable = () =>
-    new DomainError(
+  const unavailable = (cause?: unknown) => {
+    const error = new DomainError(
       "generation_safety_terminal_unavailable",
       "Actual typed original allowance custody is unavailable.",
       503,
     );
+    // Preserve private transport/timeout evidence for the real W1 owner. The
+    // public error remains bounded; Error.cause is intentionally nonenumerable.
+    if (cause !== undefined)
+      Object.defineProperty(error, "cause", {
+        value: cause,
+        configurable: true,
+      });
+    return error;
+  };
   try {
     if (requestAuthority.getStore()) throw unavailable();
     for (const source of GENERATION_SAFETY_TERMINAL_SOURCES)
@@ -218,7 +227,7 @@ export async function assertGenerationSafetyTerminalCatalogue(
         GENERATION_SAFETY_TERMINAL_CATALOGUE_SHA256
     )
       throw unavailable();
-  } catch {
-    throw unavailable();
+  } catch (cause) {
+    throw unavailable(cause);
   }
 }

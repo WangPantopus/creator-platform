@@ -1,5 +1,9 @@
 ### Corrected original empty-failure and source-client custody — October 3, 2026 UTC
 
+### Actual metadata read-timeout closure — October 3, 2026 UTC
+
+The215 metadata helper sends savepoint restoration/release only after successful reads and preserves the original private nonenumerable Error.cause in its bounded503. Personal closed-copy real pg15ms read timeout confirms no later helper SQL in actual server statements, awaited source closure/client removal and all six unchanged canonical61 custody digests. SQL/frozen twelve-source pins remain unchanged. Backend/types/scoped lint/format pass; this is helper failure-path qualification, not genuine factory/full terminal/activation/C10 acceptance. [Exact evidence limits](../../../artifacts/workstreams/W4/runtime/2026-10-03/generation-safety-terminal/README.md). All nine packages and R01–R15 remain incomplete.
+
 Actual0215 now releases fan usage when no output was delivered, matching the original failed-generation workflow; known provider costs/reference remain complete, unknown holds remain and delivered interrupted work retains its original weighting. The metadata factory observes the actual client before BEGIN, closes uncertain/failed sources without another query, awaits actual end and retains all original/secondary cleanup errors. Personally repeated identical strict closed61 qualification passes: two new functions,14 no-scope plans,8 refusals,13 drift/restores and all six custody digests. The twelve-source pin is explicitly limited; full remaining owner graph/current caller composition/C10/activation still required. [Current corrected hashes and retained earlier evidence](../../../artifacts/workstreams/W4/runtime/2026-10-03/generation-safety-terminal/README.md). All nine packages/R01–R15 remain incomplete.
 
 ### Actual typed safety settlement source qualification — October 3, 2026 UTC
