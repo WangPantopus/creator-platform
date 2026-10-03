@@ -1,0 +1,10 @@
+{
+  "observedAt": "2026-10-02T13:30:14.572962+00:00",
+  "qualification": "Actual catalog preflight expression only, using existing creator_runtime; no held0102 install or worker acceptance",
+  "databaseVersion": "17.11 (Debian 17.11-1.pgdg12+2)",
+  "relationsScanned": 504,
+  "sequenceRelations": 1,
+  "existingRuntimePrivilegeMatches": 115,
+  "sqlSourceCommit": "d2f8d9b35c1427b408f2b2273345aec47c2ebd92",
+  "sqlSourceSHA256": "2f1c4b30133a0c8707b16b15c1e42a9daf539cb5edeeb48ad6a835352a4f444d"
+}

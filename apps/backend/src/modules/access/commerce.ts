@@ -118,8 +118,19 @@ export async function reserveCostAllowance(
   key: string,
   units: number,
   policyVersion?: string,
+  originalRule?: Readonly<{
+    version: string;
+    microsPerUnit: number;
+    ceilingUnits: number;
+    rounding: "ceil";
+  }>,
 ) {
   assertThreadScope(scope);
+  invariant(
+    originalRule === undefined || policyVersion !== undefined,
+    "original_cost_rule_required",
+    "Original weighted cost custody requires its policy version.",
+  );
   invariant(
     Number.isSafeInteger(units) && units > 0 && units <= 2147483647,
     "invalid_cost_units",
@@ -139,14 +150,17 @@ export async function reserveCostAllowance(
     units: number;
     state: string;
     cost_policy_version?: string | null;
+    cost_rule?: unknown;
   }>(
-    "SELECT id,units,state,to_jsonb(r)->>'cost_policy_version' AS cost_policy_version FROM creator.commerce_allowance_reservation r WHERE creator_id=$1 AND fan_id=$2 AND key=$3",
+    `SELECT id,units,state,to_jsonb(r)->>'cost_policy_version' AS cost_policy_version${originalRule ? ",cost_rule" : ""} FROM creator.commerce_allowance_reservation r WHERE creator_id=$1 AND fan_id=$2 AND key=$3`,
     [scope.creatorId, scope.fanId, key],
   );
   if (prior.rows[0]) {
     invariant(
       prior.rows[0].units === units &&
-        (prior.rows[0].cost_policy_version ?? undefined) === policyVersion,
+        (prior.rows[0].cost_policy_version ?? undefined) === policyVersion &&
+        (!originalRule ||
+          contentHash(prior.rows[0].cost_rule) === contentHash(originalRule)),
       "idempotency_conflict",
       "Reservation parameters changed.",
     );
@@ -191,7 +205,7 @@ export async function reserveCostAllowance(
   );
   return (
     await client.query<{ id: string; units: number; state: string }>(
-      `INSERT INTO creator.commerce_allowance_reservation(creator_id,fan_id,grant_id,key,units,state,pass_id,pass_cycle${policyVersion === undefined ? "" : ",cost_policy_version"}) VALUES($1,$2,$3,$4,$5,'reserved',$6,$7${policyVersion === undefined ? "" : ",$8"}) RETURNING id,units,state`,
+      `INSERT INTO creator.commerce_allowance_reservation(creator_id,fan_id,grant_id,key,units,state,pass_id,pass_cycle${policyVersion === undefined ? "" : ",cost_policy_version"}${originalRule ? ",cost_rule" : ""}) VALUES($1,$2,$3,$4,$5,'reserved',$6,$7${policyVersion === undefined ? "" : ",$8"}${originalRule ? ",$9::jsonb" : ""}) RETURNING id,units,state`,
       [
         scope.creatorId,
         scope.fanId,
@@ -201,6 +215,7 @@ export async function reserveCostAllowance(
         pass?.id ?? null,
         pass?.cycle_start ?? null,
         ...(policyVersion === undefined ? [] : [policyVersion]),
+        ...(originalRule ? [JSON.stringify(originalRule)] : []),
       ],
     )
   ).rows[0]!;

@@ -1,0 +1,28 @@
+{
+  "recordedAt": "2026-10-01 10:13:23 UTC",
+  "owner": "W6 primary continuation in 970d",
+  "services": {
+    "backend4106": "stopped using owned terminal session",
+    "web3006": "stopped using owned terminal session",
+    "listeners": "none observed after stop"
+  },
+  "fixture": {
+    "name": "creator-platform-w6-media-completion-test-20261001",
+    "id": "41715161c96448cc717255a0e4f98dabd003fbdcec5e3a879e0568b213cf806d",
+    "labels": {
+      "creator-platform.lease": "2026-10-01",
+      "creator-platform.owner": "W6-resume-media"
+    },
+    "port": 55456,
+    "database": "creator_w6_media_completion_test",
+    "status": "stopped and removed",
+    "anonymousVolume": "4ad4e4a26133cd69d3f9b7b1366562ec514dab7a02b95de847e5d66ff22133e6",
+    "volumeStatus": "exclusive ownership verified; removed with container -v",
+    "acceptanceData": false
+  },
+  "mediaToolContainers": "none remaining for exclusively owned diagnostic image",
+  "mediaToolImage": "creator-platform-w6-media-tools:20261001 removed without global pruning",
+  "temporaryDirectory": "/tmp/creator-platform-w6-completion-20261001 removed after realpath, owner and contents validation",
+  "peers": "W1/W2/W3/W4/W7 and other W6 containers remain; no peer devices, caches, data, build outputs or source modified",
+  "preservedPeerSource": "apps/ios/Package.resolved"
+}

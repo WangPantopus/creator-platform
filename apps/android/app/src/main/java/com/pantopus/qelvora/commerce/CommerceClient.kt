@@ -38,13 +38,14 @@ import kotlinx.serialization.json.*
 @Serializable data class CommerceCommitment(val id: String, val state: String, val version: Int, val due_at: String, val delivered_at: String?, val accept_act_id: String? = null, val evidence: CommerceDeliveryEvidence? = null)
 @Serializable data class CommerceShare(val version: Int, val fan_choice: Boolean, val revoked_at: String?)
 @Serializable data class CommerceLedger(val kind: String, val amount: String, val currency: String)
-@Serializable data class CommerceDetail(val packet: CommercePacket, val commitment: CommerceCommitment?, val share: CommerceShare?, val ledger: List<CommerceLedger> = emptyList())
+@Serializable data class CommerceCallTransport(val state: String, val authorKind: String, val recordedAt: String? = null)
+@Serializable data class CommerceDetail(val packet: CommercePacket, val commitment: CommerceCommitment?, val share: CommerceShare?, val ledger: List<CommerceLedger> = emptyList(), val callTransport: CommerceCallTransport? = null)
 @Serializable data class CommerceOverview(val fan: CommerceFan?, val creators: List<CommerceCreator>, val packets: List<CommercePacket>, val modes: List<CommerceMode>, val limits: List<CommerceLimit>, val memberships: List<CommerceMembership>, val slots: List<CommerceSlot>, val policy: CommercePolicy, val capabilities: CommerceCapabilities, val exposure: CommerceExposure?,val pass:List<CommercePass> = emptyList(),val passChoices:CommercePassChoices = CommercePassChoices(),val spendingNotices:List<CommerceSpendingNotice> = emptyList(),val tiers:List<CommerceTier> = emptyList())
 class CommerceFailure(val status: Int, override val message: String) : Exception(message)
 
 /** Shares canonical OS-encrypted session storage, never a local entitlement authority. */
 class CommerceClient(context: Context, private val baseURL: String, private val accountId: String? = null) {
-    private val storage = SecureSessionStorage(context)
+    private val storage = SecureSessionStorage(context, baseURL)
     private val json = Json { ignoreUnknownKeys = true }
     suspend fun request(path: String, body: JsonObject? = null): JsonElement = withContext(Dispatchers.IO) {
         val token = storage.read() ?: throw CommerceFailure(401, "Your session ended. Continue with Pantopus again.")

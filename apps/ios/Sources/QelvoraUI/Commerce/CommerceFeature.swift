@@ -32,7 +32,7 @@ struct CommerceFeature: View {
             VStack(alignment: .leading, spacing: 24) {
                 HStack {
                     if screen != "requests" { Button("Back", variant: .quiet) { screen = "requests"; detail = nil } }
-                    Spacer(); Text(title.uppercased()).qText("meta"); Spacer()
+                    Spacer(); Text(title.uppercased()).qText("data-sm"); Spacer()
                     Button("Refresh", variant: .quiet, disabled: busy) { Task { await refresh() } }
                 }
                 if !failure.isEmpty { Notice(tone: .error, title: "Connection status", children: failure) }
@@ -159,9 +159,10 @@ struct CommerceFeature: View {
     private func spending(_ data: CommerceOverview) -> some View {
         VStack(alignment: .leading, spacing: 24) {
             Text("Spending and time").qText("display-md")
-            Text(CommerceAmount.display(data.exposure?.captured ?? 0, data.policy.currency)).qText("spend-total")
+            Text(CommerceAmount.display(data.exposure?.captured ?? 0, data.policy.currency))
+                .modifier(QelvoraTextStyle(style: .init(family: "mono", size: 44, lineHeight: 48, weight: 400, letterSpacing: 0)))
             Text("Charged this UTC calendar month").qText("caption")
-            if let month = data.exposure?.month { Text(month + " · UTC").qText("meta") }
+            if let month = data.exposure?.month { Text(month + " · UTC").qText("data-sm") }
             let limit = data.limits.first { $0.currency == data.policy.currency }
             panel {
                 row("Current limit", limit.map { $0.explicit_none ? "No limit" : CommerceAmount.display(Int64($0.amount ?? "0") ?? 0, $0.currency) } ?? "Choose before your first paid action")
@@ -236,13 +237,25 @@ struct CommerceFeature: View {
             }
             if ["submitting", "submitted", "more_info", "offer_pending"].contains(packet.state) { Button("Withdraw request", variant: .secondary, block: true, disabled: busy) { Task { await mutate("packets/\(packet.id)/withdraw", values: ["version": packet.version], message: "Hold release is being confirmed.") } } }
             if packet.payment_state == "unknown" || packet.payment_state == "requires_action" { Notice(title: "Payment processing", children: "The provider must confirm payment. No completion is inferred from this screen.") }
+            if let transport = detail.callTransport {
+                Notice(title: "System · call status", children: transport.state == "closed_unresolved" ? "The call room closed after neither participant joined during the arrival window. The service outcome remains unresolved. Recorded \(when(transport.recordedAt)). Check the current receipt for billing status." : "Current call status is unavailable. Your recorded receipt remains available.")
+            }
             if detail.commitment?.delivered_at != nil, ["delivered", "refunded", "resolved"].contains(detail.commitment?.state ?? "") {
-                Receipt(reqId: reqID(packet.id), title: packet.snapshot.title, rows: [ReceiptRow(id: "amount", label: "Charged", value: CommerceAmount.display(packet.snapshot.amount, packet.snapshot.currency)), ReceiptRow(id: "delivery", label: "Delivered", value: when(detail.commitment?.delivered_at))] + (refund > 0 ? [ReceiptRow(id: "refund", label: "Refund confirmed", value: CommerceAmount.display(refund, packet.snapshot.currency))] : []), label: detail.commitment?.evidence?.authorKind == "approved_draft" ? "Prepared by AI · approved by \(name)" : "\(packet.snapshot.title) · personally fulfilled by \(name)", name: name)
+                Receipt(reqId: reqID(packet.id), title: packet.snapshot.title, rows: [ReceiptRow(id: "amount", label: "Charged", value: CommerceAmount.display(packet.snapshot.amount, packet.snapshot.currency)), ReceiptRow(id: "delivery", label: "Delivered", value: when(detail.commitment?.delivered_at))] + (refund > 0 ? [ReceiptRow(id: "refund", label: "Refund confirmed", value: CommerceAmount.display(refund, packet.snapshot.currency))] : []), label: fulfillmentLabel(detail.commitment?.evidence?.authorKind, title: packet.snapshot.title, name: name), name: name)
                 if let signedActId = detail.commitment?.evidence?.signedActId ?? detail.commitment?.accept_act_id {
                     Button(detail.commitment?.evidence?.signedActId != nil ? "Open signed verification" : "Open signed acceptance", variant: .quiet, block: true) { session.destination = "/verify/" + signedActId }
                 }
                 if detail.commitment?.state == "delivered" || detail.share?.fan_choice == true { Button(detail.share?.fan_choice == true ? "Revoke sharing" : "Allow sharing without your handle", variant: .secondary, block: true, disabled: busy || (!packet.snapshot.shareable && detail.share?.fan_choice != true) || detail.share?.revoked_at != nil) { Task { await mutate("packets/\(packet.id)/share", values: ["version": detail.share?.version ?? 1, "enabled": detail.share?.fan_choice != true, "handleDisplay": "hidden"], message: "Your sharing choice is saved.") } } }
             }
+        }
+    }
+    private func fulfillmentLabel(_ kind: String?, title: String, name: String) -> String {
+        switch kind {
+        case "approved_draft": return "Prepared by AI · approved by \(name)"
+        case "human_creator": return "\(title) · personally fulfilled by \(name)"
+        case "human_call": return "Personal call · provider-confirmed outcome"
+        case "system": return "System delivery notice"
+        default: return "Delivery recorded"
         }
     }
     private func membership(_ data: CommerceOverview) -> some View {
@@ -255,6 +268,9 @@ struct CommerceFeature: View {
                 StoreMembershipPane(baseURL: baseURL, productIDs: currentProducts, accountID: accountID, onVerified: { await refresh() }).id(accountID)
             } else {
                 Notice(title: "Purchase and restore unavailable", children: "Store products must be configured and verified by the server before access is granted.")
+                if data.memberships.contains(where: { $0.provider == "apple" }) {
+                    StoreSubscriptionManagement().id(session.session?.accountId)
+                }
             }
             Text("Unused memberships cancelled within seven days qualify for a full refund. Later refunds follow the remaining paid period; store refunds follow that store's process.").qText("caption")
         }
@@ -294,4 +310,3 @@ struct CommerceFeature: View {
     private func when(_ value: String?) -> String { guard let value else { return "—" }; guard let date = instant(value) else { return value }; return date.formatted(date: .abbreviated, time: .shortened) }
     private func outcome(_ packet: CommercePacket) -> String { ["released":"Hold released · nothing charged", "failed":"Payment failed · nothing charged", "unknown":"Confirming payment", "requires_action":"Payment authentication needed", "refund_pending":"Refund processing", "refunded":"Refund confirmed"][packet.payment_state] ?? (packet.delivered_at != nil || packet.commitment_state == "delivered" ? "Delivered" : packet.state.replacingOccurrences(of: "_", with: " ")) }
 }
-

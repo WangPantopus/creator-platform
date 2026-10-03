@@ -1,0 +1,35 @@
+{
+  "source": "616698f3d9a034ba0fb4ffc3d4dff36465c011d0",
+  "labelledSynthetic": true,
+  "operatorFaultInjection": true,
+  "providerDenial": false,
+  "jobHash": "f5b1dc68facdb329a12a35fd847114817f13b91ce0ea350757232b8f7a4d51b9",
+  "fault": {
+    "labelledSynthetic": true,
+    "operatorFaultInjection": true,
+    "providerDenial": false,
+    "source": "616698f3d9a034ba0fb4ffc3d4dff36465c011d0",
+    "phases": [
+      "actual_matching_lease_shortened",
+      "actual_hook_separate_COMMIT_delayed",
+      "actual_hook_refused"
+    ],
+    "realWorkerClaim": true,
+    "delayMs": 3999.7948749999996,
+    "sqlState": "23514",
+    "elapsedMs": 4061.610667000001
+  },
+  "task": {
+    "state": "retry",
+    "error_code": "domain_hook_error",
+    "attempts": 1,
+    "receipt_present": false,
+    "data_present": false,
+    "no_live_lease": true
+  },
+  "scopes": {
+    "core_scopes": 0,
+    "domain_scopes": 0
+  },
+  "qualified": true
+}

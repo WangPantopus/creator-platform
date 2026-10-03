@@ -1,0 +1,58 @@
+{
+  "source": "3a4730835ced734138c06905e85c36ef40488746",
+  "base": "1048f2f43050444acb918925eea6d0b9db404877",
+  "at": "2026-10-02T14:27:30.930348+00:00",
+  "operator": "Personally operated actual app using authorized browserd interactive operator; no assertions or test suite.",
+  "apiSource": "3a4730835ced734138c06905e85c36ef40488746",
+  "backend": "Owned actual canonical57 PostgreSQL; foundationReady=true, ready=false, development identity, generation unconfigured.",
+  "before": {
+    "source": "6784efd4c7d20557e2f5e1294190a80c5a889335",
+    "viewport": 195,
+    "scrollWidth": 219,
+    "fiveNavigationTargets": [35.796875, 48],
+    "defects": [
+      "Navigation labels overlap.",
+      "New Note heading action and draft status overflow viewport."
+    ]
+  },
+  "after": {
+    "viewport195": {
+      "themes": ["Light", "Night"],
+      "scrollWidth": 195,
+      "navigationColumns": 3,
+      "navigationRows": 2,
+      "targetWidthRange": [59.65625, 59.671875],
+      "targetHeight": 48,
+      "keyboard": "Focused Notes, Tab moved to Requests with visible focus."
+    },
+    "viewport390": {
+      "themes": ["Light", "Night"],
+      "scrollWidth": 390,
+      "navigationColumns": 5,
+      "targetWidthRange": [74.796875, 74.8125],
+      "targetHeight": 48
+    },
+    "viewport1280": {
+      "themes": ["Light", "Night"],
+      "scrollWidth": 1280,
+      "sidebarWidth": 248,
+      "phoneNavigationDisplay": "none",
+      "keyboard": "Focused desktop More, Enter opened actual More with Thanks/Impact/License/Support."
+    },
+    "liveOutage": "With actual Notes already mounted, stopped own API. After 8.5 seconds, actual Reconnect to Studio concealed private draft and navigation. Restarted same-source API; current role refresh restored unchanged unsigned draft automatically.",
+    "initialOutage": "Separately saw Studio unavailable during a cold reload with API stopped.",
+    "failedAttempt": "Tried a button selector for Choose your Studio; actual control was a link. Selector timed out and performed no action. Recovery occurred automatically, not through this failed attempt."
+  },
+  "statuses": {
+    "implemented": "W5-only CSS source3a473083. No shared navigation or Team code changed.",
+    "runnable": "Actual development web/API operated; production build pending shared build slot.",
+    "integrated": "Standalone branch from currentmain1048; PR not yet merged.",
+    "verified": "Personally observed stated layout/keyboard/unavailable/recovery paths only.",
+    "releaseReady": false
+  },
+  "qualifications": [
+    "Unsigned development draft only. Creator verification is DEVELOPMENT-ONLY SEEDED (2026-10-01T20:44:26Z), no proof or passkey.",
+    "No genuine signature, Note publication, two-fan reply isolation, payment, media provenance, delivery or privacy receipt fabricated.",
+    "No new test code. Native app behavior unchanged by this web CSS increment."
+  ]
+}

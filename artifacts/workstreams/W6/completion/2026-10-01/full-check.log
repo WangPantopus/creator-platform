@@ -1,0 +1,127 @@
+Scope: all 8 workspace projects
+✓ Lockfile passes supply-chain policies (verified 1d ago)
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+Done in 3.9s using pnpm v11.19.0
+$ pnpm generate:check && pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm build
+$ pnpm --filter @qelvora/api generate --check && node scripts/generate-shared.mjs --check && node scripts/generate-native-api.mjs --check
+$ tsx scripts/generate-openapi.ts --check
+Verified 12 shared web, Swift and Kotlin resources.
+Verified Swift/Kotlin API models and 96 operations from OpenAPI.
+$ turbo run typecheck
+
+   • Packages in scope: @qelvora/api, @qelvora/backend, @qelvora/brand, @qelvora/copy, @qelvora/tokens, @qelvora/ui-web, @qelvora/web
+   • Running typecheck in 7 packages
+   • Remote caching disabled, using shared worktree cache
+
+@qelvora/copy:typecheck: cache hit, replaying logs 3859b3c11213c319
+@qelvora/copy:typecheck: $ tsc --noEmit
+@qelvora/brand:typecheck: cache hit, replaying logs 82b6e60a5032143e
+@qelvora/brand:typecheck: $ tsc --noEmit
+@qelvora/tokens:typecheck: cache hit, replaying logs 53cffeeeea9741bf
+@qelvora/tokens:typecheck: $ tsc --noEmit
+@qelvora/api:typecheck: cache hit, replaying logs 19ab78af64a28b03
+@qelvora/ui-web:typecheck: cache hit, replaying logs 308207a5523bde3a
+@qelvora/api:typecheck: $ tsc --noEmit
+@qelvora/ui-web:typecheck: $ tsc --noEmit
+@qelvora/backend:typecheck: cache miss, executing 9ab53ac24196832a
+@qelvora/web:typecheck: cache hit, replaying logs 94f389d99bf0fa4c
+@qelvora/web:typecheck: $ tsc --noEmit
+@qelvora/backend:typecheck: $ tsc --noEmit
+
+ Tasks:    7 successful, 7 total
+Cached:    6 cached, 7 total
+  Time:    25.923s
+
+$ eslint apps/backend packages apps/web scripts tests playwright.config.ts --ignore-pattern '**/generated/**'
+$ prettier --check apps packages config scripts tests '*.json' '*.yaml' '.github/**/*.yml'
+Checking formatting...
+All matched files use Prettier code style!
+$ node --test scripts/shared.test.mjs && turbo run test
+✔ one rename updates native identifiers, package scopes and UI names while preserving Pantopus and binary assets (368.842346ms)
+✔ all fixed copy and both themes exist in generated web, Swift and Kotlin resources (324.387317ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 838.830546
+
+   • Packages in scope: @qelvora/api, @qelvora/backend, @qelvora/brand, @qelvora/copy, @qelvora/tokens, @qelvora/ui-web, @qelvora/web
+   • Running test in 7 packages
+   • Remote caching disabled, using shared worktree cache
+
+@qelvora/api:test: cache bypass, force executing c598997f677c4acb
+@qelvora/copy:build: cache miss, executing 0cac4356cca28abd
+@qelvora/api:build: cache miss, executing 7d9876fb27872c34
+@qelvora/brand:build: cache hit, replaying logs c68e80ea4bd32f3d
+@qelvora/brand:build: $ tsc --noEmit
+@qelvora/tokens:build: cache hit, replaying logs cc0386ae4b0d76ff
+@qelvora/tokens:build: $ tsc --noEmit
+@qelvora/api:build: $ tsc --noEmit
+@qelvora/api:test: $ vitest run --passWithNoTests
+@qelvora/copy:build: $ tsc --noEmit
+@qelvora/api:test:
+@qelvora/api:test:  RUN  v3.2.4 /Users/yingpengwang/.codex/worktrees/970d/creator-platform/packages/api
+@qelvora/api:test:
+@qelvora/api:test: No test files found, exiting with code 0
+@qelvora/api:test:
+@qelvora/api:test: include: **/*.{test,spec}.?(c|m)[jt]s?(x)
+@qelvora/api:test: exclude:  **/node_modules/**, **/dist/**, **/cypress/**, **/.{idea,git,cache,output,temp}/**, **/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*
+@qelvora/api:test:
+@qelvora/backend:test: cache bypass, force executing b3565e0b0bc9100b
+@qelvora/backend:test: $ vitest run
+@qelvora/backend:test:
+@qelvora/backend:test:  RUN  v3.2.4 /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/backend
+@qelvora/backend:test:
+@qelvora/backend:test:  ❯ tests/postgres.integration.test.ts (9 tests | 1 failed) 304549ms
+@qelvora/backend:test:    ✓ PostgreSQL foundation using the real non-owner role > T-11 denies unscoped read/write and leaves no tenant context on pooled connections 64ms
+@qelvora/backend:test:    × PostgreSQL foundation using the real non-owner role > T-11 checks 10,000 random pairs against 1,000 real scoped threads 300012ms
+@qelvora/backend:test:      → Test timed out in 300000ms.
+@qelvora/backend:test: If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+@qelvora/backend:test:    ✓ PostgreSQL foundation using the real non-owner role > T-03/T-23 interrupt delivered text before the takeover boundary and reject stale generation frames  323ms
+@qelvora/backend:test:    ✓ PostgreSQL foundation using the real non-owner role > T-04/T-30 commits announced handback before new AI text and resumes with no duplicates 184ms
+@qelvora/backend:test:    ✓ PostgreSQL foundation using the real non-owner role > T-18/T-24 serializes simultaneous retries and last-unit allowance races 181ms
+@qelvora/backend:test:    ✓ PostgreSQL foundation using the real non-owner role > T-27 refuses stale extraction and never rebuilds a deleted fact 147ms
+@qelvora/backend:test:    ✓ PostgreSQL foundation using the real non-owner role > T-34 refuses team and stolen-session named acts; real user-verified signatures bind exact content once  476ms
+@qelvora/backend:test:    ✓ PostgreSQL foundation using the real non-owner role > T-28 stores verified duplicate inbox events once and reconciles current state 17ms
+@qelvora/backend:test:    ✓ PostgreSQL foundation using the real non-owner role > commits outbox frames with state and retries publication in aggregate order after a crash 89ms
+@qelvora/backend:test:  ✓ tests/contracts.test.ts (9 tests) 445ms
+@qelvora/backend:test:
+@qelvora/backend:test: ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+@qelvora/backend:test:
+@qelvora/backend:test:  FAIL  tests/postgres.integration.test.ts > PostgreSQL foundation using the real non-owner role > T-11 checks 10,000 random pairs against 1,000 real scoped threads
+@qelvora/backend:test: Error: Test timed out in 300000ms.
+@qelvora/backend:test: If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+@qelvora/backend:test:  ❯ tests/postgres.integration.test.ts:203:5
+@qelvora/backend:test:     201|       ).rejects.toMatchObject({ code: "unsafe_database_role" });
+@qelvora/backend:test:     202|     });
+@qelvora/backend:test:     203|     it("T-11 checks 10,000 random pairs against 1,000 real scoped thre…
+@qelvora/backend:test:        |     ^
+@qelvora/backend:test:     204|       instrumentContext = true;
+@qelvora/backend:test:     205|       try {
+@qelvora/backend:test:
+@qelvora/backend:test: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+@qelvora/backend:test:
+@qelvora/backend:test:
+@qelvora/backend:test:  Test Files  1 failed | 1 passed (2)
+@qelvora/backend:test:       Tests  1 failed | 17 passed (18)
+@qelvora/backend:test:    Start at  02:35:35
+@qelvora/backend:test:    Duration  309.98s (transform 758ms, setup 0ms, collect 3.18s, tests 304.99s, environment 1ms, prepare 554ms)
+@qelvora/backend:test:
+@qelvora/backend:test: [ELIFECYCLE] Test failed. See above for more details.
+@qelvora/backend#test:  ERROR  command (/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/backend) /Users/yingpengwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback/pnpm run test exited (1)
+
+ Tasks:    5 successful, 6 total
+Cached:    2 cached, 6 total
+  Time:    5m20.385s
+Failed:    @qelvora/backend#test
+
+ WARNING  no output files found for task @qelvora/api#build. Please check your `outputs` key in `turbo.json`
+ WARNING  no output files found for task @qelvora/copy#build. Please check your `outputs` key in `turbo.json`
+ ERROR  run failed: command  exited (1)
+[ELIFECYCLE] Test failed. See above for more details.
+[ELIFECYCLE] Command failed with exit code 1.

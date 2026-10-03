@@ -112,7 +112,16 @@ private struct W3ThreadScreen: View {
             .alert("Source unavailable", isPresented: Binding(get: { !sourceFailure.isEmpty }, set: { if !$0 { sourceFailure = "" } })) { SwiftUI.Button("Close") { sourceFailure = "" } } message: { Text(sourceFailure) }
     }
     @ViewBuilder private func row(_ message: W3Message, page: W3Page) -> some View {
-        if message.authorKind == .system { SystemLine(children: message.text) }
+        if message.authorKind == .system {
+            if let destination = message.publicAnswerDestination(creatorId: page.creatorId) {
+                SwiftUI.Button { session.open(destination) } label: {
+                    SystemLine(children: message.text).frame(minHeight: 48).contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(model.offline || scenePhase != .active)
+                .accessibilityLabel("System update: Answered publicly. Open answer")
+            } else { SystemLine(children: message.text) }
+        }
         else if message.recording != nil { recordingRow(message, page: page) }
         else if let correction = message.correction, let original = (model.older + page.messages).first(where: { $0.id == correction.originalMessageId && $0.version == correction.originalVersion && $0.authorKind == .ai }) {
             Correction(aiText: original.text, children: message.text, name: page.creatorName, onVerify: { if let act = message.signedActId { session.open("/verify/" + act) } })
@@ -279,18 +288,21 @@ private struct W3AccountScreen: View {
     let baseURL: URL; @ObservedObject var session: FanSession
     @State private var account: W3Account?; @State private var failure = ""
     @State private var cursor: String?; @State private var loading = false
+    @State private var revision = 0
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var scheme
     var body: some View {
         ScrollView { VStack(alignment: .leading, spacing: 28) {
             Text("You").qText("title")
             if !failure.isEmpty { Notice(tone: .error, title: "Account unavailable", children: failure) }
             Text(account.map { "@" + $0.fan.handle } ?? "Your account").qText("display-md")
-            Text(account?.fan.intro ?? "Your intro is private until you choose to share it.").qText("body")
+            Text(account.map { $0.fan.intro ?? "You haven’t added an intro yet." } ?? (failure.isEmpty ? "Loading your account…" : "Your intro is unavailable.")).qText("body")
             Button("Handle and intro", variant: .quiet) { session.open("/identity/account") }
             Button("Memberships and requests", variant: .secondary, block: true) { session.open("/commerce/requests") }
             Button("Spend and time", variant: .quiet, block: true) { session.open("/commerce/spending") }
             Button("Notifications", variant: .quiet, block: true) { session.open("/notifications/settings") }
             Text("Me and privacy").qText("display-md")
+            Text(QelvoraCopy.text("conversationAccess")).qText("caption")
             Text("Memory and conversation access by creator").qText("body")
             if let account, account.threads.isEmpty { Text("No conversations yet.").qText("body") }
             ForEach(account?.threads ?? []) { thread in Button(thread.name, variant: .quiet, block: true) { session.open("/threads/" + thread.creatorId + "/" + thread.fanId) } }
@@ -301,11 +313,29 @@ private struct W3AccountScreen: View {
             Button("Export or delete my data", variant: .secondary, block: true) { session.open("/support/privacy") }
             Button("Help and safety", variant: .quiet) { session.open("/support") }
         }.padding(16) }.frame(maxWidth: 390).background(qColor("ground",scheme)).foregroundStyle(qColor("ink",scheme))
-            .task(id: session.session?.accountId) { await refresh() }.refreshable { await refresh() }
+            .task(id: "\(accountId)-\(scenePhase)") {
+                if scenePhase == .active { await refresh(before: cursor) }
+                else { conceal() }
+            }
+            .onChange(of: scenePhase) { _, phase in if phase != .active { conceal() } }
+            .onDisappear { conceal() }
+            .refreshable { await refresh() }
+    }
+    private func conceal() {
+        revision += 1; account = nil; loading = false
     }
     private func refresh(before: String? = nil) async {
-        guard !loading else { return }; loading = true; cursor = before; defer { loading = false }
-        do { let fresh: W3Account = try await W3ConversationClient(baseURL:baseURL, expectedAccountId: accountId).request("account" + (before.map { "?cursor=" + $0 } ?? "")); guard !Task.isCancelled else { return }; account = fresh; cursor = before; failure = "" }
-        catch { if !Task.isCancelled { if let denial = error as? W3Failure, [401,403,404].contains(denial.status) { account = nil }; failure = (error as? W3Failure)?.message ?? "Reconnect to open You." } }
+        conceal()
+        guard scenePhase == .active else { return }
+        let currentRevision = revision
+        loading = true; cursor = before; failure = ""
+        defer { if revision == currentRevision { loading = false } }
+        do {
+            let fresh: W3Account = try await W3ConversationClient(baseURL:baseURL, expectedAccountId: accountId).request("account" + (before.map { "?cursor=" + $0 } ?? ""))
+            guard !Task.isCancelled, revision == currentRevision, scenePhase == .active, session.session?.accountId == accountId else { return }
+            account = fresh; cursor = before
+        } catch {
+            if !Task.isCancelled, revision == currentRevision, scenePhase == .active { failure = (error as? W3Failure)?.message ?? "Reconnect to open You." }
+        }
     }
 }
