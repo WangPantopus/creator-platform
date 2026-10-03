@@ -9,6 +9,7 @@ import {
   useTrust,
   useTrustSession,
   trustApi,
+  retryTrustReads,
   dateLabel,
 } from "../../ops/trust-client";
 
@@ -230,7 +231,7 @@ export default function PrivacyPage() {
           Google Play subscriptions
         </a>
       </nav>
-      <TrustSession />
+      <TrustSession capabilityError={capability.error} />
       {capability.data?.verificationMethod === "current_session" && (
         <p>
           <a href="/api/auth/continue?returnTo=%2Fsupport%2Fprivacy">
@@ -239,11 +240,11 @@ export default function PrivacyPage() {
           before requesting or downloading your data.
         </p>
       )}
-      <ErrorState error={error} retry={() => void refresh()} />
       <ErrorState
-        error={capability.error}
-        retry={() => void capability.refresh()}
+        error={error?.code === capability.error?.code ? null : error}
+        retry={retryTrustReads}
       />
+      <ErrorState error={capability.error} retry={retryTrustReads} />
       {capability.loading && (
         <p className="qv-help" role="status">
           Loading…
