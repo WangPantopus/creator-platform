@@ -1,5 +1,56 @@
 # W6 browser recording signature lifetime — October 3, 2026 UTC
 
+## Current original-session consumer integration — 13:22 UTC
+
+W6 personally read W1's exact original69 and focused producer
+`489d93eef10f29e9f50fa6c7d1f74a975c2bb791` before normally consuming it.
+The common W6 consumer67544 is reused at `d122d358`, adding actual sessionId to
+MediaSession/mediaRequest and the complete original upload sequence, validating
+optional expected-session header/query against the genuine same-cookie W1
+session and forwarding the original account/session to the actual core guard.
+Source `ccb69be359393cf319800b8ab83e41f084067c1c` explicitly retains that original
+session on signing-command/sign and every W1 begin/verify/cancel request.
+No new account equality alias or reconstructed credential supplies authority.
+
+Normal main integration and the original shared producer produce exact source
+`c1940e6b0b51d6c65be6b19210f209221041fb7b`, including captured current main
+`b4d3099a489f2fda72c2138ca8e0a5d3c3a0b1b2`. W8's0225 entry is reserved_unapplied,
+not SQL/grants or an accepted catalogue. Scoped backend/web types, lint, format,
+diff and unchanged generation12/115 pass. Fresh normal sequential backend/web
+shipping builds pass13:22:18.746→13:22:29.813Z; the canonical heavy wrapper exits0
+and releases normally before W7's next actual13:22:38.368Z lease. Backend/web
+build-log SHA256s:
+`22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5`,
+`a9c4a4d7c067fb0669e4a99ea0dc5f10036c5c6ff25fb4a69a8c4e19f3ff5dec`.
+Backend bundle SHA256 remains
+`f1b73ce1ff7c354bb9e7b6dbe55a37524d193ae8d03d11cdb304fabfa8847a1d`.
+W7 read the complete five-file media delta without a narrow source blocker;
+that source review does not supply a signer-family positive.
+
+The unchanged common producer/consumer bytes were really composed and personally
+operated on the [separate f0 offer runtime](../../browser-call-view-lifetime/2026-10-03/README.md):
+old-view same-account409/concealment, new backend/platform original-session409,
+real product Account refresh/sign-out, account switch and warm/cold recovery.
+Those actual refusals do not reach SignRecording. No c194 runtime/device was
+started and the changed signer remains genuinely unreached with no ready human
+recording. Earlier signing/Voice entry observations below retain their exact
+source. The earlier browser known-denial failure was independently repaired and
+operated by narrow merged291; that is not human capture or signing acceptance.
+
+W2 has since actually observed source draft loss on same-session Studio
+navigation with the shared489 boundary. W1 is exposing genuine session-end
+observation separately from local view cancellation; focused296 and this composed
+consumer remain held for that correction and actual qualification. W6 will reuse
+the real producer contract, not invent its own emitter. Original signed-act
+retry, passkey/expiry/revocation, W3 human_reply association, original task/
+factory/cleanup/LAST/COMMIT/C10/publication and real fan playback remain open.
+At the13:11UTC capture,282/284/289 heads each have ten queued checks, not passes. All
+three active W6 branches and shared main include b4; exact user workbook custody
+is preserved, private/historical/peer/stash refs untouched. Own services/PG/
+browser/native resources remain closed. No new tests or activation;289 stays draft.
+
+## Earlier original signature implementation and operation
+
 Personally implemented on fresh owned `codex/w6-recording-signature-lifetime-20261003` from main72d0a557, normally incorporating current main10f6cfc88a1dbae369ff1b80720c4e115c14c81d. Source7d803df91f646930a91efbd3f67313a470179049 replaces the media component's raw identity fetch with the actual W1 request/session/account boundary and original passkey cancellation signal. Source716443c7a209413546f201ec41beebf451fc31fe also aborts pre-submission challenge cleanup when its host disables signing. Sourced5db3d774e785b4b60079c001ed1da8555ac1f90 disposes the exact inner review when W1 issues a different signal, even for equal account/session IDs; a fresh review never adopts an earlier signed-act retry.
 
 The actual backend producer was read before editing: `media/service.ts` signingCommand/command/sign, actual W3 human_active recording association, W1 begin/verify/cancel and their typed schemas. The original returned command must match all six processed recording fields, and a human_reply must retain the actual thread subject. Typed challenge/signature/asset/command parsing and view checks bookend every awaited request, JSON read and passkey result. The same creator/fan/asset/version/hash/count/MIME/duration/expiry and original account/session/signal remain bound. No Actor, worker interactive scope, publication authority or replacement credential is constructed.
