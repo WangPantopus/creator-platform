@@ -1,5 +1,7 @@
 # W7 Mac Studio continuation handoff — 2026-10-01
 
+**Current authority, October 3:** Read the [current continuation](W7-2026-10-02-next.md) first. PR31 is a draft and W7 remains incomplete. Source review covers all100 production paths; latest shipping qualification and full combined review remain open. Older “current,” ready-PR, missing-SDK, resource and producer statements below are dated history. In particular, source483 actually exposed “Sections” for every Discover category; source35da is an unoperated repair. Preserve the historical failures and every original acceptance row.
+
 **User-authorized cleanup, 2026-10-02:** W7-only native caches/old APKs and disposable restore/qualification databases removed; canonical data/private inputs/devices/evidence preserved. Clean checkout removal follows this final push; recreate from the remote W7 branch if absent. [Current cleanup and continuation](W7-2026-10-02-next.md). PR31 remains ready/open/unmerged; W7 incomplete.
 
 **Human-requested handoff, 2026-10-02:** Published sourcec970; own resources physically closed, newer-main review boundary and all unfinished original acceptance recorded in the [current transfer](W7-2026-10-02-next.md). Routine verification artifacts stay local. PR31 remains ready/open/unmerged; exact-current-head gates remain required.

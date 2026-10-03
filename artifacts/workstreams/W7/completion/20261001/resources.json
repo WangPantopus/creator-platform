@@ -849,19 +849,20 @@
       "evidence": "Routine screenshots/hash/log/diagnostic evidence remains private under successor scratch."
     },
     "prReview20261003": {
-      "source": "4bf9d17abc1dc7274b6c0775499d0296e4fcdb4b",
-      "reviewedMain": "41471fd24fe43dd41d6114e67ba00ba1a6a0783b",
-      "integration": "c2115634cd5e5ce032112a2ebb5d5366e45820f5",
-      "sourcePathsPersonallyReadAtCheckpoint": 49,
-      "sourcePathsTotal": 99,
+      "source": "35da106bfcc138899d9e36b6be75d85ec7c2fffa",
+      "reviewedMain": "6a9f10a850fb4769c667f89a6304505dd6a04728",
+      "integration": "3ead5472953f875b83b6ccad370cac3c82b2c97b",
+      "sourcePathsPersonallyReadAtCheckpoint": 100,
+      "sourcePathsTotal": 100,
       "fullCombinedReviewComplete": false,
       "pr31": "open draft/unmerged",
       "existingWorkspace": "pass;9 backend contracts/9 PostgreSQL cases skipped",
       "existingVisual": "13pass/2.8min unchanged references; own test servers closed",
-      "native": "c211 Swift18/signed iOS/strict signature/Android47 pass; identical native source4bf; current operation pending",
-      "ownerInventory": "46initial;34openat08:11UTC after12W3 and206 CLOSED-unmerged consolidation plus newW5 documentation283; all7published owner dispositions personally read",
+      "native": "c211 Swift18/signed iOS/strict signature/Android47 pass;35da shared Segmented repair not yet built or operated; last actual shipping operation483",
+      "ownerInventory": "46initial;13closed-unmerged;283/285documentation-only merged08:42UTC; later284distinct owner increment; all7published dispositions and main five-file documentation delta personally read",
       "authority": "no new SQL; original0044\u20130060 ceiling/unanswered17-entry packet/genuine inputs remain absent",
-      "originalAcceptance": "all original unfinished rows and historical failures preserved; W7 incomplete"
+      "originalAcceptance": "all original unfinished rows and historical failures preserved; W7 incomplete",
+      "latestExactHeadCI": "35da all5 Foundation plus Trust queued; later pushed head requires its own exact jobs"
     }
   },
   "previousTransfer": {
