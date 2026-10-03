@@ -74,6 +74,9 @@ export function useGrowthPublicSession(context: string) {
       const headers = new Headers(init.headers);
       headers.set("Content-Type", "application/json");
       headers.set("X-Expected-Account-Id", before.accountId);
+      // A replacement cookie for the same account must not authorize this
+      // original public-page action. Ordinary token rotation keeps this ID.
+      headers.set("X-Expected-Session-Id", before.sessionId);
       const response = await fetch(`/api/growth/${path}`, {
         ...init,
         headers,
