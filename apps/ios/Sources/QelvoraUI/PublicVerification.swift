@@ -105,6 +105,8 @@ private struct PublicVerificationScreen: View {
         configuration.urlCache = nil
         configuration.httpCookieStorage = nil
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        configuration.timeoutIntervalForRequest = 30
+        configuration.timeoutIntervalForResource = 30
         let transport = URLSession(configuration: configuration)
         defer { transport.invalidateAndCancel() }
         do {
