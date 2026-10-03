@@ -7,96 +7,86 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.*
 import com.pantopus.qelvora.generated.*
+import com.pantopus.qelvora.identity.FanSession
+import com.pantopus.qelvora.identity.FanSessionRequestCapture
+import com.pantopus.qelvora.ui.Button
+import com.pantopus.qelvora.ui.ButtonVariant
 import com.pantopus.qelvora.ui.VoiceNote
 import com.pantopus.qelvora.ui.qColor
 import com.pantopus.qelvora.ui.qText
 import kotlinx.coroutines.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
-import java.net.HttpURLConnection
 import java.net.URI
-import java.net.URL
 import java.security.MessageDigest
 import java.time.Instant
 import java.util.UUID
 
 @Serializable data class ConversationRecording(val state: String, val asset: APIMediaMediaAsset? = null)
-@Serializable private data class RecordingTicket(val asset: APIMediaMediaAsset, val url: String, val expiresAt: String, val playbackFile: APIMediaPlaybackFile)
-private data class LoadedRecording(val bytes: ByteArray, val proof: APIMediaPlaybackFile)
+private data class LoadedRecording(val bytes: ByteArray, val proof: APIMediaPlaybackFile, val checkedAt: Long)
 
-/** Credentials stay in W1's store. Audio is bounded and checked in memory; redirects and disk caching are disabled. */
-private class RecordingClient(private val base: URL, private val accountId: String, creatorId: String, fanId: String, private val token: () -> String?) {
-    private val json = Json { ignoreUnknownKeys = true }
-    private val family = "/v1/w6/threads/$creatorId/$fanId/media"
-    init {
-        UUID.fromString(accountId); UUID.fromString(creatorId); UUID.fromString(fanId)
-        require(base.userInfo == null && (base.protocol == "https" || (base.protocol == "http" && base.host in listOf("localhost", "127.0.0.1", "10.0.2.2"))))
-    }
-    private suspend fun bytes(path: String, limit: Int, post: Boolean = false, proof: APIMediaPlaybackFile? = null): ByteArray = withContext(Dispatchers.IO) {
-        val credential = token() ?: throw ConversationFailure(401, "Your session ended. Reopen the conversation.")
-        val url = URI(base.toString()).resolve(path).toURL()
-        require(url.protocol == base.protocol && url.host == base.host && url.port == base.port && url.userInfo == null)
-        val connection = url.openConnection() as HttpURLConnection
-        connection.instanceFollowRedirects = false; connection.useCaches = false
-        connection.connectTimeout = 15_000; connection.readTimeout = 15_000
-        connection.requestMethod = if (post) "POST" else "GET"
-        connection.setRequestProperty("Authorization", "Bearer $credential")
-        connection.setRequestProperty("X-Qelvora-Expected-Account", accountId)
-        try {
-            if (post) {
-                connection.setRequestProperty("Content-Type", "application/json"); connection.doOutput = true
-                connection.setFixedLengthStreamingMode(2); connection.outputStream.use { it.write("{}".toByteArray()) }
-            }
-            if (connection.responseCode != 200) throw ConversationFailure(connection.responseCode, "Audio access could not be confirmed. Try again.")
-            if (proof != null && connection.contentLengthLong != proof.bytes) throw ConversationFailure(503, "This recording changed. Refresh to try again.")
-            val output = java.io.ByteArrayOutputStream()
-            val hash = proof?.let { MessageDigest.getInstance("SHA-256") }
-            connection.inputStream.use { input ->
-                val chunk = ByteArray(8192)
-                while (true) {
-                    coroutineContext.ensureActive()
-                    val count = input.read(chunk); if (count < 0) break
-                    if (count > limit - output.size()) throw ConversationFailure(503, "The recording could not be confirmed.")
-                    output.write(chunk, 0, count); hash?.update(chunk, 0, count)
-                }
-            }
-            coroutineContext.ensureActive()
-            if (token() != credential) throw ConversationFailure(401, "Your account changed. Reopen the conversation.")
-            if (proof != null && (output.size().toLong() != proof.bytes || hash!!.digest().joinToString("") { "%02x".format(it.toInt() and 255) } != proof.sha256)) throw ConversationFailure(503, "The recording could not be confirmed.")
-            output.toByteArray()
-        } finally { connection.disconnect() }
+/** Every request retains the same actual W1 capture and immutable typed client. */
+private class RecordingClient(private val base: URI, private val capture: FanSessionRequestCapture, private val creatorId: String, private val fanId: String) {
+    suspend fun isCurrent(): Boolean = withContext(Dispatchers.Main.immediate) { capture.isCurrent() }
+    private suspend fun requireCurrent() { currentCoroutineContext().ensureActive(); check(isCurrent()) }
+    private fun text(asset: APIMediaMediaAsset, key: String): String? = (asset.provenance?.get(key) as? JsonPrimitive)?.takeIf { it.isString }?.content
+    private fun number(asset: APIMediaMediaAsset, key: String): Double? = (asset.provenance?.get(key) as? JsonPrimitive)?.takeIf { !it.isString }?.doubleOrNull?.takeIf { it.isFinite() }
+    private fun uuid(value: String?): Boolean = value != null && runCatching { UUID.fromString(value).toString() == value }.getOrDefault(false)
+    private fun qualified(asset: APIMediaMediaAsset): Boolean {
+        // This is the original creator signer, not the viewing fan account.
+        val verified = (asset.provenance?.get("c2paVerified") as? JsonPrimitive)?.takeIf { !it.isString }?.booleanOrNull == true
+        return asset.state == APIMediaMediaAssetState.READY && asset.purpose == APIMediaMediaAssetPurpose.HUMAN_REPLY &&
+            asset.mimeType == "audio/mp4" && asset.bytes in 1L..268_435_456L && (asset.durationMs ?: 0) in 1L..3_600_000L &&
+            uuid(asset.signedActId) && uuid(text(asset, "accountId")) && verified && number(asset, "schemaVersion") == 1.0 &&
+            text(asset, "kind") == "human_recording" && text(asset, "creatorId") == creatorId && text(asset, "fanId") == fanId &&
+            text(asset, "threadId") == asset.threadId && text(asset, "purpose") == "human_reply" &&
+            text(asset, "signedActId") == asset.signedActId && text(asset, "assetId") == asset.id &&
+            number(asset, "assetVersion") == asset.version.toDouble() && text(asset, "processedMediaSha256") == asset.sha256 &&
+            number(asset, "processedMediaBytes") == asset.bytes.toDouble() && text(asset, "processedMediaMimeType") == asset.mimeType &&
+            number(asset, "processedMediaDurationMs") == asset.durationMs?.toDouble() && text(asset, "transform") == "aac_m4a"
     }
     private fun matches(current: APIMediaMediaAsset, asset: APIMediaMediaAsset): Boolean =
-        current.id == asset.id && current.threadId == asset.threadId && current.state == APIMediaMediaAssetState.READY &&
-        current.purpose == APIMediaMediaAssetPurpose.HUMAN_REPLY && current.version == asset.version &&
-        current.sha256 == asset.sha256 && current.bytes == asset.bytes && current.mimeType == "audio/mp4" &&
-        current.durationMs == asset.durationMs && current.signedActId != null && current.signedActId == asset.signedActId
-    private fun matchesFile(asset: APIMediaMediaAsset, proof: APIMediaPlaybackFile): Boolean {
-        val provenance = asset.provenance
-        return if (proof.variant == APIMediaPlaybackFileVariant.CREDENTIALED)
-            provenance?.get("c2paVerified")?.jsonPrimitive?.booleanOrNull == true &&
-            provenance?.get("fileVariant")?.jsonPrimitive?.contentOrNull == "credentialed" &&
-            provenance?.get("fileSha256")?.jsonPrimitive?.contentOrNull == proof.sha256 &&
-            provenance?.get("fileBytes")?.jsonPrimitive?.longOrNull == proof.bytes
-        else provenance?.get("c2paVerified")?.jsonPrimitive?.booleanOrNull != true && proof.sha256 == asset.sha256 && proof.bytes == asset.bytes
+        qualified(current) && qualified(asset) && current.id == asset.id && current.threadId == asset.threadId &&
+        current.version == asset.version && current.sha256 == asset.sha256 && current.bytes == asset.bytes &&
+        current.durationMs == asset.durationMs && current.signedActId == asset.signedActId && text(current, "accountId") == text(asset, "accountId")
+    private fun matchesFile(asset: APIMediaMediaAsset, proof: APIMediaPlaybackFile): Boolean =
+        qualified(asset) && proof.variant == APIMediaPlaybackFileVariant.CREDENTIALED && proof.bytes in 1L..268_435_456L &&
+        proof.sha256.matches(Regex("^[a-f0-9]{64}$")) && text(asset, "fileVariant") == "credentialed" &&
+        text(asset, "fileSha256") == proof.sha256 && number(asset, "fileBytes") == proof.bytes.toDouble()
+    suspend fun assertCurrent(asset: APIMediaMediaAsset, proof: APIMediaPlaybackFile): Long {
+        val started = android.os.SystemClock.elapsedRealtime()
+        requireCurrent()
+        val current = capture.client.readThreadMedia(creatorId, fanId, asset.id, capture.expectedAccountId)
+        requireCurrent()
+        check(matches(current, asset) && matchesFile(current, proof) && matchesFile(asset, proof) && android.os.SystemClock.elapsedRealtime() - started < 5000)
+        return started
     }
-    suspend fun assertCurrent(asset: APIMediaMediaAsset, proof: APIMediaPlaybackFile) {
-        val current = json.decodeFromString<APIMediaMediaAsset>(bytes("$family/${asset.id}", 1_000_000).toString(Charsets.UTF_8))
-        if (!matches(current, asset) || !matchesFile(current, proof)) throw ConversationFailure(403, "This recording is no longer available.")
-    }
-    suspend fun audio(asset: APIMediaMediaAsset): LoadedRecording {
-        UUID.fromString(asset.id)
-        val ticket = json.decodeFromString<RecordingTicket>(bytes("$family/${asset.id}/playback", 1_000_000, post = true).toString(Charsets.UTF_8))
-        val proof = ticket.playbackFile
-        val url = URI(ticket.url)
-        val path = "$family/${asset.id}/play"
-        require(matches(ticket.asset, asset) && matchesFile(ticket.asset, proof) && proof.bytes in 1..268_435_456 && Regex("^[a-f0-9]{64}$").matches(proof.sha256))
-        require(Instant.parse(ticket.expiresAt).isAfter(Instant.now()) && url.isAbsolute && url.userInfo == null && url.fragment == null && url.path == path)
+    suspend fun audio(asset: APIMediaMediaAsset): LoadedRecording = withContext(Dispatchers.IO) {
+        require(uuid(asset.id) && qualified(asset)); requireCurrent()
+        val ticket = capture.client.threadMediaPlayback(creatorId, fanId, asset.id, capture.expectedAccountId)
+        requireCurrent()
+        val proof = ticket.playbackFile; val url = URI(ticket.url)
+        val path = "/v1/w6/threads/$creatorId/$fanId/media/${asset.id}/play"
+        require(matches(ticket.asset, asset) && matchesFile(ticket.asset, proof) && matchesFile(asset, proof))
+        require(Instant.parse(ticket.expiresAt).isAfter(Instant.now()) && url.scheme == base.scheme && url.host == base.host && url.port == base.port && url.userInfo == null && url.fragment == null && url.rawPath == path)
         require(url.rawQuery != null && Regex("^ticket=[A-Za-z0-9_.-]+$").matches(url.rawQuery))
-        // The ticket never selects a host: only this fixed path/query goes to the configured authenticated base.
-        val audio = bytes(path + "?" + url.rawQuery, proof.bytes.toInt(), proof = proof)
-        try { assertCurrent(asset, proof) } catch (error: Exception) { audio.fill(0); throw error }
-        return LoadedRecording(audio, proof)
+        val token = url.rawQuery.substring(7)
+        val bytes = ByteArray(proof.bytes.toInt()); val hash = MessageDigest.getInstance("SHA-256")
+        try {
+            var offset = 0
+            while (offset < bytes.size) {
+                requireCurrent()
+                val end = minOf(offset + 1_048_576, bytes.size)
+                val result = capture.client.playThreadMedia(creatorId, fanId, asset.id, token, "bytes=$offset-${end-1}", capture.expectedAccountId)
+                try {
+                    requireCurrent()
+                    check(result.status == 206 && result.contentRange == "bytes $offset-${end-1}/${proof.bytes}" && result.body.size == end - offset)
+                    result.body.copyInto(bytes, offset); hash.update(result.body); offset = end
+                } finally { result.body.fill(0) }
+            }
+            check(hash.digest().joinToString("") { "%02x".format(it.toInt() and 255) } == proof.sha256)
+            LoadedRecording(bytes, proof, assertCurrent(asset, proof))
+        } catch (failure: Throwable) { bytes.fill(0); throw failure }
     }
 }
 
@@ -114,9 +104,9 @@ private class RecordingDataSource(private var bytes: ByteArray?) : MediaDataSour
 }
 
 @Composable
-internal fun ConversationRecordingPlayer(baseURL: String, accountId: String, creatorId: String, fanId: String, asset: APIMediaMediaAsset, name: String, time: String, active: Boolean, token: () -> String?, onVerify: () -> Unit) {
+internal fun ConversationRecordingPlayer(baseURL: String, session: FanSession, destination: String, accountId: String, creatorId: String, fanId: String, asset: APIMediaMediaAsset, name: String, time: String, active: Boolean, onVerify: () -> Unit) {
     val key = "$baseURL/$accountId/$creatorId/$fanId/${asset.id}/${asset.version}/${asset.sha256}"
-    val client = remember(key) { RecordingClient(URL(baseURL), accountId, creatorId, fanId, token) }
+    var client by remember(key, session, destination) { mutableStateOf<RecordingClient?>(null) }
     val scope = rememberCoroutineScope()
     var player by remember(key) { mutableStateOf<MediaPlayer?>(null) }
     var source by remember(key) { mutableStateOf<RecordingDataSource?>(null) }
@@ -128,61 +118,115 @@ internal fun ConversationRecordingPlayer(baseURL: String, accountId: String, cre
     var failure by remember(key) { mutableStateOf("") }
     var load by remember(key) { mutableStateOf<Job?>(null) }
     var revision by remember(key) { mutableStateOf(0L) }
+    var checkedAt by remember(key) { mutableLongStateOf(0L) }
     val currentActive by rememberUpdatedState(active)
-    fun clear() {
-        revision += 1
-        load?.cancel(); load = null
+    fun fresh() = android.os.SystemClock.elapsedRealtime() - checkedAt < 5000
+    fun discardBytes() {
         player?.release(); player = null; source?.close(); source = null; proof = null
-        loading = false; prepared = false; playing = false; position = 0
+        prepared = false; playing = false; position = 0; checkedAt = 0
     }
-    DisposableEffect(key) { onDispose { clear() } }
-    LaunchedEffect(active, key) {
+    fun clear() { revision += 1; load?.cancel(); load = null; loading = false; discardBytes(); client = null }
+    DisposableEffect(key, session, destination) { onDispose { clear() } }
+    LaunchedEffect(active, key, session, destination) {
         if (!active) { clear(); return@LaunchedEffect }
         while (isActive) {
-            delay(1000)
-            val current = player; val file = proof
-            val attempt = revision
-            if (current != null && file != null) try {
-                client.assertCurrent(asset, file)
-                ensureActive(); if (revision == attempt && prepared && player === current) { position = current.currentPosition.toLong(); playing = current.isPlaying }
+            val api = client; val current = player; val file = proof; val attempt = revision
+            if (api != null && current != null && file != null && prepared) try {
+                val started = api.assertCurrent(asset, file)
+                ensureActive()
+                if (currentActive && revision == attempt && player === current && client === api) checkedAt = started
             } catch (error: Exception) {
                 if (error is CancellationException) throw error
-                if (revision == attempt && player === current) { clear(); failure = "This recording is unavailable. Reopen the conversation to try again." }
+                if (revision == attempt && player === current && client === api) { clear(); failure = "This recording is unavailable. Reopen the conversation to try again." }
             }
+            delay(1000)
+        }
+    }
+    LaunchedEffect(active, key, session, destination) {
+        if (!active) return@LaunchedEffect
+        while (isActive) {
+            val api = client
+            if (api != null && !api.isCurrent() && client === api) { clear(); failure = "Your session changed. Load this recording again." }
+            if (player != null && !fresh()) { clear(); failure = "This recording is unavailable. Reopen the conversation to try again." }
+            if (prepared) player?.let { current -> runCatching { position = current.currentPosition.toLong().coerceIn(0L, asset.durationMs ?: 0); playing = current.isPlaying }.onFailure { clear(); failure = "Playback could not continue. Try again." } }
+            delay(500)
+        }
+    }
+    fun command(seek: Long? = null) {
+        if (!currentActive || loading || load != null) return
+        var attempt = revision; loading = true; failure = ""
+        load = scope.launch {
+            var pendingBytes: ByteArray? = null
+            try {
+                if (client?.isCurrent() != true) {
+                    discardBytes(); client = null; revision += 1; attempt = revision
+                    val capture = session.captureRequest(destination, maximumResponseBytes = 1_048_576, timeoutMs = 4000) ?: error("Your session ended.")
+                    check(capture.expectedAccountId == accountId); ensureActive()
+                    if (!currentActive || revision != attempt) return@launch
+                    client = RecordingClient(URI(baseURL), capture, creatorId, fanId)
+                }
+                val api = client ?: error("Your session ended.")
+                val current = player; val file = proof
+                if (current != null && file != null && prepared) {
+                    val started = api.assertCurrent(asset, file)
+                    ensureActive()
+                    if (!currentActive || revision != attempt || client !== api || player !== current) return@launch
+                    check(api.isCurrent() && android.os.SystemClock.elapsedRealtime() - started < 5000)
+                    if (seek != null) {
+                        val end = minOf(current.duration.toLong(), asset.durationMs ?: 0); check(end > 0)
+                        current.seekTo((current.currentPosition.toLong() + seek).coerceIn(0L, end).toInt())
+                    } else if (current.isPlaying) current.pause() else current.start()
+                    checkedAt = started; position = current.currentPosition.toLong(); playing = current.isPlaying
+                    return@launch
+                }
+                if (seek != null) return@launch
+                val audio = api.audio(asset); pendingBytes = audio.bytes; ensureActive()
+                if (!currentActive || revision != attempt || client !== api) return@launch
+                check(api.isCurrent() && android.os.SystemClock.elapsedRealtime() - audio.checkedAt < 5000)
+                val data = RecordingDataSource(audio.bytes); source = data; pendingBytes = null; proof = audio.proof; checkedAt = audio.checkedAt
+                val next = MediaPlayer(); player = next
+                next.setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_SPEECH).build())
+                next.setDataSource(data)
+                next.setOnPreparedListener {
+                    scope.launch {
+                        val currentCapture = api.isCurrent()
+                        if (revision == attempt && player === next && client === api) {
+                            if (currentCapture && currentActive && fresh()) {
+                                runCatching { check(next.duration > 0); prepared = true; next.start(); playing = true; loading = false }.onFailure { clear(); failure = "Playback could not start. Try again." }
+                            } else clear()
+                        } else runCatching { next.release() }
+                    }
+                }
+                next.setOnCompletionListener {
+                    scope.launch {
+                        val currentCapture = api.isCurrent()
+                        if (revision == attempt && player === next && client === api) {
+                            if (currentCapture && currentActive && fresh()) { playing = false; position = asset.durationMs ?: 0 } else clear()
+                        }
+                    }
+                }
+                next.setOnErrorListener { _, _, _ ->
+                    scope.launch {
+                        val currentCapture = api.isCurrent()
+                        if (revision == attempt && player === next && client === api) { clear(); failure = if (currentCapture && currentActive) "Playback could not start. Try again." else "Your session changed. Load this recording again." }
+                    }; true
+                }
+                next.prepareAsync()
+            } catch (error: Exception) {
+                if (error is CancellationException) throw error
+                if (revision == attempt) { clear(); failure = "Audio access could not be confirmed. Try again." }
+            } finally { pendingBytes?.fill(0); if (revision == attempt) { load = null; if (player == null || prepared) loading = false } }
         }
     }
     fun elapsed(milliseconds: Long): String { val seconds = maxOf(0, milliseconds / 1000); return "${seconds / 60}:${(seconds % 60).toString().padStart(2, '0')}" }
     Column {
         VoiceNote(name = name, time = time, duration = elapsed(asset.durationMs ?: 0), playing = playing, playbackAvailable = active && !loading,
-            waveform = asset.waveform, position = position.toDouble() / maxOf(1L, asset.durationMs ?: 0), onVerify = onVerify, onPlayPause = {
-                if (currentActive) {
-                    val current = player
-                    if (current != null) { if (current.isPlaying) current.pause() else current.start(); playing = current.isPlaying }
-                    else if (load == null) {
-                        val attempt = revision
-                        load = scope.launch {
-                        loading = true; failure = ""
-                        var pendingBytes: ByteArray? = null
-                        try {
-                            val audio = client.audio(asset); pendingBytes = audio.bytes; ensureActive()
-                            if (!currentActive || revision != attempt) return@launch
-                            val data = RecordingDataSource(audio.bytes); source = data; pendingBytes = null; proof = audio.proof
-                            val next = MediaPlayer(); player = next
-                            next.setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_SPEECH).build())
-                            next.setDataSource(data)
-                            next.setOnPreparedListener { if (revision == attempt && player === it) { if (currentActive) { prepared = true; it.start(); playing = true; loading = false } else clear() } }
-                            next.setOnCompletionListener { if (revision == attempt && player === it) { playing = false; position = asset.durationMs ?: 0 } }
-                            next.setOnErrorListener { failed, _, _ -> if (revision == attempt && player === failed) { clear(); failure = "Playback could not start. Try again." }; true }
-                            next.prepareAsync()
-                        } catch (error: Exception) {
-                            if (error is CancellationException) throw error
-                            if (revision == attempt) { clear(); failure = "Audio access could not be confirmed. Try again." }
-                        } finally { pendingBytes?.fill(0); if (revision == attempt) { load = null; if (player == null) loading = false } }
-                        }
-                    }
-                }
-            })
+            waveform = asset.waveform, position = position.toDouble() / maxOf(1L, asset.durationMs ?: 0), onVerify = onVerify, onPlayPause = { command() })
         BasicText(if (loading) "Loading recording…" else elapsed(position), style = qText("data-sm").copy(color = qColor("ink")))
+        if (prepared) {
+            Button("Back 10 seconds", ButtonVariant.QUIET, disabled = !active || loading) { command(-10_000) }
+            Button("Forward 10 seconds", ButtonVariant.QUIET, disabled = !active || loading) { command(10_000) }
+        }
         if (failure.isNotEmpty()) BasicText(failure, style = qText("caption").copy(color = qColor("ink")))
     }
 }
