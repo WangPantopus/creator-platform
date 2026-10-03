@@ -67,6 +67,16 @@ export function createApp(
   dependencies: ApplicationDependencies = {},
 ) {
   const app = express();
+  // Preserve the actual middleware-issued Actor. Resolving the same token a
+  // second time creates a different object and breaks original ThreadScope
+  // custody; account equality cannot substitute for that identity.
+  const resolvedRequests = new WeakMap<
+    Request,
+    Readonly<{
+      token: string;
+      authority: NonNullable<ReturnType<typeof requestAuthority.getStore>>;
+    }>
+  >();
   app.disable("x-powered-by");
   if (dependencies.telemetry) app.use(dependencies.telemetry.middleware());
   app.use((_req, res, next) => {
@@ -121,15 +131,14 @@ export function createApp(
       // closed accounts. Its router enforces operation-specific authority.
       if (!dependencies.trustRouter || !/^\/trust(?:\/|$)/u.test(req.path))
         await dependencies.assertActorAllowed?.(resolved.actor);
-      requestAuthority.run(
-        Object.freeze({
-          accountId: resolved.actor.accountId,
-          sessionId: resolved.sessionId,
-          actor: resolved.actor,
-          adultVerifiedAt: resolved.adultVerifiedAt,
-        }),
-        next,
-      );
+      const authority = Object.freeze({
+        accountId: resolved.actor.accountId,
+        sessionId: resolved.sessionId,
+        actor: resolved.actor,
+        adultVerifiedAt: resolved.adultVerifiedAt,
+      });
+      resolvedRequests.set(req, Object.freeze({ token, authority }));
+      requestAuthority.run(authority, next);
     });
   if (dependencies.trustRouter) app.use(dependencies.trustRouter);
   else
@@ -239,7 +248,25 @@ export function createApp(
         "Continue with Pantopus to use this app.",
         401,
       );
-    const actor = await resolveActor(dependencies.identity, token);
+    const binding = resolvedRequests.get(req);
+    const authority = requestAuthority.getStore();
+    if (
+      dependencies.platformIdentity &&
+      (!binding ||
+        binding.token !== token ||
+        authority !== binding.authority ||
+        !authority.actor ||
+        authority.actor.accountId !== authority.accountId ||
+        authority.actor.adultEligible !== true)
+    )
+      throw new DomainError(
+        "current_request_actor_required",
+        "Reopen this action with your current signed-in account.",
+        401,
+      );
+    const actor = binding
+      ? binding.authority.actor!
+      : await resolveActor(dependencies.identity, token);
     await dependencies.assertActorAllowed?.(actor);
     return actor;
   };
