@@ -1,5 +1,12 @@
 # W4 original commerce session view — October 3, 2026
 
+## Current canonical namespace guard — October3 18:20 UTC
+
+Normally consumes actual W1 b0c15d51c72d1620e0069c9262037945a4d87d86 at2986ee7bb2ef14914bee144da6e11607b22afd58. The complete two-file delta is personally read. Each shared namespace snapshot retains its actual original marker; entries are considered before that marker and the marker is checked unchanged before deletion, preserving a replacement session even when it writes identical field values. Disjoint genuine W2 session keys remain unchanged. This denial cleanup creates no Session, Actor, scope or request authority.
+
+Current web types, scoped lint/format and diff pass without new tests. Prior e5d shipping/web operation remains qualified only to its own source. Current build and personal cross-tab/public-document/session-replacement/command/provider/C10 qualification remain open. The shared runtime transport is recovered; own61 ledger/schema/roles/security match the historical migration snapshot and all38 Commerce tables/two rows retain the latest pre-outage8bc3d065 fingerprint. Full historical data/sequences differ after recorded later activity, and are not credited as an unchanged outage baseline.
+
+
 ## Canonical scoped cleanup successor — 17:44 UTC
 
 Normally integrated actual W1 bebb1e7ba5e2205d0e8aed266fe20e61109c06ec after personally reading all11 incoming paths and complete shared buffer/document/boundary/Studio API leaves. Literal delayed cross-tab hints now trigger the genuine bounded session reread; original end and private buffer cleanup target only the captured original tuple. The canonical public-document observer snapshots owner namespaces and tuple registrations before reading, preserves the current genuine session and values changed since that snapshot, and supplies no identity or permission. Actual W2 disjoint session namespaces and W5 scoped uncertain-command cleanup are reused once; the redundant W6 recording observer is removed. No broader producer or owner operation is borrowed.
