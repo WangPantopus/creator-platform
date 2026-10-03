@@ -110,6 +110,10 @@ Read W8's final200/beff87bd successor at
 docs/workstreams/handoffs/W8-continuation-2026-10-03-codex.md from that actual
 published branch before restoration/purpose/Commerce composition; its owner
 evidence does not transfer acceptance and its latest W5/W4 inputs remain unconsumed.
+Also read W3's final63/82c9abff W3-mac-studio-2026-10-03.md and takeover prompt,
+and W4's final303/6a82fc12 W4-continuation-handoff-2026-10-03-afternoon.md and
+W4-next-agent-2026-10-03.md. Exact published links and the new W4 a3-consuming
+heads are in the W6 handoff; their source/runtime evidence remains attributed.
 
 The human said **none of the real inputs are available** and asked us to make
 independent decisions. Do not repeatedly ask the same question or manufacture

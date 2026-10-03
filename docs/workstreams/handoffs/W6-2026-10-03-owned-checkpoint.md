@@ -312,6 +312,24 @@ are closed; this is separate owner evidence. New W5 a3 settlement and W4
 301/cec source remain explicitly unconsumed there, and201/C10 remains held.
 No W8 acceptance is transferred to W6 and no W6 resource is restarted.
 
+W3's final existing63 checkpoint is82c9abffdb00f73bc7ba3fb4baedb508b1170917,
+independently fetched and its successor header inspected. Read
+[W3's final handoff](https://github.com/WangPantopus/creator-platform/blob/82c9abffdb00f73bc7ba3fb4baedb508b1170917/docs/workstreams/handoffs/W3-mac-studio-2026-10-03.md)
+and W3-takeover-2026-10-03.md from that branch before recording association or
+human_active handback work. Functional runtime remains4d085a8f; W5 a3 and W1
+terminal188 remain unconsumed there. All A–I/task/provider/privacy gates remain;
+W3's own closure and narrow native evidence are not W6 acceptance.
+
+W4's final existing303 checkpoint is6a82fc1272dc8b25ac167598012aa5da4ff91dc5,
+independently checked at its actual owned checkout. Read
+[W4's final handoff](https://github.com/WangPantopus/creator-platform/blob/6a82fc1272dc8b25ac167598012aa5da4ff91dc5/docs/workstreams/handoffs/W4-continuation-handoff-2026-10-03-afternoon.md)
+and prompts/W4-next-agent-2026-10-03.md from that branch before C06/C07 or
+publication/financial composition. All six W4 retained branches now consume W5
+a3 byte-exactly;262/27cde2b0 retains original publicationf42/b404 and247/75bba77b
+retains terminal188 source. These are successor source-review inputs only,
+not sources operated by W6 or genuine positive task/provider/financial/C10 proof.
+W6 source and closed resource state remain unchanged.
+
 | Owner | Existing threadID                    |
 | ----- | ------------------------------------ |
 | W1    | 01a0ff21-c27d-7b62-9d6e-870b4eb44c19 |
