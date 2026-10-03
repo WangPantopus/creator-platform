@@ -311,3 +311,8 @@ Generation, terminal and cursor catalogue guards preserve their original private
 ### W1 October3 — standard private Error causes
 
 DomainError accepts optional native ErrorOptions, preserving existing code/message/status calls. Generation connection and catalogue guards use that standard constructor instead of an enumerable cause assignment. Actual delayed transport operations verify nonenumerable wrapper causes while private inspection still retains original failures. Backend types, scoped lint and existing9 contracts pass; no public response or purpose permission is expanded.
+
+
+### W1 original publication connection settlement — October3 UTC
+
+Keep the publication pool distinct from core/generation/terminal authority. An uncertain response does not justify submitting another rollback: close and await the exact source, discard once, and preserve the original private cause. Successful candidate discovery must have a ROLLBACK receipt before returning its task, with one family per transaction. Genuine208 finalization retains all owner/restoration/signature bookends; successful finalization leaves only COMMIT and its actual receipt. Standard nonenumerable Error.cause supports private transport classification without changing public responses. Thirteen real read-only PostgreSQL scenarios and all six closed preservation fingerprints qualify cleanup; they do not establish whole graph/C10/positive publication or activation.
