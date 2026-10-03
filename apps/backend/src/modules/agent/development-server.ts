@@ -12,6 +12,10 @@ import { createAgentDomain } from "./integration.js";
 import { agentFeature } from "./feature.js";
 import { DevelopmentLicenseVerifier } from "./development-license.js";
 import { createDevelopmentTrust } from "../trust/development.js";
+import {
+  composeContentHost,
+  createContentStudio,
+} from "../content/integration.js";
 
 if (
   process.env.NODE_ENV !== "development" ||
@@ -92,9 +96,42 @@ const backend = await createConfiguredBackend({
     domain = prepareDomain(runtime);
     await domain.service.repository.assertRuntimeRole();
     conversations = createConversationRuntime(runtime);
-    runtime.configureSignedSubjects(conversations.signedSubjectPolicies);
+    const composition = composeContentHost({
+      pool: runtime.pool,
+      owners: {
+        conversation: runtime.conversation,
+        access: runtime.access,
+        agent: domain.service,
+        profiles: runtime.identity?.profiles,
+      },
+      dependencies: {
+        assertAllowed: runtime.assertCreatorAllowed,
+        assertAllowedInTransaction: runtime.assertContentAllowedInTransaction,
+      },
+      sources: {
+        service: domain.sources,
+        repository: domain.service.repository,
+      },
+      ...(runtime.assertScopeAllowedInTransaction
+        ? {
+            assertScopeAllowedInTransaction:
+              runtime.assertScopeAllowedInTransaction,
+          }
+        : {}),
+    });
+    const studio = createContentStudio({
+      pool: runtime.pool,
+      owners: composition.owners,
+      dependencies: composition.dependencies,
+    });
+    composition.bindContent(studio.content);
+    runtime.configureSignedSubjects([
+      ...conversations.signedSubjectPolicies,
+      studio.signedSubjects,
+    ]);
     return [
       conversations.registration,
+      ...studio.features,
       agentFeature({ domain, pool: runtime.pool, development: true }),
     ];
   },

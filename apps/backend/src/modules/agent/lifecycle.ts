@@ -13,6 +13,15 @@ export class AgentLifecycle {
     private readonly runtime: LiveAgentRuntime | null,
     private readonly usageRetention?: PreparedUsageRetention,
   ) {}
+  /** Original post-graph privacy composition must retain this exact repository;
+   * a matching connection URL or copied service shape is not its custody. */
+  assertRepository(repository: AgentRepository): void {
+    invariant(
+      repository === this.repository,
+      "agent_lifecycle_composition_mismatch",
+      "Use this lifecycle's actual original Agent repository.",
+    );
+  }
   async assertAccountingClient(client: PoolClient) {
     const installed = await generationJournalInstalled(client);
     if (installed) {
