@@ -1,5 +1,11 @@
 # Actual W3 System output and W4 ending bridge — October 3, 2026 UTC
 
+## Independent sequence-default ACL correction
+
+Current262 normally consumes236 source `643fb80b1d63e7c8bf1cf6a84e49330950c3f6ff` and applies the same sequence-default ACL correction to its own catalogue. The actual thirteen original SQL sources plus a rollback-only NULL-ACL sequence metadata probe reproduce the old table-default grants, then match PostgreSQL's actual sequence grantor/role/privilege/grantable projection. An explicit sequence USAGE grant changes the catalogue; both grant and sequence-probe rollback restore the original fingerprint. Existing baseline metadata is unchanged and all six canonical61 custody comparisons match. No sequence value or business/scope/output/ledger row was created or consumed.
+
+Private worker receipt SHA256 `3e2c0f3d50ed4e13e3742b99256e396bb6afc521e4514b4b121e3c963579d27e`; the parent's retained initial private comparison failures and successful receipt remain in236's record. Both current source projections pass backend build/types, scoped lint/format and diff. This is metadata qualification only: complete accepted pins, genuine factory/output/financial/cleanup/COMMIT/C10, approved minimum, current hosted checks and activation remain open. Both PRs remain draft.
+
 ## Existing PR review: reachable relation coverage repair
 
 Current262 normally consumes parent236 `6730a245eee3eb01e579efcb55dc435f803d1580`, which repairs the independently reproduced omitted `publication_worker_effect` policy and clears the incomplete original accepted catalogue pin. The worker catalogue applies the same relation selection to its actual seven roles: every owned or table/column/sequence-reachable relation, schema identity, and attached trigger definitions. Immutable SQL bytes, the genuine issuer, private W3 output and ending bridge remain unchanged. Both complete owner acceptance pins are absent.
