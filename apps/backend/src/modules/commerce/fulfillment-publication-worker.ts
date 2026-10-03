@@ -117,6 +117,19 @@ export class CommerceFulfillmentPublicationWorker {
     private readonly minimumRecipients: number,
   ) {}
 
+  /** Cancellation context comes only from W1's genuine live binding. Await
+   * the complete operation; these checks issue no SQL or permission. */
+  private async withOriginalSignal<T>(
+    client: PoolClient,
+    scope: PublicationTaskScope,
+    operation: () => Promise<T>,
+  ): Promise<T> {
+    this.identity.originalSignalInTransaction(scope, client)?.throwIfAborted();
+    const value = await operation();
+    this.identity.originalSignalInTransaction(scope, client)?.throwIfAborted();
+    return value;
+  }
+
   /** minimumRecipients is an explicitly configured approved policy value.
    * There is no default, approval scalar, replacement issuer or startup pin.
    */
@@ -157,19 +170,26 @@ export class CommerceFulfillmentPublicationWorker {
    */
   async recipients(client: PoolClient, scope: PublicationTaskScope) {
     if (requestAuthority.getStore() || this.held.has(scope)) unavailable();
-    await this.identity.authorizeInTransaction(scope, client);
-    await assertFulfillmentPublicationWorkerCatalogue(client);
-    const preparation = await this.identity.preparationInTransaction(
-      scope,
-      client,
+    await this.withOriginalSignal(client, scope, () =>
+      this.identity.authorizeInTransaction(scope, client),
     );
-    const original = await this.identity.originalInTransaction(scope, client);
+    await this.withOriginalSignal(client, scope, () =>
+      assertFulfillmentPublicationWorkerCatalogue(client),
+    );
+    const preparation = await this.withOriginalSignal(client, scope, () =>
+      this.identity.preparationInTransaction(scope, client),
+    );
+    const original = await this.withOriginalSignal(client, scope, () =>
+      this.identity.originalInTransaction(scope, client),
+    );
     if (!original.document.planRef) return undefined;
     if (!preparation.fulfillmentNonce || !scope.signedActId) unavailable();
     const planRef = CommerceFulfillmentPlanRef.parse(original.document.planRef);
-    const result = await client.query(
-      "SELECT * FROM creator.fulfillment_publication_worker_recipients($1,$2)",
-      [preparation.nonce, preparation.token],
+    const result = await this.withOriginalSignal(client, scope, () =>
+      client.query(
+        "SELECT * FROM creator.fulfillment_publication_worker_recipients($1,$2)",
+        [preparation.nonce, preparation.token],
+      ),
     );
     const rows = z
       .array(originalRecipient)
@@ -227,12 +247,15 @@ export class CommerceFulfillmentPublicationWorker {
     if (requestAuthority.getStore()) unavailable();
     const held = this.held.get(scope);
     if (!held || held.client !== client) unavailable();
-    await this.identity.authorizeInTransaction(scope, client);
-    const preparation = await this.identity.preparationInTransaction(
-      scope,
-      client,
+    await this.withOriginalSignal(client, scope, () =>
+      this.identity.authorizeInTransaction(scope, client),
     );
-    const original = await this.identity.originalInTransaction(scope, client);
+    const preparation = await this.withOriginalSignal(client, scope, () =>
+      this.identity.preparationInTransaction(scope, client),
+    );
+    const original = await this.withOriginalSignal(client, scope, () =>
+      this.identity.originalInTransaction(scope, client),
+    );
     invariant(
       preparation === held.preparation &&
         original.transaction === held.transaction &&
@@ -258,14 +281,16 @@ export class CommerceFulfillmentPublicationWorker {
       held.linked.has(recipient)
     )
       unavailable();
-    const result = await client.query(
-      "SELECT * FROM creator.publication_worker_system_link($1,$2,$3,$4)",
-      [
-        held.preparation.nonce,
-        held.preparation.token,
-        recipient.packetId,
-        recipient.threadId,
-      ],
+    const result = await this.withOriginalSignal(client, scope, () =>
+      client.query(
+        "SELECT * FROM creator.publication_worker_system_link($1,$2,$3,$4)",
+        [
+          held.preparation.nonce,
+          held.preparation.token,
+          recipient.packetId,
+          recipient.threadId,
+        ],
+      ),
     );
     if (result.rowCount !== 1) unavailable();
     const row = actualOutput.parse(result.rows[0]);
@@ -305,15 +330,17 @@ export class CommerceFulfillmentPublicationWorker {
       issued.recipient !== recipient
     )
       unavailable();
-    const result = await client.query<{ recorded: boolean }>(
-      "SELECT creator.fulfillment_publication_worker_record_delivery($1,$2,$3,$4,$5) AS recorded",
-      [
-        held.preparation.nonce,
-        held.preparation.token,
-        recipient.packetId,
-        output.messageId,
-        output.eventId,
-      ],
+    const result = await this.withOriginalSignal(client, scope, () =>
+      client.query<{ recorded: boolean }>(
+        "SELECT creator.fulfillment_publication_worker_record_delivery($1,$2,$3,$4,$5) AS recorded",
+        [
+          held.preparation.nonce,
+          held.preparation.token,
+          recipient.packetId,
+          output.messageId,
+          output.eventId,
+        ],
+      ),
     );
     if (result.rows[0]?.recorded !== true) unavailable();
     held.delivered.set(recipient, output);
@@ -329,10 +356,14 @@ export class CommerceFulfillmentPublicationWorker {
   ): Promise<void> {
     const held = await this.current(client, scope);
     if (held.delivered.size !== held.recipients.length) unavailable();
-    await assertFulfillmentPublicationWorkerCatalogue(client);
-    const result = await client.query<{ receipt: unknown }>(
-      "SELECT creator.fulfillment_publication_worker_receipt($1,$2) AS receipt",
-      [held.preparation.nonce, held.preparation.token],
+    await this.withOriginalSignal(client, scope, () =>
+      assertFulfillmentPublicationWorkerCatalogue(client),
+    );
+    const result = await this.withOriginalSignal(client, scope, () =>
+      client.query<{ receipt: unknown }>(
+        "SELECT creator.fulfillment_publication_worker_receipt($1,$2) AS receipt",
+        [held.preparation.nonce, held.preparation.token],
+      ),
     );
     const receipt = finalReceipt.parse(result.rows[0]?.receipt);
     invariant(
@@ -363,9 +394,11 @@ export class CommerceFulfillmentPublicationWorker {
     }
     // The fixed W4 owner rechecks every original receipt/proof, then calls
     // W3's private ending port. No W3 read follows removal of its bindings.
-    const ended = await client.query<{ removed: number }>(
-      "SELECT creator.fulfillment_publication_worker_end_system_links($1,$2) AS removed",
-      [held.preparation.nonce, held.preparation.token],
+    const ended = await this.withOriginalSignal(client, scope, () =>
+      client.query<{ removed: number }>(
+        "SELECT creator.fulfillment_publication_worker_end_system_links($1,$2) AS removed",
+        [held.preparation.nonce, held.preparation.token],
+      ),
     );
     invariant(
       ended.rowCount === 1 && ended.rows[0]?.removed === held.delivered.size,
