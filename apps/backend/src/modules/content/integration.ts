@@ -6,6 +6,10 @@ import { contentPublicProjection } from "../growth/content.js";
 import { createCommercePublicationPermission } from "../commerce/publication.js";
 import { assertCommercePublicationSource } from "../commerce/publication-source.js";
 export {
+  ContentFulfillmentPublicationWorker,
+  type ContentFulfillmentPublicationConfiguration,
+} from "./fulfillment-publication.js";
+export {
   PreparedContentGenerationOrigins,
   GENERATION_CONTENT_ORIGIN_MIGRATION,
   GENERATION_CONTENT_ORIGIN_SIGNATURE,
