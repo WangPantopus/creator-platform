@@ -1,5 +1,9 @@
 # W8 contract, migration and runtime register
 
+## Actual private artifact parent — 2026-10-03
+
+[Existing201 storage guard](../../operations/W8-privacy-streaming.md) requires the already existing private POSIX-owned parent and canonical real path with no symlinked ancestors; it creates only the leaf and rechecks before each operation. Seven actual configuration refusals, later permission-change refusal, storage-only8MiB/fresh-process SHA verification, different-account404 and metadata-symlink refusal are personally observed, with original files/permissions restored. No database job, task, owner EOF/COMMIT or C10/download/application receipt is supplied. Runtime source/type/lint/format checks pass; original Agent graph/held purposes and all remaining release gates remain required.
+
 ## Restrictive original-purpose profile boundaries — 2026-10-03
 
 [Held0221–0224](W8-next-allocations.md) reserve distinct additive restrictive profile SELECT policies for the existing W3 context, W4 audience, two W2 metadata/retrieval roles and W5 original-content origin. All published SQL/current runtime guards are independently read/hash-checked. Original0095/0179/0182/0211/0187/0102/0186 bytes, functions, scope issuers and all original task/client/PID/fullXID/login/family/restoration/negative/COMMIT gates remain intact. PUBLIC permissive policies must not OR-bypass the role-specific boundary. W5's separate predicate preserves original signature-family order; original scope checks and final genuine identity remain required. Independent whole policy/ACL/function/caller catalogue and closed compiler/drift/refusal/fresh-preserved/task/C10 qualification remain required; no accepted catalogue, new role/grant, activation or raw-worker/provider permission is supplied. Active61/frozen47 remain unchanged.

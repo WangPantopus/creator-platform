@@ -1,5 +1,9 @@
 # W8 protected C10 streaming continuation
 
+## Private path custody — 2026-10-03
+
+The existing private-store draft now enforces the documented existing private parent and canonical path, checks actual POSIX ownership/permissions and refuses symlinked ancestors before creating only the leaf. Each store operation rechecks those boundaries. The actual earlier source advertised two unsafe parent configurations; the repaired source refuses seven path/permission cases and a later parent permission change. A separate fresh process reads the actual labelled synthetic8MiB storage artifact in128 parts of at most64KiB with the same SHA256; different-account404 and symlinked metadata refusal pass. Restored metadata/permissions are reverified. Backend types/lint/format/diff pass, no new tests or database/provider activity. This storage qualification supplies no original task, owner EOF/COMMIT, protected job download or full C10 acceptance; PR201 remains draft.
+
 ## Canonical Agent owner resolution — 2026-10-03
 
 The private-store draft accepts `AgentPrivacyOwnerPorts` directly or a resolver supplied by W1 after its genuine graph binds. The resolver is evaluated once per original claimed task; undefined reports `agent_privacy_unavailable`, without selecting the development standby Agent. The selected service must use the exact original canonical host Pool object, and a supplied actual prepared0196 source must pass its own `assertHostPool` check before the adapter runs. The coordinator still supplies current same-client task/restoration authority. Missing owners and pool mismatches remain explicit blocked tasks rather than spending retries.

@@ -2,9 +2,11 @@
 
 ## Opt-in local private artifact directory
 
-`createDevelopmentTrust` accepts `TRUST_PRIVATE_ARTIFACT_DIRECTORY` only inside its existing loopback development mode. It prepares the actual absolute OS-owned directory before exposing the store; the leaf must be a nonsymlink directory with mode0700. Place it under an already private, owned configuration root. Missing configuration retains the unavailable-store behavior. This is single-host private file storage; it supplies no managed Growth key, off-site encryption, lifecycle authority, provider receipt or completed export.
+`createDevelopmentTrust` accepts `TRUST_PRIVATE_ARTIFACT_DIRECTORY` only inside its existing loopback development mode. It prepares the actual absolute OS-owned directory before exposing the store; the leaf and existing immediate parent must be nonsymlink private directories owned by the current POSIX user. Use0700 and the canonical real path with no symlinked ancestors. Provision the parent privately first; the store creates only its leaf and never a recursive parent chain. Parent/path/leaf checks run again before writes, verification, reads and sweeps. Missing configuration retains the unavailable-store behavior. This is single-host private file storage; it supplies no managed Growth key, off-site encryption, lifecycle authority, provider receipt or completed export.
 
 Actual filesystem preflight created an owned0700 directory and refused relative,0755 and symlink configurations. Backend types/scoped lint pass. Real prepared Agent0196 source, owner task/EOF/COMMIT qualification, protected complete artifact/download and eight-domain application acceptance remain required. No fake job or receipt was created by this preflight.
+
+The October3 repeat first reproduced both nonprivate-parent and symlinked-parent configurations being advertised by the old source. The repair refuses seven actual unsafe/missing/path configurations before creating their leaf, and refuses a configured parent's later permission change. An actual labelled storage-only8MiB write/seal/verification and separate fresh-process read match SHA256 across128 parts of at most64KiB. Different-account binding404 and symlinked metadata refusal pass; metadata and parent permissions are restored and reverified. The minted storage binding is synthetic, with no database job, task, domain authority or C10 receipt. Scripts, bytes and JSON remain private outside Git; backend types/lint/format/diff pass without new tests.
 
 
 ## Closed privacy continuation — 2026-10-02 (draft)

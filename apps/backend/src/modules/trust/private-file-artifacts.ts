@@ -1,8 +1,16 @@
 import { constants, type Dir } from "node:fs";
-import { lstat, mkdir, open, opendir, rename, unlink } from "node:fs/promises";
+import {
+  lstat,
+  mkdir,
+  open,
+  opendir,
+  realpath,
+  rename,
+  unlink,
+} from "node:fs/promises";
 import type { FileHandle } from "node:fs/promises";
 import { createHash, randomUUID } from "node:crypto";
-import { join, isAbsolute } from "node:path";
+import { dirname, join, isAbsolute, resolve } from "node:path";
 import { DomainError } from "../../core/errors.js";
 import {
   PrivacyArtifact,
@@ -25,13 +33,30 @@ export class PrivateFileArtifacts implements PrivacyArtifactStore {
     return store;
   }
   private async root() {
-    await mkdir(this.directory, { recursive: true, mode: 0o700 });
+    const owner = process.getuid?.();
+    const parent = dirname(this.directory);
+    const parentStat = await lstat(parent);
+    // The approved parent must already exist and be private. Do not create a
+    // chain beneath a shared directory or follow a symlinked ancestor.
+    if (
+      owner === undefined ||
+      !parentStat.isDirectory() ||
+      parentStat.isSymbolicLink() ||
+      (parentStat.mode & 0o077) !== 0 ||
+      parentStat.uid !== owner ||
+      (await realpath(parent)) !== resolve(parent)
+    )
+      throw new Error("artifact_directory_unsafe");
+    await mkdir(this.directory, { mode: 0o700 }).catch((error) => {
+      if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
+    });
     const stat = await lstat(this.directory);
     if (
       !stat.isDirectory() ||
       stat.isSymbolicLink() ||
       (stat.mode & 0o077) !== 0 ||
-      (process.getuid && stat.uid !== process.getuid())
+      stat.uid !== owner ||
+      (await realpath(this.directory)) !== resolve(this.directory)
     )
       throw new Error("artifact_directory_unsafe");
   }
