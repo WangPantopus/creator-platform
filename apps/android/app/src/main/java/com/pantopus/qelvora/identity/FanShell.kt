@@ -365,8 +365,8 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                 }
                 val labels = listOf("navHome" to "/home", "navDiscover" to "/discover", "navRequests" to "/requests", "navYou" to "/you")
                 val path = model.destination.substringBefore('?')
-                val accountDestination = path.startsWith("/identity/") || path == "/support" || path.startsWith("/support/") || path == "/notifications/settings"
-                val selectedTab = if (accountDestination) "navYou" else labels.firstOrNull { path == it.second || path.startsWith(it.second + "/") }?.first ?: "navHome"
+                val accountDestination = path.startsWith("/identity/") || path == "/support" || path.startsWith("/support/") || path == "/notifications/settings" || path == "/commerce/spending"
+                val selectedTab = if (accountDestination) "navYou" else if (path.startsWith("/commerce/")) "navRequests" else labels.firstOrNull { path == it.second || path.startsWith(it.second + "/") }?.first ?: "navHome"
                 TabBar(QelvoraCopy.text(selectedTab)) { label -> model.destination = labels.first { QelvoraCopy.text(it.first) == label }.second }
             }
         }
