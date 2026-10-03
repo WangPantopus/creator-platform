@@ -100,7 +100,7 @@ export function trustReplyError(error: unknown) {
   const status = { PT401: 401, PT403: 403, PT409: 409, PT410: 410 }[
     code as "PT401" | "PT403" | "PT409" | "PT410"
   ];
-  return new DomainError(
+  const failure = new DomainError(
     status === 410 ? "reply_withdrawn" : "reply_review_unavailable",
     status === 401
       ? "Sign in again before reviewing this reply."
@@ -113,4 +113,8 @@ export function trustReplyError(error: unknown) {
             : "The reply review connection is unavailable. The reply stays pending.",
     status ?? 503,
   );
+  // The original held-client owner must distinguish a settled refusal from
+  // an unknown PostgreSQL reply before choosing savepoint/transaction cleanup.
+  Object.defineProperty(failure, "cause", { value: error });
+  return failure;
 }
