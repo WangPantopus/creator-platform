@@ -7,6 +7,7 @@ import { commerceSignedSubjects } from "./modules/commerce/registration.js";
 import { configureGrowthForBackend } from "./modules/growth/configured.js";
 import { composeConversationHost } from "./modules/conversation/host.js";
 import { createCommerceStudio } from "./modules/commerce/studio.js";
+import { registeredCommerceApprovalMigration } from "./modules/commerce/approval-registration.js";
 import {
   composeContentHost,
   createContentStudio,
@@ -131,6 +132,8 @@ try {
             );
             features.close.push(() => host.close());
             const { commerce, conversation, agent } = host;
+            const approvalMigration =
+              await registeredCommerceApprovalMigration();
             // Preparing the genuine graph does not configure a provider, worker
             // purpose or arrival policy. Calls remain unmounted until those
             // separate producers exist; no request Actor is invented.
@@ -266,6 +269,16 @@ try {
                   pool: runtime.pool,
                   owners: contentHost.owners,
                   dependencies: contentHost.dependencies,
+                  ...(approvalMigration
+                    ? {
+                        approvals: {
+                          database: runtime.database,
+                          access: runtime.access,
+                          conversation: runtime.conversation,
+                          migration: approvalMigration,
+                        },
+                      }
+                    : {}),
                 })
               : createContentStudio({
                   pool: runtime.pool,
