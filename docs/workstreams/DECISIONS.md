@@ -1,5 +1,9 @@
 # Decisions and missing-design register
 
+### W1 current owner Team role edits — October3 UTC
+
+Keep replacement inside the original identity membership/invitation family and use the actual middleware Actor, original expected-account mismatch header, opaque session and same-client restoration/creator denial before positive owner/member locks. Require a verified, recovered owner; Team membership cannot approve as creator. Compare reviewed role sets under existing locks, refuse stale edits and allow an already-current retry. Revoke outstanding unaccepted invitations on success/retry to prevent later restoration of old roles; retain accepted history. Existing tables have no history version, so do not invent one or claim ABA protection. The focused current-main producer preserves main's fan-profile allowlist, leaving the separate stacked intro endpoint untouched. Positive Team/UI/native/full H08 acceptance remains open. [Exact port and qualifications](../implementation/W1-team-role-update.md).
+
 These are implementation/release dependencies, not requests for the founder to answer everything before work can start. Owners prepare concrete options and evidence, continue independent work, and ask only when the choice becomes necessary. No pending choice is silently converted into a production default.
 
 ## Decisions already settled
