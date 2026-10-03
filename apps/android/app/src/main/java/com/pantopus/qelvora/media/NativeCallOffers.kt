@@ -51,7 +51,7 @@ private fun validOffer(value: JSONObject): Boolean = runCatching {
 }.getOrDefault(false)
 private fun sameOffer(left: JSONObject?, right: JSONObject?): Boolean {
     if (left == null || right == null) return left == right
-    return listOf("id", "commitmentId", "version", "state", "creatorTimeZone", "fanTimeZone", "expiresAt", "selectedSessionId", "slots").all { left.opt(it).toString() == right.opt(it).toString() }
+    return listOf("id", "commitmentId", "version", "state", "creatorTimeZone", "fanTimeZone", "expiresAt", "selectedSessionId", "slots").all { left.opt(it)?.toString() == right.opt(it)?.toString() }
 }
 
 /** Query selects a screen only; the canonical actor and server transaction authorize every selection. */
