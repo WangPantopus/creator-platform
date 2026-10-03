@@ -346,6 +346,22 @@ export function CreatorAI({
   const identitySignal = identity?.signal;
   const endIdentity = identity?.end;
   const isSessionEnded = identity?.isSessionEnded;
+  const canUseDraft = useCallback(
+    () =>
+      !identitySignal?.aborted &&
+      (!identityAccount ||
+        !identitySession ||
+        readDraft(`w2-session:${identityAccount}`) === identitySession),
+    [identityAccount, identitySession, identitySignal],
+  );
+  const writeDraft = useCallback(
+    (key: string, value: unknown) => {
+      // Storage is shared by tabs. An older view awaiting canonical invalidation
+      // cannot read, overwrite or clear a replacement session's local buffers.
+      if (canUseDraft()) storeDraft(key, value);
+    },
+    [canUseDraft],
+  );
   const request = useCallback(
     async (path: string, init: RequestInit = {}) => {
       identitySignal?.throwIfAborted();
@@ -521,7 +537,7 @@ export function CreatorAI({
         }
         setState(data);
         if (!dirtyRef.current) setConfiguration(data.configuration);
-        if (initial) {
+        if (initial && canUseDraft()) {
           setStory(data.interview.story);
           setBoundaries(data.interview.boundaries);
           setStatusText(data.status?.text ?? "");
@@ -579,7 +595,14 @@ export function CreatorAI({
         return null;
       }
     },
-    [request, identityAccount, identitySignal, endIdentity, setError],
+    [
+      request,
+      identityAccount,
+      identitySignal,
+      endIdentity,
+      setError,
+      canUseDraft,
+    ],
   );
   useEffect(() => {
     void fetchState(true);
@@ -669,7 +692,7 @@ export function CreatorAI({
   }, [configuration?.examples]);
   useEffect(() => {
     if (!state || identitySignal?.aborted) return;
-    storeDraft(`w2-source:${state.actorAccountId}:${state.creator.id}`, {
+    writeDraft(`w2-source:${state.actorAccountId}:${state.creator.id}`, {
       title,
       text,
       rights,
@@ -689,10 +712,11 @@ export function CreatorAI({
     state?.creator.id,
     state?.actorAccountId,
     identitySignal,
+    writeDraft,
   ]);
   useEffect(() => {
     if (!state || identitySignal?.aborted) return;
-    storeDraft(`w2-interview:${state.actorAccountId}:${state.creator.id}`, {
+    writeDraft(`w2-interview:${state.actorAccountId}:${state.creator.id}`, {
       story,
       boundaries,
     });
@@ -702,10 +726,11 @@ export function CreatorAI({
     state?.creator.id,
     state?.actorAccountId,
     identitySignal,
+    writeDraft,
   ]);
   useEffect(() => {
     if (state && dirty && configuration && !identitySignal?.aborted)
-      storeDraft(`w2-config:${state.actorAccountId}:${state.creator.id}`, {
+      writeDraft(`w2-config:${state.actorAccountId}:${state.creator.id}`, {
         revision: draftRevision.current,
         configuration,
       });
@@ -715,6 +740,7 @@ export function CreatorAI({
     state?.creator.id,
     state?.actorAccountId,
     identitySignal,
+    writeDraft,
   ]);
   useEffect(() => {
     if (
@@ -837,7 +863,7 @@ export function CreatorAI({
     );
     dirtyRef.current = false;
     draftRevision.current = null;
-    storeDraft(`w2-config:${state.actorAccountId}:${state.creator.id}`, null);
+    writeDraft(`w2-config:${state.actorAccountId}:${state.creator.id}`, null);
     setDirty(false);
   };
   const actSource = async (source: Source, operation: string) => {
@@ -1977,7 +2003,7 @@ export function CreatorAI({
                         dirtyRef.current = false;
                         draftRevision.current = null;
                         setDirty(false);
-                        storeDraft(
+                        writeDraft(
                           `w2-config:${state.actorAccountId}:${state.creator.id}`,
                           null,
                         );
