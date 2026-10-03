@@ -1,0 +1,51 @@
+{
+  "source": "2949dc7e8549103b1451d474784eea3d7dcdbfbe",
+  "baseMainIncluded": "496c25236f1a791f0e1227c56e0380fc17df26c6",
+  "qualification": {
+    "backendTypes": "passed",
+    "webTypes": "passed",
+    "generation": "passed: 101 operations",
+    "scopedLint": "passed",
+    "scopedFormat": "passed",
+    "productionNext": "passed; Next 16.3.7, two workers, shared heavy build lease released"
+  },
+  "privateBuildLogSha256": "008415e0a1ffe4c10b92683544396ad2f53b8b2af4ac5c740ace1fa3c1ef3daa",
+  "ownerFiles": {
+    "apps/backend/src/modules/conversation/service.ts": {
+      "source": "a632cd7ad5af0e4dffc2385cc3b8497961fb23dc",
+      "sha256": "4878039a8c8f86b3c944b93daa3874105b147c4b7c37cfa0b79f48d99cc38525"
+    },
+    "apps/backend/src/modules/commerce/schema-fulfillment-plans.sql": {
+      "source": "a632cd7ad5af0e4dffc2385cc3b8497961fb23dc",
+      "sha256": "d728ec3d71f3b9fd11c49b3f2faf91624e7b03868d5ab4b462b0730fddae4aa1"
+    },
+    "apps/backend/src/modules/commerce/schema-fulfillment-plan-read.sql": {
+      "source": "a632cd7ad5af0e4dffc2385cc3b8497961fb23dc",
+      "sha256": "534f5c36b3d58eb2099f9a9a12452a60b287e4f1f3040c4ebeba99a3c8e96684"
+    },
+    "apps/backend/src/modules/commerce/schema-fulfillment-original-hash.sql": {
+      "source": "a632cd7ad5af0e4dffc2385cc3b8497961fb23dc",
+      "sha256": "167b04e53310b6cba5dfa61cafba58f69242836698611a4d2c7e4136132583f5"
+    },
+    "apps/backend/src/modules/commerce/fulfillment-plans.ts": {
+      "source": "84a035328150746e6a94cbce8e511de87b469109",
+      "sha256": "4128cba64bb59d3e662fa169ab82f2ad7d761e8e8ae1ca39a1d4790c2e81819d"
+    },
+    "apps/backend/src/modules/commerce/fulfillment-view-authority.ts": {
+      "source": "84a035328150746e6a94cbce8e511de87b469109",
+      "sha256": "c07f108eec7fe510e7c220aa7b7b47ab9940e2264c90143b2ca6c096cf6f2221"
+    }
+  },
+  "sqlRegisteredOrActivated": false,
+  "businessRecordsProduced": false,
+  "nativeBuildOrOperationAtThisSource": false,
+  "positiveGroupAcceptance": false,
+  "releaseReady": false,
+  "limits": [
+    "Founder minimum pending; no default",
+    "No Stripe sandbox or original captures",
+    "Genuine signer requires real proof and human biometric ceremony",
+    "Viewer 0199/0200/0202 and complete current source/privacy graph not activated",
+    "Group media task, bounded Studio plan reader and source-retraction projection remain owner dependencies"
+  ]
+}

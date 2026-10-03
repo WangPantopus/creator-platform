@@ -14,6 +14,12 @@ import { StudioService } from "../studio/service.js";
 import { studioFeature } from "../studio/registration.js";
 import { CommerceService } from "../commerce/service.js";
 import {
+  CommerceFulfillmentPlans,
+  FULFILLMENT_PLAN_MIGRATION,
+  FULFILLMENT_PLAN_SCHEMA_SHA256,
+} from "../commerce/fulfillment-plans.js";
+import { SIGNATURE_READ_FENCE_MIGRATION } from "../identity/signature-read-fence.js";
+import {
   commerceFeature,
   commerceSignedSubjects,
 } from "../commerce/registration.js";
@@ -92,6 +98,13 @@ const sessionKey = (await readFile(sessionKeyFile, "utf8")).trim();
 const currency = process.env.COMMERCE_CURRENCY;
 if (!currency)
   throw new Error("Explicit development commerce currency is required.");
+const groupMinimumText = process.env.W5_GROUP_MINIMUM_RECIPIENTS;
+if (
+  groupMinimumText !== undefined &&
+  (!/^(?:[2-9]|[1-9][0-9]|100)$/u.test(groupMinimumText) ||
+    Number(groupMinimumText) > 100)
+)
+  throw new Error("W5 group minimum must be the explicit founder choice2–100.");
 let content: ContentService;
 let studio: StudioService;
 const features: {
@@ -213,6 +226,54 @@ const backend = await createConfiguredBackend({
         "Configure the current caller-held content denial authority.",
         503,
       );
+    let groupPublication:
+      | import("./group-publication.js").ContentGroupPublicationOwners
+      | undefined;
+    if (groupMinimumText !== undefined) {
+      if (!runtime.assertScopeAllowedInTransaction)
+        throw new DomainError(
+          "fulfillment_plans_unconfigured",
+          "Current original-recipient denial authority is unavailable.",
+          503,
+        );
+      try {
+        const plans = await CommerceFulfillmentPlans.prepare({
+          database: runtime.database,
+          access: runtime.access,
+          assertScopeAllowedInTransaction:
+            runtime.assertScopeAllowedInTransaction,
+          minimumRecipients: Number(groupMinimumText),
+          migration: {
+            version: FULFILLMENT_PLAN_MIGRATION,
+            checksum: FULFILLMENT_PLAN_SCHEMA_SHA256,
+          },
+          signatureMigration: {
+            version: SIGNATURE_READ_FENCE_MIGRATION,
+            checksum:
+              "157640de84f22d6d638d788dfe04314fd193efaed80a829f288bec7cbcb815b5",
+          },
+        });
+        groupPublication = {
+          database: runtime.database,
+          access: runtime.access,
+          plans,
+          conversations: runtime.conversation,
+        };
+      } catch (error) {
+        if (
+          !(error instanceof DomainError) ||
+          error.status !== 503 ||
+          ![
+            "fulfillment_plans_unconfigured",
+            "signature_read_unconfigured",
+          ].includes(error.code)
+        )
+          throw error;
+        process.stderr.write(
+          `W5 group publication unavailable: ${error.code}.\n`,
+        );
+      }
+    }
     const composition = composeContentHost({
       pool: runtime.pool,
       owners: {
@@ -228,6 +289,7 @@ const backend = await createConfiguredBackend({
         reviewReply: createTrustReplyReviewer(),
       },
       sources: { service: sources, repository },
+      ...(groupPublication ? { groupPublication } : {}),
       ...(runtime.audienceIdentity
         ? { tenure: { audienceIdentity: runtime.audienceIdentity } }
         : {}),
@@ -298,7 +360,10 @@ backend.server.listen(apiPort, "127.0.0.1", () =>
     `W5 API${apiPort} · persisted non-owner RLS · synthetic development actors · genuine W1 passkeys required; provider-dependent paths unavailable until configured.\n`,
   ),
 );
+let stopping = false;
 const stop = () => {
+  if (stopping) return;
+  stopping = true;
   void (async () => {
     await features.growth?.close();
     await features.growthPool?.end();

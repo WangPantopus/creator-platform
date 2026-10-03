@@ -703,6 +703,7 @@
   <string name="w6_reload_saved_windows" formatted="false">Reload saved windows</string>
   <string name="w6_the_call_is_unavailable" formatted="false">The call is unavailable.</string>
   <string name="w6_camera_or_microphone_access_is_off_or_unavailable_check_your" formatted="false">Camera or microphone access is off or unavailable. Check your device settings and try again.</string>
+  <string name="w6_call_service_unavailable" formatted="false">Calling is not connected yet.</string>
   <string name="w6_calling_is_not_connected_yet_your_booking_is_unchanged" formatted="false">Calling is not connected yet. Your booking is unchanged.</string>
   <string name="w6_connection_failed_rejoin_the_same_call" formatted="false">Connection failed. Rejoin the same call.</string>
   <string name="w6_consent_could_not_be_saved" formatted="false">Consent could not be saved.</string>
@@ -747,6 +748,7 @@
   <string name="w6_summary_queued_available_when_its_provider_completes" formatted="false">Summary queued · available when its provider completes.</string>
   <string name="w6_delete_this_summary" formatted="false">Delete this summary</string>
   <string name="w6_call_receipt" formatted="false">Call receipt</string>
+  <string name="w6_call_in_progress" formatted="false">Human call</string>
   <string name="w6_recording_occurred_check_the_consent_history" formatted="false">Recording occurred · check the consent history</string>
   <string name="w6_no_recording_was_confirmed" formatted="false">No recording was confirmed</string>
   <string name="w6_view_the_reconciled_receipt" formatted="false">View the reconciled receipt</string>
@@ -945,4 +947,15 @@
   <string name="w5_content_reply_withdrawn" formatted="false">This reply was withdrawn. It cannot be shared again.</string>
   <string name="w5_content_fan_profile_required" formatted="false">Set up your fan profile before continuing.</string>
   <string name="w5_content_invalid_request" formatted="false">Check your reply and sharing choices before trying again. Your input is kept.</string>
+  <string name="identity_choose_handle" formatted="false">Choose your handle</string>
+  <string name="identity_edit_public_profile" formatted="false">Edit public profile</string>
+  <string name="identity_session_read_failed" formatted="false">This device could not read your session securely. Unlock it and try signing in again.</string>
+  <string name="identity_session_save_failed" formatted="false">This device could not save your session securely. Unlock it and try signing in again.</string>
+  <string name="identity_private_clear_failed" formatted="false">This device could not clear its saved private data. Private screens are closed. Unlock it and retry clearing before signing in again.</string>
+  <string name="identity_private_clear_retry" formatted="false">Retry clearing saved private data</string>
+  <string name="w1_call_lookup_title" formatted="false">Your call</string>
+  <string name="w1_call_lookup_checking" formatted="false">Checking the booking and your current access…</string>
+  <string name="w1_call_lookup_unavailable" formatted="false">This call could not be opened. Retry, or open Requests to check its current status.</string>
+  <string name="identity_proof_review_support" formatted="false">Request verification review</string>
+  <string name="identity_proof_review_support_body" formatted="false">Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified.</string>
 </resources>

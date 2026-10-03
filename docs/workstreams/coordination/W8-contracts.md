@@ -1,5 +1,38 @@
 # W8 contract, migration and runtime register
 
+## Human-requested seamless handoff checkpoint — 2026-10-02
+
+Read the [complete successor prompt](../handoffs/W8-continuation-2026-10-02-codex.md) first. All source is committed/pushed: durable reply review draft #200/head10624047; private development store draft #201/heade8c2608a; finite feedback lifecycle draft #192/head2e1de9d7. They retain genuine application acceptance and activation work. Worker/terminal negative drafts #131/#145 also remain open. Old #83 is closed as superseded; no branch history was removed.
+
+Reviewed ready integrations #199 (Android Trust canonical navigation) and #195 (fixed complete Agent export source) normally merged as d5cc93b6/4f94e1fe. Agent0196/accounting0163 remain held/unapplied. All own API/web/devices/container are normally stopped with databases, volumes, private tools/backups retained and no active W8 build/device leases. The separately restored native checkpoint now passes all six custody comparisons; no original iMac recovery, all-eight C10, new native navigation acceptance, provider or release completion is claimed. Continue the entire R1–R10/G0–G5 scope from the concrete next actions in the successor prompt.
+
+## Reply reviewer continuation contract — 2026-10-02
+
+Export `prepareTrustReplyReviewer(runtime)` (the legacy `createTrustReplyReviewer` name is the same asynchronous prepared contract). Await it in `registerFeatures` after W1 has issued the genuine BackendRuntime; retain undefined when the exact active SQL/catalogue is unavailable. The callback accepts only W5’s actual held PoolClient and full `(replyId,creatorId,fanId,version,text,textHash)` tuple. It validates W1’s original request authority/session holder and same configured database plus restoration/current denials at both ends. It issues no Actor, ThreadScope, consent or publication authority. The12000 transport ceiling grants no paid-tenure permission. W5’s4000/current-tenure policy stays authoritative.
+
+The durable safety case is idempotent per reply/version/hash; private source text is read through purpose-leased Ops evidence only. Allowed/flagged require the matching immutable recorded reviewer decision in the actual case settlement transaction. Withdrawal, changed source, negative authority or missing active source refuses; unavailable production remains pending. Held0156 source65a86e17 requires the separate guarded migration wave and genuine app acceptance. No use of a privileged metadata qualification as an author/reviewer session.
+
+## Ready closed four-source privacy wave — 2026-10-02
+
+PR151 merged12ea10a6, exacthead91dcd4c6 after actual three-client cursor acceptance. Two web/backend and the current compile checks passed; one current Android runtime passed, its duplicate was still running at merge; six foundation jobs queued and one obsolete compile cancelled were not passes. [Actual receipt](../../../artifacts/workstreams/W8/privacy-domain-worker/20261002-mac-studio/app-acceptance/README.md) preserves the four completed/four blocked synthetic task result.
+
+PR159 remains the sole four-source57→61 activation continuation:0074/0082/0087/0103 exact original source bytes, closed atomic rollout with private fresh backup and independently executed separate six-hash restore. W1's reviewed early core-role preflight is included. Forty-seven prior held entries keep the exact frozen map; additional0198–0207 are held allocations/source dependencies only. The focused wave keeps main's uncomposed Growth refusal; reviewed W7 source integration is a separate increment. No all-eight C10, erasure, original recovery, provider or release completion is implied. Current W8 devices/services stopped; private data preserved.
+
+
+## Corrected held dependency ordering and actual owner integration — 2026-10-02
+
+Focused draftPR159 publishes the closed four-source continuation; its original6771bfed future held map is superseded. W1 caught that moving only63–102 left dependent translation/terminal/Agent consumers before their producers. All47 held slots are now0151–0197, metadata only: original83→0168,111→0194,112→0195,113→0196;99→0183,100→0184,105→0188,106→0189; late subject108→0190 thennegative109→0191 thenfinancial107→0192. Actual map `infra/migrations/waves/20261002-privacy-held.json` SHA256 **2338f48ea4b1008f47eef43ff7a835021e5e917669ad44f21179c69d03227c0a** is authoritative. SQL files/bytes, canonical57 and selected74/82/87/103 are unchanged; unknown further DDL dependencies require review before any future wave. No fabricated ledger aliases.
+
+Combined integration source2423dd12 contains actual mergedW2 Agent166d9ee6 and personally reviewedW7 Growthb7d21b0c. [Exact source review](https://github.com/WangPantopus/creator-platform/blob/2423dd12/artifacts/workstreams/W8/privacy-domain-integration/20261002-mac-studio/README.md) verifies actual same-client restoration/task bookends, one fixed-source cursor and separate COMMIT; types/scopedlint pass. W1 server.ts remains untouched. W8 managed Growth key/worker URL are absent; no peer credentials or synthetic provider receipts were borrowed. Real composed61 web/Android/iOS/task/expiry/physical effects and fullC10/recovery/release remain pending. All own resources are stopped with private checkpoints retained. Continue actual Trust/owner acceptance and collect independent owner fresh/preserved-upgrade reviews.
+
+
+## Closed privacy continuation — 2026-10-02
+
+[Personally executed four-purpose SQL continuation](../../../artifacts/workstreams/W8/migration-continuation/20261002-mac-studio/README.md) is on `codex/w8-migration-continuation-20261002`, normal main merge2c9aa8ca. Actual private backup/separate restore and atomic57→61 preserve57 history/131 rows/roles/sequence; fresh61 schema/security/roles match. Eight functions have zero compiler diagnostics;20 actual drift mutations refuse and roll back. All four targets remain closed. Draft packet selects only0074/0082/0087/0103; no main/peer/app/task/C10/original recovery/release activation is claimed.
+
+Draft metadata-only held map moves36 lower unready reservations to0114–0149, preserves SQL paths/bytes/history and leaves0111–0113 unchanged.0150 is W6 distinct current-account single-call metadata discovery, source/issuance/current booking/negative custody pending. Next: consume actual merged W2 Agent correction and W7 Growth owner; operate a separate labelled development copy through all three clients and independently inspect genuine task/COMMIT/refusals; obtain owner fresh/preserved-upgrade reviews before finalizing. No new unit tests or paid calls. Own API/web/devices/build slots and database container are stopped; private closed61 checkpoint/volumes retained.
+
+
 Held metadata only:0083 carries W3 actual immutable translation job/consumer;0111 W1 private translation issuer and0112 W8 original-participant negatives await its exact source/currentness/policy.0113 is W2's separate NoLogin all-owned Agent export snapshot with its own scope and genuine job/token/XID/PID/immutable ownership; it must not widen0087 private scope ACL or isolated owner. Actual Agent empty fan/thread preflight also needs0087 same-client lifecycle/restoration before locks and COMMIT. W2 is adding this owner port. No registry activation, fabricated Actor/provenance/policy or complete C10 is authorized by these allocations.
 
 

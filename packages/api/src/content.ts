@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CommerceFulfillmentPlanRef } from "./commerce/fulfillment.ts";
 
 /** C08 v1. Audience and AI-source permission are independent, server checked. */
 export const ContentAudience = z.discriminatedUnion("kind", [
@@ -48,6 +49,9 @@ export const ContentDocument = z
       .strictObject({ replyId: z.uuid(), consentVersion: z.int().positive() })
       .nullable(),
     packetId: z.uuid().nullable(),
+    // Omitted stays omitted: adding a default changes historical signed C08s.
+    // Recipients and current consent remain W4-owned; this is a reference only.
+    planRef: CommerceFulfillmentPlanRef.nullable().optional(),
     live: z
       .strictObject({
         sessionId: z.uuid(),
@@ -58,6 +62,20 @@ export const ContentDocument = z
       .nullable()
       .optional(),
   })
+  .refine(
+    (v) =>
+      !v.planRef ||
+      (v.kind === "public_answer" &&
+        v.packetId === null &&
+        v.quote === null &&
+        !v.live &&
+        v.scheduledAt === null &&
+        (v.audience.kind === "public" ||
+          (v.audience.kind === "groups" &&
+            v.audience.ids.length === 1 &&
+            v.audience.ids[0] === v.planRef.id))),
+    "A fulfillment plan needs its exact public or matched-group answer.",
+  )
   .refine(
     (v) => v.kind !== "note" || v.audience.kind !== "public",
     "Notes need an explicit relationship audience.",

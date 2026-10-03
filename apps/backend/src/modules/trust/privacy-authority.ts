@@ -171,14 +171,15 @@ export function privacyTaskAuthority(pool: Pool) {
       "privacy_authority_changed",
       "The verified data request is no longer leased to this worker.",
     );
-    if (input.scope === "account") {
-      invariant(
-        job.ownership_ref && job.owned_creator_ids !== null,
-        "privacy_ownership_missing",
-        "The verified pre-deletion ownership snapshot is required.",
-      );
-      return z.array(z.uuid()).max(100).parse(job.owned_creator_ids);
-    }
-    return [];
+    invariant(
+      job.ownership_ref && job.owned_creator_ids !== null,
+      "privacy_ownership_missing",
+      "The verified original ownership snapshot is required.",
+    );
+    const owned = z.array(z.uuid()).max(100).parse(job.owned_creator_ids);
+    // This coordinator observation cannot extend 0087's held-client authority.
+    // A distinct reviewed purpose must consume non-account ownership on that
+    // original client; preserve 0087's existing non-account projection for now.
+    return input.scope === "account" ? owned : [];
   };
 }

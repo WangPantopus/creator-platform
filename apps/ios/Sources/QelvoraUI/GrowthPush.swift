@@ -116,7 +116,7 @@ public final class GrowthPushCoordinator: ObservableObject {
         guard acknowledged != binding else { return }
         if granted && binding.token == nil { return } // Wait for the genuine UIApplicationDelegate token.
         do {
-            guard let credential = try await SecureSessionStorage().read(), snapshot == generation else { return }
+            guard let credential = try await SecureSessionStorage(issuer: baseURL).read(), snapshot == generation else { return }
             let installation = try GrowthPushInstallation.next()
             let client = GrowthClient(baseURL: baseURL)
             if let token = binding.token {

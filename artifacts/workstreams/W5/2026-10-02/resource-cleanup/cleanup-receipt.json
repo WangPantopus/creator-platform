@@ -1,0 +1,86 @@
+{
+  "recordedAt": "2026-10-02T22:04:47.270649+00:00",
+  "humanAuthorization": "Permanently remove disposable W5 resources and clean published worktrees; preserve anything needed for future work.",
+  "publishedAudit": {
+    "allRelatedPrsMerged": 46,
+    "beforeWorktrees": [
+      {
+        "checkout": "/Users/yingpengwang/.codex/worktrees/w5-studio-continuation/creator-platform",
+        "head": "02a10b9e203bb824c9ffb3eb29ecb3a46725c323",
+        "remoteHead": "02a10b9e203bb824c9ffb3eb29ecb3a46725c323",
+        "clean": true,
+        "relatedPr": 190,
+        "relatedPrState": "MERGED",
+        "allocatedKiB": 2559356
+      },
+      {
+        "checkout": "/Users/yingpengwang/estimate-rescue/creator-platform/w5-creator-studio-handoff-f56a24",
+        "head": "bd8aca7c143230bf9fca73d4cb9873e1e0775032",
+        "remoteHead": "bd8aca7c143230bf9fca73d4cb9873e1e0775032",
+        "clean": true,
+        "relatedPr": 69,
+        "relatedPrState": "MERGED",
+        "allocatedKiB": 1067244
+      }
+    ]
+  },
+  "actualRemovedBuilds": [
+    {
+      "path": "/private/tmp/creator-w5-ios-derived",
+      "allocatedKiBBefore": 1503100,
+      "permanentlyRemoved": true
+    },
+    {
+      "path": "/private/tmp/creator-w5-ios-packages",
+      "allocatedKiBBefore": 463156,
+      "permanentlyRemoved": true
+    },
+    {
+      "actualApkSha256BeforeDeletion": "b3a39dcad2004e066e43de453aef4f84ce6781958433f10888abc7ac88a2eab5"
+    },
+    {
+      "path": "/private/tmp/creator-w5-android-build",
+      "allocatedKiBBefore": 289024,
+      "permanentlyRemoved": true
+    },
+    {
+      "path": "/private/tmp/creator-w5-gradle-project",
+      "allocatedKiBBefore": 3560,
+      "permanentlyRemoved": true
+    },
+    {
+      "path": "/private/tmp/creator-w5-tenure-installed.apk",
+      "allocatedKiBBefore": 14716,
+      "permanentlyRemoved": true
+    }
+  ],
+  "actualRemovedNativeAllocatedKiB": 2273556,
+  "actualRemovedOlderWorktree": {
+    "at": "2026-10-02T22:02:54.355080+00:00",
+    "path": "/Users/yingpengwang/estimate-rescue/creator-platform/w5-creator-studio-handoff-f56a24",
+    "absent": true,
+    "publishedHead": "bd8aca7c143230bf9fca73d4cb9873e1e0775032",
+    "pr69": "MERGED",
+    "sharedGitRetained": true,
+    "ignoredFiles": "Only known node_modules, generated Xcode project and .next-w5 builds; no unique ignored inputs found."
+  },
+  "ownedContinuationWorktree": {
+    "path": "/Users/yingpengwang/.codex/worktrees/w5-studio-continuation/creator-platform",
+    "status": "Archive/remove after this clean documentation branch is pushed and its PR is handled through normal checks. Local final receipt retained outside the checkout.",
+    "preCleanupHead": "02a10b9e203bb824c9ffb3eb29ecb3a46725c323",
+    "preCleanupHeadPublished": true,
+    "preCleanupPr190": "MERGED",
+    "preCleanupAllocatedKiB": 2559356
+  },
+  "retained": {
+    "database": "creator-platform-w5-local stopped normally; original61 databases and named volume creator-platform-w5-pg-20261001 retained; zero other clients before stop.",
+    "private": "Secrets0600, independent restores, original dumps and operator receipts retained under ~/.config/creator-platform/w5-20261001 and w5-20261002. Small temporary operator files/provenance preserved in cleanup-20261002.",
+    "devices": "Own AVD configuration/data and shut-down simulator retained for successor, no current W5 lease.",
+    "browser": "Private retained actor profiles and screenshots at /private/tmp/creator-w5-shell-operator retained.",
+    "shared": "Primary repository/current-chat workspace, peer worktrees/containers, Docker images, Android/iOS SDKs, JDK, global Gradle/pnpm caches retained."
+  },
+  "deletedSharedOrPrivateData": false,
+  "newProductCode": false,
+  "newTests": false,
+  "limits": "du measures logical allocated directory entries, including possible hardlinks/APFS clones; global free-space changes may include concurrent peer cleanup. This is resource housekeeping, not additional application acceptance."
+}
