@@ -3,8 +3,9 @@ export class DomainError extends Error {
     readonly code: string,
     message: string,
     readonly status = 403,
+    options?: ErrorOptions,
   ) {
-    super(message);
+    super(message, options);
   }
 }
 export function invariant(

@@ -106,6 +106,8 @@ export function createPublicationMedia(input: {
       transaction: string;
       pid: number;
       originalHash: string;
+      signal?: AbortSignal;
+      check(): void;
       attachments: Map<string, ContentBody["media"][number]>;
       evidence: Map<string, ProcessedMediaEvidence>;
       ready: Map<string, string>;
@@ -119,7 +121,9 @@ export function createPublicationMedia(input: {
       "media_publication_preparation_required",
       "Prepare media on its original publication task and client.",
     );
+    held.check();
     const original = await input.identity.originalInTransaction(scope, client);
+    held.check();
     invariant(
       held.transaction === original.transaction &&
         held.pid === original.pid &&
@@ -129,9 +133,12 @@ export function createPublicationMedia(input: {
     );
     return held;
   };
-  const assertPurpose = async (client: PoolClient) => {
-    for (const source of sources)
+  const assertPurpose = async (client: PoolClient, check: () => void) => {
+    check();
+    for (const source of sources) {
       await assertRegisteredMigration(client, source);
+      check();
+    }
     const result = await client.query<{ ready: boolean }>(
       `SELECT current_user=session_user AND current_user='creator_publication_worker'
        AND current_setting('transaction_isolation')='read committed'
@@ -161,6 +168,7 @@ export function createPublicationMedia(input: {
              OR has_any_column_privilege(current_user,c.oid,'SELECT,INSERT,UPDATE,REFERENCES')))
        AS ready FROM pg_roles r WHERE r.rolname=current_user`,
     );
+    check();
     invariant(
       result.rows[0]?.ready === true,
       "media_publication_unconfigured",
@@ -173,12 +181,14 @@ export function createPublicationMedia(input: {
     id: string,
   ) => {
     const held = await current(client, scope);
+    held.check();
     invariant(
       held.evidence.has(id),
       "media_version_changed",
       "Use only this original signed publication's media.",
     );
-    await assertPurpose(client);
+    await assertPurpose(client, held.check);
+    held.check();
     invariant(
       scope.signedActId,
       "media_signature_required",
@@ -188,6 +198,7 @@ export function createPublicationMedia(input: {
       "SELECT creator.publication_media_snapshot($1,$2,$3,$4) AS snapshot",
       [scope.creatorId, scope.contentId, scope.version, z.uuid().parse(id)],
     );
+    held.check();
     const value = snapshotSchema.parse(result.rows[0]?.snapshot);
     invariant(
       value.creatorId === scope.creatorId &&
@@ -215,7 +226,10 @@ export function createPublicationMedia(input: {
   const verifiedBytes = async (
     row: Snapshot,
     proof: ProcessedMediaEvidence,
+    signal: AbortSignal | undefined,
+    check: () => void,
   ) => {
+    check();
     if (
       contentHash(evidenceOf(row)) !== contentHash(proof) ||
       row.manifestPending ||
@@ -241,7 +255,9 @@ export function createPublicationMedia(input: {
       row.maxBytes,
       { bytes: row.bytes, sha256: row.sha256 },
       false,
+      signal,
     );
+    check();
     await readMediaFile(
       input.storage.file(row.id, "output"),
       row.maxBytes,
@@ -250,16 +266,31 @@ export function createPublicationMedia(input: {
         sha256: row.provenance!.fileSha256 as string,
       },
       false,
+      signal,
     );
+    check();
     return Date.parse(row.expiresAt) > Date.now();
   };
   return Object.freeze<PublicationMedia>({
     async prepare(client, scope) {
+      // Only the genuine issuer supplies cancellation for this same task/client.
+      // An unsignaled original stays unsignaled; no replacement controller is made.
+      const signal = input.identity.originalSignalInTransaction(scope, client);
+      const check = () => {
+        invariant(
+          input.identity.originalSignalInTransaction(scope, client) === signal,
+          "media_publication_signal_changed",
+          "The original publication cancellation context changed.",
+        );
+        signal?.throwIfAborted();
+      };
+      check();
       const original = await input.identity.originalInTransaction(
         scope,
         client,
       );
-      await assertPurpose(client);
+      check();
+      await assertPurpose(client, check);
       invariant(
         !prepared.has(scope),
         "media_publication_preparation_required",
@@ -291,6 +322,8 @@ export function createPublicationMedia(input: {
         transaction: original.transaction,
         pid: original.pid,
         originalHash: contentHash(original),
+        signal,
+        check,
         attachments,
         evidence,
         ready: new Map(),
@@ -299,6 +332,7 @@ export function createPublicationMedia(input: {
     },
     async evidence(client, scope, attachment) {
       const held = await current(client, scope);
+      held.check();
       const original = held.attachments.get(attachment.assetId);
       invariant(
         original && contentHash(original) === contentHash(attachment),
@@ -306,6 +340,7 @@ export function createPublicationMedia(input: {
         "The complete original attachment is required.",
       );
       const row = await snapshot(client, scope, attachment.assetId);
+      held.check();
       invariant(
         row.version === attachment.version &&
           row.sha256 === attachment.sha256 &&
@@ -329,6 +364,7 @@ export function createPublicationMedia(input: {
     },
     async ready(client, scope, expected) {
       const held = await current(client, scope);
+      held.check();
       const proof = ProcessedMediaEvidenceSchema.parse(expected);
       const original = held.evidence.get(proof.assetId);
       invariant(
@@ -338,18 +374,24 @@ export function createPublicationMedia(input: {
       );
       held.ready.delete(proof.assetId);
       const row = await snapshot(client, scope, proof.assetId);
+      held.check();
       // Share-locks from the projection hold the actual asset through commit.
       // Verify both immutable processed bytes and the distinct served variant;
       // no credential tool, signer, repair or alternate file is run here.
-      if (!(await verifiedBytes(row, proof))) return false;
+      const verified = await verifiedBytes(row, proof, held.signal, held.check);
+      held.check();
+      if (!verified) return false;
       await input.identity.authorizeInTransaction(scope, client);
-      await assertPurpose(client);
+      held.check();
+      await assertPurpose(client, held.check);
+      held.check();
       if (Date.parse(row.expiresAt) <= Date.now()) return false;
       held.ready.set(row.id, contentHash(row));
       return true;
     },
     async finalize(client, scope) {
       const held = await current(client, scope);
+      held.check();
       invariant(
         held.ready.size === held.evidence.size,
         "media_publication_unavailable",
@@ -362,14 +404,16 @@ export function createPublicationMedia(input: {
         a.localeCompare(b),
       )) {
         const row = await snapshot(client, scope, id);
+        held.check();
         earliestExpiry = Math.min(earliestExpiry, Date.parse(row.expiresAt));
         invariant(
           contentHash(row) === held.ready.get(id) &&
-            (await verifiedBytes(row, proof)),
+            (await verifiedBytes(row, proof, held.signal, held.check)),
           "media_publication_unavailable",
           "The actual media metadata, provenance or bytes changed before commit.",
         );
       }
+      held.check();
       invariant(
         earliestExpiry > Date.now(),
         "media_publication_unavailable",
