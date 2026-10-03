@@ -1,5 +1,11 @@
 # Trust transaction settlement — October 3, 2026 UTC
 
+## Current runnable web build and reviewed cancellation — 2026-10-03
+
+Actual36d37cb96efabe9f9e2474beac466dce2a410aaf production Next build exits0 in10.38seconds using a fresh ignored in-project output directory. The installed16.3.7 distDir documentation explicitly forbids leaving the project; the earlier external-relative attempt panics before compilation and exits1 in0.84seconds. Its failed operator/log and the earlier generated-import assertion failure remain private. The corrected operator saves the actual compiler exit before checking generated imports, restores both exact original imports and verifies clean unchanged tracked source. It inherits no provider environment, acquires no device and normally releases its finite heavy guard. A runnable bundle does not qualify the current original-session or signed Ops workflow.
+
+W8 independently reads W5's entire28c133d7 two-file repair and full bounded core classifier, then reuses only its byte-identical core classifier. Private wrapped AbortError/TimeoutError now remains uncertain throughout the cause chain before any helper cleanup. Exact backend types/scoped lint/format pass after an initial wrong-relative-path copy leaves baseline unchanged and uncredited. W5 retains actual product consumer/cleanup custody; its primitive results are not borrowed as a genuine reply, task, recorded decision or application acceptance. Central Trust worker ACK/lost-COMMIT-response reconciliation remains open.
+
 ## Original reply-review error cause — 15:38 UTC
 
 The genuine `trustReplyError` adapter preserves the original non-DomainError as a private, nonenumerable cause while retaining its current public status and message. W5 identified that dropping a real PostgreSQL read-timeout cause could let its consumer attempt savepoint cleanup after an uncertain query. Its consumer repair remains separately owned; this adapter supplies no reply, decision or permission.
