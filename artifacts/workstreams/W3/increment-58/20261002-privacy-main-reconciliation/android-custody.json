@@ -1,0 +1,33 @@
+{
+  "source": "e9c740ea7f293f37c800cad65e3ae9920279fe42",
+  "timestamp": "2026-10-02T17:06:54.423293+00:00",
+  "custody": {
+    "token": "38199bbd-9dbb-479f-843d-3534dbcfde15",
+    "inode": 241224849,
+    "pid": 7254,
+    "slot": "/private/tmp/creator-platform-emulator-slot-2",
+    "serial": "emulator-5584"
+  },
+  "avd": "Qelvora_W3_API34",
+  "fontScale": "2.0",
+  "displaySize": "Physical size: 1170x2532",
+  "displayDensity": "Physical density: 480",
+  "coldLaunchWaitMs": {
+    "Light": 1262,
+    "Night": 870
+  },
+  "latencyQualification": "Application launches only; no conversation acknowledgement or p95 qualification.",
+  "account": "Personally selected Development actor one and recovered existing kilnfire using the real shipping client.",
+  "privacy": "Empty thread list; actual export/delete endpoint refusal. No export or deletion performed.",
+  "shutdown": {
+    "timestamp": "2026-10-02T17:07:19.423773+00:00",
+    "supervisorExit": 0,
+    "ownProcessAbsent": true,
+    "ownSerialAbsent": true,
+    "exactSlotReleased": true,
+    "peerSlotUntouched": true
+  },
+  "inputMethod": "Actual earlier taps and scrolls used adb shell input, with uiautomator hierarchy and actual screenshot readback. This did not follow the required CUA-only UI input method.",
+  "supportedCUAAcceptance": false,
+  "requiredRepeat": "Repeat personally through supported CUA; no successful Android Studio attachment recipe is claimed."
+}

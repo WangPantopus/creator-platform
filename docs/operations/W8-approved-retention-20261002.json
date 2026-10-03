@@ -1,0 +1,27 @@
+{
+  "version": "w8-product-retention-20261002-v1",
+  "approvalDate": "2026-10-02",
+  "approvedBy": "project-owner",
+  "scope": "creator-platform-product-data",
+  "ordinaryData": {
+    "denyImmediately": true,
+    "purgeByDaysAfterOriginalDeletionRequest": 30
+  },
+  "detachedKnownAIAccounting": {
+    "retainCalendarMonths": 12,
+    "from": "original-settlement",
+    "detachAccountIdentityAndPrivateText": true,
+    "preserveOriginalAmountsAndReferences": true
+  },
+  "unresolvedAIAccounting": {
+    "status": "operator-and-maximum-period-missing",
+    "proposedEscalationAfterDays": 30,
+    "operator": null,
+    "maximumUnresolvedPeriod": null,
+    "preserveUnknownStateAndReservationCeiling": true
+  },
+  "externalProviderRetentionAuthority": null,
+  "externalSubscriptionAuthority": null,
+  "legalCertification": null,
+  "productionReady": false
+}
