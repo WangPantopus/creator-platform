@@ -17,7 +17,7 @@ type IdentityScope = {
   session: Session;
 };
 const Scope = createContext<IdentityScope | null>(null);
-const sessionChannel = "qelvora-identity-status";
+export const sessionChannel = "qelvora-identity-status";
 
 /** Only an invalidation signal crosses tabs; credentials and private data never do. */
 export function announceSessionEnd() {
@@ -37,6 +37,26 @@ export function IdentitySessionBoundary({
   returnTo: string;
   children: React.ReactNode;
 }) {
+  return (
+    <IdentitySessionView
+      key={`${initial.accountId}:${initial.sessionId}:${returnTo}`}
+      initial={initial}
+      returnTo={returnTo}
+    >
+      {children}
+    </IdentitySessionView>
+  );
+}
+
+function IdentitySessionView({
+  initial,
+  returnTo,
+  children,
+}: {
+  initial: Session;
+  returnTo: string;
+  children: React.ReactNode;
+}) {
   const [valid, setValid] = useState(true);
   const [error, setError] = useState("");
   const [session, setSession] = useState(initial);
@@ -44,33 +64,53 @@ export function IdentitySessionBoundary({
   const sessionId = initial.sessionId;
   const controller = useRef<AbortController | null>(null);
   if (!controller.current) controller.current = new AbortController();
-  const end = useCallback(() => {
-    controller.current?.abort();
-    setValid(false);
-    location.replace(`/auth/continue?returnTo=${encodeURIComponent(returnTo)}`);
-  }, [returnTo]);
+  const [lifetime, setLifetime] = useState(() => ({
+    signal: controller.current!.signal,
+    revision: 0,
+  }));
+  const signal = lifetime.signal;
+  const end = useCallback(
+    (original: AbortSignal) => {
+      if (original.aborted || controller.current?.signal !== original) return;
+      controller.current.abort();
+      setValid(false);
+      location.replace(
+        `/auth/continue?returnTo=${encodeURIComponent(returnTo)}`,
+      );
+    },
+    [returnTo],
+  );
+  const endOriginal = useCallback(() => end(signal), [end, signal]);
   useEffect(() => {
+    // Development effect restarts need a fresh lifetime. Old consumers retain
+    // their aborted signal; they cannot end or update this replacement view.
+    if (controller.current!.signal.aborted)
+      controller.current = new AbortController();
+    const owner = controller.current!;
+    setLifetime((previous) =>
+      previous.signal === owner.signal
+        ? previous
+        : { signal: owner.signal, revision: previous.revision + 1 },
+    );
     let active = true;
     let checking = false;
     const check = async () => {
-      if (!active || checking || controller.current?.signal.aborted) return;
+      if (!active || checking || owner.signal.aborted) return;
       checking = true;
       try {
         const options = {
           cache: "no-store",
-          signal: AbortSignal.any([
-            controller.current!.signal,
-            AbortSignal.timeout(4000),
-          ]),
+          signal: AbortSignal.any([owner.signal, AbortSignal.timeout(4000)]),
         } satisfies RequestInit;
         let response = await fetch("/api/platform/identity/session", options);
+        if (!active || owner.signal.aborted) return;
         // Rotation can invalidate an in-flight request using the previous
         // cookie. Recheck the current cookie before ending the visible session.
         if (response.status === 401)
           response = await fetch("/api/platform/identity/session", options);
-        if (!active) return;
+        if (!active || owner.signal.aborted) return;
         if (response.status === 401) {
-          end();
+          end(owner.signal);
           return;
         }
         if (!response.ok)
@@ -78,18 +118,18 @@ export function IdentitySessionBoundary({
             "Reconnect to check your account status. Your unsaved input is kept.",
           );
         const session = SessionSchema.parse(await response.json());
-        if (!active) return;
+        if (!active || owner.signal.aborted) return;
         if (
           session.accountId !== accountId ||
           session.sessionId !== sessionId
         ) {
-          end();
+          end(owner.signal);
           return;
         }
         setError("");
         setSession(session);
       } catch {
-        if (active && !controller.current?.signal.aborted)
+        if (active && !owner.signal.aborted)
           setError(
             "Reconnect to check your account status. Your unsaved input is kept.",
           );
@@ -103,7 +143,7 @@ export function IdentitySessionBoundary({
         : new BroadcastChannel(sessionChannel);
     if (channel)
       channel.onmessage = (event) => {
-        if (event.data === "ended") end();
+        if (active && event.data === "ended") end(owner.signal);
       };
     const timer = setInterval(check, 4000);
     window.addEventListener("focus", check);
@@ -112,6 +152,7 @@ export function IdentitySessionBoundary({
     void check();
     return () => {
       active = false;
+      owner.abort();
       clearInterval(timer);
       channel?.close();
       window.removeEventListener("focus", check);
@@ -122,7 +163,8 @@ export function IdentitySessionBoundary({
   if (!valid) return null;
   return (
     <Scope.Provider
-      value={{ accountId, signal: controller.current.signal, end, session }}
+      key={lifetime.revision}
+      value={{ accountId, signal, end: endOriginal, session }}
     >
       {error && (
         <Notice title="Account status" tone="offline">
@@ -137,46 +179,60 @@ export function IdentitySessionBoundary({
 export function useIdentityRequest() {
   const scope = useContext(Scope);
   const accountId = scope?.accountId;
+  const sessionId = scope?.session.sessionId;
   const signal = scope?.signal;
   const end = scope?.end;
   const request = useCallback(
     async (path: string, init: RequestInit = {}) => {
-      if (!signal || !end || !accountId)
+      if (!signal || !end || !accountId || !sessionId)
         throw new Error("Identity session required.");
+      const original = AbortSignal.any([
+        signal,
+        AbortSignal.timeout(10000),
+        ...(init.signal ? [init.signal] : []),
+      ]);
+      original.throwIfAborted();
       const headers = new Headers(init.headers);
       // This is a mismatch precondition, never a source of account authority.
       headers.set("X-Expected-Account-Id", accountId);
+      headers.set("X-Expected-Session-Id", sessionId);
       const response = await fetch(`/api/platform/identity/${path}`, {
         ...init,
         headers,
         cache: "no-store",
-        signal: AbortSignal.any([
-          signal,
-          AbortSignal.timeout(10000),
-          ...(init.signal ? [init.signal] : []),
-        ]),
+        signal: original,
       });
+      original.throwIfAborted();
       if (response.status === 401) {
         const current = await fetch("/api/platform/identity/session", {
           cache: "no-store",
-          signal: AbortSignal.any([signal, AbortSignal.timeout(4000)]),
+          signal: AbortSignal.any([original, AbortSignal.timeout(4000)]),
         });
+        original.throwIfAborted();
+        const session = current.ok
+          ? SessionSchema.parse(await current.json())
+          : undefined;
+        original.throwIfAborted();
         if (
           current.status === 401 ||
-          (current.ok &&
-            SessionSchema.parse(await current.json()).accountId !== accountId)
+          (session &&
+            (session.accountId !== accountId ||
+              session.sessionId !== sessionId))
         )
           end();
-      } else if (
-        response.status === 409 &&
-        (await response.clone().json()).error?.code ===
-          "session_account_changed"
-      )
-        end();
-      if (signal.aborted) throw new DOMException("Session ended", "AbortError");
+      } else if (response.status === 409) {
+        const failure = await response.clone().json();
+        original.throwIfAborted();
+        if (
+          failure.error?.code === "session_account_changed" ||
+          failure.error?.code === "session_view_changed"
+        )
+          end();
+      }
+      original.throwIfAborted();
       return response;
     },
-    [accountId, signal, end],
+    [accountId, sessionId, signal, end],
   );
   if (!scope)
     throw new Error("Identity forms require an account session boundary.");
