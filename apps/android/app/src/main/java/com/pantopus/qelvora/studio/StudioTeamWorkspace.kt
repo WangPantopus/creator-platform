@@ -156,7 +156,7 @@ private class NativeTeamState(
     }
     fun select(role: String, selected: Boolean) {
         val value = edit ?: return
-        if (!mayManage || saving || reading || value.unknown || value.confirmed) return
+        if (!mayManage || saving || reading || editIsStale || value.unknown || value.confirmed) return
         edit = value.copy(desired = (if (selected) (value.desired + role).distinct() else value.desired.filter { it != role }).sorted())
     }
     fun reviewCurrent() {
@@ -262,7 +262,7 @@ fun StudioTeamWorkspace(
                         TextLine(teamCopy("Desired", mapOf("roles" to edit.desired.joinToString { it.lowercase() })))
                         state.currentEditRoles?.let { TextLine(teamCopy("Current", mapOf("roles" to it.joinToString { role -> role.lowercase() }))) }
                         TeamRole.entries.forEach { role ->
-                            Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).toggleable(value = edit.desired.contains(role.name), enabled = !state.saving && !state.reading && !edit.unknown && !edit.confirmed, role = Role.Checkbox, onValueChange = { state.select(role.name, it) }).padding(vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).toggleable(value = edit.desired.contains(role.name), enabled = !state.saving && !state.reading && !state.editIsStale && !edit.unknown && !edit.confirmed, role = Role.Checkbox, onValueChange = { state.select(role.name, it) }).padding(vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                                 Glyph(if (edit.desired.contains(role.name)) "check" else "circle", 20.dp, qColor("ink"))
                                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) { TextLine(role.title, strong = true); TextLine(role.detail, "caption") }
                             }

@@ -158,7 +158,7 @@ private struct NativeTeamEdit {
         error = ""
     }
     func select(_ role: String, selected: Bool) {
-        guard mayManage, !saving, !reading, var value = edit, !value.unknown, !value.confirmed else { return }
+        guard mayManage, !saving, !reading, !editIsStale, var value = edit, !value.unknown, !value.confirmed else { return }
         value.desired = (selected ? Array(Set(value.desired + [role])) : value.desired.filter { $0 != role }).sorted()
         edit = value
     }
@@ -289,7 +289,7 @@ private struct NativeTeamExpired: Error {}
                 ForEach(NativeTeamRole.allCases) { role in
                     Toggle(isOn: Binding(get: { edit.desired.contains(role.rawValue) }, set: { state.select(role.rawValue, selected: $0) })) {
                         VStack(alignment: .leading, spacing: 4) { Text(role.title).qText("body-strong"); Text(role.detail).qText("caption") }
-                    }.frame(minHeight: 48).disabled(state.saving || state.reading || edit.unknown || edit.confirmed)
+                    }.frame(minHeight: 48).disabled(state.saving || state.reading || state.editIsStale || edit.unknown || edit.confirmed)
                 }
                 if state.editIsStale && state.currentEditRoles != nil {
                     Button(teamCopy("ReviewCurrent"), variant: .secondary, block: true, disabled: state.saving || state.reading) { state.reviewCurrent() }
