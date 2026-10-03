@@ -322,7 +322,13 @@ async function assertTerminalCatalogue(
 export class GenerationTerminalAuthority {
   private readonly issued = new WeakMap<
     GenerationTerminalScope,
-    { client: PoolClient; nonce: string; transaction: string; pid: number }
+    {
+      client: PoolClient;
+      nonce: string;
+      transaction: string;
+      pid: number;
+      readonly signal?: AbortSignal;
+    }
   >();
   private constructor(
     private readonly pool: Pool,
@@ -657,7 +663,12 @@ export class GenerationTerminalAuthority {
                 )
               ).rows[0],
             );
-          this.issued.set(scope, { client, nonce: proof.nonce, ...binding });
+          this.issued.set(scope, {
+            client,
+            nonce: proof.nonce,
+            signal,
+            ...binding,
+          });
           await this.authorizeInTransaction(scope, client);
           const value = await work(client, scope);
           await this.configuration.assertSettledInTransaction(client, scope);
@@ -674,6 +685,21 @@ export class GenerationTerminalAuthority {
     } catch (error) {
       return this.failure(error);
     }
+  }
+
+  /** Original cancellation context only; no normal generation permission. */
+  originalSignalInTransaction(
+    scope: GenerationTerminalScope,
+    client: PoolClient,
+  ): AbortSignal | undefined {
+    this.assertWorker();
+    const binding = this.issued.get(scope);
+    invariant(
+      binding && binding.client === client,
+      "generation_terminal_required",
+      "Use the original settlement transaction and scope.",
+    );
+    return binding.signal;
   }
 
   async authorizeInTransaction(
