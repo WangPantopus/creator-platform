@@ -126,7 +126,15 @@ export class ContentHeldClient {
     try {
       if (this.transaction && !this.discard) {
         try {
-          await this.client.query(control(this.client, "ROLLBACK"));
+          const result = await this.client.query(
+            control(this.client, "ROLLBACK"),
+          );
+          if (result.command !== "ROLLBACK")
+            throw new DomainError(
+              "content_privacy_rollback_unavailable",
+              "The actual Content rollback receipt is required.",
+              503,
+            );
           this.transaction = false;
         } catch (error) {
           this.discard = true;
