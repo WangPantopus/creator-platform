@@ -56,6 +56,17 @@ async function requestForView<T>(
     ? AbortSignal.any([view!.signal, ...(signal ? [signal] : [])])
     : signal;
   original?.throwIfAborted();
+  // Settle a real session read before its four-second poll replaces it. A
+  // stalled read must reach the readiness consumer while keeping the original
+  // account/view lifetime and its unsent input intact. Include the JSON body.
+  const responseSignal =
+    path === "session" && body === undefined
+      ? AbortSignal.any([
+          ...(original ? [original] : []),
+          AbortSignal.timeout(3000),
+        ])
+      : original;
+  responseSignal?.throwIfAborted();
   const response = await fetch(`/api/trust/${path}`, {
     method: body === undefined ? "GET" : "POST",
     headers: {
@@ -72,10 +83,10 @@ async function requestForView<T>(
     },
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
     cache: "no-store",
-    ...(original ? { signal: original } : {}),
+    ...(responseSignal ? { signal: responseSignal } : {}),
   });
   const result = await response.json();
-  original?.throwIfAborted();
+  responseSignal?.throwIfAborted();
   if (revision !== sessionRevision && !path.startsWith("dev/"))
     throw new TrustError(
       "Your account changed. Reopen this page.",
