@@ -976,6 +976,14 @@
       "sourceSha256": "6fa4006cb8c2f6901c7006595d08196573daef33f06aa6cec866a546ffcd2f01",
       "state": "reserved_unapplied",
       "reason": "Additive original0027 ownership constraint continuation and isolated metadata-only registered-source readiness. New verified jobs capture immutable full original ownership for every scope. Original0027/0087 bytes, roles and history stay unchanged; old NULL snapshots fail closed. Actual held non-account family projection is a separate pending purpose; closed SQL/catalogue review and actual unavailable web acceptance do not activate this source or qualify full C10."
+    },
+    {
+      "id": "0210",
+      "owner": "W2",
+      "version": "0210_w2_generation_guardrail_event",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_generation_guardrail_event.sql",
+      "state": "reserved_unapplied",
+      "reason": "Distinct fixed W2 generation_record_agent_guardrail(uuid,uuid,text,text) event purpose requested by the current owner. Requires actual W1 original private nonce/job/client/PID/fullXID/login, current W2 input/version, bounded category/contextHash, current restoration/negative authority, original idempotency and actual C10/expiry. Isolated NoLogin purpose with fixed own audit insertion only; no raw worker table grant, fan text/message/memory/money, fabricated Actor or dropped guardrail effect. Exact owner source/signature/typed issuer manifest/effective catalogue/compiler and real operation review pending. Allocation only; no activation or provider permission."
     }
   ]
 }
