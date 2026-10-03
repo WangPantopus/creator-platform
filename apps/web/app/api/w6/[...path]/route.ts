@@ -41,6 +41,11 @@ async function proxy(
     const queryAccounts = query.getAll("expectedAccountId");
     const headerAccount = request.headers.get("x-qelvora-expected-account");
     const selector = headerAccount ?? queryAccounts[0];
+    const querySessions = query.getAll("expectedSessionId");
+    const headerSession = request.headers.get("X-Expected-Session-Id");
+    const sessionSelector = headerSession ?? querySessions[0];
+    let expectedAccount: string | undefined;
+    let expectedSession: string | undefined;
     if (selector !== undefined && selector !== null) {
       const expected = IdSchema.safeParse(selector);
       if (
@@ -59,13 +64,42 @@ async function proxy(
           },
           { status: 400, headers: { "Cache-Control": "no-store" } },
         );
+      expectedAccount = expected.data;
+    }
+    if (sessionSelector !== undefined && sessionSelector !== null) {
+      const expected = IdSchema.safeParse(sessionSelector);
+      if (
+        !expected.success ||
+        querySessions.length > 1 ||
+        (headerSession !== null &&
+          querySessions.length === 1 &&
+          headerSession !== querySessions[0])
+      )
+        return Response.json(
+          {
+            error: {
+              code: "session_view_invalid",
+              message: "Reopen this content with your current session.",
+            },
+          },
+          { status: 400, headers: { "Cache-Control": "no-store" } },
+        );
+      expectedSession = expected.data;
+    }
+    if (expectedAccount !== undefined || expectedSession !== undefined) {
+      // Both facts come from W1's genuine issuer under this same immutable
+      // request cookie. Selectors only refuse a mismatch; they grant nothing.
       const actual = await platformFetch("/v1/identity/session");
       if (!actual.ok)
         return Response.json(await actual.json(), {
           status: actual.status,
           headers: { "Cache-Control": "no-store" },
         });
-      if (SessionSchema.parse(await actual.json()).accountId !== expected.data)
+      const session = SessionSchema.parse(await actual.json());
+      if (
+        expectedAccount !== undefined &&
+        session.accountId !== expectedAccount
+      )
         return Response.json(
           {
             error: {
@@ -75,9 +109,29 @@ async function proxy(
           },
           { status: 409, headers: { "Cache-Control": "no-store" } },
         );
-      headers["x-qelvora-expected-account"] = expected.data;
+      if (
+        expectedSession !== undefined &&
+        session.sessionId !== expectedSession
+      )
+        return Response.json(
+          {
+            error: {
+              code: "session_view_changed",
+              message:
+                "Your session changed. Reopen this form before continuing.",
+            },
+          },
+          { status: 409, headers: { "Cache-Control": "no-store" } },
+        );
+      if (expectedAccount !== undefined) {
+        headers["x-qelvora-expected-account"] = expectedAccount;
+        headers["X-Expected-Account-Id"] = expectedAccount;
+      }
+      if (expectedSession !== undefined)
+        headers["X-Expected-Session-Id"] = expectedSession;
     }
     query.delete("expectedAccountId");
+    query.delete("expectedSessionId");
     const upstreamQuery = query.toString();
     const data = ["GET", "HEAD"].includes(request.method)
       ? undefined
