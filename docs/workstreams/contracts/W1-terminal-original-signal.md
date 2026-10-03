@@ -1,0 +1,5 @@
+# Original terminal signal custody
+
+`GenerationTerminalAuthority.originalSignalInTransaction(scope, client)` synchronously returns the exact optional signal already passed by the original `withTerminal` call to its original held transaction. The private issued WeakMap retains that signal as readonly. The getter requires its genuine live `GenerationTerminalScope`, the same client and the existing non-request worker condition. It issues no SQL, controller, Task, scope or permission; durable terminal authorization, mode, provenance, original client/PID/fullXID/nonce and catalogue checks remain required.
+
+This terminal scope is distinct from normal `GenerationTaskScope` and publication custody. W4 may bookend its complete owner awaits with the original terminal signal; an unsignaled after-incurred settlement remains unsignaled. Binding cleanup invalidates the port. Existing settlement, terminal cleanup and catalogue order are unchanged. No worker purpose or accepted catalogue pin is activated, and source checks do not establish positive terminal or provider operation.

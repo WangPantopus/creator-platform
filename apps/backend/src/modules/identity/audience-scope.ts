@@ -9,6 +9,7 @@ import {
   assertHeldCurrentRequestSession,
 } from "./request-authority.js";
 import { invariant } from "../../core/errors.js";
+import { withRequestContextRestore } from "./request-context.js";
 
 const audienceScopeBrand: unique symbol = Symbol("AudienceScope");
 
@@ -157,24 +158,26 @@ export class AudienceIdentityAuthority {
       [scope.creatorId, scope.fanId, scope.actorAccountId],
     );
     // Hold genuine negative keys before positive profile/family leases.
-    try {
-      await this.configuration.assertAllowed(
-        held.actor,
-        scope.creatorId,
-        {
-          fanId: scope.fanId,
-          fanAccountId: scope.fanAccountId,
-          creatorAccountId: scope.creatorAccountId,
-        },
-        client,
-      );
-      await assertHeldCurrentRequestSession(held, client);
-    } finally {
-      await client.query(
-        "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true),set_config('app.account_id',$3,true)",
-        [scope.creatorId, scope.fanId, scope.actorAccountId],
-      );
-    }
+    await withRequestContextRestore(
+      async () => {
+        await this.configuration.assertAllowed(
+          held.actor,
+          scope.creatorId,
+          {
+            fanId: scope.fanId,
+            fanAccountId: scope.fanAccountId,
+            creatorAccountId: scope.creatorAccountId,
+          },
+          client,
+        );
+        await assertHeldCurrentRequestSession(held, client);
+      },
+      () =>
+        client.query(
+          "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true),set_config('app.account_id',$3,true)",
+          [scope.creatorId, scope.fanId, scope.actorAccountId],
+        ),
+    );
     // Public profile SELECT does not grant its owner-only UPDATE RLS required
     // by FOR SHARE. Lock only this already-resolved creator row under its
     // actual owner, then restore the audience account before any domain work.

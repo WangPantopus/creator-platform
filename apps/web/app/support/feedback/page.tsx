@@ -3,10 +3,11 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import {
   TrustSession,
-  trustApi,
+  useTrustRequest,
   useTrustSession,
 } from "../../ops/trust-client";
 export default function FeedbackPage() {
+  const request = useTrustRequest();
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const form = useRef<HTMLFormElement>(null);
@@ -34,7 +35,7 @@ export default function FeedbackPage() {
           setBusy(true);
           const input = new FormData(event.currentTarget);
           try {
-            await trustApi("feedback", {
+            await request("feedback", {
               consent: input.get("consent") === "on",
               cohort: input.get("cohort"),
               useful: input.get("useful") === "yes",

@@ -1,0 +1,25 @@
+{
+  "sourceRevision": "0220c457a01fc98e3c32f39e19fc67caaaf54e8f",
+  "environment": {
+    "database": "separate disposable PostgreSQL 17 with pgvector",
+    "cpu": 1,
+    "memoryMiB": 512
+  },
+  "existingChecks": {
+    "files": 2,
+    "tests": 18,
+    "passed": 18,
+    "failed": 0,
+    "vitestDurationSeconds": 131.96,
+    "supervisedElapsedMs": 133397
+  },
+  "newUnitTestsWritten": false,
+  "retainedW1DatabaseTouched": false,
+  "ownedDisposableDatabaseStoppedAndRemoved": true,
+  "peerResourcesTouched": false,
+  "limits": [
+    "No positive held-purpose or provider operation is inferred.",
+    "Current same-client generation/terminal source is compiled; live catalogue drift acceptance remains open.",
+    "Shipping native and personal operation remain qualified to their recorded earlier revisions."
+  ]
+}

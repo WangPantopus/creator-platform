@@ -1,0 +1,14 @@
+Primary tool transcript findings; this file is a narrated record, not reconstructed raw command output.
+First combined backend compile failed on duplicate Growth integration imports and canonicalContentFollows declaration; exact W7 single-definition source restored and retry passed.
+Two attempted historical contract-log paths were absent; located actual studio-runtime/20261002/core-follow-live-raw path.
+Recursive heavy-lock cleanup command rejected before execution; owner-checked unlink plus empty-directory removal used safely.
+First compiled API launch failed ENOENT resolving registry outside repository; full private process log retained0600, sanitized startup failure recorded separately.
+First readiness attempt failed connection before repaired API; actual retry503 trust_unconfigured preserved.
+Swift first original run failed iOS-only autocapitalization in main availability source; existing cross-platform helper repaired all three sites; original retry passed.
+First local web visual had one127.0.0.1 versus localhost origin mismatch; no test/reference/tolerance or runner changed, retry uses normal localhost origin.
+Production browser Continue click retained auth page without visible acknowledgement; actual API independently503 identity_unconfigured. This is not successful sign-in.
+Swift successful log retains compiler/test output with host Contacts storage URI metadata redacted; full0600 private original retained, no Contacts data exported.
+Fresh catalogue first read used incorrect verification_status column and failed42703; inspected actual canonical source, corrected verification query, current40 migrations/0 creators verified. Empty initial output is failure, not catalogue evidence.
+One evidence-summary XML read used element indexing and failed TypeError; corrected attribute read, no source/product mutation.
+iOS first Reload tap after Save hit Home tab because control partially crossed738-point content edge; actual Home AX/screenshot preserved. Warm settings return and fully visible control used for corrected attempt.
+First broad input scan incorrectly classified nonsecret PASSKEY_ORIGINS localhost URL as a key and matched four AX URL records. Corrected secret field classification; actual passwords/keys/private DB credentials found zero matches across complete increment. Raw command logs intentionally preserve terminal whitespace; source-only diff whitespace check passed separately.

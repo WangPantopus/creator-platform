@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import java.net.HttpURLConnection
 import java.net.URL
+import java.io.IOException
 import java.util.UUID
 
 @Serializable data class ConversationMessage(
@@ -96,6 +97,9 @@ class ConversationClient(private val baseURL: String, private val token: () -> S
                 throw ConversationFailure(if (error?.get("code")?.jsonPrimitive?.content == "session_account_changed") 401 else status, error?.get("message")?.jsonPrimitive?.content ?: "This conversation is unavailable. Your input is kept.")
             }
             value ?: throw ConversationFailure(503, "Reconnect to refresh this conversation.")
+        } catch (failure: IOException) {
+            coroutineContext.ensureActive()
+            throw ConversationFailure(503, "Reconnect to refresh. Your input is kept.")
         } finally { connection.disconnect() }
     }
     suspend fun page(path: String): ConversationPage = json.decodeFromJsonElement(request(path))

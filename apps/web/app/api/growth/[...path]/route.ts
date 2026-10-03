@@ -25,6 +25,15 @@ async function handle(
   try {
     const result = await growthRequest(path + request.nextUrl.search, {
       method: request.method,
+      ...(request.headers.get("X-Expected-Account-Id")
+        ? {
+            headers: {
+              "X-Expected-Account-Id": request.headers.get(
+                "X-Expected-Account-Id",
+              )!,
+            },
+          }
+        : {}),
       ...(request.method !== "GET" && request.method !== "DELETE"
         ? { body: await request.text() }
         : {}),

@@ -19,6 +19,7 @@ import { PasskeyService } from "./modules/identity/passkeys.js";
 import { attachRealtime } from "./realtime/gateway.js";
 import type { SignedSubjectPolicy } from "./modules/identity/subjects.js";
 import { createTrustRuntime } from "./operations/runtime.js";
+import { requestAuthority } from "./modules/identity/request-authority.js";
 import { resolveActor } from "./modules/identity/adapter.js";
 import { DomainError } from "./core/errors.js";
 import { trustIdentityAuthority } from "./modules/trust/identity-authority.js";
@@ -41,6 +42,9 @@ export type BackendRuntime = {
     client: pg.PoolClient,
   ) => Promise<void>;
   assertRestoredInTransaction?: (client: pg.PoolClient) => Promise<void>;
+  assertGenerationWorkerRestoredInTransaction?: (
+    client: pg.PoolClient,
+  ) => Promise<void>;
   assertContentAllowedInTransaction?: (
     client: pg.PoolClient,
     actor: import("./modules/identity/adapter.js").Actor,
@@ -284,6 +288,9 @@ export async function createConfiguredBackend(input: {
     ? {
         sessions,
         profiles: new IdentityProfiles(pool, {
+          ...(assertAudienceAllowed
+            ? { assertInvitationAllowed: assertAudienceAllowed }
+            : {}),
           assertCreatorAllowed: async (actor, creatorId, client) => {
             if (!trust)
               throw new DomainError(
@@ -356,6 +363,17 @@ export async function createConfiguredBackend(input: {
               actor,
               creatorId,
             );
+          },
+          assertGenerationWorkerRestoredInTransaction: async (
+            client: pg.PoolClient,
+          ) => {
+            if (!trust)
+              throw new DomainError(
+                "trust_unconfigured",
+                "Current generation recovery authority is unavailable.",
+                503,
+              );
+            await trust.assertGenerationWorkerRestoredInTransaction(client);
           },
           holdPublicPacketNegativeAuthority: async (
             client: pg.PoolClient,
@@ -480,7 +498,24 @@ export async function createConfiguredBackend(input: {
               "Continue with Pantopus to use this app.",
               401,
             );
-          return resolveActor(sessions ?? input.identity, token);
+          if (platformIdentity) {
+            // Preserve the Actor actually resolved by this request's canonical
+            // middleware. A second resolve issues a different object and cannot
+            // stand in for the original session/held-request identity.
+            const original = requestAuthority.getStore();
+            if (
+              !original?.actor ||
+              original.actor.accountId !== original.accountId ||
+              original.actor.adultEligible !== true
+            )
+              throw new DomainError(
+                "current_request_actor_required",
+                "Reopen this action with your current signed-in account.",
+                401,
+              );
+            return original.actor;
+          }
+          return resolveActor(input.identity, token);
         },
       });
     }

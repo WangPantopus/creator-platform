@@ -1,5 +1,7 @@
 # W1 focused native producer qualification
 
+This note preserves the initial focused producer qualification throughda5a. [The current W1 handoff](../../../../../docs/workstreams/handoffs/W1-continuation-2026-10-02-codex.md) separately records exact4af Swift and combined315 shipping/Swift/contract qualification, normal147 merge and remaining personal acceptance.
+
 Environment: owned main-based worktree on Mac Studio, Xcode27/iOS27 SDK, Node24/pnpm12.5.1, JDK21 and existing Android SDK. Each heavy build acquired and normally released the agreed atomic W1 build guard. No peer checkout was changed. No simulator/emulator was booted for these build checks.
 
 Source: `320d9c97c156c4c1b9514da41861321c1d3c58bc` passed all18 existing Swift checks, including the unchanged3 NativeSnapshotTests: build11.62s; suite15.149s; snapshot15.141s. No reference, tolerance or test code changed. Later changes affect only Kotlin shell extraction and shipping iOS App/project configuration; the checked Swift package sources remain identical.

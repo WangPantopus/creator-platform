@@ -3,57 +3,6 @@
 <resources>
   <string name="app_name">Qelvora</string>
   <string name="continue_with_pantopus" formatted="false">Continue with Pantopus</string>
-  <string name="identity_input_kept_unavailable" formatted="false">The service is unavailable. Your input has been kept; try again.</string>
-  <string name="identity_input_kept_unreadable" formatted="false">The service returned an unreadable response. Your input has been kept; try again.</string>
-  <string name="identity_profile_save_failed" formatted="false">Could not save. Try again.</string>
-  <string name="identity_private_clear_failed" formatted="false">This device could not clear its saved private data. Private screens are closed. Unlock it and retry clearing before signing in again.</string>
-  <string name="identity_private_clear_retry" formatted="false">Retry clearing saved private data</string>
-  <string name="identity_session_read_failed" formatted="false">This device could not read your session securely. Unlock it and try signing in again.</string>
-  <string name="identity_session_save_failed" formatted="false">This device could not save your session securely. Unlock it and try signing in again.</string>
-  <string name="identity_team_access_title" formatted="false">Current team access</string>
-  <string name="identity_team_access_loading" formatted="false">Checking team access…</string>
-  <string name="identity_team_access_required" formatted="false">Refresh team access before creating or changing invitations.</string>
-  <string name="identity_verification_invalid_link" formatted="false">This verification link is invalid.</string>
-  <string name="identity_verification_missing" formatted="false">This signed act could not be found.</string>
-  <string name="identity_verification_unavailable_title" formatted="false">Verification unavailable</string>
-  <string name="identity_verification_signed_unavailable_title" formatted="false">Signed act unavailable</string>
-  <string name="identity_verification_checking_title" formatted="false">Checking signature</string>
-  <string name="identity_verification_loading" formatted="false">Loading the current public verification.</string>
-  <string name="identity_verification_unconfigured" formatted="false">Verification is unavailable in this app. Try again when the connection is available.</string>
-  <string name="identity_verification_failed" formatted="false">Reconnect and try again. Verification could not be checked.</string>
-  <string name="identity_verification_historical_unavailable" formatted="false">The historical approval remains recorded. Current authority is unavailable.</string>
-  <string name="identity_verification_withdrawn_content_title" formatted="false">Content withdrawn</string>
-  <string name="identity_verification_withdrawn_content" formatted="false">The content is no longer public. Signature metadata remains available.</string>
-  <string name="identity_verification_metadata_title" formatted="false">Signed act metadata</string>
-  <string name="identity_verification_metadata_notice" formatted="false">Open the original authorized object to view this act. This page shows its signature metadata.</string>
-  <string name="identity_verification_private_title" formatted="false">Private signed act</string>
-  <string name="identity_verification_private_notice" formatted="false">The act’s private content and conversation are not public. This page shows signature metadata.</string>
-  <string name="identity_verification_author" formatted="false">Author</string>
-  <string name="identity_verification_act" formatted="false">Act</string>
-  <string name="identity_verification_content_version" formatted="false">Signed content version</string>
-  <string name="identity_verification_written_by" formatted="false">Written by</string>
-  <string name="identity_verification_approved_author" formatted="false">AI draft · creator approved</string>
-  <string name="identity_verification_authorized_only" formatted="false">Shown only with authorized content</string>
-  <string name="identity_verification_signed" formatted="false">Signed</string>
-  <string name="identity_verification_status" formatted="false">Status</string>
-  <string name="identity_verification_valid" formatted="false">Valid when checked</string>
-  <string name="identity_verification_key_revoked" formatted="false">Signing key revoked</string>
-  <string name="identity_verification_creator_revoked" formatted="false">Creator verification revoked</string>
-  <string name="identity_verification_withdrawn" formatted="false">This card was withdrawn</string>
-  <string name="identity_verification_shared_by" formatted="false">Shared by</string>
-  <string name="identity_verification_not_disclosed" formatted="false">Not disclosed</string>
-  <string name="identity_verification_hash" formatted="false">Exact act hash · SHA-256
-{hash}</string>
-  <string name="identity_verification_public_notice" formatted="false">Anyone can open this page. It shows authorized content, signature provenance and the revocation status when checked, with nothing else from the conversation.</string>
-  <string name="identity_verification_refresh" formatted="false">Refresh verification</string>
-  <string name="identity_verification_act_reply" formatted="false">Reply</string>
-  <string name="identity_verification_act_approved" formatted="false">Approved AI draft</string>
-  <string name="identity_verification_act_note" formatted="false">Note · one-to-many</string>
-  <string name="identity_verification_act_reaction" formatted="false">Reaction</string>
-  <string name="identity_verification_act_acceptance" formatted="false">Acceptance</string>
-  <string name="identity_verification_act_correction" formatted="false">Correction</string>
-  <string name="identity_verification_act_other" formatted="false">Signed act</string>
-  <string name="creator_interview_estimate" formatted="false">About 20 minutes for your interview</string>
   <string name="welcome_title" formatted="false">Her AI answers you now. She answers in person when you ask.</string>
   <string name="welcome_body" formatted="false">Every message says who wrote it: Maya\'s AI, Maya herself, or her team. You\'ll always know which.</string>
   <string name="pantopus_account" formatted="false">One Pantopus account signs you in to every Pantopus app. New here? You\'ll create it in the next step.</string>
@@ -119,12 +68,6 @@
   <string name="welcome_context" formatted="false">Maya · Ceramics · Kiln Club</string>
   <string name="pantopus_unavailable" formatted="false">Pantopus sign-in is not connected in this local build.</string>
   <string name="pantopus_unavailable_title" formatted="false">Pantopus sign-in is unavailable</string>
-  <string name="account_unavailable_title" formatted="false">We can\'t reach your account right now</string>
-  <string name="account_unavailable_body" formatted="false">Your session is kept on this device. Try again in a moment.</string>
-  <string name="page_unavailable_title" formatted="false">This page didn\'t load</string>
-  <string name="page_unavailable_body" formatted="false">Nothing you saved was changed. Try again in a moment.</string>
-  <string name="adult_only_title" formatted="false">This app is for adults</string>
-  <string name="adult_only_body" formatted="false">This app is available to adults aged 18 and over.</string>
   <string name="nav_home" formatted="false">Home</string>
   <string name="nav_discover" formatted="false">Discover</string>
   <string name="nav_requests" formatted="false">Requests</string>
@@ -537,25 +480,25 @@
   <string name="growth_your_entry_context_is_kept_no_message_has_been_sent" formatted="false">Your entry context is kept. No message has been sent.</string>
   <string name="growth_getstring" formatted="false">).getString(</string>
   <string name="growth_loading2" formatted="false">Loading…</string>
-  <string name="growth_kind_ai_reply" formatted="false">ai reply</string>
-  <string name="growth_kind_approved_draft" formatted="false">approved draft</string>
-  <string name="growth_kind_personal_reply" formatted="false">personal reply</string>
-  <string name="growth_kind_request_status" formatted="false">request status</string>
-  <string name="growth_kind_call_reminder" formatted="false">call reminder</string>
-  <string name="growth_kind_answered_publicly" formatted="false">answered publicly</string>
-  <string name="growth_kind_content_match" formatted="false">content match</string>
-  <string name="growth_kind_announcement" formatted="false">announcement</string>
-  <string name="growth_kind_creator_offer" formatted="false">creator offer</string>
-  <string name="growth_kind_slot_change" formatted="false">slot change</string>
-  <string name="growth_kind_new_packet" formatted="false">new packet</string>
-  <string name="growth_kind_commitment_due" formatted="false">commitment due</string>
-  <string name="growth_kind_guardrail" formatted="false">guardrail</string>
-  <string name="growth_kind_pool_share" formatted="false">pool share</string>
-  <string name="growth_kind_note" formatted="false">note</string>
-  <string name="growth_kind_reaction" formatted="false">reaction</string>
-  <string name="growth_kind_public_answer" formatted="false">public answer</string>
-  <string name="growth_kind_spending_reminder" formatted="false">spending reminder</string>
-  <string name="growth_kind_weekly_impact" formatted="false">weekly impact</string>
+  <string name="growth_kind_ai_reply" formatted="false">AI replies</string>
+  <string name="growth_kind_approved_draft" formatted="false">Approved AI drafts</string>
+  <string name="growth_kind_personal_reply" formatted="false">Personal replies and voice notes</string>
+  <string name="growth_kind_request_status" formatted="false">Request status updates</string>
+  <string name="growth_kind_call_reminder" formatted="false">Call reminders</string>
+  <string name="growth_kind_answered_publicly" formatted="false">Your question answered publicly</string>
+  <string name="growth_kind_content_match" formatted="false">Posts about what you asked</string>
+  <string name="growth_kind_announcement" formatted="false">Creator announcements</string>
+  <string name="growth_kind_creator_offer" formatted="false">Offers from creators</string>
+  <string name="growth_kind_slot_change" formatted="false">Pass slot changes</string>
+  <string name="growth_kind_new_packet" formatted="false">New requests</string>
+  <string name="growth_kind_commitment_due" formatted="false">Commitment reminders</string>
+  <string name="growth_kind_guardrail" formatted="false">Safety events and reports</string>
+  <string name="growth_kind_pool_share" formatted="false">Pass pool updates</string>
+  <string name="growth_kind_note" formatted="false">New Notes</string>
+  <string name="growth_kind_reaction" formatted="false">Reactions to your replies</string>
+  <string name="growth_kind_public_answer" formatted="false">New public answers</string>
+  <string name="growth_kind_spending_reminder" formatted="false">Spending reminders</string>
+  <string name="growth_kind_weekly_impact" formatted="false">Weekly impact digests</string>
   <string name="growth_for_you" formatted="false">For you</string>
   <string name="growth_crafts" formatted="false">Crafts</string>
   <string name="growth_music" formatted="false">Music</string>
@@ -960,8 +903,95 @@
   <string name="w6_retry_availability_save" formatted="false">Retry this availability save</string>
   <string name="w6_refresh_will_replace_availability_changes" formatted="false">Replace your unsaved changes with the saved availability?</string>
   <string name="w6_availability_account_changed" formatted="false">Your account changed. Reopen availability to continue.</string>
+  <string name="account_unavailable_title" formatted="false">We can\'t reach your account right now</string>
+  <string name="account_unavailable_body" formatted="false">Your session is kept on this device. Try again in a moment.</string>
   <string name="limit_reminders_off" formatted="false">Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.</string>
   <string name="limit_reminders_unknown" formatted="false">Lowering a limit is immediate.</string>
+  <string name="page_unavailable_title" formatted="false">This page didn\'t load</string>
+  <string name="page_unavailable_body" formatted="false">Nothing you saved was changed. Try again in a moment.</string>
+  <string name="identity_input_kept_unavailable" formatted="false">The service is unavailable. Your input has been kept; try again.</string>
+  <string name="identity_input_kept_unreadable" formatted="false">The service returned an unreadable response. Your input has been kept; try again.</string>
+  <string name="identity_profile_save_failed" formatted="false">Could not save. Try again.</string>
+  <string name="identity_private_clear_failed" formatted="false">This device could not clear its saved private data. Private screens are closed. Unlock it and retry clearing before signing in again.</string>
+  <string name="identity_private_clear_retry" formatted="false">Retry clearing saved private data</string>
+  <string name="identity_session_read_failed" formatted="false">This device could not read your session securely. Unlock it and try signing in again.</string>
+  <string name="identity_session_save_failed" formatted="false">This device could not save your session securely. Unlock it and try signing in again.</string>
+  <string name="identity_team_access_title" formatted="false">Current team access</string>
+  <string name="identity_team_access_loading" formatted="false">Checking team access…</string>
+  <string name="identity_team_access_required" formatted="false">Refresh team access before creating or changing invitations.</string>
+  <string name="identity_verification_page_title" formatted="false">Signature verification</string>
+  <string name="identity_verification_invalid_link" formatted="false">This verification link is invalid.</string>
+  <string name="identity_verification_missing" formatted="false">This signed act could not be found.</string>
+  <string name="identity_verification_unavailable_title" formatted="false">Verification unavailable</string>
+  <string name="identity_verification_signed_unavailable_title" formatted="false">Signed act unavailable</string>
+  <string name="identity_verification_checking_title" formatted="false">Checking signature</string>
+  <string name="identity_verification_loading" formatted="false">Loading the current public verification.</string>
+  <string name="identity_verification_unconfigured" formatted="false">Verification is unavailable in this app. Try again when the connection is available.</string>
+  <string name="identity_verification_failed" formatted="false">Reconnect and try again. Verification could not be checked.</string>
+  <string name="identity_verification_historical_unavailable" formatted="false">The historical approval remains recorded. Current authority is unavailable.</string>
+  <string name="identity_verification_withdrawn_content_title" formatted="false">Content withdrawn</string>
+  <string name="identity_verification_withdrawn_content" formatted="false">The content is no longer public. Signature metadata remains available.</string>
+  <string name="identity_verification_metadata_title" formatted="false">Signed act metadata</string>
+  <string name="identity_verification_metadata_notice" formatted="false">Open the original authorized object to view this act. This page shows its signature metadata.</string>
+  <string name="identity_verification_private_title" formatted="false">Private signed act</string>
+  <string name="identity_verification_private_notice" formatted="false">The act’s private content and conversation are not public. This page shows signature metadata.</string>
+  <string name="identity_verification_author" formatted="false">Author</string>
+  <string name="identity_verification_act" formatted="false">Act</string>
+  <string name="identity_verification_content_version" formatted="false">Signed content version</string>
+  <string name="identity_verification_written_by" formatted="false">Written by</string>
+  <string name="identity_verification_approved_author" formatted="false">AI draft · creator approved</string>
+  <string name="identity_verification_authorized_only" formatted="false">Shown only with authorized content</string>
+  <string name="identity_verification_signed" formatted="false">Signed</string>
+  <string name="identity_verification_status" formatted="false">Status</string>
+  <string name="identity_verification_valid" formatted="false">Valid when checked</string>
+  <string name="identity_verification_key_revoked" formatted="false">Signing key revoked</string>
+  <string name="identity_verification_creator_revoked" formatted="false">Creator verification revoked</string>
+  <string name="identity_verification_withdrawn" formatted="false">This card was withdrawn</string>
+  <string name="identity_verification_shared_by" formatted="false">Shared by</string>
+  <string name="identity_verification_not_disclosed" formatted="false">Not disclosed</string>
+  <string name="identity_verification_hash" formatted="false">Exact act hash · SHA-256
+{hash}</string>
+  <string name="identity_verification_public_notice" formatted="false">Anyone can open this page. It shows authorized content, signature provenance and the revocation status when checked, with nothing else from the conversation.</string>
+  <string name="identity_verification_refresh" formatted="false">Refresh verification</string>
+  <string name="identity_verification_act_reply" formatted="false">Reply</string>
+  <string name="identity_verification_act_approved" formatted="false">Approved AI draft</string>
+  <string name="identity_verification_act_note" formatted="false">Note · one-to-many</string>
+  <string name="identity_verification_act_reaction" formatted="false">Reaction</string>
+  <string name="identity_verification_act_acceptance" formatted="false">Acceptance</string>
+  <string name="identity_verification_act_correction" formatted="false">Correction</string>
+  <string name="identity_verification_act_other" formatted="false">Signed act</string>
+  <string name="creator_interview_estimate" formatted="false">About 20 minutes for your interview</string>
+  <string name="adult_only_title" formatted="false">This app is for adults</string>
+  <string name="adult_only_body" formatted="false">This app is available to adults aged 18 and over.</string>
+  <string name="growth_device_push_heading" formatted="false">Notifications on this device</string>
+  <string name="growth_device_push_allow" formatted="false">Allow notifications on this device</string>
+  <string name="growth_device_push_open_settings" formatted="false">Open notification settings</string>
+  <string name="growth_device_push_unavailable" formatted="false">Push delivery is not enabled for this app. Your in-app notifications remain available.</string>
+  <string name="growth_device_push_unknown" formatted="false">Device permission is unavailable. Check notification settings.</string>
+  <string name="growth_device_push_not_requested" formatted="false">Choose whether this device may show notifications. Your account preferences apply separately.</string>
+  <string name="growth_device_push_denied" formatted="false">Notifications are blocked in device settings. Your in-app record remains available.</string>
+  <string name="growth_device_push_granted" formatted="false">This device allows notifications. Your account preferences and quiet hours still apply.</string>
+  <string name="growth_device_push_quiet" formatted="false">This device allows quiet notifications. You can change their presentation in device settings.</string>
+  <string name="growth_device_push_permission_failed" formatted="false">Device permission could not be read. Try again in notification settings.</string>
+  <string name="growth_device_push_registration_failed" formatted="false">Push registration could not complete. Reconnect and reopen the app to retry. Your in-app record remains available.</string>
+  <string name="growth_more_creators" formatted="false">More creators</string>
+  <string name="growth_first_page" formatted="false">First page</string>
+  <string name="growth_download_complete_reply" formatted="false">Download complete reply</string>
+  <string name="growth_share_complete_reply" formatted="false">Share complete reply</string>
+  <string name="identity_choose_handle" formatted="false">Choose your handle</string>
+  <string name="identity_edit_public_profile" formatted="false">Edit public profile</string>
+  <string name="intro_offer_title" formatted="false">Tell creators’ AIs about yourself once</string>
+  <string name="intro_offer_body" formatted="false">Add a short intro in your own words. You choose, per creator, whether their AI may use it.</string>
+  <string name="intro_offer_label" formatted="false">A line about you · optional</string>
+  <string name="intro_offer_save" formatted="false">Save intro</string>
+  <string name="intro_offer_skip" formatted="false">Skip</string>
+  <string name="intro_offer_saving" formatted="false">Saving…</string>
+  <string name="intro_offer_finish" formatted="false">Finish</string>
+  <string name="intro_offer_saved_pending" formatted="false">Your intro is saved. Reconnect to finish dismissing this offer.</string>
+  <string name="intro_offer_skipped_pending" formatted="false">Your choice is kept on this screen. Reconnect to finish dismissing this offer.</string>
+  <string name="intro_offer_unavailable" formatted="false">Your intro could not be saved. Your input is kept. Reconnect and try again.</string>
+  <string name="intro_offer_ack_unavailable" formatted="false">This offer could not be dismissed. Reconnect and try again.</string>
+  <string name="intro_offer_acknowledging" formatted="false">Finishing…</string>
   <string name="w5_content_status" formatted="false">Content status</string>
   <string name="w5_content_checking_access" formatted="false">Checking current access. Your input is kept during a connection interruption.</string>
   <string name="w5_content_check_current_access" formatted="false">Check current access</string>
@@ -975,11 +1005,61 @@
   <string name="w5_content_reply_withdrawn" formatted="false">This reply was withdrawn. It cannot be shared again.</string>
   <string name="w5_content_fan_profile_required" formatted="false">Set up your fan profile before continuing.</string>
   <string name="w5_content_invalid_request" formatted="false">Check your reply and sharing choices before trying again. Your input is kept.</string>
-  <string name="identity_choose_handle" formatted="false">Choose your handle</string>
-  <string name="identity_edit_public_profile" formatted="false">Edit public profile</string>
+  <string name="growth_back_to_reply" formatted="false">Back to reply</string>
+  <string name="growth_reply_image_export_help" formatted="false">The complete reply is split into labeled images when needed. Multiple images download together as a ZIP, with a complete text copy.</string>
+  <string name="growth_preparing_reply_images" formatted="false">Preparing images…</string>
+  <string name="growth_reply_image_progress" formatted="false">Prepared {page} images…</string>
+  <string name="growth_reply_image_page" formatted="false">Page {page}</string>
+  <string name="growth_reply_images_ready" formatted="false">Your download is ready. Check your browser’s downloads.</string>
+  <string name="growth_reply_image_export_failed" formatted="false">The complete image export could not be prepared. Retry, or download the complete text.</string>
+  <string name="growth_notification_channel" formatted="false">{kind} · {channel}</string>
+  <string name="growth_weekly_impact_summary" formatted="false">This week: {people} people helped and {thanks} thanks.</string>
+  <string name="growth_spending_limit_reached" formatted="false">You\'ve reached {percent}% of your monthly limit.</string>
   <string name="w1_call_lookup_title" formatted="false">Your call</string>
   <string name="w1_call_lookup_checking" formatted="false">Checking the booking and your current access…</string>
   <string name="w1_call_lookup_unavailable" formatted="false">This call could not be opened. Retry, or open Requests to check its current status.</string>
+  <string name="identity_development_title" formatted="false">Development identity</string>
+  <string name="identity_development_body" formatted="false">Synthetic local account. Pantopus production sign-in is not connected.</string>
   <string name="identity_proof_review_support" formatted="false">Request verification review</string>
   <string name="identity_proof_review_support_body" formatted="false">Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified.</string>
+  <string name="w5_native_team_workspace" formatted="false">Studio workspace</string>
+  <string name="w5_native_team_title" formatted="false">Team</string>
+  <string name="w5_native_team_status" formatted="false">Team status</string>
+  <string name="w5_native_team_refresh" formatted="false">Check current team access</string>
+  <string name="w5_native_team_unavailable" formatted="false">Reconnect and check current team access to continue.</string>
+  <string name="w5_native_team_account_changed" formatted="false">Your account or session changed. Reopen Team with your current account.</string>
+  <string name="w5_native_team_denied" formatted="false">Current Team access is unavailable for this account.</string>
+  <string name="w5_native_team_saved" formatted="false">The role change was confirmed.</string>
+  <string name="w5_native_team_changed" formatted="false">The current roles changed. Check Team and review them before another save.</string>
+  <string name="w5_native_team_unknown" formatted="false">The response was interrupted. Check current Team or retry the exact reviewed role change.</string>
+  <string name="w5_native_team_no_workspace" formatted="false">No creator or Team workspace is available for this account.</string>
+  <string name="w5_native_team_owner" formatted="false">Creator workspace</string>
+  <string name="w5_native_team_member" formatted="false">Team workspace</string>
+  <string name="w5_native_team_verification_required" formatted="false">Current creator verification is required before opening Team.</string>
+  <string name="w5_native_team_invitation" formatted="false">Invitation from {name} · {roles} · expires {expires}</string>
+  <string name="w5_native_team_accept" formatted="false">Accept invitation</string>
+  <string name="w5_native_team_accepted" formatted="false">The invitation acceptance was confirmed.</string>
+  <string name="w5_native_team_acceptance_unknown" formatted="false">The response was interrupted. Check current Team access, then retry this exact invitation. Nothing is sent automatically.</string>
+  <string name="w5_native_team_retry_acceptance" formatted="false">Retry exact invitation acceptance</string>
+  <string name="w5_native_team_back" formatted="false">Studio workspace</string>
+  <string name="w5_native_team_identity_rule" formatted="false">Team words always carry the team label. Team replies never fulfill a personal commitment.</string>
+  <string name="w5_native_team_no_members" formatted="false">No Team members.</string>
+  <string name="w5_native_team_removed" formatted="false">Access removed</string>
+  <string name="w5_native_team_creator_only" formatted="false">Only the creator can change Team access.</string>
+  <string name="w5_native_team_edit" formatted="false">Edit roles</string>
+  <string name="w5_native_team_edit_for" formatted="false">Roles for {member}</string>
+  <string name="w5_native_team_reviewed" formatted="false">Reviewed roles: {roles}</string>
+  <string name="w5_native_team_desired" formatted="false">Desired roles: {roles}</string>
+  <string name="w5_native_team_current" formatted="false">Current roles: {roles}</string>
+  <string name="w5_native_team_review_current" formatted="false">Review current roles</string>
+  <string name="w5_native_team_retry_exact" formatted="false">Retry exact role change</string>
+  <string name="w5_native_team_save" formatted="false">Save roles</string>
+  <string name="w5_native_teamtriage_title" formatted="false">Triage</string>
+  <string name="w5_native_teamtriage_detail" formatted="false">Reads and routes the queue. Replies as team.</string>
+  <string name="w5_native_teamdrafter_title" formatted="false">Drafting</string>
+  <string name="w5_native_teamdrafter_detail" formatted="false">Prepares drafts. Never approves as you.</string>
+  <string name="w5_native_teampublisher_title" formatted="false">Publishing</string>
+  <string name="w5_native_teampublisher_detail" formatted="false">Publishes content under team identity.</string>
+  <string name="w5_native_teamscheduler_title" formatted="false">Scheduling</string>
+  <string name="w5_native_teamscheduler_detail" formatted="false">Offers times from your hours.</string>
 </resources>

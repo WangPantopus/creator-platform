@@ -1,0 +1,64 @@
+{
+  "recordedAt": "2026-10-02T12:38:41.422147+00:00",
+  "operator": "W1 primary personally",
+  "applicationRevision": "dcb77f23833f8a79761ee072b018e7aa78d765b7",
+  "apiRevision": "dcb77f23833f8a79761ee072b018e7aa78d765b7",
+  "environment": "owned retained40 PG17; production backend bundle; explicit development identity; loopback HTTP",
+  "device": {
+    "avd": "Qelvora_W1_API34",
+    "serial": "emulator-5554",
+    "os": "Android34",
+    "displayPixels": [
+      1080,
+      2400
+    ],
+    "memoryKiB": 2026148,
+    "cores": 2,
+    "theme": "Night",
+    "fontScale": "retained1.0, not remeasured during this run"
+  },
+  "apkSha256": "d09a46f88ffa001ec5c5214094a0c7bdbfb2e1de162fd0f072f4b8add31017d9",
+  "steps": [
+    "Installed actual shipping APK and cold-launched Account against actual current API",
+    "Observed retained actor-one handle and Edit public profile",
+    "Personally signed out to Welcome via Studio mirror",
+    "Personally opened development chooser and selected actual actor four",
+    "Observed authenticated Account without fan onboarding, placeholder @ or profile",
+    "Personally operated Refresh session; private original/latest row comparison verified unchanged session, credential rotation and expiry advance",
+    "Stopped only owned API; force-stopped and cold-launched shipping app against real outage",
+    "Observed Account status unavailable, retained-session notice and Retry without private controls",
+    "Restarted same production API; personally used the visible Retry target and observed restored Account",
+    "Verified same original actor-four session remains persisted, with fan profile count zero",
+    "Normally stopped verified owned5554 and released matching UUID/inode GUI and slot2 custody"
+  ],
+  "persistedOutcome": {
+    "actorFourActiveSessionCount": 3,
+    "actorFourFanProfileCount": 0,
+    "sameSession": true,
+    "credentialRotated": true,
+    "expiryAdvanced": true
+  },
+  "failures": [
+    "Standalone launch had no Studio mirror",
+    "Normal IDE launch blocked on invisible prior crash-report consent and logged automatic2560MiB RAM increase; owned process normally stopped",
+    "Official CLI launch with explicit authenticated loopback grpc8554/qt-hide-window/crash-report-mode never/qemu-m2048 established actual Studio mirror within budget",
+    "Initial button clicks did not complete a touch; fresh screenshots and short four-pixel drags completed gestures",
+    "Half-size coordinate diagnostic touched APK pane; it changed no app state"
+  ],
+  "timings": {
+    "coldActivityLaunchMs": 778,
+    "completeJourneyElapsed": "not measured"
+  },
+  "limitations": [
+    "No release identity, actual creator/proof, passkey, paid provider or complete native acceptance",
+    "iOS shipping compilation passes but W1 personal operation remains open",
+    "Recovered UI can also refresh automatically; recovery observation does not isolate Retry from background polling",
+    "No200percent/assistive-tech measurement in this run",
+    "No new unit tests or fixture data; no raw credentials, cookies or private IDs recorded"
+  ],
+  "screenshots": [
+    "android-dcb-no-fan-account-night.png",
+    "android-dcb-cold-outage-night.png",
+    "android-dcb-recovered-account-night.png"
+  ]
+}

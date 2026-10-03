@@ -26,31 +26,27 @@ struct GrowthNotificationSettings: View {
             Text(QelvoraCopy.text("growthNotificationSettings")).qText("display-md")
             Text(QelvoraCopy.text("growthYourInAppRecordCannotBeTurnedOffPushAnd")).qText("body")
             if value != nil {
-                Toggle(QelvoraCopy.text("growthPushNotifications"), isOn: field(\.push))
-                Toggle(QelvoraCopy.text("growthEmailDigest"), isOn: field(\.email))
-                Toggle(QelvoraCopy.text("growthHideSensitivePreviews"), isOn: field(\.hideSensitive))
-                TextField(QelvoraCopy.text("growthQuietHoursFromHhMm"), text: $from)
-                    .textFieldStyle(.roundedBorder)
-                    .focused($focused, equals: .from)
-                    .accessibilityHint(errors[.from] ?? "")
-                fieldError(.from)
-                TextField(QelvoraCopy.text("growthQuietHoursUntilHhMm"), text: $until)
-                    .textFieldStyle(.roundedBorder)
-                    .focused($focused, equals: .until)
-                    .accessibilityHint(errors[.until] ?? "")
-                fieldError(.until)
-                TextField(QelvoraCopy.text("growthTimeZone"), text: field(\.timeZone))
-                    .textFieldStyle(.roundedBorder)
-                    .focused($focused, equals: .timeZone)
-                    .accessibilityHint(errors[.timeZone] ?? "")
-                    .autocorrectionDisabled()
-                    #if os(iOS)
-                    .textInputAutocapitalization(.never)
-                    #endif
-                fieldError(.timeZone)
+                #if os(iOS)
+                GrowthDevicePushSettings()
+                #endif
+                preferenceToggle(QelvoraCopy.text("growthPushNotifications"), value: field(\.push))
+                preferenceToggle(QelvoraCopy.text("growthEmailDigest"), value: field(\.email))
+                preferenceToggle(QelvoraCopy.text("growthHideSensitivePreviews"), value: field(\.hideSensitive))
+                preferenceField(.from, label: QelvoraCopy.text("growthQuietHoursFromHhMm"), text: $from)
+                preferenceField(.until, label: QelvoraCopy.text("growthQuietHoursUntilHhMm"), text: $until)
+                preferenceField(.timeZone, label: QelvoraCopy.text("growthTimeZone"), text: field(\.timeZone))
                 Text(QelvoraCopy.text("growthLeaveBothTimesEmptyForNoQuietHours")).qText("caption")
-                ForEach(creators) {creator in Toggle(QelvoraCopy.text("growthPushAndEmail2", values: ["name": creator.name]), isOn: allowed(\.mutedCreators, creator.id))}
-                ForEach(growthNotificationKinds, id: \.self) {kind in VStack(alignment: .leading) {Text(QelvoraCopy.text("growthKind" + kind.split(separator: "_").map { $0.prefix(1).uppercased() + $0.dropFirst() }.joined())).qText("label");Toggle(QelvoraCopy.text("growthPush"), isOn: allowed(\.disabledPushTypes, kind));Toggle(QelvoraCopy.text("growthEmail"), isOn: allowed(\.disabledEmailTypes, kind))}}
+                ForEach(creators) {creator in
+                    preferenceToggle(QelvoraCopy.text("growthPushAndEmail2", values: ["name": creator.name]), value: allowed(\.mutedCreators, creator.id))
+                }
+                ForEach(growthNotificationKinds, id: \.self) {kind in
+                    let label = QelvoraCopy.text("growthKind" + kind.split(separator: "_").map { $0.prefix(1).uppercased() + $0.dropFirst() }.joined())
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(label).qText("label")
+                        preferenceToggle(QelvoraCopy.text("growthPush"), value: allowed(\.disabledPushTypes, kind), accessibilityLabel: QelvoraCopy.text("growthNotificationChannel", values: ["kind": label, "channel": QelvoraCopy.text("growthPush")]))
+                        preferenceToggle(QelvoraCopy.text("growthEmail"), value: allowed(\.disabledEmailTypes, kind), accessibilityLabel: QelvoraCopy.text("growthNotificationChannel", values: ["kind": label, "channel": QelvoraCopy.text("growthEmail")]))
+                    }.accessibilityElement(children: .contain)
+                }
                 Button(busy ? QelvoraCopy.text("growthSaving") : QelvoraCopy.text("growthSavePreferences"), variant: .secondary, block: true, disabled: busy) {Task {await save()}}
             } else if message.isEmpty {ProgressView()}
             if !message.isEmpty {Text(message).qText("body").accessibilityAddTraits(.updatesFrequently)}
@@ -61,6 +57,39 @@ struct GrowthNotificationSettings: View {
         .onChange(of: until) { _, _ in clearError(.from); clearError(.until) }
         .onChange(of: value?.timeZone) { _, _ in clearError(.timeZone) }
         .task {await load()}
+    }
+    private func preferenceToggle(_ label: String, value: Binding<Bool>, accessibilityLabel: String? = nil) -> some View {
+        SwiftUI.Button { value.wrappedValue.toggle() } label: {
+            HStack {
+                Text(label).qText("body")
+                Spacer(minLength: 12)
+                Toggle("", isOn: .constant(value.wrappedValue))
+                    .labelsHidden().allowsHitTesting(false).accessibilityHidden(true)
+            }.frame(minHeight: 44).contentShape(Rectangle())
+        }.buttonStyle(.plain)
+            .accessibilityLabel(accessibilityLabel ?? label)
+            .accessibilityValue(QelvoraCopy.text(value.wrappedValue ? "growthOn" : "growthOff"))
+    }
+    private func preferenceField(_ field: Field, label: String, text: Binding<String>) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(label).qText("caption").foregroundStyle(qColor("ink-muted", scheme))
+            TextField(label, text: text)
+                .textFieldStyle(.plain)
+                .qText("body")
+                .padding(12)
+                .frame(minHeight: 48)
+                .background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: 12))
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(qColor(errors[field] == nil ? "control-line" : "alert", scheme), lineWidth: 1))
+                .focused($focused, equals: field)
+                .accessibilityLabel(label)
+                .accessibilityHint(errors[field] ?? "")
+                .autocorrectionDisabled()
+                #if os(iOS)
+                .textInputAutocapitalization(.never)
+                .keyboardType(field == .timeZone ? .asciiCapable : .numbersAndPunctuation)
+                #endif
+            fieldError(field)
+        }
     }
     @ViewBuilder private func fieldError(_ field: Field) -> some View {
         if let error = errors[field] {
