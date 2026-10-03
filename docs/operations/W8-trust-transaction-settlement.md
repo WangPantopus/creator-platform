@@ -1,5 +1,19 @@
 # Trust transaction settlement — October 3, 2026 UTC
 
+## Original checked Trust session — October 3, 2026
+
+W8 independently read and reuses the exact three-file W1 producer489d93eef10f29e9f50fa6c7d1f74a975c2bb791 from draft296: actual core session mismatch refusal, original platform forwarding/renewal and complete canonical browser lifetime boundary. Existing main routes and allowlist remain intact. Earlier W1 operation at69 and W8 Privacy operation atd229 are attributed to those original sources; neither qualifies this new integration.
+
+Trust's canonical session response now exposes only the real middleware session ID, with the same original Actor/account. Missing or misbound canonical context refuses. The original configured Trust callback preserves that actual middleware Actor instead of resolving the credential again into another object. An explicitly isolated development selector remains labelled and may report a null session ID; it supplies no canonical session or fabricated authority.
+
+Private reads and original form callbacks carry the checked account/session as denial-only headers. Same-account session replacement invalidates and aborts the old checked view, resets its draft epoch and requires fresh private reads. Original form callbacks also retain their actual browser departure/StrictMode lifetime. Ordinary loading or token rotation with the same real session preserves drafts. Trust forwarding, including actual canonical logout, retains the pin and genuine upstream refusal; nonstream browser cancellation now reaches the original upstream fetch. These browser lifetimes issue no database task, EOF, COMMIT or provider receipt.
+
+Source integration is implemented; current personal shipping-root same-account replacement, native operation, readable Ops/signed workflow, download/EOF, all-eight C10 and release/pilot acceptance remain open. PR200 stays draft. No new unit tests, SQL, role renewal, consent or paid call is introduced.
+
+## Current native build qualification — October 3, 2026
+
+W8 independently builds the shipping Android and iOS roots at3b1106073614aab9ab78965f812c0db3edb87f4f after exactcac8 Trust reuse. Actual Android37-task debug build and normal signature verification pass; actual Xcode build and deep/strict debug signature verification pass. Android APK SHA25605586a5e3f4b86c741d812819dfa337f6eb79795ca4f4779f29c02d1fe9f8710; iOS executable SHA25604a4bea745b3e72dbea96b3b7c907a745c29102c28b4f7889c79def614d37e7d. Their actual loopback backend URLs are10.0.2.2:4108 and127.0.0.1:4108 respectively. The exact native trees remain unchanged through reviewed mainb4d3099a; the wrapper releases normally and no device is acquired by this build. Private logs/receipts stay outside Git. These fresh builds establish runnable artifacts; current personal operation and release readiness remain separate and pending.
+
 ## Original denial savepoint settlement — October 3, 2026
 
 Independent W1/W8 source review found unconditional rollback/release after uncertain interactive/public-creator denial reads. Both now use one internal savepoint finalizer on the actual original caller's client. An uncertain read or observed AbortError escapes without helper cleanup; failed rollback/release sends no further helper SQL and retains the original refusal alongside the cleanup cause. Ordinary settled refusals still rollback/release, and a settled public denial still releases partial locks. The helper creates no request/task signal or authority, does not close/release a client, and leaves final transaction settlement with its original owner. W1 separately owns the analogous Access caller cleanup repair.

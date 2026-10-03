@@ -6,6 +6,8 @@
 
 ## Real-session private read gate — 2026-10-03
 
+[Current original-session continuation](../../operations/W8-trust-transaction-settlement.md) consumes W1's exact489d93ee producer and captures actual Trust session/account plus real browser lifetime. The canonical router exposes only genuine middleware session ID and same Actor; its original configured host preserves that Actor instead of reissuing it. Expected session forwarding and logout refusal are denial-only. Same-account replacement revokes private reads/form epochs; periodic loading and same-session token rotation preserve them. Explicit isolated development selection stays labelled with no fabricated canonical ID. Source/type/lint qualification is distinct from personal current root/native, download/EOF, signed Ops, C10 and release acceptance, which remain required.
+
 [Existing200 shared client](../../operations/W8-trust-transaction-settlement.md) adds the default-compatible optional `useTrust(path, enabled)` gate for W3 reuse. Disabled/replaced reads clear results and abort their real browser GET; re-enable reads afresh and old paths cannot display results. All Ops read surfaces consume actual session readiness and combined Retry. Account change revokes readiness; periodic loading changes no form epoch or authority. Actual case inputs and pending action keys survive a same-account outage. Source checks pass; current personal operation, readable-case concealment and original signed reply/C10 remain required. Browser cancellation grants no server/task/COMMIT receipt; no SQL, role or held migration changes.
 
 ## Bounded original Trust settlement — 2026-10-03

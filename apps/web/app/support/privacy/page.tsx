@@ -9,7 +9,7 @@ import {
   type TrustSessionState,
   useTrust,
   useTrustSession,
-  trustApi,
+  useTrustRequest,
   retryTrustReads,
   dateLabel,
 } from "../../ops/trust-client";
@@ -25,6 +25,7 @@ function Job({
   readEnabled: boolean;
   onReadError: (id: string, error: TrustError | null) => void;
 }) {
+  const request = useTrustRequest();
   const { data, error, loading, refresh } = useTrust<PrivacyJobView>(
     `privacy/jobs/${id}`,
     readEnabled,
@@ -83,7 +84,7 @@ function Job({
                   const current = epoch.current;
                   setBusy(true);
                   try {
-                    await trustApi(`privacy/jobs/${id}/retry`, {});
+                    await request(`privacy/jobs/${id}/retry`, {});
                     if (epoch.current !== current) return;
                     setError(null);
                     await refresh();
@@ -141,6 +142,7 @@ function Job({
   );
 }
 export default function PrivacyPage() {
+  const request = useTrustRequest();
   const [sessionState, setSessionState] = useState<TrustSessionState>({
     ready: false,
     error: null,
@@ -213,7 +215,7 @@ export default function PrivacyPage() {
     setError(null);
     key.current ??= crypto.randomUUID();
     try {
-      const job = await trustApi<{ id: string; immediateDeny: boolean }>(
+      const job = await request<{ id: string; immediateDeny: boolean }>(
         "privacy/jobs",
         {
           kind,
