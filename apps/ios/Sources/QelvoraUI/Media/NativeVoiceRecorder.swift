@@ -181,10 +181,17 @@ public final class NativeVoiceRecorder: NSObject, ObservableObject, @preconcurre
             let result = try await preparation.prepare(at: location, delegate: delegate, current: { [weak self] in
                 await MainActor.run { self?.generation == requestGeneration }
             })
-            guard generation == requestGeneration, !Task.isCancelled else {
+            // A delegate error can arrive during the preparer's final actor
+            // hop while no recorder has yet been adopted by this UI.
+            guard generation == requestGeneration, !Task.isCancelled, !delegate.hasFailed else {
                 await preparation.abandon(result)
                 VoiceRecordingCache.endPreparation(location)
-                _ = VoiceRecordingCache.discard(location)
+                let cleared = VoiceRecordingCache.discard(location)
+                if generation == requestGeneration {
+                    if !cleared { file = location }
+                    state = .failed
+                    reason = QelvoraCopy.text(cleared ? "w6TheMicrophoneIsUnavailableTryAgain" : "w6ThePrivatePreviewCouldNotBeClearedTryAgainBefore")
+                }
                 return
             }
             VoiceRecordingCache.endPreparation(location)
