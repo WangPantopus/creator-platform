@@ -1,5 +1,12 @@
 # W8 resume prompt — complete the workstream
 
+## Finite development feedback source — 2026-10-02
+
+Held 0207 now implements the development-only notice, seven-day feedback limit capped at November 1, physical withdrawal/expiry and SQL offer uniqueness. The actual configured-runtime factory supplies W1/W3 policy callbacks and a bounded isolated expiry worker. [Integration contract](../../operations/W8-development-feedback.md) gives exact exports and source hash. Zero compiler diagnostics, fourteen deliberate catalogue drifts, executable-registry refusal and six unchanged custody comparisons passed on a closed rolled-back database. Types and scoped lint passed. No new unit tests or routine capture/JSON commits.
+
+Original 0056/0057 and old unknown events remain unchanged. Owner composition, actual fan consent, native/web operation, saved physical effects, C10 and activation remain pending. Financial retention, original recovery and the complete workstream remain open. Own app services are stopped; the W8 emulator has just been leased for the separate ownership increment.
+
+
 ## Latest host cleanup direction — 2026-10-02
 
 [Permanent resource cleanup](W8-resource-cleanup-2026-10-02.md) supersedes old occupied-worktree/build statements below. W8 removed24 disposable build/cache/dependency paths (5.392GiB allocated before deletion), preserved private tools/results/configuration/backups, verified the retained native checkpoint hash and kept stopped database containers/volumes/compiler setup. The clean fully pushed W8 and60fb worktrees are removed after this cleanup documentation merges; create a fresh checkout and install/rebuild locked dependencies for continuation. No primary/peer/shared SDK/global cache/database/private-data cleanup or new acceptance is implied.
