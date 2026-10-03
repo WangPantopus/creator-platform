@@ -1,0 +1,1076 @@
+{
+  "capturedAt": "2026-10-03T23:28:09.844174+00:00",
+  "capturedBeforeHandoffDocumentationCommit": true,
+  "repository": "WangPantopus/creator-platform",
+  "preservedCheckout": "/Users/yingpengwang/.codex/worktrees/w5-successor-studio/creator-platform",
+  "remoteMain": "5c08634b7542fef95dd6c176030a785845250c62",
+  "sourceHeadAtCapture": "7daa31f8d649d85342db06d120baee8346ef3e0d",
+  "allNinePackagesComplete": false,
+  "releaseReady": false,
+  "estimatedEngineeringCompletion": {
+    "percent": 60,
+    "remainingPercent": 40,
+    "remainingAutonomousFractionApproximate": 0.5,
+    "measured": false,
+    "fullyAcceptedPackages": 0,
+    "totalPackages": 9
+  },
+  "currentOpenCount": 37,
+  "allDraft": true,
+  "originalReviewOpenCount": 43,
+  "additionalMainMergesInRenewedReview": 0,
+  "earlierMergedW5FeaturePRs": [207, 211, 222, 227, 229, 231, 251, 269, 246],
+  "sourceReuseClosedUnmerged": [299, 280, 236, 296, 293],
+  "parentDocumentationMerge": {
+    "number": 295,
+    "target": "W1 original21",
+    "mainMerge": false
+  },
+  "openPullRequests": [
+    {
+      "number": 21,
+      "owner": "W1",
+      "title": "Preserve onboarding intro timing and profile save lifetime",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/21",
+      "draft": true,
+      "head": "85ac12317f9f027cf8828ea7fb1148f687ec2e0c",
+      "headBranch": "codex/w1-onboarding-timing-20261001",
+      "base": "5c08634b7542fef95dd6c176030a785845250c62",
+      "baseBranch": "main"
+    },
+    {
+      "number": 22,
+      "owner": "W1",
+      "title": "Restore Restart focus after authorship practice completion",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/22",
+      "draft": true,
+      "head": "41805917c14bb64c90d000d43a19818d41309047",
+      "headBranch": "codex/w1-comprehension-focus-20261001",
+      "base": "85ac12317f9f027cf8828ea7fb1148f687ec2e0c",
+      "baseBranch": "codex/w1-onboarding-timing-20261001"
+    },
+    {
+      "number": 26,
+      "owner": "W1",
+      "title": "Preserve unchanged generated resources and verify portable rename",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/26",
+      "draft": true,
+      "head": "38b7ca7551acafc755f9d462e251e79447fa819f",
+      "headBranch": "codex/w1-generation-efficiency-20261001",
+      "base": "41805917c14bb64c90d000d43a19818d41309047",
+      "baseBranch": "codex/w1-comprehension-focus-20261001"
+    },
+    {
+      "number": 28,
+      "owner": "W1",
+      "title": "Gate Team actions on current access reads",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/28",
+      "draft": true,
+      "head": "f7c91b3663b3fb55135ba6d092dab2fb71c2c4d2",
+      "headBranch": "codex/w1-team-state-20261001",
+      "base": "38b7ca7551acafc755f9d462e251e79447fa819f",
+      "baseBranch": "codex/w1-generation-efficiency-20261001"
+    },
+    {
+      "number": 29,
+      "owner": "W1",
+      "title": "Connect canonical Home and preserve native saved-thread navigation",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/29",
+      "draft": true,
+      "head": "70e07e369582af4600826bfd6cd8c246651ecaf7",
+      "headBranch": "codex/w1-home-host-20261001",
+      "base": "f7c91b3663b3fb55135ba6d092dab2fb71c2c4d2",
+      "baseBranch": "codex/w1-team-state-20261001"
+    },
+    {
+      "number": 31,
+      "owner": "W7",
+      "title": "Guard Growth journeys with current session and owner proofs",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/31",
+      "draft": true,
+      "head": "c052ef67fa85301562b5123b682c88b931107c9a",
+      "headBranch": "codex/w7-completion-20261001",
+      "base": "5c08634b7542fef95dd6c176030a785845250c62",
+      "baseBranch": "main"
+    },
+    {
+      "number": 35,
+      "owner": "W1",
+      "title": "Keep signing bound to the original review and session",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/35",
+      "draft": true,
+      "head": "0de1447e191dcb1be64e992c4f9e4cb76149b53c",
+      "headBranch": "codex/w1-signing-authority-20261001",
+      "base": "70e07e369582af4600826bfd6cd8c246651ecaf7",
+      "baseBranch": "codex/w1-home-host-20261001"
+    },
+    {
+      "number": 36,
+      "owner": "W3",
+      "title": "Revalidate privacy snapshots and recover retained Android sessions",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/36",
+      "draft": true,
+      "head": "de8adebb5c4f1844a7ad7c9833b802548cf8578a",
+      "headBranch": "codex/w3-privacy-revalidation",
+      "base": "5c08634b7542fef95dd6c176030a785845250c62",
+      "baseBranch": "main"
+    },
+    {
+      "number": 42,
+      "owner": "W1",
+      "title": "Connect Signed links to public verification across clients",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/42",
+      "draft": true,
+      "head": "5094a6bd74f65e97aa6a55256dad8f7cb1a8e683",
+      "headBranch": "codex/w1-native-verification-20261001",
+      "base": "0de1447e191dcb1be64e992c4f9e4cb76149b53c",
+      "baseBranch": "codex/w1-signing-authority-20261001"
+    },
+    {
+      "number": 48,
+      "owner": "W1",
+      "title": "Preserve canonical native storage recovery copy",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/48",
+      "draft": true,
+      "head": "2e8cca67d1a9c37835f2210072ae77a96fcde092",
+      "headBranch": "codex/w1-native-storage-20261001",
+      "base": "5094a6bd74f65e97aa6a55256dad8f7cb1a8e683",
+      "baseBranch": "codex/w1-native-verification-20261001"
+    },
+    {
+      "number": 49,
+      "owner": "W1",
+      "title": "Validate native API origins and supply iOS host configuration",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/49",
+      "draft": true,
+      "head": "d892789ba5f384ae51952f44556f1376b465c383",
+      "headBranch": "codex/w1-native-uri-20261001",
+      "base": "2e8cca67d1a9c37835f2210072ae77a96fcde092",
+      "baseBranch": "codex/w1-native-storage-20261001"
+    },
+    {
+      "number": 51,
+      "owner": "W1",
+      "title": "Publish W1 handoff and preserve source before worktree cleanup",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/51",
+      "draft": true,
+      "head": "d4a2f6f6fb24ed714614bb38f1f9115a1310e202",
+      "headBranch": "codex/w1-handoff-20261001",
+      "base": "d892789ba5f384ae51952f44556f1376b465c383",
+      "baseBranch": "codex/w1-native-uri-20261001"
+    },
+    {
+      "number": 63,
+      "owner": "W3",
+      "title": "Compose guarded conversations with current producer and privacy contracts",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/63",
+      "draft": true,
+      "head": "82c9abffdb00f73bc7ba3fb4baedb508b1170917",
+      "headBranch": "codex/w3-generation-host",
+      "base": "5c08634b7542fef95dd6c176030a785845250c62",
+      "baseBranch": "main"
+    },
+    {
+      "number": 66,
+      "owner": "W1",
+      "title": "Keep sessions truthful during outages and fit identity screens to phones",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/66",
+      "draft": true,
+      "head": "116ac444c4db375c3be2fe1f508ce5b5b6a035c5",
+      "headBranch": "codex/w1-session-truth-20261001",
+      "base": "d4a2f6f6fb24ed714614bb38f1f9115a1310e202",
+      "baseBranch": "codex/w1-handoff-20261001"
+    },
+    {
+      "number": 74,
+      "owner": "W1",
+      "title": "Harden issuer custody, recovery and integrated platform authority",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/74",
+      "draft": true,
+      "head": "8cf7e5ddc2b46e455985a81f950a23d03707e950",
+      "headBranch": "codex/w1-completion-20261001",
+      "base": "116ac444c4db375c3be2fe1f508ce5b5b6a035c5",
+      "baseBranch": "codex/w1-session-truth-20261001"
+    },
+    {
+      "number": 131,
+      "owner": "W8",
+      "title": "Bind generation negatives to the genuine private worker nonce",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/131",
+      "draft": true,
+      "head": "5901c9dd62973a20fd7d3ccae132374fcd627056",
+      "headBranch": "codex/w8-generation-worker-denial",
+      "base": "5c08634b7542fef95dd6c176030a785845250c62",
+      "baseBranch": "main"
+    },
+    {
+      "number": 132,
+      "owner": "W2",
+      "title": "Bind Creator AI worker inputs, provider admission and retrieval to genuine purpose custody",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/132",
+      "draft": true,
+      "head": "2d92c0a1cb931fd1876da64958d878e2d21d1e80",
+      "headBranch": "codex/w2-generation-inputs-20261002",
+      "base": "5c08634b7542fef95dd6c176030a785845250c62",
+      "baseBranch": "main"
+    },
+    {
+      "number": 145,
+      "owner": "W8",
+      "title": "Bind terminal trust denials to original generation custody",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/145",
+      "draft": true,
+      "head": "da0e2af95baa19280ddf3ebdae4ce8ead1a5eca7",
+      "headBranch": "codex/w8-generation-terminal-denial",
+      "base": "5901c9dd62973a20fd7d3ccae132374fcd627056",
+      "baseBranch": "codex/w8-generation-worker-denial"
+    },
+    {
+      "number": 182,
+      "owner": "W3",
+      "title": "W3: preserve original ownership and await privacy export cleanup",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/182",
+      "draft": true,
+      "head": "a3a42678b404a60690b9fef94a409f4fe760cf7d",
+      "headBranch": "codex/w3-privacy-cursor-purpose",
+      "base": "77ec4cfba18a1e9541bc6145b923d4efa7096bfa",
+      "baseBranch": "codex/w3-privacy-cursor-review-base"
+    },
+    {
+      "number": 192,
+      "owner": "W8",
+      "title": "Stage finite development feedback consent and physical lifecycle",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/192",
+      "draft": true,
+      "head": "05225166284225b966a0606192bbbb77821cc18b",
+      "headBranch": "codex/w8-development-feedback-lifecycle",
+      "base": "5c08634b7542fef95dd6c176030a785845250c62",
+      "baseBranch": "main"
+    },
+    {
+      "number": 200,
+      "owner": "W8",
+      "title": "Prepare exact-version reply reviews with original Trust session custody",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/200",
+      "draft": true,
+      "head": "beff87bd7a815efcdf6dfa56199fb0707e206f46",
+      "headBranch": "codex/w8-reply-review-current",
+      "base": "5c08634b7542fef95dd6c176030a785845250c62",
+      "baseBranch": "main"
+    },
+    {
+      "number": 201,
+      "owner": "W8",
+      "title": "Prepare opt-in private development artifact storage",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/201",
+      "draft": true,
+      "head": "753eb34476ee620bf7227d47d932f4aeb6afd1e3",
+      "headBranch": "codex/w8-development-private-artifacts",
+      "base": "5c08634b7542fef95dd6c176030a785845250c62",
+      "baseBranch": "main"
+    },
+    {
+      "number": 213,
+      "owner": "W4",
+      "title": "Retain original Commerce Actor and settle account cleanup",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/213",
+      "draft": true,
+      "head": "4e6d29a3f99b7ec362b621dcd0a1ed7b768cc726",
+      "headBranch": "codex/w4-call-original-actor-20261002",
+      "base": "5c08634b7542fef95dd6c176030a785845250c62",
+      "baseBranch": "main"
+    },
+    {
+      "number": 242,
+      "owner": "W8",
+      "title": "feat(trust): add held original-task Conversation family authority",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/242",
+      "draft": true,
+      "head": "1a674e59b46ad42c3e4acd0ef906c6753ff75c44",
+      "headBranch": "codex/w8-original-privacy-family-20261003",
+      "base": "5c08634b7542fef95dd6c176030a785845250c62",
+      "baseBranch": "main"
+    },
+    {
+      "number": 247,
+      "owner": "W4",
+      "title": "Derive safety allowance settlement from original typed provenance",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/247",
+      "draft": true,
+      "head": "75bba77b53a5c0d0675309daed946f017d3d17bd",
+      "headBranch": "codex/w4-generation-safety-terminal-20261003",
+      "base": "5c08634b7542fef95dd6c176030a785845250c62",
+      "baseBranch": "main"
+    },
+    {
+      "number": 262,
+      "owner": "W4",
+      "title": "Preserve original fulfillment publication and worker custody",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/262",
+      "draft": true,
+      "head": "27cde2b04b65c8b29bd0ba59a9b18ba716260101",
+      "headBranch": "codex/w4-publication-worker-20261003",
+      "base": "5c08634b7542fef95dd6c176030a785845250c62",
+      "baseBranch": "main"
+    },
+    {
+      "number": 279,
+      "owner": "W2",
+      "title": "Bind Agent privacy and expiry metadata to original held sources",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/279",
+      "draft": true,
+      "head": "02c344e478dcfd3ea72cfb3db5d0d3af7db8f4b6",
+      "headBranch": "codex/w2-expiry-cancellation-20261003",
+      "base": "5c08634b7542fef95dd6c176030a785845250c62",
+      "baseBranch": "main"
+    },
+    {
+      "number": 282,
+      "owner": "W6",
+      "title": "fix(calls): bind offers and exact retries to original sessions",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/282",
+      "draft": true,
+      "head": "3f4d44611c5a3a2c30f44b5a5532c76fdc5c49bc",
+      "headBranch": "codex/w6-call-offer-lifetime-20261003",
+      "base": "85ac12317f9f027cf8828ea7fb1148f687ec2e0c",
+      "baseBranch": "codex/w1-onboarding-timing-20261001"
+    },
+    {
+      "number": 284,
+      "owner": "W6",
+      "title": "fix(ios): retain recorder cleanup custody and bound preparation",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/284",
+      "draft": true,
+      "head": "bf2a95f19c185786b2617895ff5c00712e76d63b",
+      "headBranch": "codex/w6-ios-preview-cleanup-20261003",
+      "base": "5c08634b7542fef95dd6c176030a785845250c62",
+      "baseBranch": "main"
+    },
+    {
+      "number": 288,
+      "owner": "W5",
+      "title": "Review exact Team role changes and preserve uncertain retries",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/288",
+      "draft": true,
+      "head": "7daa31f8d649d85342db06d120baee8346ef3e0d",
+      "headBranch": "codex/w5-team-role-consumer-20261003",
+      "base": "d2f541c3c2b0d8b356fb2d3c08cc1ff96f9ba9f5",
+      "baseBranch": "codex/w1-completion-20261001"
+    },
+    {
+      "number": 289,
+      "owner": "W6",
+      "title": "fix(media): bind browser recording signatures to original account and view",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/289",
+      "draft": true,
+      "head": "dc39dc2e08da5c03578c21d09cf959ddc5dfb86d",
+      "headBranch": "codex/w6-recording-signature-lifetime-20261003",
+      "base": "85ac12317f9f027cf8828ea7fb1148f687ec2e0c",
+      "baseBranch": "codex/w1-onboarding-timing-20261001"
+    },
+    {
+      "number": 298,
+      "owner": "W4",
+      "title": "Bind commerce forms to their original session view",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/298",
+      "draft": true,
+      "head": "34cdba6270badab7210943d82703e87e22b4c718",
+      "headBranch": "codex/w4-original-session-view-20261003",
+      "base": "85ac12317f9f027cf8828ea7fb1148f687ec2e0c",
+      "baseBranch": "codex/w1-onboarding-timing-20261001"
+    },
+    {
+      "number": 301,
+      "owner": "W4",
+      "title": "Bound original commerce privacy settlement and export fields",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/301",
+      "draft": true,
+      "head": "cec286e9bdc16e9296f1e8af1fd59826c40a12c2",
+      "headBranch": "codex/w4-commerce-privacy-settlement-20261003",
+      "base": "5c08634b7542fef95dd6c176030a785845250c62",
+      "baseBranch": "main"
+    },
+    {
+      "number": 302,
+      "owner": "W5",
+      "title": "Consume original group publication custody in Content",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/302",
+      "draft": true,
+      "head": "b520000666fdb5595995702a76fe848edc0c79d2",
+      "headBranch": "codex/w5-group-worker-consumer-20261003",
+      "base": "5cc17cf28f51b8e95a2888b946de5cec2854076d",
+      "baseBranch": "codex/w4-publication-worker-20261003"
+    },
+    {
+      "number": 303,
+      "owner": "W4",
+      "title": "Keep native Commerce requests on the original account session",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/303",
+      "draft": true,
+      "head": "6a82fc1272dc8b25ac167598012aa5da4ff91dc5",
+      "headBranch": "codex/w4-native-spending-return-20261003",
+      "base": "26e5140ea5d03667d4b28ca796907b10a1bf1b7f",
+      "baseBranch": "codex/w4-original-session-view-20261003"
+    },
+    {
+      "number": 304,
+      "owner": "W5",
+      "title": "Preserve unknown reply review settlement through original cleanup",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/304",
+      "draft": true,
+      "head": "b919869200489b3f224896f0894a9cf6dfce4a82",
+      "headBranch": "codex/w5-reply-review-transport-20261003",
+      "base": "23981492357c587c5e1122d9b191d7c1459ef886",
+      "baseBranch": "codex/w1-completion-20261001"
+    },
+    {
+      "number": 305,
+      "owner": "W6",
+      "title": "fix(media): preserve Studio session and publication custody",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/305",
+      "draft": true,
+      "head": "037851fb1719db99092560caf8ef5a8fa7988427",
+      "headBranch": "codex/w6-studio-media-session-20261003",
+      "base": "85ac12317f9f027cf8828ea7fb1148f687ec2e0c",
+      "baseBranch": "codex/w1-onboarding-timing-20261001"
+    }
+  ],
+  "ownedPRChecks": [
+    {
+      "baseRefName": "codex/w1-completion-20261001",
+      "headRefOid": "7daa31f8d649d85342db06d120baee8346ef3e0d",
+      "isDraft": true,
+      "mergeStateStatus": "UNSTABLE",
+      "mergeable": "MERGEABLE",
+      "number": 288,
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-03T22:47:46Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37159381408/job/111309432000",
+          "name": "web-and-backend",
+          "startedAt": "2026-10-03T22:45:14Z",
+          "status": "COMPLETED",
+          "workflowName": "Foundation checks"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-03T22:45:54Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37159378948/job/111309423406",
+          "name": "web-and-backend",
+          "startedAt": "2026-10-03T22:43:25Z",
+          "status": "COMPLETED",
+          "workflowName": "Foundation checks"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37159381408/job/111309432025",
+          "name": "web-visual",
+          "startedAt": "2026-10-03T22:43:09Z",
+          "status": "QUEUED",
+          "workflowName": "Foundation checks"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37159378948/job/111309423233",
+          "name": "web-visual",
+          "startedAt": "2026-10-03T22:43:05Z",
+          "status": "QUEUED",
+          "workflowName": "Foundation checks"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37159381408/job/111309432031",
+          "name": "ios-foundation",
+          "startedAt": "2026-10-03T22:43:09Z",
+          "status": "QUEUED",
+          "workflowName": "Foundation checks"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37159378948/job/111309423344",
+          "name": "ios-foundation",
+          "startedAt": "2026-10-03T22:43:05Z",
+          "status": "QUEUED",
+          "workflowName": "Foundation checks"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37159381408/job/111309432059",
+          "name": "android-foundation",
+          "startedAt": "2026-10-03T22:43:09Z",
+          "status": "QUEUED",
+          "workflowName": "Foundation checks"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37159378948/job/111309423377",
+          "name": "android-foundation",
+          "startedAt": "2026-10-03T22:43:05Z",
+          "status": "QUEUED",
+          "workflowName": "Foundation checks"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-03T22:49:48Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37159381408/job/111309431884",
+          "name": "android-runtime",
+          "startedAt": "2026-10-03T22:44:06Z",
+          "status": "COMPLETED",
+          "workflowName": "Foundation checks"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-03T22:49:45Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37159378948/job/111309423470",
+          "name": "android-runtime",
+          "startedAt": "2026-10-03T22:44:20Z",
+          "status": "COMPLETED",
+          "workflowName": "Foundation checks"
+        }
+      ]
+    },
+    {
+      "baseRefName": "codex/w4-publication-worker-20261003",
+      "headRefOid": "b520000666fdb5595995702a76fe848edc0c79d2",
+      "isDraft": true,
+      "mergeStateStatus": "UNSTABLE",
+      "mergeable": "MERGEABLE",
+      "number": 302,
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-03T18:42:18Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37145055185/job/111267166999",
+          "name": "web-and-backend",
+          "startedAt": "2026-10-03T18:40:05Z",
+          "status": "COMPLETED",
+          "workflowName": "Foundation checks"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-03T18:42:16Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37145052325/job/111267159088",
+          "name": "web-and-backend",
+          "startedAt": "2026-10-03T18:40:03Z",
+          "status": "COMPLETED",
+          "workflowName": "Foundation checks"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37145055185/job/111267166940",
+          "name": "web-visual",
+          "startedAt": "2026-10-03T18:40:03Z",
+          "status": "QUEUED",
+          "workflowName": "Foundation checks"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37145052325/job/111267158893",
+          "name": "web-visual",
+          "startedAt": "2026-10-03T23:25:02Z",
+          "status": "IN_PROGRESS",
+          "workflowName": "Foundation checks"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37145052325/job/111267159076",
+          "name": "ios-foundation",
+          "startedAt": "2026-10-03T18:40:01Z",
+          "status": "QUEUED",
+          "workflowName": "Foundation checks"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37145055185/job/111267166862",
+          "name": "ios-foundation",
+          "startedAt": "2026-10-03T23:17:55Z",
+          "status": "IN_PROGRESS",
+          "workflowName": "Foundation checks"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37145055185/job/111267166946",
+          "name": "android-foundation",
+          "startedAt": "2026-10-03T18:40:03Z",
+          "status": "QUEUED",
+          "workflowName": "Foundation checks"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37145052325/job/111267159095",
+          "name": "android-foundation",
+          "startedAt": "2026-10-03T18:40:01Z",
+          "status": "QUEUED",
+          "workflowName": "Foundation checks"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-03T18:45:43Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37145055185/job/111267166960",
+          "name": "android-runtime",
+          "startedAt": "2026-10-03T18:40:05Z",
+          "status": "COMPLETED",
+          "workflowName": "Foundation checks"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-03T18:45:42Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37145052325/job/111267159178",
+          "name": "android-runtime",
+          "startedAt": "2026-10-03T18:40:03Z",
+          "status": "COMPLETED",
+          "workflowName": "Foundation checks"
+        }
+      ]
+    },
+    {
+      "baseRefName": "codex/w1-completion-20261001",
+      "headRefOid": "b919869200489b3f224896f0894a9cf6dfce4a82",
+      "isDraft": true,
+      "mergeStateStatus": "UNSTABLE",
+      "mergeable": "MERGEABLE",
+      "number": 304,
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-03T22:54:21Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37159762068/job/111310616735",
+          "name": "web-and-backend",
+          "startedAt": "2026-10-03T22:50:17Z",
+          "status": "COMPLETED",
+          "workflowName": "Foundation checks"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37159762068/job/111310616662",
+          "name": "web-visual",
+          "startedAt": "2026-10-03T22:50:15Z",
+          "status": "QUEUED",
+          "workflowName": "Foundation checks"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37159762068/job/111310616599",
+          "name": "ios-foundation",
+          "startedAt": "2026-10-03T22:50:15Z",
+          "status": "QUEUED",
+          "workflowName": "Foundation checks"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37159762068/job/111310616697",
+          "name": "android-foundation",
+          "startedAt": "2026-10-03T22:50:15Z",
+          "status": "QUEUED",
+          "workflowName": "Foundation checks"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-03T22:55:47Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37159762068/job/111310616841",
+          "name": "android-runtime",
+          "startedAt": "2026-10-03T22:50:16Z",
+          "status": "COMPLETED",
+          "workflowName": "Foundation checks"
+        }
+      ]
+    }
+  ],
+  "branchCurrency": {
+    "recordedAt": "2026-10-03T23:00:15.404768+00:00",
+    "remoteMain": "5c08634b7542fef95dd6c176030a785845250c62",
+    "primaryMainHead": "5c08634b7542fef95dd6c176030a785845250c62",
+    "branches": [
+      {
+        "branch": "codex/w5-successor-studio-20261002",
+        "head": "5c08634b7542fef95dd6c176030a785845250c62",
+        "remote": "5c08634b7542fef95dd6c176030a785845250c62",
+        "containsCapturedMain": true,
+        "matchesRemote": true
+      },
+      {
+        "branch": "codex/w5-bounded-reply-pages-20261002",
+        "head": "5c08634b7542fef95dd6c176030a785845250c62",
+        "remote": "5c08634b7542fef95dd6c176030a785845250c62",
+        "containsCapturedMain": true,
+        "matchesRemote": true
+      },
+      {
+        "branch": "codex/w5-library-current-search-20261002",
+        "head": "5c08634b7542fef95dd6c176030a785845250c62",
+        "remote": "5c08634b7542fef95dd6c176030a785845250c62",
+        "containsCapturedMain": true,
+        "matchesRemote": true
+      },
+      {
+        "branch": "codex/w5-original-answer-controls-20261002",
+        "head": "5c08634b7542fef95dd6c176030a785845250c62",
+        "remote": "5c08634b7542fef95dd6c176030a785845250c62",
+        "containsCapturedMain": true,
+        "matchesRemote": true
+      },
+      {
+        "branch": "codex/w5-native-content-return-20261002",
+        "head": "5c08634b7542fef95dd6c176030a785845250c62",
+        "remote": "5c08634b7542fef95dd6c176030a785845250c62",
+        "containsCapturedMain": true,
+        "matchesRemote": true
+      },
+      {
+        "branch": "codex/w5-audited-thread-pages-20261003",
+        "head": "5c08634b7542fef95dd6c176030a785845250c62",
+        "remote": "5c08634b7542fef95dd6c176030a785845250c62",
+        "containsCapturedMain": true,
+        "matchesRemote": true
+      },
+      {
+        "branch": "codex/w5-current-team-view-20261003",
+        "head": "5c08634b7542fef95dd6c176030a785845250c62",
+        "remote": "5c08634b7542fef95dd6c176030a785845250c62",
+        "containsCapturedMain": true,
+        "matchesRemote": true
+      },
+      {
+        "branch": "codex/w5-content-export-cleanup-20261003",
+        "head": "5c08634b7542fef95dd6c176030a785845250c62",
+        "remote": "5c08634b7542fef95dd6c176030a785845250c62",
+        "containsCapturedMain": true,
+        "matchesRemote": true
+      },
+      {
+        "branch": "codex/w5-fan-reply-pages-20261003",
+        "head": "5c08634b7542fef95dd6c176030a785845250c62",
+        "remote": "5c08634b7542fef95dd6c176030a785845250c62",
+        "containsCapturedMain": true,
+        "matchesRemote": true
+      },
+      {
+        "branch": "codex/w5-pr-backlog-review-20261003",
+        "head": "5c08634b7542fef95dd6c176030a785845250c62",
+        "remote": "5c08634b7542fef95dd6c176030a785845250c62",
+        "containsCapturedMain": true,
+        "matchesRemote": true
+      },
+      {
+        "branch": "codex/w5-team-role-consumer-20261003",
+        "head": "7daa31f8d649d85342db06d120baee8346ef3e0d",
+        "remote": "7daa31f8d649d85342db06d120baee8346ef3e0d",
+        "containsCapturedMain": true,
+        "matchesRemote": true
+      },
+      {
+        "branch": "codex/w5-origin-profile-fence-20261003",
+        "head": "1c9d75481d5cdb19ba88101a6167d742007da1bc",
+        "remote": "1c9d75481d5cdb19ba88101a6167d742007da1bc",
+        "containsCapturedMain": true,
+        "matchesRemote": true
+      },
+      {
+        "branch": "codex/w5-current-post-entry-20261003",
+        "head": "863d96a54914941650868434b9d44800b3cb189c",
+        "remote": "863d96a54914941650868434b9d44800b3cb189c",
+        "containsCapturedMain": true,
+        "matchesRemote": true
+      },
+      {
+        "branch": "codex/w5-native-team-workspace-20261003",
+        "head": "6330d4a4250731c1c730a534b50c16e1dc884711",
+        "remote": "6330d4a4250731c1c730a534b50c16e1dc884711",
+        "containsCapturedMain": true,
+        "matchesRemote": true
+      },
+      {
+        "branch": "codex/w5-original-studio-session-20261003",
+        "head": "1daacd7299678d2d12ccb7d419dae8fbb71f0c5c",
+        "remote": "1daacd7299678d2d12ccb7d419dae8fbb71f0c5c",
+        "containsCapturedMain": true,
+        "matchesRemote": true
+      },
+      {
+        "branch": "codex/w5-group-worker-consumer-20261003",
+        "head": "b520000666fdb5595995702a76fe848edc0c79d2",
+        "remote": "b520000666fdb5595995702a76fe848edc0c79d2",
+        "containsCapturedMain": true,
+        "matchesRemote": true
+      },
+      {
+        "branch": "codex/w5-reply-review-transport-20261003",
+        "head": "b919869200489b3f224896f0894a9cf6dfce4a82",
+        "remote": "b919869200489b3f224896f0894a9cf6dfce4a82",
+        "containsCapturedMain": true,
+        "matchesRemote": true
+      },
+      {
+        "branch": "codex/w5-scoped-studio-cleanup-20261003",
+        "head": "ac128c4dc23264c8365cc25ac32cc93774b10f9c",
+        "remote": "ac128c4dc23264c8365cc25ac32cc93774b10f9c",
+        "containsCapturedMain": true,
+        "matchesRemote": true
+      },
+      {
+        "branch": "codex/w5-native-content-session-20261003",
+        "head": "ea2b9d25c29a380355e9c3dcfde69d2053be01ed",
+        "remote": "ea2b9d25c29a380355e9c3dcfde69d2053be01ed",
+        "containsCapturedMain": true,
+        "matchesRemote": true
+      }
+    ],
+    "peerAndArchivalBranchesUntouched": true,
+    "count": 19
+  },
+  "currentComposerQualification": {
+    "source": "7daa31f8d649d85342db06d120baee8346ef3e0d",
+    "runtime": "Next development and genuine committed isolated API",
+    "independentOpenViewDenial": true,
+    "savedReturnDenial": true,
+    "actualRoleCommands": 2,
+    "finalMembershipRoles": ["triage"],
+    "finalMembershipTuple": "89552",
+    "noContentSaveOrSignatureCommand": true,
+    "fullCurrentViewportThemeMatrix": false,
+    "nativeAcceptance": false,
+    "runtimeClosedAt": "2026-10-03T23:12:40.752448+00:00",
+    "processExitCodes": {
+      "api": -2,
+      "forwarder": -2,
+      "web": 0
+    },
+    "privateEvidence": "~/.config/creator-platform/w5-20261003/team-7daa-current-r2/",
+    "failedInitialStartupExcluded": true
+  },
+  "rollbackPrimitiveQualification": {
+    "source": "a3d10d1a3e66e9362599e781991d84cd1d4cd7d6",
+    "recordedAt": "2026-10-03T22:46:38.232653+00:00",
+    "allSixCustodyHashesMatch": {
+      "creator_w5": {
+        "ledgerSha256": true,
+        "schemaSha256": true,
+        "rolesSha256": true,
+        "securitySha256": true,
+        "sequenceSha256": true,
+        "dataSha256": true
+      },
+      "creator_w5_privacy_main_restore_20261002": {
+        "ledgerSha256": true,
+        "schemaSha256": true,
+        "rolesSha256": true,
+        "securitySha256": true,
+        "sequenceSha256": true,
+        "dataSha256": true
+      }
+    },
+    "original57DumpMatches": true,
+    "proxyPort43435Absent": true,
+    "normalActualRollbackConfirmed": [
+      "SELECT 1",
+      "BEGIN",
+      "ROLLBACK",
+      "SELECT 1"
+    ],
+    "actualLossMilliseconds": [101.071, 1501.889],
+    "metadataOnly": true,
+    "productReviewOrSigningAcceptance": false
+  },
+  "pausedNativeCheckpoint": {
+    "branch": "codex/w5-native-content-session-20261003",
+    "head": "ea2b9d25c29a380355e9c3dcfde69d2053be01ed",
+    "pushed": true,
+    "readyPR": false,
+    "backendTypecheckLintFormat": true,
+    "swiftParse": true,
+    "shippingBuildOrAppAcceptance": false,
+    "retainedAlreadyAppliedStash": "b6055022601c731b1b78eab158ce787d162ca9e6"
+  },
+  "groupWorker": {
+    "branch": "codex/w5-group-worker-consumer-20261003",
+    "head": "b520000666fdb5595995702a76fe848edc0c79d2",
+    "originalSignalProposalApplied": false,
+    "minimumHasDefault": false,
+    "genuinePositiveTaskActivationOrAcceptance": false,
+    "sameOriginalAndLastFinalGatesRequired": true
+  },
+  "dataCustody": {
+    "recordedAt": "2026-10-03T23:15:06.386Z",
+    "source": "7daa31f8d649d85342db06d120baee8346ef3e0d",
+    "snapshots": [
+      {
+        "database": "creator_w5",
+        "ledgerRows": 61,
+        "ledgerSha256": "b3cb959d120f2db4640b6fbdb5ec087ea7f0781a487f564696319fe716cb8427",
+        "schemaSha256": "c69b0fafad55dc1234c200c5dfc745ef105c7ba5d14cca0197c386ca995fcbab",
+        "rolesSha256": "123403ba7928db12891c4edad598693c1f80c5dd22b64cfe9f5e937a88258ada",
+        "securitySha256": "384424be82ac4b64a81d0038f4f7f51855c1c919a1584d9922309ba8b071b714",
+        "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+        "dataSha256": "223bcbc2a46198d88e27fa2a56e796a9626664b414f6cdabb7ec0a12c95c520d",
+        "dataRows": 148,
+        "dataTables": 163,
+        "oldRolesPreserved": true,
+        "ledgerMatchesSource": true,
+        "closedOriginal57Matches": {
+          "ledger": false,
+          "schema": false,
+          "roles": true,
+          "security": false,
+          "sequence": true,
+          "data": false
+        }
+      },
+      {
+        "database": "creator_w5_privacy_main_restore_20261002",
+        "ledgerRows": 57,
+        "ledgerSha256": "2b6f7b224f46cffa47da3ebddbf52207cb05d26a2964fdf4d92aab4dc0ac297b",
+        "schemaSha256": "cfbc894fd59dc3981ab4fa31d2ff7154e2865b452a71b79afd483abe94557ea3",
+        "rolesSha256": "123403ba7928db12891c4edad598693c1f80c5dd22b64cfe9f5e937a88258ada",
+        "securitySha256": "c52f89e7be1b96dc2f0f64b5b4162f3df0c03fb84c755b756c0c80e8bba1c416",
+        "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+        "dataSha256": "d8ff1d7d7dd42a04e2c5154d9c183ca80ec6db824de7534011b2496f1ede73d4",
+        "dataRows": 36,
+        "dataTables": 161,
+        "oldRolesPreserved": true,
+        "ledgerMatchesSource": true,
+        "closedOriginal57Matches": {
+          "ledger": true,
+          "schema": true,
+          "roles": true,
+          "security": true,
+          "sequence": true,
+          "data": true
+        }
+      }
+    ],
+    "original57DumpSha256": "fa49700e18e3d7289d33b793acb05fbf72b104d5296f2c665bd2d5c6cfa55f0f",
+    "original57DumpMatches": true,
+    "schemaSerializationCorrection": "Initial snapshot recorded only schemaCustody inner metadata hash. Actual original manifest uses canonical hash of the complete helper result; corrected without any database change.",
+    "trafficStarted": false,
+    "mutation": false,
+    "heldPurposeActivation": false,
+    "restorationAcceptance": false
+  },
+  "currentDraftMetadata": {
+    "source": "7daa31f8d649d85342db06d120baee8346ef3e0d",
+    "recordedAt": "2026-10-03T23:16:54.784Z",
+    "note": [
+      {
+        "id": "170f95f9-2da6-42af-afe0-b7c3d88aba23",
+        "version": 21,
+        "state": "draft",
+        "audience": {
+          "kind": "members"
+        }
+      }
+    ],
+    "otherClients": 0,
+    "mutation": false
+  },
+  "resourceCustody": {
+    "recordedAt": "2026-10-03T23:25:24.634229+00:00",
+    "source": "7daa31f8d649d85342db06d120baee8346ef3e0d",
+    "ownListeners": {
+      "30055": false,
+      "41055": false,
+      "41056": false,
+      "43435": false
+    },
+    "leases": {
+      "/private/tmp/creator-platform-heavy-build.lock": {
+        "exists": false,
+        "w5Owner": false
+      },
+      "/private/tmp/creator-platform-native-gui.lock": {
+        "exists": true,
+        "w5Owner": false
+      },
+      "/private/tmp/creator-platform-emulator-slot-1": {
+        "exists": false,
+        "w5Owner": false
+      },
+      "/private/tmp/creator-platform-emulator-slot-2": {
+        "exists": true,
+        "w5Owner": false
+      },
+      "/private/tmp/creator-platform-simulator-slot-1": {
+        "exists": false,
+        "w5Owner": false
+      },
+      "/private/tmp/creator-platform-simulator-slot-2": {
+        "exists": false,
+        "w5Owner": false
+      },
+      "/private/tmp/creator-platform-simulator-slot-3": {
+        "exists": false,
+        "w5Owner": false
+      }
+    },
+    "ownedSimulators": [
+      {
+        "udid": "78C3590E-6D36-4A73-9E46-D23563EF0134",
+        "name": "Creator Platform W5",
+        "state": "Shutdown",
+        "isAvailable": true
+      }
+    ],
+    "historicallyUsedSharedSimulatorPreserved": [
+      {
+        "udid": "A189976E-697E-4DE7-8EE3-6E355B990FAD",
+        "name": "Pantopus S1",
+        "state": "Booted"
+      }
+    ],
+    "nativeDevicesStartedThisFinalOperation": false,
+    "androidPersonalAcceptance": false,
+    "container": {
+      "id": "7a940068aa781f484fbb3fbc48740d4b891f31a83a4170fd8f744dded21b4320",
+      "running": false,
+      "pid": 0,
+      "exitCode": 0
+    },
+    "secretFileMode": "0o600",
+    "sharedStateNotChanged": true,
+    "firstBroadDeviceFilterExcluded": "A189 is PantopusS1, not owned W5; observed booted and preserved, never shut down."
+  },
+  "privateContinuationRoot": "~/.config/creator-platform/w5-20261003/",
+  "heldPurposeSQLActivated": false,
+  "fabricatedIdentitySignatureConsentPaymentMediaDeliveryPrivacyReceipt": false,
+  "genuineProofHumanTouchIDProviderPaymentKeysAndC2PASignerRemainRequired": true
+}

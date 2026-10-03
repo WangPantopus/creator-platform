@@ -1,5 +1,38 @@
 # Current Team role consumer — bounded personal operation
 
+## Repaired independent open view at7daa31f8
+
+Personally operated exact `7daa31f8d649d85342db06d120baee8346ef3e0d` through
+the committed launcher and actual Next development runtime against original61.
+The creator UI saved triage→drafter+triage, and a fresh supported-CUA Chrome
+Incognito window began signed out then signed in as the actual development
+fan-one. The IAB creator remained Creator workspace. The fan entered unsent
+draft text; the actual creator withdrew Drafting back to triage. Its already
+open Composer removed the editor, body, audience, media, AI-source and signing
+controls, showing Content editing unavailable and Return to Notes. Reloading
+that same saved Composer URL preserved the denial. Both role POSTs returned
+genuine200 through the pass-through relay; no draft save/signature command.
+Read-only final membership is triage/xmin89552.
+
+This is bounded current independent open-view/saved-return acceptance. It is
+not current390/1280 Light/Night, keyboard/large-text, native or complete Team
+acceptance. The shipping web build remains atc7dd, not relabelled to7daa.
+An initial startup lacked the private relay control file and stopped before
+personal operation; all listeners/guard closed. That failed-start directory is
+preserved and excluded. Fresh retry used explicit genuine pass-through only.
+One browser-control interruption was resolved by fresh state already showing
+the real chooser. One address entry dropped its first character and reached a
+search page; excluded as app evidence, corrected with supported native paste.
+No search result was used as source or acceptance.
+
+Own Incognito and IAB18 sessions signed out normally, window/tab closed and
+viewport reset. Exact GUI owner/dev/inode released. Runtime normally interrupted
+at23:12:40.752Z before its23:13:23 hard deadline; API/relay wrappers-2, web0,
+all30055/41055/41056 absent, Next environment restored and heavy guard released.
+Private0600 PNGs/network/membership/closure/operator summary are retained in
+`~/.config/creator-platform/w5-20261003/team-7daa-current-r2/`.
+No whole package or release-ready gate is checked off.
+
 ## Current independent fan operation and Composer repair
 
 At `49070ca369ada7239919c5760e4c645bc16b4268`, personally operated the
