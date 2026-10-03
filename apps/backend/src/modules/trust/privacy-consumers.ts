@@ -149,6 +149,7 @@ export function createPrivacyConsumers(input: {
     const purpose = createCommercePrivacyAuthority(
       input.commerce.pool,
       input.commercePrivacy,
+      input.assertRestoredInTransaction,
     );
     const authority = {
       async withPrivacyJob<T>(
