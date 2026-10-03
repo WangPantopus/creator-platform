@@ -271,7 +271,12 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     private fun message(failure: Exception): String = if (failure is CreatorAPIError) runCatching { Json.decodeFromString<APIError>(failure.body).error.message }.getOrDefault("This action could not complete. Reconnect and try again.") else "This action could not complete. Reconnect and try again."
 }
 
-class FanFeatureRegistration(val matches: (String) -> Boolean, val allowsSignedOut: (String) -> Boolean = { false }, val screen: @Composable (FanSession) -> Unit)
+class FanFeatureRegistration(
+    val matches: (String) -> Boolean,
+    val allowsSignedOut: (String) -> Boolean = { false },
+    val rootObserver: @Composable (FanSession) -> Unit = {},
+    val screen: @Composable (FanSession) -> Unit,
+)
 
 @Composable
 fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/home", features: List<FanFeatureRegistration> = emptyList(), destinationDelivery: Long = 0L) {
@@ -289,6 +294,9 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
         }
         FanSession(context, baseURL, restored ?: returnTo)
     }
+    // Observe genuine boundaries while a restored/private feature is unmounted.
+    // Feature observers issue no session authority and serialize no private data.
+    features.forEach { it.rootObserver(model) }
     val currentReturn by rememberUpdatedState(permittedReturn)
     val currentDelivery by rememberUpdatedState(destinationDelivery)
     DisposableEffect(model, registry) {

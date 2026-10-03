@@ -1,3 +1,9 @@
+## Original native outage and configuration input — October 3, 2026 16:54 UTC
+
+Personally operated exact9d iOS shipping bytes at1535c67c: original fan Requests→Spending, persisted No limit/zero charges, native decimal keyboard6.50 unsent, real API stop and automatic private concealment/retained-input notice. Recovery is held by the independently confirmed shared Docker daemon/forwarding outage; no post-operation durable fingerprint or restored-input pass is credited. Own API, simulator, GUI and pending Docker clients are physically closed; W7 is notified of early release. [Named private receipts and limitations](../../../artifacts/workstreams/W4/runtime/2026-10-03/native-original-session/README.md).
+
+Personally reviewed W8 e8587c8c and reused its genuine root observer/memory-only configuration pattern for unsent Spending input. Source excludes credentials, requests, action keys and private results, revalidates the original tuple and fresh overview before one-time restoration, and preserves actual new edits. Fresh Android build and personal Night/rotation/session disposal remain pending. W8 coordinates the single proposed infrastructure recovery; no shared restart or peer container mutation is performed here. No whole package/R01–R15 item is complete.
+
 ## Native shipping compilation, personal operation pending — October 3, 2026 16:10 UTC
 
 Actual303/9d6f9331 shipping Android37 tasks85 seconds and normally signed iOS54 seconds exit0; APK/iOS deep strict signatures verify, full Debug executable and dylib hashes are retained independently. Four exact-head fast CI checks pass; six Mac jobs remain queued. Canonical heavy custody is normally released and physical absence checked; W7 follows. [Named compilation and private receipt hashes](../../../artifacts/workstreams/W4/runtime/2026-10-03/native-original-session/README.md).
