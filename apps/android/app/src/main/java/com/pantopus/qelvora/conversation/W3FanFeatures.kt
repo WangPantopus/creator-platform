@@ -407,6 +407,49 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     val key = remember(handle) { UUID.randomUUID().toString() }
     val scope = rememberCoroutineScope(); val uriHandler = LocalUriHandler.current
     val contextPending = Uri.parse(session.destination).getQueryParameter("context") != null
+    val target = session.destination
+    val accountId = session.session?.accountId
+    val sessionId = session.session?.sessionId
+    var postContext by remember { mutableStateOf<APIGrowthPostEntryContextResponseContext?>(null) }
+    var contextSessionId by remember { mutableStateOf<String?>(null) }
+    var contextDestination by remember { mutableStateOf("") }
+    var contextFailure by remember { mutableStateOf("") }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var foreground by remember(lifecycleOwner) { mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, _ ->
+            foreground = lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+            if (!foreground) postContext = null
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer); postContext = null }
+    }
+    LaunchedEffect(baseURL, target, accountId, sessionId, foreground) {
+        postContext = null; contextFailure = ""
+        if (!foreground || !contextPending) return@LaunchedEffect
+        while (isActive) {
+            postContext = null; contextFailure = ""
+            val values = Uri.parse(target).getQueryParameters("context")
+            val id = values.singleOrNull()?.let { raw -> runCatching { UUID.fromString(raw).also { require(it.toString().equals(raw, ignoreCase = true)) } }.getOrNull() }
+            val capture = if (id != null && ApplicationDestination.isPermitted(target)) session.captureRequest(target, maximumResponseBytes = 8192, timeoutMs = 5000) else null
+            if (capture == null || capture.expectedAccountId != accountId) {
+                contextFailure = QelvoraCopy.text("growthThisDestinationIsUnavailableReconnectAndTryAgain")
+            } else try {
+                if (!capture.isCurrent()) return@LaunchedEffect
+                val page = capture.client.readPostEntryContext(handle, id.toString(), capture.expectedAccountId)
+                val post = page.context
+                if (!foreground || !capture.isCurrent()) return@LaunchedEffect
+                require(UUID.fromString(post.creatorId).toString().equals(post.creatorId, ignoreCase = true))
+                require(UUID.fromString(post.contentId) == id && post.version in 1..2147483647L && post.title.length <= 180)
+                require(post.destination == "/creators/$handle/posts/$id")
+                contextSessionId = capture.sessionId; contextDestination = capture.destination; postContext = post
+            } catch (failure: Throwable) {
+                if (failure is CancellationException) throw failure
+                if (foreground && capture.isCurrent()) contextFailure = QelvoraCopy.text("growthThisDestinationIsUnavailableReconnectAndTryAgain")
+            }
+            delay(4000)
+        }
+    }
     LaunchedEffect(handle) {
         try {
             require(Regex("[A-Za-z0-9_-]{1,100}").matches(handle))
@@ -430,9 +473,18 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             BasicText("WHAT IT REMEMBERS",style=qText("meta").copy(color = qColor("ink"))); BasicText("Only what you agree to. It asks first, and you can see and delete every memory in You.",style=qText("body").copy(color = qColor("ink")))
         }
         if(error.isNotEmpty()) item { Notice(title="Conversation unavailable",children=error) }
-        if(contextPending) item { Notice(title="Post context unavailable",children="This post's context is not connected to the conversation service yet. Your destination is kept.") }
+        if(contextPending) item {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                postContext?.takeIf { foreground && !session.checkingSession && contextSessionId == sessionId && contextDestination == target && it.creatorId == creator?.optString("id") }?.let { post ->
+                    ContextCard(QelvoraCopy.text("growthFromAPost"), post.title) { session.open("/creators/$handle/chat") }
+                }
+                Notice(title="Post context unavailable",children=contextFailure.ifEmpty { "This post's conversation context is not connected yet. Remove the post context to continue to the current AI provider review." })
+                Button(QelvoraCopy.text("removeContext"), variant=ButtonVariant.QUIET, block=true) { session.open("/creators/$handle/chat") }
+            }
+        }
         item {
             Button("Start with $name's AI",variant=ButtonVariant.AI,block=true,disabled=busy || creator == null || contextPending || capabilities?.generationAvailable != true || capabilities?.consentAvailable != true) { scope.launch {
+                if (contextPending || session.destination != target) return@launch
                 val policy=capabilities?.providers ?: return@launch; busy=true
                 try {
                     val page=client.json.decodeFromJsonElement<ConversationPage>(client.request("begin",buildJsonObject { put("creatorId",creator!!.getString("id"));put("policyVersion",policy.version);put("accessNoticeAccepted",true);put("idempotencyKey",key) }))

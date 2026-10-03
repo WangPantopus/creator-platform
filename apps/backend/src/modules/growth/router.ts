@@ -129,6 +129,13 @@ export function createGrowthRouter(
   );
   router.get("/creators/:handle/posts/:id/context", async (req, res) => {
     const actor = await actorFor(req);
+    const expectedAccount = req.get("x-qelvora-expected-account");
+    if (expectedAccount && uuid(expectedAccount) !== actor.accountId)
+      throw new DomainError(
+        "growth_entry_session_required",
+        copy.growthErrorGrowthAuthorityRequired,
+        401,
+      );
     if (!options.postEntryContext)
       throw new DomainError(
         "growth_entry_context_unconfigured",

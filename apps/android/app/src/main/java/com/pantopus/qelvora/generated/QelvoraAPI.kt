@@ -5346,6 +5346,41 @@ enum class APIStudioStudioThreadEntriesCoverage {
 }
 
 @Serializable
+data class APIGrowthPostEntryContextResponse(
+  val `context`: APIGrowthPostEntryContextResponseContext
+)
+
+@Serializable
+data class APIGrowthPostEntryContextResponseContext(
+  val `source`: APIGrowthPostEntryContextResponseContextSource,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `version`: Long,
+  val `title`: String,
+  val `destination`: String
+)
+
+@Serializable
+enum class APIGrowthPostEntryContextResponseContextSource {
+  @SerialName("post") POST
+}
+
+@Serializable
+data class APIGrowthPostEntryContext(
+  val `source`: APIGrowthPostEntryContextSource,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `version`: Long,
+  val `title`: String,
+  val `destination`: String
+)
+
+@Serializable
+enum class APIGrowthPostEntryContextSource {
+  @SerialName("post") POST
+}
+
+@Serializable
 enum class ReadCreatorMediaPolicyPurpose {
   @SerialName("source_audio") SOURCE_AUDIO,
   @SerialName("interview_audio") INTERVIEW_AUDIO,
@@ -5443,6 +5478,7 @@ class CreatorAPIClient(private val baseURL: String, private val maximumResponseB
   suspend fun studioReplyDraft(creatorId: String, fanId: String): APIStudioReplyDraft = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads/${segment(fanId)}/draft", "GET", authenticated = true))
   suspend fun saveStudioReplyDraft(creatorId: String, fanId: String, xQelvoraExpectedAccount: String? = null, body: APIStudioSaveReplyDraft): APIStudioDraftVersion = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads/${segment(fanId)}/draft", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun sendStudioReplyDraft(creatorId: String, fanId: String, xQelvoraExpectedAccount: String? = null, body: APIStudioSendReplyDraft): APIMessage = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads/${segment(fanId)}/send-draft", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun readPostEntryContext(handle: String, id: String, xQelvoraExpectedAccount: String? = null): APIGrowthPostEntryContextResponse = json.decodeFromString(request("/v1/growth/creators/${segment(handle)}/posts/${segment(id)}/context", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun health(): APIHealth = json.decodeFromString(request("/health", "GET", authenticated = false))
   suspend fun identityCapabilities(): APIIdentityCapabilities = json.decodeFromString(request("/v1/identity/capabilities", "GET", authenticated = false))
   suspend fun continueWithPantopus(body: APIIdentityContinue): APIIdentityRedirect = json.decodeFromString(request("/v1/identity/continue", "POST", body = json.encodeToString(body), authenticated = false))
