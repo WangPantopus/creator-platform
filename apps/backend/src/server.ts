@@ -20,6 +20,8 @@ import {
 } from "./modules/trust/development.js";
 import { agentFeature } from "./modules/agent/feature.js";
 import { createGrowthAPIPool } from "./db/growth-api-pool.js";
+import { contentPublicProjection } from "./modules/growth/content.js";
+import { canonicalCoreContentFollows } from "./modules/growth/core-follows.js";
 import { DomainError } from "./core/errors.js";
 import { InteractiveCallControl } from "./modules/session/interactive-control.js";
 import { AccountCallMetadata } from "./modules/session/account-call-metadata.js";
@@ -52,6 +54,9 @@ if (config.identityAdapter === "development" && !config.identitySessionKey)
     "Development identity requires an explicit IDENTITY_SESSION_KEY.",
   );
 const growthAPIPool = await createGrowthAPIPool(config.databaseUrl);
+// The core Follow purpose is not activated. Its canonical reader keeps
+// follower content unavailable until its owner supplies actual custody.
+const coreContentFollows = canonicalCoreContentFollows();
 let configured: Awaited<ReturnType<typeof createConfiguredBackend>> | undefined;
 try {
   configured =
@@ -152,14 +157,18 @@ try {
                   );
                 },
                 mediaPublication: mediaHost?.contentPublication,
+                // Content retains its canonical held client. Growth's API
+                // pool serves public projection, never recipient authority.
+                ...(features.growth ? { follows: coreContentFollows } : {}),
               },
               ...(features.growth && runtime.identity
                 ? {
-                    growth: {
-                      service: features.growth.service,
-                      signing: runtime.identity.signing,
-                      follows: { follows: features.growth.contentFollows },
-                    },
+                    publicProjection: async (actor, effect) =>
+                      contentPublicProjection(
+                        features.growth!.service,
+                        content.content,
+                        runtime.identity!.signing,
+                      )(actor, effect),
                   }
                 : {}),
               assertScopeAllowedInTransaction:
