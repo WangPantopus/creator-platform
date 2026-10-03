@@ -1,0 +1,10 @@
+{
+  "owner": "W8",
+  "source": "2d131a784437d91db1dd7fcbdda8e8253800ba83",
+  "files": {
+    "apps/backend/src/modules/trust/privacy-authority.ts": "c5d7b1d3b2f2dfeb4978051175964a1911fce9efd06b7593fee3f189bd5619da",
+    "apps/backend/src/modules/trust/privacy-catalog.ts": "fe29fa4e8988f127580f4f1074f9a5029f040262b01561937ac481a9604cb78b",
+    "apps/backend/src/modules/trust/conversation-privacy-authority.ts": "699dc9001bc5f6f9b6885c7fa9bb25873b2cbdf5aa19d565615f3cdbc04128f6"
+  },
+  "copy": "Exact original owner bytes; no registry or SQL changed."
+}

@@ -45,10 +45,6 @@ import {
   CommerceFulfillmentPlans,
   type CommerceGroupRecipient,
 } from "../commerce/fulfillment-plans.js";
-import {
-  FULFILLMENT_CATALOGUE_QUERY,
-  FULFILLMENT_CATALOGUE_SHA256,
-} from "../commerce/fulfillment-catalogue.js";
 import { ConversationSystemLinkSchema } from "../../../../../packages/api/src/conversation/system-link.js";
 
 type ThreadRow = {
@@ -102,6 +98,14 @@ function message(row: MessageRow): Message {
 }
 
 export class ConversationService {
+  private frameNotifications?: ThreadFrameNotifications;
+  watchFrames(threadId: string, wake: () => void): () => void {
+    this.frameNotifications ??= new ThreadFrameNotifications(this.db.pool);
+    return this.frameNotifications.subscribe(threadId, wake);
+  }
+  closeFrameNotifications(): void {
+    this.frameNotifications?.close();
+  }
   private fulfillmentPlans?: CommerceFulfillmentPlans;
   configureFulfillmentPlans(plans: CommerceFulfillmentPlans): void {
     CommerceFulfillmentPlans.assertRuntime(plans, this.db, this.access);
@@ -208,14 +212,7 @@ export class ConversationService {
       "Refresh this conversation to read its links.",
     );
     CommerceFulfillmentPlans.assertRuntime(plans, this.db, this.access);
-    const catalogue = (
-      await client.query<{ checksum: string }>(FULFILLMENT_CATALOGUE_QUERY)
-    ).rows[0]?.checksum;
-    invariant(
-      catalogue === FULFILLMENT_CATALOGUE_SHA256,
-      "system_link_catalogue_changed",
-      "Original public-answer delivery is unavailable.",
-    );
+    await plans.assertCurrentCatalogueInTransaction(client);
     const rows = (
       await client.query<{
         message_id: string;
@@ -260,14 +257,6 @@ export class ConversationService {
     return messages.map((m) =>
       links.has(m.id) ? { ...m, systemLink: links.get(m.id)! } : m,
     );
-  }
-  private frameNotifications?: ThreadFrameNotifications;
-  watchFrames(threadId: string, wake: () => void): () => void {
-    this.frameNotifications ??= new ThreadFrameNotifications(this.db.pool);
-    return this.frameNotifications.subscribe(threadId, wake);
-  }
-  closeFrameNotifications(): void {
-    this.frameNotifications?.close();
   }
   isFor(database: Database, access: AccessService) {
     return this.db === database && this.access === access;

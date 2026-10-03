@@ -1,0 +1,57 @@
+{
+  "source": "616ebf4a527556218f60831296567bffb579eeab",
+  "kind": "personal manual observations, no assertions",
+  "views": [
+    {
+      "at": "2026-10-02T11:06:37.564Z",
+      "theme": "light",
+      "viewport": [390, 844],
+      "hidden": false,
+      "text": "Home\nYour account\nContent status\nCurrent scope authority is not configured.\n\nChecking current access. Your input stays in this tab during a connection interruption.\n\nCheck current access",
+      "textareaCount": 0,
+      "overflow": false
+    },
+    {
+      "at": "2026-10-02T11:06:42.031Z",
+      "theme": "night",
+      "viewport": [390, 844],
+      "hidden": false,
+      "text": "Home\nYour account\nContent status\nCurrent scope authority is not configured.\n\nChecking current access. Your input stays in this tab during a connection interruption.\n\nCheck current access",
+      "textareaCount": 0,
+      "overflow": false
+    },
+    {
+      "at": "2026-10-02T11:06:46.469Z",
+      "theme": "light",
+      "viewport": [1280, 900],
+      "hidden": false,
+      "text": "Home\nYour account\nContent status\nCurrent scope authority is not configured.\n\nChecking current access. Your input stays in this tab during a connection interruption.\n\nCheck current access",
+      "textareaCount": 0,
+      "overflow": false
+    },
+    {
+      "at": "2026-10-02T11:06:50.939Z",
+      "theme": "night",
+      "viewport": [1280, 900],
+      "hidden": false,
+      "text": "Home\nYour account\nContent status\nCurrent scope authority is not configured.\n\nChecking current access. Your input stays in this tab during a connection interruption.\n\nCheck current access",
+      "textareaCount": 0,
+      "overflow": false
+    }
+  ],
+  "policy": {
+    "at": "2026-10-02T11:07:42.084Z",
+    "header": "x-qelvora-expected-account",
+    "sessionStatus": 200,
+    "accountId": "10000000-0000-4000-8000-000000000002",
+    "policy": {
+      "status": 503,
+      "code": "scope_denial_unconfigured"
+    },
+    "wrongAccount": {
+      "status": 403,
+      "code": "content_account_changed"
+    }
+  },
+  "excluded": "Earlier exploratory requests used an unrecognized account header and were not wrong-account evidence."
+}

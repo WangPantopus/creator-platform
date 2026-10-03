@@ -1,0 +1,25 @@
+{
+  "source": "65e54e9ba3cb7cb3de2d9d21675736eb5b6ecdf8",
+  "ownPid": 1810,
+  "keyboard": "Actual Check current access button focused and Enter invoked; no private content appeared under missing scope authority",
+  "pausedAt": "2026-10-02T12:09:03.629693+00:00",
+  "signal": "signal.SIGSTOP",
+  "pausedProcessState": "T",
+  "actualNetwork": {
+    "exitCode": 28,
+    "httpCode": "000"
+  },
+  "outageView": {
+    "url": "http://localhost:30055/studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/notes?theme=night",
+    "text": "Reconnect to Studio\nYour input is kept in this tab. Studio is hidden until your current account and roles can be checked again.\nCheck connection and roles"
+  },
+  "outageAt": "2026-10-02T12:09:12.172356+00:00",
+  "resumedAt": "2026-10-02T12:09:12.240138+00:00",
+  "resumeSignal": "signal.SIGCONT",
+  "recoveryView": {
+    "url": "http://localhost:30055/studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/notes?theme=night",
+    "text": "Qelvora Studio\nMaya\nRefresh role\nNotes\nNew Note\nAction status\nCurrent scope authority is not configured.\n\nChecking current Note and private reply access.\n\nCheck current access"
+  },
+  "recoveryAt": "2026-10-02T12:09:17.744607+00:00",
+  "qualification": "One local loopback observation of Studio identity/role outage concealment and actual account recovery. Private Note/replies/tenure remain unavailable before and after due absent current scope; no positive Note retention/paid badge/latency p95 claim."
+}

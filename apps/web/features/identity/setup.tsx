@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { brand } from "@qelvora/brand";
 import { copy } from "@qelvora/copy";
 import { Notice } from "@qelvora/ui-web";
@@ -458,6 +459,20 @@ export function CreatorSetup({ initial }: { initial: Session }) {
                         ? "Your proof is awaiting manual review. This status is separate from payout-provider identity checks."
                         : "Creator identity is checked independently of payout-provider identity checks."))}
                 </Notice>
+                {proof.state === "pending" && !proofExpired && (
+                  <div>
+                    <p className="qv-help">
+                      {copy.identityProofReviewSupportBody}
+                    </p>
+                    <Link
+                      href={`/support?creatorId=${encodeURIComponent(creator.id)}&kind=verification`}
+                      className="qv-btn qv-btn--secondary"
+                      prefetch={false}
+                    >
+                      {copy.identityProofReviewSupport}
+                    </Link>
+                  </div>
+                )}
                 <button
                   ref={proofFocus}
                   className="qv-btn qv-btn--quiet"

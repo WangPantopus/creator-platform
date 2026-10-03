@@ -40,10 +40,16 @@ public final class NativeVoiceRecorder: NSObject, ObservableObject, @preconcurre
             state = .failed; reason = QelvoraCopy.text("w6MicrophoneRecordingIsUnavailableInThisAppBuild"); return
         }
         state = .requesting
-        let allowed = await AVAudioApplication.requestRecordPermission()
+        let allowed = (try? await NativeMediaDevicePermissions.request(camera: false)) == true
         guard requestGeneration == generation else { return }
-        guard allowed else { state = .denied; reason = QelvoraCopy.text("w6MicrophoneAccessIsOffAllowItInSettingsThenTry"); return }
+        guard allowed else {
+            let access = NativeMediaDevicePermissions.granted(camera: false)
+            state = access ? .failed : .denied
+            reason = QelvoraCopy.text(access ? "w6TheMicrophoneIsUnavailableTryAgain" : "w6MicrophoneAccessIsOffAllowItInSettingsThenTry")
+            return
+        }
         #endif
+        var attemptedFile: URL?
         do {
             #if os(iOS)
             let audioSession = AVAudioSession.sharedInstance()
@@ -51,6 +57,7 @@ public final class NativeVoiceRecorder: NSObject, ObservableObject, @preconcurre
             try audioSession.setActive(true)
             #endif
             let location = FileManager.default.temporaryDirectory.appendingPathComponent("voice-\(UUID().uuidString).m4a")
+            attemptedFile = location
             let settings: [String: Any] = [AVFormatIDKey: kAudioFormatMPEG4AAC, AVSampleRateKey: 48000, AVNumberOfChannelsKey: 1, AVEncoderBitRateKey: 96000, AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue]
             let audio = try AVAudioRecorder(url: location, settings: settings)
             audio.delegate = self
@@ -64,7 +71,12 @@ public final class NativeVoiceRecorder: NSObject, ObservableObject, @preconcurre
                     if self.duration >= self.maximumDuration { self.stop(); return }
                 }
             }
-        } catch { state = .failed; reason = QelvoraCopy.text("w6TheMicrophoneIsUnavailableTryAgain"); deactivate() }
+        } catch {
+            // prepareToRecord can leave a container header even when hardware
+            // capture fails. It never became a preview owned by `file`.
+            if let attemptedFile { try? FileManager.default.removeItem(at: attemptedFile) }
+            state = .failed; reason = QelvoraCopy.text("w6TheMicrophoneIsUnavailableTryAgain"); deactivate()
+        }
     }
     public func pause(interrupted: Bool = false) {
         if interrupted && state == .requesting {
@@ -149,7 +161,10 @@ public struct MediaRecordingView: View {
                 Text(QelvoraCopy.text("w6UploadingAndExactMediaSigningRequireAConfiguredAccountAnd")).qText("caption")
             }.padding(QelvoraTokens.space4).frame(maxWidth: QelvoraTokens.phoneWidth, alignment: .leading)
         }.background(qColor("ground", scheme)).foregroundStyle(qColor("ink", scheme))
-            .onChange(of: scenePhase) { _, phase in if phase != .active { recorder.pause(interrupted: true); recorder.pausePreview() } }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .background || (phase == .inactive && recorder.state != .requesting) { recorder.pause(interrupted: true) }
+                if phase != .active { recorder.pausePreview() }
+            }
             .onDisappear { recorder.discard() }
     }
 }

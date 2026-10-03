@@ -287,6 +287,7 @@ D-H, D-01 to D-27) are in the Domain Model.
 | 2026-09-25 | Deferred by the founder: AI provider names on the consent screen stay `[AI PROVIDERS]`; native in-app purchase for paid replies waits for counsel; cards are designed as a direct card hold |
 | 2026-09-25 | Phases 4 to 6 drafted end to end: 64 screens on six canvases, five prototypes, the audit and developer handoff (see the design plan for links) |
 | 2026-09-25 | Brand aim: a high-end, premium product. The luxury comes from craft, calm, service and honesty ("quiet luxury"), never from status or exclusivity language, which the copy system forbids |
+| 2026-10-02 | Human directs streams to prioritize working features and personally operated web/native E2E; retain functional JSON and concise necessary records, avoid committing routine screenshots or bulky diagnostic receipts. W3 [current checkpoint](workstreams/handoffs/W3-mac-studio-2026-10-02.md) remains incomplete. |
 
 ## 15. Open questions and known inconsistencies
 

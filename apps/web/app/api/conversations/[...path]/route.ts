@@ -5,7 +5,7 @@ import { sameRequestOrigin } from "../../../../lib/request-origin";
 
 const uuid = "[a-f0-9-]{36}";
 const permitted = new RegExp(
-  `^(?:capabilities|account|realtime-ticket|begin|${uuid}/${uuid}(?:/(?:events|offline|memory(?:/${uuid})?|preferences|consent|presence|usage|messages|audit|fan-replies|team-replies|recordings|citations/${uuid}|messages/${uuid}(?:/dont-remember|/feedback|/corrections)?|messages/status(?:/[^/]{8,128})?))?)$`,
+  `^(?:capabilities|account|realtime-ticket|begin|${uuid}/${uuid}(?:/(?:events|offline|intro-offer(?:/acknowledgement)?|memory(?:/${uuid})?|preferences|consent|presence|usage|messages|audit|fan-replies|team-replies|recordings|citations/${uuid}|messages/${uuid}(?:/dont-remember|/feedback|/corrections)?|messages/status(?:/[^/]{8,128})?))?)$`,
   "u",
 );
 async function proxy(

@@ -1,0 +1,26 @@
+{
+  "recordedAtUtc": "2026-10-02T17:33:25Z",
+  "operator": "primary W4",
+  "android": {
+    "source": "00cfad792d64bf18b53e64cc444d1157d08ab343",
+    "shippingDebugBuildPassed": true,
+    "durationSeconds": 41,
+    "apkSha256": "5a81e430f6e600dd6c64f4a4ea6ae9352bbb7f3c77c970b6a541b493d4d4af3a",
+    "sharedHeavyLeaseReleased": true,
+    "personallyOperatedSystemLink": false
+  },
+  "iosRetry": {
+    "normalSignedShippingAppSource": "142f7208d2ea1e099a0662b25698c31018abfab6",
+    "ownedSimulator": "BC8F4A5B-6F9E-4A89-813B-FF4DD8572271",
+    "bootInstallLaunchPassed": true,
+    "cuaDeviceHubBinding": "com.apple.dt.Devices",
+    "cuaResult": "server timeout -10005 before UI state",
+    "personallyOperatedCommerce": false,
+    "ownSimulatorStopped": true,
+    "exactGuiAndSimulatorLeaseReleased": true,
+    "alternativeOperationalDriverExecuted": false
+  },
+  "peerResourcesChanged": false,
+  "positiveDeliveryVerified": false,
+  "releaseReady": false
+}

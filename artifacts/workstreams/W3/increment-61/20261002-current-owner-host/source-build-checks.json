@@ -1,0 +1,39 @@
+{
+  "source": "bb5fe1460669044e4f5992250cd499ef99425d94",
+  "unitTestsWritten": false,
+  "unitTestsRun": false,
+  "observedChecks": [
+    {
+      "command": "pnpm run build",
+      "cwd": "apps/backend",
+      "exitCode": 0,
+      "coverage": "TypeScript and shipping esbuild",
+      "execSession": 58451
+    },
+    {
+      "command": "pnpm exec tsc --noEmit",
+      "cwd": "apps/web",
+      "exitCode": 0,
+      "execSession": 65881
+    },
+    {
+      "command": "scoped ESLint and Prettier on reconciled host, terminal, privacy, lineage and Growth sources",
+      "exitCode": 0,
+      "execSession": 65155
+    },
+    {
+      "command": "pnpm generate:check",
+      "exitCode": 0,
+      "sharedResources": 12,
+      "nativeOperations": 103
+    },
+    {
+      "command": "git diff --check with artifacts excluded",
+      "exitCode": 0
+    }
+  ],
+  "rawCheckOutputNotRetainedForEarlierSessions": true,
+  "rawArtifactWhitespace": "Full merge diff check flags original W7 evidence log trailing whitespace. Raw evidence bytes preserved; source/document check excludes artifacts.",
+  "nextInstalledVersion": "16.3.7",
+  "nextCache": "Actual next typegen regenerated removed-route validators; previous own stopped cache preserved privately; no config changed."
+}

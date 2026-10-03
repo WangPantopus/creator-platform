@@ -1,3 +1,7 @@
+## W4 personally consumed integration — 2026-10-02
+
+Root consumed exact22f9fc1b into the actual current branch and only W5 da6553df optional/no-default C08 delta. Correct held purposes are0178 and0167 under W8 fb1cbca, superseding the older mapping below. Publication retry uses actual W4 preparePublicationRetry/finalizePublicationRetry and emits no recipient proof. Current viewer0199, genuine W8 denial0200 and finite C10 detachment are required; group activation remains closed. Android build exposed missing imports on the older root parent, now corrected; native rebuild/positive operation is pending. Root planning/type/contract evidence does not establish delivery or permission.
+
 # W3 original public-answer System links
 
 W3 personally consumed the genuine W4 fulfillment class, catalogue, original-service reader, held SQL and public reference contract unchanged from `58d39e671609750fac88a3fa11f22ab9d2eccd51`. This increment implements the matched-request plan path. The separate single-public-packet path remains unavailable until its actual original recipient producer is supplied; no plan is invented for it.
@@ -28,8 +32,6 @@ The association and frames remain in existing thread custody, with no independen
 
 ## Registry and acceptance limits
 
-The held SQL is copied unchanged and never applied here. W8's published proposed map corrected `fb1cbcaab7926e96a361bfd7840ecf192efafefd` (held-map SHA256 `2338f48ea4b1008f47eef43ff7a835021e5e917669ad44f21179c69d03227c0a`) supersedes `6771bfed` and moves held W4 0094 to 0178 and signature fence 0081 to 0167 without changing SQL paths/bytes. The current exact W4 class still requires its original literal purposes; consume the owners' genuine reviewed factory updates before enabling that wave. No alias ledger or permissive preparation fallback is supplied.
+The held SQL is copied unchanged and never applied here. W8's published proposed map `6771bfed2ac07d34bfb04ef66d4d909f014ba7da` moves held W4 0094 to 0141 and signature fence 0081 to 0130 without changing SQL paths/bytes. The current exact W4 class still requires its original literal purposes; consume the owners' genuine reviewed factory updates before enabling that wave. No alias ledger or permissive preparation fallback is supplied.
 
 The actual W3 synthetic copy currently has 57 registered migrations and no fulfillment plan/delivery tables or current signature-fence purpose. Original database traffic remains closed. No publication, recipient, signature, provider/license/policy acceptance, delivery receipt or current audience grant was fabricated. Positive web/iOS/Android link delivery, current viewer refusal after retraction, rollback, committed replay and full W3 packages A–I remain open until genuine owner composition and personally operated runtime journeys pass. No new test code.
-
-Actual 0094 review also finds NO ACTION message/thread-family foreign keys and immutable BEFORE DELETE delivery/member/review records. Populated C10 deletion requires genuine W4 finite financial retention/detachment and W8 physical erasure composition first. Both owners were notified; W4 confirmed positive activation stays closed until that source and approved policy exist. W3 preserved the SQL and supplied no fabricated detach authority.

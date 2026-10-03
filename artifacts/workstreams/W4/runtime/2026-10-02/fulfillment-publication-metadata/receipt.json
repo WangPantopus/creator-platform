@@ -1,0 +1,110 @@
+{
+  "isolatedOnly": true,
+  "originalPublicationInstalled": false,
+  "originalPublicationTemporarilyInstalled": true,
+  "schemaSha256": "b2eecdea88d937fb46018ceee1a4385502d366f3a82a061b3c4d5de5696981f0",
+  "definitions": {
+    "creator.bind_commerce_fulfillment_publication(uuid,uuid)": "f262c587b79295dad4ae00ef42a782691c43e31bf875e5a4fbc9e71b20c577dd",
+    "creator.commerce_fulfillment_publication_document_ready(uuid,uuid,integer)": "7fcd53adf7ea7c94427bb260652e7bc5b9b213bddf0b6398df7397cb6514fa3f",
+    "creator.commerce_fulfillment_publication_matches(uuid)": "9184c6ce678ea6398210a8eb553c5c7ccf901248977ea2dbbe3006a600a8b7c8",
+    "creator.commerce_fulfillment_publication_negative_originals(uuid)": "e02403875e38e52488e466a330a79513941106674a427960238f3257c2881972",
+    "creator.commerce_fulfillment_publication_originals(uuid)": "f9e3f2fc44cdf9e0d4c378d9cb5c78e6995062f1ba8c308929c2f5eb3e8a24d3",
+    "creator.end_commerce_fulfillment_publication(uuid)": "5b57614dbcff8c0921abb87754f2e29880d5f1b9836690a857e440d5a2feba51",
+    "creator.prepare_commerce_fulfillment_publication(uuid,uuid,integer,uuid,uuid)": "4651cfd2c99dbf538a9f453649c496ec37e977c6d7825c62bc8ad97bf8cad547",
+    "creator.require_fulfillment_publication_cleanup()": "0a9ca68948794268193fde501a362bc8a1191d660ad78a2f2e24287cc6d02da0"
+  },
+  "compiler": [
+    {
+      "signature": "creator.bind_commerce_fulfillment_publication(uuid,uuid)",
+      "diagnosticCount": 0
+    },
+    {
+      "signature": "creator.commerce_fulfillment_publication_document_ready(uuid,uuid,integer)",
+      "diagnosticCount": 0
+    },
+    {
+      "signature": "creator.commerce_fulfillment_publication_negative_originals(uuid)",
+      "diagnosticCount": 0
+    },
+    {
+      "signature": "creator.commerce_fulfillment_publication_originals(uuid)",
+      "diagnosticCount": 0
+    },
+    {
+      "signature": "creator.end_commerce_fulfillment_publication(uuid)",
+      "diagnosticCount": 0
+    },
+    {
+      "signature": "creator.prepare_commerce_fulfillment_publication(uuid,uuid,integer,uuid,uuid)",
+      "diagnosticCount": 1
+    },
+    {
+      "signature": "creator.require_fulfillment_publication_cleanup()",
+      "diagnosticCount": 0
+    }
+  ],
+  "missing205CompilerDependency": true,
+  "closed": [
+    {
+      "name": "unregisteredEarlyEntry",
+      "actualSqlRefusal": true,
+      "code": "55000"
+    },
+    {
+      "name": "workerCannotPrepare",
+      "actualSqlRefusal": true,
+      "code": "42501"
+    },
+    {
+      "name": "workerCannotReadNegativePreparation",
+      "actualSqlRefusal": true,
+      "code": "42501"
+    },
+    {
+      "name": "runtimeCannotUseActorlessScope",
+      "actualSqlRefusal": true,
+      "code": "42501"
+    },
+    {
+      "name": "workerCannotBind",
+      "actualSqlRefusal": true,
+      "code": "42501"
+    },
+    {
+      "name": "workerCannotEnd",
+      "actualSqlRefusal": true,
+      "code": "42501"
+    }
+  ],
+  "catalogue": "c021172315f7e274bae783dd5b720cd9f17a5345acd51707140f9dfcd6457b2f",
+  "mutations": [
+    {
+      "name": "privateQuestionGrant",
+      "detected": true,
+      "restored": true,
+      "rolledBack": true
+    },
+    {
+      "name": "publicOriginalsExecution",
+      "detected": true,
+      "restored": true,
+      "rolledBack": true
+    },
+    {
+      "name": "bodyRestrictionDropped",
+      "detected": true,
+      "restored": true,
+      "rolledBack": true
+    }
+  ],
+  "after": {
+    "migrations": 57,
+    "plans": 0,
+    "deliveries": 0,
+    "rolled_back": true
+  },
+  "negativeProducer205Implemented": false,
+  "lifecycle208Integrated": false,
+  "positivePublicationVerified": false,
+  "releaseReady": false
+}

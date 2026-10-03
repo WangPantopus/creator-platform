@@ -1,0 +1,60 @@
+{
+  "source": "d0d44540cef9c6a4e3e7e51529e8f773e343a7e5",
+  "observedAt": "2026-10-02T19:34:02.730433+00:00",
+  "responses": [
+    {
+      "path": "/health/ready",
+      "status": 503,
+      "body": {
+        "ready": false,
+        "capabilities": [
+          {
+            "name": "trust_runtime",
+            "required": true,
+            "state": "unavailable",
+            "code": "trust_unconfigured",
+            "checkedAt": "2026-10-02T19:34:02.637Z"
+          }
+        ]
+      }
+    },
+    {
+      "path": "/v1/conversations/capabilities",
+      "status": 200,
+      "body": {
+        "providers": {
+          "version": "development-unreviewed-openai-20261001",
+          "reference": "synthetic-review-only-unapproved-processor-20261001",
+          "providers": [
+            {
+              "name": "OpenAI",
+              "termsUrl": "https://openai.com/policies/services-agreement/",
+              "noTraining": true,
+              "noRetention": false
+            }
+          ],
+          "verified": false
+        },
+        "developmentSynthetic": true,
+        "consentAvailable": false,
+        "generationAvailable": false,
+        "firstConversationAvailable": false,
+        "correctionsAvailable": false,
+        "recordingDeliveryAvailable": false,
+        "offlineAvailable": false,
+        "accessDisclosure": "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time."
+      }
+    }
+  ],
+  "apiSignal": {
+    "pid": 93311,
+    "signal": "SIGINT",
+    "cwdChecked": true
+  },
+  "sqlSHA256": "73474526575ecbdec8b5452039f953d5af35357f5ba1922d300394791b94aa06",
+  "exactW2UsageRetentionSource725413029306da6ce80353a027492ecc9bae076d": true,
+  "actualW8AllScopeOwnershipProducerPublished": false,
+  "positiveCursorQualified": false,
+  "sqlApplied": false,
+  "nativeOrWebUIChanged": false
+}

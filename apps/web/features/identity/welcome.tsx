@@ -86,8 +86,18 @@ export function IdentityWelcome({
           className="qv-btn qv-btn--secondary qv-btn--lg qv-btn--block"
           href={`/api/auth/continue?returnTo=${encodeURIComponent(destination)}`}
         >
-          {copy.continueWithPantopus}
+          {error === "identity_unconfigured"
+            ? copy.retry
+            : copy.continueWithPantopus}
         </a>
+        {error === "identity_unconfigured" && (
+          <a
+            className="qv-btn qv-btn--text qv-btn--block"
+            href={`/auth/continue?returnTo=${encodeURIComponent(destination)}`}
+          >
+            {copy.back}
+          </a>
+        )}
         <p>{copy.pantopusAccount}</p>
       </div>
     </main>

@@ -1,0 +1,48 @@
+{
+  "observedAt": "2026-10-02T18:18:05.371915+00:00",
+  "source": "bb5fe1460669044e4f5992250cd499ef99425d94",
+  "signalled": [
+    {
+      "kind": "api",
+      "port": 4103,
+      "listeningPid": 1200,
+      "cwd": "/Users/yingpengwang/estimate-rescue/creator-platform/w3-fan-conversations-chat-55cfcc/apps/backend",
+      "signal": "SIGINT",
+      "actualListenerChecked": true
+    },
+    {
+      "kind": "web",
+      "port": 3003,
+      "listeningPid": 1943,
+      "cwd": "/Users/yingpengwang/estimate-rescue/creator-platform/w3-fan-conversations-chat-55cfcc/apps/web",
+      "signal": "SIGINT",
+      "actualListenerChecked": true
+    }
+  ],
+  "budget": {
+    "creator-platform-heavy-build.lock": {
+      "occupied": false,
+      "touched": false
+    },
+    "creator-platform-emulator-slot-1": {
+      "occupied": true,
+      "touched": false
+    },
+    "creator-platform-emulator-slot-2": {
+      "occupied": true,
+      "touched": false
+    },
+    "creator-platform-simulator-slot-1": {
+      "occupied": true,
+      "touched": false
+    },
+    "creator-platform-simulator-slot-2": {
+      "occupied": true,
+      "touched": false
+    },
+    "creator-platform-simulator-slot-3": {
+      "occupied": false,
+      "touched": false
+    }
+  }
+}
