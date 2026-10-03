@@ -1,5 +1,32 @@
 # Creator call-offer and genuine recording retry lifetime — 3 October 2026
 
+## Canonical native producer integration — 19:24 UTC
+
+W6 personally read the complete current native producer deltas from W1's
+published115-operation source6f985242a47ab2c0e3663eeb71118c98db6c5594,
+including e446's confirmed-credential/read budget and c03 post-await generation
+correction. Reuse that exact generator and Swift/Kotlin FanShell leaves, then
+regenerate this branch's actual unchanged12/115 catalogue. No generated file
+from another catalogue, Actor, credential reconstruction, role or purpose is
+introduced. All W6 call/media/OS consumers and their unique source remain.
+
+Captured clients now pin genuine opening account/session headers and require
+the credential confirmed by the original canonical read. Native identity reads
+retain a separate4s/64KiB budget. Android's one complete request budget physically
+cancels its original OkHttp Call through body consumption; byte ceilings,
+no redirects/cache/retry and parent cancellation meaning are retained. The
+existing OkHttp4.12 dependency is unchanged. Original producer private Trust/
+Commerce/Content helpers are retained, without claiming their consumers operated.
+
+Canonical generation12/115, generator lint/format, Swift frontend parsing and
+diff checks pass. Current combined native shipping/install/operation and CI are
+still pending; W1's own builds are not W6 acceptance. Existing PR282 is reused,
+with producer/prerequisite296/current native gates held. No new tests/coverage.
+W6 runtime/browser/worker/scanner/device/build leases are closed before this
+integration; last actual app state comes from discard source d42a, Note18,
+five deleted photo rows/business0/protected target closed. No DB read or call/
+recording/signature/settlement acceptance is inferred from source composition.
+
 ## Retained PR282 source reconciliation — 18:08 UTC
 
 Producta257e3313562e7dcb6fe9c3950c8cd79e9b33830 normally merges the complete
