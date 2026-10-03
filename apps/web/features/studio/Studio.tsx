@@ -1037,7 +1037,7 @@ function Notes({ creator }: { creator: Creator }) {
                   Previous replies
                 </button>
               )}
-              {replies.nextCursor && replyCursors.current.length < 50 && (
+              {replies.nextCursor && (
                 <button
                   className="qv-btn qv-btn--secondary"
                   disabled={action.busy}
