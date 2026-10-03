@@ -586,6 +586,23 @@ export function createOpenApi() {
         parameters: pair,
         post: operation("sendHumanReply", "Message", "HumanReply"),
       },
+      "/v1/conversations/begin": {
+        parameters: ["X-Expected-Account-Id", "X-Expected-Session-Id"].map(
+          (name) => ({
+            in: "header",
+            name,
+            required: false,
+            description:
+              "Refuse a changed original view; grants no account, consent or session authority.",
+            schema: { type: "string", format: "uuid" },
+          }),
+        ),
+        post: operation(
+          "beginConversation",
+          "ConversationConversationPage",
+          "ConversationBeginConversation",
+        ),
+      },
       "/v1/conversations/{creatorId}/{fanId}/recordings": {
         parameters: pair,
         post: operation(

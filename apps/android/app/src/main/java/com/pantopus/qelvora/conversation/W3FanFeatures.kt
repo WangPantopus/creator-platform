@@ -54,7 +54,7 @@ object W3FanFeatures {
         else if (parts.size == 3 && parts[0] == "threads") {
             val valid = runCatching { UUID.fromString(parts[1]); UUID.fromString(parts[2]); true }.getOrDefault(false)
             if (valid) ConversationScreen(baseURL, parts[1], parts[2], session) else Notice(title = "Conversation unavailable", children = "Open this conversation from your account.")
-        } else if (parts.size == 3 && parts[0] == "creators" && parts[2] == "chat") FirstConversation(baseURL, parts[1], session)
+        } else if (parts.size == 3 && parts[0] == "creators" && parts[2] == "chat") key(session.session?.accountId, session.session?.sessionId, session.destination) { FirstConversation(baseURL, parts[1], session) }
         else if (Uri.parse(session.destination).path == "/you") ConversationAccount(baseURL, session)
         else Notice(title = "Conversation unavailable", children = "Open this conversation from your account.")
     })
@@ -483,13 +483,18 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             }
         }
         item {
-            Button("Start with $name's AI",variant=ButtonVariant.AI,block=true,disabled=busy || creator == null || contextPending || capabilities?.generationAvailable != true || capabilities?.consentAvailable != true) { scope.launch {
-                if (contextPending || session.destination != target) return@launch
-                val policy=capabilities?.providers ?: return@launch; busy=true
+            Button("Start with $name's AI",variant=ButtonVariant.AI,block=true,disabled=busy || !foreground || session.checkingSession || creator == null || contextPending || capabilities?.generationAvailable != true || capabilities?.consentAvailable != true) { scope.launch {
+                if (busy || !foreground || contextPending || session.destination != target || capabilities?.generationAvailable != true || capabilities?.consentAvailable != true) return@launch
+                val policy=capabilities?.providers ?: return@launch
+                val selectedCreator=creator ?: return@launch
+                val capture=session.captureRequest(target, maximumResponseBytes=1_000_000, timeoutMs=15_000) ?: return@launch
+                if (capture.expectedAccountId != accountId || capture.sessionId != sessionId || !capture.isCurrent() || !foreground || session.destination != target) return@launch
+                busy=true
                 try {
-                    val page=client.json.decodeFromJsonElement<ConversationPage>(client.request("begin",buildJsonObject { put("creatorId",creator!!.getString("id"));put("policyVersion",policy.version);put("accessNoticeAccepted",true);put("idempotencyKey",key) }))
+                    val page=capture.client.beginConversation(capture.expectedAccountId, capture.sessionId, APIConversationBeginConversation(selectedCreator.getString("id"),policy.version,APIConversationBeginConversationAccessNoticeAccepted,key))
+                    if (!foreground || !capture.isCurrent() || page.creatorId != selectedCreator.getString("id") || runCatching { UUID.fromString(page.fanId) }.isFailure) return@launch
                     session.open("/threads/${page.creatorId}/${page.fanId}")
-                } catch(failure: Throwable) { if(failure is CancellationException) throw failure;error=failure.message ?: "Reconnect to try again. No message was sent." } finally {busy=false}
+                } catch(failure: Throwable) { if(failure is CancellationException) throw failure;if(foreground && capture.isCurrent()) error="Reconnect to try again. No message was sent." } finally {busy=false}
             } }
             Button("Not now",variant=ButtonVariant.QUIET,block=true) { session.open("/creators/$handle") }
         }
