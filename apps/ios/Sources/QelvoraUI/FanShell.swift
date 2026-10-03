@@ -33,7 +33,13 @@ public final class FanSession: ObservableObject {
     @Published public private(set) var hasSavedCredential = false
     @Published public private(set) var checkingSession: Bool
     @Published public var destination: String {
-        didSet { if destination != oldValue { destinationGeneration &+= 1 } }
+        didSet {
+            if destination != oldValue {
+                destinationGeneration &+= 1
+                navigationRestoreAllowed = false
+                persistDestination()
+            }
+        }
     }
     @Published public var error = ""
     @Published public var busy = false
@@ -51,12 +57,54 @@ public final class FanSession: ObservableObject {
     private var refreshingSession = false
     private var validationWaiters: [UUID: CheckedContinuation<Void, Never>] = [:]
     private var removedArrivalFor: String?
+    private var navigationInitialized = false
+    private var navigationRestoreAllowed: Bool
+    private var navigationRevision = 0
     public init(baseURL: URL?, destination: String = "/home") {
         self.destination = ApplicationDestination.isPermitted(destination) ? destination : "/home"
+        navigationRestoreAllowed = destination == "/home"
         self.baseURL = baseURL
         checkingSession = baseURL != nil
         storage = SecureSessionStorage(issuer: baseURL)
         if let baseURL { let credentials = storage; api = CreatorAPIClient(baseURL: baseURL, token: { try await credentials.read() }) } else { api = nil }
+    }
+    private func persistDestination() {
+        guard navigationInitialized, let active = session, !purgingPrivateState, !localPurgeFailed,
+              ApplicationDestination.isPermitted(destination) else { return }
+        let target = destination, snapshot = generation
+        navigationRevision += 1
+        let revision = navigationRevision
+        Task { [weak self] in
+            guard let self, snapshot == generation, session?.accountId == active.accountId,
+                  session?.sessionId == active.sessionId else { return }
+            do {
+                guard let credential = try await storage.read(), snapshot == generation,
+                      session?.accountId == active.accountId, session?.sessionId == active.sessionId else { return }
+                try await storage.saveDestination(target, accountId: active.accountId, credential: credential, revision: revision)
+            } catch {
+                guard snapshot == generation, revision == navigationRevision else { return }
+                self.error = "Your place in the app could not be kept. You can still open it again."
+            }
+        }
+    }
+    private func restoreDestination(account: APISession, credential: String, generation snapshot: Int) async {
+        guard !navigationInitialized else { return }
+        let navigation = destinationGeneration
+        do {
+            let saved = try await storage.readDestination(accountId: account.accountId, credential: credential)
+            guard !Task.isCancelled, snapshot == generation, session?.accountId == account.accountId,
+                  session?.sessionId == account.sessionId else { return }
+            navigationInitialized = true
+            if navigationRestoreAllowed, navigation == destinationGeneration, let saved {
+                destination = saved
+            }
+            navigationRestoreAllowed = false
+            persistDestination()
+        } catch {
+            guard !Task.isCancelled, snapshot == generation else { return }
+            navigationInitialized = true; navigationRestoreAllowed = false
+            self.error = "Your saved place is unavailable. Open it again from the app."
+        }
     }
     /// Never reconstruct default/global storage for an authenticated request.
     /// Captures expire on navigation (including away and back), rotation,
@@ -138,12 +186,14 @@ public final class FanSession: ObservableObject {
         }
         guard current == generation, !Task.isCancelled else { return }
         hasSavedCredential = token != nil
-        guard token != nil else { await purge(); return }
+        guard let token else { await purge(); return }
         do {
             let value = try await api.identitySession()
             guard current == generation, !Task.isCancelled else { return }
             if let previous = session, previous.accountId != value.accountId { if await purge() { error = "The account changed. Continue with Pantopus again." }; return }
             session = value; error = ""
+            await restoreDestination(account: value, credential: token, generation: current)
+            guard current == generation, !Task.isCancelled else { return }
             #if os(iOS)
             GrowthPushCoordinator.shared.update(session: value, baseURL: baseURL, owner: self)
             #endif
@@ -238,6 +288,7 @@ public final class FanSession: ObservableObject {
         purgingPrivateState = true; localPurgeFailed = true
         defer { purgingPrivateState = false }
         generation += 1; session = nil; hasSavedCredential = false; checkingSession = false; actors = []; choosingDevelopmentActor = false; error = ""
+        navigationInitialized = false; navigationRestoreAllowed = false
         finishValidationWaiters()
         #if os(iOS)
         GrowthPushCoordinator.shared.update(session: nil, baseURL: baseURL, owner: self)
@@ -280,7 +331,7 @@ public final class FanSession: ObservableObject {
         }
     }
     #endif
-    public func open(_ target: String) { guard ApplicationDestination.isPermitted(target) else { error = "This link is unavailable. Open the object from the app."; return }; removedArrivalFor = nil; destination = target }
+    public func open(_ target: String) { guard ApplicationDestination.isPermitted(target) else { error = "This link is unavailable. Open the object from the app."; return }; navigationRestoreAllowed = false; removedArrivalFor = nil; destination = target; persistDestination() }
     static func message(_ error: Error) -> String { if let failure = error as? CreatorAPIError, let result = try? JSONDecoder().decode(APIError.self, from: failure.body) { return result.error.message }; return "This action could not complete. Reconnect and try again." }
 }
 
