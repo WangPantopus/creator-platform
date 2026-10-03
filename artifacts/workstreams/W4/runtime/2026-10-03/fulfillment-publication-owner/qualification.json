@@ -1,0 +1,180 @@
+{
+  "isolatedOnly": true,
+  "originalsUnchanged": true,
+  "sourceHead": "41d021f2a21112c3cb201d6ba34d0bf88ae8f369",
+  "sources": [
+    {
+      "name": "0178.sql",
+      "sha256": "d728ec3d71f3b9fd11c49b3f2faf91624e7b03868d5ab4b462b0730fddae4aa1"
+    },
+    {
+      "name": "0158.sql",
+      "sha256": "100e319216568ee1ed27081be0520dbfdb3b7019659946c2c5de1f6859d32cc1"
+    },
+    {
+      "name": "0204.sql",
+      "sha256": "b2eecdea88d937fb46018ceee1a4385502d366f3a82a061b3c4d5de5696981f0"
+    },
+    {
+      "name": "0205.sql",
+      "sha256": "b72de739cfcc93d24f2af2f7813d396a7a1e44eb97e7bfc739aef7cb95a9dbf5"
+    },
+    {
+      "name": "205-catalogue.mts",
+      "sha256": "1d953e970ff1921513430017a05ffef01416b25be0d7abec9a5d10defc0aabf0"
+    }
+  ],
+  "activated": false,
+  "businessRowsCreated": 0,
+  "ledgerRowsFabricated": 0,
+  "before": {
+    "count": 61,
+    "ledger": "78e21c4d8dad3d5c35dee53b3286059faba8783327f55db41117030aa04acc43",
+    "schema": "397fff7fb154657f46dc70aea504cbdf79d6fee0e2f7ffa0a11ca5751c8f8924",
+    "data": "274a1e7a186a0bf28906db03f551cfdc2aaf118fd410f0e5b7fc871f1d6e48f6",
+    "rows": 65,
+    "tables": 163,
+    "roles": "70c667c5cdf17199c08459270b8bd7006372e3e40299799bc19b092915bdd7d8",
+    "security": "5b99fafdd59f4cc447ddd14a2e55f5f0daf2d48d7ba929348fb824b346fe5af8",
+    "sequences": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e"
+  },
+  "denialCatalogue": "8a58811f1184b529fb2709dcbca80780261dbae2aa8f14459bf337165c5529ce",
+  "expectedDenialCatalogue": "8a58811f1184b529fb2709dcbca80780261dbae2aa8f14459bf337165c5529ce",
+  "ownerCatalogue": "821fd1ce84fd35ffe881ac895504ad3f071f2945fc5676dc282f2e26d99fe8ce",
+  "compiler": [
+    {
+      "signature": "creator.bind_commerce_fulfillment_publication(uuid,uuid)",
+      "diagnosticCount": 0
+    },
+    {
+      "signature": "creator.commerce_fulfillment_publication_document_ready(uuid,uuid,integer)",
+      "diagnosticCount": 0
+    },
+    {
+      "signature": "creator.commerce_fulfillment_publication_negative_originals(uuid)",
+      "diagnosticCount": 0
+    },
+    {
+      "signature": "creator.commerce_fulfillment_publication_originals(uuid)",
+      "diagnosticCount": 0
+    },
+    {
+      "signature": "creator.end_commerce_fulfillment_publication(uuid)",
+      "diagnosticCount": 0
+    },
+    {
+      "signature": "creator.prepare_commerce_fulfillment_publication(uuid,uuid,integer,uuid,uuid)",
+      "diagnosticCount": 0
+    },
+    {
+      "signature": "creator.require_fulfillment_publication_cleanup()",
+      "diagnosticCount": 0
+    },
+    {
+      "signature": "creator_trust.fulfillment_publication_denial(uuid)",
+      "diagnosticCount": 0
+    }
+  ],
+  "expectedCompilerFunctions": [
+    "creator.bind_commerce_fulfillment_publication(uuid,uuid)",
+    "creator.commerce_fulfillment_publication_document_ready(uuid,uuid,integer)",
+    "creator.commerce_fulfillment_publication_negative_originals(uuid)",
+    "creator.commerce_fulfillment_publication_originals(uuid)",
+    "creator.end_commerce_fulfillment_publication(uuid)",
+    "creator.prepare_commerce_fulfillment_publication(uuid,uuid,integer,uuid,uuid)",
+    "creator.require_fulfillment_publication_cleanup()",
+    "creator_trust.fulfillment_publication_denial(uuid)"
+  ],
+  "compilerExtensionRolledBack": true,
+  "closed": [
+    {
+      "name": "unregisteredEarly",
+      "actualCode": "55000"
+    },
+    {
+      "name": "workerEarly",
+      "actualCode": "42501"
+    },
+    {
+      "name": "workerNegativeOriginals",
+      "actualCode": "42501"
+    },
+    {
+      "name": "workerBind",
+      "actualCode": "42501"
+    },
+    {
+      "name": "workerCleanup",
+      "actualCode": "42501"
+    },
+    {
+      "name": "workerTrustDenial",
+      "actualCode": "42501"
+    },
+    {
+      "name": "runtimeActorlessMatch",
+      "actualCode": "42501"
+    }
+  ],
+  "unregisteredExecutableRefused": true,
+  "drifts": [
+    {
+      "name": "originalQuestionGrant",
+      "ownerDetected": true,
+      "denialDetected": false,
+      "restored": true
+    },
+    {
+      "name": "publicOriginalsExecution",
+      "ownerDetected": true,
+      "denialDetected": true,
+      "restored": true
+    },
+    {
+      "name": "originalBodyPolicyDropped",
+      "ownerDetected": true,
+      "denialDetected": false,
+      "restored": true
+    },
+    {
+      "name": "denialPublicExecution",
+      "ownerDetected": false,
+      "denialDetected": true,
+      "restored": true
+    },
+    {
+      "name": "denialProducerSetting",
+      "ownerDetected": false,
+      "denialDetected": true,
+      "restored": true
+    },
+    {
+      "name": "originalCleanupDisabled",
+      "ownerDetected": true,
+      "denialDetected": true,
+      "restored": true
+    }
+  ],
+  "after": {
+    "count": 61,
+    "ledger": "78e21c4d8dad3d5c35dee53b3286059faba8783327f55db41117030aa04acc43",
+    "schema": "397fff7fb154657f46dc70aea504cbdf79d6fee0e2f7ffa0a11ca5751c8f8924",
+    "data": "274a1e7a186a0bf28906db03f551cfdc2aaf118fd410f0e5b7fc871f1d6e48f6",
+    "rows": 65,
+    "tables": 163,
+    "roles": "70c667c5cdf17199c08459270b8bd7006372e3e40299799bc19b092915bdd7d8",
+    "security": "5b99fafdd59f4cc447ddd14a2e55f5f0daf2d48d7ba929348fb824b346fe5af8",
+    "sequences": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e"
+  },
+  "custody": {
+    "ledger": true,
+    "schema": true,
+    "data": true,
+    "roles": true,
+    "security": true,
+    "sequences": true
+  },
+  "passed": true,
+  "fullLifecycle208Integrated": false,
+  "positivePublicationVerified": false
+}
