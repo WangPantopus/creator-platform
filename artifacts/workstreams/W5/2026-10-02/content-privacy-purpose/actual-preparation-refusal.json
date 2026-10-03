@@ -1,0 +1,16 @@
+{
+  "phase": "actual_original57_canonical_password_login_preparation",
+  "identity": {
+    "current_user": "creator_runtime",
+    "session_user": "creator_runtime",
+    "ledger_rows": 57
+  },
+  "outcome": "refused",
+  "code": "content_privacy_purpose_unavailable",
+  "status": 503,
+  "actualTaskInvoked": false,
+  "bodyRead": false,
+  "receiptIssued": false,
+  "registryChanged": false,
+  "limits": "Real password login and missing-purpose preparation refusal only; no actual lease, body export, COMMIT acceptance, privacy receipt or release claim."
+}

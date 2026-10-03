@@ -62,7 +62,7 @@ function proofCommand(proof: z.infer<typeof proofSchema>) {
 }
 
 /** A separate noninteractive purpose issuer. Neither an Actor nor a request
- * session can authorize it. W8 must activate reviewed 0071 plus its held denial
+ * session can authorize it. W8 must activate reviewed 0158 plus its held denial
  * projection before construction/use; no development or missing-port fallback.
  */
 export class PublicationIdentityAuthority {

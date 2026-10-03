@@ -178,4 +178,94 @@ final class W6RuntimeJourney: XCTestCase {
         attachment.lifetime = .keepAlways
         add(attachment)
     }
+
+    /// Operates the real OS prompt in the shipping private-preview destination.
+    /// The calling/publication APIs remain unavailable; no response is replaced.
+    func testActualPrivateVoicePermissionDenial() {
+        let app = XCUIApplication(bundleIdentifier: "com.pantopus.qelvora")
+        app.launchArguments = ["--api-url", "http://127.0.0.1:4106", "--return-to", "/media/voice"]
+        app.launch()
+        XCTAssertTrue(app.buttons["Record"].waitForExistence(timeout: 15))
+        app.buttons["Record"].tap()
+        let system = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        let alert = system.alerts.firstMatch
+        XCTAssertTrue(alert.waitForExistence(timeout: 15))
+        print("W6_ACTUAL_MICROPHONE_PROMPT " + alert.debugDescription)
+        capture(system, name: "W6-ios-real-microphone-prompt")
+        let deny = alert.buttons.matching(NSPredicate(format: "label IN %@", ["Don't Allow", "Don’t Allow"])).firstMatch
+        XCTAssertTrue(deny.exists)
+        deny.tap()
+        XCTAssertTrue(app.staticTexts["Microphone access is off. Allow it in Settings, then try again."].waitForExistence(timeout: 15))
+        XCTAssertFalse(app.buttons["Pause"].exists)
+        capture(app, name: "W6-ios-real-microphone-denied")
+    }
+
+    func testActualPrivateVoicePermissionAndCapture() {
+        let app = XCUIApplication(bundleIdentifier: "com.pantopus.qelvora")
+        app.launchArguments = ["--api-url", "http://127.0.0.1:4106", "--return-to", "/media/voice"]
+        app.launch()
+        XCTAssertTrue(app.buttons["Record"].waitForExistence(timeout: 15))
+        app.buttons["Record"].tap()
+        let system = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        let alert = system.alerts.firstMatch
+        XCTAssertTrue(alert.waitForExistence(timeout: 15))
+        print("W6_ACTUAL_MICROPHONE_PROMPT " + alert.debugDescription)
+        XCTAssertTrue(alert.buttons["Allow"].exists)
+        alert.buttons["Allow"].tap()
+        let recording = app.buttons["Pause"]
+        if !recording.waitForExistence(timeout: 15) {
+            XCTAssertTrue(app.staticTexts["The microphone is unavailable. Try again."].exists)
+            XCTAssertFalse(app.buttons["Play private preview"].exists)
+            capture(app, name: "W6-ios-real-microphone-hardware-unavailable")
+            print("W6_ACTUAL_MICROPHONE_HARDWARE_UNAVAILABLE_NO_CAPTURE_ACCEPTED")
+            return
+        }
+        let timer = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'seconds recorded'")).firstMatch
+        let elapsed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "NOT label BEGINSWITH '0 ' AND NOT label BEGINSWITH '1 '"), object: timer)
+        XCTAssertEqual(XCTWaiter.wait(for: [elapsed], timeout: 15), .completed)
+        capture(app, name: "W6-ios-real-private-recording")
+        app.buttons["Stop and preview"].tap()
+        XCTAssertTrue(app.buttons["Play private preview"].waitForExistence(timeout: 15))
+        capture(app, name: "W6-ios-real-private-preview")
+        app.buttons["Play private preview"].tap()
+        app.buttons["Pause preview"].tap()
+        app.buttons["Discard recording"].tap()
+        XCTAssertTrue(app.buttons["Record"].exists)
+        XCTAssertFalse(app.buttons["Play private preview"].exists)
+        capture(app, name: "W6-ios-real-private-discard")
+        print("W6_ACTUAL_PRIVATE_PREVIEW_ONLY_NOT_HUMAN_PUBLICATION_ACCEPTANCE")
+    }
+    func testActualUnavailableCallDoesNotAdmit() {
+        let app = XCUIApplication(bundleIdentifier: "com.pantopus.qelvora")
+        // Use the real account UI to renew an expired local credential before
+        // exercising the call gate. No bearer/session state is injected.
+        app.launchArguments = ["--api-url", "http://127.0.0.1:4106", "--return-to", "/identity/account"]
+        app.launch()
+        if app.buttons["continue-with-pantopus"].waitForExistence(timeout: 5) {
+            if !app.buttons["continue-with-pantopus"].isHittable { app.swipeUp() }
+            app.buttons["continue-with-pantopus"].tap()
+            XCTAssertTrue(app.buttons["Development actor two"].waitForExistence(timeout: 15))
+            app.buttons["Development actor two"].tap()
+        }
+        XCTAssertTrue(app.staticTexts["@w6_local_fan"].waitForExistence(timeout: 20))
+        capture(app, name: "W6-ios-real-call-account")
+        app.terminate()
+        app.launchArguments = ["--api-url", "http://127.0.0.1:4106", "--return-to", "/calls/60000000-0000-4000-8000-000000000001/60000000-0000-4000-8000-000000000002/60000000-0000-4000-8000-000000000006"]
+        app.launch()
+        XCTAssertTrue(app.staticTexts["This call is unavailable"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.staticTexts["Reconnect to refresh this call. Actions are unavailable until access is confirmed."].waitForExistence(timeout: 15))
+        XCTAssertFalse(app.buttons["Enter the waiting room"].exists)
+        XCTAssertFalse(XCUIApplication(bundleIdentifier: "com.apple.springboard").alerts.firstMatch.exists)
+        capture(app, name: "W6-ios-real-call-unavailable")
+        let refresh = app.buttons["Refresh call"]
+        if !refresh.isHittable { app.swipeUp() }
+        XCTAssertTrue(refresh.isHittable)
+        refresh.tap()
+        XCTAssertTrue(app.staticTexts["This call is unavailable"].exists)
+        XCTAssertFalse(app.buttons["Enter the waiting room"].exists)
+        capture(app, name: "W6-ios-real-call-refresh-unavailable")
+        app.terminate()
+        print("W6_ACTUAL_CALL_GATE_AND_OWN_APP_TERMINATION_FINISHED")
+    }
+
 }

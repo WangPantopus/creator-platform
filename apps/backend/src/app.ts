@@ -122,7 +122,12 @@ export function createApp(
       if (!dependencies.trustRouter || !/^\/trust(?:\/|$)/u.test(req.path))
         await dependencies.assertActorAllowed?.(resolved.actor);
       requestAuthority.run(
-        { accountId: resolved.actor.accountId, sessionId: resolved.sessionId },
+        Object.freeze({
+          accountId: resolved.actor.accountId,
+          sessionId: resolved.sessionId,
+          actor: resolved.actor,
+          adultVerifiedAt: resolved.adultVerifiedAt,
+        }),
         next,
       );
     });

@@ -1,0 +1,10 @@
+
+ RUN  v3.2.4 /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/backend
+
+ ✓ tests/contracts.test.ts (9 tests) 48ms
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  06:09:26
+   Duration  1.06s (transform 325ms, setup 0ms, collect 740ms, tests 48ms, environment 0ms, prepare 131ms)
+

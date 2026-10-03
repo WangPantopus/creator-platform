@@ -1,0 +1,20 @@
+{
+  "stoppedAt": "2026-10-02T16:00:13.546011+00:00",
+  "peerResourcesTouched": false,
+  "released": [
+    "creator-platform-emulator-slot-2",
+    "creator-platform-simulator-slot-1"
+  ],
+  "simulator": "FAB31883-2F36-4E50-83B3-D9654B60FF00 shutdown",
+  "emulator": "emulator-5580 killed explicitly; absent from adb",
+  "apiLastPid": 19297,
+  "webLastPid": 84652,
+  "postgres": "creator-platform-w7-macstudio-20261001 normally stopped, volume retained",
+  "browser": "own tab4 closed",
+  "apiExit": 0,
+  "webExit": 143,
+  "softwareEmulatorExit": 0,
+  "idbCompanionExit": 0,
+  "previousWebWrapperExit": 143,
+  "leaseCustody": "Exact captured owner token+directory device/inode matched before unlink/rmdir"
+}

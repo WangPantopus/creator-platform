@@ -11,6 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,6 +19,7 @@ import com.pantopus.qelvora.generated.QelvoraTokens as T
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pantopus.qelvora.identity.FanSession
@@ -144,7 +146,7 @@ object CommerceFanFeature {
                     limit?.effective_at?.let { CommerceText("Your increase takes effect ${commerceWhen(it)}.", "caption") }
                 }
                 SpendLimit(options = listOf("Choose an amount", "No limit"), selected = choice, remindersOn = limit?.reminders_on, onSelect = { choice = it })
-                if (choice == "Choose an amount") CommerceField("Monthly amount in ${current.policy.currency}", amount, { amount = it })
+                if (choice == "Choose an amount") CommerceField("Monthly amount in ${current.policy.currency}", amount, { amount = it }, keyboardType = KeyboardType.Decimal)
                 Button(if (reminders) "Reminders at 50% and 100% · on" else "Reminders at 50% and 100% · off", ButtonVariant.QUIET, block = true) { reminders = !reminders }
                 CommerceText("Increases take 24 hours. Decreases are immediate and affect new requests. Existing obligations remain.", "caption")
                 Button(if (busy) "Saving…" else "Save limit", ButtonVariant.SECONDARY, block = true, disabled = busy || choice == null) { scope.launch {
@@ -259,7 +261,7 @@ object CommerceFanFeature {
 @Composable private fun CommerceText(text: String, style: String = "body") { BasicText(text, style = qText(style).copy(color = qColor("ink"))) }
 @Composable private fun CommercePanel(content: @Composable ColumnScope.() -> Unit) { Column(Modifier.fillMaxWidth().background(qColor("surface"), RoundedCornerShape(12.dp)).border(1.dp, qColor("line"), RoundedCornerShape(12.dp)).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp), content = content) }
 @Composable private fun CommerceRow(label: String, value: String) { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) { Box(Modifier.weight(1f)) { CommerceText(label) }; Box(Modifier.weight(1f)) { CommerceText(value, "data-md") } } }
-@Composable private fun CommerceField(label: String, value: String, onChange: (String) -> Unit, lines: Int = 1) { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { CommerceText(label, "label"); BasicTextField(value, onChange, Modifier.fillMaxWidth().heightIn(min = 48.dp).background(qColor("surface"), RoundedCornerShape(12.dp)).border(1.dp, qColor("control-line"), RoundedCornerShape(12.dp)).padding(12.dp).semantics { contentDescription = label }, textStyle = qText("body").copy(color = qColor("ink")), minLines = lines) } }
+@Composable private fun CommerceField(label: String, value: String, onChange: (String) -> Unit, lines: Int = 1, keyboardType: KeyboardType = KeyboardType.Text) { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { CommerceText(label, "label"); BasicTextField(value, onChange, Modifier.fillMaxWidth().heightIn(min = 48.dp).background(qColor("surface"), RoundedCornerShape(12.dp)).border(1.dp, qColor("control-line"), RoundedCornerShape(12.dp)).padding(12.dp).semantics { contentDescription = label }, textStyle = qText("body").copy(color = qColor("ink")), minLines = lines, keyboardOptions = KeyboardOptions(keyboardType = keyboardType)) } }
 private fun commerceWhen(value: String?): String = value?.let { runCatching { DateTimeFormatter.ofPattern("MMM d, uuuu HH:mm").withZone(ZoneId.systemDefault()).format(Instant.parse(it)) }.getOrDefault(it) } ?: "—"
 private fun commerceID(value: String) = "REQ-" + value.take(8).uppercase()
 private fun commerceRequestCategory(packet: CommercePacket): String = when {

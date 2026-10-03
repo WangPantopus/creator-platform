@@ -1,0 +1,16 @@
+# Held current-request session bootstrap
+
+`holdCurrentRequestSession(client, accountId)` is the strict request-only issuer for a lookup that has not yet learned its creator/thread family. `assertHeldCurrentRequestSession(held, client)` rechecks its original bookends. Both exports live in `apps/backend/src/modules/identity/request-authority.ts`.
+
+The real identity middleware supplies the frozen actor and the timestamp of the current successful upstream adult-eligibility confirmation. Session creation time, a caller's Actor, a retained scope, an absent ALS store and a noninteractive job cannot supply that evidence. Issuance rejects missing, mismatched or stale request evidence before any lookup.
+
+The caller must already hold an explicit READ COMMITTED transaction on its actual non-owner `creator_runtime` client. The issuer checks transaction presence, effective/login role, current account/session bindings and full transaction ID; it then binds the actual account and locks/rechecks the actual unrevoked, unexpired session. The opaque frozen result is recorded in a process-local WeakMap with the original request object, client, backend PID and transaction ID. Each assertion rejects a forged/serialized result, another request/client, changed bindings and COMMIT/ROLLBACK reuse, and rechecks current session expiry while holding its lock.
+
+This capability supplies the current actual actor and session only. It grants no family discovery, participant membership, Access permission, private content, provider use or call admission. A one-ID call consumer must independently qualify its exact metadata SQL/catalogue, hold W8's actual restoration on the same client, keep the learned tuple private, apply actual participant negatives and obtain the genuine Access family plus W4 current booking authorization before returning an authorized call response. All checks and metadata bookends use the same held transaction; no secondary connection or fallback is permitted.
+
+The existing `assertCurrentSession` remains appropriate inside already scoped host/job operations: its absence behavior is deliberately preserved. It is not a standalone request proof and must not be substituted for this strict issuer.
+
+Qualification: source/type/lint and existing authority contracts are checked. No one-ID SQL is activated by this change; positive combined lookup/booking/client acceptance still requires its actual owner implementation and personally operated journeys.
+
+
+W1 October2 Database correction: AccessService privately retains the exact original supplied Actor in its issued ThreadScope WeakMap. The public metadata cannot reconstruct an Actor; copied scopes, changed account/adult fields and unrelated request Actors refuse. Database.withThread passes that original object to both restriction ports. Actual interactive requests additionally hold the genuine current request on the same original client before negative/family leases, require Actor identity equality and recheck after restrictions and before COMMIT. Existing separately scoped host callbacks retain their actual supplied Actor without acquiring interactive bootstrap or DI09 custody. Actual18 existing checks pass on a separate disposable PostgreSQL17 instance, normally stopped/removed; retained canonical/development databases and role credentials are untouched.

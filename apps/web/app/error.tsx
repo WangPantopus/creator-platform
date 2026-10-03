@@ -17,7 +17,7 @@ export default function RouteError({
   useEffect(() => message.current?.focus(), []);
   return (
     <main className="qv route-error">
-      <div ref={message} tabIndex={-1} role="alert">
+      <div ref={message} tabIndex={-1}>
         <Notice
           tone="error"
           title={

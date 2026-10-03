@@ -1,0 +1,157 @@
+{
+  "observedAt": "2026-10-02T18:17:40.745Z",
+  "source": "bb5fe1460669044e4f5992250cd499ef99425d94",
+  "transaction": "Each actual private pool: BEGIN READ ONLY; ROLLBACK",
+  "pools": [
+    {
+      "purpose": "core",
+      "database": "creator_w3_dev57_1790946508212",
+      "login": "creator_runtime",
+      "database_marker": "creator-platform:synthetic-development-copy",
+      "original_closed": true,
+      "runtime_roles": [
+        {
+          "role": "creator_runtime",
+          "login": true,
+          "inherit": false,
+          "bypassRLS": false,
+          "superuser": false,
+          "memberships": 0
+        },
+        {
+          "role": "growth_worker",
+          "login": true,
+          "inherit": false,
+          "bypassRLS": false,
+          "superuser": false,
+          "memberships": 0
+        },
+        {
+          "role": "w3_growth_api",
+          "login": true,
+          "inherit": true,
+          "bypassRLS": false,
+          "superuser": false,
+          "memberships": 2
+        }
+      ],
+      "registered": 57
+    },
+    {
+      "purpose": "growth_api",
+      "database": "creator_w3_dev57_1790946508212",
+      "login": "w3_growth_api",
+      "database_marker": "creator-platform:synthetic-development-copy",
+      "original_closed": true,
+      "runtime_roles": [
+        {
+          "role": "creator_runtime",
+          "login": true,
+          "inherit": false,
+          "bypassRLS": false,
+          "superuser": false,
+          "memberships": 0
+        },
+        {
+          "role": "growth_worker",
+          "login": true,
+          "inherit": false,
+          "bypassRLS": false,
+          "superuser": false,
+          "memberships": 0
+        },
+        {
+          "role": "w3_growth_api",
+          "login": true,
+          "inherit": true,
+          "bypassRLS": false,
+          "superuser": false,
+          "memberships": 2
+        }
+      ]
+    },
+    {
+      "purpose": "growth_worker",
+      "database": "creator_w3_dev57_1790946508212",
+      "login": "growth_worker",
+      "database_marker": "creator-platform:synthetic-development-copy",
+      "original_closed": true,
+      "runtime_roles": [
+        {
+          "role": "creator_runtime",
+          "login": true,
+          "inherit": false,
+          "bypassRLS": false,
+          "superuser": false,
+          "memberships": 0
+        },
+        {
+          "role": "growth_worker",
+          "login": true,
+          "inherit": false,
+          "bypassRLS": false,
+          "superuser": false,
+          "memberships": 0
+        },
+        {
+          "role": "w3_growth_api",
+          "login": true,
+          "inherit": true,
+          "bypassRLS": false,
+          "superuser": false,
+          "memberships": 2
+        }
+      ]
+    }
+  ],
+  "responses": [
+    {
+      "path": "/health/ready",
+      "status": 503,
+      "body": {
+        "ready": false,
+        "capabilities": [
+          {
+            "name": "trust_runtime",
+            "required": true,
+            "state": "unavailable",
+            "code": "trust_unconfigured",
+            "checkedAt": "2026-10-02T18:17:40.739Z"
+          }
+        ]
+      }
+    },
+    {
+      "path": "/v1/conversations/capabilities",
+      "status": 200,
+      "body": {
+        "providers": {
+          "version": "development-unreviewed-openai-20261001",
+          "reference": "synthetic-review-only-unapproved-processor-20261001",
+          "providers": [
+            {
+              "name": "OpenAI",
+              "termsUrl": "https://openai.com/policies/services-agreement/",
+              "noTraining": true,
+              "noRetention": false
+            }
+          ],
+          "verified": false
+        },
+        "developmentSynthetic": true,
+        "consentAvailable": false,
+        "generationAvailable": false,
+        "firstConversationAvailable": false,
+        "correctionsAvailable": false,
+        "recordingDeliveryAvailable": false,
+        "offlineAvailable": false,
+        "accessDisclosure": "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time."
+      }
+    }
+  ],
+  "openaiPrivateEnvPresent": false,
+  "openaiCredentialConfigured": false,
+  "sqlApplied": false,
+  "roleChanged": false,
+  "credentialsPrinted": false
+}

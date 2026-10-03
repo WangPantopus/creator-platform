@@ -1,0 +1,81 @@
+{
+  "recordedAt": "2026-10-02T09:54:34.464Z",
+  "baseHead": "099c7c530060fd524879e86942d7b092a53f98f1",
+  "sources": [
+    {
+      "path": "apps/backend/src/modules/growth/device-session.ts",
+      "sha256": "baf951123645f52e7d90fe5729e72e20cabadeb86ed779de5943c9d1d36d68dc"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/notifications.ts",
+      "sha256": "c25a2b844341fbaa308c6ddd90f526fff8fd1950d7a77d940f3c2ce644218a1c"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/providers.ts",
+      "sha256": "df22213e86b7048567e1675cd9aac29fc73337654848a7af7e83ac9a6425aa0c"
+    }
+  ],
+  "files": [
+    {
+      "path": "provider-lock-web-arrival.png",
+      "bytes": 11180,
+      "sha256": "25a7064b42e91e9c354acd641b30b3147d748a0992e2acf04003f0f2b620ea83"
+    },
+    {
+      "path": "provider-lock-web-arrival.txt",
+      "bytes": 772,
+      "sha256": "7cdacb1352bb3f709480972513aba14a79640c59d31e5243b60bf3de491fc17b"
+    },
+    {
+      "path": "provider-lock-web-settings.png",
+      "bytes": 119316,
+      "sha256": "a0fca89588150ce7c094a960b196e6f151a5fc9a0e6db7c2b911d55acbd962fb"
+    },
+    {
+      "path": "provider-lock-web-settings.txt",
+      "bytes": 375,
+      "sha256": "11209dc8a8a323529c589b06375480d29ae7599c847ed81c1e53536cdf4be63e"
+    },
+    {
+      "path": "provider-lock-build.log",
+      "bytes": 41,
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    {
+      "path": "provider-lock-lint.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "provider-lock-contracts.log",
+      "bytes": 328,
+      "sha256": "089f043e1d614116595933ff2297c9328d0abb5c90c85842cc73b3154dd54d5d"
+    },
+    {
+      "path": "provider-lock-health-ready.json",
+      "bytes": 162,
+      "sha256": "8e5add91b5644ee19ef3f6bf257da58a73c7b6bdffb3ae0e31529f56dbfb5d82"
+    }
+  ],
+  "personalSourceReview": "All three final changed source files reviewed by primary; final combined PR review still open",
+  "checks": {
+    "backendBuild": "pass",
+    "eslint": "pass",
+    "existingContracts": "9 pass"
+  },
+  "runtime": {
+    "apiPid": 34841,
+    "apiSession": 10018,
+    "webPid": 72333,
+    "webSession": 15471,
+    "notificationIdArrival": "Same ID retained through real development sign-in; unavailable and retry observed",
+    "preferenceSaveReload": "Completed save/reload22:30–08:15/AmericaLosAngeles, push/email off, hideSensitive on",
+    "requiredReadiness": "503 trust_unconfigured",
+    "providerDelivery": "not operated: approved APNs/FCM/email/HTTPS and actual owner purpose inputs unavailable",
+    "nativeChanges": false,
+    "nativeDevices": "stopped, exact leases already released"
+  },
+  "privateValueScan": "pass",
+  "releaseAccepted": false,
+  "workstreamComplete": false
+}

@@ -1,0 +1,14 @@
+ nspname | proname | prosecdef 
+---------+---------+-----------
+(0 rows)
+
+ migration_count |             last              
+-----------------+-------------------------------
+              40 | 0043_w8_relationship_backfill
+(1 row)
+
+ datconnlimit |                admission                 
+--------------+------------------------------------------
+            0 | creator-platform:restored-traffic-closed
+(1 row)
+

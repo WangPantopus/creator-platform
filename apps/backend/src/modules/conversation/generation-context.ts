@@ -11,7 +11,7 @@ import {
 import type { ThreadSnapshot } from "../agent/pipeline.js";
 
 export const GENERATION_CONTEXT_MIGRATION =
-  "0095_w3_generation_purpose_consumers";
+  "0179_w3_generation_purpose_consumers";
 export const GENERATION_CONTEXT_SIGNATURE =
   "creator.generation_conversation_context(uuid,uuid)";
 const owner = "creator_generation_conversation_context";
