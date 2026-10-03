@@ -1,3 +1,10 @@
+## Qualified existing navigation and preserved todo — October 3, 2026 11:07 UTC
+
+Existing210 merged exact037f9a37 into reviewed10f6cfc8, producing main132bc055. Four exact-head fast jobs pass; six Mac visual/native foundation jobs remain queued, transparently scoped rather than claimed passing. Personal unchanged-source web account/outage/Retry/Light/Night390/1280 navigation and four38-table custody comparisons qualify only that change. All12 active W4 branches normally include captured132bc055, match pushed heads and preserve native/backend/SQL source plus the user workbook. Four retained W4 drafts stay held; the fresh35-PR inventory includes W5/W6's distinct288/289. [Current heads, source reuse, receipts, queue and limits](../../../artifacts/workstreams/W4/runtime/2026-10-03/open-pr-review/README.md) supersede dated captures below.
+
+- [x] Reuse, personally qualify and merge existing owned Studio/Commerce return navigation in210.
+- [ ] Complete every original commerce package/R01–R15, including genuine authorities/provider/output/financial/cleanup/C10 and current native accessibility. Current Android build/resource metadata is preparation; personal current Night/TalkBack remains pending after W2, then W7.
+
 ## Current existing-PR review and preserved todo — October 3, 2026 UTC
 
 All46 initial PRs have owner/source/dependency dispositions;13 redundant originals are closed/unmerged with their source/history and outstanding acceptance preserved. Existing236/262 now repair the omitted worker policy and actual sequence-default ACL projection, with personally verified rollback custody. Existing247 reuses W2 and W5's actual source once: its27-source review has46 zero-row plans,28 SQL refusals plus unregistered W5 guard503,51 restored metadata drifts and all six custody comparisons. Original0157 static diagnostics, complete accepted pins and genuine original task/factory/provider/output/financial/cleanup/sole COMMIT/C10 remain open. No retained W4 runtime PR is merged or full package/R01–R15 row checked off from this audit.
