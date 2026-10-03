@@ -22,6 +22,7 @@ import { agentFeature } from "./modules/agent/feature.js";
 import { DomainError } from "./core/errors.js";
 import { InteractiveCallControl } from "./modules/session/interactive-control.js";
 import { AccountCallMetadata } from "./modules/session/account-call-metadata.js";
+import { prepareTrustReplyReviewer } from "./modules/trust/reply-review.js";
 
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
@@ -124,6 +125,7 @@ const configured =
             },
             dependencies: {
               assertAllowed: runtime.assertCreatorAllowed,
+              reviewReply: await prepareTrustReplyReviewer(runtime),
               assertAllowedInTransaction: async (client, actor, creatorId) => {
                 if (
                   !runtime.assertRestoredInTransaction ||
