@@ -29,7 +29,17 @@ retention policy, SQL, role membership or registry activation is invented.
 Current backend types, four-path lint/format/diff checks and nine unchanged
 backend contracts pass. Nine PostgreSQL integration cases skip because their
 actual database is absent; skipped is not pass. No new tests or coverage work.
-Shipping compilation, real ingestion/cancellation/unknown-settlement, retry,
+Actual frozen f9fcacd0c7f7973094af0eecd605486210739bcc backend shipping
+build exits0 at17:41:22.955Z after4.50seconds. Log SHA256
+`22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5`;
+private three-bundle receipt SHA256
+`10860fa630631999b45e80cbb3169ec0da9ab4ed5eecf521a74098f20d00c9cf`.
+Actual ingestion bundle SHA256
+`f596efa43aa20f6276e12f4484c312dd370afd527946ecb5eba01a6e5d0ca220`.
+Exact heavy owner0549cb2d-6b99-4cab-ac9c-ff5a05f194c3,dev16777232/
+inode244652744 released normally; physical guard absence confirmed. Source
+remained clean/frozen. Web/native builds and installs did not run.
+Real ingestion/cancellation/unknown-settlement, retry,
 scan/processing/revoke/deletion and privacy/C10 acceptance remain pending.
 No W6 runtime/device/browser/DB transaction started; canonical61 and the closed
 upgrade target remain preserved. W8 owns coordinated Docker recovery.
