@@ -1,5 +1,18 @@
 # W4 original commerce session view — October 3, 2026
 
+## Current canonical namespace guard — October3 18:20 UTC
+
+Normally consumes actual W1 b0c15d51c72d1620e0069c9262037945a4d87d86 at2986ee7bb2ef14914bee144da6e11607b22afd58. The complete two-file delta is personally read. Each shared namespace snapshot retains its actual original marker; entries are considered before that marker and the marker is checked unchanged before deletion, preserving a replacement session even when it writes identical field values. Disjoint genuine W2 session keys remain unchanged. This denial cleanup creates no Session, Actor, scope or request authority.
+
+Current web types, scoped lint/format and diff pass without new tests. Prior e5d shipping/web operation remains qualified only to its own source. Current build and personal cross-tab/public-document/session-replacement/command/provider/C10 qualification remain open. The shared runtime transport is recovered; own61 ledger/schema/roles/security match the historical migration snapshot and all38 Commerce tables/two rows retain the latest pre-outage8bc3d065 fingerprint. Full historical data/sequences differ after recorded later activity, and are not credited as an unchanged outage baseline.
+
+
+## Canonical scoped cleanup successor — 17:44 UTC
+
+Normally integrated actual W1 bebb1e7ba5e2205d0e8aed266fe20e61109c06ec after personally reading all11 incoming paths and complete shared buffer/document/boundary/Studio API leaves. Literal delayed cross-tab hints now trigger the genuine bounded session reread; original end and private buffer cleanup target only the captured original tuple. The canonical public-document observer snapshots owner namespaces and tuple registrations before reading, preserves the current genuine session and values changed since that snapshot, and supplies no identity or permission. Actual W2 disjoint session namespaces and W5 scoped uncertain-command cleanup are reused once; the redundant W6 recording observer is removed. No broader producer or owner operation is borrowed.
+
+Combined e5d2f4f88d66c8f3000fc752f6e5971594ef8e4e web types, changed-path lint/format/diff and frozen normal webpack/TypeScript production build pass. Actual build17:40:19.537109–17:40:40.489198Z exits0, source clean/unchanged, private receipt SHA25603d278123b7d30451611c7aa3c7c13eda0fd5a44f3615214c1893367623622bf and log420095e0cf635ddb9d960f1d920e702000f7842413c9a64c8655dda4e30386b0. Canonical wrapper normally releases; fresh physical guard absence passes. This qualifies the named compilation only. Shared Docker outage prevents current actual session/account/command race and recovery operation; delayed-hint/public-document/cold-buffer/current footer and complete R01–R15 remain unaccepted.298 stays draft; earlier personal receipts remain attributed to their named trees.
+
 ## Corrected producer and personal repeat — 14:45 UTC
 
 The actual browser review also identified Commerce's You footer link pointing back to Spending. Its destination is now the existing canonical /you page, preserving Spending's selected parent tab. This one-line correction still requires personal current navigation operation; preceding captures and the d2aa6678 production build qualify their named earlier source.
