@@ -25,11 +25,18 @@ DO $$ BEGIN
  THEN RAISE EXCEPTION 'New isolated original-family purpose required'; END IF;
 END $$;
 
+-- Original request time is immutable to both Trust application roles. This
+-- single metadata grant supplies the approved elapsed-day deletion boundary;
+-- it grants neither scope access nor a caller-controlled deadline.
+SET LOCAL ROLE creator_trust_owner;
+GRANT SELECT(created_at) ON creator_trust.privacy_job TO creator_privacy_fence;
+RESET ROLE;
+
 -- The existing private owner reads its existing metadata only. The new purpose
 -- receives no table/scope access and cannot mint, replace or erase a binding.
 CREATE FUNCTION creator_trust.privacy_task_original_binding(jid uuid,d text,token uuid)
 RETURNS jsonb LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path=pg_catalog AS $$
-DECLARE held creator_trust.privacy_commit_scope%ROWTYPE; original jsonb;
+DECLARE held creator_trust.privacy_commit_scope%ROWTYPE; original jsonb; requested_at timestamptz;
 BEGIN
  IF session_user<>'creator_runtime' OR current_user<>'creator_privacy_fence'
   OR jid IS NULL OR token IS NULL OR d<>'conversation' OR d IS NULL
@@ -42,8 +49,8 @@ BEGIN
  IF NOT FOUND THEN RAISE EXCEPTION 'Original held task binding required' USING ERRCODE='42501'; END IF;
  SELECT jsonb_build_object('id',j.id,'account_id',j.account_id,'kind',j.kind,'scope',j.scope,
   'creator_id',j.creator_id,'thread_id',j.thread_id,'verified_at',j.verified_at,'verification_ref',j.verification_ref,
-  'owned_creator_ids',j.owned_creator_ids,'ownership_ref',j.ownership_ref,'lease_until',t.lease_until)
- INTO original FROM creator_trust.privacy_job j JOIN creator_trust.privacy_task t ON t.job_id=j.id
+  'owned_creator_ids',j.owned_creator_ids,'ownership_ref',j.ownership_ref,'lease_until',t.lease_until),j.created_at
+ INTO original,requested_at FROM creator_trust.privacy_job j JOIN creator_trust.privacy_task t ON t.job_id=j.id
  WHERE j.id=held.job_id AND j.state NOT IN('complete','dead_letter')
   AND j.kind IN('export','delete') AND j.scope IN('account','creator','thread')
   AND j.verified_at IS NOT NULL AND j.verification_ref<>''
@@ -58,7 +65,8 @@ BEGIN
  THEN RAISE EXCEPTION 'Original task binding changed' USING ERRCODE='42501'; END IF;
  RETURN jsonb_build_object('accountId',original->'account_id','kind',original->'kind','scope',original->'scope',
   'creatorId',original->'creator_id','threadId',original->'thread_id',
-  'ownedCreatorIds',original->'owned_creator_ids','ownershipRef',original->'ownership_ref');
+  'ownedCreatorIds',original->'owned_creator_ids','ownershipRef',original->'ownership_ref',
+  'deleteDue',original->>'kind'='delete' AND requested_at+interval '720 hours'<=clock_timestamp());
 END $$;
 ALTER FUNCTION creator_trust.privacy_task_original_binding(uuid,text,uuid) OWNER TO creator_privacy_fence;
 REVOKE ALL ON FUNCTION creator_trust.privacy_task_original_binding(uuid,text,uuid) FROM PUBLIC;
@@ -118,7 +126,8 @@ BEGIN
  IF current_user<>'creator_privacy_family' THEN
   RAISE EXCEPTION 'Isolated original-family purpose required' USING ERRCODE='42501'; END IF;
  binding:=creator_trust.privacy_task_original_binding(jid,'conversation',token);
- IF binding->>'kind' IS DISTINCT FROM 'delete' THEN RETURN false; END IF;
+ IF binding->>'kind' IS DISTINCT FROM 'delete' OR binding->'deleteDue' IS DISTINCT FROM 'true'::jsonb
+ THEN RETURN false; END IF;
  IF NOT creator_trust.privacy_task_family_matches(jid,token,t,c,f) THEN RETURN false; END IF;
  IF binding<>creator_trust.privacy_task_original_binding(jid,'conversation',token) THEN
   RAISE EXCEPTION 'Original delete family binding changed' USING ERRCODE='42501'; END IF;

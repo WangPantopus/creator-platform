@@ -14,15 +14,15 @@ const roles = [
 ];
 export const originalPrivacyFamilyMigration = Object.freeze({
   version: "0214_w8_original_privacy_family",
-  checksum: "e815785fb8d00036b4d510275803794adbb28c634b7ae4ef55dbf70d3bbacdcb",
+  checksum: "fcb8f6174d48ed89b9a06d8a51ac4f0c5dd4288950f2d18b351825d9d81dd793",
 });
 export const originalPrivacyBindingSignature =
   "creator_trust.privacy_task_original_binding(uuid,text,uuid)";
 export const originalPrivacyBindingDefinition =
-  "96258c090117abc5b0a45beb8f12b8aa48d81645501c66617329463523f9fc63";
+  "c183dcbefe669c0918d5165717bc7c5423d9537824f2ba401ff9813db0137e13";
 // Only actual closed qualification may fill this value; no startup readback.
 const catalogueChecksum =
-  "e2dd075515d08bfcc0ded60230645e6d1e5c4d79b028a8e537dd76b3bb3fabf3";
+  "90200a538329f88c8f98f9caa53d1561dd7b51d43b32a01c5a285af858da8279";
 
 function unavailable(): never {
   throw new DomainError(

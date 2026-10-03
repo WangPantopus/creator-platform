@@ -44,6 +44,12 @@ const columns = [
 export async function assertPrivacyTaskCatalog(client: PoolClient) {
   const family = await originalPrivacyFamilyRegisteredExtension(client);
   const expectedFunctions = family ? [...functions, family] : functions;
+  const expectedColumns = family
+    ? [
+        ...columns,
+        { relation: "privacy_job", column: "created_at", privilege: "SELECT" },
+      ]
+    : columns;
   const ready = (
     await client.query<{ ready: boolean }>(
       `WITH role AS (
@@ -145,7 +151,7 @@ export async function assertPrivacyTaskCatalog(client: PoolClient) {
         "0087_w8_privacy_task_commit_fence",
         "33e619bfdea66355e1d8d2b90ed2d0389f21ae024fda63e1b984c99aede847ef",
         JSON.stringify(expectedFunctions),
-        JSON.stringify(columns),
+        JSON.stringify(expectedColumns),
         expectedFunctions.length,
         family !== undefined,
       ],
