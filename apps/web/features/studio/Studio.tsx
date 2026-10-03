@@ -1224,11 +1224,11 @@ function Compose({
   onDone: () => void;
   post?: boolean;
 }) {
-  const canDraft =
-    creator.verification === "verified" &&
-    (creator.owned ||
-      creator.roles.includes("drafter") ||
-      creator.roles.includes("publisher"));
+  const hasDraftRole =
+    creator.owned ||
+    creator.roles.includes("drafter") ||
+    creator.roles.includes("publisher");
+  const canDraft = creator.verification === "verified" && hasDraftRole;
   const canPublish =
     creator.verification === "verified" &&
     (creator.owned || creator.roles.includes("publisher"));
@@ -1292,6 +1292,7 @@ function Compose({
     useSavedDraft(value);
   };
   useEffect(() => {
+    if (!hasDraftRole) return;
     // Only opaque command references persist across a reload; no draft or fan text.
     try {
       const stored = sessionStorage.getItem(pendingStorage);
@@ -1367,9 +1368,9 @@ function Compose({
           });
         });
     }
-  }, [creator.id, id]);
+  }, [creator.id, id, hasDraftRole]);
   const edit = (update: Partial<ContentBody>) => {
-    if (!draftReady || pendingPublication) return;
+    if (!hasDraftRole || !draftReady || pendingPublication) return;
     setDocument((d) => ({ ...d, ...update }));
     setReview(null);
   };
@@ -1423,6 +1424,28 @@ function Compose({
     !document.quote &&
     !document.packetId &&
     document.kind !== "public_answer";
+  if (!hasDraftRole)
+    return (
+      <section className="w5-compose">
+        <header className="w5-compose-head">
+          <Link href={`/studio/${creator.id}/notes`}>Notes</Link>
+          <strong>{post ? "Publish" : "Note draft"}</strong>
+          <span />
+        </header>
+        <div className="w5-gutter">
+          <Notice tone="error" title="Content editing unavailable">
+            Your current role does not allow creating or editing content. Ask
+            the creator to review your roles before preparing a draft.
+          </Notice>
+          <Link
+            className="qv-btn qv-btn--secondary"
+            href={`/studio/${creator.id}/notes`}
+          >
+            Return to Notes
+          </Link>
+        </div>
+      </section>
+    );
   if (!draftReady)
     return (
       <section className="w5-compose">
