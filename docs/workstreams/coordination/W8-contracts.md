@@ -1,5 +1,13 @@
 # W8 contract, migration and runtime register
 
+## Current account read retry — 2026-10-03
+
+`retryTrustReads()` refreshes real capability/session/job hooks without granting a session or resetting the form epoch. Each hook preserves its current sequence/account fence. Actual503 session errors offer retry; only actual401 may offer reauthentication. Pending session reads withhold development sign-in navigation. [Personal real-web operation and independent saved state](../../operations/W8-privacy-session-recovery.md) qualify cold/warm recovery and cross-tab account separation only; the existing incomplete export remains unavailable for download.
+
+## Original-recipient interactive denial source — 2026-10-02
+
+[Held0200](../../operations/W8-fulfillment-view-denial.md) now implements the separate genuine0199 interactive contract. `prepareTrustFulfillmentViewDenial(runtime, actualCommerceFulfillmentViewAuthority)` accepts only the original held client and W4 opaque scope; actual current session/client/PID/fullXID, complete originals and restoration/source bookends remain mandatory. New NoLogin purpose checks viewer and every original family with sorted nonwaiting negatives. No Actor, fan list, body, positive permission or COMMIT is issued. W4's exact combined0199/0202 catalogue needs independent owner review before activation; old hashes correctly refuse the new grants/policies. Personal closed rollback qualification preserves all six canonical61 custody hashes and supplies no signed/financial/provider or application acceptance.
+
 ## Distinct publication original comparison allocation — 2026-10-02
 
 Held0213 reserves W4's `schema-fulfillment-publication-original-hash.sql` and version `0213_w4_fulfillment_publication_original_hash`. Its fixed actorless comparison must consume only actual bound0204 plus genuine W1 early0208 on the original held worker nonce/client/PID/fullXID/login/task/token. Complete2–100 original input/financial/consent/evidence comparison, same-client restoration,0205 negatives, positive gates and final bookends must remain distinct. Only bounded boolean/evidence may return; no question/input, recipient/frame write or inferred provider receipt. Interactive0199/0202 are not publication aliases. W4 supplies exact fixed signatures/source and combined effective catalogue for independent review; W1 alone owns final cleanup/COMMIT. This reservation grants no executable activation or genuine application acceptance.
