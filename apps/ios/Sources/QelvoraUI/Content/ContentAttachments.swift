@@ -144,6 +144,7 @@ private struct ContentPlaybackDeadline: Sendable {
     func download(ticket: String, asset: ContentAudienceAsset, playbackFile: ContentPlaybackFile, deadline: ContentPlaybackDeadline) async throws -> URL {
         try await requireCurrent()
         guard playbackFile.matches(asset), deadline.current else { throw URLError(.badServerResponse) }
+        guard ContentMediaCache.prepare() else { throw CocoaError(.fileWriteUnknown) }
         let file = FileManager.default.temporaryDirectory.appendingPathComponent("w5-content-" + UUID().uuidString + (asset.mimeType == "image/png" ? ".png" : ".m4a"))
         #if canImport(UIKit)
         let attributes: [FileAttributeKey: Any] = [.protectionKey: FileProtectionType.complete]
