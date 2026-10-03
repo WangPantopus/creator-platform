@@ -17,6 +17,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -191,15 +192,46 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         }
     } }
     val current = page
-    Column(Modifier.fillMaxSize().widthIn(max = 390.dp).background(qColor("ground"))) {
+    BoxWithConstraints(Modifier.fillMaxSize().widthIn(max = 390.dp)) {
+    // Keep the actual conversation and its privacy notice reachable when
+    // enlarged text or the keyboard leaves too little room for fixed controls.
+    val scrollControls = LocalDensity.current.fontScale >= 1.5f || maxHeight < 480.dp
+    Column(Modifier.fillMaxSize().background(qColor("ground"))) {
         if (current == null) {
             Notice(title = "Conversation unavailable", children = if (error.isEmpty()) "Loading your messages…" else error)
             Button("Refresh", variant = ButtonVariant.SECONDARY) { scope.launch { refresh() } }
             Button("Help and safety", variant = ButtonVariant.QUIET) { session.open("/support") }
         } else {
-            ThreadHeader(name = current.creatorName, subtitle = "Official AI", live = current.control == APIThreadControl.HUMAN_ACTIVE, onBack = { session.open("/you") }, onAbout = { privacy = true })
-            IdentityStrip(state = if (current.control == APIThreadControl.HUMAN_ACTIVE) IdentityState.HUMAN else if (current.control == APIThreadControl.AI_ACTIVE) IdentityState.AI else IdentityState.PAUSED, name = current.creatorName)
+            val header: @Composable () -> Unit = {
+                ThreadHeader(name = current.creatorName, subtitle = "Official AI", live = current.control == APIThreadControl.HUMAN_ACTIVE, onBack = { session.open("/you") }, onAbout = { privacy = true })
+                IdentityStrip(state = if (current.control == APIThreadControl.HUMAN_ACTIVE) IdentityState.HUMAN else if (current.control == APIThreadControl.AI_ACTIVE) IdentityState.AI else IdentityState.PAUSED, name = current.creatorName)
+            }
+            val messageLabel = if (current.control == APIThreadControl.HUMAN_ACTIVE) "Message ${current.creatorName}" else "Message ${current.creatorName}'s AI"
+            val input: @Composable (Modifier) -> Unit = { modifier ->
+                BasicTextField(value = draft, onValueChange = { draft = it.take(2000) }, modifier = modifier.heightIn(min = 48.dp, max = 160.dp).semantics { contentDescription = messageLabel }.background(qColor("surface")).padding(12.dp), textStyle = qText("body").copy(color = qColor("ink")), cursorBrush = SolidColor(qColor("ink")), maxLines = 5)
+            }
+            val sendButton: @Composable () -> Unit = {
+                Button("Send", variant = if (current.control == APIThreadControl.HUMAN_ACTIVE) ButtonVariant.MAYA else ButtonVariant.AI, block = scrollControls, disabled = !current.canSend || offline || !foreground || busy || pending != null || current.generationSequences.isNotEmpty() || draft.isBlank()) { scope.launch { send() } }
+            }
+            val privacyControls: @Composable () -> Unit = {
+                Button("Me and privacy", variant = ButtonVariant.QUIET) { privacy = true }
+                Button("Get support", variant = ButtonVariant.QUIET) { session.open("/support") }
+            }
+            val composer: @Composable () -> Unit = {
+                Column(Modifier.imePadding().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    if (!current.canSend) Notice(title = "AI unavailable", children = current.unavailableReason ?: "Messaging is unavailable.")
+                    if (scrollControls) {
+                        BasicText(messageLabel, style = qText("label").copy(color = qColor("ink")))
+                        input(Modifier.fillMaxWidth())
+                        sendButton()
+                    } else Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { input(Modifier.weight(1f)); sendButton() }
+                    Button("Ask ${current.creatorName} to step in", variant = ButtonVariant.MAYA, block = true) { session.open("/commerce/packet?creatorId=$creatorId") }
+                    if (scrollControls) Column { privacyControls() } else Row { privacyControls() }
+                }
+            }
+            if (!scrollControls) header()
             LazyColumn(state = scroll, modifier = Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                if (scrollControls) item { Column { header() } }
                 item(key = "intro-offer") {
                     NativeIntroOffer(client, root, session, introOfferId, current.feedbackPolicy != null,
                         enabled = !busy && !offline && foreground && !privacy && source == null)
@@ -275,17 +307,11 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 }
                 pending?.let { pendingItem -> item { Message(kind = MessageKind.FAN, children = pendingItem.text, name = current.creatorName, delivery = if (pendingItem.rejected) Delivery.FAILED else if (pendingItem.uncertain) null else Delivery.PENDING); if (pendingItem.uncertain) { BasicText("Acceptance hasn't been confirmed. Retry checks the same message without a duplicate.", style = qText("caption").copy(color = qColor("ink"))); Button("Retry", variant = ButtonVariant.QUIET, disabled = busy || offline) { scope.launch { send(true) } } } else if (pendingItem.rejected) { BasicText("Not sent", style = qText("caption").copy(color = qColor("ink"))); Button("Keep editing", variant = ButtonVariant.QUIET) { draft = pendingItem.text; pending = null } } } }
                 if (error.isNotEmpty()) item { Notice(title = "Conversation status", children = error) }
+                if (scrollControls) item { composer() }
             }
-            Column(Modifier.imePadding().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                if (!current.canSend) Notice(title = "AI unavailable", children = current.unavailableReason ?: "Messaging is unavailable.")
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    BasicTextField(value = draft, onValueChange = { draft = it.take(2000) }, modifier = Modifier.weight(1f).heightIn(min = 48.dp, max = 160.dp).semantics { contentDescription = if (current.control == APIThreadControl.HUMAN_ACTIVE) "Message ${current.creatorName}" else "Message ${current.creatorName}'s AI" }.background(qColor("surface")).padding(12.dp), textStyle = qText("body").copy(color = qColor("ink")), cursorBrush = SolidColor(qColor("ink")), maxLines = 5)
-                    Button("Send", variant = if (current.control == APIThreadControl.HUMAN_ACTIVE) ButtonVariant.MAYA else ButtonVariant.AI, disabled = !current.canSend || offline || !foreground || busy || pending != null || current.generationSequences.isNotEmpty() || draft.isBlank()) { scope.launch { send() } }
-                }
-                Button("Ask ${current.creatorName} to step in", variant = ButtonVariant.MAYA, block = true) { session.open("/commerce/packet?creatorId=$creatorId") }
-                Row { Button("Me and privacy", variant = ButtonVariant.QUIET) { privacy = true }; Button("Get support", variant = ButtonVariant.QUIET) { session.open("/support") } }
-            }
+            if (!scrollControls) composer()
         }
+    }
     }
 }
 

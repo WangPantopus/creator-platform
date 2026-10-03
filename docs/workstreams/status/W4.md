@@ -4,11 +4,25 @@ Personally implemented allocated0213 fixed all-original boolean against W1 publi
 
 Actual eleven-source closed canonical61 rollback review passes21 PL functions (including genuine W1 finalizer/213),16 no-scope empty SELECT plans, eight ACL/unregistered refusals and13 detected/restored drifts; all six custody fingerprints match. Backend build/typecheck, scoped lint and format/diff pass. Canonical creator_runtime guard refuses503 with61 unchanged. The personally found pre-body ordering gap was sent to W1: its new genuine prepared208/still-live204 snapshot/early213 invocation requires fresh owner-source qualification and pins. Full worker factory/W3 System/delivery/sole final COMMIT/finite C10/activation/positive acceptance and all nine packages/R01–R15 remain incomplete. [Exact source review and limits](../../../artifacts/workstreams/W4/runtime/2026-10-03/fulfillment-publication-original/README.md). Routine operator JSON remains private.
 
+### Current Android Spending return personally operated — October 3, 2026 UTC
+
+Current f68e/main23de shipping APK builds and installs normally. Actual CUA Studio mirror You→Spending→BackYou and Requests→Spending→BackRequests pass; real decimal-pad6.50 remains unsaved and is discarded on normal cold relaunch. Same fan session, saved6USD/original pending05:42UTC/reminders off and zero totals persist. Initial standalone mirror refusal is retained; the preserved AVD was normally restarted through Studio, with exact owned5554/PID metadata. Only W4's device/leases were released. Current Android Night/TalkBack/creator/provider/group acceptance remains open. [Actual evidence and named source limits](../../../artifacts/workstreams/W4/runtime/2026-10-03/android-personal-return/README.md). All nine packages/R01–R15 remain incomplete.
+
+### Personally operated current iOS Spending return — October 3, 2026 UTC
+
+The normal signed combined Back/shell-tab build at PR230e607ba6e/main68142326 passes strict signature verification. Personally used CUA on exact ownedBC8: cold Requests and internal Spending Back, direct You Spending/Back in Light/Night, real6.50 unsaved decimal draft and normal cold relaunch with draft discarded. Saved6USD/originalpendingOctober3 05:42UTC/remindersoff/zero totals preserved; no Save/financial action. Light restored, exact normalShutdown verified and token/inode/device GUI+slot3 released. Current Android combined shipping attempt retainedbusy75 and remains pending; initial iOS coldAXfailure is retained with this successful named repeat. Creator/provider/store/passkey/full accessibility acceptance and all nine packages/R01–R15 remain open. [Current binary/receipt/safe views](../../../artifacts/workstreams/W4/runtime/2026-10-03/ios-personal-return/README.md).
+
 ### Independent interactive viewer and actual0200 review — October 3, 2026 UTC
 
 Personally qualified unchanged0178/0199/0202 with W8's actual0200 on the closed canonical61 copy: six actual PL functions/cleanup compile cleanly;12 real permission/policy/function/role drifts and five unregistered/ACL refusals restore; NULL returns unavailable. All six custody fingerprints match with no fabricated ledger/scope/business rows. Logical-name owner catalogues and61 purpose pins are independently requalified. The actual W4 guard requires executable registration and calls the real W8 producer guard for the exact200 extension; its own factory metadata review rolls back. Canonical runtime still refuses503, with61 ledger/login unchanged.
 
 Backend build/types/scoped lint/format/diff pass; full operator JSON stays private. Actual issuer/callback/positive viewing, W5 final permissions/signatures/source and finite C10 remain open. [Personal source qualification and limits](../../../artifacts/workstreams/W4/runtime/2026-10-03/fulfillment-view-denial/README.md). All nine packages and R01–R15 remain incomplete.
+
+### Personally operated iOS and native Spending return correction — October 3, 2026 UTC
+
+The primary personally operated real CUA DeviceHub iOS sign-in chooser, preserved6USD/pending-limit/reminders-off Spending, Requests categories, actual decimal6.50 unsaved draft and truthful unavailable membership management. Night/TextSize7/ReduceMotion exposed a reachable Save control; VoiceOver-on Requests navigation and labels were observed. Original system settings restored visibly; exact owned simulator shut down and GUI/slot3 released. This used the named preceding7514 binary and API0bc66; no new-source or provider/signing acceptance is inferred.
+
+Cold launch recovered the labelled session but guest AX/touches disappeared at unavailable Home, so cold Requests/Spending remains incomplete. The observed direct You→Spending Back defect is corrected in both W4 native sources; shared Home-tab selection reported to W1. Corrected-source device return remains pending. [Personal evidence, failure and limits](../../../artifacts/workstreams/W4/runtime/2026-10-03/ios-personal-return/README.md). All nine packages/R01–R15 remain incomplete; routine operator JSON stays private.
 
 ### Current audience composition and actual0211 caller review — October 3, 2026 UTC
 
