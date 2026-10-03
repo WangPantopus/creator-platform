@@ -86,6 +86,13 @@ export function growthAccountExport(
         value: accountId,
       },
       {
+        collection: "deliveryReceipts",
+        // A receipt belongs to the account through its original delivery.
+        // Registration hashes identify devices and stay outside the export.
+        sql: "SELECT receipt.delivery_id,receipt.state,receipt.provider_ref,receipt.updated_at FROM growth.provider_receipt receipt JOIN growth.delivery delivery ON delivery.id=receipt.delivery_id WHERE delivery.account_id=$1",
+        value: accountId,
+      },
+      {
         collection: "insightSignals",
         sql: "SELECT id,creator_id,topic_key,window_start,unresolved,version FROM growth.insight_signal WHERE subject_key=$1",
         value: service.privacySubjectKey(accountId),
