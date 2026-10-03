@@ -5,6 +5,7 @@ import { DomainError, invariant } from "../../core/errors.js";
 import { generationJournalInstalled } from "./generation-journal.js";
 import type { PoolClient } from "pg";
 import type { PreparedUsageRetention } from "./usage-retention.js";
+import { agentPrivacyTransaction } from "./privacy-transaction.js";
 
 /** Only the trusted W8 adapter calls this with a verified notice; not an unprotected HTTP route. */
 export class AgentLifecycle {
@@ -120,7 +121,10 @@ export class AgentLifecycle {
     jobId: string,
     assertAuthorized: () => Promise<void>,
     assertTaskInTransaction: (client: PoolClient) => Promise<void>,
-    accountingBoundary?: (client: PoolClient) => Promise<{ reference: string }>,
+    accountingBoundary:
+      | ((client: PoolClient) => Promise<{ reference: string }>)
+      | undefined,
+    signal: AbortSignal,
   ) {
     invariant(
       !scope.development && jobId.length >= 8,
@@ -130,204 +134,200 @@ export class AgentLifecycle {
     await assertAuthorized();
     await this.repository.assertRuntimeRole();
     this.runtime?.interruptCreator(scope.creatorId);
-    const client = await this.repository.pool.connect();
-    try {
-      await client.query("BEGIN");
-      await assertTaskInTransaction(client);
-      await client.query(
-        "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
-        [scope.creatorId, scope.accountId],
-      );
-      await client.query(
-        "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
-        [`agent.purge:${scope.creatorId}`],
-      );
-      await assertAuthorized();
-      await assertTaskInTransaction(client);
-      const lineage = await this.assertAccountingClient(client);
-      let boundaryReference: string | undefined;
-      if (lineage) {
-        invariant(
-          accountingBoundary,
-          "thread_accounting_privacy_unconfigured",
-          "The completed conversation disposition and accounting receipt are required before creator erasure.",
-        );
-        boundaryReference = (await accountingBoundary(client)).reference;
-        invariant(
-          boundaryReference,
-          "accounting_boundary_incomplete",
-          "A durable accounting boundary reference is required.",
-        );
-      }
-      const assertDetached = async () => {
+    return agentPrivacyTransaction(
+      this.repository.pool,
+      signal,
+      async (client) => {
         await assertTaskInTransaction(client);
-        if (!lineage) return;
-        for (const table of [
-          "ai_generation_receipt",
-          "ai_generation_attempt",
-          "ai_generation_admission",
-        ])
+        await client.query(
+          "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
+          [scope.creatorId, scope.accountId],
+        );
+        await client.query(
+          "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+          [`agent.purge:${scope.creatorId}`],
+        );
+        await assertAuthorized();
+        await assertTaskInTransaction(client);
+        const lineage = await this.assertAccountingClient(client);
+        let boundaryReference: string | undefined;
+        if (lineage) {
+          invariant(
+            accountingBoundary,
+            "thread_accounting_privacy_unconfigured",
+            "The completed conversation disposition and accounting receipt are required before creator erasure.",
+          );
+          boundaryReference = (await accountingBoundary(client)).reference;
+          invariant(
+            boundaryReference,
+            "accounting_boundary_incomplete",
+            "A durable accounting boundary reference is required.",
+          );
+        }
+        const assertDetached = async () => {
+          await assertTaskInTransaction(client);
+          if (!lineage) return;
+          for (const table of [
+            "ai_generation_receipt",
+            "ai_generation_attempt",
+            "ai_generation_admission",
+          ])
+            invariant(
+              !(
+                await client.query(
+                  `SELECT 1 FROM creator.${table} WHERE creator_id=$1 LIMIT 1`,
+                  [scope.creatorId],
+                )
+              ).rowCount,
+              "accounting_cleanup_pending",
+              "Complete every conversation accounting family before creator erasure.",
+            );
           invariant(
             !(
               await client.query(
-                `SELECT 1 FROM creator.${table} WHERE creator_id=$1 LIMIT 1`,
+                "SELECT 1 FROM creator.ai_usage WHERE creator_id=$1 AND (thread_id IS NOT NULL OR fan_id IS NOT NULL OR generation_id IS NOT NULL OR attempt_id IS NOT NULL OR call_ordinal IS NOT NULL OR (cost_micros IS NULL AND accounting_retained_until IS NULL)) LIMIT 1",
                 [scope.creatorId],
               )
-            ).rowCount,
+            ).rowCount &&
+              !(
+                await client.query(
+                  "SELECT 1 FROM creator.ai_event WHERE creator_id=$1 AND type='ai.generation_receipt' AND (payload ? 'threadId' OR payload ? 'fanId') LIMIT 1",
+                  [scope.creatorId],
+                )
+              ).rowCount,
             "accounting_cleanup_pending",
-            "Complete every conversation accounting family before creator erasure.",
+            "Linked or unresolved unplanned accounting requires actual disposition before creator erasure.",
           );
-        invariant(
-          !(
+        };
+        const tombstone = await client.query(
+          "SELECT 1 FROM creator.ai_tombstone WHERE creator_id=$1",
+          [scope.creatorId],
+        );
+        const receipt = {
+          domain: "agent",
+          jobId,
+          purged: true,
+          remainingMedia: "not_owned_by_agent",
+          ...(boundaryReference
+            ? { accountingBoundaryReference: boundaryReference }
+            : {}),
+        };
+        if (!tombstone.rowCount) {
+          const owner = await client.query<{ account_id: string }>(
+            "SELECT account_id FROM creator.creator_profile WHERE id=$1",
+            [scope.creatorId],
+          );
+          invariant(
+            !owner.rows[0] || owner.rows[0].account_id === scope.accountId,
+            "privacy_owner_changed",
+            "This deletion job cannot purge a different creator owner.",
+          );
+          if (owner.rows[0])
             await client.query(
-              "SELECT 1 FROM creator.ai_usage WHERE creator_id=$1 AND (thread_id IS NOT NULL OR fan_id IS NOT NULL OR generation_id IS NOT NULL OR attempt_id IS NOT NULL OR call_ordinal IS NOT NULL OR (cost_micros IS NULL AND accounting_retained_until IS NULL)) LIMIT 1",
-              [scope.creatorId],
-            )
-          ).rowCount &&
-            !(
-              await client.query(
-                "SELECT 1 FROM creator.ai_event WHERE creator_id=$1 AND type='ai.generation_receipt' AND (payload ? 'threadId' OR payload ? 'fanId') LIMIT 1",
-                [scope.creatorId],
-              )
-            ).rowCount,
-          "accounting_cleanup_pending",
-          "Linked or unresolved unplanned accounting requires actual disposition before creator erasure.",
-        );
-      };
-      const tombstone = await client.query(
-        "SELECT 1 FROM creator.ai_tombstone WHERE creator_id=$1",
-        [scope.creatorId],
-      );
-      const receipt = {
-        domain: "agent",
-        jobId,
-        purged: true,
-        remainingMedia: "not_owned_by_agent",
-        ...(boundaryReference
-          ? { accountingBoundaryReference: boundaryReference }
-          : {}),
-      };
-      if (!tombstone.rowCount) {
-        const owner = await client.query<{ account_id: string }>(
-          "SELECT account_id FROM creator.creator_profile WHERE id=$1",
-          [scope.creatorId],
-        );
-        invariant(
-          !owner.rows[0] || owner.rows[0].account_id === scope.accountId,
-          "privacy_owner_changed",
-          "This deletion job cannot purge a different creator owner.",
-        );
-        if (owner.rows[0])
+              "SELECT id FROM creator.creator_profile WHERE id=$1 AND account_id=$2 FOR UPDATE",
+              [scope.creatorId, scope.accountId],
+            );
           await client.query(
-            "SELECT id FROM creator.creator_profile WHERE id=$1 AND account_id=$2 FOR UPDATE",
-            [scope.creatorId, scope.accountId],
+            "SELECT creator_id FROM creator.ai_workspace WHERE creator_id=$1 FOR UPDATE",
+            [scope.creatorId],
           );
-        await client.query(
-          "SELECT creator_id FROM creator.ai_workspace WHERE creator_id=$1 FOR UPDATE",
-          [scope.creatorId],
-        );
-        await client.query(
-          "UPDATE creator.ai_workspace SET paused=true,live_version_id=NULL WHERE creator_id=$1",
-          [scope.creatorId],
-        );
-        // A receipt alone cannot erase a missed family or open attempt.
-        await assertDetached();
-        // Remove unretained usage before its referenced creator cost holds.
-        await client.query(
-          lineage
-            ? "DELETE FROM creator.ai_usage WHERE creator_id=$1 AND accounting_retained_until IS NULL"
-            : "DELETE FROM creator.ai_usage WHERE creator_id=$1",
-          [scope.creatorId],
-        );
-        for (const table of [
-          "ai_shadow_evaluation",
-          "ai_shadow_sample",
-          "ai_style_embedding",
-          "ai_cost_hold",
-          "ai_version",
-          "ai_evaluation",
-          "ai_chunk",
-          "ai_ingestion",
-          "ai_source",
-          "ai_license",
-          "ai_sponsor",
-          "ai_regression",
-          "ai_command",
-          "ai_event",
-        ]) {
-          await assertTaskInTransaction(client);
           await client.query(
-            `DELETE FROM creator.${table} WHERE creator_id=$1`,
+            "UPDATE creator.ai_workspace SET paused=true,live_version_id=NULL WHERE creator_id=$1",
+            [scope.creatorId],
+          );
+          // A receipt alone cannot erase a missed family or open attempt.
+          await assertDetached();
+          // Remove unretained usage before its referenced creator cost holds.
+          await client.query(
+            lineage
+              ? "DELETE FROM creator.ai_usage WHERE creator_id=$1 AND accounting_retained_until IS NULL"
+              : "DELETE FROM creator.ai_usage WHERE creator_id=$1",
+            [scope.creatorId],
+          );
+          for (const table of [
+            "ai_shadow_evaluation",
+            "ai_shadow_sample",
+            "ai_style_embedding",
+            "ai_cost_hold",
+            "ai_version",
+            "ai_evaluation",
+            "ai_chunk",
+            "ai_ingestion",
+            "ai_source",
+            "ai_license",
+            "ai_sponsor",
+            "ai_regression",
+            "ai_command",
+            "ai_event",
+          ]) {
+            await assertTaskInTransaction(client);
+            await client.query(
+              `DELETE FROM creator.${table} WHERE creator_id=$1`,
+              [scope.creatorId],
+            );
+          }
+          await client.query(
+            "DELETE FROM creator.ai_workspace WHERE creator_id=$1",
+            [scope.creatorId],
+          );
+          // A committed tombstone proves the entire deletion above committed atomically.
+          await client.query(
+            "INSERT INTO creator.ai_tombstone(creator_id) VALUES($1)",
             [scope.creatorId],
           );
         }
-        await client.query(
-          "DELETE FROM creator.ai_workspace WHERE creator_id=$1",
-          [scope.creatorId],
-        );
-        // A committed tombstone proves the entire deletion above committed atomically.
-        await client.query(
-          "INSERT INTO creator.ai_tombstone(creator_id) VALUES($1)",
-          [scope.creatorId],
-        );
-      }
-      // A replay must not acknowledge a resurrected family either.
-      await assertDetached();
-      const retainedAccounting = lineage
-        ? (
-            await client.query<{
-              policy_version: string;
-              reason: string;
-              unknown: boolean;
-              until: Date;
-              records: string;
-            }>(
-              "SELECT accounting_retention_version AS policy_version,accounting_retention_reason AS reason,cost_micros IS NULL AS unknown,max(accounting_retained_until) AS until,count(*)::text AS records FROM creator.ai_usage WHERE creator_id=$1 AND accounting_retained_until IS NOT NULL GROUP BY accounting_retention_version,accounting_retention_reason,cost_micros IS NULL LIMIT 201",
-              [scope.creatorId],
-            )
-          ).rows
-        : [];
-      invariant(
-        retainedAccounting.length <= 200,
-        "bounded_subjob_required",
-        "Complete bounded retained-accounting receipts before acknowledging creator erasure.",
-      );
-      if (lineage) {
-        const currentBoundary = await accountingBoundary!(client);
+        // A replay must not acknowledge a resurrected family either.
+        await assertDetached();
+        const retainedAccounting = lineage
+          ? (
+              await client.query<{
+                policy_version: string;
+                reason: string;
+                unknown: boolean;
+                until: Date;
+                records: string;
+              }>(
+                "SELECT accounting_retention_version AS policy_version,accounting_retention_reason AS reason,cost_micros IS NULL AS unknown,max(accounting_retained_until) AS until,count(*)::text AS records FROM creator.ai_usage WHERE creator_id=$1 AND accounting_retained_until IS NOT NULL GROUP BY accounting_retention_version,accounting_retention_reason,cost_micros IS NULL LIMIT 201",
+                [scope.creatorId],
+              )
+            ).rows
+          : [];
         invariant(
-          currentBoundary.reference === boundaryReference,
-          "accounting_boundary_changed",
-          "The accounting disposition changed before erasure completed.",
+          retainedAccounting.length <= 200,
+          "bounded_subjob_required",
+          "Complete bounded retained-accounting receipts before acknowledging creator erasure.",
         );
-      }
-      await assertAuthorized();
-      await assertTaskInTransaction(client);
-      await client.query("COMMIT");
-      return {
-        ...receipt,
-        retainedAccounting: retainedAccounting.map((row) => ({
-          policyVersion: row.policy_version,
-          records: row.records,
-          unknown: row.unknown,
-          until: row.unknown ? null : row.until.toISOString(),
-          reason: row.reason,
-        })),
-        retained: retainedAccounting.map((row) => ({
-          category: row.unknown
-            ? "unresolved_agent_cost"
-            : "unlinked_agent_accounting",
-          until: row.unknown ? null : row.until.toISOString(),
-          reason: row.unknown
-            ? `${row.reason} Unresolved provider cost requires actual reconciliation; expiry cannot clear this marker.`
-            : row.reason,
-        })),
-      };
-    } catch (error) {
-      await client.query("ROLLBACK");
-      throw error;
-    } finally {
-      client.release();
-    }
+        if (lineage) {
+          const currentBoundary = await accountingBoundary!(client);
+          invariant(
+            currentBoundary.reference === boundaryReference,
+            "accounting_boundary_changed",
+            "The accounting disposition changed before erasure completed.",
+          );
+        }
+        await assertAuthorized();
+        await assertTaskInTransaction(client);
+        return {
+          ...receipt,
+          retainedAccounting: retainedAccounting.map((row) => ({
+            policyVersion: row.policy_version,
+            records: row.records,
+            unknown: row.unknown,
+            until: row.unknown ? null : row.until.toISOString(),
+            reason: row.reason,
+          })),
+          retained: retainedAccounting.map((row) => ({
+            category: row.unknown
+              ? "unresolved_agent_cost"
+              : "unlinked_agent_accounting",
+            until: row.unknown ? null : row.until.toISOString(),
+            reason: row.unknown
+              ? `${row.reason} Unresolved provider cost requires actual reconciliation; expiry cannot clear this marker.`
+              : row.reason,
+          })),
+        };
+      },
+    );
   }
   /** A consumer selects its event type before the bound, preserving other events. */
   async pendingEvents(scope: CreatorScope, limit = 100, eventType?: string) {
