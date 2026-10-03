@@ -2,6 +2,18 @@ import { Client, type Pool, type PoolClient } from "pg";
 import { DomainError, invariant } from "../../core/errors.js";
 import { querySettlementUncertain } from "../../core/query-settlement.js";
 
+/** Cancellation uses the original pool's shorter positive acquisition budget. */
+export function agentPrivacyConnectionTimeout(pool: Pool): number {
+  const configured = pool.options.connectionTimeoutMillis;
+  const original =
+    typeof configured === "number" || typeof configured === "string"
+      ? Number(configured)
+      : NaN;
+  return Number.isFinite(original) && original > 0
+    ? Math.min(original, 1500)
+    : 1500;
+}
+
 /** A per-query pg option replaces its connection budget. Keep a shorter
  * positive original budget, including pg's numeric environment form. */
 export function agentPrivacyQueryTimeout(
@@ -84,10 +96,7 @@ export async function agentPrivacyTransaction<T>(
       if (pid !== undefined) {
         const control = new Client({
           ...pool.options,
-          connectionTimeoutMillis: Math.min(
-            pool.options.connectionTimeoutMillis!,
-            1500,
-          ),
+          connectionTimeoutMillis: agentPrivacyConnectionTimeout(pool),
           statement_timeout: 1500,
           query_timeout: agentPrivacyQueryTimeout(client, 1500),
           pipeline: false,

@@ -7,7 +7,10 @@ import { registeredMigration } from "../../db/reviewed-migration.js";
 import { requestAuthority } from "../identity/request-authority.js";
 import type { PrivacyTaskInput } from "../trust/privacy-authority.js";
 import { generationConsumerCatalogue } from "./generation-consumer-catalogue.js";
-import { agentPrivacyQueryTimeout } from "./privacy-transaction.js";
+import {
+  agentPrivacyConnectionTimeout,
+  agentPrivacyQueryTimeout,
+} from "./privacy-transaction.js";
 
 export const AGENT_PRIVACY_EXPORT_MIGRATION = "0196_w2_privacy_export_snapshot";
 const Owner = "creator_w2_privacy_export";
@@ -339,7 +342,7 @@ export class PreparedAgentPrivacyExport {
         const failures: unknown[] = [];
         const control = new Client({
           ...this.pool.options,
-          connectionTimeoutMillis: 1500,
+          connectionTimeoutMillis: agentPrivacyConnectionTimeout(this.pool),
           statement_timeout: 1500,
           query_timeout: agentPrivacyQueryTimeout(client, 1500),
           pipeline: false,
