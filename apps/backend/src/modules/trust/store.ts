@@ -61,7 +61,7 @@ export class TrustStore {
       );
     return trustTransaction(this.pool, async (client) => {
       await client.query(
-        "SELECT set_config('app.account_id',$1,true),set_config('statement_timeout','5000',true),set_config('lock_timeout','2000',true)",
+        "SELECT set_config('app.account_id',$1,true),set_config('lock_timeout','2000',true)",
         [actor.accountId],
       );
       const result = await work(client);
