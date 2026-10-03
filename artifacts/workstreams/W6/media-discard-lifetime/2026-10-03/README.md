@@ -19,7 +19,13 @@ or malformed responses. Physical deletion still requires the genuine durable
 worker acknowledgement. Local-only discard needs no media identity.
 
 Current web types, three-path ESLint/Prettier and diff checks pass. No new unit,
-UI or E2E test files. Shipping compilation and actual disposal/session-switch,
+UI or E2E test files. Actual frozen da4d13e3990dabc6f78d45fc8c4c0194a0da4e5e
+web shipping build exits0 at17:28:21.394Z after6.97seconds; log SHA256
+`62084fb5af683f147cb98abf15b21743357611dc91a5d41c1cd61a046c90cb81`.
+Private receipt SHA256 `638eaaa1eee3d597989eb0eec668ba0911c6f78877d0964a280f775a77a2d600`.
+Original heavy lease e2209a77-252f-4c11-a95d-e1b296e9973c,dev16777232/
+inode244638952 releases normally; physical guard absence confirmed. Backend/
+native builds and installs did not run. Actual disposal/session-switch,
 unknown-response and worker-deletion operations remain pending. Docker's bounded
 daemon ping still times out at17:23Z; no new W6 runtime, browser, worker, device
 or database transaction started. W8 coordinates recovery; the original clone,
