@@ -1,8 +1,70 @@
 # Current Team role consumer — bounded personal operation
 
-## Renewed PR-first review at3461c6d4
+## Current personal operation atf712531f
 
-The existing PR288 is now stacked on W1 PR296. Ordinary exact merge
+Existing PR288 is now stacked on preserved original W1 PR21. Source
+`f712531f9be181bd8329763a3a7c4aa9b39c6fe8` normally merges exact W1
+`85ac12317f9f027cf8828ea7fb1148f687ec2e0c`; all captured main5c and complete
+b0 producer remain present. Canonical copy conflicts were resolved from the
+actual three-way source union with no conflicting semantic keys; all115/12
+derived resources were regenerated. Web/backend types/generation/diff pass.
+No shipping build or native app acceptance atf712 is claimed.
+
+Personally operated real API41055 through the committed launcher and canonical
+Next development web30055 atf712 against owned original canonical61. A fresh
+private transparent41056 relay forwarded genuine requests/results unchanged,
+logging only finite role command/response hashes/status. It withheld one actual
+successful backend response until the genuine BFF deadline, without fabricating
+a callback, response, Actor or authority. Maya remains explicitly synthetic,
+development-only seeded verified without proof/passkey/signing acceptance.
+
+The saved creator workspace reopened actual @kilnfire triage. A genuine reviewed
+triage→drafter+triage save returned backend200 and committed xmin86744 before the
+response was lost. The UI retained original reviewed triage/desired draft+triage,
+locked selection and offered Retry exact role change. Enter sent the identical
+command hash; actual200 confirmed, and read-only durable xmin86744 was unchanged.
+No automatic command or duplicate membership mutation occurred.
+
+A second own creator view saved scheduler+triage. The first retained original
+reviewed drafter+triage and desired triage; Save/checkboxes were disabled until
+explicit Review current roles. Enter on that review preserved desired triage;
+actual UI Save restored triage atxmin86875. No stale HTTP409 was observed/claimed.
+Both same-cookie-jar views are creator views, not independent fan isolation.
+
+A checked original owned API71246 was genuinely SIGSTOP-paused. Account checking
+concealed Studio to Reconnect while retaining unsent Drafting. Actual SIGCONT of
+the same process automatically recovered the original editor, selected Drafting
+and keyboard focus; no role POST occurred. Attempted obsolete connection controls
+were already absent after automatic recovery and are excluded as actions.
+
+Actual390/1280 Light/Night were inspected, with fresh width/scrollWidth matching
+390/1280 and explicit theme attributes. Current visible button heights44/48px.
+Enter on Close role editor, after current Team read settled, returned actual focus
+to Edit roles for @kilnfire. Initial transient Checking/body focus is excluded.
+
+The second view's genuine Account/Sign out/Continue/fan-one sign-in ended the
+original unsent creator editor to Continue. Opening the saved Team URL under
+actual @kilnfire triage showed current role denial, Retry and no management
+controls. This is sequential genuine account departure and current role refusal,
+not independent fan open-view revocation or a captured HTTP-status assertion.
+Final read-only durable roles aretriage/xmin86875, revokedAt:null.
+
+Private0600 PNGs, finite network hashes, before/commit/retry/final metadata and
+operator summary stay in `~/.config/creator-platform/w5-20261003/team-f712-current/`.
+Next/API/relay normally interrupted at20:16:20; wrappers0/1/1, own heavy guard
+released and all three listeners independently absent. Both own tabs closed and
+viewport reset; generated Next environment imports restored. A subsequent actual
+snapshot found new W2 heavy custody, so no global slot absence is claimed.
+
+Implemented/runnable: current combined source/types/generation and genuine local
+web/API. Integrated: actual W1 prerequisite consumed; PR21/288 still unmerged.
+Verified: only the bounded personalf712 observations above. Current shipping/
+native, independent fan open-view revocation and full required CI remain open.
+Release-ready:false. No whole Team or other original package is complete.
+
+## Historical PR-first review at3461c6d4
+
+At this historical source PR288 was stacked on W1 PR296. Ordinary exact merge
 `3461c6d43b4c94c08b69b6df617787aefd6cca2c` consumes the complete original
 producer `b0c15d51c72d1620e0069c9262037945a4d87d86`, including canonical
 request/session denial, configured host and marker-guarded negative cleanup.
@@ -19,13 +81,55 @@ Next environment imports were restored. No new test code was written.
 
 Implemented/runnable: the exact combined source and these checks/builds.
 Integrated: the real W1 prerequisite is present in this branch; both PRs remain
-unmerged. Verified: source checks/builds only at3461. Current personal app
-acceptance is blocked by the shared Docker outage. Earlier55/8a/8161 operations
-remain at their exact sources and are not transferred. Wrong-account/session
-departure, independent fan open-view revocation, current interrupted/stale/
-duplicate role changes, durable records and current Light/Night web qualification
-remain necessary. Required queued CI is not passed. Release-ready:false;
-no complete Team or other original package is checked off.
+unmerged. Verified: source checks/builds at3461 and the separately bounded
+personal operation at497b below. Earlier55/8a/8161 operations remain at their
+exact sources and are not transferred. Independent fan open-view revocation,
+current interrupted/stale/duplicate role changes, durable action readback and
+the full current Light/Night web qualification remain necessary. Required
+queued CI is not passed. Release-ready:false; no complete Team or other original
+package is checked off.
+
+## Personal original-session departure at497b561e
+
+The complete executable tree at `497b561edfb9c450eef976ca9e6dc64b97f5a320`
+matches3461; the intervening commit records the backlog review. Following W8's
+actual shared Docker recovery, W5 normally started only its existing owned
+`creator-platform-w5-local` container. Six read-only custody hashes of the
+closed57 restore match the original private manifest; the original dump hash
+also matches. The original canonical61 ledger and old role attributes remain
+preserved. Closed restore admission remains0. The first schema comparison used
+the helper's inner hash instead of the original manifest's canonical whole-result
+hash; correcting that read-only serialization required no catalogue change.
+This is custody evidence, not purpose activation, a privacy receipt or completed
+restoration acceptance.
+
+Personally operated the committed API launcher on41055 and the canonical Next
+development runtime on127.0.0.1:30055 at497b. Actual health remained development,
+foundation-ready and generation-unconfigured. No production HTTPS guard was
+bypassed. A fresh390×844 Light view of the saved real @kilnfire fan-one Team route
+showed its actual triage scope, current role refusal and Retry, with no member or
+invitation management controls. Fresh measured innerWidth/scrollWidth were390.
+
+Through actual Account/Sign out/Continue UI, the explicitly labelled development
+creator opened Team and reviewed triage with unsent Drafting selected. A second
+own tab signed in through the genuine development flow as that same creator,
+replacing the account's original session. Clicking Save roles in the original
+view closed it to Continue. No HTTP status was captured, so this observation does
+not claim409 or a particular wire denial. The genuine read-only post-operation
+membership remains triage, xmin84891, with zero publications/replies and61 ledger
+rows. No role change, invite, proof/passkey, signing, approval or payment occurred.
+These two same-cookie-jar tabs do not qualify independent fan isolation or
+open-view revocation.
+
+Private0600 runtime logs, three PNG captures and
+`team-497b-post-session-departure.json` are retained under the current private
+backlog directory. An initial Loading capture was excluded and replaced only
+after the actual Retry view settled. Own Next and API were normally interrupted;
+the Next wrapper exited0, the launcher wrapper exited1, both listeners were
+absent and the exact heavy guard released. Both own tabs closed and viewport reset.
+No W5 native/device/GUI lease was held. The queued owners were notified of actual
+release. Current native, full four-view/theme/keyboard/saved return, independent
+fan revocation, outage/recovery and action retry/readback acceptance remain open.
 
 ## Current run at8aeca5f1
 
