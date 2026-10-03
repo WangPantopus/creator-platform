@@ -1,5 +1,25 @@
 # Creator call-offer and genuine recording retry lifetime — 3 October 2026
 
+## Retained PR282 source reconciliation — 18:08 UTC
+
+Producta257e3313562e7dcb6fe9c3950c8cd79e9b33830 normally merges the complete
+published W1b0c15d51 producer/consumer graph into the existing calls branch.
+W6 personally compared the two conflicted identity files with their genuine
+canonical successor and retained W1's full boundary/namespace guard. Ordinary
+disposal remains distinct from genuine tuple end; cross-tab hints require an
+actual bounded reread and old snapshots cannot erase a newer namespace marker.
+All unique native/web call offers, exact command retries and original signing
+producer remain; no replacement implementation or tests are added.
+
+Current combined web/backend types, canonical12 resources/115 operations and
+all13 merged app-path lint/format/diff checks pass. No new shipping build,
+installation or runtime operation is supplied. Earlierc408/dd52 receipts below
+retain their actual pins. Existing282 is stacked on W1 PR296, with original
+signing source also dependent on W1's retained35→74 graph. Both prerequisite
+acceptance and exact-head CI/relevant E2E remain open; queued/old passes are not
+admission. Actual offer/call/media rows remain last-observed0; no new DB read is
+claimed during the shared Docker outage. All W6 resources stay closed.
+
 ## Canonical producer personally operated — 15:33 UTC
 
 This section supersedes the cold-page cleanup holds in the earlier runs below.
