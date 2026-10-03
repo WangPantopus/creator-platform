@@ -1,5 +1,40 @@
 # Native Team domain source and compilation
 
+## Current original-session composition at28a5d14a
+
+The renewed review found a local lifetime gap around the suspended genuine
+`capture.isCurrent()` check. The Team component now checks its own original
+generation/account/session/cancellation again after that check in both Swift
+and Kotlin, including expiry, read, write and error-result paths. This is a
+domain view bookend, not a replacement issuer or a copy of W1's root authority.
+
+Ordinary exact merge `2b925949cdd557e752d4076ff25cd344b68c982a` consumes W1's
+published existing21 producer `e446d4232fe8ae4e122bfcf01d69b2c7969d3513`,
+including the complete b0 web host/negative cleanup and the actual115 native
+SDK/root adaptation of c03de336. The real original FanSession capture supplies
+both account and session denial pins. Absent later Intro/Push contracts remain
+absent; no hand-written generated API, SDK stub, guessed route or new PR was
+introduced. Both branches include captured main5c08634b.
+
+Product `28a5d14add70c9e4cc89960f69fe31299049f081` additionally conceals the
+private body and actions during genuine checking/busy/error states. Temporary
+readiness loss preserves the same mounted identity's unsent reviewed selection.
+Once a role command can begin dispatch, its original capture and exact tuple
+are locked as unconfirmed; a later temporary account check or interrupted result
+cannot silently unlock editing or fabricate acknowledgement. An actual current
+successful response is still required to mark it saved. The earlier explicit
+stale-role review fix remains present.
+
+At28a5, web/backend types,115-operation/12-resource canonical consistency, Swift
+source parsing and diff checks pass. Current shipping builds, existing required
+CI and personally operated app acceptance remain pending. W1's actual shipping
+Team registration/navigation/profile-gate contract is still absent, so these
+components remain unmounted. Historical77 builds and owner native observations
+are not transferred. Implemented: these domain guards and original producer
+consumption. Runnable/integrated/verified: bounded by current checks and the
+missing root/build/app qualifications. Release-ready:false; all nine whole W5
+packages remain incomplete.
+
 ## Renewed existing-PR review at249d3b36
 
 The current PR293 source review found that native role choices remained editable

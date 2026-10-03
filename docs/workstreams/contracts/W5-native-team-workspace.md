@@ -32,8 +32,9 @@ screen on navigation, account/session replacement and route delivery. The domain
 component independently binds the supplied session's actual account, session and
 destination. It captures requests only through that model's issuer-bound
 `captureRequest` (262,144 bytes, four-second request timeout), with original
-capture `isCurrent()` bookends. It does not reconstruct credentials or accept an
-actor/account supplied by a route.
+capture `isCurrent()` bookends. The domain also checks its original local view
+generation/account/session/cancellation after the issuer check suspends. It does
+not reconstruct credentials or accept an actor/account supplied by a route.
 
 The directory comes from generated `studioSession()`. A Team read uses that
 directory, generated `studioTeam(creatorId)`, then another actual Studio session
@@ -46,11 +47,15 @@ seconds. Inactive/disposed views cancel their own operations and clear private
 state. A transient unavailable read conceals the body and controls while keeping
 the same mounted account's unsent role selection for recovery. Actual
 401/403/404, changed identity and disposal clear it.
+Genuine account checking, busy or error states also conceal the body and actions;
+temporary readiness loss alone does not discard the reviewed selection.
 
 Only a current owned verified creator view offers role editing. Writes use the
 generated `updateTeamMemberRoles` with the original captured expected-account
 header and immutable reviewed `expectedRoles`/desired `roles`. An interrupted
 response locks selection; explicit Retry uses that original capture and tuple.
+The tuple is locked when dispatch can begin, so a later account check or a result
+that cannot be applied never silently enables edits or claims it was saved.
 There is no automatic replay or invented idempotency/signature key. If current
 membership is neither reviewed nor desired, explicit Review current roles adopts
 the actual current set while preserving desired choices. A current desired set
