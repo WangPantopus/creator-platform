@@ -1,0 +1,19 @@
+{
+  "recordedAt": "2026-10-01T13:10:27.814633+00:00",
+  "removedOwnedDisposablePaths": [
+    "/private/tmp/creator-platform-w1-rename-20261001",
+    "/Users/yingpengwang/.codex/worktrees/0516/creator-platform/artifacts/workstreams/W1/build/rename-ios-current-20261001",
+    "/Users/yingpengwang/.codex/worktrees/0516/creator-platform/artifacts/workstreams/W1/build/rename-android-current-20261001",
+    "/Users/yingpengwang/.codex/worktrees/0516/creator-platform/apps/web/.next-w1-onboarding-build-20261001"
+  ],
+  "allRemoved": true,
+  "retained": [
+    "Main final shipping native products",
+    "W1 main SourcePackages cache, reusable native tools and private signing/debug keys",
+    "Current integrated web build and loopback preview 3011",
+    "Current backend and W1-only database/container 55451",
+    "Private build logs and full original asset digests outside Git",
+    "Every peer checkout, process, database, cache and device"
+  ],
+  "qualification": "Removed only verified owned disposable rename copies/products and the stopped superseded Next output after current product hashes, metadata and asset custody were retained. No native device was allocated; no shared Docker pruning."
+}

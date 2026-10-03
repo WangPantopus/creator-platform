@@ -22,7 +22,7 @@ fun fanFeatures(context: Context, baseURL: String?): List<FanFeatureRegistration
         allowsSignedOut = { it == "/discover" || it.startsWith("/invite/") || it.startsWith("/share/") || (it.startsWith("/creators/") && !it.contains("/chat")) },
         screen = { model ->
             val scope = rememberCoroutineScope()
-            GrowthFanFeature(baseURL, token = model::currentToken, destination = model.destination, onSignIn = { model.open(it); scope.launch { model.beginSignIn() } })
+            GrowthFanFeature(baseURL, token = model::currentToken, destination = model.destination, onNavigate = model::open, onSignIn = { model.open(it); scope.launch { model.beginSignIn() } })
         }
     )
 ) + W6FanFeatures.registrations

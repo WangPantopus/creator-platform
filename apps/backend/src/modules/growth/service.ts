@@ -15,6 +15,7 @@ import {
   CreatorProjection,
   ContentProjection,
   Destination,
+  HomeThreadDestination,
   Preferences,
   defaultPreferences,
   InsightSignal,
@@ -338,7 +339,13 @@ export class GrowthService {
       };
     });
     const entries = (await this.owners.home(actor))
-      .filter((e) => Destination.safeParse(e.destination).success)
+      .filter(
+        (e) =>
+          Destination.safeParse(e.destination).success ||
+          (e.kind === "thread" &&
+            HomeThreadDestination.safeParse(e.destination).success &&
+            e.destination.split("/")[2] === e.creatorId),
+      )
       .sort(
         (a, b) =>
           Number(b.kind !== "thread") - Number(a.kind !== "thread") ||
