@@ -1,4 +1,5 @@
 import type { PoolClient, QueryConfig } from "pg";
+import { DomainError } from "../../core/errors.js";
 import { querySettlementUncertain } from "../../core/query-settlement.js";
 
 // Installed pg supports a per-query read deadline. Its QueryConfig declaration
@@ -68,7 +69,13 @@ export class ContentHeldClient {
 
   async begin(): Promise<void> {
     this.discard = true;
-    await this.run(() => this.client.query(control("BEGIN")));
+    const result = await this.run(() => this.client.query(control("BEGIN")));
+    if (result.command !== "BEGIN")
+      throw new DomainError(
+        "content_privacy_begin_unavailable",
+        "The original Content transaction could not begin.",
+        503,
+      );
     this.transaction = true;
     this.discard = false;
   }
@@ -76,7 +83,13 @@ export class ContentHeldClient {
   async commit(): Promise<void> {
     // Uncertain BEGIN/COMMIT cannot be followed by another SQL command.
     this.discard = true;
-    await this.run(() => this.client.query(control("COMMIT")));
+    const result = await this.run(() => this.client.query(control("COMMIT")));
+    if (result.command !== "COMMIT")
+      throw new DomainError(
+        "content_privacy_commit_unavailable",
+        "The actual Content commit receipt is required.",
+        503,
+      );
     this.transaction = false;
     this.discard = false;
   }
