@@ -16,6 +16,10 @@ import { AgentService } from "./service.js";
 import type { AgentModel } from "./model.js";
 import { ProviderResponseError } from "./response-usage.js";
 import type { StreamProposal } from "./streaming.js";
+import {
+  assertGenerationConsumerCustody,
+  type GenerationConsumerCustody,
+} from "./generation-consumer-catalogue.js";
 
 export const GENERATION_PROVIDER_MIGRATION =
   "0181_w2_generation_attempt_admission";
@@ -75,6 +79,7 @@ export class PreparedGenerationProviderAccounting {
     private readonly inputs: PreparedGenerationAgentInputs,
     private readonly context: PreparedGenerationConversationContext,
     private readonly journal: PreparedGenerationJournal,
+    private readonly custody: GenerationConsumerCustody,
   ) {}
 
   assertComposition(input: {
@@ -103,6 +108,8 @@ export class PreparedGenerationProviderAccounting {
     context: PreparedGenerationConversationContext;
     journal: PreparedGenerationJournal;
     consumers: readonly GenerationPurposeConsumer[];
+    /** Independently reviewed effective permission/RLS catalogue. */
+    catalogueChecksum: string;
   }): Promise<PreparedGenerationProviderAccounting> {
     const model = input.service.pipeline.model;
     invariant(
@@ -122,9 +129,17 @@ export class PreparedGenerationProviderAccounting {
     input.inputs.assertHostPool(input.service.repository.pool);
     input.context.assertHostPool(input.service.repository.pool);
     input.journal.assertPool(input.service.repository.pool);
-    const consumers = [...input.consumers];
+    const consumers = Object.freeze(
+      input.consumers.map((consumer) =>
+        Object.freeze({
+          ...consumer,
+          migration: Object.freeze({ ...consumer.migration }),
+        }),
+      ),
+    );
     invariant(
-      consumers.length === GENERATION_PROVIDER_SIGNATURES.length &&
+      Hash.safeParse(input.catalogueChecksum).success &&
+        consumers.length === GENERATION_PROVIDER_SIGNATURES.length &&
         GENERATION_PROVIDER_SIGNATURES.every(
           (signature) =>
             consumers.filter((consumer) => consumer.signature === signature)
@@ -141,7 +156,18 @@ export class PreparedGenerationProviderAccounting {
       "generation_provider_unconfigured",
       "Use all three exact source-reviewed accounting consumers.",
     );
+    const custody: GenerationConsumerCustody = Object.freeze({
+      owner,
+      consumers,
+      catalogueChecksum: input.catalogueChecksum,
+      callers: Object.freeze([]),
+      dependencies: Object.freeze([
+        "creator.generation_scope_matches(uuid,uuid)",
+        "creator.generation_agent_inputs(uuid,uuid)",
+      ]),
+    });
     try {
+      await assertGenerationConsumerCustody(input.workerPool, custody);
       for (const consumer of consumers) {
         input.identity.assertConsumerRegistered(consumer);
         const row = (
@@ -195,6 +221,7 @@ export class PreparedGenerationProviderAccounting {
       input.inputs,
       input.context,
       input.journal,
+      custody,
     );
   }
 
@@ -203,6 +230,7 @@ export class PreparedGenerationProviderAccounting {
     scope: GenerationTaskScope,
   ): Promise<GenerationProviderAttempt> {
     await this.identity.authorizeInTransaction(scope, client);
+    await assertGenerationConsumerCustody(client, this.custody);
     await this.journal.assertClient(client);
     const context = await this.context.currentInTransaction(client, scope);
     const facts = await this.inputs.currentInTransaction(client, scope);
@@ -233,6 +261,7 @@ export class PreparedGenerationProviderAccounting {
     await this.inputs.authorizeInTransaction(facts, scope, client);
     await this.context.assertCurrentInTransaction(client, scope, context);
     await this.identity.authorizeInTransaction(scope, client);
+    await assertGenerationConsumerCustody(client, this.custody);
     const attempt = Object.freeze({
       generationId: scope.generationId,
       workerToken: scope.workerToken,
@@ -261,6 +290,7 @@ export class PreparedGenerationProviderAccounting {
       "Use this worker's actual current issued provider attempt.",
     );
     await this.identity.authorizeInTransaction(scope, client);
+    await assertGenerationConsumerCustody(client, this.custody);
     await this.journal.assertClient(client);
     const context = await this.context.currentInTransaction(client, scope);
     const facts = await this.inputs.currentInTransaction(client, scope);
@@ -286,6 +316,7 @@ export class PreparedGenerationProviderAccounting {
     await this.inputs.authorizeInTransaction(facts, scope, client);
     await this.context.assertCurrentInTransaction(client, scope, context);
     await this.identity.authorizeInTransaction(scope, client);
+    await assertGenerationConsumerCustody(client, this.custody);
     const admitted = Object.freeze({ id: z.uuid().parse(raw) });
     this.admissions.set(admitted, {
       generationId: scope.generationId,
@@ -342,6 +373,10 @@ export class PreparedGenerationProviderAccounting {
         "generation_completion_pool_changed",
         "Use the original distinct worker pool without interactive identity.",
       );
+      // Completion keeps only its original private admission capability after
+      // revocation. Check accounting custody without requiring new read/admit
+      // authority, so an incurred charge can still be recorded truthfully.
+      await assertGenerationConsumerCustody(client, this.custody);
       const updated = (
         await client.query<{ completed: boolean }>(
           "SELECT creator.generation_finish_provider_usage($1,$2,$3,$4,$5::jsonb,$6) AS completed",
@@ -360,6 +395,7 @@ export class PreparedGenerationProviderAccounting {
         "generation_usage_completion_missing",
         "The original admitted usage must persist its actual reported charge.",
       );
+      await assertGenerationConsumerCustody(client, this.custody);
       await client.query("COMMIT");
       custody.completed = true;
       custody.capability = "";

@@ -22,7 +22,11 @@ import {
 import type { AgentModel } from "./model.js";
 import { compile } from "./pipeline.js";
 import { AgentService } from "./service.js";
-import { generationConsumerCatalogue } from "./generation-consumer-catalogue.js";
+import {
+  generationConsumerCatalogue,
+  assertGenerationConsumerCustody,
+  type GenerationConsumerCustody,
+} from "./generation-consumer-catalogue.js";
 
 export const GENERATION_RETRIEVAL_MIGRATION =
   "0187_w2_generation_retrieval_context";
@@ -106,6 +110,7 @@ export class PreparedGenerationRuntimeContext {
     private readonly inputs: PreparedGenerationAgentInputs,
     private readonly context: PreparedGenerationConversationContext,
     private readonly accounting: PreparedGenerationProviderAccounting,
+    private readonly custody: GenerationConsumerCustody,
   ) {}
 
   static async prepare(input: {
@@ -136,7 +141,10 @@ export class PreparedGenerationRuntimeContext {
     input.inputs.assertHostPool(input.service.repository.pool);
     input.context.assertHostPool(input.service.repository.pool);
     input.accounting.assertComposition(input);
-    const receipt = input.consumer;
+    const receipt = Object.freeze({
+      ...input.consumer,
+      migration: Object.freeze({ ...input.consumer.migration }),
+    });
     input.identity.assertConsumerRegistered(receipt);
     invariant(
       receipt.owner === owner &&
@@ -148,7 +156,21 @@ export class PreparedGenerationRuntimeContext {
       "generation_retrieval_unconfigured",
       "The exact reviewed stored-source retrieval executable and catalogue are required.",
     );
+    const custody: GenerationConsumerCustody = Object.freeze({
+      owner,
+      consumers: Object.freeze([receipt]),
+      catalogueChecksum: input.catalogueChecksum,
+      callers: Object.freeze([]),
+      dependencies: Object.freeze([
+        "creator.generation_scope_matches(uuid,uuid)",
+        "creator.generation_agent_inputs(uuid,uuid)",
+        "creator.generation_allowance_audience(uuid,uuid)",
+        "creator.generation_content_origins(uuid,uuid,jsonb)",
+        "creator.canonical_json(jsonb)",
+      ]),
+    });
     try {
+      await assertGenerationConsumerCustody(input.workerPool, custody);
       const row = (
         await input.workerPool.query<{ ready: boolean; definition: string }>(
           `SELECT session_user='creator_generation_worker' AND current_user=session_user
@@ -203,6 +225,7 @@ export class PreparedGenerationRuntimeContext {
       input.inputs,
       input.context,
       input.accounting,
+      custody,
     );
   }
 
@@ -272,6 +295,7 @@ export class PreparedGenerationRuntimeContext {
       "Use this actual accepted turn's privately issued model embedding.",
     );
     await this.identity.authorizeInTransaction(scope, client);
+    await assertGenerationConsumerCustody(client, this.custody);
     const conversation = await this.context.currentInTransaction(client, scope);
     invariant(
       query.acceptedHash === contentHash({ text: conversation.acceptedText }),
@@ -318,6 +342,7 @@ export class PreparedGenerationRuntimeContext {
     await this.inputs.authorizeInTransaction(facts, scope, client);
     await this.context.assertCurrentInTransaction(client, scope, conversation);
     await this.identity.authorizeInTransaction(scope, client);
+    await assertGenerationConsumerCustody(client, this.custody);
     return freeze(value);
   }
 
