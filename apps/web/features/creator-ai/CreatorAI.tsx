@@ -33,6 +33,7 @@ import {
   developmentProofReference,
 } from "../../../../packages/api/src/agent/contracts";
 import "./creator-ai.css";
+import { sessionChannel } from "../identity/session-boundary";
 
 type ErrorBody = { error?: { code: string; message: string } };
 type CreatorAIIdentity = Readonly<{
@@ -81,6 +82,33 @@ function storeDraft(key: string, value: unknown) {
     else localStorage.setItem(key, JSON.stringify(value));
   } catch {
     /* Private browsing may disable storage; server drafts still work. */
+  }
+}
+function purgeStoredDrafts(accountId?: string) {
+  try {
+    const prefixes = ["w2-source", "w2-interview", "w2-config"].map(
+      (kind) => `${kind}:${accountId ? `${accountId}:` : ""}`,
+    );
+    const sessionKey = accountId ? `w2-session:${accountId}` : null;
+    for (const key of Object.keys(localStorage))
+      if (
+        prefixes.some((prefix) => key.startsWith(prefix)) ||
+        (sessionKey ? key === sessionKey : key.startsWith("w2-session:"))
+      )
+        localStorage.removeItem(key);
+  } catch {
+    /* Unavailable storage cannot restore a draft. */
+  }
+}
+let draftSessionEnds: BroadcastChannel | undefined;
+function watchDraftSessionEnd() {
+  // The negative canonical notification must still clear this app's buffers
+  // after navigating to Account. It never supplies identity or authority.
+  if (!draftSessionEnds && typeof BroadcastChannel !== "undefined") {
+    draftSessionEnds = new BroadcastChannel(sessionChannel);
+    draftSessionEnds.onmessage = (event) => {
+      if (event.data === "ended") purgeStoredDrafts();
+    };
   }
 }
 function Button({
@@ -377,21 +405,8 @@ export function CreatorAI({
       !isSessionEnded
     )
       return;
+    watchDraftSessionEnd();
     const sessionKey = `w2-session:${identityAccount}`;
-    const purgeStoredDrafts = () => {
-      try {
-        const prefixes = ["w2-source", "w2-interview", "w2-config"].map(
-          (kind) => `${kind}:${identityAccount}:`,
-        );
-        const keys = Object.keys(localStorage).filter((key) =>
-          prefixes.some((prefix) => key.startsWith(prefix)),
-        );
-        for (const key of keys) localStorage.removeItem(key);
-        localStorage.removeItem(sessionKey);
-      } catch {
-        /* Storage may already be unavailable; the account boundary unmounts. */
-      }
-    };
     const dispose = () => {
       ++fetchSequence.current;
       ++sourceFileSequence.current;
@@ -400,13 +415,14 @@ export function CreatorAI({
       // The canonical boundary disposes private React state on navigation and
       // effect restart too. Only its original genuine session end deletes the
       // stored buffers that the same continuing session may recover.
-      if (isSessionEnded()) purgeStoredDrafts();
+      if (isSessionEnded()) purgeStoredDrafts(identityAccount);
     };
     if (identitySignal.aborted) dispose();
     else {
       // Access-token rotation retains the server session ID. Fresh sign-in
       // creates another ID, so a draft left on an unmounted page cannot return.
-      if (readDraft(sessionKey) !== identitySession) purgeStoredDrafts();
+      if (readDraft(sessionKey) !== identitySession)
+        purgeStoredDrafts(identityAccount);
       storeDraft(sessionKey, identitySession);
       identitySignal.addEventListener("abort", dispose, { once: true });
     }
