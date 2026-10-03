@@ -10330,11 +10330,11 @@ public actor CreatorAPIClient {
   public func playAudienceCreatorMedia(creatorId: String, assetId: String, ticket: String, range: String? = nil, xQelvoraExpectedAccount: String? = nil, expectedAccountId: String? = nil) async throws -> CreatorAPIBinaryResponse {
     try await requestBytes("/v1/w6/creators/\(segment(creatorId))/audience-media/\(segment(assetId))/play", method: "GET", authenticated: true, query: [URLQueryItem(name: "ticket", value: ticket), URLQueryItem(name: "expectedAccountId", value: expectedAccountId)], headers: ["Range": range, "x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
   }
-  public func readCreatorCallAvailability(creatorId: String) async throws -> APICallAvailabilityView {
-    try await request("/v1/w6/creators/\(segment(creatorId))/call-availability", method: "GET", authenticated: true)
+  public func readCreatorCallAvailability(creatorId: String, xQelvoraExpectedAccount: String? = nil) async throws -> APICallAvailabilityView {
+    try await request("/v1/w6/creators/\(segment(creatorId))/call-availability", method: "GET", authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
   }
-  public func saveCreatorCallAvailability(creatorId: String, body: APICallAvailabilityCommand) async throws -> APICallAvailability {
-    try await request("/v1/w6/creators/\(segment(creatorId))/call-availability", method: "PUT", body: JSONEncoder().encode(body), authenticated: true)
+  public func saveCreatorCallAvailability(creatorId: String, xQelvoraExpectedAccount: String? = nil, body: APICallAvailabilityCommand) async throws -> APICallAvailability {
+    try await request("/v1/w6/creators/\(segment(creatorId))/call-availability", method: "PUT", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
   }
   public func beginCreatorMedia(creatorId: String, body: APIMediaCreatorMediaUploadRequest) async throws -> APIMediaCreatorMediaUploadTicket {
     try await request("/v1/w6/creators/\(segment(creatorId))/media", method: "POST", body: JSONEncoder().encode(body), authenticated: true)

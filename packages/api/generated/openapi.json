@@ -10497,6 +10497,16 @@
             "type": "string",
             "format": "uuid"
           }
+        },
+        {
+          "in": "header",
+          "name": "x-qelvora-expected-account",
+          "required": false,
+          "description": "Pin to the original account. Must match the actual current session; never grants authority.",
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
         }
       ],
       "get": {

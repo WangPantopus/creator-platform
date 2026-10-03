@@ -209,7 +209,7 @@ export const mediaPaths = {
     },
   },
   "/v1/w6/creators/{creatorId}/call-availability": {
-    parameters: [path("creatorId")],
+    parameters: [path("creatorId"), expectedAccountHeader],
     get: operation("readCreatorCallAvailability", "CallAvailabilityView"),
     put: operation(
       "saveCreatorCallAvailability",
