@@ -105,12 +105,12 @@ export async function startMediaWorker(
     : undefined;
   const threadWorker = new MediaWorker(
     media,
+    (scope, work) =>
+      workerDatabase.transaction({ kind: "thread", ...scope }, work),
     scanner,
     credentials,
     environment.ffmpeg,
     environment.ffprobe,
-    (scope, work) =>
-      workerDatabase.transaction({ kind: "thread", ...scope }, work),
   );
   // Restore only purpose-specific worker RLS, including after request/session,
   // profile verification, owner or thread authority has been revoked.
