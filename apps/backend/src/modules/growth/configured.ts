@@ -7,6 +7,10 @@ import {
   canonicalCreatorOwner,
   canonicalContentFollows,
 } from "./integration.js";
+import {
+  canonicalCreatorProjections,
+  type PublicCreatorAIProjection,
+} from "./creator-projection.js";
 import { createGrowthRuntime } from "./runtime.js";
 import type {
   GrowthPrivacyScope,
@@ -15,6 +19,22 @@ import type {
 import type { DeliveryProvider } from "./notifications.js";
 import type { GrowthEventSources } from "./relay.js";
 import type { ActivationSource, ThanksPermission } from "./retention.js";
+import {
+  spendingNotificationState,
+  type SpendingNotificationReader,
+} from "./account-notifications.js";
+import {
+  canonicalCoreContentFollows,
+  type CoreFollowMigration,
+} from "./core-follows.js";
+import {
+  weeklyImpactNotificationState,
+  type WeeklyImpactNoticeReader,
+} from "./impact-notifications.js";
+import {
+  canonicalPostEntryContext,
+  type CurrentPostEntryReader,
+} from "./entry-context.js";
 
 /** Canonical host seam. Owner callbacks are injected; absent producers never become fixtures. */
 export async function configureGrowthForBackend(
@@ -22,13 +42,24 @@ export async function configureGrowthForBackend(
     pool: pg.Pool;
     identity: IdentityRuntime | undefined;
     owners?: Partial<GrowthOwners>;
+    publicCreatorAI?: PublicCreatorAIProjection;
     privacyScope?: GrowthPrivacyScope;
     privacyTaskAuthority?: GrowthPrivacyTaskAuthority;
     assertAllowed?: Parameters<typeof canonicalCreatorOwner>[1];
     provider?: DeliveryProvider;
     sources?: GrowthEventSources;
+    sourceScan?: Parameters<typeof createGrowthRuntime>[0]["sourceScan"];
     activationSource?: ActivationSource;
     thanksPermission?: ThanksPermission;
+    weeklyImpactSource?: Parameters<
+      typeof createGrowthRuntime
+    >[0]["weeklyImpactSource"];
+    /** Actual W8 receipt for the unregistered core Follow proposal; absent stays unavailable. */
+    coreFollowMigration?: CoreFollowMigration;
+    spendingNotices?: SpendingNotificationReader;
+    weeklyImpactNotices?: WeeklyImpactNoticeReader;
+    /** W5's actual current recipient/public-entry purpose, never a public DTO fallback. */
+    postEntryReader?: CurrentPostEntryReader;
     experimentsEnabled?: boolean;
   },
   env: NodeJS.ProcessEnv = process.env,
@@ -49,14 +80,42 @@ export async function configureGrowthForBackend(
     connectionTimeoutMillis: 5000,
     statement_timeout: 5000,
   });
+  // Idle connection loss is reported by the pool, outside the tick's promise.
+  // pg removes that client; later ticks still claim and recheck real leases.
+  worker.on("error", () => {
+    console.warn(
+      "Growth worker database connection lost; leased work requires reconnecting.",
+    );
+  });
   try {
     const runtime = await createGrowthRuntime({
       runtimePool: input.pool,
       workerPool: worker,
       secret: Buffer.from(env.GROWTH_ENCRYPTION_KEY!, "hex"),
+      creatorSource: canonicalCreatorProjections(
+        input.pool,
+        input.publicCreatorAI,
+      ),
       owners: {
         ...unavailableOwners,
         ...input.owners,
+        notificationState: async (event, recipient, custody) =>
+          event.type === "spending_reminder"
+            ? spendingNotificationState(input.spendingNotices)(
+                event,
+                recipient,
+                custody,
+              )
+            : event.type === "weekly_impact"
+              ? weeklyImpactNotificationState(input.weeklyImpactNotices)(
+                  event,
+                  recipient,
+                  custody,
+                )
+              : (
+                  input.owners?.notificationState ??
+                  unavailableOwners.notificationState
+                )(event, recipient, custody),
         creatorFor: input.assertAllowed
           ? canonicalCreatorOwner(input.identity.profiles, input.assertAllowed)
           : async (actor) => {
@@ -81,9 +140,12 @@ export async function configureGrowthForBackend(
       privacyScope: input.privacyScope,
       privacyTaskAuthority: input.privacyTaskAuthority,
       provider: input.provider,
+      verificationOrigin: env.GROWTH_PUBLIC_ORIGIN,
       sources: input.sources,
+      sourceScan: input.sourceScan,
       activationSource: input.activationSource,
       thanksPermission: input.thanksPermission,
+      weeklyImpactSource: input.weeklyImpactSource,
       experimentsEnabled: input.experimentsEnabled,
       installURLs: {
         ...(env.GROWTH_IOS_INSTALL_URL
@@ -94,12 +156,26 @@ export async function configureGrowthForBackend(
           : {}),
       },
     });
+    let closeInFlight: Promise<void> | undefined;
     return {
       ...runtime,
+      postEntryContext: canonicalPostEntryContext(
+        runtime.service,
+        input.postEntryReader,
+      ),
       contentFollows: canonicalContentFollows(),
-      async close() {
-        await runtime.stop();
-        await worker.end();
+      coreContentFollows: canonicalCoreContentFollows(
+        input.coreFollowMigration,
+      ),
+      close() {
+        closeInFlight ??= (async () => {
+          try {
+            await runtime.stop();
+          } finally {
+            await worker.end();
+          }
+        })();
+        return closeInFlight;
       },
     };
   } catch (error) {

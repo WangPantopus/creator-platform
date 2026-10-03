@@ -267,6 +267,10 @@
   gap: 24px;
   border-radius: var(--radius-xl);
 }
+.growth-export--approved {
+  background: var(--ai-surface);
+  color: var(--ai-ink);
+}
 .growth-export a {
   word-break: break-all;
 }

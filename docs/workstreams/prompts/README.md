@@ -1,6 +1,6 @@
 # Eight paste-ready workstream prompts
 
-For the next W1 agent, use the [W1 continuation prompt](W1-resume-handoff.md) together with the [W1 handoff](../handoffs/W1-platform-identity.md). This starts from the preserved feature-branch checkpoint and retains the full original assignment below.
+For the next W1 agent, use the [October1 complete continuation prompt](W1-resume-2026-10-01.md) together with the [current W1 handoff](../handoffs/W1-resume-2026-10-01.md). It starts from the full published implementation chain, lifts the earlier resource/native-verification holds, requires actual three-client end-to-end operation without new unit tests and authorizes ready PRs and normal ready merges. The full original assignment remains.
 
 For the next W2 agent, use the [October 1 complete continuation prompt](W2-resume-20261001.md) and [current W2 handoff](../handoffs/W2-creator-ai-20261001.md). They preserve all nine packages/R01–R14 and latest human authorization to restore needed runtimes, personally verify all three apps, open ready PRs and merge ready PRs normally.
 

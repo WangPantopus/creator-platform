@@ -1,0 +1,243 @@
+{
+  "recordedAt": "2026-10-01T13:09:13.953668+00:00",
+  "branch": "codex/w1-home-host-20261001",
+  "applicationSourceRevision": "552e2528b0ccefa8ea3005cd54eb7969c9059a02",
+  "integratedMainRevision": "2824ed4e0079eb1a30ce177439fb3579be955ef9",
+  "stackIntegrationRevision": "f345e94b97f2b716dc618c2dccc6a2eb11be8995",
+  "sourceFiles": [
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanFeatures.kt",
+      "sha256": "85edf90c36a8d8470c4c1fd66d6744771fb2421a01e69671a71140407243856e",
+      "bytes": 1620,
+      "modifiedAt": "2026-10-01T12:39:29.355672+00:00"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/Growth.kt",
+      "sha256": "a8fb1b4064d9ab41434cb5bcd8934f06d68908aebcef1a51aa7b60f5f54fd231",
+      "bytes": 24686,
+      "modifiedAt": "2026-10-01T12:39:29.355179+00:00"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/contracts.ts",
+      "sha256": "4d0073ee37bf5087d560e9fd714ad6adcbff530cf376964bf023e4e2c5fead7a",
+      "bytes": 8477,
+      "modifiedAt": "2026-10-01T12:34:47.392972+00:00"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/home.ts",
+      "sha256": "c97f3b683ead88ee81227087a392b4860b5364b87f6a1beb7461d29156ef5842",
+      "bytes": 5956,
+      "modifiedAt": "2026-10-01T12:34:47.394139+00:00"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/service.ts",
+      "sha256": "50040f5507a76588e3220d036f339e39e25ea5faafbd3c1b15a0af6ef3fb35a9",
+      "bytes": 41671,
+      "modifiedAt": "2026-10-01T12:34:47.393751+00:00"
+    },
+    {
+      "path": "apps/backend/src/server.ts",
+      "sha256": "0117ea1afabc87a2b34c46a1a122709569d1b28ec49ac4f28979e2277c28612a",
+      "bytes": 5559,
+      "modifiedAt": "2026-10-01T12:34:47.394476+00:00"
+    },
+    {
+      "path": "apps/ios/App/QelvoraApp.swift",
+      "sha256": "4404db037d09be3ce820decaac961a8eba8a5298a7c5d13e147d1dff904fb40f",
+      "bytes": 3004,
+      "modifiedAt": "2026-10-01T12:39:29.354408+00:00"
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Growth.swift",
+      "sha256": "f13d0f46e5ac956b841e854c8dc4f1c1ea24fb3aafdbaad36cc96bf59bf960a8",
+      "bytes": 27793,
+      "modifiedAt": "2026-10-01T12:39:29.353936+00:00"
+    }
+  ],
+  "supportingChecks": {
+    "canonicalGeneration": "passed; 12 resources / 96 operations; no emitted source difference",
+    "backend": "TypeScript and bundled executable passed after Home destination changes",
+    "productionWeb": "passed on f345e94; all web/shared/canonical config sources byte-identical at 552e252",
+    "shippingIos": "normal generic iOS Simulator build, maximum 2 jobs passed on current Home/native navigation source",
+    "shippingAndroid": "offline shipping assembleDebug, no daemon, maximum 2 workers passed on current Home/native navigation source",
+    "affectedEslintPrettierDiff": "passed",
+    "originalBackendContractAssertions": "All 9 original assertions passed; none edited or added",
+    "newTests": false
+  },
+  "mainProducts": {
+    "backend": {
+      "path": "apps/backend/dist/server.mjs",
+      "sha256": "a93244105cd46e88f6c4f3f060752bd134fbbe82ecaa9b9b3f62a58829bc50e4",
+      "bytes": 1173655,
+      "modifiedAt": "2026-10-01T12:35:17.191008+00:00"
+    },
+    "webBuildId": "nVdb_YnNe9vCugA7SD_Ao",
+    "ios": {
+      "bundleIdentifier": "com.pantopus.qelvora",
+      "displayName": "Qelvora",
+      "bundleName": "QelvoraApp",
+      "executable": {
+        "path": "artifacts/workstreams/W1/build/ios-20261001/Build/Products/Debug-iphonesimulator/QelvoraApp.app/QelvoraApp",
+        "sha256": "05b96e765f9bb9e483d9ec4c79f37cd4b0d07156416d09e3bbf32cd842c3d299",
+        "bytes": 123808,
+        "modifiedAt": "2026-10-01T12:41:00.533455+00:00"
+      },
+      "debugLibrary": {
+        "path": "artifacts/workstreams/W1/build/ios-20261001/Build/Products/Debug-iphonesimulator/QelvoraApp.app/QelvoraApp.debug.dylib",
+        "sha256": "9171e6014d12e468969eb1e9912878aa54c55045ba0dd9c8686288cc36dc00f0",
+        "bytes": 58086336,
+        "modifiedAt": "2026-10-01T12:41:00.291131+00:00"
+      },
+      "strictOnDiskSignature": "passed; compilation/signature verification only, no installation or secure-storage acceptance"
+    },
+    "android": {
+      "applicationId": "com.pantopus.qelvora",
+      "variant": "debug",
+      "apk": {
+        "path": "artifacts/workstreams/W1/build/android-20261001/app/outputs/apk/debug/app-debug.apk",
+        "sha256": "d40717456f1011a870988e6ffe23888cd1dfb79d02f3eab611c26bd9a298f887",
+        "bytes": 15033608,
+        "modifiedAt": "2026-10-01T12:44:24.748958+00:00"
+      },
+      "versionName": "0.1.0",
+      "minSdkVersionForDexing": 26,
+      "qualification": "Shipping debug compiler output; no emulator installation, launch, interaction, secure storage or provider/device acceptance."
+    }
+  },
+  "freshRename": {
+    "sourceRevision": "552e2528b0ccefa8ea3005cd54eb7969c9059a02",
+    "temporaryBrand": "W1Rename",
+    "changedTextFilesAndPaths": 814,
+    "lockedOfflineInstallation": "374 reused / 0 downloaded; no lockfile change",
+    "canonicalGeneration": "passed; 12 resources / 96 operations",
+    "backend": "passed",
+    "productionWeb": "passed",
+    "shippingIos": "passed; normal generic Simulator maximum 2 jobs; reused W1 SourcePackages cache only",
+    "shippingAndroid": "passed; offline assembleDebug, no daemon, maximum 2 workers; all 37 tasks executed",
+    "backendProduct": {
+      "path": "apps/backend/dist/server.mjs",
+      "sha256": "f6a8838147c58f285f9c89a716707a2372ca8f219cd4410ee0105094661f1710",
+      "bytes": 1173663,
+      "modifiedAt": "2026-10-01T12:47:38.313096+00:00"
+    },
+    "webBuildId": "54Bo1UOWsHNLYpNN8O5q9",
+    "ios": {
+      "bundleIdentifier": "com.pantopus.w1rename",
+      "displayName": "W1Rename",
+      "bundleName": "W1RenameApp",
+      "executable": {
+        "path": "artifacts/workstreams/W1/build/rename-ios-current-20261001/Build/Products/Debug-iphonesimulator/W1RenameApp.app/W1RenameApp",
+        "sha256": "f8e40e94866308cf1881a775cfc8a7e030251269ec0ea35aab0a02e03dfd3b3f",
+        "bytes": 123808,
+        "modifiedAt": "2026-10-01T12:52:16.041385+00:00"
+      },
+      "debugLibrary": {
+        "path": "artifacts/workstreams/W1/build/rename-ios-current-20261001/Build/Products/Debug-iphonesimulator/W1RenameApp.app/W1RenameApp.debug.dylib",
+        "sha256": "d7ae13cfadf3d8a22aee32aa75eb98e905dd8e72dd551d63f1695166252bdf7b",
+        "bytes": 58548112,
+        "modifiedAt": "2026-10-01T12:52:15.698381+00:00"
+      },
+      "strictOnDiskSignature": "passed; compilation/signature verification only, no installation or secure-storage acceptance"
+    },
+    "android": {
+      "applicationId": "com.pantopus.w1rename",
+      "variant": "debug",
+      "apk": {
+        "path": "artifacts/workstreams/W1/build/rename-android-current-20261001/app/outputs/apk/debug/app-debug.apk",
+        "sha256": "0ef02efdc58d7525233b85b164eda420febf8ff1a4228c31dd1e44d06f35f06c",
+        "bytes": 14058522,
+        "modifiedAt": "2026-10-01T12:56:56.166779+00:00"
+      },
+      "versionName": "0.1.0",
+      "minSdkVersionForDexing": 26,
+      "qualification": "Shipping debug compiler output; no emulator installation, launch, interaction, secure storage or provider/device acceptance."
+    },
+    "assets": "asset-custody.json",
+    "disposableCopy": "/private/tmp/creator-platform-w1-rename-20261001",
+    "externalIdentitiesOrDeviceOperation": false
+  },
+  "privateBuildLogReceipts": [
+    {
+      "privateLogName": "integrated-web-build.log",
+      "sha256": "f49b1400758d6a0c18a496cc57835ba22bd4f093404281f520bb1a2b01a6ac77",
+      "bytes": 2624,
+      "retainedOutsideGit": true
+    },
+    {
+      "privateLogName": "integrated-ios-build.log",
+      "sha256": "d72509b3da58fd91da952e90c9b33bf6939c35fb93548a889e5deeb9509d91b9",
+      "bytes": 156807,
+      "retainedOutsideGit": true
+    },
+    {
+      "privateLogName": "integrated-android-build.log",
+      "sha256": "59fb2869b77e7f6aa103b559de0e05ff284cc49579aa67e507d4168dcfc4481f",
+      "bytes": 2604,
+      "retainedOutsideGit": true
+    },
+    {
+      "privateLogName": "home-navigation-api.log",
+      "sha256": "78411ff67376e13add583725747889f22d07c09f9a497f44d6fd3a73d83469df",
+      "bytes": 62,
+      "retainedOutsideGit": true
+    },
+    {
+      "privateLogName": "current-rename-backend-build.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+      "bytes": 41,
+      "retainedOutsideGit": true
+    },
+    {
+      "privateLogName": "current-rename-web-build.log",
+      "sha256": "0b39f27090f3c9f5410e29c1a7b109cfd6efd529878454e5ebeec7d5cddb07f7",
+      "bytes": 2626,
+      "retainedOutsideGit": true
+    },
+    {
+      "privateLogName": "current-rename-ios-build.log",
+      "sha256": "ab7c06b2eeedd6f4646094d562574656ca981b475ebf92745e171ec4986f1a72",
+      "bytes": 316994,
+      "retainedOutsideGit": true
+    },
+    {
+      "privateLogName": "current-rename-android-build.log",
+      "sha256": "94656c442d88c42c31049d0dc1ea22d9e10cc27fa4ee6365e9eae71c9f6600b7",
+      "bytes": 2328,
+      "retainedOutsideGit": true
+    },
+    {
+      "privateLogName": "home-navigation-ios-build.log",
+      "sha256": "7b153a4734161f80320d2d9c1b31c6054d87b556805be25da6d12f310d818399",
+      "bytes": 131220,
+      "retainedOutsideGit": true,
+      "qualification": "Final current native source build; preceding integrated native build is a distinct earlier checkpoint."
+    },
+    {
+      "privateLogName": "home-navigation-android-build.log",
+      "sha256": "28ecf0d316827af74884c167e3197eb4a4f8812b5f2ea91a61486fa30d25fe95",
+      "bytes": 2601,
+      "retainedOutsideGit": true,
+      "qualification": "Final current native source build; preceding integrated native build is a distinct earlier checkpoint."
+    }
+  ],
+  "compilerQualifications": [
+    "Xcode 26.5 / Swift 6.3.2; shipping normal on-disk signatures verified for both iOS bundles",
+    "Compatible local xctest-dynamic-overlay 1.13.1 resolution used; compiler lockfile churn restored to exact tracked source",
+    "Existing W1-owned JDK 21.0.12.1+1, Gradle 8.9 and Android SDK/build tools reused; no new licenses or emulator images",
+    "Node 24.19.0; installed fallback pnpm 11.19.0 versus requested 12.5.1; frozen offline dependencies unchanged",
+    "Heavy builds serial; no native input APIs or alternate device automation used"
+  ],
+  "acceptance": {
+    "configuredHome": false,
+    "actualSavedHistoryAfterAvailabilityChange": false,
+    "nativeNavigationOperation": false,
+    "productionBrowserOperation": false,
+    "exactHeadHostedCI": "Code Review connection missing; no pass or merge",
+    "genuineIdentityPasskeyLicenseProviderPrivacyOrReleaseAcceptance": false
+  },
+  "runtime": {
+    "api": "552e252 backend; loopback 4111; development identity; foundationReady=true / ready=false / generation unconfigured; Growth disabled",
+    "web": "Loopback production preview 3011, new integrated Build ID; page responds HTTP 200. HTTPS application-origin guard remains and prevents an HTTP production authentication journey. Browser control still unverified/refused; reachability is not browser acceptance.",
+    "database": "Existing W1-only container on loopback 55451, 512 MiB / 2 CPUs; both existing logical W1 DBs retained. No migration, grant, approval, membership or provider change."
+  }
+}

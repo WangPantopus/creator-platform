@@ -10,4 +10,5 @@ Writes recheck the current credential inside the original shared Keychain actor.
 
 Existing Swift checks and shipping build/personal operation are separate qualifications. The initial eighteen existing checks passed with unchanged original snapshots; the final clear-order correction requires its shipping build and personally operated cold/API-interruption/rotation/account-replacement/purge paths. This source alone does not establish full H02/H03/H15 acceptance.
 
+
 Focused current-main source c69be181 now passes all18 existing Swift checks/unchanged3 snapshots and a normally signed shipping build/strict codesign. W1 personally operated its exact installed binary through cold You/Account, canonical URL entry, actual API-off Retry/refusal and same-source recovery, persisted same-session rotation, actual server sign-out/cold Welcome and a distinct account's own cold You. [Exact source, operation and limits](../../artifacts/workstreams/W1/resume/2026-10-03-focused-ios-destination/run.md) keep OS-storage faults, broader private purge, issuer-B, cancellation, Android, production and accessibility acceptance open.

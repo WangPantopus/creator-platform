@@ -5,8 +5,10 @@ import { canonical } from "../../core/canonical.js";
 import {
   Destination,
   EventEnvelope,
+  StoredEventEnvelope,
   Preferences,
   defaultPreferences,
+  type GrowthEvent,
   type GrowthOwners,
   type NotificationKind,
   type NotificationPreferences,
@@ -14,6 +16,13 @@ import {
 } from "./contracts.js";
 import type { GrowthDatabase } from "./database.js";
 import type { GrowthErasure } from "./erasure.js";
+import { requireAccountNotificationSchema } from "./account-notifications.js";
+import {
+  interactiveNotificationCustody,
+  leasedNotificationCustody,
+  type NotificationReadCustody,
+} from "./notification-custody.js";
+import type { Actor } from "../identity/adapter.js";
 
 const authorKinds: Record<
   NotificationKind,
@@ -153,9 +162,14 @@ export function present(type: NotificationKind, state: NotificationState) {
 export interface DeliveryProvider {
   send(input: {
     channel: "push" | "email";
+    /** Recheck the actual lease, owner presentation and controls after credential lookup, before external bytes. */
+    beforeSubmit: () => Promise<void>;
     accountId: string;
     notificationId: string;
     idempotencyKey: string;
+    /** Actual held email delivery lease, used for durable provider receipts. */
+    deliveryIds?: string[];
+    leaseId?: string;
     sender: string;
     preview: string;
     destination: string;
@@ -176,9 +190,10 @@ export class DeliveryFailure extends Error {
     super("delivery_unavailable");
   }
 }
-class QuietDelivery extends DeliveryFailure {
+/** A bounded device batch made durable progress; it did not fail delivery. */
+export class DeliveryProgress extends Error {
   constructor() {
-    super(900);
+    super("delivery_pending_devices");
   }
 }
 export function quietNow(preferences: NotificationPreferences, now: Date) {
@@ -209,8 +224,10 @@ export class Notifications {
     private readonly erasure: GrowthErasure,
     private readonly provider?: DeliveryProvider,
   ) {}
-  async consume(input: unknown) {
+  async consume(input: unknown, custody?: NotificationReadCustody) {
     const event = EventEnvelope.parse(input);
+    if (event.creatorId === null)
+      await requireAccountNotificationSchema(this.db.worker);
     const envelopeHash = createHash("sha256")
       .update(canonical(event))
       .digest("hex");
@@ -218,7 +235,7 @@ export class Notifications {
     const states = await Promise.all(
       event.recipients.map(async (recipient) => ({
         recipient,
-        state: await this.owners.notificationState(event, recipient),
+        state: await this.owners.notificationState(event, recipient, custody),
       })),
     );
     if (states.some(({ state }) => state.retryable))
@@ -298,125 +315,72 @@ export class Notifications {
     });
   }
   async drain(limit = 25) {
-    const leaseId = randomUUID();
-    const jobs = await this.db.transaction(
-      this.db.worker,
-      async (client) =>
-        (
-          await client.query(
-            `WITH picked AS (SELECT id FROM growth.delivery WHERE channel='push' AND ((state='queued' AND available_at<=now()) OR (state='leased' AND lease_until<now())) ORDER BY available_at LIMIT $1 FOR UPDATE SKIP LOCKED)
+    const boundedLimit = Math.min(Math.max(limit, 1), 100);
+    let claimed = 0;
+    for (let batch = 0; batch < boundedLimit; batch++) {
+      const leaseId = randomUUID();
+      const jobs = await this.db.transaction(
+        this.db.worker,
+        async (client) =>
+          (
+            await client.query(
+              `WITH picked AS (SELECT id FROM growth.delivery WHERE channel='push' AND ((state='queued' AND available_at<=now()) OR (state='leased' AND lease_until<now())) ORDER BY available_at LIMIT $1 FOR UPDATE SKIP LOCKED)
       UPDATE growth.delivery d SET state='leased',lease_until=now()+interval '60 seconds',lease_id=$2,attempts=attempts+1 FROM picked WHERE d.id=picked.id RETURNING d.*`,
-            [Math.min(Math.max(limit, 1), 100), leaseId],
-          )
-        ).rows,
-    );
-    for (const job of jobs) {
+              [1, leaseId],
+            )
+          ).rows,
+      );
+      const job = jobs[0];
+      if (!job) break;
+      claimed++;
       try {
         const result = await this.db.worker.query(
-          `SELECT n.*,e.envelope,p.document AS preference FROM growth.notification n JOIN growth.event_inbox e ON e.id=n.event_id LEFT JOIN growth.preference p ON p.account_id=n.account_id WHERE n.id=$1`,
-          [job.notification_id],
+          `SELECT n.id,e.envelope FROM growth.notification n JOIN growth.event_inbox e ON e.id=n.event_id WHERE n.id=$1 AND n.account_id=$2`,
+          [job.notification_id, job.account_id],
         );
         const notification = result.rows[0];
-        const event = EventEnvelope.parse(notification.envelope);
-        const recipient = event.recipients.find(
-          (r) => r.accountId === job.account_id,
+        if (!notification) throw new DeliveryFailure(1);
+        const event = StoredEventEnvelope.parse(notification.envelope);
+        const prepared = await this.prepareDelivery(
+          [job],
+          [event],
+          leaseId,
+          "push",
         );
-        if (!recipient) throw new Error("recipient_missing");
-        const state = await this.owners.notificationState(event, recipient);
-        if (state.retryable) throw new Error("notification_owner_unconfigured");
-        const prefs = (notification.preference ??
-          defaultPreferences) as NotificationPreferences;
-        const channel = job.channel as "push" | "email";
-        const disabled =
-          channel === "push"
-            ? prefs.disabledPushTypes
-            : prefs.disabledEmailTypes;
-        if (
-          !state.available ||
-          !state.authorized ||
-          state.version < event.aggregateVersion ||
-          !prefs[channel] ||
-          prefs.mutedCreators.includes(event.creatorId) ||
-          disabled.includes(event.type)
-        ) {
-          await this.finish(job.id, leaseId, "suppressed");
-          continue;
-        }
-        if (quietNow(prefs, new Date())) {
+        if (!prepared) continue;
+        if (!this.provider) throw new Error("provider_unconfigured");
+        const view = prepared.entries[0]!;
+        const delivered = await this.provider.send({
+          channel: "push",
+          accountId: job.account_id,
+          notificationId: notification.id,
+          idempotencyKey: job.id,
+          ...view,
+          beforeSubmit: async () => {
+            const current = await this.prepareDelivery(
+              [job],
+              [event],
+              leaseId,
+              "push",
+            );
+            if (!current || canonical(current) !== canonical(prepared))
+              throw new DeliveryFailure(1);
+          },
+        });
+        await this.db.worker.query(
+          "UPDATE growth.delivery SET state='sent',provider_ref=$3,lease_until=NULL,last_error=NULL WHERE id=$1 AND lease_id=$2 AND state='leased'",
+          [job.id, leaseId, delivered.providerRef],
+        );
+      } catch (error) {
+        if (error instanceof DeliveryProgress) {
           await this.db.worker.query(
-            "UPDATE growth.delivery SET state='queued',available_at=now()+interval '15 minutes',attempts=greatest(0,attempts-1),lease_until=NULL WHERE id=$1 AND lease_id=$2",
+            "UPDATE growth.delivery SET state='queued',attempts=greatest(0,attempts-1),available_at=now()+interval '1 second',lease_until=NULL,last_error=NULL WHERE id=$1 AND lease_id=$2 AND state='leased'",
             [job.id, leaseId],
           );
           continue;
         }
-        const view = present(event.type, state);
-        if (!view) {
-          await this.finish(job.id, leaseId, "suppressed");
-          continue;
-        }
-        if (!this.provider) throw new Error("provider_unconfigured");
-        await this.db.transaction(this.db.worker, async (client) => {
-          const retained = await this.erasure.event(client, event);
-          if (!retained?.recipients.some((r) => r.accountId === job.account_id))
-            return;
-          if (
-            !(
-              await client.query(
-                "SELECT 1 FROM growth.delivery WHERE id=$1 AND lease_id=$2 AND state='leased'",
-                [job.id, leaseId],
-              )
-            ).rowCount
-          )
-            return;
-          // Account controls use this same erasure fence. Read preferences
-          // after acquiring it and hold it through provider submission so a
-          // completed opt-out/mute cannot be bypassed by an earlier read.
-          const currentPrefs = Preferences.parse(
-            (
-              await client.query(
-                "SELECT document FROM growth.preference WHERE account_id=$1",
-                [job.account_id],
-              )
-            ).rows[0]?.document ?? defaultPreferences,
-          );
-          if (
-            !currentPrefs.push ||
-            currentPrefs.mutedCreators.includes(event.creatorId) ||
-            currentPrefs.disabledPushTypes.includes(event.type)
-          ) {
-            await client.query(
-              "UPDATE growth.delivery SET state='suppressed',lease_until=NULL WHERE id=$1 AND lease_id=$2 AND state='leased'",
-              [job.id, leaseId],
-            );
-            return;
-          }
-          if (quietNow(currentPrefs, new Date())) {
-            await client.query(
-              "UPDATE growth.delivery SET state='queued',available_at=now()+interval '15 minutes',attempts=greatest(0,attempts-1),lease_until=NULL WHERE id=$1 AND lease_id=$2 AND state='leased'",
-              [job.id, leaseId],
-            );
-            return;
-          }
-          const delivered = await this.provider!.send({
-            channel,
-            accountId: job.account_id,
-            notificationId: notification.id,
-            idempotencyKey: job.id,
-            sender: view.sender,
-            preview: currentPrefs.hideSensitive
-              ? copy.growthHiddenUpdate
-              : view.preview,
-            destination: view.destination,
-            authorship: view.authorship,
-          });
-          await client.query(
-            "UPDATE growth.delivery SET state='sent',provider_ref=$3,lease_until=NULL,last_error=NULL WHERE id=$1 AND lease_id=$2",
-            [job.id, leaseId, delivered.providerRef],
-          );
-        });
-      } catch (error) {
         await this.db.worker.query(
-          "UPDATE growth.delivery SET state=$3,available_at=now()+($4*interval '1 second'),lease_until=NULL,last_error='delivery_unavailable' WHERE id=$1 AND lease_id=$2",
+          "UPDATE growth.delivery SET state=$3,available_at=now()+($4*interval '1 second'),lease_until=NULL,last_error='delivery_unavailable' WHERE id=$1 AND lease_id=$2 AND state='leased'",
           [
             job.id,
             leaseId,
@@ -433,9 +397,7 @@ export class Notifications {
       }
     }
     return {
-      claimed:
-        jobs.length +
-        (await this.drainEmail(Math.min(Math.max(limit, 1), 100))),
+      claimed: claimed + (await this.drainEmail(boundedLimit)),
     };
   }
   private async drainEmail(limit: number) {
@@ -474,121 +436,58 @@ export class Notifications {
       });
       if (!jobs.length) break;
       claimed += jobs.length;
-      const eligible: typeof jobs = [];
-      const eligibleEvents: ReturnType<typeof EventEnvelope.parse>[] = [];
-      const entries: NonNullable<
-        Parameters<DeliveryProvider["send"]>[0]["entries"]
-      > = [];
       try {
+        const events: GrowthEvent[] = [];
         for (const job of jobs) {
           const row = (
             await this.db.worker.query(
-              "SELECT n.*,e.envelope,p.document AS preference FROM growth.notification n JOIN growth.event_inbox e ON e.id=n.event_id LEFT JOIN growth.preference p ON p.account_id=n.account_id WHERE n.id=$1",
-              [job.notification_id],
+              "SELECT e.envelope FROM growth.notification n JOIN growth.event_inbox e ON e.id=n.event_id WHERE n.id=$1 AND n.account_id=$2",
+              [job.notification_id, job.account_id],
             )
           ).rows[0];
-          const event = EventEnvelope.parse(row.envelope),
-            recipient = event.recipients.find(
-              (r) => r.accountId === job.account_id,
-            );
-          if (!recipient) {
-            await this.finish(job.id, leaseId, "suppressed");
-            continue;
-          }
-          const state = await this.owners.notificationState(event, recipient),
-            prefs = Preferences.parse(row.preference ?? defaultPreferences);
-          if (state.retryable)
-            throw new Error("notification_owner_unconfigured");
-          if (
-            !state.available ||
-            !state.authorized ||
-            state.version < event.aggregateVersion ||
-            !prefs.email ||
-            prefs.mutedCreators.includes(event.creatorId) ||
-            prefs.disabledEmailTypes.includes(event.type)
-          ) {
-            await this.finish(job.id, leaseId, "suppressed");
-            continue;
-          }
-          const view = present(event.type, state);
-          if (!view) {
-            await this.finish(job.id, leaseId, "suppressed");
-            continue;
-          }
-          if (quietNow(prefs, new Date())) throw new QuietDelivery();
-          eligible.push(job);
-          eligibleEvents.push(event);
-          entries.push(view);
+          if (!row) throw new DeliveryFailure(1);
+          events.push(StoredEventEnvelope.parse(row.envelope));
         }
-        if (!entries.length) continue;
+        const prepared = await this.prepareDelivery(
+          jobs,
+          events,
+          leaseId,
+          "email",
+        );
+        if (!prepared) continue;
         if (!this.provider) throw new DeliveryFailure(60);
-        await this.db.transaction(this.db.worker, async (client) => {
-          await this.erasure.lockEvents(client, eligibleEvents);
-          const current = await client.query(
-            "SELECT id FROM growth.delivery WHERE id=ANY($1::uuid[]) AND lease_id=$2 AND state='leased'",
-            [eligible.map((job) => job.id), leaseId],
-          );
-          // Purge may have completed while owners were being read. Rebuild on the next lease.
-          if (current.rowCount !== eligible.length) return;
-          const currentPrefs = Preferences.parse(
-            (
-              await client.query(
-                "SELECT document FROM growth.preference WHERE account_id=$1",
-                [jobs[0]!.account_id],
-              )
-            ).rows[0]?.document ?? defaultPreferences,
-          );
-          const sendingJobs: typeof jobs = [];
-          const sendingEntries: typeof entries = [];
-          for (let index = 0; index < eligible.length; index++) {
-            const job = eligible[index]!,
-              event = eligibleEvents[index]!;
-            if (
-              !currentPrefs.email ||
-              currentPrefs.mutedCreators.includes(event.creatorId) ||
-              currentPrefs.disabledEmailTypes.includes(event.type)
-            ) {
-              await client.query(
-                "UPDATE growth.delivery SET state='suppressed',lease_until=NULL WHERE id=$1 AND lease_id=$2 AND state='leased'",
-                [job.id, leaseId],
-              );
-              continue;
-            }
-            sendingJobs.push(job);
-            sendingEntries.push({
-              ...entries[index]!,
-              preview: currentPrefs.hideSensitive
-                ? copy.growthHiddenUpdate
-                : entries[index]!.preview,
-            });
-          }
-          if (!sendingEntries.length) return;
-          if (quietNow(currentPrefs, new Date())) throw new QuietDelivery();
-          const first = sendingEntries[0]!;
-          const result = await this.provider!.send({
-            channel: "email",
-            accountId: jobs[0]!.account_id,
-            notificationId: sendingJobs[0]!.notification_id,
-            idempotencyKey: jobs[0]!.digest_id,
-            sender: copy.growthYourUpdates,
-            preview: first.preview,
-            destination: "/notifications",
-            authorship: "system",
-            entries: sendingEntries,
-          });
-          await client.query(
-            "UPDATE growth.delivery SET state='sent',provider_ref=$3,lease_until=NULL,last_error=NULL WHERE id=ANY($1::uuid[]) AND lease_id=$2",
-            [sendingJobs.map((job) => job.id), leaseId, result.providerRef],
-          );
+        const result = await this.provider.send({
+          channel: "email",
+          accountId: jobs[0]!.account_id,
+          notificationId: jobs.find(
+            (job) => job.id === prepared.deliveryIds[0],
+          )!.notification_id,
+          idempotencyKey: jobs[0]!.digest_id,
+          deliveryIds: prepared.deliveryIds,
+          leaseId,
+          sender: copy.growthYourUpdates,
+          preview: prepared.entries[0]!.preview,
+          destination: "/notifications",
+          authorship: "system",
+          entries: prepared.entries,
+          beforeSubmit: async () => {
+            const current = await this.prepareDelivery(
+              jobs.filter((job) => prepared.deliveryIds.includes(job.id)),
+              events.filter((_event, index) =>
+                prepared.deliveryIds.includes(jobs[index]!.id),
+              ),
+              leaseId,
+              "email",
+            );
+            if (!current || canonical(current) !== canonical(prepared))
+              throw new DeliveryFailure(1);
+          },
         });
+        await this.db.worker.query(
+          "UPDATE growth.delivery SET state='sent',provider_ref=$3,lease_until=NULL,last_error=NULL WHERE id=ANY($1::uuid[]) AND lease_id=$2 AND state='leased'",
+          [prepared.deliveryIds, leaseId, result.providerRef],
+        );
       } catch (error) {
-        if (error instanceof QuietDelivery) {
-          await this.db.worker.query(
-            "UPDATE growth.delivery SET state='queued',attempts=greatest(0,attempts-1),available_at=now()+interval '15 minutes',lease_until=NULL WHERE id=ANY($1::uuid[]) AND lease_id=$2 AND state='leased'",
-            [jobs.map((job) => job.id), leaseId],
-          );
-          continue;
-        }
         await this.db.worker.query(
           "UPDATE growth.delivery SET state=CASE WHEN attempts>=8 OR $3 THEN 'dead' ELSE 'queued' END,available_at=now()+($4*interval '1 second'),lease_until=NULL,last_error='delivery_unavailable' WHERE id=ANY($1::uuid[]) AND lease_id=$2 AND state='leased'",
           [
@@ -605,11 +504,109 @@ export class Notifications {
     }
     return claimed;
   }
-  private async finish(id: string, leaseId: string, state: string) {
-    await this.db.worker.query(
-      "UPDATE growth.delivery SET state=$3,lease_until=NULL WHERE id=$1 AND lease_id=$2",
-      [id, leaseId, state],
-    );
+  /** Owner reads and external submission stay outside these short negative-fence transactions. */
+  private async prepareDelivery(
+    jobs: { id: string; account_id: string; notification_id: string }[],
+    events: GrowthEvent[],
+    leaseId: string,
+    channel: "push" | "email",
+  ) {
+    const accountId = jobs[0]?.account_id;
+    if (
+      !accountId ||
+      jobs.length !== events.length ||
+      jobs.some((job) => job.account_id !== accountId)
+    )
+      throw new DeliveryFailure(60, true);
+    const views: ReturnType<typeof present>[] = [];
+    for (let index = 0; index < jobs.length; index++) {
+      const event = events[index]!;
+      const recipient = event.recipients.find((r) => r.accountId === accountId);
+      if (!recipient || !roles[event.type].includes(recipient.role)) {
+        views.push(null);
+        continue;
+      }
+      const state = await this.owners.notificationState(
+        event,
+        recipient,
+        event.creatorId === null || event.type === "weekly_impact"
+          ? leasedNotificationCustody(this.db, this.erasure, event, accountId, {
+              kind: "delivery",
+              id: jobs[index]!.id,
+              leaseId,
+            })
+          : undefined,
+      );
+      if (state.retryable) throw new Error("notification_owner_unconfigured");
+      views.push(
+        state.available &&
+          state.authorized &&
+          state.version >= event.aggregateVersion
+          ? present(event.type, state)
+          : null,
+      );
+    }
+    return this.db.transaction(this.db.worker, async (client) => {
+      // Acquire the complete sorted fence set before checking individual events.
+      await this.erasure.lockEvents(client, events);
+      const leases = await client.query(
+        "SELECT id FROM growth.delivery WHERE id=ANY($1::uuid[]) AND account_id=$2 AND channel=$3 AND lease_id=$4 AND state='leased' AND lease_until>clock_timestamp() FOR NO KEY UPDATE",
+        [jobs.map((job) => job.id), accountId, channel, leaseId],
+      );
+      if (leases.rowCount !== jobs.length) return null;
+      const preferences = Preferences.parse(
+        (
+          await client.query(
+            "SELECT document FROM growth.preference WHERE account_id=$1",
+            [accountId],
+          )
+        ).rows[0]?.document ?? defaultPreferences,
+      );
+      const deliveryIds: string[] = [];
+      const entries: NonNullable<
+        Parameters<DeliveryProvider["send"]>[0]["entries"]
+      > = [];
+      for (let index = 0; index < jobs.length; index++) {
+        const job = jobs[index]!,
+          event = events[index]!,
+          view = views[index];
+        const retained = await this.erasure.event(client, event);
+        const disabled =
+          channel === "push"
+            ? preferences.disabledPushTypes
+            : preferences.disabledEmailTypes;
+        if (
+          !view ||
+          !retained?.recipients.some((r) => r.accountId === accountId) ||
+          !preferences[channel] ||
+          (event.creatorId !== null &&
+            preferences.mutedCreators.includes(event.creatorId)) ||
+          disabled.includes(event.type)
+        ) {
+          await client.query(
+            "UPDATE growth.delivery SET state='suppressed',lease_until=NULL WHERE id=$1 AND lease_id=$2 AND state='leased'",
+            [job.id, leaseId],
+          );
+          continue;
+        }
+        deliveryIds.push(job.id);
+        entries.push({
+          ...view,
+          preview: preferences.hideSensitive
+            ? copy.growthHiddenUpdate
+            : view.preview,
+        });
+      }
+      if (!deliveryIds.length) return null;
+      if (quietNow(preferences, new Date())) {
+        await client.query(
+          "UPDATE growth.delivery SET state='queued',available_at=now()+interval '15 minutes',attempts=greatest(0,attempts-1),lease_until=NULL WHERE id=ANY($1::uuid[]) AND lease_id=$2 AND state='leased'",
+          [deliveryIds, leaseId],
+        );
+        return null;
+      }
+      return { deliveryIds, entries };
+    });
   }
   async listCurrent(
     rows: {
@@ -623,6 +620,7 @@ export class Notifications {
       read_at: string | null;
       created_at: string;
     }[],
+    actor: Actor,
   ) {
     const output = [];
     const envelopes = (
@@ -635,12 +633,16 @@ export class Notifications {
     for (const row of rows) {
       const raw = byId.get(row.event_id);
       if (!raw) continue;
-      const event = EventEnvelope.parse(raw);
+      const event = StoredEventEnvelope.parse(raw);
       const recipient = event.recipients.find(
         (r) => r.accountId === row.account_id,
       );
       if (!recipient) continue;
-      const state = await this.owners.notificationState(event, recipient);
+      const state = await this.owners.notificationState(
+        event,
+        recipient,
+        interactiveNotificationCustody(this.db, actor, row.id, event),
+      );
       if (state.retryable)
         throw new DomainError(
           "notification_owner_unconfigured",
@@ -651,6 +653,8 @@ export class Notifications {
       const current = state.available ? present(event.type, state) : null;
       output.push({
         id: row.id,
+        available: Boolean(current),
+        creatorId: event.creatorId,
         type: row.type,
         sender: current?.sender ?? row.sender,
         authorKind: state.available ? state.authorKind : "system",

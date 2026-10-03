@@ -1,0 +1,11 @@
+{
+  "owner": "W7",
+  "token": "bb80272c-3447-4f3a-8d6f-5ce660d4663c",
+  "device": "FAB31883-2F36-4E50-83B3-D9654B60FF00",
+  "purpose": "notification-ID-current-owner-cold-warm",
+  "start": "2026-10-02T09:07:13.239631+00:00",
+  "dev": 16777232,
+  "ino": 240301053,
+  "releasedAt": "2026-10-02T09:31:40.835313+00:00",
+  "state": "Owned device normally stopped; exact UUID/inode lease released; app data retained"
+}

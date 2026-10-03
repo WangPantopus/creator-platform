@@ -1,0 +1,64 @@
+{
+  "sourcePacket": "fb1cbcaab7926e96a361bfd7840ecf192efafefd",
+  "heldPacketSha256": "2338f48ea4b1008f47eef43ff7a835021e5e917669ad44f21179c69d03227c0a",
+  "review": "Primary W1 reviewed all 47 mappings and explicit producer ordering; this is not activation or unseen owner-source approval. No SQL file or applied ledger bytes changed.",
+  "mappings": [
+    {
+      "old": "0071_w1_publication_worker_scope",
+      "currentHeld": "0158_w1_publication_worker_scope",
+      "path": "apps/backend/src/modules/identity/schema-publication-scope.sql",
+      "sqlSha256": "100e319216568ee1ed27081be0520dbfdb3b7019659946c2c5de1f6859d32cc1",
+      "state": "reserved_unapplied",
+      "activationClaimed": false
+    },
+    {
+      "old": "0072_w1_generation_worker_scope",
+      "currentHeld": "0159_w1_generation_worker_scope",
+      "path": "apps/backend/src/modules/identity/schema-generation-scope.sql",
+      "sqlSha256": "7de41bf10228219d69480e302bac7d69626d8d848d8276bb1fe54e49112a5627",
+      "state": "reserved_unapplied",
+      "activationClaimed": false
+    },
+    {
+      "old": "0081_w1_signature_read_fence",
+      "currentHeld": "0167_w1_signature_read_fence",
+      "path": "apps/backend/src/modules/identity/schema-signature-read-fence.sql",
+      "sqlSha256": "157640de84f22d6d638d788dfe04314fd193efaed80a829f288bec7cbcb815b5",
+      "state": "reserved_unapplied",
+      "activationClaimed": false
+    },
+    {
+      "old": "0085_w1_public_ai_metadata_scope",
+      "currentHeld": "0170_w1_public_ai_metadata_scope",
+      "path": "apps/backend/src/modules/identity/schema-public-ai-scope.sql",
+      "sqlSha256": "0325048ec855877e59430423850ec72360610a96328aaaef903139f512aa0606",
+      "state": "reserved_unapplied",
+      "activationClaimed": false
+    },
+    {
+      "old": "0099_w1_generation_terminal_scope",
+      "currentHeld": "0183_w1_generation_terminal_scope",
+      "path": "apps/backend/src/modules/identity/schema-generation-terminal.sql",
+      "sqlSha256": "fadbf62a3ddf06142c3a6ad30313503f9bebe7b6d64f67f8ba01ff13ce2398c7",
+      "state": "reserved_unapplied",
+      "activationClaimed": false
+    },
+    {
+      "old": "0100_w8_generation_terminal_denial",
+      "currentHeld": "0184_w8_generation_terminal_denial",
+      "path": "apps/backend/migrations/0100_w8_generation_terminal_denial.sql",
+      "sqlSha256": "393920665d8860ee53ee6ef740ba0ad4a6921aceddcbf33f6419727e846532af",
+      "state": "reserved_unapplied",
+      "activationClaimed": false,
+      "actualSourceCommit": "d12db34c"
+    },
+    {
+      "old": "0083_w3_translation_worker_scope",
+      "currentHeld": "0168_w3_translation_worker_scope",
+      "path": "apps/backend/src/modules/conversation/migrations/0083_w3_translation_worker_scope.sql",
+      "sqlSha256": "d54004e707764281ea576a92fc78c13e05689ad229c06d9964669629566a3ed8",
+      "state": "reserved_unapplied",
+      "activationClaimed": false
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+# Canonical native storage copy repair
+
+Current PR51 source 3e009886c0ed8e2912deb29d0ed9d3db2e2b0044 failed hosted web/backend generation checks and Android mergeDebugResources. The original PR48 storage increment repeated four canonical copy keys already supplied by updated main. Its manually repeated generated entries produced duplicate Android resource names and stale web/Swift/Kotlin resources.
+
+The repair belongs in PR48, before normal propagation through49,51,66 and74. After normally reconciling the original stack with main5c08634b, four identical later occurrences were removed from config/copy.json. The parsed effective mapping, existing copy, resource names and ordering remain unchanged. The canonical generator removed only the repeated entries from the five affected generated assets. No generated asset is independently patched, and no original assertion, pixel reference, tolerance or native test is changed.
+
+Canonical generation checks and the existing shared rename/copy checks validate the source repair. Actual current Android resource compilation, shipping builds, runtime operation and current exact-head hosted checks remain separate requirements. This repair does not establish native storage/origin/rotation/purge/isolation acceptance or make PR51 ready by itself; its failed historical head remains recorded and its draft disposition is retained until the new source qualifies.

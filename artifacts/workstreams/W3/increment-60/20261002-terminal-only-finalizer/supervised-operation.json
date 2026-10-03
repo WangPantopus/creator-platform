@@ -1,0 +1,51 @@
+[
+  {
+    "operation": "purpose",
+    "source": "8d4ed7bfb4c562716d3374a878369ef396cf0452",
+    "startedAt": "2026-10-02T17:48:40.019582+00:00",
+    "completedAt": "2026-10-02T17:48:40.419501+00:00",
+    "pid": 18435,
+    "command": [
+      "pnpm",
+      "exec",
+      "tsx",
+      "/private/tmp/w3-terminal-only-60/purpose-observation.mts"
+    ],
+    "exitCode": 0,
+    "log": "/private/tmp/w3-terminal-only-60/purpose.log",
+    "logSHA256": "73f883a29d38f77a95244735326c849592caac1a81fc442460781be129bc8f0a"
+  },
+  {
+    "operation": "api",
+    "source": "8d4ed7bfb4c562716d3374a878369ef396cf0452",
+    "startedAt": "2026-10-02T17:48:40.419759+00:00",
+    "completedAt": "2026-10-02T17:48:42.246983+00:00",
+    "pid": 18446,
+    "command": [
+      "pnpm",
+      "exec",
+      "tsx",
+      "src/server.ts"
+    ],
+    "exitCode": 1,
+    "log": "/private/tmp/w3-terminal-only-60/api.log",
+    "logSHA256": "4bbb236c984b9161ba7b8c4d8b4a0f4ba187062946addd427de97c64ac5ba658"
+  },
+  {
+    "operation": "generation-worker",
+    "source": "8d4ed7bfb4c562716d3374a878369ef396cf0452",
+    "startedAt": "2026-10-02T17:48:42.247206+00:00",
+    "completedAt": "2026-10-02T17:48:43.121496+00:00",
+    "pid": 18483,
+    "command": [
+      "pnpm",
+      "exec",
+      "tsx",
+      "src/workers/start.ts",
+      "generation"
+    ],
+    "exitCode": 1,
+    "log": "/private/tmp/w3-terminal-only-60/generation-worker.log",
+    "logSHA256": "a0aea0a4c9de3274a19fc1e9c9be30801b383c97286f7371e856e0848da1190e"
+  }
+]

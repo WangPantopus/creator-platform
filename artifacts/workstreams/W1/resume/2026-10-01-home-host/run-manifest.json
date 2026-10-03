@@ -1,0 +1,81 @@
+{
+  "recordedAt": "2026-10-01T12:09:22.325091+00:00",
+  "branch": "codex/w1-home-host-20261001",
+  "baseRevision": "2f4809128d0111247995c5ed689425e5c249ea91",
+  "sourceState": "Final uncommitted server.ts composition was compiled and reviewed; no Home app journey is claimed. Other files are unchanged exported producers.",
+  "sourceFiles": [
+    {
+      "path": "apps/backend/src/server.ts",
+      "sha256": "98c6a02b3df54a7fa0ac52220a51646c1ec7a28de6941111510e871d01f4cc07"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/home.ts",
+      "sha256": "501aa2cd54bb70f9e8be33190823399c9bdc617675b707e6024c4650d0189b28"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/configured.ts",
+      "sha256": "114add980eae82bd47aae968eb2cc957ec3cac875fc10cc9787292b7c3111392"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/runtime.ts",
+      "sha256": "09ce1a25ace9c9745f7d2bd38aff25e5dfceb1f5d912d3a57e5535fecd1f55ae"
+    },
+    {
+      "path": "apps/backend/src/modules/conversation/feature.ts",
+      "sha256": "11a413574d4e1cc3bf25d51ad223acba248cefe266d6f66441ad1bc90a2c0278"
+    },
+    {
+      "path": "apps/backend/src/integration.ts",
+      "sha256": "be8fa8916046c9b7e8f5a6dd574c96f89ce424b8adba140914d3da2ca570f132"
+    },
+    {
+      "path": "apps/backend/migrations/0002_w1_identity.sql",
+      "sha256": "5aa91502d511375eb7a43e0f226f3e1aeeee896981b7ea4b6faf1aa5bee97f82"
+    }
+  ],
+  "implementation": {
+    "homeOwner": "Actual canonicalConversationHome receives current W3 ConversationFeature, the same AccessService/Database and canonical SignedActService",
+    "directory": "Existing reader fetches at most two 50-row account pages, rejects overflow/fan/cursor mismatch and issues current individual fan scopes before private message reads",
+    "handle": "One parameterized ID lookup of canonical public creator-profile handle on the same non-owner runtime pool; public-identity SELECT policy is explicit in immutable 0002",
+    "composition": "Conversation and content construct before Growth; current denial callbacks and environment guard remain",
+    "missingProducers": "Other Growth owners keep their existing unavailable defaults; no delivery, share, provider, commerce, privacy or experiment readiness invented"
+  },
+  "supportingChecks": {
+    "backendBuild": "passed (TypeScript + bundled executable)",
+    "affectedEslint": "passed",
+    "affectedPrettier": "passed",
+    "diffCheck": "passed",
+    "nativeOrWebRebuild": "Not required: no client/shared/resource/API change",
+    "newTests": false
+  },
+  "backendArtifact": {
+    "path": "apps/backend/dist/server.mjs",
+    "sha256": "a5c6f43022481f45ece4b56e6b5fdeb989ae0d27ff0e1ab368e4217f5f7d99fa"
+  },
+  "runtimeInputs": {
+    "enable": "GROWTH_ENABLED=true in the actual intended host",
+    "worker": "GROWTH_WORKER_DATABASE_URL with a distinct non-owner/non-bypass growth_worker role; runtime must have the reviewed growth_runtime membership and privileges without worker membership",
+    "secret": "Managed 32-byte GROWTH_ENCRYPTION_KEY, persisted securely; never committed",
+    "schema": "Canonical Growth migrations through continuation, claims and erasure fence; fresh W1 DB has all 40 active migrations",
+    "production": "Genuine identity and current trust denial/held-client callbacks still required; development scope cannot substitute"
+  },
+  "acceptance": {
+    "homeRegisteredHostOperation": false,
+    "browser": "Current canonical localhost navigation refused by supported browser tool with ERR_BLOCKED_BY_CLIENT; user asked to check page availability while independent work continues",
+    "growthRuntime": "Not enabled in current private W1 runtime; no worker credential, new grants or fake configuration supplied",
+    "fanConversationHistory": "No real licensed conversation or fabricated thread/message",
+    "requiredNext": [
+      "Prepare actual reviewed dedicated Growth runtime/worker configuration",
+      "Personally operate empty Home and authorized persisted history, expiry/revocation/erasure/account replacement and inaccessible-family cases",
+      "Confirm retained-history navigation when creator public availability changes",
+      "Inspect exact-head Code Review CI before any merge"
+    ]
+  },
+  "nonClaims": [
+    "No full H09/H13/H20 acceptance",
+    "No production readiness",
+    "No schema/migration/role/auth/signature/provider-policy change",
+    "No native UI, privacy completion, delivery receipt, independent-client timing or new test"
+  ],
+  "rolePreflight": "role-preflight.json: actual core has no Growth runtime/worker membership or Growth schema/preference privileges; no grants changed"
+}

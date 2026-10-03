@@ -3,6 +3,7 @@ import type { Pool, PoolClient } from "pg";
 import {
   CreatorProfileInputSchema,
   FanProfileInputSchema,
+  FanIntroInputSchema,
   ProofInputSchema,
   ProofSubmitSchema,
   TeamInviteSchema,
@@ -12,6 +13,8 @@ import type { Actor } from "./adapter.js";
 import { identityTransaction } from "./transaction.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import type { CreatorRestriction } from "./creator-scope.js";
+import type { AudienceRestriction } from "./audience-scope.js";
+import { withRequestContextRestore } from "./request-context.js";
 import {
   holdCurrentRequestSession,
   assertHeldCurrentRequestSession,
@@ -44,6 +47,9 @@ export class IdentityProfiles {
     private readonly pool: Pool,
     private readonly team?: Readonly<{
       assertCreatorAllowed: CreatorRestriction;
+      /** Actual creator/recipient negatives only; an invitation supplies the
+       * distinct Team permission. This issues no AudienceScope or Actor. */
+      assertInvitationAllowed?: AudienceRestriction;
     }>,
   ) {}
   async view(actor: Actor) {
@@ -107,6 +113,31 @@ export class IdentityProfiles {
         return result.rows[0];
       }),
     );
+  }
+  async saveFanIntro(actor: Actor, input: unknown) {
+    const body = FanIntroInputSchema.parse(input);
+    return identityTransaction(this.pool, actor.accountId, async (client) => {
+      await client.query(
+        "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+        [actor.accountId],
+      );
+      const saved = await client.query(
+        "UPDATE creator.fan_profile SET intro=$2,version=version+1 WHERE account_id=$1 AND version=$3 RETURNING id,handle,intro,version",
+        [actor.accountId, body.intro, body.expectedVersion],
+      );
+      if (saved.rows[0]) return saved.rows[0];
+      const current = await client.query(
+        "SELECT id,handle,intro,version FROM creator.fan_profile WHERE account_id=$1",
+        [actor.accountId],
+      );
+      // A lost Save response can be retried without overwriting a later edit.
+      if (current.rows[0]?.intro === body.intro) return current.rows[0];
+      throw new DomainError(
+        "fan_profile_changed",
+        "Your profile changed. Reopen your intro to review it. Your input is kept.",
+        409,
+      );
+    });
   }
   async requireCreator(client: PoolClient, actor: Actor, creatorId: string) {
     const result = await client.query(
@@ -271,37 +302,172 @@ export class IdentityProfiles {
       "team_creator_identity",
       "The creator does not need a team invitation.",
     );
+    const assertAllowed = this.team?.assertCreatorAllowed;
+    if (!assertAllowed)
+      throw new DomainError(
+        "team_authority_unconfigured",
+        "Current creator authority is unavailable for this team.",
+        503,
+      );
     return identityTransaction(this.pool, actor.accountId, async (client) => {
-      await this.requireCreator(client, actor, creatorId);
+      const held = await holdCurrentRequestSession(client, actor.accountId);
+      invariant(
+        held.actor === actor,
+        "current_request_actor_required",
+        "Reopen this team with your current account.",
+      );
+      await client.query("SELECT set_config('app.creator_id',$1,true)", [
+        creatorId,
+      ]);
+      await assertAllowed(actor, creatorId, client);
+      await assertHeldCurrentRequestSession(held, client);
+      const creator = await this.requireCreator(client, actor, creatorId);
+      invariant(
+        creator.verification === "verified" && !creator.recovery_required,
+        "creator_verification_required",
+        "Current creator verification and signing recovery are required.",
+      );
       await client.query(
         "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
         [`team:${creatorId}:${body.accountId}`],
       );
+      const member = await client.query(
+        "SELECT 1 FROM creator.team_membership WHERE creator_id=$1 AND account_id=$2 AND revoked_at IS NULL",
+        [creatorId, body.accountId],
+      );
+      invariant(
+        member.rowCount === 0,
+        "team_member_exists",
+        "This account already belongs to the team. Review its current roles instead.",
+      );
+      // Repeat the exact invitation lookup under the same original family
+      // lease. A separate Studio preflight cannot serialize concurrent invites.
+      const prior = await client.query<{
+        id: string;
+        creatorId: string;
+        accountId: string;
+        roles: string[];
+        expiresAt: Date;
+        accepted: boolean;
+      }>(
+        `SELECT id,creator_id AS "creatorId",account_id AS "accountId",roles,
+         expires_at AS "expiresAt",false AS accepted FROM creator.team_invitation
+         WHERE creator_id=$1 AND account_id=$2 AND accepted_at IS NULL
+          AND revoked_at IS NULL AND expires_at>clock_timestamp()
+         ORDER BY expires_at DESC,id LIMIT 1`,
+        [creatorId, body.accountId],
+      );
+      if (prior.rows[0]) {
+        invariant(
+          [...new Set(prior.rows[0].roles)].sort().join() ===
+            [...new Set(body.roles)].sort().join(),
+          "team_invitation_exists",
+          "A current invitation already exists with different roles. Remove it before choosing new roles.",
+        );
+        await assertAllowed(actor, creatorId, client);
+        await assertHeldCurrentRequestSession(held, client);
+        return prior.rows[0];
+      }
       const result = await client.query(
-        'INSERT INTO creator.team_invitation(creator_id,account_id,roles,expires_at) VALUES($1,$2,$3,now()+interval \'7 days\') RETURNING id,creator_id AS "creatorId",account_id AS "accountId",roles,expires_at AS "expiresAt",false AS accepted',
+        'INSERT INTO creator.team_invitation(creator_id,account_id,roles,expires_at) VALUES($1,$2,$3,clock_timestamp()+interval \'7 days\') RETURNING id,creator_id AS "creatorId",account_id AS "accountId",roles,expires_at AS "expiresAt",false AS accepted',
         [creatorId, body.accountId, [...new Set(body.roles)]],
       );
+      await assertAllowed(actor, creatorId, client);
+      await assertHeldCurrentRequestSession(held, client);
       return result.rows[0];
     });
   }
   async acceptInvite(actor: Actor, invitationId: string) {
+    const assertAllowed = this.team?.assertInvitationAllowed;
+    if (!assertAllowed)
+      throw new DomainError(
+        "team_authority_unconfigured",
+        "Current invitation authority is unavailable for this team.",
+        503,
+      );
     return identityTransaction(this.pool, actor.accountId, async (client) => {
-      const target = await client.query(
-        "SELECT creator_id FROM creator.team_invitation WHERE id=$1 AND account_id=$2",
+      const held = await holdCurrentRequestSession(client, actor.accountId);
+      invariant(
+        held.actor === actor,
+        "current_request_actor_required",
+        "Reopen this invitation with your current account.",
+      );
+      const target = await client.query<{
+        creator_id: string;
+        creator_account_id: string;
+        fan_id: string;
+      }>(
+        `SELECT i.creator_id,c.account_id AS creator_account_id,f.id AS fan_id
+         FROM creator.team_invitation i
+         JOIN creator.creator_profile c ON c.id=i.creator_id
+         JOIN creator.fan_profile f ON f.account_id=i.account_id
+         WHERE i.id=$1 AND i.account_id=$2`,
         [invitationId, actor.accountId],
       );
+      const family = target.rows[0];
       invariant(
-        target.rows[0],
+        family,
+        "invitation_unavailable",
+        "This team invitation is unavailable.",
+      );
+      const context = () =>
+        client.query(
+          "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true),set_config('app.account_id',$3,true)",
+          [family.creator_id, family.fan_id, actor.accountId],
+        );
+      const assertRecipientAllowed = () =>
+        withRequestContextRestore(async () => {
+          await assertAllowed(
+            actor,
+            family.creator_id,
+            {
+              fanId: family.fan_id,
+              fanAccountId: actor.accountId,
+              creatorAccountId: family.creator_account_id,
+            },
+            client,
+          );
+          await assertHeldCurrentRequestSession(held, client);
+        }, context);
+      await context();
+      // Original participant negatives precede positive creator/fan leases.
+      await assertRecipientAllowed();
+      // Reuse the existing Identity owner-row lock discipline: only this real
+      // stored creator account is used temporarily for its own RLS lease. No
+      // owner Actor/session is constructed, and recipient context is restored
+      // before Team work. Unknown settlement escapes without another query.
+      await client.query("SELECT set_config('app.account_id',$1,true)", [
+        family.creator_account_id,
+      ]);
+      const creator = await withRequestContextRestore(
+        () =>
+          client.query(
+            "SELECT 1 FROM creator.creator_profile WHERE id=$1 AND account_id=$2 AND verification='verified' AND NOT recovery_required FOR SHARE",
+            [family.creator_id, family.creator_account_id],
+          ),
+        context,
+      );
+      invariant(
+        creator.rowCount === 1,
+        "invitation_unavailable",
+        "This team invitation is unavailable.",
+      );
+      const fan = await client.query(
+        "SELECT 1 FROM creator.fan_profile WHERE id=$1 AND account_id=$2 FOR SHARE",
+        [family.fan_id, actor.accountId],
+      );
+      invariant(
+        fan.rowCount === 1,
         "invitation_unavailable",
         "This team invitation is unavailable.",
       );
       await client.query(
         "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
-        [`team:${target.rows[0].creator_id}:${actor.accountId}`],
+        [`team:${family.creator_id}:${actor.accountId}`],
       );
       const invitation = await client.query(
-        "SELECT * FROM creator.team_invitation WHERE id=$1 AND account_id=$2 AND expires_at>now() AND revoked_at IS NULL FOR UPDATE",
-        [invitationId, actor.accountId],
+        "SELECT *,expires_at>clock_timestamp() AS unexpired FROM creator.team_invitation WHERE id=$1 AND account_id=$2 AND creator_id=$3 AND revoked_at IS NULL FOR UPDATE",
+        [invitationId, actor.accountId, family.creator_id],
       );
       const row = invitation.rows[0];
       invariant(
@@ -309,33 +475,95 @@ export class IdentityProfiles {
         "invitation_unavailable",
         "This team invitation is unavailable.",
       );
-      if (row.accepted_at) return { done: true as const };
+      const roles = TeamRolesUpdateInputSchema.shape.roles.parse(row.roles);
+      const membership = (
+        await client.query<{ roles: unknown; revoked_at: Date | null }>(
+          "SELECT roles,revoked_at FROM creator.team_membership WHERE creator_id=$1 AND account_id=$2 FOR UPDATE",
+          [family.creator_id, actor.accountId],
+        )
+      ).rows[0];
+      if (row.accepted_at) {
+        invariant(
+          membership &&
+            membership.revoked_at === null &&
+            [...TeamRolesUpdateInputSchema.shape.roles.parse(membership.roles)]
+              .sort()
+              .join() === [...roles].sort().join(),
+          "team_acceptance_changed",
+          "This team membership changed. Reopen the team to review its current access.",
+        );
+        await assertRecipientAllowed();
+        await assertHeldCurrentRequestSession(held, client);
+        return { done: true as const };
+      }
+      invariant(
+        row.unexpired === true,
+        "invitation_unavailable",
+        "This team invitation is unavailable.",
+      );
+      invariant(
+        !membership || membership.revoked_at !== null,
+        "team_member_exists",
+        "You already belong to this team. Reopen it to review your current roles.",
+      );
       await client.query(
         "INSERT INTO creator.team_membership(creator_id,account_id,roles) VALUES($1,$2,$3) ON CONFLICT(creator_id,account_id) DO UPDATE SET roles=excluded.roles,revoked_at=NULL",
-        [row.creator_id, actor.accountId, row.roles],
+        [family.creator_id, actor.accountId, [...roles].sort()],
       );
-      await client.query(
-        "UPDATE creator.team_invitation SET accepted_at=now() WHERE id=$1",
+      const accepted = await client.query(
+        "UPDATE creator.team_invitation SET accepted_at=clock_timestamp() WHERE id=$1 AND accepted_at IS NULL AND revoked_at IS NULL AND expires_at>clock_timestamp() RETURNING id",
         [invitationId],
       );
+      invariant(
+        accepted.rowCount === 1,
+        "invitation_unavailable",
+        "This team invitation is unavailable.",
+      );
+      await assertRecipientAllowed();
+      await assertHeldCurrentRequestSession(held, client);
       return { done: true as const };
     });
   }
   async removeMember(actor: Actor, creatorId: string, accountId: string) {
+    const assertAllowed = this.team?.assertCreatorAllowed;
+    if (!assertAllowed)
+      throw new DomainError(
+        "team_authority_unconfigured",
+        "Current creator authority is unavailable for this team.",
+        503,
+      );
+    invariant(
+      accountId !== actor.accountId,
+      "team_creator_identity",
+      "The creator's identity cannot be removed through team membership.",
+    );
     return identityTransaction(this.pool, actor.accountId, async (client) => {
+      const held = await holdCurrentRequestSession(client, actor.accountId);
+      invariant(
+        held.actor === actor,
+        "current_request_actor_required",
+        "Reopen this team with your current account.",
+      );
+      await client.query("SELECT set_config('app.creator_id',$1,true)", [
+        creatorId,
+      ]);
+      await assertAllowed(actor, creatorId, client);
+      await assertHeldCurrentRequestSession(held, client);
       await this.requireCreator(client, actor, creatorId);
       await client.query(
         "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
         [`team:${creatorId}:${accountId}`],
       );
       await client.query(
-        "UPDATE creator.team_membership SET revoked_at=now() WHERE creator_id=$1 AND account_id=$2",
+        "UPDATE creator.team_membership SET revoked_at=clock_timestamp() WHERE creator_id=$1 AND account_id=$2 AND revoked_at IS NULL",
         [creatorId, accountId],
       );
       await client.query(
-        "UPDATE creator.team_invitation SET revoked_at=now() WHERE creator_id=$1 AND account_id=$2 AND revoked_at IS NULL",
+        "UPDATE creator.team_invitation SET revoked_at=clock_timestamp() WHERE creator_id=$1 AND account_id=$2 AND revoked_at IS NULL",
         [creatorId, accountId],
       );
+      await assertAllowed(actor, creatorId, client);
+      await assertHeldCurrentRequestSession(held, client);
       return { done: true as const };
     });
   }
