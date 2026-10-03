@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import {
   CreatorMediaAssetSchema,
   MediaRevocationSchema,
@@ -29,6 +29,7 @@ export function PhotoAttachment({
   onReady(asset: CreatorMediaAsset, alt: string): void;
   beforeDiscard(assetId: string): Promise<void>;
 }) {
+  const altId = useId();
   const [available, setAvailable] = useState(false),
     [file, setFile] = useState<File | null>(null),
     [alt, setAlt] = useState(""),
@@ -68,7 +69,12 @@ export function PhotoAttachment({
     };
   }, [expectedAccountId]);
   useEffect(() => {
-    if (!asset || !["quarantined", "processing"].includes(asset.state)) return;
+    if (
+      activity === "discard" ||
+      !asset ||
+      !["quarantined", "processing"].includes(asset.state)
+    )
+      return;
     const abort = new AbortController();
     let timer: ReturnType<typeof setTimeout>;
     const poll = async () => {
@@ -103,7 +109,7 @@ export function PhotoAttachment({
       abort.abort();
       clearTimeout(timer);
     };
-  }, [asset, creatorId, objectId, expectedAccountId]);
+  }, [asset, creatorId, objectId, expectedAccountId, activity]);
   const upload = async () => {
     if (!file || pending.current) return;
     pending.current = true;
@@ -194,6 +200,7 @@ export function PhotoAttachment({
         );
       ticket.current = undefined;
       uploadKey.current = undefined;
+      setError("");
       setAsset(null);
       setFile(null);
       setAlt("");
@@ -240,16 +247,17 @@ export function PhotoAttachment({
           }}
         />
       </label>
-      <label className="w5-field">
-        Alternative text
+      <div className="w5-field">
+        <label htmlFor={altId}>Alternative text</label>
         <textarea
+          id={altId}
           style={{ resize: "none" }}
           maxLength={1000}
           value={alt}
           onChange={(event) => setAlt(event.target.value)}
           placeholder="Describe the photo"
         />
-      </label>
+      </div>
       {file && <p>{file.name}</p>}
       {activity === "upload" && (
         <p role="status">Uploaded {Math.round(progress * 100)}%</p>

@@ -1,5 +1,56 @@
 # W6 PR review follow-up — October 3, 2026
 
+## Current backlog and real photo acknowledgement qualification — 21:58 UTC
+
+Fresh inventory37 open/all draft: owner-confirmed293 closed unmerged21:35:47Z,
+6330d4a functional source/contract/history/evidence preserved in original74/d2f.
+Five source duplicates and docs-only295 into21 reduced43→37; no backlog main
+merge. All37 actual heads/all six active pushed W6 branches contain fresh main
+5c08634b.282/3f4d four successes/six queued;284/bf2a nine successes/one queued.
+No fully green qualified retained merge candidate; earlier Maven502 retained.
+
+Existing305/65b actual photo ack loss/original same-asset retry/logout/account
+departure qualified. All10 photos durably deleted/Note20/business0/protected
+upgrade closed. All own resources/ports/leases closed21:58:08. Personally repair
+observed stale removal error and unstable alt label; changed-source shipping/
+runtime repeat pending. Late host-save/genuine human/publication/native positive
+remain open. Reuse existing305/original producer leaves, no invented authority,
+held activation, new tests or coverage.
+[Exact actual observations](../../../artifacts/workstreams/W6/media-discard-lifetime/2026-10-03/README.md).
+
+## Current W6 closure and CI qualification — 21:15 UTC
+
+Original current-call PG closure is personally verified after attributed W8
+engine recovery: exact container/image/volume/binding, exited, all4 ports/PIDs
+closed and c4 lease released21:14:56. No post-recovery app/data acceptance.
+282/e428 has three SUCCESS/one Android FAILURE/six QUEUED; real Google Maven502
+before compile/runtime, other same-head Android success. Supported failed-run/
+job reruns are refused while workflow active; no cancellation/waiver/label edit.
+All retained positive/dependency/current-CI gates and38-draft dispositions stand.
+[Exact source/failure/closure](../../../artifacts/workstreams/W6/creator-call-offer/2026-10-03/README.md).
+
+## Current retained-head qualification — 21:03 UTC
+
+Fresh GitHub inventory still38/all draft, oldest21/85ac. Full ownership/reuse
+review and the earlier43→38 dispositions below stand; no backlog main merge.
+282/5f594,289/dc39 and305/65b51 each have four SUCCESS/six QUEUED;
+284/bf2a has seven SUCCESS/three QUEUED. Every retained PR still has queued checks;
+no current fully green merge candidate. All six active owned W6 branches contain
+freshly fetched main5c08634b7542fef95dd6c176030a785845250c62. Shared/peer/protected
+checkouts and numeric stash remain untouched. Later documentation heads need
+fresh CI, rather than inheriting these source pins.
+
+W6 personally qualified frozen282/5f594 shipping and actual web/iOS/Android
+negative/recovery/account journeys; native installed hashes verified. No
+human/offer/provider/audio/positive admission is supplied. Native resources,
+browser and app servers are closed; original PG cannot yet be verified stopped
+because Docker control RPC stalled. Exact runtime lease remains,55446 open;
+W8 coordinates the shared incident. Last actual state61/Note19/business0/all7
+photosdeletedv2/protected target closed. Keep282 draft. Existing284 latestpreview
+failure/adoption,289 genuine recorded signature and305 positive human/task/
+publication gates remain. Reuse original PRs; no new tests/coverage.
+[Exact current verification and closure gap](../../../artifacts/workstreams/W6/creator-call-offer/2026-10-03/README.md).
+
 ## Current retained backlog and personal qualification — 19:53 UTC
 
 Fresh GitHub inventory has38 open/all38 draft, oldest21/85ac1231. The renewed43

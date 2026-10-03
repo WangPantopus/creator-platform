@@ -1,5 +1,64 @@
 # Original media discard lifetime — October 3, 2026
 
+## Actual DELETE acknowledgement loss and observed repair — 21:58 UTC
+
+Frozen305 source65b51b54f4aa6ac9a95da11f6c9caa48a469f2e6 is byte-identical to
+qualified29f across backend/web/packages/configuration. Fresh backend/web builds
+passed21:46:21/21:46:30Z. First PG readback failed57P03 during normal startup;
+subsequent readiness and genuine selected-state read exactly matched the prior
+61/Note19/all7 deleted rows/protected upgrade limit0/owner closure before app
+traffic. This is selected-state equality, not a full restore guarantee.
+
+Personally operated genuine W1 issuer Studio uploads and original expected
+account/SID741d5b9b-a642-43ee-aef0-a6284a2f44eb. An owned private gateway only
+held/dropped actual upstream bytes; it supplied no application response/authority.
+All actual40-byte202 receipts are revoked/deletion pending, SHA256
+6393a5587dcfa8bdda2173fb62b148f4cc1e76e3ae4678afda00c7d0d3d88705.
+
+| Actual asset                         | Observation                                                                                                                                                                                                                    |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 377a65f0-d79b-481c-82bd-4f22b36329c5 | 40-byte corrupt PNG. Actual revocation committed before held receipt. First drop triggered Chromium automatic same-session DELETE retry; genuine retry202 cleared file. This did not establish an unreconciled client failure. |
+| 3ab84149-87c9-41c6-9620-bf74338de5c6 | 49-byte corrupt PNG. All three actual transport acknowledgements dropped. Exact local file and alternative text remained. Explicit Discard reused same asset/SID, received real202 and cleared inputs.                         |
+| 22daeca4-80b8-415d-95f9-b9546f1c1103 | 35-byte corrupt PNG. After real202 was held, original logout200/issuer account switch/navigation removed old form. Client left before receipt; replacement correctly has no Studio role and issued no replacement DELETE.      |
+
+Actual row input SHA256 respectively:
+8227475362d9b116294fbee9627e4c0cf9965d539dbfd547aff9f099806b12b3,
+77651e9afe25d51a787d9208272b412449b872c3d696d1b4adee1fe647c2e513,
+74b60224dea6c9821ec58020a89f047732684d13c5a721f8356005518ee78355.
+No processing/C2PA/human/positive publication is inferred from these corrupt
+uploads. Rejected/quarantined photos are absent from document.media; their
+beforeDiscard skips draft save. Late host-detach save remains unqualified.
+
+The run exposed a stale processing403 notice after successful removal and an
+implicit alternative-text label incorporating textarea contents. Personally
+repair polling suspension during discard, notice clearing after canonical
+receipt, and separate stable explicit labeling. Web types/scoped lint/format
+pass. Changed-source shipping/runtime repeat is pending; no new tests/coverage.
+
+Real dedicated0062 worker completed all10 rows deleted/version2, no jobs and
+all exact storage directories absent. Note20 draft/61 migrations/business0;
+protected upgrade limit0/owner closure remains. First worker start refused a
+missing private directory; a genuine owned0700 empty work directory corrected
+that launcher setup. First closure guard refused /private/tmp socket alias;
+actual child/group/socket ownership was verified using lsof's /tmp alias. Initial
+failures preserved, no held purpose or signer invocation.
+
+Genuine browser logout/context/server/lease, API/Next/TLS/worker/scanner/child/
+socket and3006/3106/4106/55446 all closed. Original PG exited and exact runtime
+lease71e27254-e7f3-45ed-844a-4949bd5bdd86/dev16777232/inode245243021 released
+21:58:08Z. No native/shared browser/peer mutation. Human voice, signature,
+production signer/provider/hardware/full accessibility remain open.
+
+Private evidence SHA256:
+
+- shipping-build.json: `c7311f2f0eca6de18b545cb13442759256c24f1e189424b91c9127528f0d0914`.
+- browser-result.json: `45c41d82762c0f7f5b3d0b9dbbdfbd9c29d9beaa34ea8e587735eb34f59b9649`.
+- final-state.json: `20987a10e3f36e6495c39ce4ca844879c73d9b6a613b209dada9905cd3357136`.
+- original-response-events.jsonl: `219b72e39bfeba7de7e6435edaefb4115a229a22f389d15b5d2e9bdadc70760f`.
+- original-request-metadata.jsonl: `0838925bedc079a26fad5233e3e8be594161ea02a20cf5b1abcb4324e0589b94`.
+- storage-closure.json: `f17d19cdaae3d9f00c95ac0e2f18e334a9694cf4e2e6df887446bdc46f5ad245`.
+- closure.json: `864a3b894ae7fe5df9dbb3b8f252cda9fd80a45112fa31058114c637388b9b93`.
+
 ## Current composition personally operated — 19:16 UTC
 
 Frozen `d42a8e47185cd73d91d6901f19520befd5809825` normally merges the complete
