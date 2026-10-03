@@ -16,6 +16,14 @@ type SelectionProps = {
   actorAccountId: string;
   canSelect: boolean;
 };
+function selectionNotice(error: unknown, fallback: string) {
+  if (!(error instanceof MediaRequestError)) return fallback;
+  return ["media_unavailable", "media_transport_unavailable"].includes(
+    error.code ?? "",
+  )
+    ? copy.w6TheTimesCouldNotBeLoadedReconnectAndTryAgain
+    : error.message;
+}
 export function SelectTime(props: SelectionProps) {
   return (
     <SelectionForm
@@ -132,11 +140,7 @@ function SelectionForm({
           setOffer(null);
           setStale(true);
           setLoaded(true);
-          setNotice(
-            error instanceof MediaRequestError
-              ? error.message
-              : copy.w6TheTimesCouldNotBeLoaded,
-          );
+          setNotice(selectionNotice(error, copy.w6TheTimesCouldNotBeLoaded));
           if (
             error instanceof MediaRequestError &&
             ([401, 403, 404, 409].includes(error.status) ||
@@ -295,9 +299,10 @@ function SelectionForm({
       if (mounted()) {
         setStale(true);
         setNotice(
-          error instanceof MediaRequestError
-            ? error.message
-            : copy.w6ThisTimeIsUnavailableReloadTheCurrentOffer,
+          selectionNotice(
+            error,
+            copy.w6ThisTimeIsUnavailableReloadTheCurrentOffer,
+          ),
         );
       }
     } finally {
@@ -388,7 +393,9 @@ function SelectionForm({
       ) : (
         <p className="w6-notice">
           {loaded
-            ? copy.w6ThisOfferChangedOrExpiredOpenRequestsForItsCurrent
+            ? notice && !offer
+              ? copy.w6TheTimesCouldNotBeLoaded
+              : copy.w6ThisOfferChangedOrExpiredOpenRequestsForItsCurrent
             : copy.w6CheckingTheCurrentOfferAndParticipantAccess}
         </p>
       )}
