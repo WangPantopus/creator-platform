@@ -7,6 +7,10 @@ import { registeredMigration } from "../../db/reviewed-migration.js";
 import { requestAuthority } from "../identity/request-authority.js";
 import type { PrivacyTaskInput } from "../trust/privacy-authority.js";
 import { generationConsumerCatalogue } from "./generation-consumer-catalogue.js";
+import {
+  agentPrivacyConnectionTimeout,
+  agentPrivacyQueryTimeout,
+} from "./privacy-transaction.js";
 
 export const AGENT_PRIVACY_EXPORT_MIGRATION = "0196_w2_privacy_export_snapshot";
 const Owner = "creator_w2_privacy_export";
@@ -325,7 +329,7 @@ export class PreparedAgentPrivacyExport {
     signal.throwIfAborted();
     const pidQuery = {
       text: "SELECT pg_backend_pid() AS pid",
-      query_timeout: 5000,
+      query_timeout: agentPrivacyQueryTimeout(client),
     };
     const pid = z
       .int()
@@ -338,9 +342,9 @@ export class PreparedAgentPrivacyExport {
         const failures: unknown[] = [];
         const control = new Client({
           ...this.pool.options,
-          connectionTimeoutMillis: 1500,
+          connectionTimeoutMillis: agentPrivacyConnectionTimeout(this.pool),
           statement_timeout: 1500,
-          query_timeout: 1500,
+          query_timeout: agentPrivacyQueryTimeout(client, 1500),
           pipeline: false,
         });
         const onError = (error: Error) => {

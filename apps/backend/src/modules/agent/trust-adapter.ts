@@ -190,7 +190,6 @@ export function agentPrivacyHook(
         "privacy_scope_large",
         "Split this account operation into bounded creator jobs.",
       );
-      await service.repository.assertRuntimeRole();
       input.signal?.throwIfAborted();
       let accountingReference: string | undefined;
       let lineage = false;
@@ -220,6 +219,10 @@ export function agentPrivacyHook(
         service.repository.pool,
         input.signal,
         async (accountingClient) => {
+          await service.repository.assertRuntimeRoleInTransaction(
+            accountingClient,
+          );
+          input.signal?.throwIfAborted();
           await assertTask(accountingClient);
           lineage = await lifecycle.assertAccountingClient(accountingClient);
           if (lineage) {
@@ -341,6 +344,8 @@ export function agentPrivacyHook(
               service.repository.pool,
               input.signal,
               async (client) => {
+                await service.repository.assertRuntimeRoleInTransaction(client);
+                input.signal?.throwIfAborted();
                 await assertTask(client);
                 await client.query(
                   "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
