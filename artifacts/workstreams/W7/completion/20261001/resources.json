@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-03T18:57:32.203778+00:00",
+  "updatedAt": "2026-10-03T19:34:27.612353+00:00",
   "owner": "W7 primary",
   "chatId": "01a0ff25-62ae-7062-8e4c-125a04e9c33e",
   "checkout": "/Users/yingpengwang/.codex/worktrees/w7-successor-20261002/creator-platform",
@@ -115,7 +115,7 @@
     "latestSwiftCheckExitStatus": 0
   },
   "restorationReceipt": "leased-privacy-native-checkpoint.json",
-  "currentSource": "3dc68f01cfc332403516851bace7178749a9d912",
+  "currentSource": "388dfcce55a8f508f3158168b6ddfc3ad8c4eff8",
   "handoff": "docs/workstreams/handoffs/W7-2026-10-02-next.md",
   "nativeToolPreparation": {
     "jdkHome": "/private/tmp/creator-platform-w7-completion-20261001/native-tools/jdk17/jdk-17.0.20.1+1/Contents/Home",
@@ -849,31 +849,40 @@
       "evidence": "Routine screenshots/hash/log/diagnostic evidence remains private under successor scratch."
     },
     "prReview20261003": {
-      "source": "3dc68f01cfc332403516851bace7178749a9d912",
+      "source": "388dfcce55a8f508f3158168b6ddfc3ad8c4eff8",
       "reviewedMain": "5c08634b7542fef95dd6c176030a785845250c62",
       "integration": "092e5e4ca651d802e0b2673f2900c155de87d832",
       "sourcePathsPersonallyReadAtCheckpoint": 158,
       "sourcePathsTotal": 158,
       "fullCombinedReviewComplete": false,
       "pr31": "open draft/unmerged",
-      "existingWorkspace": "3dc6/6PASS4.604s;native/web/pkg/generator bytesunchangedfromqualified4ec",
+      "existingWorkspace": "388 existing6/6PASS1.595s",
       "existingVisual": "4ec13originalPASS2.8min;references/dimensions/contractunchanged",
       "native": "Currentb92 installedexecutable/dylib/APKhashmatch; personallyoperated bothshippingcoldofflineHelpLight/Night, iOSRefresh fallbackretained; AndroidNightRefreshattemptuncredited. iOSText11fingerswipereachesfooter/Refresh, sharedbannerellipsisstillfailure. HealthyNight/configuration/originalsession/stall/privateprotected/spoken/populated acceptanceOPEN; originalfailurespreserved.",
-      "ownerInventory": "Fresh40open/allDraft/oldest21; all42capturedheads containmain5c, allsevenownersauditcurrentPRs. Earlier13andnew299/280/236verifiedCLOSED-unmerged consolidations retained. W1Commerce/session,b0cwebcleanup,c03Swift andW4native/known-settlement originalsource personallyreviewed/selected; nopeercheckoutedit/acceptanceborrow.",
+      "ownerInventory": "Fresh38open/allDraft/oldest21. Allsevenownersretaincustody;296verifiedCLOSEDunmergedsourceb0c preservedin21;17historicalconsolidations. Documentation-only295MERGEDinto21 atca8f, notmain. Main5cfetchedunchanged/contained; nopeercheckoutedit.",
       "authority": "NoSQLmigration/grant/role/authoritydata;backupstale;unansweredfull17packet/human0044\u20130060 binding",
       "originalAcceptance": "Every unfinished original row/historical failure retained; W7incomplete",
-      "latestExactHeadCI": "Current3dcnotyetpushed; old0511remoteTrust/webbackend/AndroidruntimePASS,3MacfamiliesQUEUED. Allsixexactnewpushedhead/finalcombined/currentjourneysrequired; noW7merge.",
-      "resources": "actual18:52:38.591751UTC API/websettled,FABShutdown,5580absent,all3exactleasesreleased;canonical40/cap0/0otherclients/PGexited0",
+      "latestExactHeadCI": "Pushedbf060Foundation37146865826 web-and-backend111272526628 andAndroid-runtime111272526310SUCCESS;webvisual111272526474/ios111272526536/androidfoundation111272526568QUEUED. TrustPR37146865892/111272523888 andmanual37146872266/111272544894SUCCESS. Nonequalifiesnew388; all6exactnewhead+currentjourneys+fullcombinedrequired.",
+      "resources": "physicalclosure19:24:10.624941before19:31:58.929856deadline:APIexit0/web-15,FABShutdown,5580absent/emulator0,all3exactleasesreleased,canonical40/limit0/0otherclients/PGexited0. Heavy388normalexactrelease19:30:53.123419 afterchild0; successorW2leasepreserved.",
       "postEntry": "Capturedb549Begin/sourceguard117registrycurrent; prior047normaldisclosures/refusalsoperated,olderfafailurespreserved. Genuinecreator/provider/context unavailable. W7 5b publicaction sessionpin is a narrow separate repair, shipping/genuineracepending.",
       "publicEntryRetry": "930 four-page repair personally operated in production: actual post Retry initially lost destination toDiscover; repaired post UUID/creator sectionChat/invite UUID/share UUID retained after clicks. Actual API shutdown share Reload/Retry retains UUID. Refusal/recovery only, no genuine publication/share/invite/consent acceptance. Routine evidence stays private. Current047 productionRequests\u2192Continue\u2192Retry\u2192Back retains commerce/requests and reportsidentity_unconfigured; genuine authenticated/session-race remains open. Current092 personally operated StudioSources\u2192Continue\u2192Retry\u2192Back retains /studio/ai/sources and reportsidentity_unconfigured. Initial incorrectHTTPproductionorigin refused; correctedlocalmissingoriginunset, policyunchanged. Own tab3closed/user1untouched; newroutineevidenceprivate. Current5b productionDiscoversearch/category/outage/Tryagain recovery retained; HomeContinue/refusal/Retry preserves/home. Owntab4closed/usertab1untouched; noauthenticated/genuinecreatoracceptance. Currentb92 actualproduction publicHelp offline/Tryagain retainsroute/emergencystaffingguidance; noAPI/DB; owntab5closed/web130/user1untouched. Current3dc productionretained-cookieSpendingsaved-sessionoutageRetry retains/commerce/spending; /trust/crisis Tryagain retainsroute/emergency/adult/staffingguidance. Initial/help404preserved; tab6closed/usertab1untouched; noAPI/PG/authority/poplulatedacceptance.",
       "generatedOperations": 117,
       "roleCatalogueDependency": "ExactW8d6seven-pathoriginalfamilyminimum selected at3dc; literalcore/noOUTBOUND/inboundAPIgrantsretained; held0214unregistered/unapplied; noSQL/grant/role/authority workaround orprotectedacceptance.",
       "combinedPaths": 1206,
-      "openDrafts": 40,
-      "additionalVerifiedClosedUnmerged": [299, 280, 236],
-      "nativeQualification": "4ecSwift18/11013.782s;signediOSdeepstrict;Android47tasks37s/APKsigPASS",
-      "nativeOperation": "Current4ecPENDING after preserved setup refusals; no current installed operation credited",
-      "sharedDockerRecovery": "Completed by W8 with supported tools under direct human existingruntime authority; old pendingquestion/uncertainty superseded"
+      "openDrafts": 38,
+      "additionalVerifiedClosedUnmerged": [299, 280, 236, 296],
+      "nativeQualification": "388Swift18/11014.361s;signediOSdeepstrict;Android47tasks74s/APKsigPASS; webunchangedretains4ec13 originalpasses",
+      "nativeOperation": "bf060 actualdevelopment-accountAPIoutage\u2192Refreshsessionrecovery/RequestsCommerce-unconfigured refusal. Text11Noticebodywrapsfully but staticrootnoticesoverflow/hidecontrols;388repaircurrentshippingoperationPENDING. AndroidStudioemptyRunningDevices/AddDeviceno-selector; noAndroidUIcredit.",
+      "sharedDockerRecovery": "Completed by W8 with supported tools under direct human existingruntime authority; old pendingquestion/uncertainty superseded",
+      "documentOnlyOwnerMerge": {
+        "pr": 295,
+        "base": "codex/w1-onboarding-timing-20261001",
+        "head": "15876bf88bc623e1451e5293f4c6767d3829ebac",
+        "merge": "ca8f796bc2e42877953d64d71eb562bfc8b66c00",
+        "mergedAt": "2026-10-03T19:28:56Z",
+        "productOrMainMerge": false
+      },
+      "newNativeSelections": "W1exact6fcanonicalgenerator/W7actual117 regenerated9a22;W3exactfbc2paths229;ownobservedrootoverflowrepair388 personallyreviewed, repairedshippingoperationpending"
     }
   },
   "previousTransfer": {
