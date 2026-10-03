@@ -1,0 +1,11 @@
+{
+  "consumedSource": "e080cf9407ca3d55ec03fb773e2c53ddd5b60869",
+  "sqlUnchanged": "7ab8974d065b1b9e5befa2ded26c6978876957fab0eee80b9632825bbac98477",
+  "path": "apps/backend/src/modules/agent/generation-terminal-journal.ts",
+  "sha256": "14ff1f7b4864a8daa53bdcf7864635b4935627521446bdd2ab104875051e6639",
+  "localChecks": {
+    "typecheck": "PASS",
+    "scopedLint": "PASS"
+  },
+  "actualScopeOrFactory": "not issued/registered"
+}

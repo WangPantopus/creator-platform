@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "host": "Yingpengs-Mac-Studio.local",
+  "sourceSHA": "5ec5cb07a5f5185e4dd68732f2562f32aec753a7",
+  "backupName": "creator_w2-pre-wave-20261002T120143Z.pgdump",
+  "bytes": 541750,
+  "dumpSHA256": "10e377187d4b562a5a5193e7633ec75bee836ee728229c4f984c9e40b965829a",
+  "TOCentries": 1277,
+  "restoreDatabase": "creator_w2_pre_wave_restore_20261002t120143z",
+  "initialRestoreCommand": "failed: CREATE DATABASE combined with another statement; no database created",
+  "correctedSeparateCreateAndComment": "passed",
+  "exitOnRestoreError": true,
+  "restore": "passed",
+  "actualDigests": {
+    "ledgerSha256": "20712be324ee79c36e30e86527fc9f6edd083266477b9757a4859aa49bfe2350",
+    "schemaSha256": "c644f2e880991f1478bf372060ff42a95e2cb919fa8ef976d7a9fe37853cd1f9",
+    "dataSha256": "cfae0d0ab619e3a5745f9ca91b317e42e406e763a2e602bf27dd727950fcf9a7",
+    "securitySha256": "d70cfb378aed72e0bbbd82165aa56bc2976da4752d4053c03575728c77a86f1f",
+    "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+    "ledgerRows": 40,
+    "rows": 42,
+    "tables": 145,
+    "securityRecords": 14205,
+    "sequences": 1
+  },
+  "restoredDigests": {
+    "ledgerSha256": "20712be324ee79c36e30e86527fc9f6edd083266477b9757a4859aa49bfe2350",
+    "schemaSha256": "c644f2e880991f1478bf372060ff42a95e2cb919fa8ef976d7a9fe37853cd1f9",
+    "dataSha256": "cfae0d0ab619e3a5745f9ca91b317e42e406e763a2e602bf27dd727950fcf9a7",
+    "securitySha256": "d70cfb378aed72e0bbbd82165aa56bc2976da4752d4053c03575728c77a86f1f",
+    "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+    "ledgerRows": 40,
+    "rows": 42,
+    "tables": 145,
+    "securityRecords": 14205,
+    "sequences": 1
+  },
+  "separateRestoreMatches": true,
+  "trafficClosed": true,
+  "providerCalls": 0,
+  "heldPurposeMigrationsActivated": false
+}

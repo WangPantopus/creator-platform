@@ -17,6 +17,7 @@ Independent narrow repair candidate is based on actual main `53133967`, after W6
 
 Current independent source repair: strict creator-signed/team-authenticated translation provenance, provider text minimization, and no absent-provider ingestion timer. Backend types/lint/format and nine existing contracts PASS; real API remains ready=false/generation=unconfigured with one disabled notice. Distinct real translation job/source/accounting remain open, without an invented generation row. [Receipt](../20261002-translation-provenance/README.md). Latest live milestone backup after actual iOS sessions: private716,006 bytes / SHA256a406cb5c… /1,572 TOC, separately restored; all57 ledger rows,44 business rows/161 tables, schema/security/roles/membership/sequences match. First guessed database-owner refusal preserved and corrected from actual owner/ACLs. The61 privacy-wave copy backup remains a separate earlier qualification.
 
+
 **Current synthetic-host guard:** genuine DevelopmentLicenseVerifier now exposes exact pool qualification; actual creator_runtime accepts its own pool and refuses a different pool with the same URL503 before any second connection/provider/write. [Source-qualified receipt](../20261001-mac-studio/synthetic-pool-qualification/README.md). This does not approve processor policy/consent/retention or activate generation. W3’s explicit verified:false synthetic qualification and genuine W1 generation-task consumers remain in progress.
 
 [Current nine-package finish matrix](finish-matrix.md) and [remaining delivery backlog](release-backlog.md) are authoritative for current scope. Full W2 is incomplete. Source implemented, runnable isolated behavior, canonical integration, personal operation and release readiness are distinct in that matrix.
@@ -27,12 +28,40 @@ Current proof: [public main check](../20261001-mac-studio/public-projection/merg
 
 Earlier iMac source/provider counts/cleanup/archive/PR40-pending assertions and every incremental receipt remain in [verbatim README history](README-history-20261002.md), [matrix history](finish-matrix-history-20261002.md), [backlog history](release-backlog-history-20261002.md); [manifest](current-record-reconciliation.json) pins their bytes/SHA256. They are dated evidence, not current runnable records.
 
-W8 reserved held0096_w2_generation_input_consumers and0097_w2_generation_attempt_admission for genuine W1 task-scope/NOLOGIN reviewed consumers. Source implementation proceeds with W1/W3/W4/W5; original live40 is unchanged and no job/Actor/approval/raw worker grant is invented.
+W8 reserved held0096_w2_generation_input_consumers and0097_w2_generation_attempt_admission for genuine W1 task-scope/NOLOGIN reviewed consumers. Source implementation proceeds with W1/W3/W4/W5; original40 history/data/roles/sequence are preserved in the now-upgraded live57 and no job/Actor/approval/raw worker grant is invented.
 
+PR126 normally merged9b3c0a7a→65a92f9b (11:52:42Z),4fast exact-head checks passed/six Mac queued; actual main pool-guard repeat passed at5ec5/creator_runtime/57/0otherconnections. Held0096 current compiled/licence/source-proof inputs are now implemented under genuine W1 purpose/private nonce and explicit exact-function receipts. Copied57 SQL/ACL negative probes allrefused42501,0jobs/provider/private-content reads; source checks18passed/T11unchanged45781ms. Purpose audience/retrieval, admission/completion/terminal settlement and canonical activation remainopen. [Input checkpoint receipt](../20261001-mac-studio/generation-purpose-inputs/README.md).
+
+The owned live database now has canonical57 after main5ec5’s exact17-file atomic upgrade, independent715731-byte private backup/SHAef7e489d…separate restore and full ledger/schema/data/security/sequence custody. Original42rows145tables/40history/roles/sequence preserved; actualfresh57 catalogue/security match. MainAPI5ec5 restarts; actualNightStudio retainssameMaya20/sidebar248/nooverflow. Mainpoolguard passes; ready503trust_unconfigured. Future generation/public/C10 purpose activation and all provider/native/p95/production gates remainindependent. [Canonical57 milestone](../20261001-mac-studio/live-canonical57/README.md).
+
+W1’s actual published owner contractdcb77f23 is consumed for creator_w2_generation_input, retaining exact migration/function-definition/private-nonce/NOLOGIN/zero-raw-worker guards. Held0096 SQL remainsunchanged25f89…; draftPR132 is the reviewable input milestone.0097provider admission/completion and distinct0099/0100terminal custody remaininprogress/unactivated.
+
+Held0097 accounting source now uses genuine W1 purpose plus current W2 inputs/W3 published context32f9f6c6 and actual prepared0077/C10 custody, computes the configured model ceiling and commits durable unknown usage before provider I/O. Private completion is bound to original usage/generation/attempt; forged custody and raw worker access refuse. Creator/family exports exclude the digest. Actual closed copied57 SQL:8 denial probes42501, zero durable writes/provider calls, ledger57 unchanged; typecheck/lint passed after fixing nullable model qualification. This is draftPR132 source only: no canonical activation, accepted job or positive provider proof; distinct0099/0100 late receipt reconciliation/original W4 settlement and purpose retrieval remain open. [Accounting checkpoint](../20261001-mac-studio/generation-attempt-admission/README.md).
+
+Actual native Chrome200% Light/Night on populatedMaya20 now personally verified:1280×900→640×450 CSS, no horizontal overflow, Tone/20th example/44px label/bottom44pxNotes keyboard reachable. Native Zoom Reset100% and originalNight restored; matching shared GUI leases released. Source7bf3 reconciles main4d6470; backend/web types passed after isolated dependencies refreshed. This does not establish390-wide200%, all artboards, screen readers/native/provider/p95 acceptance. [Browser receipt](../20261001-mac-studio/browser-text-200/README.md).
+
+
+Historical PR143 opening receipt follows; its CI/merge pending statement is superseded by the merged increment below.
 
 ### 2026-10-02 — real 390-wide 200% Studio navigation
 
 Actual native Chrome 200% exposed More outside the 195-pixel CSS viewport despite no document overflow. W2-only CSS repair personally operated on exact `fc92a031`: all five 57×44 links fit in Light and Night; Night keyboard reached all five and the twentieth stored example’s 44-pixel label. Baseline 390×1300 gutter 16 and 1280×900 sidebar 248 retained in both themes. Native zoom reset to 100%; matching GUI lease released. [Sanitized receipt](../20261002-studio-200-navigation/README.md). Local web typecheck and formatting passed; exact-head CI and normal merge pending. Screen readers, native iOS, other artboards, provider paths and named p95 remain open. No persisted state or provider writes.
+
+
+### 2026-10-02 — merged narrow Studio repair; held genuine retrieval
+
+PR143 normal merge `1048f2f4` (exact head `e28cc951`, four fast checks PASS, six macOS QUEUED; main unprotected/rulesets[] rechecked). Personally reloaded actual main Studio at1280×900 and CSS195×650; all57×44 links fit and More takes keyboard focus. Earlier actual native200% Light/Night AX/DOM checks retained. Screenshot audit found195×128 cropped native200% captures; whole-window capture remains open, not full R12 acceptance. [Navigation receipt](../20261002-studio-200-navigation/README.md).
+
+Held0104 now uses actual W4 audience and W5 origins before nearest-four source selection, privately issued real-model embeddings bound to accepted text/message/generation/attempt/version, five approved retrieved styles and same-client authority bookends. Corrected SQL `bf9d9c35`, actual definition `b92d539a`: actual closed-copy install,36 effective column grants/zero table and sequence grants, five42501 refusals, both actual-role query plans PASS; first ambiguous-id failure preserved. Ledger57 and all journal/scope rows0 unchanged. Backend typecheck/scoped lint and18 existing checks PASS; T-11 unchanged10k pairs/30k queries/300000ms, observed65457ms (not app p95). [Retrieval receipt](../20261002-generation-retrieval/README.md). No activation/provider vector/genuine job/signed approval/financial acceptance. Actual105 terminal seal and late correction remain next.
+
+
+## 2026-10-02 — original terminal journal source and closed review
+
+W2 implemented held0105 `PreparedGenerationTerminalJournal`: actual W1 final terminal scope/client → original all-attempt seal/read → immutable receipt; no ThreadScope/provider/message/financial authority. SQL SHA256 `7ab8974d065b1b9e5befa2ded26c6978876957fab0eee80b9632825bbac98477`. Actual W1-0099/W8-0100/W3-0110 installed with exact dependencies only on own traffic-closed copied DB. Semantic compiler2.10 produced0 issues for all3 functions;9 corrected42501 refusals; ledger57 and all journal/job counts0 before=after. Original wrong-column42703 retained and corrected; no new unit coverage tests. TypeScript/scoped lint passed. Source/ACL/definition/catalogue evidence: [terminal journal receipt](../../../artifacts/workstreams/W2/completion/20261002-generation-terminal-journal/README.md).
+
+Still source-held: no live activation, genuine purpose, positive transition, late-provider correction, W4 weighted settlement, C10 race, wakeup/client delivery or p95. W3 now published actual0110 finalization; W4 original terminal settlement and separate already-terminal107/W1-108/W8-109 remain coordinated dependencies. W8 identified a real Agent empty-family C10 held-client COMMIT-fence gap; W2 accepted and is implementing the actual0087 lifecycle port next. Team translation cannot invent a creator signature or generation FK.
+
+Actual main1048 browser restoration: native Chrome100%, DPR1, Night1280×900/sidebar248, exact W2 GUI lease released; physical native200 capture omitted bottom viewport and stays private, so full native capture/artboard proof remains open. No native/heavy/device slot held by W2.
 
 
 ## 2026-10-02 — Agent privacy custody includes empty families
@@ -42,8 +71,28 @@ W2 closed the source-level empty-family Agent ACK gap: required real held-client
 Coherent repeatable-read export stays truthfully closed under actual W8 restoration. W8 reserved held0113 for W2's separate fixed all-owned-sources purpose/private scope + one Read Committed NO SCROLL cursor; do not widen strict0087 scope/function custody or use lateral GUC changes/per-creator snapshots. Actual original late accounting108/109/107, C10 disposition/finite retention, provider and complete three-client operation remain open.
 
 
+## 2026-10-02 — merged Agent COMMIT fence; coherent source review
+
+PR152 normally merged166d9ee6, exact64ee1e5b four fast+extra compile PASS/six macOS QUEUED; main68c839b9 backend typecheck PASS. No admin override. W8 independently operated genuine empty-fan account export on its labelled61 copy after separate COMMIT; W2 has not personally completed that job or all-eight C10.
+
+W2 implemented original0113 coherent account export producer/current W8 metadata196: own private purpose, fixed one-query snapshot, complete topology serializer, actual task/restoration/COMMIT fences, actual PID cancellation. Actual closed-copy six compiler checks0 issues/seven42501 refusals/ledger57 and all job/journal counts0 unchanged. Real non-owner generic engine experiment confirms full materialization42.6MB spill, snapshot at first fetch, timeout/cancel/reusable connection; FETCH8 is not bounded DB production, measurements are not p95 or actual Agent purpose. Initial SQL/type/volatile/driver errors preserved. Readiness stays false without actual reviewed activation/source/lifecycle ports. No fake job, signature, finite retention, production consent or release approval. Receipt: artifacts/workstreams/W2/completion/20261002-privacy-export-snapshot/README.md.
+
+Corrected W8 held mapfb1cbca/SHA2338f48e consumed: own163 lineage/165 expiry/180 inputs/181 admission/187 retrieval/188 journal/196 export metadata; original SQL bytes/paths unchanged, no aliases. W4 found an actual embedded old98 SQL registration guard and owns repair before future activation. Actual W4 terminal106 source1f18a5d1/PR161 is available, separately reviewing105 same-client drift fences. Late108/109/107, translation genuine-job accounting, weekly digest, provider/native/complete artboards/named p95 remain active work.
+
+Validated latest private715734-byte backup/SHA3997a822…1572 TOC/separate closed restore: all162 full-row tables99 rows/57 history/schema ACL/roles/membership/sequences match. First live comparison differed in canonical session touch; own API/web stopped for corrected snapshot, no peers stopped. Provider key and old archive last checked absent; no credential search.
+
 This independently extracted privacy fix is reviewed against main36f9505e; draft132 input/admission/retrieval/terminal work remains separate and unfinished.
 
+
+2026-10-02 current terminal consumer increment: W4 exact e080cf9407ca3d55ec03fb773e2c53ddd5b60869 class consumed unchanged; own188 descriptor/function/ACL/column/RLS currentness bookends every held read/seal rather than relying on163. W2 personally detected/restored3 actual rolled-back drift changes on own closed57, all generations/usage/receipts0; first wrong-column42703 retained. No registered factory/genuine scope/provider/financial lifecycle claim. Main590c7ec9 API4102/web3002 restored after validated715734B backup; actual shipping Android build37tasks/77s PASS, exact e2136252… APK not yet personally operated. Future source activation, actual native/provider/complete C10/translation/digest/p95 remain open.
+
+
+2026-10-02 terminal-registry continuation: consumed exact W1 `00fbdc5a` identity/terminal and W2 journal source; separate terminal-purpose contract preserves unchanged183 issuer bridge=true and188/189 terminal-only=false. Actual closed-copy metadata confirms issuer true/true and W2 journal false/true; W4 owner absent here. Backend types/scoped lint/nine existing contracts PASS, no SQL/grant/ledger activation or genuine positive job/financial/provider proof. See artifacts/workstreams/W2/completion/20261002-terminal-registry/README.md.
+
+Actual main590 web cold DBstop→focused unavailable retains canonical Maya session; Retry while down remains recovery, actual DBready→manualRetry restores20examples/criteria/banner/APIalive. JPEG1280×843 for DOM1280×900 is cropped, not fullartboard proof. Current-main Android37tasks/77s APK e2136252 installed only after actual own5554/Qelvora_W2_API34 verification; GUI journey pending. Initial provisional5584 identity was corrected(readonly console was W3; no install/input/stop); initial actual2560MB launch stopped and supported-lowram corrected to actual2cores/2048hardware/2026148kBguest. Failures and limits retained in artifacts/workstreams/W2/completion/20261002-main-reverification/receipt.json.
+
+
+2026-10-02 independent W2 four-source privacywave qualification: actual W8 PR159fb1cbca packetSHA2d72120d on closed copied57→61, private716282B dump/SHA16be8ac9/separate restore full ledger/schema/business/security/roles/sequences match. All57 original checksums/timestamps,42 rows/161 original tables/oldroles/sequence preserved; independentfresh61/zero business rows matches resulting schema/security/roles; private scopes0; eight actual semantic compiler checks0. First partial-restore measurement/schemaACL mismatch and missingmanifest refusal retained; corrected after completed preparation. Stale pre-upgrade manifest refused after wave. Live W2 remains57; no positive job/196/C10/provider/main activation. See artifacts/workstreams/W2/completion/20261002-privacy-wave/README.md.
 
 ## 2026-10-02 19:21 UTC — current native Trust acceptance
 

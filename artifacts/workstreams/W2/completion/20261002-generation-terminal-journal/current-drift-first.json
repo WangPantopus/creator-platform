@@ -1,0 +1,7 @@
+{
+  "firstAttempt": "GRANT SELECT(content) ON creator.message",
+  "sqlstate": "42703",
+  "diagnostic": "column content of relation message does not exist",
+  "effect": "failed before granted privilege, transaction connection exited/rolled back",
+  "next": "read actual immutable W3 schema before selecting corrected existing column"
+}

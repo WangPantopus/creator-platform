@@ -1,0 +1,66 @@
+{
+  "time": "2026-10-02T16:10:51.602Z",
+  "host": "Yingpengs-Mac-Studio.local",
+  "database": "creator_w2_export_engine_20261002",
+  "mode": "separate generic PostgreSQL engine experiment; not an Agent job, purpose source, protected artifact, task ACK or production/p95 proof",
+  "rows": 20000,
+  "payloadBytesPerRow": 2048,
+  "login": {
+    "session_user": "creator_runtime",
+    "current_user": "creator_runtime",
+    "rolsuper": false,
+    "rolbypassrls": false
+  },
+  "before": {
+    "temp_files": "0",
+    "temp_bytes": "0"
+  },
+  "firstFetch": {
+    "milliseconds": 200.25812500000006,
+    "rows": 8,
+    "revisions": [
+      1
+    ],
+    "firstID": 1,
+    "nodeBefore": {
+      "rss": 105594880,
+      "heapTotal": 18972672,
+      "heapUsed": 10755744,
+      "external": 3642699,
+      "arrayBuffers": 1075684
+    },
+    "nodeAfter": {
+      "rss": 85278720,
+      "heapTotal": 18972672,
+      "heapUsed": 11509656,
+      "external": 3659576,
+      "arrayBuffers": 1092521
+    }
+  },
+  "exhaustion": {
+    "count": 20000,
+    "allRevisionOne": true,
+    "totalMilliseconds": 2417.61175,
+    "maxHeap": 40966736,
+    "peakRss": 176668672
+  },
+  "after": {
+    "temp_files": "1",
+    "temp_bytes": "42559996"
+  },
+  "concurrentCurrent": 2,
+  "statementTimeout": {
+    "milliseconds": 201.17000000000007,
+    "sqlstate": "57014"
+  },
+  "controlLogin": {
+    "session_user": "creator_runtime",
+    "current_user": "creator_runtime"
+  },
+  "cancelResult": true,
+  "cancellation": {
+    "milliseconds": 210.8013329999999,
+    "sqlstate": "57014"
+  },
+  "reusableAfterCancel": true
+}

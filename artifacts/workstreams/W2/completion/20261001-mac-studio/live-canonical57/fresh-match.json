@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "host": "Yingpengs-Mac-Studio.local",
+  "sourceSHA": "5ec5cb07a5f5185e4dd68732f2562f32aec753a7",
+  "upgraded": {
+    "ledgerSha256": "b9710dfd946e53b0d5478e4fe5889cc7a24532db7f914bbcd697cf6e17d2fe0a",
+    "schemaSha256": "fc7b456d1b7d45cf6b11d67e26b1e446feb86c01a19f8eacc53cbf2ec1649b97",
+    "catalogSha256": "fea364febf838ca396a921dfb86b9a80be14eac513c6e68ba7d1e07211efbe18",
+    "dataSha256": "c8ea88efb782bf5f2d76c2633513d589247283876645d72fc1d59a23ddeb8ea1",
+    "securitySha256": "77c9c35c99d87bb655ae5ae61f8da73aec485a6a5234f748ec9d3d266cd2188e",
+    "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+    "ledgerRows": 57,
+    "rows": 42,
+    "tables": 161,
+    "securityRecords": 14674,
+    "sequences": 1
+  },
+  "fresh": {
+    "ledgerSha256": "52a537f786de7ba28326234f0f56986e5e085fb51afaa3d95ac0130784770784",
+    "schemaSha256": "fc7b456d1b7d45cf6b11d67e26b1e446feb86c01a19f8eacc53cbf2ec1649b97",
+    "catalogSha256": "fea364febf838ca396a921dfb86b9a80be14eac513c6e68ba7d1e07211efbe18",
+    "dataSha256": "350454f50368490d655164036b7858cef9d41a7da2c51be7fb7077e766336e0b",
+    "securitySha256": "77c9c35c99d87bb655ae5ae61f8da73aec485a6a5234f748ec9d3d266cd2188e",
+    "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+    "ledgerRows": 57,
+    "rows": 0,
+    "tables": 161,
+    "securityRecords": 14674,
+    "sequences": 1
+  },
+  "catalogMatches": true,
+  "securityMatches": true,
+  "heldPurposeMigrationsActivated": false
+}

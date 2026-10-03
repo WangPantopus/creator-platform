@@ -1,0 +1,22 @@
+{
+  "initialSqlFailure": "private scope transferred before trigger creation; permission denied, whole0113 rolled back; fixed by transferring ownership after creating trigger without widening ACLs",
+  "semanticQueryFailure": "Ambiguous unqualified id references (42702), corrected actual table aliases",
+  "stableWarnings": "Two genuine volatile-expression warnings retained in first-compiler.jsonl; source declared VOLATILE, one fixed RETURN QUERY snapshot at first execution, six functions now0 issues",
+  "cancellationTypeErrors": [
+    "no-unsafe-finally throwing cancellation error",
+    "QueryResult overload inferred void"
+  ],
+  "correctedChecks": "TypeScript/scoped lint pass after moving error propagation outside finally and using explicit QueryResult<{document:unknown}>",
+  "engineFirstAttempt": "ERR_MODULE_NOT_FOUND pg because temporary driver was at root; moved to backend before any driver DB call, later removed",
+  "backupFirstComparison": {
+    "time": "2026-10-02T16:16:00Z",
+    "bytes": 715731,
+    "sha256": "8f314bed4330b85abe3f9bbd7436323f263c797cba86f3dcf2a9f0a284d9529d",
+    "rawDataMatch": false,
+    "canonicalFullRowDifference": [
+      "creator.identity_session"
+    ],
+    "cause": "own API/web canonical session touch during live snapshot/comparison",
+    "resolution": "Stopped only own API/web, new715734-byte dump separately restored; all162 full-row table hashes, ledger/schema/ACL/roles/membership/sequences match. First private dump kept unqualified."
+  }
+}

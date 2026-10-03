@@ -1,0 +1,31 @@
+{
+  "sourceBase": "19b655b7e38e0795d16a05e0ca8bd90111338e74",
+  "host": "Yingpengs-Mac-Studio.local",
+  "sourceFiles": {
+    "apps/backend/src/modules/agent/generation-provider-usage.ts": "d02737ee4bffab4fd92f9f2ecabf4730e3fa7072117a9cc6879489b5c8ad09fd",
+    "apps/backend/src/modules/agent/migrations/0097_w2_generation_attempt_admission.sql": "eab8c8e07b8a1e6ba4384f5300560bd46853bf98509faade5a1b555e130c75ee",
+    "apps/backend/src/modules/conversation/generation-context.ts": "62f3d3b697ef09b77eeaf64b2d1c03649e10ab17e7dd4efa2f8946fa2ac61680",
+    "apps/backend/src/modules/conversation/migrations/0095_w3_generation_purpose_consumers.sql": "9449f7f9254aa1c9c77713b1683d5c85076b357f13e573882ee5d2d03d1715e0",
+    "apps/backend/src/modules/agent/service.ts": "e32491864ce0ac6c82226bc6123eb61177c90cd537156b7871fda202cc6bf02e",
+    "apps/backend/src/modules/agent/journal-privacy.ts": "e5529a482d19bcbdaed7b33b043ba92f7c19373ae48e32f783d3bed215c2ced1"
+  },
+  "consumedContextSource": "32f9f6c64c478190bf69718329228314f7b06b72",
+  "checks": {
+    "backendTypecheck": "passed after nullable model qualification correction",
+    "lint": "passed",
+    "moduleGraph": "loaded",
+    "existingBackendTests": 18,
+    "unchangedT11": {
+      "pairs": 10000,
+      "queries": 30000,
+      "timeoutMs": 300000,
+      "observedMs": 45784
+    },
+    "suiteMs": 48110
+  },
+  "limits": [
+    "No new unit tests",
+    "Source validation does not establish positive worker/provider/terminal operation",
+    "Late sealed receipt append and W4 settlement remain unconfigured"
+  ]
+}
