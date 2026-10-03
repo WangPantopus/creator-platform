@@ -139,12 +139,23 @@ struct GrowthRequestFailure: Error {
 public struct GrowthClient: Sendable {
   public let baseURL: URL
   public let token: @Sendable () async throws -> String?
+  private let capture: (@Sendable () async -> FanSessionRequestCapture?)?
   public init(
     baseURL: URL,
     token: (@Sendable () async throws -> String?)? = nil
   ) {
     self.baseURL = baseURL
     self.token = token ?? { try await SecureSessionStorage(issuer: baseURL).read() }
+    self.capture = nil
+  }
+  @MainActor
+  init(baseURL: URL, session: FanSession, destination: String) {
+    self.baseURL = baseURL
+    self.capture = { await session.captureRequest(from: destination) }
+    self.token = {
+      guard let captured = await session.captureRequest(from: destination) else { return nil }
+      return await captured.growthCredential()
+    }
   }
   func request<T: Decodable>(_ path: String, method: String = "GET", body: Data? = nil, expectedSession: String? = nil) async throws
     -> T
@@ -159,7 +170,9 @@ public struct GrowthClient: Sendable {
     request.cachePolicy = .reloadIgnoringLocalCacheData
     request.setValue("application/json", forHTTPHeaderField: "Content-Type")
     let publicRead = path.hasPrefix("public/")
-    let value = publicRead ? nil : try await token()
+    let captured = publicRead ? nil : await capture?()
+    if !publicRead, capture != nil, captured == nil { throw GrowthRequestFailure(status: 401) }
+    let value = publicRead ? nil : captured == nil ? try await token() : await captured?.growthCredential()
     if !publicRead, value == nil { throw GrowthRequestFailure(status: 401) }
     if let expectedSession, value != expectedSession { throw GrowthRequestFailure(status: 401) }
     if let value {
@@ -171,7 +184,9 @@ public struct GrowthClient: Sendable {
       throw GrowthRequestFailure(status: http.statusCode)
     }
     try Task.checkCancellation()
-    if !publicRead, try await token() != value { throw GrowthRequestFailure(status: 401) }
+    if let captured {
+      guard await captured.isCurrent() else { throw GrowthRequestFailure(status: 401) }
+    } else if !publicRead, try await token() != value { throw GrowthRequestFailure(status: 401) }
     return try JSONDecoder().decode(T.self, from: data)
   }
   public func registerDevice(installationID: UUID, token value: Data, granted: Bool, registrationRevision: Int, expectedSession: String) async throws {
@@ -244,10 +259,14 @@ public struct GrowthFanFeature: View {
   public init(
     baseURL: URL?, destination: String = "/discover",
     token: (@Sendable () async throws -> String?)? = nil,
+    session: FanSession? = nil,
     onSignIn: @escaping (String) -> Void = { _ in },
     onNavigate: ((String) -> Void)? = nil
   ) {
-    client = baseURL.map { GrowthClient(baseURL: $0, token: token) }
+    client = baseURL.map { origin in
+      if let session { return GrowthClient(baseURL: origin, session: session, destination: destination) }
+      return GrowthClient(baseURL: origin, token: token)
+    }
     self.destination = destination
     _route = State(initialValue: destination)
     signIn = onSignIn
@@ -255,20 +274,13 @@ public struct GrowthFanFeature: View {
   }
   public static func registration(baseURL: URL?) -> FanFeatureRegistration {
     FanFeatureRegistration(
-      matches: { matches($0) },
+      matches: { matches($0) && !$0.components(separatedBy: "?")[0].hasSuffix("/chat") },
       allowsSignedOut: {
         $0 == "/discover" || $0.hasPrefix("/invite/") || $0.hasPrefix("/share/")
           || ($0.hasPrefix("/creators/") && !$0.contains("/chat"))
       },
       screen: { session in
-        AnyView(
-          GrowthFanFeature(
-            baseURL: baseURL, destination: session.destination,
-            onSignIn: { target in
-              session.open(target)
-              Task { await session.beginSignIn() }
-            }, onNavigate: session.open
-          ).id(session.destination))
+        AnyView(GrowthSessionScreen(model: session, baseURL: baseURL))
       })
   }
   public static func matches(_ route: String) -> Bool {
@@ -781,6 +793,27 @@ public struct GrowthFanFeature: View {
   private func openNotification(_ item: GrowthNotification) {
     guard let id = UUID(uuidString: item.id) else { record(GrowthRequestFailure(status: 404)); return }
     open("/notifications/" + id.uuidString.lowercased())
+  }
+}
+
+/// The shipping shell supplies the actual session. Replacing it or leaving the
+/// foreground destroys private presentation and any temporary share document.
+private struct GrowthSessionScreen: View {
+  @ObservedObject var model: FanSession
+  let baseURL: URL?
+  @Environment(\.scenePhase) private var scenePhase
+  @Environment(\.colorScheme) private var scheme
+  var body: some View {
+    Group {
+      if scenePhase == .active {
+        GrowthFanFeature(baseURL: baseURL, destination: model.destination, session: model,
+          onSignIn: { target in model.open(target); Task { await model.beginSignIn() } },
+          onNavigate: model.open)
+          .id(model.destination + (model.session?.sessionId ?? "signed-out"))
+      } else {
+        qColor("ground", scheme)
+      }
+    }
   }
 }
 

@@ -24,6 +24,7 @@ public final class FanSessionRequestCapture {
         self.credential = credential
     }
     public func isCurrent() async -> Bool { await owner?.requestCaptureIsCurrent(self) ?? false }
+    func growthCredential() async -> String? { await isCurrent() ? credential : nil }
 }
 
 @MainActor
