@@ -1,0 +1,52 @@
+{
+  "operator": "primary W4",
+  "webSource": "142f7208d2ea1e099a0662b25698c31018abfab6",
+  "apiSource": "65f9dc16130f8a0ecb5b36c5be42e27d0e9bded7",
+  "canonicalMigrations": 57,
+  "identityMode": "real product sign-in as labeled development actor two",
+  "personallyVerified": [
+    "Web return visits at390x844 and1280x900 in explicit Light/Night preserve current6USD, pending No limit Oct3 05:42 as displayed, reminders off and zero totals.",
+    "Real Tab navigation reaches Manage memberships; Return opens unavailable billing/restore with no access claim."
+  ],
+  "shippingBuilds": {
+    "source": "142f7208d2ea1e099a0662b25698c31018abfab6",
+    "android": "pass; currentmain permission recovery/LiveKit and decimal keyboard repair",
+    "androidApkSha256": "1bac0828abe06be574cd52572e8f0bdd83338047a652a85fe0efa3d5d59a7f81",
+    "ios": "pass; normal simulator signing; currentmain permission recovery/LiveKit and canonical camera usage purpose",
+    "iosBinarySha256": "7a0bffd7157602218f8db44bdb65427c9153df0af3dc5fc568fd67ea5fc83db7",
+    "iosCameraDescriptionPresent": true
+  },
+  "nativeOperationStatus": {
+    "decimalAndroidInput": "personally verified real decimal keyboard in Light/Night and cold return; android-decimal-input receipt",
+    "ios": "CUA DeviceHub timeout; prepared alternative operational driver not run; explicit human authorization requested",
+    "deviceAndGuiLeasesHeld": false
+  },
+  "failedDeviceAcquisition": "Remaining Android slot was owned by W5. An erroneous own5564 launcher after refused lease was immediately interrupted; process/port shutdown verified. No peer device/slot changed.",
+  "evidence": [
+    {
+      "file": "web-current6-pending-none-1280-light.png",
+      "sha256": "af4c9543974bf33a76e5c8607056d757ec7d35cd4090b10661b7ec5d235b22ee"
+    },
+    {
+      "file": "web-current6-pending-none-1280-night.png",
+      "sha256": "e39c8a27eb3acf62c462d33e9b414134c1326641706c4602e48cc9a195fbbe1e"
+    },
+    {
+      "file": "web-current6-pending-none-390-light.png",
+      "sha256": "d78b27776c0fc9af94af689bbfed7d8d55af60a52ed99f6419012237f5f31a3d"
+    },
+    {
+      "file": "web-current6-pending-none-390-night.png",
+      "sha256": "9c495d84b31545b087faa2c8674cb32d7c683c3d63b777c7b81c6f4d6140866e"
+    },
+    {
+      "file": "web-keyboard-membership-focus-1280-night.png",
+      "sha256": "4f40c20dc01011d214e5e033f0001a879524526982f3c3b2ec8e8ec88c486ba0"
+    },
+    {
+      "file": "web-membership-unavailable-keyboard-1280-night.png",
+      "sha256": "202d881c506cab326653f4d7eb11678a10db4e39edb72f9d473af498d6a3a94c"
+    }
+  ],
+  "releaseReady": false
+}

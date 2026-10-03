@@ -1,0 +1,19 @@
+{
+  "database": "creator_w6_human_media_20261001",
+  "canonicalRegistryAccepted": false,
+  "sourceBase": "b1a3b022",
+  "sourceHadAvailabilityChanges": true,
+  "readAt": "2026-10-02T07:58:49.014Z",
+  "lostResponse": {
+    "attempts": 2,
+    "sameExactCommand": false,
+    "firstServerCommitVersion": 2,
+    "retryReturnedVersion": 2
+  },
+  "overlap": {
+    "status": 422,
+    "code": "availability_invalid",
+    "retainedInput": "2026-11-01T08:35:00.000Z",
+    "confirmedReloadValue": "2026-11-01T09:30:00.000Z"
+  }
+}

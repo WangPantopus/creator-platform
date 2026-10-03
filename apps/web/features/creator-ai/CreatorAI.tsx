@@ -800,12 +800,16 @@ export function CreatorAI({
     "Team",
   ];
   const destination = (name: string) => {
-    if (["Notes", "Requests", "Threads"].includes(name)) {
+    if (
+      ["Notes", "Requests", "Threads", "Publish", "Team", "More"].includes(name)
+    ) {
       const currentCreator = creatorId ?? state?.creator.id;
       return currentCreator
         ? `/studio/${encodeURIComponent(currentCreator)}/${name.toLowerCase()}`
         : "/studio/workspace";
     }
+    if (name === "Offers") return "/commerce/offers";
+    if (name === "Earnings") return "/commerce/earnings";
     return name === "My AI" ? "/studio/ai" : `/studio/${name.toLowerCase()}`;
   };
   const controlsDisabled = busy || !online;
@@ -894,6 +898,7 @@ export function CreatorAI({
               <Link
                 key={name}
                 href={destination(name)}
+                onClick={(e) => navigate(e, destination(name))}
                 className="qv-side__item"
               >
                 <span className="qv-side__icon">
@@ -2634,7 +2639,8 @@ export function CreatorAI({
         {["Notes", "Requests", "Threads", "My AI", "More"].map((name) => (
           <Link
             key={name}
-            href={name === "More" ? "/studio/ai/license" : destination(name)}
+            href={destination(name)}
+            onClick={(e) => navigate(e, destination(name))}
             aria-current={name === "My AI" ? "page" : undefined}
           >
             <Glyph name={name} size={name === "Notes" ? 17 : 22} />

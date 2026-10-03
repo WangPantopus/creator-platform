@@ -2,7 +2,12 @@ import type { Pool, PoolClient } from "pg";
 import { IdSchema } from "@qelvora/api";
 import type { Actor } from "./adapter.js";
 import { identityTransaction } from "./transaction.js";
-import { assertCurrentSession, requestAuthority } from "./request-authority.js";
+import {
+  assertCurrentSession,
+  requestAuthority,
+  holdCurrentRequestSession,
+  assertHeldCurrentRequestSession,
+} from "./request-authority.js";
 import { DomainError, invariant } from "../../core/errors.js";
 
 const creatorScopeBrand: unique symbol = Symbol("CreatorScope");
@@ -112,6 +117,7 @@ export class CreatorIdentityAuthority {
     requirement: CreatorRequirement,
   ) {
     this.assertRequest(scope.accountId);
+    const held = await holdCurrentRequestSession(client, scope.accountId);
     invariant(
       requirement === "owned" || requirement === "verified",
       "creator_requirement_invalid",
@@ -120,6 +126,20 @@ export class CreatorIdentityAuthority {
     await client.query("SELECT set_config('app.creator_id',$1,true)", [
       scope.creatorId,
     ]);
+    // Hold current negative authority before the positive creator lease.
+    try {
+      await this.configuration.assertAllowed(
+        held.actor,
+        scope.creatorId,
+        client,
+      );
+      await assertHeldCurrentRequestSession(held, client);
+    } finally {
+      await client.query(
+        "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
+        [scope.creatorId, scope.accountId],
+      );
+    }
     const creator = (
       await client.query<{
         verification: string;
@@ -141,17 +161,6 @@ export class CreatorIdentityAuthority {
         "creator_verification_required",
         "Current creator verification and signing recovery are required.",
       );
-    try {
-      await this.configuration.assertAllowed(
-        { accountId: scope.accountId, adultEligible: true },
-        scope.creatorId,
-        client,
-      );
-    } finally {
-      await client.query(
-        "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
-        [scope.creatorId, scope.accountId],
-      );
-    }
+    await assertHeldCurrentRequestSession(held, client);
   }
 }

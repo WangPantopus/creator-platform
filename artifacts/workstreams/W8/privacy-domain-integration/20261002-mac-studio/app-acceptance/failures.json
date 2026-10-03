@@ -1,0 +1,49 @@
+{
+  "source": "5057343aefa289ae57693d5be614461056bb7260",
+  "readbackOperator": [
+    {
+      "code": "42P01",
+      "reason": "Operator first assumed private fence table names; fixed against exact SQL."
+    },
+    {
+      "code": "actual_saved_state_mismatch",
+      "reason": "Operator incorrectly assumed tokens are cleared. Real terminal states clear lease_until and retain historical token; token is not live authority. Correct check passes."
+    }
+  ],
+  "androidOperator": {
+    "initialBootAndInstall": true,
+    "subsequentDeviceAbsent": true,
+    "causeEstablished": false,
+    "firstOperatorError": "Owned Android operator failed",
+    "samePreservedAvdRestart": true,
+    "separatePersistentOperatorSession": true,
+    "finalLightNightAccepted": true
+  },
+  "opsOperator": {
+    "firstCaseWaitTimedOut": true,
+    "reason": "Operator checked for purpose field before case gate rendered. Correct wait and real access200 then cold case/zoom both pass."
+  },
+  "iosAccessibilitySize": {
+    "actualSetting": "accessibility-extra-extra-extra-large",
+    "ordinaryFontRestored": "large",
+    "journeyAccepted": false,
+    "operatorError": "Actual saved export list unavailable",
+    "swipeAndAppLayoutCauseNotEstablished": true,
+    "screenshotsAndRawAXRemainPrivate": true
+  },
+  "newUnitTests": false,
+  "paidModelCalls": 0,
+  "checkpointOperator": {
+    "firstStreamWaitHung": true,
+    "firstDumpRetainedPrivately": true,
+    "asyncPipelineCorrected": true
+  },
+  "separateRestore": {
+    "firstQualificationFailed": true,
+    "fiveCustodyHashesMatchBeforeRepair": true,
+    "rawSchemaDifferences": "Only explicit-vs-implicit default owner ACLs on two isolated scope tables",
+    "sameOwnerOnlyGrantReplay": true,
+    "allSixHashesMatchAfterReplay": true,
+    "trafficReady": false
+  }
+}

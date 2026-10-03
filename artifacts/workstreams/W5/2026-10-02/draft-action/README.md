@@ -1,0 +1,5 @@
+# Draft action composition
+
+Actual unsigned Notes at source `3b24991e` exposed browser-default link color and a text-height target. There is no draft-specific reference composition. W5 reuses shared `qv-link-btn` 44px minimum target and typography, adding only W5 inline alignment, theme ink and underline. Canonical Link destination and draft/scheduled/media-pending predicate remain unchanged. Shared components, Team and fulfillment delivery are untouched.
+
+At source `aabb3f062a6597065fa0a7c8ec5990e190788ae4`, personal operation verified actual 390/1280 Light/Night theme, no horizontal overflow, 44px target, all four screenshots, and keyboard Enter returning to saved All members revision 4. An initial Light-labeled shot after account-route restoration had Night ink and is excluded; only explicit-theme current screenshots are retained. First focus wait timed out; the fresh Notes read and next actual keyboard action succeeded. Web typecheck and scoped lint/format pass. No new tests or native acceptance claim. Identity is DEVELOPMENT-ONLY SEEDED VERIFIED without proof or passkey.

@@ -73,6 +73,40 @@ export type BackendRuntime = {
   ) => Promise<void>;
   configureSignedSubjects: (policies: readonly SignedSubjectPolicy[]) => void;
 };
+const issuedRuntimes = new WeakMap<
+  BackendRuntime,
+  Readonly<{
+    pool: BackendRuntime["pool"];
+    database: BackendRuntime["database"];
+    access: BackendRuntime["access"];
+    conversation: BackendRuntime["conversation"];
+    identity: BackendRuntime["identity"];
+    restored: BackendRuntime["assertRestoredInTransaction"];
+    denied: BackendRuntime["assertScopeAllowedInTransaction"];
+    creatorDenied: BackendRuntime["assertCreatorAllowedInTransaction"];
+    contentDenied: BackendRuntime["assertContentAllowedInTransaction"];
+    audience: BackendRuntime["audienceIdentity"];
+  }>
+>();
+/** Genuine complete host graph only; clones or replaced authority callbacks
+ * cannot prepare a family-discovery purpose. Recheck at every bookend. */
+export function isConfiguredBackendRuntime(runtime: BackendRuntime): boolean {
+  const issued = issuedRuntimes.get(runtime);
+  return (
+    issued !== undefined &&
+    issued.pool === runtime.pool &&
+    issued.database === runtime.database &&
+    issued.access === runtime.access &&
+    issued.conversation === runtime.conversation &&
+    issued.identity === runtime.identity &&
+    issued.restored === runtime.assertRestoredInTransaction &&
+    issued.denied === runtime.assertScopeAllowedInTransaction &&
+    issued.creatorDenied === runtime.assertCreatorAllowedInTransaction &&
+    issued.contentDenied === runtime.assertContentAllowedInTransaction &&
+    issued.audience === runtime.audienceIdentity
+  );
+}
+
 type TrustConfiguration = Omit<
   Parameters<typeof createTrustRuntime>[0],
   "actor" | "origin"
@@ -214,7 +248,7 @@ export async function createConfiguredBackend(input: {
     pool,
     undefined,
     assertScopeAllowed,
-    input.assertScopeAllowedInTransaction,
+    assertScopeAllowedInTransaction,
   );
   try {
     await database.assertRuntimeRole();
@@ -450,10 +484,26 @@ export async function createConfiguredBackend(input: {
         },
       });
     }
+    issuedRuntimes.set(
+      backendRuntime,
+      Object.freeze({
+        pool: backendRuntime.pool,
+        database: backendRuntime.database,
+        access: backendRuntime.access,
+        conversation: backendRuntime.conversation,
+        identity: backendRuntime.identity,
+        restored: backendRuntime.assertRestoredInTransaction,
+        denied: backendRuntime.assertScopeAllowedInTransaction,
+        creatorDenied: backendRuntime.assertCreatorAllowedInTransaction,
+        contentDenied: backendRuntime.assertContentAllowedInTransaction,
+        audience: backendRuntime.audienceIdentity,
+      }),
+    );
     features = (await input.registerFeatures?.(backendRuntime)) ?? [];
     featuresConfigured = true;
     Object.freeze(subjects);
   } catch (error) {
+    issuedRuntimes.delete(backendRuntime);
     await trust?.stop();
     await pool.end();
     throw error;
@@ -532,6 +582,7 @@ export async function createConfiguredBackend(input: {
     identity: platformIdentity,
     trust,
     close: async () => {
+      issuedRuntimes.delete(backendRuntime);
       for (const connection of sockets.clients)
         connection.close(1001, "Server shutdown");
       await trust?.stop();

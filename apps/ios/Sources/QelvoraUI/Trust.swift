@@ -20,7 +20,7 @@ private struct TrustFailure: Decodable { struct Detail: Decodable { let message:
 public struct TrustClient: Sendable {
     public let baseURL: URL
     public let token: @Sendable () async throws -> String?
-    public init(baseURL: URL, token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) { self.baseURL = baseURL; self.token = token }
+    public init(baseURL: URL, token: (@Sendable () async throws -> String?)? = nil) { self.baseURL = baseURL; self.token = token ?? { try await SecureSessionStorage(issuer: baseURL).read() } }
     fileprivate func request<T: Decodable>(_ path: String, body: Data? = nil) async throws -> T {
         try JSONDecoder().decode(T.self, from: await bytes(path, body: body))
     }
@@ -73,7 +73,7 @@ public struct TrustFanFeature: View {
     @State private var feedbackComment = ""
     @State private var feedbackConsent = false
     @Environment(\.colorScheme) private var scheme
-    public init(baseURL: URL?, destination: String = "/support", token: @escaping @Sendable () async throws -> String? = { try await SecureSessionStorage().read() }) {
+    public init(baseURL: URL?, destination: String = "/support", token: (@Sendable () async throws -> String?)? = nil) {
         client = baseURL.map { TrustClient(baseURL: $0, token: token) }; _route = State(initialValue: destination)
         let query = URLComponents(string: destination)?.queryItems ?? []
         let creator = query.first { $0.name == "creatorId" }?.value ?? "", message = query.first { $0.name == "messageId" }?.value ?? ""
@@ -84,7 +84,7 @@ public struct TrustFanFeature: View {
     public static func registration(baseURL: URL?) -> FanFeatureRegistration { FanFeatureRegistration(matches: { $0.hasPrefix("/support") || $0.hasPrefix("/trust") }, allowsSignedOut: { $0.hasPrefix("/trust") }, screen: { model in
         let account = model.session?.accountId
         return AnyView(TrustFanFeature(baseURL: baseURL, destination: model.destination, token: {
-            let credential = try await SecureSessionStorage().read()
+            let credential = try await SecureSessionStorage(issuer: baseURL).read()
             // A task from the old screen must never pick up the next account's
             // credential after an asynchronous secure-storage read.
             guard account != nil, await MainActor.run(body: { model.session?.accountId }) == account else { throw TrustClientError(message: "Your account changed. Reopen this screen before continuing.", reference: nil) }
@@ -146,7 +146,7 @@ public struct TrustFanFeature: View {
     private var privacy: some View { VStack(alignment: .leading, spacing: 16) {
         Text("Export and deletion are separate from canceling store billing. A job finishes only after every data domain acknowledges it.").qText("body")
         Link("Manage Apple subscriptions", destination: URL(string: "https://apps.apple.com/account/subscriptions")!)
-        Picker("Data scope", selection: $scope) { Text("Account").tag("account"); Text("Creator").tag("creator"); Text("Conversation").tag("thread") }.pickerStyle(.menu)
+        Picker("Data scope", selection: $scope) { Text("Account").tag("account"); Text("Creator").tag("creator"); Text("Conversation").tag("thread") }.pickerStyle(.menu).frame(minHeight: 44).contentShape(Rectangle())
         if scope != "account" { field("Creator ID", $creatorID) }; if scope == "thread" { field("Conversation ID", $threadID) }
         if capability?.localDevelopment == true { Text("Synthetic local account: type LOCAL DEVELOPMENT to confirm.").qText("caption"); field("Local confirmation", $proof) }
         else if capability?.verificationMethod == "current_session" { Text("Your sign-in must be recent. Continue with Pantopus again if asked to verify your account.").qText("caption") }
@@ -154,7 +154,7 @@ public struct TrustFanFeature: View {
         else { Text("Fresh account verification must be connected before requesting data changes.").qText("caption") }
         Button("Request export", variant: .secondary, block: true, disabled: privacyDisabled) { Task { await privacyCommand("export") } }
         Button("Request deletion", variant: .secondary, block: true, disabled: privacyDisabled) { confirmingDelete = true }
-        ForEach(jobs) { job in Button(job.kind + " · " + job.scope + " · " + job.state, variant: .quiet, block: true) { Task { await jobDetail(job.id) } } }
+        ForEach(jobs) { job in Button(job.kind + " · " + job.scope + " · " + job.state.replacingOccurrences(of: "_", with: " "), variant: .quiet, block: true, disabled: busy) { Task { await jobDetail(job.id) } } }
         if let selectedJob { jobProgress(selectedJob) }
     } }
     @ViewBuilder private func jobProgress(_ job: TrustJob) -> some View {
@@ -168,8 +168,8 @@ public struct TrustFanFeature: View {
         }
     }
     private func taskDescription(_ task: TrustTask) -> String {
-        let failure = task.error_code.map { " · " + $0 } ?? ""
-        return task.domain + ": " + task.state + failure
+        let failure = task.error_code.map { " · " + $0.replacingOccurrences(of: "_", with: " ") } ?? ""
+        return task.domain + ": " + task.state.replacingOccurrences(of: "_", with: " ") + failure
     }
     private func retainedRecord(_ item: TrustRetained) -> some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -179,7 +179,7 @@ public struct TrustFanFeature: View {
         }
     }
     private var privacyDisabled: Bool { busy || capability?.actorVerification != "configured" || (capability?.localDevelopment == true ? proof != "LOCAL DEVELOPMENT" : capability?.verificationMethod != "current_session" && proof.isEmpty) || (scope != "account" && UUID(uuidString: creatorID) == nil) || (scope == "thread" && UUID(uuidString: threadID) == nil) }
-    private func field(_ title: String, _ value: Binding<String>, multiline: Bool = false) -> some View { VStack(alignment: .leading, spacing: 8) { Text(title).qText("label"); TextField(title, text: value, axis: multiline ? .vertical : .horizontal).textFieldStyle(.roundedBorder).qDisableAutoCapitalization().autocorrectionDisabled().lineLimit(multiline ? 3...8 : 1...1).accessibilityLabel(title) } }
+    private func field(_ title: String, _ value: Binding<String>, multiline: Bool = false) -> some View { VStack(alignment: .leading, spacing: 8) { Text(title).qText("label"); TextField(title, text: value, axis: multiline ? .vertical : .horizontal).textFieldStyle(.roundedBorder).qDisableAutoCapitalization().autocorrectionDisabled().lineLimit(multiline ? 3...8 : 1...1).frame(minHeight: 44).contentShape(Rectangle()).accessibilityLabel(title) } }
     // Public crisis help never waits on capability or account data: a restored or
     // degraded host can refuse those while help stays available. A failed capability
     // read clears the old value so data requests cannot submit on stale verification.
@@ -189,7 +189,20 @@ public struct TrustFanFeature: View {
         var failure: Error?
         do { help = try await client.request("help") } catch { failure = error }
         if route.contains("privacy") { do { capability = try await client.request("capabilities") } catch { capability = nil; failure = failure ?? error } }
-        do { if route.hasPrefix("/trust") || route.contains("feedback") { } else if route.contains("access") { let page: TrustItems<TrustAccess> = try await client.request("access-history"); history = page.items } else if route.contains("privacy") { let page: TrustItems<TrustJob> = try await client.request("privacy/jobs"); jobs = page.items } else { let page: TrustItems<TrustCase> = try await client.request("my-cases"); let inbox: TrustItems<TrustNotice> = try await client.request("inbox"); cases = page.items; notices = inbox.items } } catch { cases = []; notices = []; jobs = []; history = []; selectedJob = nil; exportPayload = nil; failure = failure ?? error }
+        do {
+            if route.hasPrefix("/trust") || route.contains("feedback") { }
+            else if route.contains("access") { let page: TrustItems<TrustAccess> = try await client.request("access-history"); history = page.items }
+            else if route.contains("privacy") {
+                exportPayload = nil
+                let page: TrustItems<TrustJob> = try await client.request("privacy/jobs")
+                jobs = page.items
+                if let selectedId = selectedJob?.id, jobs.contains(where: { $0.id == selectedId }) {
+                    let detail: TrustJob = try await client.request("privacy/jobs/" + selectedId)
+                    selectedJob = detail
+                    jobs = jobs.map { $0.id == selectedId ? detail : $0 }
+                } else { selectedJob = nil }
+            } else { let page: TrustItems<TrustCase> = try await client.request("my-cases"); let inbox: TrustItems<TrustNotice> = try await client.request("inbox"); cases = page.items; notices = inbox.items }
+        } catch { cases = []; notices = []; jobs = []; history = []; selectedJob = nil; exportPayload = nil; failure = failure ?? error }
         error = failure?.localizedDescription ?? ""
     }
     private func perform(_ path: String, _ input: [String: Any]) async -> TrustAck? { guard let client, !busy else { return nil }; busy = true; defer { busy = false }; do { let ack: TrustAck = try await client.request(path, body: JSONSerialization.data(withJSONObject: input)); error = ""; commandKey = UUID().uuidString; return ack } catch { self.error = error.localizedDescription; return nil } }
@@ -199,8 +212,17 @@ public struct TrustFanFeature: View {
     }
     private func appeal(_ item: TrustCase) async { if await perform("cases/" + item.id + "/appeals", ["version": item.version, "reason": reason, "idempotencyKey": commandKey]) != nil { result = "Your appeal is saved for a different reviewer."; reason = ""; await load() } }
     private func privacyCommand(_ kind: String) async { var input: [String: Any] = ["kind": kind, "scope": scope, "proof": capability?.verificationMethod == "current_session" ? "CURRENT_SESSION" : proof, "idempotencyKey": commandKey]; if scope != "account" { input["creatorId"] = creatorID.lowercased() }; if scope == "thread" { input["threadId"] = threadID.lowercased() }; if let ack = await perform("privacy/jobs", input) { result = "Request saved; inspect each domain's progress."; await load(); if let id = ack.id { await jobDetail(id) } } }
-    private func jobDetail(_ id: String) async { guard let client else { return }; exportPayload = nil; do { selectedJob = try await client.request("privacy/jobs/" + id); error = "" } catch { selectedJob = nil; self.error = error.localizedDescription } }
+    private func jobDetail(_ id: String) async {
+        guard let client, !busy else { return }
+        busy = true; defer { busy = false }
+        exportPayload = nil
+        do {
+            let detail: TrustJob = try await client.request("privacy/jobs/" + id)
+            selectedJob = detail
+            jobs = jobs.map { $0.id == id ? detail : $0 }
+            error = ""
+        } catch { selectedJob = nil; self.error = error.localizedDescription }
+    }
     private func download(_ id: String) async { guard let client, !busy else { return }; busy = true; defer { busy = false }; do { exportPayload = TrustExport(data: try await client.bytes("privacy/jobs/" + id + "/download")); error = "" } catch { exportPayload = nil; self.error = error.localizedDescription } }
     private func retry(_ id: String) async { if await perform("privacy/jobs/" + id + "/retry", [:]) != nil { result = "Incomplete domains queued again."; await jobDetail(id) } }
 }
-

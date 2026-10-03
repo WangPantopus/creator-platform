@@ -289,7 +289,7 @@
       "removed": true
     }
   ],
-  "state": "W1 servers/devices/owned files released; Docker container/image/volume cleanup blocked by shared engine startup failure",
+  "state": "Original September 29 W1 resources verified released on October 2; Docker blocker closed, later sessions preserved",
   "filesystemRemovedAt": "2026-09-30T04:43:04.490579+00:00",
   "totalEnumeratedFilesystemAllocatedKiBRemoved": 5777536,
   "docker": {
@@ -300,16 +300,19 @@
       "response": "",
       "clientError": "curl timeout after 8 seconds with zero response bytes; removal not verified"
     },
-    "containerRemovalVerified": false,
-    "engineReadStatus": "503 Docker Desktop is unable to start",
-    "imagesAndVolumes": "Could not inspect ownership or remove safely while engine is unavailable. No shared Docker VM/data/images/volumes were deleted or pruned.",
-    "nextAction": "Restore shared Docker Desktop with owner coordination, inspect exact W1 container/mounts and image reuse, remove W1 container and only exclusively owned/unreferenced W1 data/images. Shared engine restart is outside W1-only resource release.",
+    "containerRemovalVerified": true,
+    "engineReadStatus": "Healthy on October 2; original creator-platform-w1-local absent",
+    "imagesAndVolumes": "No current volume predates the original cleanup, no original named volume or W1-only image tag found. Shared/reused images and newer session storage retained.",
+    "nextAction": "None for the original September 29 resources. Preserve newer W1/peer sessions and their shared images/volumes.",
     "desktopStartAttempt": {
       "command": "docker desktop start --detach --timeout 15",
       "exit": 0,
       "response": "Docker Desktop is already running",
       "engineRecovered": false
-    }
+    },
+    "historicalEngineReadStatus": "503 Docker Desktop is unable to start",
+    "removalVerification": "Original container already absent at October 2 inspection; this resumed run did not delete it.",
+    "historicalNextAction": "Restore shared Docker Desktop with owner coordination, inspect exact W1 container/mounts and image reuse, remove W1 container and only exclusively owned/unreferenced W1 data/images. Shared engine restart is outside W1-only resource release."
   },
   "devices": {
     "ios": {
@@ -363,5 +366,99 @@
     "w1ListeningPorts": "none",
     "sharedMainIndexSha256": "8258bf3059d2fb2edeef988caa30574774b227bdfff051c3f73c93a74523097f",
     "nativeDeviceRemovalPersonallyVerified": true
+  },
+  "historicalState": "W1 servers/devices/owned files released; Docker container/image/volume cleanup blocked by shared engine startup failure",
+  "followUp20261002": {
+    "verifiedAt": "2026-10-02T10:41:58.677521+00:00",
+    "clientDate": "2026-10-02",
+    "scope": "Original September 29 W1 handoff resources only. Later W1/peer work and active runtime/data are preserved.",
+    "userAuthorizedSharedDockerRestart": true,
+    "restartNeeded": false,
+    "dockerEngineHealthy": true,
+    "dockerEngineVersion": "29.8.0",
+    "originalContainerAbsent": true,
+    "originalContainerRemovalByThisResumedRun": false,
+    "currentVolumeCount": 20,
+    "earliestCurrentVolumeCreatedAt": "2026-09-30T05:54:37Z",
+    "volumesPredatingOriginalCleanup": [],
+    "originalNamedVolumeMatches": [],
+    "currentW1SessionsPreserved": [
+      {
+        "name": "creator-platform-w1-purpose-review-20261002",
+        "created": "2026-10-02 01:10:52 -0700 PDT",
+        "state": "running"
+      },
+      {
+        "name": "creator-platform-w1-cc",
+        "created": "2026-10-01 13:27:00 -0700 PDT",
+        "state": "running"
+      }
+    ],
+    "currentDockerImages": [
+      {
+        "Repository": "pgvector/pgvector",
+        "Tag": "pg17",
+        "ID": "ac08538c6f8b",
+        "Containers": "12"
+      },
+      {
+        "Repository": "livekit/livekit-server",
+        "Tag": "v1.13.7",
+        "ID": "6fd3b7088874",
+        "Containers": "1"
+      },
+      {
+        "Repository": "public.ecr.aws/supabase/storage-api",
+        "Tag": "v1.54.1",
+        "ID": "09c0f6f63ba7",
+        "Containers": "4"
+      },
+      {
+        "Repository": "public.ecr.aws/supabase/postgrest",
+        "Tag": "v14.10",
+        "ID": "bca3f86f69d8",
+        "Containers": "4"
+      },
+      {
+        "Repository": "public.ecr.aws/supabase/postgres",
+        "Tag": "17.6.1.106",
+        "ID": "21ab97114931",
+        "Containers": "4"
+      },
+      {
+        "Repository": "public.ecr.aws/supabase/postgres-meta",
+        "Tag": "v0.96.4",
+        "ID": "4dd3e0ff3e9a",
+        "Containers": "4"
+      },
+      {
+        "Repository": "public.ecr.aws/supabase/gotrue",
+        "Tag": "v2.188.1",
+        "ID": "87db8c737af4",
+        "Containers": "4"
+      },
+      {
+        "Repository": "public.ecr.aws/supabase/mailpit",
+        "Tag": "v1.22.3",
+        "ID": "f7f7c31de4de",
+        "Containers": "4"
+      },
+      {
+        "Repository": "public.ecr.aws/supabase/kong",
+        "Tag": "2.8.1",
+        "ID": "1b53405d8680",
+        "Containers": "4"
+      }
+    ],
+    "exclusiveW1ImageTagsFound": [],
+    "original47PathsAbsent": true,
+    "originalSimulatorDataAbsent": true,
+    "originalAvdRegistryAbsent": true,
+    "originalPullRequest": {
+      "number": 6,
+      "state": "MERGED",
+      "mergedHead": "299c953ca42ec735f5fe84b9ee68d5c6581bfeb5"
+    },
+    "result": "Original W1 resource release verified complete. No original container, pre-cleanup volumes or W1-only image tags found; all originally inventoried paths/device data remain absent. Shared images, dependencies and newer runtime resources retained."
   }
 }

@@ -3,8 +3,30 @@ import { z } from "zod";
 import { DomainError, invariant } from "../../core/errors.js";
 import { requestAuthority } from "../identity/request-authority.js";
 import { PrivacyDomains, type PrivacyHook } from "./contracts.js";
+import { assertPrivacyTaskCatalog } from "./privacy-catalog.js";
 
 export type PrivacyTaskInput = Parameters<PrivacyHook["run"]>[0];
+/** Current restoration and genuine lease on the same held lifecycle client.
+ * This port never creates request authority or substitutes a pool observation. */
+export async function restoredPrivacyTaskAuthorityInTransaction(
+  client: PoolClient,
+  input: PrivacyTaskInput,
+  assertRestoredInTransaction?: (client: PoolClient) => Promise<void>,
+): Promise<readonly string[]> {
+  if (!assertRestoredInTransaction || !input.signal)
+    throw new DomainError(
+      "privacy_commit_fence_unavailable",
+      "Current held lifecycle and restoration authority is required.",
+      503,
+    );
+  input.signal.throwIfAborted();
+  await assertRestoredInTransaction(client);
+  const owned = await privacyTaskAuthorityInTransaction(client, input);
+  await assertRestoredInTransaction(client);
+  input.signal.throwIfAborted();
+  return owned;
+}
+
 /** Same held-client lifecycle capability. The exact real task and its signal
  * come from the coordinator claim, never an interactive request or UUID alone.
  * 0087 locks current job/task metadata before domain locks and checks its actual
@@ -59,6 +81,7 @@ export async function privacyTaskAuthorityInTransaction(
     );
   await client.query("SAVEPOINT w8_privacy_task_fence");
   try {
+    await assertPrivacyTaskCatalog(client);
     const row = (
       await client.query<{ owned: string[] }>(
         "SELECT creator_trust.fence_privacy_task($1,$2,$3,$4,$5,$6,$7,$8) AS owned",
@@ -104,6 +127,13 @@ export async function privacyTaskAuthorityInTransaction(
 /** Worker-only negative/ownership metadata. A client UUID never grants a lifecycle scope. */
 export function privacyTaskAuthority(pool: Pool) {
   return async (input: PrivacyTaskInput) => {
+    if (!input.signal || requestAuthority.getStore())
+      throw new DomainError(
+        "privacy_authority_unavailable",
+        "The actual cancellable lifecycle task is required.",
+        503,
+      );
+    input.signal.throwIfAborted();
     z.uuid().parse(input.jobId);
     z.uuid().parse(input.accountId);
     z.uuid().parse(input.leaseToken);
@@ -135,19 +165,21 @@ export function privacyTaskAuthority(pool: Pool) {
         ],
       )
     ).rows[0];
+    input.signal.throwIfAborted();
     invariant(
       job,
       "privacy_authority_changed",
       "The verified data request is no longer leased to this worker.",
     );
-    if (input.scope === "account") {
-      invariant(
-        job.ownership_ref && job.owned_creator_ids !== null,
-        "privacy_ownership_missing",
-        "The verified pre-deletion ownership snapshot is required.",
-      );
-      return z.array(z.uuid()).max(100).parse(job.owned_creator_ids);
-    }
-    return [];
+    invariant(
+      job.ownership_ref && job.owned_creator_ids !== null,
+      "privacy_ownership_missing",
+      "The verified original ownership snapshot is required.",
+    );
+    const owned = z.array(z.uuid()).max(100).parse(job.owned_creator_ids);
+    // This coordinator observation cannot extend 0087's held-client authority.
+    // A distinct reviewed purpose must consume non-account ownership on that
+    // original client; preserve 0087's existing non-account projection for now.
+    return input.scope === "account" ? owned : [];
   };
 }

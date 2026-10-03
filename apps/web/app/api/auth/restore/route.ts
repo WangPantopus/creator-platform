@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { applicationOrigin } from "../../../../lib/request-origin";
+import { requiresFanHandle } from "../../../../lib/identity-destination";
 import {
   ReturnTargetSchema,
   SessionSchema,
@@ -68,7 +69,11 @@ export async function GET(request: NextRequest) {
     const session = SessionSchema.parse(await response.json());
     const target = session
       ? new URL(
-          !session.fan || query.get("resumeHandle") === "1"
+          requiresFanHandle(
+            session,
+            returnTo,
+            query.get("resumeHandle") === "1",
+          )
             ? `/onboarding/handle?returnTo=${encodeURIComponent(returnTo)}`
             : returnTo,
           origin,

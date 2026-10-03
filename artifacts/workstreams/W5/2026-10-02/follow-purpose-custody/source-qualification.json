@@ -1,0 +1,32 @@
+{
+  "sourceCommit": "d62f3bd3e1b8e2fb66ee2d277c27f80a715a53db",
+  "capturedMain": "f899f7591525aec036988564dc644a8d0887d2fd",
+  "ownerSource": "dc5bef938b62037b4f60f685c08aa6406b97b900",
+  "fileSha256": "ee1712b5babc563817d8ccf52b586158982b161ea1fbd3a3a6c2cb00e94b9cf7",
+  "checks": {
+    "backendTypecheck": "passed",
+    "scopedLintFormat": "passed",
+    "diffCheck": "passed"
+  },
+  "change": "Exact owner source: held0185 descriptor and genuine W1 request session held before metadata and checked before/after fixed follow SQL. Original SQL/history unchanged.",
+  "activation": false,
+  "genuineRegisteredDefinitionReceiptSupplied": false,
+  "positiveAudienceOrHomeAcceptance": false,
+  "releaseReady": false,
+  "priorQualification": {
+    "sourceCommit": "8d9487ff7af9ebb088553ad9e408adfd3a65872c",
+    "capturedMain": "02dcd5ec5e24d999bdfdd1d98d6727293da1be6d",
+    "ownerSource": "d5bf8452902c2e9d799e8f91e506620be0de12e9",
+    "fileSha256": "eabe1358a938e4c36b72ae0349f4db111a2336bf04f644fbe6262734bb031a7a",
+    "checks": {
+      "backendTypecheck": "passed",
+      "scopedLintFormat": "passed",
+      "diffCheck": "passed"
+    },
+    "change": "held purpose descriptor0101\u21920185 from exact owner source; original SQL/history unchanged",
+    "activation": false,
+    "genuineRegisteredDefinitionReceiptSupplied": false,
+    "positiveAudienceOrHomeAcceptance": false,
+    "releaseReady": false
+  }
+}

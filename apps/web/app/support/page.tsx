@@ -14,6 +14,7 @@ import {
 } from "../ops/trust-client";
 
 export default function SupportPage() {
+  const session = useTrust<{ accountId: string }>("session");
   const { data, error, refresh } = useTrust<{
     items: (CaseSummary & { resolution_reason?: string })[];
   }>("my-cases");
@@ -51,6 +52,16 @@ export default function SupportPage() {
     const uuid =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (creator && uuid.test(creator)) setCreatorId(creator);
+    // Setup supplies presentation context only. The report API still verifies
+    // the current creator and snapshots its actual owner proof.
+    if (
+      params.get("kind") === "verification" &&
+      creator &&
+      uuid.test(creator) &&
+      !reportedMessage &&
+      !params.get("requestId")
+    )
+      setKind("verification");
     if (
       creator &&
       reportedMessage &&
@@ -212,7 +223,10 @@ export default function SupportPage() {
             key.current = null;
           }}
         />
-        <button className="qv-btn qv-btn--secondary" disabled={busy}>
+        <button
+          className="qv-btn qv-btn--secondary"
+          disabled={busy || !session.data}
+        >
           {busy ? "Saving…" : "Send report"}
         </button>
         <ErrorState error={actionError} />
