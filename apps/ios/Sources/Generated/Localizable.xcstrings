@@ -11066,6 +11066,28 @@
           }
         }
       }
+    },
+    "Calling is not connected yet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calling is not connected yet."
+          }
+        }
+      }
+    },
+    "Human call": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Human call"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

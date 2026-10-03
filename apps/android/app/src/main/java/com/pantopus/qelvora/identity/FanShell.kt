@@ -12,6 +12,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
+import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.semantics.contentDescription
@@ -35,6 +37,25 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.json.Json
 
 data class ArrivalContext(val source: String, val title: String, val creatorName: String)
+private val requestCaptureIssuer = Any()
+/** Client lifetime only. Check before a request/handoff and before applying
+ * its result. Credentials remain in the actual issuer-bound session model. */
+class FanSessionRequestCapture private constructor(
+    val client: CreatorAPIClient, val expectedAccountId: String,
+    val sessionId: String, val destination: String,
+    private val current: suspend () -> Boolean,
+) {
+    @androidx.annotation.MainThread
+    suspend fun isCurrent(): Boolean { currentCoroutineContext().ensureActive(); return current() }
+    companion object {
+        internal fun issue(issuer: Any, client: CreatorAPIClient, accountId: String,
+                           sessionId: String, destination: String,
+                           current: suspend () -> Boolean): FanSessionRequestCapture {
+            check(issuer === requestCaptureIssuer)
+            return FanSessionRequestCapture(client, accountId, sessionId, destination, current)
+        }
+    }
+}
 class FanSession(private val context: Context, private val baseURL: String?, returnTo: String) {
     private val storage = SecureSessionStorage(context, baseURL)
     fun currentToken(): String? = storage.read()
@@ -42,7 +63,10 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     var session by mutableStateOf<APISession?>(null); private set
     var hasSavedCredential by mutableStateOf(false); private set
     var checkingSession by mutableStateOf(baseURL != null); private set
-    var destination by mutableStateOf(if (ApplicationDestination.isPermitted(returnTo)) returnTo else "/home")
+    private var currentDestination by mutableStateOf(if (ApplicationDestination.isPermitted(returnTo)) returnTo else "/home")
+    var destination: String
+        get() = currentDestination
+        set(value) { if (value != currentDestination) { destinationGeneration++; currentDestination = value } }
     var error by mutableStateOf("")
     var busy by mutableStateOf(false)
     var choosingActor by mutableStateOf(false)
@@ -51,9 +75,30 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     var purgingPrivateState by mutableStateOf(false); private set
     var arrival by mutableStateOf<ArrivalContext?>(null); private set
     private var generation = 0
+    private var destinationGeneration = 0
     private var rotatingCredential = false
     private var refreshingSession = false
     private var removedArrivalFor: String? = null
+    /** No default/global storage reconstruction. Away-and-back navigation also
+     * invalidates an earlier capture, even when account and token are equal. */
+    @androidx.annotation.MainThread
+    suspend fun captureRequest(from: String): FanSessionRequestCapture? {
+        currentCoroutineContext().ensureActive()
+        val origin = baseURL ?: return null
+        val active = session ?: return null
+        if (busy || purgingPrivateState || localPurgeFailed || checkingSession || rotatingCredential || destination != from) return null
+        val snapshot = generation; val navigation = destinationGeneration
+        val credential = runCatching { storage.read() }.getOrNull() ?: return null
+        fun matches(): Boolean = snapshot == generation && navigation == destinationGeneration &&
+            destination == from && session?.accountId == active.accountId && session?.sessionId == active.sessionId &&
+            !purgingPrivateState && !localPurgeFailed && !rotatingCredential
+        val capture = FanSessionRequestCapture.issue(requestCaptureIssuer,
+            CreatorAPIClient(origin) { credential }, active.accountId, active.sessionId, from) {
+            currentCoroutineContext().ensureActive()
+            matches() && runCatching { storage.read() }.getOrNull() == credential && matches()
+        }
+        return if (capture.isCurrent()) capture else null
+    }
     suspend fun purge(): Boolean = withContext(NonCancellable) {
         if (purgingPrivateState) return@withContext false
         val pushCredential = runCatching { currentToken() }.getOrNull()
@@ -173,18 +218,12 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     }
     /** Navigation only. Reject responses for a departed destination, account or credential. */
     suspend fun resolveCallDestination(callId: String, from: String): Boolean {
-        val origin = baseURL ?: return false
-        val active = session ?: return false
-        if (busy || purgingPrivateState || destination != from) return false
         val id = runCatching { java.util.UUID.fromString(callId).also { require(it.toString().equals(callId, ignoreCase = true)) } }.getOrNull() ?: return false
-        val snapshot = generation
+        val capture = captureRequest(from) ?: return false
         try {
-            val credential = currentToken() ?: return false
-            if (snapshot != generation || destination != from) return false
-            val client = CreatorAPIClient(origin) { credential }
-            val route = client.readAccountCallRoute(id.toString(), active.accountId)
-            currentCoroutineContext().ensureActive()
-            if (busy || snapshot != generation || destination != from || session?.accountId != active.accountId || session?.sessionId != active.sessionId || currentToken() != credential) return false
+            if (!capture.isCurrent()) return false
+            val route = capture.client.readAccountCallRoute(id.toString(), capture.expectedAccountId)
+            if (!capture.isCurrent()) return false
             val returned = java.util.UUID.fromString(route.sessionId)
             val creator = java.util.UUID.fromString(route.creatorId)
             val fan = java.util.UUID.fromString(route.fanId)
@@ -195,7 +234,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         catch (_: Exception) { return false }
     }
     suspend fun logout(all: Boolean = false) {
-        if (busy) return; val client = api ?: run { purge(); return }; busy = true
+        if (busy) return; val client = api ?: run { purge(); return }; busy = true; generation++
         try { if (all) client.revokeSessions() else client.logout(); purge() }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (failure: CreatorAPIError) { if (failure.status == 401) purge() else error = message(failure) }
@@ -229,7 +268,36 @@ class FanFeatureRegistration(val matches: (String) -> Boolean, val allowsSignedO
 
 @Composable
 fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/home", features: List<FanFeatureRegistration> = emptyList(), destinationDelivery: Long = 0L, notificationID: String? = null, onNotificationConsumed: () -> Unit = {}) {
-    val model = remember(baseURL) { FanSession(context, baseURL, returnTo) }; val scope = rememberCoroutineScope()
+    // This root owns one navigation snapshot. Save the actual route at the
+    // lifecycle save, not a mirror that can lag feature-local navigation.
+    // Credentials, session authority and feature payloads are never serialized.
+    val permittedReturn = returnTo.takeIf(ApplicationDestination::isPermitted) ?: "/home"
+    val registry = (context as? ComponentActivity)?.savedStateRegistry
+    val model = remember(baseURL) {
+        val saved = registry?.consumeRestoredStateForKey("qelvora.fan.navigation")
+        val restored = saved?.getString("destination")?.takeIf {
+            ApplicationDestination.isPermitted(returnTo) && saved.getString("origin") == baseURL &&
+                saved.getString("return") == permittedReturn && saved.getLong("delivery") == destinationDelivery &&
+                ApplicationDestination.isPermitted(it)
+        }
+        FanSession(context, baseURL, restored ?: returnTo)
+    }
+    val currentReturn by rememberUpdatedState(permittedReturn)
+    val currentDelivery by rememberUpdatedState(destinationDelivery)
+    DisposableEffect(model, registry) {
+        registry?.registerSavedStateProvider("qelvora.fan.navigation") {
+            Bundle().apply {
+                putString("origin", baseURL)
+                putString("return", currentReturn)
+                putLong("delivery", currentDelivery)
+                putString("destination", model.destination.takeIf(ApplicationDestination::isPermitted) ?: "/home")
+            }
+        }
+        onDispose { registry?.unregisterSavedStateProvider("qelvora.fan.navigation") }
+    }
+    var appliedReturn by remember(baseURL) { mutableStateOf(returnTo) }
+    var appliedDelivery by remember(baseURL) { mutableStateOf(destinationDelivery) }
+    val scope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
     var foreground by remember(lifecycleOwner) { mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
     DisposableEffect(lifecycleOwner) {
@@ -237,7 +305,12 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
-    LaunchedEffect(returnTo, destinationDelivery) { model.open(returnTo) }
+    LaunchedEffect(returnTo, destinationDelivery) {
+        // A new explicit delivery takes priority; an unchanged initial intent
+        // must not overwrite the route restored for this origin.
+        if (!ApplicationDestination.isPermitted(returnTo) || appliedReturn != returnTo || appliedDelivery != destinationDelivery) model.open(returnTo)
+        appliedReturn = returnTo; appliedDelivery = destinationDelivery
+    }
     LaunchedEffect(model.destination) { model.loadArrival() }
     LaunchedEffect(model, foreground) { if (foreground) { model.refresh(); while (true) { delay(4000); if (!model.choosingActor && !model.busy && (model.session != null || model.hasSavedCredential)) model.refresh() } } }
     LaunchedEffect(model.session) { GrowthPush.refresh(context) }

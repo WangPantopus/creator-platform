@@ -14,6 +14,7 @@ import {
 } from "../agent/trust-adapter.js";
 import type { AgentService } from "../agent/service.js";
 import type { AgentLifecycle } from "../agent/lifecycle.js";
+import type { PreparedAgentPrivacyExport } from "../agent/privacy-export-snapshot.js";
 import type { CommerceService } from "../commerce/service.js";
 import { commercePrivacyHook } from "../commerce/operations.js";
 import {
@@ -63,6 +64,8 @@ export function createPrivacyConsumers(input: {
     service: AgentService;
     lifecycle: AgentLifecycle;
     artifacts?: AgentExportArtifactSink;
+    /** Genuine reviewed single-source cursor, with this host's restoration/task ports. */
+    privacyExportSnapshot?: PreparedAgentPrivacyExport;
   };
   commerce?: CommerceService;
   /** Exact registered job fence/function custody; absent configuration never issues a financial export scope. */
@@ -169,6 +172,8 @@ export function createPrivacyConsumers(input: {
           },
         ),
         input.agent.artifacts,
+        Boolean(input.agent.privacyExportSnapshot),
+        input.agent.privacyExportSnapshot,
       ),
     );
   if (input.commerce) {

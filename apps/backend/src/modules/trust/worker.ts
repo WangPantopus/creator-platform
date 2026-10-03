@@ -168,6 +168,10 @@ export class TrustWorker {
           leaseToken: task.lease_token,
           signal,
         };
+        // Missing historical ownership cannot be reconstructed by a hook after
+        // identity deletion. This coordinator check only refuses work; each
+        // owner still needs its own authority on the actual held client.
+        await privacyTaskAuthority(this.pool)(job);
         const result = await hook.run(job);
         signal.throwIfAborted();
         receipt(result.receipt);
@@ -240,6 +244,7 @@ export class TrustWorker {
       const unavailable = [
         "privacy_artifact_unconfigured",
         "privacy_commit_fence_unavailable",
+        "privacy_ownership_missing",
         "growth_held_authority_unavailable",
         "restoration_pending",
         "conversation_privacy_unavailable",

@@ -100,6 +100,8 @@ export function contentSignedSubjects(
         row,
         document,
       );
+      if (document.planRef)
+        await service.publicationSources.groupPositive(client, actor);
       return publicationCommand(row, document, mediaEvidence);
     },
   };

@@ -33,5 +33,31 @@
   },
   "normalCreatorProofAndOpsJourney": "not yet operated",
   "externalOwnershipVerified": false,
-  "releaseReady": false
+  "releaseReady": false,
+  "mergedFulfillment": {
+    "head": "3bcc4206ff57899cc0e954bc7d778749ae580723",
+    "merge": "513a8f9c2d4c837640b20a6615f4e669f537cb10",
+    "hostedWebBackend": "two successful checks",
+    "hostedAndroidRuntime": "two successful checks",
+    "hostedNativeAndVisual": "six queued jobs"
+  },
+  "actualPersonalWeb": {
+    "freshCanonicalFanSignIn": true,
+    "savedLimitUsd": 6,
+    "exposureAndCapturedHeldRefundTotals": 0,
+    "reminders": false,
+    "originalPendingNoneDeadlinePreserved": true,
+    "separateFixtureCreatorProfileSavedNormally": true,
+    "realDevelopmentChallengeGeneratedAndKeptPrivate": true,
+    "labelledSyntheticPostSubmittedNormally": true,
+    "displayedVerification": "pending",
+    "signingDisabled": true,
+    "opsCaseAndApprovalOperated": false,
+    "externalOwnershipVerified": false
+  },
+  "mergedProofOwner": {
+    "head": "76286f32da36be2b79ee456bcde1ab27fe93062f",
+    "merge": "09288da65feee510b5f83408e76af7a544ead076",
+    "postUrlProjectionAddedWithoutHistoricalEvidenceMutation": true
+  }
 }

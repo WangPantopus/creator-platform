@@ -1023,4 +1023,6 @@
   <string name="identity_development_body" formatted="false">Synthetic local account. Pantopus production sign-in is not connected.</string>
   <string name="identity_proof_review_support" formatted="false">Request verification review</string>
   <string name="identity_proof_review_support_body" formatted="false">Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified.</string>
+  <string name="w6_call_service_unavailable" formatted="false">Calling is not connected yet.</string>
+  <string name="w6_call_in_progress" formatted="false">Human call</string>
 </resources>

@@ -1021,7 +1021,9 @@ public enum QelvoraCopy {
     "identityDevelopmentTitle": "Development identity",
     "identityDevelopmentBody": "Synthetic local account. Pantopus production sign-in is not connected.",
     "identityProofReviewSupport": "Request verification review",
-    "identityProofReviewSupportBody": "Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified."
+    "identityProofReviewSupportBody": "Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified.",
+    "w6CallServiceUnavailable": "Calling is not connected yet.",
+    "w6CallInProgress": "Human call"
   ]
   private static let variables = try! NSRegularExpression(pattern: #"\{([^}]+)\}"#)
   public static func text(_ key: String, values: [String: String] = [:]) -> String {
