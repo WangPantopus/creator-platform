@@ -33,6 +33,7 @@ import {
   developmentProofReference,
 } from "../../../../packages/api/src/agent/contracts";
 import "./creator-ai.css";
+import { sessionChannel } from "../identity/session-boundary";
 
 type ErrorBody = { error?: { code: string; message: string } };
 type CreatorAIIdentity = Readonly<{
@@ -40,6 +41,7 @@ type CreatorAIIdentity = Readonly<{
   sessionId: string;
   signal: AbortSignal;
   end: () => void;
+  isSessionEnded: () => boolean;
 }>;
 type Preview = {
   revision: number;
@@ -80,6 +82,33 @@ function storeDraft(key: string, value: unknown) {
     else localStorage.setItem(key, JSON.stringify(value));
   } catch {
     /* Private browsing may disable storage; server drafts still work. */
+  }
+}
+function purgeStoredDrafts(accountId?: string) {
+  try {
+    const prefixes = ["w2-source", "w2-interview", "w2-config"].map(
+      (kind) => `${kind}:${accountId ? `${accountId}:` : ""}`,
+    );
+    const sessionKey = accountId ? `w2-session:${accountId}` : null;
+    for (const key of Object.keys(localStorage))
+      if (
+        prefixes.some((prefix) => key.startsWith(prefix)) ||
+        (sessionKey ? key === sessionKey : key.startsWith("w2-session:"))
+      )
+        localStorage.removeItem(key);
+  } catch {
+    /* Unavailable storage cannot restore a draft. */
+  }
+}
+let draftSessionEnds: BroadcastChannel | undefined;
+function watchDraftSessionEnd() {
+  // The negative canonical notification must still clear this app's buffers
+  // after navigating to Account. It never supplies identity or authority.
+  if (!draftSessionEnds && typeof BroadcastChannel !== "undefined") {
+    draftSessionEnds = new BroadcastChannel(sessionChannel);
+    draftSessionEnds.onmessage = (event) => {
+      if (event.data === "ended") purgeStoredDrafts();
+    };
   }
 }
 function Button({
@@ -307,88 +336,98 @@ export function CreatorAI({
   const identitySession = identity?.sessionId;
   const identitySignal = identity?.signal;
   const endIdentity = identity?.end;
+  const isSessionEnded = identity?.isSessionEnded;
   const request = useCallback(
     async (path: string, init: RequestInit = {}) => {
-      identitySignal?.throwIfAborted();
+      const original = identitySignal
+        ? AbortSignal.any([
+            identitySignal,
+            ...(init.signal ? [init.signal] : []),
+          ])
+        : init.signal;
+      original?.throwIfAborted();
       const headers = new Headers(init.headers);
       if (identityAccount)
         headers.set("X-Expected-Account-Id", identityAccount);
+      // The captured view supplies a denial-only precondition. The genuine
+      // cookie-resolved session remains the backend's identity authority.
+      if (identitySession)
+        headers.set("X-Expected-Session-Id", identitySession);
       const response = await fetch(path, {
         ...init,
         headers,
         cache: "no-store",
-        ...(identitySignal
-          ? {
-              signal: AbortSignal.any([
-                identitySignal,
-                ...(init.signal ? [init.signal] : []),
-              ]),
-            }
-          : {}),
+        ...(original ? { signal: original } : {}),
       });
+      original?.throwIfAborted();
       if (identitySignal && endIdentity && identityAccount) {
         if (response.status === 401) {
           const current = await fetch("/api/platform/identity/session", {
             cache: "no-store",
-            signal: AbortSignal.any([
-              identitySignal,
-              AbortSignal.timeout(4000),
-            ]),
+            signal: AbortSignal.any([original!, AbortSignal.timeout(4000)]),
           });
+          original?.throwIfAborted();
+          const session = current.ok
+            ? SessionSchema.parse(await current.json())
+            : undefined;
+          original?.throwIfAborted();
           if (
             current.status === 401 ||
-            (current.ok &&
-              SessionSchema.parse(await current.json()).accountId !==
-                identityAccount)
+            (session &&
+              (session.accountId !== identityAccount ||
+                session.sessionId !== identitySession))
           )
             endIdentity();
         } else if (response.status === 409) {
           const code = ((await response.clone().json()) as ErrorBody).error
             ?.code;
+          original?.throwIfAborted();
           if (
-            ["session_account_changed", "studio_actor_changed"].includes(
-              code ?? "",
-            )
+            [
+              "session_account_changed",
+              "session_view_changed",
+              "studio_actor_changed",
+            ].includes(code ?? "")
           )
             endIdentity();
         }
-        identitySignal.throwIfAborted();
+        original?.throwIfAborted();
       }
       return response;
     },
-    [identityAccount, identitySignal, endIdentity],
+    [identityAccount, identitySession, identitySignal, endIdentity],
   );
   useEffect(() => {
-    if (!identitySignal || !identityAccount || !identitySession) return;
+    if (
+      !identitySignal ||
+      !identityAccount ||
+      !identitySession ||
+      !isSessionEnded
+    )
+      return;
+    watchDraftSessionEnd();
     const sessionKey = `w2-session:${identityAccount}`;
-    const purge = () => {
+    const dispose = () => {
       ++fetchSequence.current;
       ++sourceFileSequence.current;
       actorKey.current = null;
       pendingKeys.current.clear();
-      try {
-        const prefixes = ["w2-source", "w2-interview", "w2-config"].map(
-          (kind) => `${kind}:${identityAccount}:`,
-        );
-        const keys = Object.keys(localStorage).filter((key) =>
-          prefixes.some((prefix) => key.startsWith(prefix)),
-        );
-        for (const key of keys) localStorage.removeItem(key);
-        localStorage.removeItem(sessionKey);
-      } catch {
-        /* Storage may already be unavailable; the account boundary unmounts. */
-      }
+      // The canonical boundary disposes private React state on navigation and
+      // effect restart too. Only its original genuine session end deletes the
+      // stored buffers that the same continuing session may recover.
+      if (isSessionEnded()) purgeStoredDrafts(identityAccount);
     };
-    if (identitySignal.aborted) purge();
+    if (identitySignal.aborted) dispose();
     else {
       // Access-token rotation retains the server session ID. Fresh sign-in
       // creates another ID, so a draft left on an unmounted page cannot return.
-      if (readDraft(sessionKey) !== identitySession) purge();
+      if (readDraft(sessionKey) !== identitySession)
+        purgeStoredDrafts(identityAccount);
       storeDraft(sessionKey, identitySession);
-      identitySignal.addEventListener("abort", purge, { once: true });
+      identitySignal.addEventListener("abort", dispose, { once: true });
     }
-    return () => identitySignal.removeEventListener("abort", purge);
-  }, [identityAccount, identitySession, identitySignal]);
+    return () => identitySignal.removeEventListener("abort", dispose);
+  }, [identityAccount, identitySession, identitySignal, isSessionEnded]);
   const edit = (next: Configuration) => {
     if (!dirtyRef.current) draftRevision.current = state?.revision ?? null;
     setConfiguration(next);
