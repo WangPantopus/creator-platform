@@ -1,5 +1,11 @@
 # Trust transaction settlement — October 3, 2026 UTC
 
+## Reuse of existing private-store worker settlement — 2026-10-03
+
+Complete review of draft201 finds original78cabdef already repairs the worker ACK transaction and failure updates. The earlier raw/unconditional ACK diagnosis applies to200's separate worker, not201. W8 reuses only that exact111-line worker delta in200; the original transaction helper is already byte-identical. Missing-hook/failure updates match the original running task/effect token, and an uncertain completed ACK cannot be overwritten by a retry. Source settlement closes/discards the original client before later fresh failure handling, while specific private settlement codes survive reporting. The retry metric requires an actual updated row. Genuine hook/lease/source/receipt and existing retained-record behavior are preserved; no provider or task authority is issued.
+
+Backend types/scoped lint/format and diff checks pass. Fresh exact original job/domain/token/receipt/data fault readback, protected store/EOF/source COMMIT/ACK/download and all-eight C10 remain pending after the actual engine outage. The existing running-only update already protects completed state; an additional runtime reconciliation helper is not introduced without a demonstrated remaining failure. No new unit test, role, SQL, consent, fabricated result or paid call is added.
+
 ## Current runnable web build and reviewed cancellation — 2026-10-03
 
 Actual36d37cb96efabe9f9e2474beac466dce2a410aaf production Next build exits0 in10.38seconds using a fresh ignored in-project output directory. The installed16.3.7 distDir documentation explicitly forbids leaving the project; the earlier external-relative attempt panics before compilation and exits1 in0.84seconds. Its failed operator/log and the earlier generated-import assertion failure remain private. The corrected operator saves the actual compiler exit before checking generated imports, restores both exact original imports and verifies clean unchanged tracked source. It inherits no provider environment, acquires no device and normally releases its finite heavy guard. A runnable bundle does not qualify the current original-session or signed Ops workflow.
