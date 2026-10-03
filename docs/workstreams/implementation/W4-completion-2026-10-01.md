@@ -1,5 +1,9 @@
 ### Actual prepared-stage original comparison requalification — October 3, 2026 UTC
 
+### Actual publication metadata timeout custody — October 3, 2026 UTC
+
+The W4 publication metadata helper restores/releases only successful reads and preserves its original private nonenumerable Error.cause. Personal closed-copy real pg2ms metadata read timeout shows no later W4 helper SQL, awaited source closure/removal and all six unchanged canonical61 digests. The initial missing-held-W8-role outcome remains private. Backend/types/lint/format and actual503/61/login/cause privacy checks pass; SQL/pins unchanged. W8 nested denial/W1 complete wrapper, genuine factory/delivery, finite C10 and activation remain open. [Exact limits](../../../artifacts/workstreams/W4/runtime/2026-10-03/fulfillment-publication-original/README.md). All nine packages/R01–R15 remain incomplete.
+
 ### Actual canonical publication delivery evidence — October 3, 2026 UTC
 
 The new213 final comparator now checks the whole original group-delivery evidence descriptor produced by the actual existing writer, including exact planRef/System message/publication act, replacing the mismatched new field names. Original0178 and interactive producer bytes remain unchanged. Independent eleven-source rollback review passes21 actual compiler checks,16 no-scope plans,8 ACL/unregistered refusals,13 restored drifts and all six canonical61 custody digests. Current source/catalogue and private receipt hashes are in the [brief evidence](../../../artifacts/workstreams/W4/runtime/2026-10-03/fulfillment-publication-original/README.md). Genuine worker/final delivery/activation/finite C10 and all nine packages/R01–R15 remain incomplete.
