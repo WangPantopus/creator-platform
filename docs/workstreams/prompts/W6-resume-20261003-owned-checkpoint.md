@@ -106,6 +106,10 @@ W8 alone activates the fully reviewed original wave.0208/0213 are already
 reserved_unapplied with no sourceSha256; held0197/0201 and later purposes remain
 closed. Full original catalogue/restoration/cancellation/C10 and genuine factory/
 approved bounded originals are still required; no hand-applied SQL or startup pin.
+Read W8's final200/beff87bd successor at
+docs/workstreams/handoffs/W8-continuation-2026-10-03-codex.md from that actual
+published branch before restoration/purpose/Commerce composition; its owner
+evidence does not transfer acceptance and its latest W5/W4 inputs remain unconsumed.
 
 The human said **none of the real inputs are available** and asked us to make
 independent decisions. Do not repeatedly ask the same question or manufacture

@@ -302,6 +302,16 @@ Use current tools/status and keep each owner's source and evidence attributed.
 Human authorized coordinating these seven existing chats about retained PRs;
 no user-owned successor chat was created. These chats may also be handing off.
 
+W8 final checkpoint arrived after W6's initial handoff: existing200/
+beff87bd7a815efcdf6dfa56199fb0707e206f46, functional source
+e57581694daab517a5a3a7dd4878db83595bb1c3. Independently inspected its actual
+checkout HEAD and successor document. Read
+[W8's published successor](https://github.com/WangPantopus/creator-platform/blob/beff87bd7a815efcdf6dfa56199fb0707e206f46/docs/workstreams/handoffs/W8-continuation-2026-10-03-codex.md)
+before restoration/purpose/Commerce composition. Its own container/ports/devices
+are closed; this is separate owner evidence. New W5 a3 settlement and W4
+301/cec source remain explicitly unconsumed there, and201/C10 remains held.
+No W8 acceptance is transferred to W6 and no W6 resource is restarted.
+
 | Owner | Existing threadID                    |
 | ----- | ------------------------------------ |
 | W1    | 01a0ff21-c27d-7b62-9d6e-870b4eb44c19 |
