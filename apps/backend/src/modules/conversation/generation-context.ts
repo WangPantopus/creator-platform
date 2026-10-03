@@ -4,6 +4,7 @@ import { z } from "zod";
 import { canonical, contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
+import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
 import {
   GenerationIdentityAuthority,
   type GenerationPurposeConsumer,
@@ -17,6 +18,12 @@ export const GENERATION_CONTEXT_SOURCE_SHA256 =
   "9449f7f9254aa1c9c77713b1683d5c85076b357f13e573882ee5d2d03d1715e0";
 export const GENERATION_CONTEXT_SIGNATURE =
   "creator.generation_conversation_context(uuid,uuid)";
+export const generationContextProfileBoundSource = Object.freeze({
+  owner: "W3",
+  name: "w3_generation_context_profile_bound",
+  path: "apps/backend/src/modules/conversation/migrations/pending_w3_generation_context_profile_bound.sql",
+  checksum: "b0fe4643e110a4a6b752ae44847543c7cb8897bdd2a56c2daa58574b9c58536e",
+});
 const owner = "creator_generation_conversation_context";
 const Hash = z.string().regex(/^[a-f0-9]{64}$/u);
 const Columns = {
@@ -287,12 +294,21 @@ export class PreparedGenerationConversationContext {
   private async assertCustody(client: PoolClient): Promise<void> {
     const receipt = this.custody.consumer;
     try {
+      await assertRegisteredMigration(
+        client,
+        generationContextProfileBoundSource,
+      );
       await this.identity.assertCatalogueInTransaction(client);
       const installed = (
         await client.query<{ ready: boolean; definition: string }>(
           `SELECT session_user='creator_generation_worker' AND current_user=session_user
            AND current_setting('transaction_isolation')='read committed'
            AND EXISTS(SELECT FROM creator.schema_migration WHERE version=$1 AND checksum=$2)
+           AND EXISTS(SELECT FROM pg_policy policy
+            WHERE policy.polrelid=to_regclass('creator.fan_profile')
+             AND policy.polname='w3_generation_context_profile_bound'
+             AND policy.polcmd='r' AND NOT policy.polpermissive
+             AND policy.polroles=ARRAY[r.oid])
            AND p.prokind='f' AND p.prosecdef AND p.provolatile='v' AND p.proconfig=ARRAY['search_path=pg_catalog']
            AND pg_get_userbyid(p.proowner)=$3 AND NOT r.rolcanlogin AND NOT r.rolinherit
            AND NOT r.rolsuper AND NOT r.rolbypassrls AND NOT r.rolcreatedb AND NOT r.rolcreaterole
