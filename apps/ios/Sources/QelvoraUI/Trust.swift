@@ -76,7 +76,8 @@ public struct TrustFanFeature: View {
     private let client: TrustClient?
     @ObservedObject private var model: FanSession
     private var route: String { model.destination }
-    private var privateReady: Bool { model.session != nil && !model.checkingSession && !model.busy && model.error.isEmpty && !model.purgingPrivateState && !model.localPurgeFailed }
+    private var privateVisible: Bool { model.session != nil && !model.busy && model.error.isEmpty && !model.purgingPrivateState && !model.localPurgeFailed }
+    private var privateReady: Bool { privateVisible && !model.checkingSession }
     private var privateDisabled: Bool { busy || !privateReady }
     @State private var operation: Task<Void, Never>?
     @State private var refreshOperation: Task<Void, Never>?
@@ -127,8 +128,8 @@ public struct TrustFanFeature: View {
             navigation
             if busy { ProgressView().accessibilityLabel("Loading") }
             if !error.isEmpty { Notice(tone: .error, title: "Could not complete", children: error) }
-            if privateReady && !result.isEmpty { Notice(title: "Saved", children: result) }
-            if !privateReady && !route.hasPrefix("/trust") { Notice(title: "Account unavailable", children: "Refresh your account before continuing. Unsaved input stays in this account view.") }
+            if privateVisible && !result.isEmpty { Notice(title: "Saved", children: result) }
+            if !privateVisible && !route.hasPrefix("/trust") { Notice(title: "Account unavailable", children: "Refresh your account before continuing. Unsaved input stays in this account view.") }
             if route.contains("privacy") { privacy } else if route.contains("access") { accessHistory } else if route.contains("feedback") { feedback } else if route.hasPrefix("/trust") { crisisHelp } else { support }
             Button("Refresh", variant: .secondary, block: true, disabled: busy || model.checkingSession || model.busy) { refreshOperation?.cancel(); refreshOperation = Task { await model.refresh() } }
         }.padding(16) }.foregroundStyle(qColor("ink", scheme)).background(qColor("ground", scheme))
@@ -167,7 +168,7 @@ public struct TrustFanFeature: View {
         field("What happened?", $reason, multiline: true)
         Button(kind == "block" ? "Block creator" : "Send report", variant: .secondary, block: true, disabled: privateDisabled || reason.trimmingCharacters(in: .whitespacesAndNewlines).count < 12 || (kind == "support" && !requestID.isEmpty && UUID(uuidString: requestID) == nil) || (kind == "block" && UUID(uuidString: creatorID) == nil) || (kind == "ai_report" && (UUID(uuidString: creatorID) == nil || UUID(uuidString: messageID) == nil))) { run { await report() } }
         Text("Your cases").qText("title")
-        if privateReady { ForEach(cases) { item in VStack(alignment: .leading, spacing: 8) { Text("CASE-\(item.number) · \(item.kind.replacingOccurrences(of: "_", with: " ")) · \(item.state)").qText("body-strong"); if item.state == "resolved" { Button("Appeal CASE-\(item.number)", variant: .secondary, disabled: privateDisabled || reason.count < 12) { run { await appeal(item) } } } } }
+        if privateVisible { ForEach(cases) { item in VStack(alignment: .leading, spacing: 8) { Text("CASE-\(item.number) · \(item.kind.replacingOccurrences(of: "_", with: " ")) · \(item.state)").qText("body-strong"); if item.state == "resolved" { Button("Appeal CASE-\(item.number)", variant: .secondary, disabled: privateDisabled || reason.count < 12) { run { await appeal(item) } } } } }
         Text("Trust inbox").qText("title")
         ForEach(notices) { item in VStack(alignment: .leading, spacing: 8) { Text(item.type.replacingOccurrences(of: "_", with: " ")).qText("label"); Text(item.reason).qText("body") } } }
     } }
@@ -178,7 +179,7 @@ public struct TrustFanFeature: View {
     } }
     private var accessHistory: some View { VStack(alignment: .leading, spacing: 16) {
         Text("These records show when an authorized operations account opened your case evidence and its purpose. Opening a case does not mean someone read every word.").qText("body")
-        if privateReady { if history.isEmpty && !busy { Text("No case accesses yet.").qText("caption") }
+        if privateVisible { if history.isEmpty && !busy { Text("No case accesses yet.").qText("caption") }
         ForEach(Array(history.enumerated()), id: \.offset) { _, item in VStack(alignment: .leading, spacing: 8) { Text(item.action.replacingOccurrences(of: "_", with: " ") + " · " + item.created_at).qText("caption"); Text(item.purpose).qText("body") } } }
     } }
     private var feedback: some View { VStack(alignment: .leading, spacing: 16) {
@@ -200,7 +201,7 @@ public struct TrustFanFeature: View {
         else { Text("Fresh account verification must be connected before requesting data changes.").qText("caption") }
         Button("Request export", variant: .secondary, block: true, disabled: privacyDisabled) { run { await privacyCommand("export") } }
         Button("Request deletion", variant: .secondary, block: true, disabled: privacyDisabled) { confirmingDelete = true }
-        if privateReady { ForEach(jobs) { job in
+        if privateVisible { ForEach(jobs) { job in
             Text("Requested " + job.created_at).qText("caption")
             Button(job.kind + " · " + job.scope + " · " + job.state.replacingOccurrences(of: "_", with: " "), variant: .quiet, block: true, disabled: privateDisabled) { run { await jobDetail(job.id) } }
                 .accessibilityLabel(job.kind + ", " + job.scope + ", " + job.state.replacingOccurrences(of: "_", with: " ") + ", requested " + job.created_at + ", job " + job.id)
@@ -215,7 +216,7 @@ public struct TrustFanFeature: View {
         if job.state != "complete" { Button("Retry incomplete domains", variant: .secondary, block: true, disabled: privateDisabled) { run { await retry(job.id) } } }
         if job.state == "complete" && job.kind == "export" {
             Button("Prepare export", variant: .secondary, block: true, disabled: privateDisabled) { run { await download(job.id) } }
-            if let exportPayload { ShareLink("Share your export", item: exportPayload, preview: SharePreview("Your creator data")) }
+            if privateReady, let exportPayload { ShareLink("Share your export", item: exportPayload, preview: SharePreview("Your creator data")) }
         }
     }
     private func taskDescription(_ task: TrustTask) -> String {
@@ -238,8 +239,9 @@ public struct TrustFanFeature: View {
     private func clearPrivateResults() {
         suspendPrivateResults()
         cases = []; notices = []; jobs = []; history = []; selectedJob = nil
+        capability = nil
     }
-    private func suspendPrivateResults() { workEpoch += 1; busy = false; exportPayload = nil; capability = nil; confirmingDelete = false; result = ""; error = "" }
+    private func suspendPrivateResults() { workEpoch += 1; busy = false; exportPayload = nil; confirmingDelete = false; result = ""; error = "" }
     private func beginWork() -> Int { workEpoch += 1; busy = true; return workEpoch }
     private func finishWork(_ epoch: Int) { if workEpoch == epoch { busy = false } }
     private func capture() async throws -> FanSessionRequestCapture {
