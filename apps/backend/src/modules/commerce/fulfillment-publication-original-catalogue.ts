@@ -88,21 +88,18 @@ export async function fulfillmentPublicationOriginalPurposeCatalogue(
   client: PoolClient,
 ) {
   await client.query("SAVEPOINT w4_publication_original_catalogue");
-  try {
-    await client.query("SET LOCAL search_path=pg_catalog");
-    const catalogue = (
-      await client.query<{ catalogue: unknown }>(
-        FULFILLMENT_PUBLICATION_ORIGINAL_CATALOGUE_QUERY,
-      )
-    ).rows[0]?.catalogue;
-    const denial = await fulfillmentPublicationDenialPurposeCatalogue(client);
-    return { catalogue, denial };
-  } finally {
-    await client.query(
-      "ROLLBACK TO SAVEPOINT w4_publication_original_catalogue",
-    );
-    await client.query("RELEASE SAVEPOINT w4_publication_original_catalogue");
-  }
+  await client.query("SET LOCAL search_path=pg_catalog");
+  const catalogue = (
+    await client.query<{ catalogue: unknown }>(
+      FULFILLMENT_PUBLICATION_ORIGINAL_CATALOGUE_QUERY,
+    )
+  ).rows[0]?.catalogue;
+  const denial = await fulfillmentPublicationDenialPurposeCatalogue(client);
+  // Failed reads may still be in flight. Only the genuine transaction owner
+  // decides rollback versus destruction; never enqueue helper SQL after them.
+  await client.query("ROLLBACK TO SAVEPOINT w4_publication_original_catalogue");
+  await client.query("RELEASE SAVEPOINT w4_publication_original_catalogue");
+  return { catalogue, denial };
 }
 
 // Primary closed canonical61 qualification of the eleven actual source files,
@@ -192,12 +189,15 @@ export const FULFILLMENT_PUBLICATION_ORIGINAL_SOURCES = Object.freeze(
   ].map((source) => Object.freeze(source)),
 );
 
-function unavailable(): never {
-  throw new DomainError(
+function unavailable(cause?: unknown): never {
+  const error = new DomainError(
     "fulfillment_publication_original_unavailable",
     "The original publication inputs cannot be checked. Try again later.",
     503,
   );
+  if (cause !== undefined)
+    Object.defineProperty(error, "cause", { value: cause, configurable: true });
+  throw error;
 }
 
 /** Exact executable/source/ledger and full owner/producer metadata custody on
@@ -227,7 +227,7 @@ export async function assertCommerceFulfillmentPublicationOriginalCatalogue(
       ) !== FULFILLMENT_PUBLICATION_ORIGINAL_CATALOGUE_SHA256
     )
       unavailable();
-  } catch {
-    unavailable();
+  } catch (cause) {
+    unavailable(cause);
   }
 }

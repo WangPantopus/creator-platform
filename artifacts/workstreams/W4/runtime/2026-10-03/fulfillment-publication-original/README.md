@@ -1,5 +1,9 @@
 # W4 actual actorless original comparison — October 3, 2026 UTC
 
+Current W4 metadata reads restore/release their savepoint only after successful reads, and the bounded public error preserves its original private nonenumerable Error.cause for the actual W1 owner. Personal closed-copy real pg2ms read timeout confirms the metadata SELECT ran, no later W4 helper SQL was submitted, source closure was awaited before removal and all six original canonical61 custody digests match. Reviewed private receipt SHA256 is `a4db7d7e27df80b3e76cce5b8a5d2fd54cba021b6369ef8b06d4dc80e3a14530`. The initial15ms attempt reached the missing held W8 metadata role before a timeout; that actual failure and unchanged custody are retained privately.
+
+Backend build/types/scoped lint/format pass. Actual canonical runtime still refuses503 with61/login unchanged and an original private nonenumerable cause. This qualifies only W4’s metadata failure path. W8’s nested denial helper and W1’s complete actual transaction wrapper require their owner repairs/reviews; no full publication transport or factory acceptance is inferred. SQL and frozen eleven-source catalogue pins below remain unchanged.
+
 ### Canonical delivery evidence correction — October 3, 2026 UTC
 
 The primary found that the new finalizing comparator expected `fulfillmentKind` and `signedActId`, while the actual original delivery writer stores the complete `{kind, planRef, contentId, contentVersion, messageId, publicationSignedActId, authorKind}` descriptor. Current213 now compares that whole exact canonical descriptor, including the original immutable plan reference and actual System message. Original0178 and its interactive producer bytes remain unchanged.
