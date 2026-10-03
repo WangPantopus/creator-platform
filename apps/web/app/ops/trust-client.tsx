@@ -7,6 +7,7 @@ export class TrustError extends Error {
     message: string,
     readonly code: string,
     readonly correlationId?: string,
+    readonly status?: number,
   ) {
     super(message);
   }
@@ -58,6 +59,7 @@ export async function trustApi<T>(path: string, body?: unknown): Promise<T> {
       result.error?.message ?? "This service is unavailable.",
       result.error?.code ?? "service_unavailable",
       result.error?.correlationId,
+      response.status,
     );
   return result as T;
 }
@@ -80,6 +82,11 @@ export function useTrustSession(reset: () => void) {
     };
   }, []);
   return epoch;
+}
+/** Retry current reads together without granting an account or changing the
+ * form/session epoch. Each real response retains the original account fence. */
+export function retryTrustReads() {
+  window.dispatchEvent(new Event("trust-retry"));
 }
 export function useTrust<T>(path: string) {
   const [data, setData] = useState<T | null>(null);
@@ -109,18 +116,26 @@ export function useTrust<T>(path: string) {
     void refresh();
     const update = () => void refresh();
     window.addEventListener("trust-session", update);
+    window.addEventListener("trust-retry", update);
     return () => {
       sequence.current++;
       window.removeEventListener("trust-session", update);
+      window.removeEventListener("trust-retry", update);
     };
   }, [refresh]);
   return { data, error, loading, refresh };
 }
-export function TrustSession() {
-  const { data } = useTrust<{
+export function TrustSession({
+  capabilityError = null,
+}: {
+  /** A containing page may already present the same capability failure. */
+  capabilityError?: TrustError | null;
+} = {}) {
+  const capability = useTrust<{
     localDevelopment: boolean;
     localActorSelection?: boolean;
   }>("capabilities");
+  const { data } = capability;
   const session = useTrust<{ accountId: string }>("session");
   const [actor, setActor] = useState("fan");
   const actorChoice = useRef<HTMLSelectElement | null>(null);
@@ -200,7 +215,10 @@ export function TrustSession() {
     if (selected) setActor(selected);
   }, [data?.localDevelopment, session.data?.accountId]);
   const continuation =
-    returnTo && !session.loading && !session.data ? (
+    returnTo &&
+    !session.loading &&
+    !session.data &&
+    (!session.error || session.error.status === 401) ? (
       <a
         className="qv-link-btn"
         href={`/api/auth/continue?returnTo=${encodeURIComponent(returnTo)}`}
@@ -208,12 +226,23 @@ export function TrustSession() {
         Continue with Pantopus
       </a>
     ) : null;
+  if (capability.error)
+    return capability.error.code === capabilityError?.code ? null : (
+      <ErrorState error={capability.error} retry={retryTrustReads} />
+    );
+  if (session.error && session.error.status !== 401)
+    return <ErrorState error={session.error} retry={retryTrustReads} />;
   if (!data?.localDevelopment) return continuation;
   if (data.localActorSelection === false)
     return (
       <div className="trust-session">
         <p>Synthetic local accounts · no provider or production identity</p>
-        {returnTo && (
+        {session.loading && (
+          <p className="qv-help" role="status">
+            Checking account…
+          </p>
+        )}
+        {returnTo && !session.loading && (
           <a
             className="qv-link-btn"
             href={`/api/auth/continue?returnTo=${encodeURIComponent(returnTo)}`}

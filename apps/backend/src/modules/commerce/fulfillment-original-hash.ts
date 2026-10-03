@@ -39,12 +39,17 @@ export class CommerceFulfillmentOriginalHash {
     await input.database.assertRuntimeRole();
     const client = await input.database.pool.connect();
     try {
+      await client.query("BEGIN");
       await CommerceFulfillmentViewAuthority.assertCurrentCatalogue(
         input.viewAuthority,
         input.database,
         client,
       );
       await assertFulfillmentOriginalHashCatalogue(client);
+      await client.query("ROLLBACK");
+    } catch (error) {
+      await client.query("ROLLBACK").catch(() => undefined);
+      throw error;
     } finally {
       client.release();
     }
