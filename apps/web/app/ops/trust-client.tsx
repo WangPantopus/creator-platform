@@ -237,7 +237,12 @@ export function TrustSession({
     return (
       <div className="trust-session">
         <p>Synthetic local accounts · no provider or production identity</p>
-        {returnTo && (
+        {session.loading && (
+          <p className="qv-help" role="status">
+            Checking account…
+          </p>
+        )}
+        {returnTo && !session.loading && (
           <a
             className="qv-link-btn"
             href={`/api/auth/continue?returnTo=${encodeURIComponent(returnTo)}`}
