@@ -492,6 +492,7 @@ export class PreparedConversationPrivacyCursor {
     let cancellationFailure: unknown;
     const abort = () => {
       if (cancelling) return;
+      this.uncertainClients.add(client);
       cancelling = cancelConversationPrivacyBackend(this.pool, pid).catch(
         (error: unknown) => {
           cancellationFailure = error;
@@ -505,9 +506,14 @@ export class PreparedConversationPrivacyCursor {
     let queryFailure: unknown;
     try {
       signal.throwIfAborted();
-      result = await client.query<ConversationPrivacyCursorRow>(
-        "FETCH FORWARD 16 FROM w3_conversation_privacy_export",
-      );
+      // The installed pg runtime supports this per-query read deadline. It
+      // bounds a lost response even when the original pool has no deadline;
+      // the producer then destroys the retained source, never queues rollback.
+      const fetch = {
+        text: "FETCH FORWARD 16 FROM w3_conversation_privacy_export",
+        query_timeout: 3000,
+      };
+      result = await client.query<ConversationPrivacyCursorRow>(fetch);
     } catch (error) {
       queryFailed = true;
       queryFailure = error;
@@ -564,7 +570,11 @@ export class PreparedConversationPrivacyCursor {
     );
     parentSignal.throwIfAborted();
     await this.assertCurrent(client, job, families);
-    const signal = AbortSignal.any([job.signal!, parentSignal]);
+    const signal = AbortSignal.any([
+      job.signal!,
+      parentSignal,
+      AbortSignal.timeout(3000),
+    ]);
     const rows = z
       .array(ConversationPrivacyCursorRow)
       .max(16)

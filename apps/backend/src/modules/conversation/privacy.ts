@@ -257,13 +257,14 @@ export function conversationPrivacyHook(
         }
         // This PID belongs to the still-held deletion client. Cancellation
         // never releases its task locks or permits another pool borrower.
-        cancelling = cancelConversationPrivacyBackend(
-          input.pool,
-          backendPid,
-        ).catch((error: unknown) => {
-          cancellationFailures.push(error);
-          discardClient = true;
-        });
+        cancelling = cancelConversationPrivacyBackend(input.pool, backendPid)
+          .catch((error: unknown) => {
+            cancellationFailures.push(error);
+            discardClient = true;
+          })
+          // A healthy cancel does not prove that a stalled transport delivered
+          // the original query's response. End the exact held source too.
+          .finally(destroy);
       };
       signal.addEventListener("abort", abort, { once: true });
       const accountingReceipts: Record<string, unknown>[] = [];

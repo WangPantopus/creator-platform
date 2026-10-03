@@ -129,12 +129,14 @@ export function conversationPrivacyExportStream(
     }
     // Covers original PID/BEGIN/catalogue/DECLARE/bookend queries too. Typed
     // FETCH owns its page cancel; both control sockets settle before cleanup.
-    cancelling = cancelConversationPrivacyBackend(input.pool, backendPid).catch(
-      (error: unknown) => {
+    cancelling = cancelConversationPrivacyBackend(input.pool, backendPid)
+      .catch((error: unknown) => {
         cancellationFailures.push(error);
         discardClient = true;
-      },
-    );
+      })
+      // Even a successful control cancel cannot deliver a dropped source reply.
+      // End this exact retained client before waiting on the original query.
+      .finally(destroySource);
   };
   signal.addEventListener("abort", abort, { once: true });
   const flush = async () => {
