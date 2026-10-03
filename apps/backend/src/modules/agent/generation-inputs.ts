@@ -187,6 +187,8 @@ export class PreparedGenerationAgentInputs {
       callers: Object.freeze([
         "creator_w2_generation_journal",
         "creator_w2_generation_retrieval",
+        "creator_w2_generation_guardrail",
+        "creator_w2_generation_metadata",
       ]),
       dependencies: Object.freeze([
         "creator.generation_scope_matches(uuid,uuid)",

@@ -123,7 +123,7 @@ export function generationAccountingLifecycle(input: {
         await assert(client, job, family);
         const predicate =
           table === "ai_event"
-            ? "type='ai.generation_receipt' AND payload->>'threadId'=$2 AND payload->>'fanId'=$3"
+            ? "(type='ai.generation_receipt' OR (type='ai.guardrail' AND payload->>'purpose'='generation_guardrail')) AND payload->>'threadId'=$2 AND payload->>'fanId'=$3"
             : table === "ai_usage"
               ? usagePredicate
               : "thread_id=$2::uuid AND fan_id=$3::uuid";
@@ -264,7 +264,7 @@ export function generationAccountingLifecycle(input: {
       ] as const) {
         const predicate =
           table === "ai_event"
-            ? "type='ai.generation_receipt' AND payload->>'threadId'=$2 AND payload->>'fanId'=$3"
+            ? "(type='ai.generation_receipt' OR (type='ai.guardrail' AND payload->>'purpose'='generation_guardrail')) AND payload->>'threadId'=$2 AND payload->>'fanId'=$3"
             : "thread_id=$2::uuid AND fan_id=$3::uuid";
         deleted[table] = 0;
         for (;;) {
@@ -305,7 +305,7 @@ export function generationAccountingLifecycle(input: {
       );
       await assert(client, job, family);
       const finalResidual = await client.query(
-        "SELECT 1 FROM creator.ai_usage WHERE creator_id=$1 AND thread_id=$2 AND fan_id=$3 UNION ALL SELECT 1 FROM creator.ai_generation_admission WHERE creator_id=$1 AND thread_id=$2 AND fan_id=$3 UNION ALL SELECT 1 FROM creator.ai_generation_attempt WHERE creator_id=$1 AND thread_id=$2 AND fan_id=$3 UNION ALL SELECT 1 FROM creator.ai_generation_receipt WHERE creator_id=$1 AND thread_id=$2 AND fan_id=$3 UNION ALL SELECT 1 FROM creator.ai_event WHERE creator_id=$1 AND type='ai.generation_receipt' AND payload->>'threadId'=$2::text AND payload->>'fanId'=$3::text LIMIT 1",
+        "SELECT 1 FROM creator.ai_usage WHERE creator_id=$1 AND thread_id=$2 AND fan_id=$3 UNION ALL SELECT 1 FROM creator.ai_generation_admission WHERE creator_id=$1 AND thread_id=$2 AND fan_id=$3 UNION ALL SELECT 1 FROM creator.ai_generation_attempt WHERE creator_id=$1 AND thread_id=$2 AND fan_id=$3 UNION ALL SELECT 1 FROM creator.ai_generation_receipt WHERE creator_id=$1 AND thread_id=$2 AND fan_id=$3 UNION ALL SELECT 1 FROM creator.ai_event WHERE creator_id=$1 AND (type='ai.generation_receipt' OR (type='ai.guardrail' AND payload->>'purpose'='generation_guardrail')) AND payload->>'threadId'=$2::text AND payload->>'fanId'=$3::text LIMIT 1",
         bind(family),
       );
       invariant(
@@ -417,7 +417,7 @@ export function generationAccountingLifecycle(input: {
       }
       const events = (
         await client.query(
-          "SELECT * FROM creator.ai_event WHERE creator_id=$1 AND type='ai.generation_receipt' AND payload->>'threadId'=$2 AND payload->>'fanId'=$3 LIMIT 2001",
+          "SELECT * FROM creator.ai_event WHERE creator_id=$1 AND (type='ai.generation_receipt' OR (type='ai.guardrail' AND payload->>'purpose'='generation_guardrail')) AND payload->>'threadId'=$2 AND payload->>'fanId'=$3 LIMIT 2001",
           bind(family),
         )
       ).rows;
@@ -497,7 +497,7 @@ export function generationAccountingLifecycle(input: {
         ],
       );
       await client.query(
-        "DELETE FROM creator.ai_event WHERE creator_id=$1 AND type='ai.generation_receipt' AND payload->>'threadId'=$2 AND payload->>'fanId'=$3",
+        "DELETE FROM creator.ai_event WHERE creator_id=$1 AND (type='ai.generation_receipt' OR (type='ai.guardrail' AND payload->>'purpose'='generation_guardrail')) AND payload->>'threadId'=$2 AND payload->>'fanId'=$3",
         bind(family),
       );
       for (const table of [
