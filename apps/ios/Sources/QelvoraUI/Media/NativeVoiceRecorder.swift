@@ -4,7 +4,29 @@ import SwiftUI
 /// Only a cold process has no live private recording to preserve.
 @MainActor enum VoiceRecordingCache {
     private static var prepared = false
+    // Preserve failed deletion custody even when the owning view disappears.
+    private static var pendingDeletion: Set<URL> = []
+    static func discard(_ file: URL) -> Bool {
+        let location = file.standardizedFileURL
+        let manager = FileManager.default
+        let stem = location.deletingPathExtension().lastPathComponent
+        let identifier = String(stem.dropFirst("voice-".count))
+        guard location.deletingLastPathComponent() == manager.temporaryDirectory.standardizedFileURL,
+              location.pathExtension == "m4a", stem.hasPrefix("voice-"),
+              let id = UUID(uuidString: identifier), id.uuidString.caseInsensitiveCompare(identifier) == .orderedSame else { return false }
+        pendingDeletion.insert(location)
+        do {
+            let values = try location.resourceValues(forKeys: [.isRegularFileKey, .isSymbolicLinkKey])
+            guard values.isSymbolicLink != true, values.isRegularFile == true else { return false }
+            try manager.removeItem(at: location)
+        } catch {
+            guard (error as? CocoaError)?.code == .fileReadNoSuchFile || (error as? CocoaError)?.code == .fileNoSuchFile else { return false }
+        }
+        pendingDeletion.remove(location)
+        return true
+    }
     static func prepare() -> Bool {
+        for file in Array(pendingDeletion) { if !discard(file) { return false } }
         if prepared { return true }
         let manager = FileManager.default
         do {
@@ -17,7 +39,7 @@ import SwiftUI
                 guard let id = UUID(uuidString: identifier), id.uuidString.caseInsensitiveCompare(identifier) == .orderedSame else { continue }
                 let values = try file.resourceValues(forKeys: keys)
                 guard values.isSymbolicLink != true, values.isRegularFile == true else { continue }
-                try manager.removeItem(at: file)
+                guard discard(file) else { return false }
             }
             prepared = true
             return true
@@ -60,7 +82,7 @@ public final class NativeVoiceRecorder: NSObject, ObservableObject, @preconcurre
         #endif
     }
     public func start() async {
-        discard()
+        guard discard() else { return }
         guard VoiceRecordingCache.prepare() else {
             state = .failed; reason = QelvoraCopy.text("w6ThePrivatePreviewCouldNotBeClearedTryAgainBefore"); return
         }
@@ -102,10 +124,11 @@ public final class NativeVoiceRecorder: NSObject, ObservableObject, @preconcurre
                 }
             }
         } catch {
-            // prepareToRecord can leave a container header even when hardware
-            // capture fails. It never became a preview owned by `file`.
-            if let attemptedFile { try? FileManager.default.removeItem(at: attemptedFile) }
-            state = .failed; reason = QelvoraCopy.text("w6TheMicrophoneIsUnavailableTryAgain"); deactivate()
+            // Failed hardware preparation can still leave a private header.
+            // Keep its custody if deletion fails, before allowing another act.
+            let cleared = attemptedFile.map { VoiceRecordingCache.discard($0) } ?? true
+            if !cleared { file = attemptedFile }
+            state = .failed; reason = QelvoraCopy.text(cleared ? "w6TheMicrophoneIsUnavailableTryAgain" : "w6ThePrivatePreviewCouldNotBeClearedTryAgainBefore"); deactivate()
         }
     }
     public func pause(interrupted: Bool = false) {
@@ -146,10 +169,14 @@ public final class NativeVoiceRecorder: NSObject, ObservableObject, @preconcurre
     }
     public func seek(to seconds: TimeInterval) { player?.currentTime = min(duration, max(0, seconds)) }
     public func pausePreview() { player?.pause() }
-    public func discard() {
+    @discardableResult public func discard() -> Bool {
         generation += 1; clock?.cancel(); clock = nil; recorder?.stop(); recorder = nil; player?.stop(); player = nil
-        if let file { try? FileManager.default.removeItem(at: file) }
-        file = nil; duration = 0; state = .idle; reason = nil; deactivate()
+        duration = 0; deactivate()
+        if let file, !VoiceRecordingCache.discard(file) {
+            state = .failed; reason = QelvoraCopy.text("w6ThePrivatePreviewCouldNotBeClearedTryAgainBefore"); return false
+        }
+        file = nil; state = .idle; reason = nil
+        return true
     }
     private func deactivate() {
         #if os(iOS)
