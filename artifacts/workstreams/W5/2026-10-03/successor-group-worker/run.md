@@ -1,5 +1,22 @@
 # Original group publication consumer — October 3, 2026
 
+## Renewed existing-PR parent reconciliation
+
+PR302 normally merges current W4 PR262
+`5cc17cf28f51b8e95a2888b946de5cec2854076d` at integration
+`aa5b3a83bcd0fd36bf65be1f8b67309d647e4abb`. W4 consolidated its original
+PR236 ancestry and closed236 unmerged with the published source preserved.
+W5 independently compared the entire app/package/script/config/workflow/lockfile
+trees against original3cd6: identical. The same complete executable trees are
+unchanged from prior302 head4b58. Only W4 review/closure documentation advanced.
+The existing302 stack remains explicit; no duplicate feature PR was created.
+
+Current backend types, all nine existing contracts and diff checks pass ataa5b.
+Earlier70af bounded refusals remain historical and are not transferred. No new
+purpose, catalogue acceptance, minimum, factory, task, signature, media,
+delivery or COMMIT is issued by this reconciliation. Current required CI and all
+named positive app/worker/C10 gates below remain open. Release-ready:false.
+
 Personally implemented source `70af350a03d35d4377f8078e675287038b082517`
 on W4 PR262 exact head `3cd6de4f04d7abd64b6448771fb82c2f9a5eb0bd`,
 which includes captured remote main `5c08634b7542fef95dd6c176030a785845250c62`.
