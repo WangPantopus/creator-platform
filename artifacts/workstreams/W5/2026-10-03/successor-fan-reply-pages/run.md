@@ -87,3 +87,44 @@ wrong-role denial, four web views, actual outage concealment/automatic recovery
 and retained fan identity. Unverified: populated paging, two-fan private reply
 isolation, actual0156 review, genuine signed creator reaction and current native
 personal operation. Release-ready: false; the original nine packages continue.
+
+## Exact140f5658 repaired fan operation
+
+Product source `140f56589351d165faa7fde820ec9cdfd40f8f26` includes actual
+W6 playback/cache main `f54f5a7d9939f8fa667781997e4111839305a0e6` and the fan
+navigation repair. Backend/web/API types, actual scoped ESLint (after correcting
+one nonexistent file argument), Prettier, diff and canonical114/12 checks passed.
+All three normal shipping builds passed serially under the shared heavy lease.
+The first iOS attempt returned75 while occupied and changed no build; the later
+guarded build passed. Strict deep codesign verification passed. Android APK
+SHA256 `4c8e9b072d596f5d4f396d30ca7d1cc037742d6e5295e736d410c379d517734b`.
+iOS executable SHA256
+`dbecf56c6ad625bf3003b3e53e7a399e770c5e0e00447eb5c1bbaf946a3aa658`;
+debug dylib SHA256
+`46e6449d0cbc9b1a8884009699643dabdb69d7cbf02fce5eebbd732adb69c71d`.
+Private logs `/private/tmp/w5-fan-140f5658-web.log`,
+`/private/tmp/w5-fan-140f5658-android.log` and
+`/private/tmp/w5-fan-140f5658-ios-retry.log`. Native personal operation remains
+pending the shared GUI/device queue; these are compilation receipts only.
+
+Normally stopped only checked owned prior API/web PIDs23406/13170, then started
+the committed launcher and immutable `.next-w5-fan-140f5658` web output.
+Personally operated supported CUA against exact-source API/web and canonical61.
+Settled390/1280 Light/Night still refused the actual unsigned Note. The actual
+Night account action measured46px high and inherited current ink. Enter on that
+link reached Your account with retained `@kilnfire`. The initial desktop Light
+capture caught a transient expired access lease and is excluded from settled
+view evidence; the subsequent `-light-settled.jpg` visibly shows the refusal.
+Private captures `/private/tmp/w5-fan-140f5658-web390-{light,night}.jpg`,
+`/private/tmp/w5-fan-140f5658-web1280-night.jpg`,
+`/private/tmp/w5-fan-140f5658-web1280-light-settled.jpg` and
+`/private/tmp/w5-fan-140f5658-account-return.jpg` were personally inspected.
+The earlier6aea outage and wrong-role records retain their original source.
+
+After those exact observations, captured/fetched/merged actual remote main
+`18583c42a8d542697eab05dc796be01b91c9bf45`: W2 shares the current uncertainty
+classifier, W4 mounts the ordinary Requests route, and W8 records its independent
+operation. These owner observations are not W5 acceptance. Native source is
+unchanged from140f5658; final integration source checks are recorded separately.
+No populated reply, signature, review, payment, delivery or media-provenance
+acceptance is claimed. Release-ready remains false for all-nine W5 completion.
