@@ -82,8 +82,9 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     /** No default/global storage reconstruction. Away-and-back navigation also
      * invalidates an earlier capture, even when account and token are equal. */
     @androidx.annotation.MainThread
-    suspend fun captureRequest(from: String): FanSessionRequestCapture? {
+    suspend fun captureRequest(from: String, maximumResponseBytes: Int = 268_435_456, timeoutMs: Int = 30_000): FanSessionRequestCapture? {
         currentCoroutineContext().ensureActive()
+        if (maximumResponseBytes !in 1..268_435_456 || timeoutMs !in 1..30_000) return null
         val origin = baseURL ?: return null
         val active = session ?: return null
         if (busy || purgingPrivateState || localPurgeFailed || checkingSession || rotatingCredential || destination != from) return null
@@ -93,7 +94,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
             destination == from && session?.accountId == active.accountId && session?.sessionId == active.sessionId &&
             !purgingPrivateState && !localPurgeFailed && !rotatingCredential
         val capture = FanSessionRequestCapture.issue(requestCaptureIssuer,
-            CreatorAPIClient(origin) { credential }, active.accountId, active.sessionId, from) {
+            CreatorAPIClient(origin, maximumResponseBytes = maximumResponseBytes, timeoutMs = timeoutMs) { credential }, active.accountId, active.sessionId, from) {
             currentCoroutineContext().ensureActive()
             matches() && runCatching { storage.read() }.getOrNull() == credential && matches()
         }

@@ -16,6 +16,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.ensureActive
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
@@ -597,6 +598,34 @@ data class APICommerceVersionCommand(
   val `version`: Long,
   val `idempotencyKey`: String
 )
+
+@Serializable
+data class APIMediaCapabilities(
+  val `mediaAvailable`: Boolean,
+  val `creatorMediaAvailable`: Boolean,
+  val `creatorMediaAudienceAvailable`: Boolean,
+  val `callsAvailable`: Boolean,
+  val `aiAudioAvailable`: APIMediaCapabilitiesAiAudioAvailable,
+  val `callRecoveryAvailable`: Boolean,
+  val `reason`: APIMediaCapabilitiesReason
+)
+
+@Serializable(with = APIMediaCapabilitiesAiAudioAvailableSerializer::class)
+object APIMediaCapabilitiesAiAudioAvailable { const val value: Boolean = false }
+object APIMediaCapabilitiesAiAudioAvailableSerializer : KSerializer<APIMediaCapabilitiesAiAudioAvailable> {
+  override val descriptor = PrimitiveSerialDescriptor("APIMediaCapabilitiesAiAudioAvailable", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APIMediaCapabilitiesAiAudioAvailable {
+    if (decoder.decodeBoolean() != false) throw SerializationException("Expected false")
+    return APIMediaCapabilitiesAiAudioAvailable
+  }
+  override fun serialize(encoder: Encoder, value: APIMediaCapabilitiesAiAudioAvailable) { encoder.encodeBoolean(false) }
+}
+
+@Serializable
+enum class APIMediaCapabilitiesReason {
+  @SerialName("media_unconfigured") MEDIA_UNCONFIGURED,
+  @SerialName("licensed_ai_audio_and_provider_verification_required") LICENSED_AI_AUDIO_AND_PROVIDER_VERIFICATION_REQUIRED
+}
 
 @Serializable
 data class APIMediaCreatorMediaAsset(
@@ -5270,22 +5299,37 @@ enum class ReadCreatorMediaPolicyPurpose {
 class CreatorAPIError(val status: Int, val body: String): Exception("API request refused ($status)")
 data class CreatorAPIBinaryResponse(val body: ByteArray, val status: Int, val contentType: String?, val contentRange: String?, val acceptRanges: String?)
 
-class CreatorAPIClient(private val baseURL: String, private val token: suspend () -> String?) {
+class CreatorAPIClient(private val baseURL: String, private val maximumResponseBytes: Int = 268_435_456, private val timeoutMs: Int = 30_000, private val token: suspend () -> String?) {
   private val json = Json { ignoreUnknownKeys = false }
   private suspend fun request(path: String, method: String, body: String? = null, authenticated: Boolean, query: List<Pair<String, String?>> = emptyList(), headers: Map<String, String> = emptyMap()): String =
     requestBytes(path, method, body?.toByteArray(Charsets.UTF_8), authenticated, query, headers, "application/json", "application/json").body.toString(Charsets.UTF_8)
   private suspend fun requestBytes(path: String, method: String, body: ByteArray? = null, authenticated: Boolean, query: List<Pair<String, String?>> = emptyList(), headers: Map<String, String> = emptyMap(), accept: String = "application/octet-stream", contentType: String = "application/octet-stream"): CreatorAPIBinaryResponse = withContext(Dispatchers.IO) {
+    kotlinx.coroutines.currentCoroutineContext().ensureActive()
+    require(maximumResponseBytes in 1..268_435_456 && timeoutMs in 1..30_000)
     val encodedQuery = query.filter { it.second != null }.joinToString("&") { segment(it.first) + "=" + segment(it.second!!) }
     val connection = URL(baseURL.trimEnd('/') + path + (if (encodedQuery.isEmpty()) "" else "?" + encodedQuery)).openConnection() as HttpURLConnection
     try {
       connection.requestMethod = method
-      connection.connectTimeout = 15000; connection.readTimeout = 30000
+      connection.instanceFollowRedirects = false; connection.useCaches = false
+      connection.connectTimeout = minOf(15000, timeoutMs); connection.readTimeout = timeoutMs
       connection.setRequestProperty("Accept", accept)
       headers.forEach { (name, value) -> connection.setRequestProperty(name, value) }
       if (authenticated) token()?.let { connection.setRequestProperty("Authorization", "Bearer $it") }
       if (body != null) { connection.doOutput = true; connection.setRequestProperty("Content-Type", contentType); connection.outputStream.use { it.write(body) } }
       val status = connection.responseCode
-      val payload = (if (status in 200..299) connection.inputStream else connection.errorStream)?.use { it.readBytes() } ?: byteArrayOf()
+      val maximum = if (status in 200..299) maximumResponseBytes else minOf(maximumResponseBytes, 8192)
+      check(connection.contentLengthLong <= maximum.toLong())
+      val payload = (if (status in 200..299) connection.inputStream else connection.errorStream)?.use { stream ->
+        val output = java.io.ByteArrayOutputStream()
+        val buffer = ByteArray(8192)
+        while (true) {
+          kotlinx.coroutines.currentCoroutineContext().ensureActive()
+          val count = stream.read(buffer); if (count < 0) break
+          check(output.size() + count <= maximum); output.write(buffer, 0, count)
+        }
+        output.toByteArray()
+      } ?: byteArrayOf()
+      kotlinx.coroutines.currentCoroutineContext().ensureActive()
       if (status !in 200..299) throw CreatorAPIError(status, payload.toString(Charsets.UTF_8))
       CreatorAPIBinaryResponse(payload, status, connection.getHeaderField("Content-Type"), connection.getHeaderField("Content-Range"), connection.getHeaderField("Accept-Ranges"))
     } finally { connection.disconnect() }
@@ -5374,6 +5418,7 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
   suspend fun handback(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/handback", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply): APIMessage = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/human-replies", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput): APIConversationConversationRecordingResult = json.decodeFromString(request("/v1/conversations/${segment(creatorId)}/${segment(fanId)}/recordings", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun readMediaCapabilities(): APIMediaCapabilities = json.decodeFromString(request("/v1/w6/capabilities", "GET", authenticated = false))
   suspend fun readCallSession(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = null): APICallCallSession = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/calls/${segment(sessionId)}", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun joinCallSession(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = null): APICallCallAdmission = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/calls/${segment(sessionId)}/join", "POST", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun setCallConsent(creatorId: String, fanId: String, sessionId: String, xQelvoraExpectedAccount: String? = null, body: APICallConsentCommand): APICallCallSession = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/calls/${segment(sessionId)}/consent", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
@@ -5389,8 +5434,8 @@ class CreatorAPIClient(private val baseURL: String, private val token: suspend (
   suspend fun readAudienceCreatorMedia(creatorId: String, assetId: String, xQelvoraExpectedAccount: String? = null): APIMediaCreatorMediaAsset = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/audience-media/${segment(assetId)}", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun audienceCreatorMediaPlayback(creatorId: String, assetId: String, xQelvoraExpectedAccount: String? = null): APIMediaCreatorMediaPlaybackTicket = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/audience-media/${segment(assetId)}/playback", "POST", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun playAudienceCreatorMedia(creatorId: String, assetId: String, ticket: String, range: String? = null, xQelvoraExpectedAccount: String? = null, expectedAccountId: String? = null): CreatorAPIBinaryResponse = requestBytes("/v1/w6/creators/${segment(creatorId)}/audience-media/${segment(assetId)}/play", "GET", authenticated = true, query = listOf("ticket" to ticket, "expectedAccountId" to expectedAccountId), headers = listOf("Range" to range, "x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap())
-  suspend fun readCreatorCallAvailability(creatorId: String): APICallAvailabilityView = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/call-availability", "GET", authenticated = true))
-  suspend fun saveCreatorCallAvailability(creatorId: String, body: APICallAvailabilityCommand): APICallAvailability = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/call-availability", "PUT", body = json.encodeToString(body), authenticated = true))
+  suspend fun readCreatorCallAvailability(creatorId: String, xQelvoraExpectedAccount: String? = null): APICallAvailabilityView = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/call-availability", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun saveCreatorCallAvailability(creatorId: String, xQelvoraExpectedAccount: String? = null, body: APICallAvailabilityCommand): APICallAvailability = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/call-availability", "PUT", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun beginCreatorMedia(creatorId: String, body: APIMediaCreatorMediaUploadRequest): APIMediaCreatorMediaUploadTicket = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun readCreatorMedia(creatorId: String, assetId: String): APIMediaCreatorMediaAsset = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media/${segment(assetId)}", "GET", authenticated = true))
   suspend fun revokeCreatorMedia(creatorId: String, assetId: String): APIMediaMediaRevocation = json.decodeFromString(request("/v1/w6/creators/${segment(creatorId)}/media/${segment(assetId)}", "DELETE", authenticated = true))
