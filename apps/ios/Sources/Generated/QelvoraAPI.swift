@@ -1711,6 +1711,144 @@ public enum APIMediaPlaybackFileVariant: String, Codable, Sendable {
   case `credentialed` = "credentialed"
 }
 
+public struct APIMediaPlaybackTicket: Codable, Sendable {
+  public let `url`: String
+  public let `expiresAt`: String
+  public let `asset`: APIMediaPlaybackTicketAsset
+  public let `playbackFile`: APIMediaPlaybackTicketPlaybackFile
+  public init(url: String, expiresAt: String, asset: APIMediaPlaybackTicketAsset, playbackFile: APIMediaPlaybackTicketPlaybackFile) {
+    self.url = url
+    self.expiresAt = expiresAt
+    self.asset = asset
+    self.playbackFile = playbackFile
+  }
+}
+
+public struct APIMediaPlaybackTicketAsset: Codable, Sendable {
+  public let `id`: String
+  public let `threadId`: String
+  public let `purpose`: APIMediaPlaybackTicketAssetPurpose
+  public let `state`: APIMediaPlaybackTicketAssetState
+  public let `version`: Int
+  public let `mimeType`: String
+  public let `bytes`: Int
+  public let `uploadedBytes`: Int
+  public let `durationMs`: Int?
+  public let `sha256`: String
+  public let `waveform`: [Double]
+  public let `signedActId`: String?
+  public let `expiresAt`: String
+  public let `failureCode`: String?
+  public let `provenance`: [String: APIJSONValue]?
+  public init(id: String, threadId: String, purpose: APIMediaPlaybackTicketAssetPurpose, state: APIMediaPlaybackTicketAssetState, version: Int, mimeType: String, bytes: Int, uploadedBytes: Int, durationMs: Int? = nil, sha256: String, waveform: [Double], signedActId: String? = nil, expiresAt: String, failureCode: String? = nil, provenance: [String: APIJSONValue]? = nil) {
+    self.id = id
+    self.threadId = threadId
+    self.purpose = purpose
+    self.state = state
+    self.version = version
+    self.mimeType = mimeType
+    self.bytes = bytes
+    self.uploadedBytes = uploadedBytes
+    self.durationMs = durationMs
+    self.sha256 = sha256
+    self.waveform = waveform
+    self.signedActId = signedActId
+    self.expiresAt = expiresAt
+    self.failureCode = failureCode
+    self.provenance = provenance
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `threadId`
+    case `purpose`
+    case `state`
+    case `version`
+    case `mimeType`
+    case `bytes`
+    case `uploadedBytes`
+    case `durationMs`
+    case `sha256`
+    case `waveform`
+    case `signedActId`
+    case `expiresAt`
+    case `failureCode`
+    case `provenance`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.threadId = try container.decode(String.self, forKey: .threadId)
+    self.purpose = try container.decode(APIMediaPlaybackTicketAssetPurpose.self, forKey: .purpose)
+    self.state = try container.decode(APIMediaPlaybackTicketAssetState.self, forKey: .state)
+    self.version = try container.decode(Int.self, forKey: .version)
+    self.mimeType = try container.decode(String.self, forKey: .mimeType)
+    self.bytes = try container.decode(Int.self, forKey: .bytes)
+    self.uploadedBytes = try container.decode(Int.self, forKey: .uploadedBytes)
+    self.durationMs = try container.decode(Int?.self, forKey: .durationMs)
+    self.sha256 = try container.decode(String.self, forKey: .sha256)
+    self.waveform = try container.decode([Double].self, forKey: .waveform)
+    self.signedActId = try container.decode(String?.self, forKey: .signedActId)
+    self.expiresAt = try container.decode(String.self, forKey: .expiresAt)
+    self.failureCode = try container.decode(String?.self, forKey: .failureCode)
+    self.provenance = try container.decode([String: APIJSONValue]?.self, forKey: .provenance)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(threadId, forKey: .threadId)
+    try container.encode(purpose, forKey: .purpose)
+    try container.encode(state, forKey: .state)
+    try container.encode(version, forKey: .version)
+    try container.encode(mimeType, forKey: .mimeType)
+    try container.encode(bytes, forKey: .bytes)
+    try container.encode(uploadedBytes, forKey: .uploadedBytes)
+    try container.encode(durationMs, forKey: .durationMs)
+    try container.encode(sha256, forKey: .sha256)
+    try container.encode(waveform, forKey: .waveform)
+    try container.encode(signedActId, forKey: .signedActId)
+    try container.encode(expiresAt, forKey: .expiresAt)
+    try container.encode(failureCode, forKey: .failureCode)
+    try container.encode(provenance, forKey: .provenance)
+  }
+}
+
+public enum APIMediaPlaybackTicketAssetPurpose: String, Codable, Sendable {
+  case `fan_attachment` = "fan_attachment"
+  case `source_audio` = "source_audio"
+  case `interview_audio` = "interview_audio"
+  case `post_photo` = "post_photo"
+  case `human_note` = "human_note"
+  case `human_reply` = "human_reply"
+  case `call_recording` = "call_recording"
+  case `ai_audio` = "ai_audio"
+}
+
+public enum APIMediaPlaybackTicketAssetState: String, Codable, Sendable {
+  case `uploading` = "uploading"
+  case `quarantined` = "quarantined"
+  case `processing` = "processing"
+  case `ready` = "ready"
+  case `rejected` = "rejected"
+  case `revoked` = "revoked"
+  case `deleted` = "deleted"
+}
+
+public struct APIMediaPlaybackTicketPlaybackFile: Codable, Sendable {
+  public let `variant`: APIMediaPlaybackTicketPlaybackFileVariant
+  public let `sha256`: String
+  public let `bytes`: Int
+  public init(variant: APIMediaPlaybackTicketPlaybackFileVariant, sha256: String, bytes: Int) {
+    self.variant = variant
+    self.sha256 = sha256
+    self.bytes = bytes
+  }
+}
+
+public enum APIMediaPlaybackTicketPlaybackFileVariant: String, Codable, Sendable {
+  case `processed` = "processed"
+  case `credentialed` = "credentialed"
+}
+
 public struct APIMediaProcessedMediaEvidence: Codable, Sendable {
   public let `assetId`: String
   public let `version`: Int
@@ -10679,6 +10817,15 @@ public actor CreatorAPIClient {
   }
   public func leaseOfflineConversation(creatorId: String, fanId: String) async throws -> APIConversationConversationOfflineSnapshot {
     try await request("/v1/conversations/\(segment(creatorId))/\(segment(fanId))/offline", method: "GET", authenticated: true)
+  }
+  public func readThreadMedia(creatorId: String, fanId: String, assetId: String, xQelvoraExpectedAccount: String? = nil) async throws -> APIMediaMediaAsset {
+    try await request("/v1/w6/threads/\(segment(creatorId))/\(segment(fanId))/media/\(segment(assetId))", method: "GET", authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func threadMediaPlayback(creatorId: String, fanId: String, assetId: String, xQelvoraExpectedAccount: String? = nil) async throws -> APIMediaPlaybackTicket {
+    try await request("/v1/w6/threads/\(segment(creatorId))/\(segment(fanId))/media/\(segment(assetId))/playback", method: "POST", authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
+  public func playThreadMedia(creatorId: String, fanId: String, assetId: String, ticket: String, range: String? = nil, xQelvoraExpectedAccount: String? = nil, expectedAccountId: String? = nil) async throws -> CreatorAPIBinaryResponse {
+    try await requestBytes("/v1/w6/threads/\(segment(creatorId))/\(segment(fanId))/media/\(segment(assetId))/play", method: "GET", authenticated: true, query: [URLQueryItem(name: "ticket", value: ticket), URLQueryItem(name: "expectedAccountId", value: expectedAccountId)], headers: ["Range": range, "x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
   }
   public func readMediaCapabilities() async throws -> APIMediaCapabilities {
     try await request("/v1/w6/capabilities", method: "GET", authenticated: false)
