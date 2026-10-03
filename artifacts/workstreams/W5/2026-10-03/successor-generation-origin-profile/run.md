@@ -1,5 +1,45 @@
 # W5 original generation origin profile restriction
 
+## Current original deadline and cancellation at eb7ed13f
+
+Product `a22d8266` repairs the original metadata budget and cancellation gap
+identified during review of existing W3 PR63. Current composition
+`eb7ed13f553705c8e198d7eaa0633a915e0a1d64` normally consumes actual W8
+PR242 `1a674e59b46ad42c3e4acd0ef906c6753ff75c44` and W5's canonical existing
+PR304 helper leaf `6dcf7ae9f311673798300dd10a2e74915f7dac4d`. The shared
+catalogue file is byte-identical to that W8 source, retaining its options API
+and5000ms cap. There is no alternate callback or new feature PR.
+
+The W5 profile proof and both catalogue reads now use min(actual positive
+original pg connection query_timeout,5000), including the installed numeric
+string representation. Missing/invalid original budgets refuse instead of
+receiving a new deadline. Optional original cancellation is checked before and
+after asynchronous migration-source reads and metadata queries. It is passed
+unchanged into the actual shared catalogue reader. The existing origin port
+accepts that same signal; preparation combines it with its existing6s ceiling,
+and original current-source calls retain cancellation bookends. The unchanged
+canonical ContentHeldClient additionally preserves shorter original deadlines
+for BEGIN/COMMIT/ROLLBACK, original socket settlement and awaited cleanup.
+
+W2/W3 are coordinating the real upstream signal. W1 owns the actual private
+scope-binding signal port; W5 does not infer a signal from a task, create another
+scope/issuer/controller, or claim caller integration before its published source
+is consumed. Original task/client/nonce/PID/full transaction/hash and LAST genuine
+identity bookend remain intact. Both SQL hashes remain unchanged:0224
+`09d3df2f3549d0267dce2fe049789e575b1c8f212ee887d2d5396f110bafc047`,0186
+`2f1c4b30133a0c8707b16b15c1e42a9daf539cb5edeeb48ad6a835352a4f444d`.
+
+At eb7ed13f, current backend types and all nine existing contracts pass. Scoped
+lint/format/diff checks pass for the new W5 source. No new tests were written.
+This is implemented source qualification, not current positive execution of the
+profile proof. The actual0224 remains reserved_unapplied/unregistered; canonical61
+is preserved and no held SQL was activated. Current genuine task/predicate/
+catalogue/factory pins, full signal integration, cancellation/commit/body
+operation and release-ready acceptance remain held. Prior metadata operations
+below remain at their original sources and are not transferred to this repair.
+
+## Historical profile source and bounded metadata qualification
+
 The consumer additionally requires the actual issuer's registered original consumer receipt and an independently reviewed effective table/column/RLS/schema catalogue checksum. It compares that catalogue on the same original client at preparation and both read bookends. The shared metadata reader now accepts an optional finite read deadline; W5 supplies5000ms to each of its two actual queries, while existing callers and returned fields retain their default behavior. This adds no accepted catalogue hash or activation. Backend typecheck, scoped lint/format and diff checks pass for this additional source.
 
 Base is captured main `6a9f10a850fb4769c667f89a6304505dd6a04728`, normally merged into the owned branch. The separate SQL was first published at `c43b49b8366618e8cb208c3068283c1c200aa9df`. Its SHA256 is `09d3df2f3549d0267dce2fe049789e575b1c8f212ee887d2d5396f110bafc047`. Original0186 SQL remains byte-identical at `2f1c4b30133a0c8707b16b15c1e42a9daf539cb5edeeb48ad6a835352a4f444d`.
