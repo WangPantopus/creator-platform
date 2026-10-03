@@ -16,6 +16,10 @@ O19 / the native Studio portion of Q15 is decided: implement native daily creato
 
 The main-compatible two-file cold recovery correction7400de38 preserves saved credentials during a 5xx and keeps Retry/automatic restore available. Its narrow dependency set permits coherent main integration before the full issuer-storage stack lands. Its successful shipping builds and W2-operated outages are supporting/producer evidence; full W1 storage, rotation, persistent purge, issuer isolation and personal iOS acceptance remain separate obligations. Native Account may show a fan handle only when the real fan profile exists; authenticated security settings do not require inventing a fan profile.
 
+### W1 current owner Team role edits — October3 UTC
+
+Keep replacement inside the original identity membership/invitation family and use the actual middleware Actor, original expected-account mismatch header, opaque session and same-client restoration/creator denial before positive owner/member locks. Require a verified, recovered owner; Team membership cannot approve as creator. Compare reviewed role sets under existing locks, refuse stale edits and allow an already-current retry. Revoke outstanding unaccepted invitations on success/retry to prevent later restoration of old roles; retain accepted history. Existing tables have no history version, so do not invent one or claim ABA protection. The focused current-main producer preserves main's fan-profile allowlist, leaving the separate stacked intro endpoint untouched. Positive Team/UI/native/full H08 acceptance remains open. [Exact port and qualifications](../implementation/W1-team-role-update.md).
+
 These are implementation/release dependencies, not requests for the founder to answer everything before work can start. Owners prepare concrete options and evidence, continue independent work, and ask only when the choice becomes necessary. No pending choice is silently converted into a production default.
 
 ## Decisions already settled
@@ -267,3 +271,7 @@ Personally reviewed actualW6 550e0562: exact original registered SQL/definition/
 ## Native spending navigation — October3 UTC
 
 Daily Spend is entered from You, so both shipping shells retain You as its selected tab. Other existing Commerce destinations select Requests. The prior generic fallback selected Home for `/commerce/spending` and request-detail routes despite retaining those actual destinations. This shell repair changes the selected navigation state; each owner screen continues to authorize its actual account/object and controls its Back destination. W4 owns its operated Spend Back repair. Current shipping rebuild/personal navigation verification remains required; original references are preserved.
+
+## iOS cold destination custody — October3 UTC
+
+Preserve a bounded canonical path and actual account UUID in the existing issuer-specific device-only Keychain namespace. Query parameters and private screen/draft bodies stay out of this record. Restore only after the real current session resolves the same account; an incoming destination takes precedence. Serialize writes with credential custody and reject stale model/revision/token writes. Clear destination metadata on sign-out or account replacement while always attempting credential deletion, and preserve it through guarded same-account rotation. A saved path is presentation context; current object authority remains mandatory.
