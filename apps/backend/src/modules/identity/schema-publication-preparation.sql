@@ -76,6 +76,7 @@ CREATE POLICY publication_original_header ON creator.commerce_fulfillment_public
   AND transaction_id=pg_current_xact_id() AND login_name=session_user);
 RESET ROLE;
 GRANT EXECUTE ON FUNCTION creator.commerce_fulfillment_publication_originals(uuid),
+ creator.commerce_fulfillment_publication_negative_originals(uuid),
  creator.commerce_fulfillment_publication_matches(uuid) TO creator_publication_authority;
 
 CREATE FUNCTION creator.require_publication_preparation_cleanup() RETURNS trigger
@@ -95,6 +96,7 @@ RETURNS TABLE(nonce uuid,token uuid,fulfillment_nonce uuid,proof jsonb)
 LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path=pg_catalog AS $$
 DECLARE header record; owner_account uuid; stored_hash text; n uuid; t uuid; f uuid; body jsonb;
  original_expiry timestamptz=clock_timestamp()+interval '5 minutes'; family_expiry timestamptz;
+ plan jsonb; families jsonb; allowed boolean;
 BEGIN
  IF session_user<>'creator_publication_worker' OR current_setting('transaction_isolation')<>'read committed'
   OR nullif(current_setting('app.account_id',true),'') IS NOT NULL
@@ -120,8 +122,17 @@ BEGIN
  IF header.kind='public_answer' AND header.packet_id IS NULL AND f IS NULL THEN
   RAISE EXCEPTION 'Original fulfillment preparation missing' USING ERRCODE='42501'; END IF;
  IF f IS NOT NULL THEN
-  SELECT x.expires_at INTO family_expiry FROM creator.commerce_fulfillment_publication_scope x WHERE x.nonce=f;
-  IF family_expiry IS NULL THEN RAISE EXCEPTION 'Original fulfillment deadline missing' USING ERRCODE='42501'; END IF;
+  SELECT x.expires_at,jsonb_build_object('planId',x.plan_id,'revision',x.plan_revision,'hash',x.plan_hash,'audience',x.audience,
+   'recipientCount',x.recipient_count,'creatorAccountId',x.creator_account_id) INTO family_expiry,plan
+  FROM creator.commerce_fulfillment_publication_scope x WHERE x.nonce=f AND x.negatives_ready
+   AND x.backend_pid=pg_backend_pid() AND x.transaction_id=pg_current_xact_id() AND x.login_name=session_user
+   AND x.creator_id=c AND x.content_id=o AND x.content_version=v AND x.publisher_account_id=p
+   AND x.signed_act_id=s AND x.publication_nonce IS NULL AND x.expires_at>clock_timestamp();
+  SELECT jsonb_agg(to_jsonb(original) ORDER BY original.thread_id,original.packet_id) INTO families
+   FROM creator.commerce_fulfillment_publication_negative_originals(f) original;
+  IF family_expiry IS NULL OR plan IS NULL OR families IS NULL
+   OR jsonb_array_length(families) IS DISTINCT FROM (plan->>'recipientCount')::integer THEN
+   RAISE EXCEPTION 'Original fulfillment snapshot/deadline missing' USING ERRCODE='42501'; END IF;
   original_expiry=LEAST(original_expiry,family_expiry);
  END IF;
  PERFORM set_config('publication.operation','discover',true),set_config('publication.creator_id',c::text,true),
@@ -132,8 +143,14 @@ BEGIN
   RAISE EXCEPTION 'Original publication negatives refused' USING ERRCODE='42501'; END IF;
  n=gen_random_uuid();t=gen_random_uuid();
  INSERT INTO creator.publication_preparation(nonce,token,backend_pid,transaction_id,login_name,creator_id,content_id,version,
-  publisher_account_id,signed_act_id,kind,packet_id,fulfillment_nonce,phase,expires_at)
- VALUES(n,t,pg_backend_pid(),pg_current_xact_id(),session_user,c,o,v,p,s,header.kind,header.packet_id,f,'prepared',original_expiry);
+  publisher_account_id,signed_act_id,kind,packet_id,fulfillment_nonce,phase,expires_at,original_plan,original_families)
+ VALUES(n,t,pg_backend_pid(),pg_current_xact_id(),session_user,c,o,v,p,s,header.kind,header.packet_id,f,'prepared',original_expiry,plan,families);
+ IF f IS NOT NULL THEN
+  IF to_regprocedure('creator.fulfillment_publication_original_hash_matches(uuid,uuid)') IS NULL THEN
+   RAISE EXCEPTION 'Actual early original213 comparator unavailable' USING ERRCODE='55000'; END IF;
+  EXECUTE 'SELECT creator.fulfillment_publication_original_hash_matches($1,$2)' INTO allowed USING n,t;
+  IF allowed IS DISTINCT FROM true THEN RAISE EXCEPTION 'Early original fulfillment inputs refused' USING ERRCODE='42501'; END IF;
+ END IF;
  -- Old exact proof now follows actual early negatives. Neither this body nor
  -- the private tokens are exported as an interactive Actor or task DTO.
  body=creator.read_publication_task(c,o,v,p,s);
@@ -166,10 +183,11 @@ BEGIN
    AND x.login_name=session_user AND x.expires_at>clock_timestamp();
   SELECT jsonb_agg(to_jsonb(original) ORDER BY original.thread_id,original.packet_id) INTO families
    FROM creator.commerce_fulfillment_publication_originals(held.fulfillment_nonce) original;
-  IF plan IS NULL OR jsonb_array_length(families) IS DISTINCT FROM (plan->>'recipientCount')::integer THEN RETURN false; END IF;
+  IF plan IS NULL OR families IS NULL OR jsonb_array_length(families) IS DISTINCT FROM (plan->>'recipientCount')::integer
+   OR plan IS DISTINCT FROM held.original_plan OR families IS DISTINCT FROM held.original_families THEN RETURN false; END IF;
  END IF;
  UPDATE creator.publication_preparation SET publication_nonce=issued.id,command_hash=issued.command_hash,command=issued.command,
-  original_plan=plan,original_families=families,phase='bound',
+  phase='bound',
   expires_at=LEAST(expires_at,issued.created_at+interval '5 minutes') WHERE nonce=n AND token=t;
  RETURN FOUND;
 END $$;
@@ -181,71 +199,64 @@ RETURNS TABLE(creator_id uuid,content_id uuid,version integer,publisher_account_
  publication_nonce uuid,fulfillment_nonce uuid,command_hash text,original_plan jsonb,original_families jsonb,finalizing boolean)
 LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path=pg_catalog AS $$
 BEGIN
- IF session_user<>'creator_publication_worker' OR current_setting('transaction_isolation')<>'read committed' THEN
+ IF session_user<>'creator_publication_worker' OR current_setting('transaction_isolation')<>'read committed'
+  OR n IS NULL OR t IS NULL OR nullif(current_setting('app.account_id',true),'') IS NOT NULL
+  OR nullif(current_setting('app.identity_session_id',true),'') IS NOT NULL
+  OR nullif(current_setting('app.creator_id',true),'') IS NOT NULL
+  OR nullif(current_setting('app.fan_id',true),'') IS NOT NULL THEN
   RAISE EXCEPTION 'Original actorless preparation required' USING ERRCODE='42501'; END IF;
  RETURN QUERY SELECT x.creator_id,x.content_id,x.version,x.publisher_account_id,x.signed_act_id,x.publication_nonce,
   x.fulfillment_nonce,x.command_hash,x.original_plan,x.original_families,x.phase='finalizing'
- FROM creator.publication_preparation x JOIN creator.publication_worker_scope issued ON issued.id=x.publication_nonce
- WHERE x.nonce=n AND x.token=t AND x.phase IN('bound','finalizing') AND x.fulfillment_nonce IS NOT NULL
-  AND x.backend_pid=pg_backend_pid() AND x.transaction_id=pg_current_xact_id() AND x.login_name=session_user
-  AND x.expires_at>clock_timestamp() AND issued.id=nullif(current_setting('publication.scope_id',true),'')::uuid
-  AND issued.backend_pid=x.backend_pid AND issued.transaction_id=x.transaction_id AND issued.login_name=x.login_name
-  AND issued.creator_id=x.creator_id AND issued.content_id=x.content_id AND issued.version=x.version
-  AND issued.publisher_account_id=x.publisher_account_id AND issued.signed_act_id=x.signed_act_id
-  AND issued.command_hash=x.command_hash AND issued.command=x.command;
- IF NOT FOUND THEN RAISE EXCEPTION 'Original bound preparation ended' USING ERRCODE='42501'; END IF;
+ FROM creator.publication_preparation x
+ WHERE x.nonce=n AND x.token=t AND x.fulfillment_nonce IS NOT NULL AND x.original_plan IS NOT NULL
+  AND x.original_families IS NOT NULL AND x.backend_pid=pg_backend_pid()
+  AND x.transaction_id=pg_current_xact_id() AND x.login_name=session_user AND x.expires_at>clock_timestamp()
+  AND ((x.phase='prepared' AND x.publication_nonce IS NULL AND x.command_hash IS NULL AND x.command IS NULL
+   AND nullif(current_setting('publication.scope_id',true),'') IS NULL
+   AND EXISTS(SELECT FROM creator.commerce_fulfillment_publication_scope early
+    WHERE early.nonce=x.fulfillment_nonce AND early.negatives_ready AND early.publication_nonce IS NULL AND early.command_hash IS NULL
+     AND early.backend_pid=x.backend_pid AND early.transaction_id=x.transaction_id AND early.login_name=x.login_name
+     AND early.creator_id=x.creator_id AND early.content_id=x.content_id AND early.content_version=x.version
+     AND early.publisher_account_id=x.publisher_account_id AND early.signed_act_id=x.signed_act_id
+     AND early.expires_at>=x.expires_at AND early.expires_at>clock_timestamp()
+     AND jsonb_build_object('planId',early.plan_id,'revision',early.plan_revision,'hash',early.plan_hash,'audience',early.audience,
+      'recipientCount',early.recipient_count,'creatorAccountId',early.creator_account_id)=x.original_plan
+     AND jsonb_array_length(x.original_families)=early.recipient_count))
+   OR (x.phase IN('bound','finalizing') AND EXISTS(SELECT FROM creator.publication_worker_scope issued
+    WHERE issued.id=x.publication_nonce AND issued.id=nullif(current_setting('publication.scope_id',true),'')::uuid
+     AND issued.backend_pid=x.backend_pid AND issued.transaction_id=x.transaction_id AND issued.login_name=x.login_name
+     AND issued.creator_id=x.creator_id AND issued.content_id=x.content_id AND issued.version=x.version
+     AND issued.publisher_account_id=x.publisher_account_id AND issued.signed_act_id=x.signed_act_id
+     AND issued.command_hash=x.command_hash AND issued.command=x.command
+     AND issued.created_at>clock_timestamp()-interval '5 minutes')));
+ IF NOT FOUND THEN RAISE EXCEPTION 'Original preparation ended or changed' USING ERRCODE='42501'; END IF;
 END $$;
 
--- Private213 RLS predicate. Derive the one original held tuple internally;
--- never accept or export a private nonce/token, GUC alias or original body.
+-- Private213 RLS predicates derive actual tokens internally. The projection
+-- above requires either live negatives-ready early204 or exact bound0158;
+-- finalizing never reopens ended204. No token/list/body or GUC alias is returned.
 CREATE FUNCTION creator.publication_preparation_original_family_bound(c uuid,p uuid,f uuid,t uuid)
 RETURNS boolean LANGUAGE sql VOLATILE SECURITY DEFINER SET search_path=pg_catalog AS $$
- SELECT session_user='creator_publication_worker' AND current_setting('transaction_isolation')='read committed'
-  AND nullif(current_setting('app.account_id',true),'') IS NULL
-  AND nullif(current_setting('app.identity_session_id',true),'') IS NULL
-  AND nullif(current_setting('app.creator_id',true),'') IS NULL
-  AND nullif(current_setting('app.fan_id',true),'') IS NULL
-  AND c IS NOT NULL AND p IS NOT NULL AND f IS NOT NULL AND t IS NOT NULL
+ SELECT c IS NOT NULL AND p IS NOT NULL AND f IS NOT NULL AND t IS NOT NULL
   AND EXISTS(SELECT FROM creator.publication_preparation x
-   JOIN creator.publication_worker_scope issued ON issued.id=x.publication_nonce
-   CROSS JOIN LATERAL jsonb_array_elements(x.original_families) family
-   WHERE x.creator_id=c AND x.phase IN('bound','finalizing') AND x.fulfillment_nonce IS NOT NULL
-    AND x.backend_pid=pg_backend_pid() AND x.transaction_id=pg_current_xact_id() AND x.login_name=session_user
-    AND x.expires_at>clock_timestamp() AND issued.id=nullif(current_setting('publication.scope_id',true),'')::uuid
-    AND issued.backend_pid=x.backend_pid AND issued.transaction_id=x.transaction_id AND issued.login_name=x.login_name
-    AND issued.creator_id=x.creator_id AND issued.content_id=x.content_id AND issued.version=x.version
-    AND issued.publisher_account_id=x.publisher_account_id AND issued.signed_act_id=x.signed_act_id
-    AND issued.command_hash=x.command_hash AND issued.command=x.command
-    AND family->>'creator_id'=c::text AND family->>'packet_id'=p::text
+   CROSS JOIN LATERAL creator.publication_preparation_originals(x.nonce,x.token) original
+   CROSS JOIN LATERAL jsonb_array_elements(original.original_families) family
+   WHERE original.creator_id=c AND family->>'creator_id'=c::text AND family->>'packet_id'=p::text
     AND family->>'fan_id'=f::text AND family->>'thread_id'=t::text)
 $$;
 
--- Fixed metadata-only213 RLS bindings. No arbitrary JSON key, NULL wildcard,
--- original recipient list or private preparation token crosses this port.
 CREATE FUNCTION creator.publication_preparation_original_metadata_bound(k text,i uuid)
 RETURNS boolean LANGUAGE sql VOLATILE SECURITY DEFINER SET search_path=pg_catalog AS $$
- SELECT session_user='creator_publication_worker' AND current_setting('transaction_isolation')='read committed'
-  AND nullif(current_setting('app.account_id',true),'') IS NULL
-  AND nullif(current_setting('app.identity_session_id',true),'') IS NULL
-  AND nullif(current_setting('app.creator_id',true),'') IS NULL
-  AND nullif(current_setting('app.fan_id',true),'') IS NULL
-  AND k IS NOT NULL AND i IS NOT NULL
+ SELECT k IS NOT NULL AND i IS NOT NULL
   AND k IN('creator','fan','mode','commitment','acceptance','creator_account','fan_account','packet','plan')
   AND EXISTS(SELECT FROM creator.publication_preparation x
-   JOIN creator.publication_worker_scope issued ON issued.id=x.publication_nonce
-   CROSS JOIN LATERAL jsonb_array_elements(x.original_families) family
-   WHERE x.phase IN('bound','finalizing') AND x.fulfillment_nonce IS NOT NULL
-    AND x.backend_pid=pg_backend_pid() AND x.transaction_id=pg_current_xact_id() AND x.login_name=session_user
-    AND x.expires_at>clock_timestamp() AND issued.id=nullif(current_setting('publication.scope_id',true),'')::uuid
-    AND issued.backend_pid=x.backend_pid AND issued.transaction_id=x.transaction_id AND issued.login_name=x.login_name
-    AND issued.creator_id=x.creator_id AND issued.content_id=x.content_id AND issued.version=x.version
-    AND issued.publisher_account_id=x.publisher_account_id AND issued.signed_act_id=x.signed_act_id
-    AND issued.command_hash=x.command_hash AND issued.command=x.command
-    AND CASE k WHEN 'creator' THEN family->>'creator_id' WHEN 'fan' THEN family->>'fan_id'
-     WHEN 'mode' THEN family->>'mode_id' WHEN 'commitment' THEN family->>'commitment_id'
-     WHEN 'acceptance' THEN family->>'acceptance_id' WHEN 'creator_account' THEN family->>'creator_account_id'
-     WHEN 'fan_account' THEN family->>'fan_account_id' WHEN 'packet' THEN family->>'packet_id'
-     WHEN 'plan' THEN x.original_plan->>'planId' END=i::text)
+   CROSS JOIN LATERAL creator.publication_preparation_originals(x.nonce,x.token) original
+   CROSS JOIN LATERAL jsonb_array_elements(original.original_families) family
+   WHERE CASE k WHEN 'creator' THEN family->>'creator_id' WHEN 'fan' THEN family->>'fan_id'
+    WHEN 'mode' THEN family->>'mode_id' WHEN 'commitment' THEN family->>'commitment_id'
+    WHEN 'acceptance' THEN family->>'acceptance_id' WHEN 'creator_account' THEN family->>'creator_account_id'
+    WHEN 'fan_account' THEN family->>'fan_account_id' WHEN 'packet' THEN family->>'packet_id'
+    WHEN 'plan' THEN original.original_plan->>'planId' END=i::text)
 $$;
 
 CREATE FUNCTION creator.prepared_publication_matches(n uuid,t uuid) RETURNS boolean

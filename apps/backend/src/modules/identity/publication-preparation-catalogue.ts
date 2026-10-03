@@ -10,7 +10,7 @@ export const publicationPreparationSource = Object.freeze({
   name: "w1_publication_preparation",
   path: "apps/backend/src/modules/identity/schema-publication-preparation.sql",
   owner: "W1",
-  checksum: "eb393fac0e580c3b7c58e4586ebd98539f99b696aacc9db1756ea5523c059c07",
+  checksum: "b0a47eac2a722b4f29c87875c474ba73d148e840b10bcf9e75af9ec467a2dda3",
 });
 
 export const publicationPreparationCatalogueQuery = `WITH roles AS (
@@ -85,10 +85,10 @@ export const publicationPreparationCatalogueQuery = `WITH roles AS (
 ) AS catalogue`;
 
 // This fingerprint captures actual0157/0158/0160/0167/0176/0178/0201/0204/0205/0208
-// in a closed rolled-back clone. Actual213 is still missing: fulfillment finalization
-// refuses, and adding its real grants requires combined requalification.
+// plus actual213 in a closed rolled-back clone. The full configured owner
+// catalogue, worker composition, C10 and activation remain separate gates.
 export const publicationPreparationCatalogueChecksum =
-  "db11105f6a196d91fb4ab97a4a71706d5d6a885b0a0358c94b5cbcb3622b3af9";
+  "e2f1060d4c01d54391efbfe7f4517b2c3a47273df2f302ff22c83c175b1a1788";
 
 function unavailable(): never {
   throw new DomainError(

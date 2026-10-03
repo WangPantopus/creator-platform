@@ -6,7 +6,7 @@ import {
 } from "../modules/trust/scope-restriction.js";
 import { trustLocalRestorationInTransaction } from "../modules/trust/restoration.js";
 import { DomainError } from "../core/errors.js";
-import { assertCommerceFulfillmentPublicationCatalogue } from "../modules/commerce/fulfillment-publication-catalogue.js";
+import { assertCommerceFulfillmentPublicationOriginalCatalogue } from "../modules/commerce/fulfillment-publication-original-catalogue.js";
 
 const pool = process.argv[2];
 if (!["generation", "ingestion", "publication"].includes(pool ?? ""))
@@ -32,7 +32,8 @@ if (pool === "generation") {
         );
     },
     assertAllowed: trustPublicationWorkerDenial(),
-    assertPreparationAllowed: assertCommerceFulfillmentPublicationCatalogue,
+    assertPreparationAllowed:
+      assertCommerceFulfillmentPublicationOriginalCatalogue,
   });
   const shutdown = () => {
     void worker.close().then(() => process.exit(0));
