@@ -388,7 +388,7 @@ private struct W3AccountScreen: View {
                         accountRow("Receipts", detail: "Your purchases and deliveries") { session.open("/commerce/requests") }
                         accountDivider
                         accountRow("Help and safety", detail: "Report, block, crisis support") { session.open("/support") }
-                    }.accessibilityLabel("Your account")
+                    }
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Your intro").qText("title")
                         Text(account.map { $0.fan.intro ?? "You haven’t added an intro yet." } ?? (failure.isEmpty ? "Loading your account…" : "Your intro is unavailable.")).qText("body")
