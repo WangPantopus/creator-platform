@@ -1,5 +1,76 @@
 # Original browser call view and session — 3 October 2026
 
+## Current integrated offer operation — 13:00 UTC
+
+W7's remaining SelectTime finding is personally repaired at `d3f22174`, with
+three redundant caller selectors corrected at `8336df13` after the first
+scoped typecheck failed. Reads and selection retain the genuine opening W1
+account/session/signal, keyed form lifetime, combined cancellation and
+concealment. W6 read and normally integrated W1's focused original producer
+`489d93eef10f29e9f50fa6c7d1f74a975c2bb791` from draft296, preserving its complete
+canonical boundary and exact backend/platform guard. Main's documentation-only
+294/`34e5b75c` is included. Exact composed source is
+`f0e76c72107b6944cb686eb5343cd98e42f447dc`.
+
+Fresh normal sequential backend and production web builds pass under the
+canonical exclusive heavy guard, released at12:48:21.854Z. Scoped backend/web
+types, lint and unchanged generation12/115 pass. Backend/web build-log SHA256s:
+`22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5`,
+`d747e5e802f55539336eaae7478847ba61012942621f2c0d1f23edd94d5f7ccd`.
+Actual new backend bundle SHA256:
+`f1b73ce1ff7c354bb9e7b6dbe55a37524d193ae8d03d11cdb304fabfa8847a1d`.
+Unlike the earlier4c run below, this runtime really composes W1's core guard.
+No held SQL/purpose, native source or test is added by this integration.
+
+Owned normal shipping Chromium/HTTPS3006/API4106 on canonical61 personally
+operated genuine development fan issuer completion and offer entry/Reload.
+The unused offer destination ends0055 with `?offer=1`; no offer was constructed.
+Reload carries actual original account/session and receives calls_unconfigured.
+Same-account genuine replacement8e9fd28a→c8c0ba73 makes the still-open old form
+send its original session, receive409 and conceal at sign-in; the same real
+route confirms session_view_changed. Actual browser POST to the platform
+refresh endpoint with that genuine original pin also returns409 from the newly
+composed backend guard, before dispatch. A current session read confirms the
+replacement remains current. This protocol refusal does not prove signing.
+
+The first non-browser protocol probe omitted Origin and correctly received403;
+its failed operator expectation is preserved. Repeating through actual browser
+fetch supplies the genuine browser Origin and observes409. Two heavy-slot75
+refusals and a startup's unnecessary global-empty guard assertion are preserved;
+the pre-lease API invocation refused with no service started. Peer build custody
+was never changed. The subsequent runtime lease is independent of peer builds.
+
+Actual owned API stop/Reload shows media_unavailable/reconnect guidance. Cold
+reload retains the session at the account-unavailable Retry screen; restarting
+the same actual API and Retry restores the correct unconfigured offer notice.
+Open Requests reaches truthful commerce_unconfigured, not a populated queue.
+Real Account Refresh200 sends the original account/session headers, rotates its
+actual cookie and retains the session. Actual fan→creator issuer replacement
+makes the old fan form receive409/session_account_changed and conceal; fresh
+creator entry and real product Sign out200 pass. All issued sessions are closed;
+no page errors. W6 personally viewed Night390×844 and Light1280 refusal screens.
+No selection POST, genuine slots/DST/concurrency/expiry/reminders, call control,
+passkey, publication, SDK connection or full accessibility positive is inferred.
+Unknown consent/End/summary retry and all earlier positive gates remain open.
+
+Selected read-only state at13:00:20.123Z remains canonical61/Note5, three deleted
+photos and messages/thread-media/publications/offers/calls/admissions0. Seed
+human_active/epoch0 is not a genuine handback. The preserved upgraded target
+retains connection-limit0 and restored-traffic-closed. This is not a whole-db
+privacy comparison. Runtime nonce673f99aa-b8d5-43f1-8b45-8c12d7922d8b,
+dev16777232/inode244303018 closed13:00:44.716616Z after exact byte/dev/inode,
+PID/nonce/command, sole-listener and Next process-group checks. API34998 stopped
+for the outage; restarted API60082, Next35361/group35695 and TLS36543 then
+stopped normally. Ports3006/3106/4106/55446 closed, original PG preserved/exited,
+owned browser/exact leases released; no native device started and peers untouched.
+Private browser/state/closure SHA256s:
+`a77ece48ed799c435102d8f2184a7a8f8dc9215a3f7fe307f26b62aa3f1b57fd`,
+`5bf9393014639b528c5ff38cc93fcc36feda8c766936c6047ce55980988c814e`,
+`700db87abe707732ea0235ed953eb465d160476d9c41152d2062687789a98835`.
+Routine operational files remain private;282 stays draft at its original gates.
+
+## Earlier original-view operation
+
 W6 personally extends held PR282's call lifetime repair. The previous web
 CallView fenced SDK connection callbacks but consent/End/summary responses could
 replace a newer projection and lacked their own original-view cancellation.
