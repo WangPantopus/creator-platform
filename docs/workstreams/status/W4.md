@@ -1,3 +1,7 @@
+### Shared web Requests entry point corrected — October 3, 2026 UTC
+
+Personally observed the account footer's `/requests` destination return 404. A server redirect now reaches the existing account-bound `/commerce/requests` consumer. CUA You → Requests and a normal browser reload resolve the preserved labelled synthetic account's empty queue; refresh remains enabled. Web types, scoped lint, format and diff checks pass. No new tests, proof/approval replay or financial actions. [Source, private capture hashes and limits](../../../artifacts/workstreams/W4/runtime/2026-10-03/web-requests-return/README.md). Creator Studio, provider and paid lifecycle acceptance and all nine packages/R01–R15 remain open.
+
 ### Current Android Spending return personally operated — October 3, 2026 UTC
 
 Current f68e/main23de shipping APK builds and installs normally. Actual CUA Studio mirror You→Spending→BackYou and Requests→Spending→BackRequests pass; real decimal-pad6.50 remains unsaved and is discarded on normal cold relaunch. Same fan session, saved6USD/original pending05:42UTC/reminders off and zero totals persist. Initial standalone mirror refusal is retained; the preserved AVD was normally restarted through Studio, with exact owned5554/PID metadata. Only W4's device/leases were released. Current Android Night/TalkBack/creator/provider/group acceptance remains open. [Actual evidence and named source limits](../../../artifacts/workstreams/W4/runtime/2026-10-03/android-personal-return/README.md). All nine packages/R01–R15 remain incomplete.
