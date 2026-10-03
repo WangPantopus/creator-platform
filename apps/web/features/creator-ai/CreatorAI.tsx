@@ -296,6 +296,7 @@ export function CreatorAI({
     rightsEvidence: string;
     revision: number;
   } | null>(null);
+  const sourceReviewButtons = useRef(new Map<string, HTMLButtonElement>());
   const [olderVersions, setOlderVersions] = useState<Version[]>([]);
   const [historyEnd, setHistoryEnd] = useState(false);
   const [confirmed, setConfirmed] = useState<Record<string, boolean>>({});
@@ -1197,6 +1198,15 @@ export function CreatorAI({
                       <div className="qv-source">
                         <div className="qv-source__text">
                           <button
+                            ref={(button) => {
+                              if (button)
+                                sourceReviewButtons.current.set(
+                                  source.id,
+                                  button,
+                                );
+                              else
+                                sourceReviewButtons.current.delete(source.id);
+                            }}
                             className="w2-source-title"
                             onClick={() => void loadReview(source)}
                           >
@@ -1355,32 +1365,55 @@ export function CreatorAI({
                         <Button
                           disabled={controlsDisabled}
                           onClick={() =>
-                            void action(async () => {
-                              const source = sourceRows.find(
-                                (s) => s.id === review.id,
-                              )!;
-                              await api(
-                                `sources/${review.id}`,
-                                {
-                                  expectedRevision: review.revision,
-                                  title: review.title,
-                                  text: review.text,
-                                  origin: source.origin,
-                                  originReference:
-                                    source.originReference ?? undefined,
-                                  audience: source.audience,
-                                  rightsEvidence: source.rightsEvidence,
-                                  expiresAt: source.expiresAt,
-                                },
-                                "PUT",
-                              );
-                              setReview(null);
-                            }, "Revision saved; review and approve it again.")
+                            void action(
+                              async () => {
+                                const source = sourceRows.find(
+                                  (s) => s.id === review.id,
+                                )!;
+                                await api(
+                                  `sources/${review.id}`,
+                                  {
+                                    expectedRevision: review.revision,
+                                    title: review.title,
+                                    text: review.text,
+                                    origin: source.origin,
+                                    originReference:
+                                      source.originReference ?? undefined,
+                                    audience: source.audience,
+                                    rightsEvidence: source.rightsEvidence,
+                                    expiresAt: source.expiresAt,
+                                  },
+                                  "PUT",
+                                );
+                                setReview(null);
+                              },
+                              "Revision saved; review and approve it again.",
+                              sourceReviewButtons.current.get(review.id) ??
+                                studioHeading.current,
+                            )
                           }
                         >
                           Save revision
                         </Button>
-                        <Button variant="quiet" onClick={() => setReview(null)}>
+                        <Button
+                          variant="quiet"
+                          onClick={() => {
+                            const opener =
+                              sourceReviewButtons.current.get(review.id) ??
+                              studioHeading.current;
+                            setReview(null);
+                            // Close removes this control; retain the original
+                            // source's place in the keyboard reading order.
+                            if (
+                              !identitySignal?.aborted &&
+                              !dialog.current?.open &&
+                              opener?.isConnected &&
+                              opener.getClientRects().length &&
+                              !opener.matches(":disabled")
+                            )
+                              opener.focus();
+                          }}
+                        >
                           Close source
                         </Button>
                       </div>
@@ -1421,37 +1454,41 @@ export function CreatorAI({
                       <form
                         onSubmit={(e: FormEvent) => {
                           e.preventDefault();
-                          void action(async () => {
-                            const audience =
-                              scopeKind === "public"
-                                ? { kind: "public" }
-                                : {
-                                    kind: scopeKind,
-                                    ids: scopeIds
-                                      .split(",")
-                                      .map((s) => s.trim())
-                                      .filter(Boolean),
-                                  };
-                            const result = await api("sources", {
-                              title,
-                              text,
-                              origin: sourceOrigin,
-                              audience,
-                              rightsEvidence: rights,
-                              expiresAt: expiry
-                                ? new Date(expiry).toISOString()
-                                : null,
-                            });
-                            if (result.duplicate)
-                              return "This source already exists; no duplicate was created.";
-                            else {
-                              setTitle("");
-                              setText("");
-                              setRights("");
-                              setSourceOrigin("manual_text");
-                              setSourceForm(false);
-                            }
-                          }, "Source saved as a candidate. Review before approving.");
+                          void action(
+                            async () => {
+                              const audience =
+                                scopeKind === "public"
+                                  ? { kind: "public" }
+                                  : {
+                                      kind: scopeKind,
+                                      ids: scopeIds
+                                        .split(",")
+                                        .map((s) => s.trim())
+                                        .filter(Boolean),
+                                    };
+                              const result = await api("sources", {
+                                title,
+                                text,
+                                origin: sourceOrigin,
+                                audience,
+                                rightsEvidence: rights,
+                                expiresAt: expiry
+                                  ? new Date(expiry).toISOString()
+                                  : null,
+                              });
+                              if (result.duplicate)
+                                return "This source already exists; no duplicate was created.";
+                              else {
+                                setTitle("");
+                                setText("");
+                                setRights("");
+                                setSourceOrigin("manual_text");
+                                setSourceForm(false);
+                              }
+                            },
+                            "Source saved as a candidate. Review before approving.",
+                            studioHeading.current,
+                          );
                         }}
                         className="w2-form"
                       >
