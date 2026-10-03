@@ -2078,6 +2078,60 @@ public enum APICallCallConsentPurpose: String, Codable, Sendable {
   case `ai_source` = "ai_source"
 }
 
+public struct APICallCallOfferContext: Codable, Sendable {
+  public let `commitmentId`: String
+  public let `threadId`: String
+  public let `authorizationVersion`: Int
+  public let `creatorName`: String
+  public let `durationSeconds`: Int
+  public let `mediaMode`: APICallCallOfferContextMediaMode
+  public init(commitmentId: String, threadId: String, authorizationVersion: Int, creatorName: String, durationSeconds: Int, mediaMode: APICallCallOfferContextMediaMode) {
+    self.commitmentId = commitmentId
+    self.threadId = threadId
+    self.authorizationVersion = authorizationVersion
+    self.creatorName = creatorName
+    self.durationSeconds = durationSeconds
+    self.mediaMode = mediaMode
+  }
+}
+
+public enum APICallCallOfferContextMediaMode: String, Codable, Sendable {
+  case `audio` = "audio"
+  case `video` = "video"
+}
+
+public struct APICallCallOfferReceipt: Codable, Sendable {
+  public let `id`: String
+  public let `version`: Double
+  public let `slots`: [APICallCallOfferReceiptSlotsItem]
+  public let `expiresAt`: String
+  public let `creatorTimeZone`: String
+  public let `fanTimeZone`: String
+  public let `acceptance`: APICallCallOfferReceiptAcceptance
+  public init(id: String, version: Double, slots: [APICallCallOfferReceiptSlotsItem], expiresAt: String, creatorTimeZone: String, fanTimeZone: String, acceptance: APICallCallOfferReceiptAcceptance) {
+    self.id = id
+    self.version = version
+    self.slots = slots
+    self.expiresAt = expiresAt
+    self.creatorTimeZone = creatorTimeZone
+    self.fanTimeZone = fanTimeZone
+    self.acceptance = acceptance
+  }
+}
+
+public struct APICallCallOfferReceiptSlotsItem: Codable, Sendable {
+  public let `id`: String
+  public let `startsAt`: String
+  public init(id: String, startsAt: String) {
+    self.id = id
+    self.startsAt = startsAt
+  }
+}
+
+public enum APICallCallOfferReceiptAcceptance: String, Codable, Sendable {
+  case `accepted_by_commerce` = "accepted_by_commerce"
+}
+
 public struct APICallCallOffer: Codable, Sendable {
   public let `id`: String
   public let `commitmentId`: String
@@ -10555,7 +10609,7 @@ public enum ApplicationDestination {
   public static func isPermitted(_ value: String) -> Bool {
     if value.count > 2048 || value.contains("%") || value.contains("\\") || value.contains("#") || value.rangeOfCharacter(from: .whitespacesAndNewlines) != nil { return false }
     let parts = value.components(separatedBy: "?")
-    guard parts.count <= 2, parts[0].range(of: "^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|ops(?:/(?:audits|metrics|cases/[a-f0-9-]{36}))?|status|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/(?:overview|sources|style|rules|test|versions|license|interview|onboard))?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post(?:/[a-f0-9-]{36})?|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$", options: .regularExpression) != nil else { return false }
+    guard parts.count <= 2, parts[0].range(of: "^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|ops(?:/(?:audits|metrics|cases/[a-f0-9-]{36}))?|status|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}|/(?:workspace|setup|notes|requests|threads|ai(?:/(?:overview|sources|style|rules|test|versions|license|interview|onboard))?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post(?:/[a-f0-9-]{36})?|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$", options: .regularExpression) != nil else { return false }
     if parts.count == 1 { return true }
     let scopes = ["context": "^/creators/", "creatorId": "^(?:/commerce/|/support$|/you$|/media/voice$)", "fanId": "^/you$", "packetId": "^/commerce/", "offer": "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId": "^/support$", "quote": "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet": "^/studio/[a-f0-9-]{36}/publish$", "objectId": "^/media/voice$", "kind": "^/support$"]
     let literalValues = ["offer": "1", "kind": "verification"]
