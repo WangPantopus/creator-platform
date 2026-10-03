@@ -1,3 +1,9 @@
+### Personally operated iOS and native Spending return correction — October 3, 2026 UTC
+
+The primary personally operated real CUA DeviceHub iOS sign-in chooser, preserved6USD/pending-limit/reminders-off Spending, Requests categories, actual decimal6.50 unsaved draft and truthful unavailable membership management. Night/TextSize7/ReduceMotion exposed a reachable Save control; VoiceOver-on Requests navigation and labels were observed. Original system settings restored visibly; exact owned simulator shut down and GUI/slot3 released. This used the named preceding7514 binary and API0bc66; no new-source or provider/signing acceptance is inferred.
+
+Cold launch recovered the labelled session but guest AX/touches disappeared at unavailable Home, so cold Requests/Spending remains incomplete. The observed direct You→Spending Back defect is corrected in both W4 native sources; shared Home-tab selection reported to W1. Corrected-source device return remains pending. [Personal evidence, failure and limits](../../../artifacts/workstreams/W4/runtime/2026-10-03/ios-personal-return/README.md). All nine packages/R01–R15 remain incomplete; routine operator JSON stays private.
+
 ### Current audience composition and actual0211 caller review — October 3, 2026 UTC
 
 The W4 audience factory retains its original canonical host Pool, requires the exact executable in W1's real consumer registry and exposes assertComposition(identity, hostPool) for exact same-object composition. Personally reviewed W2 published2a093f82's fixed NOLOGIN metadata caller; only that exact caller is added to the original ACL/unsafe-role checks. Original0182 SQL/function bytes remain unchanged, and unknown function/table/column/PUBLIC privileges still refuse.
