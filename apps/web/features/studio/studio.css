@@ -509,6 +509,8 @@
 }
 .w5-fan nav {
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   justify-content: space-between;
   margin-bottom: 24px;
 }
