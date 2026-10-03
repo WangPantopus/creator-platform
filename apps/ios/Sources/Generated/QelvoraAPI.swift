@@ -10974,6 +10974,9 @@ public actor CreatorAPIClient {
   public func sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply) async throws -> APIMessage {
     try await request("/v1/threads/\(segment(creatorId))/\(segment(fanId))/human-replies", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
   }
+  public func beginConversation(xExpectedAccountId: String? = nil, xExpectedSessionId: String? = nil, body: APIConversationBeginConversation) async throws -> APIConversationConversationPage {
+    try await request("/v1/conversations/begin", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["X-Expected-Account-Id": xExpectedAccountId, "X-Expected-Session-Id": xExpectedSessionId].compactMapValues { $0 })
+  }
   public func deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput) async throws -> APIConversationConversationRecordingResult {
     try await request("/v1/conversations/\(segment(creatorId))/\(segment(fanId))/recordings", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
   }

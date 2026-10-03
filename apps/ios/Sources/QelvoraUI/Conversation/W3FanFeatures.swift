@@ -24,7 +24,8 @@ private struct W3ConversationDestination: View {
         if let baseURL, path.count == 3, path[0] == "threads", UUID(uuidString: path[1]) != nil, UUID(uuidString: path[2]) != nil {
             W3ThreadScreen(baseURL: baseURL, creatorId: path[1], fanId: path[2], session: session)
         } else if let baseURL, path.count == 3, path[0] == "creators", path[2] == "chat" {
-            W3FirstConversation(baseURL: baseURL, handle: path[1], accountId: session.session?.accountId ?? "signed-out", session: session)
+            W3FirstConversation(baseURL: baseURL, handle: path[1], accountId: session.session?.accountId ?? "signed-out", originalSessionId: session.session?.sessionId, destination: session.destination, session: session)
+                .id((session.session?.sessionId ?? "signed-out") + session.destination)
         } else if let baseURL, path == ["you"] {
             let query = URLComponents(string: session.destination)?.queryItems ?? []
             if ApplicationDestination.isPermitted(session.destination),
@@ -204,7 +205,9 @@ private struct W3ThreadScreen: View {
 private struct W3Passage: Decodable, Identifiable, Sendable { let id: String; let title: String; let text: String }
 
 private struct W3FirstConversation: View {
-    let baseURL: URL; let handle: String; let accountId: String; @ObservedObject var session: FanSession
+    let baseURL: URL; let handle: String; let accountId: String
+    let originalSessionId: String?; let destination: String
+    @ObservedObject var session: FanSession
     @State private var creator: GrowthCreator?; @State private var caps: W3Capabilities?; @State private var failure = ""; @State private var busy = false
     @State private var key = UUID().uuidString.lowercased()
     @Environment(\.colorScheme) private var scheme
@@ -275,7 +278,7 @@ private struct W3FirstConversation: View {
                     }
                     Spacer(minLength: 0)
                     VStack(spacing: 10) {
-                        Button("Start with \(creator?.name ?? "the creator")'s AI", variant: .ai, size: .lg, block: true, disabled: busy || creator == nil || contextPending || caps?.generationAvailable != true || caps?.consentAvailable != true) { Task { await begin() } }
+                        Button("Start with \(creator?.name ?? "the creator")'s AI", variant: .ai, size: .lg, block: true, disabled: busy || scenePhase != .active || session.checkingSession || session.session?.sessionId != originalSessionId || session.destination != destination || creator == nil || contextPending || caps?.generationAvailable != true || caps?.consentAvailable != true) { Task { await begin() } }
                         Button("Not now", variant: .quiet, block: true) { session.open("/creators/" + handle) }
                     }
                 }.frame(maxWidth: .infinity, minHeight: max(0, geometry.size.height - 52), alignment: .topLeading)
@@ -330,9 +333,25 @@ private struct W3FirstConversation: View {
         }.frame(maxWidth: .infinity, alignment: .leading).padding(16)
     }
     private func begin() async {
-        guard !contextPending, let creator, let policy = caps?.providers else { return }; busy = true; defer { busy = false }
-        do { let page: W3Page = try await W3ConversationClient(baseURL: baseURL, expectedAccountId: accountId).request("begin", body: JSONEncoder().encode(W3Begin(creatorId: creator.id, policyVersion: policy.version, accessNoticeAccepted: true, idempotencyKey: key))); session.open("/threads/" + page.creatorId + "/" + page.fanId) }
-        catch { failure = (error as? W3Failure)?.message ?? "Reconnect to try again. No message was sent." }
+        guard !busy, !contextPending, scenePhase == .active,
+              caps?.generationAvailable == true, caps?.consentAvailable == true,
+              let creator, let policy = caps?.providers,
+              let capture = await session.captureRequest(from: destination, maximumResponseBytes: 1_000_000, timeoutSeconds: 15),
+              capture.expectedAccountId == accountId, capture.sessionId == originalSessionId,
+              await capture.isCurrent(), scenePhase == .active,
+              session.destination == destination else { return }
+        busy = true; defer { busy = false }
+        do {
+            let page = try await capture.client.beginConversation(
+                xExpectedAccountId: capture.expectedAccountId, xExpectedSessionId: capture.sessionId,
+                body: APIConversationBeginConversation(creatorId: creator.id, policyVersion: policy.version, accessNoticeAccepted: .init(), idempotencyKey: key))
+            guard !Task.isCancelled, scenePhase == .active, await capture.isCurrent(),
+                  page.creatorId == creator.id, UUID(uuidString: page.fanId) != nil else { return }
+            session.open("/threads/" + page.creatorId + "/" + page.fanId)
+        } catch {
+            guard !Task.isCancelled, scenePhase == .active, await capture.isCurrent() else { return }
+            failure = "Reconnect to try again. No message was sent."
+        }
     }
 }
 
