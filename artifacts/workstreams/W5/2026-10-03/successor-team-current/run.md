@@ -37,7 +37,7 @@ Current390/1280 Light/Night removed-member views were personally inspected;
 the invitation/acceptance/removal writes remain evidence at8e8a2a6d.
 
 Private captures are under /private/tmp/creator-w5-shell-operator/shots/
-with production-8e8a2a6d-team-* and production-d7455b0f-team-* names.
+with production-8e8a2a6d-team-_ and production-d7455b0f-team-_ names.
 Read-only actual-record inspection is /private/tmp/w5-team-actual-record.sql.
 The old later-blank observation, populated limits, editable-role successor,
 human identity/signing and all-nine acceptance remain open. These are bounded
@@ -68,8 +68,8 @@ show the link; the later settled account captures supplied the visible result.
 Two earlier fill selectors matched no input and timed out without a change;
 the actual default-type input was then filled normally.
 
-Private captures are production-a4fa861a-team-* and
-production-f93d70d4-team-* under the existing private screenshot directory.
+Private captures are production-a4fa861a-team-_ and
+production-f93d70d4-team-_ under the existing private screenshot directory.
 The invitation/acceptance/removal durable-record evidence remains at8e8a2a6d;
 these later reads do not transfer that write observation to another source.
 The old later-blank observation, editable roles, populated limits, genuine
