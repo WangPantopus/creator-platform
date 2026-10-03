@@ -216,6 +216,15 @@ private final class W3RecordingPlayback: ObservableObject {
     ProcessInfo.processInfo.systemUptime - checkedAt < 5 && unexpired(expiresAt)
   }
 
+  private func activatePlaybackSession() throws {
+    // AVAudioSession belongs to iOS. The shared macOS package uses the host's
+    // audio service; both paths retain the same current recording checks.
+    #if os(iOS)
+      try AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio)
+      try AVAudioSession.sharedInstance().setActive(true)
+    #endif
+  }
+
   private func discardBytes() {
     player?.stop()
     player = nil
@@ -296,10 +305,7 @@ private final class W3RecordingPlayback: ObservableObject {
           } else if observedPlayer.isPlaying {
             observedPlayer.pause()
           } else {
-            #if os(iOS)
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio)
-            try AVAudioSession.sharedInstance().setActive(true)
-            #endif
+            try activatePlaybackSession()
             guard await api.isCurrent(), active, attempt == revision, client === api,
                   player === observedPlayer, ProcessInfo.processInfo.systemUptime - started < 5
             else { return }
@@ -319,10 +325,7 @@ private final class W3RecordingPlayback: ObservableObject {
         guard next.duration.isFinite, next.duration > 0, next.prepareToPlay() else {
           throw URLError(.cannotDecodeContentData)
         }
-        #if os(iOS)
-        try AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio)
-        try AVAudioSession.sharedInstance().setActive(true)
-        #endif
+        try activatePlaybackSession()
         guard await api.isCurrent(), active, attempt == revision, client === api,
               ProcessInfo.processInfo.systemUptime - audio.checkedAt < 5
         else { return }
