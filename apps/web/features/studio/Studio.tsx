@@ -330,7 +330,7 @@ export function Studio({
   creatorId?: string;
   screen?: string[];
 }) {
-  const { session, signal, end } = useIdentityRequest();
+  const { session, signal, end, isSessionEnded } = useIdentityRequest();
   useEffect(
     () =>
       configureStudioRequests({
@@ -338,8 +338,9 @@ export function Studio({
         sessionId: session.sessionId,
         signal,
         end,
+        isSessionEnded,
       }),
-    [session.accountId, session.sessionId, signal, end],
+    [session.accountId, session.sessionId, signal, end, isSessionEnded],
   );
   const requestedPath = creatorId
     ? `/studio/${creatorId}/${screen.join("/") || "notes"}`

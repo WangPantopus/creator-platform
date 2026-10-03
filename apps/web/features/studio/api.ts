@@ -1,3 +1,5 @@
+import { sessionChannel } from "../identity/session-boundary";
+
 export class StudioFailure extends Error {
   constructor(
     readonly status: number,
@@ -15,15 +17,16 @@ let identityScope: {
   sessionId: string;
   signal: AbortSignal;
   end: () => void;
+  isSessionEnded: () => boolean;
 } | null = null;
 // Retain only the last genuine identity tuple for clearing private retry state.
 // Effect cleanup may remove the active scope before the next one is configured.
 let previousIdentity: { accountId: string; sessionId: string } | null = null;
-export function configureStudioRequests(
-  scope: NonNullable<typeof identityScope>,
-) {
-  const purge = () => {
-    pendingCommands.clear();
+const identityStorage = "w5.original-session";
+let sessionEnds: BroadcastChannel | undefined;
+function purgeStudioState() {
+  pendingCommands.clear();
+  try {
     for (const key of Object.keys(sessionStorage))
       if (
         key.startsWith("w5.pendingPublication:") ||
@@ -33,21 +36,49 @@ export function configureStudioRequests(
         key.startsWith("w5.team-reply:")
       )
         sessionStorage.removeItem(key);
-  };
+    sessionStorage.removeItem(identityStorage);
+  } catch {
+    // Unavailable storage cannot restore a private command or cursor.
+  }
+}
+export function configureStudioRequests(
+  scope: NonNullable<typeof identityScope>,
+) {
+  // Keep the canonical negative invalidation while navigating to Account.
+  // Neither this message nor the presentation marker supplies authority.
+  if (!sessionEnds && typeof BroadcastChannel !== "undefined") {
+    sessionEnds = new BroadcastChannel(sessionChannel);
+    sessionEnds.onmessage = (event) => {
+      if (event.data === "ended") purgeStudioState();
+    };
+  }
   if (
     previousIdentity &&
     (previousIdentity.accountId !== scope.accountId ||
       previousIdentity.sessionId !== scope.sessionId)
   )
-    purge();
+    purgeStudioState();
+  const marker = JSON.stringify([scope.accountId, scope.sessionId]);
+  try {
+    // A reload loses the in-memory tuple. Persist only the actual identity
+    // marker, and refuse old metadata before any same-session saved return.
+    if (sessionStorage.getItem(identityStorage) !== marker) purgeStudioState();
+    sessionStorage.setItem(identityStorage, marker);
+  } catch {
+    // Storage-free operation retains only this genuine in-memory lifetime.
+  }
   previousIdentity = {
     accountId: scope.accountId,
     sessionId: scope.sessionId,
   };
   identityScope = scope;
-  scope.signal.addEventListener("abort", purge, { once: true });
+  const ended = () => {
+    if (scope.isSessionEnded()) purgeStudioState();
+  };
+  scope.signal.addEventListener("abort", ended, { once: true });
+  if (scope.signal.aborted) ended();
   return () => {
-    scope.signal.removeEventListener("abort", purge);
+    scope.signal.removeEventListener("abort", ended);
     if (identityScope === scope) identityScope = null;
   };
 }
