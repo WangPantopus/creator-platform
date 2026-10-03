@@ -176,7 +176,12 @@ function unavailable(cause?: unknown): never {
     "The reviewed original conversation output is unavailable.",
     503,
   );
-  if (cause !== undefined) error.cause = cause;
+  if (cause !== undefined)
+    Object.defineProperty(error, "cause", {
+      value: cause,
+      configurable: true,
+      writable: true,
+    });
   throw error;
 }
 
