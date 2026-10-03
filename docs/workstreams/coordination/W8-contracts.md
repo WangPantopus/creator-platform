@@ -1,5 +1,9 @@
 # W8 contract, migration and runtime register
 
+## Discovery transport uncertainty — 2026-10-03
+
+The cancellation control uses the same actual configured runtime connection options,1500ms client/server/connect bounds and non-pipelined close. Source/control errors are retained privately. Uncertain cancellation closes the original session without later SQL, then discards it; safe cancellation still awaits original rollback. Bounded privacy_family_cancel_unavailable/privacy_family_rollback_unavailable codes remain retryable and survive worker reporting. [Actual transport-stall and rollback-failure qualifications](../../operations/W8-privacy-family-cancellation.md) use real original tasks on separate labelled copies and preserve original custody. They issue no family authority, receipt or application acceptance.
+
 ## Original family and typed terminal allocations — 2026-10-03
 
 Held0214 reserves W8 `migrations/0214_w8_original_privacy_family.sql`. The additive fixed `creator_trust.privacy_task_original_binding(uuid,text,uuid) RETURNS jsonb` uses only original0087 owner/private scope metadata on the actual original client/PID/fullXID/session/job/domain/token/current lease. Its bounded original binding is callable only by the new isolated family purpose; no rawscope grant or original function/ACL change. New `creator_privacy_family` supplies the original owned-creator projection and fixed `privacy_task_family_matches(uuid,uuid,uuid,uuid,uuid) RETURNS boolean` for genuine Conversation account/creator/thread tasks. Actual0209 and executable registration/full combined catalogue remain mandatory. Current profile ownership, a narrower account-only empty result, caller arrays and fabricated Actors cannot supply original family authority. Exact implemented source/qualification and personal operation remain pending.
