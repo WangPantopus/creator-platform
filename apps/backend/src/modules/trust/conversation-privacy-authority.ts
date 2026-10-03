@@ -289,7 +289,8 @@ export function conversationPrivacyAuthority(
         "privacy_scope_mismatch",
         "This family is outside the verified request.",
       );
-      await assertOriginalPrivacyFamilyCatalog(client);
+      await assertOriginalPrivacyFamilyCatalog(client, job.signal);
+      job.signal?.throwIfAborted();
       const row = (
         await client.query<{ matches: boolean }>(
           "SELECT creator_trust.privacy_task_family_matches($1,$2,$3,$4,$5) AS matches",

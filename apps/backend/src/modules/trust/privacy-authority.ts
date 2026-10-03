@@ -84,7 +84,8 @@ export async function privacyTaskAuthorityInTransaction(
   await client.query("SAVEPOINT w8_privacy_task_fence");
   let owned: readonly string[];
   try {
-    await assertPrivacyTaskCatalog(client);
+    await assertPrivacyTaskCatalog(client, input.signal);
+    input.signal.throwIfAborted();
     const row = (
       await client.query<{ owned: string[] }>(
         "SELECT creator_trust.fence_privacy_task($1,$2,$3,$4,$5,$6,$7,$8) AS owned",
@@ -111,7 +112,8 @@ export async function privacyTaskAuthorityInTransaction(
       // The immutable 0087 function keeps its original account-only result.
       // Every-scope projection is a separately registered fixed purpose on
       // this actual held original task, never a coordinator observation.
-      await assertOriginalPrivacyFamilyCatalog(client);
+      await assertOriginalPrivacyFamilyCatalog(client, input.signal);
+      input.signal.throwIfAborted();
       const family = (
         await client.query<{ owned: string[] }>(
           "SELECT creator_trust.privacy_task_owned_creators($1,$2) AS owned",

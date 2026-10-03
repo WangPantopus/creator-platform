@@ -1,12 +1,30 @@
-import type { Pool } from "pg";
+import type { Pool, QueryConfig } from "pg";
 
 /** Shared read-only catalogue for W2's independently reviewed fixed consumers. */
 export async function generationConsumerCatalogue(
   pool: Pick<Pool, "query">,
   role: string,
+  options: Readonly<{ queryTimeout?: number; signal?: AbortSignal }> = {},
 ) {
+  if (
+    options.queryTimeout !== undefined &&
+    (!Number.isSafeInteger(options.queryTimeout) || options.queryTimeout < 1)
+  )
+    throw new Error("The original catalogue response budget is invalid.");
+  const query = async (text: string, values: unknown[]) => {
+    options.signal?.throwIfAborted();
+    const result = await pool.query({
+      text,
+      values,
+      ...(options.queryTimeout === undefined
+        ? {}
+        : { query_timeout: options.queryTimeout }),
+    } as QueryConfig & { query_timeout?: number });
+    options.signal?.throwIfAborted();
+    return result;
+  };
   const relations = (
-    await pool.query(
+    await query(
       `SELECT n.nspname AS schema,c.relname AS relation,c.relkind,pg_get_userbyid(c.relowner) AS owner,
        c.relrowsecurity,c.relforcerowsecurity,
        ARRAY(SELECT privilege FROM unnest(ARRAY['SELECT','INSERT','UPDATE','DELETE','TRUNCATE','REFERENCES','TRIGGER']) privilege
@@ -28,7 +46,7 @@ export async function generationConsumerCatalogue(
     )
   ).rows;
   const schemas = (
-    await pool.query(
+    await query(
       `SELECT nspname AS schema,has_schema_privilege($1,oid,'USAGE') AS usage,
        has_schema_privilege($1,oid,'CREATE') AS create FROM pg_namespace
        WHERE nspname !~ '^pg_' AND nspname<>'information_schema' ORDER BY nspname`,
