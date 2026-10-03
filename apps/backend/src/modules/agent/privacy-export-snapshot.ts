@@ -92,12 +92,17 @@ async function assertReviewedExport(
     )
       throw new Error("Inactive export executable source");
     await assertAgentPrivacyExportPurposeCatalogue(database, review);
-  } catch {
-    throw new DomainError(
+  } catch (cause) {
+    const failure = new DomainError(
       "privacy_export_unconfigured",
       "Reviewed current all-source export custody is unavailable.",
       503,
     );
+    Object.defineProperty(failure, "cause", {
+      value: cause,
+      configurable: true,
+    });
+    throw failure;
   }
 }
 
@@ -211,12 +216,17 @@ export async function assertAgentPrivacyExportPurposeCatalogue(
       review.catalogueChecksum
     )
       throw new Error("Unreviewed export source permissions");
-  } catch {
-    throw new DomainError(
+  } catch (cause) {
+    const failure = new DomainError(
       "privacy_export_unconfigured",
       "Reviewed current all-source export custody is unavailable.",
       503,
     );
+    Object.defineProperty(failure, "cause", {
+      value: cause,
+      configurable: true,
+    });
+    throw failure;
   }
 }
 
@@ -313,12 +323,14 @@ export class PreparedAgentPrivacyExport {
     sql: string,
   ) {
     signal.throwIfAborted();
+    const pidQuery = {
+      text: "SELECT pg_backend_pid() AS pid",
+      query_timeout: 5000,
+    };
     const pid = z
       .int()
       .positive()
-      .parse(
-        (await client.query("SELECT pg_backend_pid() AS pid")).rows[0]?.pid,
-      );
+      .parse((await client.query(pidQuery)).rows[0]?.pid);
     let cancelling: Promise<void> | undefined;
     let cancellationFailure: unknown;
     const abort = () => {
