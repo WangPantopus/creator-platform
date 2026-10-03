@@ -9,8 +9,8 @@ function control(
   text: string,
 ): QueryConfig & { query_timeout: number } {
   // pg uses the query override before its actual connection read budget.
-  // Preserve a shorter positive original budget, including pg's numeric
-  // environment representation, rather than extending it to this ceiling.
+  // Preserve a shorter positive original budget, including a numeric string
+  // in the connection configuration, rather than extending it to this ceiling.
   const original = (
       client as PoolClient & {
         connectionParameters?: { query_timeout?: unknown };
