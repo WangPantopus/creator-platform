@@ -12,6 +12,7 @@ import {
   requestAuthority,
 } from "../identity/request-authority.js";
 import { assertReplyReviewCatalog } from "./reply-review-catalog.js";
+import { trustTransaction } from "./transaction.js";
 
 /** Transport ceiling, not paid-tenure permission. W5 retains its current4000
  * limit until its actual policy/schema and mounted reviewer support expansion. */
@@ -52,29 +53,24 @@ export async function prepareTrustReplyReviewer(runtime: BackendRuntime) {
     restored: runtime.assertRestoredInTransaction,
     denied: runtime.assertContentAllowedInTransaction,
   });
-  const client = await runtime.pool.connect();
   try {
-    await client.query("BEGIN READ ONLY");
-    await ports.restored(client);
-    await assertReplyReviewCatalog(client);
-    const database = (
-      await client.query<{ database: string }>(
-        "SELECT current_database() AS database",
-      )
-    ).rows[0]!.database;
-    return reviewer(runtime, database, ports);
+    return await trustTransaction(
+      runtime.pool,
+      async (client) => {
+        await ports.restored(client);
+        await assertReplyReviewCatalog(client);
+        const database = (
+          await client.query<{ database: string }>(
+            "SELECT current_database() AS database",
+          )
+        ).rows[0]!.database;
+        return reviewer(runtime, database, ports);
+      },
+      { readOnly: true },
+    );
   } catch (error) {
     if (error instanceof DomainError && error.status === 503) return undefined;
     throw error;
-  } finally {
-    let discard = false;
-    try {
-      await client.query("ROLLBACK");
-    } catch {
-      discard = true;
-    } finally {
-      client.release(discard);
-    }
   }
 }
 

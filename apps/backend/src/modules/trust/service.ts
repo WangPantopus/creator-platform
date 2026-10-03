@@ -21,6 +21,7 @@ import {
 } from "./privacy-export.js";
 import { trustReplyError } from "./reply-review.js";
 import { assertReplyReviewCatalog } from "./reply-review-catalog.js";
+import { querySettlementUncertain } from "../../core/query-settlement.js";
 
 type CaseRow = CaseSummary & {
   reporter_account_id: string;
@@ -303,6 +304,7 @@ export class TrustService {
           replyEvidence.push(await this.replyEvidence(client, caseId));
           await client.query("RELEASE SAVEPOINT reply_evidence");
         } catch (error) {
+          if (querySettlementUncertain(error)) throw error;
           await client.query("ROLLBACK TO SAVEPOINT reply_evidence");
           await client.query("RELEASE SAVEPOINT reply_evidence");
           const value = trustReplyError(error);
@@ -440,6 +442,7 @@ export class TrustService {
                   await this.replyEvidence(client, caseId);
                   await client.query("RELEASE SAVEPOINT reply_closure");
                 } catch (error) {
+                  if (querySettlementUncertain(error)) throw error;
                   await client.query("ROLLBACK TO SAVEPOINT reply_closure");
                   await client.query("RELEASE SAVEPOINT reply_closure");
                   const value = trustReplyError(error);

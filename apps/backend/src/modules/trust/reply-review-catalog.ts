@@ -13,18 +13,25 @@ const purpose = "creator_trust_reply_projection";
 const catalogueChecksum =
   "2f477720a8ab473540e541dd3e15a7433bcd023e58b0aed586ca57a5003c1664";
 
-function unavailable(): never {
-  throw new DomainError(
+function unavailable(cause?: unknown): never {
+  const failure = new DomainError(
     "reply_review_unavailable",
     "Reply review is unavailable. This reply stays pending.",
     503,
   );
+  if (cause !== undefined)
+    Object.defineProperty(failure, "cause", {
+      value: cause,
+      configurable: true,
+    });
+  throw failure;
 }
 
 /** Metadata only, for closed source review. No request, case access, source body
  * or decision is issued. Keep caller search_path and transaction state intact. */
 export async function replyReviewPurposeCatalogue(client: PoolClient) {
   await client.query("SAVEPOINT w8_reply_review_catalog");
+  let completed = false;
   try {
     await client.query("SET LOCAL search_path=pg_catalog");
     const permissions = await generationConsumerCatalogue(client, purpose);
@@ -99,10 +106,15 @@ export async function replyReviewPurposeCatalogue(client: PoolClient) {
           AND k.conname='safety_case_kind_check'`,
       )
     ).rows;
+    completed = true;
     return { permissions, role, dependencies, executables, tables, caseKinds };
   } finally {
-    await client.query("ROLLBACK TO SAVEPOINT w8_reply_review_catalog");
-    await client.query("RELEASE SAVEPOINT w8_reply_review_catalog");
+    // A failed response belongs to its original transaction owner. Never
+    // submit helper cleanup behind that possibly still-running source read.
+    if (completed) {
+      await client.query("ROLLBACK TO SAVEPOINT w8_reply_review_catalog");
+      await client.query("RELEASE SAVEPOINT w8_reply_review_catalog");
+    }
   }
 }
 
@@ -115,8 +127,8 @@ export async function assertReplyReviewPurposeCatalog(client: PoolClient) {
       catalogueChecksum
     )
       unavailable();
-  } catch {
-    unavailable();
+  } catch (cause) {
+    unavailable(cause);
   }
 }
 
@@ -144,7 +156,7 @@ export async function assertReplyReviewCatalog(client: PoolClient) {
     ).rows[0]?.ready;
     if (ready !== true) unavailable();
     await assertReplyReviewPurposeCatalog(client);
-  } catch {
-    unavailable();
+  } catch (cause) {
+    unavailable(cause);
   }
 }
