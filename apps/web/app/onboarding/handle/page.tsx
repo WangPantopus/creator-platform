@@ -23,6 +23,7 @@ export default async function Page({
       >
         <HandleForm
           returnTo={returnTo}
+          editing={!!session.fan}
           initialHandle={session.fan?.handle}
           initialIntro={session.fan?.intro}
         />

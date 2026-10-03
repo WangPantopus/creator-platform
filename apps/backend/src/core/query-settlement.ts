@@ -1,5 +1,5 @@
-/** Only cleanup classification. A transport/read timeout does not establish
- * that PostgreSQL consumed the query, and never supplies request authority.
+/** Only cleanup classification. A transport/read timeout or cancellation does
+ * not establish that PostgreSQL consumed the query or supply request authority.
  * Preserve and inspect private causes through bounded owner refusals. */
 export function querySettlementUncertain(failure: unknown): boolean {
   const pending = [failure];
@@ -9,6 +9,13 @@ export function querySettlementUncertain(failure: unknown): boolean {
     if (!value || typeof value !== "object" || seen.has(value)) continue;
     seen.add(value);
     if (seen.size > 64) return true;
+    // Owner refusals retain the original error as a private cause. Inspect its
+    // cancellation name here too, before any consumer chooses cleanup SQL.
+    if (
+      value instanceof Error &&
+      ["AbortError", "TimeoutError"].includes(value.name)
+    )
+      return true;
     if (
       value instanceof Error &&
       [
