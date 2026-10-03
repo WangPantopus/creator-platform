@@ -1,0 +1,308 @@
+[
+  {
+    "baseRefOid": "41471fd24fe43dd41d6114e67ba00ba1a6a0783b",
+    "headRefOid": "cf281262f5f0a0bdf1612db70391579cbf9afe90",
+    "isDraft": true,
+    "number": 282,
+    "title": "fix(calls): bind web offers to current account and view lifetime",
+    "updatedAt": "2026-10-03T08:06:02Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/282"
+  },
+  {
+    "baseRefOid": "63c7382e4bd6566c74e3ca3d74da62ebb7e859bc",
+    "headRefOid": "ce9cf35faa2409761450838d0bd363809efef035",
+    "isDraft": true,
+    "number": 280,
+    "title": "feat(w3): write original publication System links with private custody",
+    "updatedAt": "2026-10-03T07:40:49Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/280"
+  },
+  {
+    "baseRefOid": "41471fd24fe43dd41d6114e67ba00ba1a6a0783b",
+    "headRefOid": "6b05a5e09322dd951d619bb7f77404b0a356e3d7",
+    "isDraft": true,
+    "number": 279,
+    "title": "Bind Agent privacy and expiry metadata to original held sources",
+    "updatedAt": "2026-10-03T07:47:31Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/279"
+  },
+  {
+    "baseRefOid": "63c7382e4bd6566c74e3ca3d74da62ebb7e859bc",
+    "headRefOid": "24152ae5482bb6c8370faca14cec100599cf84f5",
+    "isDraft": true,
+    "number": 276,
+    "title": "fix(w3): bound context profile reads to genuine original custody",
+    "updatedAt": "2026-10-03T07:40:47Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/276"
+  },
+  {
+    "baseRefOid": "63c7382e4bd6566c74e3ca3d74da62ebb7e859bc",
+    "headRefOid": "517136ebf3e8de05b794e78bf953151d2ab34cf8",
+    "isDraft": true,
+    "number": 275,
+    "title": "feat(w3): recover original terminals with observed cursors and typed settlement",
+    "updatedAt": "2026-10-03T07:40:45Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/275"
+  },
+  {
+    "baseRefOid": "6aa3675823c34635d3819edf3f9fb775ecbaa242",
+    "headRefOid": "cf1bcd4c8ce89a725a6fec086f8110ebf1756e59",
+    "isDraft": true,
+    "number": 262,
+    "title": "Bind fulfillment publication to original worker custody",
+    "updatedAt": "2026-10-03T07:43:02Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/262"
+  },
+  {
+    "baseRefOid": "41471fd24fe43dd41d6114e67ba00ba1a6a0783b",
+    "headRefOid": "d6b13853c6c5f1bca63ae549259d7adcc5578df0",
+    "isDraft": true,
+    "number": 247,
+    "title": "Derive safety allowance settlement from original typed provenance",
+    "updatedAt": "2026-10-03T07:43:00Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/247"
+  },
+  {
+    "baseRefOid": "41471fd24fe43dd41d6114e67ba00ba1a6a0783b",
+    "headRefOid": "a2f3a080f11e50d8b3ca3a589c23c6a504c4820b",
+    "isDraft": true,
+    "number": 242,
+    "title": "feat(trust): add held original-task Conversation family authority",
+    "updatedAt": "2026-10-03T07:36:56Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/242"
+  },
+  {
+    "baseRefOid": "41471fd24fe43dd41d6114e67ba00ba1a6a0783b",
+    "headRefOid": "5745e6e15f6eca8d11bfa93c0994c89f5d27474d",
+    "isDraft": true,
+    "number": 236,
+    "title": "Compare actorless publication against every original service",
+    "updatedAt": "2026-10-03T07:46:20Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/236"
+  },
+  {
+    "baseRefOid": "41471fd24fe43dd41d6114e67ba00ba1a6a0783b",
+    "headRefOid": "7d687bbf74d0fa9c7be2b343cd650e3a2890398c",
+    "isDraft": true,
+    "number": 213,
+    "title": "Retain original Access Actor during call settlement",
+    "updatedAt": "2026-10-03T07:46:18Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/213"
+  },
+  {
+    "baseRefOid": "41471fd24fe43dd41d6114e67ba00ba1a6a0783b",
+    "headRefOid": "32506494e3bf6c66bd7f031620f15576d2c57b89",
+    "isDraft": false,
+    "number": 210,
+    "title": "Return commerce Studio links to the creator workspace",
+    "updatedAt": "2026-10-03T07:56:25Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/210"
+  },
+  {
+    "baseRefOid": "41471fd24fe43dd41d6114e67ba00ba1a6a0783b",
+    "headRefOid": "3de14bf335f8ade673efa5ec79d0c30d73690b77",
+    "isDraft": true,
+    "number": 206,
+    "title": "Require original executable source for Personal Approval preparation",
+    "updatedAt": "2026-10-03T07:46:15Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/206"
+  },
+  {
+    "baseRefOid": "41471fd24fe43dd41d6114e67ba00ba1a6a0783b",
+    "headRefOid": "8c79e2555960f1811c6afb10c4edeabdd0c58dbc",
+    "isDraft": true,
+    "number": 201,
+    "title": "Prepare opt-in private development artifact storage",
+    "updatedAt": "2026-10-03T07:36:54Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/201"
+  },
+  {
+    "baseRefOid": "41471fd24fe43dd41d6114e67ba00ba1a6a0783b",
+    "headRefOid": "6f8750c8afecb226c804d4aa3ccb7278551d0c68",
+    "isDraft": true,
+    "number": 200,
+    "title": "Prepare durable exact-version Ops reply reviews",
+    "updatedAt": "2026-10-03T07:36:52Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/200"
+  },
+  {
+    "baseRefOid": "41471fd24fe43dd41d6114e67ba00ba1a6a0783b",
+    "headRefOid": "4d4e2ae944ab555d1cdfe70d4f09711eaefb5490",
+    "isDraft": true,
+    "number": 192,
+    "title": "Stage finite development feedback consent and physical lifecycle",
+    "updatedAt": "2026-10-03T07:36:50Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/192"
+  },
+  {
+    "baseRefOid": "77ec4cfba18a1e9541bc6145b923d4efa7096bfa",
+    "headRefOid": "316dae84db3e3ee942c02c3d3eed2e0c490ebc58",
+    "isDraft": true,
+    "number": 182,
+    "title": "W3: preserve original ownership and await privacy export cleanup",
+    "updatedAt": "2026-10-03T07:50:57Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/182"
+  },
+  {
+    "baseRefOid": "5d81f4acf70d42b1de8d333a5fbd096d6417064b",
+    "headRefOid": "ee6caec855da7342d601cb0d19ef89f8fdb21e7b",
+    "isDraft": true,
+    "number": 145,
+    "title": "Bind terminal trust denials to original generation custody",
+    "updatedAt": "2026-10-03T07:38:40Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/145"
+  },
+  {
+    "baseRefOid": "41471fd24fe43dd41d6114e67ba00ba1a6a0783b",
+    "headRefOid": "e10cec83f1f49abc826e249ef5287942a7183177",
+    "isDraft": true,
+    "number": 132,
+    "title": "Bind Creator AI worker inputs, provider admission and retrieval to genuine purpose custody",
+    "updatedAt": "2026-10-03T07:53:23Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/132"
+  },
+  {
+    "baseRefOid": "41471fd24fe43dd41d6114e67ba00ba1a6a0783b",
+    "headRefOid": "5d81f4acf70d42b1de8d333a5fbd096d6417064b",
+    "isDraft": true,
+    "number": 131,
+    "title": "Bind generation negatives to the genuine private worker nonce",
+    "updatedAt": "2026-10-03T07:38:38Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/131"
+  },
+  {
+    "baseRefOid": "82edc7a8ad0659c1876a64193f7eaae4f8917e58",
+    "headRefOid": "2fffab2e209d3fa287875949718f3acf0dfc99cc",
+    "isDraft": true,
+    "number": 74,
+    "title": "Harden issuer custody, recovery and integrated platform authority",
+    "updatedAt": "2026-10-03T07:59:42Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/74"
+  },
+  {
+    "baseRefOid": "e2f0a79287938dbc7c7d29599fe65b358ab71a0e",
+    "headRefOid": "82edc7a8ad0659c1876a64193f7eaae4f8917e58",
+    "isDraft": true,
+    "number": 66,
+    "title": "Keep sessions truthful during outages and fit identity screens to phones",
+    "updatedAt": "2026-10-03T07:58:59Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/66"
+  },
+  {
+    "baseRefOid": "41471fd24fe43dd41d6114e67ba00ba1a6a0783b",
+    "headRefOid": "e049965b677082a33f1f8a2e271974a0fb2f34e4",
+    "isDraft": true,
+    "number": 63,
+    "title": "Compose guarded conversations with current producer and privacy contracts",
+    "updatedAt": "2026-10-03T07:51:58Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/63"
+  },
+  {
+    "baseRefOid": "d80d687c989d8b7c17dc091c73d3cd9f12e11df8",
+    "headRefOid": "e2f0a79287938dbc7c7d29599fe65b358ab71a0e",
+    "isDraft": false,
+    "number": 51,
+    "title": "Publish W1 handoff and preserve source before worktree cleanup",
+    "updatedAt": "2026-10-03T07:58:57Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/51"
+  },
+  {
+    "baseRefOid": "39e05febf6d73742b3ed7bfd2e4ad3e9d21e75bb",
+    "headRefOid": "d80d687c989d8b7c17dc091c73d3cd9f12e11df8",
+    "isDraft": true,
+    "number": 49,
+    "title": "Validate native API origins and supply iOS host configuration",
+    "updatedAt": "2026-10-03T07:58:54Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/49"
+  },
+  {
+    "baseRefOid": "4736936538584b9d7f85d194113e905cf49b71cf",
+    "headRefOid": "39e05febf6d73742b3ed7bfd2e4ad3e9d21e75bb",
+    "isDraft": true,
+    "number": 48,
+    "title": "Handle native storage failures and foreground session refresh",
+    "updatedAt": "2026-10-03T07:58:52Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/48"
+  },
+  {
+    "baseRefOid": "485ccc16e04ccc70cdf9876be8b8c9ca89a81def",
+    "headRefOid": "4736936538584b9d7f85d194113e905cf49b71cf",
+    "isDraft": true,
+    "number": 42,
+    "title": "Connect Signed links to public verification across clients",
+    "updatedAt": "2026-10-03T07:58:50Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/42"
+  },
+  {
+    "baseRefOid": "41471fd24fe43dd41d6114e67ba00ba1a6a0783b",
+    "headRefOid": "cebaf7615c55af23082088d34903a3a3cb57a8d5",
+    "isDraft": false,
+    "number": 36,
+    "title": "Revalidate privacy snapshots and recover retained Android sessions",
+    "updatedAt": "2026-10-03T07:50:54Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/36"
+  },
+  {
+    "baseRefOid": "7d85075e86e0a9178c28075732c7da3c1486ace1",
+    "headRefOid": "485ccc16e04ccc70cdf9876be8b8c9ca89a81def",
+    "isDraft": true,
+    "number": 35,
+    "title": "Hold current creator authority through assertion verification",
+    "updatedAt": "2026-10-03T07:58:48Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/35"
+  },
+  {
+    "baseRefOid": "41471fd24fe43dd41d6114e67ba00ba1a6a0783b",
+    "headRefOid": "4bf9d17abc1dc7274b6c0775499d0296e4fcdb4b",
+    "isDraft": true,
+    "number": 31,
+    "title": "Guard Growth journeys with current session and owner proofs",
+    "updatedAt": "2026-10-03T07:59:52Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/31"
+  },
+  {
+    "baseRefOid": "c166bf9c0386fe21db5b161bb0a6d2bf8a8cc4ad",
+    "headRefOid": "7d85075e86e0a9178c28075732c7da3c1486ace1",
+    "isDraft": true,
+    "number": 29,
+    "title": "Connect canonical Home and preserve native saved-thread navigation",
+    "updatedAt": "2026-10-03T07:58:45Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/29"
+  },
+  {
+    "baseRefOid": "d92525805ec8af67dedc2adc23ceba816d09079e",
+    "headRefOid": "c166bf9c0386fe21db5b161bb0a6d2bf8a8cc4ad",
+    "isDraft": true,
+    "number": 28,
+    "title": "Gate Team actions on current access reads",
+    "updatedAt": "2026-10-03T07:58:43Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/28"
+  },
+  {
+    "baseRefOid": "31c7f03d15e41e18c39494ba182844014c14507f",
+    "headRefOid": "d92525805ec8af67dedc2adc23ceba816d09079e",
+    "isDraft": true,
+    "number": 26,
+    "title": "Preserve unchanged generated resources and verify portable rename",
+    "updatedAt": "2026-10-03T07:58:40Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/26"
+  },
+  {
+    "baseRefOid": "94de605f46197c8aae3493052a68767f108a4224",
+    "headRefOid": "31c7f03d15e41e18c39494ba182844014c14507f",
+    "isDraft": true,
+    "number": 22,
+    "title": "Restore Restart focus after authorship practice completion",
+    "updatedAt": "2026-10-03T07:58:38Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/22"
+  },
+  {
+    "baseRefOid": "41471fd24fe43dd41d6114e67ba00ba1a6a0783b",
+    "headRefOid": "94de605f46197c8aae3493052a68767f108a4224",
+    "isDraft": true,
+    "number": 21,
+    "title": "Defer intro collection beyond initial onboarding",
+    "updatedAt": "2026-10-03T07:57:45Z",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/21"
+  }
+]
