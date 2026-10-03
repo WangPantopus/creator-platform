@@ -5,6 +5,7 @@ type PrivateBuffer = {
   key: string;
   raw: string | null;
   identity: OriginalSession | null;
+  namespaceMarker?: { key: string; raw: string | null };
 };
 type CleanupObserver = {
   original: OriginalSession;
@@ -58,6 +59,7 @@ export function capturePrivateBufferMarkers() {
           storage: localStorage,
           key,
           raw,
+          namespaceMarker: { key, raw },
           identity:
             typeof sessionId === "string" && sessionId
               ? { accountId: parts[1]!, sessionId }
@@ -67,14 +69,16 @@ export function capturePrivateBufferMarkers() {
         ["w2-source", "w2-interview", "w2-config"].includes(parts[0] ?? "")
       ) {
         let identity: OriginalSession | null = null;
+        let namespaceMarker: PrivateBuffer["namespaceMarker"];
         if (parts.length === 4 && parts[1] && parts[2])
           identity = { accountId: parts[1], sessionId: parts[2] };
         else if (parts.length === 3 && parts[1]) {
           // Legacy adoption remains limited to its pre-existing session marker.
           try {
-            const sessionId: unknown = JSON.parse(
-              localStorage.getItem(`w2-session:${parts[1]}`) ?? "null",
-            );
+            const markerKey = `w2-session:${parts[1]}`;
+            const markerRaw = localStorage.getItem(markerKey);
+            namespaceMarker = { key: markerKey, raw: markerRaw };
+            const sessionId: unknown = JSON.parse(markerRaw ?? "null");
             if (typeof sessionId === "string" && sessionId)
               identity = { accountId: parts[1], sessionId };
           } catch {
@@ -86,6 +90,7 @@ export function capturePrivateBufferMarkers() {
           key,
           raw: localStorage.getItem(key),
           identity,
+          namespaceMarker,
         });
       }
     }
@@ -106,7 +111,8 @@ export function capturePrivateBufferMarkers() {
     ["w6.recording-delivery-session", ["w6.recording-delivery:"]],
   ] as const) {
     try {
-      const identity = storedSession(sessionStorage.getItem(markerKey));
+      const markerRaw = sessionStorage.getItem(markerKey);
+      const identity = storedSession(markerRaw);
       for (const key of Object.keys(sessionStorage))
         if (
           key === markerKey ||
@@ -117,6 +123,7 @@ export function capturePrivateBufferMarkers() {
             key,
             raw: sessionStorage.getItem(key),
             identity,
+            namespaceMarker: { key: markerKey, raw: markerRaw },
           });
     } catch {
       /* One disabled namespace cannot prevent the others. */
@@ -129,9 +136,23 @@ function discardSnapshot(
   snapshot: ReturnType<typeof capturePrivateBufferMarkers>,
   inactive: (original: OriginalSession | null) => boolean,
 ) {
-  for (const buffer of snapshot.buffers) {
+  // Keep each namespace marker until its entries have been considered. A new
+  // session may write identical values while the genuine reread is pending.
+  const entries = snapshot.buffers.filter(
+    (buffer) => buffer.namespaceMarker?.key !== buffer.key,
+  );
+  const markers = snapshot.buffers.filter(
+    (buffer) => buffer.namespaceMarker?.key === buffer.key,
+  );
+  for (const buffer of [...entries, ...markers]) {
     if (!inactive(buffer.identity)) continue;
     try {
+      if (
+        buffer.namespaceMarker &&
+        buffer.storage.getItem(buffer.namespaceMarker.key) !==
+          buffer.namespaceMarker.raw
+      )
+        continue;
       // New W2 sessions have disjoint keys. Legacy values changed since the
       // snapshot are retained; they never authorize adoption or a request.
       if (buffer.storage.getItem(buffer.key) === buffer.raw)
