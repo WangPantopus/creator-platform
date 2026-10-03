@@ -287,6 +287,9 @@ export async function createConfiguredBackend(input: {
     ? {
         sessions,
         profiles: new IdentityProfiles(pool, {
+          ...(assertAudienceAllowed
+            ? { assertInvitationAllowed: assertAudienceAllowed }
+            : {}),
           assertCreatorAllowed: async (actor, creatorId, client) => {
             if (!trust)
               throw new DomainError(

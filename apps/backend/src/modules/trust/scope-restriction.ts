@@ -9,10 +9,49 @@ import type { AudienceRestriction } from "../identity/audience-scope.js";
 import type { Actor } from "../identity/adapter.js";
 import type { TrustService } from "./service.js";
 import { DomainError } from "../../core/errors.js";
+import { querySettlementUncertain } from "../../core/query-settlement.js";
 import {
   assertCurrentSession,
   requestAuthority,
 } from "../identity/request-authority.js";
+
+/** Cleanup only on the actual caller's transaction. Unknown source reads and
+ * observed abort failures belong to its original settlement owner. This helper
+ * neither releases the client nor manufactures a request/task signal. */
+async function denialSavepoint<T>(
+  client: PoolClient,
+  name: "w8_interactive_denial" | "w8_public_creator_denial",
+  read: () => Promise<T>,
+  rollbackResult?: (result: T) => boolean,
+): Promise<T> {
+  await client.query(`SAVEPOINT ${name}`);
+  let result: T;
+  try {
+    result = await read();
+  } catch (failure) {
+    if (
+      querySettlementUncertain(failure) ||
+      (failure instanceof Error && failure.name === "AbortError")
+    )
+      throw failure;
+    try {
+      await client.query(`ROLLBACK TO SAVEPOINT ${name}`);
+      await client.query(`RELEASE SAVEPOINT ${name}`);
+    } catch (cleanupFailure) {
+      // A failed rollback/release must not trigger another helper command or
+      // replace the actual original refusal with its cleanup error.
+      throw new AggregateError(
+        [failure, cleanupFailure],
+        "Original Trust denial and savepoint cleanup failed.",
+      );
+    }
+    throw failure;
+  }
+  if (rollbackResult?.(result))
+    await client.query(`ROLLBACK TO SAVEPOINT ${name}`);
+  await client.query(`RELEASE SAVEPOINT ${name}`);
+  return result;
+}
 
 async function projectedDenial(
   client: PoolClient,
@@ -36,8 +75,7 @@ async function projectedDenial(
   // genuine session first; this reentrant check never substitutes an owner or
   // creates worker request authority. SAVEPOINT rejects an idle client and
   // releases any partial try-lock acquisition on denied/unavailable results.
-  await client.query("SAVEPOINT w8_interactive_denial");
-  try {
+  await denialSavepoint(client, "w8_interactive_denial", async () => {
     await assertCurrentSession(client, actor.accountId);
     await client.query("SELECT set_config('app.identity_session_id',$1,true)", [
       authority.sessionId,
@@ -56,12 +94,7 @@ async function projectedDenial(
       );
     if (result === "denied")
       throw new DomainError("scope_revoked", "This scope is closed.");
-  } catch (error) {
-    await client.query("ROLLBACK TO SAVEPOINT w8_interactive_denial");
-    throw error;
-  } finally {
-    await client.query("RELEASE SAVEPOINT w8_interactive_denial");
-  }
+  });
 }
 
 async function denialQuery(
@@ -174,55 +207,54 @@ export function trustPublicCreatorDenial() {
   return async (client: PoolClient, creatorId: string): Promise<boolean> => {
     const creator = z.uuid().parse(creatorId);
     const authority = requestAuthority.getStore();
-    await client.query("SAVEPOINT w8_public_creator_denial");
-    try {
-      if (authority) {
-        await assertCurrentSession(client, authority.accountId);
-        await client.query(
-          "SELECT set_config('app.identity_session_id',$1,true)",
-          [authority.sessionId],
-        );
-      }
-      const bound = (
-        await client.query<{ account: string | null; session: string | null }>(
-          `SELECT nullif(current_setting('app.account_id',true),'') AS account,
+    return denialSavepoint(
+      client,
+      "w8_public_creator_denial",
+      async () => {
+        if (authority) {
+          await assertCurrentSession(client, authority.accountId);
+          await client.query(
+            "SELECT set_config('app.identity_session_id',$1,true)",
+            [authority.sessionId],
+          );
+        }
+        const bound = (
+          await client.query<{
+            account: string | null;
+            session: string | null;
+          }>(
+            `SELECT nullif(current_setting('app.account_id',true),'') AS account,
            nullif(current_setting('app.identity_session_id',true),'') AS session`,
+          )
+        ).rows[0];
+        if (
+          !bound ||
+          (authority
+            ? bound.account !== authority.accountId ||
+              bound.session !== authority.sessionId
+            : bound.account !== null || bound.session !== null)
         )
-      ).rows[0];
-      if (
-        !bound ||
-        (authority
-          ? bound.account !== authority.accountId ||
-            bound.session !== authority.sessionId
-          : bound.account !== null || bound.session !== null)
-      )
-        throw new DomainError(
-          "public_creator_context_unavailable",
-          "Current public creator authority is unavailable.",
-          503,
+          throw new DomainError(
+            "public_creator_context_unavailable",
+            "Current public creator authority is unavailable.",
+            503,
+          );
+        const result = await denialQuery(
+          client,
+          "SELECT creator_trust.public_creator_denial($1) AS denial",
+          [creator],
         );
-      const result = await denialQuery(
-        client,
-        "SELECT creator_trust.public_creator_denial($1) AS denial",
-        [creator],
-      );
-      if (result === "denied") {
-        await client.query("ROLLBACK TO SAVEPOINT w8_public_creator_denial");
-        return false;
-      }
-      if (result !== "allowed")
-        throw new DomainError(
-          "public_creator_denial_unavailable",
-          "Current public creator authority is unavailable. Try again.",
-          503,
-        );
-      return true;
-    } catch (error) {
-      await client.query("ROLLBACK TO SAVEPOINT w8_public_creator_denial");
-      throw error;
-    } finally {
-      await client.query("RELEASE SAVEPOINT w8_public_creator_denial");
-    }
+        if (result === "denied") return false;
+        if (result !== "allowed")
+          throw new DomainError(
+            "public_creator_denial_unavailable",
+            "Current public creator authority is unavailable. Try again.",
+            503,
+          );
+        return true;
+      },
+      (result) => result === false,
+    );
   };
 }
 

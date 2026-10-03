@@ -2,6 +2,7 @@ import type { Pool, PoolClient } from "pg";
 import type { Actor } from "../identity/adapter.js";
 import { PostgresIdentityRead, type IdentityRead } from "../identity/read.js";
 import { DomainError, invariant } from "../../core/errors.js";
+import { withRequestContextRestore } from "../identity/request-context.js";
 import {
   assertCurrentSession,
   requestAuthority,
@@ -226,20 +227,21 @@ export class AccessService {
     if (heldClient) {
       // Hold negative keys before positive thread/profile/team row locks. The
       // metadata pointer above is not permission; all positives are rechecked.
-      try {
-        await this.assertAllowedInTransaction!(
-          actor,
-          creatorId,
-          thread.id,
-          participants,
-          client,
-        );
-      } finally {
-        await client.query(
-          "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true),set_config('app.account_id',$3,true)",
-          [creatorId, fanId, actor.accountId],
-        );
-      }
+      await withRequestContextRestore(
+        () =>
+          this.assertAllowedInTransaction!(
+            actor,
+            creatorId,
+            thread.id,
+            participants,
+            client,
+          ),
+        () =>
+          client.query(
+            "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true),set_config('app.account_id',$3,true)",
+            [creatorId, fanId, actor.accountId],
+          ),
+      );
       const currentThread = await client.query(
         `SELECT 1 FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND deleted_at IS NULL FOR ${lockMode === "write" ? "UPDATE" : "SHARE"}`,
         [thread.id, creatorId, fanId],
