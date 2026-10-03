@@ -127,9 +127,9 @@ export class PreparedUsageRetention {
       "Use the prepared repository pool and a bounded expiry batch.",
     );
     signal.throwIfAborted();
-    await repository.assertRuntimeRole();
-    signal.throwIfAborted();
     return agentPrivacyTransaction(this.pool, signal, async (client) => {
+      await repository.assertRuntimeRoleInTransaction(client);
+      signal.throwIfAborted();
       await client.query(
         "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
         [scope.creatorId, scope.accountId],

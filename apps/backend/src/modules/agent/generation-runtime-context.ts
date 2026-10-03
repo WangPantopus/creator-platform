@@ -1,3 +1,4 @@
+import { assertGenerationProfileBound } from "./generation-profile-bound.js";
 import { createHash } from "node:crypto";
 import type { Pool, PoolClient } from "pg";
 import { z } from "zod";
@@ -193,6 +194,7 @@ export class PreparedGenerationRuntimeContext {
     });
     try {
       await assertGenerationConsumerCustody(input.workerPool, custody);
+      await assertGenerationProfileBound(input.workerPool);
       const row = (
         await input.workerPool.query<{ ready: boolean; definition: string }>(
           `SELECT session_user='creator_generation_worker' AND current_user=session_user
@@ -348,6 +350,7 @@ export class PreparedGenerationRuntimeContext {
     );
     await this.identity.authorizeInTransaction(scope, client);
     await assertGenerationConsumerCustody(client, this.custody);
+    await assertGenerationProfileBound(client);
     const conversation = await this.context.currentInTransaction(client, scope);
     invariant(
       query.acceptedHash === contentHash({ text: conversation.acceptedText }),
@@ -395,6 +398,7 @@ export class PreparedGenerationRuntimeContext {
     await this.context.assertCurrentInTransaction(client, scope, conversation);
     await this.identity.authorizeInTransaction(scope, client);
     await assertGenerationConsumerCustody(client, this.custody);
+    await assertGenerationProfileBound(client);
     return freeze(value);
   }
 
