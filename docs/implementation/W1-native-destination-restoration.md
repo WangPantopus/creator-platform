@@ -1,0 +1,11 @@
+# Native destination restoration
+
+W1 personally reproduced signed shipping iOS54bb4ccd cold-launching Home after the user had opened You. The existing credential restored the account, while its destination was only in memory. The source repair stores presentation context in the same actual issuer-specific Keychain service, as a separate `identity-route` item with `WhenUnlockedThisDeviceOnly` accessibility.
+
+The record contains version1, the actual resolved account UUID and a canonical path of at most512 UTF-8 bytes. It stores no query parameters, credential, private screen body, draft, worker token, provider result or permission. The complete encoded record is bounded to1024 bytes on read. Missing/corrupt/wrong-account metadata cannot confer access; malformed metadata is cleared and the app offers ordinary navigation.
+
+The app reads this path only after its saved credential resolves through the real current identity session. An incoming canonical destination wins over a saved path. A cold API interruption keeps session checking/refusal at the root; it cannot restore an authenticated object before current account resolution. Every feature still authorizes its own object through the original captured client/account/session/navigation lifetime.
+
+Writes recheck the current credential inside the original shared Keychain actor. A model owner and monotonic write revision reject late destinations; the current account/session/generation are checked before acquiring that credential. Sign-out/account replacement blocks all credential readers and clears the path under the same actor fence. Credential deletion is attempted even if path deletion fails; private purge failure remains fenced. Guarded same-account rotation preserves the path. No new global or default credential storage is reconstructed.
+
+Existing Swift checks and shipping build/personal operation are separate qualifications. The initial eighteen existing checks passed with unchanged original snapshots; the final clear-order correction requires its shipping build and personally operated cold/API-interruption/rotation/account-replacement/purge paths. This source alone does not establish full H02/H03/H15 acceptance.

@@ -296,3 +296,7 @@ Daily Spend is entered from You, so both shipping shells retain You as its selec
 ## Original generation connection custody — October3 UTC
 
 Generation and terminal authority own their original transaction settlement. Bind cancellation to the PID read from that checked-out connection, retain it until the separate bounded control socket settles, and destroy uncertain transports or failed rollbacks. A signal grants no purpose permission and cannot supply a PID or alter an original lease. Close cancellation before atomic COMMIT so delayed cancellation cannot reach that commit or a later pool user, and return the actual commit receipt once accepted. Scope invalidation and all original authority bookends precede settlement. Actual transport qualification on W1's closed database is distinct from positive worker/business/consent acceptance.
+
+## iOS cold destination custody — October3 UTC
+
+Preserve a bounded canonical path and actual account UUID in the existing issuer-specific device-only Keychain namespace. Query parameters and private screen/draft bodies stay out of this record. Restore only after the real current session resolves the same account; an incoming destination takes precedence. Serialize writes with credential custody and reject stale model/revision/token writes. Clear destination metadata on sign-out or account replacement while always attempting credential deletion, and preserve it through guarded same-account rotation. A saved path is presentation context; current object authority remains mandatory.
