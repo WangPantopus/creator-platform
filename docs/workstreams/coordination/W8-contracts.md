@@ -1,5 +1,13 @@
 # W8 contract, migration and runtime register
 
+## Current account read retry — 2026-10-03
+
+`retryTrustReads()` refreshes real capability/session/job hooks without granting a session or resetting the form epoch. Each hook preserves its current sequence/account fence. Actual503 session errors offer retry; only actual401 may offer reauthentication. Pending session reads withhold development sign-in navigation. [Personal real-web operation and independent saved state](../../operations/W8-privacy-session-recovery.md) qualify cold/warm recovery and cross-tab account separation only; the existing incomplete export remains unavailable for download.
+
+## Original-recipient interactive denial source — 2026-10-02
+
+[Held0200](../../operations/W8-fulfillment-view-denial.md) now implements the separate genuine0199 interactive contract. `prepareTrustFulfillmentViewDenial(runtime, actualCommerceFulfillmentViewAuthority)` accepts only the original held client and W4 opaque scope; actual current session/client/PID/fullXID, complete originals and restoration/source bookends remain mandatory. New NoLogin purpose checks viewer and every original family with sorted nonwaiting negatives. No Actor, fan list, body, positive permission or COMMIT is issued. W4's exact combined0199/0202 catalogue needs independent owner review before activation; old hashes correctly refuse the new grants/policies. Personal closed rollback qualification preserves all six canonical61 custody hashes and supplies no signed/financial/provider or application acceptance.
+
 ## Actual post-graph Agent privacy port — 2026-10-03
 
 `AgentPrivacyOwnerPorts` in `trust/privacy-consumers.ts` accepts the actual service/lifecycle/prepared0196 source directly or a W1 resolver. Resolve once per original claimed task; undefined is a blocked dependency. The service repository and actual source must use the exact canonical host Pool object. W8 fixes original coordinator ownership/task/restoration after resolving the owner. W2's same-repository lifecycle assertion and the actual completed same-job Conversation accounting boundary remain required before full0163 Agent ACK. No source-registration boolean, fallback Agent, caller JSON receipt or separate-pool proof substitutes for them. Source201 still needs genuine integration and personal web/Android/iOS export/download acceptance.
