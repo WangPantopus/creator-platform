@@ -327,7 +327,13 @@ export class PreparedAgentPrivacyExport {
           ...this.pool.options,
           connectionTimeoutMillis: 1500,
           statement_timeout: 1500,
+          query_timeout: 1500,
+          pipeline: false,
         });
+        const onError = (error: Error) => {
+          cancellationFailure ??= error;
+        };
+        control.on("error", onError);
         try {
           await control.connect();
           const cancelled = await control.query<{ cancelled: boolean }>(
@@ -340,7 +346,11 @@ export class PreparedAgentPrivacyExport {
             "The actual source backend could not be cancelled.",
           );
         } finally {
-          await control.end();
+          try {
+            await control.end();
+          } finally {
+            control.removeListener("error", onError);
+          }
         }
       })().catch((error: unknown) => {
         cancellationFailure = error;
