@@ -60,9 +60,14 @@ export class VoiceRecorder {
       // A denied browser permission can still leave device enumeration pending.
       // Use its real current status before capture; unsupported queries retain
       // the browser's original permission prompt and cancellation generation.
-      const permission = await navigator.permissions
-        ?.query({ name: "microphone" as PermissionName })
-        .catch(() => undefined);
+      let permission: PermissionStatus | undefined;
+      try {
+        permission = await navigator.permissions?.query({
+          name: "microphone" as PermissionName,
+        });
+      } catch {
+        permission = undefined;
+      }
       if (generation !== this.generation) return;
       if (permission?.state === "denied")
         throw new DOMException(
