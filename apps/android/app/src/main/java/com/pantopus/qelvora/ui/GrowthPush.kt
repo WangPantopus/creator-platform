@@ -159,11 +159,17 @@ object GrowthPush {
     suspend fun resolveTap(client: GrowthClient, id: String, captured: String): String {
         val current = client.request("notifications/$id", expectedSession = captured)
         check(current.getString("id") == id)
-        check(current.optBoolean("available", false))
+        check(current.opt("available") == true)
         val destination = current.getString("destination")
         check(com.pantopus.qelvora.generated.ApplicationDestination.isPermitted(destination))
-        client.request("notifications/$id/read", "PUT", org.json.JSONObject(), captured)
-        return destination
+        val ack = client.request("notifications/$id/read", "PUT", org.json.JSONObject(), captured)
+        check(ack.opt("read") == true)
+        val fresh = client.request("notifications/$id", expectedSession = captured)
+        check(fresh.getString("id") == id && fresh.opt("available") == true)
+        val freshDestination = fresh.getString("destination")
+        check(com.pantopus.qelvora.generated.ApplicationDestination.isPermitted(freshDestination))
+        currentCoroutineContext().ensureActive()
+        return freshDestination
     }
     private fun sessionDigest(value: String): String = java.security.MessageDigest.getInstance("SHA-256").digest(value.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }
     fun received(context: Context, id: String?, highPriority: Boolean) {

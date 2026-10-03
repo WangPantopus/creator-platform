@@ -210,8 +210,12 @@ public struct GrowthClient: Sendable {
     guard UUID(uuidString: current.id) == id, current.available else { throw GrowthRequestFailure(status: 404) }
     guard ApplicationDestination.isPermitted(current.destination) else { throw URLError(.badServerResponse) }
     struct Ack: Decodable { let read: Bool }
-    let _: Ack = try await request("notifications/" + id.uuidString.lowercased() + "/read", method: "PUT", body: Data("{}".utf8), expectedSession: expectedSession)
-    return current.destination
+    let ack: Ack = try await request("notifications/" + id.uuidString.lowercased() + "/read", method: "PUT", body: Data("{}".utf8), expectedSession: expectedSession)
+    guard ack.read else { throw URLError(.badServerResponse) }
+    let fresh: Current = try await request("notifications/" + id.uuidString.lowercased(), expectedSession: expectedSession)
+    guard UUID(uuidString: fresh.id) == id, fresh.available else { throw GrowthRequestFailure(status: 404) }
+    guard ApplicationDestination.isPermitted(fresh.destination) else { throw URLError(.badServerResponse) }
+    return fresh.destination
   }
 }
 
@@ -258,6 +262,7 @@ public struct GrowthFanFeature: View {
   @State private var hasSession = false
   @State private var loading = false
   @Environment(\.colorScheme) private var scheme
+  @Environment(\.dynamicTypeSize) private var textSize
   public init(
     baseURL: URL?, destination: String = "/discover",
     token: (@Sendable () async throws -> String?)? = nil,
@@ -297,7 +302,9 @@ public struct GrowthFanFeature: View {
           if route == "/notifications/settings" {
             GrowthNotificationSettings(client: client)
           } else if route == "/discover" {
-            Text(QelvoraCopy.text("navDiscover")).qText("display-lg").accessibilityAddTraits(.isHeader).accessibilityFocused($discoverHeadingFocused)
+            // The smaller display token still scales with accessible text;
+            // at the largest sizes the whole heading fits without a lone letter.
+            Text(QelvoraCopy.text("navDiscover")).qText(textSize >= .accessibility4 ? "display-md" : "display-lg").accessibilityAddTraits(.isHeader).accessibilityFocused($discoverHeadingFocused)
             TextField(QelvoraCopy.text("growthSearchCreators"), text: $query,
               prompt: Text(QelvoraCopy.text("growthSearchCreatorsCraftsOrQuestions")).foregroundStyle(qColor("ink-muted", scheme)))
               .textFieldStyle(.plain)
