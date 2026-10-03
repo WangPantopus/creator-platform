@@ -19,13 +19,18 @@ export const FULFILLMENT_PUBLICATION_WORKER_CATALOGUE_QUERY = `WITH roles AS (
  SELECT oid,rolname,rolcanlogin,rolinherit,rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls,rolconfig
  FROM pg_roles WHERE rolname IN('creator_publication_authority','creator_publication_worker','creator_fulfillment_publication_metadata','creator_trust_fulfillment_publication_denial','creator_fulfillment_publication_original_hash','creator_fulfillment_publication_worker','creator_w3_publication_output')
 ), relations AS (
- SELECT c.oid,c.relname,c.relowner,c.relkind,c.relrowsecurity,c.relforcerowsecurity,c.relispartition,c.relacl
- FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='creator'
- AND c.relname IN('publication_preparation','publication_worker_scope','content_index','content_revision','content_publication',
+ SELECT c.oid,n.nspname AS schema,c.relname,c.relowner,c.relkind,c.relrowsecurity,c.relforcerowsecurity,c.relispartition,c.relacl
+ FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
+ AND ((n.nspname='creator' AND c.relname IN('publication_preparation','publication_worker_scope','content_index','content_revision','content_publication',
  'creator_profile','fan_profile','team_membership','passkey_credential','signed_act','signed_act_consumption','signed_publication','signed_verification',
  'commerce_fulfillment_publication_scope','commerce_fulfillment_plan','commerce_fulfillment_member','commerce_group_delivery',
  'commerce_packet','commerce_commitment','commerce_mode','commerce_ledger','commerce_effect','commerce_share_grant',
- 'thread','message','event','commerce_event','publication_worker_system_binding')
+ 'thread','message','event','commerce_event','publication_worker_system_binding'))
+  OR c.relowner IN(SELECT oid FROM roles)
+  OR EXISTS(SELECT FROM roles r WHERE CASE WHEN c.relkind IN('r','p','v','m','f') THEN
+   has_table_privilege(r.oid,c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
+    OR has_any_column_privilege(r.oid,c.oid,'SELECT,INSERT,UPDATE,REFERENCES')
+   WHEN c.relkind='S' THEN has_sequence_privilege(r.oid,c.oid,'SELECT,UPDATE,USAGE') ELSE false END))
 ) SELECT jsonb_build_object(
  'roles',(SELECT jsonb_agg(to_jsonb(r)-'oid' ORDER BY r.rolname COLLATE "C") FROM roles r),
  'memberships',(SELECT jsonb_agg(jsonb_build_object('role',pg_get_userbyid(m.roleid),'member',pg_get_userbyid(m.member),
@@ -48,10 +53,10 @@ export const FULFILLMENT_PUBLICATION_WORKER_CATALOGUE_QUERY = `WITH roles AS (
    FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) g)) ORDER BY p.oid::regprocedure::text COLLATE "C")
   FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
   WHERE CASE WHEN n.nspname !~ '^pg_' AND n.nspname<>'information_schema' AND p.prokind IN('f','p') THEN
-   p.proowner IN(SELECT oid FROM roles) OR p.oid=ANY(ARRAY[to_regprocedure('creator.commerce_group_delivery_exact()'),to_regprocedure('creator.fence_signature_metadata_write()'),
+   p.proowner IN(SELECT oid FROM roles) OR EXISTS(SELECT FROM pg_trigger t WHERE t.tgfoid=p.oid AND t.tgrelid IN(SELECT oid FROM relations)) OR p.oid=ANY(ARRAY[to_regprocedure('creator.commerce_group_delivery_exact()'),to_regprocedure('creator.fence_signature_metadata_write()'),
      to_regprocedure('creator.fence_public_packet_write()'),to_regprocedure('creator.fence_public_mode_write()')])
     OR EXISTS(SELECT FROM roles r WHERE has_function_privilege(r.oid,p.oid,'EXECUTE')) ELSE false END),
- 'relations',(SELECT jsonb_agg(jsonb_build_object('name',o.relname,'owner',pg_get_userbyid(o.relowner),'kind',o.relkind,
+ 'relations',(SELECT jsonb_agg(jsonb_build_object('schema',o.schema,'name',o.relname,'owner',pg_get_userbyid(o.relowner),'kind',o.relkind,
   'rls',o.relrowsecurity,'forced',o.relforcerowsecurity,'partition',o.relispartition,
   'columns',(SELECT jsonb_agg(jsonb_build_object('number',a.attnum,'name',a.attname,'type',format_type(a.atttypid,a.atttypmod),
    'required',a.attnotnull,'identity',a.attidentity,'generated',a.attgenerated,'default',pg_get_expr(d.adbin,d.adrelid),
@@ -73,7 +78,7 @@ export const FULFILLMENT_PUBLICATION_WORKER_CATALOGUE_QUERY = `WITH roles AS (
   'indexes',(SELECT jsonb_agg(jsonb_build_object('name',i.relname,'valid',x.indisvalid,'ready',x.indisready,'live',x.indislive,
    'definition',pg_get_indexdef(i.oid)) ORDER BY i.relname) FROM pg_index x JOIN pg_class i ON i.oid=x.indexrelid WHERE x.indrelid=o.oid),
   'triggers',(SELECT jsonb_agg(jsonb_build_object('name',t.tgname,'enabled',t.tgenabled,'definition',pg_get_triggerdef(t.oid)) ORDER BY t.tgname)
-   FROM pg_trigger t WHERE t.tgrelid=o.oid AND NOT t.tgisinternal)) ORDER BY o.relname COLLATE "C") FROM relations o),
+   FROM pg_trigger t WHERE t.tgrelid=o.oid AND NOT t.tgisinternal)) ORDER BY o.schema COLLATE "C",o.relname COLLATE "C") FROM relations o),
  'effectivePrivileges',(SELECT jsonb_agg(jsonb_build_object('role',r.rolname,'schema',n.nspname,'relation',c.relname,'kind',c.relkind,
   'table',ARRAY(SELECT privilege FROM unnest(ARRAY['SELECT','INSERT','UPDATE','DELETE','TRUNCATE','REFERENCES','TRIGGER']) privilege
    WHERE CASE WHEN c.relkind IN('r','p','v','m','f') THEN has_table_privilege(r.oid,c.oid,privilege) ELSE false END ORDER BY privilege),

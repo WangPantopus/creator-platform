@@ -1,5 +1,15 @@
 # Actual W3 System output and W4 ending bridge — October 3, 2026 UTC
 
+## Existing PR review: reachable relation coverage repair
+
+Current262 normally consumes parent236 `6730a245eee3eb01e579efcb55dc435f803d1580`, which repairs the independently reproduced omitted `publication_worker_effect` policy and clears the incomplete original accepted catalogue pin. The worker catalogue applies the same relation selection to its actual seven roles: every owned or table/column/sequence-reachable relation, schema identity, and attached trigger definitions. Immutable SQL bytes, the genuine issuer, private W3 output and ending bridge remain unchanged. Both complete owner acceptance pins are absent.
+
+The closed canonical61 repeat applies the same13 published SQL sources and includes31 detailed relations with no reachable relation omitted. All33 actual PL functions have zero diagnostics,17 no-scope plans expose zero rows,22 genuine ACL/unregistered/NULL-scope refusals match, and27 catalogue drifts are detected/restored, including the previously missed worker policy and dropped `content_effect` type constraint. All six original custody comparisons match. No business/scope/output/ledger rows were fabricated. Review-only fingerprint `71f78a91621d79027052e8b1818878380b227c77d9f39e5705b95c64f7dff009`; private receipt SHA256 `a0337cada1f8141ca0c9c80c97f76d9f0886c4f8e3319adf9f451eba3a87aeae`. The initial undetected-policy result is preserved in236's thin record. Earlier catalogue fingerprints below are historical.
+
+Backend build/types, affected lint/format and diff checks pass. Independent source checks pass; overall qualification remains false. Genuine factory/task/output/financial/cleanup/COMMIT/C10, explicit approved minimum2–100, current hosted checks and activation remain open. Existing262 stays draft. The owned isolated review container is stopped; routine operators/receipts/logs remain private.
+
+## Earlier System output checkpoint
+
 Consumed actual W3 `cf7294aa47c1a68ad427ad6081d211e6c1ade6ab` SQL and metadata guard byte-exact. The real separate writer emits only the fixed neutral existing-thread System message/event and retains private same-PID/full-XID/login original output bindings. Its private proof and cleanup ports are granted only to the actual W4 isolated owner; the raw worker cannot invoke them. W3 source SHA256 is `c620daaa66c5ecbd743beee443f1d4b2bb5226184b9051f6b8dc79c6aeafb660`.
 
 W4's fixed `fulfillment_publication_worker_end_system_links(uuid,uuid)` bridge repeats the complete original immutable delivery receipt and every private W3 proof, then invokes actual W3 cleanup and compares the removed count with the exact receipt count. TypeScript first compares every real delivery/output tuple, then calls only the W4 bridge and compares its returned count with all delivered recipients. No W3 read follows binding removal; W1 then owns its joint current signature/domain/cleanup gate and sole COMMIT. The complete catalogue includes the private binding's columns/constraints/indexes/forced-RLS/policies/deferred cleanup and the actual W3 metadata graph. Both owners' complete acceptance pins remain absent.
