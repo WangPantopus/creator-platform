@@ -14,6 +14,7 @@ import {
   assertConversationPrivacyPool,
   cancelConversationPrivacyBackend,
   conversationPrivacyCause,
+  conversationPrivacyQueryTimeout,
 } from "./privacy-cancellation.js";
 import {
   fenceConversationPrivacyTask,
@@ -493,12 +494,14 @@ export class PreparedConversationPrivacyCursor {
     const abort = () => {
       if (cancelling) return;
       this.uncertainClients.add(client);
-      cancelling = cancelConversationPrivacyBackend(this.pool, pid).catch(
-        (error: unknown) => {
-          cancellationFailure = error;
-          this.uncertainClients.add(client);
-        },
-      );
+      cancelling = cancelConversationPrivacyBackend(
+        this.pool,
+        pid,
+        client,
+      ).catch((error: unknown) => {
+        cancellationFailure = error;
+        this.uncertainClients.add(client);
+      });
     };
     signal.addEventListener("abort", abort, { once: true });
     let result: QueryResult<ConversationPrivacyCursorRow> | undefined;
@@ -511,7 +514,7 @@ export class PreparedConversationPrivacyCursor {
       // the producer then destroys the retained source, never queues rollback.
       const fetch = {
         text: "FETCH FORWARD 16 FROM w3_conversation_privacy_export",
-        query_timeout: 3000,
+        query_timeout: conversationPrivacyQueryTimeout(client, 3000),
       };
       result = await client.query<ConversationPrivacyCursorRow>(fetch);
     } catch (error) {
