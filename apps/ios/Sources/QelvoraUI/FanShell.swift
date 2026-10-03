@@ -60,7 +60,8 @@ public final class FanSession: ObservableObject {
     /// Never reconstruct default/global storage for an authenticated request.
     /// Captures expire on navigation (including away and back), rotation,
     /// replacement, purge, cancellation or a changed stored credential.
-    public func captureRequest(from target: String) async -> FanSessionRequestCapture? {
+    public func captureRequest(from target: String, maximumResponseBytes: Int = 268_435_456, timeoutSeconds: TimeInterval = 30) async -> FanSessionRequestCapture? {
+        guard (1...268_435_456).contains(maximumResponseBytes), timeoutSeconds > 0, timeoutSeconds <= 30 else { return nil }
         guard let baseURL, let active = session, destination == target, !busy,
               !purgingPrivateState, !localPurgeFailed, !checkingSession,
               !rotatingCredential, !Task.isCancelled else { return nil }
@@ -69,7 +70,7 @@ public final class FanSession: ObservableObject {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.urlCache = nil; configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         let capture = FanSessionRequestCapture(owner: self,
-            client: CreatorAPIClient(baseURL: baseURL, session: URLSession(configuration: configuration), token: { credential }),
+            client: CreatorAPIClient(baseURL: baseURL, session: URLSession(configuration: configuration), maximumResponseBytes: maximumResponseBytes, timeoutSeconds: timeoutSeconds, token: { credential }),
             accountId: active.accountId, sessionId: active.sessionId, destination: target,
             generation: snapshot, destinationGeneration: navigation, credential: credential)
         return await capture.isCurrent() ? capture : nil
