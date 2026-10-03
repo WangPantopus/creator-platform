@@ -2,6 +2,8 @@
 
 ## Corrected producer and personal repeat — 14:45 UTC
 
+The actual browser review also identified Commerce's You footer link pointing back to Spending. Its destination is now the existing canonical /you page, preserving Spending's selected parent tab. This one-line correction still requires personal current navigation operation; preceding captures and the d2aa6678 production build qualify their named earlier source.
+
 At15:01UTC the normal expanded d2aa6678 production build passed Webpack, TypeScript and all33 static pages. Its log SHA256 is6a7f72707d66ffc4eaf9ae9d758757ccd67f9995803a4657d4aff7ad3aa524c1. The actual canonical build wrapper exited0 and released its token/inode-owned guard; physical absence was checked, generated imports restored and W2/W3 notified. This qualifies the named expanded shipping build only; preceding e795 UI operation and current queued hosted checks remain separately attributed. No W4 runtime or browser window was started by this build.
 
 Personally operated source e79579ee with W1's corrected b0281ee5/65d273b7 boundary. Night at an actually observed390×844 has no horizontal overflow: Requests→Spending, unsaved6.50, real API outage with draft retained and Save disabled, normal Retry/recovery and ordinary Refresh pass. A genuine new same-account session clears the old view/draft. The default1280×720 replacement tab likewise clears its draft after genuine other-account sign-in; the fan is restored normally. Cold API outage/reload keeps the session, offline Retry remains unavailable and restart/Retry recovers matured No limit/reminders-off/zero totals. No financial Save was executed.

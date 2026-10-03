@@ -2334,7 +2334,7 @@ function CommerceAccountScreen({
               Requests
             </Link>
             <Link
-              href="/commerce/spending"
+              href="/you"
               aria-current={screen === "spending" ? "page" : undefined}
             >
               You
