@@ -216,7 +216,7 @@ export class PreparedConversationPrivacyCursor {
         }
       }
     }
-    if (transportFailures.length || cleanupFailures.length) {
+    if (failed || transportFailures.length || cleanupFailures.length) {
       const error = new DomainError(
         "conversation_export_source_unavailable",
         "The original export source could not settle safely.",
@@ -237,7 +237,6 @@ export class PreparedConversationPrivacyCursor {
       );
       throw error;
     }
-    if (failed) throw failure;
     return prepared;
   }
 
