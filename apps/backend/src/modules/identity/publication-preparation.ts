@@ -32,7 +32,7 @@ const sources = Object.freeze([
     owner: "W1",
     name: "w1_publication_preparation",
     checksum:
-      "ec7b685f3486032af62942a27aabf508a6c29f147c02242528ed7d358b4790fd",
+      "5f4e2237be4588753e22478ef6d5550032179c1f951f471673c2ca86e674f66f",
   },
   {
     path: "apps/backend/migrations/0073_w8_publication_worker_denial.sql",
@@ -256,7 +256,7 @@ const functions = Object.freeze([
     signature: "creator.finalize_prepared_publication_scope(uuid)",
     argumentNames: ["n"],
     bodyHash:
-      "808344c4b74d55cbd34fb088d03d9fb74a0d083c8698b0bf052caf94d28be409",
+      "441f02a9569bef93eb71d51ce210692b8c423bdc008357974527a7c75dbb96cb",
     owner: "creator_publication_authority",
     definer: true,
     configuration: ["search_path=pg_catalog", "statement_timeout=5s"],

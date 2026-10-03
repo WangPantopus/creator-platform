@@ -52,6 +52,8 @@ type PendingIndex = {
   kind: string;
   state: string;
   scheduled_at: Date | null;
+  packet_id: string | null;
+  audience: unknown;
   due: boolean;
 };
 
@@ -77,7 +79,7 @@ export class ContentPublicationWorker {
         if (!acquired.rows[0]?.acquired) return { state: "busy" as const };
         const row = (
           await client.query<PendingIndex>(
-            "SELECT id,creator_id,version,kind,state,scheduled_at,scheduled_at IS NULL OR scheduled_at<=now() AS due FROM creator.content_index WHERE id=$1 AND creator_id=$2 AND version=$3 FOR UPDATE",
+            "SELECT id,creator_id,version,kind,state,scheduled_at,packet_id,audience,scheduled_at IS NULL OR scheduled_at<=now() AS due FROM creator.content_index WHERE id=$1 AND creator_id=$2 AND version=$3 FOR UPDATE",
             [scope.contentId, scope.creatorId, scope.version],
           )
         ).rows[0];
@@ -119,6 +121,8 @@ export class ContentPublicationWorker {
           publication?.author_account_id === scope.publisherAccountId &&
             publication.signed_act_id === scope.signedActId &&
             document.kind === row.kind &&
+            document.packetId === row.packet_id &&
+            contentHash(document.audience) === contentHash(row.audience) &&
             (document.scheduledAt === null
               ? row.scheduled_at === null
               : row.scheduled_at?.getTime() ===

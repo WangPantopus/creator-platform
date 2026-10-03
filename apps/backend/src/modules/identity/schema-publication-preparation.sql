@@ -170,6 +170,7 @@ BEGIN
   AND pub.author_account_id=sealed.publisher_account_id AND pub.signed_act_id IS NOT DISTINCT FROM sealed.signed_act_id
   AND cp.verification='verified' AND NOT cp.recovery_required
   AND sealed.created_at>clock_timestamp()-interval '5 minutes'
+  AND early.expires_at>clock_timestamp()
   AND NOT EXISTS(SELECT FROM creator.content_tombstone WHERE account_id IN(owner_account,sealed.publisher_account_id))
   AND ((sealed.signed_act_id IS NOT NULL AND sealed.publisher_account_id=owner_account
    AND pub.author_kind IN('human_broadcast','human_creator') AND consumed.signed_act_id IS NOT NULL
