@@ -1,6 +1,9 @@
 package com.pantopus.qelvora.media
 
 import com.pantopus.qelvora.generated.QelvoraCopy
+import com.pantopus.qelvora.generated.CreatorAPIError
+import com.pantopus.qelvora.generated.APIError
+import kotlinx.serialization.json.Json
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -52,6 +55,10 @@ private fun validOffer(value: JSONObject): Boolean = runCatching {
 private fun sameOffer(left: JSONObject?, right: JSONObject?): Boolean {
     if (left == null || right == null) return left == right
     return listOf("id", "commitmentId", "version", "state", "creatorTimeZone", "fanTimeZone", "expiresAt", "selectedSessionId", "slots").all { left.opt(it)?.toString() == right.opt(it)?.toString() }
+}
+private fun offerNotice(error: Exception, fallback: String): String {
+    val code = (error as? CreatorAPIError)?.let { runCatching { Json.decodeFromString<APIError>(it.body).error.code }.getOrNull() }
+    return if (code in listOf("calls_unconfigured", "call_control_unconfigured", "call_provider_unconfigured", "call_admission_unverified", "call_control_role_invalid")) QelvoraCopy.text("w6CallServiceUnavailable") else fallback
 }
 
 /** Query selects a screen only; the canonical actor and server transaction authorize every selection. */
@@ -162,7 +169,7 @@ private fun NativeCallOffers(baseURL: String?, model: FanSession) {
                 offer = next; loaded = true; stale = next?.getString("state") == "offered" && deadline?.current() != true; now = System.currentTimeMillis()
                 notice = if (stale) QelvoraCopy.text("w6ThisOfferChangedOrExpiredOpenRequestsForItsCurrent") else null
             } catch (cancelled: CancellationException) { throw cancelled }
-            catch (_: Exception) { if (current(api, attempt)) { offer = null; chosen = null; loaded = true; stale = true; notice = QelvoraCopy.text("w6TheTimesCouldNotBeLoadedReconnectAndTryAgain") } }
+            catch (error: Exception) { if (current(api, attempt)) { offer = null; chosen = null; loaded = true; stale = true; notice = offerNotice(error, QelvoraCopy.text("w6TheTimesCouldNotBeLoadedReconnectAndTryAgain")) } }
         } catch (cancelled: CancellationException) { throw cancelled }
         finally { if (attempt == epoch) busy = false }
     }
@@ -192,7 +199,7 @@ private fun NativeCallOffers(baseURL: String?, model: FanSession) {
                 }
             } catch (_: TimeoutCancellationException) { if (current(api, attempt)) { stale = true; notice = QelvoraCopy.text("w6ThisTimeIsUnavailableReloadTheCurrentOffer") } }
             catch (cancelled: CancellationException) { throw cancelled }
-            catch (_: Exception) { if (current(api, attempt)) { stale = true; notice = QelvoraCopy.text("w6ThisTimeIsUnavailableReloadTheCurrentOffer") } }
+            catch (error: Exception) { if (current(api, attempt)) { stale = true; notice = offerNotice(error, QelvoraCopy.text("w6ThisTimeIsUnavailableReloadTheCurrentOffer")) } }
         } catch (cancelled: CancellationException) { throw cancelled }
         finally { if (attempt == epoch) busy = false }
     }
@@ -214,7 +221,7 @@ private fun NativeCallOffers(baseURL: String?, model: FanSession) {
                 }
             } catch (_: TimeoutCancellationException) { if (current(api, attempt)) { stale = true; notice = QelvoraCopy.text("w6ThisTimeIsUnavailableReloadTheCurrentOffer") } }
             catch (cancelled: CancellationException) { throw cancelled }
-            catch (_: Exception) { if (current(api, attempt)) { stale = true; notice = QelvoraCopy.text("w6ThisTimeIsUnavailableReloadTheCurrentOffer") } }
+            catch (error: Exception) { if (current(api, attempt)) { stale = true; notice = offerNotice(error, QelvoraCopy.text("w6ThisTimeIsUnavailableReloadTheCurrentOffer")) } }
         } catch (cancelled: CancellationException) { throw cancelled }
         finally { if (attempt == epoch) busy = false }
     }

@@ -20,6 +20,14 @@ private struct NativeOfferDeadline {
     let id: String; let version: Int; let timestamp: String; let wall: Date; let elapsed: ContinuousClock.Instant
     var current: Bool { Date() < wall && ContinuousClock().now < elapsed }
 }
+private func callOfferNotice(_ error: Error, fallback: String) -> String {
+    if let failure = error as? CreatorAPIError,
+       let code = (try? JSONDecoder().decode(APIError.self, from: failure.body))?.error.code,
+       ["calls_unconfigured", "call_control_unconfigured", "call_provider_unconfigured", "call_admission_unverified", "call_control_role_invalid"].contains(code) {
+        return QelvoraCopy.text("w6CallServiceUnavailable")
+    }
+    return fallback
+}
 @MainActor public struct NativeCallDestination: View {
     let baseURL: URL?; @ObservedObject var model: FanSession
     public init(baseURL: URL?, model: FanSession) { self.baseURL = baseURL; self.model = model }
@@ -122,7 +130,7 @@ private struct NativeOfferDeadline {
             offer = next; loaded = true; stale = next?.state == "offered" && deadline?.current != true; now = Date()
             notice = stale ? QelvoraCopy.text("w6ThisOfferChangedOrExpiredOpenRequestsForItsCurrent") : nil
         } catch is CancellationError { }
-        catch { if await current(request, attempt) { offer = nil; chosen = nil; loaded = true; stale = true; notice = QelvoraCopy.text("w6TheTimesCouldNotBeLoadedReconnectAndTryAgain") } }
+        catch { if await current(request, attempt) { offer = nil; chosen = nil; loaded = true; stale = true; notice = callOfferNotice(error, fallback: QelvoraCopy.text("w6TheTimesCouldNotBeLoadedReconnectAndTryAgain")) } }
     }
     private func select() async {
         guard !busy, selectable, canSelect, let chosen, let offer, let route,
@@ -143,7 +151,7 @@ private struct NativeOfferDeadline {
                   NativeCallOffer.date(selected.scheduledAt) == starts else { throw URLError(.badServerResponse) }
             open("/calls/\(route.creatorID.uuidString.lowercased())/\(route.fanID.uuidString.lowercased())/\(sessionID.uuidString.lowercased())")
         } catch is CancellationError { }
-        catch { if await current(request, attempt) { stale = true; notice = QelvoraCopy.text("w6ThisTimeIsUnavailableReloadTheCurrentOffer") } }
+        catch { if await current(request, attempt) { stale = true; notice = callOfferNotice(error, fallback: QelvoraCopy.text("w6ThisTimeIsUnavailableReloadTheCurrentOffer")) } }
     }
     private func openSelected(_ id: UUID) async {
         guard !busy, !stale, scenePhase == .active, let route, let observed = offer else { return }
@@ -160,7 +168,7 @@ private struct NativeOfferDeadline {
                   [session.creatorAccountId, session.fanAccountId].contains(where: { UUID(uuidString: $0) == UUID(uuidString: request.expectedAccountId) }) else { throw URLError(.badServerResponse) }
             open("/calls/\(route.creatorID.uuidString.lowercased())/\(route.fanID.uuidString.lowercased())/\(id.uuidString.lowercased())")
         } catch is CancellationError { }
-        catch { if await current(request, attempt) { stale = true; notice = QelvoraCopy.text("w6ThisTimeIsUnavailableReloadTheCurrentOffer") } }
+        catch { if await current(request, attempt) { stale = true; notice = callOfferNotice(error, fallback: QelvoraCopy.text("w6ThisTimeIsUnavailableReloadTheCurrentOffer")) } }
     }
     var body: some View {
         ScrollView { VStack(alignment: .leading, spacing: QelvoraTokens.space5) {
