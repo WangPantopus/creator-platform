@@ -53,6 +53,7 @@ export class MediaRequestError extends Error {
 
 type MediaIdentity = {
   accountId: string;
+  sessionId: string;
   signal: AbortSignal;
   end: () => void;
 };
@@ -65,12 +66,65 @@ export function configureMediaRequests(current: MediaIdentity) {
   };
 }
 
+/** Retain the genuine opening W1 binding before any asynchronous draft cleanup.
+ * These are refusal pins, not identity or task authority. A later view cannot
+ * lend its session or lifetime to this operation. */
+export function captureMediaRequest(expectedAccountId?: string) {
+  const original = identity;
+  if (!original)
+    throw new MediaRequestError(
+      "Your session changed. Reopen this form before continuing.",
+      409,
+      "session_view_changed",
+    );
+  if (
+    expectedAccountId !== undefined &&
+    original.accountId !== expectedAccountId
+  )
+    throw new MediaRequestError(
+      "Your account changed. Reopen this content to continue.",
+      409,
+      "session_account_changed",
+    );
+  const check = () => {
+    original.signal.throwIfAborted();
+    if (identity !== original)
+      throw new MediaRequestError(
+        "Your session changed. Reopen this form before continuing.",
+        409,
+        "session_view_changed",
+      );
+  };
+  check();
+  return Object.freeze({
+    signal: original.signal,
+    check,
+    async request<T>(path: string, init: RequestInit = {}): Promise<T> {
+      check();
+      const result = await mediaRequest<T>(path, {
+        ...init,
+        expectedAccountId: original.accountId,
+        expectedSessionId: original.sessionId,
+        signal: AbortSignal.any([
+          original.signal,
+          ...(init.signal ? [init.signal] : []),
+        ]),
+      });
+      check();
+      return result;
+    },
+  });
+}
+
 export async function mediaRequest<T>(
   path: string,
-  init: RequestInit & { expectedAccountId?: string } = {},
+  init: RequestInit & {
+    expectedAccountId?: string;
+    expectedSessionId?: string;
+  } = {},
 ): Promise<T> {
   const current = identity;
-  const { expectedAccountId, ...request } = init;
+  const { expectedAccountId, expectedSessionId, ...request } = init;
   if (
     current &&
     expectedAccountId !== undefined &&
@@ -81,11 +135,23 @@ export async function mediaRequest<T>(
       409,
       "session_account_changed",
     );
+  if (
+    current &&
+    expectedSessionId !== undefined &&
+    expectedSessionId !== current.sessionId
+  )
+    throw new MediaRequestError(
+      "Your session changed. Reopen this form before continuing.",
+      409,
+      "session_view_changed",
+    );
   const headers = new Headers(request.headers);
   if (!headers.has("Content-Type"))
     headers.set("Content-Type", "application/json");
   const account = expectedAccountId ?? current?.accountId;
   if (account !== undefined) headers.set("x-qelvora-expected-account", account);
+  const session = expectedSessionId ?? current?.sessionId;
+  if (session !== undefined) headers.set("X-Expected-Session-Id", session);
   const signal = current
     ? AbortSignal.any([
         current.signal,
@@ -117,9 +183,11 @@ export async function mediaRequest<T>(
     const error = (await response.json().catch(() => null)) as {
       error?: { message?: string; code?: string };
     } | null;
+    signal?.throwIfAborted();
     if (
       response.status === 409 &&
-      error?.error?.code === "session_account_changed"
+      (error?.error?.code === "session_account_changed" ||
+        error?.error?.code === "session_view_changed")
     )
       current?.end();
     throw new MediaRequestError(
@@ -221,6 +289,7 @@ async function uploadBinary<A extends MediaAsset | CreatorMediaAsset>(input: {
     mediaRequest<T>(path, {
       ...init,
       expectedAccountId,
+      expectedSessionId: openingIdentity?.sessionId,
       signal,
     });
   const parseAsset = (value: unknown): A => {
