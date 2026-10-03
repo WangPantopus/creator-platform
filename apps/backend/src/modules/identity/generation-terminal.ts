@@ -8,7 +8,10 @@ import {
   type GenerationTask,
 } from "./generation-scope.js";
 import { requestAuthority } from "./request-authority.js";
-import { generationTransaction } from "./generation-transaction.js";
+import {
+  assertGenerationPoolCustody,
+  generationTransaction,
+} from "./generation-transaction.js";
 
 export const GENERATION_TERMINAL_MIGRATION =
   "0183_w1_generation_terminal_scope";
@@ -327,12 +330,14 @@ export class GenerationTerminalAuthority {
   assertPool(pool: Pool): void {
     if (pool !== this.pool) this.unconfigured();
   }
-  private unconfigured(): never {
-    throw new DomainError(
+  private unconfigured(cause?: unknown): never {
+    const failure = new DomainError(
       "generation_terminal_unconfigured",
       "Reviewed generation settlement authority is unavailable.",
       503,
     );
+    if (cause !== undefined) failure.cause = cause;
+    throw failure;
   }
   static async create(configuration: {
     pool: Pool;
@@ -348,18 +353,21 @@ export class GenerationTerminalAuthority {
       scope: GenerationTerminalScope,
     ) => Promise<void>;
   }): Promise<GenerationTerminalAuthority> {
+    assertGenerationPoolCustody(configuration.pool);
     const input = Object.freeze({
       ...configuration,
       migration: Object.freeze({ ...configuration.migration }),
       denialMigration: Object.freeze({ ...configuration.denialMigration }),
       definitions: Object.freeze({ ...configuration.definitions }),
     });
-    const unavailable = () => {
-      throw new DomainError(
+    const unavailable = (cause: unknown) => {
+      const failure = new DomainError(
         "generation_terminal_unconfigured",
         "The original generation settlement custody is not installed.",
         503,
       );
+      failure.cause = cause;
+      throw failure;
     };
     try {
       invariant(
@@ -386,8 +394,8 @@ export class GenerationTerminalAuthority {
           definitionChecksum: Hash.parse(input.definitions[signature]),
         });
       await assertTerminalCatalogue(input.pool, input);
-    } catch {
-      unavailable();
+    } catch (cause) {
+      unavailable(cause);
     }
     return new GenerationTerminalAuthority(input.pool, {
       generation: input.generation,
@@ -406,8 +414,8 @@ export class GenerationTerminalAuthority {
     try {
       await this.configuration.generation.assertCatalogueInTransaction(client);
       await assertTerminalCatalogue(client, this.configuration.catalogue);
-    } catch {
-      this.unconfigured();
+    } catch (cause) {
+      this.unconfigured(cause);
     }
   }
 

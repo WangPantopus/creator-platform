@@ -473,12 +473,14 @@ export class GenerationIdentityAuthority {
         consumers,
         terminalConsumers,
       });
-    } catch {
-      throw new DomainError(
+    } catch (cause) {
+      const failure = new DomainError(
         "generation_scope_unconfigured",
         "The reviewed generation purpose authority is not installed.",
         503,
       );
+      failure.cause = cause;
+      throw failure;
     }
     const frozenConsumers = Object.freeze(
       consumers.map((consumer) =>
@@ -557,12 +559,14 @@ export class GenerationIdentityAuthority {
     await client.query("RELEASE SAVEPOINT w1_generation_catalogue");
     try {
       await assertGenerationCatalogue(client, this.configuration.catalogue);
-    } catch {
-      throw new DomainError(
+    } catch (cause) {
+      const failure = new DomainError(
         "generation_scope_unconfigured",
         "The current reviewed generation catalogue is unavailable.",
         503,
       );
+      failure.cause = cause;
+      throw failure;
     }
   }
 
