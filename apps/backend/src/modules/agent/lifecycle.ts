@@ -132,12 +132,13 @@ export class AgentLifecycle {
       "A verified deletion job is required.",
     );
     await assertAuthorized();
-    await this.repository.assertRuntimeRole();
-    this.runtime?.interruptCreator(scope.creatorId);
     return agentPrivacyTransaction(
       this.repository.pool,
       signal,
       async (client) => {
+        await this.repository.assertRuntimeRoleInTransaction(client);
+        signal.throwIfAborted();
+        this.runtime?.interruptCreator(scope.creatorId);
         await assertTaskInTransaction(client);
         await client.query(
           "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
