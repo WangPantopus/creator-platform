@@ -50,7 +50,8 @@ object CommerceFanFeature {
         if (baseURL != null && originalAccount != null && originalSession != null) CommerceClient(session, originalAccount, originalSession, originalDestination) else null
     }; val scope = rememberCoroutineScope()
     var disposed by remember { mutableStateOf(false) }
-    fun privateVisible(): Boolean = !disposed && originalAccount != null && originalSession != null && session.session?.accountId == originalAccount && session.session?.sessionId == originalSession && session.destination == originalDestination &&
+    fun originalViewCurrent(): Boolean = !disposed && originalAccount != null && originalSession != null && session.session?.accountId == originalAccount && session.session?.sessionId == originalSession && session.destination == originalDestination
+    fun privateVisible(): Boolean = originalViewCurrent() &&
         !session.busy && session.error.isEmpty() && !session.purgingPrivateState && !session.localPurgeFailed
     fun privateReady(): Boolean = privateVisible() && !session.checkingSession
     val ready = privateReady()
@@ -72,6 +73,7 @@ object CommerceFanFeature {
     var commerceAvailable by remember { mutableStateOf(false) }
     var arrived by remember { mutableStateOf(false) }
     val commandDisabled = busy || !ready || !commerceAvailable
+    val refreshDisabled = busy || !originalViewCurrent() || session.busy || session.checkingSession || session.purgingPrivateState || session.localPurgeFailed
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     var foreground by remember { mutableStateOf(lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
     DisposableEffect(lifecycle) {
@@ -124,6 +126,11 @@ object CommerceFanFeature {
             client.request(path, JsonObject(values + ("idempotencyKey" to JsonPrimitive(key)))); if (!privateReady()) return; notice = message; failure = ""; refresh(allowBusy = true)
         } catch (error: Exception) { report(error) } finally { busy = false }
     }
+    suspend fun retry() {
+        if (busy || !originalViewCurrent() || session.busy || session.checkingSession || session.purgingPrivateState || session.localPurgeFailed) return
+        if (!privateReady()) session.refresh()
+        if (privateReady()) refresh()
+    }
     LaunchedEffect(ready) {
         if (!ready) return@LaunchedEffect
         refresh()
@@ -161,7 +168,7 @@ object CommerceFanFeature {
                 if (screen == "spending" && arrivalPath == "/commerce/spending") session.open("/you")
                 else { screen = "requests"; detail = null }
             }
-            Button("Refresh", ButtonVariant.QUIET, disabled = busy || !ready) { scope.launch { refresh() } }
+            Button("Refresh", ButtonVariant.QUIET, disabled = refreshDisabled) { scope.launch { retry() } }
         }
         if (!visible) Notice(title = "Account status", children = "Reconnect to check your account. Your unsaved input is kept.")
         if (visible && failure.isNotEmpty()) Notice("error", "Connection status", failure)
