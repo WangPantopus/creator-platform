@@ -10,7 +10,9 @@ import { createCommerceStudio } from "./modules/commerce/studio.js";
 import {
   composeContentHost,
   createContentStudio,
+  createCurrentContentPostEntryReader,
 } from "./modules/content/integration.js";
+import type { CurrentPostEntryReader } from "./modules/growth/entry-context.js";
 import { mediaFeature } from "./modules/media/registration.js";
 import { readMediaEnvironment } from "./modules/media/environment.js";
 import { composeMediaHost, runtimeMediaDenials } from "./modules/media/host.js";
@@ -143,9 +145,24 @@ try {
                 : "Call control: unavailable; canonical held request authority is not activated.\n",
             );
             runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
+            // Growth and Content share publication/follow composition. Resolve
+            // the actual reader after the canonical Content service is bound,
+            // before listeners start; no request can borrow a projection DTO.
+            let postEntryReader: CurrentPostEntryReader | undefined;
             features.growth = await configureGrowthForBackend({
               ...runtime,
               pool: growthAPIPool ?? runtime.pool,
+              postEntryReader: {
+                current(input) {
+                  if (!postEntryReader)
+                    throw new DomainError(
+                      "growth_entry_context_unconfigured",
+                      "Current post context is unavailable. Reopen the post and try again.",
+                      503,
+                    );
+                  return postEntryReader.current(input);
+                },
+              },
               privacyTaskAuthority: async (client, job) => {
                 if (!runtime.assertRestoredInTransaction)
                   throw new DomainError(
@@ -261,6 +278,16 @@ try {
                   dependencies: contentHost.dependencies,
                 });
             contentHost.bindContent(content.content);
+            if (
+              features.growth &&
+              runtime.audienceIdentity &&
+              runtime.assertRestoredInTransaction &&
+              runtime.assertContentAllowedInTransaction
+            )
+              postEntryReader = createCurrentContentPostEntryReader(
+                runtime,
+                content.content,
+              );
             mediaHost?.bindContent(content.content);
             runtime.configureSignedSubjects(
               Array.isArray(content.signedSubjects)

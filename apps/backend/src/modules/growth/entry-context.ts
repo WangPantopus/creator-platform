@@ -92,6 +92,27 @@ export function canonicalPostEntryContext(
       current.state !== "published"
     )
       return null;
+    // Finish on the actual owner reader again after the public projection read.
+    // A title/version changed or withdrawn during that read cannot be returned
+    // as the original reference; the owner also rechecks the held W1 session.
+    const final = await reader.current({
+      actor,
+      creatorId: creator.id,
+      contentId: entry.contentId,
+    });
+    if (final === null) return null;
+    const fresh = PostReference.parse(final);
+    if (
+      fresh.creatorId !== post.creatorId ||
+      fresh.contentId !== post.contentId ||
+      fresh.version !== post.version ||
+      fresh.title !== post.title
+    )
+      throw new DomainError(
+        "growth_entry_context_changed",
+        copy.growthThisDestinationIsUnavailableReconnectAndTryAgain,
+        503,
+      );
     return Object.freeze({
       source: "post" as const,
       creatorId: post.creatorId,

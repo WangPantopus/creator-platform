@@ -20,6 +20,10 @@ import { registerGrowth } from "./integration.js";
 import type { CreatorProjectionSource } from "./creator-projection.js";
 import { WeeklyImpact, type WeeklyImpactSource } from "./weekly-impact.js";
 import {
+  canonicalPostEntryContext,
+  type CurrentPostEntryReader,
+} from "./entry-context.js";
+import {
   rotatingGrowthSources,
   databaseGrowthSourceCheckpoint,
   type GrowthSourceDirectory,
@@ -45,6 +49,7 @@ export async function createGrowthRuntime(input: {
   activationSource?: ActivationSource;
   thanksPermission?: ThanksPermission;
   weeklyImpactSource?: WeeklyImpactSource;
+  postEntryReader?: CurrentPostEntryReader;
   privacyScope?: GrowthPrivacyScope;
   privacyTaskAuthority?: GrowthPrivacyTaskAuthority;
   installURLs?: Partial<Record<"ios" | "android", string>>;
@@ -96,6 +101,10 @@ export async function createGrowthRuntime(input: {
   const relay = new GrowthRelay(service);
   const engagement = new Engagement(service, input.installURLs);
   const experiments = new GrowthExperiments(service, input.experimentsEnabled);
+  const postEntryContext = canonicalPostEntryContext(
+    service,
+    input.postEntryReader,
+  );
   let running: Promise<void> | null = null,
     timer: ReturnType<typeof setTimeout> | null = null,
     stopped = true;
@@ -196,7 +205,13 @@ export async function createGrowthRuntime(input: {
     relay,
     engagement,
     experiments,
-    feature: registerGrowth(service, { retention, engagement, experiments }),
+    postEntryContext,
+    feature: registerGrowth(service, {
+      retention,
+      engagement,
+      experiments,
+      postEntryContext,
+    }),
     privacyHook: growthPrivacyHook(
       service,
       input.privacyScope,
