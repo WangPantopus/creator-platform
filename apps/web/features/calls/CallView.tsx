@@ -114,6 +114,7 @@ function CallSessionView({
     const result = await mediaRequest<unknown>(path, {
       ...init,
       expectedAccountId: opening.session.accountId,
+      expectedSessionId: opening.session.sessionId,
       signal,
     });
     signal.throwIfAborted();
