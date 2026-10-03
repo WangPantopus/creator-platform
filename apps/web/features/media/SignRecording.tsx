@@ -205,8 +205,10 @@ function RecordingSignature({
       identity.signal !== original.signal ||
       (expectedAccountId !== undefined &&
         expectedAccountId !== original.session.accountId)
-    )
+    ) {
       operation.current?.controller.abort();
+      cancellation.current?.abort();
+    }
   }, [disabled, identity.signal, original, expectedAccountId]);
 
   async function platform(path: string, body: unknown, attempt: Operation) {
