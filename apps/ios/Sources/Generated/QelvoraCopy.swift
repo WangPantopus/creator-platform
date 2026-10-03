@@ -955,6 +955,8 @@ public enum QelvoraCopy {
     "identityEditPublicProfile": "Edit public profile",
     "identitySessionReadFailed": "This device could not read your session securely. Unlock it and try signing in again.",
     "identitySessionSaveFailed": "This device could not save your session securely. Unlock it and try signing in again.",
+    "identityInputKeptUnavailable": "The service is unavailable. Your input has been kept; try again.",
+    "identityInputKeptUnreadable": "The service returned an unreadable response. Your input has been kept; try again.",
     "identityPrivateClearFailed": "This device could not clear its saved private data. Private screens are closed. Unlock it and retry clearing before signing in again.",
     "identityPrivateClearRetry": "Retry clearing saved private data",
     "w1CallLookupTitle": "Your call",

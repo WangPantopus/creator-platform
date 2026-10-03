@@ -955,6 +955,8 @@ object QelvoraCopy {
     "identityEditPublicProfile" to "Edit public profile",
     "identitySessionReadFailed" to "This device could not read your session securely. Unlock it and try signing in again.",
     "identitySessionSaveFailed" to "This device could not save your session securely. Unlock it and try signing in again.",
+    "identityInputKeptUnavailable" to "The service is unavailable. Your input has been kept; try again.",
+    "identityInputKeptUnreadable" to "The service returned an unreadable response. Your input has been kept; try again.",
     "identityPrivateClearFailed" to "This device could not clear its saved private data. Private screens are closed. Unlock it and retry clearing before signing in again.",
     "identityPrivateClearRetry" to "Retry clearing saved private data",
     "w1CallLookupTitle" to "Your call",

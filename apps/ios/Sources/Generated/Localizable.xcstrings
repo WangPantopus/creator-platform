@@ -10363,6 +10363,28 @@
         }
       }
     },
+    "The service is unavailable. Your input has been kept; try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The service is unavailable. Your input has been kept; try again."
+          }
+        }
+      }
+    },
+    "The service returned an unreadable response. Your input has been kept; try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The service returned an unreadable response. Your input has been kept; try again."
+          }
+        }
+      }
+    },
     "This device could not clear its saved private data. Private screens are closed. Unlock it and retry clearing before signing in again.": {
       "extractionState": "manual",
       "localizations": {

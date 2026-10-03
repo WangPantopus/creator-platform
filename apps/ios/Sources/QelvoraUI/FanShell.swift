@@ -50,6 +50,18 @@ public final class FanSessionRequestCapture {
             throw error
         }
     }
+    /// Content uses this same genuine capture, never reconstructed credentials.
+    public func contentBytes(_ path: String, body: Data? = nil, query: [URLQueryItem] = []) async throws -> CreatorAPIBinaryResponse {
+        guard await isCurrent(), let owner, !owner.checkingSession, !owner.busy, owner.error.isEmpty else { throw URLError(.userAuthenticationRequired) }
+        do {
+            let response = try await client.contentBytes(path, expectedAccountId: expectedAccountId, expectedSessionId: sessionId, body: body, query: query)
+            guard await isCurrent(), !owner.checkingSession, !owner.busy, owner.error.isEmpty else { throw CancellationError() }
+            return response
+        } catch {
+            guard await isCurrent(), !owner.checkingSession, !owner.busy, owner.error.isEmpty else { throw CancellationError() }
+            throw error
+        }
+    }
 }
 
 @MainActor
@@ -81,6 +93,8 @@ public final class FanSession: ObservableObject {
     private var rotatingCredential = false
     private var refreshingSession = false
     private var validationWaiters: [UUID: CheckedContinuation<Void, Never>] = [:]
+    // Set only by the genuine canonical read using this exact stored credential.
+    private var confirmedCredential: String?
     private var removedArrivalFor: String?
     private var navigationInitialized = false
     private var navigationRestoreAllowed: Bool
@@ -158,13 +172,13 @@ public final class FanSession: ObservableObject {
         guard requestedGeneration == generation, requestedNavigation == destinationGeneration else { return nil }
         guard let baseURL, let active = session, destination == target, !busy,
               !purgingPrivateState, !localPurgeFailed, !checkingSession,
-              !rotatingCredential, !Task.isCancelled else { return nil }
+              !rotatingCredential, error.isEmpty, !Task.isCancelled else { return nil }
         let snapshot = generation, navigation = destinationGeneration
-        guard let credential = try? await storage.read() else { return nil }
+        guard let credential = try? await storage.read(), credential == confirmedCredential else { return nil }
         let configuration = URLSessionConfiguration.ephemeral
         configuration.urlCache = nil; configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         let capture = FanSessionRequestCapture(owner: self,
-            client: CreatorAPIClient(baseURL: baseURL, session: URLSession(configuration: configuration), maximumResponseBytes: maximumResponseBytes, timeoutSeconds: timeoutSeconds, token: { credential }),
+            client: CreatorAPIClient(baseURL: baseURL, session: URLSession(configuration: configuration), maximumResponseBytes: maximumResponseBytes, timeoutSeconds: timeoutSeconds, expectedAccountId: active.accountId, expectedSessionId: active.sessionId, token: { credential }),
             accountId: active.accountId, sessionId: active.sessionId, destination: target,
             generation: snapshot, destinationGeneration: navigation, credential: credential)
         return await capture.isCurrent() ? capture : nil
@@ -174,6 +188,7 @@ public final class FanSession: ObservableObject {
             capture.owner === self && capture.generation == generation &&
             capture.destinationGeneration == destinationGeneration && destination == capture.destination &&
             session?.accountId == capture.expectedAccountId && session?.sessionId == capture.sessionId &&
+            capture.credential == confirmedCredential &&
             !purgingPrivateState && !localPurgeFailed && !rotatingCredential && !Task.isCancelled
         }
         guard matches(), let credential = try? await storage.read() else { return false }
@@ -198,7 +213,7 @@ public final class FanSession: ObservableObject {
     public func removeArrival() { arrival = nil; removedArrivalFor = destination.components(separatedBy: "?")[0]; destination = removedArrivalFor! }
     public func refresh() async {
         guard !rotatingCredential, !refreshingSession, !purgingPrivateState, !Task.isCancelled else { return }
-        guard let api else { checkingSession = false; return }
+        guard let baseURL, api != nil else { checkingSession = false; return }
         refreshingSession = true; checkingSession = true
         defer { refreshingSession = false; checkingSession = false; finishValidationWaiters() }
         let current = generation
@@ -213,10 +228,21 @@ public final class FanSession: ObservableObject {
         hasSavedCredential = token != nil
         guard let token else { await purge(); return }
         do {
-            let value = try await api.identitySession()
+            // Canonical identity observation has a separate short transport
+            // budget; private domain requests retain their own original bounds.
+            let configuration = URLSessionConfiguration.ephemeral
+            configuration.urlCache = nil; configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+            configuration.timeoutIntervalForRequest = 4; configuration.timeoutIntervalForResource = 4
+            let identityClient = CreatorAPIClient(baseURL: baseURL, session: URLSession(configuration: configuration), maximumResponseBytes: 65_536, timeoutSeconds: 4, token: { token })
+            let value = try await identityClient.identitySession()
             guard current == generation, !Task.isCancelled else { return }
+            guard try await storage.read() == token else {
+                confirmedCredential = nil; session = nil
+                error = "Your session changed. Refresh your account before continuing."
+                return
+            }
             if let previous = session, previous.accountId != value.accountId { if await purge() { error = "The account changed. Continue with Pantopus again." }; return }
-            session = value; error = ""
+            confirmedCredential = token; session = value; error = ""
             await restoreDestination(account: value, credential: token, generation: current)
             guard current == generation, !Task.isCancelled else { return }
             #if os(iOS)
@@ -224,13 +250,17 @@ public final class FanSession: ObservableObject {
             #endif
         } catch let failure as CreatorAPIError {
             guard current == generation, !Task.isCancelled else { return }
+            confirmedCredential = nil
+            guard (try? await storage.read()) == token else {
+                session = nil; error = "Your session changed. Refresh your account before continuing."; return
+            }
             if failure.status == 401 {
                 if !busy { refreshingSession = false; await refreshCredentials() }
                 else { if await purge() { error = "Your session ended. Continue with Pantopus again." } }
             }
             else { error = Self.message(failure) }
         } catch is CancellationError { return }
-        catch { guard current == generation, !Task.isCancelled else { return }; self.error = "Reconnect to refresh your account. Actions are unavailable while offline." }
+        catch { guard current == generation, !Task.isCancelled else { return }; confirmedCredential = nil; self.error = "Reconnect to refresh your account. Actions are unavailable while offline." }
     }
     public func beginSignIn() async {
         guard !busy else { return }; busy = true; defer { busy = false }
@@ -263,9 +293,39 @@ public final class FanSession: ObservableObject {
         #endif
     }
     public func saveHandle(_ handle: String, intro: String) async -> Bool {
-        guard let api, !busy else { return false }; busy = true; defer { busy = false }
-        do { _ = try await api.saveFanProfile(body: APIFanProfileInput(handle: handle, intro: intro)); await refresh(); return session?.fan != nil }
-        catch { self.error = Self.message(error); return false }
+        guard let capture = await captureRequest(from: destination, maximumResponseBytes: 65_536, timeoutSeconds: 10),
+              await capture.isCurrent(), !busy else { return false }
+        busy = true; defer { busy = false }
+        do {
+            guard await capture.isCurrent() else { return false }
+            _ = try await capture.client.saveFanProfile(body: APIFanProfileInput(handle: handle, intro: intro))
+            guard await capture.isCurrent() else { return false }
+            await refresh()
+            guard await capture.isCurrent() else { return false }
+            return session?.fan != nil
+        } catch {
+            guard await capture.isCurrent() else { return false }
+            self.error = error is CreatorAPIError ? Self.message(error) : QelvoraCopy.text(error is DecodingError ? "identityInputKeptUnreadable" : "identityInputKeptUnavailable")
+            return false
+        }
+    }
+    /// Save only the intro, against the original account/profile version.
+    public func saveIntro(_ intro: String, accountId: String, sessionId: String) async -> Bool {
+        guard !busy, let current = session, current.accountId == accountId,
+              current.sessionId == sessionId, let fan = current.fan,
+              let capture = await captureRequest(from: destination, maximumResponseBytes: 65_536, timeoutSeconds: 10),
+              await capture.isCurrent() else { return false }
+        busy = true; defer { busy = false }
+        do {
+            let text = intro.trimmingCharacters(in: .whitespacesAndNewlines)
+            let saved = try await capture.client.saveFanIntro(body: APIFanIntroInput(intro: text, expectedVersion: fan.version))
+            guard await capture.isCurrent(), saved.id == fan.id, saved.intro == text else { return false }
+            await refresh()
+            return await capture.isCurrent()
+        } catch {
+            if await capture.isCurrent() { self.error = Self.message(error) }
+            return false
+        }
     }
     /// Recover navigation only with the credential and destination that opened it.
     /// The call screen independently authorizes the booking and every action.
@@ -312,7 +372,7 @@ public final class FanSession: ObservableObject {
         guard !purgingPrivateState else { return false }
         purgingPrivateState = true; localPurgeFailed = true
         defer { purgingPrivateState = false }
-        generation += 1; session = nil; hasSavedCredential = false; checkingSession = false; actors = []; choosingDevelopmentActor = false; error = ""
+        generation += 1; confirmedCredential = nil; session = nil; hasSavedCredential = false; checkingSession = false; actors = []; choosingDevelopmentActor = false; error = ""
         navigationInitialized = false; navigationRestoreAllowed = false
         finishValidationWaiters()
         #if os(iOS)
@@ -415,9 +475,9 @@ public struct FanAppShell: View {
             } else if model.session == nil {
                 Welcome(returnTo: model.destination, showContext: model.arrival != nil, contextSource: model.arrival?.source, contextTitle: model.arrival?.title, bodyCopy: model.arrival.map { "Every message says who wrote it: " + $0.creatorName + "'s AI, " + $0.creatorName + ", or their team. You'll always know which." } ?? "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext: model.removeArrival, onContinue: { Task { await model.beginSignIn() } }).id(model.arrival?.title)
             } else if model.session?.fan == nil, let feature = features.first(where: { $0.matches(model.destination) && $0.allowsSignedOut(model.destination) }) {
-                feature.screen(model).id((model.session?.accountId ?? "") + model.destination)
+                feature.screen(model).id((model.session?.accountId ?? "") + (model.session?.sessionId ?? "") + model.destination)
             } else if model.session?.fan == nil, ApplicationDestination.requiresFanProfile(model.destination) {
-                NativeHandleForm(model: model)
+                NativeHandleForm(model: model).id((model.session?.accountId ?? "") + (model.session?.sessionId ?? ""))
             } else {
                 VStack(spacing: 0) {
                     let feature = features.first(where: { $0.matches(model.destination) })
@@ -438,8 +498,8 @@ public struct FanAppShell: View {
                             if model.session?.creator != nil { CredentialSettings(model: model) }
                             #endif
                         }.padding(16) }
-                    } else if model.destination == "/onboarding/handle" { NativeHandleForm(model: model) }
-                    else if let feature { feature.screen(model).id((model.session?.accountId ?? "") + model.destination + destinationDelivery.uuidString) }
+                    } else if model.destination == "/onboarding/handle" { NativeHandleForm(model: model).id((model.session?.accountId ?? "") + (model.session?.sessionId ?? "")) }
+                    else if let feature { feature.screen(model).id((model.session?.accountId ?? "") + (model.session?.sessionId ?? "") + model.destination + destinationDelivery.uuidString) }
                     else { EmptyState(title: "This destination is not connected yet", body: "Your account and arrival context are kept. Return to your account or try again when this feature is available.") { Button("Your account", variant: .secondary) { model.destination = "/you" } }.frame(maxHeight: .infinity) }
                     TabBar(active: tab) { model.destination = "/" + $0.rawValue.lowercased() }
                 }

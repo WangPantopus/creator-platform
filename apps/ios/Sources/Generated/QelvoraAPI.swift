@@ -10211,8 +10211,10 @@ public actor CreatorAPIClient {
   private let token: @Sendable () async throws -> String?
   private let maximumResponseBytes: Int
   private let timeoutSeconds: TimeInterval
-  public init(baseURL: URL, session: URLSession = .shared, maximumResponseBytes: Int = 268_435_456, timeoutSeconds: TimeInterval = 30, token: @escaping @Sendable () async throws -> String?) {
-    self.baseURL = baseURL; self.session = session; self.maximumResponseBytes = maximumResponseBytes; self.timeoutSeconds = timeoutSeconds; self.token = token
+  private let expectedAccountId: String?
+  private let expectedSessionId: String?
+  public init(baseURL: URL, session: URLSession = .shared, maximumResponseBytes: Int = 268_435_456, timeoutSeconds: TimeInterval = 30, expectedAccountId: String? = nil, expectedSessionId: String? = nil, token: @escaping @Sendable () async throws -> String?) {
+    self.baseURL = baseURL; self.session = session; self.maximumResponseBytes = maximumResponseBytes; self.timeoutSeconds = timeoutSeconds; self.expectedAccountId = expectedAccountId; self.expectedSessionId = expectedSessionId; self.token = token
   }
   /// W8 private transport through this original client; pins only refuse a
   /// changed genuine session. Public help uses the separate anonymous path.
@@ -10229,6 +10231,16 @@ public actor CreatorAPIClient {
           !expectedAccountId.isEmpty, !expectedSessionId.isEmpty, (body?.count ?? 0) <= 1_048_576 else { throw URLError(.badURL) }
     return try await requestBytes(path, method: body == nil ? "GET" : "POST", body: body, authenticated: true,
       headers: ["X-Expected-Account-Id": expectedAccountId, "X-Expected-Session-Id": expectedSessionId, "x-commerce-account-id": expectedAccountId],
+      accept: "application/json", contentType: "application/json")
+  }
+  /// W5 JSON transport retains the original client and denial-only session pins.
+  public func contentBytes(_ path: String, expectedAccountId: String, expectedSessionId: String, body: Data? = nil, query: [URLQueryItem] = []) async throws -> CreatorAPIBinaryResponse {
+    guard path.range(of: #"^/v1/content/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*$"#, options: .regularExpression) != nil,
+          !expectedAccountId.isEmpty, !expectedSessionId.isEmpty, (body?.count ?? 0) <= 1_048_576,
+          query.count <= 4, Set(query.map(\.name)).count == query.count,
+          query.allSatisfy({ ["contentId", "cursor", "targetKind", "targetId"].contains($0.name) && ($0.value?.utf8.count ?? 0) <= 1024 }) else { throw URLError(.badURL) }
+    return try await requestBytes(path, method: body == nil ? "GET" : "POST", body: body, authenticated: true, query: query,
+      headers: ["X-Expected-Account-Id": expectedAccountId, "X-Expected-Session-Id": expectedSessionId],
       accept: "application/json", contentType: "application/json")
   }
   private func request<Response: Decodable & Sendable>(_ path: String, method: String, body: Data? = nil, authenticated: Bool, query: [URLQueryItem] = [], headers: [String: String] = [:], contentType: String = "application/json") async throws -> Response {
@@ -10250,6 +10262,12 @@ public actor CreatorAPIClient {
     request.setValue(accept, forHTTPHeaderField: "Accept")
     if body != nil { request.setValue(contentType, forHTTPHeaderField: "Content-Type") }
     for (name, value) in headers { request.setValue(value, forHTTPHeaderField: name) }
+    // Genuine capture pins only refuse a changed request; credentials remain
+    // the server's actual authority. Uncaptured canonical reads have no pins.
+    if authenticated {
+      if let expectedAccountId { request.setValue(expectedAccountId, forHTTPHeaderField: "X-Expected-Account-Id") }
+      if let expectedSessionId { request.setValue(expectedSessionId, forHTTPHeaderField: "X-Expected-Session-Id") }
+    }
     if authenticated, let value = try await token() { request.setValue("Bearer \(value)", forHTTPHeaderField: "Authorization") }
     try Task.checkCancellation()
     let (bytes, response) = try await session.bytes(for: request, delegate: CreatorAPIRedirectGuard())

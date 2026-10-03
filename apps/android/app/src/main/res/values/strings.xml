@@ -955,6 +955,8 @@
   <string name="identity_edit_public_profile" formatted="false">Edit public profile</string>
   <string name="identity_session_read_failed" formatted="false">This device could not read your session securely. Unlock it and try signing in again.</string>
   <string name="identity_session_save_failed" formatted="false">This device could not save your session securely. Unlock it and try signing in again.</string>
+  <string name="identity_input_kept_unavailable" formatted="false">The service is unavailable. Your input has been kept; try again.</string>
+  <string name="identity_input_kept_unreadable" formatted="false">The service returned an unreadable response. Your input has been kept; try again.</string>
   <string name="identity_private_clear_failed" formatted="false">This device could not clear its saved private data. Private screens are closed. Unlock it and retry clearing before signing in again.</string>
   <string name="identity_private_clear_retry" formatted="false">Retry clearing saved private data</string>
   <string name="w1_call_lookup_title" formatted="false">Your call</string>
