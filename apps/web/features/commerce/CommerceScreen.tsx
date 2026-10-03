@@ -832,16 +832,22 @@ function CommerceAccountScreen({
   );
   const visiblePackets =
     data?.packets.filter((p) => requestCategory(p) === filter) ?? [];
-  const earningsCreator = data?.owned.find(
-    (c) =>
-      c.id === (creatorId ?? data.owned[0]?.id) &&
-      c.verification === "verified",
-  )?.id;
+  const ownedCreator = data?.owned.find(
+    (c) => c.id === (creatorId ?? data.owned[0]?.id),
+  );
+  const earningsCreator =
+    ownedCreator?.verification === "verified" ? ownedCreator.id : undefined;
   const poolSummary = data?.poolEarnings?.find(
     (p) => p.creatorId === earningsCreator,
   );
   const selectedTier = data?.tiers.find((t) => t.id === membershipTier);
-  const suffix = activeCreator ? `?creatorId=${activeCreator}` : "";
+  const navigationCreator = studio ? ownedCreator?.id : activeCreator;
+  const suffix = navigationCreator ? `?creatorId=${navigationCreator}` : "";
+  const requestsDestination = studio
+    ? ownedCreator
+      ? `/studio/${ownedCreator.id}/requests`
+      : "/studio/workspace"
+    : "/commerce/requests";
   function creatorPicker() {
     return (
       <label className="commerce-field">
@@ -868,8 +874,9 @@ function CommerceAccountScreen({
     >
       {studio && (
         <aside className="commerce-sidebar">
-          <Link href="/">{brand.name} Studio</Link>
+          <Link href="/studio/workspace">{brand.name} Studio</Link>
           <nav aria-label="Commerce Studio">
+            <Link href={requestsDestination}>Requests</Link>
             <Link
               href={`/commerce/offers${suffix}`}
               aria-current={screen === "offers" ? "page" : undefined}
@@ -895,7 +902,7 @@ function CommerceAccountScreen({
       )}
       <main className="commerce-main">
         <header className="commerce-header">
-          <Link href="/commerce/requests" aria-label="Back to requests">
+          <Link href={requestsDestination} aria-label="Back to requests">
             ‹
           </Link>
           {screen === "spending" ? (
