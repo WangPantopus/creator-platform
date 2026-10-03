@@ -1,3 +1,10 @@
+## Commerce privacy source review — October 3, 2026 13:58 UTC
+
+- [ ] Qualify the genuine Commerce late-host/configuration and actual held restoration/task/fault/sole-COMMIT lifecycle after the owned source repair; source/type/query planning is not export authority or positive acceptance.
+- [ ] Complete protected artifact sink/current stage/cancellation cleanup, approved retained-record/deletion policy, durable ACK and finite C10. No full package/R01–R15 row is complete.
+
+[Personally reviewed source and canonical61 projection bounds](../../../artifacts/workstreams/W4/runtime/2026-10-03/commerce-privacy-settlement/README.md) record the reuse of the real main settlement class, explicit fields in both paths,17 installed query plans/five uninstalled held projections and unchanged38-table commerce custody. Existing9 contract checks and the normal shipping bundle pass; no new test code or synthetic task/artifact/financial acceptance is added.
+
 ## Current signed iOS and original real deadline — October 3, 2026 13:06 UTC
 
 - [x] Personally operate current signed iOS original-account Requests/You Spending Back in named Light/Night paths, actual decimal6.50 unsaved input and normal cold discard; preserve all38 commerce tables/two rows and release the actual bounded own resources.
@@ -352,3 +359,8 @@ PR114 merged at `97a79a34` with final W1 try-signature, W8 actual-session try-ne
 ## R12 final source gate and packet-order continuation — October 2, 2026
 
 PR116 merged at `ad47dfe5`. The unmounted qualified-read consumer now prepares genuine current purpose/reader/family/audience before W4 domain locks, then authorizes the exact current source LAST after wallet/cap/dedupe/credit writes. All result paths use the final gate; denial/unavailability rolls back the entire transaction. Current explicit sharing, mode, accepted capture, refund and dispute checks gate credit eligibility; cap-zero records stay uncredited. R07 signing preparation uses packet→commitment NOWAIT, and R08 current statement application uses packet→commitment locks. Compilation/scoped checks and34 real non-owner SQL plans pass. Personal fan return preserves current7USD, pending No limit deadline and reminders off after API restart and actual pending creator setup. Genuine qualified reads, credits, anti-farming/races and provider acceptance remain open. [Evidence](../../../artifacts/workstreams/W4/runtime/2026-10-02/qualified-read-final-gate/receipt.json).
+## Original Commerce wrapped cancellation — October 3, 2026 17:04 UTC
+
+Personally reviewed current W5 draft304/af56f46b and reused only the byte-identical28c133d7 shared64-object classifier. Genuine AbortError/TimeoutError inside a retained private cause now reach Commerce's existing uncertain-settlement/close-discard path without later rollback SQL. Backend types, affected lint/format/diff and all nine unchanged backend contracts pass. [Exact reuse and limits](../../../artifacts/workstreams/W4/runtime/2026-10-03/commerce-privacy-settlement/README.md).
+
+Genuine task/EOF/sole-COMMIT/protected sink/retention/ACK/C10 operation remains held; no owner primitive acceptance is transferred. Main is freshly5c08634b; the latest inventory has43 open/all43 drafts beginning21, including personally source-reviewed305 and current304. W8 coordinates the single proposed Docker recovery; W4 runtime/native/GUI/pending CLI custody is closed. All nine packages/R01–R15 remain incomplete.
