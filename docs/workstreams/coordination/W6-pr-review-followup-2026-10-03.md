@@ -1,5 +1,16 @@
 # W6 PR review follow-up — October 3, 2026
 
+## Current retained-head qualification — 19:00 UTC
+
+Fresh GitHub inventory still40/all40 draft. Oldest21 now e446d423 incorporates
+W1's original web graph and native minimum;36 nowde8adebb incorporates W3's
+post-await continuation guards;63 now1bed29a1. Owner shipping/current operation
+is pending, so previous-head acceptance is not transferred. PR302 nowb5200006;
+W6 has not yet reviewed that new delta. Four fast305/dabb checks SUCCESS/six
+Mac QUEUED. Current combined Studio was personally built/operated and normally
+closed18:59:40Z; its [exact named observations and limits](../../../artifacts/workstreams/W6/studio-media-session/2026-10-03/README.md)
+are recorded separately from genuine human/task/provider positives. No new merge.
+
 ## Completed ownership/reuse disposition pass — 18:19 UTC
 
 Fresh GitHub capture18:19:10Z has40 open/all40 draft, oldest21. W4 consolidated

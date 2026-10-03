@@ -1,5 +1,60 @@
 # Studio media original session — October 3, 2026
 
+## Current combined graph personally operated — 18:59 UTC
+
+Frozen source `dabbcc4a7062ed35c26d32c5be56b8ae986de117`, product
+`67630ef08baf74c9bb23a30e885f38db3c074cdf`, incorporates the complete W1
+bebb/b0c graph. Sequential backend18:34:33.385–18:34:37.562Z and production
+web18:34:37.575–18:34:44.968Z builds exited0. Backend log SHA256
+`22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5`,
+web log `e4178836c5a222378156bcca802381cb918b7e0fdafac428f88ec914e1093bad`,
+server bundle `1fcf4fe14e13f8476d4a105f13e6ee30c5d134b62f7b75259fde5227e00a06f4`.
+Heavy build lease W6-pr305-current-web/ad5ccdd4-f009-4541-941f-b5db79e12485,
+dev16777232/inode244744076 was normally released before runtime.
+
+W6 personally operated production Studio against the actual canonical61 clone
+in an isolated Playwright context. Actual issuer continuation/completion supplied
+the original account/session. Recorder capability200 sent both original headers.
+The actual missing microphone settled0:00/Record with “The microphone is
+unavailable. Try again.” Permission was `prompt`; this current observation does
+**not** repeat earlier6f permission-denied evidence. Settled Night390x844 and
+Light1280x900 images were personally inspected. Close restored Voice focus.
+Actual browser offline concealed Studio and kept input; online recovery returned
+capability200 with the same original session. No backend-outage result is inferred.
+
+Both genuine same-account and other-account replacement refused real Studio
+save-on-open409 with original headers before mounting a recorder. W1 navigated
+to authentication. Separate original-pinned media proxy reads returned409/
+`session_view_changed` and409/`session_account_changed` respectively; those are
+not UI media requests. Actual product “Sign out on all devices” returned200 and
+concealed Account. Page errors were empty. Incorrect denial assertions,
+ineffective permission tooling and one screenshot timeout remain private;
+they supply no denial or product acceptance.
+
+Read-only closing state18:59:17Z:61 migrations, Note draft17 from actual
+save-on-open, three historical photos still deleted/version2, zero messages,
+thread media/publications/offers/calls/admissions. Seeded human_active epoch0
+remains unqualified. Protected upgrade target remains connection-limit0 and
+owner-closed. No human capture/upload/scan/sign/publication/playback, native,
+full accessibility, provider or whole-package acceptance is claimed.
+
+Runtime lease dd445283-d76e-4739-b71c-8e5817114fdb/dev16777232/inode244746166:
+API5894, web6235/childgroup6574/listener6576, TLS6583. Exact owner bytes,
+commands, sole listeners and process group checked before normal shutdown.
+Owned browser/context/server closed and its exact lease released; all3006/3106/
+4106/55446 ports closed, original PG exited and runtime lease released
+18:59:40.991128Z. No native devices or peer mutation. Preserved source/tools/
+keys/database/volume intact. Private browser/state/closure SHA256:
+`e37bc2d2f316bbd3c2d5984bf6e5f162285740e8de91b06d6ceaf9f76941df89`,
+`2aee10fcc0373fc8d7536d668006979d9b5314daa383a936b411248a30b895bf`,
+`7b854b389f125a903e616694eea224a7bab1242c303234079002922cf7a55cbc`.
+
+At19:00 actual PR305 dabb checks: four fast SUCCESS, six Mac QUEUED. W6 read
+current web/backend job111264699820 and Android job111264693857 logs;
+existing foundation fixtures are not these affected journeys. W1 dependency296,
+queued jobs and genuine positive journeys remain open. PR305 stays draft and
+unmerged; following6f history keeps its original attribution.
+
 **18:00 backlog reconciliation:** Existing PR305 is stacked on canonical W1
 PR296. Product67630ef08baf74c9bb23a30e885f38db3c074cdf normally merges the complete
 bebb1e7b producer/consumer graph and b0c15d51 namespace-marker guard. W6 read
