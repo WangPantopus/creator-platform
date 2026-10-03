@@ -233,7 +233,12 @@ export class CommerceFulfillmentPlans {
     );
     const client = await input.database.pool.connect();
     try {
+      await client.query("BEGIN");
       await plans.assertCatalogue(client);
+      await client.query("ROLLBACK");
+    } catch (error) {
+      await client.query("ROLLBACK").catch(() => undefined);
+      throw error;
     } finally {
       client.release();
     }
