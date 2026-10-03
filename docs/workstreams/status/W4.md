@@ -1,3 +1,9 @@
+### Current audience composition and actual0211 caller review — October 3, 2026 UTC
+
+The W4 audience factory retains its original canonical host Pool, requires the exact executable in W1's real consumer registry and exposes assertComposition(identity, hostPool) for exact same-object composition. Personally reviewed W2 published2a093f82's fixed NOLOGIN metadata caller; only that exact caller is added to the original ACL/unsafe-role checks. Original0182 SQL/function bytes remain unchanged, and unknown function/table/column/PUBLIC privileges still refuse.
+
+Actual isolated canonical61 rollback qualification passes both original audience/metadata compiler checks, seven real metadata drift refusals and five raw/missing-purpose/unregistered refusals, preserving all six custody digests. The review container is stopped; no ledger/scope/business rows fabricated. Backend build/types/scoped lint/format/diff pass. Actual W2 consumption, real prepared composition/worker/provider/positive generation and C10/activation remain open. [Exact owner evidence](../../../artifacts/workstreams/W4/runtime/2026-10-03/generation-metadata-audience/README.md).
+
 ### Successor Studio return and nonpaid draft — October 2, 2026 evening
 
 Personally saved/reloaded/edited one labelled synthetic Creator Notes membership draft with no product or price; preserved the existing approval. Offers now returns to the current owned Studio Requests instead of fan Requests and the logo returns to workspace. Actual empty creator Requests loaded at desktop and390 phone width; unavailable Earnings retains its closed gate. Web types/scoped lint/format pass. Both native rebuilds pass with normal iOS signing, but repeated Android System UI ANR prevented complete operation; own emulator and exact leases released. [Current receipt and limitations](../../../artifacts/workstreams/W4/runtime/2026-10-02/studio-return-navigation/README.md). All nine packages/R01–R15 remain assigned.
