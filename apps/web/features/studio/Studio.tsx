@@ -1476,14 +1476,16 @@ function Compose({
               key={kind}
               type="button"
               aria-pressed={document.audience.kind === kind}
-              onClick={() =>
+              disabled={!!document.planRef}
+              onClick={() => {
+                if (document.audience.kind === kind) return;
                 edit({
                   audience:
                     kind === "tiers" || kind === "groups"
                       ? { kind, ids: [] }
                       : { kind: kind as "public" | "followers" | "members" },
-                })
-              }
+                });
+              }}
             >
               {kind === "members"
                 ? "All members"
@@ -1491,49 +1493,58 @@ function Compose({
             </button>
           ))}
         </div>
-        {["tiers", "groups"].includes(document.audience.kind) && (
-          <fieldset className="w5-field">
-            <legend>Select {document.audience.kind}</legend>
-            {!catalog && (
-              <p>
-                Current audience options are unavailable. Refresh after
-                reconnecting.
-              </p>
-            )}
-            {catalog?.[document.audience.kind as "tiers" | "groups"].map(
-              (option) => (
-                <label key={option.id}>
-                  <input
-                    type="checkbox"
-                    checked={
-                      "ids" in document.audience &&
-                      document.audience.ids.includes(option.id)
-                    }
-                    onChange={(e) => {
-                      const ids =
-                        "ids" in document.audience ? document.audience.ids : [];
-                      edit({
-                        audience: {
-                          kind: document.audience.kind as "tiers" | "groups",
-                          ids: e.target.checked
-                            ? [...ids, option.id]
-                            : ids.filter((id) => id !== option.id),
-                        },
-                      });
-                    }}
-                  />
-                  {option.name}
-                </label>
-              ),
-            )}
-            {catalog?.[document.audience.kind as "tiers" | "groups"].length ===
-              0 && (
-              <p>
-                No current {document.audience.kind} are available. Configure
-                Offers first.
-              </p>
-            )}
-          </fieldset>
+        {!document.planRef &&
+          ["tiers", "groups"].includes(document.audience.kind) && (
+            <fieldset className="w5-field">
+              <legend>Select {document.audience.kind}</legend>
+              {!catalog && (
+                <p>
+                  Current audience options are unavailable. Refresh after
+                  reconnecting.
+                </p>
+              )}
+              {catalog?.[document.audience.kind as "tiers" | "groups"].map(
+                (option) => (
+                  <label key={option.id}>
+                    <input
+                      type="checkbox"
+                      checked={
+                        "ids" in document.audience &&
+                        document.audience.ids.includes(option.id)
+                      }
+                      onChange={(e) => {
+                        const ids =
+                          "ids" in document.audience
+                            ? document.audience.ids
+                            : [];
+                        edit({
+                          audience: {
+                            kind: document.audience.kind as "tiers" | "groups",
+                            ids: e.target.checked
+                              ? [...ids, option.id]
+                              : ids.filter((id) => id !== option.id),
+                          },
+                        });
+                      }}
+                    />
+                    {option.name}
+                  </label>
+                ),
+              )}
+              {catalog?.[document.audience.kind as "tiers" | "groups"]
+                .length === 0 && (
+                <p>
+                  No current {document.audience.kind} are available. Configure
+                  Offers first.
+                </p>
+              )}
+            </fieldset>
+          )}
+        {document.planRef && (
+          <p className="qv-help">
+            This answer keeps its original request audience. To change that
+            audience, revise the fulfillment plan in Requests.
+          </p>
         )}
         <p className="qv-help">
           {creator.owned ? (
@@ -1551,66 +1562,73 @@ function Compose({
           )}
         </p>
       </div>
-      {post && !document.quote && !document.packetId && (
-        <div className="w5-gutter w5-field">
-          <label htmlFor="content-kind">Library entry</label>
-          <select
-            id="content-kind"
-            value={document.kind}
-            onChange={(e) =>
-              edit({ kind: e.target.value as ContentBody["kind"], live: null })
-            }
-          >
-            <option value="post">Post</option>
-            <option value="live">Scheduled live session</option>
-            <option value="replay">Replay</option>
-          </select>
-          {["live", "replay"].includes(document.kind) && (
-            <>
-              <label htmlFor="live-session">Session from Live</label>
-              <select
-                id="live-session"
-                disabled={!liveCatalog?.available}
-                value={document.live?.sessionId ?? ""}
-                onChange={(e) => {
-                  const session = liveCatalog?.items.find(
-                    (s) => s.sessionId === e.target.value,
-                  );
-                  if (session) {
-                    const live = {
-                      sessionId: session.sessionId,
-                      startsAt: session.startsAt,
-                      endsAt: session.endsAt,
-                      replayContentId: session.replayContentId,
-                    };
-                    edit({ live });
-                  }
-                }}
-              >
-                <option value="">Choose a session</option>
-                {liveCatalog?.items
-                  .filter((s) => document.kind !== "replay" || s.replayReady)
-                  .map((s) => (
-                    <option key={s.sessionId} value={s.sessionId}>
-                      {new Date(s.startsAt).toLocaleString()} —{" "}
-                      {new Date(s.endsAt).toLocaleString()}
-                    </option>
-                  ))}
-              </select>
-              <p>
-                Choose the audience separately for each replay. A live entry
-                points to the scheduled session.
-              </p>
-              {!liveCatalog?.available && (
-                <Notice title="Live sessions unavailable">
-                  The live service is not connected. Schedule a session in Live,
-                  then return when the session list is available.
-                </Notice>
-              )}
-            </>
-          )}
-        </div>
-      )}
+      {post &&
+        !document.planRef &&
+        !document.quote &&
+        !document.packetId &&
+        document.kind !== "public_answer" && (
+          <div className="w5-gutter w5-field">
+            <label htmlFor="content-kind">Library entry</label>
+            <select
+              id="content-kind"
+              value={document.kind}
+              onChange={(e) =>
+                edit({
+                  kind: e.target.value as ContentBody["kind"],
+                  live: null,
+                })
+              }
+            >
+              <option value="post">Post</option>
+              <option value="live">Scheduled live session</option>
+              <option value="replay">Replay</option>
+            </select>
+            {["live", "replay"].includes(document.kind) && (
+              <>
+                <label htmlFor="live-session">Session from Live</label>
+                <select
+                  id="live-session"
+                  disabled={!liveCatalog?.available}
+                  value={document.live?.sessionId ?? ""}
+                  onChange={(e) => {
+                    const session = liveCatalog?.items.find(
+                      (s) => s.sessionId === e.target.value,
+                    );
+                    if (session) {
+                      const live = {
+                        sessionId: session.sessionId,
+                        startsAt: session.startsAt,
+                        endsAt: session.endsAt,
+                        replayContentId: session.replayContentId,
+                      };
+                      edit({ live });
+                    }
+                  }}
+                >
+                  <option value="">Choose a session</option>
+                  {liveCatalog?.items
+                    .filter((s) => document.kind !== "replay" || s.replayReady)
+                    .map((s) => (
+                      <option key={s.sessionId} value={s.sessionId}>
+                        {new Date(s.startsAt).toLocaleString()} —{" "}
+                        {new Date(s.endsAt).toLocaleString()}
+                      </option>
+                    ))}
+                </select>
+                <p>
+                  Choose the audience separately for each replay. A live entry
+                  points to the scheduled session.
+                </p>
+                {!liveCatalog?.available && (
+                  <Notice title="Live sessions unavailable">
+                    The live service is not connected. Schedule a session in
+                    Live, then return when the session list is available.
+                  </Notice>
+                )}
+              </>
+            )}
+          </div>
+        )}
       {post && (
         <label className="w5-field w5-gutter">
           Title
@@ -1690,15 +1708,19 @@ function Compose({
         <input
           type="checkbox"
           checked={document.aiUseIntent}
-          disabled={!creator.owned && !document.aiUseIntent}
+          disabled={
+            (!!document.planRef || !creator.owned) && !document.aiUseIntent
+          }
           onChange={(e) => edit({ aiUseIntent: e.target.checked })}
         />
         <span>
           <strong>Let my AI use this</strong>
           <span className="qv-help">
-            {creator.owned
-              ? "Adds a source candidate for this same audience. Approve it separately in My AI."
-              : "The creator must confirm AI reuse for this revision. Team edits can remove that intent."}
+            {document.planRef
+              ? "AI reuse of this answer needs a separate current approval, which is unavailable."
+              : creator.owned
+                ? "Adds a source candidate for this same audience. Approve it separately in My AI."
+                : "The creator must confirm AI reuse for this revision. Team edits can remove that intent."}
           </span>
         </span>
       </label>
