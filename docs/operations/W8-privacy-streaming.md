@@ -1,5 +1,13 @@
 # W8 protected C10 streaming continuation
 
+## Original coordinator acknowledgement settlement — 2026-10-03
+
+The existing201 worker now reuses the exact original-client `trustTransaction` helper from draft200 for privacy/effect acknowledgement and missing-hook/failure transitions. Each transition requires the real finite original pool acquisition budget and actual five-second host/server limits; the45-second owner deadline and genuine task signal remain separate. Original job/effect ID, lease token, running state and acknowledgement expiry fences remain. Unknown BEGIN/read/COMMIT responses close the actual source before discard/release, with no assumed rollback or settled success.
+
+Failure transitions now update only a still-running original token. A lost COMMIT reply or failed settlement therefore cannot downgrade a durable completed task/effect, erase its receipt or rewrite its case/recipient notices. The privacy retry counter increments only for an actually updated, settled failure row. Bounded settlement codes remain explicit. No actor, owner receipt, source EOF/COMMIT or task authority is manufactured.
+
+Backend types, scoped lint/format and diff pass without new tests. The reused helper's earlier real PostgreSQL probes qualify its primitive only; these new worker call sites still require actual original-task/effect fault operation and independent saved-state reads before acceptance. Full prepared owner/storage/ACK/download/native/C10 and release/pilot remain open; PR201 stays draft.
+
 ## Private path custody — 2026-10-03
 
 The existing private-store draft now enforces the documented existing private parent and canonical path, checks actual POSIX ownership/permissions and refuses symlinked ancestors before creating only the leaf. Each store operation rechecks those boundaries. The actual earlier source advertised two unsafe parent configurations; the repaired source refuses seven path/permission cases and a later parent permission change. A separate fresh process reads the actual labelled synthetic8MiB storage artifact in128 parts of at most64KiB with the same SHA256; different-account404 and symlinked metadata refusal pass. Restored metadata/permissions are reverified. Backend types/lint/format/diff pass, no new tests or database/provider activity. This storage qualification supplies no original task, owner EOF/COMMIT, protected job download or full C10 acceptance; PR201 remains draft.

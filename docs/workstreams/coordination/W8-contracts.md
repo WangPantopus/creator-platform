@@ -1,5 +1,9 @@
 # W8 contract, migration and runtime register
 
+## Original worker acknowledgement budget — 2026-10-03
+
+[Current201](../../operations/W8-privacy-streaming.md) reuses the unchanged draft200 original-client settlement helper for task/effect acknowledgement and failure transitions. Its actual host budget adds no task or owner authority. Running/token fences preserve durable completed receipts after lost COMMIT replies; original acknowledgement expiry and case/recipient semantics remain. Types/lint/format/diff pass; current actual task/effect fault and independent saved-state qualification remain required. No new SQL, scope, catalogue pin, actor, consent or provider receipt is supplied.
+
 ## Actual private artifact parent — 2026-10-03
 
 [Existing201 storage guard](../../operations/W8-privacy-streaming.md) requires the already existing private POSIX-owned parent and canonical real path with no symlinked ancestors; it creates only the leaf and rechecks before each operation. Seven actual configuration refusals, later permission-change refusal, storage-only8MiB/fresh-process SHA verification, different-account404 and metadata-symlink refusal are personally observed, with original files/permissions restored. No database job, task, owner EOF/COMMIT or C10/download/application receipt is supplied. Runtime source/type/lint/format checks pass; original Agent graph/held purposes and all remaining release gates remain required.
