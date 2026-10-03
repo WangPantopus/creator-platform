@@ -219,8 +219,12 @@ export async function composeConversationHost(
     "0183_w1_generation_terminal_scope",
     "0184_w8_generation_terminal_denial",
     "0188_w2_generation_terminal_journal",
+    // Immutable0189 remains a prerequisite of its typed financial successor.
+    // Its legacy worker executables cannot substitute for current0215.
     "0189_w4_generation_terminal_settlement",
     "0203_w3_terminal_only_finalization",
+    "0215_w4_generation_safety_terminal_settlement",
+    "0218_w1_generation_terminal_discovery",
   ])
     if (!(await registeredChecksum(version)))
       missing.push(`registered ${version}`);
