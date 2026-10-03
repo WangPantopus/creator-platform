@@ -28,6 +28,9 @@ import type { Database } from "../../db/database.js";
 import type { PaymentProvider, Intent } from "../payments/provider.js";
 import { CreditWallet, type CreditRules } from "./accounting.js";
 import type { CommerceVoiceFulfillment } from "./voice-fulfillment.js";
+import { CommerceFulfillmentPlans } from "./fulfillment-plans.js";
+import { CommerceCallTransport } from "./call-transport.js";
+import type { CallTransportStatus } from "../../../../../packages/api/src/commerce/contracts.js";
 
 export type CommercePolicy = {
   currency: string;
@@ -149,6 +152,16 @@ const ModeCommand = z
   );
 
 export class CommerceService {
+  private callTransport?: CommerceCallTransport;
+  configureCallTransport(value: CommerceCallTransport) {
+    CommerceCallTransport.assertRuntime(value, this.db, this.access);
+    invariant(
+      !this.callTransport || this.callTransport === value,
+      "call_transport_graph_mismatch",
+      "The call status graph is already configured.",
+    );
+    this.callTransport = value;
+  }
   constructor(
     readonly pool: Pool,
     private readonly db: Database,
@@ -159,17 +172,66 @@ export class CommerceService {
     private readonly trialAdmission?: CommerceTrialAdmission,
     private readonly assertCreatorReadAllowed?: CommerceCreatorReadAuthority,
     private readonly voiceFulfillment?: CommerceVoiceFulfillment,
+    private readonly fulfillmentPlans?: CommerceFulfillmentPlans,
   ) {
     voiceFulfillment?.assertRuntime(db, access);
+    if (fulfillmentPlans)
+      CommerceFulfillmentPlans.assertRuntime(fulfillmentPlans, db, access);
   }
   get voiceFulfillmentAvailable() {
     return Boolean(this.voiceFulfillment);
   }
   private fulfillmentAvailable(kind: string) {
+    // A policy string cannot promise a group publication. Its genuine W3
+    // System-link/W5 publication composition is a separate required producer.
+    if (kind === "group_answer") return false;
     return (
       kind === "written_reply" ||
       (Boolean(this.policy.fulfillmentModes?.includes(kind)) &&
-        (kind !== "voice_note" || this.voiceFulfillmentAvailable))
+        (kind !== "voice_note" || this.voiceFulfillmentAvailable) &&
+        (kind !== "guaranteed_review" || Boolean(this.fulfillmentPlans)))
+    );
+  }
+  get reviewFulfillmentAvailable() {
+    return Boolean(this.fulfillmentPlans);
+  }
+  private requireFulfillmentPlans() {
+    if (!this.fulfillmentPlans)
+      throw new DomainError(
+        "fulfillment_plans_unconfigured",
+        "Original group and review fulfillment authority is unavailable.",
+        503,
+      );
+    return this.fulfillmentPlans;
+  }
+  createFulfillmentPlan(actor: Actor, creatorId: string, input: unknown) {
+    return this.requireFulfillmentPlans().create(actor, creatorId, input);
+  }
+  async reviewAttestationCommand(actor: Actor, packetId: string) {
+    const scope = await this.packetScope(actor, packetId);
+    invariant(
+      scope.authority === "creator",
+      "creator_required",
+      "Only the creator can attest review of this original request.",
+    );
+    return this.requireFulfillmentPlans().reviewQuote(
+      actor,
+      scope.creatorId,
+      packetId,
+    );
+  }
+  async attestReview(actor: Actor, packetId: string, input: unknown) {
+    const scope = await this.packetScope(actor, packetId);
+    invariant(
+      scope.authority === "creator",
+      "creator_required",
+      "Only the creator can attest review of this original request.",
+    );
+    return this.requireFulfillmentPlans().attestReview(
+      actor,
+      scope.creatorId,
+      packetId,
+      input,
     );
   }
   get creatorFinancialReadAvailable() {
@@ -695,7 +757,10 @@ export class CommerceService {
             );
           else if (increase)
             await client.query(
-              `UPDATE creator.commerce_spend_limit SET pending_amount=$3,pending_none=$4,effective_at=now()+interval '24 hours',reminders_on=$5,version=version+1 WHERE fan_id=$1 AND currency=$2`,
+              `UPDATE creator.commerce_spend_limit SET pending_amount=$3,pending_none=$4,
+               effective_at=CASE WHEN pending_none=$4 AND pending_amount IS NOT DISTINCT FROM $3::bigint
+                 AND effective_at>now() THEN effective_at ELSE now()+interval '24 hours' END,
+               reminders_on=$5,version=version+1 WHERE fan_id=$1 AND currency=$2`,
               [
                 fan.id,
                 body.currency,
@@ -1165,6 +1230,49 @@ export class CommerceService {
     return this.packet(actor, result.packetId);
   }
   async packet(actor: Actor, id: string) {
+    const before = await this.packetRecord(actor, id);
+    let callTransport: CallTransportStatus | null = null;
+    const c = before.commitment;
+    if (
+      !c ||
+      !["audio_call", "video_call"].includes(c.mode) ||
+      !["due", "in_progress"].includes(c.state)
+    )
+      return { ...before, callTransport };
+    callTransport = { state: "unavailable", authorKind: "system" };
+    if (this.callTransport) {
+      try {
+        const scope = await this.access.openThread(
+          actor,
+          before.packet.creator_id,
+          before.packet.fan_id,
+          false,
+        );
+        callTransport = await this.callTransport.forCommitment(scope, c.id);
+      } catch (error) {
+        // A denied/unavailable current family never opens call metadata. Keep
+        // the separately authorized retained financial receipt available.
+        if (
+          !(error instanceof DomainError) ||
+          ![403, 404, 503].includes(error.status)
+        )
+          throw error;
+      }
+    }
+    // The owner port uses its own held family transaction. Re-read original
+    // financial state afterward so an intervening resolution cannot carry a
+    // stale unresolved transport label into a completed/refunded receipt.
+    const current = await this.packetRecord(actor, id);
+    if (
+      current.packet.version !== before.packet.version ||
+      current.commitment?.id !== c.id ||
+      current.commitment?.version !== c.version ||
+      !["due", "in_progress"].includes(current.commitment?.state ?? "")
+    )
+      callTransport = null;
+    return { ...current, callTransport };
+  }
+  private async packetRecord(actor: Actor, id: string) {
     return this.account(actor, async (client) => {
       const p = (
         await client.query<PacketRow>(
@@ -1176,7 +1284,7 @@ export class CommerceService {
       const commitment =
         (
           await client.query(
-            "SELECT * FROM creator.commerce_commitment WHERE packet_id=$1",
+            "SELECT c.*,p.accepted_act_id AS accept_act_id FROM creator.commerce_commitment c JOIN creator.commerce_packet p ON p.id=c.packet_id AND p.creator_id=c.creator_id AND p.fan_id=c.fan_id WHERE p.id=$1",
             [id],
           )
         ).rows[0] ?? null;
@@ -2352,6 +2460,10 @@ export class CommerceService {
       }
     } catch (error) {
       await this.account(actor, async (client) => {
+        // Reconciliation takes packet before effect everywhere else. Keep that
+        // order on failure too, so a returning provider result cannot deadlock
+        // with this recovery transaction while each holds the other's row.
+        await this.lockPacket(client, effect.packet_id);
         const changed = await client.query(
           "UPDATE creator.commerce_effect SET state='unknown',error_code=$2,lease_until=NULL,next_at=now()+interval '30 seconds',updated_at=now() WHERE id=$1 AND attempt=$3 AND state='processing'",
           [
@@ -2719,12 +2831,32 @@ export class CommerceService {
       for (const p of rows)
         ids.push(await this.queueRelease(client, p, "expired"));
       const overdue = (
-        await client.query<{ packet_id: string }>(
-          "SELECT packet_id FROM creator.commerce_commitment WHERE state IN ('due','in_progress') AND due_at<=now() ORDER BY due_at LIMIT 50 FOR UPDATE SKIP LOCKED",
+        await client.query<PacketRow>(
+          `SELECT p.* FROM creator.commerce_packet p
+           JOIN creator.commerce_commitment c ON c.packet_id=p.id
+            AND c.creator_id=p.creator_id AND c.fan_id=p.fan_id
+           WHERE c.state IN ('due','in_progress') AND c.due_at<=now()
+           ORDER BY c.due_at,c.id LIMIT 50 FOR UPDATE OF p SKIP LOCKED`,
         )
       ).rows;
-      for (const row of overdue) {
-        const p = await this.lockPacket(client, row.packet_id);
+      for (const p of overdue) {
+        // Candidate metadata can change while waiting for its packet. Lock and
+        // recheck the commitment only after the packet, matching delivery and
+        // refund reconciliation; a concurrent completed delivery is skipped.
+        const current = await client.query<{ id: string }>(
+          `SELECT id FROM creator.commerce_commitment
+           WHERE packet_id=$1 AND creator_id=$2 AND fan_id=$3
+            AND state IN ('due','in_progress') AND due_at<=now() FOR UPDATE`,
+          [p.id, p.creator_id, p.fan_id],
+        );
+        if (!current.rowCount) continue;
+        invariant(
+          p.state === "accepted" &&
+            p.payment_state === "captured" &&
+            p.intent_ref,
+          "deadline_reconciliation_required",
+          "The overdue commitment needs confirmed captured payment reconciliation.",
+        );
         await client.query(
           "UPDATE creator.commerce_commitment SET state='refund_pending',outcome='deadline_missed',version=version+1 WHERE packet_id=$1",
           [p.id],

@@ -1,0 +1,58 @@
+[
+  {
+    "timestamp": "2026-10-02T15:19:17.866Z",
+    "level": "error",
+    "environment": "local-development",
+    "release": "8eee65eec96d619a28476f920329387e16db70bd",
+    "correlationId": "9006bc6d-a0ce-43a9-be75-a6f4b03e7c1b",
+    "method": "GET",
+    "route": "/:creatorId/studio",
+    "status": 503,
+    "transferOutcome": "finished",
+    "errorCode": "scope_denial_unconfigured",
+    "failureClass": null,
+    "durationMs": 58.13
+  },
+  {
+    "timestamp": "2026-10-02T15:19:21.762Z",
+    "level": "error",
+    "environment": "local-development",
+    "release": "8eee65eec96d619a28476f920329387e16db70bd",
+    "correlationId": "5f296550-57d2-4301-8225-62f76cf8bdfc",
+    "method": "GET",
+    "route": "/:creatorId/studio",
+    "status": 503,
+    "transferOutcome": "finished",
+    "errorCode": "scope_denial_unconfigured",
+    "failureClass": null,
+    "durationMs": 43.63
+  },
+  {
+    "timestamp": "2026-10-02T15:19:26.130Z",
+    "level": "error",
+    "environment": "local-development",
+    "release": "8eee65eec96d619a28476f920329387e16db70bd",
+    "correlationId": "21abec5e-c276-4fd9-ae52-58fb9ac59f96",
+    "method": "GET",
+    "route": "/:creatorId/studio",
+    "status": 503,
+    "transferOutcome": "finished",
+    "errorCode": "scope_denial_unconfigured",
+    "failureClass": null,
+    "durationMs": 44.61
+  },
+  {
+    "timestamp": "2026-10-02T15:19:29.919Z",
+    "level": "error",
+    "environment": "local-development",
+    "release": "8eee65eec96d619a28476f920329387e16db70bd",
+    "correlationId": "496b6024-5f15-4a99-b78a-40c120b843d8",
+    "method": "GET",
+    "route": "/:creatorId/studio",
+    "status": 503,
+    "transferOutcome": "finished",
+    "errorCode": "scope_denial_unconfigured",
+    "failureClass": null,
+    "durationMs": 61.46
+  }
+]

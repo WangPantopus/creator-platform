@@ -1,0 +1,200 @@
+{
+  "isolatedOnly": true,
+  "registered": false,
+  "actualRuntimeLogin": true,
+  "nullSelectors": true,
+  "explainWithoutAnalyze": true,
+  "sourceSha256": "cb91d5b2439783512141b2ea2c4f2664412ad28fe127f6674d6bd1d636819628",
+  "planCount": 28,
+  "plans": [
+    {
+      "line": 279,
+      "sqlSha256": "668b70c7f33a19671c6ed35c5817ced0cd64df281d69674fe4e942c9d4b9903e",
+      "parameters": 4,
+      "planned": true
+    },
+    {
+      "line": 347,
+      "sqlSha256": "0a340fc157867105e41fae6b0f0a2d06659b4e5be37ee7468d5369d0e3c790af",
+      "parameters": 0,
+      "planned": true
+    },
+    {
+      "line": 407,
+      "sqlSha256": "328ddd83fe34b90255013e5b2dcce3f6a5f16a808d46c3c22dd1c7800d13061b",
+      "parameters": 3,
+      "planned": true
+    },
+    {
+      "line": 428,
+      "sqlSha256": "7dc92b55863a3978f78e5fa7506fe403bc63c50c455f4aff163ab7d954e4723d",
+      "parameters": 2,
+      "planned": true
+    },
+    {
+      "line": 434,
+      "sqlSha256": "689f028e520f23f09000751de1b0f09a1ff13e458ae129bfc8c6712d76bea3d2",
+      "parameters": 0,
+      "planned": true
+    },
+    {
+      "line": 437,
+      "sqlSha256": "51945d3fa139964f91dc28b5c9373d375e4569d543e13d7aef6ebb0f3a26ffc0",
+      "parameters": 0,
+      "planned": true
+    },
+    {
+      "line": 468,
+      "sqlSha256": "f87667621992f60f4c18a755e7f8b18073660232e5528fb866532f783d1d12ba",
+      "parameters": 1,
+      "planned": true
+    },
+    {
+      "line": 503,
+      "sqlSha256": "6e6caf0c8c28b51b499f0216ee0a48b6da1b33f953a2755e021db87e77fdb845",
+      "parameters": 2,
+      "planned": true
+    },
+    {
+      "line": 507,
+      "sqlSha256": "eec885694c8dd0b29df469fb0ea25537489691e907361cd483623096634d8789",
+      "parameters": 2,
+      "planned": true
+    },
+    {
+      "line": 586,
+      "sqlSha256": "b8d423b68a243094d45f2bad77231989c613c0ad8a43ae79a400dc42bd2452e9",
+      "parameters": 2,
+      "planned": true
+    },
+    {
+      "line": 628,
+      "sqlSha256": "f55ea27334b5620d16dfc6709c60f044089ca3a884f044b385f2eb7c53d73034",
+      "parameters": 8,
+      "planned": true
+    },
+    {
+      "line": 848,
+      "sqlSha256": "7e7083be091af590b308d28062648284717f4149e7498a57bc5fb8b6dc7d0c39",
+      "parameters": 4,
+      "planned": true
+    },
+    {
+      "line": 863,
+      "sqlSha256": "62baa005f564d09976add30ce7456cd5f4917a0f3256d90e63296635fc0be85f",
+      "parameters": 2,
+      "planned": true
+    },
+    {
+      "line": 1026,
+      "sqlSha256": "6fc5bf672b0fea7bf2c7343576d0b668ea6164287694fd917377d3bd1b2428b3",
+      "parameters": 3,
+      "planned": true
+    },
+    {
+      "line": 1118,
+      "sqlSha256": "5b4c3c33a96b41bb5da314487427ea982054467436f162acf3bb13afc377bff9",
+      "parameters": 2,
+      "planned": true
+    },
+    {
+      "line": 1212,
+      "sqlSha256": "96189a619b9c9525b44231af5ede88057bba9c8ac05d27dee124ed01e40f464c",
+      "parameters": 3,
+      "planned": true
+    },
+    {
+      "line": 1230,
+      "sqlSha256": "5b4c3c33a96b41bb5da314487427ea982054467436f162acf3bb13afc377bff9",
+      "parameters": 2,
+      "planned": true
+    },
+    {
+      "line": 1423,
+      "sqlSha256": "116314a913da365d1a1058aa7d781e9fd3f8b8170b9e126391fc32036a9832a6",
+      "parameters": 6,
+      "planned": true
+    },
+    {
+      "line": 1504,
+      "sqlSha256": "c4883a37c5a9fcd87a1cb814578b51db7d14ccad8d630b266f9d5b4cf9bdd8f7",
+      "parameters": 4,
+      "planned": true
+    },
+    {
+      "line": 1560,
+      "sqlSha256": "c4306159bab7168900111ff4ed5fb78f668748a62ce55d93cca336f09e040d80",
+      "parameters": 3,
+      "planned": true
+    },
+    {
+      "line": 1569,
+      "sqlSha256": "344fb8fce4479cea0a332450bc9e1b9ce0c38d595d037f383e0a345423be1791",
+      "parameters": 9,
+      "planned": true
+    },
+    {
+      "line": 1600,
+      "sqlSha256": "b31e1dc3795b2289cc8596e9bb2bb3b61d67171ff57a3c9d8ce2dc07a347990d",
+      "parameters": 10,
+      "planned": true
+    },
+    {
+      "line": 1693,
+      "sqlSha256": "e1ce75284d1ceb775c070213e51a0198dbe7cddaf1b596fc2d2e65f9b4dee4eb",
+      "parameters": 1,
+      "planned": true
+    },
+    {
+      "line": 1704,
+      "sqlSha256": "f2a49b04bb6993f0a2a3242788cf69fb338c1f1a68c6cb3403077a95dc1689fc",
+      "parameters": 2,
+      "planned": true
+    },
+    {
+      "line": 1719,
+      "sqlSha256": "ef86ac5246d943cf36975a107701e179ee64cf9b8fcfcfdb5016f87b69ed56b8",
+      "parameters": 3,
+      "planned": true
+    },
+    {
+      "line": 1881,
+      "sqlSha256": "16539331e6dfaf4f7768e943b70f1f166f6eae9acc961db3a7083c3fb477e3a4",
+      "parameters": 6,
+      "planned": true
+    },
+    {
+      "line": 1912,
+      "sqlSha256": "85ea02e73684c9d3f7f1561efc02a3997203b648c5297d4112414bbe3b788a58",
+      "parameters": 2,
+      "planned": true
+    },
+    {
+      "line": 1955,
+      "sqlSha256": "4c1f43ab89349d66387b5ee75c391f16cdad72a3b5490f06a3f513a4ffa2fd26",
+      "parameters": 15,
+      "planned": true
+    }
+  ],
+  "counts": {
+    "canonicalMigrations": 57,
+    "packets": 0,
+    "financialRows": 0,
+    "plans": 0,
+    "members": 0,
+    "deliveries": 0,
+    "reviews": 0
+  },
+  "positiveLifecycleVerified": false,
+  "scope": "Current actual W4 owner SELECT shapes; NULL selectors, EXPLAIN without ANALYZE, isolated review only",
+  "sourceQualification": "Backend types and scoped lint/format pass; original0178/0199/0202 SQL unchanged",
+  "ports": [
+    "prepareDraftRead",
+    "prepareDraftReadBatch",
+    "prepareDraftReadBatchPositive",
+    "finalizeDraftReadBatch"
+  ],
+  "actualPositiveBatch": false,
+  "actualW5Consumer": "Pending integration of published W5 source/these new ports",
+  "noNewUnitTests": true
+}

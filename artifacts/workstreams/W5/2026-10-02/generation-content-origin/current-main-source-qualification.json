@@ -1,0 +1,14 @@
+{
+  "sourceCommit": "cd08500bfdb754766e9bafdc486e1d8b6ebb8c29",
+  "capturedMain": "b6c073aef97b2ea7c06847b4baa9914d9bce06b7",
+  "checkedAt": "2026-10-02T19:23:47.003143+00:00",
+  "checks": {
+    "backendTypecheck": "passed",
+    "webTypecheck": "passed",
+    "generateCheck": "passed: 101 API operations",
+    "scopedEslintPrettier": "passed",
+    "diffCheck": "passed"
+  },
+  "privacyFileByteIdenticalToCapturedMain": true,
+  "limits": "0198 export and 0186 origin purpose remain held; no activation or genuine publication, provider generation, signature, privacy receipt or current native UI acceptance. Creator verification is DEVELOPMENT-ONLY SEEDED."
+}

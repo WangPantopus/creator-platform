@@ -1,0 +1,70 @@
+{
+  "wave": "20261002",
+  "sourceCommit": "c7bbcbcd608e5312d381c4e05a618263b60871b7",
+  "privateBackupAndSeparateRestore": true,
+  "sourceLedgerRows": 40,
+  "upgradeLedgerRows": 57,
+  "freshLedgerRows": 57,
+  "originalRows": 22,
+  "originalTables": 145,
+  "oldLedgerPreserved": true,
+  "oldDataPreserved": true,
+  "oldRolesPreserved": true,
+  "sourceUntouched": true,
+  "exactWave": true,
+  "schemaMatches": true,
+  "securityMatches": true,
+  "originalSequencePreserved": true,
+  "originalSecuritySha256": "bbc6245018b18725b01bf5ae92e4f95c5278abe57e8d2946a7dcb27a0307a9c7",
+  "originalSequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+  "upgradeSecuritySha256": "249d35bb7ca07e943e270992768b96281ea14e0dd736fa71e04b21900b29f2f3",
+  "freshSecuritySha256": "249d35bb7ca07e943e270992768b96281ea14e0dd736fa71e04b21900b29f2f3",
+  "upgradeSchemaSha256": "fc7b456d1b7d45cf6b11d67e26b1e446feb86c01a19f8eacc53cbf2ec1649b97",
+  "freshSchemaSha256": "fc7b456d1b7d45cf6b11d67e26b1e446feb86c01a19f8eacc53cbf2ec1649b97",
+  "releaseReady": false,
+  "notVerified": [
+    "Activated application runtime/native/provider acceptance",
+    "Real verified creator/passkey, paid receipts, successful transactions",
+    "Canonical held accounting/source waves and C10 policy"
+  ],
+  "merge": "5ec5cb07a5f5185e4dd68732f2562f32aec753a7",
+  "reminderMerge": "b96e77ef50ac24b8676b2b83f6fcde48cfc7a6d4",
+  "appDatabase": "Original creator_w4 now57; no live-data restore; protected40 backup retained",
+  "sourceActivation": {
+    "exact57": true,
+    "originalLedgerPreserved": true,
+    "schemaMatchesRehearsal": true,
+    "securityMatchesRehearsal": true,
+    "originalDataPreserved": true,
+    "originalSequencePreserved": true,
+    "originalRolesPreserved": true,
+    "sourceLedgerRows": 57,
+    "originalRows": 22,
+    "originalTables": 145,
+    "sourceNoRestore": true,
+    "activationAppliedToOriginal": true,
+    "developmentAcceptanceOnly": true,
+    "releaseReady": false
+  },
+  "domainReconciliation": {
+    "ownedDevelopment": true,
+    "externalMoneyAndStoreRowsAbsent": true,
+    "privacyJobsAndTransportGenerationRowsAbsent": true,
+    "onlySpendPreferenceRowsRetained": 1,
+    "sourceNoRestore": true,
+    "privateOriginalBackupSeparatelyRestored": true,
+    "releaseReady": false
+  },
+  "personalWebAcceptance": {
+    "normalDevelopmentActorTwoSignIn": true,
+    "currentCap7USD": true,
+    "originalPendingNoneDeadlineRetained": true,
+    "remindersOff": true,
+    "financialTotalsZero": true,
+    "providerRestoreDisabled": true
+  },
+  "operatorCorrections": [
+    "Private helper cleanup ended an already-ended pool after successful closure; corrected and repeated",
+    "Initial full57 comparison refused independently applied new-row timestamps; corrected to exact57 versions/checksums plus all original40 complete ledger rows, matching official wave custody"
+  ]
+}

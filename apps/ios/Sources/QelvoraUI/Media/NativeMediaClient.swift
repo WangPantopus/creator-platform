@@ -29,6 +29,8 @@ public struct NativeCreatorUploadTicket: Decodable, Sendable {
 }
 public struct NativeMediaRequestError: Error, Sendable {
     public let status: Int
+    public let code: String?
+    public init(status: Int, code: String? = nil) { self.status = status; self.code = code }
 }
 
 /** Session tokens come from W1's secure account store; W6 never issues or persists identities. */
@@ -36,9 +38,10 @@ public struct NativeMediaClient: Sendable {
     public let baseURL: URL
     public let sessionToken: @Sendable () async throws -> String
     public init(baseURL: URL, sessionToken: @escaping @Sendable () async throws -> String) { self.baseURL = baseURL; self.sessionToken = sessionToken }
-    public func request(path: String, method: String = "GET", body: Data? = nil, contentType: String = "application/json", offset: Int? = nil, expectedAccountId: UUID? = nil) async throws -> Data {
+    public func request(path: String, method: String = "GET", body: Data? = nil, contentType: String = "application/json", offset: Int? = nil, expectedAccountId: UUID? = nil, timeoutSeconds: TimeInterval = 15) async throws -> Data {
         guard baseURL.scheme == "https" || (baseURL.scheme == "http" && ["localhost", "127.0.0.1"].contains(baseURL.host ?? "")), baseURL.user == nil, baseURL.password == nil, path.hasPrefix("/v1/w6/"), !path.contains(".."), let url = URL(string: path, relativeTo: baseURL), url.host == baseURL.host, url.scheme == baseURL.scheme, url.port == baseURL.port else { throw URLError(.badURL) }
-        var request = URLRequest(url: url); request.httpMethod = method; request.httpBody = body; request.timeoutInterval = 15
+        guard timeoutSeconds > 0 && timeoutSeconds <= 30 else { throw URLError(.badURL) }
+        var request = URLRequest(url: url); request.httpMethod = method; request.httpBody = body; request.timeoutInterval = timeoutSeconds
         request.setValue("Bearer \(try await sessionToken())", forHTTPHeaderField: "Authorization")
         request.setValue(contentType, forHTTPHeaderField: "Content-Type")
         if let offset { request.setValue(String(offset), forHTTPHeaderField: "Upload-Offset") }
@@ -47,7 +50,10 @@ public struct NativeMediaClient: Sendable {
         defer { session.invalidateAndCancel() }
         let (data, response) = try await session.data(for: request)
         guard let response = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
-        guard (200..<300).contains(response.statusCode) else { throw NativeMediaRequestError(status: response.statusCode) }
+        guard (200..<300).contains(response.statusCode) else {
+            struct Failure: Decodable { struct Detail: Decodable { let code: String? }; let error: Detail }
+            throw NativeMediaRequestError(status: response.statusCode, code: (try? JSONDecoder().decode(Failure.self, from: data))?.error.code)
+        }
         return data
     }
     public func uploadRecording(file: URL, creatorID: UUID, fanID: UUID, purpose: String, durationMilliseconds: Int, idempotencyKey: String, resume: NativeUploadTicket? = nil, ticketChanged: @Sendable (NativeUploadTicket) async -> Void, progress: @Sendable (Double) async -> Void, expectedAccountId: UUID? = nil) async throws -> NativeMediaAsset {

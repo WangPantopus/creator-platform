@@ -1,0 +1,54 @@
+{
+  "time": "2026-10-02T19:22:51.746181+00:00",
+  "host": "Yingpengs-Mac-Studio.local",
+  "source": "06520a02aa12cec370b3232eb80d17f0f274eeb2",
+  "baseMain": "12ea10a670ed601ffb21700f9d5360f3ebb1ee68",
+  "iosTree": "09d88dba634f6f5d99bf3087b838e558ae9531d5",
+  "device": "BC8E18B6-620A-4191-8B27-AAB264458081",
+  "viewportPoints": {
+    "width": 402,
+    "height": 874,
+    "scale": 3
+  },
+  "binarySha256": "416f81bc35adfacac01322d831826f605bdf006934ca87f6f6258c1ab99a2d87",
+  "build": "Shipping QelvoraApp Debug; xcodegen, xcodebuild and strict deep codesign verification passed; own heavy slot normally released",
+  "backend": "Actual same-source W2 launcher, real W8 Trust, non-owner canonical57, foundationReady true/generation unconfigured/readiness503",
+  "provider": "Designated key absent; no provider calls",
+  "actors": [
+    "canonical labeled Development actor one: fictional creator",
+    "canonical labeled Development actor two: separate synthetic fan"
+  ],
+  "operated": [
+    "Current signed app cold API outage retained session/recovery UI; own backend resumed and shell automatically returned",
+    "Old-session native export with actual LOCAL DEVELOPMENT entry refused fresh verification; no new job",
+    "Actual sign-out, Continue with Pantopus, Development actor one sign-in; saved web-created creator export readback",
+    "All8 saved domain states personally read in Light and Night: Trust complete, seven blocked, no download",
+    "Actual actor-one sign-out/actor-two sign-in: old creator job absent, proof reset, data actions disabled",
+    "Unpaid crisis help actual API-backed Light/Night; no regional resources configured; no continuous monitoring/response guarantee"
+  ],
+  "measurements": {
+    "scopeAXHeightBefore": 34.3333333333,
+    "proofAXHeightBefore": 34,
+    "scopeAXHeightAfter": 44,
+    "proofAXHeightAfter": 44,
+    "toolbarButtonHeights": 44,
+    "dataActionHeights": 48,
+    "p95": null
+  },
+  "creatorJobSha256": "79a486e1cc18cc8843609d307d779558b8dea8fbed323b312baad3b974955b49",
+  "retainedFailures": [
+    "Warm prior app waited for Retry but exposed retained-account offline banner; timeout retained, no cold recovery claim for that prior attempt",
+    "Initial source065 startup lacked RELEASE_REVISION and refused immutable revision; corrected with exact actual source SHA",
+    "One wait used Export or delete data rather than actual Export or delete my data and timed out",
+    "Default/scroll-visible targets reported empty point or moved before write; no write, reread and targeted actual scrollable section",
+    "AX keyboard return role was Key; Button guard refused; read actual action-backend Key then completed",
+    "You substring matched Your data StaticText; guard refused; navigated observed Home then unambiguous You instead"
+  ],
+  "resourceDisposition": "Only own app/API/companion normally stopped; BC8 shut down, original Light appearance restored; exact own token/dev/inode simulator lease released",
+  "limits": [
+    "No fresh native export accepted yet; creator request originated on personally operated web",
+    "List separation/state reset is not a direct foreign job-detail attack",
+    "No full screen-reader, exact200% text or populated artboard acceptance",
+    "No61 migration/app acceptance, genuine all-eight export, download/purge, provider, cited fan or release claim"
+  ]
+}

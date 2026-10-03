@@ -1,0 +1,34 @@
+{
+  "isolatedOnly": true,
+  "noLoginPurpose": true,
+  "explainOnly": true,
+  "nullSelectors": true,
+  "checks": [
+    {
+      "name": "originalReservation",
+      "planned": true
+    },
+    {
+      "name": "originalAdmission",
+      "planned": true
+    },
+    {
+      "name": "originalReceipt",
+      "planned": true
+    },
+    {
+      "name": "membershipLock",
+      "planned": true
+    },
+    {
+      "name": "originalPassLock",
+      "planned": true
+    },
+    {
+      "name": "originalGrantLock",
+      "planned": true
+    }
+  ],
+  "businessRowsCreated": 0,
+  "positiveLifecycleVerified": false
+}

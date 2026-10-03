@@ -1,0 +1,30 @@
+{
+  "recordedAt": "2026-10-02T07:43:07.380543+00:00",
+  "migration": "0080_w4_fan_request_page_index",
+  "sqlSha256": "4af3abb0065e69565a45da5309e0963774bb17dbebadeed70de6236ad23c436e",
+  "state": "Implemented unregistered/unapplied/unmounted proposal; no positive Home acceptance",
+  "validation": [
+    "Metadata-only index DDL and directory/current-family SQL plans succeeded under creator_runtime on owned clone inside rollback",
+    "Index definition empirically validated: fan_id,updated_at,id with indoption0,3,3; final readiness corrected to catalog output",
+    "Backend typecheck and changed-file lint pass before narrow readiness/allocation correction"
+  ],
+  "behavior": [
+    "At most51 directory pointers/50 emitted requests, keyset updated_at,id using six fractional timestamp digits",
+    "Actual account current denial on directory transaction, genuine fan thread scope and current verification on each family read",
+    "Only System status metadata; no disclosure, text, amount or provider/payment reference selected",
+    "Per-emitted-entry cursor and page cursor for W7 composite merge; changed activity pointers skipped until fresh visit",
+    "Actual destination commerce/status?packetId with W7 narrow C09 route review"
+  ],
+  "required": [
+    "W8 canonical0080 activation and held account producer",
+    "W7 composite Home wrapper/C09 route support",
+    "Real populated request and concurrent activity/deletion/denial/pagination acceptance"
+  ],
+  "notManufactured": [
+    "Creators",
+    "Receipts",
+    "Consent",
+    "Paid requests",
+    "Successful transactions"
+  ]
+}

@@ -8,6 +8,14 @@ import * as UI from "@qelvora/ui-web";
 import { brand } from "@qelvora/brand";
 import { copy, formatCopy } from "@qelvora/copy";
 
+// The supplied design explicitly shows reminders on. Keep that fixture state
+// separate from product callers, whose missing state must remain unknown.
+const referenceUI = {
+  ...UI,
+  SpendLimit: (props: React.ComponentProps<typeof UI.SpendLimit>) =>
+    React.createElement(UI.SpendLimit, { ...props, remindersOn: true }),
+};
+
 type Node = DefaultTreeAdapterMap["node"];
 type Element = DefaultTreeAdapterMap["element"];
 type Values = Record<string, unknown>;
@@ -236,7 +244,9 @@ function renderNode(
   }
   if (node.tagName === "x-import") {
     const name = attrs["component-from-global-scope"]?.split(".").pop() ?? "";
-    const component = (UI as unknown as Record<string, Component>)[name];
+    const component = (referenceUI as unknown as Record<string, Component>)[
+      name
+    ];
     if (!component) throw new Error(`Unknown design component ${name}`);
     if (options.foundation && (name === "Button" || name === "StepIn")) {
       const text = renderKids().join("");
@@ -270,7 +280,7 @@ function initialValues(source: string, options: RenderOptions): Values {
     .replace("</script>", "");
   if (!script) return {};
   const context = vm.createContext({
-    window: { React, Qelvora: UI },
+    window: { React, Qelvora: referenceUI },
     DCLogic: class {
       state: Values = options.values ?? {};
       setState() {}
@@ -327,7 +337,7 @@ export function renderComponent(name: string): React.ReactNode {
   let rendered: React.ReactNode = null;
   const context = vm.createContext({
     React,
-    window: { Qelvora: UI },
+    window: { Qelvora: referenceUI },
     document: { getElementById: () => ({}) },
     ReactDOM: {
       createRoot: () => ({

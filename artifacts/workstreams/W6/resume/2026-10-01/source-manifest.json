@@ -1,0 +1,14 @@
+{
+  "sourceCommit": "3867b74ff3d80d041dd0552ae5c33422a17c09ea",
+  "canonicalBase": "2f0319dbb6979878c5a9019e68503506902f9ea0",
+  "files": {
+    "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeCallConnectionService.kt": "b032a0b98c97a27bc82babd761e6416011859198ffa388ce8de1ef404d82f920",
+    "apps/backend/src/modules/media/lifecycle.ts": "c1621a6bdddc70e2996d167538bae7172c87056fe379db40215d3a14538774bf",
+    "apps/backend/src/modules/session/service.ts": "9d74a58abaf0eef17190a8c49334efafab1c449a15d2e3bfc6f29094f60dad0c",
+    "apps/backend/src/modules/session/worker.ts": "9d64ae335f7e1de3810d89a79dadaf6b958728a202a23b7f91e2328c389e5ffc",
+    "apps/ios/Sources/QelvoraUI/Media/NativeCallCoordinator.swift": "21b583448d46411220a72a88c601910fc20e6e067a45d6103ed959fc392a878a",
+    "apps/ios/Tests/QelvoraUITests/NativeSnapshotTests.swift": "ab7b7cf83551f9a2b3d3b5a40e1ef0ebb5b79d0dd84da1d26200b273da0bc161",
+    "apps/web/features/media/api.ts": "dcc1654fd06109fc663719393cb725b9df58585b85972ef1e5d41ae5c4480bdb",
+    "playwright.config.ts": "b0ac26ee4c3bf3ef83cc489269b16a4aaecd4d6e3fb183115765370ca3e20aea"
+  }
+}

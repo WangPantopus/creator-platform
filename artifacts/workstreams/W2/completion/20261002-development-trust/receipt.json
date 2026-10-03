@@ -1,0 +1,133 @@
+{
+  "time": "2026-10-02T18:41:59.899636+00:00",
+  "host": "Yingpengs-Mac-Studio.local",
+  "source": "8d5a683eb734937eb6e8a01680d94299e3f3f327",
+  "launcherSha256": "9e637180963349f52e0d201ecd41703f4247c3aa759d24dfc1f18c09c5011abf",
+  "ports": {
+    "api": 4102,
+    "web": 3002,
+    "database": 55442
+  },
+  "database": "creator_w2",
+  "canonicalLedger": 57,
+  "actualRoles": {
+    "core": "creator_runtime",
+    "trustRequest": "creator_trust_runtime",
+    "trustWorker": "creator_trust_worker",
+    "eachTrustRoleLogin": true,
+    "unsafeAttributes": false,
+    "reachableMemberships": 0,
+    "ownedRelationsFunctionsSchemas": 0,
+    "grantsChanged": false,
+    "coreCredentialChanged": false,
+    "privateConfigurationMode": "0600"
+  },
+  "composition": {
+    "factory": "createDevelopmentTrust",
+    "sameAgentInstance": true,
+    "actualHeldRestorationCallback": true,
+    "restorationDatabaseBoundToValidatedW2Endpoint": true,
+    "webProxy": "explicit W8_API_URL + W8_LOCAL_DEVELOPMENT loopback"
+  },
+  "checks": {
+    "backendTypes": "PASS",
+    "scopedESLint": "PASS",
+    "format": "PASS",
+    "existingContracts": {
+      "count": 9,
+      "milliseconds": 1418,
+      "result": "PASS"
+    }
+  },
+  "personallyOperated": [
+    "Reload populated Maya Studio:20fixed examples,development disclosure,model actions disabled",
+    "Old canonical session export rejected: fresh_verification_required, no job",
+    "Actual canonical actor-one picker sign-in, LOCAL DEVELOPMENT synthetic confirmation, Request export",
+    "Check progress readback matches independent PostgreSQL eight-task outcome",
+    "Actual public crisis endpoint and visible Light/Night390 help page, empty regional resources and no paid routing"
+  ],
+  "webObservations": [
+    {
+      "surface": "privacy",
+      "theme": "light",
+      "viewport": [
+        1280,
+        900
+      ],
+      "screenshot": "creator-export-blocked-light-full.png",
+      "fullPage": true
+    },
+    {
+      "surface": "privacy",
+      "theme": "light",
+      "viewport": [
+        390,
+        1300
+      ],
+      "horizontalOverflow": false,
+      "screenshot": "creator-export-blocked-light-390-full.png",
+      "fullPage": true
+    },
+    {
+      "surface": "crisis",
+      "theme": "light",
+      "viewport": [
+        390,
+        1300
+      ],
+      "screenshot": "crisis-help-light-390.png"
+    },
+    {
+      "surface": "crisis",
+      "theme": "night",
+      "viewport": [
+        390,
+        1300
+      ],
+      "horizontalOverflow": false,
+      "screenshot": "crisis-help-night-390.png"
+    }
+  ],
+  "persisted": {
+    "actorAccount": "10000000-0000-4000-8000-000000000001",
+    "creatorId": "97152450-4093-4b15-9148-b12c16053956",
+    "jobSha256": "79a486e1cc18cc8843609d307d779558b8dea8fbed323b312baad3b974955b49",
+    "kind": "export",
+    "scope": "account",
+    "ownedCreatorCount": 1,
+    "state": "blocked",
+    "trust": "complete",
+    "agent": "privacy_commit_fence_unavailable",
+    "identity": "privacy_commit_fence_unavailable",
+    "media": "privacy_commit_fence_unavailable",
+    "conversation": "conversation_lineage_unavailable",
+    "commerce": "domain_hook_unavailable",
+    "content": "domain_hook_unavailable",
+    "growth": "domain_hook_unavailable",
+    "taskCount": 8,
+    "eachAttempts": 1,
+    "downloadLinks": 0,
+    "usage": 0,
+    "evaluations": 0,
+    "versions": 0
+  },
+  "failuresPreserved": [
+    "Initial actual startup local_restoration_unconfigured because factory used ambient DATABASE_URL; corrected explicit actual W2 environment binding",
+    "Initial web503trust_unconfigured because W8 proxy URL absent; corrected explicit same-owned-host configuration",
+    "Old session failed fresh verification before creating a job",
+    "Read-only diagnostic guessed privacy_ownership_scope relation and refused42P01; corrected to actual privacy_job ownership metadata, no zero-scope assertion"
+  ],
+  "backup": {
+    "bytes": 717264,
+    "sha256": "662dec68eaf682e99329932ad2fb7f562cfa963adcb4fa4a2fc76e53ca2a63c1",
+    "custody": "live/before/isolatedrestore/after matches ledger/schema/business/security/roles/membership/sequences",
+    "businessRows": 56
+  },
+  "prerequisites": {
+    "designatedOpenAIKeyExists": false,
+    "originalArchiveExists": false,
+    "checkedAt": "2026-10-02T18:39:45Z"
+  },
+  "resources": "Own API/web quiesced normally for backup; no W2 native device/lease held; browser viewport reset. No peer resource changed.",
+  "limits": "Request saved and one actual Trust domain acknowledgement; not coherent Agent export, download, erasure, all-eight C10, provider consent/licensing, fan generation, translation job, native Trust journey, artboard or p95/release acceptance."
+}

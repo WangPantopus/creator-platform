@@ -1,0 +1,104 @@
+{
+  "recordedAt": "2026-10-02T09:57:24.300723+00:00",
+  "clientSource": "08872cea",
+  "androidBuildSource": "c7b07442",
+  "iosDriverSource": "1a9b3231",
+  "outageBackendSource": "472bd24597867fc4c4fd2ee84e01b16be165c22f",
+  "database": "creator_w6_wave_fresh_20261002",
+  "registryCandidateSource": "064fa55e4eaadd6b76c189e41e24fb041b30a3de",
+  "registryEntries": 57,
+  "activationOwner": "W8 PR95; not main activation acceptance",
+  "availabilityAfterAndroidSave": [
+    {
+      "creator_id": "60000000-0000-4000-8000-000000000001",
+      "creator_account_id": "10000000-0000-4000-8000-000000000001",
+      "version": 4,
+      "time_zone": "America/Los_Angeles",
+      "windows": [
+        {
+          "endsAt": "2026-11-01T08:45:00.000Z",
+          "startsAt": "2026-11-01T08:30:00.000Z"
+        },
+        {
+          "endsAt": "2026-11-01T10:15:00.000Z",
+          "startsAt": "2026-11-01T09:30:00.000Z"
+        }
+      ],
+      "updated_at": "2026-10-02T09:49:57.777216+00:00"
+    }
+  ],
+  "binarySha256": {
+    "androidShippingApk": "4e82e490e276d0f201303ee7f25f5b1512a325178f3fe650a07d83f6b68d129a",
+    "iosShippingAppExecutable": "e1a0aa68398eab11a1c704d7f3fdd35a308203bf15617832279eb6491433bd7a"
+  },
+  "actualJourneys": {
+    "iosAvailability": {
+      "result": "passed",
+      "seconds": 81.474,
+      "databaseVersion": 3,
+      "fanDenial": true,
+      "actualCreatorSignIn": true,
+      "minuteOffsetAliasSave": true,
+      "coldReturn": true,
+      "restoredFan": true
+    },
+    "iosOutage": {
+      "result": "passed",
+      "seconds": 15.112,
+      "mode": "Night",
+      "textSize": "accessibility-extra-large; exact200percent not claimed",
+      "serverActuallyStopped": true,
+      "retainedKeychain": true,
+      "continueAbsent": true,
+      "externalRestartAfterRetryMarker": true,
+      "sameFanAccountReturnedWithoutSignIn": true
+    },
+    "android": {
+      "result": "personally operated via adb",
+      "normalShippingBuildAndInstall": true,
+      "fanDenial": true,
+      "actualCreatorSignIn": true,
+      "minuteOffsetAliasSave": true,
+      "databaseVersion": 4,
+      "coldReturn": true,
+      "serverActuallyStoppedForEarlierOutage": true,
+      "retainedKeystore": true,
+      "sameFanAccountReturnedAutomaticallyWithoutSignIn": true,
+      "finalFanSignIn": true
+    }
+  },
+  "failedAttempts": [
+    "iOS initial cold return crashed on missing canonical copy key; repaired and repeated",
+    "iOS authority polling disabled a focused field; repaired and repeated",
+    "iOS repeat2 saved version2 but driver account precondition and keyboard dismissal failed; repeated from actual sign-out",
+    "iOS first outage restart arrived after driver deadline; external controlled repeat passed",
+    "Android adb Ctrl+A did not select the Starts value and KEYCODE_ENTER inserted newline; actual Select all context menu and visible IME Done corrected draft before any save",
+    "Android cold-return attempt used a nonexistent creator ID; actual real creator-family deep link repeated successfully"
+  ],
+  "openAcceptance": [
+    "large-text iOS shared TabBar wraps labels; W1 owns repair",
+    "full200percent navigation and VoiceOver/TalkBack not accepted",
+    "paid booking, provider transport, human voice publication/fan playback, physical hardware remain unavailable"
+  ],
+  "resources": {
+    "iosSimulator": "shut down; exact own slot1 released",
+    "androidEmulator": "5582 shut down; exact own token/inode slot2 released",
+    "heavyBuild": "none owned"
+  },
+  "screenshots": {
+    "W6-availability-fan-denied.png": "e9147ff67260b58101fd5e3a86c4d567f3f2c530b8648220c919074b1a5ddb09",
+    "W6-availability-owner-cold-return.png": "fcc4590fb2095ba6db7e8b7b8a0e0cc33b1632799abed31aef64fafbcdbe672b",
+    "W6-availability-owner-dst-windows.png": "fcc4590fb2095ba6db7e8b7b8a0e0cc33b1632799abed31aef64fafbcdbe672b",
+    "W6-availability-owner-minute-offset-alias.png": "0af62037f323140551afbd26ac3737d4aa1b56b804053220656a26dfa36de8b5",
+    "W6-availability-owner-save.png": "9cef091cfeab01934b0d19a91cb4d1a6d67a20b909ae26f124afa7d6cb8abe74",
+    "W6-ios-real-automatic-same-account-recovery.png": "682a5b0c3845a4c7cf860c6048524c1f419b24b4e799a52a7a498f61f99b7144",
+    "W6-ios-real-cold-outage-retained.png": "cbff937db7326f76410b2312366f5d0c84d81a1951f3d999a46ee14155a60219",
+    "android-automatic-same-account-recovery.png": "d8e95156a41af500f862d3917ff14a3cb0ec2d96510bd853eb27fd8f8f9785ba",
+    "android-availability-saved.png": "a1c5891c068501f329ff5faff38abc4c9f40bff2b7de587d9bb27aa189431080",
+    "android-canonical57-fan-denied.png": "d0b5f1b441a0d8afbbadc5158a65ad2453f14cd214bed49d28938c589da47d94",
+    "android-cold-outage-retained.png": "a1e40395aedc9fc607d90e283e6d39200b809bb1f1145f6fed89acd3fa2405a6",
+    "android-final-fan-account.png": "8581018f271712a40d65310c6d088df1867178baafdf410b9a7e75f28d2f9daf",
+    "android-minute-offset-alias.png": "f4845b5552daa76f0fe32a199f452977f70e53a675bb2a2c8a73a8c7e19fc438",
+    "android-owner-cold-return.png": "37005ae69f5a50b3cd58614bdb94fa1ceabaa2d21f80d4092afc68cf29ce838f"
+  }
+}

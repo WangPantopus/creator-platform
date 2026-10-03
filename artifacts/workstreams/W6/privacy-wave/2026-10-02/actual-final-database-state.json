@@ -1,0 +1,32 @@
+{
+  "at": "2026-10-02T16:40:24.840Z",
+  "readOnlyAdministrativeInspection": true,
+  "source": "73ab8bdd",
+  "compiledCandidateSource": "e92d141da59501a4c3f98c4577608a64651fa6ff",
+  "registryProducer": "fb1cbcaab7926e96a361bfd7840ecf192efafefd",
+  "state": {
+    "database": "creator_w6_privacy_app_20261002",
+    "migrations": 61,
+    "calls": 0,
+    "admissions": 0,
+    "media": 0,
+    "creator_media": 0,
+    "call_effects": 0,
+    "call_events": 0,
+    "interactive_denial": "creator_trust.interactive_denial(text,uuid,uuid)",
+    "account_call_metadata": null,
+    "runtime_memberships": 0
+  },
+  "threads": [
+    {
+      "id": "60000000-0000-4000-8000-000000000004",
+      "control": "human_active",
+      "control_epoch": 0
+    }
+  ],
+  "preservedUpgrade": {
+    "datname": "creator_w6_privacy_upgrade_20261002",
+    "datconnlimit": 0,
+    "note": "creator-platform:restored-traffic-closed"
+  }
+}

@@ -15,7 +15,12 @@
   position: sticky;
   top: 0;
   height: 100dvh;
+  min-height: 0;
+  overflow-y: auto;
   box-sizing: border-box;
+}
+.w2-sidebar .qv-side__item {
+  min-height: 44px;
 }
 .w2-main {
   padding: 36px 48px;
@@ -567,6 +572,24 @@ details[open] > summary:before {
   }
   .w2-dialog .w2-actions button {
     flex: 1;
+  }
+}
+@media (max-width: 260px) {
+  .w2-phone-nav {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(44px, 1fr));
+  }
+  .w2-main {
+    padding-bottom: calc(152px + env(safe-area-inset-bottom));
+  }
+  .w2-confirmation {
+    bottom: calc(132px + env(safe-area-inset-bottom));
+  }
+  html:has(.w2-studio) {
+    scroll-padding-block: 16px calc(132px + env(safe-area-inset-bottom));
+  }
+  .w2-main :is(input, textarea, select, button, a, summary) {
+    scroll-margin-block: 16px calc(132px + env(safe-area-inset-bottom));
   }
 }
 @media (prefers-reduced-motion: reduce) {

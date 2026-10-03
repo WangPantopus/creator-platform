@@ -1,0 +1,16 @@
+{
+  "database": "creator_w8_privacy61_app_restore_20261002",
+  "closed": true,
+  "ledgerRows": 61,
+  "ledgerSha256": "3322e9d5af7b224db88a8255c9b253e9036f2d93727b76822522aca8a40e3012",
+  "schemaSha256": "255db3760c978651763bdd3a528c6bb689f09885493b653da534ab6a00f00d3f",
+  "dataSha256": "f5d03a668693bac25072a386ccccd86d139aaabc179404b1a5344be2d547a398",
+  "dataRows": 153,
+  "dataTables": 163,
+  "rolesSha256": "4eb281738f6a8f102701908867a75f5024b8ef4bc89c5e0b85a5f76c79a0ceeb",
+  "roleCount": 39,
+  "securitySha256": "8508124da2aa8870e5434c532623b2428c550b25c3809c51cb5d4916fbce7015",
+  "securityRecords": 14792,
+  "sequenceSha256": "402815c51ebb61c28cf3f046c63bbd4e653135afa32ab09858cb6002befeaecb",
+  "sequences": 1
+}
