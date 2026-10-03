@@ -58,6 +58,7 @@ export function FanContent({
   const [text, setText] = useState(""),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
+    [checking, setChecking] = useState(false),
     [muted, setMuted] = useState(false);
   const [replyPolicy, setReplyPolicy] = useState<NoteReplyPolicy | null>(null);
   const [thanks, setThanks] = useState<Thanks | null>(null),
@@ -70,8 +71,9 @@ export function FanContent({
     reading = useRef(false),
     checkedAt = useRef(0),
     busyRef = useRef(false),
-    depth = useRef(1);
+    replyCursors = useRef<(string | null)[]>([null]);
   const resetInputs = useCallback(() => {
+    replyCursors.current = [null];
     setReplyPolicy(null);
     setText("");
     setThanksText("");
@@ -81,8 +83,9 @@ export function FanContent({
   }, []);
   const observedViewer = useRef<string | null>(null);
   const load = useCallback(async () => {
-    if (reading.current) return;
+    if (reading.current || document.hidden) return;
     reading.current = true;
+    setChecking(true);
     try {
       const cycleStartedAt = Date.now();
       const generation = ++loading.current;
@@ -111,6 +114,11 @@ export function FanContent({
         return;
       }
 
+      const replyCursor =
+        observedViewer.current === before.accountId
+          ? replyCursors.current.at(-1)
+          : null;
+
       const results = await Promise.allSettled([
         studioRequest<ContentView>(
           "content",
@@ -124,25 +132,12 @@ export function FanContent({
           undefined,
           before.accountId,
         ),
-        (async () => {
-          let page: ReplyPage = await studioRequest(
-            "content",
-            `${creatorId}/replies`,
-            undefined,
-            before.accountId,
-          );
-          const items = [...page.items];
-          for (let n = 1; n < depth.current && page.nextCursor; n++) {
-            page = await studioRequest(
-              "content",
-              `${creatorId}/replies?cursor=${page.nextCursor}`,
-              undefined,
-              before.accountId,
-            );
-            items.push(...page.items);
-          }
-          return { ...page, items };
-        })(),
+        studioRequest<ReplyPage>(
+          "content",
+          `${creatorId}/replies?${new URLSearchParams({ contentId, ...(replyCursor ? { cursor: replyCursor } : {}) })}`,
+          undefined,
+          before.accountId,
+        ),
         Promise.resolve(before),
         (async () =>
           NoteReplyPolicySchema.parse(
@@ -222,7 +217,7 @@ export function FanContent({
       }
       if (observedViewer.current !== before.accountId) {
         resetInputs();
-        depth.current = 1;
+        replyCursors.current = [null];
         observedViewer.current = before.accountId;
       }
       setViewer(before.accountId);
@@ -254,17 +249,32 @@ export function FanContent({
       const failure = results.find((r) => r.status === "rejected");
       setError(failure?.status === "rejected" ? failure.reason.message : "");
       checkedAt.current = cycleStartedAt;
-      setCurrent(Date.now() - cycleStartedAt < 5000);
+      setCurrent(!document.hidden && Date.now() - cycleStartedAt < 5000);
     } finally {
       reading.current = false;
+      setChecking(false);
     }
   }, [creatorId, contentId, resetInputs]);
   useEffect(() => {
+    replyCursors.current = [null];
+    observedViewer.current = null;
+    setCurrent(false);
+    setContent(null);
+    setReplies([]);
+    setCursor(null);
+    resetInputs();
     void load();
     const refresh = () => {
-      if (!busyRef.current) void load();
+      if (!busyRef.current && !document.hidden) void load();
+    };
+    const visibility = () => {
+      if (document.hidden) {
+        ++loading.current;
+        setCurrent(false);
+      } else refresh();
     };
     window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", visibility);
     const timer = setInterval(refresh, 4000);
     const expiry = setInterval(() => {
       if (Date.now() - checkedAt.current >= 5000) setCurrent(false);
@@ -274,8 +284,9 @@ export function FanContent({
       clearInterval(timer);
       clearInterval(expiry);
       window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", visibility);
     };
-  }, [load]);
+  }, [load, resetInputs]);
   const act = async (operation: () => Promise<unknown>) => {
     if (busyRef.current) return;
     busyRef.current = true;
@@ -344,8 +355,12 @@ export function FanContent({
   return (
     <main className="w5-fan" aria-busy={busy}>
       <nav>
-        <Link href="/home">Home</Link>
-        <Link href="/you">Your account</Link>
+        <Link className="qv-btn qv-btn--quiet" href="/home">
+          Home
+        </Link>
+        <Link className="qv-btn qv-btn--quiet" href="/you">
+          Your account
+        </Link>
       </nav>
       {error && (
         <Notice tone="error" title="Content status">
@@ -365,6 +380,7 @@ export function FanContent({
       )}
       {!current && signInRequired && (
         <Link
+          className="qv-btn qv-btn--quiet"
           href={`/auth/continue?returnTo=${encodeURIComponent(`/content/${creatorId}/${contentId}`)}`}
         >
           Continue with Pantopus
@@ -401,7 +417,12 @@ export function FanContent({
                   member={content.teamMember ?? undefined}
                 />
                 {content.signedActId && (
-                  <Link href={`/verify/${content.signedActId}`}>Signed</Link>
+                  <Link
+                    className="qv-btn qv-btn--quiet"
+                    href={`/verify/${content.signedActId}`}
+                  >
+                    Signed
+                  </Link>
                 )}
                 <h1>
                   {content.document.title || "From " + content.creatorName}
@@ -598,17 +619,39 @@ export function FanContent({
             ))}
           </section>
         )}
-        {cursor && (
-          <button
-            disabled={busy || depth.current >= 5}
-            onClick={() =>
-              void act(async () => {
-                depth.current++;
-              })
-            }
-          >
-            Older private replies
-          </button>
+        {(replyCursors.current.length > 1 || cursor) && (
+          <nav className="w5-actions" aria-label="Your private reply pages">
+            {replyCursors.current.length > 1 && (
+              <button
+                disabled={busy || checking}
+                onClick={() =>
+                  void act(async () => {
+                    setCurrent(false);
+                    setReplies([]);
+                    setCursor(null);
+                    replyCursors.current.pop();
+                  })
+                }
+              >
+                Newer private replies
+              </button>
+            )}
+            {cursor && (
+              <button
+                disabled={busy || checking}
+                onClick={() =>
+                  void act(async () => {
+                    setCurrent(false);
+                    setReplies([]);
+                    setCursor(null);
+                    replyCursors.current.push(cursor);
+                  })
+                }
+              >
+                Older private replies
+              </button>
+            )}
+          </nav>
         )}
         <button
           disabled={busy}
