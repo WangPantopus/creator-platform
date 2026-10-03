@@ -9,8 +9,8 @@ function control(
   text: string,
 ): QueryConfig & { query_timeout: number } {
   // pg uses the query override before its actual connection read budget.
-  // Preserve a shorter positive original budget, including pg's numeric
-  // environment representation, rather than extending it to this ceiling.
+  // Preserve a shorter positive original budget, including a numeric string
+  // in the connection configuration, rather than extending it to this ceiling.
   const original = (
       client as PoolClient & {
         connectionParameters?: { query_timeout?: unknown };
@@ -126,7 +126,15 @@ export class ContentHeldClient {
     try {
       if (this.transaction && !this.discard) {
         try {
-          await this.client.query(control(this.client, "ROLLBACK"));
+          const result = await this.client.query(
+            control(this.client, "ROLLBACK"),
+          );
+          if (result.command !== "ROLLBACK")
+            throw new DomainError(
+              "content_privacy_rollback_unavailable",
+              "The actual Content rollback receipt is required.",
+              503,
+            );
           this.transaction = false;
         } catch (error) {
           this.discard = true;
