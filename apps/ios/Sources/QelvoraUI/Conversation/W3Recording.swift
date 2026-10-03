@@ -34,9 +34,9 @@ private actor W3RecordingClient {
   let baseURL: URL
   let accountId: String
   let family: String
-  private let credentials = SecureSessionStorage()
+  private let credentials: SecureSessionStorage
   init(baseURL: URL, accountId: String, creatorId: String, fanId: String) {
-    self.baseURL = baseURL
+    self.baseURL = baseURL; credentials = SecureSessionStorage(issuer: baseURL)
     self.accountId = accountId
     family = "/v1/w6/threads/\(creatorId)/\(fanId)/media"
   }

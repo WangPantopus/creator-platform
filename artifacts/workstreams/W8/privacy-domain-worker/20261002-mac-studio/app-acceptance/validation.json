@@ -1,0 +1,32 @@
+{
+  "backendRevision": "48d69e364ca572ab0b4ae772d3839ea5df9bf61e",
+  "syntheticOnly": true,
+  "originalRecovery": false,
+  "fullC10": false,
+  "newUnitTests": false,
+  "iosBinarySha256": "31f993e84dd9f966269abadb04cb7c04a338c6eff5b031e384c915ed8dbdc845",
+  "androidApkSha256": "127db9a73c856d20c0064372c47bf5a22efbe09f3681482a1593b0ec40a1bbbe",
+  "nativeTrustSourcesIdenticalTo616698f3": true,
+  "servicesStoppedNormally": true,
+  "ownDevicesStopped": true,
+  "ownSlotsReleasedByExactCustody": true,
+  "generatedNextEnvRestored": true,
+  "screenReaderAcceptance": false,
+  "failuresPreserved": [
+    {
+      "operation": "Android Night selected job",
+      "observed": "Job detail was below the job list; initial operator waited without scrolling.",
+      "correction": "Scroll the real selected detail; both actual appearances subsequently agree."
+    },
+    {
+      "operation": "Final administrator readback",
+      "observed": "jsonb_array_length refused uuid[] (42883).",
+      "correction": "Use cardinality on the actual immutable ownership array; rerun passed."
+    },
+    {
+      "operation": "Synthetic proof evidence",
+      "observed": "Identity proof read omits postUrl; original case says Not submitted.",
+      "correction": "Exact focused correction requested from W1; preserved separately, not privacy acceptance."
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+Verified Swift/Kotlin API models and 96 operations from OpenAPI.
+ Tasks:    7 successful, 7 total
+@qelvora/backend:test:  Test Files  2 passed (2)
+@qelvora/backend:test:       Tests  18 passed (18)
+@qelvora/backend:test:    Duration  270.41s (transform 705ms, setup 0ms, collect 2.31s, tests 267.14s, environment 0ms, prepare 276ms)
+ Tasks:    6 successful, 6 total
+ Tasks:    6 successful, 6 total

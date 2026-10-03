@@ -1,53 +1,73 @@
 import { spawn } from "node:child_process";
-import { createHash } from "node:crypto";
-import { readFile, stat } from "node:fs/promises";
+import { constants } from "node:fs";
+import { open } from "node:fs/promises";
+import { createConnection } from "node:net";
+import { once } from "node:events";
 import path from "node:path";
 import { withDeadline } from "./deadline.js";
+import { MEDIA_FILE_CEILING, readMediaFile } from "./files.js";
 import { z } from "zod";
 
 export interface MalwareScanner {
   scan(file: string): Promise<"clean" | "infected">;
 }
-function processFile(
+export function processFile(
   command: string,
   args: string[],
   limitBytes: number,
   timeoutMs = 60_000,
+  options: { signal?: AbortSignal; env?: NodeJS.ProcessEnv; cwd?: string } = {},
 ): Promise<Buffer> {
   return new Promise((resolve, reject) => {
+    if (options.signal?.aborted) {
+      reject(new Error("media_processor_aborted"));
+      return;
+    }
     const child = spawn(command, args, {
       shell: false,
       stdio: ["ignore", "pipe", "pipe"],
+      detached: process.platform !== "win32",
+      ...options,
     });
     const chunks: Buffer[] = [];
     let length = 0;
-    let failed = false;
+    let failure: Error | undefined;
+    const stop = (error: Error) => {
+      failure ??= error;
+      // External signers share this process group. Stop descendants as well
+      // before a worker removes staging or releases its durable job lease.
+      if (child.pid && process.platform !== "win32") {
+        try {
+          process.kill(-child.pid, "SIGKILL");
+        } catch {
+          child.kill("SIGKILL");
+        }
+      } else child.kill("SIGKILL");
+    };
+    const abort = () => stop(new Error("media_processor_aborted"));
+    options.signal?.addEventListener("abort", abort, { once: true });
     const timer = setTimeout(() => {
-      failed = true;
-      child.kill("SIGKILL");
-      reject(new Error("media_parser_timeout"));
+      stop(new Error("media_parser_timeout"));
     }, timeoutMs);
     child.stdout.on("data", (chunk: Buffer) => {
+      if (failure) return;
       length += chunk.length;
       if (length > limitBytes) {
-        failed = true;
-        child.kill("SIGKILL");
-        reject(new Error("media_parser_output_limit"));
+        stop(new Error("media_parser_output_limit"));
       } else chunks.push(chunk);
     });
     // Parser diagnostics can contain file metadata. Never include them in shared logs/evidence.
     child.stderr.resume();
     child.on("error", () => {
-      failed = true;
-      clearTimeout(timer);
-      reject(new Error("media_processor_unavailable"));
+      failure ??= new Error("media_processor_unavailable");
     });
     child.on("close", (code) => {
       clearTimeout(timer);
-      if (!failed) {
-        if (code === 0) resolve(Buffer.concat(chunks));
-        else reject(new MediaProcessError(code));
-      }
+      options.signal?.removeEventListener("abort", abort);
+      // Wait for termination before a worker removes staging or releases a lease.
+      if (failure) reject(failure);
+      else if (code === 0) resolve(Buffer.concat(chunks));
+      else reject(new MediaProcessError(code));
     });
   });
 }
@@ -78,12 +98,87 @@ export class CommandMalwareScanner implements MalwareScanner {
           file,
         ],
         8192,
+        55_000,
       );
       return "clean";
     } catch (error) {
       if (error instanceof MediaProcessError && error.exitCode === 1)
         return "infected";
       throw new Error("malware_scanner_unavailable");
+    }
+  }
+}
+/** clamd keeps its signature database loaded, so a scan costs milliseconds
+ * instead of a full clamscan database load per file. Size, scan-time and
+ * alert-on-limit settings live in the daemon's own configuration
+ * (StreamMaxLength, MaxFileSize, MaxScanSize, MaxScanTime, AlertExceedsMax). */
+export class ClamdMalwareScanner implements MalwareScanner {
+  constructor(
+    private readonly socket: string,
+    private readonly timeoutMs = 55_000,
+  ) {
+    if (!path.isAbsolute(socket))
+      throw new Error("malware_scanner_path_invalid");
+  }
+  async scan(file: string): Promise<"clean" | "infected"> {
+    // Same descriptor rules as the processor: no links, FIFOs or other non-files.
+    const handle = await open(
+      file,
+      constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK,
+    );
+    try {
+      const stat = await handle.stat();
+      if (!stat.isFile() || stat.size <= 0 || stat.size > MEDIA_FILE_CEILING)
+        throw new Error("media_integrity_invalid");
+      const reply = await new Promise<string>((resolve, reject) => {
+        const connection = createConnection(this.socket);
+        const chunks: Buffer[] = [];
+        let length = 0;
+        let settled = false;
+        const fail = () => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          connection.destroy();
+          reject(new Error("malware_scanner_unavailable"));
+        };
+        const timer = setTimeout(fail, this.timeoutMs);
+        connection.on("data", (chunk: Buffer) => {
+          length += chunk.length;
+          // A verdict is one short line; anything longer is not a clamd reply.
+          if (length > 4096) fail();
+          else chunks.push(chunk);
+        });
+        connection.on("error", fail);
+        connection.on("close", () => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          resolve(Buffer.concat(chunks).toString("utf8"));
+        });
+        connection.on("connect", () => {
+          void (async () => {
+            connection.write("zINSTREAM\0");
+            for await (const chunk of handle.createReadStream({
+              autoClose: false,
+              highWaterMark: 65_536,
+            }) as AsyncIterable<Buffer>) {
+              const size = Buffer.alloc(4);
+              size.writeUInt32BE(chunk.length);
+              if (!connection.write(Buffer.concat([size, chunk])))
+                await once(connection, "drain");
+            }
+            // A zero-length chunk ends the stream; clamd replies, then closes.
+            connection.end(Buffer.alloc(4));
+          })().catch(fail);
+        });
+      });
+      const verdict = reply.replace(/\0+$/u, "").trim();
+      if (verdict === "stream: OK") return "clean";
+      if (/^stream: \S.* FOUND$/u.test(verdict)) return "infected";
+      throw new Error("malware_scanner_unavailable");
+    } finally {
+      await handle.close();
     }
   }
 }
@@ -97,12 +192,41 @@ const Probe = z.object({
       z.object({
         codec_type: z.string(),
         codec_name: z.string(),
-        width: z.number().optional(),
-        height: z.number().optional(),
+        width: z.number().int().positive().optional(),
+        height: z.number().int().positive().optional(),
       }),
     )
     .max(4),
 });
+const demuxers: Record<string, string> = {
+  "audio/webm": "matroska,webm",
+  "audio/ogg": "ogg",
+  "audio/wav": "wav",
+  "audio/mp4": "mov,mp4,m4a,3gp,3g2,mj2",
+  "image/png": "png_pipe",
+  "image/jpeg": "jpeg_pipe",
+};
+function parserInput(file: string, mimeType: string) {
+  const formats = demuxers[mimeType];
+  if (!formats) throw new Error("media_type_invalid");
+  // Restrict demuxers before opening untrusted input. A disguised playlist must
+  // never be allowed to read another local file or fetch a remote resource.
+  return [
+    "-protocol_whitelist",
+    "file,pipe",
+    "-format_whitelist",
+    formats,
+    "-max_streams",
+    "4",
+    "-threads",
+    "1",
+    ...(mimeType === "audio/mp4"
+      ? ["-enable_drefs", "0", "-use_absolute_path", "0"]
+      : []),
+    "-i",
+    file,
+  ];
+}
 /** Shared bounded scanner/parser/transcoder. Run only in the ingestion pool. */
 export class MediaProcessor {
   constructor(
@@ -120,16 +244,27 @@ export class MediaProcessor {
     max_duration_ms: number;
   }) {
     const staging = input.staging;
-    const size = (await stat(input.file)).size;
-    if (size !== Number(input.bytes) || size > input.max_bytes)
-      throw new Error("media_integrity_invalid");
-    const bytes = await readFile(input.file);
     if (
-      bytes.length !== Number(input.bytes) ||
-      bytes.length > input.max_bytes ||
-      createHash("sha256").update(bytes).digest("hex") !== input.input_sha256
+      !Number.isSafeInteger(input.max_bytes) ||
+      input.max_bytes <= 0 ||
+      input.max_bytes > MEDIA_FILE_CEILING ||
+      !Number.isSafeInteger(input.max_duration_ms) ||
+      input.max_duration_ms < 0 ||
+      input.max_duration_ms > 3_600_000 ||
+      (input.mime_type.startsWith("audio/") && input.max_duration_ms === 0) ||
+      path.resolve(input.file) === path.resolve(staging)
     )
       throw new Error("media_integrity_invalid");
+    const source = parserInput(input.file, input.mime_type);
+    await readMediaFile(
+      input.file,
+      input.max_bytes,
+      {
+        bytes: Number(input.bytes),
+        sha256: input.input_sha256,
+      },
+      false,
+    );
     if (!this.scanner) throw new Error("malware_scanner_unconfigured");
     if ((await withDeadline(this.scanner.scan(input.file), 60_000)) !== "clean")
       throw new Error("media_scan_rejected");
@@ -138,13 +273,11 @@ export class MediaProcessor {
       [
         "-v",
         "error",
-        "-protocol_whitelist",
-        "file,pipe",
         "-show_format",
         "-show_streams",
         "-of",
         "json",
-        input.file,
+        ...source,
       ],
       32_768,
     );
@@ -198,10 +331,9 @@ export class MediaProcessor {
           "-v",
           "error",
           "-xerror",
-          "-protocol_whitelist",
-          "file,pipe",
-          "-i",
-          input.file,
+          "-filter_threads",
+          "1",
+          ...source,
           "-map",
           "0:a:0",
           "-vn",
@@ -230,10 +362,9 @@ export class MediaProcessor {
       "error",
       "-xerror",
       "-y",
-      "-protocol_whitelist",
-      "file,pipe",
-      "-i",
-      input.file,
+      "-filter_threads",
+      "1",
+      ...source,
       "-map_metadata",
       "-1",
       "-fs",
@@ -245,9 +376,11 @@ export class MediaProcessor {
         "-map",
         "0:a:0",
         "-t",
-        String(input.max_duration_ms / 1000),
+        String(duration! / 1000),
         "-c:a",
         "aac",
+        "-threads",
+        "1",
         "-b:a",
         "96k",
         "-ac",
@@ -269,14 +402,52 @@ export class MediaProcessor {
         "image2",
         "-vcodec",
         "png",
+        "-threads",
+        "1",
       );
     args.push(staging);
     await processFile(this.ffmpeg, args, 1024);
-    if ((await stat(staging)).size > input.max_bytes)
-      throw new Error("media_output_size_invalid");
-    const output = await readFile(staging);
-    if (output.length > input.max_bytes)
-      throw new Error("media_output_size_invalid");
+    const output = (await readMediaFile(staging, input.max_bytes)).output;
+    const outputMime = audio ? "audio/mp4" : "image/png";
+    const converted = Probe.parse(
+      JSON.parse(
+        (
+          await processFile(
+            this.ffprobe,
+            [
+              "-v",
+              "error",
+              "-show_format",
+              "-show_streams",
+              "-of",
+              "json",
+              ...parserInput(staging, outputMime),
+            ],
+            32_768,
+          )
+        ).toString("utf8"),
+      ),
+    );
+    if (
+      converted.streams.length !== 1 ||
+      (audio
+        ? converted.streams[0]?.codec_name !== "aac"
+        : converted.streams[0]?.codec_name !== "png")
+    )
+      throw new Error("media_output_invalid");
+    if (audio) {
+      const encodedDuration = Number(converted.format.duration) * 1000;
+      // AAC frame boundaries may differ slightly; a byte ceiling must never
+      // silently shorten a recording. The delivered container still obeys the cap.
+      if (
+        !Number.isFinite(encodedDuration) ||
+        encodedDuration <= 0 ||
+        encodedDuration > input.max_duration_ms ||
+        Math.abs(encodedDuration - duration!) > 22
+      )
+        throw new Error("media_output_duration_invalid");
+      duration = Math.ceil(encodedDuration);
+    }
     const waveform: number[] = [];
     if (audio) {
       const pcm = await processFile(
@@ -285,8 +456,10 @@ export class MediaProcessor {
           "-nostdin",
           "-v",
           "error",
-          "-i",
-          staging,
+          "-xerror",
+          "-filter_threads",
+          "1",
+          ...parserInput(staging, outputMime),
           "-vn",
           "-ac",
           "1",
@@ -298,6 +471,8 @@ export class MediaProcessor {
         ],
         Math.ceil((input.max_duration_ms / 1000) * 200) + 1024,
       );
+      if (!pcm.length || pcm.length % 2 !== 0)
+        throw new Error("media_output_invalid");
       const samples = Math.floor(pcm.length / 2);
       const step = Math.max(1, Math.ceil(samples / 64));
       for (let begin = 0; begin < samples; begin += step) {
@@ -310,7 +485,7 @@ export class MediaProcessor {
 
     return {
       output,
-      mimeType: audio ? "audio/mp4" : "image/png",
+      mimeType: outputMime,
       durationMs: duration,
       waveform,
     };

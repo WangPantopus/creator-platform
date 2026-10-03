@@ -36,6 +36,19 @@ import {
 import { AgentPipeline, compile, type ThreadSnapshot } from "./pipeline.js";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
+import type {
+  PublicAIIdentityAuthority,
+  PublicAIReadFacts,
+  PublicAIReadScope,
+} from "../identity/public-ai-scope.js";
+import { isDevelopmentLicense } from "./development-license.js";
+
+/** Genuine server-issued public metadata; this is never a creator Actor. */
+export type PublicAILicenseContext = Readonly<{
+  identity: PublicAIIdentityAuthority;
+  scope: PublicAIReadScope;
+  facts: PublicAIReadFacts;
+}>;
 
 export interface LicenseVerifier {
   /** True only for the labeled loopback development authority, which serves
@@ -52,6 +65,12 @@ export interface LicenseVerifier {
   isCurrentInTransaction?(
     scope: CreatorScope,
     license: License,
+    client: PoolClient,
+  ): Promise<boolean>;
+  /** Checks the actual held stored proof through W1's public purpose, without
+   * changing visitor GUCs or inventing a creator scope. */
+  isCurrentPublicInTransaction?(
+    context: PublicAILicenseContext,
     client: PoolClient,
   ): Promise<boolean>;
 }
@@ -96,6 +115,11 @@ export class AgentService {
   private licensingServes(scope: CreatorScope) {
     return scope.development === Boolean(this.licenseVerifier?.synthetic);
   }
+  /** The configured verifier has already passed its host boundary. Never infer
+   * this qualification from a client flag, account ID or stored license text. */
+  get syntheticDevelopmentLicensing() {
+    return this.licenseVerifier?.synthetic === true;
+  }
   async currentLicense(
     scope: CreatorScope,
     license: License | null,
@@ -103,6 +127,7 @@ export class AgentService {
   ) {
     return license &&
       licensed(license) &&
+      this.licensingServes(scope) &&
       this.licenseVerifier &&
       (client
         ? await this.licenseVerifier.isCurrentInTransaction?.(
@@ -113,6 +138,45 @@ export class AgentService {
         : await this.licenseVerifier.isCurrent(scope, license))
       ? license
       : null;
+  }
+  async currentPublicLicense(
+    context: PublicAILicenseContext,
+    client: PoolClient,
+  ): Promise<License | null> {
+    context.identity.assertPool(this.repository.pool);
+    await context.identity.authorizeInTransaction(
+      context.scope,
+      client,
+      context.facts,
+    );
+    const stored = context.facts.license;
+    if (!stored) return null;
+    const license: License = {
+      ...stored,
+      permittedUses: [...stored.permittedUses],
+    };
+    if (!licensed(license)) return null;
+    const verifier = this.licenseVerifier;
+    if (!verifier?.isCurrentPublicInTransaction)
+      throw new DomainError(
+        "public_agent_license_unconfigured",
+        "Current public AI license authority is unavailable.",
+        503,
+      );
+    // Public scopes have no development/account substitution flag. Only the
+    // configured verifier decides which proof family this host can serve.
+    if (isDevelopmentLicense(license) !== (verifier.synthetic === true))
+      return null;
+    const current = await verifier.isCurrentPublicInTransaction(
+      context,
+      client,
+    );
+    await context.identity.authorizeInTransaction(
+      context.scope,
+      client,
+      context.facts,
+    );
+    return current === true ? license : null;
   }
   async snapshot(
     client: PoolClient,
@@ -202,7 +266,7 @@ export class AgentService {
         const gates: string[] = [];
         if (creator.verification !== "verified")
           gates.push("Creator verification is pending.");
-        if (!(await this.currentLicense(scope, license)))
+        if (!(await this.currentLicense(scope, license, client)))
           gates.push(
             this.licenseVerifier?.synthetic && this.licensingServes(scope)
               ? "Record the labeled development license. It is not a reviewed license."
@@ -872,6 +936,7 @@ export class AgentService {
           await this.currentLicense(
             scope,
             await licenseRow(client, scope.creatorId),
+            client,
           ),
           "license_required",
           "An active reviewed license is required.",
@@ -1017,6 +1082,7 @@ export class AgentService {
           await this.currentLicense(
             scope,
             await licenseRow(client, scope.creatorId),
+            client,
           ),
           "license_required",
           "An active license is required.",

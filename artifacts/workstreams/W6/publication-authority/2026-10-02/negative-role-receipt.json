@@ -1,0 +1,42 @@
+{
+  "canonicalRegistryAcceptance": false,
+  "positivePublicationAccepted": false,
+  "checks": [
+    {
+      "case": "unissued task",
+      "denied": true
+    },
+    {
+      "case": "forged GUC and ledger nonce",
+      "denied": true
+    },
+    {
+      "case": "raw asset SELECT",
+      "denied": true,
+      "sqlState": "42501"
+    },
+    {
+      "case": "asset mutation",
+      "denied": true,
+      "sqlState": "42501"
+    },
+    {
+      "case": "interactive SET ROLE",
+      "denied": true,
+      "sqlState": "42501"
+    },
+    {
+      "case": "serialized scope",
+      "denied": true,
+      "code": "publication_scope_required"
+    }
+  ],
+  "privileges": {
+    "role": "creator_publication_worker",
+    "direct_select": false,
+    "any_update": false,
+    "publication_insert": false,
+    "owner_membership": false,
+    "interactive_membership": false
+  }
+}

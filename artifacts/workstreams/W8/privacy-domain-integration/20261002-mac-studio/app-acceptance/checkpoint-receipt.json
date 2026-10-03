@@ -1,0 +1,10 @@
+{
+  "source": "5057343aefa289ae57693d5be614461056bb7260",
+  "labelledSynthetic": true,
+  "originalRecovery": false,
+  "databaseClosed": true,
+  "checkpointBytes": 768305,
+  "checkpointSha256": "9b042bc09ed903f802683660f581e18e2ffd393bfbde7d91a473936cd3e778cc",
+  "separateCheckpointRestoreVerified": true,
+  "restoreRequiresExactOwnerAclRepresentationReplay": true
+}

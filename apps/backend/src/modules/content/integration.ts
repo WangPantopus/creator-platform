@@ -4,9 +4,24 @@ import { contentFeature, contentSignedSubjects } from "./registration.js";
 import { ContentSources } from "./sources.js";
 import { contentPublicProjection } from "../growth/content.js";
 import { createCommercePublicationPermission } from "../commerce/publication.js";
+import { assertCommercePublicationSource } from "../commerce/publication-source.js";
+export {
+  PreparedContentGenerationOrigins,
+  GENERATION_CONTENT_ORIGIN_MIGRATION,
+  GENERATION_CONTENT_ORIGIN_SIGNATURE,
+  type GenerationContentOriginSource,
+} from "./generation-origin.js";
 import { DomainError } from "../../core/errors.js";
 import { StudioService } from "../studio/service.js";
 import { studioFeature } from "../studio/registration.js";
+import {
+  createContentCreatorTenureHost,
+  createContentTenureHost,
+} from "./tenure.js";
+import {
+  ContentPublicationWorker,
+  type ContentPublicationDependencies,
+} from "./publication.js";
 
 /** W1 host seam: one service instance for HTTP and exact W1 signed subjects.
  * Production hosts supply W8's current scope denial callback. Each downstream
@@ -18,6 +33,11 @@ export function createContentStudio(input: {
   dependencies: ContentDependencies &
     Required<Pick<ContentDependencies, "assertAllowed">>;
 }) {
+  if (input.dependencies.publicationSource)
+    assertCommercePublicationSource(
+      input.dependencies.publicationSource,
+      input.pool,
+    );
   const content = new ContentService(input.pool, input.dependencies);
   const studio = new StudioService(content, input.owners);
   return {
@@ -37,6 +57,8 @@ export type CurrentThanksTarget = (input: {
   fanAccountId: string;
   targetKind: string;
   targetId: string;
+  /** Propagates the real worker deadline; it cannot grant target access. */
+  signal?: AbortSignal;
 }) => Promise<boolean>;
 
 export type ContentFollowReaders = {
@@ -65,13 +87,47 @@ export function composeContentHost(input: {
     >;
     follows?: ContentFollowReaders;
   };
+  /** W7's actual canonical-core reader can remain on Content's held client
+   * while public projection uses a separately configured Growth API pool. */
+  followReaders?: ContentFollowReaders;
   paidAudienceCount?: NonNullable<ContentDependencies["audienceCount"]>;
+  tenure?: Parameters<typeof createContentTenureHost>[0];
+  creatorTenure?: Parameters<typeof createContentCreatorTenureHost>[0];
+  /** Use W7's contentPublicProjection bound to this exact Content service.
+   * This producer is neither a recipient grant nor a background purpose. */
+  publicProjection?: NonNullable<ContentDependencies["effect"]>;
+  publication?: ContentPublicationDependencies;
+  publicationSource?: ContentDependencies["publicationSource"];
+  groupPublication?: ContentDependencies["groupPublication"];
+  packetRead?: {
+    prepare: NonNullable<ContentDependencies["preparePublicPacketRead"]>;
+    preparePositive: NonNullable<
+      ContentDependencies["preparePublicPacketReadPositive"]
+    >;
+    read: NonNullable<ContentDependencies["publicPacketRead"]>;
+  };
   assertScopeAllowedInTransaction?: import("../access/scope.js").ScopeRestrictionInTransaction;
 }) {
+  if (input.publicationSource)
+    assertCommercePublicationSource(input.publicationSource, input.pool);
+  if (input.dependencies.publicationSource)
+    assertCommercePublicationSource(
+      input.dependencies.publicationSource,
+      input.pool,
+    );
+  if (
+    input.publicationSource &&
+    input.dependencies.publicationSource &&
+    input.publicationSource !== input.dependencies.publicationSource
+  )
+    throw new Error(
+      "Content composition must retain one actual publication source.",
+    );
   if (input.growth && input.growth.service.db.runtime !== input.pool)
     throw new Error(
       "Content and Growth must share the configured runtime pool.",
     );
+  const follows = input.followReaders ?? input.growth?.follows;
   let content: ContentService | null = null;
   let sources: ContentSources | null = null;
   let projection: ReturnType<typeof contentPublicProjection> | null = null;
@@ -85,13 +141,37 @@ export function composeContentHost(input: {
   const dependencies: ContentDependencies &
     Required<Pick<ContentDependencies, "assertAllowed">> = {
     ...input.dependencies,
-    ...(input.growth?.follows ? { follows: input.growth.follows.follows } : {}),
-    ...(input.growth?.follows?.count || input.paidAudienceCount
+    ...(input.groupPublication
+      ? { groupPublication: input.groupPublication }
+      : {}),
+    ...(input.tenure ? createContentTenureHost(input.tenure) : {}),
+    ...(input.creatorTenure
+      ? createContentCreatorTenureHost(input.creatorTenure)
+      : {}),
+    ...(input.publicationSource
+      ? { publicationSource: input.publicationSource }
+      : {}),
+    ...(input.packetRead
+      ? {
+          preparePublicPacketRead: input.packetRead.prepare,
+          preparePublicPacketReadPositive: input.packetRead.preparePositive,
+          publicPacketRead: input.packetRead.read,
+        }
+      : {}),
+    ...(follows ? { follows: follows.follows } : {}),
+    ...(follows?.count || input.paidAudienceCount
       ? {
           audienceCount: async (client, creatorId, audience) => {
+            // W4's count is creator authoring metadata. A fan or Team view
+            // must neither call that owner-only port nor substitute its owner.
+            const owner = await client.query<{ owned: boolean }>(
+              "SELECT account_id=nullif(current_setting('app.account_id',true),'')::uuid AS owned FROM creator.creator_profile WHERE id=$1",
+              [creatorId],
+            );
+            if (owner.rows[0]?.owned !== true) return null;
             const reader =
               audience.kind === "followers"
-                ? input.growth?.follows?.count
+                ? follows?.count
                 : input.paidAudienceCount;
             const value = reader
               ? await reader(client, creatorId, audience)
@@ -135,8 +215,14 @@ export function composeContentHost(input: {
         );
         return { reference: `revoked:${effect.contentId}:${effect.version}` };
       }
-      if (["published", "withdrawn"].includes(effect.type))
-        return projection ? projection(actor, effect) : unavailable();
+      if (["published", "withdrawn"].includes(effect.type)) {
+        if (!content) return unavailable();
+        return projection
+          ? projection(actor, effect)
+          : input.publicProjection
+            ? input.publicProjection(actor, effect)
+            : unavailable();
+      }
       return input.dependencies.effect
         ? input.dependencies.effect(actor, effect)
         : unavailable();
@@ -145,6 +231,9 @@ export function composeContentHost(input: {
   return {
     owners: input.owners,
     dependencies,
+    publicationWorker: input.publication
+      ? new ContentPublicationWorker(input.publication)
+      : null,
     bindContent(service: ContentService) {
       if (service.pool !== input.pool || (content && content !== service))
         throw new Error(

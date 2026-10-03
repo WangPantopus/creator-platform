@@ -1,0 +1,28 @@
+{
+  "recordedAt": "2026-10-02T10:13:23.053372+00:00",
+  "runtimeSource": "855c1b6575a130f7bb11ac9f2ec172f953ac9d6b",
+  "consumedDenialProducer": "940e2922b07b3cb6b39e7f0ba5bd353bbc030e48",
+  "unregisteredMigration0082Sha256": "3742b1e6b7f367ca626176615c5362ecf002fe5fcc5a96ea941d35a4708e8686",
+  "actualDatabase": {
+    "ledgerCount": 57,
+    "interactiveDenialInstalled": false,
+    "availabilityVersion": 4
+  },
+  "actualBrowserJourney": {
+    "identitySessionRead": 200,
+    "studioAccountRead": 200,
+    "availabilityRead": 503,
+    "saveButtonDisabled": true,
+    "privateStartsFields": 0,
+    "unavailableCopyVisible": true,
+    "screenshot": "web-0082-media-unavailable.png"
+  },
+  "actualCapabilities": {
+    "mediaAvailable": false,
+    "creatorMediaAvailable": false,
+    "creatorMediaAudienceAvailable": false,
+    "callsAvailable": false,
+    "aiAudioAvailable": false
+  },
+  "claims": "Actual unavailable browser path and retained stored version only. No positive0082 or full-workstream acceptance; native repeat will follow real W8 activation."
+}

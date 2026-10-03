@@ -117,7 +117,10 @@ export function useTrust<T>(path: string) {
   return { data, error, loading, refresh };
 }
 export function TrustSession() {
-  const { data } = useTrust<{ localDevelopment: boolean }>("capabilities");
+  const { data } = useTrust<{
+    localDevelopment: boolean;
+    localActorSelection?: boolean;
+  }>("capabilities");
   const session = useTrust<{ accountId: string }>("session");
   const [actor, setActor] = useState("fan");
   const actorChoice = useRef<HTMLSelectElement | null>(null);
@@ -125,11 +128,39 @@ export function TrustSession() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [returnTo, setReturnTo] = useState<string | null>(null);
+  const signOut = async () => {
+    setBusy(true);
+    try {
+      await trustApi("dev/logout", {});
+      invalidateSession();
+      const channel = new BroadcastChannel("trust-account");
+      channel.postMessage("changed");
+      channel.close();
+      setError("");
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : "Sign out unavailable.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
   useEffect(() => {
     const destination = IdentityContinueSchema.safeParse({
       returnTo: window.location.pathname + window.location.search,
     });
-    setReturnTo(destination.success ? destination.data.returnTo : "/home");
+    // Appearance parameters are not identity navigation authority. Preserve
+    // the registered Trust page when its optional query is not a return target.
+    const page = IdentityContinueSchema.safeParse({
+      returnTo: window.location.pathname,
+    });
+    setReturnTo(
+      destination.success
+        ? destination.data.returnTo
+        : page.success
+          ? page.data.returnTo
+          : "/home",
+    );
   }, []);
   useEffect(() => {
     const refresh = () => void session.refresh();
@@ -178,6 +209,32 @@ export function TrustSession() {
       </a>
     ) : null;
   if (!data?.localDevelopment) return continuation;
+  if (data.localActorSelection === false)
+    return (
+      <div className="trust-session">
+        <p>Synthetic local accounts · no provider or production identity</p>
+        {returnTo && (
+          <a
+            className="qv-link-btn"
+            href={`/api/auth/continue?returnTo=${encodeURIComponent(returnTo)}`}
+          >
+            {session.data
+              ? "Switch development account"
+              : "Continue with Pantopus"}
+          </a>
+        )}
+        {session.data && (
+          <button
+            className="qv-link-btn"
+            disabled={busy}
+            onClick={() => void signOut()}
+          >
+            Sign out
+          </button>
+        )}
+        {error && <p role="alert">{error}</p>}
+      </div>
+    );
   return (
     <div className="trust-session">
       {continuation}
@@ -230,23 +287,7 @@ export function TrustSession() {
       <button
         className="qv-link-btn"
         disabled={busy}
-        onClick={async () => {
-          setBusy(true);
-          try {
-            await trustApi("dev/logout", {});
-            invalidateSession();
-            const channel = new BroadcastChannel("trust-account");
-            channel.postMessage("changed");
-            channel.close();
-            setError("");
-          } catch (error) {
-            setError(
-              error instanceof Error ? error.message : "Sign out unavailable.",
-            );
-          } finally {
-            setBusy(false);
-          }
-        }}
+        onClick={() => void signOut()}
       >
         Sign out
       </button>

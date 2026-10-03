@@ -1,0 +1,17 @@
+{
+  "source": "f02980a7e798fb6a021a328348374f5ae9ad8b1a",
+  "observedAt": "2026-10-02T16:48:16.791249+00:00",
+  "iosBuildSource": "da6553dfbf89af6fd73000909c30274387a7e488",
+  "iosSourceTreeUnchangedByImportCorrection": true,
+  "iosShippingBuild": "passed",
+  "strictIOSCodeSignature": "passed",
+  "iosDebugDylibSHA256": "f97b47d32f41c1b7bb593b118a28f644a5a3f072d3277119822bda954bb41dfd",
+  "androidShippingBuild": "passed_after_duplicate_import_correction",
+  "androidAPK_SHA256": "bb4d9f9f7ed8d015528077c25fb02f97eaabdb29501b2b1ce45ab190e4e5f7a5",
+  "earlierAndroidFailure": "da6553df duplicate QelvoraCopy import; preserved actual failed log and corrected f02980a7",
+  "sharedHeavyBuildLeases": "sequential own leases normally released",
+  "personalNativeOperationOfThisSource": "pending; both emulator slots occupied at16:42:41Z, prior Device Hub timeout remains an iOS UI blocker",
+  "databaseActivated": false,
+  "positiveFulfillmentOrSigningAcceptance": false,
+  "releaseReady": false
+}
