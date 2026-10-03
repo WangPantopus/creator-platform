@@ -1072,6 +1072,14 @@
       "sourceSha256": "a4f01c5f1eb1e19d79437b17cce872def1366965ba27c8c46b0d5f9bb73da436",
       "state": "reserved_unapplied",
       "reason": "Distinct actual W1 output cursor continuation published45cf4f02. Isolated creator_generation_cursor_authority owns private refresh_generation_output_cursor(uuid,uuid,integer,uuid) for the actual W3 writer only and readonly generation_output_cursor_view(uuid,uuid,integer,integer) for generation worker only. Actual W3 fullXID typed provenance plus original own+1 durable event/job/thread/lease metadata authorizes updating only original private scope task.lastSequence; original nonce/PID/fullXID/intent/createdAt/deadline and0159/0179 SQL stay immutable. Genuine JS refresh invalidates old view and uses latest private view at final bookend. No fabricated output, scope grant or updated deadline. Actual combined catalogue is unavailable until independently reviewed SQL/caller/drift/C10/cancellation/sole W1 COMMIT and genuine owner output qualification. Exact published source pin is custody metadata only, not activation or provider/financial permission."
+    },
+    {
+      "id": "0217",
+      "owner": "W3",
+      "version": "0217_w3_generation_provenance_purge",
+      "path": "apps/backend/migrations/0217_w3_generation_provenance_purge.sql",
+      "state": "reserved_unapplied",
+      "reason": "Distinct proposed ordinary generation sentence provenance purge. Isolated NoLogin NoInherit NoBypassRLS creator_w3_generation_privacy, no memberships, owns only fixed creator.purge_generation_sentence_provenance(uuid,uuid,uuid,uuid,uuid) RETURNS integer for actual creator_runtime caller. Original job/token/thread/creator/fan and W8 fixed DELETE-only full-family plus immutable original deletion due authority must authorize each bounded page of at most500 rows before/after, preserve original task/deferred separate COMMIT/current restoration, and delete all eleven ordinary provenance columns by row deletion before message/event/generation foreign-key parents. Only this isolated purger may execute the new DELETE-only checker; original private binding helper remains executable only by creator_privacy_family. No raw scope/job/body grants, caller dates/nonce/GUC, export-as-purge authority, clock reset on retry/restore, retained/unknown costs or fabricated receipts. Exact owner source/typed original due boundary/effective combined214+217 caller catalogue/compiler/drift/C10/real purge/cleanup and physical erasure acceptance remain pending. Allocation only; no activation."
     }
   ]
 }

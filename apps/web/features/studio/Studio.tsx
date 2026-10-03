@@ -1401,6 +1401,15 @@ function Compose({
       throw failure;
     }
   };
+  const plannedAnswer = !!document.planRef;
+  const chooseAudienceIds =
+    !plannedAnswer && ["tiers", "groups"].includes(document.audience.kind);
+  const chooseKind =
+    post &&
+    !plannedAnswer &&
+    !document.quote &&
+    !document.packetId &&
+    document.kind !== "public_answer";
   if (!draftReady)
     return (
       <section className="w5-compose">
@@ -1471,14 +1480,16 @@ function Compose({
               key={kind}
               type="button"
               aria-pressed={document.audience.kind === kind}
-              onClick={() =>
+              disabled={plannedAnswer}
+              onClick={() => {
+                if (document.audience.kind === kind) return;
                 edit({
                   audience:
                     kind === "tiers" || kind === "groups"
                       ? { kind, ids: [] }
                       : { kind: kind as "public" | "followers" | "members" },
-                })
-              }
+                });
+              }}
             >
               {kind === "members"
                 ? "All members"
@@ -1486,7 +1497,7 @@ function Compose({
             </button>
           ))}
         </div>
-        {["tiers", "groups"].includes(document.audience.kind) && (
+        {chooseAudienceIds && (
           <fieldset className="w5-field">
             <legend>Select {document.audience.kind}</legend>
             {!catalog && (
@@ -1530,6 +1541,12 @@ function Compose({
             )}
           </fieldset>
         )}
+        {plannedAnswer && (
+          <p className="qv-help">
+            This answer keeps its original request audience. To change that
+            audience, revise the fulfillment plan in Requests.
+          </p>
+        )}
         <p className="qv-help">
           {creator.owned ? (
             <>
@@ -1546,14 +1563,17 @@ function Compose({
           )}
         </p>
       </div>
-      {post && !document.quote && !document.packetId && (
+      {chooseKind && (
         <div className="w5-gutter w5-field">
           <label htmlFor="content-kind">Library entry</label>
           <select
             id="content-kind"
             value={document.kind}
             onChange={(e) =>
-              edit({ kind: e.target.value as ContentBody["kind"], live: null })
+              edit({
+                kind: e.target.value as ContentBody["kind"],
+                live: null,
+              })
             }
           >
             <option value="post">Post</option>
@@ -1685,15 +1705,17 @@ function Compose({
         <input
           type="checkbox"
           checked={document.aiUseIntent}
-          disabled={!creator.owned && !document.aiUseIntent}
+          disabled={(plannedAnswer || !creator.owned) && !document.aiUseIntent}
           onChange={(e) => edit({ aiUseIntent: e.target.checked })}
         />
         <span>
           <strong>Let my AI use this</strong>
           <span className="qv-help">
-            {creator.owned
-              ? "Adds a source candidate for this same audience. Approve it separately in My AI."
-              : "The creator must confirm AI reuse for this revision. Team edits can remove that intent."}
+            {plannedAnswer
+              ? "AI reuse of this answer needs a separate current approval, which is unavailable."
+              : creator.owned
+                ? "Adds a source candidate for this same audience. Approve it separately in My AI."
+                : "The creator must confirm AI reuse for this revision. Team edits can remove that intent."}
           </span>
         </span>
       </label>
@@ -1898,6 +1920,7 @@ function Compose({
       )}
       {review && canPublish && (
         <Modal
+          restoreFocusTo={noteInput}
           title={
             document.scheduledAt
               ? "Review scheduled publication"
