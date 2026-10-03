@@ -85,6 +85,14 @@ const callParameters = [
 ];
 const offers = "/v1/w6/threads/{creatorId}/{fanId}/call-offers";
 export const mediaPaths = {
+  "/v1/w6/capabilities": {
+    get: {
+      ...operation("readMediaCapabilities", "MediaCapabilities"),
+      security: [],
+      description:
+        "Public service composition state only. These flags grant no media, call, publication or account authority.",
+    },
+  },
   [call]: {
     parameters: callParameters,
     get: operation("readCallSession", "CallCallSession"),
@@ -201,7 +209,7 @@ export const mediaPaths = {
     },
   },
   "/v1/w6/creators/{creatorId}/call-availability": {
-    parameters: [path("creatorId")],
+    parameters: [path("creatorId"), expectedAccountHeader],
     get: operation("readCreatorCallAvailability", "CallAvailabilityView"),
     put: operation(
       "saveCreatorCallAvailability",
