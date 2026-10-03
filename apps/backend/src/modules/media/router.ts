@@ -18,6 +18,7 @@ import type { AccountCallMetadata } from "../session/account-call-metadata.js";
 import type { AvailabilityService } from "../session/availability.js";
 import { visibleSession } from "../session/service.js";
 import { withDeadline } from "./deadline.js";
+import { CapabilitiesSchema } from "../../../../../packages/api/src/media.js";
 import {
   AdmissionRedemptionSchema,
   type CallSession,
@@ -45,28 +46,30 @@ export function createW6Router(dependencies: W6RouterDependencies) {
     next();
   });
   router.get("/capabilities", (_req, res) =>
-    res.json({
-      mediaAvailable: Boolean(dependencies.media),
-      creatorMediaAvailable: Boolean(
-        dependencies.creatorMedia && dependencies.creatorScopeFor,
-      ),
-      creatorMediaAudienceAvailable: Boolean(
-        dependencies.creatorMedia?.audienceIdentity &&
-          dependencies.audienceScopeFor,
-      ),
-      callsAvailable: Boolean(
-        dependencies.sessions &&
-          dependencies.actorFor &&
-          dependencies.sessions.provider.name !== "unconfigured" &&
-          dependencies.sessions.interactiveControlAvailable &&
-          dependencies.sessions.provider.supportsSingleUseAdmission,
-      ),
-      aiAudioAvailable: false,
-      callRecoveryAvailable: dependencies.accountCalls?.available === true,
-      reason: !dependencies.media
-        ? "media_unconfigured"
-        : "licensed_ai_audio_and_provider_verification_required",
-    }),
+    res.json(
+      CapabilitiesSchema.parse({
+        mediaAvailable: Boolean(dependencies.media),
+        creatorMediaAvailable: Boolean(
+          dependencies.creatorMedia && dependencies.creatorScopeFor,
+        ),
+        creatorMediaAudienceAvailable: Boolean(
+          dependencies.creatorMedia?.audienceIdentity &&
+            dependencies.audienceScopeFor,
+        ),
+        callsAvailable: Boolean(
+          dependencies.sessions &&
+            dependencies.actorFor &&
+            dependencies.sessions.provider.name !== "unconfigured" &&
+            dependencies.sessions.interactiveControlAvailable &&
+            dependencies.sessions.provider.supportsSingleUseAdmission,
+        ),
+        aiAudioAvailable: false,
+        callRecoveryAvailable: dependencies.accountCalls?.available === true,
+        reason: !dependencies.media
+          ? "media_unconfigured"
+          : "licensed_ai_audio_and_provider_verification_required",
+      }),
+    ),
   );
   router.use(express.json({ limit: "64kb" }));
   router.get("/calls/:sessionId/route", async (req, res) => {
