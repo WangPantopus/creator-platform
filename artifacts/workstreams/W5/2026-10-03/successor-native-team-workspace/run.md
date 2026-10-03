@@ -1,5 +1,54 @@
 # Native Team domain source and compilation
 
+## Shipping root composition at6f57f355
+
+Normal merge `6f57f355b20a871af1cb727166895d54d27e57cc` consumes actual
+W1 PR74 `d2f541c3c2b0d8b356fb2d3c08cc1ff96f9ba9f5`. W1 personally owns
+the shipping shell registration, route/profile gates and original session
+lifecycle. Both W5 component files remain byte-identical toaa7e78fd. The actual
+complete producer graph now generates116 operations/12 resources; no absent
+contract or generated model was manufactured. The entire apps/packages/config/
+scripts/infra/workflow/lockfile tree matches the consumed W1 source. Consequently
+PR293 has no unique executable delta against that parent; the retained W5
+branch preserves the original implementation history and qualification records.
+
+The actual `/studio/workspace` and canonical UUID `/studio/:id/team` routes
+receive the shipping shell's genuine FanSession. Signed-out access remains
+refused. Only those two registered routes are exempt from the fan-handle
+prerequisite; real Studio reads still decide creator/Team eligibility. Canonical
+generation, web/backend types, Swift parsing, canonical-copy/navigation format,
+source diff checks and all nine existing backend contracts pass on the composed
+tree. No new test code was written. Shipping compilation and personal operation
+at6f57f355 remain pending; the prior c120 artifact below is not transferred.
+
+Implemented: the original W5 domain source, reused by the actual W1 root.
+Runnable/integrated: the composed source and named checks, with shipping runtime
+qualification still pending. Verified: those source checks only at this commit.
+Current native Light/Night, saved return, independent account/open-view role
+revocation, stale/duplicate/interrupted invitation and role actions, outage/
+recovery and genuine durable records remain open. Full required CI and the
+broader original Team package remain open. Release-ready:false.
+
+## Bounded Android compilation atc120195c
+
+Personally compiled clean source
+`c120195c9c5365710910bb7254dcadf858d6d6a0`, productaa7e78fd, in the actual
+Android shipping project. Two earlier atomic preflights refused actual available
+disk below4GiB before Gradle started; both logs remain preserved and both guards
+released normally. A fresh actual4.89GiB preflight passed without lowering the
+threshold. The finite180-second Java17/API35/offline/2-worker build used only the
+new owned `/private/tmp/w5-native-team-c120-android` output and original host
+emulator API URL. `assembleDebug` exited0 in52.578seconds at21:19:00.499UTC,
+all37 tasks executed, and the canonical heavy guard normally released.
+
+APK SHA256: `4b303a1046367be88c9855c89a65469f660d5c6c9d277a949ddff839b82b29d0`.
+Installed SDK apksigner verifies the genuine APK with one signer and v2 signing.
+This verifies app artifact preparation only; no device, GUI, API, business-row
+write, root acceptance, human signature or passkey ceremony occurred. Private
+logs and the bounded build receipt remain under
+`~/.config/creator-platform/w5-20261003/current-pr-backlog/`. This artifact predates
+the shipping root composition and does not qualify a later source.
+
 ## Current invitation acceptance source ataa7e78fd
 
 Product `aa7e78fd99c308f4ed9f66c68e4810b0226fe0b9` adds the missing genuine
