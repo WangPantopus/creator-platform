@@ -1,23 +1,26 @@
-import type { PoolClient } from "pg";
+import type { PoolClient, QueryConfig } from "pg";
+import { querySettlementUncertain } from "../../core/query-settlement.js";
 
-function queryReadTimedOut(failure: unknown): boolean {
-  const pending = [failure];
-  const seen = new Set<Error>();
-  while (pending.length) {
-    const error = pending.pop();
-    if (!(error instanceof Error) || seen.has(error)) continue;
-    seen.add(error);
-    // pg 8.23 rejects the caller here without settling the active wire query
-    // or emitting a client error. A wrapper may retain it as a private cause.
-    if (error.message === "Query read timeout" || seen.size > 32) return true;
-    if (error.cause !== undefined) pending.push(error.cause);
-    if (error instanceof AggregateError)
-      for (const cause of error.errors) {
-        pending.push(cause);
-        if (pending.length > 32) return true;
+// Bound control response reads without extending a shorter original pg budget.
+// The installed pg runtime supports this option despite QueryConfig omitting it.
+function control(
+  client: PoolClient,
+  text: string,
+): QueryConfig & { query_timeout: number } {
+  const original = (
+      client as PoolClient & {
+        connectionParameters?: { query_timeout?: unknown };
       }
-  }
-  return false;
+    ).connectionParameters?.query_timeout,
+    budget =
+      typeof original === "number" || typeof original === "string"
+        ? Number(original)
+        : NaN;
+  return {
+    text,
+    query_timeout:
+      Number.isFinite(budget) && budget > 0 ? Math.min(budget, 1500) : 1500,
+  };
 }
 
 /** Retains the original borrowed client through rollback or physical shutdown.
@@ -55,7 +58,9 @@ export class GrowthHeldClient {
     if (this.client.pipeline)
       throw new Error("growth_nonpipeline_client_required");
     this.uncertain = true;
-    await this.client.query(sql);
+    const result = await this.client.query(control(this.client, sql));
+    if (result.command !== "BEGIN")
+      throw new Error("growth_begin_receipt_required");
     this.transactionStarted = true;
     this.assertCurrent();
     this.uncertain = false;
@@ -64,7 +69,9 @@ export class GrowthHeldClient {
   async commit() {
     this.assertCurrent();
     this.uncertain = true;
-    await this.client.query("COMMIT");
+    const result = await this.client.query(control(this.client, "COMMIT"));
+    if (result.command !== "COMMIT")
+      throw new Error("growth_commit_receipt_required");
     this.transactionStarted = false;
     this.assertCurrent();
     this.uncertain = false;
@@ -93,13 +100,17 @@ export class GrowthHeldClient {
       input.destroy ||
       this.uncertain ||
       this.signal?.aborted ||
-      queryReadTimedOut(input.failure)
+      querySettlementUncertain(input.failure)
     )
       this.destroy();
     try {
       if (this.transactionStarted && !this.shutdown) {
         try {
-          await this.client.query("ROLLBACK");
+          const result = await this.client.query(
+            control(this.client, "ROLLBACK"),
+          );
+          if (result.command !== "ROLLBACK")
+            throw new Error("growth_rollback_receipt_required");
           this.transactionStarted = false;
         } catch (error) {
           errors.push(error);
