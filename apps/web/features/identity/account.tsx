@@ -43,7 +43,7 @@ export function AccountPanel() {
       if (path === "refresh") {
         setMessage("Session refreshed.");
       } else {
-        announceSessionEnd();
+        announceSessionEnd(session);
         identity.end();
       }
     } catch {

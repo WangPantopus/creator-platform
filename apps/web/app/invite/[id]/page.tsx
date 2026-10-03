@@ -12,8 +12,8 @@ export default async function Invite({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   try {
-    const { id } = await params;
     const data = await growthRequest<{ creator: Creator; destination: string }>(
       `public/invites/${encodeURIComponent(id)}`,
     );
@@ -52,7 +52,7 @@ export default async function Invite({
   } catch (error) {
     return (
       <GrowthShell>
-        <Failure error={error} />
+        <Failure error={error} returnTo={`/invite/${encodeURIComponent(id)}`} />
       </GrowthShell>
     );
   }

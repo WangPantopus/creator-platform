@@ -6,21 +6,27 @@ import {
   ErrorState,
   TrustError,
   TrustSession,
+  type TrustSessionState,
   useTrust,
   useTrustSession,
-  trustApi,
+  useTrustRequest,
+  retryTrustReads,
   caseLabel,
   dateLabel,
 } from "../ops/trust-client";
 
 export default function SupportPage() {
-  const session = useTrust<{ accountId: string }>("session");
+  const request = useTrustRequest();
+  const [sessionState, setSessionState] = useState<TrustSessionState>({
+    ready: false,
+    error: null,
+  });
   const { data, error, refresh } = useTrust<{
     items: (CaseSummary & { resolution_reason?: string })[];
-  }>("my-cases");
+  }>("my-cases", sessionState.ready);
   const inbox = useTrust<{
     items: { id: string; type: string; reason: string; created_at: string }[];
-  }>("inbox");
+  }>("inbox", sessionState.ready);
   const [kind, setKind] = useState("support");
   const [reason, setReason] = useState("");
   const [creatorId, setCreatorId] = useState("");
@@ -44,6 +50,7 @@ export default function SupportPage() {
     setBusy(false);
     setActionError(null);
     key.current = null;
+    setSessionState({ ready: false, error: null });
   });
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -93,19 +100,20 @@ export default function SupportPage() {
         appears only in its scoped case. If you are in immediate danger, contact
         local emergency services.
       </p>
-      <TrustSession />
-      <ErrorState error={error} retry={() => void refresh()} />
+      <TrustSession onSessionState={setSessionState} />
+      <ErrorState error={sessionState.error ?? error} retry={retryTrustReads} />
       <form
         className="trust-panel"
         onSubmit={async (event) => {
           event.preventDefault();
+          if (!sessionState.ready || busy) return;
           const current = epoch.current;
           setBusy(true);
           setActionError(null);
           key.current ??= crypto.randomUUID();
           try {
             if (kind === "block") {
-              await trustApi("blocks", {
+              await request("blocks", {
                 creatorId,
                 reason,
                 idempotencyKey: key.current,
@@ -119,7 +127,7 @@ export default function SupportPage() {
               await refresh();
               return;
             }
-            const result = await trustApi<CaseSummary>("reports", {
+            const result = await request<CaseSummary>("reports", {
               kind,
               reason,
               ...(kind !== "support" && creatorId ? { creatorId } : {}),
@@ -225,7 +233,7 @@ export default function SupportPage() {
         />
         <button
           className="qv-btn qv-btn--secondary"
-          disabled={busy || !session.data}
+          disabled={busy || !sessionState.ready}
         >
           {busy ? "Saving…" : "Send report"}
         </button>
@@ -259,11 +267,12 @@ export default function SupportPage() {
               <form
                 onSubmit={async (event) => {
                   event.preventDefault();
+                  if (!sessionState.ready || busy) return;
                   const current = epoch.current;
                   setBusy(true);
                   key.current ??= crypto.randomUUID();
                   try {
-                    await trustApi(`cases/${item.id}/appeals`, {
+                    await request(`cases/${item.id}/appeals`, {
                       version: item.version,
                       reason: appealReason,
                       idempotencyKey: key.current,
@@ -302,7 +311,10 @@ export default function SupportPage() {
                     key.current = null;
                   }}
                 />
-                <button className="qv-btn qv-btn--secondary" disabled={busy}>
+                <button
+                  className="qv-btn qv-btn--secondary"
+                  disabled={busy || !sessionState.ready}
+                >
                   Send appeal
                 </button>
               </form>

@@ -12,7 +12,7 @@ import {
   TrustSession,
   useTrust,
   useTrustSession,
-  trustApi,
+  useTrustRequest,
   caseLabel,
   dateLabel,
 } from "../../trust-client";
@@ -40,6 +40,7 @@ export default function CasePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+  const request = useTrustRequest();
   const { data, error, loading, refresh } = useTrust<CaseDetail>(`cases/${id}`);
   const [purpose, setPurpose] = useState("");
   const [reason, setReason] = useState("");
@@ -82,7 +83,7 @@ export default function CasePage({
     setActionError(null);
     key.current ??= crypto.randomUUID();
     try {
-      await trustApi(`cases/${id}/decisions`, {
+      await request(`cases/${id}/decisions`, {
         version: data.version,
         resolution,
         reason,
@@ -116,7 +117,7 @@ export default function CasePage({
     setActionError(null);
     retryKey.current ??= crypto.randomUUID();
     try {
-      await trustApi(`cases/${id}/effects/retry`, {
+      await request(`cases/${id}/effects/retry`, {
         version: data.version,
         reason: retryReason,
         idempotencyKey: retryKey.current,
@@ -214,7 +215,7 @@ export default function CasePage({
                 setBusy(true);
                 setActionError(null);
                 try {
-                  await trustApi(`cases/${id}/access`, {
+                  await request(`cases/${id}/access`, {
                     purpose,
                     minutes: 15,
                   });

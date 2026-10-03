@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-02T18:54:10.931203+00:00",
+  "parent": "6079ba3dd7bb7b95a2ed476f362f8cec995fa5bc",
+  "reviewedMain": "ecca4c4380ced8d51b07fa25734c6cc5b7c5d053",
+  "sixFileIncrementPersonallyReviewed": true,
+  "combinedPRReviewComplete": false,
+  "sourceSha256": {
+    "apps/android/app/src/main/java/com/pantopus/qelvora/ui/Growth.kt": "d69b1c424697b62c06af119d6b4d48682ec0723a241c8c91e632ea330101fd48",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/ui/GrowthPreferences.kt": "1519fa8c8f37d95dfb6c425e0d7e28637d8986eb2a44ed0aecd58a0fb6e8357f",
+    "apps/ios/Sources/QelvoraUI/GrowthPreferences.swift": "99b671558732631b0e1f1bfb82d8194f083c66f86c614a3d5a10216f623760ed",
+    "apps/web/app/notifications/settings/page.tsx": "35aae156def45e681fdd291ff765eb3bab75c08197043eccc13baac39ee42f0e",
+    "apps/web/features/growth/actions.tsx": "f2f1f8afd558efebdbd27ce1770e0b87851376c9400fe4a0c76aa4198d2b65dc",
+    "apps/web/features/growth/preferences.tsx": "dfb0e9bb29aefdbf1d4ecf98855aef1ca57fcf6982dd0e013ae64a23899cc4b3"
+  },
+  "codeDecision": "The same original load credential binds both native reads and Save; web currentSession restoration executes outside the page catch, and resolved account ID binds both reads and Save. Existing backend verified bearer supplies authority; expected-account header only denies mismatch.",
+  "remainingPersonalBranches": [
+    "native mid-flight credential rotation/account transfer refusal",
+    "authenticated shipping web stale form and expired-session restoration"
+  ],
+  "noNewTests": true,
+  "AndroidState": "matching APK Save/Reload; ordinary development account two defaults and account one persistence personally observed after identical retained-AVD recovery. Mid-flight branch unobserved."
+}

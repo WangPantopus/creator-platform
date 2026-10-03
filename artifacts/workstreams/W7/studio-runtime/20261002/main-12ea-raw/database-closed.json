@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-02T19:43:08.247Z",
+  "database": "creator_w7",
+  "migrations": 40,
+  "otherClients": 0,
+  "connection_limit": 0,
+  "comment": "W7 traffic closed after original-40 shipping runtime; wave unactivated; fresh private backup required",
+  "newSQLActivated": false,
+  "backupRefreshRequired": true
+}

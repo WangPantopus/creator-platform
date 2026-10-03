@@ -1,0 +1,403 @@
+{
+  "observedAt": "2026-10-02T19:15:07.268163+00:00",
+  "reviewer": "W7 primary, personally",
+  "priorReviewedMain": "ecca4c4380ced8d51b07fa25734c6cc5b7c5d053",
+  "incomingMain": "12ea10a670ed601ffb21700f9d5360f3ebb1ee68",
+  "sourceHead": "d5bf8452902c2e9d799e8f91e506620be0de12e9",
+  "personalIncomingSourceReviewComplete": true,
+  "method": "Personally read each source delta, full new owner/SQL implementations and all eight semantic catalogue arrays; filled truncated output gaps in separate reads across this continuous turn.",
+  "files": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "26da499638976992444be49b4aa95eb9489189d49d4c8b3d3db7c5275ce87438"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/content/ContentFeature.kt",
+      "sha256": "a9b0966d335cc353c2ddd449e47f6aab797793a82dfcb62297bd357215d71e5a"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt",
+      "sha256": "48c5eb50c5baba5e7738d27364fc2c7c891c917d8cde6f7912333c5549d36fb5"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt",
+      "sha256": "465f3a435abb9be5fe7b455830d280b988d42e95e7f1fa97fa75d5467c301c5b"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeAvailability.kt",
+      "sha256": "580ee603b721bc76dcfd42f7013aecb8fdad134b51ba8e6b0ae2e4745efc11f0"
+    },
+    {
+      "path": "apps/android/app/src/main/res/values/strings.xml",
+      "sha256": "97cfc52199927014f58ab4a99978f0f8012c480c3cc215774697daddfda7b241"
+    },
+    {
+      "path": "apps/backend/migrations/0084_w8_team_thread_denial.sql",
+      "sha256": "7b7189c0a1d14d615abe7fc12c51de63781943e7447775bf439c842e44b07451"
+    },
+    {
+      "path": "apps/backend/migrations/0086_w8_public_creator_denial.sql",
+      "sha256": "876e5a0636e9010f3349b57ecc6ff71b42f316cc7210d8b80bac9be4955efe8c"
+    },
+    {
+      "path": "apps/backend/migrations/0089_w8_creator_fan_denial.sql",
+      "sha256": "0a738e0a29c77e65274931d4054b5db26a340b8c10a498e8c016457ab1a22860"
+    },
+    {
+      "path": "apps/backend/migrations/0103_w8_domain_privacy_task_fence.sql",
+      "sha256": "040771e88c1cea0720519a2c162cd02319229d9c67171966fc98bc6a3476c15d"
+    },
+    {
+      "path": "apps/backend/migrations/0150_w6_account_call_metadata.sql",
+      "sha256": "8f4cebbdee2649a97b2e8e7e31173cbe4563dd6f951dd677f51cd61b50befc1a"
+    },
+    {
+      "path": "apps/backend/migrations/0201_w8_worker_migration_metadata.sql",
+      "sha256": "2fce1ce5aa6c9f571067d999e2a62ac8d71b8e147b97393e7e87091227159e6f"
+    },
+    {
+      "path": "apps/backend/scripts/build.mjs",
+      "sha256": "6f681442127b878f1edd9df50e4a41559ff7f75c0bb6223812263ce02148f301"
+    },
+    {
+      "path": "apps/backend/scripts/reconcile-restored-trust.ts",
+      "sha256": "21e683e49180972fd9bd1257b0f3ac35707d4987e1362d6ed70f6b7e53311431"
+    },
+    {
+      "path": "apps/backend/src/app.ts",
+      "sha256": "10bd7b5ff4e1a5f0766eb9cb4015274b29a9918e15188b2f9bb882d1f8adcef4"
+    },
+    {
+      "path": "apps/backend/src/core/purpose-catalogue.ts",
+      "sha256": "57aec2e0a9d0b9ff31b428bee7b9652f88438fa929bd9bd33fd72f5bac3adc09"
+    },
+    {
+      "path": "apps/backend/src/db/reviewed-migration.ts",
+      "sha256": "faa9a484b6ad1eb58a8cc8a876732fbcf51564be123960d31c5ced6209cf3e8e"
+    },
+    {
+      "path": "apps/backend/src/integration.ts",
+      "sha256": "3310c831de13d2a7496aa14317ef3293ac29efd048faae3369b83bb3a392f253"
+    },
+    {
+      "path": "apps/backend/src/modules/access/commerce.ts",
+      "sha256": "c60764ec9712db077daba4637c4680573465c387e2220e5f172bc3f06af72735"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/development-server.ts",
+      "sha256": "765211c93c542710022be7a44134e65569346b03fa9d96eec9dd6228fa539597"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/generation-journal.ts",
+      "sha256": "4aa5f96866b61713428162640648456cff24a397735456465fa873fb3430e1d8"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/generation-terminal-journal.ts",
+      "sha256": "25abc57a6b62335ab1e0d5b1bc598273a83e04fb407011578fc79d484dbd3370"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/migrations/0105_w2_generation_terminal_journal.sql",
+      "sha256": "7ab8974d065b1b9e5befa2ded26c6978876957fab0eee80b9632825bbac98477"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/runtime.ts",
+      "sha256": "2b2715e3a9fa8a68d8e5253f9a504b9a7d4f15470632c09272ecd306cb5d33e3"
+    },
+    {
+      "path": "apps/backend/src/modules/agent/translation.ts",
+      "sha256": "d1493f1d9b25eaa20d9d70a1318e503a1b287ec4eb0af1a3f966391c77288ab9"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/attributed-cost-policy.ts",
+      "sha256": "eb92a114905202dfdc44e3e120056e4ce330af8327e4267b3173ac7ac2f2433d"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/generation-allowance.ts",
+      "sha256": "574770423af57bf8815f25cfc16ae426fe0512d435d169f0294023cb6d674262"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/generation-audience.ts",
+      "sha256": "a028ee08bd8d2c0bada3d98a2b9527235c490bb6ce1c2beaa5d2580e94a06347"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/generation-terminal-settlement.ts",
+      "sha256": "fa7e3c274a247de80a708cd3f8782a98f48ed4c2f327f93621882e9ecbff0f40"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/home.ts",
+      "sha256": "cee398c955c027e785887ab9101c06cfd0a0a461bece76c70d2484c451981d1b"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/original-cost-custody.ts",
+      "sha256": "d87c07c639c1f820d948538c5c9ed4b8f7db6c8732b1571cd1e64def065bc809"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/paid-coverage.ts",
+      "sha256": "1e0e0d360d8ea547335efddcca7f3af26f044273614a1f51cba595e3ff8ce31a"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/public-packet-host.ts",
+      "sha256": "d4c298f996c3ec2411f5feb6ac5dbd91f2908a2fb15343e654afe35b6a6a142c"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/public-packet-read.ts",
+      "sha256": "4ad26d2e5d7af055c7cc7814221d8ba5db5978d53e808ddce197fe6e311ece48"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/scheduling.ts",
+      "sha256": "74913e89f38bb72b248c69a6d0bd96c072b43a4060be4f2e87f6ef646ef1244d"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/schema-generation-audience-renumbered.sql",
+      "sha256": "98f9373fbf2403e05f6f26a4223a94779d3280fefa89f2ab2c6f30fbbef796be"
+    },
+    {
+      "path": "apps/backend/src/modules/commerce/schema-generation-terminal-settlement.sql",
+      "sha256": "a6e386de7506035d6bc0d10da644cb8ee2620824217b9c2c61a9a34cb7fa4fc9"
+    },
+    {
+      "path": "apps/backend/src/modules/content/development-server.ts",
+      "sha256": "2f1a8adb3d36e8186859b708a95090a81c32fc69f2d46608f0d2465af254dcfe"
+    },
+    {
+      "path": "apps/backend/src/modules/content/integration.ts",
+      "sha256": "b66e665d248f78f7a3bae5b37c054299d89e099123d8c45ef5d349c6b57d6f73"
+    },
+    {
+      "path": "apps/backend/src/modules/content/privacy-export-custody.ts",
+      "sha256": "387103d93f9c61b9fa384d25c6bc5179500eed4e14c9a713c9789c1847e81906"
+    },
+    {
+      "path": "apps/backend/src/modules/content/privacy-export.ts",
+      "sha256": "7f1fa717ed81358cab4c7920c427c38a3eeeba15d48c181a5f1318fa8deaf389"
+    },
+    {
+      "path": "apps/backend/src/modules/content/privacy.ts",
+      "sha256": "706c064e6b11308ec4c2db39598f01fc0fee2152cf80d371204193c7d369181e"
+    },
+    {
+      "path": "apps/backend/src/modules/content/schema-content-privacy-export.sql",
+      "sha256": "faff9c4be7b6f27601032756a6be845d656969d81f15e89ad10611e639a83ff8"
+    },
+    {
+      "path": "apps/backend/src/modules/content/service.ts",
+      "sha256": "0464554fcb191b7dc5f85cbbf9d09b22ccb3495a0fdb73be608f29e2106eb656"
+    },
+    {
+      "path": "apps/backend/src/modules/content/tenure.ts",
+      "sha256": "c2f63acb7b04c89db60d59cf2976277805f6669546feda8c9d0a228c46abfdd4"
+    },
+    {
+      "path": "apps/backend/src/modules/identity/audience-scope.ts",
+      "sha256": "7859aabe0d1a00ebfe7aa269a4fb5291fc88c311ca01b5d4bd2ad46d7efbb2ec"
+    },
+    {
+      "path": "apps/backend/src/modules/identity/creator-scope.ts",
+      "sha256": "4552d7fbafef7c897b9fcdc785b9c023c30fea56ad29b0ed42fabc7ffd61725f"
+    },
+    {
+      "path": "apps/backend/src/modules/identity/generation-scope.ts",
+      "sha256": "a4e3e2757faa8fe74adb9e31829130bb7acf8d72958b096d7d68af5ce0431214"
+    },
+    {
+      "path": "apps/backend/src/modules/identity/generation-terminal-custody.ts",
+      "sha256": "b3d6467064890f3d570b779d973e8eae872647779347018c5be61431fe19f5f6"
+    },
+    {
+      "path": "apps/backend/src/modules/identity/generation-terminal.ts",
+      "sha256": "bd6454363dd4f9a3fe24af164dbbd3697001914ccc49fc3f1bbb383b47c221b2"
+    },
+    {
+      "path": "apps/backend/src/modules/identity/request-authority.ts",
+      "sha256": "5f981978df0b6cd98975537733cb2e62ef8b8670276fe4af0d12f4d37eb40941"
+    },
+    {
+      "path": "apps/backend/src/modules/identity/schema-generation-terminal.sql",
+      "sha256": "fadbf62a3ddf06142c3a6ad30313503f9bebe7b6d64f67f8ba01ff13ce2398c7"
+    },
+    {
+      "path": "apps/backend/src/modules/identity/sessions.ts",
+      "sha256": "9c6d4350197c95b6ab165ce94316cb56c612dc4f460781c8434545588fffb8cd"
+    },
+    {
+      "path": "apps/backend/src/modules/identity/signature-read-fence.ts",
+      "sha256": "e2ba14cd13c94388d72c32bf1aded4c76754e7d8f6b7ed53b8722b6780632f21"
+    },
+    {
+      "path": "apps/backend/src/modules/identity/signed-acts.ts",
+      "sha256": "13c5efe665a81d1fbd04096072bab4d4ff4fb457c42dabee115e5faea5f28090"
+    },
+    {
+      "path": "apps/backend/src/modules/media/host.ts",
+      "sha256": "177758a4e80a8909cc427400460f7b565f3696d6096b255c9b2a5fb9fe801eab"
+    },
+    {
+      "path": "apps/backend/src/modules/media/publication.ts",
+      "sha256": "38f57f04ad8987075ce70101fd691d93a0e97fc128fd7cc1d74a89d880c39786"
+    },
+    {
+      "path": "apps/backend/src/modules/media/router.ts",
+      "sha256": "bf2010e7fa144a51a37b12d391657952c29904d8e5bad39606cf528959012f6d"
+    },
+    {
+      "path": "apps/backend/src/modules/session/account-call-metadata.ts",
+      "sha256": "ddce56f082dcda63dea1a3c64cfd210a8e301c520d6dacbb1789c3122b821a89"
+    },
+    {
+      "path": "apps/backend/src/modules/session/call-metadata-catalog.ts",
+      "sha256": "dc1ca08553f3e59bdeec5a2d8a739ca34839d71be5e06c34d6073f0bb0d1203e"
+    },
+    {
+      "path": "apps/backend/src/modules/session/commerce.ts",
+      "sha256": "88ec1c99855d48923345bee43e455366c9f67711e4d998100dbb5fa7a30287d2"
+    },
+    {
+      "path": "apps/backend/src/modules/session/interactive-control.ts",
+      "sha256": "1b5579a13f580dc5fdd8f62146d5fad7b7f5d15afb6dda13a630bc8ba2232150"
+    },
+    {
+      "path": "apps/backend/src/modules/session/livekit-journal.ts",
+      "sha256": "df2439acc1738457947c3af022840a675457b94e14180c9713fa53978ccd0a8e"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/conversation-privacy-authority.ts",
+      "sha256": "699dc9001bc5f6f9b6885c7fa9bb25873b2cbdf5aa19d565615f3cdbc04128f6"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/development.ts",
+      "sha256": "3ca316c4cd5e7841497dd6fe92fa0da8a5bf5e05d71d86319dd84e61d3b1c232"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/domain-adapters.ts",
+      "sha256": "865e8fa02fc319979e543f13cce2a64fbe791c787f7e031d8b94ab816f731845"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/domain-privacy-authority.ts",
+      "sha256": "19a6a60fce2f390a1522374d959a495b425fc526d9bbb30796102696a0f5ee23"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/domain-privacy-catalog.ts",
+      "sha256": "f36bfa5b69cfc2343a5fc65d44ae4d41509b04b97bbf0b96ebaad3bb449a2848"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/identity-privacy-hook.ts",
+      "sha256": "e4b30bfb5c8a1512c8e8b8cb11a7b8fdd19d3d0494271bdbc1a54bbcb4a3e062"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/media-privacy-hook.ts",
+      "sha256": "581af1c184b124b95d28ce1cc4ab4a2794361a5fed1c3a0023322abc56bb3db6"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/own-privacy-hook.ts",
+      "sha256": "c2b85854cb6321c0fad53e3caebe4af4ff759f5bf629996fb4227402cea227ae"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/privacy-authority.ts",
+      "sha256": "c5d7b1d3b2f2dfeb4978051175964a1911fce9efd06b7593fee3f189bd5619da"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/privacy-consumers.ts",
+      "sha256": "a942a15de9b9c80773a46744e15609be20bc9581425685e4d16aebb78f03c253"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/scope-restriction.ts",
+      "sha256": "be4729367f5af641b53391ba1df9a3017cba05448efa186201f43c0a3d7f232d"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/worker.ts",
+      "sha256": "c028eafe73778c609edefa467d3eef004a18c5ead4b830bacfeca2ca3cc429b5"
+    },
+    {
+      "path": "apps/backend/src/operations/runtime.ts",
+      "sha256": "e1479e43e185b1ce1fb8b7ce8bdca96cdc927e4262358f7d02ebfa7572458b10"
+    },
+    {
+      "path": "apps/backend/src/server.ts",
+      "sha256": "e470cef4a27677208d4ecaaeb9575435c69710308b8206af12f2d220ccae515a"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/Localizable.xcstrings",
+      "sha256": "bcfd28cb83f240911f3836d03aa4aad2d035106cb8547c26fa8d6af52a168133"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/QelvoraAPI.swift",
+      "sha256": "4a7d5334c501cfbbc091fde2a039dcbdaec81fc8aaff5c8090bb9e111ae12a5f"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/QelvoraCopy.swift",
+      "sha256": "40ad00dab698badfa9741790b697dfc6b769930f04bd16577bc8cbe9fdf7d3f8"
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Content/ContentFeature.swift",
+      "sha256": "78cf2da5e76ef31b198bd67938df26294e7623c5f4310a756dc8aec80a900fb2"
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Media/NativeAvailability.swift",
+      "sha256": "76c1c1f06e5a703bd36eb771c42137803fe432ae9f9b0d70194eb8961e9174d7"
+    },
+    {
+      "path": "apps/web/app/ops/trust-client.tsx",
+      "sha256": "50ef0ef1068438af1f8ce70953fbe79395877e7a1ee43950343e65296f1babcb"
+    },
+    {
+      "path": "apps/web/features/calls/AvailabilityEditor.tsx",
+      "sha256": "53038d28e4a0ff5a91f36ab8e5f65ce7c6ce808c4801668dd39436ad2015601a"
+    },
+    {
+      "path": "apps/web/features/content/Content.tsx",
+      "sha256": "c938a07b15f1b4fad7c76a4987fb8454f7fc2d72d6b5dc507b9a2f505185045a"
+    },
+    {
+      "path": "apps/web/features/studio/Studio.tsx",
+      "sha256": "fd2d4d41e0088c5bc13c96c3ec3fefc57d43bd3f11ca7a3bd30afb12c64d5cfe"
+    },
+    {
+      "path": "config/copy.json",
+      "sha256": "b795d9573656a6c4e638bf82206b20d011f3283b9f5be8dc54449564939bf118"
+    },
+    {
+      "path": "infra/migrations.json",
+      "sha256": "be8854088549fc2e66fe881b694fb3e24400e56b6f7c62881ef5deb4906f3e84"
+    },
+    {
+      "path": "packages/api/generated/openapi.json",
+      "sha256": "b05b70dd825eab216cc71b7be8f737769aa5f90e204489d8518a421b00dfe729"
+    },
+    {
+      "path": "packages/api/src/content.ts",
+      "sha256": "bd315ba997088c0651b012d2213b004e1f652d604c0c7f6fabbef4d827506eb4"
+    },
+    {
+      "path": "packages/api/src/media-openapi.ts",
+      "sha256": "7ba33ad40b7ba8ffd8d74d981f85d10b275e0c623546e2652b362b4bbfae542d"
+    },
+    {
+      "path": "packages/api/src/session.ts",
+      "sha256": "90de0e3421fe019a2e1b85c91bede11c11315119ef9b3870da1597d6bf5f8a77"
+    },
+    {
+      "path": "packages/copy/src/index.ts",
+      "sha256": "7180bc758e3c2609f2021b20ce7659890ff47586db8ddf1b3b3869a9ba9088fc"
+    }
+  ],
+  "resolutions": {
+    "apps/backend/src/server.ts": "f622e0cfe62e6cb953b5559cd77ec7eac2fc321e4f213c34f69b40379c817033",
+    "apps/backend/src/modules/trust/privacy-consumers.ts": "849f2a1c0e4abed3808c1a380f7c2ff407a158fb2d72727d90ab4646e4789d0b",
+    "apps/backend/src/modules/trust/worker.ts": "c028eafe73778c609edefa467d3eef004a18c5ead4b830bacfeca2ca3cc429b5"
+  },
+  "preserved": [
+    "Separate Growth API pool and actual deferred Growth privacy owner",
+    "Canonical core Content publisher/0185 Follow refusal",
+    "Single-flight orderly shutdown"
+  ],
+  "adopted": [
+    "Prepared call metadata/control graph and current held request checks",
+    "Current restoration in privacy owners and blocked unavailable states"
+  ],
+  "firstReceiptWriteFailure": "Nonexistent generic raw directory; script exited1 before pnpm check. Corrected to main-12ea-raw; no check success inferred.",
+  "sqlActivated": false,
+  "runtimeAcceptance": false,
+  "finalCombinedPRReviewComplete": false,
+  "knownNewerMain": "09288da65feee510b5f83408e76af7a544ead076",
+  "newerMainReviewComplete": false
+}

@@ -4,6 +4,10 @@ import { contentFeature, contentSignedSubjects } from "./registration.js";
 import { ContentSources } from "./sources.js";
 import { contentPublicProjection } from "../growth/content.js";
 import { createCommercePublicationPermission } from "../commerce/publication.js";
+export {
+  createCurrentContentPostEntryReader,
+  type CurrentContentPostEntryReader,
+} from "./post-entry.js";
 import { assertCommercePublicationSource } from "../commerce/publication-source.js";
 export {
   PreparedContentGenerationOrigins,

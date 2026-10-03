@@ -1,0 +1,9 @@
+{
+  "idbPid": 47909,
+  "emulatorLease": "exacttoken/dev/ino released creator-platform-emulator-slot-1",
+  "simulatorLease": "exacttoken/dev/ino released creator-platform-simulator-slot-1",
+  "at": "2026-10-02T16:42:46.685541+00:00",
+  "simulator": "own explicitUDID shutdown",
+  "emulator": "own explicit5580 emu kill exit0",
+  "peerTouched": false
+}

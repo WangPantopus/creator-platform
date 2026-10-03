@@ -32,6 +32,11 @@ import type { CommerceService } from "../commerce/service.js";
 import type { ConversationLineage } from "./lineage.js";
 import type { ConversationRecordings } from "./recordings.js";
 import type { ConversationCorrections } from "./corrections.js";
+import {
+  conversationHomeCursor,
+  readConversationHomeCursor,
+} from "./home-cursor.js";
+import { GrowthHeldClient } from "../growth/held-client.js";
 
 export const accessDisclosure =
   "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.";
@@ -391,6 +396,108 @@ export class ConversationFeature {
       "write",
     );
     return this.page(scope);
+  }
+  /** Globally ordered account metadata. Installation is additive and explicitly
+   * gated; older hosts retain their reachable UUID directory, without claiming
+   * activity order. Private previews are read only through fresh pair scopes. */
+  async accountForHome(actor: Actor, cursor?: string) {
+    const ready =
+      (
+        await this.db.pool.query(`SELECT
+        EXISTS(SELECT FROM pg_attribute WHERE attrelid='creator.conversation_relationship'::regclass AND attname='activity_at' AND attnotnull AND NOT attisdropped)
+        AND to_regclass('creator.conversation_relationship_activity_page') IS NOT NULL
+        AND EXISTS(SELECT FROM pg_trigger WHERE tgrelid='creator.message'::regclass AND tgname='record_relationship_activity' AND tgenabled='O') AS ready`)
+      ).rows[0]?.ready === true;
+    if (!ready) {
+      if (cursor && !IdSchema.safeParse(cursor).success)
+        throw new DomainError(
+          "account_activity_unavailable",
+          "Refresh your conversations before paging.",
+          503,
+        );
+      return {
+        ...(await this.account(actor, cursor)),
+        order: "directory" as const,
+      };
+    }
+    const before = cursor ? readConversationHomeCursor(cursor) : null;
+    const client = await this.db.pool.connect();
+    const held = new GrowthHeldClient(client);
+    let failure: unknown;
+    try {
+      await held.begin();
+      await client.query("SELECT set_config('app.account_id',$1,true)", [
+        actor.accountId,
+      ]);
+      await assertCurrentSession(client, actor.accountId);
+      const fan = (
+        await client.query<{
+          id: string;
+          handle: string;
+          intro: string | null;
+        }>(
+          "SELECT id,handle,intro FROM creator.fan_profile WHERE account_id=$1",
+          [actor.accountId],
+        )
+      ).rows[0];
+      invariant(
+        fan,
+        "fan_profile_required",
+        "Choose your handle before opening You.",
+      );
+      if (before) {
+        const known = await client.query(
+          "SELECT thread_id FROM creator.conversation_relationship WHERE account_id=$1 AND fan_id=$2 AND thread_id=$3",
+          [actor.accountId, fan.id, before.threadId],
+        );
+        if (!known.rowCount)
+          throw new DomainError(
+            "account_cursor_unavailable",
+            "Refresh your conversations before paging.",
+            404,
+          );
+      }
+      const threads = (
+        await client.query<{
+          id: string;
+          creatorId: string;
+          fanId: string;
+          name: string;
+          activityAt: string;
+        }>(
+          `SELECT r.thread_id AS id,r.creator_id AS "creatorId",r.fan_id AS "fanId",cp.display_name AS name,
+         to_char(r.activity_at AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "activityAt"
+         FROM creator.conversation_relationship r JOIN creator.creator_profile cp ON cp.id=r.creator_id
+         WHERE r.account_id=$1 AND r.fan_id=$2 AND ($3::timestamptz IS NULL OR (r.activity_at,r.thread_id)<($3::timestamptz,$4::uuid))
+         ORDER BY r.activity_at DESC,r.thread_id DESC LIMIT 51`,
+          [
+            actor.accountId,
+            fan.id,
+            before?.activityAt ?? null,
+            before?.threadId ?? null,
+          ],
+        )
+      ).rows;
+      await assertCurrentSession(client, actor.accountId);
+      await held.commit();
+      return {
+        fan,
+        threads: threads.slice(0, 50),
+        nextCursor:
+          threads.length > 50
+            ? conversationHomeCursor({
+                threadId: threads[49]!.id,
+                activityAt: threads[49]!.activityAt,
+              })
+            : null,
+        order: "activity" as const,
+      };
+    } catch (error) {
+      failure = error;
+      throw error;
+    } finally {
+      await held.close({ failure });
+    }
   }
   async account(actor: Actor, cursor?: string) {
     const before = IdSchema.optional().parse(cursor);

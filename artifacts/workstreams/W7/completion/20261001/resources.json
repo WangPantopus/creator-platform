@@ -1,0 +1,1075 @@
+{
+  "updatedAt": "2026-10-03T23:09:02.986174+00:00",
+  "owner": "W7 primary",
+  "chatId": "01a0ff25-62ae-7062-8e4c-125a04e9c33e",
+  "checkout": "/Users/yingpengwang/.codex/worktrees/w7-successor-20261002/creator-platform",
+  "branch": "codex/w7-completion-20261001",
+  "base": "2f0319dbb6979878c5a9019e68503506902f9ea0",
+  "scopeComplete": false,
+  "resources": {
+    "api": {
+      "address": "127.0.0.1:4107",
+      "pid": null,
+      "session": null,
+      "identity": "explicit development",
+      "generation": "unconfigured",
+      "source": "Combined shipping bundle: strict W5 proof, bounded Home, complete sharing export; public HTTPS origin and canonical source directory remain unconfigured",
+      "compiledSource": "d511b446c958783802bd5e64976ad942380da823",
+      "state": "Stopped normally (session68987 exit0); current development shipping bundle operated for unauthenticated notification-ID refusal and readiness body only. No real provider configured or sent.",
+      "lastPid": 50405,
+      "lastSession": 68987,
+      "lastOperatedSource": "d511b446c958783802bd5e64976ad942380da823"
+    },
+    "web": {
+      "address": "127.0.0.1:3007",
+      "pid": null,
+      "session": null,
+      "mode": "Production Next16.3.7, explicitly loopback",
+      "state": "Stopped normally (session14518 exit143); production build and corrected loopback launch reached signed-out settings and preserved sign-in destination. Initial misconfigured runtime3614 exit143 preserved. No authenticated/populated journey.",
+      "lastPid": 50987,
+      "lastSession": 14518
+    },
+    "postgres": {
+      "container": "creator-platform-w7-document-20261001",
+      "volume": "creator-platform-w7-document-20261001",
+      "address": "127.0.0.1:55447",
+      "database": "creator_w7_takeover_20260930",
+      "recovery": "Original encrypted takeover database restored with retained original keys; runtime LOGIN roles recovered from retained configuration and original role memberships restored.",
+      "state": "Stopped, retained owned container and volume. Only original W7 target database and original roles/memberships restored; no new SQL proposal applied. Peer W4 container untouched.",
+      "containerId": "2f444b5830a913d1813aebf664705bb7dff51d7d999168fc00040d40ad53fe4f",
+      "memoryBytes": 536870912,
+      "cpus": 1
+    },
+    "disposableChecks": {
+      "container": "creator-platform-w7-foundation-20261001",
+      "address": "127.0.0.1:55457",
+      "database": "creator_w7_foundation_test",
+      "status": "Idle retry passed all18 existing checks unchanged, including10000 pairs/30000 assertions. Earlier role mismatch and300000ms timeout preserved.",
+      "state": "No matching W7 container remains at current inspection; removed during repo cleanup. Retained original recovery archive is preserved."
+    },
+    "ios": {
+      "udid": "CE855FD5-A4AA-4C62-A63B-5E80D2E1DFF1",
+      "name": "W7 Document20261001",
+      "runtime": "iOS26.5",
+      "state": "Current signed d511b446 shipping app installed and cold-launched to rendered Welcome on retained owned device; first premature blank frame preserved. Terminated and shut down. Populated OS controls/APNs/native tap/race acceptance remain open.",
+      "bundleId": "com.pantopus.qelvora",
+      "installedSource": "d511b446c958783802bd5e64976ad942380da823"
+    },
+    "android": {
+      "adbPort": 5047,
+      "consolePort": 5570,
+      "adbDevicePort": 5571,
+      "state": "No Android runtime/emulator/SDK packages restored or operated in this handoff wave. Original signing key retained; official checksum-verified Java17 and command-line tools only extracted under owned native-tools for continuation.",
+      "avd": "W7_Completion_20261001",
+      "serial": "emulator-5570",
+      "avdPath": "/private/tmp/creator-platform-w7-completion-20261001/android-user/avd/W7_Completion_20261001.avd"
+    },
+    "temporaryRoot": "/private/tmp/creator-platform-w7-completion-20261001",
+    "privateConfigurationDirectory": "/Users/yingpengwang/.config/creator-platform/w7-completion-20261001"
+  },
+  "retainedRecovery": {
+    "directory": "/Users/yingpengwang/.config/creator-platform/cleanup-20261001",
+    "backupSha256": "83221699a1daec1cd715bebe477913b0f7aadd476c7a2f93420d4ad6f3d1b216",
+    "androidKeySha256": "4d70a4b9d5db5589a0b66a9894c680bf6ae9fd788ed8de2ae3b357200546ecce",
+    "altered": false
+  },
+  "independentWork": "Strict W5 publication proof and stale withdrawal; bounded canonical Home/Discover and current displayed-page W4 pass metadata; complete labeled text export; rotating encrypted worker checkpoint; closed Thanks collector with250-row keyset pages and20 consented quotes. Four additive SQL proposals remain unallocated/unregistered/unapplied. Actual producer authority, global installed recency, narrow privacy mapping and populated/provider acceptance remain open.",
+  "externalInputs": "Approved identity/verified creator/signing authority, APNs/FCM/email transport and public HTTPS origin not supplied; requested once. No production acceptance claimed.",
+  "reviewedMain": "61cfa732a5f9c08c35d6ac1c76f00209d047cc96",
+  "combinedSource": "483009bf2df72d06f44586a1fda025e451e9e76d",
+  "removedBuildResources": {
+    "android-sdk": true,
+    "gradle-home": true,
+    "android-build": true,
+    "ios-derived": true,
+    "ios-packages": true,
+    "swift-checks": true,
+    "android-user/avd/W7_Completion_20261001.avd": true,
+    "ios-document-derived": false,
+    "ios-document-packages": false,
+    "swift-document-checks": false,
+    "swift-document-cache": false
+  },
+  "iosDeviceDirectoryExists": true,
+  "localRuntimeConstraint": "Verified direct W7 section3 authorizes minimal restoration after the earlier W5 cleanup. No newer direct human cleanup request found in inspected history. One owned native build/check at a time; stop temporary services/devices after the concrete journey.",
+  "removedSourceDependencies": false,
+  "nativeRestoration": {
+    "at": "2026-10-01T16:46:00.126768+00:00",
+    "authority": "direct W7 completion instruction section3: reprovision minimum dependencies for next concrete journey; no newer direct human cleanup request found in verified history",
+    "constraint": "one nice-priority iOS build, jobs1; no DB/web/Android runtime or simulator boot",
+    "source": "303395901d590d85f9510fe72f4f866ae97903cd",
+    "derived": "/private/tmp/creator-platform-w7-completion-20261001/ios-document-derived",
+    "packages": "/private/tmp/creator-platform-w7-completion-20261001/ios-document-packages",
+    "status": "BUILD SUCCEEDED; strict signature exit0; existing18 Swift checks/110 original comparisons exit0; actual fresh-device unavailable-share cold launch personally observed in Light/Night. Positive grant/PDF/sheet/AX input acceptance remains open.",
+    "buildLog": "ios-document-build.log",
+    "buildProcessRunning": false,
+    "buildProcessExitStatus": "not retrieved: tool session metadata was discarded; compiler log reports BUILD SUCCEEDED",
+    "swiftCheckSession": 87853,
+    "swiftCheckExitStatus": 0,
+    "noNewTestsOrFlows": true,
+    "shutdownAt": "2026-10-01T19:51:51.963419+00:00",
+    "currentSource": "d511b446c958783802bd5e64976ad942380da823",
+    "latestBuildLog": "ios-push-build-reviewed.log",
+    "latestBuildExitStatus": 0,
+    "latestSwiftCheckLog": "swift-push-checks.log",
+    "latestSwiftCheckExitStatus": 0
+  },
+  "restorationReceipt": "leased-privacy-native-checkpoint.json",
+  "currentSource": "cca526fe5a1fdd46386a974b2119efd40b06889c",
+  "handoff": "docs/workstreams/handoffs/W7-2026-10-03-next.md",
+  "nativeToolPreparation": {
+    "jdkHome": "/private/tmp/creator-platform-w7-completion-20261001/native-tools/jdk17/jdk-17.0.20.1+1/Contents/Home",
+    "jdkArchiveSha256": "c01975da12ed4235250ff891fe8bba73a9e73037d444b269c9d0922b5dbc8e0a",
+    "commandlineTools": "/private/tmp/creator-platform-w7-completion-20261001/native-tools/android-commandline/cmdline-tools",
+    "commandlineArchiveSha1": "112cf9618794a997ff273537d55bee02c22abffe",
+    "sdkPackagesInstalled": false,
+    "nativeProcessesRunning": false
+  },
+  "currentHost": {
+    "recordedAt": "2026-10-03T07:34:10.625444+00:00",
+    "note": "W7 moved from the old iMac (Intel, macOS 26, Xcode 26.5) to Yingpeng's Mac Studio (Apple M2 Max, macOS 27.0 26A428, Xcode 27.0 27A266a, iOS 27.0 simulator runtime). Every iMac-era resource listed elsewhere in this file (container creator-platform-w7-document-20261001, simulator CE855FD5-A4AA-4C62-A63B-5E80D2E1DFF1, /private/tmp/creator-platform-w7-completion-20261001 caches, ~/.config/creator-platform/{secrets,cleanup-20261001,w7-completion-20261001}) is absent from this machine and was not copied. Those entries are historical iMac custody only.",
+    "checkout": "/Users/yingpengwang/.codex/worktrees/w7-successor-20261002/creator-platform",
+    "postgres": {
+      "container": "creator-platform-w7-macstudio-20261001",
+      "volume": "creator-platform-w7-macstudio-20261001",
+      "image": "pgvector/pgvector:pg17",
+      "address": "127.0.0.1:55447",
+      "database": "creator_w7",
+      "superuserPasswordFile": "~/.config/creator-platform/w7-macstudio-20261001/pg-superuser-password (mode 0600, never printed)",
+      "state": "Physically stopped/exited0 at5c3 closure20:19:55.636924; canonical40 migrations, creator_w7 connectionlimit0 and zero other clients verified before stop; retained data/private inputs/volume unchanged.",
+      "recoveredIMacData": "not restored; the iMac backup holds 0 creators/relationships/shares and is not on this machine"
+    },
+    "reservedPorts": {
+      "api": 4107,
+      "web": 3007,
+      "note": "Own API4107/web3007 closed; canonical PG stopped after40/zero creators/provider receipts/other clients/connectionlimit0. No migration activated. Verify actual source/listeners before reuse."
+    },
+    "iosSimulator": {
+      "name": "Qelvora W7 iPhone 16e",
+      "udid": "FAB31883-2F36-4E50-83B3-D9654B60FF00",
+      "runtime": "iOS 27.0",
+      "points": "390x844",
+      "state": "Shutdown; latest5c3 operation Text3/Light/VoiceOverOFF/ReduceMotionOFF/CaptureKeyboardOFF restored; corrected709 clipping operation pending."
+    },
+    "androidAvd": {
+      "name": "Qelvora_W7_API34",
+      "image": "system-images;android-34;google_apis;arm64-v8a",
+      "display": "1170x2532 @480dpi = 390x844 dp",
+      "state": "Stopped/5580absent; installed current388 hash matched,2026148KiB/two cores; Studio excluded standalone launch, next supported qt-hide-window mode unoperated."
+    },
+    "swiftBuildScratch": "/private/tmp/claude-501/... session scratchpad (disposable; not a dependency)",
+    "sharedMachineBudget": "Adopted W1's 2026-10-01 budget: one heavy native build machine-wide via mkdir /private/tmp/creator-platform-heavy-build.lock (+owner file); at most two creator-platform emulators via /private/tmp/creator-platform-emulator-slot-{1,2}; at most three booted simulators via /private/tmp/creator-platform-simulator-slot-{1,2,3}; explicit UDID/serial only. Three earlier local swift test passes in this session ran before the budget message.",
+    "peerResourcesObserved": "W1 55441/4101-range, W2 55442 and 55449, W3 55443, W4 55444, W5 55435/API 4105/web 3005, W6 55446, W8 55438 and 55439/web 3008/API 4108; peer simulators and emulators were never touched.",
+    "privateConfigurationDirectory": "~/.config/creator-platform/w7-macstudio-20261001",
+    "environmentFiles": {
+      "migration.env": ["DATABASE_MIGRATION_URL"],
+      "runtime.env": [
+        "NODE_ENV",
+        "PORT",
+        "WEB_ORIGIN",
+        "PASSKEY_RP_ID",
+        "PASSKEY_ORIGINS",
+        "CREATOR_FEATURE_ENABLED",
+        "IDENTITY_ADAPTER",
+        "IDENTITY_SESSION_KEY",
+        "DATABASE_URL",
+        "GROWTH_ENABLED",
+        "GROWTH_ENCRYPTION_KEY",
+        "GROWTH_WORKER_DATABASE_URL",
+        "QELVORA_API_URL",
+        "QELVORA_GROWTH_API_URL",
+        "GROWTH_API_DATABASE_URL"
+      ],
+      "roles.private.json": "fresh private API/worker passwords; files0600; no values logged or committed",
+      "runtime-before-pool-split.env": "Private0600 recovery copy only; never print/commit/upload values"
+    },
+    "nativeBuild": "Current20aeb native709 Swift18/11014.697s/signed shipping iOS/deep-strict PASS; Android388 unchanged47tasks74s/APKsignature PASS; actual exact owner/dev/inode release20:32:23.734912 after child0, no device/GUI held.",
+    "api": {
+      "source": "5c3a917324464ac560f3c1d166c3895cbd5049de",
+      "log": "Private0600 current-5c3-api-runtime.log; not uploaded",
+      "lastPid": null,
+      "lastSession": 2179,
+      "state": "Physically closed20:19:55.636924 after current5c3 operation; own ports closed, no traffic",
+      "session": 2179,
+      "previous13dSnapshot": {
+        "source": "13d94b51, built actual combined main0e; source94 later compiled but not launched",
+        "log": "/private/tmp/creator-platform-w7-successor-20261002/combined-main-0e-api.log",
+        "lastPid": 1535,
+        "lastSession": 57703
+      },
+      "previousRecordedMetadataBefore20aeb": {
+        "source": "483009bf, last personally launched shipping API; newer4bf build passes but has not been launched",
+        "log": "/private/tmp/creator-platform-w7-successor-20261002/current-cold-route-api.log",
+        "lastPid": 81452,
+        "lastSession": 90238,
+        "state": "Stopped normally exit0 after exact source/cwd/PID verification; no listener4107",
+        "session": null
+      }
+    },
+    "web": {
+      "mode": "Shipping production Next 16.3.7, apps/web cwd, loopback 3007",
+      "acceptance": "Actual Requests redirect, retained-session outage Retry, expired-session recovery, Continue/identity_unconfigured/Retry/Back preserve destination; authenticated populated operation remains open",
+      "lastPid": null,
+      "lastParentSession": 15301,
+      "state": "Physically closed20:19:55.636924 after current5c3 operation; own ports closed, no traffic",
+      "session": 2179,
+      "log": "Private0600 current-5c3-web-runtime.log; not uploaded",
+      "lastSession": 2179,
+      "source": "5c3a917324464ac560f3c1d166c3895cbd5049de",
+      "previous13dSnapshot": {
+        "source": "13d94b51, production main0e/f6 Privacy gates",
+        "log": "/private/tmp/creator-platform-w7-successor-20261002/combined-main-0e-web.log",
+        "lastPid": 1565,
+        "lastSession": 97171
+      },
+      "previousRecordedMetadataBefore20aeb": {
+        "lastPid": 67006,
+        "lastParentSession": 15301,
+        "state": "Stopped after exact source/cwd/PID verification; Next wrapper exit1 after TERM, no listener3007; subsequent4bf configured visual own3007/3107 servers also closed",
+        "session": null,
+        "log": "/private/tmp/creator-platform-w7-successor-20261002/current-cold-route-production-web.log",
+        "lastSession": 15301,
+        "source": "483009bf, last personally operated shipping production web; newer4bf configured visual check is separate"
+      }
+    },
+    "pushConfiguration": {
+      "CreatorPushEnabled": false,
+      "firebaseSDK": "25.1.0",
+      "FirebaseProjectValuesSupplied": false,
+      "APNsProviderSupplied": false,
+      "emailProviderSupplied": false,
+      "publicHTTPSOriginSupplied": false
+    },
+    "databaseRoles": {
+      "core": "creator_runtime direct LOGIN, NOINHERIT, no Growth or worker membership",
+      "growthAPI": "w7_api direct LOGIN, INHERIT, only creator_runtime+growth_runtime, no worker",
+      "growthWorker": "growth_worker direct LOGIN, NOINHERIT",
+      "realCoreAndGrowthReadiness": "passed; protected trust/purpose authorities remain unconfigured"
+    },
+    "accountNotifications": "Unregistered pending SQL and owner port; actual40-migration catalogue refuses503. No allowed W7 slot free, no migration above0060 activated, no purpose/Actor/provider fabricated.",
+    "shareImages": "Browser-local complete-image source compiled; genuine permitted rendering/download and revocation-during-render acceptance remain open.",
+    "coreFollowMetadata": "Corrected held0185 descriptor from personally reviewed W8fb1cbca; exact original SQL bytes/path unchanged, all five W7 proposals unregistered/unapplied. Own canonical40 DB stopped, function absent; human0044\u20130060 self-application ceiling preserved.",
+    "publisherProof": {
+      "state": "Implemented/compiled, genuine permitted projection/signature/runtime acceptance absent",
+      "ownerSource": "5b95b8904e76ec7d8ec9f8388092eaf1a5c82aaf",
+      "sourceCherryPick": "f73793f3",
+      "evidence": "artifacts/workstreams/W7/studio-runtime/20261002/owner-proof.md",
+      "services": "All own services/devices/leases stopped"
+    },
+    "weeklyImpactRuntime": {
+      "state": "Normally stopped; retained own data/binaries/private configuration",
+      "apiPid": null,
+      "apiLastPid": 85637,
+      "apiExit": 0,
+      "apiPort": 4107,
+      "webPid": null,
+      "webLastPid": 55079,
+      "webExit": 143,
+      "webPort": 3007,
+      "webBuild": ".next-w7-impact-20261002",
+      "devices": "Both W7 apps terminated; own simulator shut down, emulator-5580 explicitly killed, exact owned slots released; no peer touched",
+      "collection": "Actual source/counts/Thanks/current-purpose/notice readers unbound; no fabricated aggregate",
+      "readiness": "503 trust_unconfigured observed",
+      "webAuth": "Production HTTP continuation503 identity_unconfigured, destination preserved, no policy weakening",
+      "source": "Final scheduler directory-failure isolation compiled after native/API observations; repaired positive collection branch unoperated",
+      "evidence": "artifacts/workstreams/W7/studio-runtime/20261002/weekly-impact.md",
+      "cleanup": {
+        "stoppedAt": "2026-10-02T12:47:21.298437+00:00",
+        "apiExit": 0,
+        "webExit": 143,
+        "softwareEmulatorExit": 0,
+        "idbCompanionExit": 0,
+        "simulator": "FAB31883-2F36-4E50-83B3-D9654B60FF00 shut down",
+        "emulator": "emulator-5580 killed explicitly",
+        "released": [
+          "creator-platform-simulator-slot-1",
+          "creator-platform-emulator-slot-1"
+        ],
+        "postgres": "creator-platform-w7-macstudio-20261001 normally stopped",
+        "browser": "own w7ImpactTab closed",
+        "peerResourcesTouched": false
+      }
+    },
+    "coreFollowQualification": {
+      "container": "creator-platform-w7-core-follow-custody-20261002",
+      "database": "creator_w7_core_follow_custody",
+      "port": 55448,
+      "volume": "13feec244f25a74f2b7b5a5ada20e8055827b6d1246c39b86f85637c055c3a85",
+      "state": "Permanently removed during user-authorized cleanup; stopped qualification container and its exclusively owned anonymous volume deleted. No product data; historical source/function-definition custody proof retained.",
+      "mainW7RuntimeDatabase": "untouched,stopped,40 active migrations,no metadata function/namespace",
+      "privateInputNames": [
+        "DATABASE_MIGRATION_URL",
+        "POSTGRES_USER",
+        "POSTGRES_DB",
+        "POSTGRES_PASSWORD"
+      ],
+      "containerExists": false,
+      "volumeExists": false
+    },
+    "mainIntegrationRuntime": {
+      "stoppedAt": "2026-10-02T14:31:41.202148+00:00",
+      "apiLastPid": 51804,
+      "apiExit": 0,
+      "webLastPid": 66458,
+      "webExit": 1,
+      "webExitNote": "Owned next process terminated with TERM; pnpm wrapper returned1; no product failure inferred from shutdown wrapper",
+      "iosUDID": "FAB31883-2F36-4E50-83B3-D9654B60FF00",
+      "ios": "App terminated/simulator shutdown",
+      "android": "emulator-5580 explicitly killed,exit0",
+      "companionLastPid": 80720,
+      "companionExit": 0,
+      "released": ["simulator-slot1", "emulator-slot1"],
+      "leaseCustody": "Actual owner UUID+inode checked before owner-file unlink and empty directory removal",
+      "database": "creator-platform-w7-macstudio-20261001 normally stopped,exit0",
+      "browser": "own w7MainTab closed",
+      "peerResourcesTouched": false,
+      "state": "All W7 resources stopped; current source/acceptance limits in main-integration.md",
+      "evidence": "artifacts/workstreams/W7/studio-runtime/20261002/main-integration.md",
+      "environmentValues": "Not recorded; existing private0600 runtime input names unchanged",
+      "SQLActivated": false
+    },
+    "privacyHeldConsumer": {
+      "parent": "9841372c38f1afe17d27a35e06e92c550b246bae",
+      "implemented": true,
+      "checks": "workspace/production pass",
+      "runtimeObserved": false,
+      "resourcesStarted": false,
+      "newSQLActivated": false,
+      "dependencies": [
+        "current0053 on retained40 database",
+        "registered0103",
+        "real protected export storage/current owner protocols"
+      ],
+      "sourceEvidence": "artifacts/workstreams/W7/studio-runtime/20261002/privacy-held.md"
+    },
+    "pushLifecycleRuntime": {
+      "state": "All own services/devices stopped normally; exact owned leases released; no peer resource touched",
+      "parentSource": "b7d21b0c6363af679dabccd29828424130ec0ef2",
+      "apiPort": 4107,
+      "webPort": 3007,
+      "apiLastPid": 19297,
+      "apiExit": 0,
+      "webLastPid": 84652,
+      "webExit": 143,
+      "androidAPK_SHA256": "b991accb3246bb1c49ea65a09da47bf71281199d1897766a150580d28bc00e03",
+      "iosSource": "Unchanged984 shipping app; reinstalled and actually operated",
+      "newTests": false,
+      "newSQLActivated": false,
+      "providerOperated": false,
+      "privacyJobOperated": false,
+      "cleanup": {
+        "stoppedAt": "2026-10-02T16:00:13.546011+00:00",
+        "peerResourcesTouched": false,
+        "released": [
+          "creator-platform-emulator-slot-2",
+          "creator-platform-simulator-slot-1"
+        ],
+        "simulator": "FAB31883-2F36-4E50-83B3-D9654B60FF00 shutdown",
+        "emulator": "emulator-5580 killed explicitly; absent from adb",
+        "apiLastPid": 19297,
+        "webLastPid": 84652,
+        "postgres": "creator-platform-w7-macstudio-20261001 normally stopped, volume retained",
+        "browser": "own tab4 closed",
+        "apiExit": 0,
+        "webExit": 143,
+        "softwareEmulatorExit": 0,
+        "idbCompanionExit": 0,
+        "previousWebWrapperExit": 143,
+        "leaseCustody": "Exact captured owner token+directory device/inode matched before unlink/rmdir"
+      },
+      "evidence": "artifacts/workstreams/W7/studio-runtime/20261002/push-lifecycle.md"
+    },
+    "main587Runtime": {
+      "api": "stopped normally, dual signal actual exit0, then recoveryAPI normalexit0",
+      "web": "production stopped normally, supervised parentexit143 after nodeSIGTERM",
+      "configuredVisual": "Final original13pass2.8m; both temporaryownservers exited,3007/3177 free",
+      "devices": "own simulatorFAB shutdown/emulator5580 killed; exactownedslot1 leases released, companionexit0",
+      "postgres": "canonical40 stopped, volume retained",
+      "SQLActivated": false
+    },
+    "privateWaveRestore": {
+      "container": "creator-platform-w7-wave-restore-20261002",
+      "volume": "creator-platform-w7-wave-restore-20261002",
+      "port": 55457,
+      "database": "creator_w7_restore_20261002",
+      "state": "Permanently removed during user-authorized cleanup; both stopped container and exclusively owned stale duplicate volume deleted. Historical restore proof retained; future activation needs a newly created separate restore.",
+      "privateDirectory": "/Users/yingpengwang/.config/creator-platform/w7-macstudio-20261001/wave-backup-20261002",
+      "runtimeClients": false,
+      "containerExists": false,
+      "volumeExists": false
+    },
+    "wavePreparation": {
+      "packet": "infra/migrations/waves/20261002.json",
+      "packetSha256": "9e21499af1c10ad488dbb6e7f6477c675f2c2511bfde5c7635f3adfef56919b9",
+      "actualLedger": 40,
+      "targetLedger": 57,
+      "backupCreatedAt": "2026-10-02T16:58:50.204Z",
+      "manifestMaximumAgeMinutes": 60,
+      "limitQuestion": "pending exact0061/0062 development-only revision; no approval assumed",
+      "allSixBackupRestoreDigestsMatch": true,
+      "SQLActivated": false
+    },
+    "mainEccaRuntime": {
+      "sourceParent": "e306c224a934c1c837ec32fe7c8f34ee29196671",
+      "frozenMain": "ecca4c4380ced8d51b07fa25734c6cc5b7c5d053",
+      "API": "stopped verified own17089 SIGTERM exit0",
+      "web": "stopped verified own20712 SIGTERM exit143;first wrongcwd start failure preserved",
+      "devices": "own FAB simulator shutdown,5580 emulator killed; exactownedslot1 UUID/device/inode leases released; companion48645 exit0",
+      "SQLActivated": false,
+      "webPid": 20712,
+      "database": "stopped;40 ledger;connectionlimit0;trafficclosed;no other clients",
+      "backupRefreshRequiredBeforeActivation": true
+    },
+    "settingsCustodyRuntime": {
+      "startedAt": "2026-10-02T18:08:21.108330+00:00",
+      "source": "6079ba3d + six source files uncommitted",
+      "apiSession": null,
+      "webSession": null,
+      "iosUDID": "FAB31883-2F36-4E50-83B3-D9654B60FF00",
+      "simulatorSlot": 2,
+      "simulatorLease": "f50170d9-ff25-4193-b46a-0a3f980c6b62",
+      "emulator": "5580 absent, retained AVD unchanged; exact slot2 released",
+      "migrationActivation": false,
+      "scopeComplete": false,
+      "ios": "shutdown after actual Save/Reload/account switch; lease released",
+      "web": "stopped exit143; own temporary browser tab closed",
+      "androidSession": null,
+      "androidSerial": "emulator-5580",
+      "androidSlot": 2,
+      "androidLease": "168382a8-41ab-448d-a024-6a6fcb64573f",
+      "firstAndroidApiExit": 1,
+      "initialAndroidSession": 13874,
+      "initialAndroidExit": 134,
+      "androidAccountAcceptance": "ordinary development account switch/persistence observed; mid-flight race and production acceptance open",
+      "deviceHostCause": "not established; preserved macOS SIGABRT/gRPC stack",
+      "cleanupAt": "2026-10-02T18:54:10.931203+00:00",
+      "retryAndroidExit": 0,
+      "repairedApiExit": 0,
+      "newTests": false,
+      "evidence": "artifacts/workstreams/W7/studio-runtime/20261002/settings-custody.md",
+      "resourceBudgetCorrection": "Preserved emulator logs show requested2048 was silently raised to2560; prior actual cap compliance unproven. Current main12ea uses official -lowram and actual2026148KiB/2cores."
+    },
+    "currentRun": "Current source20aeb: originalW1 Home gate removal and own709 noticeclip checked; personal5c3 operation/closure20:19:55 preserved; corrected native/Android and genuine owner journeys remain open; no SQL/merge/completion.",
+    "main12eaRuntime": {
+      "at": "2026-10-02T19:47:42.548761+00:00",
+      "parent": "d5bf8452902c2e9d799e8f91e506620be0de12e9",
+      "reviewedMain": "12ea10a670ed601ffb21700f9d5360f3ebb1ee68",
+      "incomingSourcePathsPersonallyReviewed": 93,
+      "resolvedAndFollowSourceSHA256": {
+        "apps/backend/src/server.ts": "f622e0cfe62e6cb953b5559cd77ec7eac2fc321e4f213c34f69b40379c817033",
+        "apps/backend/src/modules/trust/privacy-consumers.ts": "849f2a1c0e4abed3808c1a380f7c2ff407a158fb2d72727d90ab4646e4789d0b",
+        "apps/backend/src/modules/trust/worker.ts": "c028eafe73778c609edefa467d3eef004a18c5ead4b830bacfeca2ca3cc429b5",
+        "apps/backend/src/modules/growth/core-follows.ts": "ee1712b5babc563817d8ccf52b586158982b161ea1fbd3a3a6c2cb00e94b9cf7"
+      },
+      "checks": {
+        "finalWorkspace": {
+          "session": 49199,
+          "exit": 0,
+          "tasks": 6,
+          "existingContractsPass": 9,
+          "PostgreSQLCasesSkipped": 9
+        },
+        "signedIOS": {
+          "session": 23162,
+          "exit": 0,
+          "strictSignature": "pass"
+        },
+        "androidShippingOriginalChecks": {
+          "firstExit": 75,
+          "retrySession": 32021,
+          "retryExit": 0,
+          "tasks": 47
+        },
+        "originalSwift": {
+          "session": 82811,
+          "exit": 0,
+          "checks": 18,
+          "originalVisualComparisons": 110
+        }
+      },
+      "actualShipping": {
+        "web": "Production signed-out Settings/Continue/Retry/Back retained destination; actual Discover API outage/retry/restart/retry recovered to empty directory",
+        "ios": "Built and installed executable/dylib match; actual Home/Notifications/Settings Save acknowledgement then Reload restored quiet values",
+        "android": "Built and installed APK match; actual Home/Notifications/Settings Save acknowledgement then Reload restored quiet values; corrected first invalid entry host refusal preserved"
+      },
+      "nativeResourceCorrection": {
+        "actualCurrentAndroidRAMKiB": 2026148,
+        "onlineCores": "0-1",
+        "lowram": true,
+        "priorSettingsCustodyBudgetUnproven": true
+      },
+      "cleanup": {
+        "APIInitialExit": 0,
+        "APIRecoveryExit": 0,
+        "webExit": 143,
+        "companionExit": 0,
+        "emulatorExit": 0,
+        "devices": "own FAB Shutdown and5580 absent; exact leases released",
+        "ports": "4107/3007 free",
+        "postgres": "40 migrations,no otherclients,connectionlimit0,stopped exit0",
+        "peerResourcesTouched": false
+      },
+      "failedAttemptsPreserved": [
+        "first Android heavy guard exit75 before retry",
+        "absent guessed Docker path corrected to inventoried /usr/local/bin/docker",
+        "first pg_isready no response; proceeded only after ready",
+        "first server.js startup MODULE_NOT_FOUND corrected to actual server.mjs",
+        "first Android entry-host refusal corrected with actual app host/existing debug local-api option",
+        "browser first Back operation timed out; fresh separate Back succeeded",
+        "initial database comment null; earlier closure-comment claim corrected",
+        "prior settings-custody emulator silently raised requested2048MB to2560; current supported -lowram verifiedactualcap"
+      ],
+      "currentMainUnreviewed": "79e3b0c7d57fcfc6828618fe5b712ff48909e731",
+      "exactParentCI": {
+        "Foundation": "two pass,three queued",
+        "Trust": "success"
+      },
+      "newHeadChecksRequired": true,
+      "finalCombinedPRReviewComplete": false,
+      "newSQLActivated": false,
+      "newTests": false,
+      "harnessAdded": false,
+      "populatedAcceptance": false,
+      "providerAccepted": false,
+      "protectedPrivacyAccepted": false,
+      "releaseAccepted": false,
+      "workstreamComplete": false,
+      "losslessLogOrigins": [
+        {
+          "file": "main-12ea-android-bottom-dump.log.gz",
+          "uncompressedSHA256": "e902cc18417d20019f58647a0c42a867d1d6a2ccc36e38ce39b57e12d8635423",
+          "uncompressedBytes": 65
+        },
+        {
+          "file": "main-12ea-android-footer-dump.log.gz",
+          "uncompressedSHA256": "30008857f11120e3a107e8a8d0f1e227f36513e335b2a49c89ecd78a28005dfa",
+          "uncompressedBytes": 65
+        },
+        {
+          "file": "main-12ea-android-home-dump.log.gz",
+          "uncompressedSHA256": "581ba35e618ae0433ac468387a6e19b81d6db7adff48be35a52d8ceb992c85e4",
+          "uncompressedBytes": 54
+        },
+        {
+          "file": "main-12ea-android-home-repaired-dump.log.gz",
+          "uncompressedSHA256": "5da80ad6cd40f25cbfa7f3c4f479d2a9a0d4f494faa78cf488c6a8b9654ddcdf",
+          "uncompressedBytes": 63
+        },
+        {
+          "file": "main-12ea-android-notifications-dump.log.gz",
+          "uncompressedSHA256": "2a11baaf12358717fe43b3789839bcd66294d903a456595a1c8fcd9a17c71a51",
+          "uncompressedBytes": 63
+        },
+        {
+          "file": "main-12ea-android-reload-dump.log.gz",
+          "uncompressedSHA256": "fb9d5f3309bbbb47ae2d46ab649cb30ef43ef3d4313be203d0f2445822ed78c0",
+          "uncompressedBytes": 65
+        },
+        {
+          "file": "main-12ea-android-reload-top-dump.log.gz",
+          "uncompressedSHA256": "38a27fbb7785e4d40b1170cba83bb34af0692d83f1dde047c4b1c72669635a51",
+          "uncompressedBytes": 69
+        },
+        {
+          "file": "main-12ea-android-reload-visible-dump.log.gz",
+          "uncompressedSHA256": "c9912973389dd19e7e8ba6afd6479a6dd59912e2b73b3471e4c3574431eec095",
+          "uncompressedBytes": 73
+        },
+        {
+          "file": "main-12ea-android-retry.log.gz",
+          "uncompressedSHA256": "82b4c075da826667c681f07149eb7a22b3fd66031b3f10400b0ab437e9c7d14a",
+          "uncompressedBytes": 3105
+        },
+        {
+          "file": "main-12ea-android-save-dump.log.gz",
+          "uncompressedSHA256": "623546d94a04d42c83bd8fce682450c2e854bd010b13401a73e7fa5a15f67a5b",
+          "uncompressedBytes": 63
+        },
+        {
+          "file": "main-12ea-android-settings-dump.log.gz",
+          "uncompressedSHA256": "19b7b1304cbcbca074bb32dc5ffde5183617c0956e1c0c86f173597c62742573",
+          "uncompressedBytes": 58
+        },
+        {
+          "file": "main-12ea-android.log.gz",
+          "uncompressedSHA256": "579fab07d2ce6340b2133ab3db7a1f5f9fcf6dfa70155a8592c653937bd12886",
+          "uncompressedBytes": 66
+        },
+        {
+          "file": "main-12ea-api-recovery.log.gz",
+          "uncompressedSHA256": "fc921f908105fbd76ad1e4ee2a24d5e791e1047039c7d1d5b7f45eb9a6bc6579",
+          "uncompressedBytes": 140
+        },
+        {
+          "file": "main-12ea-api-repaired.log.gz",
+          "uncompressedSHA256": "fc921f908105fbd76ad1e4ee2a24d5e791e1047039c7d1d5b7f45eb9a6bc6579",
+          "uncompressedBytes": 140
+        },
+        {
+          "file": "main-12ea-api.log.gz",
+          "uncompressedSHA256": "5befb705ba409a1bff77911815f1a2cd58597301ce869678f05f2bf1d2c06929",
+          "uncompressedBytes": 800
+        },
+        {
+          "file": "main-12ea-emulator-lease.json.gz",
+          "uncompressedSHA256": "8192b4cc066ac1eed0d9c3513d9a88ebf56c370176f3b395548dbba78f7a6775",
+          "uncompressedBytes": 499
+        },
+        {
+          "file": "main-12ea-emulator.log.gz",
+          "uncompressedSHA256": "c63fabbf39e79db34d553e7e7c9775adc0e90577d394f64a9f715a8f3aa2b183",
+          "uncompressedBytes": 8055
+        },
+        {
+          "file": "main-12ea-idb.log.gz",
+          "uncompressedSHA256": "da414764c2ded7f3eb81b006f299798f8d99d7afe1ba18547b1dd2d5727261ca",
+          "uncompressedBytes": 81163
+        },
+        {
+          "file": "main-12ea-ios.log.gz",
+          "uncompressedSHA256": "af13acbc0e5811e059e0a5e7a2a38ea6dc1a1841917c907d4799786167d3087f",
+          "uncompressedBytes": 97810
+        },
+        {
+          "file": "main-12ea-prior-foundation.json.gz",
+          "uncompressedSHA256": "1ca63b91f1dd6a5279b11e80c1646cf7a83e5f26d395750acdc54ed728f8fb5a",
+          "uncompressedBytes": 5575
+        },
+        {
+          "file": "main-12ea-prior-trust.json.gz",
+          "uncompressedSHA256": "d2b6fa8c52008cbf5177f18b51264e259c77313b06b3e86091f06eca6ec9d82f",
+          "uncompressedBytes": 3216
+        },
+        {
+          "file": "main-12ea-simulator-lease.json.gz",
+          "uncompressedSHA256": "f0626522b81fda12dba70969fbb21097c191226755e6213ee2d003fac4fef0ed",
+          "uncompressedBytes": 394
+        },
+        {
+          "file": "main-12ea-swift.log.gz",
+          "uncompressedSHA256": "69c04167f5d76924df796b45e2c812dd608794e5ee77cef9ee7e7afa6f89cebc",
+          "uncompressedBytes": 65341
+        },
+        {
+          "file": "main-12ea-web.log.gz",
+          "uncompressedSHA256": "a6a113636c84c4e24d566d300be347fb6b76872c147d6134d5733cbdcd1f57bc",
+          "uncompressedBytes": 153
+        },
+        {
+          "file": "main-12ea-workspace-final.log.gz",
+          "uncompressedSHA256": "445743fca87f5fe57513fc32fe256ccd23c20cebd398908548fb2729903a2e9d",
+          "uncompressedBytes": 10028
+        },
+        {
+          "file": "main-12ea-workspace.log.gz",
+          "uncompressedSHA256": "7186dda880da2eacb0a5c26a58fce8c402cd41c785c151078d2b5e307fa3b585",
+          "uncompressedBytes": 10223
+        },
+        {
+          "file": "readiness.headers.gz",
+          "uncompressedSHA256": "a487b49f5f3da4f8d17de1b98de6241bc48afa9ba927731e4ca36057b2ab5eb2",
+          "uncompressedBytes": 330
+        },
+        {
+          "file": "main-12ea-publication-first-diffcheck.log.gz",
+          "uncompressedSHA256": "16c6a2aca6e9235c5aa2f1ce5068607f53003ede74627a60b22d56aa91fbad67",
+          "uncompressedBytes": 1606
+        }
+      ],
+      "publicationCorrection": {
+        "firstCommitCheckExit": 2,
+        "cause": "Raw HTTP headers contain original CRLF line endings; lossless gzip preserves original bytes without introducing trailing-whitespace source",
+        "headersUncompressedSHA256": "a487b49f5f3da4f8d17de1b98de6241bc48afa9ba927731e4ca36057b2ab5eb2",
+        "firstCommitCreated": false,
+        "firstPush": "unchanged parent, Everything up-to-date",
+        "firstTrustDispatch": "unchanged d5 parent; does not qualify changed source",
+        "newHeadParentGuardRequired": true
+      }
+    },
+    "cleanup20261002": {
+      "userAuthorized": true,
+      "removedRebuildableNativeAllocatedGiB": 2.8,
+      "removedPrivateBuildDirectories": [
+        "/private/tmp/creator-platform-w7-active-20261001/ios-derived",
+        "/private/tmp/creator-platform-w7-active-20261001/swift-checks"
+      ],
+      "removedOldInstalledAPKCopies": 5,
+      "removedDisposableContainers": [
+        "creator-platform-w7-wave-restore-20261002",
+        "creator-platform-w7-core-follow-custody-20261002"
+      ],
+      "removedDisposableVolumes": [
+        "creator-platform-w7-wave-restore-20261002",
+        "13feec244f25a74f2b7b5a5ada20e8055827b6d1246c39b86f85637c055c3a85"
+      ],
+      "canonicalPostgres": "Retained stopped, original40 unchanged",
+      "configuredNativeDevices": "Retained shutdown/absent; state preserved",
+      "privateInputsAndSmallEvidence": "Retained; checkout diagnostics copied into scratch",
+      "sharedResourcesAndPeersTouched": false,
+      "checkout": "Scheduled permanent removal only after clean commit/push and exact remote-head verification; successor recreates managed worktree if absent",
+      "finalLocalReceipt": "~/.config/creator-platform/w7-macstudio-20261001/cleanup-20261002/final-status.md",
+      "futureActivation": "Fresh closed backup and newly created separate real restore required; no SQL activated",
+      "swiftBuildScratch": "Native DerivedData/Swift check product directories removed; retained scratch logs and evidence remain"
+    },
+    "successorContinuation20261003": {
+      "source": "474089774289015191d912c025dbd470001267df",
+      "reviewedMain": "c56913f6b359d3070bee613d04d31bf67a2fdc57",
+      "checkout": "/Users/yingpengwang/.codex/worktrees/w7-successor-20261002/creator-platform",
+      "branch": "codex/w7-completion-20261001",
+      "canonicalDatabase": {
+        "container": "creator-platform-w7-macstudio-20261001",
+        "database": "creator_w7",
+        "port": 55447,
+        "state": "Stopped exit0",
+        "migrations": 40,
+        "creators": 0,
+        "connectionLimit": 0,
+        "clients": 0,
+        "activation": "No new SQL; unanswered complete0061/0062 packet remains held",
+        "backup": "Stale after actual settings writes; fresh closed backup/separate restore required before any approved activation"
+      },
+      "api": {
+        "port": 4107,
+        "state": "Stopped normally exit0"
+      },
+      "web": {
+        "port": 3007,
+        "state": "Stopped after verified own-PID SIGTERM; process exit1"
+      },
+      "ios": {
+        "udid": "FAB31883-2F36-4E50-83B3-D9654B60FF00",
+        "state": "Shutdown",
+        "lease": "Exact owner/device/inode released"
+      },
+      "android": {
+        "serial": 5580,
+        "state": "Absent/shutdown",
+        "lease": "Previously released; no newer Android source in this increment"
+      },
+      "qualification": "Workspace/original Swift/signed iOS/all13 unchanged web visual checks pass; installed iOS hashes match; no populated/provider/privacy acceptance",
+      "evidence": "Local private scratch; no new screenshots/diagnostic JSON committed",
+      "scopeComplete": false
+    },
+    "receiptContinuation20261003": {
+      "source": "c8fd9d1485da30baf20e326bc8728476d861827f",
+      "reviewedMain": "9e9710439ac858e148460bcc03ee8460f534ae8f",
+      "checkout": "/Users/yingpengwang/.codex/worktrees/w7-successor-20261002/creator-platform",
+      "branch": "codex/w7-completion-20261001",
+      "canonicalDatabase": {
+        "container": "creator-platform-w7-macstudio-20261001",
+        "database": "creator_w7",
+        "port": 55447,
+        "state": "Stopped exit0",
+        "migrations": 40,
+        "creators": 0,
+        "connectionLimit": 0,
+        "clients": 0,
+        "activation": "No new SQL; unanswered complete0061/0062 packet remains held",
+        "backup": "Stale after actual settings writes; fresh closed backup/separate restore required before any approved activation"
+      },
+      "api": {
+        "port": 4107,
+        "state": "Stopped normally exit0"
+      },
+      "web": {
+        "port": 3007,
+        "state": "Stopped after verified own-PID SIGTERM; process exit1"
+      },
+      "ios": {
+        "udid": "FAB31883-2F36-4E50-83B3-D9654B60FF00",
+        "state": "Shutdown",
+        "lease": "Exact owner/device/inode released"
+      },
+      "android": {
+        "serial": 5580,
+        "state": "Absent/shutdown",
+        "lease": "Exact owner/device/inode released after actual emulator shutdown",
+        "verifiedGuest": "2026148 KiB/two cores; supported lowram flags"
+      },
+      "qualification": "Workspace,18 original Swift/110 comparisons, signed shipping iOS, existing Android47-task checks and13 unchanged web visuals pass. Both installed native hashes match; actual Settings Save/Reload/sign-out observed. No genuine populated/provider/protected export acceptance.",
+      "evidence": "Local private scratch; no new screenshots/diagnostic JSON committed",
+      "scopeComplete": false,
+      "privacyExport": "Current source adds original account delivery receipt outcomes; registration hashes excluded. Current protected service still unavailable; current owner catalogue review required.",
+      "failure": "First Android emulator host SIGABRT/null-root retained locally; identical retained AVD restart recovered. No peer, AVD wipe or global SDK change."
+    },
+    "heldClientContinuation20261003": {
+      "source": "7d3c9eb3c6fbc106c7372157aeeae0e25034d023",
+      "reviewedMain": "42040362fba654957a38a33b494b2081aaee1c30",
+      "mergeHead": "8c592b0b1f6e2b38cfc1f8075b1fc8e0f2ffd4b9",
+      "api": "4107 stopped normally exit0",
+      "web": "3007 stopped after verified own PID SIGTERM, exit1",
+      "database": "Canonical retained, stopped exit0;40 migrations,zero creators/receipts/clients,connectionlimit0,no new SQL;backup stale",
+      "devices": "Own FAB Shutdown/5580 absent, exact owner/device/inode leases released; own companion terminated; peers untouched",
+      "androidBuildSha256": "a31b34dcf99b0dddfa2b73f69eec0f655b5379c97203a7036ea234a6d893f4b7",
+      "androidGuest": "2026148 KiB/two cores; supported lowram flags",
+      "observed": "Both shipping apps actual Settings Save/Reload/signout against repaired Growth backend; rebuilt Android OS microphone denial/zero voice files; production Studio preserves sign-in destination",
+      "failures": "Android guest Bluetooth abort/System UI refusal, early launch and null-root retained privately; W5 current Content navigation crash remains open",
+      "privacy": "Original worker shutdown now awaited before export completion; receipt metadata remains account-delivery-bound. Genuine protected authority/owner catalogue and actual job acceptance remain pending",
+      "qualification": "Existing workspace and Android47 tasks pass; prior signed iOS/original18 Swift110 comparisons unchanged. First4204 visual12pass/1fail(Thread17rounded-edge pixels,delta5) preserved privately; unchanged focused2/full13 reruns pass. Six exact-new-head gates required.",
+      "scopeComplete": false,
+      "evidence": "Private local scratch; no new routine screenshots or diagnostic JSON committed"
+    },
+    "sessionThanksContinuation20261003": {
+      "source": "17c034434ed8001961c86992b16b5c2ccb842205",
+      "reviewedMain": "42040362fba654957a38a33b494b2081aaee1c30",
+      "qualification": "Full existing workspace6 tasks/4 cached passes9.478s;13 unchanged visuals pass3.2min after preserved first12pass/1fail; genuine web-session/Thanks/protected operation unaccepted",
+      "observed": "Rebuilt production web Settings Continue/Retry/Back preserves destination; sign-in unavailable. No TLS/ATS/cookie policy changed",
+      "failures": "Initial PG readiness/connectionlimit0 API failure; incorrectly inherited backend WEB_ORIGIN caused production HTTPS refusal/blank Retry. Correct web launch recovered sign-in gate. Private evidence retained",
+      "resources": "Own APIexit0/webexit143,PGstopped40migrations/zero creators/receipts/clients/connectionlimit0; devices remain Shutdown/absent,leases released,peers untouched;no new SQL,backup stale",
+      "scopeComplete": false
+    },
+    "replyExportMainContinuation20261003": {
+      "source": "94a69c86f36cf1457fcb26a76e93ecff45048599",
+      "reviewedMain": "afde5068cdd76cd3f9dc1653a82441ac95c1f64d",
+      "sourceChanges": "a598 iOS renderer bounds/export task/file custody;13d iOS-only AVAudioSession guard;b994 awaited driver-timeout/Home client cleanup; reviewed main Privacy/media/navigation/Content changes",
+      "lastOperatedSource": "13d94b51259a0d977e9c0dc63d63f7ad623a7628",
+      "installedHashes": {
+        "iosExecutable": "72262151609b36376cbc05c0648c3bf0b9e5ec45f523778910a1c08ecff492d9",
+        "iosDebugDylib": "59125a89b0c335904401ce5fffa58898846dfdd1c79baeb675e8eda6cadc488a",
+        "androidAPK": "789ff3273f9b24fa047373fcab7d26f10595659cc5358a0e295426819f54a2db"
+      },
+      "qualification": "Current94 workspace passes; Android47tasks passes18s; Swift18checks/110original comparisons passes15.564s; signed iOSbuild passes;13 web visuals pass on identical current web/ref source; current-artifact native operation awaits occupied shared GUI",
+      "failures": "Incoming macOS AVAudioSession compile failed before13d repair; occupied build refusals; externally running emulator Studio attachment refusal; first guessed app executable path failed before corrected hash match; conservative lease release refused comparison shape then exact full JSON/device/inode confirmed release",
+      "resources": "Own APIexit0/webparentexit1/emulatorExit0/simulatorShutdown;40migrations/zero creators/receipts/clients/cap0/PGstopped;exact GUI/slot1sim/slot1emu released;peers untouched;no SQL activation;backup stale",
+      "scopeComplete": false
+    },
+    "sessionValidationContinuation20261003": {
+      "source": "2a0cfbd985439c40cd1b2de4a8558c21a933b85d",
+      "reviewedMain": "f54f5a7d9939f8fa667781997e4111839305a0e6",
+      "implementation": "214a7ff5 actual session-validation wait with navigation/generation/cancellation/issuer storage guards retained; original same-client/pool/publication/plan guards preserved",
+      "observedBackend": "d7813c7395bf7fb9df474c598e3eaf51cb13dd19",
+      "observedNativeSource": "94a69c86f36cf1457fcb26a76e93ecff45048599",
+      "observed": "Current-artifact Settings saved/reloaded existing22:30\u201308:15/America/Los_Angeles/push-emailoff/hidden previews. Home first401 sign-in refusal; Retry and You\u2192Home empty recovery. Development only; repaired artifact not operated.",
+      "qualification": "Source2a workspace pass:9backend contracts/9PGcases skipped,6buildtasks5cached5.001s. Native source4ce signed iOS and strictdeep codesign pass,Android47tasks9executed38uptodate18s,18Swift/110original comparisons15.467s. Backend-only2a leaves native/web source unchanged; web72 configured13visualpass2.9min retained. Current214 native operation and genuine Thanks consent/source targets remain pending.",
+      "failures": "Production2b visual10pass/3auth-testfailures retained privately; configured13 subsequently pass without source/test/reference/tolerance changes. Actual Home401 recovered on Retry; repair requires personal operation. Occupied heavy build attempts refuse75 and preserve peer locks. First2a workspace stopped at formatter after typecheck/lint; scoped formatting corrected and complete original check closed0; no test/source/reference policy weakened.",
+      "resourceClosure": "Own API TERM after exact PID/cwd/listener verification; PG40/zero creators/provider receipts/other clients/cap0 verified then dockerstop0; FAB Shutdown/exact full JSON/dev/inode GUI+sim leases released;5580 absent; peers untouched;backupstale",
+      "hostedHead": "1fadfa71a30bc98d5f178fc8fa08ee042d242577",
+      "hosted": "1fad pushed/PRhead verified; Foundation37103979212/37103977678 and Trust37103979201/37103977113 queued at inspection; no2a qualification. Older2b successes/threeMacqueued remain historical.",
+      "scopeComplete": false,
+      "evidence": "Routine screenshots, hashes and logs stay private under own successor scratch.",
+      "reviewedDelta": "All9 paths a1fa9367..f54f5a7d personally read: Android/iOS exact direct regular private Content download cold-process cleanup and three W6 records. No W7 cache runtime acceptance borrowed.",
+      "thanksConsentGuard": "2a0cfbd9 rereads original Thanks after real current-target callback; refuses changed exact creator/account/fan/kind/target,requested version/hash,withdrawal/sharing flags;identity disclosure requires valid quote and current strictidentity flag. Compiled only; no genuine read/consent/race acceptance."
+    },
+    "prAuditCheckpoint20261003": {
+      "source": "483009bf2df72d06f44586a1fda025e451e9e76d",
+      "reviewedMain": "61cfa732a5f9c08c35d6ac1c76f00209d047cc96",
+      "fetchedUnreviewedMain": "41471fd24fe43dd41d6114e67ba00ba1a6a0783b",
+      "qualification": "Workspace9pass/9PGskipped;13configuredvisuals;18Swift/110originalcomparisons;47Androidtasks;signediOS/strictsignature pass. Both actual installed hashes match483.",
+      "observed": "Shipping iOS Home/settingsReload/defaultcoldsettings/explicitDiscover/signout; Android actual authenticatedGRPC Studio connection,2026148KiB/CPU0-1,SettingsSaveack/Reload/Home/signout;productionRequests destination-preserving Continue/unconfiguredRetry/Back. Development/empty/refusal only.",
+      "openDefects": "iOS Discover category accessible names all Sections; explicitHome launch uses default restoration sentinel. Genuine populated/source/consent/provider/privacy/cohort acceptance open.",
+      "resourceClosure": "OwnAPIexit0/webexit1/PGstopped,40migrations/zero creators/receipts/otherclients/cap0;FABShutdown/5580absent;exactfullraw+dev/inode GUI/sim/emu leases released;peers untouched;backupstale/no new SQL.",
+      "failure": "First closure query used nonexistent creator.creator42P01; actual original creator.creator_profile query then verified counts/cap0 and PGstopped. Prior auth/visual/native/queue failures retained.",
+      "publishedHead": "c73432ec161c0fca0bb341463d3fea370719ee0b",
+      "hosted": "Currentc734 Foundation/Trust queued/inprogress; no483 hosted qualification.",
+      "priority": "Human requested46openPRs/34drafts oldestfirst starting21; allseven active owners contacted;W7owns31. No new feature increment while audit pending.",
+      "scopeComplete": false,
+      "evidence": "Routine screenshots/hash/log/diagnostic evidence remains private under successor scratch."
+    },
+    "prReview20261003": {
+      "source": "20aeb0bb7e2ff93eae2a4cd0fc4ecb3a4b8a31e3",
+      "reviewedMain": "5c08634b7542fef95dd6c176030a785845250c62",
+      "integration": "092e5e4ca651d802e0b2673f2900c155de87d832",
+      "sourcePathsPersonallyReadAtCheckpoint": 161,
+      "sourcePathsTotal": 161,
+      "fullCombinedReviewComplete": false,
+      "pr31": "open draft/unmerged",
+      "existingWorkspace": "20aeb all six existing phases PASS; 9 actual contracts/9 PostgreSQL skipped; production web cache unchanged9a1",
+      "existingVisual": "Unchanged9a1 all13original PASS2.9min; exact references/dimensions/99.85%-within8 unchanged",
+      "native": "Current5c3 personally operated; corrected709 largest-text acceptance open; every original native/populated/spoken/artboard row retained.",
+      "ownerInventory": "Fresh38open/allDraft/oldest21. Allsevenownersretaincustody;296verifiedCLOSEDunmergedsourceb0c preservedin21;17historicalconsolidations. Documentation-only295MERGEDinto21 atca8f, notmain. Main5cfetchedunchanged/contained; nopeercheckoutedit.",
+      "authority": "NoSQLmigration/grant/role/authoritydata;backupstale;unansweredfull17packet/human0044\u20130060 binding",
+      "originalAcceptance": "Every unfinished original row/historical failure retained; W7incomplete",
+      "latestExactHeadCI": "Pushed5c3 Trust/web-and-backend/android-runtime SUCCESS; web-visual/ios-foundation/android-foundation QUEUED. New20aeb push and all six exact-new-head SUCCESS remain required.",
+      "resources": "Actual5c3 closure20:19:55.636924 before20:26:01.900875; API0/web-15/emu0,FABShutdown/5580absent,all4ownedportsclosed,canonical40/cap0/0otherclients/PGexited0,all3exactleasesreleased. Heavy20aeb child0/exactrelease20:32:23.734912; no own lease.",
+      "postEntry": "Capturedb549Begin/sourceguard117registrycurrent; prior047normaldisclosures/refusalsoperated,olderfafailurespreserved. Genuinecreator/provider/context unavailable. W7 5b publicaction sessionpin is a narrow separate repair, shipping/genuineracepending.",
+      "publicEntryRetry": "930 four-page repair personally operated in production: actual post Retry initially lost destination toDiscover; repaired post UUID/creator sectionChat/invite UUID/share UUID retained after clicks. Actual API shutdown share Reload/Retry retains UUID. Refusal/recovery only, no genuine publication/share/invite/consent acceptance. Routine evidence stays private. Current047 productionRequests\u2192Continue\u2192Retry\u2192Back retains commerce/requests and reportsidentity_unconfigured; genuine authenticated/session-race remains open. Current092 personally operated StudioSources\u2192Continue\u2192Retry\u2192Back retains /studio/ai/sources and reportsidentity_unconfigured. Initial incorrectHTTPproductionorigin refused; correctedlocalmissingoriginunset, policyunchanged. Own tab3closed/user1untouched; newroutineevidenceprivate. Current5b productionDiscoversearch/category/outage/Tryagain recovery retained; HomeContinue/refusal/Retry preserves/home. Owntab4closed/usertab1untouched; noauthenticated/genuinecreatoracceptance. Currentb92 actualproduction publicHelp offline/Tryagain retainsroute/emergencystaffingguidance; noAPI/DB; owntab5closed/web130/user1untouched. Current3dc productionretained-cookieSpendingsaved-sessionoutageRetry retains/commerce/spending; /trust/crisis Tryagain retainsroute/emergency/adult/staffingguidance. Initial/help404preserved; tab6closed/usertab1untouched; noAPI/PG/authority/poplulatedacceptance.",
+      "generatedOperations": 117,
+      "roleCatalogueDependency": "ExactW8d6seven-pathoriginalfamilyminimum selected at3dc; literalcore/noOUTBOUND/inboundAPIgrantsretained; held0214unregistered/unapplied; noSQL/grant/role/authority workaround orprotectedacceptance.",
+      "combinedPaths": 1209,
+      "openDrafts": 38,
+      "additionalVerifiedClosedUnmerged": [299, 280, 236, 296],
+      "nativeQualification": "Current20aeb native709 Swift18/11014.697s/signed shipping iOS/deep-strict PASS; Android388 unchanged47tasks74s/APKsignature PASS",
+      "nativeOperation": "5c3 actual development-account Text11 outage preserves destination/tabs; notice scroll overlaps status bar. Native709 clipping compiled, corrected largest-text/spoken/currentAndroid operation pending. StandardText3 actualAPIrestart/Refresh preserves same account/removes warning. Android currenthash/RAM/authenticated8580 discovery verified, Studio pane empty; no Android UI credit.",
+      "sharedDockerRecovery": "Completed by W8 with supported tools under direct human existingruntime authority; old pendingquestion/uncertainty superseded",
+      "documentOnlyOwnerMerge": {
+        "pr": 295,
+        "base": "codex/w1-onboarding-timing-20261001",
+        "head": "15876bf88bc623e1451e5293f4c6767d3829ebac",
+        "merge": "ca8f796bc2e42877953d64d71eb562bfc8b66c00",
+        "mergedAt": "2026-10-03T19:28:56Z",
+        "productOrMainMerge": false
+      },
+      "newNativeSelections": "ExactW1 50a request/resource caller deadline5c3; own observed notice overlap narrowclip709; repaired personal operation pending. Earlier6f/fbc/388 and all historical failures retained.",
+      "latestWebSelection": "OriginalW3 4cff/4834 readiness/Privacy plus9f Support personally operated currentproduction5c3: unsent draft survives actualAPIoutage/restart/Retry/report disabled; PrivacyRetry disabled submission/destination retained; no real task/report/positive protected acceptance.",
+      "previous9a1Notes": {
+        "source": "9a1fb968f15a72afbb464220b3f37bd81332bbd3",
+        "existingWorkspace": "9a1 fullworkspace6/6PASS/currentproduction33routes",
+        "native": "Currentb92 installedexecutable/dylib/APKhashmatch; personallyoperated bothshippingcoldofflineHelpLight/Night, iOSRefresh fallbackretained; AndroidNightRefreshattemptuncredited. iOSText11fingerswipereachesfooter/Refresh, sharedbannerellipsisstillfailure. HealthyNight/configuration/originalsession/stall/privateprotected/spoken/populated acceptanceOPEN; originalfailurespreserved.",
+        "latestExactHeadCI": "bf060passesremainoldhead; new9a1push/all6exactheadCIrequired; threeMacqueuesnotpasses",
+        "resources": "physicalclosure19:24:10.624941before19:31:58.929856deadline:APIexit0/web-15,FABShutdown,5580absent/emulator0,all3exactleasesreleased,canonical40/limit0/0otherclients/PGexited0. Heavy388normalexactrelease19:30:53.123419 afterchild0; successorW2leasepreserved.",
+        "nativeQualification": "388Swift18/11014.361s;signediOSdeepstrict;Android47tasks74s/APKsigPASS; webunchangedretains4ec13 originalpasses",
+        "nativeOperation": "bf060 actualdevelopment-accountAPIoutage\u2192Refreshsessionrecovery/RequestsCommerce-unconfigured refusal. Text11Noticebodywrapsfully but staticrootnoticesoverflow/hidecontrols;388repaircurrentshippingoperationPENDING. AndroidStudioemptyRunningDevices/AddDeviceno-selector; noAndroidUIcredit.",
+        "newNativeSelections": "W1exact6fcanonicalgenerator/W7actual117 regenerated9a22;W3exactfbc2paths229;ownobservedrootoverflowrepair388 personallyreviewed, repairedshippingoperationpending",
+        "latestWebSelection": "ExactW3original4cff/4834producer+privacyconsumer/9fSupport threepaths; allfinaldiffs/dependencies personallyread; currentproductionoperationpending"
+      },
+      "homeSelection": {
+        "originalOwnerSources": [
+          "70e07e369582af4600826bfd6cd8c246651ecaf7",
+          "c64e27a697835621044de0b7f0ea9a88651a94de"
+        ],
+        "selectedCommit": "20aeb0bb7e2ff93eae2a4cd0fc4ecb3a4b8a31e3",
+        "paths": 3,
+        "publishedHandleGateRemoved": true,
+        "currentIssuedScopeSigningPagingPreserved": true,
+        "genuinePopulatedUnpublishedAcceptance": false
+      },
+      "nextAndroidLaunch": {
+        "supportedFlag": "-qt-hide-window",
+        "installedBytecodePersonallyReviewed": true,
+        "authentication": "original localhost8580 token",
+        "requestedBounds": [
+          "-lowram",
+          "-memory2048",
+          "-cores2",
+          "-no-snapshot-save"
+        ],
+        "globalSDKChanges": false,
+        "nextPersonalOperation": false
+      }
+    },
+    "controlReceiptContinuation20261003": {
+      "source": "c127dbe3d1e18f61d2d372ff934865572deaf556",
+      "selectedContentSource": "6dcf7ae9f",
+      "growth": "1500ms ceiling preserving shorter original positive pg budget; actual BEGIN/COMMIT/ROLLBACK receipts; original core uncertain classifier; same borrowed client held until settlement",
+      "workspace": "six phases passed;9 original contracts pass;9 PostgreSQL cases skipped",
+      "nativeAndWebSourceUnchanged": true,
+      "runtimeAcceptance": "Ordinary current c127 Android preferences Save/Reload observed; wire-fault and genuine protected-task acceptance remain open",
+      "freshPhysicalReadback": "2026-10-03T21:00:08.787283+00:00 FABShutdown/5580absent; own3007/4107/55447/5580/8580closed; noDockerprobe",
+      "engineIncident": "W8 authorized normal recovery completed; independent own container readback exited0. W7 did not mutate shared engine or peers.",
+      "ownIdleCleanup": "three rebuildable intermediate directories removed; signed shipping app/APK hashes unchanged; all inputs/evidence retained; no peer/shared cleanup",
+      "combinedPathRecount": 1211,
+      "sourcePathsPersonallyRead": 162,
+      "combinedReviewComplete": false,
+      "scopeComplete": false,
+      "lastPushedHead": "deeab166fab3355c5be515e53a9196da043f19a7",
+      "lastPushedCI": "Foundation37154137475 web/backend+Android-runtime success;3Macfamilies queued. TrustPR37154137392/manual37154133977success. Does not qualify newer5f4a."
+    },
+    "preferenceOperationContinuation20261003": {
+      "source": "5f4a6a3abf34498077422302597a5dd0cbd84949",
+      "personallyOperatedSource": "c127dbe3d1e18f61d2d372ff934865572deaf556",
+      "observations": "Current Android original preferences Save/Reload. iOS709 largest clipping and destination/tab preservation, outage\u2192Text3 Refresh recovery; full maximum offline notice reading open. No genuine/provider/protected/populated acceptance.",
+      "nativeRepair": "Loading/saving operation labels separated; current workspace6/6,Swift18/11014.286s,signedshippingiOSstrict,Android47tasks40s/APKsig pass. Personally operated repaired settings pending.",
+      "physicalClosedAt": "2026-10-03T21:32:01.079458+00:00",
+      "hardDeadline": "2026-10-03T21:33:25.148228+00:00",
+      "canonicalMigrations": 40,
+      "connectionLimit": 0,
+      "otherClients": 0,
+      "databaseState": "exited 0",
+      "simulator": "Shutdown",
+      "emulatorAbsent": true,
+      "guest": {
+        "ramKiB": 2026148,
+        "cpuPresent": "0-1"
+      },
+      "portsClosed": [3007, 4107, 55447, 5580, 8580],
+      "exactLeaseRelease": true,
+      "routineEvidence": "private only; no new PNG/diagnostic JSON published",
+      "combinedPathRecount": 1211,
+      "sourcePathsPersonallyRead": 162,
+      "combinedReviewComplete": false,
+      "scopeComplete": false,
+      "heavyBuildRelease": "2026-10-03T21:43:20.016615+00:00 childexit0/exactowner-dev-inode release",
+      "backlog": "37 open/all draft/oldest21;293 independently closed unmerged, reused in74;18 historical consolidations, no main/product acceptance"
+    },
+    "originalTrustAndSettlementContinuation20261003": {
+      "source": "10d1189dd76a936ed78819b11ed500280988a4db",
+      "selectedTrustOwner": "8c423d937c01fdcabace94848c8eaf45a57c8fa6",
+      "selectedSessionDeadlineOwner": "85eb5b504893a206ca9e4b96467315f6ebaf709c",
+      "selectedOriginalTransactionsOwner": "63b841b325489a3a8aeb31bd00912baaa798b36e",
+      "workspace": "6/6; original9 contracts pass/9 PostgreSQL skipped",
+      "webVisuals": "Unchanged e56 web source13 pass/2.9min; references unchanged",
+      "native": "Qualified5f4a source/products unchanged; repaired personal operation pending",
+      "personalCurrentShippingAcceptance": false,
+      "productionTrustTLSQualification": false,
+      "canonicalMigrations": 40,
+      "newSQLActivated": false,
+      "lastPhysicalClosure": "2026-10-03T21:32:01.079458+00:00",
+      "currentSourcePathsPersonallyRead": 170,
+      "combinedPaths": 1219,
+      "combinedReviewComplete": false,
+      "openPRs": 37,
+      "allCurrentPRHeadsContainMain": true,
+      "main": "5c08634b7542fef95dd6c176030a785845250c62",
+      "published80cCI": "Foundation web/backend+Android-runtime SUCCESS/three Mac jobs QUEUED; Trust SUCCESS; no qualification of this new source",
+      "scopeComplete": false,
+      "routineEvidence": "Private only; no new PNG/diagnostic JSON committed"
+    },
+    "humanTransfer20261003": {
+      "recordedAt": "2026-10-03T23:09:02.986174+00:00",
+      "source": "cca526fe5a1fdd46386a974b2119efd40b06889c",
+      "scopeComplete": false,
+      "checkout": "/Users/yingpengwang/.codex/worktrees/w7-successor-20261002/creator-platform",
+      "checkoutDisposition": "Eligible clean managed archive after final push; inspect actual existence and recreate from remote W7 branch when absent. Private inputs/products/evidence remain outside checkout.",
+      "handoff": "docs/workstreams/handoffs/W7-2026-10-03-next.md",
+      "successorPrompt": "docs/workstreams/prompts/W7-handoff-2026-10-03.md",
+      "PR": 31,
+      "PRState": "draft/open/unmerged",
+      "main": "5c08634b7542fef95dd6c176030a785845250c62",
+      "sourcePathsRecount": 171,
+      "fullCombinedReviewComplete": false,
+      "workspace": "6/6 pass;9 contracts pass/9 PostgreSQL cases skipped",
+      "operatedHead": "7229b32003c722b1f3f800622afb06ed346b3d3f",
+      "observed": "Labelled development fan only: Android corrected Reload Loading/actual stall/refusal/retry/original Save; iOS refusal/recovery/restored original Save. iOS busy label/largest-text/full populated/provider/privacy/cohort/artboard acceptance open. No current7229 browser journey. cca rollback leaf compiled only.",
+      "resources": {
+        "state": "closed",
+        "physicalClosedAt": "2026-10-03T23:00:42.172784+00:00",
+        "apiExit": 0,
+        "webExit": -15,
+        "emulatorExit": 0,
+        "closedConnectionLimit": 0,
+        "closedOtherClients": 0,
+        "PGclosedState": "exited 0",
+        "simulatorFinal": "Shutdown",
+        "emulatorAbsent": true,
+        "portsClosed": true,
+        "guest": {
+          "ramKiB": 2026148,
+          "cpuPresent": "0-1"
+        },
+        "leases": [
+          {
+            "path": "/private/tmp/creator-platform-native-gui.lock",
+            "dev": 16777232,
+            "ino": 245308982,
+            "released": true
+          },
+          {
+            "path": "/private/tmp/creator-platform-simulator-slot-1",
+            "dev": 16777232,
+            "ino": 245308985,
+            "released": true
+          },
+          {
+            "path": "/private/tmp/creator-platform-emulator-slot-1",
+            "dev": 16777232,
+            "ino": 245308987,
+            "released": true
+          }
+        ]
+      },
+      "canonicalMigrations": 40,
+      "newSQLApplied": false,
+      "inputAuthority": "Original0044\u20130060 ceiling; full frozen17-entry0061/0062 question unanswered; old backup stale; genuine inputs absent.",
+      "privateContinuation": "/private/tmp/creator-platform-w7-successor-20261002",
+      "sharedAndPeersUntouched": true,
+      "currentFinalHeadCI": "Inspect after final documentation push. Older7229 Trust/web-backend/Android-runtime pass, three Mac Foundation families queued; none qualifies new head."
+    }
+  },
+  "previousTransfer": {
+    "checkout": "/Users/yingpengwang/.codex/worktrees/0546/creator-platform",
+    "reviewedMain": "c1c615e6ece53bff4bc6a47d7f4d332757df1295",
+    "combinedSource": "d511b446c958783802bd5e64976ad942380da823",
+    "currentSource": "d511b446c958783802bd5e64976ad942380da823",
+    "handoff": "docs/workstreams/handoffs/W7-2026-10-01-completion.md"
+  }
+}

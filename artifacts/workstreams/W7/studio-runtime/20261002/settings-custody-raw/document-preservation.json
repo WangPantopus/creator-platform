@@ -1,0 +1,50 @@
+{
+  "at": "2026-10-02T18:35:01.917941+00:00",
+  "records": [
+    {
+      "path": "docs/workstreams/status/W7.md",
+      "preservedHistoricalBodySha256": "f7c78c5137c72142eefa0e7ddf0a0c33268aad52eb464f5a6626a0048015871a",
+      "verifiedPublishedOriginalSHA256": "c242efd58e74e47539bacee660b14d083c5fef04945b77422dbe436b622eebfd",
+      "headerRemovalEqualsPublishedParentBytes": true
+    },
+    {
+      "path": "docs/workstreams/coordination/W7.md",
+      "preservedHistoricalBodySha256": "1fa0c07f80be1de1425a5a19de1d71d1a4ff91adb91dd397ac3bacdb3dde41a3",
+      "verifiedPublishedOriginalSHA256": "b76a5a274722d6706553815aa7e66e89d830f88f503c63e49d547741c5c9ccaf",
+      "headerRemovalEqualsPublishedParentBytes": true
+    },
+    {
+      "path": "docs/workstreams/handoffs/W7-2026-10-01-macstudio.md",
+      "preservedHistoricalBodySha256": "c3185405ce3bf2e41924a928b49883afb82195072310101598ee12e24c597bf8",
+      "verifiedPublishedOriginalSHA256": "765fe821a83e81c28f09ad9ed60f182aa726abd61168d4aebac4f992440103c9",
+      "headerRemovalEqualsPublishedParentBytes": true
+    },
+    {
+      "path": "docs/workstreams/handoffs/W7-2026-10-01-completion.md",
+      "preservedHistoricalBodySha256": "a8cd81468b0c986212ed64a116f578e343758eadc2310934149187249163d8e3",
+      "verifiedPublishedOriginalSHA256": "79d9be3787708235082c512959d735268e5e3d2b980ed6f5fa052c0e57373ab1",
+      "headerRemovalEqualsPublishedParentBytes": true
+    },
+    {
+      "path": "artifacts/workstreams/W7/completion/20261001/README.md",
+      "preservedHistoricalBodySha256": "640781afca7ce81669f164e9c0aa4c0ad33e2c18d708e0c853d6e4c252f557f9",
+      "verifiedPublishedOriginalSHA256": "1753b884480b743ce60bb5148ce2335c067d1d3a5860144f7c4234fea3c74f51",
+      "headerRemovalEqualsPublishedParentBytes": true
+    },
+    {
+      "path": "artifacts/workstreams/W7/studio-runtime/20261002/README.md",
+      "preservedHistoricalBodySha256": "5e4eec97153d881a4f0d6dd2688a2ef2150f9c147b37b1d386b9ae7dff0ebf78",
+      "verifiedPublishedOriginalSHA256": "66e64ac55b6a02f08f1750c2ae1385588fa23c8be392b05b5cff835ba6537700",
+      "headerRemovalEqualsPublishedParentBytes": true
+    },
+    {
+      "path": "artifacts/workstreams/W7/resume/20260930/acceptance.md",
+      "preservedHistoricalBodySha256": "1904c6158b0e00c7cd2039a39b9825051519f01206a670ee740af1d292070eef",
+      "verifiedPublishedOriginalSHA256": "16abb58bf7eef5f0f2d356a8516da74907aa8674ce55bb513e5aae8256d04ff0",
+      "headerRemovalEqualsPublishedParentBytes": true
+    }
+  ],
+  "originalRowsPreserved": true,
+  "verifiedAgainAt": "2026-10-02T18:56:22.168317+00:00",
+  "priorHashReceiptLimit": "Prior preservedHistoricalBodySha256 values are retained as historical entries; they do not match full published parent document hashes. Current exact byte comparison proves all original documents/rows unchanged after removing only the new header."
+}

@@ -1,0 +1,20 @@
+- main:
+  - status:
+    - generic: Temporarily unavailable
+    - generic: This card is unavailable.
+  - link "Try again":
+    - /url: /discover
+  - navigation "Main":
+    - link "Home":
+      - /url: /home
+      - text: Home
+    - link "Discover":
+      - /url: /discover
+      - text: Discover
+    - link "Requests":
+      - /url: /requests
+      - text: Requests
+    - link "You":
+      - /url: /you
+      - text: You
+- alert

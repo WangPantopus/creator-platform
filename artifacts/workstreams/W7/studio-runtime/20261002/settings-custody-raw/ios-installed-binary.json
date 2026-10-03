@@ -1,0 +1,16 @@
+{
+  "sourceBase": "6079ba3d",
+  "changes": "six uncommitted account-bound notification settings files",
+  "rows": [
+    {
+      "path": "QelvoraApp",
+      "builtSha256": "b0afc64b2fede07bdd356f4a36afbc5f0dc1419cea820289aae0cb4087ab18b0",
+      "installedSha256": "b0afc64b2fede07bdd356f4a36afbc5f0dc1419cea820289aae0cb4087ab18b0"
+    },
+    {
+      "path": "QelvoraApp.debug.dylib",
+      "builtSha256": "650995515cbd3323343d69c8ee8da9f16adba2bb0e99659a5bc2c6b79f36ab32",
+      "installedSha256": "650995515cbd3323343d69c8ee8da9f16adba2bb0e99659a5bc2c6b79f36ab32"
+    }
+  ]
+}

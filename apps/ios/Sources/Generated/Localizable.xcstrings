@@ -2135,6 +2135,28 @@
         }
       }
     },
+    "Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate."
+          }
+        }
+      }
+    },
+    "Lowering a limit is immediate.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lowering a limit is immediate."
+          }
+        }
+      }
+    },
     "No limit": {
       "extractionState": "manual",
       "localizations": {
@@ -3125,6 +3147,127 @@
         }
       }
     },
+    "Notifications on this device": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notifications on this device"
+          }
+        }
+      }
+    },
+    "Allow notifications on this device": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow notifications on this device"
+          }
+        }
+      }
+    },
+    "Open notification settings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open notification settings"
+          }
+        }
+      }
+    },
+    "Push delivery is not enabled for this app. Your in-app notifications remain available.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Push delivery is not enabled for this app. Your in-app notifications remain available."
+          }
+        }
+      }
+    },
+    "Device permission is unavailable. Check notification settings.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Device permission is unavailable. Check notification settings."
+          }
+        }
+      }
+    },
+    "Choose whether this device may show notifications. Your account preferences apply separately.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose whether this device may show notifications. Your account preferences apply separately."
+          }
+        }
+      }
+    },
+    "Notifications are blocked in device settings. Your in-app record remains available.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notifications are blocked in device settings. Your in-app record remains available."
+          }
+        }
+      }
+    },
+    "This device allows notifications. Your account preferences and quiet hours still apply.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This device allows notifications. Your account preferences and quiet hours still apply."
+          }
+        }
+      }
+    },
+    "This device allows quiet notifications. You can change their presentation in device settings.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This device allows quiet notifications. You can change their presentation in device settings."
+          }
+        }
+      }
+    },
+    "Device permission could not be read. Try again in notification settings.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Device permission could not be read. Try again in notification settings."
+          }
+        }
+      }
+    },
+    "Push registration could not complete. Reconnect and reopen the app to retry. Your in-app record remains available.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Push registration could not complete. Reconnect and reopen the app to retry. Your in-app record remains available."
+          }
+        }
+      }
+    },
     "Email digest": {
       "extractionState": "manual",
       "localizations": {
@@ -3928,6 +4071,28 @@
         }
       }
     },
+    "More creators": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "More creators"
+          }
+        }
+      }
+    },
+    "First page": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "First page"
+          }
+        }
+      }
+    },
     "AN INVITATION FROM {value1}": {
       "extractionState": "manual",
       "localizations": {
@@ -4126,6 +4291,83 @@
         }
       }
     },
+    "Back to reply": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back to reply"
+          }
+        }
+      }
+    },
+    "The complete reply is split into labeled images when needed. Multiple images download together as a ZIP, with a complete text copy.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The complete reply is split into labeled images when needed. Multiple images download together as a ZIP, with a complete text copy."
+          }
+        }
+      }
+    },
+    "Preparing images…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparing images…"
+          }
+        }
+      }
+    },
+    "Prepared {page} images…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepared {page} images…"
+          }
+        }
+      }
+    },
+    "Page {page}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Page {page}"
+          }
+        }
+      }
+    },
+    "Your download is ready. Check your browser’s downloads.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your download is ready. Check your browser’s downloads."
+          }
+        }
+      }
+    },
+    "The complete image export could not be prepared. Retry, or download the complete text.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The complete image export could not be prepared. Retry, or download the complete text."
+          }
+        }
+      }
+    },
     "Your first 72 hours": {
       "extractionState": "manual",
       "localizations": {
@@ -4298,6 +4540,50 @@
           "stringUnit": {
             "state": "translated",
             "value": "YOUR WEEK · IMPACT"
+          }
+        }
+      }
+    },
+    "You helped {people} people this week.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You helped {people} people this week."
+          }
+        }
+      }
+    },
+    "A THANK-YOU, SHARED WITH PERMISSION": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A THANK-YOU, SHARED WITH PERMISSION"
+          }
+        }
+      }
+    },
+    "Counts are for this week only. Fans are never named here without their consent.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Counts are for this week only. Fans are never named here without their consent."
+          }
+        }
+      }
+    },
+    "No weekly digest is available yet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No weekly digest is available yet."
           }
         }
       }
@@ -5259,211 +5545,211 @@
         }
       }
     },
-    "ai reply": {
+    "AI replies": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "ai reply"
+            "value": "AI replies"
           }
         }
       }
     },
-    "approved draft": {
+    "Approved AI drafts": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "approved draft"
+            "value": "Approved AI drafts"
           }
         }
       }
     },
-    "personal reply": {
+    "Personal replies and voice notes": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "personal reply"
+            "value": "Personal replies and voice notes"
           }
         }
       }
     },
-    "request status": {
+    "Request status updates": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "request status"
+            "value": "Request status updates"
           }
         }
       }
     },
-    "call reminder": {
+    "Call reminders": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "call reminder"
+            "value": "Call reminders"
           }
         }
       }
     },
-    "answered publicly": {
+    "Your question answered publicly": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "answered publicly"
+            "value": "Your question answered publicly"
           }
         }
       }
     },
-    "content match": {
+    "Posts about what you asked": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "content match"
+            "value": "Posts about what you asked"
           }
         }
       }
     },
-    "announcement": {
+    "Creator announcements": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "announcement"
+            "value": "Creator announcements"
           }
         }
       }
     },
-    "creator offer": {
+    "Offers from creators": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "creator offer"
+            "value": "Offers from creators"
           }
         }
       }
     },
-    "slot change": {
+    "Pass slot changes": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "slot change"
+            "value": "Pass slot changes"
           }
         }
       }
     },
-    "new packet": {
+    "New requests": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "new packet"
+            "value": "New requests"
           }
         }
       }
     },
-    "commitment due": {
+    "Commitment reminders": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "commitment due"
+            "value": "Commitment reminders"
           }
         }
       }
     },
-    "guardrail": {
+    "Safety events and reports": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "guardrail"
+            "value": "Safety events and reports"
           }
         }
       }
     },
-    "pool share": {
+    "Pass pool updates": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "pool share"
+            "value": "Pass pool updates"
           }
         }
       }
     },
-    "note": {
+    "New Notes": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "note"
+            "value": "New Notes"
           }
         }
       }
     },
-    "reaction": {
+    "Reactions to your replies": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "reaction"
+            "value": "Reactions to your replies"
           }
         }
       }
     },
-    "public answer": {
+    "New public answers": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "public answer"
+            "value": "New public answers"
           }
         }
       }
     },
-    "spending reminder": {
+    "Spending reminders": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "spending reminder"
+            "value": "Spending reminders"
           }
         }
       }
     },
-    "weekly impact": {
+    "Weekly impact digests": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "weekly impact"
+            "value": "Weekly impact digests"
           }
         }
       }
@@ -5519,6 +5805,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "{label} · {state}"
+          }
+        }
+      }
+    },
+    "{kind} · {channel}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{kind} · {channel}"
           }
         }
       }
@@ -6179,6 +6476,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Impact uses closed weekly observation windows."
+          }
+        }
+      }
+    },
+    "This week: {people} people helped and {thanks} thanks.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This week: {people} people helped and {thanks} thanks."
           }
         }
       }
@@ -7026,17 +7334,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sign in to a configured creator account to upload and sign. Your preview stays on this device until you upload it."
-          }
-        }
-      }
-    },
-    "Uploads and signing are unavailable here. Your preview stays on this device.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uploads and signing are unavailable here. Your preview stays on this device."
           }
         }
       }
@@ -9659,6 +9956,94 @@
         }
       }
     },
+    "Download complete reply": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Download complete reply"
+          }
+        }
+      }
+    },
+    "Share complete reply": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share complete reply"
+          }
+        }
+      }
+    },
+    "We can't reach your account right now": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We can't reach your account right now"
+          }
+        }
+      }
+    },
+    "Your session is kept on this device. Try again in a moment.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your session is kept on this device. Try again in a moment."
+          }
+        }
+      }
+    },
+    "This page didn't load": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This page didn't load"
+          }
+        }
+      }
+    },
+    "Nothing you saved was changed. Try again in a moment.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing you saved was changed. Try again in a moment."
+          }
+        }
+      }
+    },
+    "You've reached {percent}% of your monthly limit.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You've reached {percent}% of your monthly limit."
+          }
+        }
+      }
+    },
+    "Uploads and signing are unavailable here. Your preview stays on this device.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uploads and signing are unavailable here. Your preview stays on this device."
+          }
+        }
+      }
+    },
     "Record a voice reply": {
       "extractionState": "manual",
       "localizations": {
@@ -9787,72 +10172,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Your account changed. Reopen availability to continue."
-          }
-        }
-      }
-    },
-    "We can't reach your account right now": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "We can't reach your account right now"
-          }
-        }
-      }
-    },
-    "Your session is kept on this device. Try again in a moment.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Your session is kept on this device. Try again in a moment."
-          }
-        }
-      }
-    },
-    "Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate."
-          }
-        }
-      }
-    },
-    "Lowering a limit is immediate.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Lowering a limit is immediate."
-          }
-        }
-      }
-    },
-    "This page didn't load": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This page didn't load"
-          }
-        }
-      }
-    },
-    "Nothing you saved was changed. Try again in a moment.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nothing you saved was changed. Try again in a moment."
           }
         }
       }
@@ -10040,6 +10359,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "This device could not save your session securely. Unlock it and try signing in again."
+          }
+        }
+      }
+    },
+    "The service is unavailable. Your input has been kept; try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The service is unavailable. Your input has been kept; try again."
+          }
+        }
+      }
+    },
+    "The service returned an unreadable response. Your input has been kept; try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The service returned an unreadable response. Your input has been kept; try again."
           }
         }
       }

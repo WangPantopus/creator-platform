@@ -1,0 +1,13 @@
+Browser tab: 5, Title: "Qelvora", URL: "http://127.0.0.1:3007/discover?q=craft&category=".
+1 AXWebArea Qelvora, URL: 127.0.0.1:3007/discover?q=craft&category=
+	2 container
+		3 text Temporarily unavailable
+		4 text The service is unavailable. Please try again.
+		5 link Description: Try again, Value: 127.0.0.1:3007/discover?q=craft&category=
+		6 container Main
+			7 link Description: Home, Value: 127.0.0.1:3007/home
+			8 link Description: Discover, Value: 127.0.0.1:3007/discover
+			9 link Description: Requests, Value: 127.0.0.1:3007/requests
+			10 link Description: You, Value: 127.0.0.1:3007/you
+
+The focused UI element is 1 AXWebArea Qelvora, URL: 127.0.0.1:3007/discover?q=craft&category=

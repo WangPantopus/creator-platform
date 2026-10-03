@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-02T19:28:16.650543+00:00",
+  "serial": "emulator-5580",
+  "emulatorVersion": "37.1.11.0",
+  "requestedRAMMB": 2048,
+  "actualGuestMemTotalKiB": 2026148,
+  "onlineCPU": "0-1",
+  "lowram": true,
+  "source": "https://android.googlesource.com/platform/external/qemu/+/emu-master-dev/android/android-emu/android/main-common.c",
+  "earlierCorrection": "Original settings-custody emulator logs report automatic2560MB despite requested2048; prior actual compliance cannot be inferred.",
+  "avdConfigUnchanged": true,
+  "wiped": false
+}

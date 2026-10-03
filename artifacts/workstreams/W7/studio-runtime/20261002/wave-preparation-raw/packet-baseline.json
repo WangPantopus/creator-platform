@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-02T17:06:17.639Z",
+  "sourceHead": "0f437fdedd61cc6849b0480b1dd34b883cce2a8e",
+  "packetPath": "infra/migrations/waves/20261002.json",
+  "packetSha256": "9e21499af1c10ad488dbb6e7f6477c675f2c2511bfde5c7635f3adfef56919b9",
+  "packetSourceChecksumsMatched": 57,
+  "baselineEntries": 40,
+  "waveEntries": 17,
+  "targetEntries": 57,
+  "actualLedgerEntries": 40,
+  "actualLedgerExactlyMatchesBaseline": true,
+  "actualLedgerSha256": "4b0193a05cf3b4d025fbf80a64751d6d1aaf04241a25850c62f25c73ef9d93d5",
+  "database": {
+    "database": "creator_w7",
+    "superuser": true,
+    "connection_limit": 0,
+    "traffic_marker": "creator-platform:restored-traffic-closed"
+  },
+  "aboveUserCeiling": [
+    {
+      "version": "0061_w4_payout_custody",
+      "path": "apps/backend/src/modules/commerce/schema-payout-custody.sql",
+      "checksum": "a2453c00868cd7a6fcaf30a1121884a73daa4942a2ac8b7214504d19285c1efd"
+    },
+    {
+      "version": "0062_w6_creator_media_worker",
+      "path": "apps/backend/src/modules/media/worker-scope.sql",
+      "checksum": "abf169bb75c9bdc8aff771ac1d929f6a09a7211e6340b84b36d5700daa38a82a"
+    }
+  ],
+  "newMigrationsApplied": 0,
+  "personalWaveSQLReview": "All 17 SQL sources read; 0060 re-read in two bounded chunks after truncated earlier output.",
+  "backupReceipt": "Canonical 40 backup and separate restore matched ledger/schema/data/security/sequences/roles digests; private archive and globals excluded from public evidence."
+}

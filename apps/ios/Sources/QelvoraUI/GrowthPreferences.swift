@@ -11,13 +11,16 @@ private let growthNotificationKinds = ["ai_reply", "approved_draft", "personal_r
 
 struct GrowthNotificationSettings: View {
     private enum Field: Hashable { case from, until, timeZone }
+    private enum Operation { case loading, saving }
     let client: GrowthClient?
     @State private var value: GrowthPreferences?
+    @State private var formSession: String?
     @State private var creators: [PreferenceCreators.Creator] = []
     @State private var from = ""
     @State private var until = ""
     @State private var message = ""
-    @State private var busy = false
+    @State private var operation: Operation?
+    private var busy: Bool { operation != nil }
     @State private var errors: [Field: String] = [:]
     @FocusState private var focused: Field?
     @Environment(\.colorScheme) private var scheme
@@ -26,41 +29,70 @@ struct GrowthNotificationSettings: View {
             Text(QelvoraCopy.text("growthNotificationSettings")).qText("display-md")
             Text(QelvoraCopy.text("growthYourInAppRecordCannotBeTurnedOffPushAnd")).qText("body")
             if value != nil {
-                Toggle(QelvoraCopy.text("growthPushNotifications"), isOn: field(\.push))
-                Toggle(QelvoraCopy.text("growthEmailDigest"), isOn: field(\.email))
-                Toggle(QelvoraCopy.text("growthHideSensitivePreviews"), isOn: field(\.hideSensitive))
-                TextField(QelvoraCopy.text("growthQuietHoursFromHhMm"), text: $from)
-                    .textFieldStyle(.roundedBorder)
-                    .focused($focused, equals: .from)
-                    .accessibilityHint(errors[.from] ?? "")
-                fieldError(.from)
-                TextField(QelvoraCopy.text("growthQuietHoursUntilHhMm"), text: $until)
-                    .textFieldStyle(.roundedBorder)
-                    .focused($focused, equals: .until)
-                    .accessibilityHint(errors[.until] ?? "")
-                fieldError(.until)
-                TextField(QelvoraCopy.text("growthTimeZone"), text: field(\.timeZone))
-                    .textFieldStyle(.roundedBorder)
-                    .focused($focused, equals: .timeZone)
-                    .accessibilityHint(errors[.timeZone] ?? "")
-                    .autocorrectionDisabled()
-                    #if os(iOS)
-                    .textInputAutocapitalization(.never)
-                    #endif
-                fieldError(.timeZone)
+                #if os(iOS)
+                GrowthDevicePushSettings()
+                #endif
+                preferenceToggle(QelvoraCopy.text("growthPushNotifications"), value: field(\.push))
+                preferenceToggle(QelvoraCopy.text("growthEmailDigest"), value: field(\.email))
+                preferenceToggle(QelvoraCopy.text("growthHideSensitivePreviews"), value: field(\.hideSensitive))
+                preferenceField(.from, label: QelvoraCopy.text("growthQuietHoursFromHhMm"), text: $from)
+                preferenceField(.until, label: QelvoraCopy.text("growthQuietHoursUntilHhMm"), text: $until)
+                preferenceField(.timeZone, label: QelvoraCopy.text("growthTimeZone"), text: field(\.timeZone))
                 Text(QelvoraCopy.text("growthLeaveBothTimesEmptyForNoQuietHours")).qText("caption")
-                ForEach(creators) {creator in Toggle(QelvoraCopy.text("growthPushAndEmail2", values: ["name": creator.name]), isOn: allowed(\.mutedCreators, creator.id))}
-                ForEach(growthNotificationKinds, id: \.self) {kind in VStack(alignment: .leading) {Text(QelvoraCopy.text("growthKind" + kind.split(separator: "_").map { $0.prefix(1).uppercased() + $0.dropFirst() }.joined())).qText("label");Toggle(QelvoraCopy.text("growthPush"), isOn: allowed(\.disabledPushTypes, kind));Toggle(QelvoraCopy.text("growthEmail"), isOn: allowed(\.disabledEmailTypes, kind))}}
-                Button(busy ? QelvoraCopy.text("growthSaving") : QelvoraCopy.text("growthSavePreferences"), variant: .secondary, block: true, disabled: busy) {Task {await save()}}
+                ForEach(creators) {creator in
+                    preferenceToggle(QelvoraCopy.text("growthPushAndEmail2", values: ["name": creator.name]), value: allowed(\.mutedCreators, creator.id))
+                }
+                ForEach(growthNotificationKinds, id: \.self) {kind in
+                    let label = QelvoraCopy.text("growthKind" + kind.split(separator: "_").map { $0.prefix(1).uppercased() + $0.dropFirst() }.joined())
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(label).qText("label")
+                        preferenceToggle(QelvoraCopy.text("growthPush"), value: allowed(\.disabledPushTypes, kind), accessibilityLabel: QelvoraCopy.text("growthNotificationChannel", values: ["kind": label, "channel": QelvoraCopy.text("growthPush")]))
+                        preferenceToggle(QelvoraCopy.text("growthEmail"), value: allowed(\.disabledEmailTypes, kind), accessibilityLabel: QelvoraCopy.text("growthNotificationChannel", values: ["kind": label, "channel": QelvoraCopy.text("growthEmail")]))
+                    }.accessibilityElement(children: .contain)
+                }
+                Button(operation == .saving ? QelvoraCopy.text("growthSaving") : QelvoraCopy.text("growthSavePreferences"), variant: .secondary, block: true, disabled: busy) {Task {await save()}}
             } else if message.isEmpty {ProgressView()}
             if !message.isEmpty {Text(message).qText("body").accessibilityAddTraits(.updatesFrequently)}
-            Button(QelvoraCopy.text("growthReloadSettings"), variant: .quiet, disabled: busy) {Task {await load()}}
+            Button(QelvoraCopy.text(operation == .loading ? "growthLoading" : "growthReloadSettings"), variant: .quiet, disabled: busy) {Task {await load()}}
         }
         .disabled(busy)
         .onChange(of: from) { _, _ in clearError(.from); clearError(.until) }
         .onChange(of: until) { _, _ in clearError(.from); clearError(.until) }
         .onChange(of: value?.timeZone) { _, _ in clearError(.timeZone) }
         .task {await load()}
+    }
+    private func preferenceToggle(_ label: String, value: Binding<Bool>, accessibilityLabel: String? = nil) -> some View {
+        SwiftUI.Button { value.wrappedValue.toggle() } label: {
+            HStack {
+                Text(label).qText("body")
+                Spacer(minLength: 12)
+                Toggle("", isOn: .constant(value.wrappedValue))
+                    .labelsHidden().allowsHitTesting(false).accessibilityHidden(true)
+            }.frame(minHeight: 44).contentShape(Rectangle())
+        }.buttonStyle(.plain)
+            .accessibilityLabel(accessibilityLabel ?? label)
+            .accessibilityValue(QelvoraCopy.text(value.wrappedValue ? "growthOn" : "growthOff"))
+    }
+    private func preferenceField(_ field: Field, label: String, text: Binding<String>) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(label).qText("caption").foregroundStyle(qColor("ink-muted", scheme))
+            TextField(label, text: text)
+                .textFieldStyle(.plain)
+                .qText("body")
+                .padding(12)
+                .frame(minHeight: 48)
+                .background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: 12))
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(qColor(errors[field] == nil ? "control-line" : "alert", scheme), lineWidth: 1))
+                .focused($focused, equals: field)
+                .accessibilityLabel(label)
+                .accessibilityHint(errors[field] ?? "")
+                .autocorrectionDisabled()
+                #if os(iOS)
+                .textInputAutocapitalization(.never)
+                .keyboardType(field == .timeZone ? .asciiCapable : .numbersAndPunctuation)
+                #endif
+            fieldError(field)
+        }
     }
     @ViewBuilder private func fieldError(_ field: Field) -> some View {
         if let error = errors[field] {
@@ -85,15 +117,17 @@ struct GrowthNotificationSettings: View {
     private func load() async {
         guard !busy else { return }
         guard let client else { message = QelvoraCopy.text("growthTheGrowthServiceIsNotConfigured"); return }
-        busy = true
-        defer { busy = false }
+        operation = .loading
+        defer { operation = nil }
         do {
-            let preferences: GrowthPreferences = try await client.request("preferences")
-            let directory: PreferenceCreators = try await client.request("preferences/creators")
+            guard let captured = try await client.token() else { throw GrowthRequestFailure(status: 401) }
+            let preferences: GrowthPreferences = try await client.request("preferences", expectedSession: captured)
+            let directory: PreferenceCreators = try await client.request("preferences/creators", expectedSession: captured)
             guard !Task.isCancelled else { return }
             // Commit the complete form only after both reads succeed. A partial
             // reload must not combine new toggles with old/empty quiet hours.
             value = preferences
+            formSession = captured
             creators = directory.creators
             from = time(preferences.quietStart)
             until = time(preferences.quietEnd)
@@ -122,12 +156,15 @@ struct GrowthNotificationSettings: View {
             focused = invalid
             return
         }
-        busy = true
-        defer { busy = false }
+        operation = .saving
+        defer { operation = nil }
         current.quietStart = minute(from)
         current.quietEnd = minute(until)
         do {
-            let updated: GrowthPreferences = try await client.request("preferences", method: "PUT", body: JSONEncoder().encode(current))
+            // The loaded form owns this credential snapshot. Taking a new one
+            // here could submit an old account's choices after account transfer.
+            guard let formSession else { throw GrowthRequestFailure(status: 401) }
+            let updated: GrowthPreferences = try await client.request("preferences", method: "PUT", body: JSONEncoder().encode(current), expectedSession: formSession)
             value = updated
             message = QelvoraCopy.text("growthPreferencesSavedYourInAppRecordRemainsAvailable")
         } catch is CancellationError {

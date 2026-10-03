@@ -54,7 +54,7 @@ object W3FanFeatures {
         else if (parts.size == 3 && parts[0] == "threads") {
             val valid = runCatching { UUID.fromString(parts[1]); UUID.fromString(parts[2]); true }.getOrDefault(false)
             if (valid) ConversationScreen(baseURL, parts[1], parts[2], session) else Notice(title = "Conversation unavailable", children = "Open this conversation from your account.")
-        } else if (parts.size == 3 && parts[0] == "creators" && parts[2] == "chat") FirstConversation(baseURL, parts[1], session)
+        } else if (parts.size == 3 && parts[0] == "creators" && parts[2] == "chat") key(session.session?.accountId, session.session?.sessionId, session.destination) { FirstConversation(baseURL, parts[1], session) }
         else if (Uri.parse(session.destination).path == "/you") ConversationAccount(baseURL, session)
         else Notice(title = "Conversation unavailable", children = "Open this conversation from your account.")
     })
@@ -176,7 +176,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     }
     source?.let { passage -> Dialog(onDismissRequest = { source = null }) {
         Column(Modifier.background(qColor("ground")).padding(16.dp)) {
-            BasicText("Original source", style = qText("meta").copy(color = qColor("ink")))
+            BasicText("Original source", style = qText("data-sm").copy(color = qColor("ink")))
             LazyColumn(Modifier.weight(1f, fill = false), verticalArrangement = Arrangement.spacedBy(16.dp)) { item { BasicText(passage.first, style = qText("display-md").copy(color = qColor("ink"))); SelectionContainer { BasicText(passage.second, style = qText("body").copy(color = qColor("ink"))) } } }
             Button("Close", variant = ButtonVariant.QUIET) { source = null }
         }
@@ -370,7 +370,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         item { Button("Back", variant = ButtonVariant.QUIET, onClick = onBack); BasicText("Me and privacy", style = qText("title").copy(color = qColor("ink"))); if (error.isNotEmpty()) Notice(title = "Privacy status", children = error) }
         item { BasicText("What $name's AI remembers", style = qText("display-md").copy(color = qColor("ink"))); if (memory?.items?.isEmpty() == true) BasicText("No memories. The AI asks before remembering.", style = qText("body").copy(color = qColor("ink"))) }
         items(memory?.items.orEmpty(), key = { it.id }) { item -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            BasicText(if (item.state == "proposed") "Want me to remember this? Only if you say yes." else "Remembered · ${item.kind}", style = qText("meta").copy(color = qColor("ink")))
+            BasicText(if (item.state == "proposed") "Want me to remember this? Only if you say yes." else "Remembered · ${item.kind}", style = qText("data-sm").copy(color = qColor("ink")))
             if (editing == item.id) { BasicTextField(text, { text = it.take(2000) }, textStyle = qText("body").copy(color = qColor("ink")), cursorBrush = SolidColor(qColor("ink"))); Button("Save proposal", variant = ButtonVariant.SECONDARY, disabled = busy || text.isBlank()) { scope.launch { decide(item, "edit") } } } else BasicText(item.text, style = qText("body").copy(color = qColor("ink")))
             if (item.sensitiveCategory != null) BasicText("Sensitive item · agreeing applies only to this exact memory.", style = qText("caption").copy(color = qColor("ink")))
             Button("View where this came from",variant=ButtonVariant.QUIET) { scope.launch { try { provenance=client.json.decodeFromJsonElement(client.request("$root/messages/${item.provenanceMessageId}")) } catch(failure:Throwable) { if(failure is CancellationException) throw failure;error=failure.message ?: "This source message is unavailable." } } }
@@ -407,6 +407,49 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     val key = remember(handle) { UUID.randomUUID().toString() }
     val scope = rememberCoroutineScope(); val uriHandler = LocalUriHandler.current
     val contextPending = Uri.parse(session.destination).getQueryParameter("context") != null
+    val target = session.destination
+    val accountId = session.session?.accountId
+    val sessionId = session.session?.sessionId
+    var postContext by remember { mutableStateOf<APIGrowthPostEntryContextResponseContext?>(null) }
+    var contextSessionId by remember { mutableStateOf<String?>(null) }
+    var contextDestination by remember { mutableStateOf("") }
+    var contextFailure by remember { mutableStateOf("") }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var foreground by remember(lifecycleOwner) { mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, _ ->
+            foreground = lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+            if (!foreground) postContext = null
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer); postContext = null }
+    }
+    LaunchedEffect(baseURL, target, accountId, sessionId, foreground) {
+        postContext = null; contextFailure = ""
+        if (!foreground || !contextPending) return@LaunchedEffect
+        while (isActive) {
+            postContext = null; contextFailure = ""
+            val values = Uri.parse(target).getQueryParameters("context")
+            val id = values.singleOrNull()?.let { raw -> runCatching { UUID.fromString(raw).also { require(it.toString().equals(raw, ignoreCase = true)) } }.getOrNull() }
+            val capture = if (id != null && ApplicationDestination.isPermitted(target)) session.captureRequest(target, maximumResponseBytes = 8192, timeoutMs = 5000) else null
+            if (capture == null || capture.expectedAccountId != accountId) {
+                contextFailure = QelvoraCopy.text("growthThisDestinationIsUnavailableReconnectAndTryAgain")
+            } else try {
+                if (!capture.isCurrent()) return@LaunchedEffect
+                val page = capture.client.readPostEntryContext(handle, id.toString(), capture.expectedAccountId)
+                val post = page.context
+                if (!foreground || !capture.isCurrent()) return@LaunchedEffect
+                require(UUID.fromString(post.creatorId).toString().equals(post.creatorId, ignoreCase = true))
+                require(UUID.fromString(post.contentId) == id && post.version in 1..2147483647L && post.title.length <= 180)
+                require(post.destination == "/creators/$handle/posts/$id")
+                contextSessionId = capture.sessionId; contextDestination = capture.destination; postContext = post
+            } catch (failure: Throwable) {
+                if (failure is CancellationException) throw failure
+                if (foreground && capture.isCurrent()) contextFailure = QelvoraCopy.text("growthThisDestinationIsUnavailableReconnectAndTryAgain")
+            }
+            delay(4000)
+        }
+    }
     LaunchedEffect(handle) {
         try {
             require(Regex("[A-Za-z0-9_-]{1,100}").matches(handle))
@@ -418,7 +461,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     LazyColumn(Modifier.fillMaxSize().widthIn(max = 390.dp).background(qColor("ground")),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(24.dp)) {
         item { Button("Back",variant=ButtonVariant.QUIET) { session.open("/creators/$handle") }; AuthorLabel(kind=AuthorKind.AI,name=name); BasicText("Before your first message",style=qText("display-lg").copy(color = qColor("ink"))) }
         item {
-            BasicText("WHO RUNS IT",style=qText("meta").copy(color = qColor("ink")))
+            BasicText("WHO RUNS IT",style=qText("data-sm").copy(color = qColor("ink")))
             val policy = capabilities?.providers
             if(policy == null) BasicText("AI providers and their verified processing terms are not configured yet.",style=qText("body").copy(color = qColor("ink")))
             policy?.providers?.forEach { provider ->
@@ -426,18 +469,32 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 Button(provider.name + " processing terms",variant=ButtonVariant.QUIET) { uriHandler.openUri(provider.termsUrl) }
                 BasicText((if(provider.noTraining) "Doesn't train on your messages." else "Review message use in these terms.") + " " + (if(provider.noRetention) "Doesn't keep your messages." else "Review message retention in these terms."),style=qText("caption").copy(color = qColor("ink")))
             }
-            BasicText("WHO CAN READ IT",style=qText("meta").copy(color = qColor("ink"))); BasicText(capabilities?.accessDisclosure ?: "Conversations can be read by the creator and their authorized team. Those accesses are logged.",style=qText("body").copy(color = qColor("ink")))
-            BasicText("WHAT IT REMEMBERS",style=qText("meta").copy(color = qColor("ink"))); BasicText("Only what you agree to. It asks first, and you can see and delete every memory in You.",style=qText("body").copy(color = qColor("ink")))
+            BasicText("WHO CAN READ IT",style=qText("data-sm").copy(color = qColor("ink"))); BasicText(capabilities?.accessDisclosure ?: "Conversations can be read by the creator and their authorized team. Those accesses are logged.",style=qText("body").copy(color = qColor("ink")))
+            BasicText("WHAT IT REMEMBERS",style=qText("data-sm").copy(color = qColor("ink"))); BasicText("Only what you agree to. It asks first, and you can see and delete every memory in You.",style=qText("body").copy(color = qColor("ink")))
         }
         if(error.isNotEmpty()) item { Notice(title="Conversation unavailable",children=error) }
-        if(contextPending) item { Notice(title="Post context unavailable",children="This post's context is not connected to the conversation service yet. Your destination is kept.") }
+        if(contextPending) item {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                postContext?.takeIf { foreground && !session.checkingSession && contextSessionId == sessionId && contextDestination == target && it.creatorId == creator?.optString("id") }?.let { post ->
+                    ContextCard(QelvoraCopy.text("growthFromAPost"), post.title) { session.open("/creators/$handle/chat") }
+                }
+                Notice(title="Post context unavailable",children=contextFailure.ifEmpty { "This post's conversation context is not connected yet. Remove the post context to continue to the current AI provider review." })
+                Button(QelvoraCopy.text("removeContext"), variant=ButtonVariant.QUIET, block=true) { session.open("/creators/$handle/chat") }
+            }
+        }
         item {
-            Button("Start with $name's AI",variant=ButtonVariant.AI,block=true,disabled=busy || creator == null || contextPending || capabilities?.generationAvailable != true || capabilities?.consentAvailable != true) { scope.launch {
-                val policy=capabilities?.providers ?: return@launch; busy=true
+            Button("Start with $name's AI",variant=ButtonVariant.AI,block=true,disabled=busy || !foreground || session.checkingSession || creator == null || contextPending || capabilities?.generationAvailable != true || capabilities?.consentAvailable != true) { scope.launch {
+                if (busy || !foreground || contextPending || session.destination != target || capabilities?.generationAvailable != true || capabilities?.consentAvailable != true) return@launch
+                val policy=capabilities?.providers ?: return@launch
+                val selectedCreator=creator ?: return@launch
+                val capture=session.captureRequest(target, maximumResponseBytes=1_000_000, timeoutMs=15_000) ?: return@launch
+                if (capture.expectedAccountId != accountId || capture.sessionId != sessionId || !capture.isCurrent() || !foreground || session.destination != target) return@launch
+                busy=true
                 try {
-                    val page=client.json.decodeFromJsonElement<ConversationPage>(client.request("begin",buildJsonObject { put("creatorId",creator!!.getString("id"));put("policyVersion",policy.version);put("accessNoticeAccepted",true);put("idempotencyKey",key) }))
+                    val page=capture.client.beginConversation(capture.expectedAccountId, capture.sessionId, APIConversationBeginConversation(selectedCreator.getString("id"),policy.version,APIConversationBeginConversationAccessNoticeAccepted,key))
+                    if (!foreground || !capture.isCurrent() || page.creatorId != selectedCreator.getString("id") || runCatching { UUID.fromString(page.fanId) }.isFailure) return@launch
                     session.open("/threads/${page.creatorId}/${page.fanId}")
-                } catch(failure: Throwable) { if(failure is CancellationException) throw failure;error=failure.message ?: "Reconnect to try again. No message was sent." } finally {busy=false}
+                } catch(failure: Throwable) { if(failure is CancellationException) throw failure;if(foreground && capture.isCurrent()) error="Reconnect to try again. No message was sent." } finally {busy=false}
             } }
             Button("Not now",variant=ButtonVariant.QUIET,block=true) { session.open("/creators/$handle") }
         }

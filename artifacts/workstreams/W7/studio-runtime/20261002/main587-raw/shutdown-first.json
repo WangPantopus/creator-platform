@@ -1,0 +1,29 @@
+{
+  "at": "2026-10-02T16:22:46.706065+00:00",
+  "APIpid": 3834,
+  "source": "Staged reviewed main587 merge on6f9325ee plus personally implemented Growth close latch",
+  "readiness": {
+    "status": 503,
+    "body": {
+      "ready": false,
+      "capabilities": [
+        {
+          "name": "trust_runtime",
+          "required": true,
+          "state": "unavailable",
+          "code": "trust_unconfigured",
+          "checkedAt": "2026-10-02T16:22:46.703Z"
+        }
+      ]
+    }
+  },
+  "signals": [
+    "SIGINT",
+    "SIGTERM"
+  ],
+  "SQLActivated": false,
+  "newTests": false,
+  "providerOperated": false,
+  "exit": 0,
+  "observed": "Real compiled API started; two OS signals sent; normal exit0, no pg Pool.end exception. Both handler invocations overlapping is not independently established."
+}

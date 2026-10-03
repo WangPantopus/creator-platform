@@ -196,6 +196,8 @@
   <string name="written_by" formatted="false">Written by {name}</string>
   <string name="monthly_limit_legend" formatted="false">Monthly limit for requests and memberships</string>
   <string name="limit_reminders" formatted="false">Reminders at 50% and 100% of your limit are on. Lowering a limit is immediate.</string>
+  <string name="limit_reminders_off" formatted="false">Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.</string>
+  <string name="limit_reminders_unknown" formatted="false">Lowering a limit is immediate.</string>
   <string name="no_limit" formatted="false">No limit</string>
   <string name="nav_chat" formatted="false">Chat</string>
   <string name="nav_posts" formatted="false">Posts</string>
@@ -286,6 +288,17 @@
   <string name="growth_preferences_were_not_saved" formatted="false">Preferences were not saved.</string>
   <string name="growth_your_in_app_notification_record_cannot_be_turned_off_push" formatted="false">Your in-app notification record cannot be turned off. Push and email are optional. Email delivery is grouped daily for creators and weekly for fans.</string>
   <string name="growth_push_notifications" formatted="false">Push notifications</string>
+  <string name="growth_device_push_heading" formatted="false">Notifications on this device</string>
+  <string name="growth_device_push_allow" formatted="false">Allow notifications on this device</string>
+  <string name="growth_device_push_open_settings" formatted="false">Open notification settings</string>
+  <string name="growth_device_push_unavailable" formatted="false">Push delivery is not enabled for this app. Your in-app notifications remain available.</string>
+  <string name="growth_device_push_unknown" formatted="false">Device permission is unavailable. Check notification settings.</string>
+  <string name="growth_device_push_not_requested" formatted="false">Choose whether this device may show notifications. Your account preferences apply separately.</string>
+  <string name="growth_device_push_denied" formatted="false">Notifications are blocked in device settings. Your in-app record remains available.</string>
+  <string name="growth_device_push_granted" formatted="false">This device allows notifications. Your account preferences and quiet hours still apply.</string>
+  <string name="growth_device_push_quiet" formatted="false">This device allows quiet notifications. You can change their presentation in device settings.</string>
+  <string name="growth_device_push_permission_failed" formatted="false">Device permission could not be read. Try again in notification settings.</string>
+  <string name="growth_device_push_registration_failed" formatted="false">Push registration could not complete. Reconnect and reopen the app to retry. Your in-app record remains available.</string>
   <string name="growth_email_digest" formatted="false">Email digest</string>
   <string name="growth_hide_sensitive_previews" formatted="false">Hide sensitive previews</string>
   <string name="growth_quiet_hours" formatted="false">Quiet hours</string>
@@ -359,6 +372,8 @@
   <string name="growth_discover_creators" formatted="false">Discover creators</string>
   <string name="growth_new_from_people_you_follow" formatted="false">New from people you follow</string>
   <string name="growth_latest_first" formatted="false">Latest first.</string>
+  <string name="growth_more_creators" formatted="false">More creators</string>
+  <string name="growth_first_page" formatted="false">First page</string>
   <string name="growth_an_invitation_from" formatted="false">AN INVITATION FROM {value1}</string>
   <string name="growth_s_ai_can_help_you_keep_going" formatted="false">{value1}\'s AI can help you keep going.</string>
   <string name="growth_accept_invitation" formatted="false">Accept invitation</string>
@@ -377,6 +392,13 @@
   <string name="growth_the_author_label_and_verification_link_stay_on_the_default" formatted="false">The author label and verification link stay on the default export.</string>
   <string name="growth_s_reply" formatted="false">{value1}\'s reply</string>
   <string name="growth_download_labeled_image" formatted="false">Download labeled image</string>
+  <string name="growth_back_to_reply" formatted="false">Back to reply</string>
+  <string name="growth_reply_image_export_help" formatted="false">The complete reply is split into labeled images when needed. Multiple images download together as a ZIP, with a complete text copy.</string>
+  <string name="growth_preparing_reply_images" formatted="false">Preparing images…</string>
+  <string name="growth_reply_image_progress" formatted="false">Prepared {page} images…</string>
+  <string name="growth_reply_image_page" formatted="false">Page {page}</string>
+  <string name="growth_reply_images_ready" formatted="false">Your download is ready. Check your browser’s downloads.</string>
+  <string name="growth_reply_image_export_failed" formatted="false">The complete image export could not be prepared. Retry, or download the complete text.</string>
   <string name="growth_your_first72_hours" formatted="false">Your first 72 hours</string>
   <string name="growth_your_first_digest_appears_after_the72_hour_observation_window" formatted="false">Your first digest appears after the 72-hour observation window closes.</string>
   <string name="growth_publish_your_ai_to_start" formatted="false">Publish your AI to start</string>
@@ -393,6 +415,10 @@
   <string name="growth_distinct_fans" formatted="false">{value1} · {value2} distinct fans</string>
   <string name="growth_open_your_launch_kit" formatted="false">Open your launch kit</string>
   <string name="growth_your_week_impact" formatted="false">YOUR WEEK · IMPACT</string>
+  <string name="growth_impact_people_helped" formatted="false">You helped {people} people this week.</string>
+  <string name="growth_impact_thank_you" formatted="false">A THANK-YOU, SHARED WITH PERMISSION</string>
+  <string name="growth_impact_week_counts" formatted="false">Counts are for this week only. Fans are never named here without their consent.</string>
+  <string name="growth_impact_not_available" formatted="false">No weekly digest is available yet.</string>
   <string name="growth_the_people_you_helped_this_week" formatted="false">The people you helped this week.</string>
   <string name="growth_ai_conversations" formatted="false">AI conversations</string>
   <string name="growth_personal_replies" formatted="false">Personal replies</string>
@@ -480,30 +506,31 @@
   <string name="growth_your_entry_context_is_kept_no_message_has_been_sent" formatted="false">Your entry context is kept. No message has been sent.</string>
   <string name="growth_getstring" formatted="false">).getString(</string>
   <string name="growth_loading2" formatted="false">Loading…</string>
-  <string name="growth_kind_ai_reply" formatted="false">ai reply</string>
-  <string name="growth_kind_approved_draft" formatted="false">approved draft</string>
-  <string name="growth_kind_personal_reply" formatted="false">personal reply</string>
-  <string name="growth_kind_request_status" formatted="false">request status</string>
-  <string name="growth_kind_call_reminder" formatted="false">call reminder</string>
-  <string name="growth_kind_answered_publicly" formatted="false">answered publicly</string>
-  <string name="growth_kind_content_match" formatted="false">content match</string>
-  <string name="growth_kind_announcement" formatted="false">announcement</string>
-  <string name="growth_kind_creator_offer" formatted="false">creator offer</string>
-  <string name="growth_kind_slot_change" formatted="false">slot change</string>
-  <string name="growth_kind_new_packet" formatted="false">new packet</string>
-  <string name="growth_kind_commitment_due" formatted="false">commitment due</string>
-  <string name="growth_kind_guardrail" formatted="false">guardrail</string>
-  <string name="growth_kind_pool_share" formatted="false">pool share</string>
-  <string name="growth_kind_note" formatted="false">note</string>
-  <string name="growth_kind_reaction" formatted="false">reaction</string>
-  <string name="growth_kind_public_answer" formatted="false">public answer</string>
-  <string name="growth_kind_spending_reminder" formatted="false">spending reminder</string>
-  <string name="growth_kind_weekly_impact" formatted="false">weekly impact</string>
+  <string name="growth_kind_ai_reply" formatted="false">AI replies</string>
+  <string name="growth_kind_approved_draft" formatted="false">Approved AI drafts</string>
+  <string name="growth_kind_personal_reply" formatted="false">Personal replies and voice notes</string>
+  <string name="growth_kind_request_status" formatted="false">Request status updates</string>
+  <string name="growth_kind_call_reminder" formatted="false">Call reminders</string>
+  <string name="growth_kind_answered_publicly" formatted="false">Your question answered publicly</string>
+  <string name="growth_kind_content_match" formatted="false">Posts about what you asked</string>
+  <string name="growth_kind_announcement" formatted="false">Creator announcements</string>
+  <string name="growth_kind_creator_offer" formatted="false">Offers from creators</string>
+  <string name="growth_kind_slot_change" formatted="false">Pass slot changes</string>
+  <string name="growth_kind_new_packet" formatted="false">New requests</string>
+  <string name="growth_kind_commitment_due" formatted="false">Commitment reminders</string>
+  <string name="growth_kind_guardrail" formatted="false">Safety events and reports</string>
+  <string name="growth_kind_pool_share" formatted="false">Pass pool updates</string>
+  <string name="growth_kind_note" formatted="false">New Notes</string>
+  <string name="growth_kind_reaction" formatted="false">Reactions to your replies</string>
+  <string name="growth_kind_public_answer" formatted="false">New public answers</string>
+  <string name="growth_kind_spending_reminder" formatted="false">Spending reminders</string>
+  <string name="growth_kind_weekly_impact" formatted="false">Weekly impact digests</string>
   <string name="growth_for_you" formatted="false">For you</string>
   <string name="growth_crafts" formatted="false">Crafts</string>
   <string name="growth_music" formatted="false">Music</string>
   <string name="growth_food" formatted="false">Food</string>
   <string name="growth_label_with_state" formatted="false">{label} · {state}</string>
+  <string name="growth_notification_channel" formatted="false">{kind} · {channel}</string>
   <string name="growth_creator_with_state" formatted="false">{name} · {state}</string>
   <string name="growth_decision_accept" formatted="false">Accept</string>
   <string name="growth_decision_defer" formatted="false">Defer</string>
@@ -568,6 +595,7 @@
   <string name="growth_error_producer_event_conflict2" formatted="false">The owner event does not match its retry key.</string>
   <string name="growth_error_producer_event_conflict3" formatted="false">This producer event ID has different contents.</string>
   <string name="growth_error_impact_window_open" formatted="false">Impact uses closed weekly observation windows.</string>
+  <string name="growth_weekly_impact_summary" formatted="false">This week: {people} people helped and {thanks} thanks.</string>
   <string name="growth_error_growth_data_erased" formatted="false">Rebuild this Impact without erased subjects.</string>
   <string name="growth_error_private_reply_unavailable" formatted="false">This private reply is not authorized.</string>
   <string name="growth_error_comment_expired" formatted="false">This comment is outside the private-reply window.</string>
@@ -648,7 +676,6 @@
   <string name="w6_this_file_could_not_be_processed_record_again" formatted="false">This file could not be processed. Record again.</string>
   <string name="w6_uploaded_processing_before_sharing" formatted="false">Uploaded · processing before sharing</string>
   <string name="w6_sign_in_to_a_configured_creator_account_to_upload_and" formatted="false">Sign in to a configured creator account to upload and sign. Your preview stays on this device until you upload it.</string>
-  <string name="w6_uploads_and_signing_are_unavailable_your_preview_stays_on_this_device" formatted="false">Uploads and signing are unavailable here. Your preview stays on this device.</string>
   <string name="w6_this_recording_limit_does_not_match_the_current_saved_content" formatted="false">This recording limit does not match the current saved content.</string>
   <string name="w6_media_is_unavailable_try_again" formatted="false">Media is unavailable. Try again.</string>
   <string name="w6_this_upload_does_not_belong_to_the_current_content_refresh" formatted="false">This upload does not belong to the current content. Refresh before continuing.</string>
@@ -891,6 +918,14 @@
   <string name="growth_error_quiet_hours_pair" formatted="false">Both quiet-hour boundaries are required</string>
   <string name="growth_error_time_zone" formatted="false">Choose a valid time zone, such as America/Los_Angeles.</string>
   <string name="growth_error_quiet_hours_format" formatted="false">Enter a time in HH:mm, from 00:00 to 23:59.</string>
+  <string name="growth_download_complete_reply" formatted="false">Download complete reply</string>
+  <string name="growth_share_complete_reply" formatted="false">Share complete reply</string>
+  <string name="account_unavailable_title" formatted="false">We can\'t reach your account right now</string>
+  <string name="account_unavailable_body" formatted="false">Your session is kept on this device. Try again in a moment.</string>
+  <string name="page_unavailable_title" formatted="false">This page didn\'t load</string>
+  <string name="page_unavailable_body" formatted="false">Nothing you saved was changed. Try again in a moment.</string>
+  <string name="growth_spending_limit_reached" formatted="false">You\'ve reached {percent}% of your monthly limit.</string>
+  <string name="w6_uploads_and_signing_are_unavailable_your_preview_stays_on_this_device" formatted="false">Uploads and signing are unavailable here. Your preview stays on this device.</string>
   <string name="w6_record_a_voice_reply" formatted="false">Record a voice reply</string>
   <string name="w6_deliver_this_recording" formatted="false">Deliver this recording</string>
   <string name="w6_recording_credentials_are_processing" formatted="false">Your signature is saved. Content credentials are processing before delivery.</string>
@@ -903,12 +938,6 @@
   <string name="w6_retry_availability_save" formatted="false">Retry this availability save</string>
   <string name="w6_refresh_will_replace_availability_changes" formatted="false">Replace your unsaved changes with the saved availability?</string>
   <string name="w6_availability_account_changed" formatted="false">Your account changed. Reopen availability to continue.</string>
-  <string name="account_unavailable_title" formatted="false">We can\'t reach your account right now</string>
-  <string name="account_unavailable_body" formatted="false">Your session is kept on this device. Try again in a moment.</string>
-  <string name="limit_reminders_off" formatted="false">Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.</string>
-  <string name="limit_reminders_unknown" formatted="false">Lowering a limit is immediate.</string>
-  <string name="page_unavailable_title" formatted="false">This page didn\'t load</string>
-  <string name="page_unavailable_body" formatted="false">Nothing you saved was changed. Try again in a moment.</string>
   <string name="w5_content_status" formatted="false">Content status</string>
   <string name="w5_content_checking_access" formatted="false">Checking current access. Your input is kept during a connection interruption.</string>
   <string name="w5_content_check_current_access" formatted="false">Check current access</string>
@@ -926,6 +955,8 @@
   <string name="identity_edit_public_profile" formatted="false">Edit public profile</string>
   <string name="identity_session_read_failed" formatted="false">This device could not read your session securely. Unlock it and try signing in again.</string>
   <string name="identity_session_save_failed" formatted="false">This device could not save your session securely. Unlock it and try signing in again.</string>
+  <string name="identity_input_kept_unavailable" formatted="false">The service is unavailable. Your input has been kept; try again.</string>
+  <string name="identity_input_kept_unreadable" formatted="false">The service returned an unreadable response. Your input has been kept; try again.</string>
   <string name="identity_private_clear_failed" formatted="false">This device could not clear its saved private data. Private screens are closed. Unlock it and retry clearing before signing in again.</string>
   <string name="identity_private_clear_retry" formatted="false">Retry clearing saved private data</string>
   <string name="w1_call_lookup_title" formatted="false">Your call</string>

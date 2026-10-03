@@ -1,0 +1,12 @@
+Browser tab: 6, Title: "Qelvora", URL: "http://127.0.0.1:3007/calls/10000000-0000-4000-8000-000000000001/10000000-0000-4000-8000-000000000002/10000000-0000-4000-8000-000000000003".
+0 AXWebArea Qelvora, URL: 127.0.0.1:3007/calls/10000000-0000-4000-8000-000000000001/10000000-0000-4000-8000-000000000002/10000000-0000-4000-8000-000000000003
+	1 container
+		2 text CALL
+		3 heading This call is unavailable, Value: 1
+			4 text This call is unavailable
+		5 text Continue with Pantopus to use this app.
+		6 button Refresh call
+		7 link Description: Continue with Pantopus, Value: 127.0.0.1:3007/api/auth/continue?returnTo=%2Fcalls%2F10000000-0000-4000-8000-000000000001%2F10000000-0000-4000-8000-000000000002%2F10000000-0000-4000-8000-000000000003
+		8 link Description: Get help, Value: 127.0.0.1:3007/support
+
+The focused UI element is 0 AXWebArea Qelvora, URL: 127.0.0.1:3007/calls/10000000-0000-4000-8000-000000000001/10000000-0000-4000-8000-000000000002/10000000-0000-4000-8000-000000000003

@@ -11,16 +11,19 @@ import android.content.Intent
 import java.net.URI
 import com.pantopus.qelvora.ui.NativeFoundationCatalog
 import com.pantopus.qelvora.ui.QelvoraTheme
+import com.pantopus.qelvora.ui.GrowthPush
 import com.pantopus.qelvora.identity.FanAppShell
 import com.pantopus.qelvora.identity.fanFeatures
 
 class MainActivity : ComponentActivity() {
     private val destination = mutableStateOf("/home")
     private val destinationDelivery = mutableStateOf(0L)
+    private val notificationID = mutableStateOf<String?>(null)
     private var debugAPIURL: String? = null
     private var debugAppearance: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        notificationID.value = GrowthPush.tapId(intent)
         destination.value = returnTarget(intent)
         destinationDelivery.value = savedInstanceState?.getLong("destination_delivery") ?: 0L
         val configured = apiOrigin(BuildConfig.CREATOR_API_URL)
@@ -38,7 +41,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
             QelvoraTheme(night = night) {
-                if (BuildConfig.DEBUG && intent.getBooleanExtra("catalog", false)) NativeFoundationCatalog(intent.getStringExtra("component")) else FanAppShell(this, local ?: configured, destination.value, fanFeatures(this, local ?: configured), destinationDelivery.value)
+                if (BuildConfig.DEBUG && intent.getBooleanExtra("catalog", false)) NativeFoundationCatalog(intent.getStringExtra("component")) else FanAppShell(this, local ?: configured, destination.value, fanFeatures(this, local ?: configured), destinationDelivery.value, notificationID.value) { notificationID.value = null }
             }
         }
     }
@@ -57,11 +60,13 @@ class MainActivity : ComponentActivity() {
         // the current screen. The counter is navigation, never authority.
         if (!launcherResume) {
             setIntent(intent)
+            notificationID.value = GrowthPush.tapId(intent)
             destination.value = returnTarget(intent)
             destinationDelivery.value++
         }
     }
     private fun returnTarget(intent: Intent): String {
+        if (GrowthPush.tapId(intent) != null) return "/notifications"
         if (BuildConfig.DEBUG) intent.getStringExtra("return_to")?.let { return it }
         val uri = intent.data ?: return "/home"
         if (uri.scheme != "qelvora" || uri.host != "app" || uri.port != -1 || uri.encodedUserInfo != null || uri.fragment != null) return "/unavailable"

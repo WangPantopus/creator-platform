@@ -1,0 +1,16 @@
+{
+  "stoppedAt": "2026-10-02T12:47:21.298437+00:00",
+  "apiExit": 0,
+  "webExit": 143,
+  "softwareEmulatorExit": 0,
+  "idbCompanionExit": 0,
+  "simulator": "FAB31883-2F36-4E50-83B3-D9654B60FF00 shut down",
+  "emulator": "emulator-5580 killed explicitly",
+  "released": [
+    "creator-platform-simulator-slot-1",
+    "creator-platform-emulator-slot-1"
+  ],
+  "postgres": "creator-platform-w7-macstudio-20261001 normally stopped",
+  "browser": "own w7ImpactTab closed",
+  "peerResourcesTouched": false
+}

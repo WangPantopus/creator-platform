@@ -3,6 +3,7 @@ import type { Pool, PoolClient } from "pg";
 import type { Actor } from "../identity/adapter.js";
 import { DomainError } from "../../core/errors.js";
 import { assertCurrentSession } from "../identity/request-authority.js";
+import { GrowthHeldClient } from "./held-client.js";
 
 export class GrowthDatabase {
   actorFence?: (
@@ -76,6 +77,8 @@ export class GrowthDatabase {
     actor: Actor,
     creatorId: string | null,
     work: (client: PoolClient) => Promise<T>,
+    /** Negative erasure fencing only; never installed as a runtime creator GUC. */
+    negativeCreatorFence?: string,
   ): Promise<T> {
     if (!actor.adultEligible)
       throw new DomainError(
@@ -96,7 +99,11 @@ export class GrowthDatabase {
       });
     if (!this.actorFence) return perform();
     return this.transaction(this.worker, async (client) => {
-      await this.actorFence!(client, actor.accountId, creatorId);
+      await this.actorFence!(
+        client,
+        actor.accountId,
+        creatorId ?? negativeCreatorFence ?? null,
+      );
       return perform();
     });
   }
@@ -107,40 +114,28 @@ export class GrowthDatabase {
   ): Promise<T> {
     signal?.throwIfAborted();
     const client = await pool.connect();
-    let released = false;
-    const abort = () => {
-      if (!released) {
-        released = true;
-        client.release(true);
-      }
-    };
-    signal?.addEventListener("abort", abort, { once: true });
+    const held = new GrowthHeldClient(client, signal);
+    let failure: unknown;
     try {
-      signal?.throwIfAborted();
-      await client.query("BEGIN");
+      await held.begin();
       await client.query(
         "SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','2000',true)",
       );
       const value = await work(client);
-      signal?.throwIfAborted();
-      await client.query("COMMIT");
-      signal?.throwIfAborted();
+      await held.commit();
       return value;
     } catch (error) {
-      if (!released) await client.query("ROLLBACK").catch(() => {});
+      failure = error;
       throw error;
     } finally {
-      signal?.removeEventListener("abort", abort);
-      if (!released) {
-        released = true;
-        client.release();
-      }
+      await held.close({ failure });
     }
   }
-  /** Worker-only tables used by account controls still lock the canonical session and erasure scope. */
-  async workerActor<T>(
+  /** Device transfer removes former bindings through worker-only negative
+   * scopes, while retaining the new account's actual session through commit. */
+  async fencedWorkerActor<T>(
     actor: Actor,
-    creatorId: string,
+    fence: (client: PoolClient) => Promise<void>,
     work: (client: PoolClient) => Promise<T>,
   ) {
     if (!actor.adultEligible || !this.actorFence)
@@ -149,15 +144,44 @@ export class GrowthDatabase {
         copy.growthErrorGrowthAuthorityRequired,
         503,
       );
-    return this.transaction(this.worker, async (worker) => {
-      await this.actorFence!(worker, actor.accountId, creatorId);
-      return this.transaction(this.runtime, async (runtime) => {
+    const worker = await this.worker.connect();
+    const held = new GrowthHeldClient(worker);
+    let failure: unknown;
+    try {
+      await held.begin();
+      await worker.query(
+        "SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','2000',true)",
+      );
+      // Acquire negative scopes before locking the actual session, matching
+      // account controls and erasure. The runtime lock survives worker COMMIT.
+      await fence(worker);
+      return await this.transaction(this.runtime, async (runtime) => {
         await runtime.query("SELECT set_config('app.account_id',$1,true)", [
           actor.accountId,
         ]);
         await assertCurrentSession(runtime, actor.accountId);
-        return work(worker);
+        const result = await work(worker);
+        await held.commit();
+        return result;
       });
-    });
+    } catch (error) {
+      failure = error;
+      throw error;
+    } finally {
+      await held.close({ failure });
+    }
+  }
+
+  /** Worker-only tables used by account controls still lock the canonical session and erasure scope. */
+  async workerActor<T>(
+    actor: Actor,
+    creatorId: string,
+    work: (client: PoolClient) => Promise<T>,
+  ) {
+    return this.fencedWorkerActor(
+      actor,
+      (worker) => this.actorFence!(worker, actor.accountId, creatorId),
+      work,
+    );
   }
 }

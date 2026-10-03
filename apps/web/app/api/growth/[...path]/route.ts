@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { growthContracts } from "@qelvora/api";
 import { sameRequestOrigin } from "../../../../lib/request-origin";
 import {
   growthRequest,
@@ -12,10 +13,17 @@ async function handle(
   { params }: { params: Promise<{ path: string[] }> },
 ) {
   const path = (await params).path.join("/");
-  if (!allowed.test(path))
+  const postContext =
+    /^creators\/[a-z0-9_]{3,30}\/posts\/[a-f0-9-]{36}\/context$/u.test(path);
+  if (!allowed.test(path) && !postContext)
     return NextResponse.json(
       { error: { message: "This endpoint is unavailable." } },
       { status: 404 },
+    );
+  if (postContext && (request.method !== "GET" || request.nextUrl.search))
+    return NextResponse.json(
+      { error: { message: "This endpoint is unavailable." } },
+      { status: 405, headers: { Allow: "GET", "Cache-Control": "no-store" } },
     );
   if (request.method !== "GET" && !sameRequestOrigin(request))
     return NextResponse.json(
@@ -23,26 +31,45 @@ async function handle(
       { status: 403 },
     );
   try {
+    const headers = new Headers();
+    const expectedAccount = request.headers.get("X-Expected-Account-Id");
+    const expectedSession = request.headers.get("X-Expected-Session-Id");
+    if (expectedAccount)
+      headers.set(
+        postContext ? "x-qelvora-expected-account" : "X-Expected-Account-Id",
+        expectedAccount,
+      );
+    if (expectedSession) headers.set("X-Expected-Session-Id", expectedSession);
     const result = await growthRequest(path + request.nextUrl.search, {
       method: request.method,
+      headers,
       ...(request.method !== "GET" && request.method !== "DELETE"
         ? { body: await request.text() }
         : {}),
     });
-    return NextResponse.json(result, {
-      headers: { "Cache-Control": "no-store" },
-    });
+    return NextResponse.json(
+      postContext
+        ? growthContracts.PostEntryContextResponseSchema.parse(result)
+        : result,
+      {
+        headers: { "Cache-Control": "no-store" },
+      },
+    );
   } catch (error) {
     return NextResponse.json(
       {
         error: {
+          ...(error instanceof GrowthUnavailable ? { code: error.code } : {}),
           message:
             error instanceof Error
               ? error.message
               : "This feature is unavailable.",
         },
       },
-      { status: error instanceof GrowthUnavailable ? error.status : 503 },
+      {
+        status: error instanceof GrowthUnavailable ? error.status : 503,
+        headers: { "Cache-Control": "no-store" },
+      },
     );
   }
 }

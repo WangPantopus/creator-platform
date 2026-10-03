@@ -1,0 +1,19 @@
+{
+  "at": "2026-10-02T19:42:25.915342+00:00",
+  "processes": [
+    {
+      "port": 4107,
+      "pid": 37895,
+      "command": "node --env-file=/Users/yingpengwang/.config/creator-platform/w7-macstudio-20261001/runtime.env apps/backend/dist/server.mjs",
+      "verifiedOwnCwd": true,
+      "signal": "SIGTERM"
+    },
+    {
+      "port": 3007,
+      "pid": 41185,
+      "command": "next-server (v16.3.7)",
+      "verifiedOwnCwd": true,
+      "signal": "SIGTERM"
+    }
+  ]
+}

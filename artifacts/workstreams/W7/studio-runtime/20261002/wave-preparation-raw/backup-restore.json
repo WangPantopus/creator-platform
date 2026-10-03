@@ -1,0 +1,40 @@
+{
+  "at": "2026-10-02T16:58:50.204Z",
+  "sourceHead": "0f437fdedd61cc6849b0480b1dd34b883cce2a8e",
+  "SQLActivated": false,
+  "newTests": false,
+  "productAcceptance": false,
+  "before": {
+    "ledgerSha256": "4b0193a05cf3b4d025fbf80a64751d6d1aaf04241a25850c62f25c73ef9d93d5",
+    "schemaSha256": "2425800d8a304981b3287bbf46530106968a83bdb1cd484583e459af9d461d8c",
+    "dataSha256": "fe755bb5386aa4f1469aa3a0f0aa6488f4f421d95e03b028bf3355ac85dd7269",
+    "securitySha256": "75852de9c24c4da8afdac17c01464dff48561470fbd59862628bf503c40fcab7",
+    "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+    "rolesSha256": "c2504eaa48001e38f6aae37fc1965f07a699e64b3813195ae480cedea7a8555d",
+    "ledgerRows": 40,
+    "dataRows": 25,
+    "tables": 145,
+    "securityRecords": 14202,
+    "sequences": 1
+  },
+  "restored": {
+    "ledgerSha256": "4b0193a05cf3b4d025fbf80a64751d6d1aaf04241a25850c62f25c73ef9d93d5",
+    "schemaSha256": "2425800d8a304981b3287bbf46530106968a83bdb1cd484583e459af9d461d8c",
+    "dataSha256": "fe755bb5386aa4f1469aa3a0f0aa6488f4f421d95e03b028bf3355ac85dd7269",
+    "securitySha256": "75852de9c24c4da8afdac17c01464dff48561470fbd59862628bf503c40fcab7",
+    "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+    "rolesSha256": "c2504eaa48001e38f6aae37fc1965f07a699e64b3813195ae480cedea7a8555d",
+    "ledgerRows": 40,
+    "dataRows": 25,
+    "tables": 145,
+    "securityRecords": 14202,
+    "sequences": 1
+  },
+  "allSixMatch": true,
+  "backupSha256": "363b753668c4a9b09e86ba9403e20d01d66bebc07cbb68f7576724c8aa8ea828",
+  "globalsSHA256": "c8f44762bb300042f37ecebb765911d4d2987540349122def2e23737490f5998",
+  "database": "creator_w7",
+  "restoreDatabase": "creator_w7_restore_20261002",
+  "excludedBootstrapCreateOnly": true,
+  "status": "private_backup_and_separate_restore_match"
+}

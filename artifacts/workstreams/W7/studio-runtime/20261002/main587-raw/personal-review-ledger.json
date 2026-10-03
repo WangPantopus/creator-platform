@@ -1,0 +1,21 @@
+{
+  "recordedAt": "2026-10-02T16:52:48.347787+00:00",
+  "parent": "6f9325ee047c4689d091478834cf0ead8bb60e5b",
+  "frozenMain": "587300ab0da004ec8bc95c17b7dcae30f6d63716",
+  "mainIncrementSourcePaths": 33,
+  "fullPRCombinedReviewComplete": false,
+  "mainIncrementSourceReview": "All33 app/config/infra/package source differences personally read; copy conflicts resolved preserving19W7labels+13ownerlabels; rawpeerartifacts remainpeer only",
+  "shutdownOwnerSource": "a7ce54d172633647b2854708c9365fd4911f2249",
+  "currentFullFilesPersonallyRead": {
+    "apps/backend/src/modules/growth/service.ts": "6eb8abbe1999fde5e061fbc8985882bb8515475c2ad09c046768a68c25225ed1",
+    "apps/backend/src/modules/growth/runtime.ts": "a89a54b57fa5a4e1e8f8cf07c00087a1f53af4801330a1a78ab0a9b6a20cfa50",
+    "apps/backend/src/modules/growth/creator-projection.ts": "75dcbd3833cd44a99695a494d060c9f22cae792a75a986f019b66b30166bd549",
+    "apps/backend/src/modules/growth/canonical.ts": "7b6a743b3fc8473c34dd91d1abaf08f1b0d49a7aa58a00e8ab87a22977cdd756",
+    "apps/backend/src/modules/growth/integration.ts": "a58a9fcb92475e48ab7b879bbfb0e1ac22ebe79cb880ff14de1f97990ec4dd66",
+    "apps/backend/src/modules/growth/database.ts": "592834d7e5afee4e8ca0e10ed0eb0a3fd49a8adb69190d9acf73cc876a0efb2e",
+    "apps/web/app/api/auth/continue/route.ts": "0254a5c5a7a1c2ade938aaee09ced2e510e0c8691a5d106ee53d572df9ecd703",
+    "apps/web/features/identity/welcome.tsx": "e08a0065184a160c2263e9c0416b6026dc62602a2d0bc08efa303700560c5626"
+  },
+  "acceptance": "Only personally observed bounded actualjourneys; no populated/provider/privacy/cohort/design acceptance",
+  "SQLActivated": false
+}

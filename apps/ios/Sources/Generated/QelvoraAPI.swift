@@ -10135,6 +10135,55 @@ public enum APIStudioStudioThreadEntriesCoverage: String, Codable, Sendable {
   case `notes_and_requests` = "notes_and_requests"
 }
 
+public struct APIGrowthPostEntryContextResponse: Codable, Sendable {
+  public let `context`: APIGrowthPostEntryContextResponseContext
+  public init(context: APIGrowthPostEntryContextResponseContext) {
+    self.context = context
+  }
+}
+
+public struct APIGrowthPostEntryContextResponseContext: Codable, Sendable {
+  public let `source`: APIGrowthPostEntryContextResponseContextSource
+  public let `creatorId`: String
+  public let `contentId`: String
+  public let `version`: Int
+  public let `title`: String
+  public let `destination`: String
+  public init(source: APIGrowthPostEntryContextResponseContextSource, creatorId: String, contentId: String, version: Int, title: String, destination: String) {
+    self.source = source
+    self.creatorId = creatorId
+    self.contentId = contentId
+    self.version = version
+    self.title = title
+    self.destination = destination
+  }
+}
+
+public enum APIGrowthPostEntryContextResponseContextSource: String, Codable, Sendable {
+  case `post` = "post"
+}
+
+public struct APIGrowthPostEntryContext: Codable, Sendable {
+  public let `source`: APIGrowthPostEntryContextSource
+  public let `creatorId`: String
+  public let `contentId`: String
+  public let `version`: Int
+  public let `title`: String
+  public let `destination`: String
+  public init(source: APIGrowthPostEntryContextSource, creatorId: String, contentId: String, version: Int, title: String, destination: String) {
+    self.source = source
+    self.creatorId = creatorId
+    self.contentId = contentId
+    self.version = version
+    self.title = title
+    self.destination = destination
+  }
+}
+
+public enum APIGrowthPostEntryContextSource: String, Codable, Sendable {
+  case `post` = "post"
+}
+
 public enum ReadCreatorMediaPolicyPurpose: String, Codable, Sendable {
   case `source_audio` = "source_audio"
   case `interview_audio` = "interview_audio"
@@ -10162,8 +10211,37 @@ public actor CreatorAPIClient {
   private let token: @Sendable () async throws -> String?
   private let maximumResponseBytes: Int
   private let timeoutSeconds: TimeInterval
-  public init(baseURL: URL, session: URLSession = .shared, maximumResponseBytes: Int = 268_435_456, timeoutSeconds: TimeInterval = 30, token: @escaping @Sendable () async throws -> String?) {
-    self.baseURL = baseURL; self.session = session; self.maximumResponseBytes = maximumResponseBytes; self.timeoutSeconds = timeoutSeconds; self.token = token
+  private let expectedAccountId: String?
+  private let expectedSessionId: String?
+  public init(baseURL: URL, session: URLSession = .shared, maximumResponseBytes: Int = 268_435_456, timeoutSeconds: TimeInterval = 30, expectedAccountId: String? = nil, expectedSessionId: String? = nil, token: @escaping @Sendable () async throws -> String?) {
+    self.baseURL = baseURL; self.session = session; self.maximumResponseBytes = maximumResponseBytes; self.timeoutSeconds = timeoutSeconds; self.expectedAccountId = expectedAccountId; self.expectedSessionId = expectedSessionId; self.token = token
+  }
+  /// W8 private transport through this original client; pins only refuse a
+  /// changed genuine session. Public help uses the separate anonymous path.
+  public func trustBytes(_ path: String, expectedAccountId: String, expectedSessionId: String, body: Data? = nil, binary: Bool = false) async throws -> CreatorAPIBinaryResponse {
+    guard path.range(of: #"^/v1/trust/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*$"#, options: .regularExpression) != nil,
+          !expectedAccountId.isEmpty, !expectedSessionId.isEmpty, (body?.count ?? 0) <= 1_048_576 else { throw URLError(.badURL) }
+    return try await requestBytes(path, method: body == nil ? "GET" : "POST", body: body, authenticated: true,
+      headers: ["X-Expected-Account-Id": expectedAccountId, "X-Expected-Session-Id": expectedSessionId],
+      accept: binary ? "application/octet-stream" : "application/json", contentType: "application/json")
+  }
+  /// W4 JSON transport retains the original client and denial-only session pins.
+  public func commerceBytes(_ path: String, expectedAccountId: String, expectedSessionId: String, body: Data? = nil) async throws -> CreatorAPIBinaryResponse {
+    guard path.range(of: #"^/v1/commerce/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*$"#, options: .regularExpression) != nil,
+          !expectedAccountId.isEmpty, !expectedSessionId.isEmpty, (body?.count ?? 0) <= 1_048_576 else { throw URLError(.badURL) }
+    return try await requestBytes(path, method: body == nil ? "GET" : "POST", body: body, authenticated: true,
+      headers: ["X-Expected-Account-Id": expectedAccountId, "X-Expected-Session-Id": expectedSessionId, "x-commerce-account-id": expectedAccountId],
+      accept: "application/json", contentType: "application/json")
+  }
+  /// W5 JSON transport retains the original client and denial-only session pins.
+  public func contentBytes(_ path: String, expectedAccountId: String, expectedSessionId: String, body: Data? = nil, query: [URLQueryItem] = []) async throws -> CreatorAPIBinaryResponse {
+    guard path.range(of: #"^/v1/content/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*$"#, options: .regularExpression) != nil,
+          !expectedAccountId.isEmpty, !expectedSessionId.isEmpty, (body?.count ?? 0) <= 1_048_576,
+          query.count <= 4, Set(query.map(\.name)).count == query.count,
+          query.allSatisfy({ ["contentId", "cursor", "targetKind", "targetId"].contains($0.name) && ($0.value?.utf8.count ?? 0) <= 1024 }) else { throw URLError(.badURL) }
+    return try await requestBytes(path, method: body == nil ? "GET" : "POST", body: body, authenticated: true, query: query,
+      headers: ["X-Expected-Account-Id": expectedAccountId, "X-Expected-Session-Id": expectedSessionId],
+      accept: "application/json", contentType: "application/json")
   }
   private func request<Response: Decodable & Sendable>(_ path: String, method: String, body: Data? = nil, authenticated: Bool, query: [URLQueryItem] = [], headers: [String: String] = [:], contentType: String = "application/json") async throws -> Response {
     let response = try await requestBytes(path, method: method, body: body, authenticated: authenticated, query: query, headers: headers, accept: "application/json", contentType: contentType)
@@ -10184,6 +10262,12 @@ public actor CreatorAPIClient {
     request.setValue(accept, forHTTPHeaderField: "Accept")
     if body != nil { request.setValue(contentType, forHTTPHeaderField: "Content-Type") }
     for (name, value) in headers { request.setValue(value, forHTTPHeaderField: name) }
+    // Genuine capture pins only refuse a changed request; credentials remain
+    // the server's actual authority. Uncaptured canonical reads have no pins.
+    if authenticated {
+      if let expectedAccountId { request.setValue(expectedAccountId, forHTTPHeaderField: "X-Expected-Account-Id") }
+      if let expectedSessionId { request.setValue(expectedSessionId, forHTTPHeaderField: "X-Expected-Session-Id") }
+    }
     if authenticated, let value = try await token() { request.setValue("Bearer \(value)", forHTTPHeaderField: "Authorization") }
     try Task.checkCancellation()
     let (bytes, response) = try await session.bytes(for: request, delegate: CreatorAPIRedirectGuard())
@@ -10351,6 +10435,9 @@ public actor CreatorAPIClient {
   public func sendStudioReplyDraft(creatorId: String, fanId: String, xQelvoraExpectedAccount: String? = nil, body: APIStudioSendReplyDraft) async throws -> APIMessage {
     try await request("/v1/studio/\(segment(creatorId))/threads/\(segment(fanId))/send-draft", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
   }
+  public func readPostEntryContext(handle: String, id: String, xQelvoraExpectedAccount: String? = nil) async throws -> APIGrowthPostEntryContextResponse {
+    try await request("/v1/growth/creators/\(segment(handle))/posts/\(segment(id))/context", method: "GET", authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+  }
   public func health() async throws -> APIHealth {
     try await request("/health", method: "GET", authenticated: false)
   }
@@ -10446,6 +10533,9 @@ public actor CreatorAPIClient {
   }
   public func sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply) async throws -> APIMessage {
     try await request("/v1/threads/\(segment(creatorId))/\(segment(fanId))/human-replies", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
+  }
+  public func beginConversation(xExpectedAccountId: String? = nil, xExpectedSessionId: String? = nil, body: APIConversationBeginConversation) async throws -> APIConversationConversationPage {
+    try await request("/v1/conversations/begin", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["X-Expected-Account-Id": xExpectedAccountId, "X-Expected-Session-Id": xExpectedSessionId].compactMapValues { $0 })
   }
   public func deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput) async throws -> APIConversationConversationRecordingResult {
     try await request("/v1/conversations/\(segment(creatorId))/\(segment(fanId))/recordings", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
@@ -10555,7 +10645,7 @@ public enum ApplicationDestination {
   public static func isPermitted(_ value: String) -> Bool {
     if value.count > 2048 || value.contains("%") || value.contains("\\") || value.contains("#") || value.rangeOfCharacter(from: .whitespacesAndNewlines) != nil { return false }
     let parts = value.components(separatedBy: "?")
-    guard parts.count <= 2, parts[0].range(of: "^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|ops(?:/(?:audits|metrics|cases/[a-f0-9-]{36}))?|status|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/(?:overview|sources|style|rules|test|versions|license|interview|onboard))?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post(?:/[a-f0-9-]{36})?|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$", options: .regularExpression) != nil else { return false }
+    guard parts.count <= 2, parts[0].range(of: "^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|ops(?:/(?:audits|metrics|cases/[a-f0-9-]{36}))?|status|notifications(?:/(?:settings|[a-f0-9-]{36}))?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/(?:overview|sources|style|rules|test|versions|license|interview|onboard))?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post(?:/[a-f0-9-]{36})?|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$", options: .regularExpression) != nil else { return false }
     if parts.count == 1 { return true }
     let scopes = ["context": "^/creators/", "creatorId": "^(?:/commerce/|/support$|/you$|/media/voice$)", "fanId": "^/you$", "packetId": "^/commerce/", "offer": "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId": "^/support$", "quote": "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet": "^/studio/[a-f0-9-]{36}/publish$", "objectId": "^/media/voice$", "kind": "^/support$"]
     let literalValues = ["offer": "1", "kind": "verification"]

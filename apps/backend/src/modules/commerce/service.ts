@@ -31,6 +31,9 @@ import type { CommerceVoiceFulfillment } from "./voice-fulfillment.js";
 import { CommerceFulfillmentPlans } from "./fulfillment-plans.js";
 import { CommerceCallTransport } from "./call-transport.js";
 import type { CallTransportStatus } from "../../../../../packages/api/src/commerce/contracts.js";
+import { ContentHeldClient } from "../content/held-client-cleanup.js";
+import { withRequestContextRestore } from "../identity/request-context.js";
+import { querySettlementUncertain } from "../../core/query-settlement.js";
 
 export type CommercePolicy = {
   currency: string;
@@ -263,16 +266,17 @@ export class CommerceService {
         "Current earnings authority is unavailable. Refresh before continuing.",
         503,
       );
-    try {
-      await this.assertCreatorReadAllowed(client, actor, creatorId);
-    } finally {
-      // The authority may read its own narrow scope; restore the real request
-      // account and clear pair scope before any financial projection runs.
-      await client.query(
-        "SELECT set_config('app.account_id',$1,true),set_config('app.creator_id','',true),set_config('app.fan_id','',true)",
-        [actor.accountId],
-      );
-    }
+    await withRequestContextRestore(
+      () => this.assertCreatorReadAllowed!(client, actor, creatorId),
+      () => {
+        // The authority may read its own narrow scope; restore the real request
+        // account and clear pair scope before any financial projection runs.
+        return client.query(
+          "SELECT set_config('app.account_id',$1,true),set_config('app.creator_id','',true),set_config('app.fan_id','',true)",
+          [actor.accountId],
+        );
+      },
+    );
     requireOwner(
       (await client.query(`${ownerQuery} FOR SHARE`, values)).rowCount,
     );
@@ -299,27 +303,90 @@ export class CommerceService {
       "Adult eligibility is required.",
     );
     await this.assertActorAllowed?.(actor);
-    const client = await this.pool.connect();
-    try {
-      await client.query(
-        options?.isolation === "repeatable read"
-          ? "BEGIN ISOLATION LEVEL REPEATABLE READ"
-          : "BEGIN",
+    const connectionBudget = this.pool.options.connectionTimeoutMillis;
+    if (
+      typeof connectionBudget !== "number" ||
+      !Number.isFinite(connectionBudget) ||
+      connectionBudget <= 0 ||
+      connectionBudget > 5000 ||
+      this.pool.options.pipeline === true
+    )
+      throw new DomainError(
+        "commerce_transaction_unavailable",
+        "The current account connection is unavailable. Try again.",
+        503,
       );
-      await client.query("SELECT set_config('app.account_id',$1,true)", [
-        actor.accountId,
-      ]);
-      await assertCurrentSession(client, actor.accountId);
+    // A finite host transport budget is cleanup only. It supplies no actor,
+    // request, purpose or provider authority and cannot extend a task lease.
+    const signal = AbortSignal.timeout(45_000);
+    const client = await this.pool.connect();
+    const held = new ContentHeldClient(client, signal);
+    let failed = false;
+    let failure: unknown;
+    let result!: T;
+    try {
+      await held.begin();
+      if (options?.isolation === "repeatable read")
+        await held.run(() =>
+          client.query("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ"),
+        );
+      await held.run(() =>
+        client.query(
+          `SELECT set_config(name,least(nullif(setting::integer,0),
+            CASE name WHEN 'statement_timeout' THEN 5000
+                      WHEN 'lock_timeout' THEN 2000 ELSE 5000 END)::text,true)
+           FROM pg_settings WHERE name IN('statement_timeout','lock_timeout','idle_in_transaction_session_timeout')`,
+        ),
+      );
+      await held.run(() =>
+        client.query("SELECT set_config('app.account_id',$1,true)", [
+          actor.accountId,
+        ]),
+      );
+      await held.run(() => assertCurrentSession(client, actor.accountId));
+      // Keep original callbacks awaited through their settlement. Closing the
+      // socket on abort must not abandon late work or its original cleanup.
       const value = await work(client);
+      signal.throwIfAborted();
       await this.assertActorAllowed?.(actor);
-      await client.query("COMMIT");
-      return value;
-    } catch (e) {
-      await client.query("ROLLBACK");
-      throw e;
+      signal.throwIfAborted();
+      await held.commit();
+      signal.throwIfAborted();
+      result = value;
+    } catch (error) {
+      failed = true;
+      failure = error;
+      if (
+        signal.aborted ||
+        querySettlementUncertain(error) ||
+        (error instanceof DomainError &&
+          [
+            "content_privacy_begin_unavailable",
+            "content_privacy_commit_unavailable",
+          ].includes(error.code))
+      ) {
+        failure = new DomainError(
+          "commerce_transaction_unavailable",
+          "This action could not be confirmed. Refresh before retrying.",
+          503,
+        );
+        Object.defineProperty(failure, "cause", { value: error });
+      }
     } finally {
-      client.release();
+      try {
+        await held.settle(failure);
+      } catch (cause) {
+        failed = true;
+        failure = new DomainError(
+          "commerce_settlement_unavailable",
+          "This action could not be confirmed. Refresh before retrying.",
+          503,
+        );
+        Object.defineProperty(failure, "cause", { value: cause });
+      }
     }
+    if (failed) throw failure;
+    return result;
   }
   async command<T>(
     client: PoolClient,
@@ -581,6 +648,66 @@ export class CommerceService {
         },
       };
     });
+  }
+  /** Current pass labels for the displayed public page. No overview truncation,
+   * financial history, private request or provider reference is projected. */
+  async passDiscovery(actor: Actor, creatorIds: readonly string[]) {
+    const ids = [...new Set(z.array(z.uuid()).max(100).parse(creatorIds))];
+    return this.account(
+      actor,
+      async (client) => {
+        if (!this.policy.passEnabled) return { enabled: false, markers: [] };
+        const fan = (
+          await client.query<{ id: string }>(
+            "SELECT id FROM creator.fan_profile WHERE account_id=$1",
+            [actor.accountId],
+          )
+        ).rows[0];
+        if (!fan) return { enabled: false, markers: [] };
+        const pass = (
+          await client.query<{ id: string }>(
+            "SELECT id FROM creator.commerce_pass WHERE fan_id=$1 AND state='active' AND (cycle_start::timestamp AT TIME ZONE 'UTC')<=clock_timestamp() AND (cycle_end::timestamp AT TIME ZONE 'UTC')>clock_timestamp()",
+            [fan.id],
+          )
+        ).rows[0];
+        if (!pass) return { enabled: false, markers: [] };
+        const creators = (
+          await client.query<{ id: string }>(
+            "SELECT id FROM creator.creator_profile WHERE id=ANY($1::uuid[]) AND verification='verified' AND NOT recovery_required",
+            [ids],
+          )
+        ).rows;
+        const slots = (
+          await client.query<{
+            creator_id: string;
+            state: "active" | "draft_next";
+            starts_at: Date;
+          }>(
+            `SELECT DISTINCT ON(s.creator_id) s.creator_id,s.state,s.starts_at
+         FROM creator.commerce_pass_slot s
+         WHERE s.fan_id=$1 AND s.creator_id=ANY($2::uuid[]) AND s.pass_id=$3 AND s.ends_at>clock_timestamp()
+           AND ((s.state='active' AND s.starts_at<=clock_timestamp()) OR (s.state='draft_next' AND s.starts_at>clock_timestamp()))
+         ORDER BY s.creator_id,(s.state='active') DESC,s.starts_at,s.id`,
+            [fan.id, creators.map((creator) => creator.id), pass.id],
+          )
+        ).rows;
+        return {
+          enabled: true,
+          markers: creators.map((creator) => {
+            const slot = slots.find((value) => value.creator_id === creator.id);
+            return {
+              creatorId: creator.id,
+              state: slot?.state ?? ("none" as const),
+              startsAt:
+                slot?.state === "draft_next"
+                  ? slot.starts_at.toISOString()
+                  : null,
+            };
+          }),
+        };
+      },
+      { isolation: "repeatable read" },
+    );
   }
   private async exposure(client: PoolClient, fanId: string, currency: string) {
     const totals = (

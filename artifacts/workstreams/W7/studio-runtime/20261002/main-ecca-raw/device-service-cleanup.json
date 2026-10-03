@@ -1,0 +1,24 @@
+{
+  "at": "2026-10-02T17:46:13.665908+00:00",
+  "simulator": "own FAB explicit shutdown",
+  "emulator": "own5580 explicit emu kill exit0",
+  "idbPid": 48645,
+  "apiPid": 17089,
+  "webPid": 20712,
+  "signals": "exact owned PIDs SIGTERM after identity/cwd checks",
+  "leasesReleased": [
+    "creator-platform-simulator-slot-1",
+    "creator-platform-emulator-slot-1"
+  ],
+  "peerTouched": false,
+  "observedAfterStop": {
+    "ownedSimulatorBooted": false,
+    "ownEmulatorPresent": false,
+    "apiExit": 0,
+    "companionExit": 0,
+    "webExit": 143,
+    "PGStopped": true,
+    "exactLeasesReleased": true
+  },
+  "leaseReleaseOrder": "lease files removed after shutdown command dispatch; subsequent command exit0 and physical inventory confirm both stopped"
+}

@@ -5,29 +5,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { InboxItem, Cluster } from "./types";
 import { glyphs } from "@qelvora/ui-web";
-
-export class GrowthActionError extends Error {
-  constructor(
-    readonly status: number,
-    message: string,
-  ) {
-    super(message);
-  }
-}
-export async function mutate(path: string, body: unknown, method = "POST") {
-  const response = await fetch(`/api/growth/${path}`, {
-    method,
-    headers: { "Content-Type": "application/json" },
-    ...(method !== "DELETE" ? { body: JSON.stringify(body) } : {}),
-  });
-  const result = await response.json();
-  if (!response.ok)
-    throw new GrowthActionError(
-      response.status,
-      result.error?.message ?? growthCopy.growthThisActionCouldNotBeCompleted,
-    );
-  return result;
-}
+import { useGrowthSession, GrowthActionError } from "./session";
+import { useGrowthPublicSession } from "./public-session";
+export { GrowthActionError } from "./session";
 export function Follow({
   creatorId,
   handle,
@@ -37,24 +17,25 @@ export function Follow({
   handle: string;
   following?: boolean;
 }) {
+  const { request, revision } = useGrowthPublicSession(`follow:${creatorId}`);
   const [value, setValue] = useState(following),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [signIn, setSignIn] = useState(false);
   useEffect(() => {
     let active = true;
-    void fetch(`/api/growth/follow/${creatorId}`)
-      .then(async (response) => {
-        if (response.ok) {
-          const result = await response.json();
-          if (active) setValue(result.following === true);
-        }
+    setValue(false);
+    setError("");
+    setSignIn(false);
+    void request<{ following: boolean }>(`follow/${creatorId}`)
+      .then((result) => {
+        if (active) setValue(result.following === true);
       })
       .catch(() => {});
     return () => {
       active = false;
     };
-  }, [creatorId]);
+  }, [creatorId, request, revision]);
   return (
     <div>
       <button
@@ -65,9 +46,13 @@ export function Follow({
           setError("");
           setSignIn(false);
           try {
-            await mutate(`follow/${creatorId}`, { following: !value }, "PUT");
+            await request(`follow/${creatorId}`, {
+              method: "PUT",
+              body: JSON.stringify({ following: !value }),
+            });
             setValue(!value);
           } catch (e) {
+            if (e instanceof DOMException && e.name === "AbortError") return;
             setSignIn(e instanceof GrowthActionError && e.status === 401);
             setError(
               e instanceof Error
@@ -107,7 +92,6 @@ export function Inbox({
   items: InboxItem[];
   timeZone?: string;
 }) {
-  const [error, setError] = useState("");
   const dateKey = (value: string | Date) => {
     const parts = Object.fromEntries(
       new Intl.DateTimeFormat("en", {
@@ -138,11 +122,6 @@ export function Inbox({
   }, {});
   return (
     <>
-      {error ? (
-        <p role="alert" className="growth-error">
-          {error}
-        </p>
-      ) : null}
       {Object.entries(groups).map(([group, entries]) => (
         <section key={group}>
           <p className="growth-meta">
@@ -158,20 +137,7 @@ export function Inbox({
             <a
               className={`qv qv-notif growth-notification ${item.readAt ? "" : "is-unread"}`}
               key={item.id}
-              href={item.destination}
-              onClick={async (event) => {
-                event.preventDefault();
-                try {
-                  await mutate(`notifications/${item.id}/read`, {}, "PUT");
-                  window.location.assign(item.destination);
-                } catch (e) {
-                  setError(
-                    e instanceof Error
-                      ? e.message
-                      : growthCopy.growthCouldNotOpenUpdate,
-                  );
-                }
-              }}
+              href={`/notifications/${item.id}`}
             >
               <span
                 aria-hidden="true"
@@ -275,6 +241,7 @@ export function Connection() {
   ) : null;
 }
 export function Producer({ cluster }: { cluster: Cluster }) {
+  const { request, signal } = useGrowthSession();
   const [outline, setOutline] = useState(
       cluster.outline ??
         growthFormat("growthAnswer", {
@@ -288,14 +255,19 @@ export function Producer({ cluster }: { cluster: Cluster }) {
   async function decide(decision: string) {
     setBusy(true);
     try {
-      await mutate(
-        "recommendations",
-        { window, topicKey: cluster.topicKey, outline, decision },
-        "PUT",
-      );
-      setMessage(`Saved: ${decision}.`);
+      await request("recommendations", {
+        method: "PUT",
+        body: JSON.stringify({
+          window,
+          topicKey: cluster.topicKey,
+          outline,
+          decision,
+        }),
+      });
+      setMessage(growthCopy.growthYourChoiceWasSaved);
       router.refresh();
     } catch (e) {
+      if (signal.aborted) return;
       setMessage(
         e instanceof Error ? e.message : growthCopy.growthCouldNotSave,
       );
@@ -339,13 +311,20 @@ export function Producer({ cluster }: { cluster: Cluster }) {
         onClick={async () => {
           setBusy(true);
           try {
-            const result = await mutate("recommendations/publish", {
-              window,
-              topicKey: cluster.topicKey,
-              outline,
-            });
+            const result = await request<{ destination: string }>(
+              "recommendations/publish",
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  window,
+                  topicKey: cluster.topicKey,
+                  outline,
+                }),
+              },
+            );
             router.push(result.destination);
           } catch (e) {
+            if (signal.aborted) return;
             setMessage(
               e instanceof Error
                 ? e.message

@@ -3,6 +3,7 @@ import { publicSchemas } from "./schemas.ts";
 import * as conversation from "./conversation/contracts.ts";
 import * as contentContracts from "./content.ts";
 import * as studioContracts from "./studio.ts";
+import * as growthContracts from "./growth.ts";
 import { mediaPaths } from "./media-openapi.ts";
 
 // Aggregate owner contracts here after the core module initializes; conversation
@@ -12,6 +13,7 @@ const domainSchemas = Object.fromEntries(
     ["Conversation", conversation],
     ["Content", contentContracts],
     ["Studio", studioContracts],
+    ["Growth", growthContracts],
   ].flatMap(([prefix, values]) =>
     Object.entries(values as Record<string, unknown>)
       .filter(([, schema]) => schema instanceof z.ZodType)
@@ -372,6 +374,34 @@ export function createOpenApi() {
     },
     paths: {
       ...contentPaths,
+      "/v1/growth/creators/{handle}/posts/{id}/context": {
+        parameters: [
+          {
+            in: "path",
+            name: "handle",
+            required: true,
+            schema: { type: "string", pattern: "^[a-z0-9_]{3,30}$" },
+          },
+          {
+            in: "path",
+            name: "id",
+            required: true,
+            schema: { type: "string", format: "uuid" },
+          },
+          {
+            in: "header",
+            name: "x-qelvora-expected-account",
+            required: false,
+            description:
+              "Pin to the original current account; grants no permission.",
+            schema: { type: "string", format: "uuid" },
+          },
+        ],
+        get: operation(
+          "readPostEntryContext",
+          "GrowthPostEntryContextResponse",
+        ),
+      },
       "/health": { get: { ...operation("health", "Health"), security: [] } },
       "/v1/identity/capabilities": {
         get: {
@@ -555,6 +585,23 @@ export function createOpenApi() {
       "/v1/threads/{creatorId}/{fanId}/human-replies": {
         parameters: pair,
         post: operation("sendHumanReply", "Message", "HumanReply"),
+      },
+      "/v1/conversations/begin": {
+        parameters: ["X-Expected-Account-Id", "X-Expected-Session-Id"].map(
+          (name) => ({
+            in: "header",
+            name,
+            required: false,
+            description:
+              "Refuse a changed original view; grants no account, consent or session authority.",
+            schema: { type: "string", format: "uuid" },
+          }),
+        ),
+        post: operation(
+          "beginConversation",
+          "ConversationConversationPage",
+          "ConversationBeginConversation",
+        ),
       },
       "/v1/conversations/{creatorId}/{fanId}/recordings": {
         parameters: pair,

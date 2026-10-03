@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-02T18:54:10.931203+00:00",
+  "failedOrLimitedCaptures": {
+    "android-settings-save-initial-stale.xml": "old SD card XML pulled after failed null-root dump, never counted as Save",
+    "android-settings-top-reload.png": "middle form only, quiet hours not visible",
+    "android-signout.png": "first unsuccessful signout sequence still shows signed-in settings",
+    "android-signout-second-first.png": "account/busy frame, not completed Welcome",
+    "android-signout-second-settled.png": "zero bytes after emulator exit, never rendered/counted",
+    "android-retry-two-account-bottom.png": "You fan page, attempted swipe did not expose Sign out",
+    "android-retry-two-canonical-account.png": "/account URI did not reach canonical identity page"
+  },
+  "completedRecovery": "/identity/account \u2192 actual Sign out \u2192 Welcome; /notifications/settings \u2192 Continue \u2192 actor one \u2192 saved settings",
+  "prematureToolReads": "One image/read issued before capture finished failed; no incomplete file counted",
+  "captureCommandsAfterRecovery": "set -e, unique XML paths, await completion before dependent actions",
+  "emulatorHostRootCause": "not established"
+}

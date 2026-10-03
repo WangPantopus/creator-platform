@@ -1,0 +1,35 @@
+{
+  "recordedAt": "2026-10-02T08:37:26.754Z",
+  "core": {
+    "name": "creator_runtime",
+    "direct_login": true,
+    "rolsuper": false,
+    "rolbypassrls": false,
+    "rolinherit": false,
+    "growth": false,
+    "worker": false
+  },
+  "growth": {
+    "name": "w7_api",
+    "direct_login": true,
+    "rolsuper": false,
+    "rolbypassrls": false,
+    "rolinherit": true,
+    "growth": true,
+    "worker": false
+  },
+  "worker": {
+    "name": "growth_worker",
+    "direct_login": true,
+    "rolsuper": false,
+    "rolbypassrls": false,
+    "rolinherit": false,
+    "growth": false,
+    "worker": true
+  },
+  "canonicalCoreRoleReady": true,
+  "growthCompositeGuardReady": true,
+  "growthDatabaseReady": true,
+  "pendingMigrationsActivated": false,
+  "purposeAuthorityConfigured": false
+}

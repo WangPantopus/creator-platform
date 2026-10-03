@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-02T18:52:19.837911+00:00",
+  "device": "emulator-5580",
+  "releasedSlot": 2,
+  "matchedOwnerTokenDeviceDevInode": true,
+  "deviceAbsentBeforeRelease": true,
+  "initialEmulatorExit": 134,
+  "retryEmulatorExit": 0,
+  "repairedApiExit": 0,
+  "peerResourcesTouched": false,
+  "canonicalDatabase": "stopped, connectionLimit0, 40 migrations, other_clients0, no activation",
+  "accountIsolation": "Personally observed account two default quiet hours/UTC and account one persisted22:30\u201308:15/AmericaLosAngeles. Mid-flight race not observed."
+}

@@ -4,8 +4,27 @@ import { querySettlementUncertain } from "../../core/query-settlement.js";
 
 // Installed pg supports a per-query read deadline. Its QueryConfig declaration
 // omits that option, so retain the supported option in this structural type.
-function control(text: string): QueryConfig & { query_timeout: number } {
-  return { text, query_timeout: 1500 };
+function control(
+  client: PoolClient,
+  text: string,
+): QueryConfig & { query_timeout: number } {
+  // pg uses the query override before its actual connection read budget.
+  // Preserve a shorter positive original budget, including pg's numeric
+  // environment representation, rather than extending it to this ceiling.
+  const original = (
+      client as PoolClient & {
+        connectionParameters?: { query_timeout?: unknown };
+      }
+    ).connectionParameters?.query_timeout,
+    budget =
+      typeof original === "number" || typeof original === "string"
+        ? Number(original)
+        : NaN;
+  return {
+    text,
+    query_timeout:
+      Number.isFinite(budget) && budget > 0 ? Math.min(budget, 1500) : 1500,
+  };
 }
 
 /** Settlement only: this wrapper issues no task, actor or export permission.
@@ -69,7 +88,9 @@ export class ContentHeldClient {
 
   async begin(): Promise<void> {
     this.discard = true;
-    const result = await this.run(() => this.client.query(control("BEGIN")));
+    const result = await this.run(() =>
+      this.client.query(control(this.client, "BEGIN")),
+    );
     if (result.command !== "BEGIN")
       throw new DomainError(
         "content_privacy_begin_unavailable",
@@ -83,7 +104,9 @@ export class ContentHeldClient {
   async commit(): Promise<void> {
     // Uncertain BEGIN/COMMIT cannot be followed by another SQL command.
     this.discard = true;
-    const result = await this.run(() => this.client.query(control("COMMIT")));
+    const result = await this.run(() =>
+      this.client.query(control(this.client, "COMMIT")),
+    );
     if (result.command !== "COMMIT")
       throw new DomainError(
         "content_privacy_commit_unavailable",
@@ -103,7 +126,15 @@ export class ContentHeldClient {
     try {
       if (this.transaction && !this.discard) {
         try {
-          await this.client.query(control("ROLLBACK"));
+          const result = await this.client.query(
+            control(this.client, "ROLLBACK"),
+          );
+          if (result.command !== "ROLLBACK")
+            throw new DomainError(
+              "content_privacy_rollback_unavailable",
+              "The actual Content rollback receipt is required.",
+              503,
+            );
           this.transaction = false;
         } catch (error) {
           this.discard = true;

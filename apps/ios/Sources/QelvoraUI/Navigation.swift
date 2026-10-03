@@ -77,22 +77,33 @@ public struct Segmented: View {
     public var label: String
     public var onSelect: (String) -> Void
     @Environment(\.colorScheme) private var scheme
+    @Environment(\.dynamicTypeSize) private var textSize
     public init(items: [String] = ["navChat", "navPosts", "navRequests", "navAccess"].map { QelvoraCopy.text($0) }, active: String? = nil, label: String = QelvoraCopy.text("sections"), onSelect: @escaping (String) -> Void = { _ in }) { self.items = items; self.active = active ?? items.first ?? ""; self.label = label; self.onSelect = onSelect }
     public var body: some View {
-        HStack(spacing: 0) {
+        NavigationLayout { _ in
             ForEach(items, id: \.self) { item in
                 SwiftUI.Button { onSelect(item) } label: {
-                    Text(item).qText("label").frame(maxWidth: .infinity).frame(height: QelvoraTokens.token("segment-height"))
+                    itemLabel(item)
                         .foregroundStyle(qColor(active == item ? "ink" : "ink-muted", scheme))
                         .background(active == item ? qColor("selected-surface", scheme) : .clear, in: RoundedRectangle(cornerRadius: QelvoraTokens.token("segment-radius")))
                         .overlay { if active == item { RoundedRectangle(cornerRadius: QelvoraTokens.token("segment-radius")).stroke(qColor("line", scheme), lineWidth: QelvoraTokens.token("hairline")) } }
                         .contentShape(Rectangle().inset(by: -QelvoraTokens.token("space-1") / 2))
-                }.buttonStyle(.plain).accessibilityLabel(item).accessibilityAddTraits(active == item ? .isSelected : [])
+                }.buttonStyle(.plain).accessibilityLabel(item).accessibilityHint(label).accessibilityAddTraits(active == item ? .isSelected : [])
             }
         }.padding(QelvoraTokens.token("space-1"))
             .background(qColor("surface-sunken", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.token("radius-lg")))
-            .accessibilityLabel(label)
-            .accessibilityElement(children: .contain)
+    }
+    @ViewBuilder private func itemLabel(_ item: String) -> some View {
+        if textSize.isAccessibilitySize {
+            Text(item).qText("label")
+                .fixedSize(horizontal: false, vertical: true)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity)
+                .padding(QelvoraTokens.token("space-2"))
+                .frame(minHeight: QelvoraTokens.token("segment-height"))
+        } else {
+            Text(item).qText("label").frame(maxWidth: .infinity).frame(height: QelvoraTokens.token("segment-height"))
+        }
     }
 }
 

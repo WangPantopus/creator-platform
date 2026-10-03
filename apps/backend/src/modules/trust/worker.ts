@@ -245,6 +245,7 @@ export class TrustWorker {
         "privacy_artifact_unconfigured",
         "privacy_commit_fence_unavailable",
         "privacy_ownership_missing",
+        "privacy_original_family_unavailable",
         "growth_held_authority_unavailable",
         "restoration_pending",
         "conversation_privacy_unavailable",
