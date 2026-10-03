@@ -1,5 +1,52 @@
 # Reply review original settlement — October 3, 2026
 
+## Minimum original control budget at5d62e275
+
+W8 and W6 identified that `ContentHeldClient`'s per-query1500ms override could
+extend a shorter actual client read budget. W5 personally read every current
+caller (the genuine Identity transaction and Content export preparation/operation)
+and installed pg's actual option precedence. Product6dcf7ae9 fixes the existing
+helper; frozen source `5d62e27579136d11cf9a18919ef0f5f3cec6732c` clarifies the
+actual connection configuration representation. BEGIN, COMMIT and ROLLBACK use
+the minimum of the genuine positive connection budget and1500ms. The original
+task/client, cause classifier, uncertainty handling and awaited socket settlement
+remain intact; no producer, callback, Actor, task, SQL purpose or new test exists.
+
+Backend types, scoped lint/format/diff and all nine existing contracts pass.
+Personally operated the actual helper at frozen5d62 through real installed pg
+and genuine `creator_runtime` connections to the owned canonical61 database,
+with read-only connections. A private transparent TCP forwarder withheld actual
+control responses without replacing callbacks, SQL results or server outcomes.
+At an observed100ms connection budget, BEGIN failed in100.308ms, COMMIT in100.518ms
+and ROLLBACK in101.638ms. The genuine numeric-string100 configuration also failed
+BEGIN in99.619ms. A4000ms original budget retained the finite1500ms ceiling and
+failed ROLLBACK in1501.961ms. All original PIDs were absent after awaited
+settlement and each replacement pooled connection was healthy. Wire metadata
+shows no additional SQL after uncertain BEGIN/COMMIT on those original sockets.
+
+An initial ROLLBACK probe attempted `PGQUERY_TIMEOUT`, which installed pg explicitly
+does not read; its actual budget wasfalse and the1500ms ceiling applied. That
+configuration attempt is preserved and excluded from short-budget qualification.
+The corrected operation observes the real connection setting before each action.
+Private0600 original/corrected/frozen receipts, response hashes and operators stay
+under `~/.config/creator-platform/w5-20261003/current-pr-backlog/`.
+
+Before/after actual ledger/schema/roles/security/sequences/data hashes are identical
+for both the original canonical61 database (137 business rows/163 tables) and
+closed57 restore (36 rows/161 tables). The closed restore still matches all six
+original manifest hashes and the private original dump hash remains unchanged.
+The forwarder and every original/replacement/observer connection closed normally;
+43435 listener is absent. No held migration, grant, role, catalogue, body state,
+review task, signer, privacy receipt or last final gate was activated or fabricated.
+
+Implemented: the canonical shorter-budget correction. Runnable/verified: named
+source checks and five metadata-only original-client response-loss operations.
+Integrated: the genuine shared settlement helper, published on existing304 for
+owner reuse. Current shipping build/CI and genuine0156 reply review, signed Note,
+two independent fans, signed reaction, native and finite C10 acceptance remain
+open. These primitives do not establish product review or privacy completion.
+Release-ready:false; all nine whole W5 packages remain incomplete.
+
 Personally implemented source `ca591d95f7f7a0c69c7c3d30ebe62e6ed223d643`
 on captured remote main `5c08634b7542fef95dd6c176030a785845250c62`.
 W5's review helper previously attempted savepoint rollback after every producer
