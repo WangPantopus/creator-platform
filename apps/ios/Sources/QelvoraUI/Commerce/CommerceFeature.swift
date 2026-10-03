@@ -33,11 +33,13 @@ struct CommerceFeature: View {
         guard baseURL != nil, let accountId, let sessionId else { return nil }
         return CommerceClient(model: session, accountId: accountId, sessionId: sessionId, destination: destination)
     }
+    private var originalViewCurrent: Bool { !disposed && accountId != nil && sessionId != nil && session.session?.accountId == accountId && session.session?.sessionId == sessionId && session.destination == destination }
     private var privateVisible: Bool {
-        !disposed && accountId != nil && sessionId != nil && session.session?.accountId == accountId && session.session?.sessionId == sessionId && session.destination == destination &&
+        originalViewCurrent &&
         !session.busy && session.error.isEmpty && !session.purgingPrivateState && !session.localPurgeFailed
     }
     private var privateReady: Bool { privateVisible && !session.checkingSession }
+    private var refreshDisabled: Bool { busy || !originalViewCurrent || session.busy || session.checkingSession || session.purgingPrivateState || session.localPurgeFailed }
     private var commandDisabled: Bool { busy || !privateReady || !commerceAvailable }
     private var modes: [CommerceMode] { overview?.modes.filter { $0.creator_id == creator } ?? [] }
     private var creatorName: String { overview?.creators.first { $0.id == creator }?.display_name ?? "the creator" }
@@ -50,7 +52,7 @@ struct CommerceFeature: View {
                         else { screen = "requests"; detail = nil }
                     } }
                     Spacer(); Text(title.uppercased()).qText("data-sm"); Spacer()
-                    Button("Refresh", variant: .quiet, disabled: busy || !privateReady) { launch { await refresh() } }
+                    Button("Refresh", variant: .quiet, disabled: refreshDisabled) { launch(requireReady: false) { await retry() } }
                 }
                 if !privateVisible { Notice(title: "Account status", children: "Reconnect to check your account. Your unsaved input is kept.") }
                 if privateVisible && !failure.isEmpty { Notice(tone: .error, title: "Connection status", children: failure) }
@@ -78,7 +80,7 @@ struct CommerceFeature: View {
                     do { try await Task.sleep(for: .seconds(1)) } catch { return }
                 }
             }
-            .refreshable { await refresh() }
+            .refreshable { await retry() }
             .onChange(of: session.session?.sessionId) { _, value in if value != sessionId { operation?.cancel(); clearPrivateState() } }
             .onChange(of: session.session?.accountId) { _, value in if value != accountId { operation?.cancel(); clearPrivateState() } }
             .onAppear { disposed = false }
@@ -97,6 +99,12 @@ struct CommerceFeature: View {
         if screen == "status", let id = parts?.queryItems?.first(where: { $0.name == "packetId" })?.value, let api {
             do { let value: CommerceDetail = try await api.request("packets/" + id); guard !Task.isCancelled, privateReady else { return }; detail = value } catch { await report(error) }
         }
+    }
+    private func retry() async {
+        guard !refreshDisabled else { return }
+        if !privateReady { await session.refresh() }
+        guard !Task.isCancelled, privateReady else { return }
+        await refresh()
     }
     private func refresh(allowBusy: Bool = false) async {
         guard privateReady, !busy || allowBusy, let api else { return }; busy = true; defer { busy = false }
@@ -162,8 +170,8 @@ struct CommerceFeature: View {
         amount = ""; choice = ""; reminders = false; summary = ""; info = ""; selectedMode = nil
         selectedPassCreators = []; replacementCreator = ""; creator = ""; keys.removeAll(); notice = ""; failure = ""; limitVersion = nil
     }
-    private func launch(_ action: @escaping @MainActor () async -> Void) {
-        guard operation == nil, privateReady else { return }
+    private func launch(requireReady: Bool = true, _ action: @escaping @MainActor () async -> Void) {
+        guard operation == nil, requireReady ? privateReady : !refreshDisabled else { return }
         operation = Task { await action(); operation = nil }
     }
     private func mutate(_ path: String, values: [String: Any], message: String) async {
