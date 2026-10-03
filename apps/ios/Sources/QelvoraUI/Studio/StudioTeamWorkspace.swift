@@ -46,7 +46,8 @@ private struct NativeTeamEdit {
     private var writeTask: Task<Void, Never>?
 
     private var now: TimeInterval { ProcessInfo.processInfo.systemUptime }
-    var mayManage: Bool { current && now < checkedUntil && creator?.owned == true && creator?.verification == "verified" }
+    var ready: Bool { session?.checkingSession == false && session?.busy == false && session?.error.isEmpty == true }
+    var mayManage: Bool { ready && current && now < checkedUntil && creator?.owned == true && creator?.verification == "verified" }
     var currentEditRoles: [String]? {
         guard let edit, let member = team?.members.first(where: { $0.account_id == edit.accountId && $0.revoked_at == nil }) else { return nil }
         return member.roles.map(\.rawValue).sorted()
@@ -82,22 +83,24 @@ private struct NativeTeamEdit {
         session?.purgingPrivateState == false && session?.localPurgeFailed == false
     }
     private func matches(_ snapshot: Int, request: FanSessionRequestCapture) async -> Bool {
-        guard matches(snapshot), await request.isCurrent() else { return false }
+        guard matches(snapshot), ready, await request.isCurrent() else { return false }
         // Secure credential reads may suspend while this component is disposed.
-        return matches(snapshot)
+        return matches(snapshot) && ready
     }
     func expire() async {
         guard active else { return }
         let snapshot = generation
         if !matches(snapshot) { deactivate(); return }
+        if !ready { conceal(); return }
         if let capture, !(await matches(snapshot, request: capture)) {
             guard matches(snapshot) else { return }
-            conceal(discardEdit: true); error = teamCopy("AccountChanged"); return
+            conceal(discardEdit: ready); error = teamCopy(ready ? "AccountChanged" : "Unavailable"); return
         }
         if now >= checkedUntil { conceal() }
     }
     func refresh() {
         guard active, !reading, !saving, let session else { return }
+        guard ready else { conceal(); return }
         let snapshot = generation, started = now
         reading = true
         readTask = Task { [weak self] in
@@ -185,9 +188,12 @@ private struct NativeTeamEdit {
             defer { if generation == snapshot { saving = false; writeTask = nil; refresh() } }
             do {
                 guard await matches(snapshot, request: command.capture), mayManage else {
-                    if matches(snapshot) { conceal(discardEdit: true); error = teamCopy("AccountChanged") }
+                    if matches(snapshot) { conceal(discardEdit: ready); error = teamCopy(ready ? "AccountChanged" : "Unavailable") }
                     return
                 }
+                // Once dispatch begins, a later account check or interrupted
+                // response must retain this exact command, never unlock edits.
+                var pending = command; pending.unknown = true; edit = pending
                 _ = try await command.capture.client.updateTeamMemberRoles(creatorId: creatorId, accountId: command.accountId,
                     xExpectedAccountId: command.capture.expectedAccountId, body: body)
                 guard await matches(snapshot, request: command.capture), edit?.accountId == command.accountId else { return }
@@ -226,7 +232,7 @@ private struct NativeTeamExpired: Error {}
         self.session = session; self.creatorId = creatorId; self.onOpenTeam = onOpenTeam; self.onReturnToWorkspace = onReturnToWorkspace
     }
     private var lifetime: String { (session.session?.accountId ?? "") + ":" + (session.session?.sessionId ?? "") + ":" + session.destination + ":" + (creatorId ?? "") }
-    private var visible: Bool { scene == .active && state.current && session.session?.accountId == state.accountId && session.session?.sessionId == state.sessionId && !session.purgingPrivateState && !session.localPurgeFailed }
+    private var visible: Bool { scene == .active && state.ready && state.current && session.session?.accountId == state.accountId && session.session?.sessionId == state.sessionId && !session.purgingPrivateState && !session.localPurgeFailed }
     public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {

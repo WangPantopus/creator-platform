@@ -66,7 +66,8 @@ private class NativeTeamState(
     private var checkedUntil = 0L
     private var readJob: Job? = null
     private var writeJob: Job? = null
-    val mayManage: Boolean get() = current && SystemClock.elapsedRealtime() < checkedUntil && creator?.owned == true && creator?.verification == "verified"
+    val ready: Boolean get() = !session.checkingSession && !session.busy && session.error.isEmpty()
+    val mayManage: Boolean get() = ready && current && SystemClock.elapsedRealtime() < checkedUntil && creator?.owned == true && creator?.verification == "verified"
     val currentEditRoles: List<String>? get() = edit?.let { command -> team?.members?.firstOrNull { it.account_id == command.accountId && it.revoked_at == null }?.roles?.map { it.name }?.sorted() }
     val editIsStale: Boolean get() = edit?.let { command -> currentEditRoles?.let { it != command.expected.sorted() && it != command.desired.sorted() } ?: true } ?: false
     val canSave: Boolean get() = mayManage && !saving && !reading && edit?.desired?.isNotEmpty() == true && edit?.confirmed == false && !editIsStale && currentEditRoles != null
@@ -85,26 +86,28 @@ private class NativeTeamState(
         session.session?.accountId == accountId && session.session?.sessionId == sessionId && !session.purgingPrivateState && !session.localPurgeFailed
     private suspend fun matches(snapshot: Int, request: FanSessionRequestCapture): Boolean {
         currentCoroutineContext().ensureActive()
-        if (!matches(snapshot)) return false
+        if (!matches(snapshot) || !ready) return false
         val currentCapture = request.isCurrent()
         // Storage may suspend independently of this component's view lifetime.
         currentCoroutineContext().ensureActive()
-        return currentCapture && matches(snapshot)
+        return currentCapture && matches(snapshot) && ready
     }
     suspend fun expire() {
         currentCoroutineContext().ensureActive()
         if (!active) return
         val snapshot = generation
         if (!matches(snapshot)) { deactivate(); return }
+        if (!ready) { conceal(); return }
         val request = capture
         if (request != null && !matches(snapshot, request)) {
-            if (matches(snapshot)) { conceal(discardEdit = true); error = teamCopy("AccountChanged") }
+            if (matches(snapshot)) { conceal(discardEdit = ready); error = teamCopy(if (ready) "AccountChanged" else "Unavailable") }
             return
         }
         if (SystemClock.elapsedRealtime() >= checkedUntil) conceal()
     }
     fun refresh() {
         if (!active || reading || saving) return
+        if (!ready) { conceal(); return }
         val snapshot = generation; val started = SystemClock.elapsedRealtime()
         reading = true
         readJob = scope.launch {
@@ -182,9 +185,12 @@ private class NativeTeamState(
         writeJob = scope.launch {
             try {
                 if (!matches(snapshot, command.capture) || !mayManage) {
-                    if (matches(snapshot)) { conceal(discardEdit = true); error = teamCopy("AccountChanged") }
+                    if (matches(snapshot)) { conceal(discardEdit = ready); error = teamCopy(if (ready) "AccountChanged" else "Unavailable") }
                     return@launch
                 }
+                // Keep the exact command locked once dispatch may have begun,
+                // including a later temporary account-readiness interruption.
+                edit = command.copy(unknown = true)
                 command.capture.client.updateTeamMemberRoles(id, command.accountId, command.capture.expectedAccountId, body)
                 if (!matches(snapshot, command.capture) || edit?.accountId != command.accountId) return@launch
                 edit = command.copy(confirmed = true, unknown = false); error = teamCopy("Saved")
@@ -233,7 +239,7 @@ fun StudioTeamWorkspace(
             if (ticks % 12 == 0) state.refresh()
         }
     }
-    val visible = foreground && state.current && accountId == state.accountId && sessionId == state.sessionId && !session.purgingPrivateState && !session.localPurgeFailed
+    val visible = foreground && state.ready && state.current && accountId == state.accountId && sessionId == state.sessionId && !session.purgingPrivateState && !session.localPurgeFailed
     Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         TextLine(teamCopy(if (creatorId == null) "Workspace" else "Title"), "display-md", modifier = Modifier.semantics { heading() })
         if (state.error.isNotEmpty()) Notice(title = teamCopy("Status"), children = state.error)
