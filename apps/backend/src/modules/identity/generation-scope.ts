@@ -157,6 +157,7 @@ type GenerationScopeBinding = {
   nonce: string;
   transaction: string;
   pid: number;
+  readonly signal?: AbortSignal;
   current: GenerationTaskScope;
 };
 
@@ -783,7 +784,13 @@ export class GenerationIdentityAuthority {
                 )
               ).rows[0],
             );
-          held = { client, nonce: proof.nonce, ...binding, current: scope };
+          held = {
+            client,
+            nonce: proof.nonce,
+            ...binding,
+            signal,
+            current: scope,
+          };
           this.issued.set(scope, held);
           await this.authorizeInTransaction(scope, client);
           const value = await work(client, scope);
@@ -886,6 +893,25 @@ export class GenerationIdentityAuthority {
     await this.authorizeInTransaction(current, client);
     await this.configuration.assertAllowed(client, current);
     return current;
+  }
+
+  /** Cancellation custody only, not permission. Return the original optional
+   * signal from this genuine current binding without issuing SQL or a scope.
+   * An unsignaled after-incurred settlement remains unsignaled. Cursor refresh
+   * retains this same private binding and cannot replace its original signal.
+   */
+  originalSignalInTransaction(
+    scope: GenerationTaskScope,
+    client: PoolClient,
+  ): AbortSignal | undefined {
+    this.assertWorker();
+    const binding = this.issued.get(scope);
+    invariant(
+      binding?.client === client && binding.current === scope,
+      "generation_scope_required",
+      "Use the current generation purpose transaction.",
+    );
+    return binding.signal;
   }
 
   /** Genuine issued object, exact held client, private transaction/PID/nonce
