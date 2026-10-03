@@ -4,6 +4,14 @@
 
 [Held0225](W8-next-allocations.md) pins W1's independently read89-line original ordinary Content signature reader at SHA256734a806c1e2252d7c5c7c418856f3b448933d993326ef471bb3351eed1367e41. Its isolated boolean purpose consumes the actual W5 creator/content/consumed act/canonical command hash/audience after original same-client domain and negative checks; unchanged0167 mutation fences and original0157 packet separation remain mandatory. The nonwaiting signer-family lease is LAST. Complete effective catalogue and original typed owner cleanup/COMMIT, drift/refusal/cancellation/withdrawal/revocation/C10/application qualification remain pending. Active61/prior76/frozen47 are preserved; reserved metadata installs no SQL/grants or accepted pin.
 
+## Original worker acknowledgement budget — 2026-10-03
+
+[Current201](../../operations/W8-privacy-streaming.md) reuses the unchanged draft200 original-client settlement helper for task/effect acknowledgement and failure transitions. Its actual host budget adds no task or owner authority. Running/token fences preserve durable completed receipts after lost COMMIT replies; original acknowledgement expiry and case/recipient semantics remain. Types/lint/format/diff pass; current actual task/effect fault and independent saved-state qualification remain required. No new SQL, scope, catalogue pin, actor, consent or provider receipt is supplied.
+
+## Actual private artifact parent — 2026-10-03
+
+[Existing201 storage guard](../../operations/W8-privacy-streaming.md) requires the already existing private POSIX-owned parent and canonical real path with no symlinked ancestors; it creates only the leaf and rechecks before each operation. Seven actual configuration refusals, later permission-change refusal, storage-only8MiB/fresh-process SHA verification, different-account404 and metadata-symlink refusal are personally observed, with original files/permissions restored. No database job, task, owner EOF/COMMIT or C10/download/application receipt is supplied. Runtime source/type/lint/format checks pass; original Agent graph/held purposes and all remaining release gates remain required.
+
 ## Restrictive original-purpose profile boundaries — 2026-10-03
 
 [Held0221–0224](W8-next-allocations.md) reserve distinct additive restrictive profile SELECT policies for the existing W3 context, W4 audience, two W2 metadata/retrieval roles and W5 original-content origin. All published SQL/current runtime guards are independently read/hash-checked. Original0095/0179/0182/0211/0187/0102/0186 bytes, functions, scope issuers and all original task/client/PID/fullXID/login/family/restoration/negative/COMMIT gates remain intact. PUBLIC permissive policies must not OR-bypass the role-specific boundary. W5's separate predicate preserves original signature-family order; original scope checks and final genuine identity remain required. Independent whole policy/ACL/function/caller catalogue and closed compiler/drift/refusal/fresh-preserved/task/C10 qualification remain required; no accepted catalogue, new role/grant, activation or raw-worker/provider permission is supplied. Active61/frozen47 remain unchanged.
@@ -28,6 +36,10 @@ Held0216 reserves W1's actual45cf4f02 `identity/schema-generation-output-cursor.
 
 `conversationPrivacyAuthority.families` keeps its original client checked out while the same configured non-owner control connection cancels the observed PID. Remove the abort listener and await cancellation/control close before final COMMIT or error ROLLBACK; release only after rollback settles, destroying the client on uncertain cancellation/rollback. [Actual worker45-second deadline and independent state](../../operations/W8-privacy-family-cancellation.md) qualify that source boundary. Immutable0087/current task/restoration authority is preserved; no family permission or receipt is issued by cancellation.
 
+## Original Agent lifecycle assertion — 2026-10-03
+
+Source201 calls `owner.lifecycle.assertRepository(owner.service.repository)` before constructing the Agent privacy adapter. W2's actual class retains the private original repository and throws503 `agent_lifecycle_composition_mismatch` for a different object; the worker leaves that dependency blocked. Same URL, structural casts and a fallback service do not supply custody. The separate completed original Conversation accounting boundary remains required before full0163 ACK.
+
 ## Current account read retry — 2026-10-03
 
 `retryTrustReads()` refreshes real capability/session/job hooks without granting a session or resetting the form epoch. Each hook preserves its current sequence/account fence. Actual503 session errors offer retry; only actual401 may offer reauthentication. Pending session reads withhold development sign-in navigation. [Personal real-web operation and independent saved state](../../operations/W8-privacy-session-recovery.md) qualify cold/warm recovery and cross-tab account separation only; the existing incomplete export remains unavailable for download.
@@ -35,6 +47,10 @@ Held0216 reserves W1's actual45cf4f02 `identity/schema-generation-output-cursor.
 ## Original-recipient interactive denial source — 2026-10-02
 
 [Held0200](../../operations/W8-fulfillment-view-denial.md) now implements the separate genuine0199 interactive contract. `prepareTrustFulfillmentViewDenial(runtime, actualCommerceFulfillmentViewAuthority)` accepts only the original held client and W4 opaque scope; actual current session/client/PID/fullXID, complete originals and restoration/source bookends remain mandatory. New NoLogin purpose checks viewer and every original family with sorted nonwaiting negatives. No Actor, fan list, body, positive permission or COMMIT is issued. W4's exact combined0199/0202 catalogue needs independent owner review before activation; old hashes correctly refuse the new grants/policies. Personal closed rollback qualification preserves all six canonical61 custody hashes and supplies no signed/financial/provider or application acceptance.
+
+## Actual post-graph Agent privacy port — 2026-10-03
+
+`AgentPrivacyOwnerPorts` in `trust/privacy-consumers.ts` accepts the actual service/lifecycle/prepared0196 source directly or a W1 resolver. Resolve once per original claimed task; undefined is a blocked dependency. The service repository and actual source must use the exact canonical host Pool object. W8 fixes original coordinator ownership/task/restoration after resolving the owner. W2's same-repository lifecycle assertion and the actual completed same-job Conversation accounting boundary remain required before full0163 Agent ACK. No source-registration boolean, fallback Agent, caller JSON receipt or separate-pool proof substitutes for them. Source201 still needs genuine integration and personal web/Android/iOS export/download acceptance.
 
 ## Distinct publication original comparison allocation — 2026-10-02
 
