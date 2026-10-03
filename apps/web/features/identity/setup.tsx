@@ -31,7 +31,7 @@ async function identityAction(
     signal: AbortSignal.timeout(10000),
   }).catch(() => {
     throw new IdentityActionError(
-      "The service is unavailable. Your input has been kept; try again.",
+      copy.identityInputKeptUnavailable,
       503,
       "service_unavailable",
     );
@@ -168,7 +168,7 @@ export function CreatorSetup({ initial }: { initial: Session }) {
     "Prove it’s you",
     "A passkey for signing",
     "Your license to your AI",
-    "A 15-minute interview in your voice",
+    copy.creatorInterviewEstimate,
     "Sources, style, rules, tests",
   ];
   return (

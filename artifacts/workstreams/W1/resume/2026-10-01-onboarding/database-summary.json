@@ -1,0 +1,28 @@
+{
+  "recordedAt": "2026-10-01T10:12:46.358Z",
+  "provenance": "Fresh W1-only interactive database, canonical migrations; no historical or peer restore.",
+  "state": {
+    "database": "creator_w1_onboarding_20261001",
+    "profiles": 1,
+    "empty_intros": 0,
+    "later_saved_intro": 1,
+    "threads": 0,
+    "processor_consents": 0,
+    "creator_drafts": 0,
+    "keys": 0,
+    "signed_acts": 0
+  },
+  "role": {
+    "rolname": "creator_runtime",
+    "rolsuper": false,
+    "rolbypassrls": false,
+    "rolinherit": false,
+    "rolcreatedb": false,
+    "rolcreaterole": false
+  },
+  "initialSaveObservation": {
+    "profiles": 1,
+    "emptyIntros": 1,
+    "source": "Read-only aggregate immediately after actual initial Handle save, before later profile edit."
+  }
+}

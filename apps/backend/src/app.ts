@@ -101,13 +101,14 @@ export function createApp(
     app.use("/v1", async (req, _res, next) => {
       const token = req.headers.authorization?.match(/^Bearer ([^\s]+)$/u)?.[1];
       const expectedAccount = req.get("X-Expected-Account-Id");
+      const expectedSession = req.get("X-Expected-Session-Id");
       // Refresh and logout also accept an expired access window within refresh_until.
       const refreshing = [
         "/identity/refresh",
         "/identity/logout",
         "/identity/revoke-sessions",
       ].includes(req.path);
-      if (!token || (refreshing && !expectedAccount)) {
+      if (!token || (refreshing && !expectedAccount && !expectedSession)) {
         next();
         return;
       }
@@ -121,6 +122,15 @@ export function createApp(
         throw new DomainError(
           "session_account_changed",
           "Your account changed. Reopen this form before saving.",
+          409,
+        );
+      // The browser may replace its cookie with another session of the same
+      // account. An old view must not adopt that replacement's authority.
+      // Ordinary one-use token rotation retains this actual session ID.
+      if (expectedSession && expectedSession !== resolved.sessionId)
+        throw new DomainError(
+          "session_view_changed",
+          "Your session changed. Reopen this form before continuing.",
           409,
         );
       if (refreshing) {

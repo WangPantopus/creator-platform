@@ -1,6 +1,16 @@
 # W1 continuation — September 30, 2026
 
+October 2 successor reconciliation: PR21 now incorporates current main `af38420d7aa5b07df009a01a4be3e8026f753d2a`, preserving the merged issuer-bound native producer, held-session finalization, proof Support and canonical Studio navigation. Only dated W1 documentation conflicted; both records are retained below. Current-source checks and personal web/native onboarding qualification are in progress. Queued hosted jobs remain non-passes. W1 original61 and the separately labelled development61 copy remain closed; no current runtime or native acceptance is inferred. The entire original seven-group/H01–H20 assignment remains incomplete.
+
 October 2 focused main increment: actual Ops/Account/Status return handling and truthful no-fan Account are implemented and personally browser-operated at cac6be9c on an independently restored, labelled canonical57 development copy. Same actual expired session rotates and returns to audits; Ops denies without membership. Original W1 remains closed. Production build/types/canonical generation/scoped checks pass; native/full workstream acceptance remains open. [Exact bounded evidence](../../../artifacts/workstreams/W1/resume/2026-10-02-ops-return/run.md).
+
+## October 1 — onboarding timing and interview estimate
+
+W1 personally resolves DI09's initial Handle timing through the governing Product Design S-F1/S-F5: new profiles collect only a handle, while an existing profile retains its optional intro editor. Web, Swift and Kotlin follow the same profile-state distinction. The later one-time offer after a useful thread answer remains unfinished; saving an intro grants no per-creator AI permission. The live setup estimate follows S-C14/A10's about 20-minute voice/text interview. [Recorded decision](../DECISIONS.md#w1-source-conflicts-resolved--october-1-2026) preserves original artboards/references and the optional imported-source path.
+
+[Actual browser evidence](../../../artifacts/workstreams/W1/resume/2026-10-01-onboarding/run.md) records fresh canonical Handle → Account, empty initial intro, later edit/save/reload, interrupted save preserving input and keyboard focus, and Light/Night phone/desktop captures. Newly changed copy uses the canonical generator. Shipping iOS/Android compilation is supporting evidence; native operation, secure-storage acceptance and assistive-technology verification remain open because native control APIs are disabled. H01–H20 stay active; this does not complete DI09's later offer, H15, H16 or H17's fresh rename.
+
+The second logical database `creator_w1_onboarding_20261001` is W1-only interactive state in the existing 55451 container. All40 active migrations were applied; no original or peer state was restored/reset. The original proof-recovery database remains retained. No conversation, processor consent, creator approval, passkey or signed act was fabricated. Exact source/build/environment qualifications are in the manifest. Current-head Code Review CI remains unavailable pending a connected GitHub account; no hosted pass or merge is claimed.
 
 ## October 1, 2026 — full W1 resumed after centralized cleanup
 
