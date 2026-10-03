@@ -166,7 +166,10 @@ function CurrentOffer(props: Destination) {
       >
         {copy.w6ReloadCurrentOffer}
       </button>
-      <a className="qv-btn qv-btn--quiet" href="/studio/requests">
+      <a
+        className="qv-btn qv-btn--quiet"
+        href={`/studio/${props.creatorId}/requests`}
+      >
         {copy.w6OpenStudioRequests}
       </a>
     </main>
