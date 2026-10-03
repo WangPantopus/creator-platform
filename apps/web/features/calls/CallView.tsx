@@ -6,6 +6,10 @@ import {
   CallSessionSchema,
   CallAdmissionSchema,
   AdmissionReceiptSchema,
+  ConsentCommandSchema,
+  EndCallSchema,
+  CallSummaryNoteSchema,
+  CallRevisionSchema,
   type CallSession,
   type CallConsentPurpose,
 } from "../../../../packages/api/src/session";
@@ -22,6 +26,12 @@ type CallViewProps = {
   sessionId: string;
   actorAccountId: string | null;
 };
+type CallAction = "consent" | "end" | "summary-note" | "delete-summary";
+type PendingCallCommand = Readonly<{
+  action: CallAction;
+  body: string;
+  fallback: string;
+}>;
 export function CallView(props: CallViewProps) {
   const identity = useIdentityRequest();
   const boundary = useRef({ signal: identity.signal, revision: 0 });
@@ -56,6 +66,7 @@ function CallSessionView({
   const opening = useRef(identity).current;
   const lifetime = useRef<AbortController | null>(null);
   const mutation = useRef<AbortController | null>(null);
+  const pendingMutation = useRef<PendingCallCommand | null>(null);
   const projection = useRef<CallSession | null>(null);
   const changingMedia = useRef(false);
   const joining = useRef(false);
@@ -72,6 +83,8 @@ function CallSessionView({
   const [localState, setLocalState] = useState("disconnected");
   const [remoteMedia, setRemoteMedia] = useState<MediaStream | null>(null);
   const [summaryNote, setSummaryNote] = useState("");
+  const [pendingCommand, setPendingCommand] =
+    useState<PendingCallCommand | null>(null);
   const [refreshVersion, setRefreshVersion] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const video = useRef<HTMLVideoElement | null>(null);
@@ -161,6 +174,8 @@ function CallSessionView({
     const close = () => {
       owner.abort();
       mutation.current?.abort();
+      pendingMutation.current = null;
+      setPendingCommand(null);
       disconnectMedia();
     };
     window.addEventListener("pagehide", close);
@@ -283,6 +298,7 @@ function CallSessionView({
       joining.current ||
       changingMedia.current ||
       mutation.current ||
+      pendingMutation.current ||
       stale ||
       transport.current ||
       ["ending", "ended", "cancelled"].includes(session.state)
@@ -321,7 +337,8 @@ function CallSessionView({
       stale ||
       joining.current ||
       changingMedia.current ||
-      mutation.current
+      mutation.current ||
+      pendingMutation.current
     )
       return;
     if (transport.current && localState !== "disconnected") return;
@@ -394,36 +411,116 @@ function CallSessionView({
     }
   }
   async function mutate(
-    action: "consent" | "end" | "summary-note" | "delete-summary",
+    action: CallAction,
     body: Record<string, unknown>,
     fallback: string,
   ) {
-    if (
-      !currentView() ||
-      mutation.current ||
-      joining.current ||
-      changingMedia.current ||
-      busy ||
-      stale
-    )
-      return false;
+    if (pendingMutation.current) return false;
+    if (!canMutate()) return false;
+    const command = Object.freeze({
+      action,
+      body: JSON.stringify(body),
+      fallback,
+    });
+    pendingMutation.current = command;
+    setPendingCommand(command);
+    return sendMutation(command);
+  }
+  function canMutate() {
+    return (
+      currentView() &&
+      !mutation.current &&
+      !joining.current &&
+      !changingMedia.current &&
+      !busy &&
+      !stale &&
+      !document.hidden
+    );
+  }
+  async function sendMutation(command: PendingCallCommand) {
+    if (!canMutate() || pendingMutation.current !== command) return false;
     const owner = lifetime.current;
     const attempt = new AbortController();
     mutation.current = attempt;
     setError(null);
     setBusy(true);
     try {
-      adoptSession(
-        await callRequest(`${root}/${action}`, {
+      const receipt = CallSessionSchema.parse(
+        await callRequest(`${root}/${command.action}`, {
           method: "POST",
-          body: JSON.stringify(body),
+          body: command.body,
           signal: attempt.signal,
         }),
       );
+      const original: unknown = JSON.parse(command.body);
+      let confirmed = false;
+      if (command.action === "consent") {
+        const body = ConsentCommandSchema.parse(original);
+        confirmed =
+          receipt.version > body.expectedVersion &&
+          receipt.consents.some(
+            (value) =>
+              value.actorAccountId === opening.session.accountId &&
+              value.role === role &&
+              value.purpose === body.purpose &&
+              value.granted === body.granted,
+          );
+      } else if (command.action === "end") {
+        const body = EndCallSchema.parse(original);
+        confirmed =
+          receipt.version >= body.expectedVersion &&
+          ["ending", "ended", "cancelled"].includes(receipt.state);
+      } else if (command.action === "summary-note") {
+        const body = CallSummaryNoteSchema.parse(original);
+        confirmed =
+          receipt.version > body.expectedVersion &&
+          receipt.creatorSummaryNote === body.note &&
+          receipt.summaryState === "pending";
+      } else {
+        const body = CallRevisionSchema.parse(original);
+        confirmed =
+          receipt.version > body.expectedVersion &&
+          receipt.summaryState === "deleted" &&
+          receipt.summary === null &&
+          receipt.creatorSummaryNote === undefined;
+      }
+      if (!confirmed)
+        throw new Error(
+          copy.w6ThisActionCouldNotCompleteRefreshTheCallBeforeTrying,
+        );
+      adoptSession(receipt);
+      if (!currentView(owner) || pendingMutation.current !== command)
+        return false;
+      pendingMutation.current = null;
+      setPendingCommand(null);
+      if (command.action === "end") {
+        disconnectMedia();
+        setLeaving(false);
+      }
       return true;
     } catch (e) {
-      if (currentView(owner) && mutation.current === attempt)
-        setError(e instanceof Error ? e.message : fallback);
+      if (currentView(owner) && mutation.current === attempt) {
+        // These original transactional refusals prove this command did not
+        // commit. A transport failure, malformed receipt or other error does
+        // not: retain the exact serialized body/key until its retry confirms.
+        if (
+          e instanceof MediaRequestError &&
+          e.status === 403 &&
+          [
+            "call_stale",
+            "call_consent_unavailable",
+            "summary_consent_required",
+            "creator_required",
+            "fan_end_choice_required",
+          ].includes(e.code ?? "")
+        ) {
+          pendingMutation.current = null;
+          setPendingCommand(null);
+          setStale(true);
+          setRefreshVersion((value) => value + 1);
+        }
+        setError(e instanceof Error ? e.message : command.fallback);
+      }
       return false;
     } finally {
       if (mutation.current === attempt) {
@@ -436,45 +533,59 @@ function CallSessionView({
     if (!session || !role) return;
     await mutate(
       "consent",
-      {
+      ConsentCommandSchema.parse({
         purpose,
         granted,
         expectedVersion: session.version,
         idempotencyKey: crypto.randomUUID(),
-      },
+      }),
       copy.w6ConsentCouldNotBeSaved,
     );
   }
   async function end(choice: "end_by_choice" | "technical_problem") {
     if (!session || !role) return;
-    if (
-      await mutate(
-        "end",
-        {
-          expectedVersion: session.version,
-          ...(role === "fan" ? { fanChoice: choice } : {}),
-          idempotencyKey: crypto.randomUUID(),
-        },
-        copy.w6TheCallCouldNotBeEndedTryAgain,
-      )
-    ) {
-      if (!currentView()) return;
-      disconnectMedia();
-      setLeaving(false);
-    }
+    await mutate(
+      "end",
+      EndCallSchema.parse({
+        expectedVersion: session.version,
+        ...(role === "fan" ? { fanChoice: choice } : {}),
+        idempotencyKey: crypto.randomUUID(),
+      }),
+      copy.w6TheCallCouldNotBeEndedTryAgain,
+    );
   }
   async function summaryAction(action: "summary-note" | "delete-summary") {
     if (!session || !role) return;
     await mutate(
       action,
-      {
-        expectedVersion: session.version,
-        idempotencyKey: crypto.randomUUID(),
-        ...(action === "summary-note" ? { note: summaryNote } : {}),
-      },
+      action === "summary-note"
+        ? CallSummaryNoteSchema.parse({
+            expectedVersion: session.version,
+            idempotencyKey: crypto.randomUUID(),
+            note: summaryNote,
+          })
+        : CallRevisionSchema.parse({
+            expectedVersion: session.version,
+            idempotencyKey: crypto.randomUUID(),
+          }),
       copy.w6TheSummaryCouldNotBeChanged,
     );
   }
+  const commandRetry = pendingCommand ? (
+    <div className="w6-notice">
+      <p role="status">{copy.w6CallActionUnconfirmed}</p>
+      <button
+        className="qv-btn qv-btn--secondary"
+        disabled={busy || stale || !role}
+        onClick={() => {
+          const original = pendingMutation.current;
+          if (original) void sendMutation(original);
+        }}
+      >
+        {copy.w6RetryCallAction}
+      </button>
+    </div>
+  ) : null;
   async function changeMedia(kind: "microphone" | "camera") {
     const adapter = transport.current;
     const epoch = mediaEpoch.current;
@@ -650,6 +761,7 @@ function CallSessionView({
           {error}
         </p>
       )}
+      {!leaving && commandRetry}
       {!live && !ended && (
         <>
           <section className="w6-card w6-call-facts">
@@ -823,7 +935,7 @@ function CallSessionView({
                 </span>
                 <input
                   type="checkbox"
-                  disabled={busy || stale || !role}
+                  disabled={busy || stale || !role || pendingCommand !== null}
                   onChange={(event) => {
                     void consent(purpose, event.target.checked);
                   }}
@@ -864,12 +976,13 @@ function CallSessionView({
                 <textarea
                   id="creator-summary-note"
                   maxLength={8000}
+                  disabled={busy || stale || pendingCommand !== null}
                   value={summaryNote}
                   onChange={(event) => setSummaryNote(event.target.value)}
                 />
                 <button
                   className="qv-btn qv-btn--secondary"
-                  disabled={busy || stale || !role}
+                  disabled={busy || stale || !role || pendingCommand !== null}
                   onClick={() => {
                     void summaryAction("summary-note");
                   }}
@@ -886,7 +999,7 @@ function CallSessionView({
           {session.summary && (
             <button
               className="qv-btn qv-btn--quiet"
-              disabled={busy || stale || !role}
+              disabled={busy || stale || !role || pendingCommand !== null}
               onClick={() => {
                 void summaryAction("delete-summary");
               }}
@@ -934,6 +1047,7 @@ function CallSessionView({
               busy ||
               stale ||
               !role ||
+              pendingCommand !== null ||
               (transport.current !== null && localState !== "disconnected")
             }
             onClick={() => {
@@ -944,7 +1058,7 @@ function CallSessionView({
           </button>
           <button
             className="qv-btn qv-btn--quiet"
-            disabled={busy || stale || !role}
+            disabled={busy || stale || !role || pendingCommand !== null}
             onClick={() => {
               void preflight();
             }}
@@ -967,6 +1081,7 @@ function CallSessionView({
             aria-labelledby="leave-title"
           >
             <h2 id="leave-title">{copy.w6EndThisCall}</h2>
+            {commandRetry}
             <p>
               {role === "fan"
                 ? copy.w6EndingByChoiceCountsAsYourCompletedCallATechnical
@@ -974,7 +1089,7 @@ function CallSessionView({
             </p>
             <button
               className="qv-btn qv-btn--secondary"
-              disabled={busy || stale || !role}
+              disabled={busy || stale || !role || pendingCommand !== null}
               onClick={() => {
                 void end("end_by_choice");
               }}
@@ -984,7 +1099,7 @@ function CallSessionView({
             {role === "fan" && (
               <button
                 className="qv-btn qv-btn--secondary"
-                disabled={busy || stale || !role}
+                disabled={busy || stale || !role || pendingCommand !== null}
                 onClick={() => {
                   void end("technical_problem");
                 }}

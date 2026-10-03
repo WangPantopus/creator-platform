@@ -686,6 +686,8 @@ object QelvoraCopy {
     "w6ConsentCouldNotBeSaved" to "Consent could not be saved.",
     "w6TheCallCouldNotBeEndedTryAgain" to "The call could not be ended. Try again.",
     "w6TheSummaryCouldNotBeChanged" to "The summary could not be changed.",
+    "w6CallActionUnconfirmed" to "This call action is unconfirmed. Retry the same action before making another change.",
+    "w6RetryCallAction" to "Retry this call action",
     "w6ThisCallIsUnavailable" to "This call is unavailable",
     "w6OpeningYourCall" to "Opening your call",
     "w6CheckingTheBookingAndParticipantAccess" to "Checking the booking and participant access.",
