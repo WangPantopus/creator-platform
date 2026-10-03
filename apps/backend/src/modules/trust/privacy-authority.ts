@@ -1,6 +1,7 @@
 import type { Pool, PoolClient } from "pg";
 import { z } from "zod";
 import { DomainError, invariant } from "../../core/errors.js";
+import { querySettlementUncertain } from "../../core/query-settlement.js";
 import { requestAuthority } from "../identity/request-authority.js";
 import { PrivacyDomains, type PrivacyHook } from "./contracts.js";
 import { assertPrivacyTaskCatalog } from "./privacy-catalog.js";
@@ -80,6 +81,7 @@ export async function privacyTaskAuthorityInTransaction(
       503,
     );
   await client.query("SAVEPOINT w8_privacy_task_fence");
+  let owned: readonly string[];
   try {
     await assertPrivacyTaskCatalog(client);
     const row = (
@@ -104,24 +106,41 @@ export async function privacyTaskAuthorityInTransaction(
         "The current lifecycle task is unavailable.",
         503,
       );
-    return z.array(z.uuid()).max(100).parse(row.owned);
+    owned = z.array(z.uuid()).max(100).parse(row.owned);
   } catch (error) {
-    await client.query("ROLLBACK TO SAVEPOINT w8_privacy_task_fence");
+    // The owning transaction settles cancellation and closes or rolls back
+    // its held client. Nested savepoint cleanup cannot follow an aborted task.
+    if (input.signal.aborted || querySettlementUncertain(error)) throw error;
+    try {
+      await client.query("ROLLBACK TO SAVEPOINT w8_privacy_task_fence");
+      await client.query("RELEASE SAVEPOINT w8_privacy_task_fence");
+    } catch (cause) {
+      throw new AggregateError(
+        [error, cause],
+        "Original task fence and savepoint restoration failures.",
+      );
+    }
     if (
       error &&
       typeof error === "object" &&
       "code" in error &&
       ["42883", "42501", "55P03", "40001"].includes(String(error.code))
-    )
-      throw new DomainError(
+    ) {
+      const failure = new DomainError(
         "privacy_commit_fence_unavailable",
         "Current lifecycle authority is unavailable. Try again.",
         503,
       );
+      Object.defineProperty(failure, "cause", {
+        value: error,
+        configurable: true,
+      });
+      throw failure;
+    }
     throw error;
-  } finally {
-    await client.query("RELEASE SAVEPOINT w8_privacy_task_fence");
   }
+  await client.query("RELEASE SAVEPOINT w8_privacy_task_fence");
+  return owned;
 }
 
 /** Worker-only negative/ownership metadata. A client UUID never grants a lifecycle scope. */
