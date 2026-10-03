@@ -54,6 +54,16 @@ Parsing/generation/scoped source checks pass; fresh shipping compilation and per
 
 [Named current commerce operation](../../../artifacts/workstreams/W4/runtime/2026-10-03/commerce-original-session/README.md) preserves previous source attribution and failures. Main/all16 active W4 branches contain reviewed5c08634b; workbook/history remain preserved. Existing210/294/300 are merged, with owner-reviewed292/297 consumed; the39 current open PRs are all drafts and retain their owner gates.
 
+## Successor checkpoint — October 3, 2026 afternoon
+
+- [x] Repair existing W4 original Content control deadlines and publish the reviewed source to all six retained drafts; preserve original producer bytes/history.
+- [x] Publish the actual #247 terminal signal consumer and #262 publication signal consumer with current scoped checks and unchanged existing contracts; record successful normal source builds without positive task/runtime inference.
+- [x] Coordinate the seven peers' oldest-first review and preserve duplicate source while reducing the backlog to37 drafts; synchronize all sixteen active W4 branches and main.
+- [ ] Finish the retained PRs' genuine current task/provider/financial/cleanup/sole-COMMIT/C10, required CI and current native/accessibility acceptance before merging.
+- [ ] Complete every original Commerce package/R01–R15. No full row is checked off.
+
+[Current source, evidence, remaining dependencies and successor actions](../handoffs/W4-continuation-handoff-2026-10-03-afternoon.md) supersede dated checkpoint facts below. The new documentation-only handoff leaves the last #303 product leaf `e7c8f7a3` unchanged. The approximate60% effort estimate is a planning judgment; it supplies no package or release acceptance.
+
 ## Current signed iOS and original real deadline — October 3, 2026 13:06 UTC
 
 - [x] Personally operate current signed iOS original-account Requests/You Spending Back in named Light/Night paths, actual decimal6.50 unsaved input and normal cold discard; preserve all38 commerce tables/two rows and release the actual bounded own resources.

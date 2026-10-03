@@ -1,0 +1,147 @@
+# W4 successor checkpoint — October 3, 2026 afternoon
+
+The founder requested a seamless handoff at a suitable checkpoint. The current repair is complete, committed and pushed; W4 holds no runtime, device, GUI or build lease. Continue the original nine Commerce packages and R01–R15. **None of those full packages or rows is complete.** This handoff supersedes the October 2 afternoon checkpoint for current branch, PR, runtime and evidence facts. Older records retain their named historical qualification.
+
+## Start here
+
+- Use `/Users/yingpengwang/.codex/worktrees/dd8c/creator-platform`. The current branch is `codex/w4-native-spending-return-20261003`, attached to existing draft [#303](https://github.com/WangPantopus/creator-platform/pull/303). Its last product leaf is `e7c8f7a3733d2f4026cfee8eed3715bccd63975f`; the commit containing this handoff adds documentation only. Resolve the current published head through Git and GitHub rather than treating the product leaf as the documentary head.
+- Captured `main` and `origin/main` are `5c08634b7542fef95dd6c176030a785845250c62`. Primary checkout `/Users/yingpengwang/creator-platform` matches and has no tracked changes. All sixteen retained active W4 branches contain this main and match their pushed heads; historical merged/retired source refs remain preserved. Fetch and verify again before further work.
+- Private scratch remains `/private/tmp/creator-platform-w4-f402` despite the newer checkout name. Do not remove it. Configurations are `api.env` and `web-trust.env`; credentials, auth state, backups, operational logs and raw records stay private. Never print or commit their contents.
+- The user workbook remains unchanged: `/Users/yingpengwang/creator-platform/docs/research/qelvora-cost-revenue-model.xlsx`, SHA256 `98571735dcd8dd278c424a463f5998988078065228fc716282cdd84e5383995b`.
+- Read this document, [the comprehensive successor prompt](../prompts/W4-next-agent-2026-10-03.md), [current status](../status/W4.md), and [the completion checklist](../implementation/W4-completion-2026-10-01.md), then the full [October 2 handoff](W4-continuation-handoff-2026-10-02-afternoon.md). Read the original [execution prompt](../prompts/W4-commerce-requests.md), [nine-package assignment](../W4-commerce-requests.md), original R01–R15 handoff, repository contracts/verification/decisions and relevant source/design documents before implementation.
+
+## Human priority and authorization
+
+Review every existing open/draft PR oldest first, beginning with #21, coordinate the other seven existing workstreams, reuse prior source, take responsibility for W4's owned PRs, fix them and merge only when their relevant source/runtime and current required checks qualify. Resume the rest of W4 after this review. No new PR is needed for this checkpoint; retain the six existing W4 drafts below.
+
+Implementation, normal commits/pushes, necessary PRs, qualified merges and coordination with all seven existing peers are authorized. Do not reset, rebase, stash, force-push, delete original branches, or manufacture authority/business evidence. Personally implement and operate acceptance; no new tests, cases, goldens or coverage. Existing required checks may run. W8 alone owns `infra/migrations.json`, activation and `operations/local-server.ts`; do not edit them. Do not replay synthetic proof creation or approval, seed financial/provider outcomes, fake Actors/Tasks/scopes, supply no-op restoration or turn a review-only catalogue hash into an accepted pin.
+
+CUA is authorized for UI control. The founder additionally allowed bounded ADB screenshots/input **only on W4's owned emulator-5564**, and temporary preinstalled TalkBack there for the specific navigation/Night/spoken verification; restore settings and shut down afterward. This does not authorize control of another stream's device or a different simulator driver. Build/install/launch/lifecycle/metadata CLI operations are allowed. Refresh CUA documentation after a context reset. Use the original resource limits and actual leases; do not disturb a peer's ownership.
+
+## Current PR checkpoint
+
+The fresh inventory at 22:43 UTC / 15:43 PDT has **37 open PRs, all drafts**, down from the founder's 43-PR check-in. Consolidation preserves original source/history and unfinished acceptance. The current audit round has produced no additional main merge. Earlier verified main merges include W4 [#210](https://github.com/WangPantopus/creator-platform/pull/210), [#294](https://github.com/WangPantopus/creator-platform/pull/294), [#300](https://github.com/WangPantopus/creator-platform/pull/300), plus W2 #286/#292, W6 #291 and W8 #297. Some are documentary qualification records. W2 #295 merged into the #21 stack, not main. Distinguish these facts from a new backlog-round merge.
+
+| W4 PR                                                             | Published product/source checkpoint                                                                                                                          | Next qualification                                                                                                                             |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| [#213](https://github.com/WangPantopus/creator-platform/pull/213) | `9185f5ed070d35b5e8c2c48f8be91da424c840cd`; `codex/w4-call-original-actor-20261002`                                                                          | Original Actor/call/account fault and context settlement; genuine provider outcomes/replay and financial-purpose/C10 gates                     |
+| [#247](https://github.com/WangPantopus/creator-platform/pull/247) | `2d29e160e72fa4c70d4cf6b3e02dc2e02c847e9b`; `codex/w4-generation-safety-terminal-20261003`                                                                   | Complete actual generation/terminal owner graph, accepted catalogue, genuine task/provider/output/journal/financial/cleanup/COMMIT and C10     |
+| [#262](https://github.com/WangPantopus/creator-platform/pull/262) | `2572bbd64f133fe14c5069e2d4e159c1a39fa85c`; `codex/w4-publication-worker-20261003`; product `b4042c58073c60e945a1e2d8821181bf97ca7427`, then one thin README | Genuine publication/creator/capture/consent/signature/System/delivery/final COMMIT, accepted pins, approved minimum and C10                    |
+| [#298](https://github.com/WangPantopus/creator-platform/pull/298) | `222017ecb0f3d12b3e5436fda844ea32cd052332`; `codex/w4-original-session-view-20261003`; base original W1 #21                                                  | Original session interleavings, actual Commerce command/BFF races and fault cleanup; current producer/CI qualification                         |
+| [#301](https://github.com/WangPantopus/creator-platform/pull/301) | `2be9c51d63e14d2c9ac4846b0d27404e4cddc241`; `codex/w4-commerce-privacy-settlement-20261003`                                                                  | Genuine export task/EOF/COMMIT, full fixed-purpose catalogue, protected sink/physical abort, retained records/deletion policy, ACK and C10     |
+| [#303](https://github.com/WangPantopus/creator-platform/pull/303) | Product `e7c8f7a3733d2f4026cfee8eed3715bccd63975f`, followed by this documentation-only handoff; branch named above; base #298                               | Current Android/iOS recovery/replacement/configuration/disposal, largest/spoken accessibility, stall timing/races and provider/store lifetimes |
+
+At the 22:43 read, #213/#262/#298/#301/#303 each had four successful jobs and six queued required jobs. Newly pushed #247 had ten queued and one running. Refresh the documentary #303 head and all checks; queued/cancelled/failed jobs are never passes. None of these PRs is merge-ready from this checkpoint. Bodies were updated through the latest cancellation source; verify fresh head/body/CI before action.
+
+The old #298 `658ca175` Android job (run `37156162347`, job `111299857212`) failed before compilation while downloading Gradle 8.9, HTTP502. A targeted rerun was refused403 because the containing run was still running. Original failure and retry remain private. The newer `222017ec` head has its own checks; do not relabel the old failure or broaden/rewrite CI to obtain a pass.
+
+## Actual source repairs completed
+
+All six existing drafts consume the complete original Content held-client control-deadline repair from W1 `23981492357c587c5e1122d9b191d7c1459ef886` / W5 `6dcf7ae9f311673798300dd10a2e74915f7dac4d`. BEGIN/COMMIT/known-safe ROLLBACK preserve a shorter positive numeric or numeric-string original query deadline, capped at 1500ms. The producer file is reused byte-exact; no broader owner graph was copied.
+
+#247/#262/#298/#303 also consume the actual shared uncertainty classifier. #247 reuses the actual generation transaction minimum from W1 `63b841b325489a3a8aeb31bd00912baaa798b36e`; #262 reuses actual publication transaction/scope `f42d14e66f49a01081979ad33a663188e6d31fcd`. Original cancellation-control connection/query budgets remain the shorter original budgets. Wrapped cancellation/transport uncertainty closes/discards and awaits the original source; healthy completed server refusals remain distinct.
+
+The last completed repair is #247. W1 `188bbf07da76d285ec8061932f20cf9ff8a03b72` adds a synchronous getter for the genuine issued **GenerationTerminalScope**, bound to the same original client, returning its original optional signal. W4's whole owner file is byte-identical. In `generation-safety-terminal-settlement.ts`, pre/post checks surround every complete awaited authorization, journal, financial SQL and catalogue operation, including the individual operations inside its catalogue method. Startup has no issued terminal scope. No GenerationTaskScope substitution, new controller, raced callback, SQL, pin or final ordering changes. The complete operation is awaited; this does not bound arbitrary stalled owner callbacks.
+
+#262 similarly surrounds complete original recipient/preparation/catalogue/System/delivery/receipt/ending operations with W1's genuine PublicationTaskScope signal. W1 retains the third final-signature callback position and supplies the optional original signal as the fourth parameter. W3 binding cleanup and the joint last signature/domain gate remain before the sole COMMIT; the getter adds no SQL after removal.
+
+Types, scoped lint/format/diff pass for all repaired source heads. All nine existing backend contracts pass in the matching shared source and again at #247 `2d29e160`; no cases were added. The actual #213 `9185f5ed` backend build passes and its 217 mapped tracked server inputs match. The latest #247 `2d29e160` build passes at 22:43:34–22:43:39 UTC with normal canonical heavy-lock release; all mapped tracked inputs match (75 integration, 218 server, 68 worker). **The held terminal modules are not imported by the default shipped entry points.** These builds establish compatibility and executable provenance, not genuine terminal/publication/task acceptance. Neither new backend build was launched. The preceding busy75 #247 attempt is preserved.
+
+W4's three publication SQL pointers are coherent and unchanged. An earlier coordination message mistakenly attached the worker hash to the consumer filename; that communication error has been corrected with W6. Do not change SQL or expected pins to repair it:
+
+- `schema-fulfillment-publication-consumer.sql`: `b2eecdea88d937fb46018ceee1a4385502d366f3a82a061b3c4d5de5696981f0`.
+- `schema-fulfillment-publication-original-hash.sql`: `a03d24d6ac09ebb2e28bc6f60dc66cf1edfffc4bc6524da743618fc79f1eed23`.
+- `schema-fulfillment-publication-worker.sql`: `1e65d539ea81e7cfd4d003b792940b19aa111eb0f06dbca950b20ce8c31259f2`.
+
+They are under `apps/backend/src/modules/commerce`. W4's original catalogue is byte-identical to closed #236 `c797fdc5`; #236 is consolidated into #262 and closed unmerged with its branch retained. Complete accepted pins and activation stay absent.
+
+## Commerce privacy coordination in flight
+
+W2's genuine existing saved export retry changed Commerce from unavailable hook to a mounted hook error; the public `domain_hook_error` does not expose its original private cause. At original W2 `a938347b`, `server.ts` provided `commerceOwner` but omitted `commercePrivacy`. Real Trust restoration was present. Static source review establishes a necessary missing-descriptor refusal if prior job checks pass; it does not prove that precise private code was the observed UI error.
+
+W8 personally read all six current #301 leaves and published their reuse in existing #200 at `e57581694daab517a5a3a7dd4878db83595bb1c3`, passing the genuine restoration callback. W4 independently compared all six leaves to original #3012be and confirmed byte equality, and read the actual one-line callback delta. W8's administrative read-only review of its two closed canonical61 databases reports exact0087 hashes/predicates, zero scopes and six matching custody comparisons. This is attributed W8 metadata evidence, not a W4 repeat or genuine runtime Task/COMMIT receipt. W2 received the original source prerequisites; its current functional `c3d6918` server still supplies commerceOwner without commercePrivacy. W2's documentation-only successor head is `2d92c0a1cb931fd1876da64958d878e2d21d1e80`.
+
+The complete #301 minimum is:
+
+1. `apps/backend/src/core/query-settlement.ts`.
+2. `apps/backend/src/modules/content/held-client-cleanup.ts`.
+3. `apps/backend/src/modules/commerce/privacy-purpose.ts`.
+4. `apps/backend/src/modules/commerce/financial-export.ts`.
+5. `apps/backend/src/modules/commerce/financial-export-projections.ts`.
+6. `apps/backend/src/modules/commerce/operations.ts`.
+
+The thin current receipt is `artifacts/workstreams/W4/runtime/2026-10-03/commerce-privacy-settlement/README.md`; original installed privacy-wave custody is in `2026-10-02/privacy-live-activation/README.md`. Older W8 #200 `d912` raw-pool/unconditional rollback is not the current #301 minimum; do not duplicate a fix based on that old host.
+
+`COMMERCE_PRIVACY_CONFIGURATION` is an immutable expected0087 catalogue, not an approval or generated authority. No additional review-token API was found. Explicitly supplying it to the existing real Commerce port addresses missing source configuration only. A genuine same-client leased task, original restoration, installed migration/function/ACL/role/trigger checks and all original bookends still have to pass. Pins are migration `0087_w8_privacy_task_commit_fence`, checksum `33e619bfdea66355e1d8d2b90ed2d0389f21ae024fda63e1b984c99aede847ef`, fence `89545999948ddf8a7d237e0298df721426aea055e706e4edc82b60879ce18e6c`, finish `87ca3cb473206101c6590c79c598695cfd2e7e491e14c5e490e3d21a06ff426d`.
+
+The source uses original signal/client/Task/idempotency, finite non-pipelined checkout, repeatable-read, shorter source deadlines, real restoration/0087 checks, actual empty EOF and explicit projections (17 installed, five held). The whole owner is awaited and the sole received COMMIT is required. External writer begin/assertCurrent/write/complete/abort callbacks are still directly awaited without an enforceable protected-sink deadline or qualified atomic publication/physical abort. No full export, deletion, ACK or C10 acceptance follows. USD is the explicitly permitted development currency only; it supplies no Stripe/payment/cost policy or pass approval.
+
+## Personal app evidence and its limits
+
+Frozen application composition `b39d914e3e198403cd236a665dfa18292adfcd5e` retains the complete original W1 #21 `85ac1231` producer, Kotlin `6f985242` whole-response timeout and Swift `50a7a6c` request/resource budget. Commerce retains its actual115 generated operations. Later W4 deadline/classifier changes do not change these native/web application bytes. Named earlier evidence keeps the original backend/source attribution.
+
+- The frozen b39 normal shipping run passes Android37 tasks, normally signed iOS, and webpack/TypeScript web33 pages at 19:42–19:44 UTC; both native signatures verify. It does not qualify the later backend repairs.
+- Personal b39 web / original #213 `b579` API operation passes Spending No limit/reminders off/$0, unsent6.50, correct You navigation, normal same-/other-account replacement clearing the view/draft, Support sign-out clearing/disabling submission and normal fan restoration. All38 Commerce tables/two rows preserve fingerprint `8bc3d0657de89b22d996c25fb02b355d141bf182cbff66df479b1a87941a1b9a`. No financial Save/report/proof replay. Own processes/tabs/ports close normally.
+- Current b39 Android personally reaches You→Spending and Requests→Spending with preserved state. Studio mirroring failed because this CLI launch omitted `-qt-hide-window`; the specifically authorized owned5564 ADB fallback was used. Night command acknowledged, but the settled frame was lost during closure. **No current Night appearance, draft/recovery, largest-text or spoken pass.** TalkBack was not enabled in this window.
+- Android restored original Night no/font1/accessibility0/services absent, but normal shutdown did not settle. Own SIGTERM/SIGKILL were needed; final physical absence and exact release were **10.4 seconds late** against the hard deadline. Preserve that timing failure. Future windows need at least90 seconds for restoration/closure and fresh source/configuration assertions.
+- Installed Studio code confirms embedded mirroring requires `-qt-hide-window`. Its installed CLI supports `-grpc 8564 -grpc-use-token -idle-grpc-timeout 300`; use the original owned AVD, CPU2/RAM2048/lowram/no snapshots, bounded leases and actual CUA guest state. This is a diagnosis, not an already qualified W4 pane operation. Other streams' pane success is not W4 acceptance.
+- Earlier named iOS source has personally operated Light/Night/unsent draft/cold discard and real limit maturation evidence. Largest text exposed shared banner/footer gaps. No personal current b39 iOS operation is established by its signed build. Read the exact dated `ios-personal-return`, `original-limit-maturation`, `commerce-original-session` and `native-original-session` receipts; do not collapse historical and current results.
+
+## Preserved resources and restart conditions
+
+Owned database `/creator-platform-w4-20261001` is stopped. ID `b8ad399d7c8f77d66a755ab61e9e91b2131a78125c852a28b6c004345de4f230`, created October1 20:36:19 UTC, pgvector/pgvector:pg17, loopback55444, CPU1/RAM768. Volume `adc1d79f12fa95ce1320474a05d8cdf303731bc2553704b790fe9740059836bb` is retained. No peer database/container/volume was restarted or removed by W4.
+
+After W8's shared-engine recovery, W4 normally restarted this exact container only, performed a read-only custody check and normally stopped it at 21:28:13 UTC with zero other clients. Against the older18:17 snapshot, ledger/schema/roles/security/sequence match; whole data changes101→111 rows after recorded normal issuer activity. There is no exact full preincident20:49 data snapshot, so no full preincident preservation claim. Current 163-table/111-row digest is `c893482025db017921fb885d24f4466f898f0987ab8763248068de224bb6950f`; Commerce38/two-row digest remains8bc3d065. Canonical ledger remains61. Review-only proposal containers described in older handoffs were disposed; recreate only exclusively owned isolated qualification copies when needed.
+
+Fresh read at 22:46–22:48 UTC confirms own database stopped, API4104/web3004 absent, emulator-5564 absent and own iOS `BC8F4A5B-6F9E-4A89-813B-FF4DD8572271` Shutdown; original W4 slots2/3 released. The shared GUI was subsequently acquired by **W7 at22:47:55 UTC** for its own finite shipping operation. That is a peer lease, not a W4 hold. Do not release it. No idle W4 reservation exists; coordinate the actual live GUI/device queue before launch.
+
+Current ignored backend `dist` is the normally built #247 `2d29e160` product. Its default entry points omit held terminal modules. The prior #213 `9185` bundle is preserved under private `backend-9185-before-terminal-build`; older b579 server/map are under `api-b579-historical-preserved`. Private `api.env` still had the earlier release label at checkpoint. **Before any launch, choose the intended actual source, build it normally, privately update its release label and verify bundle/source/configuration equality.** Do not launch stale dist under a newer branch label. Existing private guards assert old source hashes and deadlines; do not blindly reuse them or overwrite their receipts. Preserve source/product-specific outputs and failures.
+
+## Evidence locations for the next agent
+
+Tracked thin records are under `artifacts/workstreams/W4/runtime/2026-10-03/`, especially `open-pr-review`, `account-original-settlement`, `generation-safety-terminal`, `fulfillment-publication-original`, `fulfillment-publication-worker`, `commerce-privacy-settlement`, `commerce-original-session` and `native-original-session`.
+
+Private records under `/private/tmp/creator-platform-w4-f402` include:
+
+- `content-original-deadline-consumption-2142.json`, `content-original-deadline-checks-2143.json`.
+- `original-transaction-cancellation-consumption-2213.json`, `original-cancellation-scoped-checks-2219.json`.
+- `terminal-original-signal-2d29-source-checks.json`, `terminal-2d29-backend-shipping.json` (busy75), `terminal-2d29-backend-shipping-retry-2247.json` (actual successful run), `terminal-2d29-bundle-source-equality.json`.
+- `account-9185-backend-shipping.json`, `account-9185-bundle-source-equality.json`.
+- `owned-pr-current-2243.json`, `open-pr-audit-20261003/open-current-2243.json`, original body mutation/readback receipts and the final handoff receipts. The filename suffixes are identifiers; use each embedded actual timestamp.
+- `pr298-658-original-runtime-download-failure-retry.json` and original Android download-failure log.
+- `current-b39-web-personal-operation.json`, `current-b39-web-window-receipt.json`, `current-b39-android-personal-operation.json`, `current-b39-android-window-receipt.json`, `installed-studio-embedded-diagnosis.json` and the matching shipping/source/signature records.
+- `second-engine-recovery-qualified-limits.json`, `recovered-custody-second-engine-2124.json`, `pre-handoff-retained-branches-2252.json`, `pre-handoff-own-resources-full-2252.json`.
+
+Routine/raw diagnostics stay private. The final branch/source/PR/body/resource verification is recorded after this document is committed; discover its `handoff-final-*` files. Retain initial invalid/limited receipts rather than silently replacing them. In particular, the first final inventory selector returned zero branches; only the later explicit sixteen-ref inventory establishes equality.
+
+## Seven existing peer chats
+
+Human-authorized coordination targets are:
+
+| Stream | Chat ID                                | Current owned open PRs / follow-up                                                                                                                       |
+| ------ | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| W1     | `01a0ff21-c27d-7b62-9d6e-870b4eb44c19` | #21/#22/#26/#28/#29/#35/#42/#48/#49/#51/#66/#74; original issuers/signals, shared Swift budget/session/Trust producer; terminal188 consumed              |
+| W2     | `01a0ff22-a30c-7da0-8d71-d061cb1deb83` | #132/#279; genuine saved privacy export and real Commerce descriptor composition, Studio/generation owners                                               |
+| W3     | `01a0ff23-0f0c-7852-8d0f-c3e72e8562ce` | #36/#63/#182; actual terminal/System/Conversation owners, privacy/native operation; #299/#280 consolidated closed                                        |
+| W5     | `01a0ff24-49de-7a91-95e9-ea6f58bce9c8` | #288/#302/#304; current Team edit-denial UI fix, original publication/full-await signal consumer; #293 duplicate closed                                  |
+| W6     | `01a0ff24-a97e-79a2-8886-3fe67465bca3` | #282/#284/#289/#305; actual media publication/file/owner signal checks, discard/ACK and real call provider                                               |
+| W7     | `01a0ff25-62ae-7062-8e4c-125a04e9c33e` | #31; settings/session/native largest-text/spoken work, actual qualified-read producer; current shared GUI owner at checkpoint                            |
+| W8     | `01a0ff27-9473-7a92-bfa5-170d8cfc8fe5` | #131/#145/#192/#200/#201/#242; sole registry/activation owner, original Trust/publication/privacy catalogue/Task, #301 reuse/independent metadata review |
+
+Use compact `wait_threads` snapshots and fresh published source, not repetitive full-history polling. W2/W3/W8 are also at founder-requested successor checkpoints; read their final handoffs and confirm any replacement chat IDs before coordination. W2 published `docs/workstreams/handoffs/W2-creator-ai-20261003-mac-studio.md` plus its continuation prompt. W3's actual functional source is `4d085a8f9339156a36a4cf0c8dd547837441e9ae`; its existing182 `472ef982` has an identical tree and immutable base77ec4cfb. Its own GUI/device/API/web are closed, and current saved export still has four complete/four blocked domains. These are peer-attributed facts, not W4 app acceptance. Do not start duplicate chats. No permission for arbitrary third-party Slack/email follows from this coordination.
+
+## Next actions and remaining scope
+
+1. Verify clean/pushed source, fetch main, refresh all37 PR dispositions and exact head/body/required checks. Continue oldest-first owner review. Consolidate only actual duplicates while preserving original source/acceptance; do not merge a draft solely because builds or no-scope refusals pass.
+2. Continue #301 with W8's independently reviewed existing #200 host and W2's original saved export. Personally read current source/dependencies and verify genuine task/restoration/EOF/sole COMMIT, then protected sink/physical cleanup where available. Do not fabricate a new job or claim private error codes from public UI.
+3. Review the actual complete #213 Actor/client command and fault paths, #247 terminal graph and #262 publication composition with W1/W2/W3/W5/W6/W8. Finish independently executable source/metadata/fault work, preserving original SQL, missing pins and current genuine-owner gates. Qualify populated origin behavior separately from W4's empty dataset and retain original0157 static trigger diagnostics.
+4. After the actual peer GUI/device release, personally operate current source on owned web/Android/iOS. Finish navigation, original-session replacement/recovery/disposal, unsent draft/configuration, Night, largest text and authorized spoken access. Measure genuine stall behavior; current builds do not establish p95. Restore settings/labels, close within the hard deadline and release exact own leases.
+5. Continue the nine packages/R01–R15: actual Approval/delivery/signature composition, audience/tenure, packet/capacity/decisions, payment/reconciliation/ledger, stores, pass/pool, public sharing/credits, privacy/retention/C10 and all artboards. Missing external inputs block dependent acceptance only; continue independent fixes and integration.
+
+Human/provider dependencies still include real Stripe test project/catalog/webhook/collection configuration, Apple/Google store projects, genuine externally verified creator/passkey, W6 real call provider, W7 actual qualified-read evidence, business decisions Q03/Q04/Q08/Q16, explicit approved publication minimum2–100, finite C10 and retained-record/deletion/unknown-cost rules. Existing development cost policy is not business approval. Do not re-ask broad credential questions, invent defaults or infer successful payments/signatures from an unavailable gate.
+
+## Planning estimate requested by the founder
+
+**Rough estimate: 60% complete, with a plausible55–65% range, and approximately40% remaining.** This is a judgment about implementation plus review/verification effort, not a measured fraction of completed packages, a release claim or a percentage derived from closed PRs. Most source/state transitions exist and many narrow app journeys are proven; complete real provider/authority/financial/C10 and current native acceptance remain substantial.
+
+Approximately **two-thirds of the remaining effort** can proceed without new human input: review/reuse/source fixes, owner integration, existing checks/builds, metadata/fault qualification, real existing development-job operation and authorized app/device verification. The remaining third depends on the specific provider/project/verified identity/policy inputs above, plus genuine cross-owner producers. Peer coordination remains agent work. Exact division can change when current source/runtime review reveals defects. All nine full-package/R01–R15 acceptance boxes remain open.
