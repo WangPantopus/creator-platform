@@ -1,5 +1,13 @@
 # Existing PR review — October 3, 2026 UTC
 
+## Current native operation and reviewed main — October 3, 2026 12:26 UTC
+
+Current Android personally passes the named Light Requests and Night direct You return paths, actual unsaved decimal keyboard/cold discard and preserved original spending state through supported CUA Studio mirroring. All38 commerce tables/two rows match the original fingerprint; exact own shutdown/GUI+slot2 release finished12:20:32UTC, with W3 next. [Actual source, controller recovery and remaining acceptance](../android-personal-return/README.md) supersede the earlier controller limitation without erasing its failed attempt. Signed current iOS build remains preparation; TalkBack and full accessibility are still open.
+
+All13 active W4 branches and shared main normally contain captured `9e7667c61e4d9c4f8dd34357baff23e5d2c26f93`, with local/pushed heads matching, no merge conflicts and the user workbook hash preserved. The complete incoming PR291 recorder diff and surrounding source were personally read: actual denied microphone permission refuses before capture, unsupported queries retain the normal prompt, and the existing cancellation generation is rechecked. Other application/package/config/infra/script bytes, original SQL and registry remain unchanged. This source review does not borrow W6's microphone operation. Current retained heads are213 `b4710049b289adf9763783949e9e78882dbf38f8`,236 `8492e11c62095ed9e56c82f01561c06cfa7cf7bd`,247 `ce423847484425d07072d57515883b9ab29fcb1a` and262 `be8725e6a2449a902191fd41fe95a7d99e0a95c4`; their complete factory/positive/C10 gates and absent accepted pins remain open.
+
+The fresh12:22 inventory contains37 open/draft PRs, still beginning with21. Distinct W5 native Team293 remains draft and unmounted pending owner integration/operation. W2's292 changed from documentation to functional keyboard recovery during review; its earlier3952 CI/source review does not qualify the later code head. Two broken evidence links found independently by W4/W7 were corrected by W2. All seven existing owners retain their exact source and personal acceptance custody. Existing213/236/247/262 remain draft; no full commerce package or R01–R15 row is checked off.
+
 ## Current native preparation and controller limit — October 3, 2026 11:39 UTC
 
 Current iOS runtime source equals main132bc055: ordinary shipping build passes, deep/strict signature verification passes, executable SHA256 `6fe43d37c6d4c38f7af7b5a128fd2b34984f84cbde0dae53e90e697e82f141df`, and the actual artifact points to owned API4104. The first busy75 refusal is retained and the successful heavy lease normally released. Current personal iOS operation is still pending; prior named-source iOS acceptance remains historical.
