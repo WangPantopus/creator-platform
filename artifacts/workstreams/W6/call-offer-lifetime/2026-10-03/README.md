@@ -1,0 +1,47 @@
+# W6 web call-offer lifetime — 2026-10-03
+
+W6 remains incomplete. This is personally implemented web account/view lifetime and refusal/recovery evidence; genuine scheduling, provider calls, human recordings and publication remain absent.
+
+## Source and contract
+
+Product commits `0edaf17b045666b07000f442d813ef945622d1fd` and `f54657d2a23cf11f01dcf723831f6d3003ad6a24` were normally integrated through fetched main `b264136bc6df06534f7adf0212e4345ca075e7ec` at operated source `1078445fd71206e517184c5dee09fcd8c0496740`. Shared main was safely fast-forwarded to that fetched main, preserving the untracked workbook. Only this active W6 branch is updated; peer/historical branches and the preserved private proposed61 checkout are untouched.
+
+Read the actual `CallOffersSchema`, `CallSessionSchema`, `SelectTimeSchema` and backend `SessionService.offers/expireOffers/select`. The original creator schedule advisory lock, current W4 commitment authorization/version, offer/version/slot/deadline checks and retained idempotency remain backend authority. No signature, issuer, worker, SQL, payment or provider authority is manufactured or enabled.
+
+The call page validates all three destination UUIDs, restores the genuine W1 session with its original offer return destination, and mounts original identity/media boundaries keyed to the actual account/session/view. Offer reads and selection use actual expected-account headers. The offer view now bounds requests and freshness, conceals/aborts on background/navigation/unmount, uses actual expiry plus elapsed-time bounds, revalidates the complete original offer/slot before submission, retains the actual idempotency key across unknown outcomes, and checks returned participant/commitment/time before navigation. Selected-session recovery uses the actual returned session ID. Positive scheduling/DST/concurrent/expiry/navigation callback paths remain compiled-only because offers are zero.
+
+Actual API outage exposed recording-specific transport copy on the call-offer screen. The second product commit fixes that observed failure to the existing call-times recovery copy and was repeated in both dev and production UI. No new unit tests or coverage deliverables were added. Qelvora remains configured by `config/brand.json`.
+
+## Personally operated application
+
+Against the original canonical61 app clone `creator_w6_privacy_app_20261002`, the dev IAB flow operated genuine W1 development UI sign-in/refresh, product logout, creator/fan account switch, offer-query return preservation, repeated `calls_unconfigured`503, actual API stop/cold refusal/restart/recovery, and W4 Requests navigation/refusal. These are synthetic development identities, not human creator or production identity evidence.
+
+The shipping Next production UI was independently operated in an isolated Playwright Chromium context at390×844 Night. The authorized authenticator consumed actual W1 continuation/completion responses and the original issuer token/session; no Actor or authority object was constructed. Actual fan and creator offer GETs carried their respective expected-account IDs (`100…002` and `100…001`), returned503 and exposed no selectable times or Confirm action. Reload, Requests → real commerce-unconfigured refusal, browser history return, warm outage, cold retained-account Retry and actual same-backend recovery were viewed. Actual issuer logout produced backend401 and concealed the private offer; the original offer return query persisted. Actual creator account and fan restoration were viewed, and the last owned issuer session was logged out. Selection POSTs were zero.
+
+Production sign-in and product account mutations are **not accepted**: local HTTP production configuration correctly refuses logout403 because W1 requires an HTTPS application origin. Production logout concealment above used actual issuer logout through the authenticator; dev product logout passed separately. The first production account locator incorrectly expected a standalone handle; it was corrected to the actual rendered text. Failed attempts and diagnostics remain local.
+
+Dev outage/history produced React script/client and negative performance-measure diagnostics. Repeated production history/outage/recovery had zero uncaught `pageerror` events; expected HTTP503/401 and cold SSR500 remain logged. Production React441 was the handled Server Components exception during the actual cold outage ([official decoder](https://react.dev/errors/441)); the actual retained-account recovery screen and Retry were viewed. This does not establish universal absence of framework diagnostics or full accessibility.
+
+Final read-only administrative inspection at `2026-10-03T07:24:33.822Z` found61 migrations; messages/thread-media/publications/offers/calls/admissions all0; three prior creator-photo assets remain deleted/version2. The unsigned Note remains draft/version3. The seed thread's `human_active`/epoch0 is not genuine creator arrival/handback evidence. The independently upgraded target remains connection-limit0 with `creator-platform:restored-traffic-closed`. No migration, purpose, publication worker, provider or money operation was enabled. Ordinary creation TTL remains an unapproved development policy proposal.
+
+## Build, hashes and custody
+
+Installed Next16.3.7 bundled CLI/component docs were read. Scoped web/backend types/build, ESLint, formatting, canonical generation114 operations/12 resources and diff checks pass. Guarded shipping webpack build at `1078445f` compiled in4.4s, TypeScript4.8s, generated33 pages; build ID `j7ueRSt86WDxmXxzwTlur`. Backend bundle was built at `b7a980d8` before the subsequent docs-only main merge; application backend source is identical. Build/HTTP success alone is not application acceptance.
+
+| Local evidence                          | SHA-256                                                            |
+| --------------------------------------- | ------------------------------------------------------------------ |
+| Shipping call page JS                   | `154c655e5e9af76e7f3c0fe19fa85b8de104d11d13d3966343c358958fc184a4` |
+| Backend server bundle                   | `ba97f4cab81c08e5b60880eb8cb4883a49d2cd64f5d092b845a2a89d0104f6c0` |
+| Final private production browser record | `c3f8967aa688aa431f27de512976997e77a6c17c429d0359018b85774c61218c` |
+| Final private database inspection       | `b41b054eaaa048d7a88a678cfaaff85b50c6679dcea72aa9d482f3829d0e1144` |
+| Exact private closure receipt           | `5adf2644e5bfc2ed82307f168cc23c2a2fb68a28230d846e9b398f63c2191e10` |
+
+Routine screenshots/JSON/logs/builds remain private in `/tmp/qelvora-w6-runtime-20261001`. The one owned production launcher left its old child alive on termination; exact old process-group/cwd/nonce verification identified and stopped only that owned group, then launcher shutdown was repaired locally to include its children. The corrected production run used group5783. Final API34655, web5773/group5783 and original owned container `e1d9f59f…33a5a7` are stopped; ports3006/4106/55446 are closed. Runtime lease nonce `2416e98b-5a1c-4394-b4ca-70cb2ce52668`, dev16777232/inode243759032 was verified/released at `2026-10-03T07:25:30Z`. Original database/volume/backups/tools/secrets remain preserved.
+
+The isolated Chromium PID34527 closed and its exact nonce/dev/inode browser lease released. No native device was booted. A peer W1 heavy slot was preserved; W6 waited and subsequently acquired/released its own slot. Two earlier owned IAB tabs6/7 could not be closed or navigated because Browser Use URL policy blocks the browser's autogenerated `data:` network-error page. They are **not claimed closed**; user/peer tabs were untouched. The generated Next output-path declaration was restored to canonical after stopping the server.
+
+PR265 normally merged exact `832246cb` at `a1fa9367`; PR273 normally merged exact `8847eadd` at `f54f5a7d`. Current inspection now shows their web/backend checks and Android runtime successes; remaining visual/native foundation jobs are queued, with the duplicate PR273 Android runtime still in progress at inspection. Queued/in-progress are not passes. This increment's current-head hosted CI is inspected after push.
+
+## Remaining gates
+
+Genuine human microphone/passkey media and W3 original recording association, original W1/W4/W5/W6 publication preparation/positive/LAST-final qualification and W8-only activation, production signer/trust certificate, provider credentials/history/admission/egress, actual captured/signed C06 scheduling and C07 creator-authorized handback/outcomes, incoming push/physical audio, complete consent/deletion/archive/retention/export and licensed AI/audio/design/accessibility/latency/cost acceptance remain open. The human says none of the external inputs are available. No synthesized voice/sample keys or replacement authority is used; independent implementation continues personally.
