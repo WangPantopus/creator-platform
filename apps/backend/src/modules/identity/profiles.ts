@@ -6,10 +6,16 @@ import {
   ProofInputSchema,
   ProofSubmitSchema,
   TeamInviteSchema,
+  TeamRolesUpdateInputSchema,
 } from "@qelvora/api";
 import type { Actor } from "./adapter.js";
 import { identityTransaction } from "./transaction.js";
 import { DomainError, invariant } from "../../core/errors.js";
+import type { CreatorRestriction } from "./creator-scope.js";
+import {
+  holdCurrentRequestSession,
+  assertHeldCurrentRequestSession,
+} from "./request-authority.js";
 
 const handle = (value: string) => value.replace(/^@/u, "").toLowerCase();
 export interface VerificationDecision {
@@ -34,7 +40,12 @@ export interface CreatorProofProjection {
   reason: string | null;
 }
 export class IdentityProfiles {
-  constructor(private readonly pool: Pool) {}
+  constructor(
+    private readonly pool: Pool,
+    private readonly team?: Readonly<{
+      assertCreatorAllowed: CreatorRestriction;
+    }>,
+  ) {}
   async view(actor: Actor) {
     return identityTransaction(this.pool, actor.accountId, async (client) => {
       const fan = await client.query(
@@ -325,6 +336,89 @@ export class IdentityProfiles {
         "UPDATE creator.team_invitation SET revoked_at=now() WHERE creator_id=$1 AND account_id=$2 AND revoked_at IS NULL",
         [creatorId, accountId],
       );
+      return { done: true as const };
+    });
+  }
+
+  /** Roles do not issue creator identity or authorize a named personal act. */
+  async updateMemberRoles(
+    actor: Actor,
+    creatorId: string,
+    accountId: string,
+    input: unknown,
+  ) {
+    const body = TeamRolesUpdateInputSchema.parse(input);
+    const assertAllowed = this.team?.assertCreatorAllowed;
+    if (typeof assertAllowed !== "function")
+      throw new DomainError(
+        "team_authority_unconfigured",
+        "Current creator authority is unavailable for this team.",
+        503,
+      );
+    invariant(
+      accountId !== actor.accountId,
+      "team_creator_identity",
+      "The creator's identity cannot be replaced by team roles.",
+    );
+    return identityTransaction(this.pool, actor.accountId, async (client) => {
+      const held = await holdCurrentRequestSession(client, actor.accountId);
+      invariant(
+        held.actor === actor,
+        "current_request_actor_required",
+        "Reopen this team with your current account.",
+      );
+      await client.query("SELECT set_config('app.creator_id',$1,true)", [
+        creatorId,
+      ]);
+      // Actual same-client restoration/creator negatives precede positive locks.
+      await assertAllowed(actor, creatorId, client);
+      await assertHeldCurrentRequestSession(held, client);
+      const creator = await this.requireCreator(client, actor, creatorId);
+      invariant(
+        creator.verification === "verified" && !creator.recovery_required,
+        "creator_verification_required",
+        "Current creator verification and signing recovery are required.",
+      );
+      await client.query(
+        "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+        [`team:${creatorId}:${accountId}`],
+      );
+      const membership = (
+        await client.query<{ roles: unknown }>(
+          "SELECT roles FROM creator.team_membership WHERE creator_id=$1 AND account_id=$2 AND revoked_at IS NULL FOR UPDATE",
+          [creatorId, accountId],
+        )
+      ).rows[0];
+      if (!membership)
+        throw new DomainError(
+          "team_member_unavailable",
+          "This member no longer has access. Refresh the team before continuing.",
+          409,
+        );
+      const roles = TeamRolesUpdateInputSchema.shape.roles.parse(
+        membership.roles,
+      );
+      const same = (left: readonly string[], right: readonly string[]) =>
+        [...left].sort().join("|") === [...right].sort().join("|");
+      if (!same(roles, body.roles)) {
+        if (!same(roles, body.expectedRoles))
+          throw new DomainError(
+            "team_roles_changed",
+            "This member's roles changed. Refresh the team and review them before saving.",
+            409,
+          );
+        await client.query(
+          "UPDATE creator.team_membership SET roles=$3 WHERE creator_id=$1 AND account_id=$2 AND revoked_at IS NULL",
+          [creatorId, accountId, [...body.roles].sort()],
+        );
+      }
+      // Also on a retry: an unaccepted invitation must not restore old roles.
+      await client.query(
+        "UPDATE creator.team_invitation SET revoked_at=clock_timestamp() WHERE creator_id=$1 AND account_id=$2 AND accepted_at IS NULL AND revoked_at IS NULL",
+        [creatorId, accountId],
+      );
+      await assertAllowed(actor, creatorId, client);
+      await assertHeldCurrentRequestSession(held, client);
       return { done: true as const };
     });
   }
