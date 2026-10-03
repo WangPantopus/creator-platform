@@ -1,5 +1,48 @@
 # W6 PR review follow-up — October 3, 2026
 
+## Current retained backlog and personal qualification — 19:53 UTC
+
+Fresh GitHub inventory has38 open/all38 draft, oldest21/85ac1231. The renewed43
+backlog reduced through four owner-proven duplicate closures299/280/236/296
+(unmerged, source retained) and docs-only295 normally merged into original21
+atca8f796bc2e42877953d64d71eb562bfc8b66c00/19:28:56Z. W6 independently
+inspected295's eight documentation-only paths and actual merge target. This is
+not a backlog main merge or application acceptance. W1 first retargeted existing
+282/288/289/298/305 to original21, retaining all functional296 source before its
+19:24:27Z closure. Historical entries below retain their dated counts/pins.
+
+| Owner | Retained PRs, oldest first          | Current action/acceptance limit                                                                                                                                                                                                             |
+| ----- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| W1    | 21,22,26,28,29,35,42,48,49,51,66,74 | Preserve unique35 and historical49/51; original21 contains full original-session graph/native transport. Current relevant application and CI qualification still held.                                                                      |
+| W2    | 132,279                             | Distinct original policy bindings retained;295 documentation reconciled into original21. Actual original generation/privacy/C10 remains held.                                                                                               |
+| W3    | 36,63,182                           | Original continuation repairs retained; recording association/native/current positive/private gates remain open.182 remains immutable comparison custody.                                                                                   |
+| W4    | 213,247,262,298,301,303             | Preserve unique original settlement/scheduling/financial/task/native producers; current source/build does not prove genuine provider/task/COMMIT/C10 acceptance.                                                                            |
+| W5    | 288,293,302,304                     | Reuse exact canonical shorter-original control-budget leaf; current task/review/worker publication and native positives remain held.                                                                                                        |
+| W6    | 282,284,289,305                     | Personally qualify retained increments; integrate original-client ingestion and discard into existing305. Native282 current transport shipping/install pending;284 preview adoption/encode-error and289 genuine recording-sign remain open. |
+| W7    | 31                                  | Retain distinct composed source; current relevant application/private/positive/accessibility and CI gates remain open.                                                                                                                      |
+| W8    | 131,145,192,200,201,242             | Preserve distinct purposes and exact original caller/worker/restore contracts. W8 alone owns registry activation; original wave and privacy/C10 positives remain held.                                                                      |
+
+Personally captured current-head CI:282/273c7955 four SUCCESS/six QUEUED;
+284/bf2a95f1 four SUCCESS/five QUEUED/one IN_PROGRESS;
+289/473cd8bb four SUCCESS/six QUEUED plus five obsolete CANCELLED;
+305/a47bb7e8 four SUCCESS/six QUEUED. No complete pass or current main merge
+candidate is established. Queue progress is not accepted application evidence.
+All six active owned W6 branches contain freshly fetched main
+5c08634b7542fef95dd6c176030a785845250c62. Shared/peer/protected proposed61 and
+numeric stash remain untouched.
+
+W6 personally shipping-built/operated frozen29f (full retained305/discard,
+reviewed original21/50a and exact W5 control-budget leaf). Real dedicated-worker/
+original-discovered-family/Trust-denial BEGIN/COMMIT acknowledgement loss closes
+and discards the original connection at its shorter100ms budget, with no SQL
+afterward; final real backend PIDs are absent. Actual corrupt/EICAR ingestion
+rejection, originalSID canonical DELETE202 and durable deletion leave seven
+photos deletedv2/no jobs/every exact storage directory absent. Note19/business0/
+protected connection-limit0/ownerclosed retained. Exact own runtime normally
+closed19:52:04Z; results sent to W5/W8. No new PR/test, human/signing/task/provider/
+publication/C10/native positive is claimed. See the
+[exact source, operation and closure](../../../artifacts/workstreams/W6/ingestion-settlement/2026-10-03/README.md).
+
 ## Current retained-head qualification — 19:00 UTC
 
 Fresh GitHub inventory still40/all40 draft. Oldest21 now e446d423 incorporates
