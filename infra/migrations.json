@@ -902,8 +902,9 @@
       "owner": "W8",
       "version": "0200_w8_fulfillment_view_denial",
       "path": "apps/backend/migrations/0200_w8_fulfillment_view_denial.sql",
+      "sourceSha256": "7c0fabdb974c9fcf46bd4c7fe70ea0dd11ceec87348d81962e1506fd9983024c",
       "state": "reserved_unapplied",
-      "reason": "Original-recipient Trust negatives; depends on actual0178 fulfillment plan and0199 genuine viewer metadata issuer. Exact concrete viewer/session/client/XID/plan/revision/original-recipient binding is pending owner source review. No fabricated family/Actor/nonce, NULL-packet permission, raw question/body or successful callback. Allocation only; current restoration and all-original negative custody remain required before positive viewing."
+      "reason": "Implemented distinct original-recipient viewing negatives under actual0199 private issuer and original0178/0202. Closed rollback: six explicit compiler functions without diagnostics, twenty actual catalogue drift refusals, exact private ACL/wrong-login/NULL refusal, matching hand-installed ledger still inactive and all six canonical61 custody hashes unchanged. Prepared genuine host/issuer/WeakMap scope callback holds current same-client restoration, complete2-100 originals, viewer/fan/owner/creator sorted nonwaiting negatives and full source/tuple bookends. Actual W4 combined catalogue, executable activation, signed/financial/consent originals, positive composition and personal three-app acceptance remain required. No caller fan list, fabricated Actor/nonce, NULL-packet permission or raw question/body."
     },
     {
       "id": "0201",
