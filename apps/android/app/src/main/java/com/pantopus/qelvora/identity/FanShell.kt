@@ -43,16 +43,31 @@ private val requestCaptureIssuer = Any()
 class FanSessionRequestCapture private constructor(
     val client: CreatorAPIClient, val expectedAccountId: String,
     val sessionId: String, val destination: String,
+    private val trustReady: () -> Boolean,
     private val current: suspend () -> Boolean,
 ) {
     @androidx.annotation.MainThread
     suspend fun isCurrent(): Boolean { currentCoroutineContext().ensureActive(); return current() }
+    /** Keep the original issuer/client, bounds and cancellable operation. */
+    @androidx.annotation.MainThread
+    suspend fun trustBytes(path: String, body: ByteArray? = null, binary: Boolean = false): CreatorAPIBinaryResponse {
+        check(isCurrent() && trustReady()) { "Refresh your account before continuing." }
+        try {
+            val response = client.trustBytes(path, expectedAccountId, sessionId, body, binary)
+            if (!isCurrent() || !trustReady()) throw kotlinx.coroutines.CancellationException("Your original account view changed.")
+            return response
+        } catch (failure: Exception) {
+            if (!isCurrent() || !trustReady()) throw kotlinx.coroutines.CancellationException("Your original account view changed.")
+            throw failure
+        }
+    }
     companion object {
         internal fun issue(issuer: Any, client: CreatorAPIClient, accountId: String,
                            sessionId: String, destination: String,
+                           trustReady: () -> Boolean,
                            current: suspend () -> Boolean): FanSessionRequestCapture {
             check(issuer === requestCaptureIssuer)
-            return FanSessionRequestCapture(client, accountId, sessionId, destination, current)
+            return FanSessionRequestCapture(client, accountId, sessionId, destination, trustReady, current)
         }
     }
 }
@@ -94,7 +109,8 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
             destination == from && session?.accountId == active.accountId && session?.sessionId == active.sessionId &&
             !purgingPrivateState && !localPurgeFailed && !rotatingCredential
         val capture = FanSessionRequestCapture.issue(requestCaptureIssuer,
-            CreatorAPIClient(origin, maximumResponseBytes = maximumResponseBytes, timeoutMs = timeoutMs) { credential }, active.accountId, active.sessionId, from) {
+            CreatorAPIClient(origin, maximumResponseBytes = maximumResponseBytes, timeoutMs = timeoutMs) { credential }, active.accountId, active.sessionId, from,
+            trustReady = { !checkingSession && !refreshingSession && !busy && error.isEmpty() }) {
             currentCoroutineContext().ensureActive()
             matches() && runCatching { storage.read() }.getOrNull() == credential && matches()
         }
@@ -265,7 +281,12 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     private fun message(failure: Exception): String = if (failure is CreatorAPIError) runCatching { Json.decodeFromString<APIError>(failure.body).error.message }.getOrDefault("This action could not complete. Reconnect and try again.") else "This action could not complete. Reconnect and try again."
 }
 
-class FanFeatureRegistration(val matches: (String) -> Boolean, val allowsSignedOut: (String) -> Boolean = { false }, val screen: @Composable (FanSession) -> Unit)
+class FanFeatureRegistration(
+    val matches: (String) -> Boolean,
+    val allowsSignedOut: (String) -> Boolean = { false },
+    val rootObserver: @Composable (FanSession) -> Unit = {},
+    val screen: @Composable (FanSession) -> Unit,
+)
 
 @Composable
 fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/home", features: List<FanFeatureRegistration> = emptyList(), destinationDelivery: Long = 0L, notificationID: String? = null, onNotificationConsumed: () -> Unit = {}) {
@@ -283,6 +304,9 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
         }
         FanSession(context, baseURL, restored ?: returnTo)
     }
+    // Observe genuine boundaries while a restored/private feature is unmounted.
+    // Feature observers issue no session authority and serialize no private data.
+    features.forEach { it.rootObserver(model) }
     val currentReturn by rememberUpdatedState(permittedReturn)
     val currentDelivery by rememberUpdatedState(destinationDelivery)
     DisposableEffect(model, registry) {
@@ -336,12 +360,20 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                 Button("Cancel", ButtonVariant.QUIET) { model.choosingActor = false }
             }
             model.session == null && features.any { it.matches(model.destination) && it.allowsSignedOut(model.destination) } -> key(model.destination, destinationDelivery) { features.first { it.matches(model.destination) && it.allowsSignedOut(model.destination) }.screen(model) }
-            model.session == null && model.hasSavedCredential -> Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            model.session == null && model.hasSavedCredential -> Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 BasicText(QelvoraCopy.text(if (model.checkingSession && model.error.isEmpty()) "growthLoading" else "accountUnavailableTitle"), style = qText("display-md").copy(color = qColor("ink")), modifier = Modifier.semantics { heading() })
                 BasicText(QelvoraCopy.text("accountUnavailableBody"), style = qText("body").copy(color = qColor("ink-muted")))
                 Button(QelvoraCopy.text("retry"), ButtonVariant.SECONDARY, block = true, disabled = model.busy || model.checkingSession) { scope.launch { model.refresh() } }
+                if (features.any { it.matches("/trust/crisis") && it.allowsSignedOut("/trust/crisis") }) {
+                    Button("Crisis help", ButtonVariant.QUIET, block = true) { model.open("/trust/crisis") }
+                }
             }
-            model.session == null && model.checkingSession -> BasicText(QelvoraCopy.text("growthLoading"), style = qText("body").copy(color = qColor("ink")), modifier = Modifier.padding(16.dp))
+            model.session == null && model.checkingSession -> Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                BasicText(QelvoraCopy.text("growthLoading"), style = qText("body").copy(color = qColor("ink")))
+                if (features.any { it.matches("/trust/crisis") && it.allowsSignedOut("/trust/crisis") }) {
+                    Button("Crisis help", ButtonVariant.QUIET, block = true) { model.open("/trust/crisis") }
+                }
+            }
             model.session == null -> Welcome(returnTo = model.destination, showContext = model.arrival != null, contextSource = model.arrival?.source, contextTitle = model.arrival?.title, bodyCopy = model.arrival?.let { "Every message says who wrote it: ${it.creatorName}'s AI, ${it.creatorName}, or their team. You'll always know which." } ?: "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext = model::removeArrival, onContinue = { scope.launch { model.beginSignIn() } })
             model.session?.fan == null && features.any { it.matches(model.destination) && it.allowsSignedOut(model.destination) } -> key(model.session?.accountId, model.destination) { features.first { it.matches(model.destination) && it.allowsSignedOut(model.destination) }.screen(model) }
             (model.session?.fan == null && ApplicationDestination.requiresFanProfile(model.destination)) || model.destination == "/onboarding/handle" -> HandleForm(model)

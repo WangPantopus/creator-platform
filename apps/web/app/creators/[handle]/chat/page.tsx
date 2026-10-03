@@ -4,9 +4,10 @@ import { Button, Notice } from "@qelvora/ui-web";
 import { currentSession } from "../../../../lib/session";
 import { IdentitySessionBoundary } from "../../../../features/identity/session-boundary";
 import { ConsentScreen } from "../../../../features/conversation/ConsentScreen";
+import { PostEntryReference } from "../../../../features/conversation/PostEntryReference";
 import { growthRequest } from "../../../../features/growth/server";
 import { GrowthShell, Failure } from "../../../../features/growth/shell";
-import type { Creator, Post } from "../../../../features/growth/types";
+import type { Creator } from "../../../../features/growth/types";
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
 /** Context destination; W3 owns the authenticated conversation body and consent. */
@@ -66,19 +67,8 @@ export default async function ContextualChat({
     const { creator } = await growthRequest<{ creator: Creator }>(
       `public/creators/${encodeURIComponent(handle)}`,
     );
-    let post: Post | undefined;
-    if (typeof context === "string") {
-      post = (
-        await growthRequest<{ post: Post }>(
-          `public/creators/${handle}/posts/${context}`,
-        )
-      ).post;
-      if (!post.aiContextEligible)
-        throw new Error(
-          growthCopy.growthThisPostCannotBeUsedAsConversationContext,
-        );
-    }
-    if (session && creator.state === "published" && !post)
+    const hasContext = typeof context === "string";
+    if (session && creator.state === "published" && !hasContext)
       return (
         <IdentitySessionBoundary
           key={`${session.accountId}:${creator.id}`}
@@ -92,7 +82,7 @@ export default async function ContextualChat({
           />
         </IdentitySessionBoundary>
       );
-    return (
+    const screen = (
       <GrowthShell>
         <header className="growth-header">
           <a href={`/creators/${handle}`}>{creator.name}</a>
@@ -105,31 +95,24 @@ export default async function ContextualChat({
               value2: creator.name,
             })}
           </p>
-          {post ? (
-            <>
-              <div className="qv qv-context">
-                <div className="qv-context__text">
-                  <span className="qv-meta">{growthCopy.growthFromAPost}</span>
-                  <span>{post.title}</span>
-                </div>
-                <a
-                  className="qv-icon-btn"
-                  aria-label={growthCopy.removeContext}
-                  href={`/creators/${handle}/chat`}
-                >
-                  ×
-                </a>
-              </div>
-            </>
+          {hasContext && session ? (
+            <PostEntryReference
+              handle={handle}
+              creatorId={creator.id}
+              contentId={context.toLowerCase()}
+            />
           ) : null}
           {creator.state !== "published" ? (
             <Notice title={growthCopy.growthAiPaused}>
               {growthFormat("growthSAiIsPaused", { value1: creator.name })}
             </Notice>
-          ) : post ? (
+          ) : hasContext ? (
             <Notice title="Post context unavailable">
               This post's conversation context is not connected yet. Remove the
               post context to continue to the current AI provider review.
+              <Button href={directEntry} variant="quiet" block>
+                {growthCopy.removeContext}
+              </Button>
             </Notice>
           ) : !session ? (
             <Notice title={growthCopy.growthSignInToContinue}>
@@ -153,6 +136,17 @@ export default async function ContextualChat({
           </p>
         </div>
       </GrowthShell>
+    );
+    return session ? (
+      <IdentitySessionBoundary
+        key={`${session.accountId}:${session.sessionId}:${creator.id}:${context ?? ""}`}
+        initial={session}
+        returnTo={returnTo}
+      >
+        {screen}
+      </IdentitySessionBoundary>
+    ) : (
+      screen
     );
   } catch (error) {
     return (

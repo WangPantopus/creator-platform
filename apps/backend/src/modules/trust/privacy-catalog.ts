@@ -1,5 +1,6 @@
 import type { PoolClient } from "pg";
 import { DomainError } from "../../core/errors.js";
+import { originalPrivacyFamilyRegisteredExtension } from "./privacy-family-catalog.js";
 
 const functions = [
   {
@@ -41,6 +42,14 @@ const columns = [
  * manually installed proposal, extra grant/owner/membership or early trigger
  * is unavailable. Do not cache this across the real held transaction. */
 export async function assertPrivacyTaskCatalog(client: PoolClient) {
+  const family = await originalPrivacyFamilyRegisteredExtension(client);
+  const expectedFunctions = family ? [...functions, family] : functions;
+  const expectedColumns = family
+    ? [
+        ...columns,
+        { relation: "privacy_job", column: "created_at", privilege: "SELECT" },
+      ]
+    : columns;
   const ready = (
     await client.query<{ ready: boolean }>(
       `WITH role AS (
@@ -80,7 +89,7 @@ export async function assertPrivacyTaskCatalog(client: PoolClient) {
         AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=(SELECT oid FROM role) AND relkind IN('r','p','v','m','S','f') AND oid<>(SELECT oid FROM scope))
         AND NOT EXISTS(SELECT FROM pg_type t WHERE t.typowner=(SELECT oid FROM role)
           AND t.oid<>(SELECT reltype FROM scope) AND t.typelem<>(SELECT reltype FROM scope))
-        AND (SELECT count(*)=2 FROM pg_proc p JOIN expected_functions e ON p.oid=e.oid
+        AND (SELECT count(*)=$5 FROM pg_proc p JOIN expected_functions e ON p.oid=e.oid
           WHERE p.proowner=(SELECT oid FROM role) AND p.prosecdef AND p.proconfig=ARRAY['search_path=pg_catalog']::text[]
           AND encode(sha256(convert_to(pg_get_functiondef(p.oid),'UTF8')),'hex')=e.sha256)
         AND NOT EXISTS(SELECT FROM pg_proc WHERE proowner=(SELECT oid FROM role) AND oid NOT IN(SELECT oid FROM expected_functions))
@@ -88,8 +97,11 @@ export async function assertPrivacyTaskCatalog(client: PoolClient) {
           WHERE (acl.grantee=(SELECT oid FROM role) AND p.oid NOT IN(SELECT oid FROM expected_functions))
           OR (p.oid IN(SELECT oid FROM expected_functions) AND
             (acl.privilege_type<>'EXECUTE' OR acl.is_grantable OR acl.grantor<>(SELECT oid FROM role)
-              OR (acl.grantee<>(SELECT oid FROM role) AND NOT(p.oid=to_regprocedure('creator_trust.fence_privacy_task(uuid,uuid,text,text,uuid,uuid,text,uuid)')
-                AND acl.grantee=(SELECT oid FROM pg_roles WHERE rolname='creator_runtime'))))))
+              OR (acl.grantee<>(SELECT oid FROM role) AND NOT(
+                (p.oid=to_regprocedure('creator_trust.fence_privacy_task(uuid,uuid,text,text,uuid,uuid,text,uuid)')
+                 AND acl.grantee=(SELECT oid FROM pg_roles WHERE rolname='creator_runtime'))
+                OR ($6::boolean AND p.oid=to_regprocedure('creator_trust.privacy_task_original_binding(uuid,text,uuid)')
+                 AND acl.grantee=(SELECT oid FROM pg_roles WHERE rolname='creator_privacy_family')))))))
         AND has_function_privilege(current_user,to_regprocedure('creator_trust.fence_privacy_task(uuid,uuid,text,text,uuid,uuid,text,uuid)'),'EXECUTE')
         AND NOT EXISTS(SELECT FROM pg_class c CROSS JOIN LATERAL aclexplode(coalesce(c.relacl,acldefault(CASE WHEN c.relkind='S' THEN 's'::"char" ELSE 'r'::"char" END,c.relowner))) acl
           WHERE c.relkind IN('r','p','v','m','S','f') AND acl.grantee=(SELECT oid FROM role) AND c.oid<>(SELECT oid FROM scope))
@@ -138,8 +150,10 @@ export async function assertPrivacyTaskCatalog(client: PoolClient) {
       [
         "0087_w8_privacy_task_commit_fence",
         "33e619bfdea66355e1d8d2b90ed2d0389f21ae024fda63e1b984c99aede847ef",
-        JSON.stringify(functions),
-        JSON.stringify(columns),
+        JSON.stringify(expectedFunctions),
+        JSON.stringify(expectedColumns),
+        expectedFunctions.length,
+        family !== undefined,
       ],
     )
   ).rows[0]?.ready;

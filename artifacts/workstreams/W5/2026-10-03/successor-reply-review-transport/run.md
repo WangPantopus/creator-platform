@@ -1,0 +1,96 @@
+# Reply review original settlement — October 3, 2026
+
+Personally implemented source `ca591d95f7f7a0c69c7c3d30ebe62e6ed223d643`
+on captured remote main `5c08634b7542fef95dd6c176030a785845250c62`.
+W5's review helper previously attempted savepoint rollback after every producer
+error. A PostgreSQL response timeout can leave the original command unsettled;
+fallback cleanup must not queue more SQL or report a successfully pending reply.
+
+The consumer now uses the existing `querySettlementUncertain` classifier and
+lets the original uncertain error or cancellation reach the transaction owner.
+Known completed failures still restore the savepoint and retain quarantined
+review behavior; negative4xx still escapes. Cleanup failure preserves both
+actual errors. Successful RELEASE failure cannot re-enter producer fallback.
+No review state, fan permission or signature policy changed.
+
+Reused owner source is explicit: W1 PR74
+`81a401bd938c9c7bb1e1e72dea9798cc6e77f95f` supplies the byte-identical
+`identity/transaction.ts` and `identity/request-context.ts`. The original
+transaction uses unchanged `ContentHeldClient`, its actual five-second host
+budget and awaited settlement. Pool acquisition remains the configured host's
+responsibility. The prior W5 `6fcc02c57aa84e56fb3d1e662f5e18e5a268c9be`
+role-check restore guard is reused. W8 PR200
+`50165fe6d78be5f3288cbb41f8d792abaf3a1df6` supplies only the exact
+`trustReplyError` cause-preservation leaf; its prepared reviewer/root/SQL wave
+is not copied or activated. Public error status/message stay unchanged and the
+actual original cause remains private and nonenumerable.
+
+Backend build/types, affected lint/format/diff and all nine existing backend
+contract checks pass. No new unit, UI or E2E tests were written.
+
+At exact sourceca591d95, personally operated two primitive reads on owned PG17
+canonical61 through the actual installed pg, real `creator_runtime` connection
+and unchanged `ContentHeldClient`. The real client read timeout occurred
+in61.666ms; the genuine Trust adapter retained its cause and the shared
+classifier returned uncertain=true. Original client settlement completed;
+an independent read300ms later found its PID absent. The real40ms server
+statement timeout returned57014 in45.738ms, retained its cause and classified
+uncertain=false; ordinary rollback kept the healthy pooled PID. Cause was
+nonenumerable in both cases. The actual role/database/61 ledger remained.
+The original pool closed normally afterward.
+
+These reads use no product reply, Actor, task, reviewer callback, document,
+decision, signature, approval or receipt. They do not invoke the private reply
+helper or qualify its actual application journey. Client socket closure does
+not establish immediate backend cancellation. No held migration/role/registry
+or business state was activated. The private0600 operator receipt is outside
+Git at `~/.config/creator-platform/w5-20261003/reply-review-transport/errors-ca59.json`,
+SHA256 `25f15132112d55060157bcc4a4c5ccda2b75677a27fe1c179586abaa75ef8a25`.
+
+Implemented: W5 original review/savepoint guard plus genuine owner cleanup
+leaves. Runnable: build and actual named PostgreSQL primitives. Integrated:
+exact existing owner leaves, while genuine prepared0156/root activation and
+current shipping-app qualification remain separate. Verified: static checks
+and the two named primitive outcomes only. Release-ready:false. Actual signed
+Note, recorded Ops review, two-fan privacy, duplicate/withdrawal/reaction,
+current browser/native acceptance and finite C10 remain open. All nine W5
+packages remain incomplete. No heavy/API/browser/device lease is held.
+
+## Wrapped cancellation review and exact repair
+
+W6 and W8 personally identify a source gap in the first revision: Trust wraps
+the actual AbortError/TimeoutError as a DomainError with a private cause, while
+Content checked only the outer name and the shared classifier checked only
+transport messages/codes. The earlier ca591d95 primitives do not qualify that
+missing case or a positive product review.
+
+Personally implemented at `28c133d7e3ad65739852e02d83d496cfe19c2d7e`:
+the existing bounded cause/AggregateError traversal also recognizes actual
+AbortError/TimeoutError names. Content uses that single classifier before
+savepoint cleanup. The held-client owner also receives the same conservative
+classification. No callback, task, Actor, reviewed decision or authority is
+introduced; completed PostgreSQL57014 remains a settled failure.
+
+Exact-source backend build/types, affected lint/format/diff and all nine
+existing contracts pass. Personally operated actual Node timer cancellation,
+its elapsed TimeoutError reason and explicit AbortSignal cancellation through
+the original Trust error leaf: all retain their original nonenumerable cause,
+public503 and uncertain=true. Private0600 receipt SHA256
+`12e6433e6fca693f08b3cf4109f083705fc796daedba6f8c4eb1fedd1f29de1f`.
+These are host cancellation primitives only, with no database client or task.
+
+The original read-only canonical61 PostgreSQL operation is repeated at this
+exact source, preserving the earlier receipt. Actual client read timeout
+63.086ms is uncertain=true; original settlement completes and independent
+readback300ms later finds its PID absent. Actual server57014 at43.761ms remains
+uncertain=false with safe rollback and its healthy pooled PID. Both original
+causes stay private/nonenumerable; actual creator_runtime/database/61 ledger
+remain and the pool closes normally. Private0600 receipt SHA256
+`5c78bf62a5924983f11a828a8a75dc73440349f7f814be0304c56410fa397b72`.
+Normal finite check wrapper releases the canonical heavy guard; no lease is held.
+
+Verified: the stated source checks and actual host/PostgreSQL primitives.
+The private product helper, genuine0156 review/task, signed Note, two-fan
+privacy, current native application and finite C10 are still unverified.
+PR304 remains draft for those gates; all nine packages remain incomplete and
+release-ready:false. No primitive is promoted into application acceptance.

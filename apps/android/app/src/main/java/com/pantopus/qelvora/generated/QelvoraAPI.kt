@@ -5567,6 +5567,41 @@ enum class APIStudioStudioThreadEntriesCoverage {
 }
 
 @Serializable
+data class APIGrowthPostEntryContextResponse(
+  val `context`: APIGrowthPostEntryContextResponseContext
+)
+
+@Serializable
+data class APIGrowthPostEntryContextResponseContext(
+  val `source`: APIGrowthPostEntryContextResponseContextSource,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `version`: Long,
+  val `title`: String,
+  val `destination`: String
+)
+
+@Serializable
+enum class APIGrowthPostEntryContextResponseContextSource {
+  @SerialName("post") POST
+}
+
+@Serializable
+data class APIGrowthPostEntryContext(
+  val `source`: APIGrowthPostEntryContextSource,
+  val `creatorId`: String,
+  val `contentId`: String,
+  val `version`: Long,
+  val `title`: String,
+  val `destination`: String
+)
+
+@Serializable
+enum class APIGrowthPostEntryContextSource {
+  @SerialName("post") POST
+}
+
+@Serializable
 enum class ReadCreatorMediaPolicyPurpose {
   @SerialName("source_audio") SOURCE_AUDIO,
   @SerialName("interview_audio") INTERVIEW_AUDIO,
@@ -5580,6 +5615,13 @@ data class CreatorAPIBinaryResponse(val body: ByteArray, val status: Int, val co
 
 class CreatorAPIClient(private val baseURL: String, private val maximumResponseBytes: Int = 268_435_456, private val timeoutMs: Int = 30_000, private val token: suspend () -> String?) {
   private val json = Json { ignoreUnknownKeys = false }
+  /** W8 private transport on this original client, with denial-only pins. */
+  suspend fun trustBytes(path: String, expectedAccountId: String, expectedSessionId: String, body: ByteArray? = null, binary: Boolean = false): CreatorAPIBinaryResponse {
+    require(path.matches(Regex("^/v1/trust/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*$")) && expectedAccountId.isNotEmpty() && expectedSessionId.isNotEmpty() && (body?.size ?: 0) <= 1_048_576)
+    return requestBytes(path, if (body == null) "GET" else "POST", body, authenticated = true,
+      headers = mapOf("X-Expected-Account-Id" to expectedAccountId, "X-Expected-Session-Id" to expectedSessionId),
+      accept = if (binary) "application/octet-stream" else "application/json", contentType = "application/json")
+  }
   private suspend fun request(path: String, method: String, body: String? = null, authenticated: Boolean, query: List<Pair<String, String?>> = emptyList(), headers: Map<String, String> = emptyMap()): String =
     requestBytes(path, method, body?.toByteArray(Charsets.UTF_8), authenticated, query, headers, "application/json", "application/json").body.toString(Charsets.UTF_8)
   private suspend fun requestBytes(path: String, method: String, body: ByteArray? = null, authenticated: Boolean, query: List<Pair<String, String?>> = emptyList(), headers: Map<String, String> = emptyMap(), accept: String = "application/octet-stream", contentType: String = "application/octet-stream"): CreatorAPIBinaryResponse = withContext(Dispatchers.IO) {
@@ -5664,6 +5706,7 @@ class CreatorAPIClient(private val baseURL: String, private val maximumResponseB
   suspend fun studioReplyDraft(creatorId: String, fanId: String): APIStudioReplyDraft = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads/${segment(fanId)}/draft", "GET", authenticated = true))
   suspend fun saveStudioReplyDraft(creatorId: String, fanId: String, xQelvoraExpectedAccount: String? = null, body: APIStudioSaveReplyDraft): APIStudioDraftVersion = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads/${segment(fanId)}/draft", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun sendStudioReplyDraft(creatorId: String, fanId: String, xQelvoraExpectedAccount: String? = null, body: APIStudioSendReplyDraft): APIMessage = json.decodeFromString(request("/v1/studio/${segment(creatorId)}/threads/${segment(fanId)}/send-draft", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
+  suspend fun readPostEntryContext(handle: String, id: String, xQelvoraExpectedAccount: String? = null): APIGrowthPostEntryContextResponse = json.decodeFromString(request("/v1/growth/creators/${segment(handle)}/posts/${segment(id)}/context", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun health(): APIHealth = json.decodeFromString(request("/health", "GET", authenticated = false))
   suspend fun identityCapabilities(): APIIdentityCapabilities = json.decodeFromString(request("/v1/identity/capabilities", "GET", authenticated = false))
   suspend fun continueWithPantopus(body: APIIdentityContinue): APIIdentityRedirect = json.decodeFromString(request("/v1/identity/continue", "POST", body = json.encodeToString(body), authenticated = false))
@@ -5697,6 +5740,7 @@ class CreatorAPIClient(private val baseURL: String, private val maximumResponseB
   suspend fun takeover(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/takeover", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun handback(creatorId: String, fanId: String, body: APIControlCommand): APIFrame = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/handback", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply): APIMessage = json.decodeFromString(request("/v1/threads/${segment(creatorId)}/${segment(fanId)}/human-replies", "POST", body = json.encodeToString(body), authenticated = true))
+  suspend fun beginConversation(xExpectedAccountId: String? = null, xExpectedSessionId: String? = null, body: APIConversationBeginConversation): APIConversationConversationPage = json.decodeFromString(request("/v1/conversations/begin", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("X-Expected-Account-Id" to xExpectedAccountId, "X-Expected-Session-Id" to xExpectedSessionId).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput): APIConversationConversationRecordingResult = json.decodeFromString(request("/v1/conversations/${segment(creatorId)}/${segment(fanId)}/recordings", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun leaseOfflineConversation(creatorId: String, fanId: String): APIConversationConversationOfflineSnapshot = json.decodeFromString(request("/v1/conversations/${segment(creatorId)}/${segment(fanId)}/offline", "GET", authenticated = true))
   suspend fun readThreadMedia(creatorId: String, fanId: String, assetId: String, xQelvoraExpectedAccount: String? = null): APIMediaMediaAsset = json.decodeFromString(request("/v1/w6/threads/${segment(creatorId)}/${segment(fanId)}/media/${segment(assetId)}", "GET", authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))

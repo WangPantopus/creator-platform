@@ -1,13 +1,29 @@
-import type { Pool } from "pg";
+import type { Pool, QueryConfig } from "pg";
 
 /** Shared read-only catalogue for W2's independently reviewed fixed consumers. */
 export async function generationConsumerCatalogue(
   pool: Pick<Pool, "query">,
   role: string,
+  queryTimeoutMs?: number,
 ) {
+  if (
+    queryTimeoutMs !== undefined &&
+    (!Number.isInteger(queryTimeoutMs) ||
+      queryTimeoutMs < 1 ||
+      queryTimeoutMs > 5000)
+  )
+    throw new Error(
+      "Use a finite metadata read budget of at most five seconds.",
+    );
+  // Installed pg supports this read deadline; the declaration omits it.
+  const query = (text: string): QueryConfig & { query_timeout?: number } => ({
+    text,
+    values: [role],
+    ...(queryTimeoutMs === undefined ? {} : { query_timeout: queryTimeoutMs }),
+  });
   const relations = (
     await pool.query(
-      `SELECT n.nspname AS schema,c.relname AS relation,c.relkind,pg_get_userbyid(c.relowner) AS owner,
+      query(`SELECT n.nspname AS schema,c.relname AS relation,c.relkind,pg_get_userbyid(c.relowner) AS owner,
        c.relrowsecurity,c.relforcerowsecurity,
        ARRAY(SELECT privilege FROM unnest(ARRAY['SELECT','INSERT','UPDATE','DELETE','TRUNCATE','REFERENCES','TRIGGER']) privilege
         WHERE CASE WHEN c.relkind IN('r','p','v','m','f') THEN has_table_privilege($1,c.oid,privilege) ELSE false END ORDER BY privilege) AS table_privileges,
@@ -23,16 +39,14 @@ export async function generationConsumerCatalogue(
         FROM pg_policy p WHERE p.polrelid=c.oid AND (0=ANY(p.polroles) OR (SELECT oid FROM pg_roles WHERE rolname=$1)=ANY(p.polroles))),'[]'::jsonb) AS policies
        FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
        WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
-       ORDER BY n.nspname,c.relname,c.relkind`,
-      [role],
+       ORDER BY n.nspname,c.relname,c.relkind`),
     )
   ).rows;
   const schemas = (
     await pool.query(
-      `SELECT nspname AS schema,has_schema_privilege($1,oid,'USAGE') AS usage,
+      query(`SELECT nspname AS schema,has_schema_privilege($1,oid,'USAGE') AS usage,
        has_schema_privilege($1,oid,'CREATE') AS create FROM pg_namespace
-       WHERE nspname !~ '^pg_' AND nspname<>'information_schema' ORDER BY nspname`,
-      [role],
+       WHERE nspname !~ '^pg_' AND nspname<>'information_schema' ORDER BY nspname`),
     )
   ).rows;
   return { relations, schemas };

@@ -19,8 +19,9 @@ export const publicationWorkerOutputSignatures = Object.freeze({
   cleanup: "creator.require_publication_worker_system_cleanup()",
 });
 
-// Actual W4 ending bridge and complete original caller/source/catalogue/C10
-// review are pending. Startup readback and closed compilation cannot approve it.
+// The genuine W4 ending bridge is integrated. Complete original owner,
+// catalogue and task/COMMIT/C10 qualification remains pending; neither startup
+// readback nor closed compilation supplies approval.
 export const publicationWorkerOutputCatalogueChecksum: string | undefined =
   undefined;
 
