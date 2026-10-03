@@ -149,7 +149,7 @@ for (const { operation, parameters } of operations) {
 let swift =
   "// Generated from packages/api/generated/openapi.json. Do not edit.\nimport Foundation\n\n";
 let kotlin =
-  "// Generated from packages/api/generated/openapi.json. Do not edit.\npackage com.pantopus.qelvora.generated\n\nimport kotlinx.serialization.Serializable\nimport kotlinx.serialization.SerialName\nimport kotlinx.serialization.Required\nimport kotlinx.serialization.KSerializer\nimport kotlinx.serialization.SerializationException\nimport kotlinx.serialization.descriptors.PrimitiveKind\nimport kotlinx.serialization.descriptors.PrimitiveSerialDescriptor\nimport kotlinx.serialization.encoding.Decoder\nimport kotlinx.serialization.encoding.Encoder\nimport kotlinx.serialization.encodeToString\nimport kotlinx.serialization.decodeFromString\nimport kotlinx.serialization.json.Json\nimport kotlinx.serialization.json.JsonElement\nimport kotlinx.coroutines.Dispatchers\nimport kotlinx.coroutines.withContext\nimport java.net.HttpURLConnection\nimport java.net.URL\nimport java.net.URLEncoder\n\n";
+  "// Generated from packages/api/generated/openapi.json. Do not edit.\npackage com.pantopus.qelvora.generated\n\nimport kotlinx.serialization.Serializable\nimport kotlinx.serialization.SerialName\nimport kotlinx.serialization.Required\nimport kotlinx.serialization.KSerializer\nimport kotlinx.serialization.SerializationException\nimport kotlinx.serialization.descriptors.PrimitiveKind\nimport kotlinx.serialization.descriptors.PrimitiveSerialDescriptor\nimport kotlinx.serialization.encoding.Decoder\nimport kotlinx.serialization.encoding.Encoder\nimport kotlinx.serialization.encodeToString\nimport kotlinx.serialization.decodeFromString\nimport kotlinx.serialization.json.Json\nimport kotlinx.serialization.json.JsonElement\nimport kotlinx.coroutines.Dispatchers\nimport kotlinx.coroutines.withContext\nimport kotlinx.coroutines.ensureActive\nimport java.net.HttpURLConnection\nimport java.net.URL\nimport java.net.URLEncoder\n\n";
 swift += `public enum APIJSONValue: Codable, Sendable {\n  case string(String), number(Double), boolean(Bool), array([APIJSONValue]), object([String: APIJSONValue]), null\n  public init(from decoder: Decoder) throws {\n    let container = try decoder.singleValueContainer()\n    if container.decodeNil() { self = .null }\n    else if let value = try? container.decode(Bool.self) { self = .boolean(value) }\n    else if let value = try? container.decode(Double.self) { self = .number(value) }\n    else if let value = try? container.decode(String.self) { self = .string(value) }\n    else if let value = try? container.decode([APIJSONValue].self) { self = .array(value) }\n    else { self = .object(try container.decode([String: APIJSONValue].self)) }\n  }\n  public func encode(to encoder: Encoder) throws {\n    var container = encoder.singleValueContainer()\n    switch self {\n      case .string(let value): try container.encode(value)\n      case .number(let value): try container.encode(value)\n      case .boolean(let value): try container.encode(value)\n      case .array(let value): try container.encode(value)\n      case .object(let value): try container.encode(value)\n      case .null: try container.encodeNil()\n    }\n  }\n}\n\n`;
 for (const [name, { kind, schema }] of models) {
   if (kind === "nullable") {
@@ -197,16 +197,26 @@ public struct CreatorAPIBinaryResponse: Sendable {
   public let acceptRanges: String?
 }
 
+private final class CreatorAPIRedirectGuard: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
+  func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping @Sendable (URLRequest?) -> Void) { completionHandler(nil) }
+}
+
 public actor CreatorAPIClient {
   private let baseURL: URL
   private let session: URLSession
   private let token: @Sendable () async throws -> String?
-  public init(baseURL: URL, session: URLSession = .shared, token: @escaping @Sendable () async throws -> String?) { self.baseURL = baseURL; self.session = session; self.token = token }
+  private let maximumResponseBytes: Int
+  private let timeoutSeconds: TimeInterval
+  public init(baseURL: URL, session: URLSession = .shared, maximumResponseBytes: Int = 268_435_456, timeoutSeconds: TimeInterval = 30, token: @escaping @Sendable () async throws -> String?) {
+    self.baseURL = baseURL; self.session = session; self.maximumResponseBytes = maximumResponseBytes; self.timeoutSeconds = timeoutSeconds; self.token = token
+  }
   private func request<Response: Decodable & Sendable>(_ path: String, method: String, body: Data? = nil, authenticated: Bool, query: [URLQueryItem] = [], headers: [String: String] = [:], contentType: String = "application/json") async throws -> Response {
     let response = try await requestBytes(path, method: method, body: body, authenticated: authenticated, query: query, headers: headers, accept: "application/json", contentType: contentType)
     return try JSONDecoder().decode(Response.self, from: response.body)
   }
   private func requestBytes(_ path: String, method: String, body: Data? = nil, authenticated: Bool, query: [URLQueryItem] = [], headers: [String: String] = [:], accept: String = "application/octet-stream", contentType: String = "application/octet-stream") async throws -> CreatorAPIBinaryResponse {
+    try Task.checkCancellation()
+    guard (1...268_435_456).contains(maximumResponseBytes), timeoutSeconds > 0, timeoutSeconds <= 30 else { throw URLError(.badURL) }
     guard var url = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else { throw URLError(.badURL) }
     url.percentEncodedPath = path
     if !query.isEmpty {
@@ -215,13 +225,23 @@ public actor CreatorAPIClient {
     }
     guard let target = url.url else { throw URLError(.badURL) }
     var request = URLRequest(url: target)
-    request.httpMethod = method; request.httpBody = body
+    request.httpMethod = method; request.httpBody = body; request.timeoutInterval = timeoutSeconds
     request.setValue(accept, forHTTPHeaderField: "Accept")
     if body != nil { request.setValue(contentType, forHTTPHeaderField: "Content-Type") }
     for (name, value) in headers { request.setValue(value, forHTTPHeaderField: name) }
     if authenticated, let value = try await token() { request.setValue("Bearer \\(value)", forHTTPHeaderField: "Authorization") }
-    let (data, response) = try await session.data(for: request)
+    try Task.checkCancellation()
+    let (bytes, response) = try await session.bytes(for: request, delegate: CreatorAPIRedirectGuard())
     guard let response = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
+    let maximum = (200..<300).contains(response.statusCode) ? maximumResponseBytes : min(maximumResponseBytes, 8192)
+    if response.expectedContentLength > Int64(maximum) { throw URLError(.dataLengthExceedsMaximum) }
+    var data = Data()
+    for try await byte in bytes {
+      try Task.checkCancellation()
+      guard data.count < maximum else { throw URLError(.dataLengthExceedsMaximum) }
+      data.append(byte)
+    }
+    try Task.checkCancellation()
     guard (200..<300).contains(response.statusCode) else { throw CreatorAPIError(status: response.statusCode, body: data) }
     return CreatorAPIBinaryResponse(body: data, status: response.statusCode, contentType: response.value(forHTTPHeaderField: "Content-Type"), contentRange: response.value(forHTTPHeaderField: "Content-Range"), acceptRanges: response.value(forHTTPHeaderField: "Accept-Ranges"))
   }
@@ -230,22 +250,37 @@ public actor CreatorAPIClient {
 kotlin += `class CreatorAPIError(val status: Int, val body: String): Exception("API request refused ($status)")
 data class CreatorAPIBinaryResponse(val body: ByteArray, val status: Int, val contentType: String?, val contentRange: String?, val acceptRanges: String?)
 
-class CreatorAPIClient(private val baseURL: String, private val token: suspend () -> String?) {
+class CreatorAPIClient(private val baseURL: String, private val maximumResponseBytes: Int = 268_435_456, private val timeoutMs: Int = 30_000, private val token: suspend () -> String?) {
   private val json = Json { ignoreUnknownKeys = false }
   private suspend fun request(path: String, method: String, body: String? = null, authenticated: Boolean, query: List<Pair<String, String?>> = emptyList(), headers: Map<String, String> = emptyMap()): String =
     requestBytes(path, method, body?.toByteArray(Charsets.UTF_8), authenticated, query, headers, "application/json", "application/json").body.toString(Charsets.UTF_8)
   private suspend fun requestBytes(path: String, method: String, body: ByteArray? = null, authenticated: Boolean, query: List<Pair<String, String?>> = emptyList(), headers: Map<String, String> = emptyMap(), accept: String = "application/octet-stream", contentType: String = "application/octet-stream"): CreatorAPIBinaryResponse = withContext(Dispatchers.IO) {
+    kotlinx.coroutines.currentCoroutineContext().ensureActive()
+    require(maximumResponseBytes in 1..268_435_456 && timeoutMs in 1..30_000)
     val encodedQuery = query.filter { it.second != null }.joinToString("&") { segment(it.first) + "=" + segment(it.second!!) }
     val connection = URL(baseURL.trimEnd('/') + path + (if (encodedQuery.isEmpty()) "" else "?" + encodedQuery)).openConnection() as HttpURLConnection
     try {
       connection.requestMethod = method
-      connection.connectTimeout = 15000; connection.readTimeout = 30000
+      connection.instanceFollowRedirects = false; connection.useCaches = false
+      connection.connectTimeout = minOf(15000, timeoutMs); connection.readTimeout = timeoutMs
       connection.setRequestProperty("Accept", accept)
       headers.forEach { (name, value) -> connection.setRequestProperty(name, value) }
       if (authenticated) token()?.let { connection.setRequestProperty("Authorization", "Bearer $it") }
       if (body != null) { connection.doOutput = true; connection.setRequestProperty("Content-Type", contentType); connection.outputStream.use { it.write(body) } }
       val status = connection.responseCode
-      val payload = (if (status in 200..299) connection.inputStream else connection.errorStream)?.use { it.readBytes() } ?: byteArrayOf()
+      val maximum = if (status in 200..299) maximumResponseBytes else minOf(maximumResponseBytes, 8192)
+      check(connection.contentLengthLong <= maximum.toLong())
+      val payload = (if (status in 200..299) connection.inputStream else connection.errorStream)?.use { stream ->
+        val output = java.io.ByteArrayOutputStream()
+        val buffer = ByteArray(8192)
+        while (true) {
+          kotlinx.coroutines.currentCoroutineContext().ensureActive()
+          val count = stream.read(buffer); if (count < 0) break
+          check(output.size() + count <= maximum); output.write(buffer, 0, count)
+        }
+        output.toByteArray()
+      } ?: byteArrayOf()
+      kotlinx.coroutines.currentCoroutineContext().ensureActive()
       if (status !in 200..299) throw CreatorAPIError(status, payload.toString(Charsets.UTF_8))
       CreatorAPIBinaryResponse(payload, status, connection.getHeaderField("Content-Type"), connection.getHeaderField("Content-Range"), connection.getHeaderField("Accept-Ranges"))
     } finally { connection.disconnect() }
