@@ -1,5 +1,8 @@
 # W2 remaining delivery backlog — October 2, Mac Studio
 
+**Current Agent privacy transaction increment — October3 UTC:** original repository-pool cancellation/cleanup now covers purge, accounting preflight, coherent stream and legacy artifact export; actual task/final fences and snapshot isolation retained. Six real PostgreSQL primitive cases personally pass, including wrapped timeout/no later SQL and real committed marker with withheld COMMIT reply/reconciliation refusal; no genuine C10/erasure/p95 proof. Existing9/build/types/scoped checks pass. Current main0a445 consumed, mainf6 browser outage/cold Retry/separate actor/Night personally pass. Private766353B/SHA6fb4b9f0 independently restores all six custody comparisons,61/119rows/163tables. Owned services/containers stopped and copies closed. [Failures, exact limits and remaining assignment](../20261003-privacy-cancellation/README.md). Source review/CI/normal integration/current-main runtime remains pending.
+
+
 **Current owner cancellation consumption — October3 UTC:** actual W1 872a43f6 including ErrorOptions prerequisite, W3 output002da286/context471a3d53 and W4 dbc catalogue bytes consumed. Both delivery paths pass the real producer abort signal into original held custody. Typed terminal registry/discovery and whole-graph review remain held/unallocated; no activation. Current mainf6 health200/readiness503 and real browser privacy outage/cold Retry/separate-actor exclusion personally pass; all-eight/C10/provider/native delivery/p95 remain open. Merged240/244/249 fast checks now have SUCCESS results while native/visual jobs remain queued; cancelled240 runs retained. [Exact sources and limits](../20261003-cancellation-custody/README.md).
 
 
