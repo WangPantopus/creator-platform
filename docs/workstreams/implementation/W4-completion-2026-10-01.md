@@ -1,3 +1,7 @@
+## Named current native read, full acceptance held — October 3, 20:28 UTC
+
+Current b39 signed Android product at documentary a64 personally reads You→Spending with original No limit/zero totals and unchanged38-table Commerce data. Supported CUA pane remains unavailable and the human-approved owned5564 ADB alternative is used. Night command acknowledges but the settled frame fails during closure; no unsent-input/recovery/enlarged/spoken/command/provider/C10 pass is claimed. Exact original settings are verified restored; normal emulator shutdown needs owned SIGTERM/SIGKILL, immediate serial absence fails, and fresh physical absence/exact release finishes10.4s past the hard deadline. The timing failure remains recorded and full native qualification remains open. [Exact source, private hashes and retained failures](../../../artifacts/workstreams/W4/runtime/2026-10-03/native-original-session/README.md).
+
 ## Current original stack reuse and personal web qualification — October 3, 20:04 UTC
 
 All38 current open PRs are drafts with exactly one of eight existing owners, beginning with October1 #21; all seven peers are coordinated. W1 #296 joins W3 #299/#280 and W4 #236 as closed unmerged duplicates with independently preserved original scope. W2 #295's reviewed records merge into #21's stack, without a new main merge. W4 retains #213/#247/#262/#298/#301/#303 with their complete gates. [Full oldest-first dispositions and source custody](../../../artifacts/workstreams/W4/runtime/2026-10-03/open-pr-review/README.md).
