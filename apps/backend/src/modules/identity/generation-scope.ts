@@ -3,6 +3,12 @@ import type { Pool, PoolClient } from "pg";
 import { z } from "zod";
 import { canonical } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
+import {
+  assertGenerationOutputCursorCatalogue,
+  generationOutputCursorSource,
+  generationOutputCursorSignature,
+} from "./generation-output-cursor.js";
+import { registeredMigration } from "../../db/reviewed-migration.js";
 import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import { assertCurrentSession, requestAuthority } from "./request-authority.js";
 
@@ -105,6 +111,22 @@ export type GenerationTask = Readonly<z.infer<typeof taskSchema>>;
 const generationBrand: unique symbol = Symbol("GenerationTaskScope");
 export type GenerationTaskScope = GenerationTask &
   Readonly<{ [generationBrand]: true; kind: "generation" }>;
+const outputCursorSchema = z.strictObject({
+  generationId: z.uuid(),
+  messageId: z.uuid(),
+  sequence: z.int().min(1).max(1024),
+  cursor: z.int().positive(),
+});
+export type GenerationOutputCursor = Readonly<
+  z.infer<typeof outputCursorSchema>
+>;
+type GenerationScopeBinding = {
+  client: PoolClient;
+  nonce: string;
+  transaction: string;
+  pid: number;
+  current: GenerationTaskScope;
+};
 
 export type GenerationRestriction = (
   client: PoolClient,
@@ -336,7 +358,7 @@ async function assertGenerationCatalogue(
 export class GenerationIdentityAuthority {
   private readonly issued = new WeakMap<
     GenerationTaskScope,
-    { client: PoolClient; nonce: string; transaction: string; pid: number }
+    GenerationScopeBinding
   >();
   private constructor(
     private readonly pool: Pool,
@@ -676,6 +698,7 @@ export class GenerationIdentityAuthority {
     const task = Object.freeze(taskSchema.parse(input));
     const client = await this.pool.connect();
     let scope: GenerationTaskScope | undefined;
+    let held: GenerationScopeBinding | undefined;
     try {
       await this.begin(client);
       await this.configuration.assertAllowed(client, task);
@@ -715,13 +738,14 @@ export class GenerationIdentityAuthority {
             )
           ).rows[0],
         );
-      this.issued.set(scope, { client, nonce: proof.nonce, ...binding });
+      held = { client, nonce: proof.nonce, ...binding, current: scope };
+      this.issued.set(scope, held);
       await this.authorizeInTransaction(scope, client);
       const value = await work(client, scope);
-      await this.configuration.assertAllowed(client, task);
-      await this.authorizeInTransaction(scope, client);
+      await this.configuration.assertAllowed(client, held.current);
+      await this.authorizeInTransaction(held.current, client);
       await client.query("SELECT creator.end_generation_scope()");
-      this.issued.delete(scope);
+      this.issued.delete(held.current);
       await this.assertCatalogueInTransaction(client);
       await client.query("COMMIT");
       return value;
@@ -730,8 +754,94 @@ export class GenerationIdentityAuthority {
       return this.failure(error);
     } finally {
       if (scope) this.issued.delete(scope);
+      if (held) this.issued.delete(held.current);
       client.release();
     }
+  }
+
+  /** Issue the updated immutable view only after the real W3 writer refreshed
+   * the original SQL task. A frame/cast alone cannot advance a cursor. Prior
+   * committed idempotent output already has its current view and must not use
+   * this own +1 port. Original nonce/fullXID/PID/intent/deadline stay unchanged.
+   */
+  async refreshAfterOutput(
+    scope: GenerationTaskScope,
+    client: PoolClient,
+    input: GenerationOutputCursor,
+  ): Promise<GenerationTaskScope> {
+    await this.authorizeInTransaction(scope, client);
+    const binding = this.issued.get(scope)!;
+    const output = outputCursorSchema.parse(input);
+    invariant(
+      output.generationId === scope.generationId &&
+        output.messageId === scope.aiMessageId &&
+        output.sequence === scope.lastSequence + 1,
+      "generation_output_cursor_changed",
+      "Use the actual next original sentence cursor.",
+    );
+    const migration = await registeredMigration(generationOutputCursorSource);
+    const consumer = this.configuration.consumers.find(
+      (entry) =>
+        entry.signature === generationOutputCursorSignature &&
+        entry.owner === "creator_generation_cursor_authority" &&
+        entry.migration.version === migration?.version &&
+        entry.migration.checksum === migration?.checksum,
+    );
+    if (!migration || !consumer)
+      throw new DomainError(
+        "generation_output_cursor_unconfigured",
+        "The reviewed original output cursor is unavailable.",
+        503,
+      );
+    this.assertConsumerRegistered(consumer);
+    await this.configuration.assertAllowed(client, scope);
+    await assertGenerationOutputCursorCatalogue(client);
+    const proof = z
+      .strictObject({
+        nonce: z.uuid(),
+        task: taskSchema,
+        ...outputCursorSchema.shape,
+      })
+      .parse(
+        (
+          await client.query<{ proof: unknown }>(
+            "SELECT creator.generation_output_cursor_view($1,$2,$3,$4) AS proof",
+            [
+              scope.generationId,
+              scope.workerToken,
+              output.sequence,
+              output.cursor,
+            ],
+          )
+        ).rows[0]?.proof,
+      );
+    const nextSequence = proof.task.lastSequence;
+    invariant(
+      binding.current === scope &&
+        this.issued.get(scope) === binding &&
+        proof.nonce === binding.nonce &&
+        scope.lastSequence + 1 === nextSequence &&
+        nextSequence === output.sequence &&
+        proof.generationId === output.generationId &&
+        proof.messageId === output.messageId &&
+        proof.sequence === output.sequence &&
+        proof.cursor === output.cursor &&
+        canonical({ ...scope, lastSequence: nextSequence }) ===
+          canonical({ ...proof.task, kind: scope.kind }),
+      "generation_output_cursor_changed",
+      "The original output or purpose binding changed.",
+    );
+    const current = Object.freeze({
+      ...proof.task,
+      [generationBrand]: true as const,
+      kind: "generation" as const,
+    });
+    this.issued.delete(scope);
+    binding.current = current;
+    this.issued.set(current, binding);
+    await this.authorizeInTransaction(current, client);
+    await this.configuration.assertAllowed(client, current);
+    return current;
   }
 
   /** Genuine issued object, exact held client, private transaction/PID/nonce
@@ -743,7 +853,7 @@ export class GenerationIdentityAuthority {
     this.assertWorker();
     const binding = this.issued.get(scope);
     invariant(
-      binding?.client === client,
+      binding?.client === client && binding.current === scope,
       "generation_scope_required",
       "Use the current generation purpose transaction.",
     );
