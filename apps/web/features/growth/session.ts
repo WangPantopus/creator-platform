@@ -3,6 +3,15 @@ import { useCallback } from "react";
 import { copy } from "@qelvora/copy";
 import { useIdentityRequest } from "../identity/session-boundary";
 
+export class GrowthActionError extends Error {
+  constructor(
+    readonly status: number,
+    message: string,
+  ) {
+    super(message);
+  }
+}
+
 /** Private Growth forms use W1's actual issued session lifetime. The account
  * header is only a mismatch precondition; the server still resolves authority. */
 export function useGrowthSession() {
@@ -33,7 +42,8 @@ export function useGrowthSession() {
         end();
       signal.throwIfAborted();
       if (!response.ok)
-        throw new Error(
+        throw new GrowthActionError(
+          response.status,
           result.error?.message ?? copy.growthThisActionCouldNotBeCompleted,
         );
       return result as T;

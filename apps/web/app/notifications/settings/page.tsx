@@ -41,7 +41,6 @@ export default async function Settings() {
           </header>
           <PreferenceForm
             key={session.accountId}
-            accountId={session.accountId}
             initial={preferences}
             creators={directory.creators}
           />

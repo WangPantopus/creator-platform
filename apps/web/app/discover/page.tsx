@@ -90,6 +90,7 @@ export default async function Discover({
       <PassAccessProvider
         creatorIds={data.creators.map((creator) => creator.id)}
         accountId={session?.accountId}
+        sessionId={session?.sessionId}
       >
         <div className="growth-stack">
           {data.creators.length ? (

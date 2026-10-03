@@ -5,16 +5,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { InboxItem, Cluster } from "./types";
 import { glyphs } from "@qelvora/ui-web";
-import { useGrowthSession } from "./session";
-
-export class GrowthActionError extends Error {
-  constructor(
-    readonly status: number,
-    message: string,
-  ) {
-    super(message);
-  }
-}
+import { useGrowthSession, GrowthActionError } from "./session";
+export { GrowthActionError } from "./session";
 export async function mutate(
   path: string,
   body: unknown,
