@@ -1,5 +1,19 @@
 import { z } from "zod";
 
+/** Public composition state only. Protected media still requires current access. */
+export const CapabilitiesSchema = z.strictObject({
+  mediaAvailable: z.boolean(),
+  creatorMediaAvailable: z.boolean(),
+  creatorMediaAudienceAvailable: z.boolean(),
+  callsAvailable: z.boolean(),
+  aiAudioAvailable: z.literal(false),
+  callRecoveryAvailable: z.boolean(),
+  reason: z.enum([
+    "media_unconfigured",
+    "licensed_ai_audio_and_provider_verification_required",
+  ]),
+});
+
 /** W6 namespaced C02/C10 contracts; no client-supplied authorship or grants. */
 export const MediaPurposeSchema = z.enum([
   "fan_attachment",
