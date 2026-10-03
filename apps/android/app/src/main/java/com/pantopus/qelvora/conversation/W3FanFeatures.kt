@@ -176,7 +176,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     }
     source?.let { passage -> Dialog(onDismissRequest = { source = null }) {
         Column(Modifier.background(qColor("ground")).padding(16.dp)) {
-            BasicText("Original source", style = qText("meta").copy(color = qColor("ink")))
+            BasicText("Original source", style = qText("data-sm").copy(color = qColor("ink")))
             LazyColumn(Modifier.weight(1f, fill = false), verticalArrangement = Arrangement.spacedBy(16.dp)) { item { BasicText(passage.first, style = qText("display-md").copy(color = qColor("ink"))); SelectionContainer { BasicText(passage.second, style = qText("body").copy(color = qColor("ink"))) } } }
             Button("Close", variant = ButtonVariant.QUIET) { source = null }
         }
@@ -370,7 +370,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         item { Button("Back", variant = ButtonVariant.QUIET, onClick = onBack); BasicText("Me and privacy", style = qText("title").copy(color = qColor("ink"))); if (error.isNotEmpty()) Notice(title = "Privacy status", children = error) }
         item { BasicText("What $name's AI remembers", style = qText("display-md").copy(color = qColor("ink"))); if (memory?.items?.isEmpty() == true) BasicText("No memories. The AI asks before remembering.", style = qText("body").copy(color = qColor("ink"))) }
         items(memory?.items.orEmpty(), key = { it.id }) { item -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            BasicText(if (item.state == "proposed") "Want me to remember this? Only if you say yes." else "Remembered · ${item.kind}", style = qText("meta").copy(color = qColor("ink")))
+            BasicText(if (item.state == "proposed") "Want me to remember this? Only if you say yes." else "Remembered · ${item.kind}", style = qText("data-sm").copy(color = qColor("ink")))
             if (editing == item.id) { BasicTextField(text, { text = it.take(2000) }, textStyle = qText("body").copy(color = qColor("ink")), cursorBrush = SolidColor(qColor("ink"))); Button("Save proposal", variant = ButtonVariant.SECONDARY, disabled = busy || text.isBlank()) { scope.launch { decide(item, "edit") } } } else BasicText(item.text, style = qText("body").copy(color = qColor("ink")))
             if (item.sensitiveCategory != null) BasicText("Sensitive item · agreeing applies only to this exact memory.", style = qText("caption").copy(color = qColor("ink")))
             Button("View where this came from",variant=ButtonVariant.QUIET) { scope.launch { try { provenance=client.json.decodeFromJsonElement(client.request("$root/messages/${item.provenanceMessageId}")) } catch(failure:Throwable) { if(failure is CancellationException) throw failure;error=failure.message ?: "This source message is unavailable." } } }
@@ -461,7 +461,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     LazyColumn(Modifier.fillMaxSize().widthIn(max = 390.dp).background(qColor("ground")),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(24.dp)) {
         item { Button("Back",variant=ButtonVariant.QUIET) { session.open("/creators/$handle") }; AuthorLabel(kind=AuthorKind.AI,name=name); BasicText("Before your first message",style=qText("display-lg").copy(color = qColor("ink"))) }
         item {
-            BasicText("WHO RUNS IT",style=qText("meta").copy(color = qColor("ink")))
+            BasicText("WHO RUNS IT",style=qText("data-sm").copy(color = qColor("ink")))
             val policy = capabilities?.providers
             if(policy == null) BasicText("AI providers and their verified processing terms are not configured yet.",style=qText("body").copy(color = qColor("ink")))
             policy?.providers?.forEach { provider ->
@@ -469,8 +469,8 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 Button(provider.name + " processing terms",variant=ButtonVariant.QUIET) { uriHandler.openUri(provider.termsUrl) }
                 BasicText((if(provider.noTraining) "Doesn't train on your messages." else "Review message use in these terms.") + " " + (if(provider.noRetention) "Doesn't keep your messages." else "Review message retention in these terms."),style=qText("caption").copy(color = qColor("ink")))
             }
-            BasicText("WHO CAN READ IT",style=qText("meta").copy(color = qColor("ink"))); BasicText(capabilities?.accessDisclosure ?: "Conversations can be read by the creator and their authorized team. Those accesses are logged.",style=qText("body").copy(color = qColor("ink")))
-            BasicText("WHAT IT REMEMBERS",style=qText("meta").copy(color = qColor("ink"))); BasicText("Only what you agree to. It asks first, and you can see and delete every memory in You.",style=qText("body").copy(color = qColor("ink")))
+            BasicText("WHO CAN READ IT",style=qText("data-sm").copy(color = qColor("ink"))); BasicText(capabilities?.accessDisclosure ?: "Conversations can be read by the creator and their authorized team. Those accesses are logged.",style=qText("body").copy(color = qColor("ink")))
+            BasicText("WHAT IT REMEMBERS",style=qText("data-sm").copy(color = qColor("ink"))); BasicText("Only what you agree to. It asks first, and you can see and delete every memory in You.",style=qText("body").copy(color = qColor("ink")))
         }
         if(error.isNotEmpty()) item { Notice(title="Conversation unavailable",children=error) }
         if(contextPending) item {
