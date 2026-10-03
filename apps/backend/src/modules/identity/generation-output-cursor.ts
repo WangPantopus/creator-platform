@@ -58,12 +58,14 @@ export const generationOutputCursorCatalogueQuery = `SELECT jsonb_build_object(
    to_regclass('creator.generation_sentence_provenance'),to_regclass('creator.event')))
 ) AS catalogue`;
 
-function unavailable(): never {
-  throw new DomainError(
+function unavailable(cause?: unknown): never {
+  const failure = new DomainError(
     "generation_output_cursor_unconfigured",
     "The reviewed original output cursor is unavailable.",
     503,
   );
+  if (cause !== undefined) failure.cause = cause;
+  throw failure;
 }
 
 /** Same actual held purpose client. This metadata guard issues no lease,
@@ -76,35 +78,34 @@ export async function assertGenerationOutputCursorCatalogue(
   try {
     await assertRegisteredMigration(client, generationOutputCursorSource);
     await client.query("SAVEPOINT w1_generation_output_cursor_catalogue");
-    try {
-      await client.query("SET LOCAL search_path=pg_catalog");
-      const cursor = await generationConsumerCatalogue(
-        client,
-        "creator_generation_cursor_authority",
-      );
-      const writer = await generationConsumerCatalogue(
-        client,
-        "creator_w3_generation_output",
-      );
-      const catalogue = (
-        await client.query<{ catalogue: unknown }>(
-          generationOutputCursorCatalogueQuery,
-        )
-      ).rows[0]?.catalogue;
-      if (
-        contentHash({ cursor, writer, catalogue }) !==
-        generationOutputCursorCatalogueChecksum
+    await client.query("SET LOCAL search_path=pg_catalog");
+    const cursor = await generationConsumerCatalogue(
+      client,
+      "creator_generation_cursor_authority",
+    );
+    const writer = await generationConsumerCatalogue(
+      client,
+      "creator_w3_generation_output",
+    );
+    const catalogue = (
+      await client.query<{ catalogue: unknown }>(
+        generationOutputCursorCatalogueQuery,
       )
-        unavailable();
-    } finally {
-      await client.query(
-        "ROLLBACK TO SAVEPOINT w1_generation_output_cursor_catalogue",
-      );
-      await client.query(
-        "RELEASE SAVEPOINT w1_generation_output_cursor_catalogue",
-      );
-    }
-  } catch {
-    unavailable();
+    ).rows[0]?.catalogue;
+    if (
+      contentHash({ cursor, writer, catalogue }) !==
+      generationOutputCursorCatalogueChecksum
+    )
+      unavailable();
+    // Restore only after a successful metadata read. Any failure escapes to
+    // original transaction custody; an uncertain response must see no more SQL.
+    await client.query(
+      "ROLLBACK TO SAVEPOINT w1_generation_output_cursor_catalogue",
+    );
+    await client.query(
+      "RELEASE SAVEPOINT w1_generation_output_cursor_catalogue",
+    );
+  } catch (cause) {
+    unavailable(cause);
   }
 }

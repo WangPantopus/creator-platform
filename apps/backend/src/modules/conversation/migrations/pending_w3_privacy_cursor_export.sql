@@ -115,7 +115,7 @@ BEGIN
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0181_w2_generation_attempt_admission' AND checksum='eab8c8e07b8a1e6ba4384f5300560bd46853bf98509faade5a1b555e130c75ee')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0188_w2_generation_terminal_journal' AND checksum='7ab8974d065b1b9e5befa2ded26c6978876957fab0eee80b9632825bbac98477')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0210_w2_generation_guardrail_event' AND checksum='0c0fc7fee7182f3e77695222e51cce910268f7844437a5e974f68af5927a3382')
-  OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0212_w3_generation_worker_output' AND checksum='c0ebe6adc3981b2cbb26f81f4e09c1724f633cff88bf2cc7443bdc58c5056378')
+  OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0212_w3_generation_worker_output' AND checksum='76ee832c45e5dc422a8128afdc162a354fc54b7df4f611fb6186cdf3bd094df8')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0056_w3_correction_feedback_lineage' AND checksum='1044700d59b9dbb2d2b36d890496de0be6fb3d53c4409504f3c7693906866c35')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0057_w3_feedback_consent' AND checksum='08cb6f37c12ca3131b2e307a237569aa4d104fc627566e619a39fa18a1814d11')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0059_w3_recording_association' AND checksum='b61d50d7f85c0ef468e00a8d2d6b737b4d405a9349810c552f7d9df7f527c42e')

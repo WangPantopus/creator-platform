@@ -129,7 +129,9 @@ DECLARE task jsonb; facts jsonb; tid uuid; cid uuid; fid uuid; mid uuid; version
 BEGIN
  IF session_user<>'creator_generation_worker' OR current_user<>'creator_w3_generation_output'
   OR g IS NULL OR w IS NULL OR NOT creator.generation_scope_matches(g,w)
-  OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0212_w3_generation_worker_output') THEN
+  OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0212_w3_generation_worker_output')
+  OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0216_w1_generation_output_cursor'
+   AND checksum='a4f01c5f1eb1e19d79437b17cce872def1366965ba27c8c46b0d5f9bb73da436') THEN
   RAISE EXCEPTION 'Use genuine original-generation output custody' USING ERRCODE='42501';
  END IF;
  SELECT s.task INTO task FROM creator.generation_worker_scope s WHERE s.generation_id=g AND s.worker_token=w;
@@ -239,6 +241,13 @@ BEGIN
  VALUES(tid,cid,fid,cursor,'sentence',frame,(task->>'initiatingAccountId')::uuid) RETURNING id INTO event_id;
  INSERT INTO creator.generation_sentence_provenance(generation_id,sequence,thread_id,creator_id,fan_id,message_id,event_id,content_hash,approval,transaction_id)
  VALUES(g,n,tid,cid,fid,mid,event_id,content_hash,approved,pg_current_xact_id());
+ -- Genuine W1 private continuation, after this actual same-fullXID INSERT.
+ -- The committed retry above does not advance the cursor a second time.
+ -- W1 changes only its original task.lastSequence; the typed caller must then
+ -- obtain W1's issued replacement view before the W2 postappend bookend.
+ IF creator.refresh_generation_output_cursor(g,w,n,event_id) IS DISTINCT FROM true THEN
+  RAISE EXCEPTION 'Original output cursor continuation failed' USING ERRCODE='42501';
+ END IF;
  IF NOT creator.generation_scope_matches(g,w) OR creator.generation_agent_inputs(g,w) IS DISTINCT FROM facts THEN
   RAISE EXCEPTION 'Original generation or compiled input ended before output' USING ERRCODE='42501';
  END IF;
@@ -249,6 +258,8 @@ RESET ROLE;
 ALTER FUNCTION creator.generation_worker_output(uuid,uuid,integer,text,jsonb) OWNER TO creator_w3_generation_output;
 REVOKE ALL ON FUNCTION creator.generation_worker_output(uuid,uuid,integer,text,jsonb) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION creator.generation_worker_output(uuid,uuid,integer,text,jsonb) TO creator_generation_worker;
--- No application adapter, W2 approval producer, W1 cursor refresh, privacy
--- composition, registration or ledger activation is supplied by this source.
+-- Install order is held0212 then actual0216. The helper need not exist while
+-- PostgreSQL creates this PL/pgSQL body, but both exact sources and the fully
+-- reviewed combined catalogue are mandatory before execution. No W2 approval
+-- producer, privacy composition, registration or activation is supplied here.
 COMMIT;

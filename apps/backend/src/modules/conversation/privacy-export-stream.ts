@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import type { PoolClient } from "pg";
 import { canonical } from "../../core/canonical.js";
-import { invariant } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
 import type { PrivacyHook } from "../trust/contracts.js";
 import type { PrivacyExportStream } from "../trust/privacy-export.js";
 import {
@@ -11,6 +11,12 @@ import {
 } from "./privacy.js";
 import { PreparedConversationPrivacyCursor } from "./privacy-export-cursor.js";
 import { writeConversationPrivacyCursor } from "./privacy-export-cursor-rows.js";
+import {
+  assertConversationPrivacyPool,
+  cancelConversationPrivacyBackend,
+  conversationPrivacyCause,
+  conversationPrivacyReadUncertain,
+} from "./privacy-cancellation.js";
 
 type Job = Parameters<PrivacyHook["run"]>[0];
 const sorted = (families: readonly ConversationPrivacyFamily[]) =>
@@ -66,16 +72,41 @@ export function conversationPrivacyExportStream(
   let client: PoolClient | undefined;
   let clientReleased = false;
   let discardClient = false;
+  let backendPid: number | undefined;
+  let cancelling: Promise<void> | undefined;
+  let destroying: Promise<void> | undefined;
+  let phase: "pid" | "begin" | "work" | "commit" = "pid";
+  const transportFailures: unknown[] = [];
+  const cancellationFailures: unknown[] = [];
+  const cleanupFailures: unknown[] = [];
+  const sourceError = (error: Error) => {
+    transportFailures.push(error);
+    discardClient = true;
+  };
+  const destroySource = () => {
+    discardClient = true;
+    if (!client) return Promise.resolve();
+    return (destroying ??= client.end().catch((error: unknown) => {
+      cleanupFailures.push(error);
+    }));
+  };
   const releaseClient = async (destroy = false) => {
     if (client && !clientReleased) {
       clientReleased = true;
-      if (destroy)
-        await client.end().catch((error: unknown) => {
-          failed = true;
-          failure ??= error;
-        });
-      cursor.forget(client);
-      client.release(destroy);
+      try {
+        if (destroy) await destroySource();
+      } catch (error) {
+        cleanupFailures.push(error);
+      } finally {
+        cursor.forget(client);
+        try {
+          client.release(destroy);
+        } catch (error) {
+          cleanupFailures.push(error);
+        } finally {
+          client.removeListener("error", sourceError);
+        }
+      }
     }
   };
   const done = new Promise<void>((resolve) => {
@@ -91,6 +122,19 @@ export function conversationPrivacyExportStream(
     // The producer retains the held client through query cancellation and
     // awaited rollback. Only its final cleanup may forget or release it.
     notify();
+    if (!client || clientReleased || cancelling) return;
+    if (backendPid === undefined) {
+      cancelling = destroySource();
+      return;
+    }
+    // Covers original PID/BEGIN/catalogue/DECLARE/bookend queries too. Typed
+    // FETCH owns its page cancel; both control sockets settle before cleanup.
+    cancelling = cancelConversationPrivacyBackend(input.pool, backendPid).catch(
+      (error: unknown) => {
+        cancellationFailures.push(error);
+        discardClient = true;
+      },
+    );
   };
   signal.addEventListener("abort", abort, { once: true });
   const flush = async () => {
@@ -140,9 +184,22 @@ export function conversationPrivacyExportStream(
   const produce = async () => {
     try {
       await assertCurrent();
+      assertConversationPrivacyPool(input.pool);
       client = await input.pool.connect();
+      client.on("error", sourceError);
+      signal.throwIfAborted();
+      const observed = (await client.query("SELECT pg_backend_pid() AS pid"))
+        .rows[0]?.pid;
+      invariant(
+        Number.isSafeInteger(observed) && observed > 0,
+        "conversation_export_source_unavailable",
+        "The actual retained source backend is required.",
+      );
+      backendPid = observed;
+      phase = "begin";
       signal.throwIfAborted();
       await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
+      phase = "work";
       await client.query(
         "SET LOCAL timezone='UTC'; SET LOCAL statement_timeout='10s'; SET LOCAL lock_timeout='1s'; SET LOCAL idle_in_transaction_session_timeout='5s'",
       );
@@ -165,23 +222,90 @@ export function conversationPrivacyExportStream(
       await cursor.assertCurrent(client, job, families);
       await fenceConversationPrivacyTask(input.authority, client, job);
       signal.throwIfAborted();
-      await client.query("COMMIT");
+      signal.removeEventListener("abort", abort);
+      await cancelling;
+      if (cancellationFailures.length || transportFailures.length)
+        throw new DomainError(
+          "conversation_export_cancel_unavailable",
+          "The original source connection could not settle safely.",
+          503,
+        );
       signal.throwIfAborted();
+      phase = "commit";
+      const receipt = await client.query("COMMIT");
+      invariant(
+        receipt.command === "COMMIT",
+        "conversation_export_commit_unavailable",
+        "The original source did not return a commit receipt.",
+      );
       committed = true;
+      signal.throwIfAborted();
     } catch (error) {
       failed = true;
       failure = error;
-      if (client && !clientReleased)
-        await client.query("ROLLBACK").catch(() => {
-          discardClient = true;
-        });
+      signal.removeEventListener("abort", abort);
+      await cancelling;
+      if (client && !clientReleased) {
+        discardClient ||=
+          cursor.requiresDestruction(client) ||
+          transportFailures.length > 0 ||
+          cancellationFailures.length > 0 ||
+          (!committed &&
+            (phase !== "work" || conversationPrivacyReadUncertain(error)));
+        if (!discardClient && !committed) {
+          try {
+            await client.query("ROLLBACK");
+          } catch (error) {
+            discardClient = true;
+            cleanupFailures.push(error);
+          }
+        }
+      }
     } finally {
+      signal.removeEventListener("abort", abort);
+      await cancelling;
+      discardClient ||=
+        transportFailures.length > 0 || cancellationFailures.length > 0;
       try {
         await releaseClient(discardClient);
       } catch (error) {
-        failed = true;
-        failure ??= error;
+        cleanupFailures.push(error);
       } finally {
+        if (
+          transportFailures.length ||
+          cancellationFailures.length ||
+          cleanupFailures.length
+        ) {
+          const error = new DomainError(
+            cancellationFailures.length
+              ? "conversation_export_cancel_unavailable"
+              : committed
+                ? "conversation_export_release_unavailable"
+                : "conversation_export_rollback_unavailable",
+            committed
+              ? "The source committed but connection cleanup failed. Reconcile its actual receipt."
+              : "Export could not settle safely; this task cannot complete.",
+            503,
+          );
+          conversationPrivacyCause(
+            error,
+            new AggregateError(
+              [
+                ...new Set(
+                  [
+                    ...(failed ? [failure] : []),
+                    ...transportFailures,
+                    ...cancellationFailures,
+                    ...cleanupFailures,
+                  ].filter((cause) => cause !== undefined),
+                ),
+              ],
+              "Original export and settlement failures.",
+            ),
+          );
+          failed = true;
+          failure = error;
+        }
         signal.removeEventListener("abort", abort);
         resolveDone();
         notify();
