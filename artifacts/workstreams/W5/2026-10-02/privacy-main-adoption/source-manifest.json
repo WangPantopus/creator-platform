@@ -1,0 +1,14 @@
+{
+  "sourceCommit": "98024f7b8f028bdebea9bcdb5dc1141e7f372d43",
+  "canonicalMain": "b6c073aef97b2ea7c06847b4baa9914d9bce06b7",
+  "wave": "20261002-privacy",
+  "packetSha256": "2d72120d1be136081acb5d324f19dae44660d6e423e932cc962664596ab4c3e2",
+  "originalDatabase": "creator_w5",
+  "independentRestore": "creator_w5_privacy_main_restore_20261002",
+  "restoreTrafficClosed": true,
+  "applicationAdmission": "returned only to saved original local-development admission after actual preservation and safety checks",
+  "newHeldPurposesActivated": false,
+  "genuineTaskOrContentAcceptance": false,
+  "releaseReady": false,
+  "creatorVerification": "DEVELOPMENT-ONLY SEEDED at2026-10-01T20:44:26Z; no proof or passkey"
+}

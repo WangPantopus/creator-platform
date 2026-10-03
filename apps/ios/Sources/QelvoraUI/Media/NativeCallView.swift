@@ -11,7 +11,6 @@ public struct NativeCallRoute: Sendable {
     var path: String { "/v1/w6/threads/\(creatorID.uuidString.lowercased())/\(fanID.uuidString.lowercased())/calls/\(sessionID.uuidString.lowercased())" }
 }
 public struct NativeCallAdmission: Decodable, Sendable { public let token: String; public let url: String; public let nonce: String; public let sessionId: String; public let accountId: String; public let expiresAt: String; public let role: String }
-private struct NativeCallRedemption: Decodable { let admitted: Bool }
 private struct NativeCallConsent: Decodable, Sendable { let role: String; let purpose: String; let granted: Bool }
 private struct NativeCallPacket: Decodable, Sendable { let summary: String; let attachmentIds: [String] }
 private struct NativeCallDocument: Decodable, Sendable {
@@ -21,7 +20,7 @@ private struct NativeCallDocument: Decodable, Sendable {
     let state: String; let version: Int; let recordingState: String; let consents: [NativeCallConsent]; let packet: NativeCallPacket
     let outcome: String?; let summary: String?; let summaryState: String?; let recordingOccurred: Bool?
 }
-/** The genuine provider adapter owns capture, rendering and OS audio activation. No adapter is registered by default. */
+/** The genuine provider adapter owns capture, rendering and OS audio activation. */
 @MainActor public protocol NativeCallScreenTransport: AnyObject {
     var mediaView: AnyView { get }
     func connect(admission: NativeCallAdmission, camera: Bool, onState: @escaping @MainActor (String) -> Void) async throws
@@ -33,7 +32,9 @@ private struct NativeCallDocument: Decodable, Sendable {
 
 /** Uses persisted server state and real account credentials; no local delivered-time clock or default creator. */
 @MainActor public struct NativeCallView: View {
-    private let client: NativeMediaClient?; private let route: NativeCallRoute?; private let actorAccountID: String?; private let open: (String) -> Void
+    private let baseURL: URL?; private let destination: String; private let route: NativeCallRoute?; private let open: (String) -> Void
+    @ObservedObject private var model: FanSession
+    private var actorAccountID: String? { model.session?.accountId }
     @Environment(\.colorScheme) private var scheme
     @Environment(\.scenePhase) private var scenePhase
     @State private var call: NativeCallDocument?
@@ -51,9 +52,24 @@ private struct NativeCallDocument: Decodable, Sendable {
     @State private var automaticRefresh = true
     @State private var pollDelay = 1000
     @State private var refreshVersion = 0
-    public init(baseURL: URL?, destination: String, actorAccountID: String?, open: @escaping (String) -> Void = { _ in }) {
-        route = NativeCallRoute(destination: destination); self.actorAccountID = actorAccountID; self.open = open
-        client = baseURL.map { NativeMediaClient(baseURL: $0, sessionToken: { guard let value = try await SecureSessionStorage().read() else { throw URLError(.userAuthenticationRequired) }; return value }) }
+    public init(baseURL: URL?, destination: String, model: FanSession, open: @escaping (String) -> Void = { _ in }) {
+        route = NativeCallRoute(destination: destination); self.baseURL = baseURL; self.destination = destination; self.model = model; self.open = open
+    }
+    private func current(_ request: FanSessionRequestCapture) async -> Bool {
+        guard active, !Task.isCancelled else { return false }
+        return await request.isCurrent()
+    }
+    private func document(_ value: APICallCallSession, route: NativeCallRoute) throws -> NativeCallDocument {
+        guard UUID(uuidString: value.id) == route.sessionID,
+              UUID(uuidString: value.creatorId) == route.creatorID,
+              UUID(uuidString: value.fanId) == route.fanID else { throw URLError(.badServerResponse) }
+        return try JSONDecoder().decode(NativeCallDocument.self, from: JSONEncoder().encode(value))
+    }
+    private func read(_ request: FanSessionRequestCapture, route: NativeCallRoute) async throws -> NativeCallDocument {
+        guard await current(request) else { throw CancellationError() }
+        let value = try await request.client.readCallSession(creatorId: route.creatorID.uuidString.lowercased(), fanId: route.fanID.uuidString.lowercased(), sessionId: route.sessionID.uuidString.lowercased(), xQelvoraExpectedAccount: request.expectedAccountId)
+        guard await current(request) else { throw CancellationError() }
+        return try document(value, route: route)
     }
     private func clock(_ milliseconds: Int) -> String { String(format: "%02d:%02d", max(0, milliseconds) / 60000, max(0, milliseconds) / 1000 % 60) }
     private func role(_ value: NativeCallDocument) -> String? { actorAccountID == value.creatorAccountId ? "creator" : actorAccountID == value.fanAccountId ? "fan" : nil }
@@ -66,21 +82,23 @@ private struct NativeCallDocument: Decodable, Sendable {
         return QelvoraCopy.text("w6WaitingForBothParticipants")
     }
     private func refresh() async {
-        guard !fetching, !busy, let client, let route else { return }; fetching = true; defer { fetching = false }
-        guard let account = actorAccountID.flatMap({ UUID(uuidString: $0) }) else { automaticRefresh = false; return }
+        guard !fetching, !busy, let route, let request = await model.captureRequest(from: destination) else { return }; fetching = true; defer { fetching = false }
         do {
-            let value = try JSONDecoder().decode(NativeCallDocument.self, from: await client.request(path: route.path, expectedAccountId: account))
-            try Task.checkCancellation()
-            guard active else { return }
+            let value = try await read(request, route: route)
+            guard await current(request) else { return }
             if value.version >= (call?.version ?? 0) { call = value }; stale = false; error = nil
             pollDelay = ["ended", "cancelled"].contains(value.state) ? 30000 : 1000
             if ["ending", "ended", "cancelled"].contains(value.state) { await disconnectMedia() }
         } catch is CancellationError { }
         catch {
-            guard active, !Task.isCancelled else { return }
-            if let failure = error as? NativeMediaRequestError {
+            guard await current(request) else { return }
+            if let failure = error as? CreatorAPIError {
                 if [401, 403, 404, 409].contains(failure.status) { await disconnectMedia(); call = nil; automaticRefresh = false }
-                if ["calls_unconfigured", "call_control_unconfigured", "call_provider_unconfigured", "call_admission_unverified", "call_control_role_invalid"].contains(failure.code ?? "") { automaticRefresh = false }
+                let code = (try? JSONDecoder().decode(APIError.self, from: failure.body))?.error.code
+                if ["calls_unconfigured", "call_control_unconfigured", "call_provider_unconfigured", "call_admission_unverified", "call_control_role_invalid"].contains(code ?? "") {
+                    await disconnectMedia(); call = nil; automaticRefresh = false; stale = true
+                    self.error = QelvoraCopy.text("w6CallServiceUnavailable"); return
+                }
             }
             pollDelay = min(pollDelay * 2, 30000)
             stale = true; self.error = QelvoraCopy.text("w6ReconnectToRefreshThisCallActionsAreUnavailableUntilAccess")
@@ -91,17 +109,41 @@ private struct NativeCallDocument: Decodable, Sendable {
         await current?.disconnect()
     }
     private func action(_ name: String, values: [String: Any] = [:]) async {
-        guard !busy, !stale, let call, role(call) != nil, let client, let route else { return }; busy = true; error = nil; defer { busy = false }
+        guard !busy, !stale, let call, role(call) != nil, let route, let request = await model.captureRequest(from: destination) else { return }; busy = true; error = nil; defer { busy = false }
         do {
             var body = values; body["expectedVersion"] = call.version; body["idempotencyKey"] = UUID().uuidString
-            let result = try await client.request(path: route.path + "/" + name, method: "POST", body: JSONSerialization.data(withJSONObject: body))
-            self.call = try JSONDecoder().decode(NativeCallDocument.self, from: result)
+            let data = try JSONSerialization.data(withJSONObject: body), decoder = JSONDecoder()
+            let creator = route.creatorID.uuidString.lowercased(), fan = route.fanID.uuidString.lowercased(), session = route.sessionID.uuidString.lowercased()
+            guard await current(request) else { return }
+            let result: APICallCallSession
+            switch name {
+            case "consent": result = try await request.client.setCallConsent(creatorId: creator, fanId: fan, sessionId: session, xQelvoraExpectedAccount: request.expectedAccountId, body: decoder.decode(APICallConsentCommand.self, from: data))
+            case "end": result = try await request.client.endCallSession(creatorId: creator, fanId: fan, sessionId: session, xQelvoraExpectedAccount: request.expectedAccountId, body: decoder.decode(APICallEndCall.self, from: data))
+            case "delete-summary": result = try await request.client.deleteCallSummary(creatorId: creator, fanId: fan, sessionId: session, xQelvoraExpectedAccount: request.expectedAccountId, body: decoder.decode(APICallCallRevision.self, from: data))
+            default: throw URLError(.unsupportedURL)
+            }
+            guard await current(request) else { return }
+            self.call = try document(result, route: route)
             if name == "end" { await disconnectMedia(); leaving = false }
-        } catch { self.error = QelvoraCopy.text("w6ThisActionCouldNotCompleteRefreshTheCallBeforeTrying"); stale = true }
+        } catch is CancellationError { }
+        catch { if await current(request) { self.error = QelvoraCopy.text("w6ThisActionCouldNotCompleteRefreshTheCallBeforeTrying"); stale = true } }
     }
     private func join() async {
-        guard active, !busy, !stale, transport == nil || localState == "disconnected", let call, role(call) != nil, let client, let route else { return }
-        guard let adapter = NativeCallTransports.create?(route.sessionID) else { error = QelvoraCopy.text("w6CallingIsNotConnectedYetYourBookingIsUnchanged"); return }
+        guard active, !busy, !stale, transport == nil || localState == "disconnected", let call, role(call) != nil, let route, let request = await model.captureRequest(from: destination) else { return }
+        let adapter: any NativeCallScreenTransport
+        if let custom = NativeCallTransports.create?(route.sessionID) { adapter = custom }
+        else {
+            #if os(iOS)
+            adapter = LiveKitCallKitTransport(sessionID: route.sessionID, isCurrent: { await current(request) }) { sessionID in
+                guard sessionID == route.sessionID, await current(request) else { throw CancellationError() }
+                let value = try await read(request, route: route)
+                guard role(value) != nil, !["ending", "ended", "cancelled"].contains(value.state), let end = date(value.hardEndAt), end > Date(), await current(request) else { throw CancellationError() }
+                return (value.creatorName, value.mediaMode == "video")
+            }
+            #else
+            error = QelvoraCopy.text("w6CallingIsNotConnectedYetYourBookingIsUnchanged"); return
+            #endif
+        }
         busy = true; error = nil; defer { busy = false }
         mediaEpoch += 1; let epoch = mediaEpoch
         let wantsCamera = call.mediaMode == "video"
@@ -112,32 +154,53 @@ private struct NativeCallDocument: Decodable, Sendable {
                 return
             }
             try Task.checkCancellation()
-            guard active, epoch == mediaEpoch else { return }
+            guard active, epoch == mediaEpoch, await current(request) else { return }
             #else
             self.error = QelvoraCopy.text("w6CallingIsNotConnectedYetYourBookingIsUnchanged")
             return
             #endif
-            let admission = try JSONDecoder().decode(NativeCallAdmission.self, from: await client.request(path: route.path + "/join", method: "POST", body: Data("{}".utf8)))
+            let creator = route.creatorID.uuidString.lowercased(), fan = route.fanID.uuidString.lowercased(), session = route.sessionID.uuidString.lowercased()
+            let value = try await request.client.joinCallSession(creatorId: creator, fanId: fan, sessionId: session, xQelvoraExpectedAccount: request.expectedAccountId)
+            let admission = try JSONDecoder().decode(NativeCallAdmission.self, from: JSONEncoder().encode(value))
             try Task.checkCancellation()
-            guard active, epoch == mediaEpoch else { return }
+            guard active, epoch == mediaEpoch, await current(request) else { return }
             guard UUID(uuidString: admission.sessionId) == route.sessionID,
                   admission.accountId.lowercased() == actorAccountID?.lowercased(),
                   admission.role == role(call), UUID(uuidString: admission.nonce) != nil,
                   let expires = date(admission.expiresAt), expires > Date() else { throw URLError(.badServerResponse) }
-            let receipt = try await client.request(path: route.path + "/redeem", method: "POST", body: JSONSerialization.data(withJSONObject: ["nonce": admission.nonce]))
+            let receipt = try await request.client.redeemCallAdmission(creatorId: creator, fanId: fan, sessionId: session, xQelvoraExpectedAccount: request.expectedAccountId, body: APICallAdmissionRedemption(nonce: admission.nonce))
             try Task.checkCancellation()
-            guard active, epoch == mediaEpoch else { return }
-            guard try JSONDecoder().decode(NativeCallRedemption.self, from: receipt).admitted,
+            guard active, epoch == mediaEpoch, await current(request) else { return }
+            guard receipt.admitted.value,
                   admission.accountId.lowercased() == actorAccountID?.lowercased(),
                   expires > Date() else { throw URLError(.badServerResponse) }
             transport = adapter; camera = wantsCamera
-            try await adapter.connect(admission: admission, camera: camera, onState: { if active && epoch == mediaEpoch { localState = $0 } })
-            if !active || epoch != mediaEpoch { await adapter.disconnect() }
+            try await adapter.connect(admission: admission, camera: camera, onState: { state in Task { @MainActor in if active, epoch == mediaEpoch, await current(request) { localState = state } } })
+            let currentRequest = await current(request)
+            if !active || epoch != mediaEpoch || !currentRequest { await adapter.disconnect() }
         } catch {
             await adapter.disconnect()
-            guard active, epoch == mediaEpoch else { return }
+            guard active, epoch == mediaEpoch, await current(request) else { return }
             transport = nil; localState = "disconnected"; self.error = QelvoraCopy.text("w6ConnectionFailedRejoinTheSameCall")
         }
+    }
+    private func changeMicrophone() async {
+        guard let adapter = transport, let request = await model.captureRequest(from: destination), await current(request) else { return }
+        let epoch = mediaEpoch, enabled = muted
+        do {
+            try await adapter.microphone(enabled: enabled)
+            guard active, epoch == mediaEpoch, await current(request) else { return }
+            muted = !enabled
+        } catch { if active, epoch == mediaEpoch, await current(request) { self.error = QelvoraCopy.text("w6MicrophoneChangeFailed") } }
+    }
+    private func changeCamera() async {
+        guard let adapter = transport, let request = await model.captureRequest(from: destination), await current(request) else { return }
+        let epoch = mediaEpoch, enabled = !camera
+        do {
+            try await adapter.camera(enabled: enabled)
+            guard active, epoch == mediaEpoch, await current(request) else { return }
+            camera = enabled
+        } catch { if active, epoch == mediaEpoch, await current(request) { self.error = QelvoraCopy.text("w6CameraChangeFailed") } }
     }
     public var body: some View {
         ScrollView {
@@ -165,8 +228,8 @@ private struct NativeCallDocument: Decodable, Sendable {
                         if let transport { transport.mediaView.frame(minHeight: 260).background(qColor("maya-surface", scheme)).clipShape(RoundedRectangle(cornerRadius: 24)) }
                         else { Text(QelvoraCopy.text("w6MediaConnectionIsUnavailable")).qText("body") }
                         HStack {
-                            Button(muted ? QelvoraCopy.text("w6Unmute") : QelvoraCopy.text("w6Mute"), variant: .secondary, disabled: busy || stale || transport == nil) { Task { do { try await transport?.microphone(enabled: muted); muted.toggle() } catch { self.error = QelvoraCopy.text("w6MicrophoneChangeFailed") } } }
-                            Button(QelvoraCopy.text("w6Camera"), variant: .secondary, disabled: busy || stale || transport == nil || call.mediaMode != "video") { Task { do { try await transport?.camera(enabled: !camera); camera.toggle() } catch { self.error = QelvoraCopy.text("w6CameraChangeFailed") } } }
+                            Button(muted ? QelvoraCopy.text("w6Unmute") : QelvoraCopy.text("w6Mute"), variant: .secondary, disabled: busy || stale || transport == nil) { Task { await changeMicrophone() } }
+                            Button(QelvoraCopy.text("w6Camera"), variant: .secondary, disabled: busy || stale || transport == nil || call.mediaMode != "video") { Task { await changeCamera() } }
                         }
                         HStack { Button(QelvoraCopy.text("w6Report"), variant: .secondary) { open("/support") }; Button(QelvoraCopy.text("w6Leave"), variant: .secondary, disabled: busy || stale || role(call) == nil) { leaving = true } }
                     }
@@ -195,10 +258,10 @@ private struct NativeCallDocument: Decodable, Sendable {
                     }
                 }
                 if let error { Text(error).qText("caption") }
-                Button(QelvoraCopy.text("w6RefreshCall"), variant: .quiet, disabled: busy || fetching || client == nil || route == nil) { refreshVersion += 1 }
+                Button(QelvoraCopy.text("w6RefreshCall"), variant: .quiet, disabled: busy || fetching || baseURL == nil || route == nil) { refreshVersion += 1 }
             }.padding(QelvoraTokens.space4).frame(maxWidth: QelvoraTokens.phoneWidth, alignment: .leading)
         }.background(qColor("ground", scheme)).foregroundStyle(qColor("ink", scheme))
-            .task(id: "\(route?.path ?? ""):\(actorAccountID ?? ""):\(refreshVersion):\(scenePhase)") {
+            .task(id: "\(route?.path ?? ""):\(actorAccountID ?? ""):\(model.session?.sessionId ?? ""):\(refreshVersion):\(scenePhase)") {
                 guard scenePhase == .active else { return }
                 automaticRefresh = true; pollDelay = 1000
                 while !Task.isCancelled && automaticRefresh {
@@ -208,7 +271,7 @@ private struct NativeCallDocument: Decodable, Sendable {
                 }
             }
             .onAppear { active = true }
-            .onChange(of: actorAccountID) { _, _ in Task { await disconnectMedia(); call = nil; stale = true } }
+            .onChange(of: model.session?.sessionId) { _, _ in Task { await disconnectMedia(); call = nil; stale = true } }
             .onChange(of: scenePhase) { _, phase in
                 if phase == .background, transport == nil { mediaEpoch += 1 }
             }

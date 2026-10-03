@@ -2,21 +2,59 @@
 import Foundation
 import SwiftUI
 import LiveKit
+import AVFoundation
 
-/** SDK transport only; its factory stays unregistered until real host authority exists. */
+/** Actual SDK media; OS composition admits it only after current backend authorization. */
 @MainActor public final class LiveKitNativeCallTransport: NSObject, ObservableObject, NativeCallScreenTransport, RoomDelegate {
     private let sessionID: UUID
     private var room: Room?
+    private var disconnectTask: Task<Void, Never>?
+    private var controls: [UUID: Task<Void, any Error>] = [:]
     private var epoch = 0
     private var cameraAllowed = false
     private var stateChanged: (@MainActor (String) -> Void)?
+    private static weak var systemAudioOwner: LiveKitNativeCallTransport?
+    private var previousAutomaticAudio: Bool?
+    private var previousEngineAvailability: AudioEngineAvailability?
     @Published private var remoteVideo: VideoTrack?
     public init(sessionID: UUID) { self.sessionID = sessionID; super.init() }
     public var mediaView: AnyView { AnyView(LiveKitCallMedia(transport: self)) }
 
+    /** CallKit alone activates AVAudioSession. The SDK may establish transport
+     * and publish while its audio engine is held off until didActivate. */
+    internal func reserveSystemAudio() throws {
+        guard Self.systemAudioOwner == nil else { throw URLError(.resourceUnavailable) }
+        let manager = AudioManager.shared
+        let automatic = manager.audioSession.isAutomaticConfigurationEnabled
+        let availability = manager.engineAvailability
+        manager.audioSession.isAutomaticConfigurationEnabled = false
+        do {
+            try manager.setEngineAvailability(.none)
+            try AVAudioSession.sharedInstance().setCategory(.playAndRecord, mode: .voiceChat, options: [.allowBluetooth])
+            previousAutomaticAudio = automatic; previousEngineAvailability = availability
+            Self.systemAudioOwner = self
+        } catch {
+            manager.audioSession.isAutomaticConfigurationEnabled = automatic
+            try? manager.setEngineAvailability(availability)
+            throw error
+        }
+    }
+    internal func systemAudio(active: Bool) throws {
+        guard Self.systemAudioOwner === self else { throw URLError(.resourceUnavailable) }
+        try AudioManager.shared.setEngineAvailability(active ? .default : .none)
+    }
+    private func releaseSystemAudio() {
+        guard Self.systemAudioOwner === self else { return }
+        // Restore only after this SDK connection has drained, so a late cleanup
+        // cannot stop a replacement call's audio engine.
+        if let automatic = previousAutomaticAudio { AudioManager.shared.audioSession.isAutomaticConfigurationEnabled = automatic }
+        if let availability = previousEngineAvailability { try? AudioManager.shared.setEngineAvailability(availability) }
+        previousAutomaticAudio = nil; previousEngineAvailability = nil; Self.systemAudioOwner = nil
+    }
+
     public func connect(admission: NativeCallAdmission, camera: Bool, onState: @escaping @MainActor (String) -> Void) async throws {
         guard NativeMediaDevicePermissions.granted(camera: camera) else { throw URLError(.noPermissionsToReadFile) }
-        guard room == nil, UUID(uuidString: admission.sessionId) == sessionID,
+        guard room == nil, disconnectTask == nil, UUID(uuidString: admission.sessionId) == sessionID,
               let url = URLComponents(string: admission.url), url.user == nil, url.password == nil,
               url.query == nil, url.fragment == nil, !admission.token.isEmpty, admission.token.count <= 16384 else { throw URLError(.badServerResponse) }
         var allowed = url.scheme == "wss"
@@ -42,17 +80,35 @@ import LiveKit
         }
     }
     public func microphone(enabled: Bool) async throws {
-        guard let room else { throw URLError(.notConnectedToInternet) }
-        try await room.localParticipant.setMicrophone(enabled: enabled)
+        guard let current = room else { throw URLError(.notConnectedToInternet) }
+        let generation = epoch, id = UUID()
+        let task = Task { @MainActor in _ = try await current.localParticipant.setMicrophone(enabled: enabled) }
+        controls[id] = task; defer { controls.removeValue(forKey: id) }
+        try await withTaskCancellationHandler { try await task.value } onCancel: { task.cancel() }
+        try Task.checkCancellation()
+        guard generation == epoch, room === current else { throw CancellationError() }
     }
     public func camera(enabled: Bool) async throws {
-        guard let room, cameraAllowed else { throw URLError(.resourceUnavailable) }
-        try await room.localParticipant.setCamera(enabled: enabled)
+        guard let current = room, cameraAllowed else { throw URLError(.resourceUnavailable) }
+        let generation = epoch, id = UUID()
+        let task = Task { @MainActor in _ = try await current.localParticipant.setCamera(enabled: enabled) }
+        controls[id] = task; defer { controls.removeValue(forKey: id) }
+        try await withTaskCancellationHandler { try await task.value } onCancel: { task.cancel() }
+        try Task.checkCancellation()
+        guard generation == epoch, room === current else { throw CancellationError() }
     }
     public func disconnect() async {
+        if let disconnectTask { await disconnectTask.value; return }
         epoch += 1; let current = room; room = nil; stateChanged = nil; remoteVideo = nil; cameraAllowed = false
         current?.remove(delegate: self)
-        await current?.disconnect()
+        let pending = Array(controls.values); controls.removeAll()
+        pending.forEach { $0.cancel() }
+        let drain = Task { @MainActor in
+            for task in pending { _ = try? await task.value }
+            await current?.disconnect(); releaseSystemAudio()
+        }
+        disconnectTask = drain
+        await drain.value; disconnectTask = nil
     }
     private func updateVideo(_ current: Room) {
         guard room === current else { return }

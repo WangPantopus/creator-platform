@@ -1,0 +1,15 @@
+{
+  "source": "5e1f54acad536fa0af1a9a1ae933e37dc42746b5",
+  "baseMain": "7a2e08fa4f602e9075d1394d55fbaad963dec7d2",
+  "checks": {
+    "backendTypes": "passed",
+    "scopedLintFormat": "passed"
+  },
+  "ownerSource": "c97049cba3f9dddc4133b621ef20b9be1c3b8adc",
+  "ownerFile": "apps/backend/src/modules/growth/content.ts",
+  "ownerFileSha256": "8bca458b9743e493f07380cd051882efb3d286962c471cd9e5f4def356c0561d",
+  "change": "Actual initial/proof-view non-null planRef withdrawal and refusal until genuine owner retraction exists. W5 repeated shutdown guard before any asynchronous close.",
+  "registeredOrActivatedMigration": false,
+  "positiveGroupProjection": false,
+  "releaseReady": false
+}

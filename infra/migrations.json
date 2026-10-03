@@ -325,22 +325,26 @@
     {
       "version": "0074_w8_content_runtime_denial",
       "path": "apps/backend/migrations/0074_w8_content_runtime_denial.sql",
-      "owner": "W8"
+      "owner": "W8",
+      "sourceSha256": "61866894c579039cfc2bf11522edeaf46fa03bd51761cca3791ab3471fb9b2f3"
     },
     {
       "version": "0082_w8_interactive_denial_try_fence",
       "path": "apps/backend/migrations/0082_w8_interactive_denial_try_fence.sql",
-      "owner": "W8"
+      "owner": "W8",
+      "sourceSha256": "3742b1e6b7f367ca626176615c5362ecf002fe5fcc5a96ea941d35a4708e8686"
     },
     {
       "version": "0087_w8_privacy_task_commit_fence",
       "path": "apps/backend/migrations/0087_w8_privacy_task_commit_fence.sql",
-      "owner": "W8"
+      "owner": "W8",
+      "sourceSha256": "33e619bfdea66355e1d8d2b90ed2d0389f21ae024fda63e1b984c99aede847ef"
     },
     {
       "version": "0103_w8_domain_privacy_task_fence",
       "path": "apps/backend/migrations/0103_w8_domain_privacy_task_fence.sql",
-      "owner": "W8"
+      "owner": "W8",
+      "sourceSha256": "040771e88c1cea0720519a2c162cd02319229d9c67171966fc98bc6a3476c15d"
     }
   ],
   "reserved": [
@@ -989,6 +993,23 @@
       "path": "apps/backend/migrations/0207_w8_development_feedback_lifecycle.sql",
       "state": "reserved_unapplied",
       "reason": "Development-only finite feedback/IntroOffer expiry and actual withdrawal proposal following human authorization for necessary product policy. Exact notice/version, fixed seven-day feedback/event lifecycle, isolated NoLogin expiry/withdrawal role and original held W1/W3 callback contract require source/owner/C10 review and real saved-state acceptance. No invented fan consent, marketing/training/provider use, production/legal approval or expiry of unclassified historical identity events. Allocation only; source not yet implemented."
+    },
+    {
+      "id": "0208",
+      "owner": "W1",
+      "version": "0208_w1_publication_preparation",
+      "path": "apps/backend/src/modules/identity/schema-publication-preparation.sql",
+      "state": "reserved_unapplied",
+      "reason": "Actual W1 early private preparation before publication task/body/positive creator or key locks; original task/token/client/PID/fullXID and original publication-worker scope nonce, joint W4/W1 final SQL cleanup before only COMMIT. Exact owner source and signatures pending; no fabricated actor/session, old-scope bridge, provider grant or activation."
+    },
+    {
+      "id": "0209",
+      "owner": "W8",
+      "version": "0209_w8_all_scope_privacy_ownership",
+      "path": "apps/backend/migrations/0209_w8_all_scope_privacy_ownership.sql",
+      "sourceSha256": "6fa4006cb8c2f6901c7006595d08196573daef33f06aa6cec866a546ffcd2f01",
+      "state": "reserved_unapplied",
+      "reason": "Additive original0027 ownership constraint continuation and isolated metadata-only registered-source readiness. New verified jobs capture immutable full original ownership for every scope. Original0027/0087 bytes, roles and history stay unchanged; old NULL snapshots fail closed. Actual held non-account family projection is a separate pending purpose; closed SQL/catalogue review and actual unavailable web acceptance do not activate this source or qualify full C10."
     }
   ]
 }

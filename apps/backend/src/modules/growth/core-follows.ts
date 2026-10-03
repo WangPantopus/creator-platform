@@ -3,12 +3,14 @@ import type { PoolClient } from "pg";
 import { z } from "zod";
 import { DomainError } from "../../core/errors.js";
 import {
-  assertCurrentSession,
+  assertHeldCurrentRequestSession,
+  holdCurrentRequestSession,
   requestAuthority,
 } from "../identity/request-authority.js";
 
 /** Actual W8 registry receipt, never a fabricated purpose or family scope.
- * W8 reserved 0101; this descriptor does not register or activate its SQL. */
+ * Corrected held map fb1cbca reserves0185; SQL bytes and applied history stay
+ * unchanged. This descriptor does not register or activate the proposal. */
 export interface CoreFollowMigration {
   version: string;
   checksum: string;
@@ -16,7 +18,7 @@ export interface CoreFollowMigration {
   functionDefinitionSha256: string;
 }
 const Migration = z.strictObject({
-  version: z.literal("0101_w7_core_follow_metadata"),
+  version: z.literal("0185_w7_core_follow_metadata"),
   checksum: z.string().regex(/^[a-f0-9]{64}$/u),
   functionDefinitionSha256: z.string().regex(/^[a-f0-9]{64}$/u),
 });
@@ -42,6 +44,7 @@ export function canonicalCoreContentFollows(registered?: CoreFollowMigration) {
     if (!migration || !authority || authority.accountId !== accountId)
       throw unavailable();
     z.uuid().parse(authority.sessionId);
+    const held = await holdCurrentRequestSession(client, accountId);
     const context = (
       await client.query<{
         account_id: string;
@@ -71,7 +74,7 @@ export function canonicalCoreContentFollows(registered?: CoreFollowMigration) {
       !context.fan
     )
       throw unavailable();
-    await assertCurrentSession(client, accountId);
+    await assertHeldCurrentRequestSession(held, client);
     const session = await client.query<{ id: string | null }>(
       "SELECT current_setting('app.identity_session_id',true) AS id",
     );
@@ -158,6 +161,7 @@ export function canonicalCoreContentFollows(registered?: CoreFollowMigration) {
       )
     ).rows[0];
     if (typeof row?.following !== "boolean") throw unavailable();
+    await assertHeldCurrentRequestSession(held, client);
     return row.following;
   };
 }
