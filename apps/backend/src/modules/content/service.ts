@@ -21,12 +21,14 @@ import {
 import type { Actor } from "../identity/adapter.js";
 import { identityTransaction } from "../identity/transaction.js";
 import { assertCurrentSession } from "../identity/request-authority.js";
+import { withRequestContextRestore } from "../identity/request-context.js";
 import {
   consumeCreatorSignedAct,
   setSignatureVisibility,
 } from "../identity/subjects.js";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
+import { querySettlementUncertain } from "../../core/query-settlement.js";
 import { baseNoteReplyPolicy } from "./tenure.js";
 import {
   ContentPublicationSources,
@@ -440,17 +442,17 @@ export class ContentService {
     await client.query("SELECT set_config('app.account_id',$1,true)", [
       owner.account_id,
     ]);
-    let currentCreator;
-    try {
-      currentCreator = await client.query(
-        "SELECT 1 FROM creator.creator_profile WHERE id=$1 AND account_id=$2 AND verification='verified' AND NOT recovery_required FOR SHARE",
-        [creatorId, owner.account_id],
-      );
-    } finally {
-      await client.query("SELECT set_config('app.account_id',$1,true)", [
-        actor.accountId,
-      ]);
-    }
+    const currentCreator = await withRequestContextRestore(
+      () =>
+        client.query(
+          "SELECT 1 FROM creator.creator_profile WHERE id=$1 AND account_id=$2 AND verification='verified' AND NOT recovery_required FOR SHARE",
+          [creatorId, owner.account_id],
+        ),
+      () =>
+        client.query("SELECT set_config('app.account_id',$1,true)", [
+          actor.accountId,
+        ]),
+    );
     invariant(
       currentCreator.rowCount === 1,
       "creator_role_required",
@@ -2040,8 +2042,9 @@ export class ContentService {
     // Roll back partial producer writes if unavailable. Successful queue and
     // decision records commit or roll back with the actual source reply.
     await client.query("SAVEPOINT w5_reply_review_producer");
+    let result;
     try {
-      const result = await this.dependencies.reviewReply(client, {
+      result = await this.dependencies.reviewReply(client, {
         replyId,
         creatorId,
         fanId,
@@ -2049,20 +2052,25 @@ export class ContentService {
         text,
         textHash,
       });
-      if (
-        result &&
-        ["pending", "allowed", "flagged"].includes(result.state) &&
-        result.textHash === textHash &&
-        typeof result.reference === "string" &&
-        result.reference.trim().length > 0 &&
-        result.reference.length <= 200
-      ) {
-        await client.query("RELEASE SAVEPOINT w5_reply_review_producer");
-        return { ...result };
-      }
     } catch (failure) {
-      await client.query("ROLLBACK TO SAVEPOINT w5_reply_review_producer");
-      await client.query("RELEASE SAVEPOINT w5_reply_review_producer");
+      // An unknown original DB response or actual cancellation must reach the
+      // transaction owner. Never enqueue savepoint cleanup after it or turn it
+      // into a successful quarantined reply. W8 retains the private cause.
+      if (
+        querySettlementUncertain(failure) ||
+        (failure instanceof Error &&
+          ["AbortError", "TimeoutError"].includes(failure.name))
+      )
+        throw failure;
+      try {
+        await client.query("ROLLBACK TO SAVEPOINT w5_reply_review_producer");
+        await client.query("RELEASE SAVEPOINT w5_reply_review_producer");
+      } catch (cleanup) {
+        throw new AggregateError(
+          [failure, cleanup],
+          "Original reply review and savepoint cleanup failed.",
+        );
+      }
       if (
         failure instanceof DomainError &&
         failure.status >= 400 &&
@@ -2070,6 +2078,19 @@ export class ContentService {
       )
         throw failure;
       return pending;
+    }
+    if (
+      result &&
+      ["pending", "allowed", "flagged"].includes(result.state) &&
+      result.textHash === textHash &&
+      typeof result.reference === "string" &&
+      result.reference.trim().length > 0 &&
+      result.reference.length <= 200
+    ) {
+      // A failed RELEASE is itself an original transaction failure. It cannot
+      // re-enter producer fallback and submit another cleanup command.
+      await client.query("RELEASE SAVEPOINT w5_reply_review_producer");
+      return { ...result };
     }
     await client.query("ROLLBACK TO SAVEPOINT w5_reply_review_producer");
     await client.query("RELEASE SAVEPOINT w5_reply_review_producer");
