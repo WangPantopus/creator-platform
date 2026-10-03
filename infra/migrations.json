@@ -1001,6 +1001,14 @@
       "path": "apps/backend/src/modules/conversation/migrations/pending_w3_worker_output.sql",
       "state": "reserved_unapplied",
       "reason": "Distinct ordered approved-sentence generation worker output purpose requested by W3. Separate NoLogin writer requires W1 original genuine private GenerationTaskScope/client/PID/fullXID/login, W2 WeakMap-branded ApprovedGenerationSentence and actual assertApprovedInTransaction on that same client/scope, current thread/message/epoch/sequence, restoration/negative/source bookends and original idempotent durable frame/outbox notification. W1 remains sole COMMIT owner; readonly0179 context and terminal0203 purposes remain separate. Exact fixed owner SQL signatures/source/typed issuer manifest/effective catalogue/compiler/C10 and real cancellation/EOF/COMMIT operation review pending. No fake Actor, raw scope/table grant, duplicated publication authority or provider permission. Allocation only; no activation."
+    },
+    {
+      "id": "0213",
+      "owner": "W4",
+      "version": "0213_w4_fulfillment_publication_original_hash",
+      "path": "apps/backend/src/modules/commerce/schema-fulfillment-publication-original-hash.sql",
+      "state": "reserved_unapplied",
+      "reason": "Distinct actorless publication original-input/financial/consent/evidence comparison purpose requested by W4. Separate isolated NoLogin owner consumes only actual bound0204 and genuine W1 early0208 publication authority on the original held worker client/nonce/PID/fullXID/login/current task/token. Complete bounded2-100 originals, exact plan/revision/hash/audience and unchanged private inputs/versions/signatures/consents/capture evidence must be rechecked with current restoration and all-original0205 negatives before positive body/signature gates and at final bookends. Fixed comparison returns only bounded boolean/evidence, never raw question/input or fabricated settlement/provider facts. Exact owner signatures/source/typed issuer/effective combined catalogue/compiler/C10/cancellation/cleanup/sole W1 COMMIT review pending. Separate from interactive0199/0202 and metadata0204; no Actor/ThreadScope alias, recipient/frame writes, raw worker grants, activation or provider permission."
     }
   ]
 }
