@@ -1,0 +1,85 @@
+{
+  "recordedAt": "2026-10-03T00:59:46.489218+00:00",
+  "source": {
+    "base": "af38420d7aa5b07df009a01a4be3e8026f753d2a",
+    "branch": "codex/w4-studio-commerce-return-20261002",
+    "file": "apps/web/features/commerce/CommerceScreen.tsx",
+    "sha256": "1560b1ccbb8adcc723be89a1f562be4e31c21e3325a0edf5e145c6b3fae4af38",
+    "state": "shipping source plus navigation change; web HMR, API unchanged base"
+  },
+  "personalWeb": {
+    "controller": "CUA in W4 primary chat",
+    "api": "canonical server, preserved canonical61 development database",
+    "fixture": "existing labelled synthetic creator; no repeated verification or approval",
+    "tier": {
+      "normalSave": true,
+      "reloadPersisted": true,
+      "editLoaded": true,
+      "label": "W4 SYNTHETIC DRAFT \u2014 workflow only",
+      "state": "draft",
+      "benefit": "Creator Notes",
+      "product": null,
+      "price": "unset"
+    },
+    "readOnlyCounts": {
+      "matchingSyntheticDrafts": 1,
+      "activeMemberships": 0,
+      "financialLedgerRows": 0
+    },
+    "navigation": {
+      "before": "Offers back link entered fan Requests; Studio logo entered fan root",
+      "after": "Offers back and sidebar use owned creator Studio Requests; logo uses Studio workspace",
+      "desktopReturn": "actual owned creator empty Requests loaded after transient reconnect state recovered; attempted Continue locator disappeared before click, so no sign-in replay",
+      "phoneReturn": "actual owned creator empty Requests loaded",
+      "phoneNight": {
+        "width": 390,
+        "height": 844,
+        "documentScrollWidth": 390
+      },
+      "unavailableEarnings": "authority-unavailable; Requests destination falls back to Studio workspace",
+      "workspace": "actual existing labelled creator shown"
+    },
+    "privateScreenshots": [
+      {
+        "name": "offers-synthetic-draft-phone-light.jpg",
+        "sha256": "9d3e9608d248ee96c13c725360a65a77dd9d2957268db446aed791fa42640785"
+      },
+      {
+        "name": "offers-synthetic-draft-desktop-night.jpg",
+        "sha256": "c494e5ea80ad21acdf11b80ed2b9a4587f5f3679f41618ddc5b1c2c29f25ad82"
+      },
+      {
+        "name": "offers-return-phone-night.jpg",
+        "sha256": "38c0d681541d63565508e908de4e28a7a49253a5404362c4ab5b969b3401b827"
+      },
+      {
+        "name": "creator-request-return-desktop.jpg",
+        "sha256": "f8365a7c73d656e34b560f23491c00657ffc48c34502f9fe9f4504a4dc7afc4b"
+      },
+      {
+        "name": "creator-request-return-phone.jpg",
+        "sha256": "0afb791d577e1d47f7150c6fe6b33b73f9476854dd0f97320f664b49b5b167bf"
+      }
+    ]
+  },
+  "checks": {
+    "webTypecheck": "passed",
+    "scopedEslint": "passed",
+    "prettier": "passed",
+    "gitDiffCheck": "passed",
+    "newTestsWritten": false
+  },
+  "nativeRebuild": {
+    "source": "7514ddd5d3c1c6d146e2e5a864fdc7a1ff886006",
+    "android": "normal assembleDebug passed; initial Kotlin daemon startup failure recovered by normal Gradle retry; initial premature install failed before package service, repeat after boot completed succeeded",
+    "apkSha256": "c142c9e102206299a36f592be3f7feec0057bc4a675416664593f722b1f3cb71",
+    "ios": "normal xcodebuild simulator build passed with signing enabled; codesign --verify --deep --strict passed",
+    "acceptance": "Android reached normal application Development identity chooser, but repeated OS System UI ANR prevented complete journey. CUA attempted Wait and System UI Close app; later app remained black. No complete native acceptance inferred. iOS not operated in this increment.",
+    "leases": "own emulator-5564 exited0; launcher verified exact nonce/inode GUI and slot2 release; both paths absent"
+  },
+  "limits": [
+    "Synthetic creator is not externally verified ownership or a genuine passkey.",
+    "Nonpaid draft and empty Requests only; no payment, publication, signing, fulfillment, provider/store or earnings acceptance.",
+    "All nine packages and R01\u2013R15 remain assigned and incomplete."
+  ]
+}
