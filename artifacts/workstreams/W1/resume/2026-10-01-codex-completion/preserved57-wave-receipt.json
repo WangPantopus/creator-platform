@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-02T13:14:50.518Z",
+  "source": "39c274a3dfa16e35b1f070635fc32e57aa014c70",
+  "environment": "Owned pgvector/pg17 container creator-platform-w1-cc, loopback55441; retained creator_w1",
+  "operator": "current reviewed apps/backend/scripts/activate-wave.ts, wave20261002",
+  "backup": {
+    "format": "actual private pg_dump custom",
+    "sha256": "163bf9f6cc327ce3c80f364e2f80ed9f9c9fc4c232dfb429486be7cb9cb7b4e3",
+    "privateFilesOutsideGit": true,
+    "actualSeparateClosedDatabaseRestore": true,
+    "executorAndExtensionOwnership": "original postgres retained",
+    "custodyDigests": {
+      "ledgerSha256": "0e7143b3b718495fc4546da19ad52b3a74637e2694cda33aedf41e7fe209d17d",
+      "schemaSha256": "e5b6f5bb64053cfe91ae98675fbbb67a5f194b689bf52f46b9e685bdbdc1d6c9",
+      "dataSha256": "4cdc542ec0a467deb649f4ac03dd47d85cd1b6ac766a4b1dc42824061b9ffe1d",
+      "securitySha256": "046724fc84a3d87512110c2d35c335b4412500f3d56048003d71ea7ca8747796",
+      "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71"
+    },
+    "restoredCustodyDigests": {
+      "ledgerSha256": "0e7143b3b718495fc4546da19ad52b3a74637e2694cda33aedf41e7fe209d17d",
+      "schemaSha256": "e5b6f5bb64053cfe91ae98675fbbb67a5f194b689bf52f46b9e685bdbdc1d6c9",
+      "dataSha256": "4cdc542ec0a467deb649f4ac03dd47d85cd1b6ac766a4b1dc42824061b9ffe1d",
+      "securitySha256": "046724fc84a3d87512110c2d35c335b4412500f3d56048003d71ea7ca8747796",
+      "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71"
+    },
+    "allFiveMatch": true
+  },
+  "activation": {
+    "wave": "20261002",
+    "applied": [
+      "0044_w4_personal_approval",
+      "0045_w5_reply_review",
+      "0046_w6_call_availability",
+      "0047_w6_creator_media",
+      "0049_w4_generation_cost_settlement",
+      "0050_w3_account_relationship_index",
+      "0051_w5_media_publication",
+      "0053_w8_runtime_denial_projection",
+      "0054_w4_pass_purchase_effects",
+      "0055_w4_pass_pool_effects",
+      "0056_w3_correction_feedback_lineage",
+      "0057_w3_feedback_consent",
+      "0058_w3_correction_signature",
+      "0059_w3_recording_association",
+      "0060_w8_composed_signed_message",
+      "0061_w4_payout_custody",
+      "0062_w6_creator_media_worker"
+    ],
+    "priorLedgerRows": 40,
+    "ledgerRows": 57,
+    "priorHistoryPreserved": true,
+    "originalDataPreserved": true,
+    "originalRows": 27,
+    "originalTables": 145,
+    "oldRolesPreserved": true,
+    "originalSequencesPreserved": true,
+    "originalSequences": 1,
+    "verifiedBackupSecurity": true,
+    "securityRecords": 14675,
+    "afterSecuritySha256": "6878cdd658937f0ad8eba1a80fa912751c21568f71928ee7cb1ea3f75eb42539",
+    "roleSafety": {
+      "checkedRoles": 3,
+      "pinnedFunctions": 7,
+      "directCapabilities": 82,
+      "publicCapabilities": 327,
+      "pinnedPublicFunctions": 23
+    },
+    "afterSchemaSha256": "39406115c69a07db31e4fd3300f40bbbe254c2dc4eec99c46df5c4f817df35ae",
+    "trafficClosed": true,
+    "releaseReady": false
+  },
+  "personallyPerformed": [
+    "Verified owned API/web PID/cwd and normally stopped only those processes.",
+    "Closed original database marker and CONNECTION LIMIT0 after actual client-quiescence check.",
+    "Created private custom dump and independently restored into another closed database with original owner/extensions/ACLs.",
+    "Compared five actual transaction snapshots and generated private manifest only after every comparison matched.",
+    "Ran reviewed atomic57-entry operator with real migration-administrator credential outside runtime/Git."
+  ],
+  "currentState": {
+    "originalAndRestoreTrafficClosed": true,
+    "api4111": "stopped",
+    "web3011": "stopped",
+    "originalTombstones": 0,
+    "originalPrivacyJobs": 0,
+    "higherPurposeActivation": false,
+    "genuineReadinessReconciliation": "pending actual owner ports",
+    "releaseReady": false
+  },
+  "failures": [
+    "Initial container-local inventory inherited absent POSTGRES_USER and attempted role root; no mutation occurred. Real privately configured migration administrator inventory succeeded.",
+    "Initial private .ts operator could not run top-level await under CJS; renamed own private operator to .mts before any database mutation."
+  ],
+  "timings": {
+    "measured": false
+  },
+  "limitations": [
+    "Same owned cluster, separately named independently restored database; not a production cross-region/disaster-recovery exercise.",
+    "No five-minute RPO/one-hour RTO/provider/private-purpose/creator or full W1 release acceptance inferred.",
+    "No new unit test, business fixture, synthetic restore receipt, role reset, historical ledger rewrite or peer mutation."
+  ]
+}

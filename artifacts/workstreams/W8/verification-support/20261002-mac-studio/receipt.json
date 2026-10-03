@@ -1,0 +1,30 @@
+{
+  "webSource": "87578f8c7e40767decd07fe44c134b91071faf5a",
+  "backendSource": "f558ca04915f24115c132460322c398246bc5c2a",
+  "humanAuthorizedSyntheticOnly": true,
+  "externalOwnershipVerified": false,
+  "providerReceipt": false,
+  "newUnitTests": false,
+  "hashedActualIdentities": {
+    "creatorId": "08a8af7a72f3b70fa383d8ca43f499e1eb26af0796ab4e5ee400faa633fc534f",
+    "proofId": "848cc2a8e467a71c64e380160898bdda05e04edc62d4429a7926f39cc37a501a",
+    "caseId": "ea1b233f1a66fdb7d986802a35c44d0992cfb02df8460dffc6d4bd351ede67d2"
+  },
+  "originalCasePreservedWithMissingPostProjection": true,
+  "newCaseIncludesOriginalSavedCodeAndPost": true,
+  "oneRecordedDecisionAndOneCompleteEffect": true,
+  "preApprovalCodeAndPostGuardExecuted": true,
+  "initialDecisionRunReceiptMissing": true,
+  "initialDecisionRunFailure": "Unqualified cold access form was visible while its actual case read was loading; the subsequent lost-purpose wait timed out after the actual decision/effect already completed.",
+  "noSecondReportOrDecisionOnResume": true,
+  "coldReadAndIndependentSavedStatePass": true,
+  "capturesAndCodeKeptPrivate": true,
+  "normalSignout": true,
+  "ownServicesExited0": true,
+  "ownDevicesOrSlots": false,
+  "originalRecovery": false,
+  "fullNativeProofAcceptance": false,
+  "pendingOwnerSetupLinkAndReturnRegistration": true,
+  "firstSupportSubmitRefusedBeforeKnownAccount": true,
+  "supportButtonNowWaitsActualSession": true
+}

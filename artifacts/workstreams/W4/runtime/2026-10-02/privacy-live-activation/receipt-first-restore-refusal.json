@@ -1,0 +1,23 @@
+{
+  "source": "b6c073aef97b2ea7c06847b4baa9914d9bce06b7",
+  "privateBackupAndActualSeparateRestore": true,
+  "sourceLedgerRows": 57,
+  "liveLedgerRows": 61,
+  "freshLedgerRows": 61,
+  "originalRows": 36,
+  "originalTables": 161,
+  "originalLedgerRecordsPreserved": true,
+  "originalDataPreserved": true,
+  "originalSequencesPreserved": true,
+  "originalRolesPreserved": true,
+  "separateRestorePreserved": false,
+  "exactWave": true,
+  "freshSchemaMatches": true,
+  "freshSecurityMatches": true,
+  "freshRoleAttributesMatch": true,
+  "schemaSha256": "47ce91688f162cd5848cc6a44d738e85bb3aab0770c05c3be8f2cac0a1eafbe6",
+  "securitySha256": "5b99fafdd59f4cc447ddd14a2e55f5f0daf2d48d7ba929348fb824b346fe5af8",
+  "trafficStillClosed": true,
+  "appAcceptance": false,
+  "releaseReady": false
+}

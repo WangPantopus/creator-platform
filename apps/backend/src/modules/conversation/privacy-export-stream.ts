@@ -1,18 +1,16 @@
 import { createHash, randomUUID } from "node:crypto";
 import type { PoolClient } from "pg";
-import type { AuthorKind } from "@qelvora/api";
 import { canonical } from "../../core/canonical.js";
 import { invariant } from "../../core/errors.js";
 import type { PrivacyHook } from "../trust/contracts.js";
 import type { PrivacyExportStream } from "../trust/privacy-export.js";
-import { generationJournalInstalled } from "../agent/generation-journal.js";
 import {
-  conversationAuthorLabel,
   fenceConversationPrivacyTask,
   type ConversationPrivacyFamily,
   type ConversationPrivacyInput,
 } from "./privacy.js";
-import { writeConversationExportRows } from "./privacy-export-rows.js";
+import { PreparedConversationPrivacyCursor } from "./privacy-export-cursor.js";
+import { writeConversationPrivacyCursor } from "./privacy-export-cursor-rows.js";
 
 type Job = Parameters<PrivacyHook["run"]>[0];
 const sorted = (families: readonly ConversationPrivacyFamily[]) =>
@@ -27,6 +25,13 @@ export function conversationPrivacyExportStream(
   families: readonly ConversationPrivacyFamily[],
   parentSignal: AbortSignal,
 ): PrivacyExportStream {
+  const cursor = input.exportCursor;
+  invariant(
+    cursor instanceof PreparedConversationPrivacyCursor,
+    "conversation_export_unconfigured",
+    "The actual complete READ COMMITTED source cursor is required.",
+  );
+  cursor.assertRuntime(input);
   const snapshotRef = `conversation-export:${randomUUID()}`;
   const controller = new AbortController();
   const signal = AbortSignal.any([
@@ -58,6 +63,21 @@ export function conversationPrivacyExportStream(
   let wake: (() => void) | undefined;
   let rejectWrite: ((error: unknown) => void) | undefined;
   let resolveDone!: () => void;
+  let client: PoolClient | undefined;
+  let clientReleased = false;
+  let discardClient = false;
+  const releaseClient = async (destroy = false) => {
+    if (client && !clientReleased) {
+      clientReleased = true;
+      if (destroy)
+        await client.end().catch((error: unknown) => {
+          failed = true;
+          failure ??= error;
+        });
+      cursor.forget(client);
+      client.release(destroy);
+    }
+  };
   const done = new Promise<void>((resolve) => {
     resolveDone = resolve;
   });
@@ -68,12 +88,20 @@ export function conversationPrivacyExportStream(
   };
   const abort = () => {
     rejectWrite?.(signal.reason);
+    // The producer retains the held client through query cancellation and
+    // awaited rollback. Only its final cleanup may forget or release it.
     notify();
   };
   signal.addEventListener("abort", abort, { once: true });
   const flush = async () => {
     if (!buffered) return;
     await assertCurrent();
+    invariant(
+      client && !clientReleased,
+      "export_source_incomplete",
+      "The actual held export client is required.",
+    );
+    await cursor.assertCurrent(client, job, families);
     const data = Buffer.from(buffer.subarray(0, buffered));
     buffered = 0;
     invariant(
@@ -110,180 +138,54 @@ export function conversationPrivacyExportStream(
     }
   };
   const produce = async () => {
-    let client: PoolClient | undefined;
     try {
       await assertCurrent();
       client = await input.pool.connect();
       signal.throwIfAborted();
-      await client.query("BEGIN ISOLATION LEVEL REPEATABLE READ");
+      await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
       await client.query(
-        "SET LOCAL timezone='UTC'; SET LOCAL statement_timeout='10s'; SET LOCAL lock_timeout='5s'",
+        "SET LOCAL timezone='UTC'; SET LOCAL statement_timeout='10s'; SET LOCAL lock_timeout='1s'; SET LOCAL idle_in_transaction_session_timeout='5s'",
       );
-      await fenceConversationPrivacyTask(input.authority, client, job);
-      invariant(
-        !(await generationJournalInstalled(client)) || input.accounting,
-        "conversation_accounting_unavailable",
-        "Installed accounting requires its complete prepared export port.",
+      await client.query(
+        `SELECT set_config('app.account_id','',true),set_config('app.identity_session_id','',true),
+         set_config('app.creator_id','',true),set_config('app.fan_id','',true),
+         set_config('generation.scope_nonce','',true),set_config('generation.terminal_nonce','',true)`,
       );
-      await write('{"schemaVersion":2,"threadExports":[');
-      let first = true;
-      for (const family of sorted(families)) {
-        signal.throwIfAborted();
-        const held = client;
-        const assertFamily = async () => {
-          signal.throwIfAborted();
-          await input.authority.assertFamily(held, job, family);
-          signal.throwIfAborted();
-        };
-        await assertFamily();
-        const thread = (
-          await held.query(
-            `SELECT t.id,t.creator_id,t.fan_id,t.control,t.control_epoch,t.revision,t.deleted_at,t.off_the_record,t.intro_shared,t.memory_revision,t.human_active_until,t.last_activity_at,t.session_started_at,t.last_reminder_at,cp.display_name
-             FROM creator.thread t JOIN creator.creator_profile cp ON cp.id=t.creator_id
-             WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 FOR SHARE OF t`,
-            [family.threadId, family.creatorId, family.fanId],
-          )
-        ).rows[0];
-        invariant(
-          thread,
-          "privacy_family_unavailable",
-          "The actual verified family is unavailable.",
-        );
-        await write(`${first ? "" : ","}{"thread":${JSON.stringify(thread)}`);
-        first = false;
-        const counts: Record<string, unknown> = {};
-        if (input.accounting) {
-          await write(',"accounting":');
-          counts.accounting = await input.accounting.exportMetadataTo(
-            held,
-            job,
-            family,
-            write,
-            signal,
-          );
-        }
-        if (input.lineage) {
-          await write(',"lineage":');
-          counts.lineage = await input.lineage.exportMetadataTo(
-            held,
-            family,
-            write,
-            assertFamily,
-            signal,
-          );
-        }
-        if (input.recordings) {
-          await write(',"recordings":');
-          counts.recordings = await input.recordings.exportMetadataTo(
-            held,
-            family,
-            write,
-            assertFamily,
-            signal,
-          );
-        }
-        for (const [name, table, projection, key] of [
-          [
-            "messages",
-            "message",
-            'id,author_kind AS "authorKind",text,delivery_state AS "deliveryState",control_epoch AS "controlEpoch",sequence,version,signed_act_id AS "signedActId",signed_content_hash AS "signedContentHash",author_account_id AS "authorAccountId",citations,team_member AS member,off_the_record AS "offTheRecord",created_at AS "createdAt"',
-            "lpad(sequence::text,10,'0')||':'||id::text",
-          ],
-          [
-            "memories",
-            "memory",
-            "id,kind,text,state,semantic_key,provenance_message_id,sensitive_category,edited_by_fan,created_at",
-            "id::text",
-          ],
-          [
-            "audit",
-            "thread_audit",
-            "id,reader_account_id,role,read_at",
-            "id::text",
-          ],
-          [
-            "consents",
-            "processor_consent",
-            "id,version,providers,consented_at,withdrawn_at",
-            "id::text",
-          ],
-          [
-            "memoryConsents",
-            "memory_consent",
-            "id,item_id,item_hash,category,consented_at,withdrawn_at",
-            "id::text",
-          ],
-          [
-            "usageDays",
-            "conversation_usage_day",
-            "day,seconds,companion_seconds",
-            "day::text",
-          ],
-          [
-            "events",
-            "event",
-            "id,cursor,type,payload,actor_account_id,created_at,published_at",
-            "lpad(cursor::text,10,'0')||':'||id::text",
-          ],
-          [
-            "exclusions",
-            "memory_exclusion",
-            "semantic_key,normalized_text",
-            "semantic_key",
-          ],
-          [
-            "generations",
-            "generation",
-            "id,fan_message_id,ai_message_id,grant_id,reservation_id,epoch,last_sequence,state,context_revision,accepted_at,first_visible_at,completed_at,failure_code",
-            "id::text",
-          ],
-        ] as const) {
-          await write(`,${JSON.stringify(name)}:`);
-          counts[name] = await writeConversationExportRows({
-            client: held,
-            family,
-            table,
-            projection,
-            key,
-            write,
-            signal,
-            assertCurrent: assertFamily,
-            ...(name === "messages"
-              ? {
-                  map: (row: Record<string, unknown>) => ({
-                    ...row,
-                    authorLabel: conversationAuthorLabel(
-                      row.authorKind as AuthorKind,
-                      thread.display_name,
-                      typeof row.member === "string" ? row.member : null,
-                    ),
-                  }),
-                }
-              : {}),
-          });
-        }
-        await assertFamily();
-        await write(`,"sourceCounts":${JSON.stringify(counts)}}`);
-      }
-      await write("]}");
+      await cursor.open(client, job, families);
+      const held = client;
+      await writeConversationPrivacyCursor({
+        next: () => cursor.next(held, job, families, signal),
+        write,
+        families,
+        signal,
+      });
+      await cursor.close(client, job, families);
       await flush();
       await assertCurrent();
-      for (const family of sorted(families)) {
-        signal.throwIfAborted();
-        await input.authority.assertFamily(client, job, family);
-      }
+      await cursor.assertCurrent(client, job, families);
+      await fenceConversationPrivacyTask(input.authority, client, job);
       signal.throwIfAborted();
       await client.query("COMMIT");
+      signal.throwIfAborted();
       committed = true;
     } catch (error) {
       failed = true;
       failure = error;
-      if (client) await client.query("ROLLBACK").catch(() => undefined);
+      if (client && !clientReleased)
+        await client.query("ROLLBACK").catch(() => {
+          discardClient = true;
+        });
     } finally {
-      client?.release();
-      signal.removeEventListener("abort", abort);
-      resolveDone();
-      notify();
+      try {
+        await releaseClient(discardClient);
+      } catch (error) {
+        failed = true;
+        failure ??= error;
+      } finally {
+        signal.removeEventListener("abort", abort);
+        resolveDone();
+        notify();
+      }
     }
   };
   let checksum: string | undefined;

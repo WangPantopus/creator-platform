@@ -3,7 +3,7 @@ import { responseLanguage } from "../agent/language.js";
 
 /** Reserved source descriptor. Registration and genuine W1/W8 purpose custody
  * are separate requirements; this value cannot activate a worker or provider. */
-export const TRANSLATION_JOB_MIGRATION = "0083_w3_translation_worker_scope";
+export const TRANSLATION_JOB_MIGRATION = "0168_w3_translation_worker_scope";
 
 const Hash = z.string().regex(/^[a-f0-9]{64}$/u);
 const Instant = z.iso

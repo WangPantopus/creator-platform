@@ -9,7 +9,12 @@ import {
   SignedMarker,
 } from "@qelvora/ui-web";
 import type { CSSProperties } from "react";
+import type { Metadata } from "next";
 import { platformFetch } from "../../../lib/session";
+
+export const metadata: Metadata = {
+  title: copy.identityVerificationPageTitle,
+};
 
 function record(value: unknown): Record<string, unknown> | null {
   return value !== null && typeof value === "object" && !Array.isArray(value)
@@ -56,6 +61,7 @@ function Unavailable({
 }) {
   return (
     <main className="public-verification">
+      <h1>{copy.identityVerificationPageTitle}</h1>
       <Notice
         title={
           missing
@@ -87,6 +93,7 @@ export default async function Verification({
   if (!identifier.success || id !== id.toLowerCase())
     return (
       <main className="public-verification">
+        <h1>{copy.identityVerificationPageTitle}</h1>
         <Notice title={copy.identityVerificationSignedUnavailableTitle}>
           {copy.identityVerificationInvalidLink}
         </Notice>
@@ -141,7 +148,7 @@ export default async function Verification({
       }).format(new Date(signature.verifiedAt)) + " UTC";
     return (
       <main className="public-verification">
-        <span className="qv-meta">/VERIFY/{id.toUpperCase()}</span>
+        <span className="qv-meta">{copy.identityVerificationPageTitle}</span>
         <div className="verification-title">
           <svg width="40" height="40" viewBox="0 0 16 16" aria-hidden="true">
             <path

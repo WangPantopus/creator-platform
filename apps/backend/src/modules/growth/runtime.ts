@@ -18,6 +18,7 @@ import {
 } from "./lifecycle.js";
 import { registerGrowth } from "./integration.js";
 import type { CreatorProjectionSource } from "./creator-projection.js";
+import { WeeklyImpact, type WeeklyImpactSource } from "./weekly-impact.js";
 import {
   rotatingGrowthSources,
   databaseGrowthSourceCheckpoint,
@@ -43,6 +44,7 @@ export async function createGrowthRuntime(input: {
   };
   activationSource?: ActivationSource;
   thanksPermission?: ThanksPermission;
+  weeklyImpactSource?: WeeklyImpactSource;
   privacyScope?: GrowthPrivacyScope;
   privacyTaskAuthority?: GrowthPrivacyTaskAuthority;
   installURLs?: Partial<Record<"ios" | "android", string>>;
@@ -90,6 +92,7 @@ export async function createGrowthRuntime(input: {
       )
     : input.sources;
   const retention = new Retention(service, input.thanksPermission);
+  const weeklyImpact = new WeeklyImpact(service, retention);
   const relay = new GrowthRelay(service);
   const engagement = new Engagement(service, input.installURLs);
   const experiments = new GrowthExperiments(service, input.experimentsEnabled);
@@ -161,6 +164,12 @@ export async function createGrowthRuntime(input: {
         input.observe?.("growth_worker_failure", 1);
       }
     }
+    try {
+      await weeklyImpact.tick(input.weeklyImpactSource);
+    } catch {
+      // An unavailable owner aggregate cannot block other inbox/delivery work.
+      input.observe?.("growth_worker_failure", 1);
+    }
     const relayed = await relay.drain();
     input.observe?.("growth_relay_claimed", relayed.claimed);
     await retention.drainActivation(input.activationSource);
@@ -183,6 +192,7 @@ export async function createGrowthRuntime(input: {
   return {
     service,
     retention,
+    weeklyImpact,
     relay,
     engagement,
     experiments,
@@ -213,6 +223,7 @@ export async function createGrowthRuntime(input: {
       producerReadiness: sourceReadiness,
       deliveryProvider: Boolean(input.provider),
       activationSource: Boolean(input.activationSource),
+      weeklyImpactSource: Boolean(input.weeklyImpactSource),
       privacyOwnership: Boolean(input.privacyTaskAuthority),
       privacyStreaming: Boolean(input.privacyTaskAuthority),
       experimentsEnabled: input.experimentsEnabled ?? false,

@@ -265,24 +265,37 @@ export class GrowthDeviceSessions {
     )
       return null;
     const signal = AbortSignal.timeout(10000);
-    return this.db.transaction(
+    const current = await this.db.transaction(
       this.db.runtime,
       async (client) => {
         await client.query("SELECT set_config('app.account_id',$1,true)", [
           accountId,
         ]);
-        const current = await client.query(
-          "SELECT id FROM creator.identity_session WHERE id=$1 AND account_id=$2 AND revoked_at IS NULL AND refresh_until>clock_timestamp() FOR SHARE",
-          [registration.sessionId, accountId],
+        const binding = await client.query(
+          `SELECT s.id FROM creator.identity_session s
+           WHERE s.id=$1 AND s.account_id=$2 AND s.revoked_at IS NULL AND s.refresh_until>clock_timestamp()
+           AND EXISTS(SELECT FROM growth.device d WHERE d.account_id=$2 AND d.installation_id=$3 AND d.platform=$4
+             AND d.token_hash=$5 AND d.encrypted_token=$6 AND d.permission='granted' AND d.revoked_at IS NULL
+             AND d.updated_at>clock_timestamp()-interval '270 days')`,
+          [
+            registration.sessionId,
+            accountId,
+            installationId,
+            platform,
+            tokenHash,
+            encrypted,
+          ],
         );
-        if (current.rowCount !== 1) return null;
         // Access-token refresh retains this session ID. Its refresh window,
         // rather than the short access window, bounds background registration.
-        // Hold through submission so a completed logout cannot be overtaken.
-        signal.throwIfAborted();
-        return work(registration.token, signal);
+        return binding.rowCount === 1;
       },
       signal,
     );
+    if (!current) return null;
+    // Release the connection before external I/O. This is a fresh submission
+    // check, not a promise that a provider can recall an accepted message.
+    signal.throwIfAborted();
+    return work(registration.token, signal);
   }
 }

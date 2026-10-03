@@ -47,6 +47,7 @@ internal fun GrowthNotificationSettings(client: GrowthClient?) {
     val fromView = remember { BringIntoViewRequester() }
     val untilView = remember { BringIntoViewRequester() }
     val zoneView = remember { BringIntoViewRequester() }
+    val messageView = remember { BringIntoViewRequester() }
     val timeZones = remember { TimeZone.getAvailableIDs().toSet() }
     val scope = rememberCoroutineScope()
     val ink = qColor("ink")
@@ -77,6 +78,12 @@ internal fun GrowthNotificationSettings(client: GrowthClient?) {
         } catch (cancelled: CancellationException) { throw cancelled }
         catch (_: Exception) { message = QelvoraCopy.text("growthSettingsNeedACurrentSignedInAccountAndNetworkConnection") }
         finally { busy = false }
+    }
+    LaunchedEffect(message) {
+        if (message.isNotEmpty()) {
+            withFrameNanos { }
+            messageView.bringIntoView()
+        }
     }
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         BasicText(QelvoraCopy.text("growthNotificationSettings"), style = qText("display-md").copy(color = ink))
@@ -136,7 +143,8 @@ internal fun GrowthNotificationSettings(client: GrowthClient?) {
                 }
             }
         }
-        if (message.isNotEmpty()) BasicText(message, style = qText("body").copy(color = ink))
+        if (message.isNotEmpty()) BasicText(message, style = qText("body").copy(color = ink),
+            modifier = Modifier.bringIntoViewRequester(messageView).semantics { liveRegion = LiveRegionMode.Polite })
         Button(QelvoraCopy.text("growthReloadSettings"), ButtonVariant.QUIET, disabled = busy) {reload++}
     }
 }

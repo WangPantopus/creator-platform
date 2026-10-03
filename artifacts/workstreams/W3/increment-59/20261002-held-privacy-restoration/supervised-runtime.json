@@ -1,0 +1,15 @@
+{
+  "run": 5,
+  "source": "a4a6a45d68e020f53a65e7983635736d4fce4e1d",
+  "startedAt": "2026-10-02T17:21:35.832126+00:00",
+  "supervisorPid": 13114,
+  "commandPid": 13540,
+  "log": "/private/tmp/w3-held-privacy-api-5.log",
+  "launcher": "pnpm exec tsx src/server.ts",
+  "exitStatusQualified": true,
+  "completedAt": "2026-10-02T17:25:12.831070+00:00",
+  "serviceCommandExitCode": 0,
+  "logSHA256": "d166a21d035549bf7d9c095c68ac9f91b4cb8428c38f3f542fcef753781886e0",
+  "duplicatePoolCloseObserved": false,
+  "shutdownFailureObserved": false
+}

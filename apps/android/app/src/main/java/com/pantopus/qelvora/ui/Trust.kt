@@ -63,7 +63,7 @@ fun trustFanRegistration(context: Context, baseURL: String?) = FanFeatureRegistr
     allowsSignedOut = { it.startsWith("/trust") },
     screen = { model ->
         val account = model.session?.accountId
-        key(account) { TrustFanFeature(context, baseURL, model.destination) {
+        key(account) { TrustFanFeature(context, baseURL, model.destination, onNavigate = model::open) {
             val credential = model.currentToken()
             check(account != null && model.session?.accountId == account) { "Your account changed. Reopen this screen before continuing." }
             credential
@@ -73,10 +73,11 @@ fun trustFanRegistration(context: Context, baseURL: String?) = FanFeatureRegistr
 
 /** Missing phone composition is recorded; use established tokens and controls at 16dp gutters. */
 @Composable
-fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/support", token: () -> String? = { SecureSessionStorage(context, baseURL).read() }) {
+fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/support", onNavigate: ((String) -> Unit)? = null, token: () -> String? = { SecureSessionStorage(context, baseURL).read() }) {
     val client = remember(baseURL) { baseURL?.let { TrustClient(it, token) } }
     val coroutine = rememberCoroutineScope()
-    var route by remember { mutableStateOf(destination) }
+    var route by remember(destination) { mutableStateOf(destination) }
+    fun navigate(target: String) { if (onNavigate != null) onNavigate(target) else route = target }
     var cases by remember { mutableStateOf<List<JsonObject>>(emptyList()) }
     var notices by remember { mutableStateOf<List<JsonObject>>(emptyList()) }
     var jobs by remember { mutableStateOf<List<JsonObject>>(emptyList()) }
@@ -146,7 +147,16 @@ fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/
             try {
                 if (route.startsWith("/trust") || route.contains("feedback")) { }
                 else if (route.contains("access")) history = client.request("access-history").items()
-                else if (route.contains("privacy")) jobs = client.request("privacy/jobs").items()
+                else if (route.contains("privacy")) {
+                    pendingExport = null
+                    jobs = client.request("privacy/jobs").items()
+                    val selectedId = selectedJob?.text("id")
+                    if (selectedId != null && jobs.any { it.text("id") == selectedId }) {
+                        val detail = client.request("privacy/jobs/$selectedId")
+                        selectedJob = detail
+                        jobs = jobs.map { if (it.text("id") == selectedId) detail else it }
+                    } else selectedJob = null
+                }
                 else { cases = client.request("my-cases").items(); notices = client.request("inbox").items() }
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (current: Exception) { cases = emptyList(); notices = emptyList(); jobs = emptyList(); history = emptyList(); selectedJob = null; pendingExport = null; failure = failure ?: current }
@@ -162,10 +172,18 @@ fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/
         finally { busy = false }
     }
     suspend fun jobDetail(id: String) {
+        if (client == null || busy) return
+        busy = true
         pendingExport = null
-        try { selectedJob = client?.request("privacy/jobs/$id"); error = "" }
+        try {
+            val detail = client.request("privacy/jobs/$id")
+            selectedJob = detail
+            jobs = jobs.map { if (it.text("id") == id) detail else it }
+            error = ""
+        }
         catch (cancelled: CancellationException) { throw cancelled }
         catch (failure: Exception) { selectedJob = null; error = failure.message ?: "Reconnect and try again." }
+        finally { busy = false }
     }
     suspend fun privacyCommand(action: String) {
         val input = buildJsonObject { put("kind", action); put("scope", scope); put("proof", if (verificationMethod == "current_session") "CURRENT_SESSION" else proof); put("idempotencyKey", key); if (scope != "account") put("creatorId", creatorId.lowercase()); if (scope == "thread") put("threadId", threadId.lowercase()) }
@@ -176,9 +194,9 @@ fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/
     Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).imePadding().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         TrustText(if (route.contains("privacy")) "Your data" else if (route.contains("access")) "Case access history" else if (route.contains("feedback")) "Optional product feedback" else if (route.startsWith("/trust")) "Crisis help protocol" else "Help and reports", "display-md")
         TrustText("Reports are available without paid access. Evidence is limited to what you report.")
-        Row { Button("Support", ButtonVariant.QUIET) { route = "/support" }; Button("Your data", ButtonVariant.QUIET) { route = "/support/privacy" } }
-        Row { Button("Access history", ButtonVariant.QUIET) { route = "/support/access" }; Button("Feedback", ButtonVariant.QUIET) { route = "/support/feedback" } }
-        Button("Crisis help", ButtonVariant.QUIET) { route = "/trust/crisis" }
+        Row { Button("Support", ButtonVariant.QUIET) { navigate("/support") }; Button("Your data", ButtonVariant.QUIET) { navigate("/support/privacy") } }
+        Row { Button("Access history", ButtonVariant.QUIET) { navigate("/support/access") }; Button("Feedback", ButtonVariant.QUIET) { navigate("/support/feedback") } }
+        Button("Crisis help", ButtonVariant.QUIET) { navigate("/trust/crisis") }
         if (busy) TrustText("Loading…")
         if (error.isNotEmpty()) Notice("error", "Could not complete", error)
         if (result.isNotEmpty()) Notice(title = "Saved", children = result)
@@ -213,10 +231,10 @@ fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/
             val disabled = busy || !verificationConfigured || (if (local) proof != "LOCAL DEVELOPMENT" else verificationMethod != "current_session" && proof.isEmpty()) || (scope != "account" && !validTrustId(creatorId)) || (scope == "thread" && !validTrustId(threadId))
             Button("Request export", ButtonVariant.SECONDARY, block = true, disabled = disabled) { coroutine.launch { privacyCommand("export") } }
             Button("Request deletion", ButtonVariant.SECONDARY, block = true, disabled = disabled) { confirmDelete = true }
-            jobs.forEach { job -> Button(job.text("kind") + " · " + job.text("scope") + " · " + job.text("state"), ButtonVariant.QUIET, block = true) { coroutine.launch { jobDetail(job.text("id")) } } }
+            jobs.forEach { job -> Button(job.text("kind") + " · " + job.text("scope") + " · " + job.text("state").replace('_', ' '), ButtonVariant.QUIET, block = true, disabled = busy) { coroutine.launch { jobDetail(job.text("id")) } } }
             selectedJob?.let { job ->
                 TrustText("Job " + job.text("id"), "caption")
-                job["tasks"]?.jsonArray?.forEach { item -> val task = item.jsonObject; TrustText(task.text("domain") + ": " + task.text("state") + task.text("error_code").takeIf { it.isNotEmpty() }?.let { " · $it" }.orEmpty()) }
+                job["tasks"]?.jsonArray?.forEach { item -> val task = item.jsonObject; TrustText(task.text("domain") + ": " + task.text("state").replace('_', ' ') + task.text("error_code").takeIf { it.isNotEmpty() }?.let { " · " + it.replace('_', ' ') }.orEmpty()) }
                 job["retained"]?.jsonArray?.forEach { item -> val retained = item.jsonObject; TrustText("Retained: " + retained.text("category").replace('_',' '),"label"); TrustText(retained.text("reason")); retained.text("until").takeIf { it.isNotEmpty() }?.let { TrustText("Until $it","caption") } }
                 if (job.text("state") != "complete") Button("Retry incomplete domains", ButtonVariant.SECONDARY, block = true, disabled = busy) { coroutine.launch { if (perform("privacy/jobs/" + job.text("id") + "/retry", buildJsonObject {}) != null) { result = "Incomplete domains queued again."; jobDetail(job.text("id")) } } }
                 if (job.text("state") == "complete" && job.text("kind") == "export") Button("Save export", ButtonVariant.SECONDARY, block = true, disabled = busy) { coroutine.launch {

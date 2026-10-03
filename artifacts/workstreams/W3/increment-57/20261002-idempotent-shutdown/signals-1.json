@@ -1,0 +1,19 @@
+{
+  "source": "38a0cd591f062f6f5357d4fab3a7804232044f93",
+  "observedAt": "2026-10-02T16:36:44.422099+00:00",
+  "pid": 58985,
+  "cwd": "/Users/yingpengwang/estimate-rescue/creator-platform/w3-fan-conversations-chat-55cfcc/apps/backend",
+  "command": "/Users/yingpengwang/.nvm/versions/node/v24.13.0/bin/node --require /Users/yingpengwang/estimate-rescue/creator-platform/w3-fan-conversations-chat-55cfcc/node_modules/.pnpm/tsx@4.20.6/node_modules/tsx/dist/preflight.cjs --import file:///Users/yingpengwang/estimate-rescue/creator-platform/w3-fan-conversations-chat-55cfcc/node_modules/.pnpm/tsx@4.20.6/node_modules/tsx/dist/loader.mjs src/server.ts",
+  "signals": [
+    {
+      "signal": "SIGINT",
+      "sentAt": "2026-10-02T16:36:44.422414+00:00"
+    },
+    {
+      "signal": "SIGTERM",
+      "sentAt": "2026-10-02T16:36:44.422441+00:00"
+    }
+  ],
+  "exitStatusQualified": false,
+  "supervision": "first run shell pipeline does not preserve backend exit status"
+}

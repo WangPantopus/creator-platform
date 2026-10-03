@@ -1,0 +1,9 @@
+# W4 founder-authorized resource cleanup — October 2, 2026
+
+The primary verified that its source/evidence commit matched the pushed branch and all37 original W4 PRs were merged. Two obsolete W4 worktrees were clean, had no submodules or needed ignored files, and their heads were contained in the pushed merged handoff. The Codex-managed store recovery checkout was archived and removed; the earlier evening checkout was permanently removed through Git. Git history remains remote and a small managed recovery snapshot remains for the archived checkout.
+
+Four stopped W4-only rollback qualification containers and their exclusive anonymous volumes were removed after checking every container's mounts for sharing. The canonical61 database container/volume and current private backup were preserved. Its SHA256 is unchanged. Shared Docker images remain.
+
+Deleted ignored local node_modules, four Next outputs, backend dist, project-local Gradle cache, generated Xcode project, TypeScript build metadata and the private iOS/Android build outputs. Source/evidence and small private configuration, backups, operational helpers and proof evidence remain. Current checkout fell from approximately1.4GiB to246MiB and private scratch from1.4GiB to30MiB. Removed folders include shared hardlinks/APFS extents; their allocated counts are not exclusive disk-reclamation claims.
+
+The successor must reinstall locked dependencies with `pnpm install --frozen-lockfile`, regenerate XcodeGen and normally rebuild apps. Review databases must be freshly recreated for later isolated qualification. Native device data, SDKs, globally shared dependencies/caches and peers' resources were not touched. No new unit tests, runtime acceptance or business-row changes occurred. [Exact metadata receipt](receipt.json) contains paths/counts/hashes only.

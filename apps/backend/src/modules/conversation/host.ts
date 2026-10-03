@@ -27,7 +27,13 @@ import { ProviderPolicySchema } from "../../../../../packages/api/src/conversati
 import { conversationAgentGenerator } from "./agent-generator.js";
 import { ConversationCorrections } from "./corrections.js";
 import { ConversationLineage } from "./lineage.js";
+import type { ReplyFeedbackAuthority } from "./lineage.js";
+import {
+  IdentityIntroOffers,
+  type IntroOfferPolicy,
+} from "../identity/intro-offers.js";
 import { ConversationRecordings } from "./recordings.js";
+import type { PreparedConversationPrivacyCursor } from "./privacy-export-cursor.js";
 import { createConversationRuntime } from "./runtime.js";
 import {
   DevelopmentConversationPolicy,
@@ -55,6 +61,12 @@ const DevelopmentEconomicsSchema = z.strictObject({
 
 /** Inputs supplied by their owners. Absent inputs keep their paths off. */
 export type ConversationHostProducers = {
+  /** W8: actual feedback notice/consent/expiry; no development substitute. */
+  feedbackAuthority?: ReplyFeedbackAuthority;
+  /** W8: approved minimal account-level intro-offer use and retention. */
+  introOfferPolicy?: IntroOfferPolicy;
+  /** W4: genuinely prepared original group fulfillment on this exact graph. */
+  fulfillmentPlans?: import("../commerce/fulfillment-plans.js").CommerceFulfillmentPlans;
   /** W2: the configured license authority for this host. */
   licenseVerifier?: LicenseVerifier;
   /** W2: the reviewed thread-accounting retention for the usage journal. */
@@ -62,6 +74,12 @@ export type ConversationHostProducers = {
     retentionPolicyVersion: string;
     assertPrivacyRegistered: () => Promise<void>;
   };
+  /** W2's actual prepared expiry producer plus W8's independently reviewed
+   *0206 custody. W8 fixes its real held-task authority when preparing exports. */
+  privacyCursor?: Omit<
+    Parameters<typeof PreparedConversationPrivacyCursor.prepare>[0],
+    "pool" | "authority" | "journal" | "lineage" | "recordings"
+  >;
   /** W6: the host's media runtime on this same database pool. */
   media?: MediaService;
   /** W6: fan reads of signed recordings ask W3 for the exact publication. */
@@ -72,10 +90,19 @@ export type ConversationHostProducers = {
 
 type Registry = { migrations: { version: string; path: string }[] };
 const repositoryRoot = new URL("../../../../../", import.meta.url);
+declare const __QELVORA_REGISTERED_MIGRATIONS__:
+  | Readonly<Record<string, string>>
+  | undefined;
 
 /** Only an executable registry entry counts. The expected checksum is the
  * reviewed file's own bytes, never a value read back from the database. */
 async function registeredChecksum(version: string) {
+  // Shipping bundles carry the exact executable registry's SQL hashes from
+  // their build. Source execution retains the same checked-out byte custody.
+  if (typeof __QELVORA_REGISTERED_MIGRATIONS__ !== "undefined")
+    return Object.hasOwn(__QELVORA_REGISTERED_MIGRATIONS__, version)
+      ? __QELVORA_REGISTERED_MIGRATIONS__[version]
+      : undefined;
   const registry = JSON.parse(
     await readFile(new URL("infra/migrations.json", repositoryRoot), "utf8"),
   ) as Registry;
@@ -181,6 +208,24 @@ export async function composeConversationHost(
   if (!producers.licenseVerifier) missing.push("license verifier (W2)");
   if (!runtime.access.threadScopeInTransactionAvailable)
     missing.push("in-transaction denial (W8)");
+  // Held source allocations are not active custody. The legacy interactive
+  // generator below cannot replace the actual scoped worker/settlement graph.
+  for (const version of [
+    "0159_w1_generation_worker_scope",
+    "0177_w8_generation_worker_denial",
+    "0179_w3_generation_purpose_consumers",
+    "0180_w2_generation_input_consumers",
+    "0181_w2_generation_attempt_admission",
+    "0183_w1_generation_terminal_scope",
+    "0184_w8_generation_terminal_denial",
+    "0188_w2_generation_terminal_journal",
+    "0189_w4_generation_terminal_settlement",
+    "0203_w3_terminal_only_finalization",
+  ])
+    if (!(await registeredChecksum(version)))
+      missing.push(`registered ${version}`);
+  if (requested)
+    missing.push("current generation worker composition (W3/W1/W2/W4)");
 
   let journal: PreparedGenerationJournal | undefined;
   const journalChecksum = await registeredChecksum(migrations.journal);
@@ -236,12 +281,20 @@ export async function composeConversationHost(
   const lineage = await ConversationLineage.prepare({
     database: runtime.database,
     migrationVersion: migrations.lineage,
+    feedbackAuthority: producers.feedbackAuthority,
     feedbackMigration: await registeredChecksum(
       migrations.feedbackConsent,
     ).then((checksum) =>
       checksum ? { version: migrations.feedbackConsent, checksum } : undefined,
     ),
   });
+  if (lineage && producers.feedbackAuthority && producers.introOfferPolicy)
+    lineage.configureIntroOffers(
+      await IdentityIntroOffers.prepare({
+        database: runtime.database,
+        assertOfferAllowed: producers.introOfferPolicy,
+      }),
+    );
   const corrections = lineage
     ? await ConversationCorrections.prepare({
         database: runtime.database,
@@ -347,6 +400,9 @@ export async function composeConversationHost(
     ...(lineage ? { lineage } : {}),
     ...(corrections ? { corrections } : {}),
     ...(recordings ? { recordings } : {}),
+    ...(producers.fulfillmentPlans
+      ? { fulfillmentPlans: producers.fulfillmentPlans }
+      : {}),
   });
   // Studio drafting, evaluation and ingestion use the same configured model.
   agent ??= createAgentDomain({
@@ -398,6 +454,14 @@ export async function composeConversationHost(
     privacy: {
       ...(lineage ? { lineage } : {}),
       ...(recordings ? { recordings } : {}),
+      ...(journal && producers.privacyCursor
+        ? {
+            cursorPreparation: {
+              ...producers.privacyCursor,
+              journal,
+            },
+          }
+        : {}),
     },
     fanGeneration: { available, missing },
     close() {

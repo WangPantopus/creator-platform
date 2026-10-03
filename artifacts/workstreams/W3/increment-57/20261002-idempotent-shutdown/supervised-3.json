@@ -1,0 +1,15 @@
+{
+  "run": 3,
+  "source": "38a0cd591f062f6f5357d4fab3a7804232044f93",
+  "startedAt": "2026-10-02T16:38:39.596256+00:00",
+  "supervisorPid": 70732,
+  "commandPid": 71369,
+  "log": "/private/tmp/w3-idempotent-shutdown-api-3.log",
+  "launcher": "pnpm exec tsx src/server.ts",
+  "exitStatusQualified": true,
+  "completedAt": "2026-10-02T16:41:44.974824+00:00",
+  "serviceCommandExitCode": 0,
+  "logSHA256": "d166a21d035549bf7d9c095c68ac9f91b4cb8428c38f3f542fcef753781886e0",
+  "duplicatePoolCloseObserved": false,
+  "shutdownFailureObserved": false
+}

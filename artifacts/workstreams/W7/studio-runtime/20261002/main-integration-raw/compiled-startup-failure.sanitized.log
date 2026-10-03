@@ -1,0 +1,26 @@
+$ node dist/server.mjs
+node:internal/fs/promises:637
+  return new FileHandle(await PromisePrototypeThen(
+                        ^
+
+Error: ENOENT: no such file or directory, open '/Users/yingpengwang/estimate-rescue/infra/migrations.json'
+    at async open (node:internal/fs/promises:637:25)
+    at async readFile (node:internal/fs/promises:1269:14)
+    at async registeredChecksum (file:///Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/backend/dist/server.mjs:34220:5)
+    at async composeConversationHost (file:///Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/backend/dist/server.mjs:34264:27)
+    at async Object.registerFeatures (file:///Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/backend/dist/server.mjs:44128:20)
+    at async createConfiguredBackend (file:///Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/backend/dist/server.mjs:13271:17)
+    at async file:///Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/backend/dist/server.mjs:44103:59 {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/yingpengwang/estimate-rescue/infra/migrations.json'
+}
+
+Node.js v24.13.0
+[ELIFECYCLE] Command failed with exit code 1.
+Error: ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL
+
+  × "pnpm recursive run" failed in /Users/yingpengwang/estimate-rescue/
+  │ creator-platform/w7-completion-840545/apps/backend
+

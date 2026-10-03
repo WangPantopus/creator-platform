@@ -485,5 +485,375 @@
     "contentSha256": "9cedfd6fde76b33537167ed3fd347a1fe6e40b5473c884266a49f6b40df93d7a",
     "sanitized": true,
     "sanitization": "terminal escapes removed; masked GitHub credentials retained as masked"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-actor-chooser.xml": {
+    "sha256": "3f412113d76866c0a1b0234ba213545cebe9c7c0222c06b6159a53030511bc8c",
+    "bytes": 6743,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-before-reload-final.xml": {
+    "sha256": "09ba07f460e5ebb7afd331f0f76c016673fce890cf2ec655aacd0f3b0e9754fa",
+    "bytes": 19418,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-confirmation-before-save.xml": {
+    "sha256": "cab237bd4f5a359c1dec4ecb90c65ec18b10ed2c09bac9cb353fd5c347fe4be9",
+    "bytes": 19760,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-confirmation-edge-before.xml": {
+    "sha256": "f1430ea7532e8f2cca1a08af476e6fd8f602ccabd7a0f076313299e2a9c32641",
+    "bytes": 20057,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-confirmation-repaired.png": {
+    "sha256": "cff67a02dd0546ecaaafdde5a4dddf1c65e0568a0cb75d65fb85b449911f08d1",
+    "bytes": 179679,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-confirmation-repaired.xml": {
+    "sha256": "794225d061f70df7991bbb900203e3f0df32152cadc9b80503fe1cc576bd4c54",
+    "bytes": 19444,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-confirmation-save-visible.xml": {
+    "sha256": "5966f959ff4dcdb7835b9443e0497991eea9c76965a53a12950f5bbd33866bb0",
+    "bytes": 20048,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-development-launched.png": {
+    "sha256": "eb2bbdf4188ce0aff9006c093dd1ee1a5b85e90d06236bdddc5b03f41ff9b3dd",
+    "bytes": 103303,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-development-launched.xml": {
+    "sha256": "d7f2daa4a515d61dfcec84b417b817bbcbbfcda60baf69bfa9a62319ff8ef0a1",
+    "bytes": 9347,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-home-settled.png": {
+    "sha256": "eb2bbdf4188ce0aff9006c093dd1ee1a5b85e90d06236bdddc5b03f41ff9b3dd",
+    "bytes": 103303,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-home-settled.xml": {
+    "sha256": "542db4ba546ae2de41432ea71aacb462ea5e7b36f9302fdcd35e444e24986b49",
+    "bytes": 12370,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-home.png": {
+    "sha256": "30901e2e4578feeb54634a21edc01d3f72594685311c873ad71dfc675907ab9b",
+    "bytes": 177308,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-home.xml": {
+    "sha256": "ae31cb025625c6a91eba2435aa9a59692394686d1ec69db7b4903b065fe86918",
+    "bytes": 5382,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-notifications.png": {
+    "sha256": "f655c8c6e81c8a7a99b4564eddf070105a380b8d8847ff275e34475c3c10c675",
+    "bytes": 95727,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-notifications.xml": {
+    "sha256": "1f651e1a16421e6d56a6a8c78cb4d2bb5adbdb936b5bb200453adbc2be9dbba2",
+    "bytes": 11370,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-reloaded-final.png": {
+    "sha256": "e52bf679136a88db414d90244fc9370ab7aea0efeaafb115eb3070b323fe766b",
+    "bytes": 172647,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-reloaded-final.xml": {
+    "sha256": "5966f959ff4dcdb7835b9443e0497991eea9c76965a53a12950f5bbd33866bb0",
+    "bytes": 20048,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-settings-lower.xml": {
+    "sha256": "9d233f3726cf90dab47e4e1a0fcdaef647fad173b50d632ed9592af8fbce01b2",
+    "bytes": 19794,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-settings-save-result.png": {
+    "sha256": "722b22a796ce88936d87f69e15dd2342e736d2b38232658339bc216cb58a7171",
+    "bytes": 177581,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-settings-save-result.xml": {
+    "sha256": "09ba07f460e5ebb7afd331f0f76c016673fce890cf2ec655aacd0f3b0e9754fa",
+    "bytes": 19418,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-settings-saved.png": {
+    "sha256": "14ca59c76c0b6aa9cedf205fd114b99547b060f10bd114ea43e11c516e58ee7b",
+    "bytes": 174664,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-settings-saved.xml": {
+    "sha256": "a37e188bc040247f094c7d36aca4c1884823763afa5e7714db10a80145fc2519",
+    "bytes": 19424,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-settings-scrolled.xml": {
+    "sha256": "a37e188bc040247f094c7d36aca4c1884823763afa5e7714db10a80145fc2519",
+    "bytes": 19424,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-settings-signed-out.xml": {
+    "sha256": "3f412113d76866c0a1b0234ba213545cebe9c7c0222c06b6159a53030511bc8c",
+    "bytes": 6743,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-settings.png": {
+    "sha256": "d996e3ff4c897bb671f549080c8998979f8f91667c203fe4119fd5fe87bc8400",
+    "bytes": 185209,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-settings.xml": {
+    "sha256": "beed30fa7af923bb82302a6468fcfcdc9582d2f71d65fcac92cfafd2ad796b77",
+    "bytes": 15955,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-share-cold-night.png": {
+    "sha256": "fa695ba54d9458949f9e955631503651708ff0b5972d218ad407f831f9f787fd",
+    "bytes": 82928,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-share-cold-night.xml": {
+    "sha256": "12f31e70f32573ba9975512f0cbfaadd379bec325bb74e34615f3d2cea7d8364",
+    "bytes": 11674,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-share-retry.png": {
+    "sha256": "1181b70826c7ca708e2e31b4263006feaf1272c9f5f46091450d8a8601021ffa",
+    "bytes": 82028,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-share-retry.xml": {
+    "sha256": "12f31e70f32573ba9975512f0cbfaadd379bec325bb74e34615f3d2cea7d8364",
+    "bytes": 11674,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-share-warm.png": {
+    "sha256": "c11db8f58f575b38b3fb98971090a89d298887ca97b11e43826f73b1bff829a5",
+    "bytes": 82237,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-share-warm.xml": {
+    "sha256": "12f31e70f32573ba9975512f0cbfaadd379bec325bb74e34615f3d2cea7d8364",
+    "bytes": 11674,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-signin-unavailable.png": {
+    "sha256": "a51cb1d30e12b2a72b4f4e668732b7255d8278a24641c3d95526441a05051012",
+    "bytes": 197378,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/binary-readiness-receipt.json": {
+    "sha256": "265bc3c89bb112259131d669b04ba0e0efeed564c8018cd52c609c2bfa07ab5c",
+    "bytes": 863,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/cleanup-receipt.json": {
+    "sha256": "88f0343e9a5c234b5e43529d4382e0bac8886681aafe95938a8dd8d1051a2f40",
+    "bytes": 706,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/database-bounds.json": {
+    "sha256": "e3f9c7b518fb5171df192f2c275a7756bc20ad8366624d415659c8331bcda0b0",
+    "bytes": 53,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/ios-settings-before-reload.ax.json": {
+    "sha256": "4c312f1d3dc46965196b182a72cd3a869af7963faa58670fbe75f3139d0ff673",
+    "bytes": 32949,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/ios-settings-before-save.ax.json": {
+    "sha256": "2a7c0dec21ff87ae383dad4a29238c63badfbbedc88a1343f83ba135fa75e69d",
+    "bytes": 32432,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/ios-settings-first.ax.json": {
+    "sha256": "83a7af2049998964bf573fca84f9853ec14b893ab78c162481d3085a7c8dc474",
+    "bytes": 32158,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/ios-settings-first.png": {
+    "sha256": "22afc2d30dbafa1e163beb138561f16174886ff44fa8e382de74d0d32626ff0d",
+    "bytes": 227508,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/ios-settings-reloaded.ax.json": {
+    "sha256": "543dabc94442df4daa94530315cf4583cd5a0b6ace4437579a6027fcd984b668",
+    "bytes": 32436,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/ios-settings-reloaded.png": {
+    "sha256": "4d5f5fd6fd2e0d56ba8d0e7bbb807581c20d433475b0a4656ecab1d7df306240",
+    "bytes": 196182,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/ios-settings-saved.ax.json": {
+    "sha256": "5285b6e098356727357bd2de98b6a0d04fba360adec64f4779447476b2f7b2b2",
+    "bytes": 32953,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/ios-settings-saved.png": {
+    "sha256": "802c30d8ef75623896d345b392637e2e0449a9e1c8637765c2a62d24af6d7fc6",
+    "bytes": 204032,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/ios-settings-scrolled.ax.json": {
+    "sha256": "16c964f27ff82af76fe5826a8bd2bfc5d2f91c360dc75e5471737263853d1cb4",
+    "bytes": 32338,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/ios-settings-scrolled.png": {
+    "sha256": "c5bf0e70ac0338ca16ac26257cde2af41ec154d60d297ec82347e58f558d4470",
+    "bytes": 195039,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/ios-share-cold-night-settled.ax.json": {
+    "sha256": "4323b6d2bc1f9a0581711a52c6dfa60b25867badac5a66dcf8f03846de58f826",
+    "bytes": 3237,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/ios-share-cold-night-settled.png": {
+    "sha256": "1b6ecbc77fc892f1f0ecd5bb2eba0823bd25eff3ec5f369510efb23ff99973c9",
+    "bytes": 136064,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/ios-share-cold-night.ax.json": {
+    "sha256": "f17ff8cf56a57fd7917a1082a16539c351fc195faa87b3f617877df094f51352",
+    "bytes": 3240,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/ios-share-cold-night.png": {
+    "sha256": "a71225964685fce0fb2322b3d159792c872c470d4a76c502330e62f3644a66ff",
+    "bytes": 68246,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/ios-share-retry.ax.json": {
+    "sha256": "dc3541801f27f82ed10b969c582b188ca9131800af1ec1af3d62622f9cc43300",
+    "bytes": 3237,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/ios-share-retry.png": {
+    "sha256": "8be2b1cef5ea847bcddca65e8ec08b7416a5d4c341347899566cbe58cc1b1e56",
+    "bytes": 135723,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/ios-share-warm.ax.json": {
+    "sha256": "724197f40de75c7497bf84be49c7812fd055a37af5c74698b9cd5aed4e3db111",
+    "bytes": 3237,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/ios-share-warm.png": {
+    "sha256": "19eb6415e70e8cb588540bd7db95aecc5c57b3a767be38337238187cd740d695",
+    "bytes": 135380,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/preserved-tool-outcomes.txt": {
+    "sha256": "7673c31608bafd71bc7929a5bdfab0a75340b701adb71748784e4c33c2ab3fd1",
+    "bytes": 1890,
+    "kind": "separately narrated failures, not raw logs"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/receipt.json": {
+    "sha256": "8189ee6bf23a5a1c9ad7555cb87169b74e47b2e0ae3b946fc22bd143e7177cbc",
+    "bytes": 2909,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/web-continue-canonical-final.ax.txt": {
+    "sha256": "09a4c0095ad9b3a516e91b2ecd5bd978c8196aba2808fa8bcb0c076443bb74e9",
+    "bytes": 1045,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/web-continue-canonical-final.png": {
+    "sha256": "eca0aef64b34e72a05a1d01218be64cb6bb05dfc7f7f7f65612db59f8cd158c8",
+    "bytes": 36229,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/web-continue-first.png": {
+    "sha256": "dd57a0fe627dfde60fe74990ba181f9eee2d58be9674440cfbfc2e6ecfa272b7",
+    "bytes": 29969,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/web-continue-repaired.ax.txt": {
+    "sha256": "09a4c0095ad9b3a516e91b2ecd5bd978c8196aba2808fa8bcb0c076443bb74e9",
+    "bytes": 1045,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/web-continue-repaired.png": {
+    "sha256": "eca0aef64b34e72a05a1d01218be64cb6bb05dfc7f7f7f65612db59f8cd158c8",
+    "bytes": 36229,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/web-settings-signed-out.png": {
+    "sha256": "3b5b4e3f8fcddc0deed22b2b0fd6124c9c53408effc7483f10fd766f390ffcc9",
+    "bytes": 16296,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/web-share-image-unavailable.png": {
+    "sha256": "873eb7d2fd2ee555bc759ccacb218f053ec76bbb49c6dd386043ba0ad4c01880",
+    "bytes": 14804,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/web-share-retry.png": {
+    "sha256": "873eb7d2fd2ee555bc759ccacb218f053ec76bbb49c6dd386043ba0ad4c01880",
+    "bytes": 14804,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/personal-review-ledger.json": {
+    "sha256": "95d1816e9ade84f8f1a057577d96c9dadf31181d9cc0b6a96f98a765d63ec744",
+    "bytes": 1826,
+    "kind": "actual captured output"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/workspace-check-final.log.gz": {
+    "sha256": "c8ff83b7afae8c366d0dc34d444d53c04d1917056dd75e5772d0c2e2d329c0df",
+    "contentSha256": "33f7e404c3b0f69be133f3cc9574515f5818f98032e78d84e6fa414058f121f0",
+    "bytes": 2534,
+    "kind": "Exact captured log bytes preserved with gzip; no whitespace normalization"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/web-visual.log.gz": {
+    "sha256": "f1a10a3a5950c40dedfb726603c1f96402012d98f0471d5e8b1ccd3ceaaa0e7d",
+    "contentSha256": "9b592a1bca9acb26d66805cf62eb69fa90111235912ac1ed55d69a78735c0799",
+    "bytes": 1501,
+    "kind": "Exact captured log bytes preserved with gzip; no whitespace normalization"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-build-final.log.gz": {
+    "sha256": "c806f6759259d175086edefc08a257ce7338fe1e7ecc5a243edd03d5793e63a2",
+    "contentSha256": "6557ce201a57183e6f7307389031e29d13b3b6e8aebdf7b87d27969bf6152f5c",
+    "bytes": 952,
+    "kind": "Exact captured log bytes preserved with gzip; no whitespace normalization"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-build-confirmation.log.gz": {
+    "sha256": "89b62d377eddbe8cdea1c0574110fa06d1d6715ed97c930398b064b2a3e0c3cb",
+    "contentSha256": "8474939fb4fc804845b8694eb4ab6f4ce3c9aed96862a1d553d03a6d204ebf5b",
+    "bytes": 953,
+    "kind": "Exact captured log bytes preserved with gzip; no whitespace normalization"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/workspace-check.log.gz": {
+    "sha256": "2507ace2645d83d29b36c08fbff51ecce38ade1d4aea9a316e3a608e75b2265c",
+    "contentSha256": "7f929836e9f13149306a42ec17fff242feedc13726cb9152bec43c8aee2167a5",
+    "bytes": 2532,
+    "kind": "Exact captured log bytes preserved with gzip; no whitespace normalization"
+  },
+  "../../studio-runtime/20261002/push-lifecycle-raw/android-build-first.log.gz": {
+    "sha256": "21050843ab9fea49ed2dbf7a352aa1cc6d76b0c07fe6623337eb9dc25554e05d",
+    "contentSha256": "8fa590989e4db3cb2d5e7f65863cc1e2c85ea1e85729900edfe1ca9c9e112f45",
+    "bytes": 953,
+    "kind": "Exact captured log bytes preserved with gzip; no whitespace normalization"
+  },
+  "../../studio-runtime/20261002/held-map-raw/backend-existing.log.gz": {
+    "sha256": "f064f04b1ef7bb44b2522260a60446aab57ca8fc9276d35f75da994aeaa81286",
+    "bytes": 404,
+    "contentSha256": "9c0bfd5cf5bb7466bec8217bcc889bee4847ad451462967f1782a7dd06532ca7"
+  },
+  "../../studio-runtime/20261002/held-map-raw/receipt.json": {
+    "sha256": "0351de85082c42f348290b9c488f59d376f9670ca54c109f2111e379fdfb787f",
+    "bytes": 3284
   }
 }

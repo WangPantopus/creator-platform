@@ -19,7 +19,7 @@ export type ScopeRestrictionInTransaction = (
 ) => Promise<void>;
 
 const threadScopeBrand: unique symbol = Symbol("ThreadScope");
-const issued = new WeakSet<object>();
+const issued = new WeakMap<object, Actor>();
 export type ThreadScope = Readonly<{
   [threadScopeBrand]: true;
   threadId: string;
@@ -32,11 +32,20 @@ export type ThreadScope = Readonly<{
   authority: "fan" | "creator" | "triage";
 }>;
 export function assertThreadScope(scope: ThreadScope): void {
+  const actor = issued.get(scope);
   invariant(
-    issued.has(scope),
+    actor !== undefined &&
+      actor.accountId === scope.actorAccountId &&
+      actor.adultEligible === true,
     "scope_required",
     "A verified thread scope is required.",
   );
+}
+/** Original server-resolved caller retained by the issuer. Scope metadata,
+ * serialization and copied objects cannot manufacture an Actor. */
+export function threadScopeActor(scope: ThreadScope): Actor {
+  assertThreadScope(scope);
+  return issued.get(scope)!;
 }
 
 /** W4 implements weighted reservations; W3 supplies its durable generation identity. */
@@ -296,7 +305,7 @@ export class AccessService {
       creatorName: pair.creatorName,
       authority,
     });
-    issued.add(scope);
+    issued.set(scope, actor);
     return scope;
   }
 

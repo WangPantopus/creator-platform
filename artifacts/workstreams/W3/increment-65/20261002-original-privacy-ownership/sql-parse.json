@@ -1,0 +1,22 @@
+{
+  "parser": "v7.20",
+  "postgresqlParser": [
+    17,
+    7
+  ],
+  "migrationStatements": 71,
+  "sourceSHA256": "73474526575ecbdec8b5452039f953d5af35357f5ba1922d300394791b94aa06",
+  "appliedToDatabase": false,
+  "liveOwnerRoleOrTypeCheck": false,
+  "plpgsqlFunctions": [
+    {
+      "name": "creator.fence_conversation_privacy_export",
+      "parsedBodies": 1
+    },
+    {
+      "name": "creator.finish_conversation_privacy_export_scope",
+      "parsedBodies": 1
+    }
+  ],
+  "stableSourceStatements": 1
+}

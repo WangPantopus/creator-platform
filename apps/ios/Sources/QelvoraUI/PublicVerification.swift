@@ -47,7 +47,7 @@ private struct PublicVerificationScreen: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                Text("/VERIFY/" + signedActId.uppercased()).qText("data-sm").foregroundStyle(qColor("ink-muted", scheme))
+                Text(QelvoraCopy.text("identityVerificationPageTitle")).qText("title").accessibilityAddTraits(.isHeader)
                 if scenePhase == .active, let signature, signature.signedActId == signedActId {
                     HStack(spacing: 12) {
                         QelvoraGlyph(name: "sealCheck", size: 40, color: qColor("maya-ink", scheme), cutColor: qColor("ground", scheme))

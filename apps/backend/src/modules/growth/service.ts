@@ -7,7 +7,7 @@ import {
   randomBytes,
 } from "node:crypto";
 import { z } from "zod";
-import type { QueryResultRow } from "pg";
+import type { PoolClient, QueryResultRow } from "pg";
 import type { Actor } from "../identity/adapter.js";
 import { DomainError } from "../../core/errors.js";
 import { contentHash } from "../../core/canonical.js";
@@ -776,7 +776,7 @@ export class GrowthService {
           )
         ).rows,
     );
-    return this.notifications.listCurrent(rows);
+    return this.notifications.listCurrent(rows, actor);
   }
   async markRead(actor: Actor, id: string) {
     return this.db.actor(actor, null, async (client) => {
@@ -805,7 +805,7 @@ export class GrowthService {
           )
         ).rows,
     );
-    const current = (await this.notifications.listCurrent(rows))[0];
+    const current = (await this.notifications.listCurrent(rows, actor))[0];
     if (!current)
       throw new DomainError(
         "notification_unavailable",
@@ -1663,16 +1663,15 @@ export class GrowthService {
   }
   async privacyDelete(
     accountId: string,
-    ownedCreatorIds: readonly string[],
     signal: AbortSignal,
-    assertAuthority: () => Promise<void>,
+    assertAuthority: (client: PoolClient) => Promise<readonly string[]>,
   ) {
     await this.db.transaction(
       this.db.worker,
       async (client) => {
-        await assertAuthority();
+        const ownedCreatorIds = await assertAuthority(client);
         await this.erasure.mark(client, accountId, ownedCreatorIds);
-        await assertAuthority();
+        await assertAuthority(client);
         const checkpointSchema = (
           await client.query(
             "SELECT to_regclass('growth.source_scan_checkpoint') IS NOT NULL AND (SELECT count(*)=2 FROM information_schema.columns WHERE table_schema='growth' AND table_name='source_scan_checkpoint' AND column_name IN ('generation','expires_at')) AS ready",
@@ -1790,7 +1789,7 @@ export class GrowthService {
           [ownedCreatorIds],
         );
         // Losing the exact task lease rolls back the whole erasure transaction.
-        await assertAuthority();
+        await assertAuthority(client);
       },
       signal,
     );

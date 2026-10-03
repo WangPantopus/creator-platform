@@ -1,0 +1,8 @@
+$ tsc --noEmit && node scripts/build.mjs
+src/modules/content/thanks-projection.ts(160,13): error TS2353: Object literal may only specify known properties, and 'signal' does not exist in type '{ creatorId: string; fanAccountId: string; targetKind: string; targetId: string; }'.
+[ELIFECYCLE] Command failed with exit code 2.
+Error: ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL
+
+  × "pnpm recursive run" failed in /Users/yingpengwang/estimate-rescue/
+  │ creator-platform/w7-completion-840545/apps/backend
+

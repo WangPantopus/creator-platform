@@ -174,6 +174,12 @@ for (const [suffix, id, response, body] of [
   ownedPath(content + "/replies/{id}/" + suffix, "post", id!, response!, body);
 ownedPath(content + "/mute", "get", "contentPreference", "ContentPreference");
 ownedPath(
+  content + "/reply-policy",
+  "get",
+  "noteReplyPolicy",
+  "NoteReplyPolicy",
+);
+ownedPath(
   content + "/mute",
   "post",
   "muteContent",
@@ -402,6 +408,9 @@ export function createOpenApi() {
       },
       "/v1/identity/fan-profile": {
         post: operation("saveFanProfile", "FanProfile", "FanProfileInput"),
+      },
+      "/v1/identity/fan-profile/intro": {
+        post: operation("saveFanIntro", "FanProfile", "FanIntroInput"),
       },
       "/v1/identity/creator-profile": {
         post: operation(

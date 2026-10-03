@@ -1,0 +1,7 @@
+Monitoring boot status for Qelvora W7 iPhone 16e (FAB31883-2F36-4E50-83B3-D9654B60FF00).
+[2026-10-02 14:12:21 +0000] Status=1, isTerminal=NO, Elapsed=00:02.
+	Waiting on BackBoard
+
+[2026-10-02 14:12:22 +0000] Status=4294967295, isTerminal=YES, Elapsed=00:04.
+	Finished
+

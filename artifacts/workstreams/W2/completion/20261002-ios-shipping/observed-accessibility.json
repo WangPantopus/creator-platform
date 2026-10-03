@@ -1,0 +1,1924 @@
+{
+  "coldLight": [
+    {
+      "AXLabel": "Account status, The service is unavailable. Please try again.",
+      "AXUniqueId": "account-status",
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "height": 61.66666793823242,
+        "x": 15.5,
+        "y": 315.5,
+        "width": 371
+      }
+    },
+    {
+      "AXLabel": "We can't reach your account right now",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Heading",
+      "frame": {
+        "y": 408.5,
+        "width": 291.3333333333333,
+        "height": 56,
+        "x": 16
+      }
+    },
+    {
+      "AXLabel": "Your session is kept on this device. Try again in a moment.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "x": 16,
+        "height": 41.66666666666663,
+        "y": 480.5,
+        "width": 323.3333333333333
+      }
+    },
+    {
+      "AXLabel": "Retry",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "height": 48,
+        "y": 538,
+        "width": 370,
+        "x": 16
+      }
+    }
+  ],
+  "retryDownLight": [
+    {
+      "AXLabel": "Account status, The service is unavailable. Please try again.",
+      "AXUniqueId": "account-status",
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "height": 61.66666793823242,
+        "x": 15.5,
+        "y": 315.5,
+        "width": 371
+      }
+    },
+    {
+      "AXLabel": "We can't reach your account right now",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Heading",
+      "frame": {
+        "y": 408.5,
+        "width": 291.3333333333333,
+        "height": 56,
+        "x": 16
+      }
+    },
+    {
+      "AXLabel": "Your session is kept on this device. Try again in a moment.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "x": 16,
+        "height": 41.66666666666663,
+        "y": 480.5,
+        "width": 323.3333333333333
+      }
+    },
+    {
+      "AXLabel": "Retry",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "height": 48,
+        "y": 538,
+        "width": 370,
+        "x": 16
+      }
+    }
+  ],
+  "beforePostReadyRetryLight": [
+    {
+      "AXLabel": "Development identity, Synthetic account \u00b7 actual local API.",
+      "AXUniqueId": "",
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "y": 77.5,
+        "width": 371,
+        "height": 61.66666793823242,
+        "x": 15.5
+      }
+    },
+    {
+      "AXLabel": "You",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "height": 22.333333333333343,
+        "x": 22,
+        "y": 170.66666666666666,
+        "width": 29
+      }
+    },
+    {
+      "AXLabel": "@w2_native_fan",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "x": 22,
+        "width": 171.66666666666666,
+        "height": 26,
+        "y": 221
+      }
+    },
+    {
+      "AXLabel": "Handle and intro",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "x": 22,
+        "width": 142.33333333333331,
+        "height": 44,
+        "y": 317
+      }
+    },
+    {
+      "AXLabel": "Memberships and requests",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "width": 358,
+        "x": 22,
+        "height": 48,
+        "y": 389
+      }
+    },
+    {
+      "AXLabel": "Spend and time",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "x": 22,
+        "y": 465,
+        "width": 358,
+        "height": 44
+      }
+    },
+    {
+      "AXLabel": "Notifications",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "width": 358,
+        "x": 22,
+        "y": 537,
+        "height": 44
+      }
+    },
+    {
+      "AXLabel": "Me and privacy",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "y": 609,
+        "width": 161.66666666666666,
+        "height": 26,
+        "x": 22
+      }
+    },
+    {
+      "AXLabel": "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "width": 358,
+        "x": 22,
+        "y": 663,
+        "height": 49.66666666666663
+      }
+    },
+    {
+      "AXLabel": "Memory and conversation access by creator",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "height": 19.66666666666663,
+        "y": 740.6666666666666,
+        "x": 22,
+        "width": 301.3333333333333
+      }
+    },
+    {
+      "AXLabel": "No conversations yet.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "x": 22,
+        "y": 788.3333333333333,
+        "width": 147,
+        "height": 19.66666666666663
+      }
+    },
+    {
+      "AXLabel": "Export or delete my data",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "width": 358,
+        "x": 22,
+        "y": 835.9999999999999,
+        "height": 48
+      }
+    },
+    {
+      "AXLabel": "Help and safety",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "x": 22,
+        "y": 911.9999999999999,
+        "height": 44,
+        "width": 137
+      }
+    },
+    {
+      "AXLabel": "Home",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "width": 96.66666666666666,
+        "height": 48,
+        "x": 8,
+        "y": 768
+      }
+    },
+    {
+      "AXLabel": "Discover",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "y": 768,
+        "x": 104.66666666666666,
+        "height": 48,
+        "width": 96.33333333333334
+      }
+    },
+    {
+      "AXLabel": "Requests",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "height": 48,
+        "x": 201,
+        "y": 768,
+        "width": 96.66666666666663
+      }
+    },
+    {
+      "AXLabel": "You",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "height": 48,
+        "x": 297.66666666666663,
+        "y": 768,
+        "width": 96.33333333333331
+      }
+    }
+  ],
+  "retryDownNight": [
+    {
+      "AXLabel": "Account status, The service is unavailable. Please try again.",
+      "AXUniqueId": "account-status",
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "x": 15.5,
+        "height": 61.66666793823242,
+        "y": 315.5,
+        "width": 371
+      }
+    },
+    {
+      "AXLabel": "We can't reach your account right now",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Heading",
+      "frame": {
+        "y": 408.5,
+        "width": 291.3333333333333,
+        "height": 56,
+        "x": 16
+      }
+    },
+    {
+      "AXLabel": "Your session is kept on this device. Try again in a moment.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "height": 41.66666666666663,
+        "x": 16,
+        "y": 480.5,
+        "width": 323.3333333333333
+      }
+    },
+    {
+      "AXLabel": "Retry",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "x": 16,
+        "width": 370,
+        "height": 48,
+        "y": 538
+      }
+    }
+  ],
+  "beforePostReadyRetryNight": [
+    {
+      "AXLabel": "Development identity, Synthetic account \u00b7 actual local API.",
+      "AXUniqueId": "",
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "height": 61.66666793823242,
+        "x": 15.5,
+        "y": 77.5,
+        "width": 371
+      }
+    },
+    {
+      "AXLabel": "You",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "y": 170.66666666666666,
+        "width": 29,
+        "height": 22.333333333333343,
+        "x": 22
+      }
+    },
+    {
+      "AXLabel": "@w2_native_fan",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "x": 22,
+        "height": 26,
+        "y": 221,
+        "width": 171.66666666666666
+      }
+    },
+    {
+      "AXLabel": "Handle and intro",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "height": 44,
+        "y": 317,
+        "width": 142.33333333333331,
+        "x": 22
+      }
+    },
+    {
+      "AXLabel": "Memberships and requests",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "height": 48,
+        "x": 22,
+        "y": 389,
+        "width": 358
+      }
+    },
+    {
+      "AXLabel": "Spend and time",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "height": 44,
+        "x": 22,
+        "y": 465,
+        "width": 358
+      }
+    },
+    {
+      "AXLabel": "Notifications",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "y": 537,
+        "x": 22,
+        "height": 44,
+        "width": 358
+      }
+    },
+    {
+      "AXLabel": "Me and privacy",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "width": 161.66666666666666,
+        "height": 26,
+        "x": 22,
+        "y": 609
+      }
+    },
+    {
+      "AXLabel": "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "x": 22,
+        "y": 663,
+        "height": 49.66666666666663,
+        "width": 358
+      }
+    },
+    {
+      "AXLabel": "Memory and conversation access by creator",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "width": 301.3333333333333,
+        "x": 22,
+        "y": 740.6666666666666,
+        "height": 19.66666666666663
+      }
+    },
+    {
+      "AXLabel": "No conversations yet.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "height": 19.66666666666663,
+        "y": 788.3333333333333,
+        "x": 22,
+        "width": 147
+      }
+    },
+    {
+      "AXLabel": "Export or delete my data",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "x": 22,
+        "y": 835.9999999999999,
+        "width": 358,
+        "height": 48
+      }
+    },
+    {
+      "AXLabel": "Help and safety",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "width": 137,
+        "x": 22,
+        "y": 911.9999999999999,
+        "height": 44
+      }
+    },
+    {
+      "AXLabel": "Home",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "y": 768,
+        "width": 96.66666666666666,
+        "height": 48,
+        "x": 8
+      }
+    },
+    {
+      "AXLabel": "Discover",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "width": 96.33333333333334,
+        "x": 104.66666666666666,
+        "y": 768,
+        "height": 48
+      }
+    },
+    {
+      "AXLabel": "Requests",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "x": 201,
+        "y": 768,
+        "width": 96.66666666666663,
+        "height": 48
+      }
+    },
+    {
+      "AXLabel": "You",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "width": 96.33333333333331,
+        "x": 297.66666666666663,
+        "height": 48,
+        "y": 768
+      }
+    }
+  ],
+  "accountAccessibilityXL": [
+    {
+      "AXLabel": "Development identity, Synthetic account \u00b7 actual local API.",
+      "AXUniqueId": "",
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "height": 149,
+        "x": 15.5,
+        "y": 77.5,
+        "width": 371
+      }
+    },
+    {
+      "AXLabel": "You",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "x": 22,
+        "y": 258,
+        "height": 48.333333333333314,
+        "width": 62.66666666666666
+      }
+    },
+    {
+      "AXLabel": "@w2_native_fan",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "width": 335,
+        "x": 22,
+        "y": 334.3333333333333,
+        "height": 122.33333333333331
+      }
+    },
+    {
+      "AXLabel": "Handle and intro",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "y": 526.6666666666666,
+        "width": 281.3333333333333,
+        "height": 44,
+        "x": 22
+      }
+    },
+    {
+      "AXLabel": "Memberships and requests",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "x": 22,
+        "height": 90.66666666666663,
+        "y": 598.6666666666666,
+        "width": 358
+      }
+    },
+    {
+      "AXLabel": "Spend and time",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "height": 44,
+        "y": 717.3333333333333,
+        "x": 22,
+        "width": 358
+      }
+    },
+    {
+      "AXLabel": "Notifications",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "width": 358,
+        "y": 789.3333333333333,
+        "height": 44,
+        "x": 22
+      }
+    },
+    {
+      "AXLabel": "Me and privacy",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "width": 196.33333333333331,
+        "height": 122.33333333333337,
+        "x": 22,
+        "y": 861.3333333333333
+      }
+    },
+    {
+      "AXLabel": "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "x": 22,
+        "y": 1011.6666666666666,
+        "width": 358,
+        "height": 258.33333333333337
+      }
+    },
+    {
+      "AXLabel": "Memory and conversation access by creator",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "x": 22,
+        "width": 355.66666666666663,
+        "height": 138.33333333333326,
+        "y": 1298
+      }
+    },
+    {
+      "AXLabel": "No conversations yet.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "width": 320.3333333333333,
+        "x": 22,
+        "height": 42.66666666666674,
+        "y": 1464.3333333333333
+      }
+    },
+    {
+      "AXLabel": "Export or delete my data",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "width": 358,
+        "x": 22,
+        "y": 1535,
+        "height": 90.66666666666674
+      }
+    },
+    {
+      "AXLabel": "Help and safety",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "height": 44,
+        "x": 22,
+        "y": 1653.6666666666665,
+        "width": 270
+      }
+    },
+    {
+      "AXLabel": "Home",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "x": 8,
+        "width": 189,
+        "height": 57.33333333333337,
+        "y": 693
+      }
+    },
+    {
+      "AXLabel": "Discover",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "height": 57.33333333333337,
+        "x": 205,
+        "y": 693,
+        "width": 189
+      }
+    },
+    {
+      "AXLabel": "Requests",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "y": 758.3333333333333,
+        "width": 189,
+        "height": 57.33333333333337,
+        "x": 8
+      }
+    },
+    {
+      "AXLabel": "You",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "height": 57.33333333333337,
+        "y": 758.3333333333333,
+        "width": 189,
+        "x": 205
+      }
+    }
+  ],
+  "privacyAccessibilityXL": [
+    {
+      "AXLabel": "Development identity, Synthetic account \u00b7 actual local API.",
+      "AXUniqueId": "",
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "y": 77.5,
+        "width": 371,
+        "height": 149,
+        "x": 15.5
+      }
+    },
+    {
+      "AXLabel": "Your data",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "height": 56.66666666666663,
+        "x": 16,
+        "y": 258,
+        "width": 229.33333333333331
+      }
+    },
+    {
+      "AXLabel": "Reports are available without paid access. Case evidence is limited to what you report.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "width": 368.3333333333333,
+        "height": 186.33333333333337,
+        "x": 16,
+        "y": 330.66666666666663
+      }
+    },
+    {
+      "AXLabel": "Support",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "x": 16,
+        "width": 151,
+        "height": 44,
+        "y": 533
+      }
+    },
+    {
+      "AXLabel": "Your data",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "height": 44,
+        "y": 533,
+        "width": 172,
+        "x": 175
+      }
+    },
+    {
+      "AXLabel": "Access history",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "height": 90.66666666666663,
+        "x": 16,
+        "y": 593,
+        "width": 146.33333333333331
+      }
+    },
+    {
+      "AXLabel": "Feedback",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "x": 170.33333333333331,
+        "width": 178.66666666666669,
+        "height": 44,
+        "y": 616.3333333333333
+      }
+    },
+    {
+      "AXLabel": "Crisis help",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "x": 16,
+        "y": 699.6666666666666,
+        "width": 188.66666666666666,
+        "height": 44
+      }
+    },
+    {
+      "AXLabel": "Could not complete, This endpoint is unavailable.",
+      "AXUniqueId": "",
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "x": 15.5,
+        "height": 149,
+        "y": 759.1666666666666,
+        "width": 371
+      }
+    },
+    {
+      "AXLabel": "Export and deletion are separate from canceling store billing. A job finishes only after every data domain acknowledges it.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "y": 923.6666666666666,
+        "x": 16,
+        "height": 282.33333333333337,
+        "width": 369.66666666666663
+      }
+    },
+    {
+      "AXLabel": "Manage Apple subscriptions",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Link",
+      "frame": {
+        "height": 96,
+        "y": 1222,
+        "x": 16,
+        "width": 255.66666666666663
+      }
+    },
+    {
+      "AXLabel": "Data scope, Account",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "PopUpButton",
+      "frame": {
+        "x": 16,
+        "y": 1334,
+        "height": 62,
+        "width": 212
+      }
+    },
+    {
+      "AXLabel": "Fresh account verification must be connected before requesting data changes.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "width": 321.66666666666663,
+        "height": 109,
+        "x": 16,
+        "y": 1412
+      }
+    },
+    {
+      "AXLabel": "Request export",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": false,
+      "type": "Button",
+      "frame": {
+        "x": 16,
+        "y": 1537,
+        "width": 370,
+        "height": 48
+      }
+    },
+    {
+      "AXLabel": "Request deletion",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": false,
+      "type": "Button",
+      "frame": {
+        "width": 370,
+        "x": 16,
+        "y": 1601,
+        "height": 48
+      }
+    },
+    {
+      "AXLabel": "Refresh",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "width": 370,
+        "x": 16,
+        "y": 1665,
+        "height": 48
+      }
+    },
+    {
+      "AXLabel": "Home",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "width": 189,
+        "y": 693,
+        "height": 57.33333333333337,
+        "x": 8
+      }
+    },
+    {
+      "AXLabel": "Discover",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "width": 189,
+        "x": 205,
+        "y": 693,
+        "height": 57.33333333333337
+      }
+    },
+    {
+      "AXLabel": "Requests",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "y": 758.3333333333333,
+        "width": 189,
+        "height": 57.33333333333337,
+        "x": 8
+      }
+    },
+    {
+      "AXLabel": "You",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "width": 189,
+        "x": 205,
+        "height": 57.33333333333337,
+        "y": 758.3333333333333
+      }
+    }
+  ],
+  "VoiceOverOn": [
+    {
+      "AXLabel": "Accessibility",
+      "AXUniqueId": "BackButton",
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "height": 44,
+        "x": 16,
+        "y": 62,
+        "width": 44
+      }
+    },
+    {
+      "AXLabel": "VoiceOver",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Heading",
+      "frame": {
+        "y": 73.66666666666666,
+        "x": 160,
+        "height": 20.66666666666667,
+        "width": 81.66666666666669
+      }
+    },
+    {
+      "AXLabel": "VoiceOver",
+      "AXUniqueId": "VoiceOverTouchEnabled",
+      "AXValue": "1",
+      "enabled": true,
+      "type": "CheckBox",
+      "frame": {
+        "width": 330,
+        "x": 36,
+        "y": 146.3333282470703,
+        "height": 28
+      }
+    },
+    {
+      "AXLabel": "VoiceOver speaks items on the screen:",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "x": 35.000000000000014,
+        "y": 191.66666666666669,
+        "width": 244.33333333333337,
+        "height": 15.666666666666657
+      }
+    },
+    {
+      "AXLabel": "  Tap once to select an item.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "x": 35,
+        "y": 207.33333333333334,
+        "height": 15.666666666666657,
+        "width": 176
+      }
+    },
+    {
+      "AXLabel": "  Double-tap to activate the selected item.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "width": 261,
+        "height": 15.666666666666657,
+        "x": 35,
+        "y": 223
+      }
+    },
+    {
+      "AXLabel": "Learn more\u2026",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Link",
+      "frame": {
+        "height": 20,
+        "x": 35,
+        "y": 243.66666666666669,
+        "width": 79
+      }
+    },
+    {
+      "AXLabel": "What\u2019s new in VoiceOver\u2026",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Link",
+      "frame": {
+        "x": 35,
+        "width": 160,
+        "height": 20,
+        "y": 268.6666666666667
+      }
+    },
+    {
+      "AXLabel": "Live Recognition",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Heading",
+      "frame": {
+        "x": 110,
+        "width": 131,
+        "height": 20.333333333333314,
+        "y": 329.22908210754395
+      }
+    },
+    {
+      "AXLabel": "Close",
+      "AXUniqueId": "xmark.circle.fill",
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "height": 26,
+        "x": 341.66666666666663,
+        "y": 325.66666348775226,
+        "width": 26
+      }
+    },
+    {
+      "AXLabel": "Using on-device intelligence, your iPhone can detect people, doors, scenes, text, and furniture around you. Four finger triple-tap to start Live Recognition or use the Live Recognition Rotor.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "y": 353.56241544087726,
+        "width": 237.33333333333331,
+        "height": 118,
+        "x": 110
+      }
+    },
+    {
+      "AXLabel": "VoiceOver Practice",
+      "AXUniqueId": "VoiceOverTouchGestureHelpEnabled",
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "x": 20,
+        "y": 528.6666584014893,
+        "width": 362,
+        "height": 53
+      }
+    },
+    {
+      "AXLabel": "VoiceOver Tutorial",
+      "AXUniqueId": "VoiceOverTouchTutorialEnabled",
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "width": 362,
+        "x": 20,
+        "height": 53,
+        "y": 581.6666584014893
+      }
+    },
+    {
+      "AXLabel": "Speaking Rate",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Heading",
+      "frame": {
+        "x": 20,
+        "height": 45.33333206176758,
+        "y": 651.9999923706055,
+        "width": 362
+      }
+    },
+    {
+      "AXLabel": "Speaking Rate",
+      "AXUniqueId": "SpeakingRateSlider",
+      "AXValue": "50%",
+      "enabled": true,
+      "type": "Slider",
+      "frame": {
+        "width": 362,
+        "height": 51,
+        "x": 20,
+        "y": 697.333324432373
+      }
+    },
+    {
+      "AXLabel": "Adjusts the speaking rate of the current voice.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "GenericElement",
+      "frame": {
+        "width": 362,
+        "y": 748.3333250681559,
+        "height": 30,
+        "x": 20
+      }
+    },
+    {
+      "AXLabel": "Speech",
+      "AXUniqueId": "Voices",
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "height": 53,
+        "y": 795.9999904632568,
+        "width": 362,
+        "x": 20
+      }
+    },
+    {
+      "AXLabel": "Braille",
+      "AXUniqueId": "Braille",
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "height": 53,
+        "y": 848.9999904632568,
+        "x": 20,
+        "width": 362
+      }
+    }
+  ],
+  "VoiceOverOff": [
+    {
+      "AXLabel": "Accessibility",
+      "AXUniqueId": "BackButton",
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "x": 16,
+        "height": 44,
+        "y": 62,
+        "width": 44
+      }
+    },
+    {
+      "AXLabel": "VoiceOver",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Heading",
+      "frame": {
+        "width": 81.66666666666669,
+        "x": 160,
+        "y": 73.66666666666666,
+        "height": 20.66666666666667
+      }
+    },
+    {
+      "AXLabel": "VoiceOver",
+      "AXUniqueId": "VoiceOverTouchEnabled",
+      "AXValue": "0",
+      "enabled": true,
+      "type": "CheckBox",
+      "frame": {
+        "width": 330,
+        "x": 36,
+        "y": 146.3333282470703,
+        "height": 28
+      }
+    },
+    {
+      "AXLabel": "VoiceOver speaks items on the screen:",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "height": 15.666666666666657,
+        "y": 191.66666666666669,
+        "x": 35.000000000000014,
+        "width": 244.33333333333337
+      }
+    },
+    {
+      "AXLabel": "  Tap once to select an item.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "height": 15.666666666666657,
+        "y": 207.33333333333334,
+        "width": 176,
+        "x": 35
+      }
+    },
+    {
+      "AXLabel": "  Double-tap to activate the selected item.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "width": 261,
+        "y": 223,
+        "height": 15.666666666666657,
+        "x": 35
+      }
+    },
+    {
+      "AXLabel": "Learn more\u2026",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Link",
+      "frame": {
+        "width": 79,
+        "height": 20,
+        "x": 35,
+        "y": 243.66666666666669
+      }
+    },
+    {
+      "AXLabel": "What\u2019s new in VoiceOver\u2026",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Link",
+      "frame": {
+        "x": 35,
+        "y": 268.6666666666667,
+        "width": 160,
+        "height": 20
+      }
+    },
+    {
+      "AXLabel": "Live Recognition",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Heading",
+      "frame": {
+        "y": 329.22908210754395,
+        "width": 131,
+        "height": 20.333333333333314,
+        "x": 110
+      }
+    },
+    {
+      "AXLabel": "Close",
+      "AXUniqueId": "xmark.circle.fill",
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "height": 26,
+        "x": 341.66666666666663,
+        "y": 325.66666348775226,
+        "width": 26
+      }
+    },
+    {
+      "AXLabel": "Using on-device intelligence, your iPhone can detect people, doors, scenes, text, and furniture around you. Four finger triple-tap to start Live Recognition or use the Live Recognition Rotor.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "x": 110,
+        "width": 237.33333333333331,
+        "height": 118,
+        "y": 353.56241544087726
+      }
+    },
+    {
+      "AXLabel": "VoiceOver Tutorial",
+      "AXUniqueId": "VoiceOverTouchTutorialEnabled",
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "x": 20,
+        "width": 362,
+        "height": 53,
+        "y": 528.6666584014893
+      }
+    },
+    {
+      "AXLabel": "Speaking Rate",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Heading",
+      "frame": {
+        "width": 362,
+        "height": 45.33333206176758,
+        "x": 20,
+        "y": 598.9999923706055
+      }
+    },
+    {
+      "AXLabel": "Speaking Rate",
+      "AXUniqueId": "SpeakingRateSlider",
+      "AXValue": "50%",
+      "enabled": true,
+      "type": "Slider",
+      "frame": {
+        "x": 20,
+        "y": 644.333324432373,
+        "height": 51,
+        "width": 362
+      }
+    },
+    {
+      "AXLabel": "Adjusts the speaking rate of the current voice.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "GenericElement",
+      "frame": {
+        "x": 20,
+        "y": 695.3333250681559,
+        "width": 362,
+        "height": 30
+      }
+    },
+    {
+      "AXLabel": "Speech",
+      "AXUniqueId": "Voices",
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "width": 362,
+        "x": 20,
+        "y": 742.9999904632568,
+        "height": 53
+      }
+    },
+    {
+      "AXLabel": "Braille",
+      "AXUniqueId": "Braille",
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "y": 795.9999904632568,
+        "x": 20,
+        "height": 53,
+        "width": 362
+      }
+    },
+    {
+      "AXLabel": "Verbosity",
+      "AXUniqueId": "Verbosity",
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "y": 848.9999904632568,
+        "width": 362,
+        "height": 53,
+        "x": 20
+      }
+    }
+  ],
+  "ReduceMotionOn": [
+    {
+      "AXLabel": "Accessibility",
+      "AXUniqueId": "BackButton",
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "width": 44,
+        "x": 16,
+        "y": 62,
+        "height": 44
+      }
+    },
+    {
+      "AXLabel": "Motion",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Heading",
+      "frame": {
+        "y": 73.66666666666666,
+        "width": 55.33333333333334,
+        "height": 20.66666666666667,
+        "x": 173.33333333333334
+      }
+    },
+    {
+      "AXLabel": "Reduce Motion",
+      "AXUniqueId": "REDUCE_MOTION",
+      "AXValue": "1",
+      "enabled": true,
+      "type": "CheckBox",
+      "frame": {
+        "x": 36,
+        "y": 146.3333282470703,
+        "width": 330,
+        "height": 28
+      }
+    },
+    {
+      "AXLabel": "Reduce the motion of the user interface, including the parallax effect of icons.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "GenericElement",
+      "frame": {
+        "x": 20,
+        "y": 186.66666666666669,
+        "height": 46,
+        "width": 362
+      }
+    },
+    {
+      "AXLabel": "Auto-Play Animated Images",
+      "AXUniqueId": "REDUCE_MOTION_AUTOPLAY_ANIMATED_IMAGES",
+      "AXValue": "1",
+      "enabled": true,
+      "type": "CheckBox",
+      "frame": {
+        "width": 330,
+        "x": 36,
+        "y": 263,
+        "height": 28
+      }
+    },
+    {
+      "AXLabel": "Auto-Play Video Previews",
+      "AXUniqueId": "REDUCE_MOTION_AUTOPLAY_VIDEO_PREVIEWS",
+      "AXValue": "1",
+      "enabled": true,
+      "type": "CheckBox",
+      "frame": {
+        "width": 330,
+        "height": 28,
+        "x": 36,
+        "y": 316
+      }
+    },
+    {
+      "AXLabel": "Auto-Play Message Effects",
+      "AXUniqueId": "ReduceMotionAutoplayMessagesEffects",
+      "AXValue": "1",
+      "enabled": true,
+      "type": "CheckBox",
+      "frame": {
+        "y": 369,
+        "x": 36,
+        "height": 28,
+        "width": 330
+      }
+    },
+    {
+      "AXLabel": "Control if videos, animated images, and full screen effects in messages play automatically.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "GenericElement",
+      "frame": {
+        "height": 46,
+        "x": 20,
+        "y": 409.3333326975505,
+        "width": 362
+      }
+    },
+    {
+      "AXLabel": "Prefer Non-Blinking Cursor",
+      "AXUniqueId": "PREFER_NONBLINKING_CURSOR",
+      "AXValue": "0",
+      "enabled": true,
+      "type": "CheckBox",
+      "frame": {
+        "width": 330,
+        "x": 36,
+        "height": 28.000030517578125,
+        "y": 485.6666564941406
+      }
+    },
+    {
+      "AXLabel": "Prefer the cursor indicator in text does not blink.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "GenericElement",
+      "frame": {
+        "height": 30,
+        "x": 20,
+        "y": 525.9999987284343,
+        "width": 362
+      }
+    }
+  ],
+  "ReduceMotionOff": [
+    {
+      "AXLabel": "Accessibility",
+      "AXUniqueId": "BackButton",
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "x": 16,
+        "width": 44,
+        "height": 44,
+        "y": 62
+      }
+    },
+    {
+      "AXLabel": "Motion",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Heading",
+      "frame": {
+        "height": 20.66666666666667,
+        "x": 173.33333333333334,
+        "y": 73.66666666666666,
+        "width": 55.33333333333334
+      }
+    },
+    {
+      "AXLabel": "Reduce Motion",
+      "AXUniqueId": "REDUCE_MOTION",
+      "AXValue": "0",
+      "enabled": true,
+      "type": "CheckBox",
+      "frame": {
+        "height": 28,
+        "y": 146.3333282470703,
+        "x": 36,
+        "width": 330
+      }
+    },
+    {
+      "AXLabel": "Reduce the motion of the user interface, including the parallax effect of icons.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "GenericElement",
+      "frame": {
+        "height": 46,
+        "x": 20,
+        "y": 186.66666666666669,
+        "width": 362
+      }
+    },
+    {
+      "AXLabel": "Prefer Cross-Fade Transitions",
+      "AXUniqueId": "REDUCE_MOTION_REDUCE_SLIDE_ANIMATIONS",
+      "AXValue": "0",
+      "enabled": true,
+      "type": "CheckBox",
+      "frame": {
+        "height": 28,
+        "x": 36,
+        "y": 263,
+        "width": 330
+      }
+    },
+    {
+      "AXLabel": "Reduces the movement of onscreen elements and screen actions, such as launching or moving between apps, to help with motion sensitivity.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "GenericElement",
+      "frame": {
+        "x": 20,
+        "y": 303.3333326975505,
+        "height": 62,
+        "width": 362
+      }
+    },
+    {
+      "AXLabel": "Auto-Play Animated Images",
+      "AXUniqueId": "REDUCE_MOTION_AUTOPLAY_ANIMATED_IMAGES",
+      "AXValue": "1",
+      "enabled": true,
+      "type": "CheckBox",
+      "frame": {
+        "x": 36,
+        "width": 330,
+        "height": 28,
+        "y": 395.6666564941406
+      }
+    },
+    {
+      "AXLabel": "Auto-Play Video Previews",
+      "AXUniqueId": "REDUCE_MOTION_AUTOPLAY_VIDEO_PREVIEWS",
+      "AXValue": "1",
+      "enabled": true,
+      "type": "CheckBox",
+      "frame": {
+        "x": 36,
+        "y": 448.6666564941406,
+        "width": 330,
+        "height": 28
+      }
+    },
+    {
+      "AXLabel": "Auto-Play Message Effects",
+      "AXUniqueId": "ReduceMotionAutoplayMessagesEffects",
+      "AXValue": "1",
+      "enabled": true,
+      "type": "CheckBox",
+      "frame": {
+        "y": 501.6666564941406,
+        "width": 330,
+        "height": 28.000030517578125,
+        "x": 36
+      }
+    },
+    {
+      "AXLabel": "Control if videos, animated images, and full screen effects in messages play automatically.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "GenericElement",
+      "frame": {
+        "width": 362,
+        "x": 20,
+        "y": 541.9999968210857,
+        "height": 46
+      }
+    },
+    {
+      "AXLabel": "Prefer Non-Blinking Cursor",
+      "AXUniqueId": "PREFER_NONBLINKING_CURSOR",
+      "AXValue": "0",
+      "enabled": true,
+      "type": "CheckBox",
+      "frame": {
+        "y": 618.3333129882812,
+        "width": 330,
+        "height": 28,
+        "x": 36
+      }
+    },
+    {
+      "AXLabel": "Prefer the cursor indicator in text does not blink.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "GenericElement",
+      "frame": {
+        "height": 30,
+        "y": 658.6666628519694,
+        "width": 362,
+        "x": 20
+      }
+    }
+  ],
+  "TextRestored": [
+    {
+      "AXLabel": "Display & Text Size",
+      "AXUniqueId": "BackButton",
+      "AXValue": null,
+      "enabled": true,
+      "type": "Button",
+      "frame": {
+        "height": 44,
+        "x": 16,
+        "y": 62,
+        "width": 44
+      }
+    },
+    {
+      "AXLabel": "Larger Text",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "Heading",
+      "frame": {
+        "height": 20.66666666666667,
+        "x": 156,
+        "y": 73.66666666666666,
+        "width": 89.66666666666669
+      }
+    },
+    {
+      "AXLabel": "Larger Accessibility Sizes",
+      "AXUniqueId": "LARGER_DYNAMIC_TYPE_SWITCH",
+      "AXValue": "0",
+      "enabled": true,
+      "type": "CheckBox",
+      "frame": {
+        "y": 146.3333282470703,
+        "width": 330,
+        "height": 28,
+        "x": 36
+      }
+    },
+    {
+      "AXLabel": "Apps that support Dynamic Type will adjust to your preferred reading size below.",
+      "AXUniqueId": null,
+      "AXValue": null,
+      "enabled": true,
+      "type": "StaticText",
+      "frame": {
+        "width": 312,
+        "height": 64.33333333333331,
+        "x": 45,
+        "y": 196.66666666666669
+      }
+    },
+    {
+      "AXLabel": null,
+      "AXUniqueId": "DYNAMIC_TYPE_SLIDER",
+      "AXValue": "50%",
+      "enabled": true,
+      "type": "Slider",
+      "frame": {
+        "height": 80,
+        "y": 742.6666660308838,
+        "width": 362,
+        "x": 20
+      }
+    }
+  ]
+}

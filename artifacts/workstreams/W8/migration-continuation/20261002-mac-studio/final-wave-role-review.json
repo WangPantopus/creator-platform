@@ -1,0 +1,14 @@
+{
+  "source": "1464ea24",
+  "labelledSynthetic": true,
+  "readOnlyBaseline": {
+    "checkedPrivatePurposes": 2,
+    "administratorSelectedCatalogueReview": true
+  },
+  "temporaryGrowthMembershipRefusedBeforeDDL": true,
+  "actualClosed": true,
+  "ledgerRows": 61,
+  "driftRolledBack": true,
+  "noActivation": true,
+  "noFakeJob": true
+}

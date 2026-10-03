@@ -50,6 +50,7 @@ dependencies {
     implementation("androidx.credentials:credentials-play-services-auth:1.6.0")
     implementation("com.android.billingclient:billing:9.1.0")
     implementation("com.google.firebase:firebase-messaging:25.1.0")
+    implementation("androidx.work:work-runtime-ktx:2.10.5")
     implementation("io.livekit:livekit-android:2.29.0")
     debugImplementation("androidx.compose.ui:ui-tooling")
     testImplementation("junit:junit:4.13.2")

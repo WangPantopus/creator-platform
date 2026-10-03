@@ -1,0 +1,10 @@
+$ tsc --noEmit && node scripts/build.mjs
+src/modules/growth/relay.ts(117,41): error TS2339: Property 'accountId' does not exist on type '{ schemaVersion: 2; type: "spending_reminder"; creatorId: null; accountId: string; recipients: { accountId: string; role: "fan"; }[]; id: string; aggregateId: string; aggregateVersion: number; causationId: string; correlationId: string; occurredAt: string; } | { ...; }'.
+  Property 'accountId' does not exist on type '{ schemaVersion: 1; type: "note" | "public_answer" | "reaction" | "approved_draft" | "guardrail" | "ai_reply" | "personal_reply" | "request_status" | "call_reminder" | "answered_publicly" | ... 7 more ... | "weekly_impact"; ... 7 more ...; occurredAt: string; }'.
+src/modules/growth/relay.ts(185,27): error TS2339: Property 'recipients' does not exist on type 'never'.
+[ELIFECYCLE] Command failed with exit code 2.
+Error: ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL
+
+  × "pnpm recursive run" failed in /Users/yingpengwang/estimate-rescue/
+  │ creator-platform/w7-completion-840545/apps/backend
+
