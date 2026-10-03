@@ -968,7 +968,8 @@
       "version": "0208_w1_publication_preparation",
       "path": "apps/backend/src/modules/identity/schema-publication-preparation.sql",
       "state": "reserved_unapplied",
-      "reason": "Actual W1 early private preparation before publication task/body/positive creator or key locks; original task/token/client/PID/fullXID and original publication-worker scope nonce, joint W4/W1 final SQL cleanup before only COMMIT. Exact owner source and signatures pending; no fabricated actor/session, old-scope bridge, provider grant or activation."
+      "reason": "Actual W1 original-token/private-client early preparation and joint finalizer source implemented, held and unapplied. Closed clone SQL applies/rolls back and five functions have no compiler diagnostics; finalizer reports missing actual213 owner comparator. Real213 source, combined owner/catalogue requalification, original input/financial/consent evidence and personal publication acceptance remain required. No activation, fabricated Actor/nonce/proof or old-scope bridge.",
+      "sourceSha256": "4afa4bc72f265bfb1415aa0f701435475f88ed46bbd6cd539bfd333695ba0fa6"
     },
     {
       "id": "0209",

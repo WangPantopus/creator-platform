@@ -20,12 +20,14 @@ export async function startPublicationWorker(
   authority: {
     assertRestoredInTransaction: (client: PoolClient) => Promise<void>;
     assertAllowed: PublicationRestriction;
+    assertPreparationAllowed: (client: PoolClient) => Promise<void>;
   },
 ) {
   if (
     !env.PUBLICATION_WORKER_DATABASE_URL ||
     typeof authority.assertRestoredInTransaction !== "function" ||
-    typeof authority.assertAllowed !== "function"
+    typeof authority.assertAllowed !== "function" ||
+    typeof authority.assertPreparationAllowed !== "function"
   )
     throw new DomainError(
       "publication_worker_unconfigured",
@@ -58,6 +60,10 @@ export async function startPublicationWorker(
   };
   const identity = new PublicationIdentityAuthority(pool, {
     assertDiscoveryAllowed: assertRestored,
+    assertPreparationAllowed: async (client) => {
+      await assertRestored(client);
+      await authority.assertPreparationAllowed(client);
+    },
     assertAllowed: async (client, task) => {
       await assertRestored(client);
       await authority.assertAllowed(client, task);
