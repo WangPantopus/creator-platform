@@ -86,6 +86,14 @@ const terminalContracts = [
       "8de1897f2e70f763382984459274eb7616ad7149b457811fffd90fb8b7df2e8c",
     signatures: ["creator.generation_terminal_output(uuid,uuid)"],
   },
+  {
+    owner: "creator_generation_terminal_discovery",
+    originalScopeBridge: false,
+    version: "0218_w1_generation_terminal_discovery",
+    checksum:
+      "83a56963f6c37e05b0850fa6a0e97475282fbfa3e90d1372f86bea701622e7bc",
+    signatures: ["creator.pending_generation_terminal_cursors(integer)"],
+  },
 ] as const;
 // Additive0215 revokes this legacy worker EXECUTE. It must not be relabelled
 // as a generation consumer or accepted alongside the typed replacement.
@@ -352,6 +360,8 @@ async function assertGenerationCatalogue(
          AND has_function_privilege($4,to_regprocedure($5),'EXECUTE')
          AND has_function_privilege($4,
           to_regprocedure('creator.generation_scope_matches(uuid,uuid)'),'EXECUTE')=$6::boolean
+         AND ($7::boolean IS NULL OR has_function_privilege($4,
+          to_regprocedure('creator.generation_terminal_matches(uuid,uuid,boolean)'),'EXECUTE')=$7::boolean)
          AS ready,pg_get_functiondef(p.oid) AS definition
          FROM pg_proc p JOIN pg_roles r ON r.oid=p.proowner JOIN pg_language l ON l.oid=p.prolang
          WHERE p.oid=to_regprocedure($1)`,
@@ -361,12 +371,17 @@ async function assertGenerationCatalogue(
           consumer.migration.checksum,
           consumer.owner,
           "purpose" in consumer
-            ? "creator.generation_terminal_matches(uuid,uuid,boolean)"
+            ? consumer.owner === "creator_generation_terminal_discovery"
+              ? "creator.pending_generation_terminals(integer)"
+              : "creator.generation_terminal_matches(uuid,uuid,boolean)"
             : "creator.generation_scope_matches(uuid,uuid)",
           !("purpose" in consumer) ||
             terminalContracts.find(
               (contract) => contract.owner === consumer.owner,
             )?.originalScopeBridge === true,
+          consumer.owner === "creator_generation_terminal_discovery"
+            ? false
+            : null,
         ],
       )
     ).rows[0];
@@ -445,7 +460,7 @@ export class GenerationIdentityAuthority {
         .parse(input.consumers ?? []);
       terminalConsumers = z
         .array(terminalConsumerSchema)
-        .max(9)
+        .max(10)
         .parse(input.terminalConsumers ?? []);
       const combined = [...consumers, ...terminalConsumers];
       if (
