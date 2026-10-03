@@ -34,3 +34,24 @@ source-only qualification until genuine owner gates/data exist. Genuine proof,
 human Touch ID ceremony, signing and all nine-package release acceptance remain
 open. No virtual authenticator or fabricated verification/signature was used.
 Release-ready: false.
+
+## Current production review, 2026-10-03
+
+At `68f2e6e4cbc16203f9c339c5e48d8b81528d79f0`, production Next build and
+web/backend types pass. Actual owned API41055 and built web30055 were restarted
+at this same source on canonical61. Personally operated ordinary saved Note
+review in390/1280 Light/Night: the preview remains explicitly unsigned, status
+wraps and no false signed marker appears. Actual signing-begin requests returned
+403, “A registered creator passkey is required.” No authenticator, human proof,
+biometric ceremony or signing callback was substituted. Escape in both themes
+restored textarea#note-text and retained text/audience/schedule. Actual review
+saves advanced the Note from19 to20/21.
+
+Private personally inspected images:
+`/private/tmp/creator-w5-shell-operator/shots/production-68f2e6e-review-{390,1280}-{light,night}-refusal.png`.
+The initial read-only DB invocation failed before connecting because the
+container's unset POSTGRES_USER selected absent root; it made no DB change.
+Later source-only integration is qualified separately and does not transfer
+these app observations. Planned controls/populated tier preservation, real
+creator proof, human Touch ID signing and positive private/group/paid/media/AI/
+live acceptance remain open. W5 remains not release-ready.
