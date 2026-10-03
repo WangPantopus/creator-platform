@@ -31,7 +31,7 @@ export function PhotoAttachment({
     [file, setFile] = useState<File | null>(null),
     [alt, setAlt] = useState(""),
     [asset, setAsset] = useState<CreatorMediaAsset | null>(null),
-    [busy, setBusy] = useState(false),
+    [activity, setActivity] = useState<"upload" | "discard" | null>(null),
     [progress, setProgress] = useState(0),
     [error, setError] = useState("");
   const ticket = useRef<CreatorMediaUploadTicket | undefined>(undefined),
@@ -39,6 +39,7 @@ export function PhotoAttachment({
     controller = useRef<AbortController | null>(null),
     fileInput = useRef<HTMLInputElement | null>(null),
     pending = useRef(false);
+  const busy = activity !== null;
   useEffect(() => {
     const abort = new AbortController();
     void mediaRequest<{ creatorMediaAvailable?: boolean }>("capabilities", {
@@ -97,7 +98,7 @@ export function PhotoAttachment({
   const upload = async () => {
     if (!file || pending.current) return;
     pending.current = true;
-    setBusy(true);
+    setActivity("upload");
     setError("");
     const abort = new AbortController();
     controller.current = abort;
@@ -137,13 +138,13 @@ export function PhotoAttachment({
         );
     } finally {
       pending.current = false;
-      setBusy(false);
+      setActivity(null);
     }
   };
   const discard = async () => {
     if (pending.current) return;
     pending.current = true;
-    setBusy(true);
+    setActivity("discard");
     setError("");
     try {
       const current = ticket.current?.asset;
@@ -172,7 +173,7 @@ export function PhotoAttachment({
       );
     } finally {
       pending.current = false;
-      setBusy(false);
+      setActivity(null);
     }
   };
   return (
@@ -213,7 +214,10 @@ export function PhotoAttachment({
         />
       </label>
       {file && <p>{file.name}</p>}
-      {busy && <p role="status">Uploaded {Math.round(progress * 100)}%</p>}
+      {activity === "upload" && (
+        <p role="status">Uploaded {Math.round(progress * 100)}%</p>
+      )}
+      {activity === "discard" && <p role="status">Removing saved photo…</p>}
       {asset && (
         <p role="status">
           {asset.state === "ready"
@@ -231,7 +235,7 @@ export function PhotoAttachment({
         >
           {uploadKey.current ? "Retry upload" : "Upload photo"}
         </button>
-        {busy && (
+        {activity === "upload" && (
           <button
             className="qv-btn qv-btn--quiet"
             onClick={() => {
