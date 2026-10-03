@@ -1,5 +1,15 @@
 # W2 original Studio session consumer — October3 UTC
 
+## October 3 16:40 — genuine-session draft namespaces and current native failure
+
+Pushed minimum owned consumer `013062d1b717f00d1a0024d5b6169a6e65aa8516` on draft #295. Every Source/interview/config read, write, save and discard now addresses `kind:actualAccountId:actualSessionId:creatorId`; original captured signal, genuine request account/session preconditions, revision checks and keyboard handling remain. Actor reset includes the genuine session. A true original end deletes only its exact namespace, without check-then-delete of shared account keys or replacement metadata. Optional continuing-session legacy adoption requires the captured original marker before the first fetch and the same genuine marker before/after the read; the consumer does not write that marker. Standalone explicitly labelled development mode without an identity retains legacy keys without inventing a session.
+
+Exact web TypeScript, file ESLint, Prettier and diff checks exit 0. W1 is composing the canonical genuine-reread/document-snapshot cleanup producer; its old literal ended message and broad marker-gated cleanup are not qualified for the new namespace. Current composed production build, personally operated delayed-old-end/newer-session journeys, exact-head CI and normal integration remain pending. Earlier actual c80 browser acceptance and the 1767 hosted successes retain their exact source limits.
+
+Frozen 1767 hosted validation has two web/backend and two Android-runtime SUCCESS jobs; six Mac jobs remained QUEUED. The completed web/backend job's full log is read: frozen dependencies, generation, seven TypeScript checks, lint/format, existing shared/backend tests, real T11 10,000 pairs/30,000 queries in 46.835 seconds, and production builds pass. Queued work is never credited, and these passes do not transfer to 013062d1.
+
+[Fresh signed iOS388/API1767 personal operation](../20261003-native-privacy-388/README.md) reads actual eight-domain saved-job states and preserves unsent keyboard input through appearance/larger text/immediate outage/recovery, but exposes a stalled-response concealment gap (still rendered at20.633 seconds, concealed by31.637). W1/W8 own the correction; Android awaits its observed theme-recreation draft-loss fix. Private770921B backup independently restores all six custody comparisons61/153/163/44; device/API/container/leases are stopped or released and copies closed. No whole-package/native/provider/all-eight/p95/release completion is inferred.
+
 ## October3 15:10 combined source and marker-aware original end
 
 All six active W2 branches normally contain fetched main5c08634b; held132/paired inputsac92c18f and held2797c007cd8 are pushed. Four actual documentation conflicts in held132 retained every dated observation from both sides, including the earlier database40 rows explicitly labelled historical; no held SQL or worker graph was activated.
