@@ -1,5 +1,41 @@
 import SwiftUI
 
+/// Keep the reference row at standard sizes; give accessible text real layout space.
+private struct NavigationLayout<Content: View>: View {
+    @Environment(\.dynamicTypeSize) private var textSize
+    private let content: (Bool) -> Content
+    init(@ViewBuilder content: @escaping (Bool) -> Content) { self.content = content }
+    var body: some View {
+        if textSize >= .accessibility4 {
+            VStack(spacing: QelvoraTokens.token("space-2")) { content(true) }
+        } else if textSize.isAccessibilitySize {
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: QelvoraTokens.token("space-2")) { content(false) }
+        } else {
+            HStack(spacing: 0) { content(false) }
+        }
+    }
+}
+
+private struct NavigationLabel<Icon: View>: View {
+    let title: String
+    let horizontal: Bool
+    @ViewBuilder let icon: () -> Icon
+    var body: some View {
+        Group {
+            if horizontal {
+                HStack(spacing: QelvoraTokens.token("space-3")) { icon(); text }
+            } else {
+                VStack(spacing: QelvoraTokens.token("space-1")) { icon(); text }
+            }
+        }.frame(maxWidth: .infinity, minHeight: QelvoraTokens.token("space-12"))
+            .contentShape(Rectangle())
+    }
+    private var text: some View {
+        Text(title).qText("tab-label").fixedSize(horizontal: false, vertical: true)
+            .multilineTextAlignment(.center)
+    }
+}
+
 public enum FanTab: String, CaseIterable, Sendable {
     case home = "Home", discover = "Discover", requests = "Requests", you = "You"
     var title: String { QelvoraCopy.text("nav" + rawValue) }
@@ -17,16 +53,15 @@ public struct TabBar: View {
     @Environment(\.colorScheme) private var scheme
     public init(active: FanTab = .home, onSelect: @escaping (FanTab) -> Void = { _ in }) { self.active = active; self.onSelect = onSelect }
     public var body: some View {
-        HStack(spacing: 0) {
+        NavigationLayout { horizontal in
             ForEach(FanTab.allCases, id: \.rawValue) { tab in
                 SwiftUI.Button { onSelect(tab) } label: {
-                    VStack(spacing: QelvoraTokens.token("space-1")) {
+                    NavigationLabel(title: tab.title, horizontal: horizontal) {
                         QelvoraGlyph(name: tab.glyph, color: qColor(active == tab ? "ink" : "ink-muted", scheme))
-                        Text(tab.title).qText("tab-label")
-                    }.frame(maxWidth: .infinity, minHeight: QelvoraTokens.token("space-12"))
+                    }
                         .foregroundStyle(qColor(active == tab ? "ink" : "ink-muted", scheme))
                         .contentShape(Rectangle())
-                }.buttonStyle(.plain).accessibilityAddTraits(active == tab ? .isSelected : [])
+                }.buttonStyle(.plain).accessibilityLabel(tab.title).accessibilityAddTraits(active == tab ? .isSelected : [])
             }
         }.padding(.horizontal, QelvoraTokens.token("space-2"))
             .padding(.top, QelvoraTokens.token("author-gap"))
@@ -52,11 +87,12 @@ public struct Segmented: View {
                         .background(active == item ? qColor("selected-surface", scheme) : .clear, in: RoundedRectangle(cornerRadius: QelvoraTokens.token("segment-radius")))
                         .overlay { if active == item { RoundedRectangle(cornerRadius: QelvoraTokens.token("segment-radius")).stroke(qColor("line", scheme), lineWidth: QelvoraTokens.token("hairline")) } }
                         .contentShape(Rectangle().inset(by: -QelvoraTokens.token("space-1") / 2))
-                }.buttonStyle(.plain).accessibilityAddTraits(active == item ? .isSelected : [])
+                }.buttonStyle(.plain).accessibilityLabel(item).accessibilityAddTraits(active == item ? .isSelected : [])
             }
         }.padding(QelvoraTokens.token("space-1"))
             .background(qColor("surface-sunken", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.token("radius-lg")))
             .accessibilityLabel(label)
+            .accessibilityElement(children: .contain)
     }
 }
 
@@ -79,17 +115,18 @@ public struct StudioTabBar: View {
     @Environment(\.colorScheme) private var scheme
     public init(active: StudioTab = .requests, requests: Int = 0, onSelect: @escaping (StudioTab) -> Void = { _ in }) { self.active = active; self.requests = requests; self.onSelect = onSelect }
     public var body: some View {
-        HStack(spacing: 0) {
+        NavigationLayout { horizontal in
             ForEach(StudioTab.allCases, id: \.rawValue) { tab in
                 SwiftUI.Button { onSelect(tab) } label: {
-                    VStack(spacing: QelvoraTokens.token("space-1")) {
+                    NavigationLabel(title: tab.title, horizontal: horizontal) {
                         QelvoraGlyph(name: tab.glyph, size: tab == .notes ? QelvoraTokens.textStyles["caption"]!.lineHeight : QelvoraTokens.token("glyph-size"), color: qColor(active == tab ? "ink" : "ink-muted", scheme))
                             .frame(height: QelvoraTokens.token("glyph-size"))
                             .overlay(alignment: .topLeading) { if tab == .requests && requests > 0 { NavigationCount(count: requests).overlay { Capsule().inset(by: -QelvoraTokens.token("hairline")).stroke(qColor("surface", scheme), lineWidth: QelvoraTokens.token("hairline") * 2) }.offset(x: QelvoraTokens.token("message-padding"), y: -QelvoraTokens.token("author-gap")) } }
-                        Text(tab.title).qText("tab-label")
-                    }.frame(maxWidth: .infinity, minHeight: QelvoraTokens.token("space-12"))
+                    }
                         .foregroundStyle(qColor(active == tab ? "ink" : "ink-muted", scheme)).contentShape(Rectangle())
-                }.buttonStyle(.plain).accessibilityAddTraits(active == tab ? .isSelected : [])
+                }.buttonStyle(.plain).accessibilityLabel(tab.title)
+                    .accessibilityValue(tab == .requests && requests > 0 ? QelvoraCopy.text("waiting", values: ["count": String(requests)]) : "")
+                    .accessibilityAddTraits(active == tab ? .isSelected : [])
             }
         }.padding(.horizontal, QelvoraTokens.token("space-2"))
             .padding(.top, QelvoraTokens.token("author-gap"))

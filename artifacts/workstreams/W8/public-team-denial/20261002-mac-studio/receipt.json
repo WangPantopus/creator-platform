@@ -1,0 +1,84 @@
+{
+  "recordedAt": "2026-10-02T10:07:24.771377+00:00",
+  "sourceParent": "940e2922",
+  "sources": {
+    "apps/backend/migrations/0084_w8_team_thread_denial.sql": {
+      "sha256": "7b7189c0a1d14d615abe7fc12c51de63781943e7447775bf439c842e44b07451"
+    },
+    "apps/backend/migrations/0086_w8_public_creator_denial.sql": {
+      "sha256": "876e5a0636e9010f3349b57ecc6ff71b42f316cc7210d8b80bac9be4955efe8c"
+    },
+    "W1/schema-public-ai-scope.sql": {
+      "commit": "dce780db",
+      "sha256": "0325048ec855877e59430423850ec72360610a96328aaaef903139f512aa0606"
+    }
+  },
+  "purposeReview40": {
+    "label": "actual saved browser session and held non-owner denial; synthetic only",
+    "actualCanonicalSession": true,
+    "anonymousCreator": true,
+    "missingCreator": {
+      "code": "public_creator_denial_unavailable",
+      "status": 503
+    },
+    "unboundAnonymous": {
+      "code": "public_creator_context_unavailable",
+      "status": 503
+    },
+    "actualVisitorBlocked": false,
+    "actualVisitorUnblocked": true,
+    "noTeamAuthority": {
+      "code": "scope_denial_unavailable",
+      "status": 503
+    },
+    "anonymousConcurrentWriter": {
+      "code": "public_creator_denial_unavailable",
+      "status": 503
+    },
+    "elapsedMs": 1.7985840000000053,
+    "actualTeamPositiveAcceptance": false,
+    "publicAIPermissionAcceptance": false,
+    "providerGenerationAcceptance": false
+  },
+  "closedReview57": {
+    "label": "actual closed synthetic canonical57 + exact proposal DDL; no activated futureledger",
+    "producer": "dce780db",
+    "unregisteredFactory": {
+      "code": "public_ai_unconfigured",
+      "status": 503
+    },
+    "anonymousNegative": "allowed",
+    "existingSeedProfileMetadata": {
+      "currentVersion": null,
+      "license": null,
+      "aiPermission": false
+    },
+    "omittedCleanupCommit": "23514",
+    "sameActualScopeMatches": true,
+    "privileges": {
+      "exactauthoritynegative": true,
+      "publicationnegative": false,
+      "privatemetadata": false,
+      "rawtrust": false,
+      "fullconfiguration": false,
+      "fanmessage": false
+    },
+    "genuineVerifiedCreatorAcceptance": false,
+    "publicAIPermission": false
+  },
+  "ddl": {
+    "database": "creator_w8_packet_review_v3_20261002",
+    "canonicalLedger": 57,
+    "proposals": ["0082", "0084", "0085@dce780db", "0086"],
+    "oneTransaction": true,
+    "canonicalActivation": false,
+    "trafficMarker": "closed",
+    "finalConnectionLimit": 0
+  },
+  "limitations": [
+    "Actual Team positive/Approval race pending; no Team membership or signing proof fabricated.",
+    "Public metadata facts use the existing labelled synthetic seed profile with no License/live version; no public AI permission.",
+    "Factory correctly remains503 without canonical0085 ledger.",
+    "Scope cleanup/purpose grants are SQL custody checks, not app/publication/provider acceptance."
+  ]
+}

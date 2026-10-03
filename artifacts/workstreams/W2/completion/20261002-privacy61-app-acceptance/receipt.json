@@ -1,0 +1,132 @@
+{
+  "time": "2026-10-02T19:53:29.251621+00:00",
+  "host": "Yingpengs-Mac-Studio.local / M2 Max / macOS27",
+  "source": "438f7cd4cf4570936986705bd2c98631ba252563",
+  "base": "48abe9877316f5d39e1b3b79c6e4cae6f9e03483",
+  "agentAdapterSha256": "b742f55a172b2f56b8ee308c23c3bc9626565d9778fcb84d343cf2da4629d1e2",
+  "database": {
+    "ledger": 61,
+    "originalLive": "creator_w2 owner-closed connectionLimit0 / original data preserved",
+    "fresh": "creator_w2_privacy61_fresh_20261002 owner-closed connectionLimit0",
+    "appTarget": "creator_w2_trust_restore_20261002t192445z / independently validated restored synthetic copy",
+    "boundedOpening": "Only appTarget connectionLimit20 with closed marker removed for loopback acceptance; not a release/original-iMac/all-eight reopening qualification"
+  },
+  "actors": {
+    "creator": "10000000-0000-4000-8000-000000000001",
+    "fan": "10000000-0000-4000-8000-000000000002",
+    "fictionalCreator": "97152450-4093-4b15-9148-b12c16053956",
+    "verificationLimit": "Earlier admin synthetic prerequisite, not production identity verification"
+  },
+  "device": "visible Chrome via supported CUA",
+  "provider": {
+    "configured": false,
+    "designatedKey": "absent at previous exact-path check; no alternate credential search",
+    "calls": 0,
+    "evaluationsOrPublication": "not performed"
+  },
+  "actions": [
+    "Normal canonical session refresh and actor-one sign-in on restored copy",
+    "Real retained export retried through LOCAL DEVELOPMENT UI; Identity and Media joined completed Trust; Agent unexpected retry domain_hook_error retained",
+    "Stopped own API before attempts exhausted; diagnosed missing store guard code mismatch",
+    "Changed known missing-store guard to recognized privacy_artifact_unconfigured; restarted exact-source API",
+    "Worker processed next genuine retry: Agent blocked attempt7; manually retried pending domains via actual UI and checked progress: Agent blocked attempt8, not dead_letter",
+    "Personally read same eight domain outcomes in Light/Night at1280x900 and390x1300; no horizontal overflow or Download control",
+    "Canonical switch to actor two clears creator job and proof; no data requests yet"
+  ],
+  "persistedTasks": [
+    {
+      "state": "blocked",
+      "domain": "agent",
+      "attempts": 8,
+      "errorCode": "privacy_artifact_unconfigured",
+      "dataPresent": false,
+      "receiptPresent": false
+    },
+    {
+      "state": "blocked",
+      "domain": "commerce",
+      "attempts": 3,
+      "errorCode": "domain_hook_unavailable",
+      "dataPresent": false,
+      "receiptPresent": false
+    },
+    {
+      "state": "blocked",
+      "domain": "content",
+      "attempts": 3,
+      "errorCode": "domain_hook_unavailable",
+      "dataPresent": false,
+      "receiptPresent": false
+    },
+    {
+      "state": "blocked",
+      "domain": "conversation",
+      "attempts": 3,
+      "errorCode": "conversation_lineage_unavailable",
+      "dataPresent": false,
+      "receiptPresent": false
+    },
+    {
+      "state": "blocked",
+      "domain": "growth",
+      "attempts": 3,
+      "errorCode": "domain_hook_unavailable",
+      "dataPresent": false,
+      "receiptPresent": false
+    },
+    {
+      "state": "complete",
+      "domain": "identity",
+      "attempts": 2,
+      "errorCode": null,
+      "dataPresent": true,
+      "receiptPresent": true
+    },
+    {
+      "state": "complete",
+      "domain": "media",
+      "attempts": 2,
+      "errorCode": null,
+      "dataPresent": true,
+      "receiptPresent": true
+    },
+    {
+      "state": "complete",
+      "domain": "trust",
+      "attempts": 1,
+      "errorCode": null,
+      "dataPresent": true,
+      "receiptPresent": true
+    }
+  ],
+  "checks": {
+    "backendTypecheck": "PASS",
+    "scopedESLint": "PASS",
+    "Prettier": "PASS",
+    "existingContracts": {
+      "count": 9,
+      "durationMs": 48,
+      "result": "PASS"
+    },
+    "apiHealthHTTP": 200,
+    "generation": "unconfigured",
+    "allEightDownload": false
+  },
+  "failuresPreserved": [
+    "Pre-fix Agent retried domain_hook_error six times; no complete receipt/data fabricated",
+    "First post-reload DOM was pre-hydration generic form; guessed exact Synthetic local account wait timed out; actual DOM uses Synthetic local accounts \u00b7 no provider or production identity, then observed actual session200 and corrected state",
+    "Earlier session_expired401 required normal canonical sign-in, not cookie injection"
+  ],
+  "limits": [
+    "Scope/list actor separation only, not a foreign job-detail attack",
+    "Three completed tasks include actual bounded synthetic data; not full nonempty all-eight export, coherent196, purge or family job acceptance",
+    "No provider, cited fan delivery, exact native61 acceptance, full accessibility/artboards, named p95 or release-ready claim"
+  ],
+  "screenshots": [
+    "creator-blocked-light-1280.png",
+    "creator-blocked-light-390.png",
+    "creator-blocked-night-1280.png",
+    "creator-blocked-night-390.png",
+    "separate-fan-no-creator-job-light-1280.png"
+  ]
+}

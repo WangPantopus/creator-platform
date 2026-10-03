@@ -1,0 +1,76 @@
+{
+  "isolatedOnly": true,
+  "applied": [
+    {
+      "id": "0074",
+      "sha256": "61866894c579039cfc2bf11522edeaf46fa03bd51761cca3791ab3471fb9b2f3",
+      "registered": false
+    },
+    {
+      "id": "0077",
+      "sha256": "16dddc80bebe32979f822104d8f411e0f545b4e212da6dc147c72f959e660f17",
+      "registered": false
+    },
+    {
+      "id": "0082",
+      "sha256": "3742b1e6b7f367ca626176615c5362ecf002fe5fcc5a96ea941d35a4708e8686",
+      "registered": false
+    },
+    {
+      "id": "0099",
+      "sha256": "fadbf62a3ddf06142c3a6ad30313503f9bebe7b6d64f67f8ba01ff13ce2398c7",
+      "registered": false
+    },
+    {
+      "id": "0100",
+      "sha256": "393920665d8860ee53ee6ef740ba0ad4a6921aceddcbf33f6419727e846532af",
+      "registered": false
+    },
+    {
+      "id": "0105",
+      "sha256": "7ab8974d065b1b9e5befa2ded26c6978876957fab0eee80b9632825bbac98477",
+      "registered": false
+    },
+    {
+      "id": "0106",
+      "sha256": "a6e386de7506035d6bc0d10da644cb8ee2620824217b9c2c61a9a34cb7fa4fc9",
+      "registered": false
+    }
+  ],
+  "compiler": [
+    {
+      "signature": "creator.generation_settle_original_allowance(uuid,uuid)",
+      "diagnostics": []
+    },
+    {
+      "signature": "creator.generation_original_allowance_receipt(uuid,uuid)",
+      "diagnostics": []
+    },
+    {
+      "signature": "creator.commerce_original_cost_rule()",
+      "diagnostics": []
+    }
+  ],
+  "definitions": {
+    "creator.generation_settle_original_allowance(uuid,uuid)": "cddbdb434ecb023ff04dbee5bac381b12abec54b89dd426b067336625aa3a410",
+    "creator.generation_original_allowance_receipt(uuid,uuid)": "51ae2cde6450bc5b624e329e5e77ac8efef7ef744beac0fe44dadedfed9c940d"
+  },
+  "refusals": [
+    {
+      "signature": "creator.generation_settle_original_allowance(uuid,uuid)",
+      "code": "42501"
+    },
+    {
+      "signature": "creator.generation_original_allowance_receipt(uuid,uuid)",
+      "code": "42501"
+    }
+  ],
+  "after": {
+    "ledger": 57,
+    "generations": 0,
+    "messages": 0,
+    "reservations": 0,
+    "journalreceipts": 0
+  },
+  "positiveLifecycleVerified": false
+}

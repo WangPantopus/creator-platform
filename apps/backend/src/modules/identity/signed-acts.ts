@@ -8,7 +8,11 @@ import { HumanReplySchema, type SignedActCommand } from "@qelvora/api";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import type { Actor } from "./adapter.js";
-import type { AccessService, ThreadScope } from "../access/scope.js";
+import {
+  assertThreadScope,
+  type AccessService,
+  type ThreadScope,
+} from "../access/scope.js";
 import { identityTransaction } from "./transaction.js";
 import {
   prepareSignedSubject,
@@ -52,14 +56,24 @@ export class SignedActService {
     requested: SignedActCommand,
   ) {
     return this.accountTransaction(actor.accountId, async (client) => {
-      const canonical = await prepareSignedSubject(
+      const prepared = await prepareSignedSubject(
         client,
         actor,
         creatorId,
         requested,
         this.subjectPolicies,
       );
-      return this.beginOnClient(client, actor, creatorId, canonical);
+      const result = await this.beginOnClient(
+        client,
+        actor,
+        creatorId,
+        prepared.command,
+      );
+      await prepared.finalizeBeforeCommit({
+        phase: "challenge",
+        challengeId: result.challengeId,
+      });
+      return result;
     });
   }
   /** The selected fan is a lookup input. Only the canonical issuer supplies
@@ -93,6 +107,9 @@ export class SignedActService {
         requested.content,
       );
       let canonical: SignedActCommand;
+      let prepared:
+        | Awaited<ReturnType<typeof prepareSignedSubject>>
+        | undefined;
       if (text.success) {
         const active = await client.query(
           "SELECT 1 FROM creator.thread WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND deleted_at IS NULL AND control='human_active'",
@@ -109,7 +126,7 @@ export class SignedActService {
           content: text.data,
         };
       } else {
-        canonical = await prepareSignedSubject(
+        prepared = await prepareSignedSubject(
           client,
           actor,
           creatorId,
@@ -117,13 +134,24 @@ export class SignedActService {
           this.subjectPolicies,
           scope,
         );
+        canonical = prepared.command;
       }
       invariant(
         contentHash(canonical) === contentHash(requested),
         "signed_content_changed",
         "Review the current exact reply before signing.",
       );
-      return this.beginOnClient(client, actor, creatorId, canonical);
+      const result = await this.beginOnClient(
+        client,
+        actor,
+        creatorId,
+        canonical,
+      );
+      await prepared?.finalizeBeforeCommit({
+        phase: "challenge",
+        challengeId: result.challengeId,
+      });
+      return result;
     });
   }
   private async accountTransaction<T>(
@@ -203,6 +231,16 @@ export class SignedActService {
       "Adult eligibility is required.",
     );
     return this.accountTransaction(actor.accountId, async (client) => {
+      // Recovery locks the owned profile before credentials/challenges. Keep
+      // that order and hold current creator authority through verification.
+      const owner = await client.query<{
+        id: string;
+        verification: string;
+        recovery_required: boolean;
+      }>(
+        "SELECT id,verification,recovery_required FROM creator.creator_profile WHERE account_id=$1 FOR SHARE",
+        [actor.accountId],
+      );
       const found = await client.query<{
         id: string;
         account_id: string;
@@ -221,12 +259,11 @@ export class SignedActService {
         "assertion_expired",
         "This signing request is unavailable.",
       );
-      const owner = await client.query(
-        "SELECT id FROM creator.creator_profile WHERE id=$1 AND account_id=$2 AND verification=$3 AND NOT recovery_required",
-        [challenge.creator_id, actor.accountId, "verified"],
-      );
+      const profile = owner.rows[0];
       invariant(
-        owner.rowCount === 1,
+        profile?.id === challenge.creator_id &&
+          profile.verification === "verified" &&
+          !profile.recovery_required,
         "creator_required",
         "Creator authority changed before signing.",
       );
@@ -306,6 +343,19 @@ export class SignedActService {
         "This signed act is unavailable.",
         404,
       );
+    const publicCommand = row.withdrawn ? null : row.public_command;
+    if (
+      publicCommand !== null &&
+      (typeof publicCommand !== "object" ||
+        Array.isArray(publicCommand) ||
+        publicCommand.actType !== row.act_type ||
+        contentHash(publicCommand) !== row.content_hash)
+    )
+      throw new DomainError(
+        "signature_content_unavailable",
+        "The exact signed content could not be verified. Try again later.",
+        503,
+      );
     return {
       signedActId: row.id,
       creatorName: row.creator_name,
@@ -319,11 +369,52 @@ export class SignedActService {
           : row.creator_revoked
             ? "creator_revoked"
             : "valid",
-      content: row.withdrawn ? null : row.public_command,
-      contentAvailable: !row.withdrawn && row.public_command !== null,
+      content: publicCommand,
+      contentAvailable: publicCommand !== null,
       explanation:
         "A signature proves an authorized key approved this exact act. It does not prove that every factual statement is true.",
     };
+  }
+  /** Current metadata on the caller's held, genuinely issued thread read.
+   * The domain supplies its complete canonical command; no private command or
+   * signer account is copied into the public verification response. */
+  async matchesThreadAct(
+    client: PoolClient,
+    scope: ThreadScope,
+    signedActId: string,
+    command: SignedActCommand,
+  ): Promise<boolean> {
+    assertThreadScope(scope);
+    if (command.subjectId !== scope.threadId) {
+      const body = command.content;
+      if (
+        command.actType !== "correction" ||
+        !body ||
+        typeof body !== "object" ||
+        Array.isArray(body) ||
+        body.kind !== "conversation_correction" ||
+        body.threadId !== scope.threadId ||
+        body.creatorId !== scope.creatorId ||
+        body.fanId !== scope.fanId
+      )
+        return false;
+    }
+    const result = await client.query<{ valid: boolean }>(
+      `SELECT EXISTS(SELECT 1 FROM creator.signed_verification v
+       JOIN creator.creator_profile cp ON cp.id=v.creator_id AND cp.account_id=v.account_id
+       WHERE v.id=$1 AND v.creator_id=$2 AND v.account_id=$3
+       AND v.act_type=$4 AND v.content_hash=$5
+       AND NOT v.withdrawn AND NOT v.key_revoked AND NOT v.creator_revoked
+       AND cp.verification='verified' AND NOT cp.recovery_required) AS valid`,
+      [
+        signedActId,
+        scope.creatorId,
+        scope.creatorAccountId,
+        command.actType,
+        contentHash(command),
+      ],
+    );
+    return result.rows[0]?.valid === true;
   }
 }
 

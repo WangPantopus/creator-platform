@@ -5,6 +5,7 @@ import { invariant } from "../../core/errors.js";
 import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import type { AudienceSnapshot } from "../agent/pipeline.js";
 import type { Database } from "../../db/database.js";
+import { lockMembershipAudience } from "./audience-memberships.js";
 
 export type VerifiedGroupAudience = {
   groupIds: readonly string[];
@@ -54,30 +55,11 @@ export async function commerceAudience(
 ): Promise<AudienceSnapshot> {
   assertThreadScope(scope);
   const observedAt = Date.now();
-  const memberships = (
-    await client.query<{
-      tier_id: string;
-      id: string;
-      version: number;
-      period_end: Date;
-      audience_end: Date;
-      grant_id: string;
-    }>(
-      `SELECT m.tier_id,m.id,m.version,m.period_end,m.grant_id,
-     least(CASE WHEN m.state='grace' THEN coalesce(m.grace_end,m.period_end) ELSE m.period_end END,g.valid_until) AS audience_end
-     FROM creator.commerce_membership m
-     JOIN creator.access_grant g ON g.id=m.grant_id AND g.creator_id=m.creator_id AND g.fan_id=m.fan_id
-     WHERE m.creator_id=$1 AND m.fan_id=$2 AND m.state IN('active','grace','cancelled') AND m.period_start<=now()
-     AND CASE WHEN m.state='grace' THEN coalesce(m.grace_end,m.period_end) ELSE m.period_end END>now()
-     AND g.state='active' AND g.valid_from<=now() AND g.valid_until>now() AND 'ai_message'=ANY(g.capabilities)
-     ORDER BY m.tier_id,m.id LIMIT 1001 FOR SHARE OF m,g`,
-      [scope.creatorId, scope.fanId],
-    )
-  ).rows;
-  invariant(
-    memberships.length <= 1000,
-    "audience_reconciliation_required",
-    "Current membership audience needs reconciliation before licensed context can be read.",
+  const memberships = await lockMembershipAudience(
+    client,
+    scope.creatorId,
+    scope.fanId,
+    true,
   );
   const groupIds = groups
     ? z.array(z.uuid()).max(1000).parse(groups.groupIds)

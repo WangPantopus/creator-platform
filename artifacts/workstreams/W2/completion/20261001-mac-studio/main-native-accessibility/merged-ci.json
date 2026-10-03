@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "host": "Yingpengs-Mac-Studio.local",
+  "pr": 123,
+  "prHead": "53bfe62b1d9ec7733467c6ed2c8d024c0b937647",
+  "mergedSHA": "b81aa45ba5f12a784b0038a60780263bd6822342",
+  "mergedAt": "2026-10-02T11:37:47Z",
+  "localReconciledSHA": "3ac28e8addd4ef57ef7ff395f6aaeec0ef13cd02",
+  "mainTree": "0698dc5e0f1eea3c2805017659382397c9ad12ed",
+  "localReconciledTreeEqualsMain": true,
+  "checks": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T11:25:57Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37000747348/job/110817640416",
+      "name": "web-and-backend",
+      "startedAt": "2026-10-02T11:23:38Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T11:25:41Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37000742729/job/110817626473",
+      "name": "web-and-backend",
+      "startedAt": "2026-10-02T11:23:35Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37000747348/job/110817640547",
+      "name": "web-visual",
+      "startedAt": "2026-10-02T11:23:36Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37000742729/job/110817626647",
+      "name": "web-visual",
+      "startedAt": "2026-10-02T11:23:33Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37000747348/job/110817640152",
+      "name": "ios-foundation",
+      "startedAt": "2026-10-02T11:23:36Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37000742729/job/110817626213",
+      "name": "ios-foundation",
+      "startedAt": "2026-10-02T11:23:33Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37000747348/job/110817640426",
+      "name": "android-foundation",
+      "startedAt": "2026-10-02T11:23:36Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37000742729/job/110817626532",
+      "name": "android-foundation",
+      "startedAt": "2026-10-02T11:23:33Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T11:29:30Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37000747348/job/110817640427",
+      "name": "android-runtime",
+      "startedAt": "2026-10-02T11:23:38Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-02T11:27:59Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37000742729/job/110817626494",
+      "name": "android-runtime",
+      "startedAt": "2026-10-02T11:23:35Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    }
+  ],
+  "verification": {
+    "exactHeadFastJobs": "4 passed",
+    "macOSJobs": "6 queued, unpassed",
+    "mainBackendTypecheck": "passed",
+    "mainWebTypecheck": "passed",
+    "mainAPIReadyStatus": 503,
+    "mainAPIReadyCode": "trust_unconfigured",
+    "mainAPIRuntimeSHA": "b81aa45ba5f12a784b0038a60780263bd6822342"
+  },
+  "limits": [
+    "Native personally operated APK476a2c7f was built from1503b584 before merge; exact two recovery files are preserved in main. Main native binary installation not yet repeated.",
+    "iOS personal recovery and screen readers remain unverified.",
+    "Readiness fallback is truthful unconfigured Trust, not live DB monitoring or release readiness."
+  ]
+}

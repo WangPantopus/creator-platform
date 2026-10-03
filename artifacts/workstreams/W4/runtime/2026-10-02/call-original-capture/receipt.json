@@ -1,0 +1,9 @@
+{
+  "isolatedOnly": true,
+  "canonicalMigrations": 57,
+  "currentCaptureQueryPlan": true,
+  "nonOwnerRuntimeRole": true,
+  "nullSelectors": true,
+  "businessRowsCreated": 0,
+  "positiveCapturedCallVerified": false
+}

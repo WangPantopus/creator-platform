@@ -1,0 +1,120 @@
+{
+  "source": "65e54e9ba3cb7cb3de2d9d21675736eb5b6ecdf8",
+  "at": "2026-10-02T12:07:34.341556+00:00",
+  "records": [
+    {
+      "at": "2026-10-02T12:07:31.185682+00:00",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "theme": "light",
+      "observation": {
+        "value": {
+          "hidden": false,
+          "theme": "light",
+          "width": 390,
+          "overflow": false,
+          "visible": "Qelvora Studio\nMaya\nRefresh role\nNotes\nNew Note\nAction status\nCurrent scope authority is not configured.\n\nChecking current Note and private reply access.\n\nCheck current access",
+          "replyCardsVisible": 0,
+          "tenureBadgeVisible": 0
+        }
+      },
+      "capture": "390-light.png"
+    },
+    {
+      "at": "2026-10-02T12:07:32.205709+00:00",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "theme": "night",
+      "observation": {
+        "value": {
+          "hidden": false,
+          "theme": "night",
+          "width": 390,
+          "overflow": false,
+          "visible": "Qelvora Studio\nMaya\nRefresh role\nNotes\nNew Note\nAction status\nCurrent scope authority is not configured.\n\nChecking current Note and private reply access.\n\nCheck current access",
+          "replyCardsVisible": 0,
+          "tenureBadgeVisible": 0
+        }
+      },
+      "capture": "390-night.png"
+    },
+    {
+      "at": "2026-10-02T12:07:33.250484+00:00",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "theme": "light",
+      "observation": {
+        "value": {
+          "hidden": false,
+          "theme": "light",
+          "width": 1280,
+          "overflow": false,
+          "visible": "Qelvora Studio\nMaya\nRefresh role\nNotes\nNew Note\nAction status\nCurrent scope authority is not configured.\n\nChecking current Note and private reply access.\n\nCheck current access",
+          "replyCardsVisible": 0,
+          "tenureBadgeVisible": 0
+        }
+      },
+      "capture": "1280-light.png"
+    },
+    {
+      "at": "2026-10-02T12:07:34.279778+00:00",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "theme": "night",
+      "observation": {
+        "value": {
+          "hidden": false,
+          "theme": "night",
+          "width": 1280,
+          "overflow": false,
+          "visible": "Qelvora Studio\nMaya\nRefresh role\nNotes\nNew Note\nAction status\nCurrent scope authority is not configured.\n\nChecking current Note and private reply access.\n\nCheck current access",
+          "replyCardsVisible": 0,
+          "tenureBadgeVisible": 0
+        }
+      },
+      "capture": "1280-night.png"
+    }
+  ],
+  "actualApi": {
+    "value": {
+      "sessionStatus": 200,
+      "accountId": "10000000-0000-4000-8000-000000000001",
+      "feedStatus": 503,
+      "feed": {
+        "error": {
+          "code": "scope_denial_unconfigured",
+          "message": "Current scope authority is not configured.",
+          "requestId": "75fb64d6-a2b9-4b9a-9feb-f8bff7ae7852",
+          "correlationId": "002dc19a-4018-4f98-b335-74c848ecd525"
+        }
+      },
+      "wrongAccountStatus": 403,
+      "wrongAccount": {
+        "error": {
+          "code": "content_account_changed",
+          "message": "The signed-in account changed. Refresh before continuing; this request was not applied.",
+          "requestId": "ef3e2f98-12e7-4f77-95d0-2b60438a97dd",
+          "correlationId": "7acb6eed-34ad-432d-9d21-5f9b3f3854e6"
+        }
+      }
+    }
+  },
+  "database": "fresh canonical57; future0089 unregistered and inactive",
+  "creatorVerification": "DEVELOPMENT-ONLY SEEDED VERIFIED2026-10-01T20:44:26Z; no proof/passkey",
+  "nativeBuild": {
+    "ios": "shipping build passed strict deep code-sign verify",
+    "android": "assembleDebug passed JDK21 --no-daemon --max-workers2",
+    "apkSha256": "0fc05ef4ead381013ea9b03bb8b496f08a9ab882a9d146a86ecab744193edd70",
+    "iosDylibSha256": "fde6ff3f70316f4e6b604f471de956f86c5ff5b32d8a3565569e08b36b3e257e",
+    "personalNativeUiOperationAtThisSource": "unverified"
+  },
+  "positiveTenureAndTwoFanReplies": "unverified; no confirmed paid history or genuinely published Note"
+}

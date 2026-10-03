@@ -1,0 +1,16 @@
+# W8 deletion retention proposal
+
+This is the concrete Q16 decision requested after the human asked what retention approval means. The table is a product proposal, not an approved production policy or a claim about a legal obligation. Development feedback and the optional profile-introduction prompt have their own limited policy. Provider and external subscription actions require their actual owners and receipts.
+
+| Data | Proposed treatment after account deletion | Deadline and remaining dependency |
+| --- | --- | --- |
+| Ordinary profile text, Notes/Posts, unpublished drafts, conversation/memory and non-packet media | Deny immediately; erase product-owned copies and actual protected binaries after the existing 30-day deletion delay. Do not erase another person's retained original by deleting the requesting account. | Purge by day 30, with real domain/binary receipts. W3/W4 must first detach lawful shared retained records from original family foreign keys. |
+| Consent, signature and named-act metadata attached to a retained signed packet or commitment | Retain only the minimal proof required to verify that original retained object. Preserve original expiry and withdrawal history; deny new uses immediately. | Existing original 12-month packet/commitment rule; purge proof when its last original retained dependency expires. No new 12-month clock on export, retry or restoration. |
+| Consent/signature metadata with no retained object | Revoke immediately; erase when product content is purged. | Day 30; exact dependency enumeration and expiry authority must be implemented. |
+| Detached known AI accounting costs | Keep the true amount, unit, original settlement reference and minimal reconciliation metadata; detach account identity and private text. Never change a known amount during erasure. | Proposed 12 months from original settlement, then actual financial-owner expiry. The human must approve this new deadline. |
+| Unresolved AI costs and live reservations | Preserve the original unknown state and reservation ceiling. Reconcile using actual provider evidence; never write zero or fabricate settlement to make deletion complete. | Escalate after 30 days. The human must name the responsible financial operator and decide the maximum unresolved period. This row cannot have a truthful automatic purge deadline until that decision is supplied. |
+| Provider-held data or external subscriptions | Send only actual authorized deletion/cancellation instructions through the reviewed owner adapter. | Each real provider receipt and approved provider retention rule; no local success substitute. |
+
+Deletion progress must disclose the actual retained class and original expiry without exposing private bodies or signing secrets. Restoration must replay the genuine deletion/expiry journal before reopening traffic. An absent journal cannot be reconstructed from new synthetic records.
+
+The approval needed is specific: accept or change the day-30 ordinary-data purge and the 12-month known-cost rule, and choose who resolves unknown costs and their maximum unresolved period. Until then, affected erasure and financial expiry remain unavailable; export and independent implementation continue.
