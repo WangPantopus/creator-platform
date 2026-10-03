@@ -1096,7 +1096,17 @@
       "version": "0223_w2_generation_profile_bound",
       "path": "apps/backend/src/modules/agent/migrations/pending_w2_generation_profile_bound.sql",
       "state": "reserved_unapplied",
-      "reason": "Distinct additive restrictive creator_profile SELECT boundaries requested by W2 for both existing creator_w2_generation_metadata and creator_w2_generation_retrieval. Preserve original0211/0187 source bytes, fixed metadata/retrieval functions, genuine W1 nonce/client/PID/fullXID/login/read task/family/profile ownership and all original current input/restoration/negative/final bookends. PUBLIC permissive profile policies must not OR-bypass either original purpose role. No role, membership, grants, business/scope row, Actor GUC or permission is added. Exact owner SQL/policy expressions/current registered runtime guard and independently reviewed complete effective catalogue/compiler/refusal/drift/fresh-preserved wave/cancellation/C10/genuine original task qualification remain pending. Allocation only; no source pin, accepted catalogue, activation, private body/raw-worker/provider permission or positive receipt."
+      "reason": "Distinct additive restrictive creator_profile SELECT boundaries for existing creator_w2_generation_metadata and creator_w2_generation_retrieval. W8 independently read the complete published e10cec83 SQL and original-client runtime guard and verified exact hashes. Original0211/0187 bytes, fixed functions, genuine W1 nonce/client/PID/fullXID/login/read task/family/profile ownership and current input/restoration/negative/final fences remain mandatory. PUBLIC permissive policies cannot OR-bypass either purpose boundary. No role, membership, grant, business/scope row or Actor GUC is added. Complete typed callers, independently reviewed effective catalogue, closed compiler/refusal/drift, fresh-preserved wave, cancellation/C10 and genuine original task/application qualification remain pending. Published source custody only; no accepted catalogue, activation, private body/raw-worker/provider permission or positive receipt.",
+      "sourceSha256": "5b2571d4cc115fa8250351d2904126dcd8a09ff229807f6780ad819de4d21de0"
+    },
+    {
+      "id": "0224",
+      "owner": "W5",
+      "version": "0224_w5_generation_origin_profile_fence",
+      "path": "apps/backend/src/modules/content/schema-generation-origin-profile-fence.sql",
+      "sourceSha256": "09d3df2f3549d0267dce2fe049789e575b1c8f212ee887d2d5396f110bafc047",
+      "state": "reserved_unapplied",
+      "reason": "Separate additive restrictive creator_profile SELECT boundary for existing creator_w5_generation_origin. W8 independently read/hash-checked all63 published SQL lines and current cf567643 origin/profile/effective-catalogue guards. Preserve original0102/0186 source/function, original private W1 read nonce/client/PID/fullXID/login/task generation/token/creator/account/five-second family, absence of Actor/Content GUCs and original signature-family lock order. This policy does not re-enter generation_scope_matches after the signature lease; original function and final identity bookends remain mandatory. No new role, membership, grant, scope, business row or function. Actual source registration, independently qualified policy-expression and complete effective catalogue pins, original typed callers, closed compiler/refusal/drift, fresh-preserved wave, cancellation/C10 and genuine original task/application qualification remain pending. Source custody only; no accepted catalogue, activation, public content/approval/source licence/provider authority or positive receipt."
     }
   ]
 }
