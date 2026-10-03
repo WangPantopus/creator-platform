@@ -20,8 +20,10 @@ export async function identityTransaction<T>(
     await held.run(() =>
       client.query("SELECT set_config('app.account_id',$1,true)", [accountId]),
     );
-    await held.run(() => assertCurrentSession(client, accountId));
-    const value = await held.run(() => work(client));
+    // Await the complete owner callback. The original host deadline may close
+    // its socket, but cannot release it while a late continuation still runs.
+    await assertCurrentSession(client, accountId);
+    const value = await work(client);
     await held.commit();
     return value;
   } catch (error) {
