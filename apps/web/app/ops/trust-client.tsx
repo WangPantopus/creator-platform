@@ -12,10 +12,19 @@ export class TrustError extends Error {
     super(message);
   }
 }
-let verifiedAccount: string | null = null;
+type TrustView = Readonly<{
+  accountId: string;
+  sessionId: string | null;
+  isolatedDevelopment: boolean;
+  signal: AbortSignal;
+}>;
+let verifiedView: TrustView | null = null;
+let viewController: AbortController | null = null;
 let sessionRevision = 0;
 function invalidateSession() {
-  verifiedAccount = null;
+  viewController?.abort();
+  viewController = null;
+  verifiedView = null;
   sessionRevision++;
   window.dispatchEvent(new Event("trust-session"));
 }
@@ -24,34 +33,53 @@ export async function trustApi<T>(
   body?: unknown,
   signal?: AbortSignal,
 ): Promise<T> {
+  return requestForView<T>(path, body, signal, verifiedView);
+}
+async function requestForView<T>(
+  path: string,
+  body: unknown,
+  signal: AbortSignal | undefined,
+  view: TrustView | null,
+): Promise<T> {
   signal?.throwIfAborted();
   const revision = sessionRevision;
-  const account = verifiedAccount;
   const publicPath = ["capabilities", "help", "status", "session"].includes(
     path,
   );
-  if (body !== undefined && !path.startsWith("dev/") && !account)
+  const privatePath = !publicPath && path !== "dev/session";
+  if (privatePath && (!view || view !== verifiedView || view.signal.aborted))
     throw new TrustError(
       "Refresh your account before taking this action.",
       "session_required",
     );
+  const original = privatePath
+    ? AbortSignal.any([view!.signal, ...(signal ? [signal] : [])])
+    : signal;
+  original?.throwIfAborted();
   // Settle a real session read before its four-second poll replaces it. A
   // stalled read must reach the readiness consumer while keeping the original
   // account/view lifetime and its unsent input intact. Include the JSON body.
   const responseSignal =
     path === "session" && body === undefined
       ? AbortSignal.any([
-          ...(signal ? [signal] : []),
+          ...(original ? [original] : []),
           AbortSignal.timeout(3000),
         ])
-      : signal;
+      : original;
   responseSignal?.throwIfAborted();
   const response = await fetch(`/api/trust/${path}`, {
     method: body === undefined ? "GET" : "POST",
     headers: {
       "Content-Type": "application/json",
       "X-Correlation-Id": crypto.randomUUID(),
-      ...(!publicPath && account ? { "X-Expected-Account-Id": account } : {}),
+      ...(privatePath && view
+        ? {
+            "X-Expected-Account-Id": view.accountId,
+            ...(view.sessionId
+              ? { "X-Expected-Session-Id": view.sessionId }
+              : {}),
+          }
+        : {}),
     },
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
     cache: "no-store",
@@ -65,12 +93,46 @@ export async function trustApi<T>(
       "session_account_changed",
     );
   if (response.ok && path === "session") {
-    if (verifiedAccount && verifiedAccount !== result.accountId)
+    const isolatedDevelopment =
+      result.localDevelopment === true && result.localActorSelection === true;
+    const sessionId = result.sessionId ?? null;
+    if (
+      typeof result.accountId !== "string" ||
+      (!isolatedDevelopment &&
+        (typeof sessionId !== "string" ||
+          !/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/iu.test(sessionId)))
+    )
+      throw new TrustError(
+        "Your current session could not be checked. Try again.",
+        "session_context_unavailable",
+        undefined,
+        503,
+      );
+    if (
+      verifiedView &&
+      (verifiedView.accountId !== result.accountId ||
+        verifiedView.sessionId !== sessionId ||
+        verifiedView.isolatedDevelopment !== isolatedDevelopment)
+    )
       invalidateSession();
-    verifiedAccount = result.accountId;
+    if (!verifiedView) {
+      viewController = new AbortController();
+      verifiedView = Object.freeze({
+        accountId: result.accountId,
+        sessionId,
+        isolatedDevelopment,
+        signal: viewController.signal,
+      });
+      window.dispatchEvent(new Event("trust-session-ready"));
+    }
   }
-  if (result.error?.code === "session_account_changed") invalidateSession();
-  if (path === "session" && response.status === 401 && verifiedAccount)
+  if (
+    ["session_account_changed", "session_view_changed"].includes(
+      result.error?.code,
+    )
+  )
+    invalidateSession();
+  if (path === "session" && response.status === 401 && verifiedView)
     invalidateSession();
   if (!response.ok)
     throw new TrustError(
@@ -80,6 +142,41 @@ export async function trustApi<T>(
       response.status,
     );
   return result as T;
+}
+/** The visible form captures its actual checked session and browser lifetime.
+ * A late callback cannot borrow the replacement view's cookie or authority. */
+export function useTrustRequest() {
+  const [view, setView] = useState<TrustView | null>(() => verifiedView);
+  const controller = useRef<AbortController | null>(null);
+  if (!controller.current) controller.current = new AbortController();
+  const [lifetime, setLifetime] = useState(() => controller.current!.signal);
+  useEffect(() => {
+    // Reuse the canonical boundary's actual effect-restart lifetime rule.
+    // Old callbacks keep their aborted owner; departure cancels real fetches.
+    if (controller.current!.signal.aborted)
+      controller.current = new AbortController();
+    const owner = controller.current!;
+    setLifetime(owner.signal);
+    const update = () => setView(verifiedView);
+    window.addEventListener("trust-session", update);
+    window.addEventListener("trust-session-ready", update);
+    update();
+    return () => {
+      owner.abort();
+      window.removeEventListener("trust-session", update);
+      window.removeEventListener("trust-session-ready", update);
+    };
+  }, []);
+  return useCallback(
+    <T,>(path: string, body?: unknown, signal?: AbortSignal) =>
+      requestForView<T>(
+        path,
+        body,
+        AbortSignal.any([lifetime, ...(signal ? [signal] : [])]),
+        view,
+      ),
+    [view, lifetime],
+  );
 }
 /** Invalidate form results as well as reads when the current account changes. */
 export function useTrustSession(reset: () => void) {
@@ -155,12 +252,18 @@ export function useTrust<T>(path: string, enabled = true) {
     const update = () => void refresh();
     window.addEventListener("trust-session", update);
     window.addEventListener("trust-retry", update);
+    const privatePath = !["capabilities", "help", "status", "session"].includes(
+      path,
+    );
+    if (privatePath) window.addEventListener("trust-session-ready", update);
     return () => {
       sequence.current++;
       request.current?.abort();
       request.current = null;
       window.removeEventListener("trust-session", update);
       window.removeEventListener("trust-retry", update);
+      if (privatePath)
+        window.removeEventListener("trust-session-ready", update);
     };
   }, [refresh]);
   const visible = enabled && result.path === path;
@@ -190,7 +293,10 @@ export function TrustSession({
     localActorSelection?: boolean;
   }>("capabilities");
   const { data } = capability;
-  const session = useTrust<{ accountId: string }>("session");
+  const session = useTrust<{ accountId: string; sessionId: string | null }>(
+    "session",
+  );
+  const request = useTrustRequest();
   useEffect(() => {
     const clear = () => onSessionState?.({ ready: false, error: null });
     window.addEventListener("trust-session", clear);
@@ -213,7 +319,7 @@ export function TrustSession({
   const signOut = async () => {
     setBusy(true);
     try {
-      await trustApi("dev/logout", {});
+      await request("dev/logout", {});
       invalidateSession();
       const channel = new BroadcastChannel("trust-account");
       channel.postMessage("changed");

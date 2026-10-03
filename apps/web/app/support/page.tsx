@@ -9,13 +9,14 @@ import {
   type TrustSessionState,
   useTrust,
   useTrustSession,
-  trustApi,
+  useTrustRequest,
   retryTrustReads,
   caseLabel,
   dateLabel,
 } from "../ops/trust-client";
 
 export default function SupportPage() {
+  const request = useTrustRequest();
   const [sessionState, setSessionState] = useState<TrustSessionState>({
     ready: false,
     error: null,
@@ -112,7 +113,7 @@ export default function SupportPage() {
           key.current ??= crypto.randomUUID();
           try {
             if (kind === "block") {
-              await trustApi("blocks", {
+              await request("blocks", {
                 creatorId,
                 reason,
                 idempotencyKey: key.current,
@@ -126,7 +127,7 @@ export default function SupportPage() {
               await refresh();
               return;
             }
-            const result = await trustApi<CaseSummary>("reports", {
+            const result = await request<CaseSummary>("reports", {
               kind,
               reason,
               ...(kind !== "support" && creatorId ? { creatorId } : {}),
@@ -271,7 +272,7 @@ export default function SupportPage() {
                   setBusy(true);
                   key.current ??= crypto.randomUUID();
                   try {
-                    await trustApi(`cases/${item.id}/appeals`, {
+                    await request(`cases/${item.id}/appeals`, {
                       version: item.version,
                       reason: appealReason,
                       idempotencyKey: key.current,
