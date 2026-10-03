@@ -110,7 +110,8 @@ export async function exportCommerceFinancial(
               "privacy_export_cursor_invalid",
               "The export cursor is incomplete; no artifact was published.",
             );
-            if (rows.length < 500) break;
+            // Completion requires the next actual empty fetch, including after
+            // a short page, under this same original snapshot and job.
           }
         };
         const creator = input.scope === "account" ? null : input.creatorId;
@@ -520,7 +521,7 @@ async function grants(
         [pair.creator_id, pair.fan_id],
       );
     }
-    if (rows.length < 500) break;
+    if (!rows.length) break;
     after = rows.at(-1)!;
   }
 }
