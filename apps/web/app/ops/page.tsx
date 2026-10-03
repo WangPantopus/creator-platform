@@ -9,9 +9,11 @@ import type {
 import {
   ErrorState,
   TrustSession,
+  type TrustSessionState,
   useTrust,
   caseLabel,
   openedLabel,
+  retryTrustReads,
 } from "./trust-client";
 
 const navigation: [QueueName, string][] = [
@@ -28,6 +30,7 @@ const category: Record<string, string> = {
   verification: "Verification review",
   pause: "Pause or suspension",
   support: "Support request",
+  reply_review: "Private Note reply review",
 };
 const stateLabel: Record<string, string> = {
   open: "Open",
@@ -39,16 +42,21 @@ const stateLabel: Record<string, string> = {
   appealed: "Appealed",
 };
 export default function QueuePage() {
+  const [sessionState, setSessionState] = useState<TrustSessionState>({
+    ready: false,
+    error: null,
+  });
   const [queue, setQueue] = useState<QueueName>("safety");
   const [number, setNumber] = useState("");
   const [search, setSearch] = useState("");
   const [cursor, setCursor] = useState<string | null>(null);
-  const { data, error, loading, refresh } = useTrust<{
+  const { data, error, loading } = useTrust<{
     items: CaseSummary[];
     counts: Partial<Record<QueueName, number>>;
     nextCursor: string | null;
   }>(
     `cases?queue=${queue}${search ? `&number=${search}` : ""}${cursor ? `&cursor=${cursor}` : ""}`,
+    sessionState.ready,
   );
   return (
     <div className="ops-shell ops-queue">
@@ -85,7 +93,7 @@ export default function QueuePage() {
         </a>
         <Link href="/ops/metrics">Service metrics</Link>
         <Link href="/status">Service status</Link>
-        <TrustSession />
+        <TrustSession onSessionState={setSessionState} />
       </nav>
       <main className="ops-main" id="ops-main" tabIndex={-1}>
         <h1>
@@ -97,7 +105,10 @@ export default function QueuePage() {
           Every case you open is logged. Fan message text appears only inside a
           case, never in lists or alerts.
         </p>
-        <ErrorState error={error} retry={() => void refresh()} />
+        <ErrorState
+          error={sessionState.error ?? error}
+          retry={retryTrustReads}
+        />
         {loading && <p role="status">Loading cases…</p>}
         {data && (
           <>

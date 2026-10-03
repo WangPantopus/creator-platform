@@ -1,7 +1,15 @@
 "use client";
 import Link from "next/link";
+import { useState } from "react";
 import { AuditBanner } from "@qelvora/ui-web";
-import { ErrorState, TrustSession, dateLabel, useTrust } from "../trust-client";
+import {
+  ErrorState,
+  TrustSession,
+  type TrustSessionState,
+  dateLabel,
+  useTrust,
+  retryTrustReads,
+} from "../trust-client";
 
 type Audit = {
   id: string;
@@ -12,8 +20,13 @@ type Audit = {
   queue: string;
 };
 export default function AccessAudits() {
-  const { data, error, loading, refresh } = useTrust<{ items: Audit[] }>(
+  const [sessionState, setSessionState] = useState<TrustSessionState>({
+    ready: false,
+    error: null,
+  });
+  const { data, error, loading } = useTrust<{ items: Audit[] }>(
     "operations/audits",
+    sessionState.ready,
   );
   return (
     <main className="trust-page" id="ops-main" tabIndex={-1}>
@@ -24,7 +37,7 @@ export default function AccessAudits() {
         metadata; private evidence requires its own current case lease.
       </AuditBanner>
       {loading && <p role="status">Loading audits…</p>}
-      <ErrorState error={error} retry={() => void refresh()} />
+      <ErrorState error={sessionState.error ?? error} retry={retryTrustReads} />
       {data?.items.length === 0 && (
         <p>No case access has been recorded for this operations account.</p>
       )}
@@ -37,7 +50,7 @@ export default function AccessAudits() {
           <span className="qv-meta">Reference {item.correlation_id}</span>
         </article>
       ))}
-      <TrustSession />
+      <TrustSession onSessionState={setSessionState} />
     </main>
   );
 }
