@@ -1,11 +1,16 @@
 # W4 original commerce session view — October 3, 2026
 
+## Current canonical web shipping — October 3, 19:05 UTC
+
+The normal webpack/TypeScript production build at frozen `2448d5a2ba0fe0ffecf8a432821785d0bad6a8c3` completes all 33 pages at 18:37:06.530953–18:37:22.826409 UTC, exit 0. This composition contains the actual b0 namespace correction and retained Commerce consumer. An independent complete diff verifies that all web/shared package/lock source bytes equal the current Commerce branch `c3dbec8650dd38528e9ceb3f42d7698f7513298d`. Private build receipt SHA256 `79750e2c74a24e90481d1d155b8ef8197709e0e6bb1979fe522aacb365b91230`; compiler log `d3b44be5e909951966e127c747e215c3b551fdfc6f0884ff6b6e297f636639ac`; byte-equality receipt `716a89a2ace2b2097de9d7bc687bb99a755aca3ef5f718b45644bb1a6b51f6b9`.
+
+The canonical helper releases normally. The immediate later absence assertion fails because W1 has legitimately reacquired the guard; that failure is retained, and the initial inaccurate absence message is explicitly corrected to the peers. A separate later fresh physical absence check passes. Neither peer ownership nor an old-head build is counted as a current runtime pass. Current cross-tab/public-document cleanup, genuine replacement, Commerce command races, providers and complete C10 still require personal qualification. Earlier e795 observations remain attributed to their original source; no new tests or development identity are created.
+
 ## Current canonical namespace guard — October3 18:20 UTC
 
 Normally consumes actual W1 b0c15d51c72d1620e0069c9262037945a4d87d86 at2986ee7bb2ef14914bee144da6e11607b22afd58. The complete two-file delta is personally read. Each shared namespace snapshot retains its actual original marker; entries are considered before that marker and the marker is checked unchanged before deletion, preserving a replacement session even when it writes identical field values. Disjoint genuine W2 session keys remain unchanged. This denial cleanup creates no Session, Actor, scope or request authority.
 
 Current web types, scoped lint/format and diff pass without new tests. Prior e5d shipping/web operation remains qualified only to its own source. Current build and personal cross-tab/public-document/session-replacement/command/provider/C10 qualification remain open. The shared runtime transport is recovered; own61 ledger/schema/roles/security match the historical migration snapshot and all38 Commerce tables/two rows retain the latest pre-outage8bc3d065 fingerprint. Full historical data/sequences differ after recorded later activity, and are not credited as an unchanged outage baseline.
-
 
 ## Canonical scoped cleanup successor — 17:44 UTC
 

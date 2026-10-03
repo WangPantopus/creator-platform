@@ -1,3 +1,15 @@
+## Current existing-PR priority and source reuse — October 3, 2026 19:09 UTC
+
+All 40 current open PRs are drafts with exactly one of the eight existing owners; all seven peers are coordinated, beginning with the October 1 stack at #21. This pass closes W3 #299/#280 and W4 #236 unmerged with preserved source/history. #236's complete original publication scope is consolidated into #262 with a byte-identical worker merge tree and independent W2/W5 preservation reviews. W4 retains #213/#247/#262/#298/#301/#303, all held for their named complete gates. No new main merge occurs in this latest pass.
+
+Current Commerce web shipping (33 pages), Android shipping (37 tasks), normally signed iOS shipping and strict signatures pass for their exact recorded source. The verifier-path failure is preserved with its signature-only repair. Both Spending clients now distinguish a real command from a read-only refresh label; the exact Swift minimum also builds/signs. Named 44c Android input/theme/cold operation retains its restoration timing failure and spoken acceptance gap. Current native recovery/replacement/disposal, Kotlin whole-read deadline, public-document/cross-tab/Commerce command races, required queued CI and genuine provider/privacy/publication/C10 gates remain open. [Full dispositions, source hashes and limits](../../../artifacts/workstreams/W4/runtime/2026-10-03/open-pr-review/README.md).
+
+Main and all 16 retained W4 branches include reviewed `5c08634b` at the captured read-only audit and match actual pushed refs; the user workbook and history are preserved. No complete package or R01–R15 row is checked off.
+
+- [x] Assign every current open/draft PR to an existing owner and personally review retained W4 scopes.
+- [x] Consolidate the complete redundant #236 source into #262 and close #236 unmerged with preserved custody.
+- [ ] Finish each retained PR's genuine current acceptance and required CI before merge; then continue the original nine packages/R01–R15.
+
 ## Original native outage and configuration input — October 3, 2026 16:54 UTC
 
 Personally operated exact9d iOS shipping bytes at1535c67c: original fan Requests→Spending, persisted No limit/zero charges, native decimal keyboard6.50 unsent, real API stop and automatic private concealment/retained-input notice. Recovery is held by the independently confirmed shared Docker daemon/forwarding outage; no post-operation durable fingerprint or restored-input pass is credited. Own API, simulator, GUI and pending Docker clients are physically closed; W7 is notified of early release. [Named private receipts and limitations](../../../artifacts/workstreams/W4/runtime/2026-10-03/native-original-session/README.md).

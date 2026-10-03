@@ -1,5 +1,37 @@
 # Existing PR review — October 3, 2026 UTC
 
+## Current oldest-first disposition — October 3, 19:04 UTC
+
+The fresh complete inventory contains **40 open PRs, all drafts**, beginning #21, #22, #26, #28, #29 and #31 from October 1. Every PR has exactly one existing workstream owner. All seven peer owners have renewed their dispositions; their runtime observations remain their acceptance custody. This pass closes three redundant drafts unmerged: W3 #299 and #280, and W4 #236. Source and history remain preserved. There is no new main merge in this latest pass. Earlier qualified session merges #210, #294, #297, #300 and #292 are separate dated results.
+
+| Owner | Retained open/draft PRs                                          |
+| ----- | ---------------------------------------------------------------- |
+| W1    | #21, #22, #26, #28, #29, #35, #42, #48, #49, #51, #66, #74, #296 |
+| W2    | #132, #279, #295                                                 |
+| W3    | #36, #63, #182                                                   |
+| W4    | #213, #247, #262, #298, #301, #303                               |
+| W5    | #288, #293, #302, #304                                           |
+| W6    | #282, #284, #289, #305                                           |
+| W7    | #31                                                              |
+| W8    | #131, #145, #192, #200, #201, #242                               |
+
+W1 is reviewing the oldest stacked onboarding, focus, generator, Team, Home, signing, native and handoff scopes. W2 retains distinct genuine generation/privacy purposes and current Studio session work. W3 consolidates the Conversation/privacy composition and qualifies its current native source. W5 retains Team, native Team, original publication and unknown reply settlement. W6 retains distinct call, recorder, browser signature and Studio session custody. W7 retains the complete Growth composition; its current native setup timeout remains an acceptance gap. W8 retains the six distinct Trust purposes and owns registry/activation and shared runtime recovery. No owner finding, build or empty/refusal query is borrowed as W4 positive lifecycle acceptance.
+
+| W4 PR                                                             | Captured published head | Qualification and remaining gate                                                                                                                                                                                                                                                                             |
+| ----------------------------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [#213](https://github.com/WangPantopus/creator-platform/pull/213) | `17554888`              | Original Actor and account cleanup source, existing checks and b579 shipping pass. Limited genuine Requests/Spending read is observed. External callbacks remain unbounded; genuine fault/replay/financial/provider/whole C10 acceptance remains open.                                                       |
+| [#247](https://github.com/WangPantopus/creator-platform/pull/247) | `ef20d7a0`              | Actual generation provenance/catalogue and rollback/refusal qualification is preserved. Genuine original task/factory/provider/output/financial/final COMMIT, complete accepted pins and finite C10 remain open; original 0157 diagnostics are visible.                                                      |
+| [#262](https://github.com/WangPantopus/creator-platform/pull/262) | `5cc17cf2`              | Entire original #236 scope is retained; the normal consolidation merge tree is byte-identical to its previous worker tree. W2/W5 independently verify preservation. Original recipient/System/delivery/final cleanup, approved minimum, pins, positive lifecycle and finite C10 remain open; SQL stays held. |
+| [#298](https://github.com/WangPantopus/creator-platform/pull/298) | `c3dbec86`              | Actual b0 namespace correction, current source checks and byte-equivalent 33-page shipping build pass. Current public-document/cross-tab/replacement/command qualification and producer #296 remain open.                                                                                                    |
+| [#301](https://github.com/WangPantopus/creator-platform/pull/301) | `b7297f54`              | Original Scope/projection/cause settlement source, existing checks and cf727 shipping pass. Sink callbacks remain unbounded; genuine privacy task, protected artifact publication, retention/ACK and whole C10 remain open.                                                                                  |
+| [#303](https://github.com/WangPantopus/creator-platform/pull/303) | `2448d5a2`              | Current Android/iOS shipping and signatures pass with the retained verifier-path failure and successful signature-only retry. The separately captured Swift refresh-label minimum also compiles/signs. Current native race/recovery/disposal/spoken/provider/whole C10 remains open.                         |
+
+At the captured heads, five W4 drafts have four successful fast checks and six queued Mac checks. #247 has eight successful checks and three queued checks. No queued/cancelled job is counted as a pass, and later heads require their own status. All six are mergeable at this snapshot; this does not establish release readiness. Current PR bodies describe the retained complete scopes and explicit gates.
+
+Shared main is `5c08634b7542fef95dd6c176030a785845250c62`; the actual remote is re-read at 19:03 UTC. The primary checkout and all **16 retained W4 branches** include that main and match actual pushed refs at the 18:50:29 read-only capture. The user's untracked workbook hash is preserved; no reset, rebase, force push or peer branch rewrite occurs. Component updates reuse actual reviewed producer source, without importing every unfinished peer draft.
+
+Private complete inventory SHA256 `846b8530c000efbec3f948500ebaa69ef518eabaa89599d3743f19858bcf12da`; complete branch custody `530f68dcbdf09e722c8d54377d42dc44d60d8cfc539e5c53591ab4b1287dec91`; #236→#262 preservation comparison `8db51fd0888d38f6f900bd55f1ac2eea6fddc7ba8299514cd6a5b1860d6a603a`. [Current web evidence](../commerce-original-session/README.md) and [native source/build/operation limits](../native-original-session/README.md) retain actual receipts and failures. Routine JSON/logs/screens remain private. All nine original packages and R01–R15 stay incomplete.
+
 ## Current native operation and reviewed main — October 3, 2026 12:26 UTC
 
 Current Android personally passes the named Light Requests and Night direct You return paths, actual unsaved decimal keyboard/cold discard and preserved original spending state through supported CUA Studio mirroring. All38 commerce tables/two rows match the original fingerprint; exact own shutdown/GUI+slot2 release finished12:20:32UTC, with W3 next. [Actual source, controller recovery and remaining acceptance](../android-personal-return/README.md) supersede the earlier controller limitation without erasing its failed attempt. Signed current iOS build remains preparation; TalkBack and full accessibility are still open.
