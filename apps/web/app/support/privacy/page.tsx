@@ -131,6 +131,11 @@ export default function PrivacyPage() {
     actorVerification: string;
     verificationMethod?: string;
   }>("capabilities");
+  const verificationReady =
+    !capability.loading &&
+    !!capability.data &&
+    !capability.error &&
+    capability.data.actorVerification === "configured";
   const [kind, setKind] = useState("export");
   const [scope, setScope] = useState("account");
   const [creatorId, setCreator] = useState("");
@@ -154,6 +159,7 @@ export default function PrivacyPage() {
     key.current = null;
   });
   const run = async () => {
+    if (!verificationReady || busy) return;
     const current = epoch.current;
     setBusy(true);
     setError(null);
@@ -234,10 +240,20 @@ export default function PrivacyPage() {
         </p>
       )}
       <ErrorState error={error} retry={() => void refresh()} />
+      <ErrorState
+        error={capability.error}
+        retry={() => void capability.refresh()}
+      />
+      {capability.loading && (
+        <p className="qv-help" role="status">
+          Loading…
+        </p>
+      )}
       <form
         className="trust-panel"
         onSubmit={(event) => {
           event.preventDefault();
+          if (!verificationReady || busy) return;
           if (kind === "delete") dialog.current?.showModal();
           else void run();
         }}
@@ -245,6 +261,7 @@ export default function PrivacyPage() {
         <label htmlFor="privacy-kind">Request</label>
         <select
           id="privacy-kind"
+          disabled={capability.loading}
           value={kind}
           onChange={(event) => {
             setKind(event.target.value);
@@ -257,6 +274,7 @@ export default function PrivacyPage() {
         <label htmlFor="privacy-scope">Scope</label>
         <select
           id="privacy-scope"
+          disabled={capability.loading}
           value={scope}
           onChange={(event) => {
             setScope(event.target.value);
@@ -272,6 +290,7 @@ export default function PrivacyPage() {
             <label htmlFor="privacy-creator">Creator reference</label>
             <input
               id="privacy-creator"
+              disabled={capability.loading}
               required
               value={creatorId}
               onChange={(event) => {
@@ -286,6 +305,7 @@ export default function PrivacyPage() {
             <label htmlFor="privacy-thread">Conversation reference</label>
             <input
               id="privacy-thread"
+              disabled={capability.loading}
               required
               value={threadId}
               onChange={(event) => {
@@ -295,23 +315,25 @@ export default function PrivacyPage() {
             />
           </>
         )}
-        {capability.data?.verificationMethod !== "current_session" && (
-          <>
-            <label htmlFor="privacy-proof">
-              {capability.data?.localDevelopment
-                ? "Type LOCAL DEVELOPMENT for this synthetic account"
-                : "Account verification receipt"}
-            </label>
-            <input
-              id="privacy-proof"
-              required
-              autoComplete="off"
-              value={proof}
-              onChange={(event) => setProof(event.target.value)}
-            />
-          </>
-        )}
-        {!capability.data?.localDevelopment && (
+        {capability.data &&
+          capability.data.verificationMethod !== "current_session" && (
+            <>
+              <label htmlFor="privacy-proof">
+                {capability.data?.localDevelopment
+                  ? "Type LOCAL DEVELOPMENT for this synthetic account"
+                  : "Account verification receipt"}
+              </label>
+              <input
+                id="privacy-proof"
+                disabled={capability.loading}
+                required
+                autoComplete="off"
+                value={proof}
+                onChange={(event) => setProof(event.target.value)}
+              />
+            </>
+          )}
+        {capability.data && !capability.data.localDevelopment && (
           <p className="qv-help">
             {capability.data?.verificationMethod === "current_session"
               ? "Your sign-in must be recent. Continue with Pantopus again if asked to verify your account."
@@ -320,12 +342,7 @@ export default function PrivacyPage() {
         )}
         <button
           className="qv-btn qv-btn--secondary"
-          disabled={
-            busy ||
-            !capability.data ||
-            !!capability.error ||
-            capability.data.actorVerification !== "configured"
-          }
+          disabled={busy || !verificationReady}
         >
           {busy
             ? "Saving…"
