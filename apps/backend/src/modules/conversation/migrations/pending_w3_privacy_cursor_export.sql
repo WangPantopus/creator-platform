@@ -110,6 +110,7 @@ BEGIN
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0165_w2_usage_retention_expiry' AND checksum='1c118f5ec90a5a3f3578e056af14d5e56b1379464977c4a79bd6c2b62be7f17e')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0181_w2_generation_attempt_admission' AND checksum='eab8c8e07b8a1e6ba4384f5300560bd46853bf98509faade5a1b555e130c75ee')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0188_w2_generation_terminal_journal' AND checksum='7ab8974d065b1b9e5befa2ded26c6978876957fab0eee80b9632825bbac98477')
+  OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0210_w2_generation_guardrail_event' AND checksum='0c0fc7fee7182f3e77695222e51cce910268f7844437a5e974f68af5927a3382')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0056_w3_correction_feedback_lineage' AND checksum='1044700d59b9dbb2d2b36d890496de0be6fb3d53c4409504f3c7693906866c35')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0057_w3_feedback_consent' AND checksum='08cb6f37c12ca3131b2e307a237569aa4d104fc627566e619a39fa18a1814d11')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0059_w3_recording_association' AND checksum='b61d50d7f85c0ef468e00a8d2d6b737b4d405a9349810c552f7d9df7f527c42e')
@@ -224,7 +225,9 @@ LANGUAGE sql STABLE SECURITY DEFINER SET search_path=pg_catalog AS $$
  UNION ALL
  SELECT f."threadId",f."creatorId",f."fanId",5,(id::text),
   (SELECT to_jsonb(projected) FROM (SELECT id,creator_id,type,revision,payload,created_at,published_at) projected)
- FROM families f JOIN creator.ai_event t ON t.creator_id=f."creatorId" AND t.type='ai.generation_receipt' AND t.payload->>'threadId'=f."threadId"::text AND t.payload->>'fanId'=f."fanId"::text
+ FROM families f JOIN creator.ai_event t ON t.creator_id=f."creatorId"
+  AND (t.type='ai.generation_receipt' OR (t.type='ai.guardrail' AND t.payload->>'purpose'='generation_guardrail'))
+  AND t.payload->>'threadId'=f."threadId"::text AND t.payload->>'fanId'=f."fanId"::text
  UNION ALL
  SELECT f."threadId",f."creatorId",f."fanId",6,(lpad(sequence::text,10,'0')||':'||id::text),
   (SELECT to_jsonb(projected) FROM (SELECT id,agent_version_id,agent_version_hash,corrects_message_id,corrects_message_version,signed_command) projected)
