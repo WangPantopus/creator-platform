@@ -849,21 +849,23 @@
       "evidence": "Routine screenshots/hash/log/diagnostic evidence remains private under successor scratch."
     },
     "prReview20261003": {
-      "source": "ee6f6f63dc3981b15eff8538b218826fdbba6990",
-      "reviewedMain": "6a9f10a850fb4769c667f89a6304505dd6a04728",
-      "integration": "3ead5472953f875b83b6ccad370cac3c82b2c97b",
-      "sourcePathsPersonallyReadAtCheckpoint": 101,
-      "sourcePathsTotal": 101,
+      "source": "fa82873682f96a8f1223829bc040bb974b95088d",
+      "reviewedMain": "f3b684e31ab7211c9b1f2ec990fb13df4eb192cd",
+      "integration": "6694681f5a56898b5d5e0d9e20f832024a28bdb5",
+      "sourcePathsPersonallyReadAtCheckpoint": 116,
+      "sourcePathsTotal": 116,
       "fullCombinedReviewComplete": false,
       "pr31": "open draft/unmerged",
-      "existingWorkspace": "e5 pass;9 backend contracts/9 PostgreSQL cases skipped",
-      "existingVisual": "ee6 unchanged full13pass/2.9min; first12pass/Thread Light17pixels delta5 failure preserved, unchanged focused2pass",
-      "native": "ee6 signed iOS/strict signature and Swift18/110 unchanged comparisons pass; current e5 installed hashes match, aggregate Sections hides category AX; revised ee6 actual operation pending; Android source unchanged from c21147-task pass",
-      "ownerInventory": "46 initial;13closed-unmerged;283/285 documentation merged; all seven audits reconciled; all11 paths284 read with discard failure owner repair; all6 paths286 and surrounding effects read with no blocking finding",
-      "authority": "no new SQL; original0044\u20130060 ceiling/unanswered17-entry packet/genuine inputs remain absent",
+      "existingWorkspace": "fa828 full pnpm check passes; nine original backend contracts pass/nine PostgreSQL skipped. Normal main669 incoming #290 documentation only leaves production/configuration bytes identical.",
+      "existingVisual": "a4 unchanged original13 pass3.0min; four subsequent public Retry routes are outside those cases. Earlier Thread Light17pixels delta5 failure and unchanged focused/full passing reruns preserved.",
+      "native": "fa828 existing Swift18/110 unchanged comparisons14.85s, signed iOS/strict and Android47 tasks (7 executed/40 cached) pass after preserved occupied75 and normal peer release. Repaired-artifact installation/operation pending. Prior57df installed hashes and actual Text11 Discover heading/categories LightNight, Text9 Night two columns and supported actual5580GRPC/dev-account missing-notification refusal are observed. Actual57df iOS post-context fatal Unknown text style:meta retained; fa828 canonical data-sm11-call repair is source/build acceptance only.",
+      "ownerInventory": "46 initial/13 closed-unmerged/seven audits;286/210 and documentation-only290 main merges reused. Earlier284/288 bounded source read;291 full17-line permission preflight/surroundings read.289 frozen2a signature/media and W1/passkey/backend boundaries fully read; same-account replacement precondition gap reported to owner.292 prior five docs read/two broken evidence links owner-repaired locally; new functional focus source needs frozen review. Current282/293 detailed review pending; owners retain qualification/merge custody.",
+      "authority": "No new SQL; original human0044\u20130060 ceiling, unanswered full17-entry packet and missing genuine inputs remain binding.",
       "originalAcceptance": "all original unfinished rows and historical failures preserved; W7 incomplete",
-      "latestExactHeadCI": "ee6 Foundation queued; Trust in progress/queued; older e5 backend/android-runtime/Trust pass with three Mac jobs queued",
-      "resources": "APIexit0/productionwebexit1/own PG stopped;40 migrations/0creators/0other clients/cap0; FABShutdown/5580absent; exact heavy/GUI/simulator released; no new SQL/stale backup"
+      "latestExactHeadCI": "Last inspected8fea Trust compile and both web/backend/Android-runtime job copies pass; both copies of three Mac Foundation families queued. New final head requires all six exact-head jobs.",
+      "resources": "Own4705 API SIGINT exit0/emulator1344 exit0/PGstop0;40/0creators/0otherclients/cap0;FABShutdown/5580absent; Text3/OSLight/exact GUI+sim+emu leases released; no own heavy. No new SQL/stale backup.",
+      "postEntry": "W5d28\u21929c/W7d2 current host retains actual final owner re-read; actual anonymous401/no-store. W3 exact01b13-path contract/consumers and8e original account/session repair pluscac privacy labels selected into941/867/57. Web gap repaired; native older-layout conflict preserved, actual meta crash repairedfa828 existing checks pass, new installed operation pending. No genuine metadata/generation/protected acceptance.",
+      "publicEntryRetry": "930 four-page repair personally operated in production: actual post Retry initially lost destination toDiscover; repaired post UUID/creator sectionChat/invite UUID/share UUID retained after clicks. Actual API shutdown share Reload/Retry retains UUID. Refusal/recovery only, no genuine publication/share/invite/consent acceptance. Routine evidence stays private."
     }
   },
   "previousTransfer": {
