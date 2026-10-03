@@ -27,7 +27,7 @@ import { assertOriginalCostCustody } from "./original-cost-custody.js";
 export const GENERATION_SAFETY_TERMINAL_MIGRATION =
   "0215_w4_generation_safety_terminal_settlement";
 export const GENERATION_SAFETY_TERMINAL_SCHEMA_SHA256 =
-  "97593fdef08464d54afe9ba14c340f873c4231bf48d11f3fc574a584cab6416f";
+  "5aba1bffa300a811630f66e8577d29801694a54b6f06de610f7f78a7184d9a24";
 export const GENERATION_SAFETY_TERMINAL_SIGNATURES = [
   "creator.generation_settle_typed_original_allowance(uuid,uuid)",
   "creator.generation_typed_original_allowance_receipt(uuid,uuid)",
@@ -146,39 +146,73 @@ export class CommerceGenerationSafetyTerminalSettlement {
     const client = await input.workerPool.connect();
     let failed = false;
     let failure: unknown;
-    try {
-      await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
-      await settlement.assertCatalogue(client);
-    } catch (error) {
-      failed = true;
-      failure = error;
-    }
+    let begun = false;
     let discard = false;
-    try {
-      await client.query("ROLLBACK");
-    } catch (error) {
+    const transportErrors: Error[] = [];
+    const cleanupErrors: unknown[] = [];
+    const onError = (error: Error) => {
+      if (!transportErrors.includes(error)) transportErrors.push(error);
       discard = true;
-      if (!failed) {
-        failed = true;
-        failure = error;
-      }
-      // Wait for the actual connection to close before removing it from the
-      // pool. An unsuccessful rollback must never return a reusable client.
-      try {
-        await client.end();
-      } catch {
-        // Retain the original review/rollback failure.
-      }
-    }
+    };
+    // Observe the original client before BEGIN, including errors without an
+    // active query. No uncertain transaction may be returned to the Pool.
+    client.on("error", onError);
     try {
-      client.release(discard ? true : undefined);
-    } catch (error) {
-      if (!failed) {
+      try {
+        await client.query("BEGIN ISOLATION LEVEL READ COMMITTED READ ONLY");
+        begun = true;
+        if (transportErrors.length) throw transportErrors[0];
+        await client.query("SET LOCAL statement_timeout='5s'");
+        await client.query("SET LOCAL lock_timeout='1s'");
+        await settlement.assertCatalogue(client);
+      } catch (error) {
         failed = true;
         failure = error;
+        // Catalogue refusals can wrap an active-query transport failure.
+        // Close this exact source instead of guessing transport health.
+        discard = true;
+      }
+      if (begun && !discard) {
+        try {
+          await client.query("ROLLBACK");
+        } catch (error) {
+          discard = true;
+          cleanupErrors.push(error);
+        }
+      }
+      if (discard || !begun) {
+        discard = true;
+        try {
+          await client.end();
+        } catch (error) {
+          cleanupErrors.push(error);
+        }
+      }
+    } finally {
+      try {
+        client.release(discard);
+      } catch (error) {
+        cleanupErrors.push(error);
+      } finally {
+        client.removeListener("error", onError);
       }
     }
-    if (failed) throw failure;
+    const errors = [
+      ...new Set([
+        ...(failed ? [failure] : []),
+        ...transportErrors,
+        ...cleanupErrors,
+      ]),
+    ];
+    if (errors.length === 1) throw errors[0];
+    if (errors.length > 1)
+      throw new AggregateError(
+        errors,
+        "Original safety settlement review cleanup failed",
+        {
+          cause: errors[0],
+        },
+      );
     return settlement;
   }
   private async assertCatalogue(client: PoolClient) {

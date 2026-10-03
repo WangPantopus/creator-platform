@@ -252,7 +252,9 @@ BEGIN
  safety_exempt:=crisis_count=1;
  -- Only the durable real classifier outcome supplies safety exemption. Text
  -- equality above verifies content integrity; it never classifies a response.
- weighted:=CASE WHEN safety_exempt THEN 0 ELSE ceil(total/(r.cost_rule->>'microsPerUnit')::numeric) END;
+ -- The original workflow releases fan usage for an empty failed generation.
+ -- Provider accounting remains the complete known original journal above.
+ weighted:=CASE WHEN safety_exempt OR NOT actual_output THEN 0 ELSE ceil(total/(r.cost_rule->>'microsPerUnit')::numeric) END;
  IF weighted>r.units THEN RAISE EXCEPTION 'Original cost exceeds its held fan ceiling' USING ERRCODE='55000'; END IF;
  expected_units:=weighted::integer;
  IF expected_units>r.units OR (r.output_delivered IS NOT NULL AND r.output_delivered IS DISTINCT FROM actual_output)

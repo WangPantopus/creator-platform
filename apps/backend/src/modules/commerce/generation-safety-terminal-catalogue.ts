@@ -97,7 +97,7 @@ export async function generationSafetyTerminalPurposeCatalogue(
 }
 
 export const GENERATION_SAFETY_TERMINAL_CATALOGUE_SHA256 =
-  "6450e353b079ae614e64b1a08cfa9c77edb753e45810b42b5d24579f20f18830";
+  "ec1dca0399c83f93b5accea0a1c55f9e58c8556011564ccfd7449f9364b704d0";
 export const GENERATION_SAFETY_TERMINAL_SOURCES = Object.freeze(
   [
     {
@@ -105,7 +105,7 @@ export const GENERATION_SAFETY_TERMINAL_SOURCES = Object.freeze(
       path: "apps/backend/src/modules/commerce/schema-generation-safety-terminal-settlement.sql",
       owner: "W4",
       checksum:
-        "97593fdef08464d54afe9ba14c340f873c4231bf48d11f3fc574a584cab6416f",
+        "5aba1bffa300a811630f66e8577d29801694a54b6f06de610f7f78a7184d9a24",
     },
     {
       name: "w1_generation_worker_scope",
