@@ -309,24 +309,6 @@ public final class FanSession: ObservableObject {
             return false
         }
     }
-    /// Save only the intro, against the original account/profile version.
-    public func saveIntro(_ intro: String, accountId: String, sessionId: String) async -> Bool {
-        guard !busy, let current = session, current.accountId == accountId,
-              current.sessionId == sessionId, let fan = current.fan,
-              let capture = await captureRequest(from: destination, maximumResponseBytes: 65_536, timeoutSeconds: 10),
-              await capture.isCurrent() else { return false }
-        busy = true; defer { busy = false }
-        do {
-            let text = intro.trimmingCharacters(in: .whitespacesAndNewlines)
-            let saved = try await capture.client.saveFanIntro(body: APIFanIntroInput(intro: text, expectedVersion: fan.version))
-            guard await capture.isCurrent(), saved.id == fan.id, saved.intro == text else { return false }
-            await refresh()
-            return await capture.isCurrent()
-        } catch {
-            if await capture.isCurrent() { self.error = Self.message(error) }
-            return false
-        }
-    }
     /// Recover navigation only with the credential and destination that opened it.
     /// The call screen independently authorizes the booking and every action.
     public func resolveCallDestination(_ callId: String, from target: String) async -> Bool {

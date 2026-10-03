@@ -264,24 +264,6 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         }
         finally { busy = false }
     }
-    /** Preserves the current handle and never writes using a switched credential. */
-    suspend fun saveIntro(intro: String, accountId: String, sessionId: String): Boolean {
-        val current = session ?: return false
-        val fan = current.fan ?: return false
-        if (busy || current.accountId != accountId || current.sessionId != sessionId) return false
-        val capture = captureRequest(destination, maximumResponseBytes = 65_536, timeoutMs = 10_000) ?: return false
-        if (!capture.isCurrent()) return false
-        busy = true
-        try {
-            val text = intro.trim()
-            val saved = capture.client.saveFanIntro(APIFanIntroInput(text, fan.version))
-            if (!capture.isCurrent() || saved.id != fan.id || saved.intro != text) return false
-            refresh()
-            return capture.isCurrent()
-        } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-        catch (failure: Exception) { if (capture.isCurrent()) error = message(failure); return false }
-        finally { busy = false }
-    }
     /** Navigation only. Reject responses for a departed destination, account or credential. */
     suspend fun resolveCallDestination(callId: String, from: String): Boolean {
         val id = runCatching { java.util.UUID.fromString(callId).also { require(it.toString().equals(callId, ignoreCase = true)) } }.getOrNull() ?: return false
