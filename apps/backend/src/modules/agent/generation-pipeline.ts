@@ -16,6 +16,7 @@ import {
   PreparedGenerationConversationContext,
   type GenerationConversationContext,
 } from "../conversation/generation-context.js";
+import { PreparedGenerationConversationOutput } from "../conversation/generation-output.js";
 import { CommerceGenerationAudience } from "../commerce/generation-audience.js";
 import {
   PreparedGenerationAgentInputs,
@@ -369,10 +370,22 @@ export class PreparedGenerationPipeline {
   async generate(
     task: GenerationTask,
     signal: AbortSignal,
-    /** Actual W3 prepared ordered writer, never a copied interactive adapter.
-     * Each callback must finish its W1-held append and both approval bookends. */
-    deliver: (sentence: ApprovedGenerationSentence) => Promise<void>,
+    /** The original prepared W3 writer finishes its W1-held append, both
+     * private approval bookends and sole W1 COMMIT before delivery resolves. */
+    output: PreparedGenerationConversationOutput,
   ): Promise<PipelineResult> {
+    const started = performance.now();
+    let firstApprovedMs: number | null = null;
+    invariant(
+      output instanceof PreparedGenerationConversationOutput,
+      "generation_pipeline_output_required",
+      "Use the original prepared conversation output writer.",
+    );
+    output.assertComposition({
+      identity: this.identity,
+      pipeline: this,
+      hostPool: this.service.repository.pool,
+    });
     const key = task.generationId + ":" + task.workerToken;
     invariant(
       !this.running.has(key),
@@ -443,7 +456,7 @@ export class PreparedGenerationPipeline {
           proof,
           current.replyCall,
         );
-        await deliver(approved);
+        await output.deliver(task, approved);
         await this.identity.withGeneration(task, async (client, scope) => {
           invariant(
             scope.lastSequence === approved.sequence,
@@ -452,6 +465,7 @@ export class PreparedGenerationPipeline {
           );
           await this.assertApprovedInTransaction(client, scope, approved);
         });
+        firstApprovedMs ??= Math.round(performance.now() - started);
         emitted++;
       };
       const result = await this.service.pipeline.runWithPorts(
@@ -581,7 +595,7 @@ export class PreparedGenerationPipeline {
           },
           current.classifierCall,
         );
-        await deliver(approved);
+        await output.deliver(task, approved);
         await this.identity.withGeneration(task, async (client, scope) => {
           invariant(
             scope.lastSequence === approved.sequence,
@@ -590,6 +604,7 @@ export class PreparedGenerationPipeline {
           );
           await this.assertApprovedInTransaction(client, scope, approved);
         });
+        firstApprovedMs ??= Math.round(performance.now() - started);
         emitted++;
       }
       invariant(
@@ -597,7 +612,15 @@ export class PreparedGenerationPipeline {
         "generation_output_missing",
         "Every approved sentence requires its actual ordered durable writer.",
       );
-      return result;
+      // The shared engine also serves previews. This worker measures from its
+      // original preflight through the durable append and current-cursor
+      // readback, including classifier safety/fallback delivery. Terminal
+      // settlement and client receipt are separate end-to-end measurements.
+      return {
+        ...result,
+        durationMs: Math.round(performance.now() - started),
+        firstApprovedMs,
+      };
     } finally {
       if (run) run.live = false;
       this.running.delete(key);

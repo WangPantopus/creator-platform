@@ -1,4 +1,4 @@
-import { Client, type Pool, type PoolClient } from "pg";
+import type { Pool, PoolClient } from "pg";
 import type { PrivacyHook } from "../trust/contracts.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import { copy } from "@qelvora/copy";
@@ -14,6 +14,12 @@ import type {
 import { z } from "zod";
 import { conversationPrivacyExportStream } from "./privacy-export-stream.js";
 import { PreparedConversationPrivacyCursor } from "./privacy-export-cursor.js";
+import {
+  assertConversationPrivacyPool,
+  cancelConversationPrivacyBackend,
+  conversationPrivacyCause,
+  conversationPrivacyReadUncertain,
+} from "./privacy-cancellation.js";
 
 type Job = Parameters<PrivacyHook["run"]>[0];
 function financialJob(job: Job): GenerationPrivacyJob {
@@ -216,48 +222,51 @@ export function conversationPrivacyHook(
           stream: conversationPrivacyExportStream(input, job, families, signal),
         };
       }
+      assertConversationPrivacyPool(input.pool);
       const client = await input.pool.connect();
       let discardClient = false;
       let backendPid: number | undefined;
       let cancelling: Promise<void> | undefined;
-      let cancellationFailure: unknown;
-      const transportError = () => {
+      let destroying: Promise<void> | undefined;
+      let phase: "pid" | "begin" | "work" | "commit" = "pid";
+      let committed = false;
+      const cancellationFailures: unknown[] = [];
+      const transportFailures: unknown[] = [];
+      let failed = false;
+      let failure: unknown;
+      let result: Awaited<ReturnType<PrivacyHook["run"]>> | undefined;
+      const cleanupFailures: unknown[] = [];
+      const transportError = (error: Error) => {
+        transportFailures.push(error);
         discardClient = true;
       };
       client.on("error", transportError);
+      const destroy = () => {
+        discardClient = true;
+        return (destroying ??= client.end().catch((error: unknown) => {
+          cleanupFailures.push(error);
+        }));
+      };
       const abort = () => {
-        if (backendPid === undefined || cancelling) return;
+        if (cancelling) return;
+        if (backendPid === undefined) {
+          // Before an observed PID, close only this exact held source. Never
+          // guess a backend or leave a delayed PID/BEGIN query uncancelled.
+          cancelling = destroy();
+          return;
+        }
         // This PID belongs to the still-held deletion client. Cancellation
         // never releases its task locks or permits another pool borrower.
-        cancelling = (async () => {
-          const control = new Client({
-            ...input.pool.options,
-            password: input.pool.options.password,
-            connectionTimeoutMillis: 1500,
-            statement_timeout: 1500,
-            query_timeout: 1500,
-          });
-          control.on("error", (error) => {
-            cancellationFailure ??= error;
-          });
-          try {
-            await control.connect();
-            const result = await control.query<{ cancelled: boolean }>(
-              "SELECT pg_cancel_backend($1) AS cancelled",
-              [backendPid],
-            );
-            invariant(
-              result.rows[0]?.cancelled === true,
-              "conversation_delete_cancel_unavailable",
-              "The actual held deletion backend could not be cancelled.",
-            );
-          } finally {
-            await control.end();
-          }
-        })().catch((error: unknown) => {
-          cancellationFailure ??= error;
-        });
+        cancelling = cancelConversationPrivacyBackend(input.pool, backendPid)
+          .catch((error: unknown) => {
+            cancellationFailures.push(error);
+            discardClient = true;
+          })
+          // A healthy cancel does not prove that a stalled transport delivered
+          // the original query's response. End the exact held source too.
+          .finally(destroy);
       };
+      signal.addEventListener("abort", abort, { once: true });
       const accountingReceipts: Record<string, unknown>[] = [];
       const financialDispositions: {
         threadId: string;
@@ -270,11 +279,6 @@ export function conversationPrivacyHook(
       }[] = [];
       try {
         signal.throwIfAborted();
-        await client.query("BEGIN");
-        await client.query(
-          "SET LOCAL statement_timeout='10s'; SET LOCAL lock_timeout='5s'",
-        );
-        signal.throwIfAborted();
         backendPid = z
           .int()
           .positive()
@@ -286,7 +290,13 @@ export function conversationPrivacyHook(
               )
             ).rows[0]?.pid,
           );
-        signal.addEventListener("abort", abort, { once: true });
+        phase = "begin";
+        signal.throwIfAborted();
+        await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
+        phase = "work";
+        await client.query(
+          "SET LOCAL statement_timeout='10s'; SET LOCAL lock_timeout='5s'",
+        );
         signal.throwIfAborted();
         await fenceConversationPrivacyTask(input.authority, client, job);
         const accountingInstalled = await generationJournalInstalled(client);
@@ -556,9 +566,26 @@ export function conversationPrivacyHook(
         // This client's actual task remains current even for an empty family set.
         await fenceConversationPrivacyTask(input.authority, client, job);
         signal.throwIfAborted();
-        await client.query("COMMIT");
+        signal.removeEventListener("abort", abort);
+        await cancelling;
+        if (cancellationFailures.length || transportFailures.length)
+          throw new DomainError(
+            "conversation_delete_cancel_unavailable",
+            "The original deletion connection could not settle safely.",
+            503,
+          );
         signal.throwIfAborted();
-        return {
+        // All original family/financial/retention fences are already complete.
+        // A later abort cannot cancel COMMIT or erase its actual receipt.
+        phase = "commit";
+        const receipt = await client.query("COMMIT");
+        invariant(
+          receipt.command === "COMMIT",
+          "conversation_delete_commit_unavailable",
+          "The original deletion did not return a commit receipt.",
+        );
+        committed = true;
+        result = {
           receipt: {
             schemaVersion: 1,
             domain: "conversation",
@@ -572,38 +599,93 @@ export function conversationPrivacyHook(
           retained,
         };
       } catch (error) {
+        failed = true;
+        failure = error;
         signal.removeEventListener("abort", abort);
         // A delayed control query must finish and close before ROLLBACK.
         // Even an aborted or disconnected task retains this client until its
         // actual transaction has rolled back or its connection has ended.
         await cancelling;
-        const failures = [error];
-        if (cancellationFailure !== undefined) {
+        if (phase !== "work" || conversationPrivacyReadUncertain(error)) {
           discardClient = true;
-          failures.push(cancellationFailure);
+          transportFailures.push(error);
         }
-        try {
-          await client.query("ROLLBACK");
-        } catch (rollbackFailure) {
+        if (
+          discardClient ||
+          cancellationFailures.length ||
+          transportFailures.length
+        ) {
+          // An uncertain cancel has not proved that the server consumed it.
+          // End this original session without queuing more cleanup SQL.
           discardClient = true;
-          failures.push(rollbackFailure);
+        } else if (!committed) {
+          try {
+            await client.query("ROLLBACK");
+          } catch (rollbackFailure) {
+            discardClient = true;
+            cleanupFailures.push(rollbackFailure);
+          }
         }
-        if (failures.length > 1)
-          throw new AggregateError(
-            failures,
-            "Conversation deletion cleanup failed.",
-          );
-        throw error;
       } finally {
         signal.removeEventListener("abort", abort);
         await cancelling;
+        discardClient ||=
+          cancellationFailures.length > 0 || transportFailures.length > 0;
         try {
-          if (discardClient) await client.end();
+          if (discardClient) await destroy();
+        } catch (error) {
+          cleanupFailures.push(error);
         } finally {
-          client.removeListener("error", transportError);
-          client.release(discardClient);
+          try {
+            client.release(discardClient);
+          } catch (error) {
+            cleanupFailures.push(error);
+          } finally {
+            client.removeListener("error", transportError);
+          }
         }
       }
+      if (
+        cancellationFailures.length ||
+        transportFailures.length ||
+        cleanupFailures.length
+      ) {
+        const error = new DomainError(
+          cancellationFailures.length
+            ? "conversation_delete_cancel_unavailable"
+            : committed
+              ? "conversation_delete_release_unavailable"
+              : "conversation_delete_rollback_unavailable",
+          committed
+            ? "Deletion committed but connection cleanup failed. Reconcile its actual receipt."
+            : "Deletion could not settle safely; this task cannot complete.",
+          503,
+        );
+        conversationPrivacyCause(
+          error,
+          new AggregateError(
+            [
+              ...new Set(
+                [
+                  ...(failed ? [failure] : []),
+                  ...transportFailures,
+                  ...cancellationFailures,
+                  ...cleanupFailures,
+                ].filter((cause) => cause !== undefined),
+              ),
+            ],
+            "Original deletion and settlement failures.",
+          ),
+        );
+        throw error;
+      }
+      if (failed) throw failure;
+      invariant(
+        result,
+        "conversation_delete_incomplete",
+        "Only the original completed deletion transaction can return a receipt.",
+      );
+      return result;
     },
   };
 }

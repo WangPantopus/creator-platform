@@ -8,6 +8,10 @@ import {
   type GenerationTask,
 } from "./generation-scope.js";
 import { requestAuthority } from "./request-authority.js";
+import {
+  assertGenerationPoolCustody,
+  generationTransaction,
+} from "./generation-transaction.js";
 
 export const GENERATION_TERMINAL_MIGRATION =
   "0183_w1_generation_terminal_scope";
@@ -326,12 +330,14 @@ export class GenerationTerminalAuthority {
   assertPool(pool: Pool): void {
     if (pool !== this.pool) this.unconfigured();
   }
-  private unconfigured(): never {
-    throw new DomainError(
+  private unconfigured(cause?: unknown): never {
+    const failure = new DomainError(
       "generation_terminal_unconfigured",
       "Reviewed generation settlement authority is unavailable.",
       503,
     );
+    if (cause !== undefined) failure.cause = cause;
+    throw failure;
   }
   static async create(configuration: {
     pool: Pool;
@@ -347,18 +353,21 @@ export class GenerationTerminalAuthority {
       scope: GenerationTerminalScope,
     ) => Promise<void>;
   }): Promise<GenerationTerminalAuthority> {
+    assertGenerationPoolCustody(configuration.pool);
     const input = Object.freeze({
       ...configuration,
       migration: Object.freeze({ ...configuration.migration }),
       denialMigration: Object.freeze({ ...configuration.denialMigration }),
       definitions: Object.freeze({ ...configuration.definitions }),
     });
-    const unavailable = () => {
-      throw new DomainError(
+    const unavailable = (cause: unknown) => {
+      const failure = new DomainError(
         "generation_terminal_unconfigured",
         "The original generation settlement custody is not installed.",
         503,
       );
+      failure.cause = cause;
+      throw failure;
     };
     try {
       invariant(
@@ -385,8 +394,8 @@ export class GenerationTerminalAuthority {
           definitionChecksum: Hash.parse(input.definitions[signature]),
         });
       await assertTerminalCatalogue(input.pool, input);
-    } catch {
-      unavailable();
+    } catch (cause) {
+      unavailable(cause);
     }
     return new GenerationTerminalAuthority(input.pool, {
       generation: input.generation,
@@ -405,8 +414,8 @@ export class GenerationTerminalAuthority {
     try {
       await this.configuration.generation.assertCatalogueInTransaction(client);
       await assertTerminalCatalogue(client, this.configuration.catalogue);
-    } catch {
-      this.unconfigured();
+    } catch (cause) {
+      this.unconfigured(cause);
     }
   }
 
@@ -418,7 +427,6 @@ export class GenerationTerminalAuthority {
     );
   }
   private async begin(client: PoolClient): Promise<void> {
-    await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
     await client.query(
       `SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','1000',true),
        set_config('idle_in_transaction_session_timeout','5000',true),
@@ -459,29 +467,29 @@ export class GenerationTerminalAuthority {
     throw error;
   }
 
-  async pendingTerminals(limit = 20): Promise<readonly string[]> {
+  async pendingTerminals(
+    limit = 20,
+    signal?: AbortSignal,
+  ): Promise<readonly string[]> {
     this.assertWorker();
     const n = z.int().min(1).max(64).parse(limit);
-    const client = await this.pool.connect();
     try {
-      await this.begin(client);
-      const result = await client.query<{ id: unknown }>(
-        "SELECT creator.pending_generation_terminals($1) AS id",
-        [n],
-      );
-      const ids = z
-        .array(z.uuid())
-        .max(n)
-        .parse(result.rows.map((r) => r.id));
-      await this.configuration.assertRestoredInTransaction(client);
-      await this.assertCatalogue(client);
-      await client.query("COMMIT");
-      return Object.freeze(ids);
+      return await generationTransaction(this.pool, signal, async (client) => {
+        await this.begin(client);
+        const result = await client.query<{ id: unknown }>(
+          "SELECT creator.pending_generation_terminals($1) AS id",
+          [n],
+        );
+        const ids = z
+          .array(z.uuid())
+          .max(n)
+          .parse(result.rows.map((r) => r.id));
+        await this.configuration.assertRestoredInTransaction(client);
+        await this.assertCatalogue(client);
+        return Object.freeze(ids);
+      });
     } catch (error) {
-      await client.query("ROLLBACK");
       return this.failure(error);
-    } finally {
-      client.release();
     }
   }
 
@@ -497,6 +505,7 @@ export class GenerationTerminalAuthority {
         }
       | { mode: "reconciliation"; generationId: string; lastSequence: number },
     work: (client: PoolClient, scope: GenerationTerminalScope) => Promise<T>,
+    signal?: AbortSignal,
   ): Promise<T> {
     this.assertWorker();
     const mode = intent.mode;
@@ -511,105 +520,105 @@ export class GenerationTerminalAuthority {
       .max(2_147_483_647)
       .parse(intent.lastSequence);
     const custodyToken = randomUUID();
-    const client = await this.pool.connect();
     let scope: GenerationTerminalScope | undefined;
     try {
-      await this.begin(client);
-      const raw = (
-        await client.query<{ proof: unknown }>(
-          "SELECT creator.begin_generation_terminal($1,$2,$3,$4,$5,$6) AS proof",
-          [
-            generationId,
-            custodyToken,
-            mode,
-            mode === "completion" ? intent.task.workerToken : null,
-            sequence,
-            mode === "completion" ? intent.failed : true,
-          ],
-        )
-      ).rows[0]?.proof;
-      const proof = z
-        .strictObject({
-          nonce: z.uuid(),
-          mode: z.enum(["completion", "reconciliation"]),
-          custodyToken: z.uuid(),
-          task: terminalTask,
-        })
-        .parse(raw);
-      invariant(
-        proof.mode === mode &&
-          proof.custodyToken === custodyToken &&
-          proof.task.generationId === generationId &&
-          proof.task.lastSequence === sequence,
-        "generation_terminal_changed",
-        "The original settlement cursor changed.",
-      );
-      if (mode === "completion") {
-        const expected = intent.task;
-        for (const field of [
-          "threadId",
-          "creatorId",
-          "fanId",
-          "initiatingAccountId",
-          "initiatingSessionId",
-          "creatorAccountId",
-          "fanMessageId",
-          "aiMessageId",
-          "grantId",
-          "reservationId",
-          "epoch",
-          "contextRevision",
-          "processorConsentVersion",
-        ] as const)
-          invariant(
-            canonical(proof.task[field]) === canonical(expected[field]),
-            "generation_terminal_changed",
-            "The original generation family changed.",
-          );
-        invariant(
-          proof.task.originalWorkerToken === expected.workerToken &&
-            proof.task.originalLeaseUntil ===
-              new Date(expected.leaseUntil).toISOString(),
-          "generation_terminal_changed",
-          "The original generation lease changed.",
-        );
-      }
-      scope = Object.freeze({
-        ...proof.task,
-        mode,
-        custodyToken,
-        kind: "generation_terminal" as const,
-        [terminalBrand]: true as const,
-      });
-      const binding = z
-        .strictObject({
-          transaction: z.string().regex(/^[0-9]+$/u),
-          pid: z.int().positive(),
-        })
-        .parse(
-          (
-            await client.query(
-              "SELECT pg_current_xact_id()::text AS transaction,pg_backend_pid() AS pid",
+      return await generationTransaction(this.pool, signal, async (client) => {
+        try {
+          await this.begin(client);
+          const raw = (
+            await client.query<{ proof: unknown }>(
+              "SELECT creator.begin_generation_terminal($1,$2,$3,$4,$5,$6) AS proof",
+              [
+                generationId,
+                custodyToken,
+                mode,
+                mode === "completion" ? intent.task.workerToken : null,
+                sequence,
+                mode === "completion" ? intent.failed : true,
+              ],
             )
-          ).rows[0],
-        );
-      this.issued.set(scope, { client, nonce: proof.nonce, ...binding });
-      await this.authorizeInTransaction(scope, client);
-      const value = await work(client, scope);
-      await this.configuration.assertSettledInTransaction(client, scope);
-      await this.configuration.assertRestoredInTransaction(client);
-      await this.authorizeInTransaction(scope, client, true);
-      await client.query("SELECT creator.end_generation_terminal()");
-      await this.assertCatalogue(client);
-      this.issued.delete(scope);
-      await client.query("COMMIT");
-      return value;
+          ).rows[0]?.proof;
+          const proof = z
+            .strictObject({
+              nonce: z.uuid(),
+              mode: z.enum(["completion", "reconciliation"]),
+              custodyToken: z.uuid(),
+              task: terminalTask,
+            })
+            .parse(raw);
+          invariant(
+            proof.mode === mode &&
+              proof.custodyToken === custodyToken &&
+              proof.task.generationId === generationId &&
+              proof.task.lastSequence === sequence,
+            "generation_terminal_changed",
+            "The original settlement cursor changed.",
+          );
+          if (mode === "completion") {
+            const expected = intent.task;
+            for (const field of [
+              "threadId",
+              "creatorId",
+              "fanId",
+              "initiatingAccountId",
+              "initiatingSessionId",
+              "creatorAccountId",
+              "fanMessageId",
+              "aiMessageId",
+              "grantId",
+              "reservationId",
+              "epoch",
+              "contextRevision",
+              "processorConsentVersion",
+            ] as const)
+              invariant(
+                canonical(proof.task[field]) === canonical(expected[field]),
+                "generation_terminal_changed",
+                "The original generation family changed.",
+              );
+            invariant(
+              proof.task.originalWorkerToken === expected.workerToken &&
+                proof.task.originalLeaseUntil ===
+                  new Date(expected.leaseUntil).toISOString(),
+              "generation_terminal_changed",
+              "The original generation lease changed.",
+            );
+          }
+          scope = Object.freeze({
+            ...proof.task,
+            mode,
+            custodyToken,
+            kind: "generation_terminal" as const,
+            [terminalBrand]: true as const,
+          });
+          const binding = z
+            .strictObject({
+              transaction: z.string().regex(/^[0-9]+$/u),
+              pid: z.int().positive(),
+            })
+            .parse(
+              (
+                await client.query(
+                  "SELECT pg_current_xact_id()::text AS transaction,pg_backend_pid() AS pid",
+                )
+              ).rows[0],
+            );
+          this.issued.set(scope, { client, nonce: proof.nonce, ...binding });
+          await this.authorizeInTransaction(scope, client);
+          const value = await work(client, scope);
+          await this.configuration.assertSettledInTransaction(client, scope);
+          await this.configuration.assertRestoredInTransaction(client);
+          await this.authorizeInTransaction(scope, client, true);
+          await client.query("SELECT creator.end_generation_terminal()");
+          await this.assertCatalogue(client);
+          this.issued.delete(scope);
+          return value;
+        } finally {
+          if (scope) this.issued.delete(scope);
+        }
+      });
     } catch (error) {
-      await client.query("ROLLBACK");
       return this.failure(error);
-    } finally {
-      if (scope) this.issued.delete(scope);
-      client.release();
     }
   }
 

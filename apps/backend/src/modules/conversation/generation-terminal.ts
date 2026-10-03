@@ -79,6 +79,21 @@ const Columns = {
   },
 } as const;
 
+function unavailable(cause?: unknown): never {
+  const error = new DomainError(
+    "generation_finalization_unconfigured",
+    "Reviewed conversation terminal finalization is not installed.",
+    503,
+  );
+  if (cause !== undefined)
+    Object.defineProperty(error, "cause", {
+      value: cause,
+      configurable: true,
+      writable: true,
+    });
+  throw error;
+}
+
 /** Fixed original-output finalization. W1 owns this held transaction and
  * requires genuine W2/W4 settlement before COMMIT. This consumer supplies no
  * ThreadScope, Actor, input, provider call or financial result. */
@@ -160,57 +175,129 @@ export class PreparedGenerationConversationTerminal {
         catalogueChecksum: input.catalogueChecksum,
       }),
     );
+    for (const pool of [input.hostPool, input.workerPool])
+      invariant(
+        Number.isSafeInteger(pool.options.connectionTimeoutMillis) &&
+          pool.options.connectionTimeoutMillis! > 0 &&
+          pool.options.connectionTimeoutMillis! <= 5000 &&
+          pool.options.pipeline !== true,
+        "generation_finalization_pool_mismatch",
+        "Use bounded original non-pipelined host and worker pools.",
+      );
+    const signal = AbortSignal.timeout(15_000);
     const client = await input.workerPool.connect();
-    let transactionStarted = false;
     let discardClient = true;
+    let failed = false;
+    let failure: unknown;
+    const transport: unknown[] = [];
+    const cleanup: unknown[] = [];
+    let ending: Promise<void> | undefined;
+    const endSource = () =>
+      (ending ??= client.end().catch((cause: unknown) => {
+        cleanup.push(cause);
+      }));
+    const onError = (cause: Error) => {
+      transport.push(cause);
+      discardClient = true;
+    };
+    const abort = () => {
+      discardClient = true;
+      // Qualification reads metadata only. Close its exact original socket,
+      // including an uncertain BEGIN/read; never guess a PID or queue SQL.
+      void endSource();
+    };
+    client.on("error", onError);
+    signal.addEventListener("abort", abort, { once: true });
+    const bounded = (text: string) => ({ text, query_timeout: 5000 });
     try {
+      signal.throwIfAborted();
+      if (client.pipeline) unavailable();
       // W1's catalogue proof deliberately requires a caller-held transaction.
       // Qualification reads metadata only and must leave no scope or GUC state
       // behind for the next worker borrowing this connection.
-      await client.query("BEGIN ISOLATION LEVEL READ COMMITTED READ ONLY");
-      transactionStarted = true;
+      const begun = await client.query(
+        bounded("BEGIN ISOLATION LEVEL READ COMMITTED READ ONLY"),
+      );
+      invariant(
+        begun.command === "BEGIN",
+        "generation_finalization_unconfigured",
+        "The actual original read-only transaction is required.",
+      );
       discardClient = false;
+      signal.throwIfAborted();
+      if (transport.length) throw transport[0];
       await client.query(
-        `SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','1000',true),
+        bounded(`SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','1000',true),
          set_config('idle_in_transaction_session_timeout','5000',true),
          set_config('app.account_id','',true),set_config('app.identity_session_id','',true),
          set_config('app.creator_id','',true),set_config('app.fan_id','',true),
-         set_config('generation.scope_nonce','',true)`,
+         set_config('generation.scope_nonce','',true),set_config('generation.terminal_nonce','',true)`),
       );
       const hostDatabase = (
         await input.hostPool.query<{ databaseOid: number }>(
-          'SELECT oid AS "databaseOid" FROM pg_database WHERE datname=current_database()',
+          bounded(
+            'SELECT oid AS "databaseOid" FROM pg_database WHERE datname=current_database()',
+          ),
         )
       ).rows[0];
       const workerDatabase = (
         await client.query<{ databaseOid: number }>(
-          'SELECT oid AS "databaseOid" FROM pg_database WHERE datname=current_database()',
+          bounded(
+            'SELECT oid AS "databaseOid" FROM pg_database WHERE datname=current_database()',
+          ),
         )
       ).rows[0];
       invariant(
-        hostDatabase?.databaseOid === workerDatabase?.databaseOid,
+        workerDatabase !== undefined &&
+          Number.isSafeInteger(workerDatabase.databaseOid) &&
+          workerDatabase.databaseOid > 0 &&
+          hostDatabase?.databaseOid === workerDatabase.databaseOid,
         "generation_finalization_pool_mismatch",
         "Use the same actual canonical database.",
       );
       await prepared.assertCustody(client);
+      signal.throwIfAborted();
+      if (transport.length) throw transport[0];
       // A failed qualification rollback must also refuse the factory result.
       discardClient = true;
-      await client.query("ROLLBACK");
-      transactionStarted = false;
+      const rolledBack = await client.query(bounded("ROLLBACK"));
+      invariant(
+        rolledBack.command === "ROLLBACK",
+        "generation_finalization_unconfigured",
+        "The actual metadata rollback receipt is required.",
+      );
       discardClient = false;
-      return prepared;
+    } catch (cause) {
+      failed = true;
+      failure = cause;
+      // Every failed qualification closes instead of queueing another command.
+      // A wrapped uncertain response or failed ROLLBACK is never retried.
+      discardClient = true;
     } finally {
-      if (transactionStarted) {
-        try {
-          await client.query("ROLLBACK");
-        } catch {
-          // Preserve the qualification error, but never return uncertain
-          // transaction custody to the pool.
-          discardClient = true;
-        }
+      signal.removeEventListener("abort", abort);
+      discardClient ||= signal.aborted || transport.length > 0;
+      if (discardClient || ending) await endSource();
+      try {
+        client.release(discardClient);
+      } catch (cause) {
+        cleanup.push(cause);
+      } finally {
+        client.removeListener("error", onError);
       }
-      client.release(discardClient);
     }
+    if (failed || transport.length || cleanup.length || signal.aborted)
+      unavailable(
+        new AggregateError(
+          [
+            ...(failed ? [failure] : []),
+            ...transport,
+            ...cleanup,
+            ...(signal.aborted ? [signal.reason] : []),
+          ],
+          "Original terminal metadata qualification and settlement failed",
+        ),
+      );
+    return prepared;
   }
 
   /** Recheck actual live custody on the original worker client. Factory
@@ -288,12 +375,8 @@ export class PreparedGenerationConversationTerminal {
           this.custody.catalogueChecksum
       )
         throw new Error("Unreviewed W3 terminal-only custody");
-    } catch {
-      throw new DomainError(
-        "generation_finalization_unconfigured",
-        "Reviewed conversation terminal finalization is not installed.",
-        503,
-      );
+    } catch (cause) {
+      unavailable(cause);
     }
   }
 

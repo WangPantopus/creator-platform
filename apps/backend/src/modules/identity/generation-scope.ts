@@ -3,8 +3,18 @@ import type { Pool, PoolClient } from "pg";
 import { z } from "zod";
 import { canonical } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
+import {
+  assertGenerationOutputCursorCatalogue,
+  generationOutputCursorSource,
+  generationOutputCursorSignature,
+} from "./generation-output-cursor.js";
+import { registeredMigration } from "../../db/reviewed-migration.js";
 import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import { assertCurrentSession, requestAuthority } from "./request-authority.js";
+import {
+  assertGenerationPoolCustody,
+  generationTransaction,
+} from "./generation-transaction.js";
 
 export const GENERATION_SCOPE_MIGRATION = "0159_w1_generation_worker_scope";
 const Hash = z.string().regex(/^[a-f0-9]{64}$/u);
@@ -113,6 +123,22 @@ export type GenerationTask = Readonly<z.infer<typeof taskSchema>>;
 const generationBrand: unique symbol = Symbol("GenerationTaskScope");
 export type GenerationTaskScope = GenerationTask &
   Readonly<{ [generationBrand]: true; kind: "generation" }>;
+const outputCursorSchema = z.strictObject({
+  generationId: z.uuid(),
+  messageId: z.uuid(),
+  sequence: z.int().min(1).max(1024),
+  cursor: z.int().positive(),
+});
+export type GenerationOutputCursor = Readonly<
+  z.infer<typeof outputCursorSchema>
+>;
+type GenerationScopeBinding = {
+  client: PoolClient;
+  nonce: string;
+  transaction: string;
+  pid: number;
+  current: GenerationTaskScope;
+};
 
 export type GenerationRestriction = (
   client: PoolClient,
@@ -344,7 +370,7 @@ async function assertGenerationCatalogue(
 export class GenerationIdentityAuthority {
   private readonly issued = new WeakMap<
     GenerationTaskScope,
-    { client: PoolClient; nonce: string; transaction: string; pid: number }
+    GenerationScopeBinding
   >();
   private constructor(
     private readonly pool: Pool,
@@ -379,6 +405,7 @@ export class GenerationIdentityAuthority {
     /** Separate fixed settlement registry. No original-scope grant is added. */
     terminalConsumers?: readonly GenerationTerminalPurposeConsumer[];
   }): Promise<GenerationIdentityAuthority> {
+    assertGenerationPoolCustody(configuration.pool);
     const input = Object.freeze({
       ...configuration,
       migration: Object.freeze({ ...configuration.migration }),
@@ -446,12 +473,14 @@ export class GenerationIdentityAuthority {
         consumers,
         terminalConsumers,
       });
-    } catch {
-      throw new DomainError(
+    } catch (cause) {
+      const failure = new DomainError(
         "generation_scope_unconfigured",
         "The reviewed generation purpose authority is not installed.",
         503,
       );
+      failure.cause = cause;
+      throw failure;
     }
     const frozenConsumers = Object.freeze(
       consumers.map((consumer) =>
@@ -530,17 +559,18 @@ export class GenerationIdentityAuthority {
     await client.query("RELEASE SAVEPOINT w1_generation_catalogue");
     try {
       await assertGenerationCatalogue(client, this.configuration.catalogue);
-    } catch {
-      throw new DomainError(
+    } catch (cause) {
+      const failure = new DomainError(
         "generation_scope_unconfigured",
         "The current reviewed generation catalogue is unavailable.",
         503,
       );
+      failure.cause = cause;
+      throw failure;
     }
   }
 
   private async begin(client: PoolClient): Promise<void> {
-    await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
     await client.query(
       `SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','1000',true),
        set_config('idle_in_transaction_session_timeout','5000',true),
@@ -585,92 +615,91 @@ export class GenerationIdentityAuthority {
   }
 
   /** Discovery is not permission to read a thread or admit a provider. */
-  async pendingTasks(limit = 20): Promise<readonly string[]> {
+  async pendingTasks(
+    limit = 20,
+    signal?: AbortSignal,
+  ): Promise<readonly string[]> {
     this.assertWorker();
     const bounded = z.int().min(1).max(64).parse(limit);
-    const client = await this.pool.connect();
     try {
-      await this.begin(client);
-      await this.configuration.assertDiscoveryAllowed(client);
-      const rows = await client.query<{ id: unknown }>(
-        "SELECT id FROM creator.pending_generation_tasks($1) AS id",
-        [bounded],
-      );
-      const ids = Object.freeze(
-        z
-          .array(z.uuid())
-          .max(bounded)
-          .parse(rows.rows.map((row) => row.id)),
-      );
-      await this.configuration.assertDiscoveryAllowed(client);
-      await this.assertCatalogueInTransaction(client);
-      await client.query("COMMIT");
-      return ids;
+      return await generationTransaction(this.pool, signal, async (client) => {
+        await this.begin(client);
+        await this.configuration.assertDiscoveryAllowed(client);
+        const rows = await client.query<{ id: unknown }>(
+          "SELECT id FROM creator.pending_generation_tasks($1) AS id",
+          [bounded],
+        );
+        const ids = Object.freeze(
+          z
+            .array(z.uuid())
+            .max(bounded)
+            .parse(rows.rows.map((row) => row.id)),
+        );
+        await this.configuration.assertDiscoveryAllowed(client);
+        await this.assertCatalogueInTransaction(client);
+        return ids;
+      });
     } catch (error) {
-      await client.query("ROLLBACK");
       return this.failure(error);
-    } finally {
-      client.release();
     }
   }
 
   /** The server chooses a fresh token for each claim; a known job ID alone
    * never supplies acceptance, current session or generation permission. */
-  async claimTask(generationId: string): Promise<GenerationTask | null> {
+  async claimTask(
+    generationId: string,
+    signal?: AbortSignal,
+  ): Promise<GenerationTask | null> {
     this.assertWorker();
     const intent = Object.freeze({
       generationId: z.uuid().parse(generationId),
       workerToken: randomUUID(),
     });
-    const client = await this.pool.connect();
     try {
-      await this.begin(client);
-      await this.configuration.assertAllowed(client, intent);
-      const proof = (
-        await client.query<{ proof: unknown }>(
-          "SELECT creator.claim_generation_task($1,$2) AS proof",
-          [intent.generationId, intent.workerToken],
-        )
-      ).rows[0]?.proof;
-      if (proof == null) {
+      return await generationTransaction(this.pool, signal, async (client) => {
+        await this.begin(client);
+        await this.configuration.assertAllowed(client, intent);
+        const proof = (
+          await client.query<{ proof: unknown }>(
+            "SELECT creator.claim_generation_task($1,$2) AS proof",
+            [intent.generationId, intent.workerToken],
+          )
+        ).rows[0]?.proof;
+        if (proof == null) {
+          await this.assertCatalogueInTransaction(client);
+          return null;
+        }
+        const task = Object.freeze(taskSchema.parse(proof));
+        invariant(
+          task.generationId === intent.generationId &&
+            task.workerToken === intent.workerToken &&
+            task.lastSequence === 0,
+          "generation_claim_changed",
+          "The generation claim changed.",
+        );
+        // Re-enter the actual read purpose before committing the claim. This
+        // bookends wall-clock/session/denial currentness with no new positive lease.
+        await this.configuration.assertAllowed(client, intent);
+        const read = (
+          await client.query<{ proof: unknown }>(
+            "SELECT creator.begin_generation_scope($1,$2) AS proof",
+            [task.generationId, task.workerToken],
+          )
+        ).rows[0]?.proof;
+        const checked = z
+          .strictObject({ nonce: z.uuid(), task: taskSchema })
+          .parse(read);
+        invariant(
+          canonical(checked.task) === canonical(task),
+          "generation_claim_changed",
+          "The generation claim changed.",
+        );
+        await client.query("SELECT creator.end_generation_scope()");
         await this.assertCatalogueInTransaction(client);
-        await client.query("COMMIT");
-        return null;
-      }
-      const task = Object.freeze(taskSchema.parse(proof));
-      invariant(
-        task.generationId === intent.generationId &&
-          task.workerToken === intent.workerToken &&
-          task.lastSequence === 0,
-        "generation_claim_changed",
-        "The generation claim changed.",
-      );
-      // Re-enter the actual read purpose before committing the claim. This
-      // bookends wall-clock/session/denial currentness with no new positive lease.
-      await this.configuration.assertAllowed(client, intent);
-      const read = (
-        await client.query<{ proof: unknown }>(
-          "SELECT creator.begin_generation_scope($1,$2) AS proof",
-          [task.generationId, task.workerToken],
-        )
-      ).rows[0]?.proof;
-      const checked = z
-        .strictObject({ nonce: z.uuid(), task: taskSchema })
-        .parse(read);
-      invariant(
-        canonical(checked.task) === canonical(task),
-        "generation_claim_changed",
-        "The generation claim changed.",
-      );
-      await client.query("SELECT creator.end_generation_scope()");
-      await this.assertCatalogueInTransaction(client);
-      await client.query("COMMIT");
-      return task;
+        return task;
+      });
     } catch (error) {
-      await client.query("ROLLBACK");
       return this.failure(error);
-    } finally {
-      client.release();
     }
   }
 
@@ -679,67 +708,157 @@ export class GenerationIdentityAuthority {
   async withGeneration<T>(
     input: GenerationTask,
     work: (client: PoolClient, scope: GenerationTaskScope) => Promise<T>,
+    signal?: AbortSignal,
   ): Promise<T> {
     this.assertWorker();
     const task = Object.freeze(taskSchema.parse(input));
-    const client = await this.pool.connect();
     let scope: GenerationTaskScope | undefined;
+    let held: GenerationScopeBinding | undefined;
     try {
-      await this.begin(client);
-      await this.configuration.assertAllowed(client, task);
-      const raw = (
-        await client.query<{ proof: unknown }>(
-          "SELECT creator.begin_generation_scope($1,$2) AS proof",
-          [task.generationId, task.workerToken],
-        )
-      ).rows[0]?.proof;
-      const proof = z
-        .strictObject({ nonce: z.uuid(), task: taskSchema })
-        .parse(raw);
-      // Only the job's own sequence may advance between purpose transactions.
-      // W3 still supplies its exact expected cursor at each business fence.
-      const { lastSequence: originalSequence, ...originalIntent } = task;
-      const { lastSequence: currentSequence, ...currentIntent } = proof.task;
-      invariant(
-        canonical(originalIntent) === canonical(currentIntent) &&
-          currentSequence >= originalSequence,
-        "generation_task_changed",
-        "The generation task ended or changed.",
-      );
-      scope = Object.freeze({
-        ...proof.task,
-        [generationBrand]: true as const,
-        kind: "generation" as const,
-      });
-      const binding = z
-        .strictObject({
-          transaction: z.string().regex(/^[0-9]+$/u),
-          pid: z.int().positive(),
-        })
-        .parse(
-          (
-            await client.query(
-              "SELECT pg_current_xact_id()::text AS transaction,pg_backend_pid() AS pid",
+      return await generationTransaction(this.pool, signal, async (client) => {
+        try {
+          await this.begin(client);
+          await this.configuration.assertAllowed(client, task);
+          const raw = (
+            await client.query<{ proof: unknown }>(
+              "SELECT creator.begin_generation_scope($1,$2) AS proof",
+              [task.generationId, task.workerToken],
             )
-          ).rows[0],
-        );
-      this.issued.set(scope, { client, nonce: proof.nonce, ...binding });
-      await this.authorizeInTransaction(scope, client);
-      const value = await work(client, scope);
-      await this.configuration.assertAllowed(client, task);
-      await this.authorizeInTransaction(scope, client);
-      await client.query("SELECT creator.end_generation_scope()");
-      this.issued.delete(scope);
-      await this.assertCatalogueInTransaction(client);
-      await client.query("COMMIT");
-      return value;
+          ).rows[0]?.proof;
+          const proof = z
+            .strictObject({ nonce: z.uuid(), task: taskSchema })
+            .parse(raw);
+          // Only the job's own sequence may advance between purpose transactions.
+          // W3 still supplies its exact expected cursor at each business fence.
+          const { lastSequence: originalSequence, ...originalIntent } = task;
+          const { lastSequence: currentSequence, ...currentIntent } =
+            proof.task;
+          invariant(
+            canonical(originalIntent) === canonical(currentIntent) &&
+              currentSequence >= originalSequence,
+            "generation_task_changed",
+            "The generation task ended or changed.",
+          );
+          scope = Object.freeze({
+            ...proof.task,
+            [generationBrand]: true as const,
+            kind: "generation" as const,
+          });
+          const binding = z
+            .strictObject({
+              transaction: z.string().regex(/^[0-9]+$/u),
+              pid: z.int().positive(),
+            })
+            .parse(
+              (
+                await client.query(
+                  "SELECT pg_current_xact_id()::text AS transaction,pg_backend_pid() AS pid",
+                )
+              ).rows[0],
+            );
+          held = { client, nonce: proof.nonce, ...binding, current: scope };
+          this.issued.set(scope, held);
+          await this.authorizeInTransaction(scope, client);
+          const value = await work(client, scope);
+          await this.configuration.assertAllowed(client, held.current);
+          await this.authorizeInTransaction(held.current, client);
+          await client.query("SELECT creator.end_generation_scope()");
+          this.issued.delete(held.current);
+          await this.assertCatalogueInTransaction(client);
+          return value;
+        } finally {
+          if (scope) this.issued.delete(scope);
+          if (held) this.issued.delete(held.current);
+        }
+      });
     } catch (error) {
-      await client.query("ROLLBACK");
       return this.failure(error);
-    } finally {
-      if (scope) this.issued.delete(scope);
-      client.release();
     }
+  }
+
+  /** Issue the updated immutable view only after the real W3 writer refreshed
+   * the original SQL task. A frame/cast alone cannot advance a cursor. Prior
+   * committed idempotent output already has its current view and must not use
+   * this own +1 port. Original nonce/fullXID/PID/intent/deadline stay unchanged.
+   */
+  async refreshAfterOutput(
+    scope: GenerationTaskScope,
+    client: PoolClient,
+    input: GenerationOutputCursor,
+  ): Promise<GenerationTaskScope> {
+    await this.authorizeInTransaction(scope, client);
+    const binding = this.issued.get(scope)!;
+    const output = outputCursorSchema.parse(input);
+    invariant(
+      output.generationId === scope.generationId &&
+        output.messageId === scope.aiMessageId &&
+        output.sequence === scope.lastSequence + 1,
+      "generation_output_cursor_changed",
+      "Use the actual next original sentence cursor.",
+    );
+    const migration = await registeredMigration(generationOutputCursorSource);
+    const consumer = this.configuration.consumers.find(
+      (entry) =>
+        entry.signature === generationOutputCursorSignature &&
+        entry.owner === "creator_generation_cursor_authority" &&
+        entry.migration.version === migration?.version &&
+        entry.migration.checksum === migration?.checksum,
+    );
+    if (!migration || !consumer)
+      throw new DomainError(
+        "generation_output_cursor_unconfigured",
+        "The reviewed original output cursor is unavailable.",
+        503,
+      );
+    this.assertConsumerRegistered(consumer);
+    await this.configuration.assertAllowed(client, scope);
+    await assertGenerationOutputCursorCatalogue(client);
+    const proof = z
+      .strictObject({
+        nonce: z.uuid(),
+        task: taskSchema,
+        ...outputCursorSchema.shape,
+      })
+      .parse(
+        (
+          await client.query<{ proof: unknown }>(
+            "SELECT creator.generation_output_cursor_view($1,$2,$3,$4) AS proof",
+            [
+              scope.generationId,
+              scope.workerToken,
+              output.sequence,
+              output.cursor,
+            ],
+          )
+        ).rows[0]?.proof,
+      );
+    const nextSequence = proof.task.lastSequence;
+    invariant(
+      binding.current === scope &&
+        this.issued.get(scope) === binding &&
+        proof.nonce === binding.nonce &&
+        scope.lastSequence + 1 === nextSequence &&
+        nextSequence === output.sequence &&
+        proof.generationId === output.generationId &&
+        proof.messageId === output.messageId &&
+        proof.sequence === output.sequence &&
+        proof.cursor === output.cursor &&
+        canonical({ ...scope, lastSequence: nextSequence }) ===
+          canonical({ ...proof.task, kind: scope.kind }),
+      "generation_output_cursor_changed",
+      "The original output or purpose binding changed.",
+    );
+    const current = Object.freeze({
+      ...proof.task,
+      [generationBrand]: true as const,
+      kind: "generation" as const,
+    });
+    this.issued.delete(scope);
+    binding.current = current;
+    this.issued.set(current, binding);
+    await this.authorizeInTransaction(current, client);
+    await this.configuration.assertAllowed(client, current);
+    return current;
   }
 
   /** Genuine issued object, exact held client, private transaction/PID/nonce
@@ -751,7 +870,7 @@ export class GenerationIdentityAuthority {
     this.assertWorker();
     const binding = this.issued.get(scope);
     invariant(
-      binding?.client === client,
+      binding?.client === client && binding.current === scope,
       "generation_scope_required",
       "Use the current generation purpose transaction.",
     );
