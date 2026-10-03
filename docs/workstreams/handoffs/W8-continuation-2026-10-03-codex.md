@@ -2,6 +2,14 @@
 
 The human requested a seamless handoff at the best stopping point. W8 finishes and pushes the current Commerce-source reuse increment, independently checks current closed database metadata and preservation, normally stops its own container, and prepares this checkpoint. **The entire workstream is incomplete.** This file supersedes older operational facts when they conflict; it does not reduce the original assignment or convert held work into acceptance.
 
+## Post-handoff source consolidation — October 3, 23:42 UTC
+
+GitHub independently confirms that W5 [304](https://github.com/WangPantopus/creator-platform/pull/304) closes **unmerged at23:42:07 UTC**, retained head `b919869200489b3f224896f0894a9cf6dfce4a82`. Current retained W1 [74](https://github.com/WangPantopus/creator-platform/pull/74) is `dc461fc7fdfcb4a451dbbcf42d7a35a958dcd2dd`. W8 independently compares Git blobs and confirms **all three production files** from304 are byte-identical there: ContentHeldClient, Content service and Trust reply-review. This records source consolidation only; W8 has not read/qualified the new whole coupled delta or imported it, and no0156/task/C10/application acceptance transfers. The originala3 rollback helper remains an explicit next source-review dependency. Do not reopen304 or recreate its patch.
+
+Current inventory is **36 open PRs, all drafts**, with W5 retaining288/302; the37-head snapshots below describe the initial handoff and remain preserved. Main remains5c08634b and W8 functional source remainse575. W5's committed successor is288/`51e5105a39ae21afe3ba954850cd5d353a4b5882`: read `W5-continuation-2026-10-03.md` and `W5-successor-2026-10-03.md` from its branch. It reports all own resources closed and no full package accepted. Paused native WIPea2b9d25 is published and unqualified.
+
+Additional owner successor locations received after initial handoff: W3 `W3-mac-studio-2026-10-03.md` and `W3-takeover-2026-10-03.md`, record63/82c9abff and182/a3a42678 with original functional4d085a8f; W4 record303/6a82fc12 with the filenames recorded below; W7 `W7-2026-10-03-next.md` and `W7-handoff-2026-10-03.md`, record31/c052ef67 and functionalcca526fe. W3 explicitly records forced web cleanup after25seconds, not normal shutdown acceptance. W7 archives its clean managed checkout while preserving remote source/private inputs/products/evidence; restore or use its published branch after a fresh ownership audit. These are attributed owner custody updates, not W8 acceptance. W6 updates its records with W8's exact published handoff reference. No W8 runtime/resource is restarted for this documentation increment.
+
 ## Start with these exact facts
 
 Use `/Users/yingpengwang/estimate-rescue/creator-platform/w8-trust-operations-3e30cd` explicitly. The chat default `/Users/yingpengwang/.codex/worktrees/24c3/creator-platform` is not the W8 checkout. Preserve `/Users/yingpengwang/creator-platform`; do not reset or clean it. Its tracked main is clean at `5c08634b7542fef95dd6c176030a785845250c62`, and the unrelated untracked `docs/research/qelvora-cost-revenue-model.xlsx` remains byte-identical, SHA256 `98571735dcd8dd278c424a463f5998988078065228fc716282cdd84e5383995b`.
@@ -81,7 +89,7 @@ Fresh inventory has **37 open PRs, all drafts, oldest #21**. Five earlier normal
 | W2    | 132,279                             | `01a0ff22-a30c-7da0-8d71-d061cb1deb83` |
 | W4    | 213,247,262,298,301,303             | `01a0ff23-bcca-70e0-afa5-89d2054f48ab` |
 | W6    | 282,284,289,305                     | `01a0ff24-a97e-79a2-8886-3fe67465bca3` |
-| W5    | 288,302,304                         | `01a0ff24-49de-7a91-95e9-ea6f58bce9c8` |
+| W5    | 288,302 (304 closed)                | `01a0ff24-49de-7a91-95e9-ea6f58bce9c8` |
 
 The private full inventories `open-pr-current-20261003-handoff-private.json` and `open-pr-current-20261003-handoff-final-private.json` preserve exact current source at their captures; peers continue updating. Refresh GitHub rather than carrying table-head assumptions. Current201/753eb has **all11 CI checks successful**, yet protected original Task/export/download acceptance remains unfinished and the owner explicitly retains draft. Other W8 drafts have queued Mac jobs; new e575/documentation heads need fresh checks. Prior Android Gradle distribution HTTP503 and10000ms download timeout are precompile failures, not failed application assertions, but remain failed checks. No runner labels, baselines, fixture tolerance or security gate is changed. Repository main has no branch protection/ruleset; that does not waive human end-to-end qualification.
 
