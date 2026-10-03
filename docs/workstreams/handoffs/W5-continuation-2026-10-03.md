@@ -41,9 +41,13 @@ In particular, closed293's complete executable/config/CI/lockfile tree is alread
 in actual W1 completion source; only three W5 documents differed. Do not rebuild
 that producer or create another native Team implementation.
 
-W5 retains existing288 (Team/role consumer),302 (original group worker consumer)
-and304 (reply-review original settlement). Fresh snapshot captures their actual
-heads, bases and check state. Queued/in-progress, older-head and missing CI are
+W5 retains existing288 (Team/role consumer) and302 (original group worker
+consumer). After the frozen37-PR snapshot, original W1 #74 atdc461fc7 reused
+ALL THREE unique304 production files byte for byte. W5 independently verified
+complete original-delta custody, then closed304 unmerged at23:42:07Z. Current
+queue is36 drafts,43→36 by source reuse/consolidation; still no new main merge.
+The snapshot preserves its original captured heads and a separate post-capture
+source disposition. Retained304 source/history and evidence remain available. Queued/in-progress, older-head and missing CI are
 not passes. Some peer drafts have green CI but still lack required real product
 acceptance. Review exact functional deltas and relevant actual operation before
 ordinary merges. Never use admin, blanket ready marking or a protection bypass.
@@ -96,11 +100,18 @@ and actual withheld rollback responses passed bounded metadata operation:
 replacement pools healthy. Both61/closed57 all six custody hashes unchanged,
 original57 dump matches and43435 closed. Unexpected-command branch is source
 qualified, not a fabricated-wire experiment. No0156 review/signing/privacy receipt.
-Final exact74/8cf audit confirms HeldClient reused but304 service.ts and
-trust/reply-review.ts remain unique: original withRequestContextRestore, preserved
-raw failure cause, unknown-response escape before savepoint cleanup and RELEASE
-failure escape. Current304 is DIRTY against advancing74; reconcile without losing
-these protections. It is not a duplicate merely because its shared helper is reused.
+The earlier exact74/8cf audit correctly found service.ts and Trust reply-review
+protections still unique despite shared HeldClient reuse. Subsequently original
+W1 #74 atdc461fc7fdfcb4a451dbbcf42d7a35a958dcd2dd reused BOTH remaining files
+exactly: withRequestContextRestore, preserved raw private cause, unknown-response
+escape before savepoint cleanup and RELEASE-failure escape. W5 independently
+verified all three whole-file hashes and the complete original six-path delta.
+The remaining three original paths are W5 evidence/status/coordination documents.
+304 closed unmerged23:42:07Z as superseded source, retaining b919 branch/history
+and the exact original run record, now also copied into this handoff branch.
+This is consolidation into the still-held owner PR, not main or0156 acceptance.
+Continue genuine review acceptance through the actual current W1/W8 source;
+never lose these protections or borrow old wire observations for later source.
 Private fresh evidence: `w5-20261003/rollback-receipt-current/`.
 
 **302 branch:** `codex/w5-group-worker-consumer-20261003`, actual
@@ -250,7 +261,7 @@ No source/acceptance implementation may be delegated, and no subagents here.
 
 | Owner | Current chat                         | Relevant current handoff/source                                                                                                                                                                                                        |
 | ----- | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| W1    | 01a0ff21-c27d-7b62-9d6e-870b4eb44c19 | Actual74/8cf7e5dd, original21/85ac; f42 original-signal contract. Proof/208/nativeDaily remain genuine owner work; discover new handoff.                                                                                               |
+| W1    | 01a0ff21-c27d-7b62-9d6e-870b4eb44c19 | Actual74/dc461fc7, original21/85ac; f42 original-signal contract. Proof/208/nativeDaily remain genuine owner work; discover new handoff.                                                                                               |
 | W2    | 01a0ff22-a30c-7da0-8d71-d061cb1deb83 | Final132/2d92c0a1, functionalc3d6918; W2-creator-ai-20261003-mac-studio.md and continuation-prompt handoff. No borrowed acceptance.                                                                                                    |
 | W3    | 01a0ff23-0f0c-7852-8d0f-c3e72e8562ce | Final63/82c9abff and182/a3a42678, functional4d085a8f; W3-mac-studio-2026-10-03.md and W3-takeover-2026-10-03.md. Resources closed; no borrowed native acceptance. Original historical System host retained.                            |
 | W4    | 01a0ff23-bcca-70e0-afa5-89d2054f48ab | Final262/27cde2b0,303/6a82fc12; W4-continuation-handoff-2026-10-03-afternoon.md + W4-next-agent-2026-10-03.md. Actual original signal source retained; all six drafts now reuse a3 cleanup leaf.                                       |

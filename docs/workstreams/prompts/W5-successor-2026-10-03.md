@@ -37,9 +37,13 @@ AI-source approval; public/group answers; Team/roles/settings; This helped,
 Thanks, Impact and tenure. None is fully accepted or release-ready.
 
 Continue existing PR work first. The complete oldest-first audit and all-seven
-coordination reduced43→37 by source reuse. Nine earlier W5 increments are merged
+coordination reduced43→36 by source reuse, including final304 closure after
+complete original-owner reuse; the frozen snapshot records the earlier37.
+Nine earlier W5 increments are merged
 (207/211/222/227/229/231/251/269/246), but no new main merge in this review phase.
-W5 owns existing288/302/304. Closed293 is executable-byte-identical to retained
+W5 owns existing288/302. Closed304 source is reused in actual W1 #74/dc461fc7
+and its retained b919 branch/evidence remains required historical custody.
+Closed293 is executable-byte-identical to retained
 W1 completion source; DO NOT duplicate its native Team producer. Human authorized
 coordination about these PRs. Review exact diffs and relevant personally operated
 acceptance; merge ready work normally, without admin or queued-as-pass claims.
@@ -60,10 +64,13 @@ real read-only original PostgreSQL normal/lost-response operation pass in their
 exact bounds; both61/closed57 six custody hashes match. It is NOT actual0156
 product review, privacy/C10 receipt or signed/private fan acceptance. Reuse its
 actual leaf SHA22557a38e20f908fac9fb734b21759647ee5ca34246227168550600b6bee3989
-instead of creating another cleanup helper. Current74/8cf already reuses the
-helper, but304 service/trust-reply cause/restoration/unknown/savepoint protections
-remain UNIQUE. Reconcile the advancing W1 base; do not close304 as a duplicate
-or discard those protections merely because HeldClient matches.
+instead of creating another cleanup helper. The earlier74/8cf helper-only reuse
+left service/Trust protections unique. Actual74/dc461fc7 now reuses ALL THREE
+production files byte for byte, independently verified by W5 before closing304
+unmerged23:42:07Z. Continue through genuine current W1/W8 source, preserving
+original request-context restoration/private cause/unknown/savepoint/RELEASE
+protections. Never transfer the primitive observations to later source or treat
+source consolidation as actual0156/private-fan acceptance.
 
 302 stays b5200006 with original genuine positive gates held. Consume W1 actual
 f42d14e originalSignalInTransaction and FOURTH withPublication signal argument,
