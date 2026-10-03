@@ -33,7 +33,6 @@ import {
   developmentProofReference,
 } from "../../../../packages/api/src/agent/contracts";
 import "./creator-ai.css";
-import { sessionChannel } from "../identity/session-boundary";
 
 type ErrorBody = { error?: { code: string; message: string } };
 type CreatorAIIdentity = Readonly<{
@@ -106,17 +105,6 @@ function purgeStoredDrafts(accountId?: string, sessionId?: string) {
         localStorage.removeItem(key);
   } catch {
     /* Unavailable storage cannot restore a draft. */
-  }
-}
-let draftSessionEnds: BroadcastChannel | undefined;
-function watchDraftSessionEnd() {
-  // The negative canonical notification must still clear this app's buffers
-  // after navigating to Account. It never supplies identity or authority.
-  if (!draftSessionEnds && typeof BroadcastChannel !== "undefined") {
-    draftSessionEnds = new BroadcastChannel(sessionChannel);
-    draftSessionEnds.onmessage = (event) => {
-      if (event.data === "ended") purgeStoredDrafts();
-    };
   }
 }
 function Button({
@@ -430,7 +418,6 @@ export function CreatorAI({
       !isSessionEnded
     )
       return;
-    watchDraftSessionEnd();
     const sessionKey = `w2-session:${identityAccount}`;
     const dispose = () => {
       ++fetchSequence.current;
