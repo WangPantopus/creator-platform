@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { PrivacyJobView } from "../../../../backend/src/modules/trust/contracts";
 import {
@@ -13,8 +13,16 @@ import {
   dateLabel,
 } from "../../ops/trust-client";
 
-function Job({ id }: { id: string }) {
-  const { data, error, refresh } = useTrust<PrivacyJobView>(
+function Job({
+  id,
+  available,
+  onReadError,
+}: {
+  id: string;
+  available: boolean;
+  onReadError: (id: string, error: TrustError | null) => void;
+}) {
+  const { data, error, loading, refresh } = useTrust<PrivacyJobView>(
     `privacy/jobs/${id}`,
   );
   const [actionError, setError] = useState<TrustError | null>(null);
@@ -23,10 +31,13 @@ function Job({ id }: { id: string }) {
     setError(null);
     setBusy(false);
   });
+  useEffect(() => {
+    onReadError(id, error);
+    return () => onReadError(id, null);
+  }, [id, error, onReadError]);
   return (
     <article className="trust-job">
-      <ErrorState error={error} retry={() => void refresh()} />
-      {data && (
+      {data && available && (
         <>
           <p className="qv-mono">
             {data.kind} · {data.state}
@@ -54,6 +65,7 @@ function Job({ id }: { id: string }) {
           <div className="ops-search">
             <button
               className="qv-btn qv-btn--secondary"
+              disabled={!available || loading || busy}
               onClick={() => void refresh()}
             >
               Check progress
@@ -61,8 +73,9 @@ function Job({ id }: { id: string }) {
             {data.state !== "complete" && (
               <button
                 className="qv-btn qv-btn--secondary"
-                disabled={busy}
+                disabled={!available || loading || busy}
                 onClick={async () => {
+                  if (!available || loading || busy) return;
                   const current = epoch.current;
                   setBusy(true);
                   try {
@@ -124,15 +137,37 @@ function Job({ id }: { id: string }) {
   );
 }
 export default function PrivacyPage() {
-  const { data, error, refresh } = useTrust<{ items: PrivacyJobView[] }>(
-    "privacy/jobs",
-  );
+  const { data, error, loading, refresh } = useTrust<{
+    items: PrivacyJobView[];
+  }>("privacy/jobs");
   const capability = useTrust<{
     localDevelopment: boolean;
     actorVerification: string;
     verificationMethod?: string;
   }>("capabilities");
+  const [sessionState, setSessionState] = useState<{
+    ready: boolean;
+    error: TrustError | null;
+  }>({ ready: false, error: null });
+  const [jobErrors, setJobErrors] = useState<Record<string, TrustError>>({});
+  const onReadError = useCallback((id: string, error: TrustError | null) => {
+    setJobErrors((current) => {
+      if (current[id] === error || (!error && !current[id])) return current;
+      const next = { ...current };
+      if (error) next[id] = error;
+      else delete next[id];
+      return next;
+    });
+  }, []);
+  const readError =
+    capability.error ??
+    sessionState.error ??
+    error ??
+    Object.values(jobErrors)[0] ??
+    null;
+  const readsReady = sessionState.ready && !loading && !readError;
   const verificationReady =
+    readsReady &&
     !capability.loading &&
     !!capability.data &&
     !capability.error &&
@@ -158,6 +193,8 @@ export default function PrivacyPage() {
     setError(null);
     setResult("");
     key.current = null;
+    setSessionState({ ready: false, error: null });
+    setJobErrors({});
   });
   const run = async () => {
     if (!verificationReady || busy) return;
@@ -231,7 +268,7 @@ export default function PrivacyPage() {
           Google Play subscriptions
         </a>
       </nav>
-      <TrustSession capabilityError={capability.error} />
+      <TrustSession onSessionState={setSessionState} />
       {capability.data?.verificationMethod === "current_session" && (
         <p>
           <a href="/api/auth/continue?returnTo=%2Fsupport%2Fprivacy">
@@ -240,11 +277,7 @@ export default function PrivacyPage() {
           before requesting or downloading your data.
         </p>
       )}
-      <ErrorState
-        error={error?.code === capability.error?.code ? null : error}
-        retry={retryTrustReads}
-      />
-      <ErrorState error={capability.error} retry={retryTrustReads} />
+      <ErrorState error={readError} retry={retryTrustReads} />
       {capability.loading && (
         <p className="qv-help" role="status">
           Loading…
@@ -356,9 +389,14 @@ export default function PrivacyPage() {
       </form>
       <section className="trust-panel">
         <h2>Request progress</h2>
-        {data?.items.length === 0 && <p>No data requests yet.</p>}
+        {readsReady && data?.items.length === 0 && <p>No data requests yet.</p>}
         {data?.items.map((job) => (
-          <Job key={job.id} id={job.id} />
+          <Job
+            key={job.id}
+            id={job.id}
+            available={readsReady}
+            onReadError={onReadError}
+          />
         ))}
       </section>
       <dialog className="trust-dialog" ref={dialog}>
@@ -377,7 +415,7 @@ export default function PrivacyPage() {
         <div className="actions">
           <button
             className="qv-btn qv-btn--secondary"
-            disabled={busy}
+            disabled={busy || !verificationReady}
             onClick={() => void run()}
           >
             Request deletion
