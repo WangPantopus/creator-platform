@@ -1,0 +1,15 @@
+{
+  "pr": 269,
+  "url": "https://github.com/WangPantopus/creator-platform/pull/269",
+  "reviewHead": "7a4480dec0bc21784df02f59682d9d16f2f90a16",
+  "capturedBase": "d918c859f6dc1734b73377d9cda50940c5b29fe1",
+  "mergeCommit": "a7a6f3707b74ed636198bda08cc76c6a52123a3b",
+  "mergedAt": "2026-10-03T06:11:21Z",
+  "expectedTree": "a0f4b94542c879389fd3aac5eb7add432de8bc20",
+  "actualTree": "a0f4b94542c879389fd3aac5eb7add432de8bc20",
+  "mode": "normal exact-head merge; no admin override",
+  "hostedChecks": "queued, not passes; current rulesets empty",
+  "personallyOperatedSource": "76a7d63523f48104e3db845ae77487e1373ead12",
+  "personalLimits": "actual PostgreSQL connection/control/transport primitives and unactivated catalogue refusal only; no genuine body export/task/receipt/C10. Interrupted-query backends present immediately after local closure, absent later",
+  "releaseReady": false
+}

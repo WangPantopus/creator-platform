@@ -2190,7 +2190,8 @@ export class ContentService {
              LEFT JOIN creator.content_reaction re ON re.reply_id=m.reply_id
              LEFT JOIN creator.content_reply_read rd ON rd.reply_id=m.reply_id AND rd.account_id=$4
              WHERE m.creator_id=$1 AND m.withdrawn_at IS NULL
-             AND ($2::uuid IS NULL OR (m.created_at,m.reply_id)<(SELECT created_at,reply_id FROM creator.content_reply_review WHERE reply_id=$2 AND creator_id=$1))
+             AND ($6::uuid IS NULL OR m.content_id=$6)
+             AND ($2::uuid IS NULL OR (m.created_at,m.reply_id)<(SELECT created_at,reply_id FROM creator.content_reply_review WHERE reply_id=$2 AND creator_id=$1 AND ($6::uuid IS NULL OR content_id=$6)))
              AND (($5='flagged' AND m.state='flagged') OR ($5<>'flagged' AND m.state='allowed'
                AND ($5<>'unread' OR rd.reply_version IS NULL OR rd.reply_version<m.reply_version)
                AND ($5<>'reacted' OR re.reply_id IS NOT NULL)))
@@ -2201,6 +2202,7 @@ export class ContentService {
               page.limit + 1,
               actor.accountId,
               page.filter,
+              page.contentId ?? null,
             ],
           )
         ).rows;
@@ -2224,7 +2226,8 @@ export class ContentService {
         FROM creator.content_reply_review m JOIN creator.fan_profile f ON f.id=m.fan_id LEFT JOIN creator.content_reply r ON r.id=m.reply_id
         JOIN creator.content_quote_permission p ON p.reply_id=m.reply_id LEFT JOIN creator.content_reaction re ON re.reply_id=m.reply_id
         LEFT JOIN creator.content_reply_read rd ON rd.reply_id=m.reply_id AND rd.account_id=$4
-        WHERE m.creator_id=$1 AND m.withdrawn_at IS NULL AND ($2::uuid IS NULL OR (m.created_at,m.reply_id)<(SELECT created_at,reply_id FROM creator.content_reply_review WHERE reply_id=$2 AND creator_id=$1))
+        WHERE m.creator_id=$1 AND m.withdrawn_at IS NULL AND ($7::uuid IS NULL OR m.content_id=$7)
+        AND ($2::uuid IS NULL OR (m.created_at,m.reply_id)<(SELECT created_at,reply_id FROM creator.content_reply_review WHERE reply_id=$2 AND creator_id=$1 AND ($7::uuid IS NULL OR content_id=$7)))
         AND (NOT $5 OR (($6='flagged' AND m.state='flagged') OR ($6<>'flagged' AND m.state='allowed' AND ($6<>'unread' OR rd.reply_version IS NULL OR rd.reply_version<m.reply_version) AND ($6<>'reacted' OR re.reply_id IS NOT NULL))))
         ORDER BY m.created_at DESC,m.reply_id DESC LIMIT $3`,
           [
@@ -2234,6 +2237,7 @@ export class ContentService {
             actor.accountId,
             studio,
             page.filter,
+            page.contentId ?? null,
           ],
         )
       ).rows;
