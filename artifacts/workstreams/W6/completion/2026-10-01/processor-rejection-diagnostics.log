@@ -1,0 +1,3 @@
+{"input":"diagnostic-tone.webm","inputBytes":5213,"capBytes":12000,"result":"malware_scanner_unavailable","elapsedMs":55014}
+{"input":"diagnostic-playlist.wav","inputBytes":89,"capBytes":1000000,"result":"malware_scanner_unavailable","elapsedMs":55011}
+{"input":"scanner-eicar.com","inputBytes":68,"capBytes":1000000,"result":"malware_scanner_unavailable","elapsedMs":55012}

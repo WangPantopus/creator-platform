@@ -1,0 +1,78 @@
+{
+  "readAt": "2026-10-02T12:29:20.864Z",
+  "applicationSource": "96ae8c45ba63d969549ff258af50ae42443f0937",
+  "uiDriver": "Existing opt-in actual application driver extended only to restore fan through product sign-out/sign-in",
+  "backendRelease": "96ae8c45ba63d969549ff258af50ae42443f0937",
+  "database": "W6 independently fresh canonical57; labeled synthetic seed; creator handle entered through actual web onboarding",
+  "web": {
+    "browser": "headed Chrome153",
+    "origin": "http://localhost:3006",
+    "viewport": "390x844",
+    "oldDatabaseSession": "genuinely refused then real developer sign-in and handle onboarding",
+    "creatorAvailability": {
+      "status": 503,
+      "code": "availability_unconfigured",
+      "saveDisabled": true
+    },
+    "mediaCapabilities": {
+      "mediaAvailable": false,
+      "creatorMediaAvailable": false,
+      "creatorMediaAudienceAvailable": false,
+      "callsAvailable": false,
+      "aiAudioAvailable": false,
+      "reason": "media_unconfigured"
+    },
+    "outage": "actual own API process stopped; private account hidden; session retained",
+    "recovery": "Manual Retry after API restart restores same fan; first Retry while API stopped remains unavailable; automatic recovery expectation timed out30s and is not accepted"
+  },
+  "android": {
+    "source": "canonical96 shipping app",
+    "apkSha256": "08e5006fcd3cdc62bbf8d0185a41434cd9d704136b0fe3432e5f37a808cdc0dd",
+    "buildSeconds": 22,
+    "serial": "emulator-5582",
+    "fontScale": 2,
+    "appearance": "Night",
+    "installation": "normal debug signed APK installed",
+    "actualJourneys": [
+      "old session purged after real401",
+      "real fan sign-in",
+      "fan unavailable gate with Save parent disabled and no EditText",
+      "product sign-out and creator sign-in as w6_dev_owner",
+      "creator unavailable gate",
+      "product sign-out and fan restore",
+      "real API stop and cold launch hides account",
+      "Retry while offline followed by automatic same-fan recovery after API restart"
+    ],
+    "postJourneyFailure": "Emulator aborted with exit134 after final recovery screenshot; log ends in_range_cast warning; requested final emu kill found device already absent. This is not a reliability or hardware pass."
+  },
+  "ios": {
+    "shippingExecutableSha256": "625918d16788dac2a44267c3dea2f026488b3a7b5fdcdf655ce2ee9c542e4db7",
+    "signing": "normal simulator signing/Keychain",
+    "device": "3E02BBA8-75B0-4D3B-BE37-E636C9E71687",
+    "model": "iPhone17e",
+    "os": "27.0",
+    "appearance": "Night",
+    "contentSize": "accessibility-large (not exact200% or VoiceOver)",
+    "actualFanSignInSeconds": 12.71,
+    "actualFanCreatorGateAndFanRestoreSeconds": 48.486,
+    "actualColdOutageSameFanRecoverySeconds": 29.545,
+    "failedCases": 0
+  },
+  "canonicalState": {
+    "ledgerRows": 57,
+    "availabilityRows": 0,
+    "callRows": 0,
+    "callback0092Installed": false,
+    "publicationAccepted": false,
+    "humanVoiceAccepted": false,
+    "providerCallAccepted": false
+  },
+  "cleanup": {
+    "contractContainer": "stopped",
+    "android": "already absent after exit134; exact owned slot1 token/inode released",
+    "ios": "Shutdown verified; exact owned slot2 token/inode released",
+    "heavyBuild": "released",
+    "peerDevicesAndGUI": "untouched",
+    "apiWebClamd": "owned processes retained for next increment"
+  }
+}

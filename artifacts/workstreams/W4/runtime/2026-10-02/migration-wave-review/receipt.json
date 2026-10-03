@@ -1,0 +1,62 @@
+{
+  "wave": "20261002",
+  "sourceCommit": "58b59fa0e5b8937af7cd0cb7272ae5b5662d7ee7",
+  "privateBackupAndSeparateRestore": true,
+  "sourceLedgerRows": 40,
+  "upgradeLedgerRows": 57,
+  "freshLedgerRows": 57,
+  "originalRows": 15,
+  "originalTables": 145,
+  "oldLedgerPreserved": true,
+  "oldDataPreserved": true,
+  "oldRolesPreserved": true,
+  "sourceUntouched": true,
+  "exactWave": true,
+  "schemaMatches": true,
+  "upgradeSchemaSha256": "fc7b456d1b7d45cf6b11d67e26b1e446feb86c01a19f8eacc53cbf2ec1649b97",
+  "freshSchemaSha256": "fc7b456d1b7d45cf6b11d67e26b1e446feb86c01a19f8eacc53cbf2ec1649b97",
+  "releaseReady": false,
+  "notVerified": [
+    "Activated application runtime/native/provider acceptance",
+    "Real verified creator/passkey, paid receipts, successful transactions",
+    "Canonical held accounting/source waves and C10 policy"
+  ],
+  "additionalW4Audit": [
+    "10 actual new W4 tables plus altered allowance reservation retain creator_owner ownership and forced RLS",
+    "Runtime has no owner/trust metadata/media discovery/worker membership",
+    "No PUBLIC table grants on those11 W4 tables"
+  ],
+  "operatorCorrections": [
+    "Initial audit listed obsolete guessed table names; corrected directly from the pinned CREATE TABLE sources and the altered existing allowance table, without changing schema or expected source behavior"
+  ],
+  "guardReview": {
+    "sourceCommit": "a71994f5",
+    "metadataOnly": true,
+    "already57Targets": [
+      "preserved-upgrade",
+      "fresh"
+    ],
+    "checkedRoles": 3,
+    "pinnedFunctions": 7,
+    "directCapabilities": 82,
+    "passed": true,
+    "sqlNotReplayed": true,
+    "runtimeNotReopened": true
+  },
+  "effectiveGuardReview": {
+    "sourceCommit": "064fa55e",
+    "metadataOnly": true,
+    "already57Targets": [
+      "preserved-upgrade",
+      "fresh"
+    ],
+    "checkedRoles": 3,
+    "pinnedFunctions": 7,
+    "directCapabilities": 82,
+    "publicCapabilities": 327,
+    "pinnedPublicFunctions": 23,
+    "passed": true,
+    "sqlNotReplayed": true,
+    "runtimeNotReopened": true
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "source": "5057343aefa289ae57693d5be614461056bb7260",
+  "label": "Actual labelled synthetic development61 web export; genuine Trust task acceptance, no complete C10 or original recovery",
+  "errors": [],
+  "savedStatus": 202,
+  "jobHash": "287b08849ec8587a0048fede13c16daa28236f76f79838b1e1ce16e1455475f1",
+  "state": "blocked",
+  "tasks": [
+    {
+      "domain": "agent",
+      "state": "complete",
+      "errorCode": null,
+      "receiptPresent": true
+    },
+    {
+      "domain": "commerce",
+      "state": "blocked",
+      "errorCode": "domain_hook_unavailable",
+      "receiptPresent": false
+    },
+    {
+      "domain": "content",
+      "state": "blocked",
+      "errorCode": "domain_hook_unavailable",
+      "receiptPresent": false
+    },
+    {
+      "domain": "conversation",
+      "state": "blocked",
+      "errorCode": "conversation_lineage_unavailable",
+      "receiptPresent": false
+    },
+    {
+      "domain": "growth",
+      "state": "blocked",
+      "errorCode": "domain_hook_unavailable",
+      "receiptPresent": false
+    },
+    {
+      "domain": "identity",
+      "state": "complete",
+      "errorCode": null,
+      "receiptPresent": true
+    },
+    {
+      "domain": "media",
+      "state": "complete",
+      "errorCode": null,
+      "receiptPresent": true
+    },
+    {
+      "domain": "trust",
+      "state": "complete",
+      "errorCode": null,
+      "receiptPresent": true
+    }
+  ],
+  "downloadVisible": false,
+  "phone": {
+    "width": 390,
+    "scroll": 390
+  }
+}

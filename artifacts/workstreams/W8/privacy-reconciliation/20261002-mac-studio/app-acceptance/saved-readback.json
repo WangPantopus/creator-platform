@@ -1,0 +1,80 @@
+{
+  "ops": {
+    "state": "resolved",
+    "outcome": "close",
+    "version": 2,
+    "actual_reviewer_match": true,
+    "closed": true,
+    "current_scoped_access": 1,
+    "recorded_decisions": 1,
+    "effects": 0
+  },
+  "label": "Independent actual saved synthetic account export; no full C10 receipt or release acceptance",
+  "jobHash": "649bc3e462d36903335da55aff16dc402544298ee8f5b10c6683224587b18e62",
+  "job": {
+    "kind": "export",
+    "scope": "account",
+    "state": "blocked",
+    "actual_actor_match": true,
+    "completed": false,
+    "domains": 8
+  },
+  "tasks": [
+    {
+      "domain": "agent",
+      "state": "complete",
+      "error_code": null,
+      "receipt_present": true,
+      "data_present": true
+    },
+    {
+      "domain": "commerce",
+      "state": "blocked",
+      "error_code": "domain_hook_unavailable",
+      "receipt_present": false,
+      "data_present": false
+    },
+    {
+      "domain": "content",
+      "state": "blocked",
+      "error_code": "domain_hook_unavailable",
+      "receipt_present": false,
+      "data_present": false
+    },
+    {
+      "domain": "conversation",
+      "state": "blocked",
+      "error_code": "conversation_lineage_unavailable",
+      "receipt_present": false,
+      "data_present": false
+    },
+    {
+      "domain": "growth",
+      "state": "blocked",
+      "error_code": "domain_hook_unavailable",
+      "receipt_present": false,
+      "data_present": false
+    },
+    {
+      "domain": "identity",
+      "state": "blocked",
+      "error_code": "privacy_commit_fence_unavailable",
+      "receipt_present": false,
+      "data_present": false
+    },
+    {
+      "domain": "media",
+      "state": "blocked",
+      "error_code": "privacy_commit_fence_unavailable",
+      "receipt_present": false,
+      "data_present": false
+    },
+    {
+      "domain": "trust",
+      "state": "complete",
+      "error_code": null,
+      "receipt_present": true,
+      "data_present": true
+    }
+  ]
+}

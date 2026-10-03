@@ -28,7 +28,6 @@ actor W3Realtime {
             self.key = key; self.credential = credential; self.socket = socket
         }
     }
-    private let credentials = SecureSessionStorage()
     private let session: URLSession
     private var connections: [Key: Connection] = [:]
     private var purgeRevision = 0
@@ -51,7 +50,7 @@ actor W3Realtime {
               var origin = URLComponents(url: baseURL, resolvingAgainstBaseURL: false),
               ["http", "https"].contains(origin.scheme), origin.host != nil,
               origin.user == nil, origin.password == nil else { throw accountChanged }
-        guard let credential = try await credentials.read(), revision == purgeRevision else { throw accountChanged }
+        guard let credential = try await SecureSessionStorage(issuer: baseURL).read(), revision == purgeRevision else { throw accountChanged }
         try Task.checkCancellation()
         origin.path = ""; origin.query = nil; origin.fragment = nil
         guard let originURL = origin.url else { throw URLError(.badURL) }
@@ -100,7 +99,7 @@ actor W3Realtime {
     }
     private func current(_ connection: Connection) -> Bool { connections[connection.key] === connection }
     private func validate(_ connection: Connection) async throws {
-        guard try await credentials.read() == connection.credential else { throw accountChanged }
+        guard let issuer = URL(string: connection.key.origin), try await SecureSessionStorage(issuer: issuer).read() == connection.credential else { throw accountChanged }
         guard current(connection) else { throw unavailable }
         try Task.checkCancellation()
     }

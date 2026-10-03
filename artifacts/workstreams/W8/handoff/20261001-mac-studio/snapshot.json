@@ -1,0 +1,189 @@
+{
+  "observedAt": "2026-10-01T21:05:00Z",
+  "host": "Mac Studio (Mac14,13, macOS 27.0); differs from the iMac that produced earlier W8 handoffs",
+  "mainObserved": "db1252df (PR58 merged); PR17 branch merges main before push",
+  "pr17": {
+    "branch": "codex/w8-post-cleanup-recovery",
+    "state": "draft until the Android emulator closed-mode /trust check passes; then mark ready and merge",
+    "verified": [
+      "web open and closed modes (status Light/Night 1280x900, privacy Light/Night 390x844, capability abort/503, sign-in refusal with returnTo)",
+      "HTTP closure with both RESTORED_* flags omitted (DB marker only), WebSocket 401, worker not started",
+      "iOS Simulator closed mode: privacy -> Welcome without actors; crisis help defect found and fixed"
+    ],
+    "remaining": [
+      "Boot CreatorPlatform_W8_API34 in an emulator slot, install the rebuilt APK, launch /trust and /support/privacy against the closed host (api_url http://10.0.2.2:4108), capture Light/Night, confirm crisis help renders without error and privacy shows sign-in without actors",
+      "Optionally repeat iOS/Android against the open synthetic host to confirm privacy export still works natively"
+    ],
+    "evidence": "artifacts/workstreams/W8/recovery/20261001-mac-studio/"
+  },
+  "privateInputsMissingOnThisHost": [
+    "~/.config/creator-platform/cleanup-20261001/",
+    "~/.config/creator-platform/w8-local/",
+    "~/.config/creator-platform/recovery-20261001-active/",
+    "~/.config/creator-platform/secrets/openai.env"
+  ],
+  "privateInputsLikelyLocation": "iMac ~/.config/creator-platform (W4 owner report)",
+  "w8Resources": {
+    "containers": {
+      "creator-platform-w8-macstudio-20261001": "127.0.0.1:55438, synthetic creator_w8, stopped, volume retained",
+      "creator-platform-w8-closed-20261001": "127.0.0.1:55439, closed copy with marker, stopped, volume retained"
+    },
+    "ports": {
+      "api": 4108,
+      "web": 3008
+    },
+    "iosSimulator": "Creator Platform W8 A3DBA471-82BB-43B6-9216-9A74BB5DB11C (shut down)",
+    "androidAvd": "CreatorPlatform_W8_API34, console 5568 / adb 5569, 2 cores / 2048 MB (stopped)",
+    "privateDir": "~/.config/creator-platform/w8-mac-studio-20261001 (cluster.env, runtime.env, runtime-closed.env, backups/, ios-simulator-udid)",
+    "builds": {
+      "iosDerivedData": "/private/tmp/creator-w8-ios-derived",
+      "androidBuildDir": "/private/tmp/creator-w8-android-build"
+    }
+  },
+  "sharedBudget": "W1 proposal adopted by W8: one heavy native build machine-wide (/private/tmp/creator-platform-heavy-build.lock), <=2 emulators (slot dirs, 2 cores, <=2048 MB), <=3 booted simulators (slot dirs), explicit UDID/serial",
+  "peerResources": {
+    "W1": "API 4101, web 3001, test DB 55441, simulator slot-1 F802B3F6",
+    "W2": "Postgres 55442, API 4102, web 3002",
+    "W3": "Postgres 55443 creator_w3, API 4103, web 3003",
+    "W4": "Postgres 55444 creator_w4, API 4104, web 3004, sim Creator Platform W4, emulator-5564",
+    "W5": "Postgres 55435 creator_w5, API 4105/41055, web 3005/30055, sim Creator Platform W5, AVD 5590/5591",
+    "W6": "Postgres 55446 creator_w6/creator_w6_probe, API 4106, web 3006",
+    "Pantopus": "emulator-5558 and Pantopus S1 simulator are not creator-platform resources"
+  },
+  "commitmentsMadeByW8": {
+    "registryActivationPR": "W8 opens the ONE registry PR activating reserved migrations in ascending waves; not-ready reservations are renumbered (metadata-only) above the wave. W3, W4, W5, W6 agreed not to edit infra/migrations.json and to verify on their own DBs once the branch name is sent.",
+    "devHostTrustComposition": "W8 delivers a loopback-only local-development trust mode (createTrustRuntime + integration.ts), createDevelopmentTrust(runtime) helper (scopedTrustEvidence incl. verification, verificationEffects + agentPauseEffects worker hooks, privacy consumers, dev Ops actors), and the denial callbacks incl. assertScopeAllowedInTransaction backed by 0053. W1 holds the server.ts wiring until W8 sends export names and 6-8 lines; W3/W4/W6 consume it.",
+    "migration0053": "0053_w8_runtime_denial_projection: SECURITY DEFINER deny check (block/restriction/tombstone/owned-creator tombstone) EXECUTE-granted to creator_runtime, answering only when app.account_id is a participant; exported trustScopeRestrictionInTransaction() in modules/trust.",
+    "replyReview": "W8 implements W5's reviewReply producer as a durable per-(replyId, version, textHash) review in the Ops safety queue; allowed/flagged only from a recorded reviewer decision; W5 wires host composition and retry trigger after the contract arrives.",
+    "w6Questions": "Unanswered: (a) audience/creator in-transaction restrictions should be covered by the same 0053 composition; (b) export names/ETA; (c) W8 position: ingestion workers must not mint request-style ThreadScopes outside request authority; use a purpose-authorized worker role (creator_media_worker) with an allocated ID above the wave."
+  },
+  "registryInputs": {
+    "0044_w4_personal_approval": {
+      "sha256": "4480936ea99adbc954f1e3444673772922c49e6dab8b9cce9351cf6d61c493fb",
+      "ready": true
+    },
+    "0045_w5_reply_review": {
+      "sha256": "636763eac2f10091d0291007bd9252b80ccc5631b3930f19804a82ec064a6b06",
+      "ready": "schema yes; producer pending"
+    },
+    "0046_w6_call_availability": {
+      "sha256": "47ec148a (prefix)",
+      "ownerFinal": true
+    },
+    "0047_w6_creator_media": {
+      "sha256": "3e762191 (prefix)",
+      "ownerFinal": true
+    },
+    "0048_w2_usage_lineage": {
+      "sha256": "16dddc80bebe32979f822104d8f411e0f545b4e212da6dc147c72f959e660f17",
+      "ownerFinal": true,
+      "gate": "W8 C10 accounting/export/delete/expiry registration before activation; W2 wants notice first"
+    },
+    "0049_w4_generation_cost_settlement": {
+      "sha256AfterPR61": "00f4c2cc2962a0e9f14b0ba0ad57f23823fcc811042e8d6b8b9c6dc5394daffc",
+      "previousPin": "60ab295d",
+      "dependsOn": "review/merge W4 PR61 first"
+    },
+    "0050_w3_account_relationship_index": {
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_account_index.sql",
+      "sha256": "189e19e001182efe6b28f4eed8c1633abf0945a9592b2209c950ac8de01e86e1",
+      "ownerFinal": true
+    },
+    "0051_w5_media_publication": {
+      "sha256": "f35526f24275d7b34bbbed7c12b98e3b1fd1d32b0c69b426d13370df0ca86e2e"
+    },
+    "0052_w8_privacy_export_chunks": {
+      "file": "absent",
+      "plan": "implement or renumber above the wave"
+    },
+    "0053_w8_runtime_denial_projection": {
+      "file": "absent",
+      "plan": "implement now (critical path for W3/W4/W6)"
+    },
+    "0054_w4_pass_purchase_effects": {
+      "sha256AfterPR61": "d6ead22cd6115df960dbe612b1de4a9473d2717a040cb66c6ba473da580827ca",
+      "previousPin": "8ca4b8c7"
+    },
+    "0055_w4_pass_pool_effects": {
+      "sha256": "26be8430c4301b7eda9060c94e9034b7afa5fd57a9ad5bec128f26ac2aefa4ca",
+      "note": "reservation has no pin; must follow 0054"
+    },
+    "0056_w3_correction_feedback_lineage": {
+      "sha256": "1044700d (prefix)",
+      "ownerFinal": true
+    },
+    "0057_w3_feedback_consent": {
+      "sha256": "08cb6f37 (prefix)",
+      "ownerFinal": true
+    },
+    "0058_w3_correction_signature": {
+      "sha256": "89895cd1 (prefix)",
+      "hazard": "replaces 0044's require_signed_message without the approved_draft exact-version personal-Approval branch"
+    },
+    "0059_w3_recording_association": {
+      "sha256": "e8ba9219 (prefix)",
+      "dependsOn": "0058 and W6 0047",
+      "hazard": "same replacement as 0058"
+    },
+    "0060_w8_composed_signed_message": {
+      "sha256": "43067f9a (prefix)",
+      "note": "0059 function + 0044 approved_draft branch + approval_id immutability; separate runner transactions 0058->0060 leave a weakened window"
+    },
+    "payoutCustody_w4": {
+      "path": "apps/backend/src/modules/commerce/schema-payout-custody.sql",
+      "sha256": "a2453c00868cd7a6fcaf30a1121884a73daa4942a2ac8b7214504d19285c1efd",
+      "proposedId": "0061"
+    },
+    "w6CreatorMediaWorker": "requested new ID above the wave for creator_media_worker role/policies",
+    "w7PR31Proposals": "four pending_w7_* SQL proposals (incl. a new read policy on creator.conversation_relationship) need W8 allocation and security review"
+  },
+  "w4DryRunOrder": "0044 -> 0048 -> 0049 -> 0054 -> 0055 -> payout custody passed on a fresh 40 DB (W4 report)",
+  "w6DryRun": "0044-0049, 0051, 0054-0060 applied in order on a fresh PG17 DB without errors (W6 report, 55446)",
+  "w3DryRun": "0056 -> 0057 -> 0058 in one transaction on a fresh 40 creator_w3, rolled back (W3 report)",
+  "openPRs": [
+    64,
+    63,
+    62,
+    61,
+    59,
+    53,
+    51,
+    49,
+    48,
+    47,
+    46,
+    45,
+    44,
+    42,
+    41,
+    36,
+    35,
+    31,
+    29,
+    28,
+    26,
+    24,
+    22,
+    21,
+    20,
+    19,
+    17,
+    16
+  ],
+  "notablePeerPRs": {
+    "59": "W1 defines visualWebURL; fixes the web-visual CI failure seen on PR17 and main",
+    "61": "W4 adds SET LOCAL ROLE creator_owner to reserved 0049/0054 (changes their hashes)",
+    "62": "W1 independent development actors incl. an under-18 actor (affects development identity actors used by native sign-in)",
+    "63": "W3 canonical fan generation host composition (draft); waits on W8 0053 + 0048/0049 activation",
+    "40": "W2 idle pool error listener; no longer in the open list at this observation",
+    "67": "W6 draft composeMediaHost/media env/clamd/pg_notify wakeups (stacked on #20); waits on W8 media denial hooks, worker authority ID and activation branch"
+  },
+  "ci": "web-visual fails on main until PR59; ios-foundation snapshot failures pre-exist on main; main has no branch protection",
+  "acceptanceLimit": "Synthetic environment only; no preserved-state restore, provider, staging, hardware, store or pilot acceptance in this session",
+  "peerHandoffs": {
+    "W3": "docs/workstreams/handoffs/W3-mac-studio-2026-10-01.md on PR63",
+    "W6": "docs/workstreams/handoffs/W6-2026-10-01-runtime.md on PR67",
+    "W4": "PR64 evening handoff",
+    "W1": "Successor continues from codex/w1-session-truth-20261001 (PR66); docs/workstreams/handoffs/W1-continuation-2026-10-01-claude.md records W8's trust plan; W8 must publish export names and server.ts lines in its PR description and W8-contracts.md"
+  }
+}

@@ -330,6 +330,22 @@ a.qv-stepin {
   color: var(--ink-muted);
   text-align: center;
 }
+.route-error {
+  width: 100%;
+  max-width: 390px;
+  box-sizing: border-box;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 64px 24px 40px;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+.route-error [role="alert"]:focus {
+  outline: none;
+}
 .public-verification {
   width: 100%;
   max-width: 390px;

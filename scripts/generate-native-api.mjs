@@ -435,6 +435,9 @@ const kotlinLiteralQueryValues = Object.entries(navigation.literalQueryValues)
   .join(", ");
 swift += `
 public enum ApplicationDestination {
+  public static func requiresFanProfile(_ value: String) -> Bool {
+    !isPermitted(value) || value.components(separatedBy: "?")[0].range(of: ${JSON.stringify(navigation.fanHandleExemptPathPattern)}, options: .regularExpression) == nil
+  }
   public static func isPermitted(_ value: String) -> Bool {
     if value.count > 2048 || value.contains("%") || value.contains("\\\\") || value.contains("#") || value.rangeOfCharacter(from: .whitespacesAndNewlines) != nil { return false }
     let parts = value.components(separatedBy: "?")
@@ -460,6 +463,7 @@ public enum ApplicationDestination {
 `;
 kotlin += `
 object ApplicationDestination {
+  fun requiresFanProfile(value: String): Boolean = !isPermitted(value) || !Regex(${JSON.stringify(navigation.fanHandleExemptPathPattern)}).matches(value.substringBefore('?'))
   fun isPermitted(value: String): Boolean {
     if (value.length > 2048 || value.contains('%') || value.contains('\\\\') || value.contains('#') || value.any { it.isWhitespace() }) return false
     val parts = value.split('?')

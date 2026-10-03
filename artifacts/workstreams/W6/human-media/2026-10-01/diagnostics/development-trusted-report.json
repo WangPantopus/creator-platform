@@ -1,0 +1,139 @@
+{
+  "active_manifest": "urn:c2pa:39f1a546-8d3c-4b4d-8f10-700ad46554d9",
+  "manifests": {
+    "urn:c2pa:39f1a546-8d3c-4b4d-8f10-700ad46554d9": {
+      "claim_generator_info": [
+        {
+          "name": "c2patool",
+          "version": "0.28.1",
+          "org.contentauth.c2pa_rs": "0.91.1"
+        }
+      ],
+      "title": "Signed creator media",
+      "instance_id": "xmp.iid:841368a0-a3ef-462a-b883-f7ca2447b5a1",
+      "assertions": [
+        {
+          "label": "c2pa.actions.v2",
+          "data": {
+            "actions": [
+              {
+                "action": "c2pa.created",
+                "digitalSourceType": "http://c2pa.org/digitalsourcetype/empty"
+              }
+            ]
+          },
+          "created": true
+        },
+        {
+          "label": "c2pa.hash.bmff.v3",
+          "data": {
+            "exclusions": [
+              {
+                "xpath": "/uuid",
+                "data": [
+                  {
+                    "offset": 8,
+                    "value": "2P7D1hsOSDySl1goh37EgQ=="
+                  }
+                ]
+              },
+              {
+                "xpath": "/ftyp"
+              },
+              {
+                "xpath": "/mfra"
+              },
+              {
+                "xpath": "/free"
+              },
+              {
+                "xpath": "/skip"
+              }
+            ],
+            "alg": "sha256",
+            "hash": "alsCa6DyqYiOwsoQIMbX5qgjthnxh6OqRMjHBRmZr0Y=",
+            "name": "jumbf manifest"
+          },
+          "created": true
+        },
+        {
+          "label": "org.pantopus.creator.media",
+          "data": {
+            "diagnostic": "synthetic component only; no creator signing or app acceptance",
+            "kind": "human_recording",
+            "processedMediaBytes": 18865,
+            "processedMediaDurationMs": 2000,
+            "processedMediaMimeType": "audio/mp4",
+            "processedMediaSha256": "1ee920cacb42b4a9e1b4b1794c2499c9f2bb92540645bbc17b43952917b57d4d",
+            "schemaVersion": 1
+          }
+        }
+      ],
+      "signature_info": {
+        "alg": "Es256",
+        "issuer": "Local Development Only",
+        "common_name": "Creator Platform W6 Development Signer - NOT PRODUCTION",
+        "cert_serial_number": "101875985144581540718214839149979660081844656196"
+      },
+      "label": "urn:c2pa:39f1a546-8d3c-4b4d-8f10-700ad46554d9",
+      "claim_version": 2
+    }
+  },
+  "validation_results": {
+    "activeManifest": {
+      "success": [
+        {
+          "code": "signingCredential.trusted",
+          "url": "self#jumbf=/c2pa/urn:c2pa:39f1a546-8d3c-4b4d-8f10-700ad46554d9/c2pa.signature",
+          "explanation": "signing certificate trusted, found in [system_anchors] trust anchors"
+        },
+        {
+          "code": "claimSignature.insideValidity",
+          "url": "self#jumbf=/c2pa/urn:c2pa:39f1a546-8d3c-4b4d-8f10-700ad46554d9/c2pa.signature",
+          "explanation": "claim signature valid"
+        },
+        {
+          "code": "claimSignature.validated",
+          "url": "self#jumbf=/c2pa/urn:c2pa:39f1a546-8d3c-4b4d-8f10-700ad46554d9/c2pa.signature",
+          "explanation": "claim signature valid"
+        },
+        {
+          "code": "assertion.hashedURI.match",
+          "url": "self#jumbf=/c2pa/urn:c2pa:39f1a546-8d3c-4b4d-8f10-700ad46554d9/c2pa.assertions/c2pa.actions.v2",
+          "explanation": "hashed uri matched: self#jumbf=c2pa.assertions/c2pa.actions.v2"
+        },
+        {
+          "code": "assertion.hashedURI.match",
+          "url": "self#jumbf=/c2pa/urn:c2pa:39f1a546-8d3c-4b4d-8f10-700ad46554d9/c2pa.assertions/c2pa.hash.bmff.v3",
+          "explanation": "hashed uri matched: self#jumbf=c2pa.assertions/c2pa.hash.bmff.v3"
+        },
+        {
+          "code": "assertion.hashedURI.match",
+          "url": "self#jumbf=/c2pa/urn:c2pa:39f1a546-8d3c-4b4d-8f10-700ad46554d9/c2pa.assertions/org.pantopus.creator.media",
+          "explanation": "hashed uri matched: self#jumbf=c2pa.assertions/org.pantopus.creator.media"
+        },
+        {
+          "code": "assertion.bmffHash.match",
+          "url": "self#jumbf=/c2pa/urn:c2pa:39f1a546-8d3c-4b4d-8f10-700ad46554d9/c2pa.assertions/c2pa.hash.bmff.v3",
+          "explanation": "BMFF hash valid"
+        }
+      ],
+      "informational": [
+        {
+          "code": "signingCredential.ocsp.skipped",
+          "url": "self#jumbf=/c2pa/urn:c2pa:39f1a546-8d3c-4b4d-8f10-700ad46554d9/c2pa.signature",
+          "explanation": "OCSP fetching skipped"
+        },
+        {
+          "code": "assertion.bmffHash.additionalExclusionsPresent",
+          "url": "self#jumbf=/c2pa/urn:c2pa:39f1a546-8d3c-4b4d-8f10-700ad46554d9/c2pa.assertions/c2pa.hash.bmff.v3",
+          "explanation": "extra BMFF hash exclusion(s) found"
+        }
+      ],
+      "failure": []
+    },
+    "specVersion": "2.4.0",
+    "trustListUri": "system_anchors"
+  },
+  "validation_state": "Trusted"
+}

@@ -1,5 +1,9 @@
 # W1 continuation — September 30, 2026
 
+October 2 successor reconciliation: PR21 now incorporates current main `af38420d7aa5b07df009a01a4be3e8026f753d2a`, preserving the merged issuer-bound native producer, held-session finalization, proof Support and canonical Studio navigation. Only dated W1 documentation conflicted; both records are retained below. Current-source checks and personal web/native onboarding qualification are in progress. Queued hosted jobs remain non-passes. W1 original61 and the separately labelled development61 copy remain closed; no current runtime or native acceptance is inferred. The entire original seven-group/H01–H20 assignment remains incomplete.
+
+October 2 focused main increment: actual Ops/Account/Status return handling and truthful no-fan Account are implemented and personally browser-operated at cac6be9c on an independently restored, labelled canonical57 development copy. Same actual expired session rotates and returns to audits; Ops denies without membership. Original W1 remains closed. Production build/types/canonical generation/scoped checks pass; native/full workstream acceptance remains open. [Exact bounded evidence](../../../artifacts/workstreams/W1/resume/2026-10-02-ops-return/run.md).
+
 ## October 1 — native origin validation and build configuration source
 
 Application `73c9983e` validates complete release HTTPS/debug loopback API origins and rejects app-link ports. Canonical iOS project source now supplies empty-default API/link-host build settings to the keys read by the app; generated plist is untouched and still needs XcodeGen/build validation. Swift syntax/YAML/diff checks pass only. [Exact source and outstanding acceptance](../../../artifacts/workstreams/W1/resume/2026-10-01-native-uri/run.md). No external identity, association, provider or readiness is created; original references/API/generator inputs/authority remain unchanged.

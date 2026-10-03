@@ -20,6 +20,7 @@ import {
 } from "./trust-adapter.js";
 import type { EffectHook } from "../trust/contracts.js";
 import type { PreparedGenerationJournal } from "./generation-journal.js";
+import type { PreparedUsageRetention } from "./usage-retention.js";
 
 /** The configured host supplies canonical authorities and approved providers.
  * Missing producers remain explicit; constructing Studio never enables fan delivery. */
@@ -35,6 +36,7 @@ export function createAgentDomain(input: {
   /** Opt-in owner producer for W8's actual configured stream coordinator/store. */
   coordinatorExportStream?: boolean;
   usageJournal?: PreparedGenerationJournal;
+  usageRetention?: PreparedUsageRetention;
   settleDeparture?: (
     input: Parameters<EffectHook["run"]>[0],
   ) => Promise<{ complete: boolean; receipt: Record<string, unknown> }>;
@@ -49,7 +51,11 @@ export function createAgentDomain(input: {
     input.conversation && input.audience
       ? new LiveAgentRuntime(service, input.conversation, input.audience)
       : null;
-  const lifecycle = new AgentLifecycle(repository, runtime);
+  const lifecycle = new AgentLifecycle(
+    repository,
+    runtime,
+    input.usageRetention,
+  );
   const sources = new SourceService(repository, (creatorId) =>
     runtime?.interruptCreator(creatorId),
   );

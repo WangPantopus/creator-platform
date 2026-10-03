@@ -16,13 +16,20 @@ import com.pantopus.qelvora.identity.fanFeatures
 
 class MainActivity : ComponentActivity() {
     private val destination = mutableStateOf("/home")
+    private val destinationDelivery = mutableStateOf(0L)
+    private var debugAPIURL: String? = null
+    private var debugAppearance: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         destination.value = returnTarget(intent)
+        destinationDelivery.value = savedInstanceState?.getLong("destination_delivery") ?: 0L
         val configured = apiOrigin(BuildConfig.CREATOR_API_URL)
-        val local = if (BuildConfig.DEBUG) apiOrigin(intent.getStringExtra("api_url"), loopback = true) else null
+            ?: if (BuildConfig.DEBUG) apiOrigin(BuildConfig.CREATOR_API_URL, loopback = true) else null
+        debugAPIURL = if (BuildConfig.DEBUG) apiOrigin(if (intent.hasExtra("api_url")) intent.getStringExtra("api_url") else savedInstanceState?.getString("debug_api_url"), loopback = true) else null
+        debugAppearance = if (BuildConfig.DEBUG) (if (intent.hasExtra("appearance")) intent.getStringExtra("appearance") else savedInstanceState?.getString("debug_appearance"))?.takeIf { it in listOf("light", "night") } else null
+        val local = debugAPIURL
         setContent {
-            val appearance = if (BuildConfig.DEBUG) intent.getStringExtra("appearance") else null
+            val appearance = debugAppearance
             val night = when (appearance) { "night" -> true; "light" -> false; else -> isSystemInDarkTheme() }
             SideEffect {
                 WindowCompat.getInsetsController(window, window.decorView).apply {
@@ -31,11 +38,29 @@ class MainActivity : ComponentActivity() {
                 }
             }
             QelvoraTheme(night = night) {
-                if (BuildConfig.DEBUG && intent.getBooleanExtra("catalog", false)) NativeFoundationCatalog(intent.getStringExtra("component")) else FanAppShell(this, local ?: configured, destination.value, fanFeatures(this, local ?: configured))
+                if (BuildConfig.DEBUG && intent.getBooleanExtra("catalog", false)) NativeFoundationCatalog(intent.getStringExtra("component")) else FanAppShell(this, local ?: configured, destination.value, fanFeatures(this, local ?: configured), destinationDelivery.value)
             }
         }
     }
-    override fun onNewIntent(intent: Intent) { super.onNewIntent(intent); setIntent(intent); destination.value = returnTarget(intent) }
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putLong("destination_delivery", destinationDelivery.value)
+        if (BuildConfig.DEBUG) {
+            debugAPIURL?.let { outState.putString("debug_api_url", it) }
+            debugAppearance?.let { outState.putString("debug_appearance", it) }
+        }
+        super.onSaveInstanceState(outState)
+    }
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        val launcherResume = intent.action == Intent.ACTION_MAIN && intent.hasCategory(Intent.CATEGORY_LAUNCHER) && intent.data == null && (!BuildConfig.DEBUG || !intent.hasExtra("return_to"))
+        // Repeated explicit links are new deliveries; launcher resumes keep
+        // the current screen. The counter is navigation, never authority.
+        if (!launcherResume) {
+            setIntent(intent)
+            destination.value = returnTarget(intent)
+            destinationDelivery.value++
+        }
+    }
     private fun returnTarget(intent: Intent): String {
         if (BuildConfig.DEBUG) intent.getStringExtra("return_to")?.let { return it }
         val uri = intent.data ?: return "/home"

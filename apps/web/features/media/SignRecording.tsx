@@ -12,11 +12,13 @@ export function SignRecording({
   fanId,
   onSigned,
   expectedAccountId,
+  disabled = false,
 }: {
   asset: MediaAsset;
   creatorId: string;
   fanId: string;
   expectedAccountId?: string;
+  disabled?: boolean;
   onSigned: (value: MediaAsset) => void;
 }) {
   const [busy, setBusy] = useState(false);
@@ -26,7 +28,14 @@ export function SignRecording({
   async function platform<T>(path: string, body: unknown): Promise<T> {
     const response = await fetch(`/api/platform/${path}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(expectedAccountId
+          ? { "X-Expected-Account-Id": expectedAccountId }
+          : {}),
+      },
+      credentials: "same-origin",
+      cache: "no-store",
       body: JSON.stringify(body),
     });
     if (!response.ok) {
@@ -120,7 +129,11 @@ export function SignRecording({
       <button
         className="qv-btn qv-btn--maya"
         disabled={
-          busy || unknown || !!asset.signedActId || asset.state !== "ready"
+          disabled ||
+          busy ||
+          unknown ||
+          !!asset.signedActId ||
+          asset.state !== "ready"
         }
         onClick={() => {
           void sign();
@@ -136,7 +149,7 @@ export function SignRecording({
       {unknown && (
         <button
           className="qv-btn qv-btn--secondary"
-          disabled={busy}
+          disabled={disabled || busy}
           onClick={() => {
             void publish();
           }}
