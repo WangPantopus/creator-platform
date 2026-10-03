@@ -933,7 +933,11 @@ export const copy = {
   "w1CallLookupChecking": "Checking the booking and your current access…",
   "w1CallLookupUnavailable": "This call could not be opened. Retry, or open Requests to check its current status.",
   "identityProofReviewSupport": "Request verification review",
-  "identityProofReviewSupportBody": "Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified."
+  "identityProofReviewSupportBody": "Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified.",
+  "identityInputKeptUnavailable": "The service is unavailable. Your input has been kept; try again.",
+  "identityInputKeptUnreadable": "The service returned an unreadable response. Your input has been kept; try again.",
+  "identityProfileSaveFailed": "Could not save. Try again.",
+  "creatorInterviewEstimate": "About 20 minutes for your interview"
 } as const;
 export type CopyKey = keyof typeof copy;
 type Placeholders<T extends string> = T extends `${string}{${infer Key}}${infer Rest}` ? Key | Placeholders<Rest> : never;
