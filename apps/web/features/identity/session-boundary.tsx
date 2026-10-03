@@ -24,8 +24,11 @@ const Scope = createContext<IdentityScope | null>(null);
 export const sessionChannel = "qelvora-identity-status";
 
 /** Only an invalidation signal crosses tabs; credentials and private data never do. */
-export function announceSessionEnd() {
-  discardPrivateSessionBuffers();
+export function announceSessionEnd(original: {
+  accountId: string;
+  sessionId: string;
+}) {
+  discardPrivateSessionBuffers(original);
   if (typeof BroadcastChannel === "undefined") return;
   try {
     const channel = new BroadcastChannel(sessionChannel);
@@ -165,7 +168,9 @@ function IdentitySessionView({
     }
     if (channel)
       channel.onmessage = (event) => {
-        if (active && event.data === "ended") end(owner.signal);
+        // A delayed negative hint from an older session cannot end a newer
+        // genuine view. Only the existing canonical reread decides that.
+        if (active && event.data === "ended") void check();
       };
     const timer = setInterval(check, 4000);
     window.addEventListener("focus", check);
