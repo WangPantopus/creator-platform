@@ -4,7 +4,7 @@ import { growthContracts } from "@qelvora/api";
 import { copy } from "@qelvora/copy";
 import { Notice } from "@qelvora/ui-web";
 import type { PostEntryContext } from "../../../../packages/api/src/growth";
-import { useIdentityRequest } from "../identity/session-boundary";
+import { useGrowthSession } from "../growth/session";
 
 /** Display metadata on the actual current account lifetime. Neither this
  * reference nor the expected-account header grants generation permission. */
@@ -17,7 +17,7 @@ export function PostEntryReference({
   creatorId: string;
   contentId: string;
 }) {
-  const { session, signal } = useIdentityRequest();
+  const { request, signal } = useGrowthSession();
   const [post, setPost] = useState<PostEntryContext | null>(null);
   const [error, setError] = useState("");
   useEffect(() => {
@@ -39,22 +39,17 @@ export function PostEntryReference({
       const current = sequence;
       setError("");
       try {
-        const response = await fetch(
-          `/api/growth/creators/${encodeURIComponent(handle)}/posts/${contentId}/context`,
+        const result = await request<unknown>(
+          `creators/${encodeURIComponent(handle)}/posts/${contentId}/context`,
           {
-            cache: "no-store",
-            headers: { "X-Expected-Account-Id": session.accountId },
             signal: AbortSignal.any([
-              signal,
               controller.signal,
               AbortSignal.timeout(5000),
             ]),
           },
         );
-        if (!response.ok) throw new Error();
-        const value = growthContracts.PostEntryContextResponseSchema.parse(
-          await response.json(),
-        ).context;
+        const value =
+          growthContracts.PostEntryContextResponseSchema.parse(result).context;
         if (
           value.creatorId !== creatorId ||
           value.contentId !== contentId ||
@@ -92,14 +87,7 @@ export function PostEntryReference({
       document.removeEventListener("visibilitychange", refresh);
       signal.removeEventListener("abort", conceal);
     };
-  }, [
-    handle,
-    creatorId,
-    contentId,
-    session.accountId,
-    session.sessionId,
-    signal,
-  ]);
+  }, [handle, creatorId, contentId, request, signal]);
   return (
     <>
       {post && (
