@@ -486,6 +486,22 @@ export function createOpenApi() {
         ],
         post: operation("removeTeamMember", "Done"),
       },
+      "/v1/identity/{creatorId}/team/{accountId}/roles": {
+        parameters: [
+          ...scoped(["creatorId", "accountId"]),
+          {
+            in: "header",
+            name: "X-Expected-Account-Id",
+            required: true,
+            schema: { type: "string", format: "uuid" },
+          },
+        ],
+        post: operation(
+          "updateTeamMemberRoles",
+          "Done",
+          "TeamRolesUpdateInput",
+        ),
+      },
       "/v1/identity/signed-acts/{challengeId}/cancel": {
         parameters: [
           {

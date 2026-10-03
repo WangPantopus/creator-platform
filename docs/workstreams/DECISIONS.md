@@ -1,5 +1,9 @@
 # Decisions and missing-design register
 
+### W1 current Team role replacement — October3 UTC
+
+Keep Team role edits in the original identity membership/invitation family. Require the actual middleware Actor and original expected-account mismatch header, opaque held session and real same-client restoration/creator denial before positive owner/member locks. Only a verified, recovered owner may replace active roles; membership never signs as the creator. Compare strict reviewed role sets under the existing advisory/row locks, refusing stale edits while allowing an already-current retry. Revoke outstanding unaccepted invitations on success/retry so they cannot later restore old roles; preserve accepted history. Existing tables have no role history version, so do not invent a migration, timestamp or ABA guarantee. Canonical12/116, types/scoped lint/existing9 pass; positive Team/UI/native and full H08 acceptance remain open. [Exact port](../implementation/W1-team-role-update.md).
+
 ## W1 purpose and product decisions — October 2, 2026
 
 Generation workers use their own LOGIN and genuine durable acceptance/session provenance, rather than an interactive Actor or ThreadScope. Legacy rows without provenance stay unavailable. A private nonce binds each claim/read to its exact full transaction ID, backend PID, login, job, worker token and five-second lifetime. The original live session, participant negatives, creator state, current processor consent, family epoch and lease are checked before and after purpose work. Provider I/O runs outside these short transactions. Original0072 SQL is immutable/unactivated; genuine0093 and distinct context, licence, output, memory, journal and settlement consumers must be reviewed and activated before useful generation. Visible-prefix crash reconciliation and translation still require their own purpose contracts.

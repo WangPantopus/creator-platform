@@ -5676,6 +5676,29 @@ public enum APITeamInviteRolesItem: String, Codable, Sendable {
   case `scheduler` = "scheduler"
 }
 
+public struct APITeamRolesUpdateInput: Codable, Sendable {
+  public let `expectedRoles`: [APITeamRolesUpdateInputExpectedRolesItem]
+  public let `roles`: [APITeamRolesUpdateInputRolesItem]
+  public init(expectedRoles: [APITeamRolesUpdateInputExpectedRolesItem], roles: [APITeamRolesUpdateInputRolesItem]) {
+    self.expectedRoles = expectedRoles
+    self.roles = roles
+  }
+}
+
+public enum APITeamRolesUpdateInputExpectedRolesItem: String, Codable, Sendable {
+  case `triage` = "triage"
+  case `drafter` = "drafter"
+  case `publisher` = "publisher"
+  case `scheduler` = "scheduler"
+}
+
+public enum APITeamRolesUpdateInputRolesItem: String, Codable, Sendable {
+  case `triage` = "triage"
+  case `drafter` = "drafter"
+  case `publisher` = "publisher"
+  case `scheduler` = "scheduler"
+}
+
 public struct APITeamInvitation: Codable, Sendable {
   public let `id`: String
   public let `creatorId`: String
@@ -10467,6 +10490,9 @@ public actor CreatorAPIClient {
   }
   public func removeTeamMember(creatorId: String, accountId: String) async throws -> APIDone {
     try await request("/v1/identity/\(segment(creatorId))/team/\(segment(accountId))/remove", method: "POST", authenticated: true)
+  }
+  public func updateTeamMemberRoles(creatorId: String, accountId: String, xExpectedAccountId: String, body: APITeamRolesUpdateInput) async throws -> APIDone {
+    try await request("/v1/identity/\(segment(creatorId))/team/\(segment(accountId))/roles", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["X-Expected-Account-Id": xExpectedAccountId].compactMapValues { $0 })
   }
   public func cancelSignedAct(challengeId: String) async throws -> APIDone {
     try await request("/v1/identity/signed-acts/\(segment(challengeId))/cancel", method: "POST", authenticated: true)
