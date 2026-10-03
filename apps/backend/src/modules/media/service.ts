@@ -60,6 +60,14 @@ export interface MediaAuthority {
     }>,
     client: PoolClient,
   ): Promise<boolean>;
+  /** W1's original current metadata check on this same issued thread/client.
+   * C2PA and an immutable delivery association do not keep a revoked act live. */
+  currentRecordingSignature?(
+    scope: ThreadScope,
+    signedActId: string,
+    command: SignedActCommand,
+    client: PoolClient,
+  ): Promise<boolean>;
 }
 type AssetRow = {
   id: string;
@@ -719,6 +727,16 @@ export class MediaService {
       command,
       signedActId: row.signed_act_id,
     };
+    invariant(
+      (await this.authority.currentRecordingSignature?.(
+        scope,
+        row.signed_act_id,
+        command,
+        client,
+      )) === true,
+      "media_publication_unavailable",
+      "The recording's current signature is unavailable.",
+    );
     if (scope.authority === "creator") {
       invariant(
         scope.actorAccountId === scope.creatorAccountId,
