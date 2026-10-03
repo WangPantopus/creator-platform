@@ -1,5 +1,17 @@
 # W8 contract, migration and runtime register
 
+## Human-requested seamless handoff checkpoint — 2026-10-02
+
+Read the [complete successor prompt](../handoffs/W8-continuation-2026-10-02-codex.md) first. All source is committed/pushed: durable reply review draft #200/head10624047; private development store draft #201/heade8c2608a; finite feedback lifecycle draft #192/head2e1de9d7. They retain genuine application acceptance and activation work. Worker/terminal negative drafts #131/#145 also remain open. Old #83 is closed as superseded; no branch history was removed.
+
+Reviewed ready integrations #199 (Android Trust canonical navigation) and #195 (fixed complete Agent export source) normally merged as d5cc93b6/4f94e1fe. Agent0196/accounting0163 remain held/unapplied. All own API/web/devices/container are normally stopped with databases, volumes, private tools/backups retained and no active W8 build/device leases. The separately restored native checkpoint now passes all six custody comparisons; no original iMac recovery, all-eight C10, new native navigation acceptance, provider or release completion is claimed. Continue the entire R1–R10/G0–G5 scope from the concrete next actions in the successor prompt.
+
+## Reply reviewer continuation contract — 2026-10-02
+
+Export `prepareTrustReplyReviewer(runtime)` (the legacy `createTrustReplyReviewer` name is the same asynchronous prepared contract). Await it in `registerFeatures` after W1 has issued the genuine BackendRuntime; retain undefined when the exact active SQL/catalogue is unavailable. The callback accepts only W5’s actual held PoolClient and full `(replyId,creatorId,fanId,version,text,textHash)` tuple. It validates W1’s original request authority/session holder and same configured database plus restoration/current denials at both ends. It issues no Actor, ThreadScope, consent or publication authority. The12000 transport ceiling grants no paid-tenure permission. W5’s4000/current-tenure policy stays authoritative.
+
+The durable safety case is idempotent per reply/version/hash; private source text is read through purpose-leased Ops evidence only. Allowed/flagged require the matching immutable recorded reviewer decision in the actual case settlement transaction. Withdrawal, changed source, negative authority or missing active source refuses; unavailable production remains pending. Held0156 source65a86e17 requires the separate guarded migration wave and genuine app acceptance. No use of a privileged metadata qualification as an author/reviewer session.
+
 ## Ready closed four-source privacy wave — 2026-10-02
 
 PR151 merged12ea10a6, exacthead91dcd4c6 after actual three-client cursor acceptance. Two web/backend and the current compile checks passed; one current Android runtime passed, its duplicate was still running at merge; six foundation jobs queued and one obsolete compile cancelled were not passes. [Actual receipt](../../../artifacts/workstreams/W8/privacy-domain-worker/20261002-mac-studio/app-acceptance/README.md) preserves the four completed/four blocked synthetic task result.
