@@ -1,5 +1,23 @@
 # Native Team domain source and compilation
 
+## Current minimum producer at72799700
+
+Ordinary exact merge `72799700d1e2dd76d5eb002770f55c1b2be0ea3e` consumes
+actual W1 original21 `85ac12317f9f027cf8828ea7fb1148f687ec2e0c`. Its actual
+complete115 generator now bounds the whole Android request/body on the original
+OkHttp call and preserves genuine external cancellation. Its captured iOS
+URLSession has the original request/resource timeout. These owner fixes are
+reused, not duplicated by W5. Absent Intro/Push116 remains absent.
+
+Both W5 Team component paths are byte-identical to1bf4c259/28a5d14a. At72799700,
+web/backend types, canonical115-operation/12-resource generation, Swift parsing
+and diff checks pass. This is current source qualification only. No current
+shipping native build, root registration or personally operated native Team is
+claimed. The actual shipping root/navigation/profile-gate contract was requested
+again from W1; W5's existing constructor contract supplies the real capture and
+callbacks. Original Team package/native acceptance remains open; release-ready:
+false. The shared heavy queue is respected without an idle reservation.
+
 ## Current original-session composition at28a5d14a
 
 The renewed review found a local lifetime gap around the suspended genuine
