@@ -22,8 +22,10 @@ export type GenerationConsumerCustody = Readonly<{
 export async function assertGenerationConsumerCustody(
   query: Pick<Pool, "query">,
   custody: GenerationConsumerCustody,
+  signal?: AbortSignal,
 ): Promise<void> {
   try {
+    signal?.throwIfAborted();
     const ready = (
       await query.query<{ ready: boolean }>(
         `SELECT session_user='creator_generation_worker' AND current_user=session_user
@@ -58,8 +60,10 @@ export async function assertGenerationConsumerCustody(
         ],
       )
     ).rows[0]?.ready;
+    signal?.throwIfAborted();
     if (ready !== true) throw new Error("Changed fixed consumer owner");
     for (const consumer of custody.consumers) {
+      signal?.throwIfAborted();
       const proof = (
         await query.query<{ ready: boolean; definition: string }>(
           `SELECT EXISTS(SELECT FROM creator.schema_migration WHERE version=$2 AND checksum=$3)
@@ -81,6 +85,7 @@ export async function assertGenerationConsumerCustody(
           ],
         )
       ).rows[0];
+      signal?.throwIfAborted();
       if (
         proof?.ready !== true ||
         createHash("sha256").update(proof.definition).digest("hex") !==
@@ -89,10 +94,12 @@ export async function assertGenerationConsumerCustody(
         throw new Error("Changed fixed executable custody");
     }
     if (
-      contentHash(await generationConsumerCatalogue(query, custody.owner)) !==
-      custody.catalogueChecksum
+      contentHash(
+        await generationConsumerCatalogue(query, custody.owner, { signal }),
+      ) !== custody.catalogueChecksum
     )
       throw new Error("Changed effective consumer catalogue");
+    signal?.throwIfAborted();
   } catch (cause) {
     const failure = new DomainError(
       "generation_consumer_custody_changed",
