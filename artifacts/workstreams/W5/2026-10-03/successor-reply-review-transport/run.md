@@ -1,5 +1,41 @@
 # Reply review original settlement — October 3, 2026
 
+## Current original owner callback at5e13d3d1
+
+Ordinary exact merge `5e13d3d15f2046d7db6ebc027c5b0a0175769cf1` consumes
+actual W1 PR74 `5d368bc83066c25fd8c0e35da6e43f3e7b501c03`. The one conflict
+was resolved to the exact W1 Identity transaction producer: await the complete
+owner callback while the host deadline may close its original socket, then
+settle/release only after that callback completes. W1's actual Database/Access
+settlement changes and private original-generation-signal custody are consumed.
+No original task/context or caller callback is substituted. PR304 is now stacked
+on original74; its six-path W5 diff remains distinct from that prerequisite.
+
+The W5 canonical ContentHeldClient is byte-identical to currentc7/5d62; it keeps
+min(actual original positive client budget,1500) for all controls. The real
+PostgreSQL response-loss/custody observations below stay at clean5d62. They are
+not a later-source runtime or genuine0156 product observation.
+
+At5e13, backend/web types and all nine existing contracts pass. The first canonical
+generation check failed ENOSPC while writing pnpm task-state; after only owned
+closed scratch cleanup, a fresh check verified116 genuine API operations and12
+resources from this actual W1 graph. No fake or hand-written generated DTO was
+introduced. A broad merge diff check found whitespace in inherited historical
+owner logs; those receipts were preserved. The narrow W5 diff against actual5d
+passes diff checks. No new tests or coverage work.
+
+W5 reclaimed only two closed own development Next directories (227.74MiB) and
+idle original77 iOS Intermediates (683.12MiB), each under a real atomic heavy guard.
+All26 shipping app files retained identical hashes and inodes; SDK packages,
+production web outputs, backups, database data/history and peer files were
+untouched. Guards released normally. These are custody checks, not app acceptance.
+
+Implemented/runnable/integrated: current combined source and named checks; both
+original74 and304 remain unmerged. Current shipping build/required CI, genuine
+reviewReply0156, signed Note, two independent fans, creator reaction/native,
+financialC10 and release acceptance remain held. Release-ready:false; no whole
+original package is complete.
+
 ## Minimum original control budget at5d62e275
 
 W8 and W6 identified that `ContentHeldClient`'s per-query1500ms override could
