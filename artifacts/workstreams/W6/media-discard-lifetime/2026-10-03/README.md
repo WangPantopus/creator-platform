@@ -1,5 +1,64 @@
 # Original media discard lifetime — October 3, 2026
 
+## Current composition personally operated — 19:16 UTC
+
+Frozen `d42a8e47185cd73d91d6901f19520befd5809825` normally merges the complete
+W1bebb/b0c Studio graph into the existing discard repair; both owned note
+histories were retained. Web types/three-path lint/format/diff pass. Actual
+sequential backend19:05:19.303–19:05:23.509Z and production web19:05:23.523–
+19:05:30.342Z builds exit0; backend logSHA256
+`22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5`,
+web `c1de37f730301e81d811cf693990a082ac5213e706701ba88137892f752f53e5`.
+Heavy nonce f4280517-0f38-4ad2-ab32-e51f32964f0b normally released19:05:30Z.
+
+W6 personally operated the production Studio with an actual W1 development
+issuer and original account/session headers against unchanged canonical61.
+No Actor, interactive worker scope, held migration, purpose or signing act was
+created. Actual separate ingestion used the dedicated0062 worker role and
+original Trust denial; real ClamAV ran on the owned private Unix socket.
+
+| Actual diagnostic path      | Observed result                                                                                                                                                                                                                                                                                                                                                                                                                |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 16,777,217-byte invalid PNG | Original create403/support-limit notice, no asset allocated; local Discard cleared file and alt. SHA256675b77d4a328f5ff34a3a36f517223a1d6c311b681caf98f49f70ff33118d02a.                                                                                                                                                                                                                                                       |
+| 33-byte corrupt PNG         | Actual asset b5198f5a-fc2b-4a09-aac4-5e5624c8a0ec rejected/media_parse_rejected. SHA25620d4f1559462b9e9892f243df53fb33d8d716004af92d0aeae201c7a05bec148. After offline concealment/recovery, actual retry DELETE202 returned revoked/deletion pending on that same asset; form cleared.                                                                                                                                        |
+| 68-byte standard EICAR      | Actual asset11c8c0d0-a26d-4c2c-9b0a-110ca31ff7ae rejected/media_scan_rejected; ClamAV Eicar-Test-Signature FOUND. SHA256275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f. Offline Discard retained actual file/alt/removal error with no completed media response. Online retry DELETE202 used the opening SID57ad6aed-0c0d-4254-96ff-876c12be3eb1 and the same asset, then cleared file/alt/removal controls. |
+
+Both202 receipts were strict canonical state revoked/deletion pending. Real
+worker completion, not those receipts, establishes final physical deletion:
+all five historical/current photo rows deleted/version2/delete_pending=false,
+no job pending and every exact asset storage directory absent. Note draft18,
+61 migrations; messages/thread-media/publications/offers/calls/admissions0.
+Protected upgrade target remains connection-limit0/owner-closed. W6 personally
+inspected both settled Night390x844 rejection images; no new Light/enlarged,
+full accessibility, human capture/voice-discard/signature/publication positive.
+Late asynchronous host-detach/disposal/replacement races, malformed/unknown
+DELETE receipts and changed f9 ingestion fault behavior remain unoperated.
+
+Two verifier reads timed out while controls were concealed; actual subsequent
+recovery and deletion were separately observed. Worker startup first refused a
+missing ephemeral C2PA staging directory. The existing development tools/keys
+were preserved; a fresh owned0700 empty work directory was supplied. A private
+launcher import typo was corrected before the real worker started19:09:32Z.
+No signer invocation or substitute human voice was used.
+
+Owned runtime nonce061e15bd-bed0-42f5-9e78-9c55fdee8e68/dev16777232/
+inode244793618: API10944/web11288 childgroup11904 listener11958/TLS11971,
+worker26525/scanner20477 child20814. Exact original owner/dev/inode/commands/
+listeners/process groups checked before normal stop. Browser issuer logout200,
+context/server/lease closed, worker/scanner processes and Unix socket closed,
+exact empty staging directory removed, ports3006/3106/4106/55446 closed and
+preserved original PG exited; runtime lease released19:16:21.444115Z. No native
+or peer mutation. Private browser/state/auxiliary-close/runtime-close SHA256:
+`e235b43f62d463dbf6da2b6c2244f4ff19abd2a9ae6bc878757f0b48e12d3128`,
+`9d6da186b74629797e21ffc03b32f85c4152b195bf987c2dc3626d2a72c246a0`,
+`f8bf3eeb0d075a3258b9d10ae89f53043228d9b7bd13003f6921bfa6802d0005`,
+`75fd64cdf4ef6973018f74ddb9886271fd341062cbb166b68ccc7238a6b790fd`.
+
+This qualifies only these actual photo refusal/removal/recovery observations.
+W6 remains incomplete; original publication205/208/LAST/COMMIT/C10, genuine
+human microphone/production signer/provider/hardware and queued CI gates remain
+open. Existing PR305 is reused for this coherent Studio media continuation.
+
 Personally reviewed the actual VoiceRecorder and PhotoAttachment paths. Each
 awaited host draft detachment before reading the global media identity for
 DELETE. A disposed form could therefore borrow a replacement same-account
