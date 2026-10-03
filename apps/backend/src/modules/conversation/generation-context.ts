@@ -263,7 +263,7 @@ export class PreparedGenerationConversationContext {
         "The reviewed generation context purpose is not installed.",
         503,
       );
-      unavailable.cause = new AggregateError(
+      const causes = new AggregateError(
         [
           ...new Set([
             ...(failed ? [failure] : []),
@@ -273,6 +273,11 @@ export class PreparedGenerationConversationContext {
         ],
         "Generation context qualification and cleanup failed",
       );
+      Object.defineProperty(unavailable, "cause", {
+        value: causes,
+        configurable: true,
+        writable: true,
+      });
       throw unavailable;
     }
     return prepared;
@@ -355,7 +360,11 @@ export class PreparedGenerationConversationContext {
         "The reviewed generation context purpose is not installed.",
         503,
       );
-      unavailable.cause = cause;
+      Object.defineProperty(unavailable, "cause", {
+        value: cause,
+        configurable: true,
+        writable: true,
+      });
       throw unavailable;
     }
   }
