@@ -9,11 +9,16 @@ import { requestAuthority } from "../identity/request-authority.js";
  * complete output/journal custody, original fences and effective privileges. */
 export const GENERATION_SAFETY_TERMINAL_CATALOGUE_QUERY = `WITH roles AS (
  SELECT oid,rolname,rolcanlogin,rolinherit,rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls,rolconfig
- FROM pg_roles WHERE rolname IN('creator_w4_generation_safety_terminal','creator_w4_generation_terminal','creator_generation_terminal_authority','creator_w2_generation_terminal_journal','creator_w3_generation_output','creator_w3_terminal_output','creator_generation_cursor_authority','creator_w2_generation_journal','creator_w2_generation_input','creator_generation_authority','creator_generation_worker','creator_trust_denial')
+ FROM pg_roles WHERE rolname IN('creator_w4_generation_safety_terminal','creator_w4_generation_terminal','creator_generation_terminal_authority','creator_w2_generation_terminal_journal','creator_w3_generation_output','creator_w3_terminal_output','creator_generation_cursor_authority','creator_w2_generation_journal','creator_w2_generation_input','creator_generation_authority','creator_generation_worker','creator_trust_denial','creator_w2_generation_metadata','creator_w2_generation_guardrail','creator_w2_generation_retrieval','creator_generation_conversation_context','creator_w4_generation_audience','creator_w5_generation_origin','creator_signature_read_authority','creator_commerce_public_read')
 ), relations AS (
- SELECT c.oid,c.relname,c.relowner,c.relkind,c.relrowsecurity,c.relforcerowsecurity,c.relispartition,c.relacl
- FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='creator'
- AND c.relname IN('generation_worker_scope','generation_terminal_scope','generation_sentence_provenance','generation','thread','message','event','creator_profile','fan_profile','identity_session','processor_consent','commerce_allowance_reservation','access_grant','commerce_pass','commerce_membership','commerce_membership_usage','ai_workspace','ai_generation_admission','ai_generation_attempt','ai_generation_receipt','ai_usage','ai_cost_hold')
+ SELECT c.oid,n.nspname AS schema,c.relname,c.relowner,c.relkind,c.relrowsecurity,c.relforcerowsecurity,c.relispartition,c.relacl
+ FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
+ AND (c.relname IN('generation_worker_scope','generation_terminal_scope','generation_sentence_provenance','generation','thread','message','event','creator_profile','fan_profile','identity_session','processor_consent','commerce_allowance_reservation','access_grant','commerce_pass','commerce_membership','commerce_membership_usage','ai_workspace','ai_generation_admission','ai_generation_attempt','ai_generation_receipt','ai_usage','ai_cost_hold')
+  OR c.relowner IN(SELECT oid FROM roles)
+  OR EXISTS(SELECT FROM roles r WHERE CASE WHEN c.relkind IN('r','p','v','m','f') THEN
+   has_table_privilege(r.oid,c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
+    OR has_any_column_privilege(r.oid,c.oid,'SELECT,INSERT,UPDATE,REFERENCES')
+   WHEN c.relkind='S' THEN has_sequence_privilege(r.oid,c.oid,'SELECT,UPDATE,USAGE') ELSE false END))
 ) SELECT jsonb_build_object(
  'roles',(SELECT jsonb_agg(to_jsonb(r)-'oid' ORDER BY r.rolname COLLATE "C") FROM roles r),
  'memberships',(SELECT jsonb_agg(jsonb_build_object('role',pg_get_userbyid(m.roleid),'member',pg_get_userbyid(m.member),
@@ -39,7 +44,7 @@ export const GENERATION_SAFETY_TERMINAL_CATALOGUE_QUERY = `WITH roles AS (
    p.proowner IN(SELECT oid FROM roles) OR EXISTS(SELECT FROM pg_trigger t WHERE t.tgfoid=p.oid AND t.tgrelid IN(SELECT oid FROM relations)) OR p.oid=ANY(ARRAY[to_regprocedure('creator.commerce_original_cost_rule()'),
      to_regprocedure('creator.commerce_allowance_cost_fence()'),to_regprocedure('creator.ai_generation_receipt_immutable()')])
     OR EXISTS(SELECT FROM roles r WHERE has_function_privilege(r.oid,p.oid,'EXECUTE')) ELSE false END),
- 'relations',(SELECT jsonb_agg(jsonb_build_object('name',o.relname,'owner',pg_get_userbyid(o.relowner),'kind',o.relkind,
+ 'relations',(SELECT jsonb_agg(jsonb_build_object('schema',o.schema,'name',o.relname,'owner',pg_get_userbyid(o.relowner),'kind',o.relkind,
   'rls',o.relrowsecurity,'forced',o.relforcerowsecurity,'partition',o.relispartition,
   'columns',(SELECT jsonb_agg(jsonb_build_object('number',a.attnum,'name',a.attname,'type',format_type(a.atttypid,a.atttypmod),
    'required',a.attnotnull,'identity',a.attidentity,'generated',a.attgenerated,'default',pg_get_expr(d.adbin,d.adrelid),
@@ -61,7 +66,7 @@ export const GENERATION_SAFETY_TERMINAL_CATALOGUE_QUERY = `WITH roles AS (
   'indexes',(SELECT jsonb_agg(jsonb_build_object('name',i.relname,'valid',x.indisvalid,'ready',x.indisready,'live',x.indislive,
    'definition',pg_get_indexdef(i.oid)) ORDER BY i.relname) FROM pg_index x JOIN pg_class i ON i.oid=x.indexrelid WHERE x.indrelid=o.oid),
   'triggers',(SELECT jsonb_agg(jsonb_build_object('name',t.tgname,'enabled',t.tgenabled,'definition',pg_get_triggerdef(t.oid)) ORDER BY t.tgname)
-   FROM pg_trigger t WHERE t.tgrelid=o.oid AND NOT t.tgisinternal)) ORDER BY o.relname COLLATE "C") FROM relations o),
+   FROM pg_trigger t WHERE t.tgrelid=o.oid AND NOT t.tgisinternal)) ORDER BY o.schema COLLATE "C",o.relname COLLATE "C") FROM relations o),
  'effectivePrivileges',(SELECT jsonb_agg(jsonb_build_object('role',r.rolname,'schema',n.nspname,'relation',c.relname,'kind',c.relkind,
   'table',ARRAY(SELECT privilege FROM unnest(ARRAY['SELECT','INSERT','UPDATE','DELETE','TRUNCATE','REFERENCES','TRIGGER']) privilege
    WHERE CASE WHEN c.relkind IN('r','p','v','m','f') THEN has_table_privilege(r.oid,c.oid,privilege) ELSE false END ORDER BY privilege),
@@ -96,9 +101,9 @@ export async function generationSafetyTerminalPurposeCatalogue(
   return catalogue;
 }
 
-// The personally reviewed thirteen-source setup has no fabricated scope or
-// business positives. Current W2 metadata/guardrail/retrieval, W3 context/init/
-// output, W1 cursor and W8 denial callers still require complete qualification.
+// Actual published current callers are part of the metadata graph, including
+// every relation they own or can access. No fabricated scope or business
+// positive supplies acceptance; complete current owner qualification is pending.
 // Keep factory acceptance absent; a caller or startup readback supplies no pin.
 export const GENERATION_SAFETY_TERMINAL_CATALOGUE_SHA256: string | undefined =
   undefined;
@@ -194,6 +199,76 @@ export const GENERATION_SAFETY_TERMINAL_SOURCES = Object.freeze(
       owner: "W3",
       checksum:
         "8de1897f2e70f763382984459274eb7616ad7149b457811fffd90fb8b7df2e8c",
+    },
+    {
+      name: "w8_generation_worker_denial",
+      path: "apps/backend/migrations/0093_w8_generation_worker_denial.sql",
+      owner: "W8",
+      checksum:
+        "d47b5916b0ac0c3cc33bd7d50bfdb663f39a9218dcff0b97d3a9dce7b6acc44c",
+    },
+    {
+      name: "w3_generation_purpose_consumers",
+      path: "apps/backend/src/modules/conversation/migrations/0095_w3_generation_purpose_consumers.sql",
+      owner: "W3",
+      checksum:
+        "9449f7f9254aa1c9c77713b1683d5c85076b357f13e573882ee5d2d03d1715e0",
+    },
+    {
+      name: "w4_generation_allowance_audience",
+      path: "apps/backend/src/modules/commerce/schema-generation-audience-renumbered.sql",
+      owner: "W4",
+      checksum:
+        "98f9373fbf2403e05f6f26a4223a94779d3280fefa89f2ab2c6f30fbbef796be",
+    },
+    {
+      name: "w5_generation_content_origin",
+      path: "apps/backend/src/modules/content/schema-generation-origin.sql",
+      owner: "W5",
+      checksum:
+        "2f1c4b30133a0c8707b16b15c1e42a9daf539cb5edeeb48ad6a835352a4f444d",
+    },
+    {
+      name: "w2_generation_retrieval_context",
+      path: "apps/backend/src/modules/agent/migrations/0104_w2_generation_retrieval_context.sql",
+      owner: "W2",
+      checksum:
+        "bf9d9c35b3f0bb8c18518bd06b4459d16d421f4da4a6ad0ba06f8319acc89747",
+    },
+    {
+      name: "w2_generation_guardrail_event",
+      path: "apps/backend/src/modules/agent/migrations/pending_w2_generation_guardrail_event.sql",
+      owner: "W2",
+      checksum:
+        "0c0fc7fee7182f3e77695222e51cce910268f7844437a5e974f68af5927a3382",
+    },
+    {
+      name: "w2_generation_agent_metadata",
+      path: "apps/backend/src/modules/agent/migrations/pending_w2_generation_agent_metadata.sql",
+      owner: "W2",
+      checksum:
+        "4bbcd9a24b622ee63525da6f20eaf21f84eb9c2d4d538a9122d8184347a76b4f",
+    },
+    {
+      name: "w1_signature_read_fence",
+      path: "apps/backend/src/modules/identity/schema-signature-read-fence.sql",
+      owner: "W1",
+      checksum:
+        "157640de84f22d6d638d788dfe04314fd193efaed80a829f288bec7cbcb815b5",
+    },
+    {
+      name: "w4_public_packet_read",
+      path: "apps/backend/src/modules/commerce/schema-public-packet-read.sql",
+      owner: "W4",
+      checksum:
+        "0b11d09a2dcd11cbbe715d1dccf90185270e277fea7ce6f8eabe27a36e30d4b8",
+    },
+    {
+      name: "w4_generation_audience_profile_fence",
+      path: "apps/backend/src/modules/commerce/schema-generation-audience-profile-fence.sql",
+      owner: "W4",
+      checksum:
+        "11d3d327f22082166d85f17179fe7a8cf94bcd9161714c8055b07537ff639e9d",
     },
   ].map((source) => Object.freeze(source)),
 );
