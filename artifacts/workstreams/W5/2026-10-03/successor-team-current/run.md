@@ -43,6 +43,39 @@ The old later-blank observation, populated limits, editable-role successor,
 human identity/signing and all-nine acceptance remain open. These are bounded
 development-account observations; release-ready remains false.
 
+## Current Threads/main integration
+
+At `a4fa861a1eab2f97599b596decc485914e2cdd69`, including captured main
+`4e641cd2c3b3047d3209e5b91c45d0ee399619d5`, web types, scoped lint/format
+and the normal production Next build passed. The actual owned API remained
+`c7db9ea9cb9a47eb7cf73a67a5f398dad4fbd039` on canonical61. W5 personally
+operated that immutable production web: the creator saw the real removed
+@kilnfire membership, while the retained separate fan session was denied Studio
+with no current role. All four390/1280 Light/Night Team views were inspected.
+Real browser offline mode concealed Studio; returning online and pressing Enter
+on Check connection and roles restored the focused, exact unsaved invitation
+text, and typing continued in that field. Refresh team and current renewals
+returned200. No additional invitation or membership write was needed.
+
+The actual visual check found the account link using browser-default blue on
+the creator panel. Source `f93d70d40a90fe82203436682d507187c67962a1` uses
+the shared quiet action, inheriting the panel's actual contrasting ink and44px
+minimum target. Scoped lint/format and its normal production build passed.
+W5 personally inspected the fixed account action in all four viewport/theme
+combinations, measured actual44px height and activated it with Enter to the
+current Your account page. At390, initial captures during scrolling did not
+show the link; the later settled account captures supplied the visible result.
+Two earlier fill selectors matched no input and timed out without a change;
+the actual default-type input was then filled normally.
+
+Private captures are production-a4fa861a-team-* and
+production-f93d70d4-team-* under the existing private screenshot directory.
+The invitation/acceptance/removal durable-record evidence remains at8e8a2a6d;
+these later reads do not transfer that write observation to another source.
+The old later-blank observation, editable roles, populated limits, genuine
+identity/signing and complete nine-package acceptance remain open.
+Release-ready: false.
+
 ## Original source qualification
 
 Personally implemented `e53e5951051f1c71a38f829a3855a3585155d288` and
