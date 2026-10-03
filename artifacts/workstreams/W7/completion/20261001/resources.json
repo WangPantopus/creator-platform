@@ -766,6 +766,32 @@
       "scopeComplete": false,
       "privacyExport": "Current source adds original account delivery receipt outcomes; registration hashes excluded. Current protected service still unavailable; current owner catalogue review required.",
       "failure": "First Android emulator host SIGABRT/null-root retained locally; identical retained AVD restart recovered. No peer, AVD wipe or global SDK change."
+    },
+    "heldClientContinuation20261003": {
+      "source": "7d3c9eb3c6fbc106c7372157aeeae0e25034d023",
+      "reviewedMain": "42040362fba654957a38a33b494b2081aaee1c30",
+      "mergeHead": "8c592b0b1f6e2b38cfc1f8075b1fc8e0f2ffd4b9",
+      "api": "4107 stopped normally exit0",
+      "web": "3007 stopped after verified own PID SIGTERM, exit1",
+      "database": "Canonical retained, stopped exit0;40 migrations,zero creators/receipts/clients,connectionlimit0,no new SQL;backup stale",
+      "devices": "Own FAB Shutdown/5580 absent, exact owner/device/inode leases released; own companion terminated; peers untouched",
+      "androidBuildSha256": "a31b34dcf99b0dddfa2b73f69eec0f655b5379c97203a7036ea234a6d893f4b7",
+      "androidGuest": "2026148 KiB/two cores; supported lowram flags",
+      "observed": "Both shipping apps actual Settings Save/Reload/signout against repaired Growth backend; rebuilt Android OS microphone denial/zero voice files; production Studio preserves sign-in destination",
+      "failures": "Android guest Bluetooth abort/System UI refusal, early launch and null-root retained privately; W5 current Content navigation crash remains open",
+      "privacy": "Original worker shutdown now awaited before export completion; receipt metadata remains account-delivery-bound. Genuine protected authority/owner catalogue and actual job acceptance remain pending",
+      "qualification": "Existing workspace and Android47 tasks pass; prior signed iOS/original18 Swift110 comparisons unchanged. First4204 visual12pass/1fail(Thread17rounded-edge pixels,delta5) preserved privately; unchanged focused2/full13 reruns pass. Six exact-new-head gates required.",
+      "scopeComplete": false,
+      "evidence": "Private local scratch; no new routine screenshots or diagnostic JSON committed"
+    },
+    "sessionThanksContinuation20261003": {
+      "source": "17c034434ed8001961c86992b16b5c2ccb842205",
+      "reviewedMain": "42040362fba654957a38a33b494b2081aaee1c30",
+      "qualification": "Full existing workspace6 tasks/4 cached passes9.478s;13 unchanged visuals pass3.2min after preserved first12pass/1fail; genuine web-session/Thanks/protected operation unaccepted",
+      "observed": "Rebuilt production web Settings Continue/Retry/Back preserves destination; sign-in unavailable. No TLS/ATS/cookie policy changed",
+      "failures": "Initial PG readiness/connectionlimit0 API failure; incorrectly inherited backend WEB_ORIGIN caused production HTTPS refusal/blank Retry. Correct web launch recovered sign-in gate. Private evidence retained",
+      "resources": "Own APIexit0/webexit143,PGstopped40migrations/zero creators/receipts/clients/connectionlimit0; devices remain Shutdown/absent,leases released,peers untouched;no new SQL,backup stale",
+      "scopeComplete": false
     }
   }
 }
