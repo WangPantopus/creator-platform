@@ -137,9 +137,9 @@ export class AgentLifecycle {
       signal,
       async (client) => {
         await this.repository.assertRuntimeRoleInTransaction(client);
+        await assertTaskInTransaction(client);
         signal.throwIfAborted();
         this.runtime?.interruptCreator(scope.creatorId);
-        await assertTaskInTransaction(client);
         await client.query(
           "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
           [scope.creatorId, scope.accountId],
