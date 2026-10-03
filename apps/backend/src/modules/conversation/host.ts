@@ -13,6 +13,7 @@ import {
   PreparedGenerationJournal,
 } from "../agent/generation-journal.js";
 import type { LicenseVerifier } from "../agent/service.js";
+import { PreparedUsageRetention } from "../agent/usage-retention.js";
 import { DevelopmentLicenseVerifier } from "../agent/development-license.js";
 import type { ApprovedSentence } from "../agent/runtime.js";
 import { createCommerceRuntime } from "../commerce/runtime.js";
@@ -228,14 +229,26 @@ export async function composeConversationHost(
     missing.push("current generation worker composition (W3/W1/W2/W4)");
 
   let journal: PreparedGenerationJournal | undefined;
+  const originalUsageRetention = producers.privacyCursor?.usageRetention;
+  if (producers.privacyCursor)
+    invariant(
+      originalUsageRetention instanceof PreparedUsageRetention,
+      "accounting_retention_unconfigured",
+      "The original prepared accounting retention producer is required.",
+    );
   const journalChecksum = await registeredChecksum(migrations.journal);
   if (!journalChecksum) missing.push(`registered ${migrations.journal}`);
   else if (!producers.journalPolicy) missing.push("journal policy (W2)");
-  else if (requested)
+  else if (requested || producers.privacyCursor)
+    // Original privacy accounting is independent of provider/generation setup.
     journal = await PreparedGenerationJournal.prepare(runtime.pool, {
       migration: { version: migrations.journal, checksum: journalChecksum },
       ...producers.journalPolicy,
     });
+  // The Agent lifecycle and export cursor retain the same original expiry
+  // producer. A policy string or a matching URL cannot replace its custody.
+  const usageRetention = journal ? originalUsageRetention : undefined;
+  if (journal && usageRetention) usageRetention.assertJournal(journal);
   const costChecksum = await registeredChecksum(migrations.cost);
   if (!costChecksum) missing.push(`registered ${migrations.cost}`);
 
@@ -337,6 +350,7 @@ export async function composeConversationHost(
               licenseVerifier: producers.licenseVerifier!,
               audience,
               usageJournal: journal!,
+              ...(usageRetention ? { usageRetention } : {}),
               conversation: {
                 current: (scope) => memory.context(scope),
                 assertProcessorConsent: (scope) =>
@@ -412,6 +426,7 @@ export async function composeConversationHost(
       ? { licenseVerifier: producers.licenseVerifier }
       : {}),
     ...(journal ? { usageJournal: journal } : {}),
+    ...(usageRetention ? { usageRetention } : {}),
   });
 
   const ingestion =
