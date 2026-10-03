@@ -17,7 +17,9 @@ export async function conversationRequest<T>(
   body?: unknown,
   signal?: AbortSignal,
   expectedAccountId?: string,
+  expectedSessionId?: string,
 ): Promise<T> {
+  signal?.throwIfAborted();
   const response = await fetch(`/api/conversations/${path}`, {
     method: body === undefined ? "GET" : "POST",
     cache: "no-store",
@@ -27,12 +29,16 @@ export async function conversationRequest<T>(
       ...(expectedAccountId
         ? { "X-Expected-Account-Id": expectedAccountId }
         : {}),
+      ...(expectedSessionId
+        ? { "X-Expected-Session-Id": expectedSessionId }
+        : {}),
       ...(body === undefined ? {} : { "Content-Type": "application/json" }),
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     signal: signal ?? AbortSignal.timeout(10000),
   });
   const data = await response.json();
+  signal?.throwIfAborted();
   if (!response.ok)
     throw new ConversationError(
       data.error?.code ?? "unavailable",
@@ -52,6 +58,7 @@ export function useConversationRequest() {
     request: identityRequest,
   } = useIdentityRequest();
   const accountId = session.accountId;
+  const sessionId = session.sessionId;
   return useCallback(
     async <T>(path: string, body?: unknown, requestSignal?: AbortSignal) => {
       try {
@@ -64,6 +71,7 @@ export function useConversationRequest() {
             ...(requestSignal ? [requestSignal] : []),
           ]),
           accountId,
+          sessionId,
         );
         if (signal.aborted)
           throw new DOMException("Session ended", "AbortError");
@@ -71,23 +79,29 @@ export function useConversationRequest() {
       } catch (error) {
         if (
           error instanceof ConversationError &&
-          error.code === "session_account_changed"
+          (error.code === "session_account_changed" ||
+            error.code === "session_view_changed")
         )
           end();
         else if (error instanceof ConversationError && error.status === 401) {
           // W1 rechecks the current cookie before ending an in-flight request
           // that may have raced ordinary session rotation.
           const current = await identityRequest("session");
+          const original = current.ok
+            ? SessionSchema.parse(await current.json())
+            : undefined;
+          signal.throwIfAborted();
           if (
             current.status === 401 ||
-            (current.ok &&
-              SessionSchema.parse(await current.json()).accountId !== accountId)
+            (original &&
+              (original.accountId !== accountId ||
+                original.sessionId !== sessionId))
           )
             end();
         }
         throw error;
       }
     },
-    [accountId, signal, end, identityRequest],
+    [accountId, sessionId, signal, end, identityRequest],
   );
 }
