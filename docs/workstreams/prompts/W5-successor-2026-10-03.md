@@ -28,6 +28,9 @@ fetch that exact head, and read by git show if it is not on main. Read IN ORDER:
 6. Installed Next16 docs before web code, installed Turbo docs before its commands.
 7. All current W1/W2/W3/W4/W6/W7/W8 owner contracts/handoffs and actual exact heads.
    Owners are also handing off: find their current successors using chats/threads.
+   W1 final #74 head is5b1675ca155f87957c8ad62201097de2563c3c4f, documentation
+   after implementationdc461fc7. Read W1-continuation-2026-10-03-codex.md and
+   W1-takeover-2026-10-03-codex.md at that exact head; no acceptance transfers.
 
 The original mandate covers Daily Studio/queue; all EIGHT packet choices;
 exact-version drafts and genuine signing; signed Notes, two mutually isolated

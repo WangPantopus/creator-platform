@@ -1384,5 +1384,18 @@
     ],
     "noAdditionalMainMerge": true,
     "oldAcceptanceNotTransferred": true
+  },
+  "postPublicationW1Handoff": {
+    "recordedAt": "2026-10-03T23:52:30.864566+00:00",
+    "pr": 74,
+    "verifiedPublishedHead": "5b1675ca155f87957c8ad62201097de2563c3c4f",
+    "implementationHead": "dc461fc7fdfcb4a451dbbcf42d7a35a958dcd2dd",
+    "handoffPath": "docs/workstreams/handoffs/W1-continuation-2026-10-03-codex.md",
+    "promptPath": "docs/workstreams/prompts/W1-takeover-2026-10-03-codex.md",
+    "deltaFromImplementationDocumentationOnly": true,
+    "original304SourceReusePreserved": true,
+    "ownerReportedResourcesClosed": true,
+    "ownerPersonalAcceptanceNotTransferredToW5": true,
+    "allOwnerGroupsStillIncomplete": true
   }
 }
