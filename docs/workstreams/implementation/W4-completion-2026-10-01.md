@@ -1,3 +1,7 @@
+## Existing publication PR consolidation — October 3, 2026 18:12 UTC
+
+236's complete original catalogue/SQL/evidence is retained byte-identically in existing262, with every original completion/status increment preserved. Normal parent reconciliationd8783c9d changes ancestry only: its entire tree equals prior3cd6de4f.236 is closed unmerged with its pushed branch preserved;262 targets current main and carries the full original comparator/worker/System/ending scope. Complete accepted pins, genuine original task/factory/provider/consent/signature/output/financial/cleanup/sole COMMIT, approved minimum2–100, finite C10, required checks and activation remain open. This removes duplicate review without checking off a product package or R01–R15 row. [Comparison evidence and retained qualification](../../../artifacts/workstreams/W4/runtime/2026-10-03/fulfillment-publication-worker/README.md).
+
 ## Current signed iOS and original real deadline — October 3, 2026 13:06 UTC
 
 - [x] Personally operate current signed iOS original-account Requests/You Spending Back in named Light/Night paths, actual decimal6.50 unsaved input and normal cold discard; preserve all38 commerce tables/two rows and release the actual bounded own resources.
