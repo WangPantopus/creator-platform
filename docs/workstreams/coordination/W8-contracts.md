@@ -1,5 +1,9 @@
 # W8 contract, migration and runtime register
 
+## Original Agent lifecycle assertion — 2026-10-03
+
+Source201 calls `owner.lifecycle.assertRepository(owner.service.repository)` before constructing the Agent privacy adapter. W2's actual class retains the private original repository and throws503 `agent_lifecycle_composition_mismatch` for a different object; the worker leaves that dependency blocked. Same URL, structural casts and a fallback service do not supply custody. The separate completed original Conversation accounting boundary remains required before full0163 ACK.
+
 ## Current account read retry — 2026-10-03
 
 `retryTrustReads()` refreshes real capability/session/job hooks without granting a session or resetting the form epoch. Each hook preserves its current sequence/account fence. Actual503 session errors offer retry; only actual401 may offer reauthentication. Pending session reads withhold development sign-in navigation. [Personal real-web operation and independent saved state](../../operations/W8-privacy-session-recovery.md) qualify cold/warm recovery and cross-tab account separation only; the existing incomplete export remains unavailable for download.

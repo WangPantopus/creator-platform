@@ -134,6 +134,7 @@ export function createPrivacyConsumers(input: {
           "privacy_export_pool_mismatch",
           "Use the actual canonical Agent owner on this host's original pool.",
         );
+        owner.lifecycle.assertRepository(owner.service.repository);
         owner.privacyExportSnapshot?.assertHostPool(input.runtimePool);
         return agentPrivacyHook(
           owner.service,

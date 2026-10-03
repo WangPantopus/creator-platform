@@ -249,6 +249,7 @@ export class TrustWorker {
         "restoration_pending",
         "conversation_privacy_unavailable",
         "agent_privacy_unavailable",
+        "agent_lifecycle_composition_mismatch",
         "privacy_export_pool_mismatch",
         "conversation_lineage_unavailable",
         "conversation_recordings_unavailable",
