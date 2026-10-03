@@ -685,11 +685,14 @@
       "owner": "W8",
       "version": "0177_w8_generation_worker_denial",
       "state": "reserved_unapplied",
-      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Requires exact W1 durablegeneration task/initiating provenance; no fake Actor/session/worker scope.",
+      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Requires exact W1 durablegeneration task/initiating provenance; no fake Actor/session/worker scope. Private exact0072 nonce-bound negatives; EXECUTE only to W1 NOLOGIN authority. Genuine worker/application acceptance and consumer activation pending.",
       "heldVersionHistory": [
         "0093_w8_generation_worker_denial",
         "0140_w8_generation_worker_denial"
-      ]
+      ],
+      "path": "apps/backend/migrations/0093_w8_generation_worker_denial.sql",
+      "sourceCommit": "37b87eacff54ad097c2225342fc6010d8390694c",
+      "sourceSha256": "d47b5916b0ac0c3cc33bd7d50bfdb663f39a9218dcff0b97d3a9dce7b6acc44c"
     },
     {
       "id": "0178",

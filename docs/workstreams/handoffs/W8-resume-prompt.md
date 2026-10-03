@@ -1,5 +1,11 @@
 # W8 resume prompt — complete the workstream
 
+## Initial57 merged; durable worker denial continuation — 2026-10-02
+
+PR95 merged normally at5ec5cb07, reviewedc7bbcbcd. Both backend checks, compile and both Android runtime checks passed; six Mac checks remained queued, not passed. [Merge observation](../../../artifacts/workstreams/W8/migration-wave/20261002-mac-studio/final-acceptance/merge.json) and final real-three-client receipts are published; peers are taking their own actual backup/restore and canonical upgrade. Future purposes stay unapplied.
+
+[PR131](https://github.com/WangPantopus/creator-platform/pull/131) is a focused draft while genuine worker/nonce/app acceptance remains open. Reserved0093 now binds W1's exact0072 real private nonce/provenance and permits only its NOLOGIN authority to call the negative. Canonical `assertGenerationWorkerRestoredInTransaction(client)` is restoration only, callable before nonce creation and at bookends. [Closed catalogue receipt](../../../artifacts/workstreams/W8/generation-denial/20261002-mac-studio/README.md) records zero jobs/scopes, narrow ACLs and wrong-login refusal; genuine worker/nonce/application acceptance remains open.0098 W4 audience,0099 W1 terminal scope,0100 W8 terminal negatives and reviewed-but-held0101 W7 core Follow metadata are reserved only. Completion and metadata/financial reconciliation remain distinct; no fabricated Actor, scope, provider/cost receipt or restored state.
+
 ## Latest host cleanup direction — 2026-10-02
 
 [Permanent resource cleanup](W8-resource-cleanup-2026-10-02.md) supersedes old occupied-worktree/build statements below. W8 removed24 disposable build/cache/dependency paths (5.392GiB allocated before deletion), preserved private tools/results/configuration/backups, verified the retained native checkpoint hash and kept stopped database containers/volumes/compiler setup. The clean fully pushed W8 and60fb worktrees are removed after this cleanup documentation merges; create a fresh checkout and install/rebuild locked dependencies for continuation. No primary/peer/shared SDK/global cache/database/private-data cleanup or new acceptance is implied.

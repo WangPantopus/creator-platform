@@ -19,6 +19,7 @@ import {
 } from "../modules/trust/contracts.js";
 import { Readiness, type Probe } from "./readiness.js";
 import { DomainError } from "../core/errors.js";
+import { querySettlementUncertain } from "../core/query-settlement.js";
 import { TrustTelemetry } from "./telemetry.js";
 import {
   trustScopeRestriction,
@@ -304,17 +305,22 @@ export async function createTrustRuntime(options: {
     // substitutes for currentness on this transaction.
     await assertRestored();
     let ready = false;
+    let failure: unknown;
     try {
       ready = (await options.restoreReadyInTransaction?.(client)) === true;
-    } catch {
-      ready = false;
+    } catch (error) {
+      failure = error;
     }
-    if (!ready)
-      throw new DomainError(
+    if (!ready) {
+      const unavailable = new DomainError(
         "restoration_pending",
         "Current recovery authority is unavailable for this transaction.",
         503,
       );
+      if (failure !== undefined)
+        Object.defineProperty(unavailable, "cause", { value: failure });
+      throw unavailable;
+    }
   };
   const assertScopeAllowed: ScopeRestriction = async (
     actor,
@@ -340,6 +346,61 @@ export async function createTrustRuntime(options: {
     assertActorAllowed,
     assertScopeAllowed,
     assertRestoredInTransaction,
+    /** W1 calls this before private nonce creation and at its bookends. This
+     * is restoration only; SQL0093 runs from W1's actual private claim/read. */
+    assertGenerationWorkerRestoredInTransaction: async (client: PoolClient) => {
+      await client.query("SAVEPOINT w8_generation_restoration");
+      try {
+        const bound = (
+          await client.query<{
+            login: string;
+            role: string;
+            account: string | null;
+            session: string | null;
+          }>(`SELECT session_user AS login,current_user AS role,
+          nullif(current_setting('app.account_id',true),'') AS account,
+          nullif(current_setting('app.identity_session_id',true),'') AS session`)
+        ).rows[0];
+        if (
+          !bound ||
+          bound.login !== "creator_generation_worker" ||
+          bound.role !== bound.login ||
+          bound.account !== null ||
+          bound.session !== null
+        )
+          throw new DomainError(
+            "generation_restoration_unavailable",
+            "Current generation recovery authority is unavailable.",
+            503,
+          );
+        await assertRestoredInTransaction(client);
+      } catch (error) {
+        // The original owner must settle an uncertain response. This helper
+        // borrows its client and cannot release it or submit later source SQL.
+        if (querySettlementUncertain(error)) throw error;
+        try {
+          await client.query("ROLLBACK TO SAVEPOINT w8_generation_restoration");
+          await client.query("RELEASE SAVEPOINT w8_generation_restoration");
+        } catch (cleanupError) {
+          const unavailable = new DomainError(
+            "generation_restoration_unavailable",
+            "Current generation recovery authority is unavailable.",
+            503,
+          );
+          Object.defineProperty(unavailable, "cause", {
+            value: new AggregateError(
+              [error, cleanupError],
+              "Original generation restoration and cleanup failed.",
+            ),
+          });
+          throw unavailable;
+        }
+        throw error;
+      }
+      // A failed RELEASE stays with the original owner; do not issue cleanup
+      // for the release itself or treat an unknown response as permission.
+      await client.query("RELEASE SAVEPOINT w8_generation_restoration");
+    },
     assertContentAllowedInTransaction: async (
       client: PoolClient,
       actor: Actor,
