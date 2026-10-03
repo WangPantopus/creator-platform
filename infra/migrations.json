@@ -1104,6 +1104,15 @@
       "sourceSha256": "09d3df2f3549d0267dce2fe049789e575b1c8f212ee887d2d5396f110bafc047",
       "state": "reserved_unapplied",
       "reason": "Separate additive restrictive creator_profile SELECT boundary for existing creator_w5_generation_origin. W8 independently read/hash-checked all63 published SQL lines and current cf567643 origin/profile/effective-catalogue guards. Preserve original0102/0186 source/function, original private W1 read nonce/client/PID/fullXID/login/task generation/token/creator/account/five-second family, absence of Actor/Content GUCs and original signature-family lock order. This policy does not re-enter generation_scope_matches after the signature lease; original function and final identity bookends remain mandatory. No new role, membership, grant, scope, business row or function. Actual source registration, independently qualified policy-expression and complete effective catalogue pins, original typed callers, closed compiler/refusal/drift, fresh-preserved wave, cancellation/C10 and genuine original task/application qualification remain pending. Source custody only; no accepted catalogue, activation, public content/approval/source licence/provider authority or positive receipt."
+    },
+    {
+      "id": "0225",
+      "owner": "W1",
+      "version": "0225_w1_content_signature_read",
+      "path": "apps/backend/src/modules/identity/schema-content-signature-read.sql",
+      "sourceSha256": "734a806c1e2252d7c5c7c418856f3b448933d993326ef471bb3351eed1367e41",
+      "state": "reserved_unapplied",
+      "reason": "Separate original ordinary Content LAST signature-metadata reader published7a340113, all89 SQL lines independently read/hash-checked by W8. Isolated NoLogin NoInherit NoBypassRLS creator_content_signature_read_authority owns only fixed creator.hold_content_signature_read(uuid,uuid,uuid,text,boolean) RETURNS boolean for the genuine core runtime. Narrow stored signature/session metadata, actual creator/content/consumed signed act/canonical stored publication-command hash/public audience and unchanged0167 six mutation fences remain mandatory. Original W5 version/audience/restoration/recipient/negative gates must already hold on the same original client/PID/fullXID; the final nonwaiting shared actual signer-family lease uses fresh READ COMMITTED metadata. Original0157 packet purpose remains separate; no packet, ThreadScope, Actor or second-pool alias supplies this authority. Published8c8f8ef8 corrects implicit sequence ACL projection only; the complete effective catalogue stays unaccepted. Exact source registration, original typed callers and full combined catalogue/compiler/drift/refusal/fresh-preserved/cancellation/C10/withdrawal/revocation and sole owner cleanup/COMMIT qualification remain pending. Source custody only; no installed SQL/grant, accepted pin, private body/key/assertion, provider permission or application acceptance."
     }
   ]
 }
