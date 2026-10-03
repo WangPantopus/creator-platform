@@ -242,7 +242,9 @@ export function TrustSession({
       </a>
     ) : null;
   if (capability.error)
-    return onSessionState ||
+    return capability.error.status === 401 ? (
+      continuation
+    ) : onSessionState ||
       capability.error.code === capabilityError?.code ? null : (
       <ErrorState error={capability.error} retry={retryTrustReads} />
     );
