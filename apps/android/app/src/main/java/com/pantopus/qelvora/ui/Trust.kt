@@ -1,6 +1,7 @@
 package com.pantopus.qelvora.ui
 
 import android.content.Context
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -18,6 +19,8 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.pantopus.qelvora.identity.FanFeatureRegistration
 import com.pantopus.qelvora.identity.FanSession
 import com.pantopus.qelvora.identity.FanSessionRequestCapture
@@ -38,6 +41,57 @@ private fun trustVisible(model: FanSession): Boolean = model.session != null && 
 private fun trustReady(model: FanSession): Boolean = trustVisible(model) && !model.checkingSession
 
 private data class TrustPendingExport(val bytes: ByteArray, val capture: FanSessionRequestCapture)
+
+private data class TrustDraftOwner(val origin: String, val accountId: String, val sessionId: String, val route: String)
+private data class TrustFormDraft(
+    val kind: String, val reason: String, val creatorId: String, val messageId: String,
+    val requestId: String, val threadId: String, val scope: String,
+    val useful: Boolean?, val authorship: Boolean?, val feedbackComment: String,
+)
+
+/** Activity configuration memory only. No SavedStateHandle, storage, session
+ * model, credential, verification proof, consent, request or private result. */
+private class TrustConfigurationDrafts : ViewModel() {
+    private var parked: Pair<TrustDraftOwner, TrustFormDraft>? = null
+    fun park(owner: TrustDraftOwner, draft: TrustFormDraft) { parked = owner to draft }
+    fun clear() { parked = null }
+    fun take(owner: TrustDraftOwner?): TrustFormDraft? {
+        val value = parked; clear()
+        return value?.takeIf { owner != null && it.first == owner }?.second
+    }
+    fun observe(origin: String?, route: String, accountId: String?, sessionId: String?, checking: Boolean,
+                savedCredential: Boolean, purging: Boolean, purgeFailed: Boolean, choosingActor: Boolean) {
+        val owner = parked?.first ?: return
+        if (origin != owner.origin || route != owner.route || purging || purgeFailed || choosingActor ||
+            (accountId != null && (accountId != owner.accountId || sessionId != owner.sessionId)) ||
+            (accountId == null && !checking && !savedCredential)) clear()
+    }
+    override fun onCleared() { clear() }
+    companion object {
+        val factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                check(modelClass == TrustConfigurationDrafts::class.java)
+                return TrustConfigurationDrafts() as T
+            }
+        }
+    }
+}
+private fun trustConfigurationDrafts(context: Context): TrustConfigurationDrafts? =
+    (context as? ComponentActivity)?.let { ViewModelProvider(it, TrustConfigurationDrafts.factory)["qelvora.trust.configuration.form", TrustConfigurationDrafts::class.java] }
+private fun trustDraftOwner(baseURL: String?, model: FanSession): TrustDraftOwner? =
+    baseURL?.let { origin -> model.session?.let { TrustDraftOwner(origin, it.accountId, it.sessionId, model.destination) } }
+
+/** Mounted by the original root even while account restoration hides a feature.
+ * Pending input stays sealed until the original ready tuple is revalidated. */
+@Composable
+fun trustFanConfigurationBoundary(context: Context, baseURL: String?, model: FanSession) {
+    val memory = remember(context) { trustConfigurationDrafts(context) }
+    val accountId = model.session?.accountId; val sessionId = model.session?.sessionId
+    val route = model.destination; val checking = model.checkingSession; val saved = model.hasSavedCredential
+    val purging = model.purgingPrivateState; val failed = model.localPurgeFailed; val choosing = model.choosingActor
+    SideEffect { memory?.observe(baseURL, route, accountId, sessionId, checking, saved, purging, failed, choosing) }
+}
 
 /** Private calls use the genuine original capture; public help has no credential. */
 class TrustClient(private val baseURL: String, private val capture: FanSessionRequestCapture? = null) {
@@ -76,6 +130,7 @@ class TrustClient(private val baseURL: String, private val capture: FanSessionRe
 fun trustFanRegistration(context: Context, baseURL: String?) = FanFeatureRegistration(
     matches = { it.startsWith("/support") || it.startsWith("/trust") },
     allowsSignedOut = { it.startsWith("/trust") },
+    rootObserver = { model -> trustFanConfigurationBoundary(context, baseURL, model) },
     screen = { model ->
         key(model.session?.accountId, model.session?.sessionId) { TrustFanFeature(context, baseURL, model) }
     }
@@ -84,6 +139,10 @@ fun trustFanRegistration(context: Context, baseURL: String?) = FanFeatureRegistr
 /** Missing phone composition is recorded; use established tokens and controls at 16dp gutters. */
 @Composable
 fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
+    val activity = context as? ComponentActivity
+    val draftMemory = remember(context) { trustConfigurationDrafts(context) }
+    val draftOwner = trustDraftOwner(baseURL, model)
+    var draftRestorationAttempted by remember { mutableStateOf(false) }
     val client = remember(baseURL) { baseURL?.let { TrustClient(it) } }
     val coroutine = rememberCoroutineScope()
     val route = model.destination
@@ -261,7 +320,30 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
         if (loadedRoute != route || model.error.isNotEmpty()) clearPrivateResults() else if (!privateReady) suspendPrivateResults()
         loadedRoute = route; load()
     }
-    DisposableEffect(Unit) { onDispose { operation?.cancel(); refreshOperation?.cancel(); clearPrivateResults() } }
+    LaunchedEffect(draftOwner, privateReady) {
+        if (privateReady && !draftRestorationAttempted) {
+            draftRestorationAttempted = true
+            val restored = draftMemory?.take(draftOwner)
+            // Input entered during a first readiness check wins over a parked
+            // draft; no late restoration may overwrite the actual user's edit.
+            if (restored != null && reason.isEmpty() && feedbackComment.isEmpty() && proof.isEmpty() &&
+                !feedbackConsent && useful == null && authorship == null && threadId.isEmpty() && scope == "account" &&
+                kind == (if (validTrustId(reportedCreator) && validTrustId(reportedMessage)) "ai_report" else "support") &&
+                creatorId == reportedCreator.takeIf(::validTrustId).orEmpty() && messageId == reportedMessage.takeIf(::validTrustId).orEmpty() &&
+                requestId == entry.getQueryParameter("requestId").orEmpty().takeIf(::validTrustId).orEmpty()) {
+                kind = restored.kind; reason = restored.reason; creatorId = restored.creatorId; messageId = restored.messageId
+                requestId = restored.requestId; threadId = restored.threadId; scope = restored.scope
+                useful = restored.useful; authorship = restored.authorship; feedbackComment = restored.feedbackComment
+            }
+        }
+    }
+    DisposableEffect(Unit) { onDispose {
+        if (activity?.isChangingConfigurations == true && draftOwner != null && draftOwner == trustDraftOwner(baseURL, model) &&
+            !model.purgingPrivateState && !model.localPurgeFailed && !model.choosingActor && operation?.isActive != true) {
+            draftMemory?.park(draftOwner, TrustFormDraft(kind, reason, creatorId, messageId, requestId, threadId, scope, useful, authorship, feedbackComment))
+        } else draftMemory?.clear()
+        operation?.cancel(); refreshOperation?.cancel(); clearPrivateResults()
+    } }
     LaunchedEffect(kind,reason,creatorId,messageId,requestId,threadId,scope,proof) { key=UUID.randomUUID().toString() }
     Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).imePadding().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         TrustText(if (route.contains("privacy")) "Your data" else if (route.contains("access")) "Case access history" else if (route.contains("feedback")) "Optional product feedback" else if (route.startsWith("/trust")) "Crisis help protocol" else "Help and reports", "display-md")
