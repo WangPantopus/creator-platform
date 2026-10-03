@@ -106,12 +106,13 @@ export const PlaybackFileSchema = z.strictObject({
   bytes: z.number().int().positive().max(268_435_456),
 });
 export type PlaybackFile = z.infer<typeof PlaybackFileSchema>;
-export type PlaybackTicket = {
-  url: string;
-  expiresAt: string;
-  asset: MediaAsset;
-  playbackFile: PlaybackFile;
-};
+export const PlaybackTicketSchema = z.strictObject({
+  url: z.url(),
+  expiresAt: z.iso.datetime(),
+  asset: MediaAssetSchema,
+  playbackFile: PlaybackFileSchema,
+});
+export type PlaybackTicket = z.infer<typeof PlaybackTicketSchema>;
 
 /** Creator-owned objects use real W5 content/W2 source or interview IDs, never a fabricated fan thread. */
 export const CreatorMediaPurposeSchema = z.enum([
