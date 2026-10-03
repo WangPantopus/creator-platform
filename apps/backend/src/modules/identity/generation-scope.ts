@@ -68,14 +68,14 @@ const terminalContracts = [
     ],
   },
   {
-    owner: "creator_w4_generation_terminal",
+    owner: "creator_w4_generation_safety_terminal",
     originalScopeBridge: false,
-    version: "0189_w4_generation_terminal_settlement",
+    version: "0215_w4_generation_safety_terminal_settlement",
     checksum:
-      "a6e386de7506035d6bc0d10da644cb8ee2620824217b9c2c61a9a34cb7fa4fc9",
+      "5aba1bffa300a811630f66e8577d29801694a54b6f06de610f7f78a7184d9a24",
     signatures: [
-      "creator.generation_settle_original_allowance(uuid,uuid)",
-      "creator.generation_original_allowance_receipt(uuid,uuid)",
+      "creator.generation_settle_typed_original_allowance(uuid,uuid)",
+      "creator.generation_typed_original_allowance_receipt(uuid,uuid)",
     ],
   },
   {
@@ -85,6 +85,18 @@ const terminalContracts = [
     checksum:
       "8de1897f2e70f763382984459274eb7616ad7149b457811fffd90fb8b7df2e8c",
     signatures: ["creator.generation_terminal_output(uuid,uuid)"],
+  },
+] as const;
+// Additive0215 revokes this legacy worker EXECUTE. It must not be relabelled
+// as a generation consumer or accepted alongside the typed replacement.
+const supersededTerminalContracts = [
+  {
+    owner: "creator_w4_generation_terminal",
+    version: "0189_w4_generation_terminal_settlement",
+    signatures: [
+      "creator.generation_settle_original_allowance(uuid,uuid)",
+      "creator.generation_original_allowance_receipt(uuid,uuid)",
+    ],
   },
 ] as const;
 function reviewedTerminalConsumer(consumer: GenerationTerminalPurposeConsumer) {
@@ -445,7 +457,7 @@ export class GenerationIdentityAuthority {
             consumer.owner === "creator_generation_worker" ||
             consumer.migration.version === input.migration.version ||
             consumer.migration.version === input.denialMigration.version ||
-            terminalContracts.some(
+            [...terminalContracts, ...supersededTerminalContracts].some(
               (contract) =>
                 consumer.owner === contract.owner ||
                 consumer.migration.version === contract.version ||
