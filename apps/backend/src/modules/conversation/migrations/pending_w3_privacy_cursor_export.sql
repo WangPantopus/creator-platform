@@ -68,6 +68,10 @@ GRANT SELECT(creator_id,fan_id,normalized_text,semantic_key,thread_id) ON creato
 CREATE POLICY w3_cursor_export_metadata ON creator.memory_exclusion FOR SELECT TO creator_w3_privacy_export USING(true);
 GRANT SELECT(accepted_at,ai_message_id,completed_at,context_revision,creator_id,epoch,failure_code,fan_id,fan_message_id,first_visible_at,grant_id,id,last_sequence,reservation_id,state,thread_id) ON creator.generation TO creator_w3_privacy_export;
 CREATE POLICY w3_cursor_export_metadata ON creator.generation FOR SELECT TO creator_w3_privacy_export USING(true);
+-- Ordinary original-family output provenance, never retained accounting.
+GRANT SELECT(generation_id,sequence,thread_id,creator_id,fan_id,message_id,event_id,content_hash,approval,created_at)
+ ON creator.generation_sentence_provenance TO creator_w3_privacy_export;
+CREATE POLICY w3_cursor_export_metadata ON creator.generation_sentence_provenance FOR SELECT TO creator_w3_privacy_export USING(true);
 GRANT UPDATE(id) ON creator.thread TO creator_w3_privacy_export;
 CREATE POLICY w3_cursor_export_lock ON creator.thread FOR UPDATE TO creator_w3_privacy_export USING(true) WITH CHECK(false);
 CREATE TABLE creator.conversation_privacy_export_scope (
@@ -111,10 +115,48 @@ BEGIN
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0181_w2_generation_attempt_admission' AND checksum='eab8c8e07b8a1e6ba4384f5300560bd46853bf98509faade5a1b555e130c75ee')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0188_w2_generation_terminal_journal' AND checksum='7ab8974d065b1b9e5befa2ded26c6978876957fab0eee80b9632825bbac98477')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0210_w2_generation_guardrail_event' AND checksum='0c0fc7fee7182f3e77695222e51cce910268f7844437a5e974f68af5927a3382')
+  OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0212_w3_generation_worker_output' AND checksum='62740f14b21297bd54d6a53c4eb6fecbb96856842479b6a10f19dc07cc1e14ec')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0056_w3_correction_feedback_lineage' AND checksum='1044700d59b9dbb2d2b36d890496de0be6fb3d53c4409504f3c7693906866c35')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0057_w3_feedback_consent' AND checksum='08cb6f37c12ca3131b2e307a237569aa4d104fc627566e619a39fa18a1814d11')
   OR NOT EXISTS(SELECT FROM creator.schema_migration WHERE version='0059_w3_recording_association' AND checksum='b61d50d7f85c0ef468e00a8d2d6b737b4d405a9349810c552f7d9df7f527c42e')
  THEN RAISE EXCEPTION 'Registered original export prerequisites unavailable' USING ERRCODE='42501'; END IF;
+ -- Complete exact0212 ordinary table shape. Private purpose has fixed
+ -- column SELECT only; unknown columns, defaults, owners or FK changes refuse.
+ IF NOT EXISTS(SELECT FROM pg_class c WHERE c.oid=to_regclass('creator.generation_sentence_provenance')
+   AND c.relkind='r' AND c.relowner=(SELECT oid FROM pg_roles WHERE rolname='creator_owner')
+   AND c.relrowsecurity AND c.relforcerowsecurity)
+  OR has_table_privilege(current_user,'creator.generation_sentence_provenance','SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
+  OR EXISTS(WITH expected(column_name,type_name,ordinal) AS (VALUES
+   ('generation_id','uuid',1),('sequence','int4',2),('thread_id','uuid',3),('creator_id','uuid',4),('fan_id','uuid',5),
+   ('message_id','uuid',6),('event_id','uuid',7),('content_hash','text',8),('approval','jsonb',9),('created_at','timestamptz',10)
+  ) SELECT FROM expected e FULL JOIN (SELECT * FROM pg_attribute WHERE attrelid=to_regclass('creator.generation_sentence_provenance')
+    AND attnum>0 AND NOT attisdropped) a ON a.attname=e.column_name
+   WHERE e.column_name IS NULL OR a.attnum IS NULL OR a.attnum<>e.ordinal
+    OR a.atttypid<>('pg_catalog.'||e.type_name)::regtype OR a.atttypmod<>-1 OR a.attndims<>0
+    OR NOT a.attnotnull OR a.attidentity<>'' OR a.attgenerated<>''
+    OR a.atthasdef<>(e.column_name='created_at')
+    OR (e.column_name='created_at' AND (SELECT pg_get_expr(d.adbin,d.adrelid) FROM pg_attrdef d
+     WHERE d.adrelid=a.attrelid AND d.adnum=a.attnum) IS DISTINCT FROM 'clock_timestamp()')
+    OR NOT has_column_privilege(current_user,a.attrelid,a.attnum,'SELECT')
+    OR has_column_privilege(current_user,a.attrelid,a.attnum,'INSERT,UPDATE,REFERENCES'))
+  OR (SELECT count(*) FROM pg_constraint WHERE conrelid=to_regclass('creator.generation_sentence_provenance'))<>9
+  OR EXISTS(SELECT FROM pg_constraint WHERE conrelid=to_regclass('creator.generation_sentence_provenance')
+   AND (NOT convalidated OR condeferrable OR condeferred))
+  OR NOT EXISTS(SELECT FROM pg_constraint WHERE conrelid=to_regclass('creator.generation_sentence_provenance')
+   AND contype='p' AND conkey=ARRAY[1,2]::smallint[])
+  OR NOT EXISTS(SELECT FROM pg_constraint WHERE conrelid=to_regclass('creator.generation_sentence_provenance')
+   AND contype='u' AND conkey=ARRAY[7]::smallint[])
+  OR (SELECT count(*) FROM pg_constraint WHERE conrelid=to_regclass('creator.generation_sentence_provenance') AND contype='c')<>3
+  OR EXISTS(WITH expected(parent,columns,parent_columns) AS (VALUES
+   ('creator.generation',ARRAY[1]::smallint[],ARRAY['id']),('creator.event',ARRAY[7]::smallint[],ARRAY['id']),
+   ('creator.thread',ARRAY[3,4,5]::smallint[],ARRAY['id','creator_id','fan_id']),
+   ('creator.message',ARRAY[6,3]::smallint[],ARRAY['id','thread_id'])
+  ) SELECT FROM expected e WHERE NOT EXISTS(SELECT FROM pg_constraint k
+   WHERE k.conrelid=to_regclass('creator.generation_sentence_provenance') AND k.contype='f'
+    AND k.confrelid=to_regclass(e.parent) AND k.conkey=e.columns AND k.confupdtype='a' AND k.confdeltype='a' AND k.confmatchtype='s'
+    AND ARRAY(SELECT a.attname::text FROM unnest(k.confkey) WITH ORDINALITY x(n,ordinal)
+     JOIN pg_attribute a ON a.attrelid=k.confrelid AND a.attnum=x.n ORDER BY x.ordinal)=e.parent_columns))
+ THEN RAISE EXCEPTION 'Exact ordinary original sentence provenance custody required' USING ERRCODE='42501'; END IF;
  -- Current0181 admission fingerprints are ordinary accounting provenance.
  -- Its private completion capability digest is the sole explicit omission:
  -- this purpose must have no effective access to it, including table grants.
@@ -144,7 +186,7 @@ BEGIN
  IF EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
   WHERE ((n.nspname='creator' AND c.relname=ANY(ARRAY['thread','message','memory','memory_exclusion','thread_audit','event',
    'generation','processor_consent','memory_consent','conversation_usage_day','conversation_feedback',
-   'fan_profile','creator_profile','ai_generation_admission','ai_generation_attempt','ai_generation_receipt','ai_usage','ai_event']))
+   'fan_profile','creator_profile','generation_sentence_provenance','ai_generation_admission','ai_generation_attempt','ai_generation_receipt','ai_usage','ai_event']))
    OR (n.nspname='creator_trust' AND c.relname=ANY(ARRAY['privacy_job','privacy_task'])))
   AND (NOT c.relrowsecurity OR NOT c.relforcerowsecurity OR c.relowner=r
    OR NOT EXISTS(SELECT FROM pg_policy p WHERE p.polrelid=c.oid AND p.polname='w3_cursor_export_metadata'
@@ -276,6 +318,10 @@ LANGUAGE sql STABLE SECURITY DEFINER SET search_path=pg_catalog AS $$
  SELECT f."threadId",f."creatorId",f."fanId",17,(id::text),
   (SELECT to_jsonb(projected) FROM (SELECT id,fan_message_id,ai_message_id,grant_id,reservation_id,epoch,last_sequence,state,context_revision,accepted_at,first_visible_at,completed_at,failure_code) projected)
  FROM families f JOIN creator.generation t ON t.creator_id=f."creatorId" AND t.thread_id=f."threadId" AND t.fan_id=f."fanId"
+ UNION ALL
+ SELECT f."threadId",f."creatorId",f."fanId",18,(generation_id::text||':'||lpad(sequence::text,10,'0')),
+  (SELECT to_jsonb(projected) FROM (SELECT generation_id,sequence,thread_id,creator_id,fan_id,message_id,event_id,content_hash,approval,created_at) projected)
+ FROM families f JOIN creator.generation_sentence_provenance t ON t.creator_id=f."creatorId" AND t.thread_id=f."threadId" AND t.fan_id=f."fanId"
 $$;
 CREATE FUNCTION creator.finish_conversation_privacy_export_scope()
 RETURNS trigger LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path=pg_catalog AS $$

@@ -21,7 +21,7 @@ const Owner = "creator_w3_privacy_export";
 export const CONVERSATION_PRIVACY_CURSOR_MIGRATION =
   "0206_w3_privacy_cursor_export";
 export const CONVERSATION_PRIVACY_CURSOR_SOURCE_SHA256 =
-  "34310f9dcd2bd2188b83ff177ba8108317845317e6712c91afcad532172bfe7c";
+  "b355148b6bcbcb58d239bc5e90ce5b19b93e29a3e7848c17397f5350dbcac9bf";
 const Signatures = [
   "creator.fence_conversation_privacy_export(uuid,uuid,text,uuid,uuid,uuid)",
   "creator.conversation_privacy_export_rows(uuid,uuid)",
@@ -50,7 +50,7 @@ export const ConversationPrivacyCursorRow = z.strictObject({
   thread_id: z.uuid(),
   creator_id: z.uuid(),
   fan_id: z.uuid(),
-  collection: z.number().int().min(0).max(17),
+  collection: z.number().int().min(0).max(18),
   row_key: z.string(),
   // Preserve PostgreSQL JSON numbers exactly, including64-bit accounting.
   document: z.string().min(2),
@@ -205,6 +205,8 @@ export class PreparedConversationPrivacyCursor {
           AND checksum='7ab8974d065b1b9e5befa2ded26c6978876957fab0eee80b9632825bbac98477')
          AND EXISTS(SELECT FROM creator.schema_migration WHERE version='0210_w2_generation_guardrail_event'
           AND checksum='0c0fc7fee7182f3e77695222e51cce910268f7844437a5e974f68af5927a3382')
+         AND EXISTS(SELECT FROM creator.schema_migration WHERE version='0212_w3_generation_worker_output'
+          AND checksum='62740f14b21297bd54d6a53c4eb6fecbb96856842479b6a10f19dc07cc1e14ec')
          AND has_column_privilege($3,'creator.ai_generation_attempt','admission_version_hash','SELECT')
          AND has_column_privilege($3,'creator.ai_generation_attempt','admission_model_fingerprint','SELECT')
          AND NOT has_column_privilege($3,'creator.ai_usage','completion_capability_hash','SELECT,INSERT,UPDATE,REFERENCES')
@@ -277,6 +279,42 @@ export class PreparedConversationPrivacyCursor {
     );
     const effective = {
       ...(await generationConsumerCatalogue(client, Owner)),
+      // The shared effective-ACL catalogue does not encode types, defaults or
+      // FK definitions. Keep the entire ordinary0212 relation shape in the
+      // independently reviewed checksum, including unknown columns/constraints.
+      sentenceProvenance: {
+        columns: (
+          await client.query(
+            `SELECT a.attnum,a.attname,format_type(a.atttypid,a.atttypmod) AS type,
+             a.attnotnull,a.attndims,a.attidentity,a.attgenerated,
+             pg_get_expr(d.adbin,d.adrelid) AS default_expression
+             FROM pg_attribute a LEFT JOIN pg_attrdef d ON d.adrelid=a.attrelid AND d.adnum=a.attnum
+             WHERE a.attrelid=to_regclass('creator.generation_sentence_provenance')
+              AND a.attnum>0 AND NOT a.attisdropped ORDER BY a.attnum`,
+          )
+        ).rows,
+        constraints: (
+          await client.query(
+            `SELECT conname,contype,convalidated,condeferrable,condeferred,
+             pg_get_constraintdef(oid,true) AS definition
+             FROM pg_constraint WHERE conrelid=to_regclass('creator.generation_sentence_provenance') ORDER BY conname`,
+          )
+        ).rows,
+        indexes: (
+          await client.query(
+            `SELECT pg_get_indexdef(indexrelid) AS definition,indisvalid,indisready
+             FROM pg_index WHERE indrelid=to_regclass('creator.generation_sentence_provenance')
+             ORDER BY pg_get_indexdef(indexrelid)`,
+          )
+        ).rows,
+        triggers: (
+          await client.query(
+            `SELECT tgname,tgenabled,pg_get_triggerdef(oid,true) AS definition
+             FROM pg_trigger WHERE tgrelid=to_regclass('creator.generation_sentence_provenance')
+             ORDER BY tgname`,
+          )
+        ).rows,
+      },
       functions: (
         await client.query(
           `SELECT n.nspname,p.proname,pg_get_function_identity_arguments(p.oid) AS arguments,
