@@ -62,7 +62,7 @@ Parsing/generation/scoped source checks pass; fresh shipping compilation and per
 - [ ] Finish the retained PRs' genuine current task/provider/financial/cleanup/sole-COMMIT/C10, required CI and current native/accessibility acceptance before merging.
 - [ ] Complete every original Commerce package/R01–R15. No full row is checked off.
 
-[Current source, evidence, remaining dependencies and successor actions](../handoffs/W4-continuation-handoff-2026-10-03-afternoon.md) supersede dated checkpoint facts below. The new documentation-only handoff leaves the last #303 product leaf `e7c8f7a3` unchanged. The approximate60% effort estimate is a planning judgment; it supplies no package or release acceptance.
+[Current source, evidence, remaining dependencies and successor actions](../handoffs/W4-continuation-handoff-2026-10-03-afternoon.md) supersede dated checkpoint facts below. The final original W5 a3 shared helper requires a real rollback receipt and is byte-exact in all six updated drafts; its matched checks and #2134e6d build pass without launch. The final handoff update adds only documentation after #303 source6a8fb1a4; native/web application bytes remain b39. The approximate60% effort estimate is a planning judgment; it supplies no package or release acceptance.
 
 ## Current signed iOS and original real deadline — October 3, 2026 13:06 UTC
 
