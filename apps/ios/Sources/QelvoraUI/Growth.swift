@@ -158,7 +158,9 @@ public struct GrowthClient: Sendable {
     request.timeoutInterval = 10
     request.cachePolicy = .reloadIgnoringLocalCacheData
     request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-    let value = path.hasPrefix("public/") ? nil : try await token()
+    let publicRead = path.hasPrefix("public/")
+    let value = publicRead ? nil : try await token()
+    if !publicRead, value == nil { throw GrowthRequestFailure(status: 401) }
     if let expectedSession, value != expectedSession { throw GrowthRequestFailure(status: 401) }
     if let value {
       request.setValue("Bearer " + value, forHTTPHeaderField: "Authorization")
@@ -168,7 +170,8 @@ public struct GrowthClient: Sendable {
     guard (200..<300).contains(http.statusCode) else {
       throw GrowthRequestFailure(status: http.statusCode)
     }
-    if expectedSession != nil, try await token() != value { throw GrowthRequestFailure(status: 401) }
+    try Task.checkCancellation()
+    if !publicRead, try await token() != value { throw GrowthRequestFailure(status: 401) }
     return try JSONDecoder().decode(T.self, from: data)
   }
   public func registerDevice(installationID: UUID, token value: Data, granted: Bool, registrationRevision: Int, expectedSession: String) async throws {

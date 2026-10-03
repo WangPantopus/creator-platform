@@ -47,14 +47,16 @@ class GrowthClient(private val origin: String, private val token: () -> String? 
         try {
             connection.requestMethod = method; connection.connectTimeout = 5000; connection.readTimeout = 10000
             connection.useCaches = false; connection.setRequestProperty("Content-Type", "application/json")
-            val credential = if(path.startsWith("public/")) null else token()
+            val publicRead = path.startsWith("public/")
+            val credential = if(publicRead) null else token()
+            if(!publicRead && credential == null) throw GrowthRequestFailure(401)
             if(expectedSession != null && credential != expectedSession) throw GrowthRequestFailure(401)
             credential?.let { connection.setRequestProperty("Authorization", "Bearer $it") }
             if (body != null) { connection.doOutput = true; connection.outputStream.use { it.write(body.toString().toByteArray()) } }
             if (connection.responseCode !in 200..299) throw GrowthRequestFailure(connection.responseCode)
             val response = connection.inputStream.use { it.readNBytes(1_000_001) }
             if (response.size > 1_000_000) throw IllegalStateException(QelvoraCopy.text("growthThisResponseIsUnavailable"))
-            if(expectedSession != null && token() != credential) throw GrowthRequestFailure(401)
+            if(!publicRead && token() != credential) throw GrowthRequestFailure(401)
             JSONObject(response.toString(Charsets.UTF_8))
         } finally { connection.disconnect() }
     }
