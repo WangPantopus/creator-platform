@@ -1,4 +1,4 @@
-import type { PoolClient } from "pg";
+import type { PoolClient, QueryConfig } from "pg";
 import { DomainError } from "../../core/errors.js";
 import { registeredMigration } from "../../db/reviewed-migration.js";
 
@@ -126,33 +126,59 @@ const columns = [
   })),
 ];
 
-export function feedbackUnavailable() {
-  return new DomainError(
+export function feedbackUnavailable(cause?: unknown) {
+  const error = new DomainError(
     "development_feedback_unconfigured",
     "Feedback is not available yet.",
     503,
   );
+  if (cause !== undefined)
+    Object.defineProperty(error, "cause", { value: cause, configurable: true });
+  return error;
+}
+
+// Installed pg supports this response deadline; its declaration omits it.
+function catalogueQuery(
+  text: string,
+  values: unknown[] = [],
+  queryTimeout = 5000,
+): QueryConfig & { query_timeout: number } {
+  return { text, values, query_timeout: queryTimeout };
 }
 
 /** The executable active registry, not a reservation or hand-installed function,
  * activates this finite development policy. No positive result is cached. */
-export async function assertDevelopmentFeedbackCatalog(client: PoolClient) {
+export async function assertDevelopmentFeedbackCatalog(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  signal?.throwIfAborted();
   const registered = await registeredMigration(developmentFeedbackSource);
+  signal?.throwIfAborted();
   if (registered?.version !== developmentFeedbackVersion)
     throw feedbackUnavailable();
-  await assertDevelopmentFeedbackPurposeCatalog(client);
+  await assertDevelopmentFeedbackPurposeCatalog(client, signal);
 }
 
 /** Closed source qualification may inspect purpose custody without activating
  * application consent. Application callers must use the registry gate above. */
 export async function assertDevelopmentFeedbackPurposeCatalog(
   client: PoolClient,
+  signal?: AbortSignal,
 ) {
-  await client.query("SAVEPOINT w8_feedback_catalog");
+  let completed = false;
+  let failed = false;
+  let failure: unknown;
   try {
+    signal?.throwIfAborted();
+    await client.query(
+      catalogueQuery("SAVEPOINT w8_feedback_catalog", [], 1500),
+    );
+    signal?.throwIfAborted();
     const ready = (
       await client.query<{ ready: boolean }>(
-        `WITH purpose AS (
+        catalogueQuery(
+          `WITH purpose AS (
       SELECT oid FROM pg_roles WHERE rolname=$1 AND NOT rolcanlogin AND NOT rolinherit
        AND NOT rolsuper AND NOT rolcreatedb AND NOT rolcreaterole AND NOT rolreplication
        AND NOT rolbypassrls AND rolconfig IS NULL
@@ -246,28 +272,63 @@ export async function assertDevelopmentFeedbackPurposeCatalog(
         AND i.indisvalid AND i.indisready AND i.indislive AND i.indisunique=e."unique"
         AND encode(sha256(convert_to(pg_get_indexdef(c.oid),'UTF8')),'hex')=e.hash)
       AS ready`,
-        [
-          purpose,
-          JSON.stringify(functions),
-          JSON.stringify(columns),
-          JSON.stringify(constraints),
-          JSON.stringify(policies),
-          JSON.stringify(indexes),
-        ],
+          [
+            purpose,
+            JSON.stringify(functions),
+            JSON.stringify(columns),
+            JSON.stringify(constraints),
+            JSON.stringify(policies),
+            JSON.stringify(indexes),
+          ],
+        ),
       )
     ).rows[0]?.ready;
-    if (ready !== true) throw feedbackUnavailable();
+    signal?.throwIfAborted();
+    if (ready !== true) {
+      completed = true;
+      throw feedbackUnavailable();
+    }
     const registered = (
       await client.query<{ ready: boolean }>(
-        "SELECT creator_trust.development_feedback_registered($1,$2) AS ready",
-        [developmentFeedbackVersion, developmentFeedbackSource.checksum],
+        catalogueQuery(
+          "SELECT creator_trust.development_feedback_registered($1,$2) AS ready",
+          [developmentFeedbackVersion, developmentFeedbackSource.checksum],
+        ),
       )
     ).rows[0]?.ready;
+    signal?.throwIfAborted();
+    completed = true;
     if (registered !== true) throw feedbackUnavailable();
   } catch (error) {
-    await client.query("ROLLBACK TO SAVEPOINT w8_feedback_catalog");
-    throw error;
+    failed = true;
+    failure = error;
   } finally {
-    await client.query("RELEASE SAVEPOINT w8_feedback_catalog");
+    // Failed response/actual abort belongs to the original transaction owner.
+    // Never send helper SQL behind an uncertain catalogue read.
+    if (completed && !signal?.aborted) {
+      try {
+        signal?.throwIfAborted();
+        await client.query(
+          catalogueQuery("ROLLBACK TO SAVEPOINT w8_feedback_catalog", [], 1500),
+        );
+        signal?.throwIfAborted();
+        await client.query(
+          catalogueQuery("RELEASE SAVEPOINT w8_feedback_catalog", [], 1500),
+        );
+      } catch (cause) {
+        failure = !failed
+          ? cause
+          : new AggregateError(
+              [failure, cause],
+              "Original feedback check and helper settlement failed.",
+            );
+        failed = true;
+      }
+    }
   }
+  if (!failed && signal?.aborted) {
+    failed = true;
+    failure = signal.reason;
+  }
+  if (failed) throw feedbackUnavailable(failure);
 }

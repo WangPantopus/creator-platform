@@ -9,6 +9,7 @@ import { registeredMigration } from "../../db/reviewed-migration.js";
 import { threadScopeActor, type ThreadScope } from "../access/scope.js";
 import type { ReplyFeedbackAuthority } from "../conversation/lineage.js";
 import { requestAuthority } from "../identity/request-authority.js";
+import { trustTransaction } from "./transaction.js";
 import {
   assertDevelopmentFeedbackCatalog,
   developmentFeedbackSource,
@@ -229,60 +230,61 @@ export async function createDevelopmentFeedback(
     });
   const purgeExpired: DevelopmentFeedback["purgeExpired"] = async (signal) => {
     check();
-    if (requestAuthority.getStore() || signal.aborted)
+    if (
+      !(signal instanceof AbortSignal) ||
+      requestAuthority.getStore() ||
+      signal.aborted
+    )
       throw feedbackUnavailable();
-    const client = await worker.connect();
-    try {
-      await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
-      await runtime.assertRestoredInTransaction!(client);
-      await assertDevelopmentFeedbackCatalog(client);
-      const result = (
-        await client.query<{
-          feedback_deleted: number;
-          events_deleted: number;
-        }>("SELECT * FROM creator_trust.purge_development_feedback(100)")
-      ).rows[0];
-      if (
-        !result ||
-        !Number.isInteger(result.feedback_deleted) ||
-        !Number.isInteger(result.events_deleted) ||
-        result.feedback_deleted < 0 ||
-        result.feedback_deleted > 100 ||
-        result.events_deleted < 0 ||
-        result.events_deleted > 100
-      )
-        throw feedbackUnavailable();
-      await runtime.assertRestoredInTransaction!(client);
-      await assertDevelopmentFeedbackCatalog(client);
-      check();
-      if (requestAuthority.getStore() || signal.aborted)
-        throw feedbackUnavailable();
-      await client.query("COMMIT");
-      return Object.freeze({
-        feedbackDeleted: result.feedback_deleted,
-        eventsDeleted: result.events_deleted,
-      });
-    } catch (error) {
-      await client.query("ROLLBACK");
-      throw error;
-    } finally {
-      client.release();
-    }
+    return trustTransaction(
+      worker,
+      async (client) => {
+        signal.throwIfAborted();
+        await runtime.assertRestoredInTransaction!(client);
+        signal.throwIfAborted();
+        await assertDevelopmentFeedbackCatalog(client, signal);
+        signal.throwIfAborted();
+        const result = (
+          await client.query<{
+            feedback_deleted: number;
+            events_deleted: number;
+          }>("SELECT * FROM creator_trust.purge_development_feedback(100)")
+        ).rows[0];
+        signal.throwIfAborted();
+        if (
+          !result ||
+          !Number.isInteger(result.feedback_deleted) ||
+          !Number.isInteger(result.events_deleted) ||
+          result.feedback_deleted < 0 ||
+          result.feedback_deleted > 100 ||
+          result.events_deleted < 0 ||
+          result.events_deleted > 100
+        )
+          throw feedbackUnavailable();
+        await runtime.assertRestoredInTransaction!(client);
+        signal.throwIfAborted();
+        await assertDevelopmentFeedbackCatalog(client, signal);
+        check();
+        if (requestAuthority.getStore() || signal.aborted)
+          throw feedbackUnavailable();
+        return Object.freeze({
+          feedbackDeleted: result.feedback_deleted,
+          eventsDeleted: result.events_deleted,
+        });
+      },
+      { signal, isolation: "read committed" },
+    );
   };
   try {
     for (const pool of [runtime.pool, worker]) {
-      const client = await pool.connect();
-      try {
-        await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
-        await runtime.assertRestoredInTransaction!(client);
-        await assertDevelopmentFeedbackCatalog(client);
-        await client.query("ROLLBACK");
-      } catch (error) {
-        await client.query("ROLLBACK");
-        throw error;
-      } finally {
-        client.release();
-      }
+      await trustTransaction(
+        pool,
+        async (client) => {
+          await runtime.assertRestoredInTransaction!(client);
+          await assertDevelopmentFeedbackCatalog(client);
+        },
+        { readOnly: true, isolation: "read committed" },
+      );
     }
   } catch (error) {
     closed = true;
