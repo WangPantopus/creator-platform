@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Notice } from "@qelvora/ui-web";
 import { copy } from "@qelvora/copy";
@@ -22,18 +22,23 @@ export function HandleForm({
   const [intro, setIntro] = useState(initialIntro);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const pending = useRef<AbortController | null>(null);
+  useEffect(() => () => pending.current?.abort(), []);
   return (
     <form
       className="identity-handle"
       onSubmit={async (event) => {
         event.preventDefault();
         if (saving) return;
+        const controller = new AbortController();
+        pending.current = controller;
         setSaving(true);
         setError("");
         try {
           const response = await identity
             .request("fan-profile", {
               method: "POST",
+              signal: controller.signal,
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ handle, intro: editing ? intro : "" }),
             })
@@ -43,6 +48,7 @@ export function HandleForm({
           const result = await response.json().catch(() => {
             throw new Error(copy.identityInputKeptUnreadable);
           });
+          if (identity.signal.aborted || controller.signal.aborted) return;
           if (!response.ok) {
             throw new Error(
               result.error?.message ?? copy.identityProfileSaveFailed,
@@ -51,13 +57,16 @@ export function HandleForm({
           router.replace(returnTo);
           router.refresh();
         } catch (error) {
+          if (identity.signal.aborted || controller.signal.aborted) return;
           setError(
             error instanceof Error
               ? error.message
               : copy.identityProfileSaveFailed,
           );
         } finally {
-          setSaving(false);
+          if (pending.current === controller) pending.current = null;
+          if (!identity.signal.aborted && !controller.signal.aborted)
+            setSaving(false);
         }
       }}
     >
