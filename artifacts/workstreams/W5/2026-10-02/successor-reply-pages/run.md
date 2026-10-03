@@ -33,3 +33,40 @@ slow-read concealment described above at41bfdd5c. Populated forward/back paging,
 filter changes, signed reaction and two-fan isolation remain unverified until a
 genuinely signed Note and W8-reviewed replies exist. Native operation and all
 nine-package release acceptance remain open. Release-ready: false for W5.
+
+## Production renewal repair, 2026-10-03
+
+At `64db0419c9560ffb4b7b556150c8d795f308d62d`, the production Light view
+remained in checking access despite visible-document metadata and fast actual200
+role/content/reply responses. Unchanged role reads returned new array instances,
+restarting the child load effect and invalidating its pending generation. A new
+refresh could then be skipped by the still-pending action. Personally fixed at
+`c6850d6e3c2fa7359d1af4957694aba0303b06f4`: depend on the current scalar reply
+permission. Account binding, actual permission changes, generation checks and
+the five-second lease remain enforced. This source includes captured main
+`c56913f6b359d3070bee613d04d31bf67a2fdc57`.
+
+Production Next build, web typecheck and scoped ESLint passed. The owned API41055
+and production web30055 were restarted at c6850d6e on canonical61. Personally
+operated and inspected390/1280 Light/Night: the actual revision19 unsigned draft
+and empty reviewed reply feed remained visible through repeated role renewals;
+one bounded reply read accompanied each Note refresh. Private images are under
+`/private/tmp/creator-w5-shell-operator/shots/production-c6850d6e-notes-*`.
+The files containing `unread` in their names still show All reviewed replies;
+keyboard attempts did not produce a durable filter change. Filter acceptance
+remains unverified.
+
+Personally paused only the owned API PID33504 with automatic CONT cleanup.
+Accessible state concealed Note/reply bodies, then the actual25-second pause
+image `production-c6850d6e-notes-actual-concealed.png` showed account/role
+reconnection with Studio hidden. After actual resume/health200, automatic current
+reads restored the draft and empty feed. An earlier image named `api-pause`
+caught recovery and is not concealment evidence. A later Check-current-access
+click timed out because automatic recovery had already removed that control.
+
+Implemented/runnable: bounded reads and stable unchanged-role renewal.
+Integrated: actual configured development backend, canonical61, no held-purpose
+activation. Verified: only the above exact-source unsigned/empty-feed layout,
+renewal and outage/recovery observations. Genuine signing, reviewed populated
+pages, two-fan isolation, signed reaction and filter acceptance remain open.
+Release-ready: false for the complete W5 assignment.
