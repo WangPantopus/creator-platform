@@ -1,3 +1,13 @@
+## Current signed iOS and original real deadline — October 3, 2026 13:06 UTC
+
+- [x] Personally operate current signed iOS original-account Requests/You Spending Back in named Light/Night paths, actual decimal6.50 unsaved input and normal cold discard; preserve all38 commerce tables/two rows and release the actual bounded own resources.
+- [x] Observe the original24-hour spending increase mature at its real deadline through normal Refresh; verify one stored version increment, repeated Refresh/cold stability and only the limit row changing.
+- [ ] Finish current Android internal Night Back/200%, iOS largest-text controls and authorized complete spoken accessibility; current Text11 shared-banner truncation is preserved and owner-coordinated.
+- [ ] Qualify the dependent original commerce session consumer298 with corrected actual W1 producer296, current CI, remaining artboards and actual commerce command race; review W3's specific commerce privacy export/composition findings.
+- [ ] Complete all nine original packages/R01–R15, including genuine factory/provider/financial/cleanup/sole COMMIT/C10. No full row is complete.
+
+[Current signed iOS evidence](../../../artifacts/workstreams/W4/runtime/2026-10-03/ios-personal-return/README.md) and [real deadline qualification](../../../artifacts/workstreams/W4/runtime/2026-10-03/original-limit-maturation/README.md) supersede the dated pending records without deleting them. All14 then-active W4 branches/shared main normally include reviewedb4d3099a and match pushed heads; workbook/history are preserved. Later draft298 remains held for its actual producer and current consumer gates.
+
 ## Current native repeat and retained todo — October 3, 2026 12:26 UTC
 
 - [x] Personally qualify current Android Light Requests return, Night direct You return and actual unsaved decimal/cold discard while preserving the original38-table commerce state; release the bounded own device/GUI window normally.
