@@ -231,7 +231,11 @@ fun TrustFanFeature(context: Context, baseURL: String?, destination: String = "/
             val disabled = busy || !verificationConfigured || (if (local) proof != "LOCAL DEVELOPMENT" else verificationMethod != "current_session" && proof.isEmpty()) || (scope != "account" && !validTrustId(creatorId)) || (scope == "thread" && !validTrustId(threadId))
             Button("Request export", ButtonVariant.SECONDARY, block = true, disabled = disabled) { coroutine.launch { privacyCommand("export") } }
             Button("Request deletion", ButtonVariant.SECONDARY, block = true, disabled = disabled) { confirmDelete = true }
-            jobs.forEach { job -> Button(job.text("kind") + " · " + job.text("scope") + " · " + job.text("state").replace('_', ' '), ButtonVariant.QUIET, block = true, disabled = busy) { coroutine.launch { jobDetail(job.text("id")) } } }
+            jobs.forEach { job -> key(job.text("id")) {
+                TrustText("Requested " + job.text("created_at"), "caption")
+                val label = job.text("kind") + ", " + job.text("scope") + ", " + job.text("state").replace('_', ' ') + ", requested " + job.text("created_at") + ", job " + job.text("id")
+                Button(job.text("kind") + " · " + job.text("scope") + " · " + job.text("state").replace('_', ' '), ButtonVariant.QUIET, block = true, disabled = busy, modifier = Modifier.semantics { contentDescription = label }) { coroutine.launch { jobDetail(job.text("id")) } }
+            } }
             selectedJob?.let { job ->
                 TrustText("Job " + job.text("id"), "caption")
                 job["tasks"]?.jsonArray?.forEach { item -> val task = item.jsonObject; TrustText(task.text("domain") + ": " + task.text("state").replace('_', ' ') + task.text("error_code").takeIf { it.isNotEmpty() }?.let { " · " + it.replace('_', ' ') }.orEmpty()) }
