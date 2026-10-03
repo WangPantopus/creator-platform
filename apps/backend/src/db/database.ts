@@ -5,6 +5,8 @@ import {
   type ThreadScope,
 } from "../modules/access/scope.js";
 import { DomainError } from "../core/errors.js";
+import { ContentHeldClient } from "../modules/content/held-client-cleanup.js";
+import { withRequestContextRestore } from "../modules/identity/request-context.js";
 import {
   assertCurrentSession,
   holdCurrentRequestSession,
@@ -155,8 +157,10 @@ export class Database {
     // SHARE and deadlock when they subsequently upgrade to UPDATE.
     const threadLock = lockMode === "write" ? "UPDATE" : "SHARE";
     const client = await this.pool.connect();
+    const held = new ContentHeldClient(client);
+    let failure: unknown;
     try {
-      await client.query("BEGIN");
+      await held.begin();
       await client.query(
         "SELECT set_config('app.creator_id',$1,true), set_config('app.fan_id',$2,true), set_config('app.account_id',$3,true)",
         [scope.creatorId, scope.fanId, scope.actorAccountId],
@@ -199,23 +203,24 @@ export class Database {
             "This conversation is unavailable.",
             404,
           );
-        try {
-          await this.assertAllowedInTransaction(
-            actor,
-            scope.creatorId,
-            scope.threadId,
-            {
-              fanAccountId: negativeFanAccount,
-              creatorAccountId: scope.creatorAccountId,
-            },
-            client,
-          );
-        } finally {
-          await client.query(
-            "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true),set_config('app.account_id',$3,true)",
-            [scope.creatorId, scope.fanId, scope.actorAccountId],
-          );
-        }
+        await withRequestContextRestore(
+          () =>
+            this.assertAllowedInTransaction!(
+              actor,
+              scope.creatorId,
+              scope.threadId,
+              {
+                fanAccountId: negativeFanAccount!,
+                creatorAccountId: scope.creatorAccountId,
+              },
+              client,
+            ),
+          () =>
+            client.query(
+              "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true),set_config('app.account_id',$3,true)",
+              [scope.creatorId, scope.fanId, scope.actorAccountId],
+            ),
+        );
         if (heldRequest)
           await assertHeldCurrentRequestSession(heldRequest, client);
       }
@@ -273,20 +278,21 @@ export class Database {
         // Keep the pre-resolved original fan binding current through commit.
         // This is the same narrow read-only profile lease used by Access; no
         // fan-scoped domain work runs with this temporary account binding.
-        let currentFan;
-        try {
-          await client.query("SELECT set_config('app.account_id',$1,true)", [
-            negativeFanAccount,
-          ]);
-          currentFan = await client.query(
-            "SELECT 1 FROM creator.fan_profile WHERE id=$1 AND account_id=$2 FOR SHARE",
-            [scope.fanId, negativeFanAccount],
-          );
-        } finally {
-          await client.query("SELECT set_config('app.account_id',$1,true)", [
-            scope.actorAccountId,
-          ]);
-        }
+        const currentFan = await withRequestContextRestore(
+          async () => {
+            await client.query("SELECT set_config('app.account_id',$1,true)", [
+              negativeFanAccount,
+            ]);
+            return client.query(
+              "SELECT 1 FROM creator.fan_profile WHERE id=$1 AND account_id=$2 FOR SHARE",
+              [scope.fanId, negativeFanAccount],
+            );
+          },
+          () =>
+            client.query("SELECT set_config('app.account_id',$1,true)", [
+              scope.actorAccountId,
+            ]),
+        );
         if (currentFan.rowCount !== 1)
           throw new DomainError(
             "thread_unavailable",
@@ -361,13 +367,13 @@ export class Database {
       } finally {
         this.held.delete(scopedClient);
       }
-      await client.query("COMMIT");
+      await held.commit();
       return value;
     } catch (error) {
-      await client.query("ROLLBACK");
+      failure = error;
       throw error;
     } finally {
-      client.release();
+      await held.settle(failure);
     }
   }
 }
