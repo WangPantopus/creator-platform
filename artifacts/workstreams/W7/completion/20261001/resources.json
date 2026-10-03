@@ -149,13 +149,13 @@
       "udid": "FAB31883-2F36-4E50-83B3-D9654B60FF00",
       "runtime": "iOS 27.0",
       "points": "390x844",
-      "state": "Shutdown after native94/backendd781 Settings Save/Reload, initial Home401 refusal then Retry/You→Home empty recovery; exact GUI/simulator slot1 released. Original installed hashes matched. Current214 wait repair operation pending."
+      "state": "Shutdown after current483 personally operated Home/settings Reload/defaultcoldrestoration/explicitDiscover/signout; installed hashes match; exactfullraw+dev/inode GUI+simlease released. Empty/development only; Discover Sections accessible-name defect remains open."
     },
     "androidAvd": {
       "name": "Qelvora_W7_API34",
       "image": "system-images;android-34;google_apis;arm64-v8a",
       "display": "1170x2532 @480dpi = 390x844 dp",
-      "state": "5580 absent after source13d cold launch/missing-share refusal; emulator exit0; exact slot1/GUI leases released; actual2026148KiB/2cores; Studio attachment refused; newer94 artifact operation pending"
+      "state": "Absent after current483 authenticatedGRPC Studio attachment,actual2026148KiB/CPU0-1,installed hash match,SettingsSaveack/Reload/Home/signout;exactfullraw+dev/inode emulatorlease released. Empty/development only."
     },
     "swiftBuildScratch": "/private/tmp/claude-501/... session scratchpad (disposable; not a dependency)",
     "sharedMachineBudget": "Adopted W1's 2026-10-01 budget: one heavy native build machine-wide via mkdir /private/tmp/creator-platform-heavy-build.lock (+owner file); at most two creator-platform emulators via /private/tmp/creator-platform-emulator-slot-{1,2}; at most three booted simulators via /private/tmp/creator-platform-simulator-slot-{1,2,3}; explicit UDID/serial only. Three earlier local swift test passes in this session ran before the budget message.",
