@@ -1,0 +1,18 @@
+# Cold Account and original Studio session — October 3, 2026 UTC
+
+Implemented/integrated source `8161c1052940aa77b6238722de06fca8463bf045` combines the original W5 account/session consumer, exact W1 cold buffer cleanup `72cc71cd`, and original reply-cleanup draft304. Captured main is `5c08634b7542fef95dd6c176030a785845250c62`. This operation does not qualify the reply helper, newer public-document observer or later code.
+
+Runnable: exact-source backend and webpack production web builds both exit0. The initial production HTTP sign-in correctly refuses its configured origin; that browser attempt never reaches Studio. Actual authenticated operation instead uses the committed canonical development API launcher and supported Next development host on owned41055/30055, with preserved canonical61. No production TLS, certificate or NODE_ENV policy is bypassed. Maya remains development-only seeded verified without proof or passkey.
+
+Personally verified at that exact source:
+
+- The genuine saved fan-one session restores and triage queue access refuses503; actual creator sign-in obtains the genuinely empty queue200.
+- The selected “Waiting for more information” filter survives Requests→Notes→Requests, a full cold Account document load and reload, actual Account refresh200, and a Night saved return. Cold Account logout200 at16:23:04.018Z followed by genuine fresh same-creator sign-in resets the visible filter to “All.”
+- Actual390×844 and1280×900 Light/Night views are measured, with scrollWidth equal to clientWidth. Keyboard `d`/Enter selects “Due” with SELECT focus; desktop reload retains it. The initial inherited viewport stayed1280 and its attempted390 view is unqualified; a fresh capability for the same selected browser and reload supplies the qualified390 views.
+- Normal termination of only the owned API causes actual issuer polling to conceal Studio. Same-source restart automatically restores the original “Due” filter. Attempted manual buttons had already disappeared because polling changed the page; no successful manual recovery action is credited.
+- A genuine second same-creator sign-in replaces the session. Original unchanged-triage Team Save receives real409 `session_view_changed` at16:26:08.953Z before dispatch (1.47ms) and closes its editor to the saved continuation. Actual fan-one Team return shows triage and real403 `creator_role_required`, without management controls.
+- Read-only before/after metadata is identical: canonical61, unsigned Note revision21/draft/All members, zero publications/replies, active triage membership xmin84891. No role, invitation, body, consent, signature or fulfillment is created.
+
+Private0600 receipt SHA256 `0eb9771d4d0fdc5566ad2e7214491eb812d6fa65609219aa952511e575cd7533`; separate full build/runtime logs, eight screenshots and readbacks remain outside Git. Owned tabs10/11 close and are confirmed absent; historical tabs1–4 are untouched. Viewport resets. Next70799 and API81535 receive normal TERM; dev wrapper exits1 with normal canonical heavy-guard release, API exits0. Both listeners and the heavy guard are independently absent at16:27:24Z; generated next-env is restored. W2 receives the actual browser release.
+
+Verified means only the bounded observations above. No real proof/Touch ID, signed Note, actual reply-review helper, two-fan private isolation, paid/group/provider/media/native acceptance or finite C10 receipt is inferred. Personal source review subsequently identifies wrapped AbortError/TimeoutError propagation in304 for repair. All nine packages remain incomplete; release-ready:false. No evidence transfers to later commits.
