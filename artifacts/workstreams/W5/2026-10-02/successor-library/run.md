@@ -58,3 +58,25 @@ Genuine signing, populated paging, two-fan privacy, positive group/paid/media/
 AI/live paths and current native operation remain open. Maya remains a
 DEVELOPMENT-ONLY SEEDED VERIFIED creator without genuine proof or passkey.
 Release-ready: false. All nine packages remain assigned.
+
+## Current production operation, 2026-10-03
+
+At `1add6a6f711cac41279f8ed846dc0f02459ea481`, production Next build,
+web types and scoped ESLint pass. This source includes captured main
+`8b6af5651a7a3cf6fdd45c15f073b9b5c10ef2e3`. Personally operated its built
+web30055 against actual API c6850d6e/canonical61: unmatched search returned
+No matching items, and committed-save returned the actual unsigned revision19
+Note/schedule. Personally inspected390/1280 Light/Night Library images;
+opening Edit and review again yielded Your Note and its actual All members
+audience and local10:30 schedule, with no Post/Public/groups editor controls.
+No save, signature, publication or other record was made during this operation.
+
+Actual browser offline control concealed the Library through the account/role
+boundary. Restoring connectivity retained the exact committed-save query and
+offered Retry current search. Personally clicked it; the actual200 read restored
+the same Note. Private images are
+`/private/tmp/creator-w5-shell-operator/shots/production-1add6a6f-library-{390,1280}-{light,night}.png`.
+This current-source bounded unsigned qualification supplements, without
+relabeling, the earlier saved-command observations. Populated More, committed
+once-only retry, genuine signing, paid/group/media/AI/live acceptance and all
+nine-package release readiness remain open.
