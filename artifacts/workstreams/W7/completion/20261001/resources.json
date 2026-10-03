@@ -724,6 +724,48 @@
       "qualification": "Workspace/original Swift/signed iOS/all13 unchanged web visual checks pass; installed iOS hashes match; no populated/provider/privacy acceptance",
       "evidence": "Local private scratch; no new screenshots/diagnostic JSON committed",
       "scopeComplete": false
+    },
+    "receiptContinuation20261003": {
+      "source": "c8fd9d1485da30baf20e326bc8728476d861827f",
+      "reviewedMain": "9e9710439ac858e148460bcc03ee8460f534ae8f",
+      "checkout": "/Users/yingpengwang/.codex/worktrees/w7-successor-20261002/creator-platform",
+      "branch": "codex/w7-completion-20261001",
+      "canonicalDatabase": {
+        "container": "creator-platform-w7-macstudio-20261001",
+        "database": "creator_w7",
+        "port": 55447,
+        "state": "Stopped exit0",
+        "migrations": 40,
+        "creators": 0,
+        "connectionLimit": 0,
+        "clients": 0,
+        "activation": "No new SQL; unanswered complete0061/0062 packet remains held",
+        "backup": "Stale after actual settings writes; fresh closed backup/separate restore required before any approved activation"
+      },
+      "api": {
+        "port": 4107,
+        "state": "Stopped normally exit0"
+      },
+      "web": {
+        "port": 3007,
+        "state": "Stopped after verified own-PID SIGTERM; process exit1"
+      },
+      "ios": {
+        "udid": "FAB31883-2F36-4E50-83B3-D9654B60FF00",
+        "state": "Shutdown",
+        "lease": "Exact owner/device/inode released"
+      },
+      "android": {
+        "serial": 5580,
+        "state": "Absent/shutdown",
+        "lease": "Exact owner/device/inode released after actual emulator shutdown",
+        "verifiedGuest": "2026148 KiB/two cores; supported lowram flags"
+      },
+      "qualification": "Workspace,18 original Swift/110 comparisons, signed shipping iOS, existing Android47-task checks and13 unchanged web visuals pass. Both installed native hashes match; actual Settings Save/Reload/sign-out observed. No genuine populated/provider/protected export acceptance.",
+      "evidence": "Local private scratch; no new screenshots/diagnostic JSON committed",
+      "scopeComplete": false,
+      "privacyExport": "Current source adds original account delivery receipt outcomes; registration hashes excluded. Current protected service still unavailable; current owner catalogue review required.",
+      "failure": "First Android emulator host SIGABRT/null-root retained locally; identical retained AVD restart recovered. No peer, AVD wipe or global SDK change."
     }
   }
 }
