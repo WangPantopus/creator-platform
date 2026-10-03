@@ -1,6 +1,7 @@
 import { Client, type Pool } from "pg";
 import { z } from "zod";
 import { invariant } from "../../core/errors.js";
+import { querySettlementUncertain } from "../../core/query-settlement.js";
 
 /** Destruction must close this exact source without a pipelined drain. */
 export function assertConversationPrivacyPool(pool: Pool): void {
@@ -14,6 +15,7 @@ export function assertConversationPrivacyPool(pool: Pool): void {
 /** Purpose metadata guards retain their private causes. An uncertain response
  * cannot authorize later rollback SQL; a bounded or cyclic graph fails closed. */
 export function conversationPrivacyReadUncertain(failure: unknown): boolean {
+  if (querySettlementUncertain(failure)) return true;
   const pending = [failure];
   const seen = new Set<Error>();
   while (pending.length) {
@@ -21,7 +23,7 @@ export function conversationPrivacyReadUncertain(failure: unknown): boolean {
     if (!(error instanceof Error)) continue;
     if (seen.has(error)) return true;
     seen.add(error);
-    if (seen.size > 32 || error.message === "Query read timeout") return true;
+    if (seen.size > 32) return true;
     if (error.cause !== undefined) pending.push(error.cause);
     if (error instanceof AggregateError) {
       if (error.errors.length > 32) return true;
