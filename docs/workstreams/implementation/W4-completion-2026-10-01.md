@@ -1,3 +1,7 @@
+### Original call-settlement Actor retained — October 2, 2026 evening
+
+Legacy W6 settlement now retrieves the genuine server-resolved Actor retained by Access through `threadScopeActor(scope)` instead of constructing an adult-eligible lookalike from account metadata. The same original object reaches command replay, refund preparation and effect continuation. Backend types, scoped lint/format and all nine existing contract checks pass; no new tests or business rows. This repairs interactive scope identity only; genuine provider outcome, actorless financial purpose and positive settlement/replay acceptance remain open.
+
 ### Founder-requested safe resource cleanup — October 2, 2026
 
 All37 existing W4 PRs verified merged; current handoff source equals pushed659bf1f3. Removed two obsolete clean/remote-contained worktrees, four exclusive stopped review databases/volumes and rebuildable W4 dependencies/outputs/caches. Active source checkout, canonical61/private config/backup hash/native device state/evidence and shared tooling remain. Restart now requires `pnpm install --frozen-lockfile`, XcodeGen regeneration and normal native builds. [Actual cleanup receipt](../../../artifacts/workstreams/W4/runtime/2026-10-02/resource-cleanup/receipt.json). No new runtime acceptance or completion inferred; all nine packages/R01–R15 remain assigned.

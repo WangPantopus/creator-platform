@@ -1,6 +1,6 @@
 import type { SessionEvidence } from "../../../../../packages/api/src/session.js";
 import type { ThreadScope } from "../access/scope.js";
-import { assertThreadScope } from "../access/scope.js";
+import { threadScopeActor } from "../access/scope.js";
 import type { CommerceService } from "./service.js";
 import { contentHash } from "../../core/canonical.js";
 import { invariant } from "../../core/errors.js";
@@ -21,8 +21,7 @@ export class CommerceFulfillment {
     evidence: SessionEvidence,
     key: string,
   ): Promise<void> {
-    assertThreadScope(scope);
-    const actor = { accountId: scope.actorAccountId, adultEligible: true };
+    const actor = threadScopeActor(scope);
     const resolution = await this.service.account(actor, async (client) => {
       await client.query(
         "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true)",
