@@ -11,7 +11,7 @@ import {
 import type { ThreadSnapshot } from "../agent/pipeline.js";
 
 export const GENERATION_CONTEXT_MIGRATION =
-  "0095_w3_generation_purpose_consumers";
+  "0179_w3_generation_purpose_consumers";
 export const GENERATION_CONTEXT_SIGNATURE =
   "creator.generation_conversation_context(uuid,uuid)";
 const owner = "creator_generation_conversation_context";
@@ -172,7 +172,16 @@ export class PreparedGenerationConversationContext {
         [scope.generationId, scope.workerToken],
       )
     ).rows[0]?.context;
-    const value = Context.parse(raw);
+    let value: z.infer<typeof Context>;
+    try {
+      value = Context.parse(raw);
+    } catch {
+      throw new DomainError(
+        "generation_context_unavailable",
+        "The current accepted conversation context is unavailable.",
+        503,
+      );
+    }
     invariant(
       value.generationId === scope.generationId &&
         value.threadId === scope.threadId &&
