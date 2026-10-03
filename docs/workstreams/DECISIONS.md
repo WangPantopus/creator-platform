@@ -62,3 +62,12 @@ A gap entry records requirement/source, owner, affected platforms, proposed reus
 Resolve exact typed boundaries before parallel consumers diverge: `Approval` owner and invalidation, `ShareGrant` dual consent/revocation, stable current-authorization/grant versions, allowance transaction participation, packet-vs-thread audit, call acceptance timing, immutable signed original versus translated display, Note fan-out ordering, domain-wide outbox beyond the thread log, and privacy job completion receipts. See [CONTRACTS](CONTRACTS.md) and backend research for proposed ownership.
 
 The immediate planning work raises no blocking question: these owners can start useful, reversible implementation with the established decisions. A release may remain blocked for specific inputs even while its feature development is complete; record that distinction explicitly.
+
+## Native spending navigation — October3 UTC
+
+Daily Spend is entered from You, so both shipping shells retain You as its selected tab. Other existing Commerce destinations select Requests. The prior generic fallback selected Home for `/commerce/spending` and request-detail routes despite retaining those actual destinations. This shell repair changes the selected navigation state; each owner screen continues to authorize its actual account/object and controls its Back destination. W4 owns its operated Spend Back repair. Current shipping rebuild/personal navigation verification remains required; original references are preserved.
+
+
+### W1 original Team state and current owner integration — October3 UTC
+
+During normal PR28 reconciliation through main d918c859, retain W5's current-account five-second Team reads, cancellation/hidden-page concealment, creator-only management and retained invitation input. Preserve original W1 canonical unavailable/loading/Retry copy, explicit keyboard Retry focus recovery, verified-creator invitation gate and plate link contrast. Restore focus only after the prior control was concealed and focus is on the document body; background polling cannot steal an active user's focus. Web types, scoped lint and formatting pass on the actual combined resolution. Personal current-source Team/outage operation remains pending; no prior source acceptance is inherited.

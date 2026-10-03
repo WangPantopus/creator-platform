@@ -1,0 +1,18 @@
+{
+  "pr": 229,
+  "url": "https://github.com/WangPantopus/creator-platform/pull/229",
+  "reviewHead": "43e9a6062a1b03116a76e75bb2ed65f3a4a546fb",
+  "capturedBase": "d0eed4d3b237fc85e5c50ef7489e8964b62b16db",
+  "mergeCommit": "afde5068cdd76cd3f9dc1653a82441ac95c1f64d",
+  "mergedAt": "2026-10-03T05:29:22Z",
+  "expectedTree": "7ad23e25ed6bfae1e70a632ca0bcf7eea5b0324c",
+  "actualTree": "7ad23e25ed6bfae1e70a632ca0bcf7eea5b0324c",
+  "mode": "normal exact-head merge; no admin override",
+  "hostedChecks": "queued, not passes; current rulesets empty",
+  "buildSource": "cdbc5163feb4cbec1eac612cc5e537cb6d5eb4f0",
+  "builds": "normal shipping iOS/Android and strict iOS codesign passed; native/contracts unchanged through review head",
+  "personallyOperatedIOSSource": "fc9fdfb1e00bbccc8ee0b8f4c78d371e97e7fb3f",
+  "actualAPISource": "eb605a15c1991bc532baef727b3ccfb5c0b878f7",
+  "personalLimits": "unsigned Content refusal, Light/Night Content to You and actual API interruption/recovery; cold previous destination failed; Android supported-input journey and later-artifact operation open",
+  "releaseReady": false
+}
