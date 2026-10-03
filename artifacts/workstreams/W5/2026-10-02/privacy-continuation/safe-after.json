@@ -1,0 +1,21 @@
+{
+  "source": "6771bfed2ac07d34bfb04ef66d4d909f014ba7da",
+  "phase": "independent_closed_preserved_and_fresh61",
+  "originalSourceLedger": 57,
+  "upgradedLedger": 61,
+  "freshLedger": 61,
+  "all57ChecksumsAndTimestampsPreserved": true,
+  "originalRowsPreserved": 36,
+  "originalTablesPreserved": 161,
+  "oldRolesPreserved": true,
+  "originalSequencePreserved": true,
+  "matchingSchemaSHA256": "c69b0fafad55dc1234c200c5dfc745ef105c7ba5d14cca0197c386ca995fcbab",
+  "matchingSecuritySHA256": "384424be82ac4b64a81d0038f4f7f51855c1c919a1584d9922309ba8b071b714",
+  "matchingRolesSHA256": "123403ba7928db12891c4edad598693c1f80c5dd22b64cfe9f5e937a88258ada",
+  "freshBusinessRows": 0,
+  "originalDatabaseUnchanged": true,
+  "targetsTrafficClosed": true,
+  "archiveRecovery": false,
+  "releaseReady": false,
+  "limits": "SQL custody only; no app/task/expiry/fullC10/proof/biometric/provider/signature acceptance."
+}

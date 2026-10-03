@@ -1,0 +1,12 @@
+{
+  "phase": "actual_read_only_legacy_revision_observation",
+  "contentId": "170f95f9-2da6-42af-afe0-b7c3d88aba23",
+  "version": 3,
+  "kind": "note",
+  "omittedPlanRefRemainedOmitted": true,
+  "canonicalDocumentHash": "d1b24ca6580577ced53817761a6350beb1c10cf99a6663e0ff5d1ed491cd03b1",
+  "hashUnchanged": true,
+  "databaseWrites": false,
+  "creatorStatus": "DEVELOPMENT-ONLY SEEDED VERIFIED; no proof or passkey",
+  "limits": "Actual unsigned draft observation, not signature, group audience, privacy task, delivery or release acceptance."
+}

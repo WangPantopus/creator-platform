@@ -1,0 +1,38 @@
+{
+  "at": "2026-10-02T11:36:22.176871+00:00",
+  "nativeSource": "616ebf4a527556218f60831296567bffb579eeab",
+  "backendSource": "9adf2e88481984ac9bf56d14c9998596368faba5",
+  "serial": "emulator-5554",
+  "installedApkSha256": "88d777a486a0085d56cd7c295b5537b3e968b9017fbe0acca6011874cf11f9c9",
+  "builtApkSha256": "88d777a486a0085d56cd7c295b5537b3e968b9017fbe0acca6011874cf11f9c9",
+  "excluded": "Android Studio first restored older8f APK from snapshot; all earlierUI observations are excluded for616.",
+  "androidPersonallyOperated": {
+    "lightScopeUnavailableAt": "2026-10-02T11:39:02.077Z",
+    "lightRetainedKilnfireAt": "2026-10-02T11:39:12.544Z",
+    "nightColdReturnScopeUnavailableAt": "2026-10-02T11:45:43.827Z",
+    "nightRetainedKilnfireAt": "2026-10-02T11:45:51.226Z",
+    "observed": "Current scope authority not configured; Note, reply composer and recognition concealed. Actual kilnfire session retained on cold Night launch.",
+    "input": "CUA Android Studio own embedded emulator-5554 only",
+    "deviceShutdown": true
+  },
+  "ios": {
+    "source": "616ebf4a527556218f60831296567bffb579eeab",
+    "udid": "78C3590E-6D36-4A73-9E46-D23563EF0134",
+    "dylibSha256": "3b1904c3305d351b7ff1422c95c13eccccbac8697b1ea17c71d8d4dfbe5a1d6c",
+    "codeSignVerify": "passed strict deep verification",
+    "installAndLaunch": "passed via simctl against actual 41055 backend",
+    "personalUiOperation": "unverified: CUA com.apple.dt.Devices and Device Hub both returned timeoutReached -10005 after peer GUI release",
+    "alternateInput": "not authorized; not used",
+    "deviceShutdown": true
+  },
+  "notVerified": [
+    "genuine signed Note",
+    "positive tenure badge",
+    "longer reply submission",
+    "two-fan reply isolation",
+    "positive Note outage/recovery",
+    "personal iOS UI acceptance"
+  ],
+  "creatorVerification": "DEVELOPMENT-ONLY SEEDED VERIFIED at2026-10-01T20:44:26Z; no proof and no passkey",
+  "recordedAt": "2026-10-02T11:49:32.997398+00:00"
+}

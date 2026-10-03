@@ -1,0 +1,44 @@
+{
+  "source": "165c3395",
+  "activeCount": 61,
+  "fourSourceOrder": [
+    "0074_w8_content_runtime_denial",
+    "0082_w8_interactive_denial_try_fence",
+    "0087_w8_privacy_task_commit_fence",
+    "0103_w8_domain_privacy_task_fence"
+  ],
+  "packetSha256": "2d72120d1be136081acb5d324f19dae44660d6e423e932cc962664596ab4c3e2",
+  "frozen47HeldMapSha256": "2338f48ea4b1008f47eef43ff7a835021e5e917669ad44f21179c69d03227c0a",
+  "heldAllocationsThrough0207": true,
+  "historicalSqlOrLedgerRewrite": false,
+  "allEightC10": false,
+  "productionRelease": false,
+  "currentGrowthRemainsSafelyUncomposed": true,
+  "ownerQualifications": [
+    {
+      "owner": "W1",
+      "source": "a7ce54d1",
+      "qualification": "actual closed61 core-role preflight and refused temporary Growth membership before wave DDL"
+    },
+    {
+      "owner": "W2",
+      "source": "a1b9d832c893ee458514d82e6cceb82a12e5374f",
+      "qualification": "independent owned fresh/preserved upgrade and full separate restored custody",
+      "backupBytes": 716282,
+      "notOriginalRecovery": true
+    },
+    {
+      "owner": "W4",
+      "qualification": "independent actual owned fresh/preserved wave; no payment/provider effect inferred"
+    },
+    {
+      "owner": "W5",
+      "qualification": "independent actual owned fresh/preserved wave; future content export198 remains held"
+    }
+  ],
+  "actualAppReceipts": [
+    "privacy-domain-worker/20261002-mac-studio/app-acceptance",
+    "privacy-task-expiry/20261002-mac-studio",
+    "privacy-domain-integration/20261002-mac-studio/app-acceptance"
+  ]
+}

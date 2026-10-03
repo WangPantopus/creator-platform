@@ -10,7 +10,9 @@
   "jobInputsFabricated": 0,
   "scope": "Metadata SQL and negative process issuance only; no real privacy job/export/commit acceptance",
   "releaseReady": false,
-  "sourceCheckpoint": "W8 bfe831bdee7f609f5bcf789cf9eecf455c3a5393 exact held-client issuer; no SQL activation",
+  "sourceCheckpoint": "W8 4065e91d50e74d297630b962661dafe71cdf878a exact held-client issuer and shared catalog guard; no SQL activation",
+  "sharedCatalogRefused": true,
+  "catalogReadTransaction": "Actual creator_runtime READ ONLY on original canonical57; no job input supplied",
   "functionDefinitionCustody": "W8 actual read-only reviewed catalog hashes, configuration is explicit and exact",
   "implemented": [
     "No Actor/adult eligibility/request session from privacy account ID",

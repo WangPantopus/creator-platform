@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ConversationSystemLinkSchema } from "./conversation/system-link.ts";
 import { identitySchemas, ReturnTargetSchema } from "./identity.ts";
 import * as agent from "./agent/contracts.ts";
 import * as commerce from "./commerce/contracts.ts";
@@ -156,6 +157,7 @@ export const MessageSchema = z.strictObject({
   // Scoped server attribution; never request authority or public signature data.
   member: z.string().nullable().optional(),
   authorAccountId: IdSchema.nullable().optional(),
+  systemLink: ConversationSystemLinkSchema.nullable().optional(),
 });
 export const AcceptedMessageSchema = z.strictObject({
   message: MessageSchema,
@@ -173,6 +175,7 @@ export const FrameSchema = z.strictObject({
   generationId: IdSchema.nullable(),
   sequence: z.number().int().nonnegative(),
   control: ThreadControlSchema.optional(),
+  systemLink: ConversationSystemLinkSchema.nullable().optional(),
 });
 export const SubscribeSchema = z.strictObject({
   kind: z.literal("subscribe"),

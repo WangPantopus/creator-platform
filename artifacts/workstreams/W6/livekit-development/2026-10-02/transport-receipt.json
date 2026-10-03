@@ -1,0 +1,165 @@
+{
+  "qualification": "Self-hosted development transport only; no human media, canonical calls, single-use admission or complete history accepted",
+  "observedAt": "2026-10-02T10:48:08.144Z",
+  "firstState": {
+    "rooms": [
+      {
+        "sid": "RM_gef6tVUaSBXU",
+        "name": "w6-development-3404b177-7119-4e6b-89fd-d0f7b77d54aa",
+        "numParticipants": 1,
+        "activeRecording": false
+      }
+    ],
+    "participants": [
+      {
+        "sid": "PA_8tPkmGvnZ2Pc",
+        "identity": "6ff95afb-2150-455d-ab3b-3965c8c9758b",
+        "state": 2,
+        "tracks": []
+      }
+    ],
+    "callbacks": [
+      {
+        "id": "EV_XahmYykGLawF",
+        "event": "room_started",
+        "room_sid": "RM_gef6tVUaSBXU",
+        "complete_history": 0
+      },
+      {
+        "id": "EV_7HnaTzzJPWeM",
+        "event": "participant_joined",
+        "room_sid": "RM_gef6tVUaSBXU",
+        "complete_history": 0
+      }
+    ],
+    "historyComplete": false
+  },
+  "microphoneFailure": "{\n  \"error\": \"NotFoundError: Requested device not found\"\n}",
+  "replayRoom": {
+    "room": "w6-development-434636af-0ecd-4470-b6d3-c3c2a315b968",
+    "sid": "RM_RXhj8xgjxpXX",
+    "recording": false,
+    "developmentOnly": true
+  },
+  "replayAfterLeave": {
+    "state": "connected",
+    "identity": "e40bc035-ce7c-4eef-8d53-3edf50c9bfb1",
+    "replayAccepted": true
+  },
+  "deleted": {
+    "roomAbsent": true,
+    "credentialRevocationConfirmed": false
+  },
+  "replayAfterDelete": {
+    "state": "connected",
+    "identity": "e40bc035-ce7c-4eef-8d53-3edf50c9bfb1",
+    "replayAccepted": true
+  },
+  "recreatedState": {
+    "rooms": [
+      {
+        "sid": "RM_ms7W5bzUQKir",
+        "name": "w6-development-434636af-0ecd-4470-b6d3-c3c2a315b968",
+        "numParticipants": 0,
+        "activeRecording": false
+      }
+    ],
+    "participants": [
+      {
+        "sid": "PA_TpkNtZyWR3zC",
+        "identity": "e40bc035-ce7c-4eef-8d53-3edf50c9bfb1",
+        "state": 2,
+        "tracks": []
+      }
+    ],
+    "callbacks": [
+      {
+        "id": "EV_wpysPaTtCjHY",
+        "event": "room_started",
+        "room_sid": "RM_RXhj8xgjxpXX",
+        "complete_history": 0
+      },
+      {
+        "id": "EV_HaUbf98qTvPP",
+        "event": "participant_joined",
+        "room_sid": "RM_RXhj8xgjxpXX",
+        "complete_history": 0
+      },
+      {
+        "id": "EV_B2JMFZFJW3ce",
+        "event": "participant_left",
+        "room_sid": "RM_RXhj8xgjxpXX",
+        "complete_history": 0
+      },
+      {
+        "id": "EV_9BytNWrbHVq5",
+        "event": "participant_joined",
+        "room_sid": "RM_RXhj8xgjxpXX",
+        "complete_history": 0
+      },
+      {
+        "id": "EV_zyvCAiDvtFGZ",
+        "event": "participant_left",
+        "room_sid": "RM_RXhj8xgjxpXX",
+        "complete_history": 0
+      },
+      {
+        "id": "EV_SBReMExFGk7m",
+        "event": "room_finished",
+        "room_sid": "RM_RXhj8xgjxpXX",
+        "complete_history": 0
+      }
+    ],
+    "historyComplete": false
+  },
+  "finalState": {
+    "rooms": [
+      {
+        "sid": "RM_ms7W5bzUQKir",
+        "name": "w6-development-434636af-0ecd-4470-b6d3-c3c2a315b968",
+        "numParticipants": 0,
+        "activeRecording": false
+      }
+    ],
+    "participants": [],
+    "callbacks": [
+      {
+        "id": "EV_wpysPaTtCjHY",
+        "event": "room_started",
+        "room_sid": "RM_RXhj8xgjxpXX",
+        "complete_history": 0
+      },
+      {
+        "id": "EV_HaUbf98qTvPP",
+        "event": "participant_joined",
+        "room_sid": "RM_RXhj8xgjxpXX",
+        "complete_history": 0
+      },
+      {
+        "id": "EV_B2JMFZFJW3ce",
+        "event": "participant_left",
+        "room_sid": "RM_RXhj8xgjxpXX",
+        "complete_history": 0
+      },
+      {
+        "id": "EV_9BytNWrbHVq5",
+        "event": "participant_joined",
+        "room_sid": "RM_RXhj8xgjxpXX",
+        "complete_history": 0
+      },
+      {
+        "id": "EV_zyvCAiDvtFGZ",
+        "event": "participant_left",
+        "room_sid": "RM_RXhj8xgjxpXX",
+        "complete_history": 0
+      },
+      {
+        "id": "EV_SBReMExFGk7m",
+        "event": "room_finished",
+        "room_sid": "RM_RXhj8xgjxpXX",
+        "complete_history": 0
+      }
+    ],
+    "historyComplete": false
+  }
+}

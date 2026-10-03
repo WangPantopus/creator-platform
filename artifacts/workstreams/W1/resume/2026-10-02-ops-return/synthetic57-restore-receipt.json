@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "at": "2026-10-02T13:55:15.310Z",
+  "source": "W1 retained synthetic-development database; original remains closed",
+  "scope": "labelled separate synthetic development restore; bounded identity/Ops-return journey only",
+  "backupSha256": "5f7adfbc2a69ee80a6db245feeb50f54e9f7975f7149fa813fef37c27a196540",
+  "before": {
+    "ledgerSha256": "d6878de46f8f52182f9181e6e27e1188dbb4b3cae3a782c8363ca23f8c32cf28",
+    "schemaSha256": "39406115c69a07db31e4fd3300f40bbbe254c2dc4eec99c46df5c4f817df35ae",
+    "dataSha256": "765228ee43c771cd6fea21c146020d8b8c7c844a6705d1017b89beecbf86c765",
+    "securitySha256": "6878cdd658937f0ad8eba1a80fa912751c21568f71928ee7cb1ea3f75eb42539",
+    "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+    "ledgerRows": 57,
+    "rows": 27,
+    "tables": 161
+  },
+  "restored": {
+    "ledgerSha256": "d6878de46f8f52182f9181e6e27e1188dbb4b3cae3a782c8363ca23f8c32cf28",
+    "schemaSha256": "39406115c69a07db31e4fd3300f40bbbe254c2dc4eec99c46df5c4f817df35ae",
+    "dataSha256": "765228ee43c771cd6fea21c146020d8b8c7c844a6705d1017b89beecbf86c765",
+    "securitySha256": "6878cdd658937f0ad8eba1a80fa912751c21568f71928ee7cb1ea3f75eb42539",
+    "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+    "ledgerRows": 57,
+    "rows": 27,
+    "tables": 161
+  },
+  "fiveCustodyDigestsMatch": true,
+  "originalUnchanged": true,
+  "originalTrafficClosed": true,
+  "separateCopyOwnerOpened": true,
+  "separateCopyConnectionLimit": 32,
+  "issuerKeyFresh": true,
+  "originalEnvUnchanged": true,
+  "workersNotStarted": true,
+  "purposeProposalsActivated": false,
+  "releaseReady": false
+}

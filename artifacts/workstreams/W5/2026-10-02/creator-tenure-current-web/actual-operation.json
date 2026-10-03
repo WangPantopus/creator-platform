@@ -1,0 +1,115 @@
+{
+  "sourceCommit": "1753c0e5d6ccc4d985c6860202bb4c9c2831662d",
+  "database": "original creator_w5 canonical57; no purpose activation",
+  "developmentIdentity": "Maya verification is DEVELOPMENT-ONLY SEEDED (2026-10-01T20:44:26Z), no proof or passkey; not acceptance",
+  "actualWeb": [
+    {
+      "facts": {
+        "value": {
+          "theme": "light",
+          "width": 390,
+          "scroll": 390,
+          "hidden": false,
+          "background": "rgb(243, 242, 238)"
+        }
+      },
+      "screen": {
+        "url": "http://localhost:30055/studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/notes?theme=light",
+        "text": "Qelvora Studio\nMaya\nRefresh role\nNotes\nNew Note\nAction status\nCurrent scope authority is not configured.\n\nChecking current Note and private reply access.\n\nCheck current access"
+      },
+      "shot": {
+        "file": "1753-notes-390-light.png"
+      }
+    },
+    {
+      "facts": {
+        "value": {
+          "theme": "night",
+          "width": 390,
+          "scroll": 390,
+          "hidden": false,
+          "background": "rgb(20, 18, 15)"
+        }
+      },
+      "screen": {
+        "url": "http://localhost:30055/studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/notes?theme=night",
+        "text": "Qelvora Studio\nMaya\nRefresh role\nNotes\nNew Note\nAction status\nCurrent scope authority is not configured.\n\nChecking current Note and private reply access.\n\nCheck current access"
+      },
+      "shot": {
+        "file": "1753-notes-390-night.png"
+      }
+    },
+    {
+      "facts": {
+        "value": {
+          "theme": "light",
+          "width": 1280,
+          "scroll": 1280,
+          "hidden": false,
+          "background": "rgb(243, 242, 238)"
+        }
+      },
+      "screen": {
+        "url": "http://localhost:30055/studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/notes?theme=light",
+        "text": "Qelvora Studio\nMaya\nRefresh role\nNotes\nNew Note\nAction status\nCurrent scope authority is not configured.\n\nChecking current Note and private reply access.\n\nCheck current access"
+      },
+      "shot": {
+        "file": "1753-notes-1280-light.png"
+      }
+    },
+    {
+      "facts": {
+        "value": {
+          "theme": "night",
+          "width": 1280,
+          "scroll": 1280,
+          "hidden": false,
+          "background": "rgb(20, 18, 15)"
+        }
+      },
+      "screen": {
+        "url": "http://localhost:30055/studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/notes?theme=night",
+        "text": "Qelvora Studio\nMaya\nRefresh role\nNotes\nNew Note\nAction status\nCurrent scope authority is not configured.\n\nChecking current Note and private reply access.\n\nCheck current access"
+      },
+      "shot": {
+        "file": "1753-notes-1280-night.png"
+      }
+    }
+  ],
+  "recovery": {
+    "sourceCommit": "1753c0e5d6ccc4d985c6860202bb4c9c2831662d",
+    "keyboardFocused": {
+      "value": "a  More "
+    },
+    "keyboardNavigation": {
+      "url": "http://localhost:30055/studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/more",
+      "text": "Qelvora Studio\nMaya\nRefresh role\nMore\nOffers\n\u203a\nPublish\n\u203a\nInsights\n\u203a\nEarnings\n\u203a\nTeam\n\u203a\nThanks\n\u203a\nImpact\n\u203a\nVerification and account\n\u203a\nLicense\n\u203a\nSupport\n\u203a\n\nPersonal signing and commitments stay with the creator. Support access is scoped and audited.\n\nCall availability\n\nUse dated windows. Each offered call and its reconnect allowance must fit inside one window. Existing bookings keep their agreed time.\n\nYour time zone\nAdd a window\nSave availability\nReload saved windows\n\nCall availability is not connected yet."
+    },
+    "actualOwnApiPid": 97173,
+    "pausedState": "T",
+    "pausedSeconds": 14.09081075002905,
+    "endpointDuringPause": "timeout",
+    "outage": {
+      "url": "http://localhost:30055/studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/notes?theme=night",
+      "text": "Reconnect to Studio\nYour input is kept in this tab. Studio is hidden until your current account and roles can be checked again.\nCheck connection and roles"
+    },
+    "outageShot": {
+      "file": "1753-api-stopped-notes-1280-night.png"
+    },
+    "recovery": {
+      "url": "http://localhost:30055/studio/46b9a215-4f9c-4ab3-ab40-1c0d87f2a34e/notes?theme=night",
+      "text": "Qelvora Studio\nMaya\nRefresh role\nNotes\nNew Note\nAction status\nCurrent scope authority is not configured.\n\nChecking current Note and private reply access.\n\nCheck current access"
+    },
+    "recoveryShot": {
+      "file": "1753-api-recovered-notes-1280-night.png"
+    },
+    "limits": "Actual own API STOP/CONT and denied Notes route recovery only, not positive private body withdrawal/reply/tenure/signing acceptance."
+  },
+  "actualWrongAccount": "fan1 retained kilnfire account received Studio unavailable: current account has no role",
+  "keyboardLimit": "Tab after the final access button reached body; no full tab-order acceptance claimed. Explicit focus+Enter on visible desktop More did navigate to actual More destinations.",
+  "iosControl": "Actual com.apple.dt.Devices CUA retry at2026-10-02 again returned -10005 timeout; no iOS UI acceptance from it",
+  "bodyReadThroughUnavailableAuthority": false,
+  "actualBusinessCommandSubmitted": false,
+  "actualSignatureReplyTenureAcceptance": false,
+  "releaseReady": false
+}

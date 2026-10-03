@@ -1,0 +1,44 @@
+{
+  "actualWorkerBaseline": true,
+  "exactClassSQLUsed": true,
+  "catalogueChecksum": "c0592619e8e7df381e4ed47073b80a80650cbb66a670eadd2d9ea47005c4e950",
+  "definitions": {
+    "creator.generation_agent_journal_receipt(uuid,uuid)": "557c1558773e36ced55aca522e16e15d975665afb3873a95cbab9661e0d76f4b",
+    "creator.generation_seal_agent_journal(uuid,uuid)": "925097ea517ebcdace4f23e281f4575cbf76914636b0503afa2989afd4cd49b7",
+    "creator.generation_append_agent_receipt(uuid,uuid)": "7a30d64bc13f633fb15b806cbf55d5b1bb194c4cbdfb02ee5e821d0b61e09ca4"
+  },
+  "unregisteredFactoryDenies": true,
+  "mutations": [
+    {
+      "name": "unexpectedBodyGrant",
+      "actualMutation": true,
+      "administratorSelectedWorkerMetadata": true,
+      "detected": true,
+      "rolledBack": true,
+      "restored": true
+    },
+    {
+      "name": "executableSearchPath",
+      "actualMutation": true,
+      "administratorSelectedWorkerMetadata": true,
+      "detected": true,
+      "rolledBack": true,
+      "restored": true
+    },
+    {
+      "name": "privateHelperRawExecute",
+      "actualMutation": true,
+      "administratorSelectedWorkerMetadata": true,
+      "detected": true,
+      "rolledBack": true,
+      "restored": true
+    }
+  ],
+  "after": {
+    "ledger": 57,
+    "generations": 0,
+    "receipts": 0
+  },
+  "positiveLifecycleVerified": false,
+  "noPreparedScopeFabricated": true
+}

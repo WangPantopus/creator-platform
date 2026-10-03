@@ -1,5 +1,7 @@
 import { rm } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
+import type { PoolClient } from "pg";
+import { DomainError } from "../../core/errors.js";
 import type { ThreadScope } from "../access/scope.js";
 import { MediaService } from "./service.js";
 import { withDeadline } from "./deadline.js";
@@ -14,6 +16,15 @@ export interface ContentCredentialSigner {
     signal: AbortSignal;
   }): Promise<{ bytes: Buffer; verified: true }>;
 }
+export type ThreadMediaWorkerScope = Readonly<{
+  creatorId: string;
+  fanId: string;
+  ownerAccountId: string;
+}>;
+export type ThreadMediaWorkerTransaction = <T>(
+  scope: ThreadMediaWorkerScope,
+  work: (client: PoolClient) => Promise<T>,
+) => Promise<T>;
 /** Run exclusively in W8's bounded ingestion pool, never the interactive Node process. */
 export class MediaWorker {
   private readonly processor: MediaProcessor;
@@ -23,11 +34,33 @@ export class MediaWorker {
     private readonly credentials?: ContentCredentialSigner,
     ffmpeg = "ffmpeg",
     ffprobe = "ffprobe",
+    private readonly workerTransaction?: ThreadMediaWorkerTransaction,
   ) {
     this.processor = new MediaProcessor(scanner, ffmpeg, ffprobe);
   }
-  async process(scope: ThreadScope): Promise<boolean> {
-    const claimed = await this.service.db.withThread(scope, async (client) => {
+  private transaction<T>(
+    scope: ThreadScope | ThreadMediaWorkerScope,
+    work: (client: PoolClient) => Promise<T>,
+  ): Promise<T> {
+    if (this.workerTransaction) {
+      if (!("ownerAccountId" in scope))
+        throw new DomainError(
+          "media_worker_scope_required",
+          "A durable media worker family is required.",
+          503,
+        );
+      return this.workerTransaction(scope, work);
+    }
+    if (!("authority" in scope))
+      throw new DomainError(
+        "media_worker_transaction_required",
+        "Media worker transaction authority is unconfigured.",
+        503,
+      );
+    return this.service.db.withThread(scope, work);
+  }
+  async process(scope: ThreadScope | ThreadMediaWorkerScope): Promise<boolean> {
+    const claimed = await this.transaction(scope, async (client) => {
       // Retention expiry first denies access, then uses the same durable deletion path as revocation.
       // Bound each pass; W8 enumerates authorized scopes rather than a cross-tenant sweep.
       await client.query(
@@ -72,7 +105,7 @@ export class MediaWorker {
       values: unknown[] = [],
       before?: () => Promise<void>,
     ) =>
-      this.service.db.withThread(scope, async (client) => {
+      this.transaction(scope, async (client) => {
         const owned = (
           await client.query<{ state: string }>(
             "SELECT state FROM creator.media_asset WHERE id=$1 AND creator_id=$2 AND fan_id=$3 AND version=$4 AND job_lease_until=$5 AND job_lease_until>now() FOR UPDATE",
@@ -239,18 +272,13 @@ export class MediaWorker {
       await rm(staging, { force: true });
     }
     // A revocation racing external parsing/credential work must leave no derived file behind.
-    const tombstoned = await this.service.db.withThread(
-      scope,
-      async (client) => {
-        const row = await client.query<{ state: string }>(
-          "SELECT state FROM creator.media_asset WHERE id=$1 AND creator_id=$2 AND fan_id=$3",
-          [claimed.id, scope.creatorId, scope.fanId],
-        );
-        return (
-          !row.rows[0] || ["revoked", "deleted"].includes(row.rows[0].state)
-        );
-      },
-    );
+    const tombstoned = await this.transaction(scope, async (client) => {
+      const row = await client.query<{ state: string }>(
+        "SELECT state FROM creator.media_asset WHERE id=$1 AND creator_id=$2 AND fan_id=$3",
+        [claimed.id, scope.creatorId, scope.fanId],
+      );
+      return !row.rows[0] || ["revoked", "deleted"].includes(row.rows[0].state);
+    });
     if (tombstoned) await this.service.storage.delete(claimed.id);
     return true;
   }

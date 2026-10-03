@@ -1,0 +1,395 @@
+{
+  "at": "2026-10-02T21:59:16.246090+00:00",
+  "scope": "W4 owned resources only",
+  "sourceCommitBeforeCleanup": "659bf1f301be38cc705559f23f701ec358655cdd",
+  "workstreamComplete": false,
+  "removedGenerated": [
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/f402/creator-platform/node_modules",
+      "allocatedBytesBefore": 613834752,
+      "isSymlink": false,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/f402/creator-platform/apps/backend/node_modules",
+      "allocatedBytesBefore": 12288,
+      "isSymlink": false,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/f402/creator-platform/apps/web/node_modules",
+      "allocatedBytesBefore": 12288,
+      "isSymlink": false,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/f402/creator-platform/packages/api/node_modules",
+      "allocatedBytesBefore": 8192,
+      "isSymlink": false,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/f402/creator-platform/packages/ui-web/node_modules",
+      "allocatedBytesBefore": 8192,
+      "isSymlink": false,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/f402/creator-platform/apps/android/.gradle",
+      "allocatedBytesBefore": 9060352,
+      "isSymlink": false,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/f402/creator-platform/apps/backend/dist",
+      "allocatedBytesBefore": 6983680,
+      "isSymlink": false,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/f402/creator-platform/apps/ios/QelvoraApp.xcodeproj",
+      "allocatedBytesBefore": 28672,
+      "isSymlink": false,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/f402/creator-platform/apps/web/tsconfig.tsbuildinfo",
+      "allocatedBytesBefore": 258048,
+      "isSymlink": false,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/f402/creator-platform/apps/web/.next-w4-trust-20261002",
+      "allocatedBytesBefore": 178405376,
+      "isSymlink": false,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/f402/creator-platform/apps/web/.next-w4-pr157-20261002",
+      "allocatedBytesBefore": 120856576,
+      "isSymlink": false,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/f402/creator-platform/apps/web/.next",
+      "allocatedBytesBefore": 302034944,
+      "isSymlink": false,
+      "removed": true
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/f402/creator-platform/apps/web/.next-w4-resume",
+      "allocatedBytesBefore": 331776,
+      "isSymlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-platform-w4-f402/ios-derived",
+      "allocatedBytesBefore": 1190969344,
+      "isSymlink": false,
+      "removed": true
+    },
+    {
+      "path": "/private/tmp/creator-platform-w4-f402/android-build",
+      "allocatedBytesBefore": 293822464,
+      "isSymlink": false,
+      "removed": true
+    }
+  ],
+  "generatedAllocatedBytesBefore": 2716626944,
+  "removedWorktrees": [
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/w4-store-recovery-refresh/creator-platform",
+      "head": "c7bbcbcd608e5312d381c4e05a618263b60871b7",
+      "headContainedInPushedMergedHandoff": true,
+      "allocatedKiBBefore": 738408,
+      "method": "Codex archive: checkout removed; small Git recovery snapshot retained",
+      "pathAbsentAfter": true
+    },
+    {
+      "path": "/Users/yingpengwang/estimate-rescue/creator-platform/workstream-4-commerce-lifecycle-d07a78",
+      "head": "0f742a91f3f32f17318620e02b2570618709ab41",
+      "headEqualsRemoteBranch": true,
+      "headContainedInPushedMergedHandoff": true,
+      "relatedPullRequest": 64,
+      "relatedPullRequestMerged": true,
+      "allocatedKiBBefore": 792276,
+      "method": "git worktree remove",
+      "pathAbsentAfter": true
+    }
+  ],
+  "removedReviewContainers": [
+    {
+      "container": "creator-platform-w4-privacy-live-restore-20261002",
+      "volume": "7abc9ea14fe4126b5fa7874233e537fe9d00c4c60a40fb0a0bf920d7fe7bdf06",
+      "stopped": true,
+      "exclusiveVolume": true
+    },
+    {
+      "container": "creator-platform-w4-privacy-upgrade-20261002",
+      "volume": "34302e27d2f4207cd1d735e50f45c2d67aa68a7562aab68f1930cfaa45f86965",
+      "stopped": true,
+      "exclusiveVolume": true
+    },
+    {
+      "container": "creator-platform-w4-privacy-wave-20261002",
+      "volume": "3652419e1e7ff1d9c256f7534e7ef67ad15751c13ba6802de32f81640e7c56a0",
+      "stopped": true,
+      "exclusiveVolume": true
+    },
+    {
+      "container": "creator-platform-w4-generation-review-20261002",
+      "volume": "4e2a034aa85109c1e83ad3101624a1f19680e12509b3a0c1929cf0babab0dc03",
+      "stopped": true,
+      "exclusiveVolume": true
+    }
+  ],
+  "removedDockerImages": 0,
+  "retainedCanonicalContainer": "creator-platform-w4-20261001",
+  "retainedPrimaryWorktree": "/Users/yingpengwang/.codex/worktrees/f402/creator-platform",
+  "retainedPrivateBackup": {
+    "present": true,
+    "sha256": "c1d7203d176b694431a2aae74e1bbd585385bf4b6d117dedd8d7d5a5e324e201",
+    "mode": "0o600"
+  },
+  "retainedPrivateConfiguration": true,
+  "retainedNativeDevices": true,
+  "preservedSharedToolingAndCaches": true,
+  "nextAgentReinstallRequired": "pnpm install --frozen-lockfile",
+  "nextAgentRebuildRequired": [
+    "Next output",
+    "backend dist",
+    "XcodeGen project and normal signed iOS build",
+    "Android Gradle outputs"
+  ],
+  "privateFileContentsWithheld": true,
+  "measurementNote": "Allocated folder counts can include shared hardlinks/APFS extents; they are not an assertion of exclusive host disk bytes reclaimed.",
+  "verifiedExistingW4PullRequests": [
+    {
+      "number": 191,
+      "state": "MERGED",
+      "head": "659bf1f301be38cc705559f23f701ec358655cdd",
+      "merge": "8dcb429a0707239f57a70217e9d60d4f9e89af66"
+    },
+    {
+      "number": 186,
+      "state": "MERGED",
+      "head": "1abcb1ce3ad06427565388420e7659b47ecc37f8",
+      "merge": "7a9640484a934c58630d6c2e4c4ea0b86726226f"
+    },
+    {
+      "number": 161,
+      "state": "MERGED",
+      "head": "0b584ea46b5eded42de2faec0d2fa402cbe114e4",
+      "merge": "f4e9c28ab8fd23440904c44954c4d54729a90d5b"
+    },
+    {
+      "number": 158,
+      "state": "MERGED",
+      "head": "f2112d0f3a0d2a520784737a20b09c6d64d1edfd",
+      "merge": "3ef708f7af218505a9c147ebefaed1e6e85e9d01"
+    },
+    {
+      "number": 157,
+      "state": "MERGED",
+      "head": "3bcc4206ff57899cc0e954bc7d778749ae580723",
+      "merge": "513a8f9c2d4c837640b20a6615f4e669f537cb10"
+    },
+    {
+      "number": 146,
+      "state": "MERGED",
+      "head": "c7cb8388f5b8c3c889ecc81fdddf4c01ba511130",
+      "merge": "e120435929c22d53a80ac0a035379936b9f828ea"
+    },
+    {
+      "number": 141,
+      "state": "MERGED",
+      "head": "43edf362a4665838bc6b8597d8de9b565d4783a9",
+      "merge": "d827f667eb71a42264bd5128c089e83fc15c130e"
+    },
+    {
+      "number": 134,
+      "state": "MERGED",
+      "head": "321918fa959cf76a814247d7eb8fe67f9bb87699",
+      "merge": "65f9dc16130f8a0ecb5b36c5be42e27d0e9bded7"
+    },
+    {
+      "number": 128,
+      "state": "MERGED",
+      "head": "cacc176da90466fc3c7dc523753b7f68d844032f",
+      "merge": "f489fb2a857a882467aa2f07c929643cb873b121"
+    },
+    {
+      "number": 127,
+      "state": "MERGED",
+      "head": "887663d8ac254d3126462964151948a65487ff51",
+      "merge": "b96e77ef50ac24b8676b2b83f6fcde48cfc7a6d4"
+    },
+    {
+      "number": 122,
+      "state": "MERGED",
+      "head": "0093d15e6b0a0d76744744e77c6f583298381148",
+      "merge": "3cfdde0561b22784515ca75eb54097a6baf623d1"
+    },
+    {
+      "number": 117,
+      "state": "MERGED",
+      "head": "fd337abc596bac8a88a48c7270099ffbd09a4eb6",
+      "merge": "5b597230b27c156baa0badb5b2db495817309eea"
+    },
+    {
+      "number": 116,
+      "state": "MERGED",
+      "head": "6a2c260626d4b73b14fa45ff76cec0512da08cf6",
+      "merge": "ad47dfe5de4f5a027ba328574d51432cc015c5bc"
+    },
+    {
+      "number": 114,
+      "state": "MERGED",
+      "head": "0b4614355e17947af4cc6b432943a48d1253557d",
+      "merge": "97a79a34aa98c327d1cc501756bd8484bf3bc9f8"
+    },
+    {
+      "number": 110,
+      "state": "MERGED",
+      "head": "38845c57d8e40dae6ae69a9788c937e8e6aa67a6",
+      "merge": "9506de1f9ddbbfc10248f51d4b34c7b88d8e17f5"
+    },
+    {
+      "number": 103,
+      "state": "MERGED",
+      "head": "1d60aabff4c735805ef2e6765b93b568d1273930",
+      "merge": "d40d74276c54c323916d52668f7ae38caac869c5"
+    },
+    {
+      "number": 102,
+      "state": "MERGED",
+      "head": "8f20784b98b43a75f1bd3c4d640dec2729d1096d",
+      "merge": "a0c211239fbc1af5f2c353194b197466f4b2b2af"
+    },
+    {
+      "number": 96,
+      "state": "MERGED",
+      "head": "ea606c4f12eaa72ee071058c9da01f409b31ccd3",
+      "merge": "83f605a71f96b56caf63f7c1f65c36f47685b875"
+    },
+    {
+      "number": 93,
+      "state": "MERGED",
+      "head": "7a01a898ce7388ee203ee1c719069037d8f05e17",
+      "merge": "64af3823670df458f5a71609c8b3c734899a961b"
+    },
+    {
+      "number": 82,
+      "state": "MERGED",
+      "head": "9c5367d60df1fdb4869dff77925113cb9312d3a5",
+      "merge": "109b4b4fb55df82449fa55ad5cc5087cf7531edc"
+    },
+    {
+      "number": 64,
+      "state": "MERGED",
+      "head": "0f742a91f3f32f17318620e02b2570618709ab41",
+      "merge": "2fd4ddbfad31fa0b23e3205aa57ef16b5c5d4fd5"
+    },
+    {
+      "number": 61,
+      "state": "MERGED",
+      "head": "662f542eef5bae7b706a75967557547fb8f764aa",
+      "merge": "d5216da4498563343a8191deabd17609286e53c9"
+    },
+    {
+      "number": 54,
+      "state": "MERGED",
+      "head": "748c396a2fa3a15a14a2f70f9832b2133848383f",
+      "merge": "cd78f7b677e3ffc5b6c588e647a1a0df08a21e4c"
+    },
+    {
+      "number": 53,
+      "state": "MERGED",
+      "head": "d207f5043facf0b0f24ec55d90b640b229ff0b06",
+      "merge": "d7568f9f90d2e5c119ed3d8bbf709049ee616c63"
+    },
+    {
+      "number": 47,
+      "state": "MERGED",
+      "head": "c44661baa9bf9cb4546b3a76f0ee15ab7f60d7ab",
+      "merge": "adec0cf4dec42d573037b42dc0761b1915b4795f"
+    },
+    {
+      "number": 46,
+      "state": "MERGED",
+      "head": "887b97fdfb364b10ed575a070a9ec0de49016dab",
+      "merge": "084a61a234961783935df5d6a193b98da11a9b85"
+    },
+    {
+      "number": 44,
+      "state": "MERGED",
+      "head": "e64cf065d494e1fc5148a3d50c0d25484d090715",
+      "merge": "2de6e433333d7084c9180c17312741a3ff296acd"
+    },
+    {
+      "number": 41,
+      "state": "MERGED",
+      "head": "9bdce706fdb4749acc1032a5f39263d966c9d1b6",
+      "merge": "cb67fffbbd85b572afb0f9f692668339e6ae203e"
+    },
+    {
+      "number": 39,
+      "state": "MERGED",
+      "head": "9d6469dda096938a94bf244725773365290a417f",
+      "merge": "c1c615e6ece53bff4bc6a47d7f4d332757df1295"
+    },
+    {
+      "number": 37,
+      "state": "MERGED",
+      "head": "154ca5fe1db9ff2b6503020d29cae0622ee494a4",
+      "merge": "4c2ea26867d27ba7466e0ac7446216fe0a49b24f"
+    },
+    {
+      "number": 34,
+      "state": "MERGED",
+      "head": "35b84a25dcc742748a2e09ee78ab5e6031f7f631",
+      "merge": "3de0f14ba82139c9d694ddd3cd676216103a036c"
+    },
+    {
+      "number": 33,
+      "state": "MERGED",
+      "head": "bc09b36521f6ba09f38683229ccfba13f1f2e112",
+      "merge": "1c11b098c3f86ec07740c760b423c4fccc9ec5f7"
+    },
+    {
+      "number": 30,
+      "state": "MERGED",
+      "head": "9ae9d0478b352e0e81f5f9b3611b9747c960c491",
+      "merge": "2824ed4e0079eb1a30ce177439fb3579be955ef9"
+    },
+    {
+      "number": 27,
+      "state": "MERGED",
+      "head": "f3e5ff41d849be4846990e10f058a4ffe849619a",
+      "merge": "257b3b6105c86f82a114a73e9945ec69155e07c6"
+    },
+    {
+      "number": 25,
+      "state": "MERGED",
+      "head": "282aaac957fee83e6b34c10b28f2dc69b6e02bd4",
+      "merge": "817940d32fdec5c16167ff52b1b6a7e11a9d10f6"
+    },
+    {
+      "number": 18,
+      "state": "MERGED",
+      "head": "f08b35f9f71bb08e15d4e55e2eaf52cfde2a3722",
+      "merge": "70ba74a7983dc4f5d0fd0ccd6bcfb657576f9a0b"
+    },
+    {
+      "number": 5,
+      "state": "MERGED",
+      "head": "c1802963d8a470ad31df9dded7200bdb1bd9daca",
+      "merge": "c4b4a4f06e55399f1c976077f636579f0411d677"
+    }
+  ],
+  "postCleanupVerifiedAt": "2026-10-02T22:02:15.660779+00:00",
+  "canonicalContainerStoppedWithOriginalVolume": true,
+  "privateConfigurationStillMode0600": true,
+  "remainingPrimaryWorktreeAllocatedKiB": 252252,
+  "remainingPrivateScratchAllocatedKiB": 30476
+}

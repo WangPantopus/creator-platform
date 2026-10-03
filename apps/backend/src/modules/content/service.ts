@@ -9,6 +9,7 @@ import {
   PublishContent,
   ContentVersionCommand,
   ReplyToNote,
+  NoteReplyPolicy,
   QuoteConsent,
   ReactToReply,
   ThanksCommand,
@@ -26,6 +27,7 @@ import {
 } from "../identity/subjects.js";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
+import { baseNoteReplyPolicy } from "./tenure.js";
 import {
   ContentPublicationSources,
   type ContentPublicationSourceController,
@@ -116,6 +118,38 @@ export type ContentPublicationProof = {
   mediaReady: boolean;
 };
 export interface ContentDependencies {
+  /** Prepare every bounded creator-visible candidate's real negative pair
+   * before creator/content/membership positives. Never issue a fan scope. */
+  prepareCreatorTenure?: (
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+    fanIds: readonly string[],
+  ) => Promise<void>;
+  creatorTenure?: (
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+    fanId: string,
+  ) => Promise<
+    | import("../../../../../packages/api/src/content.js").ContentTenureRecognition
+    | null
+  >;
+  /** Issue the genuine request scope before leasing the content pool client. */
+  prepareAudienceRequest?: (actor: Actor, creatorId: string) => Promise<void>;
+  /** Actual own-fan identity prepared after all packet negatives and before
+   * content/quote/membership/grant positives, retained on this exact client. */
+  prepareAudienceRead?: (
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+  ) => Promise<void>;
+  /** Uses only W4 currentTenure; server rechecks for every actual reply. */
+  replyPolicy?: (
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+  ) => Promise<NoteReplyPolicy>;
   /** Current producer state only. Missing adapters fail closed for their path. */
   follows?: (
     client: PoolClient,
@@ -136,6 +170,7 @@ export interface ContentDependencies {
   ) => Promise<number | null>;
   mediaPublication?: ContentPublicationMedia;
   publicationSource?: ContentPublicationSourceController;
+  groupPublication?: import("./group-publication.js").ContentGroupPublicationOwners;
   /** W1 withdrawal-only registry. Must verify this exact consumed act and
    * persist a durable audit for the actual publisher on this held client.
    * It cannot issue signing authority or disclose a new public command. */
@@ -168,7 +203,7 @@ export interface ContentDependencies {
     input: ContentPacketRead,
   ) => Promise<boolean>;
   /** W8 reviews the exact immutable reply. Missing/unavailable review leaves it quarantined. */
-  reviewReply?: (
+  reviewReply?: ((
     client: PoolClient,
     input: {
       replyId: string;
@@ -182,7 +217,10 @@ export interface ContentDependencies {
     state: "pending" | "allowed" | "flagged";
     reference: string;
     textHash: string;
-  }>;
+  }>) & {
+    /** Actual W8 callback capability, not host-supplied tenure permission. */
+    readonly maxTextLength?: number;
+  };
   /** Hold current W1 session and W8 creator/fan denial on the domain client,
    * before object locks. This callback cannot substitute a worker Actor. */
   assertAllowedInTransaction?: (
@@ -231,7 +269,7 @@ export interface ContentDependencies {
 }
 
 export function publicationCommand(
-  row: Index,
+  row: Pick<Index, "id" | "creator_id" | "version">,
   document: ContentBody,
   mediaEvidence: readonly ProcessedMediaEvidence[] = [],
 ): SignedActCommand {
@@ -273,6 +311,8 @@ export class ContentService {
   ) {
     this.publicationSources = new ContentPublicationSources(
       dependencies.publicationSource,
+      dependencies.groupPublication,
+      pool,
     );
   }
   private async consentRecord(
@@ -548,10 +588,58 @@ export class ContentService {
     creatorId: string,
     contentId: string,
   ) {
+    await this.requireOrdinaryRead(client, creatorId, contentId);
     await this.dependencies.preparePublicPacketRead?.(client, actor, {
       creatorId,
       contentId,
     });
+    await this.dependencies.prepareAudienceRead?.(client, actor, creatorId);
+  }
+  private async hasFulfillmentPlan(
+    client: PoolClient,
+    creatorId: string,
+    contentId: string,
+    version?: number,
+  ) {
+    // Tuple metadata only. A plan's group ID cannot enter ordinary tier-group
+    // eligibility or disclose its body before the genuine viewer is prepared.
+    return (
+      (
+        await client.query(
+          `SELECT FROM creator.content_index i JOIN creator.content_revision r
+         ON r.content_id=i.id AND r.creator_id=i.creator_id AND r.version=i.version
+         WHERE i.creator_id=$1 AND i.id=$2 AND ($3::integer IS NULL OR i.version=$3)
+         AND r.document->'planRef' IS NOT NULL AND r.document->'planRef'<>'null'::jsonb`,
+          [creatorId, contentId, version ?? null],
+        )
+      ).rowCount === 1
+    );
+  }
+  private async requireOrdinaryRead(
+    client: PoolClient,
+    creatorId: string,
+    contentId: string,
+    version?: number,
+  ) {
+    const candidate = (
+      await client.query<{ planned_answer: boolean }>(
+        `SELECT kind='public_answer' AND packet_id IS NULL AS planned_answer
+         FROM creator.content_index WHERE creator_id=$1 AND id=$2
+         AND ($3::integer IS NULL OR version=$3)`,
+        [creatorId, contentId, version ?? null],
+      )
+    ).rows[0];
+    // A fan cannot inspect revision metadata before eligibility. The public,
+    // body-free index tuple also closes planned answers hidden by revision RLS.
+    if (
+      candidate?.planned_answer ||
+      (await this.hasFulfillmentPlan(client, creatorId, contentId, version))
+    )
+      throw new DomainError(
+        "fulfillment_view_unconfigured",
+        "Current access to this answer is unavailable.",
+        503,
+      );
   }
   async index(
     client: PoolClient,
@@ -594,6 +682,7 @@ export class ContentService {
     actor: Actor,
     row: Index,
   ) {
+    await this.requireOrdinaryRead(client, row.creator_id, row.id, row.version);
     const creator = (
       await client.query(
         "SELECT verification,recovery_required FROM creator.creator_profile WHERE id=$1",
@@ -721,6 +810,20 @@ export class ContentService {
     row: Index,
     authoring = true,
   ): Promise<ContentView> {
+    const metadata = (
+      await client.query<{ plan_ref: unknown }>(
+        "SELECT document->'planRef' AS plan_ref FROM creator.content_revision WHERE content_id=$1 AND version=$2",
+        [row.id, row.version],
+      )
+    ).rows[0];
+    if (metadata?.plan_ref)
+      await this.publicationSources.assertGroupPublisher(client, actor, {
+        creatorId: row.creator_id,
+        contentId: row.id,
+        version: row.version,
+        state: row.state,
+        planRef: metadata.plan_ref,
+      });
     const revision = (
       await client.query(
         "SELECT document FROM creator.content_revision WHERE content_id=$1 AND version=$2",
@@ -729,6 +832,7 @@ export class ContentService {
     ).rows[0];
     invariant(revision, "content_unavailable", "This revision is unavailable.");
     const document = ContentDocument.parse(revision.document);
+
     const creator = (
       await client.query(
         "SELECT display_name,handle FROM creator.creator_profile WHERE id=$1",
@@ -827,13 +931,30 @@ export class ContentService {
   }
   async save(actor: Actor, creatorId: string, raw: unknown) {
     const input = SaveContent.parse(raw);
+    if (input.document.planRef && input.document.aiUseIntent)
+      throw new DomainError(
+        "fulfillment_source_unconfigured",
+        "Current approval for reusing this answer is unavailable.",
+        503,
+      );
     return this.transaction(actor, creatorId, async (client) => {
+      await this.publicationSources.prepareSave(client, actor, {
+        creatorId,
+        contentId: input.id,
+        expectedVersion: input.expectedVersion,
+        document: input.document,
+        idempotencyKey: input.idempotencyKey,
+      });
       await this.authorizeOwnedMedia(client, actor, creatorId);
       const role = await this.role(client, actor, creatorId, [
         "drafter",
         "publisher",
       ]);
-      return this.command(
+      if (input.document.planRef) {
+        await this.index(client, creatorId, input.id, true);
+        await this.publicationSources.groupPositive(client, actor);
+      }
+      const result = await this.command(
         client,
         actor,
         "save",
@@ -886,7 +1007,7 @@ export class ContentService {
               "Choose tiers from this creator.",
             );
           }
-          if (document.audience.kind === "groups") {
+          if (document.audience.kind === "groups" && !document.planRef) {
             const tiers = (
               await client.query(
                 "SELECT catalog FROM creator.commerce_tier WHERE creator_id=$1",
@@ -962,6 +1083,9 @@ export class ContentService {
           return { id: input.id, version, state: "draft" };
         },
       );
+      if (input.document.planRef)
+        await this.publicationSources.finalizeSave(client, actor);
+      return result;
     });
   }
   async validatePublication(
@@ -970,6 +1094,27 @@ export class ContentService {
     row: Index,
     document: ContentBody,
   ) {
+    if (document.planRef) {
+      await this.publicationSources.assertGroupPublisher(client, actor, {
+        creatorId: row.creator_id,
+        contentId: row.id,
+        version: row.version,
+        state: row.state,
+        planRef: document.planRef,
+      });
+      if (document.media.length)
+        throw new DomainError(
+          "fulfillment_media_task_unconfigured",
+          "Current recorded-answer fulfillment is unavailable. Your draft is kept.",
+          503,
+        );
+      if (document.aiUseIntent)
+        throw new DomainError(
+          "fulfillment_source_unconfigured",
+          "Current approval for reusing this answer is unavailable.",
+          503,
+        );
+    }
     invariant(
       document.text.length > 0 || document.media.length > 0,
       "content_empty",
@@ -1091,6 +1236,8 @@ export class ContentService {
         row,
         view.document,
       );
+      if (view.document.planRef)
+        await this.publicationSources.groupPositive(client, actor);
       const result = {
         command: publicationCommand(row, view.document, mediaEvidence),
         view,
@@ -1174,6 +1321,8 @@ export class ContentService {
               signature,
               command,
             );
+          if (document.planRef)
+            await this.publicationSources.groupPositive(client, actor);
           const scheduled = document.scheduledAt !== null;
           const mediaPending = quote.mediaEvidence.length > 0;
           if (mediaPending) {
@@ -1239,6 +1388,8 @@ export class ContentService {
               await this.effect(client, row, "source_candidate");
             // Keep exact command private on generic verification pages; C08 checks current access.
           }
+          if (document.planRef)
+            await this.publicationSources.emitGroup(client, actor);
           return {
             id,
             version: row.version,
@@ -1299,6 +1450,8 @@ export class ContentService {
             row,
             view.document,
           );
+          if (view.document.planRef)
+            await this.publicationSources.groupPositive(client, actor);
           invariant(
             contentHash(current.mediaEvidence) ===
               contentHash(
@@ -1514,7 +1667,17 @@ export class ContentService {
     );
   }
   async get(actor: Actor, creatorId: string, id: string, studio = false) {
+    if (!studio)
+      await this.dependencies.prepareAudienceRequest?.(actor, creatorId);
     return this.transaction(actor, creatorId, async (client) => {
+      const planned =
+        studio &&
+        (await this.publicationSources.prepareReadBatch(
+          client,
+          actor,
+          creatorId,
+          [id],
+        ));
       const row = await this.index(
         client,
         creatorId,
@@ -1523,7 +1686,12 @@ export class ContentService {
         studio ? undefined : actor,
       );
       await this.authorizeRead(client, actor, row, studio);
-      return this.view(client, actor, row, studio);
+      if (planned)
+        await this.publicationSources.positiveReadBatch(client, actor);
+      const view = await this.view(client, actor, row, studio);
+      if (planned)
+        await this.publicationSources.finalizeReadBatch(client, actor);
+      return view;
     });
   }
   /** Internal W7 owner proof port. A publisher does not become its own fan.
@@ -1559,7 +1727,7 @@ export class ContentService {
       // real phased owner fence and each source's retraction producer must be
       // composed before these proofs are available. Do not take late negative
       // leases below the creator/content positives or call a viewer as owner.
-      if (current.document.quote)
+      if (current.document.quote || current.document.planRef)
         throw new DomainError(
           "publication_source_authority_unconfigured",
           "Current publication source authority is not connected.",
@@ -1616,6 +1784,8 @@ export class ContentService {
           )
             mediaReady = false;
       }
+      if (current.document.planRef)
+        await this.publicationSources.groupPositive(client, actor);
       const result = {
         view: current,
         command,
@@ -1631,14 +1801,9 @@ export class ContentService {
   }
   async list(actor: Actor, creatorId: string, raw: unknown, studio = false) {
     const page = ContentPage.parse(raw);
+    if (!studio)
+      await this.dependencies.prepareAudienceRequest?.(actor, creatorId);
     return this.transaction(actor, creatorId, async (client) => {
-      if (studio)
-        await this.role(client, actor, creatorId, [
-          "triage",
-          "drafter",
-          "publisher",
-          "scheduler",
-        ]);
       const rows = (
         await client.query<Index>(
           "SELECT * FROM creator.content_index WHERE creator_id=$1 AND ($2::uuid IS NULL OR (created_at,id)<(SELECT created_at,id FROM creator.content_index WHERE id=$2 AND creator_id=$1)) AND ($3::text IS NULL OR state=$3) ORDER BY created_at DESC,id DESC LIMIT $4",
@@ -1650,12 +1815,41 @@ export class ContentService {
           ],
         )
       ).rows;
+      const selected = rows.slice(0, page.limit);
+      const planned =
+        studio &&
+        (await this.publicationSources.prepareReadBatch(
+          client,
+          actor,
+          creatorId,
+          selected.map((row) => row.id),
+        ));
+      if (!studio)
+        for (const row of selected)
+          await this.requireOrdinaryRead(
+            client,
+            creatorId,
+            row.id,
+            row.version,
+          );
+      if (studio)
+        await this.role(client, actor, creatorId, [
+          "triage",
+          "drafter",
+          "publisher",
+          "scheduler",
+        ]);
       const items: ContentView[] = [];
       // Resolve every bounded page family's negatives before the first content
       // lock. Never prepare a second family after a prior row's source fence.
-      if (!studio)
+      if (!studio) {
         for (const row of rows.slice(0, page.limit))
-          await this.prepareReadInTransaction(client, actor, creatorId, row.id);
+          await this.dependencies.preparePublicPacketRead?.(client, actor, {
+            creatorId,
+            contentId: row.id,
+          });
+        await this.dependencies.prepareAudienceRead?.(client, actor, creatorId);
+      }
       const currentRows: Index[] = [];
       for (const row of rows.slice(0, page.limit)) {
         let current: Index;
@@ -1687,6 +1881,8 @@ export class ContentService {
           (await this.preparePacketPositive(client, actor, current))
         )
           packetPrepared.push(current);
+      if (planned)
+        await this.publicationSources.positiveReadBatch(client, actor);
       // Every content/quote/audience/mode/packet positive lock is now held. Final W4
       // source gates and plain view reads cannot introduce a later identity or
       // domain lock from another candidate after the first source fence.
@@ -1705,19 +1901,37 @@ export class ContentService {
         )
           items.push(view);
       }
-      return {
+      const result = {
         items,
         nextCursor: rows.length > page.limit ? rows[page.limit - 1]!.id : null,
         serverTime: new Date().toISOString(),
       };
+      if (planned)
+        await this.publicationSources.finalizeReadBatch(client, actor);
+      return result;
     });
   }
   async reply(actor: Actor, creatorId: string, id: string, raw: unknown) {
     const input = ReplyToNote.parse(raw);
+    await this.dependencies.prepareAudienceRequest?.(actor, creatorId);
     return this.transaction(actor, creatorId, async (client) => {
       await this.assertReplyReviewInstalled(client);
-      const row = await this.index(client, creatorId, id, false, actor);
-      await this.authorizeRead(client, actor, row);
+      await this.prepareReadInTransaction(client, actor, creatorId, id);
+      const policy = await this.currentReplyPolicy(client, actor, creatorId);
+      if (input.text.length > policy.limit)
+        throw new DomainError(
+          "note_reply_limit",
+          `Your current private reply limit is ${policy.limit} characters.`,
+          409,
+        );
+      const row = await this.index(client, creatorId, id);
+      invariant(
+        (await this.eligibleBeforePacket(client, actor, row)) &&
+          (await this.preparePacketPositive(client, actor, row)),
+        "content_unavailable",
+        "This content is unavailable to this audience.",
+      );
+      await client.query("SELECT set_config('app.content_id',$1,true)", [id]);
       invariant(
         row.kind === "note",
         "note_required",
@@ -1730,7 +1944,7 @@ export class ContentService {
         )
       ).rows[0];
       invariant(fan, "fan_profile_required", "Set up your fan profile first.");
-      return this.command(
+      const receipt = await this.command(
         client,
         actor,
         "reply",
@@ -1772,7 +1986,45 @@ export class ContentService {
           return { ...reply, safetyState: decision.state };
         },
       );
+      // All reply/reviewer/idempotency writes precede a packet's final source
+      // gate. A revoked source or contention rolls back the complete receipt.
+      invariant(
+        await this.packetEligible(client, actor, row),
+        "content_unavailable",
+        "This content is unavailable to this audience.",
+      );
+      return receipt;
     });
+  }
+  private async currentReplyPolicy(
+    client: PoolClient,
+    actor: Actor,
+    creatorId: string,
+  ) {
+    const policy = NoteReplyPolicy.parse(
+      this.dependencies.replyPolicy
+        ? await this.dependencies.replyPolicy(client, actor, creatorId)
+        : baseNoteReplyPolicy(actor, creatorId),
+    );
+    invariant(
+      policy.accountId === actor.accountId && policy.creatorId === creatorId,
+      "content_account_changed",
+      "Reopen this Note with your current account.",
+    );
+    return this.dependencies.reviewReply &&
+      this.dependencies.reviewReply.maxTextLength === 12000
+      ? policy
+      : NoteReplyPolicy.parse({
+          ...policy,
+          limit: 4000,
+          longerRepliesActive: false,
+        });
+  }
+  async replyPolicy(actor: Actor, creatorId: string) {
+    await this.dependencies.prepareAudienceRequest?.(actor, creatorId);
+    return this.transaction(actor, creatorId, (client) =>
+      this.currentReplyPolicy(client, actor, creatorId),
+    );
   }
   private async reviewReplyText(
     client: PoolClient,
@@ -1929,6 +2181,36 @@ export class ContentService {
     const page = ContentReplyPage.parse(raw);
     return this.transaction(actor, creatorId, async (client) => {
       await this.assertReplyReviewInstalled(client);
+      if (studio && this.dependencies.prepareCreatorTenure) {
+        // Metadata only: the actual owner producer must finish every candidate
+        // pair's negatives before the role and any tenure positives below.
+        const candidates = (
+          await client.query<{ fan_id: string }>(
+            `SELECT m.fan_id FROM creator.content_reply_review m
+             LEFT JOIN creator.content_reaction re ON re.reply_id=m.reply_id
+             LEFT JOIN creator.content_reply_read rd ON rd.reply_id=m.reply_id AND rd.account_id=$4
+             WHERE m.creator_id=$1 AND m.withdrawn_at IS NULL
+             AND ($2::uuid IS NULL OR (m.created_at,m.reply_id)<(SELECT created_at,reply_id FROM creator.content_reply_review WHERE reply_id=$2 AND creator_id=$1))
+             AND (($5='flagged' AND m.state='flagged') OR ($5<>'flagged' AND m.state='allowed'
+               AND ($5<>'unread' OR rd.reply_version IS NULL OR rd.reply_version<m.reply_version)
+               AND ($5<>'reacted' OR re.reply_id IS NOT NULL)))
+             ORDER BY m.created_at DESC,m.reply_id DESC LIMIT $3`,
+            [
+              creatorId,
+              page.cursor ?? null,
+              page.limit + 1,
+              actor.accountId,
+              page.filter,
+            ],
+          )
+        ).rows;
+        await this.dependencies.prepareCreatorTenure(
+          client,
+          actor,
+          creatorId,
+          candidates.map((candidate) => candidate.fan_id),
+        );
+      }
       if (studio) await this.role(client, actor, creatorId, ["triage"]);
       else
         invariant(
@@ -1955,6 +2237,24 @@ export class ContentService {
           ],
         )
       ).rows;
+      const tenure = new Map<
+        string,
+        | import("../../../../../packages/api/src/content.js").ContentTenureRecognition
+        | null
+      >();
+      if (studio && this.dependencies.creatorTenure)
+        for (const fanId of [
+          ...new Set<string>(rows.slice(0, page.limit).map((r) => r.fan_id)),
+        ].sort())
+          tenure.set(
+            fanId,
+            await this.dependencies.creatorTenure(
+              client,
+              actor,
+              creatorId,
+              fanId,
+            ),
+          );
       const items: PrivateNoteReply[] = rows.slice(0, page.limit).map((r) => ({
         id: r.id,
         contentId: r.content_id,
@@ -1966,6 +2266,7 @@ export class ContentService {
             : (r.text ?? "Reply withheld and routed for safety review."),
         version: r.version,
         createdAt: r.created_at.toISOString(),
+        ...(studio ? { tenure: tenure.get(r.fan_id) ?? null } : {}),
         safetyState: r.state,
         safetyReviewAvailable: Boolean(this.dependencies.reviewReply),
         read: Boolean(r.read),
@@ -2238,6 +2539,8 @@ export class ContentService {
   }
   async thanks(actor: Actor, creatorId: string, raw: unknown) {
     const input = ThanksCommand.parse(raw);
+    if (!input.withdrawn && input.targetKind === "content")
+      await this.dependencies.prepareAudienceRequest?.(actor, creatorId);
     return this.transaction(actor, creatorId, async (client) => {
       const fan = (
         await client.query(

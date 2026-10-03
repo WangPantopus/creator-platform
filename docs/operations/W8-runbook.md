@@ -1,5 +1,15 @@
 # Trust operation and recovery
 
+
+## Closed privacy continuation — 2026-10-02 (draft)
+
+The reviewed candidate is `infra/migrations/waves/20261002-privacy.json`: exact canonical57 plus0074/0082/0087/0103, in ascending order and one transaction. Select `W8_MIGRATION_WAVE=20261002-privacy` with the same private backup/manifest and separate administrator requirements below. The operator accepts only this four-purpose continuation. It checks original denial/media role custody plus three additional fixed function definitions/ACLs, eight extra metadata columns/two policies, and the shared complete0087/0103 private-role/scope/trigger catalogue guards. Administrator-selected session identities are catalogue review only; they never substitute for actual worker password login, lease, signal, COMMIT or application acceptance. Preexisting unregistered role/object capabilities refuse. Private scopes must have the exact types/nullability/primary-key/deferred-trigger shape and be empty. Original SQL bytes/57 history remain unchanged.
+
+[Actual closed synthetic backup, separate restore,57→61 upgrade, fresh61 and20 rolled-back drift refusals](../../artifacts/workstreams/W8/migration-continuation/20261002-mac-studio/README.md) qualify the SQL operator only. All review/upgrade/restore/fresh targets remain closed. Main and peer databases are not activated by this receipt. Real web/Android/iOS, genuine task/expiry/COMMIT, each owner's fresh/preserved-upgrade, all-eight C10 and original recovery are still required. For a preserved canonical40 source, use the previously approved initial57 revision/operator first; this continuation requires the entire57 baseline and does not bypass the initial guard or invent history.
+
+All47 unfinished reservations are metadata-only moved to0151–0197 in `infra/migrations/waves/20261002-privacy-held.json`; source paths/bytes, old SQL filenames and existing applied history remain unchanged. The initial split map was superseded after W1 found dependent issuers before their moved tables. Original0083/0111/0112 are now0168/0194/0195, original0113 is0196, and original0150 single-call metadata is0197. Original0099/0100/0105/0106 are0183/0184/0188/0189; late accounting0183+0188 feeds0190 subject→0191 negatives→0192 financial correction. Owners must review the exact complete map and actual source purpose/version; unknown additional DDL dependencies still need review before activation. Allocation is not permission or source approval. Canonical0087 private owner/ACL are not widened.
+
+
 Preserved targets follow [the R6 reconciliation procedure](W8-preserved-reconciliation.md). `scripts/reconcile-restored-trust.ts` inventories an actual named/owner-closed target read-only and always returns trafficReady false. It does not clear closure, issue provider effects or certify all eight domains.
 
 ## Simulator credential custody

@@ -1,0 +1,24 @@
+{
+  "at": "2026-10-02T16:49:23.985847+00:00",
+  "android": {
+    "device": "emulator-5582",
+    "normalEmulatorExitCode": 0,
+    "leaseReleased": true,
+    "actualRAMKiB": 2026148,
+    "cores": 2,
+    "crashDetectionSuppressed": false
+  },
+  "ios": {
+    "device": "3E02BBA8-75B0-4D3B-BE37-E636C9E71687",
+    "normalShutdown": true,
+    "leaseReleased": true,
+    "driverExitCode": 65,
+    "driverPassedTests": 0,
+    "driverFailedTests": 1,
+    "appActionsFinishedSeconds": 22.82,
+    "driverDurationSeconds": 681.471,
+    "ownSimulatorDiagnosisTimeoutSeconds": 600
+  },
+  "heavyBuildLeaseReleased": true,
+  "peerResourcesTouched": false
+}

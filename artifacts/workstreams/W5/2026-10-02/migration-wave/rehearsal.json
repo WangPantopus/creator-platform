@@ -1,0 +1,13 @@
+{
+  "phase": "completedRehearsal",
+  "sourceCommit": "716c8cb815799f8475be839a28da886f3c35e899",
+  "packetCommit": "58b59fa0e5b8937af7cd0cb7272ae5b5662d7ee7",
+  "freshLedgerRows": 57,
+  "upgradedLedgerRows": 57,
+  "matchingCatalogSha256": "cfbc894fd59dc3981ab4fa31d2ff7154e2865b452a71b79afd483abe94557ea3",
+  "originalLedgerRows": 40,
+  "originalUnchanged": true,
+  "independentRestore": true,
+  "trafficClosed": true,
+  "releaseReady": false
+}
