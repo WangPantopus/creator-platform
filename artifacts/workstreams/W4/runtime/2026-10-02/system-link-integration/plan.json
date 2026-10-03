@@ -1,0 +1,13 @@
+{
+  "isolatedOnly": true,
+  "querySha256": "b3e308f5c8a84b537e6210bece04dcda5d3a27636f0d97b6503461459a6efec9",
+  "explainWithoutAnalyze": true,
+  "nullSelectors": true,
+  "nonOwnerRole": true,
+  "counts": {
+    "deliveries": 0,
+    "messages": 0,
+    "migrations": 57
+  },
+  "positiveSystemLinkVerified": false
+}

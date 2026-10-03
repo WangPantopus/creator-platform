@@ -1,0 +1,54 @@
+{
+  "observedAt": "2026-10-02T15:15:55.410Z",
+  "source": "b5164a81",
+  "backendRelease": "e4a1b978",
+  "url": "http://localhost:3006/calls/60000000-0000-4000-8000-000000000001/60000000-0000-4000-8000-000000000002/60000000-0000-4000-8000-000000000006",
+  "permanentDenialCountBefore": 14,
+  "currentCount": 21,
+  "actualOutageResponses": [
+    {
+      "at": 1790953979895,
+      "status": 503,
+      "code": "media_unavailable"
+    },
+    {
+      "at": 1790953981912,
+      "status": 503,
+      "code": "media_unavailable"
+    },
+    {
+      "at": 1790953985926,
+      "status": 503,
+      "code": "media_unavailable"
+    },
+    {
+      "at": 1790953993940,
+      "status": 503,
+      "code": "media_unavailable"
+    },
+    {
+      "at": 1790954009980,
+      "status": 503,
+      "code": "media_unavailable"
+    },
+    {
+      "at": 1790954040254,
+      "status": 503,
+      "code": "media_unavailable"
+    },
+    {
+      "at": 1790954070315,
+      "status": 503,
+      "code": "calls_unconfigured"
+    }
+  ],
+  "outageIntervalsMilliseconds": [
+    2017,
+    4014,
+    8014,
+    16040,
+    30274,
+    30061
+  ],
+  "afterRecoveryBody": "CALL\nThis call is unavailable\n\nCalling is not connected yet.\n\nRefresh call\nContinue with Pantopus\nGet help"
+}

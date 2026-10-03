@@ -1,0 +1,34 @@
+{
+  "recordedAt": "2026-10-02T15:46:38.877205+00:00",
+  "environment": "labelled synthetic source integration, all W8 services/devices stopped",
+  "main": "68c839b9936452f5f443c0f0454f9b3a7abc787a",
+  "agentMergedSource": "166d9ee674ac6937621eddc1e7af27be73ad834c",
+  "growthOwner": "b7d21b0c6363af679dabccd29828424130ec0ef2",
+  "files": {
+    "apps/backend/src/modules/growth/erasure.ts": "2133fec20973257bc0bb8147999f32f1d121442a58c2a90047cb06da71d40598",
+    "apps/backend/src/modules/growth/lifecycle.ts": "c9978810b443e3523c1e525fb6a340d6226f6ebab7e7c4a94a5e9bc967a6203d",
+    "apps/backend/src/modules/growth/privacy-export.ts": "4c537faed97f6a1a6a27905c26102e8a36e2080b350eb423669cdd7f834abe28",
+    "apps/backend/src/modules/growth/service.ts": "d528a8eb7782407d7068eb8f5a9902eb7ac07e25b667c7ec64f57152246a4e8e",
+    "apps/backend/src/modules/trust/privacy-consumers.ts": "82162237271153f92af635c2d696709b4a295ded87bf4ecefec56af4d000339a"
+  },
+  "review": {
+    "growthLifecycleAndExport": "exact personally read W7 files; one fixed-source READ COMMITTED READ WRITE cursor; actual task/restoration before locks/pages/COMMIT; signal destroys dedicated client; no pooled/legacy ownership permission",
+    "growthDelete": "only same-client lifecycle changes integrated against main; other main methods preserved; actual ownership before mark and final separate COMMIT",
+    "coordinator": "real domainPrivacyTaskAuthorityInTransaction and held restoration; Agent merged actual third lifecycle callback retained; no true/pool fallback",
+    "serverTs": "unchanged; W1 owns final root composition"
+  },
+  "checks": {
+    "backendTypecheck": "passed",
+    "scopedEslint": "passed",
+    "newUnitTests": 0,
+    "actualGrowthTaskCommit": "not operated",
+    "realWebAndroidIOS": "pending for composed61",
+    "fullC10": "pending",
+    "releaseReady": false
+  },
+  "dependencies": [
+    "Managed original Growth encryption key and actual worker URL absent from W8 profiles; no peer credentials borrowed",
+    "Protected artifact store/physical erasure and finite policy still need actual configuration/receipt",
+    "Corrected held dependency map publication pending; SQL bytes/applied history unchanged"
+  ]
+}

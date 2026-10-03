@@ -1,0 +1,46 @@
+Scope: all 8 workspace projects
+✓ Lockfile passes supply-chain policies (verified 1d ago)
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+Done in 3.9s using pnpm v11.19.0
+
+ RUN  v3.2.4 /Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/backend
+
+ ❯ tests/postgres.integration.test.ts (9 tests | 1 failed | 8 skipped) 304169ms
+   ↓ PostgreSQL foundation using the real non-owner role > T-11 denies unscoped read/write and leaves no tenant context on pooled connections
+   × PostgreSQL foundation using the real non-owner role > T-11 checks 10,000 random pairs against 1,000 real scoped threads 300018ms
+     → Test timed out in 300000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+   ↓ PostgreSQL foundation using the real non-owner role > T-03/T-23 interrupt delivered text before the takeover boundary and reject stale generation frames
+   ↓ PostgreSQL foundation using the real non-owner role > T-04/T-30 commits announced handback before new AI text and resumes with no duplicates
+   ↓ PostgreSQL foundation using the real non-owner role > T-18/T-24 serializes simultaneous retries and last-unit allowance races
+   ↓ PostgreSQL foundation using the real non-owner role > T-27 refuses stale extraction and never rebuilds a deleted fact
+   ↓ PostgreSQL foundation using the real non-owner role > T-34 refuses team and stolen-session named acts; real user-verified signatures bind exact content once
+   ↓ PostgreSQL foundation using the real non-owner role > T-28 stores verified duplicate inbox events once and reconciles current state
+   ↓ PostgreSQL foundation using the real non-owner role > commits outbox frames with state and retries publication in aggregate order after a crash
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/postgres.integration.test.ts > PostgreSQL foundation using the real non-owner role > T-11 checks 10,000 random pairs against 1,000 real scoped threads
+Error: Test timed out in 300000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/postgres.integration.test.ts:203:5
+    201|       ).rejects.toMatchObject({ code: "unsafe_database_role" });
+    202|     });
+    203|     it("T-11 checks 10,000 random pairs against 1,000 real scoped thre…
+       |     ^
+    204|       instrumentContext = true;
+    205|       try {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 8 skipped (9)
+   Start at  02:45:17
+   Duration  306.99s (transform 620ms, setup 0ms, collect 2.09s, tests 304.17s, environment 0ms, prepare 202ms)
+
+undefined
+/Users/yingpengwang/.codex/worktrees/970d/creator-platform/apps/backend:
+[ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL] Command failed with exit code 1: vitest run tests/postgres.integration.test.ts -t 'T-11 checks 10,000 random pairs'

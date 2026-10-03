@@ -1,0 +1,35 @@
+{
+  "at": "2026-10-02T16:56:43.912278+00:00",
+  "source": "6b6e60ac29009706e2bda8ea71a2e8178605e70f",
+  "mainIntegrated": "ecca4c4380ced8d51b07fa25734c6cc5b7c5d053",
+  "checks": [
+    {
+      "log": "account-call-metadata-integrated-backend-build.log",
+      "result": "PASS",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5"
+    },
+    {
+      "log": "account-call-metadata-integrated-web-types.log",
+      "result": "PASS",
+      "sha256": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92"
+    },
+    {
+      "log": "account-call-metadata-integrated-generation.log",
+      "result": "PASS",
+      "sha256": "1dc06110c0cb04a55f72f69ea6f1ee8ad6552681a5d3efbc20ef258d36f449a5"
+    },
+    {
+      "log": "account-call-metadata-format-check.log",
+      "result": "PASS",
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    {
+      "log": "account-call-metadata-integrated-existing-contracts.log",
+      "result": "PASS18/18;74.06s",
+      "sha256": "ca124fdc200857840b90effeee572350f189823542260789959eae57b0704fc4"
+    }
+  ],
+  "noNewUnitTests": true,
+  "actualAppsOperatedSourceQualifier": "README.md; scope operated before unrelated W5 main integration; no new W6 app behavior changed",
+  "contractContainerStopped": true
+}

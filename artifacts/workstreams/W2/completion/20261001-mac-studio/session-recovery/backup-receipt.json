@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "source": "creator_w2 / owned W2 55442",
+  "backupAt": "2026-10-02T07:13:42Z",
+  "host": "Yingpengs-Mac-Studio.local",
+  "bytes": 541337,
+  "sha256": "237b6a7c28cdac7e54df2183c7fee3c59462eed21bc4dd3170709a0ceda2b0b7",
+  "privatePath": "~/.config/creator-platform/w2-mac-studio-20261001/creator_w2-20261002T071342Z.pgdump",
+  "tocList": "passed",
+  "restore": {
+    "database": "creator_w2_rehearsal_recovery_20261002",
+    "exitOnError": true,
+    "result": "passed",
+    "migrations": 40,
+    "draftRevision": 15,
+    "fixedExamples": 20,
+    "usage": 0,
+    "activeActorSessions": 3
+  },
+  "limits": [
+    "Private backup is not committed.",
+    "Existing synthetic verification/license remain labeled; no real-provider acceptance.",
+    "Restored session count does not prove personal operation of each session."
+  ]
+}

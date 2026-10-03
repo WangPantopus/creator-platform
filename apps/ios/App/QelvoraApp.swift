@@ -30,7 +30,11 @@ struct QelvoraApp: App {
         if let index = arguments.firstIndex(of: "--api-url"), arguments.indices.contains(index + 1), let url = apiOrigin(arguments[index + 1], loopback: true) { return url }
         #endif
         guard let value = Bundle.main.object(forInfoDictionaryKey: "CreatorAPIURL") as? String else { return nil }
+        #if DEBUG
+        return apiOrigin(value) ?? apiOrigin(value, loopback: true)
+        #else
         return apiOrigin(value)
+        #endif
     }
     private func apiOrigin(_ value: String, loopback: Bool = false) -> URL? {
         guard let origin = URLComponents(string: value), let host = origin.host, !host.isEmpty,

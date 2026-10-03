@@ -1,0 +1,71 @@
+{
+  "sourceCommit": "3b24991e09f04b2df62046e6f9b57c520ac271c3",
+  "database": "Owned fresh local database; 61 canonical migrations adopted with independently restored backup. No held purpose migrations activated.",
+  "identity": "DEVELOPMENT-ONLY SEEDED VERIFIED at 2026-10-01T20:44:26Z; no proof, passkey or acceptance.",
+  "web": {
+    "viewports": [
+      {
+        "width": 390,
+        "height": 844
+      },
+      {
+        "width": 1280,
+        "height": 900
+      }
+    ],
+    "themes": ["Light", "Night"],
+    "screenshots": [
+      {
+        "path": "3b249-notes-390-light-current.png",
+        "sha256": "472a3176949fa425fcfbd4b05275ccf8a93d8bb916b28e1bbff2d3b0526219df",
+        "personallyViewed": true
+      },
+      {
+        "path": "3b249-notes-390-night-current.png",
+        "sha256": "ee771623df98b2308b666bb42897aea26052e5225c2dde288a8980bed553c2b7",
+        "personallyViewed": true
+      },
+      {
+        "path": "3b249-notes-1280-light-current.png",
+        "sha256": "cf7cc3648ccc841b93a13a1951a6f9c0d252986b3102df1f2274db794f940f46",
+        "personallyViewed": true
+      },
+      {
+        "path": "3b249-notes-1280-night-current.png",
+        "sha256": "29d5aa3196a4a674689c13663cdcbf0cba8ad78e4cb2d6fbb38898a12364d2db",
+        "personallyViewed": true
+      }
+    ],
+    "observed": "Actual Notes draft and successful empty private feed, no horizontal overflow; saved-return composer revision 3 changed through app to All members, saved and returned as revision 4. Wrong-account Studio role denied. Actual API pause concealed Studio; recovery required fresh role check.",
+    "limits": "Unsigned draft only. No positive published Note, two-fan isolation, Thanks consent or withdrawal, signed reaction, genuine signing, paid/group delivery or release readiness."
+  },
+  "builds": {
+    "web": "Next 16.3.7 production build passed at this source under owned heavy-build lease, two workers.",
+    "ios": {
+      "shippingBuild": "Passed; strict code-signature verification passed.",
+      "debugDylibSha256": "11c91fdd72e826bff9f751c476bc6d0a7bf77d4e46aca0761071d4c472306bee",
+      "personalOperation": "Not verified at this source; own simulator stayed shut down."
+    },
+    "android": {
+      "shippingBuild": "Passed with JDK 21, --no-daemon --max-workers=2.",
+      "apkSha256": "b3a39dcad2004e066e43de453aef4f84ce6781958433f10888abc7ac88a2eab5"
+    }
+  },
+  "androidOperation": {
+    "operator": "Personal CUA through Android Studio Running Devices, owned CreatorPlatform_W5_API34 only.",
+    "actions": [
+      "Installed actual current APK",
+      "Cold launch Light to actual unsigned Note with api_url on launch",
+      "Observed Content unavailable without private body or reply controls",
+      "Pressed Refresh; content stayed unavailable",
+      "Opened You; actual @kilnfire retained",
+      "Cold launch Night with same actual api_url and lowercase content IDs",
+      "Observed Night Content unavailable",
+      "Opened You; @kilnfire retained"
+    ],
+    "resourceObservation": "AVD configured two cores/2048 MB. IDE boot exposed MemTotal 2538144 kB and cpu0-1; physical RAM was larger than configured. Startup System UI ANR dismissed with actual CUA Wait.",
+    "limits": "No exported native screenshot file or positive signed-content acceptance. App unavailable on unsigned Note is a truthful refusal, not published-content verification.",
+    "cleanup": "Owned emulator shut down and GUI/emulator leases released; peer devices untouched."
+  },
+  "qualification": "Implemented source and successful builds; bounded real UI operations only. All nine packages are not release-ready."
+}
