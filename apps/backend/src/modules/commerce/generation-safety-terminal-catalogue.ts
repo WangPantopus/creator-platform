@@ -9,7 +9,7 @@ import { requestAuthority } from "../identity/request-authority.js";
  * complete output/journal custody, original fences and effective privileges. */
 export const GENERATION_SAFETY_TERMINAL_CATALOGUE_QUERY = `WITH roles AS (
  SELECT oid,rolname,rolcanlogin,rolinherit,rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls,rolconfig
- FROM pg_roles WHERE rolname IN('creator_w4_generation_safety_terminal','creator_w4_generation_terminal','creator_generation_terminal_authority','creator_w2_generation_terminal_journal','creator_w3_generation_output','creator_generation_cursor_authority','creator_w2_generation_journal','creator_w2_generation_input','creator_generation_authority','creator_generation_worker','creator_trust_denial')
+ FROM pg_roles WHERE rolname IN('creator_w4_generation_safety_terminal','creator_w4_generation_terminal','creator_generation_terminal_authority','creator_w2_generation_terminal_journal','creator_w3_generation_output','creator_w3_terminal_output','creator_generation_cursor_authority','creator_w2_generation_journal','creator_w2_generation_input','creator_generation_authority','creator_generation_worker','creator_trust_denial')
 ), relations AS (
  SELECT c.oid,c.relname,c.relowner,c.relkind,c.relrowsecurity,c.relforcerowsecurity,c.relispartition,c.relacl
  FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='creator'
@@ -96,8 +96,12 @@ export async function generationSafetyTerminalPurposeCatalogue(
   return catalogue;
 }
 
-export const GENERATION_SAFETY_TERMINAL_CATALOGUE_SHA256 =
-  "ec1dca0399c83f93b5accea0a1c55f9e58c8556011564ccfd7449f9364b704d0";
+// The personally reviewed thirteen-source setup has no fabricated scope or
+// business positives. Current W2 metadata/guardrail/retrieval, W3 context/init/
+// output, W1 cursor and W8 denial callers still require complete qualification.
+// Keep factory acceptance absent; a caller or startup readback supplies no pin.
+export const GENERATION_SAFETY_TERMINAL_CATALOGUE_SHA256: string | undefined =
+  undefined;
 export const GENERATION_SAFETY_TERMINAL_SOURCES = Object.freeze(
   [
     {
@@ -183,6 +187,13 @@ export const GENERATION_SAFETY_TERMINAL_SOURCES = Object.freeze(
       owner: "W1",
       checksum:
         "a4f01c5f1eb1e19d79437b17cce872def1366965ba27c8c46b0d5f9bb73da436",
+    },
+    {
+      name: "w3_terminal_only_finalization",
+      path: "apps/backend/src/modules/conversation/migrations/pending_w3_terminal_only_finalization.sql",
+      owner: "W3",
+      checksum:
+        "8de1897f2e70f763382984459274eb7616ad7149b457811fffd90fb8b7df2e8c",
     },
   ].map((source) => Object.freeze(source)),
 );

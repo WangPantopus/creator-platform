@@ -1,3 +1,11 @@
+# Current actual typed owner composition — October 3, 2026 UTC
+
+W1 published5d7b1d6f's complete generation issuer/finite nine-function registry and its generation transport/output-cursor/ErrorOptions dependencies are consumed byte-exact. The registry accepts only the actual0215 typed financial pair and explicitly forbids the legacy0189 pair as generic consumers. The actual separate W3 terminal-only0203 source published8d4ed7bf is consumed at exact SQL SHA2568de1897f2e70f763382984459274eb7616ad7149b457811fffd90fb8b7df2e8c. W4 explicitly includes that owner's role attributes, memberships, settings and effective privileges in metadata custody and its actual source/executable/ledger requirements.
+
+Personal thirteen-source closed canonical61 rollback review passes: three actual PL functions with zero diagnostics,18 no-scope reads returning0,14 actual ACL/missing-scope refusals,20 detected/restored drifts (including W3 LOGIN/BYPASSRLS/private-text/original-bridge/PUBLIC), and all six unchanged custody fingerprints. No business, ledger or private scope rows were fabricated. Private receipt SHA256: `0bcad0f3e1e5d52941c7229e0c37f298eec86800260095e640da9bc52bc313fd`. Exact review catalogue: `a5375e923e1e5e3b638ec6c9c68ebb05a085750afe5a7fe67ceea12c10b9e707`. The two W4 function definition pins remain unchanged.
+
+This qualifies the named source setup only. The complete current W2 metadata/guardrail/retrieval, W3 context/init/output, W1 cursor and W8 denial graph still requires independent qualification. The accepted complete-owner catalogue pin is absent and the factory refuses construction. Held215 remains inactive; complete financial/provider/safety/race/C10 and positive genuine terminal acceptance remain open. The previous12-source ec1d pin below is historical and cannot authorize the expanded current factory. Backend types/build/scoped lint and formatting/diff pass; no new tests were written. Routine operator JSON/logs remain private outside Git.
+
 # Actual typed safety settlement — October 3, 2026 UTC
 
 The metadata helper restores/releases its savepoint only after successful reads. A failed query submits no later helper SQL. The bounded public DomainError retains its original private nonenumerable Error.cause so the genuine W1 transaction owner can distinguish a healthy SQL refusal from an uncertain transport/timeout.

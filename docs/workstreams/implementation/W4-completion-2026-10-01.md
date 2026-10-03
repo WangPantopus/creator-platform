@@ -1,3 +1,9 @@
+### Actual W1 typed registry and separate W3 terminal owner — October 3, 2026 UTC
+
+Personally read/consumed W1 published5d7b1d6f full generation issuer with actual typed0215-only finite-nine-function terminal registry, generation transport/output-cursor and ErrorOptions dependencies. Actual published W3 terminal-only8d4ed7bf source is consumed byte-exact at8de1897f. The W4 catalogue now explicitly inspects that separate owner's role attributes, memberships and effective ACL and requires its actual0203 source; legacy0189 cannot be relabelled or accepted as a generic consumer. Types/build/scoped lint pass.
+
+Personal thirteen-source canonical61 rollback review passes three actual compiler checks,18 no-scope plans,14 ACL/missing-scope refusals,20 detected/restored metadata drifts and all six original custody fingerprints. This is that exact source review, not complete current owner or positive terminal acceptance. The accepted complete-owner pin remains absent, so factory construction stays unavailable. Current W2/W3/W1/W8 whole graph, C10, genuine generation/financial/provider/race and activation remain open; all nine packages/R01–R15 remain incomplete. [Exact evidence and limits](../../../artifacts/workstreams/W4/runtime/2026-10-03/generation-safety-terminal/README.md).
+
 ### Corrected original empty-failure and source-client custody — October 3, 2026 UTC
 
 ### Actual metadata read-timeout closure — October 3, 2026 UTC
