@@ -1,23 +1,25 @@
 "use client";
 import { copy, formatCopy } from "@qelvora/copy";
 import { useEffect, useRef, useState } from "react";
-import type {
-  CallOfferView,
-  CallSession,
+import {
+  CallOffersSchema,
+  CallSessionSchema,
+  type CallOfferView,
 } from "../../../../packages/api/src/session";
-import { mediaRequest } from "../media/api";
+import { mediaRequest, MediaRequestError } from "../media/api";
 import "../media/media.css";
 /** An offer link carries a destination, never a booking or payment authority. */
 type SelectionProps = {
   creatorId: string;
   fanId: string;
   offerId: string;
+  actorAccountId: string;
   canSelect: boolean;
 };
 export function SelectTime(props: SelectionProps) {
   return (
     <SelectionForm
-      key={`${props.creatorId}/${props.fanId}/${props.offerId}`}
+      key={`${props.actorAccountId}/${props.creatorId}/${props.fanId}/${props.offerId}`}
       {...props}
     />
   );
@@ -26,6 +28,7 @@ function SelectionForm({
   creatorId,
   fanId,
   offerId,
+  actorAccountId,
   canSelect,
 }: SelectionProps) {
   const root = `threads/${creatorId}/${fanId}/call-offers`;
@@ -34,7 +37,15 @@ function SelectionForm({
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [stale, setStale] = useState(true);
+  const [now, setNow] = useState(0);
   const [revision, setRevision] = useState(0);
+  const lifetime = useRef<AbortController | null>(null);
+  const command = useRef<AbortController | null>(null);
+  const currentOffer = useRef<CallOfferView | null>(null);
+  const deadline = useRef<{ wall: number; elapsed: number } | null>(null);
+  const selectionVersion = useRef<number | null>(null);
+  const selecting = useRef(false);
   const submission = useRef<{
     slot: string;
     version: number;
@@ -42,70 +53,266 @@ function SelectionForm({
   } | null>(null);
   useEffect(() => {
     let active = true;
-    void mediaRequest<CallOfferView[]>(root)
-      .then((values) => {
-        if (active) {
-          setOffer(values.find((value) => value.id === offerId) ?? null);
-          setChosen(null);
-          setNotice(null);
-          setLoaded(true);
-        }
-      })
-      .catch((error: unknown) => {
-        if (active) {
+    let epoch = 0;
+    let retry = true;
+    let delay = 1000;
+    let request: AbortController | null = null;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const controller = new AbortController();
+    lifetime.current = controller;
+    function conceal() {
+      epoch++;
+      request?.abort();
+      request = null;
+      command.current?.abort();
+      command.current = null;
+      selecting.current = false;
+      setBusy(false);
+      clearTimeout(timer);
+      currentOffer.current = null;
+      deadline.current = null;
+      setOffer(null);
+      setStale(true);
+    }
+    async function refresh() {
+      if (!active || request || selecting.current || document.hidden) return;
+      const started = performance.now();
+      const attempt = epoch;
+      const pending = new AbortController();
+      request = pending;
+      try {
+        const values = CallOffersSchema.parse(
+          await mediaRequest<unknown>(root, {
+            expectedAccountId: actorAccountId,
+            signal: AbortSignal.any([
+              controller.signal,
+              pending.signal,
+              AbortSignal.timeout(4000),
+            ]),
+          }),
+        );
+        if (!active || document.hidden || attempt !== epoch) return;
+        if (performance.now() - started >= 5000)
+          throw new Error(copy.w6TheTimesCouldNotBeLoadedReconnectAndTryAgain);
+        const next = values.find((value) => value.id === offerId) ?? null;
+        if (next) {
+          for (const zone of [next.fanTimeZone, next.creatorTimeZone])
+            new Intl.DateTimeFormat(undefined, { timeZone: zone });
+          const wall = Date.parse(next.expiresAt);
+          const elapsed = performance.now() + Math.max(0, wall - Date.now());
+          const prior = currentOffer.current;
+          deadline.current = {
+            wall,
+            elapsed:
+              prior?.version === next.version &&
+              prior.expiresAt === next.expiresAt &&
+              deadline.current
+                ? Math.min(deadline.current.elapsed, elapsed)
+                : elapsed,
+          };
+        } else deadline.current = null;
+        currentOffer.current = next;
+        setOffer(next);
+        setChosen((slot) =>
+          next?.state === "offered" &&
+          selectionVersion.current === next.version &&
+          next.slots.some((value) => value.id === slot)
+            ? slot
+            : null,
+        );
+        setStale(false);
+        setNow(Date.now());
+        setNotice(null);
+        setLoaded(true);
+        delay = 30000;
+      } catch (error) {
+        if (active && !document.hidden && attempt === epoch) {
+          currentOffer.current = null;
+          deadline.current = null;
+          setOffer(null);
+          setStale(true);
           setLoaded(true);
           setNotice(
-            error instanceof Error
+            error instanceof MediaRequestError
               ? error.message
               : copy.w6TheTimesCouldNotBeLoaded,
           );
+          if (
+            error instanceof MediaRequestError &&
+            ([401, 403, 404, 409].includes(error.status) ||
+              error.code === "calls_unconfigured")
+          )
+            retry = false;
+          delay = Math.min(30000, delay * 2);
         }
-      });
+      } finally {
+        if (request === pending) request = null;
+        if (active && attempt === epoch && retry && !document.hidden)
+          timer = setTimeout(() => void refresh(), delay);
+      }
+    }
+    const foreground = () => {
+      if (document.hidden) conceal();
+      else {
+        clearTimeout(timer);
+        if (retry) void refresh();
+      }
+    };
+    const clock = setInterval(() => {
+      if (active && !document.hidden) {
+        setNow(Date.now());
+        if (
+          currentOffer.current?.state === "offered" &&
+          deadline.current &&
+          (Date.now() >= deadline.current.wall ||
+            performance.now() >= deadline.current.elapsed)
+        ) {
+          setChosen(null);
+          setStale(true);
+          setNotice(copy.w6ThisOfferChangedOrExpiredOpenRequestsForItsCurrent);
+        }
+      }
+    }, 500);
+    void refresh();
+    window.addEventListener("pagehide", conceal);
+    window.addEventListener("pageshow", foreground);
+    document.addEventListener("visibilitychange", foreground);
     return () => {
       active = false;
+      epoch++;
+      clearTimeout(timer);
+      clearInterval(clock);
+      request?.abort();
+      command.current?.abort();
+      command.current = null;
+      controller.abort();
+      if (lifetime.current === controller) lifetime.current = null;
+      window.removeEventListener("pagehide", conceal);
+      window.removeEventListener("pageshow", foreground);
+      document.removeEventListener("visibilitychange", foreground);
     };
-  }, [root, offerId, revision]);
+  }, [root, offerId, actorAccountId, revision]);
   async function select() {
-    if (!offer || !chosen || busy || !canSelect) return;
+    const observed = currentOffer.current;
+    const boundary = lifetime.current;
+    const expires = deadline.current;
+    if (
+      !observed ||
+      !boundary ||
+      boundary.signal.aborted ||
+      !expires ||
+      Date.now() >= expires.wall ||
+      performance.now() >= expires.elapsed ||
+      !chosen ||
+      busy ||
+      selecting.current ||
+      stale ||
+      document.hidden ||
+      observed.state !== "offered" ||
+      !canSelect
+    )
+      return;
+    const slot = observed.slots.find((value) => value.id === chosen);
+    if (!slot || Date.parse(slot.startsAt) <= Date.now()) return;
+    const here = location.href;
+    const pending = new AbortController();
+    command.current = pending;
+    selecting.current = true;
+    const signal = AbortSignal.any([
+      boundary.signal,
+      pending.signal,
+      AbortSignal.timeout(10000),
+    ]);
+    const mounted = () =>
+      !boundary.signal.aborted &&
+      !pending.signal.aborted &&
+      !document.hidden &&
+      lifetime.current === boundary &&
+      command.current === pending &&
+      location.href === here;
+    const current = () => mounted() && !signal.aborted;
     setBusy(true);
     setNotice(null);
     try {
+      const started = performance.now();
+      const values = CallOffersSchema.parse(
+        await mediaRequest<unknown>(root, {
+          expectedAccountId: actorAccountId,
+          signal,
+        }),
+      );
+      if (!current()) return;
+      const latest = values.find((value) => value.id === observed.id);
+      if (
+        !latest ||
+        latest.state !== "offered" ||
+        latest.version !== observed.version ||
+        latest.commitmentId !== observed.commitmentId ||
+        latest.expiresAt !== observed.expiresAt ||
+        latest.creatorTimeZone !== observed.creatorTimeZone ||
+        latest.fanTimeZone !== observed.fanTimeZone ||
+        !latest.slots.some(
+          (value) => value.id === slot.id && value.startsAt === slot.startsAt,
+        ) ||
+        Date.now() >= expires.wall ||
+        performance.now() >= expires.elapsed ||
+        Date.parse(slot.startsAt) <= Date.now() ||
+        performance.now() - started >= 5000
+      )
+        throw new Error(copy.w6ThisTimeIsUnavailableReloadTheCurrentOffer);
       if (
         submission.current?.slot !== chosen ||
-        submission.current?.version !== offer.version
+        submission.current?.version !== observed.version
       )
         submission.current = {
           slot: chosen,
-          version: offer.version,
+          version: observed.version,
           key: crypto.randomUUID(),
         };
-      const session = await mediaRequest<CallSession>(
-        `${root}/${offer.id}/select`,
-        {
+      const session = CallSessionSchema.parse(
+        await mediaRequest<unknown>(`${root}/${observed.id}/select`, {
           method: "POST",
+          expectedAccountId: actorAccountId,
+          signal,
           body: JSON.stringify({
             slotId: chosen,
-            expectedVersion: offer.version,
+            expectedVersion: observed.version,
             idempotencyKey: submission.current.key,
           }),
-        },
+        }),
       );
+      if (!current()) return;
+      if (
+        session.creatorId !== creatorId ||
+        session.fanId !== fanId ||
+        session.fanAccountId !== actorAccountId ||
+        session.commitmentId !== observed.commitmentId ||
+        Date.parse(session.scheduledAt) !== Date.parse(slot.startsAt)
+      )
+        throw new Error(copy.w6ThisTimeIsUnavailableReloadTheCurrentOffer);
       window.location.assign(`/calls/${creatorId}/${fanId}/${session.id}`);
     } catch (error) {
-      setNotice(
-        error instanceof Error
-          ? error.message
-          : copy.w6ThisTimeIsUnavailableReloadTheCurrentOffer,
-      );
+      if (mounted()) {
+        setStale(true);
+        setNotice(
+          error instanceof MediaRequestError
+            ? error.message
+            : copy.w6ThisTimeIsUnavailableReloadTheCurrentOffer,
+        );
+      }
     } finally {
-      setBusy(false);
+      if (command.current === pending) {
+        command.current = null;
+        selecting.current = false;
+        setBusy(false);
+      }
     }
   }
   return (
     <main className="w6-call w6-offer">
       <span className="qv-meta">{copy.w6CALLREQUEST}</span>
       <h1>{copy.w6ChooseATime}</h1>
-      {offer?.state === "offered" ? (
+      {offer?.state === "offered" && !stale ? (
         <>
           <div className="w6-offer-slots">
             {offer.slots.map((slot) => (
@@ -133,8 +340,13 @@ function SelectionForm({
                   name="call-time"
                   value={slot.id}
                   checked={chosen === slot.id}
-                  disabled={busy || !canSelect}
-                  onChange={() => setChosen(slot.id)}
+                  disabled={
+                    busy || !canSelect || Date.parse(slot.startsAt) <= now
+                  }
+                  onChange={() => {
+                    selectionVersion.current = offer.version;
+                    setChosen(slot.id);
+                  }}
                 />
               </label>
             ))}
@@ -166,7 +378,7 @@ function SelectionForm({
             {copy.w6ConfirmThisTime}
           </button>
         </>
-      ) : offer?.state === "selected" && offer.selectedSessionId ? (
+      ) : offer?.state === "selected" && !stale && offer.selectedSessionId ? (
         <a
           className="qv-btn qv-btn--secondary"
           href={`/calls/${creatorId}/${fanId}/${offer.selectedSessionId}`}
