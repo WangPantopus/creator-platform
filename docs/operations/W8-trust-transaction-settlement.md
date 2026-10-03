@@ -1,5 +1,17 @@
 # Trust transaction settlement — October 3, 2026 UTC
 
+## Personally operated current signed iOS — 13:30 UTC
+
+W8 personally operated the fresh signed3b iOS artifact against actual shipping-root8c423d937c01fdcabace94848c8eaf45a57c8fa6. The installed executable independently matches the recorded04a4bea7 hash. Actual You → Privacy presents eight saved original jobs with creation times/immutable IDs; the newest994e4ee0 export presents all eight saved task states. Warm backend stop followed by actual native Refresh conceals jobs/details and disables requests; same-source restart and actual Refresh recover the original list/detail. Automatic concealment before Refresh was not qualified. W3's later direct observation finds stale native details before Refresh and remains a current source gap.
+
+Normal own-app termination and cold relaunch while stopped retain the genuine account/offline refusal; actual stopped Retry refuses. Same-source restart automatically recovers the retained Privacy list of eight jobs. An attempted old Retry index fails because recovery already replaced the view; it is not a successful post-restart Retry action. Light/Night and Text11 are viewed, with shared Development identity clipping retained. Full largest-text control reachability and spoken accessibility remain open. Original Text3/Light/Reduce Motion off/VoiceOver off are restored; own A3 is physically Shutdown and exact leases release. The same fresh signed Android APK installs successfully and actual Studio CUA reaches labelled Home/404, but the bounded window ends before Privacy; Android workflow acceptance remains open.
+
+Fresh independent saved readback preserves all eight stable jobs,64 full tasks,five cases and exact memberships. Copy ledger/schema/roles/security/sequences match, while its business digest differs after real authentication; the separate original matches all six fresh custodies. Both databases are normally traffic-closed again; every own API phase exits0, Android is physically absent and exact GUI/device leases release before W3's next window. Routine PNGs/operator JSON and failed attempts remain private. No export/delete/domain Retry/consent/renewal/paid call occurs. PR200, original-family/full C10/release/pilot remain open.
+
+## Complete session producer correction
+
+W8 independently reads both narrow producer corrections6a84ab33 andb0281ee5 and reuses the complete current W1 boundary. Its original-lifetime observation distinguishes true session end from ordinary view disposal/StrictMode cancellation and is exposed through the actual returned request hook. It supplies no server revocation proof or task authority. Current consumer/runtime qualification remains separate from earlier489/8c operation; builds and old-head passes are not transferred.
+
 ## Original checked Trust session — October 3, 2026
 
 W8 independently read and reuses the exact three-file W1 producer489d93eef10f29e9f50fa6c7d1f74a975c2bb791 from draft296: actual core session mismatch refusal, original platform forwarding/renewal and complete canonical browser lifetime boundary. Existing main routes and allowlist remain intact. Earlier W1 operation at69 and W8 Privacy operation atd229 are attributed to those original sources; neither qualifies this new integration.
