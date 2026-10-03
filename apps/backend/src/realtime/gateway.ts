@@ -20,9 +20,11 @@ export function attachRealtime(
   authority: {
     assertActorAllowed?: (actor: Actor) => Promise<void>;
     consumeTicket?: (ticket: string) => string;
-    resolveSession?: (
-      token: string,
-    ) => Promise<{ actor: Actor; sessionId: string }>;
+    resolveSession?: (token: string) => Promise<{
+      actor: Actor;
+      sessionId: string;
+      adultVerifiedAt?: string;
+    }>;
     telemetry?: {
       observe(name: string, value: number): void;
       increment(name: string, amount?: number): void;
@@ -296,12 +298,19 @@ export function attachRealtime(
     return current;
   }
   function withAuthority<T>(
-    current: { actor: Actor; sessionId?: string },
+    current: { actor: Actor; sessionId?: string; adultVerifiedAt?: string },
     work: () => Promise<T>,
   ): Promise<T> {
     return current.sessionId
       ? requestAuthority.run(
-          { accountId: current.actor.accountId, sessionId: current.sessionId },
+          {
+            accountId: current.actor.accountId,
+            sessionId: current.sessionId,
+            actor: current.actor,
+            // Only the actual session resolver may provide this confirmation.
+            // Older adapters without it remain unavailable at the W1 gate.
+            adultVerifiedAt: current.adultVerifiedAt,
+          },
           work,
         )
       : work();
