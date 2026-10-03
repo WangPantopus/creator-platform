@@ -1,5 +1,9 @@
 # W8 contract, migration and runtime register
 
+## Bounded original Trust settlement — 2026-10-03
+
+[Existing draft200 repair](../../operations/W8-trust-transaction-settlement.md) reuses the unchanged Content settlement helper on the same actual Trust client without borrowing authority. A finite original pool acquisition budget, actual five-second host deadline and same-client server timeout bound Trust metadata/actor/reviewer preparation. Caller signals, when genuine, remain separate. Uncertain reads or actual abort close before discard/release; completed policy failures may roll back. Failed catalogue/restoration reads and uncertain Ops evidence send no helper cleanup SQL; private causes stay non-enumerable. Observed client closure is distinct from separately observed server termination. These primitives neither activate held0156 nor issue task/receipt/reply/provider permission; current signed three-client/C10 acceptance remains required.
+
 ## Restrictive original-purpose profile boundaries — 2026-10-03
 
 [Held0221–0223](W8-next-allocations.md) reserve distinct additive restrictive profile SELECT policies for the existing W3 context, W4 audience and two W2 metadata/retrieval roles. W3/W4 published SQL/current runtime deltas are independently read/hash-checked; W2's exact source remains pending. Original0095/0179/0182/0211/0187 bytes, functions, scope issuers and all original task/client/PID/fullXID/login/family/restoration/negative/COMMIT gates remain intact. PUBLIC permissive policies must not OR-bypass the role-specific boundary. Independent whole policy/ACL/function/caller catalogue and closed compiler/drift/refusal/fresh-preserved/task/C10 qualification remain required; no accepted catalogue, new role/grant, activation or raw-worker/provider permission is supplied. Active61/frozen47 remain unchanged. W5's exact proposed path remains pending a separate allocation.
