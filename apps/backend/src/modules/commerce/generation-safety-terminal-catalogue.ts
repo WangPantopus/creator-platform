@@ -3,6 +3,10 @@ import { contentHash } from "../../core/canonical.js";
 import { DomainError } from "../../core/errors.js";
 import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
 import { requestAuthority } from "../identity/request-authority.js";
+import {
+  assertGenerationProfileBound,
+  GENERATION_PROFILE_BOUND_SOURCE,
+} from "../agent/generation-profile-bound.js";
 
 /** Logical-name metadata pattern from the actual independently reviewed W1/W4
  * publication catalogue. Includes both legacy and typed financial callers,
@@ -284,6 +288,7 @@ export const GENERATION_SAFETY_TERMINAL_SOURCES = Object.freeze(
       checksum:
         "b0fe4643e110a4a6b752ae44847543c7cb8897bdd2a56c2daa58574b9c58536e",
     },
+    GENERATION_PROFILE_BOUND_SOURCE,
   ].map((source) => Object.freeze(source)),
 );
 
@@ -309,6 +314,7 @@ export async function assertGenerationSafetyTerminalCatalogue(
     if (requestAuthority.getStore()) throw unavailable();
     for (const source of GENERATION_SAFETY_TERMINAL_SOURCES)
       await assertRegisteredMigration(client, source);
+    await assertGenerationProfileBound(client);
     const ready = (
       await client.query<{
         ready: boolean;
