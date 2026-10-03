@@ -195,6 +195,7 @@ export function useIdentityRequest() {
       const headers = new Headers(init.headers);
       // This is a mismatch precondition, never a source of account authority.
       headers.set("X-Expected-Account-Id", accountId);
+      headers.set("X-Expected-Session-Id", sessionId);
       const response = await fetch(`/api/platform/identity/${path}`, {
         ...init,
         headers,
@@ -222,7 +223,11 @@ export function useIdentityRequest() {
       } else if (response.status === 409) {
         const failure = await response.clone().json();
         original.throwIfAborted();
-        if (failure.error?.code === "session_account_changed") end();
+        if (
+          failure.error?.code === "session_account_changed" ||
+          failure.error?.code === "session_view_changed"
+        )
+          end();
       }
       original.throwIfAborted();
       return response;
