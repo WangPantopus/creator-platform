@@ -3,6 +3,7 @@ import type { Actor } from "../identity/adapter.js";
 import { PostgresIdentityRead, type IdentityRead } from "../identity/read.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import { withRequestContextRestore } from "../identity/request-context.js";
+import { ContentHeldClient } from "../content/held-client-cleanup.js";
 import {
   assertCurrentSession,
   requestAuthority,
@@ -105,8 +106,10 @@ export class AccessService {
     auditOpen = true,
   ): Promise<ThreadScope> {
     const client = await this.pool.connect();
+    const held = new ContentHeldClient(client);
+    let failure: unknown;
     try {
-      await client.query("BEGIN");
+      await held.begin();
       const scope = await this.issueThreadScope(
         client,
         actor,
@@ -115,13 +118,13 @@ export class AccessService {
         auditOpen,
         false,
       );
-      await client.query("COMMIT");
+      await held.commit();
       return scope;
     } catch (error) {
-      await client.query("ROLLBACK");
+      failure = error;
       throw error;
     } finally {
-      client.release();
+      await held.settle(failure);
     }
   }
   /** Issue the same canonical scope on a caller-held transaction. The caller

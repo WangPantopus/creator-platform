@@ -1,26 +1,6 @@
 import { Client, type Pool, type PoolClient } from "pg";
 import { DomainError, invariant } from "../../core/errors.js";
-
-/** Purpose guards retain private transport causes. Inspect a bounded graph;
- * an exhausted bound also cannot prove that a later rollback is safe. */
-function hasUncertainReadResponse(error: unknown): boolean {
-  const pending: unknown[] = [error];
-  const visited = new Set<unknown>();
-  let inspected = 0;
-  while (pending.length) {
-    if (++inspected > 32) return true;
-    const current = pending.pop();
-    if (!(current instanceof Error) || visited.has(current)) continue;
-    visited.add(current);
-    if (current.message === "Query read timeout") return true;
-    if (current.cause !== undefined) pending.push(current.cause);
-    if (current instanceof AggregateError && Array.isArray(current.errors)) {
-      if (current.errors.length > 32 - inspected) return true;
-      pending.push(...current.errors);
-    }
-  }
-  return false;
-}
+import { querySettlementUncertain } from "../../core/query-settlement.js";
 
 /** A separately configured original publication worker
  * must have a finite one-connection acquisition/read budget and no pipelined
@@ -191,7 +171,7 @@ export async function publicationTransaction<T>(
     failure = error;
     await settle();
     const uncertainResponse =
-      phase !== "work" || hasUncertainReadResponse(error);
+      phase !== "work" || querySettlementUncertain(error);
     if (uncertainResponse) transportFailures.push(error);
     if (
       uncertainResponse ||
