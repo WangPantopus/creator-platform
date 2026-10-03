@@ -1,5 +1,9 @@
 # W8 contract, migration and runtime register
 
+## Original Content LAST signature reader — 2026-10-03
+
+[Held0225](W8-next-allocations.md) pins W1's independently read89-line original ordinary Content signature reader at SHA256734a806c1e2252d7c5c7c418856f3b448933d993326ef471bb3351eed1367e41. Its isolated boolean purpose consumes the actual W5 creator/content/consumed act/canonical command hash/audience after original same-client domain and negative checks; unchanged0167 mutation fences and original0157 packet separation remain mandatory. The nonwaiting signer-family lease is LAST. Complete effective catalogue and original typed owner cleanup/COMMIT, drift/refusal/cancellation/withdrawal/revocation/C10/application qualification remain pending. Active61/prior76/frozen47 are preserved; reserved metadata installs no SQL/grants or accepted pin.
+
 ## Real-session private read gate — 2026-10-03
 
 [Existing200 shared client](../../operations/W8-trust-transaction-settlement.md) adds the default-compatible optional `useTrust(path, enabled)` gate for W3 reuse. Disabled/replaced reads clear results and abort their real browser GET; re-enable reads afresh and old paths cannot display results. All Ops read surfaces consume actual session readiness and combined Retry. Account change revokes readiness; periodic loading changes no form epoch or authority. Actual case inputs and pending action keys survive a same-account outage. Source checks pass; current personal operation, readable-case concealment and original signed reply/C10 remain required. Browser cancellation grants no server/task/COMMIT receipt; no SQL, role or held migration changes.
