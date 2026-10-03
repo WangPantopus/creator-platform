@@ -261,7 +261,11 @@ export function conversationPrivacyHook(
         }
         // This PID belongs to the still-held deletion client. Cancellation
         // never releases its task locks or permits another pool borrower.
-        cancelling = cancelConversationPrivacyBackend(input.pool, backendPid)
+        cancelling = cancelConversationPrivacyBackend(
+          input.pool,
+          backendPid,
+          client,
+        )
           .catch((error: unknown) => {
             cancellationFailures.push(error);
             discardClient = true;
