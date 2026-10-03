@@ -85,3 +85,69 @@ Only W5's own simulator and actual W5 AVD were stopped; their data remains.
 Exact GUI/device leases were released, and physical Android retirement was
 confirmed. W8 received the next queued window. Peer devices/containers were
 untouched. W5 holds no device/GUI/heavy lease after this operation.
+
+## October 3 current artifact operation
+
+The shipping iOS build at `fc9fdfb1e00bbccc8ee0b8f4c78d371e97e7fb3f`
+passed normal build and strict deep codesign verification. Executable SHA256:
+`f27c31c1dc94c73782cdeada881bd2db16f5594b3796b116a049a39acb5b5fcd`;
+debug dylib SHA256:
+`8c564a7e2d1d157bf20ff1b4f75a47200fd960439e22af84c0d5cb33a04bb595`.
+Shipping Android build at `eb605a15c1991bc532baef727b3ccfb5c0b878f7`
+passed assembleDebug. APK SHA256:
+`b11867c93ad5a4e3efda6af45195f3fc986141eb7fcb24d393077f451619c701`.
+These native trees are unchanged through captured main f6a2f39c; W6's later
+0e0d02ad changes require new builds and are not covered by these observations.
+
+At05:05–05:09Z, W5 personally operated that exact fc9fdfb1 iOS artifact through
+supported CUA on owned78C3590E, against actual APIeb605a15/canonical61.
+The retained, explicitly labelled development account correctly refused the
+actual unsigned Note. Refresh did not reveal its body. Content → You retained
+@kilnfire without a crash in Light and Night. The Night launch used an explicit
+original Content destination. A separate cold launch without a supplied
+destination retained the account but opened Home instead of the previous You
+page. This is a saved-destination failure, reported to W1, not an accepted return.
+
+An actual35-second pause of owned API PID39485 concealed the Content view and
+showed account reconnect/current-access recovery. The guarded operator resumed
+that same process. Supported CUA Check current access restored the unsigned
+refusal; You then remained stable. Actual AX state and screenshots were
+personally inspected. Private captures are
+/private/tmp/creator-w5-shell-operator/shots/ios-fc9fdfb1-{light-unsigned-refusal,light-content-to-you,night-cold-home-without-target,night-api-outage-concealed,night-content-to-you-recovered}.png.
+No signed/private-body, proof/passkey or later-source acceptance is inferred.
+
+The exact eb605a15 APK installed and launched on owned W5 Android. The initial
+IDE launch and an explicit2048MB launch both raised actual memory to2560MB;
+each owned process was stopped immediately after its physical memory audit.
+The documented emulator `-lowram` option with explicit2048MB/two cores and
+no snapshot load/save then produced actual MemTotal2026148kB/CPUs0-1. The
+installed artifact reached Welcome with the correct10.0.2.2:41055 API/Content
+target. Supported Studio's mirror did not mount this externally launched engine;
+the explicit native-app path was also unavailable. No guest input was issued
+through another tool. Android journey acceptance remains open. Private actual
+guest capture: android-eb605a15-budget-correct-guest.png in the same shots directory.
+
+Own simulator and Android were normally shut down and exact UUIDc9b81358,
+device/inode/raw-owner GUI/device custody released; W3 received the next window.
+All eight successor-owned branches were updated and pushed with exact captured
+remote main `0e0d02ad476f6e88112b6fc68d11efe95fe7f0eb`. Predecessor and peer
+checkouts were preserved. The full nine-package assignment is still incomplete.
+
+At source `6497599ec1381f80e7c0bac00c76b74b03db13c2`, incorporating W6
+main0e0d02ad, both normal shipping builds passed. iOS strict deep codesign also
+passed. Executable SHA256:
+`37c803a09ee8b560958283477350edbe62566dc018bdbb3ed5fed39c17206290`;
+debug dylib SHA256:
+`edd64515407184f022c574ccd3c7abb531a2ec80cfed1d27672ed057f82f4bfd`;
+Android APK SHA256:
+`676ca3dc1d672b89e03ccdcfb3c58bc128688360cd481d74cba1736f29950d28`.
+Canonical generation114 operations/12 resources and backend/web types passed
+at this same branch source. These new artifacts have compilation qualification;
+the personal device observations above remain at fc9fdfb1/eb605a15.
+
+Captured main `0a445ec2506b016f981aff46adaec5cdf281f875` adds W4's reviewed
+Spend/Requests tab-return fix and W6's reviewed enlarged Android conversation
+layout. It is integrated into this branch; an attempted fresh heavy build
+returned75 while W1 held the slot. That refusal is not a build pass. Current
+artifact operation and genuine signed/private, provider and paid acceptance
+remain unverified. No later-commit release readiness is claimed.
