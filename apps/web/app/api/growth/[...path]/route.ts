@@ -66,7 +66,10 @@ async function handle(
               : "This feature is unavailable.",
         },
       },
-      { status: error instanceof GrowthUnavailable ? error.status : 503 },
+      {
+        status: error instanceof GrowthUnavailable ? error.status : 503,
+        headers: { "Cache-Control": "no-store" },
+      },
     );
   }
 }
