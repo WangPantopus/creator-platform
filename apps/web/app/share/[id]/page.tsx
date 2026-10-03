@@ -137,7 +137,7 @@ export default async function Share({
   } catch (error) {
     return (
       <GrowthShell>
-        <Failure error={error} />
+        <Failure error={error} returnTo={`/share/${encodeURIComponent(id)}`} />
       </GrowthShell>
     );
   }
