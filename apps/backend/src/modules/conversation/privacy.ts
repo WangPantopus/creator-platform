@@ -14,6 +14,7 @@ import type {
 import { z } from "zod";
 import { conversationPrivacyExportStream } from "./privacy-export-stream.js";
 import { PreparedConversationPrivacyCursor } from "./privacy-export-cursor.js";
+import { PreparedGenerationProvenancePurge } from "./generation-provenance-privacy.js";
 import {
   assertConversationPrivacyPool,
   cancelConversationPrivacyBackend,
@@ -144,6 +145,9 @@ export type ConversationPrivacyInput = {
   /** Distinct reviewed0206 source. Per-family readers cannot substitute for
    * the one READ COMMITTED cursor snapshot required by the real0087 fence. */
   exportCursor?: PreparedConversationPrivacyCursor;
+  /** Distinct0217 DELETE owner. Its actual zero page must precede removing
+   * ordinary generation/message/event parents on this held transaction. */
+  provenancePurge?: PreparedGenerationProvenancePurge;
   /** Exact prepared W4 port; original-policy evidence precedes journal purge.
    * Finite reviewed retention and expiry remain W8's separate responsibility. */
   generationCostPrivacyReconciliation?: GenerationCostPrivacyReconciliation;
@@ -268,6 +272,7 @@ export function conversationPrivacyHook(
       };
       signal.addEventListener("abort", abort, { once: true });
       const accountingReceipts: Record<string, unknown>[] = [];
+      let removedGenerationProvenance = 0;
       const financialDispositions: {
         threadId: string;
         financialDispositionReference: string;
@@ -299,6 +304,18 @@ export function conversationPrivacyHook(
         );
         signal.throwIfAborted();
         await fenceConversationPrivacyTask(input.authority, client, job);
+        const provenanceInstalled = (
+          await client.query<{ installed: boolean }>(
+            "SELECT to_regclass('creator.generation_sentence_provenance') IS NOT NULL AS installed",
+          )
+        ).rows[0]?.installed;
+        invariant(
+          provenanceInstalled === false ||
+            input.provenancePurge instanceof PreparedGenerationProvenancePurge,
+          "conversation_provenance_purge_unavailable",
+          "Installed ordinary provenance needs its actual prepared original deletion owner.",
+        );
+        input.provenancePurge?.assertRuntime(input);
         const accountingInstalled = await generationJournalInstalled(client);
         const weightedInstalled = (
           await client.query<{ installed: boolean }>(
@@ -470,6 +487,21 @@ export function conversationPrivacyHook(
             accountingReceipts.push(accounting.receipt);
             retained.push(...accounting.retained);
           }
+          if (input.provenancePurge) {
+            const provenance = await input.provenancePurge.purgeFamily(
+              client,
+              job,
+              family,
+            );
+            invariant(
+              Number.isSafeInteger(
+                removedGenerationProvenance + provenance.removed,
+              ),
+              "bounded_subjob_required",
+              "Use a bounded original provenance deletion subjob.",
+            );
+            removedGenerationProvenance += provenance.removed;
+          }
           // Tombstoned thread remains as the minimal family identifier. Denial is
           // already immediate through W8; content and replay payloads are purged.
           signal.throwIfAborted();
@@ -592,6 +624,7 @@ export function conversationPrivacyHook(
             jobId: job.jobId,
             idempotencyKey: job.idempotencyKey,
             processedThreads: families.length,
+            ...(input.provenancePurge ? { removedGenerationProvenance } : {}),
             ...(accountingReceipts.length ? { accountingReceipts } : {}),
             ...(financialDispositions.length ? { financialDispositions } : {}),
             completedAt: new Date().toISOString(),

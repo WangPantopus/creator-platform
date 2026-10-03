@@ -28,6 +28,7 @@ import {
 } from "../commerce/privacy-purpose.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import { PreparedConversationPrivacyCursor } from "../conversation/privacy-export-cursor.js";
+import { PreparedGenerationProvenancePurge } from "../conversation/generation-provenance-privacy.js";
 import { trustPrivacyHook } from "./own-privacy-hook.js";
 import { mediaPrivacyHook } from "./media-privacy-hook.js";
 import { growthPrivacyHook } from "../growth/lifecycle.js";
@@ -45,6 +46,12 @@ export type ConversationPrivacyOwnerPorts = Omit<
   cursorPreparation?: Omit<
     Parameters<typeof PreparedConversationPrivacyCursor.prepare>[0],
     "pool" | "authority" | "lineage" | "recordings"
+  >;
+  /** Actual independently reviewed0217 definition/effective custody. The
+   * coordinator fixes its own original pool/task authority at preparation. */
+  provenancePurgePreparation?: Omit<
+    Parameters<typeof PreparedGenerationProvenancePurge.prepare>[0],
+    "pool" | "authority"
   >;
 };
 
@@ -119,6 +126,18 @@ export function createPrivacyConsumers(input: {
             503,
           );
         let exportCursor = owners?.exportCursor;
+        let provenancePurge = owners?.provenancePurge;
+        if (
+          job.kind === "delete" &&
+          !provenancePurge &&
+          owners?.provenancePurgePreparation
+        ) {
+          provenancePurge = await PreparedGenerationProvenancePurge.prepare({
+            ...owners.provenancePurgePreparation,
+            pool: input.runtimePool,
+            authority: conversationAuthority,
+          });
+        }
         if (
           job.kind === "export" &&
           !exportCursor &&
@@ -140,6 +159,7 @@ export function createPrivacyConsumers(input: {
         return conversationPrivacyHook({
           ...owners,
           ...(exportCursor ? { exportCursor } : {}),
+          ...(provenancePurge ? { provenancePurge } : {}),
           pool: input.runtimePool,
           authority: conversationAuthority,
           retention: input.conversationRetention,
