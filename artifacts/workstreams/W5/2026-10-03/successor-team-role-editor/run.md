@@ -1,5 +1,32 @@
 # Current Team role consumer — bounded personal operation
 
+## Renewed PR-first review at3461c6d4
+
+The existing PR288 is now stacked on W1 PR296. Ordinary exact merge
+`3461c6d43b4c94c08b69b6df617787aefd6cca2c` consumes the complete original
+producer `b0c15d51c72d1620e0069c9262037945a4d87d86`, including canonical
+request/session denial, configured host and marker-guarded negative cleanup.
+The eight-path W5 role-editor diff remains separate from that prerequisite;
+there is no duplicate producer or new feature PR. Both include captured main
+`5c08634b7542fef95dd6c176030a785845250c62`.
+
+At3461, existing web/backend types, 115-operation/12-resource generation,
+affected lint/format, diff checks and all nine existing backend contracts pass.
+The actual production web webpack build and backend shipping build each exit0;
+their atomic heavy guards release normally. Private0600 logs are retained in
+`~/.config/creator-platform/w5-20261003/current-pr-backlog/`. The generated
+Next environment imports were restored. No new test code was written.
+
+Implemented/runnable: the exact combined source and these checks/builds.
+Integrated: the real W1 prerequisite is present in this branch; both PRs remain
+unmerged. Verified: source checks/builds only at3461. Current personal app
+acceptance is blocked by the shared Docker outage. Earlier55/8a/8161 operations
+remain at their exact sources and are not transferred. Wrong-account/session
+departure, independent fan open-view revocation, current interrupted/stale/
+duplicate role changes, durable records and current Light/Night web qualification
+remain necessary. Required queued CI is not passed. Release-ready:false;
+no complete Team or other original package is checked off.
+
 ## Current run at8aeca5f1
 
 Personally operated exact API/web source `8aeca5f1631f598d17ad6efb9ee2d9cb0aa6b35d`,
