@@ -1148,6 +1148,7 @@ function Modal({
     <dialog
       ref={ref}
       className="qv w5-dialog"
+      aria-label={title}
       onCancel={(event) => {
         event.preventDefault();
         if (!closeDisabled) onClose();
@@ -1180,6 +1181,12 @@ const emptyBody = (kind: ContentBody["kind"] = "note"): ContentBody => ({
   quote: null,
   packetId: null,
 });
+const scheduleInput = (value: string | null) => {
+  if (!value) return "";
+  const date = new Date(value);
+  const part = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${part(date.getMonth() + 1)}-${part(date.getDate())}T${part(date.getHours())}:${part(date.getMinutes())}`;
+};
 function Compose({
   creator,
   id,
@@ -1223,6 +1230,9 @@ function Compose({
       idempotencyKey: string;
     } | null>(null),
     [schedule, setSchedule] = useState(""),
+    [draftChanged, setDraftChanged] = useState(false),
+    [currentDraft, setCurrentDraft] = useState<ContentView | null>(null),
+    noteInput = useRef<HTMLTextAreaElement>(null),
     [voiceObjectId, setVoiceObjectId] = useState<string | null>(null),
     voiceTrigger = useRef<HTMLButtonElement>(null),
     [photoObjectId, setPhotoObjectId] = useState<string | null>(null),
@@ -1235,6 +1245,16 @@ function Compose({
     setPendingPublication(null);
   };
   const draftReady = !id || saved?.id === id;
+  const useSavedDraft = (value: ContentView) => {
+    setDocument(value.document);
+    setSchedule(scheduleInput(value.document.scheduledAt));
+    setSaved({ id: value.id, version: value.version });
+    draftId.current = value.id;
+    operation.current = null;
+    setReview(null);
+    setDraftChanged(false);
+    setCurrentDraft(null);
+  };
   const loadDraft = async () => {
     if (!id) return;
     const value = await studioRequest<ContentView>(
@@ -1243,9 +1263,7 @@ function Compose({
       undefined,
       creator.viewerAccountId,
     );
-    setDocument({ ...value.document, scheduledAt: null });
-    setSaved({ id, version: value.version });
-    draftId.current = id;
+    useSavedDraft(value);
   };
   useEffect(() => {
     // Only opaque command references persist across a reload; no draft or fan text.
@@ -1270,6 +1288,7 @@ function Compose({
               `${creator.id}/${value.id}/studio`,
             );
             setDocument(view.document);
+            setSchedule(scheduleInput(view.document.scheduledAt));
             setSaved({ id: view.id, version: view.version });
             setReview({
               view,
@@ -1347,15 +1366,27 @@ function Compose({
       snapshot = JSON.stringify(body);
     if (operation.current?.body !== snapshot)
       operation.current = { body: snapshot, key: key() };
-    const result = await studioRequest<{ id: string; version: number }>(
-      "content",
-      `${creator.id}/drafts`,
-      { ...body, idempotencyKey: operation.current.key },
-      creator.viewerAccountId,
-    );
-    setSaved(result);
-    operation.current = null;
-    return result;
+    try {
+      const result = await studioRequest<{ id: string; version: number }>(
+        "content",
+        `${creator.id}/drafts`,
+        { ...body, idempotencyKey: operation.current.key },
+        creator.viewerAccountId,
+      );
+      setSaved(result);
+      setDraftChanged(false);
+      operation.current = null;
+      return result;
+    } catch (failure) {
+      if (
+        failure instanceof StudioFailure &&
+        failure.code === "content_changed"
+      ) {
+        setDraftChanged(true);
+        setReview(null);
+      }
+      throw failure;
+    }
   };
   if (!draftReady)
     return (
@@ -1384,6 +1415,31 @@ function Compose({
         <span />
       </header>
       <Feedback action={action} />
+      {draftChanged && (
+        <div className="w5-gutter">
+          <p className="qv-help">
+            A newer revision is saved. Your local edits are kept. Review the
+            saved draft before choosing which revision to edit.
+          </p>
+          <button
+            className="qv-btn qv-btn--secondary"
+            disabled={action.busy}
+            onClick={() =>
+              void action.run(async () => {
+                const value = await studioRequest<ContentView>(
+                  "content",
+                  `${creator.id}/${draftId.current}/studio`,
+                  undefined,
+                  creator.viewerAccountId,
+                );
+                setCurrentDraft(value);
+              })
+            }
+          >
+            Review saved draft
+          </button>
+        </div>
+      )}
       {creator.verification !== "verified" && (
         <Notice title="Creator verification">
           Current creator status: {creator.verification.replaceAll("_", " ")}.
@@ -1565,6 +1621,7 @@ function Compose({
           {post ? "Your post" : "Your Note"}
         </label>
         <textarea
+          ref={noteInput}
           id="note-text"
           autoFocus={!!id}
           rows={5}
@@ -1747,6 +1804,85 @@ function Compose({
         </div>
         {saved && <p className="qv-meta">SAVED · REVISION {saved.version}</p>}
       </div>
+      {currentDraft && (
+        <Modal
+          title="Saved draft changed"
+          onClose={() => setCurrentDraft(null)}
+          restoreFocusTo={noteInput}
+        >
+          <p className="qv-meta">
+            {contentStateLabel(currentDraft.state)} · revision{" "}
+            {currentDraft.version}
+          </p>
+          <p>Audience: {currentDraft.audienceLabel}</p>
+          {currentDraft.document.title && (
+            <h3>{currentDraft.document.title}</h3>
+          )}
+          <label className="w5-field">
+            Saved {post ? "post" : "Note"}
+            <textarea readOnly rows={5} value={currentDraft.document.text} />
+          </label>
+          <p>
+            Schedule:{" "}
+            {currentDraft.document.scheduledAt
+              ? time(currentDraft.document.scheduledAt)
+              : "Not scheduled"}
+          </p>
+          <p>
+            AI reuse intent:{" "}
+            {currentDraft.document.aiUseIntent
+              ? "Requested · separate approval required"
+              : "Off"}
+          </p>
+          <p className="qv-help">
+            Loading this revision replaces your local edits. Keeping your edits
+            on this revision leaves them unsaved and invalidates the signing
+            preview. Saving checks the current revision again.
+          </p>
+          <div className="w5-actions">
+            <button
+              className="qv-btn qv-btn--secondary"
+              onClick={() => {
+                useSavedDraft(currentDraft);
+                action.setNotice(
+                  "Saved revision loaded. Review it before signing.",
+                );
+              }}
+            >
+              Load saved revision
+            </button>
+            <button
+              className="qv-btn qv-btn--secondary"
+              disabled={
+                currentDraft.state !== "draft" ||
+                !!currentDraft.document.planRef ||
+                !!document.planRef
+              }
+              onClick={() => {
+                setSaved({
+                  id: currentDraft.id,
+                  version: currentDraft.version,
+                });
+                operation.current = null;
+                setReview(null);
+                setDraftChanged(false);
+                setCurrentDraft(null);
+                action.setNotice(
+                  "Your local edits are kept on the current revision. Save when ready.",
+                );
+              }}
+            >
+              Keep my edits on this revision
+            </button>
+            <button
+              className="qv-btn qv-btn--quiet"
+              onClick={() => setCurrentDraft(null)}
+            >
+              Keep editing without changes
+            </button>
+          </div>
+        </Modal>
+      )}
       {review && canPublish && (
         <Modal
           title={

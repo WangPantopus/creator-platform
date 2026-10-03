@@ -195,6 +195,15 @@ export function composeMediaHost(input: {
         : null;
     },
     denied: (scope, client) => denials.thread(scope, client),
+    currentRecordingSignature: async (scope, signedActId, command, client) =>
+      runtime.identity
+        ? runtime.identity.signing.matchesThreadAct(
+            client,
+            scope,
+            signedActId,
+            command,
+          )
+        : false,
     // Fan playback needs W3's exact delivered association; unbound fails closed.
     currentRecordingPublication: async (scope, recording, client) =>
       recordingPublication
