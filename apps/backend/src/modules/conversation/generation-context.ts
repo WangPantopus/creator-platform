@@ -189,11 +189,18 @@ export class PreparedGenerationConversationContext {
     let discard = true;
     let failure: unknown;
     let failed = false;
+    const transportErrors: Error[] = [];
     const cleanupErrors: unknown[] = [];
+    const onError = (error: Error) => {
+      transportErrors.push(error);
+      discard = true;
+    };
+    client.on("error", onError);
     try {
       await client.query("BEGIN ISOLATION LEVEL READ COMMITTED READ ONLY");
       started = true;
       discard = false;
+      if (transportErrors.length) throw transportErrors[0];
       await client.query(
         `SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','1000',true),
          set_config('idle_in_transaction_session_timeout','5000',true),
@@ -220,15 +227,15 @@ export class PreparedGenerationConversationContext {
         "Use the same actual canonical database.",
       );
       await prepared.assertCustody(client);
-      discard = true;
-      await client.query("ROLLBACK");
-      started = false;
-      discard = false;
     } catch (error) {
       failure = error;
       failed = true;
+      // A purpose guard may wrap an uncertain client response. Close this
+      // exact read-only source instead of submitting more transaction SQL.
+      discard = true;
     } finally {
-      if (started) {
+      discard ||= transportErrors.length > 0;
+      if (started && !discard) {
         try {
           await client.query("ROLLBACK");
         } catch (error) {
@@ -236,6 +243,7 @@ export class PreparedGenerationConversationContext {
           cleanupErrors.push(error);
         }
       }
+      discard ||= transportErrors.length > 0;
       try {
         if (discard) await client.end();
       } catch (error) {
@@ -246,14 +254,27 @@ export class PreparedGenerationConversationContext {
         } catch (error) {
           cleanupErrors.push(error);
         }
+        client.removeListener("error", onError);
       }
     }
-    if (cleanupErrors.length)
-      throw new AggregateError(
-        failed ? [failure, ...cleanupErrors] : cleanupErrors,
-        "Generation context qualification cleanup failed",
+    if (failed || transportErrors.length || cleanupErrors.length) {
+      const unavailable = new DomainError(
+        "generation_context_unconfigured",
+        "The reviewed generation context purpose is not installed.",
+        503,
       );
-    if (failed) throw failure;
+      unavailable.cause = new AggregateError(
+        [
+          ...new Set([
+            ...(failed ? [failure] : []),
+            ...transportErrors,
+            ...cleanupErrors,
+          ]),
+        ],
+        "Generation context qualification and cleanup failed",
+      );
+      throw unavailable;
+    }
     return prepared;
   }
 
@@ -328,12 +349,14 @@ export class PreparedGenerationConversationContext {
           this.custody.catalogueChecksum
       )
         throw new Error("Unreviewed generation context executable");
-    } catch {
-      throw new DomainError(
+    } catch (cause) {
+      const unavailable = new DomainError(
         "generation_context_unconfigured",
         "The reviewed generation context purpose is not installed.",
         503,
       );
+      unavailable.cause = cause;
+      throw unavailable;
     }
   }
 
