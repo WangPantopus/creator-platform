@@ -31,10 +31,7 @@ import {
   weeklyImpactNotificationState,
   type WeeklyImpactNoticeReader,
 } from "./impact-notifications.js";
-import {
-  canonicalPostEntryContext,
-  type CurrentPostEntryReader,
-} from "./entry-context.js";
+import type { CurrentPostEntryReader } from "./entry-context.js";
 
 /** Canonical host seam. Owner callbacks are injected; absent producers never become fixtures. */
 export async function configureGrowthForBackend(
@@ -146,6 +143,7 @@ export async function configureGrowthForBackend(
       activationSource: input.activationSource,
       thanksPermission: input.thanksPermission,
       weeklyImpactSource: input.weeklyImpactSource,
+      postEntryReader: input.postEntryReader,
       experimentsEnabled: input.experimentsEnabled,
       installURLs: {
         ...(env.GROWTH_IOS_INSTALL_URL
@@ -159,10 +157,6 @@ export async function configureGrowthForBackend(
     let closeInFlight: Promise<void> | undefined;
     return {
       ...runtime,
-      postEntryContext: canonicalPostEntryContext(
-        runtime.service,
-        input.postEntryReader,
-      ),
       contentFollows: canonicalContentFollows(),
       coreContentFollows: canonicalCoreContentFollows(
         input.coreFollowMigration,
