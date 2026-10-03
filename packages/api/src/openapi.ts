@@ -160,6 +160,7 @@ for (const [suffix, id] of [
     "cursor",
     "limit",
     "filter",
+    "contentId",
   ]);
 for (const [suffix, id, response, body] of [
   ["consent", "contentReplyConsent", "ContentConsentResult", "QuoteConsent"],

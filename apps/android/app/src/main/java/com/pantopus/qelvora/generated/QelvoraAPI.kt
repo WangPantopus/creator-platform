@@ -1810,6 +1810,7 @@ data class APIContentReplyListItemsItemReaction(
 data class APIContentReplyPage(
   val `cursor`: String? = null,
   val `limit`: Long,
+  val `contentId`: String? = null,
   val `filter`: APIContentReplyPageFilter
 )
 
@@ -4642,6 +4643,7 @@ data class APIContentContentReplyListItemsItemReaction(
 data class APIContentContentReplyPage(
   val `cursor`: String? = null,
   val `limit`: Long,
+  val `contentId`: String? = null,
   val `filter`: APIContentContentReplyPageFilter
 )
 
@@ -5430,8 +5432,8 @@ class CreatorAPIClient(private val baseURL: String, private val maximumResponseB
   suspend fun studioContentList(creatorId: String, cursor: String? = null, limit: Long? = null, state: String? = null, query: String? = null): APIContentList = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio", "GET", authenticated = true, query = listOf("cursor" to cursor, "limit" to limit?.toString(), "state" to state, "query" to query)))
   suspend fun studioLiveCatalog(creatorId: String): APIContentLiveCatalog = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio/live", "GET", authenticated = true))
   suspend fun saveContent(creatorId: String, xQelvoraExpectedAccount: String? = null, body: APISaveContent): APIContentResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/drafts", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
-  suspend fun contentReplies(creatorId: String, cursor: String? = null, limit: Long? = null, filter: String? = null): APIContentReplyList = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies", "GET", authenticated = true, query = listOf("cursor" to cursor, "limit" to limit?.toString(), "filter" to filter)))
-  suspend fun studioContentReplies(creatorId: String, cursor: String? = null, limit: Long? = null, filter: String? = null): APIContentReplyList = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio/replies", "GET", authenticated = true, query = listOf("cursor" to cursor, "limit" to limit?.toString(), "filter" to filter)))
+  suspend fun contentReplies(creatorId: String, cursor: String? = null, limit: Long? = null, filter: String? = null, contentId: String? = null): APIContentReplyList = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies", "GET", authenticated = true, query = listOf("cursor" to cursor, "limit" to limit?.toString(), "filter" to filter, "contentId" to contentId)))
+  suspend fun studioContentReplies(creatorId: String, cursor: String? = null, limit: Long? = null, filter: String? = null, contentId: String? = null): APIContentReplyList = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio/replies", "GET", authenticated = true, query = listOf("cursor" to cursor, "limit" to limit?.toString(), "filter" to filter, "contentId" to contentId)))
   suspend fun contentReplyConsent(creatorId: String, id: String, xQelvoraExpectedAccount: String? = null, body: APIQuoteConsent): APIContentConsentResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies/${segment(id)}/consent", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun contentReplyReaction(creatorId: String, id: String, xQelvoraExpectedAccount: String? = null, body: APIReactToReply): APIContentReactionResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies/${segment(id)}/reaction", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun withdrawContentReply(creatorId: String, id: String, xQelvoraExpectedAccount: String? = null, body: APIContentVersionCommand): APIContentWithdrawResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies/${segment(id)}/withdraw", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))

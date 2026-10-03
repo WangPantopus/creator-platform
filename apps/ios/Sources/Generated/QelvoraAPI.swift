@@ -3448,10 +3448,12 @@ public struct APIContentReplyListItemsItemReaction: Codable, Sendable {
 public struct APIContentReplyPage: Codable, Sendable {
   public let `cursor`: String?
   public let `limit`: Int
+  public let `contentId`: String?
   public let `filter`: APIContentReplyPageFilter
-  public init(cursor: String? = nil, limit: Int, filter: APIContentReplyPageFilter) {
+  public init(cursor: String? = nil, limit: Int, contentId: String? = nil, filter: APIContentReplyPageFilter) {
     self.cursor = cursor
     self.limit = limit
+    self.contentId = contentId
     self.filter = filter
   }
 }
@@ -8764,10 +8766,12 @@ public struct APIContentContentReplyListItemsItemReaction: Codable, Sendable {
 public struct APIContentContentReplyPage: Codable, Sendable {
   public let `cursor`: String?
   public let `limit`: Int
+  public let `contentId`: String?
   public let `filter`: APIContentContentReplyPageFilter
-  public init(cursor: String? = nil, limit: Int, filter: APIContentContentReplyPageFilter) {
+  public init(cursor: String? = nil, limit: Int, contentId: String? = nil, filter: APIContentContentReplyPageFilter) {
     self.cursor = cursor
     self.limit = limit
+    self.contentId = contentId
     self.filter = filter
   }
 }
@@ -10290,11 +10294,11 @@ public actor CreatorAPIClient {
   public func saveContent(creatorId: String, xQelvoraExpectedAccount: String? = nil, body: APISaveContent) async throws -> APIContentResult {
     try await request("/v1/content/\(segment(creatorId))/drafts", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
   }
-  public func contentReplies(creatorId: String, cursor: String? = nil, limit: Int? = nil, filter: String? = nil) async throws -> APIContentReplyList {
-    try await request("/v1/content/\(segment(creatorId))/replies", method: "GET", authenticated: true, query: [URLQueryItem(name: "cursor", value: cursor), URLQueryItem(name: "limit", value: limit.map { String($0) }), URLQueryItem(name: "filter", value: filter)])
+  public func contentReplies(creatorId: String, cursor: String? = nil, limit: Int? = nil, filter: String? = nil, contentId: String? = nil) async throws -> APIContentReplyList {
+    try await request("/v1/content/\(segment(creatorId))/replies", method: "GET", authenticated: true, query: [URLQueryItem(name: "cursor", value: cursor), URLQueryItem(name: "limit", value: limit.map { String($0) }), URLQueryItem(name: "filter", value: filter), URLQueryItem(name: "contentId", value: contentId)])
   }
-  public func studioContentReplies(creatorId: String, cursor: String? = nil, limit: Int? = nil, filter: String? = nil) async throws -> APIContentReplyList {
-    try await request("/v1/content/\(segment(creatorId))/studio/replies", method: "GET", authenticated: true, query: [URLQueryItem(name: "cursor", value: cursor), URLQueryItem(name: "limit", value: limit.map { String($0) }), URLQueryItem(name: "filter", value: filter)])
+  public func studioContentReplies(creatorId: String, cursor: String? = nil, limit: Int? = nil, filter: String? = nil, contentId: String? = nil) async throws -> APIContentReplyList {
+    try await request("/v1/content/\(segment(creatorId))/studio/replies", method: "GET", authenticated: true, query: [URLQueryItem(name: "cursor", value: cursor), URLQueryItem(name: "limit", value: limit.map { String($0) }), URLQueryItem(name: "filter", value: filter), URLQueryItem(name: "contentId", value: contentId)])
   }
   public func contentReplyConsent(creatorId: String, id: String, xQelvoraExpectedAccount: String? = nil, body: APIQuoteConsent) async throws -> APIContentConsentResult {
     try await request("/v1/content/\(segment(creatorId))/replies/\(segment(id))/consent", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })

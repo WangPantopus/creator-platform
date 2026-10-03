@@ -335,3 +335,7 @@ Issue only strict immutable original candidate ID/cursor observations through th
 ### W1 original Team state and current owner integration — October3 UTC
 
 During normal PR28 reconciliation through main d918c859, retain W5's current-account five-second Team reads, cancellation/hidden-page concealment, creator-only management and retained invitation input. Preserve original W1 canonical unavailable/loading/Retry copy, explicit keyboard Retry focus recovery, verified-creator invitation gate and plate link contrast. Restore focus only after the prior control was concealed and focus is on the document body; background polling cannot steal an active user's focus. Web types, scoped lint and formatting pass on the actual combined resolution. Personal current-source Team/outage operation remains pending; no prior source acceptance is inherited.
+
+## iOS cold destination custody — October3 UTC
+
+Preserve a bounded canonical path and actual account UUID in the existing issuer-specific device-only Keychain namespace. Query parameters and private screen/draft bodies stay out of this record. Restore only after the real current session resolves the same account; an incoming destination takes precedence. Serialize writes with credential custody and reject stale model/revision/token writes. Clear destination metadata on sign-out or account replacement while always attempting credential deletion, and preserve it through guarded same-account rotation. A saved path is presentation context; current object authority remains mandatory.

@@ -722,6 +722,14 @@
           "schema": {
             "type": "string"
           }
+        },
+        {
+          "in": "query",
+          "name": "contentId",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
         }
       ],
       "get": {
@@ -835,6 +843,14 @@
         {
           "in": "query",
           "name": "filter",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "contentId",
           "required": false,
           "schema": {
             "type": "string"
@@ -18376,6 +18392,11 @@
             "minimum": 1,
             "maximum": 50
           },
+          "contentId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
           "filter": {
             "default": "all",
             "type": "string",
@@ -27567,6 +27588,11 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 50
+          },
+          "contentId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           },
           "filter": {
             "default": "all",
