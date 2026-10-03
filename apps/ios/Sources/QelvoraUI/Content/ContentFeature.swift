@@ -93,7 +93,7 @@ private struct ContentFanScreen: View {
     @State private var content: ContentViewValue?
     @State private var replies: [ContentReply] = []
     @State private var nextCursor: String?
-    @State private var replyDepth = 1
+    @State private var replyCursors: [String?] = [nil]
     @State private var replyText = ""
     @State private var replyPolicy: ContentReplyPolicy?
     @State private var thanks: ContentThanks?
@@ -161,7 +161,7 @@ private struct ContentFanScreen: View {
                                 Toggle("Show my handle on the quote", isOn: Binding(get: { reply.consent.showHandle }, set: { value in Task { await consent(reply, text: true, handle: value) } })).disabled(busy || !reply.consent.shareText)
                             }.padding(16).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: 16))
                         }
-                        if nextCursor != nil { Button("Older replies", variant: .secondary, disabled: busy || replyDepth >= 5) { Task { await older() } } }
+                        replyPageControls
                         if let muted { Button(muted ? "Unmute Notes from this creator" : "Mute Notes from this creator", variant: .quiet, disabled: busy) { Task { if await mutate("mute", ["muted": !muted]) { await load(refreshThanks:false) } } } }
                     }
                     Text("This helped").qText("display-md").accessibilityAddTraits(.isHeader)
@@ -179,7 +179,7 @@ private struct ContentFanScreen: View {
                             Button("Withdraw private reply",variant:.quiet,disabled:busy) { Task { await withdraw(reply) } }
                         }.padding(16).background(qColor("surface",scheme))
                     }
-                    if nextCursor != nil { Button("Older replies",variant:.secondary,disabled:busy || replyDepth >= 5) { Task { await older() } } }
+                    replyPageControls
                     if thanks != nil && thanks?.withdrawn == false { Button("Withdraw Thanks",variant:.quiet,disabled:busy || !thanksAccess) { Task { await saveThanks(withdraw:true) } } }
                     if let muted { Button(muted ? "Unmute Notes from this creator" : "Mute Notes from this creator",variant:.quiet,disabled:busy) { Task { if await mutate("mute",["muted": !muted]) { await load(refreshThanks:false) } } } }
                 }
@@ -232,6 +232,7 @@ private struct ContentFanScreen: View {
     }
     @MainActor private func clearAuthority() {
         suspendAccess(); content = nil; replies = []; thanks = nil; nextCursor = nil
+        replyCursors = [nil]
         viewerAccountId = nil; muted = nil; replyText = ""; thanksText = ""; shareDigest = false; showIdentity = false; retryKeys = [:]
     }
     @MainActor private func load(refreshThanks: Bool = true) async {
@@ -248,19 +249,12 @@ private struct ContentFanScreen: View {
                 if let failure=error as? ContentFailure, failure.status==401 || failure.accountChanged {throw error}
                 statuses.append(contentFailureCopy(error))
             }
-            let depth = before.accountId == viewerAccountId ? replyDepth : 1
+            let cursor = before.accountId == viewerAccountId ? replyCursors.last ?? nil : nil
             var page:ContentReplyPage?;var currentReplies:[ContentReply]=[];var repliesAvailable=false
             do {
-                var fresh:ContentReplyPage=try await client.request(creatorId+"/replies", expectedAccountId: before.accountId)
-                var items=fresh.items
-                if depth > 1 {
-                    for _ in 1..<depth {
-                        guard let cursor = fresh.nextCursor else { break }
-                        fresh = try await client.request(creatorId + "/replies?cursor=" + cursor, expectedAccountId: before.accountId)
-                        items += fresh.items
-                    }
-                }
-                page=fresh;currentReplies=items;repliesAvailable=true
+                let query = "contentId=" + contentId + (cursor.map { "&cursor=" + $0 } ?? "")
+                let fresh:ContentReplyPage=try await client.request(creatorId+"/replies?"+query, expectedAccountId: before.accountId)
+                page=fresh;currentReplies=fresh.items;repliesAvailable=true
             } catch {
                 if (error as? ContentFailure)?.authorityDenied == true {throw error}
                 statuses.append("Private replies are unavailable. Refresh to try again.")
@@ -283,7 +277,7 @@ private struct ContentFanScreen: View {
             guard active, !Task.isCancelled, generation==loadGeneration else{return}
             guard before.accountId==after.accountId else {clearAuthority();self.error=QelvoraCopy.text("w5ContentAccountChanged");return}
             let changed=viewerAccountId != before.accountId
-            if changed {replyText="";thanksText="";shareDigest=false;showIdentity=false;retryKeys=[:];signature=nil;replyDepth=1}
+            if changed {replyText="";thanksText="";shareDigest=false;showIdentity=false;retryKeys=[:];signature=nil;replyCursors=[nil]}
             viewerAccountId=before.accountId;muted=after.muted;content=view;replies=currentReplies;nextCursor=page?.nextCursor;thanks=mine;replyAccess=repliesAvailable;thanksAccess=thanksAvailable;replyPolicy=policy
             if thanksAvailable && (refreshThanks || changed) {thanksText=mine?.text ?? "";shareDigest=mine?.shareWithCreatorDigest ?? false;showIdentity=mine?.showIdentity ?? false}
             self.error=statuses.joined(separator: "\n")
@@ -314,9 +308,27 @@ private struct ContentFanScreen: View {
         guard thanksAccess else {return}
         if await mutate("thanks", ["targetKind": "content", "targetId": contentId, "text": withdraw ? "" : thanksText, "shareWithCreatorDigest": !withdraw && shareDigest, "showIdentity": !withdraw && showIdentity, "withdrawn": withdraw, "expectedVersion": thanks?.version ?? 0, "idempotencyKey": UUID().uuidString]) { await load() }
     }
-    @MainActor private func older() async {
-        guard !busy, currentAccess, nextCursor != nil, replyDepth < 5 else { return }; busy = true; defer { busy = false }
-        replyDepth += 1
+    @ViewBuilder private var replyPageControls: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if replyCursors.count > 1 {
+                Button("Newer replies", variant: .secondary, disabled: busy || loading) { Task { await changeReplyPage(newer: true) } }
+            }
+            if let cursor = nextCursor {
+                Button("Older replies", variant: .secondary, disabled: busy || loading) { Task { await changeReplyPage(next: cursor) } }
+            }
+        }
+    }
+    @MainActor private func changeReplyPage(next: String? = nil, newer: Bool = false) async {
+        guard !busy, !loading, currentAccess else { return }
+        if newer {
+            guard replyCursors.count > 1 else { return }
+            replyCursors.removeLast()
+        } else {
+            guard let next, UUID(uuidString: next) != nil else { return }
+            replyCursors.append(next)
+        }
+        busy = true; defer { busy = false }
+        suspendAccess(); replies = []; nextCursor = nil
         await load(refreshThanks: false)
     }
     @MainActor private func verify() async {
