@@ -1,0 +1,398 @@
+﻿2026-10-01T15:59:55.5312520Z Current runner version: '2.337.0'
+2026-10-01T15:59:55.5345990Z ##[group]Runner Image Provisioner
+2026-10-01T15:59:55.5347460Z Hosted Compute Agent
+2026-10-01T15:59:55.5348190Z Version: 20260819.586
+2026-10-01T15:59:55.5349000Z Commit: 3cc4a88dfa507ef76119ad1bb3eccc6378bb2b76
+2026-10-01T15:59:55.5349950Z Build Date: 2026-08-18T23:20:18Z
+2026-10-01T15:59:55.5350810Z Worker ID: {908cd19b-0eaa-4037-92d6-336e159a351b}
+2026-10-01T15:59:55.5351750Z Azure Region: westus
+2026-10-01T15:59:55.5352720Z ##[endgroup]
+2026-10-01T15:59:55.5356600Z ##[group]Operating System
+2026-10-01T15:59:55.5357410Z macOS
+2026-10-01T15:59:55.5358030Z 26.6.1
+2026-10-01T15:59:55.5358640Z 25G76
+2026-10-01T15:59:55.5359260Z ##[endgroup]
+2026-10-01T15:59:55.5359920Z ##[group]Runner Image
+2026-10-01T15:59:55.5360650Z Image: macos-26
+2026-10-01T15:59:55.5361330Z Version: 20260824.0517.1
+2026-10-01T15:59:55.5363140Z Included Software: https://github.com/actions/runner-images/blob/macos-26/20260824.0517/images/macos/macos-26-Readme.md
+2026-10-01T15:59:55.5365450Z Image Release: https://github.com/actions/runner-images/releases/tag/macos-26%2F20260824.0517
+2026-10-01T15:59:55.5367000Z ##[endgroup]
+2026-10-01T15:59:55.5369840Z ##[group]GITHUB_TOKEN Permissions
+2026-10-01T15:59:55.5374340Z Contents: read
+2026-10-01T15:59:55.5375170Z Metadata: read
+2026-10-01T15:59:55.5376270Z Packages: read
+2026-10-01T15:59:55.5377720Z ##[endgroup]
+2026-10-01T15:59:55.5381010Z Secret source: Actions
+2026-10-01T15:59:55.5382640Z Cache mode: write
+2026-10-01T15:59:55.5383920Z Prepare workflow directory
+2026-10-01T15:59:55.5889430Z Prepare all required actions
+2026-10-01T15:59:55.5965500Z Getting action download info
+2026-10-01T15:59:55.9576660Z Download action repository 'actions/checkout@11d5960a326750d5838078e36cf38b85af677262' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-01T15:59:56.2093780Z Download action repository 'pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa' (SHA:f40ffcd9367d9f12939873eb1018b921a783ffaa)
+2026-10-01T15:59:56.6628140Z Download action repository 'actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+2026-10-01T15:59:56.8116110Z Download action repository 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-01T15:59:57.1727940Z Complete job name: web-visual
+2026-10-01T15:59:57.2810740Z ##[group]Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+2026-10-01T15:59:57.2813600Z with:
+2026-10-01T15:59:57.2814440Z   repository: WangPantopus/creator-platform
+2026-10-01T15:59:57.2822980Z   token: ***
+2026-10-01T15:59:57.2823730Z   ssh-strict: true
+2026-10-01T15:59:57.2824450Z   ssh-user: git
+2026-10-01T15:59:57.2825190Z   persist-credentials: true
+2026-10-01T15:59:57.2826110Z   clean: true
+2026-10-01T15:59:57.2826860Z   sparse-checkout-cone-mode: true
+2026-10-01T15:59:57.2827770Z   fetch-depth: 1
+2026-10-01T15:59:57.2828500Z   fetch-tags: false
+2026-10-01T15:59:57.2829240Z   show-progress: true
+2026-10-01T15:59:57.2830040Z   lfs: false
+2026-10-01T15:59:57.2830910Z   submodules: false
+2026-10-01T15:59:57.2831710Z   set-safe-directory: true
+2026-10-01T15:59:57.2832740Z   allow-unsafe-pr-checkout: false
+2026-10-01T15:59:57.2834640Z ##[endgroup]
+2026-10-01T15:59:57.5877240Z Syncing repository: WangPantopus/creator-platform
+2026-10-01T15:59:57.5881870Z ##[group]Getting Git version info
+2026-10-01T15:59:57.5883560Z Working directory is '/Users/runner/work/creator-platform/creator-platform'
+2026-10-01T15:59:57.5886070Z [command]/usr/local/bin/git version
+2026-10-01T15:59:57.6224040Z git version 2.55.0
+2026-10-01T15:59:57.6255120Z ##[endgroup]
+2026-10-01T15:59:57.6266940Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/c7b5cef9-682f-49fb-8cc3-2b050dc92a72/.gitconfig'
+2026-10-01T15:59:57.6283960Z Temporarily overriding HOME='/Users/runner/work/_temp/c7b5cef9-682f-49fb-8cc3-2b050dc92a72' before making global git config changes
+2026-10-01T15:59:57.6290340Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-01T15:59:57.6296720Z [command]/usr/local/bin/git config --global --add safe.directory /Users/runner/work/creator-platform/creator-platform
+2026-10-01T15:59:57.6450830Z Deleting the contents of '/Users/runner/work/creator-platform/creator-platform'
+2026-10-01T15:59:57.6457530Z ##[group]Initializing the repository
+2026-10-01T15:59:57.6465520Z [command]/usr/local/bin/git init /Users/runner/work/creator-platform/creator-platform
+2026-10-01T15:59:57.6839650Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-01T15:59:57.6849330Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-01T15:59:57.6873790Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-01T15:59:57.6959750Z hint: call:
+2026-10-01T15:59:57.6964000Z hint:
+2026-10-01T15:59:57.7008450Z hint: 	git config --global init.defaultBranch <name>
+2026-10-01T15:59:57.7012880Z hint:
+2026-10-01T15:59:57.7095450Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-01T15:59:57.7137390Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-01T15:59:57.7142570Z hint:
+2026-10-01T15:59:57.7169200Z hint: 	git branch -m <name>
+2026-10-01T15:59:57.7173060Z hint:
+2026-10-01T15:59:57.7177570Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-01T15:59:57.7184200Z Initialized empty Git repository in /Users/runner/work/creator-platform/creator-platform/.git/
+2026-10-01T15:59:57.7197570Z [command]/usr/local/bin/git remote add origin https://github.com/WangPantopus/creator-platform
+2026-10-01T15:59:57.7235540Z ##[endgroup]
+2026-10-01T15:59:57.7239770Z ##[group]Disabling automatic garbage collection
+2026-10-01T15:59:57.7243870Z [command]/usr/local/bin/git config --local gc.auto 0
+2026-10-01T15:59:57.7316760Z ##[endgroup]
+2026-10-01T15:59:57.7318950Z ##[group]Setting up auth
+2026-10-01T15:59:57.7328280Z [command]/usr/local/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-01T15:59:57.7449800Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-01T15:59:58.2210130Z [command]/usr/local/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-01T15:59:58.4745280Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-01T15:59:58.7766640Z [command]/usr/local/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-01T15:59:59.1162760Z [command]/usr/local/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-01T15:59:59.4178500Z [command]/usr/local/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-01T15:59:59.7193170Z ##[endgroup]
+2026-10-01T15:59:59.7234040Z ##[group]Fetching the repository
+2026-10-01T15:59:59.7271340Z [command]/usr/local/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +95cc51e3be56f6c5a4cb8ae8710b8b029202d4c3:refs/remotes/pull/24/merge
+2026-10-01T16:00:03.7699850Z From https://github.com/WangPantopus/creator-platform
+2026-10-01T16:00:03.7703990Z  * [new ref]         95cc51e3be56f6c5a4cb8ae8710b8b029202d4c3 -> pull/24/merge
+2026-10-01T16:00:03.7722240Z ##[endgroup]
+2026-10-01T16:00:03.7724880Z ##[group]Determining the checkout info
+2026-10-01T16:00:03.7728640Z ##[endgroup]
+2026-10-01T16:00:03.7740120Z [command]/usr/local/bin/git sparse-checkout disable
+2026-10-01T16:00:03.7956850Z [command]/usr/local/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-01T16:00:03.8117560Z ##[group]Checking out the ref
+2026-10-01T16:00:03.8123200Z [command]/usr/local/bin/git checkout --progress --force refs/remotes/pull/24/merge
+2026-10-01T16:00:04.9633980Z Updating files:  28% (898/3112)
+2026-10-01T16:00:05.1484820Z Updating files:  29% (903/3112)
+2026-10-01T16:00:05.1849950Z Updating files:  30% (934/3112)
+2026-10-01T16:00:05.2456730Z Updating files:  31% (965/3112)
+2026-10-01T16:00:05.3420560Z Updating files:  32% (996/3112)
+2026-10-01T16:00:05.4198190Z Updating files:  33% (1027/3112)
+2026-10-01T16:00:05.4468640Z Updating files:  34% (1059/3112)
+2026-10-01T16:00:05.4731500Z Updating files:  35% (1090/3112)
+2026-10-01T16:00:05.5034370Z Updating files:  36% (1121/3112)
+2026-10-01T16:00:05.5290220Z Updating files:  37% (1152/3112)
+2026-10-01T16:00:05.5577540Z Updating files:  38% (1183/3112)
+2026-10-01T16:00:05.5775340Z Updating files:  39% (1214/3112)
+2026-10-01T16:00:05.5966870Z Updating files:  40% (1245/3112)
+2026-10-01T16:00:05.6250460Z Updating files:  41% (1276/3112)
+2026-10-01T16:00:05.6468790Z Updating files:  42% (1308/3112)
+2026-10-01T16:00:05.6924300Z Updating files:  43% (1339/3112)
+2026-10-01T16:00:05.7172900Z Updating files:  44% (1370/3112)
+2026-10-01T16:00:05.7472230Z Updating files:  45% (1401/3112)
+2026-10-01T16:00:05.7693030Z Updating files:  46% (1432/3112)
+2026-10-01T16:00:05.7910020Z Updating files:  47% (1463/3112)
+2026-10-01T16:00:05.8140000Z Updating files:  48% (1494/3112)
+2026-10-01T16:00:05.8369970Z Updating files:  49% (1525/3112)
+2026-10-01T16:00:05.8382500Z Updating files:  50% (1556/3112)
+2026-10-01T16:00:05.8582430Z Updating files:  50% (1558/3112)
+2026-10-01T16:00:05.9013290Z Updating files:  51% (1588/3112)
+2026-10-01T16:00:05.9185940Z Updating files:  52% (1619/3112)
+2026-10-01T16:00:05.9474070Z Updating files:  53% (1650/3112)
+2026-10-01T16:00:05.9749020Z Updating files:  54% (1681/3112)
+2026-10-01T16:00:05.9902620Z Updating files:  55% (1712/3112)
+2026-10-01T16:00:06.0076560Z Updating files:  56% (1743/3112)
+2026-10-01T16:00:06.0358980Z Updating files:  57% (1774/3112)
+2026-10-01T16:00:06.0524600Z Updating files:  58% (1805/3112)
+2026-10-01T16:00:06.0661540Z Updating files:  59% (1837/3112)
+2026-10-01T16:00:06.1031970Z Updating files:  60% (1868/3112)
+2026-10-01T16:00:06.1244960Z Updating files:  61% (1899/3112)
+2026-10-01T16:00:06.1345690Z Updating files:  62% (1930/3112)
+2026-10-01T16:00:06.1457230Z Updating files:  63% (1961/3112)
+2026-10-01T16:00:06.1711870Z Updating files:  64% (1992/3112)
+2026-10-01T16:00:06.1867470Z Updating files:  65% (2023/3112)
+2026-10-01T16:00:06.2304420Z Updating files:  66% (2054/3112)
+2026-10-01T16:00:06.2429110Z Updating files:  67% (2086/3112)
+2026-10-01T16:00:06.2616960Z Updating files:  68% (2117/3112)
+2026-10-01T16:00:06.2766850Z Updating files:  69% (2148/3112)
+2026-10-01T16:00:06.2941770Z Updating files:  70% (2179/3112)
+2026-10-01T16:00:06.3096230Z Updating files:  71% (2210/3112)
+2026-10-01T16:00:06.3193370Z Updating files:  72% (2241/3112)
+2026-10-01T16:00:06.3328520Z Updating files:  73% (2272/3112)
+2026-10-01T16:00:06.3511600Z Updating files:  74% (2303/3112)
+2026-10-01T16:00:06.3786330Z Updating files:  75% (2334/3112)
+2026-10-01T16:00:06.4053750Z Updating files:  76% (2366/3112)
+2026-10-01T16:00:06.4173570Z Updating files:  77% (2397/3112)
+2026-10-01T16:00:06.4364390Z Updating files:  78% (2428/3112)
+2026-10-01T16:00:06.4525860Z Updating files:  79% (2459/3112)
+2026-10-01T16:00:06.4696920Z Updating files:  80% (2490/3112)
+2026-10-01T16:00:06.5061030Z Updating files:  81% (2521/3112)
+2026-10-01T16:00:06.5283650Z Updating files:  82% (2552/3112)
+2026-10-01T16:00:06.5472020Z Updating files:  83% (2583/3112)
+2026-10-01T16:00:06.5664230Z Updating files:  84% (2615/3112)
+2026-10-01T16:00:06.5868210Z Updating files:  85% (2646/3112)
+2026-10-01T16:00:06.6053450Z Updating files:  86% (2677/3112)
+2026-10-01T16:00:06.6112670Z Updating files:  87% (2708/3112)
+2026-10-01T16:00:06.6216640Z Updating files:  88% (2739/3112)
+2026-10-01T16:00:06.7746180Z Updating files:  89% (2770/3112)
+2026-10-01T16:00:06.7865520Z Updating files:  90% (2801/3112)
+2026-10-01T16:00:06.7992940Z Updating files:  91% (2832/3112)
+2026-10-01T16:00:06.8097010Z Updating files:  92% (2864/3112)
+2026-10-01T16:00:06.8225040Z Updating files:  93% (2895/3112)
+2026-10-01T16:00:06.8374590Z Updating files:  94% (2926/3112)
+2026-10-01T16:00:06.8393390Z Updating files:  95% (2957/3112)
+2026-10-01T16:00:06.8536290Z Updating files:  95% (2958/3112)
+2026-10-01T16:00:06.8654800Z Updating files:  96% (2988/3112)
+2026-10-01T16:00:06.8817470Z Updating files:  97% (3019/3112)
+2026-10-01T16:00:06.8992050Z Updating files:  98% (3050/3112)
+2026-10-01T16:00:06.9210820Z Updating files:  99% (3081/3112)
+2026-10-01T16:00:06.9213770Z Updating files: 100% (3112/3112)
+2026-10-01T16:00:06.9215190Z Updating files: 100% (3112/3112), done.
+2026-10-01T16:00:06.9313580Z HEAD is now at 95cc51e Merge a164fe8aa3f8948b7d51dbdb68c65e13bdc56de1 into 70ba74a7983dc4f5d0fd0ccd6bcfb657576f9a0b
+2026-10-01T16:00:06.9368200Z ##[endgroup]
+2026-10-01T16:00:06.9539810Z [command]/usr/local/bin/git log -1 --format=%H
+2026-10-01T16:00:06.9669610Z 95cc51e3be56f6c5a4cb8ae8710b8b029202d4c3
+2026-10-01T16:00:07.0257720Z ##[group]Run pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa
+2026-10-01T16:00:07.0258860Z with:
+2026-10-01T16:00:07.0259210Z   dest: ~/setup-pnpm
+2026-10-01T16:00:07.0260030Z   run_install: null
+2026-10-01T16:00:07.0260690Z   cache: false
+2026-10-01T16:00:07.0261170Z   cache_dependency_path: pnpm-lock.yaml
+2026-10-01T16:00:07.0261990Z   package_json_file: package.json
+2026-10-01T16:00:07.0262470Z   standalone: false
+2026-10-01T16:00:07.0262940Z ##[endgroup]
+2026-10-01T16:00:07.3095050Z ##[group]Running self-installer...
+2026-10-01T16:00:09.1118400Z (node:1367) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-01T16:00:09.1121200Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-01T16:00:09.3499000Z Progress: resolved 1, reused 0, downloaded 0, added 0
+2026-10-01T16:00:09.5356200Z Packages: +2
+2026-10-01T16:00:09.5356780Z ++
+2026-10-01T16:00:10.3545080Z Progress: resolved 15, reused 0, downloaded 1, added 0
+2026-10-01T16:00:11.3609770Z Progress: resolved 15, reused 0, downloaded 1, added 1
+2026-10-01T16:00:12.0884870Z Progress: resolved 15, reused 0, downloaded 2, added 2, done
+2026-10-01T16:00:12.1367960Z .../.pnpm/pnpm@12.5.1/node_modules/pnpm preinstall$ node install.js
+2026-10-01T16:00:12.6307820Z .../.pnpm/pnpm@12.5.1/node_modules/pnpm preinstall: Done
+2026-10-01T16:00:12.6316860Z .../.pnpm/pnpm@12.5.1/node_modules/pnpm postinstall$ node install.js
+2026-10-01T16:00:12.7455950Z .../.pnpm/pnpm@12.5.1/node_modules/pnpm postinstall: Done
+2026-10-01T16:00:15.4571930Z 
+2026-10-01T16:00:15.4576350Z dependencies:
+2026-10-01T16:00:15.4577640Z + pnpm 12.5.1 (12.8.1 is available)
+2026-10-01T16:00:15.4582200Z 
+2026-10-01T16:00:15.4675980Z Done in 6.6s
+2026-10-01T16:00:15.5057050Z ##[endgroup]
+2026-10-01T16:00:15.5059770Z Installation Completed!
+2026-10-01T16:00:15.5442720Z ##[group]Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+2026-10-01T16:00:15.5443650Z with:
+2026-10-01T16:00:15.5444060Z   node-version: 24
+2026-10-01T16:00:15.5444890Z   cache: pnpm
+2026-10-01T16:00:15.5445330Z   always-auth: false
+2026-10-01T16:00:15.5445780Z   check-latest: false
+2026-10-01T16:00:15.5450870Z   token: ***
+2026-10-01T16:00:15.5451300Z env:
+2026-10-01T16:00:15.5452800Z   PNPM_HOME: /Users/runner/setup-pnpm/node_modules/.bin
+2026-10-01T16:00:15.5453590Z ##[endgroup]
+2026-10-01T16:00:15.8558440Z (node:1489) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-01T16:00:15.8666990Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-01T16:00:15.8966110Z Found in cache @ /Users/runner/hostedtoolcache/node/24.19.0/x64
+2026-10-01T16:00:15.8978470Z ##[group]Environment details
+2026-10-01T16:00:16.7659990Z node: v24.19.0
+2026-10-01T16:00:16.7662700Z npm: 11.17.0
+2026-10-01T16:00:16.7664150Z yarn: 1.22.22
+2026-10-01T16:00:16.7666630Z ##[endgroup]
+2026-10-01T16:00:16.7695390Z [command]/Users/runner/setup-pnpm/node_modules/.bin/pnpm store path --silent
+2026-10-01T16:00:16.8149900Z /Users/runner/setup-pnpm/node_modules/.bin/store/v11
+2026-10-01T16:00:17.1340760Z pnpm cache is not found
+2026-10-01T16:00:17.1571700Z ##[group]Run pnpm install --frozen-lockfile
+2026-10-01T16:00:17.1572550Z [36;1mpnpm install --frozen-lockfile[0m
+2026-10-01T16:00:17.1659760Z shell: /bin/bash -e {0}
+2026-10-01T16:00:17.1660260Z env:
+2026-10-01T16:00:17.1660800Z   PNPM_HOME: /Users/runner/setup-pnpm/node_modules/.bin
+2026-10-01T16:00:17.1661520Z ##[endgroup]
+2026-10-01T16:00:17.2424760Z Scope: all 8 workspace projects
+2026-10-01T16:00:17.3127930Z ? Verifying lockfile against supply-chain policies (486 entries)...
+2026-10-01T16:00:17.9465170Z Packages are cloned from the content-addressable store to the virtual store.
+2026-10-01T16:00:18.0157370Z   Content-addressable store is at: /Users/runner/setup-pnpm/node_modules/.bin/store/v11
+2026-10-01T16:00:18.0176590Z   Virtual store is at:             node_modules/.pnpm
+2026-10-01T16:00:18.5250420Z Downloading next@16.3.7: 0.00 B/41.74 MB
+2026-10-01T16:00:19.6043470Z Progress: resolved 374, reused 0, downloaded 133, added 128
+2026-10-01T16:00:20.3785360Z [WARN] Tarball download average speed 22 KiB/s (size 34 KiB) is below 50 KiB/s: https://registry.npmjs.org/ws/-/ws-8.22.0.tgz (GET)
+2026-10-01T16:00:20.6614330Z Downloading @next/swc-darwin-x64@16.3.7: 0.00 B/32.83 MB
+2026-10-01T16:00:21.5198980Z Downloading @turbo/darwin-64@2.11.5: 0.00 B/17.04 MB
+2026-10-01T16:00:21.5842150Z [WARN] Tarball download average speed 32 KiB/s (size 87 KiB) is below 50 KiB/s: https://registry.npmjs.org/magic-string/-/magic-string-0.30.21.tgz (GET)
+2026-10-01T16:00:22.3747660Z Downloading @img/sharp-libvips-darwin-x64@1.3.4: 0.00 B/8.93 MB
+2026-10-01T16:00:23.3804440Z Downloading next@16.3.7: 5.07 MB/41.74 MB
+2026-10-01T16:00:24.9804400Z Downloading @next/swc-darwin-x64@16.3.7: 6.29 MB/32.83 MB
+2026-10-01T16:00:25.9159460Z ✓ Lockfile passes supply-chain policies (486 entries in 8.6s)
+2026-10-01T16:00:25.9165990Z Lockfile is up to date, resolution step is skipped
+2026-10-01T16:00:27.3115300Z Downloading @next/swc-darwin-x64@16.3.7: 16.92 MB/32.83 MB
+2026-10-01T16:00:28.5567660Z Downloading @next/swc-darwin-x64@16.3.7: 28.07 MB/32.83 MB
+2026-10-01T16:00:29.5668770Z Progress: resolved 374, reused 0, downloaded 350, added 320
+2026-10-01T16:00:30.5910090Z Progress: resolved 374, reused 0, downloaded 362, added 352
+2026-10-01T16:00:32.9095730Z Progress: resolved 374, reused 0, downloaded 364, added 352
+2026-10-01T16:00:34.1421860Z Downloading next@16.3.7: 23.56 MB/41.74 MB
+2026-10-01T16:00:37.1213140Z Downloading next@16.3.7: 34.53 MB/41.74 MB
+2026-10-01T16:00:41.2400320Z Downloading next@16.3.7: 41.74 MB/41.74 MB, done
+2026-10-01T16:00:42.3456880Z Progress: resolved 374, reused 0, downloaded 374, added 367
+2026-10-01T16:00:43.4639690Z Progress: resolved 374, reused 0, downloaded 374, added 371
+2026-10-01T16:00:50.7746250Z Progress: resolved 374, reused 0, downloaded 374, added 373
+2026-10-01T16:00:50.8473650Z Packages: +374
+2026-10-01T16:00:50.8476610Z ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-10-01T16:00:50.9628810Z Progress: resolved 374, reused 0, downloaded 374, added 374, done
+2026-10-01T16:00:50.9711680Z .../esbuild@0.25.12/node_modules/esbuild postinstall$ node install.js
+2026-10-01T16:00:50.9714440Z .../esbuild@0.28.2/node_modules/esbuild postinstall$ node install.js
+2026-10-01T16:00:51.2057500Z .../esbuild@0.25.12/node_modules/esbuild postinstall: Done
+2026-10-01T16:00:51.2060620Z .../esbuild@0.28.2/node_modules/esbuild postinstall: Done
+2026-10-01T16:00:51.4710600Z 
+2026-10-01T16:00:51.4713140Z devDependencies:
+2026-10-01T16:00:51.4748120Z + @eslint/js 9.39.1
+2026-10-01T16:00:51.4751110Z + @playwright/test 1.63.0
+2026-10-01T16:00:51.4753670Z + @types/node 24.10.1
+2026-10-01T16:00:51.4759270Z + @types/pngjs 6.0.5
+2026-10-01T16:00:51.4767150Z + eslint 9.39.1
+2026-10-01T16:00:51.4775830Z + globals 16.5.0
+2026-10-01T16:00:51.4780690Z + pngjs 7.0.0
+2026-10-01T16:00:51.4782010Z + prettier 3.6.2
+2026-10-01T16:00:51.4783650Z + tsx 4.20.6
+2026-10-01T16:00:51.4785280Z + turbo 2.11.5
+2026-10-01T16:00:51.4787050Z + typescript 5.9.3
+2026-10-01T16:00:51.4791170Z + typescript-eslint 8.46.4
+2026-10-01T16:00:51.4793010Z + vitest 3.2.4
+2026-10-01T16:00:51.4793470Z 
+2026-10-01T16:00:51.4968470Z Done in 34.3s using pnpm v12.5.1
+2026-10-01T16:00:51.5288130Z ##[group]Run pnpm exec playwright install chromium
+2026-10-01T16:00:51.5289810Z [36;1mpnpm exec playwright install chromium[0m
+2026-10-01T16:00:51.5415010Z shell: /bin/bash -e {0}
+2026-10-01T16:00:51.5415700Z env:
+2026-10-01T16:00:51.5416370Z   PNPM_HOME: /Users/runner/setup-pnpm/node_modules/.bin
+2026-10-01T16:00:51.5417240Z ##[endgroup]
+2026-10-01T16:00:52.6874940Z Downloading Chrome for Testing 153.0.8010.12 (playwright chromium v1243) from https://cdn.playwright.dev/builds/cft/153.0.8010.12/mac-x64/chrome-mac-x64.zip
+2026-10-01T16:00:53.7166770Z |                                                                                |   0% of 192.3 MiB
+2026-10-01T16:00:54.4892690Z |■■■■■■■■                                                                        |  10% of 192.3 MiB
+2026-10-01T16:00:54.7584660Z |■■■■■■■■■■■■■■■■                                                                |  20% of 192.3 MiB
+2026-10-01T16:00:55.0442580Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 192.3 MiB
+2026-10-01T16:00:55.3016620Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 192.3 MiB
+2026-10-01T16:00:55.5956550Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 192.3 MiB
+2026-10-01T16:00:55.8584500Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 192.3 MiB
+2026-10-01T16:00:56.1484470Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 192.3 MiB
+2026-10-01T16:00:56.4349450Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 192.3 MiB
+2026-10-01T16:00:56.6644060Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 192.3 MiB
+2026-10-01T16:00:56.9712140Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 192.3 MiB
+2026-10-01T16:01:05.5423940Z Chrome for Testing 153.0.8010.12 (playwright chromium v1243) downloaded to /Users/runner/Library/Caches/ms-playwright/chromium-1243
+2026-10-01T16:01:05.5431940Z Downloading FFmpeg (playwright ffmpeg v1011) from https://cdn.playwright.dev/dbazure/download/playwright/builds/ffmpeg/1011/ffmpeg-mac.zip
+2026-10-01T16:01:06.2611400Z |                                                                                |   1% of 1.3 MiB
+2026-10-01T16:01:06.2618820Z |■■■■■■■■                                                                        |  10% of 1.3 MiB
+2026-10-01T16:01:06.2626580Z |■■■■■■■■■■■■■■■■                                                                |  20% of 1.3 MiB
+2026-10-01T16:01:06.2629270Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 1.3 MiB
+2026-10-01T16:01:06.2631260Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  41% of 1.3 MiB
+2026-10-01T16:01:06.2635130Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 1.3 MiB
+2026-10-01T16:01:06.2637170Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 1.3 MiB
+2026-10-01T16:01:06.2638660Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  71% of 1.3 MiB
+2026-10-01T16:01:06.2640030Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 1.3 MiB
+2026-10-01T16:01:06.2641390Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 1.3 MiB
+2026-10-01T16:01:06.2642910Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 1.3 MiB
+2026-10-01T16:01:06.3600630Z FFmpeg (playwright ffmpeg v1011) downloaded to /Users/runner/Library/Caches/ms-playwright/ffmpeg-1011
+2026-10-01T16:01:06.3611040Z Downloading Chrome Headless Shell 153.0.8010.12 (playwright chromium-headless-shell v1243) from https://cdn.playwright.dev/builds/cft/153.0.8010.12/mac-x64/chrome-headless-shell-mac-x64.zip
+2026-10-01T16:01:07.1731920Z |                                                                                |   0% of 99.2 MiB
+2026-10-01T16:01:07.5933870Z |■■■■■■■■                                                                        |  10% of 99.2 MiB
+2026-10-01T16:01:07.7433120Z |■■■■■■■■■■■■■■■■                                                                |  20% of 99.2 MiB
+2026-10-01T16:01:07.8526640Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 99.2 MiB
+2026-10-01T16:01:07.9881110Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 99.2 MiB
+2026-10-01T16:01:08.1014590Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 99.2 MiB
+2026-10-01T16:01:08.2109310Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 99.2 MiB
+2026-10-01T16:01:08.4365220Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 99.2 MiB
+2026-10-01T16:01:08.5778050Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 99.2 MiB
+2026-10-01T16:01:08.7365610Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 99.2 MiB
+2026-10-01T16:01:08.9000110Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 99.2 MiB
+2026-10-01T16:01:12.7800450Z Chrome Headless Shell 153.0.8010.12 (playwright chromium-headless-shell v1243) downloaded to /Users/runner/Library/Caches/ms-playwright/chromium_headless_shell-1243
+2026-10-01T16:01:12.8206320Z ##[group]Run pnpm test:visual
+2026-10-01T16:01:12.8207700Z [36;1mpnpm test:visual[0m
+2026-10-01T16:01:12.8303490Z shell: /bin/bash -e {0}
+2026-10-01T16:01:12.8304000Z env:
+2026-10-01T16:01:12.8304530Z   PNPM_HOME: /Users/runner/setup-pnpm/node_modules/.bin
+2026-10-01T16:01:12.8305230Z ##[endgroup]
+2026-10-01T16:01:12.9168990Z $ playwright test
+2026-10-01T16:01:13.8568520Z ReferenceError: visualWebURL is not defined
+2026-10-01T16:01:13.8570650Z     at Object.<anonymous> (/Users/runner/work/creator-platform/creator-platform/playwright.config.ts:14:14)
+2026-10-01T16:01:13.8572650Z     at Module._compile (node:internal/modules/cjs/loader:1872:14)
+2026-10-01T16:01:13.8574100Z     at Object.<anonymous> (node:internal/modules/cjs/loader:2003:10)
+2026-10-01T16:01:13.8575390Z     at Module.load (node:internal/modules/cjs/loader:1594:32)
+2026-10-01T16:01:13.8576640Z     at Module._load (node:internal/modules/cjs/loader:1396:12)
+2026-10-01T16:01:13.8577860Z     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-10-01T16:01:13.8579080Z     at Module.require (node:internal/modules/cjs/loader:1617:12)
+2026-10-01T16:01:13.8580020Z     at require (node:internal/modules/helpers:153:16)
+2026-10-01T16:01:13.8581980Z     at requireOrImport (/Users/runner/work/creator-platform/creator-platform/node_modules/.pnpm/playwright@1.63.0/node_modules/playwright/lib/common/index.js:1083:18)
+2026-10-01T16:01:13.8585040Z     at loadUserConfig (/Users/runner/work/creator-platform/creator-platform/node_modules/.pnpm/playwright@1.63.0/node_modules/playwright/lib/common/index.js:1268:52)
+2026-10-01T16:01:13.8587900Z     at loadConfig (/Users/runner/work/creator-platform/creator-platform/node_modules/.pnpm/playwright@1.63.0/node_modules/playwright/lib/common/index.js:1275:28)
+2026-10-01T16:01:13.8591010Z     at Object.loadConfigFromFile (/Users/runner/work/creator-platform/creator-platform/node_modules/.pnpm/playwright@1.63.0/node_modules/playwright/lib/common/index.js:1490:10)
+2026-10-01T16:01:13.8594150Z     at runTests (/Users/runner/work/creator-platform/creator-platform/node_modules/.pnpm/playwright@1.63.0/node_modules/playwright/lib/cli/testActions.js:46:18)
+2026-10-01T16:01:13.8597820Z     at _Command.<anonymous> (/Users/runner/work/creator-platform/creator-platform/node_modules/.pnpm/playwright@1.63.0/node_modules/playwright/lib/program.js:55:7)
+2026-10-01T16:01:13.8675920Z [ELIFECYCLE] Command failed with exit code 1.
+2026-10-01T16:01:13.8714420Z ##[error]Process completed with exit code 1.
+2026-10-01T16:01:13.8862490Z ##[group]Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+2026-10-01T16:01:13.8863520Z with:
+2026-10-01T16:01:13.8864000Z   name: visual-review
+2026-10-01T16:01:13.8864480Z   path: playwright-report
+test-results
+
+2026-10-01T16:01:13.8865630Z   if-no-files-found: warn
+2026-10-01T16:01:13.8866130Z   compression-level: 6
+2026-10-01T16:01:13.8866580Z   overwrite: false
+2026-10-01T16:01:13.8867050Z   include-hidden-files: false
+2026-10-01T16:01:13.8867550Z env:
+2026-10-01T16:01:13.8868040Z   PNPM_HOME: /Users/runner/setup-pnpm/node_modules/.bin
+2026-10-01T16:01:13.8868700Z ##[endgroup]
+2026-10-01T16:01:14.1721620Z (node:2102) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-01T16:01:14.1725440Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-01T16:01:14.1817450Z Multiple search paths detected. Calculating the least common ancestor of all paths
+2026-10-01T16:01:14.1820930Z The least common ancestor is /Users/runner/work/creator-platform/creator-platform. This will be the root directory of the artifact
+2026-10-01T16:01:14.1849140Z ##[warning]No files were found with the provided path: playwright-report
+test-results. No artifacts will be uploaded.
+2026-10-01T16:01:14.2169290Z Post job cleanup.
+2026-10-01T16:01:14.4751160Z Pruning is unnecessary.
+2026-10-01T16:01:14.5043540Z Post job cleanup.
+2026-10-01T16:01:14.7136100Z [command]/usr/local/bin/git version
+2026-10-01T16:01:14.7278420Z git version 2.55.0
+2026-10-01T16:01:14.7327020Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/64740f0e-a89e-4159-bb62-d294fdadfa60/.gitconfig'
+2026-10-01T16:01:14.7350910Z Temporarily overriding HOME='/Users/runner/work/_temp/64740f0e-a89e-4159-bb62-d294fdadfa60' before making global git config changes
+2026-10-01T16:01:14.7354480Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-01T16:01:14.7361440Z [command]/usr/local/bin/git config --global --add safe.directory /Users/runner/work/creator-platform/creator-platform
+2026-10-01T16:01:14.7489310Z [command]/usr/local/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-01T16:01:14.7606680Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-01T16:01:14.9117080Z [command]/usr/local/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-01T16:01:14.9224810Z http.https://github.com/.extraheader
+2026-10-01T16:01:14.9245890Z [command]/usr/local/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-01T16:01:14.9372910Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-01T16:01:15.0914130Z [command]/usr/local/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-01T16:01:15.1036790Z [command]/usr/local/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-01T16:01:15.2919540Z Cleaning up orphan processes
+2026-10-01T16:01:15.6888250Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262, actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02, pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

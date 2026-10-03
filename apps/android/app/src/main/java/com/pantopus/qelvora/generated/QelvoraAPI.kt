@@ -4177,6 +4177,7 @@ enum class APIConversationMemoryProposalKind {
 @Serializable
 data class APIConversationProviderPolicy(
   val `version`: String,
+  val `reference`: String? = null,
   val `providers`: List<APIConversationProviderPolicyProvidersItem>,
   val `verified`: Boolean
 )
@@ -5357,8 +5358,22 @@ enum class ReadCreatorMediaPolicyPurpose {
 class CreatorAPIError(val status: Int, val body: String): Exception("API request refused ($status)")
 data class CreatorAPIBinaryResponse(val body: ByteArray, val status: Int, val contentType: String?, val contentRange: String?, val acceptRanges: String?)
 
-class CreatorAPIClient(private val baseURL: String, private val maximumResponseBytes: Int = 268_435_456, private val timeoutMs: Int = 30_000, private val token: suspend () -> String?) {
+class CreatorAPIClient(private val baseURL: String, private val maximumResponseBytes: Int = 268_435_456, private val timeoutMs: Int = 30_000, private val expectedAccountId: String? = null, private val expectedSessionId: String? = null, private val token: suspend () -> String?) {
   private val json = Json { ignoreUnknownKeys = false }
+  /** W8 private transport on this original client, with denial-only pins. */
+  suspend fun trustBytes(path: String, expectedAccountId: String, expectedSessionId: String, body: ByteArray? = null, binary: Boolean = false): CreatorAPIBinaryResponse {
+    require(path.matches(Regex("^/v1/trust/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*$")) && expectedAccountId.isNotEmpty() && expectedSessionId.isNotEmpty() && (body?.size ?: 0) <= 1_048_576)
+    return requestBytes(path, if (body == null) "GET" else "POST", body, authenticated = true,
+      headers = mapOf("X-Expected-Account-Id" to expectedAccountId, "X-Expected-Session-Id" to expectedSessionId),
+      accept = if (binary) "application/octet-stream" else "application/json", contentType = "application/json")
+  }
+  /** W5 JSON transport on this original client, with denial-only session pins. */
+  suspend fun contentBytes(path: String, expectedAccountId: String, expectedSessionId: String, body: ByteArray? = null, query: List<Pair<String, String?>> = emptyList()): CreatorAPIBinaryResponse {
+    require(path.matches(Regex("^/v1/content/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*$")) && expectedAccountId.isNotEmpty() && expectedSessionId.isNotEmpty() && (body?.size ?: 0) <= 1_048_576 && query.size <= 4 && query.map { it.first }.toSet().size == query.size && query.all { it.first in setOf("contentId", "cursor", "targetKind", "targetId") && (it.second?.toByteArray(Charsets.UTF_8)?.size ?: 0) <= 1024 })
+    return requestBytes(path, if (body == null) "GET" else "POST", body, authenticated = true, query = query,
+      headers = mapOf("X-Expected-Account-Id" to expectedAccountId, "X-Expected-Session-Id" to expectedSessionId),
+      accept = "application/json", contentType = "application/json")
+  }
   private suspend fun request(path: String, method: String, body: String? = null, authenticated: Boolean, query: List<Pair<String, String?>> = emptyList(), headers: Map<String, String> = emptyMap()): String =
     requestBytes(path, method, body?.toByteArray(Charsets.UTF_8), authenticated, query, headers, "application/json", "application/json").body.toString(Charsets.UTF_8)
   private suspend fun requestBytes(path: String, method: String, body: ByteArray? = null, authenticated: Boolean, query: List<Pair<String, String?>> = emptyList(), headers: Map<String, String> = emptyMap(), accept: String = "application/octet-stream", contentType: String = "application/octet-stream"): CreatorAPIBinaryResponse = withContext(Dispatchers.IO) {
@@ -5372,6 +5387,11 @@ class CreatorAPIClient(private val baseURL: String, private val maximumResponseB
       connection.connectTimeout = minOf(15000, timeoutMs); connection.readTimeout = timeoutMs
       connection.setRequestProperty("Accept", accept)
       headers.forEach { (name, value) -> connection.setRequestProperty(name, value) }
+      // Captured original pins are denial preconditions, never identity.
+      if (authenticated) {
+        expectedAccountId?.let { connection.setRequestProperty("X-Expected-Account-Id", it) }
+        expectedSessionId?.let { connection.setRequestProperty("X-Expected-Session-Id", it) }
+      }
       if (authenticated) token()?.let { connection.setRequestProperty("Authorization", "Bearer $it") }
       if (body != null) { connection.doOutput = true; connection.setRequestProperty("Content-Type", contentType); connection.outputStream.use { it.write(body) } }
       val status = connection.responseCode
