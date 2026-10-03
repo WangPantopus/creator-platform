@@ -154,11 +154,12 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
     val replyLimit = replyPolicy?.limit ?: 4000
     var loading by remember { mutableStateOf(false) }
     var checkedAt by remember { mutableLongStateOf(0L) }
-    var replyDepth by remember { mutableIntStateOf(1) }
+    var replyCursors by remember { mutableStateOf<List<String?>>(listOf(null)) }
     val retryKeys=remember { mutableMapOf<String,String>() }
     fun suspendAccess() { currentAccess = false; replyAccess = false; thanksAccess = false; replyPolicy = null; signature = null; signatureStatus = "" }
     fun clearAuthority() {
         suspendAccess(); content = null; replies = emptyList(); thanks = null; cursor = null
+        replyCursors = listOf(null)
         viewerAccountId = null; muted = null; replyText = ""; thanksText = ""; share = false; identity = false; retryKeys.clear()
     }
     suspend fun load(resetThanks:Boolean=true) {
@@ -173,17 +174,12 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
                 if(failure is ContentFailure && (failure.status==401 || failure.accountChanged))throw failure
                 statuses.add(contentFailureCopy(failure));null
             }
-            val depth=if(before.text("accountId")==viewerAccountId)replyDepth else 1
+            val replyCursor=if(before.text("accountId")==viewerAccountId)replyCursors.last() else null
             var page:JsonObject?=null;var currentReplies:List<JsonObject> = emptyList();var repliesAvailable=false
             try {
-                var fresh=api.request("$creatorId/replies", expectedAccountId=before.text("accountId")).jsonObject
-                val items=fresh["items"]!!.jsonArray.map{it.jsonObject}.toMutableList()
-                for(n in 1 until depth){
-                    val next=fresh["nextCursor"]?.jsonPrimitive?.contentOrNull?:break
-                    fresh=api.request("$creatorId/replies?cursor=$next", expectedAccountId=before.text("accountId")).jsonObject
-                    items.addAll(fresh["items"]!!.jsonArray.map{it.jsonObject})
-                }
-                page=fresh;currentReplies=items;repliesAvailable=true
+                val query="contentId=$contentId"+(replyCursor?.let{"&cursor=$it"}?:"")
+                val fresh=api.request("$creatorId/replies?$query", expectedAccountId=before.text("accountId")).jsonObject
+                page=fresh;currentReplies=fresh["items"]!!.jsonArray.map{it.jsonObject};repliesAvailable=true
             }catch(cancelled:kotlinx.coroutines.CancellationException){throw cancelled}catch(failure:Exception){
                 if(failure is ContentFailure && failure.authorityDenied)throw failure
                 statuses.add("Private replies are unavailable. Refresh to try again.")
@@ -208,7 +204,7 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
             if(before.text("accountId")!=after.text("accountId")){clearAuthority();error=QelvoraCopy.text("w5ContentAccountChanged");return}
             val currentMuted = after["muted"]?.jsonPrimitive?.booleanOrNull ?: throw ContentFailure(503, "note_preferences_unconfigured")
             val changed=viewerAccountId!=before.text("accountId")
-            if(changed){replyText="";thanksText="";share=false;identity=false;retryKeys.clear();signature=null;replyDepth=1}
+            if(changed){replyText="";thanksText="";share=false;identity=false;retryKeys.clear();signature=null;replyCursors=listOf(null)}
             viewerAccountId=before.text("accountId");muted=currentMuted;content=view;replies=currentReplies;cursor=page?.get("nextCursor")?.jsonPrimitive?.contentOrNull;thanks=mine;replyAccess=repliesAvailable;thanksAccess=thanksAvailable;replyPolicy=policy
             if(thanksAvailable && (resetThanks||changed)){thanksText=mine?.text("text").orEmpty();share=mine?.flag("shareWithCreatorDigest")?:false;identity=mine?.flag("showIdentity")?:false}
             error=statuses.joinToString("\n")
@@ -232,6 +228,19 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
         try { client?.request("$creatorId/$path", command, expectedAccountId=viewerAccountId) ?: error("The content service is not connected."); retryKeys.remove(fingerprint); if (clearReply) replyText = ""; load(resetThanks) }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (failure: Exception) { if(failure is ContentFailure && failure.status in 400..499)retryKeys.remove(fingerprint); if(failure is ContentFailure && failure.authorityDenied)clearAuthority(); error = contentFailureCopy(failure, action = true) }
+        finally { busy = false }
+    }
+    suspend fun changeReplyPage(next: String? = null, newer: Boolean = false) {
+        if (busy || loading || !currentAccess) return
+        if (newer) {
+            if (replyCursors.size < 2) return
+            replyCursors = replyCursors.dropLast(1)
+        } else {
+            if (next == null || runCatching { UUID.fromString(next) }.isFailure) return
+            replyCursors = replyCursors + next
+        }
+        busy = true
+        try { suspendAccess(); replies = emptyList(); cursor = null; load(false) }
         finally { busy = false }
     }
     LaunchedEffect(client, contentId) {
@@ -269,7 +278,8 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
                 if(consent.flag("shareText")||consent.flag("showHandle"))Button("Withdraw quote permission",ButtonVariant.QUIET,disabled=busy){scope.launch{mutate("replies/${reply.text("id")}/consent",buildJsonObject{put("version",consent.number("version"));put("shareText",false);put("showHandle",false);put("idempotencyKey",UUID.randomUUID().toString())})}}
                 Button("Withdraw private reply",ButtonVariant.QUIET,disabled=busy){scope.launch{mutate("replies/${reply.text("id")}/withdraw",buildJsonObject{put("version",reply.number("version"));put("idempotencyKey",UUID.randomUUID().toString())})}}
             }}
-            if (cursor != null) Button("Older replies", ButtonVariant.SECONDARY, disabled = busy || replyDepth >= 5) { scope.launch { if (!busy && replyDepth < 5) { busy = true; try { replyDepth++; load(false) } finally { busy = false } } } }
+            if (replyCursors.size > 1) Button("Newer replies", ButtonVariant.SECONDARY, disabled = busy || loading) { scope.launch { changeReplyPage(newer = true) } }
+            cursor?.let { next -> Button("Older replies", ButtonVariant.SECONDARY, disabled = busy || loading) { scope.launch { changeReplyPage(next) } } }
             if(thanks!=null && thanks?.flag("withdrawn")==false)Button("Withdraw Thanks",ButtonVariant.QUIET,disabled=busy || !thanksAccess){scope.launch{mutate("thanks",buildJsonObject{put("targetKind","content");put("targetId",contentId);put("text","");put("shareWithCreatorDigest",false);put("showIdentity",false);put("withdrawn",true);put("expectedVersion",thanks?.number("version")?:0);put("idempotencyKey",UUID.randomUUID().toString())},resetThanks=true)}}
             Button(if(muted==true) "Unmute Notes from this creator" else "Mute Notes from this creator",ButtonVariant.QUIET,disabled=busy || muted==null){scope.launch{val currentMuted=muted?:return@launch;mutate("mute",buildJsonObject{put("muted",!currentMuted)})}}
         }
@@ -317,7 +327,8 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
                         ContentChoice("Show my handle on the quote", consent.flag("showHandle"), busy || !consent.flag("shareText")) { choice(true, it) }
                     } }
                 }
-                if (cursor != null) Button("Older replies", ButtonVariant.SECONDARY, disabled = busy || replyDepth >= 5) { scope.launch { if (!busy && replyDepth < 5) { busy = true; try { replyDepth++; load(false) } finally { busy = false } } } }
+                if (replyCursors.size > 1) Button("Newer replies", ButtonVariant.SECONDARY, disabled = busy || loading) { scope.launch { changeReplyPage(newer = true) } }
+                cursor?.let { next -> Button("Older replies", ButtonVariant.SECONDARY, disabled = busy || loading) { scope.launch { changeReplyPage(next) } } }
                 Button(if(muted==true) "Unmute Notes from this creator" else "Mute Notes from this creator", ButtonVariant.QUIET, disabled = busy || muted==null) { scope.launch { val currentMuted=muted?:return@launch;mutate("mute", buildJsonObject { put("muted", !currentMuted) }) } }
             }
             QText("This helped", "display-md", modifier = Modifier.semantics { heading() }); ContentInput("Thanks · optional", thanksText, 2000) { thanksText = it }
