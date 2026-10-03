@@ -1,0 +1,13 @@
+# W5 original generation origin profile restriction
+
+Base is captured main `6a9f10a850fb4769c667f89a6304505dd6a04728`, normally merged into the owned branch. The separate SQL was first published at `c43b49b8366618e8cb208c3068283c1c200aa9df`. Its SHA256 is `09d3df2f3549d0267dce2fe049789e575b1c8f212ee887d2d5396f110bafc047`. Original0186 SQL remains byte-identical at `2f1c4b30133a0c8707b16b15c1e42a9daf539cb5edeeb48ad6a835352a4f444d`.
+
+The additive restrictive creator_profile SELECT policy applies only to the existing isolated creator_w5_generation_origin owner. It retains the original private read task, nonce, PID, full transaction, login, five-second scope and original creator/account pair. It creates no role, grant, scope, task, Actor or positive publication authority. The original function still performs its genuine generation_scope_matches checks; the policy does not re-enter the issuer after the signature family.
+
+PreparedContentGenerationOrigins now requires an independently qualified policy predicate checksum. The source-registration helper requires the exact W5 owner/path/SQL bytes to be executable in the canonical registry and present in the actual ledger; a reservation or readback cannot activate it. Current checks on the actual original worker client require the restrictive SELECT policy, exact role and predicate, isolated owner and forced original creator/private-scope RLS before and after the origin read. The genuine identity authorization remains LAST.
+
+Preparation uses the existing ContentHeldClient with finite actual pool acquisition and read/transaction deadlines. It keeps the borrowed client until completed rollback or original socket closure and discard. Origin/catalogue failures preserve the private non-enumerable cause for the original issuer's settlement; no public error detail is added.
+
+Backend typecheck, scoped ESLint/Prettier and diff checks pass. The initial typecheck caught the installed pg declaration omitting its supported query_timeout option; the final source retains the option through the existing structural QueryConfig pattern. No new tests, coverage work or SQL execution.
+
+Implemented source is distinct from runnable/integrated/verified/release-ready. Separate W8 allocation, original complete policy/ACL/function/caller catalogue, actual compiler and refusal/drift/cancellation qualification, a genuine accepted original generation task and positive signed-origin application operation remain pending. No accepted policy-definition or complete-catalogue hash is supplied. No existing worker factory calls this preparation port at this base. The owned database remains at61 canonical migrations, and all W5 API/web/device/build leases remain stopped.
