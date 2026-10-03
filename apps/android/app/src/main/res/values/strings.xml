@@ -119,6 +119,12 @@
   <string name="welcome_context" formatted="false">Maya · Ceramics · Kiln Club</string>
   <string name="pantopus_unavailable" formatted="false">Pantopus sign-in is not connected in this local build.</string>
   <string name="pantopus_unavailable_title" formatted="false">Pantopus sign-in is unavailable</string>
+  <string name="account_unavailable_title" formatted="false">We can\'t reach your account right now</string>
+  <string name="account_unavailable_body" formatted="false">Your session is kept on this device. Try again in a moment.</string>
+  <string name="page_unavailable_title" formatted="false">This page didn\'t load</string>
+  <string name="page_unavailable_body" formatted="false">Nothing you saved was changed. Try again in a moment.</string>
+  <string name="adult_only_title" formatted="false">This app is for adults</string>
+  <string name="adult_only_body" formatted="false">This app is available to adults aged 18 and over.</string>
   <string name="nav_home" formatted="false">Home</string>
   <string name="nav_discover" formatted="false">Discover</string>
   <string name="nav_requests" formatted="false">Requests</string>
@@ -954,12 +960,8 @@
   <string name="w6_retry_availability_save" formatted="false">Retry this availability save</string>
   <string name="w6_refresh_will_replace_availability_changes" formatted="false">Replace your unsaved changes with the saved availability?</string>
   <string name="w6_availability_account_changed" formatted="false">Your account changed. Reopen availability to continue.</string>
-  <string name="account_unavailable_title" formatted="false">We can\'t reach your account right now</string>
-  <string name="account_unavailable_body" formatted="false">Your session is kept on this device. Try again in a moment.</string>
   <string name="limit_reminders_off" formatted="false">Reminders at 50% and 100% of your limit are off. Lowering a limit is immediate.</string>
   <string name="limit_reminders_unknown" formatted="false">Lowering a limit is immediate.</string>
-  <string name="page_unavailable_title" formatted="false">This page didn\'t load</string>
-  <string name="page_unavailable_body" formatted="false">Nothing you saved was changed. Try again in a moment.</string>
   <string name="w5_content_status" formatted="false">Content status</string>
   <string name="w5_content_checking_access" formatted="false">Checking current access. Your input is kept during a connection interruption.</string>
   <string name="w5_content_check_current_access" formatted="false">Check current access</string>

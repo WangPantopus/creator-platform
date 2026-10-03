@@ -98,7 +98,8 @@ a.qv-stepin {
   text-decoration: none;
 }
 .identity-handle {
-  min-height: 844px;
+  /* Same reference height as Welcome, never taller than the visible area. */
+  min-height: min(844px, 100svh);
   padding: 16px 20px 36px;
   display: flex;
   flex-direction: column;
@@ -278,7 +279,9 @@ a.qv-stepin {
 .identity-welcome {
   width: 100%;
   max-width: 390px;
-  min-height: 844px;
+  /* Keep the 390x844 reference composition, but never push the primary
+     action below the visible area when browser toolbars are expanded. */
+  min-height: min(844px, 100svh);
   box-sizing: border-box;
   margin: 0 auto;
   display: flex;
