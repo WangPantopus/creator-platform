@@ -261,24 +261,27 @@ public struct TrustFanFeature: View {
         guard let client else { error = "The trust service is not configured."; return }
         let epoch = beginWork(); defer { finishWork(epoch) }
         var failure: Error?
-        do { let value: TrustHelp = try await client.request("help"); try Task.checkCancellation(); help = value } catch { if Task.isCancelled { return }; failure = error }
-        guard privateReady, !Task.isCancelled else { return }
-        if route.contains("privacy") { do { let value: TrustCapability = try await client.request("capabilities"); try Task.checkCancellation(); capability = value } catch { if Task.isCancelled { return }; capability = nil; failure = failure ?? error } }
+        do { let value: TrustHelp = try await client.request("help"); guard !Task.isCancelled, workEpoch == epoch else { return }; help = value } catch { guard !Task.isCancelled, workEpoch == epoch else { return }; failure = error }
+        guard privateReady, !Task.isCancelled, workEpoch == epoch else { return }
+        if route.contains("privacy") { do { let value: TrustCapability = try await client.request("capabilities"); guard !Task.isCancelled, privateReady, workEpoch == epoch else { return }; capability = value } catch { guard !Task.isCancelled, privateReady, workEpoch == epoch else { return }; capability = nil; failure = failure ?? error } }
         do {
             let client = try await capturedClient()
+            guard !Task.isCancelled, privateReady, workEpoch == epoch else { return }
             if route.hasPrefix("/trust") || route.contains("feedback") { }
-            else if route.contains("access") { let page: TrustItems<TrustAccess> = try await client.request("access-history"); history = page.items }
+            else if route.contains("access") { let page: TrustItems<TrustAccess> = try await client.request("access-history"); guard !Task.isCancelled, privateReady, workEpoch == epoch else { return }; history = page.items }
             else if route.contains("privacy") {
                 exportPayload = nil
                 let page: TrustItems<TrustJob> = try await client.request("privacy/jobs")
+                guard !Task.isCancelled, privateReady, workEpoch == epoch else { return }
                 jobs = page.items
                 if let selectedId = selectedJob?.id, jobs.contains(where: { $0.id == selectedId }) {
                     let detail: TrustJob = try await client.request("privacy/jobs/" + selectedId)
+                    guard !Task.isCancelled, privateReady, workEpoch == epoch else { return }
                     selectedJob = detail
                     jobs = jobs.map { $0.id == selectedId ? detail : $0 }
                 } else { selectedJob = nil }
-            } else { let page: TrustItems<TrustCase> = try await client.request("my-cases"); let inbox: TrustItems<TrustNotice> = try await client.request("inbox"); cases = page.items; notices = inbox.items }
-        } catch { guard !Task.isCancelled, privateReady else { return }; cases = []; notices = []; jobs = []; history = []; selectedJob = nil; exportPayload = nil; failure = failure ?? error }
+            } else { let page: TrustItems<TrustCase> = try await client.request("my-cases"); guard !Task.isCancelled, privateReady, workEpoch == epoch else { return }; let inbox: TrustItems<TrustNotice> = try await client.request("inbox"); guard !Task.isCancelled, privateReady, workEpoch == epoch else { return }; cases = page.items; notices = inbox.items }
+        } catch { guard !Task.isCancelled, privateReady, workEpoch == epoch else { return }; cases = []; notices = []; jobs = []; history = []; selectedJob = nil; exportPayload = nil; failure = failure ?? error }
         guard !Task.isCancelled, privateReady, workEpoch == epoch else { return }
         error = failure?.localizedDescription ?? ""
     }
