@@ -40,6 +40,7 @@ type CreatorAIIdentity = Readonly<{
   sessionId: string;
   signal: AbortSignal;
   end: () => void;
+  isSessionEnded: () => boolean;
 }>;
 type Preview = {
   revision: number;
@@ -307,6 +308,7 @@ export function CreatorAI({
   const identitySession = identity?.sessionId;
   const identitySignal = identity?.signal;
   const endIdentity = identity?.end;
+  const isSessionEnded = identity?.isSessionEnded;
   const request = useCallback(
     async (path: string, init: RequestInit = {}) => {
       const original = identitySignal
@@ -368,13 +370,15 @@ export function CreatorAI({
     [identityAccount, identitySession, identitySignal, endIdentity],
   );
   useEffect(() => {
-    if (!identitySignal || !identityAccount || !identitySession) return;
+    if (
+      !identitySignal ||
+      !identityAccount ||
+      !identitySession ||
+      !isSessionEnded
+    )
+      return;
     const sessionKey = `w2-session:${identityAccount}`;
-    const purge = () => {
-      ++fetchSequence.current;
-      ++sourceFileSequence.current;
-      actorKey.current = null;
-      pendingKeys.current.clear();
+    const purgeStoredDrafts = () => {
       try {
         const prefixes = ["w2-source", "w2-interview", "w2-config"].map(
           (kind) => `${kind}:${identityAccount}:`,
@@ -388,16 +392,26 @@ export function CreatorAI({
         /* Storage may already be unavailable; the account boundary unmounts. */
       }
     };
-    if (identitySignal.aborted) purge();
+    const dispose = () => {
+      ++fetchSequence.current;
+      ++sourceFileSequence.current;
+      actorKey.current = null;
+      pendingKeys.current.clear();
+      // The canonical boundary disposes private React state on navigation and
+      // effect restart too. Only its original genuine session end deletes the
+      // stored buffers that the same continuing session may recover.
+      if (isSessionEnded()) purgeStoredDrafts();
+    };
+    if (identitySignal.aborted) dispose();
     else {
       // Access-token rotation retains the server session ID. Fresh sign-in
       // creates another ID, so a draft left on an unmounted page cannot return.
-      if (readDraft(sessionKey) !== identitySession) purge();
+      if (readDraft(sessionKey) !== identitySession) purgeStoredDrafts();
       storeDraft(sessionKey, identitySession);
-      identitySignal.addEventListener("abort", purge, { once: true });
+      identitySignal.addEventListener("abort", dispose, { once: true });
     }
-    return () => identitySignal.removeEventListener("abort", purge);
-  }, [identityAccount, identitySession, identitySignal]);
+    return () => identitySignal.removeEventListener("abort", dispose);
+  }, [identityAccount, identitySession, identitySignal, isSessionEnded]);
   const edit = (next: Configuration) => {
     if (!dirtyRef.current) draftRevision.current = state?.revision ?? null;
     setConfiguration(next);
