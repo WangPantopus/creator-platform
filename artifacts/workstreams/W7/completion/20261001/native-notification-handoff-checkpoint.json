@@ -1,0 +1,133 @@
+{
+  "at": "2026-10-01T19:51:51.963419+00:00",
+  "source": "d511b446c958783802bd5e64976ad942380da823",
+  "scopeComplete": false,
+  "noNewTestsOrFlows": true,
+  "personalReview": true,
+  "handoff": "docs/workstreams/handoffs/W7-2026-10-01-completion.md",
+  "prompt": "docs/workstreams/prompts/W7-completion-handoff-2026-10-01.md",
+  "checks": {
+    "sessionBinding": {
+      "session": 58631,
+      "exit": 0,
+      "contracts": 9
+    },
+    "latestBackend": {
+      "session": 68867,
+      "exit": 0,
+      "contracts": 9,
+      "buildLintFormat": true
+    },
+    "latestShippingIOS": {
+      "session": 4874,
+      "exit": 0,
+      "signatureExit": 0
+    },
+    "existingSwift": {
+      "session": 44490,
+      "exit": 0,
+      "checks": 18,
+      "originalComparisons": 110,
+      "newReferences": 0,
+      "frozenLockfile": false,
+      "transitiveResolutionDifference": "local xctest-dynamic-overlay1.13.1; restored committed swift-issue-reporting2.1.1"
+    },
+    "productionWebBuild": {
+      "session": 92033,
+      "exit": 0
+    }
+  },
+  "preservedFailures": [
+    {
+      "log": "ios-push-build.log",
+      "exit": 65,
+      "reason": "Swift switch-expression placement; repaired"
+    },
+    {
+      "log": "ios-push-build-repair.log",
+      "exit": 65,
+      "reason": "catch error shadows published error; repaired"
+    },
+    {
+      "log": "web-push-runtime.log",
+      "reason": "wrong API environment variable; corrected before signed-out observation"
+    },
+    {
+      "image": "ios-push-signed-out.png",
+      "reason": "captured before rendered first frame; later actual frame observed"
+    }
+  ],
+  "images": {
+    "ios-push-signed-out.png": {
+      "sha256": "bd522e96ca9b38e72b40f7e735be3cfa9497c7449aa3b2eed5aa15dcbd636a7c",
+      "width": 1170,
+      "height": 2532,
+      "observed": "premature blank launch frame"
+    },
+    "ios-push-signed-out-observed.png": {
+      "sha256": "6f1c60481b883bcf21fbda5db0fea6a2f38c23f1c3419ec8f3b2becbb2bfd4b0",
+      "width": 1170,
+      "height": 2532,
+      "observed": "personally observed rendered signed-out Welcome, not populated permission or provider acceptance"
+    }
+  },
+  "actualOperation": {
+    "web": "signed-out settings and contextual arrival only; sign-in unavailable without approved public origin/provider",
+    "ios": "current signed shipping cold launch and rendered Welcome only; AX interaction denied",
+    "notificationIdUnauthenticatedHTTPStatus": 401,
+    "readinessBody": {
+      "ready": false,
+      "code": "trust_unconfigured"
+    },
+    "readinessHTTPStatusThisWaveSeparatelyCaptured": false,
+    "android": "not operated on current source",
+    "providers": "not configured or called",
+    "ownerGeneratedNotifications": "none; genuine authority absent"
+  },
+  "latestPreviouslyPublishedCI": {
+    "head": "7f71c2faeed3143b7a38abc23acc57324312964d",
+    "foundationRun": 36908886586,
+    "trustRun": 36908878705,
+    "trustConclusion": "success",
+    "jobs": [
+      {
+        "name": "android-foundation",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "ios-foundation",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "name": "web-and-backend",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "android-runtime",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "web-visual",
+        "status": "queued",
+        "conclusion": ""
+      }
+    ],
+    "doesNotAcceptCurrentSource": true,
+    "iosFailureReceipt": "ci-ios-7f71-failure.json"
+  },
+  "remainingCriticalWork": [
+    "Repair hosted Xcode26.5 failure93 original comparisons without changing original references or tolerances",
+    "Android actual SDK permission/channel/token/session/tap wiring and supported token/FID contract",
+    "Durable installation ordering when no registration row exists or after deletion; legacy clients lack revision",
+    "Genuine owner/recipient/provider authority held through submission and actual in-flight revocation races",
+    "Globally recent general large-account W3/W4/W6 Home and bounded rotating purpose-issued producers",
+    "Full original19 notifications/13 populated Light-Night artboards/consent-sharing-credit/insight-activation-retention-measurement/W8 protected streaming/release matrix"
+  ],
+  "sourceHashes": 86,
+  "archivedLogs": 81,
+  "resourcesStopped": true
+}

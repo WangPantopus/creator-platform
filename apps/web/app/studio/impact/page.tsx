@@ -64,7 +64,7 @@ export default async function Impact() {
               </p>
             </>
           ) : (
-            <NoData title={growthCopy.growthYourFirstDigestIsOnItsWay}>
+            <NoData title={growthCopy.growthNoUpdatesYet}>
               {
                 growthCopy.growthAWeeklyDigestAppearsWhenTheActivityAndConsentedThanks
               }

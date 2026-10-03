@@ -340,6 +340,41 @@ export async function createTrustRuntime(options: {
     assertActorAllowed,
     assertScopeAllowed,
     assertRestoredInTransaction,
+    /** W1 calls this before private nonce creation and at its bookends. This
+     * is restoration only; SQL0093 runs from W1's actual private claim/read. */
+    assertGenerationWorkerRestoredInTransaction: async (client: PoolClient) => {
+      await client.query("SAVEPOINT w8_generation_restoration");
+      try {
+        const bound = (
+          await client.query<{
+            login: string;
+            role: string;
+            account: string | null;
+            session: string | null;
+          }>(`SELECT session_user AS login,current_user AS role,
+          nullif(current_setting('app.account_id',true),'') AS account,
+          nullif(current_setting('app.identity_session_id',true),'') AS session`)
+        ).rows[0];
+        if (
+          !bound ||
+          bound.login !== "creator_generation_worker" ||
+          bound.role !== bound.login ||
+          bound.account !== null ||
+          bound.session !== null
+        )
+          throw new DomainError(
+            "generation_restoration_unavailable",
+            "Current generation recovery authority is unavailable.",
+            503,
+          );
+        await assertRestoredInTransaction(client);
+      } catch (error) {
+        await client.query("ROLLBACK TO SAVEPOINT w8_generation_restoration");
+        throw error;
+      } finally {
+        await client.query("RELEASE SAVEPOINT w8_generation_restoration");
+      }
+    },
     assertContentAllowedInTransaction: async (
       client: PoolClient,
       actor: Actor,

@@ -1,0 +1,184 @@
+{
+  "recordedAt": "2026-10-01T10:46:17.665Z",
+  "baseRevision": "5425598bfee787314b48e960a1bba852ef432459",
+  "sourceState": "Modified generator scripts; generated output stays byte-for-byte unchanged.",
+  "filesCompared": 15,
+  "changedFiles": 0,
+  "before": [
+    {
+      "path": "packages/api/generated/openapi.json",
+      "sha256": "af9509f9c2a46c1d0f2368d746305caff47a5ea6b3dddff4f3a22baaa1b07077",
+      "mtimeNanoseconds": "1790850016439506883"
+    },
+    {
+      "path": "packages/tokens/tokens.css",
+      "sha256": "596d7a31461c8a940b72599cda95e4e16fdf60cb468730e5481f1678b59c18bf",
+      "mtimeNanoseconds": "1790850016594259582"
+    },
+    {
+      "path": "packages/tokens/src/index.ts",
+      "sha256": "b4618b134c39a5d1ba631cf19e6a8a6ecb0078b23017d91eb0b7a2b60d30d096",
+      "mtimeNanoseconds": "1790850016594778507"
+    },
+    {
+      "path": "packages/brand/src/index.ts",
+      "sha256": "d5fe1749868414817e3b866de84db8133101cd5d749b8a7350b9e3a2950608e3",
+      "mtimeNanoseconds": "1790850016595136782"
+    },
+    {
+      "path": "packages/copy/src/index.ts",
+      "sha256": "228bf644c457c4e2f8b7effb10ce7345eecdd33e8022f06c4479dc881c411731",
+      "mtimeNanoseconds": "1790850016595848686"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/QelvoraTokens.swift",
+      "sha256": "7a48b96a3de28460e316083536662d59fa124ac8498e45e7121a1e73d3898ac7",
+      "mtimeNanoseconds": "1790850016596501666"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/QelvoraCopy.swift",
+      "sha256": "b4cd6917d8b8e14846f65bbd1c47b5d75c8704dc40b8a6669e9ebd87cae9713f",
+      "mtimeNanoseconds": "1790850016597437255"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/Localizable.xcstrings",
+      "sha256": "4d3da0bcf7af8ef37b06f40179ec70b335cc5d70fb9086349586f9e9f1bd6e38",
+      "mtimeNanoseconds": "1790850016599708789"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraTokens.kt",
+      "sha256": "8d8d3abac99e12cefddfd0525d7627be1c54cd157bc92c202c890f6916f30e9a",
+      "mtimeNanoseconds": "1790850016596747853"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt",
+      "sha256": "619f2be91296c705cb62aaea54415bf5a98e0ad24dc0ffad5d717f421e21f168",
+      "mtimeNanoseconds": "1790850016598264872"
+    },
+    {
+      "path": "apps/android/app/src/main/res/values/strings.xml",
+      "sha256": "6538841a25bd87fbfa6f97c947192096910ed6f119552b54fcc1687443321b03",
+      "mtimeNanoseconds": "1790850016600508208"
+    },
+    {
+      "path": "apps/ios/Sources/Resources/Glyphs.json",
+      "sha256": "c8d8c6e480edc258c9ce93290e8a8fa50235d27c4fea21667afe5cc6500ac82f",
+      "mtimeNanoseconds": "1790850016600762287"
+    },
+    {
+      "path": "apps/android/app/src/main/assets/Glyphs.json",
+      "sha256": "c8d8c6e480edc258c9ce93290e8a8fa50235d27c4fea21667afe5cc6500ac82f",
+      "mtimeNanoseconds": "1790850016600944090"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/QelvoraAPI.swift",
+      "sha256": "296bcd229befdbe8ab4ce642970230d86abee866e885a3ad26381a534192cbe3",
+      "mtimeNanoseconds": "1790850016745204547"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt",
+      "sha256": "ab2cec75072a49ecd24c12367a201d6b23070cfe684cba7853ecb215e10ee041",
+      "mtimeNanoseconds": "1790850016746012966"
+    }
+  ],
+  "after": [
+    {
+      "path": "packages/api/generated/openapi.json",
+      "sha256": "af9509f9c2a46c1d0f2368d746305caff47a5ea6b3dddff4f3a22baaa1b07077",
+      "mtimeNanoseconds": "1790850016439506883"
+    },
+    {
+      "path": "packages/tokens/tokens.css",
+      "sha256": "596d7a31461c8a940b72599cda95e4e16fdf60cb468730e5481f1678b59c18bf",
+      "mtimeNanoseconds": "1790850016594259582"
+    },
+    {
+      "path": "packages/tokens/src/index.ts",
+      "sha256": "b4618b134c39a5d1ba631cf19e6a8a6ecb0078b23017d91eb0b7a2b60d30d096",
+      "mtimeNanoseconds": "1790850016594778507"
+    },
+    {
+      "path": "packages/brand/src/index.ts",
+      "sha256": "d5fe1749868414817e3b866de84db8133101cd5d749b8a7350b9e3a2950608e3",
+      "mtimeNanoseconds": "1790850016595136782"
+    },
+    {
+      "path": "packages/copy/src/index.ts",
+      "sha256": "228bf644c457c4e2f8b7effb10ce7345eecdd33e8022f06c4479dc881c411731",
+      "mtimeNanoseconds": "1790850016595848686"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/QelvoraTokens.swift",
+      "sha256": "7a48b96a3de28460e316083536662d59fa124ac8498e45e7121a1e73d3898ac7",
+      "mtimeNanoseconds": "1790850016596501666"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/QelvoraCopy.swift",
+      "sha256": "b4cd6917d8b8e14846f65bbd1c47b5d75c8704dc40b8a6669e9ebd87cae9713f",
+      "mtimeNanoseconds": "1790850016597437255"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/Localizable.xcstrings",
+      "sha256": "4d3da0bcf7af8ef37b06f40179ec70b335cc5d70fb9086349586f9e9f1bd6e38",
+      "mtimeNanoseconds": "1790850016599708789"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraTokens.kt",
+      "sha256": "8d8d3abac99e12cefddfd0525d7627be1c54cd157bc92c202c890f6916f30e9a",
+      "mtimeNanoseconds": "1790850016596747853"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt",
+      "sha256": "619f2be91296c705cb62aaea54415bf5a98e0ad24dc0ffad5d717f421e21f168",
+      "mtimeNanoseconds": "1790850016598264872"
+    },
+    {
+      "path": "apps/android/app/src/main/res/values/strings.xml",
+      "sha256": "6538841a25bd87fbfa6f97c947192096910ed6f119552b54fcc1687443321b03",
+      "mtimeNanoseconds": "1790850016600508208"
+    },
+    {
+      "path": "apps/ios/Sources/Resources/Glyphs.json",
+      "sha256": "c8d8c6e480edc258c9ce93290e8a8fa50235d27c4fea21667afe5cc6500ac82f",
+      "mtimeNanoseconds": "1790850016600762287"
+    },
+    {
+      "path": "apps/android/app/src/main/assets/Glyphs.json",
+      "sha256": "c8d8c6e480edc258c9ce93290e8a8fa50235d27c4fea21667afe5cc6500ac82f",
+      "mtimeNanoseconds": "1790850016600944090"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/QelvoraAPI.swift",
+      "sha256": "296bcd229befdbe8ab4ce642970230d86abee866e885a3ad26381a534192cbe3",
+      "mtimeNanoseconds": "1790850016745204547"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt",
+      "sha256": "ab2cec75072a49ecd24c12367a201d6b23070cfe684cba7853ecb215e10ee041",
+      "mtimeNanoseconds": "1790850016746012966"
+    }
+  ],
+  "generation": "12 shared resources / 96 OpenAPI operations",
+  "checks": "Canonical generation and strict generation check passed; no tests added.",
+  "implementation": [
+    {
+      "path": "scripts/generate-shared.mjs",
+      "sha256": "d85bd80d7b57d1c0bba17a4e6b7d52b4fbb85bd0fe85651cbee315f2bb4ef508"
+    },
+    {
+      "path": "scripts/generate-native-api.mjs",
+      "sha256": "4ccbd8a738cfbf67beb61fd3fd1dbc45cef0949b200ff13527b5aa06c0525323"
+    },
+    {
+      "path": "packages/api/scripts/generate-openapi.ts",
+      "sha256": "45894f4ccce80167a709256392d34800cd898ddccb3e2596a1106daea9cb1a1f"
+    }
+  ],
+  "supportingChecks": {
+    "apiTypecheck": "passed",
+    "affectedEslint": "passed",
+    "affectedPrettier": "passed",
+    "existingSharedChecks": "2/2 passed; original checks unchanged"
+  },
+  "limits": "No elapsed build-time, performance percentile or native UI acceptance is inferred. The existing strict stale-output checks and write-on-change behavior are preserved. Generated bytes are identical, so existing app build/interaction receipts remain source-specific supporting evidence; no redundant consumer rebuild was triggered by this tooling-only repair."
+}

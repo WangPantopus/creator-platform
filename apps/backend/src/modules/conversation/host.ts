@@ -23,6 +23,12 @@ import { ProviderPolicySchema } from "../../../../../packages/api/src/conversati
 import { conversationAgentGenerator } from "./agent-generator.js";
 import { ConversationCorrections } from "./corrections.js";
 import { ConversationLineage } from "./lineage.js";
+import type { ReplyFeedbackAuthority } from "./lineage.js";
+import {
+  IdentityIntroOffers,
+  type IntroOfferPolicy,
+  type IntroOfferRetention,
+} from "../identity/intro-offers.js";
 import { ConversationRecordings } from "./recordings.js";
 import { createConversationRuntime } from "./runtime.js";
 
@@ -47,6 +53,11 @@ const DevelopmentEconomicsSchema = z.strictObject({
 
 /** Inputs supplied by their owners. Absent inputs keep their paths off. */
 export type ConversationHostProducers = {
+  /** W8: actual feedback notice/consent/expiry; no development substitute. */
+  feedbackAuthority?: ReplyFeedbackAuthority;
+  /** W8: approved minimal account-level intro-offer use and retention. */
+  introOfferPolicy?: IntroOfferPolicy;
+  introOfferRetention?: IntroOfferRetention;
   /** W4: genuinely prepared original group fulfillment on this exact graph. */
   fulfillmentPlans?: import("../commerce/fulfillment-plans.js").CommerceFulfillmentPlans;
   /** W2: the configured license authority for this host. */
@@ -210,12 +221,26 @@ export async function composeConversationHost(
   const lineage = await ConversationLineage.prepare({
     database: runtime.database,
     migrationVersion: migrations.lineage,
+    feedbackAuthority: producers.feedbackAuthority,
     feedbackMigration: await registeredChecksum(
       migrations.feedbackConsent,
     ).then((checksum) =>
       checksum ? { version: migrations.feedbackConsent, checksum } : undefined,
     ),
   });
+  if (
+    lineage &&
+    producers.feedbackAuthority &&
+    producers.introOfferPolicy &&
+    producers.introOfferRetention
+  )
+    lineage.configureIntroOffers(
+      await IdentityIntroOffers.prepare({
+        database: runtime.database,
+        assertOfferAllowed: producers.introOfferPolicy,
+        retention: producers.introOfferRetention,
+      }),
+    );
   const corrections = lineage
     ? await ConversationCorrections.prepare({
         database: runtime.database,

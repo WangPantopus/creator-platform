@@ -1,0 +1,23 @@
+{
+  "capturedAt": "2026-10-01T12:25:47.977246+00:00",
+  "compiledSource": "17b8df06818e21de6527201245c9de8b6f4ff286",
+  "health": {
+    "status": "ok",
+    "ready": false,
+    "foundationReady": true,
+    "identity": "configured",
+    "identityMode": "development",
+    "generation": "unconfigured",
+    "registeredFeatures": [
+      "conversation",
+      "creator-ai",
+      "media",
+      "content",
+      "studio",
+      "growth"
+    ],
+    "readinessEndpoint": "/health/ready",
+    "database": "configured",
+    "featureEnabled": true
+  }
+}

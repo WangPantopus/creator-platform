@@ -1,0 +1,155 @@
+{
+  "recordedAt": "2026-10-01T13:52:36.295801+00:00",
+  "applicationSourceRevision": "aade8649cf870bd5b44df2b9f2a40a3d8d4a3af4",
+  "integratedMainRevision": "3de0f14ba82139c9d694ddd3cd676216103a036c",
+  "localStack": [
+    "codex/w1-comprehension-focus-20261001 558d5c9d4be29ac60e06b396dd58432251c90d36",
+    "codex/w1-generation-efficiency-20261001 aa102dba44258fd265e023501340565f98830d2c",
+    "codex/w1-home-host-20261001 20022da3a36ef60055fb70636e47cbca969f4478",
+    "codex/w1-onboarding-timing-20261001 f4f5bd9a1d284b5da8b5ef146d8aee845ef14679",
+    "codex/w1-resume-20261001 b19ae6ce0091cfd24ca5303b0b579eb07cb88b5d",
+    "codex/w1-signing-authority-20261001 aade8649cf870bd5b44df2b9f2a40a3d8d4a3af4",
+    "codex/w1-team-state-20261001 6b22113944d8bc57163219df366ae8bbd2f3fa4f"
+  ],
+  "supportingChecks": {
+    "generation": "passed; 12 resources / 97 operations; no generated diff",
+    "backend": "passed; TypeScript and bundling",
+    "productionWeb": "passed",
+    "shippingIos": "passed; normal generic Simulator build / maximum 2 jobs",
+    "shippingAndroid": "passed; offline no-daemon / maximum 2 workers; 58s, 37 tasks, 4 executed",
+    "originalBackendContracts": "9 passed; unchanged assertions; 1.38s total",
+    "newTestCode": false
+  },
+  "products": {
+    "backend": {
+      "path": "apps/backend/dist/server.mjs",
+      "sha256": "4aa2949a33b93c935a7051a3c1f81c1b2b870b2dd4f2ca563f1ae310d4fe46b8",
+      "bytes": 1182955
+    },
+    "webBuildId": "zEdH0F1H4GmyS8-ATGDhW",
+    "ios": {
+      "bundleIdentifier": "com.pantopus.qelvora",
+      "displayName": "Qelvora",
+      "executable": {
+        "path": "artifacts/workstreams/W1/build/ios-20261001/Build/Products/Debug-iphonesimulator/QelvoraApp.app/QelvoraApp",
+        "sha256": "a4132fafe059e54e44aaaec2db801fc0623ce5d5ca3c944269b95be93616beff",
+        "bytes": 123808
+      },
+      "debugLibrary": {
+        "path": "artifacts/workstreams/W1/build/ios-20261001/Build/Products/Debug-iphonesimulator/QelvoraApp.app/QelvoraApp.debug.dylib",
+        "sha256": "6e262678832f2831d090ba44e9517ff2a5f3e42d2236554d9c3efa2d9929f6ad",
+        "bytes": 58438560
+      },
+      "strictSignature": "passed; no install, launch or interaction"
+    },
+    "android": {
+      "path": "artifacts/workstreams/W1/build/android-20261001/app/outputs/apk/debug/app-debug.apk",
+      "sha256": "65708fc104ad001ad0ecafc22e96cc214517ce0f89a24f0b63bfb72f6e1fbfdf",
+      "bytes": 15033608
+    }
+  },
+  "freshRename": {
+    "sourceRevision": "aade8649cf870bd5b44df2b9f2a40a3d8d4a3af4",
+    "brand": "W1Rename",
+    "textFilesAndPathsRenamed": 820,
+    "generation": "passed; 12 resources / 97 operations",
+    "backend": "passed",
+    "web": "passed",
+    "ios": "passed; normal signed build; maximum 2 jobs; reused main SourcePackages cache",
+    "android": "not run; cleanup request forbids further heavy local builds until explicit resumption",
+    "products": {
+      "backend": {
+        "path": "/private/tmp/creator-platform-w1-rename-latest-20261001/apps/backend/dist/server.mjs",
+        "sha256": "4ee7adb68f621bfc63ede9379b5e68524a20c7d0756f5b250286311a386e5ea7",
+        "bytes": 1182963
+      },
+      "webBuildId": "Fhdbc6SrTBabsWYTVHr-D",
+      "ios": {
+        "bundleIdentifier": "com.pantopus.w1rename",
+        "displayName": "W1Rename",
+        "executable": {
+          "path": "artifacts/workstreams/W1/build/rename-ios-latest-20261001/Build/Products/Debug-iphonesimulator/W1RenameApp.app/W1RenameApp",
+          "sha256": "64bfd47975f1d302d35538d4736d564a65a2b62d86a3763c79e50c50fe6417be",
+          "bytes": 123808
+        },
+        "debugLibrary": {
+          "path": "artifacts/workstreams/W1/build/rename-ios-latest-20261001/Build/Products/Debug-iphonesimulator/W1RenameApp.app/W1RenameApp.debug.dylib",
+          "sha256": "e737da36a0c388db09e67cf98b7588d14da96e657cee162332b1f4f453884fa7",
+          "bytes": 58885504
+        },
+        "strictSignature": "passed; no install, launch or interaction"
+      }
+    },
+    "binaryAssets": 1219,
+    "changedBinaryAssets": 0,
+    "originalIosReferences": 110,
+    "sourcePathDigestAggregate": "d65805bff268a0d7ba8a0543eb55cc50f2ac0b4cc219575f8687db25b7685b14"
+  },
+  "privateLogs": [
+    {
+      "name": "latest-main-backend-build.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+      "bytes": 41
+    },
+    {
+      "name": "latest-main-web-build.log",
+      "sha256": "e1a9d42be5ae06875def139506866cf6eaffc90aa5fdb4019e376b4e3f76ce6f",
+      "bytes": 2639
+    },
+    {
+      "name": "latest-main-ios-build.log",
+      "sha256": "098aaae6c44609320326d2022d6ce39d9edc8f912371861008058643f9405781",
+      "bytes": 159833
+    },
+    {
+      "name": "latest-main-android-build.log",
+      "sha256": "bf26c04e4504d5863afc1d4821d073f85c654d9f68637372eea1f119fd0cccf7",
+      "bytes": 281
+    },
+    {
+      "name": "latest-main-android-build-corrected.log",
+      "sha256": "b35b47b00398bfbe8c9dfd678391e2380f43a3bfcf43aaf9ceb06cc605a7aeeb",
+      "bytes": 2601
+    },
+    {
+      "name": "latest-rename-install.log",
+      "sha256": "3d3fc8f60aba4dc02973fbacd8568cdf3012700cd1cb42e4e4e02ec9163e1979",
+      "bytes": 982
+    },
+    {
+      "name": "latest-rename-backend-build.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+      "bytes": 41
+    },
+    {
+      "name": "latest-rename-web-build.log",
+      "sha256": "61bf95999dccf066c3ac90c08c6b36a5819144d71120ac1abc889e16061da229",
+      "bytes": 2639
+    },
+    {
+      "name": "latest-rename-ios-build.log",
+      "sha256": "d660eb00c07cd9f5f66638bf70da06c9402748bb1672f5abc3bf3c2dc845b15f",
+      "bytes": 319104
+    }
+  ],
+  "limits": [
+    "Compilation and unchanged checks are supporting evidence; no browser/native/provider acceptance",
+    "Initial Android attempt exited before compilation due to wrong JDK path; corrected existing private tools path passed",
+    "Compatible local Swift resolution used; tracked Package.resolved and next-env.d.ts restored to exact HEAD",
+    "No renamed Android build pass on this source",
+    "No new local heavy builds/runtimes until cleanup restriction is explicitly resumed",
+    "No new device allocated; API/web/database already stopped",
+    "CI requires Code Review GitHub connection; unavailable is not pass"
+  ],
+  "resourceRelease": {
+    "recordedAt": "2026-10-01T13:53:07.077233+00:00",
+    "removed": [
+      "/private/tmp/creator-platform-w1-rename-latest-20261001",
+      "artifacts/workstreams/W1/build/rename-ios-latest-20261001"
+    ],
+    "qualification": "Owned disposable source/products removed after digest retention. No active W1 build, owned API/web listener or allocated device. Private keys/configuration and source retained; peer processes not touched.",
+    "formerInteractiveContainer": "absent at inspection",
+    "matchingNamedVolume": "absent at inspection",
+    "privateConfigurationAndKeys": "retained outside Git; not proof of persisted database state"
+  }
+}

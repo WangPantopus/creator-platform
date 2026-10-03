@@ -1,0 +1,24 @@
+{
+  "baseRevision": "af38420d7aa5b07df009a01a4be3e8026f753d2a",
+  "migration": {
+    "version": "0044_w4_personal_approval",
+    "owner": "W4",
+    "path": "apps/backend/src/modules/commerce/schema-approval.sql",
+    "checksum": "4480936ea99adbc954f1e3444673772922c49e6dab8b9cce9351cf6d61c493fb"
+  },
+  "checks": {
+    "backendBuildAndTypes": "passed",
+    "scopedEslint": "passed",
+    "prettier": "passed",
+    "diffCheck": "passed",
+    "sourceDescriptor": "original0044",
+    "existingSchemaQuery": "ready",
+    "runtimeRole": "creator_runtime",
+    "runtimeSuperuser": false,
+    "runtimeBypassRls": false,
+    "businessWrites": 0
+  },
+  "integration": "W1 canonical server integration pending",
+  "positiveSignedDelivery": "not performed",
+  "releaseReady": false
+}

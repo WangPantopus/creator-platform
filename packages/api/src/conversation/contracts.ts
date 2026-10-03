@@ -96,6 +96,14 @@ export const ReplyFeedbackInputSchema = z
     },
   );
 export type ReplyFeedbackInput = z.infer<typeof ReplyFeedbackInputSchema>;
+/** Eligibility from explicit helpful feedback, never proof of presentation. */
+export const ConversationIntroOfferSchema = z.strictObject({
+  offerId: IdSchema.nullable(),
+});
+export const ReplyFeedbackResultSchema = z.strictObject({
+  rating: ReplyFeedbackRatingSchema.nullable(),
+  introOffer: ConversationIntroOfferSchema.nullable(),
+});
 export const ConversationCorrectionCommandSchema = z.strictObject({
   actType: z.literal("correction"),
   subjectId: IdSchema,

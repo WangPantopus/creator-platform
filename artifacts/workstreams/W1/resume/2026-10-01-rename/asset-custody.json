@@ -1,0 +1,10 @@
+{
+  "recordedAt": "2026-10-01T10:54:48.990Z",
+  "sourceRevision": "5425598bfee787314b48e960a1bba852ef432459",
+  "disposableName": "W1Rename",
+  "checkedAssets": 1111,
+  "changedAssets": 0,
+  "originalAssetAggregateSha256": "a254e6650c2f1f2ec8d3e584c27e27a02e3ade5d69e4b0bcc54fbfde88a882ec",
+  "referenceIosCount": 110,
+  "qualification": "Read-only SHA-256 comparison of every tracked image/font/media/PDF asset between live source and the disposable renamed copy. Original reference pixels remain immutable, including the separately documented W7 exception at this source revision. This is asset custody, not visual or native interaction acceptance."
+}

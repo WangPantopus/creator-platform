@@ -1,0 +1,60 @@
+{
+  "recordedAt": "2026-10-02T12:52:06.158144+00:00",
+  "baseHead": "067a81d85a62676446c5f37969c6615650ef8f76",
+  "supersedes": "core-follows-receipt.json remains preserved as3f proposal history",
+  "state": "Corrected canonical core context; SQL unnumbered/unregistered/unapplied; no higher W7 activation",
+  "sources": [
+    {
+      "path": "apps/backend/src/modules/growth/core-follows.ts",
+      "sha256": "00aaa202cd1a7076558d6fc1d744fc97b88a915cad1152cb20a497eefb05f505"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/migrations/pending_w7_core_follow_metadata.sql",
+      "sha256": "3a87bd2c899ce0083b9d7e97eb79e93372fb83aa8f941e1f29ea3f61f5e821b6"
+    },
+    {
+      "path": "apps/backend/src/modules/identity/request-authority.ts",
+      "sha256": "ae27c9e9f851f76e6921580763677a31bc95a1b857721cf4f54d7ed505d93fac"
+    }
+  ],
+  "definitionSha256": "f886d1338005e5260cc6f827eb77dd2ab2baaa2feb3008d8a3af92c600c70832",
+  "actualW1SessionSource": "dcb77f23833f8a79761ee072b018e7aa78d765b7",
+  "actualW1SessionFileByteIdentical": true,
+  "custody": [
+    "Real stored fan_profile account row; no app.fan_id prerequisite or invented GUC",
+    "Actual W1 ALS/account/current held session binds app.identity_session_id transaction-locally after its successful current FOR SHARE check",
+    "Actual core creator_runtime,READ COMMITTED,xid,current creator/account; same held owner family/negative gates required",
+    "W8 held descriptor literal0101_w7_core_follow_metadata only; actual registry/checksum required, no SQL applied beyond human0044-0060 ceiling",
+    "Metadata NOLOGIN/NOINHERIT/no memberships/rolconfig, no namespace/relation ownership or other function ownership, no schema CREATE anywhere",
+    "Exact fixed function ACL/effective column/table grants/forced RLS/WITH CHECKfalse; session-only metadata, no raw Growth/core membership expansion"
+  ],
+  "checks": {
+    "backendBuild": "exit0 after directory repair",
+    "lint": "exit0",
+    "originalContracts": "9 passed, exit0",
+    "sharedGenerator": "12 shared files verified, exit0",
+    "productionWeb": "shipping production build exit0",
+    "ios": "shipping signed build exit0; codesign --deep --strict exit0",
+    "android": "shipping APK build exit0",
+    "noNewTestCode": true
+  },
+  "actualCatalogue": "40 migrations; no function/namespace, unbound fan GUCnull, verified creators0. Read-only refusal only",
+  "runtimeAcceptance": "Unrelated account,session revocation,busy row,positive Follow,denial,erasure and populated current content still unobserved; no source slot installed",
+  "cleanup": {
+    "stoppedAt": "2026-10-02T12:47:21.298437+00:00",
+    "apiExit": 0,
+    "webExit": 143,
+    "softwareEmulatorExit": 0,
+    "idbCompanionExit": 0,
+    "simulator": "FAB31883-2F36-4E50-83B3-D9654B60FF00 shut down",
+    "emulator": "emulator-5580 killed explicitly",
+    "released": [
+      "creator-platform-simulator-slot-1",
+      "creator-platform-emulator-slot-1"
+    ],
+    "postgres": "creator-platform-w7-macstudio-20261001 normally stopped",
+    "browser": "own w7ImpactTab closed",
+    "peerResourcesTouched": false
+  },
+  "definitionHashMode": "Exact UTF-8 proposed CREATE FUNCTION statement through body before REVOKE; no installed pg_get_functiondef exists"
+}

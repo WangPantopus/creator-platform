@@ -6,11 +6,14 @@ import type { ApprovedSentence } from "../agent/runtime.js";
 import type { ConversationPrivacyFamily } from "./privacy.js";
 import type { ConversationRecordings } from "./recordings.js";
 import type { ConversationLineageProjection } from "./lineage-projection.js";
+import { IdentityIntroOffers } from "../identity/intro-offers.js";
 import { IdSchema } from "@qelvora/api";
 import {
   ConversationMessageSchema,
   ReplyFeedbackInputSchema,
   ReplyFeedbackPolicySchema,
+  ReplyFeedbackResultSchema,
+  ConversationIntroOfferSchema,
   type ReplyFeedbackPolicy,
   type ConversationMessage,
 } from "../../../../../packages/api/src/conversation/contracts.js";
@@ -38,6 +41,49 @@ export interface ReplyFeedbackAuthority {
 }
 
 export class ConversationLineage {
+  private introOffers?: IdentityIntroOffers;
+  configureIntroOffers(introOffers: IdentityIntroOffers) {
+    invariant(
+      !this.introOffers && introOffers instanceof IdentityIntroOffers,
+      "intro_offer_unconfigured",
+      "Intro offers require their actual prepared account authority.",
+    );
+    introOffers.assertPool(this.db.pool);
+    this.introOffers = introOffers;
+  }
+  async pendingIntroOffer(scope: ThreadScope) {
+    assertThreadScope(scope);
+    invariant(
+      scope.authority === "fan" && this.introOffers,
+      "intro_offer_unavailable",
+      "Your intro offer is unavailable. Try again.",
+    );
+    return this.db.withThread(scope, async (client) =>
+      ConversationIntroOfferSchema.parse(
+        await this.introOffers!.pendingInTransaction(scope, client),
+      ),
+    );
+  }
+  async acknowledgeIntroOffer(scope: ThreadScope, offerId: string) {
+    assertThreadScope(scope);
+    invariant(
+      scope.authority === "fan" && this.introOffers,
+      "intro_offer_unavailable",
+      "Your intro offer is unavailable. Try again.",
+    );
+    return this.db.withThread(
+      scope,
+      async (client) => {
+        await this.introOffers!.acknowledgeInTransaction(
+          scope,
+          client,
+          IdSchema.parse(offerId),
+        );
+        return { acknowledged: true as const };
+      },
+      "write",
+    );
+  }
   private recordings?: ConversationRecordings;
   configureRecordings(recordings: ConversationRecordings) {
     invariant(
@@ -368,7 +414,10 @@ export class ConversationLineage {
               scope.actorAccountId,
             ],
           );
-          return { rating: null };
+          return ReplyFeedbackResultSchema.parse({
+            rating: null,
+            introOffer: null,
+          });
         }
         invariant(
           this.feedbackAuthority,
@@ -406,7 +455,21 @@ export class ConversationLineage {
             consent.expiresAt,
           ],
         );
-        return { rating: body.rating };
+        // Await the owner's operation inside this original write. A response
+        // only records eligibility; the actual Save/Skip has its own receipt.
+        const introOffer =
+          body.rating === "helpful" && this.introOffers
+            ? await this.introOffers.afterHelpfulInTransaction(scope, client, {
+                messageId,
+                messageVersion: body.messageVersion,
+                agentVersionId: body.agentVersion.id,
+                agentVersionHash: body.agentVersion.hash,
+              })
+            : null;
+        return ReplyFeedbackResultSchema.parse({
+          rating: body.rating,
+          introOffer,
+        });
       },
       "write",
     );

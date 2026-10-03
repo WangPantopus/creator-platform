@@ -1,0 +1,182 @@
+{
+  "recordedAtPacific": "2026-10-01T12:35:58.233208-07:00",
+  "workstream": "W3",
+  "implementationCheckout": "/Users/yingpengwang/.codex/worktrees/w3-conversations/creator-platform",
+  "primaryBranch": "codex/w3-privacy-revalidation",
+  "preHandoffPrimaryHead": "4a3e6f690a85a9a9318a1a8bb692d8a1db09f8eb",
+  "reviewedRemoteMain": "c1c615e6ece53bff4bc6a47d7f4d332757df1295",
+  "authority": {
+    "date": "2026-10-01",
+    "source": "Latest direct human message in W3 chat01a0f6b4-d8e4-7020-aa34-919424057469",
+    "priorCleanupRuntimeHoldSuperseded": true,
+    "localDependenciesToolsDBServersBuildsEmulatorSimulatorMayResume": true,
+    "newUnitTestsRequired": false,
+    "testCoverageMayBeRestricted": true,
+    "personallyOperatedWebAndroidIOSendToEndRequired": true,
+    "PRCreationAndNormalMergeWhenReadyAuthorized": true,
+    "repeatContinuationApprovalRequired": false,
+    "ambition": "Build the greatest app in the world",
+    "handoffOnlyTurnStartedNoNewLocalRuntime": true
+  },
+  "PRSnapshots": {
+    "pr24": {
+      "file": "pr24-snapshot.json",
+      "sha256": "14280cb83eb68de68a485a190c3bce50755691dc7a5c63f2759903d77cb5344f",
+      "head": "a164fe8aa3f8948b7d51dbdb68c65e13bdc56de1",
+      "summary": {
+        "FAILURE": 4,
+        "SUCCESS": 6
+      }
+    },
+    "pr36": {
+      "file": "pr36-snapshot.json",
+      "sha256": "92bdd80325ce84d9303896debb526a691ba2163cd806ea47e923d3ae55c6bb50",
+      "head": "4a3e6f690a85a9a9318a1a8bb692d8a1db09f8eb",
+      "summary": {
+        "FAILURE": 1,
+        "QUEUED": 3,
+        "SUCCESS": 6
+      }
+    },
+    "pr45": {
+      "file": "pr45-snapshot.json",
+      "sha256": "82e5152d6d7b016d6840277da344db51397e56ebcf0b36722ae09dda1e56a415",
+      "head": "a4917db65767dd16534f38a7b257010d213257d9",
+      "summary": {
+        "FAILURE": 4,
+        "SUCCESS": 6
+      }
+    }
+  },
+  "personallyReadHostedLogs": [
+    {
+      "jobId": 110453592795,
+      "head": "4a3e6f690a85a9a9318a1a8bb692d8a1db09f8eb",
+      "file": "pr36-pr-web-backend.log",
+      "sha256": "f33ccabb738dd4b9b142fb9283cb049723167a3de3acc864c03b1953b7fd42dc",
+      "actualCheckout": "1d775446604ad3402f83477dc659893377c19c44",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36887163222/job/110453592795",
+      "personallyRead": true
+    },
+    {
+      "jobId": 110453459399,
+      "head": "4a3e6f690a85a9a9318a1a8bb692d8a1db09f8eb",
+      "file": "pr36-push-web-backend.log",
+      "sha256": "5e0dfd1a4a7eaea7c14b4a70e8254e40e4581583415dbe58ab9975fc5e39c098",
+      "actualCheckout": "4a3e6f690a85a9a9318a1a8bb692d8a1db09f8eb",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36887159115/job/110453459399",
+      "personallyRead": true
+    },
+    {
+      "jobId": 110453592826,
+      "head": "4a3e6f690a85a9a9318a1a8bb692d8a1db09f8eb",
+      "file": "pr36-pr-android-runtime.log",
+      "sha256": "96b80716e55e97cf99b7d134dde099e36aedb4b60fa4c9bd116e8888525f0ad1",
+      "actualCheckout": "1d775446604ad3402f83477dc659893377c19c44",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36887163222/job/110453592826",
+      "personallyRead": true
+    },
+    {
+      "jobId": 110453458853,
+      "head": "4a3e6f690a85a9a9318a1a8bb692d8a1db09f8eb",
+      "file": "pr36-push-android-runtime.log",
+      "sha256": "12f62c8352d6d4ef784c4098fc954a58f15197ba493388c67b791a5ebb64eb92",
+      "actualCheckout": "4a3e6f690a85a9a9318a1a8bb692d8a1db09f8eb",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36887159115/job/110453458853",
+      "personallyRead": true
+    },
+    {
+      "jobId": 110453592410,
+      "head": "4a3e6f690a85a9a9318a1a8bb692d8a1db09f8eb",
+      "file": "pr36-pr-android-foundation.log",
+      "sha256": "b843301941d362aeac6f5a197cf2ed9a47ac5c77321f89828dbf90dfccdb4535",
+      "actualCheckout": "1d775446604ad3402f83477dc659893377c19c44",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36887163222/job/110453592410",
+      "personallyRead": true
+    },
+    {
+      "jobId": 110453459321,
+      "head": "4a3e6f690a85a9a9318a1a8bb692d8a1db09f8eb",
+      "file": "pr36-push-android-foundation.log",
+      "sha256": "708f97bbd2690e9596acfce0781370a6ec73084034bdc1bfe02b2b5e1e78f4cb",
+      "actualCheckout": "4a3e6f690a85a9a9318a1a8bb692d8a1db09f8eb",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36887159115/job/110453459321",
+      "personallyRead": true
+    },
+    {
+      "jobId": 110453592693,
+      "head": "4a3e6f690a85a9a9318a1a8bb692d8a1db09f8eb",
+      "file": "pr36-pr-ios-failed.log",
+      "sha256": "245fb70d402f09c94d9255ba975e70b79bf96d8d6f3f4303793f15c2db3e0d38",
+      "actualCheckout": "1d775446604ad3402f83477dc659893377c19c44",
+      "conclusion": "FAILURE",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36887163222/job/110453592693",
+      "personallyRead": true,
+      "reportedSnapshotMismatches": 106
+    },
+    {
+      "jobId": 110437716771,
+      "head": "a4917db65767dd16534f38a7b257010d213257d9",
+      "file": "pr45-pr-web-visual-failed.log",
+      "sha256": "4ab80583398be5c009029c4b306bf0491c648aa1f5ba8f9970f780f72d2ae922",
+      "actualCheckout": "e0eea53a2ea82d2510b11b0f03af14375d8cba75",
+      "conclusion": "FAILURE",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36882556015/job/110437716771",
+      "personallyRead": true,
+      "failurePhase": "Playwright configuration load before visual comparisons"
+    },
+    {
+      "jobId": 110336889518,
+      "head": "a164fe8aa3f8948b7d51dbdb68c65e13bdc56de1",
+      "file": "pr24-pr-web-visual-failed.log",
+      "sha256": "0d9bcb5425974e9546dfa65b412accf6d26dcd0c81772d2a1209f26b8b8b507b",
+      "actualCheckout": "95cc51e3be56f6c5a4cb8ae8710b8b029202d4c3",
+      "conclusion": "FAILURE",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36852405181/job/110336889518",
+      "personallyRead": true,
+      "failurePhase": "Playwright configuration load before visual comparisons"
+    },
+    {
+      "jobId": 110437717205,
+      "head": "a4917db65767dd16534f38a7b257010d213257d9",
+      "file": "pr45-pr-ios-failed.log",
+      "sha256": "2e0a8b6247bb31fb5add08aaa83f5a567f4672a77df1275c510809ec42371ee9",
+      "actualCheckout": "e0eea53a2ea82d2510b11b0f03af14375d8cba75",
+      "conclusion": "FAILURE",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/36882556015/job/110437717205",
+      "personallyRead": true,
+      "reportedSnapshotMismatches": 106
+    }
+  ],
+  "unchangedSevenOperatedSourceHashes": {
+    "apps/web/features/conversation/AccountScreen.tsx": "8ac28741a25b949ed1767393f224c3d62422a47ac6ad5242377d0f5e439ecf10",
+    "apps/ios/Sources/QelvoraUI/Conversation/W3FanFeatures.swift": "787d0f39f6846cd74a3255b6e5db283a7384baa8c73eb0d5a1bcd89426a0bfa7",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt": "8cd36d8a7e9d5bb989dc2f4731e942539a8052af8e9af54f272f0c944fe4f773",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/ConversationClient.kt": "a37b8a973d59a9c0c7765db4148c0932940bc7b77c1b315910f4d097a1ee2ae2",
+    "apps/ios/Sources/QelvoraUI/FanShell.swift": "70aabf59e45128daab006642bf8f2e8993caac9dcb35fa269b2b17fd7edb5a04",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanShell.kt": "31c502dbf8a8bfafc65e64611fe5eb769a497ec82f13006aa7cc033bac7a152e",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/MainActivity.kt": "0207e520b6e732bcdcd07cfb6290840d9a73b02a6f6e7866ae6473bfd823d766"
+  },
+  "priorOperatedNativeBoundary": "30cc2b0/main1c11; not a whole-current-graph product acceptance",
+  "preservedUnstagedUserPackageResolved": "9d2d4764e569259be9107b6d28d257f9cf0ffa0e2da0c9028d6277337cfb1318",
+  "privateOriginalBackup": {
+    "path": "/Users/yingpengwang/.config/creator-platform/cleanup-20261001/creator-platform-w3-20260930.sql.gz",
+    "bytes": 55281,
+    "sha256": "b92b011fe6cbcd2da770737c68054e500632be7e75b876b388d1ba87c5309a15"
+  },
+  "remainingW3Acceptance": "All originally unaccepted A-I product/provider/populated/two-device/offline/lifecycle/language/accessibility/performance journeys remain to finish; latest human removes runtime hold, not evidence gaps",
+  "wholeW3Complete": false,
+  "sourceCodeChangedForHandoff": false,
+  "limits": [
+    "These CI logs refer to their exact pre-handoff heads/synthetic checkouts, not a later documentation head.",
+    "Successful hosted checks do not replace personally operated all-client product verification.",
+    "Earlier frozen cleanup records describe historical constraints; latest direct human authority supersedes them.",
+    "No secrets, database state, new tests or captured source/reference images were fabricated or overwritten."
+  ]
+}

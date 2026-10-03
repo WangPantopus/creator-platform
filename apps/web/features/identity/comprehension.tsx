@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Message } from "@qelvora/ui-web";
 
 const cards = [
@@ -38,7 +38,23 @@ const answers = [
 export function ComprehensionPractice() {
   const [step, setStep] = useState(0);
   const [score, setScore] = useState(0);
+  const restartRef = useRef<HTMLButtonElement>(null);
+  const completedAnswerRef = useRef<HTMLButtonElement | null>(null);
   const current = cards[step];
+  useEffect(() => {
+    const completedAnswer = completedAnswerRef.current;
+    completedAnswerRef.current = null;
+    if (
+      !current &&
+      completedAnswer &&
+      document.visibilityState === "visible" &&
+      (document.activeElement === document.body ||
+        document.activeElement === completedAnswer) &&
+      restartRef.current?.isConnected
+    ) {
+      restartRef.current.focus();
+    }
+  }, [current]);
   return (
     <>
       <div className="preview-notice">
@@ -73,6 +89,7 @@ export function ComprehensionPractice() {
             T-21 · CARD {Math.min(step + 1, 4)} OF 4 · {score} RIGHT
           </span>
           <button
+            ref={restartRef}
             className="qv-link-btn"
             onClick={() => {
               setStep(0);
@@ -142,8 +159,14 @@ export function ComprehensionPractice() {
                 className="qv-btn qv-btn--secondary"
                 style={{ minHeight: 52, fontSize: 13 }}
                 disabled={!current}
-                onClick={() => {
+                onClick={(event) => {
                   if (current) {
+                    if (
+                      step === cards.length - 1 &&
+                      document.activeElement === event.currentTarget
+                    ) {
+                      completedAnswerRef.current = event.currentTarget;
+                    }
                     setScore(score + (current.answer === id ? 1 : 0));
                     setStep(step + 1);
                   }

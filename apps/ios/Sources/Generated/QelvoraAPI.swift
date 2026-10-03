@@ -5247,6 +5247,15 @@ public struct APIFanProfileInput: Codable, Sendable {
   }
 }
 
+public struct APIFanIntroInput: Codable, Sendable {
+  public let `intro`: String
+  public let `expectedVersion`: Int
+  public init(intro: String, expectedVersion: Int) {
+    self.intro = intro
+    self.expectedVersion = expectedVersion
+  }
+}
+
 public struct APIFanProfile: Codable, Sendable {
   public let `id`: String
   public let `handle`: String
@@ -6085,10 +6094,12 @@ public struct APIErrorError: Codable, Sendable {
   public let `code`: String
   public let `message`: String
   public let `requestId`: String
-  public init(code: String, message: String, requestId: String) {
+  public let `correlationId`: String?
+  public init(code: String, message: String, requestId: String, correlationId: String? = nil) {
     self.code = code
     self.message = message
     self.requestId = requestId
+    self.correlationId = correlationId
   }
 }
 
@@ -6873,6 +6884,24 @@ public struct APIConversationConversationCorrectionInputCommandContent: Codable,
 
 public enum APIConversationConversationCorrectionInputCommandContentKind: String, Codable, Sendable {
   case `conversation_correction` = "conversation_correction"
+}
+
+public struct APIConversationConversationIntroOffer: Codable, Sendable {
+  public let `offerId`: String?
+  public init(offerId: String? = nil) {
+    self.offerId = offerId
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `offerId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.offerId = try container.decode(String?.self, forKey: .offerId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(offerId, forKey: .offerId)
+  }
 }
 
 public struct APIConversationConversationMessage: Codable, Sendable {
@@ -7859,6 +7888,52 @@ public struct APIConversationReplyFeedbackPolicy: Codable, Sendable {
 public enum APIConversationReplyFeedbackRating: String, Codable, Sendable {
   case `helpful` = "helpful"
   case `not_helpful` = "not_helpful"
+}
+
+public struct APIConversationReplyFeedbackResult: Codable, Sendable {
+  public let `rating`: APIConversationReplyFeedbackResultRating?
+  public let `introOffer`: APIConversationReplyFeedbackResultIntroOffer?
+  public init(rating: APIConversationReplyFeedbackResultRating? = nil, introOffer: APIConversationReplyFeedbackResultIntroOffer? = nil) {
+    self.rating = rating
+    self.introOffer = introOffer
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `rating`
+    case `introOffer`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.rating = try container.decode(APIConversationReplyFeedbackResultRating?.self, forKey: .rating)
+    self.introOffer = try container.decode(APIConversationReplyFeedbackResultIntroOffer?.self, forKey: .introOffer)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(rating, forKey: .rating)
+    try container.encode(introOffer, forKey: .introOffer)
+  }
+}
+
+public enum APIConversationReplyFeedbackResultRating: String, Codable, Sendable {
+  case `helpful` = "helpful"
+  case `not_helpful` = "not_helpful"
+}
+
+public struct APIConversationReplyFeedbackResultIntroOffer: Codable, Sendable {
+  public let `offerId`: String?
+  public init(offerId: String? = nil) {
+    self.offerId = offerId
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `offerId`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.offerId = try container.decode(String?.self, forKey: .offerId)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(offerId, forKey: .offerId)
+  }
 }
 
 public struct APIConversationTeamReply: Codable, Sendable {
@@ -10162,8 +10237,37 @@ public actor CreatorAPIClient {
   private let token: @Sendable () async throws -> String?
   private let maximumResponseBytes: Int
   private let timeoutSeconds: TimeInterval
-  public init(baseURL: URL, session: URLSession = .shared, maximumResponseBytes: Int = 268_435_456, timeoutSeconds: TimeInterval = 30, token: @escaping @Sendable () async throws -> String?) {
-    self.baseURL = baseURL; self.session = session; self.maximumResponseBytes = maximumResponseBytes; self.timeoutSeconds = timeoutSeconds; self.token = token
+  private let expectedAccountId: String?
+  private let expectedSessionId: String?
+  public init(baseURL: URL, session: URLSession = .shared, maximumResponseBytes: Int = 268_435_456, timeoutSeconds: TimeInterval = 30, expectedAccountId: String? = nil, expectedSessionId: String? = nil, token: @escaping @Sendable () async throws -> String?) {
+    self.baseURL = baseURL; self.session = session; self.maximumResponseBytes = maximumResponseBytes; self.timeoutSeconds = timeoutSeconds; self.expectedAccountId = expectedAccountId; self.expectedSessionId = expectedSessionId; self.token = token
+  }
+  /// W8 private transport through this original client; pins only refuse a
+  /// changed genuine session. Public help uses the separate anonymous path.
+  public func trustBytes(_ path: String, expectedAccountId: String, expectedSessionId: String, body: Data? = nil, binary: Bool = false) async throws -> CreatorAPIBinaryResponse {
+    guard path.range(of: #"^/v1/trust/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*$"#, options: .regularExpression) != nil,
+          !expectedAccountId.isEmpty, !expectedSessionId.isEmpty, (body?.count ?? 0) <= 1_048_576 else { throw URLError(.badURL) }
+    return try await requestBytes(path, method: body == nil ? "GET" : "POST", body: body, authenticated: true,
+      headers: ["X-Expected-Account-Id": expectedAccountId, "X-Expected-Session-Id": expectedSessionId],
+      accept: binary ? "application/octet-stream" : "application/json", contentType: "application/json")
+  }
+  /// W4 JSON transport retains the original client and denial-only session pins.
+  public func commerceBytes(_ path: String, expectedAccountId: String, expectedSessionId: String, body: Data? = nil) async throws -> CreatorAPIBinaryResponse {
+    guard path.range(of: #"^/v1/commerce/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*$"#, options: .regularExpression) != nil,
+          !expectedAccountId.isEmpty, !expectedSessionId.isEmpty, (body?.count ?? 0) <= 1_048_576 else { throw URLError(.badURL) }
+    return try await requestBytes(path, method: body == nil ? "GET" : "POST", body: body, authenticated: true,
+      headers: ["X-Expected-Account-Id": expectedAccountId, "X-Expected-Session-Id": expectedSessionId, "x-commerce-account-id": expectedAccountId],
+      accept: "application/json", contentType: "application/json")
+  }
+  /// W5 JSON transport retains the original client and denial-only session pins.
+  public func contentBytes(_ path: String, expectedAccountId: String, expectedSessionId: String, body: Data? = nil, query: [URLQueryItem] = []) async throws -> CreatorAPIBinaryResponse {
+    guard path.range(of: #"^/v1/content/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*$"#, options: .regularExpression) != nil,
+          !expectedAccountId.isEmpty, !expectedSessionId.isEmpty, (body?.count ?? 0) <= 1_048_576,
+          query.count <= 4, Set(query.map(\.name)).count == query.count,
+          query.allSatisfy({ ["contentId", "cursor", "targetKind", "targetId"].contains($0.name) && ($0.value?.utf8.count ?? 0) <= 1024 }) else { throw URLError(.badURL) }
+    return try await requestBytes(path, method: body == nil ? "GET" : "POST", body: body, authenticated: true, query: query,
+      headers: ["X-Expected-Account-Id": expectedAccountId, "X-Expected-Session-Id": expectedSessionId],
+      accept: "application/json", contentType: "application/json")
   }
   private func request<Response: Decodable & Sendable>(_ path: String, method: String, body: Data? = nil, authenticated: Bool, query: [URLQueryItem] = [], headers: [String: String] = [:], contentType: String = "application/json") async throws -> Response {
     let response = try await requestBytes(path, method: method, body: body, authenticated: authenticated, query: query, headers: headers, accept: "application/json", contentType: contentType)
@@ -10184,6 +10288,12 @@ public actor CreatorAPIClient {
     request.setValue(accept, forHTTPHeaderField: "Accept")
     if body != nil { request.setValue(contentType, forHTTPHeaderField: "Content-Type") }
     for (name, value) in headers { request.setValue(value, forHTTPHeaderField: name) }
+    // Genuine capture pins only refuse a changed request; credentials remain
+    // the server's actual authority. Uncaptured canonical reads have no pins.
+    if authenticated {
+      if let expectedAccountId { request.setValue(expectedAccountId, forHTTPHeaderField: "X-Expected-Account-Id") }
+      if let expectedSessionId { request.setValue(expectedSessionId, forHTTPHeaderField: "X-Expected-Session-Id") }
+    }
     if authenticated, let value = try await token() { request.setValue("Bearer \(value)", forHTTPHeaderField: "Authorization") }
     try Task.checkCancellation()
     let (bytes, response) = try await session.bytes(for: request, delegate: CreatorAPIRedirectGuard())
@@ -10378,6 +10488,9 @@ public actor CreatorAPIClient {
   public func saveFanProfile(body: APIFanProfileInput) async throws -> APIFanProfile {
     try await request("/v1/identity/fan-profile", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
   }
+  public func saveFanIntro(body: APIFanIntroInput) async throws -> APIFanProfile {
+    try await request("/v1/identity/fan-profile/intro", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
+  }
   public func saveCreatorProfile(body: APICreatorProfileInput) async throws -> APICreatorProfile {
     try await request("/v1/identity/creator-profile", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
   }
@@ -10555,9 +10668,9 @@ public enum ApplicationDestination {
   public static func isPermitted(_ value: String) -> Bool {
     if value.count > 2048 || value.contains("%") || value.contains("\\") || value.contains("#") || value.rangeOfCharacter(from: .whitespacesAndNewlines) != nil { return false }
     let parts = value.components(separatedBy: "?")
-    guard parts.count <= 2, parts[0].range(of: "^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|ops(?:/(?:audits|metrics|cases/[a-f0-9-]{36}))?|status|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/(?:overview|sources|style|rules|test|versions|license|interview|onboard))?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post(?:/[a-f0-9-]{36})?|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$", options: .regularExpression) != nil else { return false }
+    guard parts.count <= 2, parts[0].range(of: "^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|ops(?:/(?:audits|metrics|cases/[a-f0-9-]{36}))?|status|notifications(?:/(?:settings|[a-f0-9-]{36}))?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/(?:workspace|setup|notes|requests|threads|ai(?:/(?:overview|sources|style|rules|test|versions|license|interview|onboard))?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post(?:/[a-f0-9-]{36})?|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$", options: .regularExpression) != nil else { return false }
     if parts.count == 1 { return true }
-    let scopes = ["context": "^/creators/", "creatorId": "^(?:/commerce/|/support$|/you$|/media/voice$)", "fanId": "^/you$", "packetId": "^/commerce/", "offer": "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId": "^/support$", "quote": "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet": "^/studio/[a-f0-9-]{36}/publish$", "objectId": "^/media/voice$", "kind": "^/support$"]
+    let scopes = ["context": "^/creators/", "creatorId": "^(?:/commerce/|/support$|/you$|/media/voice$)", "fanId": "^/you$", "packetId": "^/commerce/", "offer": "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId": "^/support$", "kind": "^/support$", "quote": "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet": "^/studio/[a-f0-9-]{36}/publish$", "objectId": "^/media/voice$"]
     let literalValues = ["offer": "1", "kind": "verification"]
     let fields = parts[1].components(separatedBy: "&")
     guard fields.count <= 2 else { return false }

@@ -6310,6 +6310,98 @@
         }
       }
     },
+    "/v1/identity/fan-profile/intro": {
+      "post": {
+        "operationId": "saveFanIntro",
+        "security": [
+          {
+            "PantopusSession": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FanIntroInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FanProfile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Session ended",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Action refused",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unavailable object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Integration unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/identity/creator-profile": {
       "post": {
         "operationId": "saveCreatorProfile",
@@ -21231,6 +21323,27 @@
         ],
         "additionalProperties": false
       },
+      "FanIntroInput": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "intro": {
+            "default": "",
+            "type": "string",
+            "maxLength": 240
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "intro",
+          "expectedVersion"
+        ],
+        "additionalProperties": false
+      },
       "FanProfile": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -22682,6 +22795,9 @@
               },
               "requestId": {
                 "type": "string"
+              },
+              "correlationId": {
+                "type": "string"
               }
             },
             "required": [
@@ -23770,6 +23886,28 @@
           "command",
           "signedActId",
           "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "ConversationConversationIntroOffer": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "offerId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "offerId"
         ],
         "additionalProperties": false
       },
@@ -25983,6 +26121,59 @@
           "helpful",
           "not_helpful"
         ]
+      },
+      "ConversationReplyFeedbackResult": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "rating": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "helpful",
+                  "not_helpful"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "introOffer": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "offerId": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "offerId"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "rating",
+          "introOffer"
+        ],
+        "additionalProperties": false
       },
       "ConversationTeamReply": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",

@@ -1,0 +1,299 @@
+{
+  "workstream": "W1 — platform, identity, and app foundations",
+  "clientDate": "2026-10-01",
+  "auditPurpose": "Preserve all useful W1 source before user-authorized deletion of all dedicated W1 worktrees.",
+  "applicationCheckpoint": "c74c95166675d96221e2e9551bda827dfd79cd32",
+  "initialHandoffCheckpoint": "169dec23031ca6984cdd635333d83e61f07311f0",
+  "publication": [
+    {
+      "branch": "codex/w1-account-keyboard",
+      "head": "ad56fc75c4c54e1474d54a4856aabc6afce31f27",
+      "remoteHead": "f5d55ab3d2ca09a8f1bd18b49f0d3759270bdda7",
+      "aheadBehind": "290\t0",
+      "publishedThroughRemote": false,
+      "inMain": true
+    },
+    {
+      "branch": "codex/w1-comprehension-focus-20261001",
+      "head": "5a1efef0e8c6aaec020873f21a11edf20c7489b3",
+      "remoteHead": "5a1efef0e8c6aaec020873f21a11edf20c7489b3",
+      "aheadBehind": "0\t0",
+      "publishedThroughRemote": true,
+      "inMain": false
+    },
+    {
+      "branch": "codex/w1-generation-efficiency-20261001",
+      "head": "ffb6b02b35a3684c0e3ab4e0c84dce58e00eb3ef",
+      "remoteHead": "ffb6b02b35a3684c0e3ab4e0c84dce58e00eb3ef",
+      "aheadBehind": "0\t0",
+      "publishedThroughRemote": true,
+      "inMain": false
+    },
+    {
+      "branch": "codex/w1-handoff-2026-09-29",
+      "head": "6661226a7b3b27ba3b4516b6b7666fd3fdaa88ac",
+      "remoteHead": "299c953ca42ec735f5fe84b9ee68d5c6581bfeb5",
+      "aheadBehind": "1\t0",
+      "publishedThroughRemote": false,
+      "inMain": true
+    },
+    {
+      "branch": "codex/w1-handoff-20261001",
+      "head": "169dec23031ca6984cdd635333d83e61f07311f0",
+      "remoteHead": "169dec23031ca6984cdd635333d83e61f07311f0",
+      "aheadBehind": "0\t0",
+      "publishedThroughRemote": true,
+      "inMain": false
+    },
+    {
+      "branch": "codex/w1-home-host-20261001",
+      "head": "f17620c3265838202b97f97bf12b5bb011419f2f",
+      "remoteHead": "f17620c3265838202b97f97bf12b5bb011419f2f",
+      "aheadBehind": "0\t0",
+      "publishedThroughRemote": true,
+      "inMain": false
+    },
+    {
+      "branch": "codex/w1-native-storage-20261001",
+      "head": "84968320a2fd5609b8d9b02589baeb80de02f6f4",
+      "remoteHead": "84968320a2fd5609b8d9b02589baeb80de02f6f4",
+      "aheadBehind": "0\t0",
+      "publishedThroughRemote": true,
+      "inMain": false
+    },
+    {
+      "branch": "codex/w1-native-uri-20261001",
+      "head": "c74c95166675d96221e2e9551bda827dfd79cd32",
+      "remoteHead": "c74c95166675d96221e2e9551bda827dfd79cd32",
+      "aheadBehind": "0\t0",
+      "publishedThroughRemote": true,
+      "inMain": false
+    },
+    {
+      "branch": "codex/w1-native-verification-20261001",
+      "head": "fa68e0dd9c82c55bd927e1191862dfe0c6c4ccfe",
+      "remoteHead": "fa68e0dd9c82c55bd927e1191862dfe0c6c4ccfe",
+      "aheadBehind": "0\t0",
+      "publishedThroughRemote": true,
+      "inMain": false
+    },
+    {
+      "branch": "codex/w1-onboarding-timing-20261001",
+      "head": "75267e07852603a7947e5125f3d1ddb665876921",
+      "remoteHead": "75267e07852603a7947e5125f3d1ddb665876921",
+      "aheadBehind": "0\t0",
+      "publishedThroughRemote": true,
+      "inMain": false
+    },
+    {
+      "branch": "codex/w1-resume-20261001",
+      "head": "5944484f2b4f46124ba01ba868a341db2a3ed71b",
+      "remoteHead": "5944484f2b4f46124ba01ba868a341db2a3ed71b",
+      "aheadBehind": "0\t0",
+      "publishedThroughRemote": true,
+      "inMain": false
+    },
+    {
+      "branch": "codex/w1-signing-authority-20261001",
+      "head": "d2b3b95dab25c0f8642080cef1593e2376783fbb",
+      "remoteHead": "d2b3b95dab25c0f8642080cef1593e2376783fbb",
+      "aheadBehind": "0\t0",
+      "publishedThroughRemote": true,
+      "inMain": false
+    },
+    {
+      "branch": "codex/w1-team-state-20261001",
+      "head": "a65aa012ee3a28533924038575c2191563f3a39b",
+      "remoteHead": "a65aa012ee3a28533924038575c2191563f3a39b",
+      "aheadBehind": "0\t0",
+      "publishedThroughRemote": true,
+      "inMain": false
+    },
+    {
+      "branchCount": 13,
+      "commitsAbsentFromAllOriginRefs": ""
+    }
+  ],
+  "pullRequests": [
+    {
+      "baseRefName": "codex/w1-native-uri-20261001",
+      "headRefName": "codex/w1-handoff-20261001",
+      "headRefOid": "169dec23031ca6984cdd635333d83e61f07311f0",
+      "isDraft": false,
+      "number": 51,
+      "state": "OPEN",
+      "title": "Publish full W1 handoff and authorize verified PR delivery",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/51"
+    },
+    {
+      "baseRefName": "codex/w1-native-storage-20261001",
+      "headRefName": "codex/w1-native-uri-20261001",
+      "headRefOid": "c74c95166675d96221e2e9551bda827dfd79cd32",
+      "isDraft": true,
+      "number": 49,
+      "state": "OPEN",
+      "title": "Validate native API origins and supply iOS host configuration",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/49"
+    },
+    {
+      "baseRefName": "codex/w1-native-verification-20261001",
+      "headRefName": "codex/w1-native-storage-20261001",
+      "headRefOid": "84968320a2fd5609b8d9b02589baeb80de02f6f4",
+      "isDraft": true,
+      "number": 48,
+      "state": "OPEN",
+      "title": "Handle native storage failures and foreground session refresh",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/48"
+    },
+    {
+      "baseRefName": "codex/w1-signing-authority-20261001",
+      "headRefName": "codex/w1-native-verification-20261001",
+      "headRefOid": "fa68e0dd9c82c55bd927e1191862dfe0c6c4ccfe",
+      "isDraft": true,
+      "number": 42,
+      "state": "OPEN",
+      "title": "Connect Signed links to public verification across clients",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/42"
+    },
+    {
+      "baseRefName": "codex/w1-home-host-20261001",
+      "headRefName": "codex/w1-signing-authority-20261001",
+      "headRefOid": "d2b3b95dab25c0f8642080cef1593e2376783fbb",
+      "isDraft": true,
+      "number": 35,
+      "state": "OPEN",
+      "title": "Hold current creator authority through assertion verification",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/35"
+    },
+    {
+      "baseRefName": "codex/w1-team-state-20261001",
+      "headRefName": "codex/w1-home-host-20261001",
+      "headRefOid": "f17620c3265838202b97f97bf12b5bb011419f2f",
+      "isDraft": true,
+      "number": 29,
+      "state": "OPEN",
+      "title": "Connect canonical Home and preserve native saved-thread navigation",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/29"
+    },
+    {
+      "baseRefName": "codex/w1-generation-efficiency-20261001",
+      "headRefName": "codex/w1-team-state-20261001",
+      "headRefOid": "a65aa012ee3a28533924038575c2191563f3a39b",
+      "isDraft": true,
+      "number": 28,
+      "state": "OPEN",
+      "title": "Gate Team actions on current access reads",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/28"
+    },
+    {
+      "baseRefName": "codex/w1-comprehension-focus-20261001",
+      "headRefName": "codex/w1-generation-efficiency-20261001",
+      "headRefOid": "ffb6b02b35a3684c0e3ab4e0c84dce58e00eb3ef",
+      "isDraft": true,
+      "number": 26,
+      "state": "OPEN",
+      "title": "Preserve unchanged generated resources and verify portable rename",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/26"
+    },
+    {
+      "baseRefName": "codex/w1-onboarding-timing-20261001",
+      "headRefName": "codex/w1-comprehension-focus-20261001",
+      "headRefOid": "5a1efef0e8c6aaec020873f21a11edf20c7489b3",
+      "isDraft": true,
+      "number": 22,
+      "state": "OPEN",
+      "title": "Restore Restart focus after authorship practice completion",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/22"
+    },
+    {
+      "baseRefName": "codex/w1-resume-20261001",
+      "headRefName": "codex/w1-onboarding-timing-20261001",
+      "headRefOid": "75267e07852603a7947e5125f3d1ddb665876921",
+      "isDraft": true,
+      "number": 21,
+      "state": "OPEN",
+      "title": "Defer intro collection beyond initial onboarding",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/21"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "codex/w1-resume-20261001",
+      "headRefOid": "5944484f2b4f46124ba01ba868a341db2a3ed71b",
+      "isDraft": false,
+      "number": 16,
+      "state": "OPEN",
+      "title": "Keep creator verification setup bound to saved proof state",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/16"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "codex/w1-account-keyboard",
+      "headRefOid": "f5d55ab3d2ca09a8f1bd18b49f0d3759270bdda7",
+      "isDraft": false,
+      "number": 11,
+      "state": "MERGED",
+      "title": "Restore keyboard focus after account actions",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/11"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "codex/w1-handoff-2026-09-29",
+      "headRefOid": "299c953ca42ec735f5fe84b9ee68d5c6581bfeb5",
+      "isDraft": false,
+      "number": 6,
+      "state": "MERGED",
+      "title": "Integrate W1 account recovery, Studio and creator media foundations",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/6"
+    }
+  ],
+  "dedicatedWorktrees": [
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/7f32/creator-platform",
+      "head": "2e337a1afdf6d8bba3974427588e0b34b6d42d36",
+      "trackedChanges": 0,
+      "untrackedChanges": 0,
+      "ignoredFiles": 0,
+      "publication": "ancestor of freshly fetched origin/main",
+      "inventoryKiB": 1900,
+      "disposition": "Removed with normal git worktree remove; parent alias marker and empty parent removed."
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/worktrees/0516/creator-platform",
+      "headAtAudit": "169dec23031ca6984cdd635333d83e61f07311f0",
+      "trackedChanges": 0,
+      "untrackedChanges": 0,
+      "ignoredGeneratedFileCount": 1881,
+      "ignoredGeneratedGroups": {
+        "apps/backend/dist": 6,
+        "apps/ios/QelvoraApp.xcodeproj": 3,
+        "apps/web/.next-w1-20261001": 536,
+        "apps/web/.next-w1-integrated-build-20261001": 1335,
+        "apps/web/tsconfig.tsbuildinfo": 1
+      },
+      "inventoryKiB": 705948,
+      "disposition": "User-authorized removal immediately after this documentation audit is committed, pushed, and verified on existing PR51; recheck clean status and exact remote head before deletion."
+    }
+  ],
+  "missingFormerWorktrees": [
+    "/Users/yingpengwang/.codex/worktrees/w1-resume/creator-platform",
+    "/Users/yingpengwang/.codex/worktrees/w1-handoff/creator-platform"
+  ],
+  "sharedPrimary": {
+    "path": "/Users/yingpengwang/creator-platform",
+    "trackedChanges": 0,
+    "onlyUntrackedRoot": ".turbo/",
+    "disposition": "Preserved: shared primary repository and Git object store for peer worktrees."
+  },
+  "usefulUncommittedW1SourceFound": false,
+  "newApplicationCommitRequired": false,
+  "newPullRequestRequired": false,
+  "auditDocumentationPullRequest": 51,
+  "peerWorktrees": "Read-only ownership/status inventory only; peer source, uncommitted changes and checkouts preserved.",
+  "resources": "No dependency install, app build or runtime created. Codex/CUA tool processes were identified and preserved. The legacy ADB process was not changed.",
+  "acceptance": "Publication and storage-cleanup audit only; not current CI, actual app or full W1 acceptance.",
+  "notes": [
+    "Two old local W1 branch tips differ from their same-name remote tips but are already ancestors of published origin/main; no unpublished source commits exist across the 13 W1 branches.",
+    "Keep branch refs, open PRs, private configuration/keys/backups outside these worktrees and source evidence. Recreate an isolated checkout from published codex/w1-handoff-20261001 for future work."
+  ],
+  "originMainAtAudit": "d6ea70e4778d716ce81ce0ede2c04910cd934052"
+}

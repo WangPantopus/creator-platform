@@ -1,0 +1,41 @@
+{
+  "recordedAt": "2026-10-01T12:12:41.347968+00:00",
+  "source": "Actual read-only catalog transaction on fresh W1 interactive database creator_w1_resume_20261001",
+  "roles": [
+    {
+      "rolname": "creator_runtime",
+      "rolcanlogin": true,
+      "rolsuper": false,
+      "rolbypassrls": false,
+      "rolinherit": false,
+      "rolcreatedb": false,
+      "rolcreaterole": false
+    },
+    {
+      "rolname": "growth_runtime",
+      "rolcanlogin": true,
+      "rolsuper": false,
+      "rolbypassrls": false,
+      "rolinherit": false,
+      "rolcreatedb": false,
+      "rolcreaterole": false
+    },
+    {
+      "rolname": "growth_worker",
+      "rolcanlogin": true,
+      "rolsuper": false,
+      "rolbypassrls": false,
+      "rolinherit": false,
+      "rolcreatedb": false,
+      "rolcreaterole": false
+    }
+  ],
+  "memberships": [],
+  "coreGrowthAccess": {
+    "growth_schema": false,
+    "growth_preferences": false,
+    "runtime_member": false,
+    "worker_member": false
+  },
+  "meaning": "The current core runtime is not a Growth runtime member and has no Growth schema/preference privileges. Dedicated reviewed pool/grant configuration is required before enabling the registered feature. No role grants, passwords or configuration were changed."
+}
