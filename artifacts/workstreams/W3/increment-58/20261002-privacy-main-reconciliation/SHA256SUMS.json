@@ -1,0 +1,78 @@
+{
+  "android-account-light-200.png": {
+    "bytes": 213676,
+    "sha256": "78ce141d8d3016457ece7814ca32f8e166eeba7dbba1cdd50a1be32d27fabade"
+  },
+  "android-account-night-200.png": {
+    "bytes": 216021,
+    "sha256": "681d94488f8ec664a898021cf5b240d5a3ba4506d37a6d656a269afed37e6a36"
+  },
+  "android-build.log": {
+    "bytes": 2104,
+    "sha256": "6cdfbb81a28c685a92ae1e91ee273621edf6158efe328fce0f32b571dd49da45"
+  },
+  "android-custody.json": {
+    "bytes": 1429,
+    "sha256": "6070650ef2fbe344b8b5600a87e5c7f786fec049b85a98710419fe344363fbda"
+  },
+  "android-data-refusal-light-200.png": {
+    "bytes": 205347,
+    "sha256": "89ee9de16e7ad7b12fdf03a3240dfdf8bac38775c8dd4de595e26836ce616ff0"
+  },
+  "android-entry-light-200.png": {
+    "bytes": 215646,
+    "sha256": "035c5ff32c8b0408df0968386cbd024867b55c3fae073d463bb7dfe85a50ef36"
+  },
+  "android-privacy-light-200.png": {
+    "bytes": 228268,
+    "sha256": "c907c42d3a04ff5dfd3934234acd96631840abd596d476537b88e3d3552dfc09"
+  },
+  "android-privacy-night-200.png": {
+    "bytes": 228821,
+    "sha256": "686f8d3b3904b484bc981e332abfc09b8f8c5db72624c8897f82d174a18b4883"
+  },
+  "catalogue.json": {
+    "bytes": 1297,
+    "sha256": "e0706721bbcc2e3ca65e7b33504b938397c7509c861e84a17939d893f8c44b32"
+  },
+  "ios-build.log": {
+    "bytes": 120674,
+    "sha256": "81e6104760c2bb2db4daa834a6d6dc4b12874ecb40a70aaf2732b9052fc4f570"
+  },
+  "prior72-ci.json": {
+    "bytes": 3154,
+    "sha256": "d54d8eee754b17c5ce4ba34daff722b4072e24ed8717d535565aa4ed6df92de3"
+  },
+  "prior72-final-web-visual.log": {
+    "bytes": 57688,
+    "sha256": "ac9345188dbfb8e38f3e94b221d744b9c770c3c4299732c3dd4e5d9de4f65e04"
+  },
+  "run.md": {
+    "bytes": 4349,
+    "sha256": "77e9314dc2b3d74b539bf8afc7590b550ecc418866a5b87025b5c63130c01343"
+  },
+  "runtime-custody.json": {
+    "bytes": 500,
+    "sha256": "c8cf44ac071a01aafe92a66c23a70faa000c925c30f52c1df32f37c9366a7c25"
+  },
+  "source-build-operation.json": {
+    "bytes": 2950,
+    "sha256": "69a70eeda679a832573f9108d9a12fa6a765fe53929c33ed17a37d81e93f7367"
+  },
+  "web-current-account-full.png": {
+    "bytes": 49358,
+    "sha256": "db2f7eab3e70f9a20a59e11b60f3b5b3d0cef5be03eedfcdf7c3475a97d697cf"
+  },
+  "web-current-account-partial-scroll.png": {
+    "bytes": 39212,
+    "sha256": "a73cd77008e3147621f5b859b29570ab73a060c102cd7f60ee35a6bd8aea2f50"
+  },
+  "web-current-account.png": {
+    "bytes": 35573,
+    "sha256": "49f0bf78d5d693f57b6665a65beb31d72b385e56981697e4b1c8739c0cbbdddf"
+  },
+  "web-privacy-refusal.png": {
+    "bytes": 51883,
+    "sha256": "33da04ef7e5b0739e95b219f43ede9b5e317a5f70b041fac03f91480e066a0bf"
+  }
+}
