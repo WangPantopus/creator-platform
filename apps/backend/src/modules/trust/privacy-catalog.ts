@@ -41,8 +41,13 @@ const columns = [
 /** Exact activated lifecycle source and metadata-only purpose custody. A
  * manually installed proposal, extra grant/owner/membership or early trigger
  * is unavailable. Do not cache this across the real held transaction. */
-export async function assertPrivacyTaskCatalog(client: PoolClient) {
-  const family = await originalPrivacyFamilyRegisteredExtension(client);
+export async function assertPrivacyTaskCatalog(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  signal?.throwIfAborted();
+  const family = await originalPrivacyFamilyRegisteredExtension(client, signal);
+  signal?.throwIfAborted();
   const expectedFunctions = family ? [...functions, family] : functions;
   const expectedColumns = family
     ? [
@@ -157,6 +162,7 @@ export async function assertPrivacyTaskCatalog(client: PoolClient) {
       ],
     )
   ).rows[0]?.ready;
+  signal?.throwIfAborted();
   if (ready !== true)
     throw new DomainError(
       "privacy_commit_fence_unavailable",

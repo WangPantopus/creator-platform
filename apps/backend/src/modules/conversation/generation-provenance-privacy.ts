@@ -51,23 +51,49 @@ function unavailable(cause?: unknown): never {
 
 /** Real metadata reads have a finite driver budget. A failure escapes directly
  * to the original connection custodian; no helper savepoint SQL follows it. */
-function metadata<Row extends QueryResultRow = QueryResultRow>(
+function metadataBudget(client: PoolClient) {
+  const original = (
+    client as PoolClient & {
+      connectionParameters?: { query_timeout?: unknown };
+    }
+  ).connectionParameters?.query_timeout;
+  if (
+    typeof original !== "number" ||
+    !Number.isSafeInteger(original) ||
+    original < 1
+  )
+    unavailable();
+  return Math.min(original, 5000);
+}
+
+async function metadata<Row extends QueryResultRow = QueryResultRow>(
   client: PoolClient,
   text: string,
   values: unknown[] = [],
+  signal?: AbortSignal,
 ) {
+  signal?.throwIfAborted();
   const query: QueryConfig & { query_timeout: number } = {
     text,
     values,
-    query_timeout: 5000,
+    query_timeout: metadataBudget(client),
   };
-  return client.query<Row>(query);
+  const result = await client.query<Row>(query);
+  signal?.throwIfAborted();
+  return result;
 }
 
 /** W3's exact purger metadata only. W8 owns its separate combined214/217
  * checker/caller catalogue; this function neither replaces nor approves it. */
-export async function generationProvenancePurgeCatalogue(client: PoolClient) {
-  const permissions = await generationConsumerCatalogue(client, purpose, 5000);
+export async function generationProvenancePurgeCatalogue(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  signal?.throwIfAborted();
+  const permissions = await generationConsumerCatalogue(client, purpose, {
+    queryTimeout: metadataBudget(client),
+    signal,
+  });
   const roles = (
     await metadata(
       client,
@@ -77,6 +103,7 @@ export async function generationProvenancePurgeCatalogue(client: PoolClient) {
     EXISTS(SELECT FROM pg_db_role_setting WHERE setrole=r.oid) AS settings
     FROM pg_roles r WHERE rolname=ANY($1::text[]) ORDER BY rolname COLLATE "C"`,
       [[purpose, "creator_runtime"]],
+      signal,
     )
   ).rows;
   const dependencies = (
@@ -88,6 +115,7 @@ export async function generationProvenancePurgeCatalogue(client: PoolClient) {
      AND d.dbid IN(0,(SELECT oid FROM pg_database WHERE datname=current_database()))
     ORDER BY d.deptype,a.type,a.object_names,a.object_args`,
       [purpose],
+      signal,
     )
   ).rows;
   const executables = (
@@ -101,6 +129,7 @@ export async function generationProvenancePurgeCatalogue(client: PoolClient) {
      AND (p.proowner=(SELECT oid FROM pg_roles WHERE rolname=$1) OR has_function_privilege($1,p.oid,'EXECUTE'))
     ORDER BY n.nspname COLLATE "C",p.proname COLLATE "C",pg_get_function_identity_arguments(p.oid) COLLATE "C"`,
       [purpose],
+      signal,
     )
   ).rows;
   const relation = (
@@ -131,6 +160,8 @@ export async function generationProvenancePurgeCatalogue(client: PoolClient) {
       'function',pg_get_functiondef(t.tgfoid)) ORDER BY t.tgname)
      FROM pg_trigger t WHERE t.tgrelid=c.oid) AS triggers
     FROM pg_class c WHERE c.oid=to_regclass('creator.generation_sentence_provenance')`,
+      [],
+      signal,
     )
   ).rows;
   return { permissions, roles, dependencies, executables, relation };
@@ -259,18 +290,30 @@ export class PreparedGenerationProvenancePurge {
     return prepared;
   }
 
-  private async assertCatalogue(client: PoolClient) {
+  private async assertCatalogue(client: PoolClient, signal?: AbortSignal) {
+    signal?.throwIfAborted();
     if (requestAuthority.getStore()) unavailable();
-    await assertRegisteredMigration(client, generationProvenancePurgeSource);
-    await assertRegisteredMigration(client, {
-      name: "w3_generation_worker_output",
-      owner: "W3",
-      path: "apps/backend/src/modules/conversation/migrations/pending_w3_worker_output.sql",
-      checksum: GENERATION_OUTPUT_SOURCE_SHA256,
-    });
+    await assertRegisteredMigration(
+      client,
+      generationProvenancePurgeSource,
+      signal,
+    );
+    signal?.throwIfAborted();
+    await assertRegisteredMigration(
+      client,
+      {
+        name: "w3_generation_worker_output",
+        owner: "W3",
+        path: "apps/backend/src/modules/conversation/migrations/pending_w3_worker_output.sql",
+        checksum: GENERATION_OUTPUT_SOURCE_SHA256,
+      },
+      signal,
+    );
+    signal?.throwIfAborted();
     // Actual W8 must approve its additive isolated DELETE-checker caller.
     // The original214-only catalogue cannot be substituted after217 grants.
-    await assertOriginalPrivacyFamilyCatalog(client);
+    await assertOriginalPrivacyFamilyCatalog(client, signal);
+    signal?.throwIfAborted();
     const ready = (
       await metadata<{ ready: boolean; definition: string }>(
         client,
@@ -294,13 +337,14 @@ export class PreparedGenerationProvenancePurge {
        AND shobj_description(oid,'pg_database') IS DISTINCT FROM 'creator-platform:restored-traffic-closed') AS ready,
       pg_get_functiondef(p.oid) AS definition FROM pg_proc p WHERE p.oid=to_regprocedure($2)`,
         [purpose, generationProvenancePurgeSignature],
+        signal,
       )
     ).rows[0];
     if (
       !ready?.ready ||
       createHash("sha256").update(ready.definition, "utf8").digest("hex") !==
         this.custody.definitionSha256 ||
-      contentHash(await generationProvenancePurgeCatalogue(client)) !==
+      contentHash(await generationProvenancePurgeCatalogue(client, signal)) !==
         this.custody.catalogueChecksum
     )
       unavailable();
@@ -324,8 +368,10 @@ export class PreparedGenerationProvenancePurge {
     for (;;) {
       signal.throwIfAborted();
       await fenceConversationPrivacyTask(this.authority, client, job);
+      signal.throwIfAborted();
       await this.authority.assertFamily(client, job, family);
-      await this.assertCatalogue(client);
+      signal.throwIfAborted();
+      await this.assertCatalogue(client, signal);
       signal.throwIfAborted();
       const result = await metadata<{ removed: unknown }>(
         client,
@@ -337,6 +383,7 @@ export class PreparedGenerationProvenancePurge {
           family.creatorId,
           family.fanId,
         ],
+        signal,
       );
       invariant(
         result.rowCount === 1 && result.rows.length === 1,
@@ -346,6 +393,7 @@ export class PreparedGenerationProvenancePurge {
       const page = z.int().min(0).max(500).parse(result.rows[0]?.removed);
       signal.throwIfAborted();
       await this.authority.assertFamily(client, job, family);
+      signal.throwIfAborted();
       invariant(
         Number.isSafeInteger(removed + page),
         "bounded_subjob_required",

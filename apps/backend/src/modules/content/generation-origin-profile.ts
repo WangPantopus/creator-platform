@@ -80,7 +80,7 @@ export async function assertOriginProfileFence(
         await generationConsumerCatalogue(
           client,
           "creator_w5_generation_origin",
-          5000,
+          { queryTimeout: 5000 },
         ),
       ) !== catalogueChecksum
     )

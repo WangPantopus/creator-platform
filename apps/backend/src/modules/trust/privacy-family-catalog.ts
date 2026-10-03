@@ -1,4 +1,4 @@
-import type { PoolClient } from "pg";
+import type { PoolClient, QueryConfig, QueryResultRow } from "pg";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError } from "../../core/errors.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
@@ -38,30 +38,96 @@ function unavailable(cause?: unknown): never {
   throw failure;
 }
 
+function responseBudget(client: PoolClient, ceiling: number) {
+  const parameters = (
+    client as PoolClient & {
+      connectionParameters?: { query_timeout?: unknown };
+    }
+  ).connectionParameters;
+  if (!parameters) unavailable();
+  const original = parameters.query_timeout;
+  if (
+    original !== undefined &&
+    original !== null &&
+    original !== false &&
+    original !== 0 &&
+    (typeof original !== "number" ||
+      !Number.isSafeInteger(original) ||
+      original < 1)
+  )
+    unavailable();
+  return typeof original === "number" && original > 0
+    ? Math.min(original, ceiling)
+    : ceiling;
+}
+
+function familyReader(client: PoolClient, signal?: AbortSignal) {
+  return async <R extends QueryResultRow = QueryResultRow>(
+    text: string,
+    values: unknown[] = [],
+    ceiling = 5000,
+  ) => {
+    signal?.throwIfAborted();
+    const result = await client.query<R>({
+      text,
+      values,
+      query_timeout: responseBudget(client, ceiling),
+    } as QueryConfig & { query_timeout: number });
+    signal?.throwIfAborted();
+    return result;
+  };
+}
+
+/** Read-only caller qualification. Incoming API children do not supply this
+ * literal core login with parent roles or private family/task permission. */
+export async function assertOriginalPrivacyFamilyCaller(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  const query = familyReader(client, signal);
+  const result = await query<{
+    ready: boolean;
+  }>(`SELECT current_user=session_user AND session_user='creator_runtime'
+      AND current_setting('transaction_isolation') IN('read committed','repeatable read')
+      AND EXISTS(SELECT FROM pg_roles r WHERE rolname=current_user AND rolcanlogin AND NOT rolinherit
+       AND NOT rolsuper AND NOT rolbypassrls AND NOT rolcreatedb AND NOT rolcreaterole AND NOT rolreplication
+       AND rolconfig IS NULL AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid)
+       AND NOT EXISTS(SELECT FROM pg_db_role_setting WHERE setrole=r.oid)) AS ready`);
+  if (result.rows[0]?.ready !== true) unavailable();
+}
+
 /** Closed metadata review only. No original preparation, task, body or positive
  * permission is issued. Preserve the caller's transaction and search path. */
 export async function originalPrivacyFamilyPurposeCatalogue(
   client: PoolClient,
+  signal?: AbortSignal,
 ) {
-  await client.query("SAVEPOINT w8_original_family_catalog");
+  const query = familyReader(client, signal);
+  await query("SAVEPOINT w8_original_family_catalog", [], 1500);
   let completed = false;
   try {
-    await client.query("SET LOCAL search_path=pg_catalog");
-    const permissions = await generationConsumerCatalogue(client, purpose);
+    await query("SET LOCAL search_path=pg_catalog");
+    const permissions = await generationConsumerCatalogue(client, purpose, {
+      queryTimeout: responseBudget(client, 5000),
+      signal,
+    });
     const issuerPermissions = await generationConsumerCatalogue(
       client,
       "creator_privacy_fence",
+      { queryTimeout: responseBudget(client, 5000), signal },
     );
     const projectionPermissions = await generationConsumerCatalogue(
       client,
       "creator_privacy_ownership_metadata",
+      { queryTimeout: responseBudget(client, 5000), signal },
     );
     const callerPermissions = await generationConsumerCatalogue(
       client,
       "creator_runtime",
+      { queryTimeout: responseBudget(client, 5000), signal },
     );
     const role = (
-      await client.query(
+      await query(
         `SELECT rolname,rolcanlogin,rolinherit,rolsuper,rolcreatedb,rolcreaterole,
          rolreplication,rolbypassrls,rolconfig,
          EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid OR roleid=r.oid) AS memberships,
@@ -71,7 +137,7 @@ export async function originalPrivacyFamilyPurposeCatalogue(
       )
     ).rows;
     const dependencies = (
-      await client.query(
+      await query(
         `SELECT d.deptype,a.type,a.object_names,a.object_args
          FROM pg_shdepend d CROSS JOIN LATERAL
           pg_identify_object_as_address(d.classid,d.objid,d.objsubid) a
@@ -82,7 +148,7 @@ export async function originalPrivacyFamilyPurposeCatalogue(
       )
     ).rows;
     const executables = (
-      await client.query(
+      await query(
         `SELECT n.nspname,p.proname,pg_get_function_identity_arguments(p.oid) AS arguments,
          pg_get_userbyid(p.proowner) AS owner,p.prosecdef,p.provolatile,p.proconfig,
          encode(sha256(convert_to(pg_get_functiondef(p.oid),'UTF8')),'hex') AS definition,
@@ -97,7 +163,7 @@ export async function originalPrivacyFamilyPurposeCatalogue(
       )
     ).rows;
     const relations = (
-      await client.query(
+      await query(
         `SELECT c.relname,pg_get_userbyid(c.relowner) AS owner,c.relkind,c.relispartition,
          c.relrowsecurity,c.relforcerowsecurity,
          (SELECT jsonb_agg(jsonb_build_object('role',CASE WHEN acl.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(acl.grantee) END,
@@ -150,20 +216,22 @@ export async function originalPrivacyFamilyPurposeCatalogue(
     // A failed read may still be in flight. Its owner must settle or destroy
     // the held connection; never submit helper cleanup behind that read.
     if (completed) {
-      await client.query("ROLLBACK TO SAVEPOINT w8_original_family_catalog");
-      await client.query("RELEASE SAVEPOINT w8_original_family_catalog");
+      await query("ROLLBACK TO SAVEPOINT w8_original_family_catalog", [], 1500);
+      await query("RELEASE SAVEPOINT w8_original_family_catalog", [], 1500);
     }
   }
 }
 
 export async function assertOriginalPrivacyFamilyPurposeCatalog(
   client: PoolClient,
+  signal?: AbortSignal,
 ) {
   try {
     if (
       !catalogueChecksum ||
-      contentHash(await originalPrivacyFamilyPurposeCatalogue(client)) !==
-        catalogueChecksum
+      contentHash(
+        await originalPrivacyFamilyPurposeCatalogue(client, signal),
+      ) !== catalogueChecksum
     )
       unavailable();
   } catch (cause) {
@@ -175,7 +243,10 @@ export async function assertOriginalPrivacyFamilyPurposeCatalog(
  * proposal or matching manually installed ledger cannot grant family authority. */
 export async function originalPrivacyFamilyRegisteredExtension(
   client: PoolClient,
+  signal?: AbortSignal,
 ) {
+  signal?.throwIfAborted();
+  const query = familyReader(client, signal);
   const source = {
     name: "w8_original_privacy_family",
     path: "apps/backend/migrations/0214_w8_original_privacy_family.sql",
@@ -183,6 +254,7 @@ export async function originalPrivacyFamilyRegisteredExtension(
     checksum: originalPrivacyFamilyMigration.checksum,
   };
   const active = await registeredMigration(source);
+  signal?.throwIfAborted();
   if (!active) return undefined;
   try {
     const ownership = await registeredMigration({
@@ -191,6 +263,7 @@ export async function originalPrivacyFamilyRegisteredExtension(
       owner: "W8",
       checksum: allScopeOwnershipMigration.checksum,
     });
+    signal?.throwIfAborted();
     if (
       !ownership ||
       ownership.version !== allScopeOwnershipMigration.version ||
@@ -200,7 +273,7 @@ export async function originalPrivacyFamilyRegisteredExtension(
     for (const migration of [active, ownership]) {
       if (
         (
-          await client.query<{ ready: boolean }>(
+          await query<{ ready: boolean }>(
             "SELECT EXISTS(SELECT FROM creator.schema_migration WHERE version=$1 AND checksum=$2) AS ready",
             [migration.version, migration.checksum],
           )
@@ -208,20 +281,8 @@ export async function originalPrivacyFamilyRegisteredExtension(
       )
         unavailable();
     }
-    if (
-      (
-        await client.query<{
-          ready: boolean;
-        }>(`SELECT current_user=session_user AND session_user='creator_runtime'
-      AND current_setting('transaction_isolation') IN('read committed','repeatable read')
-      AND EXISTS(SELECT FROM pg_roles r WHERE rolname=current_user AND rolcanlogin AND NOT rolinherit
-       AND NOT rolsuper AND NOT rolbypassrls AND NOT rolcreatedb AND NOT rolcreaterole AND NOT rolreplication
-       AND rolconfig IS NULL AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid OR roleid=r.oid)
-       AND NOT EXISTS(SELECT FROM pg_db_role_setting WHERE setrole=r.oid)) AS ready`)
-      ).rows[0]?.ready !== true
-    )
-      unavailable();
-    await assertOriginalPrivacyFamilyPurposeCatalog(client);
+    await assertOriginalPrivacyFamilyCaller(client, signal);
+    await assertOriginalPrivacyFamilyPurposeCatalog(client, signal);
     return {
       signature: originalPrivacyBindingSignature,
       sha256: originalPrivacyBindingDefinition,
@@ -231,6 +292,10 @@ export async function originalPrivacyFamilyRegisteredExtension(
   }
 }
 
-export async function assertOriginalPrivacyFamilyCatalog(client: PoolClient) {
-  if (!(await originalPrivacyFamilyRegisteredExtension(client))) unavailable();
+export async function assertOriginalPrivacyFamilyCatalog(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  if (!(await originalPrivacyFamilyRegisteredExtension(client, signal)))
+    unavailable();
 }
