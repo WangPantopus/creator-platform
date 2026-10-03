@@ -125,7 +125,6 @@ function SelectionForm({
       try {
         const values = CallOffersSchema.parse(
           await offerRequest<unknown>(root, {
-            expectedAccountId: actorAccountId,
             signal: AbortSignal.any([
               controller.signal,
               pending.signal,
@@ -301,7 +300,6 @@ function SelectionForm({
       const started = performance.now();
       const values = CallOffersSchema.parse(
         await offerRequest<unknown>(root, {
-          expectedAccountId: actorAccountId,
           signal,
         }),
       );
@@ -336,7 +334,6 @@ function SelectionForm({
       const session = CallSessionSchema.parse(
         await offerRequest<unknown>(`${root}/${observed.id}/select`, {
           method: "POST",
-          expectedAccountId: actorAccountId,
           signal,
           body: JSON.stringify({
             slotId: chosen,
