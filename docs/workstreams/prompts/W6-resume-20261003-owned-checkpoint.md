@@ -97,6 +97,9 @@ original command. W1 f42/actual208 hashb0a47eac…; W4 actual213 a03d24d6…;
 published262/2572 checker1238f63d… and consumerb2eecdea… are coherent;1e65d539…
 is W4 worker SQL, not consumer. Accepted expanded catalogue pin remains undefined.
 W5 acknowledged reusing W6's exact consumer SHA1e34a23a… on existing302 after288.
+Its late published304/a3d10d1a original HeldClient ROLLBACK-receipt correction
+has not been imported/operated by W6; personally review and qualify it before
+using the older29f ingestion evidence for any new composition.
 Never construct a customer Actor, use interactive worker scope, guess authority
 or a task/default minimum, or put owner/file/catalogue cleanup after LAST.
 W8 alone activates the fully reviewed original wave.0208/0213 are already

@@ -138,6 +138,14 @@ worker or guessed authority. Genuine W3 recording association/human_active
 creator-authorized handback must use latest63, originalbe506c9e/b339 and its
 actual successor handoff. Seeded human_active/epoch0 is not handback proof.
 
+Late producer input received during final handoff: W5 published304/a3d10d1a
+`ContentHeldClient` SHA25622557a38e20f908fac9fb734b21759647ee5ca34246227168550600b6bee3989
+with actual ROLLBACK-receipt checking and original-budget/uncertain-settlement
+custody. W6 has not imported or operated this new leaf. Successor must personally
+read, integrate where applicable and qualify its affected ingestion paths;
+older29f evidence remains attributed to its older exact composition. W5's
+primitive operation is not genuine task/media/proof/publication acceptance.
+
 ## Every retained PR and merge disposition
 
 The user prioritized every open/draft PR oldest-first, starting21, before new
