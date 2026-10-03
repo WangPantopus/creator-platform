@@ -933,4 +933,40 @@
   <string name="w1_call_lookup_unavailable" formatted="false">This call could not be opened. Retry, or open Requests to check its current status.</string>
   <string name="identity_proof_review_support" formatted="false">Request verification review</string>
   <string name="identity_proof_review_support_body" formatted="false">Send a support request for your submitted proof. A reviewer must approve it before your creator identity is verified.</string>
+  <string name="w5_native_team_workspace" formatted="false">Studio workspace</string>
+  <string name="w5_native_team_title" formatted="false">Team</string>
+  <string name="w5_native_team_status" formatted="false">Team status</string>
+  <string name="w5_native_team_refresh" formatted="false">Check current team access</string>
+  <string name="w5_native_team_unavailable" formatted="false">Reconnect and check current team access to continue.</string>
+  <string name="w5_native_team_account_changed" formatted="false">Your account or session changed. Reopen Team with your current account.</string>
+  <string name="w5_native_team_denied" formatted="false">Current Team access is unavailable for this account.</string>
+  <string name="w5_native_team_saved" formatted="false">The role change was confirmed.</string>
+  <string name="w5_native_team_changed" formatted="false">The current roles changed. Check Team and review them before another save.</string>
+  <string name="w5_native_team_unknown" formatted="false">The response was interrupted. Check current Team or retry the exact reviewed role change.</string>
+  <string name="w5_native_team_no_workspace" formatted="false">No creator or Team workspace is available for this account.</string>
+  <string name="w5_native_team_owner" formatted="false">Creator workspace</string>
+  <string name="w5_native_team_member" formatted="false">Team workspace</string>
+  <string name="w5_native_team_verification_required" formatted="false">Current creator verification is required before opening Team.</string>
+  <string name="w5_native_team_invitation" formatted="false">Invitation from {name} · {roles} · expires {expires}</string>
+  <string name="w5_native_team_back" formatted="false">Studio workspace</string>
+  <string name="w5_native_team_identity_rule" formatted="false">Team words always carry the team label. Team replies never fulfill a personal commitment.</string>
+  <string name="w5_native_team_no_members" formatted="false">No Team members.</string>
+  <string name="w5_native_team_removed" formatted="false">Access removed</string>
+  <string name="w5_native_team_creator_only" formatted="false">Only the creator can change Team access.</string>
+  <string name="w5_native_team_edit" formatted="false">Edit roles</string>
+  <string name="w5_native_team_edit_for" formatted="false">Roles for {member}</string>
+  <string name="w5_native_team_reviewed" formatted="false">Reviewed roles: {roles}</string>
+  <string name="w5_native_team_desired" formatted="false">Desired roles: {roles}</string>
+  <string name="w5_native_team_current" formatted="false">Current roles: {roles}</string>
+  <string name="w5_native_team_review_current" formatted="false">Review current roles</string>
+  <string name="w5_native_team_retry_exact" formatted="false">Retry exact role change</string>
+  <string name="w5_native_team_save" formatted="false">Save roles</string>
+  <string name="w5_native_teamtriage_title" formatted="false">Triage</string>
+  <string name="w5_native_teamtriage_detail" formatted="false">Reads and routes the queue. Replies as team.</string>
+  <string name="w5_native_teamdrafter_title" formatted="false">Drafting</string>
+  <string name="w5_native_teamdrafter_detail" formatted="false">Prepares drafts. Never approves as you.</string>
+  <string name="w5_native_teampublisher_title" formatted="false">Publishing</string>
+  <string name="w5_native_teampublisher_detail" formatted="false">Publishes content under team identity.</string>
+  <string name="w5_native_teamscheduler_title" formatted="false">Scheduling</string>
+  <string name="w5_native_teamscheduler_detail" formatted="false">Offers times from your hours.</string>
 </resources>
