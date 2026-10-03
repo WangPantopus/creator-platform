@@ -41,6 +41,10 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Share your camera in a video call you choose to join.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Record a voice note you choose to send.</string>
+	<string>Use your microphone for voice notes and calls you choose.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+	</array>
 </dict>
 </plist>

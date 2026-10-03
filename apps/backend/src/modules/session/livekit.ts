@@ -217,9 +217,24 @@ export class LiveKitCallProvider implements CallProvider {
     return { token: await token.toJwt(), url: this.config.websocketURL };
   }
   async closeRoom(roomId: string) {
-    // Cloud's explicit cutoff includes the documented clock buffer. No new
-    // credential may be issued after the durable closure fence begins.
-    const cutoff = BigInt(Math.ceil(Date.now() / 1000) + 60);
+    // An explicit Cloud cutoff must be within 60s of the provider's clock.
+    // Leave room for clock skew and cover SDK refreshes during this bounded
+    // removal attempt. Custody blocks issuance before returning all identities.
+    const started = performance.now();
+    const cutoff = BigInt(Math.floor(Date.now() / 1000) + 30);
+    const requireCurrentCutoff = () => {
+      const remaining = Number(cutoff) - Date.now() / 1000;
+      if (
+        performance.now() - started > 20_000 ||
+        remaining < 5 ||
+        remaining > 45
+      )
+        throw new DomainError(
+          "call_revocation_attempt_expired",
+          "Call closure requires a fresh provider revocation attempt.",
+          503,
+        );
+    };
     const identities = await this.custody.beginClosure(roomId, cutoff);
     if (
       identities.length > 1000 ||
@@ -232,11 +247,14 @@ export class LiveKitCallProvider implements CallProvider {
       );
     for (const identity of identities) {
       z.uuid().parse(identity);
+      requireCurrentCutoff();
       await this.rooms.removeParticipant(roomId, identity, {
         revokeTokenTs: cutoff,
       });
+      requireCurrentCutoff();
       await this.custody.recordRemoval(roomId, identity, cutoff);
     }
+    requireCurrentCutoff();
     const rooms = await this.rooms.listRooms([roomId]);
     if (rooms.length) await this.rooms.deleteRoom(roomId);
     if ((await this.rooms.listRooms([roomId])).length)
@@ -251,6 +269,7 @@ export class LiveKitCallProvider implements CallProvider {
         "Self-hosted token revocation is not verified.",
         503,
       );
+    requireCurrentCutoff();
     await this.custody.confirmRevocation(roomId, cutoff);
   }
   async state(roomId: string) {
