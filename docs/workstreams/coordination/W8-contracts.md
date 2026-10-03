@@ -1,5 +1,9 @@
 # W8 contract, migration and runtime register
 
+## Held discovery cancellation settlement — 2026-10-03
+
+`conversationPrivacyAuthority.families` keeps its original client checked out while the same configured non-owner control connection cancels the observed PID. Remove the abort listener and await cancellation/control close before final COMMIT or error ROLLBACK; release only after rollback settles, destroying the client on uncertain cancellation/rollback. [Actual worker45-second deadline and independent state](../../operations/W8-privacy-family-cancellation.md) qualify that source boundary. Immutable0087/current task/restoration authority is preserved; no family permission or receipt is issued by cancellation.
+
 ## Current account read retry — 2026-10-03
 
 `retryTrustReads()` refreshes real capability/session/job hooks without granting a session or resetting the form epoch. Each hook preserves its current sequence/account fence. Actual503 session errors offer retry; only actual401 may offer reauthentication. Pending session reads withhold development sign-in navigation. [Personal real-web operation and independent saved state](../../operations/W8-privacy-session-recovery.md) qualify cold/warm recovery and cross-tab account separation only; the existing incomplete export remains unavailable for download.
