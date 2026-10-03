@@ -27,9 +27,16 @@ export const sessionChannel = "qelvora-identity-status";
 export function announceSessionEnd() {
   discardPrivateSessionBuffers();
   if (typeof BroadcastChannel === "undefined") return;
-  const channel = new BroadcastChannel(sessionChannel);
-  channel.postMessage("ended");
-  channel.close();
+  try {
+    const channel = new BroadcastChannel(sessionChannel);
+    try {
+      channel.postMessage("ended");
+    } finally {
+      channel.close();
+    }
+  } catch {
+    // Optional cross-tab notification cannot prevent the actual local end.
+  }
 }
 
 /** Unmount private drafts on revocation or account switch, including return from bfcache. */
@@ -149,10 +156,13 @@ function IdentitySessionView({
         checking = false;
       }
     };
-    const channel =
-      typeof BroadcastChannel === "undefined"
-        ? null
-        : new BroadcastChannel(sessionChannel);
+    let channel: BroadcastChannel | null = null;
+    try {
+      if (typeof BroadcastChannel !== "undefined")
+        channel = new BroadcastChannel(sessionChannel);
+    } catch {
+      // The genuine bounded session reread still detects invalidation.
+    }
     if (channel)
       channel.onmessage = (event) => {
         if (active && event.data === "ended") end(owner.signal);

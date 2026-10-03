@@ -24,9 +24,15 @@ let identityScope: {
 let previousIdentity: { accountId: string; sessionId: string } | null = null;
 const identityStorage = "w5.original-session";
 let sessionEnds: BroadcastChannel | undefined;
-function purgeStudioState() {
+function purgeStudioState(original?: { accountId: string; sessionId: string }) {
   pendingCommands.clear();
   try {
+    if (
+      original &&
+      sessionStorage.getItem(identityStorage) !==
+        JSON.stringify([original.accountId, original.sessionId])
+    )
+      return;
     for (const key of Object.keys(sessionStorage))
       if (
         key.startsWith("w5.pendingPublication:") ||
@@ -73,7 +79,7 @@ export function configureStudioRequests(
   };
   identityScope = scope;
   const ended = () => {
-    if (scope.isSessionEnded()) purgeStudioState();
+    if (scope.isSessionEnded()) purgeStudioState(scope);
   };
   scope.signal.addEventListener("abort", ended, { once: true });
   if (scope.signal.aborted) ended();
