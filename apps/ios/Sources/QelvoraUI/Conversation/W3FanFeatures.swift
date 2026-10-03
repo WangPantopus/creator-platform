@@ -205,34 +205,39 @@ private struct W3FirstConversation: View {
         return postContext
     }
     var body: some View {
-        VStack(alignment: .leading, spacing: 24) {
-            Button("Back", variant: .quiet) { session.open("/creators/" + handle) }
-            AuthorLabel(kind: .ai, name: creator?.name ?? "the creator")
-            Text("Before your first message").qText("display-lg")
-            VStack(alignment: .leading, spacing: 16) {
-                Text("WHO RUNS IT").qText("data-sm")
-                if let policy = caps?.providers {
-                    Text("This AI is powered by " + policy.providers.map(\.name).joined(separator: ", ") + ".").qText("body")
-                    ForEach(policy.providers, id: \.name) { provider in
-                        if let url = URL(string: provider.termsUrl) { Link(provider.name + " processing terms", destination: url) }
-                        Text((provider.noTraining ? "Doesn't train on your messages." : "Review message use in these terms.") + " " + (provider.noRetention ? "Doesn't keep your messages." : "Review message retention in these terms.")).qText("caption")
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    Button("Back", variant: .quiet) { session.open("/creators/" + handle) }
+                    AuthorLabel(kind: .ai, name: creator?.name ?? "the creator")
+                    Text("Before your first message").qText("display-lg").accessibilityAddTraits(.isHeader)
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("WHO RUNS IT").qText("data-sm")
+                        if let policy = caps?.providers {
+                            Text("This AI is powered by " + policy.providers.map(\.name).joined(separator: ", ") + ".").qText("body")
+                            ForEach(policy.providers, id: \.name) { provider in
+                                if let url = URL(string: provider.termsUrl) { Link(provider.name + " processing terms", destination: url) }
+                                Text((provider.noTraining ? "Doesn't train on your messages." : "Review message use in these terms.") + " " + (provider.noRetention ? "Doesn't keep your messages." : "Review message retention in these terms.")).qText("caption")
+                            }
+                        } else { Text("AI providers and their verified processing terms are not configured yet.").qText("body") }
+                        Text("WHO CAN READ IT").qText("data-sm"); Text(caps?.accessDisclosure ?? "Conversations can be read by the creator and their authorized team. Those accesses are logged.").qText("body")
+                        Text("WHAT IT REMEMBERS").qText("data-sm"); Text("Only what you agree to. It asks first, and you can see and delete every memory in You.").qText("body")
+                    }.padding(16).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusLg))
+                    if !failure.isEmpty { Notice(tone: .error, title: "Conversation unavailable", children: failure) }
+                    if contextPending {
+                        if let post = visiblePostContext {
+                            ContextCard(source: QelvoraCopy.text("growthFromAPost"), title: post.title, onRemove: { session.open("/creators/" + handle + "/chat") })
+                        }
+                        Notice(title: "Post context unavailable", children: contextFailure.isEmpty ? "This post's conversation context is not connected yet. Remove the post context to continue to the current AI provider review." : contextFailure)
+                        Button(QelvoraCopy.text("removeContext"), variant: .quiet, block: true) { session.open("/creators/" + handle + "/chat") }
                     }
-                } else { Text("AI providers and their verified processing terms are not configured yet.").qText("body") }
-                Text("WHO CAN READ IT").qText("data-sm"); Text(caps?.accessDisclosure ?? "Conversations can be read by the creator and their authorized team. Those accesses are logged.").qText("body")
-                Text("WHAT IT REMEMBERS").qText("data-sm"); Text("Only what you agree to. It asks first, and you can see and delete every memory in You.").qText("body")
-            }.padding(16).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusLg))
-            if !failure.isEmpty { Notice(tone: .error, title: "Conversation unavailable", children: failure) }
-            if contextPending {
-                if let post = visiblePostContext {
-                    ContextCard(source: QelvoraCopy.text("growthFromAPost"), title: post.title, onRemove: { session.open("/creators/" + handle + "/chat") })
-                }
-                Notice(title: "Post context unavailable", children: contextFailure.isEmpty ? "This post's conversation context is not connected yet. Remove the post context to continue to the current AI provider review." : contextFailure)
-                Button(QelvoraCopy.text("removeContext"), variant: .quiet, block: true) { session.open("/creators/" + handle + "/chat") }
-            }
-            Spacer(minLength: 0)
-            Button("Start with \(creator?.name ?? "the creator")'s AI", variant: .ai, size: .lg, block: true, disabled: busy || creator == nil || contextPending || caps?.generationAvailable != true || caps?.consentAvailable != true) { Task { await begin() } }
-            Button("Not now", variant: .quiet, block: true) { session.open("/creators/" + handle) }
-        }.padding(.horizontal, 16).padding(.top, 16).padding(.bottom, 36).frame(maxWidth: 390).background(qColor("ground", scheme))
+                    Spacer(minLength: 0)
+                    Button("Start with \(creator?.name ?? "the creator")'s AI", variant: .ai, size: .lg, block: true, disabled: busy || creator == nil || contextPending || caps?.generationAvailable != true || caps?.consentAvailable != true) { Task { await begin() } }
+                    Button("Not now", variant: .quiet, block: true) { session.open("/creators/" + handle) }
+                }.frame(maxWidth: .infinity, minHeight: max(0, geometry.size.height - 52), alignment: .topLeading)
+                    .padding(.horizontal, 16).padding(.top, 16).padding(.bottom, 36).frame(maxWidth: 390)
+            }.frame(maxWidth: .infinity).background(qColor("ground", scheme))
+        }
             .task {
                 struct Page: Decodable { let creator: GrowthCreator }
                 do { let page: Page = try await GrowthClient(baseURL: baseURL, token: { nil }).request("public/creators/" + handle); creator = page.creator; caps = try await W3ConversationClient(baseURL: baseURL).request("capabilities", publicRead: true) }
