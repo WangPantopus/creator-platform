@@ -143,7 +143,7 @@ private struct NativeAvailability: View {
             guard let sent = command else { return }
             let original = APICallAvailabilityCommand(timeZone: sent.timeZone, windows: sent.windows.map { APICallAvailabilityCommandWindowsItem(startsAt: $0.startsAt, endsAt: $0.endsAt) }, expectedVersion: sent.expectedVersion, idempotencyKey: sent.idempotencyKey)
             guard await currentRequest(captured, epoch: epoch) else { return }
-            let receipt = try await captured.client.saveCreatorCallAvailability(creatorId: creator.uuidString.lowercased(), body: original, xQelvoraExpectedAccount: captured.expectedAccountId)
+            let receipt = try await captured.client.saveCreatorCallAvailability(creatorId: creator.uuidString.lowercased(), xQelvoraExpectedAccount: captured.expectedAccountId, body: original)
             guard await currentRequest(captured, epoch: epoch) else { return }
             let value = try JSONDecoder().decode(SavedAvailability.self, from: JSONEncoder().encode(receipt))
             let normalized = sent.windows.sorted { instant($0.startsAt)! < instant($1.startsAt)! }
