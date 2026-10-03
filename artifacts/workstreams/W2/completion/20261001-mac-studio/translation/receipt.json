@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "host": "Yingpengs-Mac-Studio.local",
+  "at": "2026-10-02T08:23:58.015532+00:00",
+  "baseMain": "cf2cf8504318d89c611033136522603154b7cfe4",
+  "sourceSha256": {
+    "language.ts": "2f16eafcc44ede659b26b303eb54b14cd06f36a57a34994778ba7fdc0e43b509",
+    "translation.ts": "aff25eafc5f6932a63336bac16fa1fe5b3f3967badb9c276998a3923caa024e2",
+    "runtime.ts": "0ab4e0814c6b6b444c6eafc29c392569eae4f05f6eea3f24b80167555f2e59fe",
+    "pipeline.ts": "50c9a4d0e24ddf76ee46d495020a7f0fead3fb5e0d0a667487ca8c32abbc652a",
+    "provider-usage.ts": "f831cdf870e1f0b48c116dbec962568d3ce409d381359e99629bcdff5b3d54ef",
+    "generation-journal.ts": "587760904e7dcdc62f793bc4b5d2a640ba91178f6016a61eeb1815e1481d86e3"
+  },
+  "implementation": {
+    "sourceKinds": [
+      "human_creator",
+      "approved_draft",
+      "team",
+      "human_broadcast"
+    ],
+    "sourceBinding": "contentHash({messageId,version,authorKind,text,signedAct:{id,contentHash,authorAccountId}}), immutable message.version",
+    "execution": "genuine accepted durable W3 translation job and actual held client/lease callback required",
+    "categories": ["reply", "guardrail"],
+    "durablePurposes": ["translation", "translation_guardrail"],
+    "release": "opaque frozen result, same execution, actual held source/purpose/license/version/audience recheck before W3 commits",
+    "memory": "translation attempt refused by memoryJournal",
+    "generationLanguage": "optional validated current-turn language tag, default current fan-message language; eight slots and pipeline w2-context-guardrails-10 preserved"
+  },
+  "checks": {
+    "typecheck": "passed",
+    "scopedLint": "passed",
+    "format": "passed",
+    "existingBackend": {
+      "passed": 18,
+      "skipped": 0,
+      "T11": {
+        "pairs": 10000,
+        "queries": 30000,
+        "durationMs": 52468,
+        "limitMs": 300000
+      }
+    },
+    "operatorInputCheck": {
+      "acceptedTags": ["es", "zh-Hant-TW", "ja", "ar", "pt-BR"],
+      "refusedLanguageInputs": 9,
+      "aiOriginal": "refused",
+      "missingProvenance": "refused",
+      "emptyMeaningVerdict": "refused",
+      "invalidExecutionPurposes": [
+        "null",
+        "empty string",
+        "false",
+        "zero",
+        "other"
+      ],
+      "invalidExecutionPurposesOutcome": "all refused; absent backward-compatible reply, explicit reply and translation accepted by purpose mapper only; no genuine execution authority created"
+    },
+    "lintCommandFailures": "Two initial filenames did not exist; corrected six-file lint passed."
+  },
+  "providerCalls": 0,
+  "signedActsCreated": 0,
+  "durableJobsCreated": 0,
+  "limits": [
+    "Designated OpenAI credential remains absent; no positive translation or own-language response proof.",
+    "Actual W3 translation job/held signed-original producer not yet implemented/registered.",
+    "0077/0079 journal/privacy policy activation remains held by W8.",
+    "Predefined deterministic crisis text remains canonical English; multilingual safety copy acceptance remains open.",
+    "No native/web translation UX or named p95 acceptance claimed.",
+    "No new unit tests or fabricated signature/consent/lease authority."
+  ],
+  "reconciledMain": "c5cab8a00da193dbedd6182b9dccdd8a805fec6e"
+}

@@ -4,10 +4,11 @@ import {
   randomUUID,
   timingSafeEqual,
 } from "node:crypto";
-import { mkdir, open, readFile, rename, rm, stat } from "node:fs/promises";
+import { mkdir, open, rename, rm, stat } from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
 import { DomainError } from "../../core/errors.js";
+import { MEDIA_FILE_CEILING, readMediaFile } from "./files.js";
 import {
   PlaybackFileSchema,
   type PlaybackFile,
@@ -282,8 +283,9 @@ export class PrivateMediaStorage {
       | "processed"
       | "manifest"
       | "thumbnail" = "output",
+    maxBytes = MEDIA_FILE_CEILING,
   ) {
-    return readFile(this.file(assetId, kind));
+    return (await readMediaFile(this.file(assetId, kind), maxBytes)).output;
   }
   async size(assetId: string, kind: "input" | "output" = "output") {
     return (await stat(this.file(assetId, kind))).size;

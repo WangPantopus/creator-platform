@@ -1,0 +1,234 @@
+{
+  "schemaVersion": 1,
+  "sourceWave": "20261002",
+  "publicFunctions": {
+    "baseline40": [
+      {
+        "name": "creator.canonical_json(jsonb)",
+        "owner": "creator_owner",
+        "sha256": "b7fed94f03ee79912e987991d9aef820f6994fcfdd26a01dafcf21d52e0aad00",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator.commerce_immutable()",
+        "owner": "creator_owner",
+        "sha256": "abbc21ce0455b775c6e26f2534916545c5760373b9857b0bc1957af0e4e2f1ba",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator.commerce_scope(uuid, uuid)",
+        "owner": "creator_owner",
+        "sha256": "d91be28082959a51bc606330256a47faa35cdf75ce785f4b58529636d9c57aea",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator.content_role(uuid, text[])",
+        "owner": "creator_owner",
+        "sha256": "873c3a439e084cc3961e4c290ea69d606ad4e92c4d518e4ca3ae19bee2c10f21",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator.require_signed_message()",
+        "owner": "creator_owner",
+        "sha256": "9418d81f953369ba97d065e370ca85fc432f1ffd6179539012eff72ff1bb1a59",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator_trust.current_account()",
+        "owner": "creator_trust_owner",
+        "sha256": "52693834937f1ad9c735a3ef5607a76460c98e843f962d16ee5cbb7f20601530",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator_trust.has_case_access(uuid)",
+        "owner": "creator_trust_owner",
+        "sha256": "b7d645caf1d848fbecdf38d53c0965a84e88722fe82297ec6ae3b0a3f9d12465",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator_trust.may_queue(text)",
+        "owner": "creator_trust_owner",
+        "sha256": "5c7f3e054d4decf644c4800b1c1fec50b34e0f006ec961359a5fa852b8fb0ef6",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "growth.immutable_share()",
+        "owner": "growth_owner",
+        "sha256": "14794dd90fd4bcc6e72ba797ce9a5b659d97541c13d89d9c272a6f8b713acfbe",
+        "privilege": "EXECUTE",
+        "grantable": false
+      }
+    ],
+    "canonical57": [
+      {
+        "name": "creator.canonical_json(jsonb)",
+        "owner": "creator_owner",
+        "sha256": "b7fed94f03ee79912e987991d9aef820f6994fcfdd26a01dafcf21d52e0aad00",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator.commerce_allowance_cost_fence()",
+        "owner": "creator_owner",
+        "sha256": "e0e9c942901f2d1dd9d522f06f7728357f20995498ed5b6c717e1c85e6d8cafc",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator.commerce_immutable()",
+        "owner": "creator_owner",
+        "sha256": "abbc21ce0455b775c6e26f2534916545c5760373b9857b0bc1957af0e4e2f1ba",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator.commerce_pass_effect_fence()",
+        "owner": "creator_owner",
+        "sha256": "9b22f6cfedd35812434e1ddb77af27d1f3a01a7a861e0c444cb619555060c051",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator.commerce_payout_custody_matches()",
+        "owner": "creator_owner",
+        "sha256": "cc0f1219fff96e45b6c7579f75a310be96c205e5e016d509185b6068d38d6051",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator.commerce_payout_identity_fence()",
+        "owner": "creator_owner",
+        "sha256": "2d59709a7225aceab719c357a46d3e8191d93ad74dcdd87e13e3c93fb9b50bbb",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator.commerce_payout_reversal_matches()",
+        "owner": "creator_owner",
+        "sha256": "83fa16900cf80da322761f4a5118f632740668b17f40c2edeb94fcb02984e146",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator.commerce_pool_effect_fence()",
+        "owner": "creator_owner",
+        "sha256": "2dc5a63c6ce979c8e0cb79d0b7f3c3cbf63239d2f01aa2355007063c3469ff0c",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator.commerce_scope(uuid, uuid)",
+        "owner": "creator_owner",
+        "sha256": "d91be28082959a51bc606330256a47faa35cdf75ce785f4b58529636d9c57aea",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator.content_role(uuid, text[])",
+        "owner": "creator_owner",
+        "sha256": "873c3a439e084cc3961e4c290ea69d606ad4e92c4d518e4ca3ae19bee2c10f21",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator.freeze_approval_snapshot()",
+        "owner": "creator_owner",
+        "sha256": "f4f8255c7f2fb78aeb514b74df37287b50c608ac0b868d2b35cc583bdde638b7",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator.guard_creator_media_immutability()",
+        "owner": "creator_owner",
+        "sha256": "4d69ca5425a6288e44275b048493ce8ca7c02238b829cdaa88bfa3b5074c87a2",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator.guard_creator_media_publication()",
+        "owner": "creator_owner",
+        "sha256": "f9f9a41d1968e2adfe6d7f5ccca4e5d7b7e56f7c14fff05034c2d80649210411",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator.invalidate_creator_approvals()",
+        "owner": "creator_owner",
+        "sha256": "5787dc948936530fb1fa8edffde2160d2a2c8145b013a0e474142aa28d0d7755",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator.invalidate_draft_approval()",
+        "owner": "creator_owner",
+        "sha256": "e0e0c808355845f08ff9009d3084b65b96fd7563f5a5b1f5cbf8e5588b698787",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator.invalidate_key_approvals()",
+        "owner": "creator_owner",
+        "sha256": "e7002eed5fe7b47258bad07b3c66db5c3452b8e6dcc39893f99380e8d9218ed4",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator.require_signed_message()",
+        "owner": "creator_owner",
+        "sha256": "b4dfb8874141e6455f7adf1ebed996897fa63a1d1955eb05a0978a5f18df6f99",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator.validate_draft_source()",
+        "owner": "creator_owner",
+        "sha256": "e20488ae1c4e3bde76ddf80a04d69531e4c33558d1cc1b0d3f00f2e2db723dca",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator.validate_personal_approval()",
+        "owner": "creator_owner",
+        "sha256": "de2d1d43cbc71b6684cc67743fbef0227d2a3b40b0a05431d9b484f3715ec7e6",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator_trust.current_account()",
+        "owner": "creator_trust_owner",
+        "sha256": "52693834937f1ad9c735a3ef5607a76460c98e843f962d16ee5cbb7f20601530",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator_trust.has_case_access(uuid)",
+        "owner": "creator_trust_owner",
+        "sha256": "b7d645caf1d848fbecdf38d53c0965a84e88722fe82297ec6ae3b0a3f9d12465",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "creator_trust.may_queue(text)",
+        "owner": "creator_trust_owner",
+        "sha256": "5c7f3e054d4decf644c4800b1c1fec50b34e0f006ec961359a5fa852b8fb0ef6",
+        "privilege": "EXECUTE",
+        "grantable": false
+      },
+      {
+        "name": "growth.immutable_share()",
+        "owner": "growth_owner",
+        "sha256": "14794dd90fd4bcc6e72ba797ce9a5b659d97541c13d89d9c272a6f8b713acfbe",
+        "privilege": "EXECUTE",
+        "grantable": false
+      }
+    ]
+  }
+}

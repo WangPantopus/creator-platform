@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { Actor } from "../identity/adapter.js";
 import { DomainError } from "../../core/errors.js";
 import { TrustStore, command, priorCommand } from "./store.js";
+import { assertAllScopeOwnershipCatalog } from "./privacy-ownership-catalog.js";
 import {
   PrivacyDomains,
   type CaseSummary,
@@ -81,7 +82,7 @@ export type TrustDependencies = {
     actor: Actor,
     input: PrivacyCommand,
   ) => Promise<void>;
-  /** W1 resolves current owned profiles before identity deletion, never from request IDs. */
+  /** W1 resolves original owned profiles for every new scope, never from request IDs. */
   privacyOwnership?: (actor: Actor) => Promise<{
     creatorIds: readonly string[];
     reference: string;
@@ -94,7 +95,12 @@ export class TrustService {
     readonly artifacts?: PrivacyArtifactStore,
   ) {}
   private async capturePrivacyOwnership(actor: Actor) {
-    if (!this.dependencies.privacyOwnership) return null;
+    if (!this.dependencies.privacyOwnership)
+      throw new DomainError(
+        "privacy_ownership_unavailable",
+        "Account ownership could not be verified. Reconnect and retry.",
+        503,
+      );
     let timer: ReturnType<typeof setTimeout> | undefined;
     try {
       const value = await Promise.race([
@@ -771,6 +777,8 @@ export class TrustService {
         input.idempotencyKey,
         immutable,
         async () => {
+          if (input.scope !== "account")
+            await assertAllScopeOwnershipCatalog(client);
           if (input.kind === "export" || input.scope === "account")
             await this.assertAllowedInTransaction(
               client,
@@ -778,10 +786,9 @@ export class TrustService {
               input.creatorId,
               input.threadId,
             );
-          const ownership =
-            input.scope === "account"
-              ? await this.capturePrivacyOwnership(actor)
-              : null;
+          // Capture every original scope before identity can disappear. A fan
+          // snapshot is explicitly [], never a missing ownership connection.
+          const ownership = await this.capturePrivacyOwnership(actor);
           const rate = await client.query<{ count: string }>(
             "SELECT count(*) FROM creator_trust.privacy_job WHERE account_id=$1 AND created_at>now()-interval '1 hour'",
             [actor.accountId],
@@ -802,8 +809,8 @@ export class TrustService {
               input.threadId ?? null,
               verified.verifiedAt,
               verified.reference,
-              ownership ? [...new Set(ownership.creatorIds)].sort() : null,
-              ownership?.reference ?? null,
+              [...new Set(ownership.creatorIds)].sort(),
+              ownership.reference,
             ],
           );
           const id = job.rows[0]!.id;

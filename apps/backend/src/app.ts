@@ -122,11 +122,31 @@ export function createApp(
       if (!dependencies.trustRouter || !/^\/trust(?:\/|$)/u.test(req.path))
         await dependencies.assertActorAllowed?.(resolved.actor);
       requestAuthority.run(
-        { accountId: resolved.actor.accountId, sessionId: resolved.sessionId },
+        Object.freeze({
+          accountId: resolved.actor.accountId,
+          sessionId: resolved.sessionId,
+          actor: resolved.actor,
+          adultVerifiedAt: resolved.adultVerifiedAt,
+        }),
         next,
       );
     });
   if (dependencies.trustRouter) app.use(dependencies.trustRouter);
+  else
+    app.get("/health/ready", (_req, res) =>
+      res.status(503).json({
+        ready: false,
+        capabilities: [
+          {
+            name: "trust_runtime",
+            required: true,
+            state: "unavailable",
+            code: "trust_unconfigured",
+            checkedAt: new Date().toISOString(),
+          },
+        ],
+      }),
+    );
   app.get("/health", (_req, res) =>
     res.json({
       status: "ok",
@@ -333,6 +353,7 @@ export function createApp(
         "/",
         "/v1/agent",
         "/v1/commerce",
+        "/v1/commerce-approvals",
         "/v1/w6",
         "/v1/growth",
         "/v1/content",

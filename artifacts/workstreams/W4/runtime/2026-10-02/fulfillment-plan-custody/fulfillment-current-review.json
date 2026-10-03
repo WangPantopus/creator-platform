@@ -1,0 +1,59 @@
+{
+  "schemaSha256": "d728ec3d71f3b9fd11c49b3f2faf91624e7b03868d5ab4b462b0730fddae4aa1",
+  "isolatedOnly": true,
+  "registered": false,
+  "actualRuntimeLogin": true,
+  "closedReadiness": true,
+  "compiler": [
+    {
+      "function": "creator.commerce_fulfillment_original_member()",
+      "relation": "creator.commerce_fulfillment_member",
+      "diagnosticCount": 0
+    },
+    {
+      "function": "creator.commerce_fulfillment_plan_complete()",
+      "relation": "creator.commerce_fulfillment_plan",
+      "diagnosticCount": 0
+    },
+    {
+      "function": "creator.commerce_group_delivery_exact()",
+      "relation": "creator.commerce_group_delivery",
+      "diagnosticCount": 0
+    },
+    {
+      "function": "creator.commerce_immutable()",
+      "relation": "creator.commerce_fulfillment_member",
+      "diagnosticCount": 0
+    },
+    {
+      "function": "creator.commerce_immutable()",
+      "relation": "creator.commerce_fulfillment_plan",
+      "diagnosticCount": 0
+    },
+    {
+      "function": "creator.commerce_immutable()",
+      "relation": "creator.commerce_group_delivery",
+      "diagnosticCount": 0
+    },
+    {
+      "function": "creator.commerce_immutable()",
+      "relation": "creator.commerce_review_attestation",
+      "diagnosticCount": 0
+    },
+    {
+      "function": "creator.commerce_review_attestation_exact()",
+      "relation": "creator.commerce_review_attestation",
+      "diagnosticCount": 0
+    }
+  ],
+  "counts": {
+    "canonicalMigrations": 57,
+    "packets": 0,
+    "financialRows": 0,
+    "plans": 0,
+    "members": 0,
+    "deliveries": 0,
+    "reviews": 0
+  },
+  "positiveLifecycleVerified": false
+}

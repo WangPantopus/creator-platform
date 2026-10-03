@@ -1,0 +1,103 @@
+{
+  "workstream": "W4",
+  "increment": "spending-continuation",
+  "date": "2026-10-01",
+  "source": {
+    "base": "c67ec73e",
+    "web": "apps/web/features/commerce/CommerceScreen.tsx",
+    "ios": "apps/ios/Sources/QelvoraUI/Commerce/CommerceFeature.swift",
+    "android": "apps/android/app/src/main/java/com/pantopus/qelvora/commerce/CommerceFeature.kt"
+  },
+  "environment": {
+    "web": "localhost:3004",
+    "api": "loopback:4104",
+    "database": "owned 55444, fresh40 canonical through0043",
+    "identity": "explicit synthetic development actor two",
+    "currency": "USD development display only",
+    "payments": "unconfigured"
+  },
+  "personallyOperated": [
+    "Actual web Pantopus development sign-in, handle onboarding and spending destination",
+    "Set25USD, lower10USD immediately, raise50USD scheduled24hours with10USD retained",
+    "Stop owned API, type8USD and submit; readable reconnect error retains input and no offline command is applied",
+    "Restart canonical API, retry8USD; reduction takes effect and clears pending50USD",
+    "Full reload retains8USD",
+    "Explicit No limit with reminders unchecked; request schedules24hours while8USD remains current",
+    "Light/Night phone and1280desktop return visits preserve current and pending state",
+    "Keyboard Tab reaches reminders and Manage memberships with visible focus and scroll into view"
+  ],
+  "persistedInspection": {
+    "mode": "read-only private boolean assertions, no account records emitted",
+    "result": "PASS: current8USD, explicit_none=false, pending_none=true, pending_amount=null, reminders=false, delayed effective time"
+  },
+  "correction": "A transient uncommitted reminder default-on experiment was based on the older D21 design. The later R10 explicit opt-in mandate was found and all three source defaults restored false before publication. Earlier cap screenshots include the manually saved reminders-on preference from that experiment; later deliberate uncheck persisted false. No default-change fix is claimed.",
+  "native": {
+    "android": "shipping build PASS after opt-in restoration; installed/explicit owned launch PASS, actual taps pending",
+    "ios": "earlier shipping build/install/launch PASS; two invalid meta text-style calls corrected to canonical caption semibold at c67ec73e; rebuilt operation pending",
+    "resources": "owned native devices stopped and slots released while direct control/build coordination resolves"
+  },
+  "limitations": [
+    "No24hour clock passage/rollover simulated or claimed",
+    "No payment, creator verification, receipt, store membership or SQL bypass fabricated",
+    "No W7 notice delivery/time-use producer acceptance",
+    "No native commerce tap/system-management-sheet acceptance",
+    "No200percent/reduced-motion/VoiceOver/TalkBack acceptance",
+    "No release readiness"
+  ],
+  "screenshots": [
+    {
+      "path": "cap-25-light-390.jpg",
+      "sha256": "4925add1d3d11842360cc8661614122c2285fe8af8e65926add16f3e41bb6b95"
+    },
+    {
+      "path": "lower-10-light-390.jpg",
+      "sha256": "6e2e653602b9c9b333a35ba83710e790757b8c570f496fe95aa81b770634eb04"
+    },
+    {
+      "path": "none-pending-light-1280.jpg",
+      "sha256": "28f41019998b3b2f4196ef15351e1187da0e95a917729552fefd79f1a5e0d41c"
+    },
+    {
+      "path": "none-pending-light-390.jpg",
+      "sha256": "f312544cf2893ad9d68a240d48d44ac1cc44f6d952401f0b4f2e01fdb4f9f833"
+    },
+    {
+      "path": "none-pending-light-390x844.jpg",
+      "sha256": "9a61e424a70ef49e7afb94ce4f9b56c9e8d8bbb458499e22ef348bdbed860442"
+    },
+    {
+      "path": "none-pending-night-1280.jpg",
+      "sha256": "bd165e0f1f774a699f189604447a891bd8720f86b687567de4edf5062cc35f69"
+    },
+    {
+      "path": "none-pending-night-390.jpg",
+      "sha256": "6258ae7e7bef3df5cf41011e3f923ca71b877880f5e5af915b97911aa59569cb"
+    },
+    {
+      "path": "offline-input-kept-light-390.jpg",
+      "sha256": "da700f516ddd4349aa10077e47b60f44bbf4daa456750409922b81959e4049c5"
+    },
+    {
+      "path": "raise-50-pending-light-390.jpg",
+      "sha256": "3c81c9ad7ad6b5b2cb08a6fe46add9ceddc73eae3f2c2a5c8f3fa530b64adab3"
+    },
+    {
+      "path": "reconnected-lower-8-light-390.jpg",
+      "sha256": "80723c5abb1319d05bfdfe16395501d26516bfe186f6c61e986ed8397935c812"
+    }
+  ],
+  "additionalReturnVisits": [
+    {
+      "file": "spending-night-390x844.jpg",
+      "result": "actual Night return visit retains cap800, pending explicit none and remindersfalse; no24hour activation claim"
+    }
+  ],
+  "additionalScreenshotHashes": {
+    "spending-night-390x844.jpg": "b729aeb10134df78a14443b4f6d361957753e81a29516e5faa2d303397961ec7"
+  },
+  "additionalInvalidInputEvidence": {
+    "file": "invalid-cap-night-390x844.jpg",
+    "sha256": "eb0fb2324c0ceef9d490f80606ca3422edb2646cef201f8053ecd5593f42098e",
+    "result": "Actual earlier Night390x844 frame: draft1.001 is rejected with Enter a valid amount; current/pending values are retained. Frame preserved and indexed October2; no new successful save or clock passage claimed."
+  }
+}

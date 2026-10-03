@@ -1,0 +1,11 @@
+{
+  "source": "creator_w8_privacy61_app_20261002",
+  "target": "creator_w8_privacy61_lease_20261002",
+  "sourceClosed": true,
+  "method": "PostgreSQL template clone; not a separate dump restore",
+  "labelledSynthetic": true,
+  "originalRecovery": false,
+  "migrations": 61,
+  "existing_jobs": 4,
+  "existing_tasks": 32
+}

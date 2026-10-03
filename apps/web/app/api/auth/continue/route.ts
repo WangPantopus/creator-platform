@@ -26,15 +26,20 @@ export async function GET(request: NextRequest) {
       throw new Error("Application origin is not configured");
     target = new URL("/auth/continue", applicationOrigin(request));
   } catch {
-    return NextResponse.json(
-      {
-        error: {
-          code: "identity_unconfigured",
-          message: "Pantopus sign-in is temporarily unavailable. Try again.",
-        },
+    // No configured origin means no provider navigation is safe. A relative
+    // Location stays on the requesting site without trusting Host/forwarded
+    // headers, and preserves the validated destination in the recovery UI.
+    const recovery = new URLSearchParams({
+      returnTo,
+      error: valid ? "identity_unconfigured" : "invalid_return",
+    });
+    return new NextResponse(null, {
+      status: 303,
+      headers: {
+        Location: `/auth/continue?${recovery.toString()}`,
+        "Cache-Control": "no-store",
       },
-      { status: 503 },
-    );
+    });
   }
   target.searchParams.set("returnTo", returnTo);
   if (!valid) {

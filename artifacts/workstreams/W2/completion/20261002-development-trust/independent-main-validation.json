@@ -1,0 +1,60 @@
+{
+  "time": "2026-10-02T18:48:16.397390+00:00",
+  "candidateBase": "3dc3e0b670c4f5bde133d7a7e939c6bc3956ad8e",
+  "candidateCodeHead": "1358d3f7dd5f5a8401e4fc0169d60b7a56038770",
+  "extraction": "Only actual W2 launcher and new sanitized receipt/own records; no draft132 migrations or held future owner source copied",
+  "launcherSha256": "9e637180963349f52e0d201ecd41703f4247c3aa759d24dfc1f18c09c5011abf",
+  "checks": {
+    "backendTypes": "PASS",
+    "scopedESLint": "PASS",
+    "format": "PASS",
+    "existingContracts": {
+      "count": 9,
+      "milliseconds": 68,
+      "result": "PASS"
+    }
+  },
+  "personallyRestartedAPI": {
+    "port": 4102,
+    "release": "1358d3f7dd5f5a8401e4fc0169d60b7a56038770",
+    "readyHTTP": 503,
+    "trustDatabase": "available/non_owner_rls_verified",
+    "restorationDenial": "available",
+    "privacyAuthority": "available",
+    "missingDomainsProvidersOwnerProbes": "unavailable",
+    "ingestionDisabledNotices": 1,
+    "ingestionRetryFailures": 0
+  },
+  "personallyOperatedReadback": {
+    "creatorActor": "10000000-0000-4000-8000-000000000001",
+    "existingJob": "same79a486e1 hash from receipt.json",
+    "ui": "one actual blocked request / Trust complete / seven explicit dependencies / no download",
+    "theme": "night",
+    "viewport": [
+      1280,
+      900
+    ],
+    "horizontalOverflow": false,
+    "screenshot": "candidate-creator-readback-night-1280-full.png"
+  },
+  "personallyOperatedCanonicalActorSwitch": {
+    "through": "actual Development actor two button",
+    "fanActor": "10000000-0000-4000-8000-000000000002",
+    "ui": "No data requests yet; old creator job/proof/result cleared",
+    "postgresCounts": {
+      "creatorJobs": 1,
+      "fanJobs": 0
+    },
+    "theme": "light",
+    "viewport": [
+      1280,
+      900
+    ],
+    "horizontalOverflow": false,
+    "screenshot": "candidate-separate-fan-no-creator-job.png"
+  },
+  "failuresPreserved": [
+    "Read-only diagnostic guessed creator.account_profile and refused42P01; corrected to actual privacy_job count query, no fabricated profile or zero-job assertion from failed query"
+  ],
+  "limits": "Personal scoped request list separation/readback, not a direct cross-account job-detail attack, full coherent export/download, erasure or C10. Native/current full host/provider/translation/p95/release remain open. Browser viewport restored."
+}

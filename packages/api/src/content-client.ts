@@ -199,6 +199,12 @@ export class ContentStudioClient {
   preference(creatorId: string) {
     return this.request(this.path(creatorId, "/mute"), C.ContentPreference);
   }
+  replyPolicy(creatorId: string) {
+    return this.request(
+      this.path(creatorId, "/reply-policy"),
+      C.NoteReplyPolicy,
+    );
+  }
   mute(creatorId: string, muted: boolean) {
     return this.request(
       this.path(creatorId, "/mute"),

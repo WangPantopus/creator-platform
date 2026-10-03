@@ -1,0 +1,22 @@
+{
+  "proposalOnly": true,
+  "sourceSQLSha256": "98f9373fbf2403e05f6f26a4223a94779d3280fefa89f2ab2c6f30fbbef796be",
+  "preservedOriginalSQLSha256": "91e56109c91c9437104d68a00ccf1c7f5cc3ea0180db8d3535becb8d72f1bb2c",
+  "newMigration": "0182_w4_generation_allowance_audience",
+  "dependencies": [
+    "0159_w1_generation_worker_scope",
+    "0177_w8_generation_worker_denial",
+    "0049_w4_generation_cost_settlement"
+  ],
+  "functionDefinitionSha256": "0f8d71b2adf8e27ab5c3e94a96144ceb934f6a65fd420ab04e1eff9011e61d2f",
+  "diagnostics": [],
+  "administratorSelectedWorkerCatalogueRefusal": "55000",
+  "actualTaskVerified": false,
+  "unregistered": true,
+  "originalFunctionRestored": true,
+  "after": {
+    "ledger": 57,
+    "generations": 0,
+    "reservations": 0
+  }
+}

@@ -2,6 +2,8 @@
 
 For the next W1 agent, use the [W1 continuation prompt](W1-resume-handoff.md) together with the [W1 handoff](../handoffs/W1-platform-identity.md). This starts from the preserved feature-branch checkpoint and retains the full original assignment below.
 
+For the next W2 agent, use the [October 1 complete continuation prompt](W2-resume-20261001.md) and [current W2 handoff](../handoffs/W2-creator-ai-20261001.md). They preserve all nine packages/R01–R14 and latest human authorization to restore needed runtimes, personally verify all three apps, open ready PRs and merge ready PRs normally.
+
 Copy the **entire contents of one prompt file** into the independent agent assigned to that stream. Each file is self-contained: it repeats the founder's personal-implementation and no-new-test-code rules, includes the complete stream scope and primary artboards, and specifies real-app verification and delivery evidence. You do not need to prepend a separate common prompt.
 
 Every owner must personally implement, launch, diagnose, fix and verify its work. Subagents may only research or check information read-only. The eight workstream owners are peers, not implementation subagents recruited by one owner.

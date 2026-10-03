@@ -1,0 +1,39 @@
+{
+  "recordedAt": "2026-10-01T14:28:56.619485+00:00",
+  "base": "a92b04757378108e3a88b7c03f71e8a68e66c6ec",
+  "branch": "codex/w4-store-management-recovery-20261001",
+  "requirements": [
+    "R04",
+    "R10",
+    "R13",
+    "R14"
+  ],
+  "changes": [
+    "Existing Apple/Google membership history retains official store account management when server purchase verification is unavailable.",
+    "Android settings-launch failure displays recovery instructions instead of swallowing the error.",
+    "Purchase/restore remain server-verified; store settings do not grant entitlement or infer cancellation."
+  ],
+  "sourceSha256": {
+    "apps/ios/Sources/QelvoraUI/Commerce/StoreMembershipPane.swift": "5d8280d6383f63125ca37d81ff2c3af670909b83a47c5994d904162ad8554952",
+    "apps/ios/Sources/QelvoraUI/Commerce/CommerceFeature.swift": "d4536cf6572582b461fe763e562d0b331b97cefddcfa3d8b3e20895b26b16105",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/commerce/StoreMembership.kt": "3ed7c6767836ac0430a425321b12c1e419d7c5de6ba01e53efdb47961071f738",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/commerce/CommerceFeature.kt": "36be60fe0d750ff58b5b2fa689c4d3311d55c98a3999b9ba4462a8c7135a7bfe"
+  },
+  "verification": {
+    "swiftSyntax": {
+      "command": "swiftc -frontend -parse <two changed Swift files>",
+      "exitCode": 0,
+      "scope": "Syntax only; not typecheck/build or native operation."
+    },
+    "diffCheck": {
+      "exitCode": 0
+    },
+    "runtime": "Not launched or personally operated for this increment. Native CUA is disabled; owned runtime resources were stopped during cleanup.",
+    "storeAcceptance": "Unavailable: no approved Apple/Play sandbox, product configuration or real linked subscription."
+  },
+  "references": [
+    "https://developer.apple.com/documentation/swiftui/view/managesubscriptionssheet(ispresented:subscriptiongroupid:)",
+    "https://developer.android.com/google/play/billing/subscriptions#deep-link"
+  ],
+  "releaseReady": false
+}

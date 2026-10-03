@@ -629,15 +629,18 @@ public struct Receipt: View {
 
 public struct SpendLimit: View {
   public var options: [String]
+  public var remindersOn: Bool?
   public var onSelect: (String) -> Void
   private var providedSelection: Binding<String?>?
   @State private var localSelection: String?
   @Environment(\.colorScheme) private var scheme
   public init(
     options: [String] = ["$30", "$60", "$120", QelvoraCopy.text("noLimit")],
-    selection: Binding<String?>? = nil, onSelect: @escaping (String) -> Void = { _ in }
+    selection: Binding<String?>? = nil, remindersOn: Bool? = nil,
+    onSelect: @escaping (String) -> Void = { _ in }
   ) {
     self.options = options
+    self.remindersOn = remindersOn
     self.providedSelection = selection
     self.onSelect = onSelect
   }
@@ -677,7 +680,7 @@ public struct SpendLimit: View {
         }
       }.accessibilityElement(children: .contain).accessibilityLabel(
         QelvoraCopy.text("monthlyLimitLegend"))
-      Text(QelvoraCopy.text("limitReminders")).qText("caption").foregroundStyle(
+      Text(QelvoraCopy.text(remindersOn == true ? "limitReminders" : remindersOn == false ? "limitRemindersOff" : "limitRemindersUnknown")).qText("caption").foregroundStyle(
         qColor("ink-muted", scheme))
     }.foregroundStyle(qColor("ink", scheme))
   }

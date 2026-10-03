@@ -1,0 +1,385 @@
+{
+  "schemaVersion": 1,
+  "wave": "20261002-privacy",
+  "state": "proposed_unapplied",
+  "supersedesSha256": "9efbb69e476ad39a895e5aa5db0468ad8bd98061c308f0ba9c4e35fa61e90ba7",
+  "reason": "Original split mapping left dependent104\u2013113 before moved producers. Full held ordering is metadata only; unknown additional DDL dependencies still require owner source review before activation.",
+  "mappings": [
+    {
+      "owner": "W7",
+      "old": "0063_w7_relationship_activity",
+      "previousProposed": "0114_w7_relationship_activity",
+      "new": "0151_w7_relationship_activity",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w7_relationship_activity.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W7",
+      "old": "0064_w7_source_scan_checkpoint",
+      "previousProposed": "0115_w7_source_scan_checkpoint",
+      "new": "0152_w7_source_scan_checkpoint",
+      "path": "apps/backend/src/modules/growth/migrations/pending_w7_source_scan_checkpoint.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W7",
+      "old": "0065_w7_home_page_index",
+      "previousProposed": "0116_w7_home_page_index",
+      "new": "0153_w7_home_page_index",
+      "path": "apps/backend/src/modules/growth/migrations/pending_w7_home_page_index.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W7",
+      "old": "0066_w7_thanks_window_index",
+      "previousProposed": "0117_w7_thanks_window_index",
+      "new": "0154_w7_thanks_window_index",
+      "path": "apps/backend/src/modules/content/migrations/pending_w7_thanks_window_index.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W4",
+      "old": "0068_w4_paid_coverage",
+      "previousProposed": "0118_w4_paid_coverage",
+      "new": "0155_w4_paid_coverage",
+      "path": "apps/backend/src/modules/commerce/schema-paid-coverage.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W8",
+      "old": "0069_w8_reply_review",
+      "previousProposed": "0119_w8_reply_review",
+      "new": "0156_w8_reply_review",
+      "path": "apps/backend/migrations/0069_w8_reply_review.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W4",
+      "old": "0070_w4_public_packet_read",
+      "previousProposed": "0120_w4_public_packet_read",
+      "new": "0157_w4_public_packet_read",
+      "path": "apps/backend/src/modules/commerce/schema-public-packet-read.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W1",
+      "old": "0071_w1_publication_worker_scope",
+      "previousProposed": "0121_w1_publication_worker_scope",
+      "new": "0158_w1_publication_worker_scope",
+      "path": "apps/backend/src/modules/identity/schema-publication-scope.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W1",
+      "old": "0072_w1_generation_worker_scope",
+      "previousProposed": "0122_w1_generation_worker_scope",
+      "new": "0159_w1_generation_worker_scope",
+      "path": "apps/backend/src/modules/identity/schema-generation-scope.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W8",
+      "old": "0073_w8_publication_worker_denial",
+      "previousProposed": "0123_w8_publication_worker_denial",
+      "new": "0160_w8_publication_worker_denial",
+      "path": "apps/backend/migrations/0073_w8_publication_worker_denial.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W6",
+      "old": "0075_w6_publication_media_scope",
+      "previousProposed": "0124_w6_publication_media_scope",
+      "new": "0161_w6_publication_media_scope",
+      "path": "apps/backend/src/modules/media/publication-scope.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W8",
+      "old": "0076_w8_public_packet_denial",
+      "previousProposed": "0125_w8_public_packet_denial",
+      "new": "0162_w8_public_packet_denial",
+      "path": "apps/backend/migrations/0076_w8_public_packet_denial.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W2",
+      "old": "0077_w2_usage_lineage",
+      "previousProposed": "0126_w2_usage_lineage",
+      "new": "0163_w2_usage_lineage",
+      "path": "apps/backend/src/modules/agent/migrations/0048_w2_usage_lineage.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W8",
+      "old": "0078_w8_privacy_export_chunks",
+      "previousProposed": "0127_w8_privacy_export_chunks",
+      "new": "0164_w8_privacy_export_chunks",
+      "path": "apps/backend/migrations/0052_w8_privacy_export_chunks.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W2",
+      "old": "0079_w2_usage_retention_expiry",
+      "previousProposed": "0128_w2_usage_retention_expiry",
+      "new": "0165_w2_usage_retention_expiry",
+      "path": "apps/backend/src/modules/agent/migrations/0067_w2_usage_retention_expiry.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W4",
+      "old": "0080_w4_fan_request_page_index",
+      "previousProposed": "0129_w4_fan_request_page_index",
+      "new": "0166_w4_fan_request_page_index",
+      "path": "apps/backend/src/modules/commerce/schema-home-request-metadata.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W1",
+      "old": "0081_w1_signature_read_fence",
+      "previousProposed": "0130_w1_signature_read_fence",
+      "new": "0167_w1_signature_read_fence",
+      "path": "apps/backend/src/modules/identity/schema-signature-read-fence.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W3",
+      "old": "0083_w3_translation_worker_scope",
+      "previousProposed": "0131_w3_translation_worker_scope",
+      "new": "0168_w3_translation_worker_scope",
+      "path": null,
+      "originalDependencies": []
+    },
+    {
+      "owner": "W8",
+      "old": "0084_w8_team_thread_denial",
+      "previousProposed": "0132_w8_team_thread_denial",
+      "new": "0169_w8_team_thread_denial",
+      "path": "apps/backend/migrations/0084_w8_team_thread_denial.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W1",
+      "old": "0085_w1_public_ai_metadata_scope",
+      "previousProposed": "0133_w1_public_ai_metadata_scope",
+      "new": "0170_w1_public_ai_metadata_scope",
+      "path": "apps/backend/src/modules/identity/schema-public-ai-scope.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W8",
+      "old": "0086_w8_public_creator_denial",
+      "previousProposed": "0134_w8_public_creator_denial",
+      "new": "0171_w8_public_creator_denial",
+      "path": "apps/backend/migrations/0086_w8_public_creator_denial.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W5",
+      "old": "0088_w5_reply_tenure_cap",
+      "previousProposed": "0135_w5_reply_tenure_cap",
+      "new": "0172_w5_reply_tenure_cap",
+      "path": null,
+      "originalDependencies": []
+    },
+    {
+      "owner": "W8",
+      "old": "0089_w8_creator_fan_denial",
+      "previousProposed": "0136_w8_creator_fan_denial",
+      "new": "0173_w8_creator_fan_denial",
+      "path": "apps/backend/migrations/0089_w8_creator_fan_denial.sql",
+      "originalDependencies": []
+    },
+    {
+      "owner": "W4",
+      "old": "0090_w4_spending_notice_custody",
+      "previousProposed": "0137_w4_spending_notice_custody",
+      "new": "0174_w4_spending_notice_custody",
+      "path": null,
+      "originalDependencies": []
+    },
+    {
+      "owner": "W8",
+      "old": "0091_w8_account_denial",
+      "previousProposed": "0138_w8_account_denial",
+      "new": "0175_w8_account_denial",
+      "path": null,
+      "originalDependencies": []
+    },
+    {
+      "owner": "W6",
+      "old": "0092_w6_provider_callback_ingress",
+      "previousProposed": "0139_w6_provider_callback_ingress",
+      "new": "0176_w6_provider_callback_ingress",
+      "path": null,
+      "originalDependencies": []
+    },
+    {
+      "owner": "W8",
+      "old": "0093_w8_generation_worker_denial",
+      "previousProposed": "0140_w8_generation_worker_denial",
+      "new": "0177_w8_generation_worker_denial",
+      "path": null,
+      "originalDependencies": []
+    },
+    {
+      "owner": "W4",
+      "old": "0094_w4_fulfillment_plan_custody",
+      "previousProposed": "0141_w4_fulfillment_plan_custody",
+      "new": "0178_w4_fulfillment_plan_custody",
+      "path": null,
+      "originalDependencies": []
+    },
+    {
+      "owner": "W3",
+      "old": "0095_w3_generation_purpose_consumers",
+      "previousProposed": "0142_w3_generation_purpose_consumers",
+      "new": "0179_w3_generation_purpose_consumers",
+      "path": null,
+      "originalDependencies": [72, 93]
+    },
+    {
+      "owner": "W2",
+      "old": "0096_w2_generation_input_consumers",
+      "previousProposed": "0143_w2_generation_input_consumers",
+      "new": "0180_w2_generation_input_consumers",
+      "path": null,
+      "originalDependencies": [72, 93]
+    },
+    {
+      "owner": "W2",
+      "old": "0097_w2_generation_attempt_admission",
+      "previousProposed": "0144_w2_generation_attempt_admission",
+      "new": "0181_w2_generation_attempt_admission",
+      "path": null,
+      "originalDependencies": [72, 93, 95, 96]
+    },
+    {
+      "owner": "W4",
+      "old": "0098_w4_generation_allowance_audience",
+      "previousProposed": "0145_w4_generation_allowance_audience",
+      "new": "0182_w4_generation_allowance_audience",
+      "path": null,
+      "originalDependencies": [72, 93, 97]
+    },
+    {
+      "owner": "W1",
+      "old": "0099_w1_generation_terminal_scope",
+      "previousProposed": "0146_w1_generation_terminal_scope",
+      "new": "0183_w1_generation_terminal_scope",
+      "path": null,
+      "originalDependencies": []
+    },
+    {
+      "owner": "W8",
+      "old": "0100_w8_generation_terminal_denial",
+      "previousProposed": "0147_w8_generation_terminal_denial",
+      "new": "0184_w8_generation_terminal_denial",
+      "path": null,
+      "originalDependencies": []
+    },
+    {
+      "owner": "W7",
+      "old": "0101_w7_core_follow_metadata",
+      "previousProposed": "0148_w7_core_follow_metadata",
+      "new": "0185_w7_core_follow_metadata",
+      "path": null,
+      "originalDependencies": []
+    },
+    {
+      "owner": "W5",
+      "old": "0102_w5_generation_content_origin",
+      "previousProposed": "0149_w5_generation_content_origin",
+      "new": "0186_w5_generation_content_origin",
+      "path": null,
+      "originalDependencies": [72, 81, 93]
+    },
+    {
+      "owner": "W2",
+      "old": "0104_w2_generation_retrieval_context",
+      "previousProposed": "0104_w2_generation_retrieval_context",
+      "new": "0187_w2_generation_retrieval_context",
+      "path": null,
+      "originalDependencies": [98, 102]
+    },
+    {
+      "owner": "W2",
+      "old": "0105_w2_generation_terminal_journal",
+      "previousProposed": "0105_w2_generation_terminal_journal",
+      "new": "0188_w2_generation_terminal_journal",
+      "path": null,
+      "originalDependencies": [97, 99, 100]
+    },
+    {
+      "owner": "W4",
+      "old": "0106_w4_generation_terminal_settlement",
+      "previousProposed": "0106_w4_generation_terminal_settlement",
+      "new": "0189_w4_generation_terminal_settlement",
+      "path": null,
+      "originalDependencies": [99, 100, 105]
+    },
+    {
+      "owner": "W1",
+      "old": "0108_w1_generation_accounting_subject",
+      "previousProposed": "0108_w1_generation_accounting_subject",
+      "new": "0190_w1_generation_accounting_subject",
+      "path": null,
+      "originalDependencies": [99, 105]
+    },
+    {
+      "owner": "W8",
+      "old": "0109_w8_generation_accounting_denial",
+      "previousProposed": "0109_w8_generation_accounting_denial",
+      "new": "0191_w8_generation_accounting_denial",
+      "path": null,
+      "originalDependencies": [97, 105, 108]
+    },
+    {
+      "owner": "W4",
+      "old": "0107_w4_generation_accounting_correction",
+      "previousProposed": "0107_w4_generation_accounting_correction",
+      "new": "0192_w4_generation_accounting_correction",
+      "path": null,
+      "originalDependencies": [108, 109]
+    },
+    {
+      "owner": "W3",
+      "old": "0110_w3_generation_terminal_finalization",
+      "previousProposed": "0110_w3_generation_terminal_finalization",
+      "new": "0193_w3_generation_terminal_finalization",
+      "path": null,
+      "originalDependencies": [99, 100, 105, 106]
+    },
+    {
+      "owner": "W1",
+      "old": "0111_w1_translation_worker_scope",
+      "previousProposed": "0111_w1_translation_worker_scope",
+      "new": "0194_w1_translation_worker_scope",
+      "path": null,
+      "originalDependencies": [83]
+    },
+    {
+      "owner": "W8",
+      "old": "0112_w8_translation_worker_denial",
+      "previousProposed": "0112_w8_translation_worker_denial",
+      "new": "0195_w8_translation_worker_denial",
+      "path": null,
+      "originalDependencies": [83, 111]
+    },
+    {
+      "owner": "W2",
+      "old": "0113_w2_privacy_export_snapshot",
+      "previousProposed": "0113_w2_privacy_export_snapshot",
+      "new": "0196_w2_privacy_export_snapshot",
+      "path": null,
+      "originalDependencies": [77, 79, 97]
+    },
+    {
+      "owner": "W6",
+      "old": "0150_w6_account_call_metadata",
+      "previousProposed": "0150_w6_account_call_metadata",
+      "new": "0197_w6_account_call_metadata",
+      "path": null,
+      "originalDependencies": []
+    }
+  ]
+}

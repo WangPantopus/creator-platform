@@ -1,0 +1,16 @@
+{
+  "label": "actual synthetic purpose-review catalogue; held0087 not canonical activation",
+  "sourceSha256": "33e619bfdea66355e1d8d2b90ed2d0389f21ae024fda63e1b984c99aede847ef",
+  "functions": [
+    {
+      "signature": "creator_trust.fence_privacy_task(uuid,uuid,text,text,uuid,uuid,text,uuid)",
+      "owner": "creator_privacy_fence",
+      "sha256": "89545999948ddf8a7d237e0298df721426aea055e706e4edc82b60879ce18e6c"
+    },
+    {
+      "signature": "creator_trust.finish_privacy_task_scope()",
+      "owner": "creator_privacy_fence",
+      "sha256": "87ca3cb473206101c6590c79c598695cfd2e7e491e14c5e490e3d21a06ff426d"
+    }
+  ]
+}
