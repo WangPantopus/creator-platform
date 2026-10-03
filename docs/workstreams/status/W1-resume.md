@@ -4,6 +4,10 @@ October 2 successor reconciliation: PR21 now incorporates current main `af38420d
 
 October 2 focused main increment: actual Ops/Account/Status return handling and truthful no-fan Account are implemented and personally browser-operated at cac6be9c on an independently restored, labelled canonical57 development copy. Same actual expired session rotates and returns to audits; Ops denies without membership. Original W1 remains closed. Production build/types/canonical generation/scoped checks pass; native/full workstream acceptance remains open. [Exact bounded evidence](../../../artifacts/workstreams/W1/resume/2026-10-02-ops-return/run.md).
 
+## October 1 — authorship practice keyboard recovery
+
+Personally operated four keyboard answers and observed focus fall to the page on completion. The web repair moves focus to Restart only when the completed answer owned focus and focus has not moved to another control. Light 4/4 and Night/reduced-motion 1/4 both recover focus; Restart resets card/score and Tab returns to answers. [Evidence and exact source/build hashes](../../../artifacts/workstreams/W1/resume/2026-10-01-comprehension/run.md). Production web build, typecheck and affected lint/formatting pass. Cards, author labels, score semantics and original references are preserved. This closes the observed browser focus defect only; H15's full visual/accessibility matrix and H16's consented-participant study remain open.
+
 ## October 1 — onboarding timing and interview estimate
 
 W1 personally resolves DI09's initial Handle timing through the governing Product Design S-F1/S-F5: new profiles collect only a handle, while an existing profile retains its optional intro editor. Web, Swift and Kotlin follow the same profile-state distinction. The later one-time offer after a useful thread answer remains unfinished; saving an intro grants no per-creator AI permission. The live setup estimate follows S-C14/A10's about 20-minute voice/text interview. [Recorded decision](../DECISIONS.md#w1-source-conflicts-resolved--october-1-2026) preserves original artboards/references and the optional imported-source path.
