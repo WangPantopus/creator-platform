@@ -1,3 +1,10 @@
+## Commerce privacy source review — October 3, 2026 13:58 UTC
+
+- [ ] Qualify the genuine Commerce late-host/configuration and actual held restoration/task/fault/sole-COMMIT lifecycle after the owned source repair; source/type/query planning is not export authority or positive acceptance.
+- [ ] Complete protected artifact sink/current stage/cancellation cleanup, approved retained-record/deletion policy, durable ACK and finite C10. No full package/R01–R15 row is complete.
+
+[Personally reviewed source and canonical61 projection bounds](../../../artifacts/workstreams/W4/runtime/2026-10-03/commerce-privacy-settlement/README.md) record the reuse of the real main settlement class, explicit fields in both paths,17 installed query plans/five uninstalled held projections and unchanged38-table commerce custody. Existing9 contract checks and the normal shipping bundle pass; no new test code or synthetic task/artifact/financial acceptance is added.
+
 ## Current signed iOS and original real deadline — October 3, 2026 13:06 UTC
 
 - [x] Personally operate current signed iOS original-account Requests/You Spending Back in named Light/Night paths, actual decimal6.50 unsaved input and normal cold discard; preserve all38 commerce tables/two rows and release the actual bounded own resources.

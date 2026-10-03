@@ -11,6 +11,7 @@ import {
   exportCommerceFinancial,
   type FinancialExportSink,
 } from "./financial-export.js";
+import { financialExportSelects } from "./financial-export-projections.js";
 
 type EffectInput = Parameters<EffectHook["run"]>[0];
 /** W8 must revalidate the live case, scope and financial permission before issuing
@@ -147,6 +148,7 @@ export function commercePrivacyHook(
               input.scope === "account" ? null : input.creatorId;
             const exportThread =
               input.scope === "thread" ? input.threadId : null;
+            const projections = await financialExportSelects(client);
             const packets = (
               await client.query(
                 "SELECT id,creator_id,fan_id,thread_id,snapshot,disclosure,visibility,state,payment_state,created_at,submitted_at,accepted_at FROM creator.commerce_packet WHERE ($1::uuid IS NULL OR creator_id=$1) AND ($2::uuid IS NULL OR thread_id=$2) ORDER BY created_at,id LIMIT 2001",
@@ -156,7 +158,7 @@ export function commercePrivacyHook(
             const ids = packets.map((row) => row.id);
             const commitments = (
               await client.query(
-                "SELECT * FROM creator.commerce_commitment WHERE packet_id=ANY($1::uuid[]) ORDER BY id LIMIT 2001",
+                `${projections.commerce_commitment} WHERE packet_id=ANY($1::uuid[]) ORDER BY id LIMIT 2001`,
                 [ids],
               )
             ).rows;
@@ -193,6 +195,41 @@ export function commercePrivacyHook(
               data[name] = rows;
             };
             const commitmentIds = commitments.map((row) => row.id);
+            const fulfillmentSchema = (
+              await client.query<{ count: number }>(
+                "SELECT count(*)::integer AS count FROM information_schema.tables WHERE table_schema='creator' AND table_name IN('commerce_fulfillment_plan','commerce_fulfillment_member','commerce_group_delivery','commerce_review_attestation')",
+              )
+            ).rows[0]?.count;
+            invariant(
+              fulfillmentSchema === 0 || fulfillmentSchema === 4,
+              "fulfillment_schema_incomplete",
+              "The complete original group and review history is required before this export can finish.",
+            );
+            if (fulfillmentSchema === 4) {
+              await bounded(
+                "fulfillmentPlans",
+                "SELECT id,revision,creator_id,content_id,content_version,audience,minimum_recipients,recipient_count,source_hash,created_by,created_at FROM creator.commerce_fulfillment_plan WHERE EXISTS(SELECT FROM creator.commerce_fulfillment_member member WHERE member.plan_id=commerce_fulfillment_plan.id AND member.plan_revision=commerce_fulfillment_plan.revision AND member.packet_id=ANY($1::uuid[])) ORDER BY id,revision LIMIT 2001",
+                [ids],
+              );
+              for (const [name, relation, keys] of [
+                [
+                  "fulfillmentMembers",
+                  "commerce_fulfillment_member",
+                  "plan_id,plan_revision,packet_id",
+                ],
+                [
+                  "groupDeliveries",
+                  "commerce_group_delivery",
+                  "plan_id,plan_revision,packet_id",
+                ],
+                ["reviewAttestations", "commerce_review_attestation", "id"],
+              ] as const)
+                await bounded(
+                  name,
+                  `${projections[relation]} WHERE packet_id=ANY($1::uuid[]) ORDER BY ${keys} LIMIT 2001`,
+                  [ids],
+                );
+            }
             const approvalSchema = (
               await client.query<{
                 drafts: string | null;
@@ -214,7 +251,7 @@ export function commercePrivacyHook(
               ] as const)
                 await bounded(
                   name,
-                  `SELECT * FROM creator.${relation} WHERE ($1::uuid IS NULL OR creator_id=$1) AND ($2::uuid IS NULL OR thread_id=$2) ORDER BY id LIMIT 2001`,
+                  `${projections[relation]} WHERE ($1::uuid IS NULL OR creator_id=$1) AND ($2::uuid IS NULL OR thread_id=$2) ORDER BY id LIMIT 2001`,
                   [exportCreator, exportThread],
                 );
             await bounded(
@@ -224,7 +261,7 @@ export function commercePrivacyHook(
             );
             await bounded(
               "sharing",
-              "SELECT * FROM creator.commerce_share_grant WHERE commitment_id=ANY($1::uuid[]) ORDER BY id LIMIT 2001",
+              `${projections.commerce_share_grant} WHERE commitment_id=ANY($1::uuid[]) ORDER BY id LIMIT 2001`,
               [commitmentIds],
             );
             await bounded(
@@ -259,7 +296,7 @@ export function commercePrivacyHook(
               ] as const) {
                 await bounded(
                   name,
-                  `SELECT * FROM creator.${relation} WHERE ($1::uuid IS NULL OR creator_id=$1) LIMIT 2001`,
+                  `${projections[relation]} WHERE ($1::uuid IS NULL OR creator_id=$1) LIMIT 2001`,
                   [creator],
                 );
               }
@@ -280,7 +317,7 @@ export function commercePrivacyHook(
                 ] as const)
                   await bounded(
                     name,
-                    `SELECT * FROM creator.${relation} WHERE ($1::uuid IS NULL OR creator_id=$1) ORDER BY id LIMIT 2001`,
+                    `${projections[relation]} WHERE ($1::uuid IS NULL OR creator_id=$1) ORDER BY id LIMIT 2001`,
                     [creator],
                   );
               for (const [name, relation] of [
@@ -290,7 +327,7 @@ export function commercePrivacyHook(
               ] as const) {
                 await bounded(
                   name,
-                  `SELECT * FROM creator.${relation} WHERE creator.commerce_scope(creator_id,NULL) AND ($1::uuid IS NULL OR creator_id=$1) LIMIT 2001`,
+                  `${projections[relation]} WHERE creator.commerce_scope(creator_id,NULL) AND ($1::uuid IS NULL OR creator_id=$1) LIMIT 2001`,
                   [creator],
                 );
               }
@@ -344,7 +381,7 @@ export function commercePrivacyHook(
                 );
                 await bounded(
                   "poolCycles",
-                  "SELECT * FROM creator.commerce_pool_cycle WHERE cycle IN(SELECT cycle FROM creator.commerce_pool_effect WHERE ($1::uuid IS NULL OR creator_id=$1)) LIMIT 2001",
+                  `${projections.commerce_pool_cycle} WHERE cycle IN(SELECT cycle FROM creator.commerce_pool_effect WHERE ($1::uuid IS NULL OR creator_id=$1)) LIMIT 2001`,
                   [creator],
                 );
               }
@@ -383,11 +420,11 @@ export function commercePrivacyHook(
               for (const [name, query] of [
                 [
                   "spendingLimits",
-                  "SELECT * FROM creator.commerce_spend_limit LIMIT 2001",
+                  `${projections.commerce_spend_limit} LIMIT 2001`,
                 ],
                 [
                   "spendingNotices",
-                  "SELECT * FROM creator.commerce_spending_notice LIMIT 2001",
+                  `${projections.commerce_spending_notice} LIMIT 2001`,
                 ],
                 [
                   "passes",
