@@ -180,6 +180,26 @@ function unavailable(cause?: unknown): never {
   throw error;
 }
 
+/** Metadata guards retain their private cause. A wrapped client timeout still
+ * leaves the original response uncertain; bounded/cyclic causes fail closed. */
+function uncertainReadResponse(failure: unknown): boolean {
+  const pending = [failure];
+  const seen = new Set<Error>();
+  while (pending.length) {
+    const error = pending.pop();
+    if (!(error instanceof Error)) continue;
+    if (seen.has(error)) return true;
+    seen.add(error);
+    if (seen.size > 128 || error.message === "Query read timeout") return true;
+    pending.push(error.cause);
+    if (error instanceof AggregateError) {
+      if (error.errors.length > 128) return true;
+      pending.push(...error.errors);
+    }
+  }
+  return false;
+}
+
 /** W1 owns each held transaction and sole COMMIT. This writer consumes only
  * W2's private approval and W1's genuine scope; it cannot issue either one. */
 export class PreparedGenerationConversationOutput {
@@ -265,10 +285,10 @@ export class PreparedGenerationConversationOutput {
     let discard = true;
     let failure: unknown;
     let failed = false;
-    let transportError: Error | undefined;
+    const transportErrors: Error[] = [];
     const cleanupErrors: unknown[] = [];
     const onError = (error: Error) => {
-      transportError ??= error;
+      transportErrors.push(error);
       discard = true;
     };
     client.on("error", onError);
@@ -300,16 +320,16 @@ export class PreparedGenerationConversationOutput {
         "Use the same actual canonical database.",
       );
       await prepared.assertCustody(client);
-      discard = true;
-      await client.query("ROLLBACK");
-      started = false;
-      if (transportError) throw transportError;
-      discard = false;
     } catch (error) {
       failed = true;
       failure = error;
+      // A client read timeout does not prove that the original query ended.
+      // Failed BEGIN already retains discard=true. Never queue cleanup SQL on
+      // either uncertain source, or retry a failed ROLLBACK.
+      discard ||= uncertainReadResponse(error);
     } finally {
-      if (started) {
+      discard ||= transportErrors.length > 0;
+      if (started && !discard) {
         try {
           await client.query("ROLLBACK");
         } catch (error) {
@@ -317,30 +337,33 @@ export class PreparedGenerationConversationOutput {
           cleanupErrors.push(error);
         }
       }
-      discard ||= transportError !== undefined;
+      discard ||= transportErrors.length > 0;
       try {
         if (discard) await client.end();
       } catch (error) {
         cleanupErrors.push(error);
       } finally {
-        client.removeListener("error", onError);
         try {
           client.release(discard);
         } catch (error) {
           cleanupErrors.push(error);
         }
+        client.removeListener("error", onError);
       }
     }
-    if (transportError && !failed) {
-      failed = true;
-      failure = transportError;
-    }
-    if (cleanupErrors.length)
-      throw new AggregateError(
-        failed ? [failure, ...cleanupErrors] : cleanupErrors,
-        "Generation output qualification cleanup failed",
+    if (failed || transportErrors.length || cleanupErrors.length)
+      unavailable(
+        new AggregateError(
+          [
+            ...new Set([
+              ...(failed ? [failure] : []),
+              ...transportErrors,
+              ...cleanupErrors,
+            ]),
+          ],
+          "Generation output qualification and cleanup failed",
+        ),
       );
-    if (failed) throw failure;
     return prepared;
   }
 
@@ -502,9 +525,14 @@ export class PreparedGenerationConversationOutput {
   async deliver(
     task: GenerationTask,
     sentence: ApprovedGenerationSentence,
+    signal?: AbortSignal,
   ): Promise<void> {
-    await this.identity.withGeneration(task, async (client, scope) => {
-      await this.appendInTransaction(client, scope, sentence);
-    });
+    await this.identity.withGeneration(
+      task,
+      async (client, scope) => {
+        await this.appendInTransaction(client, scope, sentence);
+      },
+      signal,
+    );
   }
 }
