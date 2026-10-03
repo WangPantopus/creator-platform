@@ -14,7 +14,7 @@ const roles = [
 ];
 export const originalPrivacyFamilyMigration = Object.freeze({
   version: "0214_w8_original_privacy_family",
-  checksum: "bb93fda4d7ff4647b532e1bc57f59642bc63bd207056ace7b436ddafa74adbe3",
+  checksum: "e815785fb8d00036b4d510275803794adbb28c634b7ae4ef55dbf70d3bbacdcb",
 });
 export const originalPrivacyBindingSignature =
   "creator_trust.privacy_task_original_binding(uuid,text,uuid)";
@@ -22,7 +22,7 @@ export const originalPrivacyBindingDefinition =
   "96258c090117abc5b0a45beb8f12b8aa48d81645501c66617329463523f9fc63";
 // Only actual closed qualification may fill this value; no startup readback.
 const catalogueChecksum =
-  "426857aad55d6b81254c5641d8c15e32ec5c7f12f4e299c814c6876fecc8f03f";
+  "e2dd075515d08bfcc0ded60230645e6d1e5c4d79b028a8e537dd76b3bb3fabf3";
 
 function unavailable(): never {
   throw new DomainError(

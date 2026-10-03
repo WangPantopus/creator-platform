@@ -2,7 +2,7 @@
 
 ## Fixed original Conversation family source — 2026-10-03
 
-Held0214 now implements `privacy_task_original_binding(uuid,text,uuid) RETURNS jsonb`, `privacy_task_owned_creators(uuid,uuid) RETURNS uuid[]` and `privacy_task_family_matches(uuid,uuid,uuid,uuid,uuid) RETURNS boolean`. The first is original-fence-owned and callable only by the isolated family purpose; the latter two accept genuine original job/token and full tuple on the actual core client. [Exact source/caller/catalogue and qualification limits](../../operations/W8-original-privacy-family.md) retain original0087/private ACL and0209 source. No caller arrays, current creator ownership, account-only fallback or raw scope grant supplies authority. Registry activation, genuine positive all-scope/owner/C10/app work remain open.
+Held0214 now implements `privacy_task_original_binding(uuid,text,uuid) RETURNS jsonb`, `privacy_task_owned_creators(uuid,uuid) RETURNS uuid[]` and `privacy_task_family_matches(uuid,uuid,uuid,uuid,uuid) RETURNS boolean`. A fourth fixed `privacy_task_delete_family_matches(uuid,uuid,uuid,uuid,uuid) RETURNS boolean` checks original kind=delete and the same locked complete tuple, with no PUBLIC/core executable grant. The first is original-fence-owned and callable only by the isolated family purpose; the latter two accept genuine original job/token and full tuple on the actual core client. [Exact source/caller/catalogue and qualification limits](../../operations/W8-original-privacy-family.md) retain original0087/private ACL and0209 source. No caller arrays, current creator ownership, account-only fallback or raw scope grant supplies authority. Registry activation, genuine positive all-scope/owner/C10/app work remain open.
 
 ## Discovery transport uncertainty — 2026-10-03
 

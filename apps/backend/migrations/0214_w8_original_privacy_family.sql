@@ -109,10 +109,27 @@ BEGIN
   RAISE EXCEPTION 'Original family binding changed' USING ERRCODE='42501'; END IF;
  RETURN true;
 END $$;
+-- Separate DELETE-only boundary for a later independently reviewed isolated
+-- provenance purger. The public/core caller receives no executable grant.
+CREATE FUNCTION creator_trust.privacy_task_delete_family_matches(jid uuid,token uuid,t uuid,c uuid,f uuid)
+RETURNS boolean LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path=pg_catalog AS $$
+DECLARE binding jsonb;
+BEGIN
+ IF current_user<>'creator_privacy_family' THEN
+  RAISE EXCEPTION 'Isolated original-family purpose required' USING ERRCODE='42501'; END IF;
+ binding:=creator_trust.privacy_task_original_binding(jid,'conversation',token);
+ IF binding->>'kind' IS DISTINCT FROM 'delete' THEN RETURN false; END IF;
+ IF NOT creator_trust.privacy_task_family_matches(jid,token,t,c,f) THEN RETURN false; END IF;
+ IF binding<>creator_trust.privacy_task_original_binding(jid,'conversation',token) THEN
+  RAISE EXCEPTION 'Original delete family binding changed' USING ERRCODE='42501'; END IF;
+ RETURN true;
+END $$;
 ALTER FUNCTION creator_trust.privacy_task_owned_creators(uuid,uuid) OWNER TO creator_privacy_family;
 ALTER FUNCTION creator_trust.privacy_task_family_matches(uuid,uuid,uuid,uuid,uuid) OWNER TO creator_privacy_family;
+ALTER FUNCTION creator_trust.privacy_task_delete_family_matches(uuid,uuid,uuid,uuid,uuid) OWNER TO creator_privacy_family;
 REVOKE ALL ON FUNCTION creator_trust.privacy_task_owned_creators(uuid,uuid),
- creator_trust.privacy_task_family_matches(uuid,uuid,uuid,uuid,uuid) FROM PUBLIC;
+ creator_trust.privacy_task_family_matches(uuid,uuid,uuid,uuid,uuid),
+ creator_trust.privacy_task_delete_family_matches(uuid,uuid,uuid,uuid,uuid) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION creator_trust.privacy_task_owned_creators(uuid,uuid),
  creator_trust.privacy_task_family_matches(uuid,uuid,uuid,uuid,uuid) TO creator_runtime;
 COMMIT;
