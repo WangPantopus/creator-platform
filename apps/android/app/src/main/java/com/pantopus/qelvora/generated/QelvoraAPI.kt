@@ -1810,6 +1810,7 @@ data class APIContentReplyListItemsItemReaction(
 data class APIContentReplyPage(
   val `cursor`: String? = null,
   val `limit`: Long,
+  val `contentId`: String? = null,
   val `filter`: APIContentReplyPageFilter
 )
 
@@ -2971,6 +2972,28 @@ data class APITeamInvite(
 
 @Serializable
 enum class APITeamInviteRolesItem {
+  @SerialName("triage") TRIAGE,
+  @SerialName("drafter") DRAFTER,
+  @SerialName("publisher") PUBLISHER,
+  @SerialName("scheduler") SCHEDULER
+}
+
+@Serializable
+data class APITeamRolesUpdateInput(
+  val `expectedRoles`: List<APITeamRolesUpdateInputExpectedRolesItem>,
+  val `roles`: List<APITeamRolesUpdateInputRolesItem>
+)
+
+@Serializable
+enum class APITeamRolesUpdateInputExpectedRolesItem {
+  @SerialName("triage") TRIAGE,
+  @SerialName("drafter") DRAFTER,
+  @SerialName("publisher") PUBLISHER,
+  @SerialName("scheduler") SCHEDULER
+}
+
+@Serializable
+enum class APITeamRolesUpdateInputRolesItem {
   @SerialName("triage") TRIAGE,
   @SerialName("drafter") DRAFTER,
   @SerialName("publisher") PUBLISHER,
@@ -4808,6 +4831,7 @@ data class APIContentContentReplyListItemsItemReaction(
 data class APIContentContentReplyPage(
   val `cursor`: String? = null,
   val `limit`: Long,
+  val `contentId`: String? = null,
   val `filter`: APIContentContentReplyPageFilter
 )
 
@@ -5596,8 +5620,8 @@ class CreatorAPIClient(private val baseURL: String, private val maximumResponseB
   suspend fun studioContentList(creatorId: String, cursor: String? = null, limit: Long? = null, state: String? = null, query: String? = null): APIContentList = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio", "GET", authenticated = true, query = listOf("cursor" to cursor, "limit" to limit?.toString(), "state" to state, "query" to query)))
   suspend fun studioLiveCatalog(creatorId: String): APIContentLiveCatalog = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio/live", "GET", authenticated = true))
   suspend fun saveContent(creatorId: String, xQelvoraExpectedAccount: String? = null, body: APISaveContent): APIContentResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/drafts", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
-  suspend fun contentReplies(creatorId: String, cursor: String? = null, limit: Long? = null, filter: String? = null): APIContentReplyList = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies", "GET", authenticated = true, query = listOf("cursor" to cursor, "limit" to limit?.toString(), "filter" to filter)))
-  suspend fun studioContentReplies(creatorId: String, cursor: String? = null, limit: Long? = null, filter: String? = null): APIContentReplyList = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio/replies", "GET", authenticated = true, query = listOf("cursor" to cursor, "limit" to limit?.toString(), "filter" to filter)))
+  suspend fun contentReplies(creatorId: String, cursor: String? = null, limit: Long? = null, filter: String? = null, contentId: String? = null): APIContentReplyList = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies", "GET", authenticated = true, query = listOf("cursor" to cursor, "limit" to limit?.toString(), "filter" to filter, "contentId" to contentId)))
+  suspend fun studioContentReplies(creatorId: String, cursor: String? = null, limit: Long? = null, filter: String? = null, contentId: String? = null): APIContentReplyList = json.decodeFromString(request("/v1/content/${segment(creatorId)}/studio/replies", "GET", authenticated = true, query = listOf("cursor" to cursor, "limit" to limit?.toString(), "filter" to filter, "contentId" to contentId)))
   suspend fun contentReplyConsent(creatorId: String, id: String, xQelvoraExpectedAccount: String? = null, body: APIQuoteConsent): APIContentConsentResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies/${segment(id)}/consent", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun contentReplyReaction(creatorId: String, id: String, xQelvoraExpectedAccount: String? = null, body: APIReactToReply): APIContentReactionResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies/${segment(id)}/reaction", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun withdrawContentReply(creatorId: String, id: String, xQelvoraExpectedAccount: String? = null, body: APIContentVersionCommand): APIContentWithdrawResult = json.decodeFromString(request("/v1/content/${segment(creatorId)}/replies/${segment(id)}/withdraw", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("x-qelvora-expected-account" to xQelvoraExpectedAccount).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
@@ -5663,6 +5687,7 @@ class CreatorAPIClient(private val baseURL: String, private val maximumResponseB
   suspend fun inviteTeamMember(creatorId: String, body: APITeamInvite): APITeamInvitation = json.decodeFromString(request("/v1/identity/${segment(creatorId)}/team/invite", "POST", body = json.encodeToString(body), authenticated = true))
   suspend fun acceptTeamInvitation(invitationId: String): APIDone = json.decodeFromString(request("/v1/identity/team/${segment(invitationId)}/accept", "POST", authenticated = true))
   suspend fun removeTeamMember(creatorId: String, accountId: String): APIDone = json.decodeFromString(request("/v1/identity/${segment(creatorId)}/team/${segment(accountId)}/remove", "POST", authenticated = true))
+  suspend fun updateTeamMemberRoles(creatorId: String, accountId: String, xExpectedAccountId: String, body: APITeamRolesUpdateInput): APIDone = json.decodeFromString(request("/v1/identity/${segment(creatorId)}/team/${segment(accountId)}/roles", "POST", body = json.encodeToString(body), authenticated = true, headers = listOf("X-Expected-Account-Id" to xExpectedAccountId).mapNotNull { (name, value) -> value?.let { name to it } }.toMap()))
   suspend fun cancelSignedAct(challengeId: String): APIDone = json.decodeFromString(request("/v1/identity/signed-acts/${segment(challengeId)}/cancel", "POST", authenticated = true))
   suspend fun publicSignature(signedActId: String): APIPublicSignature = json.decodeFromString(request("/v1/identity/signed-acts/${segment(signedActId)}", "GET", authenticated = false))
   suspend fun beginSignedAct(creatorId: String, body: APIBeginSignedAct): APISignedChallenge = json.decodeFromString(request("/v1/identity/${segment(creatorId)}/signed-acts/begin", "POST", body = json.encodeToString(body), authenticated = true))
