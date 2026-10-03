@@ -6,7 +6,13 @@
 
 PostgreSQL17 pg_dump can restore the isolated0087/0103 scope tables with implicit default owner ACLs instead of the source's explicit owner ACL. The first raw-schema mismatch must be preserved as a failed qualification. Do not relax catalog guards or edit pg_catalog. Only after independently proving that these **two empty private scope tables' same-owner ACL representation is the sole difference**, replay supported `GRANT ALL PRIVILEGES` as each exact isolated owner on its own scope table, with the target closed/no other clients. Independently compare the complete catalog, data/history/role/effective-security/sequence again. Any other difference refuses; no public/runtime/worker grant, closure removal or traffic-ready claim. The actual scratch operator/metadata and dumps remain private outside Git. The first888.254s interval includes restore/custody inspection, not an original-data RTO or WAL RPO.
 
+## Opt-in local private artifact directory
 
+`createDevelopmentTrust` accepts `TRUST_PRIVATE_ARTIFACT_DIRECTORY` only inside its existing loopback development mode. It prepares the actual absolute OS-owned directory before exposing the store; the leaf and existing immediate parent must be nonsymlink private directories owned by the current POSIX user. Use0700 and the canonical real path with no symlinked ancestors. Provision the parent privately first; the store creates only its leaf and never a recursive parent chain. Parent/path/leaf checks run again before writes, verification, reads and sweeps. Missing configuration retains the unavailable-store behavior. This is single-host private file storage; it supplies no managed Growth key, off-site encryption, lifecycle authority, provider receipt or completed export.
+
+Actual filesystem preflight created an owned0700 directory and refused relative,0755 and symlink configurations. Backend types/scoped lint pass. Real prepared Agent0196 source, owner task/EOF/COMMIT qualification, protected complete artifact/download and eight-domain application acceptance remain required. No fake job or receipt was created by this preflight.
+
+The October3 repeat first reproduced both nonprivate-parent and symlinked-parent configurations being advertised by the old source. The repair refuses seven actual unsafe/missing/path configurations before creating their leaf, and refuses a configured parent's later permission change. An actual labelled storage-only8MiB write/seal/verification and separate fresh-process read match SHA256 across128 parts of at most64KiB. Different-account binding404 and symlinked metadata refusal pass; metadata and parent permissions are restored and reverified. The minted storage binding is synthetic, with no database job, task, domain authority or C10 receipt. Scripts, bytes and JSON remain private outside Git; backend types/lint/format/diff pass without new tests.
 
 ## Closed privacy continuation — 2026-10-02 (draft)
 
@@ -16,13 +22,11 @@ The reviewed candidate is `infra/migrations/waves/20261002-privacy.json`: exact 
 
 All47 unfinished reservations are metadata-only moved to0151–0197 in `infra/migrations/waves/20261002-privacy-held.json`; source paths/bytes, old SQL filenames and existing applied history remain unchanged. The initial split map was superseded after W1 found dependent issuers before their moved tables. Original0083/0111/0112 are now0168/0194/0195, original0113 is0196, and original0150 single-call metadata is0197. Original0099/0100/0105/0106 are0183/0184/0188/0189; late accounting0183+0188 feeds0190 subject→0191 negatives→0192 financial correction. Owners must review the exact complete map and actual source purpose/version; unknown additional DDL dependencies still need review before activation. Allocation is not permission or source approval. Canonical0087 private owner/ACL are not widened.
 
-
 Preserved targets follow [the R6 reconciliation procedure](W8-preserved-reconciliation.md). `scripts/reconcile-restored-trust.ts` inventories an actual named/owner-closed target read-only and always returns trafficReady false. It does not clear closure, issue provider effects or certify all eight domains.
 
 ## Simulator credential custody
 
 Build a launched iOS simulator app normally under the shared heavy-build guard, with `CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=-`. Disabling signing can compile but omit Xcode's actual simulated `application-identifier` entitlement, causing canonical complete200 followed by Keychain failure and no authenticated session. Merely ad-hoc resigning that binary does not restore the omitted simulated entitlement. Verify the normally built shipping app through actual sign-in/cold return and saved backend state. No production signing key is fabricated by this simulator build.
-
 
 ## Initial wave operator — 2026-10-02 (draft)
 
@@ -31,7 +35,6 @@ Use `apps/backend/scripts/activate-wave.ts` only after review of the exact packe
 Stop the target's applications/workers, owner-close its database marker, set `CONNECTION LIMIT 0`, and stop its other clients. This requires migration administrator authority; runtime roles must remain non-owner/non-bypass. From `apps/backend`, run `node --env-file=<private-file> --import tsx scripts/activate-wave.ts`. It holds the migration advisory lock, verifies exact historical/source custody, applies the whole wave in one transaction, and rolls back changed original rows/history/old roles. Success leaves traffic closed. Reopening requires domain reconciliation and real application acceptance, not the migration receipt alone. The exact adopted-W5 exception has a synthetic source-layout rehearsal; it does not replace the historical35→48 adopter or authorize any other profile. PUBLIC/effective database privileges and exact purpose-role function/ACL custody are checked before/after rollout.
 
 [Current synthetic rehearsal](../../artifacts/workstreams/W8/migration-wave/20261002-mac-studio/README.md) is SQL verification only. It is not original preserved-data recovery. The default fresh runner remains `scripts/migrate-trust.ts`; it refuses any existing ledger with pending wave migrations, which must use the private-backup atomic operator. Exact initial purpose-role custody is checked before/after both paths. Fresh empty install and fully applied verification remain available.
-
 
 Optional local request-role composition: keep core `creator_runtime` by default. `TRUST_CORE_DATABASE_ROLE` must exactly match the URL username of an explicitly provisioned LOGIN INHERIT role with only `creator_runtime,growth_runtime` memberships, no direct domain relation/column/function grants and no owner/worker/admin attributes or reachable memberships. Same exact loopback database and separate Trust runtime/worker URLs remain required. `runtime-composite.env` and disabled negative-probe `runtime-unsafe-composite.env` are private0600 W8 profiles; never print them. W1's root design instead uses a separate `GROWTH_API_DATABASE_URL` for Growth/Content and keeps its core NOINHERIT. [Actual receipt](../../artifacts/workstreams/W8/development-trust/20261002-composite/README.md).
 
