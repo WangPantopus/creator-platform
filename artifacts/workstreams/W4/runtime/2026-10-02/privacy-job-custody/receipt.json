@@ -1,0 +1,34 @@
+{
+  "role": "creator_runtime",
+  "sourceLedgerRows": 57,
+  "sqlPlans": 2,
+  "installedPurposeReady": false,
+  "missingConfigurationRefused": true,
+  "arbitraryNonIdentityObjectRefused": true,
+  "callbackReached": false,
+  "businessWrites": 0,
+  "jobInputsFabricated": 0,
+  "scope": "Metadata SQL and negative process issuance only; no real privacy job/export/commit acceptance",
+  "releaseReady": false,
+  "sourceCheckpoint": "W8 4065e91d50e74d297630b962661dafe71cdf878a exact held-client issuer and shared catalog guard; no SQL activation",
+  "sharedCatalogRefused": true,
+  "catalogReadTransaction": "Actual creator_runtime READ ONLY on original canonical57; no job input supplied",
+  "functionDefinitionCustody": "W8 actual read-only reviewed catalog hashes, configuration is explicit and exact",
+  "implemented": [
+    "No Actor/adult eligibility/request session from privacy account ID",
+    "Same-Pool process scope expires with its callback; no ACK before a real fenced projection COMMIT",
+    "Original job/domain/token/signal/immutable ownership before financial domain queries; wall-clock deferred commit fence",
+    "Paged artifact begins only after actual job fence; abort on any failure; complete requires own current artifact lease",
+    "Deletion/retained restricted or erased creator history remains unavailable without purpose and Q16 policy",
+    "Bounded exporter also includes activated paid coverage and denial history"
+  ],
+  "notVerified": [
+    "Actual registered0087 privacy task or positive export/COMMIT",
+    "Cancellation/expiry/takeover on real Commerce job",
+    "Encrypted artifact delivery and final privacy ACK",
+    "Deletion/expiry obligations under approved Q16"
+  ],
+  "newUnitTests": 0,
+  "registryEdits": 0,
+  "operationsLocalServerEdits": 0
+}

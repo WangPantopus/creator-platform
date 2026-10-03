@@ -174,6 +174,12 @@ for (const [suffix, id, response, body] of [
   ownedPath(content + "/replies/{id}/" + suffix, "post", id!, response!, body);
 ownedPath(content + "/mute", "get", "contentPreference", "ContentPreference");
 ownedPath(
+  content + "/reply-policy",
+  "get",
+  "noteReplyPolicy",
+  "NoteReplyPolicy",
+);
+ownedPath(
   content + "/mute",
   "post",
   "muteContent",

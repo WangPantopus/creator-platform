@@ -70,6 +70,15 @@ export type MediaPolicy = Readonly<{
   retentionSeconds: number;
   allowTranscript: boolean;
 }>;
+/** A current read projection; the upload transaction rechecks its own policy. */
+export const ThreadRecordingPolicySchema = z.strictObject({
+  creatorId: z.uuid(),
+  fanId: z.uuid(),
+  threadId: z.uuid(),
+  purpose: z.literal("human_reply"),
+  maxBytes: z.number().int().positive().max(268435456),
+  maxDurationMs: z.number().int().positive().max(3600000),
+});
 export type UploadTicket = {
   asset: MediaAsset;
   url: string;

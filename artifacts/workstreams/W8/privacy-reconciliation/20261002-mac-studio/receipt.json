@@ -1,0 +1,44 @@
+{
+  "observedAt": "2026-10-02T12:44:12.739912+00:00",
+  "label": "labelled synthetic closed57 inventory and actual non-owner held-proposal refusal; not recovery/reopening",
+  "sourceSha256": {
+    "apps/backend/scripts/reconcile-restored-trust.ts": "21e683e49180972fd9bd1257b0f3ac35707d4987e1362d6ed70f6b7e53311431",
+    "apps/backend/src/modules/trust/privacy-catalog.ts": "fe29fa4e8988f127580f4f1074f9a5029f040262b01561937ac481a9604cb78b",
+    "apps/backend/src/modules/trust/privacy-authority.ts": "e7edbfe561f9ba69e12bf815125aaf28cacab6f37951dad333ec8f8123b98bd1",
+    "apps/backend/src/modules/trust/conversation-privacy-authority.ts": "a3fffa1f00fc531014ed49613bd20989d3e50d365daaa73125cf7a1bdcae686b",
+    "apps/backend/src/modules/trust/privacy-consumers.ts": "e3fe67d1c8ba0f80e14b93badf28b9ec7dd8e424d85ddf408038433c4ce6ee94"
+  },
+  "guard": {
+    "label": "actual non-owner catalogue guard; unregistered held87 refused, no scope or job issued",
+    "outcome": {
+      "code": "privacy_commit_fence_unavailable",
+      "status": 503
+    },
+    "rawScope": "42501",
+    "ledger": 40,
+    "activated": 0
+  },
+  "proposalCatalogueOnly": {
+    "predicates": 47,
+    "sourceCustodyPredicatesPassed": 46,
+    "mandatoryActivatedRegistry": false,
+    "registryMutation": false,
+    "scopeIssued": false,
+    "sourceReviewExcludedRegistryOnly": true
+  },
+  "privateStatePrinted": false,
+  "corrections": [
+    "Initial typecheck caught omitted role-guard installed argument; corrected to exact0053/0062 ledger versions.",
+    "Prettier was initially invoked with root-relative paths from backend cwd and matched no files; rerun from repository root.",
+    "Raw scope read in the scratch operator correctly refused42501; retained as negative, not a scope count.",
+    "Initial source-catalog check included implicit owner capabilities on the private scope index; narrowed relation ACL inspection to actual grantable table/view/sequence kinds, then all46 custody predicates passed."
+  ],
+  "limitations": [
+    "No activated0087 or genuine current-job scope accepted through the new registry guard.",
+    "No complete eight-domain export/delete/purge or provider/storage effect acceptance.",
+    "Closed57 still retains the original export with6 complete/2 blocked domains; existing complete receipts are inventoried, not newly verified owner effects.",
+    "Current all-role security inventory has14685 records after2 new isolated generation roles in this owned cluster; it does not equal or replace the earlier14683-record checkpoint.",
+    "Original iMac archives/key/journal/recovery volume absent; trafficReady staysfalse.",
+    "New owner-port composition and Commerce PR134 integration still require actual composed app/native saved-state acceptance."
+  ]
+}

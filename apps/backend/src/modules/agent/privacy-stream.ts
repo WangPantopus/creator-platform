@@ -5,10 +5,16 @@ import type { AgentService } from "./service.js";
 import type { CreatorScope } from "./repository.js";
 import { generationJournalInstalled } from "./generation-journal.js";
 import type { PrivacyExportStream } from "../trust/privacy-export.js";
+import type { PrivacyTaskInput } from "../trust/privacy-authority.js";
+import type { PreparedAgentPrivacyExport } from "./privacy-export-snapshot.js";
 
 /** Consumer of W8's immutable3240da0 PrivacyExportStream, returned
  * by PrivacyHook.run. The coordinator owns durable storage/verification/ack. */
 export type AgentPrivacyExportStream = PrivacyExportStream;
+export type AgentAccountingExportBoundary = {
+  assertCurrent(client: PoolClient): Promise<{ reference: string }>;
+  assertCustody(client: PoolClient): Promise<boolean>;
+};
 
 /** One MVCC source snapshot across every authoritative owned creator. One
  * pending chunk provides backpressure; closing the iterator rolls back. */
@@ -16,7 +22,10 @@ export function agentExportStream(
   service: AgentService,
   scopes: readonly CreatorScope[],
   assertCurrent: () => Promise<void>,
+  assertTaskInTransaction: (client: PoolClient) => Promise<void>,
   parentSignal?: AbortSignal,
+  accounting?: AgentAccountingExportBoundary,
+  source?: { prepared: PreparedAgentPrivacyExport; job: PrivacyTaskInput },
 ): AgentPrivacyExportStream {
   const snapshotRef = `agent-export:${randomUUID()}`;
   const controller = new AbortController();
@@ -26,6 +35,7 @@ export function agentExportStream(
     ...(parentSignal ? [parentSignal] : []),
   ]);
   const hash = createHash("sha256");
+  let heldClient: PoolClient | undefined;
   let bytes = 0;
   let count = 0;
   let started = false;
@@ -58,6 +68,12 @@ export function agentExportStream(
     if (!buffered) return;
     signal.throwIfAborted();
     await assertCurrent();
+    invariant(
+      heldClient,
+      "privacy_commit_fence_unavailable",
+      "Use the actual held export task.",
+    );
+    await assertTaskInTransaction(heldClient);
     const data = Buffer.from(buffer.subarray(0, buffered));
     buffered = 0;
     invariant(
@@ -97,51 +113,68 @@ export function agentExportStream(
     try {
       signal.throwIfAborted();
       await assertCurrent();
+      await service.repository.assertRuntimeRole();
       client = await service.repository.pool.connect();
-      await client.query("BEGIN ISOLATION LEVEL REPEATABLE READ");
+      invariant(
+        source,
+        "privacy_export_unconfigured",
+        "The reviewed complete export source is required; paginated READ COMMITTED reads cannot attest one coherent snapshot.",
+      );
+      source.prepared.assertHostPool(service.repository.pool);
+      await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
+      heldClient = client;
+      await assertTaskInTransaction(client);
       await client.query(
-        "SET LOCAL statement_timeout='10s'; SET LOCAL lock_timeout='5s'",
+        "SET LOCAL statement_timeout='10s'; SET LOCAL lock_timeout='5s'; SET LOCAL work_mem='1MB'",
       );
       // Current W2 lineage hooks must be composed before a full-domain stream
       // could omit an account's fan relationships or acknowledge thread data.
-      invariant(
-        !(await generationJournalInstalled(client)),
-        "thread_accounting_privacy_unconfigured",
-        "Register complete fan-accounting privacy before exporting this installed lineage schema.",
-      );
-      await write('{"schemaVersion":2,"creatorExports":[');
-      let first = true;
-      for (const scope of [...scopes].sort((a, b) =>
-        a.creatorId.localeCompare(b.creatorId),
-      )) {
-        signal.throwIfAborted();
-        await assertCurrent();
-        await client.query(
-          "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
-          [scope.creatorId, scope.accountId],
-        );
-        // Holds current ownership through source exhaustion. A missing profile
-        // fails; a verified owned profile without AI configuration is explicit.
-        const owner = await client.query(
-          "SELECT id FROM creator.creator_profile WHERE id=$1 AND account_id=$2 FOR SHARE",
-          [scope.creatorId, scope.accountId],
-        );
+      const lineage = await generationJournalInstalled(client);
+      let boundaryReference: string | undefined;
+      if (lineage) {
         invariant(
-          owner.rowCount && !scope.development,
-          "privacy_owner_changed",
-          "The current owned creator must match this verified export.",
+          accounting,
+          "thread_accounting_privacy_unconfigured",
+          "Register complete fan-accounting privacy before exporting this installed lineage schema.",
         );
-        await write(
-          `${first ? "" : ","}{"creatorId":${JSON.stringify(scope.creatorId)},"data":`,
+        await accounting.assertCustody(client);
+        boundaryReference = (await accounting.assertCurrent(client)).reference;
+        invariant(
+          boundaryReference,
+          "accounting_boundary_incomplete",
+          "The finalized conversation export artifact is required.",
         );
-        await service.exportInTransaction(scope, client, write, signal);
-        await write("}");
-        first = false;
       }
-      await write("]}");
+      const snapshot = await source.prepared.beginInTransaction(
+        client,
+        source.job,
+        signal,
+      );
+      invariant(
+        JSON.stringify(snapshot.creatorIds) ===
+          JSON.stringify(scopes.map((scope) => scope.creatorId).sort()) &&
+          scopes.every(
+            (scope) =>
+              !scope.development && scope.accountId === source.job.accountId,
+          ),
+        "privacy_owner_changed",
+        "The current task's complete owned family must match this source.",
+      );
+      await source.prepared.writeInTransaction(client, snapshot, write);
       await flush();
       signal.throwIfAborted();
       await assertCurrent();
+      if (lineage) {
+        await accounting!.assertCustody(client);
+        invariant(
+          (await accounting!.assertCurrent(client)).reference ===
+            boundaryReference,
+          "accounting_boundary_changed",
+          "The finalized conversation accounting export changed before source exhaustion.",
+        );
+      }
+      await source.prepared.finishInTransaction(client, snapshot);
+      await assertTaskInTransaction(client);
       await client.query("COMMIT");
       complete = true;
     } catch (error) {
@@ -150,6 +183,7 @@ export function agentExportStream(
       if (client) await client.query("ROLLBACK").catch(() => undefined);
     } finally {
       client?.release();
+      heldClient = undefined;
       signal.removeEventListener("abort", abort);
       resolveDone();
       notify();

@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-02T05:16:10.025524+00:00",
+  "environment": "labelled experimental synthetic clone creator_w8_devtrust_v2_20261001",
+  "canonicalMigrationCount": 40,
+  "experimentalDDL": "0053 manually applied only to clone; canonical registry unchanged",
+  "branch": "codex/w8-development-trust-runtime",
+  "currentSource": "5c681883a1ff874902e9311f16cf1b81ca6472b4",
+  "openBackendSource": "8931b62c4487c0e56deb203e97d9429d45376605",
+  "caseSessionUiSource": "645a4a31a737b51f806c94a452d435e72b58e71e",
+  "effectLeaseSource": "8ab433f8c0f1e88bf2d16c0f5bc254affc8d5054",
+  "migrationSha256": "4da2e2b56f51f70e39336c6c7d26646e1732703f2e3f39c35f700ff959237185",
+  "projection": {
+    "environment": "experimental synthetic clone",
+    "canonicalMigrations": 40,
+    "ddl": "0053 manually applied to isolated clone only",
+    "role": "creator_runtime",
+    "participant": "allowed",
+    "nonparticipant": "unavailable",
+    "audience": "allowed",
+    "creatorOwner": "allowed",
+    "creatorNonowner": "unavailable",
+    "denialWaitedForHeldTransaction": true,
+    "denialCommitElapsedMs": 153.67920900000001,
+    "participantAfterCommit": "denied",
+    "audienceAfterCommit": "denied",
+    "participantAfterRevocation": "allowed",
+    "repeatableReadSnapshot": "unavailable"
+  },
+  "projectionLimit": "150ms artificial held-transaction interval, not a production latency distribution or real in-flight provider test",
+  "webCreatorDraft": {
+    "environment": "synthetic canonical development host",
+    "url": "/studio/setup",
+    "saveStatus": 200,
+    "creatorId": "fde73dd2-8f72-4473-9730-975b9ee30113",
+    "verification": "pending",
+    "legacySelectorCount": 0,
+    "nextDependency": "A human-supplied external account URL and proof post, or explicit authorization for a clearly synthetic verification fixture."
+  },
+  "ops": {
+    "environment": "synthetic canonical development host",
+    "responses": [
+      {
+        "path": "case/decisions",
+        "status": 200
+      }
+    ],
+    "caseId": "0b260ca6-1bc1-4b15-a782-587b5bb51702",
+    "caseVisible": 1,
+    "legacySelectorCount": 0
+  },
+  "savedDecision": {
+    "state": "resolved",
+    "version": 2,
+    "outcome": "close",
+    "actualSupervisor": true,
+    "recipientAccount": "10000000-0000-4000-8000-000000000002",
+    "recipientNotice": "resolved",
+    "auditActions": {
+      "case_open": 1,
+      "decision": 1,
+      "evidence_read": 9
+    },
+    "auditCountObservation": "observed before the final resolved-case read; counts are not a final invariant",
+    "recipientUi": "actual canonical reauthentication; saved case decision and inbox notice visibly present"
+  },
+  "closedHost": {
+    "environment": "experimental synthetic clone",
+    "source": "269fc9965631652fb0ce8b48f4dcea2dec010f3f",
+    "markerOnly": true,
+    "/health/live": {
+      "status": 200
+    },
+    "/health/ready": {
+      "status": 503,
+      "ready": false
+    },
+    "/v1/trust/help": {
+      "status": 200,
+      "protocolVersion": "crisis-v1",
+      "resources": 0
+    },
+    "/v1/identity/capabilities": {
+      "status": 200,
+      "signInAvailable": false,
+      "actorCount": 0
+    },
+    "/v1/trust/privacy/jobs": {
+      "status": 503,
+      "code": "restoration_pending"
+    },
+    "identityContinueStatus": 503
+  },
+  "native": {
+    "ios": {
+      "udid": "A3DBA471-82BB-43B6-9216-9A74BB5DB11C",
+      "binarySha256": "4d947f104d60fa6c0d297c1a37a3d142a7d29d112c40b0b86d4dcd8298431206",
+      "acceptance": "public help and unauthenticated privacy arrival in light/night; no submitted native form"
+    },
+    "android": {
+      "serial": "emulator-5568",
+      "apkSha256": "5f52b247162d200dcb26e12cd129af096408d36ff8d2646429166b7397b48b0a",
+      "cores": 2,
+      "memTotalKiB": 2026148,
+      "acceptance": "public help and unauthenticated privacy arrival in light/night; no submitted native form"
+    }
+  },
+  "checks": {
+    "backendTypecheck": "passed after current main merge",
+    "webTypecheck": "passed after current main merge",
+    "newUnitTests": 0
+  },
+  "unverified": [
+    "external proof approval/effect",
+    "native sign-in and form submission",
+    "real in-flight model denial",
+    "all eight C10 domains/purge receipts",
+    "full Ops accessibility/design acceptance",
+    "preserved-data restore",
+    "provider/staging/pilot/release gates"
+  ],
+  "captures": {
+    "ios-privacy-night.png": "f36801c26c80a9443b7c74c9f577c6df9d04599ae2a52f0aa657037d4db4b58f",
+    "android-trust-light.png": "3d075c91c1615fe8cd0cead65619679942983414a3a4a4f74b1aecec47c4023e",
+    "ios-privacy-light.png": "73221b40c9d0b7bbb4aea223399495098dffaedd91f3bb69987808c61801c636",
+    "web-creator-draft-light.png": "cfee98cce01b7c9abb68cc0de96c1fae1b0840bc51ff63c97b86fa3d6a7c2465",
+    "web-ops-queue-light.png": "2e5dfb884cb681bfd8375a26659837bae10b5a6e4ef5282c66306a1a50eac2d7",
+    "android-trust-night.png": "ade9383badb5ddc5097e0b8f5c52a6f16835ea03afa0f384325caa14a7d32ccb",
+    "web-ops-resolved-light.png": "8e5cdbe9a38cce364b01e4356a2a711216dfd9bdcf315500c6d2b4ac8b2d043c",
+    "android-privacy-light.png": "f801029302aceec48e5462a4c086586062893a8dd4260d64e302fd44b9f9470e",
+    "web-ops-case-light.png": "461c467e6b4005e7b8af09998f61d2de6015b648e30ee79144b05bada2015e8f",
+    "ios-trust-night.png": "c5f87d33e39d883e2238f9e317e1ced45278f23856e2141cd2fd8349c566c7c2",
+    "ios-trust-light.png": "f1c0e567b68e29278205e6b33fa0233a0cfd4c92b0ef5243c07d468de634737c",
+    "web-support-saved-light.png": "0155974723a5f25ff7aabafd32f3c25b431eef019f00049231524b3c82e2d1dd",
+    "android-privacy-night.png": "af01f2af4deb530d9e00974361cb24194163c23099a5bc49ca0928ea7b6e601d",
+    "web-recipient-notice-night.png": "77ab9b9acfb7b10adb2825b3a0be5ba022d5fdef641929746f8737658437dd79"
+  },
+  "ingress": {
+    "source": "5c681883a1ff874902e9311f16cf1b81ca6472b4",
+    "producerBinaryPutStatus": 200,
+    "producerBytes": 4,
+    "trustTelemetryOnProducer": 0,
+    "trustInvalidBodyStatus": 415,
+    "trustHelpStatus": 200,
+    "limit": "Router integration probe; real W6 saved-upload acceptance remains W6-owned."
+  },
+  "resourceState": "W8 API4108, web3008 and database container stopped; devices/leases released; data retained."
+}

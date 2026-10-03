@@ -1,0 +1,102 @@
+{
+  "at": "2026-10-01T15:41:05.780717+00:00",
+  "baseline": "c1c615e6ece53bff4bc6a47d7f4d332757df1295",
+  "branch": "codex/w4-signed-voice-fulfillment-20261001",
+  "scope": "Prepared W3/W6 signed voice commitment consumer plus bounded Studio selection/player; no new fulfillment request shape or actor/signature/media/provider issuance",
+  "sourceHashes": {
+    "apps/backend/src/modules/commerce/voice-fulfillment.ts": "23d0050938bcaf0e744c480634d890e85a4a62cd0bc18c8e4919fddc9545cfc8",
+    "apps/backend/src/modules/commerce/service.ts": "8f7b6cf30160663dc5d363fbf9c5f3790ace5250abc97d2e7f77dd6bbce9a235",
+    "apps/backend/src/modules/commerce/runtime.ts": "66b447744e56305004cfaacb9ef6e6e21fb75e389406fd1f00a9312189f0b0e0",
+    "apps/backend/src/modules/commerce/router.ts": "70e055425d2bf73f739850fce7e7c84098b04cc750291191576a84aef7bf5a9d",
+    "apps/backend/src/modules/studio/service.ts": "732f2739405e6968b6d42df2f8554d5435491b44f688bbb91afc22a41d60d591",
+    "apps/web/features/studio/Studio.tsx": "6642372e5bd2c3da8d94476da838b77b5a8a7b289709ae0f63bdccd4b4c23ae2"
+  },
+  "checks": {
+    "backendTypecheck": "passed",
+    "backendBundle": "passed",
+    "scopedLint": "passed",
+    "webProductionBuild": "passed Next16.3.7 webpack, final TypeScript and31 prerendered pages; output.next-w4-voice",
+    "nonOwnerSQL": "actual current signed delivered-message FOR SHARE query EXPLAIN-only succeeds under creator_runtime, no actor scope or data inserted",
+    "format": "passed final owned source/document/manifest check",
+    "diffWhitespace": "passed"
+  },
+  "runtime": {
+    "api": "canonical TSX server4104 on final source",
+    "web": "development3004 for actual fan empty-history observations; separately built production start for expired-session denial",
+    "os": "macOS26.5 x86_64",
+    "browser": "Codex IAB",
+    "identity": "one actual restored development fan w4_resume_fan; explicitly synthetic development identity, no verified creator",
+    "provider": "unconfigured; no provider or OpenAI request",
+    "database": {
+      "container": "creator-platform-w4-checkpoint-20261001",
+      "image": "pgvector/pgvector:pg17",
+      "cpus": 1,
+      "memoryMiB": 512,
+      "port": "127.0.0.1:55444",
+      "freshMigrations": 40,
+      "latest": "0043_w8_relationship_backfill",
+      "creatorProfiles": 0,
+      "fanProfiles": 1,
+      "commerceLedgerRows": 0,
+      "packets": 0,
+      "recordingColumns": 0,
+      "composedSigningInstalled": false,
+      "runtimeRoleSuperuser": false,
+      "runtimeRoleBypassRLS": false
+    }
+  },
+  "capabilities": {
+    "configured": true,
+    "paymentsAvailable": false,
+    "nativeReplyPurchase": false,
+    "membershipAvailable": false,
+    "passEnabled": false,
+    "passPurchaseAvailable": false,
+    "payoutsAvailable": false,
+    "voiceFulfillmentAvailable": false,
+    "payoutOnboardingAvailable": false,
+    "creatorEarningsAvailable": false,
+    "poolEarningsAvailable": false
+  },
+  "actions": [
+    {
+      "mode": "development",
+      "viewport": "1280x720 Night then390x844 Light/Night",
+      "action": "Refresh actual Requests and select Delivered",
+      "observed": "No requests yet; zero false delivery/receipt,390 scroll width at390 viewport"
+    },
+    {
+      "mode": "production",
+      "viewport": "390x844 Light/Night",
+      "action": "Reload actual Requests after production start",
+      "observed": "Continue with Pantopus; expired session does not reveal account information"
+    },
+    {
+      "mode": "production",
+      "action": "Click existing Continue with Pantopus link through canonical continuation",
+      "observed": "Browser blocked the continuation with net::ERR_BLOCKED_BY_CLIENT before authentication completed; no bypass or alternate-network retry",
+      "accepted": false
+    }
+  ],
+  "screenshots": {
+    "restored-requests-night-390.jpg": "c59bcabb47a7d921d6dee05d53db3e32c94059ec69824d4bf9755d9a15903ced",
+    "production-session-light-390.jpg": "a20bf19b39a9573d200b618c46994bd31287c03c66ff2394a0f4e4e6dbd68f74",
+    "production-session-night-390.jpg": "4cd703b9a54b2902ed296aaf282e82dfd8b82fb7b15de0468d13b69d95914154",
+    "restored-requests-night-1280.jpg": "1ee565ea3dcbdb69bd31d6bf591bdf1ecdc3918215089c2eb78a27e3e3796fd6",
+    "restored-requests-light-390.jpg": "d488724c95f52405095f05abe21380588cd0868b3bee5c9d8af67832b5bf9630"
+  },
+  "failedObservations": [
+    "The first read-only count used nonexistent creator.financial_ledger; corrected to actual creator.commerce_ledger with0 rows. No mutation occurred.",
+    "Production browser authentication continuation was blocked; production signed-in or voice acceptance is not established.",
+    "Owned Next production process closed its3004 listener on interrupt but remained idle after SIGTERM; only the PID verified against its own cwd/log was terminated after the grace period. Final production build/server was relaunched and denial recaptured. No peer process touched."
+  ],
+  "activation": "Actual prepared same Database/AccessService ConversationRecordings plus exact installed0058/0059 and W8 assigned0060 checksum43067f9a;0060 preserves0044 personal Approval. Current registry reservations are unapplied. Mode policy opt-in also required before offering/submission/capture.",
+  "limitations": [
+    "No genuine signed recording/creator passkey/current private recording authority or binary provenance/provider proof exists.",
+    "Current schema cannot mount the voice adapter. Positive delivery and revocation races remain unverified.",
+    "Studio picker/player source compiles; genuine creator Studio operation/recording creation and native paid voice acceptance remain unavailable.",
+    "No migration registry/applied bytes/tests/cases/reference assets/assertions changed; no fabricated actor or receipt."
+  ],
+  "releaseReady": false,
+  "deliveryVersion": "Actual captured accepted packet, current commitment mode and exact reply act required. Packet version advances atomically with delivered evidence and packet-version notification, fixing the prior future-version notification."
+}

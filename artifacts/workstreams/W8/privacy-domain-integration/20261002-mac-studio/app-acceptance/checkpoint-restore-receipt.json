@@ -1,0 +1,34 @@
+{
+  "sourceRevision": "5057343aefa289ae57693d5be614461056bb7260",
+  "source": "creator_w8_privacy61_app_20261002",
+  "target": "creator_w8_privacy61_app_restore_20261002",
+  "labelledSynthetic": true,
+  "originalRecovery": false,
+  "trafficReady": false,
+  "separateRestoreSeconds": 888.254,
+  "before": {
+    "ledgerRows": 61,
+    "ledgerSha256": "3322e9d5af7b224db88a8255c9b253e9036f2d93727b76822522aca8a40e3012",
+    "schemaSha256": "255db3760c978651763bdd3a528c6bb689f09885493b653da534ab6a00f00d3f",
+    "dataSha256": "f5d03a668693bac25072a386ccccd86d139aaabc179404b1a5344be2d547a398",
+    "dataRows": 153,
+    "dataTables": 163,
+    "rolesSha256": "4eb281738f6a8f102701908867a75f5024b8ef4bc89c5e0b85a5f76c79a0ceeb",
+    "securitySha256": "8508124da2aa8870e5434c532623b2428c550b25c3809c51cb5d4916fbce7015",
+    "sequenceSha256": "402815c51ebb61c28cf3f046c63bbd4e653135afa32ab09858cb6002befeaecb",
+    "closed": true
+  },
+  "restored": {
+    "ledgerRows": 61,
+    "ledgerSha256": "3322e9d5af7b224db88a8255c9b253e9036f2d93727b76822522aca8a40e3012",
+    "schemaSha256": "8df0c5c5b58b8ba3f5944ffb73294b35e5dfeb2f6d728499dd2e5cd050487910",
+    "dataSha256": "f5d03a668693bac25072a386ccccd86d139aaabc179404b1a5344be2d547a398",
+    "dataRows": 153,
+    "dataTables": 163,
+    "rolesSha256": "4eb281738f6a8f102701908867a75f5024b8ef4bc89c5e0b85a5f76c79a0ceeb",
+    "securitySha256": "8508124da2aa8870e5434c532623b2428c550b25c3809c51cb5d4916fbce7015",
+    "sequenceSha256": "402815c51ebb61c28cf3f046c63bbd4e653135afa32ab09858cb6002befeaecb",
+    "closed": true
+  },
+  "hashesMatch": false
+}

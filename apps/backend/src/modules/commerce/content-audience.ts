@@ -5,6 +5,7 @@ import { ContentAudience } from "../../../../../packages/api/src/content.js";
 import { z } from "zod";
 import { invariant } from "../../core/errors.js";
 import type { VerifiedGroupAudience } from "./audience.js";
+import { lockMembershipAudience } from "./audience-memberships.js";
 
 /** Current identity/pair denials must remain held through the content read/write.
  * This is a configured-host producer, never a caller-supplied permission. */
@@ -57,16 +58,38 @@ export async function commerceContentAudience(
   );
   const fan = (
     await client.query<{ id: string }>(
-      "SELECT id FROM creator.fan_profile WHERE account_id=$1 FOR SHARE",
+      "SELECT id FROM creator.fan_profile WHERE account_id=$1",
       [actor.accountId],
     )
   ).rows[0];
   if (!fan) return false;
   await assertAllowed(client, actor, creatorId, fan.id);
+  const retained = (
+    await client.query<{ retained: boolean }>(
+      "SELECT current_setting('app.account_id',true)=$1 AS retained",
+      [actor.accountId],
+    )
+  ).rows[0]?.retained;
+  invariant(
+    retained,
+    "audience_scope_required",
+    "Audience authority must retain the actual caller.",
+  );
   await client.query(
     "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true)",
     [creatorId, fan.id],
   );
+  const currentFan = await client.query(
+    "SELECT id FROM creator.fan_profile WHERE id=$1 AND account_id=$2 FOR SHARE",
+    [fan.id, actor.accountId],
+  );
+  if (!currentFan.rowCount) {
+    await client.query(
+      "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true)",
+      [context.creator_id ?? "", context.fan_id ?? ""],
+    );
+    return false;
+  }
   // Restore pair context on successful return. If any read/guard fails, the
   // owning transaction must roll back; never continue an aborted transaction.
   let eligible: boolean;
@@ -84,22 +107,11 @@ export async function commerceContentAudience(
         audience.ids.some((id) => ids.includes(id)),
     );
   } else {
-    const memberships = (
-      await client.query<{ tier_id: string }>(
-        `SELECT m.tier_id FROM creator.commerce_membership m
-         JOIN creator.access_grant g ON g.id=m.grant_id AND g.creator_id=m.creator_id AND g.fan_id=m.fan_id
-         WHERE m.creator_id=$1 AND m.fan_id=$2 AND m.state IN('active','grace','cancelled')
-           AND m.period_start<=now()
-           AND CASE WHEN m.state='grace' THEN coalesce(m.grace_end,m.period_end) ELSE m.period_end END>now()
-           AND g.source='membership' AND g.state='active' AND g.valid_from<=now() AND g.valid_until>now()
-         ORDER BY m.tier_id,m.id LIMIT 1001 FOR SHARE OF m,g`,
-        [creatorId, fan.id],
-      )
-    ).rows;
-    invariant(
-      memberships.length <= 1000,
-      "audience_reconciliation_required",
-      "Current membership audience needs reconciliation.",
+    const memberships = await lockMembershipAudience(
+      client,
+      creatorId,
+      fan.id,
+      false,
     );
     eligible =
       audience.kind === "members"

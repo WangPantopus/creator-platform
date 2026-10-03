@@ -321,7 +321,10 @@ export default function PrivacyPage() {
         <button
           className="qv-btn qv-btn--secondary"
           disabled={
-            busy || capability.data?.actorVerification === "unavailable"
+            busy ||
+            !capability.data ||
+            !!capability.error ||
+            capability.data.actorVerification !== "configured"
           }
         >
           {busy
