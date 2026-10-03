@@ -267,7 +267,7 @@ object CommerceFanFeature {
                 if (choice == "Choose an amount") CommerceField("Monthly amount in ${current.policy.currency}", amount, { spendingEdited = true; amount = it }, keyboardType = KeyboardType.Decimal)
                 Button(if (reminders) "Reminders at 50% and 100% · on" else "Reminders at 50% and 100% · off", ButtonVariant.QUIET, block = true) { spendingEdited = true; reminders = !reminders }
                 CommerceText("Increases take 24 hours. Decreases are immediate and affect new requests. Existing obligations remain.", "caption")
-                Button(if (busy) "Saving…" else "Save limit", ButtonVariant.SECONDARY, block = true, disabled = commandDisabled || choice == null) { scope.launch {
+                Button(if (commandInFlight) "Saving…" else "Save limit", ButtonVariant.SECONDARY, block = true, disabled = commandDisabled || choice == null) { scope.launch {
                     try { val value = if (choice == "No limit") null else commerceMinor(amount, current.policy.currency); mutate("spend-limit", buildJsonObject { put("currency", current.policy.currency); put("amount", value?.let { JsonPrimitive(it) } ?: JsonNull); put("explicitNone", choice == "No limit"); put("remindersOn", reminders) }, "Your spending choice is saved.") } catch (error: Exception) { report(error) }
                 } }
                 current.spendingNotices.forEach { notice -> CommerceText("You’ve reached ${notice.threshold}% of your monthly limit.") }

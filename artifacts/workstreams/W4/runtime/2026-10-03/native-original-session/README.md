@@ -1,5 +1,14 @@
 # Original native Commerce account view — October 3, 2026
 
+## Current selected repairs and named Android observation — 18:36 UTC
+
+Reuses only W1 actualc03de3367cdff9e6cffa45199506324c87cffa3e eight-line Swift root correction: both success and CreatorAPIError reread the original stored credential, then repeat generation/cancellation checks after that suspension before updating confirmedCredential/session/error. No broader native features or generated outputs are copied. Swift parsing and diff checks pass; fresh shipping and this current iOS lifetime operation remain pending. Android's observed overview-refresh Saving label now depends only on actual commandInFlight; original readiness/disabled behavior is unchanged.
+
+Personally operated actual44c signed Android APK on own5564 CPU2/RAM2048 lowram (guest0–1/2026148KiB), checkout3a795cff native bytes equal, actual immutable213b579 API. Genuine session restores Requests and reads Spending's original No limit/zero charges. Actual decimal input6.50 remains unsent through genuine OS Light→Night Activity recreation, with Spending/choice retained; scroll position resets. Cold restart shows No limit and a fresh amount field is empty. All38 Commerce tables/two rows match8bc3d065 before/during/after; no Save, purchase, receipt or proof replay.
+
+The human explicitly permitted bounded ADB screenshots/input and temporary preinstalled TalkBack on this device. TalkBack settings enable1, but no actual focus/speech is verified; it is restored0 and spoken acceptance remains open. The18:29 deadline guard closes the guest at18:29:17.914UTC, but omitted Night restoration. A separate restoration-only reopen at18:31:33–18:31:51 restores actual Nightno/font1.0/TalkBack0/originalnullservice and child exits0. Its immediate ADB absence read fails while the closing serial remains visible; that failure is retained and exact leases stay held. A fresh physical absence read passes and exact GUI/slot2 release completes18:33:35UTC. No successful full deadline/closure qualification is inferred. Private personal receipt SHA25668165b8ca49c5f0384d4f3b1fb8be5628834c163464bdbf37e6b3927bc1097a3; closure5f15100260ee67673f0533a3f0299f4bc1a62c83bd2abde3c6316a5960eed7b3. Current source/Recovery/replacement/iOS/stall/enlarged/spoken/provider/C10 remain open; prior44c observation does not qualify the selected repairs.
+
+
 
 ## Current shipping receipt — 17:57 UTC
 
