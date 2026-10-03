@@ -9,7 +9,7 @@ import { requestAuthority } from "../identity/request-authority.js";
  * complete output/journal custody, original fences and effective privileges. */
 export const GENERATION_SAFETY_TERMINAL_CATALOGUE_QUERY = `WITH roles AS (
  SELECT oid,rolname,rolcanlogin,rolinherit,rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls,rolconfig
- FROM pg_roles WHERE rolname IN('creator_w4_generation_safety_terminal','creator_w4_generation_terminal','creator_generation_terminal_authority','creator_w2_generation_terminal_journal','creator_w3_generation_output','creator_w3_terminal_output','creator_generation_cursor_authority','creator_w2_generation_journal','creator_w2_generation_input','creator_generation_authority','creator_generation_worker','creator_trust_denial','creator_w2_generation_metadata','creator_w2_generation_guardrail','creator_w2_generation_retrieval','creator_generation_conversation_context','creator_w4_generation_audience','creator_w5_generation_origin','creator_signature_read_authority','creator_commerce_public_read')
+ FROM pg_roles WHERE rolname IN('creator_w4_generation_safety_terminal','creator_w4_generation_terminal','creator_generation_terminal_authority','creator_generation_terminal_discovery','creator_w2_generation_terminal_journal','creator_w3_generation_output','creator_w3_terminal_output','creator_generation_cursor_authority','creator_w2_generation_journal','creator_w2_generation_input','creator_generation_authority','creator_generation_worker','creator_trust_denial','creator_w2_generation_metadata','creator_w2_generation_guardrail','creator_w2_generation_retrieval','creator_generation_conversation_context','creator_w4_generation_audience','creator_w5_generation_origin','creator_signature_read_authority','creator_commerce_public_read')
 ), relations AS (
  SELECT c.oid,n.nspname AS schema,c.relname,c.relowner,c.relkind,c.relrowsecurity,c.relforcerowsecurity,c.relispartition,c.relacl
  FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
@@ -269,6 +269,20 @@ export const GENERATION_SAFETY_TERMINAL_SOURCES = Object.freeze(
       owner: "W4",
       checksum:
         "11d3d327f22082166d85f17179fe7a8cf94bcd9161714c8055b07537ff639e9d",
+    },
+    {
+      name: "w1_generation_terminal_discovery",
+      path: "apps/backend/src/modules/identity/schema-generation-terminal-discovery.sql",
+      owner: "W1",
+      checksum:
+        "83a56963f6c37e05b0850fa6a0e97475282fbfa3e90d1372f86bea701622e7bc",
+    },
+    {
+      name: "w3_generation_context_profile_bound",
+      path: "apps/backend/src/modules/conversation/migrations/pending_w3_generation_context_profile_bound.sql",
+      owner: "W3",
+      checksum:
+        "b0fe4643e110a4a6b752ae44847543c7cb8897bdd2a56c2daa58574b9c58536e",
     },
   ].map((source) => Object.freeze(source)),
 );

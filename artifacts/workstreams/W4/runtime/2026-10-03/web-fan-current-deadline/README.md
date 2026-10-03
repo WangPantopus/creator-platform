@@ -1,0 +1,7 @@
+# Current fan return and deadline timezone correction — October 3, 2026 UTC
+
+The primary personally used normal application sign-in for preserved Development actor two, read Spending, followed its Back to Requests, returned through the fan navigation and normally reloaded Spending. Current Light1280 view has no horizontal overflow. The original6USD cap, pending No limit choice, remindersoff, zero captured/held/refunded totals and real empty Open Requests persist. No Save, proof, financial action or clock advance occurred. Frontend containing source is e9298b3d/mainb264136b; actual API source remains7ca16ecc, so this is that named runtime combination.
+
+The unchanged stored deadline is **2026-10-03T12:42:30.009437Z**. The UI renders October3 **5:42AM local**, while actual database time was07:19:16UTC. A private read-only bounded aggregate confirms one saved limit and that its deadline remains future. Earlier05:42UTC documentation labels were a timezone interpretation error; this correction supersedes them without rewriting historical captures/receipts. No matured24hour increase is verified.
+
+Safe screenshots and routine JSON remain private outside Git. Current receipt SHA256 `4846b9cd6b3b0ec6b4fa9208563abe7ff96d61fd76d5dee399cb0ee535ff5aea`. Current Night/phone/native/provider/race/notification and full commerce acceptance remain separate. All nine packages/R01–R15 remain incomplete.
