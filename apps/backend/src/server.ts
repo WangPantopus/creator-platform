@@ -29,6 +29,7 @@ import { DomainError } from "./core/errors.js";
 import { domainPrivacyTaskAuthorityInTransaction } from "./modules/trust/domain-privacy-authority.js";
 import type { ConversationPrivacyOwnerPorts } from "./modules/trust/privacy-consumers.js";
 import { createTrustReplyReviewer } from "./modules/trust/reply-review.js";
+import { createDevelopmentFeedback } from "./modules/trust/development-feedback.js";
 import { InteractiveCallControl } from "./modules/session/interactive-control.js";
 import { AccountCallMetadata } from "./modules/session/account-call-metadata.js";
 
@@ -38,8 +39,9 @@ const config = readConfig();
 const features: {
   growth: Awaited<ReturnType<typeof configureGrowthForBackend>>;
   conversationPrivacy?: ConversationPrivacyOwnerPorts;
+  start: (() => void)[];
   close: (() => void | Promise<void>)[];
-} = { growth: null, close: [] };
+} = { growth: null, start: [], close: [] };
 if (config.identityAdapter === "development" && !config.identitySessionKey)
   throw new Error(
     "Development identity requires an explicit IDENTITY_SESSION_KEY.",
@@ -98,6 +100,41 @@ try {
               }
             : {}),
           registerFeatures: async (runtime) => {
+            const feedback = await createDevelopmentFeedback(runtime);
+            if (feedback) {
+              const controller = new AbortController();
+              let timer: ReturnType<typeof setInterval> | undefined;
+              let pending: Promise<void> | undefined;
+              const run = () => {
+                if (controller.signal.aborted || pending) return;
+                pending = feedback
+                  .purgeExpired(controller.signal)
+                  .then(() => {})
+                  .catch(() => {
+                    if (!controller.signal.aborted)
+                      console.error(
+                        "Development feedback expiry is unavailable.",
+                      );
+                  })
+                  .finally(() => {
+                    pending = undefined;
+                  });
+              };
+              // Start only after the complete configured graph returns, outside
+              // request ALS. One original batch (at most 100 per relation) per
+              // minute cannot overlap or inherit interactive account authority.
+              features.start.push(() => {
+                run();
+                timer = setInterval(run, 60_000);
+                timer.unref();
+              });
+              features.close.push(async () => {
+                controller.abort();
+                if (timer) clearInterval(timer);
+                await pending;
+                await feedback.close();
+              });
+            }
             const accountCalls = await AccountCallMetadata.prepare(runtime);
             const callControl = await InteractiveCallControl.prepare(runtime);
             const mediaEnvironment = readMediaEnvironment();
@@ -119,17 +156,22 @@ try {
                 : undefined;
             // W3 composes conversations, Creator AI and commerce together so
             // fan generation uses one model, journal, allowance and trial path.
-            const host = await composeConversationHost(
-              runtime,
-              config,
-              mediaHost
+            const host = await composeConversationHost(runtime, config, {
+              ...(feedback
+                ? {
+                    feedbackAuthority: feedback.replyFeedbackAuthority,
+                    introOfferPolicy: feedback.introOfferPolicy,
+                    introOfferRetention: feedback.introOfferRetention,
+                  }
+                : {}),
+              ...(mediaHost
                 ? {
                     media: mediaHost.media,
                     bindRecordingPublication:
                       mediaHost.bindRecordingPublication,
                   }
-                : {},
-            );
+                : {}),
+            });
             features.close.push(() => host.close());
             const { commerce, conversation, agent } = host;
             const approvalMigration =
@@ -317,6 +359,7 @@ try {
   throw error;
 }
 features.growth?.start();
+for (const start of features.start) start();
 const server = configured?.server ?? createServer(createApp(config));
 server.listen(
   {
