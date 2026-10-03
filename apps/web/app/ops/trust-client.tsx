@@ -35,6 +35,16 @@ export async function trustApi<T>(
       "Refresh your account before taking this action.",
       "session_required",
     );
+  // Reuse W8's original session-read deadline before the four-second poll
+  // replaces it; keep this client's existing account and sequence fences.
+  const responseSignal =
+    path === "session" && body === undefined
+      ? AbortSignal.any([
+          ...(signal ? [signal] : []),
+          AbortSignal.timeout(3000),
+        ])
+      : signal;
+  responseSignal?.throwIfAborted();
   const response = await fetch(`/api/trust/${path}`, {
     method: body === undefined ? "GET" : "POST",
     headers: {
@@ -44,10 +54,10 @@ export async function trustApi<T>(
     },
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
     cache: "no-store",
-    ...(signal ? { signal } : {}),
+    ...(responseSignal ? { signal: responseSignal } : {}),
   });
   const result = await response.json();
-  signal?.throwIfAborted();
+  responseSignal?.throwIfAborted();
   if (revision !== sessionRevision && !path.startsWith("dev/"))
     throw new TrustError(
       "Your account changed. Reopen this page.",
