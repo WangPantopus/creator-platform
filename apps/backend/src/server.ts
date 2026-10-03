@@ -5,6 +5,8 @@ import { createConfiguredBackend } from "./integration.js";
 import { DevelopmentIdentityAdapter } from "./modules/identity/development.js";
 import { commerceSignedSubjects } from "./modules/commerce/registration.js";
 import { configureGrowthForBackend } from "./modules/growth/configured.js";
+import { canonicalCoreContentFollows } from "./modules/growth/core-follows.js";
+import { contentPublicProjection } from "./modules/growth/content.js";
 import { composeConversationHost } from "./modules/conversation/host.js";
 import { createCommerceStudio } from "./modules/commerce/studio.js";
 import {
@@ -155,10 +157,15 @@ try {
               },
               ...(features.growth && runtime.identity
                 ? {
-                    growth: {
-                      service: features.growth.service,
-                      signing: runtime.identity.signing,
-                      follows: { follows: features.growth.contentFollows },
+                    // The original core client retains Content's held gates.
+                    // No registered0185 receipt is supplied: Follow stays closed.
+                    followReaders: { follows: canonicalCoreContentFollows() },
+                    publicProjection: async (actor, effect) => {
+                      return contentPublicProjection(
+                        features.growth!.service,
+                        content.content,
+                        runtime.identity!.signing,
+                      )(actor, effect);
                     },
                   }
                 : {}),
