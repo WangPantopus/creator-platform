@@ -173,7 +173,7 @@ private struct W3ThreadScreen: View {
                asset.state == .ready, asset.mimeType == "audio/mp4", asset.purpose == .human_reply,
                message.authorKind == .human_creator, let act = message.signedActId, asset.signedActId == act,
                let accountId = session.session?.accountId {
-                W3RecordingView(baseURL: baseURL, accountId: accountId, creatorId: model.creatorId, fanId: model.fanId, asset: asset, name: page.creatorName, time: message.createdAt, active: scenePhase == .active && !privacy && source == nil && originalReply == nil, onVerify: { session.open("/verify/" + act) })
+                W3RecordingView(session: session, destination: session.destination, baseURL: baseURL, accountId: accountId, creatorId: model.creatorId, fanId: model.fanId, asset: asset, name: page.creatorName, time: message.createdAt, active: scenePhase == .active && !privacy && source == nil && originalReply == nil, onVerify: { session.open("/verify/" + act) })
                     .id(accountId + "/" + asset.id + "/" + String(asset.version) + "/" + asset.sha256)
             } else {
                 Text(message.authorLabel(name: page.creatorName)).qText("label")
