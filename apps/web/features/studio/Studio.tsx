@@ -2906,13 +2906,6 @@ function Library({ creator }: { creator: Creator }) {
       <header className="w5-heading">
         <h1>Publish</h1>
         <button
-          className="qv-link-btn"
-          disabled={reading || action.busy}
-          onClick={() => void load()}
-        >
-          Refresh library
-        </button>
-        <button
           className="qv-btn qv-btn--secondary"
           onClick={() => setEditing(null)}
         >
@@ -2963,6 +2956,15 @@ function Library({ creator }: { creator: Creator }) {
           ))}
         </select>
       </label>
+      <div className="w5-actions">
+        <button
+          className="qv-link-btn"
+          disabled={reading || action.busy}
+          onClick={() => void load()}
+        >
+          Refresh library
+        </button>
+      </div>
       {page.items.map((item) => (
         <article key={item.id} className="w5-card">
           <h2>
