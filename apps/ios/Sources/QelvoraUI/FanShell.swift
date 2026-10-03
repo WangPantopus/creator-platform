@@ -24,6 +24,19 @@ public final class FanSessionRequestCapture {
         self.credential = credential
     }
     public func isCurrent() async -> Bool { await owner?.requestCaptureIsCurrent(self) ?? false }
+    /// The original issuer/client and response bounds are retained. A cached
+    /// account during an unsuccessful restore cannot perform private Trust work.
+    public func trustBytes(_ path: String, body: Data? = nil, binary: Bool = false) async throws -> CreatorAPIBinaryResponse {
+        guard await isCurrent(), let owner, !owner.checkingSession, !owner.busy, owner.error.isEmpty else { throw URLError(.userAuthenticationRequired) }
+        do {
+            let response = try await client.trustBytes(path, expectedAccountId: expectedAccountId, expectedSessionId: sessionId, body: body, binary: binary)
+            guard await isCurrent(), !owner.checkingSession, !owner.busy, owner.error.isEmpty else { throw CancellationError() }
+            return response
+        } catch {
+            guard await isCurrent(), !owner.checkingSession, !owner.busy, owner.error.isEmpty else { throw CancellationError() }
+            throw error
+        }
+    }
 }
 
 @MainActor
