@@ -1,5 +1,7 @@
 # W1 handoff — platform, identity, and app foundations
 
+October1 successor: start with [the current handoff](W1-resume-2026-10-01.md) and [complete continuation prompt](../prompts/W1-resume-2026-10-01.md). The latest founder instruction lifts earlier holds, permits limited affected coverage without new unit tests, requires actual web/Android/iOS end-to-end operation and authorizes ready PRs and normal ready merges. H01–H20 below remain the full scope; historical restrictions/leases are superseded where the new handoff says so.
+
 September30 final continuation: start with [the current handoff](../handoffs/W1-resume-2026-09-30.md) and [current comprehensive resume prompt](../prompts/W1-resume-2026-09-30.md). They supersede the historical leases/control/producer-absence facts below while preserving the full original scope.
 
 ## Active continuation
