@@ -38,7 +38,7 @@ async function renew(token: string, expectedAccount: string | null) {
 }
 
 const allowed =
-  /^identity\/(?:session|refresh|logout|revoke-sessions|fan-profile|creator-profile|capabilities|passkeys(?:\/(?:begin|register|revoke|recovery|[a-f0-9-]{36}\/cancel))?|[a-f0-9-]{36}\/proof|proof\/[a-f0-9-]{36}\/submit|[a-f0-9-]{36}\/team\/invite|team\/[a-f0-9-]{36}\/accept|[a-f0-9-]{36}\/team\/[a-f0-9-]{36}\/remove|signed-acts\/[a-f0-9-]{36}(?:\/cancel)?|[a-f0-9-]{36}\/signed-acts\/begin|signed-acts\/verify)$/u;
+  /^identity\/(?:session|refresh|logout|revoke-sessions|fan-profile|creator-profile|capabilities|passkeys(?:\/(?:begin|register|revoke|recovery|[a-f0-9-]{36}\/cancel))?|[a-f0-9-]{36}\/proof|proof\/[a-f0-9-]{36}\/submit|[a-f0-9-]{36}\/team\/invite|team\/[a-f0-9-]{36}\/accept|[a-f0-9-]{36}\/team\/[a-f0-9-]{36}\/(?:remove|roles)|signed-acts\/[a-f0-9-]{36}(?:\/cancel)?|[a-f0-9-]{36}\/signed-acts\/begin|signed-acts\/verify)$/u;
 async function proxy(
   request: NextRequest,
   context: { params: Promise<{ path: string[] }> },
