@@ -1,6 +1,11 @@
 import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
 import { GrowthShell, Failure, NoData } from "../../../features/growth/shell";
-import { growthRequest } from "../../../features/growth/server";
+import {
+  growthRequest,
+  GrowthUnavailable,
+} from "../../../features/growth/server";
+import { currentSession } from "../../../lib/session";
+import { IdentitySessionBoundary } from "../../../features/identity/session-boundary";
 export const dynamic = "force-dynamic";
 interface Impact {
   window_start: string;
@@ -12,64 +17,85 @@ interface Impact {
   consented_thanks: { text: string; displayName: string | null }[];
 }
 export default async function Impact() {
+  const session = await currentSession("/studio/impact");
   try {
-    const { impact } = await growthRequest<{ impact: Impact | null }>("impact");
+    if (!session)
+      throw new GrowthUnavailable(
+        401,
+        "session_required",
+        growthCopy.growthSignInToContinue,
+      );
+    const init = { headers: { "X-Expected-Account-Id": session.accountId } };
+    const { impact } = await growthRequest<{ impact: Impact | null }>(
+      "impact",
+      init,
+    );
     return (
-      <GrowthShell>
-        <section className="growth-stack growth-invite qv-on-maya">
-          <span className="growth-meta">{growthCopy.growthYourWeekImpact}</span>
-          <h1>
-            {impact
-              ? growthFormat("growthImpactPeopleHelped", {
-                  people: impact.unique_fans.toLocaleString("en-US"),
-                })
-              : growthCopy.growthThePeopleYouHelpedThisWeek}
-          </h1>
-          {impact ? (
-            <>
-              <div className="growth-impact-counts">
-                {[
-                  [impact.ai_conversations, growthCopy.growthAiConversations],
-                  [impact.personal_replies, growthCopy.growthPersonalReplies],
-                  [impact.thanks_count, growthCopy.growthThanks],
-                  [impact.notes, growthCopy.navNotes],
-                ].map(([n, label]) => (
-                  <div key={String(label)}>
-                    <strong>
-                      {typeof n === "number" ? n.toLocaleString("en-US") : n}
-                    </strong>
-                    <p>{label}</p>
-                  </div>
-                ))}
-              </div>
-              {impact.consented_thanks.length > 0 && (
-                <h2 className="growth-meta">
-                  {growthCopy.growthImpactThankYou}
-                </h2>
-              )}
-              {impact.consented_thanks.map((thanks, index) => (
-                <blockquote key={index} className="growth-voice">
-                  “{thanks.text}”
-                  {thanks.displayName ? (
-                    <footer>{thanks.displayName}</footer>
-                  ) : null}
-                </blockquote>
-              ))}
-              <p className="growth-help">
-                {growthFormat(
-                  "growthSevenDaysFromThanksAppearOnlyWhenFansChooseTo",
-                  { value1: impact.window_start.slice(0, 10) },
+      <IdentitySessionBoundary
+        key={session.sessionId}
+        initial={session}
+        returnTo="/studio/impact"
+      >
+        <GrowthShell>
+          <section className="growth-stack growth-invite qv-on-maya">
+            <span className="growth-meta">
+              {growthCopy.growthYourWeekImpact}
+            </span>
+            <h1>
+              {impact
+                ? growthFormat("growthImpactPeopleHelped", {
+                    people: impact.unique_fans.toLocaleString("en-US"),
+                  })
+                : growthCopy.growthThePeopleYouHelpedThisWeek}
+            </h1>
+            {impact ? (
+              <>
+                <div className="growth-impact-counts">
+                  {[
+                    [impact.ai_conversations, growthCopy.growthAiConversations],
+                    [impact.personal_replies, growthCopy.growthPersonalReplies],
+                    [impact.thanks_count, growthCopy.growthThanks],
+                    [impact.notes, growthCopy.navNotes],
+                  ].map(([n, label]) => (
+                    <div key={String(label)}>
+                      <strong>
+                        {typeof n === "number" ? n.toLocaleString("en-US") : n}
+                      </strong>
+                      <p>{label}</p>
+                    </div>
+                  ))}
+                </div>
+                {impact.consented_thanks.length > 0 && (
+                  <h2 className="growth-meta">
+                    {growthCopy.growthImpactThankYou}
+                  </h2>
                 )}
-              </p>
-              <p className="growth-help">{growthCopy.growthImpactWeekCounts}</p>
-            </>
-          ) : (
-            <NoData title={growthCopy.growthNoUpdatesYet}>
-              {growthCopy.growthImpactNotAvailable}
-            </NoData>
-          )}
-        </section>
-      </GrowthShell>
+                {impact.consented_thanks.map((thanks, index) => (
+                  <blockquote key={index} className="growth-voice">
+                    “{thanks.text}”
+                    {thanks.displayName ? (
+                      <footer>{thanks.displayName}</footer>
+                    ) : null}
+                  </blockquote>
+                ))}
+                <p className="growth-help">
+                  {growthFormat(
+                    "growthSevenDaysFromThanksAppearOnlyWhenFansChooseTo",
+                    { value1: impact.window_start.slice(0, 10) },
+                  )}
+                </p>
+                <p className="growth-help">
+                  {growthCopy.growthImpactWeekCounts}
+                </p>
+              </>
+            ) : (
+              <NoData title={growthCopy.growthNoUpdatesYet}>
+                {growthCopy.growthImpactNotAvailable}
+              </NoData>
+            )}
+          </section>
+        </GrowthShell>
+      </IdentitySessionBoundary>
     );
   } catch (error) {
     return (

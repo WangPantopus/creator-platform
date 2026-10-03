@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { InboxItem, Cluster } from "./types";
 import { glyphs } from "@qelvora/ui-web";
+import { useGrowthSession } from "./session";
 
 export class GrowthActionError extends Error {
   constructor(
@@ -285,6 +286,7 @@ export function Connection() {
   ) : null;
 }
 export function Producer({ cluster }: { cluster: Cluster }) {
+  const { request, signal } = useGrowthSession();
   const [outline, setOutline] = useState(
       cluster.outline ??
         growthFormat("growthAnswer", {
@@ -298,14 +300,19 @@ export function Producer({ cluster }: { cluster: Cluster }) {
   async function decide(decision: string) {
     setBusy(true);
     try {
-      await mutate(
-        "recommendations",
-        { window, topicKey: cluster.topicKey, outline, decision },
-        "PUT",
-      );
-      setMessage(`Saved: ${decision}.`);
+      await request("recommendations", {
+        method: "PUT",
+        body: JSON.stringify({
+          window,
+          topicKey: cluster.topicKey,
+          outline,
+          decision,
+        }),
+      });
+      setMessage(growthCopy.growthYourChoiceWasSaved);
       router.refresh();
     } catch (e) {
+      if (signal.aborted) return;
       setMessage(
         e instanceof Error ? e.message : growthCopy.growthCouldNotSave,
       );
@@ -349,13 +356,20 @@ export function Producer({ cluster }: { cluster: Cluster }) {
         onClick={async () => {
           setBusy(true);
           try {
-            const result = await mutate("recommendations/publish", {
-              window,
-              topicKey: cluster.topicKey,
-              outline,
-            });
+            const result = await request<{ destination: string }>(
+              "recommendations/publish",
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  window,
+                  topicKey: cluster.topicKey,
+                  outline,
+                }),
+              },
+            );
             router.push(result.destination);
           } catch (e) {
+            if (signal.aborted) return;
             setMessage(
               e instanceof Error
                 ? e.message

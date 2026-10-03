@@ -10,6 +10,7 @@ import {
   type PreferencesValue,
 } from "../../../features/growth/preferences";
 import { FeedbackForm } from "../../../features/growth/feedback";
+import { IdentitySessionBoundary } from "../../../features/identity/session-boundary";
 export const dynamic = "force-dynamic";
 export default async function Settings() {
   const session = await currentSession("/notifications/settings");
@@ -29,18 +30,24 @@ export default async function Settings() {
       ),
     ]);
     return (
-      <GrowthShell>
-        <header className="growth-header">
-          <h1>{growthCopy.growthNotificationSettings}</h1>
-        </header>
-        <PreferenceForm
-          key={session.accountId}
-          accountId={session.accountId}
-          initial={preferences}
-          creators={directory.creators}
-        />
-        <FeedbackForm />
-      </GrowthShell>
+      <IdentitySessionBoundary
+        key={session.sessionId}
+        initial={session}
+        returnTo="/notifications/settings"
+      >
+        <GrowthShell>
+          <header className="growth-header">
+            <h1>{growthCopy.growthNotificationSettings}</h1>
+          </header>
+          <PreferenceForm
+            key={session.accountId}
+            accountId={session.accountId}
+            initial={preferences}
+            creators={directory.creators}
+          />
+          <FeedbackForm />
+        </GrowthShell>
+      </IdentitySessionBoundary>
     );
   } catch (error) {
     return (

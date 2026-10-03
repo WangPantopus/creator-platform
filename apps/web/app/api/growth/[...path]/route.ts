@@ -45,6 +45,7 @@ async function handle(
     return NextResponse.json(
       {
         error: {
+          ...(error instanceof GrowthUnavailable ? { code: error.code } : {}),
           message:
             error instanceof Error
               ? error.message
