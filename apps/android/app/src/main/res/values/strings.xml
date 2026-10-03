@@ -796,6 +796,7 @@
   <string name="w6_recording_paused_after_an_interruption_resume_or_preview_what_was" formatted="false">Recording paused after an interruption. Resume or preview what was saved.</string>
   <string name="w6_recording_could_not_resume_preview_it_or_record_again" formatted="false">Recording could not resume. Preview it or record again.</string>
   <string name="w6_the_saved_recording_could_not_be_played_record_again" formatted="false">The saved recording could not be played. Record again.</string>
+  <string name="w6_the_private_preview_could_not_be_cleared_try_again_before" formatted="false">The private preview could not be cleared. Try again before recording.</string>
   <string name="w6_record_and_listen_before_uploading_your_preview_stays_on_this" formatted="false">Record and listen before uploading. Your preview stays on this device.</string>
   <string name="w6_play_private_preview" formatted="false">Play private preview</string>
   <string name="w6_pause_preview" formatted="false">Pause preview</string>

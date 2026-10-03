@@ -4,7 +4,8 @@ import SwiftUI
 @MainActor
 public enum W6FanFeatures {
     public static var registrations: [FanFeatureRegistration] {
-        [FanFeatureRegistration(matches: { $0 == "/media/voice" }, allowsSignedOut: { $0 == "/media/voice" }, screen: { _ in AnyView(MediaRecordingView(maximumDuration: 60)) })]
+        _ = VoiceRecordingCache.prepare()
+        return [FanFeatureRegistration(matches: { $0 == "/media/voice" }, allowsSignedOut: { $0 == "/media/voice" }, screen: { _ in AnyView(MediaRecordingView(maximumDuration: 60)) })]
     }
     public static func callRegistration(baseURL: URL?) -> FanFeatureRegistration {
         FanFeatureRegistration(matches: { $0.hasPrefix("/calls/") || availabilityCreator($0) != nil }, screen: { session in

@@ -1,6 +1,30 @@
 import AVFoundation
 import SwiftUI
 
+/// Only a cold process has no live private recording to preserve.
+@MainActor enum VoiceRecordingCache {
+    private static var prepared = false
+    static func prepare() -> Bool {
+        if prepared { return true }
+        let manager = FileManager.default
+        do {
+            let keys: Set<URLResourceKey> = [.isRegularFileKey, .isSymbolicLinkKey]
+            let files = try manager.contentsOfDirectory(at: manager.temporaryDirectory, includingPropertiesForKeys: Array(keys))
+            for file in files {
+                let stem = file.deletingPathExtension().lastPathComponent
+                guard file.pathExtension == "m4a", stem.hasPrefix("voice-") else { continue }
+                let identifier = String(stem.dropFirst("voice-".count))
+                guard let id = UUID(uuidString: identifier), id.uuidString.caseInsensitiveCompare(identifier) == .orderedSame else { continue }
+                let values = try file.resourceValues(forKeys: keys)
+                guard values.isSymbolicLink != true, values.isRegularFile == true else { continue }
+                try manager.removeItem(at: file)
+            }
+            prepared = true
+            return true
+        } catch { return false }
+    }
+}
+
 @MainActor
 public final class NativeVoiceRecorder: NSObject, ObservableObject, @preconcurrency AVAudioRecorderDelegate {
     public enum State: String { case idle, requesting, recording, paused, preview, denied, failed }
@@ -19,6 +43,9 @@ public final class NativeVoiceRecorder: NSObject, ObservableObject, @preconcurre
         precondition(maximumDuration > 0)
         self.maximumDuration = maximumDuration
         super.init()
+        if !VoiceRecordingCache.prepare() {
+            state = .failed; reason = QelvoraCopy.text("w6ThePrivatePreviewCouldNotBeClearedTryAgainBefore")
+        }
         #if os(iOS)
         observers.append(NotificationCenter.default.addObserver(forName: AVAudioSession.interruptionNotification, object: nil, queue: .main) { [weak self] _ in
             Task { @MainActor [weak self] in self?.pause(interrupted: true) }
@@ -34,6 +61,9 @@ public final class NativeVoiceRecorder: NSObject, ObservableObject, @preconcurre
     }
     public func start() async {
         discard()
+        guard VoiceRecordingCache.prepare() else {
+            state = .failed; reason = QelvoraCopy.text("w6ThePrivatePreviewCouldNotBeClearedTryAgainBefore"); return
+        }
         let requestGeneration = generation
         #if os(iOS)
         guard Bundle.main.object(forInfoDictionaryKey: "NSMicrophoneUsageDescription") != nil else {
