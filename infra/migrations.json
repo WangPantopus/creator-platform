@@ -985,6 +985,22 @@
       "path": "apps/backend/src/modules/agent/migrations/pending_w2_generation_guardrail_event.sql",
       "state": "reserved_unapplied",
       "reason": "Distinct fixed W2 generation_record_agent_guardrail(uuid,uuid,text,text) event purpose requested by the current owner. Requires actual W1 original private nonce/job/client/PID/fullXID/login, current W2 input/version, bounded category/contextHash, current restoration/negative authority, original idempotency and actual C10/expiry. Isolated NoLogin purpose with fixed own audit insertion only; no raw worker table grant, fan text/message/memory/money, fabricated Actor or dropped guardrail effect. Exact owner source/signature/typed issuer manifest/effective catalogue/compiler and real operation review pending. Allocation only; no activation or provider permission."
+    },
+    {
+      "id": "0211",
+      "owner": "W2",
+      "version": "0211_w2_generation_agent_metadata",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_generation_agent_metadata.sql",
+      "state": "reserved_unapplied",
+      "reason": "Distinct fixed creator.generation_agent_metadata(uuid,uuid) requested by W2 for classification before embedding. Separate NoLogin purpose consumes genuine original W1 private GenerationTaskScope/client/PID/fullXID/login and current W2 input0180 plus actual W4 audience0182. Bounded current public creator id/display_name and audience/compiledHash only, with typed compile-prefix, restoration, negative and original-source bookends. Original0180/0187 bytes remain unchanged; no prompt-derived creator identity, fake early vector, Actor, raw worker table privilege, money or provider permission. Exact owner source/signature/typed issuer manifest/effective catalogue/compiler/C10 and real operation review pending. Allocation only; no activation."
+    },
+    {
+      "id": "0212",
+      "owner": "W3",
+      "version": "0212_w3_generation_worker_output",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_worker_output.sql",
+      "state": "reserved_unapplied",
+      "reason": "Distinct ordered approved-sentence generation worker output purpose requested by W3. Separate NoLogin writer requires W1 original genuine private GenerationTaskScope/client/PID/fullXID/login, W2 WeakMap-branded ApprovedGenerationSentence and actual assertApprovedInTransaction on that same client/scope, current thread/message/epoch/sequence, restoration/negative/source bookends and original idempotent durable frame/outbox notification. W1 remains sole COMMIT owner; readonly0179 context and terminal0203 purposes remain separate. Exact fixed owner SQL signatures/source/typed issuer manifest/effective catalogue/compiler/C10 and real cancellation/EOF/COMMIT operation review pending. No fake Actor, raw scope/table grant, duplicated publication authority or provider permission. Allocation only; no activation."
     }
   ]
 }
