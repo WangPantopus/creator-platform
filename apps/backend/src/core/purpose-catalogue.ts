@@ -4,26 +4,30 @@ import type { Pool, QueryConfig } from "pg";
 export async function generationConsumerCatalogue(
   pool: Pick<Pool, "query">,
   role: string,
-  queryTimeoutMs?: number,
+  options: Readonly<{ queryTimeout?: number; signal?: AbortSignal }> = {},
 ) {
   if (
-    queryTimeoutMs !== undefined &&
-    (!Number.isInteger(queryTimeoutMs) ||
-      queryTimeoutMs < 1 ||
-      queryTimeoutMs > 5000)
+    options.queryTimeout !== undefined &&
+    (!Number.isSafeInteger(options.queryTimeout) ||
+      options.queryTimeout < 1 ||
+      options.queryTimeout > 5000)
   )
-    throw new Error(
-      "Use a finite metadata read budget of at most five seconds.",
-    );
-  // Installed pg supports this read deadline; the declaration omits it.
-  const query = (text: string): QueryConfig & { query_timeout?: number } => ({
-    text,
-    values: [role],
-    ...(queryTimeoutMs === undefined ? {} : { query_timeout: queryTimeoutMs }),
-  });
+    throw new Error("The original catalogue response budget is invalid.");
+  const query = async (text: string, values: unknown[]) => {
+    options.signal?.throwIfAborted();
+    const result = await pool.query({
+      text,
+      values,
+      ...(options.queryTimeout === undefined
+        ? {}
+        : { query_timeout: options.queryTimeout }),
+    } as QueryConfig & { query_timeout?: number });
+    options.signal?.throwIfAborted();
+    return result;
+  };
   const relations = (
-    await pool.query(
-      query(`SELECT n.nspname AS schema,c.relname AS relation,c.relkind,pg_get_userbyid(c.relowner) AS owner,
+    await query(
+      `SELECT n.nspname AS schema,c.relname AS relation,c.relkind,pg_get_userbyid(c.relowner) AS owner,
        c.relrowsecurity,c.relforcerowsecurity,
        ARRAY(SELECT privilege FROM unnest(ARRAY['SELECT','INSERT','UPDATE','DELETE','TRUNCATE','REFERENCES','TRIGGER']) privilege
         WHERE CASE WHEN c.relkind IN('r','p','v','m','f') THEN has_table_privilege($1,c.oid,privilege) ELSE false END ORDER BY privilege) AS table_privileges,
@@ -39,14 +43,16 @@ export async function generationConsumerCatalogue(
         FROM pg_policy p WHERE p.polrelid=c.oid AND (0=ANY(p.polroles) OR (SELECT oid FROM pg_roles WHERE rolname=$1)=ANY(p.polroles))),'[]'::jsonb) AS policies
        FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
        WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
-       ORDER BY n.nspname,c.relname,c.relkind`),
+       ORDER BY n.nspname,c.relname,c.relkind`,
+      [role],
     )
   ).rows;
   const schemas = (
-    await pool.query(
-      query(`SELECT nspname AS schema,has_schema_privilege($1,oid,'USAGE') AS usage,
+    await query(
+      `SELECT nspname AS schema,has_schema_privilege($1,oid,'USAGE') AS usage,
        has_schema_privilege($1,oid,'CREATE') AS create FROM pg_namespace
-       WHERE nspname !~ '^pg_' AND nspname<>'information_schema' ORDER BY nspname`),
+       WHERE nspname !~ '^pg_' AND nspname<>'information_schema' ORDER BY nspname`,
+      [role],
     )
   ).rows;
   return { relations, schemas };
