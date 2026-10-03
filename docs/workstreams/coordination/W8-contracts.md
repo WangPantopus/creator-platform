@@ -1,5 +1,9 @@
 # W8 contract, migration and runtime register
 
+## Real-session private read gate — 2026-10-03
+
+[Existing200 shared client](../../operations/W8-trust-transaction-settlement.md) adds the default-compatible optional `useTrust(path, enabled)` gate for W3 reuse. Disabled/replaced reads clear results and abort their real browser GET; re-enable reads afresh and old paths cannot display results. All Ops read surfaces consume actual session readiness and combined Retry. Account change revokes readiness; periodic loading changes no form epoch or authority. Actual case inputs and pending action keys survive a same-account outage. Source checks pass; current personal operation, readable-case concealment and original signed reply/C10 remain required. Browser cancellation grants no server/task/COMMIT receipt; no SQL, role or held migration changes.
+
 ## Bounded original Trust settlement — 2026-10-03
 
 [Existing draft200 repair](../../operations/W8-trust-transaction-settlement.md) reuses the unchanged Content settlement helper on the same actual Trust client without borrowing authority. A finite original pool acquisition budget, actual five-second host deadline and same-client server timeout bound Trust metadata/actor/reviewer preparation. Caller signals, when genuine, remain separate. Uncertain reads or actual abort close before discard/release; completed policy failures may roll back. Failed catalogue/restoration reads and uncertain Ops evidence send no helper cleanup SQL; private causes stay non-enumerable. Observed client closure is distinct from separately observed server termination. These primitives neither activate held0156 nor issue task/receipt/reply/provider permission; current signed three-client/C10 acceptance remains required.

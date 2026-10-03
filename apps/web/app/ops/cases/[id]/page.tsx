@@ -10,11 +10,13 @@ import {
   ErrorState,
   TrustError,
   TrustSession,
+  type TrustSessionState,
   useTrust,
   useTrustSession,
   trustApi,
   caseLabel,
   dateLabel,
+  retryTrustReads,
 } from "../../trust-client";
 
 const choices: {
@@ -40,7 +42,14 @@ export default function CasePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const { data, error, loading, refresh } = useTrust<CaseDetail>(`cases/${id}`);
+  const [sessionState, setSessionState] = useState<TrustSessionState>({
+    ready: false,
+    error: null,
+  });
+  const { data, error, loading, refresh } = useTrust<CaseDetail>(
+    `cases/${id}`,
+    sessionState.ready,
+  );
   const [purpose, setPurpose] = useState("");
   const [reason, setReason] = useState("");
   const [resolution, setResolution] =
@@ -52,14 +61,27 @@ export default function CasePage({
   const retryKey = useRef<string | null>(null);
   const key = useRef<string | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
+  const resolutionSource = useRef<string | null>(null);
   const replyUnavailable = data?.evidence.some(
     (item) => item.category === "reply_review_unavailable",
   );
   useEffect(() => {
-    if (data?.kind === "reply_review")
+    if (!data) return;
+    const source = JSON.stringify([
+      id,
+      data.kind,
+      data.queue,
+      Boolean(replyUnavailable),
+    ]);
+    if (resolutionSource.current === source) return;
+    resolutionSource.current = source;
+    if (data.kind === "reply_review")
       setResolution(replyUnavailable ? "close" : "allow_reply");
-    else if (data && data.queue !== "disputes") setResolution("close");
-  }, [data?.queue, data?.kind, replyUnavailable]);
+    else setResolution(data.queue === "disputes" ? "uphold" : "close");
+  }, [id, data?.queue, data?.kind, replyUnavailable]);
+  useEffect(() => {
+    if (!data) dialog.current?.close();
+  }, [data]);
   useEffect(() => {
     if (!data) return;
     const remaining = new Date(data.access_expires_at).getTime() - Date.now();
@@ -79,9 +101,10 @@ export default function CasePage({
     setBusy(false);
     key.current = null;
     retryKey.current = null;
+    resolutionSource.current = null;
   });
   const confirm = async () => {
-    if (!data) return;
+    if (!data || !sessionState.ready) return;
     const current = epoch.current;
     setBusy(true);
     setActionError(null);
@@ -115,7 +138,7 @@ export default function CasePage({
     key.current = null;
   };
   const recover = async () => {
-    if (!data) return;
+    if (!data || !sessionState.ready) return;
     const current = epoch.current;
     setBusy(true);
     setActionError(null);
@@ -222,7 +245,7 @@ export default function CasePage({
         <Link className="qv-link-btn" href="/ops">
           Back to cases
         </Link>
-        <TrustSession />
+        <TrustSession onSessionState={setSessionState} />
         {loading && <p role="status">Loading case…</p>}
         {!data && (
           <>
@@ -231,11 +254,15 @@ export default function CasePage({
               Opening this case is logged. Access is limited to its evidence and
               lasts at most 15 minutes.
             </AuditBanner>
-            <ErrorState error={error} retry={() => void refresh()} />
+            <ErrorState
+              error={sessionState.error ?? error}
+              retry={retryTrustReads}
+            />
             <form
               className="ops-resolution"
               onSubmit={async (event) => {
                 event.preventDefault();
+                if (!sessionState.ready) return;
                 const current = epoch.current;
                 setBusy(true);
                 setActionError(null);
@@ -270,7 +297,10 @@ export default function CasePage({
                 onChange={(event) => setPurpose(event.target.value)}
                 rows={3}
               />
-              <button className="qv-btn qv-btn--secondary" disabled={busy}>
+              <button
+                className="qv-btn qv-btn--secondary"
+                disabled={busy || !sessionState.ready}
+              >
                 Open case for 15 minutes
               </button>
               <ErrorState error={actionError} />
@@ -534,7 +564,7 @@ export default function CasePage({
         <div className="actions">
           <button
             className="qv-btn qv-btn--secondary"
-            disabled={busy}
+            disabled={busy || !data || !sessionState.ready}
             onClick={() => void confirm()}
           >
             {busy ? "Recording…" : "Record and notify"}
