@@ -10,9 +10,35 @@ import {
   type MediaAsset,
 } from "../../../../packages/api/src/media";
 import { useConversationRequest } from "../conversation/api";
-import { useIdentityRequest } from "../identity/session-boundary";
+import {
+  sessionChannel,
+  useIdentityRequest,
+} from "../identity/session-boundary";
 import { VoiceRecording } from "../media/VoiceRecorder";
 import { mediaRequest } from "../media/api";
+
+const storagePrefix = "w6.recording-delivery:";
+const identityStorage = "w6.recording-delivery-session";
+let sessionEnds: BroadcastChannel | undefined;
+function purgeRecordingRetries() {
+  try {
+    for (const key of Object.keys(sessionStorage))
+      if (key.startsWith(storagePrefix)) sessionStorage.removeItem(key);
+    sessionStorage.removeItem(identityStorage);
+  } catch {
+    // Optional presentation storage never supplies request authority.
+  }
+}
+function watchSessionEnd() {
+  // Reuse the producer's once-per-document negative observer. It remains
+  // available after component departure to Account; no second lifetime is issued.
+  if (!sessionEnds && typeof BroadcastChannel !== "undefined") {
+    sessionEnds = new BroadcastChannel(sessionChannel);
+    sessionEnds.onmessage = (event) => {
+      if (event.data === "ended") purgeRecordingRetries();
+    };
+  }
+}
 
 /** A human recording is signed by W1, credentialed by W6, then associated by
  * W3. The remembered command is retry metadata; it supplies no authority. */
@@ -35,8 +61,9 @@ export function ConversationVoiceReply({
   onPendingChange: (pending: boolean) => void;
   onDelivered: () => void;
 }) {
-  const request = useConversationRequest();
-  const { signal, session } = useIdentityRequest();
+  const request = useRef(useConversationRequest()).current;
+  const { signal, session, isSessionEnded } =
+    useRef(useIdentityRequest()).current;
   const [available, setAvailable] = useState(false);
   const [limit, setLimit] = useState<number | null>(null);
   const [asset, setAsset] = useState<MediaAsset | null>(null);
@@ -48,7 +75,7 @@ export function ConversationVoiceReply({
     typeof ConversationRecordingInputSchema.parse
   > | null>(null);
   const sending = useRef(false);
-  const storage = `w6.recording-delivery:${expectedAccountId}:${creatorId}:${fanId}:${threadId}`;
+  const storage = `${storagePrefix}${expectedAccountId}:${creatorId}:${fanId}:${threadId}`;
   useEffect(() => {
     const abort = new AbortController();
     void Promise.all([
@@ -81,30 +108,62 @@ export function ConversationVoiceReply({
     return () => abort.abort();
   }, [request, creatorId, fanId, threadId, expectedAccountId]);
   useEffect(() => {
+    watchSessionEnd();
     try {
-      const raw = sessionStorage.getItem(storage);
+      const marker = JSON.stringify([session.accountId, session.sessionId]);
+      if (!signal.aborted && session.accountId === expectedAccountId) {
+        if (sessionStorage.getItem(identityStorage) !== marker)
+          purgeRecordingRetries();
+        sessionStorage.setItem(identityStorage, marker);
+      }
+      const raw = !signal.aborted ? sessionStorage.getItem(storage) : null;
       if (raw) {
+        const remembered = JSON.parse(raw);
         const restored = ConversationRecordingInputSchema.safeParse(
-          JSON.parse(raw),
+          remembered.command,
         );
-        if (restored.success) {
+        if (
+          restored.success &&
+          remembered.accountId === session.accountId &&
+          remembered.sessionId === session.sessionId &&
+          session.accountId === expectedAccountId &&
+          !signal.aborted
+        ) {
           command.current = restored.data;
           setPending(true);
         } else sessionStorage.removeItem(storage);
       }
     } catch {
       /* Current server authority remains mandatory on every retry. */
-    }
-    const purge = () => {
       try {
         sessionStorage.removeItem(storage);
       } catch {
-        /* Storage may be unavailable. */
+        /* Optional storage. */
       }
+    }
+    const dispose = () => {
+      command.current = null;
+      sending.current = false;
+      setAsset(null);
+      setAvailable(false);
+      setLimit(null);
+      setPending(false);
+      setBusy(false);
+      setError("");
+      setDelivered(false);
+      if (isSessionEnded()) purgeRecordingRetries();
     };
-    signal.addEventListener("abort", purge, { once: true });
-    return () => signal.removeEventListener("abort", purge);
-  }, [storage, signal]);
+    signal.addEventListener("abort", dispose, { once: true });
+    if (signal.aborted) dispose();
+    return () => signal.removeEventListener("abort", dispose);
+  }, [
+    storage,
+    signal,
+    session.accountId,
+    session.sessionId,
+    expectedAccountId,
+    isSessionEnded,
+  ]);
   useEffect(() => {
     onPendingChange(pending || busy);
     return () => onPendingChange(false);
@@ -124,6 +183,7 @@ export function ConversationVoiceReply({
       sending.current ||
       !available ||
       !current ||
+      signal.aborted ||
       session.accountId !== expectedAccountId
     )
       return;
@@ -142,7 +202,14 @@ export function ConversationVoiceReply({
         idempotencyKey: crypto.randomUUID(),
       });
       try {
-        sessionStorage.setItem(storage, JSON.stringify(command.current));
+        sessionStorage.setItem(
+          storage,
+          JSON.stringify({
+            accountId: session.accountId,
+            sessionId: session.sessionId,
+            command: command.current,
+          }),
+        );
       } catch {
         /* Keep the exact in-memory retry. */
       }
@@ -152,12 +219,14 @@ export function ConversationVoiceReply({
     setPending(true);
     setError("");
     try {
+      const original = command.current;
       const result = ConversationRecordingResultSchema.parse(
-        await request(`${creatorId}/${fanId}/recordings`, command.current),
+        await request(`${creatorId}/${fanId}/recordings`, original),
       );
+      if (signal.aborted || command.current !== original) return;
       if (
         result.threadId !== threadId ||
-        result.signedActId !== command.current.signedActId
+        result.signedActId !== original.signedActId
       )
         throw new Error(copy.w6SelectedConversationChanged);
       // Receipt validation precedes clearing the retry. A refresh failure must
@@ -179,11 +248,13 @@ export function ConversationVoiceReply({
             : copy.w6RecordingDeliveryIsUnconfirmed,
         );
     } finally {
-      sending.current = false;
-      setBusy(false);
+      if (!signal.aborted) {
+        sending.current = false;
+        setBusy(false);
+      }
     }
   }
-  if (!available || !limit)
+  if (signal.aborted || !available || !limit)
     return <p role="status">{copy.w6VoiceReplyUnavailable}</p>;
   return (
     <section aria-label={copy.w6RecordAVoiceReply}>
