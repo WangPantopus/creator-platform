@@ -19,7 +19,12 @@ function invalidateSession() {
   sessionRevision++;
   window.dispatchEvent(new Event("trust-session"));
 }
-export async function trustApi<T>(path: string, body?: unknown): Promise<T> {
+export async function trustApi<T>(
+  path: string,
+  body?: unknown,
+  signal?: AbortSignal,
+): Promise<T> {
+  signal?.throwIfAborted();
   const revision = sessionRevision;
   const account = verifiedAccount;
   const publicPath = ["capabilities", "help", "status", "session"].includes(
@@ -39,8 +44,10 @@ export async function trustApi<T>(path: string, body?: unknown): Promise<T> {
     },
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
     cache: "no-store",
+    ...(signal ? { signal } : {}),
   });
   const result = await response.json();
+  signal?.throwIfAborted();
   if (revision !== sessionRevision && !path.startsWith("dev/"))
     throw new TrustError(
       "Your account changed. Reopen this page.",
@@ -88,30 +95,50 @@ export function useTrustSession(reset: () => void) {
 export function retryTrustReads() {
   window.dispatchEvent(new Event("trust-retry"));
 }
-export function useTrust<T>(path: string) {
-  const [data, setData] = useState<T | null>(null);
-  const [error, setError] = useState<TrustError | null>(null);
+/** A disabled private read clears its result and cancels its real browser
+ * request. Re-enabling always reads again; periodic session loading need not
+ * disable a containing page. Browser cancellation is not a server receipt. */
+export function useTrust<T>(path: string, enabled = true) {
+  const [result, setResult] = useState<{
+    path: string;
+    data: T | null;
+    error: TrustError | null;
+  }>({ path, data: null, error: null });
   const [loading, setLoading] = useState(true);
   const sequence = useRef(0);
+  const request = useRef<AbortController | null>(null);
   const refresh = useCallback(async () => {
     const current = ++sequence.current;
-    setData(null);
+    request.current?.abort();
+    request.current = null;
+    setResult({ path, data: null, error: null });
+    if (!enabled) {
+      setLoading(false);
+      return;
+    }
+    const controller = new AbortController();
+    request.current = controller;
     setLoading(true);
-    setError(null);
     try {
-      const result = await trustApi<T>(path);
-      if (sequence.current === current) setData(result);
+      const data = await trustApi<T>(path, undefined, controller.signal);
+      if (sequence.current === current) setResult({ path, data, error: null });
     } catch (error) {
       if (sequence.current === current)
-        setError(
-          error instanceof TrustError
-            ? error
-            : new TrustError("Reconnect and try again.", "offline"),
-        );
+        setResult({
+          path,
+          data: null,
+          error:
+            error instanceof TrustError
+              ? error
+              : new TrustError("Reconnect and try again.", "offline"),
+        });
     } finally {
-      if (sequence.current === current) setLoading(false);
+      if (sequence.current === current) {
+        request.current = null;
+        setLoading(false);
+      }
     }
-  }, [path]);
+  }, [path, enabled]);
   useEffect(() => {
     void refresh();
     const update = () => void refresh();
@@ -119,12 +146,24 @@ export function useTrust<T>(path: string) {
     window.addEventListener("trust-retry", update);
     return () => {
       sequence.current++;
+      request.current?.abort();
+      request.current = null;
       window.removeEventListener("trust-session", update);
       window.removeEventListener("trust-retry", update);
     };
   }, [refresh]);
-  return { data, error, loading, refresh };
+  const visible = enabled && result.path === path;
+  return {
+    data: visible ? result.data : null,
+    error: visible ? result.error : null,
+    loading: enabled && (loading || result.path !== path),
+    refresh,
+  };
 }
+export type TrustSessionState = {
+  ready: boolean;
+  error: TrustError | null;
+};
 export function TrustSession({
   capabilityError = null,
   onSessionState,
@@ -133,10 +172,7 @@ export function TrustSession({
   capabilityError?: TrustError | null;
   /** A containing privacy page presents one read failure and gates its actions
    * on the real session response. Periodic loading is not an account change. */
-  onSessionState?: (state: {
-    ready: boolean;
-    error: TrustError | null;
-  }) => void;
+  onSessionState?: (state: TrustSessionState) => void;
 } = {}) {
   const capability = useTrust<{
     localDevelopment: boolean;
@@ -144,6 +180,11 @@ export function TrustSession({
   }>("capabilities");
   const { data } = capability;
   const session = useTrust<{ accountId: string }>("session");
+  useEffect(() => {
+    const clear = () => onSessionState?.({ ready: false, error: null });
+    window.addEventListener("trust-session", clear);
+    return () => window.removeEventListener("trust-session", clear);
+  }, [onSessionState]);
   useEffect(() => {
     if (capability.error || session.error)
       onSessionState?.({
@@ -242,7 +283,9 @@ export function TrustSession({
       </a>
     ) : null;
   if (capability.error)
-    return onSessionState ||
+    return capability.error.status === 401 ? (
+      continuation
+    ) : onSessionState ||
       capability.error.code === capabilityError?.code ? null : (
       <ErrorState error={capability.error} retry={retryTrustReads} />
     );
