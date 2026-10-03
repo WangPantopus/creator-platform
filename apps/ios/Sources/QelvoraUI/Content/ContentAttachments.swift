@@ -87,53 +87,39 @@ private struct ContentPlaybackFile: Decodable, Sendable, Equatable {
         asset.provenance?.fileVariant == variant && asset.provenance?.fileSha256 == sha256 && asset.provenance?.fileBytes == bytes
     }
 }
-private struct ContentMediaCapabilities: Decodable, Sendable {
-    let creatorMediaAudienceAvailable: Bool?
-}
-private final class ContentMediaRedirectGuard: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
-    func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping @Sendable (URLRequest?) -> Void) { completionHandler(nil) }
-}
-private actor ContentMediaTransport {
-    let baseURL: URL
-    let accountId: String
-    private let storage: SecureSessionStorage
-    init(baseURL: URL, accountId: String) { self.baseURL = baseURL; storage = SecureSessionStorage(issuer: baseURL); self.accountId = accountId }
-    func request(_ path: String, post: Bool = false, range: Range<Int>? = nil, total: Int? = nil) async throws -> Data {
-        guard UUID(uuidString: accountId) != nil,
-              baseURL.scheme == "https" || (baseURL.scheme == "http" && ["localhost", "127.0.0.1"].contains(baseURL.host ?? "")),
-              baseURL.user == nil, baseURL.password == nil, path.hasPrefix("/v1/w6/"), !path.contains(".."),
-              let url = URL(string: path, relativeTo: baseURL), url.scheme == baseURL.scheme, url.host == baseURL.host, url.port == baseURL.port,
-              let token = try await storage.read() else { throw URLError(.noPermissionsToReadFile) }
-        var request = URLRequest(url: url); request.httpMethod = post ? "POST" : "GET"
-        request.timeoutInterval = 4; request.cachePolicy = .reloadIgnoringLocalCacheData
-        request.setValue("Bearer " + token, forHTTPHeaderField: "Authorization")
-        request.setValue(accountId, forHTTPHeaderField: "x-qelvora-expected-account")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        if post { request.httpBody = Data("{}".utf8) }
-        if let range { request.setValue("bytes=\(range.lowerBound)-\(range.upperBound-1)", forHTTPHeaderField: "Range") }
-        let session = URLSession(configuration: .ephemeral, delegate: ContentMediaRedirectGuard(), delegateQueue: nil)
-        defer { session.invalidateAndCancel() }
-        let (bytes, raw) = try await session.bytes(for: request)
-        guard let response = raw as? HTTPURLResponse else { throw URLError(.badServerResponse) }
-        if let range, let total {
-            guard response.statusCode == 206,
-                  response.value(forHTTPHeaderField: "Content-Range") == "bytes \(range.lowerBound)-\(range.upperBound-1)/\(total)"
-            else { throw URLError(.badServerResponse) }
-        } else {
-            guard response.statusCode == 200 else { throw URLError(.noPermissionsToReadFile) }
-        }
-        let maximum = range?.count ?? 1_048_576
-        var data = Data(); data.reserveCapacity(maximum)
-        for try await byte in bytes {
-            try Task.checkCancellation()
-            guard data.count < maximum else { throw URLError(.dataLengthExceedsMaximum) }
-            data.append(byte)
-        }
-        if let range, data.count != range.count { throw URLError(.badServerResponse) }
-        try Task.checkCancellation()
-        return data
+/// One original W1 capture for metadata, ticket, ranges and local playback.
+@MainActor private final class ContentMediaTransport {
+    private let capture: FanSessionRequestCapture
+    private let creatorId: String
+    private let assetId: String
+    init(capture: FanSessionRequestCapture, creatorId: String, assetId: String) {
+        self.capture = capture; self.creatorId = creatorId; self.assetId = assetId
     }
-    func download(path: String, asset: ContentAudienceAsset, playbackFile: ContentPlaybackFile) async throws -> URL {
+    func isCurrent() async -> Bool { await capture.isCurrent() }
+    private func requireCurrent() async throws {
+        try Task.checkCancellation()
+        guard await isCurrent() else { throw URLError(.noPermissionsToReadFile) }
+    }
+    func audienceAvailable() async throws -> Bool {
+        try await requireCurrent()
+        let value = try await capture.client.readMediaCapabilities()
+        try await requireCurrent()
+        return value.creatorMediaAudienceAvailable
+    }
+    func asset() async throws -> ContentAudienceAsset {
+        try await requireCurrent()
+        let value = try await capture.client.readAudienceCreatorMedia(creatorId: creatorId, assetId: assetId, xQelvoraExpectedAccount: capture.expectedAccountId)
+        try await requireCurrent()
+        return try JSONDecoder().decode(ContentAudienceAsset.self, from: JSONEncoder().encode(value))
+    }
+    func playback() async throws -> ContentPlaybackTicket {
+        try await requireCurrent()
+        let value = try await capture.client.audienceCreatorMediaPlayback(creatorId: creatorId, assetId: assetId, xQelvoraExpectedAccount: capture.expectedAccountId)
+        try await requireCurrent()
+        return try JSONDecoder().decode(ContentPlaybackTicket.self, from: JSONEncoder().encode(value))
+    }
+    func download(ticket: String, asset: ContentAudienceAsset, playbackFile: ContentPlaybackFile) async throws -> URL {
+        try await requireCurrent()
         guard playbackFile.matches(asset) else { throw URLError(.badServerResponse) }
         let file = FileManager.default.temporaryDirectory.appendingPathComponent("w5-content-" + UUID().uuidString + (asset.mimeType == "image/png" ? ".png" : ".m4a"))
         #if canImport(UIKit)
@@ -147,14 +133,17 @@ private actor ContentMediaTransport {
             defer { try? handle.close() }
             var hasher = SHA256(); var offset = 0
             while offset < playbackFile.bytes {
-                try Task.checkCancellation()
+                try await requireCurrent()
                 let end = min(offset + 1_048_576, playbackFile.bytes)
-                let data = try await request(path, range: offset..<end, total: playbackFile.bytes)
-                try handle.write(contentsOf: data); hasher.update(data: data); offset = end
+                let range = "bytes=\(offset)-\(end-1)"
+                let result = try await capture.client.playAudienceCreatorMedia(creatorId: creatorId, assetId: assetId, ticket: ticket, range: range, xQelvoraExpectedAccount: capture.expectedAccountId)
+                try await requireCurrent()
+                guard result.status == 206, result.contentRange == "bytes \(offset)-\(end-1)/\(playbackFile.bytes)", result.body.count == end - offset else { throw URLError(.badServerResponse) }
+                try handle.write(contentsOf: result.body); hasher.update(data: result.body); offset = end
             }
             let digest = hasher.finalize().map { String(format: "%02x", $0) }.joined()
             guard digest == playbackFile.sha256 else { throw CocoaError(.fileReadCorruptFile) }
-            try Task.checkCancellation()
+            try await requireCurrent()
             return file
         } catch { try? FileManager.default.removeItem(at: file); throw error }
     }
@@ -168,7 +157,11 @@ private actor ContentMediaTransport {
     @Published var image: UIImage?
     @Published var loaded = false
     @Published var playing = false
-    private let transport: ContentMediaTransport
+    private var transport: ContentMediaTransport?
+    private let session: FanSession
+    private let destination: String
+    private let baseURL: URL
+    private let accountId: String
     private let creatorId: String; private let objectId: String; private let contentKind: String
     private let attachment: ContentAttachmentValue
     private var asset: ContentAudienceAsset?
@@ -178,11 +171,12 @@ private actor ContentMediaTransport {
     private var operation: Task<Void, Never>?
     private var generation = 0
     private var checking = false
+    private var toggling = false
     private var active = true
     private var checkedAt: TimeInterval = 0
     private var family: String { "/v1/w6/creators/" + creatorId + "/audience-media/" + attachment.assetId }
-    init(baseURL: URL, accountId: String, creatorId: String, objectId: String, contentKind: String, attachment: ContentAttachmentValue) {
-        transport = ContentMediaTransport(baseURL: baseURL, accountId: accountId)
+    init(session: FanSession, destination: String, baseURL: URL, accountId: String, creatorId: String, objectId: String, contentKind: String, attachment: ContentAttachmentValue) {
+        self.session = session; self.destination = destination; self.baseURL = baseURL; self.accountId = accountId
         self.creatorId = creatorId; self.objectId = objectId; self.contentKind = contentKind; self.attachment = attachment
     }
     private func matches(_ value: ContentAudienceAsset) -> Bool {
@@ -203,14 +197,22 @@ private actor ContentMediaTransport {
     }
     func check() async {
         guard active, !checking else { return }; checking = true; defer { checking = false }
-        let epoch = generation, started = ProcessInfo.processInfo.systemUptime
+        var epoch = generation
+        let started = ProcessInfo.processInfo.systemUptime
         do {
             guard UUID(uuidString: attachment.assetId) != nil, UUID(uuidString: creatorId) != nil, UUID(uuidString: objectId) != nil, attachment.version > 0,
                   attachment.sha256.range(of: "^[a-f0-9]{64}$", options: .regularExpression) != nil else { throw URLError(.badURL) }
-            let capabilities = try JSONDecoder().decode(ContentMediaCapabilities.self, from: await transport.request("/v1/w6/capabilities"))
-            guard capabilities.creatorMediaAudienceAvailable == true else { throw URLError(.unsupportedURL) }
-            let value = try JSONDecoder().decode(ContentAudienceAsset.self, from: await transport.request(family))
-            guard matches(value), active, epoch == generation, !Task.isCancelled else { throw URLError(.noPermissionsToReadFile) }
+            guard baseURL.scheme == "https" || (baseURL.scheme == "http" && ["localhost", "127.0.0.1"].contains(baseURL.host ?? "")), baseURL.user == nil, baseURL.password == nil else { throw URLError(.badURL) }
+            let capturedCurrent = await transport?.isCurrent() ?? false
+            if !capturedCurrent {
+                available = false; asset = nil; clearBytes(); transport = nil; epoch = generation
+                guard let capture = await session.captureRequest(from: destination, maximumResponseBytes: 1_048_576, timeoutSeconds: 4), capture.expectedAccountId == accountId else { throw URLError(.noPermissionsToReadFile) }
+                guard active, epoch == generation else { throw CancellationError() }
+                transport = ContentMediaTransport(capture: capture, creatorId: creatorId, assetId: attachment.assetId)
+            }
+            guard let api = transport, try await api.audienceAvailable() else { throw URLError(.unsupportedURL) }
+            let value = try await api.asset()
+            guard matches(value), active, epoch == generation, transport === api, await api.isCurrent(), !Task.isCancelled else { throw URLError(.noPermissionsToReadFile) }
             if let playbackFile, !playbackFile.matches(value) { clearBytes() }
             checkedAt = started; available = ProcessInfo.processInfo.systemUptime - started < 5; asset = value; error = ""
             if !available { clearBytes() }
@@ -219,7 +221,11 @@ private actor ContentMediaTransport {
             available = false; asset = nil; clearBytes(); self.error = "Attachment access could not be confirmed. Check current access before retrying."
         }
     }
-    func tick() {
+    func tick() async {
+        if let api = transport {
+            let current = await api.isCurrent()
+            if transport === api && !current { available = false; asset = nil; clearBytes(); transport = nil }
+        }
         if ProcessInfo.processInfo.systemUptime - checkedAt >= 5 { available = false; asset = nil; if busy || loaded || file != nil { clearBytes() } }
         playing = player?.isPlaying ?? false
     }
@@ -229,21 +235,23 @@ private actor ContentMediaTransport {
         playbackFile = nil
         if let file { try? FileManager.default.removeItem(at: file) }; file = nil
     }
-    func stop() { active = false; available = false; asset = nil; clearBytes() }
+    func stop() { active = false; available = false; asset = nil; clearBytes(); transport = nil }
     func setActive(_ value: Bool) { if value { active = true } else { stop() } }
     func load() {
         guard active, available, !busy, let asset, ProcessInfo.processInfo.systemUptime - checkedAt < 5 else { return }
         busy = true; let epoch = generation
         operation = Task { @MainActor in
             do {
-                let ticket = try JSONDecoder().decode(ContentPlaybackTicket.self, from: await transport.request(family + "/playback", post: true))
+                guard let api = transport, await api.isCurrent(), active, epoch == generation else { throw CancellationError() }
+                let ticket = try await api.playback()
                 guard matches(ticket.asset), ticket.asset.bytes == asset.bytes, ticket.asset.mimeType == asset.mimeType, ticket.asset.durationMs == asset.durationMs,
                       ticket.playbackFile.matches(ticket.asset), ticket.playbackFile.matches(asset),
                       let url = URL(string: ticket.url), let parts = URLComponents(url: url, resolvingAgainstBaseURL: false),
-                      parts.percentEncodedPath == family + "/play", let query = parts.queryItems, query.count == 1, query[0].name == "ticket", !(query[0].value ?? "").isEmpty,
+                      url.scheme == baseURL.scheme, url.host == baseURL.host, url.port == baseURL.port, url.user == nil, url.password == nil, parts.fragment == nil,
+                      parts.percentEncodedPath == family + "/play", let query = parts.queryItems, query.count == 1, query[0].name == "ticket", let token = query[0].value, !token.isEmpty,
                       let expiry = ISO8601DateFormatter().date(from: ticket.expiresAt) ?? ISO8601DateFormatter.withFractionalSeconds.date(from: ticket.expiresAt), expiry > Date() else { throw URLError(.badServerResponse) }
-                let saved = try await transport.download(path: parts.percentEncodedPath + "?" + (parts.percentEncodedQuery ?? ""), asset: ticket.asset, playbackFile: ticket.playbackFile)
-                guard active, epoch == generation, available, ProcessInfo.processInfo.systemUptime - checkedAt < 5, !Task.isCancelled else { try? FileManager.default.removeItem(at: saved); throw CancellationError() }
+                let saved = try await api.download(ticket: token, asset: ticket.asset, playbackFile: ticket.playbackFile)
+                guard active, epoch == generation, transport === api, await api.isCurrent(), available, ProcessInfo.processInfo.systemUptime - checkedAt < 5, !Task.isCancelled else { try? FileManager.default.removeItem(at: saved); throw CancellationError() }
                 file = saved; playbackFile = ticket.playbackFile
                 if attachment.kind == "photo" {
                     guard let source = CGImageSourceCreateWithURL(saved as CFURL, nil),
@@ -263,17 +271,28 @@ private actor ContentMediaTransport {
             }
         }
     }
-    func toggle() {
-        guard available, active, ProcessInfo.processInfo.systemUptime - checkedAt < 5 else { clearBytes(); return }
+    func toggle() async {
+        guard !toggling else { return }; toggling = true; defer { toggling = false }
+        guard available, active, !busy, ProcessInfo.processInfo.systemUptime - checkedAt < 5, let api = transport else { clearBytes(); return }
+        let epoch = generation
+        guard await api.isCurrent(), active, available, epoch == generation, transport === api, ProcessInfo.processInfo.systemUptime - checkedAt < 5 else {
+            if epoch == generation && transport === api { clearBytes() }
+            return
+        }
         guard let player else { load(); return }
         if player.isPlaying { player.pause(); playing = false; return }
         do {
             let audio = AVAudioSession.sharedInstance()
             try audio.setCategory(.playback, mode: .spokenAudio)
             try audio.setActive(true)
+            guard await api.isCurrent(), active, available, epoch == generation, self.player === player, transport === api, ProcessInfo.processInfo.systemUptime - checkedAt < 5 else {
+                if epoch == generation && transport === api { clearBytes() }
+                return
+            }
             guard player.play() else { throw URLError(.cannotDecodeContentData) }
             playing = true
         } catch {
+            guard epoch == generation else { return }
             clearBytes(); self.error = "The recording could not be played. Check current access before retrying."
         }
     }
@@ -289,9 +308,9 @@ private extension ISO8601DateFormatter {
     @Environment(\.scenePhase) private var scene
     #if canImport(UIKit)
     @StateObject private var model: ContentAttachmentModel
-    init(baseURL: URL, accountId: String, creatorId: String, objectId: String, contentKind: String, creatorName: String, attachment: ContentAttachmentValue) {
+    init(session: FanSession, destination: String, baseURL: URL, accountId: String, creatorId: String, objectId: String, contentKind: String, creatorName: String, attachment: ContentAttachmentValue) {
         self.creatorName = creatorName; self.attachment = attachment
-        _model = StateObject(wrappedValue: ContentAttachmentModel(baseURL: baseURL, accountId: accountId, creatorId: creatorId, objectId: objectId, contentKind: contentKind, attachment: attachment))
+        _model = StateObject(wrappedValue: ContentAttachmentModel(session: session, destination: destination, baseURL: baseURL, accountId: accountId, creatorId: creatorId, objectId: objectId, contentKind: contentKind, attachment: attachment))
     }
     private var recordingAction: String {
         if model.busy { return "Loading recording…" }
@@ -307,15 +326,15 @@ private extension ISO8601DateFormatter {
                 else { Button(model.busy ? "Loading photo…" : "Load photo", variant: .secondary, disabled: model.busy) { model.load() } }
             } else {
                 Text(creatorName + "’s recording").qText("label")
-                Button(recordingAction, variant: .secondary, disabled: model.busy) { model.toggle() }
+                Button(recordingAction, variant: .secondary, disabled: model.busy) { Task { await model.toggle() } }
             }
         }.task { model.setActive(scene == .active); while !Task.isCancelled { await model.check(); try? await Task.sleep(for: .seconds(2)) } }
-         .task { while !Task.isCancelled { model.tick(); try? await Task.sleep(for: .milliseconds(500)) } }
+         .task { while !Task.isCancelled { await model.tick(); try? await Task.sleep(for: .milliseconds(500)) } }
          .onChange(of: scene) { _, value in model.setActive(value == .active) }
          .onDisappear { model.stop() }
     }
     #else
-    init(baseURL: URL, accountId: String, creatorId: String, objectId: String, contentKind: String, creatorName: String, attachment: ContentAttachmentValue) { self.creatorName = creatorName; self.attachment = attachment }
+    init(session: FanSession, destination: String, baseURL: URL, accountId: String, creatorId: String, objectId: String, contentKind: String, creatorName: String, attachment: ContentAttachmentValue) { self.creatorName = creatorName; self.attachment = attachment }
     var body: some View { Text("Open this attachment in the iOS app.").qText("caption") }
     #endif
 }
