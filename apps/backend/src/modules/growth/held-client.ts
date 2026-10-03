@@ -1,5 +1,25 @@
 import type { PoolClient } from "pg";
 
+function queryReadTimedOut(failure: unknown): boolean {
+  const pending = [failure];
+  const seen = new Set<Error>();
+  while (pending.length) {
+    const error = pending.pop();
+    if (!(error instanceof Error) || seen.has(error)) continue;
+    seen.add(error);
+    // pg 8.23 rejects the caller here without settling the active wire query
+    // or emitting a client error. A wrapper may retain it as a private cause.
+    if (error.message === "Query read timeout" || seen.size > 32) return true;
+    if (error.cause !== undefined) pending.push(error.cause);
+    if (error instanceof AggregateError)
+      for (const cause of error.errors) {
+        pending.push(cause);
+        if (pending.length > 32) return true;
+      }
+  }
+  return false;
+}
+
 /** Retains the original borrowed client through rollback or physical shutdown.
  * Cleanup supplies no session, purpose, ownership or privacy authority. */
 export class GrowthHeldClient {
@@ -69,7 +89,13 @@ export class GrowthHeldClient {
 
   async close(input: { destroy?: boolean; failure?: unknown } = {}) {
     const errors: unknown[] = [];
-    if (input.destroy || this.uncertain || this.signal?.aborted) this.destroy();
+    if (
+      input.destroy ||
+      this.uncertain ||
+      this.signal?.aborted ||
+      queryReadTimedOut(input.failure)
+    )
+      this.destroy();
     try {
       if (this.transactionStarted && !this.shutdown) {
         try {

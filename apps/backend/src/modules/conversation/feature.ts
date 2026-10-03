@@ -36,6 +36,7 @@ import {
   conversationHomeCursor,
   readConversationHomeCursor,
 } from "./home-cursor.js";
+import { GrowthHeldClient } from "../growth/held-client.js";
 
 export const accessDisclosure =
   "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.";
@@ -421,8 +422,10 @@ export class ConversationFeature {
     }
     const before = cursor ? readConversationHomeCursor(cursor) : null;
     const client = await this.db.pool.connect();
+    const held = new GrowthHeldClient(client);
+    let failure: unknown;
     try {
-      await client.query("BEGIN");
+      await held.begin();
       await client.query("SELECT set_config('app.account_id',$1,true)", [
         actor.accountId,
       ]);
@@ -476,7 +479,7 @@ export class ConversationFeature {
         )
       ).rows;
       await assertCurrentSession(client, actor.accountId);
-      await client.query("COMMIT");
+      await held.commit();
       return {
         fan,
         threads: threads.slice(0, 50),
@@ -490,10 +493,10 @@ export class ConversationFeature {
         order: "activity" as const,
       };
     } catch (error) {
-      await client.query("ROLLBACK");
+      failure = error;
       throw error;
     } finally {
-      client.release();
+      await held.close({ failure });
     }
   }
   async account(actor: Actor, cursor?: string) {
