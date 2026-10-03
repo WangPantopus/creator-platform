@@ -1334,15 +1334,15 @@ export class AgentService {
           )
         ).rows,
     );
-    await array(
-      "usage",
-      async (after) =>
-        (
-          await client.query(
-            "SELECT * FROM creator.ai_usage WHERE creator_id=$1 AND ($2::uuid IS NULL OR id>$2) ORDER BY id LIMIT 50",
-            [scope.creatorId, after],
-          )
-        ).rows,
+    await array("usage", async (after) =>
+      (
+        await client.query(
+          // Private completion custody is never part of a creator export.
+          // JSON subtraction also works before held0097 is activated.
+          "SELECT to_jsonb(t)-'completion_capability_hash' AS document FROM creator.ai_usage t WHERE creator_id=$1 AND ($2::uuid IS NULL OR id>$2) ORDER BY id LIMIT 50",
+          [scope.creatorId, after],
+        )
+      ).rows.map((row) => row.document),
     );
     for (const table of [
       "ai_evaluation",

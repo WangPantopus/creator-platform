@@ -6,6 +6,8 @@ import { ProcessedMediaEvidenceSchema } from "../../../../../packages/api/src/me
 import { canonical, contentHash } from "../../core/canonical.js";
 import { invariant } from "../../core/errors.js";
 import { requestAuthority } from "./request-authority.js";
+import { assertPublicationPreparation } from "./publication-preparation.js";
+import { assertFulfillmentPublicationDenialCatalog } from "../trust/fulfillment-publication-denial-catalog.js";
 
 const taskSchema = z
   .object({
@@ -66,7 +68,17 @@ function proofCommand(proof: z.infer<typeof proofSchema>) {
  * projection before construction/use; no development or missing-port fallback.
  */
 export class PublicationIdentityAuthority {
-  private readonly issued = new WeakMap<object, PoolClient>();
+  private readonly issued = new WeakMap<
+    object,
+    Readonly<{
+      client: PoolClient;
+      preparation: string;
+      command: string;
+      transaction: string;
+      pid: number;
+      nonce: string;
+    }>
+  >();
   constructor(
     private readonly pool: Pool,
     private readonly configuration: Readonly<{
@@ -83,20 +95,33 @@ export class PublicationIdentityAuthority {
   }
 
   async assertRole(): Promise<void> {
-    const result = await this.pool.query<{ allowed: boolean }>(
-      `SELECT current_user='creator_publication_worker' AND session_user=current_user
-        AND NOT r.rolsuper AND NOT r.rolbypassrls AND NOT r.rolinherit
-        AND NOT r.rolreplication AND (r.rolconfig IS NULL OR cardinality(r.rolconfig)=0)
-        AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid)
-        AND to_regprocedure('creator.begin_publication_scope(uuid,uuid,integer,uuid,uuid,text,text)') IS NOT NULL
-        AND to_regprocedure('creator_trust.publication_worker_denial(uuid,uuid)') IS NOT NULL
-        AS allowed FROM pg_roles r WHERE r.rolname=current_user`,
+    const client = await this.pool.connect();
+    try {
+      await assertPublicationPreparation(client);
+    } finally {
+      client.release();
+    }
+  }
+
+  private async prepare(
+    client: PoolClient,
+    task: z.infer<typeof candidateSchema>,
+  ) {
+    // The genuine W8 catalogue is required before original204's private
+    // negatives/body boundary. A future combined208 wave needs its separately
+    // qualified catalogue; never learn or accept the current metadata here.
+    await assertFulfillmentPublicationDenialCatalog(client);
+    const result = await client.query<{ preparation: unknown }>(
+      "SELECT creator.prepare_publication_task($1,$2,$3,$4,$5) AS preparation",
+      [
+        task.creatorId,
+        task.contentId,
+        task.version,
+        task.publisherAccountId,
+        task.signedActId,
+      ],
     );
-    invariant(
-      result.rows[0]?.allowed === true,
-      "publication_worker_role_required",
-      "Use the activated, separate non-owner publication worker connection.",
-    );
+    return IdSchema.parse(result.rows[0]?.preparation);
   }
 
   private assertWorker() {
@@ -139,18 +164,13 @@ export class PublicationIdentityAuthority {
           "SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','2000',true)",
         );
         await this.configuration.assertDiscoveryAllowed(client);
+        const preparation = await this.prepare(client, candidate);
         const result = await client.query<{ proof: unknown }>(
-          "SELECT creator.read_publication_task($1,$2,$3,$4,$5) AS proof",
-          [
-            candidate.creatorId,
-            candidate.contentId,
-            candidate.version,
-            candidate.publisherAccountId,
-            candidate.signedActId,
-          ],
+          "SELECT creator.read_prepared_publication_task($1) AS proof",
+          [preparation],
         );
         if (result.rows[0]?.proof == null) {
-          await client.query("COMMIT");
+          await client.query("ROLLBACK");
           continue;
         }
         const proof = proofSchema.parse(result.rows[0].proof),
@@ -174,7 +194,9 @@ export class PublicationIdentityAuthority {
             }),
           ),
         );
-        await client.query("COMMIT");
+        // Discovery grants no issuance or domain write. Roll back the actual
+        // early preparation, including original204's private negatives.
+        await client.query("ROLLBACK");
       }
       return Object.freeze(tasks);
     } catch (error) {
@@ -188,6 +210,10 @@ export class PublicationIdentityAuthority {
   async withPublication<T>(
     input: PublicationTask,
     work: (client: PoolClient, scope: PublicationTaskScope) => Promise<T>,
+    beforeFinalSignatureRead?: (
+      client: PoolClient,
+      scope: PublicationTaskScope,
+    ) => Promise<void>,
   ): Promise<T> {
     this.assertWorker();
     await this.assertRole();
@@ -202,15 +228,10 @@ export class PublicationIdentityAuthority {
       // This actual held-client callback includes W8 restoration currentness.
       // The SQL issuer separately requires its purpose-specific DB denial.
       await this.configuration.assertAllowed(client, task);
+      const preparation = await this.prepare(client, task);
       const result = await client.query<{ proof: unknown }>(
-        "SELECT creator.read_publication_task($1,$2,$3,$4,$5) AS proof",
-        [
-          task.creatorId,
-          task.contentId,
-          task.version,
-          task.publisherAccountId,
-          task.signedActId,
-        ],
+        "SELECT creator.read_prepared_publication_task($1) AS proof",
+        [preparation],
       );
       const proof = proofSchema.parse(result.rows[0]?.proof);
       invariant(
@@ -233,16 +254,8 @@ export class PublicationIdentityAuthority {
         "The exact stored publication command is required.",
       );
       const issued = await client.query<{ allowed: boolean }>(
-        "SELECT creator.begin_publication_scope($1,$2,$3,$4,$5,$6,$7) AS allowed",
-        [
-          task.creatorId,
-          task.contentId,
-          task.version,
-          task.publisherAccountId,
-          task.signedActId,
-          task.commandHash,
-          canonical(command),
-        ],
+        "SELECT creator.begin_prepared_publication_scope($1,$2,$3) AS allowed",
+        [preparation, task.commandHash, canonical(command)],
       );
       invariant(
         issued.rows[0]?.allowed === true,
@@ -254,11 +267,32 @@ export class PublicationIdentityAuthority {
         [publicationScopeBrand]: true as const,
         kind: "publication" as const,
       });
-      this.issued.set(scope, client);
+      const context = await this.context(client);
+      this.issued.set(
+        scope,
+        Object.freeze({
+          client,
+          preparation,
+          command: canonical(command),
+          ...context,
+        }),
+      );
       const value = await work(client, scope);
-      await this.authorizeInTransaction(scope, client);
-      await client.query("SELECT creator.end_publication_scope()");
+      await this.configuration.assertAllowed(client, task);
+      await assertFulfillmentPublicationDenialCatalog(client);
+      await beforeFinalSignatureRead?.(client, scope);
+      const final = await client.query<{ allowed: boolean }>(
+        "SELECT creator.finalize_prepared_publication_scope($1) AS allowed",
+        [preparation],
+      );
+      invariant(
+        final.rows[0]?.allowed === true,
+        "publication_scope_expired",
+        "The original publication changed before commit.",
+      );
       this.issued.delete(scope);
+      // No matcher, callback, cleanup, settings, domain read or write follows
+      // original0208's final fresh signature gate. Only COMMIT is sent to SQL.
       await client.query("COMMIT");
       return value;
     } catch (error) {
@@ -279,10 +313,19 @@ export class PublicationIdentityAuthority {
     client: PoolClient,
   ): Promise<void> {
     this.assertWorker();
+    const held = this.issued.get(scope);
     invariant(
-      this.issued.get(scope) === client,
+      held?.client === client,
       "publication_scope_required",
       "A current issued publication scope is required.",
+    );
+    const context = await this.context(client);
+    invariant(
+      context.pid === held.pid &&
+        context.transaction === held.transaction &&
+        context.nonce === held.nonce,
+      "publication_scope_expired",
+      "The original publication transaction changed.",
     );
     const result = await client.query<{ allowed: boolean }>(
       "SELECT creator.publication_scope_matches($1,$2,$3) AS allowed",
@@ -293,5 +336,57 @@ export class PublicationIdentityAuthority {
       "publication_scope_expired",
       "The publication transaction ended or changed.",
     );
+  }
+
+  private async context(client: PoolClient) {
+    const row = (
+      await client.query<{
+        transaction: unknown;
+        pid: unknown;
+        nonce: unknown;
+      }>(
+        "SELECT pg_current_xact_id()::text AS transaction,pg_backend_pid() AS pid,current_setting('publication.scope_id',true) AS nonce",
+      )
+    ).rows[0];
+    return {
+      transaction: z
+        .string()
+        .regex(/^[0-9]+$/u)
+        .parse(row?.transaction),
+      pid: z.number().int().positive().parse(row?.pid),
+      nonce: IdSchema.parse(row?.nonce),
+    };
+  }
+
+  /** Copy the complete original command captured by this issuer, never a caller
+   * document or a structural authority lookalike. Copying grants no new scope. */
+  async originalInTransaction(scope: PublicationTaskScope, client: PoolClient) {
+    await this.authorizeInTransaction(scope, client);
+    const command = SignedActCommandSchema.parse(
+      JSON.parse(this.issued.get(scope)!.command),
+    );
+    const content = z
+      .object({
+        kind: z.literal("content_publication"),
+        creatorId: IdSchema,
+        version: z.number().int().positive(),
+        document: ContentDocument,
+        mediaEvidence: z.array(ProcessedMediaEvidenceSchema).max(10).optional(),
+      })
+      .parse(command.content);
+    invariant(
+      content.creatorId === scope.creatorId &&
+        content.version === scope.version &&
+        command.subjectId === scope.contentId &&
+        contentHash(command) === scope.commandHash,
+      "publication_command_changed",
+      "The complete original publication command is required.",
+    );
+    return {
+      document: content.document,
+      mediaEvidence: content.mediaEvidence ?? [],
+      transaction: this.issued.get(scope)!.transaction,
+      pid: this.issued.get(scope)!.pid,
+    };
   }
 }
