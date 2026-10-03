@@ -1,14 +1,13 @@
 package com.pantopus.qelvora.commerce
 
-import android.content.Context
-import com.pantopus.qelvora.identity.SecureSessionStorage
-import java.net.HttpURLConnection
-import java.net.URL
+import com.pantopus.qelvora.identity.FanSession
+import com.pantopus.qelvora.generated.CreatorAPIError
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.util.Currency
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 
@@ -41,27 +40,36 @@ import kotlinx.serialization.json.*
 @Serializable data class CommerceCallTransport(val state: String, val authorKind: String, val recordedAt: String? = null)
 @Serializable data class CommerceDetail(val packet: CommercePacket, val commitment: CommerceCommitment?, val share: CommerceShare?, val ledger: List<CommerceLedger> = emptyList(), val callTransport: CommerceCallTransport? = null)
 @Serializable data class CommerceOverview(val fan: CommerceFan?, val creators: List<CommerceCreator>, val packets: List<CommercePacket>, val modes: List<CommerceMode>, val limits: List<CommerceLimit>, val memberships: List<CommerceMembership>, val slots: List<CommerceSlot>, val policy: CommercePolicy, val capabilities: CommerceCapabilities, val exposure: CommerceExposure?,val pass:List<CommercePass> = emptyList(),val passChoices:CommercePassChoices = CommercePassChoices(),val spendingNotices:List<CommerceSpendingNotice> = emptyList(),val tiers:List<CommerceTier> = emptyList())
-class CommerceFailure(val status: Int, override val message: String) : Exception(message)
+class CommerceFailure(val status: Int, override val message: String, val code: String? = null) : Exception(message)
 
-/** Shares canonical OS-encrypted session storage, never a local entitlement authority. */
-class CommerceClient(context: Context, private val baseURL: String, private val accountId: String? = null) {
-    private val storage = SecureSessionStorage(context, baseURL)
+/** Reuses the genuine issuer's original client/cancellable capture. Pins deny
+ * replacement; neither stored credentials nor local state grant entitlements. */
+class CommerceClient(private val model: FanSession, private val accountId: String, private val sessionId: String, private val destination: String) {
     private val json = Json { ignoreUnknownKeys = true }
-    suspend fun request(path: String, body: JsonObject? = null): JsonElement = withContext(Dispatchers.IO) {
-        val token = storage.read() ?: throw CommerceFailure(401, "Your session ended. Continue with Pantopus again.")
-        val connection = URL(baseURL.trimEnd('/') + "/v1/commerce/" + path).openConnection() as HttpURLConnection
+    private fun ready(): Boolean = model.session?.accountId == accountId && model.session?.sessionId == sessionId && model.destination == destination &&
+        !model.checkingSession && !model.busy && model.error.isEmpty() && !model.purgingPrivateState && !model.localPurgeFailed
+    suspend fun request(path: String, body: JsonObject? = null): JsonElement {
+        currentCoroutineContext().ensureActive()
+        if (!ready()) throw CommerceFailure(503, "Refresh your account before continuing. Your input is kept.")
+        val original = model.captureRequest(destination, maximumResponseBytes = 4_194_304, timeoutMs = 15_000)
+            ?: throw CommerceFailure(503, "Refresh your account before continuing. Your input is kept.")
+        if (original.expectedAccountId != accountId || original.sessionId != sessionId || !ready()) throw CancellationException("Your original account view changed.")
         try {
-            connection.connectTimeout = 10000; connection.readTimeout = 15000; connection.useCaches = false
-            connection.requestMethod = if (body == null) "GET" else "POST"
-            connection.setRequestProperty("Authorization", "Bearer $token")
-            accountId?.let { connection.setRequestProperty("x-commerce-account-id", it) }
-            if (body != null) { connection.doOutput = true; connection.setRequestProperty("Content-Type", "application/json"); connection.outputStream.use { it.write(body.toString().toByteArray()) } }
-            val status = connection.responseCode
-            val text = (if (status in 200..299) connection.inputStream else connection.errorStream)?.bufferedReader()?.use { it.readText() }.orEmpty()
-            val value = runCatching { json.parseToJsonElement(text) }.getOrNull()
-            if (status !in 200..299) throw CommerceFailure(status, value?.jsonObject?.get("error")?.jsonObject?.get("message")?.jsonPrimitive?.content ?: "This action is unavailable. Your input is kept.")
-            value ?: throw CommerceFailure(503, "Reconnect to refresh this information.")
-        } finally { connection.disconnect() }
+            val response = original.commerceBytes("/v1/commerce/$path", body = body?.toString()?.toByteArray(Charsets.UTF_8))
+            currentCoroutineContext().ensureActive()
+            if (!original.isCurrent() || !ready()) throw CancellationException("Your original account view changed.")
+            val value = json.parseToJsonElement(response.body.toString(Charsets.UTF_8))
+            if (!original.isCurrent() || !ready()) throw CancellationException("Your original account view changed.")
+            return value
+        } catch (failure: Exception) {
+            currentCoroutineContext().ensureActive()
+            if (!original.isCurrent() || !ready()) throw CancellationException("Your original account view changed.")
+            if (failure is CreatorAPIError) {
+                val detail = runCatching { json.parseToJsonElement(failure.body).jsonObject["error"]?.jsonObject }.getOrNull()
+                throw CommerceFailure(failure.status, detail?.get("message")?.jsonPrimitive?.content ?: "This action is unavailable. Your input is kept.", detail?.get("code")?.jsonPrimitive?.content)
+            }
+            throw failure
+        }
     }
     suspend fun overview(): CommerceOverview = json.decodeFromJsonElement(request("overview"))
     suspend fun detail(id: String): CommerceDetail = json.decodeFromJsonElement(request("packets/$id"))
@@ -70,6 +78,8 @@ class CommerceClient(context: Context, private val baseURL: String, private val 
 fun commerceMoney(amount: Long, currency: String): String = NumberFormat.getCurrencyInstance().apply { this.currency = Currency.getInstance(currency) }.format(BigDecimal.valueOf(amount).movePointLeft(Currency.getInstance(currency).defaultFractionDigits))
 fun commerceMinor(text: String, currency: String): Long {
     val digits = Currency.getInstance(currency).defaultFractionDigits
-    require(Regex("^\\d+(?:\\.\\d{0,$digits})?$").matches(text)) { "Enter a valid amount." }
-    return text.toBigDecimal().movePointRight(digits).longValueExact().also { require(it in 0..9007199254740991L) { "This amount is too large." } }
+    if (!Regex("^\\d+(?:\\.\\d{0,$digits})?$").matches(text)) throw CommerceFailure(400, "Enter a valid amount.")
+    val amount = try { text.toBigDecimal().movePointRight(digits).longValueExact() } catch (_: ArithmeticException) { throw CommerceFailure(400, "This amount is too large.") }
+    if (amount !in 0..9007199254740991L) throw CommerceFailure(400, "This amount is too large.")
+    return amount
 }

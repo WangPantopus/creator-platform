@@ -39,13 +39,24 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.serialization.json.*
 
 object CommerceFanFeature {
-    fun registration(context: Context, baseURL: String?) = FanFeatureRegistration({ destination -> val path = destination.substringBefore("?"); path == "/requests" || (path.startsWith("/commerce/") && path.substringAfterLast("/") in listOf("requests", "spending", "access", "packet", "checkout", "status", "pass", "membership")) || (path.startsWith("/creators/") && path.endsWith("/access")) }) { session -> CommerceFeature(context, baseURL, session) }
+    fun registration(context: Context, baseURL: String?) = FanFeatureRegistration({ destination -> val path = destination.substringBefore("?"); path == "/requests" || (path.startsWith("/commerce/") && path.substringAfterLast("/") in listOf("requests", "spending", "access", "packet", "checkout", "status", "pass", "membership")) || (path.startsWith("/creators/") && path.endsWith("/access")) }) { session -> key(session.session?.accountId, session.session?.sessionId) { CommerceFeature(context, baseURL, session) } }
 }
 
 @Composable private fun CommerceFeature(context: Context, baseURL: String?, session: FanSession) {
-    val api = remember(baseURL,session.session?.accountId) { baseURL?.let { CommerceClient(context, it, session.session?.accountId) } }; val scope = rememberCoroutineScope()
+    val originalAccount = remember { session.session?.accountId }
+    val originalSession = remember { session.session?.sessionId }
+    val originalDestination = remember { session.destination }
+    val api = remember(baseURL,session,originalAccount,originalSession,originalDestination) {
+        if (baseURL != null && originalAccount != null && originalSession != null) CommerceClient(session, originalAccount, originalSession, originalDestination) else null
+    }; val scope = rememberCoroutineScope()
+    var disposed by remember { mutableStateOf(false) }
+    fun privateVisible(): Boolean = !disposed && originalAccount != null && originalSession != null && session.session?.accountId == originalAccount && session.session?.sessionId == originalSession && session.destination == originalDestination &&
+        !session.busy && session.error.isEmpty() && !session.purgingPrivateState && !session.localPurgeFailed
+    fun privateReady(): Boolean = privateVisible() && !session.checkingSession
+    val ready = privateReady()
+    val visible = privateVisible()
     var data by remember { mutableStateOf<CommerceOverview?>(null) }; var detail by remember { mutableStateOf<CommerceDetail?>(null) }
-    val arrival = remember(session.destination) { Uri.parse(session.destination) }; val arrivalPath = arrival.path.orEmpty()
+    val arrival = remember(originalDestination) { Uri.parse(originalDestination) }; val arrivalPath = arrival.path.orEmpty()
     var screen by remember { mutableStateOf(if (arrivalPath.startsWith("/commerce/")) arrivalPath.substringAfterLast("/") else if (arrivalPath.endsWith("/access")) "access" else "requests") }
     var category by remember { mutableStateOf("Open") }; var creator by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }; var failure by remember { mutableStateOf("") }; var notice by remember { mutableStateOf("") }
@@ -58,6 +69,9 @@ object CommerceFanFeature {
     var accessReceivedAt by remember { mutableStateOf<Instant?>(null) }
     var accessNow by remember { mutableStateOf(Instant.now()) }
     var limitVersion by remember { mutableStateOf<Int?>(null) }
+    var commerceAvailable by remember { mutableStateOf(false) }
+    var arrived by remember { mutableStateOf(false) }
+    val commandDisabled = busy || !ready || !commerceAvailable
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     var foreground by remember { mutableStateOf(lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
     DisposableEffect(lifecycle) {
@@ -65,18 +79,31 @@ object CommerceFanFeature {
         lifecycle.addObserver(observer)
         onDispose { lifecycle.removeObserver(observer) }
     }
+    DisposableEffect(Unit) {
+        onDispose {
+            disposed = true
+            data = null; detail = null; access = null; accessReceivedAt = null; commerceAvailable = false
+            amount = ""; choice = null; reminders = false; summary = ""; info = ""; selectedMode = null
+            creator = ""; passSelection = emptySet(); replacement = ""; keys.clear(); notice = ""; failure = ""; limitVersion = null
+        }
+    }
     suspend fun report(error: Exception) {
         if (error is CancellationException) throw error
-        failure = if (error is CommerceFailure || error is IllegalArgumentException) error.message.orEmpty() else "Reconnect to refresh. Your input is kept; actions are unavailable while offline."
-        if (error is CommerceFailure && error.status == 401) { data = null; detail = null; session.refresh() }
+        if (!privateReady()) return
+        failure = if (error is CommerceFailure) error.message else "Reconnect to refresh. Your input is kept; actions are unavailable while offline."
+        if (error !is CommerceFailure || error.status >= 500 || error.status == 401 || error.status == 409) commerceAvailable = false
+        if (error is CommerceFailure && (error.code == "session_account_changed" || error.code == "session_view_changed")) {
+            data = null; detail = null; access = null; amount = ""; choice = null; summary = ""; info = ""; keys.clear(); notice = ""; session.refresh()
+        } else if (error is CommerceFailure && error.status == 401) { data = null; detail = null; session.refresh() }
     }
-    suspend fun refresh() {
+    suspend fun refresh(allowBusy: Boolean = false) {
+        if (!privateReady() || (busy && !allowBusy)) return
         val client = api ?: run { failure = "Commerce is not connected yet."; return }; busy = true
         try {
             val accountId = session.session?.accountId
             val current = client.overview()
-            if (accountId != session.session?.accountId) return
-            data = current
+            if (!privateReady() || accountId != session.session?.accountId) return
+            data = current; commerceAvailable = true
             current.limits.firstOrNull { it.currency == current.policy.currency }?.let { limit ->
                 if (limit.version != limitVersion) {
                     val pending = limit.effective_at != null
@@ -85,33 +112,38 @@ object CommerceFanFeature {
                     reminders = limit.reminders_on; limitVersion = limit.version
                 }
             }
-            if (creator.isEmpty()) creator = current.creators.firstOrNull()?.id.orEmpty(); detail?.let { detail = client.detail(it.packet.id) }; failure = ""
+            if (creator.isEmpty()) creator = current.creators.firstOrNull()?.id.orEmpty()
+            detail?.let { val value = client.detail(it.packet.id); if (!privateReady()) return; detail = value }; failure = ""
         }
         catch (error: Exception) { report(error) } finally { busy = false }
     }
     suspend fun mutate(path: String, values: JsonObject, message: String) {
-        if (busy) return; val client = api ?: return; busy = true
+        if (busy || !privateReady() || !commerceAvailable) return; val client = api ?: return; busy = true
         try {
             val signature = path + values.toString(); val key = keys.getOrPut(signature) { UUID.randomUUID().toString() }
-            client.request(path, JsonObject(values + ("idempotencyKey" to JsonPrimitive(key)))); notice = message; failure = ""; refresh()
+            client.request(path, JsonObject(values + ("idempotencyKey" to JsonPrimitive(key)))); if (!privateReady()) return; notice = message; failure = ""; refresh(allowBusy = true)
         } catch (error: Exception) { report(error) } finally { busy = false }
     }
-    LaunchedEffect(session.session?.accountId, session.destination) {
+    LaunchedEffect(ready) {
+        if (!ready) return@LaunchedEffect
         refresh()
-        creator = arrival.getQueryParameter("creatorId") ?: data?.creators?.firstOrNull { arrivalPath.startsWith("/creators/${it.handle}/") }?.id ?: creator
-        if (screen == "status") arrival.getQueryParameter("packetId")?.let { id -> try { detail = api?.detail(id) } catch (error: Exception) { report(error) } }
+        if (!arrived && privateReady()) {
+            arrived = true
+            creator = arrival.getQueryParameter("creatorId") ?: data?.creators?.firstOrNull { arrivalPath.startsWith("/creators/${it.handle}/") }?.id ?: creator
+            if (screen == "status") arrival.getQueryParameter("packetId")?.let { id -> try { val value = api?.detail(id); if (privateReady()) detail = value } catch (error: Exception) { report(error) } }
+        }
     }
-    LaunchedEffect(screen, creator, data?.fan?.id, foreground) {
+    LaunchedEffect(screen, creator, data?.fan?.id, foreground, ready) {
         access = null; accessReceivedAt = null
         val fanId = data?.fan?.id
         val client = api
-        if (screen != "access" || !foreground || creator.isEmpty() || fanId == null || client == null) return@LaunchedEffect
+        if (!ready || screen != "access" || !foreground || creator.isEmpty() || fanId == null || client == null) return@LaunchedEffect
         val creatorId = creator; val accountId = session.session?.accountId
         while (isActive) {
             val checkedAt = Instant.now()
             try {
                 val value = client.access(creatorId, fanId)
-                if (!isActive || session.session?.accountId != accountId || value.creatorId != creatorId || value.fanId != fanId) return@LaunchedEffect
+                if (!isActive || !privateReady() || session.session?.accountId != accountId || value.creatorId != creatorId || value.fanId != fanId) return@LaunchedEffect
                 access = value; accessReceivedAt = checkedAt; accessNow = Instant.now()
             } catch (error: Exception) {
                 if (error is CancellationException) throw error
@@ -129,13 +161,14 @@ object CommerceFanFeature {
                 if (screen == "spending" && arrivalPath == "/commerce/spending") session.open("/you")
                 else { screen = "requests"; detail = null }
             }
-            Button("Refresh", ButtonVariant.QUIET, disabled = busy) { scope.launch { refresh() } }
+            Button("Refresh", ButtonVariant.QUIET, disabled = busy || !ready) { scope.launch { refresh() } }
         }
-        if (failure.isNotEmpty()) Notice("error", "Connection status", failure)
-        if (notice.isNotEmpty()) Notice(title = "Saved", children = notice)
-        val current = data
-        if (current == null) { CommerceText(if (busy) "Loading commerce…" else "This information is unavailable", "display-md") }
-        else when (screen) {
+        if (!visible) Notice(title = "Account status", children = "Reconnect to check your account. Your unsaved input is kept.")
+        if (visible && failure.isNotEmpty()) Notice("error", "Connection status", failure)
+        if (visible && notice.isNotEmpty()) Notice(title = "Saved", children = notice)
+        val current = data.takeIf { visible }
+        if (visible && current == null) { CommerceText(if (busy) "Loading commerce…" else "This information is unavailable", "display-md") }
+        else if (visible && current != null) when (screen) {
             "spending" -> {
                 CommerceText("Spending and time", "display-md")
                 BasicText(commerceMoney(current.exposure?.captured ?: 0, current.policy.currency), style = qText("data-lg").copy(fontSize = 44.sp, lineHeight = 48.sp, color = qColor("ink")))
@@ -152,7 +185,7 @@ object CommerceFanFeature {
                 if (choice == "Choose an amount") CommerceField("Monthly amount in ${current.policy.currency}", amount, { amount = it }, keyboardType = KeyboardType.Decimal)
                 Button(if (reminders) "Reminders at 50% and 100% · on" else "Reminders at 50% and 100% · off", ButtonVariant.QUIET, block = true) { reminders = !reminders }
                 CommerceText("Increases take 24 hours. Decreases are immediate and affect new requests. Existing obligations remain.", "caption")
-                Button(if (busy) "Saving…" else "Save limit", ButtonVariant.SECONDARY, block = true, disabled = busy || choice == null) { scope.launch {
+                Button(if (busy) "Saving…" else "Save limit", ButtonVariant.SECONDARY, block = true, disabled = commandDisabled || choice == null) { scope.launch {
                     try { val value = if (choice == "No limit") null else commerceMinor(amount, current.policy.currency); mutate("spend-limit", buildJsonObject { put("currency", current.policy.currency); put("amount", value?.let { JsonPrimitive(it) } ?: JsonNull); put("explicitNone", choice == "No limit"); put("remindersOn", reminders) }, "Your spending choice is saved.") } catch (error: Exception) { report(error) }
                 } }
                 current.spendingNotices.forEach { notice -> CommerceText("You’ve reached ${notice.threshold}% of your monthly limit.") }
@@ -191,9 +224,9 @@ object CommerceFanFeature {
                 }
                 if (packet.state == "more_info") {
                     CommerceText(packet.question ?: "The creator asked for more information."); CommerceField("Your answer", info, { info = it }, 4)
-                    Button("Send answer", ButtonVariant.SECONDARY, block = true, disabled = busy || info.isBlank()) { scope.launch { mutate("packets/${packet.id}/info", buildJsonObject { put("version", packet.version); put("text", info) }, "Your answer is saved.") } }
+                    Button("Send answer", ButtonVariant.SECONDARY, block = true, disabled = commandDisabled || info.isBlank()) { scope.launch { mutate("packets/${packet.id}/info", buildJsonObject { put("version", packet.version); put("text", info) }, "Your answer is saved.") } }
                 }
-                if (packet.state in listOf("submitting", "submitted", "more_info", "offer_pending")) Button("Withdraw request", ButtonVariant.SECONDARY, block = true, disabled = busy) { scope.launch { mutate("packets/${packet.id}/withdraw", buildJsonObject { put("version", packet.version) }, "Hold release is being confirmed.") } }
+                if (packet.state in listOf("submitting", "submitted", "more_info", "offer_pending")) Button("Withdraw request", ButtonVariant.SECONDARY, block = true, disabled = commandDisabled) { scope.launch { mutate("packets/${packet.id}/withdraw", buildJsonObject { put("version", packet.version) }, "Hold release is being confirmed.") } }
                 if (packet.payment_state in listOf("unknown", "requires_action")) Notice(title = "Payment processing", children = "The provider must confirm payment. No completion is inferred from this screen.")
                 if (value.commitment?.delivered_at != null && value.commitment.state in listOf("delivered", "refunded", "resolved")) {
                     val signedActId = value.commitment.evidence?.signedActId ?: value.commitment.accept_act_id
@@ -208,7 +241,7 @@ object CommerceFanFeature {
                     val rows = listOf("Charged" to commerceMoney(packet.snapshot.amount, packet.snapshot.currency), "Delivered" to commerceWhen(value.commitment.delivered_at)) + if (refund > 0) listOf("Refund confirmed" to commerceMoney(refund, packet.snapshot.currency)) else emptyList()
                     if (signedActId != null) Receipt(name = name, reqId = commerceID(packet.id), title = packet.snapshot.title, rows = rows, label = label, onVerify = { session.destination = "/verify/$signedActId" })
                     else CommercePanel { CommerceText("Receipt", "receipt-title"); rows.forEach { (label, amount) -> CommerceRow(label, amount) }; CommerceText(label, "caption") }
-                    if (value.commitment.state == "delivered" || value.share?.fan_choice == true) Button(if (value.share?.fan_choice == true) "Revoke sharing" else "Allow sharing without your handle", ButtonVariant.SECONDARY, block = true, disabled = busy || (!packet.snapshot.shareable && value.share?.fan_choice != true) || value.share?.revoked_at != null) { scope.launch { mutate("packets/${packet.id}/share", buildJsonObject { put("version", value.share?.version ?: 1); put("enabled", value.share?.fan_choice != true); put("handleDisplay", "hidden") }, "Your sharing choice is saved.") } }
+                    if (value.commitment.state == "delivered" || value.share?.fan_choice == true) Button(if (value.share?.fan_choice == true) "Revoke sharing" else "Allow sharing without your handle", ButtonVariant.SECONDARY, block = true, disabled = commandDisabled || (!packet.snapshot.shareable && value.share?.fan_choice != true) || value.share?.revoked_at != null) { scope.launch { mutate("packets/${packet.id}/share", buildJsonObject { put("version", value.share?.version ?: 1); put("enabled", value.share?.fan_choice != true); put("handleDisplay", "hidden") }, "Your sharing choice is saved.") } }
                 }
             }
             "membership" -> {
@@ -216,7 +249,7 @@ object CommerceFanFeature {
                 if (current.memberships.isEmpty()) CommerceText("No memberships yet")
                 current.memberships.forEach { member -> CommercePanel { CommerceText(member.name, "title"); CommerceRow("Status", member.state); CommerceRow("Access until", commerceWhen(member.period_end)); CommerceRow("Billing provider", member.provider) } }
                 val accountId=session.session?.accountId
-                if(current.capabilities.storePurchasesAvailable && api!=null && accountId!=null) StoreMembershipPane(context,accountId,api,current.tiers.filter {it.state=="active"}.mapNotNull {it.catalog.google}) {refresh()}
+                if(current.capabilities.storePurchasesAvailable && api!=null && accountId!=null) StoreMembershipPane(context,accountId,api,current.tiers.filter {it.state=="active"}.mapNotNull {it.catalog.google},available=!commandDisabled) {refresh()}
                 else {
                     Notice(title = "Purchase and restore unavailable", children = "Store products must be configured and verified by the server before access is granted.")
                     if(current.memberships.any {it.provider=="google"}) key(accountId) {StoreSubscriptionManagement(context)}
@@ -231,8 +264,8 @@ object CommerceFanFeature {
                     CommerceText("${pass.used + pass.reserved} of ${pass.allowance} shared AI cost units used or reserved.")
                     current.passChoices.creators.forEach { candidate -> Row(Modifier.fillMaxWidth().heightIn(min=48.dp).toggleable(passSelection.contains(candidate.id),role=Role.Checkbox) { selected -> passSelection=if(selected)passSelection+candidate.id else passSelection-candidate.id }.padding(12.dp),horizontalArrangement=Arrangement.spacedBy(12.dp)) { Box(Modifier.size(T.checkboxSize).background(if(passSelection.contains(candidate.id))qColor("ink") else qColor("surface"),RoundedCornerShape(T.radiusTail)).border(T.hairline,qColor("control-line"),RoundedCornerShape(T.radiusTail)),contentAlignment=Alignment.Center) {if(passSelection.contains(candidate.id))Glyph("check",T.space4,qColor("surface"))}; CommerceText(candidate.display_name) } }
                     val occupied=current.slots.filter { it.cycle_start==pass.cycle_start && it.state in listOf("active","draft_next","ended_readable","replaced") }.map { it.position }.toSet().size
-                    if(occupied<pass.slot_capacity) Button("Fill available slots",ButtonVariant.SECONDARY,block=true,disabled=busy || !passCurrent || passSelection.isEmpty() || passSelection.size>pass.slot_capacity-occupied) { scope.launch { mutate("pass/initial",buildJsonObject {put("version",pass.version);putJsonArray("creatorIds") {passSelection.sorted().forEach {add(it)}}},"Your current choices are saved.") } }
-                    Button("Save next month’s choices",ButtonVariant.SECONDARY,block=true,disabled=busy || !passCurrent || passSelection.size>pass.slot_capacity) { scope.launch { mutate("pass/draft",buildJsonObject {put("version",pass.version);putJsonArray("creatorIds") {passSelection.sorted().forEach {add(it)}}},"Your next-month draft is saved.") } }
+                    if(occupied<pass.slot_capacity) Button("Fill available slots",ButtonVariant.SECONDARY,block=true,disabled=commandDisabled || !passCurrent || passSelection.isEmpty() || passSelection.size>pass.slot_capacity-occupied) { scope.launch { mutate("pass/initial",buildJsonObject {put("version",pass.version);putJsonArray("creatorIds") {passSelection.sorted().forEach {add(it)}}},"Your current choices are saved.") } }
+                    Button("Save next month’s choices",ButtonVariant.SECONDARY,block=true,disabled=commandDisabled || !passCurrent || passSelection.size>pass.slot_capacity) { scope.launch { mutate("pass/draft",buildJsonObject {put("version",pass.version);putJsonArray("creatorIds") {passSelection.sorted().forEach {add(it)}}},"Your next-month draft is saved.") } }
                     CommerceText("Complete all ${pass.slot_capacity} choices. An incomplete draft carries forward your current selection.","caption")
                 }
                 current.slots.forEach { slot -> CommercePanel {
@@ -240,7 +273,7 @@ object CommerceFanFeature {
                     if(current.policy.passEnabled && current.passChoices.replaceableSlotIds.contains(slot.id)) current.pass.firstOrNull()?.let { pass ->
                         CommerceText("Free replacement", "label")
                         current.passChoices.creators.filter { candidate -> current.slots.none { it.state=="active" && it.creator_id==candidate.id } }.forEach { candidate -> Button(candidate.display_name,ButtonVariant.QUIET,block=true) {replacement=candidate.id} }
-                        Button("Replace unavailable creator",ButtonVariant.SECONDARY,block=true,disabled=busy || replacement.isEmpty()) { scope.launch { mutate("pass/slots/${slot.id}/replace",buildJsonObject {put("version",pass.version);put("creatorId",replacement)},"Your replacement is saved.") } }
+                        Button("Replace unavailable creator",ButtonVariant.SECONDARY,block=true,disabled=commandDisabled || replacement.isEmpty()) { scope.launch { mutate("pass/slots/${slot.id}/replace",buildJsonObject {put("version",pass.version);put("creatorId",replacement)},"Your replacement is saved.") } }
                     }
                 } }
                 CommerceText("A pass grants AI reach. Separate memberships grant tier depth and do not consume a slot.")
@@ -251,7 +284,7 @@ object CommerceFanFeature {
                 if (visible.isEmpty()) CommerceText(if (current.packets.isEmpty()) "No requests here. Requests appear after you send them." else "No requests here. Choose another category to view your requests and retained receipts.")
                 visible.forEach { packet ->
                     RequestStatus(reqId = commerceID(packet.id), mode = packet.snapshot.title, price = commerceMoney(packet.snapshot.amount, packet.snapshot.currency), outcome = commerceOutcome(packet))
-                    Button("View request", ButtonVariant.SECONDARY, block = true, disabled = busy) { scope.launch { try { busy = true; detail = api?.detail(packet.id); screen = "status" } catch (error: Exception) { report(error) } finally { busy = false } } }
+                    Button("View request", ButtonVariant.SECONDARY, block = true, disabled = busy || !ready) { scope.launch { try { busy = true; val value = api?.detail(packet.id); if (privateReady()) { detail = value; screen = "status" } } catch (error: Exception) { report(error) } finally { busy = false } } }
                 }
                 Button("Spending and time", ButtonVariant.SECONDARY, block = true) { screen = "spending" }
                 Button("Creator access", ButtonVariant.SECONDARY, block = true) { screen = "access" }

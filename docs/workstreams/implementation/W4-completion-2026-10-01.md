@@ -1,3 +1,9 @@
+## Native original-session consumer and existing graph reuse — October 3, 2026 15:45 UTC
+
+The native Commerce consumer now reuses actual W1 strict original-capture publishers127d6b05/81a401bd, regenerates this checkout’s115 operations and keys/disposes forms by the original account/session. Personally reviewed W8 routine-check display/readiness split preserves cached rows and scrolling while denying commands until readiness; true failures conceal rows and retain same-session input. Store verification stays on that same original client, with cancellation/disposal checks. [Source scope and outstanding qualification](../../../artifacts/workstreams/W4/runtime/2026-10-03/native-original-session/README.md).
+
+Parsing/generation/scoped source checks pass; fresh shipping compilation and personal composed native operation remain pending in the coordinated build/GUI queue. The fresh40 open PRs are all drafts, beginning21; complete W5 group-consumer source302 is personally read against the actual W4 recipient/delivery/final fence and W1 sole finalizer. Genuine minimum/catalogue/task/provider/positive/cleanup/C10 acceptance stays held. No whole package/R01–R15 item is complete.
+
 ## Corrected original commerce view — October 3, 2026 14:45 UTC
 
 - [x] Personally qualify the corrected original session consumer at named e79579ee: Night390 internal return, real unsaved decimal/outage/disabled Save/Retry/Refresh, genuine same/other-account old-view clearing and default1280 cold outage/recovery; preserve all38 commerce tables/two rows and release actual resources.
