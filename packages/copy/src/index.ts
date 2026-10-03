@@ -794,6 +794,7 @@ export const copy = {
   "w6RecordingPausedAfterAnInterruptionResumeOrPreviewWhatWas": "Recording paused after an interruption. Resume or preview what was saved.",
   "w6RecordingCouldNotResumePreviewItOrRecordAgain": "Recording could not resume. Preview it or record again.",
   "w6TheSavedRecordingCouldNotBePlayedRecordAgain": "The saved recording could not be played. Record again.",
+  "w6ThePrivatePreviewCouldNotBeClearedTryAgainBefore": "The private preview could not be cleared. Try again before recording.",
   "w6RecordAndListenBeforeUploadingYourPreviewStaysOnThis": "Record and listen before uploading. Your preview stays on this device.",
   "w6PlayPrivatePreview": "Play private preview",
   "w6PausePreview": "Pause preview",
