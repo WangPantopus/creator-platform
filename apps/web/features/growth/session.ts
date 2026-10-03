@@ -14,7 +14,7 @@ export class GrowthActionError extends Error {
 }
 
 /** Private Growth forms use W1's actual issued session lifetime. The account
- * header is only a mismatch precondition; the server still resolves authority. */
+ * headers are mismatch preconditions; the server still resolves authority. */
 export function useGrowthSession() {
   const identity = useIdentityRequest();
   const { signal, session, end, request: identityRequest } = identity;
@@ -51,6 +51,7 @@ export function useGrowthSession() {
       const headers = new Headers(init.headers);
       headers.set("Content-Type", "application/json");
       headers.set("X-Expected-Account-Id", session.accountId);
+      headers.set("X-Expected-Session-Id", session.sessionId);
       const response = await fetch(`/api/growth/${path}`, {
         ...init,
         headers,
@@ -60,7 +61,8 @@ export function useGrowthSession() {
       const result = await response.json();
       if (
         response.status === 409 &&
-        result.error?.code === "session_account_changed"
+        (result.error?.code === "session_account_changed" ||
+          result.error?.code === "session_view_changed")
       )
         end();
       await originalSession();

@@ -31,19 +31,18 @@ async function handle(
       { status: 403 },
     );
   try {
+    const headers = new Headers();
+    const expectedAccount = request.headers.get("X-Expected-Account-Id");
+    const expectedSession = request.headers.get("X-Expected-Session-Id");
+    if (expectedAccount)
+      headers.set(
+        postContext ? "x-qelvora-expected-account" : "X-Expected-Account-Id",
+        expectedAccount,
+      );
+    if (expectedSession) headers.set("X-Expected-Session-Id", expectedSession);
     const result = await growthRequest(path + request.nextUrl.search, {
       method: request.method,
-      ...(request.headers.get("X-Expected-Account-Id")
-        ? {
-            headers: {
-              [postContext
-                ? "x-qelvora-expected-account"
-                : "X-Expected-Account-Id"]: request.headers.get(
-                "X-Expected-Account-Id",
-              )!,
-            },
-          }
-        : {}),
+      headers,
       ...(request.method !== "GET" && request.method !== "DELETE"
         ? { body: await request.text() }
         : {}),
