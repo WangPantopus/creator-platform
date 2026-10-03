@@ -355,8 +355,12 @@ export function FanContent({
   return (
     <main className="w5-fan" aria-busy={busy}>
       <nav>
-        <Link href="/home">Home</Link>
-        <Link href="/you">Your account</Link>
+        <Link className="qv-btn qv-btn--quiet" href="/home">
+          Home
+        </Link>
+        <Link className="qv-btn qv-btn--quiet" href="/you">
+          Your account
+        </Link>
       </nav>
       {error && (
         <Notice tone="error" title="Content status">
@@ -376,6 +380,7 @@ export function FanContent({
       )}
       {!current && signInRequired && (
         <Link
+          className="qv-btn qv-btn--quiet"
           href={`/auth/continue?returnTo=${encodeURIComponent(`/content/${creatorId}/${contentId}`)}`}
         >
           Continue with Pantopus
@@ -412,7 +417,12 @@ export function FanContent({
                   member={content.teamMember ?? undefined}
                 />
                 {content.signedActId && (
-                  <Link href={`/verify/${content.signedActId}`}>Signed</Link>
+                  <Link
+                    className="qv-btn qv-btn--quiet"
+                    href={`/verify/${content.signedActId}`}
+                  >
+                    Signed
+                  </Link>
                 )}
                 <h1>
                   {content.document.title || "From " + content.creatorName}
