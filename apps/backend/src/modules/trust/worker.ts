@@ -266,6 +266,8 @@ export class TrustWorker {
         [
           ...unavailable,
           "hook_timeout",
+          "privacy_family_cancel_unavailable",
+          "privacy_family_rollback_unavailable",
           "artifact_too_large",
           "receipt_invalid",
           "export_artifact_missing",
