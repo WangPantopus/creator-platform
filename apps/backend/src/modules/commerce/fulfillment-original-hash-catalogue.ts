@@ -3,6 +3,7 @@ import type { PoolClient } from "pg";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError } from "../../core/errors.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
+import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
 
 export const FULFILLMENT_ORIGINAL_HASH_MIGRATION =
   "0202_w4_fulfillment_original_hash";
@@ -10,7 +11,7 @@ export const FULFILLMENT_ORIGINAL_HASH_SCHEMA_SHA256 =
   "167b04e53310b6cba5dfa61cafba58f69242836698611a4d2c7e4136132583f5";
 const Owner = "creator_fulfillment_original_hash";
 const RoleCatalogue =
-  "a93941351bbfc4d328c5442cf6463725c77458acee62102732ab17b9241217eb";
+  "1aa00174ae0fdfde77a28f336122836a0908430710a4e5a7ea63c7425d034e74";
 const Definitions = Object.freeze({
   "creator.commerce_fulfillment_originals_match(uuid)":
     "7cec5bbaf4bb23fe8a4d60c4f8a3f9804c8fe0808275ababb7961673260226be",
@@ -23,7 +24,7 @@ export const FULFILLMENT_ORIGINAL_HASH_CATALOGUE_QUERY = `WITH metadata AS (
  'functions',(SELECT jsonb_agg(jsonb_build_object('signature',p.oid::regprocedure::text,
   'owner',pg_get_userbyid(p.proowner),'definition',pg_get_functiondef(p.oid),
   'grants',(SELECT jsonb_agg(jsonb_build_object('role',CASE WHEN a.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(a.grantee) END,
-   'privilege',a.privilege_type,'grantable',a.is_grantable) ORDER BY a.grantee,a.privilege_type)
+   'privilege',a.privilege_type,'grantable',a.is_grantable) ORDER BY CASE WHEN a.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(a.grantee) END COLLATE "C",a.privilege_type)
    FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a)) ORDER BY p.oid::regprocedure::text)
   FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
   WHERE n.nspname='creator' AND p.proname IN('commerce_fulfillment_originals_match','commerce_fulfillment_original_hash_bound')),
@@ -37,7 +38,7 @@ export const FULFILLMENT_ORIGINAL_HASH_CATALOGUE_QUERY = `WITH metadata AS (
 
 // Filled only from the actual isolated SQL/operator review, never startup data.
 export const FULFILLMENT_ORIGINAL_HASH_CATALOGUE_SHA256 =
-  "a26ce60f5353600d3e83f333cd62a7125ac3dbe10390bf8c6566e96d67b6c995";
+  "2fe29055f29bc8b070c1eb52a5411718b304696d733a3b04b259d15da477e34c";
 
 export function originalHashUnavailable(): never {
   throw new DomainError(
@@ -53,6 +54,12 @@ export async function assertFulfillmentOriginalHashCatalogue(
   client: PoolClient,
 ): Promise<void> {
   try {
+    await assertRegisteredMigration(client, {
+      name: "w4_fulfillment_original_hash",
+      path: "apps/backend/src/modules/commerce/schema-fulfillment-original-hash.sql",
+      owner: "W4",
+      checksum: FULFILLMENT_ORIGINAL_HASH_SCHEMA_SHA256,
+    });
     const ready = (
       await client.query<{ ready: boolean }>(
         `SELECT session_user='creator_runtime' AND current_user=session_user
