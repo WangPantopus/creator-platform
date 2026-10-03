@@ -62,6 +62,7 @@ export function conversationPrivacyAuthority(
         // cancellation cannot reach another operation or a later COMMIT.
         cancelling = (async () => {
           if (!pid) return;
+          const failures: unknown[] = [];
           const control = new Client({
             ...runtime.options,
             connectionTimeoutMillis: 1500,
@@ -71,10 +72,8 @@ export function conversationPrivacyAuthority(
             // than wait for a pipelined drain from a stalled transport.
             pipeline: false,
           });
-          control.on("error", (error: Error) => {
-            cancellationFailure = error;
-            discardClient = true;
-          });
+          const controlError = (error: Error) => failures.push(error);
+          control.on("error", controlError);
           try {
             await control.connect();
             const cancelled = await control.query<{ cancelled: boolean }>(
@@ -86,9 +85,22 @@ export function conversationPrivacyAuthority(
               "privacy_family_cancel_unavailable",
               "The actual discovery backend could not be cancelled.",
             );
+          } catch (error) {
+            failures.push(error);
           } finally {
-            await control.end();
+            try {
+              await control.end();
+            } catch (error) {
+              failures.push(error);
+            } finally {
+              control.removeListener("error", controlError);
+            }
           }
+          if (failures.length)
+            throw new AggregateError(
+              failures,
+              "Original discovery control and close failures.",
+            );
         })()
           .catch((error: unknown) => {
             cancellationFailure = error;
