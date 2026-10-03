@@ -1,3 +1,4 @@
+import { agentPrivacyTransaction } from "./privacy-transaction.js";
 import { createHash } from "node:crypto";
 import type { Pool, PoolClient } from "pg";
 import { z } from "zod";
@@ -191,7 +192,6 @@ export function agentPrivacyHook(
       );
       await service.repository.assertRuntimeRole();
       input.signal?.throwIfAborted();
-      const accountingClient = await service.repository.pool.connect();
       let accountingReference: string | undefined;
       let lineage = false;
       const assertBoundary = boundary
@@ -216,39 +216,36 @@ export function agentPrivacyHook(
         );
         input.signal?.throwIfAborted();
       };
-      try {
-        await accountingClient.query("BEGIN ISOLATION LEVEL READ COMMITTED");
-        await assertTask(accountingClient);
-        lineage = await lifecycle.assertAccountingClient(accountingClient);
-        if (lineage) {
-          invariant(
-            assertBoundary,
-            "thread_accounting_privacy_unconfigured",
-            "Complete the actual conversation accounting task before acknowledging agent privacy.",
-          );
-          accountingReference = (await assertBoundary(accountingClient))
-            .reference;
-          invariant(
-            accountingReference,
-            "accounting_boundary_incomplete",
-            "The durable conversation accounting boundary is required.",
-          );
-          invariant(
-            (await assertBoundary(accountingClient)).reference ===
+      await agentPrivacyTransaction(
+        service.repository.pool,
+        input.signal,
+        async (accountingClient) => {
+          await assertTask(accountingClient);
+          lineage = await lifecycle.assertAccountingClient(accountingClient);
+          if (lineage) {
+            invariant(
+              assertBoundary,
+              "thread_accounting_privacy_unconfigured",
+              "Complete the actual conversation accounting task before acknowledging agent privacy.",
+            );
+            accountingReference = (await assertBoundary(accountingClient))
+              .reference;
+            invariant(
               accountingReference,
-            "accounting_boundary_changed",
-            "The completed accounting boundary changed.",
-          );
-        }
-        input.signal?.throwIfAborted();
-        await assertTask(accountingClient);
-        await accountingClient.query("COMMIT");
-      } catch (error) {
-        await accountingClient.query("ROLLBACK");
-        throw error;
-      } finally {
-        accountingClient.release();
-      }
+              "accounting_boundary_incomplete",
+              "The durable conversation accounting boundary is required.",
+            );
+            invariant(
+              (await assertBoundary(accountingClient)).reference ===
+                accountingReference,
+              "accounting_boundary_changed",
+              "The completed accounting boundary changed.",
+            );
+          }
+          input.signal?.throwIfAborted();
+          await assertTask(accountingClient);
+        },
+      );
       if (input.scope === "thread") {
         invariant(
           !scopes.length,
@@ -339,31 +336,34 @@ export function agentPrivacyHook(
           });
           const hash = createHash("sha256");
           let bytes = 0;
-          let client: PoolClient | undefined;
           try {
-            client = await service.repository.pool.connect();
-            await client.query("BEGIN ISOLATION LEVEL REPEATABLE READ");
-            await assertTask(client);
-            await client.query(
-              "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
-              [scope.creatorId, scope.accountId],
-            );
-            const snapshotClient = client;
-            await service.exportInTransaction(
-              scope,
-              client,
-              async (part) => {
-                await assertTask(snapshotClient);
+            await agentPrivacyTransaction(
+              service.repository.pool,
+              input.signal,
+              async (client) => {
+                await assertTask(client);
+                await client.query(
+                  "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
+                  [scope.creatorId, scope.accountId],
+                );
+                const snapshotClient = client;
+                await service.exportInTransaction(
+                  scope,
+                  client,
+                  async (part) => {
+                    await assertTask(snapshotClient);
+                    await assertCurrent();
+                    hash.update(part);
+                    bytes += Buffer.byteLength(part);
+                    await sink.write(part);
+                  },
+                  input.signal!,
+                );
                 await assertCurrent();
-                hash.update(part);
-                bytes += Buffer.byteLength(part);
-                await sink.write(part);
+                await assertTask(client);
               },
-              input.signal!,
+              "REPEATABLE READ",
             );
-            await assertCurrent();
-            await assertTask(client);
-            await client.query("COMMIT");
             const sha256 = hash.digest("hex");
             const artifact = await sink.complete({ bytes, sha256 });
             invariant(
@@ -379,11 +379,15 @@ export function agentPrivacyHook(
               mediaType: "application/json",
             });
           } catch (error) {
-            await client?.query("ROLLBACK").catch(() => undefined);
-            await sink.abort().catch(() => undefined);
+            try {
+              await sink.abort();
+            } catch (cleanup) {
+              throw new AggregateError(
+                [error, cleanup],
+                "Agent export source and artifact cleanup failed",
+              );
+            }
             throw error;
-          } finally {
-            client?.release();
           }
         }
         return {
@@ -407,6 +411,7 @@ export function agentPrivacyHook(
             assertCurrent,
             assertTask,
             assertBoundary,
+            input.signal,
           ),
         );
       return {
