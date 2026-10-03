@@ -208,9 +208,21 @@ public final class FanSession: ObservableObject {
         #endif
     }
     public func saveHandle(_ handle: String, intro: String) async -> Bool {
-        guard let api, !busy else { return false }; busy = true; defer { busy = false }
-        do { _ = try await api.saveFanProfile(body: APIFanProfileInput(handle: handle, intro: intro)); await refresh(); return session?.fan != nil }
-        catch { self.error = Self.message(error); return false }
+        guard let capture = await captureRequest(from: destination, maximumResponseBytes: 65_536, timeoutSeconds: 10),
+              await capture.isCurrent(), !busy else { return false }
+        busy = true; defer { busy = false }
+        do {
+            guard await capture.isCurrent() else { return false }
+            _ = try await capture.client.saveFanProfile(body: APIFanProfileInput(handle: handle, intro: intro))
+            guard await capture.isCurrent() else { return false }
+            await refresh()
+            guard await capture.isCurrent() else { return false }
+            return session?.fan != nil
+        } catch {
+            guard await capture.isCurrent() else { return false }
+            self.error = error is CreatorAPIError ? Self.message(error) : QelvoraCopy.text(error is DecodingError ? "identityInputKeptUnreadable" : "identityInputKeptUnavailable")
+            return false
+        }
     }
     /// Recover navigation only with the credential and destination that opened it.
     /// The call screen independently authorizes the booking and every action.
