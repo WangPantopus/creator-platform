@@ -28,7 +28,7 @@ import { createGrowthAPIPool } from "./db/growth-api-pool.js";
 import { DomainError } from "./core/errors.js";
 import { domainPrivacyTaskAuthorityInTransaction } from "./modules/trust/domain-privacy-authority.js";
 import type { ConversationPrivacyOwnerPorts } from "./modules/trust/privacy-consumers.js";
-import { createTrustReplyReviewer } from "./modules/trust/reply-review.js";
+import { prepareTrustReplyReviewer } from "./modules/trust/reply-review.js";
 import { createDevelopmentFeedback } from "./modules/trust/development-feedback.js";
 import { InteractiveCallControl } from "./modules/session/interactive-control.js";
 import { AccountCallMetadata } from "./modules/session/account-call-metadata.js";
@@ -259,7 +259,7 @@ try {
               },
               dependencies: {
                 assertAllowed: runtime.assertCreatorAllowed,
-                reviewReply: createTrustReplyReviewer(),
+                reviewReply: await prepareTrustReplyReviewer(runtime),
                 assertAllowedInTransaction: async (
                   client,
                   actor,
