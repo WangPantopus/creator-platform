@@ -128,7 +128,9 @@ private fun ContentInput(label: String, value: String, max: Int, change: (String
 
 @Composable
 private fun ContentScreen(context: Context, baseURL: String?, model: FanSession) {
-    val parts = model.destination.split('/').filter { it.isNotEmpty() }; val creatorId = parts[1]; val contentId = parts[2]
+    val parts = model.destination.split('/').filter { it.isNotEmpty() }
+    if (parts.size != 3 || parts[0] != "content") return
+    val creatorId = parts[1]; val contentId = parts[2]
     key(creatorId, contentId) { ContentObjectScreen(context, baseURL, model, creatorId, contentId) }
 }
 
