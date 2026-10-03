@@ -1,5 +1,12 @@
 # Actual W3 System output and W4 ending bridge — October 3, 2026 UTC
 
+## Existing PR consolidation — 18:12 UTC
+
+Normally merged exact236 parentc797fdc5b97122202b228a57722600e351a62fe6 into existing262 atd8783c9d8e5cf4b61347c2bcbdf11c65ff6f198f. The entire result tree9c13b1d8d0e85077e14338a18dc5146a7e8e846b is byte-identical to prior262 head3cd6de4f04d7abd64b6448771fb82c2f9a5eb0bd; this reconciles parent ancestry without product changes. All three original catalogue/SQL/evidence files are byte-identical to236, and every original added completion/status line remains present. Private comparison receipt SHA2568db51fd0888d38f6f900bd55f1ac2eea6fddc7ba8299514cd6a5b1860d6a603a.
+
+Existing262 now carries the complete original comparator plus worker scope against main5c08634b.236 is consolidated and closed unmerged, preserving its pushed source branch and all historical receipts. Neither this consolidation nor a metadata-only closed-copy repeat establishes positive acceptance.262 remains draft for complete accepted original/worker pins, genuine factory/task/creator/provider/capture/consent/signature/System/delivery/financial/cleanup/final COMMIT, explicitly approved minimum2–100, finite family C10, current checks and W8 activation. All nine packages/R01–R15 stay open; no source is discarded or copied into a new PR.
+
+
 ## Independent sequence-default ACL correction
 
 Current262 normally consumes236 source `643fb80b1d63e7c8bf1cf6a84e49330950c3f6ff` and applies the same sequence-default ACL correction to its own catalogue. The actual thirteen original SQL sources plus a rollback-only NULL-ACL sequence metadata probe reproduce the old table-default grants, then match PostgreSQL's actual sequence grantor/role/privilege/grantable projection. An explicit sequence USAGE grant changes the catalogue; both grant and sequence-probe rollback restore the original fingerprint. Existing baseline metadata is unchanged and all six canonical61 custody comparisons match. No sequence value was consumed and no business, scope, output or ledger row was created.
