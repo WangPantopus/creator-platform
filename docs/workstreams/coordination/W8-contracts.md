@@ -1,5 +1,9 @@
 # W8 contract, migration and runtime register
 
+## Original Content LAST signature reader — 2026-10-03
+
+[Held0225](W8-next-allocations.md) pins W1's independently read89-line original ordinary Content signature reader at SHA256734a806c1e2252d7c5c7c418856f3b448933d993326ef471bb3351eed1367e41. Its isolated boolean purpose consumes the actual W5 creator/content/consumed act/canonical command hash/audience after original same-client domain and negative checks; unchanged0167 mutation fences and original0157 packet separation remain mandatory. The nonwaiting signer-family lease is LAST. Complete effective catalogue and original typed owner cleanup/COMMIT, drift/refusal/cancellation/withdrawal/revocation/C10/application qualification remain pending. Active61/prior76/frozen47 are preserved; reserved metadata installs no SQL/grants or accepted pin.
+
 ## Original worker acknowledgement budget — 2026-10-03
 
 [Current201](../../operations/W8-privacy-streaming.md) reuses the unchanged draft200 original-client settlement helper for task/effect acknowledgement and failure transitions. Its actual host budget adds no task or owner authority. Running/token fences preserve durable completed receipts after lost COMMIT replies; original acknowledgement expiry and case/recipient semantics remain. Types/lint/format/diff pass; current actual task/effect fault and independent saved-state qualification remain required. No new SQL, scope, catalogue pin, actor, consent or provider receipt is supplied.
