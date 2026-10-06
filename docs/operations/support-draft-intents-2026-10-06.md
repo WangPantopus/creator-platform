@@ -1,0 +1,13 @@
+# Independent report and appeal retries — October 6, 2026
+
+The Support page shared one retry key between report/block and appeal forms. A real report could commit while its response was lost; opening the unrelated appeal form reset the report key, so retrying the unchanged report created a duplicate. The forms now keep separate command intents. The appeal retains its originally submitted case/version/reason/key through an unconfirmed response. Reopening that same form preserves its draft and retry. Deliberately editing a form resets only its own intent.
+
+Inputs and command-opening controls are disabled while either command is pending, preserving the submitted payload. Only the active command says Saving. Report and appeal errors appear with their respective forms; editing a report clears its old confirmation. Confirmed session replacement still clears both intents and drafts through the original-session boundary. Existing layouts, backend policy and version checks remain unchanged.
+
+## Personally operated evidence
+
+On the actual canonical development browser and non-owner database, held the genuine report 201 Fetch response after commit. Before the fix, opening the appeal and retrying the unchanged report created CASE-003 and CASE-004 for one payload. Those observed duplicate rows remain as evidence in the disposable database. After the fix, the same journey with a new payload created CASE-005 once; opening and editing the separate appeal did not change the report key, and retrying acknowledged CASE-005 while retaining the appeal draft.
+
+Then held the actual 200 appeal response after CASE-001 committed state `appealed`, version 3 and one appeal event. Its timeout error appeared beside the appeal. Reopening the same form and editing the separate report preserved the appeal intent. Its exact retry kept version 3 and one event, closed the form, and retained the independent report draft. Observed disabled controls during both pending commands. Captured desktop refusal and 390px Light/Night results without horizontal overflow. [Manifest, counters and redacted API observations](../../artifacts/pr-review/2026-10-06/support-draft-intents/manifest.json).
+
+Web types, scoped lint/format and production build passed. No new test code or backend/schema/policy change. Browser interception, media/device metrics and viewport overrides were cleared. This is a narrow local browser qualification; native, full accessibility, production identity, independent Ops adjudication and release acceptance remain open. DI-19 remains the missing complete Support/appeal design composition.

@@ -29,10 +29,18 @@ export default function SupportPage() {
   const [creatorId, setCreatorId] = useState("");
   const [messageId, setMessageId] = useState("");
   const [requestId, setRequestId] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [saving, setSaving] = useState<"report" | "appeal" | null>(null);
+  const busy = saving !== null;
   const [message, setMessage] = useState("");
-  const [actionError, setActionError] = useState<TrustError | null>(null);
-  const key = useRef<string | null>(null);
+  const [reportError, setReportError] = useState<TrustError | null>(null);
+  const [appealError, setAppealError] = useState<TrustError | null>(null);
+  const reportKey = useRef<string | null>(null);
+  const appealIntent = useRef<Readonly<{
+    caseId: string;
+    version: number;
+    reason: string;
+    idempotencyKey: string;
+  }> | null>(null);
   const [appealId, setAppealId] = useState<string | null>(null);
   const [appealReason, setAppealReason] = useState("");
   const epoch = useTrustSession(() => {
@@ -44,10 +52,17 @@ export default function SupportPage() {
     setAppealReason("");
     setAppealId(null);
     setMessage("");
-    setBusy(false);
-    setActionError(null);
-    key.current = null;
+    setSaving(null);
+    setReportError(null);
+    setAppealError(null);
+    reportKey.current = null;
+    appealIntent.current = null;
   });
+  function resetReportIntent() {
+    reportKey.current = null;
+    setMessage("");
+    setReportError(null);
+  }
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const creator = params.get("creatorId"),
@@ -105,21 +120,22 @@ export default function SupportPage() {
           event.preventDefault();
           if (!sessionState.ready || busy) return;
           const current = epoch.current;
-          setBusy(true);
-          setActionError(null);
-          key.current ??= crypto.randomUUID();
+          setSaving("report");
+          setReportError(null);
+          setMessage("");
+          reportKey.current ??= crypto.randomUUID();
           try {
             if (kind === "block") {
               await request("blocks", {
                 creatorId,
                 reason,
-                idempotencyKey: key.current,
+                idempotencyKey: reportKey.current,
               });
               if (epoch.current !== current) return;
               setMessage(
                 "Your block is saved. Enforcement in connected domains follows their current denial checks.",
               );
-              key.current = null;
+              reportKey.current = null;
               setReason("");
               await refresh();
               return;
@@ -130,18 +146,18 @@ export default function SupportPage() {
               ...(kind !== "support" && creatorId ? { creatorId } : {}),
               ...(kind === "ai_report" && messageId ? { messageId } : {}),
               ...(kind === "dispute" && requestId ? { requestId } : {}),
-              idempotencyKey: key.current,
+              idempotencyKey: reportKey.current,
             });
             if (epoch.current !== current) return;
             setMessage(
               `${caseLabel(result.number)} is saved. Return here for its decision.`,
             );
-            key.current = null;
+            reportKey.current = null;
             setReason("");
             await refresh();
           } catch (error) {
             if (epoch.current !== current) return;
-            setActionError(
+            setReportError(
               error instanceof TrustError
                 ? error
                 : new TrustError(
@@ -150,7 +166,7 @@ export default function SupportPage() {
                   ),
             );
           } finally {
-            if (epoch.current === current) setBusy(false);
+            if (epoch.current === current) setSaving(null);
           }
         }}
       >
@@ -159,9 +175,10 @@ export default function SupportPage() {
         <select
           id="report-kind"
           value={kind}
+          disabled={busy}
           onChange={(event) => {
             setKind(event.target.value);
-            key.current = null;
+            resetReportIntent();
           }}
         >
           <option value="support">Support request</option>
@@ -179,10 +196,11 @@ export default function SupportPage() {
             <input
               id="report-creator"
               value={creatorId}
+              disabled={busy}
               required={kind === "ai_report" || kind === "block"}
               onChange={(event) => {
                 setCreatorId(event.target.value);
-                key.current = null;
+                resetReportIntent();
               }}
             />
             {kind === "ai_report" && (
@@ -191,10 +209,11 @@ export default function SupportPage() {
                 <input
                   id="report-message"
                   value={messageId}
+                  disabled={busy}
                   required
                   onChange={(event) => {
                     setMessageId(event.target.value);
-                    key.current = null;
+                    resetReportIntent();
                   }}
                 />
               </>
@@ -205,10 +224,11 @@ export default function SupportPage() {
                 <input
                   id="report-request"
                   value={requestId}
+                  disabled={busy}
                   required
                   onChange={(event) => {
                     setRequestId(event.target.value);
-                    key.current = null;
+                    resetReportIntent();
                   }}
                 />
               </>
@@ -223,18 +243,19 @@ export default function SupportPage() {
           maxLength={2000}
           required
           value={reason}
+          disabled={busy}
           onChange={(event) => {
             setReason(event.target.value);
-            key.current = null;
+            resetReportIntent();
           }}
         />
         <button
           className="qv-btn qv-btn--secondary"
           disabled={busy || !sessionState.ready}
         >
-          {busy ? "Saving…" : "Send report"}
+          {saving === "report" ? "Saving…" : "Send report"}
         </button>
-        <ErrorState error={sessionState.concealed ? null : actionError} />
+        <ErrorState error={sessionState.concealed ? null : reportError} />
         {!sessionState.concealed && message && <p role="status">{message}</p>}
       </form>
       <section className="trust-panel">
@@ -251,10 +272,13 @@ export default function SupportPage() {
             {item.state === "resolved" && (
               <button
                 className="qv-btn qv-btn--secondary"
+                disabled={busy || !sessionState.ready}
                 onClick={() => {
+                  if (appealId === item.id) return;
                   setAppealId(item.id);
                   setAppealReason("");
-                  key.current = null;
+                  setAppealError(null);
+                  appealIntent.current = null;
                 }}
               >
                 Appeal decision
@@ -266,21 +290,27 @@ export default function SupportPage() {
                   event.preventDefault();
                   if (!sessionState.ready || busy) return;
                   const current = epoch.current;
-                  setBusy(true);
-                  key.current ??= crypto.randomUUID();
+                  setSaving("appeal");
+                  setAppealError(null);
+                  const intent = (appealIntent.current ??= Object.freeze({
+                    caseId: item.id,
+                    version: item.version,
+                    reason: appealReason,
+                    idempotencyKey: crypto.randomUUID(),
+                  }));
                   try {
-                    await request(`cases/${item.id}/appeals`, {
-                      version: item.version,
-                      reason: appealReason,
-                      idempotencyKey: key.current,
+                    await request(`cases/${intent.caseId}/appeals`, {
+                      version: intent.version,
+                      reason: intent.reason,
+                      idempotencyKey: intent.idempotencyKey,
                     });
                     if (epoch.current !== current) return;
                     setAppealId(null);
-                    key.current = null;
+                    appealIntent.current = null;
                     await refresh();
                   } catch (error) {
                     if (epoch.current !== current) return;
-                    setActionError(
+                    setAppealError(
                       error instanceof TrustError
                         ? error
                         : new TrustError(
@@ -289,7 +319,7 @@ export default function SupportPage() {
                           ),
                     );
                   } finally {
-                    if (epoch.current === current) setBusy(false);
+                    if (epoch.current === current) setSaving(null);
                   }
                 }}
               >
@@ -303,17 +333,22 @@ export default function SupportPage() {
                   maxLength={2000}
                   rows={3}
                   value={appealReason}
+                  disabled={busy}
                   onChange={(event) => {
                     setAppealReason(event.target.value);
-                    key.current = null;
+                    appealIntent.current = null;
+                    setAppealError(null);
                   }}
                 />
                 <button
                   className="qv-btn qv-btn--secondary"
                   disabled={busy || !sessionState.ready}
                 >
-                  Send appeal
+                  {saving === "appeal" ? "Saving…" : "Send appeal"}
                 </button>
+                <ErrorState
+                  error={sessionState.concealed ? null : appealError}
+                />
               </form>
             )}
           </article>
