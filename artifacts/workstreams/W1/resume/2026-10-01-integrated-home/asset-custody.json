@@ -1,0 +1,17 @@
+{
+  "sourceRevision": "552e2528b0ccefa8ea3005cd54eb7969c9059a02",
+  "trackedAssets": 1197,
+  "changedAssets": 0,
+  "changedPaths": [],
+  "originalIosReferences": 110,
+  "originalAssetAggregateSha256": "2ffeead1ec1aa6842b84997953a513310b392ef7c966577bbb8d68245a0c5665",
+  "correctedDiagnostic": {
+    "incorrectRenamedPathLookups": 282,
+    "examples": [
+      "apps/android/app/src/test/snapshots/images/com.pantopus.qelvora_NativeSnapshotsTest_catalogLight.png",
+      "apps/android/app/src/test/snapshots/images/com.pantopus.qelvora_NativeSnapshotsTest_catalogNight.png",
+      "apps/android/app/src/test/snapshots/images/com.pantopus.qelvora_NativeSnapshotsTest_componentsLight_accesslines.png"
+    ],
+    "cause": "Canonical renamer skips binary files, preserving their original filenames as well as bytes. The first diagnostic incorrectly expected renamed filenames."
+  }
+}

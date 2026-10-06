@@ -5,6 +5,7 @@ import { createConfiguredBackend } from "./integration.js";
 import { DevelopmentIdentityAdapter } from "./modules/identity/development.js";
 import { commerceSignedSubjects } from "./modules/commerce/registration.js";
 import { configureGrowthForBackend } from "./modules/growth/configured.js";
+import { canonicalConversationHome } from "./modules/growth/home.js";
 import { canonicalCoreContentFollows } from "./modules/growth/core-follows.js";
 import { contentPublicProjection } from "./modules/growth/content.js";
 import { composeConversationHost } from "./modules/conversation/host.js";
@@ -90,14 +91,6 @@ try {
                     development: true,
                   })
                 : undefined;
-            features.growth = await configureGrowthForBackend({
-              ...runtime,
-              pool: growthAPIPool ?? runtime.pool,
-              assertAllowed: async (actor, creatorId) =>
-                creatorId
-                  ? runtime.assertCreatorAllowed(actor, creatorId)
-                  : runtime.assertActorAllowed(actor),
-            });
             // W3 composes conversations, Creator AI and commerce together so
             // fan generation uses one model, journal, allowance and trial path.
             const host = await composeConversationHost(
@@ -122,6 +115,26 @@ try {
                 : "Call control: unavailable; canonical held request authority is not activated.\n",
             );
             runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
+            features.growth = await configureGrowthForBackend({
+              ...runtime,
+              pool: growthAPIPool ?? runtime.pool,
+              assertAllowed: async (actor, creatorId) =>
+                creatorId
+                  ? runtime.assertCreatorAllowed(actor, creatorId)
+                  : runtime.assertActorAllowed(actor),
+              ...(runtime.identity
+                ? {
+                    owners: {
+                      home: canonicalConversationHome(
+                        conversation.feature,
+                        runtime.access,
+                        runtime.database,
+                        runtime.identity.signing,
+                      ),
+                    },
+                  }
+                : {}),
+            });
             const contentHost = composeContentHost({
               pool: runtime.pool,
               owners: {
