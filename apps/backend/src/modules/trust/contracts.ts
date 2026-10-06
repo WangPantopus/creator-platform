@@ -76,6 +76,14 @@ export const BlockInput = z.strictObject({
   reason,
   idempotencyKey: key,
 });
+export const FeedbackInput = z.strictObject({
+  consent: z.literal(true),
+  cohort: z.enum(["expert", "companion", "blend", "unspecified"]),
+  useful: z.boolean(),
+  authorshipClear: z.boolean(),
+  comment: z.string().trim().max(2000).optional(),
+  idempotencyKey: key,
+});
 export const PrivacyInput = z
   .strictObject({
     kind: z.enum(["export", "delete"]),

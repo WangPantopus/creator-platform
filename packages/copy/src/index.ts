@@ -1,6 +1,7 @@
 // Generated from config/copy.json. Run pnpm generate.
 export const copy = {
   "continueWithPantopus": "Continue with Pantopus",
+  "productFeedbackUnconfirmed": "Your feedback could not be confirmed. Your answers are kept; retry the same submission.",
   "identityInputKeptUnavailable": "The service is unavailable. Your input has been kept; try again.",
   "identityInputKeptUnreadable": "The service returned an unreadable response. Your input has been kept; try again.",
   "identityProfileSaveFailed": "Could not save. Try again.",
