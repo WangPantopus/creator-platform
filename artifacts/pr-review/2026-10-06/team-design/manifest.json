@@ -1,0 +1,42 @@
+{
+  "parentPR": 310,
+  "parentRevision": "65528fa915696f05dc9e19fed9c54d2878204630",
+  "sourceHashes": {
+    "Studio.tsx": "38eb70e45b9fe1408b3d408a528eb187333fe31ef44b1fcd67f0bde71c285a86",
+    "studio.css": "27dc63df568ff6b5e6c84be487b0c0d8eca0ae9973ccfe91ab725211120a3def"
+  },
+  "references": [
+    "design/phase4d-studio-desktop/Team.dc.html",
+    "docs/source/Product_Design_Flows_Screens_and_Copy.md#S-C10"
+  ],
+  "changes": [
+    "Supplied Team meta/title",
+    "Explicit creator-only list and source attribution",
+    "Team surface and reference card padding",
+    "Creator plate no longer stretches to expanded form height"
+  ],
+  "personallyObserved": {
+    "desktop": "1280px Light/Night, actual canonical development creator view",
+    "phone": "390x844 at device scale 1, Light/Night, document width 390px",
+    "keyboardAction": {
+      "top": 483.5,
+      "bottom": 531.5,
+      "height": 48,
+      "footerTop": 765
+    },
+    "commands": "No invitation, content, signature or delivery submitted in visual run"
+  },
+  "fixture": "Explicit temporary administrator verification seed solely for local visuals; restored pending, member revoked, zero content and active invitations",
+  "checks": [
+    "web types",
+    "scoped ESLint/Prettier",
+    "final production web build"
+  ],
+  "superseded": "superseded-cdp-captures/ contains incorrectly mapped viewport and stitched full-page footer captures; retained as failures, not final viewport proof",
+  "limits": [
+    "No exact pixel or full S-C10 acceptance",
+    "DI-23 invite-by-email producer/composition remains absent",
+    "No native, external verification, provider/signing, full accessibility or release qualification",
+    "Browser media/device/viewport overrides reset"
+  ]
+}
