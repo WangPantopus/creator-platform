@@ -1,3 +1,12 @@
+## Corrected original commerce view — October 3, 2026 14:45 UTC
+
+- [x] Personally qualify the corrected original session consumer at named e79579ee: Night390 internal return, real unsaved decimal/outage/disabled Save/Retry/Refresh, genuine same/other-account old-view clearing and default1280 cold outage/recovery; preserve all38 commerce tables/two rows and release actual resources.
+- [ ] Qualify the later expanded producer/consumer graph, current CI and an actual negative commerce command/BFF race before readying298.
+- [ ] Qualify privacy301 with the genuine original task, late-bound Commerce owner and same-client restoration, bounded external sink/ACK/retention and finite C10; read-only projection/empty EOF source review is not task acceptance.
+- [ ] Complete all nine original packages/R01–R15 and current native/accessibility/provider/factory/financial acceptance. No full row is complete.
+
+[Named current commerce operation](../../../artifacts/workstreams/W4/runtime/2026-10-03/commerce-original-session/README.md) preserves previous source attribution and failures. Main/all16 active W4 branches contain reviewed5c08634b; workbook/history remain preserved. Existing210/294/300 are merged, with owner-reviewed292/297 consumed; the39 current open PRs are all drafts and retain their owner gates.
+
 ## Current signed iOS and original real deadline — October 3, 2026 13:06 UTC
 
 - [x] Personally operate current signed iOS original-account Requests/You Spending Back in named Light/Night paths, actual decimal6.50 unsaved input and normal cold discard; preserve all38 commerce tables/two rows and release the actual bounded own resources.

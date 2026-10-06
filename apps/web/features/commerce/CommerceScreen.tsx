@@ -17,7 +17,11 @@ import {
 } from "@qelvora/ui-web";
 import { copy, formatCopy } from "@qelvora/copy";
 import { brand } from "@qelvora/brand";
-import { SessionSchema, commerceContracts } from "@qelvora/api";
+import { SessionSchema, commerceContracts, type Session } from "@qelvora/api";
+import {
+  IdentitySessionBoundary,
+  useIdentityRequest,
+} from "../identity/session-boundary";
 import "./commerce.css";
 import { CardEntry, authenticateCard } from "./CardEntry";
 import { PassCheckout } from "./PassCheckout";
@@ -283,15 +287,22 @@ function requestId(id: string) {
 }
 async function commerceFetch(path: string, init: RequestInit = {}) {
   try {
+    init.signal?.throwIfAborted();
     let response = await fetch(path, { ...init, cache: "no-store" });
+    init.signal?.throwIfAborted();
     if (response.status === 401) {
+      const headers = new Headers(init.headers);
+      headers.set("Content-Type", "application/json");
       const refresh = await fetch("/api/platform/identity/refresh", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
+        signal: init.signal,
         body: "{}",
       });
-      if (refresh.ok)
-        response = await fetch(path, { ...init, cache: "no-store" });
+      init.signal?.throwIfAborted();
+      if (!refresh.ok) return refresh;
+      response = await fetch(path, { ...init, cache: "no-store" });
+      init.signal?.throwIfAborted();
     }
     return response;
   } catch (error) {
@@ -432,13 +443,13 @@ type CommerceScreenProps = {
   screen: string;
   creatorId?: string;
   packetId?: string;
-  accountId: string | null;
+  session: Session | null;
 };
 function commerceDestination({
   screen,
   creatorId,
   packetId,
-}: CommerceScreenProps) {
+}: Pick<CommerceScreenProps, "screen" | "creatorId" | "packetId">) {
   const query = new URLSearchParams();
   if (creatorId) query.set("creatorId", creatorId);
   if (packetId) query.set("packetId", packetId);
@@ -446,57 +457,12 @@ function commerceDestination({
   return `/commerce/${screen}${suffix ? `?${suffix}` : ""}`;
 }
 export function CommerceScreen(props: CommerceScreenProps) {
-  const [ended, setEnded] = useState(false);
-  const [identityAvailable, setIdentityAvailable] = useState(
-    Boolean(props.accountId),
-  );
-  useEffect(() => {
-    let active = true;
-    let checking = false;
-    const abort = new AbortController();
-    const check = async () => {
-      if (checking || document.visibilityState !== "visible") return;
-      checking = true;
-      try {
-        const response = await commerceFetch("/api/platform/identity/session", {
-          signal: AbortSignal.any([abort.signal, AbortSignal.timeout(5000)]),
-        });
-        if (!active) return;
-        if (response.status === 401) {
-          setEnded(true);
-          return;
-        }
-        if (!response.ok) throw new Error("Session unavailable");
-        const session = SessionSchema.parse(await response.json());
-        if (!active) return;
-        if (session.accountId !== props.accountId) {
-          setEnded(true);
-          return;
-        }
-        setIdentityAvailable(true);
-      } catch {
-        if (active) setIdentityAvailable(false);
-      } finally {
-        checking = false;
-      }
-    };
-    void check();
-    const timer = setInterval(() => void check(), 4000);
-    document.addEventListener("visibilitychange", check);
-    return () => {
-      active = false;
-      abort.abort();
-      clearInterval(timer);
-      document.removeEventListener("visibilitychange", check);
-    };
-  }, [props.accountId]);
-  if (ended || !props.accountId)
+  if (!props.session)
     return (
       <div className="commerce commerce-phone">
         <main className="commerce-main commerce-content">
           <Empty title="Continue with Pantopus">
-            Your session ended or the account changed. Continue to load this
-            account’s current commerce information.
+            Continue to load this account’s current commerce information.
             <Link
               className="commerce-link-button"
               href={`/auth/continue?returnTo=${encodeURIComponent(commerceDestination(props))}`}
@@ -508,6 +474,73 @@ export function CommerceScreen(props: CommerceScreenProps) {
       </div>
     );
   return (
+    <IdentitySessionBoundary
+      initial={props.session}
+      returnTo={commerceDestination(props)}
+    >
+      <CommerceIdentityScreen {...props} />
+    </IdentitySessionBoundary>
+  );
+}
+function CommerceIdentityScreen(props: CommerceScreenProps) {
+  const {
+    session: originalSession,
+    signal,
+    end,
+    request,
+  } = useIdentityRequest();
+  const [identityAvailable, setIdentityAvailable] = useState(true);
+  useEffect(() => {
+    let active = true;
+    let checking = false;
+    const abort = new AbortController();
+    const check = async () => {
+      if (checking || signal.aborted || document.visibilityState !== "visible")
+        return;
+      checking = true;
+      try {
+        const response = await request("session", {
+          signal: AbortSignal.any([abort.signal, AbortSignal.timeout(5000)]),
+        });
+        if (!active || signal.aborted) return;
+        if (!response.ok) throw new Error("Session unavailable");
+        const session = SessionSchema.parse(await response.json());
+        if (!active || signal.aborted) return;
+        if (
+          session.accountId !== originalSession.accountId ||
+          session.sessionId !== originalSession.sessionId
+        ) {
+          end();
+          return;
+        }
+        setIdentityAvailable(true);
+      } catch {
+        if (active && !signal.aborted) setIdentityAvailable(false);
+      } finally {
+        checking = false;
+      }
+    };
+    void check();
+    const timer = setInterval(() => void check(), 4000);
+    document.addEventListener("visibilitychange", check);
+    window.addEventListener("focus", check);
+    window.addEventListener("pageshow", check);
+    return () => {
+      active = false;
+      abort.abort();
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", check);
+      window.removeEventListener("focus", check);
+      window.removeEventListener("pageshow", check);
+    };
+  }, [
+    originalSession.accountId,
+    originalSession.sessionId,
+    signal,
+    end,
+    request,
+  ]);
+  return (
     <CommerceAccountScreen {...props} identityAvailable={identityAvailable} />
   );
 }
@@ -515,22 +548,50 @@ function CommerceAccountScreen({
   screen,
   creatorId,
   packetId,
-  accountId,
   identityAvailable,
 }: {
   screen: string;
   creatorId?: string;
   packetId?: string;
-  accountId: string | null;
   identityAvailable: boolean;
 }) {
+  const { session, signal, end, request } = useIdentityRequest();
+  const accountId = session.accountId;
+  const sessionId = session.sessionId;
   const accountFetch = useCallback(
-    (path: string, init: RequestInit = {}) => {
+    async (path: string, init: RequestInit = {}) => {
+      const original = AbortSignal.any([
+        signal,
+        ...(init.signal ? [init.signal] : []),
+      ]);
+      original.throwIfAborted();
       const headers = new Headers(init.headers);
-      if (accountId) headers.set("x-commerce-account-id", accountId);
-      return commerceFetch(path, { ...init, headers });
+      headers.set("x-commerce-account-id", accountId);
+      headers.set("X-Expected-Account-Id", accountId);
+      headers.set("X-Expected-Session-Id", sessionId);
+      const response = await commerceFetch(path, {
+        ...init,
+        headers,
+        signal: original,
+      });
+      original.throwIfAborted();
+      if (response.status === 409) {
+        const failure = await response.clone().json();
+        original.throwIfAborted();
+        if (
+          failure.error?.code === "session_account_changed" ||
+          failure.error?.code === "session_view_changed"
+        )
+          end();
+      } else if (response.status === 401) {
+        // The canonical producer distinguishes an ended original session from
+        // an unavailable identity service before discarding this private view.
+        await request("session", { signal: original });
+      }
+      original.throwIfAborted();
+      return response;
     },
-    [accountId],
+    [accountId, sessionId, signal, end, request],
   );
   const [data, setData] = useState<Overview | null>(null),
     [detail, setDetail] = useState<Detail | null>(null),
@@ -572,6 +633,7 @@ function CommerceAccountScreen({
     )
       .then(async (response) => {
         const body = await response.json();
+        signal.throwIfAborted();
         if (!response.ok)
           throw new Error(
             body.error?.message ?? "Conversation disclosure is unavailable.",
@@ -579,7 +641,7 @@ function CommerceAccountScreen({
         if (!abort.signal.aborted) setDisclosure(body);
       })
       .catch((error) => {
-        if (!abort.signal.aborted)
+        if (!abort.signal.aborted && !signal.aborted)
           setNotice(
             error instanceof Error
               ? error.message
@@ -587,7 +649,7 @@ function CommerceAccountScreen({
           );
       });
     return () => abort.abort();
-  }, [screen, selectedCreator, data?.fan?.id, accountFetch]);
+  }, [screen, selectedCreator, data?.fan?.id, accountFetch, signal]);
   const load = useCallback(async () => {
     setLoading(true);
     try {
@@ -600,6 +662,7 @@ function CommerceAccountScreen({
         { cache: "no-store" },
       );
       const body = await response.json();
+      signal.throwIfAborted();
       if (!response.ok) {
         setErrorCode(
           response.status === 401
@@ -627,6 +690,7 @@ function CommerceAccountScreen({
           },
         );
         const body = await response.json();
+        signal.throwIfAborted();
         if (!response.ok)
           throw new Error(
             body.error?.message ?? "This request is unavailable.",
@@ -634,13 +698,14 @@ function CommerceAccountScreen({
         setDetail(body);
       }
     } catch (e) {
-      setError(
-        e instanceof Error ? e.message : "The connection is unavailable.",
-      );
+      if (!signal.aborted)
+        setError(
+          e instanceof Error ? e.message : "The connection is unavailable.",
+        );
     } finally {
-      setLoading(false);
+      if (!signal.aborted) setLoading(false);
     }
-  }, [screen, creatorId, packetId, accountFetch]);
+  }, [screen, creatorId, packetId, accountFetch, signal]);
   useEffect(() => {
     void load();
   }, [load]);
@@ -658,20 +723,26 @@ function CommerceAccountScreen({
         "/api/platform/identity/session",
         { signal: AbortSignal.timeout(5000) },
       );
+      const currentSession = sessionResponse.ok
+        ? SessionSchema.parse(await sessionResponse.json())
+        : undefined;
+      signal.throwIfAborted();
+      if (!currentSession)
+        throw new Error("Reconnect to confirm your account before continuing.");
       if (
-        !sessionResponse.ok ||
-        SessionSchema.parse(await sessionResponse.json()).accountId !==
-          accountId
-      )
-        throw new Error(
-          "Your session changed. Continue with Pantopus to refresh this account.",
-        );
+        currentSession.accountId !== accountId ||
+        currentSession.sessionId !== sessionId
+      ) {
+        end();
+        signal.throwIfAborted();
+      }
       const response = await accountFetch(`/api/commerce/${path}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...body, idempotencyKey: key }),
       });
       const result = await response.json();
+      signal.throwIfAborted();
       if (!response.ok)
         throw new Error(result.error?.message ?? "This action is unavailable.");
       pending.current.delete(signature);
@@ -689,13 +760,14 @@ function CommerceAccountScreen({
       await load();
       return result;
     } catch (e) {
-      setNotice(
-        e instanceof Error
-          ? e.message
-          : "Your action could not be confirmed. Check the current state before retrying.",
-      );
+      if (!signal.aborted)
+        setNotice(
+          e instanceof Error
+            ? e.message
+            : "Your action could not be confirmed. Check the current state before retrying.",
+        );
     } finally {
-      setBusy(false);
+      if (!signal.aborted) setBusy(false);
     }
   }
   const studio = ["offers", "earnings", "pool"].includes(screen);
@@ -957,7 +1029,7 @@ function CommerceAccountScreen({
               <br />
               {errorCode === "session_required" ? (
                 <Link
-                  href={`/auth/continue?returnTo=${encodeURIComponent(commerceDestination({ screen, creatorId, packetId, accountId }))}`}
+                  href={`/auth/continue?returnTo=${encodeURIComponent(commerceDestination({ screen, creatorId, packetId }))}`}
                 >
                   {copy.continueWithPantopus}
                 </Link>
@@ -1083,7 +1155,7 @@ function CommerceAccountScreen({
                     key={`${currency}:${limit?.version ?? 0}`}
                     currency={currency}
                     limit={limit}
-                    busy={busy}
+                    busy={busy || !identityAvailable}
                     save={(body) => void command("spend-limit", body)}
                   />
                   {limit?.effective_at && (
@@ -2262,7 +2334,7 @@ function CommerceAccountScreen({
               Requests
             </Link>
             <Link
-              href="/commerce/spending"
+              href="/you"
               aria-current={screen === "spending" ? "page" : undefined}
             >
               You

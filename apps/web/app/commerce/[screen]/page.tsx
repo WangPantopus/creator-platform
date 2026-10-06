@@ -27,8 +27,8 @@ export default async function Page({
   const session = await currentSession();
   return (
     <CommerceScreen
-      key={session?.accountId ?? "signed-out"}
-      accountId={session?.accountId ?? null}
+      key={session ? `${session.accountId}:${session.sessionId}` : "signed-out"}
+      session={session}
       screen={screen}
       creatorId={query.creatorId}
       packetId={query.packetId}
