@@ -45,6 +45,39 @@
         }
       }
     },
+    "Current team access": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Current team access"
+          }
+        }
+      }
+    },
+    "Checking team access…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking team access…"
+          }
+        }
+      }
+    },
+    "Refresh team access before creating or changing invitations.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Refresh team access before creating or changing invitations."
+          }
+        }
+      }
+    },
     "About 20 minutes for your interview": {
       "extractionState": "manual",
       "localizations": {
