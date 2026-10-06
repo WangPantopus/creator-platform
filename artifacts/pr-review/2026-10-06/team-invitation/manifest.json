@@ -1,0 +1,31 @@
+{
+  "parentPR": 311,
+  "parentRevision": "4059abde23f2146d5dc1cb1f7834293493e58053",
+  "sourceHashes": {
+    "identity/profiles.ts": "0d2b2f199e876aa75567f16374ba8cd8b3794476300b73615178d4556c456a1c",
+    "studio/service.ts": "90e8407d75961c0671d031c308c384d1ae4648266d52d255487160aa50347e9c"
+  },
+  "environment": "Same isolated canonical development API 4206 / web 3106 / PostgreSQL 5546; non-owner runtime and genuine issued sessions",
+  "before": "Two direct concurrent requests created two different invitations even though creator verification was pending",
+  "after": [
+    "Pending creator refused 403 with no added invitations",
+    "Simultaneous same-role direct requests returned one pending ID and original expiry",
+    "Different roles refused 409 without replacing the existing invitation",
+    "Actual browser 200 response held after commit; explicit retry preserved ID, expiry, one row and xmin 2600",
+    "Genuine recipient accepted in Studio and observed Team triage; database confirms acceptance"
+  ],
+  "qualification": "Positive path used explicit temporary development administrator verification seed; no production verification, email, passkey or signing proof",
+  "checks": [
+    "seven workspace types",
+    "generation check",
+    "scoped ESLint/Prettier",
+    "backend production build"
+  ],
+  "cleanup": "Operator sessions ended; member/invitations revoked by actual canonical command; creator pending; zero content and active invitations; Fetch cleared",
+  "limits": [
+    "Convergence only while the original invitation remains pending/unexpired; no durable command-key replay after acceptance/revocation/expiry",
+    "DI-23 email invitation producer/composition gap remains",
+    "No new test code or schema/privilege/provider changes",
+    "No native, physical device, full accessibility or release acceptance"
+  ]
+}
