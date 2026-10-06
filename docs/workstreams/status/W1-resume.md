@@ -4,6 +4,16 @@ October 2 successor reconciliation: PR21 now incorporates current main `af38420d
 
 October 2 focused main increment: actual Ops/Account/Status return handling and truthful no-fan Account are implemented and personally browser-operated at cac6be9c on an independently restored, labelled canonical57 development copy. Same actual expired session rotates and returns to audits; Ops denies without membership. Original W1 remains closed. Production build/types/canonical generation/scoped checks pass; native/full workstream acceptance remains open. [Exact bounded evidence](../../../artifacts/workstreams/W1/resume/2026-10-02-ops-return/run.md).
 
+## October 1 — publication audit and authorized W1 worktree removal
+
+The founder requested committing/pushing useful uncommitted source, ensuring PR coverage and removing dedicated W1 worktrees. The [audit](../../../artifacts/workstreams/W1/resume/2026-10-01-worktree-audit/source-publication.json) finds no useful uncommitted W1 source and no W1 commit absent from all origin refs. Eleven branch tips match open PRs; two older tips are already in published main. The older `7f32` checkout is removed; `0516` is authorized for removal immediately after this documentation is pushed to existing ready PR51. Generated build products are disposable; peer worktrees/shared primary/private material remain preserved. Future W1 work must create a fresh checkout from the current published `codex/w1-handoff-20261001` tip. Full W1 acceptance remains incomplete.
+
+## October 1 — founder release of holds and next-agent handoff
+
+The latest direct founder instruction lifts the previous resource/native-verification holds: restore necessary resources and personally launch/operate web, Android emulator and iOS simulator end to end. No new unit tests or coverage-expansion requirement; affected coverage may be limited. Create ready PRs and merge normally whenever their work and validation are ready, without another permission request. The older pending resource-resumption question and cleanup-hold statements below are historical. Missing real inputs/tool capability remain factual dependencies, with independent work continuing.
+
+Use [the current handoff](../handoffs/W1-resume-2026-10-01.md) and [complete copy-paste prompt](../prompts/W1-resume-2026-10-01.md). Full application checkpoint is `c74c95166675d96221e2e9551bda827dfd79cd32`; all ten implementation PRs remain open at preparation. Current compilation, actual app journeys, CI and full H01–H20 acceptance remain unfinished. No new runtime/build/acceptance was performed while preparing this documentation handoff.
+
 ## October 1 — native origin validation and build configuration source
 
 Application `73c9983e` validates complete release HTTPS/debug loopback API origins and rejects app-link ports. Canonical iOS project source now supplies empty-default API/link-host build settings to the keys read by the app; generated plist is untouched and still needs XcodeGen/build validation. Swift syntax/YAML/diff checks pass only. [Exact source and outstanding acceptance](../../../artifacts/workstreams/W1/resume/2026-10-01-native-uri/run.md). No external identity, association, provider or readiness is created; original references/API/generator inputs/authority remain unchanged.
