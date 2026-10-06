@@ -1,0 +1,31 @@
+{
+  "parentPR": 309,
+  "parentRevision": "cd8c703ba83df17250a387d4b39312a1642b4d9e",
+  "sourceHash": "c21da0bc3b474caaa09068364ba232e29c5e7d35e0ef6fd457c6d2e19daa1137",
+  "portedFromPR": 288,
+  "portedFromRevision": "97caf2cb89df01fb9d0b4616e83a9fa0dc25194c",
+  "port": "Only compatible Studio.tsx role-editor/Composer delta; current guarded focus behavior retained; original wider graph remains held",
+  "environment": "Isolated canonical development API 4206 / web 3106 / PostgreSQL 5546; genuine issued sessions, non-owner runtime roles",
+  "qualification": "Development creator temporarily seeded verified for Team operation, subsequently restored pending; no external identity verification or signing proof",
+  "journeys": [
+    "Creator invitation and genuine recipient acceptance; triage recipient refused Team management",
+    "Actual committed role change with genuine 200 response held; exact keyboard retry retained membership xmin 1429 and returned focus",
+    "Two current creator views: conflicting role change requires explicit review without overwriting desired selection",
+    "Actual active member Composer loses text/editing/audience/media/signing controls after drafting withdrawal",
+    "Actual member removal refuses Studio; saved Composer URL reload also refuses access",
+    "1280px and 390px Light/Night role-editor captures; phone document width equals 390px viewport"
+  ],
+  "checks": [
+    "seven workspace type checks",
+    "generation check",
+    "scoped ESLint and Prettier",
+    "production web build"
+  ],
+  "cleanup": "Member revoked, creator pending, zero content rows, operator sessions ended, Fetch/media/device overrides cleared",
+  "limits": [
+    "No new test code, backend, schema, permission or provider change",
+    "No native, physical device, full accessibility, production verification/signing or release qualification",
+    "Existing Team resting composition and invite-by-email design gap remain; no full design acceptance claimed",
+    "Saved return verified after full member removal; triage-only saved return not separately established"
+  ]
+}

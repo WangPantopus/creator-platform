@@ -1,0 +1,4 @@
+$ pnpm --filter @qelvora/api generate --check && node scripts/generate-shared.mjs --check && node scripts/generate-native-api.mjs --check
+$ tsx scripts/generate-openapi.ts --check
+Verified 12 shared web, Swift and Kotlin resources.
+Verified Swift/Kotlin API models and 115 operations from OpenAPI.
