@@ -4,17 +4,20 @@ import {
   ErrorState,
   TrustSession,
   useTrust,
+  useTrustStatus,
+  retryTrustReads,
   dateLabel,
 } from "../../ops/trust-client";
 export default function AccessPage() {
-  const { data, error, refresh } = useTrust<{
+  const sessionState = useTrustStatus();
+  const { data, error } = useTrust<{
     items: {
       case_id: string;
       action: string;
       purpose: string;
       created_at: string;
     }[];
-  }>("access-history");
+  }>("access-history", sessionState.ready);
   return (
     <main className="trust-page">
       <Link href="/support">Support</Link>
@@ -24,8 +27,8 @@ export default function AccessPage() {
         case evidence, its purpose, and when. Opening a case does not mean a
         person read every word.
       </p>
-      <TrustSession />
-      <ErrorState error={error} retry={() => void refresh()} />
+      <TrustSession showErrors={false} />
+      <ErrorState error={sessionState.error ?? error} retry={retryTrustReads} />
       <section className="trust-panel">
         {data?.items.length === 0 && <p>No case accesses yet.</p>}
         {data?.items.map((item, index) => (

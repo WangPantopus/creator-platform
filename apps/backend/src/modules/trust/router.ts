@@ -5,6 +5,7 @@ import express, {
 } from "express";
 import { z, ZodError } from "zod";
 import type { Actor } from "../identity/adapter.js";
+import { requestAuthority } from "../identity/request-authority.js";
 import { DomainError } from "../../core/errors.js";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
@@ -92,7 +93,7 @@ export function createTrustRouter(options: TrustRouterOptions) {
       res.setHeader("Vary", "Origin");
       res.setHeader(
         "Access-Control-Allow-Headers",
-        "Authorization, Content-Type, X-Correlation-Id, X-Expected-Account-Id",
+        "Authorization, Content-Type, X-Correlation-Id, X-Expected-Account-Id, X-Expected-Session-Id",
       );
       res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     }
@@ -103,11 +104,36 @@ export function createTrustRouter(options: TrustRouterOptions) {
   const id = (req: Request) => z.uuid().parse(req.params.id);
   const actor = async (req: Request) => {
     const current = await options.actor(req);
+    const original = requestAuthority.getStore();
+    const isolatedDevelopment =
+      options.localDevelopment &&
+      (options.localActorSelection ?? options.localDevelopment);
+    if (
+      !isolatedDevelopment &&
+      (!original ||
+        original.accountId !== current.accountId ||
+        original.actor !== current)
+    )
+      throw new DomainError(
+        "session_context_unavailable",
+        "Your current session could not be checked. Try again.",
+        503,
+      );
     const expected = req.get("X-Expected-Account-Id");
     if (expected && z.uuid().parse(expected) !== current.accountId)
       throw new DomainError(
         "session_account_changed",
         "Your account changed. Reopen this page before taking this action.",
+        409,
+      );
+    const expectedSession = req.get("X-Expected-Session-Id");
+    if (
+      expectedSession &&
+      (!original || z.uuid().parse(expectedSession) !== original.sessionId)
+    )
+      throw new DomainError(
+        "session_view_changed",
+        "Your session changed. Reopen this page before taking this action.",
         409,
       );
     // Preserve personal support/appeals/privacy progress after a denial while
@@ -175,8 +201,11 @@ export function createTrustRouter(options: TrustRouterOptions) {
     const current = await actor(req);
     res.json({
       accountId: current.accountId,
+      sessionId: requestAuthority.getStore()?.sessionId ?? null,
       adultEligible: current.adultEligible,
       localDevelopment: options.localDevelopment,
+      localActorSelection:
+        options.localActorSelection ?? options.localDevelopment,
     });
   });
   router.post("/v1/trust/reports", async (req, res) =>

@@ -1,0 +1,372 @@
+{
+  "date": "2026-10-06",
+  "initialOpen": 36,
+  "merged": 16,
+  "held": 20,
+  "main": "b825a454a81a6ca42c7de4ada4779e67810c061d",
+  "mainTree": "569f6e1ce455a9af2de60c5f391f94718c7d9838",
+  "pullRequests": [
+    {
+      "number": 21,
+      "title": "Preserve onboarding intro timing and profile save lifetime",
+      "reviewedHead": "85ac12317f9f027cf8828ea7fb1148f687ec2e0c",
+      "originalBase": "main",
+      "disposition": "merged",
+      "reason": "Onboarding handle/intro timing and original-session save lifetime; real sign-in, edit, outage and recovery operated.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/21",
+      "mergeCommit": "2224ae096ea83c9df7c7a7caeccc7064e0b0e834",
+      "mergedAt": "2026-10-06T20:51:41Z"
+    },
+    {
+      "number": 22,
+      "title": "Restore Restart focus after authorship practice completion",
+      "reviewedHead": "41805917c14bb64c90d000d43a19818d41309047",
+      "originalBase": "codex/w1-onboarding-timing-20261001",
+      "disposition": "merged",
+      "reason": "Keyboard authorship practice completed 4/4 with Restart focused.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/22",
+      "mergeCommit": "c1a33cd8300bb6e1aec7dd41279f8ee166779fd5",
+      "mergedAt": "2026-10-06T20:52:00Z"
+    },
+    {
+      "number": 26,
+      "title": "Preserve unchanged generated resources and verify portable rename",
+      "reviewedHead": "38b7ca7551acafc755f9d462e251e79447fa819f",
+      "originalBase": "codex/w1-comprehension-focus-20261001",
+      "disposition": "merged",
+      "reason": "Generators preserve unchanged output; canonical resource/API generation checks pass.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/26",
+      "mergeCommit": "57cc8cd94cf6039ced37723c29fa4c7bf7dc93f2",
+      "mergedAt": "2026-10-06T20:52:09Z"
+    },
+    {
+      "number": 28,
+      "title": "Gate Team actions on current access reads",
+      "reviewedHead": "f7c91b3663b3fb55135ba6d092dab2fb71c2c4d2",
+      "originalBase": "codex/w1-generation-efficiency-20261001",
+      "disposition": "merged",
+      "reason": "Team actions require current access reads and preserve stale/unknown states.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/28",
+      "mergeCommit": "42e49efac5209b4fed33978ea430ea525651540b",
+      "mergedAt": "2026-10-06T20:52:17Z"
+    },
+    {
+      "number": 29,
+      "title": "Connect canonical Home and preserve native saved-thread navigation",
+      "reviewedHead": "70e07e369582af4600826bfd6cd8c246651ecaf7",
+      "originalBase": "codex/w1-team-state-20261001",
+      "disposition": "merged",
+      "reason": "Canonical Home thread destination and native saved-thread navigation use original issued scope.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/29",
+      "mergeCommit": "af12c6886a7ea0e7b64aa0602c3d9cc3e8931c74",
+      "mergedAt": "2026-10-06T20:52:25Z"
+    },
+    {
+      "number": 31,
+      "title": "Guard Growth journeys with current session and owner proofs",
+      "reviewedHead": "c052ef67fa85301562b5123b682c88b931107c9a",
+      "originalBase": "main",
+      "disposition": "held",
+      "reason": "Broad Growth graph (170 production paths in original comparison). Populated Home/notification/share/retraction journeys and owner/provider inputs remain unqualified; iOS busy/large-text reading acceptance remains open. Needs an affected-journey run on the combined graph.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/31"
+    },
+    {
+      "number": 35,
+      "title": "Keep signing bound to the original review and session",
+      "reviewedHead": "0de1447e191dcb1be64e992c4f9e4cb76149b53c",
+      "originalBase": "codex/w1-home-host-20261001",
+      "disposition": "merged",
+      "reason": "Signing retains original review/session and exact uncertain-publication custody.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/35",
+      "mergeCommit": "cfd4e12686511ba6810a7f431cab06d4a6b6bb9b",
+      "mergedAt": "2026-10-06T20:52:33Z"
+    },
+    {
+      "number": 36,
+      "title": "Revalidate privacy snapshots and recover retained Android sessions",
+      "reviewedHead": "de8adebb5c4f1844a7ad7c9833b802548cf8578a",
+      "originalBase": "main",
+      "disposition": "held",
+      "reason": "Privacy snapshots/native session recovery overlap the W3 host graph. The recorded real export remains four domains complete/four blocked; completed download/purge and current native workflows are unverified. Needs genuine all-domain completion and native recovery verification.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/36"
+    },
+    {
+      "number": 42,
+      "title": "Connect Signed links to public verification across clients",
+      "reviewedHead": "5094a6bd74f65e97aa6a55256dad8f7cb1a8e683",
+      "originalBase": "codex/w1-signing-authority-20261001",
+      "disposition": "merged",
+      "reason": "Public Signed verification across clients uses public access and hides unavailable/withdrawn content.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/42",
+      "mergeCommit": "8c5f909927b04a10727b439507732f478737a804",
+      "mergedAt": "2026-10-06T20:52:43Z"
+    },
+    {
+      "number": 48,
+      "title": "Preserve canonical native storage recovery copy",
+      "reviewedHead": "2e8cca67d1a9c37835f2210072ae77a96fcde092",
+      "originalBase": "codex/w1-native-verification-20261001",
+      "disposition": "merged",
+      "reason": "Canonical native storage recovery copy; remaining delta is copy ordering.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/48",
+      "mergeCommit": "ecfbf68fcc09278199d49cd9a026836a07d35061",
+      "mergedAt": "2026-10-06T20:52:51Z"
+    },
+    {
+      "number": 49,
+      "title": "Validate native API origins and supply iOS host configuration",
+      "reviewedHead": "d892789ba5f384ae51952f44556f1376b465c383",
+      "originalBase": "codex/w1-native-storage-20261001",
+      "disposition": "merged",
+      "reason": "Native origin/host handoff; remaining delta is documentation.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/49",
+      "mergeCommit": "94ea42263938e12c609ba4a244090778c7abfecc",
+      "mergedAt": "2026-10-06T20:52:59Z"
+    },
+    {
+      "number": 51,
+      "title": "Publish W1 handoff and preserve source before worktree cleanup",
+      "reviewedHead": "d4a2f6f6fb24ed714614bb38f1f9115a1310e202",
+      "originalBase": "codex/w1-native-uri-20261001",
+      "disposition": "merged",
+      "reason": "W1 source-preservation and successor handoff documentation.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/51",
+      "mergeCommit": "5f4756e4770cf3f585b2aea1125f74078300a856",
+      "mergedAt": "2026-10-06T20:53:08Z"
+    },
+    {
+      "number": 63,
+      "title": "Compose guarded conversations with current producer and privacy contracts",
+      "reviewedHead": "82c9abffdb00f73bc7ba3fb4baedb508b1170917",
+      "originalBase": "main",
+      "disposition": "held",
+      "reason": "Large combined Conversation/Agent/Commerce host graph. No useful generated conversation or completed export/download/purge is demonstrated; original saved export is four complete/four blocked. Needs genuine producers and a complete user journey.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/63"
+    },
+    {
+      "number": 66,
+      "title": "Keep sessions truthful during outages and fit identity screens to phones",
+      "reviewedHead": "116ac444c4db375c3be2fe1f508ce5b5b6a035c5",
+      "originalBase": "codex/w1-handoff-20261001",
+      "disposition": "merged",
+      "reason": "Truthful outage states and phone viewport/focused-input sizing.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/66",
+      "mergeCommit": "40d628735b22b8ee340019e32fb6bf92a8f5b4dc",
+      "mergedAt": "2026-10-06T20:53:18Z"
+    },
+    {
+      "number": 74,
+      "title": "Harden issuer custody, recovery and integrated platform authority",
+      "reviewedHead": "5b1675ca155f87957c8ad62201097de2563c3c4f",
+      "originalBase": "codex/w1-session-truth-20261001",
+      "disposition": "held",
+      "reason": "Large integrated issuer/Support/Team graph. Recorded immediate populated-account concealment, Support access/session gating and feedback availability remain open findings. Needs those private-view issues resolved and actual affected app operation.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/74"
+    },
+    {
+      "number": 131,
+      "title": "Bind generation negatives to the genuine private worker nonce",
+      "reviewedHead": "5901c9dd62973a20fd7d3ccae132374fcd627056",
+      "originalBase": "main",
+      "disposition": "held",
+      "reason": "Worker nonce/denial purpose 0093 remains reserved and unapplied. Source/catalogue observations are from an older synthetic cohort; current genuine worker/task/fault and denial/expiry operation are unqualified. Needs the accepted combined purpose catalogue and genuine worker verification.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/131"
+    },
+    {
+      "number": 132,
+      "title": "Bind Creator AI worker inputs, provider admission and retrieval to genuine purpose custody",
+      "reviewedHead": "955024a4910562f1b284e150c32534e4f73d2e28",
+      "originalBase": "main",
+      "disposition": "held",
+      "reason": "Large generation input/admission/retrieval/accounting graph. Accepted owner catalogue/policy, licensed inputs, original worker/task and provider/accounting completion remain absent. Needs real generation plus privacy/cancellation and final settlement operation.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/132"
+    },
+    {
+      "number": 145,
+      "title": "Bind terminal trust denials to original generation custody",
+      "reviewedHead": "da0e2af95baa19280ddf3ebdae4ce8ead1a5eca7",
+      "originalBase": "codex/w8-generation-worker-denial",
+      "disposition": "held",
+      "reason": "Terminal denial purpose 0100 and parent 131 remain held. Needs complete accepted catalogue and genuine worker terminal/settlement/race operation; zero-job SQL refusals do not establish successful settlement.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/145"
+    },
+    {
+      "number": 182,
+      "title": "W3: preserve original ownership and await privacy export cleanup",
+      "reviewedHead": "a3a42678b404a60690b9fef94a409f4fe760cf7d",
+      "originalBase": "codex/w3-privacy-cursor-review-base",
+      "disposition": "held",
+      "reason": "Historical combined W3 review anchor, based on an immutable review branch rather than main. Do not merge into that anchor. Shares incomplete W3 export/host qualification; needs a current main-targeted review after prerequisites qualify.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/182"
+    },
+    {
+      "number": 192,
+      "title": "Stage finite development feedback consent and physical lifecycle",
+      "reviewedHead": "05225166284225b966a0606192bbbb77821cc18b",
+      "originalBase": "main",
+      "disposition": "held",
+      "reason": "Finite development feedback/intro-offer policy and held 0207 purpose. Registered accepted policy/catalogue and actual save/skip/withdrawal/expiry/physical lifecycle are unqualified. Needs genuine lifecycle operation before enabling or accepting the wider change.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/192"
+    },
+    {
+      "number": 200,
+      "title": "Prepare exact-version reply reviews with original Trust session custody",
+      "reviewedHead": "5290eedd1249832ad7e5c9325b8dcc1f9acccb49",
+      "originalBase": "main",
+      "disposition": "held",
+      "reason": "Exact reply-review graph includes Commerce export callbacks from 301. Recorded first account-switch frame retains previous cases, and exact review purpose 0069 is held. Needs immediate private-view concealment, current review/sign/send operation and bounded artifact settlement.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/200"
+    },
+    {
+      "number": 201,
+      "title": "Prepare opt-in private development artifact storage",
+      "reviewedHead": "753eb34476ee620bf7227d47d932f4aeb6afd1e3",
+      "originalBase": "main",
+      "disposition": "merged",
+      "reason": "Private development artifact opt-in and original Trust transaction settlement; actual PostgreSQL success/failure/cancellation/recovery operated.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/201",
+      "mergeCommit": "d44da5658e7347b82ead54491227a49688adbbb5",
+      "mergedAt": "2026-10-06T20:56:26Z"
+    },
+    {
+      "number": 213,
+      "title": "Retain original Commerce Actor and settle account cleanup",
+      "reviewedHead": "4e6d29a3f99b7ec362b621dcd0a1ed7b768cc726",
+      "originalBase": "main",
+      "disposition": "merged",
+      "reason": "Original Commerce Actor/context restoration and bounded original-client settlement; real Commerce reads operated.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/213",
+      "mergeCommit": "a24a8177924158a528915f69736b9f3ed85f3390",
+      "mergedAt": "2026-10-06T20:56:33Z"
+    },
+    {
+      "number": 242,
+      "title": "feat(trust): add held original-task Conversation family authority",
+      "reviewedHead": "1a674e59b46ad42c3e4acd0ef906c6753ff75c44",
+      "originalBase": "main",
+      "disposition": "held",
+      "reason": "Original privacy task/family authority uses held 0209/0214 purposes and a separately qualified provenance profile. Accepted executable graph/catalogue and original all-family export/purge completion are missing. Needs genuine original-task family verification.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/242"
+    },
+    {
+      "number": 247,
+      "title": "Derive safety allowance settlement from original typed provenance",
+      "reviewedHead": "75bba77b53a5c0d0675309daed946f017d3d17bd",
+      "originalBase": "main",
+      "disposition": "held",
+      "reason": "Safety/allowance terminal graph lacks accepted catalogue pins and genuine provider/output/financial settlement. Recorded original 0157 trigger has three unsuppressed 42703 static field diagnostics. Needs those diagnostics resolved or conclusively qualified and real terminal settlement.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/247"
+    },
+    {
+      "number": 262,
+      "title": "Preserve original fulfillment publication and worker custody",
+      "reviewedHead": "27cde2b04b65c8b29bd0ba59a9b18ba716260101",
+      "originalBase": "main",
+      "disposition": "held",
+      "reason": "Original publication worker graph has no complete accepted catalogue, approved minimum or configured genuine issuer/factory. Whole deadline for external callbacks and real sign/System/delivery/financial/final-COMMIT operation remain unqualified.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/262"
+    },
+    {
+      "number": 279,
+      "title": "Bind Agent privacy and expiry metadata to original held sources",
+      "reviewedHead": "02c344e478dcfd3ea72cfb3db5d0d3af7db8f4b6",
+      "originalBase": "main",
+      "disposition": "merged",
+      "reason": "Agent privacy/expiry role and original-client lifetime guards; preserves shorter deadlines and task-before-interrupt ordering.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/279",
+      "mergeCommit": "98bf741bfe2fa25401c5574b386005e532182246",
+      "mergedAt": "2026-10-06T20:56:40Z"
+    },
+    {
+      "number": 282,
+      "title": "fix(calls): bind offers and exact retries to original sessions",
+      "reviewedHead": "3f4d44611c5a3a2c30f44b5a5532c76fdc5c49bc",
+      "originalBase": "codex/w1-onboarding-timing-20261001",
+      "disposition": "held",
+      "reason": "Call offer/session changes have negative/recovery observations only. Positive scheduling/DST/concurrent/expired-slot handling, exact retry and provider/outcome/settlement journeys are unverified. Needs an actual configured call lifecycle.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/282"
+    },
+    {
+      "number": 284,
+      "title": "fix(ios): retain recorder cleanup custody and bound preparation",
+      "reviewedHead": "bf2a95f19c185786b2617895ff5c00712e76d63b",
+      "originalBase": "main",
+      "disposition": "held",
+      "reason": "Recorder preparation/cleanup improves ownership, but final delegate-adoption race correction is compile-only. Successful actual recording, adoption, playback and encode-error cleanup remain unverified. Needs current signed native recorder operation.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/284"
+    },
+    {
+      "number": 288,
+      "title": "Review exact Team role changes and preserve uncertain retries",
+      "reviewedHead": "97caf2cb89df01fb9d0b4616e83a9fa0dc25194c",
+      "originalBase": "codex/w1-completion-20261001",
+      "disposition": "held",
+      "reason": "Unique Team editor changes depend on the unaccepted 74 graph; against main this pulls over 1,100 paths. Needs 74 qualified or the narrow Team delta isolated on current main, then current role-withdrawal/uncertain-retry and native acceptance.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/288"
+    },
+    {
+      "number": 289,
+      "title": "fix(media): bind browser recording signatures to original account and view",
+      "reviewedHead": "dc39dc2e08da5c03578c21d09cf959ddc5dfb86d",
+      "originalBase": "codex/w1-onboarding-timing-20261001",
+      "disposition": "merged",
+      "reason": "Recording signatures retain exact original asset, review/session and publication retry; compiled combined source, no positive passkey/media claim.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/289",
+      "mergeCommit": "b825a454a81a6ca42c7de4ada4779e67810c061d",
+      "mergedAt": "2026-10-06T20:56:58Z"
+    },
+    {
+      "number": 298,
+      "title": "Bind commerce forms to their original session view",
+      "reviewedHead": "34cdba6270badab7210943d82703e87e22b4c718",
+      "originalBase": "codex/w1-onboarding-timing-20261001",
+      "disposition": "merged",
+      "reason": "Commerce forms bind original account/session; real API outage/recovery and same-/other-account replacement operated.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/298",
+      "mergeCommit": "862a9c8ff2b10a7f50844282b29260f5a69b0015",
+      "mergedAt": "2026-10-06T20:56:49Z"
+    },
+    {
+      "number": 301,
+      "title": "Bound original commerce privacy settlement and export fields",
+      "reviewedHead": "cec286e9bdc16e9296f1e8af1fd59826c40a12c2",
+      "originalBase": "main",
+      "disposition": "held",
+      "reason": "Concrete unbounded sink issue: begin/assertCurrent/write/complete/abort callbacks are directly awaited without an enforceable sink deadline. Source socket budgets cannot bound them. Needs a protected writer with physical cancellation/settlement and a genuine export task through EOF/ACK/COMMIT.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/301"
+    },
+    {
+      "number": 302,
+      "title": "Consume original group publication custody in Content",
+      "reviewedHead": "b520000666fdb5595995702a76fe848edc0c79d2",
+      "originalBase": "codex/w4-publication-worker-20261003",
+      "disposition": "held",
+      "reason": "Content group-publication consumer depends on held 262 and unaccepted owner catalogues/approved minimum. Needs the genuine configured group worker, signing/media/System/delivery and once-only final commit plus fan retraction verification.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/302"
+    },
+    {
+      "number": 303,
+      "title": "Keep native Commerce requests on the original account session",
+      "reviewedHead": "6a82fc1272dc8b25ac167598012aa5da4ff91dc5",
+      "originalBase": "codex/w4-original-session-view-20261003",
+      "disposition": "held",
+      "reason": "Native original-session Commerce changes compile, but current iOS/Android outage recovery, session replacement, disposal/configuration restoration and store result lifetimes lack complete operated acceptance. Recorded Android Night/closure failures remain. Needs current native app verification.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/303"
+    },
+    {
+      "number": 305,
+      "title": "fix(media): preserve Studio session and publication custody",
+      "reviewedHead": "603282f520defa2b0267c5fa45121b6102fdc261",
+      "originalBase": "codex/w1-onboarding-timing-20261001",
+      "disposition": "held",
+      "reason": "Studio media/session and worker publication graph lacks the accepted expanded catalogue pin. Prior photo lost-ACK/retry operation does not qualify late host-detach save or positive microphone/signature/publication/playback. Needs those actual affected flows.",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/305"
+    }
+  ],
+  "postMergeMainChecks": {
+    "runUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37530303126",
+    "observedWorkflowStatus": "queued",
+    "complete": false,
+    "note": "Some jobs in progress; native and visual jobs queued. Not a pass."
+  }
+}

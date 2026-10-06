@@ -1,0 +1,178 @@
+[
+  {
+    "baseRefName": "main",
+    "headRefOid": "34cdba6270badab7210943d82703e87e22b4c718",
+    "mergeCommit": {
+      "oid": "862a9c8ff2b10a7f50844282b29260f5a69b0015"
+    },
+    "mergedAt": "2026-10-06T20:56:49Z",
+    "number": 298,
+    "state": "MERGED",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/298"
+  },
+  {
+    "baseRefName": "main",
+    "headRefOid": "dc39dc2e08da5c03578c21d09cf959ddc5dfb86d",
+    "mergeCommit": {
+      "oid": "b825a454a81a6ca42c7de4ada4779e67810c061d"
+    },
+    "mergedAt": "2026-10-06T20:56:58Z",
+    "number": 289,
+    "state": "MERGED",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/289"
+  },
+  {
+    "baseRefName": "main",
+    "headRefOid": "02c344e478dcfd3ea72cfb3db5d0d3af7db8f4b6",
+    "mergeCommit": {
+      "oid": "98bf741bfe2fa25401c5574b386005e532182246"
+    },
+    "mergedAt": "2026-10-06T20:56:40Z",
+    "number": 279,
+    "state": "MERGED",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/279"
+  },
+  {
+    "baseRefName": "main",
+    "headRefOid": "4e6d29a3f99b7ec362b621dcd0a1ed7b768cc726",
+    "mergeCommit": {
+      "oid": "a24a8177924158a528915f69736b9f3ed85f3390"
+    },
+    "mergedAt": "2026-10-06T20:56:33Z",
+    "number": 213,
+    "state": "MERGED",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/213"
+  },
+  {
+    "baseRefName": "main",
+    "headRefOid": "753eb34476ee620bf7227d47d932f4aeb6afd1e3",
+    "mergeCommit": {
+      "oid": "d44da5658e7347b82ead54491227a49688adbbb5"
+    },
+    "mergedAt": "2026-10-06T20:56:26Z",
+    "number": 201,
+    "state": "MERGED",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/201"
+  },
+  {
+    "baseRefName": "main",
+    "headRefOid": "116ac444c4db375c3be2fe1f508ce5b5b6a035c5",
+    "mergeCommit": {
+      "oid": "40d628735b22b8ee340019e32fb6bf92a8f5b4dc"
+    },
+    "mergedAt": "2026-10-06T20:53:18Z",
+    "number": 66,
+    "state": "MERGED",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/66"
+  },
+  {
+    "baseRefName": "main",
+    "headRefOid": "d4a2f6f6fb24ed714614bb38f1f9115a1310e202",
+    "mergeCommit": {
+      "oid": "5f4756e4770cf3f585b2aea1125f74078300a856"
+    },
+    "mergedAt": "2026-10-06T20:53:08Z",
+    "number": 51,
+    "state": "MERGED",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/51"
+  },
+  {
+    "baseRefName": "main",
+    "headRefOid": "d892789ba5f384ae51952f44556f1376b465c383",
+    "mergeCommit": {
+      "oid": "94ea42263938e12c609ba4a244090778c7abfecc"
+    },
+    "mergedAt": "2026-10-06T20:52:59Z",
+    "number": 49,
+    "state": "MERGED",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/49"
+  },
+  {
+    "baseRefName": "main",
+    "headRefOid": "2e8cca67d1a9c37835f2210072ae77a96fcde092",
+    "mergeCommit": {
+      "oid": "ecfbf68fcc09278199d49cd9a026836a07d35061"
+    },
+    "mergedAt": "2026-10-06T20:52:51Z",
+    "number": 48,
+    "state": "MERGED",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/48"
+  },
+  {
+    "baseRefName": "main",
+    "headRefOid": "5094a6bd74f65e97aa6a55256dad8f7cb1a8e683",
+    "mergeCommit": {
+      "oid": "8c5f909927b04a10727b439507732f478737a804"
+    },
+    "mergedAt": "2026-10-06T20:52:43Z",
+    "number": 42,
+    "state": "MERGED",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/42"
+  },
+  {
+    "baseRefName": "main",
+    "headRefOid": "0de1447e191dcb1be64e992c4f9e4cb76149b53c",
+    "mergeCommit": {
+      "oid": "cfd4e12686511ba6810a7f431cab06d4a6b6bb9b"
+    },
+    "mergedAt": "2026-10-06T20:52:33Z",
+    "number": 35,
+    "state": "MERGED",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/35"
+  },
+  {
+    "baseRefName": "main",
+    "headRefOid": "70e07e369582af4600826bfd6cd8c246651ecaf7",
+    "mergeCommit": {
+      "oid": "af12c6886a7ea0e7b64aa0602c3d9cc3e8931c74"
+    },
+    "mergedAt": "2026-10-06T20:52:25Z",
+    "number": 29,
+    "state": "MERGED",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/29"
+  },
+  {
+    "baseRefName": "main",
+    "headRefOid": "f7c91b3663b3fb55135ba6d092dab2fb71c2c4d2",
+    "mergeCommit": {
+      "oid": "42e49efac5209b4fed33978ea430ea525651540b"
+    },
+    "mergedAt": "2026-10-06T20:52:17Z",
+    "number": 28,
+    "state": "MERGED",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/28"
+  },
+  {
+    "baseRefName": "main",
+    "headRefOid": "38b7ca7551acafc755f9d462e251e79447fa819f",
+    "mergeCommit": {
+      "oid": "57cc8cd94cf6039ced37723c29fa4c7bf7dc93f2"
+    },
+    "mergedAt": "2026-10-06T20:52:09Z",
+    "number": 26,
+    "state": "MERGED",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/26"
+  },
+  {
+    "baseRefName": "main",
+    "headRefOid": "41805917c14bb64c90d000d43a19818d41309047",
+    "mergeCommit": {
+      "oid": "c1a33cd8300bb6e1aec7dd41279f8ee166779fd5"
+    },
+    "mergedAt": "2026-10-06T20:52:00Z",
+    "number": 22,
+    "state": "MERGED",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/22"
+  },
+  {
+    "baseRefName": "main",
+    "headRefOid": "85ac12317f9f027cf8828ea7fb1148f687ec2e0c",
+    "mergeCommit": {
+      "oid": "2224ae096ea83c9df7c7a7caeccc7064e0b0e834"
+    },
+    "mergedAt": "2026-10-06T20:51:41Z",
+    "number": 21,
+    "state": "MERGED",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/21"
+  }
+]

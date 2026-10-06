@@ -1,0 +1,17 @@
+# Support session recovery — October 6, 2026
+
+Support and Ops now bind each private read and form callback to the verified account, exact session ID, and browser lifetime. A synchronous external snapshot hides old DTOs during render; callbacks cannot adopt a replacement cookie. Network failures disable actions without discarding the original unsent input. Resume and negative cross-tab hints conceal private state until the actual producer answers. Only confirmed session replacement/end clears drafts. Session reads have a three-second whole-response deadline; other browser requests and BFF transport retain ten-second bounds and original cancellation.
+
+The canonical Trust composition retains the actor already issued by middleware. Trust returns that request's genuine session ID and rejects mismatched account/session preconditions. Stale development sign-out forwards those conditions and preserves a replacement cookie on refusal. Successful identity completion writes the actual issued cookie and sends an optional, payload-free negative cross-tab hint before proceeding to the already validated destination. Its short HTML handoff has a nonce-only CSP and a no-script continuation link.
+
+## Actual verification
+
+Ran the real Next browser route against the canonical development issuer and separate non-owner PostgreSQL core/Trust API/worker roles. Created CASE-001 as synthetic actor three; it persisted after reload. A synthetic reviewer with an operator-provisioned one-hour support/safety membership acquired a 15-minute audited lease, read evidence and recorded a close decision. The reporting fan saw the reason in both the case and Trust inbox, and saw the case-opening/read/decision audit history. Replacing the Ops session with a fan removed private case data and denied further access.
+
+A paused database disabled actions and hid case results while preserving the unsent draft. Freezing the real API process produced three observed browser session aborts at 3008, 3005 and 3005 ms. Resuming it restored the original session and unchanged draft. Fresh sign-in to the same account cleared the original view's draft; another-account sign-in removed its case and draft in the first observed old-tab frame after the completion correction. Actual HTTP calls through both the backend and Next BFF returned 409 for stale-session reads, mutations and sign-out; BFF refusal emitted no cookie mutation and the replacement session remained valid. Confirmed sign-out cleared private views across tabs.
+
+[Evidence manifest](../../artifacts/pr-review/2026-10-06/support-session/manifest.json) links the scope and limitations; adjacent captures show the functional routes in Light/Night at 390 pixels, without horizontal overflow. Backend/web types, scoped ESLint, backend build and production web build passed. No new test code was written.
+
+## Design and remaining scope
+
+Existing Support layout, shared tokens and copy remain in use; hide/show behavior changes no resting composition. References are `design/phase4e-4i/OpsQueue.dc.html`, `OpsCase.dc.html`, and shared AuditBanner/Notice components. Dedicated Support composition remains the recorded DI-19 design gap; this is behavioral verification, not final acceptance of missing source artboards. Native source was not changed or personally qualified here. Production identity, physical devices, provider flows, screen-reader/200% text, forced browser token rotation and eight-domain privacy completion remain unqualified. No reserved migration or purpose catalogue was activated.

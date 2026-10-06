@@ -1,4 +1,10 @@
 /* Source measurements: 4H-01/4H-02. W1 token integration requested in W8 register. */
+/* Keep private drafts mounted during a session recheck without allowing the
+ * component display rules below to override the native hidden attribute. */
+.trust-page [hidden],
+.ops-shell [hidden] {
+  display: none !important;
+}
 .ops-shell {
   --ops-sidebar: 220px;
   --ops-aside: 380px;
