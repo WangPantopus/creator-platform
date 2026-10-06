@@ -105,25 +105,9 @@ export class StudioService {
           "team_account_unavailable",
           "Choose the current public handle of an existing fan account.",
         );
-        const prior = (
-          await client.query(
-            "SELECT id,roles FROM creator.team_invitation WHERE creator_id=$1 AND account_id=$2 AND accepted_at IS NULL AND revoked_at IS NULL AND expires_at>now() ORDER BY expires_at DESC LIMIT 1",
-            [creatorId, fan.account_id],
-          )
-        ).rows[0];
-        if (prior) {
-          invariant(
-            [...new Set(prior.roles)].sort().join() ===
-              [...new Set(input.roles)].sort().join(),
-            "team_invitation_exists",
-            "A current invitation already exists with different roles. Remove it before choosing new roles.",
-          );
-          return { accountId: fan.account_id, prior };
-        }
-        return { accountId: fan.account_id, prior: null };
+        return { accountId: fan.account_id };
       },
     );
-    if (target.prior) return target.prior;
     return this.owners.profiles.invite(actor, creatorId, {
       accountId: target.accountId,
       roles: input.roles,

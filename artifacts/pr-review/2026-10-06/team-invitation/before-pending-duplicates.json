@@ -1,0 +1,8 @@
+{
+  "roles": [
+    ["drafter", "triage"],
+    ["triage", "drafter"]
+  ],
+  "verification": "pending",
+  "activeInvitations": 2
+}

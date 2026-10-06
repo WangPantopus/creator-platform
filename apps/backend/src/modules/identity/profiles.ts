@@ -266,22 +266,69 @@ export class IdentityProfiles {
   }
   async invite(actor: Actor, creatorId: string, input: unknown) {
     const body = TeamInviteSchema.parse(input);
+    const assertAllowed = this.team?.assertCreatorAllowed;
+    if (typeof assertAllowed !== "function")
+      throw new DomainError(
+        "team_authority_unconfigured",
+        "Current creator authority is unavailable for this team.",
+        503,
+      );
     invariant(
       body.accountId !== actor.accountId,
       "team_creator_identity",
       "The creator does not need a team invitation.",
     );
     return identityTransaction(this.pool, actor.accountId, async (client) => {
-      await this.requireCreator(client, actor, creatorId);
+      const held = await holdCurrentRequestSession(client, actor.accountId);
+      invariant(
+        held.actor === actor,
+        "current_request_actor_required",
+        "Reopen this team with your current account.",
+      );
+      await client.query("SELECT set_config('app.creator_id',$1,true)", [
+        creatorId,
+      ]);
+      await assertAllowed(actor, creatorId, client);
+      await assertHeldCurrentRequestSession(held, client);
+      const creator = await this.requireCreator(client, actor, creatorId);
+      invariant(
+        creator.verification === "verified" && !creator.recovery_required,
+        "creator_verification_required",
+        "Current creator verification and signing recovery are required.",
+      );
       await client.query(
         "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
         [`team:${creatorId}:${body.accountId}`],
       );
-      const result = await client.query(
-        'INSERT INTO creator.team_invitation(creator_id,account_id,roles,expires_at) VALUES($1,$2,$3,now()+interval \'7 days\') RETURNING id,creator_id AS "creatorId",account_id AS "accountId",roles,expires_at AS "expiresAt",false AS accepted',
-        [creatorId, body.accountId, [...new Set(body.roles)]],
+      const roles = [...new Set(body.roles)].sort();
+      const pending = await client.query(
+        'SELECT id,creator_id AS "creatorId",account_id AS "accountId",roles,expires_at AS "expiresAt",false AS accepted FROM creator.team_invitation WHERE creator_id=$1 AND account_id=$2 AND accepted_at IS NULL AND revoked_at IS NULL AND expires_at>now() ORDER BY expires_at DESC LIMIT 2 FOR UPDATE',
+        [creatorId, body.accountId],
       );
-      return result.rows[0];
+      if (
+        pending.rows.length > 1 ||
+        (pending.rows[0] &&
+          [...new Set(pending.rows[0].roles)].sort().join("|") !==
+            roles.join("|"))
+      )
+        throw new DomainError(
+          "team_invitation_exists",
+          "Current invitations have different or conflicting roles. Remove them before choosing new roles.",
+          409,
+        );
+      // The lock covers both the read and insert. Retries of a pending invite
+      // preserve its original ID/expiry, including concurrent direct/API callers.
+      const invitation =
+        pending.rows[0] ??
+        (
+          await client.query(
+            'INSERT INTO creator.team_invitation(creator_id,account_id,roles,expires_at) VALUES($1,$2,$3,now()+interval \'7 days\') RETURNING id,creator_id AS "creatorId",account_id AS "accountId",roles,expires_at AS "expiresAt",false AS accepted',
+            [creatorId, body.accountId, roles],
+          )
+        ).rows[0];
+      await assertAllowed(actor, creatorId, client);
+      await assertHeldCurrentRequestSession(held, client);
+      return invitation;
     });
   }
   async acceptInvite(actor: Actor, invitationId: string) {
