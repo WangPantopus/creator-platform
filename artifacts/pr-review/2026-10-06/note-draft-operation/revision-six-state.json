@@ -1,0 +1,35 @@
+{
+  "current": {
+    "id": "6e7b6fbd-c925-4017-bd1a-b6c6848d9a17",
+    "state": "draft",
+    "version": 6
+  },
+  "revisions": [
+    {
+      "text": "Development draft · October 6. Private text-only save and recovery.",
+      "version": 1
+    },
+    {
+      "text": "Development revision two · committed response recovery.",
+      "version": 2
+    },
+    {
+      "text": "Development local revision three · preserve this while the previous save is unconfirmed.",
+      "version": 3
+    },
+    {
+      "text": "Development revision four · saved status must reflect this exact text.",
+      "version": 4
+    },
+    {
+      "text": "Development revision five · newer local edits must stay visibly unsaved after the earlier save response.",
+      "version": 5
+    },
+    {
+      "text": "Development revision six · this newer local text remains unsaved until its own confirmation.",
+      "version": 6
+    }
+  ],
+  "contentRows": 1,
+  "publications": 0
+}

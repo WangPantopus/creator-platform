@@ -1,0 +1,27 @@
+{
+  "parentPR": 312,
+  "parentRevision": "3013581d5f3d83c9819cc26741fc0f7e08e5d632",
+  "sourceHash": "de38b11f145f71ef7a42310dd1ea95f41ef553fb484cd005384d809303ce9ddf",
+  "reference": "design/phase4c-studio-phone/NoteCompose.dc.html",
+  "environment": "Same isolated canonical development API 4206 / web 3106 / PostgreSQL 5546, genuine sessions and non-owner runtime",
+  "journeys": [
+    "One actual unsigned draft saved, lost revision-2 response, newer text retained, stale revision refused, explicit saved revision review and retain-local choice, revision-3 persistence/reload",
+    "Existing draft says Edit Note; editing changes status to UNSAVED CHANGES",
+    "Genuine revision-4/5 responses released after newer edits; saved baseline advances while newer text remains unsaved",
+    "Explicit save confirms revision 6; one object/six revisions/zero publications",
+    "Actual 390x844 Light/Night status fits without overflow; undo local name-token edit restores SAVED revision 6"
+  ],
+  "faults": "Only genuine Fetch responses held after commit; deadline and late acknowledgements separately observed; no response fabricated",
+  "checks": [
+    "web types",
+    "scoped ESLint/Prettier",
+    "final production web build"
+  ],
+  "cleanup": "Creator restored pending; Team member/invitations revoked; temporary Ops lease revoked; one private synthetic unsigned draft retained; browser overrides/interception cleared",
+  "limits": [
+    "Positive creator status was an explicit development verification seed, not external proof",
+    "No new test code, backend or schema change",
+    "Pending-publication recovery baseline source-reviewed only; no signing/media/provider/native/release acceptance",
+    "No full accessibility or exact screen acceptance claimed"
+  ]
+}

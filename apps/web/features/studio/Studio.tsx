@@ -1264,6 +1264,7 @@ function Compose({
     [photoObjectId, setPhotoObjectId] = useState<string | null>(null),
     action = useAction(),
     draftId = useRef<string | null>(null),
+    savedDocument = useRef<string | null>(null),
     operation = useRef<{ body: string; key: string } | null>(null);
   const pendingStorage = `w5.pendingPublication:${creator.viewerAccountId}:${creator.id}`;
   const clearPending = () => {
@@ -1272,6 +1273,7 @@ function Compose({
   };
   const draftReady = !id || saved?.id === id;
   const useSavedDraft = (value: ContentView) => {
+    savedDocument.current = JSON.stringify(value.document);
     setDocument(value.document);
     setSchedule(scheduleInput(value.document.scheduledAt));
     setSaved({ id: value.id, version: value.version });
@@ -1316,6 +1318,7 @@ function Compose({
             );
             setDocument(view.document);
             setSchedule(scheduleInput(view.document.scheduledAt));
+            savedDocument.current = JSON.stringify(view.document);
             setSaved({ id: view.id, version: view.version });
             setReview({
               view,
@@ -1372,6 +1375,7 @@ function Compose({
   const edit = (update: Partial<ContentBody>) => {
     if (!hasDraftRole || !draftReady || pendingPublication) return;
     setDocument((d) => ({ ...d, ...update }));
+    action.setNotice("");
     setReview(null);
   };
   const save = async (documentOverride = document) => {
@@ -1400,6 +1404,7 @@ function Compose({
         { ...body, idempotencyKey: operation.current.key },
         creator.viewerAccountId,
       );
+      savedDocument.current = JSON.stringify(documentOverride);
       setSaved(result);
       setDraftChanged(false);
       operation.current = null;
@@ -1469,7 +1474,7 @@ function Compose({
     <section className="w5-compose">
       <header className="w5-compose-head">
         <Link href={`/studio/${creator.id}/notes`}>Cancel</Link>
-        <strong>{post ? "Publish" : "New Note"}</strong>
+        <strong>{post ? "Publish" : id ? "Edit Note" : "New Note"}</strong>
         <span />
       </header>
       <Feedback action={action} />
@@ -1816,9 +1821,9 @@ function Compose({
             }
             onClick={() =>
               void action.run(async () => {
-                await save();
+                const result = await save();
                 action.setNotice(
-                  "Draft saved. Editing invalidates the signing preview.",
+                  `Draft revision ${result.version} saved. Editing invalidates the signing preview.`,
                 );
               })
             }
@@ -1873,7 +1878,14 @@ function Compose({
                   : "Publish as team"}
           </button>
         </div>
-        {saved && <p className="qv-meta">SAVED · REVISION {saved.version}</p>}
+        {saved && (
+          <p className="qv-meta">
+            {savedDocument.current === JSON.stringify(document)
+              ? "SAVED · REVISION "
+              : "UNSAVED CHANGES · BASED ON REVISION "}
+            {saved.version}
+          </p>
+        )}
       </div>
       {currentDraft && (
         <Modal
@@ -1930,6 +1942,7 @@ function Compose({
                 !!document.planRef
               }
               onClick={() => {
+                savedDocument.current = JSON.stringify(currentDraft.document);
                 setSaved({
                   id: currentDraft.id,
                   version: currentDraft.version,
