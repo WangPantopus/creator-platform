@@ -1,0 +1,2 @@
+{"time":"2026-10-06T22:14:05.711Z","mode":"canonical development issuer, independent operator session, actual backend producer","action":"roles","command":{"expectedRoles":["drafter","triage"],"roles":["triage"]},"status":200,"done":true,"errorCode":null,"correlationId":"5a8fa674-a5fb-49f7-ac5e-be6d0a46b668"}
+{"time":"2026-10-06T22:14:38.431Z","mode":"canonical development issuer, independent operator session, actual backend producer","action":"remove","command":{},"status":200,"done":true,"errorCode":null,"correlationId":"fb725cfb-a4e1-4da8-93d2-2d004dac64d6"}

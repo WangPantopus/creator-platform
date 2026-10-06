@@ -1,0 +1,7 @@
+{
+  "member": { "roles": ["triage"], "revoked": true },
+  "creatorId": "45d29446-0d3f-4612-a768-5dd9beeddf8f",
+  "contentRows": 0,
+  "verification": "pending",
+  "recoveryRequired": false
+}

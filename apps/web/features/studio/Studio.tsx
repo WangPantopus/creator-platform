@@ -31,7 +31,12 @@ import {
   StudioTabBar,
 } from "@qelvora/ui-web";
 import type { SignedActCommand } from "@qelvora/api";
-import { validReturnTarget, MessageSchema } from "@qelvora/api";
+import {
+  validReturnTarget,
+  MessageSchema,
+  DoneSchema,
+  TeamRolesUpdateInputSchema,
+} from "@qelvora/api";
 import type {
   ContentBody,
   ContentView,
@@ -1219,11 +1224,11 @@ function Compose({
   onDone: () => void;
   post?: boolean;
 }) {
-  const canDraft =
-    creator.verification === "verified" &&
-    (creator.owned ||
-      creator.roles.includes("drafter") ||
-      creator.roles.includes("publisher"));
+  const hasDraftRole =
+    creator.owned ||
+    creator.roles.includes("drafter") ||
+    creator.roles.includes("publisher");
+  const canDraft = creator.verification === "verified" && hasDraftRole;
   const canPublish =
     creator.verification === "verified" &&
     (creator.owned || creator.roles.includes("publisher"));
@@ -1287,6 +1292,7 @@ function Compose({
     useSavedDraft(value);
   };
   useEffect(() => {
+    if (!hasDraftRole) return;
     // Only opaque command references persist across a reload; no draft or fan text.
     try {
       const stored = sessionStorage.getItem(pendingStorage);
@@ -1362,9 +1368,9 @@ function Compose({
           });
         });
     }
-  }, [creator.id, id]);
+  }, [creator.id, id, hasDraftRole]);
   const edit = (update: Partial<ContentBody>) => {
-    if (!draftReady || pendingPublication) return;
+    if (!hasDraftRole || !draftReady || pendingPublication) return;
     setDocument((d) => ({ ...d, ...update }));
     setReview(null);
   };
@@ -1418,6 +1424,28 @@ function Compose({
     !document.quote &&
     !document.packetId &&
     document.kind !== "public_answer";
+  if (!hasDraftRole)
+    return (
+      <section className="w5-compose">
+        <header className="w5-compose-head">
+          <Link href={`/studio/${creator.id}/notes`}>Notes</Link>
+          <strong>{post ? "Publish" : "Note draft"}</strong>
+          <span />
+        </header>
+        <div className="w5-gutter">
+          <Notice tone="error" title="Content editing unavailable">
+            Your current role does not allow creating or editing content. Ask
+            the creator to review your roles before preparing a draft.
+          </Notice>
+          <Link
+            className="qv-btn qv-btn--secondary"
+            href={`/studio/${creator.id}/notes`}
+          >
+            Return to Notes
+          </Link>
+        </div>
+      </section>
+    );
   if (!draftReady)
     return (
       <section className="w5-compose">
@@ -3095,6 +3123,21 @@ function Library({ creator }: { creator: Creator }) {
     </section>
   );
 }
+const teamRoleChoices = [
+  ["triage", "Triage", "Reads and routes the queue. Replies as team."],
+  ["drafter", "Drafting", "Prepares drafts. Never approves as you."],
+  ["publisher", "Publishing", "Publishes content under team identity."],
+  ["scheduler", "Scheduling", "Offers times from your hours."],
+] as const;
+const sameTeamRoles = (left: readonly string[], right: readonly string[]) =>
+  [...left].sort().join("|") === [...right].sort().join("|");
+type TeamRoleEdit = {
+  accountId: string;
+  label: string;
+  expectedRoles: string[];
+  roles: string[];
+  responseUnknown: boolean;
+};
 function Team({
   creator,
   suspended,
@@ -3123,6 +3166,7 @@ function Team({
       }[]
     >([]),
     [roles, setRoles] = useState<string[]>([]),
+    [roleEdit, setRoleEdit] = useState<TeamRoleEdit | null>(null),
     [teamCurrent, setTeamCurrent] = useState(false),
     [reading, setReading] = useState(false),
     [readError, setReadError] = useState(""),
@@ -3132,6 +3176,9 @@ function Team({
     retryFocusRequested = useRef(false),
     mounted = useRef(false),
     previousFocus = useRef<HTMLElement | null>(null),
+    roleTrigger = useRef<HTMLButtonElement | null>(null),
+    roleReturn = useRef(false),
+    teamRefresh = useRef<HTMLButtonElement | null>(null),
     generation = useRef(0),
     checkedUntil = useRef(0),
     request = useRef<AbortController | null>(null);
@@ -3238,10 +3285,39 @@ function Team({
         target.focus();
     }
   }, [teamCurrent, reading, suspended, creator.owned]);
-  const { request: identityRequest, session } = useIdentityRequest();
+  const {
+    request: identityRequest,
+    session,
+    signal: identitySignal,
+  } = useIdentityRequest();
+  useEffect(() => {
+    if (
+      roleReturn.current &&
+      !roleEdit &&
+      teamCurrent &&
+      !action.busy &&
+      !reading &&
+      !suspended &&
+      !document.hidden
+    ) {
+      roleReturn.current = false;
+      if (document.activeElement !== document.body) return;
+      const target = roleTrigger.current?.isConnected
+        ? roleTrigger.current
+        : teamRefresh.current;
+      if (
+        target?.isConnected &&
+        !target.closest("[hidden], [inert]") &&
+        target.getClientRects().length
+      )
+        target.focus();
+    }
+  }, [roleEdit, teamCurrent, suspended, action.busy, reading]);
   const requireManagement = () => {
     if (
       !creator.owned ||
+      !teamCurrent ||
+      suspended ||
       session.accountId !== creator.viewerAccountId ||
       document.hidden ||
       performance.now() >= checkedUntil.current
@@ -3254,23 +3330,118 @@ function Team({
   };
   const identity = async (path: string, body: unknown) => {
     requireManagement();
-    const response = await identityRequest(path, {
+    const current = generation.current;
+    let response: Response;
+    try {
+      response = await identityRequest(path, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
-      }),
+      });
+    } catch {
+      throw new StudioFailure(
+        503,
+        "response_unknown",
+        "The response was interrupted. Check the current team or retry the exact reviewed action.",
+      );
+    }
+    let value;
+    try {
       value = await response.json();
+    } catch {
+      throw new StudioFailure(
+        503,
+        "response_unknown",
+        "The response was interrupted. Check the current team or retry the exact reviewed action.",
+      );
+    }
+    if (
+      !mounted.current ||
+      identitySignal.aborted ||
+      document.hidden ||
+      current !== generation.current
+    )
+      throw new StudioFailure(
+        503,
+        "response_unknown",
+        "The response arrived after this view changed. Check the current team before continuing.",
+      );
     if (!response.ok)
-      throw new Error(
-        value.error?.message ?? "The team action is unavailable.",
+      throw new StudioFailure(
+        response.status,
+        value.error?.code ?? "team_unavailable",
+        response.status === 404
+          ? "This team action is not connected in the current workspace. Your reviewed input is kept."
+          : (value.error?.message ?? "The team action is unavailable."),
       );
     return value;
+  };
+  const editedMember = roleEdit
+    ? members.find((member) => member.account_id === roleEdit.accountId)
+    : undefined;
+  const memberActive = Boolean(editedMember && !editedMember.revoked_at),
+    rolesChanged = Boolean(
+      roleEdit &&
+        editedMember &&
+        !sameTeamRoles(editedMember.roles, roleEdit.expectedRoles) &&
+        !sameTeamRoles(editedMember.roles, roleEdit.roles),
+    );
+  const saveRoles = async () => {
+    const reviewed = roleEdit;
+    requireManagement();
+    if (
+      !reviewed ||
+      !memberActive ||
+      rolesChanged ||
+      !reviewed.roles.length ||
+      creator.verification !== "verified"
+    )
+      throw new StudioFailure(
+        409,
+        "team_roles_changed",
+        "Check this member's current roles and review them before saving.",
+      );
+    try {
+      const command = TeamRolesUpdateInputSchema.safeParse({
+        expectedRoles: reviewed.expectedRoles,
+        roles: reviewed.roles,
+      });
+      if (!command.success)
+        throw new StudioFailure(
+          409,
+          "team_roles_changed",
+          "The reviewed role set is unavailable. Refresh and review this member again.",
+        );
+      const result = await identity(
+        `${creator.id}/team/${reviewed.accountId}/roles`,
+        command.data,
+      );
+      if (!DoneSchema.safeParse(result).success)
+        throw new StudioFailure(
+          503,
+          "response_unknown",
+          "The role-change response was interrupted. Check the current team or retry this exact change.",
+        );
+      roleReturn.current = true;
+      setRoleEdit(null);
+      action.setNotice("Role change saved. Current access is being checked.");
+    } catch (failure) {
+      if (failure instanceof StudioFailure && failure.status >= 500)
+        setRoleEdit((edit) =>
+          edit === reviewed ? { ...edit, responseUnknown: true } : edit,
+        );
+      throw failure;
+    } finally {
+      // A read never silently replaces the roles the creator reviewed.
+      await load();
+    }
   };
   return (
     <section className="w5-team">
       <header className="w5-heading">
         <h1>Team</h1>
         <button
+          ref={teamRefresh}
           type="button"
           className="qv-btn qv-btn--secondary"
           disabled={reading || action.busy}
@@ -3321,24 +3492,154 @@ function Team({
               <strong>{m.handle ? `@${m.handle}` : m.account_id}</strong>
               <p>{m.revoked_at ? "Removed" : m.roles.join(" · ")}</p>
               {creator.owned && !m.revoked_at && (
-                <button
-                  className="qv-btn qv-btn--quiet"
-                  disabled={action.busy || reading}
-                  onClick={() =>
-                    void action.run(async () => {
-                      await identity(
-                        `${creator.id}/team/${m.account_id}/remove`,
-                        {},
-                      );
-                      await load();
-                    })
-                  }
-                >
-                  Remove access
-                </button>
+                <div className="w5-actions">
+                  <button
+                    className="qv-btn qv-btn--secondary"
+                    aria-label={`Edit roles for ${m.handle ? `@${m.handle}` : m.account_id}`}
+                    disabled={
+                      action.busy ||
+                      reading ||
+                      Boolean(roleEdit) ||
+                      creator.verification !== "verified"
+                    }
+                    onClick={(event) =>
+                      void action.run(async () => {
+                        requireManagement();
+                        roleTrigger.current = event.currentTarget;
+                        setRoleEdit({
+                          accountId: m.account_id,
+                          label: m.handle ? `@${m.handle}` : m.account_id,
+                          expectedRoles: [...m.roles],
+                          roles: [...m.roles],
+                          responseUnknown: false,
+                        });
+                      })
+                    }
+                  >
+                    Edit roles
+                  </button>
+                  <button
+                    className="qv-btn qv-btn--quiet"
+                    disabled={action.busy || reading || Boolean(roleEdit)}
+                    onClick={() =>
+                      void action.run(async () => {
+                        await identity(
+                          `${creator.id}/team/${m.account_id}/remove`,
+                          {},
+                        );
+                        await load();
+                      })
+                    }
+                  >
+                    Remove access
+                  </button>
+                </div>
               )}
             </div>
           ))}
+          {roleEdit && creator.owned && (
+            <fieldset className="w5-team-invite" disabled={action.busy}>
+              <legend>Review roles for {roleEdit.label}</legend>
+              <p className="qv-help">
+                Team roles never approve or sign as you. Saving also closes this
+                member's pending invitations.
+              </p>
+              <p>Reviewed roles: {roleEdit.expectedRoles.join(" · ")}</p>
+              {!memberActive && (
+                <Notice title="Member access changed">
+                  This member no longer has active access. Refresh the team
+                  before making another change.
+                </Notice>
+              )}
+              {rolesChanged && editedMember && (
+                <Notice title="Roles changed">
+                  Current roles: {editedMember.roles.join(" · ")}. Review this
+                  set before saving your selection.
+                  <button
+                    className="qv-btn qv-btn--secondary"
+                    disabled={reading}
+                    onClick={() =>
+                      void action.run(async () => {
+                        requireManagement();
+                        setRoleEdit({
+                          ...roleEdit,
+                          expectedRoles: [...editedMember.roles],
+                          responseUnknown: false,
+                        });
+                      })
+                    }
+                  >
+                    Review current roles
+                  </button>
+                </Notice>
+              )}
+              {roleEdit.responseUnknown && (
+                <Notice tone="offline" title="Role change not confirmed">
+                  Your exact reviewed change is kept. Check the current team,
+                  then retry it. Nothing is sent automatically.
+                </Notice>
+              )}
+              {teamRoleChoices.map(([role, label, description]) => (
+                <label className="w5-check" key={role}>
+                  <input
+                    type="checkbox"
+                    aria-label={`${label} role for ${roleEdit.label}`}
+                    disabled={
+                      !memberActive || rolesChanged || roleEdit.responseUnknown
+                    }
+                    checked={roleEdit.roles.includes(role)}
+                    onChange={(event) =>
+                      setRoleEdit({
+                        ...roleEdit,
+                        roles: event.target.checked
+                          ? [...roleEdit.roles, role]
+                          : roleEdit.roles.filter((value) => value !== role),
+                      })
+                    }
+                  />
+                  <span>
+                    <strong>{label}</strong>
+                    <span className="qv-help">{description}</span>
+                  </span>
+                </label>
+              ))}
+              <div className="w5-actions">
+                <button
+                  className="qv-btn qv-btn--secondary"
+                  disabled={
+                    reading ||
+                    !memberActive ||
+                    rolesChanged ||
+                    !roleEdit.roles.length ||
+                    creator.verification !== "verified"
+                  }
+                  onClick={() => void action.run(saveRoles)}
+                >
+                  {roleEdit.responseUnknown
+                    ? "Retry exact role change"
+                    : "Save roles"}
+                </button>
+                <button
+                  className="qv-btn qv-btn--quiet"
+                  disabled={reading}
+                  onClick={() => void load()}
+                >
+                  Check current team
+                </button>
+                <button
+                  className="qv-btn qv-btn--quiet"
+                  onClick={() => {
+                    roleReturn.current = true;
+                    setRoleEdit(null);
+                    setTeamCurrent(false);
+                    void load();
+                  }}
+                >
+                  Close role editor
+                </button>
+              </div>
+            </fieldset>
+          )}
           {pendingInvites
             .filter((i) => !i.accepted_at && !i.revoked_at)
             .map((i) => (
@@ -3356,7 +3657,7 @@ function Team({
                 {creator.owned && (
                   <button
                     className="qv-btn qv-btn--quiet"
-                    disabled={action.busy || reading}
+                    disabled={action.busy || reading || Boolean(roleEdit)}
                     onClick={() =>
                       void action.run(async () => {
                         await identity(
@@ -3377,7 +3678,10 @@ function Team({
               <p className="qv-help">No team members or pending invitations.</p>
             )}
           {creator.owned && (
-            <fieldset className="w5-team-invite" disabled={action.busy}>
+            <fieldset
+              className="w5-team-invite"
+              disabled={action.busy || Boolean(roleEdit)}
+            >
               <legend>Invite a team member</legend>
               <label className="w5-field">
                 Public fan handle
@@ -3387,24 +3691,7 @@ function Team({
                   onChange={(e) => setAccount(e.target.value)}
                 />
               </label>
-              {[
-                [
-                  "triage",
-                  "Triage",
-                  "Reads and routes the queue. Replies as team.",
-                ],
-                [
-                  "drafter",
-                  "Drafting",
-                  "Prepares drafts. Never approves as you.",
-                ],
-                [
-                  "publisher",
-                  "Publishing",
-                  "Publishes content under team identity.",
-                ],
-                ["scheduler", "Scheduling", "Offers times from your hours."],
-              ].map(([role, label, description]) => (
+              {teamRoleChoices.map(([role, label, description]) => (
                 <label className="w5-check" key={role}>
                   <input
                     type="checkbox"
