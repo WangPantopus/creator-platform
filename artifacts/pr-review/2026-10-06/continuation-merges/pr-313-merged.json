@@ -1,0 +1,115 @@
+{
+  "baseRefName": "main",
+  "headRefOid": "809f90b48f10e2acaf805d763b39857b7f37d16a",
+  "isDraft": false,
+  "mergeCommit": {
+    "oid": "e2a6bc310a0697e1084803d3cc6ab99b9aefe4d6"
+  },
+  "mergeable": "UNKNOWN",
+  "mergedAt": "2026-10-06T22:49:13Z",
+  "number": 313,
+  "state": "MERGED",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-06T22:44:26Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37542255853/job/112537798603",
+      "name": "web-and-backend",
+      "startedAt": "2026-10-06T22:42:21Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-06T22:44:46Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37542248235/job/112537771728",
+      "name": "web-and-backend",
+      "startedAt": "2026-10-06T22:42:16Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37542255853/job/112537798516",
+      "name": "web-visual",
+      "startedAt": "2026-10-06T22:42:19Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37542248235/job/112537771741",
+      "name": "web-visual",
+      "startedAt": "2026-10-06T22:42:15Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37542255853/job/112537798591",
+      "name": "ios-foundation",
+      "startedAt": "2026-10-06T22:42:19Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37542248235/job/112537771759",
+      "name": "ios-foundation",
+      "startedAt": "2026-10-06T22:42:15Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37542255853/job/112537798579",
+      "name": "android-foundation",
+      "startedAt": "2026-10-06T22:42:19Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37542248235/job/112537771847",
+      "name": "android-foundation",
+      "startedAt": "2026-10-06T22:42:15Z",
+      "status": "QUEUED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-06T22:48:08Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37542255853/job/112537798122",
+      "name": "android-runtime",
+      "startedAt": "2026-10-06T22:42:21Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-06T22:47:51Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/WangPantopus/creator-platform/actions/runs/37542248235/job/112537771475",
+      "name": "android-runtime",
+      "startedAt": "2026-10-06T22:42:16Z",
+      "status": "COMPLETED",
+      "workflowName": "Foundation checks"
+    }
+  ],
+  "url": "https://github.com/WangPantopus/creator-platform/pull/313"
+}

@@ -2,7 +2,9 @@
 import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
 import { useEffect, useState } from "react";
 import { mutate } from "./actions";
+import { useGrowthSession } from "./session";
 export function FeedbackForm() {
+  const { request } = useGrowthSession();
   const [category, setCategory] = useState("notification"),
     [score, setScore] = useState(""),
     [busy, setBusy] = useState(false),
@@ -14,9 +16,12 @@ export function FeedbackForm() {
         event.preventDefault();
         setBusy(true);
         try {
-          await mutate("feedback", {
-            category,
-            score: score ? Number(score) : null,
+          await request("feedback", {
+            method: "POST",
+            body: JSON.stringify({
+              category,
+              score: score ? Number(score) : null,
+            }),
           });
           setMessage(growthCopy.growthFeedbackSavedThankYou);
         } catch (error) {

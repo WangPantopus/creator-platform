@@ -1,0 +1,45 @@
+{
+  "parentRevision": "809f90b48f10e2acaf805d763b39857b7f37d16a",
+  "acceptedMainAtPackaging": "e2a6bc310a0697e1084803d3cc6ab99b9aefe4d6",
+  "sourceSha256": {
+    "apps/web/app/api/growth/[...path]/route.ts": "b0861a8b186671abb8b6135f95aeef1a0ab4c9efa0841fc30cc06cc015fb8605",
+    "apps/web/app/home/page.tsx": "df882ca307dc634b92e08c99b45b339669fa84074a361db069624688d04f781e",
+    "apps/web/app/notifications/page.tsx": "c21092defa6833afba45bbc8ca21d1950726fabfc68341d2cbb3b96b760c0d93",
+    "apps/web/app/notifications/settings/page.tsx": "d448029e7bf00934680e75a4d954e7ebec479735d39baa3c86ac5ed3c4f6562e",
+    "apps/web/features/growth/actions.tsx": "58d62e8ac5a8a998891624bf2b0aa3a73e4a4156d677c63bac9a09e54f967cb3",
+    "apps/web/features/growth/engagement.tsx": "e6ca4746666017b60f18ba4045531b27f4f5dac4e6c61f69c443bde80c1a1131",
+    "apps/web/features/growth/feedback.tsx": "a9255ae6b062db5700e681ddfa2fda7ca9342bcba6a84dd81704c635cfaf6f2b",
+    "apps/web/features/growth/preferences.tsx": "b369ae4283a18010ceac8d8199eff0f7c0d0e7a206baf4d6250fcb3e8411e607",
+    "apps/web/features/growth/private-view.tsx": "c31d66ffb2a937228d141ae4460a25ebd8bc79f427682095d9d55f1ae6a0d889",
+    "apps/web/features/growth/session.ts": "c4d1ab2578a53ee7d2d129e17c18ac00dc8b3c90e0eb8472789736c97c225348"
+  },
+  "environment": "Isolated 61-migration canonical PostgreSQL 5546, genuine local development issuer/canonical Growth API 4206, web 3106; explicit private Growth configuration only",
+  "reproduced": "Old actor-three settings intent saved to actor two after actual sign-in replacement, confirmed in database",
+  "operated": [
+    "Actual preferences save, same-account second sign-in, different-account replacement across Settings/Home/inbox",
+    "Original real same-account session ID refusal 409; other-account tuple refusal 409; absent tuple refusal 400; database receipt comparisons unchanged",
+    "Held genuine successful preferences response after commit; ten-second browser deadline retains input; explicit unchanged state-setting retry succeeds",
+    "Actual keyboard time-segment editing validates missing paired boundary and focus; invalid timezone focuses its field; unreliable programmatic time fills excluded",
+    "Actual own API shutdown conceals private controls while mounted unsaved timezone remains; same configuration/key restart recovers exact original input and focus without save",
+    "Actual sign-out with real 401 session responses stalled conceals form and focuses recovery; clearing interception completes sign-out",
+    "Final 390x844 DPR1 Light/Night genuine UTC save acknowledged, no horizontal overflow; earlier guarded source submitted one optional notification score3 feedback"
+  ],
+  "checks": [
+    "final webpack production web build passed",
+    "web types passed",
+    "scoped ESLint/Prettier passed",
+    "no added tests or manually run unit tests"
+  ],
+  "configuration": "Dedicated non-owner/non-superuser/non-BYPASSRLS API login inherits only creator_runtime and growth_runtime; core remains NOINHERIT; worker separate NOINHERIT; key preserved privately, never included",
+  "data": "Only synthetic local preference/one score-only feedback rows; push/email false, hideSensitive true; notifications/deliveries/devices/emails/creator/content projections all zero",
+  "cleanup": "Actual browser sign-out; app/design tabs closed, interception/media/device/viewport cleared. Own API4206/web3106/container stopped; database and private key preserved. One inert about:blank temporary tab remains outside browser URL control.",
+  "limits": [
+    "Broad original31/74 remain held; empty Home/inbox does not qualify populated producer/retraction/share flows",
+    "Inbox read-before-open and Home engagement bound operation source reviewed; no fake item/prompt producer inserted",
+    "Rating feedback append-only lost-response idempotency is not provided; preferences retry qualifies convergent state, not exactly-once revisions",
+    "DI16 notification-control artboards missing; no CSS/design invention or exact screen/full accessibility acceptance",
+    "No native/provider/signing/media/full privacy/release acceptance; no held purpose activated",
+    "Before-fix retained-form capture is intentionally negative evidence; initial outage button focus not accepted, final stalled sign-out button focus verified",
+    "Earlier captures before final private concealment layer separately retained; final-phone-saved captures and final sign-out/outage captures identify the final behavior"
+  ]
+}
