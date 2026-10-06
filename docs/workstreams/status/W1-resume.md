@@ -4,6 +4,14 @@ October 2 successor reconciliation: PR21 now incorporates current main `af38420d
 
 October 2 focused main increment: actual Ops/Account/Status return handling and truthful no-fan Account are implemented and personally browser-operated at cac6be9c on an independently restored, labelled canonical57 development copy. Same actual expired session rotates and returns to audits; Ops denies without membership. Original W1 remains closed. Production build/types/canonical generation/scoped checks pass; native/full workstream acceptance remains open. [Exact bounded evidence](../../../artifacts/workstreams/W1/resume/2026-10-02-ops-return/run.md).
 
+## October 1 — fresh rename compilation
+
+A fresh disposable application 5425598 clone renamed 799 text files/paths to temporary W1Rename. Frozen offline dependency install, generation/check (96 operations), backend/web and shipping iOS Simulator/Android debug builds pass. Metadata confirms renamed local IDs/display names. All 1,111 binary assets, including 110 original iOS references, remain byte-identical. Current e51213a generators retain all 15 renamed output bytes/mtimes. [Exact source/build/custody and cleanup](../../../artifacts/workstreams/W1/resume/2026-10-01-rename/run.md). Renamed products/copy and redundant W1 scratch output were removed after digest evidence. Main final products, private data/keys and peers remain. H17 fresh rename compilation is now personally established as supporting evidence; native operation, external identities and the full H01–H20 acceptance remain open.
+
+## October 1 — generation efficiency
+
+Canonical generators now retain unchanged output bytes and modification times, avoiding unnecessary native recompilation after small shared changes. Actual generation/check compared all 15 output files: zero byte or timestamp changes. API types, affected lint/format and both original shared/rename checks pass; no new tests or generated-source edits. [Evidence](../../../artifacts/workstreams/W1/resume/2026-10-01-generation/run.md). No build-speed or broader acceptance claim.
+
 ## October 1 — authorship practice keyboard recovery
 
 Personally operated four keyboard answers and observed focus fall to the page on completion. The web repair moves focus to Restart only when the completed answer owned focus and focus has not moved to another control. Light 4/4 and Night/reduced-motion 1/4 both recover focus; Restart resets card/score and Tab returns to answers. [Evidence and exact source/build hashes](../../../artifacts/workstreams/W1/resume/2026-10-01-comprehension/run.md). Production web build, typecheck and affected lint/formatting pass. Cards, author labels, score semantics and original references are preserved. This closes the observed browser focus defect only; H15's full visual/accessibility matrix and H16's consented-participant study remain open.
