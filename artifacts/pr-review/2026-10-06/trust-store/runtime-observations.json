@@ -1,0 +1,63 @@
+{
+  "environment": "isolated PostgreSQL 17 canonical development database, actual non-owner roles, synthetic account only",
+  "observations": [
+    {
+      "stage": "actual API and worker startup role checks",
+      "result": "accepted non-owner, non-superuser, no-BYPASSRLS roles"
+    },
+    {
+      "stage": "successful actor transaction",
+      "scoped": {
+        "pid": 347,
+        "account": "10000000-0000-4000-8000-000000000003",
+        "statement_timeout": "2s",
+        "lock_timeout": "500ms"
+      },
+      "afterCommit": {
+        "pid": 347,
+        "account": ""
+      }
+    },
+    {
+      "stage": "insert followed by actual domain failure",
+      "code": "local_rollback_observation",
+      "persistedRows": 0,
+      "idleClients": 1
+    },
+    {
+      "stage": "actual exhausted one-client pool",
+      "elapsedMs": 502,
+      "error": {
+        "name": "Error",
+        "code": "trust_connection_unavailable",
+        "message": "The trust data service is unavailable. Try again."
+      },
+      "waitersAfterReturn": 0
+    },
+    {
+      "stage": "actual callback exceeds five-second whole-transaction budget",
+      "elapsedMs": 5002,
+      "completedSleeps": 4,
+      "error": {
+        "name": "Error",
+        "code": "trust_transaction_unavailable",
+        "message": "The trust data service is unavailable. Try again."
+      },
+      "originalPid": 347,
+      "originalSourceStillPresentImmediately": 1,
+      "originalSourceStillPresentAfter2100ms": 0,
+      "recovery": {
+        "pid": 350,
+        "persisted_rows": 0,
+        "account": "10000000-0000-4000-8000-000000000003"
+      }
+    },
+    {
+      "stage": "final settlement",
+      "idleTransactions": 0,
+      "totalClients": 1,
+      "idleClients": 1,
+      "waitingClients": 0
+    }
+  ]
+}
