@@ -9,6 +9,46 @@
   <string name="identity_team_access_title" formatted="false">Current team access</string>
   <string name="identity_team_access_loading" formatted="false">Checking team access…</string>
   <string name="identity_team_access_required" formatted="false">Refresh team access before creating or changing invitations.</string>
+  <string name="identity_verification_invalid_link" formatted="false">This verification link is invalid.</string>
+  <string name="identity_verification_missing" formatted="false">This signed act could not be found.</string>
+  <string name="identity_verification_unavailable_title" formatted="false">Verification unavailable</string>
+  <string name="identity_verification_signed_unavailable_title" formatted="false">Signed act unavailable</string>
+  <string name="identity_verification_checking_title" formatted="false">Checking signature</string>
+  <string name="identity_verification_loading" formatted="false">Loading the current public verification.</string>
+  <string name="identity_verification_unconfigured" formatted="false">Verification is unavailable in this app. Try again when the connection is available.</string>
+  <string name="identity_verification_failed" formatted="false">Reconnect and try again. Verification could not be checked.</string>
+  <string name="identity_verification_historical_unavailable" formatted="false">The historical approval remains recorded. Current authority is unavailable.</string>
+  <string name="identity_verification_withdrawn_content_title" formatted="false">Content withdrawn</string>
+  <string name="identity_verification_withdrawn_content" formatted="false">The content is no longer public. Signature metadata remains available.</string>
+  <string name="identity_verification_metadata_title" formatted="false">Signed act metadata</string>
+  <string name="identity_verification_metadata_notice" formatted="false">Open the original authorized object to view this act. This page shows its signature metadata.</string>
+  <string name="identity_verification_private_title" formatted="false">Private signed act</string>
+  <string name="identity_verification_private_notice" formatted="false">The act’s private content and conversation are not public. This page shows signature metadata.</string>
+  <string name="identity_verification_author" formatted="false">Author</string>
+  <string name="identity_verification_act" formatted="false">Act</string>
+  <string name="identity_verification_content_version" formatted="false">Signed content version</string>
+  <string name="identity_verification_written_by" formatted="false">Written by</string>
+  <string name="identity_verification_approved_author" formatted="false">AI draft · creator approved</string>
+  <string name="identity_verification_authorized_only" formatted="false">Shown only with authorized content</string>
+  <string name="identity_verification_signed" formatted="false">Signed</string>
+  <string name="identity_verification_status" formatted="false">Status</string>
+  <string name="identity_verification_valid" formatted="false">Valid when checked</string>
+  <string name="identity_verification_key_revoked" formatted="false">Signing key revoked</string>
+  <string name="identity_verification_creator_revoked" formatted="false">Creator verification revoked</string>
+  <string name="identity_verification_withdrawn" formatted="false">This card was withdrawn</string>
+  <string name="identity_verification_shared_by" formatted="false">Shared by</string>
+  <string name="identity_verification_not_disclosed" formatted="false">Not disclosed</string>
+  <string name="identity_verification_hash" formatted="false">Exact act hash · SHA-256
+{hash}</string>
+  <string name="identity_verification_public_notice" formatted="false">Anyone can open this page. It shows authorized content, signature provenance and the revocation status when checked, with nothing else from the conversation.</string>
+  <string name="identity_verification_refresh" formatted="false">Refresh verification</string>
+  <string name="identity_verification_act_reply" formatted="false">Reply</string>
+  <string name="identity_verification_act_approved" formatted="false">Approved AI draft</string>
+  <string name="identity_verification_act_note" formatted="false">Note · one-to-many</string>
+  <string name="identity_verification_act_reaction" formatted="false">Reaction</string>
+  <string name="identity_verification_act_acceptance" formatted="false">Acceptance</string>
+  <string name="identity_verification_act_correction" formatted="false">Correction</string>
+  <string name="identity_verification_act_other" formatted="false">Signed act</string>
   <string name="creator_interview_estimate" formatted="false">About 20 minutes for your interview</string>
   <string name="welcome_title" formatted="false">Her AI answers you now. She answers in person when you ask.</string>
   <string name="welcome_body" formatted="false">Every message says who wrote it: Maya\'s AI, Maya herself, or her team. You\'ll always know which.</string>
