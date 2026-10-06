@@ -1,0 +1,118 @@
+{
+  "actor": "10000000-0000-4000-8000-000000000003",
+  "beforeFix": {
+    "actualReportResponseHeld": 201,
+    "firstCommittedCase": 3,
+    "matchingRowsBeforeOpeningAppeal": 1,
+    "unchangedRetryAfterOpeningAppeal": {
+      "caseNumber": 4,
+      "matchingRows": 2
+    }
+  },
+  "afterFix": {
+    "actualReportResponseHeld": 201,
+    "firstCommittedCase": 5,
+    "matchingRowsBeforeOpeningAppeal": 1,
+    "unchangedRetryAfterOpeningAndEditingAppeal": {
+      "caseNumber": 5,
+      "matchingRows": 1,
+      "appealDraftRetained": true
+    },
+    "actualAppealResponseHeld": 200,
+    "appealBeforeRetry": {
+      "caseNumber": 1,
+      "state": "appealed",
+      "version": 3,
+      "events": 1
+    },
+    "appealAfterRetryAndReportEdit": {
+      "caseNumber": 1,
+      "state": "appealed",
+      "version": 3,
+      "events": 1,
+      "independentReportDraftRetained": true
+    }
+  },
+  "actualAPIRows": [
+    {
+      "timestamp": "2026-10-06T21:57:14.366Z",
+      "correlationId": "41abb6e6-b380-4f6f-a909-3de9eaefd093",
+      "method": "POST",
+      "route": "/v1/trust/reports",
+      "status": 503,
+      "errorCode": "service_unavailable",
+      "failureClass": "database_lock_timeout",
+      "durationMs": 2019.21
+    },
+    {
+      "timestamp": "2026-10-06T21:57:28.704Z",
+      "correlationId": "d131207d-560e-41c6-886f-cec993ef5d59",
+      "method": "POST",
+      "route": "/v1/trust/reports",
+      "status": 201,
+      "errorCode": null,
+      "failureClass": null,
+      "durationMs": 91.54
+    },
+    {
+      "timestamp": "2026-10-06T21:59:31.634Z",
+      "correlationId": "a9713066-42c3-49a7-ad66-a5a9488bd9b9",
+      "method": "POST",
+      "route": "/v1/trust/reports",
+      "status": 201,
+      "errorCode": null,
+      "failureClass": null,
+      "durationMs": 14.29
+    },
+    {
+      "timestamp": "2026-10-06T21:59:54.638Z",
+      "correlationId": "86358a86-09cf-476e-84ef-4fa8d3ee8e7f",
+      "method": "POST",
+      "route": "/v1/trust/reports",
+      "status": 201,
+      "errorCode": null,
+      "failureClass": null,
+      "durationMs": 12.24
+    },
+    {
+      "timestamp": "2026-10-06T22:00:48.460Z",
+      "correlationId": "1909fee6-7b29-4c02-940a-9797a148a370",
+      "method": "POST",
+      "route": "/v1/trust/reports",
+      "status": 201,
+      "errorCode": null,
+      "failureClass": null,
+      "durationMs": 12.69
+    },
+    {
+      "timestamp": "2026-10-06T22:01:07.122Z",
+      "correlationId": "d0190239-be9a-47ea-8b36-de7e15452dfb",
+      "method": "POST",
+      "route": "/v1/trust/reports",
+      "status": 201,
+      "errorCode": null,
+      "failureClass": null,
+      "durationMs": 9.59
+    },
+    {
+      "timestamp": "2026-10-06T22:01:35.151Z",
+      "correlationId": "638c87bf-b52b-4efa-b497-ca0554825460",
+      "method": "POST",
+      "route": "/v1/trust/cases/:id/appeals",
+      "status": 200,
+      "errorCode": null,
+      "failureClass": null,
+      "durationMs": 13.95
+    },
+    {
+      "timestamp": "2026-10-06T22:02:14.860Z",
+      "correlationId": "b007a147-0dbc-4710-8ed5-b9a77576cd21",
+      "method": "POST",
+      "route": "/v1/trust/cases/:id/appeals",
+      "status": 200,
+      "errorCode": null,
+      "failureClass": null,
+      "durationMs": 7.31
+    }
+  ]
+}
