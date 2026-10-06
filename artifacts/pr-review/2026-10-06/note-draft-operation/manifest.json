@@ -9,7 +9,8 @@
     "Existing draft says Edit Note; editing changes status to UNSAVED CHANGES",
     "Genuine revision-4/5 responses released after newer edits; saved baseline advances while newer text remains unsaved",
     "Explicit save confirms revision 6; one object/six revisions/zero publications",
-    "Actual 390x844 Light/Night status fits without overflow; undo local name-token edit restores SAVED revision 6"
+    "Actual 390x844 Light/Night status fits without overflow; undo local name-token edit restores SAVED revision 6",
+    "Actual other-account sign-in clears local-only Note; former draft URL refuses that account; pending creator fresh reload also refused. Completed states observed, not first-frame latency measured."
   ],
   "faults": "Only genuine Fetch responses held after commit; deadline and late acknowledgements separately observed; no response fabricated",
   "checks": [
