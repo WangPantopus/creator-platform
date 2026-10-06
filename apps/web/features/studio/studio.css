@@ -331,10 +331,46 @@
 .w5-more-links a:last-child {
   border: 0;
 }
+.w5-team .w5-heading {
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+.w5-team-title {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
 .w5-team-columns {
   padding: var(--space-6) var(--space-4);
   display: grid;
   gap: var(--space-6);
+  align-items: start;
+}
+.w5-team-columns > .w5-card {
+  padding: var(--space-5);
+  border: 0;
+  background: var(--team-surface);
+}
+.w5-team .w5-team-creator-only {
+  margin-inline: 0;
+  padding: var(--space-5);
+  gap: 10px;
+  border: 0;
+}
+.w5-team-creator-only h2.qv-meta {
+  color: var(--maya-accent);
+  font: 400 11px var(--font-mono);
+  letter-spacing: 0.06em;
+  white-space: normal;
+}
+.w5-team-creator-only p {
+  font-size: 15px;
+}
+.w5-team-creator-only p.w5-team-attribution {
+  padding-top: var(--space-2);
+  color: var(--on-maya-muted);
+  font-size: 13px;
 }
 .w5-team .w5-editor a {
   color: inherit;

@@ -3439,7 +3439,10 @@ function Team({
   return (
     <section className="w5-team">
       <header className="w5-heading">
-        <h1>Team</h1>
+        <div className="w5-team-title">
+          <span className="qv-meta">TEAM</span>
+          <h1>Who helps, and what they can do</h1>
+        </div>
         <button
           ref={teamRefresh}
           type="button"
@@ -3750,14 +3753,13 @@ function Team({
             </p>
           )}
         </div>
-        <div className="w5-editor qv-on-maya">
-          <h2>Only you</h2>
-          <p>
-            Approve exact drafts and sign personal replies, Notes and reactions.
-          </p>
-          <p>
-            Team words always carry the team label. Team replies never fulfill a
-            personal commitment.
+        <div className="w5-editor qv-on-maya w5-team-creator-only">
+          <h2 className="qv-meta">Only you · Cannot be shared</h2>
+          <p>Approve anything as you</p>
+          <p>Deliver written replies, voice notes and calls</p>
+          <p>Change your AI's rules and guardrails</p>
+          <p className="w5-team-attribution">
+            Team members reply as your team, never as you.
           </p>
           <Link className="qv-btn qv-btn--quiet" href="/identity/account">
             Verification and account
