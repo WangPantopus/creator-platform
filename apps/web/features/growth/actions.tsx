@@ -5,15 +5,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { InboxItem, Cluster } from "./types";
 import { glyphs } from "@qelvora/ui-web";
-
-export class GrowthActionError extends Error {
-  constructor(
-    readonly status: number,
-    message: string,
-  ) {
-    super(message);
-  }
-}
+import { GrowthActionError, useGrowthSession } from "./session";
+export { GrowthActionError } from "./session";
 export async function mutate(path: string, body: unknown, method = "POST") {
   const response = await fetch(`/api/growth/${path}`, {
     method,
@@ -107,6 +100,7 @@ export function Inbox({
   items: InboxItem[];
   timeZone?: string;
 }) {
+  const { request } = useGrowthSession();
   const [error, setError] = useState("");
   const dateKey = (value: string | Date) => {
     const parts = Object.fromEntries(
@@ -162,7 +156,10 @@ export function Inbox({
               onClick={async (event) => {
                 event.preventDefault();
                 try {
-                  await mutate(`notifications/${item.id}/read`, {}, "PUT");
+                  await request(`notifications/${item.id}/read`, {
+                    method: "PUT",
+                    body: "{}",
+                  });
                   window.location.assign(item.destination);
                 } catch (e) {
                   setError(
