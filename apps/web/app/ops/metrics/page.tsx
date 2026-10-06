@@ -1,6 +1,12 @@
 "use client";
 import Link from "next/link";
-import { ErrorState, TrustSession, useTrust } from "../trust-client";
+import {
+  ErrorState,
+  TrustSession,
+  useTrustStatus,
+  useTrust,
+  retryTrustReads,
+} from "../trust-client";
 
 type Metrics = {
   environment: string;
@@ -14,8 +20,11 @@ type Metrics = {
   timings?: Record<string, { count: number; sum: number; buckets: number[] }>;
 };
 export default function MetricsPage() {
-  const { data, error, loading, refresh } =
-    useTrust<Metrics>("operations/metrics");
+  const sessionState = useTrustStatus();
+  const { data, error, loading, refresh } = useTrust<Metrics>(
+    "operations/metrics",
+    sessionState.ready,
+  );
   return (
     <main className="trust-page trust-metrics" id="ops-main" tabIndex={-1}>
       <Link href="/ops">Back to cases</Link>
@@ -26,7 +35,7 @@ export default function MetricsPage() {
         connected before their reliability or cost can be assessed.
       </p>
       {loading && <p role="status">Loading metrics…</p>}
-      <ErrorState error={error} retry={() => void refresh()} />
+      <ErrorState error={sessionState.error ?? error} retry={retryTrustReads} />
       {data && (
         <>
           <section className="trust-panel">
@@ -140,12 +149,12 @@ export default function MetricsPage() {
       )}
       <button
         className="qv-btn qv-btn--secondary"
-        disabled={loading}
+        disabled={loading || !sessionState.ready}
         onClick={() => void refresh()}
       >
         Refresh snapshot
       </button>
-      <TrustSession />
+      <TrustSession showErrors={false} />
     </main>
   );
 }

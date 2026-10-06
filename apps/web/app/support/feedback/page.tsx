@@ -3,10 +3,13 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import {
   TrustSession,
-  trustApi,
+  useTrustStatus,
+  useTrustRequest,
   useTrustSession,
 } from "../../ops/trust-client";
 export default function FeedbackPage() {
+  const request = useTrustRequest();
+  const sessionState = useTrustStatus();
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const form = useRef<HTMLFormElement>(null);
@@ -26,15 +29,17 @@ export default function FeedbackPage() {
       </p>
       <TrustSession />
       <form
+        hidden={sessionState.concealed}
         ref={form}
         className="trust-panel"
         onSubmit={async (event) => {
           event.preventDefault();
+          if (!sessionState.ready || busy) return;
           const current = epoch.current;
           setBusy(true);
           const input = new FormData(event.currentTarget);
           try {
-            await trustApi("feedback", {
+            await request("feedback", {
               consent: input.get("consent") === "on",
               cohort: input.get("cohort"),
               useful: input.get("useful") === "yes",
@@ -86,10 +91,13 @@ export default function FeedbackPage() {
           <input type="checkbox" name="consent" required /> I agree to share
           these answers for product feedback.
         </label>
-        <button className="qv-btn qv-btn--secondary" disabled={busy}>
+        <button
+          className="qv-btn qv-btn--secondary"
+          disabled={busy || !sessionState.ready}
+        >
           Send feedback
         </button>
-        {message && <p role="status">{message}</p>}
+        {!sessionState.concealed && message && <p role="status">{message}</p>}
       </form>
     </main>
   );

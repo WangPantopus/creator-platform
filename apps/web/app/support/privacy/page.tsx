@@ -1,14 +1,21 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import Link from "next/link";
 import type { PrivacyJobView } from "../../../../backend/src/modules/trust/contracts";
 import {
   ErrorState,
   TrustError,
   TrustSession,
+  useTrustStatus,
   useTrust,
   useTrustSession,
-  trustApi,
+  useTrustRequest,
   retryTrustReads,
   dateLabel,
 } from "../../ops/trust-client";
@@ -16,14 +23,19 @@ import {
 function Job({
   id,
   available,
+  readEnabled,
   onReadError,
 }: {
   id: string;
   available: boolean;
+  readEnabled: boolean;
   onReadError: (id: string, error: TrustError | null) => void;
 }) {
+  const request = useTrustRequest();
+  const sessionState = useTrustStatus();
   const { data, error, loading, refresh } = useTrust<PrivacyJobView>(
     `privacy/jobs/${id}`,
+    readEnabled,
   );
   const [actionError, setError] = useState<TrustError | null>(null);
   const [busy, setBusy] = useState(false);
@@ -79,7 +91,7 @@ function Job({
                   const current = epoch.current;
                   setBusy(true);
                   try {
-                    await trustApi(`privacy/jobs/${id}/retry`, {});
+                    await request(`privacy/jobs/${id}/retry`, {});
                     if (epoch.current !== current) return;
                     setError(null);
                     await refresh();
@@ -130,25 +142,26 @@ function Job({
                   ))}
               </nav>
             )}
-          <ErrorState error={actionError} />
+          <ErrorState error={sessionState.concealed ? null : actionError} />
         </>
       )}
     </article>
   );
 }
 export default function PrivacyPage() {
-  const { data, error, loading, refresh } = useTrust<{
-    items: PrivacyJobView[];
-  }>("privacy/jobs");
+  const request = useTrustRequest();
+  const sessionState = useTrustStatus();
   const capability = useTrust<{
     localDevelopment: boolean;
     actorVerification: string;
     verificationMethod?: string;
   }>("capabilities");
-  const [sessionState, setSessionState] = useState<{
-    ready: boolean;
-    error: TrustError | null;
-  }>({ ready: false, error: null });
+  // A read failure blocks actions, but must not toggle its own request gate.
+  // Only the original session/capability checks enable private reads again.
+  const privateReadsEnabled = sessionState.ready && !capability.error;
+  const { data, error, loading, refresh } = useTrust<{
+    items: PrivacyJobView[];
+  }>("privacy/jobs", privateReadsEnabled);
   const [jobErrors, setJobErrors] = useState<Record<string, TrustError>>({});
   const onReadError = useCallback((id: string, error: TrustError | null) => {
     setJobErrors((current) => {
@@ -193,9 +206,11 @@ export default function PrivacyPage() {
     setError(null);
     setResult("");
     key.current = null;
-    setSessionState({ ready: false, error: null });
     setJobErrors({});
   });
+  useLayoutEffect(() => {
+    if (!verificationReady) dialog.current?.close();
+  }, [verificationReady]);
   const run = async () => {
     if (!verificationReady || busy) return;
     const current = epoch.current;
@@ -203,7 +218,7 @@ export default function PrivacyPage() {
     setError(null);
     key.current ??= crypto.randomUUID();
     try {
-      const job = await trustApi<{ id: string; immediateDeny: boolean }>(
+      const job = await request<{ id: string; immediateDeny: boolean }>(
         "privacy/jobs",
         {
           kind,
@@ -268,7 +283,7 @@ export default function PrivacyPage() {
           Google Play subscriptions
         </a>
       </nav>
-      <TrustSession onSessionState={setSessionState} />
+      <TrustSession showErrors={false} />
       {capability.data?.verificationMethod === "current_session" && (
         <p>
           <a href="/api/auth/continue?returnTo=%2Fsupport%2Fprivacy">
@@ -284,6 +299,7 @@ export default function PrivacyPage() {
         </p>
       )}
       <form
+        hidden={sessionState.concealed}
         className="trust-panel"
         onSubmit={(event) => {
           event.preventDefault();
@@ -384,8 +400,8 @@ export default function PrivacyPage() {
               ? "Request deletion"
               : "Request export"}
         </button>
-        <ErrorState error={actionError} />
-        {result && <p role="status">{result}</p>}
+        <ErrorState error={sessionState.concealed ? null : actionError} />
+        {!sessionState.concealed && result && <p role="status">{result}</p>}
       </form>
       <section className="trust-panel">
         <h2>Request progress</h2>
@@ -395,6 +411,7 @@ export default function PrivacyPage() {
             key={job.id}
             id={job.id}
             available={readsReady}
+            readEnabled={privateReadsEnabled}
             onReadError={onReadError}
           />
         ))}
@@ -428,7 +445,7 @@ export default function PrivacyPage() {
             Keep my data
           </button>
         </div>
-        <ErrorState error={actionError} />
+        <ErrorState error={sessionState.concealed ? null : actionError} />
       </dialog>
     </main>
   );
