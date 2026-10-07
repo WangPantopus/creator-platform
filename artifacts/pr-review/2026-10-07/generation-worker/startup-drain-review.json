@@ -1,0 +1,116 @@
+{
+  "sourceBase": "29f04257227a2271ca544c9514372dea549c27b0",
+  "sourceSha256": {
+    "apps/backend/src/integration.ts": "d0173055bb7095ad0e3da882ca7a624c4bbe095e3f16084274dfebf82b8178d5",
+    "apps/backend/src/server.ts": "0d952bd55ccc7372398b9f506f0dacc42d5bfa99a2bc142a91f411048897015d"
+  },
+  "startup": {
+    "scope": "Actual canonical non-owner configured backend and original ingestion transaction. Fault injection is limited to local feature/router preparation; no provider, task, scope, job or receipt is fabricated.",
+    "observations": [
+      {
+        "case": "later_preparation_failure_during_actual_ingestion",
+        "actualDatabaseLockObserved": true,
+        "startupWaitedForDrain": true,
+        "corePoolUsableDuringDrain": true,
+        "originalPreparationFailurePreserved": true,
+        "originalIngestionDenialPreserved": "creator_required",
+        "cleanupCalls": 1,
+        "poolClosed": true,
+        "sourceBackendGone": true
+      },
+      {
+        "case": "feature_preparation",
+        "originalFailurePreserved": true,
+        "actualDatabaseCleanupErrorPreserved": "22012",
+        "otherCleanupCompleted": true,
+        "cleanupCalls": 1,
+        "poolClosed": true
+      },
+      {
+        "case": "router_assembly",
+        "originalFailurePreserved": true,
+        "actualDatabaseCleanupErrorPreserved": "22012",
+        "otherCleanupCompleted": true,
+        "cleanupCalls": 1,
+        "poolClosed": true
+      },
+      {
+        "case": "normal_close",
+        "sameClosePromise": true,
+        "lateCleanupRegistrationRefused": true,
+        "cleanupCalls": 1,
+        "originalRuntimeValidDuringDrain": true,
+        "runtimeRevokedAfterDrain": true,
+        "poolClosed": true
+      }
+    ],
+    "before": {
+      "migrations": 61,
+      "usage": 0,
+      "ingestion": 0,
+      "workspaces": 0
+    },
+    "after": {
+      "migrations": 61,
+      "usage": 0,
+      "ingestion": 0,
+      "workspaces": 0
+    }
+  },
+  "normalShutdownRegression": {
+    "scope": "Actual configured canonical backend without Trust, provider or feature activation. Tests only host resource shutdown.",
+    "observations": [
+      {
+        "case": "prepared_only",
+        "sameClosePromise": true,
+        "listenerClosed": true,
+        "poolClosed": true,
+        "sourceBackendGone": true,
+        "waitedForActualDatabaseRead": false,
+        "realtimeCloseCode": null,
+        "elapsedMs": 4
+      },
+      {
+        "case": "listening",
+        "sameClosePromise": true,
+        "listenerClosed": true,
+        "poolClosed": true,
+        "sourceBackendGone": true,
+        "waitedForActualDatabaseRead": false,
+        "realtimeCloseCode": null,
+        "elapsedMs": 3
+      },
+      {
+        "case": "active_database_read",
+        "sameClosePromise": true,
+        "listenerClosed": true,
+        "poolClosed": true,
+        "sourceBackendGone": true,
+        "waitedForActualDatabaseRead": true,
+        "realtimeCloseCode": null,
+        "elapsedMs": 208
+      },
+      {
+        "case": "realtime_connection",
+        "sameClosePromise": true,
+        "listenerClosed": true,
+        "poolClosed": true,
+        "sourceBackendGone": true,
+        "waitedForActualDatabaseRead": false,
+        "realtimeCloseCode": 1001,
+        "elapsedMs": 3
+      }
+    ]
+  },
+  "validation": {
+    "backendTypecheck": "passed",
+    "backendShippingBuild": "passed under original W2 heavy-build lock",
+    "scopedEslint": "passed",
+    "scopedPrettier": "passed"
+  },
+  "limits": [
+    "No held registry activation, provider request, genuine generation, financial settlement or completed privacy task.",
+    "Review fault injection is feature/router startup only. An initial router fixture used a disallowed path; corrected to a valid feature path before all four cases passed.",
+    "Trust shutdown ordering is source-reviewed; these personally operated cases use the actual canonical backend without Trust activation."
+  ]
+}

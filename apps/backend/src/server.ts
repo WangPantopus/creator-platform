@@ -58,8 +58,7 @@ const features: {
   conversationPrivacy?: ConversationPrivacyOwnerPorts;
   agentPrivacy?: AgentPrivacyOwnerPorts;
   commerce?: import("./modules/commerce/service.js").CommerceService;
-  close: (() => void | Promise<void>)[];
-} = { growth: null, close: [] };
+} = { growth: null };
 if (config.identityAdapter === "development" && !config.identitySessionKey)
   throw new Error(
     "Development identity requires an explicit IDENTITY_SESSION_KEY.",
@@ -115,7 +114,7 @@ try {
                   }),
               }
             : {}),
-          registerFeatures: async (runtime) => {
+          registerFeatures: async (runtime, onClose) => {
             const accountCalls = await AccountCallMetadata.prepare(runtime);
             const callControl = await InteractiveCallControl.prepare(runtime);
             const mediaEnvironment = readMediaEnvironment();
@@ -164,7 +163,7 @@ try {
                   }
                 : {}),
             });
-            features.close.push(() => host.close());
+            onClose(() => host.close());
             const { commerce, conversation, agent } = host;
             features.agentPrivacy = agent;
             features.commerce = commerce?.service;
@@ -243,6 +242,8 @@ try {
                   }
                 : undefined,
             });
+            const growth = features.growth;
+            if (growth) onClose(() => growth.close());
             const contentHost = composeContentHost({
               pool: runtime.pool,
               owners: {
@@ -345,11 +346,16 @@ try {
         })
       : undefined;
 } catch (error) {
-  await Promise.allSettled([
-    features.growth?.close(),
-    ...features.close.map((close) => Promise.resolve().then(close)),
-    growthAPIPool?.end(),
-  ]);
+  // Configured-host cleanup has already drained its features before its core
+  // pool. This independently owned API pool must remain alive until that ends.
+  try {
+    await growthAPIPool?.end();
+  } catch (cleanup) {
+    throw new AggregateError(
+      [error, cleanup],
+      "Server startup and Growth API pool cleanup failed.",
+    );
+  }
   throw error;
 }
 features.growth?.start();
@@ -378,8 +384,6 @@ const shutdown = () => {
         console.error(`Shutdown could not close ${name}.`);
       }
     };
-    await close("Growth worker", () => features.growth?.close());
-    for (const action of features.close) await close("feature workers", action);
     await close("configured backend", () =>
       configured
         ? configured.close()
