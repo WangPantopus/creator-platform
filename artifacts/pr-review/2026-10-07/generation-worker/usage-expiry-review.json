@@ -1,0 +1,208 @@
+{
+  "scope": "Closed actual role/metadata review only. No expiry job, lease, deletion, completed receipt or application activation manufactured. Positive actual expiry remains unqualified.",
+  "metadataDrifts": [
+    "runtime_private_job",
+    "worker_private_scope",
+    "runtime_claim",
+    "public_fence",
+    "role_login",
+    "role_bypass",
+    "role_membership",
+    "role_setting",
+    "extra_body_column",
+    "extra_profile_access",
+    "schema_create",
+    "invoker_function",
+    "disabled_delete_trigger",
+    "disabled_commit_trigger",
+    "job_force_rls",
+    "public_policy",
+    "missing_active_unique",
+    "weakened_state",
+    "replaced_fence",
+    "extra_owned_function"
+  ],
+  "allDetectedAndRestored": true,
+  "actualRoleRefusals": 6,
+  "operations": [
+    {
+      "emptyClaimCount": 0
+    },
+    {
+      "reservedRegistration": false
+    },
+    {
+      "jobs": 0,
+      "scopes": 0
+    },
+    {
+      "retained": {
+        "jobs": null,
+        "role": null,
+        "usage": 0,
+        "ledger": 61,
+        "scopes": null
+      }
+    }
+  ],
+  "unacceptedPartialCatalogueFingerprint": "fcaa1119acdea144ae0df8e6369d6f12575255f15d630ea7728dbdc03780bf96",
+  "composition": {
+    "all19FreshAndPreservedPartsEqual": true,
+    "fresh": {
+      "scope": "Closed35-source generation plus retention/export/ownership composition. Original0214 family and0217 deletion gates are not bypassed and remain outside this partial review.",
+      "sourceSha256": {
+        "apps/backend/src/modules/identity/schema-generation-terminal-page.sql": "8632008a15ba322f6caa3b7a393635851c9d7ea18dcd6ad7f175361d4281149c",
+        "apps/backend/src/modules/commerce/schema-generation-settlement-clock.sql": "542b271ee29a5fdede8eaa77620301854026831955b717229cb055bda5bf4296",
+        "apps/backend/src/modules/agent/migrations/0067_w2_usage_retention_expiry.sql": "1c118f5ec90a5a3f3578e056af14d5e56b1379464977c4a79bd6c2b62be7f17e",
+        "apps/backend/src/modules/agent/migrations/0113_w2_privacy_export_snapshot.sql": "f0b86d507bcb7ad194c680f93487f582354f711ca91f3deffb01843c263ea65a",
+        "apps/backend/src/modules/conversation/migrations/pending_w3_privacy_cursor_export.sql": "54c43918c34410404c81e2edc0356e8dac8f880211441ac48949bc0cc174121e",
+        "apps/backend/migrations/0209_w8_all_scope_privacy_ownership.sql": "6fa4006cb8c2f6901c7006595d08196573daef33f06aa6cec866a546ffcd2f01",
+        "apps/backend/src/modules/agent/migrations/pending_w2_accounting_retention_integrity.sql": "d5a3067868f232f5fda69b11b6f57e642c2913061108edae4943010fe3457c89",
+        "apps/backend/migrations/0230_w8_usage_expiry_tasks.sql": "2e30ef05d54352d37f37deb9a33ddc22cd9fad64d71ad98d6f69f99ff394a72e"
+      },
+      "catalogueParts": 19,
+      "compiler": [],
+      "originalCustodyRestored": {
+        "schemaSha256": "abb6c0506469c8b8f2507ca3e2cb4616a7d158213fb9fd661050ccad9fbe5bf3",
+        "rolesSha256": "7edf513d1efd243817a47418db4932a38b33b7da112f3c22e2344624ab993813",
+        "rowsSha256": "6a0ea90e18ad4e3a5e523c37f18e87179790dfd007168b4bd3fb21c3ae46cdc1",
+        "tables": 143,
+        "rows": 61
+      },
+      "retained": {
+        "ledger": 61,
+        "scopeRows": {
+          "agent": 0,
+          "conversation": 0
+        }
+      }
+    },
+    "preserved": {
+      "scope": "Closed35-source generation plus retention/export/ownership composition. Original0214 family and0217 deletion gates are not bypassed and remain outside this partial review.",
+      "sourceSha256": {
+        "apps/backend/src/modules/identity/schema-generation-terminal-page.sql": "8632008a15ba322f6caa3b7a393635851c9d7ea18dcd6ad7f175361d4281149c",
+        "apps/backend/src/modules/commerce/schema-generation-settlement-clock.sql": "542b271ee29a5fdede8eaa77620301854026831955b717229cb055bda5bf4296",
+        "apps/backend/src/modules/agent/migrations/0067_w2_usage_retention_expiry.sql": "1c118f5ec90a5a3f3578e056af14d5e56b1379464977c4a79bd6c2b62be7f17e",
+        "apps/backend/src/modules/agent/migrations/0113_w2_privacy_export_snapshot.sql": "f0b86d507bcb7ad194c680f93487f582354f711ca91f3deffb01843c263ea65a",
+        "apps/backend/src/modules/conversation/migrations/pending_w3_privacy_cursor_export.sql": "54c43918c34410404c81e2edc0356e8dac8f880211441ac48949bc0cc174121e",
+        "apps/backend/migrations/0209_w8_all_scope_privacy_ownership.sql": "6fa4006cb8c2f6901c7006595d08196573daef33f06aa6cec866a546ffcd2f01",
+        "apps/backend/src/modules/agent/migrations/pending_w2_accounting_retention_integrity.sql": "d5a3067868f232f5fda69b11b6f57e642c2913061108edae4943010fe3457c89",
+        "apps/backend/migrations/0230_w8_usage_expiry_tasks.sql": "2e30ef05d54352d37f37deb9a33ddc22cd9fad64d71ad98d6f69f99ff394a72e"
+      },
+      "catalogueParts": 19,
+      "compiler": [
+        {
+          "compiler": "creator.finish_agent_privacy_export_scope()",
+          "diagnostics": []
+        },
+        {
+          "compiler": "creator.finish_conversation_privacy_export_scope()",
+          "diagnostics": []
+        },
+        {
+          "compiler": "creator_trust.record_usage_expiry_delete()",
+          "diagnostics": []
+        },
+        {
+          "compiler": "creator_trust.finish_usage_expiry_scope()",
+          "diagnostics": []
+        },
+        {
+          "compiler": "creator_trust.retry_usage_expiry_task(uuid,uuid,text)",
+          "diagnostics": []
+        },
+        {
+          "compiler": "creator.end_agent_privacy_export(uuid)",
+          "diagnostics": []
+        },
+        {
+          "compiler": "creator.agent_privacy_export_matches(uuid)",
+          "diagnostics": []
+        },
+        {
+          "compiler": "creator.current_agent_privacy_export(uuid)",
+          "diagnostics": []
+        },
+        {
+          "compiler": "creator_trust.claim_usage_expiry_tasks(integer)",
+          "diagnostics": []
+        },
+        {
+          "compiler": "creator.begin_agent_privacy_export(uuid,uuid,uuid,uuid,uuid)",
+          "diagnostics": []
+        },
+        {
+          "compiler": "creator.fence_conversation_privacy_export(uuid,uuid,text,uuid,uuid,uuid)",
+          "diagnostics": []
+        },
+        {
+          "compiler": "creator.agent_privacy_export_rows(uuid)",
+          "diagnostics": []
+        },
+        {
+          "compiler": "creator_trust.fence_usage_expiry(uuid,uuid,uuid,uuid,text)",
+          "diagnostics": []
+        },
+        {
+          "compiler": "creator.ai_usage_retention_integrity()",
+          "diagnostics": []
+        },
+        {
+          "compiler": "creator.ai_cost_hold_original_clock()",
+          "diagnostics": []
+        }
+      ],
+      "originalCustodyRestored": {
+        "schemaSha256": "30ec4ec6c71eb2c4e02fb473e65356994e3dfbcd04d8982ff31f18fbb7b5bee2",
+        "rolesSha256": "367a2a706b7aa22b37cb18051881aa0f1eb0d2bcb82129e0a1ad98a8a063c8f9",
+        "rowsSha256": "36073ad827fc043be173cf1c015594361f0a366ff8acfc98a1281804f5148c05",
+        "tables": 137,
+        "rows": 236
+      },
+      "retained": {
+        "ledger": 61,
+        "scopeRows": {
+          "agent": 0,
+          "conversation": 0
+        }
+      }
+    }
+  },
+  "registration": {
+    "scope": "Original canonical61 non-owner runtime and Trust worker pools. Source and shipping prepare use the actual labelled local restoration callback then refuse unregistered accounting integrity. Direct0230 guard separately refuses reserved source/unaccepted catalogue.",
+    "sourceAndShippingFactoryRefusal": true,
+    "directExpiryRegistrationRefusal": true,
+    "acceptedExpiryPinAbsent": true,
+    "actualHeldRestorationChecks": 2,
+    "preabortPreserved": true,
+    "samePoolRefused": true,
+    "bothPoolsReusable": true,
+    "sourceOrAuthorityWrites": 0,
+    "runtime": {
+      "role": "creator_runtime",
+      "migrations": 61,
+      "expiry_absent": true
+    }
+  },
+  "validation": {
+    "sourceParent": "30b6d8605ffb212d88ae05d814d7cba1bf289353",
+    "sourceSha256": {
+      "apps/backend/migrations/0230_w8_usage_expiry_tasks.sql": "2e30ef05d54352d37f37deb9a33ddc22cd9fad64d71ad98d6f69f99ff394a72e",
+      "apps/backend/src/modules/trust/usage-expiry.ts": "46b134b933f8a0c136fcc923a05d79d65bef24c26e6d685bc8edafbe1860810e",
+      "apps/backend/src/modules/trust/usage-expiry-catalogue.ts": "c63c8ed4562992404cb9ff4e9da90de592a3773029cc365fe03f2cb1e31f88ef",
+      "apps/backend/src/modules/agent/usage-retention.ts": "76d794b039a112dd126754e43ce51dd0567b15dac86b20ebc87d56de53dfc6d7",
+      "apps/backend/src/workers/usage-expiry.ts": "d6a4ab20f162bb97399daecfff02aa56f70fe68e4377a71cc4df4db2d3de36b8",
+      "apps/backend/scripts/build.mjs": "d9d039ab7a5af37011dd8545626a0b20988f8e8d1882be154d7958eaac557b41"
+    },
+    "shippingBuild": "passed under original W2 heavy-build lock, including final concrete retention factory return type",
+    "eslint": "passed on final source",
+    "prettier": "passed on final source",
+    "existingBackendTests": "26 existing cases passed in107.97s, T11 original10000pairs/1000threads104.050s. During this run the only subsequent change named the concrete factory return type while preserving the same freeze. No new tests added.",
+    "positiveExpiryLifetime": "unqualified; source review only, no expiry job or lease fabricated",
+    "limits": [
+      "0230 remains reserved outside61 executable migrations; fourth whole-purpose expected pin undefined.",
+      "Original0214/0217 registration prerequisites remain outside the partial graph, not bypassed.",
+      "Creator-account accounting detachment, expiry restoration replay, canonical host activation, standalone unknown-cost monitoring and notification delivery remain unfinished."
+    ]
+  }
+}

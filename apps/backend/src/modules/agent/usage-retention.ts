@@ -29,6 +29,7 @@ export class PreparedUsageRetention {
     private readonly database: string,
     readonly policyVersion: string,
     private readonly authority: UsageExpiryAuthority,
+    private readonly authorityOwner: UsageExpiryAuthority,
   ) {}
 
   static async prepare(
@@ -40,7 +41,7 @@ export class PreparedUsageRetention {
       assertPrivacyRegistered: () => Promise<void>;
       signal?: AbortSignal;
     },
-  ) {
+  ): Promise<PreparedUsageRetention> {
     invariant(
       input.migration.version === USAGE_RETENTION_MIGRATION &&
         /^[a-f0-9]{64}$/u.test(input.migration.checksum) &&
@@ -88,17 +89,18 @@ export class PreparedUsageRetention {
     input.signal?.throwIfAborted();
     await input.assertPrivacyRegistered();
     input.signal?.throwIfAborted();
-    return Object.freeze(
-      new PreparedUsageRetention(
-        pool,
-        input.migration.checksum,
-        database,
-        input.policyVersion,
-        Object.freeze({
-          assertExpiry: input.authority.assertExpiry.bind(input.authority),
-        }),
-      ),
+    const retention = new PreparedUsageRetention(
+      pool,
+      input.migration.checksum,
+      database,
+      input.policyVersion,
+      Object.freeze({
+        assertExpiry: input.authority.assertExpiry.bind(input.authority),
+      }),
+      input.authority,
     );
+    Object.freeze(retention);
+    return retention;
   }
 
   async assertClient(client: PoolClient) {
@@ -120,6 +122,14 @@ export class PreparedUsageRetention {
       journal.retentionPolicyVersion === this.policyVersion,
       "accounting_retention_policy_mismatch",
       "Journal and expiry must use the same registered retention policy.",
+    );
+  }
+
+  assertExpiryOwner(pool: Pool, authority: UsageExpiryAuthority) {
+    invariant(
+      this.pool === pool && this.authorityOwner === authority,
+      "accounting_expiry_composition_mismatch",
+      "Expiry must retain this producer's original pool and authority.",
     );
   }
 

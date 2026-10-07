@@ -46,6 +46,7 @@ await build({
     integration: "src/integration.ts",
     "workers/start": "src/workers/start.ts",
     "workers/generation-composition": "src/workers/generation-composition.ts",
+    "workers/usage-expiry": "src/workers/usage-expiry.ts",
   },
   outdir: "dist",
   outExtension: { ".js": ".mjs" },

@@ -1150,6 +1150,15 @@
       "sourceSha256": "d5a3067868f232f5fda69b11b6f57e642c2913061108edae4943010fe3457c89",
       "state": "reserved_unapplied",
       "reason": "Additive original usage/hold creation-clock immutability, finite retained deadlines and immutable original retained disposition/known cost metadata. Existing0163/0165 sources, amounts and dates are not rewritten. Original financial/task/expiry authority remains necessary for the first disposition and erasure; no new role, membership, grant, expiry job or production activation. Full account detachment and expiry worker remain unfinished."
+    },
+    {
+      "id": "0230",
+      "owner": "W8",
+      "version": "0230_w8_usage_expiry_tasks",
+      "path": "apps/backend/migrations/0230_w8_usage_expiry_tasks.sql",
+      "sourceSha256": "2e30ef05d54352d37f37deb9a33ddc22cd9fad64d71ad98d6f69f99ff394a72e",
+      "state": "reserved_unapplied",
+      "reason": "Original policy-derived known-usage expiry jobs and leases. Isolated fixed scheduler, exact held runtime binding, actual deleted-row receipt and deferred separate-COMMIT fence. Completed batch receipts remove creator/account bindings; original due clock is not reset. No accepted purpose catalogue, executable registration, populated actual lease/expiry/restoration qualification, account detachment or activation. Preserve original0163/0165/0229 source and original policy/financial/restoration authority."
     }
   ]
 }
