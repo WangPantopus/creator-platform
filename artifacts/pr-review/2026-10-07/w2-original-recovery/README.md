@@ -42,3 +42,15 @@ This proves only the bounded archive recovery. Later waves, complete privacy
 registration, generation/provider integration and production release remain
 unfinished. No application traffic was authorized. See the
 [operator runbook](../../../../docs/operations/W2-original-archive-recovery.md).
+
+## Independent main integration
+
+The final command from main-based source `bb2adf38` was separately operated on
+another raw 28-source archive copy. It made its own current backup and independent
+restore, passed the same five preflight refusal checks, committed the twelve
+actual sources while retaining all 28 original ledger records and 1,001 business
+rows, then returned an empty plan and refused apply replay. The shared W2 build
+lock protected a successful backend shipping build. Scoped ESLint, Prettier,
+`git diff --check` and all nine existing backend contract tests passed. No new
+test code was added. Exact-head CI and the normal merge disposition are recorded
+in the focused PR.
