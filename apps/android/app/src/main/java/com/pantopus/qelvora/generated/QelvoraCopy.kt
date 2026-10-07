@@ -867,6 +867,7 @@ object QelvoraCopy {
     "w6RecordingPausedAfterAnInterruptionResumeOrPreviewWhatWas" to "Recording paused after an interruption. Resume or preview what was saved.",
     "w6RecordingCouldNotResumePreviewItOrRecordAgain" to "Recording could not resume. Preview it or record again.",
     "w6TheSavedRecordingCouldNotBePlayedRecordAgain" to "The saved recording could not be played. Record again.",
+    "w6ThePrivatePreviewCouldNotBeClearedTryAgainBefore" to "The private preview could not be cleared. Try again before recording.",
     "w6RecordAndListenBeforeUploadingYourPreviewStaysOnThis" to "Record and listen before uploading. Your preview stays on this device.",
     "w6PlayPrivatePreview" to "Play private preview",
     "w6PausePreview" to "Pause preview",

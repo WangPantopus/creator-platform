@@ -67,7 +67,7 @@ class StoreMembershipCoordinator(context:Context,private val accountId:String,pr
         status=if(products.isEmpty()) "No approved monthly membership products are available in Google Play." else ""
     }
     fun purchase(context:Context,product:PlayMembershipProduct) {
-        if(busy || !client.isReady || products.none {it.detail.productId==product.detail.productId && it.offer.offerToken==product.offer.offerToken}) return
+        if(!scope.isActive || busy || !client.isReady || products.none {it.detail.productId==product.detail.productId && it.offer.offerToken==product.offer.offerToken}) return
         val host=activity(context) ?: run {status="The purchase sheet needs the active app screen.";return}
         val params=BillingFlowParams.newBuilder().setObfuscatedAccountId(accountBinding(accountId))
             .setProductDetailsParamsList(listOf(BillingFlowParams.ProductDetailsParams.newBuilder().setProductDetails(product.detail).setOfferToken(product.offer.offerToken).build())).build()
@@ -94,13 +94,15 @@ class StoreMembershipCoordinator(context:Context,private val accountId:String,pr
         if(purchase.accountIdentifiers?.obfuscatedAccountId!=accountBinding(accountId)) {status="This purchase belongs to another app account. Switch to its original account before restoring.";return}
         try {
             val confirmed=deliver(purchase.purchaseToken)
+            currentCoroutineContext().ensureActive()
+            if(!scope.isActive) return
             status=if(confirmed) "Purchase verified by the server. Refreshing access." else "Server verification is processing. Access refreshes when confirmed."
         } catch(error:CancellationException) {throw error}
         catch(_:Exception) {status="Server verification is unavailable. Restore when connected; this purchase remains recoverable."}
     }
 }
 
-@Composable fun StoreMembershipPane(context:Context,accountId:String,client:CommerceClient,catalog:List<CommerceStoreProduct>,refresh:suspend ()->Unit) {
+@Composable fun StoreMembershipPane(context:Context,accountId:String,client:CommerceClient,catalog:List<CommerceStoreProduct>,available:Boolean,refresh:suspend ()->Unit) {
     val scope=rememberCoroutineScope()
     val coordinator=remember(accountId,client) {StoreMembershipCoordinator(context,accountId) { token ->
         val result=client.request("stores/verify", kotlinx.serialization.json.buildJsonObject {
@@ -114,9 +116,9 @@ class StoreMembershipCoordinator(context:Context,private val accountId:String,pr
     LaunchedEffect(coordinator,catalog) {coordinator.load(catalog)}
     coordinator.products.forEach { product ->
         val price=product.offer.pricingPhases.pricingPhaseList.single().formattedPrice
-        Button("${product.detail.name} · $price / month",ButtonVariant.SECONDARY,block=true,disabled=coordinator.busy) {coordinator.purchase(context,product)}
+        Button("${product.detail.name} · $price / month",ButtonVariant.SECONDARY,block=true,disabled=coordinator.busy || !available) {coordinator.purchase(context,product)}
     }
-    Button("Restore purchases",ButtonVariant.QUIET,disabled=coordinator.busy) {scope.launch {coordinator.restore()}}
+    Button("Restore purchases",ButtonVariant.QUIET,disabled=coordinator.busy || !available) {scope.launch {coordinator.restore()}}
     StoreSubscriptionManagement(context,disabled=coordinator.busy)
     if(coordinator.status.isNotEmpty()) Notice(title="Store status",children=coordinator.status)
 }

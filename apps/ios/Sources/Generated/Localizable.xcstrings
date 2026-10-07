@@ -9395,6 +9395,17 @@
         }
       }
     },
+    "The private preview could not be cleared. Try again before recording.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The private preview could not be cleared. Try again before recording."
+          }
+        }
+      }
+    },
     "Record and listen before uploading. Your preview stays on this device.": {
       "extractionState": "manual",
       "localizations": {
