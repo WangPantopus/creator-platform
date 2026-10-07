@@ -1,4 +1,4 @@
-import type { PoolClient, QueryConfig } from "pg";
+import { Client, type Pool, type PoolClient, type QueryConfig } from "pg";
 import { DomainError } from "../../core/errors.js";
 import { querySettlementUncertain } from "../../core/query-settlement.js";
 
@@ -37,6 +37,9 @@ export class ContentHeldClient {
   private transportFailure: unknown;
   private closeFailure: unknown;
   private ending: Promise<void> | undefined;
+  private cancelling: Promise<void> | undefined;
+  private sourcePid: number | undefined;
+  private readonly cancellationFailures: unknown[] = [];
   private readonly aborted: Promise<never>;
   private rejectAbort!: (reason: unknown) => void;
 
@@ -46,13 +49,14 @@ export class ContentHeldClient {
   };
   private readonly abort = () => {
     this.discard = true;
-    void this.close();
+    void this.cancelAndClose();
     this.rejectAbort(this.signal?.reason);
   };
 
   constructor(
     readonly client: PoolClient,
     private readonly signal?: AbortSignal,
+    private readonly sourcePool?: Pool,
   ) {
     this.aborted = new Promise<never>((_, reject) => {
       this.rejectAbort = reject;
@@ -68,6 +72,56 @@ export class ContentHeldClient {
   private close(): Promise<void> {
     return (this.ending ??= this.client.end().catch((error: unknown) => {
       this.closeFailure = error;
+    }));
+  }
+
+  /** A socket close alone does not interrupt a server waiting on a lock. The
+   * optional original pool supplies only its existing cancellation credential;
+   * the PID is observed on the actual held client before starting its work. */
+  private cancelAndClose(): Promise<void> {
+    return (this.cancelling ??= (async () => {
+      try {
+        if (this.sourcePool && this.sourcePid !== undefined) {
+          const original = Number(
+            this.sourcePool.options.connectionTimeoutMillis,
+          );
+          const controller = new Client({
+            ...this.sourcePool.options,
+            connectionTimeoutMillis:
+              Number.isFinite(original) && original > 0
+                ? Math.min(original, 1500)
+                : 1500,
+            statement_timeout: 1500,
+            query_timeout: control(this.client, "").query_timeout,
+            pipeline: false,
+          });
+          const onError = (error: Error) =>
+            this.cancellationFailures.push(error);
+          controller.on("error", onError);
+          try {
+            await controller.connect();
+            const result = await controller.query<{ cancelled: boolean }>(
+              "SELECT pg_cancel_backend($1) AS cancelled",
+              [this.sourcePid],
+            );
+            if (result.rows[0]?.cancelled !== true)
+              throw new DomainError(
+                "content_privacy_cancel_unavailable",
+                "The actual held privacy source could not be cancelled.",
+                503,
+              );
+          } catch (error) {
+            this.cancellationFailures.push(error);
+          } finally {
+            await controller.end().catch(onError);
+            controller.removeListener("error", onError);
+          }
+        }
+      } finally {
+        await this.close();
+      }
+    })().catch((error: unknown) => {
+      this.cancellationFailures.push(error);
     }));
   }
 
@@ -88,6 +142,21 @@ export class ContentHeldClient {
 
   async begin(): Promise<void> {
     this.discard = true;
+    if (this.sourcePool) {
+      const source = await this.run(() =>
+        this.client.query(
+          control(this.client, "SELECT pg_backend_pid() AS pid"),
+        ),
+      );
+      const pid: unknown = source.rows[0]?.pid;
+      if (typeof pid !== "number" || !Number.isSafeInteger(pid) || pid <= 0)
+        throw new DomainError(
+          "content_privacy_cancel_unavailable",
+          "The original held source PID is required for cancellation.",
+          503,
+        );
+      this.sourcePid = pid;
+    }
     const result = await this.run(() =>
       this.client.query(control(this.client, "BEGIN")),
     );
@@ -142,7 +211,11 @@ export class ContentHeldClient {
         }
       }
       this.discard ||= this.signal?.aborted === true;
+      if (this.cancelling) await this.cancelling;
       if (this.discard || this.ending) await this.close();
+      // Cancellation can arrive while an uncertain source close is pending.
+      if (this.cancelling) await this.cancelling;
+      errors.push(...this.cancellationFailures);
       for (const error of [this.transportFailure, this.closeFailure])
         if (error !== undefined && !errors.includes(error)) errors.push(error);
     } finally {
