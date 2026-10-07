@@ -1,36 +1,55 @@
 "use client";
 import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { mutate } from "./actions";
-import { useGrowthSession } from "./session";
+import { GrowthActionError, useGrowthSession } from "./session";
 export function FeedbackForm() {
   const { request } = useGrowthSession();
   const [category, setCategory] = useState("notification"),
     [score, setScore] = useState(""),
     [busy, setBusy] = useState(false),
+    [confirmed, setConfirmed] = useState(false),
     [message, setMessage] = useState("");
+  const pending = useRef(false);
+  const intent = useRef<{
+    idempotencyKey: string;
+    category: string;
+    score: number | null;
+  } | null>(null);
+  const edited = () => {
+    intent.current = null;
+    setConfirmed(false);
+    setMessage("");
+  };
   return (
     <form
       className="growth-stack"
       onSubmit={async (event) => {
         event.preventDefault();
+        if (pending.current || confirmed) return;
+        pending.current = true;
+        intent.current ??= {
+          idempotencyKey: crypto.randomUUID(),
+          category,
+          score: score ? Number(score) : null,
+        };
         setBusy(true);
+        setMessage("");
         try {
           await request("feedback", {
             method: "POST",
-            body: JSON.stringify({
-              category,
-              score: score ? Number(score) : null,
-            }),
+            body: JSON.stringify(intent.current),
           });
+          setConfirmed(true);
           setMessage(growthCopy.growthFeedbackSavedThankYou);
         } catch (error) {
           setMessage(
-            error instanceof Error
+            error instanceof GrowthActionError && error.status < 500
               ? error.message
-              : growthCopy.growthFeedbackWasNotSaved,
+              : growthCopy.productFeedbackUnconfirmed,
           );
         } finally {
+          pending.current = false;
           setBusy(false);
         }
       }}
@@ -42,8 +61,12 @@ export function FeedbackForm() {
       <label>
         {growthCopy.growthTopic}
         <select
+          disabled={busy}
           value={category}
-          onChange={(event) => setCategory(event.target.value)}
+          onChange={(event) => {
+            setCategory(event.target.value);
+            edited();
+          }}
         >
           <option value="discovery_fit">
             {growthCopy.growthFindingCreators}
@@ -56,8 +79,12 @@ export function FeedbackForm() {
       <label>
         {growthCopy.growthRating}
         <select
+          disabled={busy}
           value={score}
-          onChange={(event) => setScore(event.target.value)}
+          onChange={(event) => {
+            setScore(event.target.value);
+            edited();
+          }}
         >
           <option value="">{growthCopy.growthSkipRating}</option>
           {[1, 2, 3, 4, 5].map((value) => (
@@ -70,7 +97,7 @@ export function FeedbackForm() {
       <button
         type="submit"
         className="qv-btn qv-btn--secondary"
-        disabled={busy}
+        disabled={busy || confirmed}
       >
         {busy ? growthCopy.growthSaving : growthCopy.growthSendFeedback}
       </button>
