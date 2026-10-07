@@ -57,7 +57,7 @@ export async function trustTransaction<T>(
     } catch (cause) {
       throw unavailable("trust_connection_unavailable", cause);
     }
-    held = new ContentHeldClient(client, signal);
+    held = new ContentHeldClient(client, signal, pool);
     await held.begin();
     // The core pool does not set a server timeout. Bound its actual source
     // query too, preserving any shorter existing timeout on this client.
@@ -70,9 +70,16 @@ export async function trustTransaction<T>(
     );
     if (options.readOnly)
       await held.run(() => client.query("SET TRANSACTION READ ONLY"));
-    result = await held.run(() => work(client));
+    // Cancellation interrupts the actual database source, but cannot release
+    // its client while the original owner callback or finalizer still runs.
+    result = await work(client);
+    signal.throwIfAborted();
     if (!options.readOnly) await held.commit();
   } catch (cause) {
+    // A shorter pg read budget can reject before the host deadline while the
+    // server still runs its query. Cancel that same observed source as well.
+    if (querySettlementUncertain(cause) && !signal.aborted)
+      deadline.abort(cause);
     failed = true;
     failure =
       signal.aborted ||

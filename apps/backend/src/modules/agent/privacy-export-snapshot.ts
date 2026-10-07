@@ -342,6 +342,8 @@ export class PreparedAgentPrivacyExport {
         const failures: unknown[] = [];
         const control = new Client({
           ...this.pool.options,
+          // pg-pool makes the original password/provider non-enumerable.
+          password: this.pool.options.password,
           connectionTimeoutMillis: agentPrivacyConnectionTimeout(this.pool),
           statement_timeout: 1500,
           query_timeout: agentPrivacyQueryTimeout(client, 1500),
