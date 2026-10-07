@@ -298,24 +298,13 @@ export class AgentLifecycle {
         // A replay must not acknowledge a resurrected family either.
         await assertDetached();
         const retainedAccounting = lineage
-          ? (
-              await client.query<{
-                policy_version: string;
-                reason: string;
-                unknown: boolean;
-                until: Date;
-                records: string;
-              }>(
-                "SELECT accounting_retention_version AS policy_version,accounting_retention_reason AS reason,cost_micros IS NULL AS unknown,max(accounting_retained_until) AS until,count(*)::text AS records FROM creator.ai_usage WHERE creator_id=$1 AND accounting_retained_until IS NOT NULL GROUP BY accounting_retention_version,accounting_retention_reason,cost_micros IS NULL LIMIT 201",
-                [scope.creatorId],
-              )
-            ).rows
+          ? await this.usageRetention!.detachAccount(
+              client,
+              scope,
+              assertTaskInTransaction,
+              signal,
+            )
           : [];
-        invariant(
-          retainedAccounting.length <= 200,
-          "bounded_subjob_required",
-          "Complete bounded retained-accounting receipts before acknowledging creator erasure.",
-        );
         if (lineage) {
           const currentBoundary = await accountingBoundary!(client);
           invariant(
@@ -328,21 +317,11 @@ export class AgentLifecycle {
         await assertTaskInTransaction(client);
         return {
           ...receipt,
-          retainedAccounting: retainedAccounting.map((row) => ({
-            policyVersion: row.policy_version,
-            records: row.records,
-            unknown: row.unknown,
-            until: row.unknown ? null : row.until.toISOString(),
-            reason: row.reason,
-          })),
+          retainedAccounting,
           retained: retainedAccounting.map((row) => ({
-            category: row.unknown
-              ? "unresolved_agent_cost"
-              : "unlinked_agent_accounting",
-            until: row.unknown ? null : row.until.toISOString(),
-            reason: row.unknown
-              ? `${row.reason} Unresolved provider cost requires actual reconciliation; expiry cannot clear this marker.`
-              : row.reason,
+            category: "unlinked_agent_accounting",
+            until: row.until,
+            reason: row.reason,
           })),
         };
       },

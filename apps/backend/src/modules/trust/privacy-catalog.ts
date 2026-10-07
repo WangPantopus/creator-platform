@@ -1,6 +1,7 @@
 import type { PoolClient } from "pg";
 import { DomainError } from "../../core/errors.js";
 import { originalPrivacyFamilyRegisteredExtension } from "./privacy-family-catalog.js";
+import { accountDetachedUsageRegisteredExtension } from "./account-detached-usage-catalogue.js";
 
 const functions = [
   {
@@ -47,8 +48,16 @@ export async function assertPrivacyTaskCatalog(
 ) {
   signal?.throwIfAborted();
   const family = await originalPrivacyFamilyRegisteredExtension(client, signal);
+  const detached = await accountDetachedUsageRegisteredExtension(
+    client,
+    signal,
+  );
   signal?.throwIfAborted();
-  const expectedFunctions = family ? [...functions, family] : functions;
+  const expectedFunctions = [
+    ...functions,
+    ...(family ? [family] : []),
+    ...(detached ? [detached] : []),
+  ];
   const expectedColumns = family
     ? [
         ...columns,
@@ -106,7 +115,9 @@ export async function assertPrivacyTaskCatalog(
                 (p.oid=to_regprocedure('creator_trust.fence_privacy_task(uuid,uuid,text,text,uuid,uuid,text,uuid)')
                  AND acl.grantee=(SELECT oid FROM pg_roles WHERE rolname='creator_runtime'))
                 OR ($6::boolean AND p.oid=to_regprocedure('creator_trust.privacy_task_original_binding(uuid,text,uuid)')
-                 AND acl.grantee=(SELECT oid FROM pg_roles WHERE rolname='creator_privacy_family')))))))
+                 AND acl.grantee=(SELECT oid FROM pg_roles WHERE rolname='creator_privacy_family'))
+                OR ($7::boolean AND p.oid=to_regprocedure('creator_trust.usage_account_delete_bound(uuid)')
+                 AND acl.grantee=(SELECT oid FROM pg_roles WHERE rolname='creator_usage_detachment')))))))
         AND has_function_privilege(current_user,to_regprocedure('creator_trust.fence_privacy_task(uuid,uuid,text,text,uuid,uuid,text,uuid)'),'EXECUTE')
         AND NOT EXISTS(SELECT FROM pg_class c CROSS JOIN LATERAL aclexplode(coalesce(c.relacl,acldefault(CASE WHEN c.relkind='S' THEN 's'::"char" ELSE 'r'::"char" END,c.relowner))) acl
           WHERE c.relkind IN('r','p','v','m','S','f') AND acl.grantee=(SELECT oid FROM role) AND c.oid<>(SELECT oid FROM scope))
@@ -159,6 +170,7 @@ export async function assertPrivacyTaskCatalog(
         JSON.stringify(expectedColumns),
         expectedFunctions.length,
         family !== undefined,
+        detached !== undefined,
       ],
     )
   ).rows[0]?.ready;

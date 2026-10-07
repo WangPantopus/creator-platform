@@ -1159,6 +1159,15 @@
       "sourceSha256": "2e30ef05d54352d37f37deb9a33ddc22cd9fad64d71ad98d6f69f99ff394a72e",
       "state": "reserved_unapplied",
       "reason": "Original policy-derived known-usage expiry jobs and leases. Isolated fixed scheduler, exact held runtime binding, actual deleted-row receipt and deferred separate-COMMIT fence. Completed batch receipts remove creator/account bindings; original due clock is not reset. No accepted purpose catalogue, executable registration, populated actual lease/expiry/restoration qualification, account detachment or activation. Preserve original0163/0165/0229 source and original policy/financial/restoration authority."
+    },
+    {
+      "id": "0231",
+      "owner": "W2",
+      "version": "0231_w2_account_detached_usage",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_account_detached_usage.sql",
+      "sourceSha256": "d19aa583d71250c85bdbce97c5d2c168dbb683009451de594f4434574c16874f",
+      "state": "reserved_unapplied",
+      "reason": "Original W8 account-delete scope permits atomic transfer of already-disposed known usage into private accounting with no creator/account/fan/thread identifiers or private text. Preserve original dates/amounts/disposition; unknown refuses. Fixed bounded detached expiry journals actual removed IDs. Caller/fence-catalogue integration, complete purpose acceptance and genuine deletion/expiry/restoration remain unqualified; no activation."
     }
   ]
 }

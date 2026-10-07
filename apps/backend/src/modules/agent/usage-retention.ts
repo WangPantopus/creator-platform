@@ -6,6 +6,8 @@ import { agentPrivacyTransaction } from "./privacy-transaction.js";
 import { unresolvedAccountingInTransaction } from "./accounting-uncertainty.js";
 import { agentPreparationRead } from "./preparation-read.js";
 import { assertAccountingRetentionIntegrity } from "./retention-integrity.js";
+import { assertAccountDetachedUsageCatalogue } from "../trust/account-detached-usage-catalogue.js";
+import { accountingRetentionPolicy } from "../trust/accounting-retention-policy.js";
 
 // Held above the lineage prerequisite; original reserved SQL stays immutable.
 export const USAGE_RETENTION_MIGRATION = "0165_w2_usage_retention_expiry";
@@ -131,6 +133,77 @@ export class PreparedUsageRetention {
       "accounting_expiry_composition_mismatch",
       "Expiry must retain this producer's original pool and authority.",
     );
+  }
+
+  /** The original W8 account-delete scope is checked inside the actual DELETE
+   * trigger too. Its private accounting copy and aggregate receipt commit with
+   * the creator purge; replay neither copies an identity nor resets a date. */
+  async detachAccount(
+    client: PoolClient,
+    scope: CreatorScope,
+    assertTask: (client: PoolClient) => Promise<void>,
+    signal: AbortSignal,
+  ) {
+    invariant(
+      !scope.development &&
+        this.policyVersion === accountingRetentionPolicy.version,
+      "account_detached_usage_unconfigured",
+      "Use the approved original account deletion and accounting policy.",
+    );
+    signal.throwIfAborted();
+    await this.assertClient(client);
+    await assertAccountDetachedUsageCatalogue(client, signal);
+    for (;;) {
+      await assertTask(client);
+      signal.throwIfAborted();
+      const deleted = await client.query(
+        `WITH page AS (
+          SELECT id FROM creator.ai_usage WHERE creator_id=$1
+           AND accounting_retained_until IS NOT NULL AND cost_micros IS NOT NULL
+          ORDER BY id LIMIT 100 FOR UPDATE
+        ) DELETE FROM creator.ai_usage u USING page WHERE u.creator_id=$1 AND u.id=page.id RETURNING u.id`,
+        [scope.creatorId],
+      );
+      await assertTask(client);
+      signal.throwIfAborted();
+      if (!deleted.rowCount) break;
+    }
+    const remaining = await client.query(
+      "SELECT 1 FROM creator.ai_usage WHERE creator_id=$1 LIMIT 1",
+      [scope.creatorId],
+    );
+    invariant(
+      !remaining.rowCount,
+      "accounting_cleanup_pending",
+      "No creator-linked accounting may remain after account detachment.",
+    );
+    const { rows } = await client.query<{
+      records: string;
+      original_until: string;
+    }>("SELECT * FROM creator_trust.account_detached_usage_summary($1)", [
+      scope.creatorId,
+    ]);
+    invariant(
+      rows.length <= 1 &&
+        rows.every(
+          (row) =>
+            /^[1-9][0-9]*$/.test(row.records) &&
+            Number.isFinite(Date.parse(row.original_until)),
+        ),
+      "accounting_detachment_receipt_unavailable",
+      "The original aggregate accounting disposition must remain available.",
+    );
+    await assertAccountDetachedUsageCatalogue(client, signal);
+    await assertTask(client);
+    signal.throwIfAborted();
+    return rows.map((row) => ({
+      policyVersion: this.policyVersion,
+      records: row.records,
+      unknown: false,
+      until: new Date(row.original_until).toISOString(),
+      reason:
+        "Known provider costs retain their original amounts and references for twelve UTC calendar months from original settlement, without account identity or private text.",
+    }));
   }
 
   /** A bounded producer for W8's actual expiry worker. Current owner or a

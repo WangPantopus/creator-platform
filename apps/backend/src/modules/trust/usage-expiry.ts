@@ -13,6 +13,7 @@ import {
 import { assertAccountingRetentionIntegrity } from "../agent/retention-integrity.js";
 import { accountingRetentionPolicy } from "./accounting-retention-policy.js";
 import { assertUsageExpiryCatalogue } from "./usage-expiry-catalogue.js";
+import { assertAccountDetachedUsageCatalogue } from "./account-detached-usage-catalogue.js";
 import { TrustStore } from "./store.js";
 import { trustTransaction } from "./transaction.js";
 
@@ -72,6 +73,7 @@ export class PreparedUsageExpiryOwner {
         await input.assertRestoredInTransaction(client);
         await assertAccountingRetentionIntegrity(client, input.signal);
         await assertUsageExpiryCatalogue(client, input.signal);
+        await assertAccountDetachedUsageCatalogue(client, input.signal);
         const database = (
           await client.query<{ name: string }>(
             "SELECT current_database() AS name",
@@ -88,6 +90,7 @@ export class PreparedUsageExpiryOwner {
       async (client) => {
         await input.assertRestoredInTransaction(client);
         await assertUsageExpiryCatalogue(client, input.signal);
+        await assertAccountDetachedUsageCatalogue(client, input.signal);
         const current = (
           await client.query<{ name: string }>(
             "SELECT current_database() AS name",
@@ -225,7 +228,11 @@ export class PreparedUsageExpiryOwner {
         const result = await this.pass(repository, retention, signal);
         onPass?.(result);
         try {
-          await delay(result.claimed ? 1000 : 60_000, undefined, { signal });
+          await delay(
+            result.claimed || result.expiredRecords ? 1000 : 60_000,
+            undefined,
+            { signal },
+          );
         } catch (cause) {
           if (!signal.aborted) throw cause;
         }
@@ -250,24 +257,39 @@ export class PreparedUsageExpiryOwner {
       "Expiry runs outside request authority.",
     );
     signal.throwIfAborted();
-    const claims = await trustTransaction(
+    const batch = await trustTransaction(
       this.workerPool,
       async (client) => {
         await this.assertDatabase(client);
         await this.assertRestoredInTransaction(client);
         await assertUsageExpiryCatalogue(client, signal);
+        await assertAccountDetachedUsageCatalogue(client, signal);
+        const detached = (
+          await client.query<{ expired: number }>(
+            "SELECT creator_trust.expire_detached_usage(200) AS expired",
+          )
+        ).rows[0]?.expired;
+        invariant(
+          typeof detached === "number" &&
+            Number.isSafeInteger(detached) &&
+            detached >= 0 &&
+            detached <= 200,
+          "accounting_detachment_receipt_unavailable",
+          "Actual detached accounting expiry must return its bounded deletion count.",
+        );
         const { rows } = await client.query(
           "SELECT * FROM creator_trust.claim_usage_expiry_tasks(1)",
         );
         const claims = z.array(Claimed).max(1).parse(rows);
         await this.assertRestoredInTransaction(client);
         signal.throwIfAborted();
-        return claims;
+        return { claims, detached };
       },
       { signal },
     );
-    const claimed = claims[0];
-    if (!claimed) return { claimed: 0, completed: 0, expiredRecords: 0 };
+    const claimed = batch.claims[0];
+    if (!claimed)
+      return { claimed: 0, completed: 0, expiredRecords: batch.detached };
     const claim = Object.freeze({ ...claimed, signal });
     try {
       const result = await this.current.run(claim, () =>
@@ -287,7 +309,7 @@ export class PreparedUsageExpiryOwner {
       return {
         claimed: 1,
         completed: 1,
-        expiredRecords: result.expiredIds.length,
+        expiredRecords: batch.detached + result.expiredIds.length,
       };
     } catch (error) {
       // An uncertain COMMIT may already have completed the original job.
