@@ -3,6 +3,7 @@ import type { Pool, PoolClient } from "pg";
 import type { Actor } from "../identity/adapter.js";
 import { DomainError } from "../../core/errors.js";
 import { assertCurrentSession } from "../identity/request-authority.js";
+import { growthTransaction } from "./transaction.js";
 
 export class GrowthDatabase {
   actorFence?: (
@@ -105,37 +106,7 @@ export class GrowthDatabase {
     work: (client: PoolClient) => Promise<T>,
     signal?: AbortSignal,
   ): Promise<T> {
-    signal?.throwIfAborted();
-    const client = await pool.connect();
-    let released = false;
-    const abort = () => {
-      if (!released) {
-        released = true;
-        client.release(true);
-      }
-    };
-    signal?.addEventListener("abort", abort, { once: true });
-    try {
-      signal?.throwIfAborted();
-      await client.query("BEGIN");
-      await client.query(
-        "SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','2000',true)",
-      );
-      const value = await work(client);
-      signal?.throwIfAborted();
-      await client.query("COMMIT");
-      signal?.throwIfAborted();
-      return value;
-    } catch (error) {
-      if (!released) await client.query("ROLLBACK").catch(() => {});
-      throw error;
-    } finally {
-      signal?.removeEventListener("abort", abort);
-      if (!released) {
-        released = true;
-        client.release();
-      }
-    }
+    return growthTransaction(pool, work, signal);
   }
   /** Worker-only tables used by account controls still lock the canonical session and erasure scope. */
   async workerActor<T>(

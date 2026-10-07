@@ -1,5 +1,13 @@
 # Resume checkpoint — PR review and independent app fixes
 
+## Latest resume — October 6, 2026
+
+The founder explicitly resumed work after the safe stop. PR #315 is merged at `3c6fed97645660397d50e8b87e18b9902bde2e9c`; its main Foundation run `37551102625` completed successfully. There are 26 confirmed merges and the same 20 original drafts at unchanged heads. The historical pre-315 snapshot below is retained for context.
+
+Current branch `codex/growth-transaction-settlement-20261006` starts from that main. The [Growth transaction increment](growth-transaction-settlement-2026-10-06.md) is implemented and personally operated, pending commit/PR qualification when this note is written. It preserves shorter database budgets and awaits original connection close/discard. It deliberately awaits external/nested callbacks: notification sends under erasure locks make a blanket callback timeout unsafe. Next independent finding: `workerActor()` releases its canonical session transaction before its worker write commits; fix and operate the actual revocation race. Broad provider/privacy/native/catalogue holds remain.
+
+Current review runtime is running on the same database/ports/private env/key. API log `/tmp/creator-growth-settlement-api.log`, web log `/tmp/creator-growth-settlement-web.log`. CUA restarted with browser ID5; review tab1 is actual signed-in actor two's notification settings. It has one new saved score-four feedback row; nine total rows now remain. Old browser ID2 is unavailable. No interception or viewport override has been applied in this resumed run. Update the final external receipts and genuinely sign out/stop only these resources before the next stop.
+
 The founder asked to review/merge good open and draft PRs, follow `docs/source/`, `docs/` and the exact `design/` references, verify actual running flows, and continue independent app work when broad PRs are blocked. Do not add unit/integration/E2E/snapshot test code. Existing hosted checks stay intact. No force pushes, branch deletion, workflow/check edits or manual cancellation, held-purpose activation, fake signatures/provider receipts, or invented identity/catalogue authority. No subagents have been used.
 
 On the latest instruction, finish the current feedback increment and stop at a safe checkpoint because interruption may be imminent. Do not begin the next transaction change before handoff. This file is a snapshot written before the feedback PR's final gate; always reread GitHub/current Git state before resuming.
