@@ -744,7 +744,9 @@
       "heldVersionHistory": [
         "0098_w4_generation_allowance_audience",
         "0145_w4_generation_allowance_audience"
-      ]
+      ],
+      "path": "apps/backend/src/modules/commerce/schema-generation-audience-renumbered.sql",
+      "sourceSha256": "98f9373fbf2403e05f6f26a4223a94779d3280fefa89f2ab2c6f30fbbef796be"
     },
     {
       "id": "0183",
@@ -952,7 +954,8 @@
       "version": "0206_w3_privacy_cursor_export",
       "path": "apps/backend/src/modules/conversation/migrations/pending_w3_privacy_cursor_export.sql",
       "state": "reserved_unapplied",
-      "reason": "Distinct isolated creator_w3_privacy_export NOLOGIN purpose. One fixed READ COMMITTED cursor over actual original verified job/current task/token/immutable ownership and all genuine families; same core client/PID/fullXID, current restoration bookends, actual EOF/CLOSE and deferred COMMIT. Exact source/catalogue/complete owner review and closed qualification pending; no pair-GUC source authority, raw0087 ACL widening, fake subjobs or activation."
+      "reason": "Preserved unactivated original proposal. Closed numeric-order rehearsal fails because its required0212 generation_sentence_provenance table is created later. Replaced by0233 with unchanged authority/permissions and only the corrected self-registration version; original SQL is immutable. Do not activate0206.",
+      "supersededBy": "0233_w3_privacy_cursor_export"
     },
     {
       "id": "0207",
@@ -1177,6 +1180,16 @@
       "sourceSha256": "2be4dc0bc2f74d01d506985f7dac31c49c6a7a567f19b2126025396949111643",
       "state": "reserved_unapplied",
       "reason": "Atomic original Conversation deletion receipt on existing task row, immutable after actual held transaction persists it; current-lease replay and narrow completed Conversation-to-Agent boundary projection. Original task/lease/COMMIT and protected artifact authority remain mandatory. No migration activation, historical receipt backfill, fake task or accounting disposition. Complete source/caller/custody and real lifecycle qualification remain pending."
+    },
+    {
+      "id": "0233",
+      "owner": "W3",
+      "version": "0233_w3_privacy_cursor_export",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_privacy_cursor_export_ordered.sql",
+      "sourceSha256": "99ad0ce10da98954d08b3fe31dedce0ef93be4c3be7e1aeecf3995059e41eb08",
+      "state": "reserved_unapplied",
+      "supersedes": "0206_w3_privacy_cursor_export",
+      "reason": "Orders the original Conversation cursor after its0212 provenance dependency. Original0206 preserved; fixed reader checks actual0233 registration. Caller also requires exact executable source/ledger plus actual owner/task/EOF/artifact/COMMIT custody. Closed ordered review and full composed qualification remain required; no activation."
     }
   ]
 }

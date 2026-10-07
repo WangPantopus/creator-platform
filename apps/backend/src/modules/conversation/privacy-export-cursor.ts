@@ -7,6 +7,7 @@ import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
 import { PreparedGenerationJournal } from "../agent/generation-journal.js";
 import { PreparedUsageRetention } from "../agent/usage-retention.js";
 import { requestAuthority } from "../identity/request-authority.js";
+import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
 import type { PrivacyHook } from "../trust/contracts.js";
 import { ConversationLineage } from "./lineage.js";
 import { ConversationRecordings } from "./recordings.js";
@@ -25,9 +26,15 @@ import {
 type Job = Parameters<PrivacyHook["run"]>[0];
 const Owner = "creator_w3_privacy_export";
 export const CONVERSATION_PRIVACY_CURSOR_MIGRATION =
-  "0206_w3_privacy_cursor_export";
+  "0233_w3_privacy_cursor_export";
 export const CONVERSATION_PRIVACY_CURSOR_SOURCE_SHA256 =
-  "54c43918c34410404c81e2edc0356e8dac8f880211441ac48949bc0cc174121e";
+  "99ad0ce10da98954d08b3fe31dedce0ef93be4c3be7e1aeecf3995059e41eb08";
+export const conversationPrivacyCursorSource = Object.freeze({
+  owner: "W3",
+  name: "w3_privacy_cursor_export",
+  path: "apps/backend/src/modules/conversation/migrations/pending_w3_privacy_cursor_export_ordered.sql",
+  checksum: CONVERSATION_PRIVACY_CURSOR_SOURCE_SHA256,
+});
 const Signatures = [
   "creator.fence_conversation_privacy_export(uuid,uuid,text,uuid,uuid,uuid)",
   "creator.conversation_privacy_export_rows(uuid,uuid)",
@@ -258,6 +265,10 @@ export class PreparedConversationPrivacyCursor {
       "conversation_export_worker_required",
       "Use the original lifecycle task outside interactive request authority.",
     );
+    // A matching local installation receipt and caller-supplied catalogue do
+    // not register a held source. Retain the executable source gate at every
+    // original cursor bookend as well as the fixed-version ledger check below.
+    await assertRegisteredMigration(client, conversationPrivacyCursorSource);
     await client.query("SAVEPOINT w3_cursor_catalogue");
     await client.query("RELEASE SAVEPOINT w3_cursor_catalogue");
     const row = (

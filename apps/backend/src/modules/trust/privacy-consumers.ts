@@ -56,7 +56,7 @@ export type ConversationPrivacyOwnerPorts = Omit<
   ConversationPrivacyInput,
   "pool" | "authority" | "retention" | "deletionReceipts"
 > & {
-  /** Real prepared W2 owners and independently reviewed0206 custody. The
+  /** Real prepared W2 owners and independently reviewed0233 custody. The
    * coordinator supplies its own actual authority, never a caller substitute. */
   cursorPreparation?: Omit<
     Parameters<typeof PreparedConversationPrivacyCursor.prepare>[0],

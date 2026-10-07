@@ -1,0 +1,1075 @@
+{
+  "scope": "Closed39-source generation/accounting/privacy composition including original0214/0217, with staged exact-source execution records rolled back. No executable registry activation or positive domain task.",
+  "sourceParent": "98117fd8e853d5037e9d83d0a44aa8b9ddf1a818",
+  "findingsAndFixes": [
+    "Original0206 cursor DDL precedes its0212 generation_sentence_provenance dependency; a genuine numeric-order rehearsal failed and rolled back. Reserved0233 replaces it after that dependency. Original0206 bytes preserved; only header and fixed self-registration version differ in the new source.",
+    "Conversation cursor now checks actual executable source registration at every catalogue bookend, in addition to exact source/ledger/definition/custody checks. A caller-supplied catalogue and staged ledger cannot register it.",
+    "Original0182 reservation now pins the already-published renumbered audience source98f9373f used by the actual caller; the initial operator selected the old0098 source91e56109 before this missing path was caught. No old SQL was rewritten.",
+    "Provenance purge catalogue previously included physical FK-trigger OID names, making equivalent restored schemas differ. Only known internal FK check names are represented by constraint/function/event identity; enabled state, complete behavior, function definitions and custom names remain exact."
+  ],
+  "sources": [
+    {
+      "version": "0157_w4_public_packet_read",
+      "owner": "W4",
+      "path": "apps/backend/src/modules/commerce/schema-public-packet-read.sql",
+      "checksum": "0b11d09a2dcd11cbbe715d1dccf90185270e277fea7ce6f8eabe27a36e30d4b8"
+    },
+    {
+      "version": "0159_w1_generation_worker_scope",
+      "owner": "W1",
+      "path": "apps/backend/src/modules/identity/schema-generation-scope.sql",
+      "checksum": "7de41bf10228219d69480e302bac7d69626d8d848d8276bb1fe54e49112a5627"
+    },
+    {
+      "version": "0163_w2_usage_lineage",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/0048_w2_usage_lineage.sql",
+      "checksum": "16dddc80bebe32979f822104d8f411e0f545b4e212da6dc147c72f959e660f17"
+    },
+    {
+      "version": "0165_w2_usage_retention_expiry",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/0067_w2_usage_retention_expiry.sql",
+      "checksum": "1c118f5ec90a5a3f3578e056af14d5e56b1379464977c4a79bd6c2b62be7f17e"
+    },
+    {
+      "version": "0167_w1_signature_read_fence",
+      "owner": "W1",
+      "path": "apps/backend/src/modules/identity/schema-signature-read-fence.sql",
+      "checksum": "157640de84f22d6d638d788dfe04314fd193efaed80a829f288bec7cbcb815b5"
+    },
+    {
+      "version": "0177_w8_generation_worker_denial",
+      "owner": "W8",
+      "path": "apps/backend/migrations/0093_w8_generation_worker_denial.sql",
+      "checksum": "d47b5916b0ac0c3cc33bd7d50bfdb663f39a9218dcff0b97d3a9dce7b6acc44c"
+    },
+    {
+      "version": "0179_w3_generation_purpose_consumers",
+      "owner": "W3",
+      "path": "apps/backend/src/modules/conversation/migrations/0095_w3_generation_purpose_consumers.sql",
+      "checksum": "9449f7f9254aa1c9c77713b1683d5c85076b357f13e573882ee5d2d03d1715e0"
+    },
+    {
+      "version": "0180_w2_generation_input_consumers",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/0096_w2_generation_input_consumers.sql",
+      "checksum": "25f89ddba69beed4dd780cd23a64eabb9b7481e2dcb5f192b167299a732b2c34"
+    },
+    {
+      "version": "0181_w2_generation_attempt_admission",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/0097_w2_generation_attempt_admission.sql",
+      "checksum": "eab8c8e07b8a1e6ba4384f5300560bd46853bf98509faade5a1b555e130c75ee"
+    },
+    {
+      "version": "0182_w4_generation_allowance_audience",
+      "owner": "W4",
+      "path": "apps/backend/src/modules/commerce/schema-generation-audience-renumbered.sql",
+      "checksum": "98f9373fbf2403e05f6f26a4223a94779d3280fefa89f2ab2c6f30fbbef796be"
+    },
+    {
+      "version": "0183_w1_generation_terminal_scope",
+      "owner": "W1",
+      "path": "apps/backend/src/modules/identity/schema-generation-terminal.sql",
+      "checksum": "fadbf62a3ddf06142c3a6ad30313503f9bebe7b6d64f67f8ba01ff13ce2398c7"
+    },
+    {
+      "version": "0184_w8_generation_terminal_denial",
+      "owner": "W8",
+      "path": "apps/backend/migrations/0100_w8_generation_terminal_denial.sql",
+      "checksum": "393920665d8860ee53ee6ef740ba0ad4a6921aceddcbf33f6419727e846532af"
+    },
+    {
+      "version": "0186_w5_generation_content_origin",
+      "owner": "W5",
+      "path": "apps/backend/src/modules/content/schema-generation-origin.sql",
+      "checksum": "2f1c4b30133a0c8707b16b15c1e42a9daf539cb5edeeb48ad6a835352a4f444d"
+    },
+    {
+      "version": "0187_w2_generation_retrieval_context",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/0104_w2_generation_retrieval_context.sql",
+      "checksum": "bf9d9c35b3f0bb8c18518bd06b4459d16d421f4da4a6ad0ba06f8319acc89747"
+    },
+    {
+      "version": "0188_w2_generation_terminal_journal",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/0105_w2_generation_terminal_journal.sql",
+      "checksum": "7ab8974d065b1b9e5befa2ded26c6978876957fab0eee80b9632825bbac98477"
+    },
+    {
+      "version": "0189_w4_generation_terminal_settlement",
+      "owner": "W4",
+      "path": "apps/backend/src/modules/commerce/schema-generation-terminal-settlement.sql",
+      "checksum": "a6e386de7506035d6bc0d10da644cb8ee2620824217b9c2c61a9a34cb7fa4fc9"
+    },
+    {
+      "version": "0196_w2_privacy_export_snapshot",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/0113_w2_privacy_export_snapshot.sql",
+      "checksum": "f0b86d507bcb7ad194c680f93487f582354f711ca91f3deffb01843c263ea65a"
+    },
+    {
+      "version": "0203_w3_terminal_only_finalization",
+      "owner": "W3",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_terminal_only_finalization.sql",
+      "checksum": "8de1897f2e70f763382984459274eb7616ad7149b457811fffd90fb8b7df2e8c"
+    },
+    {
+      "version": "0209_w8_all_scope_privacy_ownership",
+      "owner": "W8",
+      "path": "apps/backend/migrations/0209_w8_all_scope_privacy_ownership.sql",
+      "checksum": "6fa4006cb8c2f6901c7006595d08196573daef33f06aa6cec866a546ffcd2f01"
+    },
+    {
+      "version": "0210_w2_generation_guardrail_event",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_generation_guardrail_event.sql",
+      "checksum": "0c0fc7fee7182f3e77695222e51cce910268f7844437a5e974f68af5927a3382"
+    },
+    {
+      "version": "0211_w2_generation_agent_metadata",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_generation_agent_metadata.sql",
+      "checksum": "4bbcd9a24b622ee63525da6f20eaf21f84eb9c2d4d538a9122d8184347a76b4f"
+    },
+    {
+      "version": "0212_w3_generation_worker_output",
+      "owner": "W3",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_worker_output.sql",
+      "checksum": "76ee832c45e5dc422a8128afdc162a354fc54b7df4f611fb6186cdf3bd094df8"
+    },
+    {
+      "version": "0214_w8_original_privacy_family",
+      "owner": "W8",
+      "path": "apps/backend/migrations/0214_w8_original_privacy_family.sql",
+      "checksum": "fcb8f6174d48ed89b9a06d8a51ac4f0c5dd4288950f2d18b351825d9d81dd793"
+    },
+    {
+      "version": "0215_w4_generation_safety_terminal_settlement",
+      "owner": "W4",
+      "path": "apps/backend/src/modules/commerce/schema-generation-safety-terminal-settlement.sql",
+      "checksum": "5aba1bffa300a811630f66e8577d29801694a54b6f06de610f7f78a7184d9a24"
+    },
+    {
+      "version": "0216_w1_generation_output_cursor",
+      "owner": "W1",
+      "path": "apps/backend/src/modules/identity/schema-generation-output-cursor.sql",
+      "checksum": "a4f01c5f1eb1e19d79437b17cce872def1366965ba27c8c46b0d5f9bb73da436"
+    },
+    {
+      "version": "0217_w3_generation_provenance_purge",
+      "owner": "W3",
+      "path": "apps/backend/migrations/0217_w3_generation_provenance_purge.sql",
+      "checksum": "f2318d7a49151544796e105fe62990dc43af6fe67e49fae253b7578a0c01684e"
+    },
+    {
+      "version": "0218_w1_generation_terminal_discovery",
+      "owner": "W1",
+      "path": "apps/backend/src/modules/identity/schema-generation-terminal-discovery.sql",
+      "checksum": "83a56963f6c37e05b0850fa6a0e97475282fbfa3e90d1372f86bea701622e7bc"
+    },
+    {
+      "version": "0221_w3_generation_context_profile_bound",
+      "owner": "W3",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_generation_context_profile_bound.sql",
+      "checksum": "b0fe4643e110a4a6b752ae44847543c7cb8897bdd2a56c2daa58574b9c58536e"
+    },
+    {
+      "version": "0222_w4_generation_audience_profile_fence",
+      "owner": "W4",
+      "path": "apps/backend/src/modules/commerce/schema-generation-audience-profile-fence.sql",
+      "checksum": "11d3d327f22082166d85f17179fe7a8cf94bcd9161714c8055b07537ff639e9d"
+    },
+    {
+      "version": "0223_w2_generation_profile_bound",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_generation_profile_bound.sql",
+      "checksum": "5b2571d4cc115fa8250351d2904126dcd8a09ff229807f6780ad819de4d21de0"
+    },
+    {
+      "version": "0224_w5_generation_origin_profile_fence",
+      "owner": "W5",
+      "path": "apps/backend/src/modules/content/schema-generation-origin-profile-fence.sql",
+      "checksum": "09d3df2f3549d0267dce2fe049789e575b1c8f212ee887d2d5396f110bafc047"
+    },
+    {
+      "version": "0226_w1_generation_lifecycle",
+      "owner": "W1",
+      "path": "apps/backend/src/modules/identity/schema-generation-lifecycle.sql",
+      "checksum": "9eba74f6ae86c52eddde1acc4f7780a5c98762a86681920e11edfec15cd070a8"
+    },
+    {
+      "version": "0227_w1_generation_terminal_page",
+      "owner": "W1",
+      "path": "apps/backend/src/modules/identity/schema-generation-terminal-page.sql",
+      "checksum": "8632008a15ba322f6caa3b7a393635851c9d7ea18dcd6ad7f175361d4281149c"
+    },
+    {
+      "version": "0228_w4_generation_settlement_clock",
+      "owner": "W4",
+      "path": "apps/backend/src/modules/commerce/schema-generation-settlement-clock.sql",
+      "checksum": "542b271ee29a5fdede8eaa77620301854026831955b717229cb055bda5bf4296"
+    },
+    {
+      "version": "0229_w2_accounting_retention_integrity",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_accounting_retention_integrity.sql",
+      "checksum": "d5a3067868f232f5fda69b11b6f57e642c2913061108edae4943010fe3457c89"
+    },
+    {
+      "version": "0230_w8_usage_expiry_tasks",
+      "owner": "W8",
+      "path": "apps/backend/migrations/0230_w8_usage_expiry_tasks.sql",
+      "checksum": "2e30ef05d54352d37f37deb9a33ddc22cd9fad64d71ad98d6f69f99ff394a72e"
+    },
+    {
+      "version": "0231_w2_account_detached_usage",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_account_detached_usage.sql",
+      "checksum": "d19aa583d71250c85bdbce97c5d2c168dbb683009451de594f4434574c16874f"
+    },
+    {
+      "version": "0232_w8_conversation_accounting_boundary",
+      "owner": "W8",
+      "path": "apps/backend/migrations/0232_w8_conversation_accounting_boundary.sql",
+      "checksum": "2be4dc0bc2f74d01d506985f7dac31c49c6a7a567f19b2126025396949111643"
+    },
+    {
+      "version": "0233_w3_privacy_cursor_export",
+      "owner": "W3",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_privacy_cursor_export_ordered.sql",
+      "checksum": "99ad0ce10da98954d08b3fe31dedce0ef93be4c3be7e1aeecf3995059e41eb08"
+    }
+  ],
+  "sourceSha256": {
+    "apps/backend/src/modules/conversation/migrations/pending_w3_privacy_cursor_export_ordered.sql": "99ad0ce10da98954d08b3fe31dedce0ef93be4c3be7e1aeecf3995059e41eb08",
+    "apps/backend/src/modules/conversation/privacy-export-cursor.ts": "1c2792cc5abc91b2a96c65b6f00f92f1006ed8c4efa627eca15b3f1a91a85e17",
+    "apps/backend/src/modules/conversation/generation-provenance-privacy.ts": "dc0208b2b394097934972a328de7f821fe3c1bc9f6054e0192657917f8ddab5f",
+    "apps/backend/src/modules/conversation/host.ts": "a71c2f9701fa3fe50ca41e6d7918b3a1f357f715384fd7bc1e14d6ceb4fd3f9a",
+    "apps/backend/src/modules/trust/privacy-consumers.ts": "a6f2e6bd7a461d19caf0e7dc757ffcf8615056f636dd42edcec870fd09dee332"
+  },
+  "comparison": {
+    "sources": 39,
+    "parts": 43,
+    "equalParts": 41,
+    "differences": [
+      {
+        "part": "family_roles",
+        "field": "creator_runtime.memberships",
+        "fresh": false,
+        "preserved": true,
+        "interpretation": "Preserved legitimate incoming API children; no role changed or difference normalized into accepted custody."
+      },
+      {
+        "part": "purge_roles",
+        "field": "creator_runtime.memberships",
+        "fresh": false,
+        "preserved": true,
+        "interpretation": "Preserved legitimate incoming API children; no role changed or difference normalized into accepted custody."
+      }
+    ],
+    "purgeRelationEqualAfterStableInternalNames": true,
+    "compilerContexts": 90,
+    "diagnosticContexts": 7,
+    "cleanContexts": 83,
+    "diagnosticInterpretation": "Five unchanged generic packet-trigger contexts report fields in unreachable other-table branches; same original source has prior actual five-shape trigger qualification. Two unchanged public packet functions have shadowed/unused-variable warnings. All original diagnostics preserved; no blanket compiler pass.",
+    "sourcesSha256": "11aa233e71f904f1ab50f254d8aeb94139dc7a8b7af1b0c6d2fc626fc1353b8a",
+    "activation": false
+  },
+  "purgeCatalogueDrift": {
+    "scope": "Actual rolled-back39-source staged execution. No task, provenance row, lease, receipt or activation.",
+    "metadataDrifts": [
+      "disabled_fk",
+      "replica_fk",
+      "missing_fk",
+      "deferred_fk",
+      "renamed_constraint",
+      "extra_trigger",
+      "unforced_rls",
+      "extra_column",
+      "extra_usage_column",
+      "public_delete_check",
+      "invoker_purge"
+    ],
+    "allDetectedAndRestored": true,
+    "actualEquivalentForeignKeyRecreationPreservesFingerprint": true,
+    "originalCustodyRestored": {
+      "schemaSha256": "30ec4ec6c71eb2c4e02fb473e65356994e3dfbcd04d8982ff31f18fbb7b5bee2",
+      "rolesSha256": "a5aaa6c826de5df82d94f80e47999a89745754f57a12ccff0655d5e847a6e2fe",
+      "rowsSha256": "0fa7bf8f150223d1836c0c7caaf506a47cc625e42e75bd32237be4e0b20b8de5",
+      "ledgerSha256": "5cea848eedcb48f83f812be82319d52472c952480edd9599ffefebe21d26b4c8",
+      "securitySha256": "521b957822ecf3962f082bbe926f3928b4b1cb68f1974e4a70258c0bd3f3661a",
+      "sequencesSha256": "4459c75ced29739d1256da701024ca1d0482418fddcd2f7e4d5c63ca9b975495",
+      "tables": 164,
+      "rows": 318,
+      "sequences": 1
+    },
+    "retainedLedger": 61
+  },
+  "registration": {
+    "scope": "Actual canonical61 core password login. The exact source-registration guard now used by cursor bookends refuses held0233; original privacy catalogue remains available. No prepared export factory, task, lease, artifact or activation is simulated.",
+    "reservedSourceInactive": true,
+    "registrationRefused": true,
+    "preabortPreserved": true,
+    "originalPrivacyCataloguePasses": true,
+    "poolReusable": true
+  },
+  "originalCustodyRestored": {
+    "fresh": {
+      "schemaSha256": "30ec4ec6c71eb2c4e02fb473e65356994e3dfbcd04d8982ff31f18fbb7b5bee2",
+      "rolesSha256": "a5aaa6c826de5df82d94f80e47999a89745754f57a12ccff0655d5e847a6e2fe",
+      "rowsSha256": "0fa7bf8f150223d1836c0c7caaf506a47cc625e42e75bd32237be4e0b20b8de5",
+      "ledgerSha256": "5cea848eedcb48f83f812be82319d52472c952480edd9599ffefebe21d26b4c8",
+      "securitySha256": "521b957822ecf3962f082bbe926f3928b4b1cb68f1974e4a70258c0bd3f3661a",
+      "sequencesSha256": "4459c75ced29739d1256da701024ca1d0482418fddcd2f7e4d5c63ca9b975495",
+      "tables": 164,
+      "rows": 318,
+      "sequences": 1
+    },
+    "preserved": {
+      "schemaSha256": "30ec4ec6c71eb2c4e02fb473e65356994e3dfbcd04d8982ff31f18fbb7b5bee2",
+      "rolesSha256": "6b7665520efc40201d17625cae5d6428dbecbf9cad8f505181a9be891735b5f0",
+      "rowsSha256": "3740a373a00f7fbc753d5a828d0400b52745d8269cc8e26182e8f7914a228d7d",
+      "ledgerSha256": "e13651b0bc7aaf5fa24da7e8ee2a9a55db6075e738b214faef1330a6576b7e2d",
+      "securitySha256": "ebee81ba0a7ef967de6ac016f62cde27d37389965e614262d2ed33652f4674c3",
+      "sequencesSha256": "7973fcbf7edf035f379e628136ab3b66389a15af688b16fbd6d9695c88ac1e94",
+      "tables": 164,
+      "rows": 249,
+      "sequences": 1
+    }
+  },
+  "compiler": [
+    {
+      "compiler": "creator.fence_public_mode_write()",
+      "relation": "creator.commerce_mode",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.fence_public_packet_write()",
+      "relation": "creator.commerce_packet",
+      "diagnostics": [
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 9,
+          "statement": "IF",
+          "sqlstate": "42703",
+          "message": "record \"new\" has no field \"commitment_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL expression \"NEW.commitment_id IS DISTINCT FROM OLD.commitment_id\""
+        },
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 10,
+          "statement": "RAISE",
+          "sqlstate": "42703",
+          "message": "record \"new\" has no field \"packet_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL expression \"NEW.packet_id IS DISTINCT FROM OLD.packet_id\""
+        },
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 18,
+          "statement": "SQL statement",
+          "sqlstate": "42703",
+          "message": "record \"old\" has no field \"commitment_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL statement \"SELECT c.packet_id             FROM creator.commerce_commitment c WHERE c.id=CASE WHEN TG_OP='DELETE' THEN OLD.commitment_id ELSE NEW.commitment_id END\""
+        },
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 19,
+          "statement": "assignment",
+          "sqlstate": "42703",
+          "message": "record \"old\" has no field \"packet_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "PL/pgSQL assignment \"packet=CASE WHEN TG_OP='DELETE' THEN OLD.packet_id ELSE NEW.packet_id END\""
+        }
+      ]
+    },
+    {
+      "compiler": "creator.fence_public_packet_write()",
+      "relation": "creator.commerce_commitment",
+      "diagnostics": [
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 5,
+          "statement": "IF",
+          "sqlstate": "42703",
+          "message": "record \"new\" has no field \"thread_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL expression \"(NEW.id,NEW.creator_id,NEW.fan_id,NEW.thread_id) IS DISTINCT FROM (OLD.id,OLD.creator_id,OLD.fan_id,OLD.thread_id)\""
+        },
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 9,
+          "statement": "IF",
+          "sqlstate": "42703",
+          "message": "record \"new\" has no field \"commitment_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL expression \"NEW.commitment_id IS DISTINCT FROM OLD.commitment_id\""
+        },
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 18,
+          "statement": "SQL statement",
+          "sqlstate": "42703",
+          "message": "record \"old\" has no field \"commitment_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL statement \"SELECT c.packet_id             FROM creator.commerce_commitment c WHERE c.id=CASE WHEN TG_OP='DELETE' THEN OLD.commitment_id ELSE NEW.commitment_id END\""
+        }
+      ]
+    },
+    {
+      "compiler": "creator.fence_public_packet_write()",
+      "relation": "creator.commerce_share_grant",
+      "diagnostics": [
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 5,
+          "statement": "IF",
+          "sqlstate": "42703",
+          "message": "record \"new\" has no field \"thread_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL expression \"(NEW.id,NEW.creator_id,NEW.fan_id,NEW.thread_id) IS DISTINCT FROM (OLD.id,OLD.creator_id,OLD.fan_id,OLD.thread_id)\""
+        },
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 10,
+          "statement": "RAISE",
+          "sqlstate": "42703",
+          "message": "record \"new\" has no field \"packet_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL expression \"NEW.packet_id IS DISTINCT FROM OLD.packet_id\""
+        },
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 19,
+          "statement": "assignment",
+          "sqlstate": "42703",
+          "message": "record \"old\" has no field \"packet_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "PL/pgSQL assignment \"packet=CASE WHEN TG_OP='DELETE' THEN OLD.packet_id ELSE NEW.packet_id END\""
+        }
+      ]
+    },
+    {
+      "compiler": "creator.fence_public_packet_write()",
+      "relation": "creator.commerce_ledger",
+      "diagnostics": [
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 5,
+          "statement": "IF",
+          "sqlstate": "42703",
+          "message": "record \"new\" has no field \"thread_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL expression \"(NEW.id,NEW.creator_id,NEW.fan_id,NEW.thread_id) IS DISTINCT FROM (OLD.id,OLD.creator_id,OLD.fan_id,OLD.thread_id)\""
+        }
+      ]
+    },
+    {
+      "compiler": "creator.fence_public_packet_write()",
+      "relation": "creator.commerce_effect",
+      "diagnostics": [
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 5,
+          "statement": "IF",
+          "sqlstate": "42703",
+          "message": "record \"new\" has no field \"thread_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL expression \"(NEW.id,NEW.creator_id,NEW.fan_id,NEW.thread_id) IS DISTINCT FROM (OLD.id,OLD.creator_id,OLD.fan_id,OLD.thread_id)\""
+        },
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 9,
+          "statement": "IF",
+          "sqlstate": "42703",
+          "message": "record \"new\" has no field \"commitment_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL expression \"NEW.commitment_id IS DISTINCT FROM OLD.commitment_id\""
+        },
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 18,
+          "statement": "SQL statement",
+          "sqlstate": "42703",
+          "message": "record \"old\" has no field \"commitment_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL statement \"SELECT c.packet_id             FROM creator.commerce_commitment c WHERE c.id=CASE WHEN TG_OP='DELETE' THEN OLD.commitment_id ELSE NEW.commitment_id END\""
+        }
+      ]
+    },
+    {
+      "compiler": "creator.capture_generation_initiator()",
+      "relation": "creator.generation",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.require_generation_scope_cleanup()",
+      "relation": "creator.generation_worker_scope",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.ai_generation_receipt_immutable()",
+      "relation": "creator.ai_generation_receipt",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.fence_signature_metadata_write()",
+      "relation": "creator.creator_profile",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.fence_signature_metadata_write()",
+      "relation": "creator.passkey_credential",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.fence_signature_metadata_write()",
+      "relation": "creator.signed_act",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.fence_signature_metadata_write()",
+      "relation": "creator.signed_act_consumption",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.fence_signature_metadata_write()",
+      "relation": "creator.signed_publication",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.fence_signature_metadata_write()",
+      "relation": "creator.signed_verification",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.ai_usage_completion_custody_immutable()",
+      "relation": "creator.ai_usage",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.capture_generation_terminal()",
+      "relation": "creator.generation",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.require_generation_terminal_cleanup()",
+      "relation": "creator.generation_terminal_scope",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.derive_content_origin_metadata()",
+      "relation": "creator.content_revision",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.commerce_original_cost_rule()",
+      "relation": "creator.commerce_allowance_reservation",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.finish_agent_privacy_export_scope()",
+      "relation": "creator.agent_privacy_export_scope",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.fence_generation_first_claim()",
+      "relation": "creator.generation",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.commerce_allowance_settlement_clock()",
+      "relation": "creator.commerce_allowance_reservation",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.ai_usage_retention_integrity()",
+      "relation": "creator.ai_usage",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.ai_cost_hold_original_clock()",
+      "relation": "creator.ai_cost_hold",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator_trust.record_usage_expiry_delete()",
+      "relation": "creator.ai_usage",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator_trust.finish_usage_expiry_scope()",
+      "relation": "creator_trust.usage_expiry_scope",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator_trust.capture_account_detached_usage()",
+      "relation": "creator.ai_usage",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator_trust.immutable_conversation_delete_receipt()",
+      "relation": "creator_trust.privacy_task",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.finish_conversation_privacy_export_scope()",
+      "relation": "creator.conversation_privacy_export_scope",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.generation_terminal_matches(uuid,uuid,boolean)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.generation_record_agent_guardrail(uuid,uuid,text,text)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator_trust.retry_usage_expiry_task(uuid,uuid,text)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.begin_generation_scope(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator_trust.fence_usage_expiry(uuid,uuid,uuid,uuid,text)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.current_agent_privacy_export(uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator_trust.claim_usage_expiry_tasks(integer)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.generation_seal_agent_journal(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.generation_append_agent_receipt(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.begin_agent_privacy_export(uuid,uuid,uuid,uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.pending_generation_terminal_page(integer,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.generation_task_proof(uuid,uuid,boolean)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.claim_generation_task(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.confirm_generation_initiator(uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.generation_settle_typed_original_allowance(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.generation_worker_output(uuid,uuid,integer,text,jsonb)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.purge_generation_sentence_provenance(uuid,uuid,uuid,uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator_trust.account_detached_usage_summary(uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.end_agent_privacy_export(uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.generation_output_cursor_view(uuid,uuid,integer,integer)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator_trust.privacy_task_delete_family_matches(uuid,uuid,uuid,uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.agent_privacy_export_matches(uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.begin_generation_terminal(uuid,uuid,text,uuid,integer,boolean)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.generation_terminal_output(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.commerce_public_packet_evidence(uuid,uuid,uuid,integer,jsonb)",
+      "relation": null,
+      "diagnostics": [
+        {
+          "functionid": "creator.commerce_public_packet_evidence",
+          "lineno": 4,
+          "statement": "FOR with integer loop variable",
+          "sqlstate": "00000",
+          "message": "auto variable \"j\" shadows a previously defined variable",
+          "detail": null,
+          "hint": "SET plpgsql.extra_warnings TO 'shadowed_variables'",
+          "level": "warning extra",
+          "position": null,
+          "query": null,
+          "context": null
+        },
+        {
+          "functionid": "creator.commerce_public_packet_evidence",
+          "lineno": 47,
+          "statement": "FOR with integer loop variable",
+          "sqlstate": "00000",
+          "message": "auto variable \"j\" shadows a previously defined variable",
+          "detail": null,
+          "hint": "SET plpgsql.extra_warnings TO 'shadowed_variables'",
+          "level": "warning extra",
+          "position": null,
+          "query": null,
+          "context": null
+        },
+        {
+          "functionid": "creator.commerce_public_packet_evidence",
+          "lineno": 2,
+          "statement": "DECLARE",
+          "sqlstate": "00000",
+          "message": "unused variable \"j\"",
+          "detail": null,
+          "hint": null,
+          "level": "warning",
+          "position": null,
+          "query": null,
+          "context": null
+        }
+      ]
+    },
+    {
+      "compiler": "creator_trust.privacy_task_family_matches(uuid,uuid,uuid,uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.fence_conversation_privacy_export(uuid,uuid,text,uuid,uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.generation_typed_original_allowance_receipt(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.pending_generation_terminals(integer)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.generation_open_provider_usage(uuid,uuid,text,text,text,text)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.generation_original_allowance_receipt(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.hold_public_packet_signature_read(uuid,uuid,uuid,integer,jsonb,uuid[])",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.generation_content_origins(uuid,uuid,jsonb)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator_trust.generation_worker_denial(uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.refresh_generation_output_cursor(uuid,uuid,integer,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator_trust.expire_detached_usage(integer)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.generation_allowance_audience(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator_trust.save_conversation_delete_receipt(uuid,uuid,jsonb)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.generation_agent_metadata(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator_trust.privacy_task_owned_creators(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.generation_agent_inputs(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.generation_begin_agent_attempt(uuid,uuid,text,text,bigint,text)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.generation_agent_journal_receipt(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.agent_privacy_export_rows(uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.generation_finish_provider_usage(uuid,uuid,uuid,text,jsonb,integer)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator_trust.recover_conversation_delete_receipt(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.end_generation_scope()",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.pending_generation_terminal_cursors(integer)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.end_generation_terminal()",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.generation_conversation_context(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.pending_generation_tasks(integer)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.generation_settle_original_allowance(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.pending_generation_terminal_cursor_page(integer,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.generation_scope_matches(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.commerce_public_packet_mode(uuid,uuid,uuid,integer,jsonb)",
+      "relation": null,
+      "diagnostics": [
+        {
+          "functionid": "creator.commerce_public_packet_mode",
+          "lineno": 4,
+          "statement": "FOR with integer loop variable",
+          "sqlstate": "00000",
+          "message": "auto variable \"j\" shadows a previously defined variable",
+          "detail": null,
+          "hint": "SET plpgsql.extra_warnings TO 'shadowed_variables'",
+          "level": "warning extra",
+          "position": null,
+          "query": null,
+          "context": null
+        },
+        {
+          "functionid": "creator.commerce_public_packet_mode",
+          "lineno": 6,
+          "statement": "FOR with integer loop variable",
+          "sqlstate": "00000",
+          "message": "auto variable \"j\" shadows a previously defined variable",
+          "detail": null,
+          "hint": "SET plpgsql.extra_warnings TO 'shadowed_variables'",
+          "level": "warning extra",
+          "position": null,
+          "query": null,
+          "context": null
+        },
+        {
+          "functionid": "creator.commerce_public_packet_mode",
+          "lineno": 2,
+          "statement": "DECLARE",
+          "sqlstate": "00000",
+          "message": "unused variable \"j\"",
+          "detail": null,
+          "hint": null,
+          "level": "warning",
+          "position": null,
+          "query": null,
+          "context": null
+        }
+      ]
+    },
+    {
+      "compiler": "creator_trust.agent_conversation_accounting_boundary(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator_trust.privacy_accounting_original_scope(uuid,text,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.generation_agent_runtime_context(uuid,uuid,text,text)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator_trust.generation_terminal_denial(uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator_trust.privacy_task_original_binding(uuid,text,uuid)",
+      "relation": null,
+      "diagnostics": []
+    }
+  ],
+  "stagedLedger": 100,
+  "retainedLedger": 61,
+  "validation": {
+    "shippingBuild": "Passed under original W2 shared lock after runtime changes.",
+    "scopedLintFormatAndDiff": "Passed.",
+    "existingTests": "Previous17 existing contract/scheduler cases belong to98117fd8; no new tests and no repeated unrelated suite claimed for this metadata change.",
+    "limits": [
+      "Two role projections correctly retain preserved incoming API child membership differences; no arbitrary parity or blanket full-catalogue acceptance.",
+      "The historical original-family catalogue profiles need explicit full39-source qualification before runtime selection. Six whole-purpose activation pins remain undefined.",
+      "No populated generation, mature deletion, artifact export, expiry, uncertain-COMMIT replay, restoration or all-eight C10 is qualified.",
+      "0233 is reserved; canonical registry61 and existing activation guards remain unchanged."
+    ]
+  }
+}

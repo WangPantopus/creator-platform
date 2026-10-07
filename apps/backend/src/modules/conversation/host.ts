@@ -84,7 +84,7 @@ export type ConversationHostProducers = {
     assertPrivacyRegistered: () => Promise<void>;
   };
   /** W2's actual prepared expiry producer plus W8's independently reviewed
-   *0206 custody. W8 fixes its real held-task authority when preparing exports. */
+   *0233 custody. W8 fixes its real held-task authority when preparing exports. */
   privacyCursor?: Omit<
     Parameters<typeof PreparedConversationPrivacyCursor.prepare>[0],
     "pool" | "authority" | "journal" | "lineage" | "recordings"

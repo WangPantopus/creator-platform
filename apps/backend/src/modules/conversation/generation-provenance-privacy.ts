@@ -132,6 +132,9 @@ export async function generationProvenancePurgeCatalogue(
       signal,
     )
   ).rows;
+  // Restore assigns new OIDs to PostgreSQL's internal FK check triggers. Use
+  // their constraint/function/event identity while retaining enabled state,
+  // complete behavior and function definitions. User trigger names stay exact.
   const relation = (
     await metadata(
       client,
@@ -156,9 +159,18 @@ export async function generationProvenancePurgeCatalogue(
       'roles',ARRAY(SELECT CASE WHEN r=0 THEN 'PUBLIC' ELSE pg_get_userbyid(r) END FROM unnest(p.polroles) r ORDER BY r),
       'using',pg_get_expr(p.polqual,p.polrelid),'check',pg_get_expr(p.polwithcheck,p.polrelid)) ORDER BY p.polname)
      FROM pg_policy p WHERE p.polrelid=c.oid) AS policies,
-    (SELECT jsonb_agg(jsonb_build_object('name',t.tgname,'enabled',t.tgenabled,'internal',t.tgisinternal,'definition',pg_get_triggerdef(t.oid),
-      'function',pg_get_functiondef(t.tgfoid)) ORDER BY t.tgname)
-     FROM pg_trigger t WHERE t.tgrelid=c.oid) AS triggers
+    (SELECT jsonb_agg(jsonb_build_object('name',identity.name,'enabled',t.tgenabled,'internal',t.tgisinternal,
+      'constraint',k.conname,'definition',CASE WHEN identity.fixed THEN
+       replace(pg_get_triggerdef(t.oid),format('TRIGGER %I ',t.tgname),format('TRIGGER %I ',identity.name))
+       ELSE pg_get_triggerdef(t.oid) END,'function',pg_get_functiondef(t.tgfoid))
+      ORDER BY identity.name COLLATE "C",t.tgtype,t.tgfoid::regprocedure::text COLLATE "C")
+     FROM pg_trigger t LEFT JOIN pg_constraint k ON k.oid=t.tgconstraint
+     CROSS JOIN LATERAL (SELECT t.tgisinternal AND k.contype='f' AND t.tgfoid IN(
+       to_regprocedure('pg_catalog."RI_FKey_check_ins"()'),to_regprocedure('pg_catalog."RI_FKey_check_upd"()')) AS fixed) known
+     CROSS JOIN LATERAL (SELECT known.fixed,
+       CASE WHEN known.fixed THEN k.conname||':'||t.tgfoid::regprocedure::text||':'||t.tgtype::text
+        ELSE t.tgname::text END AS name) identity
+     WHERE t.tgrelid=c.oid) AS triggers
     FROM pg_class c WHERE c.oid=to_regclass('creator.generation_sentence_provenance')`,
       [],
       signal,
