@@ -1,0 +1,306 @@
+{
+  "targetCommit": "6812395a8d6f71473435cc6ff7f507c87bc4392b",
+  "sourceIntegrationCommit": "3b0f8181be6060343fdb3b799abdb4b09ce957cd",
+  "prs": [
+    {
+      "number": 284,
+      "sourceHead": "bf2a95f19c185786b2617895ff5c00712e76d63b",
+      "files": [
+        {
+          "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt",
+          "sourceBlob": "30bf0644b0e2334ab867d1ec3d6b62921a305f32",
+          "targetBlob": "80453d148a8dab52852726006e56711d478b3883",
+          "classification": "textually-absorbed",
+          "review": "Original addition retained alongside newer shared copy/API exports. Three-way source application leaves target unchanged; not a runtime acceptance claim.",
+          "difference": "pr284-apps_android_app_src_main_java_com_pantopus_qelvora_generated_QelvoraCopy.kt.patch"
+        },
+        {
+          "path": "apps/android/app/src/main/res/values/strings.xml",
+          "sourceBlob": "e5607b38512fe4472a8e83c85d435a363488d68f",
+          "targetBlob": "b206bdc89225886e046709bfd7c89b7bc1b6e0ef",
+          "classification": "textually-absorbed",
+          "review": "Original addition retained alongside newer shared copy/API exports. Three-way source application leaves target unchanged; not a runtime acceptance claim.",
+          "difference": "pr284-apps_android_app_src_main_res_values_strings.xml.patch"
+        },
+        {
+          "path": "apps/ios/Sources/Generated/Localizable.xcstrings",
+          "sourceBlob": "e3f4ff9db20325f24fb421bfaa849b4f50b6db95",
+          "targetBlob": "0218df5b5cc54f394b38f0c67e6939af3775bb1d",
+          "classification": "textually-absorbed",
+          "review": "Original addition retained alongside newer shared copy/API exports. Three-way source application leaves target unchanged; not a runtime acceptance claim.",
+          "difference": "pr284-apps_ios_Sources_Generated_Localizable.xcstrings.patch"
+        },
+        {
+          "path": "apps/ios/Sources/Generated/QelvoraCopy.swift",
+          "sourceBlob": "54e13a537a329a0c96dcdf94dbc6c18686feb4c3",
+          "targetBlob": "aec2f128b8168dbda96ee6d77aae1579c71a075d",
+          "classification": "textually-absorbed",
+          "review": "Original addition retained alongside newer shared copy/API exports. Three-way source application leaves target unchanged; not a runtime acceptance claim.",
+          "difference": "pr284-apps_ios_Sources_Generated_QelvoraCopy.swift.patch"
+        },
+        {
+          "path": "apps/ios/Sources/QelvoraUI/Media/NativeVoiceRecorder.swift",
+          "sourceBlob": "44e8023a270aef98b4d3190b1cab9fd7b30b0056",
+          "targetBlob": "44e8023a270aef98b4d3190b1cab9fd7b30b0056",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/ios/Sources/QelvoraUI/Media/W6FanFeatures.swift",
+          "sourceBlob": "8240d0bed4d17c87842e5882526c16c1062789d0",
+          "targetBlob": "8240d0bed4d17c87842e5882526c16c1062789d0",
+          "classification": "exact"
+        },
+        {
+          "path": "config/copy.json",
+          "sourceBlob": "89d4557e0ca868fe0d836f0232ccdac814d253a4",
+          "targetBlob": "9e6ef47b7265e13f241f974642bbe06334cebb24",
+          "classification": "textually-absorbed",
+          "review": "Original addition retained alongside newer shared copy/API exports. Three-way source application leaves target unchanged; not a runtime acceptance claim.",
+          "difference": "pr284-config_copy.json.patch"
+        },
+        {
+          "path": "packages/copy/src/index.ts",
+          "sourceBlob": "23f830c4b9453a7e3ebc42bcf315f7e23e6bf1b1",
+          "targetBlob": "ae6c49d368588bceed1e8db7054cf782f618e7c6",
+          "classification": "textually-absorbed",
+          "review": "Original addition retained alongside newer shared copy/API exports. Three-way source application leaves target unchanged; not a runtime acceptance claim.",
+          "difference": "pr284-packages_copy_src_index.ts.patch"
+        }
+      ],
+      "historicalSupportingPaths": [
+        "artifacts/workstreams/W6/ios-preview-cleanup/2026-10-03/README.md",
+        "docs/workstreams/coordination/W6.md",
+        "docs/workstreams/status/W6.md"
+      ]
+    },
+    {
+      "number": 303,
+      "sourceHead": "6a82fc1272dc8b25ac167598012aa5da4ff91dc5",
+      "files": [
+        {
+          "path": "apps/android/app/src/main/java/com/pantopus/qelvora/commerce/CommerceClient.kt",
+          "sourceBlob": "e0277529aeb63953df403eca0c8b943efb568917",
+          "targetBlob": "e0277529aeb63953df403eca0c8b943efb568917",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/android/app/src/main/java/com/pantopus/qelvora/commerce/CommerceFeature.kt",
+          "sourceBlob": "9397cf4a02b6e715639ff0cf449b377318abbdf6",
+          "targetBlob": "9397cf4a02b6e715639ff0cf449b377318abbdf6",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/android/app/src/main/java/com/pantopus/qelvora/commerce/StoreMembership.kt",
+          "sourceBlob": "fb6ad76f2e90576c0137f4de675f8142d24d07f2",
+          "targetBlob": "fb6ad76f2e90576c0137f4de675f8142d24d07f2",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/core/query-settlement.ts",
+          "sourceBlob": "804aeb8eb1889516cd0d4d6077cea251cfc7cded",
+          "targetBlob": "804aeb8eb1889516cd0d4d6077cea251cfc7cded",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/content/held-client-cleanup.ts",
+          "sourceBlob": "1028b70267403175ffe8467f31ed7f66055c09b5",
+          "targetBlob": "7e9bf7b1f9d4b7ebc444e91de13ceb65c898369e",
+          "classification": "reviewed-successor",
+          "review": "Retain newer original callback draining, actual source PID cancellation with original pool credentials, preserved shorter budgets, actual transaction receipts and aggregate cleanup. Older promise-race helper is superseded.",
+          "difference": "pr303-apps_backend_src_modules_content_held-client-cleanup.ts.patch"
+        },
+        {
+          "path": "apps/ios/Sources/QelvoraUI/Commerce/CommerceClient.swift",
+          "sourceBlob": "67e974bbe1237e773fa0d9b02fd1b64f4ac7e74e",
+          "targetBlob": "67e974bbe1237e773fa0d9b02fd1b64f4ac7e74e",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/ios/Sources/QelvoraUI/Commerce/CommerceFeature.swift",
+          "sourceBlob": "869461a1117450f8ecc5321d68c81cc48c3875fa",
+          "targetBlob": "869461a1117450f8ecc5321d68c81cc48c3875fa",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/ios/Sources/QelvoraUI/Commerce/StoreMembership.swift",
+          "sourceBlob": "6a68f185090c988d00a74293bf846e6839e5d616",
+          "targetBlob": "6a68f185090c988d00a74293bf846e6839e5d616",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/ios/Sources/QelvoraUI/Commerce/StoreMembershipPane.swift",
+          "sourceBlob": "aa12079e534b98030427dcbd51bc369ebf547793",
+          "targetBlob": "aa12079e534b98030427dcbd51bc369ebf547793",
+          "classification": "exact"
+        }
+      ],
+      "historicalSupportingPaths": [
+        "artifacts/workstreams/W4/runtime/2026-10-03/commerce-original-session/README.md",
+        "artifacts/workstreams/W4/runtime/2026-10-03/native-original-session/README.md",
+        "artifacts/workstreams/W4/runtime/2026-10-03/open-pr-review/README.md",
+        "docs/implementation/W1-captured-commerce-transport.md",
+        "docs/implementation/W1-captured-trust-transport.md",
+        "docs/workstreams/handoffs/W4-continuation-handoff-2026-10-03-afternoon.md",
+        "docs/workstreams/implementation/W4-completion-2026-10-01.md",
+        "docs/workstreams/prompts/W4-next-agent-2026-10-03.md",
+        "docs/workstreams/status/W4.md"
+      ]
+    },
+    {
+      "number": 305,
+      "sourceHead": "603282f520defa2b0267c5fa45121b6102fdc261",
+      "files": [
+        {
+          "path": "apps/backend/src/core/errors.ts",
+          "sourceBlob": "d530f5b2117406efb5541117b61ef30fe008d8c4",
+          "targetBlob": "d530f5b2117406efb5541117b61ef30fe008d8c4",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/core/query-settlement.ts",
+          "sourceBlob": "804aeb8eb1889516cd0d4d6077cea251cfc7cded",
+          "targetBlob": "804aeb8eb1889516cd0d4d6077cea251cfc7cded",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/fulfillment-publication-original-catalogue.ts",
+          "sourceBlob": "70695e1746e1da25363998f50373f23c3929d8d1",
+          "targetBlob": "70695e1746e1da25363998f50373f23c3929d8d1",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/schema-fulfillment-publication-original-hash.sql",
+          "sourceBlob": "86fd66c751c70121a852ca8af66b811d521fa873",
+          "targetBlob": "86fd66c751c70121a852ca8af66b811d521fa873",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/content/held-client-cleanup.ts",
+          "sourceBlob": "9bf8221f99ecdd0afad368fac487905546ee8194",
+          "targetBlob": "7e9bf7b1f9d4b7ebc444e91de13ceb65c898369e",
+          "classification": "reviewed-successor",
+          "review": "Retain newer original callback draining, actual source PID cancellation with original pool credentials, preserved shorter budgets, actual transaction receipts and aggregate cleanup. Older promise-race helper is superseded.",
+          "difference": "pr305-apps_backend_src_modules_content_held-client-cleanup.ts.patch"
+        },
+        {
+          "path": "apps/backend/src/modules/identity/publication-preparation-catalogue.ts",
+          "sourceBlob": "0c5bf01634819a313918340afb696d9d0c0a74d9",
+          "targetBlob": "0c5bf01634819a313918340afb696d9d0c0a74d9",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/identity/publication-scope.ts",
+          "sourceBlob": "9d4185b1b059f821b43b02e57755c05481557efd",
+          "targetBlob": "9d4185b1b059f821b43b02e57755c05481557efd",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/identity/publication-transaction.ts",
+          "sourceBlob": "7b26d79b4cf7e44454070f82e03d75e8e2a8e90a",
+          "targetBlob": "7b26d79b4cf7e44454070f82e03d75e8e2a8e90a",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/identity/schema-publication-preparation.sql",
+          "sourceBlob": "6cd779aca3121e3a4abd8b7b0d6be13e9ababf24",
+          "targetBlob": "6cd779aca3121e3a4abd8b7b0d6be13e9ababf24",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/media/publication.ts",
+          "sourceBlob": "a24c829c9c657c4e98412ce5b9fb4d8968bfe66f",
+          "targetBlob": "a24c829c9c657c4e98412ce5b9fb4d8968bfe66f",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/media/worker-access.ts",
+          "sourceBlob": "1fad0b24a6bf43ef8a9a2dd9aab3aa359e37c4e6",
+          "targetBlob": "1fad0b24a6bf43ef8a9a2dd9aab3aa359e37c4e6",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/media/worker.ts",
+          "sourceBlob": "80206139abe284f5bc83cc02f8422315a372b3eb",
+          "targetBlob": "80206139abe284f5bc83cc02f8422315a372b3eb",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/workers/media.ts",
+          "sourceBlob": "3a38ded1528eb9cff4b8798c5f629265587142b7",
+          "targetBlob": "3a38ded1528eb9cff4b8798c5f629265587142b7",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/workers/publication.ts",
+          "sourceBlob": "9f3283e0967b69dfed01b0125bc322ef38107bb6",
+          "targetBlob": "9f3283e0967b69dfed01b0125bc322ef38107bb6",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/workers/start.ts",
+          "sourceBlob": "2cc9c242f6b71fc344971a967f93ec15f82d7c39",
+          "targetBlob": "2cc9c242f6b71fc344971a967f93ec15f82d7c39",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/web/app/studio/[creatorId]/[[...screen]]/page.tsx",
+          "sourceBlob": "90188c6bea0c79ffc8cae2f532c926dcbb56b311",
+          "targetBlob": "90188c6bea0c79ffc8cae2f532c926dcbb56b311",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/web/features/media/VoiceRecorder.tsx",
+          "sourceBlob": "9ad918ed7a5d03a8c55b0b7404d631cf7abd4813",
+          "targetBlob": "9ad918ed7a5d03a8c55b0b7404d631cf7abd4813",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/web/features/media/api.ts",
+          "sourceBlob": "4954772964f1ad389a6e22b03c959cdf5e99d99c",
+          "targetBlob": "4954772964f1ad389a6e22b03c959cdf5e99d99c",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/web/features/studio/PhotoAttachment.tsx",
+          "sourceBlob": "fc44c0ff6fb44de3a0c8568e083b3b44fdda44b0",
+          "targetBlob": "fc44c0ff6fb44de3a0c8568e083b3b44fdda44b0",
+          "classification": "exact"
+        }
+      ],
+      "historicalSupportingPaths": [
+        "artifacts/workstreams/W1/resume/2026-10-03-publication-custody/run.md",
+        "artifacts/workstreams/W6/creator-call-offer/2026-10-03/README.md",
+        "artifacts/workstreams/W6/ingestion-settlement/2026-10-03/README.md",
+        "artifacts/workstreams/W6/media-discard-lifetime/2026-10-03/README.md",
+        "artifacts/workstreams/W6/publication-original-signal/2026-10-03/README.md",
+        "artifacts/workstreams/W6/resource-headroom/2026-10-03/README.md",
+        "artifacts/workstreams/W6/studio-media-session/2026-10-03/README.md",
+        "docs/implementation/W1-publication-connection-custody.md",
+        "docs/implementation/W6-creator-media.md",
+        "docs/workstreams/contracts/W1-publication-original-signal.md",
+        "docs/workstreams/contracts/W6-publication-original-media-signal.md",
+        "docs/workstreams/coordination/W6-pr-review-followup-2026-10-03.md",
+        "docs/workstreams/coordination/W6.md",
+        "docs/workstreams/handoffs/W6-2026-10-03-owned-checkpoint.md",
+        "docs/workstreams/prompts/W6-resume-20261003-owned-checkpoint.md",
+        "docs/workstreams/status/W6.md"
+      ]
+    }
+  ],
+  "integrationRepairs": [
+    "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt",
+    "apps/ios/Sources/QelvoraUI/Conversation/W3FanFeatures.swift",
+    "apps/ios/Sources/QelvoraUI/Trust.swift"
+  ],
+  "validation": {
+    "generationCheck": "passed: 12 shared resources, 119 API operations",
+    "backendBuild": "passed at 3b0f8181",
+    "webTypecheck": "passed",
+    "scopedLintFormat": "passed",
+    "swiftPackageTests": "18 passed at 6812395a",
+    "swiftRuntime": "Apple Swift 6.3.2, x86_64 macOS; existing package compiler/identity/protocol/catalogue snapshots, not device/audio operation",
+    "swiftDependencyNote": "Local SwiftPM resolved xctest-dynamic-overlay 1.13.1 in place of the retained swift-issue-reporting 2.1.1 lock identity. Application dependency pins were unchanged; the repository lockfile was restored. This local test run is not an exact-lock CI result.",
+    "swiftLogSha256": "db645fb8cf13edb7f31b8f14e63980a2c8859064cb4c15fce1eab9a6b528befa",
+    "android": "No local JDK available; current hosted compile/test qualification pending."
+  }
+}
