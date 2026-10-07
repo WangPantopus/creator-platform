@@ -262,6 +262,7 @@ export async function composeConversationHost(
     journal = await PreparedGenerationJournal.prepare(runtime.pool, {
       migration: { version: migrations.journal, checksum: journalChecksum },
       ...producers.journalPolicy,
+      signal: producers.generation?.signal,
     });
   // The Agent lifecycle and export cursor retain the same original expiry
   // producer. A policy string or a matching URL cannot replace its custody.

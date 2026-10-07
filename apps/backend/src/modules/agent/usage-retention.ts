@@ -4,6 +4,7 @@ import type { AgentRepository, CreatorScope } from "./repository.js";
 import type { PreparedGenerationJournal } from "./generation-journal.js";
 import { agentPrivacyTransaction } from "./privacy-transaction.js";
 import { unresolvedAccountingInTransaction } from "./accounting-uncertainty.js";
+import { agentPreparationRead } from "./preparation-read.js";
 
 // Held above the lineage prerequisite; original reserved SQL stays immutable.
 export const USAGE_RETENTION_MIGRATION = "0165_w2_usage_retention_expiry";
@@ -36,6 +37,7 @@ export class PreparedUsageRetention {
       policyVersion: string;
       authority: UsageExpiryAuthority;
       assertPrivacyRegistered: () => Promise<void>;
+      signal?: AbortSignal;
     },
   ) {
     invariant(
@@ -48,31 +50,42 @@ export class PreparedUsageRetention {
       "accounting_retention_unconfigured",
       "Exact installed retention custody, current expiry authority and registered privacy consumers are required.",
     );
-    const migration = (
-      await pool.query<{ checksum: string }>(
-        "SELECT checksum FROM creator.schema_migration WHERE version=$1",
-        [input.migration.version],
-      )
-    ).rows[0];
-    const schema = (
-      await pool.query<{ ready: boolean }>(
-        `SELECT
+    const { migration, schema, database } = await agentPreparationRead(
+      pool,
+      async (client) => {
+        const migration = (
+          await client.query<{ checksum: string }>(
+            "SELECT checksum FROM creator.schema_migration WHERE version=$1",
+            [input.migration.version],
+          )
+        ).rows[0];
+        const schema = (
+          await client.query<{ ready: boolean }>(
+            `SELECT
           (SELECT count(*)=4 FROM information_schema.columns WHERE table_schema='creator' AND table_name='ai_usage' AND column_name IN ('accounting_retained_until','accounting_retention_version','accounting_retention_reason','accounting_disposition_reference'))
           AND EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid='creator.ai_usage'::regclass AND conname='ai_usage_retention_binding' AND convalidated)
           AND EXISTS (SELECT 1 FROM pg_index i JOIN pg_class c ON c.oid=i.indexrelid WHERE i.indrelid='creator.ai_usage'::regclass AND c.relname='ai_usage_retention_due' AND i.indisvalid)
           AND (SELECT relrowsecurity AND relforcerowsecurity FROM pg_class WHERE oid='creator.ai_usage'::regclass)
           AS ready`,
-      )
-    ).rows[0];
+          )
+        ).rows[0];
+        const database = (
+          await client.query<{ name: string }>(
+            "SELECT current_database() AS name",
+          )
+        ).rows[0]!.name;
+        return { migration, schema, database };
+      },
+      input.signal,
+    );
     invariant(
       migration?.checksum === input.migration.checksum && schema?.ready,
       "accounting_retention_schema_unconfigured",
       "The complete registered accounting retention migration is required.",
     );
+    input.signal?.throwIfAborted();
     await input.assertPrivacyRegistered();
-    const database = (
-      await pool.query<{ name: string }>("SELECT current_database() AS name")
-    ).rows[0]!.name;
+    input.signal?.throwIfAborted();
     return Object.freeze(
       new PreparedUsageRetention(
         pool,
