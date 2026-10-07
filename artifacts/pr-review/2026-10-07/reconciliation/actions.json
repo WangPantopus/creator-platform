@@ -1,0 +1,47 @@
+{
+  "evidenceCommit": "f442ece7d2e668b16a246f71d0695dccb645a438",
+  "actions": [
+    {
+      "at": "2026-10-07T19:14:29.805812+00:00",
+      "action": "successor_obligations_comment",
+      "number": 145,
+      "result": "https://github.com/WangPantopus/creator-platform/pull/145#issuecomment-6045016732"
+    },
+    {
+      "at": "2026-10-07T19:14:30.904472+00:00",
+      "action": "source_consolidation_comment",
+      "number": 131,
+      "result": "https://github.com/WangPantopus/creator-platform/pull/131#issuecomment-6045017083"
+    },
+    {
+      "at": "2026-10-07T19:14:32.843032+00:00",
+      "action": "close_unmerged_preserve_branch",
+      "number": 131,
+      "result": "\u2713 Closed pull request WangPantopus/creator-platform#131 (Bind generation negatives to the genuine private worker nonce)"
+    },
+    {
+      "at": "2026-10-07T19:14:34.785573+00:00",
+      "action": "successor_obligations_comment",
+      "number": 63,
+      "result": "https://github.com/WangPantopus/creator-platform/pull/63#issuecomment-6045018229"
+    },
+    {
+      "at": "2026-10-07T19:14:35.956134+00:00",
+      "action": "source_consolidation_comment",
+      "number": 242,
+      "result": "https://github.com/WangPantopus/creator-platform/pull/242#issuecomment-6045018542"
+    },
+    {
+      "at": "2026-10-07T19:14:38.480696+00:00",
+      "action": "close_unmerged_preserve_branch",
+      "number": 242,
+      "result": "\u2713 Closed pull request WangPantopus/creator-platform#242 (feat(trust): add held original-task Conversation family authority)"
+    },
+    {
+      "at": "2026-10-07T19:14:40.419191+00:00",
+      "action": "integration_continuation_comment",
+      "number": 132,
+      "result": "https://github.com/WangPantopus/creator-platform/pull/132#issuecomment-6045019860"
+    }
+  ]
+}

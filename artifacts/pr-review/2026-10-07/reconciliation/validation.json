@@ -1,0 +1,15 @@
+{
+  "observedAt": "2026-10-07T19:15:39.386741+00:00",
+  "inventorySha256": "10dd37c392e26bf944bbbd83cbafa460eaa66199cab2b193d67faafe60ee7cbe",
+  "checks": [
+    "Reran inventory.py: byte-identical JSON output",
+    "All changed paths from each of 18 main merge bases accounted for exactly once",
+    "Per-target classification counts match file counts; no binary/comparison errors",
+    "All 18 CI snapshots match pinned heads and report completed successful checks",
+    "Both consolidation ancestry and all source/target blob proofs rechecked",
+    "Local links in new ledger/checkpoint/evidence README resolved",
+    "git diff --cached --check passed on initial evidence commit",
+    "Post-consolidation GitHub state and all 18 preserved remote branches verified"
+  ],
+  "scope": "Documentation and source-preservation verification. No fresh application, database, device or full CI-log acceptance."
+}

@@ -288,6 +288,7 @@ D-H, D-01 to D-27) are in the Domain Model.
 | 2026-09-25 | Phases 4 to 6 drafted end to end: 64 screens on six canvases, five prototypes, the audit and developer handoff (see the design plan for links) |
 | 2026-09-25 | Brand aim: a high-end, premium product. The luxury comes from craft, calm, service and honesty ("quiet luxury"), never from status or exclusivity language, which the copy system forbids |
 | 2026-10-02 | Human directs streams to prioritize working features and personally operated web/native E2E; retain functional JSON and concise necessary records, avoid committing routine screenshots or bulky diagnostic receipts. W3 [current checkpoint](workstreams/handoffs/W3-mac-studio-2026-10-02.md) remains incomplete. |
+| 2026-10-07 | Founder authorized reconciling the existing PR work before new feature development, preserving useful implementations and assigning one continuation path per unfinished area. See the [reconciliation ledger](operations/pr-reconciliation-2026-10-07.md); product scope and invariants remain unchanged. |
 
 ## 15. Open questions and known inconsistencies
 

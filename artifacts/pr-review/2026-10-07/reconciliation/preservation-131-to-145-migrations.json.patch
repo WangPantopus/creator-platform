@@ -1,0 +1,13 @@
+diff --git a/infra/migrations.json b/infra/migrations.json
+index 84cbb933..490defc9 100644
+--- a/infra/migrations.json
++++ b/infra/migrations.json
+@@ -768 +768 @@
+-      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Requires exact0099 private terminal contract; distinguish current completion from metadata/financial cleanup with restoration/freeze fences.",
++      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Requires exact0099 private terminal contract; distinguish current completion from metadata/financial cleanup with restoration/freeze fences. Actual0099 original nonce/task/client/XID/PID/cursor negatives; terminal NoLogin-only EXECUTE, closed empty SQL/compiler/ACL review complete. Genuine activation/worker/job/provider/original settlement/current denial race acceptance pending.",
+@@ -772 +772,4 @@
+-      ]
++      ],
++      "path": "apps/backend/migrations/0100_w8_generation_terminal_denial.sql",
++      "sourceCommit": "d12db34c7c83dd9df9cdd830557e3dcc0c5a6bdb",
++      "sourceSha256": "393920665d8860ee53ee6ef740ba0ad4a6921aceddcbf33f6419727e846532af"
