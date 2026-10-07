@@ -6,6 +6,7 @@ import type { AccessService, ThreadScope } from "../access/scope.js";
 import type { createAgentDomain } from "../agent/integration.js";
 import { confirmAcceptedGeneration } from "../identity/generation-scope.js";
 import { conversationAgentGenerator } from "./agent-generator.js";
+import { CommerceGenerationAllowance } from "../commerce/generation-allowance.js";
 
 /** Acceptance and free safety use the canonical interactive session. Only the
  * separately prepared worker executes the durable accepted generation. */
@@ -16,6 +17,7 @@ export class PreparedGenerationAcceptance {
       database: Database;
       access: AccessService;
       agent: ReturnType<typeof createAgentDomain>;
+      allowance: CommerceGenerationAllowance;
     },
     private readonly adapter: ReturnType<typeof conversationAgentGenerator>,
   ) {}
@@ -25,9 +27,11 @@ export class PreparedGenerationAcceptance {
     database: Database;
     access: AccessService;
     agent: ReturnType<typeof createAgentDomain>;
+    allowance: CommerceGenerationAllowance;
   }): PreparedGenerationAcceptance {
     invariant(
-      input.worker instanceof GenerationWorker,
+      input.worker instanceof GenerationWorker &&
+        input.allowance instanceof CommerceGenerationAllowance,
       "generation_acceptance_unconfigured",
       "Prepare the original scoped worker before accepting fan generation.",
     );
@@ -42,6 +46,8 @@ export class PreparedGenerationAcceptance {
       "generation_acceptance_unconfigured",
       "The original accounting journal and free safety route are required.",
     );
+    input.allowance.assertComposition(input.database.pool, input.access);
+    input.allowance.assertJournal(adapter.generator.journal);
     return new PreparedGenerationAcceptance(
       Object.freeze({ ...input }),
       adapter,
@@ -64,6 +70,23 @@ export class PreparedGenerationAcceptance {
 
   get journal() {
     return this.configuration.agent.service.repository.usageJournal!;
+  }
+
+  reserve(scope: ThreadScope, client: PoolClient, generationId: string) {
+    this.assertComposition(
+      this.configuration.database,
+      this.configuration.access,
+    );
+    this.configuration.allowance.assertComposition(
+      this.configuration.database.pool,
+      this.configuration.access,
+    );
+    this.configuration.allowance.assertJournal(this.journal);
+    return this.configuration.allowance.reserveGeneration(
+      scope,
+      client,
+      generationId,
+    );
   }
 
   async assertReady(scope: ThreadScope, client: PoolClient): Promise<void> {

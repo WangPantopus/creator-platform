@@ -874,11 +874,17 @@ export class ConversationService {
               );
             await this.delivery.assertReady?.(scope, client);
             const generationId = randomUUID();
-            const reservation = await this.delivery.allowance?.reserve(
-              scope,
-              client,
-              `generation:${generationId}`,
-            );
+            const reservation = this.delivery.generationAcceptance
+              ? await this.delivery.generationAcceptance.reserve(
+                  scope,
+                  client,
+                  generationId,
+                )
+              : await this.delivery.allowance?.reserve(
+                  scope,
+                  client,
+                  `generation:${generationId}`,
+                );
             const grantId =
               reservation?.grantId ??
               (await this.access.reserveAllowance(scope, client, generationId));

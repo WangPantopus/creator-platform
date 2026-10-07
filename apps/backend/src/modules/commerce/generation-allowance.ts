@@ -474,6 +474,15 @@ export class CommerceGenerationAllowance implements GenerationAllowance {
     );
   }
   async reserve(scope: ThreadScope, client: PoolClient, generationId: string) {
+    return (await this.reserveGeneration(scope, client, generationId)).grantId;
+  }
+  /** W3 captures this exact weighted reservation on its accepted generation
+   * within the same transaction. A grant UUID alone cannot bind the worker. */
+  async reserveGeneration(
+    scope: ThreadScope,
+    client: PoolClient,
+    generationId: string,
+  ) {
     if (this.captureOriginalRule) await assertOriginalCostCustody(client);
     const reservation = await reserveCostAllowance(
       client,
@@ -499,7 +508,7 @@ export class CommerceGenerationAllowance implements GenerationAllowance {
       "reservation_unavailable",
       "Generation allowance is unavailable.",
     );
-    return row.grant_id;
+    return { grantId: row.grant_id, reservationId: reservation.id };
   }
   async settle(
     scope: ThreadScope,

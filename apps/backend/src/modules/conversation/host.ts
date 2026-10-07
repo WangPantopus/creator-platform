@@ -487,12 +487,13 @@ export async function composeConversationHost(
           journal,
         })
       : undefined;
-  if (worker)
+  if (worker && commerce?.allowance)
     acceptance = PreparedGenerationAcceptance.prepare({
       worker,
       database: runtime.database,
       access: runtime.access,
       agent,
+      allowance: commerce.allowance,
     });
   const generation =
     acceptance && commerce?.generationCostReconciliation
