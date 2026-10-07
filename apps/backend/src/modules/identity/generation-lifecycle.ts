@@ -7,16 +7,16 @@ export const generationLifecycleSource = Object.freeze({
   owner: "W1",
   name: "w1_generation_lifecycle",
   path: "apps/backend/src/modules/identity/schema-generation-lifecycle.sql",
-  checksum: "cd530fbc58dcaf63002f4214873ba877feb0d2866eefb2a94988062e2ca39057",
+  checksum: "9eba74f6ae86c52eddde1acc4f7780a5c98762a86681920e11edfec15cd070a8",
 });
 
 /** Closed PostgreSQL definition receipts. The source is held as0226;
  * these do not activate it or qualify the complete prepared generation graph. */
 export const generationLifecycleDefinitions = Object.freeze({
   "creator.pending_generation_tasks(integer)":
-    "15a1f4f02195c87612e35abda9d3a1f24ee64a9cb89d733dda0279417f8aa5b6",
+    "69e18fd0c8f7f0cc1582f07980372587153e953ad20844d7720d7a4005e00330",
   "creator.pending_generation_terminals(integer)":
-    "a2b93aaec3a7702ff1534993fb57a70bf2643219a8f026baa9c47fb76380bcf3",
+    "b619edf7052bba513ea9b060289eabdf00424364b37ae75823018a7fcbb8cdef",
   "creator.fence_generation_first_claim()":
     "c1374b465c9a4ceaf58661a9e6f2e93b15a1f3462ae62af71301ab6dcc668171",
 });

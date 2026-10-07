@@ -23,6 +23,8 @@ BEGIN
  END IF;
  RETURN QUERY SELECT id FROM creator.generation
   WHERE state='queued' AND worker_token IS NULL AND lease_until IS NULL AND last_sequence=0
+   AND initiating_account_id IS NOT NULL AND initiating_session_id IS NOT NULL
+   AND initiating_adult_verified_at IS NOT NULL AND acceptance_transaction IS NOT NULL
   ORDER BY accepted_at,id LIMIT n;
 END $$;
 
@@ -35,10 +37,16 @@ BEGIN
   RAISE EXCEPTION 'Use bounded terminal discovery' USING ERRCODE='42501';
  END IF;
  RETURN QUERY SELECT id FROM creator.generation WHERE state IN('queued','generating')
+  AND initiating_account_id IS NOT NULL AND initiating_session_id IS NOT NULL
+  AND initiating_adult_verified_at IS NOT NULL AND acceptance_transaction IS NOT NULL
   AND (state='generating' OR worker_token IS NOT NULL OR lease_until IS NOT NULL OR last_sequence<>0)
   AND (lease_until IS NULL OR lease_until<=clock_timestamp())
   ORDER BY accepted_at,id LIMIT n;
 END $$;
+
+-- Original claim and terminal custody both require this complete provenance.
+-- Legacy/unconfirmed rows stay untouched; they cannot occupy every bounded
+-- discovery slot ahead of genuine accepted work or be silently adopted.
 
 -- Discovery is only an observation. A candidate may have been claimed by a
 -- different process before this process reaches it. Fence the actual UPDATE,

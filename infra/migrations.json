@@ -1120,9 +1120,9 @@
       "owner": "W1",
       "version": "0226_w1_generation_lifecycle",
       "path": "apps/backend/src/modules/identity/schema-generation-lifecycle.sql",
-      "sourceSha256": "cd530fbc58dcaf63002f4214873ba877feb0d2866eefb2a94988062e2ca39057",
+      "sourceSha256": "9eba74f6ae86c52eddde1acc4f7780a5c98762a86681920e11edfec15cd070a8",
       "state": "reserved_unapplied",
-      "reason": "Separate additive lifecycle successor reviewed in the October 7 worker integration. Splits fresh never-claimed zero-cursor discovery from previously claimed recovery, and fences the actual original first-claim UPDATE against stale discovery replay. Preserves original0159/0183 source bytes and existing grants/owners. Closed PostgreSQL compiler, selector/trigger shape operations and eight metadata drift/restoration checks pass. Complete prepared graph and genuine accepted-task/concurrent claim/cancellation/recovery qualification remain required before activation."
+      "reason": "Separate additive lifecycle successor reviewed in the October 7 worker integration. Splits fresh never-claimed zero-cursor discovery from previously claimed recovery, excludes legacy/unconfirmed rows missing the original acceptance provenance, and fences the actual original first-claim UPDATE against stale discovery replay. Preserves original0159/0183 source bytes and existing grants/owners. Closed PostgreSQL compiler, selector/trigger shape operations and eight metadata drift/restoration checks pass. Complete prepared graph and genuine accepted-task/concurrent claim/cancellation/recovery qualification remain required before activation."
     }
   ]
 }
