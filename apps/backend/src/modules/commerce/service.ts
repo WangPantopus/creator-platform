@@ -320,7 +320,7 @@ export class CommerceService {
     // request, purpose or provider authority and cannot extend a task lease.
     const signal = AbortSignal.timeout(45_000);
     const client = await this.pool.connect();
-    const held = new ContentHeldClient(client, signal);
+    const held = new ContentHeldClient(client, signal, this.pool);
     let failed = false;
     let failure: unknown;
     let result!: T;

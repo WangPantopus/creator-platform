@@ -40,8 +40,6 @@ export class ContentHeldClient {
   private cancelling: Promise<void> | undefined;
   private sourcePid: number | undefined;
   private readonly cancellationFailures: unknown[] = [];
-  private readonly aborted: Promise<never>;
-  private rejectAbort!: (reason: unknown) => void;
 
   private readonly onError = (error: Error) => {
     this.transportFailure ??= error;
@@ -50,7 +48,6 @@ export class ContentHeldClient {
   private readonly abort = () => {
     this.discard = true;
     void this.cancelAndClose();
-    this.rejectAbort(this.signal?.reason);
   };
 
   constructor(
@@ -58,12 +55,6 @@ export class ContentHeldClient {
     private readonly signal?: AbortSignal,
     private readonly sourcePool?: Pool,
   ) {
-    this.aborted = new Promise<never>((_, reject) => {
-      this.rejectAbort = reject;
-    });
-    // An abort can arrive between operations. Keep its rejection handled while
-    // the finalizer awaits this same original client's close.
-    void this.aborted.catch(() => {});
     client.on("error", this.onError);
     signal?.addEventListener("abort", this.abort, { once: true });
     if (signal?.aborted) this.abort();
@@ -133,7 +124,9 @@ export class ContentHeldClient {
     if (this.settled || this.ending || this.client.pipeline)
       throw new Error("The original non-pipelined Content client is required.");
     try {
-      const result = await Promise.race([operation(), this.aborted]);
+      // Abort cancels/closes the actual source. Await the original callback
+      // and its finalizers rather than returning while they still run.
+      const result = await operation();
       this.signal?.throwIfAborted();
       if (this.transportFailure !== undefined) throw this.transportFailure;
       return result;
@@ -214,6 +207,9 @@ export class ContentHeldClient {
         }
       }
       this.discard ||= this.signal?.aborted === true;
+      // A pg read timeout can precede any caller/host abort. Socket closure
+      // alone leaves that source executing, so settle its observed PID too.
+      if (this.discard && this.sourcePool) await this.cancelAndClose();
       if (this.cancelling) await this.cancelling;
       if (this.discard || this.ending) await this.close();
       // Cancellation can arrive while an uncertain source close is pending.

@@ -157,7 +157,7 @@ export class Database {
     // SHARE and deadlock when they subsequently upgrade to UPDATE.
     const threadLock = lockMode === "write" ? "UPDATE" : "SHARE";
     const client = await this.pool.connect();
-    const held = new ContentHeldClient(client);
+    const held = new ContentHeldClient(client, undefined, this.pool);
     let failure: unknown;
     try {
       await held.begin();
