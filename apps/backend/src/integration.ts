@@ -452,45 +452,70 @@ export async function createConfiguredBackend(input: {
         typeof input.trust === "function"
           ? await input.trust(backendRuntime)
           : input.trust;
-      if (
-        (input.identity.mode === "development") !==
-          (configuration.environment === "local-development") ||
-        (configuration.environment === "local-development" &&
-          configuration.identityMode !== "development")
-      )
-        throw new Error(
-          "Trust environment must agree with the canonical identity mode.",
+      try {
+        if (
+          (input.identity.mode === "development") !==
+            (configuration.environment === "local-development") ||
+          (configuration.environment === "local-development" &&
+            configuration.identityMode !== "development")
+        )
+          throw new Error(
+            "Trust environment must agree with the canonical identity mode.",
+          );
+        const privacyAuthority = platformIdentity
+          ? trustIdentityAuthority(pool, platformIdentity, access, database)
+          : {};
+        trust = await createTrustRuntime({
+          ...configuration,
+          dependencies: {
+            ...privacyAuthority,
+            ...configuration.dependencies,
+            privacyVerificationMethod: configuration.dependencies.verifyPrivacy
+              ? (configuration.dependencies.privacyVerificationMethod ??
+                "external_receipt")
+              : privacyAuthority.privacyVerificationMethod,
+          },
+          origin: input.config.allowedOrigin,
+          actor: async (request) => {
+            const token =
+              request.headers.authorization?.match(/^Bearer ([^\s]+)$/u)?.[1];
+            if (!token)
+              throw new DomainError(
+                "session_required",
+                "Continue with Pantopus to use this app.",
+                401,
+              );
+            // The canonical middleware has already resolved this request. Keep
+            // its exact actor and session instead of issuing a second identity.
+            const original = requestAuthority.getStore();
+            if (original?.actor) return original.actor;
+            return resolveActor(sessions ?? input.identity, token);
+          },
+        });
+      } catch (cause) {
+        // The configuration has transferred its resources, but a refused
+        // runtime has no stop() owner yet. Settle every acquired resource and
+        // preserve the preparation failure before the outer host closes core.
+        const cleanup = await Promise.allSettled([
+          ...(configuration.closePoolsOnStop
+            ? [...new Set([configuration.apiPool, configuration.workerPool])]
+                .filter((owned) => owned !== pool)
+                .map((owned) => Promise.resolve().then(() => owned.end()))
+            : []),
+          Promise.resolve().then(() =>
+            configuration.privacyArtifacts?.close?.(),
+          ),
+        ]);
+        const failures = cleanup.flatMap((result) =>
+          result.status === "rejected" ? [result.reason] : [],
         );
-      const privacyAuthority = platformIdentity
-        ? trustIdentityAuthority(pool, platformIdentity, access, database)
-        : {};
-      trust = await createTrustRuntime({
-        ...configuration,
-        dependencies: {
-          ...privacyAuthority,
-          ...configuration.dependencies,
-          privacyVerificationMethod: configuration.dependencies.verifyPrivacy
-            ? (configuration.dependencies.privacyVerificationMethod ??
-              "external_receipt")
-            : privacyAuthority.privacyVerificationMethod,
-        },
-        origin: input.config.allowedOrigin,
-        actor: async (request) => {
-          const token =
-            request.headers.authorization?.match(/^Bearer ([^\s]+)$/u)?.[1];
-          if (!token)
-            throw new DomainError(
-              "session_required",
-              "Continue with Pantopus to use this app.",
-              401,
-            );
-          // The canonical middleware has already resolved this request. Keep
-          // its exact actor and session instead of issuing a second identity.
-          const original = requestAuthority.getStore();
-          if (original?.actor) return original.actor;
-          return resolveActor(sessions ?? input.identity, token);
-        },
-      });
+        if (failures.length)
+          throw new AggregateError(
+            [cause, ...failures],
+            "Trust preparation and cleanup failed.",
+          );
+        throw cause;
+      }
     }
     issuedRuntimes.set(
       backendRuntime,
