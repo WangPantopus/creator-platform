@@ -1,13 +1,13 @@
 {
   "base": "556bd89e3696bd65f02def800dc7904d243164ec",
-  "recordedAt": "2026-10-07T09:10:22.403907+00:00",
+  "recordedAt": "2026-10-07T09:15:19.215180+00:00",
   "scope": "Original owner source settlement after uncertain pg read responses. No schema, permission, registry, task or actor issuance changes.",
   "metadata": {
     "scope": "Actual original Identity transaction with metadata-only callback and Content prepare with missing genuine registration. No actor/session/task/purpose or positive export invented.",
     "observed": [
       {
         "owner": "identity_metadata",
-        "elapsedMs": 184,
+        "elapsedMs": 187,
         "sourceBackendGone": true,
         "poolReusable": true,
         "codes": ["Query read timeout"]
@@ -27,7 +27,7 @@
       {
         "owner": "identity",
         "case": "actual_original_http_read_timeout",
-        "elapsedMs": 189,
+        "elapsedMs": 199,
         "status": 503,
         "code": "service_unavailable",
         "sourceBackendGone": true
@@ -40,7 +40,7 @@
       {
         "owner": "commerce",
         "case": "actual_original_http_read_timeout",
-        "elapsedMs": 195,
+        "elapsedMs": 201,
         "status": 503,
         "code": "commerce_transaction_unavailable",
         "sourceBackendGone": true
@@ -53,7 +53,7 @@
     ],
     "counts": {
       "migrations": 61,
-      "sessions": 13,
+      "sessions": 14,
       "privacy_jobs": 19,
       "usage": 0
     },
@@ -74,14 +74,24 @@
     "existingBackendTests": 18,
     "foundationTests": 9,
     "contractTests": 9,
-    "testDurationSeconds": 105.44,
-    "t11Seconds": 102.229,
+    "testDurationSeconds": 106.13,
+    "t11Seconds": 102.644,
     "t11IsAppP95": false,
-    "testLogSHA256": "9a5db4269e219cdc2429cee8758b90f3564048c5349195ecbdb1798f1e4d3d9d"
+    "testLogSHA256": "4ba28acab4db8a01891ba57e837c3b0fd5da90fe252643f07f027ee8a051f82a"
   },
   "limits": [
     "Original Content prepare remains refused without its registered source. Positive Content export/authority callback operation remains separately held; no purpose/task/ledger was fabricated.",
     "Existing PostgreSQL foundation tests cover Access/Database success, RLS and stale authority; they are not current-app performance distributions.",
     "HTTP read recovery does not qualify paid commerce, full privacy or native flows."
-  ]
+  ],
+  "callbackDrain": {
+    "scope": "Actual original held-client run with a real blocked metadata query and a callback finalizer awaiting a real200ms PostgreSQL read. No authority issued.",
+    "pendingAfterAbort50ms": true,
+    "originalClientStillHeldDuringFinalizer": true,
+    "callbackSettledBeforeRelease": true,
+    "originalSQLCode": "57014",
+    "sourceBackendGone": true,
+    "poolReusable": true,
+    "elapsedMs": 223
+  }
 }
