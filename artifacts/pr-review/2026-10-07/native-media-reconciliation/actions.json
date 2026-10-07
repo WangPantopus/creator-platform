@@ -1,0 +1,62 @@
+[
+  {
+    "number": 284,
+    "before": {
+      "headRefName": "codex/w6-ios-preview-cleanup-20261003",
+      "headRefOid": "bf2a95f19c185786b2617895ff5c00712e76d63b",
+      "number": 284,
+      "state": "OPEN",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/284"
+    },
+    "successor": 132,
+    "successorHead": "32f2d19d187f42ae61833cf2e6862fa547067fc0",
+    "sourceBranchPreserved": true,
+    "after": {
+      "headRefName": "codex/w6-ios-preview-cleanup-20261003",
+      "headRefOid": "bf2a95f19c185786b2617895ff5c00712e76d63b",
+      "number": 284,
+      "state": "CLOSED",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/284"
+    }
+  },
+  {
+    "number": 303,
+    "before": {
+      "headRefName": "codex/w4-native-spending-return-20261003",
+      "headRefOid": "6a82fc1272dc8b25ac167598012aa5da4ff91dc5",
+      "number": 303,
+      "state": "OPEN",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/303"
+    },
+    "successor": 132,
+    "successorHead": "32f2d19d187f42ae61833cf2e6862fa547067fc0",
+    "sourceBranchPreserved": true,
+    "after": {
+      "headRefName": "codex/w4-native-spending-return-20261003",
+      "headRefOid": "6a82fc1272dc8b25ac167598012aa5da4ff91dc5",
+      "number": 303,
+      "state": "CLOSED",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/303"
+    }
+  },
+  {
+    "number": 305,
+    "before": {
+      "headRefName": "codex/w6-studio-media-session-20261003",
+      "headRefOid": "603282f520defa2b0267c5fa45121b6102fdc261",
+      "number": 305,
+      "state": "OPEN",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/305"
+    },
+    "successor": 132,
+    "successorHead": "32f2d19d187f42ae61833cf2e6862fa547067fc0",
+    "sourceBranchPreserved": true,
+    "after": {
+      "headRefName": "codex/w6-studio-media-session-20261003",
+      "headRefOid": "603282f520defa2b0267c5fa45121b6102fdc261",
+      "number": 305,
+      "state": "CLOSED",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/305"
+    }
+  }
+]

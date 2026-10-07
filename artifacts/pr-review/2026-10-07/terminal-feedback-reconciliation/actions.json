@@ -1,0 +1,42 @@
+[
+  {
+    "number": 247,
+    "before": {
+      "headRefName": "codex/w4-generation-safety-terminal-20261003",
+      "headRefOid": "75bba77b53a5c0d0675309daed946f017d3d17bd",
+      "number": 247,
+      "state": "OPEN",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/247"
+    },
+    "successor": 132,
+    "successorHead": "32f2d19d187f42ae61833cf2e6862fa547067fc0",
+    "sourceBranchPreserved": true,
+    "after": {
+      "headRefName": "codex/w4-generation-safety-terminal-20261003",
+      "headRefOid": "75bba77b53a5c0d0675309daed946f017d3d17bd",
+      "number": 247,
+      "state": "CLOSED",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/247"
+    }
+  },
+  {
+    "number": 192,
+    "before": {
+      "headRefName": "codex/w8-development-feedback-lifecycle",
+      "headRefOid": "05225166284225b966a0606192bbbb77821cc18b",
+      "number": 192,
+      "state": "OPEN",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/192"
+    },
+    "successor": 132,
+    "successorHead": "32f2d19d187f42ae61833cf2e6862fa547067fc0",
+    "sourceBranchPreserved": true,
+    "after": {
+      "headRefName": "codex/w8-development-feedback-lifecycle",
+      "headRefOid": "05225166284225b966a0606192bbbb77821cc18b",
+      "number": 192,
+      "state": "CLOSED",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/192"
+    }
+  }
+]
