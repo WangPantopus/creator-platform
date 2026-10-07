@@ -1,0 +1,100 @@
+{
+  "sourceBase": "e3bd62bf45f06f1b199385e465d28ca044bf72ac",
+  "sourceSha256": {
+    "apps/backend/src/modules/trust/media-privacy-hook.ts": "aa6471003e10c26d2c49caee720186e167ad9929a532227e7ffed63bed765ef2"
+  },
+  "change": "The original Media consumer now uses the existing held-client settlement and actual PID cancellation helper with its own runtime pool. Original family discovery, task/restoration/family checks, row bounds, binary/archive requirements and COMMIT remain.",
+  "actualReview": {
+    "scope": "Original Media hook, canonical development HTTP account exports and real worker lease/deadline. Observation captures its actual second checkout after original family discovery, then locks the original private task-scope relation. No client, SQL result, task, authority or receipt is fabricated.",
+    "baselineComplete": true,
+    "observation": {
+      "sourceBackendGone": true,
+      "actualTaskAborted": true,
+      "actualTaskStateBeforeHookReturns": "running",
+      "elapsedMs": 45015,
+      "codes": [
+        "57014"
+      ],
+      "originalRuntimeCheckouts": 2
+    },
+    "afterFailure": {
+      "state": "running",
+      "error_code": null,
+      "attempts": 1
+    },
+    "recovered": {
+      "state": "complete",
+      "error_code": null,
+      "attempts": 2
+    },
+    "scopes": {
+      "identity": 0,
+      "trust": 0
+    },
+    "actual": {
+      "migrations": 61,
+      "sessions": 10,
+      "privacyjobs": 16,
+      "providerusage": 0
+    },
+    "limits": [
+      "Genuine empty-family Media lifecycle and cancellation during original task-fence acquisition only.",
+      "No nonempty media/binary archive, erasure, complete all-eight export or provider work is qualified."
+    ]
+  },
+  "validation": {
+    "backendShippingBuild": "passed under original shared lock",
+    "scopedEslint": "passed",
+    "prettier": "passed"
+  },
+  "limits": [
+    "Genuine empty-family source lifetime only; no nonempty media archive, erasure or complete C10 qualification.",
+    "No schema, grants, registry, generation guard or production fingerprint changed."
+  ],
+  "independentMainReview": {
+    "baseMain": "bfc8e5e7eb7e3db84d505bd7ee250289922c6abb",
+    "sourceHead": "96c1cf5e2975e0120e5fd27e530e36c077c19931",
+    "sourceSha256": "aa6471003e10c26d2c49caee720186e167ad9929a532227e7ffed63bed765ef2",
+    "actualReview": {
+      "scope": "Original Media hook, canonical development HTTP account exports and real worker lease/deadline. Observation captures its actual second checkout after original family discovery, then locks the original private task-scope relation. No client, SQL result, task, authority or receipt is fabricated.",
+      "baselineComplete": true,
+      "observation": {
+        "sourceBackendGone": true,
+        "actualTaskAborted": true,
+        "actualTaskStateBeforeHookReturns": "running",
+        "elapsedMs": 45017,
+        "codes": [
+          "57014"
+        ],
+        "originalRuntimeCheckouts": 2
+      },
+      "afterFailure": {
+        "state": "running",
+        "error_code": null,
+        "attempts": 1
+      },
+      "recovered": {
+        "state": "complete",
+        "error_code": null,
+        "attempts": 2
+      },
+      "scopes": {
+        "identity": 0,
+        "trust": 0
+      },
+      "actual": {
+        "migrations": 61,
+        "sessions": 11,
+        "privacyjobs": 18,
+        "providerusage": 0
+      },
+      "limits": [
+        "Genuine empty-family Media lifecycle and cancellation during original task-fence acquisition only.",
+        "No nonempty media/binary archive, erasure, complete all-eight export or provider work is qualified."
+      ]
+    },
+    "backendShippingBuild": "passed under original W2 shared lock",
+    "scopedEslint": "passed",
+    "prettier": "passed"
+  }
+}
