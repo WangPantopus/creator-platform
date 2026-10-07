@@ -160,4 +160,78 @@ describe("terminal recovery scheduling", () => {
     expect(attempted).toBe(1);
     expect(state.running).toBe(false);
   });
+
+  it("advances past a full unresolved batch and retries it on the next sweep", async () => {
+    const backlog = Array.from({ length: 81 }, (_, index) => ({
+      generationId: `00000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`,
+      lastSequence: 0,
+    }));
+    const cursors: (string | undefined)[] = [];
+    const attempted: string[] = [];
+    const state = {
+      running: false,
+      terminal: {
+        pendingTerminalCursors: async (
+          limit: number,
+          _signal: AbortSignal,
+          after?: string,
+        ) => {
+          cursors.push(after);
+          return backlog
+            .filter((candidate) => !after || candidate.generationId > after)
+            .slice(0, limit);
+        },
+        withTerminal: async (intent: { generationId: string }) => {
+          attempted.push(intent.generationId);
+          throw new Error("Unresolved original receipt; no scope issued");
+        },
+      },
+    };
+    for (let i = 0; i < 6; i++) {
+      const pass = Reflect.apply(
+        GenerationTerminalRecovery.prototype.recoverOnce,
+        state,
+        [new AbortController().signal, 20],
+      ) as Promise<number>;
+      await expect(pass).rejects.toMatchObject({
+        code: "generation_terminal_recovery_incomplete",
+      });
+    }
+    expect(cursors).toEqual([
+      undefined,
+      backlog[19]!.generationId,
+      backlog[39]!.generationId,
+      backlog[59]!.generationId,
+      backlog[79]!.generationId,
+      undefined,
+    ]);
+    expect(attempted.slice(0, 81)).toEqual(
+      backlog.map((candidate) => candidate.generationId),
+    );
+    expect(attempted.slice(81)).toEqual(
+      backlog.slice(0, 20).map((candidate) => candidate.generationId),
+    );
+  });
+
+  it("keeps the last observed page position when discovery fails", async () => {
+    const position = candidates[0]!.generationId;
+    const failure = new Error("Discovery transport unavailable");
+    const state = {
+      running: false,
+      afterGenerationId: position,
+      terminal: {
+        pendingTerminalCursors: async () => {
+          throw failure;
+        },
+      },
+    };
+    const pass = Reflect.apply(
+      GenerationTerminalRecovery.prototype.recoverOnce,
+      state,
+      [new AbortController().signal],
+    ) as Promise<number>;
+    await expect(pass).rejects.toBe(failure);
+    expect(state.afterGenerationId).toBe(position);
+    expect(state.running).toBe(false);
+  });
 });

@@ -11,6 +11,9 @@ import { requestAuthority } from "../modules/identity/request-authority.js";
 export class GenerationTerminalRecovery {
   private running = false;
   private lifetime = false;
+  /** Observation only, retained across passes even when a receipt is unknown.
+   * UUID order needs no acceptance timestamp or new private-row privilege. */
+  private afterGenerationId: string | undefined;
 
   constructor(
     private readonly terminal: GenerationTerminalAuthority,
@@ -43,6 +46,7 @@ export class GenerationTerminalRecovery {
       const candidates = await this.terminal.pendingTerminalCursors(
         bounded,
         signal,
+        this.afterGenerationId,
       );
       let committed = 0;
       const failures: unknown[] = [];
@@ -69,8 +73,14 @@ export class GenerationTerminalRecovery {
           // Abort still retains any incurred/cleanup failure for the host.
           if (signal.aborted && !failures.length) throw cause;
           failures.push(cause);
+        } finally {
+          // Retry unresolved work on the next sweep; never let one full batch
+          // permanently hide later accepted jobs. No outcome is inferred.
+          this.afterGenerationId = candidate.generationId;
         }
       }
+      if (!signal.aborted && candidates.length < bounded)
+        this.afterGenerationId = undefined;
       if (failures.length)
         throw new DomainError(
           "generation_terminal_recovery_incomplete",

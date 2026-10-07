@@ -4,6 +4,7 @@ import { DomainError } from "../../core/errors.js";
 import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
 import { requestAuthority } from "../identity/request-authority.js";
 import { generationLifecycleSource } from "../identity/generation-lifecycle.js";
+import { generationTerminalPageSource } from "../identity/generation-terminal-page.js";
 import { GENERATION_PROFILE_BOUND_SOURCE } from "../agent/generation-profile-bound.js";
 import { GENERATION_CONTENT_ORIGIN_PROFILE_FENCE_SOURCE } from "../content/generation-origin-profile.js";
 
@@ -113,6 +114,7 @@ export const GENERATION_SAFETY_TERMINAL_CATALOGUE_SHA256: string | undefined =
 export const GENERATION_SAFETY_TERMINAL_SOURCES = Object.freeze(
   [
     generationLifecycleSource,
+    generationTerminalPageSource,
     GENERATION_PROFILE_BOUND_SOURCE,
     GENERATION_CONTENT_ORIGIN_PROFILE_FENCE_SOURCE,
     {

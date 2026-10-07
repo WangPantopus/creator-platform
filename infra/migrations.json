@@ -1123,6 +1123,15 @@
       "sourceSha256": "9eba74f6ae86c52eddde1acc4f7780a5c98762a86681920e11edfec15cd070a8",
       "state": "reserved_unapplied",
       "reason": "Separate additive lifecycle successor reviewed in the October 7 worker integration. Splits fresh never-claimed zero-cursor discovery from previously claimed recovery, excludes legacy/unconfirmed rows missing the original acceptance provenance, and fences the actual original first-claim UPDATE against stale discovery replay. Preserves original0159/0183 source bytes and existing grants/owners. Closed PostgreSQL compiler, selector/trigger shape operations and eight metadata drift/restoration checks pass. Complete prepared graph and genuine accepted-task/concurrent claim/cancellation/recovery qualification remain required before activation."
+    },
+    {
+      "id": "0227",
+      "owner": "W1",
+      "version": "0227_w1_generation_terminal_page",
+      "path": "apps/backend/src/modules/identity/schema-generation-terminal-page.sql",
+      "sourceSha256": "8632008a15ba322f6caa3b7a393635851c9d7ea18dcd6ad7f175361d4281149c",
+      "state": "reserved_unapplied",
+      "reason": "Held bounded recovery keyset pages under the original terminal and discovery owners. Only the original discovery wrapper can call the private UUID selector; the worker receives generation ID and observed sentence cursor only. Original0183/0218 and table/column privileges stay intact. Includes a partial pending-job UUID index, exact source/function/index custody and six actual metadata drift/restoration refusals. Closed28-source review, 12 real login/GUC/bound refusals and temporary predicate pages pass; all original catalogue projections restore. No accepted task, receipt, ledger or production whole-graph pin is manufactured. Full prepared owner/privacy/provider/settlement qualification remains required before activation."
     }
   ]
 }

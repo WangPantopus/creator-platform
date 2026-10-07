@@ -5,6 +5,7 @@ import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
 import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
 import type { GenerationTerminalPurposeConsumer } from "./generation-scope.js";
 import { requestAuthority } from "./request-authority.js";
+import { assertGenerationTerminalPageCatalogue } from "./generation-terminal-page.js";
 
 export const generationTerminalDiscoverySource = Object.freeze({
   owner: "W1",
@@ -79,6 +80,7 @@ export async function assertGenerationTerminalDiscoveryCatalogue(
     unavailable();
   try {
     await assertRegisteredMigration(client, generationTerminalDiscoverySource);
+    await assertGenerationTerminalPageCatalogue(client);
     await client.query("SAVEPOINT w1_generation_terminal_discovery_catalogue");
     await client.query("SET LOCAL search_path=pg_catalog");
     const discovery = await generationConsumerCatalogue(

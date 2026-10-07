@@ -10,6 +10,7 @@ import {
 } from "./generation-output-cursor.js";
 import { registeredMigration } from "../../db/reviewed-migration.js";
 import { assertGenerationLifecycleCatalogue } from "./generation-lifecycle.js";
+import { generationTerminalPageSource } from "./generation-terminal-page.js";
 import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import { assertCurrentSession, requestAuthority } from "./request-authority.js";
 import {
@@ -94,6 +95,15 @@ const terminalContracts = [
     checksum:
       "83a56963f6c37e05b0850fa6a0e97475282fbfa3e90d1372f86bea701622e7bc",
     signatures: ["creator.pending_generation_terminal_cursors(integer)"],
+  },
+  {
+    owner: "creator_generation_terminal_discovery",
+    originalScopeBridge: false,
+    version: "0227_w1_generation_terminal_page",
+    checksum: generationTerminalPageSource.checksum,
+    signatures: [
+      "creator.pending_generation_terminal_cursor_page(integer,uuid)",
+    ],
   },
 ] as const;
 // Additive0215 revokes this legacy worker EXECUTE. It must not be relabelled
@@ -463,7 +473,7 @@ export class GenerationIdentityAuthority {
         .parse(input.consumers ?? []);
       terminalConsumers = z
         .array(terminalConsumerSchema)
-        .max(10)
+        .max(11)
         .parse(input.terminalConsumers ?? []);
       const combined = [...consumers, ...terminalConsumers];
       if (

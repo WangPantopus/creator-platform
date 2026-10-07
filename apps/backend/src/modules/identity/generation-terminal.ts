@@ -13,10 +13,11 @@ import {
   assertGenerationPoolCustody,
   generationTransaction,
 } from "./generation-transaction.js";
+import { assertGenerationTerminalDiscoveryCatalogue } from "./generation-terminal-discovery.js";
 import {
-  assertGenerationTerminalDiscoveryCatalogue,
-  generationTerminalDiscoveryConsumer,
-} from "./generation-terminal-discovery.js";
+  assertGenerationTerminalPageCatalogue,
+  generationTerminalPageConsumer,
+} from "./generation-terminal-page.js";
 
 export const GENERATION_TERMINAL_MIGRATION =
   "0183_w1_generation_terminal_scope";
@@ -203,6 +204,7 @@ async function assertTerminalCatalogue(
   input: TerminalCatalogue,
 ): Promise<void> {
   await assertGenerationLifecycleCatalogue(query);
+  await assertGenerationTerminalPageCatalogue(query);
   const ready = (
     await query.query<{ ready: boolean }>(
       `SELECT session_user='creator_generation_worker' AND current_user=session_user
@@ -216,7 +218,7 @@ async function assertTerminalCatalogue(
          AND setdatabase IN(0,(SELECT oid FROM pg_database WHERE datname=current_database())))
         AND NOT EXISTS(SELECT FROM pg_namespace WHERE nspowner=r.oid)
         AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=r.oid))
-       AND (SELECT count(*)=6 FROM pg_proc WHERE proowner=(SELECT oid FROM pg_roles WHERE rolname=$5))
+       AND (SELECT count(*)=7 FROM pg_proc WHERE proowner=(SELECT oid FROM pg_roles WHERE rolname=$5))
        AND EXISTS(SELECT FROM pg_class WHERE oid=to_regclass('creator.generation_terminal_scope')
         AND relkind='r' AND relrowsecurity AND relforcerowsecurity AND pg_get_userbyid(relowner)='creator_owner')
        AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
@@ -514,12 +516,17 @@ export class GenerationTerminalAuthority {
   async pendingTerminalCursors(
     limit = 20,
     signal?: AbortSignal,
+    afterGenerationId?: string,
   ): Promise<readonly GenerationTerminalCandidate[]> {
     this.assertWorker();
     const n = z.int().min(1).max(64).parse(limit);
+    const after =
+      afterGenerationId === undefined
+        ? null
+        : z.uuid().parse(afterGenerationId).toLowerCase();
     try {
       this.configuration.generation.assertTerminalConsumerRegistered(
-        generationTerminalDiscoveryConsumer,
+        generationTerminalPageConsumer,
       );
       return await generationTransaction(this.pool, signal, async (client) => {
         await this.begin(client);
@@ -528,8 +535,8 @@ export class GenerationTerminalAuthority {
           generationId: unknown;
           lastSequence: unknown;
         }>(
-          'SELECT generation_id AS "generationId",last_sequence AS "lastSequence" FROM creator.pending_generation_terminal_cursors($1)',
-          [n],
+          'SELECT generation_id AS "generationId",last_sequence AS "lastSequence" FROM creator.pending_generation_terminal_cursor_page($1,$2) ORDER BY generation_id',
+          [n, after],
         );
         const candidates = z
           .array(terminalCandidateSchema)
@@ -537,7 +544,14 @@ export class GenerationTerminalAuthority {
           .parse(result.rows);
         invariant(
           new Set(candidates.map((candidate) => candidate.generationId))
-            .size === candidates.length,
+            .size === candidates.length &&
+            candidates.every(
+              (candidate, index) =>
+                candidate.generationId >
+                (index === 0
+                  ? (after ?? "")
+                  : candidates[index - 1]!.generationId),
+            ),
           "generation_terminal_discovery_changed",
           "The original terminal candidate metadata changed.",
         );
