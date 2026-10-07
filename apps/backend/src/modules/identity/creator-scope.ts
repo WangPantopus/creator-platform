@@ -9,6 +9,7 @@ import {
   assertHeldCurrentRequestSession,
 } from "./request-authority.js";
 import { DomainError, invariant } from "../../core/errors.js";
+import { withRequestContextRestore } from "./request-context.js";
 
 const creatorScopeBrand: unique symbol = Symbol("CreatorScope");
 
@@ -127,19 +128,21 @@ export class CreatorIdentityAuthority {
       scope.creatorId,
     ]);
     // Hold current negative authority before the positive creator lease.
-    try {
-      await this.configuration.assertAllowed(
-        held.actor,
-        scope.creatorId,
-        client,
-      );
-      await assertHeldCurrentRequestSession(held, client);
-    } finally {
-      await client.query(
-        "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
-        [scope.creatorId, scope.accountId],
-      );
-    }
+    await withRequestContextRestore(
+      async () => {
+        await this.configuration.assertAllowed(
+          held.actor,
+          scope.creatorId,
+          client,
+        );
+        await assertHeldCurrentRequestSession(held, client);
+      },
+      () =>
+        client.query(
+          "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
+          [scope.creatorId, scope.accountId],
+        ),
+    );
     const creator = (
       await client.query<{
         verification: string;
