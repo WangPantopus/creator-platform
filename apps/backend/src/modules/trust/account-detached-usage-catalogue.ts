@@ -12,10 +12,13 @@ export const accountDetachedUsageSource = Object.freeze({
   checksum: "d19aa583d71250c85bdbce97c5d2c168dbb683009451de594f4434574c16874f",
 });
 
-/** Fixed full39-source fresh/preserved metadata and drift review. This pin
+/** Fixed full39-source fresh/preserved metadata, restore and drift review.
+ * Constraints use PostgreSQL's canonical pretty deparse, like schemaCustody:
+ * dump/restore can flatten equivalent AND groups expanded from BETWEEN.
+ * Names, validation and deferrability remain exact. This pin
  * supplies no source registration, original account task or completed erasure. */
 export const accountDetachedUsageExpectedCatalogue: string | undefined =
-  "b0d462dc6dad8bf3da71bb6ab1d36389d7b4ac01645631268dad8c1f3da4b753";
+  "689b6af98b8bf3cfcb88c08c834a1adf32d34c488686eaae913830df6d64d74f";
 
 export const accountDetachedUsageCatalogueQuery = `SELECT jsonb_build_object(
  'role',(SELECT to_jsonb(r)-'oid' FROM pg_roles r WHERE rolname='creator_usage_detachment'),
@@ -50,7 +53,7 @@ export const accountDetachedUsageCatalogueQuery = `SELECT jsonb_build_object(
     FROM aclexplode(a.attacl) g),'[]')) ORDER BY a.attnum)
    FROM pg_attribute a LEFT JOIN pg_attrdef d ON d.adrelid=a.attrelid AND d.adnum=a.attnum
    WHERE a.attrelid=c.oid AND a.attnum>0 AND NOT a.attisdropped),'[]'),
-  'constraints',coalesce((SELECT jsonb_agg(jsonb_build_object('name',k.conname,'definition',pg_get_constraintdef(k.oid),
+  'constraints',coalesce((SELECT jsonb_agg(jsonb_build_object('name',k.conname,'definition',pg_get_constraintdef(k.oid,true),
    'validated',k.convalidated,'deferrable',k.condeferrable,'deferred',k.condeferred) ORDER BY k.conname)
    FROM pg_constraint k WHERE k.conrelid=c.oid),'[]'),
   'indexes',coalesce((SELECT jsonb_agg(jsonb_build_object('definition',pg_get_indexdef(i.indexrelid),

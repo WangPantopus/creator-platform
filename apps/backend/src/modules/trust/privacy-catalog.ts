@@ -54,7 +54,34 @@ export async function assertPrivacyTaskCatalog(
     signal,
   );
   const boundary = await accountingBoundaryRegisteredExtension(client, signal);
+  return assertPrivacyTaskMetadata(
+    client,
+    { family, detached, boundary },
+    signal,
+  );
+}
+
+/** Exact canonical0087 metadata for the migration operator before any
+ * generation DDL. This issues no task authority and rejects every extension;
+ * runtime callers must use assertPrivacyTaskCatalog and its registered graph. */
+export async function assertCanonicalPrivacyTaskCatalog(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  return assertPrivacyTaskMetadata(client, {}, signal);
+}
+
+async function assertPrivacyTaskMetadata(
+  client: PoolClient,
+  extensions: {
+    family?: { signature: string; sha256: string };
+    detached?: { signature: string; sha256: string };
+    boundary?: { signature: string; sha256: string };
+  },
+  signal?: AbortSignal,
+) {
   signal?.throwIfAborted();
+  const { family, detached, boundary } = extensions;
   const expectedFunctions = [
     ...functions,
     ...(family ? [family] : []),

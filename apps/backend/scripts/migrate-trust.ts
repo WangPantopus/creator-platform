@@ -4,6 +4,9 @@ import pg from "pg";
 import { recognizedAdoptionVersions } from "./migration-custody.js";
 import { assertPrivacyWaveRoleSafety } from "./migration-privacy-roles.js";
 import { assertWaveRoleSafety } from "./migration-wave-roles.js";
+import { assertGenerationWaveRoleSafety } from "./migration-generation-roles.js";
+import { generationPrivacySourcesRegistered } from "../src/db/generation-privacy-sources.js";
+import generationReview from "../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
 
 if (!process.env.DATABASE_MIGRATION_URL)
   throw new Error(
@@ -39,13 +42,26 @@ try {
     throw new Error(
       "Legacy selection is limited to W8's isolated development databases.",
     );
-  const files = registry.migrations
+  const generationVersions = new Set(
+    generationReview.sources.map((source) => source.version),
+  );
+  const generation = registry.migrations.some((source) =>
+    generationVersions.has(source.version),
+  );
+  if (
+    generation &&
+    (localLegacy || !(await generationPrivacySourcesRegistered()))
+  )
+    throw new Error(
+      "Generation registry requires the complete reviewed source graph and canonical migration mode.",
+    );
+  const registeredFiles = registry.migrations
     .filter(
       (file) =>
         !localLegacy || file.path.startsWith("apps/backend/migrations/"),
     )
     .sort((a, b) => a.version.localeCompare(b.version));
-  const ids = files.map((file) => file.version.slice(0, 4));
+  const ids = registeredFiles.map((file) => file.version.slice(0, 4));
   if (new Set(ids).size !== ids.length)
     throw new Error("Migration IDs conflict. Resolve the W8 registry first.");
   const exists = (
@@ -64,6 +80,25 @@ try {
         )
       ).rows
     : [];
+  const installedGeneration = applied.filter((row) =>
+    generationVersions.has(row.version),
+  ).length;
+  if (
+    installedGeneration &&
+    (!generation || installedGeneration !== generationVersions.size)
+  )
+    throw new Error(
+      "Incomplete or unregistered generation wave; use the reviewed activation path, never per-file repair.",
+    );
+  // Fresh databases still bootstrap the exact canonical61. The complete new
+  // wave is only installed atomically by activate-wave after private backup,
+  // separate restore and closed-admission checks. Registered code alone cannot
+  // make that database ready. Already activated databases are verified below.
+  const files = installedGeneration
+    ? registeredFiles
+    : registeredFiles.filter(
+        (source) => !generationVersions.has(source.version),
+      );
   const historical = localLegacy
     ? new Set<string>()
     : await recognizedAdoptionVersions(applied);
@@ -83,6 +118,7 @@ try {
       (r) => r.version === "0087_w8_privacy_task_commit_fence",
     ),
     domain: rows.some((r) => r.version === "0103_w8_domain_privacy_task_fence"),
+    canonicalBeforeGeneration: generation && !installedGeneration,
   });
   const hasWave = files.some(
     (file) => file.version === "0062_w6_creator_media_worker",
@@ -102,7 +138,8 @@ try {
   if (hasWave) {
     await client.query("BEGIN");
     try {
-      await assertWaveRoleSafety(client, installedRoles(applied));
+      if (installedGeneration) await assertGenerationWaveRoleSafety(client);
+      else await assertWaveRoleSafety(client, installedRoles(applied));
       if (continuation)
         await assertPrivacyWaveRoleSafety(client, installedPrivacy(applied));
       await client.query("COMMIT");
@@ -187,7 +224,8 @@ try {
   if (hasWave) {
     await client.query("BEGIN");
     try {
-      await assertWaveRoleSafety(client, installedRoles(files));
+      if (installedGeneration) await assertGenerationWaveRoleSafety(client);
+      else await assertWaveRoleSafety(client, installedRoles(files));
       if (continuation)
         await assertPrivacyWaveRoleSafety(client, installedPrivacy(files));
       await client.query("COMMIT");
@@ -196,6 +234,10 @@ try {
       throw error;
     }
   }
+  if (generation && !installedGeneration)
+    process.stdout.write(
+      "Canonical61 verified; generation wave remains unapplied. Use W8_MIGRATION_WAVE=20261007-generation with scripts/activate-wave.ts and a verified private backup/restore before runtime admission.\n",
+    );
 } finally {
   await client.query(
     "SELECT pg_advisory_unlock(hashtextextended('creator-migrations',0))",
