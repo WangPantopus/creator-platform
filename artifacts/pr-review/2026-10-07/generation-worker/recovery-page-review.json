@@ -74,5 +74,39 @@
     "terminalScopes": 0
   },
   "forcedIndexPlan": ["generation_terminal_pending_page"],
-  "planLimit": "Empty graph with sequential scan disabled; verifies the partial index is usable, not a latency or production workload result."
+  "planLimit": "Empty graph with sequential scan disabled; verifies the partial index is usable, not a latency or production workload result.",
+  "preservedComparison": {
+    "scope": "Complete28-source closed composition in preserved canonical61, compared with fresh held-source database. No registered purpose/task/provider/settlement activation.",
+    "all11FreshAndPreservedPartsEqual": true,
+    "compiler": [
+      {
+        "compiler": "creator.fence_generation_first_claim()",
+        "diagnostics": []
+      },
+      {
+        "compiler": "creator.pending_generation_terminal_cursor_page(integer,uuid)",
+        "diagnostics": []
+      },
+      {
+        "compiler": "creator.pending_generation_tasks(integer)",
+        "diagnostics": []
+      },
+      {
+        "compiler": "creator.pending_generation_terminal_page(integer,uuid)",
+        "diagnostics": []
+      },
+      {
+        "compiler": "creator.pending_generation_terminals(integer)",
+        "diagnostics": []
+      }
+    ],
+    "originalCustodyRestored": {
+      "schemaSha256": "30ec4ec6c71eb2c4e02fb473e65356994e3dfbcd04d8982ff31f18fbb7b5bee2",
+      "rolesSha256": "367a2a706b7aa22b37cb18051881aa0f1eb0d2bcb82129e0a1ad98a8a063c8f9",
+      "rowsSha256": "36073ad827fc043be173cf1c015594361f0a366ff8acfc98a1281804f5148c05",
+      "tables": 137,
+      "rows": 236
+    },
+    "originalContainerStoppedAfterReview": true
+  }
 }
