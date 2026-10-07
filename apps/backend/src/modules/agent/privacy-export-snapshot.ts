@@ -35,6 +35,11 @@ const PublicExecutables: readonly Signature[] = [
   AGENT_PRIVACY_EXPORT_SIGNATURES[4],
 ];
 const Hash = z.string().regex(/^[a-f0-9]{64}$/u);
+// Independently reviewed on the closed100 graph and the original/restored101
+// graph. The fixed projection omits only completion_capability_hash; a new
+// ungranted usage column must not silently disappear from a complete export.
+const usageColumnsChecksum =
+  "f3196076d99a8838c4dcdbc003abfc98c7271938d7df6713e335dd172e3b7b24";
 export const AGENT_PRIVACY_EXPORT_ARRAYS = [
   "sources",
   "versions",
@@ -185,6 +190,18 @@ export async function assertAgentPrivacyExportPurposeCatalogue(
            (SELECT attnum FROM pg_attribute WHERE attrelid=to_regclass('creator.agent_privacy_export_scope') AND attname='xid')]::smallint[])
          AND (SELECT count(*)=1 FROM pg_constraint WHERE conrelid=to_regclass('creator.agent_privacy_export_scope') AND contype='u'
           AND conkey=ARRAY[(SELECT attnum FROM pg_attribute WHERE attrelid=to_regclass('creator.agent_privacy_export_scope') AND attname='nonce')]::smallint[])
+         AND (SELECT count(*)=2 FROM pg_constraint WHERE conrelid=to_regclass('creator.agent_privacy_export_scope') AND contype<>'t')
+         AND NOT EXISTS(SELECT FROM pg_constraint k JOIN pg_index i ON i.indexrelid=k.conindid
+          JOIN pg_class idx ON idx.oid=i.indexrelid JOIN pg_am am ON am.oid=idx.relam
+          WHERE k.conrelid=to_regclass('creator.agent_privacy_export_scope')
+           AND (NOT k.convalidated OR k.condeferrable OR k.condeferred
+            OR i.indrelid<>k.conrelid OR NOT i.indisunique OR NOT i.indisvalid OR NOT i.indisready OR NOT i.indimmediate
+            OR i.indpred IS NOT NULL OR i.indexprs IS NOT NULL OR idx.relowner<>(SELECT oid FROM pg_roles WHERE rolname=$3)
+            OR am.amname<>'btree'
+            OR (k.contype='p' AND (pg_get_constraintdef(k.oid)<>'PRIMARY KEY (pid, xid)' OR NOT i.indisprimary
+             OR i.indnatts<>2 OR i.indnkeyatts<>2 OR i.indkey<>'1 2'::int2vector))
+            OR (k.contype='u' AND (pg_get_constraintdef(k.oid)<>'UNIQUE (nonce)' OR i.indisprimary
+             OR i.indnatts<>1 OR i.indnkeyatts<>1 OR i.indkey<>'4'::int2vector))))
          AND NOT EXISTS(SELECT FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
           WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema' AND pg_get_userbyid(p.proowner)<>$3
            AND ((p.prosecdef AND has_function_privilege($3,p.oid,'EXECUTE'))
@@ -194,6 +211,17 @@ export async function assertAgentPrivacyExportPurposeCatalogue(
       )
     ).rows[0]?.ready;
     if (ready !== true) throw new Error("Unreviewed export owner custody");
+    const usageColumns = (
+      await database.query(
+        `SELECT a.attnum AS position,a.attname AS name,format_type(a.atttypid,a.atttypmod) AS type,
+         a.attnotnull,a.attisdropped,a.attidentity,a.attgenerated,a.attislocal,a.attinhcount,
+         pg_get_expr(d.adbin,d.adrelid) AS default_expression
+         FROM pg_attribute a LEFT JOIN pg_attrdef d ON d.adrelid=a.attrelid AND d.adnum=a.attnum
+         WHERE a.attrelid='creator.ai_usage'::regclass AND a.attnum>0 ORDER BY a.attnum`,
+      )
+    ).rows;
+    if (contentHash(usageColumns) !== usageColumnsChecksum)
+      throw new Error("Unreviewed complete usage export shape");
     for (const signature of AGENT_PRIVACY_EXPORT_SIGNATURES) {
       const executable = PublicExecutables.includes(signature);
       const row = (
