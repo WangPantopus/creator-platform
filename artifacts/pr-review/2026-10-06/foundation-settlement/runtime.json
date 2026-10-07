@@ -1,0 +1,48 @@
+{
+  "source": "b81d6de4e7c05c1213362096f8d8fc67e4e279f9",
+  "kind": "real PostgreSQL resource qualification; no request/task authority synthesized",
+  "cases": [
+    {
+      "case": "known commit",
+      "saved": 1,
+      "pid": 53,
+      "count": 1
+    },
+    {
+      "case": "known refusal rollback",
+      "code": "operator_refusal",
+      "status": 409,
+      "count": 1,
+      "pid": 53
+    },
+    {
+      "case": "host expiry awaits original callback",
+      "durationMs": 5153,
+      "observed": {
+        "atMs": 5050,
+        "total": 1,
+        "idle": 0,
+        "laterStarted": false
+      },
+      "laterStarted": true,
+      "lateCode": "Client was closed and is not queryable",
+      "total": 0,
+      "idle": 0
+    },
+    {
+      "case": "recovery after physical close",
+      "newPid": 54,
+      "originalPid": 53,
+      "different": true
+    },
+    {
+      "case": "real read timeout",
+      "durationMs": 59,
+      "error": "Query read timeout",
+      "pid": 55,
+      "total": 0,
+      "idle": 0
+    }
+  ],
+  "closedPids": []
+}
