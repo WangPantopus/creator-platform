@@ -928,6 +928,10 @@ export class GrowthService {
   async feedback(actor: Actor, input: unknown) {
     const value = z
       .strictObject({
+        idempotencyKey: z
+          .uuid()
+          .transform((key) => key.toLowerCase())
+          .optional(),
         category: z.enum([
           "discovery_fit",
           "usefulness",
@@ -938,6 +942,40 @@ export class GrowthService {
       })
       .parse(input);
     await this.db.actor(actor, null, async (client) => {
+      // Legacy clients keep their append-only contract. Keyed submissions use
+      // an account-scoped immutable row as their durable outcome, including
+      // after a process restart or a lost acknowledgement.
+      if (value.idempotencyKey) {
+        const hex = createHash("sha256")
+          .update(
+            `growth.feedback.v1:${actor.accountId}:${value.idempotencyKey}`,
+          )
+          .digest("hex");
+        const id = `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-a${hex.slice(17, 20)}-${hex.slice(20, 32)}`;
+        await client.query(
+          "INSERT INTO growth.feedback(id,account_id,category,score) VALUES($1,$2,$3,$4) ON CONFLICT(id) DO NOTHING",
+          [id, actor.accountId, value.category, value.score],
+        );
+        // A separate READ COMMITTED statement sees a concurrently committed
+        // winner after the unique index wait; a single INSERT/SELECT CTE cannot.
+        const saved = (
+          await client.query(
+            "SELECT category,score FROM growth.feedback WHERE id=$1 AND account_id=$2",
+            [id, actor.accountId],
+          )
+        ).rows[0];
+        if (
+          !saved ||
+          saved.category !== value.category ||
+          saved.score !== value.score
+        )
+          throw new DomainError(
+            "idempotency_conflict",
+            copy.w5ContentDuplicateChanged,
+            409,
+          );
+        return;
+      }
       await client.query(
         "INSERT INTO growth.feedback(account_id,category,score) VALUES($1,$2,$3)",
         [actor.accountId, value.category, value.score],
