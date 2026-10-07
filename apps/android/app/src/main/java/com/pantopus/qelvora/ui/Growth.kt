@@ -47,14 +47,16 @@ class GrowthClient(private val origin: String, private val token: () -> String? 
         try {
             connection.requestMethod = method; connection.connectTimeout = 5000; connection.readTimeout = 10000
             connection.useCaches = false; connection.setRequestProperty("Content-Type", "application/json")
-            val credential = if(path.startsWith("public/")) null else token()
+            val publicRead = path.startsWith("public/")
+            val credential = if(publicRead) null else token()
+            if(!publicRead && credential == null) throw GrowthRequestFailure(401)
             if(expectedSession != null && credential != expectedSession) throw GrowthRequestFailure(401)
             credential?.let { connection.setRequestProperty("Authorization", "Bearer $it") }
             if (body != null) { connection.doOutput = true; connection.outputStream.use { it.write(body.toString().toByteArray()) } }
             if (connection.responseCode !in 200..299) throw GrowthRequestFailure(connection.responseCode)
             val response = connection.inputStream.use { it.readNBytes(1_000_001) }
             if (response.size > 1_000_000) throw IllegalStateException(QelvoraCopy.text("growthThisResponseIsUnavailable"))
-            if(expectedSession != null && token() != credential) throw GrowthRequestFailure(401)
+            if(!publicRead && token() != credential) throw GrowthRequestFailure(401)
             JSONObject(response.toString(Charsets.UTF_8))
         } finally { connection.disconnect() }
     }
@@ -239,7 +241,7 @@ fun GrowthFanFeature(baseUrl: String?, token: () -> String? = { null }, destinat
     Column(Modifier.fillMaxSize().background(qColor("ground"))) {
         Column(Modifier.weight(1f).verticalScroll(scrollState).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             when {
-                route == "/notifications/settings" -> GrowthNotificationSettings(client)
+                route == "/notifications/settings" -> GrowthNotificationSettings(client, token)
                 route == "/discover" -> {
                     BasicText(QelvoraCopy.text("navDiscover"), style = qText("display-lg").copy(color = ink), modifier = Modifier.semantics {heading()})
                     BasicTextField(query, onValueChange = { query = it.take(120) }, textStyle = qText("body").copy(color = ink), singleLine = true, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), keyboardActions = KeyboardActions(onSearch = {refresh++}), decorationBox = {inner -> Box {if(query.isEmpty()) BasicText(QelvoraCopy.text("growthSearchCreatorsCraftsOrQuestions"), style = qText("body").copy(color = qColor("ink-muted")));inner()}}, modifier = Modifier.fillMaxWidth().background(qColor("surface"), RoundedCornerShape(12.dp)).padding(14.dp).semantics {contentDescription = QelvoraCopy.text("growthSearchCreatorsCraftsOrQuestions")})

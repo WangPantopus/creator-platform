@@ -1067,7 +1067,11 @@ public enum QelvoraCopy {
     "w5NativeTeampublisherTitle": "Publishing",
     "w5NativeTeampublisherDetail": "Publishes content under team identity.",
     "w5NativeTeamschedulerTitle": "Scheduling",
-    "w5NativeTeamschedulerDetail": "Offers times from your hours."
+    "w5NativeTeamschedulerDetail": "Offers times from your hours.",
+    "growthImpactPeopleHelped": "You helped {people} people this week.",
+    "growthImpactThankYou": "A THANK-YOU, SHARED WITH PERMISSION",
+    "growthImpactWeekCounts": "Counts are for this week only. Fans are never named here without their consent.",
+    "growthImpactNotAvailable": "No weekly digest is available yet."
   ]
   private static let variables = try! NSRegularExpression(pattern: #"\{([^}]+)\}"#)
   public static func text(_ key: String, values: [String: String] = [:]) -> String {

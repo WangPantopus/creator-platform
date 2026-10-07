@@ -52,7 +52,7 @@ export function PreferenceForm({
   initial: PreferencesValue;
   creators: { id: string; name: string }[];
 }) {
-  const { request } = useGrowthSession();
+  const { request, signal } = useGrowthSession();
   const [value, setValue] = useState(initial),
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false),
@@ -134,7 +134,10 @@ export function PreferenceForm({
             growthCopy.growthPreferencesSavedYourInAppRecordRemainsAvailable,
           );
         } catch (e) {
-          setRequiresSignIn(e instanceof GrowthActionError && e.status === 401);
+          if (signal.aborted) return;
+          setRequiresSignIn(
+            e instanceof GrowthActionError && [401, 409].includes(e.status),
+          );
           setMessage(
             e instanceof GrowthActionError && e.status === 400
               ? growthCopy.growthPreferencesWereNotSaved

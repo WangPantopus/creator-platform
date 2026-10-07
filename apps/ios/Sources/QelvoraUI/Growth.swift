@@ -139,12 +139,23 @@ struct GrowthRequestFailure: Error {
 public struct GrowthClient: Sendable {
   public let baseURL: URL
   public let token: @Sendable () async throws -> String?
+  private let capture: (@Sendable () async -> FanSessionRequestCapture?)?
   public init(
     baseURL: URL,
     token: (@Sendable () async throws -> String?)? = nil
   ) {
     self.baseURL = baseURL
     self.token = token ?? { try await SecureSessionStorage(issuer: baseURL).read() }
+    self.capture = nil
+  }
+  @MainActor
+  init(baseURL: URL, session: FanSession, destination: String) {
+    self.baseURL = baseURL
+    self.capture = { await session.captureRequest(from: destination) }
+    self.token = {
+      guard let captured = await session.captureRequest(from: destination) else { return nil }
+      return await captured.growthCredential()
+    }
   }
   func request<T: Decodable>(_ path: String, method: String = "GET", body: Data? = nil, expectedSession: String? = nil) async throws
     -> T
@@ -158,7 +169,11 @@ public struct GrowthClient: Sendable {
     request.timeoutInterval = 10
     request.cachePolicy = .reloadIgnoringLocalCacheData
     request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-    let value = path.hasPrefix("public/") ? nil : try await token()
+    let publicRead = path.hasPrefix("public/")
+    let captured = publicRead ? nil : await capture?()
+    if !publicRead, capture != nil, captured == nil { throw GrowthRequestFailure(status: 401) }
+    let value = publicRead ? nil : captured == nil ? try await token() : await captured?.growthCredential()
+    if !publicRead, value == nil { throw GrowthRequestFailure(status: 401) }
     if let expectedSession, value != expectedSession { throw GrowthRequestFailure(status: 401) }
     if let value {
       request.setValue("Bearer " + value, forHTTPHeaderField: "Authorization")
@@ -168,7 +183,10 @@ public struct GrowthClient: Sendable {
     guard (200..<300).contains(http.statusCode) else {
       throw GrowthRequestFailure(status: http.statusCode)
     }
-    if expectedSession != nil, try await token() != value { throw GrowthRequestFailure(status: 401) }
+    try Task.checkCancellation()
+    if let captured {
+      guard await captured.isCurrent() else { throw GrowthRequestFailure(status: 401) }
+    } else if !publicRead, try await token() != value { throw GrowthRequestFailure(status: 401) }
     return try JSONDecoder().decode(T.self, from: data)
   }
   public func registerDevice(installationID: UUID, token value: Data, granted: Bool, registrationRevision: Int, expectedSession: String) async throws {
@@ -192,8 +210,12 @@ public struct GrowthClient: Sendable {
     guard UUID(uuidString: current.id) == id, current.available else { throw GrowthRequestFailure(status: 404) }
     guard ApplicationDestination.isPermitted(current.destination) else { throw URLError(.badServerResponse) }
     struct Ack: Decodable { let read: Bool }
-    let _: Ack = try await request("notifications/" + id.uuidString.lowercased() + "/read", method: "PUT", body: Data("{}".utf8), expectedSession: expectedSession)
-    return current.destination
+    let ack: Ack = try await request("notifications/" + id.uuidString.lowercased() + "/read", method: "PUT", body: Data("{}".utf8), expectedSession: expectedSession)
+    guard ack.read else { throw URLError(.badServerResponse) }
+    let fresh: Current = try await request("notifications/" + id.uuidString.lowercased(), expectedSession: expectedSession)
+    guard UUID(uuidString: fresh.id) == id, fresh.available else { throw GrowthRequestFailure(status: 404) }
+    guard ApplicationDestination.isPermitted(fresh.destination) else { throw URLError(.badServerResponse) }
+    return fresh.destination
   }
 }
 
@@ -218,6 +240,8 @@ public struct GrowthFanFeature: View {
   @State private var invitation: GrowthInvitation?
   @State private var shared: GrowthSharedReply?
   @State private var replyExport: GrowthReplyDocument?
+  @State private var replyExportTask: Task<Void, Never>?
+  @State private var replyExportRequest = UUID()
   @State private var sharingReply = false
   @State private var following = false
   @State private var creators: [GrowthCreator] = []
@@ -238,13 +262,18 @@ public struct GrowthFanFeature: View {
   @State private var hasSession = false
   @State private var loading = false
   @Environment(\.colorScheme) private var scheme
+  @Environment(\.dynamicTypeSize) private var textSize
   public init(
     baseURL: URL?, destination: String = "/discover",
     token: (@Sendable () async throws -> String?)? = nil,
-    onNavigate: ((String) -> Void)? = nil,
-    onSignIn: @escaping (String) -> Void = { _ in }
+    session: FanSession? = nil,
+    onSignIn: @escaping (String) -> Void = { _ in },
+    onNavigate: ((String) -> Void)? = nil
   ) {
-    client = baseURL.map { GrowthClient(baseURL: $0, token: token) }
+    client = baseURL.map { origin in
+      if let session { return GrowthClient(baseURL: origin, session: session, destination: destination) }
+      return GrowthClient(baseURL: origin, token: token)
+    }
     self.destination = destination
     _route = State(initialValue: destination)
     signIn = onSignIn
@@ -252,21 +281,13 @@ public struct GrowthFanFeature: View {
   }
   public static func registration(baseURL: URL?) -> FanFeatureRegistration {
     FanFeatureRegistration(
-      matches: { matches($0) },
+      matches: { matches($0) && !$0.components(separatedBy: "?")[0].hasSuffix("/chat") },
       allowsSignedOut: {
         $0 == "/discover" || $0.hasPrefix("/invite/") || $0.hasPrefix("/share/")
           || ($0.hasPrefix("/creators/") && !$0.contains("/chat"))
       },
       screen: { session in
-        AnyView(
-          GrowthFanFeature(
-            baseURL: baseURL, destination: session.destination,
-            onNavigate: { session.open($0) },
-            onSignIn: { target in
-              session.open(target)
-              Task { await session.beginSignIn() }
-            }
-          ).id(session.destination))
+        AnyView(GrowthSessionScreen(model: session, baseURL: baseURL))
       })
   }
   public static func matches(_ route: String) -> Bool {
@@ -281,7 +302,9 @@ public struct GrowthFanFeature: View {
           if route == "/notifications/settings" {
             GrowthNotificationSettings(client: client)
           } else if route == "/discover" {
-            Text(QelvoraCopy.text("navDiscover")).qText("display-lg").accessibilityAddTraits(.isHeader).accessibilityFocused($discoverHeadingFocused)
+            // The smaller display token still scales with accessible text;
+            // at the largest sizes the whole heading fits without a lone letter.
+            Text(QelvoraCopy.text("navDiscover")).qText(textSize >= .accessibility4 ? "display-md" : "display-lg").accessibilityAddTraits(.isHeader).accessibilityFocused($discoverHeadingFocused)
             TextField(QelvoraCopy.text("growthSearchCreators"), text: $query,
               prompt: Text(QelvoraCopy.text("growthSearchCreatorsCraftsOrQuestions")).foregroundStyle(qColor("ink-muted", scheme)))
               .textFieldStyle(.plain)
@@ -407,7 +430,7 @@ public struct GrowthFanFeature: View {
               }
               if shared.verificationURL != nil {
                 Button(QelvoraCopy.text("growthShareCompleteReply"), variant: .secondary, block: true, disabled: sharingReply) {
-                  Task { await exportSharedReply() }
+                  startReplyExport()
                 }
               } else {
                 Notice(title: QelvoraCopy.text("growthUnavailable"), children: QelvoraCopy.text("growthImageNeedsOrigin"))
@@ -551,6 +574,8 @@ public struct GrowthFanFeature: View {
       of: destination
     ) { _, target in route = target }.task(id: route) {
       await load()
+    }.onDisappear {
+      cancelReplyExport()
     }
     #if os(iOS)
     .sheet(item: $replyExport) { artifact in GrowthReplyShareSheet(artifact: artifact) }
@@ -588,7 +613,7 @@ public struct GrowthFanFeature: View {
   private func load() async {
     let loadID = UUID()
     let loadedRoute = route
-    replyExport = nil
+    cancelReplyExport()
     homeRequestID = UUID()
     discoverRequestID = loadID
     guard let client else {
@@ -735,14 +760,35 @@ public struct GrowthFanFeature: View {
       (failure as? GrowthRequestFailure)?.message
       ?? QelvoraCopy.text("growthThisDestinationIsUnavailableReconnectAndTryAgain")
   }
-  private func exportSharedReply() async {
-    guard let client, route.hasPrefix("/share/"), !sharingReply else { return }
+  private func cancelReplyExport() {
+    replyExportRequest = UUID()
+    replyExportTask?.cancel()
+    replyExportTask = nil
+    sharingReply = false
+    replyExport?.remove()
+    replyExport = nil
+  }
+  private func startReplyExport() {
+    guard replyExportTask == nil, !sharingReply else { return }
+    let request = UUID()
+    replyExportRequest = request
+    // Button work has no automatic SwiftUI task lifetime. Retain it so route,
+    // session and foreground removal can cancel rendering and discard its file.
+    replyExportTask = Task {
+      await exportSharedReply(request: request)
+      if replyExportRequest == request { replyExportTask = nil }
+    }
+  }
+  private func exportSharedReply(request: UUID) async {
+    guard let client, route.hasPrefix("/share/"), !sharingReply,
+      replyExportRequest == request else { return }
     let target = route
     sharingReply = true
-    defer { sharingReply = false }
+    defer { if replyExportRequest == request { sharingReply = false } }
     do {
       let artifact: GrowthReplyExport = try await client.request("public/shares/" + String(target.dropFirst(7)) + "/export")
-      guard !Task.isCancelled, route == target, artifact.id == String(target.dropFirst(7)) else { return }
+      guard !Task.isCancelled, route == target, replyExportRequest == request,
+        artifact.id == String(target.dropFirst(7)) else { return }
       let rendering = Task.detached(priority: .userInitiated) { try GrowthReplyDocument.create(artifact) }
       let document = try await withTaskCancellationHandler {
         try await rendering.value
@@ -750,17 +796,18 @@ public struct GrowthFanFeature: View {
         rendering.cancel()
       }
       defer { if replyExport?.id != document.id { document.remove() } }
-      guard !Task.isCancelled, route == target else { return }
+      guard !Task.isCancelled, route == target, replyExportRequest == request else { return }
       // Rendering can be lengthy. Permission/correction must still match before
       // a file is handed to the system sheet; no locally cached grant is reused.
       let current: GrowthReplyExport = try await client.request("public/shares/" + artifact.id + "/export")
-      guard !Task.isCancelled, route == target, current == artifact else {
+      guard !Task.isCancelled, route == target, replyExportRequest == request,
+        current == artifact else {
         throw GrowthRequestFailure(status: 410)
       }
       replyExport = document
       error = ""
     } catch {
-      guard !Task.isCancelled, route == target else { return }
+      guard !Task.isCancelled, route == target, replyExportRequest == request else { return }
       if (error as? GrowthRequestFailure)?.status == 410 { shared = nil }
       record(error)
     }
@@ -780,9 +827,26 @@ public struct GrowthFanFeature: View {
     guard let id = UUID(uuidString: item.id) else { record(GrowthRequestFailure(status: 404)); return }
     open("/notifications/" + id.uuidString.lowercased())
   }
-  private func openDestination(_ target: String) {
-    if let navigate { navigate(target) }
-    else { route = target }
+}
+
+/// The shipping shell supplies the actual session. Replacing it or leaving the
+/// foreground destroys private presentation and any temporary share document.
+private struct GrowthSessionScreen: View {
+  @ObservedObject var model: FanSession
+  let baseURL: URL?
+  @Environment(\.scenePhase) private var scenePhase
+  @Environment(\.colorScheme) private var scheme
+  var body: some View {
+    Group {
+      if scenePhase == .active {
+        GrowthFanFeature(baseURL: baseURL, destination: model.destination, session: model,
+          onSignIn: { target in model.open(target); Task { await model.beginSignIn() } },
+          onNavigate: model.open)
+          .id(model.destination + (model.session?.sessionId ?? "signed-out"))
+      } else {
+        qColor("ground", scheme)
+      }
+    }
   }
 }
 

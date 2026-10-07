@@ -16,6 +16,7 @@ import {
   CreatorProjection,
   ContentProjection,
   Destination,
+  HomeThreadDestination,
   Preferences,
   defaultPreferences,
   InsightSignal,
@@ -690,7 +691,13 @@ export class GrowthService {
         503,
       );
     const entries = page.entries
-      .filter((e) => Destination.safeParse(e.destination).success)
+      .filter(
+        (e) =>
+          Destination.safeParse(e.destination).success ||
+          (e.kind === "thread" &&
+            HomeThreadDestination.safeParse(e.destination).success &&
+            e.destination.split("/")[2] === e.creatorId),
+      )
       .sort(compareHomeActivity)
       .map((entry) => ({
         id: entry.id,

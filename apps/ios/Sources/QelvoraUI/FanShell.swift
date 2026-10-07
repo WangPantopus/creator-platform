@@ -24,6 +24,7 @@ public final class FanSessionRequestCapture {
         self.credential = credential
     }
     public func isCurrent() async -> Bool { await owner?.requestCaptureIsCurrent(self) ?? false }
+    func growthCredential() async -> String? { await isCurrent() ? credential : nil }
     /// The original issuer/client and response bounds are retained. A cached
     /// account during an unsuccessful restore cannot perform private Trust work.
     public func trustBytes(_ path: String, body: Data? = nil, binary: Bool = false) async throws -> CreatorAPIBinaryResponse {
@@ -91,6 +92,7 @@ public final class FanSession: ObservableObject {
     private var destinationGeneration = 0
     private var rotatingCredential = false
     private var refreshingSession = false
+    private var validationWaiters: [UUID: CheckedContinuation<Void, Never>] = [:]
     // Set only by the genuine canonical read using this exact stored credential.
     private var confirmedCredential: String?
     private var removedArrivalFor: String?
@@ -148,6 +150,26 @@ public final class FanSession: ObservableObject {
     /// replacement, purge, cancellation or a changed stored credential.
     public func captureRequest(from target: String, maximumResponseBytes: Int = 268_435_456, timeoutSeconds: TimeInterval = 30) async -> FanSessionRequestCapture? {
         guard (1...268_435_456).contains(maximumResponseBytes), timeoutSeconds > 0, timeoutSeconds <= 30 else { return nil }
+        guard session != nil, destination == target, !purgingPrivateState,
+              !localPurgeFailed, !Task.isCancelled else { return nil }
+        let requestedGeneration = generation, requestedNavigation = destinationGeneration
+        // A foreground read can arrive during the shell's real session refresh.
+        // Wait for that validation, rather than reporting a signed-out account.
+        // Navigation, replacement, purge and cancellation still invalidate it.
+        if checkingSession {
+            let waiter = UUID()
+            await withTaskCancellationHandler {
+                await withCheckedContinuation { continuation in
+                    guard checkingSession, !Task.isCancelled else { continuation.resume(); return }
+                    validationWaiters[waiter] = continuation
+                }
+            } onCancel: {
+                Task { @MainActor [weak self] in
+                    self?.validationWaiters.removeValue(forKey: waiter)?.resume()
+                }
+            }
+        }
+        guard requestedGeneration == generation, requestedNavigation == destinationGeneration else { return nil }
         guard let baseURL, let active = session, destination == target, !busy,
               !purgingPrivateState, !localPurgeFailed, !checkingSession,
               !rotatingCredential, error.isEmpty, !Task.isCancelled else { return nil }
@@ -174,6 +196,11 @@ public final class FanSession: ObservableObject {
         guard matches(), let credential = try? await storage.read() else { return false }
         return matches() && credential == capture.credential
     }
+    private func finishValidationWaiters() {
+        let waiting = Array(validationWaiters.values)
+        validationWaiters.removeAll()
+        for continuation in waiting { continuation.resume() }
+    }
     public func loadArrival() async {
         let snapshot = destination; arrival = nil
         guard snapshot.components(separatedBy: "?")[0] != removedArrivalFor else { return }
@@ -190,7 +217,7 @@ public final class FanSession: ObservableObject {
         guard !rotatingCredential, !refreshingSession, !purgingPrivateState, !Task.isCancelled else { return }
         guard let baseURL, api != nil else { checkingSession = false; return }
         refreshingSession = true; checkingSession = true
-        defer { refreshingSession = false; checkingSession = false }
+        defer { refreshingSession = false; checkingSession = false; finishValidationWaiters() }
         let current = generation
         let token: String?
         do { token = try await storage.read() }
@@ -223,7 +250,7 @@ public final class FanSession: ObservableObject {
             await restoreDestination(account: value, credential: token, generation: current)
             guard current == generation, !Task.isCancelled else { return }
             #if os(iOS)
-            GrowthPushCoordinator.shared.update(session: value, baseURL: baseURL)
+            GrowthPushCoordinator.shared.update(session: value, baseURL: baseURL, owner: self)
             #endif
         } catch let failure as CreatorAPIError {
             guard current == generation, !Task.isCancelled else { return }
@@ -353,9 +380,10 @@ public final class FanSession: ObservableObject {
         defer { purgingPrivateState = false }
         generation += 1; confirmedCredential = nil; session = nil; hasSavedCredential = false; checkingSession = false; actors = []; choosingDevelopmentActor = false; error = ""
         navigationInitialized = false; navigationRestoreAllowed = false
+        finishValidationWaiters()
         URLCache.shared.removeAllCachedResponses()
         #if os(iOS)
-        GrowthPushCoordinator.shared.update(session: nil, baseURL: baseURL)
+        GrowthPushCoordinator.shared.update(session: nil, baseURL: baseURL, owner: self)
         #endif
         var cleared = true
         do { try await storage.save(nil) } catch { cleared = false }
@@ -364,22 +392,31 @@ public final class FanSession: ObservableObject {
         if !cleared { error = QelvoraCopy.text("identityPrivateClearFailed") }
         return cleared
     }
+    func growthClient(for capture: FanSessionRequestCapture) -> GrowthClient? {
+        guard capture.owner === self, let baseURL else { return nil }
+        return GrowthClient(baseURL: baseURL, token: {
+            guard await capture.isCurrent() else { throw GrowthRequestFailure(status: 401) }
+            return capture.credential
+        })
+    }
     #if os(iOS)
     func openNotification(_ id: UUID) async -> Bool {
-        guard let baseURL, let active = session else { open("/notifications"); return false }
-        let snapshot = generation
+        guard let baseURL, let capture = await captureRequest(from: destination) else { return false }
         do {
-            guard let credential = try await storage.read() else { return false }
-            let target = try await GrowthClient(baseURL: baseURL).notificationDestination(id: id, expectedSession: credential)
-            guard !Task.isCancelled, snapshot == generation, session?.sessionId == active.sessionId else { return false }
+            guard await capture.isCurrent() else { return false }
+            let client = GrowthClient(baseURL: baseURL, token: {
+                await capture.isCurrent() ? capture.credential : nil
+            })
+            let target = try await client.notificationDestination(id: id, expectedSession: capture.credential)
+            guard await capture.isCurrent() else { return false }
             open(target)
             return true
         } catch let failure as GrowthRequestFailure {
-            guard !Task.isCancelled, snapshot == generation else { return false }
+            guard await capture.isCurrent() else { return false }
             open("/notifications"); error = failure.message
             return [403, 404, 410].contains(failure.status)
         } catch {
-            guard !Task.isCancelled, snapshot == generation else { return false }
+            guard await capture.isCurrent() else { return false }
             open("/notifications"); self.error = QelvoraCopy.text("growthSettingsNeedACurrentSignedInAccountAndNetworkConnection")
             return false
         }
@@ -469,6 +506,7 @@ public struct FanAppShell: View {
                             Button("Help and reports", variant: .quiet, block: true) { model.open("/support") }
                             Button("Your data", variant: .quiet, block: true) { model.open("/support/privacy") }
                             Button("Notification settings", variant: .quiet, block: true) { model.open("/notifications/settings") }
+                            if model.session?.creator != nil { Button(QelvoraCopy.text("growthYourWeekImpact"), variant: .quiet, block: true) { model.open("/studio/impact") } }
                             #if os(iOS)
                             if model.session?.creator != nil { CredentialSettings(model: model) }
                             #endif
@@ -495,7 +533,7 @@ public struct FanAppShell: View {
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active { push.refreshPermission(); notificationArrivalRevision += 1 }
             }
-            .task(id: (push.pendingTap?.delivery.uuidString ?? "") + (model.session?.sessionId ?? "") + String(notificationArrivalRevision)) {
+            .task(id: (push.pendingTap?.delivery.uuidString ?? "") + (model.session?.sessionId ?? "") + String(notificationArrivalRevision) + String(model.checkingSession)) {
                 guard let tap = push.pendingTap else { return }
                 if await model.openNotification(tap.notificationID) { push.consumed(tap); destinationDelivery = UUID() }
             }
@@ -530,7 +568,7 @@ public struct FanAppShell: View {
     }
     private var tab: FanTab {
         let path = model.destination.components(separatedBy: "?")[0]
-        if path.hasPrefix("/identity/") || path == "/support" || path.hasPrefix("/support/") || path == "/notifications/settings" || path == "/commerce/spending" || StudioTeamFeature.matches(path) { return .you }
+        if path.hasPrefix("/identity/") || path == "/support" || path.hasPrefix("/support/") || path == "/notifications/settings" || path == "/studio/impact" || path == "/commerce/spending" || StudioTeamFeature.matches(path) { return .you }
         if path.hasPrefix("/commerce/") { return .requests }
         return FanTab.allCases.first { tab in
             let root = "/" + tab.rawValue.lowercased()

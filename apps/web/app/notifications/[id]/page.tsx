@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { validReturnTarget } from "@qelvora/api";
 import { copy } from "@qelvora/copy";
 import {
@@ -6,6 +5,9 @@ import {
   GrowthUnavailable,
 } from "../../../features/growth/server";
 import { GrowthShell, Failure } from "../../../features/growth/shell";
+import { currentSession } from "../../../lib/session";
+import { GrowthSessionBoundary } from "../../../features/growth/private-view";
+import { OpenNotification } from "../../../features/growth/notification-arrival";
 
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
@@ -20,7 +22,7 @@ export default async function NotificationArrival({
   const { id } = await params;
   const validId =
     /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/u.test(id);
-  let target: string;
+  const session = validId ? await currentSession(`/notifications/${id}`) : null;
   try {
     if (!validId)
       throw new GrowthUnavailable(
@@ -28,11 +30,22 @@ export default async function NotificationArrival({
         "notification_unavailable",
         copy.growthThisDestinationIsNoLongerAvailable,
       );
+    if (!session)
+      throw new GrowthUnavailable(
+        401,
+        "session_required",
+        copy.growthContinueWithPantopusToOpenYourAccountSCurrentState,
+      );
     const current = await growthRequest<{
       id: string;
       available: boolean;
       destination: string;
-    }>(`notifications/${id}`);
+    }>(`notifications/${id}`, {
+      headers: {
+        "X-Expected-Account-Id": session.accountId,
+        "X-Expected-Session-Id": session.sessionId,
+      },
+    });
     if (
       current.id !== id ||
       current.available !== true ||
@@ -43,7 +56,17 @@ export default async function NotificationArrival({
         "notification_unavailable",
         copy.growthThisDestinationIsNoLongerAvailable,
       );
-    target = current.destination;
+    return (
+      <GrowthSessionBoundary
+        key={session.sessionId}
+        initial={session}
+        returnTo={`/notifications/${id}`}
+      >
+        <GrowthShell>
+          <OpenNotification id={id} />
+        </GrowthShell>
+      </GrowthSessionBoundary>
+    );
   } catch (error) {
     return (
       <GrowthShell>
@@ -54,6 +77,4 @@ export default async function NotificationArrival({
       </GrowthShell>
     );
   }
-  // Next redirect throws; it must remain outside the lookup/recovery catch.
-  redirect(target);
 }

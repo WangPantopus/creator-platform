@@ -1069,4 +1069,8 @@
   <string name="w5_native_teampublisher_detail" formatted="false">Publishes content under team identity.</string>
   <string name="w5_native_teamscheduler_title" formatted="false">Scheduling</string>
   <string name="w5_native_teamscheduler_detail" formatted="false">Offers times from your hours.</string>
+  <string name="growth_impact_people_helped" formatted="false">You helped {people} people this week.</string>
+  <string name="growth_impact_thank_you" formatted="false">A THANK-YOU, SHARED WITH PERMISSION</string>
+  <string name="growth_impact_week_counts" formatted="false">Counts are for this week only. Fans are never named here without their consent.</string>
+  <string name="growth_impact_not_available" formatted="false">No weekly digest is available yet.</string>
 </resources>

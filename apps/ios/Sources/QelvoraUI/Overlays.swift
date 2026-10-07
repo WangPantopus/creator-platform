@@ -32,6 +32,7 @@ public struct Notice: View {
         if let title { Text(title).qText("control-body", weight: .semibold).fixedSize(horizontal: false, vertical: true) }
         Text(children).qText("control-body").fixedSize(horizontal: false, vertical: true)
       }.frame(maxWidth: .infinity, alignment: .leading)
+        .fixedSize(horizontal: false, vertical: true)
     }.padding(.horizontal, QelvoraTokens.token("message-padding")).padding(
       .vertical, QelvoraTokens.token("space-3")
     )

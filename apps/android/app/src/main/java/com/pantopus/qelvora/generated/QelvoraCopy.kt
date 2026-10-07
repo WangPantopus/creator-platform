@@ -1067,7 +1067,11 @@ object QelvoraCopy {
     "w5NativeTeampublisherTitle" to "Publishing",
     "w5NativeTeampublisherDetail" to "Publishes content under team identity.",
     "w5NativeTeamschedulerTitle" to "Scheduling",
-    "w5NativeTeamschedulerDetail" to "Offers times from your hours."
+    "w5NativeTeamschedulerDetail" to "Offers times from your hours.",
+    "growthImpactPeopleHelped" to "You helped {people} people this week.",
+    "growthImpactThankYou" to "A THANK-YOU, SHARED WITH PERMISSION",
+    "growthImpactWeekCounts" to "Counts are for this week only. Fans are never named here without their consent.",
+    "growthImpactNotAvailable" to "No weekly digest is available yet."
   )
   private val variables = Regex("""\{([^}]+)\}""")
   fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }

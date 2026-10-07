@@ -1065,7 +1065,11 @@ export const copy = {
   "w5NativeTeampublisherTitle": "Publishing",
   "w5NativeTeampublisherDetail": "Publishes content under team identity.",
   "w5NativeTeamschedulerTitle": "Scheduling",
-  "w5NativeTeamschedulerDetail": "Offers times from your hours."
+  "w5NativeTeamschedulerDetail": "Offers times from your hours.",
+  "growthImpactPeopleHelped": "You helped {people} people this week.",
+  "growthImpactThankYou": "A THANK-YOU, SHARED WITH PERMISSION",
+  "growthImpactWeekCounts": "Counts are for this week only. Fans are never named here without their consent.",
+  "growthImpactNotAvailable": "No weekly digest is available yet."
 } as const;
 export type CopyKey = keyof typeof copy;
 type Placeholders<T extends string> = T extends `${string}{${infer Key}}${infer Rest}` ? Key | Placeholders<Rest> : never;

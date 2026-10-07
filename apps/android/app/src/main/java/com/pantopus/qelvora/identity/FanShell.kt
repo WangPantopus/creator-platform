@@ -300,6 +300,23 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (_: Exception) { return false }
     }
+    suspend fun openNotification(id: String): Boolean {
+        val origin = baseURL ?: return false
+        val capture = captureRequest(destination) ?: return false
+        val credential = runCatching { currentToken() }.getOrNull() ?: return false
+        try {
+            if (!capture.isCurrent()) return false
+            val target = GrowthPush.resolveTap(GrowthClient(origin, ::currentToken), id, credential)
+            if (!capture.isCurrent()) return false
+            open(target)
+            return true
+        } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+        catch (_: Exception) {
+            if (!capture.isCurrent()) return false
+            open("/notifications"); error = QelvoraCopy.text("growthUpdateUnavailable")
+            return true
+        }
+    }
     suspend fun logout(all: Boolean = false) {
         if (busy) return; val client = api ?: run { purge(); return }; busy = true; generation++
         try { if (all) client.revokeSessions() else client.logout(); purge() }
@@ -388,17 +405,12 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
     }
     LaunchedEffect(model.destination) { model.loadArrival() }
     LaunchedEffect(model, foreground) { if (foreground) { model.refresh(); while (true) { delay(4000); if (!model.choosingActor && !model.busy && (model.session != null || model.hasSavedCredential)) model.refresh() } } }
-    LaunchedEffect(model.session) { GrowthPush.refresh(context) }
-    LaunchedEffect(notificationID, destinationDelivery, model.session?.accountId) {
+    LaunchedEffect(model.session?.sessionId, model.checkingSession, foreground) {
+        if (foreground && !model.checkingSession) GrowthPush.refresh(context)
+    }
+    LaunchedEffect(notificationID, destinationDelivery, model.session?.sessionId, model.checkingSession, foreground) {
         val id = notificationID ?: return@LaunchedEffect
-        if (model.session == null) return@LaunchedEffect
-        val captured = runCatching { model.currentToken() }.getOrNull() ?: return@LaunchedEffect
-        val sameCredential = { runCatching { model.currentToken() }.getOrNull() == captured }
-        val origin = baseURL ?: return@LaunchedEffect
-        try { val target = GrowthPush.resolveTap(GrowthClient(origin, model::currentToken), id, captured); if (sameCredential()) model.open(target) }
-        catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-        catch (_: Exception) { if (sameCredential()) { model.open("/notifications"); model.error = QelvoraCopy.text("growthUpdateUnavailable") } }
-        finally { if (sameCredential()) onNotificationConsumed() }
+        if (foreground && !model.checkingSession && model.openNotification(id)) onNotificationConsumed()
     }
     Column(Modifier.fillMaxSize().background(qColor("ground")).windowInsetsPadding(WindowInsets.safeDrawing)) {
         if (model.error.isNotEmpty()) Notice("error", "Account status", model.error)
@@ -442,13 +454,14 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                         Button("Help and reports", ButtonVariant.QUIET, block = true) { model.open("/support") }
                         Button("Your data", ButtonVariant.QUIET, block = true) { model.open("/support/privacy") }
                         Button("Notification settings", ButtonVariant.QUIET, block = true) { model.open("/notifications/settings") }
+                        if (model.session?.creator != null) Button(QelvoraCopy.text("growthYourWeekImpact"), ButtonVariant.QUIET, block = true) { model.open("/studio/impact") }
                         if (model.session?.creator != null && context is android.app.Activity) CredentialSettings(context, model)
                     } else if (feature != null) key(model.session?.accountId, model.session?.sessionId, model.destination, destinationDelivery) { feature.screen(model) }
                     else Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) { BasicText("This destination is not connected yet", style = qText("title").copy(color = qColor("ink"))); BasicText("Your account and arrival context are kept.", style = qText("body").copy(color = qColor("ink-muted"))); Button("Your account", ButtonVariant.SECONDARY) { model.destination = "/you" } }
                 }
                 val labels = listOf("navHome" to "/home", "navDiscover" to "/discover", "navRequests" to "/requests", "navYou" to "/you")
                 val path = model.destination.substringBefore('?')
-                val accountDestination = path.startsWith("/identity/") || path == "/support" || path.startsWith("/support/") || path == "/notifications/settings" || path == "/commerce/spending" || StudioTeamFeature.matches(path)
+                val accountDestination = path.startsWith("/identity/") || path == "/support" || path.startsWith("/support/") || path == "/notifications/settings" || path == "/studio/impact" || path == "/commerce/spending" || StudioTeamFeature.matches(path)
                 val selectedTab = if (accountDestination) "navYou" else if (path.startsWith("/commerce/")) "navRequests" else labels.firstOrNull { path == it.second || path.startsWith(it.second + "/") }?.first ?: "navHome"
                 TabBar(QelvoraCopy.text(selectedTab)) { label -> model.destination = labels.first { QelvoraCopy.text(it.first) == label }.second }
             }

@@ -65,7 +65,10 @@ export default async function CreatorHome({
   } catch (error) {
     return (
       <GrowthShell active="Discover">
-        <Failure error={error} />
+        <Failure
+          error={error}
+          returnTo={`/creators/${encodeURIComponent(handle)}?section=${section}`}
+        />
       </GrowthShell>
     );
   }

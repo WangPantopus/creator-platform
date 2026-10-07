@@ -3,7 +3,7 @@ import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
 import { useEffect, useRef, useState } from "react";
 import { GrowthActionError, useGrowthSession } from "./session";
 export function FeedbackForm() {
-  const { request } = useGrowthSession();
+  const { request, signal } = useGrowthSession();
   const [category, setCategory] = useState("notification"),
     [score, setScore] = useState(""),
     [busy, setBusy] = useState(false),
@@ -42,6 +42,7 @@ export function FeedbackForm() {
           setConfirmed(true);
           setMessage(growthCopy.growthFeedbackSavedThankYou);
         } catch (error) {
+          if (signal.aborted) return;
           setMessage(
             error instanceof GrowthActionError && error.status < 500
               ? error.message

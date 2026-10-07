@@ -82,7 +82,7 @@ object GrowthPush {
     val configured: Boolean get() = BuildConfig.CREATOR_PUSH_ENABLED && runCatching { java.net.URI(BuildConfig.CREATOR_API_URL).let { it.scheme == "https" && !it.host.isNullOrBlank() && it.rawUserInfo == null && it.rawPath in listOf("", "/") && it.rawQuery == null && it.rawFragment == null } }.getOrDefault(false) &&
         BuildConfig.CREATOR_FIREBASE_APPLICATION_ID.isNotBlank() && BuildConfig.CREATOR_FIREBASE_PROJECT_ID.isNotBlank() &&
         BuildConfig.CREATOR_FIREBASE_SENDER_ID.isNotBlank() && BuildConfig.CREATOR_FIREBASE_API_KEY.isNotBlank()
-    private fun credential(context: Context) = runCatching { SecureSessionStorage(context.applicationContext, BuildConfig.CREATOR_API_URL).read() }.getOrElse { failed = true; null }
+    private fun credential(context: Context): String? = runCatching { SecureSessionStorage(context.applicationContext, BuildConfig.CREATOR_API_URL).read() }.getOrElse { failed = true; null }
     fun permitted(context: Context): Boolean = (Build.VERSION.SDK_INT < 33 || ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) && NotificationManagerCompat.from(context).areNotificationsEnabled() &&
         context.getSystemService(NotificationManager::class.java).getNotificationChannel(channelId)?.importance != NotificationManager.IMPORTANCE_NONE
     private fun messaging(context: Context): FirebaseMessaging {
@@ -143,7 +143,7 @@ object GrowthPush {
         context.getSystemService(NotificationManager::class.java).cancelAll()
         // Scheduling failure must never prevent W1 from erasing credentials.
         if (captured != null) runCatching { GrowthNotificationWorker.cancelSession(context, sessionDigest(captured)) }
-        if (!configured || captured == null || credential(context) != captured) return
+        if (!configured || captured == null) return
         val order = runCatching { GrowthPushInstallation(context).next() }.getOrNull() ?: return
         scope.launch {
             registration.withLock {
@@ -159,11 +159,17 @@ object GrowthPush {
     suspend fun resolveTap(client: GrowthClient, id: String, captured: String): String {
         val current = client.request("notifications/$id", expectedSession = captured)
         check(current.getString("id") == id)
-        check(current.optBoolean("available", false))
+        check(current.opt("available") == true)
         val destination = current.getString("destination")
         check(com.pantopus.qelvora.generated.ApplicationDestination.isPermitted(destination))
-        client.request("notifications/$id/read", "PUT", org.json.JSONObject(), captured)
-        return destination
+        val ack = client.request("notifications/$id/read", "PUT", org.json.JSONObject(), captured)
+        check(ack.opt("read") == true)
+        val fresh = client.request("notifications/$id", expectedSession = captured)
+        check(fresh.getString("id") == id && fresh.opt("available") == true)
+        val freshDestination = fresh.getString("destination")
+        check(com.pantopus.qelvora.generated.ApplicationDestination.isPermitted(freshDestination))
+        currentCoroutineContext().ensureActive()
+        return freshDestination
     }
     private fun sessionDigest(value: String): String = java.security.MessageDigest.getInstance("SHA-256").digest(value.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }
     fun received(context: Context, id: String?, highPriority: Boolean) {
