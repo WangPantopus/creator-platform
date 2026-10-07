@@ -88,10 +88,12 @@ export class ContentPrivacyExport {
       throw unavailable();
     const owner = new ContentPrivacyExport(pool);
     const client = await pool.connect();
-    const held = new ContentHeldClient(client, AbortSignal.timeout(6000));
+    const held = new ContentHeldClient(client, AbortSignal.timeout(6000), pool);
     let failure: unknown;
     try {
-      await held.run(() => owner.assertCatalog(client));
+      await held.begin();
+      await held.run(() => client.query("SET TRANSACTION READ ONLY"));
+      await owner.assertCatalog(client);
       issued.add(owner);
       return owner;
     } catch (error) {
@@ -140,7 +142,7 @@ export class ContentPrivacyExport {
     // The prepared pool has a bounded checkout. If cancellation arrives while
     // queued, acquire and close that late client before this operation settles.
     const client = await this.pool.connect();
-    const held = new ContentHeldClient(client, signal);
+    const held = new ContentHeldClient(client, signal, this.pool);
     let failure: unknown;
     try {
       await held.begin();
@@ -150,8 +152,9 @@ export class ContentPrivacyExport {
         ),
       );
       // Negative/restoration task authority precedes all domain body reads.
-      await held.run(() => authority(client, input));
-      await held.run(() => this.assertCatalog(client));
+      await authority(client, input);
+      signal.throwIfAborted();
+      await this.assertCatalog(client);
       signal.throwIfAborted();
       const result = await held.run(() =>
         client.query<{ data: unknown }>(
@@ -170,7 +173,7 @@ export class ContentPrivacyExport {
       const counts = Object.fromEntries(
         Object.entries(data).map(([name, values]) => [name, values.length]),
       );
-      await held.run(() => authority(client, input));
+      await authority(client, input);
       signal.throwIfAborted();
       // Both the genuine W8 task fence and Content's independently bound
       // lease trigger execute here. No SQL follows this separate COMMIT.

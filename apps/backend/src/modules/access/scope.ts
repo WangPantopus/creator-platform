@@ -106,7 +106,7 @@ export class AccessService {
     auditOpen = true,
   ): Promise<ThreadScope> {
     const client = await this.pool.connect();
-    const held = new ContentHeldClient(client);
+    const held = new ContentHeldClient(client, undefined, this.pool);
     let failure: unknown;
     try {
       await held.begin();
