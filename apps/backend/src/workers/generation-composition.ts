@@ -14,6 +14,7 @@ import type { AgentService } from "../modules/agent/service.js";
 import type { CommerceGenerationAllowance } from "../modules/commerce/generation-allowance.js";
 import { CommerceGenerationAudience } from "../modules/commerce/generation-audience.js";
 import { CommerceGenerationSafetyTerminalSettlement } from "../modules/commerce/generation-safety-terminal-settlement.js";
+import { PreparedContentGenerationOrigins } from "../modules/content/generation-origin.js";
 import { PreparedGenerationConversationContext } from "../modules/conversation/generation-context.js";
 import { PreparedGenerationConversationOutput } from "../modules/conversation/generation-output.js";
 import { PreparedGenerationConversationTerminal } from "../modules/conversation/generation-terminal.js";
@@ -34,9 +35,11 @@ type BoundOwners =
   | "journal"
   | "pipeline"
   | "inputs"
+  | "origins"
   | "context"
   | "audience"
-  | "accounting";
+  | "accounting"
+  | "signal";
 
 /** These are independently reviewed host inputs, never task/request JSON or
  * expected hashes learned from the database being qualified. Each original
@@ -52,6 +55,10 @@ export type GenerationWorkerCustody = Readonly<{
   >;
   inputs: Omit<
     Parameters<typeof PreparedGenerationAgentInputs.prepare>[0],
+    BoundOwners
+  >;
+  origins: Omit<
+    Parameters<typeof PreparedContentGenerationOrigins.prepare>[0],
     BoundOwners
   >;
   context: Omit<
@@ -134,20 +141,30 @@ export async function prepareGenerationWorker(input: {
     hostPool,
     service: input.service,
   };
+  input.signal?.throwIfAborted();
+  const origins = await PreparedContentGenerationOrigins.prepare({
+    ...input.custody.origins,
+    ...shared,
+    signal: input.signal,
+  });
+  input.signal?.throwIfAborted();
   const inputs = await PreparedGenerationAgentInputs.prepare({
     ...input.custody.inputs,
     ...shared,
+    origins,
   });
   input.signal?.throwIfAborted();
   const context = await PreparedGenerationConversationContext.prepare({
     ...input.custody.context,
     ...shared,
   });
+  input.signal?.throwIfAborted();
   const audience = await CommerceGenerationAudience.prepare({
     ...input.custody.audience,
     ...shared,
     database: input.database,
   });
+  input.signal?.throwIfAborted();
   const metadata = await PreparedGenerationAgentMetadata.prepare({
     ...input.custody.metadata,
     ...shared,
@@ -162,6 +179,7 @@ export async function prepareGenerationWorker(input: {
     context,
     journal: input.journal,
   });
+  input.signal?.throwIfAborted();
   const retrieval = await PreparedGenerationRuntimeContext.prepare({
     ...input.custody.retrieval,
     ...shared,
@@ -169,12 +187,14 @@ export async function prepareGenerationWorker(input: {
     context,
     accounting,
   });
+  input.signal?.throwIfAborted();
   const guardrail = await PreparedGenerationGuardrail.prepare({
     ...input.custody.guardrail,
     ...shared,
     inputs,
     context,
   });
+  input.signal?.throwIfAborted();
   const pipeline = PreparedGenerationPipeline.prepare({
     ...shared,
     inputs,
@@ -191,6 +211,7 @@ export async function prepareGenerationWorker(input: {
     ...shared,
     pipeline,
   });
+  input.signal?.throwIfAborted();
 
   // W1's sole COMMIT calls the actual W4 owner prepared below. Until that
   // owner exists, this closure refuses every attempt to finalize a scope.
@@ -210,6 +231,7 @@ export async function prepareGenerationWorker(input: {
       await prepared.settlement.assertSettledInTransaction(client, scope);
     },
   });
+  input.signal?.throwIfAborted();
   const terminalJournal = await PreparedGenerationTerminalJournal.prepare({
     ...input.custody.terminalJournal,
     ...shared,
@@ -222,6 +244,7 @@ export async function prepareGenerationWorker(input: {
     ...shared,
     terminal,
   });
+  input.signal?.throwIfAborted();
   const settlement = await CommerceGenerationSafetyTerminalSettlement.prepare({
     ...input.custody.settlement,
     ...shared,

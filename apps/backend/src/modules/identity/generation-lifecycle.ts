@@ -10,7 +10,7 @@ export const generationLifecycleSource = Object.freeze({
   checksum: "cd530fbc58dcaf63002f4214873ba877feb0d2866eefb2a94988062e2ca39057",
 });
 
-/** Closed PostgreSQL definition receipts. The source is held and unallocated;
+/** Closed PostgreSQL definition receipts. The source is held as0226;
  * these do not activate it or qualify the complete prepared generation graph. */
 export const generationLifecycleDefinitions = Object.freeze({
   "creator.pending_generation_tasks(integer)":

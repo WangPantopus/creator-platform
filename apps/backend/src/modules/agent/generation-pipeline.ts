@@ -222,6 +222,14 @@ export class PreparedGenerationPipeline {
     );
   }
 
+  assertService(service: AgentService): void {
+    invariant(
+      service === this.service,
+      "generation_pipeline_service_changed",
+      "Acceptance must use this worker's original Creator AI service.",
+    );
+  }
+
   private async current(
     client: PoolClient,
     scope: GenerationTaskScope,

@@ -92,6 +92,18 @@ export class CommerceGenerationSafetyTerminalSettlement {
     );
   }
 
+  assertAcceptance(access: AccessService): void {
+    invariant(
+      access === this.configuration.access,
+      "generation_terminal_acceptance_changed",
+      "Acceptance must use this settlement's original allowance authority.",
+    );
+    this.configuration.allowance.assertComposition(
+      this.configuration.hostPool,
+      access,
+    );
+  }
+
   static async prepare(input: {
     identity: GenerationIdentityAuthority;
     terminal: GenerationTerminalAuthority;

@@ -9,6 +9,8 @@ import { PreparedGenerationConversationTerminal } from "../modules/conversation/
 import { GenerationIdentityAuthority } from "../modules/identity/generation-scope.js";
 import { GenerationTerminalAuthority } from "../modules/identity/generation-terminal.js";
 import { requestAuthority } from "../modules/identity/request-authority.js";
+import type { AccessService } from "../modules/access/scope.js";
+import type { AgentService } from "../modules/agent/service.js";
 import { GenerationTerminalRecovery } from "./generation-terminal.js";
 
 type Owners = Readonly<{
@@ -49,6 +51,18 @@ export class GenerationWorker {
       owners.finalization,
       owners.settlement,
     );
+  }
+
+  /** The API may accept durable work only for this same prepared service,
+   * journal and allowance graph. This grants no interactive worker execution. */
+  assertAcceptance(
+    hostPool: Pool,
+    access: AccessService,
+    service: AgentService,
+  ): void {
+    this.owners.pipeline.assertComposition(this.owners.identity, hostPool);
+    this.owners.pipeline.assertService(service);
+    this.owners.settlement.assertAcceptance(access);
   }
 
   static async prepare(

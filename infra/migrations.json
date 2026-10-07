@@ -1114,6 +1114,15 @@
       "sourceSha256": "734a806c1e2252d7c5c7c418856f3b448933d993326ef471bb3351eed1367e41",
       "state": "reserved_unapplied",
       "reason": "Separate original ordinary Content LAST signature-metadata reader published7a340113, all89 SQL lines independently read/hash-checked by W8. Isolated NoLogin NoInherit NoBypassRLS creator_content_signature_read_authority owns only fixed creator.hold_content_signature_read(uuid,uuid,uuid,text,boolean) RETURNS boolean for the genuine core runtime. Narrow stored signature/session metadata, actual creator/content/consumed signed act/canonical stored publication-command hash/public audience and unchanged0167 six mutation fences remain mandatory. Original W5 version/audience/restoration/recipient/negative gates must already hold on the same original client/PID/fullXID; the final nonwaiting shared actual signer-family lease uses fresh READ COMMITTED metadata. Original0157 packet purpose remains separate; no packet, ThreadScope, Actor or second-pool alias supplies this authority. Published8c8f8ef8 corrects implicit sequence ACL projection only; the complete effective catalogue stays unaccepted. Exact source registration, original typed callers and full combined catalogue/compiler/drift/refusal/fresh-preserved/cancellation/C10/withdrawal/revocation and sole owner cleanup/COMMIT qualification remain pending. Source custody only; no installed SQL/grant, accepted pin, private body/key/assertion, provider permission or application acceptance."
+    },
+    {
+      "id": "0226",
+      "owner": "W1",
+      "version": "0226_w1_generation_lifecycle",
+      "path": "apps/backend/src/modules/identity/schema-generation-lifecycle.sql",
+      "sourceSha256": "cd530fbc58dcaf63002f4214873ba877feb0d2866eefb2a94988062e2ca39057",
+      "state": "reserved_unapplied",
+      "reason": "Separate additive lifecycle successor reviewed in the October 7 worker integration. Splits fresh never-claimed zero-cursor discovery from previously claimed recovery, and fences the actual original first-claim UPDATE against stale discovery replay. Preserves original0159/0183 source bytes and existing grants/owners. Closed PostgreSQL compiler, selector/trigger shape operations and eight metadata drift/restoration checks pass. Complete prepared graph and genuine accepted-task/concurrent claim/cancellation/recovery qualification remain required before activation."
     }
   ]
 }

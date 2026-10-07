@@ -15,7 +15,6 @@ import {
 import type { LicenseVerifier } from "../agent/service.js";
 import { PreparedUsageRetention } from "../agent/usage-retention.js";
 import { DevelopmentLicenseVerifier } from "../agent/development-license.js";
-import type { ApprovedSentence } from "../agent/runtime.js";
 import { createCommerceRuntime } from "../commerce/runtime.js";
 import { readCommerceEnvironment } from "../commerce/environment.js";
 import { createCommerceAudience } from "../commerce/audience.js";
@@ -25,7 +24,8 @@ import {
 } from "../commerce/attributed-cost-policy.js";
 import type { MediaService } from "../media/service.js";
 import { ProviderPolicySchema } from "../../../../../packages/api/src/conversation/contracts.js";
-import { conversationAgentGenerator } from "./agent-generator.js";
+import { PreparedGenerationAcceptance } from "./generation-acceptance.js";
+import { prepareGenerationWorker } from "../../workers/generation-composition.js";
 import { ConversationCorrections } from "./corrections.js";
 import { ConversationLineage } from "./lineage.js";
 import type { ReplyFeedbackAuthority } from "./lineage.js";
@@ -62,6 +62,12 @@ const DevelopmentEconomicsSchema = z.strictObject({
 
 /** Inputs supplied by their owners. Absent inputs keep their paths off. */
 export type ConversationHostProducers = {
+  /** Independently reviewed worker custody and its distinct bounded pool.
+   * Pool ownership stays with the host; API acceptance does not run a worker. */
+  generation?: Pick<
+    Parameters<typeof prepareGenerationWorker>[0],
+    "workerPool" | "custody" | "signal"
+  >;
   /** W8: actual feedback notice/consent/expiry; no development substitute. */
   feedbackAuthority?: ReplyFeedbackAuthority;
   /** W8: approved minimal account-level intro-offer use and retention. */
@@ -229,6 +235,8 @@ export async function composeConversationHost(
       missing.push(`registered ${version}`);
   if (requested)
     missing.push("current generation worker composition (W3/W1/W2/W4)");
+  if (requested && !producers.generation)
+    missing.push("reviewed generation worker custody and pool");
 
   let journal: PreparedGenerationJournal | undefined;
   const originalUsageRetention = producers.privacyCursor?.usageRetention;
@@ -255,14 +263,14 @@ export async function composeConversationHost(
   if (!costChecksum) missing.push(`registered ${migrations.cost}`);
 
   const ready = requested && missing.length === 0;
-  let bound: ReturnType<typeof conversationAgentGenerator> | undefined;
+  let acceptance: PreparedGenerationAcceptance | undefined;
   const current = () => {
     invariant(
-      bound,
+      acceptance,
       "generation_unconfigured",
       "AI messaging is not connected yet.",
     );
-    return bound;
+    return acceptance;
   };
   const commerce = base
     ? await createCommerceRuntime({
@@ -284,6 +292,12 @@ export async function composeConversationHost(
                 migration: {
                   version: migrations.cost,
                   checksum: costChecksum!,
+                },
+                originalRuleMigration: {
+                  version: "0189_w4_generation_terminal_settlement",
+                  checksum: (await registeredChecksum(
+                    "0189_w4_generation_terminal_settlement",
+                  ))!,
                 },
               }),
               trialReadiness: (scope: ThreadScope, client: PoolClient) =>
@@ -333,38 +347,64 @@ export async function composeConversationHost(
     );
 
   const audience = createCommerceAudience(runtime.database);
-  let agent: ReturnType<typeof createAgentDomain> | undefined;
-  const generation =
-    ready && commerce?.generationCostReconciliation
+  const binding: {
+    conversation?: ReturnType<typeof createConversationRuntime>;
+  } = {};
+  const agent = createAgentDomain({
+    pool: runtime.pool,
+    model,
+    ...(producers.licenseVerifier
+      ? { licenseVerifier: producers.licenseVerifier }
+      : {}),
+    ...(journal ? { usageJournal: journal } : {}),
+    ...(usageRetention ? { usageRetention } : {}),
+    ...(ready
       ? {
-          generatorFactory: (
-            memory: Parameters<
-              NonNullable<
-                Parameters<
-                  typeof createConversationRuntime
-                >[0]["generatorFactory"]
-              >
-            >[0],
-          ) => {
-            agent = createAgentDomain({
-              pool: runtime.pool,
-              model,
-              licenseVerifier: producers.licenseVerifier!,
-              audience,
-              usageJournal: journal!,
-              ...(usageRetention ? { usageRetention } : {}),
-              conversation: {
-                current: (scope) => memory.context(scope),
-                assertProcessorConsent: (scope) =>
-                  runtime.conversation.assertProcessorConsent(scope),
-                assertDeliveryCurrent: (scope, expected) =>
-                  runtime.conversation.assertSafetyCurrent(scope, expected),
-              },
-            });
-            bound = conversationAgentGenerator(runtime.database, agent);
-            return bound.generator;
+          audience,
+          conversation: {
+            current: (scope: ThreadScope) => {
+              invariant(
+                binding.conversation,
+                "generation_host_unconfigured",
+                "The canonical conversation host is not ready.",
+              );
+              return binding.conversation.memory.context(scope);
+            },
+            assertProcessorConsent: (scope: ThreadScope) =>
+              runtime.conversation.assertProcessorConsent(scope),
+            assertDeliveryCurrent: (
+              scope: ThreadScope,
+              expected: Parameters<
+                typeof runtime.conversation.assertSafetyCurrent
+              >[1],
+            ) => runtime.conversation.assertSafetyCurrent(scope, expected),
           },
-          assertReady: (scope: ThreadScope, client: PoolClient) => {
+        }
+      : {}),
+  });
+  const worker =
+    ready && commerce?.allowance && journal && producers.generation
+      ? await prepareGenerationWorker({
+          ...producers.generation,
+          database: runtime.database,
+          access: runtime.access,
+          service: agent.service,
+          allowance: commerce.allowance,
+          journal,
+        })
+      : undefined;
+  if (worker)
+    acceptance = PreparedGenerationAcceptance.prepare({
+      worker,
+      database: runtime.database,
+      access: runtime.access,
+      agent,
+    });
+  const generation =
+    acceptance && commerce?.generationCostReconciliation
+      ? {
+          generationAcceptance: acceptance,
+          assertReady: async (scope: ThreadScope) => {
             invariant(
               !developmentPolicy ||
                 developmentPolicy.allowsAccounts(
@@ -375,27 +415,7 @@ export async function composeConversationHost(
               "synthetic_accounts_required",
               "Use configured fictional development accounts.",
             );
-            return current().assertReady(scope, client);
           },
-          assertApproved: (
-            scope: ThreadScope,
-            client: PoolClient,
-            sentence: ApprovedSentence,
-          ) => {
-            invariant(
-              !developmentPolicy ||
-                developmentPolicy.allowsAccounts(
-                  scope.actorAccountId,
-                  scope.fanAccountId,
-                  scope.creatorAccountId,
-                ),
-              "synthetic_accounts_required",
-              "Use configured fictional development accounts.",
-            );
-            return current().assertApproved(scope, client, sentence);
-          },
-          citation: (scope: ThreadScope, id: string) =>
-            current().citation(scope, id),
           generationCostReconciliation: commerce.generationCostReconciliation,
           firstConversation: commerce.service,
         }
@@ -420,16 +440,7 @@ export async function composeConversationHost(
       ? { fulfillmentPlans: producers.fulfillmentPlans }
       : {}),
   });
-  // Studio drafting, evaluation and ingestion use the same configured model.
-  agent ??= createAgentDomain({
-    pool: runtime.pool,
-    model,
-    ...(producers.licenseVerifier
-      ? { licenseVerifier: producers.licenseVerifier }
-      : {}),
-    ...(journal ? { usageJournal: journal } : {}),
-    ...(usageRetention ? { usageRetention } : {}),
-  });
+  binding.conversation = conversation;
 
   const ingestion =
     requested && model && env.W3_DEVELOPMENT_INGESTION
@@ -468,6 +479,7 @@ export async function composeConversationHost(
     commerce,
     conversation,
     agent,
+    generationWorker: worker,
     privacy: {
       ...(lineage ? { lineage } : {}),
       ...(recordings ? { recordings } : {}),

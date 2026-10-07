@@ -8,6 +8,7 @@ import {
 } from "../../../../../packages/api/src/agent/contracts.js";
 import { canonical, contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
+import { PreparedContentGenerationOrigins } from "../content/generation-origin.js";
 import {
   GenerationIdentityAuthority,
   type GenerationPurposeConsumer,
@@ -93,16 +94,6 @@ function freeze<T>(value: T): DeepReadonly<T> {
   return value as DeepReadonly<T>;
 }
 
-/** W5's actual current publication/reuse/withdrawal authority on the same
- * purpose client. A recorded candidate/origin reference is not approval. */
-export interface GenerationSourceOrigins {
-  assertCurrent(
-    client: PoolClient,
-    scope: GenerationTaskScope,
-    sources: readonly GenerationAgentFacts["sources"][number][],
-    signal?: AbortSignal,
-  ): Promise<void>;
-}
 export type GenerationAILicenseContext = Readonly<{
   inputs: PreparedGenerationAgentInputs;
   scope: GenerationTaskScope;
@@ -121,7 +112,7 @@ export class PreparedGenerationAgentInputs {
   private constructor(
     private readonly identity: GenerationIdentityAuthority,
     private readonly service: AgentService,
-    private readonly origins: GenerationSourceOrigins | undefined,
+    private readonly origins: PreparedContentGenerationOrigins | undefined,
     private readonly custody: GenerationConsumerCustody,
   ) {}
 
@@ -142,7 +133,7 @@ export class PreparedGenerationAgentInputs {
     consumer: GenerationPurposeConsumer;
     /** Independently reviewed effective permissions and RLS catalogue. */
     catalogueChecksum: string;
-    origins?: GenerationSourceOrigins;
+    origins?: PreparedContentGenerationOrigins;
   }): Promise<PreparedGenerationAgentInputs> {
     invariant(
       input.identity instanceof GenerationIdentityAuthority &&
@@ -151,6 +142,14 @@ export class PreparedGenerationAgentInputs {
       "Genuine worker identity and canonical Creator AI are required.",
     );
     input.identity.assertPool(input.workerPool);
+    if (input.origins !== undefined) {
+      invariant(
+        input.origins instanceof PreparedContentGenerationOrigins,
+        "generation_source_origin_unconfigured",
+        "Use the original prepared Content publication and reuse authority.",
+      );
+      input.origins.assertComposition(input.identity, input.workerPool);
+    }
     const host = new Client(input.service.repository.pool.options);
     const worker = new Client(input.workerPool.options);
     const endpoint = (client: Client) =>

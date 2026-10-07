@@ -67,6 +67,18 @@ export class PreparedContentGenerationOrigins {
     private readonly catalogueChecksum: string,
   ) {}
 
+  assertComposition(
+    identity: GenerationIdentityAuthority,
+    workerPool: Pool,
+  ): void {
+    invariant(
+      identity === this.identity,
+      "generation_content_origin_composition_mismatch",
+      "Content origins must use the original generation identity authority.",
+    );
+    this.identity.assertPool(workerPool);
+  }
+
   static async prepare(input: {
     identity: GenerationIdentityAuthority;
     workerPool: Pool;
