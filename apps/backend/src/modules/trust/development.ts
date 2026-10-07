@@ -14,6 +14,8 @@ import {
 import { createPrivacyConsumers } from "./privacy-consumers.js";
 import { trustLocalRestorationInTransaction } from "./restoration.js";
 import { PrivateFileArtifacts } from "./private-file-artifacts.js";
+import { registeredContentPrivacyProfile } from "../../db/content-privacy-profile.js";
+import { ContentPrivacyExport } from "../content/privacy-export.js";
 
 /** W1 adds these to its development adapter. These are labels, never tokens,
  * membership grants, production identities or a second session issuer. */
@@ -243,6 +245,17 @@ export async function createDevelopmentTrust(
     const privacyArtifacts = env.TRUST_PRIVATE_ARTIFACT_DIRECTORY
       ? await PrivateFileArtifacts.prepare(env.TRUST_PRIVATE_ARTIFACT_DIRECTORY)
       : undefined;
+    // Prepare the real exporter on this host's original core pool. Trust still
+    // supplies restoration, verified ownership and its current task/lease at
+    // every operation; configuration cannot create a task authority receipt.
+    const content =
+      options.consumers?.content ??
+      ((await registeredContentPrivacyProfile())
+        ? {
+            purposePool: runtime.pool,
+            exporter: await ContentPrivacyExport.prepare(runtime.pool),
+          }
+        : undefined);
     return {
       environment: "local-development",
       identityMode: "development",
@@ -277,6 +290,7 @@ export async function createDevelopmentTrust(
         runtimePool: runtime.pool,
         coordinatorPool: workerPool,
         ...options.consumers,
+        content,
         privacyArtifacts,
         assertRestoredInTransaction: async (client) => {
           if (!(await restoreReadyInTransaction(client)))
