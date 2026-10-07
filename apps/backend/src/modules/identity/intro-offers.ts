@@ -21,6 +21,11 @@ export type IntroOfferPolicy = (
   client: PoolClient,
   consent: Readonly<{ policyVersion: string; expiresAt: string }>,
 ) => Promise<void>;
+const IntroOfferRetention = z.strictObject({
+  policyVersion: z.string().min(1).max(200),
+  offerExpiresAt: z.iso.datetime(),
+});
+export type IntroOfferRetention = Readonly<z.infer<typeof IntroOfferRetention>>;
 
 /** W3 invokes only after its actual explicit helpful feedback INSERT/UPDATE,
  * inside its original held write. No delivery/LLM heuristic or old feedback is
@@ -29,11 +34,13 @@ export class IdentityIntroOffers {
   private constructor(
     private readonly database: Database,
     private readonly assertOfferAllowed: IntroOfferPolicy,
+    private readonly retention: IntroOfferRetention,
   ) {}
 
   static async prepare(input: {
     database: Database;
     assertOfferAllowed: IntroOfferPolicy;
+    retention: IntroOfferRetention;
   }): Promise<IdentityIntroOffers> {
     invariant(
       input.database instanceof Database &&
@@ -59,7 +66,11 @@ export class IdentityIntroOffers {
       "intro_offer_unconfigured",
       "Reviewed helpful-reply and account event custody is unavailable.",
     );
-    return new IdentityIntroOffers(input.database, input.assertOfferAllowed);
+    return new IdentityIntroOffers(
+      input.database,
+      input.assertOfferAllowed,
+      Object.freeze(IntroOfferRetention.parse(input.retention)),
+    );
   }
 
   assertPool(pool: Database["pool"]): void {
@@ -107,6 +118,7 @@ export class IdentityIntroOffers {
   private async readPending(
     scope: ThreadScope,
     client: PoolClient,
+    includeAcknowledged = false,
   ): Promise<IntroOfferDecision> {
     this.database.assertHeldThread(scope, client);
     if (
@@ -127,14 +139,24 @@ export class IdentityIntroOffers {
        JOIN creator.message m ON m.id=f.message_id AND m.thread_id=f.thread_id AND m.creator_id=f.creator_id AND m.fan_id=f.fan_id
        JOIN creator.fan_profile p ON p.id=f.fan_id AND p.account_id=e.account_id
        WHERE e.account_id=$1 AND e.kind='fan_intro_offer'
-        AND NOT EXISTS(SELECT FROM creator.identity_event ack WHERE ack.account_id=e.account_id
-         AND ack.kind='fan_intro_offer_acknowledged' AND ack.aggregate_id=e.id)
+        AND e.policy_version=$5 AND e.expires_at=$6::timestamptz AND e.expires_at>clock_timestamp()
+        AND ($7 OR NOT EXISTS(SELECT FROM creator.identity_event ack WHERE ack.account_id=e.account_id
+         AND ack.kind='fan_intro_offer_acknowledged' AND ack.aggregate_id=e.id
+         AND ack.policy_version=e.policy_version AND ack.expires_at=e.expires_at AND ack.expires_at>clock_timestamp()))
         AND f.thread_id=$2 AND f.creator_id=$3 AND f.fan_id=$4 AND f.rating='helpful'
-        AND f.consent_policy_version IS NOT NULL AND f.consented_at IS NOT NULL AND f.expires_at>clock_timestamp()
+        AND f.consent_policy_version=e.policy_version AND f.consented_at IS NOT NULL AND f.expires_at>clock_timestamp()
         AND m.version=f.message_version AND m.agent_version_id=f.agent_version_id AND m.agent_version_hash=f.agent_version_hash
         AND m.author_kind='ai' AND m.delivery_state IN('delivered','interrupted')
        ORDER BY e.created_at,e.id LIMIT 1 FOR SHARE OF e,f,m NOWAIT`,
-        [scope.actorAccountId, scope.threadId, scope.creatorId, scope.fanId],
+        [
+          scope.actorAccountId,
+          scope.threadId,
+          scope.creatorId,
+          scope.fanId,
+          this.retention.policyVersion,
+          this.retention.offerExpiresAt,
+          includeAcknowledged,
+        ],
       )
     ).rows[0];
     if (!row) return Object.freeze({ offerId: null });
@@ -180,7 +202,7 @@ export class IdentityIntroOffers {
           ON m.id=f.message_id AND m.thread_id=f.thread_id AND m.creator_id=f.creator_id AND m.fan_id=f.fan_id
          WHERE f.thread_id=$1 AND f.creator_id=$2 AND f.fan_id=$3 AND f.account_id=$4
           AND f.message_id=$5 AND f.message_version=$6 AND f.agent_version_id=$7 AND f.agent_version_hash=$8
-          AND f.rating='helpful' AND f.consented_at IS NOT NULL AND f.consent_policy_version IS NOT NULL
+          AND f.rating='helpful' AND f.consented_at IS NOT NULL AND f.consent_policy_version=$9
           AND f.expires_at>clock_timestamp() AND f.consented_at<=clock_timestamp()
           AND f.xmin::text::bigint=(pg_current_xact_id()::text::numeric % 4294967296)::bigint
           AND m.version=f.message_version AND m.agent_version_id=f.agent_version_id AND m.agent_version_hash=f.agent_version_hash
@@ -195,6 +217,7 @@ export class IdentityIntroOffers {
           reply.messageVersion,
           reply.agentVersionId,
           reply.agentVersionHash,
+          this.retention.policyVersion,
         ],
       )
     ).rows[0];
@@ -227,8 +250,17 @@ export class IdentityIntroOffers {
       acknowledged: boolean;
       kind: string;
     }>(
-      "SELECT e.id,e.kind,EXISTS(SELECT FROM creator.identity_event ack WHERE ack.account_id=e.account_id AND ack.kind='fan_intro_offer_acknowledged' AND ack.aggregate_id=e.id) AS acknowledged FROM creator.identity_event e WHERE e.account_id=$1 AND e.kind IN('fan_intro_offer','fan_intro_offer_suppressed') ORDER BY e.created_at,e.id LIMIT 1",
-      [scope.actorAccountId],
+      `SELECT e.id,e.kind,EXISTS(SELECT FROM creator.identity_event ack WHERE ack.account_id=e.account_id
+       AND ack.kind='fan_intro_offer_acknowledged' AND ack.aggregate_id=e.id
+       AND ack.policy_version=e.policy_version AND ack.expires_at=e.expires_at AND ack.expires_at>clock_timestamp()) AS acknowledged
+       FROM creator.identity_event e WHERE e.account_id=$1 AND e.kind IN('fan_intro_offer','fan_intro_offer_suppressed')
+       AND e.policy_version=$2 AND e.expires_at=$3::timestamptz AND e.expires_at>clock_timestamp()
+       ORDER BY e.created_at,e.id LIMIT 1`,
+      [
+        scope.actorAccountId,
+        this.retention.policyVersion,
+        this.retention.offerExpiresAt,
+      ],
     );
     const fan = (
       await client.query<{ filled: boolean }>(
@@ -252,13 +284,15 @@ export class IdentityIntroOffers {
     }
     this.database.assertHeldThread(scope, client, "write");
     const event = await client.query<{ id: string }>(
-      `INSERT INTO creator.identity_event(account_id,kind,aggregate_id,version)
-       VALUES($1,$2,$3,$4) RETURNING id`,
+      `INSERT INTO creator.identity_event(account_id,kind,aggregate_id,version,policy_version,expires_at)
+       VALUES($1,$2,$3,$4,$5,$6::timestamptz) RETURNING id`,
       [
         scope.actorAccountId,
         fan.filled ? "fan_intro_offer_suppressed" : "fan_intro_offer",
-        reply.messageId,
-        reply.messageVersion,
+        fan.filled ? scope.actorAccountId : reply.messageId,
+        fan.filled ? 1 : reply.messageVersion,
+        this.retention.policyVersion,
+        this.retention.offerExpiresAt,
       ],
     );
     await this.assertOfferAllowed(scope, client, policy);
@@ -307,25 +341,40 @@ export class IdentityIntroOffers {
       );
     this.database.assertHeldThread(scope, client, "write");
     const result = await client.query<{ acknowledged: boolean }>(
-      "SELECT EXISTS(SELECT FROM creator.identity_event ack WHERE ack.account_id=e.account_id AND ack.kind='fan_intro_offer_acknowledged' AND ack.aggregate_id=e.id) AS acknowledged FROM creator.identity_event e WHERE e.id=$1 AND e.account_id=$2 AND e.kind='fan_intro_offer'",
-      [z.uuid().parse(offerId), scope.actorAccountId],
+      `SELECT EXISTS(SELECT FROM creator.identity_event ack WHERE ack.account_id=e.account_id
+       AND ack.kind='fan_intro_offer_acknowledged' AND ack.aggregate_id=e.id
+       AND ack.policy_version=e.policy_version AND ack.expires_at=e.expires_at AND ack.expires_at>clock_timestamp()) AS acknowledged
+       FROM creator.identity_event e WHERE e.id=$1 AND e.account_id=$2 AND e.kind='fan_intro_offer'
+       AND e.policy_version=$3 AND e.expires_at=$4::timestamptz AND e.expires_at>clock_timestamp()`,
+      [
+        z.uuid().parse(offerId),
+        scope.actorAccountId,
+        this.retention.policyVersion,
+        this.retention.offerExpiresAt,
+      ],
     );
     invariant(
       result.rowCount === 1,
       "intro_offer_unavailable",
       "Your intro offer is unavailable.",
     );
+    const pending = await this.readPending(scope, client, true);
+    invariant(
+      pending.offerId === offerId,
+      "intro_offer_unavailable",
+      "Your current intro offer is unavailable. Reopen the original conversation.",
+    );
     if (!result.rows[0]!.acknowledged) {
-      const pending = await this.readPending(scope, client);
-      invariant(
-        pending.offerId === offerId,
-        "intro_offer_unavailable",
-        "Your current intro offer is unavailable. Reopen the original conversation.",
-      );
       this.database.assertHeldThread(scope, client, "write");
       await client.query(
-        "INSERT INTO creator.identity_event(account_id,kind,aggregate_id,version) VALUES($1,'fan_intro_offer_acknowledged',$2,1)",
-        [scope.actorAccountId, offerId],
+        `INSERT INTO creator.identity_event(account_id,kind,aggregate_id,version,policy_version,expires_at)
+         VALUES($1,'fan_intro_offer_acknowledged',$2,1,$3,$4::timestamptz)`,
+        [
+          scope.actorAccountId,
+          offerId,
+          this.retention.policyVersion,
+          this.retention.offerExpiresAt,
+        ],
       );
     }
     await assertCurrentSession(client, scope.actorAccountId);

@@ -33,6 +33,7 @@ import type { ReplyFeedbackAuthority } from "./lineage.js";
 import {
   IdentityIntroOffers,
   type IntroOfferPolicy,
+  type IntroOfferRetention,
 } from "../identity/intro-offers.js";
 import { ConversationRecordings } from "./recordings.js";
 import type { PreparedConversationPrivacyCursor } from "./privacy-export-cursor.js";
@@ -82,6 +83,7 @@ export type ConversationHostProducers = {
   feedbackAuthority?: ReplyFeedbackAuthority;
   /** W8: approved minimal account-level intro-offer use and retention. */
   introOfferPolicy?: IntroOfferPolicy;
+  introOfferRetention?: IntroOfferRetention;
   /** W4: genuinely prepared original group fulfillment on this exact graph. */
   fulfillmentPlans?: import("../commerce/fulfillment-plans.js").CommerceFulfillmentPlans;
   /** W2: the configured license authority for this host. */
@@ -374,11 +376,17 @@ export async function composeConversationHost(
       checksum ? { version: migrations.feedbackConsent, checksum } : undefined,
     ),
   });
-  if (lineage && producers.feedbackAuthority && producers.introOfferPolicy)
+  if (
+    lineage &&
+    producers.feedbackAuthority &&
+    producers.introOfferPolicy &&
+    producers.introOfferRetention
+  )
     lineage.configureIntroOffers(
       await IdentityIntroOffers.prepare({
         database: runtime.database,
         assertOfferAllowed: producers.introOfferPolicy,
+        retention: producers.introOfferRetention,
       }),
     );
   const corrections = lineage

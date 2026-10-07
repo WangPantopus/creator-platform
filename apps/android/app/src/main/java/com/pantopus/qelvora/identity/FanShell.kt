@@ -27,6 +27,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.pantopus.qelvora.BuildConfig
 import com.pantopus.qelvora.generated.*
+import com.pantopus.qelvora.studio.StudioTeamFeature
 import com.pantopus.qelvora.ui.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -434,6 +435,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                         BasicText("Your account", style = qText("display-md").copy(color = qColor("ink")))
                         model.session?.fan?.handle?.let { handle -> BasicText("@$handle", style = qText("body").copy(color = qColor("ink"))) }
                         Button(QelvoraCopy.text(if (model.session?.fan == null) "identityChooseHandle" else "identityEditPublicProfile"), ButtonVariant.SECONDARY, block = true) { model.destination = "/onboarding/handle" }
+                        Button(QelvoraCopy.text("w5NativeTeamWorkspace"), ButtonVariant.SECONDARY, block = true, disabled = model.busy || model.checkingSession || model.purgingPrivateState || model.localPurgeFailed || model.error.isNotEmpty()) { model.open("/studio/workspace") }
                         Button("Sign out", ButtonVariant.SECONDARY, block = true) { scope.launch { model.logout() } }
                         Button("Refresh session", ButtonVariant.SECONDARY, block = true, disabled = model.busy) { scope.launch { model.refreshCredentials() } }
                         Button("Sign out on all devices", ButtonVariant.QUIET, block = true) { scope.launch { model.logout(true) } }
@@ -446,7 +448,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                 }
                 val labels = listOf("navHome" to "/home", "navDiscover" to "/discover", "navRequests" to "/requests", "navYou" to "/you")
                 val path = model.destination.substringBefore('?')
-                val accountDestination = path.startsWith("/identity/") || path == "/support" || path.startsWith("/support/") || path == "/notifications/settings" || path == "/commerce/spending"
+                val accountDestination = path.startsWith("/identity/") || path == "/support" || path.startsWith("/support/") || path == "/notifications/settings" || path == "/commerce/spending" || StudioTeamFeature.matches(path)
                 val selectedTab = if (accountDestination) "navYou" else if (path.startsWith("/commerce/")) "navRequests" else labels.firstOrNull { path == it.second || path.startsWith(it.second + "/") }?.first ?: "navHome"
                 TabBar(QelvoraCopy.text(selectedTab)) { label -> model.destination = labels.first { QelvoraCopy.text(it.first) == label }.second }
             }

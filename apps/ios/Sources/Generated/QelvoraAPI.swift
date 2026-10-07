@@ -11172,7 +11172,7 @@ public actor CreatorAPIClient {
 
 public enum ApplicationDestination {
   public static func requiresFanProfile(_ value: String) -> Bool {
-    !isPermitted(value) || value.components(separatedBy: "?")[0].range(of: "^/(?:identity/account|status|ops(?:/.*)?)$", options: .regularExpression) == nil
+    !isPermitted(value) || value.components(separatedBy: "?")[0].range(of: "^/(?:identity/account|status|ops(?:/.*)?|studio/(?:workspace|[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/team))$", options: .regularExpression) == nil
   }
   public static func isPermitted(_ value: String) -> Bool {
     if value.count > 2048 || value.contains("%") || value.contains("\\") || value.contains("#") || value.rangeOfCharacter(from: .whitespacesAndNewlines) != nil { return false }

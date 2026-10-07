@@ -11132,6 +11132,413 @@
           }
         }
       }
+    },
+    "Studio workspace": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Studio workspace"
+          }
+        }
+      }
+    },
+    "Team status": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Team status"
+          }
+        }
+      }
+    },
+    "Check current team access": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check current team access"
+          }
+        }
+      }
+    },
+    "Reconnect and check current team access to continue.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reconnect and check current team access to continue."
+          }
+        }
+      }
+    },
+    "Your account or session changed. Reopen Team with your current account.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your account or session changed. Reopen Team with your current account."
+          }
+        }
+      }
+    },
+    "Current Team access is unavailable for this account.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Current Team access is unavailable for this account."
+          }
+        }
+      }
+    },
+    "The role change was confirmed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The role change was confirmed."
+          }
+        }
+      }
+    },
+    "The current roles changed. Check Team and review them before another save.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The current roles changed. Check Team and review them before another save."
+          }
+        }
+      }
+    },
+    "The response was interrupted. Check current Team or retry the exact reviewed role change.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The response was interrupted. Check current Team or retry the exact reviewed role change."
+          }
+        }
+      }
+    },
+    "No creator or Team workspace is available for this account.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No creator or Team workspace is available for this account."
+          }
+        }
+      }
+    },
+    "Creator workspace": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Creator workspace"
+          }
+        }
+      }
+    },
+    "Team workspace": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Team workspace"
+          }
+        }
+      }
+    },
+    "Current creator verification is required before opening Team.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Current creator verification is required before opening Team."
+          }
+        }
+      }
+    },
+    "Invitation from {name} · {roles} · expires {expires}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invitation from {name} · {roles} · expires {expires}"
+          }
+        }
+      }
+    },
+    "The invitation acceptance was confirmed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The invitation acceptance was confirmed."
+          }
+        }
+      }
+    },
+    "The response was interrupted. Check current Team access, then retry this exact invitation. Nothing is sent automatically.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The response was interrupted. Check current Team access, then retry this exact invitation. Nothing is sent automatically."
+          }
+        }
+      }
+    },
+    "Retry exact invitation acceptance": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry exact invitation acceptance"
+          }
+        }
+      }
+    },
+    "Team words always carry the team label. Team replies never fulfill a personal commitment.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Team words always carry the team label. Team replies never fulfill a personal commitment."
+          }
+        }
+      }
+    },
+    "No Team members.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Team members."
+          }
+        }
+      }
+    },
+    "Access removed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Access removed"
+          }
+        }
+      }
+    },
+    "Only the creator can change Team access.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only the creator can change Team access."
+          }
+        }
+      }
+    },
+    "Edit roles": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit roles"
+          }
+        }
+      }
+    },
+    "Roles for {member}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Roles for {member}"
+          }
+        }
+      }
+    },
+    "Reviewed roles: {roles}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reviewed roles: {roles}"
+          }
+        }
+      }
+    },
+    "Desired roles: {roles}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desired roles: {roles}"
+          }
+        }
+      }
+    },
+    "Current roles: {roles}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Current roles: {roles}"
+          }
+        }
+      }
+    },
+    "Review current roles": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Review current roles"
+          }
+        }
+      }
+    },
+    "Retry exact role change": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry exact role change"
+          }
+        }
+      }
+    },
+    "Save roles": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save roles"
+          }
+        }
+      }
+    },
+    "Triage": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Triage"
+          }
+        }
+      }
+    },
+    "Reads and routes the queue. Replies as team.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reads and routes the queue. Replies as team."
+          }
+        }
+      }
+    },
+    "Drafting": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drafting"
+          }
+        }
+      }
+    },
+    "Prepares drafts. Never approves as you.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepares drafts. Never approves as you."
+          }
+        }
+      }
+    },
+    "Publishing": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Publishing"
+          }
+        }
+      }
+    },
+    "Publishes content under team identity.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Publishes content under team identity."
+          }
+        }
+      }
+    },
+    "Scheduling": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scheduling"
+          }
+        }
+      }
+    },
+    "Offers times from your hours.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offers times from your hours."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

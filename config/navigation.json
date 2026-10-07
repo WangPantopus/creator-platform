@@ -17,5 +17,5 @@
     "offer": "1",
     "kind": "verification"
   },
-  "fanHandleExemptPathPattern": "^/(?:identity/account|status|ops(?:/.*)?)$"
+  "fanHandleExemptPathPattern": "^/(?:identity/account|status|ops(?:/.*)?|studio/(?:workspace|[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/team))$"
 }

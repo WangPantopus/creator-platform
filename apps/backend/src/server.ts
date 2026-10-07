@@ -8,6 +8,8 @@ import { configureGrowthForBackend } from "./modules/growth/configured.js";
 import { composeConversationHost } from "./modules/conversation/host.js";
 import { registeredConversationPrivacyReview } from "./modules/conversation/privacy-configuration.js";
 import { accountingRetentionPolicy } from "./modules/trust/accounting-retention-policy.js";
+import { registeredCommerceApprovalMigration } from "./modules/commerce/approval-registration.js";
+import { createDevelopmentFeedback } from "./modules/trust/development-feedback.js";
 import { createCommerceStudio } from "./modules/commerce/studio.js";
 import {
   composeContentHost,
@@ -57,7 +59,8 @@ const features: {
   conversationPrivacy?: ConversationPrivacyOwnerPorts;
   agentPrivacy?: AgentPrivacyOwnerPorts;
   commerce?: import("./modules/commerce/service.js").CommerceService;
-} = { growth: null };
+  start: (() => void)[];
+} = { growth: null, start: [] };
 if (config.identityAdapter === "development" && !config.identitySessionKey)
   throw new Error(
     "Development identity requires an explicit IDENTITY_SESSION_KEY.",
@@ -114,6 +117,41 @@ try {
               }
             : {}),
           registerFeatures: async (runtime, onClose) => {
+            const feedback = await createDevelopmentFeedback(runtime);
+            if (feedback) {
+              const controller = new AbortController();
+              let timer: ReturnType<typeof setInterval> | undefined;
+              let pending: Promise<void> | undefined;
+              const run = () => {
+                if (controller.signal.aborted || pending) return;
+                pending = feedback
+                  .purgeExpired(controller.signal)
+                  .then(() => {})
+                  .catch(() => {
+                    if (!controller.signal.aborted)
+                      console.error(
+                        "Development feedback expiry is unavailable.",
+                      );
+                  })
+                  .finally(() => {
+                    pending = undefined;
+                  });
+              };
+              // Start only after the complete configured graph returns, outside
+              // request ALS. One original batch (at most 100 per relation) per
+              // minute cannot overlap or inherit interactive account authority.
+              features.start.push(() => {
+                run();
+                timer = setInterval(run, 60_000);
+                timer.unref();
+              });
+              onClose(async () => {
+                controller.abort();
+                if (timer) clearInterval(timer);
+                await pending;
+                await feedback.close();
+              });
+            }
             const accountCalls = await AccountCallMetadata.prepare(runtime);
             const callControl = await InteractiveCallControl.prepare(runtime);
             const mediaEnvironment = readMediaEnvironment();
@@ -160,6 +198,13 @@ try {
                 : undefined;
             const host = await composeConversationHost(runtime, config, {
               ...licensing,
+              ...(feedback
+                ? {
+                    feedbackAuthority: feedback.replyFeedbackAuthority,
+                    introOfferPolicy: feedback.introOfferPolicy,
+                    introOfferRetention: feedback.introOfferRetention,
+                  }
+                : {}),
               ...(usageAccounting ? { usageAccounting } : {}),
               ...(usageAccounting && conversationPrivacy
                 ? {
@@ -185,6 +230,8 @@ try {
             });
             onClose(() => host.close());
             const { commerce, conversation, agent } = host;
+            const approvalMigration =
+              await registeredCommerceApprovalMigration();
             features.agentPrivacy = agent;
             features.commerce = commerce?.service;
             // Preparing the genuine graph does not configure a provider, worker
@@ -327,6 +374,16 @@ try {
                   pool: runtime.pool,
                   owners: contentHost.owners,
                   dependencies: contentHost.dependencies,
+                  ...(approvalMigration
+                    ? {
+                        approvals: {
+                          database: runtime.database,
+                          access: runtime.access,
+                          conversation: runtime.conversation,
+                          migration: approvalMigration,
+                        },
+                      }
+                    : {}),
                 })
               : createContentStudio({
                   pool: runtime.pool,
@@ -380,6 +437,7 @@ try {
   throw error;
 }
 features.growth?.start();
+for (const start of features.start) start();
 const server = configured?.server ?? createServer(createApp(config));
 server.listen(
   {
