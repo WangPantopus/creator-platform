@@ -583,21 +583,65 @@ export async function createConfiguredBackend(input: {
         : {}),
     },
   );
-  await trust?.start();
+  let closing: Promise<void> | undefined;
+  const close = (): Promise<void> => {
+    closing ??= (async () => {
+      const stopped = await Promise.allSettled([
+        new Promise<void>((resolve, reject) => {
+          server.close((error) => {
+            // A prepared host may never have opened an HTTP listener.
+            if (
+              error &&
+              (error as NodeJS.ErrnoException).code !== "ERR_SERVER_NOT_RUNNING"
+            )
+              reject(error);
+            else resolve();
+          });
+        }),
+        new Promise<void>((resolve, reject) => {
+          for (const connection of sockets.clients)
+            connection.close(1001, "Server shutdown");
+          sockets.close((error) => (error ? reject(error) : resolve()));
+        }),
+      ]);
+      const failures = stopped.flatMap((result) =>
+        result.status === "rejected" ? [result.reason] : [],
+      );
+      issuedRuntimes.delete(backendRuntime);
+      // A failed original Trust drain must not skip core pool cleanup.
+      for (const action of [() => trust?.stop(), () => pool.end()]) {
+        try {
+          await action();
+        } catch (cause) {
+          failures.push(cause);
+        }
+      }
+      if (failures.length)
+        throw new AggregateError(
+          failures,
+          "Configured backend shutdown failed.",
+        );
+    })();
+    return closing;
+  };
+  try {
+    await trust?.start();
+  } catch (failure) {
+    try {
+      await close();
+    } catch (cleanup) {
+      throw new AggregateError(
+        [failure, cleanup],
+        "Configured backend startup and cleanup failed.",
+      );
+    }
+    throw failure;
+  }
   return {
     server,
     pool,
     identity: platformIdentity,
     trust,
-    close: async () => {
-      issuedRuntimes.delete(backendRuntime);
-      for (const connection of sockets.clients)
-        connection.close(1001, "Server shutdown");
-      await trust?.stop();
-      await new Promise<void>((resolve, reject) =>
-        server.close((error) => (error ? reject(error) : resolve())),
-      );
-      await pool.end();
-    },
+    close,
   };
 }
