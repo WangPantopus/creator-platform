@@ -20,6 +20,8 @@ export const accountDetachedUsageSource = Object.freeze({
 export const accountDetachedUsageExpectedCatalogue: string | undefined =
   "689b6af98b8bf3cfcb88c08c834a1adf32d34c488686eaae913830df6d64d74f";
 
+// Fixed pg_catalog identities keep metadata readable by the original isolated
+// Trust worker without creator schema USAGE or any new relation grant.
 export const accountDetachedUsageCatalogueQuery = `SELECT jsonb_build_object(
  'role',(SELECT to_jsonb(r)-'oid' FROM pg_roles r WHERE rolname='creator_usage_detachment'),
  'memberships',coalesce((SELECT jsonb_agg(jsonb_build_object(
@@ -66,8 +68,9 @@ export const accountDetachedUsageCatalogueQuery = `SELECT jsonb_build_object(
    'roles',ARRAY(SELECT CASE WHEN r=0 THEN 'PUBLIC' ELSE pg_get_userbyid(r) END FROM unnest(p.polroles) r ORDER BY r::regrole::text),
    'using',pg_get_expr(p.polqual,p.polrelid),'check',pg_get_expr(p.polwithcheck,p.polrelid)) ORDER BY p.polname)
    FROM pg_policy p WHERE p.polrelid=c.oid),'[]')) ORDER BY c.oid::regclass::text)
-  FROM pg_class c WHERE c.oid IN(to_regclass('creator_trust.detached_usage'),to_regclass('creator_trust.detached_usage_expiry'),to_regclass('creator_trust.detached_usage_summary'),
-   to_regclass('creator.ai_usage'),to_regclass('creator.creator_profile'),to_regclass('creator.schema_migration'))),'[]')
+  FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+  WHERE (n.nspname='creator_trust' AND c.relname IN('detached_usage','detached_usage_expiry','detached_usage_summary'))
+   OR (n.nspname='creator' AND c.relname IN('ai_usage','creator_profile','schema_migration'))),'[]')
 ) AS catalogue`;
 
 /** Operator metadata read only. Application callers must use the registered

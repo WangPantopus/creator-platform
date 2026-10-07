@@ -17,6 +17,9 @@ export const usageExpirySource = Object.freeze({
 export const usageExpiryExpectedCatalogue: string | undefined =
   "44b10b0c30c4c0eaf41d7a2594c054eff11e9bfd590e231733582023ffdc9d7d";
 
+// Resolve fixed relation identities through metadata. to_regclass(text) would
+// require creator schema USAGE from the isolated Trust worker; catalogue
+// inspection must not widen that worker's original grants.
 export const usageExpiryCatalogueQuery = `SELECT jsonb_build_object(
  'role',(SELECT to_jsonb(r)-'oid' FROM pg_roles r WHERE rolname='creator_usage_expiry'),
  'memberships',coalesce((SELECT jsonb_agg(jsonb_build_object(
@@ -63,8 +66,9 @@ export const usageExpiryCatalogueQuery = `SELECT jsonb_build_object(
    'roles',ARRAY(SELECT CASE WHEN r=0 THEN 'PUBLIC' ELSE pg_get_userbyid(r) END FROM unnest(p.polroles) r ORDER BY r::regrole::text),
    'using',pg_get_expr(p.polqual,p.polrelid),'check',pg_get_expr(p.polwithcheck,p.polrelid)) ORDER BY p.polname)
    FROM pg_policy p WHERE p.polrelid=c.oid),'[]')) ORDER BY c.oid::regclass::text)
-  FROM pg_class c WHERE c.oid IN(to_regclass('creator_trust.usage_expiry_job'),to_regclass('creator_trust.usage_expiry_scope'),
-   to_regclass('creator.ai_usage'),to_regclass('creator.creator_profile'),to_regclass('creator.schema_migration'))),'[]')
+  FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+  WHERE (n.nspname='creator_trust' AND c.relname IN('usage_expiry_job','usage_expiry_scope'))
+   OR (n.nspname='creator' AND c.relname IN('ai_usage','creator_profile','schema_migration'))),'[]')
 ) AS catalogue`;
 
 /** Operator metadata read only. Application callers must use the registered
