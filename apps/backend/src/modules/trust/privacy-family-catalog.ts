@@ -1,4 +1,5 @@
 import type { PoolClient, QueryConfig, QueryResultRow } from "pg";
+import generationPrivacyReview from "../../../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
 import { contentHash } from "../../core/canonical.js";
 import { DomainError } from "../../core/errors.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
@@ -286,14 +287,16 @@ export async function originalPrivacyFamilyPurposeCatalogue(
 
 async function assertPurposeCatalogue(
   client: PoolClient,
-  expected: string,
+  expected: readonly string[],
   signal?: AbortSignal,
 ) {
   try {
     if (
-      contentHash(
-        await originalPrivacyFamilyPurposeCatalogue(client, signal),
-      ) !== expected
+      !expected.includes(
+        contentHash(
+          await originalPrivacyFamilyPurposeCatalogue(client, signal),
+        ),
+      )
     )
       unavailable();
   } catch (cause) {
@@ -305,7 +308,7 @@ export async function assertOriginalPrivacyFamilyPurposeCatalog(
   client: PoolClient,
   signal?: AbortSignal,
 ) {
-  await assertPurposeCatalogue(client, catalogueChecksum, signal);
+  await assertPurposeCatalogue(client, [catalogueChecksum], signal);
 }
 
 /** Closed metadata qualification only. This fixed profile supplies no source
@@ -314,7 +317,25 @@ export async function assertOriginalPrivacyFamilyProvenanceCatalog(
   client: PoolClient,
   signal?: AbortSignal,
 ) {
-  await assertPurposeCatalogue(client, provenanceCatalogueChecksum, signal);
+  await assertPurposeCatalogue(client, [provenanceCatalogueChecksum], signal);
+}
+
+/** Closed full-graph metadata qualification only. Both fixed profiles preserve
+ * incoming API children. Their membership flag cannot distinguish a forbidden
+ * parent role, so the literal caller predicate is inseparable from this check.
+ * Source registration, original task/fence and COMMIT checks remain separate. */
+export async function assertOriginalPrivacyFamilyGenerationCatalog(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  await assertOriginalPrivacyFamilyCaller(client, signal);
+  await assertPurposeCatalogue(
+    client,
+    generationPrivacyReview.originalFamilyProfiles.map(
+      (profile) => profile.sha256,
+    ),
+    signal,
+  );
 }
 
 /** Executable source and ledger gate on this actual held core client. A held
@@ -352,7 +373,21 @@ export async function originalPrivacyFamilyRegisteredExtension(
     const purgerSource = provenanceSources[provenanceSources.length - 1]!;
     const purger = await registeredMigration(purgerSource);
     signal?.throwIfAborted();
-    if (purger) {
+    const cursorSource = generationPrivacyReview.sources.find(
+      (dependency) => dependency.version === "0233_w3_privacy_cursor_export",
+    );
+    if (!cursorSource) unavailable();
+    const composed = await registeredMigration(cursorSource);
+    signal?.throwIfAborted();
+    if (composed) {
+      for (const dependency of generationPrivacyReview.sources) {
+        const migration = await registeredMigration(dependency);
+        signal?.throwIfAborted();
+        if (!migration || migration.version !== dependency.version)
+          unavailable();
+        migrations.push(migration);
+      }
+    } else if (purger) {
       for (const dependency of provenanceSources) {
         const migration =
           dependency === purgerSource
@@ -375,10 +410,14 @@ export async function originalPrivacyFamilyRegisteredExtension(
       )
         unavailable();
     }
-    await assertOriginalPrivacyFamilyCaller(client, signal);
-    if (purger)
-      await assertOriginalPrivacyFamilyProvenanceCatalog(client, signal);
-    else await assertOriginalPrivacyFamilyPurposeCatalog(client, signal);
+    if (composed)
+      await assertOriginalPrivacyFamilyGenerationCatalog(client, signal);
+    else {
+      await assertOriginalPrivacyFamilyCaller(client, signal);
+      if (purger)
+        await assertOriginalPrivacyFamilyProvenanceCatalog(client, signal);
+      else await assertOriginalPrivacyFamilyPurposeCatalog(client, signal);
+    }
     return {
       signature: originalPrivacyBindingSignature,
       sha256: originalPrivacyBindingDefinition,
