@@ -1,0 +1,114 @@
+{
+  "sourceParent": "898a334a2b843686aca9aa2f4f151f7849982fd7",
+  "scope": "Original fixed generation host configuration and initial genuine owner preparation, without provider, journal registration, claimed task or full worker lifecycle.",
+  "configuration": {
+    "sourceReview": "infra/migrations/reviews/20261007-generation-privacy.json",
+    "reviewedPurposeCatalogueSha256": "2d7e24154f5b2a988df3e730d3280eb5b74a51747c2d80177dde27b315eec680",
+    "preservedPurposeCatalogueSha256": "04c70b75424e62760bd7ad4f85f4fd303a9da9fcd2444ee3a0fe1f7897074bb4",
+    "generationConsumers": 12,
+    "terminalConsumers": 11,
+    "originalTerminalDefinitions": 6,
+    "comparison": "All consumed function definitions, permissions, policies and purpose roles match independent fresh/preserved source reviews. Preserved schema retains its original two incoming core/Growth child memberships; those are not generation purpose membership."
+  },
+  "operation": {
+    "activated": {
+      "scope": "Actual initial generation owner preparation only. No fabricated registration/task/lease/provider/output/cost/settlement.",
+      "passed": [
+        "fixed configuration",
+        "original generation identity",
+        "original Content origins",
+        "original Conversation context",
+        "original Agent inputs",
+        "original Commerce audience",
+        "original Agent metadata",
+        "purpose owner login refused at preparation and existing-owner discovery",
+        "direct worker source read refused at preparation and existing-owner discovery",
+        "original executable definition refused at preparation and existing-owner discovery",
+        "missing privacy registration refusal",
+        "empty actual discovery",
+        "actual held closure"
+      ],
+      "preabortPreserved": true,
+      "source": "Original owners with actual distinct core/generation password pools, independently fixed configuration and held local restoration.",
+      "guardrailRefusedWithoutPrivacyRegistration": true,
+      "before": {
+        "ledger": "f446394e49c9cf6bb6704e01563b80239320c8a9f0cc0c72a9a565af8bae9413",
+        "schema": "b18b6cb0f70284d783274135033aa014c48218197b233de4ec4b4ebaf747150e",
+        "roles": "53fc55601035472c89dc503929a8c71801ce62c7b03b033ce69473c742bd7412",
+        "security": "d747c93f6da7f2a38c8beef1adaffabc761f0195ac990300e8ecc26479e1729f",
+        "sequences": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+        "data": "e03ff743e7e09edab2288ae26fc3518861f814c059087607f18529df7b951813",
+        "rows": 257
+      },
+      "after": {
+        "ledger": "f446394e49c9cf6bb6704e01563b80239320c8a9f0cc0c72a9a565af8bae9413",
+        "schema": "b18b6cb0f70284d783274135033aa014c48218197b233de4ec4b4ebaf747150e",
+        "roles": "53fc55601035472c89dc503929a8c71801ce62c7b03b033ce69473c742bd7412",
+        "security": "d747c93f6da7f2a38c8beef1adaffabc761f0195ac990300e8ecc26479e1729f",
+        "sequences": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+        "data": "e03ff743e7e09edab2288ae26fc3518861f814c059087607f18529df7b951813",
+        "rows": 257
+      },
+      "remainingClients": 0,
+      "trafficClosed": true,
+      "workerPasswordRemoved": true
+    },
+    "restored": {
+      "scope": "Actual initial generation owner preparation only. No fabricated registration/task/lease/provider/output/cost/settlement.",
+      "passed": [
+        "fixed configuration",
+        "original generation identity",
+        "original Content origins",
+        "original Conversation context",
+        "original Agent inputs",
+        "original Commerce audience",
+        "original Agent metadata",
+        "purpose owner login refused at preparation and existing-owner discovery",
+        "direct worker source read refused at preparation and existing-owner discovery",
+        "original executable definition refused at preparation and existing-owner discovery",
+        "missing privacy registration refusal",
+        "empty actual discovery",
+        "actual held closure"
+      ],
+      "preabortPreserved": true,
+      "source": "Original owners with actual distinct core/generation password pools, independently fixed configuration and held local restoration.",
+      "guardrailRefusedWithoutPrivacyRegistration": true,
+      "before": {
+        "ledger": "f446394e49c9cf6bb6704e01563b80239320c8a9f0cc0c72a9a565af8bae9413",
+        "schema": "b18b6cb0f70284d783274135033aa014c48218197b233de4ec4b4ebaf747150e",
+        "roles": "53fc55601035472c89dc503929a8c71801ce62c7b03b033ce69473c742bd7412",
+        "security": "d747c93f6da7f2a38c8beef1adaffabc761f0195ac990300e8ecc26479e1729f",
+        "sequences": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+        "data": "e03ff743e7e09edab2288ae26fc3518861f814c059087607f18529df7b951813",
+        "rows": 257
+      },
+      "after": {
+        "ledger": "f446394e49c9cf6bb6704e01563b80239320c8a9f0cc0c72a9a565af8bae9413",
+        "schema": "b18b6cb0f70284d783274135033aa014c48218197b233de4ec4b4ebaf747150e",
+        "roles": "53fc55601035472c89dc503929a8c71801ce62c7b03b033ce69473c742bd7412",
+        "security": "d747c93f6da7f2a38c8beef1adaffabc761f0195ac990300e8ecc26479e1729f",
+        "sequences": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+        "data": "e03ff743e7e09edab2288ae26fc3518861f814c059087607f18529df7b951813",
+        "rows": 257
+      },
+      "remainingClients": 0,
+      "trafficClosed": true,
+      "workerPasswordRemoved": true
+    }
+  },
+  "validation": {
+    "shippingBuild": "passed under original W2 shared heavy-build lock",
+    "scopedLintFormatDiff": "passed",
+    "existingContracts": 9,
+    "existingWorkerLifetime": 8,
+    "newTestCode": false,
+    "shippingConfiguration": "fixed receipt equality, deep immutability, original callback refusal and preabort pass; not a shipping full-worker run"
+  },
+  "remaining": [
+    "Actual original privacy owner registration and all-eight composition",
+    "Original journal/guardrail/accounting/retrieval/output/terminal financial lifecycle",
+    "Genuine accepted task, consent, provider/licence policy, actual usage and completion",
+    "Populated expiry/detachment/restore and full C10",
+    "No application startup guard removed; PR132 remains draft"
+  ]
+}

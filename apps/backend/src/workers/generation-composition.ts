@@ -23,6 +23,8 @@ import { GenerationTerminalAuthority } from "../modules/identity/generation-term
 import { requestAuthority } from "../modules/identity/request-authority.js";
 import { GenerationWorker, type GenerationWorkerPass } from "./generation.js";
 
+export { reviewedGenerationWorkerCustody } from "./generation-custody.js";
+
 type BoundOwners =
   | "identity"
   | "terminal"
