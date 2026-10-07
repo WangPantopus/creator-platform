@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "postgresMajor": 17,
+  "sourceReview": "20261007-generation-privacy",
+  "scope": "Original Trust denial extension and three exact invoker trigger PUBLIC functions in the full39-source graph; not complete generation-role safety or activation.",
+  "functions": [
+    {
+      "name": "creator_trust.generation_terminal_denial(uuid)",
+      "owner": "creator_trust_denial",
+      "sha256": "fc465b04641c205007bc532f0e7f3e95450f1fb82bf0b66811d3a27c42923a22",
+      "grants": [
+        "creator_generation_terminal_authority=X/creator_trust_denial",
+        "creator_trust_denial=X/creator_trust_denial"
+      ]
+    },
+    {
+      "name": "creator_trust.generation_worker_denial(uuid)",
+      "owner": "creator_trust_denial",
+      "sha256": "8e6e20e8eb01b63075dd27c699048d60536e8952de3c433c349b7f843f90367d",
+      "grants": [
+        "creator_generation_authority=X/creator_trust_denial",
+        "creator_trust_denial=X/creator_trust_denial"
+      ]
+    }
+  ],
+  "metadataColumns": {
+    "creator.generation_worker_scope": [
+      "id",
+      "transaction_id",
+      "backend_pid",
+      "login_name",
+      "generation_id",
+      "worker_token",
+      "operation",
+      "created_at"
+    ],
+    "creator.generation_terminal_scope": [
+      "id",
+      "transaction_id",
+      "backend_pid",
+      "login_name",
+      "generation_id",
+      "custody_token",
+      "mode",
+      "task",
+      "transitioned",
+      "finalized",
+      "created_at"
+    ],
+    "creator.generation": [
+      "id",
+      "thread_id",
+      "creator_id",
+      "fan_id",
+      "fan_message_id",
+      "ai_message_id",
+      "grant_id",
+      "reservation_id",
+      "epoch",
+      "last_sequence",
+      "state",
+      "context_revision",
+      "worker_token",
+      "lease_until",
+      "completed_at",
+      "initiating_account_id",
+      "initiating_session_id",
+      "initiating_adult_verified_at",
+      "acceptance_transaction"
+    ],
+    "creator.thread": [
+      "control",
+      "control_epoch",
+      "revision",
+      "processor_consent_version",
+      "deleted_at"
+    ],
+    "creator.creator_profile": ["verification", "recovery_required"],
+    "creator.message": [
+      "id",
+      "thread_id",
+      "creator_id",
+      "fan_id",
+      "author_kind",
+      "author_account_id",
+      "delivery_state"
+    ],
+    "creator.processor_consent": [
+      "id",
+      "thread_id",
+      "creator_id",
+      "fan_id",
+      "account_id",
+      "version",
+      "withdrawn_at"
+    ]
+  },
+  "policies": [
+    {
+      "relation": "creator.generation_worker_scope",
+      "name": "generation_denial_scope"
+    },
+    {
+      "relation": "creator.generation_terminal_scope",
+      "name": "terminal_denial_scope"
+    },
+    {
+      "relation": "creator.generation",
+      "name": "generation_denial_metadata"
+    },
+    {
+      "relation": "creator.message",
+      "name": "terminal_denial_message"
+    },
+    {
+      "relation": "creator.processor_consent",
+      "name": "terminal_denial_consent"
+    }
+  ],
+  "publicTriggerFunctions": [
+    {
+      "name": "creator.ai_generation_receipt_immutable()",
+      "owner": "creator_owner",
+      "sha256": "77ebfcc9d4659b335e54a8d27e3e67898e707453010e3cce719c1b06626a06fc",
+      "privilege": "EXECUTE",
+      "grantable": false
+    },
+    {
+      "name": "creator.fence_public_mode_write()",
+      "owner": "creator_owner",
+      "sha256": "658b0433d8f731e0775c3a9f9bd205323ba8ad82a79290f689afcf467e90eb2b",
+      "privilege": "EXECUTE",
+      "grantable": false
+    },
+    {
+      "name": "creator.fence_public_packet_write()",
+      "owner": "creator_owner",
+      "sha256": "2f12634aceae0eb6d370c64088134f04ec4af9387aa61b74e88eac40e31de315",
+      "privilege": "EXECUTE",
+      "grantable": false
+    }
+  ]
+}
