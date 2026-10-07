@@ -1,0 +1,147 @@
+{
+  "scope": "Closed29-source metadata and original trigger shape review; temporary fixtures are not financial settlements or accepted work.",
+  "sourceSha256": "542b271ee29a5fdede8eaa77620301854026831955b717229cb055bda5bf4296",
+  "definitions": {
+    "definition": "8cbe0fbd70a52fa5b1f591af5f4a8cc0582ee66b5ecd0ee59846bd9f426ab848",
+    "trigger": "8b807625a039d2e5c217dd9095595d89f728c4c5e7d4e788083ffe0d03901a65",
+    "constraint": "79d339388e420475b0feda0f0453d0b7bd2e8fb95af908395246af7ac325e1c4"
+  },
+  "compiler": [],
+  "metadataDrifts": [
+    "public_execute",
+    "definer",
+    "search_path",
+    "trigger_disabled",
+    "trigger_replica",
+    "column_default",
+    "constraint_missing",
+    "caller_column_grant",
+    "definition"
+  ],
+  "allDriftsDetectedAndRestored": true,
+  "temporaryShapeChecks": {
+    "refusals": 6,
+    "rollback": true,
+    "transitions": 2,
+    "preservedRetryRows": 5
+  },
+  "realRawWorkerColumnRefusals": 1,
+  "all11CataloguePartsRestored": true,
+  "unacceptedCandidateFingerprints": {
+    "output": "e658553a00f50a9dcac3daaec12f8b916169290924f88889578e3d238cef09de",
+    "terminal": "ce6a599ccc30bba0046c7347370c12e0f6708e5a041990b14c99aca5e72b99d8",
+    "financial": "e7d197c574e7490aba3029ff67ffce9ce456e803959f8edb9cd73d14771c88ed"
+  },
+  "retained": {
+    "clock": null,
+    "usage": 0,
+    "ledger": 61,
+    "generations": 0,
+    "reservations": 0
+  },
+  "preservedComparison": {
+    "scope": "Complete29-source closed composition in preserved canonical61, compared with fresh held-source database. No registered purpose/task/provider/settlement activation.",
+    "all11FreshAndPreservedPartsEqual": true,
+    "compiler": [
+      {
+        "compiler": "creator.fence_generation_first_claim()",
+        "diagnostics": []
+      },
+      {
+        "compiler": "creator.commerce_allowance_settlement_clock()",
+        "diagnostics": []
+      },
+      {
+        "compiler": "creator.pending_generation_terminal_cursor_page(integer,uuid)",
+        "diagnostics": []
+      },
+      {
+        "compiler": "creator.pending_generation_terminal_page(integer,uuid)",
+        "diagnostics": []
+      },
+      {
+        "compiler": "creator.pending_generation_tasks(integer)",
+        "diagnostics": []
+      },
+      {
+        "compiler": "creator.pending_generation_terminals(integer)",
+        "diagnostics": []
+      }
+    ],
+    "originalCustodyRestored": {
+      "schemaSha256": "30ec4ec6c71eb2c4e02fb473e65356994e3dfbcd04d8982ff31f18fbb7b5bee2",
+      "rolesSha256": "367a2a706b7aa22b37cb18051881aa0f1eb0d2bcb82129e0a1ad98a8a063c8f9",
+      "rowsSha256": "36073ad827fc043be173cf1c015594361f0a366ff8acfc98a1281804f5148c05",
+      "tables": 137,
+      "rows": 236
+    },
+    "originalContainerStoppedAfterReview": true
+  },
+  "retentionQueries": {
+    "scope": "Original SQL projections and mutations on rolled-back temporary metadata fixtures. No genuine privacy task, financial settlement, provider receipt or C10 completion.",
+    "policy": {
+      "version": "w8-product-retention-20261007-v2",
+      "knownCalendarMonths": 12,
+      "unknownEscalationDays": 30,
+      "unknownMaximumDays": 90,
+      "unknownOperator": "project-owner"
+    },
+    "observations": [
+      {
+        "case": "manual_source_is_not_registration",
+        "refused": true
+      },
+      {
+        "case": "original_calendar_deadlines",
+        "timezone": "UTC",
+        "eligible": 5,
+        "refusedUndatedUnresolvedWrongCreatorWrongReservation": 4,
+        "microsecondsPreserved": true
+      },
+      {
+        "case": "original_calendar_deadlines",
+        "timezone": "America/Los_Angeles",
+        "eligible": 5,
+        "refusedUndatedUnresolvedWrongCreatorWrongReservation": 4,
+        "microsecondsPreserved": true
+      },
+      {
+        "case": "original_calendar_deadlines",
+        "timezone": "Pacific/Auckland",
+        "eligible": 5,
+        "refusedUndatedUnresolvedWrongCreatorWrongReservation": 4,
+        "microsecondsPreserved": true
+      },
+      {
+        "case": "unknown_usage_visible_to_required_refusal",
+        "count": 1
+      },
+      {
+        "case": "paged_original_sql_with_temporary_metadata",
+        "pageSizes": [100, 100, 10],
+        "retained": 109,
+        "expired": 100,
+        "knownAmountsUnchanged": true,
+        "holdOnlyUsageIncluded": true,
+        "unknownPreserved": true
+      }
+    ],
+    "retainedOriginalDatabase": {
+      "ledger": 61,
+      "usage": 0,
+      "reservations": 0,
+      "clock": null
+    }
+  },
+  "validation": {
+    "backendShippingBuild": "passed",
+    "scopedEslint": "passed",
+    "backendTests": {
+      "passed": 26,
+      "postgresFoundation": 9,
+      "contracts": 9,
+      "generationScheduler": 8
+    },
+    "genuineGenerationOrPrivacyAcceptance": false
+  }
+}

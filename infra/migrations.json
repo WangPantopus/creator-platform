@@ -1132,6 +1132,15 @@
       "sourceSha256": "8632008a15ba322f6caa3b7a393635851c9d7ea18dcd6ad7f175361d4281149c",
       "state": "reserved_unapplied",
       "reason": "Held bounded recovery keyset pages under the original terminal and discovery owners. Only the original discovery wrapper can call the private UUID selector; the worker receives generation ID and observed sentence cursor only. Original0183/0218 and table/column privileges stay intact. Includes a partial pending-job UUID index, exact source/function/index custody and six actual metadata drift/restoration refusals. Closed28-source review, 12 real login/GUC/bound refusals and temporary predicate pages pass; all original catalogue projections restore. No accepted task, receipt, ledger or production whole-graph pin is manufactured. Full prepared owner/privacy/provider/settlement qualification remains required before activation."
+    },
+    {
+      "id": "0228",
+      "owner": "W4",
+      "version": "0228_w4_generation_settlement_clock",
+      "path": "apps/backend/src/modules/commerce/schema-generation-settlement-clock.sql",
+      "sourceSha256": "542b271ee29a5fdede8eaa77620301854026831955b717229cb055bda5bf4296",
+      "state": "reserved_unapplied",
+      "reason": "Additive immutable original weighted-allowance settlement time, recorded by a trigger only on the actual reserved-to-terminal transition and governed by the original financial checks and sole transaction COMMIT. Historical terminal rows remain undated; caller values, backfill and retry clock resets refuse. No roles, memberships, grants, ledger adoption or policy/provider/financial receipts are supplied. Required by the original twelve-calendar-month known-cost retention rule; full prepared graph and actual financial/privacy qualification remain pending."
     }
   ]
 }

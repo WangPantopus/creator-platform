@@ -233,6 +233,7 @@ export async function composeConversationHost(
     "0218_w1_generation_terminal_discovery",
     "0226_w1_generation_lifecycle",
     "0227_w1_generation_terminal_page",
+    "0228_w4_generation_settlement_clock",
   ])
     if (!(await registeredChecksum(version)))
       missing.push(`registered ${version}`);

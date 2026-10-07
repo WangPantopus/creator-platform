@@ -48,6 +48,21 @@ export interface GenerationCostPrivacyReconciliation {
     job: GenerationPrivacyJob,
     family: GenerationPrivacyFamily,
   ): Promise<{ financialDispositionReference: string }>;
+  /** Exact original settlement times for a bounded set of this family's
+   * generations. Unknown/undated history cannot receive a new expiry clock. */
+  knownRetention(
+    client: PoolClient,
+    job: GenerationPrivacyJob,
+    family: GenerationPrivacyFamily,
+    generationIds: readonly string[],
+  ): Promise<
+    readonly {
+      generationId: string;
+      settledAt: string;
+      accountingUntil: string;
+      financialDispositionReference: string;
+    }[]
+  >;
 }
 
 export async function assertGenerationPrivacyFamily(

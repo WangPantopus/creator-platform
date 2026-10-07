@@ -1,4 +1,9 @@
 import type { Pool, PoolClient } from "pg";
+import { accountingRetentionPolicy } from "../trust/accounting-retention-policy.js";
+import {
+  assertGenerationSettlementClock,
+  knownGenerationRetentionQuery,
+} from "./generation-settlement-clock.js";
 import { invariant } from "../../core/errors.js";
 import {
   reserveCostAllowance,
@@ -280,6 +285,46 @@ export class CommerceGenerationAllowance implements GenerationAllowance {
     return Object.freeze({
       retentionPolicyVersion,
       settleGeneration,
+      knownRetention: async (
+        client: PoolClient,
+        job: GenerationPrivacyJob,
+        family: GenerationPrivacyFamily,
+        generationIds: readonly string[],
+      ) => {
+        invariant(
+          retentionPolicyVersion === accountingRetentionPolicy.version &&
+            generationIds.length > 0 &&
+            generationIds.length <= 100 &&
+            new Set(generationIds).size === generationIds.length &&
+            generationIds.every((id) => z.uuid().safeParse(id).success),
+          "accounting_retention_unconfigured",
+          "Use the approved retention decision and a complete bounded generation page.",
+        );
+        await assert(client, job, family);
+        await assertGenerationSettlementClock(client, job.signal);
+        const { rows } = await client.query<{
+          generationId: string;
+          settledAt: string;
+          accountingUntil: string;
+          financialDispositionReference: string;
+        }>(knownGenerationRetentionQuery, [
+          family.threadId,
+          family.creatorId,
+          family.fanId,
+          generationIds,
+          accountingRetentionPolicy.knownCalendarMonths,
+        ]);
+        invariant(
+          rows.length === generationIds.length &&
+            new Set(rows.map((row) => row.generationId)).size === rows.length &&
+            rows.every((row) => generationIds.includes(row.generationId)),
+          "accounting_settlement_time_unavailable",
+          "Every known cost requires its actual original financial settlement time; historical dates cannot be invented.",
+        );
+        await assert(client, job, family);
+        await assertGenerationSettlementClock(client, job.signal);
+        return Object.freeze(rows.map((row) => Object.freeze(row)));
+      },
       disposition: async (
         client: PoolClient,
         job: GenerationPrivacyJob,
