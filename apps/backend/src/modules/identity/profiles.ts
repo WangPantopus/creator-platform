@@ -514,6 +514,18 @@ export class IdentityProfiles {
       await client.query("SELECT set_config('app.creator_id',$1,true)", [
         creatorId,
       ]);
+      // Refuse an unrelated account before asking for creator-only denial
+      // authority. This metadata read grants nothing; requireCreator repeats
+      // ownership under its row lock after the negative authority is held.
+      const owned = await client.query(
+        "SELECT 1 FROM creator.creator_profile WHERE id=$1 AND account_id=$2",
+        [creatorId, actor.accountId],
+      );
+      invariant(
+        owned.rowCount === 1,
+        "creator_required",
+        "Only this creator can perform this action.",
+      );
       await assertAllowed(actor, creatorId, client);
       await assertHeldCurrentRequestSession(held, client);
       await this.requireCreator(client, actor, creatorId);
