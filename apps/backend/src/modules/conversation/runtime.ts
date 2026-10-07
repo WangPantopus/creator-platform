@@ -173,6 +173,8 @@ export function createConversationRuntime(input: {
             text,
             {
               current: (current) => memory.context(current),
+              safetyCheckpoint: (current) =>
+                input.conversation.safetyCheckpoint(current),
               assertProcessorConsent: (current) =>
                 input.conversation.assertProcessorConsent(current),
               assertDeliveryCurrent: (current, expected) =>

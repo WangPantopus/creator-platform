@@ -454,6 +454,8 @@ export async function composeConversationHost(
       ? {
           audience,
           conversation: {
+            safetyCheckpoint: (scope: ThreadScope) =>
+              runtime.conversation.safetyCheckpoint(scope),
             current: (scope: ThreadScope) => {
               invariant(
                 binding.conversation,

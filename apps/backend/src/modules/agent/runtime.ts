@@ -45,6 +45,10 @@ import {
 /** Producer contracts are callbacks, not SQL into W3 memory or W4 grant/money tables. */
 export interface ConversationContextPort {
   current(scope: ThreadScope): Promise<ThreadSnapshot>;
+  /** Pre-admission safety has no accepted message or memory provenance yet. */
+  safetyCheckpoint(
+    scope: ThreadScope,
+  ): Promise<{ epoch: number; revision: number }>;
   /** Current W1/W3 processor consent is required before sending fan text remotely. */
   assertProcessorConsent?(scope: ThreadScope): Promise<void>;
   assertDeliveryCurrent(
@@ -281,7 +285,7 @@ export class LiveAgentRuntime {
       "A bounded fan message is required.",
     );
     signal.throwIfAborted();
-    const snapshot = await context.current(scope);
+    const snapshot = await context.safetyCheckpoint(scope);
     let crisis = needsImmediateSafety(message);
     if (!crisis && this.service.pipeline.model) {
       invariant(
