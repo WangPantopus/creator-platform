@@ -90,15 +90,21 @@ export async function trustTransaction<T>(
       deadline.abort(cause);
     failed = true;
     failure =
-      signal.aborted ||
-      querySettlementUncertain(cause) ||
-      (cause instanceof DomainError &&
-        [
-          "content_privacy_begin_unavailable",
-          "content_privacy_commit_unavailable",
-        ].includes(cause.code))
-        ? unavailable("trust_transaction_unavailable", cause)
-        : cause;
+      // Preserve only this caller's original cooperative cancellation. The
+      // held source still settles below; a cleanup failure replaces it and
+      // rejects the lifetime. Internal deadlines and database errors remain
+      // unavailable, even when the caller concurrently cancels.
+      options.signal?.aborted && cause === options.signal.reason
+        ? cause
+        : signal.aborted ||
+            querySettlementUncertain(cause) ||
+            (cause instanceof DomainError &&
+              [
+                "content_privacy_begin_unavailable",
+                "content_privacy_commit_unavailable",
+              ].includes(cause.code))
+          ? unavailable("trust_transaction_unavailable", cause)
+          : cause;
   } finally {
     try {
       // Unknown BEGIN/read/COMMIT or actual abort closes this exact source,
