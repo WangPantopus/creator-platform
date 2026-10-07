@@ -1,0 +1,32 @@
+[
+  {
+    "path": "apps/backend/src/db/database.ts",
+    "source": "5b1675ca155f87957c8ad62201097de2563c3c4f",
+    "beforeSha256": "fd15252a353eeb90b60b70d003241583df15b365b670c6e4d8bd37a67e82c522",
+    "reusedSha256": "030a8b22f2dbfacd06d1fc7c9a90b5143f0ecb5366d351db629ccebb1f880536"
+  },
+  {
+    "path": "apps/backend/src/modules/access/scope.ts",
+    "source": "5b1675ca155f87957c8ad62201097de2563c3c4f",
+    "beforeSha256": "9996978b9a859cad170f16d737f63a611760a5421496fd91c71ed8657b47324a",
+    "reusedSha256": "e4f2ce2d0315b4eff14b28762032cad3ed85a5a0e6b84c1a5a59fb0e23ca3a78"
+  },
+  {
+    "path": "apps/backend/src/modules/identity/transaction.ts",
+    "source": "5b1675ca155f87957c8ad62201097de2563c3c4f",
+    "beforeSha256": "8840ab237262f50458f11d23608f3ded555c78b03d703a9887a1e458e5fc078e",
+    "reusedSha256": "33447d52ce8127f57c93ebd44ae74611861f33d2c0ea23f088d39658e8f668b5"
+  },
+  {
+    "path": "apps/backend/src/modules/identity/creator-scope.ts",
+    "source": "5b1675ca155f87957c8ad62201097de2563c3c4f",
+    "beforeSha256": "4552d7fbafef7c897b9fcdc785b9c023c30fea56ad29b0ed42fabc7ffd61725f",
+    "reusedSha256": "ac4668623699ad76811536826ea3b9360b84ad1c67abdf12eca38b125c89aeb8"
+  },
+  {
+    "path": "apps/backend/src/modules/identity/audience-scope.ts",
+    "source": "5b1675ca155f87957c8ad62201097de2563c3c4f",
+    "beforeSha256": "7859aabe0d1a00ebfe7aa269a4fb5291fc88c311ca01b5d4bd2ad46d7efbb2ec",
+    "reusedSha256": "9aba25b3097b3156d73cde86f1663fd7c9d44b460f6d1b823a94f08f1f47fcde"
+  }
+]

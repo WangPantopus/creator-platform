@@ -1,0 +1,123 @@
+diff --git a/apps/web/features/studio/Studio.tsx b/apps/web/features/studio/Studio.tsx
+index 2b77d1d3..24baa040 100644
+--- a/apps/web/features/studio/Studio.tsx
++++ b/apps/web/features/studio/Studio.tsx
+@@ -1264,6 +1264,7 @@ function Compose({
+     [photoObjectId, setPhotoObjectId] = useState<string | null>(null),
+     action = useAction(),
+     draftId = useRef<string | null>(null),
++    savedDocument = useRef<string | null>(null),
+     operation = useRef<{ body: string; key: string } | null>(null);
+   const pendingStorage = `w5.pendingPublication:${creator.viewerAccountId}:${creator.id}`;
+   const clearPending = () => {
+@@ -1272,6 +1273,7 @@ function Compose({
+   };
+   const draftReady = !id || saved?.id === id;
+   const useSavedDraft = (value: ContentView) => {
++    savedDocument.current = JSON.stringify(value.document);
+     setDocument(value.document);
+     setSchedule(scheduleInput(value.document.scheduledAt));
+     setSaved({ id: value.id, version: value.version });
+@@ -1316,6 +1318,7 @@ function Compose({
+             );
+             setDocument(view.document);
+             setSchedule(scheduleInput(view.document.scheduledAt));
++            savedDocument.current = JSON.stringify(view.document);
+             setSaved({ id: view.id, version: view.version });
+             setReview({
+               view,
+@@ -1372,6 +1375,7 @@ function Compose({
+   const edit = (update: Partial<ContentBody>) => {
+     if (!hasDraftRole || !draftReady || pendingPublication) return;
+     setDocument((d) => ({ ...d, ...update }));
++    action.setNotice("");
+     setReview(null);
+   };
+   const save = async (documentOverride = document) => {
+@@ -1400,6 +1404,7 @@ function Compose({
+         { ...body, idempotencyKey: operation.current.key },
+         creator.viewerAccountId,
+       );
++      savedDocument.current = JSON.stringify(documentOverride);
+       setSaved(result);
+       setDraftChanged(false);
+       operation.current = null;
+@@ -1469,7 +1474,7 @@ function Compose({
+     <section className="w5-compose">
+       <header className="w5-compose-head">
+         <Link href={`/studio/${creator.id}/notes`}>Cancel</Link>
+-        <strong>{post ? "Publish" : "New Note"}</strong>
++        <strong>{post ? "Publish" : id ? "Edit Note" : "New Note"}</strong>
+         <span />
+       </header>
+       <Feedback action={action} />
+@@ -1816,9 +1821,9 @@ function Compose({
+             }
+             onClick={() =>
+               void action.run(async () => {
+-                await save();
++                const result = await save();
+                 action.setNotice(
+-                  "Draft saved. Editing invalidates the signing preview.",
++                  `Draft revision ${result.version} saved. Editing invalidates the signing preview.`,
+                 );
+               })
+             }
+@@ -1873,7 +1878,14 @@ function Compose({
+                   : "Publish as team"}
+           </button>
+         </div>
+-        {saved && <p className="qv-meta">SAVED · REVISION {saved.version}</p>}
++        {saved && (
++          <p className="qv-meta">
++            {savedDocument.current === JSON.stringify(document)
++              ? "SAVED · REVISION "
++              : "UNSAVED CHANGES · BASED ON REVISION "}
++            {saved.version}
++          </p>
++        )}
+       </div>
+       {currentDraft && (
+         <Modal
+@@ -1930,6 +1942,7 @@ function Compose({
+                 !!document.planRef
+               }
+               onClick={() => {
++                savedDocument.current = JSON.stringify(currentDraft.document);
+                 setSaved({
+                   id: currentDraft.id,
+                   version: currentDraft.version,
+@@ -3439,7 +3452,10 @@ function Team({
+   return (
+     <section className="w5-team">
+       <header className="w5-heading">
+-        <h1>Team</h1>
++        <div className="w5-team-title">
++          <span className="qv-meta">TEAM</span>
++          <h1>Who helps, and what they can do</h1>
++        </div>
+         <button
+           ref={teamRefresh}
+           type="button"
+@@ -3750,14 +3766,13 @@ function Team({
+             </p>
+           )}
+         </div>
+-        <div className="w5-editor qv-on-maya">
+-          <h2>Only you</h2>
+-          <p>
+-            Approve exact drafts and sign personal replies, Notes and reactions.
+-          </p>
+-          <p>
+-            Team words always carry the team label. Team replies never fulfill a
+-            personal commitment.
++        <div className="w5-editor qv-on-maya w5-team-creator-only">
++          <h2 className="qv-meta">Only you · Cannot be shared</h2>
++          <p>Approve anything as you</p>
++          <p>Deliver written replies, voice notes and calls</p>
++          <p>Change your AI's rules and guardrails</p>
++          <p className="w5-team-attribution">
++            Team members reply as your team, never as you.
+           </p>
+           <Link className="qv-btn qv-btn--quiet" href="/identity/account">
+             Verification and account
