@@ -261,10 +261,10 @@ export async function composeConversationHost(
   ])
     if (!(await registeredChecksum(version)))
       missing.push(`registered ${version}`);
-  if (requested)
-    missing.push("current generation worker composition (W3/W1/W2/W4)");
   if (requested && !producers.generation)
-    missing.push("reviewed generation worker custody and pool");
+    missing.push(
+      "current generation worker composition: reviewed custody and pool (W3/W1/W2/W4)",
+    );
 
   let journal = producers.usageAccounting?.journal;
   if (producers.usageAccounting) {
