@@ -1,0 +1,224 @@
+{
+  "source": "fbbe65a6231d4cb1495103fa1471766d9204142f",
+  "fixture": "Temporary synthetic creator verification only; canonical API sessions and actual Team commands",
+  "observations": [
+    {
+      "label": "concurrent invite A",
+      "who": "creator",
+      "status": 200,
+      "durationMs": 103,
+      "result": {
+        "id": "666f8984-24a0-46ee-b347-f42a943257da",
+        "creatorId": "45d29446-0d3f-4612-a768-5dd9beeddf8f",
+        "accountId": "10000000-0000-4000-8000-000000000002",
+        "roles": [
+          "drafter",
+          "triage"
+        ],
+        "expiresAt": "2026-10-14T03:40:38.008Z",
+        "accepted": false
+      }
+    },
+    {
+      "label": "concurrent invite B",
+      "who": "creator",
+      "status": 200,
+      "durationMs": 88,
+      "result": {
+        "id": "666f8984-24a0-46ee-b347-f42a943257da",
+        "creatorId": "45d29446-0d3f-4612-a768-5dd9beeddf8f",
+        "accountId": "10000000-0000-4000-8000-000000000002",
+        "roles": [
+          "drafter",
+          "triage"
+        ],
+        "expiresAt": "2026-10-14T03:40:38.008Z",
+        "accepted": false
+      }
+    },
+    {
+      "label": "wrong recipient",
+      "who": "creator",
+      "status": 403,
+      "durationMs": 28,
+      "result": {
+        "error": {
+          "code": "invitation_unavailable",
+          "message": "This team invitation is unavailable.",
+          "requestId": "54613608-8c78-42d0-906a-f21d1994ae44",
+          "correlationId": "8e0c0f69-e46f-4a49-a139-795d58a7872e"
+        }
+      }
+    },
+    {
+      "label": "creator no longer verified",
+      "who": "recipient",
+      "status": 403,
+      "durationMs": 36,
+      "result": {
+        "error": {
+          "code": "invitation_unavailable",
+          "message": "This team invitation is unavailable.",
+          "requestId": "6bd1faaf-55ab-415d-9bd7-f25d0a2056e2",
+          "correlationId": "0be6c36f-ccb9-49df-ad29-401c3836569e"
+        }
+      }
+    },
+    {
+      "label": "accept original A",
+      "who": "recipient",
+      "status": 200,
+      "durationMs": 56,
+      "result": {
+        "done": true
+      }
+    },
+    {
+      "label": "accept original B",
+      "who": "recipient",
+      "status": 200,
+      "durationMs": 67,
+      "result": {
+        "done": true
+      }
+    },
+    {
+      "label": "invite existing member",
+      "who": "creator",
+      "status": 403,
+      "durationMs": 35,
+      "result": {
+        "error": {
+          "code": "team_member_exists",
+          "message": "This account already belongs to the team. Review its current roles instead.",
+          "requestId": "df7fbffb-e9f1-4136-bfff-df07760f33fc",
+          "correlationId": "296ca16d-bf0e-4dd6-8310-73404576eec3"
+        }
+      }
+    },
+    {
+      "label": "change reviewed roles",
+      "who": "creator",
+      "status": 200,
+      "durationMs": 45,
+      "result": {
+        "done": true
+      }
+    },
+    {
+      "label": "retry old acceptance after role change",
+      "who": "recipient",
+      "status": 403,
+      "durationMs": 39,
+      "result": {
+        "error": {
+          "code": "team_acceptance_changed",
+          "message": "This team membership changed. Reopen the team to review its current access.",
+          "requestId": "9b444860-f9ac-4406-82ed-ff341de06647",
+          "correlationId": "d6dd3506-d054-4dee-9714-1a6c44639dfb"
+        }
+      }
+    },
+    {
+      "label": "recipient cannot remove creator",
+      "who": "recipient",
+      "status": 503,
+      "durationMs": 31,
+      "result": {
+        "error": {
+          "code": "scope_denial_unavailable",
+          "message": "Current scope authority is unavailable. Try again.",
+          "requestId": "e59f41ab-1703-4cea-af11-e2f372892b8c",
+          "correlationId": "0131835a-66cb-4501-8aca-dc1557683625"
+        }
+      }
+    },
+    {
+      "label": "creator cannot remove own identity",
+      "who": "creator",
+      "status": 403,
+      "durationMs": 15,
+      "result": {
+        "error": {
+          "code": "team_creator_identity",
+          "message": "The creator's identity cannot be removed through team membership.",
+          "requestId": "1dea58db-80c8-4324-baf7-a06bd172b40e",
+          "correlationId": "07964162-f7c4-4483-8e9c-e713457d325c"
+        }
+      }
+    },
+    {
+      "label": "remove member",
+      "who": "creator",
+      "status": 200,
+      "durationMs": 39,
+      "result": {
+        "done": true
+      }
+    },
+    {
+      "label": "retry removal",
+      "who": "creator",
+      "status": 200,
+      "durationMs": 39,
+      "result": {
+        "done": true
+      }
+    },
+    {
+      "label": "acceptance after removal",
+      "who": "recipient",
+      "status": 403,
+      "durationMs": 33,
+      "result": {
+        "error": {
+          "code": "invitation_unavailable",
+          "message": "This team invitation is unavailable.",
+          "requestId": "91b79586-9466-470c-b50b-4c3dbb897790",
+          "correlationId": "afc46bd1-31f6-4859-be5c-6c90336a6716"
+        }
+      }
+    },
+    {
+      "label": "invite after removal",
+      "who": "creator",
+      "status": 200,
+      "durationMs": 40,
+      "result": {
+        "id": "97e5cbfb-df4b-4a10-8ee6-69b39227fee0",
+        "creatorId": "45d29446-0d3f-4612-a768-5dd9beeddf8f",
+        "accountId": "10000000-0000-4000-8000-000000000002",
+        "roles": [
+          "triage"
+        ],
+        "expiresAt": "2026-10-14T03:40:38.772Z",
+        "accepted": false
+      }
+    },
+    {
+      "label": "expired invitation",
+      "who": "recipient",
+      "status": 403,
+      "durationMs": 37,
+      "result": {
+        "error": {
+          "code": "invitation_unavailable",
+          "message": "This team invitation is unavailable.",
+          "requestId": "a958fc00-9074-4a80-828c-400f3fa5ba04",
+          "correlationId": "a03a336f-7690-4795-8128-03c85ee3341d"
+        }
+      }
+    },
+    {
+      "label": "revoke expired invitation",
+      "who": "creator",
+      "status": 200,
+      "durationMs": 41,
+      "result": {
+        "done": true
+      }
+    }
+  ],
+  "rolesAfterRetry": "[\"scheduler\"]",
+  "finalState": "{\"verification\" : \"pending\", \"version\" : 9, \"activeMembers\" : 0, \"unrevokedInvitations\" : 0}"
+}

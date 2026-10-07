@@ -1,3 +1,15 @@
+# Latest continuation checkpoint
+
+Read [draft consolidation](pr-consolidation-2026-10-06.md) and [Team invitation authority](team-invitation-authority-2026-10-06.md) before the older checkpoint below. #182 is closed into tree-identical #63; #288 is closed because its unique production changes are already on main. **18 original drafts remain.** #321 normally merged at `5d981d7b1be70a7cc22a7707eda08aeb3a841cfe`, bringing this review to32 merges. Its two actual-head web/backend checks passed; unchanged native/visual jobs were still pending and are not claimed passed.
+
+Current branch `codex/team-invitation-authority-20261006` includes main321 and the reused #74 Team guards (`fbbe65a6`) plus the personally found403 correction (`35815033`). Both source commits were actually served; later commits are docs/normal main merge only. Current Team work has passed real positive/refusal/concurrent retry API/database operations and backend checks; resolve its newest PR/head and checks before merge. Evidence and source hashes are committed with this checkpoint.
+
+Own API4206 and web3106/database5546 are currently running for review (do not infer final cleanup from the historical section). API was restarted on final35815033; log `/tmp/creator-team-authority-final-api.log`. Browser5 tab7 is the current My AI draft. Private `/tmp/creator-team-review-sessions.json` holds two genuine API-issued synthetic sessions for cleanup; never print/copy its credentials. Creator verification is restored pending/version9, intro blank; zero active Team members/unrevoked invitations. Preserve reviewed database/key. Close/log out only review sessions and resources at the final stopping point. External receipts `pr-321-pre-merge.json` and `pr-321-merged.json` supersede the old31-merge count.
+
+The #132/#63 host explicitly pushes current generation worker composition into missing dependencies whenever generation is requested. This is an engineering-owned wiring gap, beyond separate production provider/licensing prerequisites. Remaining open heads are still the captured originals. Follow the consolidation dependency table; do not duplicate their code or claim all feasible work is finished.
+
+---
+
 # Resume checkpoint — PR review and app fixes
 
 ## Current checkpoint
