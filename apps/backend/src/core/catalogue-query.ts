@@ -12,7 +12,8 @@ export function catalogueQuery<T extends QueryResultRow = QueryResultRow>(
 ) {
   return query.query<T>({
     name:
-      "purpose-catalogue:" + createHash("sha256").update(text).digest("hex"),
+      "purpose-catalogue:" +
+      createHash("sha256").update(text).digest("base64url"),
     text,
     values,
     ...options,
