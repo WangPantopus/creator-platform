@@ -1,4 +1,4 @@
-import pg from "pg";
+import pg, { type PoolClient } from "pg";
 import type { BackendRuntime } from "../../integration.js";
 import type { createTrustRuntime } from "../../operations/runtime.js";
 import { DomainError } from "../../core/errors.js";
@@ -16,6 +16,9 @@ import { trustLocalRestorationInTransaction } from "./restoration.js";
 import { PrivateFileArtifacts } from "./private-file-artifacts.js";
 import { registeredContentPrivacyProfile } from "../../db/content-privacy-profile.js";
 import { ContentPrivacyExport } from "../content/privacy-export.js";
+import { PreparedAgentPrivacyExport } from "../agent/privacy-export-snapshot.js";
+import { registeredAgentPrivacyExportReview } from "../agent/privacy-export-configuration.js";
+import { restoredPrivacyTaskAuthorityInTransaction } from "./privacy-authority.js";
 
 /** W1 adds these to its development adapter. These are labels, never tokens,
  * membership grants, production identities or a second session issuer. */
@@ -242,9 +245,14 @@ export async function createDevelopmentTrust(
     const agent =
       options.agent ?? createAgentDomain({ pool: runtime.pool, model: null });
     const restoreReadyInTransaction = trustLocalRestorationInTransaction(env);
-    const privacyArtifacts = env.TRUST_PRIVATE_ARTIFACT_DIRECTORY
-      ? await PrivateFileArtifacts.prepare(env.TRUST_PRIVATE_ARTIFACT_DIRECTORY)
-      : undefined;
+    const assertRestoredInTransaction = async (client: PoolClient) => {
+      if (!(await restoreReadyInTransaction(client)))
+        throw new DomainError(
+          "restoration_pending",
+          "This environment is unavailable while recovery is verified.",
+          503,
+        );
+    };
     // Prepare the real exporter on this host's original core pool. Trust still
     // supplies restoration, verified ownership and its current task/lease at
     // every operation; configuration cannot create a task authority receipt.
@@ -256,6 +264,24 @@ export async function createDevelopmentTrust(
             exporter: await ContentPrivacyExport.prepare(runtime.pool),
           }
         : undefined);
+    const agentReview = await registeredAgentPrivacyExportReview();
+    const agentExport =
+      options.consumers?.agentExport ??
+      (agentReview
+        ? await PreparedAgentPrivacyExport.prepare({
+            ...agentReview,
+            pool: runtime.pool,
+            assertTaskInTransaction: (client, job) =>
+              restoredPrivacyTaskAuthorityInTransaction(
+                client,
+                job,
+                assertRestoredInTransaction,
+              ),
+          })
+        : undefined);
+    const privacyArtifacts = env.TRUST_PRIVATE_ARTIFACT_DIRECTORY
+      ? await PrivateFileArtifacts.prepare(env.TRUST_PRIVATE_ARTIFACT_DIRECTORY)
+      : undefined;
     return {
       environment: "local-development",
       identityMode: "development",
@@ -291,15 +317,9 @@ export async function createDevelopmentTrust(
         coordinatorPool: workerPool,
         ...options.consumers,
         content,
+        agentExport,
         privacyArtifacts,
-        assertRestoredInTransaction: async (client) => {
-          if (!(await restoreReadyInTransaction(client)))
-            throw new DomainError(
-              "restoration_pending",
-              "This environment is unavailable while recovery is verified.",
-              503,
-            );
-        },
+        assertRestoredInTransaction,
         agent: options.consumers?.agent ?? agent,
       }),
       effectHooks: [

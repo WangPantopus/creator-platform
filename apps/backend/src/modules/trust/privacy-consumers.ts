@@ -98,6 +98,8 @@ export function createPrivacyConsumers(input: {
   /** Trust starts before W1 binds the actual canonical Agent owner graph.
    * Resolve that graph once per original claimed task, never a substitute. */
   agent?: AgentPrivacyOwnerPorts | (() => AgentPrivacyOwnerPorts | undefined);
+  /** Original W2 source prepared by this host with W8's actual held-task port. */
+  agentExport?: PreparedAgentPrivacyExport;
   commerce?: CommerceService;
   /** Trust starts before the canonical Commerce graph. Resolve only its
    * actual service at task execution; no eager replacement owner is created. */
@@ -266,7 +268,8 @@ export function createPrivacyConsumers(input: {
           "Use the actual canonical Agent owner on this host's original pool.",
         );
         owner.lifecycle.assertRepository(owner.service.repository);
-        owner.privacyExportSnapshot?.assertHostPool(input.runtimePool);
+        const exportSnapshot = owner.privacyExportSnapshot ?? input.agentExport;
+        exportSnapshot?.assertHostPool(input.runtimePool);
         const accountingBoundary = owner.service.repository.usageJournal
           ? await prepareBoundary(job.signal)
           : undefined;
@@ -300,8 +303,8 @@ export function createPrivacyConsumers(input: {
             accountingBoundary?.agentBoundary.bind(accountingBoundary),
           ),
           owner.artifacts,
-          Boolean(owner.privacyExportSnapshot),
-          owner.privacyExportSnapshot,
+          Boolean(exportSnapshot),
+          exportSnapshot,
         ).run(job);
       },
     });
