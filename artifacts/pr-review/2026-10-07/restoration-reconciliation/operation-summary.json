@@ -1,0 +1,973 @@
+{
+  "scope": "Seven fault/refusal/success scenarios per runtime, with the actual source development adapter and existing generation transaction owner. Bundle mode loads dist/integration.mjs for the host and Trust runtime; it is not whole-product acceptance. Long metadata SQL is abbreviated in command summaries; original receipts remain private.",
+  "runs": [
+    {
+      "mode": "source",
+      "release": "8eff5fae5aba0b14f133a412b009096037343ee3",
+      "database": "creator_pr132_restoration_20261007",
+      "scope": "Restoration and transaction-owner fault operation only. No issuer nonce, task, generation, provider, request or settlement was created.",
+      "observations": [
+        {
+          "name": "success",
+          "role": "creator_generation_worker",
+          "pid": 137,
+          "elapsedMs": 16,
+          "codes": [],
+          "uncertain": false,
+          "withheldResponseBytes": 0,
+          "reusedPid": 137,
+          "commandsSent": [
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS observed_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT session_user AS login,current_user AS role, \u2026"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_held_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT current_database() AS database, \u2026"
+            },
+            {
+              "kind": "source",
+              "sql": "RELEASE SAVEPOINT w8_held_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "RELEASE SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "COMMIT"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS retry_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "COMMIT"
+            }
+          ]
+        },
+        {
+          "name": "wrong_login",
+          "role": "creator_runtime",
+          "pid": 138,
+          "elapsedMs": 12,
+          "codes": [
+            "generation_restoration_unavailable"
+          ],
+          "uncertain": false,
+          "withheldResponseBytes": 0,
+          "reusedPid": 138,
+          "commandsSent": [
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS observed_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT session_user AS login,current_user AS role, \u2026"
+            },
+            {
+              "kind": "source",
+              "sql": "ROLLBACK TO SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "RELEASE SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "ROLLBACK"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS retry_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "COMMIT"
+            }
+          ]
+        },
+        {
+          "name": "known_read_error",
+          "role": "creator_generation_worker",
+          "pid": 139,
+          "elapsedMs": 15,
+          "codes": [
+            "restoration_pending",
+            "22012"
+          ],
+          "uncertain": false,
+          "withheldResponseBytes": 0,
+          "reusedPid": 139,
+          "commandsSent": [
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS observed_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT session_user AS login,current_user AS role, \u2026"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_held_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT current_database() AS database, \u2026"
+            },
+            {
+              "kind": "fault",
+              "sql": "SELECT 1 / 0"
+            },
+            {
+              "kind": "source",
+              "sql": "ROLLBACK TO SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "RELEASE SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "ROLLBACK"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS retry_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "COMMIT"
+            }
+          ]
+        },
+        {
+          "name": "unknown_read",
+          "role": "creator_generation_worker",
+          "pid": 140,
+          "elapsedMs": 314,
+          "codes": [
+            "generation_rollback_unavailable",
+            "Original generation and settlement failures.",
+            "restoration_pending",
+            "Query read timeout"
+          ],
+          "uncertain": true,
+          "withheldResponseBytes": 211,
+          "commandsSent": [
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS observed_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT session_user AS login,current_user AS role, \u2026"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_held_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT current_database() AS database, \u2026"
+            }
+          ]
+        },
+        {
+          "name": "known_release_error",
+          "role": "creator_generation_worker",
+          "pid": 141,
+          "elapsedMs": 16,
+          "codes": [
+            "3B001"
+          ],
+          "uncertain": false,
+          "withheldResponseBytes": 0,
+          "reusedPid": 141,
+          "commandsSent": [
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS observed_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT session_user AS login,current_user AS role, \u2026"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_held_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT current_database() AS database, \u2026"
+            },
+            {
+              "kind": "source",
+              "sql": "RELEASE SAVEPOINT w8_held_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "RELEASE SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "fault",
+              "sql": "RELEASE SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "ROLLBACK"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS retry_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "COMMIT"
+            }
+          ]
+        },
+        {
+          "name": "unknown_release",
+          "role": "creator_generation_worker",
+          "pid": 142,
+          "elapsedMs": 316,
+          "codes": [
+            "generation_rollback_unavailable",
+            "Original generation and settlement failures.",
+            "Query read timeout"
+          ],
+          "uncertain": true,
+          "withheldResponseBytes": 19,
+          "commandsSent": [
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS observed_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT session_user AS login,current_user AS role, \u2026"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_held_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT current_database() AS database, \u2026"
+            },
+            {
+              "kind": "source",
+              "sql": "RELEASE SAVEPOINT w8_held_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "RELEASE SAVEPOINT w8_generation_restoration"
+            }
+          ]
+        },
+        {
+          "name": "cleanup_error",
+          "role": "creator_runtime",
+          "pid": 143,
+          "elapsedMs": 13,
+          "codes": [
+            "generation_restoration_unavailable",
+            "Original generation restoration and cleanup failed.",
+            "generation_restoration_unavailable",
+            "3B001"
+          ],
+          "uncertain": false,
+          "withheldResponseBytes": 0,
+          "reusedPid": 143,
+          "commandsSent": [
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS observed_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT session_user AS login,current_user AS role, \u2026"
+            },
+            {
+              "kind": "source",
+              "sql": "ROLLBACK TO SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "fault",
+              "sql": "RELEASE SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "ROLLBACK"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS retry_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "COMMIT"
+            }
+          ]
+        }
+      ],
+      "shutdownSamePromise": true,
+      "hostClosed": true,
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "after": {
+        "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+        "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+        "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+        "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+        "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+        "dataSha256": "add04093be921cf22d124ad4ce71d9942d4b1e215433050fa5e26670105bdf10",
+        "ledgerRows": 101,
+        "businessRows": 1001,
+        "businessTables": 177
+      },
+      "originalAfter": {
+        "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+        "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+        "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+        "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+        "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+        "dataSha256": "add04093be921cf22d124ad4ce71d9942d4b1e215433050fa5e26670105bdf10",
+        "ledgerRows": 101,
+        "businessRows": 1001,
+        "businessTables": 177
+      },
+      "custodyUnchanged": true,
+      "sourceHashes": {
+        "apps/backend/src/modules/trust/restoration.ts": "6250ac6e55b451654a7b9bb330af97f29f347fa6079045eb0c78e89794849845",
+        "apps/backend/src/operations/runtime.ts": "d090ac2f88fd0dd491bda238607604fddd676f4f1475ad64c64189d7eb8de9b4",
+        "apps/backend/dist/integration.mjs": "c95e451e226b658ef7727186e8fc83d7534f146c30c4ce17511e6c769767276e"
+      },
+      "privateReceipt": "operation-source-1791401340741.json",
+      "privateReceiptSha256": "cde6bf1f93a0079198bab133bf38112f53f12477d73449af7cd6ea30d3d55b72"
+    },
+    {
+      "mode": "bundle",
+      "release": "8eff5fae5aba0b14f133a412b009096037343ee3",
+      "database": "creator_pr132_restoration_20261007",
+      "scope": "Restoration and transaction-owner fault operation only. No issuer nonce, task, generation, provider, request or settlement was created.",
+      "observations": [
+        {
+          "name": "success",
+          "role": "creator_generation_worker",
+          "pid": 167,
+          "elapsedMs": 17,
+          "codes": [],
+          "uncertain": false,
+          "withheldResponseBytes": 0,
+          "reusedPid": 167,
+          "commandsSent": [
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS observed_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT session_user AS login,current_user AS role, \u2026"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_held_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT current_database() AS database, \u2026"
+            },
+            {
+              "kind": "source",
+              "sql": "RELEASE SAVEPOINT w8_held_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "RELEASE SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "COMMIT"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS retry_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "COMMIT"
+            }
+          ]
+        },
+        {
+          "name": "wrong_login",
+          "role": "creator_runtime",
+          "pid": 168,
+          "elapsedMs": 13,
+          "codes": [
+            "generation_restoration_unavailable"
+          ],
+          "uncertain": false,
+          "withheldResponseBytes": 0,
+          "reusedPid": 168,
+          "commandsSent": [
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS observed_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT session_user AS login,current_user AS role, \u2026"
+            },
+            {
+              "kind": "source",
+              "sql": "ROLLBACK TO SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "RELEASE SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "ROLLBACK"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS retry_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "COMMIT"
+            }
+          ]
+        },
+        {
+          "name": "known_read_error",
+          "role": "creator_generation_worker",
+          "pid": 169,
+          "elapsedMs": 18,
+          "codes": [
+            "restoration_pending",
+            "22012"
+          ],
+          "uncertain": false,
+          "withheldResponseBytes": 0,
+          "reusedPid": 169,
+          "commandsSent": [
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS observed_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT session_user AS login,current_user AS role, \u2026"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_held_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT current_database() AS database, \u2026"
+            },
+            {
+              "kind": "fault",
+              "sql": "SELECT 1 / 0"
+            },
+            {
+              "kind": "source",
+              "sql": "ROLLBACK TO SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "RELEASE SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "ROLLBACK"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS retry_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "COMMIT"
+            }
+          ]
+        },
+        {
+          "name": "unknown_read",
+          "role": "creator_generation_worker",
+          "pid": 170,
+          "elapsedMs": 318,
+          "codes": [
+            "generation_rollback_unavailable",
+            "Original generation and settlement failures.",
+            "restoration_pending",
+            "Query read timeout"
+          ],
+          "uncertain": true,
+          "withheldResponseBytes": 211,
+          "commandsSent": [
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS observed_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT session_user AS login,current_user AS role, \u2026"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_held_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT current_database() AS database, \u2026"
+            }
+          ]
+        },
+        {
+          "name": "known_release_error",
+          "role": "creator_generation_worker",
+          "pid": 171,
+          "elapsedMs": 16,
+          "codes": [
+            "3B001"
+          ],
+          "uncertain": false,
+          "withheldResponseBytes": 0,
+          "reusedPid": 171,
+          "commandsSent": [
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS observed_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT session_user AS login,current_user AS role, \u2026"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_held_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT current_database() AS database, \u2026"
+            },
+            {
+              "kind": "source",
+              "sql": "RELEASE SAVEPOINT w8_held_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "RELEASE SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "fault",
+              "sql": "RELEASE SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "ROLLBACK"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS retry_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "COMMIT"
+            }
+          ]
+        },
+        {
+          "name": "unknown_release",
+          "role": "creator_generation_worker",
+          "pid": 172,
+          "elapsedMs": 315,
+          "codes": [
+            "generation_rollback_unavailable",
+            "Original generation and settlement failures.",
+            "Query read timeout"
+          ],
+          "uncertain": true,
+          "withheldResponseBytes": 19,
+          "commandsSent": [
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS observed_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT session_user AS login,current_user AS role, \u2026"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_held_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT current_database() AS database, \u2026"
+            },
+            {
+              "kind": "source",
+              "sql": "RELEASE SAVEPOINT w8_held_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "RELEASE SAVEPOINT w8_generation_restoration"
+            }
+          ]
+        },
+        {
+          "name": "cleanup_error",
+          "role": "creator_runtime",
+          "pid": 173,
+          "elapsedMs": 13,
+          "codes": [
+            "generation_restoration_unavailable",
+            "Original generation restoration and cleanup failed.",
+            "generation_restoration_unavailable",
+            "3B001"
+          ],
+          "uncertain": false,
+          "withheldResponseBytes": 0,
+          "reusedPid": 173,
+          "commandsSent": [
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS observed_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT session_user AS login,current_user AS role, \u2026"
+            },
+            {
+              "kind": "source",
+              "sql": "ROLLBACK TO SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "fault",
+              "sql": "RELEASE SAVEPOINT w8_generation_restoration"
+            },
+            {
+              "kind": "source",
+              "sql": "ROLLBACK"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS pid"
+            },
+            {
+              "kind": "source",
+              "sql": "BEGIN ISOLATION LEVEL READ COMMITTED"
+            },
+            {
+              "kind": "source",
+              "sql": "SELECT pg_backend_pid() AS retry_pid"
+            },
+            {
+              "kind": "source",
+              "sql": "COMMIT"
+            }
+          ]
+        }
+      ],
+      "shutdownSamePromise": true,
+      "hostClosed": true,
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "after": {
+        "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+        "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+        "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+        "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+        "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+        "dataSha256": "add04093be921cf22d124ad4ce71d9942d4b1e215433050fa5e26670105bdf10",
+        "ledgerRows": 101,
+        "businessRows": 1001,
+        "businessTables": 177
+      },
+      "originalAfter": {
+        "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+        "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+        "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+        "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+        "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+        "dataSha256": "add04093be921cf22d124ad4ce71d9942d4b1e215433050fa5e26670105bdf10",
+        "ledgerRows": 101,
+        "businessRows": 1001,
+        "businessTables": 177
+      },
+      "custodyUnchanged": true,
+      "sourceHashes": {
+        "apps/backend/src/modules/trust/restoration.ts": "6250ac6e55b451654a7b9bb330af97f29f347fa6079045eb0c78e89794849845",
+        "apps/backend/src/operations/runtime.ts": "d090ac2f88fd0dd491bda238607604fddd676f4f1475ad64c64189d7eb8de9b4",
+        "apps/backend/dist/integration.mjs": "c95e451e226b658ef7727186e8fc83d7534f146c30c4ce17511e6c769767276e"
+      },
+      "privateReceipt": "operation-bundle-1791401384958.json",
+      "privateReceiptSha256": "a780e427786d2450c501ca63ccf301a52fddfaf85995013c58fa73183d5c6554"
+    }
+  ]
+}

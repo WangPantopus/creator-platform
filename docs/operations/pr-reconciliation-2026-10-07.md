@@ -4,6 +4,10 @@ Account for the existing work before extending the product. This ledger gives ev
 
 **Execution status:** #131 closed unmerged into #145; #242 closed unmerged into #63. All 18 original source branches remain at their reviewed heads; the other 16 original drafts remain open. Successor obligations and #132 continuation were recorded on GitHub. [Action receipts](../../artifacts/pr-review/2026-10-07/reconciliation/actions.json) and [verified final state](../../artifacts/pr-review/2026-10-07/reconciliation/post-consolidation.json) preserve the result. No product source was changed or accepted by this reconciliation. [Project checkpoint](project-continuation-2026-10-07.md) preserves the broader product and architecture context.
 
+## Restoration integration update
+
+Commit `8eff5fae5aba0b14f133a412b009096037343ee3` restores the missing #145 protections in the #132 continuation while retaining its newer shutdown handling. [Preservation proof and actual source/built-runtime operation](../../artifacts/pr-review/2026-10-07/restoration-reconciliation/README.md) account for all seven #145 implementation/configuration paths. Seven real database fault/refusal/success cases pass in each runtime; 17 existing contract/lifetime cases also pass. #145 can now consolidate into #132 with all remaining issuer/nonce/worker/terminal/privacy/application gates transferred; publication and closure are pending. The tables and pinned heads below remain the original review snapshot.
+
 ## Evidence and interpretation
 
 The comparison pins main at `3027874ce07ec40c03567109ec317a814fae6bd8` and the integration candidate #132 at `8c78e379900555abae37dddb31143c8a7defcd23`. All 18 PR heads were unchanged from the earlier October 7 review. [Metadata](../../artifacts/pr-review/2026-10-07/reconciliation/pull-requests.json) records full head SHAs, configured bases, branch names and mergeability. [Head-check snapshot](../../artifacts/pr-review/2026-10-07/reconciliation/checks.json) reports successful checks at the inspected revisions; logs and application operation were not repeated in this documentation pass.
@@ -43,7 +47,7 @@ Transfer to #145, and ultimately #132: genuine issuer/private nonce and original
 
 ### First integration task: preserve restoration failures
 
-The comparison found concrete useful code **missing from #132**. The loss is visible in the [complete #145-to-#132 diff](../../artifacts/pr-review/2026-10-07/reconciliation/restoration-145-to-132.patch):
+The original comparison found concrete useful code **missing from #132 at `8c78e379`**. The integration update above resolves this source gap at `8eff5fae`; the following records the original diagnosis and acceptance scope. The loss is visible in the [complete #145-to-#132 diff](../../artifacts/pr-review/2026-10-07/reconciliation/restoration-145-to-132.patch):
 
 - `apps/backend/src/modules/trust/restoration.ts`: #131/#145 release the helper savepoint only after a completed metadata read. #132 and main unconditionally issue `RELEASE` in `finally`, even when the read's outcome is uncertain.
 - `apps/backend/src/operations/runtime.ts`: #131/#145 retain the original restoration callback failure as a private cause of `restoration_pending`. #132 and main discard it, which can hide the original uncertainty from the transaction owner.
@@ -89,7 +93,7 @@ Each working journey needs comparison with its actual screen/state references: L
 ## Execution sequence and closeout
 
 1. **Done:** published the pinned ledger at `f442ece7d2e668b16a246f71d0695dccb645a438`, recorded successor obligations on #145 and #63 plus continuation on #132, rechecked source and successor heads, and closed #131/#242 unmerged. Verified all 18 source branches preserved and 16 original drafts open.
-2. Reconcile the missing restoration protections from #145 into #132 while preserving newer shutdown behavior. This is the first concrete implementation task, followed by the installed-consumer/privacy/accounting work above.
+2. **Implemented and locally verified:** reconcile the missing restoration protections from #145 into #132 while preserving newer shutdown behavior. Next comes genuine installed-consumer/privacy/accounting composition; complete publication/consolidation of this repair first.
 3. Resolve the broad #63/#74/#36 differences into that same integration path. Review conflicts by behavior; preserve current main fixes. Close additional source PRs only when their useful changes and remaining gates have a verified home.
 4. Reconcile publication and focused native/media/Growth sources in the journey order above. Keep source and acceptance evidence pinned to actual revisions. Do not restart implementations already represented here.
 

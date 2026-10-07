@@ -1,5 +1,7 @@
 # W2 generation/privacy handoff — October 7, 2026
 
+**Later continuation:** the user resumed consolidation in the review chat. Its active checkout is `/Users/yingpengwang/.codex/worktrees/637b/creator-platform`, branch `codex/restoration-reconciliation-20261007`; the original 5f17 checkout remains preserved. The [current project checkpoint](../../operations/project-continuation-2026-10-07.md) and [restoration repair evidence](../../../artifacts/pr-review/2026-10-07/restoration-reconciliation/README.md) supersede the paused status and immediate next action below. The broader W2 requirements and original archive instructions remain in force.
+
 Stopped at the user's explicit handoff request. The complete assignment is unfinished. Keep this worktree and its notes; do not restart from the primary checkout or treat a successful build/one export/one merge as complete W2 acceptance.
 
 ## Resume here

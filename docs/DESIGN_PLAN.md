@@ -24,6 +24,7 @@ W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan expor
 ## Implementation continuation
 
 - [x] October 7, 2026: inventory and continuation decisions for all 18 original draft PRs, with per-file preservation evidence and outstanding acceptance in the [reconciliation ledger](operations/pr-reconciliation-2026-10-07.md).
+- [x] October 7, 2026: reused the missing #145 restoration protections in the #132 continuation; [source/built-runtime database fault evidence](../artifacts/pr-review/2026-10-07/restoration-reconciliation/README.md). This is a bounded runtime repair, not a completed generation journey.
 - [~] Reconcile and qualify the retained implementations in that ledger's journey order. Design deliverables marked complete below do not establish functional application acceptance. The [project checkpoint](operations/project-continuation-2026-10-07.md) preserves product, architecture and current engineering context.
 
 ## Sample content used in every design
