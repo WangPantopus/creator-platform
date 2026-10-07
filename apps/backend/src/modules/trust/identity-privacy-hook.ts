@@ -1,4 +1,5 @@
 import type { Pool, PoolClient } from "pg";
+import { ContentHeldClient } from "../content/held-client-cleanup.js";
 import { invariant } from "../../core/errors.js";
 import type { PrivacyHook } from "./contracts.js";
 import {
@@ -17,6 +18,7 @@ export function identityPrivacyHook(
   return {
     domain: "identity",
     async run(input) {
+      input.signal?.throwIfAborted();
       await verify(input);
       invariant(
         input.kind === "export",
@@ -29,17 +31,14 @@ export function identityPrivacyHook(
         "Relationship requests require a reviewed mapping of scoped identity proofs.",
       );
       const client = await runtime.connect();
-      let released = false;
-      const abort = () => {
-        if (!released) {
-          released = true;
-          client.release(true);
-        }
-      };
-      input.signal!.addEventListener("abort", abort, { once: true });
+      // Settlement only; original W8 task, ownership and restoration checks
+      // below remain the sole authority. Keep the source held until rollback
+      // or physical close settles, including cancellation during a query.
+      const held = new ContentHeldClient(client, input.signal, runtime);
+      let failure: unknown;
       try {
         input.signal!.throwIfAborted();
-        await client.query("BEGIN");
+        await held.begin();
         await restoredPrivacyTaskAuthorityInTransaction(
           client,
           input,
@@ -144,7 +143,7 @@ export function identityPrivacyHook(
           assertRestoredInTransaction,
         );
         input.signal!.throwIfAborted();
-        await client.query("COMMIT");
+        await held.commit();
         input.signal!.throwIfAborted();
         return {
           receipt: {
@@ -157,14 +156,10 @@ export function identityPrivacyHook(
           data,
         };
       } catch (error) {
-        if (!released) await client.query("ROLLBACK");
+        failure = error;
         throw error;
       } finally {
-        input.signal!.removeEventListener("abort", abort);
-        if (!released) {
-          released = true;
-          client.release();
-        }
+        await held.settle(failure);
       }
     },
   };

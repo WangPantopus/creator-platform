@@ -1,0 +1,305 @@
+{
+  "sourceBase": "4b8c6f621055dfcb5fa2cbcdb2642be1402e3995",
+  "sourceSha256": {
+    "apps/backend/src/modules/content/held-client-cleanup.ts": "1cd652f191ff15b6257bafae9e67d5b3511932b624539faad698fa6691c24ed3",
+    "apps/backend/src/modules/trust/identity-privacy-hook.ts": "e712fb610e17d7b2c675fa81c19942648f5b87a8ffc6b052a86c64892b89ac81",
+    "apps/backend/src/modules/trust/own-privacy-hook.ts": "3f1cd1987b26fecad17b653693cef2cba15ad00ecc2857965036e5a14cd128c6",
+    "apps/backend/src/modules/trust/worker.ts": "9f580954b0e5e3c07a300bc69f9596125062df11a7b6f43d62ad6a10afac5c73",
+    "apps/backend/src/operations/runtime.ts": "dafffee519d23de21f407be6f9bd4bd144a1c8663d1ed487a0971c3f320ce7ff"
+  },
+  "sourceChanges": [
+    "Identity and Trust retain the original held client through verified transaction settlement. Their actual observed backend PID is cancelled using the same original restricted pool credential before socket close; rollback and cleanup failures retain the original cause.",
+    "The original worker awaits source settlement after its actual deadline, drains successful claims and sibling work despite another lane failure, and retains its unwrapped active promise for shutdown.",
+    "Worker and runtime stop share their original cleanup promise. Runtime attempts both owned pool closures even after original worker failure. No task, restoration, ownership or final COMMIT fence is replaced."
+  ],
+  "actualPrivacyConsumers": {
+    "scope": "Genuine development session, HTTP-requested account export jobs, original TrustWorker-issued leases/signals and unchanged owner hooks. Fault injection only locks or terminates their actual database source. No task, scope, clock or receipt is fabricated.",
+    "observed": [
+      {
+        "ordinal": 1,
+        "domain": "trust",
+        "outcome": "complete_original_hook",
+        "injected": false,
+        "elapsedMs": 67
+      },
+      {
+        "ordinal": 2,
+        "domain": "identity",
+        "outcome": "complete_original_hook",
+        "injected": false,
+        "elapsedMs": 107
+      },
+      {
+        "ordinal": 3,
+        "domain": "identity",
+        "outcome": "complete_original_hook",
+        "injected": false,
+        "elapsedMs": 89
+      },
+      {
+        "ordinal": 4,
+        "domain": "trust",
+        "outcome": "complete_original_hook",
+        "injected": false,
+        "elapsedMs": 49
+      },
+      {
+        "ordinal": 5,
+        "domain": "identity",
+        "actualTaskStateBeforeHookReturns": "running",
+        "outcome": "failed_original_hook",
+        "injected": true,
+        "actualTaskAborted": true,
+        "codes": [
+          "57014"
+        ],
+        "backendCountAtHookReturn": 0,
+        "sourceBackendGone": true,
+        "backendExitObservationMs": 3,
+        "elapsedMs": 45017
+      },
+      {
+        "ordinal": 6,
+        "domain": "trust",
+        "actualTaskStateBeforeHookReturns": "running",
+        "outcome": "failed_original_hook",
+        "injected": true,
+        "actualTaskAborted": false,
+        "codes": [
+          "57P01"
+        ],
+        "backendCountAtHookReturn": 0,
+        "sourceBackendGone": true,
+        "backendExitObservationMs": 2,
+        "elapsedMs": 39
+      },
+      {
+        "ordinal": 7,
+        "domain": "identity",
+        "outcome": "complete_original_hook",
+        "injected": false,
+        "elapsedMs": 86
+      },
+      {
+        "ordinal": 8,
+        "domain": "trust",
+        "outcome": "complete_original_hook",
+        "injected": false,
+        "elapsedMs": 60
+      }
+    ],
+    "afterFailure": [
+      {
+        "domain": "agent",
+        "state": "complete",
+        "error_code": null,
+        "attempts": 1
+      },
+      {
+        "domain": "commerce",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "content",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "conversation",
+        "state": "blocked",
+        "error_code": "conversation_lineage_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "growth",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "identity",
+        "state": "retry",
+        "error_code": "hook_timeout",
+        "attempts": 1
+      },
+      {
+        "domain": "media",
+        "state": "running",
+        "error_code": null,
+        "attempts": 1
+      },
+      {
+        "domain": "trust",
+        "state": "retry",
+        "error_code": "domain_hook_error",
+        "attempts": 1
+      }
+    ],
+    "recovered": [
+      {
+        "domain": "agent",
+        "state": "complete",
+        "error_code": null,
+        "attempts": 1
+      },
+      {
+        "domain": "commerce",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "content",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "conversation",
+        "state": "blocked",
+        "error_code": "conversation_lineage_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "growth",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "identity",
+        "state": "complete",
+        "error_code": null,
+        "attempts": 2
+      },
+      {
+        "domain": "media",
+        "state": "complete",
+        "error_code": null,
+        "attempts": 1
+      },
+      {
+        "domain": "trust",
+        "state": "complete",
+        "error_code": null,
+        "attempts": 2
+      }
+    ],
+    "scopes": {
+      "identity": 0,
+      "trust": 0
+    },
+    "actual": {
+      "migrations": 61,
+      "sessions": 6,
+      "privacyjobs": 10,
+      "providerusage": 0
+    },
+    "limits": [
+      "Only Identity and Trust consumer lifetimes qualify; complete all-eight export and download remain unavailable.",
+      "Actual45-second worker cancellation applies to Identity. Trust source uses actual PostgreSQL termination during its blocked original read.",
+      "No held source is installed in this independent canonical61 database."
+    ]
+  },
+  "actualFailedLaneShutdown": {
+    "scope": "Real canonical development HTTP account export and original TrustWorker-issued leases. A database lock causes actual SQL57014 in the effect-claim lane while the successfully claimed Identity task continues on its original source.",
+    "closePendingWhileSourceActive": true,
+    "coreUsableDuringDrain": true,
+    "sharedClosePromise": true,
+    "sourceBefore": 1,
+    "sourceAfter": 0,
+    "sourceAborted": true,
+    "hookFailure": [
+      "57014"
+    ],
+    "closeResult": {
+      "ok": false,
+      "codes": [
+        "57014"
+      ]
+    },
+    "closeElapsedMs": 44973,
+    "ownedPoolsEnded": true,
+    "remainingRoleBackends": [],
+    "scopes": {
+      "identity": 0,
+      "trust": 0
+    },
+    "state": [
+      {
+        "domain": "agent",
+        "state": "complete",
+        "error_code": null,
+        "attempts": 1
+      },
+      {
+        "domain": "commerce",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "content",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "conversation",
+        "state": "blocked",
+        "error_code": "conversation_lineage_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "growth",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "identity",
+        "state": "retry",
+        "error_code": "hook_timeout",
+        "attempts": 1
+      },
+      {
+        "domain": "media",
+        "state": "pending",
+        "error_code": null,
+        "attempts": 0
+      },
+      {
+        "domain": "trust",
+        "state": "pending",
+        "error_code": null,
+        "attempts": 0
+      }
+    ],
+    "limits": [
+      "No effect or privacy job, lease, receipt or authority is inserted directly.",
+      "Only original Identity cancellation, queue-lane failure drainage and actual host close are qualified; no complete all-eight export or download.",
+      "No held migrations or provider usage."
+    ]
+  },
+  "earlierFailures": [
+    "The first review used an unregistered return destination and received actual HTTP400; corrected to the existing /identity/account route.",
+    "The socket-only implementation left the original blocked Identity backend present at hook return and after two seconds. The failed observation caused actual PID cancellation to be added; no successful cancellation was credited to that attempt.",
+    "Repeated development actor-one requests reached the real HTTP429 privacy limit. The rate-limit policy and retained jobs were not modified. Independent later journeys used other existing canonical development actors."
+  ],
+  "validation": {
+    "backendShippingBuild": "passed under the original W2 heavy-build lock",
+    "scopedEslint": "passed",
+    "prettier": "passed",
+    "existingContractTests": 9,
+    "existingSchedulerTests": 8,
+    "postgresFoundationTestsThisIncrement": "not run; the genuine isolated consumer/worker journeys above use PostgreSQL17 instead"
+  },
+  "limits": [
+    "Only the original Identity and Trust consumer lifetime and canonical Trust shutdown paths are qualified here. Other domains retain their actual available or blocked states.",
+    "No complete all-eight C10 export, download, erasure, genuine generation or provider/financial receipt is claimed.",
+    "The independent fresh database has only the original canonical61 migrations. No held source, direct business task, lease, scope or success receipt was installed."
+  ]
+}
