@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { Pool } from "pg";
+import { DatabaseError, type Pool } from "pg";
 import { z } from "zod";
 import type { PrivacyHook, EffectHook, PrivacyDomain } from "./contracts.js";
 import { TrustStore } from "./store.js";
@@ -36,6 +36,28 @@ type Effect = {
     amountMinor?: number;
   };
 };
+
+function retryableAuthorityFailure(error: unknown): boolean {
+  // These guards retain the original PostgreSQL cause. A lock or aborted
+  // transaction must re-run all authority checks under a fresh claim; it is
+  // not evidence of missing source/permissions. Never unwrap cleanup aggregates
+  // or unrelated failures, which can include unresolved transaction settlement.
+  for (let depth = 0; depth < 8; depth++) {
+    if (error instanceof DatabaseError)
+      return ["55P03", "40001", "40P01"].includes(error.code ?? "");
+    if (
+      !(error instanceof DomainError) ||
+      ![
+        "privacy_commit_fence_unavailable",
+        "privacy_original_family_unavailable",
+      ].includes(error.code)
+    )
+      return false;
+    error = error.cause;
+  }
+  return false;
+}
+
 // A lease token fences a slow predecessor. Hooks must deduplicate their stable effect/job key.
 export class TrustWorker {
   private timer: ReturnType<typeof setTimeout> | undefined;
@@ -314,6 +336,8 @@ export class TrustWorker {
         ].includes(message)
           ? message
           : "domain_hook_error";
+      const blocked =
+        unavailable.includes(code) && !retryableAuthorityFailure(error);
       const saved = await trustTransaction(this.pool, (client) =>
         client.query(
           "UPDATE creator_trust.privacy_task SET state=$4,error_code=$5,lease_until=NULL,available_at=now()+make_interval(secs=>$6) WHERE job_id=$1 AND domain=$2 AND lease_token=$3 AND state='running'",
@@ -321,18 +345,13 @@ export class TrustWorker {
             task.job_id,
             task.domain,
             task.lease_token,
-            unavailable.includes(code)
-              ? "blocked"
-              : task.attempts >= 8
-                ? "dead_letter"
-                : "retry",
+            blocked ? "blocked" : task.attempts >= 8 ? "dead_letter" : "retry",
             code,
             Math.min(3600, 2 ** task.attempts * 5),
           ],
         ),
       );
-      if (saved.rowCount && !unavailable.includes(code))
-        this.observe("privacy_retry", 1);
+      if (saved.rowCount && !blocked) this.observe("privacy_retry", 1);
     }
   }
   private async claimEffects(): Promise<Effect[]> {
