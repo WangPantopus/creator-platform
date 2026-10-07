@@ -1,0 +1,87 @@
+{
+  "base": "556bd89e3696bd65f02def800dc7904d243164ec",
+  "recordedAt": "2026-10-07T09:10:22.403907+00:00",
+  "scope": "Original owner source settlement after uncertain pg read responses. No schema, permission, registry, task or actor issuance changes.",
+  "metadata": {
+    "scope": "Actual original Identity transaction with metadata-only callback and Content prepare with missing genuine registration. No actor/session/task/purpose or positive export invented.",
+    "observed": [
+      {
+        "owner": "identity_metadata",
+        "elapsedMs": 184,
+        "sourceBackendGone": true,
+        "poolReusable": true,
+        "codes": ["Query read timeout"]
+      },
+      {
+        "owner": "content_preparation",
+        "elapsedMs": 175,
+        "sourceBackendGone": true,
+        "poolReusable": true,
+        "codes": ["content_privacy_purpose_unavailable", "Query read timeout"]
+      }
+    ]
+  },
+  "canonicalHttp": {
+    "scope": "Actual canonical development session, original Identity and Commerce feature/owner GET routes with a configured150ms pg read budget and real PostgreSQL table locks. Original owners/actors, no replacement route or authorization.",
+    "observed": [
+      {
+        "owner": "identity",
+        "case": "actual_original_http_read_timeout",
+        "elapsedMs": 189,
+        "status": 503,
+        "code": "service_unavailable",
+        "sourceBackendGone": true
+      },
+      {
+        "owner": "identity",
+        "case": "same_session_recovery",
+        "status": 200
+      },
+      {
+        "owner": "commerce",
+        "case": "actual_original_http_read_timeout",
+        "elapsedMs": 195,
+        "status": 503,
+        "code": "commerce_transaction_unavailable",
+        "sourceBackendGone": true
+      },
+      {
+        "owner": "commerce",
+        "case": "same_session_recovery",
+        "status": 200
+      }
+    ],
+    "counts": {
+      "migrations": 61,
+      "sessions": 13,
+      "privacy_jobs": 19,
+      "usage": 0
+    },
+    "allOwnedPoolsClosed": true,
+    "remainingRuntimeBackends": 0,
+    "limits": [
+      "Read lifetime and same-session recovery only; no spending, payment, provider or privacy completion."
+    ]
+  },
+  "configuration": "The HTTP review sets the supported pg.defaults.query_timeout to150ms in its own Node process. Original canonical URLs, restoration checks, feature registrations and actor/session producers remain unchanged.",
+  "initialReviewDiagnostics": [
+    "First Content refusal assertion expected unconfigured; actual unchanged producer code is content_privacy_purpose_unavailable. The review expectation was corrected.",
+    "Passing query_timeout in the database URL was correctly rejected by the existing development restoration guard before serving. The final review uses a plain canonical URL and supported process query-timeout configuration; no guard was changed."
+  ],
+  "validation": {
+    "backendShippingBuild": "passed under original shared heavy-build lock",
+    "scopedLintFormat": "passed",
+    "existingBackendTests": 18,
+    "foundationTests": 9,
+    "contractTests": 9,
+    "testDurationSeconds": 105.44,
+    "t11Seconds": 102.229,
+    "t11IsAppP95": false,
+    "testLogSHA256": "9a5db4269e219cdc2429cee8758b90f3564048c5349195ecbdb1798f1e4d3d9d"
+  },
+  "limits": [
+    "Original Content prepare remains refused without its registered source. Positive Content export/authority callback operation remains separately held; no purpose/task/ledger was fabricated.",
+    "Existing PostgreSQL foundation tests cover Access/Database success, RLS and stale authority; they are not current-app performance distributions.",
+    "HTTP read recovery does not qualify paid commerce, full privacy or native flows."
+  ]
+}

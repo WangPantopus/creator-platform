@@ -1,0 +1,11 @@
+# Original owner source cancellation — October 7, 2026
+
+Identity, Commerce, Access, Database and Content export now supply their actual original pool to the existing held-client helper. A PostgreSQL read timeout can precede a caller or host deadline; settlement now cancels that observed backend before closing and releasing it. Existing callbacks, actors, task fences, role/RLS checks and COMMIT/rollback receipts stay with their original owners. No new transaction deadline is imposed on Access or Database.
+
+Content metadata preparation uses a read-only transaction to observe the actual source PID before its catalogue read. Its original catalogue and task-authority callbacks are awaited directly so timeout cannot abandon their continuations. Preparation still refuses absent registration, and no positive export is inferred from the negative review.
+
+[Actual observations](../../artifacts/pr-review/2026-10-07/owner-source-cancellation/receipt.json) show original Identity metadata and Content preparation reads settling after a150ms pg budget in184ms and175ms. Both original backends are gone and the pools are reusable. Canonical Identity session and Commerce overview GETs, under that supported process read-budget configuration, return503 in189ms and195ms while a real table lock remains held. Their original backends are gone before return; release and retry in the same genuine session returns200. All owned host pools/backends close. Canonical61, thirteen development sessions, nineteen privacy jobs and zero provider usage remain.
+
+The initial Content refusal expectation was corrected to the producer's existing unavailable code. An initial URL-based timeout configuration correctly failed the unchanged restoration URL guard. The final host uses the original plain URLs and node-postgres's supported process defaults; no restoration or authority bypass was introduced.
+
+Backend shipping build under the shared lock, scoped lint/format and all18 existing backend tests pass, including the real PostgreSQL Access/Conversation suite. Its unchanged T11 workload finishes in102.229seconds; this is not an app p95 claim. No new test suite, schema/grant/registry or screen changes. Positive Content export, full privacy, paid commerce and native journeys remain separate.

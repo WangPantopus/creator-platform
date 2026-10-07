@@ -8,7 +8,7 @@ export async function identityTransaction<T>(
 ): Promise<T> {
   const client = await pool.connect();
   // An actual host read budget; this is not an incoming request/task signal.
-  const held = new ContentHeldClient(client, AbortSignal.timeout(5000));
+  const held = new ContentHeldClient(client, AbortSignal.timeout(5000), pool);
   let failure: unknown;
   try {
     await held.begin();

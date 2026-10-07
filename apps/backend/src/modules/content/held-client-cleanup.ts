@@ -214,6 +214,9 @@ export class ContentHeldClient {
         }
       }
       this.discard ||= this.signal?.aborted === true;
+      // A pg read timeout can precede any caller/host abort. Socket closure
+      // alone leaves that source executing, so settle its observed PID too.
+      if (this.discard && this.sourcePool) await this.cancelAndClose();
       if (this.cancelling) await this.cancelling;
       if (this.discard || this.ending) await this.close();
       // Cancellation can arrive while an uncertain source close is pending.
