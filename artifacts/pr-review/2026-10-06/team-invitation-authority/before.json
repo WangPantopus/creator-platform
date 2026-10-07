@@ -1,0 +1,83 @@
+{
+  "source": "b81d6de4e7c05c1213362096f8d8fc67e4e279f9",
+  "fixture": "temporary local synthetic creator verification; no production approval",
+  "observations": [
+    {
+      "who": "creator",
+      "path": "45d29446-0d3f-4612-a768-5dd9beeddf8f/team/invite",
+      "status": 200,
+      "result": {
+        "id": "797a51de-fae0-40a9-afda-8f8e3ddd7d13",
+        "creatorId": "45d29446-0d3f-4612-a768-5dd9beeddf8f",
+        "accountId": "10000000-0000-4000-8000-000000000002",
+        "roles": [
+          "triage"
+        ],
+        "expiresAt": "2026-10-14T03:39:27.747Z",
+        "accepted": false
+      }
+    },
+    {
+      "who": "recipient",
+      "path": "team/797a51de-fae0-40a9-afda-8f8e3ddd7d13/accept",
+      "status": 200,
+      "result": {
+        "done": true
+      }
+    },
+    {
+      "who": "creator",
+      "path": "45d29446-0d3f-4612-a768-5dd9beeddf8f/team/invite",
+      "status": 200,
+      "result": {
+        "id": "108539ce-7cca-4eee-be9b-d9dc089d5d89",
+        "creatorId": "45d29446-0d3f-4612-a768-5dd9beeddf8f",
+        "accountId": "10000000-0000-4000-8000-000000000002",
+        "roles": [
+          "publisher"
+        ],
+        "expiresAt": "2026-10-14T03:39:27.829Z",
+        "accepted": false
+      }
+    },
+    {
+      "who": "recipient",
+      "path": "team/108539ce-7cca-4eee-be9b-d9dc089d5d89/accept",
+      "status": 200,
+      "result": {
+        "done": true
+      }
+    },
+    {
+      "who": "creator",
+      "path": "45d29446-0d3f-4612-a768-5dd9beeddf8f/team/invite",
+      "status": 200,
+      "result": {
+        "id": "602aeb64-0685-4522-8bde-939abff2f44d",
+        "creatorId": "45d29446-0d3f-4612-a768-5dd9beeddf8f",
+        "accountId": "10000000-0000-4000-8000-000000000002",
+        "roles": [
+          "drafter"
+        ],
+        "expiresAt": "2026-10-14T03:39:50.089Z",
+        "accepted": false
+      }
+    },
+    {
+      "who": "recipient",
+      "path": "team/602aeb64-0685-4522-8bde-939abff2f44d/accept",
+      "status": 200,
+      "result": {
+        "done": true
+      }
+    },
+    {
+      "who": "creator",
+      "path": "45d29446-0d3f-4612-a768-5dd9beeddf8f/team/10000000-0000-4000-8000-000000000002/remove",
+      "status": 200,
+      "result": {
+        "done": true
+      }
+    }
+  ]
+}
