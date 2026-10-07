@@ -454,6 +454,7 @@ export class PreparedGenerationPipeline {
           const attempt = await this.accounting.beginInTransaction(
             client,
             scope,
+            facts,
           );
           await this.inputs.authorizeInTransaction(facts, scope, client);
           await this.metadata.assertCurrentInTransaction(
@@ -480,12 +481,8 @@ export class PreparedGenerationPipeline {
         signal,
       );
       const current = run;
-      const bookend = async (
-        client: PoolClient,
-        scope: GenerationTaskScope,
-      ) => {
-        await this.current(client, scope, current);
-      };
+      const bookend = (client: PoolClient, scope: GenerationTaskScope) =>
+        this.current(client, scope, current);
       let emitted = 0;
       const emit = async (
         sentence: { text: string; citations: readonly string[] },
@@ -540,7 +537,9 @@ export class PreparedGenerationPipeline {
           beforeSentence: () =>
             this.identity.withGeneration(
               task,
-              (client, scope) => bookend(client, scope),
+              async (client, scope) => {
+                await bookend(client, scope);
+              },
               signal,
             ),
           onSentence: emit,

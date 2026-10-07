@@ -11,7 +11,10 @@ import {
 } from "../identity/generation-scope.js";
 import { PreparedGenerationConversationContext } from "../conversation/generation-context.js";
 import { generationTransaction } from "../identity/generation-transaction.js";
-import { PreparedGenerationAgentInputs } from "./generation-inputs.js";
+import {
+  PreparedGenerationAgentInputs,
+  type GenerationAgentFacts,
+} from "./generation-inputs.js";
 import { PreparedGenerationJournal } from "./generation-journal.js";
 import { AgentService } from "./service.js";
 import type { AgentModel } from "./model.js";
@@ -67,7 +70,7 @@ export type GenerationProviderCall = Readonly<{
 export type GenerationAdmissionBookend = (
   client: PoolClient,
   scope: GenerationTaskScope,
-) => Promise<void>;
+) => Promise<void | GenerationAgentFacts>;
 
 /** Accounting consumer only. It does not supply terminal/output/memory write
  * permission or enable a host without the actual W1/W3/W4 terminal composition.
@@ -251,12 +254,16 @@ export class PreparedGenerationProviderAccounting {
   async beginInTransaction(
     client: PoolClient,
     scope: GenerationTaskScope,
+    licensedFacts?: GenerationAgentFacts,
   ): Promise<GenerationProviderAttempt> {
     await this.identity.authorizeInTransaction(scope, client);
     await assertGenerationConsumerCustody(client, this.custody);
     await this.journal.assertClient(client);
     const context = await this.context.currentInTransaction(client, scope);
-    const facts = await this.inputs.currentInTransaction(client, scope);
+    const facts =
+      licensedFacts ?? (await this.inputs.currentInTransaction(client, scope));
+    if (licensedFacts)
+      await this.inputs.authorizeLicensedInTransaction(facts, scope, client);
     const ceiling = this.model.maximumRunCostMicros(
       Buffer.byteLength(facts.version.compiledPrefix, "utf8"),
     );
@@ -302,6 +309,7 @@ export class PreparedGenerationProviderAccounting {
     scope: GenerationTaskScope,
     attempt: GenerationProviderAttempt,
     category: Category,
+    licensedFacts?: GenerationAgentFacts,
   ): Promise<Admitted> {
     invariant(
       this.attempts.has(attempt) &&
@@ -316,7 +324,10 @@ export class PreparedGenerationProviderAccounting {
     await assertGenerationConsumerCustody(client, this.custody);
     await this.journal.assertClient(client);
     const context = await this.context.currentInTransaction(client, scope);
-    const facts = await this.inputs.currentInTransaction(client, scope);
+    const facts =
+      licensedFacts ?? (await this.inputs.currentInTransaction(client, scope));
+    if (licensedFacts)
+      await this.inputs.authorizeLicensedInTransaction(facts, scope, client);
     invariant(
       facts.version.compiledHash === attempt.compiledHash,
       "generation_inputs_changed",
@@ -406,12 +417,13 @@ export class PreparedGenerationProviderAccounting {
     return this.identity.withGeneration(
       task,
       async (client, scope) => {
-        await bookend?.(client, scope);
+        const facts = await bookend?.(client, scope);
         const admitted = await this.openInTransaction(
           client,
           scope,
           attempt,
           category,
+          facts || undefined,
         );
         await bookend?.(client, scope);
         return admitted;
