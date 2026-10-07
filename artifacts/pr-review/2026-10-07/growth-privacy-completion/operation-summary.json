@@ -1,0 +1,734 @@
+{
+  "recordedAt": "2026-10-07T22:33:00.573655+00:00",
+  "privateEvidenceDirectory": "/Users/yingpengwang/.codex/visualizations/2026/10/07/01a11784-60b1-7fe3-8855-82bddf4675b6/conversation-commerce-completion",
+  "scope": "Actual isolated development HTTP/source and compiled operation. Original archive and data preserved. This is not populated production/provider or full physical-deletion acceptance.",
+  "operations": [
+    {
+      "receipt": {
+        "file": "growth-operation-source-1791411386753.json",
+        "sha256": "1fb1dc22889b9e5e9334213069ff902de0cad8bcab1b23a52f1bdb4ed12a8ab2"
+      },
+      "mode": "source",
+      "database": "creator_pr132_privacy5_20261007",
+      "revision": "13da5e5fc556a29341a7cf2b039bb39a58a4cd3c",
+      "checks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "generation_disabled",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_expiry_pass_completed",
+        "remaining_readiness_stays_unavailable",
+        "growth_fan_http_export_completed",
+        "commerce_fan_http_export_completed",
+        "conversation_http_export_completed",
+        "agent_http_export_completed_after_conversation",
+        "remaining_domains_reported_explicitly",
+        "all_eight_export_tasks_complete",
+        "actual_current_session_download_manifest",
+        "all_eight_downloaded_as_inline_or_verified_protected_stream",
+        "idempotent_shutdown",
+        "closed_registration_refused_before_sql"
+      ],
+      "tasks": [
+        {
+          "domain": "agent",
+          "state": "retry",
+          "error_code": "accounting_boundary_pending",
+          "attempts": 1
+        },
+        {
+          "domain": "commerce",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "content",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "conversation",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "growth",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "identity",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "media",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "trust",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        }
+      ],
+      "expiry": {
+        "name": "usage_expiry",
+        "required": true,
+        "state": "available",
+        "code": "original_usage_expiry_running",
+        "checkedAt": "2026-10-07T22:15:55.652Z"
+      },
+      "overallReady": false,
+      "downloads": [
+        {
+          "domain": "identity",
+          "storage": "inline_manifest",
+          "bytes": 506,
+          "sha256": "f0c5012d6182dfaae1004f0e4d29fbd317747c031dde6b75cb9fe77b4c4145ff"
+        },
+        {
+          "domain": "media",
+          "storage": "inline_manifest",
+          "bytes": 15,
+          "sha256": "c9c909a20ed8f0983aef6fd79de948123fdc46953b3d5bf3ba3900140cb4d7dc"
+        },
+        {
+          "domain": "agent",
+          "storage": "protected_stream",
+          "bytes": 39,
+          "sha256": "8a812b313b5c91718e7be64d3cba955042eedb455081162baa54cd500494d894",
+          "contentType": "application/octet-stream"
+        },
+        {
+          "domain": "content",
+          "storage": "inline_manifest",
+          "bytes": 231,
+          "sha256": "e2c68a35317195886f65e13cf0d0054b09a27f03fa89b5a8355d2cb18b434045"
+        },
+        {
+          "domain": "commerce",
+          "storage": "protected_stream",
+          "bytes": 935,
+          "sha256": "42e72f5ee790290b10032c34ff73594be558b64e7c00405ae86d5e9b44cab2f9",
+          "contentType": "application/x-ndjson"
+        },
+        {
+          "domain": "conversation",
+          "storage": "protected_stream",
+          "bytes": 38,
+          "sha256": "d61eb30dc07b5478175a6e6dcf8c22770bde9e16afe1762365b7965aa21b4e28",
+          "contentType": "application/octet-stream"
+        },
+        {
+          "domain": "growth",
+          "storage": "protected_stream",
+          "bytes": 541,
+          "sha256": "9805ea79d5549501d023a56abe2f76c2d748ac5c1bb094989c37d1567437bb05",
+          "contentType": "application/x-ndjson"
+        },
+        {
+          "domain": "trust",
+          "storage": "inline_manifest",
+          "bytes": 548,
+          "sha256": "d5dcf4a5a075c3fe53a067946ae53236d9c9bcadafce5068c1907df914f2e0d1"
+        }
+      ],
+      "jobState": "complete",
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "expiryTasks": []
+    },
+    {
+      "receipt": {
+        "file": "growth-operation-standalone-1791411459050.json",
+        "sha256": "9da0d7291736f051da5482049f056305dd278330ed7ca0754a70704c2684837e"
+      },
+      "mode": "standalone",
+      "database": "creator_pr132_privacy5_20261007",
+      "revision": "13da5e5fc556a29341a7cf2b039bb39a58a4cd3c",
+      "checks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_expiry_pass_completed",
+        "remaining_readiness_stays_unavailable",
+        "growth_fan_http_export_completed",
+        "commerce_fan_http_export_completed",
+        "conversation_http_export_completed",
+        "agent_http_export_completed_after_conversation",
+        "remaining_domains_reported_explicitly",
+        "all_eight_export_tasks_complete",
+        "actual_current_session_download_manifest",
+        "all_eight_downloaded_as_inline_or_verified_protected_stream",
+        "standalone_sigterm_clean_exit"
+      ],
+      "tasks": [
+        {
+          "domain": "agent",
+          "state": "retry",
+          "error_code": "accounting_boundary_pending",
+          "attempts": 1
+        },
+        {
+          "domain": "commerce",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "content",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "conversation",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "growth",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "identity",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "media",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "trust",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        }
+      ],
+      "expiry": {
+        "name": "usage_expiry",
+        "required": true,
+        "state": "available",
+        "code": "original_usage_expiry_running",
+        "checkedAt": "2026-10-07T22:17:12.785Z"
+      },
+      "overallReady": false,
+      "downloads": [
+        {
+          "domain": "identity",
+          "storage": "inline_manifest",
+          "bytes": 684,
+          "sha256": "d6dbbf9eab62f2b274b32ae52222010195c2c565bcb46c1b6ab48814b75e0a3c"
+        },
+        {
+          "domain": "media",
+          "storage": "inline_manifest",
+          "bytes": 15,
+          "sha256": "c9c909a20ed8f0983aef6fd79de948123fdc46953b3d5bf3ba3900140cb4d7dc"
+        },
+        {
+          "domain": "agent",
+          "storage": "protected_stream",
+          "bytes": 39,
+          "sha256": "8a812b313b5c91718e7be64d3cba955042eedb455081162baa54cd500494d894",
+          "contentType": "application/octet-stream"
+        },
+        {
+          "domain": "content",
+          "storage": "inline_manifest",
+          "bytes": 231,
+          "sha256": "e2c68a35317195886f65e13cf0d0054b09a27f03fa89b5a8355d2cb18b434045"
+        },
+        {
+          "domain": "commerce",
+          "storage": "protected_stream",
+          "bytes": 935,
+          "sha256": "4808f347ca7cd2b80c1a341743b2e06f7d5a26c68dde3513077ed70a48fb5464",
+          "contentType": "application/x-ndjson"
+        },
+        {
+          "domain": "conversation",
+          "storage": "protected_stream",
+          "bytes": 38,
+          "sha256": "d61eb30dc07b5478175a6e6dcf8c22770bde9e16afe1762365b7965aa21b4e28",
+          "contentType": "application/octet-stream"
+        },
+        {
+          "domain": "growth",
+          "storage": "protected_stream",
+          "bytes": 541,
+          "sha256": "d906f62a2e8859a7f35d37840b0093d08cdc9501c7194b6198655ff4cd3f3bf5",
+          "contentType": "application/x-ndjson"
+        },
+        {
+          "domain": "trust",
+          "storage": "inline_manifest",
+          "bytes": 764,
+          "sha256": "eb6c42aa88bcd3bd174f126e2c39cae5b5f2b23d48c8288c0d61c80e5a2f08cb"
+        }
+      ],
+      "jobState": "complete",
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "expiryTasks": []
+    },
+    {
+      "receipt": {
+        "file": "growth-final-export-delete-operation-standalone-1791412000802.json",
+        "sha256": "378c423c998deee55d028cc789b980d9558c7fcb4846cf93d7d2c8f4a73b11b0"
+      },
+      "mode": "standalone",
+      "database": "creator_pr132_privacy7_20261007",
+      "revision": "8e2289346c18272910f31fb12ee4164b7443c939",
+      "checks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_expiry_pass_completed",
+        "remaining_readiness_stays_unavailable",
+        "growth_fan_http_export_completed",
+        "commerce_fan_http_export_completed",
+        "conversation_http_export_completed",
+        "agent_http_export_completed_after_conversation",
+        "remaining_domains_reported_explicitly",
+        "all_eight_export_tasks_complete",
+        "actual_current_session_download_manifest",
+        "all_eight_downloaded_as_inline_or_verified_protected_stream",
+        "actual_http_account_delete_accepted",
+        "immediate_denial_acknowledged",
+        "content_and_media_missing_retention_are_blocked",
+        "incoming_growth_provenance_catalogue_accepted",
+        "original_export_download_refused_after_actual_account_delete",
+        "standalone_sigterm_clean_exit"
+      ],
+      "tasks": [
+        {
+          "domain": "agent",
+          "state": "retry",
+          "error_code": "accounting_boundary_pending",
+          "attempts": 1
+        },
+        {
+          "domain": "commerce",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "content",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "conversation",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "growth",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "identity",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "media",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "trust",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        }
+      ],
+      "expiry": {
+        "name": "usage_expiry",
+        "required": true,
+        "state": "available",
+        "code": "original_usage_expiry_running",
+        "checkedAt": "2026-10-07T22:26:08.023Z"
+      },
+      "overallReady": false,
+      "downloads": [
+        {
+          "domain": "identity",
+          "storage": "inline_manifest",
+          "bytes": 329,
+          "sha256": "d86bdfc290152c14083c4e3f5333de4faac13ca69de291606cc93b38a7a65e4f"
+        },
+        {
+          "domain": "media",
+          "storage": "inline_manifest",
+          "bytes": 15,
+          "sha256": "c9c909a20ed8f0983aef6fd79de948123fdc46953b3d5bf3ba3900140cb4d7dc"
+        },
+        {
+          "domain": "agent",
+          "storage": "protected_stream",
+          "bytes": 39,
+          "sha256": "8a812b313b5c91718e7be64d3cba955042eedb455081162baa54cd500494d894",
+          "contentType": "application/octet-stream"
+        },
+        {
+          "domain": "content",
+          "storage": "inline_manifest",
+          "bytes": 231,
+          "sha256": "e2c68a35317195886f65e13cf0d0054b09a27f03fa89b5a8355d2cb18b434045"
+        },
+        {
+          "domain": "commerce",
+          "storage": "protected_stream",
+          "bytes": 935,
+          "sha256": "cf1890f47ba86ed01bdb80a27d107ac10e3e4a3bc07fd292b46d71a8e93c3192",
+          "contentType": "application/x-ndjson"
+        },
+        {
+          "domain": "conversation",
+          "storage": "protected_stream",
+          "bytes": 38,
+          "sha256": "d61eb30dc07b5478175a6e6dcf8c22770bde9e16afe1762365b7965aa21b4e28",
+          "contentType": "application/octet-stream"
+        },
+        {
+          "domain": "growth",
+          "storage": "protected_stream",
+          "bytes": 541,
+          "sha256": "aef7fa3c8effb4f8cb8a59121fcd08d79968d3f9753211bb0245e481b3a2f5e1",
+          "contentType": "application/x-ndjson"
+        },
+        {
+          "domain": "trust",
+          "storage": "inline_manifest",
+          "bytes": 332,
+          "sha256": "df52c0cc61002e8fe3ed580ebda186b4a24fd08c2a8fc4b08e5a170892f4994e"
+        }
+      ],
+      "jobState": "complete",
+      "deleteTasks": [
+        {
+          "domain": "agent",
+          "state": "retry",
+          "error_code": "accounting_boundary_pending",
+          "attempts": 1
+        },
+        {
+          "domain": "commerce",
+          "state": "blocked",
+          "error_code": "commerce_retention_unconfigured",
+          "attempts": 1
+        },
+        {
+          "domain": "content",
+          "state": "blocked",
+          "error_code": "content_retention_unconfigured",
+          "attempts": 1
+        },
+        {
+          "domain": "conversation",
+          "state": "blocked",
+          "error_code": "conversation_retention_unavailable",
+          "attempts": 1
+        },
+        {
+          "domain": "growth",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "identity",
+          "state": "blocked",
+          "error_code": "identity_retention_unconfigured",
+          "attempts": 1
+        },
+        {
+          "domain": "media",
+          "state": "blocked",
+          "error_code": "media_retention_unconfigured",
+          "attempts": 1
+        },
+        {
+          "domain": "trust",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        }
+      ],
+      "deleteJob": {
+        "state": "blocked",
+        "created_at": "2026-10-07T22:26:34.236Z",
+        "maturity": "2026-11-06T22:26:34.236Z"
+      },
+      "statusRead": {
+        "status": 200
+      },
+      "sessionAfterDelete": {
+        "status": 403
+      },
+      "previousDownload": {
+        "status": 403,
+        "code": "scope_revoked"
+      },
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "expiryTasks": []
+    },
+    {
+      "receipt": {
+        "file": "growth-financial-closure-standalone-1791412312209.json",
+        "sha256": "7ec3e0f5e88c7d25b328e145102c908722d69b718eacdc9bb18b215efb997644"
+      },
+      "mode": "standalone",
+      "database": "creator_pr132_privacy8_20261007",
+      "revision": "8e2289346c18272910f31fb12ee4164b7443c939",
+      "checks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_expiry_pass_completed",
+        "remaining_readiness_stays_unavailable",
+        "actual_compiled_financial_staged_header_observed",
+        "fresh_database_closure_refused_after_source_snapshot",
+        "no_unsealed_private_artifact_left",
+        "no_financial_artifact_acknowledged",
+        "original_lease_released",
+        "no_original_transaction_left_open",
+        "standalone_sigterm_clean_exit"
+      ],
+      "tasks": [
+        {
+          "domain": "agent",
+          "state": "retry",
+          "error_code": "accounting_boundary_pending",
+          "attempts": 1
+        },
+        {
+          "domain": "commerce",
+          "state": "blocked",
+          "error_code": "restoration_pending",
+          "attempts": 1
+        },
+        {
+          "domain": "content",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "conversation",
+          "state": "pending",
+          "error_code": null,
+          "attempts": 0
+        },
+        {
+          "domain": "growth",
+          "state": "pending",
+          "error_code": null,
+          "attempts": 0
+        },
+        {
+          "domain": "identity",
+          "state": "pending",
+          "error_code": null,
+          "attempts": 0
+        },
+        {
+          "domain": "media",
+          "state": "pending",
+          "error_code": null,
+          "attempts": 0
+        },
+        {
+          "domain": "trust",
+          "state": "pending",
+          "error_code": null,
+          "attempts": 0
+        }
+      ],
+      "expiry": {
+        "name": "usage_expiry",
+        "required": true,
+        "state": "available",
+        "code": "original_usage_expiry_running",
+        "checkedAt": "2026-10-07T22:31:48.795Z"
+      },
+      "overallReady": false,
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "expiryTasks": [],
+      "financialResult": {
+        "state": "blocked",
+        "error_code": "restoration_pending",
+        "artifact": false,
+        "lease_released": true
+      },
+      "actualFinancialHeaderObserved": true,
+      "observedAt": "2026-10-07T22:31:52.064Z",
+      "closureInjected": true,
+      "injectedAt": "2026-10-07T22:31:52.066Z",
+      "originalArtifactAbortSettled": true,
+      "openTransactions": []
+    }
+  ],
+  "failedAttemptsPreserved": [
+    {
+      "receipt": {
+        "file": "growth-operation-source-1791411289720.json",
+        "sha256": "b1a3b6e163fa07e9f78f21e7fa62f8f921b38dabdee59b808582c17f959f0034"
+      },
+      "mode": "source",
+      "failure": ["identity:503:export_artifact_unavailable"],
+      "closureInjected": false,
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true
+    },
+    {
+      "receipt": {
+        "file": "growth-operation-source-1791411100537.json",
+        "sha256": "fc34260353b0a49eec94341af9e2ff4badb5f4c9f97d18a3c925effdf0f1686e"
+      },
+      "mode": "source",
+      "failure": ["An immutable release revision is required."],
+      "closureInjected": false,
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true
+    },
+    {
+      "receipt": {
+        "file": "growth-operation-source-1791411130087.json",
+        "sha256": "715ad2691e7a2b89c0a8f8d8de1a232697a54bef04804b88cb5543cb08bf7a2d"
+      },
+      "mode": "source",
+      "failure": ["ERR_ASSERTION"],
+      "closureInjected": false,
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true
+    },
+    {
+      "receipt": {
+        "file": "growth-operation-source-1791411206128.json",
+        "sha256": "8049fe31252397ac74dff664e1f6bc705366748e5435455f15b4455b9ffd63ca"
+      },
+      "mode": "source",
+      "failure": ["ERR_ASSERTION"],
+      "closureInjected": false,
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true
+    },
+    {
+      "receipt": {
+        "file": "growth-delete-operation-standalone-1791411544685.json",
+        "sha256": "493ceb67cff4ed4a37c39bed444a3adb91a2ad2536ab95d194acd54ffb3eb05a"
+      },
+      "mode": "standalone",
+      "failure": ["42703"],
+      "closureInjected": false,
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true
+    },
+    {
+      "receipt": {
+        "file": "financial-staging-closure-standalone-1791407079798.json",
+        "sha256": "047145af226a50abd3ece3ac7f3bd7f8ca2c111e9b0936a7d2de3df292ab3001"
+      },
+      "mode": "standalone",
+      "failure": ["ERR_ASSERTION"],
+      "closureInjected": false,
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true
+    },
+    {
+      "receipt": {
+        "file": "financial-source-closure-standalone-1791406745504.json",
+        "sha256": "0c5a259e9e510e24afe20d06329f4ff8d60490b8d11423e52d91f55fa2d7d07a"
+      },
+      "mode": "standalone",
+      "failure": ["Observation deadline expired"],
+      "closureInjected": false,
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true
+    },
+    {
+      "receipt": {
+        "file": "financial-staging-closure-standalone-1791407043970.json",
+        "sha256": "a33695652895231f338ef8ac9e6b5c471b1c2991ffd6082ee115fd3393124495"
+      },
+      "mode": "standalone",
+      "failure": ["Observation deadline expired"],
+      "closureInjected": false,
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true
+    }
+  ],
+  "notes": [
+    "tasks records the first settled observation; Agent subsequently retries after Conversation and the complete job/download confirms all eight exports finished.",
+    "Standalone final export/delete and staged Commerce closure used shipping dist/server.mjs built from 8e2289346c18272910f31fb12ee4164b7443c939.",
+    "No synthetic job authority, receipts, provider outcomes, costs, age changes or production policy supplied. Jobs originate in the actual development HTTP API and original worker."
+  ]
+}

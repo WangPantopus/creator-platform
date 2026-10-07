@@ -1,5 +1,7 @@
 # Conversation and Commerce privacy composition
 
+Later completion: [eight-domain export, account-deletion denial and compiled Commerce staging-fault settlement](../growth-privacy-completion/README.md) supersede this increment’s seven-domain and unqualified compiled-fault observations. The remainder of this document records the original bounded operation; its other acceptance limits remain.
+
 Implementation `64682b52907928fa379db4268bb6926f81fcc8f3` continues draft [PR132](https://github.com/WangPantopus/creator-platform/pull/132). This completes the next bounded host integration; generation remains disabled and complete privacy release acceptance remains open.
 
 ## What changed

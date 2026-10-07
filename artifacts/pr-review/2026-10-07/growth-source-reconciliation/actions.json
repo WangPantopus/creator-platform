@@ -1,0 +1,13 @@
+[
+  {
+    "number": 31,
+    "action": "closed_unmerged_into_132",
+    "sourceHead": "c052ef67fa85301562b5123b682c88b931107c9a",
+    "sourceBranch": "codex/w7-completion-20261001",
+    "sourceBranchPreserved": true,
+    "successorHead": "ae309a06c9d2589d4eae55d46f22efb138f154a8",
+    "evidence": "https://github.com/WangPantopus/creator-platform/blob/ae309a06c9d2589d4eae55d46f22efb138f154a8/artifacts/pr-review/2026-10-07/growth-source-reconciliation/README.md",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/31",
+    "verifiedAt": "2026-10-07T22:14:46.759419+00:00"
+  }
+]

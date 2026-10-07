@@ -1,0 +1,134 @@
+[
+  {
+    "receipt": {
+      "file": "privacy5-101-clone-receipt.json",
+      "sha256": "60ed069073bd9226aab51effc27ea011de37f5906ca8742cdae7270a12c39b09"
+    },
+    "database": "creator_pr132_privacy5_20261007",
+    "source": "creator_w2_archive_adoption_candidate",
+    "allSixDigestsMatch": true,
+    "before": {
+      "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+      "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+      "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+      "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+      "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+      "dataSha256": "add04093be921cf22d124ad4ce71d9942d4b1e215433050fa5e26670105bdf10",
+      "ledgerRows": 101,
+      "businessRows": 1001,
+      "businessTables": 177,
+      "privacyJobs": [
+        {
+          "kind": "delete",
+          "state": "running",
+          "count": 1
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      }
+    },
+    "backupSha256": "11728120dc6d50d90900a9c1efb96095a55a19eff49dea351ce935da4b8081ec",
+    "backupBytes": 1806302
+  },
+  {
+    "receipt": {
+      "file": "privacy6-101-clone-receipt.json",
+      "sha256": "1a60951a0412c3b6ac29236117429da7dbf826ca4d24ae63693c94a81f20bb76"
+    },
+    "database": "creator_pr132_privacy6_20261007",
+    "source": "creator_w2_archive_adoption_candidate",
+    "allSixDigestsMatch": true,
+    "before": {
+      "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+      "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+      "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+      "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+      "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+      "dataSha256": "add04093be921cf22d124ad4ce71d9942d4b1e215433050fa5e26670105bdf10",
+      "ledgerRows": 101,
+      "businessRows": 1001,
+      "businessTables": 177,
+      "privacyJobs": [
+        {
+          "kind": "delete",
+          "state": "running",
+          "count": 1
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      }
+    },
+    "backupSha256": "1a6199f15556c142b7d1fa084e55f1f784cbc8495f88974cdf1b143601e29baf",
+    "backupBytes": 1806302
+  },
+  {
+    "receipt": {
+      "file": "privacy7-101-clone-receipt.json",
+      "sha256": "4845254273868c18ff3712df8654d09b0ffa8af13192b13682de859a7c5a6d62"
+    },
+    "database": "creator_pr132_privacy7_20261007",
+    "source": "creator_w2_archive_adoption_candidate",
+    "allSixDigestsMatch": true,
+    "before": {
+      "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+      "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+      "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+      "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+      "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+      "dataSha256": "add04093be921cf22d124ad4ce71d9942d4b1e215433050fa5e26670105bdf10",
+      "ledgerRows": 101,
+      "businessRows": 1001,
+      "businessTables": 177,
+      "privacyJobs": [
+        {
+          "kind": "delete",
+          "state": "running",
+          "count": 1
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      }
+    },
+    "backupSha256": "4944dc81d661472b40adfc40ccb4e003b95717988a7396367d6ce79a98dd7831",
+    "backupBytes": 1806302
+  },
+  {
+    "receipt": {
+      "file": "privacy8-101-clone-receipt.json",
+      "sha256": "fdd2c79baf1ac47030b25e2c30dfc6848c0285b5bea29e3947f8e959e680d986"
+    },
+    "database": "creator_pr132_privacy8_20261007",
+    "source": "creator_w2_archive_adoption_candidate",
+    "allSixDigestsMatch": true,
+    "before": {
+      "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+      "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+      "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+      "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+      "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+      "dataSha256": "add04093be921cf22d124ad4ce71d9942d4b1e215433050fa5e26670105bdf10",
+      "ledgerRows": 101,
+      "businessRows": 1001,
+      "businessTables": 177,
+      "privacyJobs": [
+        {
+          "kind": "delete",
+          "state": "running",
+          "count": 1
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      }
+    },
+    "backupSha256": "bf477438252d1a3257c7e5032ab7174421aeb7a2382d61fedc3e638332cb6100",
+    "backupBytes": 1806302
+  }
+]

@@ -1,0 +1,47 @@
+{
+  "receipt": {
+    "file": "lifecycle-deadlines.json",
+    "sha256": "70a9a27dbce91d3dcf3e061ae2479e34b03e87d11289c9a79744b4f92607c266"
+  },
+  "result": {
+    "jobs": [
+      {
+        "kind": "delete",
+        "scope": "account",
+        "state": "running",
+        "created_at": "2026-09-30T08:48:22.966Z",
+        "maturity": "2026-10-30T08:48:22.966Z",
+        "mature": false
+      }
+    ],
+    "tasks": [
+      {
+        "domain": "agent",
+        "state": "running",
+        "error_code": null,
+        "attempts": 0,
+        "available_at": "2026-09-30T08:48:22.970Z",
+        "lease_until": "2026-09-30T08:48:22.066Z"
+      }
+    ],
+    "usage": [
+      {
+        "provider_state": null,
+        "records": 658,
+        "finite_retention": 0,
+        "due": 0,
+        "earliest_due": null,
+        "earliest_created": "2026-09-30T08:14:16.093Z",
+        "latest_created": "2026-10-01T05:56:46.088Z"
+      }
+    ],
+    "expiry": [],
+    "detached": [
+      {
+        "records": 0,
+        "due": 0,
+        "earliest_due": null
+      }
+    ]
+  }
+}

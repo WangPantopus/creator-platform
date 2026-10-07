@@ -1,0 +1,124 @@
+{
+  "receipt": {
+    "file": "growth-original-key-custody.json",
+    "sha256": "9ccf47d1d4fb395e285ce03095e06454011ded42a767e76619f0a0a046221bcd"
+  },
+  "originalManagedKeyReused": true,
+  "originalKeyReplaced": false,
+  "counts": [
+    {
+      "table": "activation_job",
+      "rows": 0
+    },
+    {
+      "table": "content_public",
+      "rows": 0
+    },
+    {
+      "table": "creator_public",
+      "rows": 0
+    },
+    {
+      "table": "delivery",
+      "rows": 0
+    },
+    {
+      "table": "device",
+      "rows": 0
+    },
+    {
+      "table": "email",
+      "rows": 0
+    },
+    {
+      "table": "entry_attribution",
+      "rows": 0
+    },
+    {
+      "table": "erasure_fence",
+      "rows": 0
+    },
+    {
+      "table": "event_inbox",
+      "rows": 0
+    },
+    {
+      "table": "experiment",
+      "rows": 0
+    },
+    {
+      "table": "feedback",
+      "rows": 0
+    },
+    {
+      "table": "follow",
+      "rows": 0
+    },
+    {
+      "table": "impact",
+      "rows": 0
+    },
+    {
+      "table": "insight_signal",
+      "rows": 0
+    },
+    {
+      "table": "insight_snapshot",
+      "rows": 0
+    },
+    {
+      "table": "insight_window",
+      "rows": 0
+    },
+    {
+      "table": "instagram_reply",
+      "rows": 0
+    },
+    {
+      "table": "invite",
+      "rows": 0
+    },
+    {
+      "table": "metric",
+      "rows": 0
+    },
+    {
+      "table": "notification",
+      "rows": 0
+    },
+    {
+      "table": "preference",
+      "rows": 0
+    },
+    {
+      "table": "producer_cursor",
+      "rows": 0
+    },
+    {
+      "table": "producer_relay",
+      "rows": 0
+    },
+    {
+      "table": "prompt_choice",
+      "rows": 0
+    },
+    {
+      "table": "provider_receipt",
+      "rows": 0
+    },
+    {
+      "table": "recommendation",
+      "rows": 0
+    },
+    {
+      "table": "share",
+      "rows": 0
+    }
+  ],
+  "closed": {
+    "closed": true,
+    "alone": true
+  },
+  "mutation": false,
+  "limit": "All 27 Growth tables are empty; no populated encrypted-history qualification is claimed."
+}
