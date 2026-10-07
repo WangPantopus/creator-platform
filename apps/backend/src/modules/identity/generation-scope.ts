@@ -1,4 +1,4 @@
-import { createHash, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import type { Pool, PoolClient } from "pg";
 import { z } from "zod";
 import { canonical } from "../../core/canonical.js";
@@ -356,7 +356,7 @@ async function assertGenerationCatalogue(
     await query.query<{
       signature: string;
       ready: boolean;
-      definition: string;
+      definitionChecksum: string;
     }>(
       `SELECT c.signature,
          session_user='creator_generation_worker' AND current_user=session_user
@@ -380,7 +380,7 @@ async function assertGenerationCatalogue(
           to_regprocedure('creator.generation_scope_matches(uuid,uuid)'),'EXECUTE')=c.original_scope_bridge::boolean
          AND (c.terminal_match::boolean IS NULL OR has_function_privilege(c.owner,
           to_regprocedure('creator.generation_terminal_matches(uuid,uuid,boolean)'),'EXECUTE')=c.terminal_match::boolean)
-         AS ready,pg_get_functiondef(p.oid) AS definition
+         AS ready,pg_catalog.encode(pg_catalog.sha256(pg_catalog.convert_to(pg_get_functiondef(p.oid),'UTF8')),'hex') AS "definitionChecksum"
          FROM jsonb_to_recordset($1::jsonb) AS c(signature text,version text,checksum text,
           owner text,dependency text,original_scope_bridge boolean,terminal_match boolean)
          JOIN pg_proc p ON p.oid=to_regprocedure(c.signature)
@@ -418,8 +418,7 @@ async function assertGenerationCatalogue(
     const proof = proofs.find((row) => row.signature === consumer.signature);
     if (
       proof?.ready !== true ||
-      createHash("sha256").update(proof.definition).digest("hex") !==
-        consumer.definitionChecksum
+      proof.definitionChecksum !== consumer.definitionChecksum
     )
       throw new Error("Generation consumer executable differs from its review");
   }
