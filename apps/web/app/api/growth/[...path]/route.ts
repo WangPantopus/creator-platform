@@ -25,7 +25,7 @@ async function handle(
   const expectedAccount = request.headers.get("X-Expected-Account-Id");
   const expectedSession = request.headers.get("X-Expected-Session-Id");
   if (
-    /^(?:home|preferences(?:\/creators)?|notifications(?:\/[a-f0-9-]+\/read)?|engagement(?:\/(?:install|return)\/(?:claim|choice))?|feedback)$/u.test(
+    /^(?:home|preferences(?:\/creators)?|notifications(?:\/[a-f0-9-]+\/read)?|engagement(?:\/(?:install|return)\/(?:claim|choice))?|feedback|funnel|experiments(?:\/[a-f0-9-]+\/stop)?)$/u.test(
       path,
     ) &&
     (!expectedAccount || !expectedSession)

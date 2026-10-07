@@ -1,0 +1,17 @@
+{
+  "originalTuple": {
+    "x-expected-account-id": "10000000-0000-4000-8000-000000000003",
+    "x-expected-session-id": "68455379-2354-4ffa-be5d-033133ef0fc4"
+  },
+  "replacementTuple": {
+    "x-expected-account-id": "10000000-0000-4000-8000-000000000003",
+    "x-expected-session-id": "5dd8fd42-ab2c-46e3-89d8-8bc1f073252f"
+  },
+  "status": 409,
+  "body": {
+    "error": {
+      "code": "session_view_changed",
+      "message": "Your session changed. Reopen this form before continuing."
+    }
+  }
+}
