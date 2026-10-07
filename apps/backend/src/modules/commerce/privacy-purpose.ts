@@ -223,7 +223,7 @@ export async function withCommercePrivacyExport<T>(
   // while queued, then close/discard that exact late client before settling.
   const signal = AbortSignal.any([input.signal!, AbortSignal.timeout(45_000)]);
   const client = await pool.connect();
-  const held = new ContentHeldClient(client, signal);
+  const held = new ContentHeldClient(client, signal, pool);
   let failed = false;
   let failure: unknown;
   let result!: T;

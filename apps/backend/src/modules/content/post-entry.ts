@@ -103,7 +103,7 @@ export function createCurrentContentPostEntryReader(
       });
       // This actual host budget is distinct from an incoming request signal.
       const budget = AbortSignal.timeout(5000);
-      const held = new ContentHeldClient(client, budget);
+      const held = new ContentHeldClient(client, budget, pool);
       let failure: unknown;
       try {
         await held.begin();

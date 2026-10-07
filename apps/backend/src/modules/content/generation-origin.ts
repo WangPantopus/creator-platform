@@ -128,7 +128,7 @@ export class PreparedContentGenerationOrigins {
       ...(input.signal ? [input.signal] : []),
       AbortSignal.timeout(6000),
     ]);
-    const held = new ContentHeldClient(client, signal);
+    const held = new ContentHeldClient(client, signal, input.workerPool);
     let failure: unknown;
     try {
       await held.begin();
