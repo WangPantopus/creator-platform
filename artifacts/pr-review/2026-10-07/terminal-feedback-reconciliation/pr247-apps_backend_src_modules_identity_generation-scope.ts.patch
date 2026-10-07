@@ -1,0 +1,95 @@
+diff --git a/apps/backend/src/modules/identity/generation-scope.ts b/apps/backend/src/modules/identity/generation-scope.ts
+index 1af4f080..3a008070 100644
+--- a/apps/backend/src/modules/identity/generation-scope.ts
++++ b/apps/backend/src/modules/identity/generation-scope.ts
+@@ -9,6 +9,8 @@ import {
+   generationOutputCursorSignature,
+ } from "./generation-output-cursor.js";
+ import { registeredMigration } from "../../db/reviewed-migration.js";
++import { assertGenerationLifecycleCatalogue } from "./generation-lifecycle.js";
++import { generationTerminalPageSource } from "./generation-terminal-page.js";
+ import { assertThreadScope, type ThreadScope } from "../access/scope.js";
+ import { assertCurrentSession, requestAuthority } from "./request-authority.js";
+ import {
+@@ -94,6 +96,15 @@ const terminalContracts = [
+       "83a56963f6c37e05b0850fa6a0e97475282fbfa3e90d1372f86bea701622e7bc",
+     signatures: ["creator.pending_generation_terminal_cursors(integer)"],
+   },
++  {
++    owner: "creator_generation_terminal_discovery",
++    originalScopeBridge: false,
++    version: "0227_w1_generation_terminal_page",
++    checksum: generationTerminalPageSource.checksum,
++    signatures: [
++      "creator.pending_generation_terminal_cursor_page(integer,uuid)",
++    ],
++  },
+ ] as const;
+ // Additive0215 revokes this legacy worker EXECUTE. It must not be relabelled
+ // as a generation consumer or accepted alongside the typed replacement.
+@@ -157,6 +168,7 @@ type GenerationScopeBinding = {
+   nonce: string;
+   transaction: string;
+   pid: number;
++  readonly signal?: AbortSignal;
+   current: GenerationTaskScope;
+ };
+ 
+@@ -232,6 +244,7 @@ async function assertGenerationCatalogue(
+   query: Pick<Pool, "query">,
+   input: GenerationCatalogue,
+ ): Promise<void> {
++  await assertGenerationLifecycleCatalogue(query);
+   const consumers = [...input.consumers, ...input.terminalConsumers];
+   const installed = (
+     await query.query<{ installed: boolean }>(
+@@ -460,7 +473,7 @@ export class GenerationIdentityAuthority {
+         .parse(input.consumers ?? []);
+       terminalConsumers = z
+         .array(terminalConsumerSchema)
+-        .max(10)
++        .max(11)
+         .parse(input.terminalConsumers ?? []);
+       const combined = [...consumers, ...terminalConsumers];
+       if (
+@@ -783,7 +796,13 @@ export class GenerationIdentityAuthority {
+                 )
+               ).rows[0],
+             );
+-          held = { client, nonce: proof.nonce, ...binding, current: scope };
++          held = {
++            client,
++            nonce: proof.nonce,
++            ...binding,
++            signal,
++            current: scope,
++          };
+           this.issued.set(scope, held);
+           await this.authorizeInTransaction(scope, client);
+           const value = await work(client, scope);
+@@ -888,6 +907,25 @@ export class GenerationIdentityAuthority {
+     return current;
+   }
+ 
++  /** Cancellation custody only, not permission. Return the original optional
++   * signal from this genuine current binding without issuing SQL or a scope.
++   * An unsignaled after-incurred settlement remains unsignaled. Cursor refresh
++   * retains this same private binding and cannot replace its original signal.
++   */
++  originalSignalInTransaction(
++    scope: GenerationTaskScope,
++    client: PoolClient,
++  ): AbortSignal | undefined {
++    this.assertWorker();
++    const binding = this.issued.get(scope);
++    invariant(
++      binding?.client === client && binding.current === scope,
++      "generation_scope_required",
++      "Use the current generation purpose transaction.",
++    );
++    return binding.signal;
++  }
++
+   /** Genuine issued object, exact held client, private transaction/PID/nonce
+    * and current durable lease. A cast/copied/retained scope is rejected. */
+   async authorizeInTransaction(

@@ -1,0 +1,107 @@
+diff --git a/apps/backend/src/modules/content/generation-origin.ts b/apps/backend/src/modules/content/generation-origin.ts
+index ba44a2d0..485dc4a0 100644
+--- a/apps/backend/src/modules/content/generation-origin.ts
++++ b/apps/backend/src/modules/content/generation-origin.ts
+@@ -67,6 +67,18 @@ export class PreparedContentGenerationOrigins {
+     private readonly catalogueChecksum: string,
+   ) {}
+ 
++  assertComposition(
++    identity: GenerationIdentityAuthority,
++    workerPool: Pool,
++  ): void {
++    invariant(
++      identity === this.identity,
++      "generation_content_origin_composition_mismatch",
++      "Content origins must use the original generation identity authority.",
++    );
++    this.identity.assertPool(workerPool);
++  }
++
+   static async prepare(input: {
+     identity: GenerationIdentityAuthority;
+     workerPool: Pool;
+@@ -79,6 +91,8 @@ export class PreparedContentGenerationOrigins {
+     profileFenceDefinitionChecksum: string;
+     /** Independently reviewed effective schema/table/column/RLS permissions. */
+     catalogueChecksum: string;
++    /** The caller's original cancellation; supplies no task or authority. */
++    signal?: AbortSignal;
+   }): Promise<PreparedContentGenerationOrigins> {
+     invariant(
+       input.identity instanceof GenerationIdentityAuthority,
+@@ -106,10 +120,15 @@ export class PreparedContentGenerationOrigins {
+       "Exact reviewed origin and signature writer receipts are required.",
+     );
+     input.identity.assertConsumerRegistered(input.consumer);
++    input.signal?.throwIfAborted();
+     const client = await input.workerPool.connect().catch((error: unknown) => {
+       throw originUnavailable(error);
+     });
+-    const held = new ContentHeldClient(client, AbortSignal.timeout(6000));
++    const signal = AbortSignal.any([
++      ...(input.signal ? [input.signal] : []),
++      AbortSignal.timeout(6000),
++    ]);
++    const held = new ContentHeldClient(client, signal, input.workerPool);
+     let failure: unknown;
+     try {
+       await held.begin();
+@@ -123,6 +142,7 @@ export class PreparedContentGenerationOrigins {
+           client,
+           input.profileFenceDefinitionChecksum,
+           input.catalogueChecksum,
++          signal,
+         ),
+       );
+       const proof = (
+@@ -242,12 +262,16 @@ export class PreparedContentGenerationOrigins {
+     client: PoolClient,
+     scope: GenerationTaskScope,
+     sources: readonly GenerationContentOriginSource[],
++    signal?: AbortSignal,
+   ): Promise<void> {
++    signal?.throwIfAborted();
+     await this.identity.authorizeInTransaction(scope, client);
++    signal?.throwIfAborted();
+     await assertOriginProfileFence(
+       client,
+       this.profileFenceDefinitionChecksum,
+       this.catalogueChecksum,
++      signal,
+     );
+     const selected = z.array(Source).min(1).max(1000).parse(sources);
+     invariant(
+@@ -288,12 +312,14 @@ export class PreparedContentGenerationOrigins {
+     );
+     let current: z.infer<typeof Origin>[];
+     try {
++      signal?.throwIfAborted();
+       const raw = (
+         await client.query<{ origins: unknown }>(
+           "SELECT creator.generation_content_origins($1,$2,$3::jsonb) AS origins",
+           [scope.generationId, scope.workerToken, JSON.stringify(distinct)],
+         )
+       ).rows[0]?.origins;
++      signal?.throwIfAborted();
+       current = z.array(Origin).min(1).max(1000).parse(raw);
+     } catch (error) {
+       if (
+@@ -326,6 +352,7 @@ export class PreparedContentGenerationOrigins {
+         "SELECT extract(epoch FROM clock_timestamp())::double precision AS epoch_seconds",
+       )
+     ).rows[0]?.epoch_seconds;
++    signal?.throwIfAborted();
+     invariant(
+       typeof currentTime === "number" &&
+         Number.isFinite(currentTime) &&
+@@ -347,7 +374,9 @@ export class PreparedContentGenerationOrigins {
+       client,
+       this.profileFenceDefinitionChecksum,
+       this.catalogueChecksum,
++      signal,
+     );
+     await this.identity.authorizeInTransaction(scope, client);
++    signal?.throwIfAborted();
+   }
+ }

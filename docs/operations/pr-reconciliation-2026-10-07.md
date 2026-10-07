@@ -10,7 +10,9 @@ The next accounting/privacy increment is implemented in `64682b52907928fa379db42
 
 Source review found the original #262 signal checks missing from #132. `0728b61fd44edebcefab38b105161c5aafee65cb` restores that exact file while retaining #302's consumer and newer client cleanup. [Complete preservation manifest](../../artifacts/pr-review/2026-10-07/conversation-commerce/source-preservation/manifest.json) accounts for every production path of #262/#301/#302, with complete diffs, original heads, historical supporting paths and [transferred acceptance](../../artifacts/pr-review/2026-10-07/conversation-commerce/source-preservation/README.md). These three were closed unmerged after publishing successor e0df89a7 and verifying exact heads and all original branches. [Actions](../../artifacts/pr-review/2026-10-07/conversation-commerce/source-preservation/actions.json) record the completed closures; this does not establish publication or full Commerce readiness.
 
-Native/media source from #284/#303/#305 is now reconciled at 3b0f8181 plus cross-domain/compiler repair 6812395a. [Every production path and remaining acceptance](../../artifacts/pr-review/2026-10-07/native-media-reconciliation/README.md) is recorded. Current hosted validation and source PR closeout remain next.
+Native/media source from #284/#303/#305 is now reconciled at 3b0f8181 plus cross-domain/compiler repair 6812395a. [Every production path and remaining acceptance](../../artifacts/pr-review/2026-10-07/native-media-reconciliation/README.md) is recorded. Hosted Android runtime and web/backend checks pass at 45bbc4da; source PR closeout remains next.
+
+Terminal #247 and finite development feedback #192 source are preserved at 5dd38cea/5db885f0, with [all production paths, repairs, validation and transferred gates](../../artifacts/pr-review/2026-10-07/terminal-feedback-reconciliation/README.md). No migration, catalogue acceptance or generation activation follows from source consolidation.
 
 ## Restoration integration update
 

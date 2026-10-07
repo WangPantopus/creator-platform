@@ -1,0 +1,29 @@
+diff --git a/apps/backend/src/modules/trust/store.ts b/apps/backend/src/modules/trust/store.ts
+index 37a86765..34802624 100644
+--- a/apps/backend/src/modules/trust/store.ts
++++ b/apps/backend/src/modules/trust/store.ts
+@@ -7,7 +7,7 @@ import { trustTransaction } from "./transaction.js";
+ export class TrustStore {
+   constructor(readonly pool: Pool) {}
+   async assertRole(worker = false): Promise<void> {
+-    return trustTransaction(
++    await trustTransaction(
+       this.pool,
+       async (client) => {
+         const result = await client.query<{
+@@ -61,11 +61,12 @@ export class TrustStore {
+       );
+     return trustTransaction(this.pool, async (client) => {
+       await client.query(
+-        "SELECT set_config('app.account_id',$1,true),set_config('lock_timeout','2000',true)",
++        `SELECT set_config('app.account_id',$1,true),
++          set_config('lock_timeout',least(nullif(setting::integer,0),2000)::text,true)
++         FROM pg_settings WHERE name='lock_timeout'`,
+         [actor.accountId],
+       );
+-      const result = await work(client);
+-      return result;
++      return work(client);
+     });
+   }
+ }

@@ -1,0 +1,38 @@
+diff --git a/apps/backend/src/modules/trust/transaction.ts b/apps/backend/src/modules/trust/transaction.ts
+index fca3591a..db1ec81b 100644
+--- a/apps/backend/src/modules/trust/transaction.ts
++++ b/apps/backend/src/modules/trust/transaction.ts
+@@ -55,8 +55,13 @@ export async function trustTransaction<T>(
+   let result!: T;
+   try {
+     // Await the bounded acquisition. Never abandon a late borrowed client.
+-    const client = await pool.connect();
+-    held = new ContentHeldClient(client, signal);
++    let client: PoolClient;
++    try {
++      client = await pool.connect();
++    } catch (cause) {
++      throw unavailable("trust_connection_unavailable", cause);
++    }
++    held = new ContentHeldClient(client, signal, pool);
+     await held.begin();
+     if (options.isolation === "read committed")
+       await held.run(() =>
+@@ -73,9 +78,16 @@ export async function trustTransaction<T>(
+     );
+     if (options.readOnly)
+       await held.run(() => client.query("SET TRANSACTION READ ONLY"));
+-    result = await held.run(() => work(client));
++    // Cancellation interrupts the actual database source, but cannot release
++    // its client while the original owner callback or finalizer still runs.
++    result = await work(client);
++    signal.throwIfAborted();
+     if (!options.readOnly) await held.commit();
+   } catch (cause) {
++    // A shorter pg read budget can reject before the host deadline while the
++    // server still runs its query. Cancel that same observed source as well.
++    if (querySettlementUncertain(cause) && !signal.aborted)
++      deadline.abort(cause);
+     failed = true;
+     failure =
+       signal.aborted ||

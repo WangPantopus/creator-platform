@@ -1,0 +1,357 @@
+{
+  "targetCommit": "5db885f09d90b15f817ece3c03106739a8e64136",
+  "terminalRepairCommit": "5dd38cea09f575d47c6f4a177b58f5682fdf2fe9",
+  "prs": [
+    {
+      "number": 247,
+      "sourceHead": "75bba77b53a5c0d0675309daed946f017d3d17bd",
+      "files": [
+        {
+          "path": "apps/backend/migrations/0093_w8_generation_worker_denial.sql",
+          "sourceBlob": "34ac260e6b3de8ad5e6bcc005e26e436d0771cf2",
+          "targetBlob": "34ac260e6b3de8ad5e6bcc005e26e436d0771cf2",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/migrations/0100_w8_generation_terminal_denial.sql",
+          "sourceBlob": "873cf1a01e36ac540cb64c7ebc0d224fc4c290c8",
+          "targetBlob": "873cf1a01e36ac540cb64c7ebc0d224fc4c290c8",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/core/errors.ts",
+          "sourceBlob": "d530f5b2117406efb5541117b61ef30fe008d8c4",
+          "targetBlob": "d530f5b2117406efb5541117b61ef30fe008d8c4",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/core/purpose-catalogue.ts",
+          "sourceBlob": "a912a65cfce6219fb717970c0738ffad8de558ce",
+          "targetBlob": "29148f2c09b84e7d2d74c8888f18d5f84ec0a82a",
+          "classification": "reconciled",
+          "review": "Retain bounded actual-query options, shorter source deadlines and original AbortSignal checks.",
+          "difference": "pr247-apps_backend_src_core_purpose-catalogue.ts.patch",
+          "sha256": "2e82d9c25703574a7335e6e74f858e87f86945e3a13b52257507c70c60846314"
+        },
+        {
+          "path": "apps/backend/src/core/query-settlement.ts",
+          "sourceBlob": "804aeb8eb1889516cd0d4d6077cea251cfc7cded",
+          "targetBlob": "804aeb8eb1889516cd0d4d6077cea251cfc7cded",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/agent/generation-profile-bound.ts",
+          "sourceBlob": "1c7cb88770fbaf59b0a1fc4f27b4a5080681bbb5",
+          "targetBlob": "1c7cb88770fbaf59b0a1fc4f27b4a5080681bbb5",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/agent/migrations/0096_w2_generation_input_consumers.sql",
+          "sourceBlob": "cbfa79dd584c1ba28a4c32841358cb6e1951e3c7",
+          "targetBlob": "cbfa79dd584c1ba28a4c32841358cb6e1951e3c7",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/agent/migrations/0097_w2_generation_attempt_admission.sql",
+          "sourceBlob": "d91e0557304901882c5db2de20a4d6e21f8748db",
+          "targetBlob": "d91e0557304901882c5db2de20a4d6e21f8748db",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/agent/migrations/0104_w2_generation_retrieval_context.sql",
+          "sourceBlob": "e0afad13d15c962cc95757c2cbcea38321e2bb6a",
+          "targetBlob": "e0afad13d15c962cc95757c2cbcea38321e2bb6a",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/agent/migrations/pending_w2_generation_agent_metadata.sql",
+          "sourceBlob": "fc8972c3a8b6650ad6aa1f5d720c7be5e49f53ff",
+          "targetBlob": "fc8972c3a8b6650ad6aa1f5d720c7be5e49f53ff",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/agent/migrations/pending_w2_generation_guardrail_event.sql",
+          "sourceBlob": "2eaa573ecfdf2459807df71c355f4698d9c51c52",
+          "targetBlob": "2eaa573ecfdf2459807df71c355f4698d9c51c52",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/agent/migrations/pending_w2_generation_profile_bound.sql",
+          "sourceBlob": "095891078e059e01d7847dfd40eac9cd4bd0b8ec",
+          "targetBlob": "095891078e059e01d7847dfd40eac9cd4bd0b8ec",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/generation-audience.ts",
+          "sourceBlob": "1291a847f7153ed7486adc25c2fa5b51f70b9de9",
+          "targetBlob": "397342b95090502a8bd3f634315d774bedc95a59",
+          "classification": "reconciled",
+          "review": "Retain genuine generation host database identity and original preparation signal.",
+          "difference": "pr247-apps_backend_src_modules_commerce_generation-audience.ts.patch",
+          "sha256": "d394c8ae92ed1bd36e5ae6129a87c1ab3240d281038033539cb1b8ef61949e12"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/generation-safety-terminal-catalogue.ts",
+          "sourceBlob": "4db27145c7cc0638c1bef9052f4ee04adad37df5",
+          "targetBlob": "9d6cabc65bd1a9f06dd50418b27dc8c44275f352",
+          "classification": "reconciled",
+          "review": "Correct implicit sequence ACL defaults using PostgreSQL lowercase s; effective existing 100/101 catalogues remain unchanged.",
+          "difference": "pr247-apps_backend_src_modules_commerce_generation-safety-terminal-catalogue.ts.patch",
+          "sha256": "45ba3dbb3ae9ba74265961febfc106b544f7bdc4909f97043f839ab559a78c76"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/generation-safety-terminal-settlement.ts",
+          "sourceBlob": "c398322fb27f5bad240d1d9f9073d9958cb4e7f3",
+          "targetBlob": "5f46a191f64250469e0a3d7dbe0b9d88436770a8",
+          "classification": "reconciled",
+          "review": "Restore original terminal scope signal checks before and after each awaited operation; retain newer composition and acceptance checks.",
+          "difference": "pr247-apps_backend_src_modules_commerce_generation-safety-terminal-settlement.ts.patch",
+          "sha256": "3252aa74c7888af252ae24c52c98261d60f8550d059bcbc7b03bced96810f28e"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/schema-generation-audience-profile-fence.sql",
+          "sourceBlob": "ca451eaa8e980afcd15c0ce46cf70c299e840e52",
+          "targetBlob": "ca451eaa8e980afcd15c0ce46cf70c299e840e52",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/schema-generation-safety-terminal-settlement.sql",
+          "sourceBlob": "6b5c05be97618c5f15fcb4effef3ad0c94aa1488",
+          "targetBlob": "6b5c05be97618c5f15fcb4effef3ad0c94aa1488",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/content/generation-origin-profile.ts",
+          "sourceBlob": "658560e3d5aa944be9a09d27609e5634029460a2",
+          "targetBlob": "0d0835e65b15d70791d0ac8c361f6cd2e49a27bb",
+          "classification": "reconciled",
+          "review": "Retain original finite deadlines, original signal and current owner composition checks.",
+          "difference": "pr247-apps_backend_src_modules_content_generation-origin-profile.ts.patch",
+          "sha256": "d0c2e1531bab74f2ffc3d6001f4c46caf43b55d534d843bf1d8a6a196e634c83"
+        },
+        {
+          "path": "apps/backend/src/modules/content/generation-origin.ts",
+          "sourceBlob": "ba44a2d0d4d0ca063ea19645677247973746b589",
+          "targetBlob": "485dc4a0b2c999142b7e0bd55ed038478197a9d4",
+          "classification": "reconciled",
+          "review": "Retain original finite deadlines, original signal and current owner composition checks.",
+          "difference": "pr247-apps_backend_src_modules_content_generation-origin.ts.patch",
+          "sha256": "fc6129f6e8c561b226660e52f4df76eddc1895d0521fcc95bb1e48d8658c2ff6"
+        },
+        {
+          "path": "apps/backend/src/modules/content/held-client-cleanup.ts",
+          "sourceBlob": "1028b70267403175ffe8467f31ed7f66055c09b5",
+          "targetBlob": "7e9bf7b1f9d4b7ebc444e91de13ceb65c898369e",
+          "classification": "reconciled",
+          "review": "Retain newer actual source PID cancellation using the original pool and await the owner callback and cleanup; no abandoned timeout race.",
+          "difference": "pr247-apps_backend_src_modules_content_held-client-cleanup.ts.patch",
+          "sha256": "bde0463e0fcf13ab9b6aeae7909e5cb213e09d756c580be19aaf4be8f24ac182"
+        },
+        {
+          "path": "apps/backend/src/modules/content/integration.ts",
+          "sourceBlob": "608a1fd73604b6c829398abd680af857d7e5438d",
+          "targetBlob": "179c19097b2293643ff4e24d1b4710c2711633f1",
+          "classification": "reconciled",
+          "review": "Original integration retained with newer same-owner privacy/export preparation.",
+          "difference": "pr247-apps_backend_src_modules_content_integration.ts.patch",
+          "sha256": "e5c77c6b38b6caa8c2e8a6c6901801cde9317db7038b685c67d07cc85efe26f5"
+        },
+        {
+          "path": "apps/backend/src/modules/content/schema-generation-origin-profile-fence.sql",
+          "sourceBlob": "458cfe1521bd0ab4349f29bc4eeca96fe8ede53c",
+          "targetBlob": "458cfe1521bd0ab4349f29bc4eeca96fe8ede53c",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/conversation/generation-context.ts",
+          "sourceBlob": "2372d5b300452c680d7b86a47f02cd50dbb78e8f",
+          "targetBlob": "f88669d9b3765c1ccc8db7d56200507df17c1391",
+          "classification": "reconciled",
+          "review": "Retain genuine same-host database, original signal and composition identity checks.",
+          "difference": "pr247-apps_backend_src_modules_conversation_generation-context.ts.patch",
+          "sha256": "de1bcba719fe888257803870055d2ba2317deea83e3ef66b1d67db09cd8668be"
+        },
+        {
+          "path": "apps/backend/src/modules/conversation/generation-terminal.ts",
+          "sourceBlob": "7635f3424c06641ca6cb1fae130fa94ab3189bf2",
+          "targetBlob": "b24a4d0f1d788b846f40582b9339e498d7e4447b",
+          "classification": "reconciled",
+          "review": "Retain genuine same-host database, original signal and composition identity checks.",
+          "difference": "pr247-apps_backend_src_modules_conversation_generation-terminal.ts.patch",
+          "sha256": "1c872e379ed3e7da7301e037e062061ec8b988c42c6b5d76c6da07e9bfa024be"
+        },
+        {
+          "path": "apps/backend/src/modules/conversation/migrations/0095_w3_generation_purpose_consumers.sql",
+          "sourceBlob": "49290f8b5524a9521e87810e90fd5ad9c71abd59",
+          "targetBlob": "49290f8b5524a9521e87810e90fd5ad9c71abd59",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/conversation/migrations/pending_w3_generation_context_profile_bound.sql",
+          "sourceBlob": "7327a9b68a424b00a2d0a734cbe67b003ab92f9a",
+          "targetBlob": "7327a9b68a424b00a2d0a734cbe67b003ab92f9a",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/conversation/migrations/pending_w3_terminal_only_finalization.sql",
+          "sourceBlob": "69200bc8fc751c33757fcf5c4cc77452cb7e4a30",
+          "targetBlob": "69200bc8fc751c33757fcf5c4cc77452cb7e4a30",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/conversation/migrations/pending_w3_worker_output.sql",
+          "sourceBlob": "88e71cbf6a31edef380e8a798b0713cee43f7482",
+          "targetBlob": "88e71cbf6a31edef380e8a798b0713cee43f7482",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/identity/generation-output-cursor.ts",
+          "sourceBlob": "62007ca4093079d488c2e039726d05d096db0c0b",
+          "targetBlob": "18e83567d619e8abff2de39f20ed3e811b7064d1",
+          "classification": "reconciled",
+          "review": "Retain reviewed original 100/101 profiles and complete source/page checks; no pin inferred from unrelated source.",
+          "difference": "pr247-apps_backend_src_modules_identity_generation-output-cursor.ts.patch",
+          "sha256": "f9e0f96ed464ad42723c7ff3059fd64c17af3c76be82e180e397c288d5a93006"
+        },
+        {
+          "path": "apps/backend/src/modules/identity/generation-scope.ts",
+          "sourceBlob": "1af4f080c7eff7fa78e0f473eab35f3f8e20f34c",
+          "targetBlob": "3a0080709c07aea60c304895885d29a041e98312",
+          "classification": "reconciled",
+          "review": "Retain newer lifecycle and paged terminal consumer with original generation signal access.",
+          "difference": "pr247-apps_backend_src_modules_identity_generation-scope.ts.patch",
+          "sha256": "932d82d56e358e5c0d408b2e3b399102fd19953f1aaaba4f2931eac2091fed0a"
+        },
+        {
+          "path": "apps/backend/src/modules/identity/generation-terminal-discovery.ts",
+          "sourceBlob": "ff1fbc1d4fd657735472aceacf20f0fa3b6a8d45",
+          "targetBlob": "2e1be9e71f3159e52aaa3409bb5210256f2ca1f8",
+          "classification": "reconciled",
+          "review": "Retain reviewed 100/101 catalogue profile and bounded paging, original source identity and lifecycle.",
+          "difference": "pr247-apps_backend_src_modules_identity_generation-terminal-discovery.ts.patch",
+          "sha256": "959c47095c5c20ab5d119e40f5c36675b13e01a8fd4adc07ac1753bfeba93aec"
+        },
+        {
+          "path": "apps/backend/src/modules/identity/generation-terminal.ts",
+          "sourceBlob": "869b81b897f413e28ad63c9b81ae4b7e2bf594f2",
+          "targetBlob": "2472a0c41f7e61fd22b2623994bfc358659cbe9b",
+          "classification": "reconciled",
+          "review": "Restore exact original signal custody in the private terminal WeakMap and same held-client accessor; retain lifecycle and paged recovery.",
+          "difference": "pr247-apps_backend_src_modules_identity_generation-terminal.ts.patch",
+          "sha256": "aac09cb783d8c1952aad7b2ba56fe285c06a8b68355e8a17c5114eb25ff9f8cd"
+        },
+        {
+          "path": "apps/backend/src/modules/identity/generation-transaction.ts",
+          "sourceBlob": "bd605902e38839066edf0e484e947e11f1cc2356",
+          "targetBlob": "bd605902e38839066edf0e484e947e11f1cc2356",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/identity/schema-generation-output-cursor.sql",
+          "sourceBlob": "bcb8dd5ea5361562ff13f3ad5466b964051eea76",
+          "targetBlob": "bcb8dd5ea5361562ff13f3ad5466b964051eea76",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/identity/schema-generation-scope.sql",
+          "sourceBlob": "a0ba7fcedccb9cce075c41af28694c3b1b5db7b7",
+          "targetBlob": "a0ba7fcedccb9cce075c41af28694c3b1b5db7b7",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/identity/schema-generation-terminal-discovery.sql",
+          "sourceBlob": "21c4c0d3c76928c5504be834b63b82a11c6a18b6",
+          "targetBlob": "21c4c0d3c76928c5504be834b63b82a11c6a18b6",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/workers/generation-terminal.ts",
+          "sourceBlob": "005cb2f6fc2c0c606fd0fdfe9d24a2fbac5f3829",
+          "targetBlob": "cdd081647b122577cd517b298c464a540b7c7a73",
+          "classification": "reconciled",
+          "review": "Retain bounded paged recovery to avoid starvation behind unknown receipts, preserving aggregate failures.",
+          "difference": "pr247-apps_backend_src_workers_generation-terminal.ts.patch",
+          "sha256": "1aaff591d1aef8d6552e0c1497f8bcd010195f8fbdc14fbe1df1e1479414d15b"
+        }
+      ],
+      "historicalSupportingPaths": [
+        "artifacts/workstreams/W4/runtime/2026-10-03/generation-safety-terminal/README.md",
+        "artifacts/workstreams/W4/runtime/2026-10-03/web-fan-current-deadline/README.md",
+        "docs/workstreams/implementation/W4-completion-2026-10-01.md",
+        "docs/workstreams/status/W4.md"
+      ]
+    },
+    {
+      "number": 192,
+      "sourceHead": "05225166284225b966a0606192bbbb77821cc18b",
+      "files": [
+        {
+          "path": "apps/backend/migrations/0207_w8_development_feedback_lifecycle.sql",
+          "sourceBlob": "655e677e9f6f4eb9fde35094e32dbb598fa6727a",
+          "targetBlob": "655e677e9f6f4eb9fde35094e32dbb598fa6727a",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/trust/development-feedback-catalog.ts",
+          "sourceBlob": "f001c9d0b8cd389b87da1c84a5ee3b6565b9e858",
+          "targetBlob": "f001c9d0b8cd389b87da1c84a5ee3b6565b9e858",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/trust/development-feedback.ts",
+          "sourceBlob": "5680050c2957ba2a2ef5eab11602f6176be17c62",
+          "targetBlob": "5680050c2957ba2a2ef5eab11602f6176be17c62",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/trust/development.ts",
+          "sourceBlob": "23bc2a9397087426517b6af8d1c0f78357549e2f",
+          "targetBlob": "3cfa0ac03b73d49a559ac47d07ba74f187f9b258",
+          "classification": "reconciled",
+          "review": "Restore original held read-only startup role/projection checks while preserving current Content/Agent/Commerce protected privacy composition.",
+          "difference": "pr192-apps_backend_src_modules_trust_development.ts.patch",
+          "sha256": "2176d6acf9eaf5501e739d9d6f73a540e0c0c1f1e76ce21f5be1f13429e00db2"
+        },
+        {
+          "path": "apps/backend/src/modules/trust/restoration.ts",
+          "sourceBlob": "0acf53ef30c893b980b76ae727a80ee9533a6c76",
+          "targetBlob": "0acf53ef30c893b980b76ae727a80ee9533a6c76",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/trust/store.ts",
+          "sourceBlob": "37a86765da6e56f9f32d2a045b4dfbdfcdb8e00c",
+          "targetBlob": "34802624e9cec3c2ff7c97fdcd1f13a3e8f44815",
+          "classification": "reconciled",
+          "review": "Retain actual original callback completion and preserve shorter existing lock timeout.",
+          "difference": "pr192-apps_backend_src_modules_trust_store.ts.patch",
+          "sha256": "62a2a702c883bde1f95f36aab27ddb5525841588faef3c443629663567ae77be"
+        },
+        {
+          "path": "apps/backend/src/modules/trust/transaction.ts",
+          "sourceBlob": "fca3591a36fcedd1f9653d5a46881354bf959e96",
+          "targetBlob": "db1ec81b73c9a8f99e762f491b59a168dc8ce1b2",
+          "classification": "reconciled",
+          "review": "Restore explicit READ COMMITTED before the first transactional query; retain current bounded borrow failure, original PID cancellation and awaited callback/cleanup.",
+          "difference": "pr192-apps_backend_src_modules_trust_transaction.ts.patch",
+          "sha256": "6f5840be88a4fc9f1b295e1e0f5e683e72c3624a70c087959436bbde5f56d2f1"
+        },
+        {
+          "path": "infra/migrations.json",
+          "sourceBlob": "aad870afd47b1f11dd62f8722e1a9946bb39cd54",
+          "targetBlob": "cda32363348e3bc85e6bcd51d5da0522b5e8918c",
+          "classification": "reconciled",
+          "review": "Preserve original 0207 source checksum and held policy reason alongside the current 101 active registrations and other reservations. 0207 remains reserved_unapplied.",
+          "difference": "pr192-infra_migrations.json.patch",
+          "sha256": "c3d7b69ec7f2fb00edb8e46aef284ddb58bc97daed5b1e1227fd875b4f81be8f"
+        }
+      ],
+      "historicalSupportingPaths": [
+        "docs/operations/W8-development-feedback.md",
+        "docs/workstreams/coordination/W8-contracts.md",
+        "docs/workstreams/handoffs/W8-resume-prompt.md",
+        "docs/workstreams/status/W8.md"
+      ]
+    }
+  ]
+}

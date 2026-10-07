@@ -1,0 +1,52 @@
+{
+  "rows": [
+    {
+      "database": "creator_w2_archive_adoption_candidate",
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "priorChecksum": "a3afc67c879715585499413b105ee9e4d8ee609c1562c8a49ea2042de65b7873",
+      "correctedChecksum": "a3afc67c879715585499413b105ee9e4d8ee609c1562c8a49ea2042de65b7873",
+      "changedRelations": []
+    },
+    {
+      "database": "creator_w2_recovered101_restore",
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "priorChecksum": "a3afc67c879715585499413b105ee9e4d8ee609c1562c8a49ea2042de65b7873",
+      "correctedChecksum": "a3afc67c879715585499413b105ee9e4d8ee609c1562c8a49ea2042de65b7873",
+      "changedRelations": []
+    },
+    {
+      "database": "creator_w2_recovered100_restore",
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "priorChecksum": "cf13fe99e8f135a00b2a9e0b220fefcb4535ce9f20c46c2db0e84b5b619eec30",
+      "correctedChecksum": "cf13fe99e8f135a00b2a9e0b220fefcb4535ce9f20c46c2db0e84b5b619eec30",
+      "changedRelations": []
+    },
+    {
+      "database": "creator_pr132_privacy4_20261007",
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "priorChecksum": "a3afc67c879715585499413b105ee9e4d8ee609c1562c8a49ea2042de65b7873",
+      "correctedChecksum": "a3afc67c879715585499413b105ee9e4d8ee609c1562c8a49ea2042de65b7873",
+      "changedRelations": []
+    }
+  ],
+  "drift": {
+    "actualNullSequenceDefaults": true,
+    "priorInventedTablePrivileges": true,
+    "explicitEquivalentSequenceDefaults": true,
+    "expandedGrantDetected": true
+  },
+  "rolledBack": true,
+  "metadataOnly": true
+}
