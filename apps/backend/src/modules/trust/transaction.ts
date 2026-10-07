@@ -20,7 +20,11 @@ function unavailable(code: string, cause: unknown) {
 export async function trustTransaction<T>(
   pool: Pool,
   work: (client: PoolClient) => Promise<T>,
-  options: Readonly<{ readOnly?: boolean; signal?: AbortSignal }> = {},
+  options: Readonly<{
+    readOnly?: boolean;
+    isolation?: "read committed";
+    signal?: AbortSignal;
+  }> = {},
 ): Promise<T> {
   options.signal?.throwIfAborted();
   const connectionBudget = pool.options.connectionTimeoutMillis;
@@ -59,6 +63,10 @@ export async function trustTransaction<T>(
     }
     held = new ContentHeldClient(client, signal, pool);
     await held.begin();
+    if (options.isolation === "read committed")
+      await held.run(() =>
+        client.query("SET TRANSACTION ISOLATION LEVEL READ COMMITTED"),
+      );
     // The core pool does not set a server timeout. Bound its actual source
     // query too, preserving any shorter existing timeout on this client.
     await held.run(() =>

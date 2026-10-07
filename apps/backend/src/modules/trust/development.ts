@@ -14,6 +14,7 @@ import {
 import { createPrivacyConsumers } from "./privacy-consumers.js";
 import { COMMERCE_PRIVACY_CONFIGURATION } from "../commerce/privacy-purpose.js";
 import { trustLocalRestorationInTransaction } from "./restoration.js";
+import { trustTransaction } from "./transaction.js";
 import { PrivateFileArtifacts } from "./private-file-artifacts.js";
 import { registeredContentPrivacyProfile } from "../../db/content-privacy-profile.js";
 import { ContentPrivacyExport } from "../content/privacy-export.js";
@@ -55,16 +56,19 @@ async function assertDevelopmentPoolRole(
   expected: string,
   members: readonly string[] = [],
 ) {
-  const result = await pool.query<{
-    role: string;
-    login: boolean;
-    inherits: boolean;
-    unsafe: boolean;
-    runtime: boolean;
-    growth: boolean;
-    direct: boolean;
-  }>(
-    `WITH RECURSIVE roles(oid) AS (
+  const result = await trustTransaction(
+    pool,
+    async (client) =>
+      client.query<{
+        role: string;
+        login: boolean;
+        inherits: boolean;
+        unsafe: boolean;
+        runtime: boolean;
+        growth: boolean;
+        direct: boolean;
+      }>(
+        `WITH RECURSIVE roles(oid) AS (
        SELECT oid FROM pg_roles WHERE rolname=current_user
        UNION SELECT m.roleid FROM pg_auth_members m JOIN roles r ON r.oid=m.member
      ) SELECT current_user AS role,
@@ -90,7 +94,9 @@ async function assertDevelopmentPoolRole(
        EXISTS(SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace,
          LATERAL aclexplode(p.proacl) a WHERE n.nspname IN ('creator','creator_trust','growth')
          AND a.grantee=(SELECT oid FROM pg_roles WHERE rolname=current_user)) AS direct`,
-    [[expected, ...members]],
+        [[expected, ...members]],
+      ),
+    { readOnly: true },
   );
   const role = result.rows[0];
   if (
@@ -193,8 +199,13 @@ export async function createDevelopmentTrust(
     );
     await assertDevelopmentPoolRole(apiPool, "creator_trust_runtime");
     await assertDevelopmentPoolRole(workerPool, "creator_trust_worker");
-    const projection = await runtime.pool.query(
-      "SELECT to_regprocedure('creator_trust.runtime_thread_denial(uuid,uuid)') AS function",
+    const projection = await trustTransaction(
+      runtime.pool,
+      (client) =>
+        client.query(
+          "SELECT to_regprocedure('creator_trust.runtime_thread_denial(uuid,uuid)') AS function",
+        ),
+      { readOnly: true },
     );
     if (!projection.rows[0]?.function)
       throw new Error("Development trust requires migration 0053.");
