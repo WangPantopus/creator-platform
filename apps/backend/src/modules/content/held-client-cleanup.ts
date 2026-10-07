@@ -87,6 +87,9 @@ export class ContentHeldClient {
           );
           const controller = new Client({
             ...this.sourcePool.options,
+            // pg-pool hides this property from object spread. Preserve the
+            // original password or password provider for cancellation too.
+            password: this.sourcePool.options.password,
             connectionTimeoutMillis:
               Number.isFinite(original) && original > 0
                 ? Math.min(original, 1500)

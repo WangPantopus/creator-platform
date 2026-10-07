@@ -1,0 +1,205 @@
+{
+  "base": "f1471a87f8ec4262968d7fed1cb57fcaba86797c",
+  "recordedAt": "2026-10-07T08:55:27.550102+00:00",
+  "scope": "Original Trust transaction drainage and original cancellation credentials; no privacy/generation authority or activation changes.",
+  "before": {
+    "scope": "Real original Trust transaction helper and original non-owner worker connection against a real PostgreSQL table lock. No privacy tasks, leases, clocks, scopes or receipts are fabricated. No business rows mutated.",
+    "observations": [
+      {
+        "mode": "caller",
+        "elapsedMs": 25,
+        "returned": true,
+        "callbackSettledAtReturn": true,
+        "remainingAtReturn": 1,
+        "sourceGone": true,
+        "replacementPid": true,
+        "codes": [
+          "trust_transaction_unavailable",
+          "Original caller cancelled its actual database work"
+        ],
+        "callbackElapsedMs": 25
+      }
+    ],
+    "counts": {
+      "migrations": 61,
+      "privacyjobs": 18,
+      "usage": 0
+    }
+  },
+  "initialRepairFailure": {
+    "cause": "pg-pool makes password non-enumerable; spreading pool.options omitted the original explicit password.",
+    "codes": [
+      "trust_client_settlement_unavailable",
+      "trust_transaction_unavailable",
+      "Connection terminated",
+      "SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"
+    ],
+    "remainingAtReturn": 1,
+    "goneWithinTwoSeconds": false,
+    "disposition": "Explicitly forward the original password or password provider in all three cancellation clients. Preserve original failure in review."
+  },
+  "direct": {
+    "scope": "Real original Trust transaction helper and original non-owner worker connection against a real PostgreSQL table lock. No privacy tasks, leases, clocks, scopes or receipts are fabricated. No business rows mutated.",
+    "observations": [
+      {
+        "mode": "caller",
+        "elapsedMs": 41,
+        "returned": true,
+        "callbackSettledAtReturn": true,
+        "remainingAtReturn": 0,
+        "sourceGone": true,
+        "replacementPid": true,
+        "codes": ["trust_transaction_unavailable", "57014"],
+        "callbackElapsedMs": 36
+      },
+      {
+        "mode": "read_budget",
+        "elapsedMs": 178,
+        "returned": true,
+        "callbackSettledAtReturn": true,
+        "remainingAtReturn": 0,
+        "sourceGone": true,
+        "replacementPid": true,
+        "codes": ["trust_transaction_unavailable", "Query read timeout"],
+        "callbackElapsedMs": 163
+      },
+      {
+        "mode": "host_budget",
+        "elapsedMs": 5015,
+        "returned": true,
+        "callbackSettledAtReturn": true,
+        "remainingAtReturn": 0,
+        "sourceGone": true,
+        "replacementPid": true,
+        "codes": ["trust_transaction_unavailable", "57014"],
+        "callbackElapsedMs": 5010
+      },
+      {
+        "mode": "password_provider",
+        "elapsedMs": 34,
+        "returned": true,
+        "callbackSettledAtReturn": true,
+        "remainingAtReturn": 0,
+        "sourceGone": true,
+        "replacementPid": true,
+        "passwordCalls": 3,
+        "codes": ["trust_transaction_unavailable", "57014"],
+        "callbackElapsedMs": 30
+      },
+      {
+        "mode": "connection_string",
+        "elapsedMs": 34,
+        "returned": true,
+        "callbackSettledAtReturn": true,
+        "remainingAtReturn": 0,
+        "sourceGone": true,
+        "replacementPid": true,
+        "codes": ["trust_transaction_unavailable", "57014"],
+        "callbackElapsedMs": 30
+      },
+      {
+        "mode": "callback_finalizer",
+        "elapsedMs": 182,
+        "returned": true,
+        "callbackSettledAtReturn": true,
+        "remainingAtReturn": 0,
+        "sourceGone": true,
+        "replacementPid": true,
+        "codes": ["trust_transaction_unavailable", "57014"],
+        "callbackElapsedMs": 182
+      }
+    ],
+    "counts": {
+      "migrations": 61,
+      "privacyjobs": 18,
+      "usage": 0
+    }
+  },
+  "agent": {
+    "scope": "Original Agent transaction and canonical role metadata query only; not a prepared export, task or provider receipt.",
+    "observations": [
+      {
+        "passwordProvider": false,
+        "elapsedMs": 46,
+        "sourceBackendGone": true,
+        "poolReusable": true,
+        "code": "57014"
+      },
+      {
+        "passwordProvider": true,
+        "providerCalls": 3,
+        "elapsedMs": 32,
+        "sourceBackendGone": true,
+        "poolReusable": true,
+        "code": "57014"
+      }
+    ]
+  },
+  "canonicalHost": {
+    "scope": "Actual canonical development session and HTTP account export; original Identity hook, TrustWorker claim, acknowledgement failure and second lease; actual Support HTTP failure/retry/replay. Faults are PostgreSQL locks only. No fake task, lease, policy, receipt or privacy completion.",
+    "observed": [
+      {
+        "event": "original_hook_finished_before_acknowledgement_lock"
+      },
+      {
+        "event": "actual_acknowledgement_source_cancelled",
+        "elapsedFromBlockedObservationMs": 5016,
+        "originalTaskStillRunning": true,
+        "sourceBackendGone": true
+      },
+      {
+        "event": "original_worker_recorded_retry",
+        "state": "retry",
+        "error_code": "trust_transaction_unavailable",
+        "attempts": 1
+      },
+      {
+        "event": "original_second_lease_complete",
+        "state": "complete",
+        "error_code": null,
+        "attempts": 2
+      },
+      {
+        "event": "actual_support_lock_failure",
+        "elapsedMs": 2025,
+        "status": 503,
+        "code": "service_unavailable",
+        "committedCommands": 0
+      },
+      {
+        "event": "support_retry_and_replay",
+        "sameReport": true,
+        "committedCommands": 1
+      }
+    ],
+    "counts": {
+      "migrations": 61,
+      "sessions": 12,
+      "privacy_jobs": 19,
+      "usage": 0
+    },
+    "allOwnedPoolsClosed": true,
+    "remainingRuntimeBackends": 0,
+    "limits": [
+      "Identity contribution only; other unavailable domains remain blocked and all-eight export/download remain unqualified.",
+      "No held migrations, provider, generation, store credential or native changes."
+    ]
+  },
+  "validation": {
+    "backendBuild": "passed under existing shared heavy-build lock",
+    "scopedLintFormat": "passed",
+    "existingTests": 18,
+    "existingTestFiles": 2,
+    "testDurationSeconds": 97.5,
+    "foundationTests": 9,
+    "contractTests": 9,
+    "t11Seconds": 94.349,
+    "t11IsAppP95": false,
+    "testLogSHA256": "2a6ae1df74ab3509df99c386c6ce78602bfeffe7e97cd53d85feb7763025e672"
+  },
+  "limits": [
+    "PreparedAgentPrivacyExport has the same credential-forwarding correction by source review; no prepared export owner/task was manufactured to exercise its private method.",
+    "No TLS/production credential rotation, provider call, completed all-eight export or native journey was operated.",
+    "A host deadline initiates cancellation; the transaction waits for its original callback/finalizer, so five seconds is not an unconditional return deadline."
+  ]
+}
