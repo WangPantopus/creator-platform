@@ -1,0 +1,98 @@
+{
+  "recordedAt": "2026-10-07T09:36:56.637295+00:00",
+  "base": "3085cf6d3addc8f8b85cd4a84b3ce0449f2558db",
+  "before": {
+    "scope": "Original Agent transaction and canonical role metadata query only; not a prepared export, task or provider receipt.",
+    "observations": [
+      {
+        "passwordProvider": false,
+        "elapsedMs": 174,
+        "sourceBackendGone": false,
+        "poolReusable": true
+      }
+    ]
+  },
+  "after": {
+    "scope": "Original Agent transaction and canonical role metadata query only; not a prepared export, task or provider receipt.",
+    "observations": [
+      {
+        "passwordProvider": false,
+        "elapsedMs": 186,
+        "sourceBackendGone": true,
+        "poolReusable": true
+      },
+      {
+        "passwordProvider": true,
+        "providerCalls": 3,
+        "elapsedMs": 182,
+        "sourceBackendGone": true,
+        "poolReusable": true
+      }
+    ]
+  },
+  "actualHost": {
+    "scope": "Actual canonical development session and HTTP account export; original Agent hook, current original task, metadata read timeout, source cancellation, retry and second lease. PostgreSQL lock plus supported pg.defaults.query_timeout=150 in this review process only. No task, lease, clock, authority or receipt manufactured.",
+    "observed": [
+      {
+        "event": "original_hook_failure",
+        "error": "Error: Query read timeout",
+        "code": null
+      },
+      {
+        "event": "original_agent_task_source_cancelled",
+        "elapsedMs": 177,
+        "sourceBackendGone": true,
+        "error": "Error: Query read timeout",
+        "code": null
+      },
+      {
+        "event": "actual_first_lease_retry",
+        "state": "retry",
+        "error_code": "domain_hook_error",
+        "attempts": 1
+      },
+      {
+        "event": "actual_second_lease_empty_family_complete",
+        "state": "complete",
+        "error_code": null,
+        "attempts": 2
+      },
+      {
+        "event": "actual_empty_creator_family",
+        "owned_creators": 0,
+        "receipt": {
+          "domain": "agent",
+          "exportedCreators": 0
+        }
+      }
+    ],
+    "counts": {
+      "migrations": 61,
+      "sessions": 17,
+      "privacy_jobs": 22,
+      "usage": 0
+    },
+    "allOwnedPoolsClosed": true,
+    "remainingRuntimeBackends": 0,
+    "limits": [
+      "Original Agent contribution covers only its genuine empty creator family. No populated prepared stream/artifact or all-eight privacy completion.",
+      "No held migrations, provider, generation, store credential or native changes."
+    ]
+  },
+  "diagnostics": [
+    "First host observation filtered on SQL text containing schema_migration; actual blocked catalogue query did not match, so the observation timed out. The original task still failed/retried; no success claimed.",
+    "Second host attempt observed actual source cancellation and retry, but incorrectly expected missing export preparation to block an empty ownership family. Actual canonical Agent branch correctly completed its empty contribution on attempt2. Final repeat checks the actual empty-family receipt."
+  ],
+  "validation": {
+    "shippingBuild": "passed under original W8 shared heavy-build lock",
+    "typecheck": "passed",
+    "eslint": "passed",
+    "prettier": "passed",
+    "existingBackendTests": "18 passed; see external backend-tests.log"
+  },
+  "limits": [
+    "No populated prepared export or complete privacy/expiry/account deletion qualification.",
+    "No schema, grant, role, registration, task, lease, policy, provider or activation change.",
+    "A deadline initiates cancellation; original callbacks/finalizers must still settle. Uncertain COMMIT remains uncertain."
+  ]
+}
