@@ -1,0 +1,307 @@
+{
+  "targetCommit": "0728b61fd44edebcefab38b105161c5aafee65cb",
+  "prs": [
+    {
+      "number": 262,
+      "sourceHead": "27cde2b04b65c8b29bd0ba59a9b18ba716260101",
+      "targetHead": "0728b61fd44edebcefab38b105161c5aafee65cb",
+      "files": [
+        {
+          "path": "apps/backend/src/core/errors.ts",
+          "sourceBlob": "d530f5b2117406efb5541117b61ef30fe008d8c4",
+          "targetBlob": "d530f5b2117406efb5541117b61ef30fe008d8c4",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/core/query-settlement.ts",
+          "sourceBlob": "804aeb8eb1889516cd0d4d6077cea251cfc7cded",
+          "targetBlob": "804aeb8eb1889516cd0d4d6077cea251cfc7cded",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/fulfillment-publication-original-catalogue.ts",
+          "sourceBlob": "70695e1746e1da25363998f50373f23c3929d8d1",
+          "targetBlob": "70695e1746e1da25363998f50373f23c3929d8d1",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/fulfillment-publication-worker-catalogue.ts",
+          "sourceBlob": "f2ec0b3d47174f3e42233b79df213150d951cf64",
+          "targetBlob": "f2ec0b3d47174f3e42233b79df213150d951cf64",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/fulfillment-publication-worker.ts",
+          "sourceBlob": "3c11b6ffa9a616844229c8f0cb24fa33b83afc43",
+          "targetBlob": "3c11b6ffa9a616844229c8f0cb24fa33b83afc43",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/schema-fulfillment-publication-original-hash.sql",
+          "sourceBlob": "86fd66c751c70121a852ca8af66b811d521fa873",
+          "targetBlob": "86fd66c751c70121a852ca8af66b811d521fa873",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/schema-fulfillment-publication-worker.sql",
+          "sourceBlob": "d8aea1346e2322b8bfe8c9bd51a1075f0a4ae418",
+          "targetBlob": "d8aea1346e2322b8bfe8c9bd51a1075f0a4ae418",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/content/held-client-cleanup.ts",
+          "sourceBlob": "1028b70267403175ffe8467f31ed7f66055c09b5",
+          "targetBlob": "7e9bf7b1f9d4b7ebc444e91de13ceb65c898369e",
+          "classification": "reviewed-successor",
+          "review": "Preserves shorter original control budgets and actual transaction receipts. Newer helper awaits original callbacks, cancels the observed source PID with the original pool credential, drains cancellation/socket cleanup and aggregates failures; retain this instead of the older promise race.",
+          "difference": "pr262-apps_backend_src_modules_content_held-client-cleanup.ts.patch"
+        },
+        {
+          "path": "apps/backend/src/modules/conversation/migrations/pending_w3_publication_worker_output.sql",
+          "sourceBlob": "2dfa03e16e3416b3febfcd3ede87cbdc7074c8a6",
+          "targetBlob": "2dfa03e16e3416b3febfcd3ede87cbdc7074c8a6",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/conversation/publication-worker-output.ts",
+          "sourceBlob": "9d8a2bb9b8a4710b48645cf33d2fd4d4cccc2e84",
+          "targetBlob": "e9f0bce3026131e2d8698210fcfbd9a848dc221d",
+          "classification": "reviewed-successor",
+          "review": "Comment-only successor difference. Required accepted catalogue checksum remains undefined; no publication activation.",
+          "difference": "pr262-apps_backend_src_modules_conversation_publication-worker-output.ts.patch"
+        },
+        {
+          "path": "apps/backend/src/modules/identity/publication-preparation-catalogue.ts",
+          "sourceBlob": "0c5bf01634819a313918340afb696d9d0c0a74d9",
+          "targetBlob": "0c5bf01634819a313918340afb696d9d0c0a74d9",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/identity/publication-preparation.ts",
+          "sourceBlob": "188e117309ca4431798ecd02b04e9627fde06892",
+          "targetBlob": "188e117309ca4431798ecd02b04e9627fde06892",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/identity/publication-scope.ts",
+          "sourceBlob": "9d4185b1b059f821b43b02e57755c05481557efd",
+          "targetBlob": "9d4185b1b059f821b43b02e57755c05481557efd",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/identity/publication-transaction.ts",
+          "sourceBlob": "7b26d79b4cf7e44454070f82e03d75e8e2a8e90a",
+          "targetBlob": "7b26d79b4cf7e44454070f82e03d75e8e2a8e90a",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/identity/schema-publication-preparation.sql",
+          "sourceBlob": "6cd779aca3121e3a4abd8b7b0d6be13e9ababf24",
+          "targetBlob": "6cd779aca3121e3a4abd8b7b0d6be13e9ababf24",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/workers/publication.ts",
+          "sourceBlob": "9f3283e0967b69dfed01b0125bc322ef38107bb6",
+          "targetBlob": "9f3283e0967b69dfed01b0125bc322ef38107bb6",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/workers/start.ts",
+          "sourceBlob": "2cc9c242f6b71fc344971a967f93ec15f82d7c39",
+          "targetBlob": "2cc9c242f6b71fc344971a967f93ec15f82d7c39",
+          "classification": "exact"
+        }
+      ],
+      "historicalSupportingPaths": [
+        "artifacts/workstreams/W4/runtime/2026-10-03/fulfillment-publication-original/README.md",
+        "artifacts/workstreams/W4/runtime/2026-10-03/fulfillment-publication-worker/README.md",
+        "docs/workstreams/implementation/W4-completion-2026-10-01.md",
+        "docs/workstreams/status/W4.md"
+      ]
+    },
+    {
+      "number": 301,
+      "sourceHead": "cec286e9bdc16e9296f1e8af1fd59826c40a12c2",
+      "targetHead": "0728b61fd44edebcefab38b105161c5aafee65cb",
+      "files": [
+        {
+          "path": "apps/backend/src/core/query-settlement.ts",
+          "sourceBlob": "804aeb8eb1889516cd0d4d6077cea251cfc7cded",
+          "targetBlob": "804aeb8eb1889516cd0d4d6077cea251cfc7cded",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/financial-export-projections.ts",
+          "sourceBlob": "f7f22492246fe7f7b0b0982e9dda554e17215e73",
+          "targetBlob": "f7f22492246fe7f7b0b0982e9dda554e17215e73",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/financial-export.ts",
+          "sourceBlob": "969bbfbb8da550d7eeacf315534e4666b8a3f149",
+          "targetBlob": "5668af8be0356d86c6871599f9f3c3d101261601",
+          "classification": "reviewed-successor",
+          "review": "Retains every fixed projection, keyset collection and real empty EOF. Shares staging with the concrete original Trust stream; external custom sink publication remains available but unqualified.",
+          "difference": "pr301-apps_backend_src_modules_commerce_financial-export.ts.patch"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/operations.ts",
+          "sourceBlob": "7a53a8f4769977540d779b13083e2800db5a2aef",
+          "targetBlob": "7a53a8f4769977540d779b13083e2800db5a2aef",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/privacy-purpose.ts",
+          "sourceBlob": "30829e56bc1bd2b616997cdd2c50925d664fde3b",
+          "targetBlob": "3499e88b9f44d8853d7a8f2079e97483c248154f",
+          "classification": "reviewed-successor",
+          "review": "Retains genuine issued scope, exact 0087 source and immutable ownership. Adds fresh original READ COMMITTED guard alongside the repeatable source; both actual commits and original-client cleanup precede artifact completion.",
+          "difference": "pr301-apps_backend_src_modules_commerce_privacy-purpose.ts.patch"
+        },
+        {
+          "path": "apps/backend/src/modules/content/held-client-cleanup.ts",
+          "sourceBlob": "1028b70267403175ffe8467f31ed7f66055c09b5",
+          "targetBlob": "7e9bf7b1f9d4b7ebc444e91de13ceb65c898369e",
+          "classification": "reviewed-successor",
+          "review": "Preserves shorter original control budgets and actual transaction receipts. Newer helper awaits original callbacks, cancels the observed source PID with the original pool credential, drains cancellation/socket cleanup and aggregates failures; retain this instead of the older promise race.",
+          "difference": "pr301-apps_backend_src_modules_content_held-client-cleanup.ts.patch"
+        }
+      ],
+      "historicalSupportingPaths": [
+        "artifacts/workstreams/W4/runtime/2026-10-03/commerce-privacy-settlement/README.md",
+        "artifacts/workstreams/W4/runtime/2026-10-03/open-pr-review/README.md",
+        "docs/workstreams/implementation/W4-completion-2026-10-01.md",
+        "docs/workstreams/status/W4.md"
+      ]
+    },
+    {
+      "number": 302,
+      "sourceHead": "b520000666fdb5595995702a76fe848edc0c79d2",
+      "targetHead": "0728b61fd44edebcefab38b105161c5aafee65cb",
+      "files": [
+        {
+          "path": "apps/backend/src/core/errors.ts",
+          "sourceBlob": "d530f5b2117406efb5541117b61ef30fe008d8c4",
+          "targetBlob": "d530f5b2117406efb5541117b61ef30fe008d8c4",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/fulfillment-publication-original-catalogue.ts",
+          "sourceBlob": "70695e1746e1da25363998f50373f23c3929d8d1",
+          "targetBlob": "70695e1746e1da25363998f50373f23c3929d8d1",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/fulfillment-publication-worker-catalogue.ts",
+          "sourceBlob": "f2ec0b3d47174f3e42233b79df213150d951cf64",
+          "targetBlob": "f2ec0b3d47174f3e42233b79df213150d951cf64",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/fulfillment-publication-worker.ts",
+          "sourceBlob": "c94cc885e7535e9333f8b92d86c7aecfefe62dd1",
+          "targetBlob": "3c11b6ffa9a616844229c8f0cb24fa33b83afc43",
+          "classification": "reviewed-successor",
+          "review": "Restores #262 byte-exact. Relative to #302, only original signal checks around complete awaited operations are added; no task or final authority is replaced.",
+          "difference": "pr302-apps_backend_src_modules_commerce_fulfillment-publication-worker.ts.patch"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/schema-fulfillment-publication-original-hash.sql",
+          "sourceBlob": "86fd66c751c70121a852ca8af66b811d521fa873",
+          "targetBlob": "86fd66c751c70121a852ca8af66b811d521fa873",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/schema-fulfillment-publication-worker.sql",
+          "sourceBlob": "d8aea1346e2322b8bfe8c9bd51a1075f0a4ae418",
+          "targetBlob": "d8aea1346e2322b8bfe8c9bd51a1075f0a4ae418",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/content/fulfillment-publication.ts",
+          "sourceBlob": "d21376b3bc75bfa4837eb79a26ac1ea962517fa3",
+          "targetBlob": "d21376b3bc75bfa4837eb79a26ac1ea962517fa3",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/content/integration.ts",
+          "sourceBlob": "570d4d9f0ade0bcf4325fb49039a0e4f4e48d845",
+          "targetBlob": "179c19097b2293643ff4e24d1b4710c2711633f1",
+          "classification": "reviewed-successor",
+          "review": "Adds current post-entry reader and generation-origin profile exports; retains the original Content fulfillment consumer exports.",
+          "difference": "pr302-apps_backend_src_modules_content_integration.ts.patch"
+        },
+        {
+          "path": "apps/backend/src/modules/conversation/migrations/pending_w3_publication_worker_output.sql",
+          "sourceBlob": "2dfa03e16e3416b3febfcd3ede87cbdc7074c8a6",
+          "targetBlob": "2dfa03e16e3416b3febfcd3ede87cbdc7074c8a6",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/conversation/publication-worker-output.ts",
+          "sourceBlob": "9d8a2bb9b8a4710b48645cf33d2fd4d4cccc2e84",
+          "targetBlob": "e9f0bce3026131e2d8698210fcfbd9a848dc221d",
+          "classification": "reviewed-successor",
+          "review": "Comment-only successor difference. Required accepted catalogue checksum remains undefined; no publication activation.",
+          "difference": "pr302-apps_backend_src_modules_conversation_publication-worker-output.ts.patch"
+        },
+        {
+          "path": "apps/backend/src/modules/identity/publication-preparation-catalogue.ts",
+          "sourceBlob": "0c5bf01634819a313918340afb696d9d0c0a74d9",
+          "targetBlob": "0c5bf01634819a313918340afb696d9d0c0a74d9",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/identity/publication-preparation.ts",
+          "sourceBlob": "188e117309ca4431798ecd02b04e9627fde06892",
+          "targetBlob": "188e117309ca4431798ecd02b04e9627fde06892",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/identity/publication-scope.ts",
+          "sourceBlob": "ac6e1f2c602265764a455be04c3f90c351acd725",
+          "targetBlob": "9d4185b1b059f821b43b02e57755c05481557efd",
+          "classification": "reviewed-successor",
+          "review": "Adds original signal propagation and the exact held-client signal accessor; retains original issuer, preparation, final signature and sole-commit authority.",
+          "difference": "pr302-apps_backend_src_modules_identity_publication-scope.ts.patch"
+        },
+        {
+          "path": "apps/backend/src/modules/identity/publication-transaction.ts",
+          "sourceBlob": "36a9d37796aebb85d96f16e97a58253c489385f2",
+          "targetBlob": "7b26d79b4cf7e44454070f82e03d75e8e2a8e90a",
+          "classification": "reviewed-successor",
+          "review": "Uses the existing bounded uncertainty classifier and respects shorter positive control budgets. Original transaction ownership retained; whole publication operation is still unqualified.",
+          "difference": "pr302-apps_backend_src_modules_identity_publication-transaction.ts.patch"
+        },
+        {
+          "path": "apps/backend/src/modules/identity/schema-publication-preparation.sql",
+          "sourceBlob": "6cd779aca3121e3a4abd8b7b0d6be13e9ababf24",
+          "targetBlob": "6cd779aca3121e3a4abd8b7b0d6be13e9ababf24",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/workers/publication.ts",
+          "sourceBlob": "9f3283e0967b69dfed01b0125bc322ef38107bb6",
+          "targetBlob": "9f3283e0967b69dfed01b0125bc322ef38107bb6",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/workers/start.ts",
+          "sourceBlob": "2cc9c242f6b71fc344971a967f93ec15f82d7c39",
+          "targetBlob": "2cc9c242f6b71fc344971a967f93ec15f82d7c39",
+          "classification": "exact"
+        }
+      ],
+      "historicalSupportingPaths": [
+        "artifacts/workstreams/W4/runtime/2026-10-03/fulfillment-publication-original/README.md",
+        "artifacts/workstreams/W4/runtime/2026-10-03/fulfillment-publication-worker/README.md",
+        "artifacts/workstreams/W5/2026-10-03/successor-group-worker/run.md",
+        "docs/workstreams/coordination/W5.md",
+        "docs/workstreams/implementation/W4-completion-2026-10-01.md",
+        "docs/workstreams/status/W4.md",
+        "docs/workstreams/status/W5.md"
+      ]
+    }
+  ]
+}
