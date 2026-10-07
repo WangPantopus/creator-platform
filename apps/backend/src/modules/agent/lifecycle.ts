@@ -6,6 +6,10 @@ import { generationJournalInstalled } from "./generation-journal.js";
 import type { PoolClient } from "pg";
 import type { PreparedUsageRetention } from "./usage-retention.js";
 import { agentPrivacyTransaction } from "./privacy-transaction.js";
+import {
+  requireResolvedAccounting,
+  unresolvedAccountingInTransaction,
+} from "./accounting-uncertainty.js";
 
 /** Only the trusted W8 adapter calls this with a verified notice; not an unprotected HTTP route. */
 export class AgentLifecycle {
@@ -151,6 +155,19 @@ export class AgentLifecycle {
         await assertAuthorized();
         await assertTaskInTransaction(client);
         const lineage = await this.assertAccountingClient(client);
+        // Diagnose uncertainty before a dependent Conversation boundary can
+        // hide its deadline. Repeat under the original locks before erasure;
+        // this read does not change the profile-before-workspace lock order.
+        const assertAccountingResolved = async () =>
+          requireResolvedAccounting(
+            await unresolvedAccountingInTransaction(
+              client,
+              scope.creatorId,
+              undefined,
+              signal,
+            ),
+          );
+        await assertAccountingResolved();
         let boundaryReference: string | undefined;
         if (lineage) {
           invariant(
@@ -167,6 +184,7 @@ export class AgentLifecycle {
         }
         const assertDetached = async () => {
           await assertTaskInTransaction(client);
+          await assertAccountingResolved();
           if (!lineage) return;
           for (const table of [
             "ai_generation_receipt",

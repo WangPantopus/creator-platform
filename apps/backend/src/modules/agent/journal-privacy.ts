@@ -2,6 +2,10 @@ import type { PoolClient } from "pg";
 import { createHash } from "node:crypto";
 import { invariant } from "../../core/errors.js";
 import { canonical } from "../../core/canonical.js";
+import {
+  requireResolvedAccounting,
+  unresolvedAccountingInTransaction,
+} from "./accounting-uncertainty.js";
 import type { PreparedUsageRetention } from "./usage-retention.js";
 import {
   type PreparedGenerationJournal,
@@ -184,6 +188,14 @@ export function generationAccountingLifecycle(input: {
       await client.query(
         "SELECT creator_id FROM creator.ai_workspace WHERE creator_id=$1 FOR UPDATE",
         [family.creatorId],
+      );
+      requireResolvedAccounting(
+        await unresolvedAccountingInTransaction(
+          client,
+          family.creatorId,
+          family,
+          signal,
+        ),
       );
       const open = await client.query(
         "SELECT 1 FROM creator.ai_generation_admission WHERE creator_id=$1 AND thread_id=$2 AND fan_id=$3 AND state='open' UNION ALL SELECT 1 FROM creator.ai_generation_attempt WHERE creator_id=$1 AND thread_id=$2 AND fan_id=$3 AND state='open' LIMIT 1",
@@ -438,7 +450,29 @@ export function generationAccountingLifecycle(input: {
       family: JournalPrivacyFamily,
       generationId: string,
     ) {
-      return journal.sealFamily(client, job, family, generationId, authority);
+      const receipt = await journal.sealFamily(
+        client,
+        job,
+        family,
+        generationId,
+        authority,
+      );
+      if (receipt.state === "unknown") {
+        requireResolvedAccounting(
+          await unresolvedAccountingInTransaction(
+            client,
+            family.creatorId,
+            family,
+            job.signal,
+          ),
+        );
+        invariant(
+          false,
+          "accounting_uncertainty_time_unavailable",
+          "Unresolved accounting has no complete original timestamp evidence.",
+        );
+      }
+      return receipt;
     },
     async currentReceipt(
       client: PoolClient,

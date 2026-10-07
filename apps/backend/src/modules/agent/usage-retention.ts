@@ -3,6 +3,7 @@ import { invariant } from "../../core/errors.js";
 import type { AgentRepository, CreatorScope } from "./repository.js";
 import type { PreparedGenerationJournal } from "./generation-journal.js";
 import { agentPrivacyTransaction } from "./privacy-transaction.js";
+import { unresolvedAccountingInTransaction } from "./accounting-uncertainty.js";
 
 // Held above the lineage prerequisite; original reserved SQL stays immutable.
 export const USAGE_RETENTION_MIGRATION = "0165_w2_usage_retention_expiry";
@@ -175,11 +176,19 @@ export class PreparedUsageRetention {
         )
       ).rows[0]!;
       await this.authority.assertExpiry(client, scope, this.policyVersion);
+      const unresolvedAccounting = await unresolvedAccountingInTransaction(
+        client,
+        scope.creatorId,
+        undefined,
+        signal,
+      );
+      await this.authority.assertExpiry(client, scope, this.policyVersion);
       return {
         policyVersion: this.policyVersion,
         expiredIds: expired.rows.map((row) => row.id),
         moreDueKnown: remaining.known,
         unresolvedDueUnknown: remaining.unknown,
+        unresolvedAccounting,
       };
     });
   }
