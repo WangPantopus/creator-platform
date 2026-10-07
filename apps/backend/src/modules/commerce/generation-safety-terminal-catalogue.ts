@@ -2,6 +2,7 @@ import type { PoolClient } from "pg";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError } from "../../core/errors.js";
 import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
+import { generationPrivacySourcesRegistered } from "../../db/generation-privacy-sources.js";
 import { requestAuthority } from "../identity/request-authority.js";
 import { generationLifecycleSource } from "../identity/generation-lifecycle.js";
 import { generationTerminalPageSource } from "../identity/generation-terminal-page.js";
@@ -106,12 +107,11 @@ export async function generationSafetyTerminalPurposeCatalogue(
   return catalogue;
 }
 
-// Actual published current callers are part of the metadata graph, including
-// every relation they own or can access. No fabricated scope or business
-// positive supplies acceptance; complete current owner qualification is pending.
-// Keep factory acceptance absent; a caller or startup readback supplies no pin.
+// Fixed full39-source fresh/preserved metadata and drift review, including
+// actual published callers. Every executable source, the genuine held worker,
+// original task/financial owners and restoration remain mandatory.
 export const GENERATION_SAFETY_TERMINAL_CATALOGUE_SHA256: string | undefined =
-  undefined;
+  "cf13fe99e8f135a00b2a9e0b220fefcb4535ce9f20c46c2db0e84b5b619eec30";
 export const GENERATION_SAFETY_TERMINAL_SOURCES = Object.freeze(
   [
     generationLifecycleSource,
@@ -317,6 +317,7 @@ export async function assertGenerationSafetyTerminalCatalogue(
   };
   try {
     if (requestAuthority.getStore()) throw unavailable();
+    if (!(await generationPrivacySourcesRegistered())) throw unavailable();
     for (const source of GENERATION_SAFETY_TERMINAL_SOURCES)
       await assertRegisteredMigration(client, source);
     const ready = (

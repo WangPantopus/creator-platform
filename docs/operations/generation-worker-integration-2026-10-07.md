@@ -1,5 +1,7 @@
 # Generation worker integration — October 7, 2026
 
+Current qualification: all six complete runtime catalogue pins are now fixed and require the exact39 executable sources. The registry remains61, so this does not activate the graph. The final section supersedes earlier dated statements that these pins are absent.
+
 The later lifecycle review below supersedes the initial executor's routing and cancellation claims. It found overlapping fresh/recovery selectors and shutdown error suppression. The fixes remain held with the complete generation graph; #132 is still draft.
 
 The existing #132 head `955024a4910562f1b284e150c32534e4f73d2e28` is the implementation base. Main `d6cd1d2e82c53ac0bb816f8d1ee2d7135b690a3a` is merged normally on `codex/generation-worker-integration-20261007`. All 18 open draft heads were checked before adding work; none contains a generation executor/host. #132, #63 and #247 contain the same terminal recovery building block. [Exact overlap inventory](../../artifacts/pr-review/2026-10-07/generation-worker/overlap.json).
@@ -190,7 +192,6 @@ Held0229 adds immutable original usage/hold creation times, finite retained dead
 
 The current Q16 decision index now reflects the user's delegated project-owner/30-day-escalation/90-day-maximum choice. Persisted expiry authority, account-free retained accounting, standalone monitoring and actual notification delivery remain unfinished. This integrity source does not activate them or qualify complete C10.
 
-
 ## Persisted expiry purpose and serial worker source
 
 Held0230 discovers jobs only from actually due known usage under the approved policy. A new isolated non-login role has fixed minimum metadata reads; the Trust worker can claim/retry through fixed functions and the runtime can bind only the exact current lease on its held transaction. The runtime and worker cannot read the private job/scope tables. The actual usage DELETE trigger records erased IDs, and a separate deferred COMMIT completes that same batch and removes its creator/account bindings. Retries preserve the original due date; an uncertain commit cannot overwrite an already completed receipt. This source does not invent tasks, dates or cost dispositions.
@@ -202,7 +203,6 @@ The concrete expiry owner retains the original runtime and Trust pools, current 
 Actual canonical runtime and Trust worker pools pass source/shipping preparation refusals, same-pool refusal, preabort and reuse. The real labelled local restoration callback executes on the original held client before missing0229 registration refuses; the direct0230 guard separately refuses its reserved source/unaccepted catalogue. Shipping build passes under the shared W2 lock, and all26 existing backend cases pass in107.97seconds (original T11 workload104.050seconds, not application p95). The final factory return-type annotation preserves the same frozen instance and passes the final build. Final scoped ESLint and Prettier checks pass. No new tests were added.
 
 This implements the expiry source and host lifetime, not a positive prepared expiry/restore operation. Original0214/0217 prerequisites, complete privacy registration, account-independent retained accounting, restoration replay of expiry receipts, canonical host integration, standalone unknown-cost monitoring and operator notification delivery remain open. Existing Identity erasure continues to refuse its missing retention adapter. The latest other17 draft heads are unchanged; no additional merge is inferred from metadata or passing builds.
-
 
 ## Account-independent known accounting
 
@@ -261,3 +261,11 @@ The [actual operator review](../../artifacts/pr-review/2026-10-07/generation-wor
 The initial internal-trigger projection exposed a PostgreSQL name-type truncation: composite identities lost their distinguishing suffix at63 bytes and70 rows could reorder. Its candidate profile correctly refused. The fixed reader keeps text identity with the constraint-owning relation; all716 identities are distinct, with maximum126 characters. Earlier reserved-alias and external collector query errors also rolled back and remain recorded. The previous provenance purger already used text and is unaffected.
 
 Final backend types, scoped lint/format/diff, search-path preservation and preabort pass. Canonical61 refuses the new guard; source/ledger requirements, six missing runtime purpose pins, the activation runner, private backup/independent restore and actual application/C10/restore work remain separate. No positive task or source registration is supplied by this operator catalogue.
+
+## Six fixed runtime catalogues and complete source gate
+
+The output cursor, terminal discovery, typed financial terminal, known-usage expiry, detached-accounting and accounting-boundary catalogue fingerprints now come from the same exact39-source graph on both independently retained databases. All six match, and eighteen actual role, grant, invoker and forced-RLS metadata changes are detected and restored on each database. [Sanitized pin and refusal evidence](../../artifacts/pr-review/2026-10-07/generation-worker/runtime-catalogue-pins-review.json).
+
+Each purpose also requires all39 exact executable source registrations through a file/build-only predicate. This adds no database query or ledger grant; the original purpose keeps its actual held-client registration, literal caller, task/lease, restoration and transaction checks. The full staged execution ledger cannot substitute for executable registration: all six guards still refuse in both closed review transactions. Actual original core, Trust-worker and generation-worker password pools likewise refuse and remain reusable; the canonical privacy catalogue still passes. All six original ledger/schema/role/data/security/sequence custodies are restored.
+
+The shipping backend build, scoped lint/format and all17 existing contract/scheduler tests pass. No test code, source SQL, executable registration or grant changed. The next step is the reviewed canonical61+39 activation packet and original activation runner, retaining current private backup, independent restore, closed-traffic, role/privacy catalogue, original data/history and sequence checks. Positive prepared-task/provider/financial execution, expiry/detachment/recovery, all-eight C10 and restore replay remain unfinished.

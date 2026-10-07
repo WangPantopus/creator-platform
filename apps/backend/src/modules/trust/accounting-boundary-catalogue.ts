@@ -1,6 +1,7 @@
 import type { PoolClient } from "pg";
 import { contentHash } from "../../core/canonical.js";
 import { invariant } from "../../core/errors.js";
+import { generationPrivacySourcesRegistered } from "../../db/generation-privacy-sources.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
 import {
   assertRegisteredMigration,
@@ -14,10 +15,10 @@ export const accountingBoundarySource = Object.freeze({
   checksum: "2be4dc0bc2f74d01d506985f7dac31c49c6a7a567f19b2126025396949111643",
 });
 
-/** The complete composed purpose is still unaccepted. A closed metadata
- * capture cannot enable a completed Conversation accounting boundary. */
+/** Fixed full39-source fresh/preserved metadata and drift review. This pin
+ * supplies no source registration or completed Conversation accounting result. */
 export const accountingBoundaryExpectedCatalogue: string | undefined =
-  undefined;
+  "1cc941e39c04c28bc6742ef0ccfe820216cb0e0ca3b662cfd67c487f08e1ffef";
 
 export const accountingBoundaryCatalogueQuery = `SELECT jsonb_build_object(
  'role',(SELECT to_jsonb(r)-'oid' FROM pg_roles r WHERE rolname='creator_privacy_accounting_boundary'),
@@ -100,7 +101,9 @@ export async function assertAccountingBoundaryCatalogue(
   signal?.throwIfAborted();
   const source = await registeredMigration(accountingBoundarySource);
   invariant(
-    source && accountingBoundaryExpectedCatalogue,
+    source &&
+      (await generationPrivacySourcesRegistered(signal)) &&
+      accountingBoundaryExpectedCatalogue,
     "accounting_boundary_unconfigured",
     "Registered Conversation accounting boundary source and accepted complete custody are required.",
   );

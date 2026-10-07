@@ -3,6 +3,7 @@ import { contentHash } from "../../core/canonical.js";
 import { invariant } from "../../core/errors.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
 import { registeredMigration } from "../../db/reviewed-migration.js";
+import { generationPrivacySourcesRegistered } from "../../db/generation-privacy-sources.js";
 
 export const accountDetachedUsageSource = Object.freeze({
   owner: "W2",
@@ -11,10 +12,10 @@ export const accountDetachedUsageSource = Object.freeze({
   checksum: "d19aa583d71250c85bdbce97c5d2c168dbb683009451de594f4434574c16874f",
 });
 
-/** The complete composed purpose is still unaccepted. A closed metadata
- * capture cannot enable account detachment or a completed erasure. */
+/** Fixed full39-source fresh/preserved metadata and drift review. This pin
+ * supplies no source registration, original account task or completed erasure. */
 export const accountDetachedUsageExpectedCatalogue: string | undefined =
-  undefined;
+  "b0d462dc6dad8bf3da71bb6ab1d36389d7b4ac01645631268dad8c1f3da4b753";
 
 export const accountDetachedUsageCatalogueQuery = `SELECT jsonb_build_object(
  'role',(SELECT to_jsonb(r)-'oid' FROM pg_roles r WHERE rolname='creator_usage_detachment'),
@@ -97,7 +98,9 @@ export async function assertAccountDetachedUsageCatalogue(
   signal?.throwIfAborted();
   const source = await registeredMigration(accountDetachedUsageSource);
   invariant(
-    source && accountDetachedUsageExpectedCatalogue,
+    source &&
+      (await generationPrivacySourcesRegistered(signal)) &&
+      accountDetachedUsageExpectedCatalogue,
     "account_detached_usage_unconfigured",
     "Registered detached accounting source and accepted complete custody are required.",
   );

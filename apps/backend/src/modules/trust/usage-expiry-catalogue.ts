@@ -3,6 +3,7 @@ import { contentHash } from "../../core/canonical.js";
 import { invariant } from "../../core/errors.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
 import { registeredMigration } from "../../db/reviewed-migration.js";
+import { generationPrivacySourcesRegistered } from "../../db/generation-privacy-sources.js";
 
 export const usageExpirySource = Object.freeze({
   owner: "W8",
@@ -11,9 +12,10 @@ export const usageExpirySource = Object.freeze({
   checksum: "2e30ef05d54352d37f37deb9a33ddc22cd9fad64d71ad98d6f69f99ff394a72e",
 });
 
-/** The complete composed purpose is still unaccepted. A closed metadata
- * capture cannot enable a persisted expiry lease or an original deletion. */
-export const usageExpiryExpectedCatalogue: string | undefined = undefined;
+/** Fixed full39-source fresh/preserved metadata and drift review. This pin
+ * supplies no source registration, expiry lease or original deletion. */
+export const usageExpiryExpectedCatalogue: string | undefined =
+  "44b10b0c30c4c0eaf41d7a2594c054eff11e9bfd590e231733582023ffdc9d7d";
 
 export const usageExpiryCatalogueQuery = `SELECT jsonb_build_object(
  'role',(SELECT to_jsonb(r)-'oid' FROM pg_roles r WHERE rolname='creator_usage_expiry'),
@@ -96,7 +98,9 @@ export async function assertUsageExpiryCatalogue(
   signal?.throwIfAborted();
   const source = await registeredMigration(usageExpirySource);
   invariant(
-    source && usageExpiryExpectedCatalogue,
+    source &&
+      (await generationPrivacySourcesRegistered(signal)) &&
+      usageExpiryExpectedCatalogue,
     "usage_expiry_unconfigured",
     "Registered expiry source and accepted complete custody are required.",
   );

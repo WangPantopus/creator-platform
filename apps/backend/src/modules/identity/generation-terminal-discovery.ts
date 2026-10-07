@@ -3,6 +3,7 @@ import { contentHash } from "../../core/canonical.js";
 import { DomainError } from "../../core/errors.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
 import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
+import { generationPrivacySourcesRegistered } from "../../db/generation-privacy-sources.js";
 import type { GenerationTerminalPurposeConsumer } from "./generation-scope.js";
 import { requestAuthority } from "./request-authority.js";
 import { assertGenerationTerminalPageCatalogue } from "./generation-terminal-page.js";
@@ -28,10 +29,10 @@ export const generationTerminalDiscoveryConsumer: GenerationTerminalPurposeConsu
       "36036c26c440e7af694b8a5702c43d96985fcf2ce8c65188f91e130f6f31c00e",
   });
 
-// The whole original caller graph, drift and restoration review is pending.
-// A minimal compilation pin or startup readback cannot approve that graph.
+// Fixed full39-source fresh/preserved metadata and drift review. Actual source
+// registration, original caller/task and restoration remain separate gates.
 export const generationTerminalDiscoveryCatalogueChecksum: string | undefined =
-  undefined;
+  "3d569c14a6161000ec11059bca86d248196a1ecb97b612bb9270b47ed63673ab";
 
 export const generationTerminalDiscoveryCatalogueQuery = `SELECT jsonb_build_object(
  'roles',(SELECT jsonb_agg(to_jsonb(r)-'oid' ORDER BY r.rolname) FROM (
@@ -79,6 +80,7 @@ export async function assertGenerationTerminalDiscoveryCatalogue(
   )
     unavailable();
   try {
+    if (!(await generationPrivacySourcesRegistered())) unavailable();
     await assertRegisteredMigration(client, generationTerminalDiscoverySource);
     await assertGenerationTerminalPageCatalogue(client);
     await client.query("SAVEPOINT w1_generation_terminal_discovery_catalogue");
