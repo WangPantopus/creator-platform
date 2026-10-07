@@ -59,86 +59,85 @@ async function activate() {
   const generation = process.env.W8_MIGRATION_WAVE === "20261007-generation";
   const continuation =
     generation || process.env.W8_MIGRATION_WAVE === "20261002-privacy";
-  const packet = JSON.parse(
-    await readFile(
-      new URL(
-        `infra/migrations/waves/${process.env.W8_MIGRATION_WAVE}.json`,
-        repositoryRoot,
-      ),
-      "utf8",
+  // Earlier reviewed waves remain usable after the complete generation graph
+  // is registered. Validate the entire chain, then execute only the selected
+  // wave against its exact predecessor; a future source is never auto-applied.
+  const ids = ["20261002", "20261002-privacy", "20261007-generation"];
+  const packets = await Promise.all(
+    ids.map(
+      async (id) =>
+        JSON.parse(
+          await readFile(
+            new URL(`infra/migrations/waves/${id}.json`, repositoryRoot),
+            "utf8",
+          ),
+        ) as Packet,
     ),
-  ) as Packet;
-  check(
-    packet.schemaVersion === 1 &&
-      packet.id === process.env.W8_MIGRATION_WAVE &&
-      packet.baseline.length === (generation ? 61 : continuation ? 57 : 40) &&
-      packet.wave.length === (generation ? 39 : continuation ? 4 : 17),
-    "Reviewed migration packet is unavailable.",
   );
-  if (continuation && !generation) {
-    const initial = JSON.parse(
-      await readFile(
-        new URL("infra/migrations/waves/20261002.json", repositoryRoot),
-        "utf8",
-      ),
-    ) as Packet;
-    check(
-      canonical(packet.baseline) ===
+  const [initial, prior, current] = packets as [Packet, Packet, Packet];
+  check(
+    packets.every(
+      (entry, index) =>
+        entry.schemaVersion === 1 &&
+        entry.id === ids[index] &&
+        entry.baseline.length === [40, 57, 61][index] &&
+        entry.wave.length === [17, 4, 39][index],
+    ) &&
+      canonical(prior.baseline) ===
         canonical([...initial.baseline, ...initial.wave]) &&
-        canonical(packet.wave.map((s) => s.version)) ===
-          canonical([
-            "0074_w8_content_runtime_denial",
-            "0082_w8_interactive_denial_try_fence",
-            "0087_w8_privacy_task_commit_fence",
-            "0103_w8_domain_privacy_task_fence",
-          ]),
-      "Continuation must preserve the exact canonical57 and four reviewed purposes.",
-    );
-  }
-  if (generation) {
-    const prior = JSON.parse(
-      await readFile(
-        new URL("infra/migrations/waves/20261002-privacy.json", repositoryRoot),
-        "utf8",
-      ),
-    ) as Packet;
-    check(
-      canonical(packet.baseline) ===
+      canonical(current.baseline) ===
         canonical([...prior.baseline, ...prior.wave]) &&
-        canonical(packet.wave) ===
-          canonical(
-            generationReview.sources.map(({ version, path, checksum }) => ({
-              version,
-              path,
-              checksum,
-            })),
-          ) &&
-        canonical(packet.outOfOrderException) ===
-          canonical(prior.outOfOrderException),
-      "Generation wave must preserve canonical61 and the exact39 reviewed sources.",
-    );
-    check(
-      await generationPrivacySourcesRegistered(),
-      "Generation wave requires all39 exact executable source registrations.",
-    );
-  }
+      canonical(prior.wave.map((s) => s.version)) ===
+        canonical([
+          "0074_w8_content_runtime_denial",
+          "0082_w8_interactive_denial_try_fence",
+          "0087_w8_privacy_task_commit_fence",
+          "0103_w8_domain_privacy_task_fence",
+        ]) &&
+      canonical(current.wave) ===
+        canonical(
+          generationReview.sources.map(({ version, path, checksum }) => ({
+            version,
+            path,
+            checksum,
+          })),
+        ) &&
+      canonical(prior.outOfOrderException) ===
+        canonical(initial.outOfOrderException) &&
+      canonical(current.outOfOrderException) ===
+        canonical(prior.outOfOrderException),
+    "The exact reviewed 40/57/61/100-source migration chain is required.",
+  );
+  check(
+    await generationPrivacySourcesRegistered(),
+    "The current operator requires all 39 exact executable generation source registrations.",
+  );
+  const packet = packets.find(
+    (entry) => entry.id === process.env.W8_MIGRATION_WAVE,
+  )!;
   const registry = JSON.parse(
     await readFile(new URL("infra/migrations.json", repositoryRoot), "utf8"),
   ) as { migrations: { version: string; path: string }[] };
   const sources = [...packet.baseline, ...packet.wave];
+  const registeredSources = [...current.baseline, ...current.wave];
   check(
-    new Set(sources.map((s) => s.version.slice(0, 4))).size === sources.length,
+    new Set(registeredSources.map((s) => s.version.slice(0, 4))).size ===
+      registeredSources.length,
     "Migration packet IDs conflict.",
   );
   check(
-    registry.migrations.length === sources.length &&
+    registry.migrations.length === registeredSources.length &&
+      new Set(registry.migrations.map((entry) => entry.version)).size ===
+        registry.migrations.length &&
       registry.migrations.every((e) =>
-        sources.some((s) => s.version === e.version && s.path === e.path),
+        registeredSources.some(
+          (s) => s.version === e.version && s.path === e.path,
+        ),
       ),
     "Active registry differs from the reviewed packet.",
   );
   const bodies = new Map<string, string>();
-  for (const source of sources) {
+  for (const source of registeredSources) {
     check(
       /^\d{4}_[a-z0-9_]+$/.test(source.version) &&
         /^(apps\/backend|infra\/migrations\/history)\/[a-zA-Z0-9_./-]+\.sql$/.test(
@@ -276,7 +275,7 @@ async function activate() {
         domain: before.some(
           (r) => r.version === "0103_w8_domain_privacy_task_fence",
         ),
-        canonicalBeforeGeneration: generation && generationInstalled === 0,
+        canonicalBeforeGeneration: generationInstalled === 0,
       });
     const tables = await waveDataTables(client);
     const beforeData = await waveDataDigest(client, tables);
@@ -364,6 +363,7 @@ async function activate() {
       ? await assertPrivacyWaveRoleSafety(client, {
           privacy: true,
           domain: true,
+          canonicalBeforeGeneration: !generation,
         })
       : undefined;
     check(
