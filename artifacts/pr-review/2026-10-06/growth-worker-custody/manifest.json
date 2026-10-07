@@ -1,0 +1,29 @@
+{
+  "base": "de2a79148c9c1688a7cbaaf2bbd4c21e039d948b",
+  "reusedPR": 31,
+  "reusedHead": "c052ef67fa85301562b5123b682c88b931107c9a",
+  "sourceSha256": {
+    "apps/backend/src/modules/growth/database.ts": "b2ca689e3ca6ebd831ce48c9e24aa88001062d40c2dc6561a023735b40eed669",
+    "apps/backend/src/modules/growth/transaction.ts": "c8c9467f162c5cb871204604f19a9bd1ce7b9e99dc23527fdae114a7b5dec2aa",
+    "apps/backend/src/modules/growth/held-client.ts": "befe0d70882556f29dda01f2bfef91a794959d0c7c49eb6dd16d0be0ecd16bc8"
+  },
+  "checks": [
+    "backend types",
+    "backend build",
+    "scoped ESLint",
+    "scoped Prettier"
+  ],
+  "operated": [
+    "Real issuer/creator proposal and logout race while real COMMIT delayed1000ms",
+    "Real1500ms control timeout/worker close/log out; unforwarded proposal absent",
+    "Actual re-sign-in/reload/stop saved proposal",
+    "Reused cleanup shorter SQL budgets/read timeout/discard/recovery/cancellation"
+  ],
+  "fault": "Loopback worker SQL bytes delayed, never fabricated; proxy5547 stopped",
+  "cleanup": "Creator restoredpending/version3; real proposal stopped; actual creator session signedout; proxy/APIstopped; web/database preservedrunning",
+  "limits": [
+    "Temporary development-only administrator creator verification seed; no production verification",
+    "No wholecallback/providerdeadline/native/purpose/broadPR31 acceptance",
+    "Observed Measurement private view still lingers after signout; PR31 already contains guards to reuse next"
+  ]
+}

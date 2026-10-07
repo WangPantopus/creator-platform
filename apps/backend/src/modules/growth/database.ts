@@ -3,7 +3,7 @@ import type { Pool, PoolClient } from "pg";
 import type { Actor } from "../identity/adapter.js";
 import { DomainError } from "../../core/errors.js";
 import { assertCurrentSession } from "../identity/request-authority.js";
-import { growthTransaction } from "./transaction.js";
+import { growthTransaction, withGrowthTransaction } from "./transaction.js";
 
 export class GrowthDatabase {
   actorFence?: (
@@ -108,10 +108,11 @@ export class GrowthDatabase {
   ): Promise<T> {
     return growthTransaction(pool, work, signal);
   }
-  /** Worker-only tables used by account controls still lock the canonical session and erasure scope. */
-  async workerActor<T>(
+  /** Reuses PR31's worker-before-session acquisition and worker-first commit.
+   * The actual session stays held through worker success or failure cleanup. */
+  async fencedWorkerActor<T>(
     actor: Actor,
-    creatorId: string,
+    fence: (client: PoolClient) => Promise<void>,
     work: (client: PoolClient) => Promise<T>,
   ) {
     if (!actor.adultEligible || !this.actorFence)
@@ -120,15 +121,42 @@ export class GrowthDatabase {
         copy.growthErrorGrowthAuthorityRequired,
         503,
       );
-    return this.transaction(this.worker, async (worker) => {
-      await this.actorFence!(worker, actor.accountId, creatorId);
+    return withGrowthTransaction(this.worker, async (held) => {
+      const worker = held.client;
+      await fence(worker);
       return this.transaction(this.runtime, async (runtime) => {
         await runtime.query("SELECT set_config('app.account_id',$1,true)", [
           actor.accountId,
         ]);
         await assertCurrentSession(runtime, actor.accountId);
-        return work(worker);
+        let failure: unknown;
+        try {
+          const result = await work(worker);
+          await held.commit();
+          return result;
+        } catch (error) {
+          failure = error;
+          throw error;
+        } finally {
+          // Also keep the session on failed/uncertain worker COMMIT until
+          // rollback or original socket close completes. PR31's outer-only
+          // finalizer would release the session before this failure cleanup.
+          await held.close({ failure });
+        }
       });
     });
+  }
+
+  /** Worker-only tables used by account controls still lock the canonical session and erasure scope. */
+  async workerActor<T>(
+    actor: Actor,
+    creatorId: string,
+    work: (client: PoolClient) => Promise<T>,
+  ) {
+    return this.fencedWorkerActor(
+      actor,
+      (worker) => this.actorFence!(worker, actor.accountId, creatorId),
+      work,
+    );
   }
 }
