@@ -1,3 +1,4 @@
+import { catalogueQuery } from "../../core/catalogue-query.js";
 import { randomUUID } from "node:crypto";
 import type { Pool, PoolClient } from "pg";
 import { z } from "zod";
@@ -247,7 +248,8 @@ async function assertGenerationCatalogue(
   await assertGenerationLifecycleCatalogue(query);
   const consumers = [...input.consumers, ...input.terminalConsumers];
   const installed = (
-    await query.query<{ installed: boolean }>(
+    await catalogueQuery<{ installed: boolean }>(
+      query,
       `SELECT session_user='creator_generation_worker' AND current_user=session_user
        AND to_regclass('creator.generation_worker_scope') IS NOT NULL
        AND to_regprocedure('creator.begin_generation_scope(uuid,uuid)') IS NOT NULL
@@ -256,7 +258,8 @@ async function assertGenerationCatalogue(
   ).rows[0]?.installed;
   if (installed !== true) throw new Error("Generation authority is absent");
   const ready = (
-    await query.query<{ ready: boolean }>(
+    await catalogueQuery<{ ready: boolean }>(
+      query,
       `SELECT
        (SELECT count(*)=2 FROM creator.schema_migration
         WHERE (version=$1 AND checksum=$2) OR (version=$3 AND checksum=$4))
@@ -353,11 +356,12 @@ async function assertGenerationCatalogue(
   // Read every expected executable in one current statement. No receipt is
   // cached and every authorization bookend still checks the full catalogue.
   const proofs = (
-    await query.query<{
+    await catalogueQuery<{
       signature: string;
       ready: boolean;
       definitionChecksum: string;
     }>(
+      query,
       `SELECT c.signature,
          session_user='creator_generation_worker' AND current_user=session_user
          AND EXISTS(SELECT FROM creator.schema_migration WHERE version=c.version AND checksum=c.checksum)

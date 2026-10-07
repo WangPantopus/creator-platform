@@ -1,3 +1,4 @@
+import { catalogueQuery } from "../../core/catalogue-query.js";
 import { createHash } from "node:crypto";
 import type { Pool } from "pg";
 import { contentHash } from "../../core/canonical.js";
@@ -27,7 +28,8 @@ export async function assertGenerationConsumerCustody(
   try {
     signal?.throwIfAborted();
     const ready = (
-      await query.query<{ ready: boolean }>(
+      await catalogueQuery<{ ready: boolean }>(
+        query,
         `SELECT session_user='creator_generation_worker' AND current_user=session_user
          AND EXISTS(SELECT FROM pg_roles r WHERE r.rolname=$1 AND NOT r.rolcanlogin
           AND NOT r.rolinherit AND NOT r.rolsuper AND NOT r.rolbypassrls
@@ -65,7 +67,8 @@ export async function assertGenerationConsumerCustody(
     for (const consumer of custody.consumers) {
       signal?.throwIfAborted();
       const proof = (
-        await query.query<{ ready: boolean; definition: string }>(
+        await catalogueQuery<{ ready: boolean; definition: string }>(
+          query,
           `SELECT EXISTS(SELECT FROM creator.schema_migration WHERE version=$2 AND checksum=$3)
            AND p.prosecdef AND p.prokind='f' AND p.provolatile='v'
            AND p.proconfig=ARRAY['search_path=pg_catalog'] AND pg_get_userbyid(p.proowner)=$4

@@ -1,4 +1,5 @@
-import type { Pool, QueryConfig } from "pg";
+import type { Pool } from "pg";
+import { catalogueQuery } from "./catalogue-query.js";
 
 /** Shared read-only catalogue for W2's independently reviewed fixed consumers. */
 export async function generationConsumerCatalogue(
@@ -15,13 +16,11 @@ export async function generationConsumerCatalogue(
     throw new Error("The original catalogue response budget is invalid.");
   const query = async (text: string, values: unknown[]) => {
     options.signal?.throwIfAborted();
-    const result = await pool.query({
-      text,
-      values,
+    const result = await catalogueQuery(pool, text, values, {
       ...(options.queryTimeout === undefined
         ? {}
         : { query_timeout: options.queryTimeout }),
-    } as QueryConfig & { query_timeout?: number });
+    });
     options.signal?.throwIfAborted();
     return result;
   };
