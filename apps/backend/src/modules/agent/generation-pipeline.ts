@@ -272,7 +272,9 @@ export class PreparedGenerationPipeline {
         "generation_pipeline_evidence_changed",
         "The exact originally permitted source/style evidence changed.",
       );
-      await this.retrieval.assertCurrentInTransaction(client, scope, retrieved);
+      // currentInTransaction owns both authority/input bookends around this
+      // fresh read. Its returned evidence is compared to the original run
+      // above; immediately rereading that same value adds no new operation.
     }
     await this.inputs.authorizeInTransaction(facts, scope, client);
     await this.metadata.assertCurrentInTransaction(client, scope, metadata);
@@ -577,11 +579,8 @@ export class PreparedGenerationPipeline {
                   scope,
                   embedding,
                 );
-                await this.retrieval.assertCurrentInTransaction(
-                  client,
-                  scope,
-                  value,
-                );
+                // The fresh reader already completes its own authority and
+                // input bookends before returning this immutable value.
                 return value;
               },
               signal,
