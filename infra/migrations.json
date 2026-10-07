@@ -1168,6 +1168,15 @@
       "sourceSha256": "d19aa583d71250c85bdbce97c5d2c168dbb683009451de594f4434574c16874f",
       "state": "reserved_unapplied",
       "reason": "Original W8 account-delete scope permits atomic transfer of already-disposed known usage into private accounting with no creator/account/fan/thread identifiers or private text. Preserve original dates/amounts/disposition; unknown refuses. Fixed bounded detached expiry journals actual removed IDs. Caller/fence-catalogue integration, complete purpose acceptance and genuine deletion/expiry/restoration remain unqualified; no activation."
+    },
+    {
+      "id": "0232",
+      "owner": "W8",
+      "version": "0232_w8_conversation_accounting_boundary",
+      "path": "apps/backend/migrations/0232_w8_conversation_accounting_boundary.sql",
+      "sourceSha256": "2be4dc0bc2f74d01d506985f7dac31c49c6a7a567f19b2126025396949111643",
+      "state": "reserved_unapplied",
+      "reason": "Atomic original Conversation deletion receipt on existing task row, immutable after actual held transaction persists it; current-lease replay and narrow completed Conversation-to-Agent boundary projection. Original task/lease/COMMIT and protected artifact authority remain mandatory. No migration activation, historical receipt backfill, fake task or accounting disposition. Complete source/caller/custody and real lifecycle qualification remain pending."
     }
   ]
 }

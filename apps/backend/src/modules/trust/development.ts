@@ -38,7 +38,7 @@ type TrustConfiguration = Omit<
 >;
 type Consumers = Omit<
   Parameters<typeof createPrivacyConsumers>[0],
-  "runtimePool" | "coordinatorPool"
+  "runtimePool" | "coordinatorPool" | "privacyArtifacts"
 >;
 
 /** Check every reachable membership, including NOINHERIT/SET ROLE paths. An
@@ -277,6 +277,7 @@ export async function createDevelopmentTrust(
         runtimePool: runtime.pool,
         coordinatorPool: workerPool,
         ...options.consumers,
+        privacyArtifacts,
         assertRestoredInTransaction: async (client) => {
           if (!(await restoreReadyInTransaction(client)))
             throw new DomainError(

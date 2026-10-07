@@ -37,6 +37,8 @@ import { contentPrivacyHook } from "../content/privacy.js";
 import type { ContentPrivacyExport } from "../content/privacy-export.js";
 import { domainPrivacyTaskAuthorityInTransaction } from "./domain-privacy-authority.js";
 import { prepareGenerationAccountingRetention } from "./generation-accounting-retention.js";
+import { PreparedPrivacyAccountingBoundary } from "./accounting-boundary.js";
+import type { PrivacyArtifactStore } from "./privacy-export.js";
 
 /** Actual host owners and reviewed registration only. W8 supplies its original
  * task/family authority when binding them; the host cannot replace that port. */
@@ -52,7 +54,7 @@ export type GenerationAccountingPreparation = Omit<
 
 export type ConversationPrivacyOwnerPorts = Omit<
   ConversationPrivacyInput,
-  "pool" | "authority" | "retention"
+  "pool" | "authority" | "retention" | "deletionReceipts"
 > & {
   /** Real prepared W2 owners and independently reviewed0206 custody. The
    * coordinator supplies its own actual authority, never a caller substitute. */
@@ -83,6 +85,8 @@ export type AgentPrivacyOwnerPorts = Readonly<{
 export function createPrivacyConsumers(input: {
   runtimePool: Pool;
   coordinatorPool: Pool;
+  /** The same protected store owned by the original Trust coordinator. */
+  privacyArtifacts?: PrivacyArtifactStore;
   /** Real current restoration on the owner's held client, never a pool check. */
   assertRestoredInTransaction?: (client: PoolClient) => Promise<void>;
   conversationRetention?: ConversationPrivacyRetention;
@@ -123,6 +127,20 @@ export function createPrivacyConsumers(input: {
     input.coordinatorPool,
     input.assertRestoredInTransaction,
   );
+  const prepareBoundary = async (signal: AbortSignal | undefined) => {
+    invariant(
+      input.assertRestoredInTransaction,
+      "accounting_boundary_unconfigured",
+      "Original held restoration authority is required for accounting privacy.",
+    );
+    return PreparedPrivacyAccountingBoundary.prepare({
+      pool: input.runtimePool,
+      authority: conversationAuthority,
+      assertRestoredInTransaction: input.assertRestoredInTransaction,
+      artifacts: input.privacyArtifacts,
+      signal,
+    });
+  };
   const hooks: PrivacyHook[] = [
     trustPrivacyHook(input.coordinatorPool, input.assertRestoredInTransaction),
     identityPrivacyHook(
@@ -214,6 +232,9 @@ export function createPrivacyConsumers(input: {
             : {}),
           ...(exportCursor ? { exportCursor } : {}),
           ...(provenancePurge ? { provenancePurge } : {}),
+          ...(job.kind === "delete" && accounting
+            ? { deletionReceipts: await prepareBoundary(job.signal) }
+            : {}),
           pool: input.runtimePool,
           authority: conversationAuthority,
           retention: input.conversationRetention,
@@ -246,6 +267,9 @@ export function createPrivacyConsumers(input: {
         );
         owner.lifecycle.assertRepository(owner.service.repository);
         owner.privacyExportSnapshot?.assertHostPool(input.runtimePool);
+        const accountingBoundary = owner.service.repository.usageJournal
+          ? await prepareBoundary(job.signal)
+          : undefined;
         return agentPrivacyHook(
           owner.service,
           owner.lifecycle,
@@ -273,6 +297,7 @@ export function createPrivacyConsumers(input: {
               await input.assertRestoredInTransaction(client);
               return owned;
             },
+            accountingBoundary?.agentBoundary.bind(accountingBoundary),
           ),
           owner.artifacts,
           Boolean(owner.privacyExportSnapshot),

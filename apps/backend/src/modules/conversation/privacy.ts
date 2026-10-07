@@ -12,6 +12,7 @@ import type {
   GenerationPrivacyJob,
 } from "../commerce/generation-privacy.js";
 import { z } from "zod";
+import { PreparedPrivacyAccountingBoundary } from "../trust/accounting-boundary.js";
 import { conversationPrivacyExportStream } from "./privacy-export-stream.js";
 import { PreparedConversationPrivacyCursor } from "./privacy-export-cursor.js";
 import { PreparedGenerationProvenancePurge } from "./generation-provenance-privacy.js";
@@ -142,6 +143,8 @@ export type ConversationPrivacyInput = {
   lineage?: ConversationLineage;
   recordings?: ConversationRecordings;
   accounting?: ConversationAccountingLifecycle;
+  /** Original W8 result persisted with this deletion's own COMMIT. */
+  deletionReceipts?: PreparedPrivacyAccountingBoundary;
   /** Distinct reviewed0206 source. Per-family readers cannot substitute for
    * the one READ COMMITTED cursor snapshot required by the real0087 fence. */
   exportCursor?: PreparedConversationPrivacyCursor;
@@ -165,6 +168,16 @@ export function conversationPrivacyHook(
       );
       const signal = job.signal;
       signal.throwIfAborted();
+      if (job.kind === "delete" && input.accounting) {
+        invariant(
+          input.deletionReceipts instanceof PreparedPrivacyAccountingBoundary,
+          "accounting_boundary_unconfigured",
+          "Accounting deletion requires its original durable result owner.",
+        );
+        input.deletionReceipts.assertConversation(input);
+        const recovered = await input.deletionReceipts.recover(job);
+        if (recovered) return recovered;
+      }
       if (!input.authority.fenceTaskInTransaction)
         throw new DomainError(
           "privacy_commit_fence_unavailable",
@@ -602,6 +615,25 @@ export function conversationPrivacyHook(
         // This client's actual task remains current even for an empty family set.
         await fenceConversationPrivacyTask(input.authority, client, job);
         signal.throwIfAborted();
+        const durableResult = input.accounting
+          ? await input.deletionReceipts!.persist(
+              client,
+              job,
+              {
+                domain: "conversation",
+                jobId: job.jobId,
+                idempotencyKey: job.idempotencyKey,
+                processedThreads: families.length,
+                ...(input.provenancePurge
+                  ? { removedGenerationProvenance }
+                  : {}),
+                accountingReceipts,
+                financialDispositions,
+              },
+              retained,
+            )
+          : undefined;
+        signal.throwIfAborted();
         signal.removeEventListener("abort", abort);
         await cancelling;
         if (cancellationFailures.length || transportFailures.length)
@@ -621,7 +653,7 @@ export function conversationPrivacyHook(
           "The original deletion did not return a commit receipt.",
         );
         committed = true;
-        result = {
+        result = durableResult ?? {
           receipt: {
             schemaVersion: 1,
             domain: "conversation",
