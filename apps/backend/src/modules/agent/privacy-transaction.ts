@@ -173,6 +173,10 @@ export async function agentPrivacyTransaction<T>(
   } catch (error) {
     failed = true;
     failure = error;
+    // A shorter driver read budget can expire while PostgreSQL still runs.
+    // Cancel the exact observed source before closing it, including uncertain
+    // BEGIN/COMMIT replies; cancellation is not a transaction outcome receipt.
+    if (uncertainAgentReadResponse(error)) abort();
     await settle();
     discard ||=
       phase !== "work" ||
@@ -184,6 +188,7 @@ export async function agentPrivacyTransaction<T>(
       } catch (error) {
         cleanup.push(error);
         discard = true;
+        if (uncertainAgentReadResponse(error)) abort();
       }
     }
   } finally {
