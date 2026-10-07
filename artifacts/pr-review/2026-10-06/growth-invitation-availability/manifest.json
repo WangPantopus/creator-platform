@@ -1,0 +1,23 @@
+{
+  "overlap": "All21 open heads including319 have byte-identical createInvite method before this change; no existing fix duplicated.",
+  "sourceSha256": {
+    "apps/backend/src/modules/growth/service.ts": "cb9c69c9c7b38f321683d596d4493411720c322d09e549e5be91af2c205f0a2a"
+  },
+  "behavior": "INSERT selects only the existing published/verified creator projection used by public invitation reads; zero selected rows produces existing creator_unavailable404 rather than raw FK503.",
+  "actualVerification": {
+    "before": "Real browser Create and copy with absent genuine creator projection returned503 and FK failure; zero invite rows. See prior Studio evidence.",
+    "after": "Two actual creator-issued browser actions returned404 in51.77ms/50.13ms and showed This creator is unavailable; button recovered; zero invite rows; clipboard remained empty.",
+    "authority": "Same non-owner composite runtime, canonical session and erasure checks; no new grants, schema or publication fixture.",
+    "cleanup": "Synthetic creator restored pending/version9; actual session signed out."
+  },
+  "checks": {
+    "backendTypesAndBuild": "PASS",
+    "scopedEslint": "PASS",
+    "scopedPrettier": "PASS"
+  },
+  "limits": [
+    "Positive published invitation delivery remains unqualified without genuine creator_public projection.",
+    "No unit/automated test code added or manually run."
+  ],
+  "base": "a6d69c3a91d8bcd6eb6a2a6ab8fc19a4cf29f0b4"
+}
