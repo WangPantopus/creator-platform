@@ -1,6 +1,6 @@
 # Product continuation and PR consolidation checkpoint
 
-Updated October 7, 2026 after the full source reconciliation and eight-domain privacy operation. Read this checkpoint first, then refresh Git/GitHub state and follow the pinned evidence. Historical observations in the [reconciliation ledger](pr-reconciliation-2026-10-07.md) describe earlier stages; they do not override this current status.
+Updated October 7, 2026 after real synthetic generation admission and provider/output diagnostics. Read this checkpoint first, then refresh Git/GitHub state and follow the pinned evidence. Historical observations in the [reconciliation ledger](pr-reconciliation-2026-10-07.md) describe earlier stages; they do not override this current status.
 
 ## Current status
 
@@ -12,13 +12,17 @@ Privacy implementation: `8e2289346c18272910f31fb12ee4164b7443c939`, following th
 
 Worker continuation `1e883f20` corrects the output descriptors to include their existing structure checks and the financial factory to select the current reviewed profile. The actual complete original worker prepares; an idle pass and loop cancellation/drain succeed with zero generations and the same 658 usage rows. [Exact evidence and remaining accepted-request/provider path](../../artifacts/pr-review/2026-10-07/generation-worker-completion/README.md). This does not enable canonical generation admission.
 
+The subsequent [generation admission checkpoint](../../artifacts/pr-review/2026-10-07/generation-admission-review/README.md) records real fictional source ingestion, six-case evaluation, publication, first-message acceptance, weighted reservation binding and provider calls. Functional source through `9cf0889c` passes the backend shipping build and17 existing tests. The latest run reaches sentence output but0212 lacks SELECT on `generation.first_visible_at`; add a reviewed incremental repair, preserving original SQL. That interrupted reply's unknown charge and hold remain unknown/unsettled. Query optimizations retain the original purpose deadlines and current checks. No complete fan answer or performance qualification is claimed.
+
+**Latest user scope:** finish fixes and merge #132 when ready, then pause before doing anything else. Further product work in the roadmap below is context, not permission to continue past that pause.
+
 ## Workspace and preservation
 
 - Active review checkout: `/Users/yingpengwang/.codex/worktrees/637b/creator-platform`, branch `codex/restoration-reconciliation-20261007`. Publish the same reviewed commits to the existing #132 branch `codex/w2-generation-inputs-20261002`. Inspect status first; do not overwrite unrelated changes or force-push.
 - Primary `/Users/yingpengwang/creator-platform` is preserved. The previous generation checkout `/Users/yingpengwang/.codex/worktrees/5f17/creator-platform` remains at its handoff state; inspect ownership/status before reuse.
 - Original PR heads are preserved in `refs/review/20261007/<number>` and their original remote branches. Each manifest compares every production path and retains supporting documentation/history. Do not reopen implementation from scratch or apply an older whole shared file over newer behavior.
 - Private evidence: `/Users/yingpengwang/.codex/visualizations/2026/10/07/01a11784-60b1-7fe3-8855-82bddf4675b6/`. Public compact summaries contain hashes and outcomes, without credentials or exported account payloads.
-- Docker container `creator-w2-original-archive-20261007` holds the original archive and separately labelled copies on port 5550. The original remains unchanged across ledger/schema/roles/security/sequences/data: 101 registrations, 177 business tables, 1,001 rows. All nine application copies are traffic-closed and have no other clients; temporary passwords and the review Growth API login are removed. Preserve them and their private receipts. Open only a separately restored labelled copy for authorized operation.
+- Docker container `creator-w2-original-archive-20261007` holds the original archive and separately labelled copies on port 5550. The original remains unchanged across ledger/schema/roles/security/sequences/data: 101 registrations, 177 business tables, 1,001 rows. All eleven application copies are traffic-closed and have no other clients; temporary passwords and the review Growth API login are removed. Preserve them and their private receipts. Open only a separately restored labelled copy for authorized operation.
 
 ## Where every source lives
 
@@ -70,4 +74,4 @@ The modular Node/Express TypeScript backend uses PostgreSQL/pgvector with eight 
 
 ## Next exact action
 
-Refresh #132's current head/checks and this checkout's status. Resume the remaining original owners using the evidence above. Next operate actual accepted fictional generation with the prepared worker, real Studio source/version/licence and current fan consent; retain the canonical startup guard until the complete request/provider/output/terminal path qualifies. Continue actual prepared worker/terminal composition and domain retention integration using the existing authorized inputs; verify their full paths before enabling generation or making #132 ready. Request external input only for a genuinely additional prerequisite, not the settled policy or existing synthetic key. Do not merge merely to reach zero open PRs. Keep successful checks pinned to their actual revision, preserve failed attempts and every original source acceptance requirement, and update this checkpoint at meaningful milestones so a later chat can continue without repeating discovery.
+Finish #132, merge when ready, then pause as the user requested. The immediate defect is the original output writer's missing SELECT on `creator.generation.first_visible_at`. Review/register an additive narrowly scoped repair and expected output catalogue on a separately restored copy, preserve0212 and all original data, verify restore/custody, then exercise actual output and terminal settlement. The preceding provider-admission/latency failures and original unknown usage remain preserved. Refresh hosted CI for the new published revision; older94c24284 checks do not cover these later changes. Keep canonical generation disabled until the full configured path qualifies. Do not let production certification or the future-mature deletion clock silently become a requirement to finish unrelated product work before the requested post-merge pause. Keep all outstanding product qualification explicit and gated; do not imply that source consolidation establishes release acceptance.

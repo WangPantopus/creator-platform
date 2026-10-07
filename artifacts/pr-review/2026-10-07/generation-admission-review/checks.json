@@ -1,0 +1,33 @@
+{
+  "revision": "9cf0889c57acba9a9f0ee04e2a4ac47c067324a4",
+  "backendShippingBuild": "passed",
+  "existingTests": {
+    "files": 2,
+    "passed": 17
+  },
+  "typecheck": "passed",
+  "scopedLint": "passed",
+  "catalogueEquivalence": {
+    "roles": 42,
+    "changedCatalogueCases": [
+      "policy",
+      "forced_rls",
+      "column",
+      "table",
+      "public",
+      "membership",
+      "sequence"
+    ],
+    "rolledBack": true
+  },
+  "executableDigestEquivalence": {
+    "functions": 127,
+    "definitionBytes": 319494,
+    "algorithm": "SHA-256 of UTF-8 pg_get_functiondef, identical in Node and PostgreSQL"
+  },
+  "logs": {
+    "creator-generation-acceptance-build.log": "306dad83729b79f2dc8eef6a7bd9e19f4c5d9b7507e1bb3662910c6af6214468",
+    "creator-generation-acceptance-tests.log": "3952c05b9806100229fd42b196a4cdfb63c294ff44dd74b917e3ef1105482904",
+    "creator-catalogue-policy-equivalence2.log": "dfd42207479ffb4d5484ccdef136dd451de2e1c1680c88e2451d4f2bafab0683"
+  }
+}

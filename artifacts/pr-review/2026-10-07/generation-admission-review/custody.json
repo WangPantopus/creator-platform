@@ -1,0 +1,337 @@
+{
+  "privateReceiptSha256": "cb2b75d10ae76711402ae8d88819702ae2cff5e4dd0ab1abe1a8b8514a5ce72f",
+  "originalUnchanged": true,
+  "rows": [
+    {
+      "database": "creator_w2_archive_adoption_candidate",
+      "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+      "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+      "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+      "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+      "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+      "dataSha256": "add04093be921cf22d124ad4ce71d9942d4b1e215433050fa5e26670105bdf10",
+      "ledgerRows": 101,
+      "businessRows": 1001,
+      "businessTables": 177,
+      "privacyJobs": [
+        {
+          "kind": "delete",
+          "state": "running",
+          "count": 1
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      }
+    },
+    {
+      "database": "creator_pr132_privacy_20261007",
+      "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+      "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+      "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+      "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+      "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+      "dataSha256": "7cf752725898f7f33df85942be0147a9435ac57027cafa63a435af701e484dee",
+      "ledgerRows": 101,
+      "businessRows": 1037,
+      "businessTables": 177,
+      "privacyJobs": [
+        {
+          "kind": "delete",
+          "state": "retry",
+          "count": 1
+        },
+        {
+          "kind": "export",
+          "state": "blocked",
+          "count": 3
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      }
+    },
+    {
+      "database": "creator_pr132_privacy2_20261007",
+      "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+      "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+      "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+      "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+      "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+      "dataSha256": "3738859ca68eee3479855544a38f406e6b1087a17327107a1ffdf5f0c9ba7d2d",
+      "ledgerRows": 101,
+      "businessRows": 1037,
+      "businessTables": 177,
+      "privacyJobs": [
+        {
+          "kind": "delete",
+          "state": "retry",
+          "count": 1
+        },
+        {
+          "kind": "export",
+          "state": "blocked",
+          "count": 3
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      }
+    },
+    {
+      "database": "creator_pr132_privacy3_20261007",
+      "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+      "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+      "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+      "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+      "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+      "dataSha256": "b5acbc92be497567da05d779d6f05d3826d1f54466b9e88f4a628f2397c3c14f",
+      "ledgerRows": 101,
+      "businessRows": 1013,
+      "businessTables": 177,
+      "privacyJobs": [
+        {
+          "kind": "delete",
+          "state": "retry",
+          "count": 1
+        },
+        {
+          "kind": "export",
+          "state": "blocked",
+          "count": 1
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      }
+    },
+    {
+      "database": "creator_pr132_privacy4_20261007",
+      "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+      "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+      "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+      "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+      "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+      "dataSha256": "2305219eb26a6d61d8417913e4c5b83ceffb04b4bb71883a74ad6005cc219889",
+      "ledgerRows": 101,
+      "businessRows": 1087,
+      "businessTables": 177,
+      "privacyJobs": [
+        {
+          "kind": "delete",
+          "state": "dead_letter",
+          "count": 1
+        },
+        {
+          "kind": "export",
+          "state": "blocked",
+          "count": 7
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      }
+    },
+    {
+      "database": "creator_pr132_privacy5_20261007",
+      "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+      "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+      "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+      "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+      "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+      "dataSha256": "b89cf210753672e794092e952aa349711efd1749cdab5dc31a5f96326a0b39c7",
+      "ledgerRows": 101,
+      "businessRows": 1055,
+      "businessTables": 177,
+      "privacyJobs": [
+        {
+          "kind": "delete",
+          "state": "blocked",
+          "count": 1
+        },
+        {
+          "kind": "delete",
+          "state": "retry",
+          "count": 1
+        },
+        {
+          "kind": "export",
+          "state": "complete",
+          "count": 3
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      }
+    },
+    {
+      "database": "creator_pr132_privacy6_20261007",
+      "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+      "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+      "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+      "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+      "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+      "dataSha256": "9ee4c005b4afffeb3ede674578c4c397638b6943b23879f8f422fd8ba2782e1b",
+      "ledgerRows": 101,
+      "businessRows": 1029,
+      "businessTables": 177,
+      "privacyJobs": [
+        {
+          "kind": "delete",
+          "state": "blocked",
+          "count": 1
+        },
+        {
+          "kind": "delete",
+          "state": "retry",
+          "count": 1
+        },
+        {
+          "kind": "export",
+          "state": "complete",
+          "count": 1
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      }
+    },
+    {
+      "database": "creator_pr132_privacy7_20261007",
+      "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+      "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+      "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+      "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+      "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+      "dataSha256": "9efbbd934a602fbce3c05853955ab78d8e6f57b569713660142901492f8fa044",
+      "ledgerRows": 101,
+      "businessRows": 1029,
+      "businessTables": 177,
+      "privacyJobs": [
+        {
+          "kind": "delete",
+          "state": "blocked",
+          "count": 1
+        },
+        {
+          "kind": "delete",
+          "state": "retry",
+          "count": 1
+        },
+        {
+          "kind": "export",
+          "state": "complete",
+          "count": 1
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      }
+    },
+    {
+      "database": "creator_pr132_privacy8_20261007",
+      "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+      "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+      "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+      "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+      "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+      "dataSha256": "8d9a65356c8aee72c28440393eaae42b13c5db66ab668293f977f8b20f930502",
+      "ledgerRows": 101,
+      "businessRows": 1013,
+      "businessTables": 177,
+      "privacyJobs": [
+        {
+          "kind": "delete",
+          "state": "retry",
+          "count": 1
+        },
+        {
+          "kind": "export",
+          "state": "blocked",
+          "count": 1
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      }
+    },
+    {
+      "database": "creator_pr132_privacy9_20261007",
+      "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+      "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+      "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+      "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+      "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+      "dataSha256": "4f20c169ea7944be230b7cd2f5352bee9466a10dbfb8b495ff672727f4bff113",
+      "ledgerRows": 101,
+      "businessRows": 1001,
+      "businessTables": 177,
+      "privacyJobs": [
+        {
+          "kind": "delete",
+          "state": "retry",
+          "count": 1
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      }
+    },
+    {
+      "database": "creator_pr132_privacy10_20261007",
+      "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+      "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+      "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+      "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+      "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+      "dataSha256": "6656b370896be7775ad2b4b9f736b5f9c8c86eb943b30ae2976ffd9d72ea50c3",
+      "ledgerRows": 101,
+      "businessRows": 1162,
+      "businessTables": 177,
+      "privacyJobs": [
+        {
+          "kind": "delete",
+          "state": "retry",
+          "count": 1
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      }
+    },
+    {
+      "database": "creator_pr132_privacy11_20261007",
+      "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+      "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+      "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+      "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+      "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+      "dataSha256": "5e47536bb04cdf814d532c7bddfad3dec3bb96b267420701568b5b9f60408f25",
+      "ledgerRows": 101,
+      "businessRows": 1241,
+      "businessTables": 177,
+      "privacyJobs": [
+        {
+          "kind": "delete",
+          "state": "retry",
+          "count": 1
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      }
+    }
+  ]
+}
