@@ -1,4 +1,6 @@
 import review from "../../../../infra/migrations/reviews/20261007-generation-worker.json" with { type: "json" };
+import contentReview from "../../../../infra/migrations/reviews/20261007-content-worker.json" with { type: "json" };
+import { registeredContentPrivacyProfile } from "../db/content-privacy-profile.js";
 import { invariant } from "../core/errors.js";
 import { generationPrivacySourcesRegistered } from "../db/generation-privacy-sources.js";
 import type { GenerationTerminalPurposeConsumer } from "../modules/identity/generation-scope.js";
@@ -17,7 +19,8 @@ function freeze<T extends object>(value: T): Readonly<T> {
   return Object.freeze(value);
 }
 
-const reviewed = freeze(review.custody);
+const baseline = freeze(review.custody);
+const withContentPrivacy = freeze(contentReview.custody);
 const terminalConsumer = (
   receipt: Omit<GenerationTerminalPurposeConsumer, "purpose">,
 ): GenerationTerminalPurposeConsumer =>
@@ -42,6 +45,10 @@ export async function reviewedGenerationWorkerCustody(
     "generation_worker_custody_unavailable",
     "The reviewed source graph, original restoration and privacy registration are required.",
   );
+  signal?.throwIfAborted();
+  const reviewed = (await registeredContentPrivacyProfile(signal))
+    ? withContentPrivacy
+    : baseline;
   signal?.throwIfAborted();
   const custody: GenerationWorkerCustody = {
     ...reviewed,

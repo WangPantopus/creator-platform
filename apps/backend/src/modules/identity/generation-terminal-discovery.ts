@@ -4,6 +4,7 @@ import { DomainError } from "../../core/errors.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
 import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
 import { generationPrivacySourcesRegistered } from "../../db/generation-privacy-sources.js";
+import { generationPrivacyCatalogueChecksum } from "../../db/content-privacy-profile.js";
 import type { GenerationTerminalPurposeConsumer } from "./generation-scope.js";
 import { requestAuthority } from "./request-authority.js";
 import { assertGenerationTerminalPageCatalogue } from "./generation-terminal-page.js";
@@ -100,7 +101,10 @@ export async function assertGenerationTerminalDiscoveryCatalogue(
     ).rows[0]?.catalogue;
     if (
       contentHash({ discovery, original, catalogue }) !==
-      generationTerminalDiscoveryCatalogueChecksum
+      (await generationPrivacyCatalogueChecksum(
+        "terminal",
+        generationTerminalDiscoveryCatalogueChecksum,
+      ))
     )
       unavailable();
     // An uncertain or failed response escapes directly to original custody.

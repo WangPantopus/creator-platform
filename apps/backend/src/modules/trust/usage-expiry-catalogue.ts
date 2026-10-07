@@ -4,6 +4,7 @@ import { invariant } from "../../core/errors.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
 import { registeredMigration } from "../../db/reviewed-migration.js";
 import { generationPrivacySourcesRegistered } from "../../db/generation-privacy-sources.js";
+import { generationPrivacyCatalogueChecksum } from "../../db/content-privacy-profile.js";
 
 export const usageExpirySource = Object.freeze({
   owner: "W8",
@@ -110,7 +111,12 @@ export async function assertUsageExpiryCatalogue(
   );
   const catalogue = await usageExpiryCatalogue(client, signal);
   invariant(
-    contentHash(catalogue) === usageExpiryExpectedCatalogue,
+    contentHash(catalogue) ===
+      (await generationPrivacyCatalogueChecksum(
+        "expiry",
+        usageExpiryExpectedCatalogue,
+        signal,
+      )),
     "usage_expiry_catalogue_changed",
     "Original expiry authority custody changed.",
   );

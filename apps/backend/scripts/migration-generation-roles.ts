@@ -1,8 +1,11 @@
 import type { PoolClient, QueryConfig, QueryResultRow } from "pg";
+import { readFile } from "node:fs/promises";
 import purposeReview from "../../../infra/migrations/reviews/20261007-generation-purpose-roles.json" with { type: "json" };
+import contentReview from "../../../infra/migrations/reviews/20261007-content-privacy.json" with { type: "json" };
+import { ContentPrivacyExport } from "../src/modules/content/privacy-export.js";
 import { contentHash } from "../src/core/canonical.js";
 import { generationConsumerCatalogue } from "../src/core/purpose-catalogue.js";
-import { schemaCustody } from "./migration-custody.js";
+import { repositoryRoot, schemaCustody, sha256 } from "./migration-custody.js";
 import {
   assertWaveRoleSafety,
   WaveRoleSafetyError,
@@ -148,7 +151,10 @@ export async function generationWavePurposeCatalogue(
 /** Fixed closed-review profiles only. This supplements the original wave
  * checker; the activation runner, backup/restore, privacy guards and actual
  * application preparations must still qualify independently. */
-export async function assertGenerationWaveRoleSafety(client: PoolClient) {
+export async function assertGenerationWaveRoleSafety(
+  client: PoolClient,
+  extension?: "content-privacy",
+) {
   if (
     purposeReview.schemaVersion !== 1 ||
     purposeReview.postgresMajor !== 17 ||
@@ -167,11 +173,37 @@ export async function assertGenerationWaveRoleSafety(client: PoolClient) {
     generationDenial: true,
   });
   const catalogue = await generationWavePurposeCatalogue(client);
-  if (
-    !(purposeReview.catalogueSha256 as string[]).includes(
-      contentHash(catalogue),
-    )
-  )
+  const accepted = extension
+    ? contentReview.purposeProfiles.map((profile) => profile.sha256)
+    : purposeReview.catalogueSha256;
+  if (!(accepted as string[]).includes(contentHash(catalogue)))
     throw new WaveRoleSafetyError("Generation-purpose wave catalogue changed.");
-  return { original, purposeRoles: purposeReview.roles.length };
+  if (extension) {
+    const source = contentReview.source;
+    if (
+      extension !== "content-privacy" ||
+      contentReview.schemaVersion !== 1 ||
+      source.version !== "0198_w5_content_privacy_export" ||
+      sha256(await readFile(new URL(source.path, repositoryRoot))) !==
+        source.checksum ||
+      !(
+        await client.query(
+          "SELECT 1 FROM creator.schema_migration WHERE version=$1 AND checksum=$2",
+          [source.version, source.checksum],
+        )
+      ).rowCount
+    )
+      throw new WaveRoleSafetyError("Exact Content export source is required.");
+    try {
+      await client.query("SET SESSION AUTHORIZATION creator_runtime");
+      await ContentPrivacyExport.assertCatalogueForReview(client);
+    } finally {
+      // An uncertain read belongs to the caller's original rollback custody.
+      await client.query("RESET SESSION AUTHORIZATION").catch(() => undefined);
+    }
+  }
+  return {
+    original,
+    purposeRoles: purposeReview.roles.length + (extension ? 1 : 0),
+  };
 }

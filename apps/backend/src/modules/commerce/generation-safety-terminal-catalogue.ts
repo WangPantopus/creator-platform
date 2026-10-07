@@ -3,6 +3,7 @@ import { contentHash } from "../../core/canonical.js";
 import { DomainError } from "../../core/errors.js";
 import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
 import { generationPrivacySourcesRegistered } from "../../db/generation-privacy-sources.js";
+import { generationPrivacyCatalogueChecksum } from "../../db/content-privacy-profile.js";
 import { requestAuthority } from "../identity/request-authority.js";
 import { generationLifecycleSource } from "../identity/generation-lifecycle.js";
 import { generationTerminalPageSource } from "../identity/generation-terminal-page.js";
@@ -316,7 +317,11 @@ export async function assertGenerationSafetyTerminalCatalogue(
     return error;
   };
   try {
-    if (requestAuthority.getStore()) throw unavailable();
+    if (
+      requestAuthority.getStore() ||
+      !GENERATION_SAFETY_TERMINAL_CATALOGUE_SHA256
+    )
+      throw unavailable();
     if (!(await generationPrivacySourcesRegistered())) throw unavailable();
     for (const source of GENERATION_SAFETY_TERMINAL_SOURCES)
       await assertRegisteredMigration(client, source);
@@ -335,7 +340,10 @@ export async function assertGenerationSafetyTerminalCatalogue(
     if (
       !ready ||
       contentHash(await generationSafetyTerminalPurposeCatalogue(client)) !==
-        GENERATION_SAFETY_TERMINAL_CATALOGUE_SHA256
+        (await generationPrivacyCatalogueChecksum(
+          "financial",
+          GENERATION_SAFETY_TERMINAL_CATALOGUE_SHA256,
+        ))
     )
       throw unavailable();
   } catch (cause) {

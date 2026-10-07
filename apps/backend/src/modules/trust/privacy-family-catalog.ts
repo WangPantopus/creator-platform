@@ -1,5 +1,7 @@
 import type { PoolClient, QueryConfig, QueryResultRow } from "pg";
 import generationPrivacyReview from "../../../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
+import contentPrivacyReview from "../../../../../infra/migrations/reviews/20261007-content-privacy.json" with { type: "json" };
+import { registeredContentPrivacyProfile } from "../../db/content-privacy-profile.js";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError } from "../../core/errors.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
@@ -338,6 +340,23 @@ export async function assertOriginalPrivacyFamilyGenerationCatalog(
   );
 }
 
+/** Closed review of the exact generation-plus-Content graph. This retains the
+ * literal core caller check and both original incoming-membership variants;
+ * executable registration and every actual ledger entry are checked below. */
+export async function assertOriginalPrivacyFamilyContentCatalog(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  await assertOriginalPrivacyFamilyCaller(client, signal);
+  await assertPurposeCatalogue(
+    client,
+    contentPrivacyReview.originalFamilyProfiles.map(
+      (profile) => profile.sha256,
+    ),
+    signal,
+  );
+}
+
 /** Executable source and ledger gate on this actual held core client. A held
  * proposal or matching manually installed ledger cannot grant family authority. */
 export async function originalPrivacyFamilyRegisteredExtension(
@@ -379,6 +398,9 @@ export async function originalPrivacyFamilyRegisteredExtension(
     if (!cursorSource) unavailable();
     const composed = await registeredMigration(cursorSource);
     signal?.throwIfAborted();
+    const contentProfile = composed
+      ? await registeredContentPrivacyProfile(signal)
+      : undefined;
     if (composed) {
       for (const dependency of generationPrivacyReview.sources) {
         const migration = await registeredMigration(dependency);
@@ -387,6 +409,7 @@ export async function originalPrivacyFamilyRegisteredExtension(
           unavailable();
         migrations.push(migration);
       }
+      if (contentProfile) migrations.push(contentProfile.source);
     } else if (purger) {
       for (const dependency of provenanceSources) {
         const migration =
@@ -410,9 +433,11 @@ export async function originalPrivacyFamilyRegisteredExtension(
       )
         unavailable();
     }
-    if (composed)
-      await assertOriginalPrivacyFamilyGenerationCatalog(client, signal);
-    else {
+    if (composed) {
+      if (contentProfile)
+        await assertOriginalPrivacyFamilyContentCatalog(client, signal);
+      else await assertOriginalPrivacyFamilyGenerationCatalog(client, signal);
+    } else {
       await assertOriginalPrivacyFamilyCaller(client, signal);
       if (purger)
         await assertOriginalPrivacyFamilyProvenanceCatalog(client, signal);

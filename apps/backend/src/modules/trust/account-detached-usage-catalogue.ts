@@ -4,6 +4,7 @@ import { invariant } from "../../core/errors.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
 import { registeredMigration } from "../../db/reviewed-migration.js";
 import { generationPrivacySourcesRegistered } from "../../db/generation-privacy-sources.js";
+import { generationPrivacyCatalogueChecksum } from "../../db/content-privacy-profile.js";
 
 export const accountDetachedUsageSource = Object.freeze({
   owner: "W2",
@@ -112,7 +113,12 @@ export async function assertAccountDetachedUsageCatalogue(
   );
   const catalogue = await accountDetachedUsageCatalogue(client, signal);
   invariant(
-    contentHash(catalogue) === accountDetachedUsageExpectedCatalogue,
+    contentHash(catalogue) ===
+      (await generationPrivacyCatalogueChecksum(
+        "detached",
+        accountDetachedUsageExpectedCatalogue,
+        signal,
+      )),
     "account_detached_usage_catalogue_changed",
     "Original detached accounting authority custody changed.",
   );

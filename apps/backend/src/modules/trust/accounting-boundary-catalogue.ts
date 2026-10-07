@@ -2,6 +2,7 @@ import type { PoolClient } from "pg";
 import { contentHash } from "../../core/canonical.js";
 import { invariant } from "../../core/errors.js";
 import { generationPrivacySourcesRegistered } from "../../db/generation-privacy-sources.js";
+import { generationPrivacyCatalogueChecksum } from "../../db/content-privacy-profile.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
 import {
   assertRegisteredMigration,
@@ -109,7 +110,12 @@ export async function assertAccountingBoundaryCatalogue(
   );
   const catalogue = await accountingBoundaryCatalogue(client, signal);
   invariant(
-    contentHash(catalogue) === accountingBoundaryExpectedCatalogue,
+    contentHash(catalogue) ===
+      (await generationPrivacyCatalogueChecksum(
+        "boundary",
+        accountingBoundaryExpectedCatalogue,
+        signal,
+      )),
     "accounting_boundary_catalogue_changed",
     "Original Conversation accounting boundary authority custody changed.",
   );

@@ -1,0 +1,452 @@
+{
+  "scope": "Fixed worker custody for the independently reviewed generation plus Content export graph. Selection requires actual executable0198 source registration; original task and held-client guards remain.",
+  "sourceReview": "20261007-content-privacy",
+  "reviewedPurposeCatalogueSha256": "2d7e24154f5b2a988df3e730d3280eb5b74a51747c2d80177dde27b315eec680",
+  "preservedPurposeCatalogueSha256": "04c70b75424e62760bd7ad4f85f4fd303a9da9fcd2444ee3a0fe1f7897074bb4",
+  "custody": {
+    "identity": {
+      "migration": {
+        "version": "0159_w1_generation_worker_scope",
+        "checksum": "7de41bf10228219d69480e302bac7d69626d8d848d8276bb1fe54e49112a5627"
+      },
+      "denialMigration": {
+        "version": "0177_w8_generation_worker_denial",
+        "checksum": "d47b5916b0ac0c3cc33bd7d50bfdb663f39a9218dcff0b97d3a9dce7b6acc44c"
+      },
+      "consumers": [
+        {
+          "migration": {
+            "version": "0180_w2_generation_input_consumers",
+            "checksum": "25f89ddba69beed4dd780cd23a64eabb9b7481e2dcb5f192b167299a732b2c34"
+          },
+          "signature": "creator.generation_agent_inputs(uuid,uuid)",
+          "owner": "creator_w2_generation_input",
+          "definitionChecksum": "5647fdd64b324793650535e1deee429d5002d5425be2af685328c6bfc56bdd93"
+        },
+        {
+          "migration": {
+            "version": "0211_w2_generation_agent_metadata",
+            "checksum": "4bbcd9a24b622ee63525da6f20eaf21f84eb9c2d4d538a9122d8184347a76b4f"
+          },
+          "signature": "creator.generation_agent_metadata(uuid,uuid)",
+          "owner": "creator_w2_generation_metadata",
+          "definitionChecksum": "ccce41f6284c0ecba5e2741f6e88c83cee3ea0a39ce3cb7b0a9c361927cebad4"
+        },
+        {
+          "migration": {
+            "version": "0187_w2_generation_retrieval_context",
+            "checksum": "bf9d9c35b3f0bb8c18518bd06b4459d16d421f4da4a6ad0ba06f8319acc89747"
+          },
+          "signature": "creator.generation_agent_runtime_context(uuid,uuid,text,text)",
+          "owner": "creator_w2_generation_retrieval",
+          "definitionChecksum": "b92d539a27964486f8d2222a411091a7c698f03c20d78179a0907a56fe5c86f6"
+        },
+        {
+          "migration": {
+            "version": "0182_w4_generation_allowance_audience",
+            "checksum": "98f9373fbf2403e05f6f26a4223a94779d3280fefa89f2ab2c6f30fbbef796be"
+          },
+          "signature": "creator.generation_allowance_audience(uuid,uuid)",
+          "owner": "creator_w4_generation_audience",
+          "definitionChecksum": "0f8d71b2adf8e27ab5c3e94a96144ceb934f6a65fd420ab04e1eff9011e61d2f"
+        },
+        {
+          "migration": {
+            "version": "0181_w2_generation_attempt_admission",
+            "checksum": "eab8c8e07b8a1e6ba4384f5300560bd46853bf98509faade5a1b555e130c75ee"
+          },
+          "signature": "creator.generation_begin_agent_attempt(uuid,uuid,text,text,bigint,text)",
+          "owner": "creator_w2_generation_journal",
+          "definitionChecksum": "f93fcc061f6d26ec81c3b981194b9913f25a3eb232c590b2ea19e35b8bb940c4"
+        },
+        {
+          "migration": {
+            "version": "0186_w5_generation_content_origin",
+            "checksum": "2f1c4b30133a0c8707b16b15c1e42a9daf539cb5edeeb48ad6a835352a4f444d"
+          },
+          "signature": "creator.generation_content_origins(uuid,uuid,jsonb)",
+          "owner": "creator_w5_generation_origin",
+          "definitionChecksum": "af318afd2b0e498bc9d257f5763265f731173442879ac4c9d1961fdb9b5cb71e"
+        },
+        {
+          "migration": {
+            "version": "0179_w3_generation_purpose_consumers",
+            "checksum": "9449f7f9254aa1c9c77713b1683d5c85076b357f13e573882ee5d2d03d1715e0"
+          },
+          "signature": "creator.generation_conversation_context(uuid,uuid)",
+          "owner": "creator_generation_conversation_context",
+          "definitionChecksum": "c07641db399389dc17d5e078146b99f51f5d440a9a07191a7714047952c6c93c"
+        },
+        {
+          "migration": {
+            "version": "0181_w2_generation_attempt_admission",
+            "checksum": "eab8c8e07b8a1e6ba4384f5300560bd46853bf98509faade5a1b555e130c75ee"
+          },
+          "signature": "creator.generation_finish_provider_usage(uuid,uuid,uuid,text,jsonb,integer)",
+          "owner": "creator_w2_generation_journal",
+          "definitionChecksum": "a828012a21a92c4046960d172f478da3bc6c10bed5124f27d6c37ae80528c6c6"
+        },
+        {
+          "migration": {
+            "version": "0181_w2_generation_attempt_admission",
+            "checksum": "eab8c8e07b8a1e6ba4384f5300560bd46853bf98509faade5a1b555e130c75ee"
+          },
+          "signature": "creator.generation_open_provider_usage(uuid,uuid,text,text,text,text)",
+          "owner": "creator_w2_generation_journal",
+          "definitionChecksum": "d4ed58442dd4fa1c9f6bd0594e347c1e394a2870356efa88b542bdee34e6ea37"
+        },
+        {
+          "migration": {
+            "version": "0224_w5_generation_origin_profile_fence",
+            "checksum": "09d3df2f3549d0267dce2fe049789e575b1c8f212ee887d2d5396f110bafc047"
+          },
+          "signature": "creator.generation_output_cursor_view(uuid,uuid,integer,integer)",
+          "owner": "creator_generation_cursor_authority",
+          "definitionChecksum": "82a41ead29625ed418d87a03ac8943590e9804b3ebcaa15f9e106cc80f9c2de6"
+        },
+        {
+          "migration": {
+            "version": "0210_w2_generation_guardrail_event",
+            "checksum": "0c0fc7fee7182f3e77695222e51cce910268f7844437a5e974f68af5927a3382"
+          },
+          "signature": "creator.generation_record_agent_guardrail(uuid,uuid,text,text)",
+          "owner": "creator_w2_generation_guardrail",
+          "definitionChecksum": "663716074d67da9106399a23be97d740577532fb8b4b1507cb65f4cf0f415374"
+        },
+        {
+          "migration": {
+            "version": "0212_w3_generation_worker_output",
+            "checksum": "76ee832c45e5dc422a8128afdc162a354fc54b7df4f611fb6186cdf3bd094df8"
+          },
+          "signature": "creator.generation_worker_output(uuid,uuid,integer,text,jsonb)",
+          "owner": "creator_w3_generation_output",
+          "definitionChecksum": "f32169bba8e4c13bca95e6e18ff9900c1d1a157fe026cb841017cb7fd65a9453"
+        }
+      ],
+      "terminalConsumers": [
+        {
+          "migration": {
+            "version": "0183_w1_generation_terminal_scope",
+            "checksum": "fadbf62a3ddf06142c3a6ad30313503f9bebe7b6d64f67f8ba01ff13ce2398c7"
+          },
+          "signature": "creator.begin_generation_terminal(uuid,uuid,text,uuid,integer,boolean)",
+          "owner": "creator_generation_terminal_authority",
+          "definitionChecksum": "b2631b4b917f2406fff50fb5beaaab8d0eb96e9512534d251d56ffb4e363b691",
+          "purpose": "generation_terminal"
+        },
+        {
+          "migration": {
+            "version": "0183_w1_generation_terminal_scope",
+            "checksum": "fadbf62a3ddf06142c3a6ad30313503f9bebe7b6d64f67f8ba01ff13ce2398c7"
+          },
+          "signature": "creator.end_generation_terminal()",
+          "owner": "creator_generation_terminal_authority",
+          "definitionChecksum": "ce3e9f466d859d7f46091b601bbd0b84357a9ee2a3157a3ca3e8e39f75a1aacc",
+          "purpose": "generation_terminal"
+        },
+        {
+          "migration": {
+            "version": "0188_w2_generation_terminal_journal",
+            "checksum": "7ab8974d065b1b9e5befa2ded26c6978876957fab0eee80b9632825bbac98477"
+          },
+          "signature": "creator.generation_agent_journal_receipt(uuid,uuid)",
+          "owner": "creator_w2_generation_terminal_journal",
+          "definitionChecksum": "557c1558773e36ced55aca522e16e15d975665afb3873a95cbab9661e0d76f4b",
+          "purpose": "generation_terminal"
+        },
+        {
+          "migration": {
+            "version": "0188_w2_generation_terminal_journal",
+            "checksum": "7ab8974d065b1b9e5befa2ded26c6978876957fab0eee80b9632825bbac98477"
+          },
+          "signature": "creator.generation_seal_agent_journal(uuid,uuid)",
+          "owner": "creator_w2_generation_terminal_journal",
+          "definitionChecksum": "925097ea517ebcdace4f23e281f4575cbf76914636b0503afa2989afd4cd49b7",
+          "purpose": "generation_terminal"
+        },
+        {
+          "migration": {
+            "version": "0215_w4_generation_safety_terminal_settlement",
+            "checksum": "5aba1bffa300a811630f66e8577d29801694a54b6f06de610f7f78a7184d9a24"
+          },
+          "signature": "creator.generation_settle_typed_original_allowance(uuid,uuid)",
+          "owner": "creator_w4_generation_safety_terminal",
+          "definitionChecksum": "b1fa2214776a9ee2bfd8a23f172e4ac87b050452e492cc57f6877c992153989b",
+          "purpose": "generation_terminal"
+        },
+        {
+          "migration": {
+            "version": "0183_w1_generation_terminal_scope",
+            "checksum": "fadbf62a3ddf06142c3a6ad30313503f9bebe7b6d64f67f8ba01ff13ce2398c7"
+          },
+          "signature": "creator.generation_terminal_matches(uuid,uuid,boolean)",
+          "owner": "creator_generation_terminal_authority",
+          "definitionChecksum": "c3f8423b34d38f4f5fdb74804ecffd7b4aa659d243d50a0524be88318ff6c8ad",
+          "purpose": "generation_terminal"
+        },
+        {
+          "migration": {
+            "version": "0203_w3_terminal_only_finalization",
+            "checksum": "8de1897f2e70f763382984459274eb7616ad7149b457811fffd90fb8b7df2e8c"
+          },
+          "signature": "creator.generation_terminal_output(uuid,uuid)",
+          "owner": "creator_w3_terminal_output",
+          "definitionChecksum": "b2b73568bcc9788e729720d1287fb9b2701f26dea20c705d80466e73f545eec7",
+          "purpose": "generation_terminal"
+        },
+        {
+          "migration": {
+            "version": "0215_w4_generation_safety_terminal_settlement",
+            "checksum": "5aba1bffa300a811630f66e8577d29801694a54b6f06de610f7f78a7184d9a24"
+          },
+          "signature": "creator.generation_typed_original_allowance_receipt(uuid,uuid)",
+          "owner": "creator_w4_generation_safety_terminal",
+          "definitionChecksum": "fa85ad12d1711d00cb485ae2bef431949bdeb165c8923292458ec0e7ee2a0f41",
+          "purpose": "generation_terminal"
+        },
+        {
+          "migration": {
+            "version": "0227_w1_generation_terminal_page",
+            "checksum": "8632008a15ba322f6caa3b7a393635851c9d7ea18dcd6ad7f175361d4281149c"
+          },
+          "signature": "creator.pending_generation_terminal_cursor_page(integer,uuid)",
+          "owner": "creator_generation_terminal_discovery",
+          "definitionChecksum": "f6924de4ce05abea703aa6995dab1dbe2a49279c4e7e290e2722c1bb57f227c6",
+          "purpose": "generation_terminal"
+        },
+        {
+          "migration": {
+            "version": "0218_w1_generation_terminal_discovery",
+            "checksum": "83a56963f6c37e05b0850fa6a0e97475282fbfa3e90d1372f86bea701622e7bc"
+          },
+          "signature": "creator.pending_generation_terminal_cursors(integer)",
+          "owner": "creator_generation_terminal_discovery",
+          "definitionChecksum": "36036c26c440e7af694b8a5702c43d96985fcf2ce8c65188f91e130f6f31c00e",
+          "purpose": "generation_terminal"
+        },
+        {
+          "migration": {
+            "version": "0183_w1_generation_terminal_scope",
+            "checksum": "fadbf62a3ddf06142c3a6ad30313503f9bebe7b6d64f67f8ba01ff13ce2398c7"
+          },
+          "signature": "creator.pending_generation_terminals(integer)",
+          "owner": "creator_generation_terminal_authority",
+          "definitionChecksum": "b619edf7052bba513ea9b060289eabdf00424364b37ae75823018a7fcbb8cdef",
+          "purpose": "generation_terminal"
+        }
+      ]
+    },
+    "terminal": {
+      "migration": {
+        "version": "0183_w1_generation_terminal_scope",
+        "checksum": "fadbf62a3ddf06142c3a6ad30313503f9bebe7b6d64f67f8ba01ff13ce2398c7"
+      },
+      "denialMigration": {
+        "version": "0184_w8_generation_terminal_denial",
+        "checksum": "393920665d8860ee53ee6ef740ba0ad4a6921aceddcbf33f6419727e846532af"
+      },
+      "denialDefinitionChecksum": "fc465b04641c205007bc532f0e7f3e95450f1fb82bf0b66811d3a27c42923a22",
+      "definitions": {
+        "creator.begin_generation_terminal(uuid,uuid,text,uuid,integer,boolean)": "b2631b4b917f2406fff50fb5beaaab8d0eb96e9512534d251d56ffb4e363b691",
+        "creator.capture_generation_terminal()": "b61df43e7edd74a33f80be0965169c4295c739d0364c18d017f48a86aa6283c4",
+        "creator.end_generation_terminal()": "ce3e9f466d859d7f46091b601bbd0b84357a9ee2a3157a3ca3e8e39f75a1aacc",
+        "creator.generation_terminal_matches(uuid,uuid,boolean)": "c3f8423b34d38f4f5fdb74804ecffd7b4aa659d243d50a0524be88318ff6c8ad",
+        "creator.pending_generation_terminals(integer)": "b619edf7052bba513ea9b060289eabdf00424364b37ae75823018a7fcbb8cdef",
+        "creator.require_generation_terminal_cleanup()": "c9df9677830afe0e1d6b2ac33ec3efd288319bdc909a5eb381946987b5bdcd62"
+      }
+    },
+    "inputs": {
+      "consumer": {
+        "migration": {
+          "version": "0180_w2_generation_input_consumers",
+          "checksum": "25f89ddba69beed4dd780cd23a64eabb9b7481e2dcb5f192b167299a732b2c34"
+        },
+        "signature": "creator.generation_agent_inputs(uuid,uuid)",
+        "owner": "creator_w2_generation_input",
+        "definitionChecksum": "5647fdd64b324793650535e1deee429d5002d5425be2af685328c6bfc56bdd93"
+      },
+      "catalogueChecksum": "c15c55dd7ee2d956ccaf14299350dfc413d64fc613c1e9f3216d5313151ead13"
+    },
+    "origins": {
+      "consumer": {
+        "migration": {
+          "version": "0186_w5_generation_content_origin",
+          "checksum": "2f1c4b30133a0c8707b16b15c1e42a9daf539cb5edeeb48ad6a835352a4f444d"
+        },
+        "signature": "creator.generation_content_origins(uuid,uuid,jsonb)",
+        "owner": "creator_w5_generation_origin",
+        "definitionChecksum": "af318afd2b0e498bc9d257f5763265f731173442879ac4c9d1961fdb9b5cb71e"
+      },
+      "catalogueChecksum": "e9dcfbf38617c4bb1d3cd1e6dec681a7ed25803af37e4ddea73b55fa3b088590",
+      "signatureMigration": {
+        "version": "0167_w1_signature_read_fence",
+        "checksum": "157640de84f22d6d638d788dfe04314fd193efaed80a829f288bec7cbcb815b5"
+      },
+      "metadataDefinitionChecksum": "afd39c80343b155f9a92f31af29f64348403d1cbcac210597950e6c2d9e0fce5",
+      "signatureFenceDefinitionChecksum": "aa5337e81fa8b6a7e133a4bfc535370d1e79d95eb9e16a37c5eebcfc3d516493",
+      "profileFenceDefinitionChecksum": "7463da40e6be21ad158d2e1e43cf8f3f887c2db020691d3ef36eff166d82e314"
+    },
+    "context": {
+      "consumer": {
+        "migration": {
+          "version": "0179_w3_generation_purpose_consumers",
+          "checksum": "9449f7f9254aa1c9c77713b1683d5c85076b357f13e573882ee5d2d03d1715e0"
+        },
+        "signature": "creator.generation_conversation_context(uuid,uuid)",
+        "owner": "creator_generation_conversation_context",
+        "definitionChecksum": "c07641db399389dc17d5e078146b99f51f5d440a9a07191a7714047952c6c93c"
+      },
+      "catalogueChecksum": "8023a3157cd5524e0a15a51aaf0ed90c1e36d2f63c05775e1bdefb15222aeae0"
+    },
+    "audience": {
+      "consumer": {
+        "migration": {
+          "version": "0182_w4_generation_allowance_audience",
+          "checksum": "98f9373fbf2403e05f6f26a4223a94779d3280fefa89f2ab2c6f30fbbef796be"
+        },
+        "signature": "creator.generation_allowance_audience(uuid,uuid)",
+        "owner": "creator_w4_generation_audience",
+        "definitionChecksum": "0f8d71b2adf8e27ab5c3e94a96144ceb934f6a65fd420ab04e1eff9011e61d2f"
+      }
+    },
+    "metadata": {
+      "consumer": {
+        "migration": {
+          "version": "0211_w2_generation_agent_metadata",
+          "checksum": "4bbcd9a24b622ee63525da6f20eaf21f84eb9c2d4d538a9122d8184347a76b4f"
+        },
+        "signature": "creator.generation_agent_metadata(uuid,uuid)",
+        "owner": "creator_w2_generation_metadata",
+        "definitionChecksum": "ccce41f6284c0ecba5e2741f6e88c83cee3ea0a39ce3cb7b0a9c361927cebad4"
+      },
+      "catalogueChecksum": "b616d50df2eee9aa4a0e0d2cc489b917bc9dd6c301e593cc55ca9c8cbacc4c15"
+    },
+    "accounting": {
+      "consumers": [
+        {
+          "migration": {
+            "version": "0181_w2_generation_attempt_admission",
+            "checksum": "eab8c8e07b8a1e6ba4384f5300560bd46853bf98509faade5a1b555e130c75ee"
+          },
+          "signature": "creator.generation_begin_agent_attempt(uuid,uuid,text,text,bigint,text)",
+          "owner": "creator_w2_generation_journal",
+          "definitionChecksum": "f93fcc061f6d26ec81c3b981194b9913f25a3eb232c590b2ea19e35b8bb940c4"
+        },
+        {
+          "migration": {
+            "version": "0181_w2_generation_attempt_admission",
+            "checksum": "eab8c8e07b8a1e6ba4384f5300560bd46853bf98509faade5a1b555e130c75ee"
+          },
+          "signature": "creator.generation_finish_provider_usage(uuid,uuid,uuid,text,jsonb,integer)",
+          "owner": "creator_w2_generation_journal",
+          "definitionChecksum": "a828012a21a92c4046960d172f478da3bc6c10bed5124f27d6c37ae80528c6c6"
+        },
+        {
+          "migration": {
+            "version": "0181_w2_generation_attempt_admission",
+            "checksum": "eab8c8e07b8a1e6ba4384f5300560bd46853bf98509faade5a1b555e130c75ee"
+          },
+          "signature": "creator.generation_open_provider_usage(uuid,uuid,text,text,text,text)",
+          "owner": "creator_w2_generation_journal",
+          "definitionChecksum": "d4ed58442dd4fa1c9f6bd0594e347c1e394a2870356efa88b542bdee34e6ea37"
+        }
+      ],
+      "catalogueChecksum": "a98502b58f8994aacc7b1363bbc63f339cbcd57f5390a6250282f7ccf7b727e8"
+    },
+    "retrieval": {
+      "consumer": {
+        "migration": {
+          "version": "0187_w2_generation_retrieval_context",
+          "checksum": "bf9d9c35b3f0bb8c18518bd06b4459d16d421f4da4a6ad0ba06f8319acc89747"
+        },
+        "signature": "creator.generation_agent_runtime_context(uuid,uuid,text,text)",
+        "owner": "creator_w2_generation_retrieval",
+        "definitionChecksum": "b92d539a27964486f8d2222a411091a7c698f03c20d78179a0907a56fe5c86f6"
+      },
+      "catalogueChecksum": "4da91a5bb7d7a1ab80f661e7f7844ff676af71a110b4de28a1633ff93fe1e923"
+    },
+    "guardrail": {
+      "consumer": {
+        "migration": {
+          "version": "0210_w2_generation_guardrail_event",
+          "checksum": "0c0fc7fee7182f3e77695222e51cce910268f7844437a5e974f68af5927a3382"
+        },
+        "signature": "creator.generation_record_agent_guardrail(uuid,uuid,text,text)",
+        "owner": "creator_w2_generation_guardrail",
+        "definitionChecksum": "663716074d67da9106399a23be97d740577532fb8b4b1507cb65f4cf0f415374"
+      },
+      "catalogueChecksum": "23536cde69da96f46012337c162289aa9375c39d82b77d403cb59889e3239077"
+    },
+    "output": {
+      "consumer": {
+        "migration": {
+          "version": "0212_w3_generation_worker_output",
+          "checksum": "76ee832c45e5dc422a8128afdc162a354fc54b7df4f611fb6186cdf3bd094df8"
+        },
+        "signature": "creator.generation_worker_output(uuid,uuid,integer,text,jsonb)",
+        "owner": "creator_w3_generation_output",
+        "definitionChecksum": "f32169bba8e4c13bca95e6e18ff9900c1d1a157fe026cb841017cb7fd65a9453"
+      },
+      "catalogueChecksum": "64688558896c38dedbf26bd7d4fe051f19c1bdaaa6eb5367498f3173e3d664a7"
+    },
+    "terminalJournal": {
+      "consumers": [
+        {
+          "migration": {
+            "version": "0188_w2_generation_terminal_journal",
+            "checksum": "7ab8974d065b1b9e5befa2ded26c6978876957fab0eee80b9632825bbac98477"
+          },
+          "signature": "creator.generation_agent_journal_receipt(uuid,uuid)",
+          "owner": "creator_w2_generation_terminal_journal",
+          "definitionChecksum": "557c1558773e36ced55aca522e16e15d975665afb3873a95cbab9661e0d76f4b"
+        },
+        {
+          "migration": {
+            "version": "0188_w2_generation_terminal_journal",
+            "checksum": "7ab8974d065b1b9e5befa2ded26c6978876957fab0eee80b9632825bbac98477"
+          },
+          "signature": "creator.generation_seal_agent_journal(uuid,uuid)",
+          "owner": "creator_w2_generation_terminal_journal",
+          "definitionChecksum": "925097ea517ebcdace4f23e281f4575cbf76914636b0503afa2989afd4cd49b7"
+        }
+      ],
+      "catalogueChecksum": "0d150c04f533ce0f401aaba23d9a6d4b49a1ab9e615bc688c817b6ca5db9eb4e",
+      "privateHelperDefinitionChecksum": "7a30d64bc13f633fb15b806cbf55d5b1bb194c4cbdfb02ee5e821d0b61e09ca4"
+    },
+    "finalization": {
+      "consumer": {
+        "migration": {
+          "version": "0203_w3_terminal_only_finalization",
+          "checksum": "8de1897f2e70f763382984459274eb7616ad7149b457811fffd90fb8b7df2e8c"
+        },
+        "signature": "creator.generation_terminal_output(uuid,uuid)",
+        "owner": "creator_w3_terminal_output",
+        "definitionChecksum": "b2b73568bcc9788e729720d1287fb9b2701f26dea20c705d80466e73f545eec7"
+      },
+      "catalogueChecksum": "bd6e5be6c14921cb31f1afa7e1d38cb83f9346f971f52d559876bd14345da679"
+    },
+    "settlement": {
+      "consumers": [
+        {
+          "migration": {
+            "version": "0215_w4_generation_safety_terminal_settlement",
+            "checksum": "5aba1bffa300a811630f66e8577d29801694a54b6f06de610f7f78a7184d9a24"
+          },
+          "signature": "creator.generation_settle_typed_original_allowance(uuid,uuid)",
+          "owner": "creator_w4_generation_safety_terminal",
+          "definitionChecksum": "b1fa2214776a9ee2bfd8a23f172e4ac87b050452e492cc57f6877c992153989b"
+        },
+        {
+          "migration": {
+            "version": "0215_w4_generation_safety_terminal_settlement",
+            "checksum": "5aba1bffa300a811630f66e8577d29801694a54b6f06de610f7f78a7184d9a24"
+          },
+          "signature": "creator.generation_typed_original_allowance_receipt(uuid,uuid)",
+          "owner": "creator_w4_generation_safety_terminal",
+          "definitionChecksum": "fa85ad12d1711d00cb485ae2bef431949bdeb165c8923292458ec0e7ee2a0f41"
+        }
+      ],
+      "catalogueChecksum": "a3afc67c879715585499413b105ee9e4d8ee609c1562c8a49ea2042de65b7873"
+    }
+  }
+}

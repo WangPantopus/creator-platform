@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "scope": "closed-metadata-only; source registration and activation remain separate",
+  "source": {
+    "version": "0198_w5_content_privacy_export",
+    "name": "w5_content_privacy_export",
+    "owner": "W5",
+    "path": "apps/backend/src/modules/content/schema-content-privacy-export.sql",
+    "checksum": "faff9c4be7b6f27601032756a6be845d656969d81f15e89ad10611e639a83ff8"
+  },
+  "baselineWave": {
+    "path": "infra/migrations/waves/20261007-generation.json",
+    "sha256": "8418840a9b15bd71ca3e155ce8742deab90048991f1324c6096003a4e7e1e908"
+  },
+  "purposeProfiles": [
+    {
+      "review": "original-and-independent-restore",
+      "sha256": "bdffd5cab9ad4886cf8acd1aaa02c15ed851a3609ce4bd258c55f883e09f01d2"
+    },
+    {
+      "review": "preserved-incoming-api",
+      "sha256": "18f805c3267dd94a9dbc7091ea2e6ef56b42403d912698df9b40608d206539c6"
+    }
+  ],
+  "runtimeCatalogues": {
+    "output": "3cf751db5dcd78257fed9434b637a352e553b65a852d5470d7e3ab82ea34b56e",
+    "terminal": "050fcb190dfc84c41b9514ee3949ebc7291199b578c738ca4254b985ac4dae47",
+    "financial": "a3afc67c879715585499413b105ee9e4d8ee609c1562c8a49ea2042de65b7873",
+    "expiry": "dff399afbbbee8ef7f6bbe9fcecd6490331f34a0758bdba1c123f5c240ea360a",
+    "detached": "6810670fbe552c9680c29ae6410a1a289a442e12492a0d14cd038a4ea9e32140",
+    "boundary": "afff7c0d475446ace27db7d17ac02eaa4efe8107b8defdfb1a871a77a09276ef"
+  },
+  "originalFamilyProfiles": [
+    {
+      "review": "original-and-independent-restore",
+      "sha256": "6bc50f04f6d3402b2026444f77a444269d9bc3b1a6cf43bd6ce3315686abb153"
+    },
+    {
+      "review": "preserved-incoming-api",
+      "sha256": "1872ac49dea0152507493aa677a9ee27cf8aaf6fb3be59c838c999c8fba72bcd"
+    }
+  ],
+  "sourceParent": "e46d2028"
+}

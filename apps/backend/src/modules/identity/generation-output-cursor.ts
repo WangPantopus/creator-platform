@@ -4,6 +4,7 @@ import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
 import { DomainError } from "../../core/errors.js";
 import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
 import { generationPrivacySourcesRegistered } from "../../db/generation-privacy-sources.js";
+import { generationPrivacyCatalogueChecksum } from "../../db/content-privacy-profile.js";
 import { requestAuthority } from "./request-authority.js";
 
 export const generationOutputCursorSignature =
@@ -96,7 +97,10 @@ export async function assertGenerationOutputCursorCatalogue(
     ).rows[0]?.catalogue;
     if (
       contentHash({ cursor, writer, catalogue }) !==
-      generationOutputCursorCatalogueChecksum
+      (await generationPrivacyCatalogueChecksum(
+        "output",
+        generationOutputCursorCatalogueChecksum,
+      ))
     )
       unavailable();
     // Restore only after a successful metadata read. Any failure escapes to
