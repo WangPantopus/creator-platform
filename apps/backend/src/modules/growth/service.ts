@@ -567,9 +567,15 @@ export class GrowthService {
           429,
         );
       const result = await client.query(
-        "INSERT INTO growth.invite(creator_id,created_by,context_id,expires_at,campaign) VALUES($1,$2,$3,now()+interval '30 days','creator_launch') RETURNING id,expires_at",
+        "INSERT INTO growth.invite(creator_id,created_by,context_id,expires_at,campaign) SELECT id,$2,$3,now()+interval '30 days','creator_launch' FROM growth.creator_public WHERE id=$1 AND state='published' AND document->>'verified'='true' RETURNING id,expires_at",
         [creatorId, actor.accountId, value.contextId],
       );
+      if (!result.rowCount)
+        throw new DomainError(
+          "creator_unavailable",
+          copy.growthThisCreatorIsUnavailable,
+          404,
+        );
       return result.rows[0];
     });
   }

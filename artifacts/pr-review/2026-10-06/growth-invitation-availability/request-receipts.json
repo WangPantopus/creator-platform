@@ -1,0 +1,30 @@
+[
+  {
+    "timestamp": "2026-10-07T03:09:00.460Z",
+    "level": "info",
+    "environment": "local-development",
+    "release": "3c8d6882c3b6bfa40b39ed592a14fda97f1345db",
+    "correlationId": "a90456d7-7ef0-4a16-b083-2febbd3076e1",
+    "method": "POST",
+    "route": "/invites",
+    "status": 404,
+    "transferOutcome": "finished",
+    "errorCode": null,
+    "failureClass": null,
+    "durationMs": 51.77
+  },
+  {
+    "timestamp": "2026-10-07T03:09:11.063Z",
+    "level": "info",
+    "environment": "local-development",
+    "release": "3c8d6882c3b6bfa40b39ed592a14fda97f1345db",
+    "correlationId": "9e0f03cb-1d80-4bf0-8846-a1dc69efdbe6",
+    "method": "POST",
+    "route": "/invites",
+    "status": 404,
+    "transferOutcome": "finished",
+    "errorCode": null,
+    "failureClass": null,
+    "durationMs": 50.13
+  }
+]

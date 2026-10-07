@@ -1,5 +1,13 @@
 # Resume checkpoint — PR review and independent app fixes
 
+## Latest update — #319 merged, invitation refusal ready
+
+**30 confirmed merges.** Studio #319 is merged at `a6d69c3a91d8bcd6eb6a2a6ab8fc19a4cf29f0b4`; exact receipts live in the external visualization folder below. Both affected head checks passed; original20 heads were freshly verified unchanged. Current branch `codex/growth-unavailable-invitation-20261006` starts from this main. The [invitation availability correction](growth-invitation-availability-2026-10-06.md) is ready to commit/open/qualify. All21 then-open createInvite implementations were byte-identical before editing; no duplicate fix exists. Actual browser attempts now return404 in about50ms, zero rows, the existing creator-unavailable copy and recovered button. Build/types/lint/format passed. No new publication/grants/schema/provider/test setup.
+
+Actual current creator is signed out and temporary verification restored pending/version9. Direct API4206 exec56931 log `/tmp/creator-growth-invitation-api.log`, web3106, DB5546 running. IAB5 review tabs1–6 are auth continuations; no interception/viewport/media overrides. Zero invites and public projections; two stopped proposals/nine feedback rows preserved.
+
+After qualifying this small PR, finish current receipt/checkpoint cleanup. Existing public-entry/follow/referral guards also exist in #31 (`features/growth/public-session.ts` and related components); inspect/reuse them if continuing. Their positive flows require a genuine published creator projection absent here. Broad20 holds remain real; do not claim all possible app work or full product qualification is complete.
+
 ## Latest update — Studio guards ready after #318
 
 **29 confirmed merges.** Measurement #318 is merged at `3c8d6882c3b6bfa40b39ed592a14fda97f1345db`; operated head `796b896d5912d78053dc183161358dcae1c7b046` has the same tree. Both affected CI checks passed at fresh normal-merge gate. Exact receipts `pr-318-pre-merge.json`/`pr-318-merged.json` are in the external visualization directory below.
