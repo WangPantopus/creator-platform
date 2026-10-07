@@ -5,6 +5,7 @@ import type { PreparedGenerationJournal } from "./generation-journal.js";
 import { agentPrivacyTransaction } from "./privacy-transaction.js";
 import { unresolvedAccountingInTransaction } from "./accounting-uncertainty.js";
 import { agentPreparationRead } from "./preparation-read.js";
+import { assertAccountingRetentionIntegrity } from "./retention-integrity.js";
 
 // Held above the lineage prerequisite; original reserved SQL stays immutable.
 export const USAGE_RETENTION_MIGRATION = "0165_w2_usage_retention_expiry";
@@ -53,6 +54,7 @@ export class PreparedUsageRetention {
     const { migration, schema, database } = await agentPreparationRead(
       pool,
       async (client) => {
+        await assertAccountingRetentionIntegrity(client, input.signal);
         const migration = (
           await client.query<{ checksum: string }>(
             "SELECT checksum FROM creator.schema_migration WHERE version=$1",
@@ -100,6 +102,7 @@ export class PreparedUsageRetention {
   }
 
   async assertClient(client: PoolClient) {
+    await assertAccountingRetentionIntegrity(client);
     const ready = await client.query(
       "SELECT version FROM creator.schema_migration WHERE version=$1 AND checksum=$2 AND current_database()=$3",
       [USAGE_RETENTION_MIGRATION, this.checksum, this.database],

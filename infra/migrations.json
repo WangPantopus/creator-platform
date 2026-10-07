@@ -1141,6 +1141,15 @@
       "sourceSha256": "542b271ee29a5fdede8eaa77620301854026831955b717229cb055bda5bf4296",
       "state": "reserved_unapplied",
       "reason": "Additive immutable original weighted-allowance settlement time, recorded by a trigger only on the actual reserved-to-terminal transition and governed by the original financial checks and sole transaction COMMIT. Historical terminal rows remain undated; caller values, backfill and retry clock resets refuse. No roles, memberships, grants, ledger adoption or policy/provider/financial receipts are supplied. Required by the original twelve-calendar-month known-cost retention rule; full prepared graph and actual financial/privacy qualification remain pending."
+    },
+    {
+      "id": "0229",
+      "owner": "W2",
+      "version": "0229_w2_accounting_retention_integrity",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_accounting_retention_integrity.sql",
+      "sourceSha256": "d5a3067868f232f5fda69b11b6f57e642c2913061108edae4943010fe3457c89",
+      "state": "reserved_unapplied",
+      "reason": "Additive original usage/hold creation-clock immutability, finite retained deadlines and immutable original retained disposition/known cost metadata. Existing0163/0165 sources, amounts and dates are not rewritten. Original financial/task/expiry authority remains necessary for the first disposition and erasure; no new role, membership, grant, expiry job or production activation. Full account detachment and expiry worker remain unfinished."
     }
   ]
 }

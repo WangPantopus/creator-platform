@@ -1,0 +1,185 @@
+{
+  "scope": "Original integrity source/catalogue in a closed rollback and temporary mechanical row shapes only. No real financial reconciliation, deletion, expiry lease or provider operation.",
+  "sourceSha256": "d5a3067868f232f5fda69b11b6f57e642c2913061108edae4943010fe3457c89",
+  "definitions": {
+    "hold": {
+      "definition": "2543f589bd4e47977865edd3c143c44070820daaba43f902fcd4a29cfa37a1f0",
+      "trigger": "fb8a996be93c22f452fc108f8cda9d755d20ae48170abbb00e83df2b7cbc377c",
+      "constraint": null
+    },
+    "usage": {
+      "definition": "921498df306ac21d20c3ba7b29f72800d1f464eba23b89a754f8fae1decdcd0f",
+      "trigger": "a82d8fa7e83a92d3cd310fbbcb9024c01431d30a3a5e4dc9ecae3646cb5d99b4",
+      "constraint": "a30b9424fd0498c5e5d367b123116d64a2d5a04c9df42a27ed31769d8f43b7ad"
+    }
+  },
+  "metadataDrifts": [
+    "public_execution",
+    "security_definer",
+    "function_owner",
+    "function_search_path",
+    "function_volatility",
+    "disabled_usage_trigger",
+    "replica_hold_trigger",
+    "column_only_trigger",
+    "conditional_trigger",
+    "missing_constraint",
+    "unvalidated_constraint",
+    "rewritten_constraint",
+    "hold_definition",
+    "relation_force_rls"
+  ],
+  "allDriftsDetectedAndRestored": true,
+  "temporaryShapeRefusals": [
+    "usage_clock",
+    "hold_clock",
+    "extended_deadline",
+    "earlier_deadline",
+    "clear_deadline",
+    "retention_policy",
+    "disposition_reference",
+    "retention_reason",
+    "known_amount",
+    "known_to_unknown",
+    "provider",
+    "model",
+    "input_tokens",
+    "output_tokens",
+    "cache_tokens",
+    "cache_write_tokens",
+    "version_hash",
+    "category",
+    "purpose",
+    "duration",
+    "infinite_deadline"
+  ],
+  "sameValueRetryPreserved": true,
+  "temporaryUnknownToKnownPreservedOriginalDates": true,
+  "temporaryExplicitErasureAndRollback": true,
+  "retained": {
+    "holds": 0,
+    "usage": 0,
+    "ledger": 61,
+    "integrity": null
+  },
+  "composition": {
+    "all16FreshAndPreservedPartsEqual": true,
+    "fresh": {
+      "scope": "Closed34-source generation plus retention/export/ownership composition. Original0214 family and0217 deletion gates are not bypassed and remain outside this partial review.",
+      "sourceSha256": {
+        "apps/backend/src/modules/identity/schema-generation-terminal-page.sql": "8632008a15ba322f6caa3b7a393635851c9d7ea18dcd6ad7f175361d4281149c",
+        "apps/backend/src/modules/commerce/schema-generation-settlement-clock.sql": "542b271ee29a5fdede8eaa77620301854026831955b717229cb055bda5bf4296",
+        "apps/backend/src/modules/agent/migrations/0067_w2_usage_retention_expiry.sql": "1c118f5ec90a5a3f3578e056af14d5e56b1379464977c4a79bd6c2b62be7f17e",
+        "apps/backend/src/modules/agent/migrations/0113_w2_privacy_export_snapshot.sql": "f0b86d507bcb7ad194c680f93487f582354f711ca91f3deffb01843c263ea65a",
+        "apps/backend/src/modules/conversation/migrations/pending_w3_privacy_cursor_export.sql": "54c43918c34410404c81e2edc0356e8dac8f880211441ac48949bc0cc174121e",
+        "apps/backend/migrations/0209_w8_all_scope_privacy_ownership.sql": "6fa4006cb8c2f6901c7006595d08196573daef33f06aa6cec866a546ffcd2f01",
+        "apps/backend/src/modules/agent/migrations/pending_w2_accounting_retention_integrity.sql": "d5a3067868f232f5fda69b11b6f57e642c2913061108edae4943010fe3457c89"
+      },
+      "catalogueParts": 16,
+      "compiler": [],
+      "originalCustodyRestored": {
+        "schemaSha256": "abb6c0506469c8b8f2507ca3e2cb4616a7d158213fb9fd661050ccad9fbe5bf3",
+        "rolesSha256": "7edf513d1efd243817a47418db4932a38b33b7da112f3c22e2344624ab993813",
+        "rowsSha256": "6a0ea90e18ad4e3a5e523c37f18e87179790dfd007168b4bd3fb21c3ae46cdc1",
+        "tables": 143,
+        "rows": 61
+      },
+      "retained": {
+        "ledger": 61,
+        "scopeRows": {
+          "agent": 0,
+          "conversation": 0
+        }
+      }
+    },
+    "preserved": {
+      "scope": "Closed34-source generation plus retention/export/ownership composition. Original0214 family and0217 deletion gates are not bypassed and remain outside this partial review.",
+      "sourceSha256": {
+        "apps/backend/src/modules/identity/schema-generation-terminal-page.sql": "8632008a15ba322f6caa3b7a393635851c9d7ea18dcd6ad7f175361d4281149c",
+        "apps/backend/src/modules/commerce/schema-generation-settlement-clock.sql": "542b271ee29a5fdede8eaa77620301854026831955b717229cb055bda5bf4296",
+        "apps/backend/src/modules/agent/migrations/0067_w2_usage_retention_expiry.sql": "1c118f5ec90a5a3f3578e056af14d5e56b1379464977c4a79bd6c2b62be7f17e",
+        "apps/backend/src/modules/agent/migrations/0113_w2_privacy_export_snapshot.sql": "f0b86d507bcb7ad194c680f93487f582354f711ca91f3deffb01843c263ea65a",
+        "apps/backend/src/modules/conversation/migrations/pending_w3_privacy_cursor_export.sql": "54c43918c34410404c81e2edc0356e8dac8f880211441ac48949bc0cc174121e",
+        "apps/backend/migrations/0209_w8_all_scope_privacy_ownership.sql": "6fa4006cb8c2f6901c7006595d08196573daef33f06aa6cec866a546ffcd2f01",
+        "apps/backend/src/modules/agent/migrations/pending_w2_accounting_retention_integrity.sql": "d5a3067868f232f5fda69b11b6f57e642c2913061108edae4943010fe3457c89"
+      },
+      "catalogueParts": 16,
+      "compiler": [
+        {
+          "compiler": "creator.agent_privacy_export_rows(uuid)",
+          "diagnostics": []
+        },
+        {
+          "compiler": "creator.agent_privacy_export_matches(uuid)",
+          "diagnostics": []
+        },
+        {
+          "compiler": "creator.finish_agent_privacy_export_scope()",
+          "diagnostics": []
+        },
+        {
+          "compiler": "creator.begin_agent_privacy_export(uuid,uuid,uuid,uuid,uuid)",
+          "diagnostics": []
+        },
+        {
+          "compiler": "creator.current_agent_privacy_export(uuid)",
+          "diagnostics": []
+        },
+        {
+          "compiler": "creator.end_agent_privacy_export(uuid)",
+          "diagnostics": []
+        },
+        {
+          "compiler": "creator.finish_conversation_privacy_export_scope()",
+          "diagnostics": []
+        },
+        {
+          "compiler": "creator.fence_conversation_privacy_export(uuid,uuid,text,uuid,uuid,uuid)",
+          "diagnostics": []
+        },
+        {
+          "compiler": "creator.ai_usage_retention_integrity()",
+          "diagnostics": []
+        },
+        {
+          "compiler": "creator.ai_cost_hold_original_clock()",
+          "diagnostics": []
+        }
+      ],
+      "originalCustodyRestored": {
+        "schemaSha256": "30ec4ec6c71eb2c4e02fb473e65356994e3dfbcd04d8982ff31f18fbb7b5bee2",
+        "rolesSha256": "367a2a706b7aa22b37cb18051881aa0f1eb0d2bcb82129e0a1ad98a8a063c8f9",
+        "rowsSha256": "36073ad827fc043be173cf1c015594361f0a366ff8acfc98a1281804f5148c05",
+        "tables": 137,
+        "rows": 236
+      },
+      "retained": {
+        "ledger": 61,
+        "scopeRows": {
+          "agent": 0,
+          "conversation": 0
+        }
+      }
+    }
+  },
+  "registration": {
+    "scope": "Actual canonical runtime and executable registry refusal. Metadata-only reserved0229 does not activate a prepared retention owner.",
+    "reservedSourceRemainsInactive": true,
+    "preabortPreserved": true,
+    "poolReusable": true,
+    "authorityOrLedgerRowsCreated": 0
+  },
+  "validation": {
+    "shippingBuild": "passed under original W2 shared heavy-build lock",
+    "typecheck": "passed",
+    "eslint": "passed",
+    "prettier": "passed",
+    "existingBackendTests": "All26 existing backend tests passed105.70s;9 PostgreSQL,9 contracts,8 scheduler. T11 original10000pairs/1000threads101.818s; no appp95 claim.",
+    "sourceParent": "9e42335b",
+    "sourceSha256": {
+      "apps/backend/src/modules/agent/retention-integrity.ts": "793a5342d495fe1e68704435a9ec6c422027210e4a83dcdbcfde45994988fd9a",
+      "apps/backend/src/modules/agent/usage-retention.ts": "63ec7ae70e810f541a1897c72194d76272caa996b98779928779f88e5722d485",
+      "apps/backend/src/modules/agent/migrations/pending_w2_accounting_retention_integrity.sql": "d5a3067868f232f5fda69b11b6f57e642c2913061108edae4943010fe3457c89"
+    }
+  }
+}
