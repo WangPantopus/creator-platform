@@ -1,5 +1,15 @@
 # Resume checkpoint — PR review and independent app fixes
 
+## Latest update — Studio guards ready after #318
+
+**29 confirmed merges.** Measurement #318 is merged at `3c8d6882c3b6bfa40b39ed592a14fda97f1345db`; operated head `796b896d5912d78053dc183161358dcae1c7b046` has the same tree. Both affected CI checks passed at fresh normal-merge gate. Exact receipts `pr-318-pre-merge.json`/`pr-318-merged.json` are in the external visualization directory below.
+
+Current branch `codex/growth-existing-studio-session-20261006` is based on that main. [Studio session integration](growth-studio-session-2026-10-06.md) is ready to commit/open/qualify. Existing #31 page guards and Producer/LaunchKit wiring were extracted after a fresh21-head overlap audit including then-pending318; current Impact visual branches and newer Inbox are preserved. Actual four-view outage/recovery, account replacement/sign-out and missing-tuple refusals passed; types/build/lint/format passed. Populated Producer is source-reviewed/compiled only, with no invented cohort. Actual invitation creation truthfully refused absent public projection, leaving zero rows/unchanged empty clipboard. Do not claim positive producer/publication/invitation acceptance.
+
+Latest runtime: direct API4206 exec47242, `/tmp/creator-growth-studio-api.log`; web3106 and DB5546 still running. Current actor signed out. Temporary creator verification restored pending/version7. IAB5 tabs1–2 prior Measurement/account auth continuations,3 Launch,4 Insights,5 Impact,6 Activation all signed out. No interception/viewport/media override. Two stopped proposals, nine feedback rows, zero invites/public projections/insight snapshots/recommendations/activation jobs. Preserve data/key.
+
+Next candidate: actual Launch invitation failed with raw FK violation because `growth.creator_public` is absent, showing generic503. Check all current draft `GrowthService.createInvite` implementations before any fix; #31 itself still has the same unchecked INSERT. A finite domain refusal for a currently unavailable creator may be an independent narrow recovery improvement. No backend change for it has been made yet. Do not fabricate a published creator to obtain a positive result.
+
 ## Latest state — after #317, Measurement integration ready
 
 Founder explicitly resumed work and requires checking every open/draft PR for overlap before new implementation, reusing existing work, and committing/pushing/opening/merging qualified increments. No unit or automated test code; perform actual running browser/API/database verification. Original authorization includes merging good PRs; no repeated approval is needed. No subagents have been used.

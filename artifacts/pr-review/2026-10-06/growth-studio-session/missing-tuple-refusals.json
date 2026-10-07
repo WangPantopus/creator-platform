@@ -1,0 +1,68 @@
+[
+  {
+    "path": "insights",
+    "method": "GET",
+    "status": 400,
+    "body": {
+      "error": {
+        "code": "session_view_required",
+        "message": "Reopen this view with your current account before continuing."
+      }
+    }
+  },
+  {
+    "path": "impact",
+    "method": "GET",
+    "status": 400,
+    "body": {
+      "error": {
+        "code": "session_view_required",
+        "message": "Reopen this view with your current account before continuing."
+      }
+    }
+  },
+  {
+    "path": "activation",
+    "method": "GET",
+    "status": 400,
+    "body": {
+      "error": {
+        "code": "session_view_required",
+        "message": "Reopen this view with your current account before continuing."
+      }
+    }
+  },
+  {
+    "path": "recommendations",
+    "method": "PUT",
+    "status": 400,
+    "body": {
+      "error": {
+        "code": "session_view_required",
+        "message": "Reopen this view with your current account before continuing."
+      }
+    }
+  },
+  {
+    "path": "recommendations/publish",
+    "method": "POST",
+    "status": 400,
+    "body": {
+      "error": {
+        "code": "session_view_required",
+        "message": "Reopen this view with your current account before continuing."
+      }
+    }
+  },
+  {
+    "path": "invites",
+    "method": "POST",
+    "status": 400,
+    "body": {
+      "error": {
+        "code": "session_view_required",
+        "message": "Reopen this view with your current account before continuing."
+      }
+    }
+  }
+]
