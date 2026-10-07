@@ -759,6 +759,8 @@
   <string name="w6_consent_could_not_be_saved" formatted="false">Consent could not be saved.</string>
   <string name="w6_the_call_could_not_be_ended_try_again" formatted="false">The call could not be ended. Try again.</string>
   <string name="w6_the_summary_could_not_be_changed" formatted="false">The summary could not be changed.</string>
+  <string name="w6_call_action_unconfirmed" formatted="false">This call action is unconfirmed. Retry the same action before making another change.</string>
+  <string name="w6_retry_call_action" formatted="false">Retry this call action</string>
   <string name="w6_this_call_is_unavailable" formatted="false">This call is unavailable</string>
   <string name="w6_opening_your_call" formatted="false">Opening your call</string>
   <string name="w6_checking_the_booking_and_participant_access" formatted="false">Checking the booking and participant access.</string>

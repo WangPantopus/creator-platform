@@ -8218,6 +8218,28 @@
         }
       }
     },
+    "This call action is unconfirmed. Retry the same action before making another change.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This call action is unconfirmed. Retry the same action before making another change."
+          }
+        }
+      }
+    },
+    "Retry this call action": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry this call action"
+          }
+        }
+      }
+    },
     "This call is unavailable": {
       "extractionState": "manual",
       "localizations": {
