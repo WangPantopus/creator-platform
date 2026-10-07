@@ -12,6 +12,17 @@
         }
       }
     },
+    "Your feedback could not be confirmed. Your answers are kept; retry the same submission.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your feedback could not be confirmed. Your answers are kept; retry the same submission."
+          }
+        }
+      }
+    },
     "The service is unavailable. Your input has been kept; try again.": {
       "extractionState": "manual",
       "localizations": {

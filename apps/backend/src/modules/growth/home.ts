@@ -53,7 +53,9 @@ const Directory = z.object({
   order: z.enum(["activity", "directory"]).optional(),
 });
 
-/** Minimal private Home read through fresh issued fan scopes. The host can
+/** Retained families use the existing private thread destination from W7.
+ * Their issued scope, rather than public profile publication, authorizes the read.
+ * Minimal private Home read through fresh issued fan scopes. The host can
  * compose this with W4 request/W6 call entries; no analytics receives text. */
 export function canonicalConversationHomePage(
   conversation: ConversationHomeDirectory,

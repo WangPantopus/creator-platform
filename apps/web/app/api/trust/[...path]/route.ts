@@ -15,13 +15,34 @@ async function endCanonicalSession(request: NextRequest) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      ...(request.headers.get("X-Expected-Account-Id")
+        ? {
+            "X-Expected-Account-Id": request.headers.get(
+              "X-Expected-Account-Id",
+            )!,
+          }
+        : {}),
+      ...(request.headers.get("X-Expected-Session-Id")
+        ? {
+            "X-Expected-Session-Id": request.headers.get(
+              "X-Expected-Session-Id",
+            )!,
+          }
+        : {}),
       ...(request.headers.get("x-correlation-id")
         ? { "X-Correlation-Id": request.headers.get("x-correlation-id")! }
         : {}),
     },
     body: "{}",
+    signal: request.signal,
   });
-  if (!result.ok || (await result.json()).done !== true)
+  const data = await result.json();
+  if (!result.ok)
+    return NextResponse.json(data, {
+      status: result.status,
+      headers: { "Cache-Control": "no-store" },
+    });
+  if (data.done !== true)
     throw new Error("Canonical sign-out was not confirmed.");
 }
 function signOutUnavailable() {
@@ -78,7 +99,8 @@ async function forward(
     );
   if (target === "dev/logout") {
     try {
-      await endCanonicalSession(request);
+      const refused = await endCanonicalSession(request);
+      if (refused) return refused;
     } catch {
       return signOutUnavailable();
     }
@@ -128,6 +150,7 @@ async function forward(
       ? request.cookies.get(trustLocalSessionCookie)?.value
       : undefined) || request.cookies.get(sessionCookie)?.value;
   const expectedAccount = request.headers.get("X-Expected-Account-Id");
+  const expectedSession = request.headers.get("X-Expected-Session-Id");
   if (
     request.method === "POST" &&
     !target.startsWith("dev/") &&
@@ -169,12 +192,15 @@ async function forward(
         ...(expectedAccount
           ? { "X-Expected-Account-Id": expectedAccount }
           : {}),
+        ...(expectedSession
+          ? { "X-Expected-Session-Id": expectedSession }
+          : {}),
       },
       ...(body ? { body } : {}),
       cache: "no-store",
       signal: streaming
         ? AbortSignal.any([request.signal, AbortSignal.timeout(300_000)])
-        : AbortSignal.timeout(10_000),
+        : AbortSignal.any([request.signal, AbortSignal.timeout(10_000)]),
     });
     if (streaming && result.ok && result.body) {
       const headers = new Headers({
@@ -195,7 +221,8 @@ async function forward(
     const data = await result.json();
     if (target === "dev/session" && result.ok) {
       try {
-        await endCanonicalSession(request);
+        const refused = await endCanonicalSession(request);
+        if (refused) return refused;
       } catch {
         return signOutUnavailable();
       }

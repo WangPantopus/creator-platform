@@ -3,6 +3,7 @@ package com.pantopus.qelvora.generated
 object QelvoraCopy {
   val strings = mapOf(
     "continueWithPantopus" to "Continue with Pantopus",
+    "productFeedbackUnconfirmed" to "Your feedback could not be confirmed. Your answers are kept; retry the same submission.",
     "identityInputKeptUnavailable" to "The service is unavailable. Your input has been kept; try again.",
     "identityInputKeptUnreadable" to "The service returned an unreadable response. Your input has been kept; try again.",
     "identityProfileSaveFailed" to "Could not save. Try again.",

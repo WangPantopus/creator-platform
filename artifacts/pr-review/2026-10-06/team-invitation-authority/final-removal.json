@@ -1,0 +1,36 @@
+{
+  "source": "3581503312fde3d0bc43295e44e1bf88733124de",
+  "out": [
+    {
+      "label": "unrelated removal",
+      "status": 403,
+      "result": {
+        "error": {
+          "code": "creator_required",
+          "message": "Only this creator can perform this action.",
+          "requestId": "1a1180ae-9888-45a0-892c-079663db33cc",
+          "correlationId": "675f3ac0-9fac-40fe-861f-e6185442780d"
+        }
+      }
+    },
+    {
+      "label": "owner idempotent removal",
+      "status": 200,
+      "result": {
+        "done": true
+      }
+    },
+    {
+      "label": "self removal",
+      "status": 403,
+      "result": {
+        "error": {
+          "code": "team_creator_identity",
+          "message": "The creator's identity cannot be removed through team membership.",
+          "requestId": "21fd38e7-3748-49c1-947d-2102db4e6a7f",
+          "correlationId": "39a88ff5-0a22-4022-a431-17583585050e"
+        }
+      }
+    }
+  ]
+}

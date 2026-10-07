@@ -1,0 +1,27 @@
+[
+  {
+    "settings": {
+      "statement": "200ms",
+      "lock": "100ms",
+      "pid": 287
+    }
+  },
+  {
+    "readTimeoutCode": "growth_transaction_unavailable",
+    "status": 503,
+    "elapsedMs": 44,
+    "socketEnded": true,
+    "total": 0
+  },
+  {
+    "recovery": {
+      "pid": 288
+    }
+  },
+  {
+    "cancelCode": "growth_transaction_unavailable",
+    "status": 503,
+    "socketEnded": true,
+    "total": 0
+  }
+]

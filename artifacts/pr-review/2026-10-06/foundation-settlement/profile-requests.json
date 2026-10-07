@@ -1,0 +1,29 @@
+[
+  {
+    "timestamp": "2026-10-07T03:34:31.154Z",
+    "release": "b81d6de4e7c05c1213362096f8d8fc67e4e279f9",
+    "method": "POST",
+    "route": "/fan-profile",
+    "status": 503,
+    "failureClass": "database_lock_timeout",
+    "durationMs": 2019.12
+  },
+  {
+    "timestamp": "2026-10-07T03:34:53.010Z",
+    "release": "b81d6de4e7c05c1213362096f8d8fc67e4e279f9",
+    "method": "POST",
+    "route": "/fan-profile",
+    "status": 200,
+    "failureClass": null,
+    "durationMs": 17.89
+  },
+  {
+    "timestamp": "2026-10-07T03:35:46.007Z",
+    "release": "b81d6de4e7c05c1213362096f8d8fc67e4e279f9",
+    "method": "POST",
+    "route": "/fan-profile",
+    "status": 200,
+    "failureClass": null,
+    "durationMs": 18.03
+  }
+]

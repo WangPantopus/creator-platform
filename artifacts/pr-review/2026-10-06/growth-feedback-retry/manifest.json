@@ -1,0 +1,40 @@
+{
+  "base": "eb0c8df6ce38284ca8b89176d3c959c2e53a1f2e",
+  "sourceSha256": {
+    "apps/backend/src/modules/growth/service.ts": "8224410fea15b3901e7a1aef2f3f1f4ddea32d15ad3e1dd871b5f204194b9df8",
+    "apps/web/features/growth/feedback.tsx": "35580a0ab302d839ae7b045add8be323b644daea9cc227d781dfe4d57534212e"
+  },
+  "environment": "Preserved canonical isolated61-migrationDB5546, actual development issuer/GrowthAPI4206/web3106; same non-owner roles/private key",
+  "reproduced": "Two unscored rows after pre-fix lost response and unchanged retry; pre-hydration rating selection excluded",
+  "qualified": [
+    "Genuine keyed save and edited acknowledgement clearing",
+    "Lost actual success response after commit; exact key/body retry with byte-identical DB receipt/xmin",
+    "Two genuine concurrent UI requests, second key deliberately changed to first actual key; both success/one row",
+    "Changed real answers deliberately reuse old key; actual409 and immutable prior row",
+    "API stopped after committed response held; private view conceals/keeps intent; process restart/exact retry leaves full receipt unchanged",
+    "Actual account switch clears original form; equal request key under other actual account creates independent scoped row",
+    "Actual390x844DPR1Light/Night confirmation; phone edit clears success/enablesnewintent/no submit"
+  ],
+  "requestReplayKeys": {
+    "lostResponse": "d61847de-487f-46a4-a4f8-11e89df55410",
+    "concurrent": "e016c46a-cb7b-41fb-8834-b2ba9b753daa",
+    "restart": "26e67fa8-9ea3-46f8-892f-6184aec4340d"
+  },
+  "faults": "Only genuine responses held; selected actual request keys deliberately reused for concurrency/conflict/account-scope faults; no fabricated identity/status/body response/provider",
+  "checks": [
+    "backend/web types",
+    "backend build",
+    "production webpack web build",
+    "scoped ESLint/Prettier",
+    "shared generation check"
+  ],
+  "data": "8 synthetic feedback rows retained including baseline/pre-fixduplicates; zero notifications/deliveries/devices/emails",
+  "limits": [
+    "Mounted browser memory only; no full reload key recovery",
+    "Legacy unkeyedAPIcallers remainappend-only",
+    "Outcome retention follows existingrow/erasure lifecycle",
+    "MissingDI16; noCSS/layout/newdesign; noexactvisual/fullaccessibility/native/provider/releaseclaim",
+    "No schema/catalogue/grant/defaultenv/generated/nativechanges or newtests"
+  ],
+  "cleanup": "Interception/media/device/viewport cleared; runtime leased for followingGrowthtransactionrecoverywork"
+}

@@ -2,7 +2,7 @@
 import { notificationKindLabel } from "./copy";
 import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
 import { useId, useRef, useState } from "react";
-import { GrowthActionError, mutate } from "./actions";
+import { GrowthActionError, useGrowthSession } from "./session";
 const kinds = [
   "ai_reply",
   "approved_draft",
@@ -52,6 +52,7 @@ export function PreferenceForm({
   initial: PreferencesValue;
   creators: { id: string; name: string }[];
 }) {
+  const { request } = useGrowthSession();
   const [value, setValue] = useState(initial),
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false),
@@ -125,7 +126,10 @@ export function PreferenceForm({
         setBusy(true);
         setRequiresSignIn(false);
         try {
-          await mutate("preferences", submitted, "PUT");
+          await request("preferences", {
+            method: "PUT",
+            body: JSON.stringify(submitted),
+          });
           setMessage(
             growthCopy.growthPreferencesSavedYourInAppRecordRemainsAvailable,
           );

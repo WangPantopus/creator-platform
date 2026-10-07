@@ -51,7 +51,12 @@ export async function trustTransaction<T>(
   let result!: T;
   try {
     // Await the bounded acquisition. Never abandon a late borrowed client.
-    const client = await pool.connect();
+    let client: PoolClient;
+    try {
+      client = await pool.connect();
+    } catch (cause) {
+      throw unavailable("trust_connection_unavailable", cause);
+    }
     held = new ContentHeldClient(client, signal);
     await held.begin();
     // The core pool does not set a server timeout. Bound its actual source

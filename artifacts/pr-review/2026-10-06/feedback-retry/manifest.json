@@ -1,0 +1,58 @@
+{
+  "parentRevision": "2d1f406f014f2933e7a9b76b81ec17bbf1d80bd5",
+  "parentPR": 306,
+  "environment": "same isolated canonical development host and non-owner database roles as Support increment",
+  "route": "/support/feedback",
+  "browserActor": "10000000-0000-4000-8000-000000000003",
+  "operatorActor": "10000000-0000-4000-8000-000000000002",
+  "observations": [
+    {
+      "stage": "first browser submission, actual 201 response held by browser developer tools after COMMIT",
+      "feedbackRows": 1,
+      "commandRows": 1
+    },
+    {
+      "stage": "browser timeout, same input and key retried, saved acknowledgment",
+      "feedbackRows": 1,
+      "commandRows": 1
+    },
+    {
+      "stage": "deliberately edited browser comment creates a new submission; real 201 held again",
+      "feedbackRows": 2,
+      "commandRows": 2
+    },
+    {
+      "stage": "readable unconfirmed message; exact retry acknowledges existing result",
+      "feedbackRows": 2,
+      "commandRows": 2
+    },
+    {
+      "stage": "separate operator-issued session: two concurrent identical submissions and a replay yield one row; edited payload with same key 409; denied consent 400",
+      "feedbackRows": 3,
+      "commandRows": 3
+    }
+  ],
+  "visuals": {
+    "themes": [
+      "light",
+      "night"
+    ],
+    "width": 390,
+    "scrollWidth": 390,
+    "layout": "existing Support form unchanged; DI-19 composition gap remains"
+  },
+  "checks": [
+    "all seven workspace type checks",
+    "12-resource and 115-operation generation check",
+    "scoped ESLint",
+    "backend build",
+    "production web build"
+  ],
+  "limits": [
+    "development identity only; no production identity/provider qualification",
+    "no native behavior changed or personally operated",
+    "90-day expiry policy and existing cleanup unchanged; long-duration purge not qualified here",
+    "keyboard/screen-reader/large-text acceptance incomplete",
+    "raw interception and media override cleared after the run; no fabricated responses"
+  ]
+}

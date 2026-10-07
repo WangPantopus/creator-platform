@@ -1,0 +1,42 @@
+{
+  "baseRevision": "b825a454a81a6ca42c7de4ada4779e67810c061d",
+  "environment": "isolated loopback development, PostgreSQL 17, non-owner core/Trust API/Trust worker roles",
+  "providerMode": "canonical synthetic development identity; no external providers",
+  "routes": [
+    "/support",
+    "/support/access",
+    "/ops",
+    "/ops/cases/73b8168b-4b49-43ed-ac47-f13e5eb62b7a"
+  ],
+  "case": {
+    "number": 1,
+    "state": "resolved",
+    "outcome": "close",
+    "version": 2
+  },
+  "actors": {
+    "reporter": "10000000-0000-4000-8000-000000000003",
+    "otherFan": "10000000-0000-4000-8000-000000000002",
+    "reviewer": "10000000-0000-4000-8000-000000000004",
+    "reviewerMembership": "operator-provisioned synthetic local membership, support/safety only, one-hour expiry"
+  },
+  "verified": [
+    "report saved, persisted across reload, audited case lease, close decision, fan inbox and fan access history",
+    "database pause: submission disabled, private results hidden, draft retained, recovery",
+    "actual API process SIGSTOP: three observed session aborts at 3008/3005/3005 ms, no draft loss, recovery",
+    "same-account fresh sign-in clears original draft",
+    "other-account sign-in removes prior case and draft in first observed old-tab frame after corrected completion handoff",
+    "fan replacement of Ops session removes case and denies Ops access; claim button disabled",
+    "confirmed sign-out clears private views across tabs",
+    "actual core and Next BFF stale-session private read, report mutation, sign-out all 409; fresh session remains usable; no Set-Cookie on BFF refusal",
+    "Light/Night phone screenshots; actual 390-pixel document width and no horizontal overflow"
+  ],
+  "limits": [
+    "browser-only increment; no native source changed",
+    "synthetic identities do not qualify production Pantopus sign-in",
+    "no payment, media, model, push, all-domain export/deletion or provider qualification",
+    "dedicated Support composition remains the existing DI-19 design gap; no new layout introduced",
+    "screen reader and 200% text not qualified in this run",
+    "same-session token rotation is handled by producer reread but not forced in the browser run"
+  ]
+}

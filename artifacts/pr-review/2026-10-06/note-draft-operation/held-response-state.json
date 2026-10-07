@@ -1,0 +1,18 @@
+{
+  "id": "6e7b6fbd-c925-4017-bd1a-b6c6848d9a17",
+  "state": "draft",
+  "version": 2,
+  "document": {
+    "kind": "note",
+    "text": "Development revision two · committed response recovery.",
+    "media": [],
+    "quote": null,
+    "title": "",
+    "audience": { "kind": "members" },
+    "packetId": null,
+    "nameToken": false,
+    "aiUseIntent": false,
+    "scheduledAt": null,
+    "showAudienceCount": false
+  }
+}

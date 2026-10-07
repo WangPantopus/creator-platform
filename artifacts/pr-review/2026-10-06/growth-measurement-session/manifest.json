@@ -1,0 +1,42 @@
+{
+  "base": "9d9d894f152dc41ebb18b076b706364cab03f366",
+  "reusedFrom": {
+    "pr": 31,
+    "head": "c052ef67fa85301562b5123b682c88b931107c9a",
+    "scope": "Measurement page and ExperimentForm/ExperimentChoices session wiring"
+  },
+  "adaptation": "Existing merged GrowthSessionBoundary and useGrowthSession; both account/session preconditions; preserve #315 FeedbackForm. Extend current proxy tuple requirement to private funnel and experiments/stop only.",
+  "sourceSha256": {
+    "apps/web/app/studio/measurement/page.tsx": "78ce0282c66c86fbd65b0433a6bc1ef9b750c65d55e22d100bea15087ba02f7a",
+    "apps/web/features/growth/feedback.tsx": "aed6f3e12837d0a15944eafa66b53c2f8fc2e9bb7327cb47500e1ed4078507f5",
+    "apps/web/app/api/growth/[...path]/route.ts": "f842cf69448ce616d876f9ea83225fcb0d9e3b170b6ea9d80363939ddde801f9"
+  },
+  "checks": {
+    "webTypecheck": "PASS",
+    "productionWebpackBuild": "PASS",
+    "scopedEslint": "PASS",
+    "scopedPrettier": "PASS"
+  },
+  "manual": {
+    "outage": "Actual API process stopped; private content hidden/inert, mounted fields retained, Check current account focused. Actual same API/key restart automatically restored all three fields and Stop criterion focus.",
+    "proposal": "Actual guarded save and reload; one new draft; correct-session stop persisted. No experiment activated.",
+    "missingTuple": "Removed tuple headers only from actual Stop request; visible refusal, byte-identical DB including xmin. No response fabricated.",
+    "sameAccountReplacement": "Actual second issuer sign-in; old private view and local draft removed.",
+    "earlierSession": "Substituted earlier genuine session ID only on actual Stop; actual 409/session_view_changed; byte-identical DB including xmin; temporary interception cleared.",
+    "otherAccountReplacement": "Actual actor two issuer sign-in; old private view and draft removed.",
+    "signout": "Actual actor three Sign out; Measurement redirected with no private controls or proposal data."
+  },
+  "cleanup": {
+    "creatorVerification": "Restored pending/version5; temporary local fixture only",
+    "proposals": "Two stopped, neither approved",
+    "browserInterception": "cleared; no viewport/media override",
+    "session": "current actor signed out",
+    "services": "direct API4206/web3106/DB5546 running for continuing review"
+  },
+  "limits": [
+    "No populated metrics producers fabricated",
+    "No missing reference artboard invented",
+    "Broad PR31 remains held",
+    "No unit or automated test code added"
+  ]
+}

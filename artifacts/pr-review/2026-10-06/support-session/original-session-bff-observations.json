@@ -1,0 +1,25 @@
+[
+  {
+    "label": "private read",
+    "status": 409,
+    "code": "session_view_changed",
+    "cookieChanged": false
+  },
+  {
+    "label": "report mutation",
+    "status": 409,
+    "code": "session_view_changed",
+    "cookieChanged": false
+  },
+  {
+    "label": "sign out",
+    "status": 409,
+    "code": "session_view_changed",
+    "cookieChanged": false
+  },
+  {
+    "label": "fresh session survives BFF refusal",
+    "status": 200,
+    "sessionUnchanged": true
+  }
+]

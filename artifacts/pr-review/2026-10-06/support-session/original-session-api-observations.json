@@ -1,0 +1,44 @@
+[
+  {
+    "label": "old view with replacement session: private read",
+    "status": 409,
+    "code": "session_view_changed",
+    "sessionUnchanged": false
+  },
+  {
+    "label": "old view with replacement session: report mutation",
+    "status": 409,
+    "code": "session_view_changed",
+    "sessionUnchanged": false
+  },
+  {
+    "label": "other account precondition",
+    "status": 409,
+    "code": "session_account_changed",
+    "sessionUnchanged": false
+  },
+  {
+    "label": "old view cannot sign out replacement session",
+    "status": 409,
+    "code": "session_view_changed",
+    "sessionUnchanged": false
+  },
+  {
+    "label": "replacement session still valid after denied sign-out",
+    "status": 200,
+    "code": null,
+    "sessionUnchanged": true
+  },
+  {
+    "label": "close operator-only fresh session",
+    "status": 200,
+    "code": null,
+    "sessionUnchanged": false
+  },
+  {
+    "label": "close operator-only original session",
+    "status": 200,
+    "code": null,
+    "sessionUnchanged": false
+  }
+]

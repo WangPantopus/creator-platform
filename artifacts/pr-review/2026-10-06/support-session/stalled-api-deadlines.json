@@ -1,0 +1,17 @@
+[
+  {
+    "path": "/api/trust/session",
+    "elapsedMs": 3008,
+    "error": "net::ERR_ABORTED"
+  },
+  {
+    "path": "/api/trust/session",
+    "elapsedMs": 3005,
+    "error": "net::ERR_ABORTED"
+  },
+  {
+    "path": "/api/trust/session",
+    "elapsedMs": 3005,
+    "error": "net::ERR_ABORTED"
+  }
+]

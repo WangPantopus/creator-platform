@@ -1,0 +1,15 @@
+# Reuse the remaining Studio Growth session guards
+
+Compared the affected files at all20 original draft heads plus pending #318 before editing. The original private report/action implementation is already in #31 at `c052ef67fa85301562b5123b682c88b931107c9a`, introduced by `23b8339b9e1c1c60aeeae878e7d443faec03e663`. This increment extracts its Insights, Impact, Activation and Launch page guards and Producer/LaunchKit request wiring. It uses the stronger GrowthSessionBoundary and exact account/session helper now on main. Current Impact rendering/styles and newer Inbox behavior are preserved; no broad branch replacement.
+
+The existing proxy tuple requirement extends to these private reports, recommendation actions and creator invitation creation. Public variant and fan referral/revocation contracts are unchanged. A mismatch is only a refusal precondition; canonical credentials remain the authority.
+
+## Personally operated
+
+The actual local issuer signed in actor three; its existing synthetic creator was temporarily marked verified in the disposable database, then restored pending/version7. Genuine API reads returned200 and the real browser showed truthful empty/suppressed Insights, Impact and 72-hour digest states. No conversations, named Thanks, metric cohorts or owner projections were fabricated.
+
+Stopped the actual review API. All four views concealed their content, showed account checking and focused the recovery button. Restarting the same API/key recovered each original view. Actual other-account issuer sign-in disposed all four old views. Reloaded the creator's current views and used real Sign out; each redirected to its own auth continuation without its previous content or action. Actual requests missing the tuple returned400/session_view_required on all six affected endpoint shapes.
+
+Launch Kit's real Create and copy action returned503 and created no invitation: PostgreSQL correctly refused the absent creator_public foreign key. The button recovered and the UI showed unavailable. The clipboard was empty and remained empty; no invitation was copied or sent. This qualifies refusal/recovery only. Positive invitation and digest publication need the genuine published projection. Producer's existing scoped mutation wiring was source-reviewed/compiled; its populated controls cannot be personally operated without real closed-window source signals, so no positive producer/composer claim is made.
+
+Web types, production webpack build in a separate ignored directory, scoped lint/format and whitespace checks passed. No automated test code was added or run. [Manifest, all-head overlap, actual view snapshots and API receipts](../../artifacts/pr-review/2026-10-06/growth-studio-session/manifest.json) preserve provenance and limits. Current session is signed out, temporary interception is cleared and no viewport/media override remains. All prior rows remain; no new invites, projections, insights, recommendations or activation jobs exist. Broad #31 and the original20 draft holds remain.

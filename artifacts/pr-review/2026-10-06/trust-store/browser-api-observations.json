@@ -1,0 +1,59 @@
+{
+  "observations": [
+    {
+      "timestamp": "2026-10-06T21:57:13.895Z",
+      "correlationId": "f2df5d3a-b602-47d9-bb02-110aea1ca18e",
+      "method": "GET",
+      "route": "/v1/trust/my-cases",
+      "status": 503,
+      "errorCode": "service_unavailable",
+      "failureClass": "database_lock_timeout",
+      "durationMs": 2010.71
+    },
+    {
+      "timestamp": "2026-10-06T21:57:14.366Z",
+      "correlationId": "41abb6e6-b380-4f6f-a909-3de9eaefd093",
+      "method": "POST",
+      "route": "/v1/trust/reports",
+      "status": 503,
+      "errorCode": "service_unavailable",
+      "failureClass": "database_lock_timeout",
+      "durationMs": 2019.21
+    },
+    {
+      "timestamp": "2026-10-06T21:57:28.704Z",
+      "correlationId": "d131207d-560e-41c6-886f-cec993ef5d59",
+      "method": "POST",
+      "route": "/v1/trust/reports",
+      "status": 201,
+      "errorCode": null,
+      "failureClass": null,
+      "durationMs": 91.54
+    },
+    {
+      "timestamp": "2026-10-06T21:57:28.741Z",
+      "correlationId": "e470ea5d-7c95-4f29-bced-d190d512d072",
+      "method": "GET",
+      "route": "/v1/trust/my-cases",
+      "status": 200,
+      "errorCode": null,
+      "failureClass": null,
+      "durationMs": 12.61
+    },
+    {
+      "timestamp": "2026-10-06T21:57:32.176Z",
+      "correlationId": "c2e234ec-f173-41fb-81fb-6fe74b30e88e",
+      "method": "GET",
+      "route": "/v1/trust/my-cases",
+      "status": 200,
+      "errorCode": null,
+      "failureClass": null,
+      "durationMs": 15.05
+    }
+  ],
+  "durableResult": {
+    "caseNumber": 2,
+    "state": "open",
+    "matchingSyntheticReportRows": 1
+  }
+}

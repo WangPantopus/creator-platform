@@ -1,0 +1,27 @@
+{
+  "base": "3c6fed97645660397d50e8b87e18b9902bde2e9c",
+  "sourceSha256": {
+    "apps/backend/src/modules/growth/database.ts": "41cb70ad2c821c5a28509b12837d478b927f02cf2c30612d447c2418530df831",
+    "apps/backend/src/modules/growth/transaction.ts": "f7a1a0851cc868cca6661725deda311fc3143384125dae54740dbc717944770e"
+  },
+  "checks": [
+    "backend tsc --noEmit passed",
+    "scoped ESLint passed",
+    "scoped Prettier passed",
+    "backend build passed"
+  ],
+  "runtime": "Actual preserved PostgreSQL/non-owner roles, canonical development identity, API4206/web3106",
+  "evidence": [
+    "baseline.json",
+    "runtime.json",
+    "browser-persistence.json",
+    "locked-feedback-retains-input.jpg",
+    "retried-feedback-saved.jpg"
+  ],
+  "limits": [
+    "No whole-callback deadline; actual external and nested callbacks remain awaited",
+    "Socket close is not instantaneous PostgreSQL backend termination",
+    "No native/provider/purpose or broad PR31 qualification",
+    "No new test code"
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "rolesReady": true,
+  "inside": {
+    "current_user": "creator_review_growth_api",
+    "statement": "200ms",
+    "lock": "100ms",
+    "pid": 41
+  },
+  "after": {
+    "statement": "200ms",
+    "lock": "100ms"
+  },
+  "serverTimeout": {
+    "name": "error",
+    "code": "57014",
+    "status": null,
+    "message": "canceling statement due to statement timeout",
+    "elapsedMs": 205
+  },
+  "domainFailure": {
+    "name": "Error",
+    "code": "review_domain_denial",
+    "status": 409,
+    "message": "Deliberate local operational denial"
+  },
+  "domainRollback": {
+    "rows": 0
+  },
+  "readTimeout": {
+    "name": "Error",
+    "code": "growth_transaction_unavailable",
+    "status": 503,
+    "message": "The service is unavailable. Please try again.",
+    "elapsedMs": 44,
+    "socketEndedAtMs": 44,
+    "pid": 41,
+    "poolTotal": 0
+  },
+  "recoveredPid": 43,
+  "cancellation": {
+    "name": "Error",
+    "code": "growth_transaction_unavailable",
+    "status": 503,
+    "message": "The service is unavailable. Please try again.",
+    "elapsedMs": 34,
+    "socketEndedAtMs": 34,
+    "pid": 43,
+    "poolTotal": 0
+  },
+  "poolExhaustion": {
+    "name": "Error",
+    "code": "growth_connection_unavailable",
+    "status": 503,
+    "message": "The service is unavailable. Please try again.",
+    "elapsedMs": 501,
+    "waiting": 0
+  },
+  "cancelledAcquisition": {
+    "name": "Error",
+    "code": "growth_transaction_unavailable",
+    "status": 503,
+    "message": "The service is unavailable. Please try again.",
+    "elapsedMs": 85,
+    "waiting": 0,
+    "total": 0
+  },
+  "finalRecovery": {
+    "pid": 45,
+    "account": null
+  },
+  "oldBackends": []
+}

@@ -61,6 +61,20 @@ async function proxy(
                 )!,
               }
             : {}),
+          ...(request.headers.has("X-Expected-Account-Id")
+            ? {
+                "X-Expected-Account-Id": request.headers.get(
+                  "X-Expected-Account-Id",
+                )!,
+              }
+            : {}),
+          ...(request.headers.has("X-Expected-Session-Id")
+            ? {
+                "X-Expected-Session-Id": request.headers.get(
+                  "X-Expected-Session-Id",
+                )!,
+              }
+            : {}),
           ...(request.method === "GET"
             ? {}
             : { "Content-Type": "application/json" }),

@@ -20,6 +20,7 @@ import { attachRealtime } from "./realtime/gateway.js";
 import type { SignedSubjectPolicy } from "./modules/identity/subjects.js";
 import { createTrustRuntime } from "./operations/runtime.js";
 import { resolveActor } from "./modules/identity/adapter.js";
+import { requestAuthority } from "./modules/identity/request-authority.js";
 import { DomainError } from "./core/errors.js";
 import { trustIdentityAuthority } from "./modules/trust/identity-authority.js";
 import {
@@ -287,6 +288,9 @@ export async function createConfiguredBackend(input: {
     ? {
         sessions,
         profiles: new IdentityProfiles(pool, {
+          ...(assertAudienceAllowed
+            ? { assertInvitationAllowed: assertAudienceAllowed }
+            : {}),
           assertCreatorAllowed: async (actor, creatorId, client) => {
             if (!trust)
               throw new DomainError(
@@ -494,6 +498,10 @@ export async function createConfiguredBackend(input: {
               "Continue with Pantopus to use this app.",
               401,
             );
+          // The canonical middleware has already resolved this request. Keep
+          // its exact actor and session instead of issuing a second identity.
+          const original = requestAuthority.getStore();
+          if (original?.actor) return original.actor;
           return resolveActor(sessions ?? input.identity, token);
         },
       });

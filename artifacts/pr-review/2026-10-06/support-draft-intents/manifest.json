@@ -1,0 +1,26 @@
+{
+  "parentPR": 308,
+  "parentRevision": "dcdb215ce70663c554e8cbfaffc953b96542d739",
+  "sourceHash": "2cc23913a3f2960916837f8fd8ed1b67bbc2c49db55b6da3619cff8d6be232f2",
+  "environment": "same isolated non-owner PostgreSQL-backed canonical development host, API 4206 / web 3106 / database 5546",
+  "journeys": [
+    "Personally reproduced duplicate unchanged report after lost response and opening appeal",
+    "Personally verified unchanged report retry after opening/editing independent appeal creates no duplicate",
+    "Personally verified actual lost appeal response, same-form reopen and independent report edit; replay preserves one event and the report draft",
+    "Observed disabled inputs and other command buttons during each pending response; only active command shows Saving",
+    "Actual 390px Light/Night captures without horizontal overflow; desktop unconfirmed appeal error sits with its form"
+  ],
+  "fault": "Browser developer tools held the genuine Fetch response after commit; no response was fabricated; interception cleared",
+  "checks": [
+    "web type check",
+    "scoped ESLint and Prettier",
+    "production web build"
+  ],
+  "limits": [
+    "Only local browser/development flow qualified; no provider/native/release qualification",
+    "No new test code, backend policy, schema or resting layout change",
+    "DI-19 Support/appeal composition gap remains",
+    "Full keyboard/screen-reader/large-text qualification and independent Ops adjudication not established by this increment",
+    "Whole-page navigation intentionally reads current case state; retry key persistence across unmount is not claimed"
+  ]
+}

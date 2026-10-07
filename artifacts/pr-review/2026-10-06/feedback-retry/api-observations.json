@@ -1,0 +1,32 @@
+[
+  {
+    "label": "concurrent original",
+    "status": 201,
+    "saved": true,
+    "code": null
+  },
+  {
+    "label": "concurrent duplicate",
+    "status": 201,
+    "saved": true,
+    "code": null
+  },
+  {
+    "label": "unchanged replay",
+    "status": 201,
+    "saved": true,
+    "code": null
+  },
+  {
+    "label": "same key with edited comment",
+    "status": 409,
+    "saved": null,
+    "code": "idempotency_conflict"
+  },
+  {
+    "label": "consent denied",
+    "status": 400,
+    "saved": null,
+    "code": "invalid_request"
+  }
+]

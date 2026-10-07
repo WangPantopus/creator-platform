@@ -1,0 +1,40 @@
+{
+  "parentPR": 307,
+  "parentRevision": "2df66294c6d97821dedc69be6dd4d9d403a5107a",
+  "environment": {
+    "database": "isolated PostgreSQL 17 canonical development database",
+    "apiPort": 4206,
+    "webPort": 3106,
+    "databasePort": 5546,
+    "identity": "canonical development issuer, synthetic accounts only",
+    "roles": [
+      "creator_trust_runtime",
+      "creator_trust_worker"
+    ]
+  },
+  "sourceHashes": {
+    "apps/backend/src/modules/trust/store.ts": "a3bbc7b3a25fb5c378c5e01c612e829ea9f6480c106a4114b970a57c1d62817e",
+    "apps/backend/src/modules/trust/transaction.ts": "445983f0d5528aa938fb4e05f0b71e6578778279e9af7cf535f2d0a5acc39896"
+  },
+  "operation": [
+    "Actual role checks, successful actor transaction, shorter existing timeouts, account scope cleared on commit",
+    "Actual write followed by domain error rolls back; source can be reused",
+    "Exhausted actual one-client pool settles in 502ms with trust_connection_unavailable and no queued acquisition",
+    "Eight one-second actual SQL sleeps exceed the whole-transaction budget at 5002ms; original client discarded, insert not persisted; recovery uses a different PID",
+    "Original server PID still present at immediate close sample and absent at the 2100ms later sample; no instantaneous server-cancellation claim",
+    "Actual browser Support submission against an exclusive table lock returns 503 in 2019ms, keeps the draft, then saves one case after lock release and unchanged retry; refreshed saved case observed"
+  ],
+  "checks": [
+    "all seven workspace type checks",
+    "12 shared resources and 115 native operation generation checks",
+    "scoped ESLint",
+    "scoped Prettier",
+    "backend build"
+  ],
+  "limits": [
+    "No new test code or SQL, grants, migration or purpose activation",
+    "Five-second host budget is not an actual caller cancellation signal",
+    "External callbacks and full privacy/export/domain/provider completion not qualified",
+    "Development browser verification only; no native interaction, full accessibility or release acceptance"
+  ]
+}

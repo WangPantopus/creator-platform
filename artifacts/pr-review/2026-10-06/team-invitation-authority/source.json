@@ -1,0 +1,11 @@
+{
+  "reusedPR": 74,
+  "reusedHead": "5b1675ca155f87957c8ad62201097de2563c3c4f",
+  "reusedImplementation": "fbbe65a6231d4cb1495103fa1471766d9204142f",
+  "finalImplementation": "3581503312fde3d0bc43295e44e1bf88733124de",
+  "adaptation": "Non-owner metadata refusal before creator-only negatives, then repeat ownership under lock; preserves main312 concurrent invitation convergence.",
+  "hashes": {
+    "apps/backend/src/modules/identity/profiles.ts": "46dad3f8412bd72a4c261db1e96d33c55ac9d79157e08788f42695513d2f20a6",
+    "apps/backend/src/integration.ts": "239c1e2b8edca671a0276717e3b58d55d378db78fdc0f8a58b743ff666beeb08"
+  }
+}

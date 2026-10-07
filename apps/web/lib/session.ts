@@ -56,7 +56,10 @@ export async function platformFetch(
       ...init.headers,
     },
     cache: "no-store",
-    signal: AbortSignal.timeout(10000),
+    signal: AbortSignal.any([
+      ...(init.signal ? [init.signal] : []),
+      AbortSignal.timeout(10000),
+    ]),
   });
 }
 /**
