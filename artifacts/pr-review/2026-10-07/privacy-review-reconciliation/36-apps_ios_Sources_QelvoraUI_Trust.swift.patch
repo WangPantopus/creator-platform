@@ -1,0 +1,51 @@
+diff --git a/apps/ios/Sources/QelvoraUI/Trust.swift b/apps/ios/Sources/QelvoraUI/Trust.swift
+index 186ab1ef..ecb989bc 100644
+--- a/apps/ios/Sources/QelvoraUI/Trust.swift
++++ b/apps/ios/Sources/QelvoraUI/Trust.swift
+@@ -193,22 +193,37 @@ public struct TrustFanFeature: View {
+     private var privacy: some View { VStack(alignment: .leading, spacing: 16) {
+         Text("Export and deletion are separate from canceling store billing. A job finishes only after every data domain acknowledges it.").qText("body")
+         Link("Manage Apple subscriptions", destination: URL(string: "https://apps.apple.com/account/subscriptions")!)
++        privacyScope
++        privacyVerification
++        Button("Request export", variant: .secondary, block: true, disabled: privacyDisabled) { run { await privacyCommand("export") } }
++        Button("Request deletion", variant: .secondary, block: true, disabled: privacyDisabled) { confirmingDelete = true }
++        privacyJobs
++    } }
++    @ViewBuilder private var privacyScope: some View {
+         Picker("Data scope", selection: $scope) { Text("Account").tag("account"); Text("Creator").tag("creator"); Text("Conversation").tag("thread") }.pickerStyle(.menu).frame(minHeight: 44).contentShape(Rectangle())
+         if scope != "account" { field("Creator ID", $creatorID) }; if scope == "thread" { field("Conversation ID", $threadID) }
++    }
++    @ViewBuilder private var privacyVerification: some View {
+         if capability?.localDevelopment == true { Text("Synthetic local account: type LOCAL DEVELOPMENT to confirm.").qText("caption"); field("Local confirmation", $proof) }
+         else if capability?.verificationMethod == "current_session" { Text("Your sign-in must be recent. Continue with Pantopus again if asked to verify your account.").qText("caption") }
+         else if capability?.actorVerification == "configured" { field("Account verification receipt", $proof) }
+         else { Text("Fresh account verification must be connected before requesting data changes.").qText("caption") }
+-        Button("Request export", variant: .secondary, block: true, disabled: privacyDisabled) { run { await privacyCommand("export") } }
+-        Button("Request deletion", variant: .secondary, block: true, disabled: privacyDisabled) { confirmingDelete = true }
+-        if privateVisible { ForEach(jobs) { job in
+-            Text("Requested " + job.created_at).qText("caption")
+-            Button(job.kind + " · " + job.scope + " · " + job.state.replacingOccurrences(of: "_", with: " "), variant: .quiet, block: true, disabled: privateDisabled) { run { await jobDetail(job.id) } }
+-                .accessibilityLabel(job.kind + ", " + job.scope + ", " + job.state.replacingOccurrences(of: "_", with: " ") + ", requested " + job.created_at + ", job " + job.id)
+-                .accessibilityIdentifier("privacy-job-" + job.id)
++    }
++    @ViewBuilder private var privacyJobs: some View {
++        if privateVisible {
++            ForEach(jobs) { job in privacyJobRow(job) }
++            if let selectedJob { jobProgress(selectedJob) }
+         }
+-        if let selectedJob { jobProgress(selectedJob) } }
+-    } }
++    }
++    @ViewBuilder private func privacyJobRow(_ job: TrustJob) -> some View {
++        let state = job.state.replacingOccurrences(of: "_", with: " ")
++        let title = job.kind + " · " + job.scope + " · " + state
++        let label = job.kind + ", " + job.scope + ", " + state + ", requested " + job.created_at + ", job " + job.id
++        Text("Requested " + job.created_at).qText("caption")
++        Button(title, variant: .quiet, block: true, disabled: privateDisabled) { run { await jobDetail(job.id) } }
++            .accessibilityLabel(label)
++            .accessibilityIdentifier("privacy-job-" + job.id)
++    }
+     @ViewBuilder private func jobProgress(_ job: TrustJob) -> some View {
+         Text("Job " + job.id).qText("caption")
+         ForEach(job.tasks ?? []) { task in Text(taskDescription(task)).qText("body") }

@@ -1,0 +1,800 @@
+{
+  "targetCommit": "9780edd694b150dbe3cd1b77238440b619ba4ad6",
+  "prs": [
+    {
+      "number": 36,
+      "sourceHead": "de8adebb5c4f1844a7ad7c9833b802548cf8578a",
+      "files": [
+        {
+          "path": "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/ConversationClient.kt",
+          "sourceBlob": "266e0e0f41e63d409cb1858b2f5f317ba842f999",
+          "targetBlob": "8d581f597a6dbf7ce67998046adb2d742d955e40",
+          "classification": "reconciled",
+          "review": "Original transport retained with current bounded/cancellable original account/session capture and additive API changes.",
+          "difference": "36-apps_android_app_src_main_java_com_pantopus_qelvora_conversation_ConversationClient.kt.patch",
+          "sha256": "2365458ad2b2f0c3bfb4ba65418ad2c3cc2338e45b93a0b404dddcea9353ec5b"
+        },
+        {
+          "path": "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt",
+          "sourceBlob": "fcd072b650f4a0ebf434a1486b436f81eeb94145",
+          "targetBlob": "f39ebc78930a173eeb7579e7d2e061c204cdea41",
+          "classification": "reconciled",
+          "review": "Original privacy snapshot/current-session guards retained alongside bounded offline permission cache, captured first-conversation/account and honest consent/development capability.",
+          "difference": "36-apps_android_app_src_main_java_com_pantopus_qelvora_conversation_W3FanFeatures.kt.patch",
+          "sha256": "af5b06cec5171f7d62c86041d057a59752870d9b47cf17ef10f17fd6cd74d7b3"
+        },
+        {
+          "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt",
+          "sourceBlob": "d50eba33206ef8ccc33ae87d9623a132d41967f0",
+          "targetBlob": "2743e8812123ddae7f93f6af636e3645c8806e26",
+          "classification": "reconciled",
+          "review": "Original contracts/copy retained with newer operations/call inputs; original recovery strings already present. Do not duplicate apparent clean merge entries. Generator check: 12 resources/119 operations.",
+          "difference": "36-apps_android_app_src_main_java_com_pantopus_qelvora_generated_QelvoraAPI.kt.patch",
+          "sha256": "3f688959ca3c216b63b21d6c77f7df67d859e7bc7f6b4dfed9975f8516ad0144"
+        },
+        {
+          "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt",
+          "sourceBlob": "4409c6ea9ed6dd06973416b663f6749c5481146c",
+          "targetBlob": "25810cc741f26a338a47e55345bae9aef5b46819",
+          "classification": "reconciled",
+          "review": "Original contracts/copy retained with newer operations/call inputs; original recovery strings already present. Do not duplicate apparent clean merge entries. Generator check: 12 resources/119 operations.",
+          "difference": "36-apps_android_app_src_main_java_com_pantopus_qelvora_generated_QelvoraCopy.kt.patch",
+          "sha256": "fc731876a9a93c9d09113a57c20581ce657d7a66632e8c8a654761182a8619e7"
+        },
+        {
+          "path": "apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanShell.kt",
+          "sourceBlob": "2c3ff9d80e204c3a6099de4da75885a17b32df57",
+          "targetBlob": "a4c469e1716724e1ad54ead74d12e75e8f813f9c",
+          "classification": "reconciled",
+          "review": "Original retained-credential recovery retained alongside newer intro-save, push and original Commerce account/session/destination capture.",
+          "difference": "36-apps_android_app_src_main_java_com_pantopus_qelvora_identity_FanShell.kt.patch",
+          "sha256": "cb819d1ffbfe0d84844f56c4332f3e70673d9d7160ecc08b7a26f4b3b223ebd6"
+        },
+        {
+          "path": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/Trust.kt",
+          "sourceBlob": "4809babc32693018703d7b4231227aee197eaa61",
+          "targetBlob": "4809babc32693018703d7b4231227aee197eaa61",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/android/app/src/main/res/values/strings.xml",
+          "sourceBlob": "83079f738b4ae9a51e572c5c36187c9c760dc62a",
+          "targetBlob": "c16df0f49666480c00a07bcbbb4a2c3e1c5f74dc",
+          "classification": "reconciled",
+          "review": "Original contracts/copy retained with newer operations/call inputs; original recovery strings already present. Do not duplicate apparent clean merge entries. Generator check: 12 resources/119 operations.",
+          "difference": "36-apps_android_app_src_main_res_values_strings.xml.patch",
+          "sha256": "ed987fd045605b0188a0ac95e2bdd74745efa0a6bf098d467f2635aab9fdb131"
+        },
+        {
+          "path": "apps/backend/src/server.ts",
+          "sourceBlob": "8c4789facf787f1deba334bf39b501ff8d1ae37f",
+          "targetBlob": "31a8391458c73fcaa0a770ed28577cf4b63c6b56",
+          "classification": "reconciled",
+          "review": "Prepare genuine reviewer after host configuration; preserve actual accounting/privacy composition and drained cleanup.",
+          "difference": "36-apps_backend_src_server.ts.patch",
+          "sha256": "0d15f13bd4e56aaaa8d31542d57a715b898c0e079eab1d89fba84d0734321e57"
+        },
+        {
+          "path": "apps/ios/Sources/Generated/Localizable.xcstrings",
+          "sourceBlob": "051a2cecc93a5e9851f8de2684b352056c6300fd",
+          "targetBlob": "be1c4a3f670d3f5c2f930b6cedece615b0d98e40",
+          "classification": "reconciled",
+          "review": "Original contracts/copy retained with newer operations/call inputs; original recovery strings already present. Do not duplicate apparent clean merge entries. Generator check: 12 resources/119 operations.",
+          "difference": "36-apps_ios_Sources_Generated_Localizable.xcstrings.patch",
+          "sha256": "e7ea3aa1ee339c5a8072bda0a1fde8fbe004dfee0e132bf2ee93d1c52bddde31"
+        },
+        {
+          "path": "apps/ios/Sources/Generated/QelvoraAPI.swift",
+          "sourceBlob": "bcff10041b577dcc4b657ea5db6df965bad6e811",
+          "targetBlob": "916992809354ec817f2a48b7b664a185b5e603ea",
+          "classification": "reconciled",
+          "review": "Original contracts/copy retained with newer operations/call inputs; original recovery strings already present. Do not duplicate apparent clean merge entries. Generator check: 12 resources/119 operations.",
+          "difference": "36-apps_ios_Sources_Generated_QelvoraAPI.swift.patch",
+          "sha256": "c4d8e7a6b8bf828d024f2e85a747711d9f6f1aaf35bde2bf7d1627733a3ef2b4"
+        },
+        {
+          "path": "apps/ios/Sources/Generated/QelvoraCopy.swift",
+          "sourceBlob": "5f0a514e0374a9caf07d555ffe397fecc4d5dfc5",
+          "targetBlob": "2846ddfc3eb78eb87cf3032942e7fc9a4bea7456",
+          "classification": "reconciled",
+          "review": "Original contracts/copy retained with newer operations/call inputs; original recovery strings already present. Do not duplicate apparent clean merge entries. Generator check: 12 resources/119 operations.",
+          "difference": "36-apps_ios_Sources_Generated_QelvoraCopy.swift.patch",
+          "sha256": "cce0a390c0f26fc2e8f59c9a645cdb998d663abce0f51c6c61c56f4388cd1f15"
+        },
+        {
+          "path": "apps/ios/Sources/QelvoraUI/Conversation/W3FanFeatures.swift",
+          "sourceBlob": "532d3cc14b6642eaf365a403294ade4a91350246",
+          "targetBlob": "ff383fb4b6200471b006ed37815790bd66fa2b17",
+          "classification": "reconciled",
+          "review": "Original privacy snapshot/current-session guards retained alongside bounded offline permission cache, captured first-conversation/account and honest consent/development capability.",
+          "difference": "36-apps_ios_Sources_QelvoraUI_Conversation_W3FanFeatures.swift.patch",
+          "sha256": "fc9ee0cb8f12413d2007d10ba652c606dc0ed60ab2a0ffdc59238208cb410985"
+        },
+        {
+          "path": "apps/ios/Sources/QelvoraUI/FanShell.swift",
+          "sourceBlob": "8f482163dc05a64fdd8a06393adc9e5e82c4e430",
+          "targetBlob": "bbfd8c1e30c0b7711a2f6b3048a6b2d214c33ecb",
+          "classification": "reconciled",
+          "review": "Restore original bounded accessible notices, actor-picker scrolling and navigation priority; retain newer push/intro/Commerce and one credential settings view.",
+          "difference": "36-apps_ios_Sources_QelvoraUI_FanShell.swift.patch",
+          "sha256": "eeeccfe50eaa5fdad1509349e2913c811673262f3d5acc719f0e2e27e5be254f"
+        },
+        {
+          "path": "apps/ios/Sources/QelvoraUI/Trust.swift",
+          "sourceBlob": "186ab1efc46e57f446e74a50d630195e095f69f1",
+          "targetBlob": "ecb989bc81f559c18fb9f2022131ad6821f0b585",
+          "classification": "reconciled",
+          "review": "Original privacy UI retained; newer compiler-safe view-builder decomposition preserves content, order and labels.",
+          "difference": "36-apps_ios_Sources_QelvoraUI_Trust.swift.patch",
+          "sha256": "b432363501ae8e345f19e6e39860494997d7e4de9e9788831801e2091add4832"
+        },
+        {
+          "path": "apps/web/app/ops/trust-client.tsx",
+          "sourceBlob": "b33258a6e846bceffd81f2e7b61d109ecbaaf11e",
+          "targetBlob": "0f2672306d7cebc95a601b7e9bec9e53a47e46dc",
+          "classification": "reconciled",
+          "review": "Retain original three-second whole-response deadline plus immutable account/session/signal, synchronous concealment and retained-credential draft recovery.",
+          "difference": "36-apps_web_app_ops_trust-client.tsx.patch",
+          "sha256": "db569a0517f8966b29d635d54ca2dfc1191124512fd6e308cbd20bbffcca3115"
+        },
+        {
+          "path": "apps/web/app/support/privacy/page.tsx",
+          "sourceBlob": "d54bde4af3d91efe5566acd0d5383d016c2d3e87",
+          "targetBlob": "6868954c0071878b102df36d3e8ae7d27bb00e29",
+          "classification": "reconciled",
+          "review": "Retain original privacy/Support behavior with current request/session guards, layout closure and independent report/appeal retry intents.",
+          "difference": "36-apps_web_app_support_privacy_page.tsx.patch",
+          "sha256": "6486ee5363a5261d35d73bfcb9b1575db4257ab65a1c42e24a658137c707e665"
+        },
+        {
+          "path": "apps/web/features/conversation/AccountScreen.tsx",
+          "sourceBlob": "8fa710cf4ff8a821b168a673b67631a83ae20ee6",
+          "targetBlob": "fc73fe31a6988f39f12d3bfdf4b10cde393e2be6",
+          "classification": "reconciled",
+          "review": "Retain original privacy invalidation plus current account/session Commerce, honest development notice and genuine consent capability.",
+          "difference": "36-apps_web_features_conversation_AccountScreen.tsx.patch",
+          "sha256": "69d7e08b52022e3f23afb369425a79b1b68e918e2d75932e44dd082997af7f21"
+        },
+        {
+          "path": "config/copy.json",
+          "sourceBlob": "e9430c9847928adedfd4e03d1a2321705f2d28c9",
+          "targetBlob": "479f3d973241880c2c880b338f2c350ac7ee6975",
+          "classification": "reconciled",
+          "review": "Original contracts/copy retained with newer operations/call inputs; original recovery strings already present. Do not duplicate apparent clean merge entries. Generator check: 12 resources/119 operations.",
+          "difference": "36-config_copy.json.patch",
+          "sha256": "e59d1116b28a7798ba0242f5be0b795c0ee4c7ad648160dafbaef30cbb5f6b09"
+        },
+        {
+          "path": "packages/api/generated/openapi.json",
+          "sourceBlob": "5c1e176b8d01133fcf009f88599fae5cab035f31",
+          "targetBlob": "b2aa0701c8e255fd0ac958148c406a9c7c9b851e",
+          "classification": "reconciled",
+          "review": "Original contracts/copy retained with newer operations/call inputs; original recovery strings already present. Do not duplicate apparent clean merge entries. Generator check: 12 resources/119 operations.",
+          "difference": "36-packages_api_generated_openapi.json.patch",
+          "sha256": "cd0d7b2ea3b5fcca8604dce88254acf4b944cbc21fde6d547565f83de865512a"
+        },
+        {
+          "path": "packages/api/src/conversation/contracts.ts",
+          "sourceBlob": "01d09cc238e687f15ced9f0019379574627af24e",
+          "targetBlob": "39384b5f389a238a99d0cbcb8e64fe3ab342b18e",
+          "classification": "reconciled",
+          "review": "Original contracts/copy retained with newer operations/call inputs; original recovery strings already present. Do not duplicate apparent clean merge entries. Generator check: 12 resources/119 operations.",
+          "difference": "36-packages_api_src_conversation_contracts.ts.patch",
+          "sha256": "88851081797386da63f166d4e83001d6749bd25a8c5d25eb72b6392689d996a0"
+        },
+        {
+          "path": "packages/copy/src/index.ts",
+          "sourceBlob": "7476ace1d7c76523b694bebdf165a6a35f9a1ae8",
+          "targetBlob": "0c165b4cb8f03d9c6b80215d2e5862893ae90516",
+          "classification": "reconciled",
+          "review": "Original contracts/copy retained with newer operations/call inputs; original recovery strings already present. Do not duplicate apparent clean merge entries. Generator check: 12 resources/119 operations.",
+          "difference": "36-packages_copy_src_index.ts.patch",
+          "sha256": "ac659a974e0685175c6a7563e9cbb4de5b04fff9d85e4648b59fbfbfce76015f"
+        },
+        {
+          "path": "scripts/generate-native-api.mjs",
+          "sourceBlob": "3b0dd402834b35b742064b662532a08ab6b82caa",
+          "targetBlob": "022ca7c2afdd36150733a12c186eb45d96d5c39d",
+          "classification": "reconciled",
+          "review": "Retain current original-account/session OkHttp cancellation and bounded transport; generated outputs verified.",
+          "difference": "36-scripts_generate-native-api.mjs.patch",
+          "sha256": "35e34258c343df6ce98b734e2eda3c75e4ca574f24c0be950ca227f2cb1162de"
+        }
+      ],
+      "historicalSupportingPaths": [
+        "artifacts/workstreams/W3/handoff/20261001/SHA256SUMS",
+        "artifacts/workstreams/W3/handoff/20261001/pr24-pr-web-visual-failed.log",
+        "artifacts/workstreams/W3/handoff/20261001/pr24-snapshot.json",
+        "artifacts/workstreams/W3/handoff/20261001/pr36-pr-android-foundation.log",
+        "artifacts/workstreams/W3/handoff/20261001/pr36-pr-android-runtime.log",
+        "artifacts/workstreams/W3/handoff/20261001/pr36-pr-ios-failed.log",
+        "artifacts/workstreams/W3/handoff/20261001/pr36-pr-web-backend.log",
+        "artifacts/workstreams/W3/handoff/20261001/pr36-push-android-foundation.log",
+        "artifacts/workstreams/W3/handoff/20261001/pr36-push-android-runtime.log",
+        "artifacts/workstreams/W3/handoff/20261001/pr36-push-web-backend.log",
+        "artifacts/workstreams/W3/handoff/20261001/pr36-snapshot.json",
+        "artifacts/workstreams/W3/handoff/20261001/pr45-pr-ios-failed.log",
+        "artifacts/workstreams/W3/handoff/20261001/pr45-pr-web-visual-failed.log",
+        "artifacts/workstreams/W3/handoff/20261001/pr45-snapshot.json",
+        "artifacts/workstreams/W3/handoff/20261001/run.md",
+        "artifacts/workstreams/W3/handoff/20261001/verification.json",
+        "artifacts/workstreams/W3/increment-101/20261003-privacy-generated-contract/run.md",
+        "artifacts/workstreams/W3/increment-30/20261001-signing-preservation/run.md",
+        "artifacts/workstreams/W3/increment-40/20261002-ordered-merges/android-account-current-light.png",
+        "artifacts/workstreams/W3/increment-40/20261002-ordered-merges/android-account-night-200.png",
+        "artifacts/workstreams/W3/increment-40/20261002-ordered-merges/android-night-start-unverified.png",
+        "artifacts/workstreams/W3/increment-40/20261002-ordered-merges/android-owned-api-stopped-return.png",
+        "artifacts/workstreams/W3/increment-40/20261002-ordered-merges/android-privacy-controls-night-200.png",
+        "artifacts/workstreams/W3/increment-40/20261002-ordered-merges/android-privacy-disabled-controls-light.png",
+        "artifacts/workstreams/W3/increment-40/20261002-ordered-merges/android-privacy-request-disabled-light.png",
+        "artifacts/workstreams/W3/increment-40/20261002-ordered-merges/android-retry-recovered-light.png",
+        "artifacts/workstreams/W3/increment-40/20261002-ordered-merges/device-custody-result.json",
+        "artifacts/workstreams/W3/increment-40/20261002-ordered-merges/receipt.json",
+        "artifacts/workstreams/W3/increment-40/20261002-ordered-merges/run.md",
+        "artifacts/workstreams/W3/increment-40/20261002-ordered-merges/web-account-current-light.png",
+        "artifacts/workstreams/W3/increment-40/20261002-ordered-merges/web-account-owned-api-stopped.png",
+        "artifacts/workstreams/W3/increment-40/20261002-ordered-merges/web-account-retry-recovered.png",
+        "artifacts/workstreams/W3/increment-40/20261002-ordered-merges/web-privacy-request-disabled.png",
+        "artifacts/workstreams/W3/increment-58/20261002-privacy-main-reconciliation/run.md",
+        "artifacts/workstreams/W3/increment-94/20261003-existing-pr-metadata-reuse/run.md",
+        "artifacts/workstreams/W3/increment-96/20261003-existing-privacy-continuation/run.md",
+        "artifacts/workstreams/W3/increment-97/20261003-current-privacy-navigation/run.md",
+        "artifacts/workstreams/W3/increment-98/20261003-private-read-recovery/run.md",
+        "artifacts/workstreams/W3/resume-20261001/offline-content-consumer-requirements.md",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/SHA256SUMS",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/W1-leased-source.diff",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-bootstrap-build.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-bootstrap-emulator.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-bootstrap-font2-restored-account.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-bootstrap-signature.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-build.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-controls-light.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-denied-light.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-earnings-main-build-only-signature.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-earnings-main-build.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-emulator.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-final-build.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-final-denied-light.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-final-distinct-actor-two-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-final-font2-controls-bottom-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-final-font2-denied-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-final-font2-signed-out-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-final-pending-actor-choice-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-final-privacy-outage-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-final-recreated-offline-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-final-restored-account-light.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-final-revoked-font2-signed-out-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-final-revoked-session-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-final-same-process-recovered-font2-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-font2-before-bootstrap-fix.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-font2-bottom-before-bootstrap-fix.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-installed-signature.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-main-pool-build.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-pool-main-font2-denied-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-pool-main-restored-account-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-pool-main-signature.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-requested-night-before-bootstrap-fix.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-requested-night-outage-before-bootstrap-fix.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-requested-night-recovered-before-bootstrap-fix.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-retained-session-build.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-route-build.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-session-retry-signature.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-signature-wrong-jdk-attempt.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-signature.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-tab-build.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-time-history-build.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-time-history-controls-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-time-history-denied-light.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-time-history-denied-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-time-history-emulator.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-time-history-restored-account-light.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/android-time-history-signature.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/backend-billing-main-types.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/backend-earnings-main-types.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/backend-final-main-types.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/backend-integrated-types.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/backend-pool-main-types.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ci-438ab04-pr-android-runtime.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ci-438ab04-pr-web-backend.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ci-438ab04-push-android-runtime.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ci-438ab04-push-web-backend.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ci-a164fe8-ios-actual-mark-light.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ci-a164fe8-ios-actual-welcome-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ci-a164fe8-pr-ios-foundation-failed.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ci-a4917db-pr-android-runtime.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ci-a4917db-pr-web-backend.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ci-a4917db-push-android-runtime.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ci-a4917db-push-web-backend.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ci-checkpoint-438ab04.json",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ci-checkpoint-a164-ios-failure.json",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ci-checkpoint-a4917db.json",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/incoming-billing-W3-contract-diff.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/incoming-earnings-W3-contract-diff.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/incoming-earnings-native-api.diff",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/incoming-main-final-native-and-conversation-diff.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/incoming-main-native-and-conversation-diff.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/incoming-payout-W3-contract-diff.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/incoming-pool-W3-contract-diff.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-build.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-controls-light-before-provider-copy.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-current-denied-light.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-current-main-denied-light.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-current-main-denied-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-denied-light-before-tab-fix.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-earnings-main-build.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-earnings-main-signature.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-final-build.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-foreground-outage-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-foreground-outage-transition.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-foreground-recovered-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-large-controls-bottom.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-night-accessibility-large.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-pool-main-build.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-route-build.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-route-final-build.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-signature-wrong-path-attempt.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-tab-build.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-tab-correct-light-before-provider-copy.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-time-history-build.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-time-history-denied-light.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-time-history-denied-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/ios-time-history-signature.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/operated-observations.json",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/run.md",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/verification.json",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-current-denied-light.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-current-main-denied-light.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-current-main-denied-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-denied-light.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-denied-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-earnings-main-types.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-final-all-device-sign-out.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-final-denied-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-final-main-types.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-format-final.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-format.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-integrated-types.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-lint-final.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-lint.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-offline-concealed.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-pool-main-denied-light.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-pool-main-types.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-recovered-denied-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-time-history-denied-light.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-time-history-denied-night.png",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-time-history-lint.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-time-history-types.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-types-final.log",
+        "artifacts/workstreams/W3/resume-20261001/privacy-refresh/web-types.log",
+        "artifacts/workstreams/W3/resume-20261001/producer-receipts.md",
+        "artifacts/workstreams/W3/resume-20261001/requirements.md",
+        "artifacts/workstreams/W3/resume-20261001/restored-catalog-readonly.json",
+        "artifacts/workstreams/W3/resume-20261001/worker-recovery-consumer-requirements.md",
+        "docs/workstreams/coordination/W3.md",
+        "docs/workstreams/handoffs/W3-resume-2026-09-30.md",
+        "docs/workstreams/handoffs/W3-resume-2026-10-01.md",
+        "docs/workstreams/prompts/W3-resume-handoff.md",
+        "docs/workstreams/status/W3.md"
+      ]
+    },
+    {
+      "number": 200,
+      "sourceHead": "5290eedd1249832ad7e5c9325b8dcc1f9acccb49",
+      "files": [
+        {
+          "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt",
+          "sourceBlob": "69f646a717392b63562e5b967ff106cfa961e26e",
+          "targetBlob": "2743e8812123ddae7f93f6af636e3645c8806e26",
+          "classification": "reconciled",
+          "review": "Original contracts/copy retained with newer operations/call inputs; original recovery strings already present. Do not duplicate apparent clean merge entries. Generator check: 12 resources/119 operations.",
+          "difference": "200-apps_android_app_src_main_java_com_pantopus_qelvora_generated_QelvoraAPI.kt.patch",
+          "sha256": "0365608f63651c5ee45e05527eec69b64509bb4dee2cfb96ffe6076cac78a6e6"
+        },
+        {
+          "path": "apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanShell.kt",
+          "sourceBlob": "101ea6cb4de11d0d9ddf79f502b458855c9f8e33",
+          "targetBlob": "a4c469e1716724e1ad54ead74d12e75e8f813f9c",
+          "classification": "reconciled",
+          "review": "Original retained-credential recovery retained alongside newer intro-save, push and original Commerce account/session/destination capture.",
+          "difference": "200-apps_android_app_src_main_java_com_pantopus_qelvora_identity_FanShell.kt.patch",
+          "sha256": "b73d1de926d5ca0d53077576875e145ddc4560a29f8cf7dc42f14c781131440c"
+        },
+        {
+          "path": "apps/android/app/src/main/java/com/pantopus/qelvora/ui/Trust.kt",
+          "sourceBlob": "4809babc32693018703d7b4231227aee197eaa61",
+          "targetBlob": "4809babc32693018703d7b4231227aee197eaa61",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/migrations/0069_w8_reply_review.sql",
+          "sourceBlob": "88741a5db4f9bc0653b2133fe1551bc871663d19",
+          "targetBlob": "88741a5db4f9bc0653b2133fe1551bc871663d19",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/app.ts",
+          "sourceBlob": "79b722e0d6ac086490d0198207897324b25e2791",
+          "targetBlob": "79b722e0d6ac086490d0198207897324b25e2791",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/core/purpose-catalogue.ts",
+          "sourceBlob": "29148f2c09b84e7d2d74c8888f18d5f84ec0a82a",
+          "targetBlob": "29148f2c09b84e7d2d74c8888f18d5f84ec0a82a",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/core/query-settlement.ts",
+          "sourceBlob": "804aeb8eb1889516cd0d4d6077cea251cfc7cded",
+          "targetBlob": "804aeb8eb1889516cd0d4d6077cea251cfc7cded",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/db/reviewed-migration.ts",
+          "sourceBlob": "80974055cf73c93f6b5fd850fc539173f9de2bf0",
+          "targetBlob": "80974055cf73c93f6b5fd850fc539173f9de2bf0",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/integration.ts",
+          "sourceBlob": "da2279202193f54de56f1bd430abfffef78e6e6f",
+          "targetBlob": "24cdf0a3c286ef802616f94e8381a9859c80e0d0",
+          "classification": "reconciled",
+          "review": "Restore original platform-account actor refusal; preserve newer runtime ownership and aggregate cleanup.",
+          "difference": "200-apps_backend_src_integration.ts.patch",
+          "sha256": "a56946a9f34c3d980dc9411907b6c876ab6a66b2681e1cb5a1e71ab0930a5f81"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/financial-export-projections.ts",
+          "sourceBlob": "f7f22492246fe7f7b0b0982e9dda554e17215e73",
+          "targetBlob": "f7f22492246fe7f7b0b0982e9dda554e17215e73",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/financial-export.ts",
+          "sourceBlob": "969bbfbb8da550d7eeacf315534e4666b8a3f149",
+          "targetBlob": "5668af8be0356d86c6871599f9f3c3d101261601",
+          "classification": "reconciled",
+          "review": "Retain current protected stream and genuine same-client source/EOF/COMMIT/cleanup; source preservation and operation in conversation-commerce.",
+          "difference": "200-apps_backend_src_modules_commerce_financial-export.ts.patch",
+          "sha256": "4199b760503aa23b646c6a15ca8bb3a1206bba66cd2081abad5326e4b95a3066"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/operations.ts",
+          "sourceBlob": "7a53a8f4769977540d779b13083e2800db5a2aef",
+          "targetBlob": "7a53a8f4769977540d779b13083e2800db5a2aef",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/commerce/privacy-purpose.ts",
+          "sourceBlob": "30829e56bc1bd2b616997cdd2c50925d664fde3b",
+          "targetBlob": "3499e88b9f44d8853d7a8f2079e97483c248154f",
+          "classification": "reconciled",
+          "review": "Retain newer original-source cancellation and protected-store bookends; source/compiled limits in conversation-commerce.",
+          "difference": "200-apps_backend_src_modules_commerce_privacy-purpose.ts.patch",
+          "sha256": "ce1cf405a5113feefb04dbaedb2e427a94ed6d2df3bed89545c37b9b64d03b0f"
+        },
+        {
+          "path": "apps/backend/src/modules/content/development-server.ts",
+          "sourceBlob": "91e83383e63a4a5df053285788237227b58a898d",
+          "targetBlob": "4f8265aa8be96430d8456461d45a824b1eb5e202",
+          "classification": "reconciled",
+          "review": "Prepare genuine reviewer asynchronously; preserve original source publication and cleanup.",
+          "difference": "200-apps_backend_src_modules_content_development-server.ts.patch",
+          "sha256": "e9095b010d9e7d56bb9c1a22e7be473fd027ddef81451f0900925c477cf97533"
+        },
+        {
+          "path": "apps/backend/src/modules/content/held-client-cleanup.ts",
+          "sourceBlob": "9bf8221f99ecdd0afad368fac487905546ee8194",
+          "targetBlob": "7e9bf7b1f9d4b7ebc444e91de13ceb65c898369e",
+          "classification": "reconciled",
+          "review": "Retain newer original-pool source cancellation and bounded observed query/rollback/release settlement; no abandoned Promise.race.",
+          "difference": "200-apps_backend_src_modules_content_held-client-cleanup.ts.patch",
+          "sha256": "a2c808bcf04db6fff7b61cb0c1125d789139691b8422950781615d2007db9f0c"
+        },
+        {
+          "path": "apps/backend/src/modules/trust/contracts.ts",
+          "sourceBlob": "dce225bf935f4ea0897078eb642ec6279469415c",
+          "targetBlob": "4c4063d02d7c653b36bcc58eba8b658d9efcf1d7",
+          "classification": "reconciled",
+          "review": "Restore private reply-review case kind and exact allow/flag decisions; public report kinds remain restricted.",
+          "difference": "200-apps_backend_src_modules_trust_contracts.ts.patch",
+          "sha256": "7f43e362028bbb7f509a8cfd77219e64eac4c056d30c29f17d8894e9b5d0c339"
+        },
+        {
+          "path": "apps/backend/src/modules/trust/development.ts",
+          "sourceBlob": "23bc2a9397087426517b6af8d1c0f78357549e2f",
+          "targetBlob": "3cfa0ac03b73d49a559ac47d07ba74f187f9b258",
+          "classification": "reconciled",
+          "review": "Retain original held read-only role/projection startup checks plus actual current privacy composition.",
+          "difference": "200-apps_backend_src_modules_trust_development.ts.patch",
+          "sha256": "2176d6acf9eaf5501e739d9d6f73a540e0c0c1f1e76ce21f5be1f13429e00db2"
+        },
+        {
+          "path": "apps/backend/src/modules/trust/domain-privacy-authority.ts",
+          "sourceBlob": "9abac9e856073fa9eb9504def248ba702a5b6393",
+          "targetBlob": "9abac9e856073fa9eb9504def248ba702a5b6393",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/trust/own-privacy-hook.ts",
+          "sourceBlob": "2fa4760f00513dc8a9fc806d62d837ca96ae157e",
+          "targetBlob": "9a832f0fe70ef9c243dd5613fae2b72197c2b4d7",
+          "classification": "reconciled",
+          "review": "Restore bounded own-account reply metadata export/delete; retain newer original task signal and pool in ContentHeldClient.",
+          "difference": "200-apps_backend_src_modules_trust_own-privacy-hook.ts.patch",
+          "sha256": "4f7fdd5641707ff975d2ab0a1fdbbc480d3bd2f4f38a022c929795658680df7a"
+        },
+        {
+          "path": "apps/backend/src/modules/trust/privacy-consumers.ts",
+          "sourceBlob": "3bb477efc2308f5d17f45ed9ebccd3bafe013694",
+          "targetBlob": "8a7b7cf7b7e10fa1cb76c45750926741f3eec124",
+          "classification": "reconciled",
+          "review": "Retain actual Agent/Conversation/Commerce owners and protected stream. Operation and limits recorded in conversation-commerce.",
+          "difference": "200-apps_backend_src_modules_trust_privacy-consumers.ts.patch",
+          "sha256": "4ef65f1af39745988f097a96f44ae66a08fadcf10fe9daad5dc35a37016355d6"
+        },
+        {
+          "path": "apps/backend/src/modules/trust/reply-review-catalog.ts",
+          "sourceBlob": "8023edfc2b83c63263265a7fac4f457bf90d709e",
+          "targetBlob": "8023edfc2b83c63263265a7fac4f457bf90d709e",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/trust/reply-review.ts",
+          "sourceBlob": "bf4e66f4210a4a56df904ad84b6f06548b272a06",
+          "targetBlob": "bf4e66f4210a4a56df904ad84b6f06548b272a06",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/trust/restoration.ts",
+          "sourceBlob": "0acf53ef30c893b980b76ae727a80ee9533a6c76",
+          "targetBlob": "0acf53ef30c893b980b76ae727a80ee9533a6c76",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/trust/router.ts",
+          "sourceBlob": "4cf0842b0e9221369be5a9801032f7bdb4f671be",
+          "targetBlob": "4421d64459e1f6ae6711c3d8f4e8a338dec66ba9",
+          "classification": "reconciled",
+          "review": "Original Trust routes retained; newer shared FeedbackInput and product_feedback command preserve idempotency for unchanged intent.",
+          "difference": "200-apps_backend_src_modules_trust_router.ts.patch",
+          "sha256": "001e9766729beac7a0d527b60da3f19a56ee25e9c227b51e32ce24012ffcc233"
+        },
+        {
+          "path": "apps/backend/src/modules/trust/scope-restriction.ts",
+          "sourceBlob": "b1223150da5ccacb653363a523a2f8bfe06bf8e5",
+          "targetBlob": "b1223150da5ccacb653363a523a2f8bfe06bf8e5",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/backend/src/modules/trust/service.ts",
+          "sourceBlob": "3350ab190de0645e38bdc0bfb3b50e66ebeca0e8",
+          "targetBlob": "5f0fdd035e4224e0840ce797c13613abf206b1fc",
+          "classification": "reconciled",
+          "review": "Restore exact reply evidence and allow/flag/withdrawn close. Success RELEASE is outside catch; preserve rollback failure causes.",
+          "difference": "200-apps_backend_src_modules_trust_service.ts.patch",
+          "sha256": "c52523f7c1761925c8fcd360ca3d8521db0b0e153f81bb1b019fe5fde0c3cf4d"
+        },
+        {
+          "path": "apps/backend/src/modules/trust/store.ts",
+          "sourceBlob": "37a86765da6e56f9f32d2a045b4dfbdfcdb8e00c",
+          "targetBlob": "34802624e9cec3c2ff7c97fdcd1f13a3e8f44815",
+          "classification": "reconciled",
+          "review": "Retain newer shorter finite lock timeout on the original held transaction.",
+          "difference": "200-apps_backend_src_modules_trust_store.ts.patch",
+          "sha256": "62a2a702c883bde1f95f36aab27ddb5525841588faef3c443629663567ae77be"
+        },
+        {
+          "path": "apps/backend/src/modules/trust/transaction.ts",
+          "sourceBlob": "944e552a752fde68013d6c802fe1dcdfbfe6de9c",
+          "targetBlob": "db1ec81b73c9a8f99e762f491b59a168dc8ce1b2",
+          "classification": "reconciled",
+          "review": "Retain original read-only/isolation options and newer actual source cancellation/settlement and aggregate cleanup.",
+          "difference": "200-apps_backend_src_modules_trust_transaction.ts.patch",
+          "sha256": "432bed02db2d474aaf29b02722ee0245f1111ed1df689a0957afea062ecb0dfd"
+        },
+        {
+          "path": "apps/backend/src/modules/trust/worker.ts",
+          "sourceBlob": "6951d6085ff2685d3573e65411e582ddabc2e5e4",
+          "targetBlob": "185b25561fe9b59cc7a8fdbe3019f11525831eb3",
+          "classification": "reconciled",
+          "review": "Retain original task guards plus newer awaited siblings, original timeout work, durable accounting and idempotent shutdown.",
+          "difference": "200-apps_backend_src_modules_trust_worker.ts.patch",
+          "sha256": "5eaad546579d3ed2bc84a02a9b261982d6e40235c10bebf73f15ed7e74f76bb1"
+        },
+        {
+          "path": "apps/backend/src/server.ts",
+          "sourceBlob": "4eb42a2d2f288d2018bb8714302274aab8440b7c",
+          "targetBlob": "31a8391458c73fcaa0a770ed28577cf4b63c6b56",
+          "classification": "reconciled",
+          "review": "Prepare genuine reviewer after host configuration; preserve actual accounting/privacy composition and drained cleanup.",
+          "difference": "200-apps_backend_src_server.ts.patch",
+          "sha256": "b5d3948d5c7d03f9229016123e2a0d725c5a42ba7d5c14f0243c6da3c17e6345"
+        },
+        {
+          "path": "apps/ios/Sources/Generated/QelvoraAPI.swift",
+          "sourceBlob": "7bf4616ce1953d7a2a621cb8cc341f7da92d4c7a",
+          "targetBlob": "916992809354ec817f2a48b7b664a185b5e603ea",
+          "classification": "reconciled",
+          "review": "Original contracts/copy retained with newer operations/call inputs; original recovery strings already present. Do not duplicate apparent clean merge entries. Generator check: 12 resources/119 operations.",
+          "difference": "200-apps_ios_Sources_Generated_QelvoraAPI.swift.patch",
+          "sha256": "99055d3097bc40f2e28b3fc5935b81ea4b2386630f6de6669f19648e736e71b7"
+        },
+        {
+          "path": "apps/ios/Sources/QelvoraUI/FanShell.swift",
+          "sourceBlob": "b406f37a9d83f296bc49f0399bf652b4f33aedc7",
+          "targetBlob": "bbfd8c1e30c0b7711a2f6b3048a6b2d214c33ecb",
+          "classification": "reconciled",
+          "review": "Restore original bounded accessible notices, actor-picker scrolling and navigation priority; retain newer push/intro/Commerce and one credential settings view.",
+          "difference": "200-apps_ios_Sources_QelvoraUI_FanShell.swift.patch",
+          "sha256": "00dbfc67f1782c7902b6e484179df6da303e9867fb8c5f24688e7879e3722503"
+        },
+        {
+          "path": "apps/ios/Sources/QelvoraUI/Trust.swift",
+          "sourceBlob": "186ab1efc46e57f446e74a50d630195e095f69f1",
+          "targetBlob": "ecb989bc81f559c18fb9f2022131ad6821f0b585",
+          "classification": "reconciled",
+          "review": "Original privacy UI retained; newer compiler-safe view-builder decomposition preserves content, order and labels.",
+          "difference": "200-apps_ios_Sources_QelvoraUI_Trust.swift.patch",
+          "sha256": "b432363501ae8e345f19e6e39860494997d7e4de9e9788831801e2091add4832"
+        },
+        {
+          "path": "apps/web/app/api/platform/[...path]/route.ts",
+          "sourceBlob": "0a0e118262e04388926d12f7b0b74dc1d61daed4",
+          "targetBlob": "aad2eeac28d622cc2a121cfa45b9abae4361da43",
+          "classification": "reconciled",
+          "review": "Original route boundaries retained with current finite upstream/caller cancellation and API evolution.",
+          "difference": "200-apps_web_app_api_platform_[...path]_route.ts.patch",
+          "sha256": "4f6358d2482e0166c952fcb3d091621a4e48f2b2147013600887904f309b339b"
+        },
+        {
+          "path": "apps/web/app/api/trust/[...path]/route.ts",
+          "sourceBlob": "bfd647b69d6ce5f05258917f62fda69f9593cc4e",
+          "targetBlob": "8c41de69caacddba10eb423d2605bbdb4688a172",
+          "classification": "reconciled",
+          "review": "Original route boundaries retained with current finite upstream/caller cancellation and API evolution.",
+          "difference": "200-apps_web_app_api_trust_[...path]_route.ts.patch",
+          "sha256": "eabe3e800621d6ae7b3c507f38bdfe84b97dfe996108c01e76c57edda1ac80f3"
+        },
+        {
+          "path": "apps/web/app/layout.tsx",
+          "sourceBlob": "4960b589d254573c8d31afad857a6a1504680f94",
+          "targetBlob": "4960b589d254573c8d31afad857a6a1504680f94",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/web/app/ops/audits/page.tsx",
+          "sourceBlob": "4bc53def41aaff7c317b78e00e619e49db1c3b3f",
+          "targetBlob": "105d7c2412fbc0197cd3e3f8c5f7fe9b6f87563c",
+          "classification": "reconciled",
+          "review": "Retain original Ops view plus newer synchronous useTrustStatus concealment on replacement and outage.",
+          "difference": "200-apps_web_app_ops_audits_page.tsx.patch",
+          "sha256": "f750a3a7abb00cfd8952927018f08105fcbdb97f668ddaaf1c46d8d70b4aa5b8"
+        },
+        {
+          "path": "apps/web/app/ops/cases/[id]/page.tsx",
+          "sourceBlob": "b365177301bd56cb19bb59cdcdc4b3fd0b26ebc0",
+          "targetBlob": "ed63175bbe9799f1ece0e04dc37fc220518f2bc2",
+          "classification": "reconciled",
+          "review": "Restore reply unavailable state and allow/flag/close choices; retain current synchronized session concealment, busy controls and dialog reset.",
+          "difference": "200-apps_web_app_ops_cases_[id]_page.tsx.patch",
+          "sha256": "5f72d0e0ce129165ac35f04ec896107c00011afbbcea880ebcbd8f04f5bbf2dc"
+        },
+        {
+          "path": "apps/web/app/ops/metrics/page.tsx",
+          "sourceBlob": "c47c1e6615c85e57558db9dcd5a81e6a8eed1547",
+          "targetBlob": "cc09483e9055db74eca687e31e3c7468bfe82865",
+          "classification": "reconciled",
+          "review": "Retain original Ops view plus newer synchronous useTrustStatus concealment on replacement and outage.",
+          "difference": "200-apps_web_app_ops_metrics_page.tsx.patch",
+          "sha256": "0efdf0ff02ae68c3aa7fb73083c27f5b7893c29c06faf9e015d0931b1c9ac1b8"
+        },
+        {
+          "path": "apps/web/app/ops/page.tsx",
+          "sourceBlob": "0c9ba114c7bbfa92d63c1ce093220f2c3f2af1e5",
+          "targetBlob": "10b7ef2a48e2d263af6cb66860ef364c52ceb09b",
+          "classification": "reconciled",
+          "review": "Retain original Ops view plus newer synchronous useTrustStatus concealment on replacement and outage.",
+          "difference": "200-apps_web_app_ops_page.tsx.patch",
+          "sha256": "6e0b86e4a5e2036973aa11be5c00c054430cde46e857b9cde81f2b45d4d6975b"
+        },
+        {
+          "path": "apps/web/app/ops/trust-client.tsx",
+          "sourceBlob": "0685333b9a35cabe757051fa79d6a976162a57fe",
+          "targetBlob": "0f2672306d7cebc95a601b7e9bec9e53a47e46dc",
+          "classification": "reconciled",
+          "review": "Retain original three-second whole-response deadline plus immutable account/session/signal, synchronous concealment and retained-credential draft recovery.",
+          "difference": "200-apps_web_app_ops_trust-client.tsx.patch",
+          "sha256": "1de2fdb5dcc90304cdada6e4c043284256669dda2935607fbcad885e8a20eb4d"
+        },
+        {
+          "path": "apps/web/app/support/feedback/page.tsx",
+          "sourceBlob": "c2428d4e79871f374e3faae0fadd64b7240131b2",
+          "targetBlob": "5b70a53aea59e459e5b121d38e6fd5984db5d959",
+          "classification": "reconciled",
+          "review": "Retain newer stable retry key, unsent input, busy/readiness gates and synchronized concealment.",
+          "difference": "200-apps_web_app_support_feedback_page.tsx.patch",
+          "sha256": "fef487dc721660aebb9f413984fc46d76ac3e51c77b2a0c38a6acb97f225a5c0"
+        },
+        {
+          "path": "apps/web/app/support/page.tsx",
+          "sourceBlob": "71705cd0e38add393542d6e2e61aebe12d02ea50",
+          "targetBlob": "e13e26c1120843d2bd97b716686e783f541f3a74",
+          "classification": "reconciled",
+          "review": "Retain original privacy/Support behavior with current request/session guards, layout closure and independent report/appeal retry intents.",
+          "difference": "200-apps_web_app_support_page.tsx.patch",
+          "sha256": "ed1ae5109b827c1a66f800bfd3c30bebde53289fd5dbe438500ae3a02a64b2bc"
+        },
+        {
+          "path": "apps/web/app/support/privacy/page.tsx",
+          "sourceBlob": "1de139e70f67b295140cb8956dd0785da1dde60c",
+          "targetBlob": "6868954c0071878b102df36d3e8ae7d27bb00e29",
+          "classification": "reconciled",
+          "review": "Retain original privacy/Support behavior with current request/session guards, layout closure and independent report/appeal retry intents.",
+          "difference": "200-apps_web_app_support_privacy_page.tsx.patch",
+          "sha256": "733219394a67845135c4c2bb64f863a2712a6b2bd0a6fb7f59a471415475f81d"
+        },
+        {
+          "path": "apps/web/features/identity/PrivateSessionCleanup.tsx",
+          "sourceBlob": "6a400c66e3450f939559df736819c553a31e513c",
+          "targetBlob": "6a400c66e3450f939559df736819c553a31e513c",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/web/features/identity/account.tsx",
+          "sourceBlob": "350e719b23be38591b26e3d06764f7f2bdc9f771",
+          "targetBlob": "350e719b23be38591b26e3d06764f7f2bdc9f771",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/web/features/identity/private-session-buffers.ts",
+          "sourceBlob": "8b4a3731dbc0f54cc23bddef767523e019312d96",
+          "targetBlob": "8b4a3731dbc0f54cc23bddef767523e019312d96",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/web/features/identity/session-boundary.tsx",
+          "sourceBlob": "908bdcb057e02e62706c83dc33e8e619bfe94d22",
+          "targetBlob": "908bdcb057e02e62706c83dc33e8e619bfe94d22",
+          "classification": "exact"
+        },
+        {
+          "path": "infra/migrations.json",
+          "sourceBlob": "c4762a64e6a3981a52c04b79d0165c90733325cd",
+          "targetBlob": "13406a310e56ccfd2155d0fe17b423be0b9403df",
+          "classification": "reconciled",
+          "review": "Restore exact original reply-review source checksum in reserved 0156. Current executable registrations remain; no activation or catalogue pin changes.",
+          "difference": "200-infra_migrations.json.patch",
+          "sha256": "7d722c96036b93de76c951e01dde19faf43e1b88264dd46b750e80d33c93f5ee"
+        },
+        {
+          "path": "scripts/generate-native-api.mjs",
+          "sourceBlob": "022ca7c2afdd36150733a12c186eb45d96d5c39d",
+          "targetBlob": "022ca7c2afdd36150733a12c186eb45d96d5c39d",
+          "classification": "exact"
+        }
+      ],
+      "historicalSupportingPaths": [
+        "docs/implementation/W1-captured-trust-transport.md",
+        "docs/operations/W8-domain-privacy-fence.md",
+        "docs/operations/W8-native-trust-capture.md",
+        "docs/operations/W8-trust-transaction-settlement.md",
+        "docs/workstreams/coordination/W8-contracts.md",
+        "docs/workstreams/coordination/W8-pr-review-20261003.md",
+        "docs/workstreams/handoffs/W8-continuation-2026-10-03-codex.md",
+        "docs/workstreams/status/W8.md"
+      ]
+    }
+  ],
+  "validation": {
+    "backendBuild": "passed",
+    "existingBackendTests": 17,
+    "webProductionBuild": "passed",
+    "existingSwiftTests": 18,
+    "finalSwiftBuild": "passed after duplicate credential-settings removal",
+    "generated": "12 resources/119 operations",
+    "applicationAcceptance": false,
+    "swiftResolution": "Local test-only overlay dependency resolution; original Package.resolved restored."
+  }
+}

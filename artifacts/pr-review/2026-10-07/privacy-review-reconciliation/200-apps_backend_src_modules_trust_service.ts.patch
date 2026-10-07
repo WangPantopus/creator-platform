@@ -1,0 +1,57 @@
+diff --git a/apps/backend/src/modules/trust/service.ts b/apps/backend/src/modules/trust/service.ts
+index 3350ab19..5f0fdd03 100644
+--- a/apps/backend/src/modules/trust/service.ts
++++ b/apps/backend/src/modules/trust/service.ts
+@@ -302,11 +302,16 @@ export class TrustService {
+         await client.query("SAVEPOINT reply_evidence");
+         try {
+           replyEvidence.push(await this.replyEvidence(client, caseId));
+-          await client.query("RELEASE SAVEPOINT reply_evidence");
+         } catch (error) {
+           if (querySettlementUncertain(error)) throw error;
+-          await client.query("ROLLBACK TO SAVEPOINT reply_evidence");
+-          await client.query("RELEASE SAVEPOINT reply_evidence");
++          try {
++            await client.query("ROLLBACK TO SAVEPOINT reply_evidence");
++          } catch (cleanup) {
++            throw new AggregateError(
++              [error, cleanup],
++              "Reply evidence and savepoint restoration failed.",
++            );
++          }
+           const value = trustReplyError(error);
+           if (![409, 410].includes(value.status)) throw value;
+           replyEvidence.push({
+@@ -315,6 +320,7 @@ export class TrustService {
+             text: value.message,
+           });
+         }
++        await client.query("RELEASE SAVEPOINT reply_evidence");
+       }
+       const timeline = await client.query<CaseDetail["timeline"][number]>(
+         "SELECT id,type,reason,created_at FROM creator_trust.case_event WHERE case_id=$1 ORDER BY created_at,id LIMIT 100",
+@@ -440,15 +446,21 @@ export class TrustService {
+                 let unavailable = false;
+                 try {
+                   await this.replyEvidence(client, caseId);
+-                  await client.query("RELEASE SAVEPOINT reply_closure");
+                 } catch (error) {
+                   if (querySettlementUncertain(error)) throw error;
+-                  await client.query("ROLLBACK TO SAVEPOINT reply_closure");
+-                  await client.query("RELEASE SAVEPOINT reply_closure");
++                  try {
++                    await client.query("ROLLBACK TO SAVEPOINT reply_closure");
++                  } catch (cleanup) {
++                    throw new AggregateError(
++                      [error, cleanup],
++                      "Reply closure and savepoint restoration failed.",
++                    );
++                  }
+                   const value = trustReplyError(error);
+                   if (![409, 410].includes(value.status)) throw value;
+                   unavailable = true;
+                 }
++                await client.query("RELEASE SAVEPOINT reply_closure");
+                 if (!unavailable)
+                   throw new DomainError(
+                     "reply_decision_required",

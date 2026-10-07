@@ -1,0 +1,38 @@
+diff --git a/apps/web/app/ops/audits/page.tsx b/apps/web/app/ops/audits/page.tsx
+index 4bc53def..105d7c24 100644
+--- a/apps/web/app/ops/audits/page.tsx
++++ b/apps/web/app/ops/audits/page.tsx
+@@ -1,11 +1,10 @@
+ "use client";
+ import Link from "next/link";
+-import { useState } from "react";
+ import { AuditBanner } from "@qelvora/ui-web";
+ import {
+   ErrorState,
+   TrustSession,
+-  type TrustSessionState,
++  useTrustStatus,
+   dateLabel,
+   useTrust,
+   retryTrustReads,
+@@ -20,10 +19,7 @@ type Audit = {
+   queue: string;
+ };
+ export default function AccessAudits() {
+-  const [sessionState, setSessionState] = useState<TrustSessionState>({
+-    ready: false,
+-    error: null,
+-  });
++  const sessionState = useTrustStatus();
+   const { data, error, loading } = useTrust<{ items: Audit[] }>(
+     "operations/audits",
+     sessionState.ready,
+@@ -50,7 +46,7 @@ export default function AccessAudits() {
+           <span className="qv-meta">Reference {item.correlation_id}</span>
+         </article>
+       ))}
+-      <TrustSession onSessionState={setSessionState} />
++      <TrustSession showErrors={false} />
+     </main>
+   );
+ }
