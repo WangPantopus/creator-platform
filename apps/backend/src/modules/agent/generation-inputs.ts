@@ -106,6 +106,7 @@ export type GenerationAILicenseContext = Readonly<{
  * Private inputs never leave the purpose callback without current licence.
  */
 export class PreparedGenerationAgentInputs {
+  private readonly licensed = new WeakSet<GenerationAgentFacts>();
   private readonly issued = new WeakMap<
     GenerationAgentFacts,
     { scope: GenerationTaskScope; client: PoolClient; hash: string }
@@ -363,11 +364,27 @@ export class PreparedGenerationAgentInputs {
       // authorization after the verifier returns. No intervening operation
       // occurs before handing the same immutable facts back to the caller.
       signal?.throwIfAborted();
+      this.licensed.add(facts);
       return facts;
     } catch (error) {
       this.issued.delete(facts);
       throw error;
     }
+  }
+
+  /** Reuse across nested readers only after this exact object completed the
+   * actual licence verifier. A verifier's in-progress input is insufficient. */
+  async authorizeLicensedInTransaction(
+    facts: GenerationAgentFacts,
+    scope: GenerationTaskScope,
+    client: PoolClient,
+  ): Promise<void> {
+    invariant(
+      this.licensed.has(facts),
+      "generation_licensed_inputs_required",
+      "Use the original inputs after their licence verification completed.",
+    );
+    await this.authorizeInTransaction(facts, scope, client);
   }
 
   /** Same issued facts, same held client, same current tuple and private nonce.

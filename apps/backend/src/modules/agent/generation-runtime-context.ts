@@ -16,7 +16,10 @@ import {
   type GenerationTaskScope,
 } from "../identity/generation-scope.js";
 import { PreparedGenerationConversationContext } from "../conversation/generation-context.js";
-import { PreparedGenerationAgentInputs } from "./generation-inputs.js";
+import {
+  PreparedGenerationAgentInputs,
+  type GenerationAgentFacts,
+} from "./generation-inputs.js";
 import {
   PreparedGenerationProviderAccounting,
   type GenerationProviderAttempt,
@@ -338,6 +341,7 @@ export class PreparedGenerationRuntimeContext {
     client: PoolClient,
     scope: GenerationTaskScope,
     embedding: GenerationQueryEmbedding,
+    licensedFacts?: GenerationAgentFacts,
   ): Promise<GenerationRuntimeContext> {
     const query = this.embeddings.get(embedding);
     invariant(
@@ -357,7 +361,13 @@ export class PreparedGenerationRuntimeContext {
       "generation_query_embedding_changed",
       "The privately embedded accepted message changed.",
     );
-    const facts = await this.inputs.currentInTransaction(client, scope);
+    // An enclosing pipeline read may already own the licensed snapshot.
+    // Reuse only the privately issued object for this exact client/purpose,
+    // with the same current-input checks before and after evidence retrieval.
+    const facts =
+      licensedFacts ?? (await this.inputs.currentInTransaction(client, scope));
+    if (licensedFacts)
+      await this.inputs.authorizeLicensedInTransaction(facts, scope, client);
     const raw = (
       await client.query<{ context: unknown }>(
         "SELECT creator.generation_agent_runtime_context($1,$2,$3,$4) AS context",
@@ -406,8 +416,9 @@ export class PreparedGenerationRuntimeContext {
     client: PoolClient,
     scope: GenerationTaskScope,
     embedding: GenerationQueryEmbedding,
+    licensedFacts?: GenerationAgentFacts,
   ): Promise<GenerationRuntimeContext> {
-    const value = await this.read(client, scope, embedding);
+    const value = await this.read(client, scope, embedding, licensedFacts);
     this.issued.set(value, {
       client,
       scope,

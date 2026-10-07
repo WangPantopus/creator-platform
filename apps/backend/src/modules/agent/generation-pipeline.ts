@@ -266,6 +266,7 @@ export class PreparedGenerationPipeline {
         client,
         scope,
         run.embedding,
+        facts,
       );
       invariant(
         retrievalInput(retrieved) === retrievalInput(run.retrieval),
@@ -281,6 +282,7 @@ export class PreparedGenerationPipeline {
     await this.context.assertCurrentInTransaction(client, scope, conversation);
     await this.identity.authorizeInTransaction(scope, client);
     run.signal.throwIfAborted();
+    return facts;
   }
 
   /** W3 supplies its original held client and genuine purpose, before and after
@@ -478,8 +480,12 @@ export class PreparedGenerationPipeline {
         signal,
       );
       const current = run;
-      const bookend = (client: PoolClient, scope: GenerationTaskScope) =>
-        this.current(client, scope, current);
+      const bookend = async (
+        client: PoolClient,
+        scope: GenerationTaskScope,
+      ) => {
+        await this.current(client, scope, current);
+      };
       let emitted = 0;
       const emit = async (
         sentence: { text: string; citations: readonly string[] },
@@ -573,11 +579,12 @@ export class PreparedGenerationPipeline {
             const retrieved = await this.identity.withGeneration(
               task,
               async (client, scope) => {
-                await bookend(client, scope);
+                const facts = await this.current(client, scope, current);
                 const value = await this.retrieval.currentInTransaction(
                   client,
                   scope,
                   embedding,
+                  facts,
                 );
                 // The fresh reader already completes its own authority and
                 // input bookends before returning this immutable value.
