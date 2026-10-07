@@ -1,0 +1,42 @@
+{
+  "base": "3c8d6882c3b6bfa40b39ed592a14fda97f1345db",
+  "sourcePr": 31,
+  "sourceHead": "c052ef67fa85301562b5123b682c88b931107c9a",
+  "originalSessionCommit": "23b8339b9e1c1c60aeeae878e7d443faec03e663",
+  "sourceSha256": {
+    "apps/web/app/studio/insights/page.tsx": "2588ce28d5d2f6f0cbf0d4863d915060e3e6bca74e1f65f22cbd0fe2917bb98b",
+    "apps/web/app/studio/impact/page.tsx": "a932b1ade403782d646e6061a74c4a7589ae8ca62b67a37cfc4381525680761f",
+    "apps/web/app/studio/activation/page.tsx": "e2067f48f51add107485fa72f9f841d118d93dfd5e6a3bbd1aaaedf0970c4def",
+    "apps/web/app/studio/launch/page.tsx": "cae76c48c738f7a7299ab38d227a1e3f847094c1467360b1c65676a86425ef15",
+    "apps/web/features/growth/actions.tsx": "086fc10f3fe61f92c8de034be0b0b23a94f90923596441645c3b41e7f097fe95",
+    "apps/web/features/growth/launch.tsx": "cabdbd99093cdb3aa8ce2e6ed8d453eed8dcfb87825f222cc6ca34ecb68699c7",
+    "apps/web/app/api/growth/[...path]/route.ts": "86e4751b2557c4437a7ab3699b9130a46770acb5886fdf16f1b03e44e92a9de5"
+  },
+  "scope": "Extract existing page/action session wiring; adapt to already merged exact account/session request and concealment helpers; preserve current Impact visual branches and newer Inbox behavior.",
+  "checks": {
+    "types": "PASS",
+    "webpackBuild": "PASS",
+    "scopedLint": "PASS",
+    "format": "PASS"
+  },
+  "manual": {
+    "reports": "Actual creator-authenticated API200 and browser empty/suppressed states for Insights, Impact and Activation",
+    "outage": "Actual review API stopped; all four views concealed private content and focused recovery button; actual restart recovered all four.",
+    "replacement": "Actual actor two issuer sign-in disposed all four original views.",
+    "signout": "Actual creator Sign out disposed all four views.",
+    "proxy": "Actual missing-tuple HTTP calls returned400/session_view_required for insights,impact,activation,recommendations,recommendations/publish,invites.",
+    "invitation": "Actual original-session-bound Create and copy action returned503 because no published creator_public projection exists (real FK refusal). Zero invite rows. Button recovered and truthful unavailable message appeared. Clipboard was empty and remained empty; no copy or transmission occurred."
+  },
+  "limits": [
+    "Populated insight Producer controls compile/reuse original-session helper; positive action is not personally operated without genuine closed-window signals.",
+    "Positive invitation and digest publication require genuine public projection/owner inputs; none fabricated.",
+    "Broad PR31 graph stays held; no design or native qualification claim."
+  ],
+  "cleanup": {
+    "creator": "pending/version7",
+    "session": "signed out",
+    "interception": "none on Studio tabs; prior Measurement interception cleared",
+    "overrides": "none",
+    "services": "API4206 direct DB5546 and web3106 remain running"
+  }
+}
