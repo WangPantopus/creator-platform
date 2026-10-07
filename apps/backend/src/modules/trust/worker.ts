@@ -330,6 +330,9 @@ export class TrustWorker {
         "generation_settlement_clock_unavailable",
         "identity_retention_unconfigured",
         "identity_scope_adapter_required",
+        "content_retention_unconfigured",
+        "content_privacy_purpose_unconfigured",
+        "media_retention_unconfigured",
       ];
       const message =
         error instanceof DomainError

@@ -37,6 +37,9 @@ const hash = z.string().regex(/^[a-f0-9]{64}$/u);
 type Custody = Readonly<{
   definitionSha256: string;
   catalogueChecksum: string;
+  /** Separately reviewed incoming API child; the literal caller still forbids
+   * parent memberships through assertOriginalPrivacyFamilyCatalog. */
+  incomingApiCatalogueChecksum?: string;
 }>;
 
 function unavailable(cause?: unknown): never {
@@ -216,6 +219,8 @@ export class PreparedGenerationProvenancePurge {
       !input.custody ||
       !hash.safeParse(input.custody.definitionSha256).success ||
       !hash.safeParse(input.custody.catalogueChecksum).success ||
+      (input.custody.incomingApiCatalogueChecksum !== undefined &&
+        !hash.safeParse(input.custody.incomingApiCatalogueChecksum).success) ||
       typeof input.authority.fenceTaskInTransaction !== "function" ||
       typeof input.authority.assertFamily !== "function"
     )
@@ -356,8 +361,12 @@ export class PreparedGenerationProvenancePurge {
       !ready?.ready ||
       createHash("sha256").update(ready.definition, "utf8").digest("hex") !==
         this.custody.definitionSha256 ||
-      contentHash(await generationProvenancePurgeCatalogue(client, signal)) !==
-        this.custody.catalogueChecksum
+      ![
+        this.custody.catalogueChecksum,
+        this.custody.incomingApiCatalogueChecksum,
+      ].includes(
+        contentHash(await generationProvenancePurgeCatalogue(client, signal)),
+      )
     )
       unavailable();
   }

@@ -34,6 +34,8 @@ const profiles = Object.freeze(
           custody: Object.freeze({
             definitionSha256: review.provenancePurge.definitionSha256,
             catalogueChecksum: review.provenancePurge.catalogues[profile],
+            incomingApiCatalogueChecksum:
+              review.provenancePurge.incomingApiCatalogues[profile],
           }),
         }),
       } satisfies Review),
