@@ -25,6 +25,9 @@ export async function generationConsumerCatalogue(
     options.signal?.throwIfAborted();
     return result;
   };
+  // A role without any effective column privilege contributes an empty list.
+  // Skip only that exhaustive per-column expansion, preserving the exact
+  // catalogue shape, inherited/table-wide grants and every relation/policy.
   const relations = (
     await query(
       `SELECT n.nspname AS schema,c.relname AS relation,c.relkind,pg_get_userbyid(c.relowner) AS owner,
@@ -33,10 +36,12 @@ export async function generationConsumerCatalogue(
         WHERE CASE WHEN c.relkind IN('r','p','v','m','f') THEN has_table_privilege($1,c.oid,privilege) ELSE false END ORDER BY privilege) AS table_privileges,
        ARRAY(SELECT privilege FROM unnest(ARRAY['SELECT','UPDATE','USAGE']) privilege
         WHERE CASE WHEN c.relkind='S' THEN has_sequence_privilege($1,c.oid,privilege) ELSE false END ORDER BY privilege) AS sequence_privileges,
+       CASE WHEN CASE WHEN c.relkind IN('r','p','v','m','f')
+        THEN has_any_column_privilege($1,c.oid,'SELECT,INSERT,UPDATE,REFERENCES') ELSE false END THEN
        coalesce((SELECT jsonb_agg(jsonb_build_object('column',a.attname,'privilege',privilege) ORDER BY a.attname,privilege)
         FROM pg_attribute a CROSS JOIN unnest(ARRAY['SELECT','INSERT','UPDATE','REFERENCES']) privilege
         WHERE a.attrelid=c.oid AND a.attnum>0 AND NOT a.attisdropped
-         AND CASE WHEN c.relkind IN('r','p','v','m','f') THEN has_column_privilege($1,c.oid,a.attnum,privilege) ELSE false END),'[]'::jsonb) AS columns,
+         AND CASE WHEN c.relkind IN('r','p','v','m','f') THEN has_column_privilege($1,c.oid,a.attnum,privilege) ELSE false END),'[]'::jsonb) ELSE '[]'::jsonb END AS columns,
        coalesce((SELECT jsonb_agg(jsonb_build_object('name',p.polname,'command',p.polcmd,'permissive',p.polpermissive,
          'roles',ARRAY(SELECT CASE WHEN r=0 THEN 'PUBLIC' ELSE pg_get_userbyid(r) END FROM unnest(p.polroles) r ORDER BY r),
          'using',pg_get_expr(p.polqual,p.polrelid),'check',pg_get_expr(p.polwithcheck,p.polrelid)) ORDER BY p.polname)
