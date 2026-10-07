@@ -13,7 +13,7 @@ The held restoration reader now releases its savepoint only after a completed re
 - Both original integration type/forwarding additions are identical.
 - The same two SQL source paths, owners and SHA256 values were already registered by #132's reviewed generation wave. No migration, registration or privilege changed in this repair.
 
-This permits consolidation of the source review into #132 with its remaining requirements transferred. It does not qualify a complete generation, terminal result or privacy lifecycle.
+#145 was closed unmerged into #132 after the verified implementation and evidence were published. [Action receipts](actions.json) and [verified state](post-consolidation.json) record source preservation and the transferred requirements. Fifteen original drafts remain open. It does not qualify a complete generation, terminal result or privacy lifecycle.
 
 ## Actual operation
 
