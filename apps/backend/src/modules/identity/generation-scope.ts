@@ -9,6 +9,7 @@ import {
   generationOutputCursorSignature,
 } from "./generation-output-cursor.js";
 import { registeredMigration } from "../../db/reviewed-migration.js";
+import { assertGenerationLifecycleCatalogue } from "./generation-lifecycle.js";
 import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import { assertCurrentSession, requestAuthority } from "./request-authority.js";
 import {
@@ -233,6 +234,7 @@ async function assertGenerationCatalogue(
   query: Pick<Pool, "query">,
   input: GenerationCatalogue,
 ): Promise<void> {
+  await assertGenerationLifecycleCatalogue(query);
   const consumers = [...input.consumers, ...input.terminalConsumers];
   const installed = (
     await query.query<{ installed: boolean }>(

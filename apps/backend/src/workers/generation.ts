@@ -126,7 +126,7 @@ export class GenerationWorker {
       try {
         result.recovered = await this.recovery.recoverOnce(signal, bounded);
       } catch (cause) {
-        signal.throwIfAborted();
+        if (signal.aborted) throw cause;
         result.recovered = null;
         result.failures.push(code(cause));
       }
@@ -137,9 +137,35 @@ export class GenerationWorker {
       for (const id of candidates) {
         signal.throwIfAborted();
         try {
-          const task = await this.owners.identity.claimTask(id, signal);
+          let task;
+          try {
+            task = await this.owners.identity.claimTask(id, signal);
+          } catch (cause) {
+            if (
+              signal.aborted ||
+              !(cause instanceof DomainError) ||
+              cause.code !== "generation_denied"
+            )
+              throw cause;
+          }
           if (!task) {
-            result.skipped++;
+            // The lifecycle selector observed this exact initial zero cursor.
+            // A lost claim race, changed consent/session or current denial may
+            // now require original recovery. W1 rechecks the cursor and refuses
+            // any live competing claim; W2/W4 derive the actual financial result.
+            // Neither a provider retry nor a caller-created zero-cost receipt.
+            await this.owners.terminal.withTerminal(
+              { mode: "reconciliation", generationId: id, lastSequence: 0 },
+              async (client, scope) => {
+                await this.owners.finalization.finalizeInTransaction(
+                  client,
+                  scope,
+                );
+                await this.owners.settlement.settleInTransaction(client, scope);
+              },
+              signal,
+            );
+            if (result.recovered !== null) result.recovered++;
             continue;
           }
           let failed = false;
@@ -152,7 +178,7 @@ export class GenerationWorker {
           } catch (cause) {
             // generate() awaits provider-usage cleanup before rejecting. Never
             // turn a lost append ACK or provider failure into guessed zero cost.
-            signal.throwIfAborted();
+            if (signal.aborted) throw cause;
             failed = true;
             result.failures.push(code(cause));
           }
@@ -178,7 +204,7 @@ export class GenerationWorker {
           if (failed) result.failed++;
           else result.completed++;
         } catch (cause) {
-          signal.throwIfAborted();
+          if (signal.aborted) throw cause;
           result.deferred++;
           result.failures.push(code(cause));
         }
@@ -220,10 +246,16 @@ export class GenerationWorker {
       while (!signal.aborted) {
         const result = await this.pass(signal, 20);
         onPass?.(result);
-        await delay(1000, undefined, { signal });
+        try {
+          await delay(1000, undefined, { signal });
+        } catch (cause) {
+          if (!signal.aborted) throw cause;
+        }
       }
     } catch (cause) {
-      if (!signal.aborted) throw cause;
+      // Only the original cooperative abort is a clean stop. An incurred
+      // usage/rollback/release failure after abort must still reject done/close.
+      if (!signal.aborted || cause !== signal.reason) throw cause;
     } finally {
       this.lifetime = false;
     }

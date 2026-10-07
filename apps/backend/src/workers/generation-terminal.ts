@@ -1,6 +1,6 @@
 import { setTimeout as delay } from "node:timers/promises";
 import { z } from "zod";
-import { invariant } from "../core/errors.js";
+import { DomainError, invariant } from "../core/errors.js";
 import { CommerceGenerationSafetyTerminalSettlement } from "../modules/commerce/generation-safety-terminal-settlement.js";
 import { PreparedGenerationConversationTerminal } from "../modules/conversation/generation-terminal.js";
 import { GenerationTerminalAuthority } from "../modules/identity/generation-terminal.js";
@@ -45,22 +45,39 @@ export class GenerationTerminalRecovery {
         signal,
       );
       let committed = 0;
+      const failures: unknown[] = [];
       for (const candidate of candidates) {
+        if (signal.aborted && failures.length) break;
         signal.throwIfAborted();
-        await this.terminal.withTerminal(
-          {
-            mode: "reconciliation",
-            generationId: candidate.generationId,
-            lastSequence: candidate.lastSequence,
-          },
-          async (client, scope) => {
-            await this.output.finalizeInTransaction(client, scope);
-            await this.settlement.settleInTransaction(client, scope);
-          },
-          signal,
-        );
-        committed++;
+        try {
+          await this.terminal.withTerminal(
+            {
+              mode: "reconciliation",
+              generationId: candidate.generationId,
+              lastSequence: candidate.lastSequence,
+            },
+            async (client, scope) => {
+              await this.output.finalizeInTransaction(client, scope);
+              await this.settlement.settleInTransaction(client, scope);
+            },
+            signal,
+          );
+          committed++;
+        } catch (cause) {
+          // Each original transaction has finished its own cleanup. An unknown
+          // old receipt must not starve every later terminal candidate forever.
+          // Abort still retains any incurred/cleanup failure for the host.
+          if (signal.aborted && !failures.length) throw cause;
+          failures.push(cause);
+        }
       }
+      if (failures.length)
+        throw new DomainError(
+          "generation_terminal_recovery_incomplete",
+          "Some original terminal receipts still require reconciliation.",
+          503,
+          { cause: new AggregateError(failures) },
+        );
       return committed;
     } finally {
       this.running = false;

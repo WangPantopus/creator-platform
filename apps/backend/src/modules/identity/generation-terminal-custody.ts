@@ -2,6 +2,7 @@ import {
   GENERATION_TERMINAL_DENIAL_MIGRATION,
   GENERATION_TERMINAL_MIGRATION,
 } from "./generation-terminal.js";
+import { generationLifecycleDefinitions } from "./generation-lifecycle.js";
 
 /** Actual closed PostgreSQL17 installation receipts, not activation or positive
  * permission. Callers still supply the genuine worker registry, held W8 recovery
@@ -29,7 +30,9 @@ export const reviewedGenerationTerminalCustody = Object.freeze({
     "creator.generation_terminal_matches(uuid,uuid,boolean)":
       "c3f8423b34d38f4f5fdb74804ecffd7b4aa659d243d50a0524be88318ff6c8ad",
     "creator.pending_generation_terminals(integer)":
-      "34fdf0905679881077e5e1479649781a15335e6ce4a4dc90ba7d2839b82f53be",
+      generationLifecycleDefinitions[
+        "creator.pending_generation_terminals(integer)"
+      ],
     "creator.require_generation_terminal_cleanup()":
       "c9df9677830afe0e1d6b2ac33ec3efd288319bdc909a5eb381946987b5bdcd62",
   }),

@@ -8,6 +8,7 @@ import {
   type GenerationTask,
 } from "./generation-scope.js";
 import { requestAuthority } from "./request-authority.js";
+import { assertGenerationLifecycleCatalogue } from "./generation-lifecycle.js";
 import {
   assertGenerationPoolCustody,
   generationTransaction,
@@ -201,6 +202,7 @@ async function assertTerminalCatalogue(
   query: Pick<Pool, "query">,
   input: TerminalCatalogue,
 ): Promise<void> {
+  await assertGenerationLifecycleCatalogue(query);
   const ready = (
     await query.query<{ ready: boolean }>(
       `SELECT session_user='creator_generation_worker' AND current_user=session_user
