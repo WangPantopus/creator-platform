@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import type { PoolClient } from "pg";
 import {
   assertCanonicalPrivacyTaskCatalog,
+  assertGenerationPrivacyTaskCatalogForReview,
   assertPrivacyTaskCatalog,
 } from "../src/modules/trust/privacy-catalog.js";
 import { assertDomainPrivacyTaskCatalog } from "../src/modules/trust/domain-privacy-catalog.js";
@@ -36,6 +37,7 @@ export async function assertPrivacyWaveRoleSafety(
     privacy: boolean;
     domain: boolean;
     canonicalBeforeGeneration?: boolean;
+    generationBeforeContent?: boolean;
   },
 ) {
   const fail = (purpose: string): never => {
@@ -114,6 +116,8 @@ export async function assertPrivacyWaveRoleSafety(
       await client.query("SET SESSION AUTHORIZATION creator_runtime");
       if (installed.canonicalBeforeGeneration)
         await assertCanonicalPrivacyTaskCatalog(client);
+      else if (installed.generationBeforeContent)
+        await assertGenerationPrivacyTaskCatalogForReview(client);
       else await assertPrivacyTaskCatalog(client);
       await client.query("RESET SESSION AUTHORIZATION");
     }

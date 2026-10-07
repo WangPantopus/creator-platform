@@ -1,6 +1,26 @@
 import type { PoolClient } from "pg";
 import { DomainError } from "../../core/errors.js";
-import { originalPrivacyFamilyRegisteredExtension } from "./privacy-family-catalog.js";
+import {
+  originalPrivacyFamilyRegisteredExtension,
+  assertOriginalPrivacyFamilyGenerationCatalog,
+  originalPrivacyBindingSignature,
+  originalPrivacyBindingDefinition,
+} from "./privacy-family-catalog.js";
+import generationReview from "../../../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
+import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
+import { contentHash } from "../../core/canonical.js";
+import {
+  accountDetachedUsageCatalogue,
+  accountDetachedUsageExpectedCatalogue,
+  accountDeleteBindingSignature,
+  accountDeleteBindingDefinition,
+} from "./account-detached-usage-catalogue.js";
+import {
+  accountingBoundaryCatalogue,
+  accountingBoundaryExpectedCatalogue,
+  accountingBoundaryBindingSignature,
+  accountingBoundaryBindingDefinition,
+} from "./accounting-boundary-catalogue.js";
 import { accountDetachedUsageRegisteredExtension } from "./account-detached-usage-catalogue.js";
 import { accountingBoundaryRegisteredExtension } from "./accounting-boundary-catalogue.js";
 
@@ -69,6 +89,47 @@ export async function assertCanonicalPrivacyTaskCatalog(
   signal?: AbortSignal,
 ) {
   return assertPrivacyTaskMetadata(client, {}, signal);
+}
+
+/** Fixed100 metadata for the closed migration operator after later Content
+ * registration. This supplies no task authority and accepts no caller pins;
+ * runtime callers retain the live registered graph above. */
+export async function assertGenerationPrivacyTaskCatalogForReview(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  for (const source of generationReview.sources)
+    await assertRegisteredMigration(client, source, signal);
+  await assertOriginalPrivacyFamilyGenerationCatalog(client, signal);
+  if (
+    contentHash(await accountDetachedUsageCatalogue(client, signal)) !==
+      accountDetachedUsageExpectedCatalogue ||
+    contentHash(await accountingBoundaryCatalogue(client, signal)) !==
+      accountingBoundaryExpectedCatalogue
+  )
+    throw new DomainError(
+      "privacy_commit_fence_unavailable",
+      "Original generation privacy metadata changed.",
+      503,
+    );
+  return assertPrivacyTaskMetadata(
+    client,
+    {
+      family: {
+        signature: originalPrivacyBindingSignature,
+        sha256: originalPrivacyBindingDefinition,
+      },
+      detached: {
+        signature: accountDeleteBindingSignature,
+        sha256: accountDeleteBindingDefinition,
+      },
+      boundary: {
+        signature: accountingBoundaryBindingSignature,
+        sha256: accountingBoundaryBindingDefinition,
+      },
+    },
+    signal,
+  );
 }
 
 async function assertPrivacyTaskMetadata(

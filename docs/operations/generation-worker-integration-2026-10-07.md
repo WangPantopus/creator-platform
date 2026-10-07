@@ -1,5 +1,7 @@
 # Generation worker integration — October 7, 2026
 
+Current Content continuation: exact0198 is now a separate registered101 extension, personally activated only on the closed recovered candidate with matching independent backup/restore and real core-pool exporter preparation. [Activation evidence](../../artifacts/pr-review/2026-10-07/content-export-custody/activation.md) supersedes earlier claims that Content remains reserved. Genuine export jobs and full privacy/generation registration remain unfinished.
+
 Current qualification: the exact39 sources now join the original61 executable registrations. The reviewed activation runner applied them atomically to an independently restored, closed copy and verified a subsequent backup/restore. All six catalogue pins match. Application traffic remains closed; the final section supersedes earlier dated statements that pins or executable registration are absent.
 
 The later lifecycle review below supersedes the initial executor's routing and cancellation claims. It found overlapping fresh/recovery selectors and shutdown error suppression. The fixes remain held with the complete generation graph; #132 is still draft.

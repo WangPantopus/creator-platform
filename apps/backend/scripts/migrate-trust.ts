@@ -6,6 +6,10 @@ import { assertPrivacyWaveRoleSafety } from "./migration-privacy-roles.js";
 import { assertWaveRoleSafety } from "./migration-wave-roles.js";
 import { assertGenerationWaveRoleSafety } from "./migration-generation-roles.js";
 import { generationPrivacySourcesRegistered } from "../src/db/generation-privacy-sources.js";
+import {
+  contentPrivacySource,
+  registeredContentPrivacyProfile,
+} from "../src/db/content-privacy-profile.js";
 import generationReview from "../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
 
 if (!process.env.DATABASE_MIGRATION_URL)
@@ -55,6 +59,13 @@ try {
     throw new Error(
       "Generation registry requires the complete reviewed source graph and canonical migration mode.",
     );
+  const content = registry.migrations.some(
+    (source) => source.version === contentPrivacySource.version,
+  );
+  if (content && (!generation || !(await registeredContentPrivacyProfile())))
+    throw new Error(
+      "Content registry requires the exact complete generation and Content graph.",
+    );
   const registeredFiles = registry.migrations
     .filter(
       (file) =>
@@ -90,15 +101,25 @@ try {
     throw new Error(
       "Incomplete or unregistered generation wave; use the reviewed activation path, never per-file repair.",
     );
+  const installedContent = applied.some(
+    (row) => row.version === contentPrivacySource.version,
+  );
+  if (
+    installedContent &&
+    (!content || installedGeneration !== generationVersions.size)
+  )
+    throw new Error(
+      "Unregistered Content extension or incomplete predecessor; no per-file repair was attempted.",
+    );
   // Fresh databases still bootstrap the exact canonical61. The complete new
   // wave is only installed atomically by activate-wave after private backup,
   // separate restore and closed-admission checks. Registered code alone cannot
   // make that database ready. Already activated databases are verified below.
-  const files = installedGeneration
-    ? registeredFiles
-    : registeredFiles.filter(
-        (source) => !generationVersions.has(source.version),
-      );
+  const files = registeredFiles.filter(
+    (source) =>
+      (installedGeneration || !generationVersions.has(source.version)) &&
+      (installedContent || source.version !== contentPrivacySource.version),
+  );
   const historical = localLegacy
     ? new Set<string>()
     : await recognizedAdoptionVersions(applied);
@@ -119,6 +140,7 @@ try {
     ),
     domain: rows.some((r) => r.version === "0103_w8_domain_privacy_task_fence"),
     canonicalBeforeGeneration: generation && !installedGeneration,
+    generationBeforeContent: installedGeneration > 0 && !installedContent,
   });
   const hasWave = files.some(
     (file) => file.version === "0062_w6_creator_media_worker",
@@ -138,7 +160,11 @@ try {
   if (hasWave) {
     await client.query("BEGIN");
     try {
-      if (installedGeneration) await assertGenerationWaveRoleSafety(client);
+      if (installedGeneration)
+        await assertGenerationWaveRoleSafety(
+          client,
+          installedContent ? "content-privacy" : undefined,
+        );
       else await assertWaveRoleSafety(client, installedRoles(applied));
       if (continuation)
         await assertPrivacyWaveRoleSafety(client, installedPrivacy(applied));
@@ -224,7 +250,11 @@ try {
   if (hasWave) {
     await client.query("BEGIN");
     try {
-      if (installedGeneration) await assertGenerationWaveRoleSafety(client);
+      if (installedGeneration)
+        await assertGenerationWaveRoleSafety(
+          client,
+          installedContent ? "content-privacy" : undefined,
+        );
       else await assertWaveRoleSafety(client, installedRoles(files));
       if (continuation)
         await assertPrivacyWaveRoleSafety(client, installedPrivacy(files));
@@ -237,6 +267,10 @@ try {
   if (generation && !installedGeneration)
     process.stdout.write(
       "Canonical61 verified; generation wave remains unapplied. Use W8_MIGRATION_WAVE=20261007-generation with scripts/activate-wave.ts and a verified private backup/restore before runtime admission.\n",
+    );
+  if (content && !installedContent)
+    process.stdout.write(
+      "Content export remains unapplied. After generation100, use W8_MIGRATION_WAVE=20261007-content with verified private backup/restore and closed admission.\n",
     );
 } finally {
   await client.query(
