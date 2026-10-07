@@ -1,0 +1,60 @@
+diff --git a/apps/web/app/calls/[creatorId]/[fanId]/[sessionId]/page.tsx b/apps/web/app/calls/[creatorId]/[fanId]/[sessionId]/page.tsx
+index 847061b7..83ff5700 100644
+--- a/apps/web/app/calls/[creatorId]/[fanId]/[sessionId]/page.tsx
++++ b/apps/web/app/calls/[creatorId]/[fanId]/[sessionId]/page.tsx
+@@ -1,8 +1,8 @@
+ import { CallView } from "../../../../../features/calls/CallView";
+ import { currentSession } from "../../../../../lib/session";
+ import { SelectTime } from "../../../../../features/calls/SelectTime";
+-import { IdSchema } from "@qelvora/api";
+ import { notFound } from "next/navigation";
++import { IdSchema } from "@qelvora/api";
+ import { IdentitySessionBoundary } from "../../../../../features/identity/session-boundary";
+ import { IdentityWelcome } from "../../../../../features/identity/welcome";
+ import { MediaSession } from "../../../../../features/media/session";
+@@ -13,18 +13,31 @@ export default async function CallPage({
+   searchParams,
+ }: {
+   params: Promise<{ creatorId: string; fanId: string; sessionId: string }>;
+-  searchParams: Promise<{ offer?: string }>;
++  searchParams: Promise<Record<string, string | string[] | undefined>>;
+ }) {
+   const supplied = await params;
+-  if (Object.values(supplied).some((id) => !IdSchema.safeParse(id).success))
+-    notFound();
+   const destination = {
+     creatorId: supplied.creatorId.toLowerCase(),
+     fanId: supplied.fanId.toLowerCase(),
+     sessionId: supplied.sessionId.toLowerCase(),
+   };
+-  const isOffer = (await searchParams).offer === "1";
+-  const returnTo = `/calls/${destination.creatorId}/${destination.fanId}/${destination.sessionId}${isOffer ? "?offer=1" : ""}`;
++  if (
++    ![destination.creatorId, destination.fanId, destination.sessionId].every(
++      (value) => IdSchema.safeParse(value).success,
++    )
++  )
++    notFound();
++  const query = await searchParams;
++  if (
++    Object.keys(query).some((key) => !["offer", "theme"].includes(key)) ||
++    (query.offer !== undefined && query.offer !== "1") ||
++    (query.theme !== undefined &&
++      (typeof query.theme !== "string" ||
++        !["light", "night"].includes(query.theme)))
++  )
++    notFound();
++  const offer = query.offer === "1";
++  const returnTo = `/calls/${destination.creatorId}/${destination.fanId}/${destination.sessionId}${offer ? "?offer=1" : ""}`;
+   const actor = await currentSession(returnTo);
+   if (!actor) return <IdentityWelcome returnTo={returnTo} arrival={null} />;
+   return (
+@@ -34,7 +47,7 @@ export default async function CallPage({
+       returnTo={returnTo}
+     >
+       <MediaSession>
+-        {isOffer ? (
++        {offer ? (
+           <SelectTime
+             creatorId={destination.creatorId}
+             fanId={destination.fanId}

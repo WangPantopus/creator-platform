@@ -1,0 +1,13 @@
+# Original call-offer, signing and retry source
+
+Code `5e15cf2b8b41c08b780245dc88b744a3153b6baa` preserves #282 at original `3f4d44611c5a3a2c30f44b5a5532c76fdc5c49bc`. The [manifest](manifest.json) accounts for all 21 production paths and preserves original supporting paths. All ten implementation leaves, including native offers, web call actions, signing and API schemas, are byte-identical to the original source. Shared generated resources retain newer contracts and copy alongside the original call additions. The fan call page combines original session/canonical-ID props with newer strict query validation. Navigation includes both the original Studio call route and newer notification destinations.
+
+Calls retain the opening account/session/destination, original request lifetime, bounded response/time budgets, offer expiry and fresh selection checks. Late callbacks cannot adopt a replacement view. Call mutations and signed offers keep their exact serialized body and idempotency key through uncertain responses; action-specific canonical receipts determine completion. The signing view retains actual visibility, challenge deadlines and the domain's pre-signing revalidation. These are the original implementation's protections, not newly invented authority.
+
+Production web build, web/backend types, scoped lint/format/diff, generated resources and the existing 17 backend tests pass. All 18 existing Swift tests pass with the previously recorded local test-dependency resolution limitation; the repository lock is unchanged. Android and complete hosted checks at this new revision remain separate qualification work. No new tests, fake booking, payment, signature, consent or provider events were introduced.
+
+## Acceptance transferred to #132
+
+Preserve the original #21 producer prerequisites and published #282 historical evidence at its actual source. Current genuine captured/signed scheduling, daylight-saving/concurrent/expired-slot behavior, selected-session recovery, positive exact retries, provider admission/history/outcomes/settlement/handback, human recording/passkey/C2PA/publication/playback, hardware/push, full accessibility and current CI remain open. Recorded historical SDK-cache, Maven and Docker shutdown failures stay part of that history; they are not relabelled as current results.
+
+The design still requires fixed-duration calls, distinct real-person authorship, authoritative connected time and outcomes, separate two-person consent for recording/summary/reuse, accurate packet context, and no overtime charges. Source reconciliation and reference snapshots do not establish these complete journeys. Consolidation into #132 preserves one continuation path without enabling generation or declaring the product ready.
