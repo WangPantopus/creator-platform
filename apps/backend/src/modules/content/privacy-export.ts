@@ -282,7 +282,10 @@ export class ContentPrivacyExport {
            AND NOT EXISTS(SELECT FROM pg_class r JOIN pg_namespace n ON n.oid=r.relnamespace WHERE r.relkind IN('r','p','v','m','S','f') AND n.nspname NOT IN('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_toast%' AND r.relowner<>$1::regrole AND (has_table_privilege($1,r.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') OR CASE WHEN r.relkind='S' THEN has_sequence_privilege($1,r.oid,'USAGE,SELECT,UPDATE') ELSE false END))
            AND EXISTS(SELECT FROM pg_class WHERE oid=to_regclass('creator.content_privacy_export_scope') AND relowner=$1::regrole AND relkind='r' AND relrowsecurity AND relforcerowsecurity)
            AND (SELECT count(*) FROM pg_trigger WHERE tgrelid=to_regclass('creator.content_privacy_export_scope') AND NOT tgisinternal)=1
-           AND EXISTS(SELECT FROM pg_trigger WHERE tgrelid=to_regclass('creator.content_privacy_export_scope') AND tgname='content_privacy_export_commit_current' AND tgfoid=to_regprocedure('creator.finish_content_privacy_export_scope()') AND tgdeferrable AND tginitdeferred AND tgenabled='O' AND tgtype=5)
+           AND EXISTS(SELECT FROM pg_trigger WHERE tgrelid=to_regclass('creator.content_privacy_export_scope') AND tgname='content_privacy_export_commit_current' AND tgfoid=to_regprocedure('creator.finish_content_privacy_export_scope()') AND tgdeferrable AND tginitdeferred AND tgenabled='O' AND tgtype=5
+            AND NOT tgisinternal AND tgnargs=0 AND octet_length(tgargs)=0 AND tgqual IS NULL AND tgattr=''::int2vector
+            AND tgconstrrelid=0 AND tgconstrindid=0
+            AND pg_get_triggerdef(oid,false)='CREATE CONSTRAINT TRIGGER content_privacy_export_commit_current AFTER INSERT ON creator.content_privacy_export_scope DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION creator.finish_content_privacy_export_scope()')
            AND (SELECT count(*) FROM pg_constraint WHERE conrelid=to_regclass('creator.content_privacy_export_scope') AND contype<>'t')=1
            AND EXISTS(SELECT FROM pg_constraint k JOIN pg_index i ON i.indexrelid=k.conindid
             JOIN pg_class idx ON idx.oid=i.indexrelid JOIN pg_am am ON am.oid=idx.relam

@@ -13,14 +13,16 @@ the original private scope, its exact primary key, and its attached TOAST storag
 and single unique index. Primary and TOAST index shape/validity are checked;
 unrelated owned tables/indexes remain forbidden. The unchanged metadata checker
 is also available through an explicit operator-only static review method, which
-issues no exporter or task authority. No SQL, migration reservation or grant
-changed.
+issues no exporter or task authority. The exact original deferred trigger definition is also required. A further actual
+probe reproduced acceptance of a trigger with `WHEN (false)` before this repair;
+the repaired check refuses it and preserves the original final lease check. No
+SQL, migration reservation or grant changed.
 
 Actual closed review executed the immutable 0198 source and its matching ledger
 entry only inside rolled-back transactions on the recovered original100 copy
 and its independent restore. The earlier ownership failure was reproduced and
 attributed to the exact automatic index/TOAST objects. The repaired complete
-catalogue passed. On the restored copy, eighteen actual metadata changes each
+catalogue passed. On the restored copy, nineteen actual metadata changes each
 refused, then passed again after restoring the original state:
 
 - Purpose LOGIN, INHERIT and membership.
@@ -28,7 +30,7 @@ refused, then passed again after restoring the original state:
 - Core access to the private scope or private trigger function; an extra private
   usage-column grant; a missing required Content-column grant.
 - Disabled RLS, removed FORCE RLS, missing primary key, extra private-scope column
-  or constraint, and a disabled deferred commit trigger.
+  or constraint, a disabled deferred commit trigger and a trigger with a false predicate.
 - Changed executable COST, an unknown source column and interactive session
   context.
 
