@@ -36,7 +36,10 @@ import {
 } from "../identity/intro-offers.js";
 import { ConversationRecordings } from "./recordings.js";
 import type { PreparedConversationPrivacyCursor } from "./privacy-export-cursor.js";
-import type { GenerationAccountingPreparation } from "../trust/privacy-consumers.js";
+import type {
+  ConversationPrivacyOwnerPorts,
+  GenerationAccountingPreparation,
+} from "../trust/privacy-consumers.js";
 import { createConversationRuntime } from "./runtime.js";
 import {
   DevelopmentConversationPolicy,
@@ -97,6 +100,7 @@ export type ConversationHostProducers = {
   /** W8's reviewed registration and finite policy. The host binds its actual
    * accounting owners; W8 later fixes its own held-task/family authority. */
   privacyAccounting?: GenerationAccountingPreparation["configuration"];
+  provenancePurge?: ConversationPrivacyOwnerPorts["provenancePurgePreparation"];
   /** W6: the host's media runtime on this same database pool. */
   media?: MediaService;
   /** W6: fan reads of signed recordings ask W3 for the exact publication. */
@@ -213,12 +217,21 @@ export async function composeConversationHost(
   if (!policy?.verified && !developmentPolicy)
     missing.push("named provider policy");
   const economics =
-    requested && env.W3_DEVELOPMENT_ECONOMICS_FILE
+    (requested || producers.usageAccounting || producers.privacyAccounting) &&
+    env.W3_DEVELOPMENT_ECONOMICS_FILE
       ? DevelopmentEconomicsSchema.parse(
           JSON.parse(await readFile(env.W3_DEVELOPMENT_ECONOMICS_FILE, "utf8")),
         )
       : undefined;
   if (!economics) missing.push("development economics");
+  if (economics)
+    invariant(
+      env.NODE_ENV === "development" &&
+        config.identityAdapter === "development" &&
+        loopback(config.allowedOrigin),
+      "development_economics_unavailable",
+      "Development accounting rules require this explicit loopback development host.",
+    );
   const model = requested ? modelFromEnvironment(env) : null;
   if (!model) missing.push("provider model and credentials");
   else if (!model.pricingConfigured) missing.push("provider rates");
@@ -297,6 +310,14 @@ export async function composeConversationHost(
   if (!costChecksum) missing.push(`registered ${migrations.cost}`);
 
   const ready = requested && missing.length === 0;
+  // Retained financial history needs its original rules even when no model
+  // or generation worker is available. Preparing that reader admits no trial.
+  const originalRuleChecksum = await registeredChecksum(
+    "0189_w4_generation_terminal_settlement",
+  );
+  const accountingReady = Boolean(
+    journal && economics && costChecksum && originalRuleChecksum,
+  );
   let acceptance: PreparedGenerationAcceptance | undefined;
   const current = () => {
     invariant(
@@ -314,7 +335,7 @@ export async function composeConversationHost(
           ...base.policy,
           ...(ready ? { trialAllowance: economics!.trialAllowance } : {}),
         },
-        ...(ready
+        ...(accountingReady
           ? {
               generationCostPolicy: attributedGenerationCostPolicy({
                 journal: journal!,
@@ -329,11 +350,13 @@ export async function composeConversationHost(
                 },
                 originalRuleMigration: {
                   version: "0189_w4_generation_terminal_settlement",
-                  checksum: (await registeredChecksum(
-                    "0189_w4_generation_terminal_settlement",
-                  ))!,
+                  checksum: originalRuleChecksum!,
                 },
               }),
+            }
+          : {}),
+        ...(ready
+          ? {
               trialReadiness: (scope: ThreadScope, client: PoolClient) =>
                 current().assertReady(scope, client),
             }
@@ -526,6 +549,9 @@ export async function composeConversationHost(
     agent,
     generationWorker: worker,
     privacy: {
+      ...(producers.provenancePurge
+        ? { provenancePurgePreparation: producers.provenancePurge }
+        : {}),
       ...(accountingPreparation ? { accountingPreparation } : {}),
       ...(lineage ? { lineage } : {}),
       ...(recordings ? { recordings } : {}),

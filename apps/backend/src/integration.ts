@@ -186,6 +186,9 @@ export async function createConfiguredBackend(input: {
     connectionString: input.config.databaseUrl,
     max: 20,
     connectionTimeoutMillis: 5000,
+    // Original privacy owners retain this same pool and require bounded reads
+    // through their held task/family callbacks, including catalogue checks.
+    query_timeout: 5000,
     idleTimeoutMillis: 30000,
   });
   // pg removes failed idle clients before emitting; active queries still reject.

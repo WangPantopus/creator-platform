@@ -1,0 +1,35 @@
+{
+  "scope": "Fixed Conversation export and provenance deletion custody reviewed on the closed generation100 graph and three independently restored Content101 copies. Exact registered source selects each profile; original task, family, held database, EOF and COMMIT checks remain mandatory.",
+  "cursor": {
+    "source": {
+      "version": "0233_w3_privacy_cursor_export",
+      "name": "w3_privacy_cursor_export",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_privacy_cursor_export_ordered.sql",
+      "owner": "W3",
+      "checksum": "99ad0ce10da98954d08b3fe31dedce0ef93be4c3be7e1aeecf3995059e41eb08"
+    },
+    "definitions": {
+      "creator.fence_conversation_privacy_export(uuid,uuid,text,uuid,uuid,uuid)": "c20292458ff54df47f4a7a590529109424a143ee62b0e29cb531f7a6891d7033",
+      "creator.conversation_privacy_export_rows(uuid,uuid)": "237b41fc48c17c3859ac3be87bd667f34f4132ecd59f301e0ae723d0d0a556e0",
+      "creator.finish_conversation_privacy_export_scope()": "a18d439512f89abe047fcfd2494cf48b366aa38ff5c4e5beaf153e98e9819bf8"
+    },
+    "catalogues": {
+      "generation": "c0fadd9f538dc9d12970ba6d0f6da8a37561060681421918397125c93a6d3fcc",
+      "content": "1f0ee9e4e0cb459485afac0b73e2fd34f529fa2e9ff738fa85c63df2bb840618"
+    }
+  },
+  "provenancePurge": {
+    "source": {
+      "version": "0217_w3_generation_provenance_purge",
+      "name": "w3_generation_provenance_purge",
+      "path": "apps/backend/migrations/0217_w3_generation_provenance_purge.sql",
+      "owner": "W3",
+      "checksum": "f2318d7a49151544796e105fe62990dc43af6fe67e49fae253b7578a0c01684e"
+    },
+    "definitionSha256": "bd9519f2b49427007f713059b8795de83556bb33153ab51748b4a298543cd115",
+    "catalogues": {
+      "generation": "da78a197e86d5595c8a3769aac919b2bdd6e70455cdb5c82a6b65daf1cca92bd",
+      "content": "92fa579178b5ed8f227117a55d62018975c12017f5de18caf8908c176f93e53c"
+    }
+  }
+}

@@ -12,6 +12,7 @@ import {
   agentPauseEffects,
 } from "./domain-adapters.js";
 import { createPrivacyConsumers } from "./privacy-consumers.js";
+import { COMMERCE_PRIVACY_CONFIGURATION } from "../commerce/privacy-purpose.js";
 import { trustLocalRestorationInTransaction } from "./restoration.js";
 import { PrivateFileArtifacts } from "./private-file-artifacts.js";
 import { registeredContentPrivacyProfile } from "../../db/content-privacy-profile.js";
@@ -315,6 +316,7 @@ export async function createDevelopmentTrust(
       privacyHooks: createPrivacyConsumers({
         runtimePool: runtime.pool,
         coordinatorPool: workerPool,
+        commercePrivacy: COMMERCE_PRIVACY_CONFIGURATION,
         ...options.consumers,
         content,
         agentExport,

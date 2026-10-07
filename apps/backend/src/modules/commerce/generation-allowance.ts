@@ -97,6 +97,7 @@ export class CommerceGenerationAllowance implements GenerationAllowance {
     private readonly database: string,
     private readonly captureOriginalRule: boolean,
     private readonly hostPool: Pool,
+    private readonly originalPolicy: GenerationCostPolicy,
   ) {}
   assertComposition(pool: Pool, access: AccessService) {
     invariant(
@@ -110,7 +111,7 @@ export class CommerceGenerationAllowance implements GenerationAllowance {
   assertJournal(journal: PreparedGenerationJournal) {
     journal.assertPool(this.hostPool);
     invariant(
-      isAttributedGenerationJournal(this.policy, journal),
+      isAttributedGenerationJournal(this.originalPolicy, journal),
       "generation_accounting_journal_mismatch",
       "Financial reconciliation must read this allowance's original generation journal.",
     );
@@ -467,6 +468,9 @@ export class CommerceGenerationAllowance implements GenerationAllowance {
       database,
       captureOriginalRule,
       pool,
+      // The factory's WeakMap binds this exact frozen policy to its journal.
+      // The defensive execution copy above cannot stand in for that identity.
+      policy,
     );
   }
   async reserve(scope: ThreadScope, client: PoolClient, generationId: string) {

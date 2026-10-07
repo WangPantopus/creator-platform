@@ -6,6 +6,8 @@ import { DevelopmentIdentityAdapter } from "./modules/identity/development.js";
 import { commerceSignedSubjects } from "./modules/commerce/registration.js";
 import { configureGrowthForBackend } from "./modules/growth/configured.js";
 import { composeConversationHost } from "./modules/conversation/host.js";
+import { registeredConversationPrivacyReview } from "./modules/conversation/privacy-configuration.js";
+import { accountingRetentionPolicy } from "./modules/trust/accounting-retention-policy.js";
 import { createCommerceStudio } from "./modules/commerce/studio.js";
 import {
   composeContentHost,
@@ -149,9 +151,30 @@ try {
                   }
                 : {};
             const usageAccounting = await runtime.prepareUsageAccounting?.();
+            const conversationPrivacy =
+              usageAccounting &&
+              mediaHost &&
+              process.env.W3_DEVELOPMENT_ECONOMICS_FILE &&
+              process.env.COMMERCE_CURRENCY
+                ? await registeredConversationPrivacyReview()
+                : undefined;
             const host = await composeConversationHost(runtime, config, {
               ...licensing,
               ...(usageAccounting ? { usageAccounting } : {}),
+              ...(usageAccounting && conversationPrivacy
+                ? {
+                    privacyCursor: {
+                      usageRetention: usageAccounting.retention,
+                      custody: conversationPrivacy.cursor,
+                    },
+                    privacyAccounting: {
+                      retentionPolicyVersion: accountingRetentionPolicy.version,
+                      assertPrivacyRegistered:
+                        usageAccounting.assertPrivacyRegistered,
+                    },
+                    provenancePurge: conversationPrivacy.provenancePurge,
+                  }
+                : {}),
               ...(mediaHost
                 ? {
                     media: mediaHost.media,

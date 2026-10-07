@@ -17,6 +17,7 @@ import type { AgentLifecycle } from "../agent/lifecycle.js";
 import type { PreparedAgentPrivacyExport } from "../agent/privacy-export-snapshot.js";
 import type { CommerceService } from "../commerce/service.js";
 import { commercePrivacyHook } from "../commerce/operations.js";
+import { commerceFinancialExportStream } from "../commerce/financial-export-stream.js";
 import {
   privacyTaskAuthority,
   privacyTaskAuthorityInTransaction,
@@ -401,6 +402,17 @@ export function createPrivacyConsumers(input: {
           input.assertRestoredInTransaction,
         );
         await verify(job);
+        if (job.kind === "export" && !input.commerceArtifacts) {
+          return {
+            receipt: {
+              schemaVersion: 1,
+              domain: "commerce",
+              jobId: job.jobId,
+              scope: job.scope,
+            },
+            stream: commerceFinancialExportStream(service, purpose, job),
+          };
+        }
         const result = await commercePrivacyHook(
           service,
           purpose,

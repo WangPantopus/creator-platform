@@ -35,6 +35,9 @@ const PublicExecutables: readonly Signature[] = [
   AGENT_PRIVACY_EXPORT_SIGNATURES[4],
 ];
 const Hash = z.string().regex(/^[a-f0-9]{64}$/u);
+// Keep pages finite while amortizing the full current task/catalogue checks.
+// Eight-row pages exhausted the real lease on ordinary retained source history.
+const ExportFetchRows = 64;
 // Independently reviewed on the closed100 graph and the original/restored101
 // graph. The fixed projection omits only completion_capability_hash; a new
 // ungranted usage column must not silently disappear from a complete export.
@@ -527,6 +530,25 @@ export class PreparedAgentPrivacyExport {
       "privacy_export_ownership_changed",
       "The held export task changed ownership.",
     );
+    await this.assertCurrentInTransaction(client, source);
+  }
+  /** Current SQL custody for each protected chunk. Full task/catalogue review
+   * still brackets every FETCH and EOF; it need not be repeated for each byte
+   * fragment of a row already read from that same privately issued cursor. */
+  async assertCurrentInTransaction(
+    client: PoolClient,
+    source: AgentPrivacyExportSource,
+  ): Promise<void> {
+    const binding = this.issued.get(source);
+    invariant(
+      binding?.client === client &&
+        !binding.ended &&
+        binding.hash === contentHash(source),
+      "privacy_export_source_required",
+      "Use this same held client's privately issued source.",
+    );
+    this.assertWorker(binding.job);
+    binding.signal.throwIfAborted();
     const allowed = (
       await client.query<{ allowed: boolean }>(
         "SELECT creator.current_agent_privacy_export($1) AS allowed",
@@ -538,6 +560,7 @@ export class PreparedAgentPrivacyExport {
       "privacy_export_task_changed",
       "Current source custody ended.",
     );
+    binding.signal.throwIfAborted();
   }
   private async fetchInTransaction(
     client: PoolClient,
@@ -552,17 +575,26 @@ export class PreparedAgentPrivacyExport {
     );
     const packets = z
       .array(Packet)
-      .max(8)
+      .max(ExportFetchRows)
       .parse(
         (
           await this.queryWithCancellation(
             client,
             binding.signal,
-            `FETCH FORWARD 8 FROM ${binding.portal}`,
+            `FETCH FORWARD ${ExportFetchRows} FROM ${binding.portal}`,
           )
         ).rows.map((row) => row.document),
       );
     if (!packets.length) binding.eof = true;
+    invariant(
+      packets.reduce(
+        (bytes, packet) => bytes + Buffer.byteLength(JSON.stringify(packet)),
+        0,
+      ) <=
+        64 * 1024 * 1024,
+      "privacy_export_page_too_large",
+      "This source page exceeds the bounded export capacity; no partial export can complete.",
+    );
     invariant(
       packets.every((packet) => source.creatorIds.includes(packet.creatorId)),
       "privacy_export_family_changed",

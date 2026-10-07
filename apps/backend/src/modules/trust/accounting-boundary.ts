@@ -1,7 +1,7 @@
-import type { Pool, PoolClient } from "pg";
+import { DatabaseError, type Pool, type PoolClient } from "pg";
 import { z } from "zod";
 import { contentHash } from "../../core/canonical.js";
-import { invariant } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
 import { agentPreparationRead } from "../agent/preparation-read.js";
 import { agentPrivacyTransaction } from "../agent/privacy-transaction.js";
 import type { CreatorScope } from "../agent/repository.js";
@@ -212,10 +212,27 @@ export class PreparedPrivacyAccountingBoundary {
       "privacy_authority_changed",
       "The original Agent ownership must match this boundary.",
     );
-    const { rows } = await client.query<{ boundary: unknown }>(
-      "SELECT creator_trust.agent_conversation_accounting_boundary($1,$2) AS boundary",
-      [job.jobId, job.leaseToken],
-    );
+    const { rows } = await client
+      .query<{
+        boundary: unknown;
+      }>(
+        "SELECT creator_trust.agent_conversation_accounting_boundary($1,$2) AS boundary",
+        [job.jobId, job.leaseToken],
+      )
+      .catch((cause: unknown) => {
+        if (
+          cause instanceof DatabaseError &&
+          cause.code === "42501" &&
+          cause.message === "Actual completed Conversation boundary required"
+        )
+          throw new DomainError(
+            "accounting_boundary_pending",
+            "Waiting for the original Conversation privacy task to complete.",
+            503,
+            { cause },
+          );
+        throw cause;
+      });
     const boundary = z
       .discriminatedUnion("kind", [
         z.strictObject({

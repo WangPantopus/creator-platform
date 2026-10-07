@@ -16,6 +16,7 @@ import type { TrustWorker } from "./worker.js";
 export type HostUsageAccounting = Readonly<{
   journal: PreparedGenerationJournal;
   retention: PreparedUsageRetention;
+  assertPrivacyRegistered: () => Promise<void>;
   bindRepository: (repository: AgentRepository) => void;
 }>;
 
@@ -104,6 +105,7 @@ export function createUsageAccountingHost(
     accounting = Object.freeze({
       journal,
       retention,
+      assertPrivacyRegistered: assertRegistered,
       bindRepository(candidate: AgentRepository) {
         invariant(
           !stopping &&

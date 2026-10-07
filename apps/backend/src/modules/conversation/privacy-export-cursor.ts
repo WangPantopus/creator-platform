@@ -354,54 +354,7 @@ export class PreparedConversationPrivacyCursor {
       "conversation_export_custody_changed",
       "The exact reviewed source functions and effective ACL are required.",
     );
-    const effective = {
-      ...(await generationConsumerCatalogue(client, Owner)),
-      // The shared effective-ACL catalogue does not encode types, defaults or
-      // FK definitions. Keep the entire ordinary0212 relation shape in the
-      // independently reviewed checksum, including unknown columns/constraints.
-      sentenceProvenance: {
-        columns: (
-          await client.query(
-            `SELECT a.attnum,a.attname,format_type(a.atttypid,a.atttypmod) AS type,
-             a.attnotnull,a.attndims,a.attidentity,a.attgenerated,
-             pg_get_expr(d.adbin,d.adrelid) AS default_expression
-             FROM pg_attribute a LEFT JOIN pg_attrdef d ON d.adrelid=a.attrelid AND d.adnum=a.attnum
-             WHERE a.attrelid=to_regclass('creator.generation_sentence_provenance')
-              AND a.attnum>0 AND NOT a.attisdropped ORDER BY a.attnum`,
-          )
-        ).rows,
-        constraints: (
-          await client.query(
-            `SELECT conname,contype,convalidated,condeferrable,condeferred,
-             pg_get_constraintdef(oid,true) AS definition
-             FROM pg_constraint WHERE conrelid=to_regclass('creator.generation_sentence_provenance') ORDER BY conname`,
-          )
-        ).rows,
-        indexes: (
-          await client.query(
-            `SELECT pg_get_indexdef(indexrelid) AS definition,indisvalid,indisready
-             FROM pg_index WHERE indrelid=to_regclass('creator.generation_sentence_provenance')
-             ORDER BY pg_get_indexdef(indexrelid)`,
-          )
-        ).rows,
-        triggers: (
-          await client.query(
-            `SELECT tgname,tgenabled,pg_get_triggerdef(oid,true) AS definition
-             FROM pg_trigger WHERE tgrelid=to_regclass('creator.generation_sentence_provenance')
-             ORDER BY tgname`,
-          )
-        ).rows,
-      },
-      functions: (
-        await client.query(
-          `SELECT n.nspname,p.proname,pg_get_function_identity_arguments(p.oid) AS arguments,
-           pg_get_userbyid(p.proowner) AS owner,has_function_privilege($1,p.oid,'EXECUTE') AS executable,
-           p.proacl::text AS acl FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
-           WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema' ORDER BY n.nspname,p.proname,arguments`,
-          [Owner],
-        )
-      ).rows,
-    };
+    const effective = await conversationPrivacyCursorCatalogue(client);
     invariant(
       contentHash(effective) === this.reviewed.catalogueChecksum,
       "conversation_export_custody_changed",
@@ -636,4 +589,69 @@ export class PreparedConversationPrivacyCursor {
   requiresDestruction(client: PoolClient): boolean {
     return this.uncertainClients.has(client);
   }
+}
+
+/** Read-only metadata for independent review; it grants no runtime authority. */
+export async function conversationPrivacyCursorCatalogue(client: PoolClient) {
+  return {
+    ...(await generationConsumerCatalogue(client, Owner)),
+    // The shared effective-ACL catalogue does not encode types, defaults or
+    // FK definitions. Keep the entire ordinary0212 relation shape in the
+    // independently reviewed checksum, including unknown columns/constraints.
+    sentenceProvenance: {
+      columns: (
+        await client.query(
+          `SELECT a.attnum,a.attname,format_type(a.atttypid,a.atttypmod) AS type,
+             a.attnotnull,a.attndims,a.attidentity,a.attgenerated,
+             pg_get_expr(d.adbin,d.adrelid) AS default_expression
+             FROM pg_attribute a LEFT JOIN pg_attrdef d ON d.adrelid=a.attrelid AND d.adnum=a.attnum
+             WHERE a.attrelid=to_regclass('creator.generation_sentence_provenance')
+              AND a.attnum>0 AND NOT a.attisdropped ORDER BY a.attnum`,
+        )
+      ).rows,
+      constraints: (
+        await client.query(
+          `SELECT conname,contype,convalidated,condeferrable,condeferred,
+             pg_get_constraintdef(oid,true) AS definition
+             FROM pg_constraint WHERE conrelid=to_regclass('creator.generation_sentence_provenance') ORDER BY conname`,
+        )
+      ).rows,
+      indexes: (
+        await client.query(
+          `SELECT pg_get_indexdef(indexrelid) AS definition,indisvalid,indisready
+             FROM pg_index WHERE indrelid=to_regclass('creator.generation_sentence_provenance')
+             ORDER BY pg_get_indexdef(indexrelid)`,
+        )
+      ).rows,
+      triggers: (
+        await client.query(
+          // PostgreSQL remints internal FK trigger names during restore.
+          // Pin their constraint/function/event identity, preserving every
+          // custom name, enabled state, function body and trigger behavior.
+          `SELECT identity.name AS tgname,t.tgenabled,t.tgisinternal,
+             k.conname AS constraint_name,pg_get_functiondef(t.tgfoid) AS function_definition,
+             CASE WHEN identity.fixed THEN
+              replace(pg_get_triggerdef(t.oid,true),format('TRIGGER %I ',t.tgname),format('TRIGGER %I ',identity.name))
+              ELSE pg_get_triggerdef(t.oid,true) END AS definition
+             FROM pg_trigger t LEFT JOIN pg_constraint k ON k.oid=t.tgconstraint
+             CROSS JOIN LATERAL (SELECT t.tgisinternal AND k.contype='f' AND t.tgfoid IN(
+              to_regprocedure('pg_catalog."RI_FKey_check_ins"()'),to_regprocedure('pg_catalog."RI_FKey_check_upd"()')) AS fixed) known
+             CROSS JOIN LATERAL (SELECT known.fixed,
+              CASE WHEN known.fixed THEN k.conname||':'||t.tgfoid::regprocedure::text||':'||t.tgtype::text
+               ELSE t.tgname::text END AS name) identity
+             WHERE t.tgrelid=to_regclass('creator.generation_sentence_provenance')
+             ORDER BY identity.name COLLATE "C",t.tgtype,t.tgfoid::regprocedure::text COLLATE "C"`,
+        )
+      ).rows,
+    },
+    functions: (
+      await client.query(
+        `SELECT n.nspname,p.proname,pg_get_function_identity_arguments(p.oid) AS arguments,
+           pg_get_userbyid(p.proowner) AS owner,has_function_privilege($1,p.oid,'EXECUTE') AS executable,
+           p.proacl::text AS acl FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
+           WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema' ORDER BY n.nspname,p.proname,arguments`,
+        [Owner],
+      )
+    ).rows,
+  };
 }

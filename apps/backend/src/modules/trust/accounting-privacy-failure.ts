@@ -2,6 +2,8 @@
  * eight ordinary transport retries cannot silently end the retention process.
  * A breach or absent original evidence requires operator reconciliation. */
 export function accountingPrivacyFailure(code: string) {
+  if (code === "accounting_boundary_pending")
+    return { state: "retry" as const, retrySeconds: 10 };
   if (
     code === "accounting_reconciliation_required" ||
     code === "accounting_reconciliation_escalated"
