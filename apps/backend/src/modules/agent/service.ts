@@ -874,7 +874,9 @@ export class AgentService {
           prompt: item.prompt,
           state: judged.value.passed && !result.blocked ? "pass" : "fail",
           answer: result.sentences.map((s) => s.text).join("\n"),
-          reason: judged.value.reason,
+          reason: result.blocked
+            ? `The output guard withheld a proposed sentence (${result.category ?? "policy violation"}). A safe fallback does not qualify this case for publication.`
+            : judged.value.reason,
           ...(result.withheld ? { withheld: result.withheld } : {}),
           citations: result.sentences.flatMap((s) => s.citations),
           usage: judged.usage,

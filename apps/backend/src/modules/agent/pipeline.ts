@@ -23,7 +23,7 @@ import { DomainError } from "../../core/errors.js";
 import { responseLanguage } from "./language.js";
 import type { StreamProposal } from "./streaming.js";
 
-export const PIPELINE_REVISION = "w2-context-guardrails-11";
+export const PIPELINE_REVISION = "w2-context-guardrails-12";
 export type AudienceSnapshot = {
   revision: string;
   tierIds: string[];
