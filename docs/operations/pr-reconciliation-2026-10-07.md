@@ -2,7 +2,7 @@
 
 Account for the existing work before extending the product. This ledger gives every one of the 18 original draft PRs a disposition, a continuation path, and remaining acceptance obligations. It is a source reconciliation map; unresolved file comparisons and product qualification remain work to do.
 
-**Execution status:** preservation verified for #131 → #145 and #242 → #63; closure pending publication of this record. Retain the other 16 original drafts. No product source was changed or accepted by this reconciliation. [Project checkpoint](project-continuation-2026-10-07.md) preserves the broader product and architecture context.
+**Execution status:** #131 closed unmerged into #145; #242 closed unmerged into #63. All 18 original source branches remain at their reviewed heads; the other 16 original drafts remain open. Successor obligations and #132 continuation were recorded on GitHub. [Action receipts](../../artifacts/pr-review/2026-10-07/reconciliation/actions.json) and [verified final state](../../artifacts/pr-review/2026-10-07/reconciliation/post-consolidation.json) preserve the result. No product source was changed or accepted by this reconciliation. [Project checkpoint](project-continuation-2026-10-07.md) preserves the broader product and architecture context.
 
 ## Evidence and interpretation
 
@@ -18,12 +18,12 @@ The [file ledger](../../artifacts/pr-review/2026-10-07/reconciliation/file-ledge
 | [36](https://github.com/WangPantopus/creator-platform/pull/36) | 22 | 0 | 5 | 6 / 11 / 0 | Retain as privacy/native recovery source. Reconcile into #132; ancestry alone is insufficient to close. |
 | [63](https://github.com/WangPantopus/creator-platform/pull/63) | 259 | 16 | 205 | 1 / 36 / 17 | Retain as Conversation/privacy source, including #242. Reconcile remaining behavior into #132. |
 | [74](https://github.com/WangPantopus/creator-platform/pull/74) | 190 | 6 | 107 | 28 / 49 / 6 | Retain. Shared Identity/runtime changes go through #132; Team work remains here; use focused source owners below for other domains. |
-| [131](https://github.com/WangPantopus/creator-platform/pull/131) | 6 | 1 | 3 | 1 / 2 / 0 | Consolidate into #145 after recording preservation and transferring all gates. Do not claim absorbed into #132. |
+| [131](https://github.com/WangPantopus/creator-platform/pull/131) | 6 | 1 | 3 | 1 / 2 / 0 | Closed unmerged into #145; preservation and all gates recorded. Do not claim absorbed into #132. |
 | [132](https://github.com/WangPantopus/creator-platform/pull/132) | 290 | 0 | 290 | 0 / 0 / 0 | Retain as the single backend generation/accounting/privacy integration path. Not merge-ready. |
 | [145](https://github.com/WangPantopus/creator-platform/pull/145) | 7 | 1 | 4 | 1 / 2 / 0 | Retain as worker/terminal source, now carrying #131. Reconcile missing restoration protections into #132 first. |
 | [192](https://github.com/WangPantopus/creator-platform/pull/192) | 8 | 0 | 0 | 5 / 2 / 1 | Retain as the finite development-consent source. Keep its policy and physical expiry obligations distinct. |
 | [200](https://github.com/WangPantopus/creator-platform/pull/200) | 50 | 14 | 20 | 10 / 19 / 1 | Retain as the exact-version reply-review source; complete with the signed Note/reply/reaction journey. |
-| [242](https://github.com/WangPantopus/creator-platform/pull/242) | 10 | 0 | 7 | 0 / 2 / 1 | Consolidate into #63 after preservation and acceptance transfer. Final integrated lifecycle work remains in #132. |
+| [242](https://github.com/WangPantopus/creator-platform/pull/242) | 10 | 0 | 7 | 0 / 2 / 1 | Closed unmerged into #63; preservation and acceptance transferred. Final integrated lifecycle work remains in #132. |
 | [247](https://github.com/WangPantopus/creator-platform/pull/247) | 37 | 1 | 23 | 0 / 6 / 8 | Retain as typed allowance-settlement source. Reconcile and qualify inside #132, without a parallel implementation. |
 | [262](https://github.com/WangPantopus/creator-platform/pull/262) | 17 | 1 | 14 | 0 / 1 / 2 | Retain original fulfillment publisher; reconcile with #302 into the publication graph already in #132. |
 | [282](https://github.com/WangPantopus/creator-platform/pull/282) | 21 | 0 | 0 | 16 / 5 / 0 | Retain as the call-offer/session/retry source. Complete actual scheduling and call outcomes here. |
@@ -88,9 +88,9 @@ Each working journey needs comparison with its actual screen/state references: L
 
 ## Execution sequence and closeout
 
-1. Publish this pinned ledger, record successor obligations on #145 and #63, recheck both source and successor heads, then close #131 and #242 unmerged without deleting branches.
+1. **Done:** published the pinned ledger at `f442ece7d2e668b16a246f71d0695dccb645a438`, recorded successor obligations on #145 and #63 plus continuation on #132, rechecked source and successor heads, and closed #131/#242 unmerged. Verified all 18 source branches preserved and 16 original drafts open.
 2. Reconcile the missing restoration protections from #145 into #132 while preserving newer shutdown behavior. This is the first concrete implementation task, followed by the installed-consumer/privacy/accounting work above.
 3. Resolve the broad #63/#74/#36 differences into that same integration path. Review conflicts by behavior; preserve current main fixes. Close additional source PRs only when their useful changes and remaining gates have a verified home.
 4. Reconcile publication and focused native/media/Growth sources in the journey order above. Keep source and acceptance evidence pinned to actual revisions. Do not restart implementations already represented here.
 
-This pass completes the inventory and continuation decisions. Conflict resolution, implementation integration and product qualification remain open. The October 6 closures of #182 and #288 remain completed historical work and are not repeated.
+This pass completes the inventory, continuation decisions and two verified consolidation closures. The inventory reproduced with identical SHA256; all changed paths, pinned CI metadata, preservation proofs and local evidence links were checked. `git diff --check` passed. No application tests or device/runtime acceptance were rerun for these documentation and PR-state changes. Conflict resolution, implementation integration and product qualification remain open. The October 6 closures of #182 and #288 remain completed historical work and are not repeated.

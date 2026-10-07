@@ -8,6 +8,8 @@ Human conclusions and continuation ownership: [remaining PR ledger](../../../../
 - `preservation-131-to-145.json` and its registry patch: five identical files and one reviewed additive registry change.
 - `preservation-242-to-63.json` and its worker patch: nine identical files and one reviewed worker evolution preserving the original family guards.
 - `restoration-145-to-132.patch`: comparison in that direction, showing protections lost from #145 and newer shutdown work in #132. It is evidence, **not a patch to apply**.
+- `actions.json` and `post-consolidation.json`: published comment/closure receipts and verified closed/open/head/branch state after the two consolidations.
+- `validation.json`: local inventory, evidence and link checks, with their scope.
 - Four `pr-*-body-at-review.txt` files retain the source/successor acceptance requirements for the two consolidation decisions. Historical source and other evidence remain in the preserved Git branches and commits named by the metadata.
 
 The saved patches use zero context; the pinned commits retain surrounding source.

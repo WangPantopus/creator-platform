@@ -2,7 +2,7 @@
 
 The immediate priority is to account for the useful work in all 18 open PRs before beginning new feature work. Preserve existing implementations, reconcile overlapping branches, and give each remaining feature one continuation path. The eventual objective remains the complete product described in the source documents.
 
-This checkpoint records the October 7 repository review and the founder-authorized consolidation that followed. The [remaining-change ledger](pr-reconciliation-2026-10-07.md) now accounts for all 18 original drafts, their source preservation, remaining comparisons and continuation paths. Its execution status is authoritative for closures; the original inventory below remains historical. Product code was unchanged in this reconciliation pass.
+This checkpoint records the October 7 repository review and the founder-authorized consolidation that followed. The [remaining-change ledger](pr-reconciliation-2026-10-07.md) now accounts for all 18 original drafts, their source preservation, remaining comparisons and continuation paths. #131 is closed into #145 and #242 into #63, both unmerged with source branches preserved; 16 original drafts remain open. The original inventory below remains historical. Product code was unchanged in this reconciliation pass.
 
 ## Resume with these sources
 
@@ -103,4 +103,4 @@ The latest 132 handoff identifies its continuation worktree as `/Users/yingpengw
 
 Keep this checkpoint current at meaningful milestones: update actual PR dispositions, current revisions, decisions, passed/failed checks, unresolved dependencies and the next exact action. Re-read relevant source before changes. A new chat can resume from this path, but must refresh external state and must not assume it automatically remembers this conversation.
 
-**Next exact action:** finish the two verified consolidation closures recorded in the ledger, then reconcile #145's missing restoration protections into #132 while preserving its newer shutdown behavior. Continue the genuine installed-consumer/privacy/accounting graph there. Refresh current GitHub heads and worktree ownership before edits; use the recorded source inventory rather than rediscovering or rebuilding the same work.
+**Next exact action:** reconcile #145's missing restoration protections into #132 while preserving its newer shutdown behavior. Continue the genuine installed-consumer/privacy/accounting graph there. Refresh current GitHub heads and worktree ownership before edits; use the recorded source inventory rather than rediscovering or rebuilding the same work.
