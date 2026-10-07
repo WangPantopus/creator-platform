@@ -330,6 +330,7 @@ export async function createTrustRuntime(options: {
       );
     await restrictScope(actor, creatorId, threadId, participants);
   };
+  let closing: Promise<void> | undefined;
   return {
     router,
     service,
@@ -393,13 +394,34 @@ export async function createTrustRuntime(options: {
     start: async () => {
       if (await restored()) await worker.start();
     },
-    stop: async () => {
-      await worker.stop();
-      options.apiPool.off("error", poolError);
-      options.workerPool.off("error", poolError);
-      telemetry.close();
-      if (options.closePoolsOnStop)
-        await Promise.all([options.apiPool.end(), options.workerPool.end()]);
-    },
+    stop: () =>
+      (closing ??= (async () => {
+        const errors: unknown[] = [];
+        try {
+          await worker.stop();
+        } catch (error) {
+          errors.push(error);
+        }
+        options.apiPool.off("error", poolError);
+        options.workerPool.off("error", poolError);
+        try {
+          telemetry.close();
+        } catch (error) {
+          errors.push(error);
+        }
+        if (options.closePoolsOnStop) {
+          const pools = await Promise.allSettled([
+            options.apiPool.end(),
+            options.workerPool.end(),
+          ]);
+          for (const result of pools)
+            if (result.status === "rejected") errors.push(result.reason);
+        }
+        if (errors.length)
+          throw new AggregateError(
+            errors,
+            "Original Trust runtime cleanup failed.",
+          );
+      })()),
   };
 }

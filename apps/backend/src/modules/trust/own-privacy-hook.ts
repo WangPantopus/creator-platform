@@ -1,4 +1,5 @@
 import type { Pool, PoolClient } from "pg";
+import { ContentHeldClient } from "../content/held-client-cleanup.js";
 import type { PrivacyHook } from "./contracts.js";
 import { domainPrivacyTaskAuthorityInTransaction } from "./domain-privacy-authority.js";
 import { DomainError } from "../../core/errors.js";
@@ -18,17 +19,14 @@ export function trustPrivacyHook(
         );
       input.signal.throwIfAborted();
       const client = await pool.connect();
-      let released = false;
-      const abort = () => {
-        if (!released) {
-          released = true;
-          client.release(true);
-        }
-      };
-      input.signal.addEventListener("abort", abort, { once: true });
+      // Settlement only; original W8 task, ownership and restoration checks
+      // below remain the sole authority. Keep the source held until rollback
+      // or physical close settles, including cancellation during a query.
+      const held = new ContentHeldClient(client, input.signal, pool);
+      let failure: unknown;
       try {
         input.signal.throwIfAborted();
-        await client.query("BEGIN");
+        await held.begin();
         await domainPrivacyTaskAuthorityInTransaction(
           client,
           input,
@@ -194,7 +192,7 @@ export function trustPrivacyHook(
           assertRestoredInTransaction,
         );
         input.signal.throwIfAborted();
-        await client.query("COMMIT");
+        await held.commit();
         input.signal.throwIfAborted();
         const retained: {
           category: string;
@@ -231,11 +229,10 @@ export function trustPrivacyHook(
           retained: input.kind === "delete" ? retained : [],
         };
       } catch (error) {
-        if (!released) await client.query("ROLLBACK");
+        failure = error;
         throw error;
       } finally {
-        input.signal.removeEventListener("abort", abort);
-        if (!released) client.release();
+        await held.settle(failure);
       }
     },
   };

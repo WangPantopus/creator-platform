@@ -40,6 +40,7 @@ type Effect = {
 export class TrustWorker {
   private timer: ReturnType<typeof setTimeout> | undefined;
   private running: Promise<void> | undefined;
+  private closing: Promise<void> | undefined;
   private stopped = false;
   constructor(
     readonly pool: Pool,
@@ -51,39 +52,72 @@ export class TrustWorker {
   async start() {
     await new TrustStore(this.pool).assertRole(true);
     this.stopped = false;
+    this.closing = undefined;
     this.schedule();
   }
   private schedule() {
     if (this.stopped) return;
     this.timer = setTimeout(() => {
-      this.running = this.tick()
+      const running = this.tick();
+      this.running = running;
+      void running
         .catch(() => {
           this.observe("worker_errors", 1);
         })
         .finally(() => {
-          this.running = undefined;
+          if (this.running === running) this.running = undefined;
           this.schedule();
-        });
+        })
+        .catch(() => {});
     }, 1000);
     this.timer.unref();
   }
-  async stop() {
+  stop(): Promise<void> {
     this.stopped = true;
     if (this.timer) clearTimeout(this.timer);
-    await this.running;
-    await this.artifacts?.close?.();
+    return (this.closing ??= (async () => {
+      const errors: unknown[] = [];
+      try {
+        await this.running;
+      } catch (error) {
+        errors.push(error);
+      }
+      try {
+        await this.artifacts?.close?.();
+      } catch (error) {
+        errors.push(error);
+      }
+      if (errors.length)
+        throw new AggregateError(
+          errors,
+          "Original Trust worker cleanup failed.",
+        );
+    })());
   }
   async tick() {
     // Start every claimed lease immediately. Slow purges must not expire a later
     // task's lease in a serial batch or delay the safety-action lane.
-    const [tasks, effects] = await Promise.all([
+    const [tasks, effects] = await Promise.allSettled([
       this.claimTasks(),
       this.claimEffects(),
     ]);
-    await Promise.all([
-      ...tasks.map((task) => this.runTask(task)),
-      ...effects.map((effect) => this.runEffect(effect)),
+    const errors: unknown[] = [];
+    if (tasks.status === "rejected") errors.push(tasks.reason);
+    if (effects.status === "rejected") errors.push(effects.reason);
+    // A failed lane or acknowledgment must not release sibling operations or
+    // allow shutdown to close their pools while their original work continues.
+    const settled = await Promise.allSettled([
+      ...(tasks.status === "fulfilled"
+        ? tasks.value.map((task) => this.runTask(task))
+        : []),
+      ...(effects.status === "fulfilled"
+        ? effects.value.map((effect) => this.runEffect(effect))
+        : []),
     ]);
+    for (const result of settled)
+      if (result.status === "rejected") errors.push(result.reason);
+    if (errors.length)
+      throw new AggregateError(errors, "Original Trust worker pass failed.");
     await this.pool.query(`UPDATE creator_trust.privacy_job j SET state=CASE
       WHEN NOT EXISTS(SELECT 1 FROM creator_trust.privacy_task t WHERE t.job_id=j.id AND t.state<>'complete') THEN 'complete'
       WHEN EXISTS(SELECT 1 FROM creator_trust.privacy_task t WHERE t.job_id=j.id AND t.state='dead_letter')
@@ -432,17 +466,21 @@ async function deadline<T>(
   const controller = new AbortController();
   let completed = false;
   try {
-    const timeout = new Promise<never>((_resolve, reject) => {
-      timer = setTimeout(() => {
-        const error = new Error("hook_timeout");
-        controller.abort(error);
-        reject(error);
-      }, ms);
-      timer.unref();
-    });
-    const result = await Promise.race([work(controller.signal), timeout]);
+    timer = setTimeout(() => controller.abort(new Error("hook_timeout")), ms);
+    timer.unref();
+    // The timeout aborts the original signal; it cannot stand in for its
+    // completion. Retain that promise through source and artifact settlement.
+    const result = await work(controller.signal);
+    controller.signal.throwIfAborted();
     completed = true;
     return result;
+  } catch (error) {
+    if (controller.signal.aborted && error !== controller.signal.reason)
+      throw new AggregateError(
+        [controller.signal.reason, error],
+        "hook_timeout",
+      );
+    throw error;
   } finally {
     if (timer) clearTimeout(timer);
     if (!completed) controller.abort();
