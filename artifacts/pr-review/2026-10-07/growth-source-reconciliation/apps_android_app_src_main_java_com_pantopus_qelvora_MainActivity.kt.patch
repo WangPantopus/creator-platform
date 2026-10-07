@@ -1,0 +1,17 @@
+diff --git a/apps/android/app/src/main/java/com/pantopus/qelvora/MainActivity.kt b/apps/android/app/src/main/java/com/pantopus/qelvora/MainActivity.kt
+index 7c7f3f13..29dd115a 100644
+--- a/apps/android/app/src/main/java/com/pantopus/qelvora/MainActivity.kt
++++ b/apps/android/app/src/main/java/com/pantopus/qelvora/MainActivity.kt
+@@ -17,10 +17,10 @@ import com.pantopus.qelvora.identity.fanFeatures
+ 
+ class MainActivity : ComponentActivity() {
+     private val destination = mutableStateOf("/home")
+-    private val destinationDelivery = mutableStateOf(0L)
+-    private val notificationID = mutableStateOf<String?>(null)
+     private var debugAPIURL: String? = null
+     private var debugAppearance: String? = null
++    private val destinationDelivery = mutableStateOf(0L)
++    private val notificationID = mutableStateOf<String?>(null)
+     override fun onCreate(savedInstanceState: Bundle?) {
+         super.onCreate(savedInstanceState)
+         notificationID.value = GrowthPush.tapId(intent)

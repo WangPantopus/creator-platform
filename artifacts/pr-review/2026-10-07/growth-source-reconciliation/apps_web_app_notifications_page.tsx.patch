@@ -1,0 +1,53 @@
+diff --git a/apps/web/app/notifications/page.tsx b/apps/web/app/notifications/page.tsx
+index 84771018..cc7e6bf8 100644
+--- a/apps/web/app/notifications/page.tsx
++++ b/apps/web/app/notifications/page.tsx
+@@ -1,10 +1,10 @@
+ import { copy as growthCopy } from "@qelvora/copy";
+ import { growthRequest, GrowthUnavailable } from "../../features/growth/server";
++import { currentSession } from "../../lib/session";
++import { GrowthSessionBoundary } from "../../features/growth/private-view";
+ import { GrowthShell, Failure, NoData } from "../../features/growth/shell";
+ import { Inbox, Connection } from "../../features/growth/actions";
+ import type { InboxItem } from "../../features/growth/types";
+-import { currentSession } from "../../lib/session";
+-import { IdentitySessionBoundary } from "../../features/identity/session-boundary";
+ export const dynamic = "force-dynamic";
+ export default async function Notifications() {
+   const session = await currentSession("/notifications");
+@@ -15,7 +15,12 @@ export default async function Notifications() {
+         "session_required",
+         growthCopy.growthContinueWithPantopusToOpenYourAccountSCurrentState,
+       );
+-    const init = { headers: { "X-Expected-Account-Id": session.accountId } };
++    const init = {
++      headers: {
++        "X-Expected-Account-Id": session.accountId,
++        "X-Expected-Session-Id": session.sessionId,
++      },
++    };
+     const [{ notifications }, preferences] = await Promise.all([
+       growthRequest<{
+         notifications: InboxItem[];
+@@ -23,11 +28,7 @@ export default async function Notifications() {
+       growthRequest<{ timeZone: string }>("preferences", init),
+     ]);
+     return (
+-      <IdentitySessionBoundary
+-        key={session.sessionId}
+-        initial={session}
+-        returnTo="/notifications"
+-      >
++      <GrowthSessionBoundary initial={session} returnTo="/notifications">
+         <GrowthShell>
+           <Connection />
+           <header className="growth-header">
+@@ -44,7 +45,7 @@ export default async function Notifications() {
+             )}
+           </section>
+         </GrowthShell>
+-      </IdentitySessionBoundary>
++      </GrowthSessionBoundary>
+     );
+   } catch (error) {
+     return (

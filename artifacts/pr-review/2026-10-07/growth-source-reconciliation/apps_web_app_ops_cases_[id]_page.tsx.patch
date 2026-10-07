@@ -1,0 +1,294 @@
+diff --git a/apps/web/app/ops/cases/[id]/page.tsx b/apps/web/app/ops/cases/[id]/page.tsx
+index eb85d272..ed63175b 100644
+--- a/apps/web/app/ops/cases/[id]/page.tsx
++++ b/apps/web/app/ops/cases/[id]/page.tsx
+@@ -1,5 +1,5 @@
+ "use client";
+-import { use, useEffect, useRef, useState } from "react";
++import { use, useEffect, useLayoutEffect, useRef, useState } from "react";
+ import Link from "next/link";
+ import { AuditBanner, Message, ModeList } from "@qelvora/ui-web";
+ import type {
+@@ -13,6 +13,8 @@ import {
+   useTrust,
+   useTrustSession,
+   useTrustRequest,
++  useTrustStatus,
++  retryTrustReads,
+   caseLabel,
+   dateLabel,
+ } from "../../trust-client";
+@@ -41,7 +43,11 @@ export default function CasePage({
+ }) {
+   const { id } = use(params);
+   const request = useTrustRequest();
+-  const { data, error, loading, refresh } = useTrust<CaseDetail>(`cases/${id}`);
++  const sessionState = useTrustStatus();
++  const { data, error, loading, refresh } = useTrust<CaseDetail>(
++    `cases/${id}`,
++    sessionState.ready,
++  );
+   const [purpose, setPurpose] = useState("");
+   const [reason, setReason] = useState("");
+   const [resolution, setResolution] =
+@@ -53,9 +59,27 @@ export default function CasePage({
+   const retryKey = useRef<string | null>(null);
+   const key = useRef<string | null>(null);
+   const dialog = useRef<HTMLDialogElement>(null);
++  const resolutionSource = useRef<string | null>(null);
++  const replyUnavailable = data?.evidence.some(
++    (item) => item.category === "reply_review_unavailable",
++  );
+   useEffect(() => {
+-    if (data && data.queue !== "disputes") setResolution("close");
+-  }, [data?.queue]);
++    if (!data) return;
++    const source = JSON.stringify([
++      id,
++      data.kind,
++      data.queue,
++      Boolean(replyUnavailable),
++    ]);
++    if (resolutionSource.current === source) return;
++    resolutionSource.current = source;
++    if (data.kind === "reply_review")
++      setResolution(replyUnavailable ? "close" : "allow_reply");
++    else setResolution(data.queue === "disputes" ? "uphold" : "close");
++  }, [id, data?.queue, data?.kind, replyUnavailable]);
++  useLayoutEffect(() => {
++    if (!data) dialog.current?.close();
++  }, [data]);
+   useEffect(() => {
+     if (!data) return;
+     const remaining = new Date(data.access_expires_at).getTime() - Date.now();
+@@ -75,9 +99,10 @@ export default function CasePage({
+     setBusy(false);
+     key.current = null;
+     retryKey.current = null;
++    resolutionSource.current = null;
+   });
+   const confirm = async () => {
+-    if (!data) return;
++    if (!data || !sessionState.ready || busy) return;
+     const current = epoch.current;
+     setBusy(true);
+     setActionError(null);
+@@ -111,7 +136,7 @@ export default function CasePage({
+     key.current = null;
+   };
+   const recover = async () => {
+-    if (!data) return;
++    if (!data || !sessionState.ready || busy) return;
+     const current = epoch.current;
+     setBusy(true);
+     setActionError(null);
+@@ -141,44 +166,65 @@ export default function CasePage({
+     }
+   };
+   const caseChoices =
+-    data?.queue === "disputes"
+-      ? choices
+-      : [
+-          {
+-            value: "close" as const,
+-            title: "Close case",
+-            meta: "Reasoned review complete",
+-          },
+-          {
+-            value: "pause_creator" as const,
+-            title: "Pause creator",
+-            meta: "Supervisor · needs agent acknowledgment",
+-          },
+-          {
+-            value: "revoke_license" as const,
+-            title: "Revoke license",
+-            meta: "Supervisor · needs license acknowledgment",
+-          },
+-          {
+-            value: "suspend_account" as const,
+-            title: "Suspend account",
+-            meta: "Supervisor · needs identity acknowledgment",
+-          },
+-          ...(data?.queue === "verification"
+-            ? [
+-                {
+-                  value: "verify_creator" as const,
+-                  title: "Approve verification",
+-                  meta: "Supervisor · needs identity acknowledgment",
+-                },
+-                {
+-                  value: "reject_verification" as const,
+-                  title: "Reject verification",
+-                  meta: "Supervisor · needs identity acknowledgment",
+-                },
+-              ]
+-            : []),
+-        ];
++    data?.kind === "reply_review"
++      ? replyUnavailable
++        ? [
++            {
++              value: "close" as const,
++              title: "Close unavailable review",
++              meta: "This does not allow the reply",
++            },
++          ]
++        : [
++            {
++              value: "allow_reply" as const,
++              title: "Allow this reply",
++              meta: "Only this exact reviewed version",
++            },
++            {
++              value: "flag_reply" as const,
++              title: "Flag this reply",
++              meta: "Keep the text out of creator delivery",
++            },
++          ]
++      : data?.queue === "disputes"
++        ? choices
++        : [
++            {
++              value: "close" as const,
++              title: "Close case",
++              meta: "Reasoned review complete",
++            },
++            {
++              value: "pause_creator" as const,
++              title: "Pause creator",
++              meta: "Supervisor · needs agent acknowledgment",
++            },
++            {
++              value: "revoke_license" as const,
++              title: "Revoke license",
++              meta: "Supervisor · needs license acknowledgment",
++            },
++            {
++              value: "suspend_account" as const,
++              title: "Suspend account",
++              meta: "Supervisor · needs identity acknowledgment",
++            },
++            ...(data?.queue === "verification"
++              ? [
++                  {
++                    value: "verify_creator" as const,
++                    title: "Approve verification",
++                    meta: "Supervisor · needs identity acknowledgment",
++                  },
++                  {
++                    value: "reject_verification" as const,
++                    title: "Reject verification",
++                    meta: "Supervisor · needs identity acknowledgment",
++                  },
++                ]
++              : []),
++          ];
+   const sold = data?.evidence.find((item) => item.mode);
+   const delivered = data?.evidence.find(
+     (item) => item.author_kind && item.author_kind !== "fan",
+@@ -197,7 +243,7 @@ export default function CasePage({
+         <Link className="qv-link-btn" href="/ops">
+           Back to cases
+         </Link>
+-        <TrustSession />
++        <TrustSession showErrors={false} />
+         {loading && <p role="status">Loading case…</p>}
+         {!data && (
+           <>
+@@ -206,11 +252,21 @@ export default function CasePage({
+               Opening this case is logged. Access is limited to its evidence and
+               lasts at most 15 minutes.
+             </AuditBanner>
+-            <ErrorState error={error} retry={() => void refresh()} />
++            <ErrorState
++              error={sessionState.error ?? error}
++              retry={retryTrustReads}
++            />
+             <form
++              hidden={sessionState.concealed}
+               className="ops-resolution"
+               onSubmit={async (event) => {
+                 event.preventDefault();
++                if (
++                  !sessionState.ready ||
++                  busy ||
++                  error?.code !== "case_access_required"
++                )
++                  return;
+                 const current = epoch.current;
+                 setBusy(true);
+                 setActionError(null);
+@@ -245,10 +301,17 @@ export default function CasePage({
+                 onChange={(event) => setPurpose(event.target.value)}
+                 rows={3}
+               />
+-              <button className="qv-btn qv-btn--secondary" disabled={busy}>
++              <button
++                className="qv-btn qv-btn--secondary"
++                disabled={
++                  busy ||
++                  !sessionState.ready ||
++                  error?.code !== "case_access_required"
++                }
++              >
+                 Open case for 15 minutes
+               </button>
+-              <ErrorState error={actionError} />
++              <ErrorState error={sessionState.concealed ? null : actionError} />
+             </form>
+           </>
+         )}
+@@ -453,7 +516,7 @@ export default function CasePage({
+             />
+             <button
+               className="qv-btn qv-btn--secondary qv-btn--block"
+-              disabled={busy || !data.can_decide}
++              disabled={busy || !sessionState.ready || !data.can_decide}
+             >
+               Resolve and notify both
+             </button>
+@@ -463,7 +526,7 @@ export default function CasePage({
+                 different reviewer.
+               </p>
+             )}
+-            <ErrorState error={actionError} />
++            <ErrorState error={sessionState.concealed ? null : actionError} />
+           </form>
+           {data.state === "action_pending" && (
+             <form
+@@ -491,7 +554,10 @@ export default function CasePage({
+                   retryKey.current = null;
+                 }}
+               />
+-              <button className="qv-btn qv-btn--secondary" disabled={busy}>
++              <button
++                className="qv-btn qv-btn--secondary"
++                disabled={busy || !sessionState.ready}
++              >
+                 Retry pending action
+               </button>
+             </form>
+@@ -509,20 +575,20 @@ export default function CasePage({
+         <div className="actions">
+           <button
+             className="qv-btn qv-btn--secondary"
+-            disabled={busy}
++            disabled={busy || !data || !sessionState.ready}
+             onClick={() => void confirm()}
+           >
+             {busy ? "Recording…" : "Record and notify"}
+           </button>
+           <button
+             className="qv-btn qv-btn--quiet"
+-            disabled={busy}
++            disabled={busy || !sessionState.ready}
+             onClick={() => dialog.current?.close()}
+           >
+             Keep reviewing
+           </button>
+         </div>
+-        <ErrorState error={actionError} />
++        <ErrorState error={sessionState.concealed ? null : actionError} />
+       </dialog>
+     </div>
+   );

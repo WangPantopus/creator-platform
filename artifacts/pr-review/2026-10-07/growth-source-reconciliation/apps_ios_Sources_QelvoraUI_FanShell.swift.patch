@@ -1,0 +1,67 @@
+diff --git a/apps/ios/Sources/QelvoraUI/FanShell.swift b/apps/ios/Sources/QelvoraUI/FanShell.swift
+index d024854d..39b3bdbc 100644
+--- a/apps/ios/Sources/QelvoraUI/FanShell.swift
++++ b/apps/ios/Sources/QelvoraUI/FanShell.swift
+@@ -228,7 +228,7 @@ public final class FanSession: ObservableObject {
+         }
+         guard current == generation, !Task.isCancelled else { return }
+         hasSavedCredential = token != nil
+-        guard let token else { await purge(); return }
++        guard let token else { if session != nil { await purge() }; return }
+         do {
+             // Canonical identity observation has a separate short transport
+             // budget; private domain requests retain their own original bounds.
+@@ -315,6 +315,24 @@ public final class FanSession: ObservableObject {
+             return false
+         }
+     }
++    /// Save only the intro, against the original account/profile version.
++    public func saveIntro(_ intro: String, accountId: String, sessionId: String) async -> Bool {
++        guard !busy, let current = session, current.accountId == accountId,
++              current.sessionId == sessionId, let fan = current.fan,
++              let capture = await captureRequest(from: destination, maximumResponseBytes: 65_536, timeoutSeconds: 10),
++              await capture.isCurrent() else { return false }
++        busy = true; defer { busy = false }
++        do {
++            let text = intro.trimmingCharacters(in: .whitespacesAndNewlines)
++            let saved = try await capture.client.saveFanIntro(body: APIFanIntroInput(intro: text, expectedVersion: fan.version))
++            guard await capture.isCurrent(), saved.id == fan.id, saved.intro == text else { return false }
++            await refresh()
++            return await capture.isCurrent()
++        } catch {
++            if await capture.isCurrent() { self.error = Self.message(error) }
++            return false
++        }
++    }
+     /// Recover navigation only with the credential and destination that opened it.
+     /// The call screen independently authorizes the booking and every action.
+     public func resolveCallDestination(_ callId: String, from target: String) async -> Bool {
+@@ -363,10 +381,10 @@ public final class FanSession: ObservableObject {
+         generation += 1; confirmedCredential = nil; session = nil; hasSavedCredential = false; checkingSession = false; actors = []; choosingDevelopmentActor = false; error = ""
+         navigationInitialized = false; navigationRestoreAllowed = false
+         finishValidationWaiters()
++        URLCache.shared.removeAllCachedResponses()
+         #if os(iOS)
+         GrowthPushCoordinator.shared.update(session: nil, baseURL: baseURL, owner: self)
+         #endif
+-        URLCache.shared.removeAllCachedResponses()
+         var cleared = true
+         do { try await storage.save(nil) } catch { cleared = false }
+         do { try await W3FanFeatures.clearPrivateState() } catch { cleared = false }
+@@ -481,6 +499,7 @@ public struct FanAppShell: View {
+                             Text("Your account").qText("display-md")
+                             if let handle = model.session?.fan?.handle { Text("@" + handle).qText("body") }
+                             Button(QelvoraCopy.text(model.session?.fan == nil ? "identityChooseHandle" : "identityEditPublicProfile"), variant: .secondary, block: true) { model.destination = "/onboarding/handle" }
++                            Button(QelvoraCopy.text("w5NativeTeamWorkspace"), variant: .secondary, block: true, disabled: model.busy || model.checkingSession || model.purgingPrivateState || model.localPurgeFailed || !model.error.isEmpty) { model.open("/studio/workspace") }
+                             Button("Sign out", variant: .secondary, block: true) { Task { await model.logout() } }
+                             Button("Refresh session", variant: .secondary, block: true, disabled: model.busy) { Task { await model.refreshCredentials() } }
+                             Button("Sign out on all devices", variant: .quiet, block: true) { Task { await model.logout(all: true) } }
+@@ -549,7 +568,7 @@ public struct FanAppShell: View {
+     }
+     private var tab: FanTab {
+         let path = model.destination.components(separatedBy: "?")[0]
+-        if path.hasPrefix("/identity/") || path == "/support" || path.hasPrefix("/support/") || path == "/notifications/settings" || path == "/studio/impact" || path == "/commerce/spending" { return .you }
++        if path.hasPrefix("/identity/") || path == "/support" || path.hasPrefix("/support/") || path == "/notifications/settings" || path == "/studio/impact" || path == "/commerce/spending" || StudioTeamFeature.matches(path) { return .you }
+         if path.hasPrefix("/commerce/") { return .requests }
+         return FanTab.allCases.first { tab in
+             let root = "/" + tab.rawValue.lowercased()

@@ -1,0 +1,13 @@
+diff --git a/apps/ios/App/QelvoraApp.swift b/apps/ios/App/QelvoraApp.swift
+index 044b29bf..d280b7a2 100644
+--- a/apps/ios/App/QelvoraApp.swift
++++ b/apps/ios/App/QelvoraApp.swift
+@@ -23,7 +23,7 @@ struct QelvoraApp: App {
+         }
+     }
+     private var features: [FanFeatureRegistration] {
+-        [ContentFanFeature.registration(baseURL: apiURL), W3FanFeatures.registration(baseURL: apiURL), CommerceFanFeature.registration(baseURL: apiURL), TrustFanFeature.registration(baseURL: apiURL), W6FanFeatures.callRegistration(baseURL: apiURL), GrowthWeeklyImpact.registration(), GrowthFanFeature.registration(baseURL: apiURL)] + W6FanFeatures.registrations
++        [PublicVerificationFeature.registration(baseURL: apiURL), StudioTeamFeature.registration(), ContentFanFeature.registration(baseURL: apiURL), W3FanFeatures.registration(baseURL: apiURL), CommerceFanFeature.registration(baseURL: apiURL), TrustFanFeature.registration(baseURL: apiURL), W6FanFeatures.callRegistration(baseURL: apiURL), GrowthWeeklyImpact.registration(), GrowthFanFeature.registration(baseURL: apiURL)] + W6FanFeatures.registrations
+     }
+     private var apiURL: URL? {
+         #if DEBUG

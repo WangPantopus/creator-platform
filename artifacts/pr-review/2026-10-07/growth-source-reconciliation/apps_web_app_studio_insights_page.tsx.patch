@@ -1,0 +1,43 @@
+diff --git a/apps/web/app/studio/insights/page.tsx b/apps/web/app/studio/insights/page.tsx
+index b7dbdcb0..5097486d 100644
+--- a/apps/web/app/studio/insights/page.tsx
++++ b/apps/web/app/studio/insights/page.tsx
+@@ -7,7 +7,7 @@ import { GrowthShell, Failure, NoData } from "../../../features/growth/shell";
+ import { Producer } from "../../../features/growth/actions";
+ import type { Cluster } from "../../../features/growth/types";
+ import { currentSession } from "../../../lib/session";
+-import { IdentitySessionBoundary } from "../../../features/identity/session-boundary";
++import { GrowthSessionBoundary } from "../../../features/growth/private-view";
+ export const dynamic = "force-dynamic";
+ export default async function Insights() {
+   const session = await currentSession("/studio/insights");
+@@ -18,13 +18,18 @@ export default async function Insights() {
+         "session_required",
+         growthCopy.growthContinueWithPantopusToOpenYourAccountSCurrentState,
+       );
+-    const init = { headers: { "X-Expected-Account-Id": session.accountId } };
++    const init = {
++      headers: {
++        "X-Expected-Account-Id": session.accountId,
++        "X-Expected-Session-Id": session.sessionId,
++      },
++    };
+     const { clusters } = await growthRequest<{ clusters: Cluster[] }>(
+       "insights",
+       init,
+     );
+     return (
+-      <IdentitySessionBoundary
++      <GrowthSessionBoundary
+         key={session.sessionId}
+         initial={session}
+         returnTo="/studio/insights"
+@@ -90,7 +95,7 @@ export default async function Insights() {
+             </div>
+           </div>
+         </GrowthShell>
+-      </IdentitySessionBoundary>
++      </GrowthSessionBoundary>
+     );
+   } catch (error) {
+     return (

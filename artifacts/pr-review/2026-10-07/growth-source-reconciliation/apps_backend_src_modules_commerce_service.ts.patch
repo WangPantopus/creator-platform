@@ -1,0 +1,13 @@
+diff --git a/apps/backend/src/modules/commerce/service.ts b/apps/backend/src/modules/commerce/service.ts
+index 515a0684..e30b18f5 100644
+--- a/apps/backend/src/modules/commerce/service.ts
++++ b/apps/backend/src/modules/commerce/service.ts
+@@ -320,7 +320,7 @@ export class CommerceService {
+     // request, purpose or provider authority and cannot extend a task lease.
+     const signal = AbortSignal.timeout(45_000);
+     const client = await this.pool.connect();
+-    const held = new ContentHeldClient(client, signal);
++    const held = new ContentHeldClient(client, signal, this.pool);
+     let failed = false;
+     let failure: unknown;
+     let result!: T;

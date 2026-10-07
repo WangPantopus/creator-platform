@@ -1,0 +1,51 @@
+diff --git a/apps/web/app/api/growth/[...path]/route.ts b/apps/web/app/api/growth/[...path]/route.ts
+index ffed686e..caa7a086 100644
+--- a/apps/web/app/api/growth/[...path]/route.ts
++++ b/apps/web/app/api/growth/[...path]/route.ts
+@@ -7,7 +7,7 @@ import {
+ } from "../../../../features/growth/server";
+ 
+ const allowed =
+-  /^(?:home|discovery-access|notifications(?:\/[a-f0-9-]+\/read)?|preferences(?:\/creators)?|follow\/[a-f0-9-]+|devices(?:\/[a-f0-9-]+)?|shares|invites(?:\/[a-f0-9-]+)?|referrals|entry|engagement(?:\/(?:install|return)\/(?:claim|choice))?|insights|funnel|impact|activation|experiments(?:\/[a-f0-9-]+\/stop|\/variant\/[a-z0-9_]+)?|feedback|recommendations(?:\/publish)?)$/u;
++  /^(?:home|discovery-access|notifications(?:\/[a-f0-9-]+(?:\/read)?)?|preferences(?:\/creators)?|follow\/[a-f0-9-]+|devices(?:\/[a-f0-9-]+)?|shares|invites(?:\/[a-f0-9-]+)?|referrals|entry|engagement(?:\/(?:install|return)\/(?:claim|choice))?|insights|funnel|impact|activation|experiments(?:\/[a-f0-9-]+\/stop|\/variant\/[a-z0-9_]+)?|feedback|recommendations(?:\/publish)?)$/u;
+ async function handle(
+   request: NextRequest,
+   { params }: { params: Promise<{ path: string[] }> },
+@@ -30,16 +30,30 @@ async function handle(
+       { error: { message: "Open this action from the app." } },
+       { status: 403 },
+     );
++  const expectedAccount = request.headers.get("X-Expected-Account-Id");
++  const expectedSession = request.headers.get("X-Expected-Session-Id");
++  if (
++    /^(?:home|preferences(?:\/creators)?|notifications(?:\/[a-f0-9-]+(?:\/read)?)?|engagement(?:\/(?:install|return)\/(?:claim|choice))?|feedback|insights|impact|activation|recommendations(?:\/publish)?|invites|funnel|experiments(?:\/[a-f0-9-]+\/stop)?)$/u.test(
++      path,
++    ) &&
++    (!expectedAccount || !expectedSession)
++  )
++    return NextResponse.json(
++      {
++        error: {
++          code: "session_view_required",
++          message:
++            "Reopen this view with your current account before continuing.",
++        },
++      },
++      { status: 400, headers: { "Cache-Control": "no-store" } },
++    );
+   try {
+     const headers = new Headers();
+-    const expectedAccount = request.headers.get("X-Expected-Account-Id");
+-    const expectedSession = request.headers.get("X-Expected-Session-Id");
+-    if (expectedAccount)
+-      headers.set(
+-        postContext ? "x-qelvora-expected-account" : "X-Expected-Account-Id",
+-        expectedAccount,
+-      );
++    if (expectedAccount) headers.set("X-Expected-Account-Id", expectedAccount);
+     if (expectedSession) headers.set("X-Expected-Session-Id", expectedSession);
++    if (postContext && expectedAccount)
++      headers.set("x-qelvora-expected-account", expectedAccount);
+     const result = await growthRequest(path + request.nextUrl.search, {
+       method: request.method,
+       headers,

@@ -1,0 +1,26 @@
+diff --git a/apps/web/features/growth/public-session.ts b/apps/web/features/growth/public-session.ts
+index f2f1de39..dc96f01d 100644
+--- a/apps/web/features/growth/public-session.ts
++++ b/apps/web/features/growth/public-session.ts
+@@ -125,13 +125,16 @@ export function useGrowthPublicSession(context: string) {
+           if (active.current && lifetime.current === pending) clear();
+         });
+     };
+-    const channel =
+-      typeof BroadcastChannel === "undefined"
+-        ? null
+-        : new BroadcastChannel(sessionChannel);
++    let channel: BroadcastChannel | null = null;
++    try {
++      if (typeof BroadcastChannel !== "undefined")
++        channel = new BroadcastChannel(sessionChannel);
++    } catch {
++      /* Canonical bounded polling remains available. */
++    }
+     if (channel)
+       channel.onmessage = (event) => {
+-        if (event.data === "ended") clear();
++        if (event.data === "ended") check();
+       };
+     const timer = setInterval(check, 4000);
+     window.addEventListener("focus", check);

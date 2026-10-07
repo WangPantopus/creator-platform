@@ -1,0 +1,28 @@
+diff --git a/apps/web/app/api/platform/[...path]/route.ts b/apps/web/app/api/platform/[...path]/route.ts
+index 0a0e1182..aad2eeac 100644
+--- a/apps/web/app/api/platform/[...path]/route.ts
++++ b/apps/web/app/api/platform/[...path]/route.ts
+@@ -45,7 +45,7 @@ async function renew(
+ }
+ 
+ const allowed =
+-  /^identity\/(?:session|refresh|logout|revoke-sessions|fan-profile|creator-profile|capabilities|passkeys(?:\/(?:begin|register|revoke|recovery|[a-f0-9-]{36}\/cancel))?|[a-f0-9-]{36}\/proof|proof\/[a-f0-9-]{36}\/submit|[a-f0-9-]{36}\/team\/invite|team\/[a-f0-9-]{36}\/accept|[a-f0-9-]{36}\/team\/[a-f0-9-]{36}\/(?:remove|roles)|signed-acts\/[a-f0-9-]{36}(?:\/cancel)?|[a-f0-9-]{36}\/signed-acts\/begin|signed-acts\/verify)$/u;
++  /^identity\/(?:session|refresh|logout|revoke-sessions|fan-profile(?:\/intro)?|creator-profile|capabilities|passkeys(?:\/(?:begin|register|revoke|recovery|[a-f0-9-]{36}\/cancel))?|[a-f0-9-]{36}\/proof|proof\/[a-f0-9-]{36}\/submit|[a-f0-9-]{36}\/team\/invite|team\/[a-f0-9-]{36}\/accept|[a-f0-9-]{36}\/team\/[a-f0-9-]{36}\/(?:remove|roles)|signed-acts\/[a-f0-9-]{36}(?:\/cancel)?|[a-f0-9-]{36}\/signed-acts\/begin|signed-acts\/verify)$/u;
+ async function proxy(
+   request: NextRequest,
+   context: { params: Promise<{ path: string[] }> },
+@@ -71,9 +71,11 @@ async function proxy(
+     if (
+       !expectedAccount &&
+       request.method === "POST" &&
+-      ["identity/fan-profile", "identity/creator-profile"].includes(
+-        path.join("/"),
+-      )
++      [
++        "identity/fan-profile",
++        "identity/fan-profile/intro",
++        "identity/creator-profile",
++      ].includes(path.join("/"))
+     ) {
+       return NextResponse.json(
+         {

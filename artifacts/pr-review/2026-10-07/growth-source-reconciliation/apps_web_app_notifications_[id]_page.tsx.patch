@@ -1,0 +1,43 @@
+diff --git a/apps/web/app/notifications/[id]/page.tsx b/apps/web/app/notifications/[id]/page.tsx
+index 2a22ddf5..2f723fd4 100644
+--- a/apps/web/app/notifications/[id]/page.tsx
++++ b/apps/web/app/notifications/[id]/page.tsx
+@@ -6,7 +6,7 @@ import {
+ } from "../../../features/growth/server";
+ import { GrowthShell, Failure } from "../../../features/growth/shell";
+ import { currentSession } from "../../../lib/session";
+-import { IdentitySessionBoundary } from "../../../features/identity/session-boundary";
++import { GrowthSessionBoundary } from "../../../features/growth/private-view";
+ import { OpenNotification } from "../../../features/growth/notification-arrival";
+ 
+ export const dynamic = "force-dynamic";
+@@ -41,7 +41,10 @@ export default async function NotificationArrival({
+       available: boolean;
+       destination: string;
+     }>(`notifications/${id}`, {
+-      headers: { "X-Expected-Account-Id": session.accountId },
++      headers: {
++        "X-Expected-Account-Id": session.accountId,
++        "X-Expected-Session-Id": session.sessionId,
++      },
+     });
+     if (
+       current.id !== id ||
+@@ -54,7 +57,7 @@ export default async function NotificationArrival({
+         copy.growthThisDestinationIsNoLongerAvailable,
+       );
+     return (
+-      <IdentitySessionBoundary
++      <GrowthSessionBoundary
+         key={session.sessionId}
+         initial={session}
+         returnTo={`/notifications/${id}`}
+@@ -62,7 +65,7 @@ export default async function NotificationArrival({
+         <GrowthShell>
+           <OpenNotification id={id} />
+         </GrowthShell>
+-      </IdentitySessionBoundary>
++      </GrowthSessionBoundary>
+     );
+   } catch (error) {
+     return (

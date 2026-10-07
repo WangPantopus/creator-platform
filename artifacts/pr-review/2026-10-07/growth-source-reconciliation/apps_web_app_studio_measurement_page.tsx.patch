@@ -1,0 +1,45 @@
+diff --git a/apps/web/app/studio/measurement/page.tsx b/apps/web/app/studio/measurement/page.tsx
+index 1e4fa052..fe0a2ed9 100644
+--- a/apps/web/app/studio/measurement/page.tsx
++++ b/apps/web/app/studio/measurement/page.tsx
+@@ -9,7 +9,7 @@ import {
+   ExperimentChoices,
+ } from "../../../features/growth/feedback";
+ import { currentSession } from "../../../lib/session";
+-import { IdentitySessionBoundary } from "../../../features/identity/session-boundary";
++import { GrowthSessionBoundary } from "../../../features/growth/private-view";
+ export const dynamic = "force-dynamic";
+ export default async function Measurement() {
+   const session = await currentSession("/studio/measurement");
+@@ -20,7 +20,12 @@ export default async function Measurement() {
+         "session_required",
+         growthCopy.growthContinueWithPantopusToOpenYourAccountSCurrentState,
+       );
+-    const init = { headers: { "X-Expected-Account-Id": session.accountId } };
++    const init = {
++      headers: {
++        "X-Expected-Account-Id": session.accountId,
++        "X-Expected-Session-Id": session.sessionId,
++      },
++    };
+     const data = await growthRequest<{
+       denominator: string;
+       retention: string;
+@@ -34,7 +39,7 @@ export default async function Measurement() {
+       timeToUsefulAnswerSeconds: number | null;
+     }>("funnel", init);
+     return (
+-      <IdentitySessionBoundary
++      <GrowthSessionBoundary
+         key={session.sessionId}
+         initial={session}
+         returnTo="/studio/measurement"
+@@ -105,7 +110,7 @@ export default async function Measurement() {
+             <ExperimentChoices />
+           </section>
+         </GrowthShell>
+-      </IdentitySessionBoundary>
++      </GrowthSessionBoundary>
+     );
+   } catch (error) {
+     return (

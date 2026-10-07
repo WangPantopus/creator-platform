@@ -1,0 +1,13 @@
+diff --git a/apps/backend/src/modules/content/post-entry.ts b/apps/backend/src/modules/content/post-entry.ts
+index fc655332..70b1f01d 100644
+--- a/apps/backend/src/modules/content/post-entry.ts
++++ b/apps/backend/src/modules/content/post-entry.ts
+@@ -103,7 +103,7 @@ export function createCurrentContentPostEntryReader(
+       });
+       // This actual host budget is distinct from an incoming request signal.
+       const budget = AbortSignal.timeout(5000);
+-      const held = new ContentHeldClient(client, budget);
++      const held = new ContentHeldClient(client, budget, pool);
+       let failure: unknown;
+       try {
+         await held.begin();

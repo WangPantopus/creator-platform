@@ -1,0 +1,15 @@
+diff --git a/apps/backend/src/core/purpose-catalogue.ts b/apps/backend/src/core/purpose-catalogue.ts
+index fbb6d4c9..29148f2c 100644
+--- a/apps/backend/src/core/purpose-catalogue.ts
++++ b/apps/backend/src/core/purpose-catalogue.ts
+@@ -8,7 +8,9 @@ export async function generationConsumerCatalogue(
+ ) {
+   if (
+     options.queryTimeout !== undefined &&
+-    (!Number.isSafeInteger(options.queryTimeout) || options.queryTimeout < 1)
++    (!Number.isSafeInteger(options.queryTimeout) ||
++      options.queryTimeout < 1 ||
++      options.queryTimeout > 5000)
+   )
+     throw new Error("The original catalogue response budget is invalid.");
+   const query = async (text: string, values: unknown[]) => {

@@ -1,0 +1,30 @@
+diff --git a/apps/web/app/studio/launch/page.tsx b/apps/web/app/studio/launch/page.tsx
+index 9cfd55bb..bb27522b 100644
+--- a/apps/web/app/studio/launch/page.tsx
++++ b/apps/web/app/studio/launch/page.tsx
+@@ -3,7 +3,7 @@ import { GrowthShell, Failure } from "../../../features/growth/shell";
+ import { LaunchKit } from "../../../features/growth/launch";
+ import { currentSession } from "../../../lib/session";
+ import { GrowthUnavailable } from "../../../features/growth/server";
+-import { IdentitySessionBoundary } from "../../../features/identity/session-boundary";
++import { GrowthSessionBoundary } from "../../../features/growth/private-view";
+ export const dynamic = "force-dynamic";
+ export default async function Launch() {
+   const session = await currentSession("/studio/launch");
+@@ -23,7 +23,7 @@ export default async function Launch() {
+       </GrowthShell>
+     );
+   return (
+-    <IdentitySessionBoundary
++    <GrowthSessionBoundary
+       key={session.sessionId}
+       initial={session}
+       returnTo="/studio/launch"
+@@ -31,6 +31,6 @@ export default async function Launch() {
+       <GrowthShell studio>
+         <LaunchKit />
+       </GrowthShell>
+-    </IdentitySessionBoundary>
++    </GrowthSessionBoundary>
+   );
+ }
