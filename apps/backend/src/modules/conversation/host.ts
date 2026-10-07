@@ -15,6 +15,7 @@ import {
 import type { LicenseVerifier } from "../agent/service.js";
 import { PreparedUsageRetention } from "../agent/usage-retention.js";
 import { DevelopmentLicenseVerifier } from "../agent/development-license.js";
+import { startDevelopmentIngestion } from "../ingestion/development-lifetime.js";
 import { createCommerceRuntime } from "../commerce/runtime.js";
 import { readCommerceEnvironment } from "../commerce/environment.js";
 import { createCommerceAudience } from "../commerce/audience.js";
@@ -446,27 +447,11 @@ export async function composeConversationHost(
     requested && model && env.W3_DEVELOPMENT_INGESTION
       ? DevelopmentIngestionSchema.parse(env.W3_DEVELOPMENT_INGESTION)
       : [];
-  const controller = new AbortController();
-  let ingesting = false;
-  const timer = ingestion.length
-    ? setInterval(() => {
-        if (ingesting) return;
-        ingesting = true;
-        void (async () => {
-          for (const owner of ingestion)
-            await agent!.ingestion
-              .tick({ ...owner, development: true }, controller.signal)
-              .catch(() =>
-                process.stderr.write(
-                  "Development source processing is unavailable; inspect the saved source state.\n",
-                ),
-              );
-        })().finally(() => {
-          ingesting = false;
-        });
-      }, 1000)
-    : undefined;
-  timer?.unref();
+  const ingesting = startDevelopmentIngestion(
+    agent.ingestion,
+    ingestion.map((owner) => ({ ...owner, development: true })),
+  );
+  let closing: Promise<void> | undefined;
 
   const available = conversation.feature.capabilities().generationAvailable;
   if (requested)
@@ -493,10 +478,25 @@ export async function composeConversationHost(
         : {}),
     },
     fanGeneration: { available, missing },
-    close() {
-      if (timer) clearInterval(timer);
-      controller.abort();
-      conversation.close();
+    close(): Promise<void> {
+      closing ??= (async () => {
+        // Stop admissions synchronously, then retain the actual ingestion
+        // promise until its final job/accounting work has settled.
+        const draining = ingesting.close();
+        const outcomes = await Promise.allSettled([
+          draining,
+          Promise.resolve().then(() => conversation.close()),
+        ]);
+        const failures = outcomes.flatMap((outcome) =>
+          outcome.status === "rejected" ? [outcome.reason] : [],
+        );
+        if (failures.length)
+          throw new AggregateError(
+            failures,
+            "Conversation host shutdown failed.",
+          );
+      })();
+      return closing;
     },
   };
 }

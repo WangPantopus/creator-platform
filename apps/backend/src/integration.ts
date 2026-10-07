@@ -597,21 +597,58 @@ export async function createConfiguredBackend(input: {
         : {}),
     },
   );
-  await trust?.start();
-  return {
-    server,
-    pool,
-    identity: platformIdentity,
-    trust,
-    close: async () => {
+  let closing: Promise<void> | undefined;
+  const close = (): Promise<void> => {
+    closing ??= (async () => {
       issuedRuntimes.delete(backendRuntime);
-      for (const connection of sockets.clients)
-        connection.close(1001, "Server shutdown");
-      await trust?.stop();
-      await new Promise<void>((resolve, reject) =>
-        server.close((error) => (error ? reject(error) : resolve())),
+      const stopped = await Promise.allSettled([
+        Promise.resolve().then(() => trust?.stop()),
+        new Promise<void>((resolve, reject) => {
+          server.close((error) => {
+            // A prepared standalone host may never open an HTTP listener.
+            // Its database and Trust resources still need their original drain.
+            if (
+              error &&
+              (error as NodeJS.ErrnoException).code !== "ERR_SERVER_NOT_RUNNING"
+            )
+              reject(error);
+            else resolve();
+          });
+        }),
+        new Promise<void>((resolve, reject) => {
+          for (const connection of sockets.clients)
+            connection.close(1001, "Server shutdown");
+          sockets.close((error) => (error ? reject(error) : resolve()));
+        }),
+      ]);
+      const failures = stopped.flatMap((result) =>
+        result.status === "rejected" ? [result.reason] : [],
       );
-      await pool.end();
-    },
+      try {
+        await pool.end();
+      } catch (cause) {
+        failures.push(cause);
+      }
+      if (failures.length)
+        throw new AggregateError(
+          failures,
+          "Configured backend shutdown failed.",
+        );
+    })();
+    return closing;
   };
+  try {
+    await trust?.start();
+  } catch (cause) {
+    try {
+      await close();
+    } catch (cleanup) {
+      throw new AggregateError(
+        [cause, cleanup],
+        "Configured backend startup and cleanup failed.",
+      );
+    }
+    throw cause;
+  }
+  return { server, pool, identity: platformIdentity, trust, close };
 }
