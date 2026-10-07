@@ -22,7 +22,7 @@ Actual closed review executed the immutable 0198 source and its matching ledger
 entry only inside rolled-back transactions on the recovered original100 copy
 and its independent restore. The earlier ownership failure was reproduced and
 attributed to the exact automatic index/TOAST objects. The repaired complete
-catalogue passed. On the restored copy, nineteen actual metadata changes each
+catalogue passed. On the final original100 review, nineteen actual metadata changes each
 refused, then passed again after restoring the original state:
 
 - Purpose LOGIN, INHERIT and membership.
@@ -47,3 +47,21 @@ was reclosed, the original null password was restored, and all six custodies
 remained identical. The backend shipping build under the shared W2 lock, scoped
 ESLint/Prettier and seventeen existing contract/worker tests passed. No new test
 code was added. Raw diagnostics and records remain private.
+
+## Independent main review
+
+Main-based source `a6f70276` was separately operated against the retained
+canonical61 backup restore. Its exact immutable source catalogue passed; all
+eighteen metadata drifts refused and restored, and the full review transaction
+rolled back with all six original custodies equal. A separate actual core-role
+password pool refused unregistered source preparation before catalogue reads
+and remained usable. The original null password and closed connection limit
+were restored. The main shipping build, nine existing contract tests, scoped
+lint/format and diff checks passed. No migration activation or export result
+is claimed. Exact-head CI and normal merge disposition are recorded in the PR.
+
+The final independent-main source `fffcdc72` also passes the exact unconditional
+commit-trigger check and all nineteen actual metadata drift/refusal/recovery
+cases on canonical61. All six rollback custodies match. Its final shipping build
+and scoped lint/format checks pass. The earlier eighteen-case review and genuine
+source-registration refusal remain separately recorded.
