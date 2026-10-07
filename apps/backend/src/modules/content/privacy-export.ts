@@ -3,6 +3,7 @@ import pg, { type Pool, type PoolClient } from "pg";
 import { z } from "zod";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError } from "../../core/errors.js";
+import { registeredMigration } from "../../db/reviewed-migration.js";
 import { requestAuthority } from "../identity/request-authority.js";
 import type { PrivacyHook } from "../trust/contracts.js";
 import { ContentHeldClient } from "./held-client-cleanup.js";
@@ -208,6 +209,30 @@ export class ContentPrivacyExport {
 
   private async assertCatalog(client: PoolClient): Promise<void> {
     try {
+      const active = await registeredMigration({
+        name: "w5_content_privacy_export",
+        path: "apps/backend/src/modules/content/schema-content-privacy-export.sql",
+        owner: "W5",
+        checksum: CONTENT_PRIVACY_EXPORT_CHECKSUM,
+      });
+      if (active?.version !== CONTENT_PRIVACY_EXPORT_MIGRATION)
+        throw unavailable();
+      await ContentPrivacyExport.assertCatalogueForReview(client);
+    } catch (error) {
+      if (
+        error instanceof DomainError &&
+        error.code === "content_privacy_purpose_unavailable"
+      )
+        throw error;
+      throw unavailable(error);
+    }
+  }
+
+  /** Closed operator metadata review only. This issues no exporter or task
+   * authority; preparation and every export bookend additionally require the
+   * actual executable source registration, never a hand-installed ledger. */
+  static async assertCatalogueForReview(client: PoolClient): Promise<void> {
+    try {
       const state = (
         await client.query<{ valid: boolean; ai: boolean }>(
           `SELECT current_user=session_user AND session_user='creator_runtime'
@@ -246,14 +271,29 @@ export class ContentPrivacyExport {
            AND NOT EXISTS(SELECT FROM pg_parameter_acl p CROSS JOIN LATERAL aclexplode(p.paracl) a WHERE a.grantee=$1::regrole)
            AND NOT EXISTS(SELECT FROM pg_largeobject_metadata l CROSS JOIN LATERAL aclexplode(l.lomacl) a WHERE a.grantee=$1::regrole)
            AND NOT EXISTS(SELECT FROM pg_largeobject_metadata WHERE lomowner=$1::regrole)
-           AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=$1::regrole AND oid<>to_regclass('creator.content_privacy_export_scope'))
+           AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=$1::regrole AND oid<>to_regclass('creator.content_privacy_export_scope')
+            AND NOT(relkind='i' AND oid IN(SELECT conindid FROM pg_constraint WHERE conrelid=to_regclass('creator.content_privacy_export_scope') AND contype='p'))
+            AND NOT(relkind='t' AND oid IN(SELECT reltoastrelid FROM pg_class WHERE oid=to_regclass('creator.content_privacy_export_scope')))
+            AND NOT(relkind='i' AND oid IN(SELECT i.indexrelid FROM pg_index i JOIN pg_class scope ON scope.reltoastrelid=i.indrelid
+             WHERE scope.oid=to_regclass('creator.content_privacy_export_scope') AND i.indisunique AND i.indisvalid AND i.indisready
+              AND i.indkey='1 2'::int2vector AND i.indnatts=2 AND i.indnkeyatts=2 AND i.indpred IS NULL AND i.indexprs IS NULL
+              AND (SELECT count(*) FROM pg_index WHERE indrelid=scope.reltoastrelid)=1)))
            AND NOT EXISTS(SELECT FROM pg_type WHERE typowner=$1::regrole AND typrelid<>to_regclass('creator.content_privacy_export_scope') AND oid<>(SELECT typarray FROM pg_type WHERE typrelid=to_regclass('creator.content_privacy_export_scope')))
            AND NOT EXISTS(SELECT FROM pg_class r JOIN pg_namespace n ON n.oid=r.relnamespace WHERE r.relkind IN('r','p','v','m','S','f') AND n.nspname NOT IN('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_toast%' AND r.relowner<>$1::regrole AND (has_table_privilege($1,r.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') OR CASE WHEN r.relkind='S' THEN has_sequence_privilege($1,r.oid,'USAGE,SELECT,UPDATE') ELSE false END))
            AND EXISTS(SELECT FROM pg_class WHERE oid=to_regclass('creator.content_privacy_export_scope') AND relowner=$1::regrole AND relkind='r' AND relrowsecurity AND relforcerowsecurity)
            AND (SELECT count(*) FROM pg_trigger WHERE tgrelid=to_regclass('creator.content_privacy_export_scope') AND NOT tgisinternal)=1
-           AND EXISTS(SELECT FROM pg_trigger WHERE tgrelid=to_regclass('creator.content_privacy_export_scope') AND tgname='content_privacy_export_commit_current' AND tgfoid=to_regprocedure('creator.finish_content_privacy_export_scope()') AND tgdeferrable AND tginitdeferred AND tgenabled='O' AND tgtype=5)
+           AND EXISTS(SELECT FROM pg_trigger WHERE tgrelid=to_regclass('creator.content_privacy_export_scope') AND tgname='content_privacy_export_commit_current' AND tgfoid=to_regprocedure('creator.finish_content_privacy_export_scope()') AND tgdeferrable AND tginitdeferred AND tgenabled='O' AND tgtype=5
+            AND NOT tgisinternal AND tgnargs=0 AND octet_length(tgargs)=0 AND tgqual IS NULL AND tgattr=''::int2vector
+            AND tgconstrrelid=0 AND tgconstrindid=0
+            AND pg_get_triggerdef(oid,false)='CREATE CONSTRAINT TRIGGER content_privacy_export_commit_current AFTER INSERT ON creator.content_privacy_export_scope DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION creator.finish_content_privacy_export_scope()')
            AND (SELECT count(*) FROM pg_constraint WHERE conrelid=to_regclass('creator.content_privacy_export_scope') AND contype<>'t')=1
-           AND EXISTS(SELECT FROM pg_constraint WHERE conrelid=to_regclass('creator.content_privacy_export_scope') AND contype='p' AND pg_get_constraintdef(oid)='PRIMARY KEY (pid, xid)') AS valid`,
+           AND EXISTS(SELECT FROM pg_constraint k JOIN pg_index i ON i.indexrelid=k.conindid
+            JOIN pg_class idx ON idx.oid=i.indexrelid JOIN pg_am am ON am.oid=idx.relam
+            WHERE k.conrelid=to_regclass('creator.content_privacy_export_scope') AND k.contype='p'
+             AND pg_get_constraintdef(k.oid)='PRIMARY KEY (pid, xid)'
+             AND i.indrelid=k.conrelid AND i.indisprimary AND i.indisunique AND i.indisvalid AND i.indisready
+             AND i.indimmediate AND i.indnatts=2 AND i.indnkeyatts=2 AND i.indkey='1 2'::int2vector
+             AND i.indpred IS NULL AND i.indexprs IS NULL AND idx.relowner=$1::regrole AND am.amname='btree') AS valid`,
           [purpose],
         )
       ).rows[0];
