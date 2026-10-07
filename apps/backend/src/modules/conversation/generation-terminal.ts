@@ -4,6 +4,7 @@ import { z } from "zod";
 import { FrameSchema, type Frame } from "@qelvora/api";
 import { canonical, contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
+import { generationHostDatabase } from "../identity/generation-host-database.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
 import {
   GenerationIdentityAuthority,
@@ -140,6 +141,7 @@ export class PreparedGenerationConversationTerminal {
     consumer: GenerationTerminalPurposeConsumer;
     /** Independently reviewed effective columns, tables, policies and schemas. */
     catalogueChecksum: string;
+    signal?: AbortSignal;
   }): Promise<PreparedGenerationConversationTerminal> {
     invariant(
       input.identity instanceof GenerationIdentityAuthority &&
@@ -198,7 +200,11 @@ export class PreparedGenerationConversationTerminal {
         "generation_finalization_pool_mismatch",
         "Use bounded original non-pipelined host and worker pools.",
       );
-    const signal = AbortSignal.timeout(15_000);
+    const signal = AbortSignal.any([
+      ...(input.signal ? [input.signal] : []),
+      AbortSignal.timeout(15_000),
+    ]);
+    const hostDatabase = await generationHostDatabase(input.hostPool, signal);
     const client = await input.workerPool.connect();
     let discardClient = true;
     let failed = false;
@@ -247,13 +253,6 @@ export class PreparedGenerationConversationTerminal {
          set_config('app.creator_id','',true),set_config('app.fan_id','',true),
          set_config('generation.scope_nonce','',true),set_config('generation.terminal_nonce','',true)`),
       );
-      const hostDatabase = (
-        await input.hostPool.query<{ databaseOid: number }>(
-          bounded(
-            'SELECT oid AS "databaseOid" FROM pg_database WHERE datname=current_database()',
-          ),
-        )
-      ).rows[0];
       const workerDatabase = (
         await client.query<{ databaseOid: number }>(
           bounded(
@@ -265,7 +264,7 @@ export class PreparedGenerationConversationTerminal {
         workerDatabase !== undefined &&
           Number.isSafeInteger(workerDatabase.databaseOid) &&
           workerDatabase.databaseOid > 0 &&
-          hostDatabase?.databaseOid === workerDatabase.databaseOid,
+          hostDatabase.oid === workerDatabase.databaseOid,
         "generation_finalization_pool_mismatch",
         "Use the same actual canonical database.",
       );

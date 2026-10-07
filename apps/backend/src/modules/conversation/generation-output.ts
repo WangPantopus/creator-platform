@@ -4,6 +4,7 @@ import { z } from "zod";
 import { FrameSchema, type Frame } from "@qelvora/api";
 import { canonical, contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
+import { generationHostDatabase } from "../identity/generation-host-database.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
 import {
   GenerationIdentityAuthority,
@@ -240,6 +241,7 @@ export class PreparedGenerationConversationOutput {
     consumer: GenerationPurposeConsumer;
     /** Reviewed outside this database, not a current readback accepted as approval. */
     catalogueChecksum: string;
+    signal?: AbortSignal;
   }): Promise<PreparedGenerationConversationOutput> {
     if (
       !(input.identity instanceof GenerationIdentityAuthority) ||
@@ -285,6 +287,10 @@ export class PreparedGenerationConversationOutput {
         catalogueChecksum: input.catalogueChecksum,
       }),
     );
+    const hostDatabase = await generationHostDatabase(
+      input.hostPool,
+      input.signal,
+    );
     const client = await input.workerPool.connect();
     let started = false;
     let discard = true;
@@ -298,6 +304,7 @@ export class PreparedGenerationConversationOutput {
     };
     client.on("error", onError);
     try {
+      input.signal?.throwIfAborted();
       await client.query("BEGIN ISOLATION LEVEL READ COMMITTED READ ONLY");
       started = true;
       discard = false;
@@ -306,11 +313,6 @@ export class PreparedGenerationConversationOutput {
        set_config('app.account_id','',true),set_config('app.identity_session_id','',true),
        set_config('app.creator_id','',true),set_config('app.fan_id','',true),
        set_config('generation.scope_nonce','',true),set_config('generation.terminal_nonce','',true)`);
-      const hostDatabase = (
-        await input.hostPool.query<{ databaseOid: number }>(
-          'SELECT oid AS "databaseOid" FROM pg_database WHERE datname=current_database()',
-        )
-      ).rows[0];
       const workerDatabase = (
         await client.query<{ databaseOid: number }>(
           'SELECT oid AS "databaseOid" FROM pg_database WHERE datname=current_database()',
@@ -320,11 +322,12 @@ export class PreparedGenerationConversationOutput {
         workerDatabase &&
           Number.isInteger(workerDatabase.databaseOid) &&
           workerDatabase.databaseOid > 0 &&
-          hostDatabase?.databaseOid === workerDatabase.databaseOid,
+          hostDatabase.oid === workerDatabase.databaseOid,
         "generation_output_pool_mismatch",
         "Use the same actual canonical database.",
       );
       await prepared.assertCustody(client);
+      input.signal?.throwIfAborted();
     } catch (error) {
       failed = true;
       failure = error;

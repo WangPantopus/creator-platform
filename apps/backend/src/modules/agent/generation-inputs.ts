@@ -9,6 +9,7 @@ import {
 import { canonical, contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import { PreparedContentGenerationOrigins } from "../content/generation-origin.js";
+import { generationHostDatabase } from "../identity/generation-host-database.js";
 import {
   GenerationIdentityAuthority,
   type GenerationPurposeConsumer,
@@ -134,6 +135,7 @@ export class PreparedGenerationAgentInputs {
     /** Independently reviewed effective permissions and RLS catalogue. */
     catalogueChecksum: string;
     origins?: PreparedContentGenerationOrigins;
+    signal?: AbortSignal;
   }): Promise<PreparedGenerationAgentInputs> {
     invariant(
       input.identity instanceof GenerationIdentityAuthority &&
@@ -198,7 +200,13 @@ export class PreparedGenerationAgentInputs {
       ]),
     });
     try {
-      await assertGenerationConsumerCustody(input.workerPool, custody);
+      input.signal?.throwIfAborted();
+      await assertGenerationConsumerCustody(
+        input.workerPool,
+        custody,
+        input.signal,
+      );
+      input.signal?.throwIfAborted();
       const installed = (
         await input.workerPool.query<{
           ready: boolean;
@@ -225,18 +233,14 @@ export class PreparedGenerationAgentInputs {
           ],
         )
       ).rows[0];
-      const canonicalDatabase = (
-        await input.service.repository.pool.query<{
-          database: string;
-          database_oid: number;
-        }>(
-          "SELECT current_database() AS database,(SELECT oid FROM pg_database WHERE datname=current_database()) AS database_oid",
-        )
-      ).rows[0];
+      const canonicalDatabase = await generationHostDatabase(
+        input.service.repository.pool,
+        input.signal,
+      );
       if (
         installed?.ready !== true ||
         installed.database !== canonicalDatabase?.database ||
-        installed.database_oid !== canonicalDatabase.database_oid ||
+        installed.database_oid !== canonicalDatabase.oid ||
         createHash("sha256").update(installed.definition).digest("hex") !==
           receipt.definitionChecksum
       )

@@ -12,6 +12,7 @@ import {
   type GenerationTaskScope,
 } from "../identity/generation-scope.js";
 import { assertGenerationPoolCustody } from "../identity/generation-transaction.js";
+import { generationHostDatabase } from "../identity/generation-host-database.js";
 
 export const GENERATION_AUDIENCE_MIGRATION =
   "0182_w4_generation_allowance_audience";
@@ -250,6 +251,7 @@ export class CommerceGenerationAudience {
      * Neither a caller JSON audience nor a self-approved catalog hash is used.
      */
     consumer: GenerationPurposeConsumer;
+    signal?: AbortSignal;
   }): Promise<CommerceGenerationAudience> {
     invariant(
       input.identity instanceof GenerationIdentityAuthority &&
@@ -288,16 +290,14 @@ export class CommerceGenerationAudience {
       "Use the exact reviewed W4 generation audience consumer.",
     );
     input.identity.assertConsumerRegistered(receipt);
-    const hostDatabase = (
-      await input.database.pool.query<{ name: string; oid: number }>(
-        "SELECT current_database() AS name,(SELECT oid FROM pg_database WHERE datname=current_database()) AS oid",
-      )
-    ).rows[0];
-    if (!hostDatabase) throw unavailable();
+    const hostDatabase = await generationHostDatabase(
+      input.database.pool,
+      input.signal,
+    );
     const audience = new CommerceGenerationAudience(
       input.identity,
       receipt,
-      Object.freeze(hostDatabase),
+      Object.freeze({ name: hostDatabase.database, oid: hostDatabase.oid }),
       input.database.pool,
     );
     const client = await input.workerPool.connect();
@@ -305,7 +305,9 @@ export class CommerceGenerationAudience {
     const sourceError = (error: Error) => transportFailures.push(error);
     client.on("error", sourceError);
     try {
+      input.signal?.throwIfAborted();
       await audience.assertCatalog(client);
+      input.signal?.throwIfAborted();
       if (transportFailures.length)
         throw new AggregateError(
           transportFailures,

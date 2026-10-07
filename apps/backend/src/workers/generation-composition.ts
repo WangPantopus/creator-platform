@@ -140,6 +140,7 @@ export async function prepareGenerationWorker(input: {
     workerPool: input.workerPool,
     hostPool,
     service: input.service,
+    signal: input.signal,
   };
   input.signal?.throwIfAborted();
   const origins = await PreparedContentGenerationOrigins.prepare({
