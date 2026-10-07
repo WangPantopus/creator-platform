@@ -60,7 +60,7 @@ export const FULFILLMENT_PUBLICATION_ORIGINAL_CATALOGUE_QUERY = `WITH roles AS (
   'grants',(SELECT jsonb_agg(jsonb_build_object('role',CASE WHEN g.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(g.grantee) END,
    'grantor',pg_get_userbyid(g.grantor),'privilege',g.privilege_type,'grantable',g.is_grantable)
    ORDER BY CASE WHEN g.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(g.grantee) END COLLATE "C",g.privilege_type)
-   FROM aclexplode(coalesce(o.relacl,CASE WHEN o.relkind='S' THEN acldefault('S',o.relowner) ELSE acldefault('r',o.relowner) END)) g),
+   FROM aclexplode(coalesce(o.relacl,CASE WHEN o.relkind='S' THEN acldefault('s',o.relowner) ELSE acldefault('r',o.relowner) END)) g),
   'policies',(SELECT jsonb_agg(jsonb_build_object('name',p.polname,'command',p.polcmd,'permissive',p.polpermissive,
    'roles',ARRAY(SELECT CASE WHEN r=0 THEN 'PUBLIC' ELSE pg_get_userbyid(r) END FROM unnest(p.polroles) r
     ORDER BY CASE WHEN r=0 THEN 'PUBLIC' ELSE pg_get_userbyid(r) END COLLATE "C"),

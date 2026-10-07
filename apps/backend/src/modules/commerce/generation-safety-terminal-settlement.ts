@@ -241,12 +241,38 @@ export class CommerceGenerationSafetyTerminalSettlement {
       );
     return settlement;
   }
-  private async assertCatalogue(client: PoolClient) {
-    await assertGenerationSafetyTerminalCatalogue(client);
-    await assertOriginalCostCustody(client);
+  /** Keep W1's exact live terminal cancellation context. The complete owner
+   * operation settles before the following check; this grants no authority. */
+  private async withOriginalSignal<T>(
+    client: PoolClient,
+    scope: GenerationTerminalScope | undefined,
+    operation: () => Promise<T>,
+  ): Promise<T> {
+    if (scope)
+      this.configuration.terminal
+        .originalSignalInTransaction(scope, client)
+        ?.throwIfAborted();
+    const value = await operation();
+    if (scope)
+      this.configuration.terminal
+        .originalSignalInTransaction(scope, client)
+        ?.throwIfAborted();
+    return value;
+  }
+  private async assertCatalogue(
+    client: PoolClient,
+    scope?: GenerationTerminalScope,
+  ) {
+    await this.withOriginalSignal(client, scope, () =>
+      assertGenerationSafetyTerminalCatalogue(client),
+    );
+    await this.withOriginalSignal(client, scope, () =>
+      assertOriginalCostCustody(client),
+    );
     const ready = (
-      await client.query<{ ready: boolean }>(
-        `SELECT session_user='creator_generation_worker' AND current_user=session_user
+      await this.withOriginalSignal(client, scope, () =>
+        client.query<{ ready: boolean }>(
+          `SELECT session_user='creator_generation_worker' AND current_user=session_user
    AND EXISTS(SELECT FROM creator.schema_migration WHERE version=$2 AND checksum=$3)
    AND NOT has_function_privilege(session_user,to_regprocedure('creator.generation_settle_original_allowance(uuid,uuid)'),'EXECUTE')
    AND NOT has_function_privilege(session_user,to_regprocedure('creator.generation_original_allowance_receipt(uuid,uuid)'),'EXECUTE')
@@ -271,18 +297,20 @@ export class CommerceGenerationSafetyTerminalSettlement {
    AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
     WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema' AND c.relkind IN('r','p','v','m','f')
      AND CASE WHEN c.relkind IN('r','p','v','m','f') THEN has_table_privilege($1,c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') ELSE false END) AS ready`,
-        [
-          Owner,
-          GENERATION_SAFETY_TERMINAL_MIGRATION,
-          GENERATION_SAFETY_TERMINAL_SCHEMA_SHA256,
-        ],
+          [
+            Owner,
+            GENERATION_SAFETY_TERMINAL_MIGRATION,
+            GENERATION_SAFETY_TERMINAL_SCHEMA_SHA256,
+          ],
+        ),
       )
     ).rows[0]?.ready;
     if (ready !== true) this.unavailable();
     for (const r of this.configuration.consumers) {
       const fn = (
-        await client.query<{ ready: boolean; definition: string }>(
-          `SELECT p.prosecdef AND p.provolatile='v'
+        await this.withOriginalSignal(client, scope, () =>
+          client.query<{ ready: boolean; definition: string }>(
+            `SELECT p.prosecdef AND p.provolatile='v'
     AND p.prokind='f' AND p.prorettype='jsonb'::regtype AND p.proconfig=ARRAY['search_path=pg_catalog']
     AND pg_get_userbyid(p.proowner)=$2 AND has_function_privilege(session_user,p.oid,'EXECUTE')
     AND NOT EXISTS(SELECT FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a
@@ -290,7 +318,8 @@ export class CommerceGenerationSafetyTerminalSettlement {
       OR recipient.rolname IS NULL OR recipient.rolname NOT IN($2,'creator_generation_worker')
       OR (a.grantee<>p.proowner AND a.is_grantable)) AS ready,pg_get_functiondef(p.oid) AS definition
     FROM pg_proc p WHERE p.oid=to_regprocedure($1)`,
-          [r.signature, Owner],
+            [r.signature, Owner],
+          ),
         )
       ).rows[0];
       if (
@@ -301,7 +330,9 @@ export class CommerceGenerationSafetyTerminalSettlement {
         this.unavailable();
     }
     // Use this held client's exact catalogue, not an outside transaction's read.
-    const catalogue = await generationSafetyTerminalPurposeCatalogue(client);
+    const catalogue = await this.withOriginalSignal(client, scope, () =>
+      generationSafetyTerminalPurposeCatalogue(client),
+    );
     if (contentHash(catalogue) !== this.configuration.catalogueChecksum)
       this.unavailable();
   }
@@ -347,32 +378,31 @@ export class CommerceGenerationSafetyTerminalSettlement {
       this.configuration.hostPool,
       this.configuration.access,
     );
-    await this.configuration.terminal.authorizeInTransaction(
-      scope,
-      client,
-      true,
+    await this.withOriginalSignal(client, scope, () =>
+      this.configuration.terminal.authorizeInTransaction(scope, client, true),
     );
-    await this.assertCatalogue(client);
-    const journal = await this.configuration.journal.sealInTransaction(
-      client,
-      scope,
+    await this.assertCatalogue(client, scope);
+    const journal = await this.withOriginalSignal(client, scope, () =>
+      this.configuration.journal.sealInTransaction(client, scope),
     );
     const raw = (
-      await client.query<{ receipt: unknown }>(
-        "SELECT creator.generation_settle_typed_original_allowance($1,$2) AS receipt",
-        [scope.generationId, scope.custodyToken],
+      await this.withOriginalSignal(client, scope, () =>
+        client.query<{ receipt: unknown }>(
+          "SELECT creator.generation_settle_typed_original_allowance($1,$2) AS receipt",
+          [scope.generationId, scope.custodyToken],
+        ),
       )
     ).rows[0]?.receipt;
     const receipt = this.verify(scope, journal, raw);
-    await this.configuration.journal.assertCurrentInTransaction(
-      client,
-      scope,
-      journal,
+    await this.withOriginalSignal(client, scope, () =>
+      this.configuration.journal.assertCurrentInTransaction(
+        client,
+        scope,
+        journal,
+      ),
     );
-    await this.configuration.terminal.authorizeInTransaction(
-      scope,
-      client,
-      true,
+    await this.withOriginalSignal(client, scope, () =>
+      this.configuration.terminal.authorizeInTransaction(scope, client, true),
     );
     this.issued.set(scope, { client, journal, receipt });
     return receipt;
@@ -389,21 +419,23 @@ export class CommerceGenerationSafetyTerminalSettlement {
       "generation_terminal_allowance_required",
       "This actual held terminal has no original financial disposition.",
     );
-    await this.configuration.terminal.authorizeInTransaction(
-      scope,
-      client,
-      true,
+    await this.withOriginalSignal(client, scope, () =>
+      this.configuration.terminal.authorizeInTransaction(scope, client, true),
     );
-    await this.configuration.journal.assertCurrentInTransaction(
-      client,
-      scope,
-      binding.journal,
+    await this.withOriginalSignal(client, scope, () =>
+      this.configuration.journal.assertCurrentInTransaction(
+        client,
+        scope,
+        binding.journal,
+      ),
     );
-    await this.assertCatalogue(client);
+    await this.assertCatalogue(client, scope);
     const raw = (
-      await client.query<{ receipt: unknown }>(
-        "SELECT creator.generation_typed_original_allowance_receipt($1,$2) AS receipt",
-        [scope.generationId, scope.custodyToken],
+      await this.withOriginalSignal(client, scope, () =>
+        client.query<{ receipt: unknown }>(
+          "SELECT creator.generation_typed_original_allowance_receipt($1,$2) AS receipt",
+          [scope.generationId, scope.custodyToken],
+        ),
       )
     ).rows[0]?.receipt;
     const current = this.verify(scope, binding.journal, raw);
@@ -412,10 +444,8 @@ export class CommerceGenerationSafetyTerminalSettlement {
       "generation_terminal_allowance_changed",
       "Original financial disposition changed before terminal COMMIT.",
     );
-    await this.configuration.terminal.authorizeInTransaction(
-      scope,
-      client,
-      true,
+    await this.withOriginalSignal(client, scope, () =>
+      this.configuration.terminal.authorizeInTransaction(scope, client, true),
     );
   }
 }
