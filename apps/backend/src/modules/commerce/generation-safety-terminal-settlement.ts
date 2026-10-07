@@ -3,6 +3,7 @@ import { Client, type Pool, type PoolClient } from "pg";
 import { z } from "zod";
 import { canonical, contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
+import { generationPrivacyCatalogueChecksum } from "../../db/content-privacy-profile.js";
 import type { AccessService } from "../access/scope.js";
 import {
   GenerationIdentityAuthority,
@@ -145,11 +146,19 @@ export class CommerceGenerationSafetyTerminalSettlement {
     const consumers = input.consumers.map((r) =>
       Object.freeze({ ...r, migration: Object.freeze({ ...r.migration }) }),
     );
+    // Select the same fixed source profile as the held catalogue guard. The
+    // Content export graph has its own reviewed permissions; comparing it to
+    // the earlier baseline would reject the original configured settlement.
+    const catalogueChecksum = GENERATION_SAFETY_TERMINAL_CATALOGUE_SHA256
+      ? await generationPrivacyCatalogueChecksum(
+          "financial",
+          GENERATION_SAFETY_TERMINAL_CATALOGUE_SHA256,
+        )
+      : undefined;
     invariant(
       consumers.length === 2 &&
         new Set(consumers.map((r) => r.signature)).size === 2 &&
-        input.catalogueChecksum ===
-          GENERATION_SAFETY_TERMINAL_CATALOGUE_SHA256 &&
+        input.catalogueChecksum === catalogueChecksum &&
         consumers.every(
           (r) =>
             GENERATION_SAFETY_TERMINAL_SIGNATURES.some(

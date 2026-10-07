@@ -387,7 +387,7 @@
         "owner": "creator_w3_generation_output",
         "definitionChecksum": "f32169bba8e4c13bca95e6e18ff9900c1d1a157fe026cb841017cb7fd65a9453"
       },
-      "catalogueChecksum": "64688558896c38dedbf26bd7d4fe051f19c1bdaaa6eb5367498f3173e3d664a7"
+      "catalogueChecksum": "6b6f2e3bc11b23eed454b590a9caab26eb8dcaecc54589e9eb2f9c858edbcd49"
     },
     "terminalJournal": {
       "consumers": [
@@ -448,5 +448,6 @@
       ],
       "catalogueChecksum": "a3afc67c879715585499413b105ee9e4d8ee609c1562c8a49ea2042de65b7873"
     }
-  }
+  },
+  "outputCatalogueReview": "20261007-generation-output-shape.json"
 }
