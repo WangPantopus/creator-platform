@@ -350,15 +350,20 @@ async function assertGenerationCatalogue(
     )
   ).rows[0]?.ready;
   if (ready !== true) throw new Error("Generation authority is not reviewed");
-  for (const consumer of consumers) {
-    const proof = (
-      await query.query<{ ready: boolean; definition: string }>(
-        `SELECT
+  // Read every expected executable in one current statement. No receipt is
+  // cached and every authorization bookend still checks the full catalogue.
+  const proofs = (
+    await query.query<{
+      signature: string;
+      ready: boolean;
+      definition: string;
+    }>(
+      `SELECT c.signature,
          session_user='creator_generation_worker' AND current_user=session_user
-         AND EXISTS(SELECT FROM creator.schema_migration WHERE version=$2 AND checksum=$3)
+         AND EXISTS(SELECT FROM creator.schema_migration WHERE version=c.version AND checksum=c.checksum)
          AND p.prokind='f' AND p.prosecdef AND p.provolatile IN('s','v')
          AND l.lanname IN('sql','plpgsql') AND p.proconfig=ARRAY['search_path=pg_catalog']
-         AND pg_get_userbyid(p.proowner)=$4
+         AND pg_get_userbyid(p.proowner)=c.owner
          AND NOT r.rolcanlogin AND NOT r.rolsuper AND NOT r.rolbypassrls AND NOT r.rolinherit
          AND NOT r.rolcreatedb AND NOT r.rolcreaterole AND NOT r.rolreplication
          AND (r.rolconfig IS NULL OR cardinality(r.rolconfig)=0)
@@ -370,34 +375,47 @@ async function assertGenerationCatalogue(
          AND EXISTS(SELECT FROM aclexplode(p.proacl) a JOIN pg_roles worker ON worker.oid=a.grantee
           WHERE worker.rolname=session_user AND a.privilege_type='EXECUTE' AND NOT a.is_grantable)
          AND has_function_privilege(current_user,p.oid,'EXECUTE')
-         AND has_function_privilege($4,to_regprocedure($5),'EXECUTE')
-         AND has_function_privilege($4,
-          to_regprocedure('creator.generation_scope_matches(uuid,uuid)'),'EXECUTE')=$6::boolean
-         AND ($7::boolean IS NULL OR has_function_privilege($4,
-          to_regprocedure('creator.generation_terminal_matches(uuid,uuid,boolean)'),'EXECUTE')=$7::boolean)
+         AND has_function_privilege(c.owner,to_regprocedure(c.dependency),'EXECUTE')
+         AND has_function_privilege(c.owner,
+          to_regprocedure('creator.generation_scope_matches(uuid,uuid)'),'EXECUTE')=c.original_scope_bridge::boolean
+         AND (c.terminal_match::boolean IS NULL OR has_function_privilege(c.owner,
+          to_regprocedure('creator.generation_terminal_matches(uuid,uuid,boolean)'),'EXECUTE')=c.terminal_match::boolean)
          AS ready,pg_get_functiondef(p.oid) AS definition
-         FROM pg_proc p JOIN pg_roles r ON r.oid=p.proowner JOIN pg_language l ON l.oid=p.prolang
-         WHERE p.oid=to_regprocedure($1)`,
-        [
-          consumer.signature,
-          consumer.migration.version,
-          consumer.migration.checksum,
-          consumer.owner,
-          "purpose" in consumer
-            ? consumer.owner === "creator_generation_terminal_discovery"
-              ? "creator.pending_generation_terminals(integer)"
-              : "creator.generation_terminal_matches(uuid,uuid,boolean)"
-            : "creator.generation_scope_matches(uuid,uuid)",
-          !("purpose" in consumer) ||
-            terminalContracts.find(
-              (contract) => contract.owner === consumer.owner,
-            )?.originalScopeBridge === true,
-          consumer.owner === "creator_generation_terminal_discovery"
-            ? false
-            : null,
-        ],
-      )
-    ).rows[0];
+         FROM jsonb_to_recordset($1::jsonb) AS c(signature text,version text,checksum text,
+          owner text,dependency text,original_scope_bridge boolean,terminal_match boolean)
+         JOIN pg_proc p ON p.oid=to_regprocedure(c.signature)
+         JOIN pg_roles r ON r.oid=p.proowner JOIN pg_language l ON l.oid=p.prolang`,
+      [
+        JSON.stringify(
+          consumers.map((consumer) => ({
+            signature: consumer.signature,
+            version: consumer.migration.version,
+            checksum: consumer.migration.checksum,
+            owner: consumer.owner,
+            dependency:
+              "purpose" in consumer
+                ? consumer.owner === "creator_generation_terminal_discovery"
+                  ? "creator.pending_generation_terminals(integer)"
+                  : "creator.generation_terminal_matches(uuid,uuid,boolean)"
+                : "creator.generation_scope_matches(uuid,uuid)",
+            original_scope_bridge:
+              !("purpose" in consumer) ||
+              terminalContracts.find(
+                (contract) => contract.owner === consumer.owner,
+              )?.originalScopeBridge === true,
+            terminal_match:
+              consumer.owner === "creator_generation_terminal_discovery"
+                ? false
+                : null,
+          })),
+        ),
+      ],
+    )
+  ).rows;
+  if (proofs.length !== consumers.length)
+    throw new Error("Generation consumer executable differs from its review");
+  for (const consumer of consumers) {
+    const proof = proofs.find((row) => row.signature === consumer.signature);
     if (
       proof?.ready !== true ||
       createHash("sha256").update(proof.definition).digest("hex") !==
