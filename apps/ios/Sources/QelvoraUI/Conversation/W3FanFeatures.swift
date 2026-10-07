@@ -594,16 +594,18 @@ private struct W3AccountScreen: View {
     }
     private func refresh(before: String? = nil) async {
         conceal()
-        guard scenePhase == .active else { return }
+        guard scenePhase == .active, let originalSessionId = session.session?.sessionId else { return }
+        let originalDestination = session.destination
+        let commerceClient = CommerceClient(model: session, accountId: accountId, sessionId: originalSessionId, destination: originalDestination)
         let currentRevision = revision
         loading = true; cursor = before; failure = ""
         defer { if revision == currentRevision { loading = false } }
         do {
             let fresh: W3Account = try await W3ConversationClient(baseURL:baseURL, expectedAccountId: accountId).request("account" + (before.map { "?cursor=" + $0 } ?? ""))
-            guard !Task.isCancelled, revision == currentRevision, scenePhase == .active, session.session?.accountId == accountId else { return }
+            guard !Task.isCancelled, revision == currentRevision, scenePhase == .active, session.session?.accountId == accountId, session.session?.sessionId == originalSessionId, session.destination == originalDestination else { return }
             account = fresh; cursor = before
-            let overview: CommerceOverview? = try? await CommerceClient(baseURL: baseURL, accountId: accountId).request("overview")
-            guard !Task.isCancelled, revision == currentRevision, scenePhase == .active, session.session?.accountId == accountId else { return }
+            let overview: CommerceOverview? = try? await commerceClient.request("overview")
+            guard !Task.isCancelled, revision == currentRevision, scenePhase == .active, session.session?.accountId == accountId, session.session?.sessionId == originalSessionId, session.destination == originalDestination else { return }
             if let overview, overview.fan?.id == fresh.fan.id { commerce = overview }
         } catch {
             if !Task.isCancelled, revision == currentRevision, scenePhase == .active { failure = (error as? W3Failure)?.message ?? "Reconnect to open You." }
