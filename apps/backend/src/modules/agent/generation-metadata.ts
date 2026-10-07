@@ -199,6 +199,26 @@ export class PreparedGenerationAgentMetadata {
     return value;
   }
 
+  /** Reuse the licensed facts already issued by this metadata read on the
+   * same genuine held purpose. Revalidate the original object before release;
+   * another client, copied metadata or a later purpose cannot reuse it. */
+  async factsInTransaction(
+    client: PoolClient,
+    scope: GenerationTaskScope,
+    value: GenerationAgentMetadata,
+  ): Promise<GenerationAgentFacts> {
+    const binding = this.issued.get(value);
+    invariant(
+      binding?.client === client &&
+        binding.scope === scope &&
+        binding.hash === contentHash(value),
+      "generation_metadata_required",
+      "Use the original metadata issued for this held client and purpose.",
+    );
+    await this.inputs.authorizeInTransaction(binding.facts, scope, client);
+    return binding.facts;
+  }
+
   async assertCurrentInTransaction(
     client: PoolClient,
     scope: GenerationTaskScope,

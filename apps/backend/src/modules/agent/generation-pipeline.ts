@@ -243,8 +243,12 @@ export class PreparedGenerationPipeline {
     );
     await this.identity.authorizeInTransaction(scope, client);
     const conversation = await this.context.currentInTransaction(client, scope);
-    const facts = await this.inputs.currentInTransaction(client, scope);
     const metadata = await this.metadata.currentInTransaction(client, scope);
+    const facts = await this.metadata.factsInTransaction(
+      client,
+      scope,
+      metadata,
+    );
     invariant(
       conversation.snapshot.revision ===
         scope.contextRevision + scope.lastSequence &&
@@ -434,10 +438,14 @@ export class PreparedGenerationPipeline {
             "generation_partial_output_terminal_required",
             "Seal the original partial output as interrupted before accepting another model run.",
           );
-          const facts = await this.inputs.currentInTransaction(client, scope);
           const metadata = await this.metadata.currentInTransaction(
             client,
             scope,
+          );
+          const facts = await this.metadata.factsInTransaction(
+            client,
+            scope,
+            metadata,
           );
           const attempt = await this.accounting.beginInTransaction(
             client,

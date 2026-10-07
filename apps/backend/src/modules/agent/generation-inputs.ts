@@ -359,8 +359,9 @@ export class PreparedGenerationAgentInputs {
         "license_expired",
         "Current generation-purpose licence authority is required.",
       );
-      signal?.throwIfAborted();
-      await this.authorizeInTransaction(facts, scope, client);
+      // currentGenerationLicense finishes with this exact facts/client/scope
+      // authorization after the verifier returns. No intervening operation
+      // occurs before handing the same immutable facts back to the caller.
       signal?.throwIfAborted();
       return facts;
     } catch (error) {

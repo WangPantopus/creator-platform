@@ -30,7 +30,13 @@ export async function generationConsumerCatalogue(
   // catalogue shape, inherited/table-wide grants and every relation/policy.
   const relations = (
     await query(
-      `SELECT n.nspname AS schema,c.relname AS relation,c.relkind,pg_get_userbyid(c.relowner) AS owner,
+      `WITH policies AS MATERIALIZED (
+        SELECT p.polrelid,jsonb_agg(jsonb_build_object('name',p.polname,'command',p.polcmd,'permissive',p.polpermissive,
+         'roles',ARRAY(SELECT CASE WHEN r=0 THEN 'PUBLIC' ELSE pg_get_userbyid(r) END FROM unnest(p.polroles) r ORDER BY r),
+         'using',pg_get_expr(p.polqual,p.polrelid),'check',pg_get_expr(p.polwithcheck,p.polrelid)) ORDER BY p.polname) AS entries
+        FROM pg_policy p WHERE 0=ANY(p.polroles) OR (SELECT oid FROM pg_roles WHERE rolname=$1)=ANY(p.polroles)
+        GROUP BY p.polrelid
+       ) SELECT n.nspname AS schema,c.relname AS relation,c.relkind,pg_get_userbyid(c.relowner) AS owner,
        c.relrowsecurity,c.relforcerowsecurity,
        ARRAY(SELECT privilege FROM unnest(ARRAY['SELECT','INSERT','UPDATE','DELETE','TRUNCATE','REFERENCES','TRIGGER']) privilege
         WHERE CASE WHEN c.relkind IN('r','p','v','m','f') THEN has_table_privilege($1,c.oid,privilege) ELSE false END ORDER BY privilege) AS table_privileges,
@@ -42,11 +48,9 @@ export async function generationConsumerCatalogue(
         FROM pg_attribute a CROSS JOIN unnest(ARRAY['SELECT','INSERT','UPDATE','REFERENCES']) privilege
         WHERE a.attrelid=c.oid AND a.attnum>0 AND NOT a.attisdropped
          AND CASE WHEN c.relkind IN('r','p','v','m','f') THEN has_column_privilege($1,c.oid,a.attnum,privilege) ELSE false END),'[]'::jsonb) ELSE '[]'::jsonb END AS columns,
-       coalesce((SELECT jsonb_agg(jsonb_build_object('name',p.polname,'command',p.polcmd,'permissive',p.polpermissive,
-         'roles',ARRAY(SELECT CASE WHEN r=0 THEN 'PUBLIC' ELSE pg_get_userbyid(r) END FROM unnest(p.polroles) r ORDER BY r),
-         'using',pg_get_expr(p.polqual,p.polrelid),'check',pg_get_expr(p.polwithcheck,p.polrelid)) ORDER BY p.polname)
-        FROM pg_policy p WHERE p.polrelid=c.oid AND (0=ANY(p.polroles) OR (SELECT oid FROM pg_roles WHERE rolname=$1)=ANY(p.polroles))),'[]'::jsonb) AS policies
+       coalesce(policies.entries,'[]'::jsonb) AS policies
        FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+       LEFT JOIN policies ON policies.polrelid=c.oid
        WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
        ORDER BY n.nspname,c.relname,c.relkind`,
       [role],
