@@ -1,0 +1,193 @@
+{
+  "recordedAt": "2026-10-07T22:52:48.714407+00:00",
+  "implementation": "1e883f20d4e3b92a916e51c2dec13231e7b80b7f",
+  "scope": "Actual original complete worker preparation and empty discovery/execution/abort drain only. No accepted task, provider call, output or terminal settlement claimed. Canonical generation admission stays disabled.",
+  "operations": [
+    {
+      "privateFile": "generation-preparation-source-1791412973462.json",
+      "sha256": "72f32ba0a00cbe070257579d37788dbaa27422e13a4fa87cd77dafd614857aad",
+      "revision": "f7bcb3040d6e3c1de308aedf18bf9dacbff89331",
+      "checks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "generation_disabled",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused"
+      ],
+      "failure": [
+        "generation_output_unconfigured",
+        "generation_output_unconfigured",
+        "generation_output_unconfigured"
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "revisionNote": "Original operator release label predates the in-progress repair; treat earlier failed/metadata attempts as diagnostic only."
+    },
+    {
+      "privateFile": "generation-preparation-source-1791413250210.json",
+      "sha256": "d506c66e0ded18a2976f83b5682ec1693ae522e85cc2fe14a279fc4c09569c0c",
+      "revision": "f7bcb3040d6e3c1de308aedf18bf9dacbff89331",
+      "checks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "generation_disabled",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused"
+      ],
+      "failure": ["generation_terminal_allowance_unconfigured"],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "revisionNote": "Original operator release label predates the in-progress repair; treat earlier failed/metadata attempts as diagnostic only."
+    },
+    {
+      "privateFile": "generation-preparation-source-1791413297425.json",
+      "sha256": "d5e644a3178bafc8a8d23a8036c915d62569726b14c269e6fe566d1adfb03c33",
+      "revision": "f7bcb3040d6e3c1de308aedf18bf9dacbff89331",
+      "checks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "generation_disabled",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "actual_original_worker_graph_prepared",
+        "same_service_journal_allowance_and_acceptance",
+        "metadata_discovery_only_no_provider_call",
+        "generation_still_disabled"
+      ],
+      "failure": ["42P01"],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "revisionNote": "Original operator release label predates the in-progress repair; treat earlier failed/metadata attempts as diagnostic only."
+    },
+    {
+      "privateFile": "generation-preparation-source-1791413328143.json",
+      "sha256": "be232ef3f294c647d6d74566e8730a67f6a7b88cdc12636f3c30d1b4965dc2d0",
+      "revision": "f7bcb3040d6e3c1de308aedf18bf9dacbff89331",
+      "checks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "generation_disabled",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "actual_original_worker_graph_prepared",
+        "same_service_journal_allowance_and_acceptance",
+        "metadata_discovery_only_no_provider_call",
+        "generation_still_disabled",
+        "idempotent_shutdown",
+        "closed_registration_refused_before_sql"
+      ],
+      "counts": {
+        "generations": 0,
+        "usage": 658
+      },
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "revisionNote": "Original operator release label predates the in-progress repair; treat earlier failed/metadata attempts as diagnostic only."
+    },
+    {
+      "privateFile": "generation-preparation-source-1791413488696.json",
+      "sha256": "531d7b7acd6b7a47388da3e9a0a608b2de95c5231a1cd81123fe900fe97422c4",
+      "revision": "1e883f20d4e3b92a916e51c2dec13231e7b80b7f",
+      "checks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "generation_disabled",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "actual_original_worker_graph_prepared",
+        "same_service_journal_allowance_and_acceptance",
+        "metadata_discovery_only_no_provider_call",
+        "generation_still_disabled",
+        "actual_empty_worker_pass",
+        "actual_worker_lifetime_abort_drained",
+        "no_generation_or_usage_record_created",
+        "idempotent_shutdown",
+        "closed_registration_refused_before_sql"
+      ],
+      "counts": {
+        "generations": 0,
+        "usage": 658
+      },
+      "countsAfter": {
+        "generations": 0,
+        "usage": 658
+      },
+      "idlePass": {
+        "completed": 0,
+        "failed": 0,
+        "recovered": 0,
+        "skipped": 0,
+        "deferred": 0,
+        "failures": []
+      },
+      "lifetimePass": {
+        "completed": 0,
+        "failed": 0,
+        "recovered": 0,
+        "skipped": 0,
+        "deferred": 0,
+        "failures": []
+      },
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true
+    }
+  ],
+  "validation": {
+    "backendBuild": true,
+    "scopedLintFormat": true,
+    "existingContracts": 9,
+    "existingWorkerLifetimeTests": 8,
+    "newUnitTests": 0
+  },
+  "sourceReview": "infra/migrations/reviews/20261007-generation-output-shape.json"
+}
