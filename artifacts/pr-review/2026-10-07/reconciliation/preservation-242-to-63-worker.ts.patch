@@ -1,0 +1,146 @@
+diff --git a/apps/backend/src/modules/trust/worker.ts b/apps/backend/src/modules/trust/worker.ts
+index 702db923..62a1a4fc 100644
+--- a/apps/backend/src/modules/trust/worker.ts
++++ b/apps/backend/src/modules/trust/worker.ts
+@@ -11,0 +12 @@ import { DomainError } from "../../core/errors.js";
++import { trustTransaction } from "./transaction.js";
+@@ -150,3 +151,5 @@ export class TrustWorker {
+-      await this.pool.query(
+-        "UPDATE creator_trust.privacy_task SET state='blocked',error_code='domain_hook_unavailable',lease_until=NULL WHERE job_id=$1 AND domain=$2 AND lease_token=$3",
+-        [task.job_id, task.domain, task.lease_token],
++      await trustTransaction(this.pool, (client) =>
++        client.query(
++          "UPDATE creator_trust.privacy_task SET state='blocked',error_code='domain_hook_unavailable',lease_until=NULL WHERE job_id=$1 AND domain=$2 AND lease_token=$3 AND state='running'",
++          [task.job_id, task.domain, task.lease_token],
++        ),
+@@ -204,3 +207,3 @@ export class TrustWorker {
+-      const client = await this.pool.connect();
+-      try {
+-        await client.query("BEGIN");
++      // Acknowledgment has its own real host budget within the original lease.
++      // A lost COMMIT response must not downgrade a durable completed task.
++      await trustTransaction(this.pool, async (client) => {
+@@ -236,7 +239 @@ export class TrustWorker {
+-        await client.query("COMMIT");
+-      } catch (error) {
+-        await client.query("ROLLBACK");
+-        throw error;
+-      } finally {
+-        client.release();
+-      }
++      });
+@@ -251,0 +249,3 @@ export class TrustWorker {
++        "agent_privacy_unavailable",
++        "agent_lifecycle_composition_mismatch",
++        "privacy_export_pool_mismatch",
+@@ -254,0 +255,3 @@ export class TrustWorker {
++        "conversation_provenance_purge_unavailable",
++        "conversation_provenance_purge_pool_unconfigured",
++        "conversation_provenance_purge_owner_changed",
+@@ -271,0 +275,8 @@ export class TrustWorker {
++          "conversation_delete_cancel_unavailable",
++          "conversation_delete_rollback_unavailable",
++          "conversation_delete_release_unavailable",
++          "conversation_provenance_purge_cleanup_unavailable",
++          "conversation_provenance_purge_receipt_unavailable",
++          "conversation_export_cancel_unavailable",
++          "conversation_export_rollback_unavailable",
++          "conversation_export_release_unavailable",
+@@ -277,0 +289,5 @@ export class TrustWorker {
++          "privacy_artifact_unconfigured",
++          "privacy_commit_fence_unavailable",
++          "trust_connection_budget_unavailable",
++          "trust_transaction_unavailable",
++          "trust_client_settlement_unavailable",
+@@ -281,14 +297,16 @@ export class TrustWorker {
+-      await this.pool.query(
+-        "UPDATE creator_trust.privacy_task SET state=$4,error_code=$5,lease_until=NULL,available_at=now()+make_interval(secs=>$6) WHERE job_id=$1 AND domain=$2 AND lease_token=$3",
+-        [
+-          task.job_id,
+-          task.domain,
+-          task.lease_token,
+-          unavailable.includes(code)
+-            ? "blocked"
+-            : task.attempts >= 8
+-              ? "dead_letter"
+-              : "retry",
+-          code,
+-          Math.min(3600, 2 ** task.attempts * 5),
+-        ],
++      const saved = await trustTransaction(this.pool, (client) =>
++        client.query(
++          "UPDATE creator_trust.privacy_task SET state=$4,error_code=$5,lease_until=NULL,available_at=now()+make_interval(secs=>$6) WHERE job_id=$1 AND domain=$2 AND lease_token=$3 AND state='running'",
++          [
++            task.job_id,
++            task.domain,
++            task.lease_token,
++            unavailable.includes(code)
++              ? "blocked"
++              : task.attempts >= 8
++                ? "dead_letter"
++                : "retry",
++            code,
++            Math.min(3600, 2 ** task.attempts * 5),
++          ],
++        ),
+@@ -296 +314,2 @@ export class TrustWorker {
+-      if (!unavailable.includes(code)) this.observe("privacy_retry", 1);
++      if (saved.rowCount && !unavailable.includes(code))
++        this.observe("privacy_retry", 1);
+@@ -313,3 +332,5 @@ export class TrustWorker {
+-      await this.pool.query(
+-        "UPDATE creator_trust.effect SET state='blocked',error_code='effect_hook_unavailable',lease_until=NULL WHERE id=$1 AND lease_token=$2",
+-        [effect.id, effect.lease_token],
++      await trustTransaction(this.pool, (client) =>
++        client.query(
++          "UPDATE creator_trust.effect SET state='blocked',error_code='effect_hook_unavailable',lease_until=NULL WHERE id=$1 AND lease_token=$2 AND state='running'",
++          [effect.id, effect.lease_token],
++        ),
+@@ -333,3 +354 @@ export class TrustWorker {
+-      const client = await this.pool.connect();
+-      try {
+-        await client.query("BEGIN");
++      await trustTransaction(this.pool, async (client) => {
+@@ -367,7 +386 @@ export class TrustWorker {
+-        await client.query("COMMIT");
+-      } catch (error) {
+-        await client.query("ROLLBACK");
+-        throw error;
+-      } finally {
+-        client.release();
+-      }
++      });
+@@ -377,5 +389,0 @@ export class TrustWorker {
+-        ["hook_timeout", "receipt_invalid"].includes(error.message)
+-          ? error.message
+-          : "effect_hook_error";
+-      await this.pool.query(
+-        "UPDATE creator_trust.effect SET state=$3,error_code=$5,lease_until=NULL,available_at=now()+make_interval(secs=>$4) WHERE id=$1 AND lease_token=$2",
+@@ -383,6 +391,21 @@ export class TrustWorker {
+-          effect.id,
+-          effect.lease_token,
+-          effect.attempts >= 8 ? "dead_letter" : "retry",
+-          Math.min(3600, 2 ** effect.attempts * 5),
+-          code,
+-        ],
++          "hook_timeout",
++          "receipt_invalid",
++          "trust_connection_budget_unavailable",
++          "trust_transaction_unavailable",
++          "trust_client_settlement_unavailable",
++        ].includes(error instanceof DomainError ? error.code : error.message)
++          ? error instanceof DomainError
++            ? error.code
++            : error.message
++          : "effect_hook_error";
++      await trustTransaction(this.pool, (client) =>
++        client.query(
++          "UPDATE creator_trust.effect SET state=$3,error_code=$5,lease_until=NULL,available_at=now()+make_interval(secs=>$4) WHERE id=$1 AND lease_token=$2 AND state='running'",
++          [
++            effect.id,
++            effect.lease_token,
++            effect.attempts >= 8 ? "dead_letter" : "retry",
++            Math.min(3600, 2 ** effect.attempts * 5),
++            code,
++          ],
++        ),

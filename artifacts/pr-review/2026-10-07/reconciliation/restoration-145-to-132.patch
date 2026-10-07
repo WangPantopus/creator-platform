@@ -1,0 +1,106 @@
+diff --git a/apps/backend/src/modules/trust/restoration.ts b/apps/backend/src/modules/trust/restoration.ts
+index 0acf53ef..a576d774 100644
+--- a/apps/backend/src/modules/trust/restoration.ts
++++ b/apps/backend/src/modules/trust/restoration.ts
+@@ -41 +40,0 @@ export function trustLocalRestorationInTransaction(
+-    let completed = false;
+@@ -55 +53,0 @@ export function trustLocalRestorationInTransaction(
+-      completed = true;
+@@ -64,4 +62 @@ export function trustLocalRestorationInTransaction(
+-      // A failed response stays with the original transaction owner. Helper
+-      // cleanup cannot settle an unknown read by sending more source SQL.
+-      if (completed)
+-        await client.query("RELEASE SAVEPOINT w8_held_restoration");
++      await client.query("RELEASE SAVEPOINT w8_held_restoration");
+diff --git a/apps/backend/src/operations/runtime.ts b/apps/backend/src/operations/runtime.ts
+index f8231dd8..071f6279 100644
+--- a/apps/backend/src/operations/runtime.ts
++++ b/apps/backend/src/operations/runtime.ts
+@@ -22 +21,0 @@ import { DomainError } from "../core/errors.js";
+-import { querySettlementUncertain } from "../core/query-settlement.js";
+@@ -308 +306,0 @@ export async function createTrustRuntime(options: {
+-    let failure: unknown;
+@@ -311,2 +309,2 @@ export async function createTrustRuntime(options: {
+-    } catch (error) {
+-      failure = error;
++    } catch {
++      ready = false;
+@@ -314,2 +312,2 @@ export async function createTrustRuntime(options: {
+-    if (!ready) {
+-      const unavailable = new DomainError(
++    if (!ready)
++      throw new DomainError(
+@@ -320,4 +317,0 @@ export async function createTrustRuntime(options: {
+-      if (failure !== undefined)
+-        Object.defineProperty(unavailable, "cause", { value: failure });
+-      throw unavailable;
+-    }
+@@ -338,0 +333 @@ export async function createTrustRuntime(options: {
++  let closing: Promise<void> | undefined;
+@@ -378,20 +373 @@ export async function createTrustRuntime(options: {
+-        // The original owner must settle an uncertain response. This helper
+-        // borrows its client and cannot release it or submit later source SQL.
+-        if (querySettlementUncertain(error)) throw error;
+-        try {
+-          await client.query("ROLLBACK TO SAVEPOINT w8_generation_restoration");
+-          await client.query("RELEASE SAVEPOINT w8_generation_restoration");
+-        } catch (cleanupError) {
+-          const unavailable = new DomainError(
+-            "generation_restoration_unavailable",
+-            "Current generation recovery authority is unavailable.",
+-            503,
+-          );
+-          Object.defineProperty(unavailable, "cause", {
+-            value: new AggregateError(
+-              [error, cleanupError],
+-              "Original generation restoration and cleanup failed.",
+-            ),
+-          });
+-          throw unavailable;
+-        }
++        await client.query("ROLLBACK TO SAVEPOINT w8_generation_restoration");
+@@ -398,0 +375,2 @@ export async function createTrustRuntime(options: {
++      } finally {
++        await client.query("RELEASE SAVEPOINT w8_generation_restoration");
+@@ -400,3 +377,0 @@ export async function createTrustRuntime(options: {
+-      // A failed RELEASE stays with the original owner; do not issue cleanup
+-      // for the release itself or treat an unknown response as permission.
+-      await client.query("RELEASE SAVEPOINT w8_generation_restoration");
+@@ -457,8 +432,29 @@ export async function createTrustRuntime(options: {
+-    stop: async () => {
+-      await worker.stop();
+-      options.apiPool.off("error", poolError);
+-      options.workerPool.off("error", poolError);
+-      telemetry.close();
+-      if (options.closePoolsOnStop)
+-        await Promise.all([options.apiPool.end(), options.workerPool.end()]);
+-    },
++    stop: () =>
++      (closing ??= (async () => {
++        const errors: unknown[] = [];
++        try {
++          await worker.stop();
++        } catch (error) {
++          errors.push(error);
++        }
++        options.apiPool.off("error", poolError);
++        options.workerPool.off("error", poolError);
++        try {
++          telemetry.close();
++        } catch (error) {
++          errors.push(error);
++        }
++        if (options.closePoolsOnStop) {
++          const pools = await Promise.allSettled([
++            options.apiPool.end(),
++            options.workerPool.end(),
++          ]);
++          for (const result of pools)
++            if (result.status === "rejected") errors.push(result.reason);
++        }
++        if (errors.length)
++          throw new AggregateError(
++            errors,
++            "Original Trust runtime cleanup failed.",
++          );
++      })()),

@@ -1,0 +1,45 @@
+{
+  "sourcePR": 131,
+  "sourceHead": "5901c9dd62973a20fd7d3ccae132374fcd627056",
+  "targetPR": 145,
+  "targetHead": "da0e2af95baa19280ddf3ebdae4ce8ead1a5eca7",
+  "ancestor": true,
+  "files": [
+    {
+      "path": "apps/backend/migrations/0093_w8_generation_worker_denial.sql",
+      "source": "100644 blob 34ac260e6b3de8ad5e6bcc005e26e436d0771cf2",
+      "target": "100644 blob 34ac260e6b3de8ad5e6bcc005e26e436d0771cf2",
+      "identical": true
+    },
+    {
+      "path": "apps/backend/src/core/query-settlement.ts",
+      "source": "100644 blob 804aeb8eb1889516cd0d4d6077cea251cfc7cded",
+      "target": "100644 blob 804aeb8eb1889516cd0d4d6077cea251cfc7cded",
+      "identical": true
+    },
+    {
+      "path": "apps/backend/src/integration.ts",
+      "source": "100644 blob bcb7015961b16b8dd0cb0439ab610a07af100d42",
+      "target": "100644 blob bcb7015961b16b8dd0cb0439ab610a07af100d42",
+      "identical": true
+    },
+    {
+      "path": "apps/backend/src/modules/trust/restoration.ts",
+      "source": "100644 blob 0acf53ef30c893b980b76ae727a80ee9533a6c76",
+      "target": "100644 blob 0acf53ef30c893b980b76ae727a80ee9533a6c76",
+      "identical": true
+    },
+    {
+      "path": "apps/backend/src/operations/runtime.ts",
+      "source": "100644 blob f8231dd89dce7d6f2a72a06dd1638650846562cd",
+      "target": "100644 blob f8231dd89dce7d6f2a72a06dd1638650846562cd",
+      "identical": true
+    },
+    {
+      "path": "infra/migrations.json",
+      "source": "100644 blob 84cbb933c752614bc01d51eb5931d6a009a3b4d9",
+      "target": "100644 blob 490defc95ee6059a103d45eb9df908f815f6b6cc",
+      "identical": false
+    }
+  ]
+}

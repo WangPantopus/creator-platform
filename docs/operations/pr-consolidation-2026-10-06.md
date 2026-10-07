@@ -1,5 +1,7 @@
 # Draft reconciliation and foundation extraction — October 6, 2026
 
+**Historical checkpoint.** The [October 7 remaining-change ledger](pr-reconciliation-2026-10-07.md) supersedes the open-draft count and continuation order below, while retaining this pass's completed closures and runtime evidence.
+
 Baseline main is `23b9d626b647f30ca4b87de2a3b25fb2c894e54a` (31 prior review merges). All 20 original draft heads were compared locally before implementation. [Exact inventory and evidence](../../artifacts/pr-review/2026-10-06/foundation-settlement/) retain their source refs. Final tree differences include shared history and newer main fixes; a missing exclusive file does not prove supersession.
 
 ## Consolidation completed
