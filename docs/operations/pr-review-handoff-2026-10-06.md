@@ -1,5 +1,30 @@
 # Resume checkpoint — PR review and independent app fixes
 
+## Latest state — after #317, Measurement integration ready
+
+Founder explicitly resumed work and requires checking every open/draft PR for overlap before new implementation, reusing existing work, and committing/pushing/opening/merging qualified increments. No unit or automated test code; perform actual running browser/API/database verification. Original authorization includes merging good PRs; no repeated approval is needed. No subagents have been used.
+
+**28 confirmed merges:** original 16 plus focused #306–#317. #317 is merged at `9d9d894f152dc41ebb18b076b706364cab03f366`; its tree equals operated head `458ec58dce6d23f7929526dec922d9ec9e317353`. Both exact-head affected CI checks passed; no completed failures; rulesets empty/main unprotected at the fresh gate. Unchanged native/reference jobs were pending, not represented as passed. External pre-merge/merged receipts are under `/Users/yingpengwang/.codex/visualizations/2026/10/06/01a112f6-a84b-7a01-8832-f9999f0dd63d/`.
+
+**Current branch:** `codex/growth-existing-measurement-session-20261006`, based on #317 main. The [Measurement integration](growth-measurement-session-2026-10-06.md) is ready to commit/open/qualify at this note. It extracts existing #31 page/form guards from `c052ef67fa85301562b5123b682c88b931107c9a`, uses already merged original-session helpers, preserves #315 FeedbackForm, and adds private Measurement endpoints to the existing proxy tuple requirement. Actual outage/recovery, genuine same-account and other-account replacement, original-session 409 with unchanged DB, normal save/stop, and sign-out passed. Web types/build/lint/format passed. Full20-head overlap inventory and source/evidence hashes are under `artifacts/pr-review/2026-10-06/growth-measurement-session/`.
+
+**20 original drafts remain held at unchanged heads:** 31,36,63,74,131,132,145,182,192,200,242,247,262,282,284,288,301,302,303,305. Exact reasons: [original review](pr-review-2026-10-06.md), `artifacts/pr-review/2026-10-06/review.json`. Broad provider/privacy/native/catalogue/signing prerequisites are not resolved by focused extractions. Next investigate existing #31 session guards for Studio Insights/Impact/Activation/Launch; compare affected paths against all20 current heads before editing. Do not rebuild these from scratch. No changes for that next increment yet.
+
+## Runtime and safe continuation
+
+API4206 is running directly against DB5546 with private `/tmp/creator-pr-review-growth.env` and `.key`; log `/tmp/creator-growth-measurement-api.log`, latest exec95015. Web3106 exec14161 uses `/tmp/creator-growth-settlement-web.log`. Docker `creator-pr-review-20261006` preserves both isolated databases; `creator_pr_review_full` has61 canonical migrations. Never print credentials/key, regenerate key, remove data, grant extra authority, fabricate provider/catalogue/signing receipts or activate held purposes.
+
+Temporary synthetic creator verification is restored pending/version5. Two experiment proposals remain stopped/unapproved, nine feedback rows remain. Current actor three genuinely signed out; all browser interception cleared, no media/viewport override. IAB browser5 review tabs1(Measurement auth continuation),2(account auth continuation) remain. Bindings growthSettlementTab, growthWorkerAccountTab, measurementCdp, growthSettlementFs. Call cua.rewriteDocumentation after compaction. Review proxy5547 is stopped. Existing Note remains unsigned with6 revisions/0 publications; prior Team memberships/invitations/Ops lease revoked. Production providers were never used.
+
+Node PATH `/Users/yingpengwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin`; gh `/Users/yingpengwang/.local/bin/gh`; Docker `/Applications/Docker.app/Contents/Resources/bin/docker`. Preserve running services for ongoing work; before a safe stop genuinely sign out, clear overrides/interception, close only review tabs, identify own processes with lsof then stop only them and the review container. Preserve private key/data/evidence. Restore only own generated apps/web/next-env.d.ts change before commit.
+
+## Merge gate
+
+Fresh OPEN/non-draft/MERGEABLE/base-main/current exact reviewed head; both affected web-and-backend jobs SUCCESS; no completed head failures; read current rulesets/protection. Never bypass required checks. Compare unchanged native/reference inputs. Normal `gh pr merge N --merge --match-head-commit SHA`, no admin/force/delete/cancel. After merge, reread receipt, fetch main, compare operated tree and original20 heads, record truthful main CI status. Attach each created PR. Broad graph holds persist until actual prerequisites are met.
+
+## Earlier checkpoints (historical; latest state above takes precedence)
+
+
 ## Latest resume — October 6, 2026
 
 **Latest steering:** the founder requires checking open/draft PRs before new work, reusing existing implementations, and committing/pushing/opening/merging qualified increments. A full20-head affected-file overlap inventory is in `artifacts/pr-review/2026-10-06/growth-worker-custody/open-pr-overlap.json`. PR31 already implements Growth cleanup and worker commit custody; the current increment reuses it. Do not independently rebuild the remaining Measurement session guards: PR31 contains them.

@@ -1,0 +1,2 @@
+573339da-580c-4a9a-b9cc-719dc5de65a2|45d29446-0d3f-4612-a768-5dd9beeddf8f|Local review: verify that session revocation waits for the worker commit.|stopped||5367
+eff6f1aa-1f6f-483a-a4d7-39d0ef75f3ec|45d29446-0d3f-4612-a768-5dd9beeddf8f|Local review: preserve this original Measurement draft during an API outage.|stopped||5553

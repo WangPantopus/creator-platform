@@ -1,7 +1,6 @@
 "use client";
 import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
 import { useEffect, useRef, useState } from "react";
-import { mutate } from "./actions";
 import { GrowthActionError, useGrowthSession } from "./session";
 export function FeedbackForm() {
   const { request } = useGrowthSession();
@@ -106,6 +105,7 @@ export function FeedbackForm() {
   );
 }
 export function ExperimentForm() {
+  const { request, signal } = useGrowthSession();
   const [busy, setBusy] = useState(false),
     [message, setMessage] = useState("");
   return (
@@ -117,16 +117,20 @@ export function ExperimentForm() {
           data = new FormData(form);
         setBusy(true);
         try {
-          await mutate("experiments", {
-            hypothesis: data.get("hypothesis"),
-            successCriterion: data.get("success"),
-            stopCriterion: data.get("stop"),
+          await request("experiments", {
+            method: "POST",
+            body: JSON.stringify({
+              hypothesis: data.get("hypothesis"),
+              successCriterion: data.get("success"),
+              stopCriterion: data.get("stop"),
+            }),
           });
           setMessage(
             growthCopy.growthDraftProposalSavedNoExperimentHasBeenActivated,
           );
           form.reset();
         } catch (error) {
+          if (signal.aborted) return;
           setMessage(
             error instanceof Error
               ? error.message
@@ -164,6 +168,7 @@ export function ExperimentForm() {
 }
 
 export function ExperimentChoices() {
+  const { request, signal } = useGrowthSession();
   const [items, setItems] = useState<
       { id: string; hypothesis: string; state: string }[]
     >([]),
@@ -171,16 +176,24 @@ export function ExperimentChoices() {
     [busy, setBusy] = useState(false);
   useEffect(() => {
     let active = true;
-    void fetch("/api/growth/experiments")
-      .then(async (response) => {
-        if (response.ok && active)
-          setItems((await response.json()).experiments);
+    void request<{
+      experiments: { id: string; hypothesis: string; state: string }[];
+    }>("experiments")
+      .then((result) => {
+        if (active) setItems(result.experiments);
       })
-      .catch(() => {});
+      .catch((error) => {
+        if (active && !signal.aborted)
+          setMessage(
+            error instanceof Error
+              ? error.message
+              : growthCopy.growthThisFeatureIsUnavailable,
+          );
+      });
     return () => {
       active = false;
     };
-  }, []);
+  }, [request, signal]);
   return items.length ? (
     <section className="growth-stack">
       <h2>{growthCopy.growthYourExperimentProposals}</h2>
@@ -196,7 +209,10 @@ export function ExperimentChoices() {
                 setBusy(true);
                 setMessage("");
                 try {
-                  await mutate(`experiments/${item.id}/stop`, {}, "PUT");
+                  await request(`experiments/${item.id}/stop`, {
+                    method: "PUT",
+                    body: "{}",
+                  });
                   setItems((current) =>
                     current.map((value) =>
                       value.id === item.id
@@ -205,6 +221,7 @@ export function ExperimentChoices() {
                     ),
                   );
                 } catch (error) {
+                  if (signal.aborted) return;
                   setMessage(
                     error instanceof Error
                       ? error.message
@@ -222,5 +239,9 @@ export function ExperimentChoices() {
       ))}
       <p role="status">{message}</p>
     </section>
+  ) : message ? (
+    <p role="status" className="growth-help">
+      {message}
+    </p>
   ) : null;
 }
