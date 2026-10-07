@@ -13,7 +13,11 @@ import {
 } from "../access/commerce.js";
 import { contentHash } from "../../core/canonical.js";
 import { z } from "zod";
-import { ReviewedGenerationCostRule } from "./attributed-cost-policy.js";
+import {
+  isAttributedGenerationJournal,
+  ReviewedGenerationCostRule,
+} from "./attributed-cost-policy.js";
+import type { PreparedGenerationJournal } from "../agent/generation-journal.js";
 import {
   ORIGINAL_COST_MIGRATION,
   ORIGINAL_COST_SCHEMA_SHA256,
@@ -101,6 +105,14 @@ export class CommerceGenerationAllowance implements GenerationAllowance {
         access.isGenerationAllowance(this),
       "generation_terminal_allowance_mismatch",
       "Original settlement requires the exact configured canonical allowance owner.",
+    );
+  }
+  assertJournal(journal: PreparedGenerationJournal) {
+    journal.assertPool(this.hostPool);
+    invariant(
+      isAttributedGenerationJournal(this.policy, journal),
+      "generation_accounting_journal_mismatch",
+      "Financial reconciliation must read this allowance's original generation journal.",
     );
   }
   /** Only this successfully prepared instance can issue its port. Each call

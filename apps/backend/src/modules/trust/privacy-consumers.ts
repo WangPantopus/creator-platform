@@ -36,6 +36,19 @@ import type { GrowthService } from "../growth/service.js";
 import { contentPrivacyHook } from "../content/privacy.js";
 import type { ContentPrivacyExport } from "../content/privacy-export.js";
 import { domainPrivacyTaskAuthorityInTransaction } from "./domain-privacy-authority.js";
+import { prepareGenerationAccountingRetention } from "./generation-accounting-retention.js";
+
+/** Actual host owners and reviewed registration only. W8 supplies its original
+ * task/family authority when binding them; the host cannot replace that port. */
+export type GenerationAccountingPreparation = Omit<
+  Parameters<typeof prepareGenerationAccountingRetention>[0],
+  "pool" | "configuration"
+> & {
+  configuration: Omit<
+    Parameters<typeof prepareGenerationAccountingRetention>[0]["configuration"],
+    "authority"
+  >;
+};
 
 export type ConversationPrivacyOwnerPorts = Omit<
   ConversationPrivacyInput,
@@ -53,6 +66,7 @@ export type ConversationPrivacyOwnerPorts = Omit<
     Parameters<typeof PreparedGenerationProvenancePurge.prepare>[0],
     "pool" | "authority"
   >;
+  accountingPreparation?: GenerationAccountingPreparation;
 };
 
 export type AgentPrivacyOwnerPorts = Readonly<{
@@ -119,6 +133,7 @@ export function createPrivacyConsumers(input: {
     {
       domain: "conversation",
       async run(job) {
+        job.signal?.throwIfAborted();
         const owners =
           typeof input.conversation === "function"
             ? input.conversation()
@@ -131,6 +146,32 @@ export function createPrivacyConsumers(input: {
           );
         let exportCursor = owners?.exportCursor;
         let provenancePurge = owners?.provenancePurge;
+        let accounting = owners?.accounting;
+        let financial = owners?.generationCostPrivacyReconciliation;
+        if (owners?.accountingPreparation) {
+          invariant(
+            !accounting &&
+              !financial &&
+              (!owners.cursorPreparation ||
+                (owners.cursorPreparation.journal ===
+                  owners.accountingPreparation.journal &&
+                  owners.cursorPreparation.usageRetention ===
+                    owners.accountingPreparation.usageRetention)),
+            "conversation_accounting_composition_mismatch",
+            "Export and deletion must use the same original accounting owners.",
+          );
+          const prepared = await prepareGenerationAccountingRetention({
+            ...owners.accountingPreparation,
+            pool: input.runtimePool,
+            configuration: {
+              ...owners.accountingPreparation.configuration,
+              authority: conversationAuthority,
+            },
+          });
+          accounting = prepared.accounting;
+          financial = prepared.financial;
+          job.signal?.throwIfAborted();
+        }
         if (
           job.kind === "delete" &&
           !provenancePurge &&
@@ -160,8 +201,17 @@ export function createPrivacyConsumers(input: {
             recordings: owners.recordings,
           });
         }
+        if (exportCursor && owners?.accountingPreparation)
+          exportCursor.assertAccounting(
+            owners.accountingPreparation.journal,
+            owners.accountingPreparation.usageRetention,
+          );
         return conversationPrivacyHook({
           ...owners,
+          ...(accounting ? { accounting } : {}),
+          ...(financial
+            ? { generationCostPrivacyReconciliation: financial }
+            : {}),
           ...(exportCursor ? { exportCursor } : {}),
           ...(provenancePurge ? { provenancePurge } : {}),
           pool: input.runtimePool,

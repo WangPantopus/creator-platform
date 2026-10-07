@@ -130,6 +130,7 @@ export async function prepareGenerationWorker(input: {
   );
   input.journal.assertPool(hostPool);
   input.allowance.assertComposition(hostPool, input.access);
+  input.allowance.assertJournal(input.journal);
   input.signal?.throwIfAborted();
   const identity = await GenerationIdentityAuthority.create({
     ...input.custody.identity,

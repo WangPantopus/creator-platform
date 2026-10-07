@@ -103,6 +103,17 @@ export class PreparedConversationPrivacyCursor {
     );
   }
 
+  assertAccounting(
+    journal: PreparedGenerationJournal,
+    usageRetention: PreparedUsageRetention,
+  ): void {
+    invariant(
+      journal === this.journal && usageRetention === this.usageRetention,
+      "conversation_accounting_composition_mismatch",
+      "Export and deletion require this cursor's original accounting owners.",
+    );
+  }
+
   assertRuntime(input: {
     pool: Pool;
     authority: ConversationPrivacyAuthority;

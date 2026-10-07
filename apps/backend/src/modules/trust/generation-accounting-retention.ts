@@ -1,8 +1,16 @@
 import { z } from "zod";
+import type { Pool } from "pg";
 import { invariant } from "../../core/errors.js";
 import type { AccessService } from "../access/scope.js";
-import type { JournalPrivacyJob } from "../agent/generation-journal.js";
-import type { JournalPrivacyRetention } from "../agent/journal-privacy.js";
+import {
+  PreparedGenerationJournal,
+  type JournalPrivacyJob,
+} from "../agent/generation-journal.js";
+import {
+  generationAccountingLifecycle,
+  type JournalPrivacyRetention,
+} from "../agent/journal-privacy.js";
+import { PreparedUsageRetention } from "../agent/usage-retention.js";
 import { CommerceGenerationAllowance } from "../commerce/generation-allowance.js";
 import type {
   GenerationPrivacyConfiguration,
@@ -26,17 +34,28 @@ function originalJob(job: JournalPrivacyJob): GenerationPrivacyJob {
  * registration/family authority. It neither registers hooks nor approves them.
  * Unknown costs remain in reconciliation; this is only the known-cost path. */
 export async function prepareGenerationAccountingRetention(input: {
+  pool: Pool;
+  journal: PreparedGenerationJournal;
+  usageRetention: PreparedUsageRetention;
   allowance: CommerceGenerationAllowance;
   access: AccessService;
   configuration: GenerationPrivacyConfiguration;
 }) {
   invariant(
-    input.allowance instanceof CommerceGenerationAllowance &&
+    input.journal instanceof PreparedGenerationJournal &&
+      input.usageRetention instanceof PreparedUsageRetention &&
+      input.allowance instanceof CommerceGenerationAllowance &&
+      input.journal.retentionPolicyVersion ===
+        accountingRetentionPolicy.version &&
       input.configuration.retentionPolicyVersion ===
         accountingRetentionPolicy.version,
     "accounting_retention_unconfigured",
     "Use the original prepared financial owner and the approved product retention policy.",
   );
+  input.journal.assertPool(input.pool);
+  input.usageRetention.assertJournal(input.journal);
+  input.allowance.assertComposition(input.pool, input.access);
+  input.allowance.assertJournal(input.journal);
   const financial = await input.allowance.privacyReconciliation(
     input.access,
     input.configuration,
@@ -59,5 +78,11 @@ export async function prepareGenerationAccountingRetention(input: {
       );
     },
   });
-  return Object.freeze({ financial, retention });
+  const accounting = generationAccountingLifecycle({
+    journal: input.journal,
+    usageRetention: input.usageRetention,
+    authority: input.configuration.authority,
+    retention,
+  });
+  return Object.freeze({ financial, retention, accounting });
 }

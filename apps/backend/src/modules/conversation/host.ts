@@ -36,6 +36,7 @@ import {
 } from "../identity/intro-offers.js";
 import { ConversationRecordings } from "./recordings.js";
 import type { PreparedConversationPrivacyCursor } from "./privacy-export-cursor.js";
+import type { GenerationAccountingPreparation } from "../trust/privacy-consumers.js";
 import { createConversationRuntime } from "./runtime.js";
 import {
   DevelopmentConversationPolicy,
@@ -88,6 +89,9 @@ export type ConversationHostProducers = {
     Parameters<typeof PreparedConversationPrivacyCursor.prepare>[0],
     "pool" | "authority" | "journal" | "lineage" | "recordings"
   >;
+  /** W8's reviewed registration and finite policy. The host binds its actual
+   * accounting owners; W8 later fixes its own held-task/family authority. */
+  privacyAccounting?: GenerationAccountingPreparation["configuration"];
   /** W6: the host's media runtime on this same database pool. */
   media?: MediaService;
   /** W6: fan reads of signed recordings ask W3 for the exact publication. */
@@ -253,7 +257,7 @@ export async function composeConversationHost(
   const journalChecksum = await registeredChecksum(migrations.journal);
   if (!journalChecksum) missing.push(`registered ${migrations.journal}`);
   else if (!producers.journalPolicy) missing.push("journal policy (W2)");
-  else if (requested || producers.privacyCursor)
+  else if (requested || producers.privacyCursor || producers.privacyAccounting)
     // Original privacy accounting is independent of provider/generation setup.
     journal = await PreparedGenerationJournal.prepare(runtime.pool, {
       migration: { version: migrations.journal, checksum: journalChecksum },
@@ -345,6 +349,33 @@ export async function composeConversationHost(
           correctionMigrationVersion: migrations.correction,
         })
       : undefined;
+  let accountingPreparation: GenerationAccountingPreparation | undefined;
+  if (producers.privacyAccounting) {
+    invariant(
+      journal &&
+        usageRetention &&
+        commerce?.allowance &&
+        lineage &&
+        recordings &&
+        producers.privacyCursor,
+      "conversation_accounting_unavailable",
+      "Accounting privacy requires the host's original journal, expiry, financial and complete export owners.",
+    );
+    accountingPreparation = Object.freeze({
+      journal,
+      usageRetention,
+      allowance: commerce.allowance,
+      access: runtime.access,
+      configuration: Object.freeze({
+        retentionPolicyVersion:
+          producers.privacyAccounting.retentionPolicyVersion,
+        assertPrivacyRegistered:
+          producers.privacyAccounting.assertPrivacyRegistered.bind(
+            producers.privacyAccounting,
+          ),
+      }),
+    });
+  }
   if (recordings)
     producers.bindRecordingPublication?.((scope, recording, client) =>
       recordings.currentPublication(scope, recording, client),
@@ -469,6 +500,7 @@ export async function composeConversationHost(
     agent,
     generationWorker: worker,
     privacy: {
+      ...(accountingPreparation ? { accountingPreparation } : {}),
       ...(lineage ? { lineage } : {}),
       ...(recordings ? { recordings } : {}),
       ...(journal && producers.privacyCursor

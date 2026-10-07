@@ -46,6 +46,20 @@ export interface AttributedGenerationJournal {
   ): Promise<AttributedGenerationReceipt>;
 }
 
+const originalJournals = new WeakMap<
+  GenerationCostPolicy,
+  AttributedGenerationJournal
+>();
+
+/** Identity of the reader actually captured by this factory, never a policy
+ * version, copied callback or caller-supplied claim of journal custody. */
+export function isAttributedGenerationJournal(
+  policy: GenerationCostPolicy,
+  journal: AttributedGenerationJournal,
+) {
+  return originalJournals.get(policy) === journal;
+}
+
 /** Preserve old reviewed rules for late receipts. A new host's current version
  * never relabels a durable earlier reservation or reweights its cost. */
 export function attributedGenerationCostPolicy(input: {
@@ -129,7 +143,7 @@ export function attributedGenerationCostPolicy(input: {
       reference: receipt.reference,
     };
   };
-  return Object.freeze({
+  const policy: GenerationCostPolicy = Object.freeze({
     version: active.version,
     originalRule: active,
     ...(input.originalRuleMigration
@@ -173,4 +187,6 @@ export function attributedGenerationCostPolicy(input: {
         }
       : {}),
   });
+  originalJournals.set(policy, input.journal);
+  return policy;
 }
