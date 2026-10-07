@@ -34,7 +34,7 @@ import { composeContentHost } from "./integration.js";
 import { configureGrowthForBackend } from "../growth/configured.js";
 import { canonicalCoreContentFollows } from "../growth/core-follows.js";
 import { contentPublicProjection } from "../growth/content.js";
-import { createTrustReplyReviewer } from "../trust/reply-review.js";
+import { prepareTrustReplyReviewer } from "../trust/reply-review.js";
 import { createDevelopmentTrust } from "../trust/development.js";
 import { createAgentDomain } from "../agent/integration.js";
 import { canonicalConversationHome } from "../growth/home.js";
@@ -286,7 +286,7 @@ const backend = await createConfiguredBackend({
       dependencies: {
         assertAllowed: runtime.assertCreatorAllowed,
         assertAllowedInTransaction: runtime.assertContentAllowedInTransaction,
-        reviewReply: createTrustReplyReviewer(),
+        reviewReply: await prepareTrustReplyReviewer(runtime),
       },
       sources: { service: sources, repository },
       ...(groupPublication ? { groupPublication } : {}),

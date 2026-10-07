@@ -577,6 +577,19 @@ export async function createConfiguredBackend(input: {
             // The canonical middleware has already resolved this request. Keep
             // its exact actor and session instead of issuing a second identity.
             const original = requestAuthority.getStore();
+            if (platformIdentity) {
+              if (
+                !original?.actor ||
+                original.actor.accountId !== original.accountId ||
+                original.actor.adultEligible !== true
+              )
+                throw new DomainError(
+                  "current_request_actor_required",
+                  "Reopen this action with your current signed-in account.",
+                  401,
+                );
+              return original.actor;
+            }
             if (original?.actor) return original.actor;
             return resolveActor(sessions ?? input.identity, token);
           },
