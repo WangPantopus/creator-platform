@@ -1,4 +1,5 @@
 import type { Pool, PoolClient } from "pg";
+import { ContentHeldClient } from "../content/held-client-cleanup.js";
 import { invariant } from "../../core/errors.js";
 import type { PrivacyHook } from "./contracts.js";
 import {
@@ -29,6 +30,7 @@ export function mediaPrivacyHook(input: {
   return {
     domain: "media",
     async run(job) {
+      job.signal?.throwIfAborted();
       await verify(job);
       invariant(
         job.kind === "export",
@@ -37,20 +39,14 @@ export function mediaPrivacyHook(input: {
       );
       const families = await authority.families(job);
       const client = await input.runtime.connect();
-      let released = false;
-      const abort = () => {
-        if (!released) {
-          released = true;
-          client.release(true);
-        }
-      };
-      job.signal!.addEventListener("abort", abort, { once: true });
+      const held = new ContentHeldClient(client, job.signal, input.runtime);
+      let failure: unknown;
       const data: unknown[] = [];
       let binaryCount = 0;
       let callCount = 0;
       try {
         job.signal!.throwIfAborted();
-        await client.query("BEGIN");
+        await held.begin();
         await restoredPrivacyTaskAuthorityInTransaction(
           client,
           job,
@@ -130,17 +126,13 @@ export function mediaPrivacyHook(input: {
           input.assertRestoredInTransaction,
         );
         job.signal!.throwIfAborted();
-        await client.query("COMMIT");
+        await held.commit();
         job.signal!.throwIfAborted();
       } catch (error) {
-        if (!released) await client.query("ROLLBACK");
+        failure = error;
         throw error;
       } finally {
-        job.signal!.removeEventListener("abort", abort);
-        if (!released) {
-          released = true;
-          client.release();
-        }
+        await held.settle(failure);
       }
       const archiveRequired = binaryCount > 0 || callCount > 0;
       invariant(
