@@ -1,0 +1,12 @@
+{
+  "before": {
+    "statement": "200ms",
+    "lock": "100ms"
+  },
+  "inside": {
+    "current_user": "creator_review_growth_api",
+    "statement": "5s",
+    "lock": "2s",
+    "pid": 34
+  }
+}

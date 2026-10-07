@@ -1,0 +1,97 @@
+{
+  "rows": [
+    {
+      "id": "e3254a2b-bbac-41c7-bf67-a10abb47781e",
+      "account_id": "10000000-0000-4000-8000-000000000003",
+      "category": "notification",
+      "score": 3,
+      "xmin": "4171"
+    },
+    {
+      "id": "3a46b2eb-02ee-4a33-808a-e09badee7cb2",
+      "account_id": "10000000-0000-4000-8000-000000000003",
+      "category": "notification",
+      "score": null,
+      "xmin": "4412"
+    },
+    {
+      "id": "b78bb281-8256-4afb-ba43-137bbde52c04",
+      "account_id": "10000000-0000-4000-8000-000000000003",
+      "category": "notification",
+      "score": null,
+      "xmin": "4420"
+    },
+    {
+      "id": "b509d790-278c-44be-a940-e8709d464ba1",
+      "account_id": "10000000-0000-4000-8000-000000000003",
+      "category": "notification",
+      "score": 4,
+      "xmin": "4475"
+    },
+    {
+      "id": "11540146-17b5-4044-a5bc-bd714affb0a9",
+      "account_id": "10000000-0000-4000-8000-000000000003",
+      "category": "notification",
+      "score": 5,
+      "xmin": "4490"
+    },
+    {
+      "id": "ed450146-73b9-41ef-a208-d2a06224bce8",
+      "account_id": "10000000-0000-4000-8000-000000000003",
+      "category": "notification",
+      "score": 1,
+      "xmin": "4569"
+    },
+    {
+      "id": "14cfb7b6-0c8f-4b7b-a7d8-4c6d28fef4a8",
+      "account_id": "10000000-0000-4000-8000-000000000003",
+      "category": "notification",
+      "score": 2,
+      "xmin": "4621"
+    },
+    {
+      "id": "eab4528e-2dd6-4bbf-ab86-5a75e6d74fb3",
+      "account_id": "10000000-0000-4000-8000-000000000002",
+      "category": "notification",
+      "score": 5,
+      "xmin": "4719"
+    },
+    {
+      "id": "3312cebb-f04d-4148-a039-326cba93a4c0",
+      "account_id": "10000000-0000-4000-8000-000000000002",
+      "category": "notification",
+      "score": 4,
+      "xmin": "4984"
+    }
+  ],
+  "feedbackRequests": [
+    {
+      "timestamp": "2026-10-07T02:35:18.212Z",
+      "level": "error",
+      "environment": "local-development",
+      "release": "3c6fed97645660397d50e8b87e18b9902bde2e9c",
+      "correlationId": "61fd6d0d-113a-4e99-97be-8f4c364697e5",
+      "method": "POST",
+      "route": "/feedback",
+      "status": 503,
+      "transferOutcome": "finished",
+      "errorCode": null,
+      "failureClass": null,
+      "durationMs": 2025.3
+    },
+    {
+      "timestamp": "2026-10-07T02:35:33.408Z",
+      "level": "info",
+      "environment": "local-development",
+      "release": "3c6fed97645660397d50e8b87e18b9902bde2e9c",
+      "correlationId": "6bf64ccf-a0d0-4d9f-94fa-f4410e108145",
+      "method": "POST",
+      "route": "/feedback",
+      "status": 201,
+      "transferOutcome": "finished",
+      "errorCode": null,
+      "failureClass": null,
+      "durationMs": 25.03
+    }
+  ]
+}
