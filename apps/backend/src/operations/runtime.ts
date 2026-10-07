@@ -34,6 +34,7 @@ import {
 } from "../modules/trust/scope-restriction.js";
 import type { ScopeRestriction } from "../modules/access/scope.js";
 import type { PrivacyArtifactStore } from "../modules/trust/privacy-export.js";
+import { createUsageAccountingHost } from "../modules/trust/usage-accounting-host.js";
 
 /** W1 mounts this runtime in the canonical backend. Local mode is explicit. */
 export async function createTrustRuntime(options: {
@@ -97,6 +98,7 @@ export async function createTrustRuntime(options: {
     "restoration_denial",
     "privacy_domains",
     "privacy_authority",
+    "usage_expiry",
   ];
   if (
     new Set(options.probes.map((probe) => probe.name)).size !==
@@ -337,12 +339,22 @@ export async function createTrustRuntime(options: {
     await restrictScope(actor, creatorId, threadId, participants);
   };
   let closing: Promise<void> | undefined;
+  const usageAccounting = createUsageAccountingHost(
+    worker,
+    assertRestoredInTransaction,
+  );
+  readiness.probes.push({
+    name: "usage_expiry",
+    required: true,
+    run: usageAccounting.readiness,
+  });
   return {
     router,
     service,
     readiness,
     telemetry,
     worker,
+    prepareUsageAccounting: usageAccounting.prepare,
     trafficReady: restored,
     assertActorAllowed,
     assertScopeAllowed,
@@ -453,16 +465,25 @@ export async function createTrustRuntime(options: {
     },
     privacyOwnershipScope: privacyOwnershipScope(options.workerPool),
     start: async () => {
-      if (await restored()) await worker.start();
+      if (await restored()) {
+        await usageAccounting.start();
+        await worker.start();
+      }
     },
     stop: () =>
       (closing ??= (async () => {
         const errors: unknown[] = [];
         try {
+          await usageAccounting.stop();
+        } catch (error) {
+          errors.push(error);
+        }
+        try {
           await worker.stop();
         } catch (error) {
           errors.push(error);
         }
+        usageAccounting.invalidate();
         options.apiPool.off("error", poolError);
         options.workerPool.off("error", poolError);
         try {

@@ -64,6 +64,11 @@ const DevelopmentEconomicsSchema = z.strictObject({
 
 /** Inputs supplied by their owners. Absent inputs keep their paths off. */
 export type ConversationHostProducers = {
+  /** Original journal and expiry prepared by the installed Trust host. */
+  usageAccounting?: Pick<
+    import("../trust/usage-accounting-host.js").HostUsageAccounting,
+    "journal" | "retention"
+  >;
   /** Independently reviewed worker custody and its distinct bounded pool.
    * Pool ownership stays with the host; API acceptance does not run a worker. */
   generation?: Pick<
@@ -246,8 +251,23 @@ export async function composeConversationHost(
   if (requested && !producers.generation)
     missing.push("reviewed generation worker custody and pool");
 
-  let journal: PreparedGenerationJournal | undefined;
-  const originalUsageRetention = producers.privacyCursor?.usageRetention;
+  let journal = producers.usageAccounting?.journal;
+  if (producers.usageAccounting) {
+    invariant(
+      !producers.journalPolicy &&
+        journal instanceof PreparedGenerationJournal &&
+        producers.usageAccounting.retention instanceof PreparedUsageRetention &&
+        (!producers.privacyCursor ||
+          producers.privacyCursor.usageRetention ===
+            producers.usageAccounting.retention),
+      "usage_accounting_composition_mismatch",
+      "Use one original journal and retention owner throughout the host.",
+    );
+    journal.assertPool(runtime.pool);
+  }
+  const originalUsageRetention =
+    producers.usageAccounting?.retention ??
+    producers.privacyCursor?.usageRetention;
   if (producers.privacyCursor)
     invariant(
       originalUsageRetention instanceof PreparedUsageRetention,
@@ -256,8 +276,13 @@ export async function composeConversationHost(
     );
   const journalChecksum = await registeredChecksum(migrations.journal);
   if (!journalChecksum) missing.push(`registered ${migrations.journal}`);
-  else if (!producers.journalPolicy) missing.push("journal policy (W2)");
-  else if (requested || producers.privacyCursor || producers.privacyAccounting)
+  else if (!journal && !producers.journalPolicy)
+    missing.push("journal policy (W2)");
+  else if (
+    !journal &&
+    producers.journalPolicy &&
+    (requested || producers.privacyCursor || producers.privacyAccounting)
+  )
     // Original privacy accounting is independent of provider/generation setup.
     journal = await PreparedGenerationJournal.prepare(runtime.pool, {
       migration: { version: migrations.journal, checksum: journalChecksum },

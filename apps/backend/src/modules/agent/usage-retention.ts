@@ -32,6 +32,7 @@ export class PreparedUsageRetention {
     readonly policyVersion: string,
     private readonly authority: UsageExpiryAuthority,
     private readonly authorityOwner: UsageExpiryAuthority,
+    private readonly assertPrivacyRegistered: () => Promise<void>,
   ) {}
 
   static async prepare(
@@ -100,12 +101,14 @@ export class PreparedUsageRetention {
         assertExpiry: input.authority.assertExpiry.bind(input.authority),
       }),
       input.authority,
+      input.assertPrivacyRegistered,
     );
     Object.freeze(retention);
     return retention;
   }
 
   async assertClient(client: PoolClient) {
+    await this.assertPrivacyRegistered();
     await assertAccountingRetentionIntegrity(client);
     const ready = await client.query(
       "SELECT version FROM creator.schema_migration WHERE version=$1 AND checksum=$2 AND current_database()=$3",

@@ -39,6 +39,74 @@ import { domainPrivacyTaskAuthorityInTransaction } from "./domain-privacy-author
 import { prepareGenerationAccountingRetention } from "./generation-accounting-retention.js";
 import { PreparedPrivacyAccountingBoundary } from "./accounting-boundary.js";
 import type { PrivacyArtifactStore } from "./privacy-export.js";
+import type { TrustWorker } from "./worker.js";
+import type { AgentRepository } from "../agent/repository.js";
+import type { PreparedUsageRetention } from "../agent/usage-retention.js";
+
+// Registration belongs to the exact hooks installed in the original worker.
+// Copies, domain names and a second pool with the same URL are not evidence.
+const registrations = new WeakMap<
+  PrivacyHook[],
+  {
+    pool: Pool;
+    coordinator: Pool;
+    worker?: TrustWorker;
+    hooks: {
+      hook: PrivacyHook;
+      domain: PrivacyHook["domain"];
+      run: PrivacyHook["run"];
+    }[];
+    agent: () => AgentPrivacyOwnerPorts | undefined;
+  }
+>();
+
+/** Called only by the owning runtime as it installs its original worker. */
+export function installPrivacyConsumers(worker: TrustWorker): void {
+  const original = registrations.get(worker.privacyHooks);
+  if (!original) return;
+  invariant(
+    !original.worker && original.coordinator === worker.pool,
+    "privacy_consumers_unregistered",
+    "Privacy consumers belong to one original Trust worker.",
+  );
+  original.worker = worker;
+}
+
+export function assertPrivacyConsumersRegistered(
+  worker: TrustWorker,
+  pool: Pool,
+  accounting?: {
+    repository: AgentRepository;
+    retention: PreparedUsageRetention;
+  },
+): void {
+  const original = registrations.get(worker.privacyHooks);
+  invariant(
+    original &&
+      original.worker === worker &&
+      original.pool === pool &&
+      original.coordinator === worker.pool &&
+      original.hooks.length === worker.privacyHooks.length &&
+      original.hooks.every(
+        ({ hook, domain, run }, index) =>
+          worker.privacyHooks[index] === hook &&
+          hook.domain === domain &&
+          hook.run === run,
+      ),
+    "privacy_consumers_unregistered",
+    "The original accounting privacy consumers must remain installed in this host's Trust worker.",
+  );
+  if (accounting) {
+    const agent = original.agent();
+    invariant(
+      agent?.service.repository === accounting.repository,
+      "agent_lifecycle_composition_mismatch",
+      "Accounting expiry must use the Agent repository registered for privacy.",
+    );
+    agent.lifecycle.assertRepository(accounting.repository);
+    agent.lifecycle.assertUsageRetention(accounting.retention);
+  }
+}
 
 /** Actual host owners and reviewed registration only. W8 supplies its original
  * task/family authority when binding them; the host cannot replace that port. */
@@ -123,6 +191,7 @@ export function createPrivacyConsumers(input: {
   >;
   additional?: PrivacyHook[];
 }) {
+  input = { ...input };
   const verify = privacyTaskAuthority(input.coordinatorPool);
   const conversationAuthority = conversationPrivacyAuthority(
     input.runtimePool,
@@ -387,5 +456,23 @@ export function createPrivacyConsumers(input: {
   hooks.push(...(input.additional ?? []));
   if (new Set(hooks.map((hook) => hook.domain)).size !== hooks.length)
     throw new Error("Duplicate privacy consumer.");
+  if (
+    input.agent &&
+    input.conversation &&
+    (input.commerce || input.commerceOwner) &&
+    input.assertRestoredInTransaction
+  ) {
+    const agent = input.agent;
+    registrations.set(hooks, {
+      pool: input.runtimePool,
+      coordinator: input.coordinatorPool,
+      hooks: hooks.map((hook) => ({
+        hook,
+        domain: hook.domain,
+        run: hook.run,
+      })),
+      agent: typeof agent === "function" ? agent : () => agent,
+    });
+  }
   return hooks;
 }

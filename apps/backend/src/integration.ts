@@ -29,6 +29,10 @@ import {
 } from "./modules/identity/audience-scope.js";
 
 export type BackendRuntime = {
+  prepareUsageAccounting?: () => Promise<
+    | import("./modules/trust/usage-accounting-host.js").HostUsageAccounting
+    | undefined
+  >;
   pool: pg.Pool;
   database: Database;
   access: AccessService;
@@ -348,6 +352,15 @@ export async function createConfiguredBackend(input: {
       : {}),
     ...(input.trust
       ? {
+          prepareUsageAccounting: async () => {
+            if (!trust)
+              throw new DomainError(
+                "trust_unconfigured",
+                "Current accounting privacy registration is unavailable.",
+                503,
+              );
+            return trust.prepareUsageAccounting(pool);
+          },
           assertRestoredInTransaction: async (client: pg.PoolClient) => {
             if (!trust)
               throw new DomainError(

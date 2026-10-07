@@ -69,6 +69,7 @@ export class PreparedGenerationJournal {
     private readonly checksum: string,
     private readonly database: string,
     readonly retentionPolicyVersion: string,
+    private readonly assertPrivacyRegistered: () => Promise<void>,
   ) {}
   static async prepare(
     pool: Pool,
@@ -129,6 +130,7 @@ export class PreparedGenerationJournal {
       input.migration.checksum,
       database,
       input.retentionPolicyVersion,
+      input.assertPrivacyRegistered,
     );
     Object.freeze(journal);
     return journal;
@@ -141,6 +143,7 @@ export class PreparedGenerationJournal {
     );
   }
   async assertClient(client: PoolClient) {
+    await this.assertPrivacyRegistered();
     const ready = (
       await client.query(
         "SELECT version FROM creator.schema_migration WHERE version=$1 AND checksum=$2 AND current_database()=$3",

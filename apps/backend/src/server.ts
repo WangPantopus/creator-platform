@@ -21,10 +21,7 @@ import {
   developmentTrustActors,
 } from "./modules/trust/development.js";
 import { agentFeature } from "./modules/agent/feature.js";
-import {
-  DevelopmentLicenseVerifier,
-  developmentSyntheticJournalPolicy,
-} from "./modules/agent/development-license.js";
+import { DevelopmentLicenseVerifier } from "./modules/agent/development-license.js";
 import { contentPublicProjection } from "./modules/growth/content.js";
 import { canonicalConversationHomePage } from "./modules/growth/home.js";
 import { canonicalHomePage } from "./modules/growth/home-composition.js";
@@ -149,12 +146,12 @@ try {
                       runtime.pool,
                       syntheticHost,
                     ),
-                    journalPolicy:
-                      developmentSyntheticJournalPolicy(syntheticHost),
                   }
                 : {};
+            const usageAccounting = await runtime.prepareUsageAccounting?.();
             const host = await composeConversationHost(runtime, config, {
               ...licensing,
+              ...(usageAccounting ? { usageAccounting } : {}),
               ...(mediaHost
                 ? {
                     media: mediaHost.media,
@@ -176,6 +173,7 @@ try {
                 : "Call control: unavailable; canonical held request authority is not activated.\n",
             );
             features.conversationPrivacy = host.privacy;
+            usageAccounting?.bindRepository(agent.service.repository);
             runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
             // Growth and Content share publication/follow composition. Resolve
             // the actual reader after the canonical Content service is bound,

@@ -28,6 +28,13 @@ export class AgentLifecycle {
         503,
       );
   }
+  assertUsageRetention(retention: PreparedUsageRetention): void {
+    invariant(
+      this.usageRetention === retention,
+      "agent_lifecycle_composition_mismatch",
+      "Accounting expiry must retain this lifecycle's original retention owner.",
+    );
+  }
   async assertAccountingClient(client: PoolClient) {
     const installed = await generationJournalInstalled(client);
     if (installed) {
