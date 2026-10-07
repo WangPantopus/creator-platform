@@ -1,0 +1,699 @@
+{
+  "database": "creator_pr_review_full",
+  "postgres": "17",
+  "isolation": "One outer transaction; held SQL BEGIN/COMMIT wrappers omitted; final ROLLBACK. No migration ledger changes.",
+  "installedSources": 26,
+  "compilerFunctions": 49,
+  "compilerContexts": 58,
+  "compiler": [
+    {
+      "kind": "compiler",
+      "function": "creator.ai_generation_receipt_immutable()",
+      "relation": "creator.ai_generation_receipt",
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.ai_usage_completion_custody_immutable()",
+      "relation": "creator.ai_usage",
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.begin_generation_scope(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.begin_generation_terminal(uuid,uuid,text,uuid,integer,boolean)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.capture_generation_initiator()",
+      "relation": "creator.generation",
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.capture_generation_terminal()",
+      "relation": "creator.generation",
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.claim_generation_task(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.commerce_original_cost_rule()",
+      "relation": "creator.commerce_allowance_reservation",
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.commerce_public_packet_evidence(uuid,uuid,uuid,integer,jsonb)",
+      "relation": null,
+      "diagnostics": [
+        {
+          "functionid": "creator.commerce_public_packet_evidence",
+          "lineno": 4,
+          "statement": "FOR with integer loop variable",
+          "sqlstate": "00000",
+          "message": "auto variable \"j\" shadows a previously defined variable",
+          "detail": null,
+          "hint": "SET plpgsql.extra_warnings TO 'shadowed_variables'",
+          "level": "warning extra",
+          "position": null,
+          "query": null,
+          "context": null
+        },
+        {
+          "functionid": "creator.commerce_public_packet_evidence",
+          "lineno": 47,
+          "statement": "FOR with integer loop variable",
+          "sqlstate": "00000",
+          "message": "auto variable \"j\" shadows a previously defined variable",
+          "detail": null,
+          "hint": "SET plpgsql.extra_warnings TO 'shadowed_variables'",
+          "level": "warning extra",
+          "position": null,
+          "query": null,
+          "context": null
+        },
+        {
+          "functionid": "creator.commerce_public_packet_evidence",
+          "lineno": 2,
+          "statement": "DECLARE",
+          "sqlstate": "00000",
+          "message": "unused variable \"j\"",
+          "detail": null,
+          "hint": null,
+          "level": "warning",
+          "position": null,
+          "query": null,
+          "context": null
+        }
+      ]
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.commerce_public_packet_mode(uuid,uuid,uuid,integer,jsonb)",
+      "relation": null,
+      "diagnostics": [
+        {
+          "functionid": "creator.commerce_public_packet_mode",
+          "lineno": 4,
+          "statement": "FOR with integer loop variable",
+          "sqlstate": "00000",
+          "message": "auto variable \"j\" shadows a previously defined variable",
+          "detail": null,
+          "hint": "SET plpgsql.extra_warnings TO 'shadowed_variables'",
+          "level": "warning extra",
+          "position": null,
+          "query": null,
+          "context": null
+        },
+        {
+          "functionid": "creator.commerce_public_packet_mode",
+          "lineno": 6,
+          "statement": "FOR with integer loop variable",
+          "sqlstate": "00000",
+          "message": "auto variable \"j\" shadows a previously defined variable",
+          "detail": null,
+          "hint": "SET plpgsql.extra_warnings TO 'shadowed_variables'",
+          "level": "warning extra",
+          "position": null,
+          "query": null,
+          "context": null
+        },
+        {
+          "functionid": "creator.commerce_public_packet_mode",
+          "lineno": 2,
+          "statement": "DECLARE",
+          "sqlstate": "00000",
+          "message": "unused variable \"j\"",
+          "detail": null,
+          "hint": null,
+          "level": "warning",
+          "position": null,
+          "query": null,
+          "context": null
+        }
+      ]
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.confirm_generation_initiator(uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.derive_content_origin_metadata()",
+      "relation": "creator.content_revision",
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.end_generation_scope()",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.end_generation_terminal()",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.fence_public_mode_write()",
+      "relation": "creator.commerce_mode",
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.fence_public_packet_write()",
+      "relation": "creator.commerce_commitment",
+      "diagnostics": [
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 5,
+          "statement": "IF",
+          "sqlstate": "42703",
+          "message": "record \"new\" has no field \"thread_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL expression \"(NEW.id,NEW.creator_id,NEW.fan_id,NEW.thread_id) IS DISTINCT FROM (OLD.id,OLD.creator_id,OLD.fan_id,OLD.thread_id)\""
+        },
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 9,
+          "statement": "IF",
+          "sqlstate": "42703",
+          "message": "record \"new\" has no field \"commitment_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL expression \"NEW.commitment_id IS DISTINCT FROM OLD.commitment_id\""
+        },
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 18,
+          "statement": "SQL statement",
+          "sqlstate": "42703",
+          "message": "record \"old\" has no field \"commitment_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL statement \"SELECT c.packet_id             FROM creator.commerce_commitment c WHERE c.id=CASE WHEN TG_OP='DELETE' THEN OLD.commitment_id ELSE NEW.commitment_id END\""
+        }
+      ]
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.fence_public_packet_write()",
+      "relation": "creator.commerce_effect",
+      "diagnostics": [
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 5,
+          "statement": "IF",
+          "sqlstate": "42703",
+          "message": "record \"new\" has no field \"thread_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL expression \"(NEW.id,NEW.creator_id,NEW.fan_id,NEW.thread_id) IS DISTINCT FROM (OLD.id,OLD.creator_id,OLD.fan_id,OLD.thread_id)\""
+        },
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 9,
+          "statement": "IF",
+          "sqlstate": "42703",
+          "message": "record \"new\" has no field \"commitment_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL expression \"NEW.commitment_id IS DISTINCT FROM OLD.commitment_id\""
+        },
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 18,
+          "statement": "SQL statement",
+          "sqlstate": "42703",
+          "message": "record \"old\" has no field \"commitment_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL statement \"SELECT c.packet_id             FROM creator.commerce_commitment c WHERE c.id=CASE WHEN TG_OP='DELETE' THEN OLD.commitment_id ELSE NEW.commitment_id END\""
+        }
+      ]
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.fence_public_packet_write()",
+      "relation": "creator.commerce_ledger",
+      "diagnostics": [
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 5,
+          "statement": "IF",
+          "sqlstate": "42703",
+          "message": "record \"new\" has no field \"thread_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL expression \"(NEW.id,NEW.creator_id,NEW.fan_id,NEW.thread_id) IS DISTINCT FROM (OLD.id,OLD.creator_id,OLD.fan_id,OLD.thread_id)\""
+        }
+      ]
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.fence_public_packet_write()",
+      "relation": "creator.commerce_packet",
+      "diagnostics": [
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 9,
+          "statement": "IF",
+          "sqlstate": "42703",
+          "message": "record \"new\" has no field \"commitment_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL expression \"NEW.commitment_id IS DISTINCT FROM OLD.commitment_id\""
+        },
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 10,
+          "statement": "RAISE",
+          "sqlstate": "42703",
+          "message": "record \"new\" has no field \"packet_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL expression \"NEW.packet_id IS DISTINCT FROM OLD.packet_id\""
+        },
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 18,
+          "statement": "SQL statement",
+          "sqlstate": "42703",
+          "message": "record \"old\" has no field \"commitment_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL statement \"SELECT c.packet_id             FROM creator.commerce_commitment c WHERE c.id=CASE WHEN TG_OP='DELETE' THEN OLD.commitment_id ELSE NEW.commitment_id END\""
+        },
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 19,
+          "statement": "assignment",
+          "sqlstate": "42703",
+          "message": "record \"old\" has no field \"packet_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "PL/pgSQL assignment \"packet=CASE WHEN TG_OP='DELETE' THEN OLD.packet_id ELSE NEW.packet_id END\""
+        }
+      ]
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.fence_public_packet_write()",
+      "relation": "creator.commerce_share_grant",
+      "diagnostics": [
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 5,
+          "statement": "IF",
+          "sqlstate": "42703",
+          "message": "record \"new\" has no field \"thread_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL expression \"(NEW.id,NEW.creator_id,NEW.fan_id,NEW.thread_id) IS DISTINCT FROM (OLD.id,OLD.creator_id,OLD.fan_id,OLD.thread_id)\""
+        },
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 10,
+          "statement": "RAISE",
+          "sqlstate": "42703",
+          "message": "record \"new\" has no field \"packet_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "SQL expression \"NEW.packet_id IS DISTINCT FROM OLD.packet_id\""
+        },
+        {
+          "functionid": "creator.fence_public_packet_write",
+          "lineno": 19,
+          "statement": "assignment",
+          "sqlstate": "42703",
+          "message": "record \"old\" has no field \"packet_id\"",
+          "detail": null,
+          "hint": null,
+          "level": "error",
+          "position": null,
+          "query": null,
+          "context": "PL/pgSQL assignment \"packet=CASE WHEN TG_OP='DELETE' THEN OLD.packet_id ELSE NEW.packet_id END\""
+        }
+      ]
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.fence_signature_metadata_write()",
+      "relation": "creator.creator_profile",
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.fence_signature_metadata_write()",
+      "relation": "creator.passkey_credential",
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.fence_signature_metadata_write()",
+      "relation": "creator.signed_act",
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.fence_signature_metadata_write()",
+      "relation": "creator.signed_act_consumption",
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.fence_signature_metadata_write()",
+      "relation": "creator.signed_publication",
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.fence_signature_metadata_write()",
+      "relation": "creator.signed_verification",
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.generation_agent_inputs(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.generation_agent_journal_receipt(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.generation_agent_metadata(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.generation_agent_runtime_context(uuid,uuid,text,text)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.generation_allowance_audience(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.generation_append_agent_receipt(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.generation_begin_agent_attempt(uuid,uuid,text,text,bigint,text)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.generation_content_origins(uuid,uuid,jsonb)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.generation_conversation_context(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.generation_finish_provider_usage(uuid,uuid,uuid,text,jsonb,integer)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.generation_open_provider_usage(uuid,uuid,text,text,text,text)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.generation_original_allowance_receipt(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.generation_output_cursor_view(uuid,uuid,integer,integer)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.generation_record_agent_guardrail(uuid,uuid,text,text)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.generation_scope_matches(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.generation_seal_agent_journal(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.generation_settle_original_allowance(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.generation_settle_typed_original_allowance(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.generation_task_proof(uuid,uuid,boolean)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.generation_terminal_matches(uuid,uuid,boolean)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.generation_terminal_output(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.generation_typed_original_allowance_receipt(uuid,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.generation_worker_output(uuid,uuid,integer,text,jsonb)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.hold_public_packet_signature_read(uuid,uuid,uuid,integer,jsonb,uuid[])",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.pending_generation_tasks(integer)",
+      "relation": null,
+      "diagnostics": [
+        {
+          "functionid": "creator.pending_generation_tasks",
+          "lineno": 8,
+          "statement": "RETURN QUERY",
+          "sqlstate": "00000",
+          "message": "routine is marked as STABLE, but expression is VOLATILE",
+          "detail": "there is a risk of unwanted behave",
+          "hint": "When you fix this issue, please, recheck other functions that uses this function.",
+          "level": "warning",
+          "position": null,
+          "query": null,
+          "context": null
+        }
+      ]
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.pending_generation_terminal_cursors(integer)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.pending_generation_terminals(integer)",
+      "relation": null,
+      "diagnostics": [
+        {
+          "functionid": "creator.pending_generation_terminals",
+          "lineno": 8,
+          "statement": "RETURN QUERY",
+          "sqlstate": "00000",
+          "message": "routine is marked as STABLE, but expression is VOLATILE",
+          "detail": "there is a risk of unwanted behave",
+          "hint": "When you fix this issue, please, recheck other functions that uses this function.",
+          "level": "warning",
+          "position": null,
+          "query": null,
+          "context": null
+        }
+      ]
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.refresh_generation_output_cursor(uuid,uuid,integer,uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.require_generation_scope_cleanup()",
+      "relation": "creator.generation_worker_scope",
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator.require_generation_terminal_cleanup()",
+      "relation": "creator.generation_terminal_scope",
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator_trust.generation_terminal_denial(uuid)",
+      "relation": null,
+      "diagnostics": []
+    },
+    {
+      "kind": "compiler",
+      "function": "creator_trust.generation_worker_denial(uuid)",
+      "relation": null,
+      "diagnostics": []
+    }
+  ],
+  "profileObservations": [
+    {
+      "kind": "origin_profile_before_fence",
+      "rows": 1
+    },
+    {
+      "kind": "origin_profile_without_scope",
+      "rows": 0
+    }
+  ],
+  "triggerOperation": {
+    "source": "Unchanged creator.fence_public_packet_write()",
+    "relationShapes": [
+      "commerce_packet",
+      "commerce_commitment",
+      "commerce_share_grant",
+      "commerce_ledger",
+      "commerce_effect"
+    ],
+    "operation": "Temporary tables copied from the real column shapes; actual original trigger executed insert/unchanged update/delete and rejected lineage update with 23514 in each. No canonical commerce rows or paid authority were created.",
+    "result": "All five completed; absent-field diagnostics concern unreachable branches for the other relation types, not a reproduced runtime failure."
+  },
+  "before": {
+    "schemaSha256": "fae68ebf084be047184ab3cf98870ec951fc0ab72384b176573ebf53ba587020",
+    "rolesSha256": "1d81a1caa22a63fac6fd88a3d498630c018c1413bb10a7c203b1f405520aeab0",
+    "rowsSha256": "9cbc7f9a479a5f3e6328b1b353f38ba609b48ad2eb9eb66c722abf77c747ca86",
+    "tables": 137,
+    "rows": 236
+  },
+  "after": {
+    "schemaSha256": "fae68ebf084be047184ab3cf98870ec951fc0ab72384b176573ebf53ba587020",
+    "rolesSha256": "1d81a1caa22a63fac6fd88a3d498630c018c1413bb10a7c203b1f405520aeab0",
+    "rowsSha256": "9cbc7f9a479a5f3e6328b1b353f38ba609b48ad2eb9eb66c722abf77c747ca86",
+    "tables": 137,
+    "rows": 236
+  },
+  "firstAttempt": {
+    "exitCode": 3,
+    "reason": "0074 content_denial_metadata already installed in canonical61. Original connection closed/transaction rolled back; second composition reused the actual installed0074/0082 dependencies."
+  },
+  "limitations": [
+    "No live generation/provider/positive purpose or settlement exercised.",
+    "No expected catalogue digest populated or migration activated.",
+    "Compiler warnings retained; packet trigger static diagnostics remain visible with operated branch attribution.",
+    "Temporary relation-shape operation does not qualify production sharing, commerce RLS, concurrency or full lifecycle."
+  ]
+}

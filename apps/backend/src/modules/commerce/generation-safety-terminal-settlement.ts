@@ -78,6 +78,20 @@ export class CommerceGenerationSafetyTerminalSettlement {
       catalogueChecksum: string;
     },
   ) {}
+  assertComposition(
+    identity: GenerationIdentityAuthority,
+    terminal: GenerationTerminalAuthority,
+    hostPool: Pool,
+  ): void {
+    invariant(
+      identity === this.configuration.identity &&
+        terminal === this.configuration.terminal &&
+        hostPool === this.configuration.hostPool,
+      "generation_terminal_settlement_composition_changed",
+      "Use this settlement's original identity, terminal and canonical host.",
+    );
+  }
+
   static async prepare(input: {
     identity: GenerationIdentityAuthority;
     terminal: GenerationTerminalAuthority;

@@ -342,6 +342,10 @@ export class GenerationTerminalAuthority {
   assertPool(pool: Pool): void {
     if (pool !== this.pool) this.unconfigured();
   }
+  assertGeneration(identity: GenerationIdentityAuthority): void {
+    if (identity !== this.configuration.generation) this.unconfigured();
+  }
+
   private unconfigured(cause?: unknown): never {
     const failure = new DomainError(
       "generation_terminal_unconfigured",

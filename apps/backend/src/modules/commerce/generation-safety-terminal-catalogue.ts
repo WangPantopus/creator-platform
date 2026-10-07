@@ -3,6 +3,8 @@ import { contentHash } from "../../core/canonical.js";
 import { DomainError } from "../../core/errors.js";
 import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
 import { requestAuthority } from "../identity/request-authority.js";
+import { GENERATION_PROFILE_BOUND_SOURCE } from "../agent/generation-profile-bound.js";
+import { GENERATION_CONTENT_ORIGIN_PROFILE_FENCE_SOURCE } from "../content/generation-origin-profile.js";
 
 /** Logical-name metadata pattern from the actual independently reviewed W1/W4
  * publication catalogue. Includes both legacy and typed financial callers,
@@ -109,6 +111,8 @@ export const GENERATION_SAFETY_TERMINAL_CATALOGUE_SHA256: string | undefined =
   undefined;
 export const GENERATION_SAFETY_TERMINAL_SOURCES = Object.freeze(
   [
+    GENERATION_PROFILE_BOUND_SOURCE,
+    GENERATION_CONTENT_ORIGIN_PROFILE_FENCE_SOURCE,
     {
       name: "w4_generation_safety_terminal_settlement",
       path: "apps/backend/src/modules/commerce/schema-generation-safety-terminal-settlement.sql",

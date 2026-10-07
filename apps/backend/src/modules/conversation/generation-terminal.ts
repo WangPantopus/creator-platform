@@ -116,6 +116,20 @@ export class PreparedGenerationConversationTerminal {
     );
   }
 
+  assertComposition(
+    identity: GenerationIdentityAuthority,
+    terminal: GenerationTerminalAuthority,
+    hostPool: Pool,
+  ): void {
+    invariant(
+      identity === this.identity &&
+        terminal === this.terminal &&
+        hostPool === this.hostPool,
+      "generation_finalization_composition_changed",
+      "Use this finalizer's original identity, terminal and canonical host.",
+    );
+  }
+
   static async prepare(input: {
     identity: GenerationIdentityAuthority;
     terminal: GenerationTerminalAuthority;

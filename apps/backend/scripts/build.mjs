@@ -45,6 +45,7 @@ await build({
     server: "src/server.ts",
     integration: "src/integration.ts",
     "workers/start": "src/workers/start.ts",
+    "workers/generation-composition": "src/workers/generation-composition.ts",
   },
   outdir: "dist",
   outExtension: { ".js": ".mjs" },

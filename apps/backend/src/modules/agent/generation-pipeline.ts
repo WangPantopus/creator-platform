@@ -211,6 +211,17 @@ export class PreparedGenerationPipeline {
     );
   }
 
+  assertComposition(
+    identity: GenerationIdentityAuthority,
+    hostPool: import("pg").Pool,
+  ): void {
+    invariant(
+      identity === this.identity && hostPool === this.service.repository.pool,
+      "generation_pipeline_composition_changed",
+      "Use this pipeline's original identity and canonical host.",
+    );
+  }
+
   private async current(
     client: PoolClient,
     scope: GenerationTaskScope,
