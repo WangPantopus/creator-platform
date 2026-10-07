@@ -1,0 +1,569 @@
+[
+  {
+    "at": "2026-10-07T02:46:25.116Z",
+    "connection": 2,
+    "phase": "worker-commit-held",
+    "delayMs": 1000
+  },
+  {
+    "at": "2026-10-07T02:46:25.319Z",
+    "connection": 2,
+    "phase": "held-100ms",
+    "activity": [
+      {
+        "pid": 195,
+        "usename": "creator_runtime",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 194,
+        "usename": "creator_runtime",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 190,
+        "usename": "creator_runtime",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 178,
+        "usename": "creator_runtime",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 189,
+        "usename": "creator_trust_runtime",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 165,
+        "usename": "creator_trust_worker",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 161,
+        "usename": "creator_trust_worker",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 191,
+        "usename": "creator_review_growth_api",
+        "state": "idle in transaction",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 197,
+        "usename": "growth_worker",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 171,
+        "usename": "growth_worker",
+        "state": "idle in transaction",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      }
+    ]
+  },
+  {
+    "at": "2026-10-07T02:46:25.619Z",
+    "connection": 2,
+    "phase": "held-400ms",
+    "activity": [
+      {
+        "pid": 195,
+        "usename": "creator_runtime",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 194,
+        "usename": "creator_runtime",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 190,
+        "usename": "creator_runtime",
+        "state": "active",
+        "wait_event_type": "Lock",
+        "wait_event": "transactionid",
+        "blockers": [
+          191
+        ],
+        "revoking": true
+      },
+      {
+        "pid": 178,
+        "usename": "creator_runtime",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 189,
+        "usename": "creator_trust_runtime",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 165,
+        "usename": "creator_trust_worker",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 161,
+        "usename": "creator_trust_worker",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 191,
+        "usename": "creator_review_growth_api",
+        "state": "idle in transaction",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 197,
+        "usename": "growth_worker",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 171,
+        "usename": "growth_worker",
+        "state": "idle in transaction",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      }
+    ]
+  },
+  {
+    "at": "2026-10-07T02:46:26.026Z",
+    "connection": 2,
+    "phase": "held-800ms",
+    "activity": [
+      {
+        "pid": 195,
+        "usename": "creator_runtime",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 194,
+        "usename": "creator_runtime",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 190,
+        "usename": "creator_runtime",
+        "state": "active",
+        "wait_event_type": "Lock",
+        "wait_event": "transactionid",
+        "blockers": [
+          191
+        ],
+        "revoking": true
+      },
+      {
+        "pid": 178,
+        "usename": "creator_runtime",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 189,
+        "usename": "creator_trust_runtime",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 165,
+        "usename": "creator_trust_worker",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 161,
+        "usename": "creator_trust_worker",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 191,
+        "usename": "creator_review_growth_api",
+        "state": "idle in transaction",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 197,
+        "usename": "growth_worker",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 171,
+        "usename": "growth_worker",
+        "state": "idle in transaction",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      }
+    ]
+  },
+  {
+    "at": "2026-10-07T02:46:26.117Z",
+    "connection": 2,
+    "phase": "worker-commit-forwarded"
+  },
+  {
+    "at": "2026-10-07T02:47:22.401Z",
+    "connection": 2,
+    "phase": "worker-commit-held",
+    "delayMs": 2200
+  },
+  {
+    "at": "2026-10-07T02:47:22.599Z",
+    "connection": 2,
+    "phase": "held-100ms",
+    "activity": [
+      {
+        "pid": 244,
+        "usename": "creator_runtime",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 240,
+        "usename": "creator_runtime",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 190,
+        "usename": "creator_runtime",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 238,
+        "usename": "creator_trust_runtime",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 165,
+        "usename": "creator_trust_worker",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 161,
+        "usename": "creator_trust_worker",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 241,
+        "usename": "creator_review_growth_api",
+        "state": "idle in transaction",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 171,
+        "usename": "growth_worker",
+        "state": "idle in transaction",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      }
+    ]
+  },
+  {
+    "at": "2026-10-07T02:47:22.899Z",
+    "connection": 2,
+    "phase": "held-400ms",
+    "activity": [
+      {
+        "pid": 244,
+        "usename": "creator_runtime",
+        "state": "active",
+        "wait_event_type": "Lock",
+        "wait_event": "transactionid",
+        "blockers": [
+          241
+        ],
+        "revoking": true
+      },
+      {
+        "pid": 240,
+        "usename": "creator_runtime",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 190,
+        "usename": "creator_runtime",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 238,
+        "usename": "creator_trust_runtime",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 165,
+        "usename": "creator_trust_worker",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 161,
+        "usename": "creator_trust_worker",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 241,
+        "usename": "creator_review_growth_api",
+        "state": "idle in transaction",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 171,
+        "usename": "growth_worker",
+        "state": "idle in transaction",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      }
+    ]
+  },
+  {
+    "at": "2026-10-07T02:47:23.297Z",
+    "connection": 2,
+    "phase": "held-800ms",
+    "activity": [
+      {
+        "pid": 244,
+        "usename": "creator_runtime",
+        "state": "active",
+        "wait_event_type": "Lock",
+        "wait_event": "transactionid",
+        "blockers": [
+          241
+        ],
+        "revoking": true
+      },
+      {
+        "pid": 240,
+        "usename": "creator_runtime",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 190,
+        "usename": "creator_runtime",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 238,
+        "usename": "creator_trust_runtime",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 165,
+        "usename": "creator_trust_worker",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 161,
+        "usename": "creator_trust_worker",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 241,
+        "usename": "creator_review_growth_api",
+        "state": "idle in transaction",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 260,
+        "usename": "growth_worker",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      },
+      {
+        "pid": 171,
+        "usename": "growth_worker",
+        "state": "idle in transaction",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "blockers": [],
+        "revoking": false
+      }
+    ]
+  },
+  {
+    "at": "2026-10-07T02:47:24.601Z",
+    "connection": 2,
+    "phase": "closed-before-forward"
+  }
+]

@@ -1,0 +1,72 @@
+[
+  {
+    "timestamp": "2026-10-07T02:45:40.771Z",
+    "level": "info",
+    "environment": "local-development",
+    "release": "de2a79148c9c1688a7cbaaf2bbd4c21e039d948b",
+    "correlationId": "f1c1d226-449d-48df-b381-245f37a01320",
+    "method": "POST",
+    "route": "/logout",
+    "status": 200,
+    "transferOutcome": "finished",
+    "errorCode": null,
+    "failureClass": null,
+    "durationMs": 2.67
+  },
+  {
+    "timestamp": "2026-10-07T02:46:26.121Z",
+    "level": "info",
+    "environment": "local-development",
+    "release": "de2a79148c9c1688a7cbaaf2bbd4c21e039d948b",
+    "correlationId": "f6c1e904-321e-4be2-a798-d3f117391647",
+    "method": "POST",
+    "route": "/experiments",
+    "status": 201,
+    "transferOutcome": "finished",
+    "errorCode": null,
+    "failureClass": null,
+    "durationMs": 1050.27
+  },
+  {
+    "timestamp": "2026-10-07T02:46:26.122Z",
+    "level": "info",
+    "environment": "local-development",
+    "release": "de2a79148c9c1688a7cbaaf2bbd4c21e039d948b",
+    "correlationId": "93b2610f-7b17-425b-bbf8-7b3286417247",
+    "method": "POST",
+    "route": "/logout",
+    "status": 200,
+    "transferOutcome": "finished",
+    "errorCode": null,
+    "failureClass": null,
+    "durationMs": 717.07
+  },
+  {
+    "timestamp": "2026-10-07T02:47:23.906Z",
+    "level": "info",
+    "environment": "local-development",
+    "release": "de2a79148c9c1688a7cbaaf2bbd4c21e039d948b",
+    "correlationId": "a6194a89-ef3c-4e2d-b180-86bde29be0cb",
+    "method": "POST",
+    "route": "/logout",
+    "status": 200,
+    "transferOutcome": "finished",
+    "errorCode": null,
+    "failureClass": null,
+    "durationMs": 1216.86
+  },
+  {
+    "timestamp": "2026-10-07T02:47:23.907Z",
+    "level": "error",
+    "environment": "local-development",
+    "release": "de2a79148c9c1688a7cbaaf2bbd4c21e039d948b",
+    "correlationId": "79a7068a-399c-483a-ba85-7ebb9599ec8f",
+    "method": "POST",
+    "route": "/experiments",
+    "status": 503,
+    "transferOutcome": "finished",
+    "errorCode": null,
+    "failureClass": null,
+    "durationMs": 1552.03
+  }
+]
