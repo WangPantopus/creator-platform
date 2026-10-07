@@ -10,6 +10,10 @@ import {
   contentPrivacySource,
   registeredContentPrivacyProfile,
 } from "../src/db/content-privacy-profile.js";
+import {
+  generationOutputRepairSource,
+  registeredGenerationOutputProfile,
+} from "../src/db/generation-output-profile.js";
 import generationReview from "../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
 
 if (!process.env.DATABASE_MIGRATION_URL)
@@ -66,6 +70,13 @@ try {
     throw new Error(
       "Content registry requires the exact complete generation and Content graph.",
     );
+  const output = registry.migrations.some(
+    (source) => source.version === generationOutputRepairSource.version,
+  );
+  if (output && (!content || !(await registeredGenerationOutputProfile())))
+    throw new Error(
+      "Output registry requires the exact complete Content and output graph.",
+    );
   const registeredFiles = registry.migrations
     .filter(
       (file) =>
@@ -111,6 +122,13 @@ try {
     throw new Error(
       "Unregistered Content extension or incomplete predecessor; no per-file repair was attempted.",
     );
+  const installedOutput = applied.some(
+    (row) => row.version === generationOutputRepairSource.version,
+  );
+  if (installedOutput && (!output || !installedContent))
+    throw new Error(
+      "Unregistered output repair or incomplete predecessor; no per-file repair was attempted.",
+    );
   // Fresh databases still bootstrap the exact canonical61. The complete new
   // wave is only installed atomically by activate-wave after private backup,
   // separate restore and closed-admission checks. Registered code alone cannot
@@ -118,7 +136,9 @@ try {
   const files = registeredFiles.filter(
     (source) =>
       (installedGeneration || !generationVersions.has(source.version)) &&
-      (installedContent || source.version !== contentPrivacySource.version),
+      (installedContent || source.version !== contentPrivacySource.version) &&
+      (installedOutput ||
+        source.version !== generationOutputRepairSource.version),
   );
   const historical = localLegacy
     ? new Set<string>()
@@ -163,7 +183,11 @@ try {
       if (installedGeneration)
         await assertGenerationWaveRoleSafety(
           client,
-          installedContent ? "content-privacy" : undefined,
+          installedOutput
+            ? "generation-output"
+            : installedContent
+              ? "content-privacy"
+              : undefined,
         );
       else await assertWaveRoleSafety(client, installedRoles(applied));
       if (continuation)
@@ -253,7 +277,11 @@ try {
       if (installedGeneration)
         await assertGenerationWaveRoleSafety(
           client,
-          installedContent ? "content-privacy" : undefined,
+          installedOutput
+            ? "generation-output"
+            : installedContent
+              ? "content-privacy"
+              : undefined,
         );
       else await assertWaveRoleSafety(client, installedRoles(files));
       if (continuation)
@@ -267,6 +295,10 @@ try {
   if (generation && !installedGeneration)
     process.stdout.write(
       "Canonical61 verified; generation wave remains unapplied. Use W8_MIGRATION_WAVE=20261007-generation with scripts/activate-wave.ts and a verified private backup/restore before runtime admission.\n",
+    );
+  if (output && !installedOutput)
+    process.stdout.write(
+      "Generation output repair remains unapplied. After Content101, use W8_MIGRATION_WAVE=20261007-generation-output with verified private backup/restore and closed admission.\n",
     );
   if (content && !installedContent)
     process.stdout.write(

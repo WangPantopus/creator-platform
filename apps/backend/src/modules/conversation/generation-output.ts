@@ -6,6 +6,8 @@ import { canonical, contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import { generationHostDatabase } from "../identity/generation-host-database.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
+import { generationOutputRepairSource } from "../../db/generation-output-profile.js";
+import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
 import {
   GenerationIdentityAuthority,
   type GenerationPurposeConsumer,
@@ -51,6 +53,7 @@ const Columns = {
       "epoch",
       "context_revision",
       "last_sequence",
+      "first_visible_at",
       "state",
       "worker_token",
       "lease_until",
@@ -378,6 +381,7 @@ export class PreparedGenerationConversationOutput {
   private async assertCustody(client: PoolClient): Promise<void> {
     const receipt = this.custody.consumer;
     try {
+      await assertRegisteredMigration(client, generationOutputRepairSource);
       await this.identity.assertCatalogueInTransaction(client);
       await assertGenerationOutputCursorCatalogue(client);
       const installed = (

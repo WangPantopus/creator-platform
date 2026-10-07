@@ -88,7 +88,18 @@ async function audit() {
       (row) => row.version === "0233_w3_privacy_cursor_export",
     );
     const roles = generation
-      ? await assertGenerationWaveRoleSafety(client)
+      ? await assertGenerationWaveRoleSafety(
+          client,
+          ledger.some(
+            (row) => row.version === "0234_w3_generation_first_visible_read",
+          )
+            ? "generation-output"
+            : ledger.some(
+                  (row) => row.version === "0198_w5_content_privacy_export",
+                )
+              ? "content-privacy"
+              : undefined,
+        )
       : await assertWaveRoleSafety(client, {
           trust: ledger.some(
             (row) => row.version === "0053_w8_runtime_denial_projection",

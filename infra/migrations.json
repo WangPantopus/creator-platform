@@ -625,6 +625,13 @@
       "owner": "W3",
       "sourceSha256": "99ad0ce10da98954d08b3fe31dedce0ef93be4c3be7e1aeecf3995059e41eb08",
       "wave": "20261007-generation"
+    },
+    {
+      "version": "0234_w3_generation_first_visible_read",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_generation_first_visible_read.sql",
+      "owner": "W3",
+      "sourceSha256": "27f7cda8ceed6fbe80035d45c4cb6b8376470d9041a3407f558a879ce2d993b4",
+      "wave": "20261007-generation-output"
     }
   ],
   "reserved": [

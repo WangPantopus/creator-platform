@@ -5,6 +5,7 @@ import { DomainError } from "../../core/errors.js";
 import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
 import { generationPrivacySourcesRegistered } from "../../db/generation-privacy-sources.js";
 import { generationPrivacyCatalogueChecksum } from "../../db/content-privacy-profile.js";
+import { assertGenerationOutputRepairIfRegistered } from "../../db/generation-output-profile.js";
 import { requestAuthority } from "./request-authority.js";
 
 export const generationOutputCursorSignature =
@@ -80,6 +81,7 @@ export async function assertGenerationOutputCursorCatalogue(
   try {
     if (!(await generationPrivacySourcesRegistered())) unavailable();
     await assertRegisteredMigration(client, generationOutputCursorSource);
+    await assertGenerationOutputRepairIfRegistered(client);
     await client.query("SAVEPOINT w1_generation_output_cursor_catalogue");
     await client.query("SET LOCAL search_path=pg_catalog");
     const cursor = await generationConsumerCatalogue(

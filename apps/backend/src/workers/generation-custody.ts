@@ -1,6 +1,7 @@
 import review from "../../../../infra/migrations/reviews/20261007-generation-worker.json" with { type: "json" };
 import contentReview from "../../../../infra/migrations/reviews/20261007-content-worker.json" with { type: "json" };
 import { registeredContentPrivacyProfile } from "../db/content-privacy-profile.js";
+import { registeredGenerationOutputProfile } from "../db/generation-output-profile.js";
 import { invariant } from "../core/errors.js";
 import { generationPrivacySourcesRegistered } from "../db/generation-privacy-sources.js";
 import type { GenerationTerminalPurposeConsumer } from "../modules/identity/generation-scope.js";
@@ -49,9 +50,20 @@ export async function reviewedGenerationWorkerCustody(
   const reviewed = (await registeredContentPrivacyProfile(signal))
     ? withContentPrivacy
     : baseline;
+  const output = await registeredGenerationOutputProfile(signal);
+  invariant(
+    !output || reviewed === withContentPrivacy,
+    "generation_worker_custody_unavailable",
+    "The output repair requires the complete Content source graph.",
+  );
   signal?.throwIfAborted();
   const custody: GenerationWorkerCustody = {
     ...reviewed,
+    output: {
+      ...reviewed.output,
+      catalogueChecksum:
+        output?.outputCatalogueChecksum ?? reviewed.output.catalogueChecksum,
+    },
     identity: {
       ...reviewed.identity,
       terminalConsumers:
@@ -77,6 +89,9 @@ export async function reviewedGenerationWorkerCustody(
     },
     settlement: {
       ...reviewed.settlement,
+      catalogueChecksum:
+        output?.runtimeCatalogues.financial ??
+        reviewed.settlement.catalogueChecksum,
       consumers: reviewed.settlement.consumers.map(terminalConsumer),
     },
   };

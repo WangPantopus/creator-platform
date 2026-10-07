@@ -1,6 +1,7 @@
 import review from "../../../../infra/migrations/reviews/20261007-content-privacy.json" with { type: "json" };
 import { invariant } from "../core/errors.js";
 import { registeredMigration } from "./reviewed-migration.js";
+import { registeredGenerationOutputProfile } from "./generation-output-profile.js";
 
 export const contentPrivacySource = Object.freeze({ ...review.source });
 
@@ -35,9 +36,10 @@ export async function generationPrivacyCatalogueChecksum(
   baseline: string,
   signal?: AbortSignal,
 ) {
-  return (
-    (await registeredContentPrivacyProfile(signal))?.runtimeCatalogues[
-      purpose
-    ] ?? baseline
-  );
+  if (await registeredContentPrivacyProfile(signal)) {
+    const output = await registeredGenerationOutputProfile(signal);
+    if (output) return output.runtimeCatalogues[purpose];
+    return profile.runtimeCatalogues[purpose];
+  }
+  return baseline;
 }

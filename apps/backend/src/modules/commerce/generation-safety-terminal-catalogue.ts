@@ -4,6 +4,7 @@ import { DomainError } from "../../core/errors.js";
 import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
 import { generationPrivacySourcesRegistered } from "../../db/generation-privacy-sources.js";
 import { generationPrivacyCatalogueChecksum } from "../../db/content-privacy-profile.js";
+import { assertGenerationOutputRepairIfRegistered } from "../../db/generation-output-profile.js";
 import { requestAuthority } from "../identity/request-authority.js";
 import { generationLifecycleSource } from "../identity/generation-lifecycle.js";
 import { generationTerminalPageSource } from "../identity/generation-terminal-page.js";
@@ -325,6 +326,7 @@ export async function assertGenerationSafetyTerminalCatalogue(
     if (!(await generationPrivacySourcesRegistered())) throw unavailable();
     for (const source of GENERATION_SAFETY_TERMINAL_SOURCES)
       await assertRegisteredMigration(client, source);
+    await assertGenerationOutputRepairIfRegistered(client);
     const ready = (
       await client.query<{
         ready: boolean;

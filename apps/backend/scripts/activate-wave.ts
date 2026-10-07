@@ -26,6 +26,8 @@ import { assertPrivacyWaveRoleSafety } from "./migration-privacy-roles.js";
 import { assertGenerationWaveRoleSafety } from "./migration-generation-roles.js";
 import { generationPrivacySourcesRegistered } from "../src/db/generation-privacy-sources.js";
 import { registeredContentPrivacyProfile } from "../src/db/content-privacy-profile.js";
+import { registeredGenerationOutputProfile } from "../src/db/generation-output-profile.js";
+import outputReview from "../../../infra/migrations/reviews/20261007-generation-first-visible.json" with { type: "json" };
 import contentReview from "../../../infra/migrations/reviews/20261007-content-privacy.json" with { type: "json" };
 import generationReview from "../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
 
@@ -58,15 +60,18 @@ async function activate() {
       "20261002-privacy",
       "20261007-generation",
       "20261007-content",
+      "20261007-generation-output",
     ].includes(process.env.W8_MIGRATION_WAVE ?? ""),
-    "Select a reviewed W8_MIGRATION_WAVE (20261002, 20261002-privacy, 20261007-generation or 20261007-content).",
+    "Select a reviewed W8_MIGRATION_WAVE (20261002, 20261002-privacy, 20261007-generation, 20261007-content or 20261007-generation-output).",
   );
   const connection = process.env.DATABASE_MIGRATION_URL;
   check(
     connection,
     "Provide a separate DATABASE_MIGRATION_URL; never a runtime credential.",
   );
-  const content = process.env.W8_MIGRATION_WAVE === "20261007-content";
+  const output = process.env.W8_MIGRATION_WAVE === "20261007-generation-output";
+  const content =
+    output || process.env.W8_MIGRATION_WAVE === "20261007-content";
   const generation =
     content || process.env.W8_MIGRATION_WAVE === "20261007-generation";
   const continuation =
@@ -79,6 +84,7 @@ async function activate() {
     "20261002-privacy",
     "20261007-generation",
     "20261007-content",
+    "20261007-generation-output",
   ];
   const packets = await Promise.all(
     ids.map(
@@ -91,7 +97,8 @@ async function activate() {
         ) as Packet,
     ),
   );
-  const [initial, prior, current, latest] = packets as [
+  const [initial, prior, current, latest, repair] = packets as [
+    Packet,
     Packet,
     Packet,
     Packet,
@@ -102,8 +109,8 @@ async function activate() {
       (entry, index) =>
         entry.schemaVersion === 1 &&
         entry.id === ids[index] &&
-        entry.baseline.length === [40, 57, 61, 100][index] &&
-        entry.wave.length === [17, 4, 39, 1][index],
+        entry.baseline.length === [40, 57, 61, 100, 101][index] &&
+        entry.wave.length === [17, 4, 39, 1, 1][index],
     ) &&
       canonical(prior.baseline) ===
         canonical([...initial.baseline, ...initial.wave]) &&
@@ -150,8 +157,23 @@ async function activate() {
         await readFile(
           new URL(contentReview.baselineWave.path, repositoryRoot),
         ),
-      ) === contentReview.baselineWave.sha256,
-    "The exact reviewed 40/57/61/100/101-source migration chain is required.",
+      ) === contentReview.baselineWave.sha256 &&
+      canonical(repair.baseline) ===
+        canonical([...latest.baseline, ...latest.wave]) &&
+      canonical(repair.wave) ===
+        canonical([
+          {
+            version: outputReview.source.version,
+            path: outputReview.source.path,
+            checksum: outputReview.source.checksum,
+          },
+        ]) &&
+      canonical(repair.outOfOrderException) ===
+        canonical(latest.outOfOrderException) &&
+      sha256(
+        await readFile(new URL(outputReview.baselineWave.path, repositoryRoot)),
+      ) === outputReview.baselineWave.sha256,
+    "The exact reviewed 40/57/61/100/101/102-source migration chain is required.",
   );
   check(
     await generationPrivacySourcesRegistered(),
@@ -161,6 +183,10 @@ async function activate() {
     await registeredContentPrivacyProfile(),
     "The exact executable Content source registration is required.",
   );
+  check(
+    await registeredGenerationOutputProfile(),
+    "The exact executable output repair source registration is required.",
+  );
   const packet = packets.find(
     (entry) => entry.id === process.env.W8_MIGRATION_WAVE,
   )!;
@@ -168,7 +194,7 @@ async function activate() {
     await readFile(new URL("infra/migrations.json", repositoryRoot), "utf8"),
   ) as { migrations: { version: string; path: string }[] };
   const sources = [...packet.baseline, ...packet.wave];
-  const registeredSources = [...latest.baseline, ...latest.wave];
+  const registeredSources = [...repair.baseline, ...repair.wave];
   check(
     new Set(registeredSources.map((s) => s.version.slice(0, 4))).size ===
       registeredSources.length,
@@ -312,10 +338,21 @@ async function activate() {
       !content || generationInstalled === current.wave.length,
       "Content activation requires the complete reviewed100-source predecessor.",
     );
+    const outputInstalled =
+      output &&
+      before.some((row) => row.version === outputReview.source.version);
+    check(
+      !output || contentInstalled,
+      "Output activation requires the complete reviewed101-source predecessor.",
+    );
     if (generationInstalled)
       await assertGenerationWaveRoleSafety(
         client,
-        contentInstalled ? "content-privacy" : undefined,
+        outputInstalled
+          ? "generation-output"
+          : contentInstalled
+            ? "content-privacy"
+            : undefined,
       );
     else
       await assertWaveRoleSafety(client, {
@@ -431,7 +468,11 @@ async function activate() {
     const roleSafety = generation
       ? await assertGenerationWaveRoleSafety(
           client,
-          content ? "content-privacy" : undefined,
+          output
+            ? "generation-output"
+            : content
+              ? "content-privacy"
+              : undefined,
         )
       : await assertWaveRoleSafety(client, {
           trust: true,
