@@ -1,0 +1,43 @@
+diff --git a/apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt b/apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt
+index b9f0cf57..f39ebc78 100644
+--- a/apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt
++++ b/apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt
+@@ -669,10 +669,13 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
+ }
+ 
+ @Composable private fun ConversationAccount(baseURL: String, session: FanSession) {
+-    val client=remember(baseURL,session.session?.accountId) { ConversationClient(baseURL,session::currentToken, session.session?.accountId) }
+-    val context = LocalContext.current
+     val accountId = session.session?.accountId
+-    val commerceClient = remember(context, baseURL, accountId) { CommerceClient(context, baseURL, accountId) }
++    val sessionId = session.session?.sessionId
++    val destination = session.destination
++    val client=remember(baseURL,session,accountId,sessionId,destination) { ConversationClient(baseURL,session::currentToken,accountId) }
++    val commerceClient = remember(session, accountId, sessionId, destination) {
++        if (accountId != null && sessionId != null) CommerceClient(session, accountId, sessionId, destination) else null
++    }
+     var commerce by remember(client) { mutableStateOf<CommerceOverview?>(null) }
+     val scroll = rememberLazyListState()
+     var account by remember(client) { mutableStateOf<JsonObject?>(null) };var error by remember(client) { mutableStateOf("") }
+@@ -698,10 +701,10 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
+         loading = true; cursor = before; error = ""
+         try {
+             val fresh = client.request("account" + (before?.let { "?cursor=$it" } ?: "")).jsonObject
+-            if (revision != currentRevision || !foreground || session.session?.accountId != accountId) return
++            if (revision != currentRevision || !foreground || session.session?.accountId != accountId || session.session?.sessionId != sessionId || session.destination != destination) return
+             account = fresh; cursor = before
+             val token = session.currentToken()
+-            val overview = try { commerceClient.overview() } catch (failure: Throwable) {
++            val overview = try { commerceClient?.overview() } catch (failure: Throwable) {
+                 if (failure is CancellationException) throw failure
+                 if (failure is CommerceFailure && failure.status in listOf(401, 409)) {
+                     if (revision == currentRevision) conceal()
+@@ -709,7 +712,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
+                 }
+                 null
+             }
+-            if (revision == currentRevision && foreground && session.session?.accountId == accountId && session.currentToken() == token && overview?.fan?.id == fresh["fan"]?.jsonObject?.get("id")?.jsonPrimitive?.content)
++            if (revision == currentRevision && foreground && session.session?.accountId == accountId && session.session?.sessionId == sessionId && session.destination == destination && session.currentToken() == token && overview?.fan?.id == fresh["fan"]?.jsonObject?.get("id")?.jsonPrimitive?.content)
+                 commerce = overview
+         }
+         catch(failure:Throwable) { if(failure is CancellationException) throw failure; if(revision == currentRevision && foreground) error=failure.message ?: "Reconnect to open You." }

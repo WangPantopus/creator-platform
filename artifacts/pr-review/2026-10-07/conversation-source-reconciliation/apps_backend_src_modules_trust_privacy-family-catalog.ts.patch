@@ -1,0 +1,134 @@
+diff --git a/apps/backend/src/modules/trust/privacy-family-catalog.ts b/apps/backend/src/modules/trust/privacy-family-catalog.ts
+index 7ec27658..5556549e 100644
+--- a/apps/backend/src/modules/trust/privacy-family-catalog.ts
++++ b/apps/backend/src/modules/trust/privacy-family-catalog.ts
+@@ -1,4 +1,7 @@
+ import type { PoolClient, QueryConfig, QueryResultRow } from "pg";
++import generationPrivacyReview from "../../../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
++import contentPrivacyReview from "../../../../../infra/migrations/reviews/20261007-content-privacy.json" with { type: "json" };
++import { registeredContentPrivacyProfile } from "../../db/content-privacy-profile.js";
+ import { contentHash } from "../../core/canonical.js";
+ import { DomainError } from "../../core/errors.js";
+ import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
+@@ -286,14 +289,16 @@ export async function originalPrivacyFamilyPurposeCatalogue(
+ 
+ async function assertPurposeCatalogue(
+   client: PoolClient,
+-  expected: string,
++  expected: readonly string[],
+   signal?: AbortSignal,
+ ) {
+   try {
+     if (
+-      contentHash(
+-        await originalPrivacyFamilyPurposeCatalogue(client, signal),
+-      ) !== expected
++      !expected.includes(
++        contentHash(
++          await originalPrivacyFamilyPurposeCatalogue(client, signal),
++        ),
++      )
+     )
+       unavailable();
+   } catch (cause) {
+@@ -305,7 +310,7 @@ export async function assertOriginalPrivacyFamilyPurposeCatalog(
+   client: PoolClient,
+   signal?: AbortSignal,
+ ) {
+-  await assertPurposeCatalogue(client, catalogueChecksum, signal);
++  await assertPurposeCatalogue(client, [catalogueChecksum], signal);
+ }
+ 
+ /** Closed metadata qualification only. This fixed profile supplies no source
+@@ -314,7 +319,42 @@ export async function assertOriginalPrivacyFamilyProvenanceCatalog(
+   client: PoolClient,
+   signal?: AbortSignal,
+ ) {
+-  await assertPurposeCatalogue(client, provenanceCatalogueChecksum, signal);
++  await assertPurposeCatalogue(client, [provenanceCatalogueChecksum], signal);
++}
++
++/** Closed full-graph metadata qualification only. Both fixed profiles preserve
++ * incoming API children. Their membership flag cannot distinguish a forbidden
++ * parent role, so the literal caller predicate is inseparable from this check.
++ * Source registration, original task/fence and COMMIT checks remain separate. */
++export async function assertOriginalPrivacyFamilyGenerationCatalog(
++  client: PoolClient,
++  signal?: AbortSignal,
++) {
++  await assertOriginalPrivacyFamilyCaller(client, signal);
++  await assertPurposeCatalogue(
++    client,
++    generationPrivacyReview.originalFamilyProfiles.map(
++      (profile) => profile.sha256,
++    ),
++    signal,
++  );
++}
++
++/** Closed review of the exact generation-plus-Content graph. This retains the
++ * literal core caller check and both original incoming-membership variants;
++ * executable registration and every actual ledger entry are checked below. */
++export async function assertOriginalPrivacyFamilyContentCatalog(
++  client: PoolClient,
++  signal?: AbortSignal,
++) {
++  await assertOriginalPrivacyFamilyCaller(client, signal);
++  await assertPurposeCatalogue(
++    client,
++    contentPrivacyReview.originalFamilyProfiles.map(
++      (profile) => profile.sha256,
++    ),
++    signal,
++  );
+ }
+ 
+ /** Executable source and ledger gate on this actual held core client. A held
+@@ -352,7 +392,25 @@ export async function originalPrivacyFamilyRegisteredExtension(
+     const purgerSource = provenanceSources[provenanceSources.length - 1]!;
+     const purger = await registeredMigration(purgerSource);
+     signal?.throwIfAborted();
+-    if (purger) {
++    const cursorSource = generationPrivacyReview.sources.find(
++      (dependency) => dependency.version === "0233_w3_privacy_cursor_export",
++    );
++    if (!cursorSource) unavailable();
++    const composed = await registeredMigration(cursorSource);
++    signal?.throwIfAborted();
++    const contentProfile = composed
++      ? await registeredContentPrivacyProfile(signal)
++      : undefined;
++    if (composed) {
++      for (const dependency of generationPrivacyReview.sources) {
++        const migration = await registeredMigration(dependency);
++        signal?.throwIfAborted();
++        if (!migration || migration.version !== dependency.version)
++          unavailable();
++        migrations.push(migration);
++      }
++      if (contentProfile) migrations.push(contentProfile.source);
++    } else if (purger) {
+       for (const dependency of provenanceSources) {
+         const migration =
+           dependency === purgerSource
+@@ -375,10 +433,16 @@ export async function originalPrivacyFamilyRegisteredExtension(
+       )
+         unavailable();
+     }
+-    await assertOriginalPrivacyFamilyCaller(client, signal);
+-    if (purger)
+-      await assertOriginalPrivacyFamilyProvenanceCatalog(client, signal);
+-    else await assertOriginalPrivacyFamilyPurposeCatalog(client, signal);
++    if (composed) {
++      if (contentProfile)
++        await assertOriginalPrivacyFamilyContentCatalog(client, signal);
++      else await assertOriginalPrivacyFamilyGenerationCatalog(client, signal);
++    } else {
++      await assertOriginalPrivacyFamilyCaller(client, signal);
++      if (purger)
++        await assertOriginalPrivacyFamilyProvenanceCatalog(client, signal);
++      else await assertOriginalPrivacyFamilyPurposeCatalog(client, signal);
++    }
+     return {
+       signature: originalPrivacyBindingSignature,
+       sha256: originalPrivacyBindingDefinition,

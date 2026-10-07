@@ -1,0 +1,30 @@
+diff --git a/apps/backend/src/modules/agent/generation-pipeline.ts b/apps/backend/src/modules/agent/generation-pipeline.ts
+index e8c59844..78d99aba 100644
+--- a/apps/backend/src/modules/agent/generation-pipeline.ts
++++ b/apps/backend/src/modules/agent/generation-pipeline.ts
+@@ -211,6 +211,25 @@ export class PreparedGenerationPipeline {
+     );
+   }
+ 
++  assertComposition(
++    identity: GenerationIdentityAuthority,
++    hostPool: import("pg").Pool,
++  ): void {
++    invariant(
++      identity === this.identity && hostPool === this.service.repository.pool,
++      "generation_pipeline_composition_changed",
++      "Use this pipeline's original identity and canonical host.",
++    );
++  }
++
++  assertService(service: AgentService): void {
++    invariant(
++      service === this.service,
++      "generation_pipeline_service_changed",
++      "Acceptance must use this worker's original Creator AI service.",
++    );
++  }
++
+   private async current(
+     client: PoolClient,
+     scope: GenerationTaskScope,

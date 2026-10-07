@@ -1,0 +1,84 @@
+diff --git a/apps/backend/src/workers/generation-terminal.ts b/apps/backend/src/workers/generation-terminal.ts
+index 005cb2f6..cdd08164 100644
+--- a/apps/backend/src/workers/generation-terminal.ts
++++ b/apps/backend/src/workers/generation-terminal.ts
+@@ -1,6 +1,6 @@
+ import { setTimeout as delay } from "node:timers/promises";
+ import { z } from "zod";
+-import { invariant } from "../core/errors.js";
++import { DomainError, invariant } from "../core/errors.js";
+ import { CommerceGenerationSafetyTerminalSettlement } from "../modules/commerce/generation-safety-terminal-settlement.js";
+ import { PreparedGenerationConversationTerminal } from "../modules/conversation/generation-terminal.js";
+ import { GenerationTerminalAuthority } from "../modules/identity/generation-terminal.js";
+@@ -11,6 +11,9 @@ import { requestAuthority } from "../modules/identity/request-authority.js";
+ export class GenerationTerminalRecovery {
+   private running = false;
+   private lifetime = false;
++  /** Observation only, retained across passes even when a receipt is unknown.
++   * UUID order needs no acceptance timestamp or new private-row privilege. */
++  private afterGenerationId: string | undefined;
+ 
+   constructor(
+     private readonly terminal: GenerationTerminalAuthority,
+@@ -43,24 +46,48 @@ export class GenerationTerminalRecovery {
+       const candidates = await this.terminal.pendingTerminalCursors(
+         bounded,
+         signal,
++        this.afterGenerationId,
+       );
+       let committed = 0;
++      const failures: unknown[] = [];
+       for (const candidate of candidates) {
++        if (signal.aborted && failures.length) break;
+         signal.throwIfAborted();
+-        await this.terminal.withTerminal(
+-          {
+-            mode: "reconciliation",
+-            generationId: candidate.generationId,
+-            lastSequence: candidate.lastSequence,
+-          },
+-          async (client, scope) => {
+-            await this.output.finalizeInTransaction(client, scope);
+-            await this.settlement.settleInTransaction(client, scope);
+-          },
+-          signal,
+-        );
+-        committed++;
++        try {
++          await this.terminal.withTerminal(
++            {
++              mode: "reconciliation",
++              generationId: candidate.generationId,
++              lastSequence: candidate.lastSequence,
++            },
++            async (client, scope) => {
++              await this.output.finalizeInTransaction(client, scope);
++              await this.settlement.settleInTransaction(client, scope);
++            },
++            signal,
++          );
++          committed++;
++        } catch (cause) {
++          // Each original transaction has finished its own cleanup. An unknown
++          // old receipt must not starve every later terminal candidate forever.
++          // Abort still retains any incurred/cleanup failure for the host.
++          if (signal.aborted && !failures.length) throw cause;
++          failures.push(cause);
++        } finally {
++          // Retry unresolved work on the next sweep; never let one full batch
++          // permanently hide later accepted jobs. No outcome is inferred.
++          this.afterGenerationId = candidate.generationId;
++        }
+       }
++      if (!signal.aborted && candidates.length < bounded)
++        this.afterGenerationId = undefined;
++      if (failures.length)
++        throw new DomainError(
++          "generation_terminal_recovery_incomplete",
++          "Some original terminal receipts still require reconciliation.",
++          503,
++          { cause: new AggregateError(failures) },
++        );
+       return committed;
+     } finally {
+       this.running = false;

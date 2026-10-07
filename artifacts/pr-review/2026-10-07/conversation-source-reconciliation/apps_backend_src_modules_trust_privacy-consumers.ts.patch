@@ -1,0 +1,297 @@
+diff --git a/apps/backend/src/modules/trust/privacy-consumers.ts b/apps/backend/src/modules/trust/privacy-consumers.ts
+index a49330c2..8a7b7cf7 100644
+--- a/apps/backend/src/modules/trust/privacy-consumers.ts
++++ b/apps/backend/src/modules/trust/privacy-consumers.ts
+@@ -17,6 +17,7 @@ import type { AgentLifecycle } from "../agent/lifecycle.js";
+ import type { PreparedAgentPrivacyExport } from "../agent/privacy-export-snapshot.js";
+ import type { CommerceService } from "../commerce/service.js";
+ import { commercePrivacyHook } from "../commerce/operations.js";
++import { commerceFinancialExportStream } from "../commerce/financial-export-stream.js";
+ import {
+   privacyTaskAuthority,
+   privacyTaskAuthorityInTransaction,
+@@ -36,12 +37,95 @@ import type { GrowthService } from "../growth/service.js";
+ import { contentPrivacyHook } from "../content/privacy.js";
+ import type { ContentPrivacyExport } from "../content/privacy-export.js";
+ import { domainPrivacyTaskAuthorityInTransaction } from "./domain-privacy-authority.js";
++import { prepareGenerationAccountingRetention } from "./generation-accounting-retention.js";
++import { PreparedPrivacyAccountingBoundary } from "./accounting-boundary.js";
++import type { PrivacyArtifactStore } from "./privacy-export.js";
++import type { TrustWorker } from "./worker.js";
++import type { AgentRepository } from "../agent/repository.js";
++import type { PreparedUsageRetention } from "../agent/usage-retention.js";
++
++// Registration belongs to the exact hooks installed in the original worker.
++// Copies, domain names and a second pool with the same URL are not evidence.
++const registrations = new WeakMap<
++  PrivacyHook[],
++  {
++    pool: Pool;
++    coordinator: Pool;
++    worker?: TrustWorker;
++    hooks: {
++      hook: PrivacyHook;
++      domain: PrivacyHook["domain"];
++      run: PrivacyHook["run"];
++    }[];
++    agent: () => AgentPrivacyOwnerPorts | undefined;
++  }
++>();
++
++/** Called only by the owning runtime as it installs its original worker. */
++export function installPrivacyConsumers(worker: TrustWorker): void {
++  const original = registrations.get(worker.privacyHooks);
++  if (!original) return;
++  invariant(
++    !original.worker && original.coordinator === worker.pool,
++    "privacy_consumers_unregistered",
++    "Privacy consumers belong to one original Trust worker.",
++  );
++  original.worker = worker;
++}
++
++export function assertPrivacyConsumersRegistered(
++  worker: TrustWorker,
++  pool: Pool,
++  accounting?: {
++    repository: AgentRepository;
++    retention: PreparedUsageRetention;
++  },
++): void {
++  const original = registrations.get(worker.privacyHooks);
++  invariant(
++    original &&
++      original.worker === worker &&
++      original.pool === pool &&
++      original.coordinator === worker.pool &&
++      original.hooks.length === worker.privacyHooks.length &&
++      original.hooks.every(
++        ({ hook, domain, run }, index) =>
++          worker.privacyHooks[index] === hook &&
++          hook.domain === domain &&
++          hook.run === run,
++      ),
++    "privacy_consumers_unregistered",
++    "The original accounting privacy consumers must remain installed in this host's Trust worker.",
++  );
++  if (accounting) {
++    const agent = original.agent();
++    invariant(
++      agent?.service.repository === accounting.repository,
++      "agent_lifecycle_composition_mismatch",
++      "Accounting expiry must use the Agent repository registered for privacy.",
++    );
++    agent.lifecycle.assertRepository(accounting.repository);
++    agent.lifecycle.assertUsageRetention(accounting.retention);
++  }
++}
++
++/** Actual host owners and reviewed registration only. W8 supplies its original
++ * task/family authority when binding them; the host cannot replace that port. */
++export type GenerationAccountingPreparation = Omit<
++  Parameters<typeof prepareGenerationAccountingRetention>[0],
++  "pool" | "configuration"
++> & {
++  configuration: Omit<
++    Parameters<typeof prepareGenerationAccountingRetention>[0]["configuration"],
++    "authority"
++  >;
++};
+ 
+ export type ConversationPrivacyOwnerPorts = Omit<
+   ConversationPrivacyInput,
+-  "pool" | "authority" | "retention"
++  "pool" | "authority" | "retention" | "deletionReceipts"
+ > & {
+-  /** Real prepared W2 owners and independently reviewed0206 custody. The
++  /** Real prepared W2 owners and independently reviewed0233 custody. The
+    * coordinator supplies its own actual authority, never a caller substitute. */
+   cursorPreparation?: Omit<
+     Parameters<typeof PreparedConversationPrivacyCursor.prepare>[0],
+@@ -53,6 +137,7 @@ export type ConversationPrivacyOwnerPorts = Omit<
+     Parameters<typeof PreparedGenerationProvenancePurge.prepare>[0],
+     "pool" | "authority"
+   >;
++  accountingPreparation?: GenerationAccountingPreparation;
+ };
+ 
+ export type AgentPrivacyOwnerPorts = Readonly<{
+@@ -69,6 +154,8 @@ export type AgentPrivacyOwnerPorts = Readonly<{
+ export function createPrivacyConsumers(input: {
+   runtimePool: Pool;
+   coordinatorPool: Pool;
++  /** The same protected store owned by the original Trust coordinator. */
++  privacyArtifacts?: PrivacyArtifactStore;
+   /** Real current restoration on the owner's held client, never a pool check. */
+   assertRestoredInTransaction?: (client: PoolClient) => Promise<void>;
+   conversationRetention?: ConversationPrivacyRetention;
+@@ -80,6 +167,8 @@ export function createPrivacyConsumers(input: {
+   /** Trust starts before W1 binds the actual canonical Agent owner graph.
+    * Resolve that graph once per original claimed task, never a substitute. */
+   agent?: AgentPrivacyOwnerPorts | (() => AgentPrivacyOwnerPorts | undefined);
++  /** Original W2 source prepared by this host with W8's actual held-task port. */
++  agentExport?: PreparedAgentPrivacyExport;
+   commerce?: CommerceService;
+   /** Trust starts before the canonical Commerce graph. Resolve only its
+    * actual service at task execution; no eager replacement owner is created. */
+@@ -103,12 +192,27 @@ export function createPrivacyConsumers(input: {
+   >;
+   additional?: PrivacyHook[];
+ }) {
++  input = { ...input };
+   const verify = privacyTaskAuthority(input.coordinatorPool);
+   const conversationAuthority = conversationPrivacyAuthority(
+     input.runtimePool,
+     input.coordinatorPool,
+     input.assertRestoredInTransaction,
+   );
++  const prepareBoundary = async (signal: AbortSignal | undefined) => {
++    invariant(
++      input.assertRestoredInTransaction,
++      "accounting_boundary_unconfigured",
++      "Original held restoration authority is required for accounting privacy.",
++    );
++    return PreparedPrivacyAccountingBoundary.prepare({
++      pool: input.runtimePool,
++      authority: conversationAuthority,
++      assertRestoredInTransaction: input.assertRestoredInTransaction,
++      artifacts: input.privacyArtifacts,
++      signal,
++    });
++  };
+   const hooks: PrivacyHook[] = [
+     trustPrivacyHook(input.coordinatorPool, input.assertRestoredInTransaction),
+     identityPrivacyHook(
+@@ -119,6 +223,7 @@ export function createPrivacyConsumers(input: {
+     {
+       domain: "conversation",
+       async run(job) {
++        job.signal?.throwIfAborted();
+         const owners =
+           typeof input.conversation === "function"
+             ? input.conversation()
+@@ -131,6 +236,32 @@ export function createPrivacyConsumers(input: {
+           );
+         let exportCursor = owners?.exportCursor;
+         let provenancePurge = owners?.provenancePurge;
++        let accounting = owners?.accounting;
++        let financial = owners?.generationCostPrivacyReconciliation;
++        if (owners?.accountingPreparation) {
++          invariant(
++            !accounting &&
++              !financial &&
++              (!owners.cursorPreparation ||
++                (owners.cursorPreparation.journal ===
++                  owners.accountingPreparation.journal &&
++                  owners.cursorPreparation.usageRetention ===
++                    owners.accountingPreparation.usageRetention)),
++            "conversation_accounting_composition_mismatch",
++            "Export and deletion must use the same original accounting owners.",
++          );
++          const prepared = await prepareGenerationAccountingRetention({
++            ...owners.accountingPreparation,
++            pool: input.runtimePool,
++            configuration: {
++              ...owners.accountingPreparation.configuration,
++              authority: conversationAuthority,
++            },
++          });
++          accounting = prepared.accounting;
++          financial = prepared.financial;
++          job.signal?.throwIfAborted();
++        }
+         if (
+           job.kind === "delete" &&
+           !provenancePurge &&
+@@ -160,10 +291,22 @@ export function createPrivacyConsumers(input: {
+             recordings: owners.recordings,
+           });
+         }
++        if (exportCursor && owners?.accountingPreparation)
++          exportCursor.assertAccounting(
++            owners.accountingPreparation.journal,
++            owners.accountingPreparation.usageRetention,
++          );
+         return conversationPrivacyHook({
+           ...owners,
++          ...(accounting ? { accounting } : {}),
++          ...(financial
++            ? { generationCostPrivacyReconciliation: financial }
++            : {}),
+           ...(exportCursor ? { exportCursor } : {}),
+           ...(provenancePurge ? { provenancePurge } : {}),
++          ...(job.kind === "delete" && accounting
++            ? { deletionReceipts: await prepareBoundary(job.signal) }
++            : {}),
+           pool: input.runtimePool,
+           authority: conversationAuthority,
+           retention: input.conversationRetention,
+@@ -195,7 +338,11 @@ export function createPrivacyConsumers(input: {
+           "Use the actual canonical Agent owner on this host's original pool.",
+         );
+         owner.lifecycle.assertRepository(owner.service.repository);
+-        owner.privacyExportSnapshot?.assertHostPool(input.runtimePool);
++        const exportSnapshot = owner.privacyExportSnapshot ?? input.agentExport;
++        exportSnapshot?.assertHostPool(input.runtimePool);
++        const accountingBoundary = owner.service.repository.usageJournal
++          ? await prepareBoundary(job.signal)
++          : undefined;
+         return agentPrivacyHook(
+           owner.service,
+           owner.lifecycle,
+@@ -223,10 +370,11 @@ export function createPrivacyConsumers(input: {
+               await input.assertRestoredInTransaction(client);
+               return owned;
+             },
++            accountingBoundary?.agentBoundary.bind(accountingBoundary),
+           ),
+           owner.artifacts,
+-          Boolean(owner.privacyExportSnapshot),
+-          owner.privacyExportSnapshot,
++          Boolean(exportSnapshot),
++          exportSnapshot,
+         ).run(job);
+       },
+     });
+@@ -254,6 +402,17 @@ export function createPrivacyConsumers(input: {
+           input.assertRestoredInTransaction,
+         );
+         await verify(job);
++        if (job.kind === "export" && !input.commerceArtifacts) {
++          return {
++            receipt: {
++              schemaVersion: 1,
++              domain: "commerce",
++              jobId: job.jobId,
++              scope: job.scope,
++            },
++            stream: commerceFinancialExportStream(service, purpose, job),
++          };
++        }
+         const result = await commercePrivacyHook(
+           service,
+           purpose,
+@@ -309,5 +468,23 @@ export function createPrivacyConsumers(input: {
+   hooks.push(...(input.additional ?? []));
+   if (new Set(hooks.map((hook) => hook.domain)).size !== hooks.length)
+     throw new Error("Duplicate privacy consumer.");
++  if (
++    input.agent &&
++    input.conversation &&
++    (input.commerce || input.commerceOwner) &&
++    input.assertRestoredInTransaction
++  ) {
++    const agent = input.agent;
++    registrations.set(hooks, {
++      pool: input.runtimePool,
++      coordinator: input.coordinatorPool,
++      hooks: hooks.map((hook) => ({
++        hook,
++        domain: hook.domain,
++        run: hook.run,
++      })),
++      agent: typeof agent === "function" ? agent : () => agent,
++    });
++  }
+   return hooks;
+ }

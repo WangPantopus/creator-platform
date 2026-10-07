@@ -1,0 +1,29 @@
+diff --git a/apps/ios/Sources/Generated/QelvoraCopy.swift b/apps/ios/Sources/Generated/QelvoraCopy.swift
+index be95b8dd..2846ddfc 100644
+--- a/apps/ios/Sources/Generated/QelvoraCopy.swift
++++ b/apps/ios/Sources/Generated/QelvoraCopy.swift
+@@ -3,6 +3,7 @@ import Foundation
+ public enum QelvoraCopy {
+   public static let strings: [String: String] = [
+     "continueWithPantopus": "Continue with Pantopus",
++    "productFeedbackUnconfirmed": "Your feedback could not be confirmed. Your answers are kept; retry the same submission.",
+     "identityInputKeptUnavailable": "The service is unavailable. Your input has been kept; try again.",
+     "identityInputKeptUnreadable": "The service returned an unreadable response. Your input has been kept; try again.",
+     "identityProfileSaveFailed": "Could not save. Try again.",
+@@ -757,6 +758,8 @@ public enum QelvoraCopy {
+     "w6ConsentCouldNotBeSaved": "Consent could not be saved.",
+     "w6TheCallCouldNotBeEndedTryAgain": "The call could not be ended. Try again.",
+     "w6TheSummaryCouldNotBeChanged": "The summary could not be changed.",
++    "w6CallActionUnconfirmed": "This call action is unconfirmed. Retry the same action before making another change.",
++    "w6RetryCallAction": "Retry this call action",
+     "w6ThisCallIsUnavailable": "This call is unavailable",
+     "w6OpeningYourCall": "Opening your call",
+     "w6CheckingTheBookingAndParticipantAccess": "Checking the booking and participant access.",
+@@ -866,6 +869,7 @@ public enum QelvoraCopy {
+     "w6RecordingPausedAfterAnInterruptionResumeOrPreviewWhatWas": "Recording paused after an interruption. Resume or preview what was saved.",
+     "w6RecordingCouldNotResumePreviewItOrRecordAgain": "Recording could not resume. Preview it or record again.",
+     "w6TheSavedRecordingCouldNotBePlayedRecordAgain": "The saved recording could not be played. Record again.",
++    "w6ThePrivatePreviewCouldNotBeClearedTryAgainBefore": "The private preview could not be cleared. Try again before recording.",
+     "w6RecordAndListenBeforeUploadingYourPreviewStaysOnThis": "Record and listen before uploading. Your preview stays on this device.",
+     "w6PlayPrivatePreview": "Play private preview",
+     "w6PausePreview": "Pause preview",

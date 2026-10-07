@@ -1,0 +1,102 @@
+diff --git a/apps/web/features/growth/actions.tsx b/apps/web/features/growth/actions.tsx
+index 512a0c6c..67d2e7c0 100644
+--- a/apps/web/features/growth/actions.tsx
++++ b/apps/web/features/growth/actions.tsx
+@@ -5,15 +5,8 @@ import { useState, useEffect } from "react";
+ import { useRouter } from "next/navigation";
+ import type { InboxItem, Cluster } from "./types";
+ import { glyphs } from "@qelvora/ui-web";
+-
+-export class GrowthActionError extends Error {
+-  constructor(
+-    readonly status: number,
+-    message: string,
+-  ) {
+-    super(message);
+-  }
+-}
++import { GrowthActionError, useGrowthSession } from "./session";
++export { GrowthActionError } from "./session";
+ export async function mutate(path: string, body: unknown, method = "POST") {
+   const response = await fetch(`/api/growth/${path}`, {
+     method,
+@@ -107,6 +100,7 @@ export function Inbox({
+   items: InboxItem[];
+   timeZone?: string;
+ }) {
++  const { request } = useGrowthSession();
+   const [error, setError] = useState("");
+   const dateKey = (value: string | Date) => {
+     const parts = Object.fromEntries(
+@@ -162,7 +156,10 @@ export function Inbox({
+               onClick={async (event) => {
+                 event.preventDefault();
+                 try {
+-                  await mutate(`notifications/${item.id}/read`, {}, "PUT");
++                  await request(`notifications/${item.id}/read`, {
++                    method: "PUT",
++                    body: "{}",
++                  });
+                   window.location.assign(`/notifications/${item.id}`);
+                 } catch (e) {
+                   setError(
+@@ -275,6 +272,7 @@ export function Connection() {
+   ) : null;
+ }
+ export function Producer({ cluster }: { cluster: Cluster }) {
++  const { request, signal } = useGrowthSession();
+   const [outline, setOutline] = useState(
+       cluster.outline ??
+         growthFormat("growthAnswer", {
+@@ -288,14 +286,19 @@ export function Producer({ cluster }: { cluster: Cluster }) {
+   async function decide(decision: string) {
+     setBusy(true);
+     try {
+-      await mutate(
+-        "recommendations",
+-        { window, topicKey: cluster.topicKey, outline, decision },
+-        "PUT",
+-      );
+-      setMessage(`Saved: ${decision}.`);
++      await request("recommendations", {
++        method: "PUT",
++        body: JSON.stringify({
++          window,
++          topicKey: cluster.topicKey,
++          outline,
++          decision,
++        }),
++      });
++      setMessage(growthCopy.growthYourChoiceWasSaved);
+       router.refresh();
+     } catch (e) {
++      if (signal.aborted) return;
+       setMessage(
+         e instanceof Error ? e.message : growthCopy.growthCouldNotSave,
+       );
+@@ -339,13 +342,20 @@ export function Producer({ cluster }: { cluster: Cluster }) {
+         onClick={async () => {
+           setBusy(true);
+           try {
+-            const result = await mutate("recommendations/publish", {
+-              window,
+-              topicKey: cluster.topicKey,
+-              outline,
+-            });
++            const result = await request<{ destination: string }>(
++              "recommendations/publish",
++              {
++                method: "POST",
++                body: JSON.stringify({
++                  window,
++                  topicKey: cluster.topicKey,
++                  outline,
++                }),
++              },
++            );
+             router.push(result.destination);
+           } catch (e) {
++            if (signal.aborted) return;
+             setMessage(
+               e instanceof Error
+                 ? e.message

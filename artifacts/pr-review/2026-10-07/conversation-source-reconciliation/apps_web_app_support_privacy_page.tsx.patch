@@ -1,0 +1,126 @@
+diff --git a/apps/web/app/support/privacy/page.tsx b/apps/web/app/support/privacy/page.tsx
+index d54bde4a..6868954c 100644
+--- a/apps/web/app/support/privacy/page.tsx
++++ b/apps/web/app/support/privacy/page.tsx
+@@ -1,15 +1,21 @@
+ "use client";
+-import { useCallback, useEffect, useRef, useState } from "react";
++import {
++  useCallback,
++  useEffect,
++  useLayoutEffect,
++  useRef,
++  useState,
++} from "react";
+ import Link from "next/link";
+ import type { PrivacyJobView } from "../../../../backend/src/modules/trust/contracts";
+ import {
+   ErrorState,
+   TrustError,
+   TrustSession,
+-  type TrustSessionState,
++  useTrustStatus,
+   useTrust,
+   useTrustSession,
+-  trustApi,
++  useTrustRequest,
+   retryTrustReads,
+   dateLabel,
+ } from "../../ops/trust-client";
+@@ -25,6 +31,8 @@ function Job({
+   readEnabled: boolean;
+   onReadError: (id: string, error: TrustError | null) => void;
+ }) {
++  const request = useTrustRequest();
++  const sessionState = useTrustStatus();
+   const { data, error, loading, refresh } = useTrust<PrivacyJobView>(
+     `privacy/jobs/${id}`,
+     readEnabled,
+@@ -83,7 +91,7 @@ function Job({
+                   const current = epoch.current;
+                   setBusy(true);
+                   try {
+-                    await trustApi(`privacy/jobs/${id}/retry`, {});
++                    await request(`privacy/jobs/${id}/retry`, {});
+                     if (epoch.current !== current) return;
+                     setError(null);
+                     await refresh();
+@@ -134,17 +142,15 @@ function Job({
+                   ))}
+               </nav>
+             )}
+-          <ErrorState error={actionError} />
++          <ErrorState error={sessionState.concealed ? null : actionError} />
+         </>
+       )}
+     </article>
+   );
+ }
+ export default function PrivacyPage() {
+-  const [sessionState, setSessionState] = useState<TrustSessionState>({
+-    ready: false,
+-    error: null,
+-  });
++  const request = useTrustRequest();
++  const sessionState = useTrustStatus();
+   const capability = useTrust<{
+     localDevelopment: boolean;
+     actorVerification: string;
+@@ -200,10 +206,9 @@ export default function PrivacyPage() {
+     setError(null);
+     setResult("");
+     key.current = null;
+-    setSessionState({ ready: false, error: null });
+     setJobErrors({});
+   });
+-  useEffect(() => {
++  useLayoutEffect(() => {
+     if (!verificationReady) dialog.current?.close();
+   }, [verificationReady]);
+   const run = async () => {
+@@ -213,7 +218,7 @@ export default function PrivacyPage() {
+     setError(null);
+     key.current ??= crypto.randomUUID();
+     try {
+-      const job = await trustApi<{ id: string; immediateDeny: boolean }>(
++      const job = await request<{ id: string; immediateDeny: boolean }>(
+         "privacy/jobs",
+         {
+           kind,
+@@ -278,7 +283,7 @@ export default function PrivacyPage() {
+           Google Play subscriptions
+         </a>
+       </nav>
+-      <TrustSession onSessionState={setSessionState} />
++      <TrustSession showErrors={false} />
+       {capability.data?.verificationMethod === "current_session" && (
+         <p>
+           <a href="/api/auth/continue?returnTo=%2Fsupport%2Fprivacy">
+@@ -294,6 +299,7 @@ export default function PrivacyPage() {
+         </p>
+       )}
+       <form
++        hidden={sessionState.concealed}
+         className="trust-panel"
+         onSubmit={(event) => {
+           event.preventDefault();
+@@ -394,8 +400,8 @@ export default function PrivacyPage() {
+               ? "Request deletion"
+               : "Request export"}
+         </button>
+-        <ErrorState error={actionError} />
+-        {result && <p role="status">{result}</p>}
++        <ErrorState error={sessionState.concealed ? null : actionError} />
++        {!sessionState.concealed && result && <p role="status">{result}</p>}
+       </form>
+       <section className="trust-panel">
+         <h2>Request progress</h2>
+@@ -439,7 +445,7 @@ export default function PrivacyPage() {
+             Keep my data
+           </button>
+         </div>
+-        <ErrorState error={actionError} />
++        <ErrorState error={sessionState.concealed ? null : actionError} />
+       </dialog>
+     </main>
+   );

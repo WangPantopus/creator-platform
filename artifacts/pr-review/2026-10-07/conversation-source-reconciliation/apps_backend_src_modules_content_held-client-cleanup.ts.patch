@@ -1,0 +1,179 @@
+diff --git a/apps/backend/src/modules/content/held-client-cleanup.ts b/apps/backend/src/modules/content/held-client-cleanup.ts
+index 9bf8221f..7e9bf7b1 100644
+--- a/apps/backend/src/modules/content/held-client-cleanup.ts
++++ b/apps/backend/src/modules/content/held-client-cleanup.ts
+@@ -1,4 +1,4 @@
+-import type { PoolClient, QueryConfig } from "pg";
++import { Client, type Pool, type PoolClient, type QueryConfig } from "pg";
+ import { DomainError } from "../../core/errors.js";
+ import { querySettlementUncertain } from "../../core/query-settlement.js";
+ 
+@@ -9,8 +9,8 @@ function control(
+   text: string,
+ ): QueryConfig & { query_timeout: number } {
+   // pg uses the query override before its actual connection read budget.
+-  // Preserve a shorter positive original budget, including pg's numeric
+-  // environment representation, rather than extending it to this ceiling.
++  // Preserve a shorter positive original budget, including a numeric string
++  // in the connection configuration, rather than extending it to this ceiling.
+   const original = (
+       client as PoolClient & {
+         connectionParameters?: { query_timeout?: unknown };
+@@ -37,8 +37,9 @@ export class ContentHeldClient {
+   private transportFailure: unknown;
+   private closeFailure: unknown;
+   private ending: Promise<void> | undefined;
+-  private readonly aborted: Promise<never>;
+-  private rejectAbort!: (reason: unknown) => void;
++  private cancelling: Promise<void> | undefined;
++  private sourcePid: number | undefined;
++  private readonly cancellationFailures: unknown[] = [];
+ 
+   private readonly onError = (error: Error) => {
+     this.transportFailure ??= error;
+@@ -46,20 +47,14 @@ export class ContentHeldClient {
+   };
+   private readonly abort = () => {
+     this.discard = true;
+-    void this.close();
+-    this.rejectAbort(this.signal?.reason);
++    void this.cancelAndClose();
+   };
+ 
+   constructor(
+     readonly client: PoolClient,
+     private readonly signal?: AbortSignal,
++    private readonly sourcePool?: Pool,
+   ) {
+-    this.aborted = new Promise<never>((_, reject) => {
+-      this.rejectAbort = reject;
+-    });
+-    // An abort can arrive between operations. Keep its rejection handled while
+-    // the finalizer awaits this same original client's close.
+-    void this.aborted.catch(() => {});
+     client.on("error", this.onError);
+     signal?.addEventListener("abort", this.abort, { once: true });
+     if (signal?.aborted) this.abort();
+@@ -71,12 +66,67 @@ export class ContentHeldClient {
+     }));
+   }
+ 
++  /** A socket close alone does not interrupt a server waiting on a lock. The
++   * optional original pool supplies only its existing cancellation credential;
++   * the PID is observed on the actual held client before starting its work. */
++  private cancelAndClose(): Promise<void> {
++    return (this.cancelling ??= (async () => {
++      try {
++        if (this.sourcePool && this.sourcePid !== undefined) {
++          const original = Number(
++            this.sourcePool.options.connectionTimeoutMillis,
++          );
++          const controller = new Client({
++            ...this.sourcePool.options,
++            // pg-pool hides this property from object spread. Preserve the
++            // original password or password provider for cancellation too.
++            password: this.sourcePool.options.password,
++            connectionTimeoutMillis:
++              Number.isFinite(original) && original > 0
++                ? Math.min(original, 1500)
++                : 1500,
++            statement_timeout: 1500,
++            query_timeout: control(this.client, "").query_timeout,
++            pipeline: false,
++          });
++          const onError = (error: Error) =>
++            this.cancellationFailures.push(error);
++          controller.on("error", onError);
++          try {
++            await controller.connect();
++            const result = await controller.query<{ cancelled: boolean }>(
++              "SELECT pg_cancel_backend($1) AS cancelled",
++              [this.sourcePid],
++            );
++            if (result.rows[0]?.cancelled !== true)
++              throw new DomainError(
++                "content_privacy_cancel_unavailable",
++                "The actual held privacy source could not be cancelled.",
++                503,
++              );
++          } catch (error) {
++            this.cancellationFailures.push(error);
++          } finally {
++            await controller.end().catch(onError);
++            controller.removeListener("error", onError);
++          }
++        }
++      } finally {
++        await this.close();
++      }
++    })().catch((error: unknown) => {
++      this.cancellationFailures.push(error);
++    }));
++  }
++
+   async run<T>(operation: () => Promise<T>): Promise<T> {
+     this.signal?.throwIfAborted();
+     if (this.settled || this.ending || this.client.pipeline)
+       throw new Error("The original non-pipelined Content client is required.");
+     try {
+-      const result = await Promise.race([operation(), this.aborted]);
++      // Abort cancels/closes the actual source. Await the original callback
++      // and its finalizers rather than returning while they still run.
++      const result = await operation();
+       this.signal?.throwIfAborted();
+       if (this.transportFailure !== undefined) throw this.transportFailure;
+       return result;
+@@ -88,6 +138,21 @@ export class ContentHeldClient {
+ 
+   async begin(): Promise<void> {
+     this.discard = true;
++    if (this.sourcePool) {
++      const source = await this.run(() =>
++        this.client.query(
++          control(this.client, "SELECT pg_backend_pid() AS pid"),
++        ),
++      );
++      const pid: unknown = source.rows[0]?.pid;
++      if (typeof pid !== "number" || !Number.isSafeInteger(pid) || pid <= 0)
++        throw new DomainError(
++          "content_privacy_cancel_unavailable",
++          "The original held source PID is required for cancellation.",
++          503,
++        );
++      this.sourcePid = pid;
++    }
+     const result = await this.run(() =>
+       this.client.query(control(this.client, "BEGIN")),
+     );
+@@ -126,7 +191,15 @@ export class ContentHeldClient {
+     try {
+       if (this.transaction && !this.discard) {
+         try {
+-          await this.client.query(control(this.client, "ROLLBACK"));
++          const result = await this.client.query(
++            control(this.client, "ROLLBACK"),
++          );
++          if (result.command !== "ROLLBACK")
++            throw new DomainError(
++              "content_privacy_rollback_unavailable",
++              "The actual Content rollback receipt is required.",
++              503,
++            );
+           this.transaction = false;
+         } catch (error) {
+           this.discard = true;
+@@ -134,7 +207,14 @@ export class ContentHeldClient {
+         }
+       }
+       this.discard ||= this.signal?.aborted === true;
++      // A pg read timeout can precede any caller/host abort. Socket closure
++      // alone leaves that source executing, so settle its observed PID too.
++      if (this.discard && this.sourcePool) await this.cancelAndClose();
++      if (this.cancelling) await this.cancelling;
+       if (this.discard || this.ending) await this.close();
++      // Cancellation can arrive while an uncertain source close is pending.
++      if (this.cancelling) await this.cancelling;
++      errors.push(...this.cancellationFailures);
+       for (const error of [this.transportFailure, this.closeFailure])
+         if (error !== undefined && !errors.includes(error)) errors.push(error);
+     } finally {

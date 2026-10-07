@@ -1,0 +1,13 @@
+diff --git a/apps/backend/src/modules/access/scope.ts b/apps/backend/src/modules/access/scope.ts
+index 9edaf8ea..58e0fd2a 100644
+--- a/apps/backend/src/modules/access/scope.ts
++++ b/apps/backend/src/modules/access/scope.ts
+@@ -106,7 +106,7 @@ export class AccessService {
+     auditOpen = true,
+   ): Promise<ThreadScope> {
+     const client = await this.pool.connect();
+-    const held = new ContentHeldClient(client);
++    const held = new ContentHeldClient(client, undefined, this.pool);
+     let failure: unknown;
+     try {
+       await held.begin();

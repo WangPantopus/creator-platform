@@ -1,0 +1,103 @@
+diff --git a/apps/backend/src/modules/agent/generation-inputs.ts b/apps/backend/src/modules/agent/generation-inputs.ts
+index cdf2ddbc..f2f7870c 100644
+--- a/apps/backend/src/modules/agent/generation-inputs.ts
++++ b/apps/backend/src/modules/agent/generation-inputs.ts
+@@ -8,6 +8,8 @@ import {
+ } from "../../../../../packages/api/src/agent/contracts.js";
+ import { canonical, contentHash } from "../../core/canonical.js";
+ import { DomainError, invariant } from "../../core/errors.js";
++import { PreparedContentGenerationOrigins } from "../content/generation-origin.js";
++import { generationHostDatabase } from "../identity/generation-host-database.js";
+ import {
+   GenerationIdentityAuthority,
+   type GenerationPurposeConsumer,
+@@ -93,16 +95,6 @@ function freeze<T>(value: T): DeepReadonly<T> {
+   return value as DeepReadonly<T>;
+ }
+ 
+-/** W5's actual current publication/reuse/withdrawal authority on the same
+- * purpose client. A recorded candidate/origin reference is not approval. */
+-export interface GenerationSourceOrigins {
+-  assertCurrent(
+-    client: PoolClient,
+-    scope: GenerationTaskScope,
+-    sources: readonly GenerationAgentFacts["sources"][number][],
+-    signal?: AbortSignal,
+-  ): Promise<void>;
+-}
+ export type GenerationAILicenseContext = Readonly<{
+   inputs: PreparedGenerationAgentInputs;
+   scope: GenerationTaskScope;
+@@ -121,7 +113,7 @@ export class PreparedGenerationAgentInputs {
+   private constructor(
+     private readonly identity: GenerationIdentityAuthority,
+     private readonly service: AgentService,
+-    private readonly origins: GenerationSourceOrigins | undefined,
++    private readonly origins: PreparedContentGenerationOrigins | undefined,
+     private readonly custody: GenerationConsumerCustody,
+   ) {}
+ 
+@@ -142,7 +134,8 @@ export class PreparedGenerationAgentInputs {
+     consumer: GenerationPurposeConsumer;
+     /** Independently reviewed effective permissions and RLS catalogue. */
+     catalogueChecksum: string;
+-    origins?: GenerationSourceOrigins;
++    origins?: PreparedContentGenerationOrigins;
++    signal?: AbortSignal;
+   }): Promise<PreparedGenerationAgentInputs> {
+     invariant(
+       input.identity instanceof GenerationIdentityAuthority &&
+@@ -151,6 +144,14 @@ export class PreparedGenerationAgentInputs {
+       "Genuine worker identity and canonical Creator AI are required.",
+     );
+     input.identity.assertPool(input.workerPool);
++    if (input.origins !== undefined) {
++      invariant(
++        input.origins instanceof PreparedContentGenerationOrigins,
++        "generation_source_origin_unconfigured",
++        "Use the original prepared Content publication and reuse authority.",
++      );
++      input.origins.assertComposition(input.identity, input.workerPool);
++    }
+     const host = new Client(input.service.repository.pool.options);
+     const worker = new Client(input.workerPool.options);
+     const endpoint = (client: Client) =>
+@@ -199,7 +200,13 @@ export class PreparedGenerationAgentInputs {
+       ]),
+     });
+     try {
+-      await assertGenerationConsumerCustody(input.workerPool, custody);
++      input.signal?.throwIfAborted();
++      await assertGenerationConsumerCustody(
++        input.workerPool,
++        custody,
++        input.signal,
++      );
++      input.signal?.throwIfAborted();
+       const installed = (
+         await input.workerPool.query<{
+           ready: boolean;
+@@ -226,18 +233,14 @@ export class PreparedGenerationAgentInputs {
+           ],
+         )
+       ).rows[0];
+-      const canonicalDatabase = (
+-        await input.service.repository.pool.query<{
+-          database: string;
+-          database_oid: number;
+-        }>(
+-          "SELECT current_database() AS database,(SELECT oid FROM pg_database WHERE datname=current_database()) AS database_oid",
+-        )
+-      ).rows[0];
++      const canonicalDatabase = await generationHostDatabase(
++        input.service.repository.pool,
++        input.signal,
++      );
+       if (
+         installed?.ready !== true ||
+         installed.database !== canonicalDatabase?.database ||
+-        installed.database_oid !== canonicalDatabase.database_oid ||
++        installed.database_oid !== canonicalDatabase.oid ||
+         createHash("sha256").update(installed.definition).digest("hex") !==
+           receipt.definitionChecksum
+       )
