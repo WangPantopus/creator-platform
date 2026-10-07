@@ -1,0 +1,339 @@
+{
+  "baseMain": "d6cd1d2e82c53ac0bb816f8d1ee2d7135b690a3a",
+  "sourceBase": "2548eb0ea8aca15909f248eaa9d28aca504928ab",
+  "sourceSha256": {
+    "apps/backend/src/integration.ts": "9f51da08349edbae7863ea96d2b1c9fe8f076051c8326cb0d67a24ab2c04db97",
+    "apps/backend/src/modules/content/held-client-cleanup.ts": "1cd652f191ff15b6257bafae9e67d5b3511932b624539faad698fa6691c24ed3",
+    "apps/backend/src/modules/trust/identity-privacy-hook.ts": "e712fb610e17d7b2c675fa81c19942648f5b87a8ffc6b052a86c64892b89ac81",
+    "apps/backend/src/modules/trust/own-privacy-hook.ts": "3f1cd1987b26fecad17b653693cef2cba15ad00ecc2857965036e5a14cd128c6",
+    "apps/backend/src/modules/trust/worker.ts": "0d2215fdc10550c1e2c75d6f50d0044925e8f7c7546adaa08020e8ccc6e2cf95",
+    "apps/backend/src/operations/runtime.ts": "52f7c07e506d33bbe9f75a562b31a2373d6a2c7f6bb82d3a35bca10dfec44c68"
+  },
+  "qualification": "Independent review on main plus only the original privacy lifetime repair and required canonical backend shutdown prerequisite. No scoped-generation activation or other draft source was extracted.",
+  "actualConsumers": {
+    "scope": "Genuine development session, HTTP-requested account export jobs, original TrustWorker-issued leases/signals and unchanged owner hooks. Fault injection only locks or terminates their actual database source. No task, scope, clock or receipt is fabricated.",
+    "observed": [
+      {
+        "ordinal": 1,
+        "domain": "identity",
+        "outcome": "complete_original_hook",
+        "injected": false,
+        "elapsedMs": 89
+      },
+      {
+        "ordinal": 2,
+        "domain": "trust",
+        "outcome": "complete_original_hook",
+        "injected": false,
+        "elapsedMs": 62
+      },
+      {
+        "ordinal": 3,
+        "domain": "identity",
+        "actualTaskStateBeforeHookReturns": "running",
+        "outcome": "failed_original_hook",
+        "injected": true,
+        "actualTaskAborted": true,
+        "codes": [
+          "57014"
+        ],
+        "backendCountAtHookReturn": 0,
+        "sourceBackendGone": true,
+        "backendExitObservationMs": 3,
+        "elapsedMs": 45014
+      },
+      {
+        "ordinal": 4,
+        "domain": "trust",
+        "actualTaskStateBeforeHookReturns": "running",
+        "outcome": "failed_original_hook",
+        "injected": true,
+        "actualTaskAborted": false,
+        "codes": [
+          "57P01"
+        ],
+        "backendCountAtHookReturn": 0,
+        "sourceBackendGone": true,
+        "backendExitObservationMs": 3,
+        "elapsedMs": 70
+      },
+      {
+        "ordinal": 5,
+        "domain": "identity",
+        "outcome": "complete_original_hook",
+        "injected": false,
+        "elapsedMs": 89
+      },
+      {
+        "ordinal": 6,
+        "domain": "trust",
+        "outcome": "complete_original_hook",
+        "injected": false,
+        "elapsedMs": 60
+      }
+    ],
+    "afterFailure": [
+      {
+        "domain": "agent",
+        "state": "complete",
+        "error_code": null,
+        "attempts": 1
+      },
+      {
+        "domain": "commerce",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "content",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "conversation",
+        "state": "blocked",
+        "error_code": "conversation_lineage_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "growth",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "identity",
+        "state": "retry",
+        "error_code": "hook_timeout",
+        "attempts": 1
+      },
+      {
+        "domain": "media",
+        "state": "running",
+        "error_code": null,
+        "attempts": 1
+      },
+      {
+        "domain": "trust",
+        "state": "running",
+        "error_code": null,
+        "attempts": 1
+      }
+    ],
+    "recovered": [
+      {
+        "domain": "agent",
+        "state": "complete",
+        "error_code": null,
+        "attempts": 1
+      },
+      {
+        "domain": "commerce",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "content",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "conversation",
+        "state": "blocked",
+        "error_code": "conversation_lineage_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "growth",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "identity",
+        "state": "complete",
+        "error_code": null,
+        "attempts": 2
+      },
+      {
+        "domain": "media",
+        "state": "complete",
+        "error_code": null,
+        "attempts": 1
+      },
+      {
+        "domain": "trust",
+        "state": "complete",
+        "error_code": null,
+        "attempts": 2
+      }
+    ],
+    "scopes": {
+      "identity": 0,
+      "trust": 0
+    },
+    "actual": {
+      "migrations": 61,
+      "sessions": 7,
+      "privacyjobs": 12,
+      "providerusage": 0
+    },
+    "limits": [
+      "Only Identity and Trust consumer lifetimes qualify; complete all-eight export and download remain unavailable.",
+      "Actual45-second worker cancellation applies to Identity. Trust source uses actual PostgreSQL termination during its blocked original read.",
+      "No held source is installed in this independent canonical61 database."
+    ]
+  },
+  "actualFailedLaneShutdown": {
+    "scope": "Real canonical development HTTP account export and original TrustWorker-issued leases. A database lock causes actual SQL57014 in the effect-claim lane while the successfully claimed Identity task continues on its original source.",
+    "closePendingWhileSourceActive": true,
+    "coreUsableDuringDrain": true,
+    "sharedClosePromise": true,
+    "sourceBefore": 1,
+    "sourceAfter": 0,
+    "sourceAborted": true,
+    "hookFailure": [
+      "57014"
+    ],
+    "closeResult": {
+      "ok": false,
+      "codes": [
+        "57014"
+      ]
+    },
+    "closeElapsedMs": 44972,
+    "ownedPoolsEnded": true,
+    "remainingRoleBackends": [],
+    "scopes": {
+      "identity": 0,
+      "trust": 0
+    },
+    "state": [
+      {
+        "domain": "agent",
+        "state": "complete",
+        "error_code": null,
+        "attempts": 1
+      },
+      {
+        "domain": "commerce",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "content",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "conversation",
+        "state": "blocked",
+        "error_code": "conversation_lineage_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "growth",
+        "state": "blocked",
+        "error_code": "domain_hook_unavailable",
+        "attempts": 1
+      },
+      {
+        "domain": "identity",
+        "state": "retry",
+        "error_code": "hook_timeout",
+        "attempts": 1
+      },
+      {
+        "domain": "media",
+        "state": "pending",
+        "error_code": null,
+        "attempts": 0
+      },
+      {
+        "domain": "trust",
+        "state": "pending",
+        "error_code": null,
+        "attempts": 0
+      }
+    ],
+    "limits": [
+      "No effect or privacy job, lease, receipt or authority is inserted directly.",
+      "Only original Identity cancellation, queue-lane failure drainage and actual host close are qualified; no complete all-eight export or download.",
+      "No held migrations or provider usage."
+    ]
+  },
+  "actualHostRegressions": {
+    "scope": "Actual configured canonical backend without Trust, provider or feature activation. Tests only host resource shutdown.",
+    "observations": [
+      {
+        "case": "prepared_only",
+        "sameClosePromise": true,
+        "listenerClosed": true,
+        "poolClosed": true,
+        "sourceBackendGone": true,
+        "waitedForActualDatabaseRead": false,
+        "realtimeCloseCode": null,
+        "elapsedMs": 3
+      },
+      {
+        "case": "listening",
+        "sameClosePromise": true,
+        "listenerClosed": true,
+        "poolClosed": true,
+        "sourceBackendGone": true,
+        "waitedForActualDatabaseRead": false,
+        "realtimeCloseCode": null,
+        "elapsedMs": 3
+      },
+      {
+        "case": "active_database_read",
+        "sameClosePromise": true,
+        "listenerClosed": true,
+        "poolClosed": true,
+        "sourceBackendGone": true,
+        "waitedForActualDatabaseRead": true,
+        "realtimeCloseCode": null,
+        "elapsedMs": 206
+      },
+      {
+        "case": "realtime_connection",
+        "sameClosePromise": true,
+        "listenerClosed": true,
+        "poolClosed": true,
+        "sourceBackendGone": true,
+        "waitedForActualDatabaseRead": false,
+        "realtimeCloseCode": 1001,
+        "elapsedMs": 4
+      }
+    ]
+  },
+  "validation": {
+    "backendShippingBuild": "passed after final host prerequisite under original W2 heavy-build lock",
+    "scopedEslint": "passed",
+    "prettier": "passed",
+    "fullBackendTests": {
+      "source": "2548eb0e before the host prerequisite",
+      "passed": 18,
+      "postgresFoundation": 9,
+      "contracts": 9,
+      "totalMs": 94630,
+      "originalT11Ms": 91493,
+      "note": "Existing original 10,000-pair scoped query test; not application p95. Final host prerequisite is covered by actual shutdown and four host operations above."
+    },
+    "mainProtection": "No protected branch or ruleset required status checks when inspected; hosted new-head CI remains separately required for the merge decision."
+  },
+  "earlierFailures": [
+    "Offline dependency setup lacked optional-package metadata. Standard online supply-chain verification passed with all391 packages reused and no lock change; no policy was disabled.",
+    "The first main shutdown review failed the shared-promise assertion and exposed main\u2019s original host close skipping its core pool on Trust failure. The host prerequisite was added and the complete actual shutdown review then passed."
+  ],
+  "limits": [
+    "Original Identity/Trust lifetimes, real claim-lane failure, canonical host shutdown and regressions only.",
+    "Other privacy domains remain available or blocked according to their actual owners. No all-eight completion, erasure, provider/generation operation or schema activation is claimed."
+  ]
+}
