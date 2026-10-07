@@ -1,0 +1,20 @@
+diff --git a/apps/backend/src/modules/content/development-server.ts b/apps/backend/src/modules/content/development-server.ts
+index 79dae9e9..4f8265aa 100644
+--- a/apps/backend/src/modules/content/development-server.ts
++++ b/apps/backend/src/modules/content/development-server.ts
+@@ -206,6 +206,15 @@ const backend = await createConfiguredBackend({
+               runtime.access,
+               runtime.database,
+               runtime.identity.signing,
++              async (creatorId) => {
++                const row = (
++                  await runtime.pool.query<{ handle: string }>(
++                    "SELECT handle FROM creator.creator_profile WHERE id=$1",
++                    [creatorId],
++                  )
++                ).rows[0];
++                return row?.handle ?? null;
++              },
+             ),
+           }
+         : {},

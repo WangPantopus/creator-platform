@@ -1,0 +1,36 @@
+diff --git a/apps/web/app/calls/[creatorId]/[fanId]/[sessionId]/page.tsx b/apps/web/app/calls/[creatorId]/[fanId]/[sessionId]/page.tsx
+index 6e24892f..83ff5700 100644
+--- a/apps/web/app/calls/[creatorId]/[fanId]/[sessionId]/page.tsx
++++ b/apps/web/app/calls/[creatorId]/[fanId]/[sessionId]/page.tsx
+@@ -6,6 +6,7 @@ import { IdSchema } from "@qelvora/api";
+ import { IdentitySessionBoundary } from "../../../../../features/identity/session-boundary";
+ import { IdentityWelcome } from "../../../../../features/identity/welcome";
+ import { MediaSession } from "../../../../../features/media/session";
++export const dynamic = "force-dynamic";
+ export const metadata = { robots: { index: false, follow: false } };
+ export default async function CallPage({
+   params,
+@@ -14,7 +15,12 @@ export default async function CallPage({
+   params: Promise<{ creatorId: string; fanId: string; sessionId: string }>;
+   searchParams: Promise<Record<string, string | string[] | undefined>>;
+ }) {
+-  const destination = await params;
++  const supplied = await params;
++  const destination = {
++    creatorId: supplied.creatorId.toLowerCase(),
++    fanId: supplied.fanId.toLowerCase(),
++    sessionId: supplied.sessionId.toLowerCase(),
++  };
+   if (
+     ![destination.creatorId, destination.fanId, destination.sessionId].every(
+       (value) => IdSchema.safeParse(value).success,
+@@ -46,7 +52,8 @@ export default async function CallPage({
+             creatorId={destination.creatorId}
+             fanId={destination.fanId}
+             offerId={destination.sessionId}
+-            canSelect={actor?.fan?.id === destination.fanId}
++            actorAccountId={actor.accountId}
++            canSelect={actor.fan?.id === destination.fanId}
+           />
+         ) : (
+           <CallView {...destination} actorAccountId={actor.accountId} />

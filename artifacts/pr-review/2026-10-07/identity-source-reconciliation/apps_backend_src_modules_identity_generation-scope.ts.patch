@@ -1,0 +1,46 @@
+diff --git a/apps/backend/src/modules/identity/generation-scope.ts b/apps/backend/src/modules/identity/generation-scope.ts
+index e38d3992..3a008070 100644
+--- a/apps/backend/src/modules/identity/generation-scope.ts
++++ b/apps/backend/src/modules/identity/generation-scope.ts
+@@ -9,6 +9,8 @@ import {
+   generationOutputCursorSignature,
+ } from "./generation-output-cursor.js";
+ import { registeredMigration } from "../../db/reviewed-migration.js";
++import { assertGenerationLifecycleCatalogue } from "./generation-lifecycle.js";
++import { generationTerminalPageSource } from "./generation-terminal-page.js";
+ import { assertThreadScope, type ThreadScope } from "../access/scope.js";
+ import { assertCurrentSession, requestAuthority } from "./request-authority.js";
+ import {
+@@ -94,6 +96,15 @@ const terminalContracts = [
+       "83a56963f6c37e05b0850fa6a0e97475282fbfa3e90d1372f86bea701622e7bc",
+     signatures: ["creator.pending_generation_terminal_cursors(integer)"],
+   },
++  {
++    owner: "creator_generation_terminal_discovery",
++    originalScopeBridge: false,
++    version: "0227_w1_generation_terminal_page",
++    checksum: generationTerminalPageSource.checksum,
++    signatures: [
++      "creator.pending_generation_terminal_cursor_page(integer,uuid)",
++    ],
++  },
+ ] as const;
+ // Additive0215 revokes this legacy worker EXECUTE. It must not be relabelled
+ // as a generation consumer or accepted alongside the typed replacement.
+@@ -233,6 +244,7 @@ async function assertGenerationCatalogue(
+   query: Pick<Pool, "query">,
+   input: GenerationCatalogue,
+ ): Promise<void> {
++  await assertGenerationLifecycleCatalogue(query);
+   const consumers = [...input.consumers, ...input.terminalConsumers];
+   const installed = (
+     await query.query<{ installed: boolean }>(
+@@ -461,7 +473,7 @@ export class GenerationIdentityAuthority {
+         .parse(input.consumers ?? []);
+       terminalConsumers = z
+         .array(terminalConsumerSchema)
+-        .max(10)
++        .max(11)
+         .parse(input.terminalConsumers ?? []);
+       const combined = [...consumers, ...terminalConsumers];
+       if (

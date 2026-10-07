@@ -1,0 +1,103 @@
+diff --git a/apps/web/app/support/privacy/page.tsx b/apps/web/app/support/privacy/page.tsx
+index 1de139e7..6868954c 100644
+--- a/apps/web/app/support/privacy/page.tsx
++++ b/apps/web/app/support/privacy/page.tsx
+@@ -1,12 +1,18 @@
+ "use client";
+-import { useCallback, useEffect, useRef, useState } from "react";
++import {
++  useCallback,
++  useEffect,
++  useLayoutEffect,
++  useRef,
++  useState,
++} from "react";
+ import Link from "next/link";
+ import type { PrivacyJobView } from "../../../../backend/src/modules/trust/contracts";
+ import {
+   ErrorState,
+   TrustError,
+   TrustSession,
+-  type TrustSessionState,
++  useTrustStatus,
+   useTrust,
+   useTrustSession,
+   useTrustRequest,
+@@ -26,6 +32,7 @@ function Job({
+   onReadError: (id: string, error: TrustError | null) => void;
+ }) {
+   const request = useTrustRequest();
++  const sessionState = useTrustStatus();
+   const { data, error, loading, refresh } = useTrust<PrivacyJobView>(
+     `privacy/jobs/${id}`,
+     readEnabled,
+@@ -135,7 +142,7 @@ function Job({
+                   ))}
+               </nav>
+             )}
+-          <ErrorState error={actionError} />
++          <ErrorState error={sessionState.concealed ? null : actionError} />
+         </>
+       )}
+     </article>
+@@ -143,10 +150,7 @@ function Job({
+ }
+ export default function PrivacyPage() {
+   const request = useTrustRequest();
+-  const [sessionState, setSessionState] = useState<TrustSessionState>({
+-    ready: false,
+-    error: null,
+-  });
++  const sessionState = useTrustStatus();
+   const capability = useTrust<{
+     localDevelopment: boolean;
+     actorVerification: string;
+@@ -202,10 +206,9 @@ export default function PrivacyPage() {
+     setError(null);
+     setResult("");
+     key.current = null;
+-    setSessionState({ ready: false, error: null });
+     setJobErrors({});
+   });
+-  useEffect(() => {
++  useLayoutEffect(() => {
+     if (!verificationReady) dialog.current?.close();
+   }, [verificationReady]);
+   const run = async () => {
+@@ -280,7 +283,7 @@ export default function PrivacyPage() {
+           Google Play subscriptions
+         </a>
+       </nav>
+-      <TrustSession onSessionState={setSessionState} />
++      <TrustSession showErrors={false} />
+       {capability.data?.verificationMethod === "current_session" && (
+         <p>
+           <a href="/api/auth/continue?returnTo=%2Fsupport%2Fprivacy">
+@@ -296,6 +299,7 @@ export default function PrivacyPage() {
+         </p>
+       )}
+       <form
++        hidden={sessionState.concealed}
+         className="trust-panel"
+         onSubmit={(event) => {
+           event.preventDefault();
+@@ -396,8 +400,8 @@ export default function PrivacyPage() {
+               ? "Request deletion"
+               : "Request export"}
+         </button>
+-        <ErrorState error={actionError} />
+-        {result && <p role="status">{result}</p>}
++        <ErrorState error={sessionState.concealed ? null : actionError} />
++        {!sessionState.concealed && result && <p role="status">{result}</p>}
+       </form>
+       <section className="trust-panel">
+         <h2>Request progress</h2>
+@@ -441,7 +445,7 @@ export default function PrivacyPage() {
+             Keep my data
+           </button>
+         </div>
+-        <ErrorState error={actionError} />
++        <ErrorState error={sessionState.concealed ? null : actionError} />
+       </dialog>
+     </main>
+   );

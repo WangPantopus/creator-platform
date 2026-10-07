@@ -1,0 +1,27 @@
+diff --git a/apps/backend/src/modules/growth/integration.ts b/apps/backend/src/modules/growth/integration.ts
+index fe227d51..fe9425d1 100644
+--- a/apps/backend/src/modules/growth/integration.ts
++++ b/apps/backend/src/modules/growth/integration.ts
+@@ -1,16 +1,16 @@
+-import type { FeatureRegistration } from "../../app.js";
+-import type { IdentityProfiles } from "../identity/profiles.js";
+-import type { Actor } from "../identity/adapter.js";
+-import type { GrowthOwners } from "./contracts.js";
+-import type { GrowthService } from "./service.js";
+ import type { PoolClient } from "pg";
+ import { z } from "zod";
+-import { DomainError } from "../../core/errors.js";
+ import { copy } from "@qelvora/copy";
++import { DomainError } from "../../core/errors.js";
+ import {
+   requestAuthority,
+   assertCurrentSession,
+ } from "../identity/request-authority.js";
++import type { FeatureRegistration } from "../../app.js";
++import type { IdentityProfiles } from "../identity/profiles.js";
++import type { Actor } from "../identity/adapter.js";
++import type { GrowthOwners } from "./contracts.js";
++import type { GrowthService } from "./service.js";
+ import { createGrowthRouter } from "./router.js";
+ 
+ /** W1's configured host mounts this before its terminal 404 and resolves each session. */

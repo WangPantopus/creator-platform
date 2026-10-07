@@ -1,0 +1,18 @@
+diff --git a/apps/android/app/src/main/AndroidManifest.xml b/apps/android/app/src/main/AndroidManifest.xml
+index 44d7728d..b22003cb 100644
+--- a/apps/android/app/src/main/AndroidManifest.xml
++++ b/apps/android/app/src/main/AndroidManifest.xml
+@@ -4,12 +4,12 @@
+     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+     <uses-permission android:name="android.permission.CAMERA" />
+     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
++    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+     <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" />
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+     <application android:name=".ui.GrowthApplication" android:label="@string/app_name" android:theme="@style/QelvoraTheme" android:allowBackup="false" android:supportsRtl="true">
+         <!-- No Firebase initialization, installation registration or analytics
+              occurs without approved configuration, a session and permission. -->

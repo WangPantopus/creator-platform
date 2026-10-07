@@ -1,0 +1,52 @@
+diff --git a/apps/backend/src/modules/identity/generation-terminal-discovery.ts b/apps/backend/src/modules/identity/generation-terminal-discovery.ts
+index ff1fbc1d..2e1be9e7 100644
+--- a/apps/backend/src/modules/identity/generation-terminal-discovery.ts
++++ b/apps/backend/src/modules/identity/generation-terminal-discovery.ts
+@@ -3,8 +3,11 @@ import { contentHash } from "../../core/canonical.js";
+ import { DomainError } from "../../core/errors.js";
+ import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
+ import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
++import { generationPrivacySourcesRegistered } from "../../db/generation-privacy-sources.js";
++import { generationPrivacyCatalogueChecksum } from "../../db/content-privacy-profile.js";
+ import type { GenerationTerminalPurposeConsumer } from "./generation-scope.js";
+ import { requestAuthority } from "./request-authority.js";
++import { assertGenerationTerminalPageCatalogue } from "./generation-terminal-page.js";
+ 
+ export const generationTerminalDiscoverySource = Object.freeze({
+   owner: "W1",
+@@ -27,10 +30,10 @@ export const generationTerminalDiscoveryConsumer: GenerationTerminalPurposeConsu
+       "36036c26c440e7af694b8a5702c43d96985fcf2ce8c65188f91e130f6f31c00e",
+   });
+ 
+-// The whole original caller graph, drift and restoration review is pending.
+-// A minimal compilation pin or startup readback cannot approve that graph.
++// Fixed full39-source fresh/preserved metadata and drift review. Actual source
++// registration, original caller/task and restoration remain separate gates.
+ export const generationTerminalDiscoveryCatalogueChecksum: string | undefined =
+-  undefined;
++  "3d569c14a6161000ec11059bca86d248196a1ecb97b612bb9270b47ed63673ab";
+ 
+ export const generationTerminalDiscoveryCatalogueQuery = `SELECT jsonb_build_object(
+  'roles',(SELECT jsonb_agg(to_jsonb(r)-'oid' ORDER BY r.rolname) FROM (
+@@ -78,7 +81,9 @@ export async function assertGenerationTerminalDiscoveryCatalogue(
+   )
+     unavailable();
+   try {
++    if (!(await generationPrivacySourcesRegistered())) unavailable();
+     await assertRegisteredMigration(client, generationTerminalDiscoverySource);
++    await assertGenerationTerminalPageCatalogue(client);
+     await client.query("SAVEPOINT w1_generation_terminal_discovery_catalogue");
+     await client.query("SET LOCAL search_path=pg_catalog");
+     const discovery = await generationConsumerCatalogue(
+@@ -96,7 +101,10 @@ export async function assertGenerationTerminalDiscoveryCatalogue(
+     ).rows[0]?.catalogue;
+     if (
+       contentHash({ discovery, original, catalogue }) !==
+-      generationTerminalDiscoveryCatalogueChecksum
++      (await generationPrivacyCatalogueChecksum(
++        "terminal",
++        generationTerminalDiscoveryCatalogueChecksum,
++      ))
+     )
+       unavailable();
+     // An uncertain or failed response escapes directly to original custody.

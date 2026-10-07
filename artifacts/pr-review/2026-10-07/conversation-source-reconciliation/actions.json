@@ -1,0 +1,13 @@
+[
+  {
+    "number": 63,
+    "action": "closed_unmerged_into_132",
+    "sourceHead": "82c9abffdb00f73bc7ba3fb4baedb508b1170917",
+    "sourceBranch": "codex/w3-generation-host",
+    "sourceBranchPreserved": true,
+    "successorHead": "6f7acfbee86a32806976722ac8b2478ae690e2ae",
+    "evidence": "https://github.com/WangPantopus/creator-platform/blob/6f7acfbee86a32806976722ac8b2478ae690e2ae/artifacts/pr-review/2026-10-07/conversation-source-reconciliation/README.md",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/63",
+    "verifiedAt": "2026-10-07T21:53:20.553857+00:00"
+  }
+]

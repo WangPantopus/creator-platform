@@ -1,0 +1,19 @@
+diff --git a/apps/backend/src/modules/trust/contracts.ts b/apps/backend/src/modules/trust/contracts.ts
+index dce225bf..4c4063d0 100644
+--- a/apps/backend/src/modules/trust/contracts.ts
++++ b/apps/backend/src/modules/trust/contracts.ts
+@@ -79,6 +79,14 @@ export const BlockInput = z.strictObject({
+   reason,
+   idempotencyKey: key,
+ });
++export const FeedbackInput = z.strictObject({
++  consent: z.literal(true),
++  cohort: z.enum(["expert", "companion", "blend", "unspecified"]),
++  useful: z.boolean(),
++  authorshipClear: z.boolean(),
++  comment: z.string().trim().max(2000).optional(),
++  idempotencyKey: key,
++});
+ export const PrivacyInput = z
+   .strictObject({
+     kind: z.enum(["export", "delete"]),
