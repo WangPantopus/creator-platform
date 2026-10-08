@@ -1,0 +1,47 @@
+{
+  "scope": "Read-only original catalogue comparison; no checksum replacement or source activation",
+  "results": [
+    {
+      "database": "creator_generation_journey43_20261007",
+      "callerPath": "public",
+      "restoredPath": "public",
+      "approvedChecksum": "0b5a600f30b7656289d86e182b93f8dba7284d5dc69c66c2ff7940fcf1356d5c",
+      "pass": true
+    },
+    {
+      "database": "creator_generation_journey43_20261007",
+      "callerPath": "pg_catalog",
+      "restoredPath": "pg_catalog",
+      "approvedChecksum": "0b5a600f30b7656289d86e182b93f8dba7284d5dc69c66c2ff7940fcf1356d5c",
+      "pass": true
+    },
+    {
+      "database": "creator_generation_journey43_20261007",
+      "callerPath": "creator, pg_catalog",
+      "restoredPath": "creator, pg_catalog",
+      "approvedChecksum": "0b5a600f30b7656289d86e182b93f8dba7284d5dc69c66c2ff7940fcf1356d5c",
+      "pass": true
+    },
+    {
+      "database": "creator_generation_journey46_20261007",
+      "callerPath": "public",
+      "restoredPath": "public",
+      "approvedChecksum": "0b5a600f30b7656289d86e182b93f8dba7284d5dc69c66c2ff7940fcf1356d5c",
+      "pass": true
+    },
+    {
+      "database": "creator_generation_journey46_20261007",
+      "callerPath": "pg_catalog",
+      "restoredPath": "pg_catalog",
+      "approvedChecksum": "0b5a600f30b7656289d86e182b93f8dba7284d5dc69c66c2ff7940fcf1356d5c",
+      "pass": true
+    },
+    {
+      "database": "creator_generation_journey46_20261007",
+      "callerPath": "creator, pg_catalog",
+      "restoredPath": "creator, pg_catalog",
+      "approvedChecksum": "0b5a600f30b7656289d86e182b93f8dba7284d5dc69c66c2ff7940fcf1356d5c",
+      "pass": true
+    }
+  ]
+}

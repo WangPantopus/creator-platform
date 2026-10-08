@@ -1,0 +1,24 @@
+{
+  "purpose": "Isolated schema source review only; no application registry allocation",
+  "applied": [
+    {
+      "name": "samples",
+      "sha256": "49b4fbcf308833c2ff0ede97fad20926ea98eabe8a9d2a1abb279a55662c3a4d"
+    },
+    {
+      "name": "privacy",
+      "sha256": "81d9ebedb8346808b32e560ffbd6246f89443423bc267d02f89f6e84465b5bc0"
+    }
+  ],
+  "functions": [
+    {
+      "signature": "creator.conversation_privacy_export_rows(uuid,uuid)",
+      "sha256": "53656e429461ca73c2fb2a4d9b9ffd0a234b4b9cf3e6c2793ac78da9205965fd"
+    },
+    {
+      "signature": "creator.purge_conversation_comparisons(uuid,uuid,uuid,uuid,uuid)",
+      "sha256": "5b39ca6d3af5cd279117e614e955ca88c4eaef50c5735ad4ac42531942f1cbab"
+    }
+  ],
+  "observedAt": "2026-10-08T12:42:41.297Z"
+}

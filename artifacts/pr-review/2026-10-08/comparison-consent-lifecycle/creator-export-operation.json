@@ -1,0 +1,136 @@
+{
+  "at": "2026-10-08T13:21:20.328448+00:00",
+  "kind": "Actual browser-created creator account export and UI downloads",
+  "database": "creator_generation_journey43_20261007",
+  "runtimeRevision": "5e5cd3abf853e0e97a1daeb0f4a5f4236f24c886",
+  "jobId": "61e07c91-56b4-4dbe-835c-0714797b4b13",
+  "domainsComplete": [
+    "agent",
+    "commerce",
+    "content",
+    "conversation",
+    "growth",
+    "identity",
+    "media",
+    "trust"
+  ],
+  "downloadedFiles": [
+    {
+      "domain": "agent",
+      "bytes": 197928,
+      "sha256": "ac6adbcc1d0d4213ad440ead44083bb8c86845a9767e770c9a1e49c254b813fb",
+      "chunks": 1,
+      "matchesManifest": true
+    },
+    {
+      "domain": "conversation",
+      "bytes": 198980,
+      "sha256": "a3d5e49ea90b5acab919fc9b05527aac53df8f51c2923f3f6ebf23b5a8a30104",
+      "chunks": 4,
+      "matchesManifest": true
+    },
+    {
+      "domain": "commerce",
+      "bytes": 12091,
+      "sha256": "98ec59e07b296ebd5d479284e95c83da98f92e1b3da48bf89c880d9e8200c547",
+      "chunks": 5,
+      "matchesManifest": true
+    },
+    {
+      "domain": "growth",
+      "bytes": 1696,
+      "sha256": "5732491ace8aa38e4fae2a07a736c36a34bac556a15a3aefe68ebfbba6ddd100",
+      "chunks": 2,
+      "matchesManifest": true
+    }
+  ],
+  "conversation": {
+    "families": 1,
+    "sourceCounts": {
+      "accounting": {
+        "schemaVersion": 1,
+        "counts": {
+          "ai_generation_admission": 18,
+          "ai_generation_attempt": 18,
+          "ai_generation_receipt": 18,
+          "ai_usage": 69,
+          "receiptNotifications": 21
+        },
+        "bytes": 114564,
+        "sha256": "95034760049a4e3c524836a0df33df6007a4596957b42263a7d834e50a5b55a7"
+      },
+      "lineage": {
+        "messages": 36,
+        "feedback": 0
+      },
+      "recordings": 0,
+      "messages": 36,
+      "memories": 0,
+      "audit": 0,
+      "consents": 1,
+      "memoryConsents": 0,
+      "usageDays": 1,
+      "events": 54,
+      "exclusions": 0,
+      "generations": 18,
+      "generation_sentence_provenance": {
+        "count": 18,
+        "bytes": 19256,
+        "sha256": "0296dd8e14e6146044cc94030bea23a711725a5cc021c18a9dc75dbbf0af678d"
+      }
+    },
+    "allMessagesHaveAuthorshipLabels": true,
+    "pendingComparisonCollectionsAbsent": true
+  },
+  "agent": {
+    "sources": 1,
+    "versions": 1,
+    "usage": 123,
+    "generationReceipts": 18,
+    "comparisonSamples": 0,
+    "comparisonEvaluations": 0
+  },
+  "commerceRecordCounts": {
+    "trials": 1,
+    "allowanceReservations": 18,
+    "accessGrants": 1
+  },
+  "media": {
+    "jobId": "61e07c91-56b4-4dbe-835c-0714797b4b13",
+    "domain": "media",
+    "complete": true,
+    "families": 1,
+    "binaryAssets": 0
+  },
+  "preserved": {
+    "unchanged": {
+      "version": true,
+      "evaluation": true,
+      "perGeneration": true,
+      "messages": true,
+      "reservations": true,
+      "usageRows": true,
+      "usageSha256": true,
+      "costMicros": true,
+      "settledUnits": true
+    },
+    "generations": 18,
+    "usageRows": 69,
+    "usageSha256": "9b6d528acbc4a957ddfcdee0beb43e064668d655ae717ce41c0cd006285af345",
+    "costMicros": 36815,
+    "settledUnits": 51
+  },
+  "retainedFailures": [
+    "Original stale verification refused; same account reconfirmed",
+    "Conversation catalogue search_path false mismatch; original approved hash retained",
+    "Media wrong Conversation-only family binding refused; original Media task now used",
+    "Original16-row populated export hit45s deadline; retained trace shows18 successful fetches with no EOF",
+    "Expired download verification returned401 browser error; fresh same-account UI sign-in allowed downloads; recovery UX remains open"
+  ],
+  "limits": [
+    "Development identity and approved fictional scenario, not production qualification",
+    "Comparison sources remain pending/unregistered/unapplied",
+    "Media has no binary assets or calls; populated archive and physical deletion remain open",
+    "No new native UI operation in this backend milestone; existing preserved native evidence remains separate"
+  ]
+}

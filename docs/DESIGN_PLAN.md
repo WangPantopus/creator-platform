@@ -23,6 +23,19 @@ W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan expor
 
 ## Implementation continuation
 
+- [x] October 8, 2026: repair and operate the original creator-account export
+  across all eight domains; verify four downloaded streams and preserve exact
+  publication/generation/accounting history. Actual catalogue, Media task and
+  page deadline failures are retained with the repairs. Expired-verification
+  download recovery, populated media, other scopes and physical deletion remain
+  open. [Bounded evidence](../artifacts/pr-review/2026-10-08/comparison-consent-lifecycle/README.md).
+
+- [~] October 8, 2026: prepare separate comparison consent, Conversation source
+  mapping, atomic invalidation, real expiry SQL and an extension of the original
+  privacy export/deletion owners. Isolated SQL operations pass; actual consent,
+  sanitizer/provider admission, saved artifacts and activation remain open.
+  [Source and qualification limits](../artifacts/pr-review/2026-10-08/comparison-consent-lifecycle/README.md).
+
 - [x] October 8, 2026: block replacement publication and retained comparison
   display when the trusted feed is disconnected; verify the gate in the actual
   preserved creator Studio with unchanged generation/accounting history.

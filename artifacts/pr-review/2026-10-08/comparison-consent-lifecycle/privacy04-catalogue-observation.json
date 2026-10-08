@@ -1,0 +1,8 @@
+{
+  "scope": "Read-only source review; not approved runtime custody",
+  "sha256": "cc2a34e0a2c1adc765651cb395922d07e0171f5d7ef3614496b36eed57e2ba04",
+  "functions": 4,
+  "storage": 2,
+  "triggers": 7,
+  "dependencies": 50
+}

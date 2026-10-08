@@ -1,5 +1,38 @@
 # Session handoff — October 8, 2026
 
+## Active continuation — comparison consent and privacy lifecycle
+
+PR [#339](https://github.com/WangPantopus/creator-platform/pull/339) merged at
+`2c1bc9f5605381469d585998a61a4de97ecc4dd5` after all eleven reviewed-head checks
+passed at `ea61835150a093184302f56a2c61bc22e0071764`. Its post-merge workflow is
+[37777455597](https://github.com/WangPantopus/creator-platform/actions/runs/37777455597);
+all five post-merge jobs passed. All five #338 post-merge jobs also passed.
+
+Continue on `codex/comparison-consent-lifecycle-20261008`. The
+[source milestone](../../artifacts/pr-review/2026-10-08/comparison-consent-lifecycle/README.md)
+adds pending consent/sample storage, source invalidation, physical expiry SQL,
+and complete export/deletion extension. It is unregistered and unapplied to
+original archives and journey copies. Separate PostgreSQL source review is
+explicitly synthetic and does not qualify fan consent or a privacy-safe feed.
+
+The current compiled backend is `5e5cd3abf853e0e97a1daeb0f4a5f4236f24c886`,
+using `native-e2e/launch43-backend-export-pages.mjs` on57304; web remains
+on3119. This launcher records private SQL timings; turn that observation off
+through a normal owned restart after diagnosis. Both native devices are stopped.
+The original creator export `61e07c91-56b4-4dbe-835c-0714797b4b13` completed
+all eight domains. All four actual UI downloads match saved hashes and sizes.
+Preserved failures exposed/fixed catalogue display drift, Media's wrong
+Conversation-only family binding, and a16-row export deadline. The original
+review checksum and deadlines remain unchanged; pages are now bounded at128.
+
+Before/after custody preserves all18 generations,69 known usage rows,51 settled
+units and the revision13/v1 publication exactly. No comparison or provider use
+occurred. Download after stale verification still needs a friendly web recovery
+flow (actual401 followed by successful same-account sign-in/downloads is retained).
+Continue the full producer/admission/artifact-invalidation work below; pending
+SQL is not activation. All ten finish criteria and October30 deletion due time
+remain unchanged.
+
 ## Active continuation — trusted comparison producer
 
 PR [#338](https://github.com/WangPantopus/creator-platform/pull/338) merged at

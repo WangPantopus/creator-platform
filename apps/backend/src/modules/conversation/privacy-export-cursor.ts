@@ -12,6 +12,10 @@ import type { PrivacyHook } from "../trust/contracts.js";
 import { ConversationLineage } from "./lineage.js";
 import { ConversationRecordings } from "./recordings.js";
 import {
+  comparisonPrivacyInstalled,
+  PreparedComparisonPrivacy,
+} from "./comparison-privacy.js";
+import {
   assertConversationPrivacyPool,
   cancelConversationPrivacyBackend,
   conversationPrivacyCause,
@@ -25,6 +29,11 @@ import {
 
 type Job = Parameters<PrivacyHook["run"]>[0];
 const Owner = "creator_w3_privacy_export";
+// Keep one bounded page in memory. Sixteen-row pages spent the original45s
+// task budget on repeated complete custody checks before a modest populated
+// export reached EOF. Every128-row page retains both original bookends; the
+// stream independently fences each64KiB chunk and the final COMMIT.
+const ExportPageRows = 128;
 export const CONVERSATION_PRIVACY_CURSOR_MIGRATION =
   "0233_w3_privacy_cursor_export";
 export const CONVERSATION_PRIVACY_CURSOR_SOURCE_SHA256 =
@@ -63,7 +72,7 @@ export const ConversationPrivacyCursorRow = z.strictObject({
   thread_id: z.uuid(),
   creator_id: z.uuid(),
   fan_id: z.uuid(),
-  collection: z.number().int().min(0).max(18),
+  collection: z.number().int().min(0).max(20),
   row_key: z.string(),
   // Preserve PostgreSQL JSON numbers exactly, including64-bit accounting.
   document: z.string().min(2),
@@ -100,7 +109,12 @@ export class PreparedConversationPrivacyCursor {
       definitions: Readonly<Record<(typeof Signatures)[number], string>>;
       catalogueChecksum: string;
     }>,
+    private readonly comparisons?: PreparedComparisonPrivacy,
   ) {}
+
+  hasComparisonSources(): boolean {
+    return this.comparisons !== undefined;
+  }
 
   assertPool(pool: Pool): void {
     invariant(
@@ -126,12 +140,14 @@ export class PreparedConversationPrivacyCursor {
     authority: ConversationPrivacyAuthority;
     lineage?: ConversationLineage;
     recordings?: ConversationRecordings;
+    comparisons?: PreparedComparisonPrivacy;
   }): void {
     this.assertPool(input.pool);
     invariant(
       input.authority === this.authority &&
         input.lineage === this.lineage &&
-        input.recordings === this.recordings,
+        input.recordings === this.recordings &&
+        input.comparisons === this.comparisons,
       "conversation_export_pool_mismatch",
       "Use the actual prepared export authority and source owners.",
     );
@@ -144,6 +160,7 @@ export class PreparedConversationPrivacyCursor {
     usageRetention: PreparedUsageRetention;
     lineage: ConversationLineage;
     recordings: ConversationRecordings;
+    comparisons?: PreparedComparisonPrivacy;
     custody: {
       migration: { version: string; checksum: string };
       definitions: Record<(typeof Signatures)[number], string>;
@@ -172,6 +189,7 @@ export class PreparedConversationPrivacyCursor {
     input.usageRetention.assertJournal(input.journal);
     input.lineage.assertPool(input.pool);
     input.recordings.assertPool(input.pool);
+    input.comparisons?.assertRuntime(input);
     const prepared = new PreparedConversationPrivacyCursor(
       input.pool,
       input.authority,
@@ -183,6 +201,7 @@ export class PreparedConversationPrivacyCursor {
         definitions: Object.freeze({ ...input.custody.definitions }),
         catalogueChecksum: input.custody.catalogueChecksum,
       }),
+      input.comparisons,
     );
     assertConversationPrivacyPool(input.pool);
     const client = await input.pool.connect();
@@ -265,6 +284,12 @@ export class PreparedConversationPrivacyCursor {
       "conversation_export_worker_required",
       "Use the original lifecycle task outside interactive request authority.",
     );
+    invariant(
+      (await comparisonPrivacyInstalled(client)) === Boolean(this.comparisons),
+      "comparison_privacy_unavailable",
+      "Installed comparison data requires its complete prepared privacy owner.",
+    );
+    await this.comparisons?.assertClient(client);
     // A matching local installation receipt and caller-supplied catalogue do
     // not register a held source. Retain the executable source gate at every
     // original cursor bookend as well as the fixed-version ledger check below.
@@ -488,7 +513,7 @@ export class PreparedConversationPrivacyCursor {
       // bounds a lost response even when the original pool has no deadline;
       // the producer then destroys the retained source, never queues rollback.
       const fetch = {
-        text: "FETCH FORWARD 16 FROM w3_conversation_privacy_export",
+        text: `FETCH FORWARD ${ExportPageRows} FROM w3_conversation_privacy_export`,
         query_timeout: conversationPrivacyQueryTimeout(client, 3000),
       };
       result = await client.query<ConversationPrivacyCursorRow>(fetch);
@@ -555,7 +580,7 @@ export class PreparedConversationPrivacyCursor {
     ]);
     const rows = z
       .array(ConversationPrivacyCursorRow)
-      .max(16)
+      .max(ExportPageRows)
       .parse((await this.fetchWithCancellation(client, signal)).rows);
     signal.throwIfAborted();
     await this.assertCurrent(client, job, families);
@@ -593,7 +618,14 @@ export class PreparedConversationPrivacyCursor {
 
 /** Read-only metadata for independent review; it grants no runtime authority. */
 export async function conversationPrivacyCursorCatalogue(client: PoolClient) {
-  return {
+  // PostgreSQL renders type names relative to search_path. Independent review
+  // uses pg_catalog, so e.g. public.vector must not become vector on an ordinary
+  // runtime connection. Preserve the original checksum and restore the caller's
+  // setting after successful metadata reads. On failure the original client
+  // custodian settles/rolls back; never issue helper SQL after an uncertain read.
+  await client.query("SAVEPOINT w3_cursor_display");
+  await client.query("SET LOCAL search_path=pg_catalog");
+  const catalogue = {
     ...(await generationConsumerCatalogue(client, Owner)),
     // The shared effective-ACL catalogue does not encode types, defaults or
     // FK definitions. Keep the entire ordinary0212 relation shape in the
@@ -654,4 +686,7 @@ export async function conversationPrivacyCursorCatalogue(client: PoolClient) {
       )
     ).rows,
   };
+  await client.query("ROLLBACK TO SAVEPOINT w3_cursor_display");
+  await client.query("RELEASE SAVEPOINT w3_cursor_display");
+  return catalogue;
 }

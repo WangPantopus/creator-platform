@@ -30,6 +30,7 @@ import {
 import { DomainError, invariant } from "../../core/errors.js";
 import { PreparedConversationPrivacyCursor } from "../conversation/privacy-export-cursor.js";
 import { PreparedGenerationProvenancePurge } from "../conversation/generation-provenance-privacy.js";
+import { PreparedComparisonPrivacy } from "../conversation/comparison-privacy.js";
 import { trustPrivacyHook } from "./own-privacy-hook.js";
 import { mediaPrivacyHook } from "./media-privacy-hook.js";
 import { growthPrivacyHook } from "../growth/lifecycle.js";
@@ -129,7 +130,7 @@ export type ConversationPrivacyOwnerPorts = Omit<
    * coordinator supplies its own actual authority, never a caller substitute. */
   cursorPreparation?: Omit<
     Parameters<typeof PreparedConversationPrivacyCursor.prepare>[0],
-    "pool" | "authority" | "lineage" | "recordings"
+    "pool" | "authority" | "lineage" | "recordings" | "comparisons"
   >;
   /** Actual independently reviewed0217 definition/effective custody. The
    * coordinator fixes its own original pool/task authority at preparation. */
@@ -138,6 +139,10 @@ export type ConversationPrivacyOwnerPorts = Omit<
     "pool" | "authority"
   >;
   accountingPreparation?: GenerationAccountingPreparation;
+  comparisonPreparation?: Pick<
+    Parameters<typeof PreparedComparisonPrivacy.prepare>[0],
+    "custody"
+  >;
 };
 
 export type AgentPrivacyOwnerPorts = Readonly<{
@@ -237,7 +242,21 @@ export function createPrivacyConsumers(input: {
         let exportCursor = owners?.exportCursor;
         let provenancePurge = owners?.provenancePurge;
         let accounting = owners?.accounting;
+        let comparisons = owners?.comparisons;
         let financial = owners?.generationCostPrivacyReconciliation;
+        if (!comparisons && owners?.comparisonPreparation) {
+          invariant(
+            job.signal,
+            "privacy_signal_required",
+            "Use the original task signal.",
+          );
+          comparisons = await PreparedComparisonPrivacy.prepare({
+            ...owners.comparisonPreparation,
+            pool: input.runtimePool,
+            authority: conversationAuthority,
+            signal: job.signal,
+          });
+        }
         if (owners?.accountingPreparation) {
           invariant(
             !accounting &&
@@ -289,6 +308,7 @@ export function createPrivacyConsumers(input: {
             authority: conversationAuthority,
             lineage: owners.lineage,
             recordings: owners.recordings,
+            ...(comparisons ? { comparisons } : {}),
           });
         }
         if (exportCursor && owners?.accountingPreparation)
@@ -299,6 +319,7 @@ export function createPrivacyConsumers(input: {
         return conversationPrivacyHook({
           ...owners,
           ...(accounting ? { accounting } : {}),
+          ...(comparisons ? { comparisons } : {}),
           ...(financial
             ? { generationCostPrivacyReconciliation: financial }
             : {}),

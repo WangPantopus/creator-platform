@@ -20,7 +20,7 @@ import {
 import { Readiness, type Probe } from "./readiness.js";
 import { DomainError } from "../core/errors.js";
 import { querySettlementUncertain } from "../core/query-settlement.js";
-import { TrustTelemetry } from "./telemetry.js";
+import { lifecycleFailure, TrustTelemetry } from "./telemetry.js";
 import {
   trustScopeRestriction,
   trustScopeRestrictionInTransaction,
@@ -255,6 +255,11 @@ export async function createTrustRuntime(options: {
         ? telemetry.increment(name, value)
         : telemetry.observe(name, value),
     options.privacyArtifacts,
+    (domain, kind, cause) =>
+      console.error(
+        "Privacy task failed.",
+        JSON.stringify({ domain, kind, ...lifecycleFailure(cause) }),
+      ),
   );
   const router = createTrustRouter({
     service,

@@ -17,6 +17,10 @@ import { conversationPrivacyExportStream } from "./privacy-export-stream.js";
 import { PreparedConversationPrivacyCursor } from "./privacy-export-cursor.js";
 import { PreparedGenerationProvenancePurge } from "./generation-provenance-privacy.js";
 import {
+  comparisonPrivacyInstalled,
+  PreparedComparisonPrivacy,
+} from "./comparison-privacy.js";
+import {
   assertConversationPrivacyPool,
   cancelConversationPrivacyBackend,
   conversationPrivacyCause,
@@ -151,6 +155,7 @@ export type ConversationPrivacyInput = {
   /** Distinct0217 DELETE owner. Its actual zero page must precede removing
    * ordinary generation/message/event parents on this held transaction. */
   provenancePurge?: PreparedGenerationProvenancePurge;
+  comparisons?: PreparedComparisonPrivacy;
   /** Exact prepared W4 port; original-policy evidence precedes journal purge.
    * Finite reviewed retention and expiry remain W8's separate responsibility. */
   generationCostPrivacyReconciliation?: GenerationCostPrivacyReconciliation;
@@ -168,6 +173,13 @@ export function conversationPrivacyHook(
       );
       const signal = job.signal;
       signal.throwIfAborted();
+      invariant(
+        (await comparisonPrivacyInstalled(input.pool)) ===
+          input.comparisons instanceof PreparedComparisonPrivacy,
+        "comparison_privacy_unavailable",
+        "Installed comparison data needs its prepared export and deletion owner.",
+      );
+      input.comparisons?.assertRuntime(input);
       if (job.kind === "delete" && input.accounting) {
         invariant(
           input.deletionReceipts instanceof PreparedPrivacyAccountingBoundary,
@@ -290,6 +302,7 @@ export function conversationPrivacyHook(
       signal.addEventListener("abort", abort, { once: true });
       const accountingReceipts: Record<string, unknown>[] = [];
       let removedGenerationProvenance = 0;
+      const removedComparisons = { samples: 0, consents: 0 };
       const financialDispositions: {
         threadId: string;
         financialDispositionReference: string;
@@ -321,6 +334,13 @@ export function conversationPrivacyHook(
         );
         signal.throwIfAborted();
         await fenceConversationPrivacyTask(input.authority, client, job);
+        invariant(
+          (await comparisonPrivacyInstalled(client)) ===
+            Boolean(input.comparisons),
+          "comparison_privacy_unavailable",
+          "The comparison privacy storage changed. Retry with its actual owner.",
+        );
+        await input.comparisons?.assertClient(client, signal);
         const provenanceInstalled = (
           await client.query<{ installed: boolean }>(
             "SELECT to_regclass('creator.generation_sentence_provenance') IS NOT NULL AS installed",
@@ -380,6 +400,15 @@ export function conversationPrivacyHook(
             "privacy_family_unavailable",
             "The verified conversation scope is unavailable.",
           );
+          if (input.comparisons) {
+            const removed = await input.comparisons.purgeFamily(
+              client,
+              job,
+              family,
+            );
+            removedComparisons.samples += removed.samples;
+            removedComparisons.consents += removed.consents;
+          }
           const keep = await input.retention!.retainedMessages(
             client,
             job,
@@ -613,6 +642,7 @@ export function conversationPrivacyHook(
           await input.authority.assertFamily(client, job, family);
         }
         // This client's actual task remains current even for an empty family set.
+        await input.comparisons?.assertClient(client, signal);
         await fenceConversationPrivacyTask(input.authority, client, job);
         signal.throwIfAborted();
         const durableResult = input.accounting
@@ -624,6 +654,7 @@ export function conversationPrivacyHook(
                 jobId: job.jobId,
                 idempotencyKey: job.idempotencyKey,
                 processedThreads: families.length,
+                ...(input.comparisons ? { removedComparisons } : {}),
                 ...(input.provenancePurge
                   ? { removedGenerationProvenance }
                   : {}),
@@ -660,6 +691,7 @@ export function conversationPrivacyHook(
             jobId: job.jobId,
             idempotencyKey: job.idempotencyKey,
             processedThreads: families.length,
+            ...(input.comparisons ? { removedComparisons } : {}),
             ...(input.provenancePurge ? { removedGenerationProvenance } : {}),
             ...(accountingReceipts.length ? { accountingReceipts } : {}),
             ...(financialDispositions.length ? { financialDispositions } : {}),

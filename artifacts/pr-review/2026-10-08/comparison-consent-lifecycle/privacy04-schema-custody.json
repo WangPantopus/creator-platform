@@ -1,0 +1,9 @@
+{
+  "purpose": "Schema-only source conformance; no original data, consent, provider calls, or release authority",
+  "sourceName": "creator_generation_journey46_20261007",
+  "targetName": "creator_comparison_privacy04_20261008",
+  "schemaSha256": "911ddd7ba831232970186d42d8aa5083c06f3478e59f9aae58d99ad02929be54",
+  "ledgerRows": 105,
+  "roles": 41,
+  "observedAt": "2026-10-08T12:42:01.082Z"
+}
