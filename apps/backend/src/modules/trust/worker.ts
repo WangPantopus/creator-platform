@@ -144,19 +144,24 @@ export class TrustWorker {
       ...(effects.status === "fulfilled"
         ? effects.value.map((effect) => this.runEffect(effect))
         : []),
-      ...(this.comparisonArtifacts
-        ? [
-            (async () => {
-              const signal = AbortSignal.timeout(30_000);
-              await this.comparisonArtifacts!.expireSources(signal);
-              await this.comparisonArtifacts!.recoverAttempts(signal);
-              await this.comparisonArtifacts!.purge(signal);
-            })(),
-          ]
-        : []),
     ]);
     for (const result of settled)
       if (result.status === "rejected") errors.push(result.reason);
+    // Recovery locks the original task FOR UPDATE while settling its files.
+    // Starting it beside a newly claimed source makes that source's required
+    // FOR SHARE NOWAIT fence fail against this same worker. Settle all claimed
+    // operations first; no newly claimed lease waits behind maintenance. Other
+    // hosts still use the original SQL locks, leases and cancellation fences.
+    if (this.comparisonArtifacts) {
+      try {
+        const signal = AbortSignal.timeout(30_000);
+        await this.comparisonArtifacts.expireSources(signal);
+        await this.comparisonArtifacts.recoverAttempts(signal);
+        await this.comparisonArtifacts.purge(signal);
+      } catch (error) {
+        errors.push(error);
+      }
+    }
     if (errors.length)
       throw new AggregateError(errors, "Original Trust worker pass failed.");
     await this.pool.query(`UPDATE creator_trust.privacy_job j SET state=CASE
