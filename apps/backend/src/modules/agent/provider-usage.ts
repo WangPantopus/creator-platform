@@ -5,6 +5,7 @@ import type { StreamProposal } from "./streaming.js";
 import type { PoolClient } from "pg";
 import { invariant } from "../../core/errors.js";
 import { ProviderResponseError } from "./response-usage.js";
+import { trustTransaction } from "../trust/transaction.js";
 
 /** Structural consumer of W3's canonical GenerationExecution (7f5f63d).
  * Only the actual scoped processor supplies these callbacks, never HTTP JSON. */
@@ -28,10 +29,32 @@ export type TranslationJobBinding = {
   sourceVersion?: number;
   sourceHash?: string;
 };
+/** A non-generation original domain owner holds and rechecks its genuine
+ * source on this client, reserves the creator ceiling and commits the journal
+ * before any remote I/O. A callback or a hold ID alone grants no source access. */
+export interface HeldProviderUsageAdmission {
+  readonly purpose: "comparison_paraphrase" | "comparison_privacy_review";
+  admit<T>(
+    journal: (client: PoolClient, creatorHoldId: string) => Promise<T>,
+  ): Promise<T>;
+}
 export function providerUsagePurpose(
   category: string,
   execution?: ProviderExecution,
+  comparisonPurpose?: string,
 ) {
+  if (comparisonPurpose !== undefined) {
+    invariant(
+      !execution &&
+        category === "guardrail" &&
+        ["comparison_paraphrase", "comparison_privacy_review"].includes(
+          comparisonPurpose,
+        ),
+      "execution_purpose_invalid",
+      "Comparison processing requires its separate original admission.",
+    );
+    return comparisonPurpose;
+  }
   invariant(
     execution?.purpose === undefined ||
       execution.purpose === "reply" ||
@@ -56,24 +79,49 @@ async function openProviderUsage(
   category: string,
   signal: AbortSignal,
   execution?: ProviderExecution,
+  heldAdmission?: HeldProviderUsageAdmission,
 ) {
   signal.throwIfAborted();
   const started = performance.now();
   const admittedScope = Object.freeze({ ...scope });
   const fingerprint = model.fingerprint;
-  const purpose = providerUsagePurpose(category, execution);
+  const purpose = providerUsagePurpose(
+    category,
+    execution,
+    heldAdmission?.purpose,
+  );
   const journal = repository.usageJournal;
+  invariant(
+    !heldAdmission || (journal && !execution),
+    "usage_original_admission_required",
+    "Use one original prepared journal and source admission.",
+  );
   const pool = repository.pool;
   const lineage = execution && {
     generationId: execution.generationId,
     attemptId: execution.attemptId,
   };
-  const insert = async (client: PoolClient) => {
+  let capturedHold: string | undefined;
+  const insert = async (client: PoolClient, creatorHoldId?: string) => {
+    if (heldAdmission) {
+      invariant(
+        !capturedHold && typeof creatorHoldId === "string",
+        "usage_original_admission_required",
+        "Admit this call exactly once under its original creator hold.",
+      );
+      capturedHold = creatorHoldId;
+    }
     if (journal)
       return journal.open(
         client,
         admittedScope,
-        { versionHash, model: fingerprint, category, purpose },
+        {
+          versionHash,
+          model: fingerprint,
+          category,
+          purpose,
+          ...(creatorHoldId ? { creatorHoldId } : {}),
+        },
         execution,
       );
     const row = await client.query<{ id: string }>(
@@ -84,9 +132,11 @@ async function openProviderUsage(
   };
   // W3 holds current thread/session/lease/processor authority through this
   // admission commit. No nested transaction and no provider I/O in its callback.
-  const id = execution
-    ? await execution.admit(insert)
-    : await repository.transaction(admittedScope, insert);
+  const id = heldAdmission
+    ? await heldAdmission.admit(insert)
+    : execution
+      ? await execution.admit(insert)
+      : await repository.transaction(admittedScope, (client) => insert(client));
   let completed = false;
   // This private closure holds only custody of the row actually committed
   // before provider I/O. Session revocation forbids new commands/admissions,
@@ -98,9 +148,7 @@ async function openProviderUsage(
       "usage_already_completed",
       "This call already completed.",
     );
-    const client = await pool.connect();
-    try {
-      await client.query("BEGIN");
+    const completeUsage = async (client: PoolClient) => {
       await client.query(
         "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
         [admittedScope.creatorId, admittedScope.accountId],
@@ -127,13 +175,14 @@ async function openProviderUsage(
           `SELECT id FROM creator.ai_usage WHERE creator_id=$1 AND id=$2
            AND generation_id IS NOT DISTINCT FROM $3::uuid
            AND attempt_id IS NOT DISTINCT FROM $4::uuid
-           AND purpose=$5 AND provider_state='admitted'`,
+           AND purpose=$5 AND provider_state='admitted'${heldAdmission ? " AND creator_hold_id=$6::uuid" : ""}`,
           [
             admittedScope.creatorId,
             id,
             lineage?.generationId ?? null,
             lineage?.attemptId ?? null,
             purpose,
+            ...(heldAdmission ? [capturedHold] : []),
           ],
         );
         invariant(
@@ -162,6 +211,19 @@ async function openProviderUsage(
             Math.round(performance.now() - started),
           ],
         );
+    };
+    if (heldAdmission) {
+      // Completion uses its original private admission receipt even after a
+      // caller abort. Settle the actual SQL source before returning its client;
+      // uncertain COMMIT must never release a live pooled transaction.
+      await trustTransaction(pool, completeUsage);
+      completed = true;
+      return;
+    }
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      await completeUsage(client);
       await client.query("COMMIT");
       completed = true;
     } catch (error) {
@@ -194,6 +256,7 @@ export async function withProviderUsage<T extends { usage: Usage }>(
   signal: AbortSignal,
   call: () => Promise<T>,
   execution?: ProviderExecution,
+  heldAdmission?: HeldProviderUsageAdmission,
 ): Promise<T> {
   const finish = await openProviderUsage(
     repository,
@@ -203,6 +266,7 @@ export async function withProviderUsage<T extends { usage: Usage }>(
     category,
     signal,
     execution,
+    heldAdmission,
   );
   let usage = unknownUsage(model);
   try {

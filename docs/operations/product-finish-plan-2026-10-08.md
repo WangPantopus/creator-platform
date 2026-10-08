@@ -9,6 +9,14 @@ The product is substantially implemented and remains incomplete.
 
 ## Continuing execution
 
+The [comparison provider/writer increment](../../artifacts/pr-review/2026-10-08/comparison-purpose-admission/README.md)
+adds original fan admission, purpose/source-bound accounting receipts, finite
+development notice and original write/COMMIT checks. Nine isolated SQL cases
+pass with synthetic sessions/provider receipts; genuine consent, sanitizer
+operation, creator read/publication fences and complete composition remain.
+All six sources are still unregistered. PRs343 and344 merged after all11 checks
+passed at their reviewed heads. Preserve prior evidence and all ten milestones.
+
 The user authorized continued implementation, commit/push, milestone PRs and
 merges when ready, with actual launched web/iOS/Android acceptance and no new
 unit tests. Existing required checks still run. All ten milestones below remain

@@ -1,0 +1,43 @@
+{
+  "kind": "isolated real SQL, synthetic sessions and provider receipts; no producer qualification",
+  "observedAt": "2026-10-08T16:03:58.162Z",
+  "database": "creator_comparison_artifact12_20261008",
+  "results": [
+    {
+      "case": "current original fan source and two known receipt bindings commit",
+      "result": "passed"
+    },
+    {
+      "case": "creator and unrelated account cannot directly read fan source samples",
+      "result": "passed"
+    },
+    {
+      "case": "invented receipt refused",
+      "result": "passed"
+    },
+    {
+      "case": "receipt from another source refuses saved comparison",
+      "result": "passed"
+    },
+    {
+      "case": "actual elapsed expiry refuses original COMMIT",
+      "result": "passed"
+    },
+    {
+      "case": "unknown cost refuses saved comparison",
+      "result": "passed"
+    },
+    {
+      "case": "missing original identity session refused",
+      "result": "passed"
+    },
+    {
+      "case": "same source and sanitizer preserves first committed sample",
+      "result": "passed"
+    },
+    {
+      "case": "original withdrawal physically removes saved sample",
+      "result": "passed"
+    }
+  ]
+}

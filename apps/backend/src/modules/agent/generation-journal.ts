@@ -287,11 +287,18 @@ export class PreparedGenerationJournal {
       model: string;
       category: string;
       purpose?: string;
+      /** A non-generation original owner may bind its actual reserved creator
+       * hold. This never creates a generation/attempt or supplies source access. */
+      creatorHoldId?: string;
     },
     execution?: ProviderExecution,
   ) {
     await this.assertClient(client);
-    const purpose = providerUsagePurpose(input.category, execution);
+    const purpose = providerUsagePurpose(
+      input.category,
+      execution,
+      input.creatorHoldId ? input.purpose : undefined,
+    );
     invariant(
       input.purpose === undefined || input.purpose === purpose,
       "execution_purpose_changed",
@@ -306,6 +313,22 @@ export class PreparedGenerationJournal {
       await execution.assertPurposeInTransaction(client, execution.purpose);
     }
     await this.workspace(client, scope.creatorId);
+    if (input.creatorHoldId !== undefined) {
+      invariant(
+        !execution,
+        "usage_hold_purpose_changed",
+        "A generation keeps its original attempt-owned cost hold.",
+      );
+      const held = await client.query(
+        "SELECT id FROM creator.ai_cost_hold WHERE id=$1 AND creator_id=$2 AND state='held' AND expires_at>clock_timestamp() FOR UPDATE NOWAIT",
+        [z.uuid().parse(input.creatorHoldId), scope.creatorId],
+      );
+      invariant(
+        held.rowCount === 1,
+        "usage_hold_unavailable",
+        "The original current creator cost reservation is required.",
+      );
+    }
     let lineage:
       | {
           thread_id: string;
@@ -355,7 +378,7 @@ export class PreparedGenerationJournal {
         execution?.generationId ?? null,
         execution?.attemptId ?? null,
         lineage?.ordinal ?? null,
-        lineage?.creator_hold_id ?? null,
+        lineage?.creator_hold_id ?? input.creatorHoldId ?? null,
         purpose,
       ],
     );

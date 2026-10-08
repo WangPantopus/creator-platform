@@ -1,5 +1,29 @@
 # Session handoff — October 8, 2026
 
+## Active continuation — comparison provider admission and writer
+
+Continue on `codex/comparison-purpose-admission-20261008` in637b. The
+[provider/writer source increment](../../artifacts/pr-review/2026-10-08/comparison-purpose-admission/README.md)
+adds original fan admission, distinct provider costs, source-bound two-call
+receipts, finite development notice, caller cancellation and additive sample
+write/commit checks. Final isolated graph12 passes nine SQL cases with synthetic
+sessions/provider receipts. No actual provider, consent or app acceptance is
+claimed. All six pending SQL sources remain unregistered and uncomposed.
+
+PR343 merged at `757bb90c122616bfb754d146461359af15a9e3c1` and PR344 at
+`b46f2f18302af307b0cf7235507e34349f8d384e`; each had all11 exact-head checks
+passing. PR342's main run37795287433 passed. PR344's main37804035475 was queued
+at this observation; no separate PR343 main run appeared in the refreshed list.
+
+Next complete the genuine creator read owner and same-transaction collection,
+replay/display/publication guards, then full metadata/restore/legacy-export
+review and executable composition. Pending SQL's PENDING ledger identities need
+reviewed allocation, not an alias. Original backend5bd6b6215 remains on57304,
+web3119; both native devices remain stopped. Preserve the actual 18 generations,
+69 usage records, original revision13 publication and all earlier evidence.
+Carry all ten milestones forward before actual consent/sanitizer/upgrade and
+the remaining full-product journeys.
+
 ## Active continuation — original Trust artifact privacy
 
 Continue on `codex/comparison-artifact-privacy-20261008` in637b. The
