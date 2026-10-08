@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Required-reason API declarations for the app and the QelvoraUI package it links.
+  Found by searching apps/ios/Sources and apps/ios/App on 2026-10-08:
+    - ProcessInfo.systemUptime, used to measure elapsed time inside the app
+      (access windows, recording and playback deadlines).
+    - URLResourceKey.contentModificationDateKey on files in the app's own caches
+      directory (GrowthReplyDocument).
+  No UserDefaults, disk-space or active-keyboard APIs are used. Re-run that search
+  when native code changes. NSPrivacyCollectedDataTypes is deliberately absent: the
+  data-collection declaration belongs to the privacy label the founder and counsel
+  approve in App Store Connect, and this file must not state it before then.
+-->
+<plist version="1.0">
+<dict>
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array>
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategorySystemBootTime</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>35F9.1</string>
+			</array>
+		</dict>
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>C617.1</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>
