@@ -193,7 +193,7 @@ export class PreparedGenerationAgentMetadata {
         value.compiledHash === facts.version.compiledHash &&
         value.compiledHash === compiled.hash &&
         facts.version.compiledPrefix === compiled.prefix &&
-        value.pipelineHash === this.service.pipeline.fingerprint &&
+        this.service.pipeline.supportsPublishedEngine(value.pipelineHash) &&
         value.pipelineHash === facts.version.pipelineHash &&
         contentHash({
           ...value.audience,

@@ -24,9 +24,9 @@ export async function generationConsumerCatalogue(
     options.signal?.throwIfAborted();
     return result;
   };
-  // A role without any effective column privilege contributes an empty list.
-  // Skip only that exhaustive per-column expansion, preserving the exact
-  // catalogue shape, inherited/table-wide grants and every relation/policy.
+  // Empty effective privilege sets need no per-privilege expansion. The
+  // prefilters use the same PostgreSQL privilege functions, including PUBLIC
+  // and inherited grants. Every execution still reads every relation/policy.
   const relations = (
     await query(
       `WITH policies AS MATERIALIZED (
@@ -37,10 +37,14 @@ export async function generationConsumerCatalogue(
         GROUP BY p.polrelid
        ) SELECT n.nspname AS schema,c.relname AS relation,c.relkind,pg_get_userbyid(c.relowner) AS owner,
        c.relrowsecurity,c.relforcerowsecurity,
+       CASE WHEN CASE WHEN c.relkind IN('r','p','v','m','f')
+        THEN has_table_privilege($1,c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') ELSE false END THEN
        ARRAY(SELECT privilege FROM unnest(ARRAY['SELECT','INSERT','UPDATE','DELETE','TRUNCATE','REFERENCES','TRIGGER']) privilege
-        WHERE CASE WHEN c.relkind IN('r','p','v','m','f') THEN has_table_privilege($1,c.oid,privilege) ELSE false END ORDER BY privilege) AS table_privileges,
+        WHERE has_table_privilege($1,c.oid,privilege) ORDER BY privilege) ELSE ARRAY[]::text[] END AS table_privileges,
+       CASE WHEN CASE WHEN c.relkind='S'
+        THEN has_sequence_privilege($1,c.oid,'SELECT,UPDATE,USAGE') ELSE false END THEN
        ARRAY(SELECT privilege FROM unnest(ARRAY['SELECT','UPDATE','USAGE']) privilege
-        WHERE CASE WHEN c.relkind='S' THEN has_sequence_privilege($1,c.oid,privilege) ELSE false END ORDER BY privilege) AS sequence_privileges,
+        WHERE has_sequence_privilege($1,c.oid,privilege) ORDER BY privilege) ELSE ARRAY[]::text[] END AS sequence_privileges,
        CASE WHEN CASE WHEN c.relkind IN('r','p','v','m','f')
         THEN has_any_column_privilege($1,c.oid,'SELECT,INSERT,UPDATE,REFERENCES') ELSE false END THEN
        coalesce((SELECT jsonb_agg(jsonb_build_object('column',a.attname,'privilege',privilege) ORDER BY a.attname,privilege)

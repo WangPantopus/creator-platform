@@ -303,7 +303,9 @@ export class PreparedGenerationAgentInputs {
     invariant(
       facts.creatorId === scope.creatorId &&
         facts.creatorAccountId === scope.creatorAccountId &&
-        facts.version.pipelineHash === this.service.pipeline.fingerprint &&
+        this.service.pipeline.supportsPublishedEngine(
+          facts.version.pipelineHash,
+        ) &&
         facts.version.compiledHash ===
           contentHash({ prefix: facts.version.compiledPrefix }) &&
         facts.version.configuration.dailyCostCapMicros > 0 &&

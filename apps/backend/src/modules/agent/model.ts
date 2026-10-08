@@ -112,6 +112,9 @@ export const JudgeVerdict = z.strictObject({
 });
 export interface AgentModel {
   readonly fingerprint: string;
+  /** Exact pre-tokenizer fingerprint, only for the unchanged provider transport
+   * used by explicitly supported historical pipeline implementations. */
+  readonly preTokenizerFingerprint?: string;
   readonly embeddingModel: string;
   readonly pricingConfigured: boolean;
   /** Plain-text assembly budget, not a provider billing receipt. */
@@ -146,6 +149,7 @@ export type ModelConfiguration = {
 /** No model defaults, credentials, rate assumptions or provider training guarantees. */
 export class OpenAIResponsesModel implements AgentModel {
   readonly fingerprint: string;
+  readonly preTokenizerFingerprint: string;
   readonly embeddingModel: string;
   private readonly tokenizers: Readonly<Record<"small" | "large", Tiktoken>>;
   countContextTokens(text: string, route: "small" | "large"): number {
@@ -254,6 +258,10 @@ export class OpenAIResponsesModel implements AgentModel {
     });
     const { apiKey: _apiKey, ...publicConfiguration } = configuration;
     void _apiKey;
+    this.preTokenizerFingerprint = contentHash({
+      adapter: "responses-v3-cache-routing",
+      ...publicConfiguration,
+    });
     this.fingerprint = contentHash({
       adapter: "responses-v3-cache-routing",
       tokenizer: { implementation: "js-tiktoken-1.0.21", encodings },

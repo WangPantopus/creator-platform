@@ -264,7 +264,7 @@ export function agentPublicProjection(
         if (
           version.state !== "live" ||
           !version.publishedAt ||
-          version.pipelineHash !== service.pipeline.fingerprint ||
+          !service.pipeline.supportsPublishedEngine(version.pipelineHash) ||
           !service.pipeline.model?.pricingConfigured ||
           (version.dailyCostCapMicros ?? 0) <= 0 ||
           !version.mode ||

@@ -1,0 +1,39 @@
+{
+  "baseCommit": "2d313f19d3d6ed08eefc0d049a761118989f63ba",
+  "scope": "Local final production sources before commit. Hosted CI must be verified separately at the pushed head.",
+  "checks": {
+    "backendTypecheck": "passed",
+    "backendProductionBuild": "passed",
+    "backendTests": {
+      "passed": 38,
+      "skipped": 9,
+      "skipReason": "Existing PostgreSQL foundation integration requires a disposable fixture; never point it at the preserved archive. Hosted CI provides that fixture."
+    },
+    "scopedESLint": "passed",
+    "scopedPrettier": "passed",
+    "historicalDifferentialCases": 14,
+    "pairedSQLSamplesPerRole": 30,
+    "purposeRoles": 5,
+    "transactionalDriftCasesPerQuery": 16
+  },
+  "sourceSha256": {
+    "apps/backend/src/core/purpose-catalogue.ts": "5ed29e89701e6e1e0caf8cb061aa42ee777776af8dcb77433f46286f6947e62d",
+    "apps/backend/src/modules/agent/delivery-authority.ts": "f95ea223c1675a6b6d35b42b3f69f6e500bf490aa6bae06bb53457200cd95e1c",
+    "apps/backend/src/modules/agent/generation-inputs.ts": "59a32edb8c6317f4f2b08fe807bf31cce1866d4e34c864c3972e17975e741b53",
+    "apps/backend/src/modules/agent/generation-metadata.ts": "0ec027556ff2db78cd4e08b78314a7a5cc95fdd36c24859e612b9e88a485e020",
+    "apps/backend/src/modules/agent/generation-pipeline.ts": "bba34f7f3fc6b7459ca3e2df5206dcfcb77e7240dff3b0835e0eb31bb88a6747",
+    "apps/backend/src/modules/agent/generation-runtime-context.ts": "5b70ebddb894c73c8f64b9f87391ba0c182af237697b702e37275539b24bda68",
+    "apps/backend/src/modules/agent/growth-adapter.ts": "f6813778008bddc653f49a95698a90bb775f390fd8b8d9b579121ce0209bef3e",
+    "apps/backend/src/modules/agent/model.ts": "be2f5c923064f67db920a0008747334f1568d7aa75dfd057c54e575e8e9dac8e",
+    "apps/backend/src/modules/agent/pipeline-compatibility.ts": "293346c2033aae5e9c832a1f8d18bc64620fa0f1fe457a40e0916e82b85091c5",
+    "apps/backend/src/modules/agent/pipeline.ts": "955cb08236e81f3f0c6fb9e6b83b4f9cf159864e4bb878f5b282e0680e02cb1a",
+    "apps/backend/src/modules/agent/runtime.ts": "5b58c050432378e13b7e8e554353d2d74ab26cedbe648a02042e5c8495166610",
+    "apps/backend/src/modules/agent/service.ts": "49bf6943e3fa320ce7f8ebf58246907a62757a7bae68f63b192266ec3c2e8c66",
+    "apps/backend/src/modules/agent/shadow-fingerprint.ts": "5eda5a4137f59cd38de853c8f62da7aa77375c168e8dd7a8f3fab2b9f78d8e1a",
+    "apps/backend/src/modules/agent/shadow.ts": "29d5d94bb39334521466dd0e536f611781db87f2f660a00e2f741fef13f63430",
+    "apps/backend/src/modules/commerce/generation-safety-terminal-catalogue.ts": "f61e9f86cc650d3a2b4e5208248623a0dec43caad79af401e4d14cfa367793db",
+    "apps/backend/tests/historical-pipeline.test.ts": "639f0f633f27d4d8d5fb99f0890b2860510e960681f077d6cfc0beadca2fc79a",
+    "apps/backend/tests/shadow-compatibility.test.ts": "dd3dd517f2cf5cf11af575177480271bf7273a6868aa462a99c5b14945d5967c"
+  },
+  "compiledServerSha256": "f0d03109ec7a8957aa593ecce5fb1b38c2419cd4ffa6cf92203091e45ae932c9"
+}

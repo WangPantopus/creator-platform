@@ -1,0 +1,32 @@
+{
+  "scope": "Read-only compatibility against real immutable publications; no provider request or authorization issued.",
+  "result": [
+    {
+      "database": "creator_generation_journey35_20261007",
+      "versionId": "a7dfb401-489a-4290-98bf-1a2a94c72596",
+      "pipelineHash": "dbd65b5f8913f4d5f8fee9a9ae68fcfd58dd2f1637c67199d8ede25fed4fd25e",
+      "expectedRevision": 12,
+      "selectedExactly": true,
+      "compiledIdentityMatches": true,
+      "current": false
+    },
+    {
+      "database": "creator_generation_journey43_20261007",
+      "versionId": "3299afea-46ee-47cd-9f4b-e630dfc84bce",
+      "pipelineHash": "1d09f184e7ddb34968bb602eb82f4705d8ceffb3499841aa6892247c40d28161",
+      "expectedRevision": 13,
+      "selectedExactly": true,
+      "compiledIdentityMatches": true,
+      "current": false
+    },
+    {
+      "database": "creator_generation_journey45_20261007",
+      "versionId": "3219b16a-f36c-4f94-8d94-d1ad9cbc526d",
+      "pipelineHash": "8421442dd35528cac294c6937df22af9f15b18c48ed63ac96c212ef2ddf7e0a7",
+      "expectedRevision": 14,
+      "selectedExactly": true,
+      "compiledIdentityMatches": true,
+      "current": true
+    }
+  ]
+}

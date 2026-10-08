@@ -1,0 +1,208 @@
+{
+  "database": "creator_generation_journey44_20261007",
+  "samples": [
+    {
+      "beforeMs": 474.72204099999976,
+      "afterMs": 337.508699
+    },
+    {
+      "beforeMs": 480.6414910000003,
+      "afterMs": 331.9728409999998
+    },
+    {
+      "beforeMs": 490.00827800000025,
+      "afterMs": 357.04018399999995
+    },
+    {
+      "beforeMs": 473.8041579999999,
+      "afterMs": 337.4309119999998
+    },
+    {
+      "beforeMs": 486.97288799999933,
+      "afterMs": 361.59040600000026
+    },
+    {
+      "beforeMs": 485.09326800000053,
+      "afterMs": 333.1216750000003
+    },
+    {
+      "beforeMs": 485.18650100000013,
+      "afterMs": 335.55228700000043
+    },
+    {
+      "beforeMs": 479.58164000000033,
+      "afterMs": 445.4776350000011
+    },
+    {
+      "beforeMs": 527.1242730000013,
+      "afterMs": 385.7625689999986
+    },
+    {
+      "beforeMs": 509.31756399999904,
+      "afterMs": 372.45320300000094
+    },
+    {
+      "beforeMs": 549.9105159999999,
+      "afterMs": 340.462082
+    },
+    {
+      "beforeMs": 472.98933899999975,
+      "afterMs": 343.40543999999863
+    },
+    {
+      "beforeMs": 510.9972430000016,
+      "afterMs": 362.43692399999964
+    },
+    {
+      "beforeMs": 512.8762490000008,
+      "afterMs": 342.47471099999893
+    },
+    {
+      "beforeMs": 489.79438800000025,
+      "afterMs": 336.01754299999993
+    },
+    {
+      "beforeMs": 507.23129599999993,
+      "afterMs": 343.491258
+    },
+    {
+      "beforeMs": 484.49704399999973,
+      "afterMs": 357.91358500000024
+    },
+    {
+      "beforeMs": 498.1329799999985,
+      "afterMs": 363.4581360000011
+    },
+    {
+      "beforeMs": 467.8649460000015,
+      "afterMs": 335.0063630000004
+    },
+    {
+      "beforeMs": 491.8702429999976,
+      "afterMs": 340.4784800000016
+    },
+    {
+      "beforeMs": 492.0414290000008,
+      "afterMs": 336.4178430000029
+    },
+    {
+      "beforeMs": 584.081381,
+      "afterMs": 394.3509759999979
+    },
+    {
+      "beforeMs": 488.0304939999987,
+      "afterMs": 344.58983199999784
+    },
+    {
+      "beforeMs": 532.4165629999989,
+      "afterMs": 408.47447300000204
+    },
+    {
+      "beforeMs": 495.38579500000196,
+      "afterMs": 375.5588089999983
+    },
+    {
+      "beforeMs": 477.2983200000017,
+      "afterMs": 405.50466100000267
+    },
+    {
+      "beforeMs": 472.2932690000016,
+      "afterMs": 349.26590399999986
+    },
+    {
+      "beforeMs": 497.3073609999992,
+      "afterMs": 334.43605599999864
+    },
+    {
+      "beforeMs": 501.3842250000016,
+      "afterMs": 353.0972870000005
+    },
+    {
+      "beforeMs": 491.9387220000026,
+      "afterMs": 339.32872999999745
+    }
+  ],
+  "drifts": [
+    {
+      "name": "SELECT",
+      "identical": true,
+      "changeObserved": true
+    },
+    {
+      "name": "INSERT",
+      "identical": true,
+      "changeObserved": true
+    },
+    {
+      "name": "UPDATE",
+      "identical": true,
+      "changeObserved": true
+    },
+    {
+      "name": "DELETE",
+      "identical": true,
+      "changeObserved": true
+    },
+    {
+      "name": "TRUNCATE",
+      "identical": true,
+      "changeObserved": true
+    },
+    {
+      "name": "REFERENCES",
+      "identical": true,
+      "changeObserved": true
+    },
+    {
+      "name": "TRIGGER",
+      "identical": true,
+      "changeObserved": true
+    },
+    {
+      "name": "sequence_USAGE",
+      "identical": true,
+      "changeObserved": true
+    },
+    {
+      "name": "sequence_SELECT",
+      "identical": true,
+      "changeObserved": true
+    },
+    {
+      "name": "sequence_UPDATE",
+      "identical": true,
+      "changeObserved": true
+    },
+    {
+      "name": "column_only",
+      "identical": true,
+      "changeObserved": true
+    },
+    {
+      "name": "public",
+      "identical": true,
+      "changeObserved": true
+    },
+    {
+      "name": "view",
+      "identical": true,
+      "changeObserved": true
+    },
+    {
+      "name": "partitioned",
+      "identical": true,
+      "changeObserved": true
+    },
+    {
+      "name": "inherited",
+      "identical": true,
+      "changeObserved": true
+    },
+    {
+      "name": "rls",
+      "identical": true,
+      "changeObserved": true
+    }
+  ],
+  "rollbackRestored": true
+}

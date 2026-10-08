@@ -519,118 +519,122 @@ export class PreparedGenerationPipeline {
         firstApprovedMs ??= Math.round(performance.now() - started);
         emitted++;
       };
-      const result = await this.service.pipeline.runWithPorts(
-        {
-          creatorId: task.creatorId,
-          configuration: DraftConfig.parse(current.facts.version.configuration),
-          creatorName: current.metadata.creatorName,
-          message: current.conversation.acceptedText,
-          grants: {
-            ...current.metadata.audience,
-            tierIds: [...current.metadata.audience.tierIds],
-            groupIds: [...current.metadata.audience.groupIds],
+      const result = await this.service.pipeline
+        .publishedEngine(current.facts.version.pipelineHash)
+        .runWithPorts(
+          {
+            creatorId: task.creatorId,
+            configuration: DraftConfig.parse(
+              current.facts.version.configuration,
+            ),
+            creatorName: current.metadata.creatorName,
+            message: current.conversation.acceptedText,
+            grants: {
+              ...current.metadata.audience,
+              tierIds: [...current.metadata.audience.tierIds],
+              groupIds: [...current.metadata.audience.groupIds],
+            },
+            snapshot: current.conversation.snapshot,
+            status: current.facts.status,
+            sponsors: current.facts.sponsors.map((s) => ({
+              ...s,
+              aliases: [...s.aliases],
+              active: true,
+            })),
+            signal,
+            // The original writer performs all current-input/approval checks
+            // before and after every append. No read-only preview callback is
+            // needed immediately before entering that same guarded writer.
+            onSentence: emit,
           },
-          snapshot: current.conversation.snapshot,
-          status: current.facts.status,
-          sponsors: current.facts.sponsors.map((s) => ({
-            ...s,
-            aliases: [...s.aliases],
-            active: true,
-          })),
-          signal,
-          // The original writer performs all current-input/approval checks
-          // before and after every append. No read-only preview callback is
-          // needed immediately before entering that same guarded writer.
-          onSentence: emit,
-        },
-        {
-          withUsage: (call, stage) =>
-            this.accounting.withUsage(
-              task,
-              current.attempt,
-              "guardrail",
-              signal,
-              call,
-              bookend,
-              (admitted) => {
-                if (stage === "classifier") current.classifierCall = admitted;
-              },
-            ),
-          withStreamUsage: (call) =>
-            this.accounting.withStreamUsage(
-              task,
-              current.attempt,
-              signal,
-              call,
-              bookend,
-              (admitted) => {
-                current.replyCall = admitted;
-              },
-            ),
-          retrieve: async () => {
-            const embedding = await this.retrieval.embedAcceptedMessage(
-              task,
-              current.attempt,
-              signal,
-              bookend,
-            );
-            const retrieved = await this.identity.withGeneration(
-              task,
-              async (client, scope) => {
-                const facts = await this.current(client, scope, current);
-                const value = await this.retrieval.currentInTransaction(
-                  client,
-                  scope,
-                  embedding,
-                  facts,
-                );
-                // The fresh reader already completes its own authority and
-                // input bookends before returning this immutable value.
-                return value;
-              },
-              signal,
-            );
-            current.embedding = embedding;
-            current.retrieval = retrieved;
-            return {
-              passages: retrieved.passages.map((p) => ({
-                ...p,
-                audience: AgentAudience.parse(p.audience),
-              })),
-              examples: async () => [...retrieved.styleExamples],
-              usage: this.retrieval.embeddingUsage(
-                embedding,
+          {
+            withUsage: (call, stage) =>
+              this.accounting.withUsage(
                 task,
                 current.attempt,
+                "guardrail",
+                signal,
+                call,
+                bookend,
+                (admitted) => {
+                  if (stage === "classifier") current.classifierCall = admitted;
+                },
               ),
-            };
-          },
-          finish: (event) =>
-            this.identity.withGeneration(
-              task,
-              async (client, scope) => {
-                await bookend(client, scope);
-                if (event.blocked) {
-                  invariant(
-                    event.category,
-                    "generation_guardrail_category_required",
-                    "An actual blocked category is required.",
+            withStreamUsage: (call) =>
+              this.accounting.withStreamUsage(
+                task,
+                current.attempt,
+                signal,
+                call,
+                bookend,
+                (admitted) => {
+                  current.replyCall = admitted;
+                },
+              ),
+            retrieve: async () => {
+              const embedding = await this.retrieval.embedAcceptedMessage(
+                task,
+                current.attempt,
+                signal,
+                bookend,
+              );
+              const retrieved = await this.identity.withGeneration(
+                task,
+                async (client, scope) => {
+                  const facts = await this.current(client, scope, current);
+                  const value = await this.retrieval.currentInTransaction(
+                    client,
+                    scope,
+                    embedding,
+                    facts,
                   );
-                  await this.guardrail.recordInTransaction(client, scope, {
-                    category: event.category,
-                    versionHash: event.versionHash,
-                    contextHash: event.contextHash,
-                  });
+                  // The fresh reader already completes its own authority and
+                  // input bookends before returning this immutable value.
+                  return value;
+                },
+                signal,
+              );
+              current.embedding = embedding;
+              current.retrieval = retrieved;
+              return {
+                passages: retrieved.passages.map((p) => ({
+                  ...p,
+                  audience: AgentAudience.parse(p.audience),
+                })),
+                examples: async () => [...retrieved.styleExamples],
+                usage: this.retrieval.embeddingUsage(
+                  embedding,
+                  task,
+                  current.attempt,
+                ),
+              };
+            },
+            finish: (event) =>
+              this.identity.withGeneration(
+                task,
+                async (client, scope) => {
                   await bookend(client, scope);
-                }
-                // Without a guardrail write the fresh read above is already
-                // this stage's complete check. W1 still verifies the purpose
-                // and current catalogue before its sole COMMIT.
-              },
-              signal,
-            ),
-        },
-      );
+                  if (event.blocked) {
+                    invariant(
+                      event.category,
+                      "generation_guardrail_category_required",
+                      "An actual blocked category is required.",
+                    );
+                    await this.guardrail.recordInTransaction(client, scope, {
+                      category: event.category,
+                      versionHash: event.versionHash,
+                      contextHash: event.contextHash,
+                    });
+                    await bookend(client, scope);
+                  }
+                  // Without a guardrail write the fresh read above is already
+                  // this stage's complete check. W1 still verifies the purpose
+                  // and current catalogue before its sole COMMIT.
+                },
+                signal,
+              ),
+          },
+        );
       if (emitted === 0 && result.category === "crisis") {
         invariant(
           current.classifierCall &&

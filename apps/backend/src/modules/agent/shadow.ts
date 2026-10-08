@@ -5,6 +5,7 @@ import { versionRow } from "./repository.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import type { ThreadSnapshot } from "./pipeline.js";
 import type { VersionComparison } from "../../../../../packages/api/src/agent/contracts.js";
+import { shadowReplayFingerprint } from "./shadow-fingerprint.js";
 export interface PrivacyParaphrasePort {
   verifiedParaphrases(scope: CreatorScope): Promise<
     readonly {
@@ -34,6 +35,24 @@ export class ShadowReplay {
       "model_unconfigured",
       "Connect an approved model before comparing versions.",
     );
+    // Check before collecting fan-derived material or incurring provider cost.
+    // The command and run repeat this check after asynchronous collection.
+    await this.service.repository.transaction(
+      scope,
+      async (client, workspace, creator) => {
+        const live = await versionRow(
+          client,
+          scope.creatorId,
+          workspace.live_version_id,
+        );
+        invariant(
+          live,
+          "live_version_required",
+          "Publish the first evaluated version before comparing recent conversations.",
+        );
+        this.service.pipeline.assertReplayVersion(live, creator.name);
+      },
+    );
     await this.collect(scope);
     let created = false;
     const receipt = await this.service.repository.command(
@@ -51,6 +70,17 @@ export class ShadowReplay {
           "live_version_required",
           "Publish the first evaluated version before comparing recent conversations.",
         );
+        const live = await versionRow(
+          client,
+          scope.creatorId,
+          workspace.live_version_id,
+        );
+        invariant(
+          live,
+          "live_version_required",
+          "The published version is unavailable.",
+        );
+        this.service.pipeline.assertReplayVersion(live, creator.name);
         const samples = await client.query(
           "SELECT 1 FROM creator.ai_shadow_sample WHERE creator_id=$1 AND created_at>=now()-interval '7 days' AND expires_at>now() LIMIT 1",
           [scope.creatorId],
@@ -81,7 +111,7 @@ export class ShadowReplay {
           [
             id,
             scope.creatorId,
-            snapshot.fingerprint,
+            shadowReplayFingerprint(snapshot.fingerprint, live),
             workspace.live_version_id,
           ],
         );
@@ -210,6 +240,7 @@ export class ShadowReplay {
             "live_version_required",
             "Publish the first evaluated version before comparing recent conversations.",
           );
+          this.service.pipeline.assertReplayVersion(live, creator.name);
           const samples = await client.query<{ paraphrased_prompt: string }>(
             "SELECT paraphrased_prompt FROM creator.ai_shadow_sample WHERE creator_id=$1 AND created_at>=now()-interval '7 days' AND expires_at>now() ORDER BY created_at DESC LIMIT 200",
             [scope.creatorId],
@@ -250,11 +281,13 @@ export class ShadowReplay {
           snapshot: synthetic,
           signal,
         };
-        const live = await this.service.pipeline.run({
-          ...base,
-          configuration: start.live.configuration,
-          sourceSet: start.live.sourceSet,
-        });
+        const live = await this.service.pipeline
+          .publishedEngine(start.live.pipelineHash)
+          .run({
+            ...base,
+            configuration: start.live.configuration,
+            sourceSet: start.live.sourceSet,
+          });
         const draft = await this.service.pipeline.run({
           ...base,
           configuration: start.snapshot.configuration,
@@ -328,9 +361,21 @@ export class ShadowReplay {
             workspace,
             creator.name,
           );
+          const live = await versionRow(
+            client,
+            scope.creatorId,
+            workspace.live_version_id,
+          );
+          const fingerprint = shadowReplayFingerprint(
+            start.snapshot.fingerprint,
+            start.live,
+          );
           invariant(
-            current.fingerprint === start.snapshot.fingerprint &&
-              workspace.live_version_id === start.live.id,
+            live &&
+              current.fingerprint === start.snapshot.fingerprint &&
+              workspace.live_version_id === start.live.id &&
+              shadowReplayFingerprint(current.fingerprint, live) ===
+                fingerprint,
             "draft_changed",
             "Draft or live version changed during shadow replay.",
           );
@@ -343,7 +388,7 @@ export class ShadowReplay {
             [
               id,
               scope.creatorId,
-              current.fingerprint,
+              fingerprint,
               start.live.id,
               JSON.stringify(comparisons),
               passed ? "passed" : "failed",

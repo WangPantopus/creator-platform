@@ -106,7 +106,7 @@ export async function assertAgentDelivery(
   );
   invariant(
     version?.state === "live" &&
-      version.pipelineHash === service.pipeline.fingerprint,
+      service.pipeline.supportsPublishedEngine(version.pipelineHash),
     "ai_updating",
     "The current evaluated AI version is unavailable or updating.",
   );
