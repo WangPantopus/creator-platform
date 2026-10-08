@@ -439,7 +439,6 @@ export class PreparedGenerationConversationContext {
     scope: GenerationTaskScope,
     context: GenerationConversationContext,
   ): Promise<void> {
-    await this.identity.authorizeInTransaction(scope, client);
     const issued = this.issued.get(context);
     invariant(
       issued?.scope === scope &&

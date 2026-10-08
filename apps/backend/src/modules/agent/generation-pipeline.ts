@@ -277,7 +277,8 @@ export class PreparedGenerationPipeline {
       // fresh read. Its returned evidence is compared to the original run
       // above; immediately rereading that same value adds no new operation.
     }
-    await this.inputs.authorizeInTransaction(facts, scope, client);
+    // Metadata's final fresh read compares its original licensed facts and
+    // audience as well as the compiled metadata on this same held purpose.
     await this.metadata.assertCurrentInTransaction(client, scope, metadata);
     await this.context.assertCurrentInTransaction(client, scope, conversation);
     await this.identity.authorizeInTransaction(scope, client);
@@ -456,7 +457,6 @@ export class PreparedGenerationPipeline {
             scope,
             facts,
           );
-          await this.inputs.authorizeInTransaction(facts, scope, client);
           await this.metadata.assertCurrentInTransaction(
             client,
             scope,
@@ -508,7 +508,9 @@ export class PreparedGenerationPipeline {
               "generation_output_not_committed",
               "The actual original writer must commit this exact ordered cursor.",
             );
-            await this.assertApprovedInTransaction(client, scope, approved);
+            // deliver() already validates approval before/after append and
+            // resolves only after the original W1 COMMIT. This read confirms
+            // that committed cursor; it does not repeat the whole input read.
           },
           signal,
         );
@@ -534,14 +536,9 @@ export class PreparedGenerationPipeline {
             active: true,
           })),
           signal,
-          beforeSentence: () =>
-            this.identity.withGeneration(
-              task,
-              async (client, scope) => {
-                await bookend(client, scope);
-              },
-              signal,
-            ),
+          // The original writer performs all current-input/approval checks
+          // before and after every append. No read-only preview callback is
+          // needed immediately before entering that same guarded writer.
           onSentence: emit,
         },
         {
@@ -658,7 +655,8 @@ export class PreparedGenerationPipeline {
               "generation_output_not_committed",
               "The original safety output must commit its exact ordered cursor.",
             );
-            await this.assertApprovedInTransaction(client, scope, approved);
+            // The original writer already checked approval at both append
+            // bookends and committed before this current cursor observation.
           },
           signal,
         );

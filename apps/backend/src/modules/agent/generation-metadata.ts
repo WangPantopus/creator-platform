@@ -232,11 +232,17 @@ export class PreparedGenerationAgentMetadata {
       "generation_metadata_required",
       "Use the original metadata issued for this held client and purpose.",
     );
-    await this.inputs.authorizeInTransaction(binding.facts, scope, client);
-    await this.audience.authorizeInTransaction(binding.audience, scope, client);
     const current = await this.currentInTransaction(client, scope);
+    // The fresh reader checks the original input, licence and audience owners
+    // at both ends. Compare its actual privately issued facts with this binding
+    // instead of separately rereading the same owners immediately beforehand.
+    const currentBinding = this.issued.get(current)!;
     invariant(
-      contentHash(current) === binding.hash,
+      contentHash(current) === binding.hash &&
+        contentHash(currentBinding.facts) === contentHash(binding.facts) &&
+        contentHash(currentBinding.audience) ===
+          contentHash(binding.audience) &&
+        new Date(binding.audience.validUntil).getTime() > Date.now(),
       "generation_metadata_changed",
       "Creator identity or allowance changed during the current generation stage.",
     );
