@@ -1,0 +1,266 @@
+{
+  "scope": "Actual isolated fictional operations; failed/unknown cases retained without backfill or artificial settlement. Diagnostic logging run is not a successful generation.",
+  "attempts": [
+    {
+      "revision": "34063c4b98d3d9253e3863b0baff5790bfebc81e",
+      "database": "creator_pr132_privacy12_20261007",
+      "receiptSha256": "5d01d9d0d180ed7342711ef8ac2b316f9ef4e9f5b4098c68a90bf2283cc8230a",
+      "checks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "isolated_candidate_original_generation_composed",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_worker_and_acceptance_composed",
+        "canonical_synthetic_creator_license_draft_source_and_approval",
+        "actual_provider_embedding_indexed_fictional_source",
+        "actual_six_case_provider_evaluation_passed_exact_draft",
+        "actual_studio_publication",
+        "actual_fan_consent_and_first_conversation_allowance",
+        "actual_http_durable_message_and_generation_acceptance"
+      ],
+      "evaluationPassed": true,
+      "workerPass": {
+        "completed": 0,
+        "failed": 0,
+        "recovered": 0,
+        "skipped": 0,
+        "deferred": 1,
+        "failures": [
+          "generation_output_cursor_unconfigured",
+          "generation_terminal_unavailable"
+        ]
+      },
+      "generations": [
+        {
+          "id": "8364bf07-cfc9-4ec3-b066-9732f19e9af6",
+          "state": "generating"
+        }
+      ],
+      "generationUsageCalls": 4,
+      "providerCostMicros": null,
+      "unknownCostPreserved": true,
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "temporaryPasswordsRemoved": true
+    },
+    {
+      "revision": "b89c7232aae0b9f78357cef999e92c42682dfbb9",
+      "database": "creator_pr132_privacy15_20261007",
+      "receiptSha256": "f3423a62106ddfdb89964a9db7b149ef2d8780500272f5c4365b023d67825d56",
+      "checks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "wrong_cursor_source_refused_during_preparation",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "isolated_candidate_original_generation_composed",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_worker_and_acceptance_composed",
+        "canonical_synthetic_creator_license_draft_source_and_approval",
+        "actual_provider_embedding_indexed_fictional_source",
+        "actual_six_case_provider_evaluation_passed_exact_draft",
+        "actual_studio_publication",
+        "actual_fan_consent_and_first_conversation_allowance",
+        "actual_http_durable_message_and_generation_acceptance"
+      ],
+      "evaluationPassed": true,
+      "workerPass": {
+        "completed": 0,
+        "failed": 0,
+        "recovered": 0,
+        "skipped": 0,
+        "deferred": 1,
+        "failures": [
+          "generation_scope_changed",
+          "generation_metadata_unavailable"
+        ]
+      },
+      "generations": [
+        {
+          "id": "5fbd67f4-2cfc-439c-899d-097460b0edeb",
+          "state": "generating"
+        }
+      ],
+      "generationUsageCalls": 6,
+      "providerCostMicros": null,
+      "unknownCostPreserved": true,
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "temporaryPasswordsRemoved": true
+    },
+    {
+      "revision": "b89c7232aae0b9f78357cef999e92c42682dfbb9",
+      "database": "creator_pr132_privacy16_20261007",
+      "receiptSha256": "9974d36e9d47fba1998a898e5acb663a0203ce98bcaeed05f8e698b53ac11693",
+      "checks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "wrong_cursor_source_refused_during_preparation",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "isolated_candidate_original_generation_composed",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_worker_and_acceptance_composed",
+        "canonical_synthetic_creator_license_draft_source_and_approval",
+        "actual_provider_embedding_indexed_fictional_source",
+        "actual_six_case_provider_evaluation_passed_exact_draft",
+        "actual_studio_publication",
+        "actual_fan_consent_and_first_conversation_allowance",
+        "actual_http_durable_message_and_generation_acceptance"
+      ],
+      "evaluationPassed": true,
+      "workerPass": {
+        "completed": 0,
+        "failed": 1,
+        "recovered": 0,
+        "skipped": 0,
+        "deferred": 0,
+        "failures": ["generation_scope_changed"]
+      },
+      "generations": [
+        {
+          "id": "4516e5b7-4887-492b-b34a-694561f818eb",
+          "state": "failed"
+        }
+      ],
+      "generationUsageCalls": 0,
+      "providerCostMicros": 0,
+      "unknownCostPreserved": false,
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "temporaryPasswordsRemoved": true
+    },
+    {
+      "revision": "7fd3ded4b1b3c6d2eccdff55395235abb30eea24",
+      "database": "creator_pr132_privacy17_20261007",
+      "receiptSha256": "4cbb136596d32fb45376a0409c58f2a3f08fa516775ee2ccbf9aa868fb6d519f",
+      "checks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "wrong_cursor_source_refused_during_preparation",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "isolated_candidate_original_generation_composed",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_worker_and_acceptance_composed",
+        "canonical_synthetic_creator_license_draft_source_and_approval",
+        "actual_provider_embedding_indexed_fictional_source",
+        "actual_six_case_provider_evaluation_passed_exact_draft",
+        "actual_studio_publication",
+        "actual_fan_consent_and_first_conversation_allowance",
+        "actual_http_durable_message_and_generation_acceptance",
+        "actual_generation_worker_provider_and_terminal_complete",
+        "idempotent_shutdown",
+        "closed_registration_refused_before_sql"
+      ],
+      "evaluationPassed": true,
+      "workerPass": {
+        "completed": 1,
+        "failed": 0,
+        "recovered": 0,
+        "skipped": 0,
+        "deferred": 0,
+        "failures": []
+      },
+      "generations": [
+        {
+          "id": "536566bc-9c89-4119-a333-91ec0908a5dc",
+          "state": "delivered"
+        }
+      ],
+      "generationUsageCalls": 5,
+      "providerCostMicros": 3373,
+      "unknownCostPreserved": false,
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "temporaryPasswordsRemoved": true
+    },
+    {
+      "revision": "fac7b222b1f81612eb751e34a7f6582890897a86",
+      "database": "creator_pr132_privacy18_20261007",
+      "receiptSha256": "c4ff5f495f6e20bd225134eca66ce182118daafda1cc8dd1076f2c731dd52f8b",
+      "checks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "wrong_cursor_source_refused_during_preparation",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "isolated_candidate_original_generation_composed",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_worker_and_acceptance_composed",
+        "canonical_synthetic_creator_license_draft_source_and_approval",
+        "actual_provider_embedding_indexed_fictional_source",
+        "actual_six_case_provider_evaluation_passed_exact_draft",
+        "actual_studio_publication",
+        "actual_fan_consent_and_first_conversation_allowance",
+        "actual_http_durable_message_and_generation_acceptance",
+        "actual_generation_worker_provider_and_terminal_complete",
+        "idempotent_shutdown",
+        "closed_registration_refused_before_sql"
+      ],
+      "evaluationPassed": true,
+      "workerPass": {
+        "completed": 1,
+        "failed": 0,
+        "recovered": 0,
+        "skipped": 0,
+        "deferred": 0,
+        "failures": []
+      },
+      "generations": [
+        {
+          "id": "05d4e192-fb93-4398-9fc1-df793542ed17",
+          "state": "delivered"
+        }
+      ],
+      "generationUsageCalls": 5,
+      "providerCostMicros": 3308,
+      "unknownCostPreserved": false,
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "temporaryPasswordsRemoved": true
+    }
+  ]
+}
