@@ -12,6 +12,7 @@ import {
 } from "../conversation/comparison-privacy.js";
 import {
   PrivacyArtifact,
+  PrivacyArtifactAttempt,
   type ArtifactBinding,
   type ExportJob,
   type PrivacyArtifactStore,
@@ -23,6 +24,12 @@ export const comparisonArtifactSource = Object.freeze({
   name: "comparison_export_artifacts",
   path: "apps/backend/src/modules/trust/pending-comparison-export-artifacts.sql",
   checksum: "c1e1dfdb83fe002fbc060c1e0737811a24d39967e12a7a840164f22091c5d0ed",
+});
+export const comparisonAttemptSource = Object.freeze({
+  owner: "W8",
+  name: "comparison_export_attempts",
+  path: "apps/backend/src/modules/trust/pending-comparison-export-attempts.sql",
+  checksum: "f99563564a82d3ba6145b82760e177ae91b2c1fd0538a4c4187b0cae5de28380",
 });
 const Owner = "creator_comparison_artifact";
 const Snapshot = z.string().min(8).max(200);
@@ -166,7 +173,10 @@ export class PreparedComparisonArtifacts {
     signal: AbortSignal;
   }) {
     invariant(
-      typeof input.artifacts.remove === "function",
+      typeof input.artifacts.remove === "function" &&
+        typeof input.artifacts.attempts === "function" &&
+        typeof input.artifacts.removeAttempt === "function" &&
+        typeof input.artifacts.forgetAttempt === "function",
       "comparison_artifact_removal_unavailable",
       "The original protected store must support physical artifact removal.",
     );
@@ -190,6 +200,7 @@ export class PreparedComparisonArtifacts {
       comparisonStorageSource,
       comparisonPrivacySource,
       comparisonArtifactSource,
+      comparisonAttemptSource,
     ])
       await assertRegisteredMigration(client, source, signal);
     const row = (
@@ -208,7 +219,7 @@ export class PreparedComparisonArtifacts {
           AND NOT EXISTS(SELECT FROM pg_db_role_setting WHERE setrole=r.oid)
           AND NOT EXISTS(SELECT FROM pg_namespace WHERE nspowner=r.oid)
           AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=r.oid)
-          AND (SELECT count(*)=7 FROM pg_proc WHERE proowner=r.oid))
+          AND (SELECT count(*)=9 FROM pg_proc WHERE proowner=r.oid))
          AND NOT EXISTS(SELECT FROM pg_database WHERE datname=current_database()
           AND (datconnlimit=0 OR shobj_description(oid,'pg_database')='creator-platform:restored-traffic-closed')) AS ready`,
         [role, Owner],
@@ -373,5 +384,77 @@ export class PreparedComparisonArtifacts {
       if (acknowledged) removed++;
     }
     return removed;
+  }
+
+  /** A restarted host discovers both unfinished attempts and sealed files that
+   * crashed before SQL retention/ACK. File age alone never authorizes removal.
+   * Keep the original task row locked through the actual storage operation. */
+  async recoverAttempts(signal: AbortSignal): Promise<number> {
+    invariant(
+      !requestAuthority.getStore(),
+      "comparison_artifact_worker_required",
+      "Use the original background artifact recovery worker.",
+    );
+    const attempts = z
+      .array(PrivacyArtifactAttempt)
+      .max(20)
+      .parse(await this.artifacts.attempts!(signal));
+    let recovered = 0;
+    for (const attempt of attempts) {
+      if (!Domain.safeParse(attempt.domain).success) continue;
+      signal.throwIfAborted();
+      const action = await trustTransaction(
+        this.workerPool,
+        async (client) => {
+          await this.assertClient(client, "creator_trust_worker", signal);
+          const result = await query(
+            client,
+            "SELECT creator_trust.fence_comparison_export_attempt($1) AS decision",
+            [JSON.stringify(attempt)],
+            signal,
+          );
+          const decision = z
+            .discriminatedUnion("action", [
+              z.strictObject({ action: z.literal("wait") }),
+              z.strictObject({ action: z.literal("remove") }),
+              z.strictObject({
+                action: z.literal("keep"),
+                artifact: PrivacyArtifact,
+              }),
+            ])
+            .parse(result.rows[0]?.decision);
+          if (decision.action === "wait") return false;
+          if (decision.action === "keep") {
+            invariant(
+              decision.artifact.reference === attempt.reference &&
+                decision.artifact.snapshotRef === attempt.snapshotRef &&
+                decision.artifact.contentType === attempt.contentType,
+              "comparison_artifact_custody_changed",
+              "Keep only the original acknowledged artifact.",
+            );
+            await this.artifacts.verify(decision.artifact, attempt, signal);
+            await this.artifacts.forgetAttempt!(attempt, signal);
+          } else {
+            await this.artifacts.removeAttempt!(attempt, signal);
+            await this.assertClient(client, "creator_trust_worker", signal);
+            const finished = await query(
+              client,
+              "SELECT creator_trust.finish_comparison_export_attempt($1) AS removed",
+              [JSON.stringify(attempt)],
+              signal,
+            );
+            invariant(
+              finished.rows[0]?.removed === true,
+              "comparison_artifact_custody_changed",
+              "The original recovery task changed before acknowledgment.",
+            );
+          }
+          return true;
+        },
+        { signal },
+      );
+      if (action) recovered++;
+    }
+    return recovered;
   }
 }

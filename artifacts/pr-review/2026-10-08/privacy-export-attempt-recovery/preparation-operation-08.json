@@ -1,0 +1,26 @@
+{
+  "scope": "read-only source metadata; no runtime registry approval",
+  "results": [
+    {
+      "path": "public",
+      "catalogueChecksum": "56d44846dcd6ccfafd25a0eb8202acf8ce97cce47ffe9c32cb7bcba0a55b6dd0",
+      "restored": true
+    },
+    {
+      "path": "pg_catalog",
+      "catalogueChecksum": "56d44846dcd6ccfafd25a0eb8202acf8ce97cce47ffe9c32cb7bcba0a55b6dd0",
+      "restored": true
+    },
+    {
+      "path": "creator, pg_catalog",
+      "catalogueChecksum": "56d44846dcd6ccfafd25a0eb8202acf8ce97cce47ffe9c32cb7bcba0a55b6dd0",
+      "restored": true
+    }
+  ],
+  "functions": 9,
+  "storage": 1,
+  "triggers": 6,
+  "dependencies": 52,
+  "pendingPreparation": "refused: reviewed_migration_unavailable",
+  "observedAt": "2026-10-08T14:22:27.888Z"
+}

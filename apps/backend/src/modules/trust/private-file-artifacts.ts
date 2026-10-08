@@ -14,6 +14,7 @@ import { dirname, join, isAbsolute, resolve } from "node:path";
 import { DomainError } from "../../core/errors.js";
 import {
   PrivacyArtifact,
+  PrivacyArtifactAttempt,
   type ArtifactBinding,
   type PrivacyArtifactStore,
 } from "./privacy-export.js";
@@ -23,6 +24,8 @@ import {
  * The configured directory must already be private to this server's OS user. */
 export class PrivateFileArtifacts implements PrivacyArtifactStore {
   private sweepDirectory: Dir | undefined;
+  private attemptDirectory: Dir | undefined;
+  private scanningAttempts = false;
   constructor(readonly directory: string) {
     if (!isAbsolute(directory)) throw new Error("artifact_directory_invalid");
   }
@@ -69,7 +72,46 @@ export class PrivateFileArtifacts implements PrivacyArtifactStore {
     const metadataPending = join(this.directory, `${reference}.json.partial`);
     const binary = join(this.directory, `${reference}.bin`);
     const metadata = join(this.directory, `${reference}.json`);
-    const file = await open(pending, "wx", 0o600);
+    const attemptPath = join(this.directory, `${reference}.attempt.json`);
+    const attempt = PrivacyArtifactAttempt.parse({
+      format: "privacy-attempt-v1",
+      reference,
+      jobId: input.jobId,
+      accountId: input.accountId,
+      domain: input.domain,
+      leaseToken: input.leaseToken,
+      snapshotRef: input.snapshotRef,
+      contentType: input.contentType,
+      createdAt: new Date().toISOString(),
+    });
+    const currentAttempt = async () => {
+      input.signal.throwIfAborted();
+      if (await this.loadAttempt(reference, "removed"))
+        throw new Error("export_attempt_removed");
+      const current = await this.loadAttempt(reference);
+      if (!current || JSON.stringify(current) !== JSON.stringify(attempt))
+        throw new Error("export_attempt_invalid");
+    };
+    // No source bytes exist until this immutable marker is durable. A crash
+    // during marker creation can leave metadata only, never untracked fan text.
+    const marker = await open(attemptPath, "wx", 0o600);
+    let file: FileHandle;
+    try {
+      try {
+        await marker.writeFile(JSON.stringify(attempt));
+        await marker.sync();
+      } finally {
+        await marker.close();
+      }
+      await this.syncDirectory();
+      await currentAttempt();
+      file = await open(pending, "wx", 0o600);
+    } catch (error) {
+      await unlink(attemptPath).catch((cleanup) => {
+        if ((cleanup as NodeJS.ErrnoException).code !== "ENOENT") throw cleanup;
+      });
+      throw error;
+    }
     const hash = createHash("sha256");
     let chunks = 0;
     let bytes = 0;
@@ -82,13 +124,28 @@ export class PrivateFileArtifacts implements PrivacyArtifactStore {
         await file.close();
       }
       // All names were minted by this attempt; no prior artifact is replaced.
-      await Promise.all(
+      const cleanup = await Promise.allSettled(
         [pending, metadataPending, binary, metadata].map((path) =>
           unlink(path).catch((error) => {
             if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
           }),
         ),
       );
+      const failures = cleanup.flatMap((result) =>
+        result.status === "rejected" ? [result.reason] : [],
+      );
+      if (failures.length)
+        throw new AggregateError(failures, "Export attempt cleanup failed.");
+      // The discovery marker is last: interrupted cleanup remains discoverable.
+      await unlink(attemptPath).catch((error) => {
+        if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+      });
+      const dir = await open(directory, "r");
+      try {
+        await dir.sync();
+      } finally {
+        await dir.close();
+      }
     };
     return {
       async write(data: Uint8Array) {
@@ -125,7 +182,7 @@ export class PrivateFileArtifacts implements PrivacyArtifactStore {
       async seal(
         summary: Pick<PrivacyArtifact, "chunks" | "bytes" | "sha256">,
       ) {
-        input.signal.throwIfAborted();
+        await currentAttempt();
         if (
           closed ||
           sealed ||
@@ -150,6 +207,7 @@ export class PrivateFileArtifacts implements PrivacyArtifactStore {
           await file.sync();
           await file.close();
           closed = true;
+          await currentAttempt();
           const meta = await open(metadataPending, "wx", 0o600);
           try {
             await meta.writeFile(JSON.stringify(artifact));
@@ -166,6 +224,10 @@ export class PrivateFileArtifacts implements PrivacyArtifactStore {
           } finally {
             await dir.close();
           }
+          // An expired predecessor may have been suspended during file I/O.
+          // Recovery's durable removal marker prevents it from recreating an
+          // acknowledged-deleted artifact when it eventually resumes.
+          await currentAttempt();
           sealed = true;
           return artifact;
         } catch (error) {
@@ -266,6 +328,185 @@ export class PrivateFileArtifacts implements PrivacyArtifactStore {
     const loaded = await this.load(artifact, binding, signal);
     await loaded.file.close();
   }
+  private async syncDirectory() {
+    const directory = await open(this.directory, "r");
+    try {
+      await directory.sync();
+    } finally {
+      await directory.close();
+    }
+  }
+  private async loadAttempt(
+    reference: string,
+    kind: "attempt" | "removed" = "attempt",
+  ) {
+    const marker = await open(
+      join(this.directory, `${reference}.${kind}.json`),
+      constants.O_RDONLY | constants.O_NOFOLLOW,
+    ).catch((error) => {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+      return undefined;
+    });
+    if (!marker) return undefined;
+    try {
+      const stat = await marker.stat();
+      if (
+        !stat.isFile() ||
+        stat.size > 4096 ||
+        (stat.mode & 0o077) !== 0 ||
+        stat.uid !== process.getuid?.()
+      )
+        throw new Error("export_attempt_invalid");
+      const attempt = PrivacyArtifactAttempt.parse(
+        JSON.parse(await marker.readFile("utf8")),
+      );
+      if (attempt.reference !== reference)
+        throw new Error("export_attempt_invalid");
+      return attempt;
+    } finally {
+      await marker.close();
+    }
+  }
+  /** Metadata discovery only; no age or opaque ID authorizes deletion. */
+  async attempts(
+    signal: AbortSignal,
+  ): Promise<readonly PrivacyArtifactAttempt[]> {
+    if (this.scanningAttempts) throw new Error("export_attempt_scan_busy");
+    this.scanningAttempts = true;
+    try {
+      signal.throwIfAborted();
+      await this.root();
+      const directory = (this.attemptDirectory ??= await opendir(
+        this.directory,
+      ));
+      const attempts: PrivacyArtifactAttempt[] = [];
+      const seen = new Set<string>();
+      for (let visited = 0; visited < 1000 && attempts.length < 20; visited++) {
+        signal.throwIfAborted();
+        const entry = await directory.read();
+        if (!entry) {
+          this.attemptDirectory = undefined;
+          await directory.close();
+          break;
+        }
+        const match =
+          /^([0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12})\.(attempt|removed)\.json$/u.exec(
+            entry.name,
+          );
+        if (!match) continue;
+        const attempt = await this.loadAttempt(
+          match[1]!,
+          match[2] as "attempt" | "removed",
+        );
+        if (attempt && !seen.has(attempt.reference)) {
+          seen.add(attempt.reference);
+          attempts.push(attempt);
+        }
+      }
+      signal.throwIfAborted();
+      return attempts;
+    } finally {
+      this.scanningAttempts = false;
+    }
+  }
+  /** The actual task owner must have proved the original attempt cannot still
+   * write and hold that fence through this call. Partial bytes have no sealed
+   * checksum; only this exact, durable private attempt marker names the files. */
+  async removeAttempt(value: PrivacyArtifactAttempt, signal: AbortSignal) {
+    const expected = PrivacyArtifactAttempt.parse(value);
+    signal.throwIfAborted();
+    await this.root();
+    const actual = await this.loadAttempt(expected.reference);
+    const removed = await this.loadAttempt(expected.reference, "removed");
+    if (
+      (actual && JSON.stringify(actual) !== JSON.stringify(expected)) ||
+      (removed && JSON.stringify(removed) !== JSON.stringify(expected))
+    )
+      throw new Error("export_attempt_invalid");
+    const paths = ["partial", "json.partial", "bin", "json"].map((suffix) =>
+      join(this.directory, `${expected.reference}.${suffix}`),
+    );
+    for (const path of paths) {
+      const stat = await lstat(path).catch((error) => {
+        if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+        return undefined;
+      });
+      if (
+        stat &&
+        ((!actual && !removed) ||
+          !stat.isFile() ||
+          stat.isSymbolicLink() ||
+          (stat.mode & 0o077) !== 0 ||
+          stat.uid !== process.getuid?.())
+      )
+        throw new Error("export_attempt_invalid");
+    }
+    signal.throwIfAborted();
+    if (!removed && actual) {
+      const pending = join(
+        this.directory,
+        `${expected.reference}.removed.json.partial`,
+      );
+      const previous = await lstat(pending).catch((error) => {
+        if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+        return undefined;
+      });
+      if (previous) {
+        if (
+          !previous.isFile() ||
+          previous.isSymbolicLink() ||
+          previous.size > 4096 ||
+          (previous.mode & 0o077) !== 0 ||
+          previous.uid !== process.getuid?.()
+        )
+          throw new Error("export_attempt_invalid");
+        // The exact original task fence also serializes removal retries. This
+        // file contains only an interrupted marker write, never source bytes.
+        await unlink(pending);
+      }
+      const marker = await open(pending, "wx", 0o600);
+      try {
+        await marker.writeFile(JSON.stringify(expected));
+        await marker.sync();
+      } finally {
+        await marker.close();
+      }
+      await rename(
+        pending,
+        join(this.directory, `${expected.reference}.removed.json`),
+      );
+      await this.syncDirectory();
+    }
+    // Once cleanup starts, settle every path before reporting cancellation.
+    // The marker remains until all possible source-byte paths are gone.
+    for (const path of [
+      ...paths,
+      join(this.directory, `${expected.reference}.attempt.json`),
+    ])
+      await unlink(path).catch((error) => {
+        if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+      });
+    await this.syncDirectory();
+    signal.throwIfAborted();
+  }
+  /** Forget discovery metadata only after the owner observes its exact completed
+   * artifact. This never removes an artifact, partial file or source payload. */
+  async forgetAttempt(value: PrivacyArtifactAttempt, signal: AbortSignal) {
+    const expected = PrivacyArtifactAttempt.parse(value);
+    signal.throwIfAborted();
+    await this.root();
+    const actual = await this.loadAttempt(expected.reference);
+    if (actual && JSON.stringify(actual) !== JSON.stringify(expected))
+      throw new Error("export_attempt_invalid");
+    signal.throwIfAborted();
+    await unlink(
+      join(this.directory, `${expected.reference}.attempt.json`),
+    ).catch((error) => {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    });
+    await this.syncDirectory();
+    signal.throwIfAborted();
+  }
   /** Exact, idempotent storage cleanup for a separately authorized revocation.
    * Expiry is deliberately not an admission condition: a revoked/expired file
    * still needs removal. Missing files can be an earlier interrupted cleanup;
@@ -292,6 +533,16 @@ export class PrivateFileArtifacts implements PrivacyArtifactStore {
     await this.root();
     const metadata = join(this.directory, `${expected.reference}.json`);
     const binary = join(this.directory, `${expected.reference}.bin`);
+    const attempt = await this.loadAttempt(expected.reference);
+    if (
+      attempt &&
+      (attempt.jobId !== expected.jobId ||
+        attempt.accountId !== expected.accountId ||
+        attempt.domain !== expected.domain ||
+        attempt.snapshotRef !== expected.snapshotRef ||
+        attempt.contentType !== expected.contentType)
+    )
+      throw new Error("export_attempt_invalid");
     const existing = async (path: string) =>
       open(path, constants.O_RDONLY | constants.O_NOFOLLOW).catch((error) => {
         if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
@@ -336,7 +587,13 @@ export class PrivateFileArtifacts implements PrivacyArtifactStore {
     signal.throwIfAborted();
     // Settle both owned paths after the first unlink, even if cancellation
     // arrives meanwhile. Binary first leaves retryable metadata after a crash.
-    for (const path of [binary, metadata])
+    for (const path of [
+      binary,
+      metadata,
+      ...(attempt
+        ? [join(this.directory, `${expected.reference}.attempt.json`)]
+        : []),
+    ])
       await unlink(path).catch((error) => {
         if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
       });
@@ -358,18 +615,49 @@ export class PrivateFileArtifacts implements PrivacyArtifactStore {
       if (removed >= 100) break;
       const entry = await directory.read();
       if (!entry) {
-        await this.close();
+        this.sweepDirectory = undefined;
+        await directory.close();
         break;
       }
       if (!entry.isFile()) continue;
       const match =
-        /^([0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12})(\.json|\.bin|\.partial|\.json\.partial)$/u.exec(
+        /^([0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12})(\.json|\.bin|\.partial|\.json\.partial|\.attempt\.json|\.removed\.json|\.removed\.json\.partial)$/u.exec(
           entry.name,
         );
       if (!match) continue;
       const path = join(this.directory, entry.name);
-      const stat = await lstat(path);
-      if (!stat.isFile() || (stat.mode & 0o077) !== 0) continue;
+      const stat = await lstat(path).catch((error) => {
+        if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+        return undefined;
+      });
+      if (
+        !stat?.isFile() ||
+        (stat.mode & 0o077) !== 0 ||
+        stat.uid !== process.getuid?.()
+      )
+        continue;
+      if (match[2] === ".attempt.json" || match[2] === ".removed.json") {
+        if (Date.now() - stat.mtimeMs < 7 * 24 * 3600_000) continue;
+        let hasBytes = false;
+        for (const suffix of ["partial", "json.partial", "bin", "json"])
+          if (
+            await lstat(join(this.directory, `${match[1]}.${suffix}`)).catch(
+              (error) => {
+                if ((error as NodeJS.ErrnoException).code !== "ENOENT")
+                  throw error;
+                return undefined;
+              },
+            )
+          )
+            hasBytes = true;
+        // Even an interrupted marker write contains no source bytes. Only
+        // discard old metadata when every possible payload path is absent.
+        if (!hasBytes && stat.uid === process.getuid?.()) {
+          await unlink(path);
+          removed++;
+        }
+        continue;
+      }
       if (match[2] !== ".json") {
         if (Date.now() - stat.mtimeMs >= 7 * 24 * 3600_000) {
           if (match[2] === ".bin") {
@@ -412,8 +700,18 @@ export class PrivateFileArtifacts implements PrivacyArtifactStore {
   }
   async close() {
     const directory = this.sweepDirectory;
+    const attempts = this.attemptDirectory;
     this.sweepDirectory = undefined;
-    await directory?.close();
+    this.attemptDirectory = undefined;
+    const closed = await Promise.allSettled([
+      directory?.close(),
+      attempts?.close(),
+    ]);
+    const failures = closed.flatMap((result) =>
+      result.status === "rejected" ? [result.reason] : [],
+    );
+    if (failures.length)
+      throw new AggregateError(failures, "Export directory cleanup failed.");
   }
   async *read(
     artifact: PrivacyArtifact,

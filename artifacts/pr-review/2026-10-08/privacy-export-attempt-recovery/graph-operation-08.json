@@ -1,0 +1,60 @@
+{
+  "kind": "isolated synthetic SQL and filesystem operation; no producer activation or fan choice",
+  "results": [
+    {
+      "case": "unheld capture and direct provenance reads refused",
+      "pass": true
+    },
+    {
+      "case": "original Conversation source, EOF, COMMIT, exact seal and completed download fence",
+      "pass": true,
+      "rows": 6
+    },
+    {
+      "case": "source withdrawal denies saved download and durable purge removes exact files",
+      "pass": true
+    },
+    {
+      "case": "withdrawal after source COMMIT before seal retains purge work and refuses ACK",
+      "pass": true
+    },
+    {
+      "case": "original Agent source and stored derived-result artifact follow withdrawal",
+      "pass": true,
+      "rows": 39
+    },
+    {
+      "case": "actual elapsed source expiry denies reads and physically purges without clock edits",
+      "pass": true
+    },
+    {
+      "case": "withdrawal cannot commit through a held source capture; retry then revokes it",
+      "pass": true
+    },
+    {
+      "case": "null fields and manifest replacement refused",
+      "pass": true
+    },
+    {
+      "case": "SIGKILL before seal: durable discovery survives restart; active lease waits; real elapsed lease permits physical cleanup and retry",
+      "pass": true
+    },
+    {
+      "case": "SIGKILL after seal before SQL retention: fresh store removes unacknowledged original files under the original task lock",
+      "pass": true
+    },
+    {
+      "case": "exact completed current artifact survives recovery; only its discovery marker is forgotten",
+      "pass": true
+    },
+    {
+      "case": "suspended predecessor cannot reseal after durable removal; removal marker remains after abort",
+      "pass": true
+    },
+    {
+      "case": "elapsed lease alone cannot remove bytes while the original source holds its task; cleanup succeeds after original rejected COMMIT settles",
+      "pass": true
+    }
+  ],
+  "observedAt": "2026-10-08T14:21:53.372Z"
+}

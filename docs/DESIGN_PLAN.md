@@ -35,6 +35,11 @@ W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan expor
   download recovery, populated media, other scopes and physical deletion remain
   open. [Bounded evidence](../artifacts/pr-review/2026-10-08/comparison-consent-lifecycle/README.md).
 
+- [x] October 8, 2026: persist private export attempt metadata before source
+  bytes; operate actual fan export/download across all eight domains with exact
+  prior generation custody. Original-task crash recovery has isolated source
+  evidence and remains unregistered. [Evidence and remaining composition](../artifacts/pr-review/2026-10-08/privacy-export-attempt-recovery/README.md).
+
 - [~] October 8, 2026: prepare source-bound saved comparison export revocation,
   deferred completion and exact physical removal. Isolated SQL/filesystem
   operations pass; unfinished-attempt/orphan recovery and app composition remain

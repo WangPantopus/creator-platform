@@ -69,6 +69,14 @@ and physical removal evidence. It remains unregistered/uncomposed. Durable
 unfinished-attempt and sealed-orphan recovery, full graph review and actual
 producer/consumer operation remain prerequisites. No milestone is closed.
 
+The [durable attempt recovery increment](../../artifacts/pr-review/2026-10-08/privacy-export-attempt-recovery/README.md)
+now has actual isolated process-crash/source-lock evidence and a real copy43 fan
+export with all eight domains complete and all four downloaded stream hashes
+verified. Pending recovery remains unregistered. Preserve new provenance in
+complete Trust export/deletion and explicitly review legacy exports before
+activation; full source/provider admission and actual producer operation remain.
+PRs340 and341 merged with eleven checks passing each;342 now targets main.
+
 ## Refreshed starting point
 
 - Continuation branch: `codex/shadow-evidence-lifetime-20261008`, retaining

@@ -1,5 +1,32 @@
 # Session handoff — October 8, 2026
 
+## Active continuation — durable export attempt recovery
+
+Continue on `codex/privacy-export-attempt-recovery-20261008` in 637b.
+Source `5bd6b6215f172344528d2735e61705a4e079fc69` now has
+[actual crash/source and real browser export evidence](../../artifacts/pr-review/2026-10-08/privacy-export-attempt-recovery/README.md).
+Pending original-task recovery remains unregistered. The private store's durable
+attempt marker is exercised by the actual app. New fan export f6a7410b completes
+all eight domains; every downloaded stream matches its saved hash. Agent's
+original-boundary retry and all earlier failures are preserved. Original creator
+export 61e07c91 and exact 18-generation/69-usage custody remain unchanged.
+
+PR [#340](https://github.com/WangPantopus/creator-platform/pull/340) merged at
+`6524a9e605fb30dc046bbaad67e02fe66cfd7f0c`; PR [#341](https://github.com/WangPantopus/creator-platform/pull/341)
+merged at `75f300c7168e7f76cf0f6bc83b5550f558041b9b`. Each had all eleven checks
+passing at its reviewed head. Refresh their separate main workflows.
+PR [#342](https://github.com/WangPantopus/creator-platform/pull/342) is open at
+`7f66a5c71` and now targets main; refresh exact-head checks before merging.
+
+The compiled backend is 5bd6b6215 on 57304, session launcher
+`native-e2e/launch43-backend-artifact-attempts.mjs`, log
+`native-e2e/backend-artifact-attempts-01.log`; web remains 3119. Both native devices
+remain stopped. Next complete original comparison read/provider admission and
+composition, full graph/restore/legacy-export review and Trust provenance
+export/deletion, then actual separate consent/sanitization and legitimate
+existing-version upgrade. Carry every milestone in the full finish plan forward.
+
+
 ## Active continuation — saved comparison artifact lifecycle
 
 Continue on `codex/comparison-artifact-lifecycle-20261008` in the same637b
