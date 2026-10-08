@@ -338,7 +338,9 @@ export class PreparedGenerationPipeline {
     call: GenerationProviderCall,
   ): ApprovedGenerationSentence {
     const value = Sentence.parse({
-      text: raw.text,
+      // W3 appends exact frame text. Include the separator before private
+      // issuance so stored text, streamed frames and provenance stay identical.
+      text: run.nextSequence === 0 ? raw.text : ` ${raw.text}`,
       citations: [...raw.citations],
     });
     this.accounting.assertCall(call, run.attempt, run.task);
