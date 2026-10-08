@@ -370,6 +370,20 @@ try {
                       )(actor, effect),
                   }
                 : {}),
+              // Own-fan membership recognition and the creator's held pair
+              // authority, as the Content development host binds them. Without
+              // these a fan cannot read a members or tier Note in this host.
+              ...(runtime.audienceIdentity
+                ? { tenure: { audienceIdentity: runtime.audienceIdentity } }
+                : {}),
+              ...(runtime.holdCreatorFanNegativeAuthority
+                ? {
+                    creatorTenure: {
+                      holdCreatorFanNegativeAuthority:
+                        runtime.holdCreatorFanNegativeAuthority,
+                    },
+                  }
+                : {}),
               assertScopeAllowedInTransaction:
                 runtime.assertScopeAllowedInTransaction,
             });
