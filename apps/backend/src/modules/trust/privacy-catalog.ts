@@ -3,10 +3,13 @@ import { DomainError } from "../../core/errors.js";
 import {
   originalPrivacyFamilyRegisteredExtension,
   assertOriginalPrivacyFamilyGenerationCatalog,
+  assertOriginalPrivacyFamilyContentCatalog,
   originalPrivacyBindingSignature,
   originalPrivacyBindingDefinition,
 } from "./privacy-family-catalog.js";
 import generationReview from "../../../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
+import contentReview from "../../../../../infra/migrations/reviews/20261007-content-privacy.json" with { type: "json" };
+import outputReview from "../../../../../infra/migrations/reviews/20261007-generation-first-visible.json" with { type: "json" };
 import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
 import { contentHash } from "../../core/canonical.js";
 import {
@@ -98,14 +101,39 @@ export async function assertGenerationPrivacyTaskCatalogForReview(
   client: PoolClient,
   signal?: AbortSignal,
 ) {
+  return assertPrivacyExtensionForReview(client, "generation", signal);
+}
+
+/** Fixed102 operator metadata before public-AI DDL. No task authority or
+ * caller-provided checksums; runtime retains its complete registered graph. */
+export async function assertOutputPrivacyTaskCatalogForReview(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  return assertPrivacyExtensionForReview(client, "output", signal);
+}
+
+async function assertPrivacyExtensionForReview(
+  client: PoolClient,
+  profile: "generation" | "output",
+  signal?: AbortSignal,
+) {
   for (const source of generationReview.sources)
     await assertRegisteredMigration(client, source, signal);
-  await assertOriginalPrivacyFamilyGenerationCatalog(client, signal);
+  if (profile === "output") {
+    await assertRegisteredMigration(client, contentReview.source, signal);
+    await assertRegisteredMigration(client, outputReview.source, signal);
+    await assertOriginalPrivacyFamilyContentCatalog(client, signal);
+  } else await assertOriginalPrivacyFamilyGenerationCatalog(client, signal);
   if (
     contentHash(await accountDetachedUsageCatalogue(client, signal)) !==
-      accountDetachedUsageExpectedCatalogue ||
+      (profile === "output"
+        ? outputReview.runtimeCatalogues.detached
+        : accountDetachedUsageExpectedCatalogue) ||
     contentHash(await accountingBoundaryCatalogue(client, signal)) !==
-      accountingBoundaryExpectedCatalogue
+      (profile === "output"
+        ? outputReview.runtimeCatalogues.boundary
+        : accountingBoundaryExpectedCatalogue)
   )
     throw new DomainError(
       "privacy_commit_fence_unavailable",

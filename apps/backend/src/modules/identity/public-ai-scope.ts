@@ -2,8 +2,14 @@ import type { Pool, PoolClient } from "pg";
 import { z } from "zod";
 import { DomainError, invariant } from "../../core/errors.js";
 import { assertCurrentSession, requestAuthority } from "./request-authority.js";
+import { contentHash } from "../../core/canonical.js";
+import {
+  registeredPublicAIProfile,
+  assertPublicAIExtensionIfRegistered,
+} from "../../db/public-ai-profile.js";
+import { publicAIPurposeCatalogue } from "./public-ai-catalogue.js";
 
-export const PUBLIC_AI_SCOPE_MIGRATION = "0170_w1_public_ai_metadata_scope";
+export const PUBLIC_AI_SCOPE_MIGRATION = "0235_w1_public_ai_metadata_scope";
 const Hash = z.string().regex(/^[a-f0-9]{64}$/u);
 const License = z.strictObject({
   state: z.enum(["active", "revoked", "suspended"]),
@@ -178,7 +184,38 @@ export class PublicAIIdentityAuthority {
         "The reviewed public AI metadata scope is not installed.",
         503,
       );
-    return new PublicAIIdentityAuthority(input.pool, input.assertAllowed);
+    const authority = new PublicAIIdentityAuthority(
+      input.pool,
+      input.assertAllowed,
+    );
+    const client = await input.pool.connect();
+    try {
+      await client.query("BEGIN READ ONLY");
+      await authority.assertCatalogue(client);
+      await client.query("COMMIT");
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+    return authority;
+  }
+
+  private async assertCatalogue(client: PoolClient) {
+    const profile = await registeredPublicAIProfile();
+    invariant(
+      profile,
+      "public_ai_unconfigured",
+      "The reviewed public AI source graph is unavailable.",
+    );
+    await assertPublicAIExtensionIfRegistered(client);
+    invariant(
+      contentHash(await publicAIPurposeCatalogue(client)) ===
+        profile.publicCatalogueChecksum,
+      "public_ai_unconfigured",
+      "The fixed public AI permission catalogue changed.",
+    );
   }
 
   async withPublicAI<T>(
@@ -198,6 +235,7 @@ export class PublicAIIdentityAuthority {
       await client.query(
         "SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','1000',true)",
       );
+      await this.assertCatalogue(client);
       await client.query(
         "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true),set_config('app.identity_session_id','',true),set_config('app.fan_id','',true)",
         [id, visitor?.accountId ?? ""],
@@ -266,6 +304,7 @@ export class PublicAIIdentityAuthority {
       // Rechecks held metadata and wall-clock/session expiry, without new locks.
       await this.authorizeInTransaction(scope, client, facts);
       await client.query("SELECT creator.end_public_ai_scope()");
+      await this.assertCatalogue(client);
       this.issued.delete(scope);
       await client.query("COMMIT");
       return value;

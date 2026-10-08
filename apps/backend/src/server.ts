@@ -266,6 +266,9 @@ try {
             features.growth = await configureGrowthForBackend({
               ...runtime,
               pool: growthAPIPool ?? runtime.pool,
+              ...(host.publicCreatorAI
+                ? { publicCreatorAI: host.publicCreatorAI }
+                : {}),
               postEntryReader: {
                 current(input) {
                   if (!postEntryReader)

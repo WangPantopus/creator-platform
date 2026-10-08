@@ -632,6 +632,18 @@
       "owner": "W3",
       "sourceSha256": "27f7cda8ceed6fbe80035d45c4cb6b8376470d9041a3407f558a879ce2d993b4",
       "wave": "20261007-generation-output"
+    },
+    {
+      "version": "0235_w1_public_ai_metadata_scope",
+      "path": "apps/backend/src/modules/identity/schema-public-ai-scope.sql",
+      "owner": "W1",
+      "sourceSha256": "0325048ec855877e59430423850ec72360610a96328aaaef903139f512aa0606"
+    },
+    {
+      "version": "0236_w8_public_creator_denial",
+      "path": "apps/backend/migrations/0086_w8_public_creator_denial.sql",
+      "owner": "W8",
+      "sourceSha256": "876e5a0636e9010f3349b57ecc6ff71b42f316cc7210d8b80bac9be4955efe8c"
     }
   ],
   "reserved": [
@@ -824,29 +836,31 @@
       "id": "0170",
       "owner": "W1",
       "version": "0170_w1_public_ai_metadata_scope",
-      "state": "reserved_unapplied",
-      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Reviewed exact public metadata nonce/cleanup; genuine publicAI/License composed acceptance pending.",
+      "state": "superseded_registered",
+      "reason": "Exact unchanged source promoted above the applied102 history for the reviewed public AI metadata wave. Previous reserved allocations remain historical; activation requires a verified private backup, independent restore and closed traffic.",
       "path": "apps/backend/src/modules/identity/schema-public-ai-scope.sql",
       "sourceCommit": "dce780db943d79c3417ca0dbcac32c05c24c44cc",
       "sourceSha256": "0325048ec855877e59430423850ec72360610a96328aaaef903139f512aa0606",
       "heldVersionHistory": [
         "0085_w1_public_ai_metadata_scope",
         "0133_w1_public_ai_metadata_scope"
-      ]
+      ],
+      "registeredVersion": "0235_w1_public_ai_metadata_scope"
     },
     {
       "id": "0171",
       "owner": "W8",
       "version": "0171_w8_public_creator_denial",
-      "state": "reserved_unapplied",
-      "reason": "Corrected full held dependency order above0150; metadata only, exact source bytes/path and applied history unchanged. Metadata-only continuation hold above0103; original source bytes and prior history preserved. Requires0085 exact authority role; anonymous/current visitor negatives, no publication worker grant.",
+      "state": "superseded_registered",
+      "reason": "Exact unchanged source promoted above the applied102 history for the reviewed public AI metadata wave. Previous reserved allocations remain historical; activation requires a verified private backup, independent restore and closed traffic.",
       "path": "apps/backend/migrations/0086_w8_public_creator_denial.sql",
       "sourceCommit": "bfe831bdee7f609f5bcf789cf9eecf455c3a5393",
       "sourceSha256": "876e5a0636e9010f3349b57ecc6ff71b42f316cc7210d8b80bac9be4955efe8c",
       "heldVersionHistory": [
         "0086_w8_public_creator_denial",
         "0134_w8_public_creator_denial"
-      ]
+      ],
+      "registeredVersion": "0236_w8_public_creator_denial"
     },
     {
       "id": "0172",

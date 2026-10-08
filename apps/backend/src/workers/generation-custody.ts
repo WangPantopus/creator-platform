@@ -2,6 +2,7 @@ import review from "../../../../infra/migrations/reviews/20261007-generation-wor
 import contentReview from "../../../../infra/migrations/reviews/20261007-content-worker.json" with { type: "json" };
 import { registeredContentPrivacyProfile } from "../db/content-privacy-profile.js";
 import { registeredGenerationOutputProfile } from "../db/generation-output-profile.js";
+import { registeredPublicAIProfile } from "../db/public-ai-profile.js";
 import { invariant } from "../core/errors.js";
 import { generationPrivacySourcesRegistered } from "../db/generation-privacy-sources.js";
 import type { GenerationTerminalPurposeConsumer } from "../modules/identity/generation-scope.js";
@@ -51,18 +52,55 @@ export async function reviewedGenerationWorkerCustody(
     ? withContentPrivacy
     : baseline;
   const output = await registeredGenerationOutputProfile(signal);
+  const publicAI = await registeredPublicAIProfile(signal);
   invariant(
-    !output || reviewed === withContentPrivacy,
+    (!output || reviewed === withContentPrivacy) && (!publicAI || output),
     "generation_worker_custody_unavailable",
     "The output repair requires the complete Content source graph.",
   );
   signal?.throwIfAborted();
   const custody: GenerationWorkerCustody = {
     ...reviewed,
+    ...(publicAI
+      ? {
+          inputs: {
+            ...reviewed.inputs,
+            catalogueChecksum:
+              publicAI.workerCatalogues.creator_w2_generation_input,
+          },
+          origins: {
+            ...reviewed.origins,
+            catalogueChecksum:
+              publicAI.workerCatalogues.creator_w5_generation_origin,
+          },
+          context: {
+            ...reviewed.context,
+            catalogueChecksum:
+              publicAI.workerCatalogues.creator_generation_conversation_context,
+          },
+          metadata: {
+            ...reviewed.metadata,
+            catalogueChecksum:
+              publicAI.workerCatalogues.creator_w2_generation_metadata,
+          },
+          accounting: {
+            ...reviewed.accounting,
+            catalogueChecksum:
+              publicAI.workerCatalogues.creator_w2_generation_journal,
+          },
+          retrieval: {
+            ...reviewed.retrieval,
+            catalogueChecksum:
+              publicAI.workerCatalogues.creator_w2_generation_retrieval,
+          },
+        }
+      : {}),
     output: {
       ...reviewed.output,
       catalogueChecksum:
-        output?.outputCatalogueChecksum ?? reviewed.output.catalogueChecksum,
+        publicAI?.outputCatalogueChecksum ??
+        output?.outputCatalogueChecksum ??
+        reviewed.output.catalogueChecksum,
     },
     identity: {
       ...reviewed.identity,
@@ -77,19 +115,29 @@ export async function reviewedGenerationWorkerCustody(
     },
     guardrail: {
       ...reviewed.guardrail,
+      catalogueChecksum:
+        publicAI?.workerCatalogues.creator_w2_generation_guardrail ??
+        reviewed.guardrail.catalogueChecksum,
       assertPrivacyRegistered: authorities.assertPrivacyRegistered,
     },
     terminalJournal: {
       ...reviewed.terminalJournal,
+      catalogueChecksum:
+        publicAI?.workerCatalogues.creator_w2_generation_terminal_journal ??
+        reviewed.terminalJournal.catalogueChecksum,
       consumers: reviewed.terminalJournal.consumers.map(terminalConsumer),
     },
     finalization: {
       ...reviewed.finalization,
+      catalogueChecksum:
+        publicAI?.workerCatalogues.creator_w3_terminal_output ??
+        reviewed.finalization.catalogueChecksum,
       consumer: terminalConsumer(reviewed.finalization.consumer),
     },
     settlement: {
       ...reviewed.settlement,
       catalogueChecksum:
+        publicAI?.runtimeCatalogues.financial ??
         output?.runtimeCatalogues.financial ??
         reviewed.settlement.catalogueChecksum,
       consumers: reviewed.settlement.consumers.map(terminalConsumer),

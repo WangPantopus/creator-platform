@@ -2,6 +2,7 @@ import record from "../../../../../infra/migrations/reviews/20261007-agent-expor
 import { invariant } from "../../core/errors.js";
 import { registeredMigration } from "../../db/reviewed-migration.js";
 import { registeredContentPrivacyProfile } from "../../db/content-privacy-profile.js";
+import { registeredPublicAIProfile } from "../../db/public-ai-profile.js";
 import type { AgentPrivacyExportReview } from "./privacy-export-snapshot.js";
 
 const source = Object.freeze({ ...record.source });
@@ -38,6 +39,12 @@ export async function registeredAgentPrivacyExportReview(
     "privacy_export_unconfigured",
     "The exact reviewed Agent export source is required.",
   );
+  const publicAI = await registeredPublicAIProfile(signal);
+  if (publicAI)
+    return Object.freeze({
+      ...profiles.content,
+      catalogueChecksum: publicAI.agentExportCatalogueChecksum,
+    });
   return (await registeredContentPrivacyProfile(signal))
     ? profiles.content
     : profiles.generation;

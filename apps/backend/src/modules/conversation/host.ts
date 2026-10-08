@@ -7,6 +7,9 @@ import type { BackendRuntime } from "../../integration.js";
 import { invariant } from "../../core/errors.js";
 import type { ThreadScope } from "../access/scope.js";
 import { createAgentDomain } from "../agent/integration.js";
+import { agentPublicProjection } from "../agent/growth-adapter.js";
+import { PublicAIIdentityAuthority } from "../identity/public-ai-scope.js";
+import { registeredPublicAIProfile } from "../../db/public-ai-profile.js";
 import { modelFromEnvironment } from "../agent/model.js";
 import {
   GENERATION_JOURNAL_MIGRATION,
@@ -487,6 +490,33 @@ export async function composeConversationHost(
           journal,
         })
       : undefined;
+  // The public directory consumes bounded licensed metadata from the same
+  // original Agent graph. This development policy authorizes only configured
+  // fictional creators; it never becomes verified provider approval.
+  let publicCreatorAI;
+  if (ready && developmentPolicy && policy) {
+    const publicReview = await registeredPublicAIProfile();
+    invariant(
+      publicReview && runtime.holdPublicCreatorNegativeAuthority,
+      "public_ai_unconfigured",
+      "The reviewed public metadata and current denial authorities are required.",
+    );
+    const publicIdentity = await PublicAIIdentityAuthority.create({
+      pool: runtime.pool,
+      migration: publicReview.sources[0]!,
+      assertAllowed: runtime.holdPublicCreatorNegativeAuthority,
+    });
+    const currentPolicy = developmentPolicy;
+    publicCreatorAI = agentPublicProjection(agent.service, publicIdentity, {
+      async current(client, scope, facts) {
+        await publicIdentity.authorizeInTransaction(scope, client, facts);
+        return (
+          currentPolicy.isFor(runtime.pool, policy) &&
+          currentPolicy.allowsAccounts(facts.creatorAccountId)
+        );
+      },
+    });
+  }
   if (worker && commerce?.allowance)
     acceptance = PreparedGenerationAcceptance.prepare({
       worker,
@@ -562,6 +592,7 @@ export async function composeConversationHost(
     conversation,
     agent,
     generationWorker: worker,
+    publicCreatorAI,
     privacy: {
       ...(producers.provenancePurge
         ? { provenancePurgePreparation: producers.provenancePurge }

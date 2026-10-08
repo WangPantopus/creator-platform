@@ -3,6 +3,7 @@ import type { PoolClient } from "pg";
 import {
   assertCanonicalPrivacyTaskCatalog,
   assertGenerationPrivacyTaskCatalogForReview,
+  assertOutputPrivacyTaskCatalogForReview,
   assertPrivacyTaskCatalog,
 } from "../src/modules/trust/privacy-catalog.js";
 import { assertDomainPrivacyTaskCatalog } from "../src/modules/trust/domain-privacy-catalog.js";
@@ -38,6 +39,7 @@ export async function assertPrivacyWaveRoleSafety(
     domain: boolean;
     canonicalBeforeGeneration?: boolean;
     generationBeforeContent?: boolean;
+    outputBeforePublic?: boolean;
   },
 ) {
   const fail = (purpose: string): never => {
@@ -118,6 +120,8 @@ export async function assertPrivacyWaveRoleSafety(
         await assertCanonicalPrivacyTaskCatalog(client);
       else if (installed.generationBeforeContent)
         await assertGenerationPrivacyTaskCatalogForReview(client);
+      else if (installed.outputBeforePublic)
+        await assertOutputPrivacyTaskCatalogForReview(client);
       else await assertPrivacyTaskCatalog(client);
       await client.query("RESET SESSION AUTHORIZATION");
     }

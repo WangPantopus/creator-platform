@@ -27,6 +27,8 @@ import { assertGenerationWaveRoleSafety } from "./migration-generation-roles.js"
 import { generationPrivacySourcesRegistered } from "../src/db/generation-privacy-sources.js";
 import { registeredContentPrivacyProfile } from "../src/db/content-privacy-profile.js";
 import { registeredGenerationOutputProfile } from "../src/db/generation-output-profile.js";
+import publicAIReview from "../../../infra/migrations/reviews/20261007-public-ai.json" with { type: "json" };
+import { registeredPublicAIProfile } from "../src/db/public-ai-profile.js";
 import outputReview from "../../../infra/migrations/reviews/20261007-generation-first-visible.json" with { type: "json" };
 import contentReview from "../../../infra/migrations/reviews/20261007-content-privacy.json" with { type: "json" };
 import generationReview from "../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
@@ -61,15 +63,18 @@ async function activate() {
       "20261007-generation",
       "20261007-content",
       "20261007-generation-output",
+      "20261007-public-ai",
     ].includes(process.env.W8_MIGRATION_WAVE ?? ""),
-    "Select a reviewed W8_MIGRATION_WAVE (20261002, 20261002-privacy, 20261007-generation, 20261007-content or 20261007-generation-output).",
+    "Select a reviewed W8_MIGRATION_WAVE (20261002, 20261002-privacy, 20261007-generation, 20261007-content 20261007-generation-output or 20261007-public-ai).",
   );
   const connection = process.env.DATABASE_MIGRATION_URL;
   check(
     connection,
     "Provide a separate DATABASE_MIGRATION_URL; never a runtime credential.",
   );
-  const output = process.env.W8_MIGRATION_WAVE === "20261007-generation-output";
+  const publicAI = process.env.W8_MIGRATION_WAVE === "20261007-public-ai";
+  const output =
+    publicAI || process.env.W8_MIGRATION_WAVE === "20261007-generation-output";
   const content =
     output || process.env.W8_MIGRATION_WAVE === "20261007-content";
   const generation =
@@ -85,6 +90,7 @@ async function activate() {
     "20261007-generation",
     "20261007-content",
     "20261007-generation-output",
+    "20261007-public-ai",
   ];
   const packets = await Promise.all(
     ids.map(
@@ -97,7 +103,8 @@ async function activate() {
         ) as Packet,
     ),
   );
-  const [initial, prior, current, latest, repair] = packets as [
+  const [initial, prior, current, latest, repair, directory] = packets as [
+    Packet,
     Packet,
     Packet,
     Packet,
@@ -109,8 +116,8 @@ async function activate() {
       (entry, index) =>
         entry.schemaVersion === 1 &&
         entry.id === ids[index] &&
-        entry.baseline.length === [40, 57, 61, 100, 101][index] &&
-        entry.wave.length === [17, 4, 39, 1, 1][index],
+        entry.baseline.length === [40, 57, 61, 100, 101, 102][index] &&
+        entry.wave.length === [17, 4, 39, 1, 1, 2][index],
     ) &&
       canonical(prior.baseline) ===
         canonical([...initial.baseline, ...initial.wave]) &&
@@ -172,8 +179,25 @@ async function activate() {
         canonical(latest.outOfOrderException) &&
       sha256(
         await readFile(new URL(outputReview.baselineWave.path, repositoryRoot)),
-      ) === outputReview.baselineWave.sha256,
-    "The exact reviewed 40/57/61/100/101/102-source migration chain is required.",
+      ) === outputReview.baselineWave.sha256 &&
+      canonical(directory.baseline) ===
+        canonical([...repair.baseline, ...repair.wave]) &&
+      canonical(directory.wave) ===
+        canonical(
+          publicAIReview.sources.map(({ version, path, checksum }) => ({
+            version,
+            path,
+            checksum,
+          })),
+        ) &&
+      canonical(directory.outOfOrderException) ===
+        canonical(repair.outOfOrderException) &&
+      sha256(
+        await readFile(
+          new URL(publicAIReview.baselineWave.path, repositoryRoot),
+        ),
+      ) === publicAIReview.baselineWave.sha256,
+    "The exact reviewed 40/57/61/100/101/102/104-source migration chain is required.",
   );
   check(
     await generationPrivacySourcesRegistered(),
@@ -187,6 +211,10 @@ async function activate() {
     await registeredGenerationOutputProfile(),
     "The exact executable output repair source registration is required.",
   );
+  check(
+    await registeredPublicAIProfile(),
+    "Both exact public AI source registrations are required.",
+  );
   const packet = packets.find(
     (entry) => entry.id === process.env.W8_MIGRATION_WAVE,
   )!;
@@ -194,7 +222,7 @@ async function activate() {
     await readFile(new URL("infra/migrations.json", repositoryRoot), "utf8"),
   ) as { migrations: { version: string; path: string }[] };
   const sources = [...packet.baseline, ...packet.wave];
-  const registeredSources = [...repair.baseline, ...repair.wave];
+  const registeredSources = [...directory.baseline, ...directory.wave];
   check(
     new Set(registeredSources.map((s) => s.version.slice(0, 4))).size ===
       registeredSources.length,
@@ -345,14 +373,27 @@ async function activate() {
       !output || contentInstalled,
       "Output activation requires the complete reviewed101-source predecessor.",
     );
+    const installedPublic = before.filter((row) =>
+      directory.wave.some((source) => source.version === row.version),
+    ).length;
+    check(
+      installedPublic === 0 || installedPublic === directory.wave.length,
+      "Partial public AI wave is not an accepted baseline.",
+    );
+    check(
+      !publicAI || outputInstalled,
+      "Public AI activation requires the complete reviewed102 predecessor.",
+    );
     if (generationInstalled)
       await assertGenerationWaveRoleSafety(
         client,
-        outputInstalled
-          ? "generation-output"
-          : contentInstalled
-            ? "content-privacy"
-            : undefined,
+        installedPublic
+          ? "public-ai"
+          : outputInstalled
+            ? "generation-output"
+            : contentInstalled
+              ? "content-privacy"
+              : undefined,
       );
     else
       await assertWaveRoleSafety(client, {
@@ -377,6 +418,7 @@ async function activate() {
         ),
         canonicalBeforeGeneration: generationInstalled === 0,
         generationBeforeContent: generationInstalled > 0 && !contentInstalled,
+        outputBeforePublic: Boolean(outputInstalled && !installedPublic),
       });
     const tables = await waveDataTables(client);
     const beforeData = await waveDataDigest(client, tables);
@@ -468,11 +510,13 @@ async function activate() {
     const roleSafety = generation
       ? await assertGenerationWaveRoleSafety(
           client,
-          output
-            ? "generation-output"
-            : content
-              ? "content-privacy"
-              : undefined,
+          publicAI
+            ? "public-ai"
+            : output
+              ? "generation-output"
+              : content
+                ? "content-privacy"
+                : undefined,
         )
       : await assertWaveRoleSafety(client, {
           trust: true,
@@ -486,6 +530,7 @@ async function activate() {
           domain: true,
           canonicalBeforeGeneration: !generation,
           generationBeforeContent: generation && !content,
+          outputBeforePublic: output && !publicAI,
         })
       : undefined;
     check(

@@ -1,6 +1,7 @@
 import review from "../../../../infra/migrations/reviews/20261007-generation-first-visible.json" with { type: "json" };
 import type { PoolClient } from "pg";
 import { invariant } from "../core/errors.js";
+import { assertPublicAIExtensionIfRegistered } from "./public-ai-profile.js";
 import {
   assertRegisteredMigration,
   registeredMigration,
@@ -35,6 +36,7 @@ export async function assertGenerationOutputRepairIfRegistered(
   client: Pick<PoolClient, "query">,
   signal?: AbortSignal,
 ) {
+  await assertPublicAIExtensionIfRegistered(client, signal);
   if (await registeredGenerationOutputProfile(signal))
     await assertRegisteredMigration(
       client,
