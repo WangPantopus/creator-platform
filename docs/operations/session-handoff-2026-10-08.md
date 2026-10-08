@@ -19,9 +19,14 @@ Then connect/operate actual web/iOS/Android comparison choice and sanitization,
 withdrawal/expiry/export, and the legitimate preserved revision13 upgrade.
 Carry every remaining milestone in the complete finish plan.
 
+PR347 is open, stacked on346; refresh exact-head checks and retarget after346.
 PR346 is still open at3d301364c; refresh all11 checks and merge when ready.
-PR345's separate main37812330409 is still running. Existing app hosts remain
-compiled5bd6b6215 on57304 and web3119; both native devices remain stopped.
+PR345's separate main37812330409 is still running. The actual backend now runs
+compiledb93e5d7c2 on57304 through `native-e2e/launch43-backend-comparison-runtime.mjs`,
+log `backend-comparison-runtime-01.log`. Web3119 reconfirmed the same fan account
+and downloaded both original source exports with exact hashes. Before/after
+custody retains all18 generations/69 usage rows and the original publication.
+No comparison source was activated. Both native devices remain stopped.
 
 ## Active continuation — original held comparison feed
 

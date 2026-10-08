@@ -58,6 +58,21 @@ was refused; the corrected read kept that bound. The initial legacy inventory
 counted only newline-terminated records; its preserved v2 parses the final JSON
 record as well. Neither failure changed actual application data.
 
+## Actual existing-app compatibility
+
+Compiled source `b93e5d7c28dbd6e0ea055fb43e21f3f8e82069a7` started successfully
+on original copy43 after a normal owned shutdown during actual idle discovery SQL.
+The launched Chrome app reconfirmed the same fictional fan account and displayed
+its original eight-domain completed export. Both [actual Agent and Conversation
+downloads](comparison-runtime-web-export-receipt.json) match their saved hashes.
+No replacement export or provider call was requested. [Screenshot](comparison-runtime-original-export.png).
+[Before](operation43-compatibility-comparison-runtime-before-20261008.json) and
+[after](operation43-compatibility-comparison-runtime-after-20261008.json) preserve
+all18 generations,69 known usage rows,36815 microdollars,51 settled units and the
+original revision13 publication. [Normal shutdown receipt](shutdown-comparison-runtime-5bd-stop.json).
+This qualifies compatibility of the existing web flow; comparison sources remain
+unregistered. Native devices remain stopped with their application state intact.
+
 ## Remaining activation work
 
 Create and operate an exact migration wave against a closed, populated restore

@@ -1,0 +1,23 @@
+{
+  "observedAt": "2026-10-08T17:31:00.348477+00:00",
+  "release": "b93e5d7c28dbd6e0ea055fb43e21f3f8e82069a7",
+  "database": "creator_generation_journey43_20261007",
+  "originalJobId": "f6a7410b-7db9-4da6-a4ca-901d7a90a317",
+  "action": "actual Chrome same-account sign-in, original completed export and both source-domain downloads",
+  "newExportRequested": false,
+  "comparisonMigrationsActivated": false,
+  "downloads": [
+    {
+      "domain": "agent",
+      "bytes": 39,
+      "sha256": "8a812b313b5c91718e7be64d3cba955042eedb455081162baa54cd500494d894",
+      "exactSavedArtifact": true
+    },
+    {
+      "domain": "conversation",
+      "bytes": 198980,
+      "sha256": "a3d5e49ea90b5acab919fc9b05527aac53df8f51c2923f3f6ebf23b5a8a30104",
+      "exactSavedArtifact": true
+    }
+  ]
+}
