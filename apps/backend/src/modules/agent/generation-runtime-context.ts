@@ -384,7 +384,7 @@ export class PreparedGenerationRuntimeContext {
       value.creatorId === scope.creatorId &&
         value.compiledHash === query.compiledHash &&
         value.compiledHash === facts.version.compiledHash &&
-        value.pipelineHash === this.service.pipeline.fingerprint &&
+        this.service.pipeline.supportsPublishedEngine(value.pipelineHash) &&
         compile(
           DraftConfig.parse(facts.version.configuration),
           value.creatorName,

@@ -1,0 +1,116 @@
+{
+  "scope": "Offline assembly using actual closed-copy43 saved messages and approved public source. No provider request or authority issued; not a replacement live generation.",
+  "models": {
+    "small": "gpt-4.1-mini-2025-04-14",
+    "large": "gpt-4.1-2025-04-14"
+  },
+  "results": [
+    {
+      "messageId": "42bb2588-b5df-4618-87ea-2fe8a90e861a",
+      "sequence": 1,
+      "historyMessages": 1,
+      "before": {
+        "evidence": 1,
+        "modelTokens": 297,
+        "bytes": 1220
+      },
+      "after": {
+        "evidence": 1,
+        "modelTokens": 297,
+        "bytes": 1220
+      }
+    },
+    {
+      "messageId": "d66c8796-4dfa-46b4-a8a4-a99f2a273cd0",
+      "sequence": 3,
+      "historyMessages": 3,
+      "before": {
+        "evidence": 1,
+        "modelTokens": 395,
+        "bytes": 1742
+      },
+      "after": {
+        "evidence": 1,
+        "modelTokens": 395,
+        "bytes": 1742
+      }
+    },
+    {
+      "messageId": "b1a5fc30-1557-4d43-afcb-cb8d78e5975d",
+      "sequence": 5,
+      "historyMessages": 5,
+      "before": {
+        "evidence": 1,
+        "modelTokens": 439,
+        "bytes": 1922
+      },
+      "after": {
+        "evidence": 1,
+        "modelTokens": 439,
+        "bytes": 1922
+      }
+    },
+    {
+      "messageId": "ea8dc3a0-c46d-4e8c-bcb0-f940364afa3e",
+      "sequence": 7,
+      "historyMessages": 7,
+      "before": {
+        "evidence": 1,
+        "modelTokens": 506,
+        "bytes": 2226
+      },
+      "after": {
+        "evidence": 1,
+        "modelTokens": 506,
+        "bytes": 2226
+      }
+    },
+    {
+      "messageId": "c0a9a8de-d79e-4839-a0e2-b5214c674b0c",
+      "sequence": 9,
+      "historyMessages": 9,
+      "before": {
+        "evidence": 0,
+        "modelTokens": 400,
+        "bytes": 1881
+      },
+      "after": {
+        "evidence": 1,
+        "modelTokens": 589,
+        "bytes": 2648
+      }
+    },
+    {
+      "messageId": "bc0eb807-17a3-47f4-aab9-32526b3e014a",
+      "sequence": 11,
+      "historyMessages": 11,
+      "before": {
+        "evidence": 0,
+        "modelTokens": 443,
+        "bytes": 2041
+      },
+      "after": {
+        "evidence": 1,
+        "modelTokens": 632,
+        "bytes": 2808
+      }
+    },
+    {
+      "messageId": "e5f9c80d-a7ac-4d31-a617-99816630ed97",
+      "sequence": 13,
+      "historyMessages": 13,
+      "before": {
+        "evidence": 0,
+        "modelTokens": 473,
+        "bytes": 2149
+      },
+      "after": {
+        "evidence": 1,
+        "modelTokens": 684,
+        "bytes": 3027
+      }
+    }
+  ],
+  "literalTokens": 14,
+  "unknownModelRefused": true
+}

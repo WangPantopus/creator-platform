@@ -1,0 +1,589 @@
+{
+  "originalDatabasePreserved": {
+    "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+    "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+    "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+    "dataSha256": "add04093be921cf22d124ad4ce71d9942d4b1e215433050fa5e26670105bdf10"
+  },
+  "originalRolesPreservedExceptNewReviewedPublicAIRole": true,
+  "temporaryPasswordsRemoved": true,
+  "temporaryGrowthRoleDropped": true,
+  "snapshots": [
+    {
+      "database": "creator_generation_journey19_20261007",
+      "closed": true,
+      "alone": true,
+      "ledgerRows": 105,
+      "originalUsageRows": 658,
+      "originalUsageSha256": "18c9ec4b950b4e914b672a0c7c5870a95c5c3780de23cd6181b7996eacae8553"
+    },
+    {
+      "database": "creator_generation_journey20_20261007",
+      "closed": true,
+      "alone": true,
+      "ledgerRows": 102,
+      "originalUsageRows": 658,
+      "originalUsageSha256": "18c9ec4b950b4e914b672a0c7c5870a95c5c3780de23cd6181b7996eacae8553"
+    },
+    {
+      "database": "creator_generation_journey21_20261007",
+      "closed": true,
+      "alone": true,
+      "ledgerRows": 104,
+      "originalUsageRows": 658,
+      "originalUsageSha256": "18c9ec4b950b4e914b672a0c7c5870a95c5c3780de23cd6181b7996eacae8553"
+    },
+    {
+      "database": "creator_generation_journey22_20261007",
+      "closed": true,
+      "alone": true,
+      "ledgerRows": 104,
+      "originalUsageRows": 658,
+      "originalUsageSha256": "18c9ec4b950b4e914b672a0c7c5870a95c5c3780de23cd6181b7996eacae8553"
+    },
+    {
+      "database": "creator_generation_journey23_20261007",
+      "closed": true,
+      "alone": true,
+      "ledgerRows": 105,
+      "originalUsageRows": 658,
+      "originalUsageSha256": "18c9ec4b950b4e914b672a0c7c5870a95c5c3780de23cd6181b7996eacae8553"
+    },
+    {
+      "database": "creator_generation_journey24_20261007",
+      "closed": true,
+      "alone": true,
+      "ledgerRows": 104,
+      "originalUsageRows": 658,
+      "originalUsageSha256": "18c9ec4b950b4e914b672a0c7c5870a95c5c3780de23cd6181b7996eacae8553"
+    },
+    {
+      "database": "creator_generation_journey25_20261007",
+      "closed": true,
+      "alone": true,
+      "ledgerRows": 105,
+      "originalUsageRows": 658,
+      "originalUsageSha256": "18c9ec4b950b4e914b672a0c7c5870a95c5c3780de23cd6181b7996eacae8553"
+    },
+    {
+      "database": "creator_generation_journey26_20261007",
+      "closed": true,
+      "alone": true,
+      "ledgerRows": 104,
+      "originalUsageRows": 658,
+      "originalUsageSha256": "18c9ec4b950b4e914b672a0c7c5870a95c5c3780de23cd6181b7996eacae8553"
+    },
+    {
+      "database": "creator_generation_journey27_20261007",
+      "closed": true,
+      "alone": true,
+      "ledgerRows": 105,
+      "originalUsageRows": 658,
+      "originalUsageSha256": "18c9ec4b950b4e914b672a0c7c5870a95c5c3780de23cd6181b7996eacae8553"
+    },
+    {
+      "database": "creator_generation_journey28_20261007",
+      "closed": true,
+      "alone": true,
+      "ledgerRows": 104,
+      "originalUsageRows": 658,
+      "originalUsageSha256": "18c9ec4b950b4e914b672a0c7c5870a95c5c3780de23cd6181b7996eacae8553"
+    },
+    {
+      "database": "creator_generation_journey29_20261007",
+      "closed": true,
+      "alone": true,
+      "ledgerRows": 105,
+      "originalUsageRows": 658,
+      "originalUsageSha256": "18c9ec4b950b4e914b672a0c7c5870a95c5c3780de23cd6181b7996eacae8553"
+    },
+    {
+      "database": "creator_generation_journey31_20261007",
+      "closed": true,
+      "alone": true,
+      "ledgerRows": 106,
+      "originalUsageRows": 658,
+      "originalUsageSha256": "18c9ec4b950b4e914b672a0c7c5870a95c5c3780de23cd6181b7996eacae8553"
+    },
+    {
+      "database": "creator_generation_journey32_20261007",
+      "closed": true,
+      "alone": true,
+      "ledgerRows": 104,
+      "originalUsageRows": 658,
+      "originalUsageSha256": "18c9ec4b950b4e914b672a0c7c5870a95c5c3780de23cd6181b7996eacae8553"
+    },
+    {
+      "database": "creator_generation_journey33_20261007",
+      "closed": true,
+      "alone": true,
+      "ledgerRows": 105,
+      "originalUsageRows": 658,
+      "originalUsageSha256": "18c9ec4b950b4e914b672a0c7c5870a95c5c3780de23cd6181b7996eacae8553"
+    },
+    {
+      "database": "creator_generation_journey34_20261007",
+      "closed": true,
+      "alone": true,
+      "ledgerRows": 106,
+      "originalUsageRows": 658,
+      "originalUsageSha256": "18c9ec4b950b4e914b672a0c7c5870a95c5c3780de23cd6181b7996eacae8553"
+    },
+    {
+      "database": "creator_generation_journey35_20261007",
+      "closed": true,
+      "alone": true,
+      "ledgerRows": 105,
+      "originalUsageRows": 658,
+      "originalUsageSha256": "18c9ec4b950b4e914b672a0c7c5870a95c5c3780de23cd6181b7996eacae8553"
+    },
+    {
+      "database": "creator_generation_journey36_20261007",
+      "closed": true,
+      "alone": true,
+      "ledgerRows": 106,
+      "originalUsageRows": 658,
+      "originalUsageSha256": "18c9ec4b950b4e914b672a0c7c5870a95c5c3780de23cd6181b7996eacae8553"
+    },
+    {
+      "database": "creator_generation_journey37_20261007",
+      "closed": true,
+      "alone": true,
+      "ledgerRows": 106,
+      "originalUsageRows": 658,
+      "originalUsageSha256": "18c9ec4b950b4e914b672a0c7c5870a95c5c3780de23cd6181b7996eacae8553"
+    },
+    {
+      "database": "creator_generation_journey38_20261007",
+      "closed": true,
+      "alone": true,
+      "ledgerRows": 106,
+      "originalUsageRows": 658,
+      "originalUsageSha256": "18c9ec4b950b4e914b672a0c7c5870a95c5c3780de23cd6181b7996eacae8553"
+    },
+    {
+      "database": "creator_generation_journey39_20261007",
+      "closed": true,
+      "alone": true,
+      "ledgerRows": 106,
+      "originalUsageRows": 658,
+      "originalUsageSha256": "18c9ec4b950b4e914b672a0c7c5870a95c5c3780de23cd6181b7996eacae8553"
+    },
+    {
+      "database": "creator_generation_journey40_20261007",
+      "closed": true,
+      "alone": true,
+      "ledgerRows": 102,
+      "originalUsageRows": 658,
+      "originalUsageSha256": "18c9ec4b950b4e914b672a0c7c5870a95c5c3780de23cd6181b7996eacae8553"
+    },
+    {
+      "database": "creator_generation_journey41_20261007",
+      "closed": true,
+      "alone": true,
+      "ledgerRows": 104,
+      "originalUsageRows": 658,
+      "originalUsageSha256": "18c9ec4b950b4e914b672a0c7c5870a95c5c3780de23cd6181b7996eacae8553"
+    },
+    {
+      "database": "creator_generation_journey42_20261007",
+      "closed": true,
+      "alone": true,
+      "ledgerRows": 105,
+      "originalUsageRows": 658,
+      "originalUsageSha256": "18c9ec4b950b4e914b672a0c7c5870a95c5c3780de23cd6181b7996eacae8553"
+    }
+  ],
+  "attempts": [
+    {
+      "database": "creator_generation_journey19_20261007",
+      "generations": [
+        {
+          "id": "a9bd44b5-5568-44f2-8b97-2aea3c998333",
+          "state": "failed",
+          "accepted_at": "2026-10-08T01:51:06.851Z",
+          "first_visible_at": null,
+          "completed_at": "2026-10-08T01:52:08.243Z",
+          "last_sequence": 0,
+          "lease_until": null
+        },
+        {
+          "id": "aba102f4-b1eb-4fb8-9db5-d75ea0674c52",
+          "state": "failed",
+          "accepted_at": "2026-10-08T01:54:10.677Z",
+          "first_visible_at": null,
+          "completed_at": "2026-10-08T01:55:12.223Z",
+          "last_sequence": 0,
+          "lease_until": null
+        },
+        {
+          "id": "cf5c730a-c3d5-44c1-9098-cd734acc5632",
+          "state": "delivered",
+          "accepted_at": "2026-10-08T01:58:32.080Z",
+          "first_visible_at": "2026-10-08T01:59:00.720Z",
+          "completed_at": "2026-10-08T01:59:18.250Z",
+          "last_sequence": 2,
+          "lease_until": null
+        },
+        {
+          "id": "1feeadfc-e583-4ef1-99a9-0ac5f4561998",
+          "state": "failed",
+          "accepted_at": "2026-10-08T02:01:53.349Z",
+          "first_visible_at": null,
+          "completed_at": "2026-10-08T02:21:22.195Z",
+          "last_sequence": 0,
+          "lease_until": null
+        },
+        {
+          "id": "c6fb0371-b409-4aa9-97d8-75e47f0beee5",
+          "state": "failed",
+          "accepted_at": "2026-10-08T02:22:12.116Z",
+          "first_visible_at": null,
+          "completed_at": "2026-10-08T02:22:14.982Z",
+          "last_sequence": 0,
+          "lease_until": null
+        }
+      ],
+      "usage": [
+        {
+          "generation_id": "1feeadfc-e583-4ef1-99a9-0ac5f4561998",
+          "calls": 1,
+          "admitted": 0,
+          "unknown": 1,
+          "known_cost_micros": null
+        },
+        {
+          "generation_id": "a9bd44b5-5568-44f2-8b97-2aea3c998333",
+          "calls": 2,
+          "admitted": 0,
+          "unknown": 0,
+          "known_cost_micros": "91"
+        },
+        {
+          "generation_id": "aba102f4-b1eb-4fb8-9db5-d75ea0674c52",
+          "calls": 1,
+          "admitted": 0,
+          "unknown": 0,
+          "known_cost_micros": "91"
+        },
+        {
+          "generation_id": "cf5c730a-c3d5-44c1-9098-cd734acc5632",
+          "calls": 5,
+          "admitted": 0,
+          "unknown": 0,
+          "known_cost_micros": "3147"
+        }
+      ],
+      "reservations": [
+        {
+          "key": "generation:1feeadfc-e583-4ef1-99a9-0ac5f4561998",
+          "id": "d6f9be69-d293-4bb5-b1ca-5f50abda8b5d",
+          "state": "reserved",
+          "units": 60,
+          "settled_units": null,
+          "output_delivered": false,
+          "original_settled_at": null
+        },
+        {
+          "key": "generation:a9bd44b5-5568-44f2-8b97-2aea3c998333",
+          "id": "206c26aa-cb45-40c7-97e7-43a79a7468f1",
+          "state": "released",
+          "units": 60,
+          "settled_units": 0,
+          "output_delivered": false,
+          "original_settled_at": "2026-10-08T01:52:09.791Z"
+        },
+        {
+          "key": "generation:aba102f4-b1eb-4fb8-9db5-d75ea0674c52",
+          "id": "5b780a1e-9059-4402-a424-c361f45f5721",
+          "state": "released",
+          "units": 60,
+          "settled_units": 0,
+          "output_delivered": false,
+          "original_settled_at": "2026-10-08T01:55:13.813Z"
+        },
+        {
+          "key": "generation:c6fb0371-b409-4aa9-97d8-75e47f0beee5",
+          "id": "7ef5eefb-290d-445c-840a-17d0d6993991",
+          "state": "released",
+          "units": 60,
+          "settled_units": 0,
+          "output_delivered": false,
+          "original_settled_at": "2026-10-08T02:22:16.523Z"
+        },
+        {
+          "key": "generation:cf5c730a-c3d5-44c1-9098-cd734acc5632",
+          "id": "7373074b-c5c0-4832-b3d6-a8f3642b5be7",
+          "state": "consumed",
+          "units": 60,
+          "settled_units": 4,
+          "output_delivered": true,
+          "original_settled_at": "2026-10-08T01:59:20.015Z"
+        }
+      ]
+    },
+    {
+      "database": "creator_generation_journey23_20261007",
+      "generations": [
+        {
+          "id": "5cfed510-ccf1-4778-9e3b-bf34b6a1a0fe",
+          "state": "failed",
+          "accepted_at": "2026-10-08T02:30:35.220Z",
+          "first_visible_at": null,
+          "completed_at": "2026-10-08T02:31:03.509Z",
+          "last_sequence": 0,
+          "lease_until": null
+        },
+        {
+          "id": "6b07b496-4f97-4f7a-bb07-0ab099ee1633",
+          "state": "failed",
+          "accepted_at": "2026-10-08T02:35:53.736Z",
+          "first_visible_at": null,
+          "completed_at": "2026-10-08T02:35:56.155Z",
+          "last_sequence": 0,
+          "lease_until": null
+        }
+      ],
+      "usage": [
+        {
+          "generation_id": "5cfed510-ccf1-4778-9e3b-bf34b6a1a0fe",
+          "calls": 3,
+          "admitted": 0,
+          "unknown": 1,
+          "known_cost_micros": "92"
+        }
+      ],
+      "reservations": [
+        {
+          "key": "generation:5cfed510-ccf1-4778-9e3b-bf34b6a1a0fe",
+          "id": "ab010a1a-64e9-4ce8-8392-56602c2bf976",
+          "state": "reserved",
+          "units": 60,
+          "settled_units": null,
+          "output_delivered": false,
+          "original_settled_at": null
+        },
+        {
+          "key": "generation:6b07b496-4f97-4f7a-bb07-0ab099ee1633",
+          "id": "248146f7-88c0-4236-ad88-ec1c707f8278",
+          "state": "released",
+          "units": 60,
+          "settled_units": 0,
+          "output_delivered": false,
+          "original_settled_at": "2026-10-08T02:35:57.826Z"
+        }
+      ]
+    },
+    {
+      "database": "creator_generation_journey25_20261007",
+      "generations": [
+        {
+          "id": "94898f73-00cb-4cfc-a933-d369470e68ab",
+          "state": "failed",
+          "accepted_at": "2026-10-08T02:46:02.561Z",
+          "first_visible_at": null,
+          "completed_at": "2026-10-08T02:46:30.901Z",
+          "last_sequence": 0,
+          "lease_until": null
+        }
+      ],
+      "usage": [
+        {
+          "generation_id": "94898f73-00cb-4cfc-a933-d369470e68ab",
+          "calls": 3,
+          "admitted": 0,
+          "unknown": 1,
+          "known_cost_micros": "91"
+        }
+      ],
+      "reservations": [
+        {
+          "key": "generation:94898f73-00cb-4cfc-a933-d369470e68ab",
+          "id": "28c36721-440e-4daa-ace9-7e78210bc58b",
+          "state": "reserved",
+          "units": 60,
+          "settled_units": null,
+          "output_delivered": false,
+          "original_settled_at": null
+        }
+      ]
+    },
+    {
+      "database": "creator_generation_journey27_20261007",
+      "generations": [
+        {
+          "id": "b93e508b-cfc9-4727-b631-2eabd5d72f6c",
+          "state": "interrupted",
+          "accepted_at": "2026-10-08T02:50:37.632Z",
+          "first_visible_at": "2026-10-08T02:51:04.074Z",
+          "completed_at": "2026-10-08T02:51:39.843Z",
+          "last_sequence": 3,
+          "lease_until": null
+        },
+        {
+          "id": "077525f6-a141-4ac3-ad71-1780bc6089d0",
+          "state": "delivered",
+          "accepted_at": "2026-10-08T02:53:31.981Z",
+          "first_visible_at": "2026-10-08T02:53:56.612Z",
+          "completed_at": "2026-10-08T02:54:01.502Z",
+          "last_sequence": 1,
+          "lease_until": null
+        },
+        {
+          "id": "75335be6-9433-46d4-b52c-bece9fd14411",
+          "state": "failed",
+          "accepted_at": "2026-10-08T02:57:37.396Z",
+          "first_visible_at": null,
+          "completed_at": "2026-10-08T02:58:39.309Z",
+          "last_sequence": 0,
+          "lease_until": null
+        }
+      ],
+      "usage": [
+        {
+          "generation_id": "077525f6-a141-4ac3-ad71-1780bc6089d0",
+          "calls": 4,
+          "admitted": 0,
+          "unknown": 0,
+          "known_cost_micros": "2655"
+        },
+        {
+          "generation_id": "75335be6-9433-46d4-b52c-bece9fd14411",
+          "calls": 1,
+          "admitted": 0,
+          "unknown": 1,
+          "known_cost_micros": null
+        },
+        {
+          "generation_id": "b93e508b-cfc9-4727-b631-2eabd5d72f6c",
+          "calls": 6,
+          "admitted": 0,
+          "unknown": 0,
+          "known_cost_micros": "3886"
+        }
+      ],
+      "reservations": [
+        {
+          "key": "generation:077525f6-a141-4ac3-ad71-1780bc6089d0",
+          "id": "4559c1bf-0d86-469a-bfcb-0005484bacd9",
+          "state": "consumed",
+          "units": 60,
+          "settled_units": 3,
+          "output_delivered": true,
+          "original_settled_at": "2026-10-08T02:54:03.165Z"
+        },
+        {
+          "key": "generation:75335be6-9433-46d4-b52c-bece9fd14411",
+          "id": "a91b5ddb-a6eb-4d0d-bb10-8118fd7cc5e8",
+          "state": "reserved",
+          "units": 60,
+          "settled_units": null,
+          "output_delivered": false,
+          "original_settled_at": null
+        },
+        {
+          "key": "generation:b93e508b-cfc9-4727-b631-2eabd5d72f6c",
+          "id": "36319d1f-dfa5-40d8-9281-1a6be1da69c9",
+          "state": "consumed",
+          "units": 60,
+          "settled_units": 4,
+          "output_delivered": true,
+          "original_settled_at": "2026-10-08T02:51:41.391Z"
+        }
+      ]
+    },
+    {
+      "database": "creator_generation_journey31_20261007",
+      "generations": [
+        {
+          "id": "7c8cc2cf-88b5-4c1f-8d1a-d121229668ff",
+          "state": "delivered",
+          "accepted_at": "2026-10-08T03:39:53.531Z",
+          "first_visible_at": "2026-10-08T03:40:16.514Z",
+          "completed_at": "2026-10-08T03:40:20.523Z",
+          "last_sequence": 1,
+          "lease_until": null
+        },
+        {
+          "id": "8ec016f9-3f3f-4445-a637-dd1ca3b9d5a0",
+          "state": "interrupted",
+          "accepted_at": "2026-10-08T03:41:15.427Z",
+          "first_visible_at": "2026-10-08T03:41:37.513Z",
+          "completed_at": "2026-10-08T03:42:26.783Z",
+          "last_sequence": 1,
+          "lease_until": null
+        }
+      ],
+      "usage": [
+        {
+          "generation_id": "7c8cc2cf-88b5-4c1f-8d1a-d121229668ff",
+          "calls": 4,
+          "admitted": 0,
+          "unknown": 0,
+          "known_cost_micros": "2584"
+        },
+        {
+          "generation_id": "8ec016f9-3f3f-4445-a637-dd1ca3b9d5a0",
+          "calls": 4,
+          "admitted": 0,
+          "unknown": 1,
+          "known_cost_micros": "423"
+        }
+      ],
+      "reservations": [
+        {
+          "key": "generation:7c8cc2cf-88b5-4c1f-8d1a-d121229668ff",
+          "id": "1ea4a602-0e6b-4fc8-8cee-965c2b9a5f94",
+          "state": "consumed",
+          "units": 60,
+          "settled_units": 3,
+          "output_delivered": true,
+          "original_settled_at": "2026-10-08T03:40:21.952Z"
+        },
+        {
+          "key": "generation:8ec016f9-3f3f-4445-a637-dd1ca3b9d5a0",
+          "id": "3e42482a-4f29-41f8-bb53-fe201143b361",
+          "state": "reserved",
+          "units": 60,
+          "settled_units": null,
+          "output_delivered": true,
+          "original_settled_at": null
+        }
+      ]
+    },
+    {
+      "database": "creator_generation_journey34_20261007",
+      "generations": [
+        {
+          "id": "1a045aa4-b3d6-4df9-8156-12d09f6a92af",
+          "state": "interrupted",
+          "accepted_at": "2026-10-08T03:50:53.923Z",
+          "first_visible_at": "2026-10-08T03:51:18.166Z",
+          "completed_at": "2026-10-08T03:51:59.764Z",
+          "last_sequence": 1,
+          "lease_until": null
+        }
+      ],
+      "usage": [
+        {
+          "generation_id": "1a045aa4-b3d6-4df9-8156-12d09f6a92af",
+          "calls": 5,
+          "admitted": 0,
+          "unknown": 2,
+          "known_cost_micros": "425"
+        }
+      ],
+      "reservations": [
+        {
+          "key": "generation:1a045aa4-b3d6-4df9-8156-12d09f6a92af",
+          "id": "c85001cb-3e75-4b80-8021-51618f9e8104",
+          "state": "reserved",
+          "units": 60,
+          "settled_units": null,
+          "output_delivered": true,
+          "original_settled_at": null
+        }
+      ]
+    }
+  ]
+}

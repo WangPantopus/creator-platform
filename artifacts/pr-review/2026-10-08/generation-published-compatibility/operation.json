@@ -1,0 +1,118 @@
+{
+  "scope": "Fictional Maya, authorized actual provider and development licence, existing labelled copies. No republishing, synthetic samples, historical rewrites, or production qualification.",
+  "revision14": {
+    "database": "creator_generation_journey45_20261007",
+    "publication": [
+      {
+        "id": "3219b16a-f36c-4f94-8d94-d1ad9cbc526d",
+        "number": 1,
+        "state": "live",
+        "compiled_hash": "9e04741be62c28029b4c931281253c2c2992dd578be37651a3aea8a85c2aea4c",
+        "pipeline_hash": "8421442dd35528cac294c6937df22af9f15b18c48ed63ac96c212ef2ddf7e0a7",
+        "published_at": "2026-10-08T06:27:02.237Z"
+      }
+    ],
+    "newGenerations": [
+      {
+        "id": "b8ab9062-8b4f-4dfe-a2fd-ed44174179b3",
+        "state": "delivered",
+        "accepted_at": "2026-10-08T07:06:30.336Z",
+        "first_visible_at": "2026-10-08T07:06:54.022Z",
+        "completed_at": "2026-10-08T07:06:56.002Z",
+        "last_sequence": 1,
+        "acceptedToFirstStoredMs": 23686,
+        "acceptedToTerminalMs": 25666,
+        "calls": 4,
+        "costMicros": 4032,
+        "observation": "compiled guarded fallback; usefulness failure, rejected proposal not captured",
+        "settledUnits": 5
+      },
+      {
+        "id": "5aa45fea-b8cd-4ad8-8b7c-ac4d2cd13af5",
+        "state": "delivered",
+        "accepted_at": "2026-10-08T07:09:24.421Z",
+        "first_visible_at": "2026-10-08T07:09:44.510Z",
+        "completed_at": "2026-10-08T07:09:47.638Z",
+        "last_sequence": 1,
+        "acceptedToFirstStoredMs": 20089,
+        "acceptedToTerminalMs": 23217,
+        "calls": 4,
+        "costMicros": 3941,
+        "observation": "source diagnostic: cited supported answer",
+        "settledUnits": 4
+      },
+      {
+        "id": "9f15834f-d1bd-46b1-b9e9-cd33ef1dc69a",
+        "state": "delivered",
+        "accepted_at": "2026-10-08T07:11:14.914Z",
+        "first_visible_at": "2026-10-08T07:11:35.388Z",
+        "completed_at": "2026-10-08T07:11:38.894Z",
+        "last_sequence": 1,
+        "acceptedToFirstStoredMs": 20474,
+        "acceptedToTerminalMs": 23980,
+        "calls": 4,
+        "costMicros": 2250,
+        "observation": "source diagnostic repeated prompt: cited supported answer",
+        "settledUnits": 3
+      },
+      {
+        "id": "4dc891f3-c9ca-4a31-ac32-17532123822d",
+        "state": "delivered",
+        "accepted_at": "2026-10-08T07:31:20.374Z",
+        "first_visible_at": "2026-10-08T07:31:40.745Z",
+        "completed_at": "2026-10-08T07:31:44.194Z",
+        "last_sequence": 1,
+        "acceptedToFirstStoredMs": 20371,
+        "acceptedToTerminalMs": 23820,
+        "calls": 4,
+        "costMicros": 2425,
+        "observation": "final compiled build: cited supported answer",
+        "settledUnits": 3
+      }
+    ],
+    "original12UsageRowsPreserved": true,
+    "totalUsageRows": 28,
+    "totalCostMicros": 24102,
+    "totalSettledUnits": 29,
+    "exactRestartPreserved": true,
+    "beforeRestartUsageSha256": "899842c1e7e8cb37dfa8e0992335c4236e4d003e5c2774dfbcc9066e32bd15f7",
+    "afterRestartUsageSha256": "899842c1e7e8cb37dfa8e0992335c4236e4d003e5c2774dfbcc9066e32bd15f7"
+  },
+  "revision13": {
+    "database": "creator_generation_journey43_20261007",
+    "publication": [
+      {
+        "id": "3299afea-46ee-47cd-9f4b-e630dfc84bce",
+        "number": 1,
+        "state": "live",
+        "compiled_hash": "9e04741be62c28029b4c931281253c2c2992dd578be37651a3aea8a85c2aea4c",
+        "pipeline_hash": "1d09f184e7ddb34968bb602eb82f4705d8ceffb3499841aa6892247c40d28161",
+        "published_at": "2026-10-08T04:45:38.268Z"
+      }
+    ],
+    "newGenerations": [
+      {
+        "id": "cda3c3b8-5f3e-406f-bc78-b6e0a22ee457",
+        "state": "delivered",
+        "accepted_at": "2026-10-08T07:38:24.486Z",
+        "first_visible_at": "2026-10-08T07:38:44.570Z",
+        "completed_at": "2026-10-08T07:38:47.623Z",
+        "last_sequence": 1,
+        "acceptedToFirstStoredMs": 20084,
+        "acceptedToTerminalMs": 23137,
+        "calls": 4,
+        "costMicros": 1092,
+        "observation": "final compiled build: original revision13 greeting, not useful-knowledge latency qualification",
+        "settledUnits": 2
+      }
+    ],
+    "existing7GenerationsAndAllMessagesReservationsUsageAndEvaluationPreserved": true
+  },
+  "cleanup": {
+    "applicationAndWebExitedNormally": true,
+    "agentBrowserTabsClosed": true,
+    "temporaryCredentialsRemoved": true,
+    "copiesClosed": 27,
+    "dockerStopped": true
+  }
+}

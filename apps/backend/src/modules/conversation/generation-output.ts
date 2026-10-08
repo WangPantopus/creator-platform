@@ -1,3 +1,4 @@
+import { catalogueQuery } from "../../core/catalogue-query.js";
 import { createHash } from "node:crypto";
 import { Client, type Pool, type PoolClient } from "pg";
 import { z } from "zod";
@@ -385,8 +386,14 @@ export class PreparedGenerationConversationOutput {
       await this.identity.assertCatalogueInTransaction(client);
       await assertGenerationOutputCursorCatalogue(client);
       const installed = (
-        await client.query<{ ready: boolean; definition: string }>(
-          `SELECT session_user='creator_generation_worker' AND current_user=session_user
+        await catalogueQuery<{ ready: boolean; definition: string }>(
+          client,
+          `WITH column_relations AS MATERIALIZED (
+            SELECT c.oid,c.relname,n.nspname FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+            WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
+             AND CASE WHEN c.relkind IN('r','p','v','m','f') THEN
+              has_any_column_privilege($3,c.oid,'SELECT,INSERT,UPDATE,REFERENCES') ELSE false END
+           ) SELECT session_user='creator_generation_worker' AND current_user=session_user
          AND current_setting('transaction_isolation')='read committed'
          AND EXISTS(SELECT FROM creator.schema_migration WHERE version=$1 AND checksum=$2)
          AND p.prokind='f' AND p.prosecdef AND p.provolatile='v' AND p.proconfig=ARRAY['search_path=pg_catalog']
@@ -401,12 +408,11 @@ export class PreparedGenerationConversationOutput {
           WHERE ns.nspname !~ '^pg_' AND ns.nspname<>'information_schema' AND CASE WHEN c.relkind IN('r','p','v','m','f') THEN
            has_table_privilege($3,c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
            WHEN c.relkind='S' THEN has_sequence_privilege($3,c.oid,'SELECT,UPDATE,USAGE') ELSE false END)
-         AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace ns ON ns.oid=c.relnamespace
+         AND NOT EXISTS(SELECT FROM column_relations c
           JOIN pg_attribute a ON a.attrelid=c.oid AND a.attnum>0 AND NOT a.attisdropped
           CROSS JOIN unnest(ARRAY['SELECT','INSERT','UPDATE','REFERENCES']) privilege
-          WHERE ns.nspname !~ '^pg_' AND ns.nspname<>'information_schema' AND CASE WHEN c.relkind IN('r','p','v','m','f') THEN
-           has_column_privilege($3,c.oid,a.attnum,privilege) ELSE false END
-          AND NOT coalesce(($5::jsonb->(ns.nspname||'.'||c.relname)->privilege) ? a.attname,false))
+          WHERE has_column_privilege($3,c.oid,a.attnum,privilege)
+          AND NOT coalesce(($5::jsonb->(c.nspname||'.'||c.relname)->privilege) ? a.attname,false))
          AND NOT EXISTS(SELECT FROM pg_namespace ns WHERE ns.nspname !~ '^pg_' AND ns.nspname<>'information_schema'
           AND has_schema_privilege($3,ns.oid,'CREATE'))
          AND has_function_privilege($3,to_regprocedure('creator.generation_scope_matches(uuid,uuid)'),'EXECUTE')

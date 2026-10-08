@@ -1,0 +1,31 @@
+{
+  "installedAt": "2026-10-08T06:30:06.196Z",
+  "existing": ["message-4afe3a14-f033-4752-9adf-015e8942232b"],
+  "click": {
+    "epoch": 1791441006263,
+    "now": 158683.59999999404
+  },
+  "http": {
+    "durationMs": 1100.5,
+    "afterClickMs": 1101
+  },
+  "accepted": null,
+  "visible": {
+    "afterClickMs": 22512.29999999702,
+    "text": "The source says to cover the mug loosely with plastic, turn it periodically, and let the handle and body dry at a similar pace.",
+    "top": 306,
+    "bottom": 463,
+    "composerTop": 536,
+    "viewport": 720
+  },
+  "actionsVisible": {
+    "afterClickMs": 22512.40000000596,
+    "text": "The source says to cover the mug loosely with plastic, turn it periodically, and let the handle and body dry at a similar pace."
+  },
+  "terminal": null,
+  "limitations": [
+    "The original observer called the presence of What it remembers terminal, but that link also appears during streaming; only first useful visibility and HTTP timing are accepted. Server completion is recorded separately.",
+    "The first short request had no click timing because its initial observer matched text instead of the button aria-label. Its missing capture remains private, and no browser latency is claimed for it.",
+    "Next development mode, loopback database, default 720px viewport, real approved fictional-provider scenario. Individual observation, not p95 or controlled A/B."
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "scope": "Offline assembly using actual copy45 saved messages and approved public source. No provider request or authority issued; not a replacement live generation.",
+  "models": {
+    "small": "gpt-4.1-mini-2025-04-14",
+    "large": "gpt-4.1-2025-04-14"
+  },
+  "results": [
+    {
+      "messageId": "62a69de0-779c-465a-b2b1-7e6957da9f21",
+      "sequence": 1,
+      "historyMessages": 1,
+      "before": {
+        "evidence": 1,
+        "modelTokens": 309,
+        "bytes": 1237
+      },
+      "after": {
+        "evidence": 1,
+        "modelTokens": 309,
+        "bytes": 1237
+      }
+    },
+    {
+      "messageId": "f8727f55-55dd-4e0d-bccb-1f5e4a8e4b2d",
+      "sequence": 3,
+      "historyMessages": 3,
+      "before": {
+        "evidence": 0,
+        "modelTokens": 313,
+        "bytes": 1498
+      },
+      "after": {
+        "evidence": 1,
+        "modelTokens": 696,
+        "bytes": 3283
+      }
+    }
+  ],
+  "literalTokens": 14,
+  "unknownModelRefused": true
+}

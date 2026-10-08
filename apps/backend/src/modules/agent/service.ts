@@ -42,6 +42,7 @@ import type {
   PublicAIReadScope,
 } from "../identity/public-ai-scope.js";
 import { isDevelopmentLicense } from "./development-license.js";
+import { shadowReplayFingerprint } from "./shadow-fingerprint.js";
 import {
   PreparedGenerationAgentInputs,
   type GenerationAILicenseContext,
@@ -356,7 +357,13 @@ export class AgentService {
         if (workspace.live_version_id) {
           const shadow = await client.query<{ state: string }>(
             "SELECT state FROM creator.ai_shadow_evaluation WHERE creator_id=$1 AND fingerprint=$2 AND live_version_id=$3 ORDER BY created_at DESC LIMIT 1",
-            [scope.creatorId, snapshot.fingerprint, workspace.live_version_id],
+            [
+              scope.creatorId,
+              liveVersion
+                ? shadowReplayFingerprint(snapshot.fingerprint, liveVersion)
+                : null,
+              workspace.live_version_id,
+            ],
           );
           if (shadow.rows[0]?.state !== "passed")
             gates.push(
@@ -1041,11 +1048,28 @@ export class AgentService {
           "An expert AI needs indexed approved sources.",
         );
         if (workspace.live_version_id) {
+          const live = await versionRow(
+            client,
+            scope.creatorId,
+            workspace.live_version_id,
+          );
+          invariant(
+            live,
+            "live_version_required",
+            "The published version is unavailable.",
+          );
+          // A stored pass from an older host must not authorize a comparison
+          // that substituted the new engine for the published baseline.
+          this.pipeline.assertReplayVersion(live, creator.name);
           // Missing samples are not evidence that the trusted recent-conversation
           // feed is empty. Until that feed can attest emptiness, require replay.
           const shadow = await client.query<{ state: string }>(
             "SELECT state FROM creator.ai_shadow_evaluation WHERE creator_id=$1 AND fingerprint=$2 AND live_version_id=$3 ORDER BY created_at DESC LIMIT 1",
-            [scope.creatorId, snapshot.fingerprint, workspace.live_version_id],
+            [
+              scope.creatorId,
+              shadowReplayFingerprint(snapshot.fingerprint, live),
+              workspace.live_version_id,
+            ],
           );
           invariant(
             shadow.rows[0]?.state === "passed",
@@ -1150,7 +1174,7 @@ export class AgentService {
           "This version is unavailable.",
         );
         invariant(
-          version.pipelineHash === this.pipeline.fingerprint,
+          this.pipeline.supportsPublishedEngine(version.pipelineHash),
           "pipeline_changed",
           "Provider or pipeline configuration changed. Evaluate a fresh draft.",
         );

@@ -1,3 +1,4 @@
+import { catalogueQuery } from "../../core/catalogue-query.js";
 import { createHash } from "node:crypto";
 import { Client, type Pool, type PoolClient } from "pg";
 import { z } from "zod";
@@ -235,6 +236,7 @@ export class PreparedGenerationConversationContext {
         "generation_context_pool_mismatch",
         "Use the same actual canonical database.",
       );
+      await input.identity.assertCatalogueInTransaction(client);
       await prepared.assertCustody(client);
       input.signal?.throwIfAborted();
     } catch (error) {
@@ -301,10 +303,18 @@ export class PreparedGenerationConversationContext {
         client,
         generationContextProfileBoundSource,
       );
-      await this.identity.assertCatalogueInTransaction(client);
+      // Runtime reads already call W1's complete current authorization on
+      // either side of this consumer's custody checks. Factory qualification
+      // checks W1 explicitly before entering here without an issued scope.
       const installed = (
-        await client.query<{ ready: boolean; definition: string }>(
-          `SELECT session_user='creator_generation_worker' AND current_user=session_user
+        await catalogueQuery<{ ready: boolean; definition: string }>(
+          client,
+          `WITH column_relations AS MATERIALIZED (
+            SELECT c.oid,c.relname,n.nspname FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+            WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
+             AND CASE WHEN c.relkind IN('r','p','v','m','f') THEN
+              has_any_column_privilege($3,c.oid,'SELECT,INSERT,UPDATE,REFERENCES') ELSE false END
+           ) SELECT session_user='creator_generation_worker' AND current_user=session_user
            AND current_setting('transaction_isolation')='read committed'
            AND EXISTS(SELECT FROM creator.schema_migration WHERE version=$1 AND checksum=$2)
            AND EXISTS(SELECT FROM pg_policy policy
@@ -325,13 +335,11 @@ export class PreparedGenerationConversationContext {
             WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
              AND CASE WHEN c.relkind IN('r','p','v','m','f') THEN
               has_table_privilege($3,c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') ELSE false END)
-           AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+           AND NOT EXISTS(SELECT FROM column_relations c
             JOIN pg_attribute a ON a.attrelid=c.oid AND a.attnum>0 AND NOT a.attisdropped
             CROSS JOIN unnest(ARRAY['SELECT','INSERT','UPDATE','REFERENCES']) AS privilege
-            WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
-             AND CASE WHEN c.relkind IN('r','p','v','m','f') THEN
-              has_column_privilege($3,c.oid,a.attnum,privilege) ELSE false END
-             AND NOT coalesce(($5::jsonb->(n.nspname||'.'||c.relname)->privilege) ? a.attname,false))
+            WHERE has_column_privilege($3,c.oid,a.attnum,privilege)
+             AND NOT coalesce(($5::jsonb->(c.nspname||'.'||c.relname)->privilege) ? a.attname,false))
            AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
             WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
              AND CASE WHEN c.relkind='S' THEN has_sequence_privilege($3,c.oid,'USAGE,SELECT,UPDATE') ELSE false END)

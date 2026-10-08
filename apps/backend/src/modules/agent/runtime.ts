@@ -359,7 +359,7 @@ export class LiveAgentRuntime {
           "The live version is unavailable.",
         );
         invariant(
-          version.pipelineHash === this.service.pipeline.fingerprint,
+          this.service.pipeline.supportsPublishedEngine(version.pipelineHash),
           "ai_updating",
           "AI is updating after a provider configuration change.",
         );
@@ -417,30 +417,32 @@ export class LiveAgentRuntime {
         assertCurrent,
       }) => {
         let emitted = 0;
-        const result = await this.service.pipeline.run({
-          scope: creatorScope,
-          usageCategory: "reply",
-          configuration: current.version.configuration,
-          creatorName: scope.creatorName,
-          sourceSet: current.version.sourceSet,
-          status: current.status,
-          sponsors: current.sponsors,
-          message,
-          grants,
-          snapshot,
-          signal,
-          execution,
-          beforeSentence: assertCurrent,
-          onSentence: async (sentence) => {
-            emitted++;
-            await deliver({
-              ...sentence,
-              authorKind: "ai",
-              versionId: current.version.id,
-              versionHash: current.version.compiledHash,
-            });
-          },
-        });
+        const result = await this.service.pipeline
+          .publishedEngine(current.version.pipelineHash)
+          .run({
+            scope: creatorScope,
+            usageCategory: "reply",
+            configuration: current.version.configuration,
+            creatorName: scope.creatorName,
+            sourceSet: current.version.sourceSet,
+            status: current.status,
+            sponsors: current.sponsors,
+            message,
+            grants,
+            snapshot,
+            signal,
+            execution,
+            beforeSentence: assertCurrent,
+            onSentence: async (sentence) => {
+              emitted++;
+              await deliver({
+                ...sentence,
+                authorKind: "ai",
+                versionId: current.version.id,
+                versionHash: current.version.compiledHash,
+              });
+            },
+          });
         if (!emitted) {
           for (const sentence of result.sentences) {
             await assertCurrent();

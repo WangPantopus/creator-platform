@@ -1,0 +1,89 @@
+{
+  "scope": "Offline differential engine regression. Scripted model/ports are test doubles, not live provider, privacy, identity or accounting evidence.",
+  "results": [
+    {
+      "revision": 12,
+      "case": "supported",
+      "equal": true,
+      "digest": "e8617a1535b6ebf003c755d3a3d3fb4ccf8f6484c62cd02b21ce11022215a101"
+    },
+    {
+      "revision": 12,
+      "case": "unsupported",
+      "equal": true,
+      "digest": "9dea90eb6bb9862b37dc2443d58d1655df8c3110d118e5295bff747fb0d9e1f8"
+    },
+    {
+      "revision": 12,
+      "case": "safe-refusal",
+      "equal": true,
+      "digest": "32a6dac188e1b90bf42aec3f28a970086720693d59afd675a7da492f760455dd"
+    },
+    {
+      "revision": 12,
+      "case": "never-reveal",
+      "equal": true,
+      "digest": "95ce72fde28df06e935e395091e085f0e3159a2b89534a9d177c053a0f028517"
+    },
+    {
+      "revision": 12,
+      "case": "historical-byte-budget",
+      "equal": true,
+      "digest": "64fd295382c83fd404f65587d4b57eb30e1c92068dbb71b5f45e9e69a24bfb8a"
+    },
+    {
+      "revision": 12,
+      "case": "immediate-crisis",
+      "equal": true,
+      "digest": "142db7fcc13c8f29564bfd808d41d399cddc181f5b4a936e3cb8123031d0ac6e"
+    },
+    {
+      "revision": 12,
+      "case": "language",
+      "equal": true,
+      "digest": "7475c2951a41417d4f1be981e762106b7ce69535a1c57c619c4d85ceee7a020b"
+    },
+    {
+      "revision": 13,
+      "case": "supported",
+      "equal": true,
+      "digest": "f86c77b9ccc7d66e4ef1a246a6958e268c74d99c5d125e3cec11f6f810318cd7"
+    },
+    {
+      "revision": 13,
+      "case": "unsupported",
+      "equal": true,
+      "digest": "e9c0127e4b6f0e898b101a1eb9dec4fcbb3cd3d9fff764aafd458cb2cf0bf3d2"
+    },
+    {
+      "revision": 13,
+      "case": "safe-refusal",
+      "equal": true,
+      "digest": "72a40e48d9f6dc78b9f307b83a751b352e5653cd7e78618954e9eab0147ea26c"
+    },
+    {
+      "revision": 13,
+      "case": "never-reveal",
+      "equal": true,
+      "digest": "76239a089cd32f983ec7a9a7873549d02ff5a621ea612f719ccd76ece6a8430d"
+    },
+    {
+      "revision": 13,
+      "case": "historical-byte-budget",
+      "equal": true,
+      "digest": "68c6a928bdcbf93527ad8a90592efbb3372d231e599b8329ac294355b6d46dcd"
+    },
+    {
+      "revision": 13,
+      "case": "immediate-crisis",
+      "equal": true,
+      "digest": "142db7fcc13c8f29564bfd808d41d399cddc181f5b4a936e3cb8123031d0ac6e"
+    },
+    {
+      "revision": 13,
+      "case": "language",
+      "equal": true,
+      "digest": "0b689401edfdf25a2988ff0451dd893cd374a7abca4663c0d7381a275d420a2a"
+    }
+  ]
+}

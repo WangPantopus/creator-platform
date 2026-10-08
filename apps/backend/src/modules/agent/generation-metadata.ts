@@ -149,10 +149,32 @@ export class PreparedGenerationAgentMetadata {
     client: PoolClient,
     scope: GenerationTaskScope,
   ): Promise<GenerationAgentMetadata> {
+    return this.read(client, scope);
+  }
+
+  private async read(
+    client: PoolClient,
+    scope: GenerationTaskScope,
+    licensedFacts?: GenerationAgentFacts,
+  ): Promise<GenerationAgentMetadata> {
     await this.identity.authorizeInTransaction(scope, client);
     await assertGenerationConsumerCustody(client, this.custody);
     await assertGenerationProfileBound(client);
-    const facts = await this.inputs.currentInTransaction(client, scope);
+    // A metadata bookend already owns licensed inputs on this exact held
+    // purpose. Revalidate their complete current contents through the input
+    // owner, as retrieval does, without recursively obtaining a second licence.
+    // No catalogue, scope, source or stored-licence read is cached or skipped.
+    let facts: GenerationAgentFacts;
+    if (licensedFacts) {
+      await this.inputs.authorizeLicensedInTransaction(
+        licensedFacts,
+        scope,
+        client,
+      );
+      facts = licensedFacts;
+    } else {
+      facts = await this.inputs.currentInTransaction(client, scope);
+    }
     const audience = await this.audience.currentInTransaction(client, scope);
     const value = Metadata.parse(
       (
@@ -171,7 +193,7 @@ export class PreparedGenerationAgentMetadata {
         value.compiledHash === facts.version.compiledHash &&
         value.compiledHash === compiled.hash &&
         facts.version.compiledPrefix === compiled.prefix &&
-        value.pipelineHash === this.service.pipeline.fingerprint &&
+        this.service.pipeline.supportsPublishedEngine(value.pipelineHash) &&
         value.pipelineHash === facts.version.pipelineHash &&
         contentHash({
           ...value.audience,
@@ -234,7 +256,7 @@ export class PreparedGenerationAgentMetadata {
       "generation_metadata_required",
       "Use the original metadata issued for this held client and purpose.",
     );
-    const current = await this.currentInTransaction(client, scope);
+    const current = await this.read(client, scope, binding.facts);
     // The fresh reader checks the original input, licence and audience owners
     // at both ends. Compare its actual privately issued facts with this binding
     // instead of separately rereading the same owners immediately beforehand.

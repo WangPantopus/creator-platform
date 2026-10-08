@@ -1,0 +1,36 @@
+{
+  "result": {
+    "type": "object",
+    "value": {
+      "scrollWidth": 390,
+      "send": [
+        {
+          "duration": 1157.7999999970198,
+          "start": 58887.09999999404
+        },
+        {
+          "duration": 1027.9000000059605,
+          "start": 206393.39999999103
+        }
+      ],
+      "timing": {
+        "accepted": 1189.2999999970198,
+        "firstDom": 28240.29999999702,
+        "firstVisible": 28240.29999999702,
+        "snapshots": [
+          {
+            "bottom": 587,
+            "composerTop": 660,
+            "ms": 28240.29999999702,
+            "text": "This is Maya’s AI using approved source material, and the source does not guarantee your mug will not crack or explain how plastic affects moisture loss.",
+            "top": 408
+          }
+        ],
+        "start": 206393.09999999404,
+        "startedAt": "2026-10-08T04:49:20.145Z",
+        "terminal": 34278.90000000596
+      },
+      "width": 390
+    }
+  }
+}
