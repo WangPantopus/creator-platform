@@ -1,0 +1,14 @@
+[
+  {
+    "path": "metadata.purpose.schema.sha256",
+    "before": "6b40bcd9a7d5ed0ae6573fc21f4f3912e5432f1207bd158bd8e2d304e43c3b7a",
+    "restored": "5c53d5e48c3551f6bc0041dc16023b93eb9abf0a8d2728486c4ef3e23675caa4"
+  },
+  {
+    "path": "metadata.purpose.schema.metadata.relations[70].grants",
+    "before": [
+      "creator_comparison_reader=arwdDxtm/creator_comparison_reader"
+    ],
+    "restored": []
+  }
+]

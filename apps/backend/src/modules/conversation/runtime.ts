@@ -48,6 +48,10 @@ export function createConversationRuntime(input: {
   lineage?: ConversationLineage;
   corrections?: ConversationCorrections;
   recordings?: ConversationRecordings;
+  comparisons?: {
+    consent: import("./comparison-consent.js").ConversationComparisonConsent;
+    samples: import("./comparison-samples.js").ConversationComparisonSamples;
+  };
   fulfillmentPlans?: CommerceFulfillmentPlans;
   assertReady?: (scope: ThreadScope, client: PoolClient) => Promise<void>;
   assertApproved?: (
@@ -197,6 +201,7 @@ export function createConversationRuntime(input: {
       : undefined,
     input.developmentPolicy,
     acceptance ? () => acceptance.isRunning : undefined,
+    input.comparisons,
   );
   return {
     feature,

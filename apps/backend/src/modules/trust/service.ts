@@ -1,7 +1,8 @@
 import type { PoolClient } from "pg";
 import { z } from "zod";
 import type { Actor } from "../identity/adapter.js";
-import { DomainError } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
+import type { PreparedComparisonArtifacts } from "./comparison-artifacts.js";
 import { TrustStore, command, priorCommand } from "./store.js";
 import { assertAllScopeOwnershipCatalog } from "./privacy-ownership-catalog.js";
 import {
@@ -96,6 +97,7 @@ export class TrustService {
     readonly store: TrustStore,
     readonly dependencies: TrustDependencies = {},
     readonly artifacts?: PrivacyArtifactStore,
+    readonly comparisonArtifacts?: PreparedComparisonArtifacts,
   ) {}
   private async capturePrivacyOwnership(actor: Actor) {
     if (!this.dependencies.privacyOwnership)
@@ -1055,21 +1057,60 @@ export class TrustService {
         job.thread_id ?? undefined,
       );
       await this.verifyFreshExport(actor);
+      const domains = (
+        await client.query(
+          "SELECT domain,data,receipt FROM creator_trust.privacy_task WHERE job_id=$1 ORDER BY domain",
+          [id],
+        )
+      ).rows;
+      await this.assertComparisonExports(client, actor, id, domains);
       return {
         schemaVersion: 1,
         jobId: id,
-        domains: (
-          await client.query(
-            "SELECT domain,data,receipt FROM creator_trust.privacy_task WHERE job_id=$1 ORDER BY domain",
-            [id],
-          )
-        ).rows,
+        domains,
       };
     });
   }
+  private async assertComparisonExports(
+    client: PoolClient,
+    actor: Actor,
+    jobId: string,
+    domains: readonly { domain: string; data: unknown }[],
+    signal = AbortSignal.timeout(5000),
+  ) {
+    const installed = (
+      await client.query(
+        "SELECT to_regclass('creator_trust.comparison_export_artifact') IS NOT NULL AS installed",
+      )
+    ).rows[0]?.installed;
+    invariant(
+      installed === Boolean(this.comparisonArtifacts),
+      "comparison_export_unconfigured",
+      "The original comparison export owner is unavailable.",
+    );
+    if (!this.comparisonArtifacts) return;
+    for (const part of domains) {
+      if (part.domain !== "agent" && part.domain !== "conversation") continue;
+      const artifact = PrivacyArtifact.safeParse(part.data);
+      invariant(
+        artifact.success &&
+          artifact.data.jobId === jobId &&
+          artifact.data.accountId === actor.accountId &&
+          artifact.data.domain === part.domain,
+        "export_artifact_unavailable",
+        "This export is no longer available. Request a new export.",
+      );
+      await this.comparisonArtifacts.assertReadable(
+        client,
+        { jobId, accountId: actor.accountId, domain: part.domain },
+        artifact.data.snapshotRef,
+        signal,
+      );
+    }
+  }
   /** This check is repeated during streaming; progress remains readable after
    * deletion, while payload download still needs current permitted authority. */
-  async authorizeExport(actor: Actor, id: string) {
+  async authorizeExport(actor: Actor, id: string, signal?: AbortSignal) {
     await this.verifyFreshExport(actor);
     await this.store.actor(actor, async (client) => {
       const job = (
@@ -1090,6 +1131,13 @@ export class TrustService {
         job.creator_id ?? undefined,
         job.thread_id ?? undefined,
       );
+      const domains = (
+        await client.query(
+          "SELECT domain,data FROM creator_trust.privacy_task WHERE job_id=$1 AND domain IN ('agent','conversation')",
+          [id],
+        )
+      ).rows;
+      await this.assertComparisonExports(client, actor, id, domains, signal);
     });
   }
   private async verifyFreshExport(actor: Actor) {
@@ -1156,7 +1204,7 @@ export class TrustService {
       );
     const binding = { jobId: id, accountId: actor.accountId, domain };
     await this.artifacts.verify(parsed.data, binding, signal);
-    await this.authorizeExport(actor, id);
+    await this.authorizeExport(actor, id, signal);
     return {
       artifact: parsed.data,
       chunks: this.artifacts.read(parsed.data, binding, signal),

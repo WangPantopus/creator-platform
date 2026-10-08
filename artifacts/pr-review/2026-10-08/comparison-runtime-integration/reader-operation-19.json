@@ -1,0 +1,39 @@
+{
+  "kind": "isolated real SQL, synthetic sessions and provider receipts; no producer or app qualification",
+  "observedAt": "2026-10-08T17:07:24.174Z",
+  "database": "creator_comparison_artifact19_20261008",
+  "results": [
+    {
+      "case": "original creator gets only sanitized fields and commit erases transient scope",
+      "result": "passed"
+    },
+    {
+      "case": "fan cannot invoke creator cohort read",
+      "result": "passed"
+    },
+    {
+      "case": "another creator cannot read the cohort",
+      "result": "passed"
+    },
+    {
+      "case": "changed original fan ownership refuses the read",
+      "result": "passed"
+    },
+    {
+      "case": "runtime cannot read private comparison scope",
+      "result": "passed"
+    },
+    {
+      "case": "actual five-second purpose expiry refuses COMMIT",
+      "result": "passed"
+    },
+    {
+      "case": "actual consent expiry changes cohort and refuses COMMIT",
+      "result": "passed"
+    },
+    {
+      "case": "original withdrawal makes subsequent creator cohort empty",
+      "result": "passed"
+    }
+  ]
+}

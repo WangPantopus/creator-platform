@@ -371,7 +371,11 @@ export function createTrustRouter(options: TrustRouterOptions) {
                 "Your account changed. Reconnect before downloading.",
                 409,
               );
-            await options.service.authorizeExport(latest, jobId);
+            await options.service.authorizeExport(
+              latest,
+              jobId,
+              controller.signal,
+            );
             yield chunk;
           }
         }

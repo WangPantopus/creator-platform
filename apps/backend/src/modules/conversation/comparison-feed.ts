@@ -35,8 +35,8 @@ import {
 export const comparisonReaderSource = Object.freeze({
   owner: "W3",
   name: "w3_comparison_reader",
-  path: "apps/backend/src/modules/conversation/migrations/pending_w3_comparison_reader.sql",
-  checksum: "f0a7ec9e16838c7b838dc0befa6097484c8683dfc67ea7b940fad00a3c7facba",
+  path: "apps/backend/src/modules/conversation/migrations/0245_w3_comparison_reader.sql",
+  checksum: "4fcb07080002cd2001c565444bcbe870d868ca5b13e32224b6feb3d8849be834",
 });
 const ReaderOwner = "creator_comparison_reader";
 const sources = [

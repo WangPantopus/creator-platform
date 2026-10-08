@@ -10,6 +10,8 @@ import { createAgentDomain } from "../agent/integration.js";
 import { agentPublicProjection } from "../agent/growth-adapter.js";
 import { PublicAIIdentityAuthority } from "../identity/public-ai-scope.js";
 import { registeredPublicAIProfile } from "../../db/public-ai-profile.js";
+import { registeredComparisonProfile } from "../../db/comparison-profile.js";
+import { prepareDevelopmentComparisonHost } from "./comparison-host.js";
 import { modelFromEnvironment } from "../agent/model.js";
 import {
   GENERATION_JOURNAL_MIGRATION,
@@ -442,12 +444,39 @@ export async function composeConversationHost(
     );
 
   const audience = createCommerceAudience(runtime.database);
+  const comparisonReview = await registeredComparisonProfile();
+  const comparisonRequested =
+    env.TRUST_DEVELOPMENT_COMPARISON_POLICY === "true";
+  if (comparisonRequested)
+    invariant(
+      comparisonReview &&
+        developmentPolicy &&
+        policy &&
+        model &&
+        ready &&
+        journal &&
+        usageRetention &&
+        producers.privacyCursor &&
+        producers.provenancePurge &&
+        accountingPreparation,
+      "comparison_unconfigured",
+      "Comparisons require the original complete conversation, accounting and privacy host.",
+    );
+  const comparisonHost = comparisonRequested
+    ? await prepareDevelopmentComparisonHost({
+        runtime,
+        policy: policy!,
+        developmentPolicy: developmentPolicy!,
+        model: model!,
+      })
+    : undefined;
   const binding: {
     conversation?: ReturnType<typeof createConversationRuntime>;
   } = {};
   const agent = createAgentDomain({
     pool: runtime.pool,
     model,
+    ...(comparisonHost ? { shadowFeed: comparisonHost.feed } : {}),
     ...(producers.licenseVerifier
       ? { licenseVerifier: producers.licenseVerifier }
       : {}),
@@ -479,6 +508,7 @@ export async function composeConversationHost(
         }
       : {}),
   });
+  const comparisons = await comparisonHost?.bind(agent.service.repository);
   const worker =
     ready && commerce?.allowance && journal && producers.generation
       ? await prepareGenerationWorker({
@@ -562,6 +592,7 @@ export async function composeConversationHost(
     ...(lineage ? { lineage } : {}),
     ...(corrections ? { corrections } : {}),
     ...(recordings ? { recordings } : {}),
+    ...(comparisons ? { comparisons } : {}),
     ...(producers.fulfillmentPlans
       ? { fulfillmentPlans: producers.fulfillmentPlans }
       : {}),
@@ -594,6 +625,13 @@ export async function composeConversationHost(
     generationWorker: worker,
     publicCreatorAI,
     privacy: {
+      ...(comparisonReview
+        ? {
+            comparisonPreparation: {
+              custody: comparisonReview.comparison.privacy,
+            },
+          }
+        : {}),
       ...(producers.provenancePurge
         ? { provenancePurgePreparation: producers.provenancePurge }
         : {}),
@@ -617,6 +655,7 @@ export async function composeConversationHost(
     },
     close(): Promise<void> {
       closing ??= (async () => {
+        comparisonHost?.close();
         // Stop admissions synchronously, then retain the actual ingestion
         // promise until its final job/accounting work has settled.
         const draining = ingesting.close();

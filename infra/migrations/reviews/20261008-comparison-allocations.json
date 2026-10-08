@@ -1,0 +1,75 @@
+{
+  "scope": "Reserved additive comparison graph. Numbered SQL changes ledger identities, the dependent storage checksum and allocation comments. Reader private-table owner privileges are explicitly limited to SELECT/INSERT/DELETE after restore review found implicit/default ACL rendering drift. Original proposals and all actual applied SQL remain unchanged. No activation or application acceptance.",
+  "sources": [
+    {
+      "version": "0239_w3_comparison_samples",
+      "owner": "W3",
+      "path": "apps/backend/src/modules/conversation/migrations/0239_w3_comparison_samples.sql",
+      "checksum": "39199c153fb758c5bb7e9ceef24b1b38dd23740732153f75aa85ff1e8c32973d",
+      "originalProposal": {
+        "path": "apps/backend/src/modules/conversation/migrations/pending_w3_comparison_samples.sql",
+        "checksum": "49b4fbcf308833c2ff0ede97fad20926ea98eabe8a9d2a1abb279a55662c3a4d"
+      }
+    },
+    {
+      "version": "0240_w3_comparison_privacy",
+      "owner": "W3",
+      "path": "apps/backend/src/modules/conversation/migrations/0240_w3_comparison_privacy.sql",
+      "checksum": "4a3b44c345f02a61c93b591dba5a8e0c35130923b72d1bc0291749ca274a0da8",
+      "originalProposal": {
+        "path": "apps/backend/src/modules/conversation/migrations/pending_w3_comparison_privacy.sql",
+        "checksum": "81d9ebedb8346808b32e560ffbd6246f89443423bc267d02f89f6e84465b5bc0"
+      }
+    },
+    {
+      "version": "0241_comparison_export_artifacts",
+      "owner": "W8",
+      "path": "apps/backend/src/modules/trust/0241_comparison_export_artifacts.sql",
+      "checksum": "63559d896eb5e5821dc15096e8f72d3b75faebcd5f23294f62ae5f8b0e63e415",
+      "originalProposal": {
+        "path": "apps/backend/src/modules/trust/pending-comparison-export-artifacts.sql",
+        "checksum": "c1e1dfdb83fe002fbc060c1e0737811a24d39967e12a7a840164f22091c5d0ed"
+      }
+    },
+    {
+      "version": "0242_comparison_export_attempts",
+      "owner": "W8",
+      "path": "apps/backend/src/modules/trust/0242_comparison_export_attempts.sql",
+      "checksum": "6333db3d2263ea59b48af4b6329a6fb853951ac22e3071f925f776010f819b5f",
+      "originalProposal": {
+        "path": "apps/backend/src/modules/trust/pending-comparison-export-attempts.sql",
+        "checksum": "f99563564a82d3ba6145b82760e177ae91b2c1fd0538a4c4187b0cae5de28380"
+      }
+    },
+    {
+      "version": "0243_comparison_export_privacy",
+      "owner": "W8",
+      "path": "apps/backend/src/modules/trust/0243_comparison_export_privacy.sql",
+      "checksum": "b9974d48123516ebcdd318b3149107e10fe2795551c10ec2f1079270f1dd0a7b",
+      "originalProposal": {
+        "path": "apps/backend/src/modules/trust/pending-comparison-export-privacy.sql",
+        "checksum": "3633aace4fec87335582f8cb85b3cd1b87a4d03d526427612821769970eb3e01"
+      }
+    },
+    {
+      "version": "0244_w3_comparison_writer",
+      "owner": "W3",
+      "path": "apps/backend/src/modules/conversation/migrations/0244_w3_comparison_writer.sql",
+      "checksum": "5e72dc539bd628faf870d39dfeca12613124c7a577d1e00d1cf27382d5cc3228",
+      "originalProposal": {
+        "path": "apps/backend/src/modules/conversation/migrations/pending_w3_comparison_writer.sql",
+        "checksum": "3737f852cd56c5864e85ca8d890439bc25af021559fc2fb6670c5685055b55da"
+      }
+    },
+    {
+      "version": "0245_w3_comparison_reader",
+      "owner": "W3",
+      "path": "apps/backend/src/modules/conversation/migrations/0245_w3_comparison_reader.sql",
+      "checksum": "4fcb07080002cd2001c565444bcbe870d868ca5b13e32224b6feb3d8849be834",
+      "originalProposal": {
+        "path": "apps/backend/src/modules/conversation/migrations/pending_w3_comparison_reader.sql",
+        "checksum": "f0a7ec9e16838c7b838dc0befa6097484c8683dfc67ea7b940fad00a3c7facba"
+      }
+    }
+  ]
+}

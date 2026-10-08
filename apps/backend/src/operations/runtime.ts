@@ -35,6 +35,7 @@ import {
 import type { ScopeRestriction } from "../modules/access/scope.js";
 import type { PrivacyArtifactStore } from "../modules/trust/privacy-export.js";
 import { createUsageAccountingHost } from "../modules/trust/usage-accounting-host.js";
+import { PreparedComparisonArtifacts } from "../modules/trust/comparison-artifacts.js";
 
 /** W1 mounts this runtime in the canonical backend. Local mode is explicit. */
 export async function createTrustRuntime(options: {
@@ -49,6 +50,7 @@ export async function createTrustRuntime(options: {
   dependencies: TrustDependencies;
   privacyHooks: PrivacyHook[];
   privacyArtifacts?: PrivacyArtifactStore;
+  comparisonArtifacts?: PreparedComparisonArtifacts;
   effectHooks: EffectHook[];
   probes: Probe[];
   restoreReady: () => Promise<boolean>;
@@ -159,12 +161,26 @@ export async function createTrustRuntime(options: {
     };
   });
   const store = new TrustStore(options.apiPool);
+  if (options.comparisonArtifacts) {
+    if (
+      !(options.comparisonArtifacts instanceof PreparedComparisonArtifacts) ||
+      !options.privacyArtifacts
+    )
+      throw new Error(
+        "Use the original prepared comparison artifact owner and protected store.",
+      );
+    options.comparisonArtifacts.assertComposition(
+      options.workerPool,
+      options.privacyArtifacts,
+    );
+  }
   await store.assertRole();
   await new TrustStore(options.workerPool).assertRole(true);
   const service = new TrustService(
     store,
     options.dependencies,
     options.privacyArtifacts,
+    options.comparisonArtifacts,
   );
   const telemetry = new TrustTelemetry(options.environment, options.release);
   const restored = async () => {
@@ -260,6 +276,7 @@ export async function createTrustRuntime(options: {
         "Privacy task failed.",
         JSON.stringify({ domain, kind, ...lifecycleFailure(cause) }),
       ),
+    options.comparisonArtifacts,
   );
   const router = createTrustRouter({
     service,
@@ -354,6 +371,7 @@ export async function createTrustRuntime(options: {
     run: usageAccounting.readiness,
   });
   return {
+    comparisonArtifacts: options.comparisonArtifacts,
     router,
     service,
     readiness,

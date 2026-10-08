@@ -1,0 +1,79 @@
+{
+  "kind": "read-only inventory; no legacy provenance or comparison consent created",
+  "observedAt": "2026-10-08T17:06:04.463Z",
+  "database": "creator_generation_journey43_20261007",
+  "artifacts": [
+    {
+      "jobId": "61e07c91-56b4-4dbe-835c-0714797b4b13",
+      "domain": "agent",
+      "reference": "5f988312-fec8-43d4-a5cc-bb2fbf33038b",
+      "snapshotRef": "agent-export:0a2267c0-54ad-4a85-9819-b3627976d06a",
+      "bytes": 197928,
+      "sha256": "ac6adbcc1d0d4213ad440ead44083bb8c86845a9767e770c9a1e49c254b813fb",
+      "lineCount": 1,
+      "relevant": [],
+      "comparisonFields": [
+        {
+          "path": "export.creatorExports.0.data.ai_shadow_sample",
+          "type": "array",
+          "items": 0
+        },
+        {
+          "path": "export.creatorExports.0.data.ai_shadow_evaluation",
+          "type": "array",
+          "items": 0
+        }
+      ],
+      "verified": true,
+      "automaticApproval": false
+    },
+    {
+      "jobId": "61e07c91-56b4-4dbe-835c-0714797b4b13",
+      "domain": "conversation",
+      "reference": "f374a585-dcea-4161-94f2-625d5c62b4a4",
+      "snapshotRef": "conversation-export:b2d19fb0-0720-475c-9e18-b39495f7f213",
+      "bytes": 198980,
+      "sha256": "a3d5e49ea90b5acab919fc9b05527aac53df8f51c2923f3f6ebf23b5a8a30104",
+      "lineCount": 1,
+      "relevant": [],
+      "comparisonFields": [],
+      "verified": true,
+      "automaticApproval": false
+    },
+    {
+      "jobId": "f6a7410b-7db9-4da6-a4ca-901d7a90a317",
+      "domain": "agent",
+      "reference": "33fc04f2-8163-4796-9dca-7627947338f2",
+      "snapshotRef": "agent-export:856c913e-2fc1-492a-8d49-fbe7606a8e31",
+      "bytes": 39,
+      "sha256": "8a812b313b5c91718e7be64d3cba955042eedb455081162baa54cd500494d894",
+      "lineCount": 1,
+      "relevant": [],
+      "comparisonFields": [],
+      "verified": true,
+      "automaticApproval": false
+    },
+    {
+      "jobId": "f6a7410b-7db9-4da6-a4ca-901d7a90a317",
+      "domain": "conversation",
+      "reference": "ef56350f-6e96-41aa-859c-c95b574ff281",
+      "snapshotRef": "conversation-export:4dc4b4ca-fdc3-42a8-a114-53cfd0f2dffe",
+      "bytes": 198980,
+      "sha256": "a3d5e49ea90b5acab919fc9b05527aac53df8f51c2923f3f6ebf23b5a8a30104",
+      "lineCount": 1,
+      "relevant": [],
+      "comparisonFields": [],
+      "verified": true,
+      "automaticApproval": false
+    }
+  ],
+  "storage": {
+    "consent": null,
+    "samples": null,
+    "artifacts": null
+  },
+  "cachedComparisons": {
+    "samples": 0,
+    "evaluations": 0
+  }
+}

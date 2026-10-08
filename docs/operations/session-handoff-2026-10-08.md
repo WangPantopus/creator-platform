@@ -1,5 +1,33 @@
 # Session handoff — October 8, 2026
 
+## Active continuation — comparison runtime integration
+
+Continue on `codex/comparison-runtime-integration-20261008` in637b. The
+[combined source milestone](../../artifacts/pr-review/2026-10-08/comparison-runtime-integration/README.md)
+reserves0239–0245 and provides gated original host/Trust/store/worker composition.
+The executable registry remains106 sources. Isolated graph19 and full restore20
+match every reviewed metadata value; original purpose permissions on existing
+relations are unchanged. Eight SQL and four actual consumer operations pass.
+The earlier owner-ACL restore mismatch and metadata timeout refusal are preserved.
+
+The four actual saved Agent/Conversation exports contain no populated comparison
+collections and retain exact hashes. No legacy mapping, consent or clock changed.
+Before activation, resolve scope-specific legacy attempt/file deletion (the
+current complete inventory conservatively waits on unmapped legacy attempts),
+extend the exact migration-wave runner and operate a closed populated restore.
+Then connect/operate actual web/iOS/Android comparison choice and sanitization,
+withdrawal/expiry/export, and the legitimate preserved revision13 upgrade.
+Carry every remaining milestone in the complete finish plan.
+
+PR347 is open, stacked on346; refresh exact-head checks and retarget after346.
+PR346 is still open at3d301364c; refresh all11 checks and merge when ready.
+PR345's separate main37812330409 is still running. The actual backend now runs
+compiledb93e5d7c2 on57304 through `native-e2e/launch43-backend-comparison-runtime.mjs`,
+log `backend-comparison-runtime-01.log`. Web3119 reconfirmed the same fan account
+and downloaded both original source exports with exact hashes. Before/after
+custody retains all18 generations/69 usage rows and the original publication.
+No comparison source was activated. Both native devices remain stopped.
+
 ## Active continuation — original held comparison feed
 
 Continue on `codex/comparison-held-feed-20261008` in 637b. The

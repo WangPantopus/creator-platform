@@ -23,6 +23,12 @@ W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan expor
 
 ## Implementation continuation
 
+- [~] October 8, 2026: reserve the complete comparison SQL graph, review all
+  combined role catalogues and exact restoration, and wire the gated original
+  runtime/Trust/export/expiry owners. Activation, legacy file lifecycle and actual
+  comparison controls/provider journeys remain open.
+  [Evidence and limits](../artifacts/pr-review/2026-10-08/comparison-runtime-integration/README.md).
+
 - [~] October 8, 2026: prepare original creator comparison reads with a finite
   SQL COMMIT scope; hold collection, provider admission, replay, display and
   publication on that current source. Eight SQL and four actual consumer source

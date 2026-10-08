@@ -6,6 +6,8 @@ import { DomainError, invariant } from "../../core/errors.js";
 import { registeredMigration } from "../../db/reviewed-migration.js";
 import { requestAuthority } from "../identity/request-authority.js";
 import { comparisonPrivacyInstalled } from "../conversation/comparison-privacy.js";
+import { PreparedComparisonArtifacts } from "../trust/comparison-artifacts.js";
+import { agentPreparationRead } from "./preparation-read.js";
 import type { PrivacyTaskInput } from "../trust/privacy-authority.js";
 import { generationConsumerCatalogue } from "./generation-consumer-catalogue.js";
 import {
@@ -87,15 +89,19 @@ export type AgentPrivacyExportSource = Readonly<{
 /** Recheck actual same-client source custody before production and at EOF;
  * startup readiness alone cannot authorize a later export. */
 async function assertReviewedExport(
-  database: Pick<Pool, "query">,
+  database: PoolClient,
   review: AgentPrivacyExportReview,
+  comparisons?: PreparedComparisonArtifacts,
+  signal = AbortSignal.timeout(5000),
 ) {
   try {
     invariant(
-      !(await comparisonPrivacyInstalled(database)),
+      (await comparisonPrivacyInstalled(database)) ===
+        comparisons instanceof PreparedComparisonArtifacts,
       "comparison_export_unconfigured",
       "Comparison exports require their original source-withdrawal artifact owner.",
     );
+    await comparisons?.assertClient(database, "creator_runtime", signal);
     const active = await registeredMigration({
       name: "w2_privacy_export_snapshot",
       path: "apps/backend/src/modules/agent/migrations/0113_w2_privacy_export_snapshot.sql",
@@ -295,6 +301,7 @@ export class PreparedAgentPrivacyExport {
       job: PrivacyTaskInput,
     ) => Promise<readonly string[]>,
     private readonly review: AgentPrivacyExportReview,
+    private readonly comparisons?: PreparedComparisonArtifacts,
   ) {}
   assertHostPool(pool: Pool) {
     invariant(
@@ -308,6 +315,7 @@ export class PreparedAgentPrivacyExport {
     migration: { version: string; checksum: string };
     definitions: Readonly<Record<Signature, string>>;
     catalogueChecksum: string;
+    comparisons?: PreparedComparisonArtifacts;
     /** Real W8 same-client task + current restoration + cancellation port. */
     assertTaskInTransaction: (
       client: PoolClient,
@@ -334,11 +342,14 @@ export class PreparedAgentPrivacyExport {
       definitions,
       catalogueChecksum: input.catalogueChecksum,
     });
-    await assertReviewedExport(input.pool, review);
+    await agentPreparationRead(input.pool, (client) =>
+      assertReviewedExport(client, review, input.comparisons),
+    );
     return new PreparedAgentPrivacyExport(
       input.pool,
       input.assertTaskInTransaction,
       review,
+      input.comparisons,
     );
   }
 
@@ -466,7 +477,12 @@ export class PreparedAgentPrivacyExport {
   ): Promise<AgentPrivacyExportSource> {
     this.assertWorker(job);
     const expected = await this.assertTask(client, job);
-    await assertReviewedExport(client, this.review);
+    await assertReviewedExport(
+      client,
+      this.review,
+      this.comparisons,
+      job.signal,
+    );
     const raw = (
       await client.query<{ proof: unknown }>(
         "SELECT creator.begin_agent_privacy_export($1,$2,$3,$4,$5) AS proof",
@@ -513,6 +529,7 @@ export class PreparedAgentPrivacyExport {
         ...(parentSignal ? [parentSignal] : []),
       ]),
     });
+    await this.comparisons?.capture(client, job, "agent", source.snapshotRef);
     await this.authorizeInTransaction(client, source);
     return source;
   }
@@ -764,7 +781,12 @@ export class PreparedAgentPrivacyExport {
       "privacy_export_source_incomplete",
       "Consume the complete original source before EOF verification.",
     );
-    await assertReviewedExport(client, this.review);
+    await assertReviewedExport(
+      client,
+      this.review,
+      this.comparisons,
+      binding.signal,
+    );
     await client.query("SELECT creator.end_agent_privacy_export($1)", [
       binding.nonce,
     ]);

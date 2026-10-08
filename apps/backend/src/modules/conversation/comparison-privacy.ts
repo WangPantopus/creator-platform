@@ -20,20 +20,20 @@ import { conversationPrivacyQueryTimeout } from "./privacy-cancellation.js";
 export const comparisonStorageSource = Object.freeze({
   owner: "W3",
   name: "w3_comparison_samples",
-  path: "apps/backend/src/modules/conversation/migrations/pending_w3_comparison_samples.sql",
-  checksum: "49b4fbcf308833c2ff0ede97fad20926ea98eabe8a9d2a1abb279a55662c3a4d",
+  path: "apps/backend/src/modules/conversation/migrations/0239_w3_comparison_samples.sql",
+  checksum: "39199c153fb758c5bb7e9ceef24b1b38dd23740732153f75aa85ff1e8c32973d",
 });
 export const comparisonPrivacySource = Object.freeze({
   owner: "W3",
   name: "w3_comparison_privacy",
-  path: "apps/backend/src/modules/conversation/migrations/pending_w3_comparison_privacy.sql",
-  checksum: "81d9ebedb8346808b32e560ffbd6246f89443423bc267d02f89f6e84465b5bc0",
+  path: "apps/backend/src/modules/conversation/migrations/0240_w3_comparison_privacy.sql",
+  checksum: "4a3b44c345f02a61c93b591dba5a8e0c35130923b72d1bc0291749ca274a0da8",
 });
 export const comparisonWriterSource = Object.freeze({
   owner: "W3",
   name: "w3_comparison_writer",
-  path: "apps/backend/src/modules/conversation/migrations/pending_w3_comparison_writer.sql",
-  checksum: "3737f852cd56c5864e85ca8d890439bc25af021559fc2fb6670c5685055b55da",
+  path: "apps/backend/src/modules/conversation/migrations/0244_w3_comparison_writer.sql",
+  checksum: "5e72dc539bd628faf870d39dfeca12613124c7a577d1e00d1cf27382d5cc3228",
 });
 const owner = "creator_comparison_lifecycle";
 const signature =
@@ -60,6 +60,29 @@ async function query<Row extends QueryResultRow = QueryResultRow>(
 
 /** Read-only operator review; no source, job, or comparison authority is issued. */
 export async function comparisonPrivacyCatalogue(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  const metadata = async (text: string) => {
+    signal?.throwIfAborted();
+    await query(client, {
+      text,
+      query_timeout: conversationPrivacyQueryTimeout(client, 5000),
+    });
+    signal?.throwIfAborted();
+  };
+  // PostgreSQL's displayed type and function names depend on search_path.
+  // Keep reviewed metadata stable and restore the original owner's settings.
+  // Any failed/uncertain query escapes to that owner's connection cleanup.
+  await metadata("SAVEPOINT comparison_privacy_catalogue");
+  await metadata("SET LOCAL search_path=pg_catalog");
+  const catalogue = await readComparisonPrivacyCatalogue(client, signal);
+  await metadata("ROLLBACK TO SAVEPOINT comparison_privacy_catalogue");
+  await metadata("RELEASE SAVEPOINT comparison_privacy_catalogue");
+  return catalogue;
+}
+
+async function readComparisonPrivacyCatalogue(
   client: PoolClient,
   signal?: AbortSignal,
 ) {

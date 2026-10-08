@@ -9,6 +9,18 @@ The product is substantially implemented and remains incomplete.
 
 ## Continuing execution
 
+[Comparison runtime integration](../../artifacts/pr-review/2026-10-08/comparison-runtime-integration/README.md)
+now has seven reserved numbered sources, complete combined catalogue/restore
+review and gated original host, export/store, withdrawal and expiry composition.
+The executable graph remains106; actual comparison UI/provider acceptance is
+still open. Four legacy export byte streams were verified and contain no populated
+comparison collections. Resolve their original attempt/file deletion handling,
+operate the closed populated upgrade, then actual consent/sanitizer/upgrade on
+all platforms. Compiledb93e5d7c2 now runs on the original copy43; actual web
+same-account sign-in and both original source export downloads pass with unchanged
+generation/accounting/publication custody. Comparison activation remains off.
+All ten finish criteria below remain unchanged.
+
 The [original held comparison feed increment](../../artifacts/pr-review/2026-10-08/comparison-held-feed/README.md)
 adds a finite SQL read/COMMIT scope and same-transaction source checks for
 collection, each provider admission, replay, display and publication. Eight

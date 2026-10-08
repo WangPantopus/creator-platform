@@ -21,6 +21,8 @@ import { ContentPrivacyExport } from "../content/privacy-export.js";
 import { PreparedAgentPrivacyExport } from "../agent/privacy-export-snapshot.js";
 import { registeredAgentPrivacyExportReview } from "../agent/privacy-export-configuration.js";
 import { restoredPrivacyTaskAuthorityInTransaction } from "./privacy-authority.js";
+import { registeredComparisonProfile } from "../../db/comparison-profile.js";
+import { PreparedComparisonArtifacts } from "./comparison-artifacts.js";
 
 /** W1 adds these to its development adapter. These are labels, never tokens,
  * membership grants, production identities or a second session issuer. */
@@ -45,7 +47,7 @@ type TrustConfiguration = Omit<
 >;
 type Consumers = Omit<
   Parameters<typeof createPrivacyConsumers>[0],
-  "runtimePool" | "coordinatorPool" | "privacyArtifacts"
+  "runtimePool" | "coordinatorPool" | "privacyArtifacts" | "comparisonArtifacts"
 >;
 
 /** Check every reachable membership, including NOINHERIT/SET ROLE paths. An
@@ -189,6 +191,7 @@ export async function createDevelopmentTrust(
     connectionTimeoutMillis: 2000,
     statement_timeout: 5000,
   });
+  let privacyArtifacts: PrivateFileArtifacts | undefined;
   try {
     await assertDevelopmentPoolRole(
       runtime.pool,
@@ -276,6 +279,27 @@ export async function createDevelopmentTrust(
             exporter: await ContentPrivacyExport.prepare(runtime.pool),
           }
         : undefined);
+    privacyArtifacts = env.TRUST_PRIVATE_ARTIFACT_DIRECTORY
+      ? await PrivateFileArtifacts.prepare(env.TRUST_PRIVATE_ARTIFACT_DIRECTORY)
+      : undefined;
+    const comparisonReview = await registeredComparisonProfile();
+    if (comparisonReview && !privacyArtifacts)
+      throw new DomainError(
+        "comparison_export_unconfigured",
+        "Comparison storage requires its original protected artifact store.",
+        503,
+      );
+    const comparisonArtifacts =
+      comparisonReview && privacyArtifacts
+        ? await PreparedComparisonArtifacts.prepare({
+            workerPool,
+            artifacts: privacyArtifacts,
+            catalogueChecksum:
+              comparisonReview.comparison.artifactsCatalogueChecksum,
+            assertRestoredInTransaction,
+            signal: AbortSignal.timeout(10_000),
+          })
+        : undefined;
     const agentReview = await registeredAgentPrivacyExportReview();
     const agentExport =
       options.consumers?.agentExport ??
@@ -283,6 +307,7 @@ export async function createDevelopmentTrust(
         ? await PreparedAgentPrivacyExport.prepare({
             ...agentReview,
             pool: runtime.pool,
+            comparisons: comparisonArtifacts,
             assertTaskInTransaction: (client, job) =>
               restoredPrivacyTaskAuthorityInTransaction(
                 client,
@@ -291,9 +316,6 @@ export async function createDevelopmentTrust(
               ),
           })
         : undefined);
-    const privacyArtifacts = env.TRUST_PRIVATE_ARTIFACT_DIRECTORY
-      ? await PrivateFileArtifacts.prepare(env.TRUST_PRIVATE_ARTIFACT_DIRECTORY)
-      : undefined;
     return {
       environment: "local-development",
       identityMode: "development",
@@ -302,6 +324,7 @@ export async function createDevelopmentTrust(
       apiPool,
       workerPool,
       privacyArtifacts,
+      comparisonArtifacts,
       dependencies: {
         ...identityAuthority,
         evidence: scopedTrustEvidence({
@@ -332,6 +355,7 @@ export async function createDevelopmentTrust(
         content,
         agentExport,
         privacyArtifacts,
+        comparisonArtifacts,
         assertRestoredInTransaction,
         agent: options.consumers?.agent ?? agent,
       }),
@@ -391,7 +415,19 @@ export async function createDevelopmentTrust(
       crisisResources: [],
     };
   } catch (error) {
-    await Promise.all([apiPool.end(), workerPool.end()]);
+    const cleanup = await Promise.allSettled([
+      apiPool.end(),
+      workerPool.end(),
+      privacyArtifacts?.close(),
+    ]);
+    const failures = cleanup.flatMap((result) =>
+      result.status === "rejected" ? [result.reason] : [],
+    );
+    if (failures.length)
+      throw new AggregateError(
+        [error, ...failures],
+        "Development Trust preparation and cleanup failed.",
+      );
     throw error;
   }
 }

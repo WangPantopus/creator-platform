@@ -29,6 +29,7 @@ import {
 } from "./modules/identity/audience-scope.js";
 
 export type BackendRuntime = {
+  comparisonArtifacts?: import("./modules/trust/comparison-artifacts.js").PreparedComparisonArtifacts;
   prepareUsageAccounting?: () => Promise<
     | import("./modules/trust/usage-accounting-host.js").HostUsageAccounting
     | undefined
@@ -91,6 +92,7 @@ const issuedRuntimes = new WeakMap<
     creatorDenied: BackendRuntime["assertCreatorAllowedInTransaction"];
     contentDenied: BackendRuntime["assertContentAllowedInTransaction"];
     audience: BackendRuntime["audienceIdentity"];
+    comparisonArtifacts: BackendRuntime["comparisonArtifacts"];
   }>
 >();
 /** Genuine complete host graph only; clones or replaced authority callbacks
@@ -108,7 +110,8 @@ export function isConfiguredBackendRuntime(runtime: BackendRuntime): boolean {
     issued.denied === runtime.assertScopeAllowedInTransaction &&
     issued.creatorDenied === runtime.assertCreatorAllowedInTransaction &&
     issued.contentDenied === runtime.assertContentAllowedInTransaction &&
-    issued.audience === runtime.audienceIdentity
+    issued.audience === runtime.audienceIdentity &&
+    issued.comparisonArtifacts === runtime.comparisonArtifacts
   );
 }
 
@@ -619,6 +622,8 @@ export async function createConfiguredBackend(input: {
         throw cause;
       }
     }
+    if (trust?.comparisonArtifacts)
+      backendRuntime.comparisonArtifacts = trust.comparisonArtifacts;
     issuedRuntimes.set(
       backendRuntime,
       Object.freeze({
@@ -632,6 +637,7 @@ export async function createConfiguredBackend(input: {
         creatorDenied: backendRuntime.assertCreatorAllowedInTransaction,
         contentDenied: backendRuntime.assertContentAllowedInTransaction,
         audience: backendRuntime.audienceIdentity,
+        comparisonArtifacts: backendRuntime.comparisonArtifacts,
       }),
     );
     features =

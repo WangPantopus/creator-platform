@@ -6,11 +6,13 @@ import { TrustStore } from "./store.js";
 import { privacyTaskAuthority } from "./privacy-authority.js";
 import {
   consumePrivacyExport,
+  PrivacyArtifact,
   type PrivacyArtifactStore,
 } from "./privacy-export.js";
 import { DomainError } from "../../core/errors.js";
 import { trustTransaction } from "./transaction.js";
 import { accountingPrivacyFailure } from "./accounting-privacy-failure.js";
+import type { PreparedComparisonArtifacts } from "./comparison-artifacts.js";
 
 type Task = {
   job_id: string;
@@ -76,6 +78,7 @@ export class TrustWorker {
       kind: "export" | "delete",
       cause: unknown,
     ) => void,
+    readonly comparisonArtifacts?: PreparedComparisonArtifacts,
   ) {}
   async start() {
     await new TrustStore(this.pool).assertRole(true);
@@ -140,6 +143,16 @@ export class TrustWorker {
         : []),
       ...(effects.status === "fulfilled"
         ? effects.value.map((effect) => this.runEffect(effect))
+        : []),
+      ...(this.comparisonArtifacts
+        ? [
+            (async () => {
+              const signal = AbortSignal.timeout(30_000);
+              await this.comparisonArtifacts!.expireSources(signal);
+              await this.comparisonArtifacts!.recoverAttempts(signal);
+              await this.comparisonArtifacts!.purge(signal);
+            })(),
+          ]
         : []),
     ]);
     for (const result of settled)
@@ -262,6 +275,23 @@ export class TrustWorker {
               verifyLease: () => privacyTaskAuthority(this.pool)(job),
             })
           : result.data;
+        if (
+          this.comparisonArtifacts &&
+          task.kind === "export" &&
+          (task.domain === "agent" || task.domain === "conversation")
+        ) {
+          if (
+            !(await this.comparisonArtifacts.retainSealed(
+              job,
+              PrivacyArtifact.parse(data),
+            ))
+          )
+            throw new DomainError(
+              "comparison_artifact_purge_pending",
+              "The comparison source changed. Its export is being removed.",
+              409,
+            );
+        }
         signal.throwIfAborted();
         return {
           receipt: result.stream
