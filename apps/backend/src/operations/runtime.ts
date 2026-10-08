@@ -165,11 +165,6 @@ export async function createTrustRuntime(options: {
     store,
     options.dependencies,
     options.privacyArtifacts,
-    (domain, kind, cause) =>
-      console.error(
-        "Privacy task failed.",
-        JSON.stringify({ domain, kind, ...lifecycleFailure(cause) }),
-      ),
   );
   const telemetry = new TrustTelemetry(options.environment, options.release);
   const restored = async () => {
@@ -260,6 +255,11 @@ export async function createTrustRuntime(options: {
         ? telemetry.increment(name, value)
         : telemetry.observe(name, value),
     options.privacyArtifacts,
+    (domain, kind, cause) =>
+      console.error(
+        "Privacy task failed.",
+        JSON.stringify({ domain, kind, ...lifecycleFailure(cause) }),
+      ),
   );
   const router = createTrustRouter({
     service,
