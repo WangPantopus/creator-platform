@@ -80,6 +80,10 @@ export class ConversationFeature {
     readonly offlineIssuer?: ConversationOfflineIssuer,
     private readonly developmentPolicy?: DevelopmentConversationPolicy,
     private readonly generationRunning?: () => boolean,
+    readonly comparisons?: {
+      consent: import("./comparison-consent.js").ConversationComparisonConsent;
+      samples: import("./comparison-samples.js").ConversationComparisonSamples;
+    },
   ) {
     this.policy = policy ? ProviderPolicySchema.parse(policy) : null;
     invariant(
@@ -137,6 +141,7 @@ export class ConversationFeature {
         Boolean(this.policyAvailable() && this.assertReady) &&
         this.access.threadScopeInTransactionAvailable,
       correctionsAvailable: Boolean(this.corrections),
+      comparisonsAvailable: Boolean(this.comparisons),
       recordingDeliveryAvailable: Boolean(this.recordings),
       offlineAvailable: Boolean(
         this.offlineIssuer &&
@@ -729,6 +734,57 @@ export function conversationFeature(
             (req.method === "GET" && !req.path.endsWith("/events")),
         );
       const root = "/v1/conversations/:creatorId/:fanId";
+      const comparisonAction = async (
+        req: import("express").Request,
+        res: import("express").Response,
+        work: (scope: ThreadScope, signal: AbortSignal) => Promise<unknown>,
+      ) => {
+        invariant(
+          feature.comparisons,
+          "comparison_unavailable",
+          "AI comparisons are not available yet.",
+        );
+        res.setHeader("Cache-Control", "no-store");
+        const controller = new AbortController();
+        const closed = () => {
+          if (!res.writableEnded) controller.abort();
+        };
+        res.on("close", closed);
+        try {
+          const signal = AbortSignal.any([
+            controller.signal,
+            AbortSignal.timeout(60_000),
+          ]);
+          const scope = await scopeFor(req);
+          signal.throwIfAborted();
+          const result = await work(scope, signal);
+          signal.throwIfAborted();
+          res.json(result);
+        } finally {
+          res.removeListener("close", closed);
+        }
+      };
+      router.get(root + "/comparison-consent", (req, res) =>
+        comparisonAction(req, res, (scope, signal) =>
+          feature.comparisons!.consent.read(scope, signal),
+        ),
+      );
+      router.post(root + "/comparison-consent", (req, res) =>
+        comparisonAction(req, res, (scope, signal) =>
+          feature.comparisons!.consent.decide(scope, req.body, signal),
+        ),
+      );
+      router.post(root + "/messages/:id/comparison", (req, res) =>
+        comparisonAction(req, res, async (scope, signal) => {
+          z.strictObject({}).parse(req.body);
+          const sample = await feature.comparisons!.samples.produce(
+            scope,
+            IdSchema.parse(req.params.id),
+            signal,
+          );
+          return { included: sample !== null };
+        }),
+      );
       router.get(root + "/offline", async (req, res) => {
         res.setHeader("Cache-Control", "no-store");
         res.json(

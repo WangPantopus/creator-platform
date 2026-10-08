@@ -1,0 +1,401 @@
+{
+  "kind": "isolated metadata review of numbered reserved SQL; no application authority",
+  "observedAt": "2026-10-08T17:06:48.793Z",
+  "completeRestoredMetadataIdentical": true,
+  "results": [
+    {
+      "label": "restored",
+      "ledgerRows": 113,
+      "purpose": "65f18199c73cc9cf75b37c3ea863194f8656dd18a0582e3b0c3c309c599396ae",
+      "runtime": {
+        "output": "3c453b30231c4507ef14d53b324880c9aea3b611ea6f821badcdf3c71917bbcc",
+        "terminal": "17c8d869a3d05c54604baa8abb0095f4af7ac97d5cc839c3a3de36bf489f62ec",
+        "financial": "d3cdca8bb991c7c72d17fc3b35561565b02db08b58528ab6140097c18f759d86",
+        "expiry": "ee140fffb77e3664c557c62ab9f77ed2df2e0464c8f66dac76268b775e9d17ee",
+        "detached": "eecd8dc508e504de998218bd1b58d41a36bd5829227411072d2f889f5ec30be0",
+        "boundary": "e3fbbcaafc1a1622d9fe87e159abd06b92ac13d252e0dc91f7e79a95ff62d61f",
+        "family": "225b8e4818935861b1c96337a26bdb04eb107849934c098b254afe85e6f39b01"
+      },
+      "output": "4b25e810204d989ebdf73e5be801f0896311653d6084cb58ce5060840fecee50",
+      "extra": {
+        "cursor": "98e886fd0ce77a3d64f0452fad09fb0cfcd43b203a5b7515527a162a718556a6",
+        "provenance": "1e4ab214abeb8d36ade388bfdef1d9a3227d675302d786e2bff1fd4738847adf",
+        "public": "c2470500a034b9cd0368690b57b2c83b45f2e0c0fbbe089461bcd8fd68cbecec"
+      },
+      "comparison": {
+        "reader": "d6649eaf1b3c583a958b342c19d3124a779b9bd1df8d5c6453aeff47deb91df7",
+        "privacy": "da218034389815e7198ed8bf1bdd3f93d39a675944d9b3ddb6cb1d18416324ce",
+        "artifacts": "f50dde0bd42419e4574770114b65543603bfb94cbd74bc3ecc00d6fb08977940"
+      },
+      "worker": {
+        "creator_commerce_public_read": "0fa43e039ffdea332b4000cf6f0ee883a0097b544bfc00fbec3b2f71c2db8602",
+        "creator_generation_authority": "da7856d0455a1ac28208e4fa7b6d8f1b7ea2e6761d2adfbf896fa416eedf9480",
+        "creator_generation_conversation_context": "be67b931a63038f5f6969c1cde421e7ce535102bdc0e90cf38edc1a8148c5002",
+        "creator_generation_cursor_authority": "492d821b08d9a9e14a0460c53e0cb569c4f2b369aab44795319f41a52ed70e8e",
+        "creator_generation_terminal_authority": "71f9366a16a5b63bb52c86f50381d85426865cc9ab6c3923a5a13a1a3fda6663",
+        "creator_generation_terminal_discovery": "523cd82e7293828edf269ca6f69d3bc58d014d4bed1a60dc3c2750e130da477e",
+        "creator_generation_worker": "25fd918f152227514b57af34efdfe6c1391f8e4bfefa597dd18a5543bd427e84",
+        "creator_privacy_accounting_boundary": "4a1493987adc429972f848f336cec52a5b6f88cafff0c7cff8d87868245191b4",
+        "creator_privacy_family": "512af796d5ecc1b31e293f962b0803e21d171954bf7a9d72446b6902ecb1a579",
+        "creator_privacy_ownership_metadata": "25fd918f152227514b57af34efdfe6c1391f8e4bfefa597dd18a5543bd427e84",
+        "creator_signature_read_authority": "78dc4c60178bd09bc4e837ca5218d26c7e8da23be476aa95ae13552b76403e43",
+        "creator_usage_detachment": "e24ef1a67abc2c8c1491655cddb876b7fcfc2bbef1b9c132f300ecb99bf30a62",
+        "creator_usage_expiry": "0cd8878bcd9582f93a71fd8c41793cbac53500e9869c1aaea25588ab51f07585",
+        "creator_w2_generation_guardrail": "a0fee793f1fffdd43d64177241f182a4d5ee75616620fe9e2c94292a52625b8d",
+        "creator_w2_generation_input": "3d35819d54a1fd66f605fc3a5eefccf44bd27993d0a2662e0226f386ac4725ae",
+        "creator_w2_generation_journal": "2aa95001450c1266474194887485092385281931a229fab73f39cfdfd7c51275",
+        "creator_w2_generation_metadata": "fb5687488200122ccccc58399cb2f80de22f7a18abf914660628b41248b19bd0",
+        "creator_w2_generation_retrieval": "a2a808ee8fab1a7fdb79ac7a708c3603e5b1fdb0e19463730d0198e94305ab04",
+        "creator_w2_generation_terminal_journal": "14bf7f75007fa233a771052076816d68a77fd37300c0ca9428a2b764cffb5b46",
+        "creator_w2_privacy_export": "1c3ad7a29dddbfb24a4181cc5af219d55f1eed5a8261c603daff605ef3dc18f2",
+        "creator_w3_generation_output": "18fc240319414de1a1306cb9ed1ebe8319dcfc1e5ea6baa97d50e1fbbb06e759",
+        "creator_w3_generation_privacy": "089366a5f64de32e2760f32c52b051bf8198279bf15f7a633f6ad42ff7383db5",
+        "creator_w3_privacy_export": "65bc38e900a1f504c136a1679b4afe8049d1893702469a5e74259d21c06c4b03",
+        "creator_w3_terminal_output": "7e5829b7b78c23358208d7076c53d5e3366ccf547f46d9632698c2cc14e17348",
+        "creator_w4_generation_audience": "a6ab8559c19d4966025e450f1a34723bbd86cca84bf78a5421f5ccec9cfda932",
+        "creator_w4_generation_safety_terminal": "6071523cd628b8b2ae1a080f5b60d90f67503607c1404e0dbce8a806151f66b3",
+        "creator_w4_generation_terminal": "bf2a23499ac20f51f76960c946694655178540164f84495ebced2294102598a2",
+        "creator_w5_generation_origin": "7d8b1ae7e6b0a31b20b6182fcf645dab3594891aa86f2cdead5ccf646052db7f"
+      },
+      "definitions": [
+        {
+          "signature": "creator.comparison_cohort_now(uuid,text,text)",
+          "owner": "creator_comparison_reader",
+          "checksum": "f4189775fa0cb7d0ce0e8f8d0da5c095015fa1634aeee0d3ce6deb14c89a3285"
+        },
+        {
+          "signature": "creator.conversation_privacy_export_rows(uuid,uuid)",
+          "owner": "creator_w3_privacy_export",
+          "checksum": "53656e429461ca73c2fb2a4d9b9ffd0a234b4b9cf3e6c2793ac78da9205965fd"
+        },
+        {
+          "signature": "creator.end_comparison_read()",
+          "owner": "creator_comparison_reader",
+          "checksum": "16e8d8ec89fa28ff08e2ab8ca52c766fa5e81518ac6d5ffa2310f0bc802695e8"
+        },
+        {
+          "signature": "creator.fence_conversation_privacy_export(uuid,uuid,text,uuid,uuid,uuid)",
+          "owner": "creator_w3_privacy_export",
+          "checksum": "c20292458ff54df47f4a7a590529109424a143ee62b0e29cb531f7a6891d7033"
+        },
+        {
+          "signature": "creator.finish_conversation_privacy_export_scope()",
+          "owner": "creator_w3_privacy_export",
+          "checksum": "a18d439512f89abe047fcfd2494cf48b366aa38ff5c4e5beaf153e98e9819bf8"
+        },
+        {
+          "signature": "creator.purge_conversation_comparisons(uuid,uuid,uuid,uuid,uuid)",
+          "owner": "creator_comparison_lifecycle",
+          "checksum": "5b39ca6d3af5cd279117e614e955ca88c4eaef50c5735ad4ac42531942f1cbab"
+        },
+        {
+          "signature": "creator.read_comparison_cohort(uuid,text,text)",
+          "owner": "creator_comparison_reader",
+          "checksum": "171dfa874672e12c9cc9f0f940a3ad953bf72f2058e766ce439707382b289585"
+        },
+        {
+          "signature": "creator_trust.begin_comparison_artifact_privacy_delete(uuid,uuid)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "f4a396849dd551f1aaa3c597ee269b6081bbdb8e375b063adccf6ef8676c29c7"
+        },
+        {
+          "signature": "creator_trust.capture_comparison_export_families()",
+          "owner": "creator_comparison_artifact",
+          "checksum": "e55375d06f1d29d1d222f621db7c4792407670ca08223031481eea0be68d8aa4"
+        },
+        {
+          "signature": "creator_trust.capture_comparison_export(text,uuid,uuid,text,uuid)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "a462ac49b9d1504d346a21cb39a1a5f8854b2c0ac10eeda9ee6f4c788ed030e4"
+        },
+        {
+          "signature": "creator_trust.claim_comparison_export_purge(integer)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "877dec29d79e8518b25083ffa2f9ae0499f8e5a6830df0e7c6e77de4506386b8"
+        },
+        {
+          "signature": "creator_trust.comparison_artifact_matches_privacy(creator_trust.comparison_export_artifact,jsonb)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "6c0bac3bc6ec9094304bd9f05db4031db56145fb4d035804dd93aef1715234aa"
+        },
+        {
+          "signature": "creator_trust.comparison_artifact_privacy_delete_rows(uuid,uuid)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "e3e0fd32c19f64742b2afc37f9b8eb2aac86686027c91adbdaf62052a94e4302"
+        },
+        {
+          "signature": "creator_trust.comparison_artifact_privacy_registered(text,text)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "0fa899f0d78631992a1c5934569a7a024a82d558c73db0cddd6609824d61f9fa"
+        },
+        {
+          "signature": "creator_trust.comparison_artifact_privacy_scope(uuid,uuid)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "29e6494eecfaad08acad9825174a5dcc0e22bca11127243e8e78e3e541db1eed"
+        },
+        {
+          "signature": "creator_trust.current_comparison_export(uuid,uuid,text,text)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "e8331cff2d40c09c0cb05a1dee72b430557e34f214dc3256f183bc98eb8b589f"
+        },
+        {
+          "signature": "creator_trust.export_comparison_artifact_privacy(uuid,uuid)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "8bac9c9c7732298d1cb610f01c1d9f959c8d0793ea7928230f71496e187909aa"
+        },
+        {
+          "signature": "creator_trust.fence_comparison_export_attempt(jsonb)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "f34b58554b854c03f33e177f1e40aeab860f1615c143bac34dea9972766672a7"
+        },
+        {
+          "signature": "creator_trust.finish_comparison_artifact_privacy_delete(uuid,uuid,text,jsonb)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "e0c1bff59d49c614ba0b9ea3212b62815571e322ab3adc16efb7bc19644c4ed9"
+        },
+        {
+          "signature": "creator_trust.finish_comparison_export_attempt(jsonb)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "9cee220a1a14502cbbc19b55bb32328d29971fa41ae8c65633d9ff27d030d948"
+        },
+        {
+          "signature": "creator_trust.finish_comparison_export_purge(text,uuid,jsonb)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "152d083e3e25b214bb5aad3a13fb251fd3ba6d3e1bdb8e2f9127a04915653cee"
+        },
+        {
+          "signature": "creator_trust.finish_comparison_export_task()",
+          "owner": "creator_comparison_artifact",
+          "checksum": "9f5c85adc53f267f59e2f9a2fde14efd0198ffd75664b73742d839790f974fb1"
+        },
+        {
+          "signature": "creator_trust.guard_comparison_export_task_clear()",
+          "owner": "creator_comparison_artifact",
+          "checksum": "ffd94f50497d7751cb3a94199f6014ebada7c26eb942681731a6e4db1347468a"
+        },
+        {
+          "signature": "creator_trust.invalidate_comparison_exports()",
+          "owner": "creator_comparison_artifact",
+          "checksum": "8578c99a8ddca13cf8fa67c2ea67905927f6115babf5d484d8ba0c8d3bbec617"
+        },
+        {
+          "signature": "creator_trust.invalidate_comparison_source()",
+          "owner": "creator_comparison_lifecycle",
+          "checksum": "fcbee652d8629f8307e908d9a0b33a282a8a7ff4a1a8dbf461fa3b3e9e2b52f7"
+        },
+        {
+          "signature": "creator_trust.purge_expired_comparison_sources(integer)",
+          "owner": "creator_comparison_lifecycle",
+          "checksum": "7999d488e5cc5d65deccd5aab20b8c7da28c8f6c8b01e809c43c068f27ec817a"
+        },
+        {
+          "signature": "creator_trust.seal_comparison_export(text,uuid,jsonb)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "951b1826d901c20a0b96462d15d6f045480dbf258bdf3e6b2b78583c33674e4d"
+        },
+        {
+          "signature": "creator_trust.withdraw_comparison_source()",
+          "owner": "creator_comparison_lifecycle",
+          "checksum": "63c35061f3cd9483b39b94903d5c98bd3136aa131201395ef7fcb69094bf8ec9"
+        }
+      ]
+    },
+    {
+      "label": "restored-incoming",
+      "ledgerRows": 113,
+      "purpose": "e4319a6c5d2d3745d74127efbd9bbb3e55652e86f7ec7604c8d594436315440e",
+      "runtime": {
+        "output": "3c453b30231c4507ef14d53b324880c9aea3b611ea6f821badcdf3c71917bbcc",
+        "terminal": "17c8d869a3d05c54604baa8abb0095f4af7ac97d5cc839c3a3de36bf489f62ec",
+        "financial": "d3cdca8bb991c7c72d17fc3b35561565b02db08b58528ab6140097c18f759d86",
+        "expiry": "ee140fffb77e3664c557c62ab9f77ed2df2e0464c8f66dac76268b775e9d17ee",
+        "detached": "eecd8dc508e504de998218bd1b58d41a36bd5829227411072d2f889f5ec30be0",
+        "boundary": "e3fbbcaafc1a1622d9fe87e159abd06b92ac13d252e0dc91f7e79a95ff62d61f",
+        "family": "5f4906ea796b718cc0920ec312c35a903f336bcaed5a13929eb528fb182a6063"
+      },
+      "output": "4b25e810204d989ebdf73e5be801f0896311653d6084cb58ce5060840fecee50",
+      "extra": {
+        "cursor": "98e886fd0ce77a3d64f0452fad09fb0cfcd43b203a5b7515527a162a718556a6",
+        "provenance": "da4fcfec2f052e6c1e21a4aef41b11b6c55dc371b11124a234e98f7faf4920b1",
+        "public": "c2470500a034b9cd0368690b57b2c83b45f2e0c0fbbe089461bcd8fd68cbecec"
+      },
+      "comparison": {
+        "reader": "d6649eaf1b3c583a958b342c19d3124a779b9bd1df8d5c6453aeff47deb91df7",
+        "privacy": "da218034389815e7198ed8bf1bdd3f93d39a675944d9b3ddb6cb1d18416324ce",
+        "artifacts": "f50dde0bd42419e4574770114b65543603bfb94cbd74bc3ecc00d6fb08977940"
+      },
+      "worker": {
+        "creator_commerce_public_read": "0fa43e039ffdea332b4000cf6f0ee883a0097b544bfc00fbec3b2f71c2db8602",
+        "creator_generation_authority": "da7856d0455a1ac28208e4fa7b6d8f1b7ea2e6761d2adfbf896fa416eedf9480",
+        "creator_generation_conversation_context": "be67b931a63038f5f6969c1cde421e7ce535102bdc0e90cf38edc1a8148c5002",
+        "creator_generation_cursor_authority": "492d821b08d9a9e14a0460c53e0cb569c4f2b369aab44795319f41a52ed70e8e",
+        "creator_generation_terminal_authority": "71f9366a16a5b63bb52c86f50381d85426865cc9ab6c3923a5a13a1a3fda6663",
+        "creator_generation_terminal_discovery": "523cd82e7293828edf269ca6f69d3bc58d014d4bed1a60dc3c2750e130da477e",
+        "creator_generation_worker": "25fd918f152227514b57af34efdfe6c1391f8e4bfefa597dd18a5543bd427e84",
+        "creator_privacy_accounting_boundary": "4a1493987adc429972f848f336cec52a5b6f88cafff0c7cff8d87868245191b4",
+        "creator_privacy_family": "512af796d5ecc1b31e293f962b0803e21d171954bf7a9d72446b6902ecb1a579",
+        "creator_privacy_ownership_metadata": "25fd918f152227514b57af34efdfe6c1391f8e4bfefa597dd18a5543bd427e84",
+        "creator_signature_read_authority": "78dc4c60178bd09bc4e837ca5218d26c7e8da23be476aa95ae13552b76403e43",
+        "creator_usage_detachment": "e24ef1a67abc2c8c1491655cddb876b7fcfc2bbef1b9c132f300ecb99bf30a62",
+        "creator_usage_expiry": "0cd8878bcd9582f93a71fd8c41793cbac53500e9869c1aaea25588ab51f07585",
+        "creator_w2_generation_guardrail": "a0fee793f1fffdd43d64177241f182a4d5ee75616620fe9e2c94292a52625b8d",
+        "creator_w2_generation_input": "3d35819d54a1fd66f605fc3a5eefccf44bd27993d0a2662e0226f386ac4725ae",
+        "creator_w2_generation_journal": "2aa95001450c1266474194887485092385281931a229fab73f39cfdfd7c51275",
+        "creator_w2_generation_metadata": "fb5687488200122ccccc58399cb2f80de22f7a18abf914660628b41248b19bd0",
+        "creator_w2_generation_retrieval": "a2a808ee8fab1a7fdb79ac7a708c3603e5b1fdb0e19463730d0198e94305ab04",
+        "creator_w2_generation_terminal_journal": "14bf7f75007fa233a771052076816d68a77fd37300c0ca9428a2b764cffb5b46",
+        "creator_w2_privacy_export": "1c3ad7a29dddbfb24a4181cc5af219d55f1eed5a8261c603daff605ef3dc18f2",
+        "creator_w3_generation_output": "18fc240319414de1a1306cb9ed1ebe8319dcfc1e5ea6baa97d50e1fbbb06e759",
+        "creator_w3_generation_privacy": "089366a5f64de32e2760f32c52b051bf8198279bf15f7a633f6ad42ff7383db5",
+        "creator_w3_privacy_export": "65bc38e900a1f504c136a1679b4afe8049d1893702469a5e74259d21c06c4b03",
+        "creator_w3_terminal_output": "7e5829b7b78c23358208d7076c53d5e3366ccf547f46d9632698c2cc14e17348",
+        "creator_w4_generation_audience": "a6ab8559c19d4966025e450f1a34723bbd86cca84bf78a5421f5ccec9cfda932",
+        "creator_w4_generation_safety_terminal": "6071523cd628b8b2ae1a080f5b60d90f67503607c1404e0dbce8a806151f66b3",
+        "creator_w4_generation_terminal": "bf2a23499ac20f51f76960c946694655178540164f84495ebced2294102598a2",
+        "creator_w5_generation_origin": "7d8b1ae7e6b0a31b20b6182fcf645dab3594891aa86f2cdead5ccf646052db7f"
+      },
+      "definitions": [
+        {
+          "signature": "creator.comparison_cohort_now(uuid,text,text)",
+          "owner": "creator_comparison_reader",
+          "checksum": "f4189775fa0cb7d0ce0e8f8d0da5c095015fa1634aeee0d3ce6deb14c89a3285"
+        },
+        {
+          "signature": "creator.conversation_privacy_export_rows(uuid,uuid)",
+          "owner": "creator_w3_privacy_export",
+          "checksum": "53656e429461ca73c2fb2a4d9b9ffd0a234b4b9cf3e6c2793ac78da9205965fd"
+        },
+        {
+          "signature": "creator.end_comparison_read()",
+          "owner": "creator_comparison_reader",
+          "checksum": "16e8d8ec89fa28ff08e2ab8ca52c766fa5e81518ac6d5ffa2310f0bc802695e8"
+        },
+        {
+          "signature": "creator.fence_conversation_privacy_export(uuid,uuid,text,uuid,uuid,uuid)",
+          "owner": "creator_w3_privacy_export",
+          "checksum": "c20292458ff54df47f4a7a590529109424a143ee62b0e29cb531f7a6891d7033"
+        },
+        {
+          "signature": "creator.finish_conversation_privacy_export_scope()",
+          "owner": "creator_w3_privacy_export",
+          "checksum": "a18d439512f89abe047fcfd2494cf48b366aa38ff5c4e5beaf153e98e9819bf8"
+        },
+        {
+          "signature": "creator.purge_conversation_comparisons(uuid,uuid,uuid,uuid,uuid)",
+          "owner": "creator_comparison_lifecycle",
+          "checksum": "5b39ca6d3af5cd279117e614e955ca88c4eaef50c5735ad4ac42531942f1cbab"
+        },
+        {
+          "signature": "creator.read_comparison_cohort(uuid,text,text)",
+          "owner": "creator_comparison_reader",
+          "checksum": "171dfa874672e12c9cc9f0f940a3ad953bf72f2058e766ce439707382b289585"
+        },
+        {
+          "signature": "creator_trust.begin_comparison_artifact_privacy_delete(uuid,uuid)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "f4a396849dd551f1aaa3c597ee269b6081bbdb8e375b063adccf6ef8676c29c7"
+        },
+        {
+          "signature": "creator_trust.capture_comparison_export_families()",
+          "owner": "creator_comparison_artifact",
+          "checksum": "e55375d06f1d29d1d222f621db7c4792407670ca08223031481eea0be68d8aa4"
+        },
+        {
+          "signature": "creator_trust.capture_comparison_export(text,uuid,uuid,text,uuid)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "a462ac49b9d1504d346a21cb39a1a5f8854b2c0ac10eeda9ee6f4c788ed030e4"
+        },
+        {
+          "signature": "creator_trust.claim_comparison_export_purge(integer)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "877dec29d79e8518b25083ffa2f9ae0499f8e5a6830df0e7c6e77de4506386b8"
+        },
+        {
+          "signature": "creator_trust.comparison_artifact_matches_privacy(creator_trust.comparison_export_artifact,jsonb)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "6c0bac3bc6ec9094304bd9f05db4031db56145fb4d035804dd93aef1715234aa"
+        },
+        {
+          "signature": "creator_trust.comparison_artifact_privacy_delete_rows(uuid,uuid)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "e3e0fd32c19f64742b2afc37f9b8eb2aac86686027c91adbdaf62052a94e4302"
+        },
+        {
+          "signature": "creator_trust.comparison_artifact_privacy_registered(text,text)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "0fa899f0d78631992a1c5934569a7a024a82d558c73db0cddd6609824d61f9fa"
+        },
+        {
+          "signature": "creator_trust.comparison_artifact_privacy_scope(uuid,uuid)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "29e6494eecfaad08acad9825174a5dcc0e22bca11127243e8e78e3e541db1eed"
+        },
+        {
+          "signature": "creator_trust.current_comparison_export(uuid,uuid,text,text)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "e8331cff2d40c09c0cb05a1dee72b430557e34f214dc3256f183bc98eb8b589f"
+        },
+        {
+          "signature": "creator_trust.export_comparison_artifact_privacy(uuid,uuid)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "8bac9c9c7732298d1cb610f01c1d9f959c8d0793ea7928230f71496e187909aa"
+        },
+        {
+          "signature": "creator_trust.fence_comparison_export_attempt(jsonb)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "f34b58554b854c03f33e177f1e40aeab860f1615c143bac34dea9972766672a7"
+        },
+        {
+          "signature": "creator_trust.finish_comparison_artifact_privacy_delete(uuid,uuid,text,jsonb)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "e0c1bff59d49c614ba0b9ea3212b62815571e322ab3adc16efb7bc19644c4ed9"
+        },
+        {
+          "signature": "creator_trust.finish_comparison_export_attempt(jsonb)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "9cee220a1a14502cbbc19b55bb32328d29971fa41ae8c65633d9ff27d030d948"
+        },
+        {
+          "signature": "creator_trust.finish_comparison_export_purge(text,uuid,jsonb)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "152d083e3e25b214bb5aad3a13fb251fd3ba6d3e1bdb8e2f9127a04915653cee"
+        },
+        {
+          "signature": "creator_trust.finish_comparison_export_task()",
+          "owner": "creator_comparison_artifact",
+          "checksum": "9f5c85adc53f267f59e2f9a2fde14efd0198ffd75664b73742d839790f974fb1"
+        },
+        {
+          "signature": "creator_trust.guard_comparison_export_task_clear()",
+          "owner": "creator_comparison_artifact",
+          "checksum": "ffd94f50497d7751cb3a94199f6014ebada7c26eb942681731a6e4db1347468a"
+        },
+        {
+          "signature": "creator_trust.invalidate_comparison_exports()",
+          "owner": "creator_comparison_artifact",
+          "checksum": "8578c99a8ddca13cf8fa67c2ea67905927f6115babf5d484d8ba0c8d3bbec617"
+        },
+        {
+          "signature": "creator_trust.invalidate_comparison_source()",
+          "owner": "creator_comparison_lifecycle",
+          "checksum": "fcbee652d8629f8307e908d9a0b33a282a8a7ff4a1a8dbf461fa3b3e9e2b52f7"
+        },
+        {
+          "signature": "creator_trust.purge_expired_comparison_sources(integer)",
+          "owner": "creator_comparison_lifecycle",
+          "checksum": "7999d488e5cc5d65deccd5aab20b8c7da28c8f6c8b01e809c43c068f27ec817a"
+        },
+        {
+          "signature": "creator_trust.seal_comparison_export(text,uuid,jsonb)",
+          "owner": "creator_comparison_artifact",
+          "checksum": "951b1826d901c20a0b96462d15d6f045480dbf258bdf3e6b2b78583c33674e4d"
+        },
+        {
+          "signature": "creator_trust.withdraw_comparison_source()",
+          "owner": "creator_comparison_lifecycle",
+          "checksum": "63c35061f3cd9483b39b94903d5c98bd3136aa131201395ef7fcb69094bf8ec9"
+        }
+      ]
+    }
+  ]
+}

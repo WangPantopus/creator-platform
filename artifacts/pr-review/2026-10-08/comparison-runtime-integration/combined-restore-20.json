@@ -1,0 +1,9 @@
+{
+  "kind": "isolated numbered schema/ledger restore; no actual app data or traffic",
+  "source": "creator_comparison_artifact19_20261008",
+  "target": "creator_comparison_artifact20_20261008",
+  "backupSha256": "10104bb8161f1103f63d4fe81c43405c5800c0ca6581bb7f41b2880c10a8cdca",
+  "backupBytes": 1416975,
+  "ledgerRows": 113,
+  "observedAt": "2026-10-08T17:06:25.709Z"
+}

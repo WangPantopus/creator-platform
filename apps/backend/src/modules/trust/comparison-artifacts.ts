@@ -6,10 +6,7 @@ import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
 import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
 import { agentPrivacyQueryTimeout } from "../agent/privacy-transaction.js";
 import { requestAuthority } from "../identity/request-authority.js";
-import {
-  comparisonPrivacySource,
-  comparisonStorageSource,
-} from "../conversation/comparison-privacy.js";
+import { comparisonPrivacyCatalogue } from "../conversation/comparison-privacy.js";
 import {
   PrivacyArtifact,
   PrivacyArtifactAttempt,
@@ -18,29 +15,30 @@ import {
   type PrivacyArtifactStore,
 } from "./privacy-export.js";
 import { trustTransaction } from "./transaction.js";
+import comparisonReview from "../../../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
 
 export const comparisonArtifactSource = Object.freeze({
   owner: "W8",
   name: "comparison_export_artifacts",
-  path: "apps/backend/src/modules/trust/pending-comparison-export-artifacts.sql",
-  checksum: "c1e1dfdb83fe002fbc060c1e0737811a24d39967e12a7a840164f22091c5d0ed",
+  path: "apps/backend/src/modules/trust/0241_comparison_export_artifacts.sql",
+  checksum: "63559d896eb5e5821dc15096e8f72d3b75faebcd5f23294f62ae5f8b0e63e415",
 });
 export const comparisonAttemptSource = Object.freeze({
   owner: "W8",
   name: "comparison_export_attempts",
-  path: "apps/backend/src/modules/trust/pending-comparison-export-attempts.sql",
-  checksum: "f99563564a82d3ba6145b82760e177ae91b2c1fd0538a4c4187b0cae5de28380",
+  path: "apps/backend/src/modules/trust/0242_comparison_export_attempts.sql",
+  checksum: "6333db3d2263ea59b48af4b6329a6fb853951ac22e3071f925f776010f819b5f",
 });
 export const comparisonArtifactPrivacySource = Object.freeze({
   owner: "W8",
   name: "comparison_export_privacy",
-  path: "apps/backend/src/modules/trust/pending-comparison-export-privacy.sql",
-  checksum: "3633aace4fec87335582f8cb85b3cd1b87a4d03d526427612821769970eb3e01",
+  path: "apps/backend/src/modules/trust/0243_comparison_export_privacy.sql",
+  checksum: "b9974d48123516ebcdd318b3149107e10fe2795551c10ec2f1079270f1dd0a7b",
 });
-// Independently operated metadata for the complete pending graph. This is a
-// catalogue check only; all five exact executable registrations remain required.
+// Independently operated numbered graph and complete restore. This is metadata
+// only; exact executable registration and original host composition are required.
 export const comparisonArtifactPrivacyCatalogueChecksum =
-  "058a0dcdc52b7e6b969e6b27074a632173332ec45630a3a49c5e7af09153d175";
+  comparisonReview.comparison.artifactsCatalogueChecksum;
 const Owner = "creator_comparison_artifact";
 const Snapshot = z.string().min(8).max(200);
 const Domain = z.enum(["agent", "conversation"]);
@@ -177,12 +175,24 @@ export class PreparedComparisonArtifacts {
     private readonly workerPool: Pool,
     private readonly artifacts: PrivacyArtifactStore,
     private readonly catalogueChecksum: string,
+    private readonly assertRestoredInTransaction: (
+      client: PoolClient,
+    ) => Promise<void>,
   ) {}
+
+  assertComposition(workerPool: Pool, artifacts: PrivacyArtifactStore) {
+    invariant(
+      workerPool === this.workerPool && artifacts === this.artifacts,
+      "comparison_artifact_composition_changed",
+      "Use the original comparison worker and protected artifact store.",
+    );
+  }
 
   static async prepare(input: {
     workerPool: Pool;
     artifacts: PrivacyArtifactStore;
     catalogueChecksum: string;
+    assertRestoredInTransaction: (client: PoolClient) => Promise<void>;
     signal: AbortSignal;
   }) {
     invariant(
@@ -198,6 +208,7 @@ export class PreparedComparisonArtifacts {
       input.workerPool,
       input.artifacts,
       Hash.parse(input.catalogueChecksum),
+      input.assertRestoredInTransaction,
     );
     await trustTransaction(
       input.workerPool,
@@ -210,13 +221,8 @@ export class PreparedComparisonArtifacts {
 
   async assertClient(client: PoolClient, role: Role, signal: AbortSignal) {
     signal.throwIfAborted();
-    for (const source of [
-      comparisonStorageSource,
-      comparisonPrivacySource,
-      comparisonArtifactSource,
-      comparisonAttemptSource,
-      comparisonArtifactPrivacySource,
-    ])
+    await this.assertRestoredInTransaction(client);
+    for (const source of comparisonReview.sources)
       await assertRegisteredMigration(client, source, signal);
     const row = (
       await query(
@@ -399,6 +405,43 @@ export class PreparedComparisonArtifacts {
       if (acknowledged) removed++;
     }
     return removed;
+  }
+
+  /** The same original Trust worker owns wall-clock expiry. No caller supplies
+   * a cutoff, edits historical clocks or treats denied reads as physical removal. */
+  async expireSources(signal: AbortSignal) {
+    invariant(
+      !requestAuthority.getStore(),
+      "comparison_artifact_worker_required",
+      "Use the original background comparison expiry worker.",
+    );
+    return trustTransaction(
+      this.workerPool,
+      async (client) => {
+        await this.assertClient(client, "creator_trust_worker", signal);
+        invariant(
+          contentHash(await comparisonPrivacyCatalogue(client, signal)) ===
+            comparisonReview.comparison.privacy.catalogueChecksum,
+          "comparison_privacy_custody_changed",
+          "The original comparison expiry owner must match independent review.",
+        );
+        const result = await query(
+          client,
+          "SELECT * FROM creator_trust.purge_expired_comparison_sources(100)",
+          [],
+          signal,
+        );
+        return z
+          .strictObject({
+            consents_deleted: z.int().min(0).max(100),
+            samples_deleted: z.int().min(0).max(100),
+            cache_deleted: z.int().min(0).max(100),
+            results_cleared: z.int().min(0).max(100),
+          })
+          .parse(result.rows[0]);
+      },
+      { signal },
+    );
   }
 
   /** A restarted host discovers both unfinished attempts and sealed files that

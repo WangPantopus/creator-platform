@@ -41,6 +41,7 @@ import { domainPrivacyTaskAuthorityInTransaction } from "./domain-privacy-author
 import { prepareGenerationAccountingRetention } from "./generation-accounting-retention.js";
 import { PreparedPrivacyAccountingBoundary } from "./accounting-boundary.js";
 import type { PrivacyArtifactStore } from "./privacy-export.js";
+import type { PreparedComparisonArtifacts } from "./comparison-artifacts.js";
 import type { TrustWorker } from "./worker.js";
 import type { AgentRepository } from "../agent/repository.js";
 import type { PreparedUsageRetention } from "../agent/usage-retention.js";
@@ -157,6 +158,7 @@ export type AgentPrivacyOwnerPorts = Readonly<{
  * Domain services use their own non-owner pools; the coordinator never obtains
  * SELECT on peer private tables or an interactive grant. */
 export function createPrivacyConsumers(input: {
+  comparisonArtifacts?: PreparedComparisonArtifacts;
   runtimePool: Pool;
   coordinatorPool: Pool;
   /** The same protected store owned by the original Trust coordinator. */
@@ -219,7 +221,11 @@ export function createPrivacyConsumers(input: {
     });
   };
   const hooks: PrivacyHook[] = [
-    trustPrivacyHook(input.coordinatorPool, input.assertRestoredInTransaction),
+    trustPrivacyHook(
+      input.coordinatorPool,
+      input.assertRestoredInTransaction,
+      input.comparisonArtifacts,
+    ),
     identityPrivacyHook(
       input.runtimePool,
       input.coordinatorPool,
@@ -318,6 +324,7 @@ export function createPrivacyConsumers(input: {
           );
         return conversationPrivacyHook({
           ...owners,
+          comparisonArtifacts: input.comparisonArtifacts,
           ...(accounting ? { accounting } : {}),
           ...(comparisons ? { comparisons } : {}),
           ...(financial

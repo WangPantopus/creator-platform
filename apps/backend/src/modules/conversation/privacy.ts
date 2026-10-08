@@ -13,6 +13,7 @@ import type {
 } from "../commerce/generation-privacy.js";
 import { z } from "zod";
 import { PreparedPrivacyAccountingBoundary } from "../trust/accounting-boundary.js";
+import type { PreparedComparisonArtifacts } from "../trust/comparison-artifacts.js";
 import { conversationPrivacyExportStream } from "./privacy-export-stream.js";
 import { PreparedConversationPrivacyCursor } from "./privacy-export-cursor.js";
 import { PreparedGenerationProvenancePurge } from "./generation-provenance-privacy.js";
@@ -156,6 +157,7 @@ export type ConversationPrivacyInput = {
    * ordinary generation/message/event parents on this held transaction. */
   provenancePurge?: PreparedGenerationProvenancePurge;
   comparisons?: PreparedComparisonPrivacy;
+  comparisonArtifacts?: PreparedComparisonArtifacts;
   /** Exact prepared W4 port; original-policy evidence precedes journal purge.
    * Finite reviewed retention and expiry remain W8's separate responsibility. */
   generationCostPrivacyReconciliation?: GenerationCostPrivacyReconciliation;

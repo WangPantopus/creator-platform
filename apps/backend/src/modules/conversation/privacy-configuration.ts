@@ -3,6 +3,7 @@ import { invariant } from "../../core/errors.js";
 import { registeredContentPrivacyProfile } from "../../db/content-privacy-profile.js";
 import { registeredMigration } from "../../db/reviewed-migration.js";
 import { registeredPublicAIProfile } from "../../db/public-ai-profile.js";
+import { registeredComparisonProfile } from "../../db/comparison-profile.js";
 import type { ConversationPrivacyOwnerPorts } from "../trust/privacy-consumers.js";
 
 type Review = Readonly<{
@@ -65,10 +66,14 @@ export async function registeredConversationPrivacyReview(
   );
   const publicAI = await registeredPublicAIProfile(signal);
   if (publicAI) {
+    const comparison = await registeredComparisonProfile(signal);
     const base = profiles.content!;
     return Object.freeze({
       cursor: Object.freeze({
         ...base.cursor,
+        ...(comparison
+          ? { definitions: comparison.conversationCursorDefinitions }
+          : {}),
         catalogueChecksum: publicAI.conversationCursorCatalogueChecksum,
       }),
       provenancePurge: Object.freeze({

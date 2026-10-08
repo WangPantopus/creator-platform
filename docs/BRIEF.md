@@ -311,3 +311,5 @@ Resolve these during the design pass (proposals in the [design plan](DESIGN_PLAN
 8. **Pass-era copy** appears in slice-1 screens (Home's "Next month's pass" card, Discover's "before spending a slot"). Design both the membership-era and pass-era variants.
 9. **Ops console** (verification review, safety cases, disputes, pauses) is required by the product but has no screens in the source docs.
 10. **Brand name, colors, approved-draft treatment, theme default, AI vs human voice player, Discover's lead, studio density:** the seven open questions in Product Design section 12.
+
+| 2026-10-08 | Comparison source integration uses the original Trust worker and protected store; numbered SQL remains reserved until the preserved-data upgrade and legacy export/file lifecycle are operated. No legacy consent or source mapping is inferred from an empty export. [Evidence](../artifacts/pr-review/2026-10-08/comparison-runtime-integration/README.md). |

@@ -1118,6 +1118,69 @@
       "sourceSha256": "734a806c1e2252d7c5c7c418856f3b448933d993326ef471bb3351eed1367e41",
       "state": "reserved_unapplied",
       "reason": "Separate original ordinary Content LAST signature-metadata reader published7a340113, all89 SQL lines independently read/hash-checked by W8. Isolated NoLogin NoInherit NoBypassRLS creator_content_signature_read_authority owns only fixed creator.hold_content_signature_read(uuid,uuid,uuid,text,boolean) RETURNS boolean for the genuine core runtime. Narrow stored signature/session metadata, actual creator/content/consumed signed act/canonical stored publication-command hash/public audience and unchanged0167 six mutation fences remain mandatory. Original W5 version/audience/restoration/recipient/negative gates must already hold on the same original client/PID/fullXID; the final nonwaiting shared actual signer-family lease uses fresh READ COMMITTED metadata. Original0157 packet purpose remains separate; no packet, ThreadScope, Actor or second-pool alias supplies this authority. Published8c8f8ef8 corrects implicit sequence ACL projection only; the complete effective catalogue stays unaccepted. Exact source registration, original typed callers and full combined catalogue/compiler/drift/refusal/fresh-preserved/cancellation/C10/withdrawal/revocation and sole owner cleanup/COMMIT qualification remain pending. Source custody only; no installed SQL/grant, accepted pin, private body/key/assertion, provider permission or application acceptance."
+    },
+    {
+      "id": "0239",
+      "version": "0239_w3_comparison_samples",
+      "owner": "W3",
+      "path": "apps/backend/src/modules/conversation/migrations/0239_w3_comparison_samples.sql",
+      "sourceSha256": "39199c153fb758c5bb7e9ceef24b1b38dd23740732153f75aa85ff1e8c32973d",
+      "state": "reserved_unapplied",
+      "reason": "Additive numbered copy of preserved comparison proposal. Complete combined catalogue, restore, legacy export and original host review pending; reservation does not activate SQL or provider use."
+    },
+    {
+      "id": "0240",
+      "version": "0240_w3_comparison_privacy",
+      "owner": "W3",
+      "path": "apps/backend/src/modules/conversation/migrations/0240_w3_comparison_privacy.sql",
+      "sourceSha256": "4a3b44c345f02a61c93b591dba5a8e0c35130923b72d1bc0291749ca274a0da8",
+      "state": "reserved_unapplied",
+      "reason": "Additive numbered copy of preserved comparison proposal. Complete combined catalogue, restore, legacy export and original host review pending; reservation does not activate SQL or provider use."
+    },
+    {
+      "id": "0241",
+      "version": "0241_comparison_export_artifacts",
+      "owner": "W8",
+      "path": "apps/backend/src/modules/trust/0241_comparison_export_artifacts.sql",
+      "sourceSha256": "63559d896eb5e5821dc15096e8f72d3b75faebcd5f23294f62ae5f8b0e63e415",
+      "state": "reserved_unapplied",
+      "reason": "Additive numbered copy of preserved comparison proposal. Complete combined catalogue, restore, legacy export and original host review pending; reservation does not activate SQL or provider use."
+    },
+    {
+      "id": "0242",
+      "version": "0242_comparison_export_attempts",
+      "owner": "W8",
+      "path": "apps/backend/src/modules/trust/0242_comparison_export_attempts.sql",
+      "sourceSha256": "6333db3d2263ea59b48af4b6329a6fb853951ac22e3071f925f776010f819b5f",
+      "state": "reserved_unapplied",
+      "reason": "Additive numbered copy of preserved comparison proposal. Complete combined catalogue, restore, legacy export and original host review pending; reservation does not activate SQL or provider use."
+    },
+    {
+      "id": "0243",
+      "version": "0243_comparison_export_privacy",
+      "owner": "W8",
+      "path": "apps/backend/src/modules/trust/0243_comparison_export_privacy.sql",
+      "sourceSha256": "b9974d48123516ebcdd318b3149107e10fe2795551c10ec2f1079270f1dd0a7b",
+      "state": "reserved_unapplied",
+      "reason": "Additive numbered copy of preserved comparison proposal. Complete combined catalogue, restore, legacy export and original host review pending; reservation does not activate SQL or provider use."
+    },
+    {
+      "id": "0244",
+      "version": "0244_w3_comparison_writer",
+      "owner": "W3",
+      "path": "apps/backend/src/modules/conversation/migrations/0244_w3_comparison_writer.sql",
+      "sourceSha256": "5e72dc539bd628faf870d39dfeca12613124c7a577d1e00d1cf27382d5cc3228",
+      "state": "reserved_unapplied",
+      "reason": "Additive numbered copy of preserved comparison proposal. Complete combined catalogue, restore, legacy export and original host review pending; reservation does not activate SQL or provider use."
+    },
+    {
+      "id": "0245",
+      "version": "0245_w3_comparison_reader",
+      "owner": "W3",
+      "path": "apps/backend/src/modules/conversation/migrations/0245_w3_comparison_reader.sql",
+      "sourceSha256": "4fcb07080002cd2001c565444bcbe870d868ca5b13e32224b6feb3d8849be834",
+      "state": "reserved_unapplied",
+      "reason": "Additive numbered copy of preserved comparison proposal. Complete combined catalogue, restore, legacy export and original host review pending; reservation does not activate SQL or provider use."
     }
   ]
 }

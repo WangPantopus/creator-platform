@@ -38,6 +38,11 @@ export function conversationPrivacyExportStream(
     "The actual complete READ COMMITTED source cursor is required.",
   );
   cursor.assertRuntime(input);
+  invariant(
+    cursor.hasComparisonSources() === Boolean(input.comparisonArtifacts),
+    "comparison_export_unconfigured",
+    "Comparison sources require their original saved-artifact owner.",
+  );
   const snapshotRef = `conversation-export:${randomUUID()}`;
   const controller = new AbortController();
   const signal = AbortSignal.any([
@@ -215,6 +220,12 @@ export function conversationPrivacyExportStream(
          set_config('generation.scope_nonce','',true),set_config('generation.terminal_nonce','',true)`,
       );
       await cursor.open(client, job, families);
+      await input.comparisonArtifacts?.capture(
+        client,
+        job,
+        "conversation",
+        snapshotRef,
+      );
       const held = client;
       await writeConversationPrivacyCursor({
         next: () => cursor.next(held, job, families, signal),
