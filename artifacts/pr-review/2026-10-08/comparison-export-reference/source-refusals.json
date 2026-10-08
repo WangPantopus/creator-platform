@@ -1,0 +1,72 @@
+[
+  {
+    "at": "2026-10-08T18:38:48.810Z",
+    "elapsedMs": 1.6762540000490844,
+    "role": "creator_trust_worker",
+    "sql": "SELECT creator_trust.seal_comparison_export($1,$2,$3) AS allowed",
+    "name": "error",
+    "code": "42501",
+    "message": "Original comparison capture required",
+    "where": "PL/pgSQL function creator_trust.seal_comparison_export(text,uuid,jsonb) line 7 at RAISE"
+  },
+  {
+    "at": "2026-10-08T18:39:18.160Z",
+    "elapsedMs": 1.578904999885708,
+    "role": "creator_trust_worker",
+    "sql": "SELECT creator_trust.seal_comparison_export($1,$2,$3) AS allowed",
+    "name": "error",
+    "code": "42501",
+    "message": "Original comparison capture required",
+    "where": "PL/pgSQL function creator_trust.seal_comparison_export(text,uuid,jsonb) line 7 at RAISE"
+  },
+  {
+    "at": "2026-10-08T18:39:58.634Z",
+    "elapsedMs": 1.2842309998814017,
+    "role": "creator_runtime",
+    "sql": "SELECT creator_trust.fence_privacy_task($1,$2,$3,$4,$5,$6,$7,$8) AS owned",
+    "name": "error",
+    "code": "55P03",
+    "message": "could not obtain lock on row in relation \"privacy_task\"",
+    "where": "SQL statement \"SELECT job_id,domain,lease_token,lease_until             FROM creator_trust.privacy_task\n   WHERE job_id=jid AND domain=d AND state='running' AND lease_token=token AND lease_until>clock_timestamp() FOR SHARE NOWAIT\"\nPL/pgSQL function creator_trust.fence_privacy_task(uuid,uuid,text,text,uuid,uuid,text,uuid) line 21 at SQL statement"
+  },
+  {
+    "at": "2026-10-08T18:41:19.803Z",
+    "elapsedMs": 0.8874310001265258,
+    "role": "creator_runtime",
+    "sql": "SELECT creator_trust.fence_privacy_task($1,$2,$3,$4,$5,$6,$7,$8) AS owned",
+    "name": "error",
+    "code": "55P03",
+    "message": "could not obtain lock on row in relation \"privacy_task\"",
+    "where": "SQL statement \"SELECT job_id,domain,lease_token,lease_until             FROM creator_trust.privacy_task\n   WHERE job_id=jid AND domain=d AND state='running' AND lease_token=token AND lease_until>clock_timestamp() FOR SHARE NOWAIT\"\nPL/pgSQL function creator_trust.fence_privacy_task(uuid,uuid,text,text,uuid,uuid,text,uuid) line 21 at SQL statement"
+  },
+  {
+    "at": "2026-10-08T18:44:01.168Z",
+    "elapsedMs": 1.1034280001185834,
+    "role": "creator_runtime",
+    "sql": "SELECT creator_trust.fence_privacy_task($1,$2,$3,$4,$5,$6,$7,$8) AS owned",
+    "name": "error",
+    "code": "55P03",
+    "message": "could not obtain lock on row in relation \"privacy_task\"",
+    "where": "SQL statement \"SELECT job_id,domain,lease_token,lease_until             FROM creator_trust.privacy_task\n   WHERE job_id=jid AND domain=d AND state='running' AND lease_token=token AND lease_until>clock_timestamp() FOR SHARE NOWAIT\"\nPL/pgSQL function creator_trust.fence_privacy_task(uuid,uuid,text,text,uuid,uuid,text,uuid) line 21 at SQL statement"
+  },
+  {
+    "at": "2026-10-08T18:49:23.003Z",
+    "elapsedMs": 0.9148610001429915,
+    "role": "creator_runtime",
+    "sql": "SELECT creator_trust.fence_privacy_task($1,$2,$3,$4,$5,$6,$7,$8) AS owned",
+    "name": "error",
+    "code": "55P03",
+    "message": "could not obtain lock on row in relation \"privacy_task\"",
+    "where": "SQL statement \"SELECT job_id,domain,lease_token,lease_until             FROM creator_trust.privacy_task\n   WHERE job_id=jid AND domain=d AND state='running' AND lease_token=token AND lease_until>clock_timestamp() FOR SHARE NOWAIT\"\nPL/pgSQL function creator_trust.fence_privacy_task(uuid,uuid,text,text,uuid,uuid,text,uuid) line 21 at SQL statement"
+  },
+  {
+    "at": "2026-10-08T18:52:12.776Z",
+    "elapsedMs": 1.1311400000013236,
+    "role": "creator_runtime",
+    "sql": "SELECT creator_trust.fence_privacy_task($1,$2,$3,$4,$5,$6,$7,$8) AS owned",
+    "name": "error",
+    "code": "55P03",
+    "message": "could not obtain lock on row in relation \"privacy_task\"",
+    "where": "SQL statement \"SELECT job_id,domain,lease_token,lease_until             FROM creator_trust.privacy_task\n   WHERE job_id=jid AND domain=d AND state='running' AND lease_token=token AND lease_until>clock_timestamp() FOR SHARE NOWAIT\"\nPL/pgSQL function creator_trust.fence_privacy_task(uuid,uuid,text,text,uuid,uuid,text,uuid) line 21 at SQL statement"
+  }
+]

@@ -1,0 +1,74 @@
+{
+  "at": "2026-10-08T18:58:15.128945+00:00",
+  "fileChanges": [
+    {
+      "jobId": "61e07c91-56b4-4dbe-835c-0714797b4b13",
+      "domain": "agent",
+      "changed": false
+    },
+    {
+      "jobId": "61e07c91-56b4-4dbe-835c-0714797b4b13",
+      "domain": "commerce",
+      "changed": false
+    },
+    {
+      "jobId": "61e07c91-56b4-4dbe-835c-0714797b4b13",
+      "domain": "conversation",
+      "changed": false
+    },
+    {
+      "jobId": "61e07c91-56b4-4dbe-835c-0714797b4b13",
+      "domain": "growth",
+      "changed": false
+    },
+    {
+      "jobId": "c09931ea-d367-4464-a581-3f6309e72263",
+      "domain": "agent",
+      "changed": false
+    },
+    {
+      "jobId": "c09931ea-d367-4464-a581-3f6309e72263",
+      "domain": "commerce",
+      "changed": false
+    },
+    {
+      "jobId": "c09931ea-d367-4464-a581-3f6309e72263",
+      "domain": "conversation",
+      "changed": true
+    },
+    {
+      "jobId": "c09931ea-d367-4464-a581-3f6309e72263",
+      "domain": "growth",
+      "changed": false
+    },
+    {
+      "jobId": "f6a7410b-7db9-4da6-a4ca-901d7a90a317",
+      "domain": "agent",
+      "changed": false
+    },
+    {
+      "jobId": "f6a7410b-7db9-4da6-a4ca-901d7a90a317",
+      "domain": "commerce",
+      "changed": false
+    },
+    {
+      "jobId": "f6a7410b-7db9-4da6-a4ca-901d7a90a317",
+      "domain": "conversation",
+      "changed": false
+    },
+    {
+      "jobId": "f6a7410b-7db9-4da6-a4ca-901d7a90a317",
+      "domain": "growth",
+      "changed": false
+    }
+  ],
+  "allOtherFilesExact": true,
+  "withdrawnAt": "2026-10-08T18:57:28.659Z",
+  "removedAt": "2026-10-08T18:57:29.820Z",
+  "savedConsentCount": 1,
+  "savedSampleCount": 1,
+  "savedSampleId": "f767cf4d-ebca-48ce-89b8-9f3fa66af1eb",
+  "savedParaphrase": "What is the recommended method for drying a freshly shaped clay mug?",
+  "downloadsRetainedAsDevelopmentEvidence": true,
+  "expiryClockChanged": false
+}

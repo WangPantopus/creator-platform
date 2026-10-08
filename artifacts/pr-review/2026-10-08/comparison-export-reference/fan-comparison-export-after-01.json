@@ -1,0 +1,109 @@
+{
+  "kind": "actual browser-requested fan account export on preserved copy43",
+  "sourceRevision": "561419f3392e1e0aa1dc4d0dd06838c772da3702",
+  "observedAt": "2026-10-08T18:52:40.163Z",
+  "job": {
+    "id": "c09931ea-d367-4464-a581-3f6309e72263",
+    "kind": "export",
+    "scope": "account",
+    "state": "dead_letter",
+    "account_id": "10000000-0000-4000-8000-000000000003",
+    "created_at": "2026-10-08T18:37:56.769Z",
+    "completed_at": null
+  },
+  "tasks": [
+    {
+      "domain": "agent",
+      "state": "dead_letter",
+      "error_code": "privacy_commit_fence_unavailable",
+      "attempts": 8
+    },
+    {
+      "domain": "commerce",
+      "state": "complete",
+      "error_code": null,
+      "attempts": 1
+    },
+    {
+      "domain": "content",
+      "state": "complete",
+      "error_code": null,
+      "attempts": 1
+    },
+    {
+      "domain": "conversation",
+      "state": "complete",
+      "error_code": null,
+      "attempts": 1
+    },
+    {
+      "domain": "growth",
+      "state": "complete",
+      "error_code": null,
+      "attempts": 1
+    },
+    {
+      "domain": "identity",
+      "state": "complete",
+      "error_code": null,
+      "attempts": 1
+    },
+    {
+      "domain": "media",
+      "state": "complete",
+      "error_code": null,
+      "attempts": 1
+    },
+    {
+      "domain": "trust",
+      "state": "complete",
+      "error_code": null,
+      "attempts": 1
+    }
+  ],
+  "artifacts": [
+    {
+      "domain": "commerce",
+      "bytes": 12091,
+      "chunks": 5,
+      "sha256": "e27022bbd528626c55a3535f6626349f9ebb63566ed2beca201fca721783e573",
+      "markerMode": "600",
+      "attemptPresent": true,
+      "manifestBindingMatches": true,
+      "sourceBindingMatches": null,
+      "snapshotRef": "commerce-export:8b2f3a04-871e-41ba-95bd-56230b27af23",
+      "reference": "e2c87add-7e92-44ad-b3c5-3dff873760d7"
+    },
+    {
+      "domain": "conversation",
+      "bytes": 200143,
+      "chunks": 4,
+      "sha256": "7c8293add168ef1982bd149fbac762d14eb82fabc42a46597828090146e35273",
+      "markerMode": null,
+      "attemptPresent": false,
+      "manifestBindingMatches": true,
+      "sourceBindingMatches": true,
+      "snapshotRef": "conversation-export:b2d1ef4a-8b3d-4c3d-aa72-49b6fae91ed0",
+      "sourceFamilies": [
+        {
+          "thread_id": "9f7ef626-3b4e-4bab-bf7c-775dd9585346",
+          "account_id": "10000000-0000-4000-8000-000000000003",
+          "creator_id": "4dbccb2f-16e0-4fa3-96ef-135798690f4a"
+        }
+      ],
+      "reference": "aa689cd6-b88f-4dd5-a6c8-b1dc8742cd59"
+    },
+    {
+      "domain": "growth",
+      "bytes": 541,
+      "chunks": 1,
+      "sha256": "b47d52acd1fc5c346a9eb7ef2e73b4c25caeeea272d1ef137b0450c42cf9b125",
+      "markerMode": "600",
+      "attemptPresent": true,
+      "manifestBindingMatches": true,
+      "sourceBindingMatches": null,
+      "snapshotRef": "3e5f3373-108d-4a5d-bd19-c726e923832c",
+      "reference": "ff5e5421-4a13-42f0-80f7-015a3f0de988"
+    }
+  ]
+}

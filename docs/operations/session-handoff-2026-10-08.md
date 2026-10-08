@@ -1,5 +1,29 @@
 # Session handoff — October 8, 2026
 
+## Active continuation — original export recovery and withdrawal
+
+Continue on `codex/comparison-export-reference-20261008` in637b. The
+[actual increment](../../artifacts/pr-review/2026-10-08/comparison-export-reference/README.md)
+fixes Agent's original snapshot reference and sequences comparison maintenance after
+claimed operations settle. Original jobc09931ea completes all8 domains on attempt9;
+all4 real browser downloads match saved hashes. Earlier reference/55P03 failures
+and attempt8dead-letter remain evidence. No applied SQL changed.
+
+Explicit web withdrawal removed the1consent/1sample and the affected Conversation
+file in1.161s. Fresh verified download now fails403; other11saved files remain exact.
+Current consent/sample counts are0; provider usage remains2known calls/921micros and
+original18generation/69usage/publication custody is unchanged. Native devices remain
+stopped; native withdrawal/Night/accessibility and creator comparison upgrade are next.
+Backend compileded709286e on57304 uses launch43-backend-comparison-export-reference-02.mjs,
+session16277, logbackend-comparison-export-reference-02.log; web3119 remains available.
+
+PR347 merged289f79e11. PR348's lastAndroidcheck was still running; PR349 and350
+continue. PR350's initial stale-generation failures are fixed by regenerating
+OpenAPI/native models; refresh its new head checks. PR346's separate main rerun
+was cancelled by347's main37827085270. Refresh latest main and all exact-head checks.
+Carry every full-plan milestone and all immutable evidence/clock/holds forward.
+
+
 ## Active continuation — real comparison choice and question
 
 Continue on `codex/comparison-choice-ui-20261008` in637b. The

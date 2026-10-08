@@ -1,0 +1,122 @@
+[
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/fan-comparison-export-after-01.json",
+    "bytes": 2962,
+    "sha256": "1b599f44256d40ca89aaee3a23081d20bf08f0d5d49422eaa3c08fdcbbf9d1a2"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/fan-comparison-export-after-02.json",
+    "bytes": 3399,
+    "sha256": "2aaf65a94015bf10e656bb5d98934051939008e3fc5c203ffbc22b3f2ec02dfb"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-export-reference-restarts.json",
+    "bytes": 527,
+    "sha256": "8887e6167b5e131cd3dc31092f893208a2849c0190a91127a55310f06bbbb61e"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-export-download-verification-01.json",
+    "bytes": 2176,
+    "sha256": "f703d8ba90a48699a56c3256fc876e68a6e6918399fcf725983879516e4e961c"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-withdrawal-before-01.json",
+    "bytes": 17005,
+    "sha256": "0c2630b4e509a784825b1df07aa3c853e58e6d8b59bcbdd8776a1867af0f3a98"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-withdrawal-after-01.json",
+    "bytes": 16774,
+    "sha256": "205fdaf48fa10bbdeb62069b76f6e8c624f976c593d9be49c42b7a91b041a779"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-withdrawal-verification-01.json",
+    "bytes": 1896,
+    "sha256": "63424ac48be3a422237e8bed3e492da4b03cece9d30e642d148fddd29546baac"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison43-export-reference-after-02.json",
+    "bytes": 4763,
+    "sha256": "8c1fcf9462dea0447d4dac33ab5f13f1db7cc9324b26650aa5fba6219bda75f1"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison43-withdrawn-01.json",
+    "bytes": 3234,
+    "sha256": "c526ba2d53f3174cb294cfea30f46fd72ec46cdc6f72db65e15bfeed20f18be0"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/operation43-compatibility-comparison-export-reference-before-01.json",
+    "bytes": 35900,
+    "sha256": "6c4d9000ec24979c980a29dd5f35d8fc8549e0ad2fdd4a9f804ced7378c1c42d"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/operation43-compatibility-comparison-export-reference-after-02.json",
+    "bytes": 35900,
+    "sha256": "5c9554bab364b2648bb4f3964c91a75e35bc707f98e7045f3d6e70085f09f726"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-export-complete-web.png",
+    "bytes": 76983,
+    "sha256": "3c7fbc84fff8430a07ee78c26d84c91a76173a8b5aecae6c11868e8e5fbe46a3"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-withdrawn-web.png",
+    "bytes": 116374,
+    "sha256": "81a6244463b83b97cdbc8cf1c4f10fe5cba3baed948470c7dcae0b73f01ee63b"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-revoked-download-web.png",
+    "bytes": 90404,
+    "sha256": "67db08f47b0682b408b7246f08e2e8b09cf3b3f4375ab2fd4639e5d9a0133a1d"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/backend-comparison-export-reference-build-01.log",
+    "bytes": 2263,
+    "sha256": "e44f012b71b7b2cd77fe04e1e6797e2882a9c0a46d969b4dab15a5ab06c8a0b4"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/backend-comparison-export-reference-build-02.log",
+    "bytes": 85,
+    "sha256": "4b0c201daaf34867b6cd431fc03d79439d4f264ec2c414b4dad8068b0d907d47"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/backend-comparison-export-reference-build-03.log",
+    "bytes": 87,
+    "sha256": "2f9113ef457dae35769a0e021608c1997200e1b0bd56daaa86ed8ac5993a1ddb"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/backend-comparison-export-reference-01.log",
+    "bytes": 25122,
+    "sha256": "571aeb8711afe6f83b67a6724a087aa95ff083532775809e3d7bb0ab1349bf13"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/backend-comparison-export-reference-02.log",
+    "bytes": 71524,
+    "sha256": "a16833caf84d870c85728616951b1b73c27e2be7a70cf302ff749ac06ac86b99"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/private/comparison-export-reference-errors-01.jsonl",
+    "bytes": 6633,
+    "sha256": "ae4f6a592103190fd690974e0828b0e92fc0e1e500b054b8113df94d7ecf3b3e"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/private/comparison-export-reference-errors-02.jsonl",
+    "bytes": 12741,
+    "sha256": "e0d989c605dace9fbbc1b02af816c0b639118b84c04a1707257a1eaa2f9b7eec"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/observe-fan-comparison-export.mjs",
+    "bytes": 3602,
+    "sha256": "968050b38db7ca74bcc8e24dc627ff9e56187faa03fff206db89d4d7fca42c23"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/observe-fan-comparison-export-v2.mjs",
+    "bytes": 3602,
+    "sha256": "a25a93b2580b0680e0738db54b1797fe712ffb51b7294805f5df3cf5d8a3ad9f"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/record-comparison-withdrawal.mjs",
+    "bytes": 2761,
+    "sha256": "2fc33fe7cfb4bbc1cc277bc9762b3ec5f5d3e1f64c289bfdd041d936524773fb"
+  }
+]

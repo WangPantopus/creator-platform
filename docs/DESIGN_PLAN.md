@@ -23,6 +23,12 @@ W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan expor
 
 ## Implementation continuation
 
+- [~] October 8, 2026: original comparison export completes all eight domains after
+  source-reference and worker-recovery sequencing fixes. Real web downloads match;
+  explicit withdrawal removes the sample and affected file, and fresh download
+  fails closed. Native withdrawal, creator populated cases and full privacy remain.
+  [Evidence](../artifacts/pr-review/2026-10-08/comparison-export-reference/README.md).
+
 - [~] October 8, 2026: separate comparison choice/question controls pass real web,
   iOS simulator and Android emulator Light journeys. One actual sample and two
   settled provider calls are retained; native repeats reuse it. New export sealing
