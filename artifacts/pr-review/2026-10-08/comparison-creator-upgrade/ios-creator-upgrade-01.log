@@ -1,0 +1,84 @@
+Heavy build slot acquired by creator-upgrade-ios-ui.
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project apps/ios/QelvoraApp.xcodeproj -scheme QelvoraApp -destination "platform=iOS Simulator,id=D5ED8A7C-924E-4F1E-AC35-DB0FACF1E1B0" -derivedDataPath /Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-build -jobs 2 "-only-testing:QelvoraUITests/ConnectedJourneyTests/testPublishedConversationSurvivesNativeRelaunch" -resultBundlePath /Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-creator-upgrade-01.xcresult test-without-building
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  swift-custom-dump: https://github.com/pointfreeco/swift-custom-dump @ 1.7.3
+  LiveKit: https://github.com/livekit/client-sdk-swift.git @ 2.17.0
+  xctest-dynamic-overlay: https://github.com/pointfreeco/xctest-dynamic-overlay @ 1.13.1
+  LiveKitWebRTC: https://github.com/livekit/webrtc-xcframework.git @ 150.7871.2
+  swift-syntax: https://github.com/swiftlang/swift-syntax @ 604.0.0
+  QelvoraNative: /Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/ios
+  swift-snapshot-testing: https://github.com/pointfreeco/swift-snapshot-testing.git @ 1.19.6
+  LiveKitUniFFI: https://github.com/livekit/livekit-uniffi-xcframework.git @ 0.1.9
+
+Writing result bundle at path:
+	/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-creator-upgrade-01.xcresult
+
+2026-10-08 12:20:38.799372-0700 QelvoraUITests-Runner[21391:3862720] [Default] Running tests...
+2026-10-08 12:20:38.879613-0700 QelvoraUITests-Runner[21391:3862957] [General] Failed to send CA Event for app launch measurements for ca_event_type: 0 event_name: com.apple.app_launch_measurement.FirstFramePresentationMetric
+2026-10-08 12:20:38.917939-0700 QelvoraUITests-Runner[21391:3862960] [General] Failed to send CA Event for app launch measurements for ca_event_type: 1 event_name: com.apple.app_launch_measurement.ExtendedLaunchMetrics
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'Selected tests' started at 2026-10-08 12:20:45.206.
+Test Suite 'QelvoraUITests.xctest' started at 2026-10-08 12:20:45.207.
+Test Suite 'ConnectedJourneyTests' started at 2026-10-08 12:20:45.207.
+Test Case '-[QelvoraUITests.ConnectedJourneyTests testPublishedConversationSurvivesNativeRelaunch]' started.
+    t =     0.00s Start Test at 2026-10-08 12:20:45.210
+    t =     0.42s Set Up
+    t =     0.43s Open com.pantopus.qelvora
+    t =     0.43s     Launch com.pantopus.qelvora
+2026-10-08 12:20:45.739 xcodebuild[21095:3859591] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-10-08 12:20:45.739 xcodebuild[21095:3859591] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     2.19s         Setting up automation session
+    t =     4.92s         Wait for com.pantopus.qelvora to idle
+    t =     6.88s Waiting 5.0s for "continue-with-pantopus" Button to exist
+    t =     7.91s     Checking `Expect predicate `existsNoRetry == 1` for object "continue-with-pantopus" Button`
+    t =     7.91s         Checking existence of `"continue-with-pantopus" Button`
+    t =     8.06s         Capturing element debug description
+    t =     8.90s     Checking `Expect predicate `existsNoRetry == 1` for object "continue-with-pantopus" Button`
+    t =     8.90s         Checking existence of `"continue-with-pantopus" Button`
+    t =     8.95s         Capturing element debug description
+    t =     9.92s     Checking `Expect predicate `existsNoRetry == 1` for object "continue-with-pantopus" Button`
+    t =     9.92s         Checking existence of `"continue-with-pantopus" Button`
+    t =     9.98s         Capturing element debug description
+    t =    10.91s     Checking `Expect predicate `existsNoRetry == 1` for object "continue-with-pantopus" Button`
+    t =    10.91s         Checking existence of `"continue-with-pantopus" Button`
+    t =    10.97s         Capturing element debug description
+    t =    11.89s     Checking `Expect predicate `existsNoRetry == 1` for object "continue-with-pantopus" Button`
+    t =    11.89s         Checking existence of `"continue-with-pantopus" Button`
+    t =    11.95s         Capturing element debug description
+    t =    11.96s     Checking existence of `"continue-with-pantopus" Button`
+    t =    12.01s Collecting debug information to assist test failure triage
+    t =    12.01s     Requesting snapshot of accessibility hierarchy for app with pid 21433
+    t =    12.14s Waiting 30.0s for "Message Maya's AI" TextField to exist
+    t =    13.19s     Checking `Expect predicate `existsNoRetry == 1` for object "Message Maya's AI" TextField`
+    t =    13.19s         Checking existence of `"Message Maya's AI" TextField`
+    t =    13.25s Find the "Ask Maya to step in" Button
+    t =    13.36s Find the "Send" Button
+2026-10-08 12:20:58.646987-0700 QelvoraUITests-Runner[21391:3862720] [general] *** Assertion failure in -[XCUIElementQuery _predicateWithType:identifier:], XCUIElementQuery.m:360
+/Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/ios/UITests/ConnectedJourneyTests.swift:164: error: -[QelvoraUITests.ConnectedJourneyTests testPublishedConversationSurvivesNativeRelaunch] : Invalid query - string identifier 'This is Maya’s AI using approved source material: the source recommends covering the mug loosely with plastic and turning it periodically. It also says to let the handle and body dry at a similar pace.' exceeds maximum length of 128 characters. You can work around this limitation by constructing a query with a custom NSPredicate that specifies the property (label, title, value, placeholderValue, or identifier) to match against. (NSInternalInconsistencyException)
+    t =    14.12s Tear Down
+Test Case '-[QelvoraUITests.ConnectedJourneyTests testPublishedConversationSurvivesNativeRelaunch]' failed (14.456 seconds).
+Test Suite 'ConnectedJourneyTests' failed at 2026-10-08 12:20:59.666.
+	 Executed 1 test, with 1 failure (1 unexpected) in 14.456 (14.459) seconds
+Test Suite 'QelvoraUITests.xctest' failed at 2026-10-08 12:20:59.668.
+	 Executed 1 test, with 1 failure (1 unexpected) in 14.456 (14.461) seconds
+Test Suite 'Selected tests' failed at 2026-10-08 12:20:59.669.
+	 Executed 1 test, with 1 failure (1 unexpected) in 14.456 (14.463) seconds
+2026-10-08 12:21:27.336 xcodebuild[21095:3859591] [MT] IDETestOperationsObserverDebug: 65.052 elapsed -- Testing started completed.
+2026-10-08 12:21:27.337 xcodebuild[21095:3859591] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-10-08 12:21:27.337 xcodebuild[21095:3859591] [MT] IDETestOperationsObserverDebug: 65.052 sec, +65.052 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-creator-upgrade-01.xcresult
+
+Failing tests:
+	ConnectedJourneyTests.testPublishedConversationSurvivesNativeRelaunch()
+
+** TEST EXECUTE FAILED **
+
+Testing started
+Heavy build slot released.

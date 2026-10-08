@@ -1,0 +1,576 @@
+{
+  "at": "2026-10-08T19:03:30.582Z",
+  "counts": {
+    "consents": 1,
+    "samples": 1,
+    "consumer_samples": 0
+  },
+  "captures": [
+    {
+      "snapshot_ref": "conversation-export:b2d1ef4a-8b3d-4c3d-aa72-49b6fae91ed0",
+      "job_id": "c09931ea-d367-4464-a581-3f6309e72263",
+      "account_id": "10000000-0000-4000-8000-000000000003",
+      "domain": "conversation",
+      "lease_token": "4e69114f-465b-4159-88db-1ce7ca2bce73",
+      "creator_ids": [
+        "4dbccb2f-16e0-4fa3-96ef-135798690f4a"
+      ],
+      "source_until": "2026-10-15T18:38:06.675Z",
+      "created_at": "2026-10-08T18:38:06.676Z",
+      "revoked_at": "2026-10-08T18:57:28.659Z",
+      "artifact": {
+        "bytes": 200143,
+        "jobId": "c09931ea-d367-4464-a581-3f6309e72263",
+        "chunks": 4,
+        "domain": "conversation",
+        "format": "privacy-stream-v1",
+        "sha256": "7c8293add168ef1982bd149fbac762d14eb82fabc42a46597828090146e35273",
+        "accountId": "10000000-0000-4000-8000-000000000003",
+        "expiresAt": "2026-10-15T18:38:33.089Z",
+        "reference": "aa689cd6-b88f-4dd5-a6c8-b1dc8742cd59",
+        "contentType": "application/octet-stream",
+        "snapshotRef": "conversation-export:b2d1ef4a-8b3d-4c3d-aa72-49b6fae91ed0"
+      },
+      "purge_token": null,
+      "purge_until": null,
+      "removed_at": "2026-10-08T18:57:29.820Z",
+      "source_families": [
+        {
+          "thread_id": "9f7ef626-3b4e-4bab-bf7c-775dd9585346",
+          "account_id": "10000000-0000-4000-8000-000000000003",
+          "creator_id": "4dbccb2f-16e0-4fa3-96ef-135798690f4a"
+        }
+      ]
+    },
+    {
+      "snapshot_ref": "agent-export:e7dcd78e-31aa-4a4c-95ee-47ea62a5152d",
+      "job_id": "c09931ea-d367-4464-a581-3f6309e72263",
+      "account_id": "10000000-0000-4000-8000-000000000003",
+      "domain": "agent",
+      "lease_token": "5282455a-d65b-42a8-85f0-4b01279eff01",
+      "creator_ids": [],
+      "source_until": "2026-10-15T18:38:45.544Z",
+      "created_at": "2026-10-08T18:38:45.544Z",
+      "revoked_at": null,
+      "artifact": null,
+      "purge_token": null,
+      "purge_until": null,
+      "removed_at": null,
+      "source_families": []
+    },
+    {
+      "snapshot_ref": "agent-export:8451b07e-f4a3-462d-bba7-da2439ee030f",
+      "job_id": "c09931ea-d367-4464-a581-3f6309e72263",
+      "account_id": "10000000-0000-4000-8000-000000000003",
+      "domain": "agent",
+      "lease_token": "4bec5b21-6787-4ef6-82fe-b241eac94022",
+      "creator_ids": [],
+      "source_until": "2026-10-15T18:39:14.003Z",
+      "created_at": "2026-10-08T18:39:14.003Z",
+      "revoked_at": null,
+      "artifact": null,
+      "purge_token": null,
+      "purge_until": null,
+      "removed_at": null,
+      "source_families": []
+    },
+    {
+      "snapshot_ref": "agent-export:5974e90d-3976-433f-b8cf-192f05c9997f",
+      "job_id": "c09931ea-d367-4464-a581-3f6309e72263",
+      "account_id": "10000000-0000-4000-8000-000000000003",
+      "domain": "agent",
+      "lease_token": "dad53a10-63f3-47ef-8f6b-99337243ee3e",
+      "creator_ids": [],
+      "source_until": "2026-10-15T18:54:53.817Z",
+      "created_at": "2026-10-08T18:54:53.817Z",
+      "revoked_at": null,
+      "artifact": {
+        "bytes": 39,
+        "jobId": "c09931ea-d367-4464-a581-3f6309e72263",
+        "chunks": 1,
+        "domain": "agent",
+        "format": "privacy-stream-v1",
+        "sha256": "8a812b313b5c91718e7be64d3cba955042eedb455081162baa54cd500494d894",
+        "accountId": "10000000-0000-4000-8000-000000000003",
+        "expiresAt": "2026-10-15T18:54:56.419Z",
+        "reference": "b765ff8d-99fa-4200-aaee-5ea36dd24418",
+        "contentType": "application/octet-stream",
+        "snapshotRef": "agent-export:5974e90d-3976-433f-b8cf-192f05c9997f"
+      },
+      "purge_token": null,
+      "purge_until": null,
+      "removed_at": null,
+      "source_families": []
+    }
+  ],
+  "files": [
+    {
+      "jobId": "61e07c91-56b4-4dbe-835c-0714797b4b13",
+      "domain": "agent",
+      "reference": "5f988312-fec8-43d4-a5cc-bb2fbf33038b",
+      "originalSha256": "ac6adbcc1d0d4213ad440ead44083bb8c86845a9767e770c9a1e49c254b813fb",
+      "entries": [
+        {
+          "suffix": ".bin",
+          "exists": true,
+          "bytes": 197928,
+          "sha256": "ac6adbcc1d0d4213ad440ead44083bb8c86845a9767e770c9a1e49c254b813fb",
+          "mode": "600"
+        },
+        {
+          "suffix": ".json",
+          "exists": true,
+          "bytes": 444,
+          "sha256": "c1f7794534a690c9d1d3e38db4f084d19068485b853e34ac3de604b6ccfcdc69",
+          "mode": "600"
+        },
+        {
+          "suffix": ".attempt.json",
+          "exists": false
+        },
+        {
+          "suffix": ".removed.json",
+          "exists": false
+        },
+        {
+          "suffix": ".partial",
+          "exists": false
+        },
+        {
+          "suffix": ".json.partial",
+          "exists": false
+        }
+      ]
+    },
+    {
+      "jobId": "61e07c91-56b4-4dbe-835c-0714797b4b13",
+      "domain": "commerce",
+      "reference": "1dac20ff-4e33-493e-9169-d4d5ea17bc9f",
+      "originalSha256": "98ec59e07b296ebd5d479284e95c83da98f92e1b3da48bf89c880d9e8200c547",
+      "entries": [
+        {
+          "suffix": ".bin",
+          "exists": true,
+          "bytes": 12091,
+          "sha256": "98ec59e07b296ebd5d479284e95c83da98f92e1b3da48bf89c880d9e8200c547",
+          "mode": "600"
+        },
+        {
+          "suffix": ".json",
+          "exists": true,
+          "bytes": 445,
+          "sha256": "181cce020f7cd86602ed6e73577c41f9e1f59515d45ff10adc22b9476a87dd15",
+          "mode": "600"
+        },
+        {
+          "suffix": ".attempt.json",
+          "exists": false
+        },
+        {
+          "suffix": ".removed.json",
+          "exists": false
+        },
+        {
+          "suffix": ".partial",
+          "exists": false
+        },
+        {
+          "suffix": ".json.partial",
+          "exists": false
+        }
+      ]
+    },
+    {
+      "jobId": "61e07c91-56b4-4dbe-835c-0714797b4b13",
+      "domain": "conversation",
+      "reference": "f374a585-dcea-4161-94f2-625d5c62b4a4",
+      "originalSha256": "a3d5e49ea90b5acab919fc9b05527aac53df8f51c2923f3f6ebf23b5a8a30104",
+      "entries": [
+        {
+          "suffix": ".bin",
+          "exists": true,
+          "bytes": 198980,
+          "sha256": "a3d5e49ea90b5acab919fc9b05527aac53df8f51c2923f3f6ebf23b5a8a30104",
+          "mode": "600"
+        },
+        {
+          "suffix": ".json",
+          "exists": true,
+          "bytes": 458,
+          "sha256": "3139aa0fde4e0805c2ef2c6b169cbeab05f170c737e7f4d314f9821be59a942d",
+          "mode": "600"
+        },
+        {
+          "suffix": ".attempt.json",
+          "exists": false
+        },
+        {
+          "suffix": ".removed.json",
+          "exists": false
+        },
+        {
+          "suffix": ".partial",
+          "exists": false
+        },
+        {
+          "suffix": ".json.partial",
+          "exists": false
+        }
+      ]
+    },
+    {
+      "jobId": "61e07c91-56b4-4dbe-835c-0714797b4b13",
+      "domain": "growth",
+      "reference": "26188aa0-ed50-4172-a241-492455d974e6",
+      "originalSha256": "5732491ace8aa38e4fae2a07a736c36a34bac556a15a3aefe68ebfbba6ddd100",
+      "entries": [
+        {
+          "suffix": ".bin",
+          "exists": true,
+          "bytes": 1696,
+          "sha256": "5732491ace8aa38e4fae2a07a736c36a34bac556a15a3aefe68ebfbba6ddd100",
+          "mode": "600"
+        },
+        {
+          "suffix": ".json",
+          "exists": true,
+          "bytes": 426,
+          "sha256": "c12b63aa20efb6c608b2a8c84fbd143eeee37d322611a6420c0f703edb4fd309",
+          "mode": "600"
+        },
+        {
+          "suffix": ".attempt.json",
+          "exists": false
+        },
+        {
+          "suffix": ".removed.json",
+          "exists": false
+        },
+        {
+          "suffix": ".partial",
+          "exists": false
+        },
+        {
+          "suffix": ".json.partial",
+          "exists": false
+        }
+      ]
+    },
+    {
+      "jobId": "c09931ea-d367-4464-a581-3f6309e72263",
+      "domain": "agent",
+      "reference": "b765ff8d-99fa-4200-aaee-5ea36dd24418",
+      "originalSha256": "8a812b313b5c91718e7be64d3cba955042eedb455081162baa54cd500494d894",
+      "entries": [
+        {
+          "suffix": ".bin",
+          "exists": true,
+          "bytes": 39,
+          "sha256": "8a812b313b5c91718e7be64d3cba955042eedb455081162baa54cd500494d894",
+          "mode": "600"
+        },
+        {
+          "suffix": ".json",
+          "exists": true,
+          "bytes": 440,
+          "sha256": "cb5c91a6b3877804820fc5672121785d6b90d2b0d23fa0690cd52293c3857333",
+          "mode": "600"
+        },
+        {
+          "suffix": ".attempt.json",
+          "exists": false
+        },
+        {
+          "suffix": ".removed.json",
+          "exists": false
+        },
+        {
+          "suffix": ".partial",
+          "exists": false
+        },
+        {
+          "suffix": ".json.partial",
+          "exists": false
+        }
+      ]
+    },
+    {
+      "jobId": "c09931ea-d367-4464-a581-3f6309e72263",
+      "domain": "commerce",
+      "reference": "e2c87add-7e92-44ad-b3c5-3dff873760d7",
+      "originalSha256": "e27022bbd528626c55a3535f6626349f9ebb63566ed2beca201fca721783e573",
+      "entries": [
+        {
+          "suffix": ".bin",
+          "exists": true,
+          "bytes": 12091,
+          "sha256": "e27022bbd528626c55a3535f6626349f9ebb63566ed2beca201fca721783e573",
+          "mode": "600"
+        },
+        {
+          "suffix": ".json",
+          "exists": true,
+          "bytes": 445,
+          "sha256": "545bdb00d8a123aa5f4ff0b2dc498c3f1dc46c1a3e050fe5ae8bf0953919a637",
+          "mode": "600"
+        },
+        {
+          "suffix": ".attempt.json",
+          "exists": true,
+          "bytes": 397,
+          "sha256": "04b02a08e80f8accc4ee1d2b2d0c6eb12e773e6167d652ac9a40edcdaf9fd14c",
+          "mode": "600"
+        },
+        {
+          "suffix": ".removed.json",
+          "exists": false
+        },
+        {
+          "suffix": ".partial",
+          "exists": false
+        },
+        {
+          "suffix": ".json.partial",
+          "exists": false
+        }
+      ]
+    },
+    {
+      "jobId": "c09931ea-d367-4464-a581-3f6309e72263",
+      "domain": "conversation",
+      "reference": "aa689cd6-b88f-4dd5-a6c8-b1dc8742cd59",
+      "originalSha256": "7c8293add168ef1982bd149fbac762d14eb82fabc42a46597828090146e35273",
+      "entries": [
+        {
+          "suffix": ".bin",
+          "exists": false
+        },
+        {
+          "suffix": ".json",
+          "exists": false
+        },
+        {
+          "suffix": ".attempt.json",
+          "exists": false
+        },
+        {
+          "suffix": ".removed.json",
+          "exists": false
+        },
+        {
+          "suffix": ".partial",
+          "exists": false
+        },
+        {
+          "suffix": ".json.partial",
+          "exists": false
+        }
+      ]
+    },
+    {
+      "jobId": "c09931ea-d367-4464-a581-3f6309e72263",
+      "domain": "growth",
+      "reference": "ff5e5421-4a13-42f0-80f7-015a3f0de988",
+      "originalSha256": "b47d52acd1fc5c346a9eb7ef2e73b4c25caeeea272d1ef137b0450c42cf9b125",
+      "entries": [
+        {
+          "suffix": ".bin",
+          "exists": true,
+          "bytes": 541,
+          "sha256": "b47d52acd1fc5c346a9eb7ef2e73b4c25caeeea272d1ef137b0450c42cf9b125",
+          "mode": "600"
+        },
+        {
+          "suffix": ".json",
+          "exists": true,
+          "bytes": 425,
+          "sha256": "49a63e4cd8e971de864c4d9aee1385f203e24282517692edfe3714586f7fb72b",
+          "mode": "600"
+        },
+        {
+          "suffix": ".attempt.json",
+          "exists": true,
+          "bytes": 379,
+          "sha256": "f525520c4c4fb51f39c2fd9fb00e5d50018db18850258ec757647cdeeb2a1333",
+          "mode": "600"
+        },
+        {
+          "suffix": ".removed.json",
+          "exists": false
+        },
+        {
+          "suffix": ".partial",
+          "exists": false
+        },
+        {
+          "suffix": ".json.partial",
+          "exists": false
+        }
+      ]
+    },
+    {
+      "jobId": "f6a7410b-7db9-4da6-a4ca-901d7a90a317",
+      "domain": "agent",
+      "reference": "33fc04f2-8163-4796-9dca-7627947338f2",
+      "originalSha256": "8a812b313b5c91718e7be64d3cba955042eedb455081162baa54cd500494d894",
+      "entries": [
+        {
+          "suffix": ".bin",
+          "exists": true,
+          "bytes": 39,
+          "sha256": "8a812b313b5c91718e7be64d3cba955042eedb455081162baa54cd500494d894",
+          "mode": "600"
+        },
+        {
+          "suffix": ".json",
+          "exists": true,
+          "bytes": 440,
+          "sha256": "3dd4caffdd509bb00b1389e2c51340448bc5e320fb26d5a1040ef6b753fa30af",
+          "mode": "600"
+        },
+        {
+          "suffix": ".attempt.json",
+          "exists": true,
+          "bytes": 395,
+          "sha256": "241b166042795928761449614cb31d66cfe405a725aad0737e468e1a2dc79965",
+          "mode": "600"
+        },
+        {
+          "suffix": ".removed.json",
+          "exists": false
+        },
+        {
+          "suffix": ".partial",
+          "exists": false
+        },
+        {
+          "suffix": ".json.partial",
+          "exists": false
+        }
+      ]
+    },
+    {
+      "jobId": "f6a7410b-7db9-4da6-a4ca-901d7a90a317",
+      "domain": "commerce",
+      "reference": "e63df79c-0c7c-49ee-bacd-a29466e2ad28",
+      "originalSha256": "31df56cce8784c70c83588c3abd3dff26e478baa2c1c9dd2c9f2856d1c4dad64",
+      "entries": [
+        {
+          "suffix": ".bin",
+          "exists": true,
+          "bytes": 12091,
+          "sha256": "31df56cce8784c70c83588c3abd3dff26e478baa2c1c9dd2c9f2856d1c4dad64",
+          "mode": "600"
+        },
+        {
+          "suffix": ".json",
+          "exists": true,
+          "bytes": 445,
+          "sha256": "d2f137ca82f9cbaaf431cabd434a55d987a0f250f62508de5e141880cfede641",
+          "mode": "600"
+        },
+        {
+          "suffix": ".attempt.json",
+          "exists": true,
+          "bytes": 397,
+          "sha256": "5b54bf93a258a7933cf602e6668974b676ba66a4b76cdb645a86d3074a2a05a5",
+          "mode": "600"
+        },
+        {
+          "suffix": ".removed.json",
+          "exists": false
+        },
+        {
+          "suffix": ".partial",
+          "exists": false
+        },
+        {
+          "suffix": ".json.partial",
+          "exists": false
+        }
+      ]
+    },
+    {
+      "jobId": "f6a7410b-7db9-4da6-a4ca-901d7a90a317",
+      "domain": "conversation",
+      "reference": "ef56350f-6e96-41aa-859c-c95b574ff281",
+      "originalSha256": "a3d5e49ea90b5acab919fc9b05527aac53df8f51c2923f3f6ebf23b5a8a30104",
+      "entries": [
+        {
+          "suffix": ".bin",
+          "exists": true,
+          "bytes": 198980,
+          "sha256": "a3d5e49ea90b5acab919fc9b05527aac53df8f51c2923f3f6ebf23b5a8a30104",
+          "mode": "600"
+        },
+        {
+          "suffix": ".json",
+          "exists": true,
+          "bytes": 458,
+          "sha256": "8b62193380570111ddb79940fd0c56871ed3c01a149262093af6346cab77272c",
+          "mode": "600"
+        },
+        {
+          "suffix": ".attempt.json",
+          "exists": true,
+          "bytes": 409,
+          "sha256": "41fdbece738c3b7b4ddbf66257a16f92a9b90a3356d048e5431365c11b4c58a3",
+          "mode": "600"
+        },
+        {
+          "suffix": ".removed.json",
+          "exists": false
+        },
+        {
+          "suffix": ".partial",
+          "exists": false
+        },
+        {
+          "suffix": ".json.partial",
+          "exists": false
+        }
+      ]
+    },
+    {
+      "jobId": "f6a7410b-7db9-4da6-a4ca-901d7a90a317",
+      "domain": "growth",
+      "reference": "367706bd-79f2-41f6-b15d-7da44e3bacb1",
+      "originalSha256": "2413fbc854f62134c8437f78353b4bee81ec051790e560a5aff978c50efdfa35",
+      "entries": [
+        {
+          "suffix": ".bin",
+          "exists": true,
+          "bytes": 541,
+          "sha256": "2413fbc854f62134c8437f78353b4bee81ec051790e560a5aff978c50efdfa35",
+          "mode": "600"
+        },
+        {
+          "suffix": ".json",
+          "exists": true,
+          "bytes": 425,
+          "sha256": "f396819302a72037c511e6264582ade2e28ca7d6ae77af4084a3e61b800bc06a",
+          "mode": "600"
+        },
+        {
+          "suffix": ".attempt.json",
+          "exists": true,
+          "bytes": 379,
+          "sha256": "7194a6174a7ba8175895374e67e0d7dd7522864ccbc00f330b07cbaf7e99e8e4",
+          "mode": "600"
+        },
+        {
+          "suffix": ".removed.json",
+          "exists": false
+        },
+        {
+          "suffix": ".partial",
+          "exists": false
+        },
+        {
+          "suffix": ".json.partial",
+          "exists": false
+        }
+      ]
+    }
+  ]
+}

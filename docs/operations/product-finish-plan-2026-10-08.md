@@ -1,5 +1,20 @@
 # Product finish plan — October 8, 2026
 
+## Current execution — preserved creator upgrade
+
+The [actual upgrade increment](../../artifacts/pr-review/2026-10-08/comparison-creator-upgrade/README.md)
+operates original engine13→14 comparison, fresh six-case evaluation, legitimate v2
+publication, cited fan reply, restart and permissible rollback/restoration. Native
+Light/Night journeys verify the preserved reply and citation. Original publication
+and69usage custody remain exact; totals are now19generations/74usage/42393micros.
+
+A subsequent same-engine comparison has one grounded answer and one fallback, so
+grounding consistency remains unfinished. Studio also retains populated comparison
+text offline. Fix that view, then operate creator populated export/result withdrawal,
+native withdrawal, in-flight withdrawal, sanitization and expiry. The ten full-plan
+criteria, production policy and original mature deletion clock remain in scope.
+
+
 ## Current execution — actual comparison export and withdrawal
 
 The [original export recovery increment](../../artifacts/pr-review/2026-10-08/comparison-export-reference/README.md)
@@ -180,7 +195,7 @@ separate evidence levels.
 | Order | Work                                                   | Present position                                                                                                                | Completion evidence                                                                                                                                                                                                     |
 | ----- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1     | Safe comparison evidence and its real privacy producer | Historical engine selection exists; trusted producer absent. Consumer sample lifetime/identity repair is the current increment. | Original Conversation/privacy owner supplies creator-scoped scrubbed samples, current consent and exclusion checks, provenance, withdrawal and physical expiry; no raw fan identifiers reach Agent.                     |
-| 2     | Existing creator upgrade                               | First publication works; no real revision 12/13 → 14 upgrade is qualified.                                                      | Actual creator comparison, boundary evaluation and legitimate publication; subsequent fan reply and accounting; restart and permissible rollback, preserving original publication records.                              |
+| 2     | Existing creator upgrade                               | Actual fictional revision13→14 publication, fan reply, restart and rollback operated; representative and production qualification remain.                                                      | Actual creator comparison, boundary evaluation and legitimate publication; subsequent fan reply and accounting; restart and permissible rollback, preserving original publication records.                              |
 | 3     | Useful response latency and grounding                  | Latest useful visible reply is 26.992s; acknowledgment 3.767s. Targets remain missed.                                           | Request-correlated measurements, production frontend, documented device/network/region/load and cache behavior; p95/p99 for acknowledgment, useful visible first sentence and completion, with supported useful output. |
 | 4     | Generation reliability and access                      | Canonical development generation and interrupted-cost recovery have real evidence.                                              | In-flight takeover, rights/consent revocation, sensitive memory, source withdrawal, uncertain retries, cancellation, paid-membership first use and shared-pass accounting.                                              |
 | 5     | Complete privacy and recovery                          | Eight-domain fan export works; populated cases and physical deletion remain incomplete.                                         | Actual retention/purge adapters, populated exports, mature deletion and provenance purge, unresolved-cost escalation, detachment, restoration/re-purge and cancellation/EOF/COMMIT checks.                              |

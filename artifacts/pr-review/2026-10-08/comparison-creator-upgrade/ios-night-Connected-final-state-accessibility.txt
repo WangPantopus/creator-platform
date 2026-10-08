@@ -1,0 +1,71 @@
+Attributes: Application, 0x10a4152b0, pid: 23269, label: 'Qelvora'
+Element subtree:
+ →Application, 0x10a4152b0, pid: 23269, label: 'Qelvora'
+    Window (Main), 0x10a419f00, {{0.0, 0.0}, {402.0, 874.0}}
+      Other, 0x10a40b980, {{0.0, 0.0}, {402.0, 874.0}}
+        Other, 0x10a413ff0, {{0.0, 0.0}, {402.0, 874.0}}
+          Other, 0x10a41b850, {{-402.0, -874.0}, {1206.0, 2622.0}}
+          Other, 0x10a40d240, {{0.0, 0.0}, {402.0, 874.0}}
+            Other, 0x10a411dd0, {{0.0, 0.0}, {402.0, 874.0}}
+              StaticText, 0x10a40ea30, {{43.0, 70.0}, {316.0, 15.7}}, label: 'Development identity · synthetic account · actual local API'
+              StaticText, 0x10a410e90, {{21.5, 109.2}, {359.0, 61.7}}, label: 'Conversation unavailable, Loading your messages…'
+                Other, 0x10a40f5d0, {{36.0, 122.7}, {16.0, 16.0}}
+                StaticText, 0x10a41acb0, {{62.0, 121.7}, {169.0, 18.3}}, label: 'Conversation unavailable'
+                StaticText, 0x10a41add0, {{62.0, 140.0}, {159.7, 18.3}}, label: 'Loading your messages…'
+              Button, 0x10a421bc0, {{153.0, 186.3}, {96.0, 48.0}}, label: 'Refresh'
+              Button, 0x10a421ce0, {{132.7, 234.3}, {137.0, 44.0}}, label: 'Help and safety'
+      Other, 0x10a421e00, {{0.0, 0.0}, {402.0, 874.0}}
+        Other, 0x10a421f20, {{-402.0, -874.0}, {1206.0, 2622.0}}
+        Other, 0x10a422040, {{0.0, 62.0}, {402.0, 812.0}}
+          Other, 0x10a422160, {{0.0, 62.0}, {402.0, 812.0}}
+            Other, 0x10a422280, {{0.0, 62.0}, {402.0, 812.0}}
+              Other, 0x10a4223a0, {{0.0, 62.0}, {402.0, 812.0}}
+                Other, 0x10a4224c0, {{0.0, 62.0}, {402.0, 812.0}}
+                  ScrollView, 0x10a4225e0, {{0.0, 62.0}, {402.3, 812.0}}
+                    Other, 0x10a422700, {{0.0, -1123.0}, {402.2, 1963.0}}
+                      StaticText, 0x10a422820, {{16.0, -1107.0}, {119.7, 22.3}}, label: 'Me and privacy'
+                      StaticText, 0x10a422940, {{16.0, -1056.7}, {284.0, 26.0}}, label: 'What Maya's AI remembers'
+                      StaticText, 0x10a422a60, {{16.0, -1002.7}, {321.0, 19.7}}, label: 'No memories. The AI asks before remembering.'
+                      StaticText, 0x10a422b80, {{16.0, -955.0}, {351.3, 32.7}}, label: 'The creator and their team can see these memories, never edit them. Deleting one also removes summaries that could repeat it.'
+                      StaticText, 0x10a422ca0, {{16.0, -894.3}, {332.0, 26.0}}, label: 'Who opened your conversations'
+                      StaticText, 0x10a422dc0, {{16.0, -840.3}, {140.3, 19.7}}, label: 'No logged openings.'
+                      StaticText, 0x10a422ee0, {{16.0, -792.7}, {370.3, 32.7}}, label: 'This shows when an authorized account opened a conversation, not that a person read every message.'
+                      StaticText, 0x10a423000, {{16.0, -732.0}, {147.7, 26.0}}, label: 'Off the record'
+                      Switch, 0x10a423120, {{16.0, -678.0}, {370.5, 28.0}}, label: 'Keep this conversation off the record', value: 0
+                        StaticText, 0x10a423240, {{16.0, -674.2}, {280.7, 20.3}}, label: 'Keep this conversation off the record'
+                        Switch, 0x10a423360, {{325.3, -678.0}, {63.0, 28.0}}, value: 0
+                      StaticText, 0x10a423480, {{16.0, -622.0}, {343.0, 32.7}}, label: 'The AI keeps no memory from it. It is still labeled, visible to the creator and their team, and you can delete it.'
+                      Switch, 0x10a4235a0, {{16.0, -561.3}, {370.5, 28.0}}, label: 'Share my intro with this creator's AI', value: 0
+                        StaticText, 0x10a4236c0, {{16.0, -557.5}, {269.3, 20.3}}, label: 'Share my intro with this creator's AI'
+                        Switch, 0x10a4237e0, {{325.3, -561.3}, {63.0, 28.0}}, value: 0
+                      StaticText, 0x10a423900, {{16.0, -505.3}, {270.7, 26.0}}, label: 'Time with this creator's AI'
+                      StaticText, 0x10a423a20, {{16.0, -451.3}, {361.0, 32.7}}, label: 'Estimated foreground time with the AI; overlapping devices count once. Days are shown in UTC.'
+                      StaticText, 0x10a423b40, {{16.0, -390.7}, {162.7, 19.7}}, label: 'This week · 158 minutes'
+                      StaticText, 0x10a423c60, {{16.0, -340.3}, {71.7, 14.3}}, label: '2026-10-08'
+                      StaticText, 0x10a423d80, {{303.0, -343.0}, {83.3, 19.7}}, label: '158 minutes'
+                      StaticText, 0x10a423ea0, {{16.0, -295.3}, {313.7, 32.7}}, label: 'Companion mode time signals await the verified AI mode configuration.'
+                      StaticText, 0x10a423fc0, {{16.0, -234.7}, {161.7, 26.0}}, label: 'AI comparisons'
+                      StaticText, 0x10a4240e0, {{16.0, -180.7}, {171.7, 14.3}}, label: 'Allowed for this creator'
+                      StaticText, 0x10a424200, {{16.0, -154.3}, {370.3, 415.7}}, label: 'In this labelled development environment, you can allow OpenAI to turn questions from the last seven days into general questions for comparing this creator’s AI versions. The creator can see those general questions and comparison replies. Automated checks screen out identifying and sensitive details; they can make mistakes. Qelvora uses this material only for these comparisons, not model training or marketing. Off-the-record questions and threads with memory exclusions are excluded. Saved questions are kept for at most 30 days after the original question, ending no later than November 1, 2026 at 00:00 UTC. You can withdraw this choice. Withdrawal removes Qelvora’s saved comparison questions and text and makes affected exports unavailable while deletion finishes. Copies already downloaded cannot be recalled. Your ordinary provider notice still applies to OpenAI’s processing. This optional choice is separate from reply feedback and ordinary AI replies.'
+                      StaticText, 0x10a424320, {{16.0, 273.3}, {251.7, 15.7}}, label: 'Your choice ends 2026-11-01T00:00:00.000Z'
+                      Button, 0x10a424440, {{16.2, 301.0}, {370.3, 48.0}}, label: 'Withdraw comparison choice'
+                      StaticText, 0x10a424560, {{16.0, 377.0}, {129.3, 26.0}}, label: 'AI providers'
+                      StaticText, 0x10a424680, {{15.7, 430.5}, {371.3, 121.7}}, label: 'Unreviewed development policy, Use fictional content only. This development configuration does not represent provider approval or permission to serve real fans. Message retention may apply.'
+                        Other, 0x10a4247a0, {{30.2, 444.0}, {16.0, 16.0}}
+                        StaticText, 0x10a4248c0, {{56.0, 443.0}, {213.3, 18.3}}, label: 'Unreviewed development policy'
+                        StaticText, 0x10a4249e0, {{56.0, 461.3}, {283.7, 78.3}}, label: 'Use fictional content only. This development configuration does not represent provider approval or permission to serve real fans. Message retention may apply.'
+                      Button, 0x10a424b00, {{16.2, 579.7}, {193.0, 20.3}}, label: 'OpenAI processing terms'
+                      Button, 0x10a424c20, {{16.2, 628.0}, {252.0, 48.0}}, label: 'Withdraw AI provider consent'
+                      Button, 0x10a424d40, {{16.2, 704.0}, {370.3, 48.0}}, label: 'Export or delete my data'
+                      Button, 0x10a424fb0, {{16.2, 780.0}, {137.0, 44.0}}, label: 'Help and safety'
+                    Other, 0x10a4252d0, {{369.0, 100.0}, {30.0, 712.0}}, label: 'Vertical scroll bar, 3 pages', value: 100%
+                      Other, 0x10a4253f0, {{396.0, 522.0}, {3.0, 287.0}}
+                    Other, 0x10a425510, {{369.0, 100.0}, {30.0, 712.0}}, label: 'Vertical scroll bar, 3 pages', value: 100%
+                      Other, 0x10a425630, {{396.0, 522.0}, {3.0, 287.0}}
+Path to element:
+ →Application, 0x10a4152b0, pid: 23269, label: 'Qelvora'
+Query chain:
+ →Find: Target Application 'com.pantopus.qelvora'
+  Output: {
+    Application, 0x10a70d270, pid: 23269, label: 'Qelvora'
+  }

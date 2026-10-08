@@ -161,7 +161,7 @@ final class ConnectedJourneyTests: XCTestCase {
         XCTAssertTrue(app.buttons["Ask \(creator) to step in"].isHittable)
         XCTAssertFalse(app.buttons["Send"].isEnabled)
         if let expected = environment["QELVORA_E2E_LATEST_TEXT"] {
-            let reply = app.staticTexts[expected]
+            let reply = app.staticTexts.matching(NSPredicate(format: "label == %@", expected)).firstMatch
             XCTAssertTrue(reply.waitForExistence(timeout: 10))
             XCTAssertTrue(reply.isHittable)
             XCTAssertLessThanOrEqual(reply.frame.maxY, composer.frame.minY)

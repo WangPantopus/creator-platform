@@ -1,0 +1,4 @@
+10-08 12:25:49.288  2515  2933 D QelvoraIdentity: session_transport_failed
+10-08 12:25:52.969  2515  2933 D QelvoraIdentity: session_reconfirmed
+10-08 12:25:58.489  2515  2986 D QelvoraRealtime: socket_transport_failed
+10-08 12:26:19.250  2515  2986 D QelvoraRealtime: socket_transport_failed

@@ -1,0 +1,187 @@
+Printing with useUnmergedTree = 'true'
+Node #1 at (l=0.0, t=0.0, r=1080.0, b=2400.0)px
+ |-Node #23 at (l=42.0, t=157.0, r=858.0, b=198.0)px
+ | Text = '[Development identity · synthetic account · actual local API]'
+ | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+ |-Node #42 at (l=11.0, t=245.0, r=127.0, b=361.0)px
+ | ContentDescription = '[Back]'
+ | Role = 'Button'
+ | Focused = 'false'
+ | Actions = [OnClick, RequestFocus]
+ | MergeDescendants = 'true'
+ |  |-Node #43 at (l=40.0, t=274.0, r=98.0, b=332.0)px
+ |    ClearAndSetSemantics = 'true'
+ |-Node #45 at (l=183.0, t=275.0, r=236.0, b=332.0)px
+ | Text = '[M]'
+ | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+ |-Node #47 at (l=291.0, t=253.0, r=405.0, b=311.0)px
+ | Text = '[Maya]'
+ | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+ |-Node #48 at (l=291.0, t=316.0, r=494.0, b=354.0)px
+ | Text = '[Official AI]'
+ | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+ |-Node #49 at (l=932.0, t=245.0, r=1048.0, b=361.0)px
+ | ContentDescription = '[About this conversation]'
+ | Role = 'Button'
+ | Focused = 'false'
+ | Actions = [OnClick, RequestFocus]
+ | MergeDescendants = 'true'
+ |  |-Node #50 at (l=961.0, t=274.0, r=1019.0, b=332.0)px
+ |    ClearAndSetSemantics = 'true'
+ |-Node #52 at (l=0.0, t=390.0, r=1080.0, b=503.0)px
+ | LiveRegion = 'Polite'
+ |  |-Node #55 at (l=55.0, t=429.0, r=87.0, b=461.0)px
+ |  | ClearAndSetSemantics = 'true'
+ |  |-Node #56 at (l=126.0, t=423.0, r=993.0, b=467.0)px
+ |    Text = '[You're talking to Maya's AI · Maya steps in on request.]'
+ |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+ |-Node #58 at (l=0.0, t=503.0, r=1080.0, b=1821.0)px
+ | IsTraversalGroup = 'true'
+ | VerticalScrollAxisRange = 'ScrollAxisRange(value=19013.0, maxValue=19113.0, reverseScrolling=false)'
+ | CollectionInfo = 'androidx.compose.ui.semantics.CollectionInfo@7e22989'
+ | Actions = [ScrollBy, ScrollByOffset, IndexForKey, ScrollToIndex, GetScrollViewportLength]
+ |  |-Node #161 at (l=42.0, t=143.0, r=1038.0, b=490.0)px
+ |  | Focused = 'false'
+ |  | Actions = [RequestFocus]
+ |  |  |-Node #162 at (l=42.0, t=143.0, r=1038.0, b=490.0)px
+ |  |    ContentDescription = '[Maya's AI]'
+ |  |     |-Node #165 at (l=42.0, t=143.0, r=235.0, b=184.0)px
+ |  |     | ContentDescription = '[Maya's AI]'
+ |  |     | ClearAndSetSemantics = 'true'
+ |  |     |  |-Node #166 at (l=42.0, t=145.0, r=79.0, b=182.0)px
+ |  |     |  | ClearAndSetSemantics = 'true'
+ |  |     |  |-Node #167 at (l=95.0, t=143.0, r=235.0, b=184.0)px
+ |  |     |    Text = '[Maya's AI]'
+ |  |     |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+ |  |     |    ClearAndSetSemantics = 'true'
+ |  |     |-Node #169 at (l=79.0, t=232.0, r=882.0, b=342.0)px
+ |  |     | Text = '[Hello, I am Maya's AI, here to assist you with your questions.]'
+ |  |     | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+ |  |     | ClearAndSetSemantics = 'true'
+ |  |     |-Node #171 at (l=42.0, t=374.0, r=234.0, b=490.0)px
+ |  |       Role = 'Button'
+ |  |       Focused = 'false'
+ |  |       Actions = [OnClick, RequestFocus]
+ |  |       MergeDescendants = 'true'
+ |  |        |-Node #172 at (l=74.0, t=406.0, r=202.0, b=458.0)px
+ |  |          Text = '[Report]'
+ |  |          Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+ |  |          ClearAndSetSemantics = 'true'
+ |  |-Node #151 at (l=42.0, t=532.0, r=1038.0, b=984.0)px
+ |  | Focused = 'false'
+ |  | Actions = [RequestFocus]
+ |  |  |-Node #152 at (l=42.0, t=532.0, r=1038.0, b=984.0)px
+ |  |    ContentDescription = '[You]'
+ |  |     |-Node #155 at (l=324.0, t=558.0, r=1001.0, b=842.0)px
+ |  |     | Text = '[What steps does the approved source recommend for drying a freshly thrown clay mug? Please answer in two concise sentences and identify yourself as Maya’s AI.]'
+ |  |     | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+ |  |     | ClearAndSetSemantics = 'true'
+ |  |     |-Node #157 at (l=42.0, t=868.0, r=486.0, b=984.0)px
+ |  |       Role = 'Button'
+ |  |       Focused = 'false'
+ |  |       Actions = [OnClick, RequestFocus]
+ |  |       MergeDescendants = 'true'
+ |  |        |-Node #158 at (l=74.0, t=900.0, r=454.0, b=952.0)px
+ |  |          Text = '[Don't remember this]'
+ |  |          Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+ |  |          ClearAndSetSemantics = 'true'
+ |  |-Node #174 at (l=42.0, t=984.0, r=524.0, b=1100.0)px, Tag: 'comparison-options-b21ed168-e517-4ad5-a1b7-0e64bc270be7'
+ |  | Role = 'Button'
+ |  | Focused = 'false'
+ |  | Actions = [OnClick, RequestFocus]
+ |  | MergeDescendants = 'true'
+ |  |  |-Node #175 at (l=74.0, t=1016.0, r=492.0, b=1068.0)px
+ |  |    Text = '[AI comparison options]'
+ |  |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+ |  |-Node #128 at (l=42.0, t=1142.0, r=1038.0, b=1821.0)px
+ |    Focused = 'false'
+ |    Actions = [RequestFocus]
+ |     |-Node #129 at (l=42.0, t=1142.0, r=1038.0, b=1821.0)px
+ |       ContentDescription = '[Maya's AI]'
+ |        |-Node #132 at (l=42.0, t=1142.0, r=235.0, b=1183.0)px
+ |        | ContentDescription = '[Maya's AI]'
+ |        | ClearAndSetSemantics = 'true'
+ |        |  |-Node #133 at (l=42.0, t=1144.0, r=79.0, b=1181.0)px
+ |        |  | ClearAndSetSemantics = 'true'
+ |        |  |-Node #134 at (l=95.0, t=1142.0, r=235.0, b=1183.0)px
+ |        |    Text = '[Maya's AI]'
+ |        |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+ |        |    ClearAndSetSemantics = 'true'
+ |        |-Node #136 at (l=79.0, t=1231.0, r=882.0, b=1515.0)px
+ |        | Text = '[This is Maya’s AI using approved source material: the source recommends covering the mug loosely with plastic and turning it periodically. It also says to let the handle and body dry at a similar pace.]'
+ |        | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+ |        | ClearAndSetSemantics = 'true'
+ |        |-Node #137 at (l=79.0, t=1547.0, r=882.0, b=1673.0)px
+ |        | Role = 'Button'
+ |        | Focused = 'false'
+ |        | Actions = [OnClick, RequestFocus]
+ |        | MergeDescendants = 'true'
+ |        |  |-Node #139 at (l=134.0, t=1594.0, r=166.0, b=1626.0)px
+ |        |  | ClearAndSetSemantics = 'true'
+ |        |  |-Node #141 at (l=215.0, t=1568.0, r=322.0, b=1609.0)px
+ |        |  | Text = '[Source]'
+ |        |  | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+ |        |  | ClearAndSetSemantics = 'true'
+ |        |  |-Node #142 at (l=215.0, t=1614.0, r=675.0, b=1652.0)px
+ |        |  | Text = '[Read the original passage]'
+ |        |  | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+ |        |  | ClearAndSetSemantics = 'true'
+ |        |  |-Node #143 at (l=814.0, t=1589.0, r=856.0, b=1631.0)px
+ |        |    ClearAndSetSemantics = 'true'
+ |        |-Node #145 at (l=42.0, t=1705.0, r=234.0, b=1821.0)px
+ |          Role = 'Button'
+ |          Focused = 'false'
+ |          Actions = [OnClick, RequestFocus]
+ |          MergeDescendants = 'true'
+ |           |-Node #146 at (l=74.0, t=1737.0, r=202.0, b=1789.0)px
+ |             Text = '[Report]'
+ |             Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+ |             ClearAndSetSemantics = 'true'
+ |-Node #61 at (l=42.0, t=1863.0, r=1038.0, b=1989.0)px
+ | Role = 'Button'
+ | Focused = 'false'
+ | Actions = [OnClick, RequestFocus]
+ | MergeDescendants = 'true'
+ |  |-Node #63 at (l=306.0, t=1889.0, r=380.0, b=1963.0)px
+ |  | ClearAndSetSemantics = 'true'
+ |  |  |-Node #65 at (l=323.0, t=1904.0, r=364.0, b=1949.0)px
+ |  |    Text = '[M]'
+ |  |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+ |  |-Node #66 at (l=406.0, t=1900.0, r=773.0, b=1952.0)px
+ |    Text = '[Ask Maya to step in]'
+ |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+ |-Node #69 at (l=74.0, t=2053.0, r=783.0, b=2115.0)px
+ | EditableText = ''
+ | TextSelectionRange = 'TextRange(0, 0)'
+ | IsEditable = 'true'
+ | ImeAction = 'Default'
+ | Focused = 'false'
+ | ContentDescription = '[Message Maya's AI]'
+ | Actions = [GetTextLayoutResult, SetText, InsertTextAtCursor, SetSelection, PerformImeAction, OnClick, OnLongClick, PasteText, RequestFocus]
+ | MergeDescendants = 'true'
+ |  |-Node #72 at (l=74.0, t=2053.0, r=412.0, b=2105.0)px
+ |    ClearAndSetSemantics = 'true'
+ |-Node #76 at (l=836.0, t=2021.0, r=1038.0, b=2147.0)px
+ | Role = 'Button'
+ | [Disabled]
+ | Actions = [OnClick]
+ | MergeDescendants = 'true'
+ |  |-Node #77 at (l=889.0, t=2058.0, r=985.0, b=2110.0)px
+ |    Text = '[Send]'
+ |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+ |-Node #80 at (l=42.0, t=2179.0, r=388.0, b=2295.0)px
+ | Role = 'Button'
+ | Focused = 'false'
+ | Actions = [OnClick, RequestFocus]
+ | MergeDescendants = 'true'
+ |  |-Node #81 at (l=74.0, t=2211.0, r=356.0, b=2263.0)px
+ |    Text = '[Me and privacy]'
+ |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+ |-Node #83 at (l=388.0, t=2179.0, r=676.0, b=2295.0)px
+   Role = 'Button'
+   Focused = 'false'
+   Actions = [OnClick, RequestFocus]
+   MergeDescendants = 'true'
+    |-Node #84 at (l=420.0, t=2211.0, r=644.0, b=2263.0)px
+      Text = '[Get support]'
+      Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]

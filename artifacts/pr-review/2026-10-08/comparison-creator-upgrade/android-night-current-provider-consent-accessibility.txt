@@ -1,0 +1,101 @@
+Printing with useUnmergedTree = 'true'
+Node #190 at (l=0.0, t=136.0, r=1080.0, b=2337.0)px
+ |-Node #212 at (l=42.0, t=157.0, r=858.0, b=198.0)px
+ | Text = '[Development identity · synthetic account · actual local API]'
+ | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+ |-Node #331 at (l=0.0, t=219.0, r=1080.0, b=2337.0)px
+   IsTraversalGroup = 'true'
+   VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=100.0, reverseScrolling=false)'
+   CollectionInfo = 'androidx.compose.ui.semantics.CollectionInfo@2e43fa4'
+   Actions = [ScrollBy, ScrollByOffset, IndexForKey, ScrollToIndex, GetScrollViewportLength]
+    |-Node #334 at (l=42.0, t=261.0, r=202.0, b=377.0)px
+    | Role = 'Button'
+    | Focused = 'false'
+    | Actions = [OnClick, RequestFocus]
+    | MergeDescendants = 'true'
+    |  |-Node #335 at (l=74.0, t=293.0, r=170.0, b=345.0)px
+    |    Text = '[Back]'
+    |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |-Node #336 at (l=42.0, t=377.0, r=354.0, b=435.0)px
+    | Text = '[Me and privacy]'
+    | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |-Node #338 at (l=42.0, t=477.0, r=788.0, b=545.0)px
+    | Text = '[What Maya's AI remembers]'
+    | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |-Node #374 at (l=42.0, t=545.0, r=879.0, b=597.0)px
+    | Text = '[No memories. The AI asks before remembering.]'
+    | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |-Node #341 at (l=42.0, t=639.0, r=424.0, b=707.0)px
+    | Text = '[Off the record]'
+    | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |-Node #342 at (l=42.0, t=707.0, r=1038.0, b=817.0)px
+    | Text = '[The AI keeps no memory from it. It remains visible to the creator and their team, and you can delete it.]'
+    | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |-Node #344 at (l=42.0, t=817.0, r=562.0, b=943.0)px
+    | Role = 'Button'
+    | Focused = 'false'
+    | Actions = [OnClick, RequestFocus]
+    | MergeDescendants = 'true'
+    |  |-Node #345 at (l=95.0, t=854.0, r=509.0, b=906.0)px
+    |    Text = '[Turn on off-the-record]'
+    |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |-Node #347 at (l=42.0, t=943.0, r=770.0, b=1059.0)px
+    | Role = 'Button'
+    | Focused = 'false'
+    | Actions = [OnClick, RequestFocus]
+    | MergeDescendants = 'true'
+    |  |-Node #348 at (l=74.0, t=975.0, r=738.0, b=1027.0)px
+    |    Text = '[Share my intro with this creator's AI]'
+    |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |-Node #349 at (l=42.0, t=1059.0, r=382.0, b=1127.0)px
+    | Text = '[AI providers]'
+    | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |-Node #375 at (l=79.0, t=1159.0, r=1001.0, b=1414.0)px
+    | LiveRegion = 'Polite'
+    |  |-Node #377 at (l=79.0, t=1162.0, r=121.0, b=1204.0)px
+    |  | ClearAndSetSemantics = 'true'
+    |  |-Node #379 at (l=147.0, t=1159.0, r=697.0, b=1207.0)px
+    |  | Text = '[Unreviewed development policy]'
+    |  | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |  |-Node #380 at (l=147.0, t=1207.0, r=1001.0, b=1414.0)px
+    |    Text = '[Use fictional content only. This development configuration does not represent provider approval or permission to serve real fans. Message retention may apply.]'
+    |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |-Node #382 at (l=42.0, t=1446.0, r=579.0, b=1562.0)px
+    | Role = 'Button'
+    | Focused = 'false'
+    | Actions = [OnClick, RequestFocus]
+    | MergeDescendants = 'true'
+    |  |-Node #383 at (l=74.0, t=1478.0, r=547.0, b=1530.0)px
+    |    Text = '[OpenAI processing terms]'
+    |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |-Node #384 at (l=42.0, t=1562.0, r=1038.0, b=1648.0)px
+    | Text = '[Doesn't train on your messages. Review message retention in these terms.]'
+    | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |-Node #352 at (l=42.0, t=1648.0, r=700.0, b=1774.0)px
+    | Role = 'Button'
+    | Focused = 'false'
+    | Actions = [OnClick, RequestFocus]
+    | MergeDescendants = 'true'
+    |  |-Node #353 at (l=95.0, t=1685.0, r=647.0, b=1737.0)px
+    |    Text = '[Withdraw AI provider consent]'
+    |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |-Node #355 at (l=42.0, t=1816.0, r=467.0, b=1884.0)px
+    | Text = '[AI comparisons]'
+    | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |-Node #389 at (l=42.0, t=1884.0, r=484.0, b=1922.0)px
+    | Text = '[Allowed for this creator]'
+    | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |-Node #390 at (l=42.0, t=1954.0, r=1038.0, b=3050.0)px
+    | Text = '[In this labelled development environment, you can allow OpenAI to turn questions from the last seven days into general questions for comparing this creator’s AI versions. The creator can see those general questions and comparison replies. Automated checks screen out identifying and sensitive details; they can make mistakes. Qelvora uses this material only for these comparisons, not model training or marketing. Off-the-record questions and threads with memory exclusions are excluded. Saved questions are kept for at most 30 days after the original question, ending no later than November 1, 2026 at 00:00 UTC. You can withdraw this choice. Withdrawal removes Qelvora’s saved comparison questions and text and makes affected exports unavailable while deletion finishes. Copies already downloaded cannot be recalled. Your ordinary provider notice still applies to OpenAI’s processing. This optional choice is separate from reply feedback and ordinary AI replies.]'
+    | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |-Node #391 at (l=42.0, t=3082.0, r=703.0, b=3123.0)px
+    | Text = '[Your choice ends 2026-11-01T00:00:00.000Z.]'
+    | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |-Node #393 at (l=42.0, t=3155.0, r=1038.0, b=3281.0)px
+      Role = 'Button'
+      Focused = 'false'
+      Actions = [OnClick, RequestFocus]
+      MergeDescendants = 'true'
+       |-Node #395 at (l=269.0, t=3192.0, r=811.0, b=3244.0)px
+         Text = '[Withdraw comparison choice]'
+         Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]

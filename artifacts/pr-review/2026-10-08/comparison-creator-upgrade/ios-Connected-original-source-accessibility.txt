@@ -1,0 +1,39 @@
+Attributes: Application, 0x104e0dd20, pid: 21844, label: 'Qelvora'
+Element subtree:
+ →Application, 0x104e0dd20, pid: 21844, label: 'Qelvora'
+    Window (Main), 0x104a30160, {{0.0, 0.0}, {402.0, 874.0}}
+      Other, 0x104a25fa0, {{0.0, 0.0}, {402.0, 874.0}}
+        Other, 0x104a1c650, {{0.0, 0.0}, {402.0, 874.0}}
+          Other, 0x104a26da0, {{-402.0, -874.0}, {1206.0, 2622.0}}
+          Other, 0x104a21f30, {{0.0, 0.0}, {402.0, 874.0}}
+            Other, 0x104a273e0, {{0.0, 0.0}, {402.0, 874.0}}
+              StaticText, 0x104a27500, {{43.0, 70.0}, {316.0, 15.7}}, label: 'Development identity · synthetic account · actual local API'
+              StaticText, 0x104a27620, {{21.5, 109.2}, {359.0, 61.7}}, label: 'Conversation unavailable, Loading your messages…'
+                Other, 0x104a27740, {{36.0, 122.7}, {16.0, 16.0}}
+                StaticText, 0x104a27860, {{62.0, 121.7}, {169.0, 18.3}}, label: 'Conversation unavailable'
+                StaticText, 0x104a27980, {{62.0, 140.0}, {159.7, 18.3}}, label: 'Loading your messages…'
+              Button, 0x104a27aa0, {{153.0, 186.3}, {96.0, 48.0}}, label: 'Refresh'
+              Button, 0x104a27bc0, {{132.7, 234.3}, {137.0, 44.0}}, label: 'Help and safety'
+      Other, 0x104a27ce0, {{0.0, 0.0}, {402.0, 874.0}}
+        Other, 0x104a27e00, {{-402.0, -874.0}, {1206.0, 2622.0}}
+        Other, 0x104a27f20, {{0.0, 62.0}, {402.0, 812.0}}
+          Other, 0x104a28040, {{0.0, 62.0}, {402.0, 812.0}}
+            Other, 0x10250a3e0, {{0.0, 62.0}, {402.0, 812.0}}
+              Other, 0x1025124a0, {{0.0, 62.0}, {402.0, 812.0}}
+                Other, 0x10250bb50, {{0.0, 62.0}, {402.0, 812.0}}
+                  ScrollView, 0x102510f30, {{1.3, 62.0}, {399.3, 812.0}}
+                    Other, 0x102514280, {{1.3, 62.0}, {399.3, 344.0}}
+                      StaticText, 0x10251ca60, {{17.3, 78.0}, {107.3, 14.3}}, label: 'Original source'
+                      StaticText, 0x10251f6e0, {{17.3, 108.3}, {354.0, 26.0}}, label: 'Maya — fictional clay drying guide'
+                      StaticText, 0x102529f30, {{17.3, 150.3}, {367.3, 239.7}}, label: 'This is original fictional material for the authorized local Maya verification scenario. Maya is a fictional ceramics educator. For a freshly thrown clay mug, even drying helps reduce cracking. Maya covers the mug loosely with plastic, turns it periodically, and lets the handle and body dry at a similar pace. Do not put freshly formed wet clay in a hot kiln. Follow the clay and kiln manufacturer’s written firing instructions. This source makes no claims about real people, personal opinions, medical advice, legal advice or financial advice.'
+                    Other, 0x10252a050, {{367.7, 98.7}, {30.0, 714.7}}, label: 'Vertical scroll bar, 1 page', value: 0%
+                      Other, 0x10252a170, {{394.7, 535.7}, {3.0, 288.7}}
+                    Other, 0x10252a290, {{367.7, 98.7}, {30.0, 714.7}}, label: 'Vertical scroll bar, 1 page', value: 0%
+                      Other, 0x10252a3b0, {{394.7, 535.7}, {3.0, 288.7}}
+Path to element:
+ →Application, 0x104e0dd20, pid: 21844, label: 'Qelvora'
+Query chain:
+ →Find: Target Application 'com.pantopus.qelvora'
+  Output: {
+    Application, 0x10261e7f0, pid: 21844, label: 'Qelvora'
+  }
