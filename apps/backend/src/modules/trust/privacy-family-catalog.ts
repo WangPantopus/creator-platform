@@ -351,7 +351,9 @@ export async function assertOriginalPrivacyFamilyContentCatalog(
   await assertOriginalPrivacyFamilyCaller(client, signal);
   await assertPurposeCatalogue(
     client,
-    contentPrivacyReview.originalFamilyProfiles.map((profile) => profile.sha256),
+    contentPrivacyReview.originalFamilyProfiles.map(
+      (profile) => profile.sha256,
+    ),
     signal,
   );
 }
@@ -400,7 +402,9 @@ export async function originalPrivacyFamilyRegisteredExtension(
     const contentProfile = composed
       ? await registeredContentPrivacyProfile(signal)
       : undefined;
-    const publicProfile = contentProfile ? await registeredPublicAIProfile(signal) : undefined;
+    const publicProfile = contentProfile
+      ? await registeredPublicAIProfile(signal)
+      : undefined;
     if (composed) {
       for (const dependency of generationPrivacyReview.sources) {
         const migration = await registeredMigration(dependency);
@@ -439,7 +443,11 @@ export async function originalPrivacyFamilyRegisteredExtension(
     if (composed) {
       if (publicProfile) {
         await assertOriginalPrivacyFamilyCaller(client, signal);
-        await assertPurposeCatalogue(client, publicProfile.originalFamilyProfiles.map(profile => profile.sha256), signal);
+        await assertPurposeCatalogue(
+          client,
+          publicProfile.originalFamilyProfiles.map((profile) => profile.sha256),
+          signal,
+        );
       } else if (contentProfile)
         await assertOriginalPrivacyFamilyContentCatalog(client, signal);
       else await assertOriginalPrivacyFamilyGenerationCatalog(client, signal);

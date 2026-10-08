@@ -4,7 +4,7 @@ Updated October 7, 2026 (final observations October 8 UTC) after canonical start
 
 ## Current status
 
-All **18 original PRs have one continuation: [#132](https://github.com/WangPantopus/creator-platform/pull/132)**. The other 17 are closed unmerged after their useful source and full remaining acceptance were published in that successor. Every closed source branch remains at its reviewed head; #132 alone advances. [Final original-PR custody](../../artifacts/pr-review/2026-10-07/growth-source-reconciliation/final-pr-custody.json) and the linked per-domain actions record the closures. Documentation PR #333 merged normally at `6d62d31457f8ad741c38fd871004970209d6105e`, which is included here.
+All **18 original PRs have one continuation: [#132](https://github.com/WangPantopus/creator-platform/pull/132)**. The other 17 are closed unmerged after their useful source and full remaining acceptance were published in that successor. Every closed source branch remains at its reviewed head; #132 completed that consolidation. [Final original-PR custody](../../artifacts/pr-review/2026-10-07/growth-source-reconciliation/final-pr-custody.json) and the linked per-domain actions record the closures. Documentation PR #333 merged normally at `6d62d31457f8ad741c38fd871004970209d6105e`, which is included here.
 
 **#132 merged at `68f6a3958608557381d0692adc83cedf1caeeac3`. All 18 original PRs are resolved.** The user subsequently authorized the next product step. This continuation adds canonical **explicit development** worker ownership, browser creator setup/public AI entry, and unknown-cost terminal recovery. [Canonical journey evidence](../../artifacts/pr-review/2026-10-07/canonical-generation-journey/README.md) is the current source of runtime observations and limitations. Production generation remains gated; source consolidation is not full product qualification.
 
@@ -18,7 +18,7 @@ The [generation admission checkpoint](../../artifacts/pr-review/2026-10-07/gener
 
 ## Workspace and preservation
 
-- Active review checkout: `/Users/yingpengwang/.codex/worktrees/637b/creator-platform`, branch `codex/canonical-generation-journey-20261007`. Publish this continuation as a new PR; #132 is already merged. Inspect status first; do not overwrite unrelated changes or force-push.
+- Active review checkout: `/Users/yingpengwang/.codex/worktrees/637b/creator-platform`, branch `codex/canonical-generation-journey-20261007`. Current continuation: [#334](https://github.com/WangPantopus/creator-platform/pull/334); #132 is already merged. Inspect status first; do not overwrite unrelated changes or force-push.
 - Primary `/Users/yingpengwang/creator-platform` is preserved. The previous generation checkout `/Users/yingpengwang/.codex/worktrees/5f17/creator-platform` remains at its handoff state; inspect ownership/status before reuse.
 - Original PR heads are preserved in `refs/review/20261007/<number>` and their original remote branches. Each manifest compares every production path and retains supporting documentation/history. Do not reopen implementation from scratch or apply an older whole shared file over newer behavior.
 - Private evidence: `/Users/yingpengwang/.codex/visualizations/2026/10/07/01a11784-60b1-7fe3-8855-82bddf4675b6/`. Public compact summaries contain hashes and outcomes, without credentials or exported account payloads.
@@ -74,4 +74,4 @@ The modular Node/Express TypeScript backend uses PostgreSQL/pgvector with eight 
 
 ## Next exact action
 
-Review the new canonical continuation and its current-head checks. Resume from the measured latency/reconnect bottleneck: qualify the complete visible stream after the follow-scroll fix, then reduce repeated current-catalogue reads/lock time while preserving every predicate and the original finite purposes. Follow with in-flight takeover and revocation/memory/idempotency cases before a creator/fan pilot. Preserve all failed attempts and unresolved-cost holds; do not clear them to make another provider attempt eligible. The other release workstreams above remain explicitly unqualified.
+Review [#334](https://github.com/WangPantopus/creator-platform/pull/334) and its current-head checks. Resume from the measured latency/reconnect bottleneck: qualify the complete visible stream after the follow-scroll fix, then reduce repeated current-catalogue reads/lock time while preserving every predicate and the original finite purposes. Follow with in-flight takeover and revocation/memory/idempotency cases before a creator/fan pilot. Preserve all failed attempts and unresolved-cost holds; do not clear them to make another provider attempt eligible. The other release workstreams above remain explicitly unqualified.
