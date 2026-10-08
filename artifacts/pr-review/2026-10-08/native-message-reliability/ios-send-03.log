@@ -1,0 +1,359 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project apps/ios/QelvoraApp.xcodeproj -scheme QelvoraApp -destination "platform=iOS Simulator,id=D5ED8A7C-924E-4F1E-AC35-DB0FACF1E1B0" -derivedDataPath /Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-build -resultBundlePath /Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-send-03.xcresult "-only-testing:QelvoraUITests/ConnectedJourneyTests/testSendMessageWithKeyboard" test-without-building
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  swift-custom-dump: https://github.com/pointfreeco/swift-custom-dump @ 1.7.3
+  QelvoraNative: /Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/ios
+  swift-snapshot-testing: https://github.com/pointfreeco/swift-snapshot-testing.git @ 1.19.6
+  LiveKitUniFFI: https://github.com/livekit/livekit-uniffi-xcframework.git @ 0.1.9
+  swift-syntax: https://github.com/swiftlang/swift-syntax @ 604.0.0
+  xctest-dynamic-overlay: https://github.com/pointfreeco/xctest-dynamic-overlay @ 1.13.1
+  LiveKit: https://github.com/livekit/client-sdk-swift.git @ 2.17.0
+  LiveKitWebRTC: https://github.com/livekit/webrtc-xcframework.git @ 150.7871.2
+
+Writing result bundle at path:
+	/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-send-03.xcresult
+
+2026-10-08 04:09:09.817192-0700 QelvoraUITests-Runner[88020:3251911] [Default] Running tests...
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'Selected tests' started at 2026-10-08 04:09:10.973.
+Test Suite 'QelvoraUITests.xctest' started at 2026-10-08 04:09:10.974.
+Test Suite 'ConnectedJourneyTests' started at 2026-10-08 04:09:10.974.
+Test Case '-[QelvoraUITests.ConnectedJourneyTests testSendMessageWithKeyboard]' started.
+    t =     0.00s Start Test at 2026-10-08 04:09:10.976
+    t =     0.06s Set Up
+    t =     0.07s Open com.pantopus.qelvora
+    t =     0.07s     Launch com.pantopus.qelvora
+2026-10-08 04:09:11.095 xcodebuild[87989:3251515] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-10-08 04:09:11.095 xcodebuild[87989:3251515] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     0.99s         Setting up automation session
+    t =     2.61s         Wait for com.pantopus.qelvora to idle
+    t =     4.27s Waiting 30.0s for "Message Maya's AI" TextField to exist
+    t =     5.27s     Checking `Expect predicate `existsNoRetry == 1` for object "Message Maya's AI" TextField`
+    t =     5.27s         Checking existence of `"Message Maya's AI" TextField`
+    t =     5.38s Tap "Message Maya's AI" TextField
+    t =     5.38s     Wait for com.pantopus.qelvora to idle
+    t =     5.39s     Find the "Message Maya's AI" TextField
+    t =     5.42s     Check for interrupting elements affecting "Message Maya's AI…" TextField
+    t =     5.47s     Synthesize event
+    t =     5.77s     Wait for com.pantopus.qelvora to idle
+    t =     6.12s Type 'Please say hello f...' into "Message Maya's AI…" TextField
+    t =     6.12s     Wait for com.pantopus.qelvora to idle
+    t =     6.48s     Find the "Message Maya's AI…" TextField
+    t =     6.58s     Check for interrupting elements affecting "Message Maya's AI…" TextField
+    t =     6.64s     Synthesize event
+    t =     8.14s     Wait for com.pantopus.qelvora to idle
+    t =     8.14s Waiting 10.0s for Keyboard (First Match) to exist
+    t =     9.20s     Checking `Expect predicate `existsNoRetry == 1` for object Keyboard (First Match)`
+    t =     9.20s         Checking existence of `Keyboard (First Match)`
+    t =    10.23s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    10.23s     Find the "Send" Button
+    t =    10.28s Find the Target Application 'com.pantopus.qelvora'
+    t =    10.44s Added attachment named 'Send-keyboard-ready'
+    t =    10.44s Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    10.79s Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    10.88s Added attachment named 'Send-keyboard-ready-accessibility'
+    t =    10.88s Tap "Send" Button
+    t =    10.88s     Wait for com.pantopus.qelvora to idle
+    t =    10.88s     Find the "Send" Button
+    t =    10.95s     Check for interrupting elements affecting "Send" Button
+    t =    11.01s     Synthesize event
+    t =    11.33s     Wait for com.pantopus.qelvora to idle
+    t =    12.42s Checking `Expect predicate `value != "Please say hello from Maya's AI in one short sentence, without pottery advice."` for object "Message Maya's AI…" TextField`
+    t =    12.42s     Find the "Message Maya's AI…" TextField
+    t =    12.49s     Capturing element debug description
+    t =    12.58s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    12.73s         Find: Descendants matching type TextField
+    t =    12.73s         Find: Elements matching predicate '"Message Maya's AI" IN identifiers'
+    t =    12.73s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    12.84s         Find: Descendants matching type TextField
+    t =    12.85s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    13.43s Checking `Expect predicate `value != "Please say hello from Maya's AI in one short sentence, without pottery advice."` for object "Message Maya's AI…" TextField`
+    t =    13.44s     Find the "Message Maya's AI" TextField
+    t =    13.54s Type 'Unsent verificatio...' into "Message Maya's AI…" TextField
+    t =    13.54s     Wait for com.pantopus.qelvora to idle
+    t =    13.55s     Find the "Message Maya's AI…" TextField
+    t =    13.62s     Check for interrupting elements affecting "Message Maya's AI…" TextField
+    t =    13.70s     Synthesize event
+    t =    14.34s     Wait for com.pantopus.qelvora to idle
+    t =    15.42s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    15.42s     Find the "Send" Button
+    t =    15.49s     Capturing element debug description
+    t =    15.56s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    15.67s         Find: Descendants matching type Button
+    t =    15.67s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    15.67s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    15.76s         Find: Descendants matching type Button
+    t =    15.77s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    16.40s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    16.40s     Find the "Send" Button
+    t =    16.48s     Capturing element debug description
+    t =    16.55s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    16.64s         Find: Descendants matching type Button
+    t =    16.64s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    16.64s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    16.74s         Find: Descendants matching type Button
+    t =    16.74s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    17.35s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    17.35s     Find the "Send" Button
+    t =    17.44s     Capturing element debug description
+    t =    17.51s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    17.60s         Find: Descendants matching type Button
+    t =    17.60s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    17.60s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    17.69s         Find: Descendants matching type Button
+    t =    17.69s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    18.41s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    18.41s     Find the "Send" Button
+    t =    18.49s     Capturing element debug description
+    t =    18.57s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    18.66s         Find: Descendants matching type Button
+    t =    18.66s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    18.67s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    18.76s         Find: Descendants matching type Button
+    t =    18.76s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    19.36s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    19.36s     Find the "Send" Button
+    t =    19.43s     Capturing element debug description
+    t =    19.52s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    19.63s         Find: Descendants matching type Button
+    t =    19.63s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    19.64s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    19.74s         Find: Descendants matching type Button
+    t =    19.74s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    20.39s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    20.39s     Find the "Send" Button
+    t =    20.47s     Capturing element debug description
+    t =    20.54s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    20.63s         Find: Descendants matching type Button
+    t =    20.63s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    20.63s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    20.73s         Find: Descendants matching type Button
+    t =    20.73s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    21.35s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    21.35s     Find the "Send" Button
+    t =    21.44s     Capturing element debug description
+    t =    21.55s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    21.65s         Find: Descendants matching type Button
+    t =    21.65s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    21.66s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    21.77s         Find: Descendants matching type Button
+    t =    21.78s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    22.44s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    22.44s     Find the "Send" Button
+    t =    22.51s     Capturing element debug description
+    t =    22.59s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    22.69s         Find: Descendants matching type Button
+    t =    22.69s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    22.69s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    22.80s         Find: Descendants matching type Button
+    t =    22.81s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    23.43s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    23.43s     Find the "Send" Button
+    t =    23.50s     Capturing element debug description
+    t =    23.59s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    23.68s         Find: Descendants matching type Button
+    t =    23.68s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    23.69s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    23.78s         Find: Descendants matching type Button
+    t =    23.78s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    24.39s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    24.40s     Find the "Send" Button
+    t =    24.47s     Capturing element debug description
+    t =    24.55s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    24.64s         Find: Descendants matching type Button
+    t =    24.64s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    24.64s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    24.74s         Find: Descendants matching type Button
+    t =    24.75s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    25.35s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    25.36s     Find the "Send" Button
+    t =    25.44s     Capturing element debug description
+    t =    25.52s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    25.62s         Find: Descendants matching type Button
+    t =    25.62s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    25.62s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    25.71s         Find: Descendants matching type Button
+    t =    25.72s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    26.36s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    26.36s     Find the "Send" Button
+    t =    26.44s     Capturing element debug description
+    t =    26.51s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    26.61s         Find: Descendants matching type Button
+    t =    26.61s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    26.61s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    26.70s         Find: Descendants matching type Button
+    t =    26.70s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    27.35s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    27.36s     Find the "Send" Button
+    t =    27.44s     Capturing element debug description
+    t =    27.53s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    27.62s         Find: Descendants matching type Button
+    t =    27.62s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    27.63s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    27.72s         Find: Descendants matching type Button
+    t =    27.73s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    28.43s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    28.43s     Find the "Send" Button
+    t =    28.51s     Capturing element debug description
+    t =    28.58s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    28.67s         Find: Descendants matching type Button
+    t =    28.67s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    28.68s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    28.77s         Find: Descendants matching type Button
+    t =    28.77s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    29.38s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    29.38s     Find the "Send" Button
+    t =    29.46s     Capturing element debug description
+    t =    29.56s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    29.67s         Find: Descendants matching type Button
+    t =    29.67s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    29.67s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    29.77s         Find: Descendants matching type Button
+    t =    29.77s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    30.38s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    30.38s     Find the "Send" Button
+    t =    30.46s     Capturing element debug description
+    t =    30.53s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    30.63s         Find: Descendants matching type Button
+    t =    30.63s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    30.63s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    30.73s         Find: Descendants matching type Button
+    t =    30.73s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    31.34s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    31.34s     Find the "Send" Button
+    t =    31.43s     Capturing element debug description
+    t =    31.52s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    31.61s         Find: Descendants matching type Button
+    t =    31.61s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    31.62s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    31.71s         Find: Descendants matching type Button
+    t =    31.72s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    32.35s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    32.35s     Find the "Send" Button
+    t =    32.42s     Capturing element debug description
+    t =    32.49s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    32.57s         Find: Descendants matching type Button
+    t =    32.57s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    32.58s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    32.67s         Find: Descendants matching type Button
+    t =    32.67s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    33.35s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    33.35s     Find the "Send" Button
+    t =    33.43s     Capturing element debug description
+    t =    33.51s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    33.61s         Find: Descendants matching type Button
+    t =    33.61s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    33.62s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    33.71s         Find: Descendants matching type Button
+    t =    33.72s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    34.35s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    34.35s     Find the "Send" Button
+    t =    34.42s     Capturing element debug description
+    t =    34.50s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    34.58s         Find: Descendants matching type Button
+    t =    34.58s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    34.59s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    34.68s         Find: Descendants matching type Button
+    t =    34.69s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    35.40s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    35.40s     Find the "Send" Button
+    t =    35.48s     Capturing element debug description
+    t =    35.56s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    35.66s         Find: Descendants matching type Button
+    t =    35.66s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    35.67s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    35.77s         Find: Descendants matching type Button
+    t =    35.77s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    36.38s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    36.38s     Find the "Send" Button
+    t =    36.41s     Capturing element debug description
+    t =    37.35s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    37.35s     Find the "Send" Button
+    t =    37.41s     Capturing element debug description
+    t =    37.49s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    37.55s         Find: Descendants matching type Button
+    t =    37.55s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    37.55s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    37.61s         Find: Descendants matching type Button
+    t =    37.61s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    38.39s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    38.39s     Find the "Send" Button
+    t =    38.49s     Capturing element debug description
+    t =    38.60s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    38.68s         Find: Descendants matching type Button
+    t =    38.68s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    38.69s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    38.75s         Find: Descendants matching type Button
+    t =    38.75s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    39.42s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    39.43s     Find the "Send" Button
+    t =    39.49s     Capturing element debug description
+    t =    39.58s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    39.65s         Find: Descendants matching type Button
+    t =    39.65s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    39.66s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    39.70s         Find: Descendants matching type Button
+    t =    39.71s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    40.38s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    40.38s     Find the "Send" Button
+    t =    40.46s     Capturing element debug description
+    t =    40.54s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    40.60s         Find: Descendants matching type Button
+    t =    40.60s         Find: Elements matching predicate '"Send" IN identifiers'
+    t =    40.60s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    40.68s         Find: Descendants matching type Button
+    t =    40.69s         Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    41.40s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    41.40s     Find the "Send" Button
+    t =    41.43s     Capturing element debug description
+    t =    42.38s Checking `Expect predicate `enabled == 1` for object "Send" Button`
+    t =    42.38s     Find the "Send" Button
+    t =    42.44s Find the "Message Maya's AI…" TextField
+    t =    42.48s Tap "Message Maya's AI" TextField
+    t =    42.49s     Wait for com.pantopus.qelvora to idle
+    t =    42.49s     Find the "Message Maya's AI" TextField
+    t =    42.53s     Check for interrupting elements affecting "Message Maya's AI" TextField
+    t =    42.57s     Synthesize event
+    t =    42.88s     Wait for com.pantopus.qelvora to idle
+    t =    43.04s Type '...' into "Message Maya's AI" TextField
+    t =    43.04s     Wait for com.pantopus.qelvora to idle
+    t =    43.42s     Find the "Message Maya's AI" TextField
+    t =    43.50s     Check for interrupting elements affecting "Message Maya's AI" TextField
+    t =    43.55s     Synthesize event
+    t =    44.18s     Wait for com.pantopus.qelvora to idle
+    t =    44.81s Find the Target Application 'com.pantopus.qelvora'
+    t =    44.98s Added attachment named 'Send-keyboard-completed'
+    t =    44.98s Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    45.36s Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    45.45s Added attachment named 'Send-keyboard-completed-accessibility'
+    t =    45.45s Get all elements bound by index for: Elements matching predicate 'label CONTAINS[cd] "hello"'
+    t =    45.52s Find the StaticText (Element at index 1)
+    t =    45.59s Find the "Ask Maya to step in" Button
+    t =    45.67s Added attachment named 'Send-timing'
+    t =    45.68s Find the Target Application 'com.pantopus.qelvora'
+    t =    45.84s Added attachment named 'Send-final-state'
+    t =    45.84s Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    46.21s Requesting snapshot of accessibility hierarchy for app with pid 88028
+    t =    46.31s Added attachment named 'Send-final-state-accessibility'
+    t =    46.31s Tear Down
+Test Case '-[QelvoraUITests.ConnectedJourneyTests testSendMessageWithKeyboard]' passed (46.577 seconds).
+Test Suite 'ConnectedJourneyTests' passed at 2026-10-08 04:09:57.553.
+	 Executed 1 test, with 0 failures (0 unexpected) in 46.577 (46.579) seconds
+Test Suite 'QelvoraUITests.xctest' passed at 2026-10-08 04:09:57.554.
+	 Executed 1 test, with 0 failures (0 unexpected) in 46.577 (46.580) seconds
+Test Suite 'Selected tests' passed at 2026-10-08 04:09:57.554.
+	 Executed 1 test, with 0 failures (0 unexpected) in 46.577 (46.582) seconds
+2026-10-08 04:09:57.918 xcodebuild[87989:3251515] [MT] IDETestOperationsObserverDebug: 49.757 elapsed -- Testing started completed.
+2026-10-08 04:09:57.918 xcodebuild[87989:3251515] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-10-08 04:09:57.918 xcodebuild[87989:3251515] [MT] IDETestOperationsObserverDebug: 49.757 sec, +49.757 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-send-03.xcresult
+
+** TEST EXECUTE SUCCEEDED **
+
+Testing started

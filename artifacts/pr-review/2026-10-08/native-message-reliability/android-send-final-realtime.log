@@ -1,0 +1,16 @@
+--------- beginning of main
+         1791457629.155  3128  3291 D QelvoraRealtime: socket_transport_failed
+         1791458159.295  3488  3524 D QelvoraIdentity: session_transport_failed
+         1791458164.095  3488  3547 D QelvoraRealtime: socket_closing_code_1013
+         1791458164.095  3488  3547 D QelvoraRealtime: server_authority_deadline
+         1791458176.189  3488  3548 D QelvoraRealtime: socket_transport_failed
+         1791458179.213  3488  3547 D QelvoraRealtime: socket_transport_failed
+         1791458423.685  3718  3761 D QelvoraRealtime: socket_closing_code_1013
+         1791458423.685  3718  3761 D QelvoraRealtime: server_authority_deadline
+         1791458427.101  3718  3746 D QelvoraIdentity: session_transport_failed
+         1791458437.009  3718  3761 D QelvoraRealtime: socket_closing_code_1013
+         1791458437.009  3718  3761 D QelvoraRealtime: server_authority_deadline
+         1791458443.691  3718  3748 D QelvoraRealtime: socket_transport_failed
+         1791458447.408  3718  3746 D QelvoraIdentity: session_reconfirmed
+         1791458453.085  3718  3748 D QelvoraRealtime: socket_transport_failed
+         1791458454.613  3718  3761 D QelvoraRealtime: socket_transport_failed

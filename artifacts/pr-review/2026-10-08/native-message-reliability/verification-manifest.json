@@ -1,0 +1,130 @@
+{
+  "scope": "Final native implementation and real development operation; source hashes take precedence over earlier build checkout labels. No production qualification.",
+  "files": [
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/ConversationResumeStorage.kt",
+      "sha256": "c82e33e3e9ad834f0a2fbda9455467ed919fc9f8769254b8308de6a9f95ce678",
+      "bytes": 4746
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/ConversationOfflineStorage.kt",
+      "sha256": "ecf1de8df712dc4b5a5574539413a4ee49d30dd61cbf7db18b375bcde1b461ce",
+      "bytes": 7203
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/ConversationRecording.kt",
+      "sha256": "57e9b0983aaa2cb7861c7713f5f9bfa5bbb576fc6285eaf5313ca7cef6b011db",
+      "bytes": 17040
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt",
+      "sha256": "23b5d05b997e34b0f1479d487fc1248f13bec63565875c9434638e3d728f596e",
+      "bytes": 71529
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/ConversationRealtime.kt",
+      "sha256": "ac7940fa0fbc4477102ae5ce4908f2f4537f923a8c96272661138a920e95ae51",
+      "bytes": 8585
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/ConversationClient.kt",
+      "sha256": "ba995e335108f89b22c8593e07f20d58cbc559c7b1cb2a55c4028ce65cc7da4b",
+      "bytes": 8719
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanShell.kt",
+      "sha256": "28aa724c1ff1bb5bf24bf487575667fc28528685b3aadcdec17794fb37853762",
+      "bytes": 40402
+    },
+    {
+      "path": "apps/android/app/src/androidTest/java/com/pantopus/qelvora/ConnectedJourneyTest.kt",
+      "sha256": "747f4ae00f0c9b546864507800e97aaf390ad365a484180438d88d37c05cb2a3",
+      "bytes": 16264
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Conversation/W3ResumeStorage.swift",
+      "sha256": "05e3b8596dfc8bfffab1d3ddf1914df58e42ca78ff2d857f61a76c8909772424",
+      "bytes": 3122
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Conversation/W3ConversationClient.swift",
+      "sha256": "f1b770c0dea30c6ef4ae97d2b504ee2df99a1ce271de06110f9570a80da2ef79",
+      "bytes": 24450
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Conversation/W3Recording.swift",
+      "sha256": "74f21728db3ad722af755004f8b5be9c1983e0e7329214bbdbce486d41edfe88",
+      "bytes": 17476
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Conversation/W3OfflineStorage.swift",
+      "sha256": "d93d7c62b9c14c96b74f00d7cc4722a0f9a8b3997214f8dbe004342c6a8f6c23",
+      "bytes": 6088
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Conversation/W3Realtime.swift",
+      "sha256": "01c78b01bd243818c4028d6b78bc6e2b94c6dbbf1eed3bc5f85e7214b7b942aa",
+      "bytes": 8654
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/Conversation/W3FanFeatures.swift",
+      "sha256": "9401d0b93ef552ad55582151c52d19956408d3c4d1c842fdd4aa5c295b0f7516",
+      "bytes": 52218
+    },
+    {
+      "path": "apps/ios/Sources/QelvoraUI/FanShell.swift",
+      "sha256": "1fe634dc54ab8fe69a8e2b186bd6fe9649524084ea00b3ff3a2c5bf052380836",
+      "bytes": 43644
+    },
+    {
+      "path": "apps/ios/UITests/ConnectedJourneyTests.swift",
+      "sha256": "38fd35df3c66a71984f1cef51a0da8fd077c86026574c19153c64504510facf9",
+      "bytes": 9154
+    },
+    {
+      "path": "apps/backend/src/realtime/gateway.ts",
+      "sha256": "eef957b420d32744fd8748eff31e2089882ada4d663ebd13225ae2f3e3ef3e7b",
+      "bytes": 13285
+    },
+    {
+      "path": "apps/android/app/build/outputs/apk/debug/app-debug.apk",
+      "sha256": "7a40953e9ba5ca4de70a234c1384dc21ae5d87ff00841978cd0da7e797a0c548",
+      "bytes": 73519969
+    },
+    {
+      "path": "apps/android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
+      "sha256": "299cb48c1f74a16873926dfeb361e49185d8ed028863bf3d117b492ee5d9a2bf",
+      "bytes": 1062744
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-build/Build/Products/Debug-iphonesimulator/QelvoraApp.app/QelvoraApp",
+      "sha256": "07e44e65f87e4e2eaf119f837b49707c6d12aaa9b55ee11ad49ab2f3dc0483c7",
+      "bytes": 48128
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/android-send-build-10.log",
+      "sha256": "b330e972d09820123169ce48035abead5727cdbd0101d531afafd5914a96fe4e",
+      "bytes": 3989
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-send-build-06.log",
+      "sha256": "1c69aa21d3943b24831945adeb67922b8aba3c26c2ecedafd98a6323f16d3f6e",
+      "bytes": 85455
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/android-send-07.log",
+      "sha256": "e7c8571f41440cf7fe32895de49327df4a002b7efdbdbc2c10d53ed7cfc332c0",
+      "bytes": 736
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-send-03.log",
+      "sha256": "2ddddc3be24e214f2b002d717859834911a71bbca85ee8add12cfa66ef476b39",
+      "bytes": 26885
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-keyboard-read-04.log",
+      "sha256": "d7a01bfb73b099ba0e10e759e0df33430536cd722d3564bdb3d75d1c0fb39c32",
+      "bytes": 6446
+    }
+  ]
+}

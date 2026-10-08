@@ -217,6 +217,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
                     if (purge()) error = "The account changed. Continue with Pantopus again."
                     return
                 }
+                if (BuildConfig.DEBUG && error.isNotEmpty()) android.util.Log.d("QelvoraIdentity", "session_reconfirmed")
                 confirmedCredential = token; session = value; error = ""
                 restoreDestination(value, token)
             } catch (failure: CreatorAPIError) {
@@ -233,7 +234,18 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
                     } else if (purge()) error = "Your session ended. Continue with Pantopus again."
                 } else error = message(failure)
             } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-            catch (_: Exception) {
+            catch (failure: Exception) {
+                // Bounded development diagnostics: no exception text, tokens,
+                // account identifiers or server response bodies.
+                if (BuildConfig.DEBUG) android.util.Log.d("QelvoraIdentity", when (failure) {
+                    is java.net.SocketTimeoutException -> "session_timeout"
+                    is java.io.InterruptedIOException -> "session_io_interrupted"
+                    is java.net.ProtocolException -> "session_protocol_failed"
+                    is java.net.ConnectException -> "session_connect_failed"
+                    is java.io.IOException -> "session_transport_failed"
+                    is kotlinx.serialization.SerializationException -> "session_decode_failed"
+                    else -> "session_local_failed"
+                })
                 if (current == generation) { confirmedCredential = null; error = "Reconnect to refresh your account. Actions are unavailable while offline." }
             }
         } finally { refreshingSession = false; checkingSession = false }
@@ -468,7 +480,11 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
             model.session?.fan == null && features.any { it.matches(model.destination) && it.allowsSignedOut(model.destination) } -> key(model.session?.accountId, model.session?.sessionId, model.destination) { features.first { it.matches(model.destination) && it.allowsSignedOut(model.destination) }.screen(model) }
             (model.session?.fan == null && ApplicationDestination.requiresFanProfile(model.destination)) || model.destination == "/onboarding/handle" -> key(model.session?.accountId, model.session?.sessionId) { HandleForm(model) }
             else -> {
-                if (model.session?.mode == APISessionMode.DEVELOPMENT) Notice(title = "Development identity", children = "Synthetic account · actual local API.")
+                val isConversation = model.destination.substringBefore('?').startsWith("/threads/")
+                if (model.session?.mode == APISessionMode.DEVELOPMENT) {
+                    if (isConversation) BasicText("Development identity · synthetic account · actual local API", style = qText("caption").copy(color = qColor("ink")), modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+                    else Notice(title = "Development identity", children = "Synthetic account · actual local API.")
+                }
                 Box(Modifier.weight(1f).fillMaxWidth()) {
                     val feature = features.firstOrNull { it.matches(model.destination) }
                     if (model.destination == "/identity/account" || (model.destination == "/you" && feature == null)) Column(Modifier.padding(16.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -491,7 +507,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                 val path = model.destination.substringBefore('?')
                 val accountDestination = path.startsWith("/identity/") || path == "/support" || path.startsWith("/support/") || path == "/notifications/settings" || path == "/studio/impact" || path == "/commerce/spending" || StudioTeamFeature.matches(path)
                 val selectedTab = if (accountDestination) "navYou" else if (path.startsWith("/commerce/")) "navRequests" else labels.firstOrNull { path == it.second || path.startsWith(it.second + "/") }?.first ?: "navHome"
-                TabBar(QelvoraCopy.text(selectedTab)) { label -> model.destination = labels.first { QelvoraCopy.text(it.first) == label }.second }
+                if (!isConversation) TabBar(QelvoraCopy.text(selectedTab)) { label -> model.destination = labels.first { QelvoraCopy.text(it.first) == label }.second }
             }
         }
     }

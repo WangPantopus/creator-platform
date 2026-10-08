@@ -1,0 +1,96 @@
+{
+  "at": "2026-10-08T10:27:04.302Z",
+  "database": "creator_generation_journey43_20261007",
+  "scope": "Actual published revision13, continued through the current compiled engine selector on a separately restored labelled development copy; fictional identity and licence, real authorized provider. Not existing-version upgrade or production qualification.",
+  "usageRows": 41,
+  "usageSha256": "d0ec99a0b41cc34c958f8653186d70d646e8d4680d7392e71d923cfe51c6ea08",
+  "costMicros": 29200,
+  "settledUnits": 37,
+  "originalEightGenerationReceipt": "/Users/yingpengwang/.codex/visualizations/2026/10/07/01a11784-60b1-7fe3-8855-82bddf4675b6/conversation-commerce-completion/operation43-compatibility-native-milestone-light-final-20261008.json",
+  "unchangedOriginalEvidence": {
+    "version": true,
+    "evaluation": true,
+    "perGeneration": true,
+    "messages": true,
+    "reservations": true,
+    "originalUsageRows": true
+  },
+  "additionalPerGeneration": [
+    {
+      "id": "39d9acb6-8cae-4adc-b31c-a9c8280760d9",
+      "state": "delivered",
+      "accepted_at": "2026-10-08T10:14:03.435Z",
+      "first_visible_at": "2026-10-08T10:14:30.030Z",
+      "completed_at": "2026-10-08T10:14:31.855Z",
+      "last_sequence": 1,
+      "acceptedToFirstStoredMs": 26595,
+      "acceptedToTerminalMs": 28420,
+      "calls": 4,
+      "costMicros": 3122
+    },
+    {
+      "id": "ab5dd350-2810-4cde-9457-7df594efcd16",
+      "state": "delivered",
+      "accepted_at": "2026-10-08T10:23:46.849Z",
+      "first_visible_at": "2026-10-08T10:24:05.761Z",
+      "completed_at": "2026-10-08T10:24:09.039Z",
+      "last_sequence": 1,
+      "acceptedToFirstStoredMs": 18912,
+      "acceptedToTerminalMs": 22190,
+      "calls": 4,
+      "costMicros": 1093
+    }
+  ],
+  "additionalMessages": [
+    {
+      "id": "2376ee14-438d-46de-8db7-ff50da559170",
+      "author_kind": "fan",
+      "text": "For a freshly thrown mug, what covering does Maya recommend while it dries? Please answer in one short sentence.",
+      "delivery_state": "accepted",
+      "citations": [],
+      "sequence": 17
+    },
+    {
+      "id": "02895ea6-e660-4e73-8094-fa0c7d960800",
+      "author_kind": "ai",
+      "text": "I\u2019m Maya\u2019s AI. I can\u2019t answer that from the approved sources. You can ask Maya directly.",
+      "delivery_state": "delivered",
+      "citations": [],
+      "sequence": 18
+    },
+    {
+      "id": "674c1041-3063-4e05-a17f-35bc24bca6dc",
+      "author_kind": "fan",
+      "text": "Please say hello from Maya's AI in one short sentence, without pottery advice.",
+      "delivery_state": "accepted",
+      "citations": [],
+      "sequence": 19
+    },
+    {
+      "id": "6473316f-95b3-47b7-8ede-87a3c17182f8",
+      "author_kind": "ai",
+      "text": "Hello, I am Maya's AI, here to assist you with your questions.",
+      "delivery_state": "delivered",
+      "citations": [],
+      "sequence": 20
+    }
+  ],
+  "additionalReservations": [
+    {
+      "key": "generation:39d9acb6-8cae-4adc-b31c-a9c8280760d9",
+      "state": "consumed",
+      "units": 60,
+      "settled_units": 4,
+      "output_delivered": true,
+      "original_settled_at": "2026-10-08T10:14:33.145Z"
+    },
+    {
+      "key": "generation:ab5dd350-2810-4cde-9457-7df594efcd16",
+      "state": "consumed",
+      "units": 60,
+      "settled_units": 2,
+      "output_delivered": true,
+      "original_settled_at": "2026-10-08T10:24:10.319Z"
+    }
+  ]
+}

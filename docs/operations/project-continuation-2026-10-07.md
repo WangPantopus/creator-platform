@@ -1,5 +1,29 @@
 # Product continuation and PR consolidation checkpoint
 
+## Active continuation — native message reliability
+
+PR [#337](https://github.com/WangPantopus/creator-platform/pull/337) merged at
+`715cc0728d417f40e97d41eec64cab6e4121cd6f` after all ten PR/head checks passed.
+Its connected read/restoration milestone is complete; full native acceptance is
+not. Work continues on `codex/native-message-journey-20261008`.
+
+Actual native sends exposed a keyboard focus loss and a connection deadline
+reported as a policy violation. The backend deadline correction is committed at
+`9f1a50eb4`; native recovery/draft/keyboard repairs now pass the bounded live
+journeys on both platforms, including Android account reconfirmation. Copy 43
+now contains 18 operations: 17 delivered and one failed iOS operation with no
+provider call, recovered by the original worker at zero settled units. The
+original eight generations, publication and usage records remain preserved;
+new receipts record every additional operation and failure. See
+[native message evidence](../../artifacts/pr-review/2026-10-08/native-message-reliability/README.md).
+
+The compiled backend is currently launched by `native-e2e/launch43-backend-realtime.mjs`
+on port 57304; web uses `native-e2e/launch43-web-trust.mjs` on port 3119, both in
+the current October 8 operation directory. The dedicated iOS simulator is shut down; its owned mediaanalysisd process was resumed first. The Android AVD has completed final account-refresh recovery checks. Refresh this live inventory before stopping anything. The complete
+[finish plan](product-finish-plan-2026-10-08.md), trusted comparison producer,
+existing-version upgrade and every unqualified acceptance item remain open.
+
+
 Updated October 8, 2026 after #335 merged. Start with the [session handoff](session-handoff-2026-10-08.md), then this checkpoint; refresh Git/GitHub state and follow the pinned evidence. Historical observations in the [reconciliation ledger](pr-reconciliation-2026-10-07.md) describe earlier stages; they do not override this current status.
 
 ## Current status

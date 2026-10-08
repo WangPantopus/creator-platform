@@ -1,0 +1,15 @@
+--------- beginning of main
+         1791455050.900  4377  4420 D QelvoraRealtime: socket_closing_code_1008
+         1791455061.150  4377  4407 D QelvoraRealtime: socket_transport_failed
+         1791455538.996  4619  4668 D QelvoraRealtime: socket_closing_code_1013
+         1791455538.996  4619  4668 D QelvoraRealtime: server_authority_deadline
+         1791455552.745  4619  4668 D QelvoraRealtime: socket_transport_failed
+         1791455553.240  4619  4654 D QelvoraRealtime: socket_transport_failed
+         1791456088.822  4800  4846 D QelvoraRealtime: socket_closing_code_1013
+         1791456088.822  4800  4846 D QelvoraRealtime: server_authority_deadline
+         1791456088.907  4800  4847 D QelvoraRealtime: socket_transport_failed
+         1791456098.224  4800  4846 D QelvoraRealtime: socket_closing_code_1013
+         1791456098.224  4800  4846 D QelvoraRealtime: server_authority_deadline
+         1791456110.400  4800  4846 D QelvoraRealtime: socket_transport_failed
+         1791456257.408  4965  5012 D QelvoraRealtime: socket_transport_failed
+         1791456332.473  5064  5109 D QelvoraRealtime: socket_transport_failed

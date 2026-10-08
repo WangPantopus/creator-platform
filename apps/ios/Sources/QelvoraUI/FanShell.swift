@@ -515,7 +515,7 @@ public struct FanAppShell: View {
                     } else if model.destination == "/onboarding/handle" { NativeHandleForm(model: model).id((model.session?.accountId ?? "") + (model.session?.sessionId ?? "")) }
                     else if let feature { feature.screen(model).id((model.session?.accountId ?? "") + (model.session?.sessionId ?? "") + model.destination + destinationDelivery.uuidString) }
                     else { EmptyState(title: "This destination is not connected yet", body: "Your account and arrival context are kept. Return to your account or try again when this feature is available.") { Button("Your account", variant: .secondary) { model.destination = "/you" } }.frame(maxHeight: .infinity) }
-                    TabBar(active: tab) { model.destination = "/" + $0.rawValue.lowercased() }.layoutPriority(1)
+                    if !isConversation { TabBar(active: tab) { model.destination = "/" + $0.rawValue.lowercased() }.layoutPriority(1) }
                 }
             }
         }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -564,9 +564,13 @@ public struct FanAppShell: View {
             if model.localPurgeFailed {
                 Button(QelvoraCopy.text("identityPrivateClearRetry"), variant: .secondary, block: true, disabled: model.busy || model.purgingPrivateState) { Task { await model.purge() } }.padding(.horizontal, 16)
             }
-            if showsDevelopmentNotice { Notice(title: "Development identity", children: "Synthetic account · actual local API.").padding(16) }
+            if showsDevelopmentNotice {
+                if isConversation { Text("Development identity · synthetic account · actual local API").qText("caption").padding(.horizontal, 16).padding(.vertical, 8) }
+                else { Notice(title: "Development identity", children: "Synthetic account · actual local API.").padding(16) }
+            }
         }
     }
+    private var isConversation: Bool { model.destination.components(separatedBy: "?")[0].hasPrefix("/threads/") }
     private var tab: FanTab {
         let path = model.destination.components(separatedBy: "?")[0]
         if path.hasPrefix("/identity/") || path == "/support" || path.hasPrefix("/support/") || path == "/notifications/settings" || path == "/studio/impact" || path == "/commerce/spending" || StudioTeamFeature.matches(path) { return .you }

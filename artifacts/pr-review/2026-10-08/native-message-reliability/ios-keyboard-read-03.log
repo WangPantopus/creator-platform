@@ -1,0 +1,88 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project apps/ios/QelvoraApp.xcodeproj -scheme QelvoraApp -destination "platform=iOS Simulator,id=D5ED8A7C-924E-4F1E-AC35-DB0FACF1E1B0" -derivedDataPath /Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-build -resultBundlePath /Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-keyboard-read-03.xcresult "-only-testing:QelvoraUITests/ConnectedJourneyTests/testKeyboardKeepsLatestReply" test-without-building
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  QelvoraNative: /Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/ios
+  LiveKitUniFFI: https://github.com/livekit/livekit-uniffi-xcframework.git @ 0.1.9
+  LiveKitWebRTC: https://github.com/livekit/webrtc-xcframework.git @ 150.7871.2
+  xctest-dynamic-overlay: https://github.com/pointfreeco/xctest-dynamic-overlay @ 1.13.1
+  swift-custom-dump: https://github.com/pointfreeco/swift-custom-dump @ 1.7.3
+  LiveKit: https://github.com/livekit/client-sdk-swift.git @ 2.17.0
+  swift-snapshot-testing: https://github.com/pointfreeco/swift-snapshot-testing.git @ 1.19.6
+  swift-syntax: https://github.com/swiftlang/swift-syntax @ 604.0.0
+
+Writing result bundle at path:
+	/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-keyboard-read-03.xcresult
+
+2026-10-08 04:08:10.359730-0700 QelvoraUITests-Runner[87921:3249718] [Default] Running tests...
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'Selected tests' started at 2026-10-08 04:08:11.540.
+Test Suite 'QelvoraUITests.xctest' started at 2026-10-08 04:08:11.541.
+Test Suite 'ConnectedJourneyTests' started at 2026-10-08 04:08:11.542.
+Test Case '-[QelvoraUITests.ConnectedJourneyTests testKeyboardKeepsLatestReply]' started.
+    t =     0.00s Start Test at 2026-10-08 04:08:11.544
+    t =     0.06s Set Up
+    t =     0.07s Open com.pantopus.qelvora
+    t =     0.07s     Launch com.pantopus.qelvora
+2026-10-08 04:08:11.675 xcodebuild[87884:3249296] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-10-08 04:08:11.675 xcodebuild[87884:3249296] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     1.16s         Setting up automation session
+    t =     2.65s         Wait for com.pantopus.qelvora to idle
+    t =     4.29s Waiting 30.0s for "Message Maya's AI" TextField to exist
+    t =     5.36s     Checking `Expect predicate `existsNoRetry == 1` for object "Message Maya's AI" TextField`
+    t =     5.36s         Checking existence of `"Message Maya's AI" TextField`
+    t =     5.47s Tap "Message Maya's AI" TextField
+    t =     5.47s     Wait for com.pantopus.qelvora to idle
+    t =     5.48s     Find the "Message Maya's AI" TextField
+    t =     5.51s     Check for interrupting elements affecting "Message Maya's AI…" TextField
+    t =     5.55s     Synthesize event
+    t =     5.86s     Wait for com.pantopus.qelvora to idle
+    t =     6.24s Type 'Unsent keyboard ch...' into "Message Maya's AI…" TextField
+    t =     6.24s     Wait for com.pantopus.qelvora to idle
+    t =     6.61s     Find the "Message Maya's AI…" TextField
+    t =     6.70s     Check for interrupting elements affecting "Message Maya's AI…" TextField
+    t =     6.75s     Synthesize event
+    t =     7.31s     Wait for com.pantopus.qelvora to idle
+    t =     7.31s Waiting 10.0s for Keyboard (First Match) to exist
+    t =     8.37s     Checking `Expect predicate `existsNoRetry == 1` for object Keyboard (First Match)`
+    t =     8.37s         Checking existence of `Keyboard (First Match)`
+    t =     8.39s Find the Target Application 'com.pantopus.qelvora'
+    t =     8.57s Added attachment named 'Read-keyboard-before-visibility-check'
+    t =     8.57s Requesting snapshot of accessibility hierarchy for app with pid 87928
+    t =     9.06s Requesting snapshot of accessibility hierarchy for app with pid 87928
+    t =     9.17s Added attachment named 'Read-keyboard-before-visibility-check-accessibility'
+    t =     9.17s Get all elements bound by index for: Elements matching predicate 'label == "Hello, I am Maya's AI, here to assist you with your questions."'
+    t =     9.23s Find the StaticText (Element at index 0)
+    t =     9.31s Find the "Ask Maya to step in" Button
+    t =     9.38s Find the Target Application 'com.pantopus.qelvora'
+    t =     9.53s Added attachment named 'Read-keyboard-visible-reply'
+    t =     9.54s Requesting snapshot of accessibility hierarchy for app with pid 87928
+    t =     9.87s Requesting snapshot of accessibility hierarchy for app with pid 87928
+    t =     9.96s Added attachment named 'Read-keyboard-visible-reply-accessibility'
+    t =     9.96s Type '...' into "Message Maya's AI…" TextField
+    t =     9.96s     Wait for com.pantopus.qelvora to idle
+    t =     9.97s     Find the "Message Maya's AI…" TextField
+    t =    10.03s     Check for interrupting elements affecting "Message Maya's AI" TextField
+    t =    10.10s     Synthesize event
+    t =    10.66s     Wait for com.pantopus.qelvora to idle
+    t =    11.27s Tear Down
+Test Case '-[QelvoraUITests.ConnectedJourneyTests testKeyboardKeepsLatestReply]' passed (11.548 seconds).
+Test Suite 'ConnectedJourneyTests' passed at 2026-10-08 04:08:23.094.
+	 Executed 1 test, with 0 failures (0 unexpected) in 11.548 (11.552) seconds
+Test Suite 'QelvoraUITests.xctest' passed at 2026-10-08 04:08:23.096.
+	 Executed 1 test, with 0 failures (0 unexpected) in 11.548 (11.555) seconds
+Test Suite 'Selected tests' passed at 2026-10-08 04:08:23.097.
+	 Executed 1 test, with 0 failures (0 unexpected) in 11.548 (11.557) seconds
+2026-10-08 04:08:23.439 xcodebuild[87884:3249296] [MT] IDETestOperationsObserverDebug: 14.854 elapsed -- Testing started completed.
+2026-10-08 04:08:23.439 xcodebuild[87884:3249296] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-10-08 04:08:23.439 xcodebuild[87884:3249296] [MT] IDETestOperationsObserverDebug: 14.854 sec, +14.854 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-keyboard-read-03.xcresult
+
+** TEST EXECUTE SUCCEEDED **
+
+Testing started
