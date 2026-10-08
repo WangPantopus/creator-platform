@@ -44,6 +44,7 @@ import type {
 import { isDevelopmentLicense } from "./development-license.js";
 import { shadowReplayFingerprint } from "./shadow-fingerprint.js";
 import { currentShadowSamples } from "./shadow-samples.js";
+import type { PrivacyParaphrasePort } from "./shadow.js";
 import {
   PreparedGenerationAgentInputs,
   type GenerationAILicenseContext,
@@ -118,6 +119,7 @@ export class AgentService {
     repository: AgentRepository,
     pipeline: AgentPipeline,
     private readonly licenseVerifier: LicenseVerifier | null = null,
+    private readonly comparisonFeed: PrivacyParaphrasePort | null = null,
   ) {
     this.repository = repository;
     this.pipeline = pipeline;
@@ -355,7 +357,11 @@ export class AgentService {
           evaluation.fingerprint !== snapshot.fingerprint
         )
           gates.push("Run passing boundary evaluations on this exact draft.");
-        if (workspace.live_version_id) {
+        if (workspace.live_version_id && !this.comparisonFeed) {
+          gates.push(
+            "Connect the privacy-safe recent conversation feed before replacing the live version.",
+          );
+        } else if (workspace.live_version_id) {
           const samples = await currentShadowSamples(client, scope.creatorId);
           const shadow = await client.query<{ state: string }>(
             "SELECT state FROM creator.ai_shadow_evaluation WHERE creator_id=$1 AND fingerprint=$2 AND live_version_id=$3 ORDER BY created_at DESC LIMIT 1",
@@ -1054,6 +1060,11 @@ export class AgentService {
           "An expert AI needs indexed approved sources.",
         );
         if (workspace.live_version_id) {
+          invariant(
+            this.comparisonFeed,
+            "shadow_feed_unconfigured",
+            "Connect the privacy-safe recent conversation feed before replacing the live version.",
+          );
           const live = await versionRow(
             client,
             scope.creatorId,

@@ -63,6 +63,10 @@ export function createAgentRouter(input: {
     const items = await input.service.repository.transaction(
       scope(req, res),
       async (client) => {
+        // A disconnected owner cannot attest that retained fan-derived text is
+        // still consented or eligible. Authenticate the creator normally, but
+        // do not return cached comparisons merely because they exist in SQL.
+        if (!input.shadow) return [];
         await client.query(
           "UPDATE creator.ai_shadow_evaluation SET state='failed',error='Comparison interrupted. Run it again.',updated_at=now() WHERE creator_id=$1 AND state='running' AND updated_at<now()-interval '10 minutes'",
           [req.params.creatorId],

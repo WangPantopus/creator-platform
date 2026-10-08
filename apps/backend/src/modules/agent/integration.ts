@@ -48,6 +48,7 @@ export function createAgentDomain(input: {
     repository,
     new AgentPipeline(repository, input.model),
     input.licenseVerifier ?? null,
+    input.shadowFeed ?? null,
   );
   const runtime =
     input.conversation && input.audience

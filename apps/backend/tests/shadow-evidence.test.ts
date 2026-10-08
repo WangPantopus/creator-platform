@@ -49,7 +49,8 @@ function fixture() {
     policyReference: "test-only",
   });
   const pipeline = new AgentPipeline(repository, model);
-  const service = new AgentService(repository, pipeline);
+  const feed = { verifiedParaphrases: vi.fn(async () => samples) };
+  const service = new AgentService(repository, pipeline, null, feed);
   const scope = {
     creatorId: randomUUID(),
     accountId: randomUUID(),
@@ -170,7 +171,6 @@ function fixture() {
       costMicros: 0,
     },
   });
-  const feed = { verifiedParaphrases: vi.fn(async () => samples) };
   const shadow = new ShadowReplay(service, feed);
   return {
     scope,

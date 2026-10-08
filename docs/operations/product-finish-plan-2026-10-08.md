@@ -36,6 +36,14 @@ one original zero-provider failed operation; its original eight operations and
 33 usage rows are unchanged. This bounded milestone does not qualify the missing
 existing-version upgrade, full native acceptance or useful-response latency.
 
+PR #338 merged at `8f39888953f4016b2059d2dceeb5867e8765748f` after all ten
+reviewed-head checks passed. Both owned native devices are now stopped with
+state preserved. Work continues on `codex/conversation-shadow-producer-20261008`.
+The trusted producer remains unconnected: new separate-purpose consent,
+sanitization and source mapping are implementation work, not qualified replay.
+The comparison consumer also needs to refuse retained evidence when its
+original trusted feed is disconnected. All ten milestones below remain open.
+
 ## Refreshed starting point
 
 - Continuation branch: `codex/shadow-evidence-lifetime-20261008`, retaining
