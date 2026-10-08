@@ -1,5 +1,9 @@
 # Session handoff — October 8, 2026
 
+**Latest: the user requested immediate handoff. Start with [the current handoff](session-handoff-2026-10-08-immediate.md).**
+The historical continuation entries below are preserved evidence, not the current runtime state.
+
+
 ## Active continuation — actual creator upgrade and native verification
 
 Continue in637b on `codex/comparison-creator-upgrade-20261008`. The

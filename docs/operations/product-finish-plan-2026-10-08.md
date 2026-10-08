@@ -1,5 +1,14 @@
 # Product finish plan — October 8, 2026
 
+## Immediate requested handoff
+
+Implementation paused at the [comparison-view privacy repair](../../artifacts/pr-review/2026-10-08/comparison-view-lifetime/README.md).
+Offline/failed-read concealment and fresh-read recovery pass in the real web app;
+visibility/identity/cancellation and populated creator export withdrawal remain.
+Use the [exact current handoff](session-handoff-2026-10-08-immediate.md) to resume.
+All ten milestones and every historical evidence/clock/hold remain in scope.
+
+
 ## Current execution — preserved creator upgrade
 
 The [actual upgrade increment](../../artifacts/pr-review/2026-10-08/comparison-creator-upgrade/README.md)

@@ -1,0 +1,42 @@
+{
+  "scope": "Actual local browser checks before immediate requested handoff. No provider/data mutation by this view repair.",
+  "sourceSha256": "5557e299d66d4051ddd3f168185d45a0cb72860727f8efbb6fce8db8372f8cff",
+  "validation": {
+    "webTypecheck": "passed",
+    "scopedEslint": "passed",
+    "prettier": "passed",
+    "nextProductionBuild": "passed; local HTTP identity unavailable by production guard",
+    "offlineClear": "passed in real development web",
+    "failedReadClear": "passed using tab-scoped request blocking",
+    "freshReadRestore": "passed",
+    "background": "not qualified; automation kept document.visibilityState visible",
+    "lateResponseCancellation": "implemented, not separately operated",
+    "populatedCreatorExportWithdrawal": "not started"
+  },
+  "files": [
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/creator-comparison-offline-before-web.png",
+      "sha256": "ad6b876836276eaa82f1bdf1fa60b3ca5419e452fe97ff263687bf86217d2b81"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/creator-comparison-offline-cleared-web.png",
+      "sha256": "c171d0fd3c41d372895dc4cc6ab3d8d20eae5057b89a4b2b0fc975942a8e694e"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/creator-comparison-read-failure-cleared-web.png",
+      "sha256": "8cc49422a300c25f9d3cd88537a96a40735f705e934cc351ad8f655a0f278b1e"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/web-comparison-view-build-01.log",
+      "sha256": "fac3e36d03a6822a3ee51acd714b215508c82c7e34f952a8b8d24673cccd8307"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/web-comparison-view-production-01.log",
+      "sha256": "9c17be723db80abcc29b9eab4427532c50c79df7b26797bf099bc1258ae59ffe"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/web-comparison-view-dev-02.log",
+      "sha256": "003754b4bf5b9aef1d4f4d51206fac07a7660d4c5a1139b60885426910b006e0"
+    }
+  ]
+}

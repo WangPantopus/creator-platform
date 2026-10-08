@@ -7,7 +7,7 @@ personal attention.
 
 ## Start every session here
 
-For the current implementation state and resources, read the [October 8 session handoff](docs/operations/session-handoff-2026-10-08.md) and [project checkpoint](docs/operations/project-continuation-2026-10-07.md). Refresh their Git/GitHub observations before resuming.
+For the current implementation state and resources, read the [October 8 immediate handoff](docs/operations/session-handoff-2026-10-08-immediate.md) and [project checkpoint](docs/operations/project-continuation-2026-10-07.md). Refresh their Git/GitHub observations before resuming.
 
 1. Read [docs/BRIEF.md](docs/BRIEF.md): the condensed product, identity system,
    screen inventory, copy system, decision log and open questions.

@@ -320,6 +320,9 @@ export function CreatorAI({
       results: VersionComparison[];
     }[];
   }>({ available: false, items: [] });
+  const [comparisonReadState, setComparisonReadState] = useState<
+    "checking" | "current" | "unavailable"
+  >("checking");
   const [confirmation, setConfirmation] = useState<{
     title: string;
     body: string;
@@ -812,31 +815,85 @@ export function CreatorAI({
   useEffect(() => {
     if (!state || !["test", "versions"].includes(current)) return;
     let cancelled = false;
+    let pending: AbortController | undefined;
     const expectedActor = actorKey.current;
+    const readable = () =>
+      !cancelled &&
+      !identitySignal?.aborted &&
+      navigator.onLine &&
+      document.visibilityState === "visible" &&
+      actorKey.current === expectedActor;
+    const clear = () => {
+      pending?.abort();
+      pending = undefined;
+      setComparisons({ available: false, items: [] });
+      setComparisonReadState(readable() ? "checking" : "unavailable");
+    };
     const load = async () => {
+      if (!readable()) {
+        clear();
+        return;
+      }
+      if (pending) return;
+      const controller = new AbortController();
+      pending = controller;
+      const signal = AbortSignal.any([
+        controller.signal,
+        AbortSignal.timeout(5000),
+      ]);
       try {
         const response = await request("/api/studio/ai/comparisons", {
           cache: "no-store",
+          signal,
           headers: {
             "X-Studio-Actor": `${state.actorAccountId}:${state.creator.id}`,
           },
         });
-        if (response.ok) {
-          const result = (await response.json()) as typeof comparisons;
-          if (!cancelled && actorKey.current === expectedActor)
-            setComparisons(result);
+        if (!response.ok) throw new Error("Comparison read unavailable");
+        const result = (await response.json()) as typeof comparisons;
+        if (pending === controller && readable() && !signal.aborted) {
+          setComparisons(result);
+          setComparisonReadState("current");
         }
       } catch {
-        /* Keep the last received comparison during a reconnect. */
+        if (!cancelled && pending === controller) {
+          setComparisons({ available: false, items: [] });
+          setComparisonReadState("unavailable");
+        }
+      } finally {
+        if (pending === controller) pending = undefined;
       }
     };
-    void load();
+    // A received paraphrase is not an offline permission. Conceal it when the
+    // source cannot be revalidated; abandoned responses cannot repopulate it.
+    const refresh = () => {
+      clear();
+      void load();
+    };
+    refresh();
     const timer = setInterval(() => void load(), 5000);
+    window.addEventListener("online", refresh);
+    window.addEventListener("offline", refresh);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    identitySignal?.addEventListener("abort", refresh);
     return () => {
       cancelled = true;
+      pending?.abort();
       clearInterval(timer);
+      window.removeEventListener("online", refresh);
+      window.removeEventListener("offline", refresh);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+      identitySignal?.removeEventListener("abort", refresh);
     };
-  }, [current, state?.creator.id, state?.actorAccountId, request]);
+  }, [
+    current,
+    state?.creator.id,
+    state?.actorAccountId,
+    request,
+    identitySignal,
+  ]);
   const api = async (path: string, body?: unknown, method = "POST") => {
     if (!navigator.onLine)
       throw new Error(
@@ -2471,12 +2528,24 @@ export function CreatorAI({
                       through both versions. Fans continue seeing the live
                       version.
                     </p>
-                    {!comparisons.available && (
-                      <p className="qv-help">
-                        Recent conversation comparison is waiting for the
-                        privacy-safe sample feed.
+                    {comparisonReadState === "checking" && (
+                      <p className="qv-help" role="status">
+                        Checking recent comparisons…
                       </p>
                     )}
+                    {comparisonReadState === "unavailable" && (
+                      <p className="qv-help" role="status">
+                        Recent comparisons are unavailable. Reconnect to review
+                        them.
+                      </p>
+                    )}
+                    {comparisonReadState === "current" &&
+                      !comparisons.available && (
+                        <p className="qv-help">
+                          Recent conversation comparison is waiting for the
+                          privacy-safe sample feed.
+                        </p>
+                      )}
                     <Button
                       disabled={
                         controlsDisabled ||

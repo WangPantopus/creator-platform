@@ -23,6 +23,12 @@ W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan expor
 
 ## Implementation continuation
 
+- [~] October 8, 2026: creator comparison results clear on offline or failed
+  permission reads and recover after fresh reads. Launched web checks and production
+  compilation pass; remaining lifetime/privacy operations are carried into the
+  [immediate requested handoff](operations/session-handoff-2026-10-08-immediate.md).
+  [Evidence](../artifacts/pr-review/2026-10-08/comparison-view-lifetime/README.md).
+
 - [~] October 8, 2026: actual preserved creator revision13→14 comparison, fresh
   six-case evaluation and v2 publication; useful cited fan reply, backend restart,
   reversible rollback/restoration and native Light/Night journeys. Existing E2E
