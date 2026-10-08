@@ -30,6 +30,20 @@ export const PrivacyArtifact = z.strictObject({
   expiresAt: z.iso.datetime(),
 });
 export type PrivacyArtifact = z.infer<typeof PrivacyArtifact>;
+/** Private recovery metadata, durably written before any source bytes. Never
+ * returned in an export or used by itself as lifecycle/removal authority. */
+export const PrivacyArtifactAttempt = z.strictObject({
+  format: z.literal("privacy-attempt-v1"),
+  reference: z.uuid(),
+  jobId: z.uuid(),
+  accountId: z.uuid(),
+  domain: z.enum(PrivacyDomains),
+  leaseToken: z.uuid(),
+  snapshotRef: snapshot,
+  contentType,
+  createdAt: z.iso.datetime(),
+});
+export type PrivacyArtifactAttempt = z.infer<typeof PrivacyArtifactAttempt>;
 export type ExportJob = Parameters<PrivacyHook["run"]>[0];
 /** The owner must hold a stable source snapshot through iterator exhaustion and
  * attest its full checksum/count. A short page or a closed iterator is not proof
@@ -86,6 +100,17 @@ export interface PrivacyArtifactStore {
   remove?(
     artifact: PrivacyArtifact,
     binding: ArtifactBinding,
+    signal: AbortSignal,
+  ): Promise<void>;
+  /** Bounded private inventory only. The original task owner must hold its
+   * actual database fence through removal or recovery acknowledgment. */
+  attempts?(signal: AbortSignal): Promise<readonly PrivacyArtifactAttempt[]>;
+  removeAttempt?(
+    attempt: PrivacyArtifactAttempt,
+    signal: AbortSignal,
+  ): Promise<void>;
+  forgetAttempt?(
+    attempt: PrivacyArtifactAttempt,
     signal: AbortSignal,
   ): Promise<void>;
   sweep?(): Promise<void>;
