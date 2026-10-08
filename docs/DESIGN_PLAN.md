@@ -23,6 +23,11 @@ W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan expor
 
 ## Implementation continuation
 
+- [~] October 8, 2026: prepare original Trust export/deletion for private comparison
+  artifact provenance, full attempt inventory and physical removal. Six isolated
+  source operations pass; activation, actual producer and mature deletion remain
+  open. [Evidence and limits](../artifacts/pr-review/2026-10-08/comparison-artifact-privacy/README.md).
+
 - [x] October 8, 2026: recover an expired-verification download on the original
   application origin, reconfirm the same creator and download the identical
   existing artifact. Preserve the initial loopback-cookie failure; production

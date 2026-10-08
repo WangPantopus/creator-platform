@@ -1,5 +1,12 @@
 import type { PoolClient } from "pg";
 import { DomainError } from "../../core/errors.js";
+import { registeredMigration } from "../../db/reviewed-migration.js";
+import { contentHash } from "../../core/canonical.js";
+import {
+  comparisonArtifactCatalogue,
+  comparisonArtifactPrivacyCatalogueChecksum,
+  comparisonArtifactPrivacySource,
+} from "./comparison-artifacts.js";
 
 const functions = [
   {
@@ -70,6 +77,35 @@ export async function assertDomainPrivacyTaskCatalog(
   client: PoolClient,
   domain: "trust" | "growth",
 ) {
+  const comparisonArtifacts =
+    (
+      await client.query<{ installed: boolean }>(
+        "SELECT EXISTS(SELECT FROM pg_policy WHERE polrelid=to_regclass('creator_trust.domain_privacy_commit_scope') AND polname='comparison_artifact_held_privacy') AS installed",
+      )
+    ).rows[0]?.installed === true;
+  // Only the additive registered source can extend the private scope's exact
+  // metadata-reader profile. Pending/unreviewed SQL never opens this gate.
+  if (comparisonArtifacts) {
+    const source = await registeredMigration(comparisonArtifactPrivacySource);
+    const registered =
+      source &&
+      (
+        await client.query<{ ready: boolean }>(
+          "SELECT creator_trust.comparison_artifact_privacy_registered($1,$2) AS ready",
+          [source.version, source.checksum],
+        )
+      ).rows[0]?.ready;
+    if (
+      registered !== true ||
+      contentHash(await comparisonArtifactCatalogue(client)) !==
+        comparisonArtifactPrivacyCatalogueChecksum
+    )
+      throw new DomainError(
+        "reviewed_migration_unavailable",
+        "Reviewed runtime authority is unavailable.",
+        503,
+      );
+  }
   const ready = (
     await client.query<{ ready: boolean }>(
       `WITH role AS (
@@ -129,7 +165,8 @@ export async function assertDomainPrivacyTaskCatalog(
         AND NOT EXISTS(SELECT FROM pg_class c CROSS JOIN LATERAL aclexplode(coalesce(c.relacl,acldefault(CASE WHEN c.relkind='S' THEN 's'::"char" ELSE 'r'::"char" END,c.relowner))) acl
           WHERE c.relkind IN('r','p','v','m','S','f') AND acl.grantee=(SELECT oid FROM role) AND c.oid<>(SELECT oid FROM scope))
         AND NOT EXISTS(SELECT FROM pg_class c CROSS JOIN LATERAL aclexplode(coalesce(c.relacl,acldefault('r',c.relowner))) acl
-          WHERE c.oid=(SELECT oid FROM scope) AND (acl.grantee<>c.relowner OR acl.grantor<>c.relowner OR acl.is_grantable))
+          WHERE c.oid=(SELECT oid FROM scope) AND (acl.grantor<>c.relowner OR acl.is_grantable
+            OR (acl.grantee<>c.relowner AND NOT($6::boolean AND acl.grantee=to_regrole('creator_comparison_artifact') AND acl.privilege_type='SELECT'))))
         AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
           CROSS JOIN LATERAL aclexplode(coalesce(c.relacl,acldefault('r',c.relowner))) acl
           WHERE n.nspname IN('creator','creator_trust','growth') AND acl.grantee=0)
@@ -162,7 +199,11 @@ export async function assertDomainPrivacyTaskCatalog(
         AND (SELECT count(*)=1 FROM pg_policy WHERE polrelid=(SELECT oid FROM scope)
           AND polname='domain_fence_private' AND polroles=ARRAY[(SELECT oid FROM role)] AND polcmd='*' AND polpermissive
           AND pg_get_expr(polqual,polrelid)='true' AND pg_get_expr(polwithcheck,polrelid)='true')
-        AND (SELECT count(*)=1 FROM pg_policy WHERE polrelid=(SELECT oid FROM scope))
+        AND (SELECT count(*)=CASE WHEN $6::boolean THEN 2 ELSE 1 END FROM pg_policy WHERE polrelid=(SELECT oid FROM scope))
+        AND (NOT $6::boolean OR (SELECT count(*)=1 FROM pg_policy WHERE polrelid=(SELECT oid FROM scope)
+          AND polname='comparison_artifact_held_privacy' AND polroles=ARRAY[to_regrole('creator_comparison_artifact')::oid]
+          AND polcmd='r' AND polpermissive AND polwithcheck IS NULL
+          AND pg_get_expr(polqual,polrelid)='((pid = pg_backend_pid()) AND (xid = pg_current_xact_id_if_assigned()) AND (caller = SESSION_USER) AND (domain = ''trust''::text))'))
         AND (SELECT count(*)=4 FROM pg_policy p JOIN pg_class c ON c.oid=p.polrelid JOIN pg_namespace n ON n.oid=c.relnamespace
           WHERE n.nspname='creator_trust' AND c.relname IN('privacy_job','privacy_task') AND p.polroles=ARRAY[(SELECT oid FROM role)]
           AND p.polpermissive AND pg_get_expr(p.polqual,p.polrelid)='true'
@@ -177,6 +218,7 @@ export async function assertDomainPrivacyTaskCatalog(
         JSON.stringify(functions),
         JSON.stringify(columns),
         domain === "trust" ? "creator_trust_worker" : "growth_worker",
+        comparisonArtifacts,
       ],
     )
   ).rows[0]?.ready;

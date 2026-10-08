@@ -409,6 +409,33 @@ export class PrivateFileArtifacts implements PrivacyArtifactStore {
       this.scanningAttempts = false;
     }
   }
+  async *scanAttempts(
+    signal: AbortSignal,
+  ): AsyncIterable<PrivacyArtifactAttempt> {
+    signal.throwIfAborted();
+    await this.root();
+    const directory = await opendir(this.directory);
+    try {
+      for (;;) {
+        signal.throwIfAborted();
+        const entry = await directory.read();
+        if (!entry) break;
+        const match =
+          /^([0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12})\.(attempt|removed)\.json$/u.exec(
+            entry.name,
+          );
+        if (!match) continue;
+        const attempt = await this.loadAttempt(
+          match[1]!,
+          match[2] as "attempt" | "removed",
+        );
+        if (attempt) yield attempt;
+      }
+      signal.throwIfAborted();
+    } finally {
+      await directory.close();
+    }
+  }
   /** The actual task owner must have proved the original attempt cannot still
    * write and hold that fence through this call. Partial bytes have no sealed
    * checksum; only this exact, durable private attempt marker names the files. */

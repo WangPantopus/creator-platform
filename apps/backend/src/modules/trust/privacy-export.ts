@@ -105,6 +105,9 @@ export interface PrivacyArtifactStore {
   /** Bounded private inventory only. The original task owner must hold its
    * actual database fence through removal or recovery acknowledgment. */
   attempts?(signal: AbortSignal): Promise<readonly PrivacyArtifactAttempt[]>;
+  /** A fresh complete inventory. Only normal iterator exhaustion establishes
+   * EOF. The lifecycle owner must first hold the source-deletion boundary. */
+  scanAttempts?(signal: AbortSignal): AsyncIterable<PrivacyArtifactAttempt>;
   removeAttempt?(
     attempt: PrivacyArtifactAttempt,
     signal: AbortSignal,

@@ -3,10 +3,12 @@ import { ContentHeldClient } from "../content/held-client-cleanup.js";
 import type { PrivacyHook } from "./contracts.js";
 import { domainPrivacyTaskAuthorityInTransaction } from "./domain-privacy-authority.js";
 import { DomainError } from "../../core/errors.js";
+import type { PreparedComparisonArtifacts } from "./comparison-artifacts.js";
 
 export function trustPrivacyHook(
   pool: Pool,
   assertRestoredInTransaction?: (client: PoolClient) => Promise<void>,
+  comparisonArtifacts?: PreparedComparisonArtifacts,
 ): PrivacyHook {
   return {
     domain: "trust",
@@ -27,12 +29,41 @@ export function trustPrivacyHook(
       try {
         input.signal.throwIfAborted();
         await held.begin();
+        const comparisonStorage = (
+          await client.query(
+            "SELECT to_regclass('creator_trust.comparison_export_artifact') AS relation",
+          )
+        ).rows[0]?.relation;
+        if (comparisonStorage && !comparisonArtifacts)
+          throw new DomainError(
+            "comparison_artifact_privacy_unavailable",
+            "The original comparison artifact privacy owner is required.",
+            503,
+          );
         await domainPrivacyTaskAuthorityInTransaction(
           client,
           input,
           "trust",
           assertRestoredInTransaction,
         );
+        const comparison = comparisonArtifacts
+          ? await comparisonArtifacts.privacyInTransaction(client, input)
+          : undefined;
+        if (comparison?.pending) {
+          await domainPrivacyTaskAuthorityInTransaction(
+            client,
+            input,
+            "trust",
+            assertRestoredInTransaction,
+          );
+          input.signal.throwIfAborted();
+          await held.commit();
+          throw new DomainError(
+            "comparison_artifact_purge_pending",
+            "Original source and saved artifact removal are still in progress.",
+            503,
+          );
+        }
         const matches = `reporter_account_id=$1 AND ($2::uuid IS NULL OR creator_id=$2) AND ($3::uuid IS NULL OR EXISTS(SELECT 1 FROM creator_trust.case_evidence e WHERE e.case_id=creator_trust.safety_case.id AND e.snapshot->>'thread_id'=$3::text))`;
         const parameters = [input.accountId, input.creatorId, input.threadId];
         const cases = (
@@ -155,6 +186,7 @@ export function trustPrivacyHook(
             blocks,
             requests,
             replyReviews,
+            ...(comparison ? { comparisonArtifacts: comparison.data } : {}),
           };
           if (
             Buffer.byteLength(JSON.stringify(exported)) >
