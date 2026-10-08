@@ -1,0 +1,98 @@
+{
+  "kind": "actual browser-requested fan account export on preserved copy43",
+  "sourceRevision": "5bd6b6215f172344528d2735e61705a4e079fc69",
+  "observedAt": "2026-10-08T14:27:37.578Z",
+  "job": {
+    "id": "f6a7410b-7db9-4da6-a4ca-901d7a90a317",
+    "kind": "export",
+    "scope": "account",
+    "state": "complete",
+    "account_id": "10000000-0000-4000-8000-000000000003",
+    "created_at": "2026-10-08T14:26:27.214Z",
+    "completed_at": "2026-10-08T14:27:05.421Z"
+  },
+  "tasks": [
+    {
+      "domain": "agent",
+      "state": "complete",
+      "error_code": null,
+      "attempts": 2
+    },
+    {
+      "domain": "commerce",
+      "state": "complete",
+      "error_code": null,
+      "attempts": 1
+    },
+    {
+      "domain": "content",
+      "state": "complete",
+      "error_code": null,
+      "attempts": 1
+    },
+    {
+      "domain": "conversation",
+      "state": "complete",
+      "error_code": null,
+      "attempts": 1
+    },
+    {
+      "domain": "growth",
+      "state": "complete",
+      "error_code": null,
+      "attempts": 1
+    },
+    {
+      "domain": "identity",
+      "state": "complete",
+      "error_code": null,
+      "attempts": 1
+    },
+    {
+      "domain": "media",
+      "state": "complete",
+      "error_code": null,
+      "attempts": 1
+    },
+    {
+      "domain": "trust",
+      "state": "complete",
+      "error_code": null,
+      "attempts": 1
+    }
+  ],
+  "artifacts": [
+    {
+      "domain": "agent",
+      "bytes": 39,
+      "chunks": 1,
+      "sha256": "8a812b313b5c91718e7be64d3cba955042eedb455081162baa54cd500494d894",
+      "markerMode": "600",
+      "markerBindingMatches": true
+    },
+    {
+      "domain": "commerce",
+      "bytes": 12091,
+      "chunks": 5,
+      "sha256": "31df56cce8784c70c83588c3abd3dff26e478baa2c1c9dd2c9f2856d1c4dad64",
+      "markerMode": "600",
+      "markerBindingMatches": true
+    },
+    {
+      "domain": "conversation",
+      "bytes": 198980,
+      "chunks": 4,
+      "sha256": "a3d5e49ea90b5acab919fc9b05527aac53df8f51c2923f3f6ebf23b5a8a30104",
+      "markerMode": "600",
+      "markerBindingMatches": true
+    },
+    {
+      "domain": "growth",
+      "bytes": 541,
+      "chunks": 1,
+      "sha256": "2413fbc854f62134c8437f78353b4bee81ec051790e560a5aff978c50efdfa35",
+      "markerMode": "600",
+      "markerBindingMatches": true
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "comparison": "exact before/after read-only custody",
+  "fields": [
+    "version",
+    "evaluation",
+    "perGeneration",
+    "messages",
+    "reservations",
+    "usageRows",
+    "usageSha256",
+    "costMicros",
+    "settledUnits"
+  ],
+  "generationCount": 18,
+  "usageRows": 69,
+  "usageSha256": "9b6d528acbc4a957ddfcdee0beb43e064668d655ae717ce41c0cd006285af345",
+  "costMicros": 36815,
+  "settledUnits": 51,
+  "sourceRevision": "5bd6b6215f172344528d2735e61705a4e079fc69",
+  "before": "2026-10-08T14:25:34.204Z",
+  "after": "2026-10-08T14:29:29.735Z"
+}

@@ -1,0 +1,50 @@
+{
+  "jobId": "f6a7410b-7db9-4da6-a4ca-901d7a90a317",
+  "observedAt": "2026-10-08T14:29:29.830Z",
+  "downloadMethod": "actual browser links",
+  "domains": [
+    "agent",
+    "commerce",
+    "content",
+    "conversation",
+    "growth",
+    "identity",
+    "media",
+    "trust"
+  ],
+  "artifacts": [
+    {
+      "domain": "agent",
+      "downloadFile": "creator-data-agent (1).bin",
+      "bytes": 39,
+      "sha256": "8a812b313b5c91718e7be64d3cba955042eedb455081162baa54cd500494d894",
+      "matchesSavedManifest": true
+    },
+    {
+      "domain": "commerce",
+      "downloadFile": "creator-data-commerce (1).jsonl",
+      "bytes": 12091,
+      "sha256": "31df56cce8784c70c83588c3abd3dff26e478baa2c1c9dd2c9f2856d1c4dad64",
+      "matchesSavedManifest": true
+    },
+    {
+      "domain": "conversation",
+      "downloadFile": "creator-data-conversation (2).bin",
+      "bytes": 198980,
+      "sha256": "a3d5e49ea90b5acab919fc9b05527aac53df8f51c2923f3f6ebf23b5a8a30104",
+      "matchesSavedManifest": true
+    },
+    {
+      "domain": "growth",
+      "downloadFile": "creator-data-growth (1).jsonl",
+      "bytes": 541,
+      "sha256": "2413fbc854f62134c8437f78353b4bee81ec051790e560a5aff978c50efdfa35",
+      "matchesSavedManifest": true
+    }
+  ],
+  "agentRetry": {
+    "attempts": 2,
+    "reason": "accounting_boundary_pending",
+    "observation": "The first Agent attempt correctly waited for the original completed Conversation accounting boundary; the actual worker completed its retry."
+  }
+}
