@@ -29,6 +29,11 @@ import {
 
 type Job = Parameters<PrivacyHook["run"]>[0];
 const Owner = "creator_w3_privacy_export";
+// Keep one bounded page in memory. Sixteen-row pages spent the original45s
+// task budget on repeated complete custody checks before a modest populated
+// export reached EOF. Every128-row page retains both original bookends; the
+// stream independently fences each64KiB chunk and the final COMMIT.
+const ExportPageRows = 128;
 export const CONVERSATION_PRIVACY_CURSOR_MIGRATION =
   "0233_w3_privacy_cursor_export";
 export const CONVERSATION_PRIVACY_CURSOR_SOURCE_SHA256 =
@@ -508,7 +513,7 @@ export class PreparedConversationPrivacyCursor {
       // bounds a lost response even when the original pool has no deadline;
       // the producer then destroys the retained source, never queues rollback.
       const fetch = {
-        text: "FETCH FORWARD 16 FROM w3_conversation_privacy_export",
+        text: `FETCH FORWARD ${ExportPageRows} FROM w3_conversation_privacy_export`,
         query_timeout: conversationPrivacyQueryTimeout(client, 3000),
       };
       result = await client.query<ConversationPrivacyCursorRow>(fetch);
@@ -575,7 +580,7 @@ export class PreparedConversationPrivacyCursor {
     ]);
     const rows = z
       .array(ConversationPrivacyCursorRow)
-      .max(16)
+      .max(ExportPageRows)
       .parse((await this.fetchWithCancellation(client, signal)).rows);
     signal.throwIfAborted();
     await this.assertCurrent(client, job, families);

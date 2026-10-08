@@ -53,7 +53,7 @@ const Header = z
 /** Serialize the one actual cursor, preserving the complete schema2 domain
  * shape. A short page never means EOF; source exhaustion requires an actual
  * empty fetch and every original family header. Application memory holds only
- * one16-row page, one row's encoded JSON and the caller's pending64KiB chunk. */
+ * one bounded cursor page, one row's encoded JSON and the pending64KiB chunk. */
 export async function writeConversationPrivacyCursor(input: {
   next(): Promise<ConversationPrivacyCursorRow[]>;
   write(part: string): Promise<void>;
