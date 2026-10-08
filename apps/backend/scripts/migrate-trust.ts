@@ -14,6 +14,8 @@ import {
   generationOutputRepairSource,
   registeredGenerationOutputProfile,
 } from "../src/db/generation-output-profile.js";
+import recoveryReview from "../../../infra/migrations/reviews/20261007-generation-recovery.json" with { type: "json" };
+import { registeredGenerationRecoveryProfile } from "../src/db/generation-recovery-profile.js";
 import publicAIReview from "../../../infra/migrations/reviews/20261007-public-ai.json" with { type: "json" };
 import { registeredPublicAIProfile } from "../src/db/public-ai-profile.js";
 import generationReview from "../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
@@ -89,6 +91,13 @@ try {
     throw new Error(
       "Public AI registry requires both exact sources and its complete predecessor.",
     );
+  const recovery = registry.migrations.some(
+    (source) => source.version === recoveryReview.source.version,
+  );
+  if (recovery && (!publicAI || !(await registeredGenerationRecoveryProfile())))
+    throw new Error(
+      "Recovery registry requires its complete reviewed predecessor.",
+    );
   const registeredFiles = registry.migrations
     .filter(
       (file) =>
@@ -151,6 +160,16 @@ try {
     throw new Error(
       "Partial public AI activation or incomplete predecessor; no repair was attempted.",
     );
+  const installedRecovery = applied.some(
+    (row) => row.version === recoveryReview.source.version,
+  );
+  if (
+    installedRecovery &&
+    (!recovery || installedPublic !== publicVersions.size)
+  )
+    throw new Error(
+      "Incomplete terminal recovery activation; no repair was attempted.",
+    );
   // Fresh databases still bootstrap the exact canonical61. The complete new
   // wave is only installed atomically by activate-wave after private backup,
   // separate restore and closed-admission checks. Registered code alone cannot
@@ -161,7 +180,8 @@ try {
       (installedContent || source.version !== contentPrivacySource.version) &&
       (installedOutput ||
         source.version !== generationOutputRepairSource.version) &&
-      (installedPublic || !publicVersions.has(source.version)),
+      (installedPublic || !publicVersions.has(source.version)) &&
+      (installedRecovery || source.version !== recoveryReview.source.version),
   );
   const historical = localLegacy
     ? new Set<string>()
@@ -207,13 +227,15 @@ try {
       if (installedGeneration)
         await assertGenerationWaveRoleSafety(
           client,
-          installedPublic
-            ? "public-ai"
-            : installedOutput
-              ? "generation-output"
-              : installedContent
-                ? "content-privacy"
-                : undefined,
+          installedRecovery
+            ? "generation-recovery"
+            : installedPublic
+              ? "public-ai"
+              : installedOutput
+                ? "generation-output"
+                : installedContent
+                  ? "content-privacy"
+                  : undefined,
         );
       else await assertWaveRoleSafety(client, installedRoles(applied));
       if (continuation)
@@ -303,13 +325,15 @@ try {
       if (installedGeneration)
         await assertGenerationWaveRoleSafety(
           client,
-          installedPublic
-            ? "public-ai"
-            : installedOutput
-              ? "generation-output"
-              : installedContent
-                ? "content-privacy"
-                : undefined,
+          installedRecovery
+            ? "generation-recovery"
+            : installedPublic
+              ? "public-ai"
+              : installedOutput
+                ? "generation-output"
+                : installedContent
+                  ? "content-privacy"
+                  : undefined,
         );
       else await assertWaveRoleSafety(client, installedRoles(files));
       if (continuation)

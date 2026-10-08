@@ -1,5 +1,5 @@
-import { createHash } from "node:crypto";
 import type { Pool } from "pg";
+import { catalogueQuery } from "../../core/catalogue-query.js";
 import { DomainError } from "../../core/errors.js";
 import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
 
@@ -27,7 +27,7 @@ export const generationLifecycleCatalogueQuery = `WITH expected(signature,owner,
  ('creator.pending_generation_terminals(integer)','creator_generation_terminal_authority',true,
   ARRAY['creator_generation_terminal_authority','creator_generation_terminal_discovery','creator_generation_worker']),
  ('creator.fence_generation_first_claim()','creator_owner',false,ARRAY['creator_owner'])
-) SELECT e.signature,pg_get_functiondef(p.oid) AS definition,
+) SELECT e.signature,encode(sha256(convert_to(pg_get_functiondef(p.oid),'UTF8')),'hex') AS "definitionChecksum",
  (pg_get_userbyid(p.proowner)=e.owner AND p.prosecdef=e.definer AND p.prokind='f'
   AND p.proconfig=ARRAY['search_path=pg_catalog'] AND l.lanname='plpgsql'
   AND (SELECT count(*)=cardinality(e.recipients) AND bool_and(
@@ -46,15 +46,31 @@ export const generationLifecycleCatalogueQuery = `WITH expected(signature,owner,
 
 /** Every discovery/claim/terminal bookend checks the actual selectors and row
  * fence. A startup observation cannot authorize replay after live drift. */
+export type GenerationLifecycleCatalogueRow = {
+  signature: keyof typeof generationLifecycleDefinitions;
+  definitionChecksum: string | null;
+  ready: boolean | null;
+};
+
 export async function assertGenerationLifecycleCatalogue(
   query: Pick<Pool, "query">,
 ): Promise<void> {
   await assertRegisteredMigration(query, generationLifecycleSource);
-  const { rows } = await query.query<{
-    signature: keyof typeof generationLifecycleDefinitions;
-    definition: string | null;
-    ready: boolean | null;
-  }>(generationLifecycleCatalogueQuery);
+  // Hash the same current UTF-8 definition in PostgreSQL. Reuse only its
+  // prepared query plan; never cache a result or transfer full bodies on every
+  // nested authorization check.
+  const { rows } = await catalogueQuery<GenerationLifecycleCatalogueRow>(
+    query,
+    generationLifecycleCatalogueQuery,
+  );
+  assertGenerationLifecycleRows(rows);
+}
+
+/** Shared validation for the same current rows, including the combined W1
+ * catalogue statement. This never accepts a startup-cached receipt. */
+export function assertGenerationLifecycleRows(
+  rows: GenerationLifecycleCatalogueRow[],
+): void {
   if (
     !(
       rows.length === 3 &&
@@ -62,8 +78,8 @@ export async function assertGenerationLifecycleCatalogue(
       rows.every(
         (row) =>
           row.ready === true &&
-          row.definition !== null &&
-          createHash("sha256").update(row.definition).digest("hex") ===
+          row.definitionChecksum !== null &&
+          row.definitionChecksum ===
             generationLifecycleDefinitions[row.signature],
       )
     )

@@ -155,10 +155,16 @@ export class PublicAIIdentityAuthority {
         AND NOT has_column_privilege(r.oid,'creator.identity_session','upstream_cipher','SELECT')
         AND has_schema_privilege(r.oid,'creator_trust','USAGE')
         AND has_function_privilege(r.oid,to_regprocedure('creator_trust.public_creator_denial(uuid)'),'EXECUTE'))
-       AND (SELECT count(*)=8 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+       AND (SELECT count(*)=7 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
         WHERE n.nspname='creator' AND c.relkind='r' AND c.relname=ANY(ARRAY[
-         'creator_profile','identity_session','ai_workspace','ai_tombstone','ai_license','ai_version','ai_source','public_ai_read_scope'])
+         'creator_profile','ai_workspace','ai_tombstone','ai_license','ai_version','ai_source','public_ai_read_scope'])
         AND c.relrowsecurity AND c.relforcerowsecurity AND pg_get_userbyid(c.relowner)='creator_owner')
+       -- Identity's original session lookup is deliberately not participant RLS.
+       -- Its narrow columns and exact current-session check remain pinned by
+       -- the public purpose catalogue; do not change the shared session table.
+       AND EXISTS(SELECT FROM pg_class WHERE oid=to_regclass('creator.identity_session')
+        AND relkind='r' AND NOT relrowsecurity AND NOT relforcerowsecurity
+        AND pg_get_userbyid(relowner)='creator_owner')
        AND (SELECT count(*)=5 FROM pg_proc p JOIN pg_roles r ON r.oid=p.proowner
         WHERE p.oid=ANY(ARRAY[
          to_regprocedure('creator.public_ai_metadata(uuid,boolean)'),

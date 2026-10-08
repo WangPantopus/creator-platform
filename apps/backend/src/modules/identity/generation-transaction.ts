@@ -2,8 +2,8 @@ import { Client, type Pool, type PoolClient } from "pg";
 import { DomainError, invariant } from "../../core/errors.js";
 import { querySettlementUncertain } from "../../core/query-settlement.js";
 
-/** No generation process is currently configured. A future original worker
- * must have a finite one-connection acquisition/read budget and no pipelined
+/** The original worker must have a finite one-connection acquisition/read
+ * budget and no pipelined
  * drain that could postpone destruction of an uncertain original session. */
 export function assertGenerationPoolCustody(pool: Pool): void {
   const { max, connectionTimeoutMillis, query_timeout, pipeline } =

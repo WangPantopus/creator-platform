@@ -1,0 +1,20 @@
+{
+  "reference": "design/phase4a-fan-core/Thread.dc.html plus accepted BUILD_PROMPT section9 corrections",
+  "observed": [
+    "Official AI author label and identity strip",
+    "Source citation opens actual licensed545-character passage",
+    "Human takeover changes strip/composer; handback explicitly restores AI",
+    "Preserved interrupted label, unavailable failed reply and past text",
+    "Geist AI typography, Light/Night390px, persistent human request action",
+    "At390x844 after follow-scroll fix, latest article bottom631 and composer top647",
+    "After enlarged-text fix, 200% CSS zoom has clientWidth390=scrollWidth390 and non-sticky header/footer",
+    "Scrolled-up position0 and latest article top877 remained unchanged across live refresh",
+    "Temporary viewport, color scheme, reduced motion, zoom and DOM timing observers removed"
+  ],
+  "limits": [
+    "200% CSS zoom is a reflow inspection, not OS text size or physical-device certification",
+    "Complete streaming visible-timing run after follow-scroll fix remains",
+    "Studio setup/published source reviewed on desktop, not all Studio responsive states",
+    "Memory consent/revocation, uncertain-send idempotency and in-flight takeover still need dedicated journeys"
+  ]
+}

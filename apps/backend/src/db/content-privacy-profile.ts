@@ -3,6 +3,7 @@ import { invariant } from "../core/errors.js";
 import { registeredMigration } from "./reviewed-migration.js";
 import { registeredGenerationOutputProfile } from "./generation-output-profile.js";
 import { registeredPublicAIProfile } from "./public-ai-profile.js";
+import { registeredGenerationRecoveryProfile } from "./generation-recovery-profile.js";
 
 export const contentPrivacySource = Object.freeze({ ...review.source });
 
@@ -41,6 +42,10 @@ export async function generationPrivacyCatalogueChecksum(
     const output = await registeredGenerationOutputProfile(signal);
     if (output) {
       const publicAI = await registeredPublicAIProfile(signal);
+      if (publicAI && purpose === "financial") {
+        const recovery = await registeredGenerationRecoveryProfile(signal);
+        if (recovery) return recovery.runtimeCatalogues.financial;
+      }
       return (publicAI ?? output).runtimeCatalogues[purpose];
     }
     return profile.runtimeCatalogues[purpose];

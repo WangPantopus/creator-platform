@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "scope": "Closed rollback review of two independently restored104 data states, each with and without incoming Growth API membership. Only the two original typed financial function bodies change; all data, ACLs, roles, clocks and five-second purposes remain unchanged. Unknown sealed cost retains its full ceiling while committing terminal output.",
+  "sources": [
+    {
+      "version": "0235_w1_public_ai_metadata_scope",
+      "name": "w1_public_ai_metadata_scope",
+      "owner": "W1",
+      "path": "apps/backend/src/modules/identity/schema-public-ai-scope.sql",
+      "checksum": "0325048ec855877e59430423850ec72360610a96328aaaef903139f512aa0606"
+    },
+    {
+      "version": "0236_w8_public_creator_denial",
+      "name": "w8_public_creator_denial",
+      "owner": "W8",
+      "path": "apps/backend/migrations/0086_w8_public_creator_denial.sql",
+      "checksum": "876e5a0636e9010f3349b57ecc6ff71b42f316cc7210d8b80bac9be4955efe8c"
+    },
+    {
+      "version": "0237_w4_generation_unknown_terminal_hold",
+      "name": "w4_generation_unknown_terminal_hold",
+      "owner": "W4",
+      "path": "apps/backend/src/modules/commerce/schema-generation-unknown-terminal-hold.sql",
+      "checksum": "1885ffa7a387325ece7f53b98fa49dff53ccffefe1cd8733f057385a54bba381"
+    }
+  ],
+  "baselineWave": {
+    "path": "infra/migrations/waves/20261007-public-ai.json",
+    "sha256": "0568f611eafe32329ca4ca8305ca33130f72a615d7a209010a9adbe65baac1e8"
+  },
+  "purposeProfiles": [
+    {
+      "review": "original",
+      "sha256": "6bc92e7a40d3fdc1c4787856f2ed41cca568ec50c9dd83b9bc4da3e774ffb299"
+    },
+    {
+      "review": "original-incoming",
+      "sha256": "806978f79129c162888e4e6f42a16c8d3515faa62de9fe930d46f016650e4d80"
+    }
+  ],
+  "runtimeCatalogues": {
+    "output": "3ccfc467923254c80d0f24e036645567148f938d834bbc8b47b8a3df28f64b1b",
+    "terminal": "e421c68f9a5ff8d25024cbaaa4f1074ccedbdcdeb3960f8268e85a626d02e1c1",
+    "financial": "587508ee00a2b1da8d16f78c987d27cde16e7cdf6920d4bb7bad79f822d6a4cf",
+    "expiry": "61b3f3c2f0ff290961c5e83de2f1eee4fec733ba47f59bd54e90a9fdc36006a5",
+    "detached": "7f14a76e12209c98755364780bf298a5da7fea20563f627c1aca744d42e020e5",
+    "boundary": "d6400ce961dd2e8ff3d4e8564e1a12f0a1986c071168f4d9b3eb58091945faad",
+    "family": "d3595ff7aa625e79b108fc8b559951502032031349377c45e2fc5de31aeba854"
+  },
+  "originalFamilyProfiles": [
+    {
+      "review": "original",
+      "sha256": "d3595ff7aa625e79b108fc8b559951502032031349377c45e2fc5de31aeba854"
+    },
+    {
+      "review": "original-incoming",
+      "sha256": "ead78dddd80eb67a32845510b6545f2c870df4d3cdf3ddf67d210f2286903093"
+    }
+  ],
+  "outputCatalogueChecksum": "db8b87427f05d2348bb0981aa8477028258b4b1ff7c242fc553f5f41ab41b953",
+  "publicCatalogueChecksum": "97cdb4235a237305cc221ec6b1548bd63881925f0cf64521eb4ef877d33fc5dc",
+  "agentExportCatalogueChecksum": "21b52395a9e69cfcf91c36df0323ce546401cd51945a98e193465d8b3d9bd648",
+  "conversationCursorCatalogueChecksum": "0b5a600f30b7656289d86e182b93f8dba7284d5dc69c66c2ff7940fcf1356d5c",
+  "provenancePurgeCatalogueChecksum": "94ca380c2269b17349edd2540d973e084dc783084d321ea774def8f4b262c093",
+  "provenancePurgeIncomingCatalogueChecksum": "69080bd120e3d8b31344d259ddd8efebed69f347ad4888218c59c5b82def1ad3",
+  "workerCatalogues": {
+    "creator_commerce_public_read": "f70dcb630ca877d16076814e516a5f6fcb4d0f6eb10cc63d6aeae78d3c8a2f4a",
+    "creator_generation_authority": "9877235c0e394a1fcd185739bac5ea272a7f5bc571d319d5ddea7abfc8e3eb33",
+    "creator_generation_conversation_context": "72a5bf51b68ae82c1e4ebf27508f1a4843574a4f34a133cbb9b04b36b794c79b",
+    "creator_generation_cursor_authority": "eebf35d3845a5b4f8df160ad56ef29547a9d0056752599ab91450c4021f43e1d",
+    "creator_generation_terminal_authority": "64ed849ff3a766e264518de805388b958b3132dd2ccb68b0ee55ca806b0d9b43",
+    "creator_generation_terminal_discovery": "144c87f9db30669ff2294ce6f15e9fbf59df02d2c5d50e3cc2ce8048e2218f53",
+    "creator_generation_worker": "a785502986e1003f388a47e6c16e070a71317b237b4815ef7eca068c60ecd854",
+    "creator_privacy_accounting_boundary": "4be9897bea0e68d58b98fca2e59caac31990a9ef781c1eea8dbd700b7368ac89",
+    "creator_privacy_family": "926fa17214e84c383ee3763280bfd9a6e1282fda61d3d7ed7f1a7bc0a5964c78",
+    "creator_privacy_ownership_metadata": "a785502986e1003f388a47e6c16e070a71317b237b4815ef7eca068c60ecd854",
+    "creator_signature_read_authority": "d5209a673ccb3d1a3548e047075a8fc7b963e52feb01513d8b7b60d1805f35a0",
+    "creator_usage_detachment": "8c94aba34913f13c3584c704d23a3d11e85b0ec952734c2e5554fd08de32b838",
+    "creator_usage_expiry": "b8ed9c97260f196d770fbc8e7becb34c6029774188c994596a506b744150a966",
+    "creator_w2_generation_guardrail": "b6d74f64d7042f380b0474351e7c83ef139c446b228d9181effcab6fdd63a2dc",
+    "creator_w2_generation_input": "b9c9c3c4b1f8c2897511ee22342d955f57a6b42e2eb85f53f51e4481e3be2a9e",
+    "creator_w2_generation_journal": "3a2811a84461fc69636a7ba1b913def9d371c840784844cd2a0c63402d85a1bf",
+    "creator_w2_generation_metadata": "c225b92bc0a4c0b523c090ab0be70224eba0ea01370372f5a82343b6e1eb3bfa",
+    "creator_w2_generation_retrieval": "7d3acd5e970b29971b0c349f304014570fcebe720ba2700bde08dd33fa5f5a96",
+    "creator_w2_generation_terminal_journal": "96ffd644850f56102c427acd45b052e70de0b430f59c28bed61dc30bfcd6ff84",
+    "creator_w2_privacy_export": "21b52395a9e69cfcf91c36df0323ce546401cd51945a98e193465d8b3d9bd648",
+    "creator_w3_generation_output": "c48b06c68515ed4b6494ee5c469d66c56badbe76977bb53bd7d72bb1065891c3",
+    "creator_w3_generation_privacy": "c2b454c130d941c2e2391d47636568248cf4a739d1ead8698c7525ab01899be6",
+    "creator_w3_privacy_export": "a05236df85afffb9e45f4ee7ec3ce240ee329ccdafe90ad03207e13139534884",
+    "creator_w3_terminal_output": "9dd610f017a0f69dd90fa6165f2286d1798e4cbc8b5cfcf755ec1bd71a9fff14",
+    "creator_w4_generation_audience": "4fb2d0635963bde46289adc76f4af1263240644d1208e1bc2f14f4798d0faa57",
+    "creator_w4_generation_safety_terminal": "7e810e99e42c5c3837d975ffd5e2cf03f6f6ad1933e1d189ed9e23fc78083354",
+    "creator_w4_generation_terminal": "6c0c4f9692d062c190fd5a14c8f15a33a633b36aa78a5fffcbeb513c8c7198ce",
+    "creator_w5_generation_origin": "a187280c975d8e00acae38b0c5ac2efef093ec5b68e4c1cb770a2f1534e510a6"
+  },
+  "denialFunction": {
+    "name": "creator_trust.public_creator_denial(uuid)",
+    "owner": "creator_trust_denial",
+    "sha256": "d3fe2e33b7adfda42dfe95761fa77e9af2869658d1e6cc5e540d365841ae5d49",
+    "grants": [
+      "creator_public_ai_authority=X/creator_trust_denial",
+      "creator_runtime=X/creator_trust_denial",
+      "creator_trust_denial=X/creator_trust_denial"
+    ]
+  },
+  "source": {
+    "version": "0237_w4_generation_unknown_terminal_hold",
+    "name": "w4_generation_unknown_terminal_hold",
+    "owner": "W4",
+    "path": "apps/backend/src/modules/commerce/schema-generation-unknown-terminal-hold.sql",
+    "checksum": "1885ffa7a387325ece7f53b98fa49dff53ccffefe1cd8733f057385a54bba381"
+  },
+  "consumers": [
+    {
+      "signature": "creator.generation_settle_typed_original_allowance(uuid,uuid)",
+      "owner": "creator_w4_generation_safety_terminal",
+      "definitionChecksum": "7bcfd13179ef20d667c3b464f92beb3d5a3d3f12eb1354f07d11121f2fa0a55f",
+      "migration": {
+        "version": "0237_w4_generation_unknown_terminal_hold",
+        "checksum": "1885ffa7a387325ece7f53b98fa49dff53ccffefe1cd8733f057385a54bba381"
+      }
+    },
+    {
+      "signature": "creator.generation_typed_original_allowance_receipt(uuid,uuid)",
+      "owner": "creator_w4_generation_safety_terminal",
+      "definitionChecksum": "a161b56ad23ac9a892055a49c91975d7cd589ff4ca28f8984d9a20f4c9a7fa74",
+      "migration": {
+        "version": "0237_w4_generation_unknown_terminal_hold",
+        "checksum": "1885ffa7a387325ece7f53b98fa49dff53ccffefe1cd8733f057385a54bba381"
+      }
+    }
+  ]
+}

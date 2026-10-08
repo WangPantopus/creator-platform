@@ -1,0 +1,15 @@
+{
+  "backendBuild": "passed",
+  "webProductionBuild": "passed",
+  "webTypecheck": "passed",
+  "scopedLint": "passed",
+  "existingBackendTests": {
+    "passed": 17,
+    "files": [
+      "tests/contracts.test.ts",
+      "tests/generation-worker-lifetime.test.ts"
+    ]
+  },
+  "migrationCurrentWaveReplay": "passed, applied0, all6digests unchanged",
+  "hostedCI": "Read current PR head; local checks do not certify hosted CI or production readiness."
+}

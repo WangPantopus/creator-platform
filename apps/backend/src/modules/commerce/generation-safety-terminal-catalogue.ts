@@ -2,6 +2,7 @@ import type { PoolClient } from "pg";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError } from "../../core/errors.js";
 import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
+import { registeredGenerationRecoveryProfile } from "../../db/generation-recovery-profile.js";
 import { generationPrivacySourcesRegistered } from "../../db/generation-privacy-sources.js";
 import { generationPrivacyCatalogueChecksum } from "../../db/content-privacy-profile.js";
 import { assertGenerationOutputRepairIfRegistered } from "../../db/generation-output-profile.js";
@@ -327,6 +328,8 @@ export async function assertGenerationSafetyTerminalCatalogue(
     for (const source of GENERATION_SAFETY_TERMINAL_SOURCES)
       await assertRegisteredMigration(client, source);
     await assertGenerationOutputRepairIfRegistered(client);
+    const recovery = await registeredGenerationRecoveryProfile();
+    if (recovery) await assertRegisteredMigration(client, recovery.source);
     const ready = (
       await client.query<{
         ready: boolean;

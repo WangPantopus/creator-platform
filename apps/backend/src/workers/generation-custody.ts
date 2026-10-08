@@ -3,6 +3,7 @@ import contentReview from "../../../../infra/migrations/reviews/20261007-content
 import { registeredContentPrivacyProfile } from "../db/content-privacy-profile.js";
 import { registeredGenerationOutputProfile } from "../db/generation-output-profile.js";
 import { registeredPublicAIProfile } from "../db/public-ai-profile.js";
+import { registeredGenerationRecoveryProfile } from "../db/generation-recovery-profile.js";
 import { invariant } from "../core/errors.js";
 import { generationPrivacySourcesRegistered } from "../db/generation-privacy-sources.js";
 import type { GenerationTerminalPurposeConsumer } from "../modules/identity/generation-scope.js";
@@ -53,8 +54,11 @@ export async function reviewedGenerationWorkerCustody(
     : baseline;
   const output = await registeredGenerationOutputProfile(signal);
   const publicAI = await registeredPublicAIProfile(signal);
+  const recovery = await registeredGenerationRecoveryProfile(signal);
   invariant(
-    (!output || reviewed === withContentPrivacy) && (!publicAI || output),
+    (!output || reviewed === withContentPrivacy) &&
+      (!publicAI || output) &&
+      (!recovery || publicAI),
     "generation_worker_custody_unavailable",
     "The output repair requires the complete Content source graph.",
   );
@@ -104,8 +108,13 @@ export async function reviewedGenerationWorkerCustody(
     },
     identity: {
       ...reviewed.identity,
-      terminalConsumers:
-        reviewed.identity.terminalConsumers.map(terminalConsumer),
+      terminalConsumers: reviewed.identity.terminalConsumers.map((consumer) =>
+        terminalConsumer(
+          recovery?.consumers.find(
+            (candidate) => candidate.signature === consumer.signature,
+          ) ?? consumer,
+        ),
+      ),
       assertAllowed: authorities.assertAllowed,
       assertDiscoveryAllowed: authorities.assertDiscoveryAllowed,
     },
@@ -137,10 +146,13 @@ export async function reviewedGenerationWorkerCustody(
     settlement: {
       ...reviewed.settlement,
       catalogueChecksum:
+        recovery?.runtimeCatalogues.financial ??
         publicAI?.runtimeCatalogues.financial ??
         output?.runtimeCatalogues.financial ??
         reviewed.settlement.catalogueChecksum,
-      consumers: reviewed.settlement.consumers.map(terminalConsumer),
+      consumers: (recovery?.consumers ?? reviewed.settlement.consumers).map(
+        terminalConsumer,
+      ),
     },
   };
   return freeze(custody);

@@ -1,0 +1,28 @@
+{
+  "pid": 48916,
+  "started": "2026-10-08T02:57:29.213Z",
+  "signalledAt": "2026-10-08T02:57:42.853Z",
+  "observed": {
+    "id": "75335be6-9433-46d4-b52c-bece9fd14411",
+    "usage_id": "b338e27d-1f30-4f6e-ba4a-ab46144975af",
+    "category": "guardrail",
+    "provider_state": "admitted",
+    "last_sequence": 0,
+    "lease_until": "2026-10-08T02:58:37.805Z"
+  },
+  "compiledHostExitCode": 0,
+  "cleanupObserved": {
+    "usageState": "completed",
+    "providerCostMicros": null,
+    "durationMs": 1341,
+    "completedAt": "2026-10-08T02:57:42.888Z",
+    "originalLeaseUntil": "2026-10-08T02:58:37.805Z",
+    "recoveredAt": "2026-10-08T02:58:39.309Z",
+    "recoveredState": "failed",
+    "providerCallsAfterRestart": 1,
+    "reservationState": "reserved",
+    "ceilingUnits": 60,
+    "settledUnits": null,
+    "originalSettledAt": null
+  }
+}

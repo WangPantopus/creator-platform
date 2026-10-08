@@ -24,6 +24,7 @@ import {
 } from "./generation-safety-terminal-catalogue.js";
 import { CommerceGenerationAllowance } from "./generation-allowance.js";
 import { assertOriginalCostCustody } from "./original-cost-custody.js";
+import { registeredGenerationRecoveryProfile } from "../../db/generation-recovery-profile.js";
 
 export const GENERATION_SAFETY_TERMINAL_MIGRATION =
   "0215_w4_generation_safety_terminal_settlement";
@@ -46,8 +47,12 @@ const Receipt = z.strictObject({
   units: z.int().nonnegative().nullable(),
   reference: Hash.nullable(),
   safetyExempt: z.boolean(),
-  expectedUnits: z.int().nonnegative(),
-  providerCostMicros: z.int().nonnegative().max(Number.MAX_SAFE_INTEGER),
+  expectedUnits: z.int().nonnegative().nullable(),
+  providerCostMicros: z
+    .int()
+    .nonnegative()
+    .max(Number.MAX_SAFE_INTEGER)
+    .nullable(),
   providerCostReference: Hash,
 });
 export type TypedOriginalGenerationAllowanceReceipt = Readonly<
@@ -56,7 +61,8 @@ export type TypedOriginalGenerationAllowanceReceipt = Readonly<
 
 /** Typed original financial disposition. Genuine W1/W2 objects and actual
  * W3 durable provenance are required; no caller amount, kind or output proof.
- * Unknown costs remain unavailable with the original hold retained. */
+ * A sealed unknown cost permits terminal output with the original hold retained;
+ * it never supplies a zero-cost settlement or another provider attempt. */
 export class CommerceGenerationSafetyTerminalSettlement {
   private readonly issued = new WeakMap<
     GenerationTerminalScope,
@@ -155,6 +161,7 @@ export class CommerceGenerationSafetyTerminalSettlement {
           GENERATION_SAFETY_TERMINAL_CATALOGUE_SHA256,
         )
       : undefined;
+    const recovery = await registeredGenerationRecoveryProfile();
     invariant(
       consumers.length === 2 &&
         new Set(consumers.map((r) => r.signature)).size === 2 &&
@@ -165,8 +172,12 @@ export class CommerceGenerationSafetyTerminalSettlement {
               (s) => s === r.signature,
             ) &&
             r.owner === Owner &&
-            r.migration.version === GENERATION_SAFETY_TERMINAL_MIGRATION &&
-            r.migration.checksum === GENERATION_SAFETY_TERMINAL_SCHEMA_SHA256 &&
+            r.migration.version ===
+              (recovery?.source.version ??
+                GENERATION_SAFETY_TERMINAL_MIGRATION) &&
+            r.migration.checksum ===
+              (recovery?.source.checksum ??
+                GENERATION_SAFETY_TERMINAL_SCHEMA_SHA256) &&
             Hash.safeParse(r.definitionChecksum).success,
         ),
       "generation_terminal_allowance_unconfigured",
@@ -364,16 +375,22 @@ export class CommerceGenerationSafetyTerminalSettlement {
         value.grantId === scope.grantId &&
         value.outputDelivered === scope.lastSequence > 0 &&
         journal.custody === "sealed" &&
-        journal.state !== "unknown" &&
-        journal.costMicros !== null &&
         value.providerCostMicros === journal.costMicros &&
         value.providerCostReference === journal.reference &&
-        value.state === "settled" &&
-        value.reference === journal.reference &&
-        value.units === value.expectedUnits &&
-        value.units !== null &&
-        value.units <= value.ceilingUnits &&
-        (!value.safetyExempt || (value.outputDelivered && value.units === 0)),
+        (journal.state === "unknown"
+          ? journal.costMicros === null &&
+            value.state === "held" &&
+            value.units === null &&
+            value.expectedUnits === null &&
+            value.reference === null
+          : journal.costMicros !== null &&
+            value.state === "settled" &&
+            value.reference === journal.reference &&
+            value.units === value.expectedUnits &&
+            value.units !== null &&
+            value.units <= value.ceilingUnits &&
+            (!value.safetyExempt ||
+              (value.outputDelivered && value.units === 0))),
       "generation_terminal_allowance_changed",
       "The real all-attempt cost, typed safety disposition and original cursor must agree.",
     );

@@ -1,0 +1,30 @@
+{
+  "environment": "Compiled backend and Next development server; real authorized fictional OpenAI calls, local loopback PostgreSQL; single observations, not p95/p99. Final concise run has no SQL trace wrapper.",
+  "generationId": "077525f6-a141-4ac3-ad71-1780bc6089d0",
+  "ackMs": 1142.629,
+  "requestToFirstTextInDOMMs": 29812.714,
+  "requestToTerminalTextInDOMMs": 35213.714,
+  "acceptedToFirstDurableSentenceMs": 24631,
+  "acceptedToTerminalMs": 29521,
+  "firstDOMGeometry": {
+    "at": 1791428040726,
+    "bottom": 1245,
+    "characters": 143,
+    "kind": "first",
+    "top": 999,
+    "viewport": 1189,
+    "visibility": "visible"
+  },
+  "visibilityLimit": "The measured run predates the follow-scroll fix: part of the last reply could sit behind the sticky composer. These are DOM timings, not a qualified fully visible sentence SLO. Later phone reload/scroll checks place the complete latest article above the composer; repeat a complete streaming timing run after this UI correction.",
+  "idleTakeoverAutomationToDOMMs": 634,
+  "idleHandbackAutomationToDOMMs": 492,
+  "controlLimit": "One idle control operation each; includes automation overhead, does not qualify in-flight takeover or p95.",
+  "targets": {
+    "ackMs": 300,
+    "firstVisibleWarmMs": 2500,
+    "firstVisibleColdMs": 4000,
+    "completeMs": 8000,
+    "takeoverMs": 500
+  },
+  "targetsMet": false
+}

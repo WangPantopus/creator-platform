@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   FrameSchema,
   ThreadDeliveryGate,
@@ -116,6 +122,7 @@ export function ConversationScreen({
   const offlineStorage = useRef<ConversationOfflineStorage | null>(null);
   const offlineShowing = useRef(false);
   const renewingOffline = useRef(false);
+  const offlineRetryAt = useRef(0);
   const root = `${creatorId}/${fanId}`;
   const [page, setPage] = useState<ConversationPage | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
@@ -130,7 +137,29 @@ export function ConversationScreen({
   const gate = useRef<ThreadDeliveryGate | null>(null);
   const latestPending = useRef<Pending | null>(null);
   latestPending.current = pending;
-  const scrollEnd = useRef<HTMLDivElement>(null);
+  const followingReply = useRef(true);
+  useEffect(() => {
+    followingReply.current = true;
+    const trackReadingPosition = () => {
+      followingReply.current =
+        document.documentElement.scrollHeight -
+          window.scrollY -
+          window.innerHeight <
+        96;
+    };
+    window.addEventListener("scroll", trackReadingPosition, { passive: true });
+    return () => window.removeEventListener("scroll", trackReadingPosition);
+  }, [root, accountId]);
+  useLayoutEffect(() => {
+    if (page && followingReply.current) {
+      // Include the in-flow sticky composer so it cannot cover the newest
+      // approved text. A fan reading older messages keeps their position.
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: "instant",
+      });
+    }
+  }, [page, pending]);
   const cursorKey = `qelvora:conversation:${accountId}:${creatorId}:${fanId}`;
   const lifecycle = useRef(0);
   const mounted = useRef(true);
@@ -175,6 +204,7 @@ export function ConversationScreen({
     async (expected: ConversationPage) => {
       if (
         renewingOffline.current ||
+        performance.now() < offlineRetryAt.current ||
         expected.offTheRecord ||
         !expected.consentCurrent ||
         document.visibilityState !== "visible" ||
@@ -199,11 +229,17 @@ export function ConversationScreen({
           snapshot.page.revision !== current.current.revision
         )
           return;
-        if (cache === offlineStorage.current)
+        if (cache === offlineStorage.current) {
+          offlineRetryAt.current = 0;
           await cache.save(snapshot, started);
+        }
       } catch {
-        if (run === lifecycle.current && cache === offlineStorage.current)
+        if (run === lifecycle.current && cache === offlineStorage.current) {
           cache.purge();
+          // Keep the live conversation independent of unavailable offline
+          // storage. Retry later without requesting a failing lease every 2s.
+          offlineRetryAt.current = performance.now() + 30_000;
+        }
       } finally {
         if (run === lifecycle.current) renewingOffline.current = false;
       }
@@ -300,6 +336,7 @@ export function ConversationScreen({
     );
     offlineStorage.current = cache;
     renewingOffline.current = false;
+    offlineRetryAt.current = 0;
     const revoked = () => {
       lifecycle.current++;
       offlineShowing.current = false;
@@ -601,8 +638,8 @@ export function ConversationScreen({
       if (!mounted.current || lifecycle.current !== revision) return;
       setPending(null);
       if (!retry) setDraft("");
+      followingReply.current = true;
       await refresh();
-      scrollEnd.current?.scrollIntoView({ block: "end", behavior: "instant" });
     } catch (error) {
       if (!mounted.current || lifecycle.current !== revision) return;
       const uncertain =
@@ -1111,7 +1148,6 @@ export function ConversationScreen({
             {failure}
           </Notice>
         )}
-        <div ref={scrollEnd} />
       </div>
       <footer className="conversation-footer">
         {!page.canSend && (

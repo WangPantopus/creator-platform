@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import purposeReview from "../../../infra/migrations/reviews/20261007-generation-purpose-roles.json" with { type: "json" };
 import contentReview from "../../../infra/migrations/reviews/20261007-content-privacy.json" with { type: "json" };
 import outputReview from "../../../infra/migrations/reviews/20261007-generation-first-visible.json" with { type: "json" };
+import recoveryReview from "../../../infra/migrations/reviews/20261007-generation-recovery.json" with { type: "json" };
 import publicAIReview from "../../../infra/migrations/reviews/20261007-public-ai.json" with { type: "json" };
 import { publicAIPurposeCatalogue } from "../src/modules/identity/public-ai-catalogue.js";
 import { ContentPrivacyExport } from "../src/modules/content/privacy-export.js";
@@ -156,7 +157,11 @@ export async function generationWavePurposeCatalogue(
  * application preparations must still qualify independently. */
 export async function assertGenerationWaveRoleSafety(
   client: PoolClient,
-  extension?: "content-privacy" | "generation-output" | "public-ai",
+  extension?:
+    | "content-privacy"
+    | "generation-output"
+    | "public-ai"
+    | "generation-recovery",
 ) {
   if (
     purposeReview.schemaVersion !== 1 ||
@@ -174,15 +179,17 @@ export async function assertGenerationWaveRoleSafety(
     content: true,
     interactive: true,
     generationDenial: true,
-    publicAI: extension === "public-ai",
+    publicAI: extension === "public-ai" || extension === "generation-recovery",
   });
   const catalogue = await generationWavePurposeCatalogue(client);
   const accepted = extension
-    ? (extension === "public-ai"
-        ? publicAIReview
-        : extension === "generation-output"
-          ? outputReview
-          : contentReview
+    ? (extension === "generation-recovery"
+        ? recoveryReview
+        : extension === "public-ai"
+          ? publicAIReview
+          : extension === "generation-output"
+            ? outputReview
+            : contentReview
       ).purposeProfiles.map((profile) => profile.sha256)
     : purposeReview.catalogueSha256;
   if (!(accepted as string[]).includes(contentHash(catalogue)))
@@ -202,7 +209,11 @@ export async function assertGenerationWaveRoleSafety(
       ).rowCount
     )
       throw new WaveRoleSafetyError("Exact Content export source is required.");
-    if (extension === "generation-output" || extension === "public-ai") {
+    if (
+      extension === "generation-output" ||
+      extension === "public-ai" ||
+      extension === "generation-recovery"
+    ) {
       const repair = outputReview.source;
       if (
         outputReview.schemaVersion !== 1 ||
@@ -220,7 +231,7 @@ export async function assertGenerationWaveRoleSafety(
           "Exact generation output repair source is required.",
         );
     }
-    if (extension === "public-ai") {
+    if (extension === "public-ai" || extension === "generation-recovery") {
       for (const source of publicAIReview.sources)
         if (
           sha256(await readFile(new URL(source.path, repositoryRoot))) !==
@@ -241,6 +252,22 @@ export async function assertGenerationWaveRoleSafety(
       )
         throw new WaveRoleSafetyError("Public AI purpose catalogue changed.");
     }
+    if (extension === "generation-recovery") {
+      const source = recoveryReview.source;
+      if (
+        sha256(await readFile(new URL(source.path, repositoryRoot))) !==
+          source.checksum ||
+        !(
+          await client.query(
+            "SELECT 1 FROM creator.schema_migration WHERE version=$1 AND checksum=$2",
+            [source.version, source.checksum],
+          )
+        ).rowCount
+      )
+        throw new WaveRoleSafetyError(
+          "Exact terminal recovery source is required.",
+        );
+    }
     try {
       await client.query("SET SESSION AUTHORIZATION creator_runtime");
       await ContentPrivacyExport.assertCatalogueForReview(client);
@@ -254,6 +281,8 @@ export async function assertGenerationWaveRoleSafety(
     purposeRoles:
       purposeReview.roles.length +
       (extension ? 1 : 0) +
-      (extension === "public-ai" ? 1 : 0),
+      (extension === "public-ai" || extension === "generation-recovery"
+        ? 1
+        : 0),
   };
 }

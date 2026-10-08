@@ -1,0 +1,28 @@
+{
+  "results": [
+    {
+      "kind": "missing-worker-url",
+      "exitCode": 1,
+      "errorCode": "generation_database_unconfigured",
+      "noListener": true,
+      "noWorker": true,
+      "durationMs": 1223
+    },
+    {
+      "kind": "wrong-worker-login",
+      "exitCode": 1,
+      "errorCode": "generation_database_unconfigured",
+      "noListener": true,
+      "noWorker": true,
+      "durationMs": 1328
+    },
+    {
+      "kind": "remote-worker-host",
+      "exitCode": 1,
+      "errorCode": "generation_database_unconfigured",
+      "noListener": true,
+      "noWorker": true,
+      "durationMs": 1107
+    }
+  ]
+}

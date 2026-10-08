@@ -6,7 +6,7 @@ import {
   type Passage,
 } from "../../../../../packages/api/src/agent/contracts.js";
 import { contentHash } from "../../core/canonical.js";
-import { invariant } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
 import {
   GenerationIdentityAuthority,
   type GenerationTask,
@@ -621,8 +621,11 @@ export class PreparedGenerationPipeline {
                     versionHash: event.versionHash,
                     contextHash: event.contextHash,
                   });
+                  await bookend(client, scope);
                 }
-                await bookend(client, scope);
+                // Without a guardrail write the fresh read above is already
+                // this stage's complete check. W1 still verifies the purpose
+                // and current catalogue before its sole COMMIT.
               },
               signal,
             ),
@@ -679,6 +682,18 @@ export class PreparedGenerationPipeline {
         durationMs: Math.round(performance.now() - started),
         firstApprovedMs,
       };
+    } catch (cause) {
+      // The model adapter labels a cooperative provider abort. Its usage
+      // owner has already awaited incurred-cost completion before it reaches
+      // this boundary. Preserve the host's original abort identity; an actual
+      // completion/rollback/release failure has a different code and survives.
+      if (
+        signal.aborted &&
+        cause instanceof DomainError &&
+        cause.code === "generation_cancelled"
+      )
+        throw signal.reason;
+      throw cause;
     } finally {
       if (run) run.live = false;
       this.running.delete(key);

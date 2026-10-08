@@ -98,6 +98,55 @@ export class AgentRepository {
         503,
       );
   }
+  /** Discovery only: avoid taking the workspace write lock every idle tick.
+   * A positive result grants nothing; the original ingestion transaction must
+   * recheck ownership, source revision, lease and model before any mutation. */
+  async ingestionPending(scope: CreatorScope, embeddingModel: string | null) {
+    invariant(
+      !requestAuthority.getStore(),
+      "ingestion_worker_required",
+      "Ingestion discovery belongs to the owned worker lifetime.",
+    );
+    await this.assertRuntimeRole();
+    const client = await this.pool.connect();
+    let discard = false;
+    try {
+      await client.query("BEGIN READ ONLY");
+      await client.query(
+        "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
+        [scope.creatorId, scope.accountId],
+      );
+      const result = await client.query<{ pending: boolean }>(
+        `SELECT EXISTS(SELECT FROM creator.creator_profile
+          WHERE id=$1 AND account_id=$2)
+         AND NOT EXISTS(SELECT FROM creator.ai_tombstone WHERE creator_id=$1)
+         AND (EXISTS(SELECT FROM creator.ai_ingestion j JOIN creator.ai_source s
+          ON s.id=j.source_id AND s.creator_id=j.creator_id
+          WHERE j.creator_id=$1 AND s.state='processing' AND s.revision=j.source_revision
+           AND (j.state='queued' OR (j.state='running' AND j.lease_until<now())))
+          OR ($3::text IS NOT NULL AND EXISTS(SELECT FROM creator.ai_source s
+           WHERE s.creator_id=$1 AND s.state='approved' AND NOT EXISTS(
+            SELECT FROM creator.ai_chunk c WHERE c.creator_id=$1 AND c.source_id=s.id
+             AND c.source_revision=s.revision AND c.embedding_model=$3 AND c.embedding IS NOT NULL)))) AS pending`,
+        [scope.creatorId, scope.accountId, embeddingModel],
+      );
+      await client.query("COMMIT");
+      return result.rows[0]?.pending === true;
+    } catch (cause) {
+      try {
+        await client.query("ROLLBACK");
+      } catch (cleanup) {
+        discard = true;
+        throw new AggregateError(
+          [cause, cleanup],
+          "Ingestion discovery cleanup failed",
+        );
+      }
+      throw cause;
+    } finally {
+      client.release(discard);
+    }
+  }
   async transaction<T>(
     scope: CreatorScope,
     work: (
