@@ -1,0 +1,14 @@
+{
+  "observedAt": "2026-10-08T18:54:29.465035+00:00",
+  "previousHost": {
+    "revision": "a2fccdc1ba92874d02ec08a02e1ea8df6adfb37b",
+    "launcherPid": 15665,
+    "backendPid": 15673,
+    "signal": "SIGTERM",
+    "exitCode": 0
+  },
+  "firstRepair": "561419f3392e1e0aa1dc4d0dd06838c772da3702",
+  "retryJob": "c09931ea-d367-4464-a581-3f6309e72263",
+  "firstRepairResult": "Task attempt8 failed55P03, preserved as dead_letter; no lease or attempt counters edited.",
+  "nextRevision": "ed709286e7271b84ce586821fb14b920d0402367"
+}

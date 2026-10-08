@@ -1,5 +1,16 @@
 # Product finish plan — October 8, 2026
 
+## Current execution — actual comparison export and withdrawal
+
+The [original export recovery increment](../../artifacts/pr-review/2026-10-08/comparison-export-reference/README.md)
+now completes the same fan export across8domains and verifies all4actual browser
+file downloads. Explicit web withdrawal removes the sample/consent and physically
+purges its affected file; fresh verified download refuses access. Other11files and
+original generation/publication custody remain exact. Native withdrawal, creator
+populated result/export revocation, in-flight withdrawal, expiry and legitimate
+revision13upgrade remain next. All ten completion criteria stay open.
+
+
 ## Current execution — real comparison controls
 
 The [web/iOS/Android comparison increment](../../artifacts/pr-review/2026-10-08/comparison-choice-ui/README.md)

@@ -1,0 +1,61 @@
+{
+  "job": {
+    "id": "c09931ea-d367-4464-a581-3f6309e72263",
+    "kind": "export",
+    "scope": "account",
+    "state": "retry",
+    "account_id": "10000000-0000-4000-8000-000000000003",
+    "created_at": "2026-10-08T18:37:56.769Z",
+    "completed_at": null
+  },
+  "tasks": [
+    {
+      "domain": "agent",
+      "state": "retry",
+      "error_code": "privacy_commit_fence_unavailable",
+      "attempts": 7
+    },
+    {
+      "domain": "commerce",
+      "state": "complete",
+      "error_code": null,
+      "attempts": 1
+    },
+    {
+      "domain": "content",
+      "state": "complete",
+      "error_code": null,
+      "attempts": 1
+    },
+    {
+      "domain": "conversation",
+      "state": "complete",
+      "error_code": null,
+      "attempts": 1
+    },
+    {
+      "domain": "growth",
+      "state": "complete",
+      "error_code": null,
+      "attempts": 1
+    },
+    {
+      "domain": "identity",
+      "state": "complete",
+      "error_code": null,
+      "attempts": 1
+    },
+    {
+      "domain": "media",
+      "state": "complete",
+      "error_code": null,
+      "attempts": 1
+    },
+    {
+      "domain": "trust",
+      "state": "complete",
+      "error_code": null,
+      "attempts": 1
+    }
+  ]
+}

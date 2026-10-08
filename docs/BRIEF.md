@@ -338,3 +338,9 @@ is displayed and cancellation clears client state. Native reuse does not purchas
 new provider calls. The actual new export remains refused until its original
 source reference is bound consistently; no privacy/upgrade completion is claimed.
 [Evidence](../artifacts/pr-review/2026-10-08/comparison-choice-ui/README.md).
+
+Comparison export recovery, October8: preserve one original source reference through
+capture and sealing, and settle claimed work before artifact recovery locks its task.
+The same actual job now completes, and web withdrawal removes its affected file
+without changing unrelated retained exports. Download denial is verified after fresh
+identity; generic refusal copy remains to refine. [Evidence](../artifacts/pr-review/2026-10-08/comparison-export-reference/README.md).

@@ -1,0 +1,118 @@
+{
+  "at": "2026-10-08T18:55:04.249Z",
+  "database": "creator_generation_journey43_20261007",
+  "scope": "Actual original fictional Maya comparison choice/question through launched app UI; real authorized provider. No production or mature deletion qualification.",
+  "consent": [
+    {
+      "thread_id": "9f7ef626-3b4e-4bab-bf7c-775dd9585346",
+      "creator_id": "4dbccb2f-16e0-4fa3-96ef-135798690f4a",
+      "fan_id": "2b7299a3-70c1-495b-a21a-4c1681c32d31",
+      "account_id": "10000000-0000-4000-8000-000000000003",
+      "policy_version": "w8-development-ai-comparison-20261008-v1",
+      "processor_policy_version": "development-unreviewed-openai-20261001",
+      "consented_at": "2026-10-08T18:23:48.435Z",
+      "expires_at": "2026-11-01T00:00:00.000Z"
+    }
+  ],
+  "samples": [
+    {
+      "id": "f767cf4d-ebca-48ce-89b8-9f3fa66af1eb",
+      "thread_id": "9f7ef626-3b4e-4bab-bf7c-775dd9585346",
+      "creator_id": "4dbccb2f-16e0-4fa3-96ef-135798690f4a",
+      "fan_id": "2b7299a3-70c1-495b-a21a-4c1681c32d31",
+      "account_id": "10000000-0000-4000-8000-000000000003",
+      "policy_version": "w8-development-ai-comparison-20261008-v1",
+      "processor_policy_version": "development-unreviewed-openai-20261001",
+      "message_id": "42bb2588-b5df-4618-87ea-2fe8a90e861a",
+      "message_version": 1,
+      "source_hash": "29869a9e9384bc8b0447fd75643b91a46a8f1420568b5d461753b14a27ea2dba",
+      "paraphrased_prompt": "What is the recommended method for drying a freshly shaped clay mug?",
+      "sanitizer_reference": "ffd78c71b7cad44d7ebd356b010b470dd8b128a85734e61ef4a587232b0a37ff:01c24380-f578-40ce-9ab9-af775edf3028:bcd21ea7-35de-43b5-a1ce-689c66e4be6a",
+      "occurred_at": "2026-10-08T04:46:53.692Z",
+      "created_at": "2026-10-08T18:24:15.838Z",
+      "expires_at": "2026-11-01T00:00:00.000Z"
+    }
+  ],
+  "usage": [
+    {
+      "id": "01c24380-f578-40ce-9ab9-af775edf3028",
+      "creator_id": "4dbccb2f-16e0-4fa3-96ef-135798690f4a",
+      "version_hash": "a814cf98cab2d276cd452b738793f63cef99150f3e815e5b76bef37eed5d7959",
+      "provider": "OpenAI",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "input_tokens": 256,
+      "output_tokens": 24,
+      "cost_micros": "141",
+      "category": "guardrail",
+      "duration_ms": 2258,
+      "created_at": "2026-10-08T18:24:10.107Z",
+      "cached_input_tokens": 0,
+      "cache_write_input_tokens": 0,
+      "creator_hold_id": "ca17ed8a-9eea-4857-970e-77dbefbdbd2b",
+      "thread_id": null,
+      "fan_id": null,
+      "generation_id": null,
+      "attempt_id": null,
+      "call_ordinal": null,
+      "purpose": "comparison_paraphrase",
+      "provider_state": "completed",
+      "completed_at": "2026-10-08T18:24:12.366Z",
+      "accounting_retained_until": null,
+      "accounting_retention_version": null,
+      "accounting_retention_reason": null,
+      "accounting_disposition_reference": null,
+      "completion_capability_hash": null
+    },
+    {
+      "id": "bcd21ea7-35de-43b5-a1ce-689c66e4be6a",
+      "creator_id": "4dbccb2f-16e0-4fa3-96ef-135798690f4a",
+      "version_hash": "ad8f41a34e53e9c4f1379676aba7c1d3ebdaf2f8963dcb82ea9fbd58ed65e9e2",
+      "provider": "OpenAI",
+      "model": "gpt-4.1-2025-04-14",
+      "input_tokens": 266,
+      "output_tokens": 31,
+      "cost_micros": "780",
+      "category": "guardrail",
+      "duration_ms": 2084,
+      "created_at": "2026-10-08T18:24:12.926Z",
+      "cached_input_tokens": 0,
+      "cache_write_input_tokens": 0,
+      "creator_hold_id": "c5e4ef4e-1abb-4c5d-b560-fdb73fec0bf0",
+      "thread_id": null,
+      "fan_id": null,
+      "generation_id": null,
+      "attempt_id": null,
+      "call_ordinal": null,
+      "purpose": "comparison_privacy_review",
+      "provider_state": "completed",
+      "completed_at": "2026-10-08T18:24:15.011Z",
+      "accounting_retained_until": null,
+      "accounting_retention_version": null,
+      "accounting_retention_reason": null,
+      "accounting_disposition_reference": null,
+      "completion_capability_hash": null
+    }
+  ],
+  "holds": [
+    {
+      "id": "c5e4ef4e-1abb-4c5d-b560-fdb73fec0bf0",
+      "creator_id": "4dbccb2f-16e0-4fa3-96ef-135798690f4a",
+      "amount_micros": "3902728",
+      "state": "settled",
+      "expires_at": "2026-10-08T18:29:13.232Z",
+      "created_at": "2026-10-08T18:24:12.926Z"
+    },
+    {
+      "id": "ca17ed8a-9eea-4857-970e-77dbefbdbd2b",
+      "creator_id": "4dbccb2f-16e0-4fa3-96ef-135798690f4a",
+      "amount_micros": "3902948",
+      "state": "settled",
+      "expires_at": "2026-10-08T18:29:10.396Z",
+      "created_at": "2026-10-08T18:24:10.107Z"
+    }
+  ],
+  "generationUsageRows": 69,
+  "generationUsageSha256": "9b6d528acbc4a957ddfcdee0beb43e064668d655ae717ce41c0cd006285af345",
+  "comparisonCostMicros": 921,
+  "unknownCosts": 0
+}

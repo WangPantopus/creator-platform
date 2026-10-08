@@ -1,0 +1,42 @@
+{
+  "at": "2026-10-08T18:55:57.309690+00:00",
+  "jobId": "c09931ea-d367-4464-a581-3f6309e72263",
+  "files": [
+    {
+      "domain": "agent",
+      "originalDownload": "/Users/yingpengwang/Downloads/creator-data-agent (3).bin",
+      "retained": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/private/comparison-export-downloads/creator-data-agent (3).bin",
+      "sha256": "8a812b313b5c91718e7be64d3cba955042eedb455081162baa54cd500494d894",
+      "bytes": 39,
+      "matches": true
+    },
+    {
+      "domain": "commerce",
+      "originalDownload": "/Users/yingpengwang/Downloads/creator-data-commerce (2).jsonl",
+      "retained": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/private/comparison-export-downloads/creator-data-commerce (2).jsonl",
+      "sha256": "e27022bbd528626c55a3535f6626349f9ebb63566ed2beca201fca721783e573",
+      "bytes": 12091,
+      "matches": true
+    },
+    {
+      "domain": "conversation",
+      "originalDownload": "/Users/yingpengwang/Downloads/creator-data-conversation (4).bin",
+      "retained": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/private/comparison-export-downloads/creator-data-conversation (4).bin",
+      "sha256": "7c8293add168ef1982bd149fbac762d14eb82fabc42a46597828090146e35273",
+      "bytes": 200143,
+      "matches": true
+    },
+    {
+      "domain": "growth",
+      "originalDownload": "/Users/yingpengwang/Downloads/creator-data-growth (2).jsonl",
+      "retained": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/private/comparison-export-downloads/creator-data-growth (2).jsonl",
+      "sha256": "b47d52acd1fc5c346a9eb7ef2e73b4c25caeeea272d1ef137b0450c42cf9b125",
+      "bytes": 541,
+      "matches": true
+    }
+  ],
+  "manifest": {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/private/comparison-export-downloads/creator-data (2).json",
+    "sha256": "931661391923caa39cf061c2632c270a42bf86710ea1f9abac74d18a19017225"
+  }
+}
