@@ -1,5 +1,37 @@
 # Session handoff — October 8, 2026
 
+## Active continuation — trusted comparison producer
+
+PR [#338](https://github.com/WangPantopus/creator-platform/pull/338) merged at
+`8f39888953f4016b2059d2dceeb5867e8765748f` after all ten checks passed at reviewed
+head `b7e7b9f8b7334f5ec7b4c1099845b8f0050bfd7c`. The separate
+[post-merge workflow](https://github.com/WangPantopus/creator-platform/actions/runs/37772899419)
+was still running at this observation. Work continues on
+`codex/conversation-shadow-producer-20261008` in the same checkout.
+
+Both dedicated native devices are shut down without deleting their state. The
+owned backend and web remain available for the next actual browser journey;
+refresh their inventory before acting. Copy 43 retains all eighteen generation
+operations and 69 known usage rows (36,815 microdollars, 51 settled units).
+The original eight operations and 33 usage rows remain exact. Native evidence
+and failed attempts are preserved in the milestone linked below.
+
+The next increment adds a separate comparison-consent and sanitization path.
+It remains unconnected until source authority, provider admission, deletion,
+physical expiry, exports and consumer read/publication guards are complete.
+Ordinary reply feedback does not authorize this use. The complete ten-milestone
+[finish plan](product-finish-plan-2026-10-08.md) remains active.
+
+The [disconnected-feed guard](../../artifacts/pr-review/2026-10-08/comparison-feed-guard/README.md)
+now blocks upgrade publication and hides comparison text without the original
+feed. It was operated in the actual preserved creator Studio with exact
+before/after custody. The current compiled backend is
+`68bfa36fb03188c5a79d8090516629240a6866b4`, launched by
+`native-e2e/launch43-backend-shutdown-diagnostic.mjs`; web remains on port 3119.
+An earlier idle SIGTERM failed without a captured cause. Safe diagnostics are
+now installed; a subsequent stop during actual idle SQL succeeded. Preserve the
+failed log and keep this shutdown issue open pending an explained reproduction.
+
 ## Active continuation — native message reliability
 
 PR [#337](https://github.com/WangPantopus/creator-platform/pull/337) merged at

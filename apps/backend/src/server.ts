@@ -41,6 +41,7 @@ import { prepareTrustReplyReviewer } from "./modules/trust/reply-review.js";
 import { InteractiveCallControl } from "./modules/session/interactive-control.js";
 import { AccountCallMetadata } from "./modules/session/account-call-metadata.js";
 import { createDevelopmentGenerationHost } from "./workers/generation-host.js";
+import { lifecycleFailure } from "./operations/telemetry.js";
 
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
@@ -60,7 +61,7 @@ const features: {
   conversationPrivacy?: ConversationPrivacyOwnerPorts;
   agentPrivacy?: AgentPrivacyOwnerPorts;
   commerce?: import("./modules/commerce/service.js").CommerceService;
-  start: ((onFailure: () => void) => void)[];
+  start: ((onFailure: (cause?: unknown) => void) => void)[];
 } = { growth: null, start: [] };
 if (config.identityAdapter === "development" && !config.identitySessionKey)
   throw new Error(
@@ -456,9 +457,12 @@ const shutdown = (fatal = false) => {
     const close = async (name: string, action: () => unknown) => {
       try {
         await action();
-      } catch {
+      } catch (cause) {
         failed = true;
-        console.error(`Shutdown could not close ${name}.`);
+        console.error(
+          `Shutdown could not close ${name}.`,
+          JSON.stringify(lifecycleFailure(cause)),
+        );
       }
     };
     await close("configured backend", () =>
@@ -481,9 +485,10 @@ server.on("error", () => {
 try {
   features.growth?.start();
   for (const start of features.start)
-    start(() => {
+    start((cause) => {
       console.error(
         "Generation worker stopped unexpectedly; closing admissions and draining the host.",
+        JSON.stringify(lifecycleFailure(cause)),
       );
       shutdown(true);
     });

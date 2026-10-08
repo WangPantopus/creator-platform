@@ -89,7 +89,10 @@ export async function createDevelopmentGenerationHost(
       signal: controller.signal,
       isRunning,
     }),
-    start(worker: GenerationWorker | undefined, onFailure: () => void) {
+    start(
+      worker: GenerationWorker | undefined,
+      onFailure: (cause?: unknown) => void,
+    ) {
       invariant(
         worker instanceof GenerationWorker && !done && !closing,
         "generation_host_unconfigured",
@@ -113,9 +116,9 @@ export async function createDevelopmentGenerationHost(
           active = false;
           if (!controller.signal.aborted) onFailure();
         },
-        () => {
+        (cause) => {
           active = false;
-          onFailure();
+          onFailure(cause);
         },
       );
       process.stdout.write(

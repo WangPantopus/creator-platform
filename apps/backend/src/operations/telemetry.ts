@@ -28,6 +28,38 @@ export function failureClass(error: unknown): string | null {
   );
 }
 
+/** Bounded shutdown diagnostics retain causal categories without serializing
+ * exception messages, stacks, SQL, provider content or connection options. */
+export function lifecycleFailure(error: unknown) {
+  const pending = [error];
+  const seen = new Set<unknown>();
+  const failures: { kind: string; code: string | null }[] = [];
+  while (pending.length && failures.length < 16) {
+    const cause = pending.shift();
+    if (seen.has(cause)) continue;
+    seen.add(cause);
+    failures.push({
+      kind:
+        cause instanceof AggregateError
+          ? "aggregate"
+          : cause instanceof DomainError
+            ? "domain"
+            : cause instanceof Error && cause.name === "AbortError"
+              ? "abort"
+              : (failureClass(cause) ?? "unexpected_failure"),
+      code:
+        cause instanceof DomainError && /^[a-z_]{1,100}$/u.test(cause.code)
+          ? cause.code
+          : null,
+    });
+    if (cause instanceof AggregateError)
+      pending.push(...cause.errors.slice(0, 16));
+    if (cause instanceof Error && cause.cause !== undefined)
+      pending.push(cause.cause);
+  }
+  return { failures, truncated: pending.length > 0 };
+}
+
 const buckets = [50, 100, 300, 500, 1000, 2500, 4000, 10000];
 export class TrustTelemetry {
   readonly startedAt = new Date();

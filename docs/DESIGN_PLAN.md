@@ -23,6 +23,11 @@ W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan expor
 
 ## Implementation continuation
 
+- [x] October 8, 2026: block replacement publication and retained comparison
+  display when the trusted feed is disconnected; verify the gate in the actual
+  preserved creator Studio with unchanged generation/accounting history.
+  [Bounded evidence and unresolved producer work](../artifacts/pr-review/2026-10-08/comparison-feed-guard/README.md).
+
 - [x] October 8, 2026: operate bounded new native sends, stable keyboard/drafts and current
   connection/account recovery, preserving every actual provider result and cost.
   Actual iOS Light/Night and Android Light/Night keyboard checks pass; complete
