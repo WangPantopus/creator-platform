@@ -71,6 +71,11 @@ export class TrustWorker {
     readonly effectHooks: EffectHook[],
     readonly observe: (signal: string, value: number) => void = () => {},
     readonly artifacts?: PrivacyArtifactStore,
+    readonly reportPrivacyFailure?: (
+      domain: PrivacyDomain,
+      kind: "export" | "delete",
+      cause: unknown,
+    ) => void,
   ) {}
   async start() {
     await new TrustStore(this.pool).assertRole(true);
@@ -305,6 +310,7 @@ export class TrustWorker {
         }
       });
     } catch (error) {
+      this.reportPrivacyFailure?.(task.domain, task.kind, error);
       const unavailable = [
         "privacy_artifact_unconfigured",
         "privacy_commit_fence_unavailable",
