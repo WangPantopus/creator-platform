@@ -11,7 +11,10 @@ import {
   generationOutputCursorSignature,
 } from "./generation-output-cursor.js";
 import { registeredMigration } from "../../db/reviewed-migration.js";
-import { generationRecoverySource } from "../../db/generation-recovery-profile.js";
+import {
+  generationRecoverySource,
+  generationPartialRecoverySource,
+} from "../../db/generation-recovery-profile.js";
 import {
   assertGenerationLifecycleRows,
   generationLifecycleCatalogueQuery,
@@ -101,6 +104,16 @@ const terminalContracts = [
     originalScopeBridge: false,
     version: generationRecoverySource.version,
     checksum: generationRecoverySource.checksum,
+    signatures: [
+      "creator.generation_settle_typed_original_allowance(uuid,uuid)",
+      "creator.generation_typed_original_allowance_receipt(uuid,uuid)",
+    ],
+  },
+  {
+    owner: "creator_w4_generation_safety_terminal",
+    originalScopeBridge: false,
+    version: generationPartialRecoverySource.version,
+    checksum: generationPartialRecoverySource.checksum,
     signatures: [
       "creator.generation_settle_typed_original_allowance(uuid,uuid)",
       "creator.generation_typed_original_allowance_receipt(uuid,uuid)",
@@ -902,7 +915,20 @@ export class GenerationIdentityAuthority {
           error.code === "55P03" &&
           Date.now() + 150 < Date.parse(task.leaseUntil)
         ) {
-          await delay(150, undefined, { signal });
+          try {
+            await delay(150, undefined, { signal });
+          } catch (cause) {
+            // Node's timer wraps the original reason. This wait starts only
+            // after the failed opening transaction has fully released.
+            if (
+              signal?.aborted &&
+              cause instanceof Error &&
+              cause.name === "AbortError" &&
+              cause.cause === signal.reason
+            )
+              throw signal.reason;
+            throw cause;
+          }
           continue;
         }
         return this.failure(error);

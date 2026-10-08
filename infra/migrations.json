@@ -651,6 +651,13 @@
       "owner": "W4",
       "sourceSha256": "1885ffa7a387325ece7f53b98fa49dff53ccffefe1cd8733f057385a54bba381",
       "wave": "20261007-generation-recovery"
+    },
+    {
+      "version": "0238_w4_generation_partial_unknown_terminal",
+      "path": "apps/backend/src/modules/commerce/schema-generation-partial-unknown-terminal.sql",
+      "owner": "W4",
+      "sourceSha256": "3db102bef52be7b51aa2caa6b2574eae568b47059ce275160d57b62009d01011",
+      "wave": "20261007-partial-generation-recovery"
     }
   ],
   "reserved": [

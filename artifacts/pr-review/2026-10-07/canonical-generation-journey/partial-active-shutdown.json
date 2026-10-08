@@ -1,0 +1,408 @@
+{
+  "scope": "Real browser-visible partial reply; actual SIGTERM of compiled canonical server, complete provider drain, restart and recovery after original lease. The SQL diagnostic probes are separately labelled.",
+  "shutdownExitCode": 0,
+  "subsequentIdleShutdownExitCode": 0,
+  "stop": {
+    "pid": 52620,
+    "started": "2026-10-08T03:50:42.457Z",
+    "signalledAt": "2026-10-08T03:51:24.368Z",
+    "observed": {
+      "id": "1a045aa4-b3d6-4df9-8156-12d09f6a92af",
+      "usage_id": "4711bb80-f6b4-460a-8935-f3f078a85249",
+      "category": "reply",
+      "provider_state": "admitted",
+      "last_sequence": 1,
+      "lease_until": "2026-10-08T03:51:54.946Z"
+    }
+  },
+  "beforeRestart": {
+    "database": "creator_generation_journey34_20261007",
+    "stage": "before-restart",
+    "generations": [
+      {
+        "id": "1a045aa4-b3d6-4df9-8156-12d09f6a92af",
+        "state": "generating",
+        "accepted_at": "2026-10-08T03:50:53.923Z",
+        "first_visible_at": "2026-10-08T03:51:18.166Z",
+        "completed_at": null,
+        "lease_until": "2026-10-08T03:51:54.946Z",
+        "last_sequence": 1,
+        "failure_code": null,
+        "message_id": "393271ec-515d-4bf8-868d-726ab317c20e",
+        "delivery_state": "generating",
+        "text": "Cover the freshly thrown mug loosely with plastic to slow down the drying process and prevent rapid moisture loss.",
+        "citations": [
+          "dc738322-c504-4ff8-8987-6b4a26ab7e06"
+        ]
+      }
+    ],
+    "usage": [
+      {
+        "id": "e26e0866-c185-459d-bccb-b225a5fcc8a1",
+        "generation_id": "1a045aa4-b3d6-4df9-8156-12d09f6a92af",
+        "attempt_id": "0124e809-8dbf-4a8a-9436-0e8e3cfb0fd0",
+        "call_ordinal": 1,
+        "category": "guardrail",
+        "purpose": "guardrail",
+        "provider_state": "completed",
+        "cost_micros": "98",
+        "created_at": "2026-10-08T03:50:56.793Z",
+        "completed_at": "2026-10-08T03:51:00.617Z"
+      },
+      {
+        "id": "c6a1cb00-24ca-40de-a6b8-54ef91ad2205",
+        "generation_id": "1a045aa4-b3d6-4df9-8156-12d09f6a92af",
+        "attempt_id": "0124e809-8dbf-4a8a-9436-0e8e3cfb0fd0",
+        "call_ordinal": 2,
+        "category": "reply",
+        "purpose": "reply",
+        "provider_state": "completed",
+        "cost_micros": "1",
+        "created_at": "2026-10-08T03:51:01.237Z",
+        "completed_at": "2026-10-08T03:51:04.691Z"
+      },
+      {
+        "id": "4711bb80-f6b4-460a-8935-f3f078a85249",
+        "generation_id": "1a045aa4-b3d6-4df9-8156-12d09f6a92af",
+        "attempt_id": "0124e809-8dbf-4a8a-9436-0e8e3cfb0fd0",
+        "call_ordinal": 3,
+        "category": "reply",
+        "purpose": "reply",
+        "provider_state": "completed",
+        "cost_micros": null,
+        "created_at": "2026-10-08T03:51:06.841Z",
+        "completed_at": "2026-10-08T03:51:24.507Z"
+      },
+      {
+        "id": "2068d5b9-a1f6-4b43-91b7-a4f6ffcf1e2e",
+        "generation_id": "1a045aa4-b3d6-4df9-8156-12d09f6a92af",
+        "attempt_id": "0124e809-8dbf-4a8a-9436-0e8e3cfb0fd0",
+        "call_ordinal": 4,
+        "category": "guardrail",
+        "purpose": "guardrail",
+        "provider_state": "completed",
+        "cost_micros": "326",
+        "created_at": "2026-10-08T03:51:11.686Z",
+        "completed_at": "2026-10-08T03:51:16.284Z"
+      },
+      {
+        "id": "0e69e1de-3c22-4d17-84c6-e13d20ba1dce",
+        "generation_id": "1a045aa4-b3d6-4df9-8156-12d09f6a92af",
+        "attempt_id": "0124e809-8dbf-4a8a-9436-0e8e3cfb0fd0",
+        "call_ordinal": 5,
+        "category": "guardrail",
+        "purpose": "guardrail",
+        "provider_state": "completed",
+        "cost_micros": null,
+        "created_at": "2026-10-08T03:51:20.429Z",
+        "completed_at": "2026-10-08T03:51:24.415Z"
+      }
+    ],
+    "receipts": [],
+    "holds": [
+      {
+        "id": "c85001cb-3e75-4b80-8021-51618f9e8104",
+        "key": "generation:1a045aa4-b3d6-4df9-8156-12d09f6a92af",
+        "state": "reserved",
+        "units": 60,
+        "settled_units": null,
+        "settlement_ref": null,
+        "output_delivered": null,
+        "original_settled_at": null,
+        "used": 0,
+        "reserved": 60
+      }
+    ],
+    "provenance": [
+      {
+        "generation_id": "1a045aa4-b3d6-4df9-8156-12d09f6a92af",
+        "sequence": 1,
+        "event_id": "52ca2f3d-7c84-40b0-a21c-f11a5cbcf56b",
+        "message_id": "393271ec-515d-4bf8-868d-726ab317c20e",
+        "content_hash": "30ab3fad8792cc20255ee5dd6fa0f563d3854778aa8e82e5b5c4df48cabb2c70",
+        "approval": {
+          "kind": "sentence",
+          "epoch": 0,
+          "passages": [
+            {
+              "id": "dc738322-c504-4ff8-8987-6b4a26ab7e06",
+              "sourceId": "33347d23-9888-4296-861c-0b65705d6ab0",
+              "sourceHash": "7ba7959f9470c2d4ce848cf6499d20abda4041536207133aa53bf7efdcfb95b9",
+              "sourceRevision": 1
+            }
+          ],
+          "citations": [
+            "dc738322-c504-4ff8-8987-6b4a26ab7e06"
+          ],
+          "versionId": "a7dfb401-489a-4290-98bf-1a2a94c72596",
+          "contextHash": "16019a6b425c2bee52803253482f8fcccb8906559218348a1ab4c879868c7822",
+          "versionHash": "405f451103079e63cb24a92b8822d2e166e499cd50be07ba447d74c013e0ae89",
+          "fanMessageId": "57656aa4-a8fd-4599-a9cc-e2d021d217b7",
+          "pipelineHash": "dbd65b5f8913f4d5f8fee9a9ae68fcfd58dd2f1637c67199d8ede25fed4fd25e",
+          "contextRevision": 2,
+          "providerUsageId": "4711bb80-f6b4-460a-8935-f3f078a85249"
+        }
+      }
+    ]
+  },
+  "afterRecovery": {
+    "database": "creator_generation_journey34_20261007",
+    "stage": "after-recovery",
+    "generations": [
+      {
+        "id": "1a045aa4-b3d6-4df9-8156-12d09f6a92af",
+        "state": "interrupted",
+        "accepted_at": "2026-10-08T03:50:53.923Z",
+        "first_visible_at": "2026-10-08T03:51:18.166Z",
+        "completed_at": "2026-10-08T03:51:59.764Z",
+        "lease_until": null,
+        "last_sequence": 1,
+        "failure_code": null,
+        "message_id": "393271ec-515d-4bf8-868d-726ab317c20e",
+        "delivery_state": "interrupted",
+        "text": "Cover the freshly thrown mug loosely with plastic to slow down the drying process and prevent rapid moisture loss.",
+        "citations": [
+          "dc738322-c504-4ff8-8987-6b4a26ab7e06"
+        ]
+      }
+    ],
+    "usage": [
+      {
+        "id": "e26e0866-c185-459d-bccb-b225a5fcc8a1",
+        "generation_id": "1a045aa4-b3d6-4df9-8156-12d09f6a92af",
+        "attempt_id": "0124e809-8dbf-4a8a-9436-0e8e3cfb0fd0",
+        "call_ordinal": 1,
+        "category": "guardrail",
+        "purpose": "guardrail",
+        "provider_state": "completed",
+        "cost_micros": "98",
+        "created_at": "2026-10-08T03:50:56.793Z",
+        "completed_at": "2026-10-08T03:51:00.617Z"
+      },
+      {
+        "id": "c6a1cb00-24ca-40de-a6b8-54ef91ad2205",
+        "generation_id": "1a045aa4-b3d6-4df9-8156-12d09f6a92af",
+        "attempt_id": "0124e809-8dbf-4a8a-9436-0e8e3cfb0fd0",
+        "call_ordinal": 2,
+        "category": "reply",
+        "purpose": "reply",
+        "provider_state": "completed",
+        "cost_micros": "1",
+        "created_at": "2026-10-08T03:51:01.237Z",
+        "completed_at": "2026-10-08T03:51:04.691Z"
+      },
+      {
+        "id": "4711bb80-f6b4-460a-8935-f3f078a85249",
+        "generation_id": "1a045aa4-b3d6-4df9-8156-12d09f6a92af",
+        "attempt_id": "0124e809-8dbf-4a8a-9436-0e8e3cfb0fd0",
+        "call_ordinal": 3,
+        "category": "reply",
+        "purpose": "reply",
+        "provider_state": "completed",
+        "cost_micros": null,
+        "created_at": "2026-10-08T03:51:06.841Z",
+        "completed_at": "2026-10-08T03:51:24.507Z"
+      },
+      {
+        "id": "2068d5b9-a1f6-4b43-91b7-a4f6ffcf1e2e",
+        "generation_id": "1a045aa4-b3d6-4df9-8156-12d09f6a92af",
+        "attempt_id": "0124e809-8dbf-4a8a-9436-0e8e3cfb0fd0",
+        "call_ordinal": 4,
+        "category": "guardrail",
+        "purpose": "guardrail",
+        "provider_state": "completed",
+        "cost_micros": "326",
+        "created_at": "2026-10-08T03:51:11.686Z",
+        "completed_at": "2026-10-08T03:51:16.284Z"
+      },
+      {
+        "id": "0e69e1de-3c22-4d17-84c6-e13d20ba1dce",
+        "generation_id": "1a045aa4-b3d6-4df9-8156-12d09f6a92af",
+        "attempt_id": "0124e809-8dbf-4a8a-9436-0e8e3cfb0fd0",
+        "call_ordinal": 5,
+        "category": "guardrail",
+        "purpose": "guardrail",
+        "provider_state": "completed",
+        "cost_micros": null,
+        "created_at": "2026-10-08T03:51:20.429Z",
+        "completed_at": "2026-10-08T03:51:24.415Z"
+      }
+    ],
+    "receipts": [
+      {
+        "generation_id": "1a045aa4-b3d6-4df9-8156-12d09f6a92af",
+        "state": "unknown",
+        "cost_micros": null,
+        "usage_ids": [
+          "e26e0866-c185-459d-bccb-b225a5fcc8a1",
+          "c6a1cb00-24ca-40de-a6b8-54ef91ad2205",
+          "4711bb80-f6b4-460a-8935-f3f078a85249",
+          "2068d5b9-a1f6-4b43-91b7-a4f6ffcf1e2e",
+          "0e69e1de-3c22-4d17-84c6-e13d20ba1dce"
+        ],
+        "attempt_ids": [
+          "0124e809-8dbf-4a8a-9436-0e8e3cfb0fd0"
+        ],
+        "receipt_hash": "59429895a3bbe63a6835377119811ac7b1de1c53263c2f667743143871a8b156"
+      }
+    ],
+    "holds": [
+      {
+        "id": "c85001cb-3e75-4b80-8021-51618f9e8104",
+        "key": "generation:1a045aa4-b3d6-4df9-8156-12d09f6a92af",
+        "state": "reserved",
+        "units": 60,
+        "settled_units": null,
+        "settlement_ref": null,
+        "output_delivered": true,
+        "original_settled_at": null,
+        "used": 0,
+        "reserved": 60
+      }
+    ],
+    "provenance": [
+      {
+        "generation_id": "1a045aa4-b3d6-4df9-8156-12d09f6a92af",
+        "sequence": 1,
+        "event_id": "52ca2f3d-7c84-40b0-a21c-f11a5cbcf56b",
+        "message_id": "393271ec-515d-4bf8-868d-726ab317c20e",
+        "content_hash": "30ab3fad8792cc20255ee5dd6fa0f563d3854778aa8e82e5b5c4df48cabb2c70",
+        "approval": {
+          "kind": "sentence",
+          "epoch": 0,
+          "passages": [
+            {
+              "id": "dc738322-c504-4ff8-8987-6b4a26ab7e06",
+              "sourceId": "33347d23-9888-4296-861c-0b65705d6ab0",
+              "sourceHash": "7ba7959f9470c2d4ce848cf6499d20abda4041536207133aa53bf7efdcfb95b9",
+              "sourceRevision": 1
+            }
+          ],
+          "citations": [
+            "dc738322-c504-4ff8-8987-6b4a26ab7e06"
+          ],
+          "versionId": "a7dfb401-489a-4290-98bf-1a2a94c72596",
+          "contextHash": "16019a6b425c2bee52803253482f8fcccb8906559218348a1ab4c879868c7822",
+          "versionHash": "405f451103079e63cb24a92b8822d2e166e499cd50be07ba447d74c013e0ae89",
+          "fanMessageId": "57656aa4-a8fd-4599-a9cc-e2d021d217b7",
+          "pipelineHash": "dbd65b5f8913f4d5f8fee9a9ae68fcfd58dd2f1637c67199d8ede25fed4fd25e",
+          "contextRevision": 2,
+          "providerUsageId": "4711bb80-f6b4-460a-8935-f3f078a85249"
+        }
+      }
+    ]
+  },
+  "sameOriginalProviderRecords": true,
+  "sameOriginalSentenceAndProvenance": true,
+  "all60UnitsStillReserved": true,
+  "browserObservation": {
+    "firstDOM": {
+      "article": {
+        "bottom": 631,
+        "height": 224,
+        "left": 16,
+        "right": 374,
+        "top": 407,
+        "width": 358
+      },
+      "articleId": "message-393271ec-515d-4bf8-868d-726ab317c20e",
+      "at": 1791431484349,
+      "footer": {
+        "bottom": 844,
+        "height": 197,
+        "left": 0,
+        "right": 390,
+        "top": 647,
+        "width": 390
+      },
+      "height": 844,
+      "scrollWidth": 390,
+      "text": "Cover the freshly thrown mug loosely with plastic to slow down the drying process and prevent rapid moisture loss.",
+      "textRect": {
+        "bottom": 507.5,
+        "height": 63.5,
+        "left": 31,
+        "right": 336.4765625,
+        "top": 444,
+        "width": 305.4765625
+      },
+      "width": 390
+    },
+    "firstVisible": {
+      "article": {
+        "bottom": 631,
+        "height": 224,
+        "left": 16,
+        "right": 374,
+        "top": 407,
+        "width": 358
+      },
+      "articleId": "message-393271ec-515d-4bf8-868d-726ab317c20e",
+      "at": 1791431484349,
+      "footer": {
+        "bottom": 844,
+        "height": 197,
+        "left": 0,
+        "right": 390,
+        "top": 647,
+        "width": 390
+      },
+      "height": 844,
+      "scrollWidth": 390,
+      "text": "Cover the freshly thrown mug loosely with plastic to slow down the drying process and prevent rapid moisture loss.",
+      "textRect": {
+        "bottom": 507.5,
+        "height": 63.5,
+        "left": 31,
+        "right": 336.4765625,
+        "top": 444,
+        "width": 305.4765625
+      },
+      "width": 390
+    },
+    "startedAt": 1791431452667,
+    "terminal": {
+      "article": {
+        "bottom": 631,
+        "height": 264,
+        "left": 16,
+        "right": 374,
+        "top": 367,
+        "width": 358
+      },
+      "articleId": "message-393271ec-515d-4bf8-868d-726ab317c20e",
+      "at": 1791431523294,
+      "footer": {
+        "bottom": 844,
+        "height": 197,
+        "left": 0,
+        "right": 390,
+        "top": 647,
+        "width": 390
+      },
+      "height": 844,
+      "scrollWidth": 390,
+      "text": "Cover the freshly thrown mug loosely with plastic to slow down the drying process and prevent rapid moisture loss.",
+      "textRect": {
+        "bottom": 467.5,
+        "height": 63.5,
+        "left": 31,
+        "right": 336.4765625,
+        "top": 404,
+        "width": 305.4765625
+      },
+      "width": 390
+    }
+  },
+  "earlierFailedShutdown": {
+    "database": "creator_generation_journey31_20261007",
+    "generationId": "8ec016f9-3f3f-4445-a637-dd1ca3b9d5a0",
+    "shutdownExitCode": 1,
+    "recoverySucceeded": true,
+    "reason": "Exposed cooperative SQL cancellation being misclassified as a cleanup failure; preserved original records and corrected before repeating on34."
+  },
+  "qualificationLimits": [
+    "The free 24-hour grant was exercised; this does not qualify paid-membership first-use or shared-pass accounting.",
+    "The final reply includes a drying explanation not explicit in the source. This proves preservation and recovery, not semantic grounding acceptance; tighten grounding evaluation before release."
+  ]
+}

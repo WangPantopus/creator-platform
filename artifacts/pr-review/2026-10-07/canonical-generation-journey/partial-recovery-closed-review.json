@@ -1,0 +1,246 @@
+{
+  "sources": [
+    {
+      "path": "apps/backend/src/modules/commerce/schema-generation-partial-unknown-terminal.sql",
+      "sourceSha256": "3db102bef52be7b51aa2caa6b2574eae568b47059ce275160d57b62009d01011"
+    }
+  ],
+  "receipts": [
+    {
+      "label": "original",
+      "before": {
+        "ledger": "f5a88e48e0fef2628d02d1d8e9eb48acf224724b564a6ac5db3cba810dada4e7",
+        "schema": "cbea77a889edcb70e0aadf4a969e55f360fdacf38e7c54efc65d2ff2326db98a",
+        "roles": "36626fe0905b3a40751fdbe4dede122ba8c5a29a30edeb53aa94d1b282d0254b",
+        "security": "71e690bf2040baa4896b230310a32c14ba9ceb63be86dfc52d7dceab40433bd4",
+        "sequences": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+        "data": "45fb49b8ed4354fffae4d90b26a238fe80a34ad67b66144817a98ce54726a7bb",
+        "ledgerRows": 105,
+        "rows": 1129
+      },
+      "purposeBefore": "6bc92e7a40d3fdc1c4787856f2ed41cca568ec50c9dd83b9bc4da3e774ffb299",
+      "purposeAfter": "961397d56e093c3e4acfcebd8b97ac8a182ec78d8b3a3bcd41920a926523779d",
+      "runtimeBefore": {
+        "output": "3ccfc467923254c80d0f24e036645567148f938d834bbc8b47b8a3df28f64b1b",
+        "terminal": "e421c68f9a5ff8d25024cbaaa4f1074ccedbdcdeb3960f8268e85a626d02e1c1",
+        "financial": "587508ee00a2b1da8d16f78c987d27cde16e7cdf6920d4bb7bad79f822d6a4cf",
+        "expiry": "61b3f3c2f0ff290961c5e83de2f1eee4fec733ba47f59bd54e90a9fdc36006a5",
+        "detached": "7f14a76e12209c98755364780bf298a5da7fea20563f627c1aca744d42e020e5",
+        "boundary": "d6400ce961dd2e8ff3d4e8564e1a12f0a1986c071168f4d9b3eb58091945faad",
+        "family": "d3595ff7aa625e79b108fc8b559951502032031349377c45e2fc5de31aeba854"
+      },
+      "runtimeAfter": {
+        "output": "3ccfc467923254c80d0f24e036645567148f938d834bbc8b47b8a3df28f64b1b",
+        "terminal": "e421c68f9a5ff8d25024cbaaa4f1074ccedbdcdeb3960f8268e85a626d02e1c1",
+        "financial": "7324fabb44dbec02c4acbdb4469a0a5b544ff8aab386f5061146f1e05e92db40",
+        "expiry": "61b3f3c2f0ff290961c5e83de2f1eee4fec733ba47f59bd54e90a9fdc36006a5",
+        "detached": "7f14a76e12209c98755364780bf298a5da7fea20563f627c1aca744d42e020e5",
+        "boundary": "d6400ce961dd2e8ff3d4e8564e1a12f0a1986c071168f4d9b3eb58091945faad",
+        "family": "d3595ff7aa625e79b108fc8b559951502032031349377c45e2fc5de31aeba854"
+      },
+      "outputBefore": "db8b87427f05d2348bb0981aa8477028258b4b1ff7c242fc553f5f41ab41b953",
+      "outputAfter": "db8b87427f05d2348bb0981aa8477028258b4b1ff7c242fc553f5f41ab41b953",
+      "changedRoles": [],
+      "extraBefore": {
+        "cursor": "0b5a600f30b7656289d86e182b93f8dba7284d5dc69c66c2ff7940fcf1356d5c",
+        "provenance": "94ca380c2269b17349edd2540d973e084dc783084d321ea774def8f4b262c093",
+        "public": "97cdb4235a237305cc221ec6b1548bd63881925f0cf64521eb4ef877d33fc5dc"
+      },
+      "extraAfter": {
+        "cursor": "0b5a600f30b7656289d86e182b93f8dba7284d5dc69c66c2ff7940fcf1356d5c",
+        "provenance": "94ca380c2269b17349edd2540d973e084dc783084d321ea774def8f4b262c093",
+        "public": "97cdb4235a237305cc221ec6b1548bd63881925f0cf64521eb4ef877d33fc5dc"
+      },
+      "consumers": [
+        {
+          "signature": "creator.generation_settle_typed_original_allowance(uuid,uuid)",
+          "owner": "creator_w4_generation_safety_terminal",
+          "checksum": "7bcfd13179ef20d667c3b464f92beb3d5a3d3f12eb1354f07d11121f2fa0a55f"
+        },
+        {
+          "signature": "creator.generation_typed_original_allowance_receipt(uuid,uuid)",
+          "owner": "creator_w4_generation_safety_terminal",
+          "checksum": "9e0c8329d983c75dfaa7923240182571ede461f85dcf5bebea36508fcb13e14e"
+        }
+      ],
+      "allOriginalDigestsRestored": true
+    },
+    {
+      "label": "journey",
+      "before": {
+        "ledger": "f5a88e48e0fef2628d02d1d8e9eb48acf224724b564a6ac5db3cba810dada4e7",
+        "schema": "cbea77a889edcb70e0aadf4a969e55f360fdacf38e7c54efc65d2ff2326db98a",
+        "roles": "36626fe0905b3a40751fdbe4dede122ba8c5a29a30edeb53aa94d1b282d0254b",
+        "security": "71e690bf2040baa4896b230310a32c14ba9ceb63be86dfc52d7dceab40433bd4",
+        "sequences": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+        "data": "45fb49b8ed4354fffae4d90b26a238fe80a34ad67b66144817a98ce54726a7bb",
+        "ledgerRows": 105,
+        "rows": 1129
+      },
+      "purposeBefore": "6bc92e7a40d3fdc1c4787856f2ed41cca568ec50c9dd83b9bc4da3e774ffb299",
+      "purposeAfter": "961397d56e093c3e4acfcebd8b97ac8a182ec78d8b3a3bcd41920a926523779d",
+      "runtimeBefore": {
+        "output": "3ccfc467923254c80d0f24e036645567148f938d834bbc8b47b8a3df28f64b1b",
+        "terminal": "e421c68f9a5ff8d25024cbaaa4f1074ccedbdcdeb3960f8268e85a626d02e1c1",
+        "financial": "587508ee00a2b1da8d16f78c987d27cde16e7cdf6920d4bb7bad79f822d6a4cf",
+        "expiry": "61b3f3c2f0ff290961c5e83de2f1eee4fec733ba47f59bd54e90a9fdc36006a5",
+        "detached": "7f14a76e12209c98755364780bf298a5da7fea20563f627c1aca744d42e020e5",
+        "boundary": "d6400ce961dd2e8ff3d4e8564e1a12f0a1986c071168f4d9b3eb58091945faad",
+        "family": "d3595ff7aa625e79b108fc8b559951502032031349377c45e2fc5de31aeba854"
+      },
+      "runtimeAfter": {
+        "output": "3ccfc467923254c80d0f24e036645567148f938d834bbc8b47b8a3df28f64b1b",
+        "terminal": "e421c68f9a5ff8d25024cbaaa4f1074ccedbdcdeb3960f8268e85a626d02e1c1",
+        "financial": "7324fabb44dbec02c4acbdb4469a0a5b544ff8aab386f5061146f1e05e92db40",
+        "expiry": "61b3f3c2f0ff290961c5e83de2f1eee4fec733ba47f59bd54e90a9fdc36006a5",
+        "detached": "7f14a76e12209c98755364780bf298a5da7fea20563f627c1aca744d42e020e5",
+        "boundary": "d6400ce961dd2e8ff3d4e8564e1a12f0a1986c071168f4d9b3eb58091945faad",
+        "family": "d3595ff7aa625e79b108fc8b559951502032031349377c45e2fc5de31aeba854"
+      },
+      "outputBefore": "db8b87427f05d2348bb0981aa8477028258b4b1ff7c242fc553f5f41ab41b953",
+      "outputAfter": "db8b87427f05d2348bb0981aa8477028258b4b1ff7c242fc553f5f41ab41b953",
+      "changedRoles": [],
+      "extraBefore": {
+        "cursor": "0b5a600f30b7656289d86e182b93f8dba7284d5dc69c66c2ff7940fcf1356d5c",
+        "provenance": "94ca380c2269b17349edd2540d973e084dc783084d321ea774def8f4b262c093",
+        "public": "97cdb4235a237305cc221ec6b1548bd63881925f0cf64521eb4ef877d33fc5dc"
+      },
+      "extraAfter": {
+        "cursor": "0b5a600f30b7656289d86e182b93f8dba7284d5dc69c66c2ff7940fcf1356d5c",
+        "provenance": "94ca380c2269b17349edd2540d973e084dc783084d321ea774def8f4b262c093",
+        "public": "97cdb4235a237305cc221ec6b1548bd63881925f0cf64521eb4ef877d33fc5dc"
+      },
+      "consumers": [
+        {
+          "signature": "creator.generation_settle_typed_original_allowance(uuid,uuid)",
+          "owner": "creator_w4_generation_safety_terminal",
+          "checksum": "7bcfd13179ef20d667c3b464f92beb3d5a3d3f12eb1354f07d11121f2fa0a55f"
+        },
+        {
+          "signature": "creator.generation_typed_original_allowance_receipt(uuid,uuid)",
+          "owner": "creator_w4_generation_safety_terminal",
+          "checksum": "9e0c8329d983c75dfaa7923240182571ede461f85dcf5bebea36508fcb13e14e"
+        }
+      ],
+      "allOriginalDigestsRestored": true
+    },
+    {
+      "label": "original-incoming",
+      "before": {
+        "ledger": "f5a88e48e0fef2628d02d1d8e9eb48acf224724b564a6ac5db3cba810dada4e7",
+        "schema": "cbea77a889edcb70e0aadf4a969e55f360fdacf38e7c54efc65d2ff2326db98a",
+        "roles": "36626fe0905b3a40751fdbe4dede122ba8c5a29a30edeb53aa94d1b282d0254b",
+        "security": "71e690bf2040baa4896b230310a32c14ba9ceb63be86dfc52d7dceab40433bd4",
+        "sequences": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+        "data": "45fb49b8ed4354fffae4d90b26a238fe80a34ad67b66144817a98ce54726a7bb",
+        "ledgerRows": 105,
+        "rows": 1129
+      },
+      "purposeBefore": "806978f79129c162888e4e6f42a16c8d3515faa62de9fe930d46f016650e4d80",
+      "purposeAfter": "8f083896a022939e49be136a6cf16719eb543fd4a238f816f55045f0ee0b8804",
+      "runtimeBefore": {
+        "output": "3ccfc467923254c80d0f24e036645567148f938d834bbc8b47b8a3df28f64b1b",
+        "terminal": "e421c68f9a5ff8d25024cbaaa4f1074ccedbdcdeb3960f8268e85a626d02e1c1",
+        "financial": "587508ee00a2b1da8d16f78c987d27cde16e7cdf6920d4bb7bad79f822d6a4cf",
+        "expiry": "61b3f3c2f0ff290961c5e83de2f1eee4fec733ba47f59bd54e90a9fdc36006a5",
+        "detached": "7f14a76e12209c98755364780bf298a5da7fea20563f627c1aca744d42e020e5",
+        "boundary": "d6400ce961dd2e8ff3d4e8564e1a12f0a1986c071168f4d9b3eb58091945faad",
+        "family": "ead78dddd80eb67a32845510b6545f2c870df4d3cdf3ddf67d210f2286903093"
+      },
+      "runtimeAfter": {
+        "output": "3ccfc467923254c80d0f24e036645567148f938d834bbc8b47b8a3df28f64b1b",
+        "terminal": "e421c68f9a5ff8d25024cbaaa4f1074ccedbdcdeb3960f8268e85a626d02e1c1",
+        "financial": "7324fabb44dbec02c4acbdb4469a0a5b544ff8aab386f5061146f1e05e92db40",
+        "expiry": "61b3f3c2f0ff290961c5e83de2f1eee4fec733ba47f59bd54e90a9fdc36006a5",
+        "detached": "7f14a76e12209c98755364780bf298a5da7fea20563f627c1aca744d42e020e5",
+        "boundary": "d6400ce961dd2e8ff3d4e8564e1a12f0a1986c071168f4d9b3eb58091945faad",
+        "family": "ead78dddd80eb67a32845510b6545f2c870df4d3cdf3ddf67d210f2286903093"
+      },
+      "outputBefore": "db8b87427f05d2348bb0981aa8477028258b4b1ff7c242fc553f5f41ab41b953",
+      "outputAfter": "db8b87427f05d2348bb0981aa8477028258b4b1ff7c242fc553f5f41ab41b953",
+      "changedRoles": [],
+      "extraBefore": {
+        "cursor": "0b5a600f30b7656289d86e182b93f8dba7284d5dc69c66c2ff7940fcf1356d5c",
+        "provenance": "69080bd120e3d8b31344d259ddd8efebed69f347ad4888218c59c5b82def1ad3",
+        "public": "97cdb4235a237305cc221ec6b1548bd63881925f0cf64521eb4ef877d33fc5dc"
+      },
+      "extraAfter": {
+        "cursor": "0b5a600f30b7656289d86e182b93f8dba7284d5dc69c66c2ff7940fcf1356d5c",
+        "provenance": "69080bd120e3d8b31344d259ddd8efebed69f347ad4888218c59c5b82def1ad3",
+        "public": "97cdb4235a237305cc221ec6b1548bd63881925f0cf64521eb4ef877d33fc5dc"
+      },
+      "consumers": [
+        {
+          "signature": "creator.generation_settle_typed_original_allowance(uuid,uuid)",
+          "owner": "creator_w4_generation_safety_terminal",
+          "checksum": "7bcfd13179ef20d667c3b464f92beb3d5a3d3f12eb1354f07d11121f2fa0a55f"
+        },
+        {
+          "signature": "creator.generation_typed_original_allowance_receipt(uuid,uuid)",
+          "owner": "creator_w4_generation_safety_terminal",
+          "checksum": "9e0c8329d983c75dfaa7923240182571ede461f85dcf5bebea36508fcb13e14e"
+        }
+      ],
+      "allOriginalDigestsRestored": true
+    },
+    {
+      "label": "journey-incoming",
+      "before": {
+        "ledger": "f5a88e48e0fef2628d02d1d8e9eb48acf224724b564a6ac5db3cba810dada4e7",
+        "schema": "cbea77a889edcb70e0aadf4a969e55f360fdacf38e7c54efc65d2ff2326db98a",
+        "roles": "36626fe0905b3a40751fdbe4dede122ba8c5a29a30edeb53aa94d1b282d0254b",
+        "security": "71e690bf2040baa4896b230310a32c14ba9ceb63be86dfc52d7dceab40433bd4",
+        "sequences": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+        "data": "45fb49b8ed4354fffae4d90b26a238fe80a34ad67b66144817a98ce54726a7bb",
+        "ledgerRows": 105,
+        "rows": 1129
+      },
+      "purposeBefore": "806978f79129c162888e4e6f42a16c8d3515faa62de9fe930d46f016650e4d80",
+      "purposeAfter": "8f083896a022939e49be136a6cf16719eb543fd4a238f816f55045f0ee0b8804",
+      "runtimeBefore": {
+        "output": "3ccfc467923254c80d0f24e036645567148f938d834bbc8b47b8a3df28f64b1b",
+        "terminal": "e421c68f9a5ff8d25024cbaaa4f1074ccedbdcdeb3960f8268e85a626d02e1c1",
+        "financial": "587508ee00a2b1da8d16f78c987d27cde16e7cdf6920d4bb7bad79f822d6a4cf",
+        "expiry": "61b3f3c2f0ff290961c5e83de2f1eee4fec733ba47f59bd54e90a9fdc36006a5",
+        "detached": "7f14a76e12209c98755364780bf298a5da7fea20563f627c1aca744d42e020e5",
+        "boundary": "d6400ce961dd2e8ff3d4e8564e1a12f0a1986c071168f4d9b3eb58091945faad",
+        "family": "ead78dddd80eb67a32845510b6545f2c870df4d3cdf3ddf67d210f2286903093"
+      },
+      "runtimeAfter": {
+        "output": "3ccfc467923254c80d0f24e036645567148f938d834bbc8b47b8a3df28f64b1b",
+        "terminal": "e421c68f9a5ff8d25024cbaaa4f1074ccedbdcdeb3960f8268e85a626d02e1c1",
+        "financial": "7324fabb44dbec02c4acbdb4469a0a5b544ff8aab386f5061146f1e05e92db40",
+        "expiry": "61b3f3c2f0ff290961c5e83de2f1eee4fec733ba47f59bd54e90a9fdc36006a5",
+        "detached": "7f14a76e12209c98755364780bf298a5da7fea20563f627c1aca744d42e020e5",
+        "boundary": "d6400ce961dd2e8ff3d4e8564e1a12f0a1986c071168f4d9b3eb58091945faad",
+        "family": "ead78dddd80eb67a32845510b6545f2c870df4d3cdf3ddf67d210f2286903093"
+      },
+      "outputBefore": "db8b87427f05d2348bb0981aa8477028258b4b1ff7c242fc553f5f41ab41b953",
+      "outputAfter": "db8b87427f05d2348bb0981aa8477028258b4b1ff7c242fc553f5f41ab41b953",
+      "changedRoles": [],
+      "extraBefore": {
+        "cursor": "0b5a600f30b7656289d86e182b93f8dba7284d5dc69c66c2ff7940fcf1356d5c",
+        "provenance": "69080bd120e3d8b31344d259ddd8efebed69f347ad4888218c59c5b82def1ad3",
+        "public": "97cdb4235a237305cc221ec6b1548bd63881925f0cf64521eb4ef877d33fc5dc"
+      },
+      "extraAfter": {
+        "cursor": "0b5a600f30b7656289d86e182b93f8dba7284d5dc69c66c2ff7940fcf1356d5c",
+        "provenance": "69080bd120e3d8b31344d259ddd8efebed69f347ad4888218c59c5b82def1ad3",
+        "public": "97cdb4235a237305cc221ec6b1548bd63881925f0cf64521eb4ef877d33fc5dc"
+      },
+      "consumers": [
+        {
+          "signature": "creator.generation_settle_typed_original_allowance(uuid,uuid)",
+          "owner": "creator_w4_generation_safety_terminal",
+          "checksum": "7bcfd13179ef20d667c3b464f92beb3d5a3d3f12eb1354f07d11121f2fa0a55f"
+        },
+        {
+          "signature": "creator.generation_typed_original_allowance_receipt(uuid,uuid)",
+          "owner": "creator_w4_generation_safety_terminal",
+          "checksum": "9e0c8329d983c75dfaa7923240182571ede461f85dcf5bebea36508fcb13e14e"
+        }
+      ],
+      "allOriginalDigestsRestored": true
+    }
+  ]
+}

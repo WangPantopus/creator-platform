@@ -14,6 +14,7 @@ import {
   generationOutputRepairSource,
   registeredGenerationOutputProfile,
 } from "../src/db/generation-output-profile.js";
+import partialRecoveryReview from "../../../infra/migrations/reviews/20261007-partial-generation-recovery.json" with { type: "json" };
 import recoveryReview from "../../../infra/migrations/reviews/20261007-generation-recovery.json" with { type: "json" };
 import { registeredGenerationRecoveryProfile } from "../src/db/generation-recovery-profile.js";
 import publicAIReview from "../../../infra/migrations/reviews/20261007-public-ai.json" with { type: "json" };
@@ -98,6 +99,18 @@ try {
     throw new Error(
       "Recovery registry requires its complete reviewed predecessor.",
     );
+  const partialRecovery = registry.migrations.some(
+    (source) => source.version === partialRecoveryReview.source.version,
+  );
+  if (
+    partialRecovery &&
+    (!recovery ||
+      (await registeredGenerationRecoveryProfile())?.source.version !==
+        partialRecoveryReview.source.version)
+  )
+    throw new Error(
+      "Partial-output recovery registry requires its complete reviewed predecessor.",
+    );
   const registeredFiles = registry.migrations
     .filter(
       (file) =>
@@ -170,6 +183,13 @@ try {
     throw new Error(
       "Incomplete terminal recovery activation; no repair was attempted.",
     );
+  const installedPartialRecovery = applied.some(
+    (row) => row.version === partialRecoveryReview.source.version,
+  );
+  if (installedPartialRecovery && (!partialRecovery || !installedRecovery))
+    throw new Error(
+      "Incomplete partial-output recovery activation; no repair was attempted.",
+    );
   // Fresh databases still bootstrap the exact canonical61. The complete new
   // wave is only installed atomically by activate-wave after private backup,
   // separate restore and closed-admission checks. Registered code alone cannot
@@ -181,7 +201,9 @@ try {
       (installedOutput ||
         source.version !== generationOutputRepairSource.version) &&
       (installedPublic || !publicVersions.has(source.version)) &&
-      (installedRecovery || source.version !== recoveryReview.source.version),
+      (installedRecovery || source.version !== recoveryReview.source.version) &&
+      (installedPartialRecovery ||
+        source.version !== partialRecoveryReview.source.version),
   );
   const historical = localLegacy
     ? new Set<string>()
@@ -227,15 +249,17 @@ try {
       if (installedGeneration)
         await assertGenerationWaveRoleSafety(
           client,
-          installedRecovery
-            ? "generation-recovery"
-            : installedPublic
-              ? "public-ai"
-              : installedOutput
-                ? "generation-output"
-                : installedContent
-                  ? "content-privacy"
-                  : undefined,
+          installedPartialRecovery
+            ? "partial-generation-recovery"
+            : installedRecovery
+              ? "generation-recovery"
+              : installedPublic
+                ? "public-ai"
+                : installedOutput
+                  ? "generation-output"
+                  : installedContent
+                    ? "content-privacy"
+                    : undefined,
         );
       else await assertWaveRoleSafety(client, installedRoles(applied));
       if (continuation)
@@ -325,15 +349,17 @@ try {
       if (installedGeneration)
         await assertGenerationWaveRoleSafety(
           client,
-          installedRecovery
-            ? "generation-recovery"
-            : installedPublic
-              ? "public-ai"
-              : installedOutput
-                ? "generation-output"
-                : installedContent
-                  ? "content-privacy"
-                  : undefined,
+          installedPartialRecovery
+            ? "partial-generation-recovery"
+            : installedRecovery
+              ? "generation-recovery"
+              : installedPublic
+                ? "public-ai"
+                : installedOutput
+                  ? "generation-output"
+                  : installedContent
+                    ? "content-privacy"
+                    : undefined,
         );
       else await assertWaveRoleSafety(client, installedRoles(files));
       if (continuation)

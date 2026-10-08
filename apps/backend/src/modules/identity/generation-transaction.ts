@@ -68,6 +68,7 @@ export async function generationTransaction<T>(
   const cleanupFailures: unknown[] = [];
   let failure: unknown;
   let failed = false;
+  let cooperativeAbort = false;
   let value: T | undefined;
   let committed = false;
   let phase: "pid" | "begin" | "work" | "commit" = "pid";
@@ -169,9 +170,31 @@ export async function generationTransaction<T>(
     failed = true;
     failure = error;
     await settle();
+    // Purpose readers retain a database failure as a private DomainError
+    // cause. Unwrap only that single-cause chain; an aggregate can contain an
+    // independent accounting/cleanup failure and must never become success.
+    let original = error;
+    for (let depth = 0; depth < 16; depth++) {
+      if (!(original instanceof DomainError) || original.cause === undefined)
+        break;
+      original = original.cause;
+    }
+    cooperativeAbort = Boolean(
+      signal?.aborted &&
+        (original === signal.reason ||
+          (cancelling &&
+            original instanceof Error &&
+            "code" in original &&
+            original.code === "57014" &&
+            original.message === "canceling statement due to user request")),
+    );
     const uncertainResponse =
       phase !== "work" || querySettlementUncertain(error);
-    if (uncertainResponse) transportFailures.push(error);
+    // An original cooperative abort still requires destruction when response
+    // settlement is uncertain. Successful destruction is cleanup, not itself
+    // a transport failure. Real cancellation/socket/rollback/release failures
+    // remain in their own collections and reject below.
+    if (uncertainResponse && !cooperativeAbort) transportFailures.push(error);
     if (
       uncertainResponse ||
       cancellationFailures.length ||
@@ -234,6 +257,6 @@ export async function generationTransaction<T>(
     );
     throw unavailable;
   }
-  if (failed) throw failure;
+  if (failed) throw cooperativeAbort ? signal!.reason : failure;
   return value as T;
 }

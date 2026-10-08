@@ -27,6 +27,7 @@ import { assertGenerationWaveRoleSafety } from "./migration-generation-roles.js"
 import { generationPrivacySourcesRegistered } from "../src/db/generation-privacy-sources.js";
 import { registeredContentPrivacyProfile } from "../src/db/content-privacy-profile.js";
 import { registeredGenerationOutputProfile } from "../src/db/generation-output-profile.js";
+import partialRecoveryReview from "../../../infra/migrations/reviews/20261007-partial-generation-recovery.json" with { type: "json" };
 import recoveryReview from "../../../infra/migrations/reviews/20261007-generation-recovery.json" with { type: "json" };
 import { registeredGenerationRecoveryProfile } from "../src/db/generation-recovery-profile.js";
 import publicAIReview from "../../../infra/migrations/reviews/20261007-public-ai.json" with { type: "json" };
@@ -67,15 +68,19 @@ async function activate() {
       "20261007-generation-output",
       "20261007-public-ai",
       "20261007-generation-recovery",
+      "20261007-partial-generation-recovery",
     ].includes(process.env.W8_MIGRATION_WAVE ?? ""),
-    "Select a reviewed W8_MIGRATION_WAVE (20261002, 20261002-privacy, 20261007-generation, 20261007-content 20261007-generation-output 20261007-public-ai or 20261007-generation-recovery).",
+    "Select a reviewed W8_MIGRATION_WAVE (20261002, 20261002-privacy, 20261007-generation, 20261007-content 20261007-generation-output 20261007-public-ai 20261007-generation-recovery or 20261007-partial-generation-recovery).",
   );
   const connection = process.env.DATABASE_MIGRATION_URL;
   check(
     connection,
     "Provide a separate DATABASE_MIGRATION_URL; never a runtime credential.",
   );
+  const partialRecovery =
+    process.env.W8_MIGRATION_WAVE === "20261007-partial-generation-recovery";
   const recovery =
+    partialRecovery ||
     process.env.W8_MIGRATION_WAVE === "20261007-generation-recovery";
   const publicAI =
     recovery || process.env.W8_MIGRATION_WAVE === "20261007-public-ai";
@@ -98,6 +103,7 @@ async function activate() {
     "20261007-generation-output",
     "20261007-public-ai",
     "20261007-generation-recovery",
+    "20261007-partial-generation-recovery",
   ];
   const packets = await Promise.all(
     ids.map(
@@ -110,15 +116,33 @@ async function activate() {
         ) as Packet,
     ),
   );
-  const [initial, prior, current, latest, repair, directory, terminalRecovery] =
-    packets as [Packet, Packet, Packet, Packet, Packet, Packet, Packet];
+  const [
+    initial,
+    prior,
+    current,
+    latest,
+    repair,
+    directory,
+    terminalRecovery,
+    partialTerminalRecovery,
+  ] = packets as [
+    Packet,
+    Packet,
+    Packet,
+    Packet,
+    Packet,
+    Packet,
+    Packet,
+    Packet,
+  ];
   check(
     packets.every(
       (entry, index) =>
         entry.schemaVersion === 1 &&
         entry.id === ids[index] &&
-        entry.baseline.length === [40, 57, 61, 100, 101, 102, 104][index] &&
-        entry.wave.length === [17, 4, 39, 1, 1, 2, 1][index],
+        entry.baseline.length ===
+          [40, 57, 61, 100, 101, 102, 104, 105][index] &&
+        entry.wave.length === [17, 4, 39, 1, 1, 2, 1, 1][index],
     ) &&
       canonical(prior.baseline) ===
         canonical([...initial.baseline, ...initial.wave]) &&
@@ -214,8 +238,25 @@ async function activate() {
         await readFile(
           new URL(recoveryReview.baselineWave.path, repositoryRoot),
         ),
-      ) === recoveryReview.baselineWave.sha256,
-    "The exact reviewed 40/57/61/100/101/102/104/105-source migration chain is required.",
+      ) === recoveryReview.baselineWave.sha256 &&
+      canonical(partialTerminalRecovery.baseline) ===
+        canonical([...terminalRecovery.baseline, ...terminalRecovery.wave]) &&
+      canonical(partialTerminalRecovery.wave) ===
+        canonical([
+          {
+            version: partialRecoveryReview.source.version,
+            path: partialRecoveryReview.source.path,
+            checksum: partialRecoveryReview.source.checksum,
+          },
+        ]) &&
+      canonical(partialTerminalRecovery.outOfOrderException) ===
+        canonical(terminalRecovery.outOfOrderException) &&
+      sha256(
+        await readFile(
+          new URL(partialRecoveryReview.baselineWave.path, repositoryRoot),
+        ),
+      ) === partialRecoveryReview.baselineWave.sha256,
+    "The exact reviewed 40/57/61/100/101/102/104/105/106-source migration chain is required.",
   );
   check(
     await generationPrivacySourcesRegistered(),
@@ -245,8 +286,8 @@ async function activate() {
   ) as { migrations: { version: string; path: string }[] };
   const sources = [...packet.baseline, ...packet.wave];
   const registeredSources = [
-    ...terminalRecovery.baseline,
-    ...terminalRecovery.wave,
+    ...partialTerminalRecovery.baseline,
+    ...partialTerminalRecovery.wave,
   ];
   check(
     new Set(registeredSources.map((s) => s.version.slice(0, 4))).size ===
@@ -420,18 +461,31 @@ async function activate() {
       !installedRecovery || installedPublic === directory.wave.length,
       "Recovery cannot precede public AI activation.",
     );
+    const installedPartialRecovery = before.some(
+      (row) => row.version === partialRecoveryReview.source.version,
+    );
+    check(
+      !partialRecovery || installedRecovery,
+      "Partial-output recovery requires the complete reviewed105 predecessor.",
+    );
+    check(
+      !installedPartialRecovery || installedRecovery,
+      "Partial-output recovery cannot precede original recovery.",
+    );
     if (generationInstalled)
       await assertGenerationWaveRoleSafety(
         client,
-        installedRecovery
-          ? "generation-recovery"
-          : installedPublic
-            ? "public-ai"
-            : outputInstalled
-              ? "generation-output"
-              : contentInstalled
-                ? "content-privacy"
-                : undefined,
+        installedPartialRecovery
+          ? "partial-generation-recovery"
+          : installedRecovery
+            ? "generation-recovery"
+            : installedPublic
+              ? "public-ai"
+              : outputInstalled
+                ? "generation-output"
+                : contentInstalled
+                  ? "content-privacy"
+                  : undefined,
       );
     else
       await assertWaveRoleSafety(client, {
@@ -548,15 +602,17 @@ async function activate() {
     const roleSafety = generation
       ? await assertGenerationWaveRoleSafety(
           client,
-          recovery
-            ? "generation-recovery"
-            : publicAI
-              ? "public-ai"
-              : output
-                ? "generation-output"
-                : content
-                  ? "content-privacy"
-                  : undefined,
+          partialRecovery
+            ? "partial-generation-recovery"
+            : recovery
+              ? "generation-recovery"
+              : publicAI
+                ? "public-ai"
+                : output
+                  ? "generation-output"
+                  : content
+                    ? "content-privacy"
+                    : undefined,
         )
       : await assertWaveRoleSafety(client, {
           trust: true,

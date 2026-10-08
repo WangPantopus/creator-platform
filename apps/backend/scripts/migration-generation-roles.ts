@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import purposeReview from "../../../infra/migrations/reviews/20261007-generation-purpose-roles.json" with { type: "json" };
 import contentReview from "../../../infra/migrations/reviews/20261007-content-privacy.json" with { type: "json" };
 import outputReview from "../../../infra/migrations/reviews/20261007-generation-first-visible.json" with { type: "json" };
+import partialRecoveryReview from "../../../infra/migrations/reviews/20261007-partial-generation-recovery.json" with { type: "json" };
 import recoveryReview from "../../../infra/migrations/reviews/20261007-generation-recovery.json" with { type: "json" };
 import publicAIReview from "../../../infra/migrations/reviews/20261007-public-ai.json" with { type: "json" };
 import { publicAIPurposeCatalogue } from "../src/modules/identity/public-ai-catalogue.js";
@@ -161,7 +162,8 @@ export async function assertGenerationWaveRoleSafety(
     | "content-privacy"
     | "generation-output"
     | "public-ai"
-    | "generation-recovery",
+    | "generation-recovery"
+    | "partial-generation-recovery",
 ) {
   if (
     purposeReview.schemaVersion !== 1 ||
@@ -173,18 +175,25 @@ export async function assertGenerationWaveRoleSafety(
     throw new WaveRoleSafetyError(
       "Generation-purpose wave review is unavailable.",
     );
+  const recovery =
+    extension === "generation-recovery" ||
+    extension === "partial-generation-recovery";
+  const selectedRecovery =
+    extension === "partial-generation-recovery"
+      ? partialRecoveryReview
+      : recoveryReview;
   const original = await assertWaveRoleSafety(client, {
     trust: true,
     media: true,
     content: true,
     interactive: true,
     generationDenial: true,
-    publicAI: extension === "public-ai" || extension === "generation-recovery",
+    publicAI: extension === "public-ai" || recovery,
   });
   const catalogue = await generationWavePurposeCatalogue(client);
   const accepted = extension
-    ? (extension === "generation-recovery"
-        ? recoveryReview
+    ? (recovery
+        ? selectedRecovery
         : extension === "public-ai"
           ? publicAIReview
           : extension === "generation-output"
@@ -212,7 +221,7 @@ export async function assertGenerationWaveRoleSafety(
     if (
       extension === "generation-output" ||
       extension === "public-ai" ||
-      extension === "generation-recovery"
+      recovery
     ) {
       const repair = outputReview.source;
       if (
@@ -231,7 +240,7 @@ export async function assertGenerationWaveRoleSafety(
           "Exact generation output repair source is required.",
         );
     }
-    if (extension === "public-ai" || extension === "generation-recovery") {
+    if (extension === "public-ai" || recovery) {
       for (const source of publicAIReview.sources)
         if (
           sha256(await readFile(new URL(source.path, repositoryRoot))) !==
@@ -252,21 +261,24 @@ export async function assertGenerationWaveRoleSafety(
       )
         throw new WaveRoleSafetyError("Public AI purpose catalogue changed.");
     }
-    if (extension === "generation-recovery") {
-      const source = recoveryReview.source;
-      if (
-        sha256(await readFile(new URL(source.path, repositoryRoot))) !==
-          source.checksum ||
-        !(
-          await client.query(
-            "SELECT 1 FROM creator.schema_migration WHERE version=$1 AND checksum=$2",
-            [source.version, source.checksum],
-          )
-        ).rowCount
-      )
-        throw new WaveRoleSafetyError(
-          "Exact terminal recovery source is required.",
-        );
+    if (recovery) {
+      for (const source of extension === "partial-generation-recovery"
+        ? [recoveryReview.source, partialRecoveryReview.source]
+        : [recoveryReview.source]) {
+        if (
+          sha256(await readFile(new URL(source.path, repositoryRoot))) !==
+            source.checksum ||
+          !(
+            await client.query(
+              "SELECT 1 FROM creator.schema_migration WHERE version=$1 AND checksum=$2",
+              [source.version, source.checksum],
+            )
+          ).rowCount
+        )
+          throw new WaveRoleSafetyError(
+            "Exact terminal recovery source is required.",
+          );
+      }
     }
     try {
       await client.query("SET SESSION AUTHORIZATION creator_runtime");
@@ -281,8 +293,6 @@ export async function assertGenerationWaveRoleSafety(
     purposeRoles:
       purposeReview.roles.length +
       (extension ? 1 : 0) +
-      (extension === "public-ai" || extension === "generation-recovery"
-        ? 1
-        : 0),
+      (extension === "public-ai" || recovery ? 1 : 0),
   };
 }
