@@ -196,6 +196,7 @@ export function createConversationRuntime(input: {
         )
       : undefined,
     input.developmentPolicy,
+    acceptance ? () => acceptance.isRunning : undefined,
   );
   return {
     feature,

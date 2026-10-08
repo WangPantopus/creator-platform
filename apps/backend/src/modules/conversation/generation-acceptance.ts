@@ -1,5 +1,5 @@
 import type { PoolClient } from "pg";
-import { invariant } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
 import type { Database } from "../../db/database.js";
 import { GenerationWorker } from "../../workers/generation.js";
 import type { AccessService, ThreadScope } from "../access/scope.js";
@@ -18,6 +18,7 @@ export class PreparedGenerationAcceptance {
       access: AccessService;
       agent: ReturnType<typeof createAgentDomain>;
       allowance: CommerceGenerationAllowance;
+      isRunning?: () => boolean;
     },
     private readonly adapter: ReturnType<typeof conversationAgentGenerator>,
   ) {}
@@ -28,6 +29,7 @@ export class PreparedGenerationAcceptance {
     access: AccessService;
     agent: ReturnType<typeof createAgentDomain>;
     allowance: CommerceGenerationAllowance;
+    isRunning?: () => boolean;
   }): PreparedGenerationAcceptance {
     invariant(
       input.worker instanceof GenerationWorker &&
@@ -72,7 +74,21 @@ export class PreparedGenerationAcceptance {
     return this.configuration.agent.service.repository.usageJournal!;
   }
 
-  reserve(scope: ThreadScope, client: PoolClient, generationId: string) {
+  get isRunning(): boolean {
+    return this.configuration.isRunning?.() ?? true;
+  }
+
+  private assertRunning(): void {
+    if (!this.isRunning)
+      throw new DomainError(
+        "generation_worker_unavailable",
+        "AI messaging is temporarily unavailable. Try again shortly.",
+        503,
+      );
+  }
+
+  async reserve(scope: ThreadScope, client: PoolClient, generationId: string) {
+    this.assertRunning();
     this.assertComposition(
       this.configuration.database,
       this.configuration.access,
@@ -82,19 +98,23 @@ export class PreparedGenerationAcceptance {
       this.configuration.access,
     );
     this.configuration.allowance.assertJournal(this.journal);
-    return this.configuration.allowance.reserveGeneration(
+    const reservation = await this.configuration.allowance.reserveGeneration(
       scope,
       client,
       generationId,
     );
+    this.assertRunning();
+    return reservation;
   }
 
   async assertReady(scope: ThreadScope, client: PoolClient): Promise<void> {
+    this.assertRunning();
     this.assertComposition(
       this.configuration.database,
       this.configuration.access,
     );
     await this.adapter.assertReady(scope, client);
+    this.assertRunning();
   }
 
   /** Called after W3's actual INSERT and journal initialization, before their
@@ -104,11 +124,13 @@ export class PreparedGenerationAcceptance {
     client: PoolClient,
     generationId: string,
   ): Promise<void> {
+    this.assertRunning();
     this.assertComposition(
       this.configuration.database,
       this.configuration.access,
     );
     await confirmAcceptedGeneration(scope, client, generationId);
+    this.assertRunning();
   }
 
   citation(scope: ThreadScope, passageId: string): Promise<unknown> {
