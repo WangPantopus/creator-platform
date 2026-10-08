@@ -1,0 +1,20 @@
+{
+  "kind": "isolated synthetic source review; not registry activation",
+  "database": "creator_comparison_artifact06_20261008",
+  "sourceSchemaSha256": "911ddd7ba831232970186d42d8aa5083c06f3478e59f9aae58d99ad02929be54",
+  "applied": [
+    {
+      "label": "w3_comparison_samples",
+      "sha256": "49b4fbcf308833c2ff0ede97fad20926ea98eabe8a9d2a1abb279a55662c3a4d"
+    },
+    {
+      "label": "w3_comparison_privacy",
+      "sha256": "81d9ebedb8346808b32e560ffbd6246f89443423bc267d02f89f6e84465b5bc0"
+    },
+    {
+      "label": "comparison_export_artifacts",
+      "sha256": "3b7be7947b655831f9c10dfb08d96fbab826e0f484506d98fa33aff374b0d8bd"
+    }
+  ],
+  "observedAt": "2026-10-08T13:51:29.297Z"
+}

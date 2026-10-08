@@ -80,6 +80,14 @@ export interface PrivacyArtifactStore {
     binding: ArtifactBinding,
     signal: AbortSignal,
   ): AsyncIterable<Uint8Array>;
+  /** Physical removal of one exact sealed artifact. The original lifecycle
+   * owner must already deny reads and retain its durable purge work until this
+   * operation settles. This storage primitive supplies no deletion authority. */
+  remove?(
+    artifact: PrivacyArtifact,
+    binding: ArtifactBinding,
+    signal: AbortSignal,
+  ): Promise<void>;
   sweep?(): Promise<void>;
   close?(): Promise<void>;
 }

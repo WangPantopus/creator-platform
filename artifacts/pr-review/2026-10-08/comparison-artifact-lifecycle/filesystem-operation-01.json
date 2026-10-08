@@ -1,0 +1,19 @@
+{
+  "observedAt": "2026-10-08T13:41:36.993Z",
+  "kind": "synthetic filesystem source operation; no account export authority",
+  "sourceSha256": "7cc54a32dcabb013b81466db9e55d13c02900dd0dfc6fe7d93f38ca394ac7d6c",
+  "directory": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/private/files-01",
+  "operations": [
+    "wrong account refused; original verified",
+    "pre-cancelled removal refused; original verified",
+    "exact removal and repeated removal settled",
+    "surviving metadata removed after interrupted pair deletion",
+    "surviving binary removed after interrupted pair deletion",
+    "mismatched manifest refused before unlink; both files retained",
+    "same-length checksum mismatch refused; metadata retained",
+    "binary symlink refused",
+    "non-private binary refused",
+    "unrelated sealed sibling still verifies and reads"
+  ],
+  "remainingFiles": 10
+}
