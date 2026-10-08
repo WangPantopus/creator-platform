@@ -314,6 +314,7 @@ Resolve these during the design pass (proposals in the [design plan](DESIGN_PLAN
 
 | 2026-10-08 | Comparison source integration uses the original Trust worker and protected store; numbered SQL remains reserved until the preserved-data upgrade and legacy export/file lifecycle are operated. No legacy consent or source mapping is inferred from an empty export. [Evidence](../artifacts/pr-review/2026-10-08/comparison-runtime-integration/README.md). |
 | 2026-10-08 | [Preserved creator upgrade](../artifacts/pr-review/2026-10-08/comparison-creator-upgrade/README.md): operate current source-approved comparison and fresh boundary evaluation before publishing engine14. Preserve original publication and cost history through restart and rollback. One fictional case does not establish production quality; later fallback inconsistency and stale offline comparison presentation remain explicit unfinished work. |
+| 2026-10-08 | [Comparison view lifetime](../artifacts/pr-review/2026-10-08/comparison-view-lifetime/README.md): a received comparison is not offline privacy authority. Conceal results on failed current reads and revalidate on return. Immediate user-requested handoff preserves unfinished populated export/withdrawal and all full-product criteria. |
 
 ### October 8 — original export scope and legacy retention
 

@@ -1,0 +1,6 @@
+⚠ You are using a non-standard "NODE_ENV" value in your environment. This creates inconsistencies in the project and is strongly advised against. Read more: https://nextjs.org/docs/messages/non-standard-node-env
+▲ Next.js 16.3.7
+- Local:         http://127.0.0.1:3119
+- Network:       http://127.0.0.1:3119
+✓ Ready in 155ms
+✓ Running next.config.ts took 33ms
