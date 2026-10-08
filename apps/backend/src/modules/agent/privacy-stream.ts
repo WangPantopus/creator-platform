@@ -166,6 +166,7 @@ export function agentExportStream(
             client,
             source.job,
             signal,
+            snapshotRef,
           );
           heldSource = snapshot;
           invariant(

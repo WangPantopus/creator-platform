@@ -474,7 +474,14 @@ export class PreparedAgentPrivacyExport {
     client: PoolClient,
     job: PrivacyTaskInput,
     parentSignal?: AbortSignal,
+    snapshotRef = `agent-export:${randomUUID()}`,
   ): Promise<AgentPrivacyExportSource> {
+    // The stream allocates its reference before opening the held source. Bind
+    // that same metadata to capture and sealing; it grants no task authority.
+    z.string()
+      .regex(/^agent-export:[a-f0-9-]{36}$/u)
+      .parse(snapshotRef);
+    z.uuid().parse(snapshotRef.slice("agent-export:".length));
     this.assertWorker(job);
     const expected = await this.assertTask(client, job);
     await assertReviewedExport(
@@ -511,7 +518,7 @@ export class PreparedAgentPrivacyExport {
     );
     const source = Object.freeze({
       [SourceBrand]: true as const,
-      snapshotRef: `agent-export:${randomUUID()}`,
+      snapshotRef,
       creatorIds: Object.freeze([...proof.creatorIds].sort()),
     });
     this.issued.set(source, {
