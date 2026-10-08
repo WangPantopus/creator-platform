@@ -44,6 +44,23 @@ sanitization and source mapping are implementation work, not qualified replay.
 The comparison consumer also needs to refuse retained evidence when its
 original trusted feed is disconnected. All ten milestones below remain open.
 
+PR #339 merged at `2c1bc9f5605381469d585998a61a4de97ecc4dd5` with all eleven
+reviewed-head checks passing; both #338 and #339 have all five post-merge jobs passing.
+The [comparison lifecycle source increment](../../artifacts/pr-review/2026-10-08/comparison-consent-lifecycle/README.md)
+now has isolated PostgreSQL withdrawal/expiry/export evidence. Its new storage
+and privacy adapter remain unregistered. Consent, actual sanitization, original
+provider admission, saved-export invalidation and complete consumer fences remain
+prerequisites; none of the ten milestones below is closed by this source review.
+
+The same milestone also repairs three actual creator export failures: stable
+reviewed metadata rendering, Media's own held task binding, and bounded128-row
+Conversation pages within the original45s deadline. The original account request
+now completes all eight domains, and all four streamed UI downloads match their
+saved checksums. Publication and all18 generation/69 usage records remain exact.
+This is bounded creator-account evidence, not populated media or mature deletion.
+Repair the observed expired-verification download UX while continuing the producer.
+
+
 ## Refreshed starting point
 
 - Continuation branch: `codex/shadow-evidence-lifetime-20261008`, retaining

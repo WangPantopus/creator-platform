@@ -1,0 +1,47 @@
+{
+  "hash": "49b4fbcf308833c2ff0ede97fad20926ea98eabe8a9d2a1abb279a55662c3a4d",
+  "results": [
+    {
+      "mode": "withdraw",
+      "pass": true
+    },
+    {
+      "mode": "processor",
+      "pass": true
+    },
+    {
+      "mode": "memory",
+      "pass": true
+    },
+    {
+      "mode": "message",
+      "pass": true
+    },
+    {
+      "mode": "off_record",
+      "pass": true
+    },
+    {
+      "mode": "unrelated_creator_preserved",
+      "pass": true
+    },
+    {
+      "mode": "contention_rolls_back_then_real_retry_succeeds",
+      "pass": true
+    },
+    {
+      "mode": "actual_wall_clock_expiry",
+      "pass": true,
+      "purged": {
+        "consents_deleted": 1,
+        "samples_deleted": 1,
+        "cache_deleted": 0,
+        "results_cleared": 0
+      }
+    },
+    {
+      "mode": "runtime_cannot_call_expiry",
+      "pass": true
+    }
+  ]
+}

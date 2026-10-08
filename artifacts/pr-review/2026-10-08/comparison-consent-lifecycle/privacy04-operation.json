@@ -1,0 +1,30 @@
+{
+  "results": [
+    {
+      "case": "direct_sample_read_denied",
+      "pass": true
+    },
+    {
+      "case": "unfenced_export_empty",
+      "pass": true
+    },
+    {
+      "case": "original_fenced_export_includes_both_collections_and_excludes_other_family",
+      "pass": true,
+      "pages": 4,
+      "sourceCounts": {
+        "consents": 1,
+        "samples": 1
+      }
+    },
+    {
+      "case": "new_deletion_cannot_bypass_original_due_boundary",
+      "pass": true
+    },
+    {
+      "case": "actual_elapsed_lease_refuses_commit",
+      "pass": true
+    }
+  ],
+  "observedAt": "2026-10-08T12:44:55.566Z"
+}

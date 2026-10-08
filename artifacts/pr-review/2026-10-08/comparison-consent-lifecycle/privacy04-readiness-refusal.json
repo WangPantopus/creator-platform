@@ -1,0 +1,7 @@
+{
+  "scope": "Only the application registration refusal; not a prepared owner or consent",
+  "case": "pending_source_cannot_prepare_runtime_authority",
+  "expectedError": "reviewed_migration_unavailable",
+  "pass": true,
+  "observedAt": "2026-10-08T12:45:54.449Z"
+}
