@@ -6,10 +6,13 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
-import java.net.HttpURLConnection
-import java.net.URL
 import java.io.IOException
 import java.util.UUID
+import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.suspendCancellableCoroutine
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 
 @Serializable data class ConversationMessage(
     val id: String, val threadId: String, val authorKind: APIMessageAuthorKind, val text: String,
@@ -57,7 +60,7 @@ fun ConversationMessage.authorLabel(name: String): String = if (correction != nu
 )
 @Serializable data class ConversationProvider(val name: String, val termsUrl: String, val noTraining: Boolean, val noRetention: Boolean)
 @Serializable data class ConversationPolicy(val version: String, val providers: List<ConversationProvider>, val verified: Boolean, val reference: String? = null)
-@Serializable data class ConversationCapabilities(val providers: ConversationPolicy? = null, val consentAvailable: Boolean, val generationAvailable: Boolean, val accessDisclosure: String, val developmentSynthetic: Boolean = false)
+@Serializable data class ConversationCapabilities(val providers: ConversationPolicy? = null, val consentAvailable: Boolean, val generationAvailable: Boolean, val accessDisclosure: String, val developmentSynthetic: Boolean = false, val comparisonsAvailable: Boolean = false)
 @Serializable data class ConversationMemory(val id: String, val kind: String, val text: String, val provenanceMessageId: String, val sensitiveCategory: String? = null, val state: String, val editedByFan: Boolean, val createdAt: String)
 @Serializable data class ConversationMemories(val revision: Long, val offTheRecord: Boolean, val introShared: Boolean, val items: List<ConversationMemory>)
 @Serializable data class ConversationAudit(val id: String, val readerAccountId: String, val role: String, val readAt: String)
@@ -65,30 +68,50 @@ fun ConversationMessage.authorLabel(name: String): String = if (correction != nu
 @Serializable data class ConversationUsageDay(val day: String, val seconds: Double, val companionSeconds: Double)
 class ConversationFailure(val status: Int, override val message: String) : Exception(message)
 
+private object ConversationTransport {
+    val http = OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS)
+        .followRedirects(false).followSslRedirects(false).retryOnConnectionFailure(false).build()
+}
+
 /** Uses W1's encrypted credential supplier and disables HTTP response caching. */
 class ConversationClient(private val baseURL: String, private val token: () -> String?, private val expectedAccountId: String?) {
     val json = Json { ignoreUnknownKeys = true }
     suspend fun request(path: String, body: JsonObject? = null, publicRead: Boolean = false): JsonElement = withContext(Dispatchers.IO) {
         if (!publicRead && expectedAccountId == null) throw ConversationFailure(401, "Reopen this page with your current account.")
         val credential = if (publicRead) null else token() ?: throw ConversationFailure(401, "Your session ended. Continue with Pantopus again.")
-        val connection = URL(baseURL.trimEnd('/') + "/v1/conversations/" + path).openConnection() as HttpURLConnection
+        val timeout = if (body != null && path.endsWith("/comparison")) 65L else 15L
+        val builder = Request.Builder().url(baseURL.trimEnd('/') + "/v1/conversations/" + path)
+            .header("Accept", "application/json").header("X-Correlation-Id", UUID.randomUUID().toString())
+        credential?.let { builder.header("Authorization", "Bearer $it") }
+        if (!publicRead) builder.header("X-Expected-Account-Id", expectedAccountId!!)
+        if (body != null) builder.post(body.toString().toRequestBody("application/json".toMediaType()))
+        val call = ConversationTransport.http.newBuilder().readTimeout(timeout, TimeUnit.SECONDS)
+            .callTimeout(timeout, TimeUnit.SECONDS).build().newCall(builder.build())
         try {
-            connection.connectTimeout = 10000; connection.readTimeout = 15000; connection.useCaches = false
-            connection.requestMethod = if (body == null) "GET" else "POST"
-            connection.setRequestProperty("Accept", "application/json")
-            connection.setRequestProperty("X-Correlation-Id", UUID.randomUUID().toString())
-            credential?.let { connection.setRequestProperty("Authorization", "Bearer $it") }
-            if (!publicRead) connection.setRequestProperty("X-Expected-Account-Id", expectedAccountId)
-            if (body != null) {
-                connection.doOutput = true; connection.setRequestProperty("Content-Type", "application/json")
-                connection.outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
+            val (status, text) = suspendCancellableCoroutine<Pair<Int, String>> { continuation ->
+                continuation.invokeOnCancellation { call.cancel() }
+                call.enqueue(object : Callback {
+                    override fun onFailure(call: Call, error: IOException) { continuation.resumeWith(Result.failure(error)) }
+                    override fun onResponse(call: Call, response: Response) {
+                        try {
+                            val result = response.use {
+                                val output = java.io.ByteArrayOutputStream()
+                                response.body?.byteStream()?.use { stream ->
+                                    val buffer = ByteArray(8192)
+                                    while (true) {
+                                        if (!continuation.isActive) throw java.io.InterruptedIOException("Conversation request cancelled")
+                                        val count = stream.read(buffer); if (count < 0) break
+                                        if (output.size() + count > 1_000_000) throw ConversationFailure(503, "This conversation response is too large. Refresh to try again.")
+                                        output.write(buffer, 0, count)
+                                    }
+                                }
+                                response.code to output.toString("UTF-8")
+                            }
+                            continuation.resumeWith(Result.success(result))
+                        } catch (error: Exception) { continuation.resumeWith(Result.failure(error)) }
+                    }
+                })
             }
-            val status = connection.responseCode
-            val text = (if (status in 200..299) connection.inputStream else connection.errorStream)?.use { stream ->
-                val output=java.io.ByteArrayOutputStream();val buffer=ByteArray(8192)
-                while(true) { val count=stream.read(buffer);if(count<0) break;if(output.size()+count>1_000_000) throw ConversationFailure(503,"This conversation response is too large. Refresh to try again.");output.write(buffer,0,count) }
-                output.toString("UTF-8")
-            }.orEmpty()
             coroutineContext.ensureActive()
             if (!publicRead && token() != credential) throw ConversationFailure(401,"Your account changed. Open this conversation again.")
             val value = runCatching { json.parseToJsonElement(text) }.getOrNull()
@@ -100,7 +123,7 @@ class ConversationClient(private val baseURL: String, private val token: () -> S
         } catch (failure: IOException) {
             coroutineContext.ensureActive()
             throw ConversationFailure(503, "Reconnect to refresh. Your input is kept.")
-        } finally { connection.disconnect() }
+        } finally { call.cancel() }
     }
     suspend fun page(path: String): ConversationPage = json.decodeFromJsonElement(request(path))
     suspend fun replay(path: String, cursor: Long): List<APIFrame> = json.decodeFromJsonElement(request("$path/events?cursor=$cursor"))

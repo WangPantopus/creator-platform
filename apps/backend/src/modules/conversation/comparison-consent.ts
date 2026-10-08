@@ -1,15 +1,21 @@
 import type { PoolClient } from "pg";
-import { z } from "zod";
 import type { Database } from "../../db/database.js";
 import { invariant } from "../../core/errors.js";
 import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 
-export const ComparisonPolicySchema = z.strictObject({
-  version: z.string().trim().min(1).max(120),
-  notice: z.string().trim().min(1).max(4000),
-  processorPolicyVersion: z.string().trim().min(1).max(120),
-});
-export type ComparisonPolicy = z.infer<typeof ComparisonPolicySchema>;
+import {
+  ComparisonPolicySchema,
+  ComparisonConsentInputSchema,
+  type ComparisonPolicy,
+  type ComparisonConsentState,
+} from "../../../../../packages/api/src/conversation/contracts.js";
+import { z } from "zod";
+export {
+  ComparisonPolicySchema,
+  ComparisonConsentInputSchema,
+  type ComparisonPolicy,
+  type ComparisonConsentState,
+} from "../../../../../packages/api/src/conversation/contracts.js";
 
 /** Comparison is a distinct purpose. Reply feedback, ordinary processor
  * consent and creator access to a thread do not opt a fan into this use.
@@ -26,22 +32,6 @@ export interface ComparisonConsentAuthority {
     policyVersion: string,
   ): Promise<{ policy: ComparisonPolicy; expiresAt: string }>;
 }
-
-export const ComparisonConsentInputSchema = z.discriminatedUnion("action", [
-  z.strictObject({
-    action: z.literal("allow"),
-    policyVersion: z.string().trim().min(1).max(120),
-    consent: z.literal(true),
-  }),
-  z.strictObject({ action: z.literal("withdraw") }),
-]);
-
-export type ComparisonConsentState = Readonly<{
-  policy: ComparisonPolicy | null;
-  allowed: boolean;
-  consentedAt: string | null;
-  expiresAt: string | null;
-}>;
 
 /** Created by the reviewed comparison host only after its complete storage,
  * invalidation, export/deletion and physical expiry owners are ready. It has

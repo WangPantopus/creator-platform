@@ -26,6 +26,37 @@ export const ProviderPolicySchema = z.strictObject({
   verified: z.boolean(),
 });
 export type ProviderPolicy = z.infer<typeof ProviderPolicySchema>;
+/** Separate fan choice for creator AI comparisons; no feedback or provider alias. */
+export const ComparisonPolicySchema = z.strictObject({
+  version: z.string().trim().min(1).max(120),
+  notice: z.string().trim().min(1).max(4000),
+  processorPolicyVersion: z.string().trim().min(1).max(120),
+});
+export type ComparisonPolicy = z.infer<typeof ComparisonPolicySchema>;
+export const ComparisonConsentInputSchema = z.discriminatedUnion("action", [
+  z.strictObject({
+    action: z.literal("allow"),
+    policyVersion: z.string().trim().min(1).max(120),
+    consent: z.literal(true),
+  }),
+  z.strictObject({ action: z.literal("withdraw") }),
+]);
+export type ComparisonConsentInput = z.infer<
+  typeof ComparisonConsentInputSchema
+>;
+export const ComparisonConsentStateSchema = z.strictObject({
+  policy: ComparisonPolicySchema.nullable(),
+  allowed: z.boolean(),
+  consentedAt: z.iso.datetime().nullable(),
+  expiresAt: z.iso.datetime().nullable(),
+});
+export type ComparisonConsentState = z.infer<
+  typeof ComparisonConsentStateSchema
+>;
+export const ComparisonQuestionResultSchema = z.strictObject({
+  included: z.boolean(),
+});
+
 export const BeginConversationSchema = z.strictObject({
   creatorId: IdSchema,
   policyVersion: z.string().max(120),

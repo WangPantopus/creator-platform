@@ -1,0 +1,202 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project apps/ios/QelvoraApp.xcodeproj -scheme QelvoraApp -destination "platform=iOS Simulator,id=D5ED8A7C-924E-4F1E-AC35-DB0FACF1E1B0" -derivedDataPath /Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-build -resultBundlePath /Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-comparison-01.xcresult "-only-testing:QelvoraUITests/ConnectedJourneyTests/testComparisonChoiceAndQuestion" test-without-building
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  swift-custom-dump: https://github.com/pointfreeco/swift-custom-dump @ 1.7.3
+  swift-syntax: https://github.com/swiftlang/swift-syntax @ 604.0.0
+  LiveKitUniFFI: https://github.com/livekit/livekit-uniffi-xcframework.git @ 0.1.9
+  xctest-dynamic-overlay: https://github.com/pointfreeco/xctest-dynamic-overlay @ 1.13.1
+  LiveKitWebRTC: https://github.com/livekit/webrtc-xcframework.git @ 150.7871.2
+  LiveKit: https://github.com/livekit/client-sdk-swift.git @ 2.17.0
+  swift-snapshot-testing: https://github.com/pointfreeco/swift-snapshot-testing.git @ 1.19.6
+  QelvoraNative: /Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/ios
+
+Writing result bundle at path:
+	/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-comparison-01.xcresult
+
+2026-10-08 11:34:55.320851-0700 QelvoraUITests-Runner[17810:3795382] [Default] Running tests...
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'Selected tests' started at 2026-10-08 11:35:01.182.
+Test Suite 'QelvoraUITests.xctest' started at 2026-10-08 11:35:01.183.
+Test Suite 'ConnectedJourneyTests' started at 2026-10-08 11:35:01.184.
+Test Case '-[QelvoraUITests.ConnectedJourneyTests testComparisonChoiceAndQuestion]' started.
+    t =     0.00s Start Test at 2026-10-08 11:35:01.186
+    t =     0.48s Set Up
+    t =     0.51s Open com.pantopus.qelvora
+    t =     0.51s     Launch com.pantopus.qelvora
+2026-10-08 11:35:01.788 xcodebuild[17697:3794207] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-10-08 11:35:01.788 xcodebuild[17697:3794207] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     2.40s         Setting up automation session
+    t =     4.71s         Wait for com.pantopus.qelvora to idle
+    t =     6.55s Waiting 30.0s for "Me and privacy" Button to exist
+    t =     7.62s     Checking `Expect predicate `existsNoRetry == 1` for object "Me and privacy" Button`
+    t =     7.62s         Checking existence of `"Me and privacy" Button`
+    t =     7.77s Checking existence of `"comparison-options-42bb2588-b5df-4618-87ea-2fe8a90e861a" Button`
+    t =     7.83s Swipe down ScrollView (First Match)
+    t =     7.83s     Wait for com.pantopus.qelvora to idle
+    t =     7.83s     Find the ScrollView (First Match)
+    t =     7.87s     Check for interrupting elements affecting ScrollView
+    t =     7.93s     Synthesize event
+    t =     8.54s     Wait for com.pantopus.qelvora to idle
+    t =    10.64s Checking existence of `"comparison-options-42bb2588-b5df-4618-87ea-2fe8a90e861a" Button`
+    t =    10.71s Swipe down ScrollView (First Match)
+    t =    10.71s     Wait for com.pantopus.qelvora to idle
+    t =    10.72s     Find the ScrollView (First Match)
+    t =    10.76s     Check for interrupting elements affecting ScrollView
+    t =    10.83s     Synthesize event
+    t =    11.30s     Wait for com.pantopus.qelvora to idle
+    t =    13.41s Checking existence of `"comparison-options-42bb2588-b5df-4618-87ea-2fe8a90e861a" Button`
+    t =    13.48s Swipe down ScrollView (First Match)
+    t =    13.48s     Wait for com.pantopus.qelvora to idle
+    t =    13.49s     Find the ScrollView (First Match)
+    t =    13.52s     Check for interrupting elements affecting ScrollView
+    t =    13.59s     Synthesize event
+    t =    14.06s     Wait for com.pantopus.qelvora to idle
+    t =    16.17s Checking existence of `"comparison-options-42bb2588-b5df-4618-87ea-2fe8a90e861a" Button`
+    t =    16.25s Swipe down ScrollView (First Match)
+    t =    16.25s     Wait for com.pantopus.qelvora to idle
+    t =    16.28s     Find the ScrollView (First Match)
+    t =    16.32s     Check for interrupting elements affecting ScrollView
+    t =    16.40s     Synthesize event
+    t =    16.86s     Wait for com.pantopus.qelvora to idle
+    t =    18.96s Checking existence of `"comparison-options-42bb2588-b5df-4618-87ea-2fe8a90e861a" Button`
+    t =    19.02s Swipe down ScrollView (First Match)
+    t =    19.02s     Wait for com.pantopus.qelvora to idle
+    t =    19.03s     Find the ScrollView (First Match)
+    t =    19.06s     Check for interrupting elements affecting ScrollView
+    t =    19.13s     Synthesize event
+    t =    19.62s     Wait for com.pantopus.qelvora to idle
+    t =    21.72s Checking existence of `"comparison-options-42bb2588-b5df-4618-87ea-2fe8a90e861a" Button`
+    t =    21.79s Swipe down ScrollView (First Match)
+    t =    21.79s     Wait for com.pantopus.qelvora to idle
+    t =    21.80s     Find the ScrollView (First Match)
+    t =    21.83s     Check for interrupting elements affecting ScrollView
+    t =    21.92s     Synthesize event
+    t =    22.39s     Wait for com.pantopus.qelvora to idle
+    t =    24.49s Checking existence of `"comparison-options-42bb2588-b5df-4618-87ea-2fe8a90e861a" Button`
+    t =    24.56s Swipe down ScrollView (First Match)
+    t =    24.56s     Wait for com.pantopus.qelvora to idle
+    t =    24.57s     Find the ScrollView (First Match)
+    t =    24.60s     Check for interrupting elements affecting ScrollView
+    t =    24.67s     Synthesize event
+    t =    25.13s     Wait for com.pantopus.qelvora to idle
+    t =    27.23s Checking existence of `"comparison-options-42bb2588-b5df-4618-87ea-2fe8a90e861a" Button`
+    t =    27.30s Swipe down ScrollView (First Match)
+    t =    27.30s     Wait for com.pantopus.qelvora to idle
+    t =    27.31s     Find the ScrollView (First Match)
+    t =    27.35s     Check for interrupting elements affecting ScrollView
+    t =    27.45s     Synthesize event
+    t =    27.91s     Wait for com.pantopus.qelvora to idle
+    t =    30.05s Checking existence of `"comparison-options-42bb2588-b5df-4618-87ea-2fe8a90e861a" Button`
+    t =    30.14s Swipe down ScrollView (First Match)
+    t =    30.15s     Wait for com.pantopus.qelvora to idle
+    t =    30.15s     Find the ScrollView (First Match)
+    t =    30.18s     Check for interrupting elements affecting ScrollView
+    t =    30.25s     Synthesize event
+    t =    30.72s     Wait for com.pantopus.qelvora to idle
+    t =    32.82s Checking existence of `"comparison-options-42bb2588-b5df-4618-87ea-2fe8a90e861a" Button`
+    t =    32.90s Swipe down ScrollView (First Match)
+    t =    32.90s     Wait for com.pantopus.qelvora to idle
+    t =    32.91s     Find the ScrollView (First Match)
+    t =    32.94s     Check for interrupting elements affecting ScrollView
+    t =    33.02s     Synthesize event
+    t =    33.49s     Wait for com.pantopus.qelvora to idle
+    t =    35.57s Checking existence of `"comparison-options-42bb2588-b5df-4618-87ea-2fe8a90e861a" Button`
+    t =    35.66s Find the "comparison-options-42bb2588-b5df-4618-87ea-2fe8a90e861a" Button
+    t =    35.75s Swipe down ScrollView (First Match)
+    t =    35.75s     Wait for com.pantopus.qelvora to idle
+    t =    35.76s     Find the ScrollView (First Match)
+    t =    35.79s     Check for interrupting elements affecting ScrollView
+    t =    35.87s     Synthesize event
+    t =    36.38s     Wait for com.pantopus.qelvora to idle
+    t =    38.50s Checking existence of `"comparison-options-42bb2588-b5df-4618-87ea-2fe8a90e861a" Button`
+    t =    38.57s Find the "comparison-options-42bb2588-b5df-4618-87ea-2fe8a90e861a" Button
+    t =    38.67s Checking existence of `"comparison-options-42bb2588-b5df-4618-87ea-2fe8a90e861a" Button`
+    t =    38.73s Find the "comparison-options-42bb2588-b5df-4618-87ea-2fe8a90e861a" Button
+    t =    38.84s Tap "comparison-options-42bb2588-b5df-4618-87ea-2fe8a90e861a" Button
+    t =    38.84s     Wait for com.pantopus.qelvora to idle
+    t =    38.85s     Find the "comparison-options-42bb2588-b5df-4618-87ea-2fe8a90e861a" Button
+    t =    38.91s     Check for interrupting elements affecting "comparison-options-42bb2588-b5df-4618-87ea-2fe8a90e861a" Button
+    t =    38.98s     Synthesize event
+    t =    39.30s     Wait for com.pantopus.qelvora to idle
+    t =    39.78s Waiting 20.0s for "Allowed for this creator" StaticText to exist
+    t =    40.85s     Checking `Expect predicate `existsNoRetry == 1` for object "Allowed for this creator" StaticText`
+    t =    40.85s         Checking existence of `"Allowed for this creator" StaticText`
+    t =    40.90s Find the "Include this question" Button
+    t =    40.95s Find the "Include this question" Button
+    t =    41.01s Find the Target Application 'com.pantopus.qelvora'
+    t =    41.23s Added attachment named 'Comparison-choice'
+    t =    41.23s Requesting snapshot of accessibility hierarchy for app with pid 17843
+    t =    41.48s Requesting snapshot of accessibility hierarchy for app with pid 17843
+    t =    41.53s Added attachment named 'Comparison-choice-accessibility'
+    t =    41.54s Tap "Include this question" Button
+    t =    41.54s     Wait for com.pantopus.qelvora to idle
+    t =    41.55s     Find the "Include this question" Button
+    t =    41.59s     Check for interrupting elements affecting "Include this question" Button
+    t =    41.64s     Synthesize event
+    t =    41.96s     Wait for com.pantopus.qelvora to idle
+    t =    41.97s Waiting 70.0s for "A general version of this question is saved for AI comparisons. You can withdraw your choice in Me and privacy." StaticText to exist
+    t =    43.00s     Checking `Expect predicate `existsNoRetry == 1` for object "A general version of this question is saved for AI comparisons. You can withdraw your choice in Me and privacy." StaticText`
+    t =    43.00s         Checking existence of `"A general version of this question is saved for AI comparisons. You can withdraw your choice in Me and privacy." StaticText`
+    t =    43.05s Find the Target Application 'com.pantopus.qelvora'
+    t =    43.27s Added attachment named 'Comparison-question-included'
+    t =    43.27s Requesting snapshot of accessibility hierarchy for app with pid 17843
+    t =    43.50s Requesting snapshot of accessibility hierarchy for app with pid 17843
+    t =    43.55s Added attachment named 'Comparison-question-included-accessibility'
+    t =    43.55s Tap "Close" Button
+    t =    43.55s     Wait for com.pantopus.qelvora to idle
+    t =    43.57s     Find the "Close" Button
+    t =    43.62s     Check for interrupting elements affecting "Close" Button
+    t =    43.67s     Synthesize event
+    t =    44.00s     Wait for com.pantopus.qelvora to idle
+    t =    44.36s Waiting 30.0s for "Me and privacy" Button to exist
+    t =    45.44s     Checking `Expect predicate `existsNoRetry == 1` for object "Me and privacy" Button`
+    t =    45.44s         Checking existence of `"Me and privacy" Button`
+    t =    45.51s Tap "Me and privacy" Button
+    t =    45.51s     Wait for com.pantopus.qelvora to idle
+    t =    45.51s     Find the "Me and privacy" Button
+    t =    45.57s     Check for interrupting elements affecting "Me and privacy" Button
+    t =    45.63s     Synthesize event
+    t =    45.98s     Wait for com.pantopus.qelvora to idle
+    t =    46.48s Checking existence of `"Allowed for this creator" StaticText`
+    t =    46.56s Swipe up ScrollView (First Match)
+    t =    46.57s     Wait for com.pantopus.qelvora to idle
+    t =    46.58s     Find the ScrollView (First Match)
+    t =    46.64s     Check for interrupting elements affecting ScrollView
+    t =    46.70s     Synthesize event
+    t =    47.21s     Wait for com.pantopus.qelvora to idle
+    t =    49.31s Checking existence of `"Allowed for this creator" StaticText`
+    t =    49.37s Find the "Allowed for this creator" StaticText
+    t =    49.49s Checking existence of `"Allowed for this creator" StaticText`
+    t =    49.56s Find the "Allowed for this creator" StaticText
+    t =    49.65s Find the Target Application 'com.pantopus.qelvora'
+    t =    49.90s Added attachment named 'Comparison-privacy-choice'
+    t =    49.90s Requesting snapshot of accessibility hierarchy for app with pid 17843
+    t =    50.16s Requesting snapshot of accessibility hierarchy for app with pid 17843
+    t =    50.26s Added attachment named 'Comparison-privacy-choice-accessibility'
+    t =    50.26s Find the Target Application 'com.pantopus.qelvora'
+    t =    50.50s Added attachment named 'Comparison-final-state'
+    t =    50.50s Requesting snapshot of accessibility hierarchy for app with pid 17843
+    t =    50.83s Requesting snapshot of accessibility hierarchy for app with pid 17843
+    t =    50.92s Added attachment named 'Comparison-final-state-accessibility'
+    t =    50.92s Tear Down
+Test Case '-[QelvoraUITests.ConnectedJourneyTests testComparisonChoiceAndQuestion]' passed (51.295 seconds).
+Test Suite 'ConnectedJourneyTests' passed at 2026-10-08 11:35:52.482.
+	 Executed 1 test, with 0 failures (0 unexpected) in 51.295 (51.298) seconds
+Test Suite 'QelvoraUITests.xctest' passed at 2026-10-08 11:35:52.483.
+	 Executed 1 test, with 0 failures (0 unexpected) in 51.295 (51.300) seconds
+Test Suite 'Selected tests' passed at 2026-10-08 11:35:52.484.
+	 Executed 1 test, with 0 failures (0 unexpected) in 51.295 (51.302) seconds
+2026-10-08 11:35:52.887 xcodebuild[17697:3794207] [MT] IDETestOperationsObserverDebug: 64.634 elapsed -- Testing started completed.
+2026-10-08 11:35:52.887 xcodebuild[17697:3794207] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-10-08 11:35:52.887 xcodebuild[17697:3794207] [MT] IDETestOperationsObserverDebug: 64.634 sec, +64.634 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-comparison-01.xcresult
+
+** TEST EXECUTE SUCCEEDED **
+
+Testing started

@@ -340,3 +340,33 @@
   flex-wrap: wrap;
   gap: var(--space-2);
 }
+
+.comparison-choice {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.comparison-choice p {
+  margin: 0;
+}
+.comparison-sheet {
+  position: fixed;
+  inset: auto 0 0;
+  margin: auto auto 0;
+  width: min(100%, 390px);
+  max-height: 90dvh;
+  overflow-y: auto;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+.comparison-sheet::backdrop {
+  background: var(--overlay-scrim);
+}
+.comparison-question {
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--surface-sunken);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

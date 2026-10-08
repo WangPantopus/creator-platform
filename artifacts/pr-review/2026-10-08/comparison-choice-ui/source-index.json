@@ -1,0 +1,70 @@
+[
+  {
+    "path": "apps/android/app/src/androidTest/java/com/pantopus/qelvora/ConnectedJourneyTest.kt",
+    "sha256": "0364fa9f1ab819ce7026d85b53b9c0e4b640c485405012182c014323f29e7322"
+  },
+  {
+    "path": "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/ConversationClient.kt",
+    "sha256": "8655a6a5d35f2a778791f46bd1415c2425c381a271e0739876e4e32f0d0c5c3d"
+  },
+  {
+    "path": "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/ConversationComparisonChoice.kt",
+    "sha256": "ccea6c0ee19fddcb95cee82fe6aafcf538733483de6da016ef3fd559de82793f"
+  },
+  {
+    "path": "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt",
+    "sha256": "1c15a240b0d4e89157f399a439b5697886323b0301bcfa449f9d1381b7dee34e"
+  },
+  {
+    "path": "apps/backend/src/modules/conversation/comparison-consent.ts",
+    "sha256": "e601c046a65bbe4c3f061eb342e0d1188c26e23932efef2d4613c83e45b897e3"
+  },
+  {
+    "path": "apps/ios/Sources/QelvoraUI/Conversation/W3ComparisonChoice.swift",
+    "sha256": "e83d97cf9c1f28413a2ba7165595f401f0e7e8ea46a131a7db103a1a066e9f7b"
+  },
+  {
+    "path": "apps/ios/Sources/QelvoraUI/Conversation/W3ConversationClient.swift",
+    "sha256": "3df8c56409667984f1ca32f8e2a657f2a009de8c995636f186cedb444048b228"
+  },
+  {
+    "path": "apps/ios/Sources/QelvoraUI/Conversation/W3FanFeatures.swift",
+    "sha256": "d6931f34f7a2457bc3663d179878f9e96fb9196e07257cfaf965a0d6c88ff0a2"
+  },
+  {
+    "path": "apps/ios/UITests/ConnectedJourneyTests.swift",
+    "sha256": "f57ba1ae2c9617e61b32fbdfcc9e9b14def27ae7e03a5bbf5a7793990be5d328"
+  },
+  {
+    "path": "apps/web/app/api/conversations/[...path]/route.ts",
+    "sha256": "6226b414f58034fc8637ae30c822da4650130084d7919bce88f0b59e9c09bd9b"
+  },
+  {
+    "path": "apps/web/features/conversation/AccountScreen.tsx",
+    "sha256": "6bfe9aa06dd66b5b69793258102f895583b892a3afc207f3de4b88bbbd9e7a83"
+  },
+  {
+    "path": "apps/web/features/conversation/ComparisonChoice.tsx",
+    "sha256": "540a0ddb05e428f002f1eca23f25ac34487ab62d333f17e5dd0aecc349fa649f"
+  },
+  {
+    "path": "apps/web/features/conversation/ConversationScreen.tsx",
+    "sha256": "2879fd4cd87faa4701d22ea4264fb7d11672bd1961019757d015fc93cac8e339"
+  },
+  {
+    "path": "apps/web/features/conversation/api.ts",
+    "sha256": "a094bdb8cdba8c90abce7019941eed35ede20970d4f3f315ab7e5009a9855fee"
+  },
+  {
+    "path": "apps/web/features/conversation/conversation.css",
+    "sha256": "b4127b60752f984bb0b20e3dd2ec1b702c7f7acdb0b625aa5da5b0fa4ac9febf"
+  },
+  {
+    "path": "apps/web/lib/session.ts",
+    "sha256": "1a3548e73952215039ab0df607819169566b89886dbbf65879589ddd3cc52ef9"
+  },
+  {
+    "path": "packages/api/src/conversation/contracts.ts",
+    "sha256": "44b28e2ee3948e727a6d08bf97ba67cab8355dff4d1c4ea49cc7a187a879443d"
+  }
+]

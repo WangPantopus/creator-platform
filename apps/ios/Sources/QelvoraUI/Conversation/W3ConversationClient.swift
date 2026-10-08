@@ -51,7 +51,7 @@ struct W3IntroAcknowledgement: Decodable, Sendable { let acknowledged: Bool }
 struct W3FeedbackResult: Decodable, Sendable { let rating: String?; let introOffer: W3IntroOffer? }
 struct W3Provider: Decodable, Sendable { let name: String; let termsUrl: String; let noTraining: Bool; let noRetention: Bool }
 struct W3Policy: Decodable, Sendable { let version: String; let reference: String?; let providers: [W3Provider]; let verified: Bool }
-struct W3Capabilities: Decodable, Sendable { let providers: W3Policy?; let consentAvailable: Bool; let generationAvailable: Bool; let accessDisclosure: String; let developmentSynthetic: Bool? }
+struct W3Capabilities: Decodable, Sendable { let providers: W3Policy?; let consentAvailable: Bool; let generationAvailable: Bool; let accessDisclosure: String; let developmentSynthetic: Bool?; let comparisonsAvailable: Bool? }
 struct W3Memory: Decodable, Identifiable, Sendable {
     let id: String; let kind: String; let text: String; let provenanceMessageId: String
     let sensitiveCategory: String?; let state: String; let editedByFan: Bool; let createdAt: String
@@ -93,7 +93,7 @@ actor W3ConversationClient {
         var target = URLComponents(url: baseURL.appendingPathComponent("v1/conversations/" + components.path), resolvingAgainstBaseURL: false)!
         target.queryItems = components.queryItems
         var request = URLRequest(url: target.url!)
-        request.httpMethod = body == nil ? "GET" : "POST"; request.httpBody = body; request.timeoutInterval = 15
+        request.httpMethod = body == nil ? "GET" : "POST"; request.httpBody = body; request.timeoutInterval = body != nil && path.hasSuffix("/comparison") ? 65 : 15
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue(UUID().uuidString.lowercased(), forHTTPHeaderField: "X-Correlation-Id")
         let requestCredential = publicRead ? nil : try await credentials.read()

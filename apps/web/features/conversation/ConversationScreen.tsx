@@ -75,6 +75,10 @@ function SystemMessage({
   );
 }
 import "./conversation.css";
+import {
+  ComparisonQuestionSheet,
+  useComparisonsAvailable,
+} from "./ComparisonChoice";
 
 type Pending = {
   key: string;
@@ -127,6 +131,9 @@ export function ConversationScreen({
   const [page, setPage] = useState<ConversationPage | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [online, setOnline] = useState(false);
+  const comparisonsAvailable = useComparisonsAvailable(online);
+  const [comparisonQuestion, setComparisonQuestion] =
+    useState<ConversationMessage | null>(null);
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState<Pending | null>(null);
   const [busy, setBusy] = useState(false);
@@ -1035,6 +1042,19 @@ export function ConversationScreen({
                   Don’t remember this
                 </button>
               ))}
+            {comparisonsAvailable &&
+              message.authorKind === "fan" &&
+              !message.offTheRecord &&
+              !page.offTheRecord &&
+              ["accepted", "delivered"].includes(message.deliveryState) && (
+                <button
+                  className="qv-link-btn"
+                  disabled={busy || !online}
+                  onClick={() => setComparisonQuestion(message)}
+                >
+                  AI comparison options
+                </button>
+              )}
             {message.authorKind === "ai" &&
               message.agentVersion &&
               ["delivered", "interrupted"].includes(message.deliveryState) &&
@@ -1104,6 +1124,13 @@ export function ConversationScreen({
               )}
           </article>
         ))}
+        {comparisonQuestion && online && (
+          <ComparisonQuestionSheet
+            root={root}
+            message={comparisonQuestion}
+            onClose={() => setComparisonQuestion(null)}
+          />
+        )}
         {pending && (
           <div>
             <Message

@@ -1,0 +1,407 @@
+[
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/android-comparison-01.log",
+    "bytes": 74,
+    "sha256": "777e8a5aade61adfcea00a0069d9dbe1e57dc813bc29fb26230ea609dc96e323"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/android-comparison-boot-01.log",
+    "bytes": 9303,
+    "sha256": "ff9e666dc0c08b37ea6e138c290fcf6907b7c8dbdbd39a5f9054af29721c8222"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/android-comparison-build-01.log",
+    "bytes": 4206,
+    "sha256": "f8209eb19bd7a3a23c76b55c9996572d27daec4305c8c257aa15b33cda48c313"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/android-comparison-build-02.log",
+    "bytes": 4326,
+    "sha256": "ae7e7924b38dc253cf3cb3963a289190c8fec7309aa54d5b32714848a5b0bd92"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/backend-comparison-active-01.log",
+    "bytes": 2468,
+    "sha256": "2b2b5e1e1974268b95a362240502baae47fd2ca78de652f5f78871fd1416a478"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/backend-comparison-active-02.log",
+    "bytes": 376402,
+    "sha256": "390521766a8b2caa1afb2318346a95ca580f1e9cbddfba3a19a106bb7b6ec9b9"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/backend-comparison-export-diagnostic-01.log",
+    "bytes": 79808,
+    "sha256": "87df1285b846d99686a6a92119a1b1c0ea1c2b5e7a1364607f49700b8cc46bc4"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/backend-comparison-feed-01.log",
+    "bytes": 72939,
+    "sha256": "7f41dec95890163750f925b83940d9d63de96166d32806d7649e2ef210c9ea44"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/backend-comparison-privacy-01.log",
+    "bytes": 46804,
+    "sha256": "48bee56f9bfe0fd7a22f2370a264e95382daf3871d90839e8df9cdf1ca23cc77"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/backend-comparison-runtime-01.log",
+    "bytes": 190479,
+    "sha256": "40b68f2eab70b54019030bc4ecfc893b9c98284a8b34a84b83a726aa4484a316"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/check-comparison-bootstrap.mjs",
+    "bytes": 1824,
+    "sha256": "7dbf26534b1c1cd406726f8183dd5b9a05209124a784547d48e28bdcbd79afe0"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/check-comparison-existing-installer-02.mjs",
+    "bytes": 1047,
+    "sha256": "92b9ce0908f816d1ed9aa44dacd38f3dbcafe83ab0292f7d1bbfe026893a61a3"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/check-comparison-existing-installer.mjs",
+    "bytes": 1039,
+    "sha256": "97e958ddba4fb493fe7ecd065336c8e3ef570ebb5c199cbd3646585e3625172b"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-bootstrap-integration-01.log",
+    "bytes": 643,
+    "sha256": "87f2e6efbc42045e49f87772b637356f267f5987270f00645f951718184bcf00"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-existing-installer-01.log",
+    "bytes": 660,
+    "sha256": "47556f4cf6a1d3c900277e53d29b30a7321aa27727bf485901fc06d819339d88"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-existing-installer-02.log",
+    "bytes": 5274,
+    "sha256": "37baa11944e79873173a59b91739816a6630ee33fe76e2eb8d37fde1a661aa2e"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-feed-custody-observation.log",
+    "bytes": 5595,
+    "sha256": "7f0898b8a990497e255fd110bcf8ef1b1cbd91d5ec8cb90aaec354dd9d3bcc59"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-feed-guard-pr.md",
+    "bytes": 1281,
+    "sha256": "0d51bc889b022513ccdca98188448ee99d75f43796abcfb3663e07248f4084ce"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-feed-guard-studio.png",
+    "bytes": 108656,
+    "sha256": "30b1572c69ab6d0566030909d380e1939b01b5f99a2045c66f72e09f76f6cc96"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-lifecycle-pr-body.md",
+    "bytes": 1770,
+    "sha256": "aab631533bb1e294d3945a6c7f8f92ad5004147285655eb66c5ff90327fa7ac9"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-owner-typecheck-01.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-owner-typecheck-02.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-owner-typecheck-03.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-privacy-after-observation.json",
+    "bytes": 5595,
+    "sha256": "7f0898b8a990497e255fd110bcf8ef1b1cbd91d5ec8cb90aaec354dd9d3bcc59"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-privacy-before-observation.json",
+    "bytes": 5595,
+    "sha256": "7f0898b8a990497e255fd110bcf8ef1b1cbd91d5ec8cb90aaec354dd9d3bcc59"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-runtime-custody-after.log",
+    "bytes": 5595,
+    "sha256": "7f0898b8a990497e255fd110bcf8ef1b1cbd91d5ec8cb90aaec354dd9d3bcc59"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-runtime-original-export.png",
+    "bytes": 103899,
+    "sha256": "4fe6edbc877690350757532429106f8f0d3b1a97bcb761f750385fd06dde219d"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-runtime-web-export-receipt.json",
+    "bytes": 789,
+    "sha256": "2b0fcabbb13cf997753bf822d9998d1980179e5d72fceae51af5a82220cc68ab"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-wave-custody-summary.json",
+    "bytes": 5595,
+    "sha256": "7f0898b8a990497e255fd110bcf8ef1b1cbd91d5ec8cb90aaec354dd9d3bcc59"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-wave-original-thread.png",
+    "bytes": 64473,
+    "sha256": "7ea5200232d76a92ab0b3bfb5c918fc3ab700f7a5c1be1021612de9251330596"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-web-choice-allowed.png",
+    "bytes": 113692,
+    "sha256": "de98284c7456627397e7bdf6f10e69346afa4782a17b51109ed710ed56ac5bda"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison-web-question-included.png",
+    "bytes": 113755,
+    "sha256": "7234b338aaf1856e62558d83ef5e0af77d3d28e2657106ca27f31aae7042a560"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison43-android-question-01.json",
+    "bytes": 4763,
+    "sha256": "80af53b560d8306b962553af633e47916bd176b6825712b34fce7b95da0ca1a9"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison43-ios-question-01.json",
+    "bytes": 4763,
+    "sha256": "1051e741a3b83c8e96eac95a4a55ea44e510100a8fb45e614581dcd3a0b1b764"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/comparison43-web-first-question-01.json",
+    "bytes": 4763,
+    "sha256": "70a0e9c7badb91fa80042183d62bf06bc45c0cacbf8a14ee5bd15a8e6d756ec5"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-comparison-01.log",
+    "bytes": 14362,
+    "sha256": "9456ea9ab49729b7f8ff7b67c3e24a3716e189ca504b7366e22022b6da173a25"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-comparison-boot-01.log",
+    "bytes": 1467,
+    "sha256": "a9ec86c67952798f9f0682ba5e736c78daf3a489a524bcb0016b7d31e73bd886"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-comparison-build-01.log",
+    "bytes": 70264,
+    "sha256": "3ea0399607570f412ec7dfdfd5efcf501fd65649d2873e217f024bae151c3408"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-comparison-build-02.log",
+    "bytes": 116698,
+    "sha256": "cad96035b117058395e75a97809987b6803d71d0aaae64cc79f35194d0470e07"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-comparison-build-03.log",
+    "bytes": 113671,
+    "sha256": "7012d3ba0b00df7203bc9e67256cbd25dcd3fdfcfb749312d71f7e0c7b5e2400"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-comparison-resolved-build-03.json",
+    "bytes": 2129,
+    "sha256": "549f43cea39b92d9c52f52ee1d4710c8ba50bcf8177774f810ff1b2a10578a88"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/launch43-backend-comparison-active-02.mjs",
+    "bytes": 1210,
+    "sha256": "7084194a83b43f0da6ffce9118c1ad118caf5c951d6bc835ba1dd3a3e206dde4"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/launch43-backend-comparison-active.mjs",
+    "bytes": 1210,
+    "sha256": "3e57e67ff09b40d702a81e5d77608c86fc5452756af72795106d653255da4aa0"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/launch43-backend-comparison-export-diagnostic.mjs",
+    "bytes": 1165,
+    "sha256": "81c9feb2beb785ba39d86049c01c8ac01c0bd5ed5ca9e79461b6f54705812458"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/launch43-backend-comparison-feed.mjs",
+    "bytes": 848,
+    "sha256": "a2b09939d66b0455f27e1d9bc3961506c52d61f6936fd4672aec1a628c1597d7"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/launch43-backend-comparison-privacy.mjs",
+    "bytes": 848,
+    "sha256": "fc11d1b8d5d1cc65f83f7b1cb8056f2cd85369e670f557f422fd9398b58f7c8e"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/launch43-backend-comparison-runtime.mjs",
+    "bytes": 1163,
+    "sha256": "f22c5d8ddb8c00b254babadf774c5ac228bcefbfca5efd0d443af3a3ec449884"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/legacy-comparison-export-inventory43-v2.json",
+    "bytes": 2523,
+    "sha256": "eff12213e269d48fd7fb2b5586e2c11c66db5d6bf708eec7efde80765b06d175"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/legacy-comparison-export-inventory43.json",
+    "bytes": 2121,
+    "sha256": "0ee9418326fb281fd5ddbd24349c9fe4875a421531be1727d2cf71828545ce70"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/operation43-compatibility-comparison-feed-after-20261008.json",
+    "bytes": 35900,
+    "sha256": "3c0245e72a50d4d1a65ace6876e2557e68242f9b844c6b871a7bc7cc127f0c90"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/operation43-compatibility-comparison-feed-before-20261008.json",
+    "bytes": 35900,
+    "sha256": "bec7d76db7d4e124b31a90a9f6906772e97c110c189069a8cb9a8dbcd1975a1d"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/operation43-compatibility-comparison-privacy-after-20261008.json",
+    "bytes": 35900,
+    "sha256": "779d06316ff0f6466ca86a83c96d9e4c5d7ead38ff2358ad2c6d54bd3890a4db"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/operation43-compatibility-comparison-privacy-before-20261008.json",
+    "bytes": 35900,
+    "sha256": "649fd0e1e069aee72d4cccb60e1a629b8ab8385e537f4eb6009001ee27b0418f"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/operation43-compatibility-comparison-runtime-after-20261008.json",
+    "bytes": 35900,
+    "sha256": "9479a52cac0ecbed1e69e16abae96dff50b036f8b098e8ea0fce06ee57c51614"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/operation43-compatibility-comparison-runtime-before-20261008.json",
+    "bytes": 35900,
+    "sha256": "e1c27854f6e831f545580097a3ef200021edab5c06e24c45094635d639eb3881"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/operation43-compatibility-comparison-wave-after-start-20261008.json",
+    "bytes": 35900,
+    "sha256": "ffb605f271aec5345fd3b7c15a9924a9c37a9eeec6897d9f4be74289f1c2cdf5"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/operation43-compatibility-comparison-wave-before-close-20261008.json",
+    "bytes": 35900,
+    "sha256": "12bc2f2a1d6337c668a372dccda52c16a28044f13d24cea5e41191c93342cfda"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/record-comparison43.mts",
+    "bytes": 2642,
+    "sha256": "df3044931bd37ba0d92948b1855e384f9bf4d272f81af5b497a866c9a60626ea"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/review-legacy-comparisons43-v2.mts",
+    "bytes": 4362,
+    "sha256": "14e52cfb5e6a0663c398f891cbdc199c43409da0e39687bdd2c95f97267494e9"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/review-legacy-comparisons43.mts",
+    "bytes": 3924,
+    "sha256": "d4a87dd62ed7f06462a1d8e434e9b5f48763e2edba5a6aeb4e7db5c42ff67470"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/shutdown-comparison-export-diagnostic.json",
+    "bytes": 505,
+    "sha256": "1717b17d7b71cf33987c5cc50a53031693896fcc760fde29fa332ff4cf5307bf"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/shutdown-comparison-privacy-before.json",
+    "bytes": 506,
+    "sha256": "fa879574203d709630ea6d6623786bf5c128894eb7e20fc3ca0ff174a98f8b22"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/shutdown-comparison-runtime-5bd-stop.json",
+    "bytes": 503,
+    "sha256": "a99c134c6a436dc2394788058ad4ef80cbc2742de18377745f6f824a970dc0a5"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/shutdown-comparison-wave-close.json",
+    "bytes": 505,
+    "sha256": "5cc5451dd414c8887e37dc9ad82ed6f36f410f68378b2c29d50433f5c3102182"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-comparison-01-attachments/0ED104DA-D9EC-47F3-AB26-A12E9C6058E2.txt",
+    "bytes": 4717,
+    "sha256": "c2436d471dc38f0fbc6ea5cf812c724e40eeb0f042ada40933d30d6538675ab3"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-comparison-01-attachments/1ED4E0D3-7206-4085-819B-827B12DC5F1C.txt",
+    "bytes": 7940,
+    "sha256": "89a4190df77780231aa8f1cbb933db3cc5be3fdf2c637427a27b7887bc0ded3e"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-comparison-01-attachments/375250BB-1617-4D64-9D0B-708BE09DC9E1.txt",
+    "bytes": 4517,
+    "sha256": "e160677341e24f4f0b87d12efe9eca5cf51d8a9608ccd5819e585777ac7970d4"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-comparison-01-attachments/5AFDA149-FD29-4285-8DAB-CC278FE69CDA.png",
+    "bytes": 377690,
+    "sha256": "e36a53a2621929573a8dcba1559302a13d7f84ae7f1e6d4a194a08053a42fbb8"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-comparison-01-attachments/766EC172-7EBC-4A07-8644-CCFF3A106B99.png",
+    "bytes": 366746,
+    "sha256": "3f22b302c80a7bb06d47a4d3eb43eea03ae0dfbca96156ef24e0080e7014e3a8"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-comparison-01-attachments/A1862791-E435-486F-A6E3-A51AEAB80B9D.txt",
+    "bytes": 7940,
+    "sha256": "fde4d1e7abb27fc1446793a3b537b407477737bfaff045d95b94ea0f66db381c"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-comparison-01-attachments/B6030F56-7E09-4D41-B4E0-CAAD75025F76.png",
+    "bytes": 362511,
+    "sha256": "af5b3055f2205aaaf4deadd6d8c3829ae6713f1a1304ae11832c6d4ec468bd38"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-comparison-01-attachments/EE8255FA-09BC-4D46-8D26-D62307235004.png",
+    "bytes": 362498,
+    "sha256": "5fea41c182549dcef3078a86f6d3a4a2c3ce5c5d8d2e17ada60c81aa016ec51a"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-comparison-01-attachments/manifest.json",
+    "bytes": 3843,
+    "sha256": "c970a1fe07271486725d82d045ef4c4f7a9bbbc12f65fef277be3967348f876a"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/android-comparison-01-attachments/1791484739936-comparison-choice-accessibility.txt",
+    "bytes": 5603,
+    "sha256": "381d540ca351d7850fcb350295db49847d7a4006906af4aa19b83ca965018dec"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/android-comparison-01-attachments/1791484739936-comparison-choice.png",
+    "bytes": 287485,
+    "sha256": "543cd7f5d24b359c67d1f6998903d2c3d8e5f12701eb92cbd161cde6de192377"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/android-comparison-01-attachments/1791484741398-comparison-question-included-accessibility.txt",
+    "bytes": 5937,
+    "sha256": "01aff33f8a6a2cf8a598e950fa95b20b362f5f1006420ec2d6394237e844ea05"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/android-comparison-01-attachments/1791484741398-comparison-question-included.png",
+    "bytes": 300822,
+    "sha256": "b2d311e9636ddcef7e8984280af9c025fb153b761715ca2b4e390a3b01881fe9"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/android-comparison-01-attachments/1791484744529-comparison-privacy-choice-accessibility.txt",
+    "bytes": 6467,
+    "sha256": "6b18efd8133377e300dece957944c159f1f98ef4dd80e6960d75cc05df75bebd"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/android-comparison-01-attachments/1791484744529-comparison-privacy-choice.png",
+    "bytes": 259197,
+    "sha256": "27612cb7b18eb62fc28079e6a84070cd320f6b4bc7462517ca09284be6b38e6c"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/android-comparison-01-attachments/1791484744991-comparison-final-state-accessibility.txt",
+    "bytes": 7707,
+    "sha256": "2e7ed6588c0dedd077a4a8d1ac00f78dd3c2b60bb92c3616c23f686fadd1a59c"
+  },
+  {
+    "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/android-comparison-01-attachments/1791484744991-comparison-final-state.png",
+    "bytes": 259197,
+    "sha256": "27612cb7b18eb62fc28079e6a84070cd320f6b4bc7462517ca09284be6b38e6c"
+  }
+]

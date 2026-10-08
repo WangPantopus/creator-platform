@@ -20,6 +20,8 @@ export async function conversationRequest<T>(
   expectedSessionId?: string,
 ): Promise<T> {
   signal?.throwIfAborted();
+  const timeout =
+    body !== undefined && path.endsWith("/comparison") ? 65_000 : 10_000;
   const response = await fetch(`/api/conversations/${path}`, {
     method: body === undefined ? "GET" : "POST",
     cache: "no-store",
@@ -35,7 +37,7 @@ export async function conversationRequest<T>(
       ...(body === undefined ? {} : { "Content-Type": "application/json" }),
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
-    signal: signal ?? AbortSignal.timeout(10000),
+    signal: signal ?? AbortSignal.timeout(timeout),
   });
   const data = await response.json();
   signal?.throwIfAborted();
@@ -67,7 +69,11 @@ export function useConversationRequest() {
           body,
           AbortSignal.any([
             signal,
-            AbortSignal.timeout(10000),
+            AbortSignal.timeout(
+              body !== undefined && path.endsWith("/comparison")
+                ? 65_000
+                : 10_000,
+            ),
             ...(requestSignal ? [requestSignal] : []),
           ]),
           accountId,

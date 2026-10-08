@@ -23,6 +23,12 @@ W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan expor
 
 ## Implementation continuation
 
+- [~] October 8, 2026: separate comparison choice/question controls pass real web,
+  iOS simulator and Android emulator Light journeys. One actual sample and two
+  settled provider calls are retained; native repeats reuse it. New export sealing
+  exposed a source-reference mismatch; export/withdrawal, Night/accessibility and
+  preserved-version upgrade remain open. [Evidence](../artifacts/pr-review/2026-10-08/comparison-choice-ui/README.md).
+
 - [~] October 8, 2026: activate the exact comparison graph through the original
   closed populated migration/restore chain and launch the real composed host.
   Existing browser conversation and all prior history remain intact. Actual

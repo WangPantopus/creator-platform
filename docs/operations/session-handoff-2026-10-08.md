@@ -1,5 +1,28 @@
 # Session handoff — October 8, 2026
 
+## Active continuation — real comparison choice and question
+
+Continue on `codex/comparison-choice-ui-20261008` in637b. The
+[three-app increment](../../artifacts/pr-review/2026-10-08/comparison-choice-ui/README.md)
+has actual web/iOS/Android Light evidence. Explicit fictional fan choice and one
+selected question produced one scrubbed sample, two real completed provider calls,
+921 microdollars and two settled holds; native repetitions reused the same sample.
+Original69 generation usage rows/hash and revision13 publication remain unchanged.
+Both native devices are stopped, preserving data. Backend compileda2fccdc1b runs
+on57304 and web3119 serves current UI. No withdrawal or upgrade has occurred.
+
+The new fan export requested18:37UTC completes seven domains; Agent sealing fails
+because stream/source snapshot references differ. Preserve that failure and later
+55P03 task-fence conflicts, bind one original reference, restart normally, retry
+the same job through UI, verify downloads, then operate withdrawal/physical purge.
+Keep every completion criterion in the full finish plan. The original mature
+deletion time and unknown-cost holds remain unchanged.
+
+PR347 merged289f79e11 with all11 exact-head checks passed;348 now targets main.
+PR349 includes the ordinary-bootstrap fix8f4a8f054; its two backend checks now pass.
+Refresh remaining PR checks and separate main workflows before merging.
+
+
 ## Active continuation — original populated comparison wave
 
 Continue on `codex/comparison-closed-wave-20261008` in637b. The

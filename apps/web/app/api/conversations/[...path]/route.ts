@@ -5,7 +5,7 @@ import { sameRequestOrigin } from "../../../../lib/request-origin";
 
 const uuid = "[a-f0-9-]{36}";
 const permitted = new RegExp(
-  `^(?:capabilities|account|realtime-ticket|begin|${uuid}/${uuid}(?:/(?:events|offline|intro-offer(?:/acknowledgement)?|memory(?:/${uuid})?|preferences|consent|presence|usage|messages|audit|fan-replies|team-replies|recordings|citations/${uuid}|messages/${uuid}(?:/dont-remember|/feedback|/corrections)?|messages/status(?:/[^/]{8,128})?))?)$`,
+  `^(?:capabilities|account|realtime-ticket|begin|${uuid}/${uuid}(?:/(?:events|offline|intro-offer(?:/acknowledgement)?|memory(?:/${uuid})?|preferences|consent|comparison-consent|presence|usage|messages|audit|fan-replies|team-replies|recordings|citations/${uuid}|messages/${uuid}(?:/dont-remember|/feedback|/comparison|/corrections)?|messages/status(?:/[^/]{8,128})?))?)$`,
   "u",
 );
 async function proxy(
@@ -64,7 +64,9 @@ async function proxy(
         );
       // Both fetches read the same request's immutable HttpOnly cookie. The
       // header never selects an actor or expands the upstream thread scope.
-      const current = await platformFetch("/v1/identity/session");
+      const current = await platformFetch("/v1/identity/session", {
+        signal: req.signal,
+      });
       if (!current.ok)
         return Response.json(await current.json(), {
           status: current.status,
@@ -99,6 +101,7 @@ async function proxy(
       `/v1/conversations${joined === "begin" ? "" : "/" + joined}${req.nextUrl.search}`,
       {
         method: req.method,
+        signal: req.signal,
         headers: {
           "X-Correlation-Id":
             req.headers.get("x-correlation-id") ?? crypto.randomUUID(),
@@ -123,6 +126,7 @@ async function proxy(
             }),
       },
       joined !== "capabilities",
+      req.method === "POST" && joined.endsWith("/comparison") ? 65_000 : 10_000,
     );
     const data = await upstream.json();
     if (joined === "realtime-ticket" && upstream.ok) {

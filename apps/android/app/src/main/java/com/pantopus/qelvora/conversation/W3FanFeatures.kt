@@ -21,6 +21,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -105,6 +106,13 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     var busy by remember(root, accountId) { mutableStateOf(false) }
     var introOfferId by remember(root, accountId) { mutableStateOf<String?>(null) }
     var privacy by remember(root, accountId) { mutableStateOf(false) }
+    var comparisonQuestion by remember(root, accountId) { mutableStateOf<ConversationMessage?>(null) }
+    var comparisonsAvailable by remember(client) { mutableStateOf(false) }
+    LaunchedEffect(client, offline) {
+        comparisonsAvailable = false
+        if (!offline) try { comparisonsAvailable = client.json.decodeFromJsonElement<ConversationCapabilities>(client.request("capabilities", publicRead = true)).comparisonsAvailable }
+        catch (failure: Exception) { if (failure is CancellationException) throw failure }
+    }
     var source by remember(root, accountId) { mutableStateOf<Pair<String,String>?>(null) }
     val lifecycleOwner = LocalLifecycleOwner.current
     var foreground by remember { mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
@@ -132,7 +140,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             foreground = lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
             if (!foreground) {
                 viewRun++; offlineShowing = false; transportReady = false; offline = true
-                page = null; older = emptyList(); before = null; gate = null; source = null
+                page = null; older = emptyList(); before = null; gate = null; source = null; comparisonQuestion = null
                 offlineContext?.let { ConversationOfflineStorage.purge(it) }; offlineContext = null
             }
         }
@@ -142,10 +150,10 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             offlineContext?.let { ConversationOfflineStorage.purge(it) }; offlineContext = null
         }
     }
-    LaunchedEffect(root,foreground,privacy,page?.threadId) {
+    LaunchedEffect(root,foreground,privacy,comparisonQuestion != null,page?.threadId) {
         if (page != null) {
             suspend fun pulse(active: Boolean) { try { client.request("$root/presence",buildJsonObject { put("clientId",presenceId);put("active",active) }) } catch(failure:Exception) { if(failure is CancellationException) throw failure } }
-            if (!foreground || privacy) pulse(false)
+            if (!foreground || privacy || comparisonQuestion != null) pulse(false)
             else while (true) { pulse(true);delay(20000) }
         }
     }
@@ -158,18 +166,18 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         if (run != viewRun || !foreground || privacy || !offlineShowing) return
         val current = page
         if (snapshot == null || (current != null && (snapshot.page.cursor < current.cursor || snapshot.page.epoch < current.epoch || snapshot.page.revision < current.revision))) { conceal(); return }
-        page = snapshot.page; older = emptyList(); before = null; gate = null; source = null
+        page = snapshot.page; older = emptyList(); before = null; gate = null; source = null; comparisonQuestion = null
     }
     suspend fun renewOffline() {
         val current = page ?: return
         val lease = offlineContext ?: return
         val run = viewRun
-        if (!foreground || privacy || !transportReady || current.offTheRecord || !current.consentCurrent) return
+        if (!foreground || privacy || comparisonQuestion != null || !transportReady || current.offTheRecord || !current.consentCurrent) return
         val started = SystemClock.elapsedRealtime()
         try {
             val value = client.request("$root/offline")
             val snapshot = client.json.decodeFromJsonElement<ConversationOfflineSnapshot>(value)
-            if (run != viewRun || !foreground || privacy || !transportReady || page?.cursor != snapshot.page.cursor || page?.epoch != snapshot.page.epoch || page?.revision != snapshot.page.revision) return
+            if (run != viewRun || !foreground || privacy || comparisonQuestion != null || !transportReady || page?.cursor != snapshot.page.cursor || page?.epoch != snapshot.page.epoch || page?.revision != snapshot.page.revision) return
             val saved = withContext(Dispatchers.IO) { ConversationOfflineStorage.save(value.toString().toByteArray(Charsets.UTF_8), lease, started) }
             if (!saved && offlineContext == lease) offlineContext = null
         } catch (failure: Exception) {
@@ -186,14 +194,14 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     }
     suspend fun refresh(propagateFailure: Boolean = false) {
         val run = viewRun
-        if (!foreground || privacy) return
+        if (!foreground || privacy || comparisonQuestion != null) return
         try {
             if (!resumeActivated) {
                 try { resumeStorage.activate(accountId) } catch (failure: Exception) { if (failure is CancellationException) throw failure }
                 resumeActivated = true
             }
             val fresh = client.page(root)
-            if (run != viewRun || !foreground || privacy) return
+            if (run != viewRun || !foreground || privacy || comparisonQuestion != null) return
             if (fresh.cursor >= (page?.cursor ?: 0) && fresh.epoch >= (page?.epoch ?: 0) && fresh.revision >= (page?.revision ?: 0)) {
                 offlineShowing = false; page = fresh; if (before == null && older.isEmpty()) before = fresh.before
                 gate = ThreadDeliveryGate(fresh.threadId, fresh.cursor, fresh.epoch, fresh.generationSequences)
@@ -206,8 +214,8 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             if (propagateFailure) throw failure
         }
     }
-    LaunchedEffect(baseURL, root, accountId, foreground, privacy) {
-        if (!foreground || privacy) {
+    LaunchedEffect(baseURL, root, accountId, foreground, privacy, comparisonQuestion != null) {
+        if (!foreground || privacy || comparisonQuestion != null) {
             viewRun++; offlineContext?.let { ConversationOfflineStorage.purge(it) }; offlineContext = null
             offlineShowing = false; conceal(); return@LaunchedEffect
         }
@@ -242,9 +250,9 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         } catch (failure: Throwable) { val uncertain = failure !is ConversationFailure || failure.status >= 500 || failure.status == 409; pending = item.copy(uncertain = uncertain, rejected = !uncertain); fail(failure) }
         finally { busy = false }
     }
-    LaunchedEffect(baseURL, root, accountId, foreground, privacy, connectionRetry) {
+    LaunchedEffect(baseURL, root, accountId, foreground, privacy, comparisonQuestion != null, connectionRetry) {
         transportReady = false; offline = true
-        if (!foreground || privacy) return@LaunchedEffect
+        if (!foreground || privacy || comparisonQuestion != null) return@LaunchedEffect
         var backoff = 1000L
         while (isActive) {
             try {
@@ -282,6 +290,18 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     if (privacy) {
         ConversationPrivacy(client, root, onBack = { privacy = false }, onData = { session.open("/support/privacy") }, onSupport = { session.open("/support") })
         return
+    }
+    comparisonQuestion?.let { question ->
+        androidx.compose.ui.window.Dialog(onDismissRequest = { comparisonQuestion = null }) {
+            Column(Modifier.background(qColor("surface"), RoundedCornerShape(24.dp)).padding(20.dp)) {
+                BasicText("AI comparisons", style = qText("display-lg").copy(color = qColor("ink")))
+                LazyColumn(Modifier.weight(1f, fill = false), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    item { BasicText("Your question", style = qText("data-sm").copy(color = qColor("ink"))); BasicText(question.text, style = qText("body").copy(color = qColor("ink"))) }
+                    item { ConversationComparisonChoice(client, root, question.id) }
+                }
+                Button("Close", variant = ButtonVariant.QUIET) { comparisonQuestion = null }
+            }
+        }
     }
     source?.let { passage -> Dialog(onDismissRequest = { source = null }) {
         Column(Modifier.background(qColor("ground")).padding(16.dp)) {
@@ -360,7 +380,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 if (scrollControls) item { Column { header() } }
                 item(key = "intro-offer") {
                     NativeIntroOffer(client, root, session, introOfferId, current.feedbackPolicy != null,
-                        enabled = !busy && !offline && foreground && !privacy && source == null)
+                        enabled = !busy && !offline && foreground && !privacy && comparisonQuestion == null && source == null)
                 }
                 item { BasicText("Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.", style = qText("caption").copy(color = qColor("ink"))) }
                 if (offline) item { Notice(title = "You're offline", children = "Saved conversation is available briefly while its reading permission is current. Reconnect to send.") }
@@ -372,6 +392,9 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 } } }
                 items(older.filter { old -> current.messages.none { it.id == old.id } } + current.messages, key = { it.id }) { message ->
                     if (message.recording == null) ConversationMessageRow(message, current.creatorName, current.control, creatorId = current.creatorId, onLink = { session.open(it) }, connected = !offline && foreground, original = (older + current.messages).firstOrNull { it.id == message.correction?.originalMessageId && it.version == message.correction.originalVersion && it.authorKind == APIMessageAuthorKind.AI }, onOriginal = { message.correction?.let { correction -> scope.launch { try { val original = client.json.decodeFromJsonElement<ConversationMessage>(client.request("$root/messages/${correction.originalMessageId}")); if (original.id != correction.originalMessageId || original.version != correction.originalVersion || original.authorKind != APIMessageAuthorKind.AI) throw ConversationFailure(409, "The original reply changed."); source = "Original AI reply · version ${original.version}" to original.text } catch (failure: Throwable) { fail(failure) } } } }, onVerify = { message.signedActId?.let { session.open("/verify/$it") } }, onReport = { session.open("/support?creatorId=$creatorId" + if (message.authorKind == APIMessageAuthorKind.AI) "&messageId=${message.id}" else "") }, onForget = if (busy || offline) null else { { scope.launch { busy=true;try { client.request("$root/messages/${message.id}/dont-remember",buildJsonObject { put("expectedRevision",current.revision) });refresh() } catch(failure:Throwable) { fail(failure) } finally {busy=false} } } }, onCitation = { id -> scope.launch { try { val passage = client.request("$root/citations/$id").jsonObject; source = passage["title"]?.jsonPrimitive?.content.orEmpty() to passage["text"]?.jsonPrimitive?.content.orEmpty() } catch (failure: Throwable) { fail(failure) } } })
+                    if (comparisonsAvailable && message.authorKind == APIMessageAuthorKind.FAN && !message.offTheRecord && !current.offTheRecord && message.deliveryState in listOf(APIMessageDeliveryState.ACCEPTED, APIMessageDeliveryState.DELIVERED)) {
+                        Button("AI comparison options", variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground, modifier = Modifier.testTag("comparison-options-${message.id}")) { comparisonQuestion = message }
+                    }
                     message.recording?.let { recording ->
                         val asset = recording.asset
                         if (recording.state == "available" && asset != null &&
@@ -381,7 +404,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                             message.authorKind == APIMessageAuthorKind.HUMAN_CREATOR && message.signedActId != null &&
                             asset.signedActId == message.signedActId) {
                             ConversationRecordingPlayer(baseURL, session, session.destination, accountId, creatorId, fanId, asset, current.creatorName, message.createdAt,
-                                active = foreground && !privacy && source == null,
+                                active = foreground && !privacy && comparisonQuestion == null && source == null,
                                 onVerify = { session.open("/verify/${message.signedActId}") })
                         } else {
                             BasicText(message.authorLabel(current.creatorName), style = qText("label").copy(color = qColor("ink")))
@@ -574,6 +597,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             if (policy?.providers == null) BasicText("AI provider consent is unavailable or has been withdrawn.", style = qText("body").copy(color = qColor("ink")))
             Button(if(page?.consentCurrent == true) "Withdraw AI provider consent" else "Agree to these AI providers", variant = ButtonVariant.SECONDARY, disabled = busy || (page?.consentCurrent != true && policy?.consentAvailable != true)) { scope.launch { consent() } }
         }
+        item { BasicText("AI comparisons", style = qText("display-md").copy(color = qColor("ink"))); ConversationComparisonChoice(client, root) }
         item { BasicText("Time with this creator's AI",style=qText("display-md").copy(color = qColor("ink"))); if (usage == null) BasicText(if (error.isEmpty()) "Loading time history…" else "Time history unavailable.", style = qText("body").copy(color = qColor("ink"))); usage?.let { time -> BasicText(time.measurement + " Days are shown in UTC.",style=qText("caption").copy(color = qColor("ink")));BasicText("This week · ${time.days.sumOf { it.seconds }.toInt()/60} minutes",style=qText("body").copy(color = qColor("ink")));time.days.forEach { day -> BasicText("${day.day} · ${day.seconds.toInt()/60} minutes",style=qText("body").copy(color = qColor("ink"))) };if(!time.modeAvailable) BasicText("Companion mode time signals await the verified AI mode configuration.",style=qText("caption").copy(color = qColor("ink"))) } }
         item { BasicText("Who opened your conversations", style = qText("display-md").copy(color = qColor("ink"))); if (audit == null) BasicText(if (error.isEmpty()) "Loading opening history…" else "Opening history unavailable.", style = qText("body").copy(color = qColor("ink"))) else if (audit?.isEmpty() == true) BasicText("No logged openings.", style = qText("body").copy(color = qColor("ink"))) }
         items(audit.orEmpty(), key = { it.id }) { entry -> BasicText((if (entry.role == "creator") "$name's account" else if (entry.role == "ops") "Authorized safety account" else "Authorized team · ${entry.role}") + "\nAccount " + entry.readerAccountId + "\n" + entry.readAt, style = qText("body").copy(color = qColor("ink"))) }

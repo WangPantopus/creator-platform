@@ -331,3 +331,10 @@ migration evidence. The original application starts with the finite fictional
 comparison policy and preserved conversation history. This does not constitute
 fan choice, sanitization or provider acceptance; separate controls and operated
 journeys remain required. [Evidence](../artifacts/pr-review/2026-10-08/comparison-closed-wave/README.md).
+
+Comparison controls continuation, October8: separate explicit creator-scoped choice
+and question selection now run in all three real apps. The current original notice
+is displayed and cancellation clears client state. Native reuse does not purchase
+new provider calls. The actual new export remains refused until its original
+source reference is bound consistently; no privacy/upgrade completion is claimed.
+[Evidence](../artifacts/pr-review/2026-10-08/comparison-choice-ui/README.md).
