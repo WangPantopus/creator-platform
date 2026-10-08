@@ -4,6 +4,7 @@ import {
   assertCanonicalPrivacyTaskCatalog,
   assertGenerationPrivacyTaskCatalogForReview,
   assertOutputPrivacyTaskCatalogForReview,
+  assertPublicPrivacyTaskCatalogForReview,
   assertPrivacyTaskCatalog,
 } from "../src/modules/trust/privacy-catalog.js";
 import { assertDomainPrivacyTaskCatalog } from "../src/modules/trust/domain-privacy-catalog.js";
@@ -40,6 +41,7 @@ export async function assertPrivacyWaveRoleSafety(
     canonicalBeforeGeneration?: boolean;
     generationBeforeContent?: boolean;
     outputBeforePublic?: boolean;
+    publicBeforeComparison?: boolean;
   },
 ) {
   const fail = (purpose: string): never => {
@@ -122,6 +124,8 @@ export async function assertPrivacyWaveRoleSafety(
         await assertGenerationPrivacyTaskCatalogForReview(client);
       else if (installed.outputBeforePublic)
         await assertOutputPrivacyTaskCatalogForReview(client);
+      else if (installed.publicBeforeComparison)
+        await assertPublicPrivacyTaskCatalogForReview(client);
       else await assertPrivacyTaskCatalog(client);
       await client.query("RESET SESSION AUTHORIZATION");
     }

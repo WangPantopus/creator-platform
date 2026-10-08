@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "scope": "Fixed metadata independently reviewed on isolated numbered114 graph22 and its complete dump/restore23, with and without incoming Growth API membership. Existing generation purpose permissions on existing relations are unchanged. Reserved sources only; actual preserved upgrade, executable registration, host composition and application acceptance remain separate.",
+  "scope": "Fixed metadata independently reviewed on isolated numbered114 graph22 and its complete dump/restore23, with and without incoming Growth API membership. Existing generation purpose permissions on existing relations are unchanged. Reserved sources only; actual preserved upgrade, executable registration, host composition and application acceptance remain separate. Original populated106 and its independent complete restore also passed exact eight-source rollback review with every business row, original history, role, security and sequence digest restored. Their explicit owner-default ACL representations are retained as independently reviewed purpose profiles.",
   "sources": [
     {
       "version": "0239_w3_comparison_samples",
@@ -67,6 +67,14 @@
     {
       "review": "original-incoming",
       "sha256": "c64f5e02ac856ec49fbc7a87fdb4430fa36893fd42bc47ccbc92d0a4505cd1b1"
+    },
+    {
+      "review": "populated-original",
+      "sha256": "5306167ad46c4fdb0ed7afc866a1f4a30ad9992efe46c6a0940e98af8c65e722"
+    },
+    {
+      "review": "populated-original-incoming",
+      "sha256": "39dce3e4c1ccdf0a38565e3f6584f0851217e7a32c69cf77f9fa92cf40fdbf9b"
     }
   ],
   "runtimeCatalogues": {
@@ -136,5 +144,9 @@
       "catalogueChecksum": "da218034389815e7198ed8bf1bdd3f93d39a675944d9b3ddb6cb1d18416324ce"
     },
     "artifactsCatalogueChecksum": "e63b8cdcc37f639ea289d3b3e19f20f26fc1bb8fe8f504a7db1d306aa2b8046b"
+  },
+  "baselineWave": {
+    "path": "infra/migrations/waves/20261007-partial-generation-recovery.json",
+    "sha256": "33253ff139f0bb44521327b18e16f47b5aa5611883ad54fce44b3a375a5d2341"
   }
 }

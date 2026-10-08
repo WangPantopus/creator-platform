@@ -658,6 +658,62 @@
       "owner": "W4",
       "sourceSha256": "3db102bef52be7b51aa2caa6b2574eae568b47059ce275160d57b62009d01011",
       "wave": "20261007-partial-generation-recovery"
+    },
+    {
+      "version": "0239_w3_comparison_samples",
+      "path": "apps/backend/src/modules/conversation/migrations/0239_w3_comparison_samples.sql",
+      "owner": "W3",
+      "sourceSha256": "39199c153fb758c5bb7e9ceef24b1b38dd23740732153f75aa85ff1e8c32973d",
+      "wave": "20261008-comparison"
+    },
+    {
+      "version": "0240_w3_comparison_privacy",
+      "path": "apps/backend/src/modules/conversation/migrations/0240_w3_comparison_privacy.sql",
+      "owner": "W3",
+      "sourceSha256": "4a3b44c345f02a61c93b591dba5a8e0c35130923b72d1bc0291749ca274a0da8",
+      "wave": "20261008-comparison"
+    },
+    {
+      "version": "0241_comparison_export_artifacts",
+      "path": "apps/backend/src/modules/trust/0241_comparison_export_artifacts.sql",
+      "owner": "W8",
+      "sourceSha256": "63559d896eb5e5821dc15096e8f72d3b75faebcd5f23294f62ae5f8b0e63e415",
+      "wave": "20261008-comparison"
+    },
+    {
+      "version": "0242_comparison_export_attempts",
+      "path": "apps/backend/src/modules/trust/0242_comparison_export_attempts.sql",
+      "owner": "W8",
+      "sourceSha256": "6333db3d2263ea59b48af4b6329a6fb853951ac22e3071f925f776010f819b5f",
+      "wave": "20261008-comparison"
+    },
+    {
+      "version": "0243_comparison_export_privacy",
+      "path": "apps/backend/src/modules/trust/0243_comparison_export_privacy.sql",
+      "owner": "W8",
+      "sourceSha256": "b9974d48123516ebcdd318b3149107e10fe2795551c10ec2f1079270f1dd0a7b",
+      "wave": "20261008-comparison"
+    },
+    {
+      "version": "0244_w3_comparison_writer",
+      "path": "apps/backend/src/modules/conversation/migrations/0244_w3_comparison_writer.sql",
+      "owner": "W3",
+      "sourceSha256": "5e72dc539bd628faf870d39dfeca12613124c7a577d1e00d1cf27382d5cc3228",
+      "wave": "20261008-comparison"
+    },
+    {
+      "version": "0245_w3_comparison_reader",
+      "path": "apps/backend/src/modules/conversation/migrations/0245_w3_comparison_reader.sql",
+      "owner": "W3",
+      "sourceSha256": "4fcb07080002cd2001c565444bcbe870d868ca5b13e32224b6feb3d8849be834",
+      "wave": "20261008-comparison"
+    },
+    {
+      "version": "0246_comparison_artifact_scope",
+      "path": "apps/backend/src/modules/trust/0246_comparison_artifact_scope.sql",
+      "owner": "W8",
+      "sourceSha256": "22de8203086fd7f7ad18140c087d0aa6355390616b90511da280bc71296c1b3f",
+      "wave": "20261008-comparison"
     }
   ],
   "reserved": [
@@ -1125,8 +1181,9 @@
       "owner": "W3",
       "path": "apps/backend/src/modules/conversation/migrations/0239_w3_comparison_samples.sql",
       "sourceSha256": "39199c153fb758c5bb7e9ceef24b1b38dd23740732153f75aa85ff1e8c32973d",
-      "state": "reserved_unapplied",
-      "reason": "Additive numbered copy of preserved comparison proposal. Complete combined catalogue, restore, legacy export and original host review pending; reservation does not activate SQL or provider use."
+      "state": "registered",
+      "reason": "Exact additive comparison graph registered after original populated and independent restore rollback review. Apply only through the closed 20261008-comparison wave; registration is not runtime activation, consent or provider acceptance.",
+      "registeredVersion": "0239_w3_comparison_samples"
     },
     {
       "id": "0240",
@@ -1134,8 +1191,9 @@
       "owner": "W3",
       "path": "apps/backend/src/modules/conversation/migrations/0240_w3_comparison_privacy.sql",
       "sourceSha256": "4a3b44c345f02a61c93b591dba5a8e0c35130923b72d1bc0291749ca274a0da8",
-      "state": "reserved_unapplied",
-      "reason": "Additive numbered copy of preserved comparison proposal. Complete combined catalogue, restore, legacy export and original host review pending; reservation does not activate SQL or provider use."
+      "state": "registered",
+      "reason": "Exact additive comparison graph registered after original populated and independent restore rollback review. Apply only through the closed 20261008-comparison wave; registration is not runtime activation, consent or provider acceptance.",
+      "registeredVersion": "0240_w3_comparison_privacy"
     },
     {
       "id": "0241",
@@ -1143,8 +1201,9 @@
       "owner": "W8",
       "path": "apps/backend/src/modules/trust/0241_comparison_export_artifacts.sql",
       "sourceSha256": "63559d896eb5e5821dc15096e8f72d3b75faebcd5f23294f62ae5f8b0e63e415",
-      "state": "reserved_unapplied",
-      "reason": "Additive numbered copy of preserved comparison proposal. Complete combined catalogue, restore, legacy export and original host review pending; reservation does not activate SQL or provider use."
+      "state": "registered",
+      "reason": "Exact additive comparison graph registered after original populated and independent restore rollback review. Apply only through the closed 20261008-comparison wave; registration is not runtime activation, consent or provider acceptance.",
+      "registeredVersion": "0241_comparison_export_artifacts"
     },
     {
       "id": "0242",
@@ -1152,8 +1211,9 @@
       "owner": "W8",
       "path": "apps/backend/src/modules/trust/0242_comparison_export_attempts.sql",
       "sourceSha256": "6333db3d2263ea59b48af4b6329a6fb853951ac22e3071f925f776010f819b5f",
-      "state": "reserved_unapplied",
-      "reason": "Additive numbered copy of preserved comparison proposal. Complete combined catalogue, restore, legacy export and original host review pending; reservation does not activate SQL or provider use."
+      "state": "registered",
+      "reason": "Exact additive comparison graph registered after original populated and independent restore rollback review. Apply only through the closed 20261008-comparison wave; registration is not runtime activation, consent or provider acceptance.",
+      "registeredVersion": "0242_comparison_export_attempts"
     },
     {
       "id": "0243",
@@ -1161,8 +1221,9 @@
       "owner": "W8",
       "path": "apps/backend/src/modules/trust/0243_comparison_export_privacy.sql",
       "sourceSha256": "b9974d48123516ebcdd318b3149107e10fe2795551c10ec2f1079270f1dd0a7b",
-      "state": "reserved_unapplied",
-      "reason": "Additive numbered copy of preserved comparison proposal. Complete combined catalogue, restore, legacy export and original host review pending; reservation does not activate SQL or provider use."
+      "state": "registered",
+      "reason": "Exact additive comparison graph registered after original populated and independent restore rollback review. Apply only through the closed 20261008-comparison wave; registration is not runtime activation, consent or provider acceptance.",
+      "registeredVersion": "0243_comparison_export_privacy"
     },
     {
       "id": "0244",
@@ -1170,8 +1231,9 @@
       "owner": "W3",
       "path": "apps/backend/src/modules/conversation/migrations/0244_w3_comparison_writer.sql",
       "sourceSha256": "5e72dc539bd628faf870d39dfeca12613124c7a577d1e00d1cf27382d5cc3228",
-      "state": "reserved_unapplied",
-      "reason": "Additive numbered copy of preserved comparison proposal. Complete combined catalogue, restore, legacy export and original host review pending; reservation does not activate SQL or provider use."
+      "state": "registered",
+      "reason": "Exact additive comparison graph registered after original populated and independent restore rollback review. Apply only through the closed 20261008-comparison wave; registration is not runtime activation, consent or provider acceptance.",
+      "registeredVersion": "0244_w3_comparison_writer"
     },
     {
       "id": "0245",
@@ -1179,8 +1241,19 @@
       "owner": "W3",
       "path": "apps/backend/src/modules/conversation/migrations/0245_w3_comparison_reader.sql",
       "sourceSha256": "4fcb07080002cd2001c565444bcbe870d868ca5b13e32224b6feb3d8849be834",
-      "state": "reserved_unapplied",
-      "reason": "Additive numbered copy of preserved comparison proposal. Complete combined catalogue, restore, legacy export and original host review pending; reservation does not activate SQL or provider use."
+      "state": "registered",
+      "reason": "Exact additive comparison graph registered after original populated and independent restore rollback review. Apply only through the closed 20261008-comparison wave; registration is not runtime activation, consent or provider acceptance.",
+      "registeredVersion": "0245_w3_comparison_reader"
+    },
+    {
+      "id": "0246",
+      "version": "0246_comparison_artifact_scope",
+      "owner": "W8",
+      "path": "apps/backend/src/modules/trust/0246_comparison_artifact_scope.sql",
+      "sourceSha256": "22de8203086fd7f7ad18140c087d0aa6355390616b90511da280bc71296c1b3f",
+      "state": "registered",
+      "registeredVersion": "0246_comparison_artifact_scope",
+      "reason": "Exact additive comparison graph registered after original populated and independent restore rollback review. Apply only through the closed 20261008-comparison wave; registration is not runtime activation, consent or provider acceptance."
     }
   ]
 }

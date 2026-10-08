@@ -27,6 +27,8 @@ import { assertGenerationWaveRoleSafety } from "./migration-generation-roles.js"
 import { generationPrivacySourcesRegistered } from "../src/db/generation-privacy-sources.js";
 import { registeredContentPrivacyProfile } from "../src/db/content-privacy-profile.js";
 import { registeredGenerationOutputProfile } from "../src/db/generation-output-profile.js";
+import comparisonReview from "../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
+import { registeredComparisonProfile } from "../src/db/comparison-profile.js";
 import partialRecoveryReview from "../../../infra/migrations/reviews/20261007-partial-generation-recovery.json" with { type: "json" };
 import recoveryReview from "../../../infra/migrations/reviews/20261007-generation-recovery.json" with { type: "json" };
 import { registeredGenerationRecoveryProfile } from "../src/db/generation-recovery-profile.js";
@@ -69,15 +71,18 @@ async function activate() {
       "20261007-public-ai",
       "20261007-generation-recovery",
       "20261007-partial-generation-recovery",
+      "20261008-comparison",
     ].includes(process.env.W8_MIGRATION_WAVE ?? ""),
-    "Select a reviewed W8_MIGRATION_WAVE (20261002, 20261002-privacy, 20261007-generation, 20261007-content 20261007-generation-output 20261007-public-ai 20261007-generation-recovery or 20261007-partial-generation-recovery).",
+    "Select a reviewed W8_MIGRATION_WAVE (20261002, 20261002-privacy, 20261007-generation, 20261007-content 20261007-generation-output 20261007-public-ai 20261007-generation-recovery 20261007-partial-generation-recovery or 20261008-comparison).",
   );
   const connection = process.env.DATABASE_MIGRATION_URL;
   check(
     connection,
     "Provide a separate DATABASE_MIGRATION_URL; never a runtime credential.",
   );
+  const comparison = process.env.W8_MIGRATION_WAVE === "20261008-comparison";
   const partialRecovery =
+    comparison ||
     process.env.W8_MIGRATION_WAVE === "20261007-partial-generation-recovery";
   const recovery =
     partialRecovery ||
@@ -104,6 +109,7 @@ async function activate() {
     "20261007-public-ai",
     "20261007-generation-recovery",
     "20261007-partial-generation-recovery",
+    "20261008-comparison",
   ];
   const packets = await Promise.all(
     ids.map(
@@ -125,7 +131,9 @@ async function activate() {
     directory,
     terminalRecovery,
     partialTerminalRecovery,
+    comparisonPacket,
   ] = packets as [
+    Packet,
     Packet,
     Packet,
     Packet,
@@ -141,8 +149,8 @@ async function activate() {
         entry.schemaVersion === 1 &&
         entry.id === ids[index] &&
         entry.baseline.length ===
-          [40, 57, 61, 100, 101, 102, 104, 105][index] &&
-        entry.wave.length === [17, 4, 39, 1, 1, 2, 1, 1][index],
+          [40, 57, 61, 100, 101, 102, 104, 105, 106][index] &&
+        entry.wave.length === [17, 4, 39, 1, 1, 2, 1, 1, 8][index],
     ) &&
       canonical(prior.baseline) ===
         canonical([...initial.baseline, ...initial.wave]) &&
@@ -255,8 +263,28 @@ async function activate() {
         await readFile(
           new URL(partialRecoveryReview.baselineWave.path, repositoryRoot),
         ),
-      ) === partialRecoveryReview.baselineWave.sha256,
-    "The exact reviewed 40/57/61/100/101/102/104/105/106-source migration chain is required.",
+      ) === partialRecoveryReview.baselineWave.sha256 &&
+      canonical(comparisonPacket.baseline) ===
+        canonical([
+          ...partialTerminalRecovery.baseline,
+          ...partialTerminalRecovery.wave,
+        ]) &&
+      canonical(comparisonPacket.wave) ===
+        canonical(
+          comparisonReview.sources.map(({ version, path, checksum }) => ({
+            version,
+            path,
+            checksum,
+          })),
+        ) &&
+      canonical(comparisonPacket.outOfOrderException) ===
+        canonical(partialTerminalRecovery.outOfOrderException) &&
+      sha256(
+        await readFile(
+          new URL(comparisonReview.baselineWave.path, repositoryRoot),
+        ),
+      ) === comparisonReview.baselineWave.sha256,
+    "The exact reviewed 40/57/61/100/101/102/104/105/106/114-source migration chain is required.",
   );
   check(
     await generationPrivacySourcesRegistered(),
@@ -278,6 +306,10 @@ async function activate() {
     await registeredGenerationRecoveryProfile(),
     "The exact terminal recovery registration is required.",
   );
+  check(
+    await registeredComparisonProfile(),
+    "All eight exact comparison source registrations are required.",
+  );
   const packet = packets.find(
     (entry) => entry.id === process.env.W8_MIGRATION_WAVE,
   )!;
@@ -286,8 +318,8 @@ async function activate() {
   ) as { migrations: { version: string; path: string }[] };
   const sources = [...packet.baseline, ...packet.wave];
   const registeredSources = [
-    ...partialTerminalRecovery.baseline,
-    ...partialTerminalRecovery.wave,
+    ...comparisonPacket.baseline,
+    ...comparisonPacket.wave,
   ];
   check(
     new Set(registeredSources.map((s) => s.version.slice(0, 4))).size ===
@@ -472,20 +504,38 @@ async function activate() {
       !installedPartialRecovery || installedRecovery,
       "Partial-output recovery cannot precede original recovery.",
     );
+    const installedComparison = before.filter((row) =>
+      comparisonPacket.wave.some((source) => source.version === row.version),
+    ).length;
+    check(
+      installedComparison === 0 ||
+        installedComparison === comparisonPacket.wave.length,
+      "Partial comparison graph is not an accepted baseline.",
+    );
+    check(
+      !comparison || installedPartialRecovery,
+      "Comparison activation requires the complete reviewed106 predecessor.",
+    );
+    check(
+      !installedComparison || installedPartialRecovery,
+      "Comparison cannot precede original recovery.",
+    );
     if (generationInstalled)
       await assertGenerationWaveRoleSafety(
         client,
-        installedPartialRecovery
-          ? "partial-generation-recovery"
-          : installedRecovery
-            ? "generation-recovery"
-            : installedPublic
-              ? "public-ai"
-              : outputInstalled
-                ? "generation-output"
-                : contentInstalled
-                  ? "content-privacy"
-                  : undefined,
+        installedComparison
+          ? "comparison"
+          : installedPartialRecovery
+            ? "partial-generation-recovery"
+            : installedRecovery
+              ? "generation-recovery"
+              : installedPublic
+                ? "public-ai"
+                : outputInstalled
+                  ? "generation-output"
+                  : contentInstalled
+                    ? "content-privacy"
+                    : undefined,
       );
     else
       await assertWaveRoleSafety(client, {
@@ -511,6 +561,9 @@ async function activate() {
         canonicalBeforeGeneration: generationInstalled === 0,
         generationBeforeContent: generationInstalled > 0 && !contentInstalled,
         outputBeforePublic: Boolean(outputInstalled && !installedPublic),
+        publicBeforeComparison: Boolean(
+          installedPublic && !installedComparison,
+        ),
       });
     const tables = await waveDataTables(client);
     const beforeData = await waveDataDigest(client, tables);
@@ -602,17 +655,19 @@ async function activate() {
     const roleSafety = generation
       ? await assertGenerationWaveRoleSafety(
           client,
-          partialRecovery
-            ? "partial-generation-recovery"
-            : recovery
-              ? "generation-recovery"
-              : publicAI
-                ? "public-ai"
-                : output
-                  ? "generation-output"
-                  : content
-                    ? "content-privacy"
-                    : undefined,
+          comparison
+            ? "comparison"
+            : partialRecovery
+              ? "partial-generation-recovery"
+              : recovery
+                ? "generation-recovery"
+                : publicAI
+                  ? "public-ai"
+                  : output
+                    ? "generation-output"
+                    : content
+                      ? "content-privacy"
+                      : undefined,
         )
       : await assertWaveRoleSafety(client, {
           trust: true,
@@ -627,6 +682,7 @@ async function activate() {
           canonicalBeforeGeneration: !generation,
           generationBeforeContent: generation && !content,
           outputBeforePublic: output && !publicAI,
+          publicBeforeComparison: publicAI && !comparison,
         })
       : undefined;
     check(
