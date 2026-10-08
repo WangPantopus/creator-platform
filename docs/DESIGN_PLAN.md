@@ -23,6 +23,12 @@ W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan expor
 
 ## Implementation continuation
 
+- [~] October 8, 2026: prepare distinct comparison provider admission, source-bound
+  cost receipts and original fan sample writes with a commit-time expiry gate.
+  Nine isolated SQL operations and backend checks pass; actual producer, creator
+  read/publication guards and full app composition remain open.
+  [Evidence and limits](../artifacts/pr-review/2026-10-08/comparison-purpose-admission/README.md).
+
 - [~] October 8, 2026: prepare original Trust export/deletion for private comparison
   artifact provenance, full attempt inventory and physical removal. Six isolated
   source operations pass; activation, actual producer and mature deletion remain

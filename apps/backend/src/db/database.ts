@@ -142,7 +142,9 @@ export class Database {
     scope: ThreadScope,
     work: (client: PoolClient) => Promise<T>,
     lockMode: ThreadLockMode = "write",
+    signal?: AbortSignal,
   ): Promise<T> {
+    signal?.throwIfAborted();
     assertThreadScope(scope);
     const actor = threadScopeActor(scope);
     if (lockMode !== "read" && lockMode !== "write")
@@ -157,7 +159,7 @@ export class Database {
     // SHARE and deadlock when they subsequently upgrade to UPDATE.
     const threadLock = lockMode === "write" ? "UPDATE" : "SHARE";
     const client = await this.pool.connect();
-    const held = new ContentHeldClient(client, undefined, this.pool);
+    const held = new ContentHeldClient(client, signal, this.pool);
     let failure: unknown;
     try {
       await held.begin();

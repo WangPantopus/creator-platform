@@ -45,14 +45,15 @@ export interface ComparisonSanitizerOperation {
   readonly signal: AbortSignal;
   readonly modelFingerprint: string;
   assertCurrent(): Promise<void>;
-  call<T>(input: {
-    stage: "paraphrase" | "privacy_review";
-    instructions: string;
-    data: string;
-    schema: z.ZodType<T>;
-    route: "small" | "large";
-  }): Promise<T>;
+  call<T>(input: ComparisonSanitizerRequest<T>): Promise<T>;
 }
+export type ComparisonSanitizerRequest<T> = {
+  stage: "paraphrase" | "privacy_review";
+  instructions: string;
+  data: string;
+  schema: z.ZodType<T>;
+  route: "small" | "large";
+};
 
 const revision = "conversation-comparison-paraphrase-v1";
 

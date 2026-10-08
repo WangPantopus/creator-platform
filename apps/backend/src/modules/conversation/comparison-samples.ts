@@ -13,8 +13,8 @@ import {
 import {
   comparisonSanitizerReference,
   sanitizeComparisonQuestion,
-  type ComparisonSanitizerOperation,
 } from "./comparison-sanitizer.js";
+import { PreparedComparisonSanitizerProvider } from "./comparison-provider.js";
 
 /** The original Trust owner checks the current comparison policy, processor
  * policy and restrictions for this exact held family. No creator-scope or
@@ -41,7 +41,10 @@ export class ConversationComparisonSamples {
     private readonly db: Database,
     private readonly authority: ComparisonUseAuthority,
     private readonly assertPrepared: (client: PoolClient) => Promise<void>,
-  ) {}
+    private readonly provider: PreparedComparisonSanitizerProvider,
+  ) {
+    provider.assertDatabase(db);
+  }
 
   private async source(
     scope: ThreadScope,
@@ -50,7 +53,7 @@ export class ConversationComparisonSamples {
   ): Promise<Source> {
     this.db.assertHeldThread(scope, client);
     invariant(
-      scope.authority === "creator" || scope.authority === "fan",
+      scope.authority === "fan" && scope.actorAccountId === scope.fanAccountId,
       "comparison_owner_required",
       "Comparison questions require their original conversation owner.",
     );
@@ -111,7 +114,16 @@ export class ConversationComparisonSamples {
       expiresAt: row.expires_at.toISOString(),
       policy,
     };
-    return Object.freeze({ ...value, hash: contentHash(value) });
+    return Object.freeze({
+      ...value,
+      hash: contentHash({
+        ...value,
+        messageId,
+        threadId: scope.threadId,
+        creatorId: scope.creatorId,
+        fanId: scope.fanId,
+      }),
+    });
   }
 
   private async sameSource(
@@ -131,29 +143,32 @@ export class ConversationComparisonSamples {
   async produce(
     scope: ThreadScope,
     messageId: string,
-    operation: ComparisonSanitizerOperation,
+    signal: AbortSignal,
   ): Promise<ShadowSample | null> {
     assertThreadScope(scope);
     z.uuid().parse(messageId);
-    operation.signal.throwIfAborted();
+    signal.throwIfAborted();
     invariant(
-      /^[a-f0-9]{64}$/u.test(operation.modelFingerprint),
+      /^[a-f0-9]{64}$/u.test(this.provider.modelFingerprint),
       "comparison_model_unavailable",
       "The comparison sanitizer is unavailable.",
     );
-    await operation.assertCurrent();
     const sanitizerReference = comparisonSanitizerReference(
-      operation.modelFingerprint,
+      this.provider.modelFingerprint,
     );
     const initial = await this.db.withThread(
       scope,
       async (client) => {
         const source = await this.source(scope, client, messageId);
         const cached = (
-          await client.query<{ id: string; paraphrased_prompt: string }>(
-            `SELECT id,paraphrased_prompt FROM creator.conversation_comparison_sample
+          await client.query<{
+            id: string;
+            paraphrased_prompt: string;
+            sanitizer_reference: string;
+          }>(
+            `SELECT id,paraphrased_prompt,sanitizer_reference FROM creator.conversation_comparison_sample
          WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND message_id=$4
-          AND message_version=$5 AND source_hash=$6 AND sanitizer_reference=$7
+          AND message_version=$5 AND source_hash=$6 AND split_part(sanitizer_reference,':',1)=$7
           AND expires_at>clock_timestamp()`,
             [
               scope.threadId,
@@ -167,99 +182,109 @@ export class ConversationComparisonSamples {
           )
         ).rows[0];
         this.db.finalizeHeldThreadBeforeCommit(scope, client, async () => {
-          operation.signal.throwIfAborted();
+          signal.throwIfAborted();
           await this.sameSource(scope, client, messageId, source);
         });
         return { source, cached };
       },
       "read",
+      signal,
     );
     if (initial.cached) {
-      operation.signal.throwIfAborted();
+      signal.throwIfAborted();
       return Object.freeze({
         sampleId: initial.cached.id,
         occurredAt: initial.source.occurredAt,
         paraphrasedPrompt: initial.cached.paraphrased_prompt,
-        sanitizerReference,
+        sanitizerReference: initial.cached.sanitizer_reference,
       });
     }
-    const assertCurrent = async () => {
-      await operation.assertCurrent();
-      await this.db.withThread(
-        scope,
-        (client) => this.sameSource(scope, client, messageId, initial.source),
-        "read",
-      );
-    };
-    const sanitized = await sanitizeComparisonQuestion(initial.source.text, {
-      signal: operation.signal,
-      modelFingerprint: operation.modelFingerprint,
-      assertCurrent,
-      call: operation.call.bind(operation),
+    const operation = this.provider.operation({
+      scope,
+      signal,
+      sourceHash: initial.source.hash,
+      assertSource: (client) =>
+        this.sameSource(scope, client, messageId, initial.source),
     });
+    const sanitized = await sanitizeComparisonQuestion(
+      initial.source.text,
+      operation,
+    );
     if (!sanitized) return null;
     operation.signal.throwIfAborted();
-    return this.db.withThread(scope, async (client) => {
-      await this.sameSource(scope, client, messageId, initial.source);
-      const id = randomUUID();
-      const source = initial.source;
-      await client.query(
-        `INSERT INTO creator.conversation_comparison_sample
+    const completedReference = operation.completedReference(
+      sanitized.sanitizerReference,
+    );
+    return this.db.withThread(
+      scope,
+      async (client) => {
+        await this.sameSource(scope, client, messageId, initial.source);
+        const id = randomUUID();
+        const source = initial.source;
+        await client.query(
+          `INSERT INTO creator.conversation_comparison_sample
          (id,thread_id,creator_id,fan_id,account_id,policy_version,processor_policy_version,
           message_id,message_version,source_hash,paraphrased_prompt,sanitizer_reference,occurred_at,expires_at)
          VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
-         ON CONFLICT(message_id,policy_version,processor_policy_version,sanitizer_reference) DO NOTHING`,
-        [
-          id,
-          scope.threadId,
-          scope.creatorId,
-          scope.fanId,
-          scope.fanAccountId,
-          source.policy.version,
-          source.policy.processorPolicyVersion,
-          messageId,
-          source.messageVersion,
-          source.hash,
-          sanitized.paraphrase,
-          sanitized.sanitizerReference,
-          source.occurredAt,
-          source.expiresAt,
-        ],
-      );
-      // Concurrent genuine attempts may have paid for different paraphrases.
-      // Preserve the first committed sample's immutable identity and text.
-      const stored = (
-        await client.query<{ id: string; paraphrased_prompt: string }>(
-          `SELECT id,paraphrased_prompt FROM creator.conversation_comparison_sample
-         WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND message_id=$4
-          AND message_version=$5 AND source_hash=$6 AND sanitizer_reference=$7
-          AND expires_at>clock_timestamp()`,
+         ON CONFLICT DO NOTHING`,
           [
+            id,
             scope.threadId,
             scope.creatorId,
             scope.fanId,
+            scope.fanAccountId,
+            source.policy.version,
+            source.policy.processorPolicyVersion,
             messageId,
             source.messageVersion,
             source.hash,
-            sanitizerReference,
+            sanitized.paraphrase,
+            completedReference,
+            source.occurredAt,
+            source.expiresAt,
           ],
-        )
-      ).rows[0];
-      invariant(
-        stored,
-        "comparison_question_changed",
-        "The comparison question changed. Refresh it.",
-      );
-      this.db.finalizeHeldThreadBeforeCommit(scope, client, async () => {
-        operation.signal.throwIfAborted();
-        await this.sameSource(scope, client, messageId, source);
-      });
-      return Object.freeze({
-        sampleId: stored.id,
-        occurredAt: source.occurredAt,
-        paraphrasedPrompt: stored.paraphrased_prompt,
-        sanitizerReference,
-      });
-    });
+        );
+        // Concurrent genuine attempts may have paid for different paraphrases.
+        // Preserve the first committed sample's immutable identity and text.
+        const stored = (
+          await client.query<{
+            id: string;
+            paraphrased_prompt: string;
+            sanitizer_reference: string;
+          }>(
+            `SELECT id,paraphrased_prompt,sanitizer_reference FROM creator.conversation_comparison_sample
+         WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND message_id=$4
+          AND message_version=$5 AND source_hash=$6 AND split_part(sanitizer_reference,':',1)=$7
+          AND expires_at>clock_timestamp()`,
+            [
+              scope.threadId,
+              scope.creatorId,
+              scope.fanId,
+              messageId,
+              source.messageVersion,
+              source.hash,
+              sanitizerReference,
+            ],
+          )
+        ).rows[0];
+        invariant(
+          stored,
+          "comparison_question_changed",
+          "The comparison question changed. Refresh it.",
+        );
+        this.db.finalizeHeldThreadBeforeCommit(scope, client, async () => {
+          operation.signal.throwIfAborted();
+          await this.sameSource(scope, client, messageId, source);
+        });
+        return Object.freeze({
+          sampleId: stored.id,
+          occurredAt: source.occurredAt,
+          paraphrasedPrompt: stored.paraphrased_prompt,
+          sanitizerReference: stored.sanitizer_reference,
+        });
+      },
+      "write",
+      signal,
+    );
   }
 }

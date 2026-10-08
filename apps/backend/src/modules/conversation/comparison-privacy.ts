@@ -29,6 +29,12 @@ export const comparisonPrivacySource = Object.freeze({
   path: "apps/backend/src/modules/conversation/migrations/pending_w3_comparison_privacy.sql",
   checksum: "81d9ebedb8346808b32e560ffbd6246f89443423bc267d02f89f6e84465b5bc0",
 });
+export const comparisonWriterSource = Object.freeze({
+  owner: "W3",
+  name: "w3_comparison_writer",
+  path: "apps/backend/src/modules/conversation/migrations/pending_w3_comparison_writer.sql",
+  checksum: "3737f852cd56c5864e85ca8d890439bc25af021559fc2fb6670c5685055b55da",
+});
 const owner = "creator_comparison_lifecycle";
 const signature =
   "creator.purge_conversation_comparisons(uuid,uuid,uuid,uuid,uuid)";
