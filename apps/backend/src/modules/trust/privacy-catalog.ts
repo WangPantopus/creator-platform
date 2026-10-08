@@ -4,11 +4,13 @@ import {
   originalPrivacyFamilyRegisteredExtension,
   assertOriginalPrivacyFamilyGenerationCatalog,
   assertOriginalPrivacyFamilyContentCatalog,
+  assertOriginalPrivacyFamilyPublicCatalogForReview,
   originalPrivacyBindingSignature,
   originalPrivacyBindingDefinition,
 } from "./privacy-family-catalog.js";
 import generationReview from "../../../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
 import contentReview from "../../../../../infra/migrations/reviews/20261007-content-privacy.json" with { type: "json" };
+import publicAIReview from "../../../../../infra/migrations/reviews/20261007-public-ai.json" with { type: "json" };
 import outputReview from "../../../../../infra/migrations/reviews/20261007-generation-first-visible.json" with { type: "json" };
 import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
 import { contentHash } from "../../core/canonical.js";
@@ -113,27 +115,45 @@ export async function assertOutputPrivacyTaskCatalogForReview(
   return assertPrivacyExtensionForReview(client, "output", signal);
 }
 
+/** Fixed104–106 operator metadata before comparison activation. The two
+ * recovery sources do not change these original privacy owners. Runtime paths
+ * still require the entire current registered graph and real held task. */
+export async function assertPublicPrivacyTaskCatalogForReview(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  return assertPrivacyExtensionForReview(client, "public", signal);
+}
+
 async function assertPrivacyExtensionForReview(
   client: PoolClient,
-  profile: "generation" | "output",
+  profile: "generation" | "output" | "public",
   signal?: AbortSignal,
 ) {
   for (const source of generationReview.sources)
     await assertRegisteredMigration(client, source, signal);
-  if (profile === "output") {
+  if (profile !== "generation") {
     await assertRegisteredMigration(client, contentReview.source, signal);
     await assertRegisteredMigration(client, outputReview.source, signal);
-    await assertOriginalPrivacyFamilyContentCatalog(client, signal);
+    if (profile === "public") {
+      for (const source of publicAIReview.sources)
+        await assertRegisteredMigration(client, source, signal);
+      await assertOriginalPrivacyFamilyPublicCatalogForReview(client, signal);
+    } else await assertOriginalPrivacyFamilyContentCatalog(client, signal);
   } else await assertOriginalPrivacyFamilyGenerationCatalog(client, signal);
   if (
     contentHash(await accountDetachedUsageCatalogue(client, signal)) !==
-      (profile === "output"
-        ? outputReview.runtimeCatalogues.detached
-        : accountDetachedUsageExpectedCatalogue) ||
+      (profile === "public"
+        ? publicAIReview.runtimeCatalogues.detached
+        : profile === "output"
+          ? outputReview.runtimeCatalogues.detached
+          : accountDetachedUsageExpectedCatalogue) ||
     contentHash(await accountingBoundaryCatalogue(client, signal)) !==
-      (profile === "output"
-        ? outputReview.runtimeCatalogues.boundary
-        : accountingBoundaryExpectedCatalogue)
+      (profile === "public"
+        ? publicAIReview.runtimeCatalogues.boundary
+        : profile === "output"
+          ? outputReview.runtimeCatalogues.boundary
+          : accountingBoundaryExpectedCatalogue)
   )
     throw new DomainError(
       "privacy_commit_fence_unavailable",

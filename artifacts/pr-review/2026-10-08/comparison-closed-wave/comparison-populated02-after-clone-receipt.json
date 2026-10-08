@@ -1,0 +1,61 @@
+{
+  "scope": "Independent closed backup of actual browser work after exact comparison wave activation on the closed populated clone.",
+  "source": "creator_comparison_populated01_20261008",
+  "database": "creator_comparison_populated02_20261008",
+  "before": {
+    "ledgerSha256": "1a68c1ebbf4c6715bd0c73acf486028184c01a9be9fc0c3496894242f8fdd233",
+    "schemaSha256": "9f10fb7943bdacfce786309af3a3d91cc6927e1c776d99af7fe2564687d2bb84",
+    "rolesSha256": "9d8b6693c06bce5d7f8fe470057f009adbc741072ef1e3df9516bce90eab4fd9",
+    "securitySha256": "1c0ad794f6b6ae569489e1b86a10133708e7132a22ba4bb64d71fb8a24e97c80",
+    "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+    "dataSha256": "6cb103b8f68ac1a14621b1ec49ad9ed09f8cfcc98b7f88ecd4427786c20fbc53",
+    "ledgerRows": 114,
+    "businessRows": 1472,
+    "businessTables": 182,
+    "privacyJobs": [
+      {
+        "kind": "delete",
+        "state": "retry",
+        "count": 1
+      },
+      {
+        "kind": "export",
+        "state": "complete",
+        "count": 2
+      }
+    ],
+    "closed": {
+      "closed": true,
+      "alone": true
+    }
+  },
+  "independentlyRestored": {
+    "ledgerSha256": "1a68c1ebbf4c6715bd0c73acf486028184c01a9be9fc0c3496894242f8fdd233",
+    "schemaSha256": "9f10fb7943bdacfce786309af3a3d91cc6927e1c776d99af7fe2564687d2bb84",
+    "rolesSha256": "9d8b6693c06bce5d7f8fe470057f009adbc741072ef1e3df9516bce90eab4fd9",
+    "securitySha256": "1c0ad794f6b6ae569489e1b86a10133708e7132a22ba4bb64d71fb8a24e97c80",
+    "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+    "dataSha256": "6cb103b8f68ac1a14621b1ec49ad9ed09f8cfcc98b7f88ecd4427786c20fbc53",
+    "ledgerRows": 114,
+    "businessRows": 1472,
+    "businessTables": 182,
+    "privacyJobs": [
+      {
+        "kind": "delete",
+        "state": "retry",
+        "count": 1
+      },
+      {
+        "kind": "export",
+        "state": "complete",
+        "count": 2
+      }
+    ],
+    "closed": {
+      "closed": true,
+      "alone": true
+    }
+  },
+  "backupSha256": "22d0c67b0c0c60502d958f7623e8c070bbb72daaee9db41ec5704181b44ee6ae",
+  "backupBytes": 2043485
+}

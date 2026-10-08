@@ -1,0 +1,65 @@
+{
+  "scope": "Complete original/restore metadata and private backup hashes; no private row payloads committed",
+  "files": [
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/original43-comparison-original-incoming.json",
+      "bytes": 53513192,
+      "sha256": "15fc48843c0231456c527dfb0b45266dda00e8bf4f69107299a28872f74e3713"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/original43-comparison-original.json",
+      "bytes": 53512106,
+      "sha256": "dadf5dd9bfe8ba8c60e18e5d109bc58a0dd2d09791f332937c171ebb26105298"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/original43-comparison-restore.json",
+      "bytes": 53512106,
+      "sha256": "dadf5dd9bfe8ba8c60e18e5d109bc58a0dd2d09791f332937c171ebb26105298"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/original43-comparison-restore-incoming.json",
+      "bytes": 53513192,
+      "sha256": "15fc48843c0231456c527dfb0b45266dda00e8bf4f69107299a28872f74e3713"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/private/comparison-populated02-after-before.dump",
+      "bytes": 2043485,
+      "sha256": "22d0c67b0c0c60502d958f7623e8c070bbb72daaee9db41ec5704181b44ee6ae"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/private/comparison-populated01-before-before.dump",
+      "bytes": 1897651,
+      "sha256": "5ba61011ea73d6e91ef1e4c92c04a6c38e09586c317a84ad40d926cd1ed6e0c5"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/private/comparison-populated04-original-after-before.dump",
+      "bytes": 2043470,
+      "sha256": "162cef12a85bc44de00ae8a2989eb1e257a4d5fbccdfa6a95350730702b3f658"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/private/comparison-populated03-before-before.dump",
+      "bytes": 1897651,
+      "sha256": "fb0af1e63b9f60d3a8222b47b1359af330a13e11bfcc2fe054132c470be2c70a"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/private/comparison-populated01-before-restored-owner-defaults.json",
+      "bytes": 1174,
+      "sha256": "450c1501c3b5394246511c3bd6d893f70ec68aec80f53caac270fdad4c33479c"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/private/comparison-populated04-original-after-restored-owner-defaults.json",
+      "bytes": 806,
+      "sha256": "c07e4ec99d57b5023db13fb1e2423d319050f8bd260d7c59973662cefd168c06"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/private/comparison-populated03-before-restored-owner-defaults.json",
+      "bytes": 1174,
+      "sha256": "450c1501c3b5394246511c3bd6d893f70ec68aec80f53caac270fdad4c33479c"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/private/comparison-populated02-after-restored-owner-defaults.json",
+      "bytes": 806,
+      "sha256": "c07e4ec99d57b5023db13fb1e2423d319050f8bd260d7c59973662cefd168c06"
+    }
+  ]
+}

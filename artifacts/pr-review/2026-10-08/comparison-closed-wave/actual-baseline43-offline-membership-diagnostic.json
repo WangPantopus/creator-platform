@@ -1,0 +1,5 @@
+{
+  "scope": "Offline diagnostic only; exact original metadata with only known incoming role entries removed or renamed; no runtime approval or database mutation",
+  "original": "961397d56e093c3e4acfcebd8b97ac8a182ec78d8b3a3bcd41920a926523779d",
+  "incoming": "8f083896a022939e49be136a6cf16719eb543fd4a238f816f55045f0ee0b8804"
+}

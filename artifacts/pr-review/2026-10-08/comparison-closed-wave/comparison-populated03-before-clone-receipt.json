@@ -1,0 +1,61 @@
+{
+  "scope": "Independent closed backup of actual browser work before additive comparison activation.",
+  "source": "creator_generation_journey43_20261007",
+  "database": "creator_comparison_populated03_20261008",
+  "before": {
+    "ledgerSha256": "3178f4cf0f16a579ab5b5057bad7dfede215c3f48c52d1a4447c06c72f022b16",
+    "schemaSha256": "97c3ddb32d8c7888138fae76d78aae1f46cd4cbbe1b251c685c5a0e5137728be",
+    "rolesSha256": "9d8b6693c06bce5d7f8fe470057f009adbc741072ef1e3df9516bce90eab4fd9",
+    "securitySha256": "8a59321116e0c581b19ec1f2f4139084ea3bf032b0706d31decd2b3b751b68bb",
+    "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+    "dataSha256": "67509f8fc6787904d1e2624ba6e37da982a6e39e518c3da62efa071110aaed6b",
+    "ledgerRows": 106,
+    "businessRows": 1472,
+    "businessTables": 178,
+    "privacyJobs": [
+      {
+        "kind": "delete",
+        "state": "retry",
+        "count": 1
+      },
+      {
+        "kind": "export",
+        "state": "complete",
+        "count": 2
+      }
+    ],
+    "closed": {
+      "closed": true,
+      "alone": true
+    }
+  },
+  "independentlyRestored": {
+    "ledgerSha256": "3178f4cf0f16a579ab5b5057bad7dfede215c3f48c52d1a4447c06c72f022b16",
+    "schemaSha256": "97c3ddb32d8c7888138fae76d78aae1f46cd4cbbe1b251c685c5a0e5137728be",
+    "rolesSha256": "9d8b6693c06bce5d7f8fe470057f009adbc741072ef1e3df9516bce90eab4fd9",
+    "securitySha256": "8a59321116e0c581b19ec1f2f4139084ea3bf032b0706d31decd2b3b751b68bb",
+    "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+    "dataSha256": "67509f8fc6787904d1e2624ba6e37da982a6e39e518c3da62efa071110aaed6b",
+    "ledgerRows": 106,
+    "businessRows": 1472,
+    "businessTables": 178,
+    "privacyJobs": [
+      {
+        "kind": "delete",
+        "state": "retry",
+        "count": 1
+      },
+      {
+        "kind": "export",
+        "state": "complete",
+        "count": 2
+      }
+    ],
+    "closed": {
+      "closed": true,
+      "alone": true
+    }
+  },
+  "backupSha256": "fb0af1e63b9f60d3a8222b47b1359af330a13e11bfcc2fe054132c470be2c70a",
+  "backupBytes": 1897651
+}

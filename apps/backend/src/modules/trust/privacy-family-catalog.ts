@@ -1,6 +1,7 @@
 import type { PoolClient, QueryConfig, QueryResultRow } from "pg";
 import generationPrivacyReview from "../../../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
 import contentPrivacyReview from "../../../../../infra/migrations/reviews/20261007-content-privacy.json" with { type: "json" };
+import publicAIReview from "../../../../../infra/migrations/reviews/20261007-public-ai.json" with { type: "json" };
 import { registeredContentPrivacyProfile } from "../../db/content-privacy-profile.js";
 import { registeredPublicAIProfile } from "../../db/public-ai-profile.js";
 import { contentHash } from "../../core/canonical.js";
@@ -354,6 +355,20 @@ export async function assertOriginalPrivacyFamilyContentCatalog(
     contentPrivacyReview.originalFamilyProfiles.map(
       (profile) => profile.sha256,
     ),
+    signal,
+  );
+}
+
+/** Fixed pre-comparison operator metadata for the public/recovery graph.
+ * This grants no task authority and accepts no runtime-selected future profile. */
+export async function assertOriginalPrivacyFamilyPublicCatalogForReview(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  await assertOriginalPrivacyFamilyCaller(client, signal);
+  await assertPurposeCatalogue(
+    client,
+    publicAIReview.originalFamilyProfiles.map((profile) => profile.sha256),
     signal,
   );
 }

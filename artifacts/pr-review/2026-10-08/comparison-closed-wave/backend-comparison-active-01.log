@@ -1,0 +1,30 @@
+file:///Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/backend/dist/server.mjs:72906
+    const failure = new DomainError(
+                    ^
+
+DomainError: Reviewed current all-source export custody is unavailable.
+    at assertReviewedExport (file:///Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/backend/dist/server.mjs:72906:21)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async file:///Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/backend/dist/server.mjs:16432:16
+    ... 4 lines matching cause stack trace ...
+    at async createConfiguredBackend (file:///Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/backend/dist/server.mjs:40660:65)
+    at async file:///Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/backend/dist/server.mjs:75044:60 {
+  code: 'privacy_export_unconfigured',
+  status: 503,
+  [cause]: DomainError: Current comparison artifact custody must match independent review.
+      at invariant (file:///Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/backend/dist/server.mjs:3082:25)
+      at _PreparedComparisonArtifacts.assertClient (file:///Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/backend/dist/server.mjs:37283:5)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async assertReviewedExport (file:///Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/backend/dist/server.mjs:72895:5)
+      at async file:///Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/backend/dist/server.mjs:16432:16
+      at async agentPrivacyTransaction (file:///Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/backend/dist/server.mjs:8360:13)
+      at async agentPreparationRead (file:///Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/backend/dist/server.mjs:16421:12)
+      at async _PreparedAgentPrivacyExport.prepare (file:///Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/backend/dist/server.mjs:73076:5)
+      at async createDevelopmentTrust (file:///Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/backend/dist/server.mjs:73705:74)
+      at async createConfiguredBackend (file:///Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/backend/dist/server.mjs:40660:65) {
+    code: 'comparison_artifact_custody_changed',
+    status: 403
+  }
+}
+
+Node.js v24.19.0

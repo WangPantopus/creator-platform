@@ -1,0 +1,9 @@
+{
+  "privateEvidenceRoot": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e",
+  "sha256": {
+    "pr349-web-backend-failure-01.log": "5f8aac79c9be5795e047c7836c2caafbb52fa650f3a6a21ff13222119be2fe94",
+    "comparison-bootstrap-integration-01.log": "87f2e6efbc42045e49f87772b637356f267f5987270f00645f951718184bcf00",
+    "comparison-existing-installer-01.log": "47556f4cf6a1d3c900277e53d29b30a7321aa27727bf485901fc06d819339d88",
+    "comparison-existing-installer-02.log": "37baa11944e79873173a59b91739816a6630ee33fe76e2eb8d37fde1a661aa2e"
+  }
+}

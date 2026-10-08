@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-08T18:07:46.572Z",
+  "scope": "Closed independent restore of actually committed populated comparison wave; original catalogue guards on administrator-selected identities, not application acceptance",
+  "generation": {
+    "original": {
+      "checkedRoles": 3,
+      "pinnedFunctions": 13,
+      "directCapabilities": 155,
+      "publicCapabilities": 369,
+      "pinnedPublicFunctions": 26
+    },
+    "purposeRoles": 33
+  },
+  "privacy": {
+    "checkedPrivatePurposes": 2,
+    "administratorSelectedCatalogueReview": true
+  },
+  "counts": {
+    "sources": 114,
+    "generations": 18,
+    "comparison_samples": 0
+  }
+}

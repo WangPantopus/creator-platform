@@ -1,0 +1,39 @@
+{
+  "at": "2026-10-08T18:11:42.439Z",
+  "kind": "actual password-login read-only source/worker/actor diagnostic; no application authority",
+  "results": [
+    {
+      "conditions": {
+        "role": "creator_runtime",
+        "literal_role": true,
+        "isolation": "read committed",
+        "no_outgoing": true,
+        "no_incoming": false,
+        "artifact_functions": 19
+      },
+      "catalogue": "e63b8cdcc37f639ea289d3b3e19f20f26fc1bb8fe8f504a7db1d306aa2b8046b"
+    },
+    {
+      "conditions": {
+        "role": "creator_trust_worker",
+        "literal_role": true,
+        "isolation": "read committed",
+        "no_outgoing": true,
+        "no_incoming": true,
+        "artifact_functions": 19
+      },
+      "catalogue": "e63b8cdcc37f639ea289d3b3e19f20f26fc1bb8fe8f504a7db1d306aa2b8046b"
+    },
+    {
+      "conditions": {
+        "role": "creator_trust_runtime",
+        "literal_role": true,
+        "isolation": "read committed",
+        "no_outgoing": true,
+        "no_incoming": true,
+        "artifact_functions": 19
+      },
+      "catalogue": "e63b8cdcc37f639ea289d3b3e19f20f26fc1bb8fe8f504a7db1d306aa2b8046b"
+    }
+  ]
+}

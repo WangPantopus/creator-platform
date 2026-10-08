@@ -224,6 +224,9 @@ export class PreparedComparisonArtifacts {
     await this.assertRestoredInTransaction(client);
     for (const source of comparisonReview.sources)
       await assertRegisteredMigration(client, source, signal);
+    // The original core login permits incoming Growth membership. A caller
+    // using SET ROLE still fails literal session_user; no outgoing membership
+    // is permitted. Trust worker/actor logins remain isolated in both directions.
     const row = (
       await query(
         client,
@@ -231,7 +234,8 @@ export class PreparedComparisonArtifacts {
          AND current_setting('transaction_isolation')='read committed'
          AND EXISTS(SELECT FROM pg_roles WHERE rolname=session_user AND NOT rolinherit AND NOT rolsuper
           AND NOT rolbypassrls AND NOT rolcreatedb AND NOT rolcreaterole AND NOT rolreplication AND rolconfig IS NULL)
-         AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=to_regrole($1) OR roleid=to_regrole($1))
+         AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=to_regrole($1)
+          OR ($1<>'creator_runtime' AND roleid=to_regrole($1)))
          AND NOT EXISTS(SELECT FROM pg_db_role_setting WHERE setrole=to_regrole($1))
          AND EXISTS(SELECT FROM pg_roles r WHERE r.rolname=$2 AND NOT r.rolcanlogin AND NOT r.rolinherit
           AND NOT r.rolsuper AND NOT r.rolbypassrls AND NOT r.rolcreatedb AND NOT r.rolcreaterole

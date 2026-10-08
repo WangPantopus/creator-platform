@@ -19,6 +19,8 @@ import recoveryReview from "../../../infra/migrations/reviews/20261007-generatio
 import { registeredGenerationRecoveryProfile } from "../src/db/generation-recovery-profile.js";
 import publicAIReview from "../../../infra/migrations/reviews/20261007-public-ai.json" with { type: "json" };
 import { registeredPublicAIProfile } from "../src/db/public-ai-profile.js";
+import comparisonReview from "../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
+import { registeredComparisonProfile } from "../src/db/comparison-profile.js";
 import generationReview from "../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
 
 if (!process.env.DATABASE_MIGRATION_URL)
@@ -111,6 +113,19 @@ try {
     throw new Error(
       "Partial-output recovery registry requires its complete reviewed predecessor.",
     );
+  const comparisonVersions = new Set(
+    comparisonReview.sources.map((source) => source.version),
+  );
+  const comparison = registry.migrations.some((source) =>
+    comparisonVersions.has(source.version),
+  );
+  if (
+    comparison &&
+    (!partialRecovery || !(await registeredComparisonProfile()))
+  )
+    throw new Error(
+      "Comparison registry requires all eight reviewed sources and the complete partial-recovery predecessor.",
+    );
   const registeredFiles = registry.migrations
     .filter(
       (file) =>
@@ -190,6 +205,18 @@ try {
     throw new Error(
       "Incomplete partial-output recovery activation; no repair was attempted.",
     );
+  const installedComparison = applied.filter((source) =>
+    comparisonVersions.has(source.version),
+  ).length;
+  if (
+    installedComparison &&
+    (!comparison ||
+      !installedPartialRecovery ||
+      installedComparison !== comparisonVersions.size)
+  )
+    throw new Error(
+      "Incomplete or unregistered comparison wave; no per-file repair was attempted.",
+    );
   // Fresh databases still bootstrap the exact canonical61. The complete new
   // wave is only installed atomically by activate-wave after private backup,
   // separate restore and closed-admission checks. Registered code alone cannot
@@ -203,7 +230,8 @@ try {
       (installedPublic || !publicVersions.has(source.version)) &&
       (installedRecovery || source.version !== recoveryReview.source.version) &&
       (installedPartialRecovery ||
-        source.version !== partialRecoveryReview.source.version),
+        source.version !== partialRecoveryReview.source.version) &&
+      (installedComparison || !comparisonVersions.has(source.version)),
   );
   const historical = localLegacy
     ? new Set<string>()
@@ -227,6 +255,7 @@ try {
     canonicalBeforeGeneration: generation && !installedGeneration,
     generationBeforeContent: installedGeneration > 0 && !installedContent,
     outputBeforePublic: installedOutput && !installedPublic,
+    publicBeforeComparison: Boolean(installedPublic && !installedComparison),
   });
   const hasWave = files.some(
     (file) => file.version === "0062_w6_creator_media_worker",
@@ -249,17 +278,19 @@ try {
       if (installedGeneration)
         await assertGenerationWaveRoleSafety(
           client,
-          installedPartialRecovery
-            ? "partial-generation-recovery"
-            : installedRecovery
-              ? "generation-recovery"
-              : installedPublic
-                ? "public-ai"
-                : installedOutput
-                  ? "generation-output"
-                  : installedContent
-                    ? "content-privacy"
-                    : undefined,
+          installedComparison
+            ? "comparison"
+            : installedPartialRecovery
+              ? "partial-generation-recovery"
+              : installedRecovery
+                ? "generation-recovery"
+                : installedPublic
+                  ? "public-ai"
+                  : installedOutput
+                    ? "generation-output"
+                    : installedContent
+                      ? "content-privacy"
+                      : undefined,
         );
       else await assertWaveRoleSafety(client, installedRoles(applied));
       if (continuation)
@@ -349,17 +380,19 @@ try {
       if (installedGeneration)
         await assertGenerationWaveRoleSafety(
           client,
-          installedPartialRecovery
-            ? "partial-generation-recovery"
-            : installedRecovery
-              ? "generation-recovery"
-              : installedPublic
-                ? "public-ai"
-                : installedOutput
-                  ? "generation-output"
-                  : installedContent
-                    ? "content-privacy"
-                    : undefined,
+          installedComparison
+            ? "comparison"
+            : installedPartialRecovery
+              ? "partial-generation-recovery"
+              : installedRecovery
+                ? "generation-recovery"
+                : installedPublic
+                  ? "public-ai"
+                  : installedOutput
+                    ? "generation-output"
+                    : installedContent
+                      ? "content-privacy"
+                      : undefined,
         );
       else await assertWaveRoleSafety(client, installedRoles(files));
       if (continuation)
@@ -381,6 +414,10 @@ try {
   if (content && !installedContent)
     process.stdout.write(
       "Content export remains unapplied. After generation100, use W8_MIGRATION_WAVE=20261007-content with verified private backup/restore and closed admission.\n",
+    );
+  if (comparison && !installedComparison)
+    process.stdout.write(
+      "Comparison sources remain unapplied. After partial-recovery106, use W8_MIGRATION_WAVE=20261008-comparison with verified private backup/restore and closed admission.\n",
     );
 } finally {
   await client.query(

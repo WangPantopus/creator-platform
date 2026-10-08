@@ -1,0 +1,6 @@
+{
+  "at": "2026-10-08T18:08:45.156Z",
+  "code": 0,
+  "stdout": "{\"wave\":\"20261008-comparison\",\"applied\":[],\"priorLedgerRows\":114,\"ledgerRows\":114,\"priorHistoryPreserved\":true,\"originalDataPreserved\":true,\"originalRows\":1472,\"originalTables\":182,\"oldRolesPreserved\":true,\"originalSequencesPreserved\":true,\"originalSequences\":1,\"verifiedBackupSecurity\":true,\"securityRecords\":17300,\"afterSecuritySha256\":\"1c0ad794f6b6ae569489e1b86a10133708e7132a22ba4bb64d71fb8a24e97c80\",\"roleSafety\":{\"original\":{\"checkedRoles\":3,\"pinnedFunctions\":13,\"directCapabilities\":155,\"publicCapabilities\":369,\"pinnedPublicFunctions\":26},\"purposeRoles\":33},\"privacyRoleSafety\":{\"checkedPrivatePurposes\":2,\"administratorSelectedCatalogueReview\":true},\"afterSchemaSha256\":\"9f10fb7943bdacfce786309af3a3d91cc6927e1c776d99af7fe2564687d2bb84\",\"trafficClosed\":true,\"releaseReady\":false}\n",
+  "stderr": ""
+}

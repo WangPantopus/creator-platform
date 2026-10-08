@@ -1,5 +1,29 @@
 # Session handoff — October 8, 2026
 
+## Active continuation — original populated comparison wave
+
+Continue on `codex/comparison-closed-wave-20261008` in637b. The
+[closed original wave](../../artifacts/pr-review/2026-10-08/comparison-closed-wave/README.md)
+is applied: executable registry and actual copy43 now both have114 sources.
+Original1472 rows/history/roles/sequences are preserved. Rollback review, original
+backup/restores01–04, actual clone wave, idempotent rerun and original43 wave pass.
+Eight applied SQL files are immutable. Preserve both initial operator refusals
+and actual first-start refusal; the corrected literal core login guard admits
+only the original incoming-membership behavior, with no outgoing core authority.
+
+Compileda2fccdc1b runs on57304 through `native-e2e/launch43-backend-comparison-active-02.mjs`,
+log `backend-comparison-active-02.log`, with explicit fictional comparison policy.
+Web3119 opens the unchanged fan thread. Both native devices remain stopped.
+All18 generations/69 usage records and original publication match before/after.
+No comparison consent/sample/provider acceptance has occurred. Next implement
+and operate the separate choice and question controls across all three apps,
+then sanitization/withdrawal/export and the legitimate preserved revision13 upgrade.
+Continue every remaining milestone in the full finish plan.
+
+PR347 targets main atf9a25ba09, PR348 is stacked on347 at0fef8fe89; refresh checks.
+PR346 merged6e2201f64. PR345's failed hosted-runner job passed its rerun;346's
+separate main37819217990 has been rerun and was queued. Refresh before merging.
+
 ## Active continuation — scoped export recovery and legacy expiry
 
 Continue on `codex/comparison-legacy-custody-20261008` in637b. The
