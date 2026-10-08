@@ -1,5 +1,10 @@
 # Generation grounding and privilege-scan improvement
 
+The [revision 14 continuation](../generation-context-latency/README.md) adds the
+context-token repair, further current-check reductions, latest live measurements
+and custody through copy 46. The revision 13 observations below remain historical
+evidence, including their failed latency qualification.
+
 Continuation after #334 merged at `d165d3116f4534b0de25def09dc5160657a76294`.
 This is an incremental grounding repair and measured database optimization.
 **End-to-end latency remains outside the design targets.**

@@ -236,6 +236,7 @@ export class PreparedGenerationConversationContext {
         "generation_context_pool_mismatch",
         "Use the same actual canonical database.",
       );
+      await input.identity.assertCatalogueInTransaction(client);
       await prepared.assertCustody(client);
       input.signal?.throwIfAborted();
     } catch (error) {
@@ -302,7 +303,9 @@ export class PreparedGenerationConversationContext {
         client,
         generationContextProfileBoundSource,
       );
-      await this.identity.assertCatalogueInTransaction(client);
+      // Runtime reads already call W1's complete current authorization on
+      // either side of this consumer's custody checks. Factory qualification
+      // checks W1 explicitly before entering here without an issued scope.
       const installed = (
         await catalogueQuery<{ ready: boolean; definition: string }>(
           client,

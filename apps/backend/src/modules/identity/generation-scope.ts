@@ -281,6 +281,9 @@ async function assertGenerationCatalogue(
   // One fresh statement checks the same lifecycle, role, ledger, function,
   // ACL and consumer predicates. Only the prepared plan is reused. Combining
   // these reads avoids hundreds of network round trips per bounded purpose.
+  // Owner OIDs in pg_namespace/pg_class are non-null. Read each complete owner
+  // set once per statement instead of a correlated relation scan per consumer;
+  // the statement still observes current catalogue data on every invocation.
   const result = (
     await catalogueQuery<{
       installed: boolean;
@@ -308,8 +311,8 @@ async function assertGenerationCatalogue(
         AND NOT r.rolcreatedb AND NOT r.rolcreaterole AND NOT r.rolreplication
         AND (r.rolconfig IS NULL OR cardinality(r.rolconfig)=0)
         AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid OR roleid=r.oid)
-        AND NOT EXISTS(SELECT FROM pg_namespace WHERE nspowner=r.oid)
-        AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=r.oid))
+        AND NOT r.oid=ANY(ARRAY(SELECT nspowner FROM pg_namespace))
+        AND NOT r.oid=ANY(ARRAY(SELECT relowner FROM pg_class)))
        AND NOT EXISTS(SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
         WHERE n.nspname !~ '^pg_' AND n.nspname<>'information_schema'
          AND c.relkind IN('r','p','v','m','f')
@@ -391,8 +394,8 @@ async function assertGenerationCatalogue(
          AND NOT r.rolcreatedb AND NOT r.rolcreaterole AND NOT r.rolreplication
          AND (r.rolconfig IS NULL OR cardinality(r.rolconfig)=0)
          AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid OR roleid=r.oid)
-         AND NOT EXISTS(SELECT FROM pg_namespace WHERE nspowner=r.oid)
-         AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=r.oid)
+         AND NOT r.oid=ANY(ARRAY(SELECT nspowner FROM pg_namespace))
+         AND NOT r.oid=ANY(ARRAY(SELECT relowner FROM pg_class))
          AND NOT EXISTS(SELECT FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a
           WHERE a.grantee=0 AND a.privilege_type='EXECUTE')
          AND EXISTS(SELECT FROM aclexplode(p.proacl) a JOIN pg_roles worker ON worker.oid=a.grantee

@@ -23,7 +23,7 @@ import { DomainError } from "../../core/errors.js";
 import { responseLanguage } from "./language.js";
 import type { StreamProposal } from "./streaming.js";
 
-export const PIPELINE_REVISION = "w2-context-guardrails-13";
+export const PIPELINE_REVISION = "w2-context-guardrails-14";
 export type AudienceSnapshot = {
   revision: string;
   tierIds: string[];
@@ -152,9 +152,97 @@ export function compile(
   });
   return { prefix, hash: contentHash({ prefix }) };
 }
-function tokens(text: string) {
-  return Buffer.byteLength(text, "utf8");
+/** Assemble already scoped text only. This result is model input, never
+ * retrieval, provider or delivery authority. The caller owns those checks. */
+export async function assembleTextContext(
+  input: Pick<PipelineInput, "message" | "snapshot" | "status" | "sponsors">,
+  prefix: string,
+  passages: readonly Passage[],
+  retrievedExamples: () => Promise<readonly string[]>,
+  tokens: (text: string) => number,
+  languageTag?: string,
+) {
+  const currentStatus =
+    input.status && Date.parse(input.status.expiresAt) > Date.now()
+      ? input.status
+      : null;
+  const sponsors = input.sponsors.filter(
+    (s) => s.active && Date.parse(s.expiresAt) > Date.now(),
+  );
+  let budget =
+    2500 -
+    tokens(
+      canonical({
+        message: input.message,
+        currentStatus,
+        sponsorships: sponsors,
+      }),
+    ) -
+    450;
+  if (budget < 0)
+    throw new DomainError(
+      "message_large",
+      "Shorten this message before sending.",
+      400,
+    );
+  const take = (values: readonly string[]) => {
+    const result: string[] = [];
+    for (const value of values) {
+      const cost = tokens(canonical(value)) + 2;
+      if (cost <= budget) {
+        result.push(value);
+        budget -= cost;
+      }
+    }
+    return result;
+  };
+  // Preserve priority while rendering the fixed eight-slot contract.
+  const memory = take(
+    input.snapshot.offTheRecord ? [] : input.snapshot.memory.slice(0, 30),
+  );
+  const notes = take(
+    input.snapshot.offTheRecord
+      ? []
+      : (input.snapshot.notes ?? []).slice(0, 30),
+  );
+  const publicAnswers = take((input.snapshot.publicAnswers ?? []).slice(0, 20));
+  const tail = take(input.snapshot.messages.slice(-30).reverse()).reverse();
+  const evidence: Passage[] = [];
+  for (const passage of passages) {
+    const cost = tokens(canonical(passage)) + 2;
+    if (cost <= budget) {
+      evidence.push(passage);
+      budget -= cost;
+    }
+  }
+  const intro = input.snapshot.intro
+    ? (take([input.snapshot.intro])[0] ?? null)
+    : null;
+  const examples = take(await retrievedExamples());
+  const context = [
+    prefix,
+    canonical({ slot2Dynamic: { currentStatus, sponsorships: sponsors } }),
+    canonical({ slot3Retrieved: examples }),
+    canonical({ slot4: { untrustedEvidence: evidence } }),
+    canonical({ slot5: intro }),
+    canonical({ slot6: { memory, notes, publicAnswers } }),
+    canonical({ slot7: { messages: tail } }),
+    canonical({
+      slot8: {
+        message: input.message,
+        ...(languageTag ? { responseLanguage: languageTag } : {}),
+      },
+    }),
+  ];
+  if (tokens(context.slice(1).join("\n\n")) > 2500)
+    throw new DomainError(
+      "context_budget",
+      "The current status or context exceeds its safe budget. Shorten the creator status.",
+      503,
+    );
+  return { context, evidence, sponsors };
 }
+
 function normalize(text: string) {
   return text
     .normalize("NFKC")
@@ -495,92 +583,24 @@ export class AgentPipeline {
         input.snapshot.messages.length > 0
           ? "small"
           : "large";
+      // The design budgets uncached text in model tokens. UTF-8 byte length
+      // prematurely exhausted it as history grew, excluding authorized chunks.
+      const tokens = (text: string) =>
+        this.model!.countContextTokens(text, route);
       const refusal = !classified.value.allowed;
       providerCallPending = true;
       const retrieved = await ports.retrieve();
       usage.push(retrieved.usage);
       providerCallPending = false;
       const passages = retrieved.passages;
-      const currentStatus =
-        input.status && Date.parse(input.status.expiresAt) > Date.now()
-          ? input.status
-          : null;
-      const sponsors = input.sponsors.filter(
-        (s) => s.active && Date.parse(s.expiresAt) > Date.now(),
-      );
-      let budget =
-        2500 -
-        tokens(
-          canonical({
-            message: input.message,
-            currentStatus,
-            sponsorships: sponsors,
-          }),
-        ) -
-        450;
-      if (budget < 0)
-        throw new DomainError(
-          "message_large",
-          "Shorten this message before sending.",
-          400,
-        );
-      const take = (values: readonly string[]) => {
-        const result: string[] = [];
-        for (const value of values) {
-          const cost = tokens(canonical(value)) + 2;
-          if (cost <= budget) {
-            result.push(value);
-            budget -= cost;
-          }
-        }
-        return result;
-      };
-      // Preserve priority while rendering the fixed eight-slot contract.
-      const memory = take(
-        input.snapshot.offTheRecord ? [] : input.snapshot.memory.slice(0, 30),
-      );
-      const notes = take(
-        input.snapshot.offTheRecord
-          ? []
-          : (input.snapshot.notes ?? []).slice(0, 30),
-      );
-      const publicAnswers = take(
-        (input.snapshot.publicAnswers ?? []).slice(0, 20),
-      );
-      const tail = take(input.snapshot.messages.slice(-30).reverse()).reverse();
-      const evidence: Passage[] = [];
-      for (const passage of passages) {
-        const cost = tokens(canonical(passage)) + 2;
-        if (cost <= budget) {
-          evidence.push(passage);
-          budget -= cost;
-        }
-      }
-      const intro = input.snapshot.intro
-        ? (take([input.snapshot.intro])[0] ?? null)
-        : null;
-      const examples = take(await retrieved.examples());
-      const context = [
+      const { context, evidence, sponsors } = await assembleTextContext(
+        input,
         compiled.prefix,
-        canonical({ slot2Dynamic: { currentStatus, sponsorships: sponsors } }),
-        canonical({ slot3Retrieved: examples }),
-        canonical({ slot4: { untrustedEvidence: evidence } }),
-        canonical({ slot5: intro }),
-        canonical({ slot6: { memory, notes, publicAnswers } }),
-        canonical({ slot7: { messages: tail } }),
-        canonical({
-          slot8: {
-            message: input.message,
-            ...(language ? { responseLanguage: language.tag } : {}),
-          },
-        }),
-      ];
-      if (tokens(context.slice(1).join("\n\n")) > 2500)
-        throw new DomainError(
-          "context_budget",
-          "The current status or context exceeds its safe budget. Shorten the creator status.",
-          503,
-        );
+        passages,
+        () => retrieved.examples(),
+        tokens,
+        language?.tag,
+      );
       const contextHash = contentHash({
         compiledHash: compiled.hash,
         sourcePassages: evidence.map((p) => p.id),

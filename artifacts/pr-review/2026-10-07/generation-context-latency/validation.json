@@ -1,0 +1,31 @@
+{
+  "baseCommit": "eb714387d82bd6ad8a309e47f95d5ce7c8c6e248",
+  "pipelineRevision": "w2-context-guardrails-14",
+  "sourceSha256": {
+    "apps/backend/package.json": "fa04a5a8a215dc4e929ca1b35daacc6750d0def56328791a4a5d5bfed0f7a6af",
+    "pnpm-lock.yaml": "09a55a28b157a935275e92bfaf9382a600d3c364a57ed0f5a34f63b69f2f90fe",
+    "apps/backend/src/modules/agent/model.ts": "4b88d904615f6c99082cce20f59d9a7d6c2fea350f27ea15e687fe0b87fba336",
+    "apps/backend/src/modules/agent/pipeline.ts": "2fab6d7b3806322c6fe5e8a34066ba86c3d98f9a0714ffa6b0d74c3d13660a62",
+    "apps/backend/src/modules/agent/generation-metadata.ts": "d0686f4c292f81055edd5188763fd419e6f2b0db88b11648f75a4f11f9823566",
+    "apps/backend/src/modules/conversation/generation-context.ts": "c72b9e6427b34f59b383c47bd0ba67bf42d4827b8e99f48dc4a4f1684c01bb14",
+    "apps/backend/src/modules/identity/generation-scope.ts": "f436a516111f867a878d8a2ce5d13245cc4c4695cdce90f9fcfc813bb4e45186"
+  },
+  "backendBuild": "pass: TypeScript and standalone bundle",
+  "existingBackendTests": {
+    "passed": 17,
+    "existingPostgresIntegrationSkipped": 9
+  },
+  "scopedEslint": "pass",
+  "scopedPrettier": "pass",
+  "compiledStartup": "worker prepared and running",
+  "compiledIdleShutdownExit": 0,
+  "compiledRestart": {
+    "startup": "worker prepared and running",
+    "providerRecordsAndOperationUnchanged": true,
+    "finalIdleShutdownExit": 0
+  },
+  "latencyTargetsMet": false,
+  "upgradeQualified": false,
+  "firstPublicationQualified": "fictional development only",
+  "webImplementationChanged": false
+}

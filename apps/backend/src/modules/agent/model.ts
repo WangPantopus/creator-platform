@@ -1,4 +1,10 @@
 import { z } from "zod";
+import {
+  getEncoding,
+  getEncodingNameForModel,
+  type Tiktoken,
+  type TiktokenModel,
+} from "js-tiktoken";
 import { DomainError } from "../../core/errors.js";
 import { streamResponses, type StreamProposal } from "./streaming.js";
 import { contentHash } from "../../core/canonical.js";
@@ -108,6 +114,8 @@ export interface AgentModel {
   readonly fingerprint: string;
   readonly embeddingModel: string;
   readonly pricingConfigured: boolean;
+  /** Plain-text assembly budget, not a provider billing receipt. */
+  countContextTokens(text: string, route: "small" | "large"): number;
   maximumRunCostMicros(prefixBytes: number): number | null;
   reply(
     instructions: string,
@@ -139,6 +147,11 @@ export type ModelConfiguration = {
 export class OpenAIResponsesModel implements AgentModel {
   readonly fingerprint: string;
   readonly embeddingModel: string;
+  private readonly tokenizers: Readonly<Record<"small" | "large", Tiktoken>>;
+  countContextTokens(text: string, route: "small" | "large"): number {
+    // Fan/source text resembling a special token remains ordinary quoted text.
+    return this.tokenizers[route].encode(text, [], []).length;
+  }
   get pricingConfigured() {
     return (
       [
@@ -213,10 +226,37 @@ export class OpenAIResponsesModel implements AgentModel {
   private active = 0;
   constructor(private readonly configuration: ModelConfiguration) {
     this.embeddingModel = configuration.embeddingModel;
+    const encodings = (() => {
+      try {
+        return {
+          small: getEncodingNameForModel(
+            configuration.smallModel as TiktokenModel,
+          ),
+          large: getEncodingNameForModel(
+            configuration.largeModel as TiktokenModel,
+          ),
+        };
+      } catch {
+        throw new DomainError(
+          "model_tokenizer_unconfigured",
+          "Configure models with reviewed tokenizers before generating.",
+          503,
+        );
+      }
+    })();
+    const small = getEncoding(encodings.small);
+    this.tokenizers = Object.freeze({
+      small,
+      large:
+        encodings.large === encodings.small
+          ? small
+          : getEncoding(encodings.large),
+    });
     const { apiKey: _apiKey, ...publicConfiguration } = configuration;
     void _apiKey;
     this.fingerprint = contentHash({
       adapter: "responses-v3-cache-routing",
+      tokenizer: { implementation: "js-tiktoken-1.0.21", encodings },
       ...publicConfiguration,
     });
   }

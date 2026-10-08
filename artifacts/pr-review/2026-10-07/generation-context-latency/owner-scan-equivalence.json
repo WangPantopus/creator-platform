@@ -1,0 +1,178 @@
+{
+  "database": "creator_generation_journey44_20261007",
+  "samples": [
+    {
+      "beforeMs": 11.609555,
+      "afterMs": 10.369619
+    },
+    {
+      "beforeMs": 11.47461299999999,
+      "afterMs": 9.911367000000013
+    },
+    {
+      "beforeMs": 10.747273000000007,
+      "afterMs": 9.05069899999998
+    },
+    {
+      "beforeMs": 9.783303000000018,
+      "afterMs": 8.168357999999984
+    },
+    {
+      "beforeMs": 9.739561000000009,
+      "afterMs": 8.454263999999995
+    },
+    {
+      "beforeMs": 8.510216000000014,
+      "afterMs": 5.777192999999983
+    },
+    {
+      "beforeMs": 7.999493000000001,
+      "afterMs": 5.932946000000015
+    },
+    {
+      "beforeMs": 6.941716000000014,
+      "afterMs": 5.0392909999999915
+    },
+    {
+      "beforeMs": 6.061597000000006,
+      "afterMs": 4.879259999999988
+    },
+    {
+      "beforeMs": 6.246120000000019,
+      "afterMs": 4.807569999999998
+    },
+    {
+      "beforeMs": 6.286028999999985,
+      "afterMs": 4.794085999999993
+    },
+    {
+      "beforeMs": 6.344118999999978,
+      "afterMs": 4.8683920000000285
+    },
+    {
+      "beforeMs": 6.265802000000008,
+      "afterMs": 4.817508999999973
+    },
+    {
+      "beforeMs": 6.0154,
+      "afterMs": 4.796775999999966
+    },
+    {
+      "beforeMs": 6.4940070000000105,
+      "afterMs": 5.102039999999988
+    },
+    {
+      "beforeMs": 6.292648999999983,
+      "afterMs": 4.7983409999999935
+    },
+    {
+      "beforeMs": 6.369222999999977,
+      "afterMs": 5.055679999999995
+    },
+    {
+      "beforeMs": 6.168275000000051,
+      "afterMs": 4.838084999999978
+    },
+    {
+      "beforeMs": 6.796754000000021,
+      "afterMs": 5.707785000000001
+    },
+    {
+      "beforeMs": 6.481572000000028,
+      "afterMs": 5.039136999999982
+    },
+    {
+      "beforeMs": 6.515431000000035,
+      "afterMs": 4.808335
+    },
+    {
+      "beforeMs": 6.223991000000012,
+      "afterMs": 4.696800999999994
+    },
+    {
+      "beforeMs": 6.408121999999992,
+      "afterMs": 5.045604000000026
+    },
+    {
+      "beforeMs": 7.040048000000013,
+      "afterMs": 4.9823729999999955
+    },
+    {
+      "beforeMs": 6.263682000000017,
+      "afterMs": 5.0357890000000225
+    },
+    {
+      "beforeMs": 6.403321000000005,
+      "afterMs": 4.740313000000015
+    },
+    {
+      "beforeMs": 6.20933100000002,
+      "afterMs": 4.690393000000029
+    },
+    {
+      "beforeMs": 6.295159000000012,
+      "afterMs": 5.014264000000026
+    },
+    {
+      "beforeMs": 6.594467999999949,
+      "afterMs": 4.756520000000023
+    },
+    {
+      "beforeMs": 6.108711999999969,
+      "afterMs": 4.766137999999955
+    }
+  ],
+  "drifts": [
+    {
+      "name": "consumer_relation_owner",
+      "identical": true,
+      "refused": true
+    },
+    {
+      "name": "consumer_schema_owner",
+      "identical": true,
+      "refused": true
+    },
+    {
+      "name": "worker_relation_owner",
+      "identical": true,
+      "refused": true
+    },
+    {
+      "name": "worker_schema_owner",
+      "identical": true,
+      "refused": true
+    },
+    {
+      "name": "authority_relation_owner",
+      "identical": true,
+      "refused": true
+    },
+    {
+      "name": "authority_schema_owner",
+      "identical": true,
+      "refused": true
+    },
+    {
+      "name": "consumer_login",
+      "identical": true,
+      "refused": true
+    },
+    {
+      "name": "worker_membership",
+      "identical": true,
+      "refused": true
+    },
+    {
+      "name": "worker_column",
+      "identical": true,
+      "refused": true
+    },
+    {
+      "name": "public_execute",
+      "identical": true,
+      "refused": true
+    }
+  ],
+  "rollbackRestored": true
+}

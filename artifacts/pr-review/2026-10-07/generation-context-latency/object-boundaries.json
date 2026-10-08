@@ -1,0 +1,11 @@
+{
+  "at": "2026-10-08T06:06:41.615Z",
+  "checks": [
+    "copied_licensed_facts_rejected",
+    "copied_metadata_rejected",
+    "copied_scope_rejected",
+    "different_client_rejected",
+    "previous_purpose_facts_rejected"
+  ],
+  "scope": "Negative forgery probes against actual issued source-host objects: copies, a forged replacement client, and a retained earlier-purpose input. Not production fault-injection coverage."
+}
