@@ -1,7 +1,7 @@
 # Session handoff — October 8, 2026
 
-**Latest: the user requested immediate handoff. Start with [the current handoff](session-handoff-2026-10-08-immediate.md).**
-The historical continuation entries below are preserved evidence, not the current runtime state.
+**History. For the order of work read [LAUNCH_PLAN](../LAUNCH_PLAN.md); for the current state, [CURRENT](CURRENT.md).**
+The entries below, including the "Continue on" instructions, the open-PR lists and "Start here", are preserved evidence from before the launch review, not current instructions or runtime state.
 
 
 ## Active continuation — actual creator upgrade and native verification
