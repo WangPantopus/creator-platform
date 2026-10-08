@@ -1,5 +1,16 @@
 # Product finish plan — October 8, 2026
 
+## Current execution — real comparison controls
+
+The [web/iOS/Android comparison increment](../../artifacts/pr-review/2026-10-08/comparison-choice-ui/README.md)
+now has explicit fictional choice, one real privacy-reviewed question, two settled
+provider calls costing921 microdollars, and native cache reuse with unchanged
+original generation/publication custody. The next actual export exposed mismatched
+Agent stream/source references and correctly failed sealing. Repair that binding,
+retry the original job, verify downloads and withdrawal/physical purge, then operate
+the preserved creator upgrade. All ten completion criteria remain open.
+
+
 This is the execution plan for the resumed `637b` checkout. It carries forward
 the complete [project checkpoint](project-continuation-2026-10-07.md),
 [session handoff](session-handoff-2026-10-08.md) and original

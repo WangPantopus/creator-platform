@@ -30,6 +30,7 @@ export async function platformFetch(
   path: string,
   init: RequestInit = {},
   authenticated = true,
+  timeoutMs: 10_000 | 65_000 = 10_000,
 ) {
   // Runtime configuration and identity availability must never be frozen into
   // an unavailable page when a deployable bundle is built without secrets.
@@ -58,7 +59,7 @@ export async function platformFetch(
     cache: "no-store",
     signal: AbortSignal.any([
       ...(init.signal ? [init.signal] : []),
-      AbortSignal.timeout(10000),
+      AbortSignal.timeout(timeoutMs),
     ]),
   });
 }

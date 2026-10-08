@@ -46,6 +46,8 @@ private struct W3ThreadScreen: View {
     @StateObject private var model: W3ThreadModel
     @ObservedObject var session: FanSession
     @State private var privacy = false
+    @State private var comparisonQuestion: W3Message?
+    @State private var comparisonsAvailable = false
     @State private var source: W3Passage?
     @State private var originalReply: W3Message?
     @State private var sourceFailure = ""
@@ -66,7 +68,7 @@ private struct W3ThreadScreen: View {
                         LazyVStack(alignment: .leading, spacing: QelvoraTokens.space4) {
                             if let offerId = model.introOfferId, session.session?.fan != nil, page.feedbackPolicy != nil {
                                 IntroOffer(offerId: offerId, session: session,
-                                    enabled: scenePhase == .active && !privacy && source == nil && originalReply == nil && !model.offline && !model.busy,
+                                    enabled: scenePhase == .active && !privacy && source == nil && originalReply == nil && comparisonQuestion == nil && !model.offline && !model.busy,
                                     acknowledge: model.acknowledgeIntroOffer).id(offerId)
                             }
                             Text("Conversations with a creator’s AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.").qText("caption").padding(12).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusMd))
@@ -112,7 +114,7 @@ private struct W3ThreadScreen: View {
                             .accessibilityLabel(page.control == .human_active ? "Message \(page.creatorName)" : "Message \(page.creatorName)'s AI")
                             .focused($composerFocused)
                             .onChange(of: model.draft) { _, value in if value.count > 2000 { model.draft = String(value.prefix(2000)) } }
-                        Button("Send", variant: page.control == .human_active ? .maya : .ai, disabled: scenePhase != .active || privacy || source != nil || originalReply != nil || !page.canSend || model.offline || model.busy || model.pending != nil || !page.generationSequences.isEmpty || model.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) { Task { await model.send() } }
+                        Button("Send", variant: page.control == .human_active ? .maya : .ai, disabled: scenePhase != .active || privacy || source != nil || originalReply != nil || comparisonQuestion != nil || !page.canSend || model.offline || model.busy || model.pending != nil || !page.generationSequences.isEmpty || model.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) { Task { await model.send() } }
                     }
                     if !composerFocused { HStack { Button("Me and privacy", variant: .quiet) { privacy = true }; Button("Get support", variant: .quiet) { session.open("/support") } } }
                 }.padding(QelvoraTokens.space4).background(qColor("ground", scheme))
@@ -123,28 +125,43 @@ private struct W3ThreadScreen: View {
                 Spacer()
             }
         }.frame(maxWidth: 390).foregroundStyle(qColor("ink", scheme)).background(qColor("ground", scheme))
-            .task(id: "\(scenePhase)-\(privacy)-\(source != nil)-\(originalReply != nil)-\(connectionRetry)") {
-                let active = scenePhase == .active && !privacy && source == nil && originalReply == nil
+            .task(id: "\(scenePhase)-\(privacy)-\(source != nil)-\(originalReply != nil || comparisonQuestion != nil)-\(connectionRetry)") {
+                let active = scenePhase == .active && !privacy && source == nil && originalReply == nil && comparisonQuestion == nil
                 model.setActive(active)
                 if active { await model.connect() }
             }
-            .task(id: "\(scenePhase)-\(privacy)-\(source != nil)-\(originalReply != nil)") {
-                if scenePhase == .active && !privacy && source == nil && originalReply == nil {
+            .task(id: "\(scenePhase)-\(privacy)-\(source != nil)-\(originalReply != nil || comparisonQuestion != nil)") {
+                if scenePhase == .active && !privacy && source == nil && originalReply == nil && comparisonQuestion == nil {
                     while !Task.isCancelled { try? await Task.sleep(for: .seconds(15)); if !Task.isCancelled { await model.refresh() } }
                 }
             }
             .onChange(of: scenePhase) { _, value in
-                if value != .active { source = nil; originalReply = nil; sourceFailure = "" }
-                model.setActive(value == .active && !privacy && source == nil && originalReply == nil)
+                if value != .active { source = nil; originalReply = nil; comparisonQuestion = nil; sourceFailure = "" }
+                model.setActive(value == .active && !privacy && source == nil && originalReply == nil && comparisonQuestion == nil)
             }
-            .onChange(of: privacy) { _, value in model.setActive(scenePhase == .active && !value && source == nil && originalReply == nil) }
-            .onChange(of: source != nil) { _, value in model.setActive(scenePhase == .active && !privacy && !value && originalReply == nil) }
-            .onChange(of: originalReply != nil) { _, value in model.setActive(scenePhase == .active && !privacy && source == nil && !value) }
-            .task(id: "\(scenePhase)-\(privacy)-\(source != nil)-\(originalReply != nil)-\(model.page != nil)") {
-                if scenePhase != .active || privacy || source != nil || originalReply != nil { await model.presence(active: false) }
+            .onChange(of: privacy) { _, value in model.setActive(scenePhase == .active && !value && source == nil && originalReply == nil && comparisonQuestion == nil) }
+            .onChange(of: source != nil) { _, value in model.setActive(scenePhase == .active && !privacy && !value && originalReply == nil && comparisonQuestion == nil) }
+            .onChange(of: originalReply != nil || comparisonQuestion != nil) { _, value in model.setActive(scenePhase == .active && !privacy && source == nil && !value) }
+            .task(id: "\(scenePhase)-\(privacy)-\(source != nil)-\(originalReply != nil || comparisonQuestion != nil)-\(model.page != nil)") {
+                if scenePhase != .active || privacy || source != nil || originalReply != nil || comparisonQuestion != nil { await model.presence(active: false) }
                 else { while !Task.isCancelled { await model.presence(active: true); try? await Task.sleep(for: .seconds(20)) } }
             }
             .onDisappear { model.setActive(false); Task { await model.presence(active: false) } }
+            .task(id: "\(model.offline)-\(scenePhase)") {
+                comparisonsAvailable = false
+                if !model.offline && scenePhase == .active {
+                    let caps: W3Capabilities? = try? await model.client.request("capabilities", publicRead: true)
+                    if !Task.isCancelled { comparisonsAvailable = caps?.comparisonsAvailable == true }
+                }
+            }
+            .sheet(item: $comparisonQuestion) { question in
+                ScrollView { VStack(alignment: .leading, spacing: 16) {
+                    HStack { Text("AI comparisons").qText("display-lg"); Spacer(); Button("Close", variant: .quiet) { comparisonQuestion = nil } }
+                    Text("Your question").qText("data-sm")
+                    Text(question.text).qText("body").padding(12).background(qColor("surface-sunken", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusLg))
+                    W3ComparisonChoice(client: model.client, root: model.root, messageId: question.id)
+                }.padding(16) }.foregroundStyle(qColor("ink", scheme)).background(qColor("ground", scheme)).presentationDragIndicator(.visible)
+            }
             .sheet(isPresented: $privacy) { W3PrivacyScreen(client: model.client, root: model.root, session: session) }
             .sheet(item: $source) { passage in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Original source").qText("data-sm"); Text(passage.title).qText("display-md"); Text(passage.text).qText("body").textSelection(.enabled) }.padding(16) } }
             .sheet(item: $originalReply) { original in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Original AI reply · version \(original.version)").qText("data-sm"); Text(original.text).qText("body").textSelection(.enabled) }.padding(16) } }
@@ -188,6 +205,9 @@ private struct W3ThreadScreen: View {
             if message.feedback != nil, page.feedbackPolicy == nil {
                 Button("Remove my response", variant: .quiet, disabled: model.busy || model.offline) { Task { await model.feedback(message, rating: nil) } }
             }
+            if comparisonsAvailable && message.authorKind == .fan && !message.offTheRecord && !page.offTheRecord && (message.deliveryState == .accepted || message.deliveryState == .delivered) {
+                Button("AI comparison options", variant: .quiet, disabled: model.busy || model.offline) { comparisonQuestion = message }.accessibilityIdentifier("comparison-options-" + message.id)
+            }
             if message.authorKind == .fan { if message.offTheRecord { Text("Not used for memory").qText("caption") } else { Button("Don't remember this",variant:.quiet,disabled:model.busy || model.offline) { Task { await model.forget(message) } } } }
         } else {
             VStack(alignment: .leading, spacing: 8) {
@@ -205,7 +225,7 @@ private struct W3ThreadScreen: View {
                asset.state == .ready, asset.mimeType == "audio/mp4", asset.purpose == .human_reply,
                message.authorKind == .human_creator, let act = message.signedActId, asset.signedActId == act,
                let accountId = session.session?.accountId {
-                W3RecordingView(session: session, destination: session.destination, baseURL: baseURL, accountId: accountId, creatorId: model.creatorId, fanId: model.fanId, asset: asset, name: page.creatorName, time: message.createdAt, active: scenePhase == .active && !privacy && source == nil && originalReply == nil, onVerify: { session.open("/verify/" + act) })
+                W3RecordingView(session: session, destination: session.destination, baseURL: baseURL, accountId: accountId, creatorId: model.creatorId, fanId: model.fanId, asset: asset, name: page.creatorName, time: message.createdAt, active: scenePhase == .active && !privacy && source == nil && originalReply == nil && comparisonQuestion == nil, onVerify: { session.open("/verify/" + act) })
                     .id(accountId + "/" + asset.id + "/" + String(asset.version) + "/" + asset.sha256)
             } else {
                 Text(message.authorLabel(name: page.creatorName)).qText("label")
@@ -419,6 +439,8 @@ private struct W3PrivacyScreen: View {
                 ForEach(usage.days, id: \.day) { day in HStack { Text(day.day).qText("data-sm"); Spacer(); Text("\(Int(day.seconds / 60)) minutes").qText("body") } }
                 if !usage.modeAvailable { Text("Companion mode time signals await the verified AI mode configuration.").qText("caption") }
             }
+            Text("AI comparisons").qText("display-md")
+            W3ComparisonChoice(client: client, root: root)
             Text("AI providers").qText("display-md")
             if caps?.providers?.verified == false { Notice(title: QelvoraCopy.text("conversationDevelopmentPolicyTitle"), children: QelvoraCopy.text("conversationDevelopmentPolicyNotice")) }
             if caps?.providers == nil { Text("AI provider consent is unavailable or has been withdrawn.").qText("body") }

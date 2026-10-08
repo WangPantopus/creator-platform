@@ -23,6 +23,42 @@ import org.junit.runner.RunWith
 class ConnectedJourneyTest {
     @get:Rule val compose = createEmptyComposeRule()
 
+    /** Actual UI reuse of a question explicitly included earlier in this
+     * preserved journey. No consent, sample, provider or account is seeded. */
+    @Test fun comparisonChoiceAndQuestion() {
+        val args = InstrumentationRegistry.getArguments()
+        val origin = args.getString("journeyApiUrl")
+        val destination = args.getString("journeyThread")
+        val sourceId = args.getString("journeyComparisonMessageId")
+        assumeTrue(origin != null && destination != null && sourceId != null)
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val intent = Intent(context, MainActivity::class.java).putExtra("api_url", origin)
+            .putExtra("return_to", destination).putExtra("appearance", args.getString("journeyAppearance") ?: "light")
+        ActivityScenario.launch<MainActivity>(intent).use {
+            try {
+                compose.waitUntil(30_000) { compose.onAllNodesWithText("AI comparison options").fetchSemanticsNodes().isNotEmpty() }
+                val target = hasTestTag("comparison-options-$sourceId")
+                compose.onNode(hasScrollToNodeAction()).performScrollToNode(target)
+                compose.onNode(target).assertIsDisplayed().performClick()
+                compose.waitUntil(20_000) { compose.onAllNodesWithText("Allowed for this creator").fetchSemanticsNodes().isNotEmpty() }
+                compose.onNode(hasScrollToNodeAction() and hasAnyDescendant(hasText("Your question")))
+                    .performScrollToNode(hasText("Include this question"))
+                capture("comparison-choice")
+                clickReady("Include this question")
+                val result = "A general version of this question is saved for AI comparisons. You can withdraw your choice in Me and privacy."
+                compose.waitUntil(70_000) { compose.onAllNodesWithText(result).fetchSemanticsNodes().isNotEmpty() }
+                compose.onNodeWithText(result).performScrollTo().assertIsDisplayed()
+                capture("comparison-question-included")
+                clickReady("Close")
+                compose.waitUntil(30_000) { compose.onAllNodesWithText("Me and privacy").fetchSemanticsNodes().isNotEmpty() }
+                clickReady("Me and privacy")
+                compose.onNode(hasScrollToNodeAction()).performScrollToNode(hasText("AI comparisons"))
+                compose.waitUntil(20_000) { compose.onAllNodesWithText("Allowed for this creator").fetchSemanticsNodes().isNotEmpty() }
+                capture("comparison-privacy-choice")
+            } finally { capture("comparison-final-state") }
+        }
+    }
+
     /** Explicit opt-in: this makes one real provider-backed send in the selected
      * development conversation. It never retries by creating another message. */
     @Test fun sendMessageWithKeyboard() {

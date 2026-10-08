@@ -6758,6 +6758,70 @@ public struct APIConversationBeginConversationAccessNoticeAccepted: Codable, Sen
   public func encode(to encoder: Encoder) throws { var container = encoder.singleValueContainer(); try container.encode(true) }
 }
 
+public typealias APIConversationComparisonConsentInput = APIJSONValue
+
+public struct APIConversationComparisonConsentState: Codable, Sendable {
+  public let `policy`: APIConversationComparisonConsentStatePolicy?
+  public let `allowed`: Bool
+  public let `consentedAt`: String?
+  public let `expiresAt`: String?
+  public init(policy: APIConversationComparisonConsentStatePolicy? = nil, allowed: Bool, consentedAt: String? = nil, expiresAt: String? = nil) {
+    self.policy = policy
+    self.allowed = allowed
+    self.consentedAt = consentedAt
+    self.expiresAt = expiresAt
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `policy`
+    case `allowed`
+    case `consentedAt`
+    case `expiresAt`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.policy = try container.decode(APIConversationComparisonConsentStatePolicy?.self, forKey: .policy)
+    self.allowed = try container.decode(Bool.self, forKey: .allowed)
+    self.consentedAt = try container.decode(String?.self, forKey: .consentedAt)
+    self.expiresAt = try container.decode(String?.self, forKey: .expiresAt)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(policy, forKey: .policy)
+    try container.encode(allowed, forKey: .allowed)
+    try container.encode(consentedAt, forKey: .consentedAt)
+    try container.encode(expiresAt, forKey: .expiresAt)
+  }
+}
+
+public struct APIConversationComparisonConsentStatePolicy: Codable, Sendable {
+  public let `version`: String
+  public let `notice`: String
+  public let `processorPolicyVersion`: String
+  public init(version: String, notice: String, processorPolicyVersion: String) {
+    self.version = version
+    self.notice = notice
+    self.processorPolicyVersion = processorPolicyVersion
+  }
+}
+
+public struct APIConversationComparisonPolicy: Codable, Sendable {
+  public let `version`: String
+  public let `notice`: String
+  public let `processorPolicyVersion`: String
+  public init(version: String, notice: String, processorPolicyVersion: String) {
+    self.version = version
+    self.notice = notice
+    self.processorPolicyVersion = processorPolicyVersion
+  }
+}
+
+public struct APIConversationComparisonQuestionResult: Codable, Sendable {
+  public let `included`: Bool
+  public init(included: Bool) {
+    self.included = included
+  }
+}
+
 public struct APIConversationConsentInput: Codable, Sendable {
   public let `version`: String
   public let `accepted`: Bool

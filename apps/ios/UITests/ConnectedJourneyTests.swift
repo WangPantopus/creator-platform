@@ -5,6 +5,54 @@ import XCTest
 /// No account, consent, publication, message or provider response is seeded here.
 @MainActor
 final class ConnectedJourneyTests: XCTestCase {
+    /// Real UI reuse of a question explicitly included earlier in the same
+    /// preserved development journey; no consent, source or identity fixture.
+    func testComparisonChoiceAndQuestion() throws {
+        let environment = ProcessInfo.processInfo.environment
+        guard let origin = environment["QELVORA_E2E_API_URL"],
+              let destination = environment["QELVORA_E2E_THREAD"],
+              let source = environment["QELVORA_E2E_COMPARISON_MESSAGE_ID"] else {
+            throw XCTSkip("Requires an explicitly selected existing comparison question.")
+        }
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["--api-url", origin, "--return-to", destination,
+                               "--appearance", environment["QELVORA_E2E_APPEARANCE"] ?? "light",
+                               "-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
+        app.launch()
+        defer { capture(app, name: "Comparison-final-state") }
+        let question = app.buttons["comparison-options-" + source]
+        XCTAssertTrue(app.buttons["Me and privacy"].waitForExistence(timeout: 30))
+        for _ in 0..<20 {
+            if question.exists && question.isHittable { break }
+            app.scrollViews.firstMatch.swipeDown()
+        }
+        XCTAssertTrue(question.exists && question.isHittable)
+        question.tap()
+        XCTAssertTrue(app.staticTexts["Allowed for this creator"].waitForExistence(timeout: 20))
+        let include = app.buttons["Include this question"]
+        for _ in 0..<8 {
+            if include.isHittable { break }
+            app.scrollViews.firstMatch.swipeUp()
+        }
+        XCTAssertTrue(include.isHittable)
+        capture(app, name: "Comparison-choice")
+        include.tap()
+        let result = app.staticTexts["A general version of this question is saved for AI comparisons. You can withdraw your choice in Me and privacy."]
+        XCTAssertTrue(result.waitForExistence(timeout: 70))
+        capture(app, name: "Comparison-question-included")
+        app.buttons["Close"].tap()
+        XCTAssertTrue(app.buttons["Me and privacy"].waitForExistence(timeout: 30))
+        app.buttons["Me and privacy"].tap()
+        let choice = app.staticTexts["Allowed for this creator"]
+        for _ in 0..<12 {
+            if choice.exists && choice.isHittable { break }
+            app.scrollViews.firstMatch.swipeUp()
+        }
+        XCTAssertTrue(choice.exists && choice.isHittable)
+        capture(app, name: "Comparison-privacy-choice")
+    }
+
     /// Read-only check of the real reply while the software keyboard is open.
     func testKeyboardKeepsLatestReply() throws {
         let environment = ProcessInfo.processInfo.environment

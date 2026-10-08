@@ -1,0 +1,14 @@
+[
+  {
+    "path": "packages/api/generated/openapi.json",
+    "sha256": "b29b15adef50d1c779d69493e9ed89394079d2ea808780dfcbcd6fa349c7fd97"
+  },
+  {
+    "path": "apps/ios/Sources/Generated/QelvoraAPI.swift",
+    "sha256": "b9062e3540665a1d882a026e1169078133e4fa02c45b351b0cf4dc8cba6a1b3f"
+  },
+  {
+    "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt",
+    "sha256": "e1e2d1c2c409125db2c310f6b2c84eb541f11e035a1869a73b86c79cb69be1ac"
+  }
+]
