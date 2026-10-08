@@ -20,7 +20,7 @@ The broader authorized journey still includes shutdown, recovery, accounting, me
 
 ## Workspace and preservation
 
-- Active review checkout: `/Users/yingpengwang/.codex/worktrees/637b/creator-platform`, branch `codex/generation-performance-grounding-20261007`, based on merged [#334](https://github.com/WangPantopus/creator-platform/pull/334). #132 is also merged. Inspect status first; do not overwrite unrelated changes or force-push.
+- Active review checkout: `/Users/yingpengwang/.codex/worktrees/637b/creator-platform`, branch `codex/generation-performance-grounding-20261007`, draft [#335](https://github.com/WangPantopus/creator-platform/pull/335), based on merged [#334](https://github.com/WangPantopus/creator-platform/pull/334). #132 is also merged. #335 records incremental grounding and scan improvements; full latency and existing-version upgrade acceptance remain open. Inspect status first; do not overwrite unrelated changes or force-push.
 - Primary `/Users/yingpengwang/creator-platform` is preserved. The previous generation checkout `/Users/yingpengwang/.codex/worktrees/5f17/creator-platform` remains at its handoff state; inspect ownership/status before reuse.
 - Original PR heads are preserved in `refs/review/20261007/<number>` and their original remote branches. Each manifest compares every production path and retains supporting documentation/history. Do not reopen implementation from scratch or apply an older whole shared file over newer behavior.
 - Private evidence: `/Users/yingpengwang/.codex/visualizations/2026/10/07/01a11784-60b1-7fe3-8855-82bddf4675b6/`. Public compact summaries contain hashes and outcomes, without credentials or exported account payloads.
