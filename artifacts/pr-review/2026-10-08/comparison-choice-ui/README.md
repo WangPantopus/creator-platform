@@ -51,3 +51,12 @@ physical artifact removal. Native Night/largest text, full exact design/accessib
 expiry, sensitive/injected sanitizer cases, creator comparison/revision13 upgrade,
 and every remaining full-product milestone remain open. Production policy and
 mature deletion are not qualified by this fictional development operation.
+
+## Generated-contract follow-up
+
+PR350's initial two backend CI jobs refused stale OpenAPI output. Regenerated the
+OpenAPI and native schema models from the shared contracts; all three generation
+checks now pass. This adds the comparison schema types without changing the
+operated client behavior. The original CI log remains in native-e2e as
+pr350-web-backend-failure-01.log. Native compilation of these generated additions
+is still subject to the new exact-head checks.
