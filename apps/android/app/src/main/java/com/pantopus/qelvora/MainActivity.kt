@@ -21,11 +21,14 @@ class MainActivity : ComponentActivity() {
     private var debugAppearance: String? = null
     private val destinationDelivery = mutableStateOf(0L)
     private val notificationID = mutableStateOf<String?>(null)
+    private val restoreSavedDestination = mutableStateOf(true)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         notificationID.value = GrowthPush.tapId(intent)
         destination.value = returnTarget(intent)
         destinationDelivery.value = savedInstanceState?.getLong("destination_delivery") ?: 0L
+        restoreSavedDestination.value = savedInstanceState?.getBoolean("restore_saved_destination")
+            ?: (intent.data == null && notificationID.value == null && (!BuildConfig.DEBUG || !intent.hasExtra("return_to")))
         val configured = apiOrigin(BuildConfig.CREATOR_API_URL)
             ?: if (BuildConfig.DEBUG) apiOrigin(BuildConfig.CREATOR_API_URL, loopback = true) else null
         debugAPIURL = if (BuildConfig.DEBUG) apiOrigin(if (intent.hasExtra("api_url")) intent.getStringExtra("api_url") else savedInstanceState?.getString("debug_api_url"), loopback = true) else null
@@ -41,12 +44,13 @@ class MainActivity : ComponentActivity() {
                 }
             }
             QelvoraTheme(night = night) {
-                if (BuildConfig.DEBUG && intent.getBooleanExtra("catalog", false)) NativeFoundationCatalog(intent.getStringExtra("component")) else FanAppShell(this, local ?: configured, destination.value, fanFeatures(this, local ?: configured), destinationDelivery.value, notificationID.value) { notificationID.value = null }
+                if (BuildConfig.DEBUG && intent.getBooleanExtra("catalog", false)) NativeFoundationCatalog(intent.getStringExtra("component")) else FanAppShell(this, local ?: configured, destination.value, fanFeatures(this, local ?: configured), destinationDelivery.value, notificationID.value, restoreSavedDestination.value) { notificationID.value = null }
             }
         }
     }
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putLong("destination_delivery", destinationDelivery.value)
+        outState.putBoolean("restore_saved_destination", restoreSavedDestination.value)
         if (BuildConfig.DEBUG) {
             debugAPIURL?.let { outState.putString("debug_api_url", it) }
             debugAppearance?.let { outState.putString("debug_appearance", it) }
@@ -55,10 +59,11 @@ class MainActivity : ComponentActivity() {
     }
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        val launcherResume = intent.action == Intent.ACTION_MAIN && intent.hasCategory(Intent.CATEGORY_LAUNCHER) && intent.data == null && (!BuildConfig.DEBUG || !intent.hasExtra("return_to"))
+        val launcherResume = intent.action == Intent.ACTION_MAIN && intent.hasCategory(Intent.CATEGORY_LAUNCHER) && intent.data == null && GrowthPush.tapId(intent) == null && (!BuildConfig.DEBUG || !intent.hasExtra("return_to"))
         // Repeated explicit links are new deliveries; launcher resumes keep
         // the current screen. The counter is navigation, never authority.
         if (!launcherResume) {
+            restoreSavedDestination.value = false
             setIntent(intent)
             notificationID.value = GrowthPush.tapId(intent)
             destination.value = returnTarget(intent)

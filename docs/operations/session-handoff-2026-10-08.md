@@ -1,5 +1,15 @@
 # Session handoff — October 8, 2026
 
+**Current continuation:** #336 is merged at `78c42fc3a`, with all five post-merge
+jobs passing. Work continues in the same checkout on
+`codex/native-connected-journey-20261008`; copy 43 and its owned backend/web are
+running for real native acceptance. See the
+[native operation evidence](../../artifacts/pr-review/2026-10-08/native-connected-journey/README.md)
+and [complete finish plan](product-finish-plan-2026-10-08.md). The stopped-resource
+inventory below is the original handoff observation, not the current live state.
+The user now authorizes commits, pushes, milestone PRs and merges after checks,
+with actual web/iOS/Android operation and no new unit tests.
+
 Successor resumed in the same `637b` checkout on
 `codex/shadow-evidence-lifetime-20261008`. See the
 [full finish plan](product-finish-plan-2026-10-08.md) and

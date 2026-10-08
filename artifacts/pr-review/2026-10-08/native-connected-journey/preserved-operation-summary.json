@@ -1,0 +1,31 @@
+{
+  "at": "2026-10-08T10:07:55.095Z",
+  "database": "creator_generation_journey43_20261007",
+  "version": [
+    {
+      "id": "3299afea-46ee-47cd-9f4b-e630dfc84bce",
+      "number": 1,
+      "state": "live",
+      "compiled_hash": "9e04741be62c28029b4c931281253c2c2992dd578be37651a3aea8a85c2aea4c",
+      "pipeline_hash": "1d09f184e7ddb34968bb602eb82f4705d8ceffb3499841aa6892247c40d28161",
+      "published_at": "2026-10-08T04:45:38.268Z"
+    }
+  ],
+  "usageRows": 33,
+  "usageSha256": "85268d72b558494c003f8cffa960c81a39e08089aca60afeb68eeabc37ae6cfd",
+  "costMicros": 24985,
+  "settledUnits": 31,
+  "generationCount": 8,
+  "generationStates": [
+    "delivered",
+    "delivered",
+    "delivered",
+    "delivered",
+    "delivered",
+    "delivered",
+    "delivered",
+    "delivered"
+  ],
+  "originalReceiptSha256": "0386760fb64e6e098457d9ac2dd20d7dcdad1c2aafe620c57f4b63612bed0aef",
+  "scope": "Read-only snapshot after final Light/native read, restoration and account replacement operations. No new generation or provider calls."
+}

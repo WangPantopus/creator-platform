@@ -4,6 +4,15 @@ Updated October 8, 2026 after #335 merged. Start with the [session handoff](sess
 
 ## Current status
 
+**Latest continuation:** #336 is merged at `78c42fc3a`; all post-merge jobs pass.
+The [connected native continuation](../../artifacts/pr-review/2026-10-08/native-connected-journey/README.md)
+uses the actual preserved copy 43, OS sessions and launched apps. Initial message
+position, Android saved navigation/composer and sign-out transition fixes are
+bounded work within the [complete finish plan](product-finish-plan-2026-10-08.md).
+The real shadow producer and existing-version upgrade remain open. The user has
+authorized autonomous milestone commit/push/PR/merge and E2E verification on all
+three platforms, without new unit tests.
+
 **October 8 successor:** continued in `637b` on
 `codex/shadow-evidence-lifetime-20261008`, carrying the handoff commit. The
 [full finish plan](product-finish-plan-2026-10-08.md) records the refreshed state,
