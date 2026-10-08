@@ -1536,19 +1536,28 @@ export class CommerceService {
             "decision_unavailable",
             "The request is not ready for a decision.",
           );
+          // A decline only releases the hold, so a late one is safe: it frees the
+          // fan's bank hold and the capacity slot now, instead of leaving the
+          // request stuck until a reconciliation pass that nothing schedules yet.
+          // Every other decision still needs an open window and an authorization
+          // that outlives capture.
+          const releasing =
+            body.action === "decline" || body.action === "ai_answer";
           invariant(
-            p.decision_at && p.decision_at.getTime() > Date.now(),
+            releasing ||
+              (p.decision_at && p.decision_at.getTime() > Date.now()),
             "decision_expired",
             "The decision window ended. Reconcile this request first.",
           );
           invariant(
             p.payment_state === "requires_capture" &&
-              p.hold_expires_at &&
-              p.hold_expires_at.getTime() - 6 * 3600000 > Date.now(),
+              (releasing ||
+                (p.hold_expires_at &&
+                  p.hold_expires_at.getTime() - 6 * 3600000 > Date.now())),
             "authorization_expiring",
             "The fan must re-authorize before acceptance.",
           );
-          if (body.action === "decline" || body.action === "ai_answer") {
+          if (releasing) {
             await client.query(
               "UPDATE creator.commerce_packet SET reason=$2 WHERE id=$1",
               [id, body.action],
