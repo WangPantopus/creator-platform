@@ -1,0 +1,43 @@
+{
+  "implementation": "54aea444e59c4bc46a6664229e07026d952abdbb",
+  "diagnostics": "68bfa36fb03188c5a79d8090516629240a6866b4",
+  "before": "2026-10-08T11:57:16.095Z",
+  "after": "2026-10-08T11:59:27.133Z",
+  "unchangedFields": [
+    "version",
+    "evaluation",
+    "perGeneration",
+    "messages",
+    "reservations",
+    "usageRows",
+    "usageSha256",
+    "costMicros",
+    "settledUnits"
+  ],
+  "generationCount": 18,
+  "usageRows": 69,
+  "usageSha256": "9b6d528acbc4a957ddfcdee0beb43e064668d655ae717ce41c0cd006285af345",
+  "costMicros": 36815,
+  "settledUnits": 51,
+  "web": {
+    "actualCreator": "maya_ceramics_dev",
+    "liveVersion": 1,
+    "draftRevision": 5,
+    "comparisonEnabled": false,
+    "publishEnabled": false,
+    "notice": "Connect the privacy-safe recent conversation feed before replacing the live version.",
+    "screenshotSha256": "30b1572c69ab6d0566030909d380e1939b01b5f99a2045c66f72e09f76f6cc96"
+  },
+  "validation": {
+    "backendTypecheck": "passed",
+    "backendBuild": "passed",
+    "existingShadowTests": 15,
+    "newUnitTests": 0
+  },
+  "limitations": [
+    "Trusted producer remains unconnected.",
+    "Preserved comparison table has not been populated by a qualified replay; the observed UI gate is not a cached-pass adversarial qualification.",
+    "Earlier native milestone remains separate from this Studio-only operation.",
+    "A previous idle SIGTERM produced a worker/host shutdown error; no cause was captured. New safe diagnostics retain future causes. One observed idle SQL cancellation on the diagnostic build exited successfully; this does not establish that the original failure was fixed."
+  ]
+}
