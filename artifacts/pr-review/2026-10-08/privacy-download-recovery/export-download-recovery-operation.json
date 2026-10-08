@@ -1,0 +1,18 @@
+{
+  "at": "2026-10-08T13:29:29.686308+00:00",
+  "jobId": "61e07c91-56b4-4dbe-835c-0714797b4b13",
+  "operated": [
+    "Original actual download refused after genuine verification lifetime elapsed",
+    "Recovery notice stays on127.0.0.1 with original request visible",
+    "Notice action enters genuine development identity chooser",
+    "Same creator reconfirmation returns to privacy without stale warning",
+    "Original Conversation download succeeds and matches prior bytes exactly"
+  ],
+  "bytes": 198980,
+  "sha256": "a3d5e49ea90b5acab919fc9b05527aac53df8f51c2923f3f6ebf23b5a8a30104",
+  "firstAttemptPreserved": "Initial absolute URL normalized host tolocalhost; lost host-bound cookies. Corrected to relative303 Location. No cookie or identity policy changed.",
+  "limits": [
+    "Development local identity and Next dev frontend; production compilation separate",
+    "No clocks modified; no new request or provider operation"
+  ]
+}

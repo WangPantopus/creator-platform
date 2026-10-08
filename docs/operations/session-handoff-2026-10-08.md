@@ -1,5 +1,24 @@
 # Session handoff — October 8, 2026
 
+## Active continuation — privacy download recovery
+
+Comparison/privacy milestone PR [#340](https://github.com/WangPantopus/creator-platform/pull/340)
+is open at `acaaeb332157214c66d21987ff7de23c922e8c6e`; refresh all checks before
+merging. Continue on `codex/privacy-export-download-recovery-20261008`.
+The [download recovery increment](../../artifacts/pr-review/2026-10-08/privacy-download-recovery/README.md)
+at `3cbac7be7` has actual expired-verification → same-origin notice → same-account
+sign-in → identical original download evidence. API clients retain401 JSON.
+The initial loopback-alias redirect failure is preserved. Production web build,
+typecheck and scoped lint/format pass; no new unit tests were added.
+
+The owned backend still runs compiled `5e5cd3abf` on57304 through
+`native-e2e/launch43-backend-export-stable.mjs`; full SQL timing observation is now
+off, bounded private PG-error observation remains. Web dev is on3119. Both owned
+native devices remain stopped. Original creator export61e07c91 is complete and
+no replacement request was made. Continue saved-comparison artifact invalidation,
+original read/provider admission and the full finish plan; no comparison source
+is registered or activated.
+
 ## Active continuation — comparison consent and privacy lifecycle
 
 PR [#339](https://github.com/WangPantopus/creator-platform/pull/339) merged at
