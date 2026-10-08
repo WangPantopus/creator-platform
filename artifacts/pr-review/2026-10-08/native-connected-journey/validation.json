@@ -1,0 +1,66 @@
+{
+  "baseCommit": "78c42fc3a5051b259473ad1e598e140e6391d210",
+  "sourceSha256": {
+    "apps/android/app/src/main/java/com/pantopus/qelvora/MainActivity.kt": "838ae959702c15ac34a7d5c03ee43a3f08e97aebde8fc9ee4c07959300551240",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/conversation/W3FanFeatures.kt": "d1c8b7936b42c67b661d189ede14beaf322928d6a41e5e27ddaa026ccfb55e67",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanShell.kt": "a5c456522b14cb143e928f444817f038ee8238dd5c144c4fa1c479787777f35f",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/identity/SecureSessionStorage.kt": "29acae0a40e6a7ea270362d23bf359d61a3ecc1f22fb9853743ba4a2b5511dfa",
+    "apps/android/app/src/main/java/com/pantopus/qelvora/ui/Welcome.kt": "25913f0ccd722847971d150af9957401cd739d6d15932278ecb7bc2a8aed3d6e",
+    "apps/ios/Sources/QelvoraUI/Conversation/W3FanFeatures.swift": "7e3dc1c8c70f00f06cbd5afe2d9a3c80e8407b373d5fd60e12aca83d8387d168",
+    "apps/ios/Sources/QelvoraUI/FanShell.swift": "2fa94a076ccd169fecfac07b1f084769a4c1dda8eeec0480812e141e05da35bd",
+    "apps/android/app/src/androidTest/java/com/pantopus/qelvora/ConnectedJourneyTest.kt": "3b0a0ed2976d59d0b20a398278216bb5fd6934ca83fcacfa8196d2614a93db1a",
+    "apps/ios/UITests/ConnectedJourneyTests.swift": "1ab6b3e985f9901379f93da199d9283241139cd3aa4c571e2ce58006db1169a8"
+  },
+  "runs": [
+    {
+      "platform": "iOS 26.5 simulator",
+      "run": "ios-connected-04",
+      "appearance": "night",
+      "result": "passed",
+      "seconds": 48.473,
+      "source": "Final iOS source; cold process restart, reply visibility, history across refresh, original citation, current provider consent"
+    },
+    {
+      "platform": "Android API 35 emulator",
+      "run": "android-connected-07",
+      "appearance": "night",
+      "result": "passed",
+      "seconds": 207.995,
+      "source": "Before pending-route persistence refinement and replacement-account label assertion; cold launch after same-AVD reboot, history refresh, citation, consent, recreate, explicit Home and account replacement"
+    },
+    {
+      "platform": "Android API 35 emulator",
+      "run": "android-connected-08",
+      "appearance": "light",
+      "result": "passed",
+      "seconds": 170.888,
+      "source": "Final Android source; same connected journey and replacement-account profile-label assertion"
+    }
+  ],
+  "earlierVisual": "ios-light.png is run02 after initial scroll anchor and before pending-key/welcome-action refinements; ios-before.png is original run01. Final current iOS evidence is run04.",
+  "artifactsSha256": {
+    "ios-before.png": "03ff9dcaa123c813f93fbed40b6797e43ce3a588f31eca285ce28eb1300c23e1",
+    "ios-history.png": "93190731988009379412019cd27a3ef340db031851e5c200e1309ca16f5cb697",
+    "web-upgrade-gate.png": "153eda384684b01e351826aa0326807a9831dccd92f1aef9106ed3919baf967f",
+    "ios-night.log": "f98c0737c6541818328a6499ac41f2a9fecc14de37f14347897cc3b6e0f5fa20",
+    "android-replacement-account.png": "a21f5b0cb97073b91b93f87dc2629e65f1693b240390e07d5cfbe7348e47e6e9",
+    "ios-consent.png": "9345b00d3cb43631522264bd84f2e069555f56fb328cd52ffc3ac7eeae1fdb70",
+    "android-light.log": "7d69e7904d409c45ad63c9f321bc86b1d014973e7f54a21a2a51d73437758845",
+    "android-source.png": "ebe6acfc6f965ea6fca70216aa467f82e65cf800a7634509604d44e41b2b46ff",
+    "android-history.png": "b929f41f30b898a19734096d3f8462f37aa9de5233f9dccbf55a563328271efe",
+    "android-night.log": "89f58cacdc70387b6c0d8841637b2de312eb41c12fbcac21e90a93cdfd6a62b5",
+    "android-consent.png": "aecf0e39029f48b9ae0371c564ab3d4167ac237de74d511c4188ec9922f32eed",
+    "preserved-operation-summary.json": "9b657de41aa3c3d90fc8c61b97e0a6193eb67f1fed65eff30fd5823b9833e4ef",
+    "android-explicit-home.png": "39db06e18a06ed0d4923c60062f0e0bdaade1e86628b2d128889193fa9db550c",
+    "android-night.png": "caf038c39344e41c41daac1a24f6f50e4e2843fba0f1197fa5e82adb2c652a3b",
+    "ios-light.png": "c0a4bcbd58369928dab26be5f45398407330a725254248568efc5d2088b62a9a",
+    "ios-source.png": "afa37e2df15ebdc4e29c46a74c3f118e37124aefcc25b75bb3acdeab6978942d",
+    "ios-night.png": "6fb56a32f5694bd05903a5af2d15578cac3c2555262915b3b56c8f427a1cbd30",
+    "android-light.png": "30171f93e886b95263ebb12e091c5a4417cd114e249813efc9720f0d03e9b8fd"
+  },
+  "fullOperationDirectory": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e",
+  "limits": [
+    "No new native generation, interrupted stream, keyboard or largest text acceptance in this increment.",
+    "Only fictional approved development operation; no production qualification."
+  ]
+}

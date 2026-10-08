@@ -290,6 +290,7 @@ D-H, D-01 to D-27) are in the Domain Model.
 | 2026-10-02 | Human directs streams to prioritize working features and personally operated web/native E2E; retain functional JSON and concise necessary records, avoid committing routine screenshots or bulky diagnostic receipts. W3 [current checkpoint](workstreams/handoffs/W3-mac-studio-2026-10-02.md) remains incomplete. |
 | 2026-10-07 | Founder authorized reconciling the existing PR work before new feature development, preserving useful implementations and assigning one continuation path per unfinished area. See the [reconciliation ledger](operations/pr-reconciliation-2026-10-07.md); product scope and invariants remain unchanged. |
 | 2026-10-08 | Resumed the preserved checkout and carried all remaining acceptance into the [product finish plan](operations/product-finish-plan-2026-10-08.md). Existing-version upgrade work first repairs comparison sample identity and expiry; a stored comparison is not original-owner privacy authority. No product invariant or open consent decision changes. |
+| 2026-10-08 | [Connected native continuation](../artifacts/pr-review/2026-10-08/native-connected-journey/README.md): use real preserved conversations and OS sessions to verify native journeys. Restore only a bounded account-bound path after current identity validation; explicit links take precedence. Keep the latest reply visible while respecting the reader's position. The complete finish plan and open production/privacy decisions remain unchanged. |
 
 ## 15. Open questions and known inconsistencies
 

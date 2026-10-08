@@ -84,7 +84,11 @@ private struct W3ThreadScreen: View {
                             Color.clear.frame(height: 1).id("conversation-end")
                         }.padding(.horizontal, QelvoraTokens.space4).padding(.vertical, QelvoraTokens.space4)
                     }.textSelection(.enabled)
-                        .onChange(of: model.pending == nil) { _, cleared in if cleared { proxy.scrollTo("conversation-end", anchor: .bottom) } }
+                        // Open at the current reply and keep bottom-anchored
+                        // content growth visible. SwiftUI preserves a reader's
+                        // deliberate scroll away from that default position.
+                        .defaultScrollAnchor(.bottom)
+                        .onChange(of: model.pending?.key) { _, sent in if sent != nil { proxy.scrollTo("conversation-end", anchor: .bottom) } }
                 }
                 VStack(spacing: QelvoraTokens.space3) {
                     if !page.canSend { Notice(title: "AI unavailable", children: page.unavailableReason ?? "Messaging is unavailable.") }

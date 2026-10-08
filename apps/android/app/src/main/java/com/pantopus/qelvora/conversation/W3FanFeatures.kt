@@ -44,6 +44,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlin.random.Random
 import kotlinx.serialization.json.*
 import java.util.UUID
@@ -113,6 +114,18 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     val presenceId = remember(root) { UUID.randomUUID().toString() }
     val scope = rememberCoroutineScope()
     val scroll = rememberLazyListState()
+    var positionedConversation by remember(root, accountId) { mutableStateOf(false) }
+    var followingReply by remember(root, accountId) { mutableStateOf(true) }
+    var positioningReply by remember(root, accountId) { mutableStateOf(false) }
+    // Observe completed user/accessibility scrolls, rather than treating a
+    // newly enlarged reply as a request to stop following it.
+    LaunchedEffect(scroll) {
+        snapshotFlow { Triple(scroll.isScrollInProgress, scroll.firstVisibleItemIndex, scroll.firstVisibleItemScrollOffset) }.collect { (moving, _, _) ->
+            if (!moving && positionedConversation && !positioningReply) {
+                followingReply = !scroll.canScrollForward
+            }
+        }
+    }
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _,_ ->
             foreground = lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
@@ -215,6 +228,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         val current = page ?: return
         if (busy || offline || !foreground || privacy || !current.canSend || (!retry && draft.isBlank())) return
         val item = if (retry) pending ?: return else PendingMessage(UUID.randomUUID().toString(), draft.trim(), (current.messages.lastOrNull()?.sequence ?: 0) + 1, if(current.control == APIThreadControl.HUMAN_ACTIVE) "fan-replies" else "messages")
+        followingReply = true
         pending = item; busy = true
         try {
             val path = item.destination
@@ -277,6 +291,17 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     // Keep the actual conversation and its privacy notice reachable when
     // enlarged text or the keyboard leaves too little room for fixed controls.
     val scrollControls = LocalDensity.current.fontScale >= 1.5f || maxHeight < 480.dp
+    LaunchedEffect(current?.threadId, current?.messages?.lastOrNull(), pending?.key, scrollControls, maxHeight) {
+        if (current != null && followingReply && !scroll.isScrollInProgress) {
+            positioningReply = true
+            try {
+                snapshotFlow { scroll.layoutInfo.totalItemsCount }.first { it > 0 }
+                withFrameNanos { }
+                scroll.scrollToItem((scroll.layoutInfo.totalItemsCount - 1).coerceAtLeast(0))
+                positionedConversation = true
+            } finally { positioningReply = false }
+        }
+    }
     Column(Modifier.fillMaxSize().background(qColor("ground"))) {
         if (current == null) {
             Notice(title = "Conversation unavailable", children = if (error.isEmpty()) "Loading your messages…" else error)
@@ -289,7 +314,17 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             }
             val messageLabel = if (current.control == APIThreadControl.HUMAN_ACTIVE) "Message ${current.creatorName}" else "Message ${current.creatorName}'s AI"
             val input: @Composable (Modifier) -> Unit = { modifier ->
-                BasicTextField(value = draft, onValueChange = { draft = it.take(2000) }, modifier = modifier.heightIn(min = 48.dp, max = 160.dp).semantics { contentDescription = messageLabel }.background(qColor("surface")).padding(12.dp), textStyle = qText("body").copy(color = qColor("ink")), cursorBrush = SolidColor(qColor("ink")), maxLines = 5)
+                BasicTextField(value = draft, onValueChange = { draft = it.take(2000) },
+                    modifier = modifier.heightIn(min = 48.dp, max = 160.dp)
+                        .semantics { contentDescription = messageLabel }
+                        .background(qColor("surface"), RoundedCornerShape(QelvoraTokens.radiusLg))
+                        .border(QelvoraTokens.hairline, qColor(if (current.control == APIThreadControl.HUMAN_ACTIVE) "maya-line" else "control-line"), RoundedCornerShape(QelvoraTokens.radiusLg))
+                        .padding(QelvoraTokens.space3),
+                    textStyle = qText("body").copy(color = qColor("ink")), cursorBrush = SolidColor(qColor("ink")), maxLines = 5,
+                    decorationBox = { field -> Box {
+                        if (draft.isEmpty()) BasicText(messageLabel, modifier = Modifier.clearAndSetSemantics { }, style = qText("body").copy(color = qColor("ink-muted")))
+                        field()
+                    } })
             }
             val sendButton: @Composable () -> Unit = {
                 Button("Send", variant = if (current.control == APIThreadControl.HUMAN_ACTIVE) ButtonVariant.MAYA else ButtonVariant.AI, block = scrollControls, disabled = !current.canSend || offline || !foreground || busy || pending != null || current.generationSequences.isNotEmpty() || draft.isBlank()) { scope.launch { send() } }
@@ -389,6 +424,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 pending?.let { pendingItem -> item { Message(kind = MessageKind.FAN, children = pendingItem.text, name = current.creatorName, delivery = if (pendingItem.rejected) Delivery.FAILED else if (pendingItem.uncertain) null else Delivery.PENDING); if (pendingItem.uncertain) { BasicText("Acceptance hasn't been confirmed. Retry checks the same message without a duplicate.", style = qText("caption").copy(color = qColor("ink"))); Button("Retry", variant = ButtonVariant.QUIET, disabled = busy || offline) { scope.launch { send(true) } } } else if (pendingItem.rejected) { BasicText("Not sent", style = qText("caption").copy(color = qColor("ink"))); Button("Keep editing", variant = ButtonVariant.QUIET) { draft = pendingItem.text; pending = null } } } }
                 if (error.isNotEmpty()) item { Notice(title = "Conversation status", children = error) }
                 if (scrollControls) item { composer() }
+                item(key = "conversation-end") { Spacer(Modifier.height(1.dp)) }
             }
             if (!scrollControls) composer()
         }

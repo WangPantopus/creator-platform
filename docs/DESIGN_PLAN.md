@@ -23,6 +23,12 @@ W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan expor
 
 ## Implementation continuation
 
+- [x] October 8, 2026: operate the preserved conversation in launched iOS and
+  Android apps, repair initial reply visibility and Android cold navigation,
+  and verify citations, consent, theme and account boundaries through actual UI.
+  [Connected native evidence and remaining acceptance](../artifacts/pr-review/2026-10-08/native-connected-journey/README.md).
+  Full native feature/design acceptance remains open.
+
 **October 8 resumed plan:** [complete product finish plan and completion criteria](operations/product-finish-plan-2026-10-08.md).
 The first increment binds shadow comparison evidence to its exact current sample
 cohort. The real privacy producer and actual existing-version upgrade remain

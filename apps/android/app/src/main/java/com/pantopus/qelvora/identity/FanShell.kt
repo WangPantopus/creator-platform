@@ -98,7 +98,7 @@ class FanSessionRequestCapture private constructor(
         }
     }
 }
-class FanSession(private val context: Context, private val baseURL: String?, returnTo: String) {
+class FanSession(private val context: Context, private val baseURL: String?, returnTo: String, restoreSavedDestination: Boolean = returnTo == "/home") {
     private val storage = SecureSessionStorage(context, baseURL)
     fun currentToken(): String? = storage.read()
     val api = baseURL?.let { CreatorAPIClient(it) { storage.read() } }
@@ -108,7 +108,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     private var currentDestination by mutableStateOf(if (ApplicationDestination.isPermitted(returnTo)) returnTo else "/home")
     var destination: String
         get() = currentDestination
-        set(value) { if (value != currentDestination) { destinationGeneration++; currentDestination = value } }
+        set(value) { if (value != currentDestination) { destinationGeneration++; navigationRestoreAllowed = false; navigationPersistencePending = true; currentDestination = value; persistDestination() } }
     var error by mutableStateOf("")
     var busy by mutableStateOf(false)
     var choosingActor by mutableStateOf(false)
@@ -123,6 +123,32 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     // Confirmed by the genuine canonical read, never by a stored account marker.
     private var confirmedCredential: String? = null
     private var removedArrivalFor: String? = null
+    private var navigationInitialized = false
+    private var navigationRestoreAllowed = restoreSavedDestination
+    private var navigationPersistencePending = true
+    private fun persistDestination() {
+        val active = session ?: return
+        val credential = confirmedCredential ?: return
+        if (!navigationInitialized || !navigationPersistencePending || purgingPrivateState || localPurgeFailed || !ApplicationDestination.isPermitted(destination)) return
+        try { storage.saveDestination(destination, active.accountId, credential); navigationPersistencePending = false }
+        catch (_: Exception) { error = "Your place in the app could not be kept. You can still open it again." }
+    }
+    private fun restoreDestination(account: APISession, credential: String) {
+        // Navigation during an offline read or credential rotation is retried
+        // only after the canonical session has confirmed the current credential.
+        if (navigationInitialized) { persistDestination(); return }
+        try {
+            val saved = storage.readDestination(account.accountId, credential)
+            navigationInitialized = true
+            val restore = navigationRestoreAllowed
+            navigationRestoreAllowed = false
+            if (restore && saved != null) destination = saved
+            persistDestination()
+        } catch (_: Exception) {
+            navigationInitialized = true; navigationRestoreAllowed = false
+            error = "Your saved place is unavailable. Open it again from the app."
+        }
+    }
     /** No default/global storage reconstruction. Away-and-back navigation also
      * invalidates an earlier capture, even when account and token are equal. */
     @androidx.annotation.MainThread
@@ -152,6 +178,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         purgingPrivateState = true; localPurgeFailed = true
         try {
             generation++; confirmedCredential = null; session = null; hasSavedCredential = false; checkingSession = false; actors = emptyList(); choosingActor = false; error = ""
+            navigationInitialized = false; navigationRestoreAllowed = false; navigationPersistencePending = true
             GrowthPush.clearSession(context, pushCredential)
             var cleared = true
             try { storage.save(null) } catch (_: Exception) { cleared = false }
@@ -191,6 +218,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
                     return
                 }
                 confirmedCredential = token; session = value; error = ""
+                restoreDestination(value, token)
             } catch (failure: CreatorAPIError) {
                 if (current != generation) return
                 confirmedCredential = null
@@ -344,7 +372,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         catch (_: Exception) { if (current == generation) error = "Session refresh could not complete. Reconnect and try again." }
         finally { busy = false; rotatingCredential = false }
     }
-    fun open(target: String) { if (ApplicationDestination.isPermitted(target)) { removedArrivalFor = null; destination = target } else error = "This link is unavailable. Open the object from the app." }
+    fun open(target: String) { if (ApplicationDestination.isPermitted(target)) { navigationRestoreAllowed = false; removedArrivalFor = null; destination = target } else error = "This link is unavailable. Open the object from the app." }
     private fun message(failure: Exception): String = if (failure is CreatorAPIError) runCatching { Json.decodeFromString<APIError>(failure.body).error.message }.getOrDefault("This action could not complete. Reconnect and try again.") else "This action could not complete. Reconnect and try again."
 }
 
@@ -356,7 +384,7 @@ class FanFeatureRegistration(
 )
 
 @Composable
-fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/home", features: List<FanFeatureRegistration> = emptyList(), destinationDelivery: Long = 0L, notificationID: String? = null, onNotificationConsumed: () -> Unit = {}) {
+fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/home", features: List<FanFeatureRegistration> = emptyList(), destinationDelivery: Long = 0L, notificationID: String? = null, restoreSavedDestination: Boolean = returnTo == "/home", onNotificationConsumed: () -> Unit = {}) {
     // This root owns one navigation snapshot. Save the actual route at the
     // lifecycle save, not a mirror that can lag feature-local navigation.
     // Credentials, session authority and feature payloads are never serialized.
@@ -369,7 +397,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                 saved.getString("return") == permittedReturn && saved.getLong("delivery") == destinationDelivery &&
                 ApplicationDestination.isPermitted(it)
         }
-        FanSession(context, baseURL, restored ?: returnTo)
+        FanSession(context, baseURL, restored ?: returnTo, restoreSavedDestination && restored == null)
     }
     // Observe genuine boundaries while a restored/private feature is unmounted.
     // Feature observers issue no session authority and serialize no private data.
@@ -436,7 +464,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                     Button("Crisis help", ButtonVariant.QUIET, block = true) { model.open("/trust/crisis") }
                 }
             }
-            model.session == null -> Welcome(returnTo = model.destination, showContext = model.arrival != null, contextSource = model.arrival?.source, contextTitle = model.arrival?.title, bodyCopy = model.arrival?.let { "Every message says who wrote it: ${it.creatorName}'s AI, ${it.creatorName}, or their team. You'll always know which." } ?: "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext = model::removeArrival, onContinue = { scope.launch { model.beginSignIn() } })
+            model.session == null -> Welcome(returnTo = model.destination, showContext = model.arrival != null, contextSource = model.arrival?.source, contextTitle = model.arrival?.title, bodyCopy = model.arrival?.let { "Every message says who wrote it: ${it.creatorName}'s AI, ${it.creatorName}, or their team. You'll always know which." } ?: "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext = model::removeArrival, onContinue = { scope.launch { model.beginSignIn() } }, busy = model.busy || model.purgingPrivateState)
             model.session?.fan == null && features.any { it.matches(model.destination) && it.allowsSignedOut(model.destination) } -> key(model.session?.accountId, model.session?.sessionId, model.destination) { features.first { it.matches(model.destination) && it.allowsSignedOut(model.destination) }.screen(model) }
             (model.session?.fan == null && ApplicationDestination.requiresFanProfile(model.destination)) || model.destination == "/onboarding/handle" -> key(model.session?.accountId, model.session?.sessionId) { HandleForm(model) }
             else -> {

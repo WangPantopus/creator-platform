@@ -7,6 +7,26 @@ the complete [project checkpoint](project-continuation-2026-10-07.md),
 the detailed history and evidence; this plan does not replace or discard it.
 The product is substantially implemented and remains incomplete.
 
+## Continuing execution
+
+The user authorized continued implementation, commit/push, milestone PRs and
+merges when ready, with actual launched web/iOS/Android acceptance and no new
+unit tests. Existing required checks still run. All ten milestones below remain
+part of the scope; a bounded native repair does not replace the safe-upgrade work.
+
+PR #336 merged at `78c42fc3a5051b259473ad1e598e140e6391d210`; its five post-merge
+Foundation jobs passed. The next branch is `codex/native-connected-journey-20261008`.
+Copy 43 is reopened through its original custody helper and used by the compiled
+backend, actual web sessions and dedicated native simulators. The initial eight
+generation/33 usage record receipt remains unchanged after native reads.
+
+The [connected native milestone](../../artifacts/pr-review/2026-10-08/native-connected-journey/README.md)
+repairs initial reply visibility, Android saved navigation and empty-composer
+presentation, and the welcome action during sign-out cleanup. Its evidence is
+backed by passing iOS Night and Android Light/Night connected UI journeys.
+It is limited to the operated flows; new native sends, interruption/keyboard/largest
+text, physical devices and the rest of the finish criteria remain outstanding.
+
 ## Refreshed starting point
 
 - Continuation branch: `codex/shadow-evidence-lifetime-20261008`, retaining

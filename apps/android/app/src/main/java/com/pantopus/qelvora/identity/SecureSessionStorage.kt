@@ -9,17 +9,22 @@ import java.security.MessageDigest
 import java.net.URI
 import java.util.Locale
 import com.pantopus.qelvora.BuildConfig
+import com.pantopus.qelvora.generated.ApplicationDestination
+import org.json.JSONObject
+import java.util.UUID
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
-/** OS Keystore encryption; app backup is disabled. No private screen state is persisted here. */
+/** OS Keystore encryption; app backup is disabled. Saved navigation contains
+ * only a bounded account-bound path, never query strings or feature payloads. */
 class SecureSessionStorage(context: Context, issuer: String?) {
     private companion object {
         val lock = Any()
         val blockedAliases = mutableSetOf<String>()
         val clearedLegacyPackages = mutableSetOf<String>()
+        val navigationOwners = mutableMapOf<String, Any>()
         fun origin(value: String?): String? = runCatching {
             val uri = URI(value ?: return null)
             val scheme = uri.scheme?.lowercase(Locale.ROOT)
@@ -36,6 +41,8 @@ class SecureSessionStorage(context: Context, issuer: String?) {
     private val legacyPreferences = context.getSharedPreferences("identity-session", Context.MODE_PRIVATE)
     private val legacyAlias = context.packageName + ".identity-session"
     private val alias = "$legacyAlias.$scope"
+    private val navigationOwner = Any()
+    private fun navigationAAD() = (requireNotNull(issuerOrigin) + "\nidentity-navigation-v1").toByteArray(Charsets.UTF_8)
     private fun clearLegacy() {
         if (legacyAlias in clearedLegacyPackages) return
         // The previous credential had no issuer binding and cannot be safely migrated.
@@ -65,7 +72,8 @@ class SecureSessionStorage(context: Context, issuer: String?) {
         } catch (_: Exception) {
             // Key invalidation or corrupt ciphertext requires reauthorization.
             blockedAliases.add(alias)
-            check(preferences.edit().remove("credential").commit())
+            navigationOwners.remove(alias)
+            check(preferences.edit().clear().commit())
             null
         }
     }
@@ -75,13 +83,60 @@ class SecureSessionStorage(context: Context, issuer: String?) {
             clearLegacy()
             if (replacing != null) check(read() == replacing)
             blockedAliases.add(alias)
-            if (token == null) { check(preferences.edit().clear().commit()); return@synchronized }
+            if (token == null) { navigationOwners.remove(alias); check(preferences.edit().clear().commit()); return@synchronized }
             require(token.isNotEmpty())
             val cipher = Cipher.getInstance("AES/GCM/NoPadding").apply { init(Cipher.ENCRYPT_MODE, key()) }
             cipher.updateAAD(requireNotNull(issuerOrigin).toByteArray(Charsets.UTF_8))
             val body = cipher.doFinal(token.toByteArray(Charsets.UTF_8))
-            check(preferences.edit().putString("credential", Base64.encodeToString(cipher.iv, Base64.NO_WRAP) + "." + Base64.encodeToString(body, Base64.NO_WRAP)).commit())
+            val edit = preferences.edit().putString("credential", Base64.encodeToString(cipher.iv, Base64.NO_WRAP) + "." + Base64.encodeToString(body, Base64.NO_WRAP))
+            // A genuine guarded rotation keeps this account's route. A new
+            // sign-in clears it atomically with credential replacement.
+            if (replacing == null) { navigationOwners.remove(alias); edit.remove("navigation") }
+            check(edit.commit())
             blockedAliases.remove(alias)
         }
+    }
+
+    fun readDestination(accountId: String, credential: String): String? = synchronized(lock) {
+        require(UUID.fromString(accountId).toString() == accountId.lowercase(Locale.ROOT))
+        check(read() == credential)
+        navigationOwners[alias] = navigationOwner
+        val encrypted = preferences.getString("navigation", null) ?: return@synchronized null
+        try {
+            require(encrypted.length <= 4096)
+            val parts = encrypted.split('.'); require(parts.size == 2)
+            val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+            cipher.init(Cipher.DECRYPT_MODE, key(), GCMParameterSpec(128, Base64.decode(parts[0], Base64.NO_WRAP)))
+            cipher.updateAAD(navigationAAD())
+            val saved = JSONObject(String(cipher.doFinal(Base64.decode(parts[1], Base64.NO_WRAP)), Charsets.UTF_8))
+            val path = saved.getString("path")
+            require(saved.getInt("version") == 1 && path.toByteArray(Charsets.UTF_8).size <= 512 &&
+                !path.contains('?') && ApplicationDestination.isPermitted(path))
+            if (saved.getString("accountId") != accountId) {
+                check(preferences.edit().remove("navigation").commit())
+                return@synchronized null
+            }
+            path
+        } catch (failure: Exception) {
+            check(preferences.edit().remove("navigation").commit())
+            throw failure
+        }
+    }
+
+    fun saveDestination(destination: String, accountId: String, credential: String) = synchronized(lock) {
+        // Recreated shells claim this lifetime when reading. A late result
+        // from an old shell cannot overwrite its replacement's navigation.
+        if (navigationOwners[alias] !== navigationOwner) return@synchronized
+        check(read() == credential)
+        require(UUID.fromString(accountId).toString() == accountId.lowercase(Locale.ROOT))
+        require(ApplicationDestination.isPermitted(destination))
+        val path = destination.substringBefore('?').takeIf {
+            it.toByteArray(Charsets.UTF_8).size <= 512 && ApplicationDestination.isPermitted(it)
+        } ?: "/home"
+        val saved = JSONObject().put("version", 1).put("accountId", accountId).put("path", path)
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding").apply { init(Cipher.ENCRYPT_MODE, key()) }
+        cipher.updateAAD(navigationAAD())
+        val encrypted = cipher.doFinal(saved.toString().toByteArray(Charsets.UTF_8))
+        check(preferences.edit().putString("navigation", Base64.encodeToString(cipher.iv, Base64.NO_WRAP) + "." + Base64.encodeToString(encrypted, Base64.NO_WRAP)).commit())
     }
 }
