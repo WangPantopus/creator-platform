@@ -1,6 +1,5 @@
 import { randomUUID } from "node:crypto";
 import type { PoolClient } from "pg";
-import { z } from "zod";
 import type { CreatorScope } from "./repository.js";
 import { AgentService } from "./service.js";
 import { versionRow } from "./repository.js";
@@ -9,12 +8,12 @@ import type { ThreadSnapshot } from "./pipeline.js";
 import type { VersionComparison } from "../../../../../packages/api/src/agent/contracts.js";
 import { shadowReplayFingerprint } from "./shadow-fingerprint.js";
 import { currentShadowSamples, type ShadowSample } from "./shadow-samples.js";
-export interface PrivacyParaphrasePort {
-  /** Complete current replay cohort, at most 200, never a delta. An empty
-   * cohort removes cached candidates and cannot pass an upgrade. The owner
-   * must enforce consent, exclusions, revocation and deletion provenance. */
-  verifiedParaphrases(scope: CreatorScope): Promise<readonly ShadowSample[]>;
-}
+import { withComparisonProviderSource } from "./comparison-provider-source.js";
+import {
+  holdComparisonCohort,
+  type PrivacyParaphrasePort,
+} from "./comparison-feed.js";
+export type { PrivacyParaphrasePort } from "./comparison-feed.js";
 const synthetic: ThreadSnapshot = {
   revision: 0,
   epoch: 0,
@@ -85,7 +84,7 @@ export class ShadowReplay {
           "The published version is unavailable.",
         );
         this.service.pipeline.assertReplayVersion(live, creator.name);
-        const samples = await currentShadowSamples(client, scope.creatorId);
+        const samples = await this.currentSamples(scope, client);
         invariant(
           samples.length,
           "shadow_samples_unavailable",
@@ -142,34 +141,28 @@ export class ShadowReplay {
     private readonly service: AgentService,
     private readonly paraphrases: PrivacyParaphrasePort,
   ) {}
+  private async currentSamples(
+    scope: CreatorScope,
+    client: PoolClient,
+  ): Promise<readonly ShadowSample[]> {
+    const samples = await currentShadowSamples(client, scope.creatorId);
+    await holdComparisonCohort(
+      this.service.repository,
+      this.paraphrases,
+      scope,
+      client,
+      samples,
+    );
+    return samples;
+  }
   async collect(scope: CreatorScope) {
-    // Copy the producer result before awaiting storage; a mutable array is not
-    // a durable snapshot. Reject malformed batches instead of truncating them.
-    const batch = z
-      .array(
-        z.strictObject({
-          sampleId: z.uuid(),
-          occurredAt: z.string(),
-          paraphrasedPrompt: z.string().min(5).max(1000),
-          sanitizerReference: z.string().trim().min(1).max(512),
-        }),
-      )
-      .max(200)
-      .safeParse(await this.paraphrases.verifiedParaphrases(scope));
-    invariant(
-      batch.success,
-      "paraphrase_required",
-      "Only a bounded batch of verified privacy-safe paraphrases enters shadow replay.",
-    );
-    const samples = batch.data;
-    invariant(
-      samples.length <= 200 &&
-        new Set(samples.map((sample) => sample.sampleId)).size ===
-          samples.length,
-      "shadow_sample_limit",
-      "Use one bounded privacy-safe sample cohort with unique identifiers.",
-    );
     return this.service.repository.transaction(scope, async (client) => {
+      const samples = await holdComparisonCohort(
+        this.service.repository,
+        this.paraphrases,
+        scope,
+        client,
+      );
       let collected = 0;
       for (const sample of samples) {
         const occurredAt = Date.parse(sample.occurredAt);
@@ -260,7 +253,7 @@ export class ShadowReplay {
             "Publish the first evaluated version before comparing recent conversations.",
           );
           this.service.pipeline.assertReplayVersion(live, creator.name);
-          const samples = await currentShadowSamples(client, scope.creatorId);
+          const samples = await this.currentSamples(scope, client);
           invariant(
             samples.length,
             "shadow_samples_unavailable",
@@ -294,7 +287,7 @@ export class ShadowReplay {
       const comparisons: VersionComparison[] = [];
       const assertSamples = async (client: PoolClient) => {
         signal.throwIfAborted();
-        const samples = await currentShadowSamples(client, scope.creatorId);
+        const samples = await this.currentSamples(scope, client);
         invariant(
           samples.length > 0 &&
             shadowReplayFingerprint(
@@ -319,6 +312,23 @@ export class ShadowReplay {
             await assertSamples(client);
           },
         );
+      const providerSource = {
+        repository: this.service.repository,
+        scope,
+        signal,
+        assertCurrent: async (client: PoolClient) => {
+          const current = await client.query(
+            "SELECT 1 FROM creator.ai_workspace WHERE creator_id=$1 AND revision=$2 AND live_version_id=$3 AND deleted_at IS NULL",
+            [scope.creatorId, expectedRevision, start.live.id],
+          );
+          invariant(
+            current.rowCount === 1,
+            "comparison_changed",
+            "Draft or live version changed before comparison processing.",
+          );
+          await assertSamples(client);
+        },
+      };
       for (const sample of start.samples) {
         await recheck();
         const base = {
@@ -337,36 +347,46 @@ export class ShadowReplay {
           snapshot: synthetic,
           signal,
         };
-        const live = await this.service.pipeline
-          .publishedEngine(start.live.pipelineHash)
-          .run({
+        const live = await withComparisonProviderSource(providerSource, () =>
+          this.service.pipeline.publishedEngine(start.live.pipelineHash).run({
             ...base,
             configuration: start.live.configuration,
             sourceSet: start.live.sourceSet,
-          });
-        await recheck();
-        const draft = await this.service.pipeline.run({
-          ...base,
-          configuration: start.snapshot.configuration,
-          sourceSet: start.snapshot.sourceSet,
-        });
-        await recheck();
-        const liveScore = await this.service.pipeline.judge(
-          sample.paraphrasedPrompt,
-          live,
-          start.live.configuration,
-          "Privacy-safe shadow replay",
-          signal,
-          scope,
+          }),
         );
         await recheck();
-        const draftScore = await this.service.pipeline.judge(
-          sample.paraphrasedPrompt,
-          draft,
-          start.snapshot.configuration,
-          "Privacy-safe shadow replay",
-          signal,
-          scope,
+        const draft = await withComparisonProviderSource(providerSource, () =>
+          this.service.pipeline.run({
+            ...base,
+            configuration: start.snapshot.configuration,
+            sourceSet: start.snapshot.sourceSet,
+          }),
+        );
+        await recheck();
+        const liveScore = await withComparisonProviderSource(
+          providerSource,
+          () =>
+            this.service.pipeline.judge(
+              sample.paraphrasedPrompt,
+              live,
+              start.live.configuration,
+              "Privacy-safe shadow replay",
+              signal,
+              scope,
+            ),
+        );
+        await recheck();
+        const draftScore = await withComparisonProviderSource(
+          providerSource,
+          () =>
+            this.service.pipeline.judge(
+              sample.paraphrasedPrompt,
+              draft,
+              start.snapshot.configuration,
+              "Privacy-safe shadow replay",
+              signal,
+              scope,
+            ),
         );
         comparisons.push({
           paraphrase: sample.paraphrasedPrompt,
@@ -443,7 +463,7 @@ export class ShadowReplay {
             start.live,
             start.samples,
           );
-          const samples = await currentShadowSamples(client, scope.creatorId);
+          const samples = await this.currentSamples(scope, client);
           invariant(
             live &&
               current.fingerprint === start.snapshot.fingerprint &&

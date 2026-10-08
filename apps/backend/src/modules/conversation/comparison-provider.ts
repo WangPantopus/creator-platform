@@ -19,6 +19,7 @@ import {
   type HeldProviderUsageAdmission,
 } from "../agent/provider-usage.js";
 import { trustTransaction } from "../trust/transaction.js";
+import { comparisonReaderSource } from "./comparison-feed.js";
 import {
   comparisonStorageSource,
   comparisonPrivacySource,
@@ -98,6 +99,7 @@ export class PreparedComparisonSanitizerProvider {
       comparisonAttemptSource,
       comparisonArtifactPrivacySource,
       comparisonWriterSource,
+      comparisonReaderSource,
     ])
       await assertRegisteredMigration(client, source, signal);
     await this.assertPrepared(client);

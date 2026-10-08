@@ -10,6 +10,8 @@ import { DomainError } from "../../core/errors.js";
 import { SourceService } from "../sources/service.js";
 import { AgentService } from "./service.js";
 import type { CreatorScope } from "./repository.js";
+import { versionRow } from "./repository.js";
+import { shadowReplayFingerprint } from "./shadow-fingerprint.js";
 import type { ShadowReplay } from "./shadow.js";
 import { EvaluationRequest } from "../../../../../packages/api/src/agent/contracts.js";
 import { once } from "node:events";
@@ -60,13 +62,37 @@ export function createAgentRouter(input: {
     res.json(await input.service.versions(scope(req, res), before));
   });
   router.get("/:creatorId/comparisons", async (req, res) => {
+    const creatorScope = scope(req, res);
     const items = await input.service.repository.transaction(
-      scope(req, res),
-      async (client) => {
+      creatorScope,
+      async (client, workspace, creator) => {
         // A disconnected owner cannot attest that retained fan-derived text is
         // still consented or eligible. Authenticate the creator normally, but
         // do not return cached comparisons merely because they exist in SQL.
         if (!input.shadow) return [];
+        const cohort = await input.service.comparisonSamples(
+          creatorScope,
+          client,
+        );
+        const live = await versionRow(
+          client,
+          creatorScope.creatorId,
+          workspace.live_version_id,
+        );
+        const snapshot = await input.service.snapshot(
+          client,
+          creatorScope,
+          workspace,
+          creator.name,
+        );
+        const currentFingerprint =
+          live && cohort.current && cohort.samples.length
+            ? shadowReplayFingerprint(
+                snapshot.fingerprint,
+                live,
+                cohort.samples,
+              )
+            : null;
         await client.query(
           "UPDATE creator.ai_shadow_evaluation SET state='failed',error='Comparison interrupted. Run it again.',updated_at=now() WHERE creator_id=$1 AND state='running' AND updated_at<now()-interval '10 minutes'",
           [req.params.creatorId],
@@ -76,7 +102,17 @@ export function createAgentRouter(input: {
             'SELECT id,fingerprint,live_version_id AS "liveVersionId",results,state,error,created_at AS "createdAt" FROM creator.ai_shadow_evaluation WHERE creator_id=$1 ORDER BY created_at DESC LIMIT 10',
             [req.params.creatorId],
           )
-        ).rows;
+        ).rows.map((row) =>
+          row.fingerprint === currentFingerprint
+            ? row
+            : {
+                ...row,
+                results: [],
+                state: "failed",
+                error:
+                  "Comparison questions or AI versions changed. Run it again.",
+              },
+        );
       },
     );
     res.json({ available: Boolean(input.shadow), items });

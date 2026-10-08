@@ -23,6 +23,12 @@ W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan expor
 
 ## Implementation continuation
 
+- [~] October 8, 2026: prepare original creator comparison reads with a finite
+  SQL COMMIT scope; hold collection, provider admission, replay, display and
+  publication on that current source. Eight SQL and four actual consumer source
+  operations pass. Full graph/host composition and launched app journeys remain.
+  [Evidence and limits](../artifacts/pr-review/2026-10-08/comparison-held-feed/README.md).
+
 - [~] October 8, 2026: prepare distinct comparison provider admission, source-bound
   cost receipts and original fan sample writes with a commit-time expiry gate.
   Nine isolated SQL operations and backend checks pass; actual producer, creator

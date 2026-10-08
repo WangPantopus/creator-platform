@@ -1,5 +1,30 @@
 # Session handoff — October 8, 2026
 
+## Active continuation — original held comparison feed
+
+Continue on `codex/comparison-held-feed-20261008` in 637b. The
+[original reader/consumer increment](../../artifacts/pr-review/2026-10-08/comparison-held-feed/README.md)
+adds a finite private SQL read scope, original creator/fan/denial checks and
+same-transaction collection, provider admission, replay, display and publication.
+Fresh isolated graph15 passes eight SQL and four actual consumer-class operations
+with synthetic identity/provider fixtures. No actual consent or provider/app
+acceptance is claimed. All seven sources remain unregistered and uncomposed.
+
+PR345 merged at `60f415b65722b62dbbd81ac9999843178aba8a18` after all eleven
+checks passed at exact head `b13db01bfb27da3f8629a028bf9e48a6c6ac5451`.
+PR344's separate main workflow37804035475 has passed; refresh345's main run.
+The current branch includes a merge of original main b46f2f183, preserving the
+same reviewed provider/writer tree while avoiding duplicate predecessor diffs.
+
+Next independently review complete combined role/catalogue custody, restoration
+and legacy saved exports; adding the reader table and writer triggers changes
+global catalogues, so older catalogue constants cannot be assumed current.
+Allocate executable SQL with real ledger identities and compose original
+policy, provider, source, reader, privacy, expiry and artifact-recovery owners.
+Then operate actual separate fan choice, sanitization, withdrawal and the
+preserved revision13 upgrade. Original backend5bd6b6215 on57304, web3119, devices
+and all original evidence remain as before. Carry every full-plan milestone.
+
 ## Active continuation — comparison provider admission and writer
 
 Continue on `codex/comparison-purpose-admission-20261008` in637b. The

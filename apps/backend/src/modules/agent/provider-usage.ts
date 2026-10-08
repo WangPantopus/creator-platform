@@ -6,6 +6,7 @@ import type { PoolClient } from "pg";
 import { invariant } from "../../core/errors.js";
 import { ProviderResponseError } from "./response-usage.js";
 import { trustTransaction } from "../trust/transaction.js";
+import { comparisonProviderAdmission } from "./comparison-provider-source.js";
 
 /** Structural consumer of W3's canonical GenerationExecution (7f5f63d).
  * Only the actual scoped processor supplies these callbacks, never HTTP JSON. */
@@ -91,8 +92,18 @@ async function openProviderUsage(
     heldAdmission?.purpose,
   );
   const journal = repository.usageJournal;
+  const comparisonAdmission = comparisonProviderAdmission(
+    repository,
+    scope,
+    category,
+  );
   invariant(
-    !heldAdmission || (journal && !execution),
+    !comparisonAdmission || (!execution && !heldAdmission),
+    "comparison_source_changed",
+    "A creator comparison cannot borrow another provider admission.",
+  );
+  invariant(
+    !(heldAdmission || comparisonAdmission) || (journal && !execution),
     "usage_original_admission_required",
     "Use one original prepared journal and source admission.",
   );
@@ -132,11 +143,15 @@ async function openProviderUsage(
   };
   // W3 holds current thread/session/lease/processor authority through this
   // admission commit. No nested transaction and no provider I/O in its callback.
-  const id = heldAdmission
-    ? await heldAdmission.admit(insert)
-    : execution
-      ? await execution.admit(insert)
-      : await repository.transaction(admittedScope, (client) => insert(client));
+  const id = comparisonAdmission
+    ? await comparisonAdmission(insert)
+    : heldAdmission
+      ? await heldAdmission.admit(insert)
+      : execution
+        ? await execution.admit(insert)
+        : await repository.transaction(admittedScope, (client) =>
+            insert(client),
+          );
   let completed = false;
   // This private closure holds only custody of the row actually committed
   // before provider I/O. Session revocation forbids new commands/admissions,
@@ -212,7 +227,7 @@ async function openProviderUsage(
           ],
         );
     };
-    if (heldAdmission) {
+    if (heldAdmission || comparisonAdmission) {
       // Completion uses its original private admission receipt even after a
       // caller abort. Settle the actual SQL source before returning its client;
       // uncertain COMMIT must never release a live pooled transaction.

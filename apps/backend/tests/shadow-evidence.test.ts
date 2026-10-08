@@ -141,11 +141,36 @@ function fixture() {
     name: "Maya",
     verification: "verified",
   };
-  vi.spyOn(repository, "transaction").mockImplementation(async (_scope, work) =>
-    work(client, workspace, creator),
+  // Keep this existing scripted fixture aligned with the original transaction
+  // callback contract. These doubles are not held-source qualification.
+  const finalizers: (() => Promise<void>)[] = [];
+  vi.spyOn(repository, "assertHeldCreator").mockImplementation(
+    (current, held) => {
+      expect(current).toBe(scope);
+      expect(held).toBe(client);
+    },
+  );
+  vi.spyOn(repository, "finalizeHeldCreatorBeforeCommit").mockImplementation(
+    (current, held, finish) => {
+      repository.assertHeldCreator(current, held);
+      expect(finalizers).toHaveLength(0);
+      finalizers.push(finish);
+    },
+  );
+  vi.spyOn(repository, "transaction").mockImplementation(
+    async (_scope, work) => {
+      finalizers.length = 0;
+      try {
+        const value = await work(client, workspace, creator);
+        for (const finish of finalizers) await finish();
+        return value;
+      } finally {
+        finalizers.length = 0;
+      }
+    },
   );
   vi.spyOn(repository, "command").mockImplementation(
-    async (_scope, _key, _input, work) => work(client, workspace, creator),
+    async (_scope, _key, _input, work) => repository.transaction(_scope, work),
   );
   vi.spyOn(service, "snapshot").mockResolvedValue(snapshot);
   const result: PipelineResult = {

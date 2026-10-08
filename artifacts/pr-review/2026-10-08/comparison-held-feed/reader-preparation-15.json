@@ -1,0 +1,32 @@
+{
+  "kind": "read-only source catalogue; no runtime registration or prepared host",
+  "observedAt": "2026-10-08T16:45:46.307Z",
+  "database": "creator_comparison_artifact15_20261008",
+  "observations": [
+    {
+      "path": "pg_catalog",
+      "catalogueSha256": "d626779ea017b12513ff5a2a16f035bb6316ab296a4620aff74faa45627c3dce",
+      "functions": 3,
+      "storage": 1,
+      "triggers": 1,
+      "dependencies": 66
+    },
+    {
+      "path": "creator,public",
+      "catalogueSha256": "d626779ea017b12513ff5a2a16f035bb6316ab296a4620aff74faa45627c3dce",
+      "functions": 3,
+      "storage": 1,
+      "triggers": 1,
+      "dependencies": 66
+    },
+    {
+      "path": "public",
+      "catalogueSha256": "d626779ea017b12513ff5a2a16f035bb6316ab296a4620aff74faa45627c3dce",
+      "functions": 3,
+      "storage": 1,
+      "triggers": 1,
+      "dependencies": 66
+    }
+  ],
+  "registered": false
+}

@@ -46,6 +46,10 @@ import { shadowReplayFingerprint } from "./shadow-fingerprint.js";
 import { currentShadowSamples } from "./shadow-samples.js";
 import type { PrivacyParaphrasePort } from "./shadow.js";
 import {
+  holdComparisonCohort,
+  comparisonCohortHash,
+} from "./comparison-feed.js";
+import {
   PreparedGenerationAgentInputs,
   type GenerationAILicenseContext,
 } from "./generation-inputs.js";
@@ -123,6 +127,24 @@ export class AgentService {
   ) {
     this.repository = repository;
     this.pipeline = pipeline;
+  }
+  async comparisonSamples(scope: CreatorScope, client: PoolClient) {
+    invariant(
+      this.comparisonFeed,
+      "shadow_feed_unconfigured",
+      "Connect the privacy-safe recent conversation feed before replacing the live version.",
+    );
+    const verified = await holdComparisonCohort(
+      this.repository,
+      this.comparisonFeed,
+      scope,
+      client,
+    );
+    const samples = await currentShadowSamples(client, scope.creatorId);
+    return {
+      samples,
+      current: comparisonCohortHash(samples) === comparisonCohortHash(verified),
+    };
   }
   /** Development creators use only the synthetic authority; every other scope
    * uses only a real verifier. Neither can authorize the other. */
@@ -362,7 +384,8 @@ export class AgentService {
             "Connect the privacy-safe recent conversation feed before replacing the live version.",
           );
         } else if (workspace.live_version_id) {
-          const samples = await currentShadowSamples(client, scope.creatorId);
+          const cohort = await this.comparisonSamples(scope, client);
+          const samples = cohort.current ? cohort.samples : [];
           const shadow = await client.query<{ state: string }>(
             "SELECT state FROM creator.ai_shadow_evaluation WHERE creator_id=$1 AND fingerprint=$2 AND live_version_id=$3 ORDER BY created_at DESC LIMIT 1",
             [
@@ -1080,7 +1103,8 @@ export class AgentService {
           this.pipeline.assertReplayVersion(live, creator.name);
           // Missing samples are not evidence that the trusted recent-conversation
           // feed is empty. Until that feed can attest emptiness, require replay.
-          const samples = await currentShadowSamples(client, scope.creatorId);
+          const cohort = await this.comparisonSamples(scope, client);
+          const samples = cohort.current ? cohort.samples : [];
           invariant(
             samples.length,
             "shadow_evaluation_required",
