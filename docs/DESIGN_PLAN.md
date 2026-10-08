@@ -23,6 +23,13 @@ W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan expor
 
 ## Implementation continuation
 
+- [~] October 8, 2026: actual preserved creator revision13→14 comparison, fresh
+  six-case evaluation and v2 publication; useful cited fan reply, backend restart,
+  reversible rollback/restoration and native Light/Night journeys. Existing E2E
+  runners now accept longer iOS labels and keep Android Compose advancing during
+  the reading wait. Grounding inconsistency and stale offline comparison text
+  remain explicit findings. [Evidence](../artifacts/pr-review/2026-10-08/comparison-creator-upgrade/README.md).
+
 - [~] October 8, 2026: original comparison export completes all eight domains after
   source-reference and worker-recovery sequencing fixes. Real web downloads match;
   explicit withdrawal removes the sample and affected file, and fresh download

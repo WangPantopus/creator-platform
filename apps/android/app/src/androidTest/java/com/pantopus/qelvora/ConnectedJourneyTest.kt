@@ -216,7 +216,10 @@ class ConnectedJourneyTest {
                 compose.onNode(hasScrollToNodeAction()).performScrollToNode(citation)
                 // Read older history through the real periodic refresh.
                 val readingPosition = compose.onAllNodes(citation)[0].fetchSemanticsNode().boundsInRoot.top
-                Thread.sleep(16_000)
+                // Keep Compose's clock and the app's effects advancing while
+                // spanning real time; blocking the test thread freezes them.
+                val readingStarted = SystemClock.elapsedRealtime()
+                compose.waitUntil(20_000) { SystemClock.elapsedRealtime() - readingStarted >= 16_000 }
                 compose.onAllNodes(citation)[0].assertIsDisplayed()
                 assertTrue("Refresh must keep the reader's position",
                     kotlin.math.abs(compose.onAllNodes(citation)[0].fetchSemanticsNode().boundsInRoot.top - readingPosition) <= 2)
@@ -295,6 +298,10 @@ class ConnectedJourneyTest {
 
     private fun capture(name: String) {
         compose.waitForIdle()
+        // A newly composed dialog can precede the OS compositor's frame.
+        // Advance the running app before capturing the whole display.
+        val drawnAfter = SystemClock.elapsedRealtime() + 250
+        compose.waitUntil(2_000) { SystemClock.elapsedRealtime() >= drawnAfter }
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val root = File(instrumentation.targetContext.getExternalFilesDir(null), "connected-journey-evidence")
         root.mkdirs()

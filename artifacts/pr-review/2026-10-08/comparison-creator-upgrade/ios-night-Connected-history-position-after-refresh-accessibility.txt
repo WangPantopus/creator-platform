@@ -1,0 +1,65 @@
+Attributes: Application, 0x106311f10, pid: 23199, label: 'Qelvora'
+Element subtree:
+ →Application, 0x106311f10, pid: 23199, label: 'Qelvora'
+    Window (Main), 0x10630d6e0, {{0.0, 0.0}, {402.0, 874.0}}
+      Other, 0x106313280, {{0.0, 0.0}, {402.0, 874.0}}
+        Other, 0x1057198a0, {{0.0, 0.0}, {402.0, 874.0}}
+          Other, 0x105728e60, {{0.0, 0.0}, {402.0, 874.0}}
+            Other, 0x105728f80, {{0.0, 0.0}, {402.0, 874.0}}
+              StaticText, 0x1057289e0, {{43.0, 70.0}, {316.0, 15.7}}, label: 'Development identity · synthetic account · actual local API'
+              Button, 0x105728b00, {{10.0, 103.7}, {44.0, 44.0}}, label: 'Back'
+                Other, 0x105728c20, {{10.0, 103.7}, {44.0, 44.0}}
+              StaticText, 0x105728d40, {{66.0, 106.7}, {38.0, 38.0}}, label: 'M'
+              StaticText, 0x1057290a0, {{116.0, 106.3}, {42.7, 22.3}}, label: 'Maya'
+              StaticText, 0x1057291c0, {{116.0, 130.7}, {78.7, 14.3}}, label: 'Official AI'
+              Button, 0x1057292e0, {{340.0, 103.7}, {44.0, 44.0}}, label: 'About this conversation'
+                Other, 0x105729400, {{340.0, 103.7}, {44.0, 44.0}}
+              ScrollView, 0x105729520, {{6.0, 212.7}, {390.0, 431.3}}
+                Other, 0x105729640, {{6.0, -9503.0}, {390.0, 10147.0}}
+                  Other, 0x105729760, {{21.5, -210.7}, {358.5, 821.0}}
+                    Button, 0x105729880, {{22.0, -210.7}, {184.0, 44.0}}, identifier: 'comparison-options-c0b57065-bd5a-44c4-a8d5-d1c919fd0a12', label: 'AI comparison options'
+                    Button, 0x1057299a0, {{22.0, -150.7}, {170.0, 44.0}}, label: 'Don't remember this'
+                    Other, 0x105729ac0, {{21.5, -90.7}, {335.0, 87.9}}, label: 'Maya's AI'
+                      Other, 0x105729be0, {{22.0, -90.7}, {74.3, 15.7}}, label: 'Maya's AI'
+                        Other, 0x105729d00, {{22.0, -90.0}, {14.0, 14.0}}
+                        StaticText, 0x105729e20, {{42.0, -90.7}, {54.3, 15.7}}, label: 'Maya's AI'
+                      StaticText, 0x105729f40, {{36.0, -57.1}, {304.3, 41.7}}, label: 'Hello, I am Maya's AI, here to assist you with your questions.'
+                    Button, 0x10572a060, {{22.0, 12.7}, {73.0, 44.0}}, label: 'Report'
+                    Other, 0x10572a180, {{94.0, 72.7}, {286.0, 127.7}}, label: 'You'
+                      StaticText, 0x10572a2a0, {{108.0, 82.6}, {258.0, 107.7}}, label: 'What steps does the approved source recommend for drying a freshly thrown clay mug? Please answer in two concise sentences and identify yourself as Maya’s AI.'
+                    Button, 0x10572a520, {{22.0, 216.3}, {184.0, 44.0}}, identifier: 'comparison-options-b21ed168-e517-4ad5-a1b7-0e64bc270be7', label: 'AI comparison options'
+                    Button, 0x10572a640, {{22.0, 276.3}, {170.0, 44.0}}, label: 'Don't remember this'
+                    Other, 0x10572a760, {{21.5, 336.3}, {335.0, 214.6}}, label: 'Maya's AI'
+                      Other, 0x10572a880, {{22.0, 336.3}, {74.3, 15.7}}, label: 'Maya's AI'
+                        Other, 0x10572a9a0, {{22.0, 337.0}, {14.0, 14.0}}
+                        StaticText, 0x10572ab50, {{42.0, 336.3}, {54.3, 15.7}}, label: 'Maya's AI'
+                      StaticText, 0x10572ac70, {{36.0, 369.9}, {306.0, 107.7}}, label: 'This is Maya’s AI using approved source material: the source recommends covering the mug loosely with plastic and turning it periodically. It also says to let the handle and body dry at a similar pace.'
+                      Button, 0x10572af40, {{35.5, 489.2}, {307.0, 49.7}}, label: 'Source, Read the original passage'
+                        Other, 0x10572b060, {{57.0, 508.0}, {12.0, 12.0}}
+                        StaticText, 0x10572b180, {{90.0, 497.6}, {44.3, 17.0}}, label: 'Source'
+                        StaticText, 0x10572b2a0, {{90.0, 514.6}, {142.3, 15.7}}, label: 'Read the original passage'
+                        Other, 0x10572b3c0, {{310.0, 503.0}, {22.0, 22.0}}
+                    Button, 0x10572b4e0, {{22.0, 566.3}, {73.0, 44.0}}, label: 'Report'
+                Other, 0x10572b600, {{363.0, 212.7}, {30.0, 431.3}}, label: 'Vertical scroll bar, 24 pages', value: 100%
+                  Other, 0x10572b720, {{390.0, 605.0}, {3.0, 36.0}}
+                Other, 0x10572b840, {{363.0, 212.7}, {30.0, 431.3}}, label: 'Vertical scroll bar, 24 pages', value: 100%
+                  Other, 0x10572b960, {{390.0, 605.0}, {3.0, 36.0}}
+              Button, 0x10572ba80, {{22.0, 660.0}, {358.0, 48.0}}, label: 'Ask Maya to step in'
+                StaticText, 0x10572bba0, {{111.7, 670.0}, {28.0, 28.0}}, label: 'M'
+                StaticText, 0x10572bcc0, {{22.0, 660.0}, {358.0, 48.0}}, label: 'Ask Maya to step in'
+              TextField, 0x10572bde0, {{34.0, 736.0}, {249.0, 20.0}}, label: 'Message Maya's AI', placeholderValue: 'Message Maya's AI…'
+                Other, 0x10572bf00, {{34.0, 743.0}, {249.0, 10.0}}, label: 'Horizontal scroll bar, 1 page', value: 0%
+                  Other, 0x10572c020, {{37.0, 750.0}, {243.0, 3.0}}
+              Button, 0x10572c140, {{303.0, 720.0}, {77.0, 48.0}}, label: 'Send', Disabled
+              Button, 0x10572c260, {{75.7, 780.0}, {133.0, 44.0}}, label: 'Me and privacy'
+              Button, 0x10572c380, {{216.7, 780.0}, {110.0, 44.0}}, label: 'Get support'
+              Other, 0x10572c4a0, {{6.0, 157.7}, {390.0, 55.0}}, label: 'You're talking to Maya's AI · Maya steps in on request'
+                Other, 0x10572c5c0, {{27.0, 179.3}, {12.0, 12.0}}
+                StaticText, 0x10572c6e0, {{54.0, 167.7}, {260.0, 35.0}}, label: 'You're talking to Maya's AI · Maya steps in on request'
+Path to element:
+ →Application, 0x106311f10, pid: 23199, label: 'Qelvora'
+Query chain:
+ →Find: Target Application 'com.pantopus.qelvora'
+  Output: {
+    Application, 0x106313950, pid: 23199, label: 'Qelvora'
+  }

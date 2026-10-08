@@ -1,0 +1,159 @@
+Heavy build slot acquired by creator-upgrade-ios-night.
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project apps/ios/QelvoraApp.xcodeproj -scheme QelvoraApp -destination "platform=iOS Simulator,id=D5ED8A7C-924E-4F1E-AC35-DB0FACF1E1B0" -derivedDataPath /Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-build -jobs 2 "-only-testing:QelvoraUITests/ConnectedJourneyTests/testPublishedConversationSurvivesNativeRelaunch" -resultBundlePath /Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-creator-upgrade-03.xcresult test-without-building
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  swift-snapshot-testing: https://github.com/pointfreeco/swift-snapshot-testing.git @ 1.19.6
+  swift-syntax: https://github.com/swiftlang/swift-syntax @ 604.0.0
+  QelvoraNative: /Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/ios
+  LiveKit: https://github.com/livekit/client-sdk-swift.git @ 2.17.0
+  swift-custom-dump: https://github.com/pointfreeco/swift-custom-dump @ 1.7.3
+  LiveKitWebRTC: https://github.com/livekit/webrtc-xcframework.git @ 150.7871.2
+  LiveKitUniFFI: https://github.com/livekit/livekit-uniffi-xcframework.git @ 0.1.9
+  xctest-dynamic-overlay: https://github.com/pointfreeco/xctest-dynamic-overlay @ 1.13.1
+
+Writing result bundle at path:
+	/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-creator-upgrade-03.xcresult
+
+2026-10-08 12:33:12.500750-0700 QelvoraUITests-Runner[23158:3894506] [Default] Running tests...
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'Selected tests' started at 2026-10-08 12:33:18.041.
+Test Suite 'QelvoraUITests.xctest' started at 2026-10-08 12:33:18.042.
+Test Suite 'ConnectedJourneyTests' started at 2026-10-08 12:33:18.043.
+Test Case '-[QelvoraUITests.ConnectedJourneyTests testPublishedConversationSurvivesNativeRelaunch]' started.
+    t =     0.00s Start Test at 2026-10-08 12:33:18.046
+    t =     0.36s Set Up
+    t =     0.38s Open com.pantopus.qelvora
+    t =     0.38s     Launch com.pantopus.qelvora
+2026-10-08 12:33:18.525 xcodebuild[22872:3891375] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-10-08 12:33:18.525 xcodebuild[22872:3891375] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     2.26s         Setting up automation session
+    t =     4.50s         Wait for com.pantopus.qelvora to idle
+    t =     6.36s Waiting 5.0s for "continue-with-pantopus" Button to exist
+    t =     7.38s     Checking `Expect predicate `existsNoRetry == 1` for object "continue-with-pantopus" Button`
+    t =     7.39s         Checking existence of `"continue-with-pantopus" Button`
+    t =     7.53s         Capturing element debug description
+    t =     8.44s     Checking `Expect predicate `existsNoRetry == 1` for object "continue-with-pantopus" Button`
+    t =     8.44s         Checking existence of `"continue-with-pantopus" Button`
+    t =     8.51s         Capturing element debug description
+    t =     9.43s     Checking `Expect predicate `existsNoRetry == 1` for object "continue-with-pantopus" Button`
+    t =     9.43s         Checking existence of `"continue-with-pantopus" Button`
+    t =     9.50s         Capturing element debug description
+    t =    10.42s     Checking `Expect predicate `existsNoRetry == 1` for object "continue-with-pantopus" Button`
+    t =    10.43s         Checking existence of `"continue-with-pantopus" Button`
+    t =    10.49s         Capturing element debug description
+    t =    11.37s     Checking `Expect predicate `existsNoRetry == 1` for object "continue-with-pantopus" Button`
+    t =    11.37s         Checking existence of `"continue-with-pantopus" Button`
+    t =    11.44s         Capturing element debug description
+    t =    11.44s     Checking existence of `"continue-with-pantopus" Button`
+    t =    11.49s Collecting debug information to assist test failure triage
+    t =    11.49s     Requesting snapshot of accessibility hierarchy for app with pid 23199
+    t =    11.59s Waiting 30.0s for "Message Maya's AI" TextField to exist
+    t =    12.60s     Checking `Expect predicate `existsNoRetry == 1` for object "Message Maya's AI" TextField`
+    t =    12.61s         Checking existence of `"Message Maya's AI" TextField`
+    t =    12.66s Find the "Ask Maya to step in" Button
+    t =    12.77s Find the "Send" Button
+    t =    12.83s Waiting 10.0s for StaticText (First Match) to exist
+    t =    13.84s     Checking `Expect predicate `existsNoRetry == 1` for object StaticText (First Match)`
+    t =    13.84s         Checking existence of `StaticText (First Match)`
+    t =    13.93s Find the StaticText (First Match)
+    t =    14.07s Find the "This is Maya’s AI using approved source material: the source recommends covering the mug loosely with plastic and turning it periodically. It also says to let the handle and body dry at a similar pace." StaticText
+    t =    14.20s Find the "Message Maya's AI" TextField
+    t =    14.27s Find the Target Application 'com.pantopus.qelvora'
+    t =    14.53s Added attachment named 'Connected-published-conversation'
+    t =    14.54s Requesting snapshot of accessibility hierarchy for app with pid 23199
+    t =    14.82s Requesting snapshot of accessibility hierarchy for app with pid 23199
+    t =    14.91s Added attachment named 'Connected-published-conversation-accessibility'
+    t =    14.91s Checking existence of `Button (First Match)`
+    t =    15.01s Find the Button (First Match)
+    t =    15.18s Checking existence of `"Source, Read the original passage" Button`
+    t =    15.26s Find the "Source, Read the original passage" Button
+    t =    15.38s Find the "Source, Read the original passage" Button
+    t =    31.54s Find the "Source, Read the original passage" Button
+    t =    31.68s Find the "Source, Read the original passage" Button
+    t =    31.78s Find the Target Application 'com.pantopus.qelvora'
+    t =    32.02s Added attachment named 'Connected-history-position-after-refresh'
+    t =    32.02s Requesting snapshot of accessibility hierarchy for app with pid 23199
+    t =    32.31s Requesting snapshot of accessibility hierarchy for app with pid 23199
+    t =    32.41s Added attachment named 'Connected-history-position-after-refresh-accessibility'
+    t =    32.42s Tap "Source, Read the original passage" Button
+    t =    32.42s     Wait for com.pantopus.qelvora to idle
+    t =    32.44s     Find the "Source, Read the original passage" Button
+    t =    32.54s     Check for interrupting elements affecting "Source, Read the original passage" Button
+    t =    32.61s     Synthesize event
+    t =    33.04s     Wait for com.pantopus.qelvora to idle
+    t =    33.05s Waiting 15.0s for "Original source" StaticText to exist
+    t =    34.08s     Checking `Expect predicate `existsNoRetry == 1` for object "Original source" StaticText`
+    t =    34.09s         Checking existence of `"Original source" StaticText`
+    t =    34.14s Find the Target Application 'com.pantopus.qelvora'
+    t =    34.35s Added attachment named 'Connected-original-source'
+    t =    34.35s Requesting snapshot of accessibility hierarchy for app with pid 23199
+    t =    34.51s Requesting snapshot of accessibility hierarchy for app with pid 23199
+    t =    34.55s Added attachment named 'Connected-original-source-accessibility'
+    t =    34.55s Terminate com.pantopus.qelvora:23199
+    t =    35.56s Open com.pantopus.qelvora
+    t =    35.56s     Launch com.pantopus.qelvora
+2026-10-08 12:33:53.605 xcodebuild[22872:3891375] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-10-08 12:33:53.605 xcodebuild[22872:3891375] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =    35.98s         Setting up automation session
+    t =    37.87s         Wait for com.pantopus.qelvora to idle
+    t =    39.77s Waiting 30.0s for "Message Maya's AI…" TextField to exist
+    t =    40.80s     Checking `Expect predicate `existsNoRetry == 1` for object "Message Maya's AI…" TextField`
+    t =    40.80s         Checking existence of `"Message Maya's AI…" TextField`
+    t =    40.96s Tap "Me and privacy" Button
+    t =    40.96s     Wait for com.pantopus.qelvora to idle
+    t =    40.96s     Find the "Me and privacy" Button
+    t =    41.03s     Check for interrupting elements affecting "Me and privacy" Button
+    t =    41.11s     Synthesize event
+    t =    41.43s     Wait for com.pantopus.qelvora to idle
+    t =    41.55s Waiting 15.0s for "Withdraw AI provider consent" Button to exist
+    t =    42.57s     Checking `Expect predicate `existsNoRetry == 1` for object "Withdraw AI provider consent" Button`
+    t =    42.57s         Checking existence of `"Withdraw AI provider consent" Button`
+    t =    42.68s Find the "Withdraw AI provider consent" Button
+    t =    42.78s Swipe up ScrollView (First Match)
+    t =    42.78s     Wait for com.pantopus.qelvora to idle
+    t =    42.78s     Find the ScrollView (First Match)
+    t =    42.83s     Check for interrupting elements affecting ScrollView
+    t =    42.95s     Synthesize event
+    t =    43.44s     Wait for com.pantopus.qelvora to idle
+    t =    45.62s Find the "Withdraw AI provider consent" Button
+    t =    45.71s Swipe up ScrollView (First Match)
+    t =    45.71s     Wait for com.pantopus.qelvora to idle
+    t =    45.72s     Find the ScrollView (First Match)
+    t =    45.83s     Check for interrupting elements affecting ScrollView
+    t =    45.91s     Synthesize event
+    t =    46.39s     Wait for com.pantopus.qelvora to idle
+    t =    47.26s Find the "Withdraw AI provider consent" Button
+    t =    47.39s Find the "Withdraw AI provider consent" Button
+    t =    47.48s Find the Target Application 'com.pantopus.qelvora'
+    t =    47.76s Added attachment named 'Connected-current-provider-consent'
+    t =    47.76s Requesting snapshot of accessibility hierarchy for app with pid 23269
+    t =    48.04s Requesting snapshot of accessibility hierarchy for app with pid 23269
+    t =    48.14s Added attachment named 'Connected-current-provider-consent-accessibility'
+    t =    48.14s Find the Target Application 'com.pantopus.qelvora'
+    t =    48.39s Added attachment named 'Connected-final-state'
+    t =    48.39s Requesting snapshot of accessibility hierarchy for app with pid 23269
+    t =    48.63s Requesting snapshot of accessibility hierarchy for app with pid 23269
+    t =    48.72s Added attachment named 'Connected-final-state-accessibility'
+    t =    48.72s Tear Down
+Test Case '-[QelvoraUITests.ConnectedJourneyTests testPublishedConversationSurvivesNativeRelaunch]' passed (49.025 seconds).
+Test Suite 'ConnectedJourneyTests' passed at 2026-10-08 12:34:07.070.
+	 Executed 1 test, with 0 failures (0 unexpected) in 49.025 (49.028) seconds
+Test Suite 'QelvoraUITests.xctest' passed at 2026-10-08 12:34:07.072.
+	 Executed 1 test, with 0 failures (0 unexpected) in 49.025 (49.029) seconds
+Test Suite 'Selected tests' passed at 2026-10-08 12:34:07.072.
+	 Executed 1 test, with 0 failures (0 unexpected) in 49.025 (49.031) seconds
+2026-10-08 12:34:07.475 xcodebuild[22872:3891375] [MT] IDETestOperationsObserverDebug: 72.826 elapsed -- Testing started completed.
+2026-10-08 12:34:07.475 xcodebuild[22872:3891375] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-10-08 12:34:07.475 xcodebuild[22872:3891375] [MT] IDETestOperationsObserverDebug: 72.826 sec, +72.826 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/ios-creator-upgrade-03.xcresult
+
+** TEST EXECUTE SUCCEEDED **
+
+Testing started
+Heavy build slot released.

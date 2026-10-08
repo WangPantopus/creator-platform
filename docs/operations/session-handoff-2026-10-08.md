@@ -1,5 +1,34 @@
 # Session handoff — October 8, 2026
 
+## Active continuation — actual creator upgrade and native verification
+
+Continue in637b on `codex/comparison-creator-upgrade-20261008`. The
+[actual increment](../../artifacts/pr-review/2026-10-08/comparison-creator-upgrade/README.md)
+publishes v2 through original comparison and fresh boundary evaluation; actual
+fan reply2d6eac2f binds66af0eba and cites the approved source. Normal backend
+restart, v1 rollback and v2 restoration preserve both publication identities,
+pipeline hashes and original dates. V2 remains live; no third publication exists.
+Original69usage hash is unchanged; totals19generations/74usage/42393micros/57units.
+
+Explicit fan choice is allowed again with one newly reviewed sample. First
+comparison1f2d7af3 passed; a later comparisona8667ab0 against v2 fails with one
+grounded side and one fallback. All costs remain known. Preserve both results.
+Studio retains this populated result offline: repair/cancel stale comparison
+presentation, then operate creator export/result and native withdrawal, in-flight
+withdrawal, sanitization and expiry. Continue every remaining full-plan milestone.
+
+Backend compileded709286e remains on57304 through
+`native-e2e/launch43-backend-creator-upgrade-restart-01.mjs`, session1041 and
+`backend-creator-upgrade-restart-01.log`; web3119 remains. Native Light/Night
+verification and final compositor capture pass; both devices are stopped with data preserved.
+Original mature deletion time, unknown-cost holds, Q13 and production gates stand.
+
+PR348 merged0e45e5b07 and349 mergedaff76a360 with all11head checks passing.
+PR350 merged4bdf3e1cd with all10head checks passing;351 now targets main at8ce0c2b3c.
+Refresh its remaining checks and the newest main workflow (349 main37831494254 was queued). Separate main37829085136 was cancelled
+by349; do not count it as a pass.
+
+
 ## Active continuation — original export recovery and withdrawal
 
 Continue on `codex/comparison-export-reference-20261008` in637b. The
