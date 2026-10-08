@@ -3669,6 +3669,38 @@ object APIConversationBeginConversationAccessNoticeAcceptedSerializer : KSeriali
   override fun serialize(encoder: Encoder, value: APIConversationBeginConversationAccessNoticeAccepted) { encoder.encodeBoolean(true) }
 }
 
+typealias APIConversationComparisonConsentInput = JsonElement
+
+@Serializable
+data class APIConversationComparisonConsentState(
+  @Required
+  val `policy`: APIConversationComparisonConsentStatePolicy? = null,
+  val `allowed`: Boolean,
+  @Required
+  val `consentedAt`: String? = null,
+  @Required
+  val `expiresAt`: String? = null
+)
+
+@Serializable
+data class APIConversationComparisonConsentStatePolicy(
+  val `version`: String,
+  val `notice`: String,
+  val `processorPolicyVersion`: String
+)
+
+@Serializable
+data class APIConversationComparisonPolicy(
+  val `version`: String,
+  val `notice`: String,
+  val `processorPolicyVersion`: String
+)
+
+@Serializable
+data class APIConversationComparisonQuestionResult(
+  val `included`: Boolean
+)
+
 @Serializable
 data class APIConversationConsentInput(
   val `version`: String,
