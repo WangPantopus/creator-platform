@@ -221,6 +221,7 @@ export function conversationPrivacyExportStream(
         write,
         families,
         signal,
+        includeComparisons: cursor.hasComparisonSources(),
       });
       await cursor.close(client, job, families);
       await flush();

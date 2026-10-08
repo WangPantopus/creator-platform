@@ -9,7 +9,7 @@ import type { ConversationPrivacyCursorRow } from "./privacy-export-cursor.js";
 
 // Ordinals match the fixed, independently reviewed0206 SELECT. Empty source
 // collections remain explicit arrays, including families with no messages.
-const Names = [
+const BaseNames = [
   "thread",
   "ai_generation_admission",
   "ai_generation_attempt",
@@ -59,7 +59,13 @@ export async function writeConversationPrivacyCursor(input: {
   write(part: string): Promise<void>;
   families: readonly ConversationPrivacyFamily[];
   signal: AbortSignal;
+  includeComparisons?: boolean;
 }): Promise<void> {
+  // The old0..18 format remains byte-for-byte unchanged without the reviewed
+  // extension. New arrays require the actual prepared cursor owner.
+  const Names: readonly string[] = input.includeComparisons
+    ? [...BaseNames, "comparisonConsents", "comparisonSamples"]
+    : BaseNames;
   const expected = [...input.families].sort((a, b) =>
     a.threadId.localeCompare(b.threadId),
   );
@@ -144,6 +150,9 @@ export async function writeConversationPrivacyCursor(input: {
           Names.slice(9, 18).map((name, i) => [name, counts[i + 9]]),
         ),
         generation_sentence_provenance: provenanceReceipt,
+        ...(input.includeComparisons
+          ? { comparisonConsents: counts[19], comparisonSamples: counts[20] }
+          : {}),
       })}}`,
     );
   };
@@ -187,6 +196,7 @@ export async function writeConversationPrivacyCursor(input: {
             row.thread_id === current.id &&
             row.creator_id === current.creator_id &&
             row.fan_id === current.fan_id &&
+            row.collection < Names.length &&
             row.collection >= collection &&
             (row.collection !== collection ||
               !lastKey ||

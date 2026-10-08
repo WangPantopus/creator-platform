@@ -12,6 +12,10 @@ import type { PrivacyHook } from "../trust/contracts.js";
 import { ConversationLineage } from "./lineage.js";
 import { ConversationRecordings } from "./recordings.js";
 import {
+  comparisonPrivacyInstalled,
+  PreparedComparisonPrivacy,
+} from "./comparison-privacy.js";
+import {
   assertConversationPrivacyPool,
   cancelConversationPrivacyBackend,
   conversationPrivacyCause,
@@ -63,7 +67,7 @@ export const ConversationPrivacyCursorRow = z.strictObject({
   thread_id: z.uuid(),
   creator_id: z.uuid(),
   fan_id: z.uuid(),
-  collection: z.number().int().min(0).max(18),
+  collection: z.number().int().min(0).max(20),
   row_key: z.string(),
   // Preserve PostgreSQL JSON numbers exactly, including64-bit accounting.
   document: z.string().min(2),
@@ -100,7 +104,12 @@ export class PreparedConversationPrivacyCursor {
       definitions: Readonly<Record<(typeof Signatures)[number], string>>;
       catalogueChecksum: string;
     }>,
+    private readonly comparisons?: PreparedComparisonPrivacy,
   ) {}
+
+  hasComparisonSources(): boolean {
+    return this.comparisons !== undefined;
+  }
 
   assertPool(pool: Pool): void {
     invariant(
@@ -126,12 +135,14 @@ export class PreparedConversationPrivacyCursor {
     authority: ConversationPrivacyAuthority;
     lineage?: ConversationLineage;
     recordings?: ConversationRecordings;
+    comparisons?: PreparedComparisonPrivacy;
   }): void {
     this.assertPool(input.pool);
     invariant(
       input.authority === this.authority &&
         input.lineage === this.lineage &&
-        input.recordings === this.recordings,
+        input.recordings === this.recordings &&
+        input.comparisons === this.comparisons,
       "conversation_export_pool_mismatch",
       "Use the actual prepared export authority and source owners.",
     );
@@ -144,6 +155,7 @@ export class PreparedConversationPrivacyCursor {
     usageRetention: PreparedUsageRetention;
     lineage: ConversationLineage;
     recordings: ConversationRecordings;
+    comparisons?: PreparedComparisonPrivacy;
     custody: {
       migration: { version: string; checksum: string };
       definitions: Record<(typeof Signatures)[number], string>;
@@ -172,6 +184,7 @@ export class PreparedConversationPrivacyCursor {
     input.usageRetention.assertJournal(input.journal);
     input.lineage.assertPool(input.pool);
     input.recordings.assertPool(input.pool);
+    input.comparisons?.assertRuntime(input);
     const prepared = new PreparedConversationPrivacyCursor(
       input.pool,
       input.authority,
@@ -183,6 +196,7 @@ export class PreparedConversationPrivacyCursor {
         definitions: Object.freeze({ ...input.custody.definitions }),
         catalogueChecksum: input.custody.catalogueChecksum,
       }),
+      input.comparisons,
     );
     assertConversationPrivacyPool(input.pool);
     const client = await input.pool.connect();
@@ -265,6 +279,12 @@ export class PreparedConversationPrivacyCursor {
       "conversation_export_worker_required",
       "Use the original lifecycle task outside interactive request authority.",
     );
+    invariant(
+      (await comparisonPrivacyInstalled(client)) === Boolean(this.comparisons),
+      "comparison_privacy_unavailable",
+      "Installed comparison data requires its complete prepared privacy owner.",
+    );
+    await this.comparisons?.assertClient(client);
     // A matching local installation receipt and caller-supplied catalogue do
     // not register a held source. Retain the executable source gate at every
     // original cursor bookend as well as the fixed-version ledger check below.

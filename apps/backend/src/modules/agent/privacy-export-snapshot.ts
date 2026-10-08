@@ -5,6 +5,7 @@ import { contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import { registeredMigration } from "../../db/reviewed-migration.js";
 import { requestAuthority } from "../identity/request-authority.js";
+import { comparisonPrivacyInstalled } from "../conversation/comparison-privacy.js";
 import type { PrivacyTaskInput } from "../trust/privacy-authority.js";
 import { generationConsumerCatalogue } from "./generation-consumer-catalogue.js";
 import {
@@ -90,6 +91,11 @@ async function assertReviewedExport(
   review: AgentPrivacyExportReview,
 ) {
   try {
+    invariant(
+      !(await comparisonPrivacyInstalled(database)),
+      "comparison_export_unconfigured",
+      "Comparison exports require their original source-withdrawal artifact owner.",
+    );
     const active = await registeredMigration({
       name: "w2_privacy_export_snapshot",
       path: "apps/backend/src/modules/agent/migrations/0113_w2_privacy_export_snapshot.sql",
