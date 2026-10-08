@@ -1,0 +1,91 @@
+{
+  "scope": "Real canonical empty/preabort operation and original SQL over temporary metadata; no fabricated task, provider cost or actual privacy completion. Trust worker scheduling/metrics integration is source-reviewed only.",
+  "observations": [
+    {
+      "case": "actual_canonical_empty_read_and_preabort",
+      "rowsCreated": 0,
+      "reused": true
+    },
+    {
+      "case": "original_age",
+      "days": 10,
+      "stage": "pending",
+      "code": "accounting_reconciliation_required",
+      "disposition": {
+        "state": "retry",
+        "retrySeconds": 3600
+      }
+    },
+    {
+      "case": "original_age",
+      "days": 30,
+      "stage": "escalated",
+      "code": "accounting_reconciliation_escalated",
+      "disposition": {
+        "state": "retry",
+        "retrySeconds": 3600
+      }
+    },
+    {
+      "case": "original_age",
+      "days": 90,
+      "stage": "breached",
+      "code": "accounting_retention_breach",
+      "disposition": {
+        "state": "blocked",
+        "retrySeconds": 3600
+      }
+    },
+    {
+      "case": "original_age",
+      "days": -1,
+      "stage": "unavailable",
+      "code": "accounting_uncertainty_time_unavailable",
+      "disposition": {
+        "state": "blocked",
+        "retrySeconds": 3600
+      }
+    },
+    {
+      "case": "expired_hold_to_later_marker",
+      "familyHoldBindingPreserved": true,
+      "legacyExactHoldReferencePreserved": true,
+      "deadlineDidNotRestart": true
+    },
+    {
+      "case": "known_metadata_not_unresolved",
+      "unchangedAmount": true
+    },
+    {
+      "case": "family_scope",
+      "otherThreadExcluded": true,
+      "creatorAggregateIncludesOriginal": true
+    },
+    {
+      "case": "elapsed_days_across_DST",
+      "timezone": "UTC",
+      "deadline": "2026-04-20T12:00:00.000Z"
+    },
+    {
+      "case": "elapsed_days_across_DST",
+      "timezone": "America/Los_Angeles",
+      "deadline": "2026-04-20T12:00:00.000Z"
+    },
+    {
+      "case": "elapsed_days_across_DST",
+      "timezone": "Pacific/Auckland",
+      "deadline": "2026-04-20T12:00:00.000Z"
+    }
+  ],
+  "retainedOriginalDatabase": {
+    "ledger": 61,
+    "usage": 0,
+    "holds": 0
+  },
+  "validation": {
+    "backendShippingBuild": "passed",
+    "scopedEslint": "passed",
+    "contractAndSchedulerTests": 17,
+    "scopedFormat": "passed"
+  }
+}

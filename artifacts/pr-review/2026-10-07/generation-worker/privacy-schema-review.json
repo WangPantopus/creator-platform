@@ -1,0 +1,77 @@
+{
+  "scope": "Closed33-source generation plus retention/export/ownership composition. Original0214 family and0217 deletion gates are not bypassed and remain outside this partial review.",
+  "all15FreshAndPreservedPartsEqual": true,
+  "sourceSha256": {
+    "apps/backend/src/modules/identity/schema-generation-terminal-page.sql": "8632008a15ba322f6caa3b7a393635851c9d7ea18dcd6ad7f175361d4281149c",
+    "apps/backend/src/modules/commerce/schema-generation-settlement-clock.sql": "542b271ee29a5fdede8eaa77620301854026831955b717229cb055bda5bf4296",
+    "apps/backend/src/modules/agent/migrations/0067_w2_usage_retention_expiry.sql": "1c118f5ec90a5a3f3578e056af14d5e56b1379464977c4a79bd6c2b62be7f17e",
+    "apps/backend/src/modules/agent/migrations/0113_w2_privacy_export_snapshot.sql": "f0b86d507bcb7ad194c680f93487f582354f711ca91f3deffb01843c263ea65a",
+    "apps/backend/src/modules/conversation/migrations/pending_w3_privacy_cursor_export.sql": "54c43918c34410404c81e2edc0356e8dac8f880211441ac48949bc0cc174121e",
+    "apps/backend/migrations/0209_w8_all_scope_privacy_ownership.sql": "6fa4006cb8c2f6901c7006595d08196573daef33f06aa6cec866a546ffcd2f01"
+  },
+  "compiler": [
+    {
+      "compiler": "creator.finish_agent_privacy_export_scope()",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.finish_conversation_privacy_export_scope()",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.fence_conversation_privacy_export(uuid,uuid,text,uuid,uuid,uuid)",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.agent_privacy_export_matches(uuid)",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.agent_privacy_export_rows(uuid)",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.end_agent_privacy_export(uuid)",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.current_agent_privacy_export(uuid)",
+      "diagnostics": []
+    },
+    {
+      "compiler": "creator.begin_agent_privacy_export(uuid,uuid,uuid,uuid,uuid)",
+      "diagnostics": []
+    }
+  ],
+  "preservedCustodyRestored": {
+    "schemaSha256": "30ec4ec6c71eb2c4e02fb473e65356994e3dfbcd04d8982ff31f18fbb7b5bee2",
+    "rolesSha256": "367a2a706b7aa22b37cb18051881aa0f1eb0d2bcb82129e0a1ad98a8a063c8f9",
+    "rowsSha256": "36073ad827fc043be173cf1c015594361f0a366ff8acfc98a1281804f5148c05",
+    "tables": 137,
+    "rows": 236
+  },
+  "freshCustodyRestored": {
+    "schemaSha256": "abb6c0506469c8b8f2507ca3e2cb4616a7d158213fb9fd661050ccad9fbe5bf3",
+    "rolesSha256": "7edf513d1efd243817a47418db4932a38b33b7da112f3c22e2344624ab993813",
+    "rowsSha256": "6a0ea90e18ad4e3a5e523c37f18e87179790dfd007168b4bd3fb21c3ae46cdc1",
+    "tables": 143,
+    "rows": 61
+  },
+  "actualLedger": 61,
+  "exportScopeRows": {
+    "agent": 0,
+    "conversation": 0
+  },
+  "unacceptedPartialGraphFingerprints": {
+    "output": "362e8ec942a7d45e391aac0972f3cd60d4c99c1177c85439617a2dd9df5e63b8",
+    "terminal": "f7ed6afd98d8324e5f6bf3caee7d1bfa83acf3232ef0f5085f023871cfece8d8",
+    "financial": "06be4b091125c8bd74bdb06e286b1519af6793224bc9fde6ea5f0cbd2d01e3d7"
+  },
+  "preservedContainerStopped": true,
+  "limits": [
+    "This is a partial C10 graph: 0214 original family and 0217 provenance deletion require actual registered prerequisite sources and were not installed or bypassed.",
+    "No held migration ledger, privacy job/task, provider usage or financial receipt was inserted.",
+    "Eight PL/pgSQL functions have no compiler diagnostics. SQL-language readers were created by PostgreSQL; no positive source EOF/COMMIT or export artifact is claimed.",
+    "No actual full prepared C10 registration, expiry worker or all-eight-domain task is qualified; production pins and activation guards remain."
+  ]
+}

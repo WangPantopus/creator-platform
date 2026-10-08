@@ -1,0 +1,73 @@
+diff --git a/apps/backend/src/modules/agent/generation-terminal-journal.ts b/apps/backend/src/modules/agent/generation-terminal-journal.ts
+index 635c3347..432aec95 100644
+--- a/apps/backend/src/modules/agent/generation-terminal-journal.ts
++++ b/apps/backend/src/modules/agent/generation-terminal-journal.ts
+@@ -3,6 +3,8 @@ import { Client, type Pool, type PoolClient } from "pg";
+ import { z } from "zod";
+ import { canonical, contentHash } from "../../core/canonical.js";
+ import { DomainError, invariant } from "../../core/errors.js";
++import { generationHostDatabase } from "../identity/generation-host-database.js";
++import { generationTransaction } from "../identity/generation-transaction.js";
+ import {
+   GenerationIdentityAuthority,
+   type GenerationTerminalPurposeConsumer,
+@@ -76,6 +78,7 @@ export class PreparedGenerationTerminalJournal {
+     privateHelperDefinitionChecksum: string;
+     /** Independently reviewed effective column/table/RLS/schema catalogue. */
+     catalogueChecksum: string;
++    signal?: AbortSignal;
+   }): Promise<PreparedGenerationTerminalJournal> {
+     invariant(
+       input.identity instanceof GenerationIdentityAuthority &&
+@@ -141,28 +144,29 @@ export class PreparedGenerationTerminalJournal {
+         catalogueChecksum: input.catalogueChecksum,
+       }),
+     );
+-    const client = await input.workerPool.connect();
+-    try {
+-      const hostDatabase = (
+-        await input.hostPool.query<{ databaseOid: number }>(
+-          'SELECT oid AS "databaseOid" FROM pg_database WHERE datname=current_database()',
+-        )
+-      ).rows[0];
+-      const workerDatabase = (
+-        await client.query<{ databaseOid: number }>(
+-          'SELECT oid AS "databaseOid" FROM pg_database WHERE datname=current_database()',
+-        )
+-      ).rows[0];
+-      invariant(
+-        hostDatabase?.databaseOid === workerDatabase?.databaseOid,
+-        "generation_terminal_journal_pool_mismatch",
+-        "Use the same actual canonical database.",
+-      );
+-      await terminalJournal.assertCustody(client);
+-      return terminalJournal;
+-    } finally {
+-      client.release();
+-    }
++    const hostDatabase = await generationHostDatabase(
++      input.hostPool,
++      input.signal,
++    );
++    await generationTransaction(
++      input.workerPool,
++      input.signal,
++      async (client) => {
++        await client.query("SET TRANSACTION READ ONLY");
++        const workerDatabase = (
++          await client.query<{ databaseOid: number }>(
++            'SELECT oid AS "databaseOid" FROM pg_database WHERE datname=current_database()',
++          )
++        ).rows[0];
++        invariant(
++          hostDatabase.oid === workerDatabase?.databaseOid,
++          "generation_terminal_journal_pool_mismatch",
++          "Use the same actual canonical database.",
++        );
++        await terminalJournal.assertCustody(client);
++      },
++    );
++    return terminalJournal;
+   }
+ 
+   /** Current fixed-consumer custody on the actual held worker client. Factory

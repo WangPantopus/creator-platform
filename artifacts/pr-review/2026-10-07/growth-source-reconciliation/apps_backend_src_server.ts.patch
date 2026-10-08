@@ -1,0 +1,305 @@
+diff --git a/apps/backend/src/server.ts b/apps/backend/src/server.ts
+index ad30bfc8..2a92eebb 100644
+--- a/apps/backend/src/server.ts
++++ b/apps/backend/src/server.ts
+@@ -6,6 +6,10 @@ import { DevelopmentIdentityAdapter } from "./modules/identity/development.js";
+ import { commerceSignedSubjects } from "./modules/commerce/registration.js";
+ import { configureGrowthForBackend } from "./modules/growth/configured.js";
+ import { composeConversationHost } from "./modules/conversation/host.js";
++import { registeredConversationPrivacyReview } from "./modules/conversation/privacy-configuration.js";
++import { accountingRetentionPolicy } from "./modules/trust/accounting-retention-policy.js";
++import { registeredCommerceApprovalMigration } from "./modules/commerce/approval-registration.js";
++import { createDevelopmentFeedback } from "./modules/trust/development-feedback.js";
+ import { createCommerceStudio } from "./modules/commerce/studio.js";
+ import {
+   composeContentHost,
+@@ -21,6 +25,7 @@ import {
+   developmentTrustActors,
+ } from "./modules/trust/development.js";
+ import { agentFeature } from "./modules/agent/feature.js";
++import { DevelopmentLicenseVerifier } from "./modules/agent/development-license.js";
+ import { contentPublicProjection } from "./modules/growth/content.js";
+ import { canonicalConversationHomePage } from "./modules/growth/home.js";
+ import { canonicalHomePage } from "./modules/growth/home-composition.js";
+@@ -28,6 +33,11 @@ import { canonicalPassAccess } from "./modules/growth/integration.js";
+ import { createGrowthAPIPool } from "./db/growth-api-pool.js";
+ import { DomainError } from "./core/errors.js";
+ import { domainPrivacyTaskAuthorityInTransaction } from "./modules/trust/domain-privacy-authority.js";
++import type {
++  AgentPrivacyOwnerPorts,
++  ConversationPrivacyOwnerPorts,
++} from "./modules/trust/privacy-consumers.js";
++import { prepareTrustReplyReviewer } from "./modules/trust/reply-review.js";
+ import { InteractiveCallControl } from "./modules/session/interactive-control.js";
+ import { AccountCallMetadata } from "./modules/session/account-call-metadata.js";
+ 
+@@ -35,25 +45,22 @@ import { AccountCallMetadata } from "./modules/session/account-call-metadata.js"
+ // into the same configured-host seam. Development identity is always explicit.
+ const config = readConfig();
+ function canonicalDevelopmentIdentity() {
+-  const identity = new DevelopmentIdentityAdapter(
++  return new DevelopmentIdentityAdapter(
+     config.allowedOrigin,
+     process.env.NODE_ENV,
++    process.env.TRUST_LOCAL_DEVELOPMENT === "true"
++      ? developmentTrustActors
++      : [],
+   );
+-  if (process.env.TRUST_LOCAL_DEVELOPMENT === "true") {
+-    const labels = new Map(
+-      developmentTrustActors.map((actor) => [actor.id, actor.label]),
+-    );
+-    // Labels describe existing synthetic accounts; the real Ops membership
+-    // check and canonical session issuer still decide every permission.
+-    for (const actor of identity.developmentActors)
+-      actor.label = labels.get(actor.id) ?? actor.label;
+-  }
+-  return identity;
+ }
++
+ const features: {
+   growth: Awaited<ReturnType<typeof configureGrowthForBackend>>;
+-  close: (() => void)[];
+-} = { growth: null, close: [] };
++  conversationPrivacy?: ConversationPrivacyOwnerPorts;
++  agentPrivacy?: AgentPrivacyOwnerPorts;
++  commerce?: import("./modules/commerce/service.js").CommerceService;
++  start: (() => void)[];
++} = { growth: null, start: [] };
+ if (config.identityAdapter === "development" && !config.identitySessionKey)
+   throw new Error(
+     "Development identity requires an explicit IDENTITY_SESSION_KEY.",
+@@ -79,6 +86,13 @@ try {
+                 ) =>
+                   createDevelopmentTrust(runtime, {
+                     consumers: {
++                      // Trust starts first. Resolve only the actual prepared
++                      // conversation owners after the canonical host binds.
++                      conversation: () => features.conversationPrivacy,
++                      // Resolve the exact Agent graph mounted in Studio, after
++                      // its original service and lifecycle have been composed.
++                      agent: () => features.agentPrivacy,
++                      commerceOwner: () => features.commerce,
+                       additional:
+                         process.env.GROWTH_ENABLED === "true"
+                           ? [
+@@ -102,15 +116,51 @@ try {
+                   }),
+               }
+             : {}),
+-          registerFeatures: async (runtime) => {
++          registerFeatures: async (runtime, onClose) => {
++            const feedback = await createDevelopmentFeedback(runtime);
++            if (feedback) {
++              const controller = new AbortController();
++              let timer: ReturnType<typeof setInterval> | undefined;
++              let pending: Promise<void> | undefined;
++              const run = () => {
++                if (controller.signal.aborted || pending) return;
++                pending = feedback
++                  .purgeExpired(controller.signal)
++                  .then(() => {})
++                  .catch(() => {
++                    if (!controller.signal.aborted)
++                      console.error(
++                        "Development feedback expiry is unavailable.",
++                      );
++                  })
++                  .finally(() => {
++                    pending = undefined;
++                  });
++              };
++              // Start only after the complete configured graph returns, outside
++              // request ALS. One original batch (at most 100 per relation) per
++              // minute cannot overlap or inherit interactive account authority.
++              features.start.push(() => {
++                run();
++                timer = setInterval(run, 60_000);
++                timer.unref();
++              });
++              onClose(async () => {
++                controller.abort();
++                if (timer) clearInterval(timer);
++                await pending;
++                await feedback.close();
++              });
++            }
+             const accountCalls = await AccountCallMetadata.prepare(runtime);
+             const callControl = await InteractiveCallControl.prepare(runtime);
+             const mediaEnvironment = readMediaEnvironment();
+             const mediaDenials = callControl
+               ? runtimeMediaDenials(runtime, callControl)
+               : null;
+-            // A genuine prepared graph attests its actual held request and
+-            // negative gates. It does not configure calling or a provider.
++            // The development host consumes W8's 0082 held try-fence. A code
++            // callback alone cannot advertise media while its real producer is
++            // absent. Registry activation and custody remain with W8.
+             const mediaAuthorityReady = Boolean(callControl);
+             const mediaHost =
+               mediaEnvironment && mediaDenials && mediaAuthorityReady
+@@ -123,27 +173,77 @@ try {
+                 : undefined;
+             // W3 composes conversations, Creator AI and commerce together so
+             // fan generation uses one model, journal, allowance and trial path.
+-            const host = await composeConversationHost(
+-              runtime,
+-              config,
+-              mediaHost
++            const syntheticHost = {
++              environment: process.env.NODE_ENV,
++              enabled: process.env.W2_DEVELOPMENT_SYNTHETIC_LICENSING,
++              identityMode: config.identityAdapter,
++              webOrigin: config.allowedOrigin,
++            };
++            const licensing =
++              process.env.W2_DEVELOPMENT_SYNTHETIC_LICENSING === "true"
++                ? {
++                    licenseVerifier: DevelopmentLicenseVerifier.create(
++                      runtime.pool,
++                      syntheticHost,
++                    ),
++                  }
++                : {};
++            const usageAccounting = await runtime.prepareUsageAccounting?.();
++            const conversationPrivacy =
++              usageAccounting &&
++              mediaHost &&
++              process.env.W3_DEVELOPMENT_ECONOMICS_FILE &&
++              process.env.COMMERCE_CURRENCY
++                ? await registeredConversationPrivacyReview()
++                : undefined;
++            const host = await composeConversationHost(runtime, config, {
++              ...licensing,
++              ...(feedback
++                ? {
++                    feedbackAuthority: feedback.replyFeedbackAuthority,
++                    introOfferPolicy: feedback.introOfferPolicy,
++                    introOfferRetention: feedback.introOfferRetention,
++                  }
++                : {}),
++              ...(usageAccounting ? { usageAccounting } : {}),
++              ...(usageAccounting && conversationPrivacy
++                ? {
++                    privacyCursor: {
++                      usageRetention: usageAccounting.retention,
++                      custody: conversationPrivacy.cursor,
++                    },
++                    privacyAccounting: {
++                      retentionPolicyVersion: accountingRetentionPolicy.version,
++                      assertPrivacyRegistered:
++                        usageAccounting.assertPrivacyRegistered,
++                    },
++                    provenancePurge: conversationPrivacy.provenancePurge,
++                  }
++                : {}),
++              ...(mediaHost
+                 ? {
+                     media: mediaHost.media,
+                     bindRecordingPublication:
+                       mediaHost.bindRecordingPublication,
+                   }
+-                : {},
+-            );
+-            features.close.push(() => host.close());
++                : {}),
++            });
++            onClose(() => host.close());
+             const { commerce, conversation, agent } = host;
++            const approvalMigration =
++              await registeredCommerceApprovalMigration();
++            features.agentPrivacy = agent;
++            features.commerce = commerce?.service;
+             // Preparing the genuine graph does not configure a provider, worker
+-            // purpose or arrival policy. The calls feature remains unmounted
+-            // until those separate producers exist; no request Actor is invented.
++            // purpose or arrival policy. Calls remain unmounted until those
++            // separate producers exist; no request Actor is invented.
+             process.stdout.write(
+               callControl
+                 ? "Call control: prepared; calling awaits provider, worker and policy composition.\n"
+                 : "Call control: unavailable; canonical held request authority is not activated.\n",
+             );
++            features.conversationPrivacy = host.privacy;
++            usageAccounting?.bindRepository(agent.service.repository);
+             runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
+             // Growth and Content share publication/follow composition. Resolve
+             // the actual reader after the canonical Content service is bound,
+@@ -201,6 +301,8 @@ try {
+                   }
+                 : undefined,
+             });
++            const growth = features.growth;
++            if (growth) onClose(() => growth.close());
+             const contentHost = composeContentHost({
+               pool: runtime.pool,
+               owners: {
+@@ -211,6 +313,7 @@ try {
+               },
+               dependencies: {
+                 assertAllowed: runtime.assertCreatorAllowed,
++                reviewReply: await prepareTrustReplyReviewer(runtime),
+                 assertAllowedInTransaction: async (
+                   client,
+                   actor,
+@@ -234,7 +337,7 @@ try {
+                 },
+                 mediaPublication: mediaHost?.contentPublication,
+                 // Canonical content retains creator_runtime and actual held
+-                // scopes. Missing 0185 custody fails closed without Growth grants.
++                // scopes. Missing 0101 custody fails closed without Growth grants.
+                 ...(features.growth
+                   ? { follows: features.growth.coreContentFollows }
+                   : {}),
+@@ -262,6 +365,16 @@ try {
+                   pool: runtime.pool,
+                   owners: contentHost.owners,
+                   dependencies: contentHost.dependencies,
++                  ...(approvalMigration
++                    ? {
++                        approvals: {
++                          database: runtime.database,
++                          access: runtime.access,
++                          conversation: runtime.conversation,
++                          migration: approvalMigration,
++                        },
++                      }
++                    : {}),
+                 })
+               : createContentStudio({
+                   pool: runtime.pool,
+@@ -302,14 +415,20 @@ try {
+         })
+       : undefined;
+ } catch (error) {
+-  await Promise.allSettled([
+-    features.growth?.close(),
+-    ...features.close.map((close) => Promise.resolve().then(close)),
+-    growthAPIPool?.end(),
+-  ]);
++  // Configured-host cleanup has already drained its features before its core
++  // pool. This independently owned API pool must remain alive until that ends.
++  try {
++    await growthAPIPool?.end();
++  } catch (cleanup) {
++    throw new AggregateError(
++      [error, cleanup],
++      "Server startup and Growth API pool cleanup failed.",
++    );
++  }
+   throw error;
+ }
+ features.growth?.start();
++for (const start of features.start) start();
+ const server = configured?.server ?? createServer(createApp(config));
+ server.listen(
+   {
+@@ -335,8 +454,6 @@ const shutdown = () => {
+         console.error(`Shutdown could not close ${name}.`);
+       }
+     };
+-    await close("Growth worker", () => features.growth?.close());
+-    for (const action of features.close) await close("feature workers", action);
+     await close("configured backend", () =>
+       configured
+         ? configured.close()

@@ -1,0 +1,194 @@
+{
+  "targetCommit": "5e15cf2b8b41c08b780245dc88b744a3153b6baa",
+  "prs": [
+    {
+      "number": 282,
+      "sourceHead": "3f4d44611c5a3a2c30f44b5a5532c76fdc5c49bc",
+      "files": [
+        {
+          "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraAPI.kt",
+          "sourceBlob": "ec1f49baa277f4e0d33aaccd8d1a70fb8f120a27",
+          "targetBlob": "2743e8812123ddae7f93f6af636e3645c8806e26",
+          "classification": "reconciled",
+          "review": "Original call copy/models retained alongside newer shared resources; current generators reproduce all outputs, 12 shared resources and 119 operations.",
+          "difference": "apps_android_app_src_main_java_com_pantopus_qelvora_generated_QelvoraAPI.kt.patch",
+          "sha256": "62995f6686a71e451cee1eade4f626c129f8c825d2065e21ecbf0b7d9126dbef"
+        },
+        {
+          "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt",
+          "sourceBlob": "4292474b2b965bab9c16c9d1108d8ae0f9c5f2c1",
+          "targetBlob": "25810cc741f26a338a47e55345bae9aef5b46819",
+          "classification": "reconciled",
+          "review": "Original call copy/models retained alongside newer shared resources; current generators reproduce all outputs, 12 shared resources and 119 operations.",
+          "difference": "apps_android_app_src_main_java_com_pantopus_qelvora_generated_QelvoraCopy.kt.patch",
+          "sha256": "aca7e37dad9f22eb7939c2f9a7b9a54f40ab6438d169ca7781b088cbffe45025"
+        },
+        {
+          "path": "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeCallOffers.kt",
+          "sourceBlob": "22c4e6e7121410c268fb957a42a7fed225e75afc",
+          "targetBlob": "22c4e6e7121410c268fb957a42a7fed225e75afc",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/android/app/src/main/java/com/pantopus/qelvora/media/NativeCallRequest.kt",
+          "sourceBlob": "a8f301e2f63506d2f8a52f89f2783907c8744ba8",
+          "targetBlob": "a8f301e2f63506d2f8a52f89f2783907c8744ba8",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/android/app/src/main/res/values/strings.xml",
+          "sourceBlob": "0ba6d534bf1e311fb6ab1defd0855a772d7c5b55",
+          "targetBlob": "c16df0f49666480c00a07bcbbb4a2c3e1c5f74dc",
+          "classification": "reconciled",
+          "review": "Original call copy/models retained alongside newer shared resources; current generators reproduce all outputs, 12 shared resources and 119 operations.",
+          "difference": "apps_android_app_src_main_res_values_strings.xml.patch",
+          "sha256": "1391a4bf2e60fa19dc8512dc764f2b77f8d2f1ee7a64b3851db0d375fe8ac06a"
+        },
+        {
+          "path": "apps/ios/Sources/Generated/Localizable.xcstrings",
+          "sourceBlob": "61dfc55c2fd4309cf658a838a44ecce6921ff9db",
+          "targetBlob": "be1c4a3f670d3f5c2f930b6cedece615b0d98e40",
+          "classification": "reconciled",
+          "review": "Original call copy/models retained alongside newer shared resources; current generators reproduce all outputs, 12 shared resources and 119 operations.",
+          "difference": "apps_ios_Sources_Generated_Localizable.xcstrings.patch",
+          "sha256": "1bcfa0a41af91b74e34f89d46ce59da0625bcb4b3eb2f301574b59e427b39d54"
+        },
+        {
+          "path": "apps/ios/Sources/Generated/QelvoraAPI.swift",
+          "sourceBlob": "1b884d8863e1a9c6b1009164feff442e7e9fe9d8",
+          "targetBlob": "916992809354ec817f2a48b7b664a185b5e603ea",
+          "classification": "reconciled",
+          "review": "Original call copy/models retained alongside newer shared resources; current generators reproduce all outputs, 12 shared resources and 119 operations.",
+          "difference": "apps_ios_Sources_Generated_QelvoraAPI.swift.patch",
+          "sha256": "8c05279aa12512de34f1e155e68590d1f8af35cfa380bc58fe32548fb9288edd"
+        },
+        {
+          "path": "apps/ios/Sources/Generated/QelvoraCopy.swift",
+          "sourceBlob": "b10fb8ecb2f26fb7c430ae2b36105b05e084133f",
+          "targetBlob": "2846ddfc3eb78eb87cf3032942e7fc9a4bea7456",
+          "classification": "reconciled",
+          "review": "Original call copy/models retained alongside newer shared resources; current generators reproduce all outputs, 12 shared resources and 119 operations.",
+          "difference": "apps_ios_Sources_Generated_QelvoraCopy.swift.patch",
+          "sha256": "31f5c6294f56c9c58b2bf2ae5d0849a35bb7525ef50f6ae393edac62984de1e0"
+        },
+        {
+          "path": "apps/ios/Sources/QelvoraUI/Media/NativeCallOffers.swift",
+          "sourceBlob": "76864cda206ba8b09830355195cf8b46e7f8a01c",
+          "targetBlob": "76864cda206ba8b09830355195cf8b46e7f8a01c",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/web/app/calls/[creatorId]/[fanId]/[sessionId]/page.tsx",
+          "sourceBlob": "847061b795a21295c54ac3cafc751514c844816a",
+          "targetBlob": "83ff570054fb577eea4c60b4f243729b76a0cc1f",
+          "classification": "reconciled",
+          "review": "Retain newer strict query whitelist and add original canonical lowercase IDs, actorAccountId, dynamic rendering and existing Identity/Media boundaries.",
+          "difference": "apps_web_app_calls_[creatorId]_[fanId]_[sessionId]_page.tsx.patch",
+          "sha256": "1e7a6e7e9ddd0307815ac84fd41f7bca214ba1bb567acb3a124df40bebed85af"
+        },
+        {
+          "path": "apps/web/app/studio/calls/[creatorId]/[fanId]/[commitmentId]/page.tsx",
+          "sourceBlob": "d486f94e29fc56fa3d1b0a213a3d6b2b7a932047",
+          "targetBlob": "d486f94e29fc56fa3d1b0a213a3d6b2b7a932047",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/web/features/calls/CallView.tsx",
+          "sourceBlob": "a10565f98443f9addfb04c7ae786cab8e430c9d9",
+          "targetBlob": "a10565f98443f9addfb04c7ae786cab8e430c9d9",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/web/features/calls/OfferTimes.tsx",
+          "sourceBlob": "e9f66db54ec2245197d96365e64eed6507400384",
+          "targetBlob": "e9f66db54ec2245197d96365e64eed6507400384",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/web/features/calls/SelectTime.tsx",
+          "sourceBlob": "5daa75b256112a7927678f55a1af16bd4fa308cb",
+          "targetBlob": "5daa75b256112a7927678f55a1af16bd4fa308cb",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/web/features/calls/StudioCallOffer.tsx",
+          "sourceBlob": "4f6a4c7c926ccd379fa4c2c4ee2ddcf7e29b57a2",
+          "targetBlob": "4f6a4c7c926ccd379fa4c2c4ee2ddcf7e29b57a2",
+          "classification": "exact"
+        },
+        {
+          "path": "apps/web/features/identity/signing.tsx",
+          "sourceBlob": "5af6b8d25f587cdfcdd98cd6213aa4a4b5886cd7",
+          "targetBlob": "5af6b8d25f587cdfcdd98cd6213aa4a4b5886cd7",
+          "classification": "exact"
+        },
+        {
+          "path": "config/copy.json",
+          "sourceBlob": "35a018642aa5257add2fd8993d2b9d9e26587c39",
+          "targetBlob": "479f3d973241880c2c880b338f2c350ac7ee6975",
+          "classification": "reconciled",
+          "review": "Original call copy/models retained alongside newer shared resources; current generators reproduce all outputs, 12 shared resources and 119 operations.",
+          "difference": "config_copy.json.patch",
+          "sha256": "ba394f1388ba093142f16137907f1927f13d87b41778627ed84eb2f6536a4918"
+        },
+        {
+          "path": "config/navigation.json",
+          "sourceBlob": "b38b6e3668033f96a2fb3619baa3cdebebcadb84",
+          "targetBlob": "9b25102b78a424358ac54c1d9e1ec9d3436f2211",
+          "classification": "reconciled",
+          "review": "Retain current notification-ID destinations and restore original Studio call route; native destination validators regenerate from this shared source.",
+          "difference": "config_navigation.json.patch",
+          "sha256": "b30cb2506700e88270e91941021e3a26d315c2b6c7c81f913cb4c2bdc9d38a29"
+        },
+        {
+          "path": "packages/api/generated/openapi.json",
+          "sourceBlob": "42b7fdb3094f993735ed4ea775d4809352044525",
+          "targetBlob": "b2aa0701c8e255fd0ac958148c406a9c7c9b851e",
+          "classification": "reconciled",
+          "review": "Original call copy/models retained alongside newer shared resources; current generators reproduce all outputs, 12 shared resources and 119 operations.",
+          "difference": "packages_api_generated_openapi.json.patch",
+          "sha256": "273083b32f4d114f81ac74ebae1e228b2f427fe7022a89ac1b305b9e23c23cb9"
+        },
+        {
+          "path": "packages/api/src/session.ts",
+          "sourceBlob": "df9e9db5a1fa8151f555bf5e5ce611023cbcbdf1",
+          "targetBlob": "df9e9db5a1fa8151f555bf5e5ce611023cbcbdf1",
+          "classification": "exact"
+        },
+        {
+          "path": "packages/copy/src/index.ts",
+          "sourceBlob": "a34e175455b7b94f428d3637e5719b68d2e98ebb",
+          "targetBlob": "0c165b4cb8f03d9c6b80215d2e5862893ae90516",
+          "classification": "reconciled",
+          "review": "Original call copy/models retained alongside newer shared resources; current generators reproduce all outputs, 12 shared resources and 119 operations.",
+          "difference": "packages_copy_src_index.ts.patch",
+          "sha256": "7c41eb77df7d758bfd6abb83423214cc367139dfcdec383cecf4137d40f46041"
+        }
+      ],
+      "historicalSupportingPaths": [
+        "artifacts/workstreams/W6/browser-call-view-lifetime/2026-10-03/README.md",
+        "artifacts/workstreams/W6/call-offer-lifetime/2026-10-03/README.md",
+        "artifacts/workstreams/W6/creator-call-offer/2026-10-03/README.md",
+        "artifacts/workstreams/W6/ingestion-settlement/2026-10-03/README.md",
+        "artifacts/workstreams/W6/media-discard-lifetime/2026-10-03/README.md",
+        "artifacts/workstreams/W6/studio-media-session/2026-10-03/README.md",
+        "docs/workstreams/coordination/W6-pr-review-2026-10-03.md",
+        "docs/workstreams/coordination/W6-pr-review-followup-2026-10-03.md",
+        "docs/workstreams/coordination/W6.md",
+        "docs/workstreams/status/W6.md"
+      ]
+    }
+  ],
+  "validation": {
+    "webProductionBuild": "passed",
+    "webAndBackendTypecheck": "passed",
+    "existingBackendTests": 17,
+    "existingSwiftTests": 18,
+    "scopedLintFormatDiff": "passed",
+    "generatedResources": 12,
+    "generatedOperations": 119,
+    "swiftResolutionLimit": "Local SwiftPM resolves the test-only overlay dependency as recorded in native-media-reconciliation; repository Package.resolved restored unchanged. Not an exact-lock hosted result.",
+    "hostedAndroid": "pending at this code revision",
+    "applicationAcceptance": false
+  }
+}

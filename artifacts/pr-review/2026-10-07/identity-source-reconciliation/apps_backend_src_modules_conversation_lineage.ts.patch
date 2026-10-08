@@ -1,0 +1,54 @@
+diff --git a/apps/backend/src/modules/conversation/lineage.ts b/apps/backend/src/modules/conversation/lineage.ts
+index b1cfddca..a06f67d2 100644
+--- a/apps/backend/src/modules/conversation/lineage.ts
++++ b/apps/backend/src/modules/conversation/lineage.ts
+@@ -6,6 +6,7 @@ import type { ApprovedSentence } from "../agent/runtime.js";
+ import type { ConversationPrivacyFamily } from "./privacy.js";
+ import type { ConversationRecordings } from "./recordings.js";
+ import type { ConversationLineageProjection } from "./lineage-projection.js";
++import { writeConversationExportRows } from "./privacy-export-rows.js";
+ import { IdentityIntroOffers } from "../identity/intro-offers.js";
+ import { IdSchema } from "@qelvora/api";
+ import {
+@@ -196,6 +197,41 @@ export class ConversationLineage {
+     );
+     return { messages, feedback };
+   }
++  /** Complete source for W3's held-snapshot export. The real leased family is
++   * rechecked before every page and again before source exhaustion. */
++  async exportMetadataTo(
++    client: PoolClient,
++    family: ConversationPrivacyFamily,
++    write: (part: string) => Promise<void>,
++    assertCurrent: () => Promise<void>,
++    signal: AbortSignal,
++  ) {
++    await write('{"messages":');
++    const messages = await writeConversationExportRows({
++      client,
++      family,
++      write,
++      assertCurrent,
++      signal,
++      table: "message",
++      key: "lpad(sequence::text,10,'0')||':'||id::text",
++      projection:
++        "id,agent_version_id,agent_version_hash,corrects_message_id,corrects_message_version,signed_command",
++    });
++    await write(',"feedback":');
++    const feedback = await writeConversationExportRows({
++      client,
++      family,
++      write,
++      assertCurrent,
++      signal,
++      table: "conversation_feedback",
++      key: "message_id::text||':'||account_id::text",
++      projection: `message_id,message_version,account_id,rating,agent_version_id,agent_version_hash,created_at,updated_at${this.feedbackConsentReady ? ",consent_policy_version,consented_at,expires_at" : ""}`,
++    });
++    await write("}");
++    return { messages, feedback };
++  }
+   async prepareDeletion(
+     client: PoolClient,
+     family: ConversationPrivacyFamily,

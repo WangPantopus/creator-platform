@@ -1,0 +1,443 @@
+diff --git a/apps/backend/src/integration.ts b/apps/backend/src/integration.ts
+index 65079bea..24cdf0a3 100644
+--- a/apps/backend/src/integration.ts
++++ b/apps/backend/src/integration.ts
+@@ -19,8 +19,8 @@ import { PasskeyService } from "./modules/identity/passkeys.js";
+ import { attachRealtime } from "./realtime/gateway.js";
+ import type { SignedSubjectPolicy } from "./modules/identity/subjects.js";
+ import { createTrustRuntime } from "./operations/runtime.js";
+-import { requestAuthority } from "./modules/identity/request-authority.js";
+ import { resolveActor } from "./modules/identity/adapter.js";
++import { requestAuthority } from "./modules/identity/request-authority.js";
+ import { DomainError } from "./core/errors.js";
+ import { trustIdentityAuthority } from "./modules/trust/identity-authority.js";
+ import {
+@@ -29,6 +29,10 @@ import {
+ } from "./modules/identity/audience-scope.js";
+ 
+ export type BackendRuntime = {
++  prepareUsageAccounting?: () => Promise<
++    | import("./modules/trust/usage-accounting-host.js").HostUsageAccounting
++    | undefined
++  >;
+   pool: pg.Pool;
+   database: Database;
+   access: AccessService;
+@@ -125,6 +129,9 @@ export async function createConfiguredBackend(input: {
+   storeNotifications?: Partial<Record<"apple" | "google", Router>>;
+   registerFeatures?: (
+     runtime: BackendRuntime,
++    /** Register each acquired worker's original drain immediately. The host
++     * awaits these even if later preparation fails, before closing its pools. */
++    onClose: (close: () => void | Promise<void>) => void,
+   ) => Promise<readonly FeatureRegistration[]>;
+   assertActorAllowed?: (
+     actor: import("./modules/identity/adapter.js").Actor,
+@@ -179,6 +186,9 @@ export async function createConfiguredBackend(input: {
+     connectionString: input.config.databaseUrl,
+     max: 20,
+     connectionTimeoutMillis: 5000,
++    // Original privacy owners retain this same pool and require bounded reads
++    // through their held task/family callbacks, including catalogue checks.
++    query_timeout: 5000,
+     idleTimeoutMillis: 30000,
+   });
+   // pg removes failed idle clients before emitting; active queries still reject.
+@@ -270,6 +280,13 @@ export async function createConfiguredBackend(input: {
+   );
+   const subjects = [...(input.signedSubjectPolicies ?? [])];
+   let featuresConfigured = false;
++  const featureCleanup: (() => void | Promise<void>)[] = [];
++  let acceptingCleanup = true;
++  const onFeatureClose = (close: () => void | Promise<void>) => {
++    if (!acceptingCleanup || typeof close !== "function")
++      throw new Error("Register feature cleanup during host composition.");
++    featureCleanup.push(close);
++  };
+   const signing = new SignedActService(
+     pool,
+     input.config.rpId,
+@@ -338,6 +355,15 @@ export async function createConfiguredBackend(input: {
+       : {}),
+     ...(input.trust
+       ? {
++          prepareUsageAccounting: async () => {
++            if (!trust)
++              throw new DomainError(
++                "trust_unconfigured",
++                "Current accounting privacy registration is unavailable.",
++                503,
++              );
++            return trust.prepareUsageAccounting(pool);
++          },
+           assertRestoredInTransaction: async (client: pg.PoolClient) => {
+             if (!trust)
+               throw new DomainError(
+@@ -460,64 +486,138 @@ export async function createConfiguredBackend(input: {
+       }
+     },
+   };
++  let server: ReturnType<typeof createServer> | undefined;
++  let sockets: ReturnType<typeof attachRealtime> | undefined;
++  let closing: Promise<void> | undefined;
++  const close = (): Promise<void> => {
++    closing ??= (async () => {
++      acceptingCleanup = false;
++      const stopped = await Promise.allSettled([
++        ...featureCleanup.map((action) => Promise.resolve().then(action)),
++        new Promise<void>((resolve, reject) => {
++          if (!server) return resolve();
++          server.close((error) => {
++            // A prepared standalone host may never open an HTTP listener.
++            // Its database and Trust resources still need their original drain.
++            if (
++              error &&
++              (error as NodeJS.ErrnoException).code !== "ERR_SERVER_NOT_RUNNING"
++            )
++              reject(error);
++            else resolve();
++          });
++        }),
++        new Promise<void>((resolve, reject) => {
++          if (!sockets) return resolve();
++          for (const connection of sockets.clients)
++            connection.close(1001, "Server shutdown");
++          sockets.close((error) => (error ? reject(error) : resolve()));
++        }),
++      ]);
++      const failures = stopped.flatMap((result) =>
++        result.status === "rejected" ? [result.reason] : [],
++      );
++      // Preserve original authority and live pools through feature settlement.
++      // A failed drain must not skip the remaining owners or hide its cause.
++      issuedRuntimes.delete(backendRuntime);
++      for (const action of [() => trust?.stop(), () => pool.end()]) {
++        try {
++          await action();
++        } catch (cause) {
++          failures.push(cause);
++        }
++      }
++      if (failures.length)
++        throw new AggregateError(
++          failures,
++          "Configured backend shutdown failed.",
++        );
++    })();
++    return closing;
++  };
+   try {
+     if (input.trust) {
+       const configuration =
+         typeof input.trust === "function"
+           ? await input.trust(backendRuntime)
+           : input.trust;
+-      if (
+-        (input.identity.mode === "development") !==
+-          (configuration.environment === "local-development") ||
+-        (configuration.environment === "local-development" &&
+-          configuration.identityMode !== "development")
+-      )
+-        throw new Error(
+-          "Trust environment must agree with the canonical identity mode.",
+-        );
+-      const privacyAuthority = platformIdentity
+-        ? trustIdentityAuthority(pool, platformIdentity, access, database)
+-        : {};
+-      trust = await createTrustRuntime({
+-        ...configuration,
+-        dependencies: {
+-          ...privacyAuthority,
+-          ...configuration.dependencies,
+-          privacyVerificationMethod: configuration.dependencies.verifyPrivacy
+-            ? (configuration.dependencies.privacyVerificationMethod ??
+-              "external_receipt")
+-            : privacyAuthority.privacyVerificationMethod,
+-        },
+-        origin: input.config.allowedOrigin,
+-        actor: async (request) => {
+-          const token =
+-            request.headers.authorization?.match(/^Bearer ([^\s]+)$/u)?.[1];
+-          if (!token)
+-            throw new DomainError(
+-              "session_required",
+-              "Continue with Pantopus to use this app.",
+-              401,
+-            );
+-          if (platformIdentity) {
+-            // Preserve the Actor actually resolved by this request's canonical
+-            // middleware. A second resolve issues a different object and cannot
+-            // stand in for the original session/held-request identity.
+-            const original = requestAuthority.getStore();
+-            if (
+-              !original?.actor ||
+-              original.actor.accountId !== original.accountId ||
+-              original.actor.adultEligible !== true
+-            )
++      try {
++        if (
++          (input.identity.mode === "development") !==
++            (configuration.environment === "local-development") ||
++          (configuration.environment === "local-development" &&
++            configuration.identityMode !== "development")
++        )
++          throw new Error(
++            "Trust environment must agree with the canonical identity mode.",
++          );
++        const privacyAuthority = platformIdentity
++          ? trustIdentityAuthority(pool, platformIdentity, access, database)
++          : {};
++        trust = await createTrustRuntime({
++          ...configuration,
++          dependencies: {
++            ...privacyAuthority,
++            ...configuration.dependencies,
++            privacyVerificationMethod: configuration.dependencies.verifyPrivacy
++              ? (configuration.dependencies.privacyVerificationMethod ??
++                "external_receipt")
++              : privacyAuthority.privacyVerificationMethod,
++          },
++          origin: input.config.allowedOrigin,
++          actor: async (request) => {
++            const token =
++              request.headers.authorization?.match(/^Bearer ([^\s]+)$/u)?.[1];
++            if (!token)
+               throw new DomainError(
+-                "current_request_actor_required",
+-                "Reopen this action with your current signed-in account.",
++                "session_required",
++                "Continue with Pantopus to use this app.",
+                 401,
+               );
+-            return original.actor;
+-          }
+-          return resolveActor(input.identity, token);
+-        },
+-      });
++            // The canonical middleware has already resolved this request. Keep
++            // its exact actor and session instead of issuing a second identity.
++            const original = requestAuthority.getStore();
++            if (platformIdentity) {
++              if (
++                !original?.actor ||
++                original.actor.accountId !== original.accountId ||
++                original.actor.adultEligible !== true
++              )
++                throw new DomainError(
++                  "current_request_actor_required",
++                  "Reopen this action with your current signed-in account.",
++                  401,
++                );
++              return original.actor;
++            }
++            if (original?.actor) return original.actor;
++            return resolveActor(sessions ?? input.identity, token);
++          },
++        });
++      } catch (cause) {
++        // The configuration has transferred its resources, but a refused
++        // runtime has no stop() owner yet. Settle every acquired resource and
++        // preserve the preparation failure before the outer host closes core.
++        const cleanup = await Promise.allSettled([
++          ...(configuration.closePoolsOnStop
++            ? [...new Set([configuration.apiPool, configuration.workerPool])]
++                .filter((owned) => owned !== pool)
++                .map((owned) => Promise.resolve().then(() => owned.end()))
++            : []),
++          Promise.resolve().then(() =>
++            configuration.privacyArtifacts?.close?.(),
++          ),
++        ]);
++        const failures = cleanup.flatMap((result) =>
++          result.status === "rejected" ? [result.reason] : [],
++        );
++        if (failures.length)
++          throw new AggregateError(
++            [cause, ...failures],
++            "Trust preparation and cleanup failed.",
++          );
++        throw cause;
++      }
+     }
+     issuedRuntimes.set(
+       backendRuntime,
+@@ -534,97 +634,91 @@ export async function createConfiguredBackend(input: {
+         audience: backendRuntime.audienceIdentity,
+       }),
+     );
+-    features = (await input.registerFeatures?.(backendRuntime)) ?? [];
++    features =
++      (await input.registerFeatures?.(backendRuntime, onFeatureClose)) ?? [];
++    acceptingCleanup = false;
+     featuresConfigured = true;
+     Object.freeze(subjects);
+-  } catch (error) {
+-    issuedRuntimes.delete(backendRuntime);
+-    await trust?.stop();
+-    await pool.end();
+-    throw error;
+-  }
+-  const application = createApp(input.config, {
+-    identity: sessions ?? input.identity,
+-    ...(platformIdentity ? { platformIdentity } : {}),
+-    access,
+-    conversation,
+-    signing,
+-    generationAvailable: false,
+-    features,
+-    ...(trust ? { trustRouter: trust.router, telemetry: trust.telemetry } : {}),
+-    assertActorAllowed,
+-    ...(input.stripeNotifications
+-      ? { stripeNotifications: input.stripeNotifications }
+-      : {}),
+-    ...(input.storeNotifications
+-      ? { storeNotifications: input.storeNotifications }
+-      : {}),
+-  });
+-  // Fence the complete host before provider ingress, session issuance or any
+-  // domain router. Public help/readiness remain usable while recovery is closed.
+-  const host = express();
+-  if (trust)
+-    host.use(async (req, res, next) => {
+-      if (await trust!.trafficReady()) return next();
+-      res.setHeader("Cache-Control", "no-store");
+-      res.setHeader("X-Content-Type-Options", "nosniff");
+-      if (["GET", "HEAD"].includes(req.method)) {
+-        if (req.path === "/v1/identity/capabilities")
+-          return res.json({
+-            signInAvailable: false,
+-            localAccountsAllowed: false,
+-            mode: input.identity.mode ?? "pantopus",
+-            developmentActors: [],
+-          });
+-        if (
+-          [
+-            "/health/live",
+-            "/health/ready",
+-            "/v1/trust/help",
+-            "/v1/trust/status",
+-          ].includes(req.path)
+-        )
+-          return next();
+-      }
+-      return res.status(503).json({
+-        error: {
+-          code: "restoration_pending",
+-          message:
+-            "This restored environment is unavailable while recovery is verified.",
+-        },
+-      });
+-    });
+-  host.use(application);
+-  const server = createServer(host);
+-  const sockets = attachRealtime(
+-    server,
+-    sessions ?? input.identity,
+-    access,
+-    conversation,
+-    input.config.allowedOrigin,
+-    {
++    const application = createApp(input.config, {
++      identity: sessions ?? input.identity,
++      ...(platformIdentity ? { platformIdentity } : {}),
++      access,
++      conversation,
++      signing,
++      generationAvailable: false,
++      features,
++      ...(trust
++        ? { trustRouter: trust.router, telemetry: trust.telemetry }
++        : {}),
+       assertActorAllowed,
+-      ...(trust ? { telemetry: trust.telemetry } : {}),
+-      ...(sessions
+-        ? { resolveSession: (token: string) => sessions.resolve(token) }
++      ...(input.stripeNotifications
++        ? { stripeNotifications: input.stripeNotifications }
+         : {}),
+-    },
+-  );
+-  await trust?.start();
+-  return {
+-    server,
+-    pool,
+-    identity: platformIdentity,
+-    trust,
+-    close: async () => {
+-      issuedRuntimes.delete(backendRuntime);
+-      for (const connection of sockets.clients)
+-        connection.close(1001, "Server shutdown");
+-      await trust?.stop();
+-      await new Promise<void>((resolve, reject) =>
+-        server.close((error) => (error ? reject(error) : resolve())),
++      ...(input.storeNotifications
++        ? { storeNotifications: input.storeNotifications }
++        : {}),
++    });
++    // Fence the complete host before provider ingress, session issuance or any
++    // domain router. Public help/readiness remain usable while recovery is closed.
++    const host = express();
++    if (trust)
++      host.use(async (req, res, next) => {
++        if (await trust!.trafficReady()) return next();
++        res.setHeader("Cache-Control", "no-store");
++        res.setHeader("X-Content-Type-Options", "nosniff");
++        if (["GET", "HEAD"].includes(req.method)) {
++          if (req.path === "/v1/identity/capabilities")
++            return res.json({
++              signInAvailable: false,
++              localAccountsAllowed: false,
++              mode: input.identity.mode ?? "pantopus",
++              developmentActors: [],
++            });
++          if (
++            [
++              "/health/live",
++              "/health/ready",
++              "/v1/trust/help",
++              "/v1/trust/status",
++            ].includes(req.path)
++          )
++            return next();
++        }
++        return res.status(503).json({
++          error: {
++            code: "restoration_pending",
++            message:
++              "This restored environment is unavailable while recovery is verified.",
++          },
++        });
++      });
++    host.use(application);
++    server = createServer(host);
++    sockets = attachRealtime(
++      server,
++      sessions ?? input.identity,
++      access,
++      conversation,
++      input.config.allowedOrigin,
++      {
++        assertActorAllowed,
++        ...(trust ? { telemetry: trust.telemetry } : {}),
++        ...(sessions
++          ? { resolveSession: (token: string) => sessions.resolve(token) }
++          : {}),
++      },
++    );
++    await trust?.start();
++    return { server, pool, identity: platformIdentity, trust, close };
++  } catch (cause) {
++    try {
++      await close();
++    } catch (cleanup) {
++      throw new AggregateError(
++        [cause, cleanup],
++        "Configured backend startup and cleanup failed.",
+       );
+-      await pool.end();
+-    },
+-  };
++    }
++    throw cause;
++  }
+ }

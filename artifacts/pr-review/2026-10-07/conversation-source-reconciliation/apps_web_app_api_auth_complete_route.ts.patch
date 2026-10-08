@@ -1,0 +1,23 @@
+diff --git a/apps/web/app/api/auth/complete/route.ts b/apps/web/app/api/auth/complete/route.ts
+index 70d66d78..ff99124a 100644
+--- a/apps/web/app/api/auth/complete/route.ts
++++ b/apps/web/app/api/auth/complete/route.ts
+@@ -13,6 +13,7 @@ import {
+ } from "../../../../lib/session";
+ import { trustLocalSessionCookie } from "../../../../lib/trust-session";
+ import { requiresFanHandle } from "../../../../lib/identity-destination";
++import { sessionCompletionResponse } from "../../../../lib/session-completion";
+ 
+ function retry(request: NextRequest, error: string) {
+   const saved = ReturnTargetSchema.safeParse(
+@@ -93,9 +94,8 @@ async function complete(
+     const target = requiresFanHandle(result.session, result.returnTo)
+       ? `/onboarding/handle?returnTo=${encodeURIComponent(result.returnTo)}`
+       : result.returnTo;
+-    const redirect = NextResponse.redirect(
++    const redirect = sessionCompletionResponse(
+       new URL(target, applicationOrigin(request)),
+-      303,
+     );
+     redirect.cookies.set(sessionCookie, result.token, {
+       ...cookieOptions,

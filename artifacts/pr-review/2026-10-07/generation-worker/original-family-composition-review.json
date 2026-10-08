@@ -1,0 +1,332 @@
+{
+  "scope": "Original family full39-source metadata profile selection; no executable registration or positive private task.",
+  "sourceParent": "2b3b76efe48d7802ebf89335a5d09f96f362b534",
+  "sourceSha256": {
+    "apps/backend/src/modules/trust/privacy-family-catalog.ts": "32553548556c39060136f835a09850e17a7d60716741700bed10ea75a0fa8bc9",
+    "infra/migrations/reviews/20261007-generation-privacy.json": "b3d1ea52a0aff4de6fbffcc6e989b06e5a250aca2e2d3d42333ee762805ae343"
+  },
+  "profiles": {
+    "fresh": {
+      "scope": "Actual exported combined generation-family assertion (fixed reviewed fingerprints plus mandatory caller predicate) over closed39-source staged SQL execution; no application source registration, private task, lease or positive family authority. Admin session selection qualifies metadata predicates only, not a password login or actual task.",
+      "mode": "fresh",
+      "fingerprint": "ef16ad655958de236ae052f52d0840bd079301bbc1c291c0160e32a82c4fd24d",
+      "drifts": [
+        "family_login",
+        "family_inherit",
+        "family_membership",
+        "core_parent",
+        "family_private_scope",
+        "family_body",
+        "core_private_scope",
+        "public_original_helper",
+        "public_delete_helper",
+        "issuer_request_time_write",
+        "scope_unforced",
+        "disabled_original_commit",
+        "task_extra_column",
+        "replaced_family_predicate",
+        "issuer_extra_owned_function",
+        "family_setting"
+      ],
+      "observations": [
+        {
+          "name": "family_login",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "family_inherit",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "family_membership",
+          "catalogueChanged": true,
+          "callerReady": false,
+          "combinedReady": false
+        },
+        {
+          "name": "core_parent",
+          "catalogueChanged": true,
+          "callerReady": false,
+          "combinedReady": false
+        },
+        {
+          "name": "family_private_scope",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "family_body",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "core_private_scope",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "public_original_helper",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "public_delete_helper",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "issuer_request_time_write",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "scope_unforced",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "disabled_original_commit",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "task_extra_column",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "replaced_family_predicate",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "issuer_extra_owned_function",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "family_setting",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        }
+      ],
+      "allDetectedAndRestored": true,
+      "newCombinedAssertionPasses": true,
+      "adminCallerRefused": true,
+      "stagedLedgerStillUnregistered": true,
+      "oldNineSourceProfileRefuses": true,
+      "preabortPreserved": true,
+      "before": {
+        "ledger": "cbd92d22449341a0720294a66d292ee7b2dd9bd65ee69924727f7f2529d40017",
+        "schema": "47ce91688f162cd5848cc6a44d738e85bb3aab0770c05c3be8f2cac0a1eafbe6",
+        "roles": "70c667c5cdf17199c08459270b8bd7006372e3e40299799bc19b092915bdd7d8",
+        "security": "5b99fafdd59f4cc447ddd14a2e55f5f0daf2d48d7ba929348fb824b346fe5af8",
+        "sequences": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+        "data": "39fa6ab7d2f6083cc5e50f0ab4ee847fdb7425d42987b07abd0f3fac275aac00",
+        "ledgerRows": 61,
+        "tables": 163,
+        "dataRows": 257
+      },
+      "after": {
+        "ledger": "cbd92d22449341a0720294a66d292ee7b2dd9bd65ee69924727f7f2529d40017",
+        "schema": "47ce91688f162cd5848cc6a44d738e85bb3aab0770c05c3be8f2cac0a1eafbe6",
+        "roles": "70c667c5cdf17199c08459270b8bd7006372e3e40299799bc19b092915bdd7d8",
+        "security": "5b99fafdd59f4cc447ddd14a2e55f5f0daf2d48d7ba929348fb824b346fe5af8",
+        "sequences": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+        "data": "39fa6ab7d2f6083cc5e50f0ab4ee847fdb7425d42987b07abd0f3fac275aac00",
+        "ledgerRows": 61,
+        "tables": 163,
+        "dataRows": 257
+      }
+    },
+    "preserved": {
+      "scope": "Actual exported combined generation-family assertion (fixed reviewed fingerprints plus mandatory caller predicate) over closed39-source staged SQL execution; no application source registration, private task, lease or positive family authority. Admin session selection qualifies metadata predicates only, not a password login or actual task.",
+      "mode": "preserved",
+      "fingerprint": "6c5f3b50f62bcd4d4b7554b2964b271b064753c1d676e32df3d871b90c457118",
+      "drifts": [
+        "family_login",
+        "family_inherit",
+        "family_membership",
+        "core_parent",
+        "family_private_scope",
+        "family_body",
+        "core_private_scope",
+        "public_original_helper",
+        "public_delete_helper",
+        "issuer_request_time_write",
+        "scope_unforced",
+        "disabled_original_commit",
+        "task_extra_column",
+        "replaced_family_predicate",
+        "issuer_extra_owned_function",
+        "family_setting"
+      ],
+      "observations": [
+        {
+          "name": "family_login",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "family_inherit",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "family_membership",
+          "catalogueChanged": true,
+          "callerReady": false,
+          "combinedReady": false
+        },
+        {
+          "name": "core_parent",
+          "catalogueChanged": false,
+          "callerReady": false,
+          "combinedReady": false
+        },
+        {
+          "name": "family_private_scope",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "family_body",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "core_private_scope",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "public_original_helper",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "public_delete_helper",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "issuer_request_time_write",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "scope_unforced",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "disabled_original_commit",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "task_extra_column",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "replaced_family_predicate",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "issuer_extra_owned_function",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        },
+        {
+          "name": "family_setting",
+          "catalogueChanged": true,
+          "callerReady": true,
+          "combinedReady": false
+        }
+      ],
+      "allDetectedAndRestored": true,
+      "newCombinedAssertionPasses": true,
+      "adminCallerRefused": true,
+      "stagedLedgerStillUnregistered": true,
+      "oldNineSourceProfileRefuses": true,
+      "preabortPreserved": true,
+      "before": {
+        "ledger": "884d8cc8a15cc50aec771fde91730215f9965fce671c021275873aac3d3a6897",
+        "schema": "daa229d0ff1e43c4ac23a77829b5a8393499f281750e0eaabfb9c97e33424f95",
+        "roles": "1299e1c5afb74c63bae1cf777f62900fe46fa986c24289830c545c0481630f24",
+        "security": "94a67ff09f134c44b31a4e4e5d74d4cbac000d08a5597299568930824cf99474",
+        "sequences": "52fcbf4b187a82aded3cedc07cfbf251d9db000efb3a818f33ceb392179d3ea0",
+        "data": "e8c8ef79523c011f547372c51f0204dabf61cd62071996af75696cb5b1e6abaf",
+        "ledgerRows": 61,
+        "tables": 163,
+        "dataRows": 188
+      },
+      "after": {
+        "ledger": "884d8cc8a15cc50aec771fde91730215f9965fce671c021275873aac3d3a6897",
+        "schema": "daa229d0ff1e43c4ac23a77829b5a8393499f281750e0eaabfb9c97e33424f95",
+        "roles": "1299e1c5afb74c63bae1cf777f62900fe46fa986c24289830c545c0481630f24",
+        "security": "94a67ff09f134c44b31a4e4e5d74d4cbac000d08a5597299568930824cf99474",
+        "sequences": "52fcbf4b187a82aded3cedc07cfbf251d9db000efb3a818f33ceb392179d3ea0",
+        "data": "e8c8ef79523c011f547372c51f0204dabf61cd62071996af75696cb5b1e6abaf",
+        "ledgerRows": 61,
+        "tables": 163,
+        "dataRows": 188
+      }
+    }
+  },
+  "canonicalRegistration": {
+    "literalCoreCallerPasses": true,
+    "workerCallerRefused": true,
+    "heldFamilyExtensionUndefined": true,
+    "fullCompositionProfileRefusesCanonical61": true,
+    "scope": "Actual canonical61 core password login. The exact source-registration guard now used by cursor bookends refuses held0233; original privacy catalogue remains available. No prepared export factory, task, lease, artifact or activation is simulated.",
+    "reservedSourceInactive": true,
+    "registrationRefused": true,
+    "preabortPreserved": true,
+    "originalPrivacyCataloguePasses": true,
+    "poolReusable": true
+  },
+  "finding": "The preserved catalogue membership boolean is already true for legitimate incoming API children. Adding an outbound creator_owner parent leaves that fingerprint unchanged. The original literal caller predicate refuses it. The combined assertion therefore always requires both the caller predicate and an exact reviewed fingerprint; no role memberships were normalized or removed.",
+  "runtimeSelection": "Only actual executable0233 registration selects the new branch. All39 exact versions/owners/paths/source hashes and actual held-client ledger checks are then required. Historical two/nine-source branches remain unchanged. Staged100 execution records alone still return no registered extension.",
+  "validation": {
+    "shippingBackendBuild": "passed under original W2 heavy-build lock",
+    "scopedESLintPrettierDiff": "passed",
+    "newTests": false,
+    "limits": [
+      "Administrative session selection is metadata qualification, not password login or private task authority. Separate canonical61 actual core/Trust worker password calls retain their narrower caller/refusal evidence.",
+      "Six complete-purpose activation pins remain undefined. Canonical registry and retained ledgers remain61.",
+      "Prepared generation, populated deletion/expiry/export/uncertain-COMMIT recovery and all-eight C10/restore remain open."
+    ]
+  }
+}

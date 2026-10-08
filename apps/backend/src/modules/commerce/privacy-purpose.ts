@@ -1,10 +1,15 @@
-import type { Pool, PoolClient } from "pg";
+import pg, { type Pool, type PoolClient } from "pg";
 import { z } from "zod";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import { requestAuthority } from "../identity/request-authority.js";
 import type { PrivacyHook } from "../trust/contracts.js";
-import { privacyTaskAuthorityInTransaction } from "../trust/privacy-authority.js";
+import {
+  privacyTaskAuthorityInTransaction,
+  restoredPrivacyTaskAuthorityInTransaction,
+} from "../trust/privacy-authority.js";
+import { ContentHeldClient } from "../content/held-client-cleanup.js";
+import { querySettlementUncertain } from "../../core/query-settlement.js";
 
 type PrivacyInput = Parameters<PrivacyHook["run"]>[0];
 export type CommercePrivacyConfiguration = Readonly<{
@@ -23,6 +28,7 @@ type Binding = {
   pool: Pool;
   job: Readonly<PrivacyInput>;
   configuration: CommercePrivacyConfiguration;
+  assertRestoredInTransaction: (client: PoolClient) => Promise<void>;
   active: boolean;
   started: boolean;
   committed: boolean;
@@ -72,6 +78,7 @@ function tuple(input: PrivacyInput) {
 export function createCommercePrivacyAuthority(
   pool: Pool,
   configuration?: CommercePrivacyConfiguration,
+  assertRestoredInTransaction?: (client: PoolClient) => Promise<void>,
 ): CommercePrivacyAuthority {
   const reviewed = configuration
     ? Object.freeze({
@@ -88,6 +95,8 @@ export function createCommercePrivacyAuthority(
     ): Promise<T> {
       if (
         !reviewed ||
+        !(pool instanceof pg.Pool) ||
+        typeof assertRestoredInTransaction !== "function" ||
         reviewed.migration.version !== migration ||
         reviewed.migration.checksum !== checksum ||
         !hashes.safeParse(reviewed.functionDefinitions).success ||
@@ -107,6 +116,7 @@ export function createCommercePrivacyAuthority(
         pool,
         job: Object.freeze({ ...input }),
         configuration: reviewed,
+        assertRestoredInTransaction,
         active: true,
         started: false,
         committed: false,
@@ -192,7 +202,11 @@ export async function withCommercePrivacyExport<T>(
   scope: CommercePrivacyScope,
   pool: Pool,
   input: PrivacyInput,
-  work: (client: PoolClient) => Promise<T>,
+  work: (
+    client: PoolClient,
+    signal: AbortSignal,
+    assertCurrent: () => Promise<void>,
+  ) => Promise<T>,
 ): Promise<T> {
   const binding = bindingFor(scope, pool, input);
   invariant(
@@ -201,22 +215,81 @@ export async function withCommercePrivacyExport<T>(
     "Commerce deletion requires the configured legal retention and obligation policy.",
   );
   if (binding.started) unavailable();
+  const connectionBudget = pool.options.connectionTimeoutMillis;
+  if (
+    !Number.isFinite(connectionBudget) ||
+    !connectionBudget ||
+    connectionBudget <= 0 ||
+    connectionBudget > 5000 ||
+    pool.options.pipeline === true
+  )
+    unavailable();
   binding.started = true;
-  const client = await pool.connect();
+  // A host transport budget does not replace the original task's signal or
+  // grant an export lease. Await bounded checkout even if cancellation arrives
+  // while queued, then close/discard that exact late client before settling.
+  const signal = AbortSignal.any([input.signal!, AbortSignal.timeout(45_000)]);
+  const guardClient = await pool.connect();
+  const guard = new ContentHeldClient(guardClient, signal, pool);
+  let held: ContentHeldClient | undefined;
+  const assertCurrent = async () => {
+    assertCommercePrivacyScope(scope, pool, input);
+    await guard.run(() => binding.assertRestoredInTransaction(guardClient));
+  };
+  const bound = (client: PoolClient) =>
+    client.query(
+      `SELECT set_config(name,least(nullif(setting::integer,0),
+      CASE name WHEN 'statement_timeout' THEN 5000
+                WHEN 'lock_timeout' THEN 1000 ELSE 5000 END)::text,true)
+     FROM pg_settings WHERE name IN('statement_timeout','lock_timeout','idle_in_transaction_session_timeout')`,
+    );
+  let failed = false;
+  let failure: unknown;
+  let result!: T;
   try {
-    await client.query("BEGIN ISOLATION LEVEL REPEATABLE READ");
-    await assertCatalog(client, binding.configuration);
-    // W8's real issuer validates the actual verified job, immutable ownership,
-    // domain and lease; its deferred constraint rejects expiration at COMMIT.
-    const owned = await privacyTaskAuthorityInTransaction(client, binding.job);
-    await client.query("SELECT set_config('app.account_id',$1,true)", [
-      binding.job.accountId,
-    ]);
+    // Fresh restoration stays on this original READ COMMITTED guard. The
+    // separate source retains one repeatable financial snapshot. Both clients
+    // come from the original pool, hold the same real task, and must settle.
+    await guard.begin();
+    await guard.run(() => bound(guardClient));
+    await assertCurrent();
+    await guard.run(() => assertCatalog(guardClient, binding.configuration));
+    const guardedOwnership = await guard.run(() =>
+      restoredPrivacyTaskAuthorityInTransaction(
+        guardClient,
+        binding.job,
+        binding.assertRestoredInTransaction,
+      ),
+    );
+    const client = await pool.connect();
+    held = new ContentHeldClient(client, signal, pool);
+    await held.begin();
+    await held.run(() =>
+      client.query("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ"),
+    );
+    await held.run(() => bound(client));
+    await held.run(() => assertCatalog(client, binding.configuration));
+    const owned = await held.run(() =>
+      privacyTaskAuthorityInTransaction(client, binding.job),
+    );
+    invariant(
+      contentHash([...owned].sort()) ===
+        contentHash([...guardedOwnership].sort()),
+      "privacy_authority_changed",
+      "Both original financial transactions must retain the same verified ownership.",
+    );
+    await held.run(() =>
+      client.query("SELECT set_config('app.account_id',$1,true)", [
+        binding.job.accountId,
+      ]),
+    );
     if (owned.length) {
       const current = (
-        await client.query<{ count: string }>(
-          "SELECT count(*)::text AS count FROM creator.creator_profile WHERE id=ANY($1::uuid[]) AND account_id=$2 AND verification='verified'",
-          [owned, binding.job.accountId],
+        await held.run(() =>
+          client.query<{ count: string }>(
+            "SELECT count(*)::text AS count FROM creator.creator_profile WHERE id=ANY($1::uuid[]) AND account_id=$2 AND verification='verified'",
+            [owned, binding.job.accountId],
+          ),
         )
       ).rows[0];
       // Ordinary financial RLS cannot export erased/restricted creator history.
@@ -229,15 +302,78 @@ export async function withCommercePrivacyExport<T>(
         "Retained creator financial history requires its configured purpose and policy.",
       );
     }
-    const value = await work(client);
+    // Keep the actual owner callback awaited through source settlement. The
+    // abort handler closes its real socket; it cannot abandon a late staging
+    // callback and skip that callback's original writer cleanup.
+    const value = await work(client, signal, assertCurrent);
+    signal.throwIfAborted();
     assertCommercePrivacyScope(scope, pool, input);
-    await client.query("COMMIT");
+    await held.run(() => assertCatalog(client, binding.configuration));
+    await held.run(() =>
+      privacyTaskAuthorityInTransaction(client, binding.job),
+    );
+    signal.throwIfAborted();
+    // The source commits exactly once. A successful source receipt alone does
+    // not publish bytes: fresh restoration and the original guard's separate
+    // deferred task fence must also pass and return their actual COMMIT.
+    await held.commit();
+    await assertCurrent();
+    await guard.run(() => assertCatalog(guardClient, binding.configuration));
+    await guard.run(() =>
+      restoredPrivacyTaskAuthorityInTransaction(
+        guardClient,
+        binding.job,
+        binding.assertRestoredInTransaction,
+      ),
+    );
+    await guard.commit();
+    signal.throwIfAborted();
     binding.committed = true;
-    return value;
+    result = value;
   } catch (error) {
-    await client.query("ROLLBACK");
-    throw error;
+    failed = true;
+    failure = error;
+    if (
+      signal.aborted ||
+      querySettlementUncertain(error) ||
+      (error instanceof DomainError &&
+        [
+          "content_privacy_begin_unavailable",
+          "content_privacy_commit_unavailable",
+        ].includes(error.code))
+    ) {
+      const unavailable = new DomainError(
+        "commerce_privacy_transaction_unavailable",
+        "The financial export could not be confirmed. Try again.",
+        503,
+      );
+      Object.defineProperty(unavailable, "cause", { value: error });
+      failure = unavailable;
+    }
   } finally {
-    client.release();
+    const cleanup = await Promise.allSettled([
+      ...(held ? [held.settle(failure)] : []),
+      guard.settle(failure),
+    ]);
+    const failures = cleanup.flatMap((outcome) =>
+      outcome.status === "rejected" ? [outcome.reason] : [],
+    );
+    if (failures.length) {
+      failed = true;
+      const unavailable = new DomainError(
+        "commerce_privacy_settlement_unavailable",
+        "The financial export could not be confirmed. Try again.",
+        503,
+      );
+      Object.defineProperty(unavailable, "cause", {
+        value: new AggregateError(
+          [...(failure === undefined ? [] : [failure]), ...failures],
+          "Original financial source and guard cleanup failed.",
+        ),
+      });
+      failure = unavailable;
+    }
   }
+  if (failed) throw failure;
+  return result;
 }

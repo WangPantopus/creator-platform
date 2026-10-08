@@ -1,0 +1,46 @@
+{
+  "android": {
+    "sourceRevision": "c9812b25",
+    "shippingAppBuildPassed": true,
+    "buildSeconds": 38,
+    "binarySha256": "843c72b6ec398e68b5d78dd58b1259a16b3a0daf9b29819a16a73c4324b9ed65",
+    "normalConfiguration": "Debug; JDK21; API10.0.2.2:4112; no launch override",
+    "newPersonalOperationAccepted": false,
+    "device": "Qelvora W1 API34; emulator-5556",
+    "os": "Android 14 / API 34",
+    "viewport": {
+      "width": 1080,
+      "height": 2400,
+      "densityDpi": 420,
+      "fontScale": 1.0
+    },
+    "guestMemoryKiB": 2026148,
+    "guestCores": 2,
+    "installed": true,
+    "firstStudioColdLaunchMs": 2182,
+    "restartedColdLaunchMs": 1857,
+    "personallyObservedWelcome": true,
+    "supportedGuestInputSucceeded": false,
+    "restartedSupervisedExitCode": 0,
+    "idleDeviceStopped": true
+  },
+  "ios": {
+    "sourceRevision": "0387b5c9",
+    "shippingAppBuildPassed": true,
+    "normalSigning": true,
+    "strictCodesignVerificationPassed": true,
+    "binarySha256": "7764a56a2fa5f28454f7a0a4bdbe9f0f739262584b7af5694d8ee5b7557dbabe",
+    "deviceUDID": "F802B3F6-9B90-4CE9-9A62-62A16E2A54AC",
+    "os": "iOS27 / Xcode27",
+    "effectiveAPI": "http://127.0.0.1:4112",
+    "linkHost": "localhost",
+    "personallyOperated": false
+  },
+  "newUnitTestsWritten": false,
+  "limits": [
+    "Shipping builds and strict signing are supporting evidence; personal journey operation is required.",
+    "Initial headless launch exited 134. Studio launch reached Welcome, then System UI showed an ANR and supervised emulator exited 134. One bounded restart reached Welcome again.",
+    "Supported CUA coordinate input failed noWindowsAvailable before sign-in. Fresh app binding, AX observation and the exposed Raise action did not restore guest input. No adb shell input or alternative input mechanism was used.",
+    "W1 normally stopped only emulator-5556 and released exact GUI and slot 2 nonce/inode receipts. No peer device, checkout or database was changed."
+  ]
+}

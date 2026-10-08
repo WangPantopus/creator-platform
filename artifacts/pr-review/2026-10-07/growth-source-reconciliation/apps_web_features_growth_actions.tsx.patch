@@ -1,0 +1,13 @@
+diff --git a/apps/web/features/growth/actions.tsx b/apps/web/features/growth/actions.tsx
+index dff80b84..48b92920 100644
+--- a/apps/web/features/growth/actions.tsx
++++ b/apps/web/features/growth/actions.tsx
+@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
+ import { useRouter } from "next/navigation";
+ import type { InboxItem, Cluster } from "./types";
+ import { glyphs } from "@qelvora/ui-web";
+-import { useGrowthSession, GrowthActionError } from "./session";
++import { GrowthActionError, useGrowthSession } from "./session";
+ import { useGrowthPublicSession } from "./public-session";
+ export { GrowthActionError } from "./session";
+ export function Follow({

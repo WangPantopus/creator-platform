@@ -7,36 +7,48 @@ import {
 } from "./privacy-purpose.js";
 import type { PrivacyHook } from "../trust/contracts.js";
 import type { CommerceService } from "./service.js";
-import { invariant } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
+import { financialExportSelects } from "./financial-export-projections.js";
 
 type ExportInput = Parameters<PrivacyHook["run"]>[0];
-export interface FinancialExportWriter {
-  /** Revalidate the exact current job, account, scope and private artifact lease. */
+export interface FinancialExportStaging {
+  /** Revalidate this source's exact current job, account and scope. A storage
+   * adapter must also retain its actual private artifact lease. */
   assertCurrent(): Promise<void>;
   write(
     collection: string,
     rows: readonly Record<string, unknown>[],
   ): Promise<void>;
-  /** Atomically publish only while that same job/account/scope lease is current. */
-  complete(manifest: {
-    recordCounts: Record<string, number>;
-    sha256: string;
-  }): Promise<{ artifactReference: string }>;
   abort(): Promise<void>;
 }
+export interface FinancialExportWriter extends FinancialExportStaging {
+  /** Atomically publish only while that same job/account/scope lease is current. */
+  complete(
+    manifest: FinancialExportManifest,
+  ): Promise<{ artifactReference: string }>;
+}
+export type FinancialExportManifest = {
+  recordCounts: Record<string, number>;
+  sha256: string;
+};
 export interface FinancialExportSink {
   /** Staged encrypted output is private and invisible until fenced completion. */
-  begin(input: ExportInput): Promise<FinancialExportWriter>;
+  begin(
+    input: ExportInput,
+    signal: AbortSignal,
+  ): Promise<FinancialExportWriter>;
 }
 
 /** Keyset pagination under one repeatable snapshot. Every query is a fixed
  * domain projection, forced RLS remains active, and no page is silently dropped. */
-export async function exportCommerceFinancial(
+export async function stageCommerceFinancial<
+  Writer extends FinancialExportStaging,
+>(
   service: CommerceService,
   scope: CommercePrivacyScope,
   input: ExportInput,
-  sink: FinancialExportSink,
-) {
+  begin: (signal: AbortSignal) => Promise<Writer>,
+): Promise<{ writer: Writer; manifest: FinancialExportManifest }> {
   invariant(
     input.kind === "export" &&
       scope.accountId === input.accountId &&
@@ -47,7 +59,7 @@ export async function exportCommerceFinancial(
     "A complete current financial export authority is required.",
   );
   assertCommercePrivacyScope(scope, service.pool, input);
-  let writer: FinancialExportWriter | undefined;
+  let writer: Writer | undefined;
   const counts: Record<string, number> = {};
   const hash = createHash("sha256");
   try {
@@ -55,7 +67,7 @@ export async function exportCommerceFinancial(
       scope,
       service.pool,
       input,
-      async (client) => {
+      async (client, signal, assertAuthority) => {
         const restricted = await client.query(
           "SELECT 1 FROM creator.creator_profile WHERE account_id=$1 AND verification<>'verified' LIMIT 1",
           [scope.accountId],
@@ -65,7 +77,10 @@ export async function exportCommerceFinancial(
           "privacy_authority_required",
           "Restricted financial records require the configured purpose-scoped privacy authority.",
         );
-        const activeWriter = (writer = await sink.begin(input));
+        const projections = await financialExportSelects(client);
+        const activeWriter = (writer = await begin(signal));
+        signal.throwIfAborted();
+        assertCommercePrivacyScope(scope, service.pool, input);
         const page = async (
           name: string,
           select: string,
@@ -76,8 +91,12 @@ export async function exportCommerceFinancial(
           counts[name] ??= 0;
           let cursor: unknown[] | undefined;
           while (true) {
+            await assertAuthority();
+            signal.throwIfAborted();
             assertCommercePrivacyScope(scope, service.pool, input);
             await activeWriter.assertCurrent();
+            signal.throwIfAborted();
+            assertCommercePrivacyScope(scope, service.pool, input);
             const after = cursor
               ? ` AND (${keys.join(",")})>(${keys.map((_, index) => `$${parameters.length + index + 1}`).join(",")})`
               : "";
@@ -87,8 +106,16 @@ export async function exportCommerceFinancial(
                 [...parameters, ...(cursor ?? [])],
               )
             ).rows;
+            signal.throwIfAborted();
+            assertCommercePrivacyScope(scope, service.pool, input);
             if (!rows.length) break;
+            await activeWriter.assertCurrent();
+            signal.throwIfAborted();
+            assertCommercePrivacyScope(scope, service.pool, input);
             await activeWriter.write(name, rows);
+            await assertAuthority();
+            signal.throwIfAborted();
+            assertCommercePrivacyScope(scope, service.pool, input);
             hash.update(JSON.stringify({ collection: name, rows }) + "\n");
             counts[name]! += rows.length;
             invariant(
@@ -102,7 +129,8 @@ export async function exportCommerceFinancial(
               "privacy_export_cursor_invalid",
               "The export cursor is incomplete; no artifact was published.",
             );
-            if (rows.length < 500) break;
+            // Completion requires the next actual empty fetch, including after
+            // a short page, under this same original snapshot and job.
           }
         };
         const creator = input.scope === "account" ? null : input.creatorId;
@@ -122,7 +150,7 @@ export async function exportCommerceFinancial(
         );
         await page(
           "commitments",
-          "SELECT * FROM creator.commerce_commitment",
+          projections.commerce_commitment,
           commitmentScope,
           ["id"],
           parameters,
@@ -160,7 +188,7 @@ export async function exportCommerceFinancial(
           ] as const)
             await page(
               name,
-              `SELECT * FROM creator.${relation}`,
+              projections[relation],
               `packet_id IN(${packets})`,
               keys,
               parameters,
@@ -182,14 +210,14 @@ export async function exportCommerceFinancial(
         if (approvalSchema.approvals) {
           await page(
             "replyDrafts",
-            "SELECT * FROM creator.commerce_reply_draft",
+            projections.commerce_reply_draft,
             packetScope,
             ["id"],
             parameters,
           );
           await page(
             "approvals",
-            "SELECT * FROM creator.commerce_approval",
+            projections.commerce_approval,
             packetScope,
             ["id"],
             parameters,
@@ -204,7 +232,7 @@ export async function exportCommerceFinancial(
         );
         await page(
           "sharing",
-          "SELECT * FROM creator.commerce_share_grant",
+          projections.commerce_share_grant,
           `commitment_id IN(${commitments})`,
           ["id"],
           parameters,
@@ -249,9 +277,7 @@ export async function exportCommerceFinancial(
             ["allowanceReservations", "commerce_allowance_reservation", ["id"]],
             ["creditTransfers", "commerce_credit_transfer", ["id"]],
           ] as const)
-            await page(name, `SELECT * FROM creator.${relation}`, scope, keys, [
-              creator,
-            ]);
+            await page(name, projections[relation], scope, keys, [creator]);
           const paidCoverageSchema = (
             await client.query<{ count: string }>(
               "SELECT count(*)::text AS count FROM information_schema.tables WHERE table_schema='creator' AND table_name IN('commerce_paid_coverage','commerce_paid_coverage_denial')",
@@ -268,13 +294,7 @@ export async function exportCommerceFinancial(
               ["paidCoverage", "commerce_paid_coverage"],
               ["paidCoverageDenials", "commerce_paid_coverage_denial"],
             ] as const)
-              await page(
-                name,
-                `SELECT * FROM creator.${relation}`,
-                scope,
-                ["id"],
-                [creator],
-              );
+              await page(name, projections[relation], scope, ["id"], [creator]);
           }
           for (const [name, relation, keys] of [
             ["modes", "commerce_mode", ["id"]],
@@ -283,7 +303,7 @@ export async function exportCommerceFinancial(
           ] as const)
             await page(
               name,
-              `SELECT * FROM creator.${relation}`,
+              projections[relation],
               `${scope} AND creator.commerce_scope(creator_id,NULL)`,
               keys,
               [creator],
@@ -349,7 +369,7 @@ export async function exportCommerceFinancial(
             );
             await page(
               "poolCycles",
-              "SELECT * FROM creator.commerce_pool_cycle",
+              projections.commerce_pool_cycle,
               "cycle IN(SELECT cycle FROM creator.commerce_pool_effect WHERE ($1::uuid IS NULL OR creator_id=$1))",
               ["cycle"],
               [creator],
@@ -396,14 +416,10 @@ export async function exportCommerceFinancial(
           for (const [name, select, keys] of [
             [
               "spendingLimits",
-              "SELECT * FROM creator.commerce_spend_limit",
+              projections.commerce_spend_limit,
               ["fan_id", "currency"],
             ],
-            [
-              "spendingNotices",
-              "SELECT * FROM creator.commerce_spending_notice",
-              ["id"],
-            ],
+            ["spendingNotices", projections.commerce_spending_notice, ["id"]],
             [
               "passes",
               "SELECT id,fan_id,state,slot_capacity,cycle_start,cycle_end,allowance,used,reserved,cancel_at_end,version FROM creator.commerce_pass",
@@ -447,23 +463,71 @@ export async function exportCommerceFinancial(
     );
     assertCommercePrivacyScope(scope, service.pool, input);
     await writer.assertCurrent();
-    const artifact = await writer.complete({
-      recordCounts: counts,
-      sha256: hash.digest("hex"),
-    });
+    assertCommercePrivacyScope(scope, service.pool, input);
+    return {
+      writer,
+      manifest: { recordCounts: counts, sha256: hash.digest("hex") },
+    };
+  } catch (error) {
+    return abortFinancialWriter(writer, error);
+  }
+}
+
+/** Optional external storage integration. The canonical host consumes the
+ * staged source through Trust's protected stream and original artifact store. */
+export async function exportCommerceFinancial(
+  service: CommerceService,
+  scope: CommercePrivacyScope,
+  input: ExportInput,
+  sink: FinancialExportSink,
+) {
+  const { writer, manifest } = await stageCommerceFinancial(
+    service,
+    scope,
+    input,
+    (signal) => sink.begin(input, signal),
+  );
+  try {
+    assertCommercePrivacyScope(scope, service.pool, input);
+    const artifact = await writer.complete(manifest);
+    assertCommercePrivacyScope(scope, service.pool, input);
+    await writer.assertCurrent();
+    assertCommercePrivacyScope(scope, service.pool, input);
     return {
       receipt: {
         jobId: input.jobId,
         scope: input.scope,
-        recordCounts: counts,
+        recordCounts: manifest.recordCounts,
         artifactReference: artifact.artifactReference,
       },
       data: { artifactReference: artifact.artifactReference },
     };
   } catch (error) {
-    await writer?.abort().catch(() => undefined);
-    throw error;
+    return abortFinancialWriter(writer, error);
   }
+}
+
+async function abortFinancialWriter(
+  writer: FinancialExportStaging | undefined,
+  error: unknown,
+): Promise<never> {
+  try {
+    await writer?.abort();
+  } catch (cleanup) {
+    const failure = new DomainError(
+      "commerce_privacy_artifact_cleanup_unavailable",
+      "The financial export could not be confirmed. Try again.",
+      503,
+    );
+    Object.defineProperty(failure, "cause", {
+      value: new AggregateError(
+        [error, cleanup],
+        "Original financial export and artifact cleanup failed.",
+      ),
+    });
+    throw failure;
+  }
+  throw error;
 }
 
 async function grants(
@@ -509,7 +573,7 @@ async function grants(
         [pair.creator_id, pair.fan_id],
       );
     }
-    if (rows.length < 500) break;
+    if (!rows.length) break;
     after = rows.at(-1)!;
   }
 }

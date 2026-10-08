@@ -1,0 +1,78 @@
+diff --git a/apps/backend/src/modules/commerce/generation-safety-terminal-catalogue.ts b/apps/backend/src/modules/commerce/generation-safety-terminal-catalogue.ts
+index 926af4f2..9d6cabc6 100644
+--- a/apps/backend/src/modules/commerce/generation-safety-terminal-catalogue.ts
++++ b/apps/backend/src/modules/commerce/generation-safety-terminal-catalogue.ts
+@@ -2,7 +2,14 @@ import type { PoolClient } from "pg";
+ import { contentHash } from "../../core/canonical.js";
+ import { DomainError } from "../../core/errors.js";
+ import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
++import { generationPrivacySourcesRegistered } from "../../db/generation-privacy-sources.js";
++import { generationPrivacyCatalogueChecksum } from "../../db/content-privacy-profile.js";
+ import { requestAuthority } from "../identity/request-authority.js";
++import { generationLifecycleSource } from "../identity/generation-lifecycle.js";
++import { generationTerminalPageSource } from "../identity/generation-terminal-page.js";
++import { generationSettlementClockSource } from "./generation-settlement-clock.js";
++import { GENERATION_PROFILE_BOUND_SOURCE } from "../agent/generation-profile-bound.js";
++import { GENERATION_CONTENT_ORIGIN_PROFILE_FENCE_SOURCE } from "../content/generation-origin-profile.js";
+ 
+ /** Logical-name metadata pattern from the actual independently reviewed W1/W4
+  * publication catalogue. Includes both legacy and typed financial callers,
+@@ -56,7 +63,7 @@ export const GENERATION_SAFETY_TERMINAL_CATALOGUE_QUERY = `WITH roles AS (
+   'grants',(SELECT jsonb_agg(jsonb_build_object('role',CASE WHEN g.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(g.grantee) END,
+    'grantor',pg_get_userbyid(g.grantor),'privilege',g.privilege_type,'grantable',g.is_grantable)
+    ORDER BY CASE WHEN g.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(g.grantee) END COLLATE "C",g.privilege_type)
+-   FROM aclexplode(coalesce(o.relacl,acldefault('r',o.relowner))) g),
++   FROM aclexplode(coalesce(o.relacl,CASE WHEN o.relkind='S' THEN acldefault('s',o.relowner) ELSE acldefault('r',o.relowner) END)) g),
+   'policies',(SELECT jsonb_agg(jsonb_build_object('name',p.polname,'command',p.polcmd,'permissive',p.polpermissive,
+    'roles',ARRAY(SELECT CASE WHEN r=0 THEN 'PUBLIC' ELSE pg_get_userbyid(r) END FROM unnest(p.polroles) r
+     ORDER BY CASE WHEN r=0 THEN 'PUBLIC' ELSE pg_get_userbyid(r) END COLLATE "C"),
+@@ -101,14 +108,18 @@ export async function generationSafetyTerminalPurposeCatalogue(
+   return catalogue;
+ }
+ 
+-// Actual published current callers are part of the metadata graph, including
+-// every relation they own or can access. No fabricated scope or business
+-// positive supplies acceptance; complete current owner qualification is pending.
+-// Keep factory acceptance absent; a caller or startup readback supplies no pin.
++// Fixed full39-source fresh/preserved metadata and drift review, including
++// actual published callers. Every executable source, the genuine held worker,
++// original task/financial owners and restoration remain mandatory.
+ export const GENERATION_SAFETY_TERMINAL_CATALOGUE_SHA256: string | undefined =
+-  undefined;
++  "cf13fe99e8f135a00b2a9e0b220fefcb4535ce9f20c46c2db0e84b5b619eec30";
+ export const GENERATION_SAFETY_TERMINAL_SOURCES = Object.freeze(
+   [
++    generationLifecycleSource,
++    generationTerminalPageSource,
++    generationSettlementClockSource,
++    GENERATION_PROFILE_BOUND_SOURCE,
++    GENERATION_CONTENT_ORIGIN_PROFILE_FENCE_SOURCE,
+     {
+       name: "w4_generation_safety_terminal_settlement",
+       path: "apps/backend/src/modules/commerce/schema-generation-safety-terminal-settlement.sql",
+@@ -306,7 +317,12 @@ export async function assertGenerationSafetyTerminalCatalogue(
+     return error;
+   };
+   try {
+-    if (requestAuthority.getStore()) throw unavailable();
++    if (
++      requestAuthority.getStore() ||
++      !GENERATION_SAFETY_TERMINAL_CATALOGUE_SHA256
++    )
++      throw unavailable();
++    if (!(await generationPrivacySourcesRegistered())) throw unavailable();
+     for (const source of GENERATION_SAFETY_TERMINAL_SOURCES)
+       await assertRegisteredMigration(client, source);
+     const ready = (
+@@ -324,7 +340,10 @@ export async function assertGenerationSafetyTerminalCatalogue(
+     if (
+       !ready ||
+       contentHash(await generationSafetyTerminalPurposeCatalogue(client)) !==
+-        GENERATION_SAFETY_TERMINAL_CATALOGUE_SHA256
++        (await generationPrivacyCatalogueChecksum(
++          "financial",
++          GENERATION_SAFETY_TERMINAL_CATALOGUE_SHA256,
++        ))
+     )
+       throw unavailable();
+   } catch (cause) {

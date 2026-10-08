@@ -1,0 +1,896 @@
+{
+  "codeCommit": "64682b52907928fa379db4268bb6926f81fcc8f3",
+  "validationContinuation": "0728b61fd44edebcefab38b105161c5aafee65cb",
+  "baseCommit": "203f874c35278e0c8c6ad8ef6fc6231e08da710f",
+  "sourceSha256": {
+    "apps/backend/src/integration.ts": "e42a55c36a9758264d5fd568792520dbbaccfffe11b09afa1743521cac71815c",
+    "apps/backend/src/modules/agent/privacy-export-snapshot.ts": "4ee22732b82adf5f84daae4965ceeab2634c4e9ce1829590e436a9c4e81b4c37",
+    "apps/backend/src/modules/agent/privacy-stream.ts": "8f20e0bf82cf13c4eab3fd1424d46f171d39918beb0e468f06950c336e508968",
+    "apps/backend/src/modules/commerce/financial-export-stream.ts": "5173e7f7a89cffef57050d0830897e6adb65d31843e7716a58889231d3f747d7",
+    "apps/backend/src/modules/commerce/financial-export.ts": "68e462f9dd985f5c513d405ec0902b2e2d4d967863fc2e7dae2902e550176fcc",
+    "apps/backend/src/modules/commerce/generation-allowance.ts": "4ea6445bf32f2069a83c209cca6f6527e42b71ee561ae29ebd465fcc1361d84a",
+    "apps/backend/src/modules/commerce/privacy-purpose.ts": "eae2ac6cc9de0246bd7a6e361d41f2b9389be160f0a9667bcb335f14ba660e19",
+    "apps/backend/src/modules/conversation/host.ts": "899bffbf06d457a62ec9495f34e8b9362fb4ce0f0bb5c7b5d5b0a5bb72611b32",
+    "apps/backend/src/modules/conversation/privacy-configuration.ts": "7e1733932efd22e09e7c4803a4fecc04c75ba63a33dbfea2dff313d418a6f383",
+    "apps/backend/src/modules/conversation/privacy-export-cursor.ts": "5cc58eb287b8f8b8165a26abf137d29f3c7d4d5f0b02ae2f3b8ff4a06f9402c5",
+    "apps/backend/src/modules/trust/accounting-boundary.ts": "552d0ec1e69a70b93aea002c866176baf88b839a7e49dc8d61552b60079ce80d",
+    "apps/backend/src/modules/trust/accounting-privacy-failure.ts": "c5fd75dd1f173bf849b90278d51248b11121db5153ed5825c4c775501b422d90",
+    "apps/backend/src/modules/trust/development.ts": "4c34012f4bed5e422b0b402529901fdd53ff1a65ab868f4137f101fa9bafb4c8",
+    "apps/backend/src/modules/trust/privacy-consumers.ts": "daaec02616e65b36b4157b430f603c2a8d7b317fe94cc95b0e2f209f04a681db",
+    "apps/backend/src/modules/trust/privacy-export.ts": "0461adf1ee7c9bd78faab1eadc3e6f675498c07cd40963e71da5f76a0b5523dd",
+    "apps/backend/src/modules/trust/usage-accounting-host.ts": "37d60f542d704efed9852c564feb22fa9c0a4464fbaea518eebab960e626752a",
+    "apps/backend/src/modules/trust/worker.ts": "b9c728027db39d69afe2f97d1a2e750d05b4a3697f80e0e0522061a7ea547bf0",
+    "apps/backend/src/server.ts": "662b48eee74e4761f4ed19672a56c0d3e06b8f3a175a3982084ecc2dade0a1b3",
+    "infra/migrations/reviews/20261007-conversation-privacy.json": "5869308a4728c239e0e970bc30438440e4b4090d4ba96cb51ae51ded736e5155"
+  },
+  "privateEvidenceDirectory": "/Users/yingpengwang/.codex/visualizations/2026/10/07/01a11784-60b1-7fe3-8855-82bddf4675b6/conversation-commerce-completion",
+  "runtimeRevisionNote": "Successful operations used these source changes before commit. RELEASE_REVISION in the private harness retained the older d7096 label; it is not the code revision. A later formatting-only change to accounting-boundary.ts does not change executable behavior. The subsequently rebuilt publication continuation is compile-tested separately; no retrospectively invented runtime bundle hash is claimed.",
+  "validation": {
+    "backendBuild": "passed",
+    "existingContracts": 9,
+    "existingWorkerLifetimeTests": 8,
+    "scopedEslint": "passed",
+    "scopedPrettier": "passed"
+  },
+  "operations": {
+    "creatorSource": {
+      "receiptFile": "operation-source-1791406274253.json",
+      "receiptSha256": "3900903568d51d1ff3315aa829cfb44259fc205514538d37410298946439043e",
+      "mode": "source",
+      "checks": [
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "generation_disabled",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_expiry_pass_completed",
+        "remaining_readiness_stays_unavailable",
+        "conversation_http_export_completed",
+        "agent_http_export_completed_after_conversation",
+        "remaining_domains_reported_explicitly",
+        "idempotent_shutdown",
+        "closed_registration_refused_before_sql"
+      ],
+      "tasks": [
+        {
+          "domain": "agent",
+          "state": "retry",
+          "error_code": "accounting_boundary_pending",
+          "attempts": 1
+        },
+        {
+          "domain": "commerce",
+          "state": "blocked",
+          "error_code": "privacy_authority_required",
+          "attempts": 1
+        },
+        {
+          "domain": "content",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "conversation",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "growth",
+          "state": "blocked",
+          "error_code": "domain_hook_unavailable",
+          "attempts": 1
+        },
+        {
+          "domain": "identity",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "media",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "trust",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "expiryTasks": [],
+      "overallReady": false,
+      "exports": [
+        {
+          "domain": "agent",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": 72359172,
+          "chunks": 70,
+          "sha256": "4e834308c0fd012923c823e2194ef51fbec1316a624edeec2e62993183b5c738"
+        },
+        {
+          "domain": "content",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": null,
+          "chunks": null,
+          "sha256": null
+        },
+        {
+          "domain": "conversation",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": 38,
+          "chunks": 1,
+          "sha256": "d61eb30dc07b5478175a6e6dcf8c22770bde9e16afe1762365b7965aa21b4e28"
+        },
+        {
+          "domain": "identity",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": null,
+          "chunks": null,
+          "sha256": null
+        },
+        {
+          "domain": "media",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": null,
+          "chunks": null,
+          "sha256": null
+        },
+        {
+          "domain": "trust",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": null,
+          "chunks": null,
+          "sha256": null
+        }
+      ]
+    },
+    "creatorStandalone": {
+      "receiptFile": "operation-standalone-1791406463634.json",
+      "receiptSha256": "f6fa9c36160ab41121c710c2ce994d946fa8b4a2f8d14cf0b5a3062a6caae5f4",
+      "mode": "standalone",
+      "checks": [
+        "original_expiry_pass_completed",
+        "remaining_readiness_stays_unavailable",
+        "conversation_http_export_completed",
+        "agent_http_export_completed_after_conversation",
+        "remaining_domains_reported_explicitly",
+        "standalone_sigterm_clean_exit"
+      ],
+      "tasks": [
+        {
+          "domain": "agent",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 2
+        },
+        {
+          "domain": "commerce",
+          "state": "blocked",
+          "error_code": "privacy_authority_required",
+          "attempts": 1
+        },
+        {
+          "domain": "content",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "conversation",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "growth",
+          "state": "blocked",
+          "error_code": "domain_hook_unavailable",
+          "attempts": 1
+        },
+        {
+          "domain": "identity",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "media",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "trust",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "expiryTasks": [],
+      "overallReady": false,
+      "exports": [
+        {
+          "domain": "agent",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": 72359171,
+          "chunks": 70,
+          "sha256": "5e3475626c24fd1cbe258fd2ab564e1b716ccff649fcb32974d60a7ab5064216"
+        },
+        {
+          "domain": "content",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": null,
+          "chunks": null,
+          "sha256": null
+        },
+        {
+          "domain": "conversation",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": 38,
+          "chunks": 1,
+          "sha256": "d61eb30dc07b5478175a6e6dcf8c22770bde9e16afe1762365b7965aa21b4e28"
+        },
+        {
+          "domain": "identity",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": null,
+          "chunks": null,
+          "sha256": null
+        },
+        {
+          "domain": "media",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": null,
+          "chunks": null,
+          "sha256": null
+        },
+        {
+          "domain": "trust",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": null,
+          "chunks": null,
+          "sha256": null
+        }
+      ]
+    },
+    "fanSource": {
+      "receiptFile": "fan-operation-source-1791406384828.json",
+      "receiptSha256": "754700104c8bc7816c5c58ef33127cad3f000a6aa2706a340bf7d6e09eec8478",
+      "mode": "source",
+      "checks": [
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "generation_disabled",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_expiry_pass_completed",
+        "remaining_readiness_stays_unavailable",
+        "commerce_fan_http_export_completed",
+        "conversation_http_export_completed",
+        "agent_http_export_completed_after_conversation",
+        "remaining_domains_reported_explicitly",
+        "idempotent_shutdown",
+        "closed_registration_refused_before_sql"
+      ],
+      "tasks": [
+        {
+          "domain": "agent",
+          "state": "retry",
+          "error_code": "accounting_boundary_pending",
+          "attempts": 1
+        },
+        {
+          "domain": "commerce",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "content",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "conversation",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "growth",
+          "state": "blocked",
+          "error_code": "domain_hook_unavailable",
+          "attempts": 1
+        },
+        {
+          "domain": "identity",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "media",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "trust",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "expiryTasks": [],
+      "overallReady": false,
+      "exports": [
+        {
+          "domain": "agent",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": 39,
+          "chunks": 1,
+          "sha256": "8a812b313b5c91718e7be64d3cba955042eedb455081162baa54cd500494d894"
+        },
+        {
+          "domain": "commerce",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": 935,
+          "chunks": 2,
+          "sha256": "cda53131ca8171876452c05c49ed36b930e4bedd0213223710e60ce701787117"
+        },
+        {
+          "domain": "content",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": null,
+          "chunks": null,
+          "sha256": null
+        },
+        {
+          "domain": "conversation",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": 38,
+          "chunks": 1,
+          "sha256": "d61eb30dc07b5478175a6e6dcf8c22770bde9e16afe1762365b7965aa21b4e28"
+        },
+        {
+          "domain": "identity",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": null,
+          "chunks": null,
+          "sha256": null
+        },
+        {
+          "domain": "media",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": null,
+          "chunks": null,
+          "sha256": null
+        },
+        {
+          "domain": "trust",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": null,
+          "chunks": null,
+          "sha256": null
+        }
+      ]
+    },
+    "fanStandalone": {
+      "receiptFile": "fan-operation-standalone-1791406549141.json",
+      "receiptSha256": "7f882d26aea67f8ec297e568af543acfd6084c496fa6df913ebb582a6d9fb8b9",
+      "mode": "standalone",
+      "checks": [
+        "original_expiry_pass_completed",
+        "remaining_readiness_stays_unavailable",
+        "commerce_fan_http_export_completed",
+        "conversation_http_export_completed",
+        "agent_http_export_completed_after_conversation",
+        "remaining_domains_reported_explicitly",
+        "standalone_sigterm_clean_exit"
+      ],
+      "tasks": [
+        {
+          "domain": "agent",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 2
+        },
+        {
+          "domain": "commerce",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "content",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "conversation",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "growth",
+          "state": "blocked",
+          "error_code": "domain_hook_unavailable",
+          "attempts": 1
+        },
+        {
+          "domain": "identity",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "media",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "trust",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "expiryTasks": [],
+      "overallReady": false,
+      "exports": [
+        {
+          "domain": "agent",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": 39,
+          "chunks": 1,
+          "sha256": "8a812b313b5c91718e7be64d3cba955042eedb455081162baa54cd500494d894"
+        },
+        {
+          "domain": "commerce",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": 935,
+          "chunks": 2,
+          "sha256": "aab47720ba7c9f296c0035f4d3f284af74dcaadfa191ed7fe33c82555ffea531"
+        },
+        {
+          "domain": "content",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": null,
+          "chunks": null,
+          "sha256": null
+        },
+        {
+          "domain": "conversation",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": 38,
+          "chunks": 1,
+          "sha256": "d61eb30dc07b5478175a6e6dcf8c22770bde9e16afe1762365b7965aa21b4e28"
+        },
+        {
+          "domain": "identity",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": null,
+          "chunks": null,
+          "sha256": null
+        },
+        {
+          "domain": "media",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": null,
+          "chunks": null,
+          "sha256": null
+        },
+        {
+          "domain": "trust",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": null,
+          "chunks": null,
+          "sha256": null
+        }
+      ]
+    },
+    "sourceStagingClosure": {
+      "receiptFile": "financial-closure-source-1791406627070.json",
+      "receiptSha256": "0e4ec729d29c9cfaffa232049354e93ff3214381fbab28984d2ba24b38b56b92",
+      "mode": "source",
+      "checks": [
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "generation_disabled",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_expiry_pass_completed",
+        "remaining_readiness_stays_unavailable",
+        "fresh_database_closure_refused_after_staging",
+        "original_source_and_guard_drained_before_artifact_abort",
+        "private_artifact_abort_settled",
+        "no_financial_artifact_acknowledged",
+        "idempotent_shutdown",
+        "closed_registration_refused_before_sql"
+      ],
+      "tasks": [
+        {
+          "domain": "agent",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 2
+        },
+        {
+          "domain": "commerce",
+          "state": "blocked",
+          "error_code": "restoration_pending",
+          "attempts": 1
+        },
+        {
+          "domain": "content",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "conversation",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "growth",
+          "state": "blocked",
+          "error_code": "domain_hook_unavailable",
+          "attempts": 1
+        },
+        {
+          "domain": "identity",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "media",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "trust",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "expiryTasks": [],
+      "overallReady": false,
+      "exports": [
+        {
+          "domain": "agent",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": 39,
+          "chunks": 1,
+          "sha256": "8a812b313b5c91718e7be64d3cba955042eedb455081162baa54cd500494d894"
+        },
+        {
+          "domain": "content",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": null,
+          "chunks": null,
+          "sha256": null
+        },
+        {
+          "domain": "conversation",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": 38,
+          "chunks": 1,
+          "sha256": "d61eb30dc07b5478175a6e6dcf8c22770bde9e16afe1762365b7965aa21b4e28"
+        },
+        {
+          "domain": "identity",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": null,
+          "chunks": null,
+          "sha256": null
+        },
+        {
+          "domain": "media",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": null,
+          "chunks": null,
+          "sha256": null
+        },
+        {
+          "domain": "trust",
+          "artifactAcknowledged": true,
+          "leaseReleased": true,
+          "bytes": null,
+          "chunks": null,
+          "sha256": null
+        }
+      ]
+    }
+  },
+  "unqualifiedStandaloneFaultAttempts": [
+    {
+      "receiptFile": "financial-source-closure-standalone-1791406745504.json",
+      "receiptSha256": "0c5a259e9e510e24afe20d06329f4ff8d60490b8d11423e52d91f55fa2d7d07a",
+      "failure": ["Observation deadline expired"],
+      "closureInjected": false,
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true
+    },
+    {
+      "receiptFile": "financial-staging-closure-standalone-1791407043970.json",
+      "receiptSha256": "a33695652895231f338ef8ac9e6b5c471b1c2991ffd6082ee115fd3393124495",
+      "failure": ["Observation deadline expired"],
+      "closureInjected": false,
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true
+    },
+    {
+      "receiptFile": "financial-staging-closure-standalone-1791407079798.json",
+      "receiptSha256": "047145af226a50abd3ece3ac7f3bd7f8ca2c111e9b0936a7d2de3df292ab3001",
+      "failure": ["ERR_ASSERTION"],
+      "closureInjected": false,
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true
+    }
+  ],
+  "catalogueDrifts": {
+    "checks": [
+      {
+        "name": "column",
+        "changed": ["cursor", "purge"]
+      },
+      {
+        "name": "constraint",
+        "changed": ["cursor", "purge"]
+      },
+      {
+        "name": "index",
+        "changed": ["cursor", "purge"]
+      },
+      {
+        "name": "internal_trigger_disabled",
+        "changed": ["cursor", "purge"]
+      },
+      {
+        "name": "private_column_grant",
+        "changed": ["cursor"]
+      },
+      {
+        "name": "purge_expanded_grant",
+        "changed": ["purge"]
+      }
+    ],
+    "restored": {
+      "cursor": "1f0ee9e4e0cb459485afac0b73e2fd34f529fa2e9ff738fa85c63df2bb840618",
+      "purge": "92fa579178b5ed8f227117a55d62018975c12017f5de18caf8908c176f93e53c"
+    }
+  },
+  "finalCustody": {
+    "originalUnchanged": true,
+    "rows": [
+      {
+        "database": "creator_w2_archive_adoption_candidate",
+        "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+        "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+        "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+        "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+        "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+        "dataSha256": "add04093be921cf22d124ad4ce71d9942d4b1e215433050fa5e26670105bdf10",
+        "ledgerRows": 101,
+        "businessRows": 1001,
+        "businessTables": 177,
+        "privacyJobs": [
+          {
+            "kind": "delete",
+            "state": "running",
+            "count": 1
+          }
+        ],
+        "closed": {
+          "closed": true,
+          "alone": true
+        }
+      },
+      {
+        "database": "creator_pr132_privacy_20261007",
+        "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+        "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+        "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+        "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+        "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+        "dataSha256": "7cf752725898f7f33df85942be0147a9435ac57027cafa63a435af701e484dee",
+        "ledgerRows": 101,
+        "businessRows": 1037,
+        "businessTables": 177,
+        "privacyJobs": [
+          {
+            "kind": "delete",
+            "state": "retry",
+            "count": 1
+          },
+          {
+            "kind": "export",
+            "state": "blocked",
+            "count": 3
+          }
+        ],
+        "closed": {
+          "closed": true,
+          "alone": true
+        }
+      },
+      {
+        "database": "creator_pr132_privacy2_20261007",
+        "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+        "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+        "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+        "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+        "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+        "dataSha256": "3738859ca68eee3479855544a38f406e6b1087a17327107a1ffdf5f0c9ba7d2d",
+        "ledgerRows": 101,
+        "businessRows": 1037,
+        "businessTables": 177,
+        "privacyJobs": [
+          {
+            "kind": "delete",
+            "state": "retry",
+            "count": 1
+          },
+          {
+            "kind": "export",
+            "state": "blocked",
+            "count": 3
+          }
+        ],
+        "closed": {
+          "closed": true,
+          "alone": true
+        }
+      },
+      {
+        "database": "creator_pr132_privacy3_20261007",
+        "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+        "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+        "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+        "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+        "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+        "dataSha256": "b5acbc92be497567da05d779d6f05d3826d1f54466b9e88f4a628f2397c3c14f",
+        "ledgerRows": 101,
+        "businessRows": 1013,
+        "businessTables": 177,
+        "privacyJobs": [
+          {
+            "kind": "delete",
+            "state": "retry",
+            "count": 1
+          },
+          {
+            "kind": "export",
+            "state": "blocked",
+            "count": 1
+          }
+        ],
+        "closed": {
+          "closed": true,
+          "alone": true
+        }
+      },
+      {
+        "database": "creator_pr132_privacy4_20261007",
+        "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+        "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+        "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+        "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+        "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+        "dataSha256": "2305219eb26a6d61d8417913e4c5b83ceffb04b4bb71883a74ad6005cc219889",
+        "ledgerRows": 101,
+        "businessRows": 1087,
+        "businessTables": 177,
+        "privacyJobs": [
+          {
+            "kind": "delete",
+            "state": "dead_letter",
+            "count": 1
+          },
+          {
+            "kind": "export",
+            "state": "blocked",
+            "count": 7
+          }
+        ],
+        "closed": {
+          "closed": true,
+          "alone": true
+        }
+      }
+    ]
+  }
+}

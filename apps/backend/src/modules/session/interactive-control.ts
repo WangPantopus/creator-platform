@@ -35,11 +35,15 @@ const projectionSource = Object.freeze({
   name: "w8_runtime_denial_projection",
   checksum: "4da2e2b56f51f70e39336c6c7d26646e1732703f2e3f39c35f700ff959237185",
 });
+// A separately validated Growth API login may inherit the core role. It cannot
+// use this purpose: both the session login and effective caller must still be
+// the literal core role. Parent memberships would expand that caller's powers
+// and remain forbidden; incoming API children do not expand its authority.
 const roleSQL = `SELECT current_user=session_user AND session_user='creator_runtime'
   AND current_setting('transaction_isolation')='read committed'
   AND r.rolcanlogin AND NOT r.rolinherit AND NOT r.rolsuper AND NOT r.rolbypassrls
   AND NOT r.rolcreatedb AND NOT r.rolcreaterole AND NOT r.rolreplication
-  AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid OR roleid=r.oid)
+  AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid)
   AND EXISTS(SELECT FROM creator.schema_migration WHERE version=$1 AND checksum=$2)
   AND EXISTS(SELECT FROM creator.schema_migration WHERE version=$3 AND checksum=$4)
   AND r.rolconfig IS NULL AND NOT EXISTS(SELECT FROM pg_db_role_setting WHERE setrole=r.oid)

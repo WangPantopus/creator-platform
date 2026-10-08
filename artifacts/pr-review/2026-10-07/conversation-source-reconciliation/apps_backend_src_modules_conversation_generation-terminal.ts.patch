@@ -1,0 +1,77 @@
+diff --git a/apps/backend/src/modules/conversation/generation-terminal.ts b/apps/backend/src/modules/conversation/generation-terminal.ts
+index 7635f342..b24a4d0f 100644
+--- a/apps/backend/src/modules/conversation/generation-terminal.ts
++++ b/apps/backend/src/modules/conversation/generation-terminal.ts
+@@ -4,6 +4,7 @@ import { z } from "zod";
+ import { FrameSchema, type Frame } from "@qelvora/api";
+ import { canonical, contentHash } from "../../core/canonical.js";
+ import { DomainError, invariant } from "../../core/errors.js";
++import { generationHostDatabase } from "../identity/generation-host-database.js";
+ import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
+ import {
+   GenerationIdentityAuthority,
+@@ -116,6 +117,20 @@ export class PreparedGenerationConversationTerminal {
+     );
+   }
+ 
++  assertComposition(
++    identity: GenerationIdentityAuthority,
++    terminal: GenerationTerminalAuthority,
++    hostPool: Pool,
++  ): void {
++    invariant(
++      identity === this.identity &&
++        terminal === this.terminal &&
++        hostPool === this.hostPool,
++      "generation_finalization_composition_changed",
++      "Use this finalizer's original identity, terminal and canonical host.",
++    );
++  }
++
+   static async prepare(input: {
+     identity: GenerationIdentityAuthority;
+     terminal: GenerationTerminalAuthority;
+@@ -126,6 +141,7 @@ export class PreparedGenerationConversationTerminal {
+     consumer: GenerationTerminalPurposeConsumer;
+     /** Independently reviewed effective columns, tables, policies and schemas. */
+     catalogueChecksum: string;
++    signal?: AbortSignal;
+   }): Promise<PreparedGenerationConversationTerminal> {
+     invariant(
+       input.identity instanceof GenerationIdentityAuthority &&
+@@ -184,7 +200,11 @@ export class PreparedGenerationConversationTerminal {
+         "generation_finalization_pool_mismatch",
+         "Use bounded original non-pipelined host and worker pools.",
+       );
+-    const signal = AbortSignal.timeout(15_000);
++    const signal = AbortSignal.any([
++      ...(input.signal ? [input.signal] : []),
++      AbortSignal.timeout(15_000),
++    ]);
++    const hostDatabase = await generationHostDatabase(input.hostPool, signal);
+     const client = await input.workerPool.connect();
+     let discardClient = true;
+     let failed = false;
+@@ -233,13 +253,6 @@ export class PreparedGenerationConversationTerminal {
+          set_config('app.creator_id','',true),set_config('app.fan_id','',true),
+          set_config('generation.scope_nonce','',true),set_config('generation.terminal_nonce','',true)`),
+       );
+-      const hostDatabase = (
+-        await input.hostPool.query<{ databaseOid: number }>(
+-          bounded(
+-            'SELECT oid AS "databaseOid" FROM pg_database WHERE datname=current_database()',
+-          ),
+-        )
+-      ).rows[0];
+       const workerDatabase = (
+         await client.query<{ databaseOid: number }>(
+           bounded(
+@@ -251,7 +264,7 @@ export class PreparedGenerationConversationTerminal {
+         workerDatabase !== undefined &&
+           Number.isSafeInteger(workerDatabase.databaseOid) &&
+           workerDatabase.databaseOid > 0 &&
+-          hostDatabase?.databaseOid === workerDatabase.databaseOid,
++          hostDatabase.oid === workerDatabase.databaseOid,
+         "generation_finalization_pool_mismatch",
+         "Use the same actual canonical database.",
+       );

@@ -2,6 +2,7 @@ import type { PoolClient } from "pg";
 import { FrameSchema, type Frame } from "@qelvora/api";
 import type { ThreadScope } from "../modules/access/scope.js";
 import type { Database } from "../db/database.js";
+import { threadFrameChannel } from "../realtime/frame-notifications.js";
 
 /** The thread lock orders every boundary and every sentence on one durable channel. */
 export async function appendFrame(
@@ -30,6 +31,12 @@ export async function appendFrame(
       scope.actorAccountId,
     ],
   );
+  // PostgreSQL emits this only when the frame transaction commits. A wakeup
+  // never substitutes for family authorization or the ordered event log.
+  await client.query("SELECT pg_notify($1,$2)", [
+    threadFrameChannel,
+    scope.threadId,
+  ]);
   return output;
 }
 

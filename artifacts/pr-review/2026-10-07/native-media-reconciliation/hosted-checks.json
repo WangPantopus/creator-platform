@@ -1,0 +1,126 @@
+{
+  "headRevision": "45bbc4dafcb4f7b1a46982770e74fd85bbabb7e1",
+  "checks": [
+    {
+      "id": 113023057631,
+      "name": "web-visual",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37688462377/job/113023057631"
+    },
+    {
+      "id": 113023057293,
+      "name": "android-runtime",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37688462377/job/113023057293"
+    },
+    {
+      "id": 113023057166,
+      "name": "android-foundation",
+      "status": "in_progress",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37688462377/job/113023057166"
+    },
+    {
+      "id": 113023057125,
+      "name": "ios-foundation",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37688462377/job/113023057125"
+    },
+    {
+      "id": 113023056725,
+      "name": "web-and-backend",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37688462377/job/113023056725"
+    },
+    {
+      "id": 113022732623,
+      "name": "android-runtime",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37688468404/job/113022732623"
+    },
+    {
+      "id": 113022732618,
+      "name": "ios-foundation",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37688468404/job/113022732618"
+    },
+    {
+      "id": 113022732583,
+      "name": "web-and-backend",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37688468404/job/113022732583"
+    },
+    {
+      "id": 113022732358,
+      "name": "android-foundation",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37688468404/job/113022732358"
+    },
+    {
+      "id": 113022732053,
+      "name": "web-visual",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37688468404/job/113022732053"
+    },
+    {
+      "id": 113022272636,
+      "name": "compile",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37688468496/job/113022272636"
+    },
+    {
+      "id": 113022270457,
+      "name": "android-foundation",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37688462672/job/113022270457"
+    },
+    {
+      "id": 113022269986,
+      "name": "android-runtime",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37688462672/job/113022269986"
+    },
+    {
+      "id": 113022269913,
+      "name": "web-visual",
+      "status": "in_progress",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37688462672/job/113022269913"
+    },
+    {
+      "id": 113022269846,
+      "name": "web-and-backend",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37688462672/job/113022269846"
+    },
+    {
+      "id": 113022269581,
+      "name": "ios-foundation",
+      "status": "in_progress",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37688462672/job/113022269581"
+    }
+  ],
+  "androidRuntime": {
+    "jobId": 113022269986,
+    "result": "success",
+    "command": "./gradlew :app:connectedDebugAndroidTest",
+    "existingTests": 4,
+    "androidAPI": 34,
+    "physicalDevice": false
+  },
+  "limits": "Snapshot at native integration revision. Remaining queued/running jobs are not success. Later backend-only commits are validated separately; full successor head checks remain a merge gate."
+}

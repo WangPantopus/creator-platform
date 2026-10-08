@@ -130,6 +130,7 @@ export const ErrorSchema = z.strictObject({
     code: z.string(),
     message: z.string(),
     requestId: z.string(),
+    correlationId: z.string().optional(),
   }),
 });
 export const HealthSchema = z.strictObject({

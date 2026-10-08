@@ -1,0 +1,22 @@
+{
+  "scope": "Fixed Agent export custody from the independently reviewed100 graph and original/restored101 extension. Source registration selects the profile; actual original task/lease/restoration and COMMIT guards remain mandatory.",
+  "source": {
+    "version": "0196_w2_privacy_export_snapshot",
+    "name": "w2_privacy_export_snapshot",
+    "path": "apps/backend/src/modules/agent/migrations/0113_w2_privacy_export_snapshot.sql",
+    "owner": "W2",
+    "checksum": "f0b86d507bcb7ad194c680f93487f582354f711ca91f3deffb01843c263ea65a"
+  },
+  "definitions": {
+    "creator.begin_agent_privacy_export(uuid,uuid,uuid,uuid,uuid)": "f584c8dd7ac65f7265747e4aa9495663ac045e9eebc78f59d41522c0f5ea2142",
+    "creator.agent_privacy_export_matches(uuid)": "b0e4564599628115efcc6afd5729cd25944327af7e592f1d0136a3e098dc2b98",
+    "creator.agent_privacy_export_rows(uuid)": "726de63f5c0097cb2b86fabd634e04a8c44d60f509fd02cfcd82e1318253d421",
+    "creator.end_agent_privacy_export(uuid)": "cfa0a68c81f0212fd4e6e0f332c8f8872f577ff674b27ad0c971a6e4ef58b54e",
+    "creator.current_agent_privacy_export(uuid)": "b6c618817329752f59b9a18108edb5e220a178645d52b96ef001857fb0ba683a",
+    "creator.finish_agent_privacy_export_scope()": "586410f9c2e7b0e855d7ea41628ab2c83add032aa74bbd1ba1f7b0428016d2b5"
+  },
+  "catalogues": {
+    "generation": "499cd6dbca1aa9479f8c676dffe472e4710fcdf658767c1dcc74a50ea5841060",
+    "content": "cc26fe2ba46cb939ff7fe31b6bd116a3233ba7fb397641c44e2d7acf01aa9ea0"
+  }
+}

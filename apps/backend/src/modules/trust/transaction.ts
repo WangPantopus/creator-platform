@@ -20,7 +20,11 @@ function unavailable(code: string, cause: unknown) {
 export async function trustTransaction<T>(
   pool: Pool,
   work: (client: PoolClient) => Promise<T>,
-  options: Readonly<{ readOnly?: boolean; signal?: AbortSignal }> = {},
+  options: Readonly<{
+    readOnly?: boolean;
+    isolation?: "read committed";
+    signal?: AbortSignal;
+  }> = {},
 ): Promise<T> {
   options.signal?.throwIfAborted();
   const connectionBudget = pool.options.connectionTimeoutMillis;
@@ -59,6 +63,10 @@ export async function trustTransaction<T>(
     }
     held = new ContentHeldClient(client, signal, pool);
     await held.begin();
+    if (options.isolation === "read committed")
+      await held.run(() =>
+        client.query("SET TRANSACTION ISOLATION LEVEL READ COMMITTED"),
+      );
     // The core pool does not set a server timeout. Bound its actual source
     // query too, preserving any shorter existing timeout on this client.
     await held.run(() =>
@@ -82,15 +90,21 @@ export async function trustTransaction<T>(
       deadline.abort(cause);
     failed = true;
     failure =
-      signal.aborted ||
-      querySettlementUncertain(cause) ||
-      (cause instanceof DomainError &&
-        [
-          "content_privacy_begin_unavailable",
-          "content_privacy_commit_unavailable",
-        ].includes(cause.code))
-        ? unavailable("trust_transaction_unavailable", cause)
-        : cause;
+      // Preserve only this caller's original cooperative cancellation. The
+      // held source still settles below; a cleanup failure replaces it and
+      // rejects the lifetime. Internal deadlines and database errors remain
+      // unavailable, even when the caller concurrently cancels.
+      options.signal?.aborted && cause === options.signal.reason
+        ? cause
+        : signal.aborted ||
+            querySettlementUncertain(cause) ||
+            (cause instanceof DomainError &&
+              [
+                "content_privacy_begin_unavailable",
+                "content_privacy_commit_unavailable",
+              ].includes(cause.code))
+          ? unavailable("trust_transaction_unavailable", cause)
+          : cause;
   } finally {
     try {
       // Unknown BEGIN/read/COMMIT or actual abort closes this exact source,

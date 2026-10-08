@@ -1,0 +1,48 @@
+diff --git a/apps/web/features/growth/pass.tsx b/apps/web/features/growth/pass.tsx
+index 46bb8bbe..131b2083 100644
+--- a/apps/web/features/growth/pass.tsx
++++ b/apps/web/features/growth/pass.tsx
+@@ -47,7 +47,10 @@ export function PassAccessProvider({
+       const pending = new AbortController();
+       controller = pending;
+       const options = {
+-        headers: { "X-Expected-Account-Id": accountId },
++        headers: {
++          "X-Expected-Account-Id": accountId,
++          "X-Expected-Session-Id": sessionId,
++        },
+         signal: AbortSignal.any([pending.signal, AbortSignal.timeout(10000)]),
+         cache: "no-store",
+       } satisfies RequestInit;
+@@ -55,6 +58,7 @@ export function PassAccessProvider({
+         const response = await fetch("/api/platform/identity/session", options);
+         if (!response.ok) throw new Error("Current session unavailable.");
+         const session = SessionSchema.parse(await response.json());
++        options.signal.throwIfAborted();
+         if (
+           session.accountId !== accountId ||
+           session.sessionId !== sessionId
+@@ -90,15 +94,18 @@ export function PassAccessProvider({
+           if (controller === pending) controller = null;
+         });
+     };
+-    const channel =
+-      typeof BroadcastChannel === "undefined"
+-        ? null
+-        : new BroadcastChannel(sessionChannel);
++    let channel: BroadcastChannel | null = null;
++    try {
++      if (typeof BroadcastChannel !== "undefined")
++        channel = new BroadcastChannel(sessionChannel);
++    } catch {
++      /* Canonical bounded polling remains available. */
++    }
+     if (channel)
+       channel.onmessage = (event) => {
+         if (event.data === "ended") {
+-          ended = true;
+           clear();
++          load();
+         }
+       };
+     window.addEventListener("focus", load);

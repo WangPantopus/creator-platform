@@ -1,0 +1,12 @@
+diff --git a/apps/web/app/api/trust/[...path]/route.ts b/apps/web/app/api/trust/[...path]/route.ts
+index bfd647b6..8c41de69 100644
+--- a/apps/web/app/api/trust/[...path]/route.ts
++++ b/apps/web/app/api/trust/[...path]/route.ts
+@@ -34,6 +34,7 @@ async function endCanonicalSession(request: NextRequest) {
+         : {}),
+     },
+     body: "{}",
++    signal: request.signal,
+   });
+   const data = await result.json();
+   if (!result.ok)

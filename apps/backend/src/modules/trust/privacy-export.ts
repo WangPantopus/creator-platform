@@ -172,7 +172,14 @@ export async function consumePrivacyExport(input: {
     await input.verifyLease();
     return artifact;
   } catch (error) {
-    await sink.abort().catch(() => {});
+    try {
+      await sink.abort();
+    } catch (cleanup) {
+      throw new AggregateError(
+        [error, cleanup],
+        "Original privacy export and protected artifact cleanup failed.",
+      );
+    }
     throw error;
   }
 }

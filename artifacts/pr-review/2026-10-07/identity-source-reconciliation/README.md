@@ -1,0 +1,19 @@
+# Identity and native Team preservation
+
+The [manifest](manifest.json) compares all 190 original #74 production paths to `efad8903` (full target SHA in the manifest). 112 paths match exactly; every remaining path has a complete diff and disposition. Original source `5b1675ca155f87957c8ad62201097de2563c3c4f` and its supporting records remain intact.
+
+The missing native Team directory, invitation acceptance and role editor are restored from their original Swift/Kotlin files. The shell supplies its actual captured account, session and destination. Original expiry, foreground/disposal, response-unknown and exact retry controls remain. Native Team navigation and shared copy are restored, including the original fan-handle exemption for workspace/Team; calls and notification routes remain. Shared generation removed duplicate identical existing handle-copy entries without changing their value. No generated files were hand edited.
+
+The original Identity intro-offer policy/expiry columns and checks are restored. Host composition now passes the actual retained policy and prepares the original finite feedback factory after the genuine runtime exists. Its nonoverlapping expiry batch starts only after host completion and uses current registered drain cleanup. Migration 0207 remains held; absent executable registration still returns no factory. No old feedback, consent or offers are manufactured.
+
+The original executable-source check for personal approval and genuine Commerce/Content composition are restored. Requests mounts the existing Commerce screen using its current full session contract and existing boundary, correcting the older accountId prop mismatch found by compilation. The newer main Team participant-denial/actor/invite convergence/removal protections remain.
+
+The original ordinary Content signature read proposal and caller are restored. The catalogue uses correct lowercase `s` for sequence ACL defaults, consistent with the earlier actual PostgreSQL observation; its accepted checksum remains absent and registration 0225 stays reserved. Neither source restoration nor this correction enables that purpose.
+
+Backend build, 17 existing contracts/lifetime tests, web typecheck and production build, scoped lint/format/diff, generation check (12 resources/119 operations), and 18 existing Swift tests pass. Local SwiftPM has the previously recorded test-only resolution limitation; original lock restored unchanged. Current Android hosted checks and actual Team application journeys remain separate acceptance gates.
+
+## Full remaining #74 acceptance in #132
+
+Retain all original seven scope groups and H01–H20: genuine issuer and production proof/recovery; approved RP/domain/origins and actual passkey devices; exact-version signing, licensing and public verification; cold/restored credentials, account/session isolation and physical private-cache purge; Team invitation/acceptance/expiry/removal/role races and creator-only acts; complete owner-composed generation/accounting/media/call/Growth/Trust/Content/privacy journeys; original current-client/PID/full-XID/nonce/earliest-expiry/finalizer-last contracts and full C10; all native/web states, large text/accessibility, independent reference fidelity and release/performance/pilot evidence. Historical signed native/Support and primitive operation remain attributed to their original sources. Current native Team positive operation is not claimed.
+
+Held 0194/0190/0208/0207/0225 and original #131/#145/#192/#200/#242/#247/#262/#301/#302/#305 obligations retain their dedicated acceptance records. Translation remains a documented non-executable proposal. The handle/email Team design discrepancy and unresolved product/provider/legal/device decisions are not silently decided. Generation stays disabled; #132 remains draft.

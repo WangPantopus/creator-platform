@@ -1,0 +1,18 @@
+{
+  "revision": "fac7b222b1f81612eb751e34a7f6582890897a86",
+  "privateAuditSha256": "5aff2fa63ab57169cd144b427a403132749adb6125cb52d332a1fc0f3bb4351b",
+  "state": "delivered",
+  "approvedFrames": 2,
+  "answer": "AI answer: To dry a freshly thrown clay mug evenly, the fictional ceramics educator Maya covers the mug loosely with plastic, turns it periodically, and ensures that the handle and body dry at a similar pace. This process helps reduce cracking in the clay. Always follow the clay and kiln manufacturer's written firing instructions for best results.",
+  "citations": 1,
+  "providerCalls": 5,
+  "providerCostMicros": 3308,
+  "journalState": "known",
+  "allowanceState": "consumed",
+  "allowanceUnits": 4,
+  "reservedAfter": 0,
+  "outputDelivered": true,
+  "originalUsageRowsUnchanged": 658,
+  "subsequentFramesIncludeSeparator": true,
+  "scope": "Fictional source-host operation; actual approved source, six-case evaluation, publication, fan consent, provider calls, output and terminal accounting. Not full product/performance/production acceptance."
+}

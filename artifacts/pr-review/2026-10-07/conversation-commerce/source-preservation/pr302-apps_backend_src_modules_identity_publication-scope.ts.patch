@@ -1,0 +1,100 @@
+diff --git a/ac6e1f2c602265764a455be04c3f90c351acd725 b/9d4185b1b059f821b43b02e57755c05481557efd
+index ac6e1f2c..9d4185b1 100644
+--- a/ac6e1f2c602265764a455be04c3f90c351acd725
++++ b/9d4185b1b059f821b43b02e57755c05481557efd
+@@ -97,6 +97,7 @@ export class PublicationIdentityAuthority {
+       transaction: string;
+       pid: number;
+       nonce: string;
++      signal?: AbortSignal;
+     }>
+   >();
+   constructor(
+@@ -117,11 +118,11 @@ export class PublicationIdentityAuthority {
+     );
+   }
+ 
+-  async assertRole(): Promise<void> {
++  async assertRole(signal?: AbortSignal): Promise<void> {
+     this.assertWorker();
+     await publicationTransaction(
+       this.pool,
+-      undefined,
++      signal,
+       async (client) => {
+         await client.query("SET LOCAL statement_timeout='5s'");
+         await client.query("SET LOCAL lock_timeout='1s'");
+@@ -183,13 +184,16 @@ export class PublicationIdentityAuthority {
+    * is independently rechecked under current denial/identity locks before work.
+    * Unsigned hashes come from a bounded, authorized current Team post projection.
+    */
+-  async pendingTasks(limit = 20): Promise<readonly PublicationTask[]> {
++  async pendingTasks(
++    limit = 20,
++    signal?: AbortSignal,
++  ): Promise<readonly PublicationTask[]> {
+     this.assertWorker();
+-    await this.assertRole();
++    await this.assertRole(signal);
+     const boundedLimit = z.number().int().min(1).max(20).parse(limit);
+     const candidates = await publicationTransaction(
+       this.pool,
+-      undefined,
++      signal,
+       async (client) => {
+         await client.query(
+           "SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','2000',true)",
+@@ -209,7 +213,7 @@ export class PublicationIdentityAuthority {
+       try {
+         const task = await publicationTransaction(
+           this.pool,
+-          undefined,
++          signal,
+           async (client) => {
+             await client.query(
+               "SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','2000',true)",
+@@ -256,11 +260,12 @@ export class PublicationIdentityAuthority {
+       client: PoolClient,
+       scope: PublicationTaskScope,
+     ) => Promise<void>,
++    signal?: AbortSignal,
+   ): Promise<T> {
+     this.assertWorker();
+-    await this.assertRole();
++    await this.assertRole(signal);
+     const task = Object.freeze(taskSchema.parse(input));
+-    return publicationTransaction(this.pool, undefined, async (client) => {
++    return publicationTransaction(this.pool, signal, async (client) => {
+       let scope: PublicationTaskScope | undefined;
+       try {
+         await client.query(
+@@ -315,6 +320,7 @@ export class PublicationIdentityAuthority {
+             client,
+             preparation,
+             command: canonical(command),
++            signal,
+             ...context,
+           }),
+         );
+@@ -345,6 +351,21 @@ export class PublicationIdentityAuthority {
+     });
+   }
+ 
++  /** Original cancellation context only; durable authorization remains required. */
++  originalSignalInTransaction(
++    scope: PublicationTaskScope,
++    client: PoolClient,
++  ): AbortSignal | undefined {
++    this.assertWorker();
++    const held = this.issued.get(scope);
++    invariant(
++      held?.client === client,
++      "publication_scope_required",
++      "A current issued publication scope is required.",
++    );
++    return held!.signal;
++  }
++
+   /** W6 joins only the exact client and still-active SQL transaction issued
+    * above. Retained scopes, other clients, JSON lookalikes and nested login
+    * sessions fail; this grants no asset, recipient or generation permission.

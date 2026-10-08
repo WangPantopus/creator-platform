@@ -3,6 +3,7 @@ import SwiftUI
 
 @main
 struct QelvoraApp: App {
+    @UIApplicationDelegateAdaptor(GrowthPushAppDelegate.self) private var pushDelegate
     init() { QelvoraFonts.register() }
     var body: some Scene {
         WindowGroup {
@@ -22,7 +23,7 @@ struct QelvoraApp: App {
         }
     }
     private var features: [FanFeatureRegistration] {
-        [PublicVerificationFeature.registration(baseURL: apiURL), ContentFanFeature.registration(baseURL: apiURL), W3FanFeatures.registration(baseURL: apiURL), CommerceFanFeature.registration(baseURL: apiURL), TrustFanFeature.registration(baseURL: apiURL), W6FanFeatures.callRegistration(baseURL: apiURL), FanFeatureRegistration(matches: { GrowthFanFeature.matches($0) && !$0.components(separatedBy: "?")[0].hasSuffix("/chat") }, allowsSignedOut: { destination in destination == "/discover" || destination.hasPrefix("/invite/") || destination.hasPrefix("/share/") || (destination.hasPrefix("/creators/") && !destination.contains("/chat")) }, screen: { session in AnyView(GrowthFanFeature(baseURL: apiURL, destination: session.destination, onNavigate: { session.open($0) }, onSignIn: { session.open($0); Task { await session.beginSignIn() } })) })] + W6FanFeatures.registrations
+        [PublicVerificationFeature.registration(baseURL: apiURL), StudioTeamFeature.registration(), ContentFanFeature.registration(baseURL: apiURL), W3FanFeatures.registration(baseURL: apiURL), CommerceFanFeature.registration(baseURL: apiURL), TrustFanFeature.registration(baseURL: apiURL), W6FanFeatures.callRegistration(baseURL: apiURL), GrowthWeeklyImpact.registration(), GrowthFanFeature.registration(baseURL: apiURL)] + W6FanFeatures.registrations
     }
     private var apiURL: URL? {
         #if DEBUG

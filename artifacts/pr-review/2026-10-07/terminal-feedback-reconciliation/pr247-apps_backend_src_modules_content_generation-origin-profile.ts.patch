@@ -1,0 +1,62 @@
+diff --git a/apps/backend/src/modules/content/generation-origin-profile.ts b/apps/backend/src/modules/content/generation-origin-profile.ts
+index 658560e3..0d0835e6 100644
+--- a/apps/backend/src/modules/content/generation-origin-profile.ts
++++ b/apps/backend/src/modules/content/generation-origin-profile.ts
+@@ -34,11 +34,29 @@ export async function assertOriginProfileFence(
+   client: PoolClient,
+   definitionChecksum: string,
+   catalogueChecksum: string,
++  signal?: AbortSignal,
+ ): Promise<void> {
+   try {
++    signal?.throwIfAborted();
++    // A per-query option overrides pg's original connection budget. Never
++    // extend that budget while checking metadata on this same held client.
++    const configured = (
++      client as PoolClient & {
++        connectionParameters?: { query_timeout?: unknown };
++      }
++    ).connectionParameters?.query_timeout;
++    const originalBudget =
++      typeof configured === "number" ||
++      (typeof configured === "string" && configured.trim() !== "")
++        ? Number(configured)
++        : NaN;
++    if (!Number.isSafeInteger(originalBudget) || originalBudget < 1)
++      throw originUnavailable();
++    const queryTimeout = Math.min(originalBudget, 5000);
+     const migration = await registeredMigration(
+       GENERATION_CONTENT_ORIGIN_PROFILE_FENCE_SOURCE,
+     );
++    signal?.throwIfAborted();
+     if (!migration) throw originUnavailable();
+     // Installed pg implements query_timeout; its QueryConfig type omits it.
+     const query: QueryConfig & { query_timeout: number } = {
+@@ -63,11 +81,12 @@ export async function assertOriginProfileFence(
+          WHERE p.polrelid=to_regclass('creator.creator_profile')
+           AND p.polname='w5_generation_origin_original_creator'`,
+       values: [migration.version, migration.checksum],
+-      query_timeout: 5000,
++      query_timeout: queryTimeout,
+     };
+     const proof = (
+       await client.query<{ ready: boolean; definition: string }>(query)
+     ).rows[0];
++    signal?.throwIfAborted();
+     if (
+       proof?.ready !== true ||
+       typeof proof.definition !== "string" ||
+@@ -80,11 +99,12 @@ export async function assertOriginProfileFence(
+         await generationConsumerCatalogue(
+           client,
+           "creator_w5_generation_origin",
+-          5000,
++          { queryTimeout, signal },
+         ),
+       ) !== catalogueChecksum
+     )
+       throw originUnavailable();
++    signal?.throwIfAborted();
+   } catch (error) {
+     throw originUnavailable(error);
+   }

@@ -1,0 +1,210 @@
+$ pnpm generate:check && pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm build
+$ pnpm --filter @qelvora/api generate --check && node scripts/generate-shared.mjs --check && node scripts/generate-native-api.mjs --check
+$ tsx scripts/generate-openapi.ts --check
+Verified 12 shared web, Swift and Kotlin resources.
+Verified Swift/Kotlin API models and 99 operations from OpenAPI.
+$ turbo run typecheck
+
+   • turbo 2.11.5
+   • Packages in scope: @qelvora/api, @qelvora/backend, @qelvora/brand, @qelvora/copy, @qelvora/tokens, @qelvora/ui-web, @qelvora/web
+   • Running typecheck in 7 packages
+   • Remote caching disabled, using shared worktree cache
+
+@qelvora/copy:typecheck: cache hit, replaying logs e7bf64963b303456
+@qelvora/api:typecheck: cache hit, replaying logs c85ac322e3790006
+@qelvora/copy:typecheck: $ tsc --noEmit
+@qelvora/brand:typecheck: cache hit, replaying logs 82b6e60a5032143e
+@qelvora/tokens:typecheck: cache hit, replaying logs 53cffeeeea9741bf
+@qelvora/api:typecheck: $ tsc --noEmit
+@qelvora/tokens:typecheck: $ tsc --noEmit
+@qelvora/brand:typecheck: $ tsc --noEmit
+@qelvora/ui-web:typecheck: cache hit, replaying logs fd7a09954ec2ca70
+@qelvora/ui-web:typecheck: $ tsc --noEmit
+@qelvora/backend:typecheck: cache miss, executing d230a038ff9d408a
+@qelvora/web:typecheck: cache hit, replaying logs abcec132f5a1ed4d
+@qelvora/web:typecheck: $ tsc --noEmit
+@qelvora/backend:typecheck: $ tsc --noEmit
+
+ Tasks:    7 successful, 7 total
+Cached:    6 cached, 7 total
+  Time:    7.215s 
+
+$ eslint apps/backend packages apps/web scripts tests playwright.config.ts --ignore-pattern '**/generated/**'
+$ prettier --check apps packages config scripts tests '*.json' '*.yaml' '.github/**/*.yml'
+Checking formatting...
+All matched files use Prettier code style!
+$ node --test scripts/shared.test.mjs && turbo run test
+✔ one rename updates native identifiers, package scopes and UI names while preserving Pantopus and binary assets (121.188458ms)
+✔ all fixed copy and both themes exist in generated web, Swift and Kotlin resources (139.861709ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 308.193375
+
+   • turbo 2.11.5
+   • Packages in scope: @qelvora/api, @qelvora/backend, @qelvora/brand, @qelvora/copy, @qelvora/tokens, @qelvora/ui-web, @qelvora/web
+   • Running test in 7 packages
+   • Remote caching disabled, using shared worktree cache
+
+@qelvora/api:test: cache bypass, force executing 6dc2e93dc4509d23
+@qelvora/brand:build: cache hit, replaying logs c68e80ea4bd32f3d
+@qelvora/tokens:build: cache hit, replaying logs cc0386ae4b0d76ff
+@qelvora/brand:build: $ tsc --noEmit
+@qelvora/tokens:build: $ tsc --noEmit
+@qelvora/copy:build: cache hit, replaying logs bd2852e1d482f3e3
+@qelvora/api:build: cache hit, replaying logs a4d2314edf277212
+@qelvora/copy:build: $ tsc --noEmit
+@qelvora/api:build: $ tsc --noEmit
+@qelvora/backend:test: cache bypass, force executing 7008f495350f3289
+@qelvora/backend:test: $ vitest run
+@qelvora/api:test: $ vitest run --passWithNoTests
+@qelvora/api:test: 
+@qelvora/api:test:  RUN  v3.2.4 /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/packages/api
+@qelvora/api:test: 
+@qelvora/api:test: No test files found, exiting with code 0
+@qelvora/api:test: 
+@qelvora/api:test: include: **/*.{test,spec}.?(c|m)[jt]s?(x)
+@qelvora/api:test: exclude:  **/node_modules/**, **/dist/**, **/cypress/**, **/.{idea,git,cache,output,temp}/**, **/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*
+@qelvora/api:test: 
+@qelvora/backend:test: 
+@qelvora/backend:test:  RUN  v3.2.4 /Users/yingpengwang/estimate-rescue/creator-platform/w7-completion-840545/apps/backend
+@qelvora/backend:test: 
+@qelvora/backend:test:  ✓ tests/contracts.test.ts (9 tests) 63ms
+@qelvora/backend:test:  ↓ tests/postgres.integration.test.ts (9 tests | 9 skipped)
+@qelvora/backend:test: 
+@qelvora/backend:test:  Test Files  1 passed | 1 skipped (2)
+@qelvora/backend:test:       Tests  9 passed | 9 skipped (18)
+@qelvora/backend:test:    Start at  07:52:44
+@qelvora/backend:test:    Duration  2.17s (transform 460ms, setup 0ms, collect 1.63s, tests 63ms, environment 0ms, prepare 186ms)
+@qelvora/backend:test: 
+
+ Tasks:    6 successful, 6 total
+Cached:    4 cached, 6 total
+  Time:    3.004s 
+
+$ turbo run build
+
+   • turbo 2.11.5
+   • Packages in scope: @qelvora/api, @qelvora/backend, @qelvora/brand, @qelvora/copy, @qelvora/tokens, @qelvora/ui-web, @qelvora/web
+   • Running build in 7 packages
+   • Remote caching disabled, using shared worktree cache
+
+@qelvora/api:build: cache hit, replaying logs a4d2314edf277212
+@qelvora/api:build: $ tsc --noEmit
+@qelvora/brand:build: cache hit, replaying logs c68e80ea4bd32f3d
+@qelvora/brand:build: $ tsc --noEmit
+@qelvora/copy:build: cache hit, replaying logs bd2852e1d482f3e3
+@qelvora/copy:build: $ tsc --noEmit
+@qelvora/tokens:build: cache hit, replaying logs cc0386ae4b0d76ff
+@qelvora/tokens:build: $ tsc --noEmit
+@qelvora/backend:build: cache miss, executing 01e804c72bfca963
+@qelvora/web:build: cache hit, replaying logs 2f5106b5ea8237a3
+@qelvora/web:build: $ next build
+@qelvora/web:build: ▲ Next.js 16.3.7 (Turbopack)
+@qelvora/web:build: ✓ Running next.config.ts took 144ms
+@qelvora/web:build: 
+@qelvora/web:build:   Creating an optimized production build ...
+@qelvora/web:build: ✓ Compiled successfully in 2.2s
+@qelvora/web:build:   Running TypeScript ...
+@qelvora/web:build:   Finished TypeScript in 5.0s ...
+@qelvora/web:build:   Collecting page data using 11 workers ...
+@qelvora/web:build:   Generating static pages using 11 workers (0/32) ...
+@qelvora/web:build:   Generating static pages using 11 workers (8/32) 
+@qelvora/web:build:   Generating static pages using 11 workers (16/32) 
+@qelvora/web:build:   Generating static pages using 11 workers (24/32) 
+@qelvora/web:build: ✓ Generating static pages using 11 workers (32/32) in 228ms
+@qelvora/web:build:   Finalizing page optimization ...
+@qelvora/web:build: 
+@qelvora/web:build: Route (app)
+@qelvora/web:build: ┌ ƒ /
+@qelvora/web:build: ├ ○ /_not-found
+@qelvora/web:build: ├ ƒ /api/auth/complete
+@qelvora/web:build: ├ ƒ /api/auth/continue
+@qelvora/web:build: ├ ƒ /api/auth/restore
+@qelvora/web:build: ├ ƒ /api/commerce-approvals/[...path]
+@qelvora/web:build: ├ ƒ /api/commerce/[...path]
+@qelvora/web:build: ├ ƒ /api/content/[...path]
+@qelvora/web:build: ├ ƒ /api/conversations/[...path]
+@qelvora/web:build: ├ ƒ /api/growth-development
+@qelvora/web:build: ├ ƒ /api/growth/[...path]
+@qelvora/web:build: ├ ƒ /api/platform/[...path]
+@qelvora/web:build: ├ ƒ /api/studio/[...path]
+@qelvora/web:build: ├ ƒ /api/studio/ai/[...path]
+@qelvora/web:build: ├ ƒ /api/trust/[...path]
+@qelvora/web:build: ├ ƒ /api/w6/[...path]
+@qelvora/web:build: ├ ƒ /auth/continue
+@qelvora/web:build: ├ ƒ /auth/development
+@qelvora/web:build: ├ ƒ /auth/restore
+@qelvora/web:build: ├ ƒ /calls/[creatorId]/[fanId]/[sessionId]
+@qelvora/web:build: ├ ƒ /chat/[handle]
+@qelvora/web:build: ├ ƒ /commerce/[screen]
+@qelvora/web:build: ├ ƒ /content/[creatorId]/[contentId]
+@qelvora/web:build: ├ ƒ /creators/[handle]
+@qelvora/web:build: ├ ƒ /creators/[handle]/chat
+@qelvora/web:build: ├ ƒ /creators/[handle]/posts/[id]
+@qelvora/web:build: ├ ƒ /creators/maya
+@qelvora/web:build: ├ ○ /design
+@qelvora/web:build: ├ ○ /design/components
+@qelvora/web:build: ├ ƒ /design/components/[name]
+@qelvora/web:build: ├ ○ /design/screens
+@qelvora/web:build: ├ ƒ /design/screens/[group]/[id]
+@qelvora/web:build: ├ ○ /design/studies/comprehension
+@qelvora/web:build: ├ ƒ /discover
+@qelvora/web:build: ├ ƒ /growth-development
+@qelvora/web:build: ├ ƒ /home
+@qelvora/web:build: ├ ƒ /identity/account
+@qelvora/web:build: ├ ƒ /invite/[id]
+@qelvora/web:build: ├ ○ /media/ai-voice
+@qelvora/web:build: ├ ƒ /media/voice
+@qelvora/web:build: ├ ƒ /notifications
+@qelvora/web:build: ├ ƒ /notifications/[id]
+@qelvora/web:build: ├ ƒ /notifications/settings
+@qelvora/web:build: ├ ƒ /onboarding/handle
+@qelvora/web:build: ├ ○ /ops
+@qelvora/web:build: ├ ○ /ops/audits
+@qelvora/web:build: ├ ƒ /ops/cases/[id]
+@qelvora/web:build: ├ ○ /ops/metrics
+@qelvora/web:build: ├ ƒ /share/[id]
+@qelvora/web:build: ├ ƒ /share/[id]/export
+@qelvora/web:build: ├ ƒ /share/[id]/image
+@qelvora/web:build: ├ ƒ /share/[id]/image/source
+@qelvora/web:build: ├ ƒ /sitemap.xml
+@qelvora/web:build: ├ ○ /status
+@qelvora/web:build: ├ ƒ /studio/[creatorId]/[[...screen]]
+@qelvora/web:build: ├ ƒ /studio/activation
+@qelvora/web:build: ├ ƒ /studio/ai/[[...section]]
+@qelvora/web:build: ├ ƒ /studio/calls/[creatorId]/[fanId]/[commitmentId]
+@qelvora/web:build: ├ ƒ /studio/impact
+@qelvora/web:build: ├ ƒ /studio/insights
+@qelvora/web:build: ├ ○ /studio/launch
+@qelvora/web:build: ├ ƒ /studio/measurement
+@qelvora/web:build: ├ ƒ /studio/setup
+@qelvora/web:build: ├ ƒ /studio/workspace
+@qelvora/web:build: ├ ○ /support
+@qelvora/web:build: ├ ○ /support/access
+@qelvora/web:build: ├ ○ /support/feedback
+@qelvora/web:build: ├ ○ /support/privacy
+@qelvora/web:build: ├ ƒ /threads/[creatorId]/[fanId]
+@qelvora/web:build: ├ ƒ /threads/[creatorId]/[fanId]/citations/[passageId]
+@qelvora/web:build: ├ ƒ /threads/[creatorId]/[fanId]/messages/[messageId]
+@qelvora/web:build: ├ ○ /trust
+@qelvora/web:build: ├ ○ /trust/crisis
+@qelvora/web:build: ├ ○ /trust/terms
+@qelvora/web:build: ├ ƒ /unsubscribe/[token]
+@qelvora/web:build: ├ ƒ /verify/[id]
+@qelvora/web:build: └ ƒ /you
+@qelvora/web:build: 
+@qelvora/web:build: 
+@qelvora/web:build: ○  (Static)   prerendered as static content
+@qelvora/web:build: ƒ  (Dynamic)  server-rendered on demand
+@qelvora/web:build: 
+@qelvora/backend:build: $ tsc --noEmit && node scripts/build.mjs
+
+ Tasks:    6 successful, 6 total
+Cached:    5 cached, 6 total
+  Time:    8.173s 
+

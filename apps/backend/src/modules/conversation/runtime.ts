@@ -1,4 +1,5 @@
 import type { PoolClient } from "pg";
+import { ConversationOfflineIssuer } from "./offline.js";
 import type { ApprovedSentence } from "../agent/runtime.js";
 import type { Database } from "../../db/database.js";
 import type { AccessService, ThreadScope } from "../access/scope.js";
@@ -15,19 +16,24 @@ import type { ProviderPolicy } from "../../../../../packages/api/src/conversatio
 import { ConversationWellbeing, type ConversationMode } from "./wellbeing.js";
 import type { CommerceService } from "../commerce/service.js";
 import { invariant } from "../../core/errors.js";
+import { DevelopmentConversationPolicy } from "./development-policy.js";
 import type { ConversationLineage } from "./lineage.js";
 import type { ConversationRecordings } from "./recordings.js";
 import type { ConversationCorrections } from "./corrections.js";
 import type { GenerationCostReconciliation } from "../commerce/generation-allowance.js";
 import type { CommerceFulfillmentPlans } from "../commerce/fulfillment-plans.js";
+import { PreparedGenerationAcceptance } from "./generation-acceptance.js";
 
 export function createConversationRuntime(input: {
   database: Database;
   access: AccessService;
   conversation: ConversationService;
   policy?: ProviderPolicy;
+  developmentPolicy?: DevelopmentConversationPolicy;
+  offlineIssuer?: { origin: string; environment: string | undefined };
   generator?: ConversationGenerator;
   generatorFactory?: (memory: MemoryService) => ConversationGenerator;
+  generationAcceptance?: PreparedGenerationAcceptance;
   allowance?: ConversationAllowance;
   /** W4's prepared port proves the exact configured AccessService identity.
    * Keep allowance absent to select its single canonical generation path. */
@@ -51,6 +57,14 @@ export function createConversationRuntime(input: {
   ) => Promise<void>;
   citation?: (scope: ThreadScope, id: string) => Promise<unknown>;
 }) {
+  invariant(
+    !input.developmentPolicy ||
+      (input.developmentPolicy instanceof DevelopmentConversationPolicy &&
+        input.policy &&
+        input.developmentPolicy.isFor(input.database.pool, input.policy)),
+    "synthetic_policy_pool_mismatch",
+    "The development policy must belong to this conversation database and exact policy.",
+  );
   invariant(
     !(input.allowance && input.generationCostReconciliation),
     "allowance_conflict",
@@ -80,8 +94,33 @@ export function createConversationRuntime(input: {
     input.conversation.configureFulfillmentPlans(input.fulfillmentPlans);
   const memory = new MemoryService(input.database, input.semantics);
   const wellbeing = new ConversationWellbeing(input.database, input.mode);
+  const acceptance = input.generationAcceptance;
+  invariant(
+    !acceptance ||
+      (acceptance instanceof PreparedGenerationAcceptance &&
+        !input.generator &&
+        !input.generatorFactory &&
+        !input.allowance &&
+        input.generationCostReconciliation),
+    "generation_execution_conflict",
+    "Scoped generation requires its original acceptance and cost reconciliation.",
+  );
+  acceptance?.assertComposition(input.database, input.access);
   const generator = input.generator ?? input.generatorFactory?.(memory);
-  generator?.journal?.assertPool(input.database.pool);
+  const journal = acceptance?.journal ?? generator?.journal;
+  journal?.assertPool(input.database.pool);
+  const assertReady = acceptance
+    ? async (scope: ThreadScope, client: PoolClient) => {
+        await acceptance.assertReady(scope, client);
+        await input.assertReady?.(scope, client);
+      }
+    : input.assertReady;
+  const citation = acceptance
+    ? acceptance.citation.bind(acceptance)
+    : input.citation;
+  const routeSafety = acceptance
+    ? acceptance.routeSafety.bind(acceptance)
+    : generator?.routeSafety?.bind(generator);
   const processor = generator
     ? new ConversationGenerationProcessor(
         input.database,
@@ -97,11 +136,12 @@ export function createConversationRuntime(input: {
     ...(input.generationCostReconciliation
       ? { reconciliation: input.generationCostReconciliation }
       : {}),
-    ...(input.assertReady ? { assertReady: input.assertReady } : {}),
+    ...(assertReady ? { assertReady } : {}),
     ...(input.assertApproved ? { assertApproved: input.assertApproved } : {}),
-    ...(input.citation ? { citation: input.citation } : {}),
+    ...(citation ? { citation } : {}),
     ...(input.lineage ? { lineage: input.lineage } : {}),
-    ...(generator?.journal ? { journal: generator.journal } : {}),
+    ...(journal ? { journal } : {}),
+    ...(acceptance ? { generationAcceptance: acceptance } : {}),
   });
   const feature = new ConversationFeature(
     input.database,
@@ -110,28 +150,31 @@ export function createConversationRuntime(input: {
     memory,
     input.policy,
     Boolean(
-      generator &&
-        generator.executionAttributed &&
-        generator.journal &&
-        generator.seal &&
+      (acceptance ||
+        (generator &&
+          generator.executionAttributed &&
+          generator.journal &&
+          generator.seal &&
+          input.assertApproved)) &&
         (input.allowance || input.generationCostReconciliation) &&
-        input.citation &&
-        input.assertReady &&
-        input.assertApproved &&
-        input.policy?.verified,
+        citation &&
+        assertReady &&
+        (input.policy?.verified || input.developmentPolicy),
     ),
     (scope) => processor?.schedule(scope),
     conversationSocketTickets,
-    input.citation,
+    citation,
     wellbeing,
     input.firstConversation,
-    generator?.routeSafety
+    routeSafety
       ? (scope, text, signal, deliver) =>
-          generator.routeSafety!(
+          routeSafety(
             scope,
             text,
             {
               current: (current) => memory.context(current),
+              safetyCheckpoint: (current) =>
+                input.conversation.safetyCheckpoint(current),
               assertProcessorConsent: (current) =>
                 input.conversation.assertProcessorConsent(current),
               assertDeliveryCurrent: (current, expected) =>
@@ -144,8 +187,15 @@ export function createConversationRuntime(input: {
     (scope, epoch) => processor?.interrupt(scope.threadId, epoch),
     input.lineage,
     input.corrections,
-    input.assertReady,
+    assertReady,
     input.recordings,
+    input.offlineIssuer
+      ? new ConversationOfflineIssuer(
+          input.offlineIssuer.origin,
+          input.offlineIssuer.environment,
+        )
+      : undefined,
+    input.developmentPolicy,
   );
   return {
     feature,

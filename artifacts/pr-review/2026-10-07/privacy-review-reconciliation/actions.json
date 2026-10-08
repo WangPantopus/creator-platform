@@ -1,0 +1,35 @@
+[
+  {
+    "number": 36,
+    "action": "closed_unmerged_into_132",
+    "sourceHead": "de8adebb5c4f1844a7ad7c9833b802548cf8578a",
+    "sourceBranch": "codex/w3-privacy-revalidation",
+    "sourceBranchPreserved": true,
+    "successorHead": "83bf246a4c7fdd2ae127ab6c1b7533b311e575dc",
+    "evidence": "https://github.com/WangPantopus/creator-platform/blob/83bf246a4c7fdd2ae127ab6c1b7533b311e575dc/artifacts/pr-review/2026-10-07/privacy-review-reconciliation/README.md",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/36",
+    "verifiedAt": "2026-10-07T21:48:26.754329+00:00"
+  },
+  {
+    "number": 200,
+    "action": "closed_unmerged_into_132",
+    "sourceHead": "5290eedd1249832ad7e5c9325b8dcc1f9acccb49",
+    "sourceBranch": "codex/w8-reply-review-current",
+    "sourceBranchPreserved": true,
+    "successorHead": "83bf246a4c7fdd2ae127ab6c1b7533b311e575dc",
+    "evidence": "https://github.com/WangPantopus/creator-platform/blob/83bf246a4c7fdd2ae127ab6c1b7533b311e575dc/artifacts/pr-review/2026-10-07/privacy-review-reconciliation/README.md",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/200",
+    "verifiedAt": "2026-10-07T21:48:34.355992+00:00"
+  },
+  {
+    "number": 282,
+    "action": "closed_unmerged_into_132",
+    "sourceHead": "3f4d44611c5a3a2c30f44b5a5532c76fdc5c49bc",
+    "sourceBranch": "codex/w6-call-offer-lifetime-20261003",
+    "sourceBranchPreserved": true,
+    "successorHead": "83bf246a4c7fdd2ae127ab6c1b7533b311e575dc",
+    "evidence": "https://github.com/WangPantopus/creator-platform/blob/83bf246a4c7fdd2ae127ab6c1b7533b311e575dc/artifacts/pr-review/2026-10-07/call-source-reconciliation/README.md",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/282",
+    "verifiedAt": "2026-10-07T21:48:42.134929+00:00"
+  }
+]

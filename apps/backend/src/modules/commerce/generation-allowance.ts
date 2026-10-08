@@ -1,4 +1,9 @@
 import type { Pool, PoolClient } from "pg";
+import { accountingRetentionPolicy } from "../trust/accounting-retention-policy.js";
+import {
+  assertGenerationSettlementClock,
+  knownGenerationRetentionQuery,
+} from "./generation-settlement-clock.js";
 import { invariant } from "../../core/errors.js";
 import {
   reserveCostAllowance,
@@ -8,7 +13,11 @@ import {
 } from "../access/commerce.js";
 import { contentHash } from "../../core/canonical.js";
 import { z } from "zod";
-import { ReviewedGenerationCostRule } from "./attributed-cost-policy.js";
+import {
+  isAttributedGenerationJournal,
+  ReviewedGenerationCostRule,
+} from "./attributed-cost-policy.js";
+import type { PreparedGenerationJournal } from "../agent/generation-journal.js";
 import {
   ORIGINAL_COST_MIGRATION,
   ORIGINAL_COST_SCHEMA_SHA256,
@@ -88,6 +97,7 @@ export class CommerceGenerationAllowance implements GenerationAllowance {
     private readonly database: string,
     private readonly captureOriginalRule: boolean,
     private readonly hostPool: Pool,
+    private readonly originalPolicy: GenerationCostPolicy,
   ) {}
   assertComposition(pool: Pool, access: AccessService) {
     invariant(
@@ -96,6 +106,14 @@ export class CommerceGenerationAllowance implements GenerationAllowance {
         access.isGenerationAllowance(this),
       "generation_terminal_allowance_mismatch",
       "Original settlement requires the exact configured canonical allowance owner.",
+    );
+  }
+  assertJournal(journal: PreparedGenerationJournal) {
+    journal.assertPool(this.hostPool);
+    invariant(
+      isAttributedGenerationJournal(this.originalPolicy, journal),
+      "generation_accounting_journal_mismatch",
+      "Financial reconciliation must read this allowance's original generation journal.",
     );
   }
   /** Only this successfully prepared instance can issue its port. Each call
@@ -280,6 +298,46 @@ export class CommerceGenerationAllowance implements GenerationAllowance {
     return Object.freeze({
       retentionPolicyVersion,
       settleGeneration,
+      knownRetention: async (
+        client: PoolClient,
+        job: GenerationPrivacyJob,
+        family: GenerationPrivacyFamily,
+        generationIds: readonly string[],
+      ) => {
+        invariant(
+          retentionPolicyVersion === accountingRetentionPolicy.version &&
+            generationIds.length > 0 &&
+            generationIds.length <= 100 &&
+            new Set(generationIds).size === generationIds.length &&
+            generationIds.every((id) => z.uuid().safeParse(id).success),
+          "accounting_retention_unconfigured",
+          "Use the approved retention decision and a complete bounded generation page.",
+        );
+        await assert(client, job, family);
+        await assertGenerationSettlementClock(client, job.signal);
+        const { rows } = await client.query<{
+          generationId: string;
+          settledAt: string;
+          accountingUntil: string;
+          financialDispositionReference: string;
+        }>(knownGenerationRetentionQuery, [
+          family.threadId,
+          family.creatorId,
+          family.fanId,
+          generationIds,
+          accountingRetentionPolicy.knownCalendarMonths,
+        ]);
+        invariant(
+          rows.length === generationIds.length &&
+            new Set(rows.map((row) => row.generationId)).size === rows.length &&
+            rows.every((row) => generationIds.includes(row.generationId)),
+          "accounting_settlement_time_unavailable",
+          "Every known cost requires its actual original financial settlement time; historical dates cannot be invented.",
+        );
+        await assert(client, job, family);
+        await assertGenerationSettlementClock(client, job.signal);
+        return Object.freeze(rows.map((row) => Object.freeze(row)));
+      },
       disposition: async (
         client: PoolClient,
         job: GenerationPrivacyJob,
@@ -410,9 +468,21 @@ export class CommerceGenerationAllowance implements GenerationAllowance {
       database,
       captureOriginalRule,
       pool,
+      // The factory's WeakMap binds this exact frozen policy to its journal.
+      // The defensive execution copy above cannot stand in for that identity.
+      policy,
     );
   }
   async reserve(scope: ThreadScope, client: PoolClient, generationId: string) {
+    return (await this.reserveGeneration(scope, client, generationId)).grantId;
+  }
+  /** W3 captures this exact weighted reservation on its accepted generation
+   * within the same transaction. A grant UUID alone cannot bind the worker. */
+  async reserveGeneration(
+    scope: ThreadScope,
+    client: PoolClient,
+    generationId: string,
+  ) {
     if (this.captureOriginalRule) await assertOriginalCostCustody(client);
     const reservation = await reserveCostAllowance(
       client,
@@ -438,7 +508,7 @@ export class CommerceGenerationAllowance implements GenerationAllowance {
       "reservation_unavailable",
       "Generation allowance is unavailable.",
     );
-    return row.grant_id;
+    return { grantId: row.grant_id, reservationId: reservation.id };
   }
   async settle(
     scope: ThreadScope,

@@ -1,0 +1,328 @@
+{
+  "base": "25c1cd1363506163e3f5ac4596744137176e45d4",
+  "main": "d6cd1d2e82c53ac0bb816f8d1ee2d7135b690a3a",
+  "source": {
+    "path": "apps/backend/src/modules/identity/schema-generation-lifecycle.sql",
+    "sha256": "cd530fbc58dcaf63002f4214873ba877feb0d2866eefb2a94988062e2ca39057",
+    "status": "held, unallocated, unregistered, unapplied"
+  },
+  "originalSourceChecksumsUnchanged": true,
+  "compiler": {
+    "newOrReplacedFunctions": 3,
+    "diagnostics": [],
+    "initialRetainedDiagnostic": "Terminal selector inherited STABLE despite clock_timestamp; changed successor to VOLATILE before recording final definition."
+  },
+  "lifecycleMetadataObservations": [
+    {
+      "name": "baseline",
+      "matchesReviewedLifecycle": true
+    },
+    {
+      "name": "trigger_disabled",
+      "matchesReviewedLifecycle": false
+    },
+    {
+      "name": "trigger_disabled_restored",
+      "matchesReviewedLifecycle": true
+    },
+    {
+      "name": "trigger_renamed",
+      "matchesReviewedLifecycle": false
+    },
+    {
+      "name": "trigger_renamed_restored",
+      "matchesReviewedLifecycle": true
+    },
+    {
+      "name": "trigger_conditional",
+      "matchesReviewedLifecycle": false
+    },
+    {
+      "name": "trigger_conditional_restored",
+      "matchesReviewedLifecycle": true
+    },
+    {
+      "name": "claim_acl_revoked",
+      "matchesReviewedLifecycle": false
+    },
+    {
+      "name": "claim_acl_revoked_restored",
+      "matchesReviewedLifecycle": true
+    },
+    {
+      "name": "recovery_acl_public",
+      "matchesReviewedLifecycle": false
+    },
+    {
+      "name": "recovery_acl_public_restored",
+      "matchesReviewedLifecycle": true
+    },
+    {
+      "name": "trigger_owner_changed",
+      "matchesReviewedLifecycle": false
+    },
+    {
+      "name": "trigger_owner_changed_restored",
+      "matchesReviewedLifecycle": true
+    },
+    {
+      "name": "selector_changed",
+      "matchesReviewedLifecycle": false
+    },
+    {
+      "name": "selector_changed_restored",
+      "matchesReviewedLifecycle": true
+    },
+    {
+      "name": "recovery_volatility",
+      "matchesReviewedLifecycle": false
+    },
+    {
+      "name": "recovery_volatility_restored",
+      "matchesReviewedLifecycle": true
+    }
+  ],
+  "temporaryShapeCoverage": {
+    "originalTriggerOperations": 6,
+    "selectorMetadataFixtures": 6,
+    "description": "Temporary metadata rows only; fresh and recovery sets are disjoint. No original generation/business task, scope, financial receipt or provider result is supplied."
+  },
+  "wholeGraphMetadata": {
+    "scope": "Unaccepted candidate hashes of the original metadata readers, after removing review-only compiler extension. No expected production pins or executable registry entries changed.",
+    "candidateFingerprints": {
+      "output": "34027fef46ea0ae7027172e5a9705c608ffb6998aa37c6b21aa5bf0d2a589e86",
+      "terminal": "57f3e59484b63699d88a4a4e8b8a52edd569766ea049e4b63cb5634711c8008b",
+      "financial": "d0435b6b4dfd5f6f5cf721ee709da6b43db10638e74d1e848885e5d9d722b8ba"
+    },
+    "drifts": [
+      {
+        "name": "output_bypass",
+        "detectedBy": ["output", "financial"],
+        "allThreeRestored": true
+      },
+      {
+        "name": "discovery_membership",
+        "detectedBy": ["terminal", "financial"],
+        "allThreeRestored": true
+      },
+      {
+        "name": "worker_body_grant",
+        "detectedBy": ["financial"],
+        "allThreeRestored": true
+      },
+      {
+        "name": "public_executable",
+        "detectedBy": ["output", "terminal", "financial"],
+        "allThreeRestored": true
+      }
+    ]
+  },
+  "transactionHelper": {
+    "scope": "Original transaction helper with the real canonical runtime credential; no prepared generation graph or business task",
+    "results": [
+      {
+        "case": "nonowner_transaction_commit",
+        "passed": true
+      },
+      {
+        "case": "active_query_abort",
+        "passed": true,
+        "elapsedMs": 165,
+        "errorCode": "57014",
+        "rollbackAwaited": true
+      },
+      {
+        "case": "after_cancel_pool_reuse",
+        "passed": true
+      },
+      {
+        "case": "unregistered_lifecycle_refused_before_discovery",
+        "passed": true
+      },
+      {
+        "case": "late_abort_preserves_actual_commit_receipt",
+        "passed": true
+      },
+      {
+        "case": "preaborted_does_not_acquire_or_query",
+        "passed": true
+      }
+    ]
+  },
+  "custodyBefore": {
+    "schemaSha256": "fae68ebf084be047184ab3cf98870ec951fc0ab72384b176573ebf53ba587020",
+    "rolesSha256": "1d81a1caa22a63fac6fd88a3d498630c018c1413bb10a7c203b1f405520aeab0",
+    "rowsSha256": "9cbc7f9a479a5f3e6328b1b353f38ba609b48ad2eb9eb66c722abf77c747ca86",
+    "tables": 137,
+    "rows": 236
+  },
+  "custodyAfter": {
+    "schemaSha256": "fae68ebf084be047184ab3cf98870ec951fc0ab72384b176573ebf53ba587020",
+    "rolesSha256": "1d81a1caa22a63fac6fd88a3d498630c018c1413bb10a7c203b1f405520aeab0",
+    "rowsSha256": "9cbc7f9a479a5f3e6328b1b353f38ba609b48ad2eb9eb66c722abf77c747ca86",
+    "tables": 137,
+    "rows": 236
+  },
+  "canonicalMigrations": 61,
+  "threads": 0,
+  "generations": 0,
+  "providerCalls": 0,
+  "unitChecks": {
+    "file": "apps/backend/tests/generation-worker-lifetime.test.ts",
+    "passed": 6,
+    "scope": "Controlled scheduler boundaries only; no prepared owner graph or generation qualification."
+  },
+  "pullRequestSnapshot": [
+    {
+      "number": 305,
+      "head": "603282f520defa2b0267c5fa45121b6102fdc261",
+      "draft": true,
+      "mergeable": "MERGEABLE",
+      "successfulChecks": 10,
+      "pendingChecks": 0
+    },
+    {
+      "number": 303,
+      "head": "6a82fc1272dc8b25ac167598012aa5da4ff91dc5",
+      "draft": true,
+      "mergeable": "MERGEABLE",
+      "successfulChecks": 10,
+      "pendingChecks": 0
+    },
+    {
+      "number": 302,
+      "head": "b520000666fdb5595995702a76fe848edc0c79d2",
+      "draft": true,
+      "mergeable": "MERGEABLE",
+      "successfulChecks": 10,
+      "pendingChecks": 0
+    },
+    {
+      "number": 301,
+      "head": "cec286e9bdc16e9296f1e8af1fd59826c40a12c2",
+      "draft": true,
+      "mergeable": "CONFLICTING",
+      "successfulChecks": 10,
+      "pendingChecks": 0
+    },
+    {
+      "number": 284,
+      "head": "bf2a95f19c185786b2617895ff5c00712e76d63b",
+      "draft": true,
+      "mergeable": "CONFLICTING",
+      "successfulChecks": 10,
+      "pendingChecks": 0
+    },
+    {
+      "number": 282,
+      "head": "3f4d44611c5a3a2c30f44b5a5532c76fdc5c49bc",
+      "draft": true,
+      "mergeable": "MERGEABLE",
+      "successfulChecks": 10,
+      "pendingChecks": 0
+    },
+    {
+      "number": 262,
+      "head": "27cde2b04b65c8b29bd0ba59a9b18ba716260101",
+      "draft": true,
+      "mergeable": "CONFLICTING",
+      "successfulChecks": 10,
+      "pendingChecks": 0
+    },
+    {
+      "number": 247,
+      "head": "75bba77b53a5c0d0675309daed946f017d3d17bd",
+      "draft": true,
+      "mergeable": "MERGEABLE",
+      "successfulChecks": 11,
+      "pendingChecks": 0
+    },
+    {
+      "number": 242,
+      "head": "1a674e59b46ad42c3e4acd0ef906c6753ff75c44",
+      "draft": true,
+      "mergeable": "CONFLICTING",
+      "successfulChecks": 11,
+      "pendingChecks": 0
+    },
+    {
+      "number": 200,
+      "head": "5290eedd1249832ad7e5c9325b8dcc1f9acccb49",
+      "draft": true,
+      "mergeable": "CONFLICTING",
+      "successfulChecks": 11,
+      "pendingChecks": 0
+    },
+    {
+      "number": 192,
+      "head": "05225166284225b966a0606192bbbb77821cc18b",
+      "draft": true,
+      "mergeable": "CONFLICTING",
+      "successfulChecks": 11,
+      "pendingChecks": 0
+    },
+    {
+      "number": 145,
+      "head": "da0e2af95baa19280ddf3ebdae4ce8ead1a5eca7",
+      "draft": true,
+      "mergeable": "MERGEABLE",
+      "successfulChecks": 11,
+      "pendingChecks": 0
+    },
+    {
+      "number": 132,
+      "head": "25c1cd1363506163e3f5ac4596744137176e45d4",
+      "draft": true,
+      "mergeable": "MERGEABLE",
+      "successfulChecks": 6,
+      "pendingChecks": 5
+    },
+    {
+      "number": 131,
+      "head": "5901c9dd62973a20fd7d3ccae132374fcd627056",
+      "draft": true,
+      "mergeable": "CONFLICTING",
+      "successfulChecks": 11,
+      "pendingChecks": 0
+    },
+    {
+      "number": 74,
+      "head": "5b1675ca155f87957c8ad62201097de2563c3c4f",
+      "draft": true,
+      "mergeable": "MERGEABLE",
+      "successfulChecks": 11,
+      "pendingChecks": 0
+    },
+    {
+      "number": 63,
+      "head": "82c9abffdb00f73bc7ba3fb4baedb508b1170917",
+      "draft": true,
+      "mergeable": "CONFLICTING",
+      "successfulChecks": 11,
+      "pendingChecks": 0
+    },
+    {
+      "number": 36,
+      "head": "de8adebb5c4f1844a7ad7c9833b802548cf8578a",
+      "draft": true,
+      "mergeable": "CONFLICTING",
+      "successfulChecks": 11,
+      "pendingChecks": 0
+    },
+    {
+      "number": 31,
+      "head": "c052ef67fa85301562b5123b682c88b931107c9a",
+      "draft": true,
+      "mergeable": "CONFLICTING",
+      "successfulChecks": 11,
+      "pendingChecks": 0
+    }
+  ],
+  "newMainMerges": 0,
+  "remaining": [
+    "Three complete graph expected pins remain absent; new lifecycle successor still needs migration allocation and full graph qualification.",
+    "Genuine prepared graph cancellation, denial, expiry, original receipt recovery and concurrent claim operation remain unqualified.",
+    "Canonical acceptance/free safety and executable composition stay guarded until those prerequisites qualify.",
+    "No UI or native changes in this increment; supplied design references remain authoritative."
+  ]
+}

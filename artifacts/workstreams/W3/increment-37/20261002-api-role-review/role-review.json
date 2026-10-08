@@ -1,0 +1,56 @@
+{
+  "source": "064fa55e4eaadd6b76c189e41e24fb041b30a3de",
+  "operation": "actual W3 baseline40 role/PUBLIC guard inside READ ONLY transaction",
+  "guardSha256": "bc69d86cd46008f9aca889512fd0df7e3f5e2f19b9ff3f4e482b6d3de5136338",
+  "ledger": {
+    "rows": 40,
+    "last": "0043_w8_relationship_backfill"
+  },
+  "installed": {
+    "trust": false,
+    "media": false
+  },
+  "guard": {
+    "checkedRoles": 0,
+    "pinnedFunctions": 0,
+    "directCapabilities": 0,
+    "publicCapabilities": 295,
+    "pinnedPublicFunctions": 9
+  },
+  "growth": [
+    {
+      "rolname": "creator_runtime",
+      "rolinherit": false,
+      "rolsuper": false,
+      "rolcreatedb": false,
+      "rolcreaterole": false,
+      "rolbypassrls": false
+    },
+    {
+      "rolname": "growth_runtime",
+      "rolinherit": false,
+      "rolsuper": false,
+      "rolcreatedb": false,
+      "rolcreaterole": false,
+      "rolbypassrls": false
+    },
+    {
+      "rolname": "growth_worker",
+      "rolinherit": false,
+      "rolsuper": false,
+      "rolcreatedb": false,
+      "rolcreaterole": false,
+      "rolbypassrls": false
+    },
+    {
+      "rolname": "w3_growth_api",
+      "rolinherit": true,
+      "rolsuper": false,
+      "rolcreatedb": false,
+      "rolcreaterole": false,
+      "rolbypassrls": false
+    }
+  ],
+  "reservedMigrationsApplied": false,
+  "at": "2026-10-02T09:21:44.070Z"
+}

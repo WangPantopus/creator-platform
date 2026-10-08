@@ -1,0 +1,11 @@
+Browser tab: 3, Title: "Qelvora", URL: "http://127.0.0.1:3007/auth/continue?returnTo=%2Fnotifications%2Fsettings".
+1 AXWebArea Qelvora, URL: 127.0.0.1:3007/auth/continue?returnTo=%2Fnotifications%2Fsettings
+	2 container
+		3 text Qelvora
+		4 heading Her AI answers you now. She answers in person when you ask., Value: 1
+			5 text Her AI answers you now. She answers in person when you ask.
+		6 text Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.
+		7 link Description: Continue with Pantopus, Value: 127.0.0.1:3007/api/auth/continue?returnTo=%2Fnotifications%2Fsettings
+		8 text One Pantopus account signs you in to every Pantopus app. New here? You'll create it in the next step.
+
+The focused UI element is 1 AXWebArea Qelvora, URL: 127.0.0.1:3007/auth/continue?returnTo=%2Fnotifications%2Fsettings

@@ -1,5 +1,7 @@
 import { readFile } from "node:fs/promises";
 import type { PoolClient } from "pg";
+import generationReview from "../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
+import generationDenial from "../../../infra/migrations/reviews/20261007-generation-denial-roles.json" with { type: "json" };
 import { canonical, repositoryRoot, sha256 } from "./migration-custody.js";
 
 export class WaveRoleSafetyError extends Error {}
@@ -81,6 +83,9 @@ export async function assertWaveRoleSafety(
     media: boolean;
     content?: boolean;
     interactive?: boolean;
+    /** Closed full39-source denial/PUBLIC-trigger operator review only; not
+     * runtime activation or safety qualification of all generation purposes. */
+    generationDenial?: boolean;
   },
 ) {
   const fail = (role: string): never => {
@@ -141,7 +146,8 @@ export async function assertWaveRoleSafety(
     fail("PostgreSQL17 required");
   if (
     (installed.content && !installed.trust) ||
-    (installed.interactive && !installed.content)
+    (installed.interactive && !installed.content) ||
+    (installed.generationDenial && !installed.interactive)
   )
     fail("continuation dependency order");
   const additions = JSON.parse(
@@ -181,6 +187,7 @@ export async function assertWaveRoleSafety(
     )
       fail("immutable continuation source");
   }
+  if (installed.generationDenial) await assertGenerationDenialExtension(client);
   const expected = [
     ...pins.functions,
     ...additions.functions.filter((f) =>
@@ -188,6 +195,7 @@ export async function assertWaveRoleSafety(
         ? installed.content
         : installed.interactive,
     ),
+    ...(installed.generationDenial ? generationDenial.functions : []),
   ].filter((f) =>
     f.owner === "creator_trust_denial" ? installed.trust : installed.media,
   );
@@ -262,6 +270,10 @@ export async function assertWaveRoleSafety(
           (c.role === "creator_trust_denial" &&
             installed.trust &&
             (metadata[c.object]?.includes(c.column) ||
+              (installed.generationDenial &&
+                (generationDenial.metadataColumns as Record<string, string[]>)[
+                  c.object
+                ]?.includes(c.column)) ||
               (installed.content &&
                 ((c.object === "creator.identity_session" &&
                   ["id", "account_id", "expires_at", "revoked_at"].includes(
@@ -375,12 +387,16 @@ export async function assertWaveRoleSafety(
         )
       ).rows[0]?.present
     : false;
-  const expectedPublic =
-    (installed.trust && installed.media
+  const expectedPublic = [
+    ...((installed.trust && installed.media
       ? publicPins.publicFunctions.canonical57
       : hasRows
         ? publicPins.publicFunctions.baseline40
-        : []) ?? fail("PUBLIC function packet");
+        : []) ?? fail("PUBLIC function packet")),
+    ...(installed.generationDenial
+      ? generationDenial.publicTriggerFunctions
+      : []),
+  ];
   if (publicPins.schemaVersion !== 1 || publicPins.sourceWave !== "20261002")
     fail("PUBLIC function packet");
   const publicFunctions = (
@@ -420,4 +436,113 @@ export async function assertWaveRoleSafety(
     publicCapabilities: publicCapabilities.length,
     pinnedPublicFunctions: publicFunctions.length,
   };
+}
+
+/** The earlier wave guard stays exact by default. This additive operator
+ * profile requires the reviewed full graph and actual executed SQL ledger;
+ * it never changes the executable registry or issues a runtime capability. */
+async function assertGenerationDenialExtension(client: PoolClient) {
+  const fail = (): never => {
+    throw new WaveRoleSafetyError(
+      "Unsafe migration purpose-role custody: generation denial extension.",
+    );
+  };
+  if (
+    generationDenial.schemaVersion !== 1 ||
+    generationDenial.postgresMajor !== 17 ||
+    generationDenial.sourceReview !== "20261007-generation-privacy" ||
+    generationDenial.functions.length !== 2 ||
+    generationDenial.publicTriggerFunctions.length !== 3 ||
+    generationDenial.policies.length !== 5 ||
+    generationReview.sources.length !== 39
+  )
+    fail();
+  // These original invoker triggers have no ordinary-call capability. Pin
+  // their exact source/ACLs above rather than accepting arbitrary PUBLIC code.
+  if (
+    (
+      await client.query<{ ready: boolean }>(
+        `SELECT count(*)=3 AND bool_and(p.prokind='f' AND NOT p.prosecdef
+         AND p.prorettype='trigger'::regtype) AS ready FROM pg_proc p
+         WHERE p.oid=ANY(ARRAY(SELECT to_regprocedure(signature) FROM unnest($1::text[]) signature))`,
+        [generationDenial.publicTriggerFunctions.map((fn) => fn.name)],
+      )
+    ).rows[0]?.ready !== true
+  )
+    fail();
+  for (const source of generationReview.sources) {
+    if (
+      sha256(await readFile(new URL(source.path, repositoryRoot))) !==
+        source.checksum ||
+      (
+        await client.query<{ ready: boolean }>(
+          "SELECT EXISTS(SELECT FROM creator.schema_migration WHERE version=$1 AND checksum=$2) AS ready",
+          [source.version, source.checksum],
+        )
+      ).rows[0]?.ready !== true
+    )
+      fail();
+  }
+  const roles = (
+    await client.query<{ safe: boolean }>(
+      `SELECT NOT rolsuper AND NOT rolcreatedb AND NOT rolcreaterole
+       AND NOT rolinherit AND NOT rolbypassrls AND NOT rolreplication
+       AND rolcanlogin=(rolname='creator_generation_worker') AND rolconfig IS NULL
+       AND NOT EXISTS(SELECT FROM pg_auth_members WHERE member=r.oid OR roleid=r.oid)
+       AND NOT EXISTS(SELECT FROM pg_db_role_setting WHERE setrole=r.oid) AS safe
+       FROM pg_roles r WHERE rolname IN('creator_generation_worker',
+        'creator_generation_authority','creator_generation_terminal_authority')`,
+    )
+  ).rows;
+  if (roles.length !== 3 || roles.some((role) => role.safe !== true)) fail();
+  const relations = Object.keys(generationDenial.metadataColumns);
+  if (
+    (
+      await client.query<{ ready: boolean }>(
+        `SELECT count(*)=$2 AND bool_and(c.relkind='r' AND NOT c.relispartition
+         AND c.relrowsecurity AND c.relforcerowsecurity
+         AND pg_get_userbyid(c.relowner)='creator_owner') AS ready
+         FROM pg_class c WHERE c.oid=ANY(ARRAY(SELECT to_regclass(r) FROM unnest($1::text[]) r))`,
+        [relations, relations.length],
+      )
+    ).rows[0]?.ready !== true
+  )
+    fail();
+  for (const [relation, columns] of Object.entries(
+    generationDenial.metadataColumns,
+  )) {
+    const ready = (
+      await client.query<{ ready: boolean }>(
+        `SELECT bool_and(has_column_privilege('creator_trust_denial',$1,column_name,'SELECT')) AS ready
+         FROM unnest($2::text[]) column_name`,
+        [relation, columns],
+      )
+    ).rows[0]?.ready;
+    if (ready !== true) fail();
+  }
+  const policies = (
+    await client.query<{ relation: string; name: string; safe: boolean }>(
+      `SELECT c.oid::regclass::text AS relation,p.polname AS name,
+       p.polcmd='r' AND p.polpermissive AND p.polwithcheck IS NULL
+       AND pg_get_expr(p.polqual,p.polrelid)='true'
+       AND p.polroles=ARRAY[(SELECT oid FROM pg_roles WHERE rolname='creator_trust_denial')] AS safe
+       FROM pg_policy p JOIN pg_class c ON c.oid=p.polrelid
+       WHERE c.oid=ANY(ARRAY(SELECT to_regclass(r) FROM unnest($1::text[]) r))
+        AND (SELECT oid FROM pg_roles WHERE rolname='creator_trust_denial')=ANY(p.polroles)`,
+      [generationDenial.policies.map((policy) => policy.relation)],
+    )
+  ).rows;
+  if (
+    policies.length !== generationDenial.policies.length ||
+    policies.some(
+      (policy) =>
+        policy.safe !== true ||
+        !generationDenial.policies.some(
+          (expected) =>
+            expected.relation === policy.relation &&
+            expected.name === policy.name,
+        ),
+    )
+  )
+    fail();
 }

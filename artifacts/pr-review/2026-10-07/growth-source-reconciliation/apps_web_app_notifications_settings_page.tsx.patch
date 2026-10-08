@@ -1,0 +1,63 @@
+diff --git a/apps/web/app/notifications/settings/page.tsx b/apps/web/app/notifications/settings/page.tsx
+index 7bec42a9..9e1d810a 100644
+--- a/apps/web/app/notifications/settings/page.tsx
++++ b/apps/web/app/notifications/settings/page.tsx
+@@ -4,13 +4,13 @@ import {
+   GrowthUnavailable,
+ } from "../../../features/growth/server";
+ import { currentSession } from "../../../lib/session";
++import { GrowthSessionBoundary } from "../../../features/growth/private-view";
+ import { GrowthShell, Failure } from "../../../features/growth/shell";
+ import {
+   PreferenceForm,
+   type PreferencesValue,
+ } from "../../../features/growth/preferences";
+ import { FeedbackForm } from "../../../features/growth/feedback";
+-import { IdentitySessionBoundary } from "../../../features/identity/session-boundary";
+ export const dynamic = "force-dynamic";
+ export default async function Settings() {
+   const session = await currentSession("/notifications/settings");
+@@ -19,9 +19,14 @@ export default async function Settings() {
+       throw new GrowthUnavailable(
+         401,
+         "session_required",
+-        growthCopy.growthSettingsNeedACurrentSignedInAccountAndNetworkConnection,
++        growthCopy.growthContinueWithPantopusToOpenYourAccountSCurrentState,
+       );
+-    const init = { headers: { "X-Expected-Account-Id": session.accountId } };
++    const init = {
++      headers: {
++        "X-Expected-Account-Id": session.accountId,
++        "X-Expected-Session-Id": session.sessionId,
++      },
++    };
+     const [preferences, directory] = await Promise.all([
+       growthRequest<PreferencesValue>("preferences", init),
+       growthRequest<{ creators: { id: string; name: string }[] }>(
+@@ -30,8 +35,7 @@ export default async function Settings() {
+       ),
+     ]);
+     return (
+-      <IdentitySessionBoundary
+-        key={session.sessionId}
++      <GrowthSessionBoundary
+         initial={session}
+         returnTo="/notifications/settings"
+       >
+@@ -39,14 +43,10 @@ export default async function Settings() {
+           <header className="growth-header">
+             <h1>{growthCopy.growthNotificationSettings}</h1>
+           </header>
+-          <PreferenceForm
+-            key={session.accountId}
+-            initial={preferences}
+-            creators={directory.creators}
+-          />
++          <PreferenceForm initial={preferences} creators={directory.creators} />
+           <FeedbackForm />
+         </GrowthShell>
+-      </IdentitySessionBoundary>
++      </GrowthSessionBoundary>
+     );
+   } catch (error) {
+     return (

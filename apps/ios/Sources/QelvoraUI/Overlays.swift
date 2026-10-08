@@ -29,9 +29,10 @@ public struct Notice: View {
       )
       .padding(.top, QelvoraTokens.token("hairline"))
       VStack(alignment: .leading, spacing: 0) {
-        if let title { Text(title).qText("control-body", weight: .semibold) }
-        Text(children).qText("control-body")
+        if let title { Text(title).qText("control-body", weight: .semibold).fixedSize(horizontal: false, vertical: true) }
+        Text(children).qText("control-body").fixedSize(horizontal: false, vertical: true)
       }.frame(maxWidth: .infinity, alignment: .leading)
+        .fixedSize(horizontal: false, vertical: true)
     }.padding(.horizontal, QelvoraTokens.token("message-padding")).padding(
       .vertical, QelvoraTokens.token("space-3")
     )

@@ -7,7 +7,10 @@ import type { CreatorScope } from "./repository.js";
 import { generationJournalInstalled } from "./generation-journal.js";
 import type { PrivacyExportStream } from "../trust/privacy-export.js";
 import type { PrivacyTaskInput } from "../trust/privacy-authority.js";
-import type { PreparedAgentPrivacyExport } from "./privacy-export-snapshot.js";
+import type {
+  AgentPrivacyExportSource,
+  PreparedAgentPrivacyExport,
+} from "./privacy-export-snapshot.js";
 
 /** Consumer of W8's immutable3240da0 PrivacyExportStream, returned
  * by PrivacyHook.run. The coordinator owns durable storage/verification/ack. */
@@ -37,6 +40,7 @@ export function agentExportStream(
   ]);
   const hash = createHash("sha256");
   let heldClient: PoolClient | undefined;
+  let heldSource: AgentPrivacyExportSource | undefined;
   let bytes = 0;
   let count = 0;
   let started = false;
@@ -69,18 +73,21 @@ export function agentExportStream(
     notify();
   };
   signal.addEventListener("abort", abort, { once: true });
-  const buffer = Buffer.alloc(64 * 1024);
+  // The protected store accepts at most one MiB per chunk. Use that finite
+  // budget so ordinary retained source documents do not spend their entire
+  // task lease revalidating the same source for every 64 KiB fragment.
+  const buffer = Buffer.alloc(1024 * 1024);
   let buffered = 0;
   const flush = async () => {
     if (!buffered) return;
     signal.throwIfAborted();
     await assertCurrent();
     invariant(
-      heldClient,
+      heldClient && heldSource && source,
       "privacy_commit_fence_unavailable",
       "Use the actual held export task.",
     );
-    await assertTaskInTransaction(heldClient);
+    await source.prepared.assertCurrentInTransaction(heldClient, heldSource);
     const data = Buffer.from(buffer.subarray(0, buffered));
     buffered = 0;
     invariant(
@@ -160,6 +167,7 @@ export function agentExportStream(
             source.job,
             signal,
           );
+          heldSource = snapshot;
           invariant(
             JSON.stringify(snapshot.creatorIds) ===
               JSON.stringify(scopes.map((scope) => scope.creatorId).sort()) &&
@@ -206,6 +214,7 @@ export function agentExportStream(
     } finally {
       if (failed) complete = false;
       heldClient = undefined;
+      heldSource = undefined;
       signal.removeEventListener("abort", abort);
       resolveDone();
       notify();

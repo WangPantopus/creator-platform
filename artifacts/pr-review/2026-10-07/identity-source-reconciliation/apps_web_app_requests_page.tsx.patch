@@ -1,0 +1,39 @@
+diff --git a/apps/web/app/requests/page.tsx b/apps/web/app/requests/page.tsx
+index 77e1fa33..09feb774 100644
+--- a/apps/web/app/requests/page.tsx
++++ b/apps/web/app/requests/page.tsx
+@@ -1,7 +1,6 @@
+ import { notFound } from "next/navigation";
+ import { copy } from "@qelvora/copy";
+ import { Notice } from "@qelvora/ui-web";
+-import { IdentitySessionBoundary } from "../../features/identity/session-boundary";
+ import { IdentityWelcome } from "../../features/identity/welcome";
+ import { CommerceScreen } from "../../features/commerce/CommerceScreen";
+ import { currentSession } from "../../lib/session";
+@@ -25,11 +24,7 @@ export default async function RequestsPage({
+   const session = await currentSession(returnTo);
+   if (!session) return <IdentityWelcome returnTo={returnTo} arrival={null} />;
+   return (
+-    <IdentitySessionBoundary
+-      key={`${session.accountId}:${session.sessionId}`}
+-      initial={session}
+-      returnTo={returnTo}
+-    >
++    <>
+       {session.mode === "development" && (
+         <div className="qv">
+           <Notice title={copy.identityDevelopmentTitle}>
+@@ -37,7 +32,11 @@ export default async function RequestsPage({
+           </Notice>
+         </div>
+       )}
+-      <CommerceScreen screen="requests" accountId={session.accountId} />
+-    </IdentitySessionBoundary>
++      <CommerceScreen
++        key={`${session.accountId}:${session.sessionId}`}
++        screen="requests"
++        session={session}
++      />
++    </>
+   );
+ }

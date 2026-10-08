@@ -1,0 +1,30 @@
+{
+  "sourcePR": 145,
+  "sourceHead": "da0e2af95baa19280ddf3ebdae4ce8ead1a5eca7",
+  "implementationCommit": "8eff5fae5aba0b14f133a412b009096037343ee3",
+  "integrationAtProof": "d254a4f17a263df12343d38344bbe23d6b49fd60",
+  "byteIdenticalFiles": [
+    {
+      "path": "apps/backend/migrations/0093_w8_generation_worker_denial.sql",
+      "blob": "34ac260e6b3de8ad5e6bcc005e26e436d0771cf2"
+    },
+    {
+      "path": "apps/backend/migrations/0100_w8_generation_terminal_denial.sql",
+      "blob": "873cf1a01e36ac540cb64c7ebc0d224fc4c290c8"
+    },
+    {
+      "path": "apps/backend/src/core/query-settlement.ts",
+      "blob": "804aeb8eb1889516cd0d4d6077cea251cfc7cded"
+    },
+    {
+      "path": "apps/backend/src/modules/trust/restoration.ts",
+      "blob": "0acf53ef30c893b980b76ae727a80ee9533a6c76"
+    }
+  ],
+  "semanticChecks": [
+    "operations/runtime.ts matches #145 completely except the retained newer idempotent shutdown declaration and stop implementation from original #132.",
+    "Both original integration.ts additions (type and forwarding callback) match #145 exactly.",
+    "0177_w8_generation_worker_denial: original SQL path/owner/SHA retained in the previously registered 20261007-generation wave; no registry change in this repair.",
+    "0184_w8_generation_terminal_denial: original SQL path/owner/SHA retained in the previously registered 20261007-generation wave; no registry change in this repair."
+  ]
+}

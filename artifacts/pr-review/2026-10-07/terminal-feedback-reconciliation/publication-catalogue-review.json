@@ -1,0 +1,47 @@
+{
+  "rows": [
+    {
+      "name": "original",
+      "priorChecksum": "8f80e665642aea3c31b79608c8137df9e308d3e0934a937e866c0fbbc53aa4bc",
+      "correctedChecksum": "8f80e665642aea3c31b79608c8137df9e308d3e0934a937e866c0fbbc53aa4bc",
+      "unchanged": true
+    },
+    {
+      "name": "worker",
+      "priorChecksum": "9a216ea9a97544d131b67ed1c0b5fc41ac4599aa72efe26064555feb5b893cc6",
+      "correctedChecksum": "9a216ea9a97544d131b67ed1c0b5fc41ac4599aa72efe26064555feb5b893cc6",
+      "unchanged": true
+    }
+  ],
+  "defaults": [
+    {
+      "kind": "r",
+      "privileges": [
+        "DELETE",
+        "INSERT",
+        "MAINTAIN",
+        "REFERENCES",
+        "SELECT",
+        "TRIGGER",
+        "TRUNCATE",
+        "UPDATE"
+      ]
+    },
+    {
+      "kind": "s",
+      "privileges": [
+        "SELECT",
+        "UPDATE",
+        "USAGE"
+      ]
+    },
+    {
+      "kind": "S",
+      "privileges": [
+        "USAGE"
+      ]
+    }
+  ],
+  "readOnly": true,
+  "activation": false
+}

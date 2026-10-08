@@ -1,0 +1,360 @@
+{
+  "scope": "Closed original migration role/schema review for the full39-source graph. Not an activation runner, executable registration, private task or runtime-release qualification.",
+  "sourceParent": "e6fc6859570f8e121731f5ccb2ff78d8238fbaec",
+  "sourceSha256": {
+    "apps/backend/scripts/migration-generation-roles.ts": "ceada9b7cef818db63e7f4a77cfb7f17023d8130dfd55dd9b5507a0c83848824",
+    "infra/migrations/reviews/20261007-generation-purpose-roles.json": "729bafe794af22002044e4dc96c7ea11c641451f702ac253fd3308d1519c39bf"
+  },
+  "profiles": {
+    "fresh": {
+      "scope": "Actual exported operator reader over closed39-source staged execution; fixed reviewed role/schema profile plus original source/ledger/denial checker; no registry/task activation.",
+      "mode": "fresh",
+      "fingerprint": "2d7e24154f5b2a988df3e730d3280eb5b74a51747c2d80177dde27b315eec680",
+      "parts": {
+        "roles": {
+          "sha256": "f9dcc87573b8cba1d0ceb97682119a38a694e55d200557e177dc50c6fff1a405",
+          "records": 28
+        },
+        "memberships": {
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "records": 0
+        },
+        "settings": {
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "records": 0
+        },
+        "dependencies": {
+          "sha256": "f23d6543aa33d108f4ab90ba06afc7044e4d1384e91b5b95740512d3b382d371",
+          "records": 1732
+        },
+        "functions": {
+          "sha256": "b9ea91af0d32ec8559e4675576526a7631ffdd0c2ae61120016e49168ad6bfc3",
+          "records": 440
+        },
+        "permissions": {
+          "sha256": "918ce9e5b4e3b00b63472166f446f583155daab504fb51a3aa0e9cb4d83d57ce",
+          "records": 28
+        },
+        "schema": {
+          "sha256": "b18b6cb0f70284d783274135033aa014c48218197b233de4ec4b4ebaf747150e",
+          "records": 2
+        },
+        "internalTriggers": {
+          "sha256": "52c13e0008e485b80459e46cc786d2cb82df583c9d92f8b8644531cf6c2367ca",
+          "records": 716
+        }
+      },
+      "searchPathPreserved": true,
+      "preabortPreserved": true,
+      "accepted": {
+        "original": {
+          "checkedRoles": 3,
+          "pinnedFunctions": 12,
+          "directCapabilities": 154,
+          "publicCapabilities": 357,
+          "pinnedPublicFunctions": 26
+        },
+        "purposeRoles": 28
+      },
+      "drifts": [
+        "creator_commerce_public_read_login",
+        "creator_generation_authority_login",
+        "creator_generation_conversation_context_login",
+        "creator_generation_cursor_authority_login",
+        "creator_generation_terminal_authority_login",
+        "creator_generation_terminal_discovery_login",
+        "creator_generation_worker_login",
+        "creator_privacy_accounting_boundary_login",
+        "creator_privacy_family_login",
+        "creator_privacy_ownership_metadata_login",
+        "creator_signature_read_authority_login",
+        "creator_usage_detachment_login",
+        "creator_usage_expiry_login",
+        "creator_w2_generation_guardrail_login",
+        "creator_w2_generation_input_login",
+        "creator_w2_generation_journal_login",
+        "creator_w2_generation_metadata_login",
+        "creator_w2_generation_retrieval_login",
+        "creator_w2_generation_terminal_journal_login",
+        "creator_w2_privacy_export_login",
+        "creator_w3_generation_output_login",
+        "creator_w3_generation_privacy_login",
+        "creator_w3_privacy_export_login",
+        "creator_w3_terminal_output_login",
+        "creator_w4_generation_audience_login",
+        "creator_w4_generation_safety_terminal_login",
+        "creator_w4_generation_terminal_login",
+        "creator_w5_generation_origin_login",
+        "purpose_parent",
+        "purpose_child",
+        "purpose_config",
+        "worker_body",
+        "private_scope_to_core",
+        "private_accounting_to_core",
+        "scope_insert_to_core",
+        "extra_owned_sequence",
+        "new_public_helper",
+        "changed_consumer_volatility",
+        "private_unforced",
+        "private_trigger_disabled",
+        "extra_private_column",
+        "disabled_internal_fk",
+        "replica_internal_fk",
+        "deferred_fk"
+      ],
+      "allDetectedAndRestored": true,
+      "equivalentForeignKeyRecreationStable": true,
+      "canonical61Refused": true,
+      "before": {
+        "ledger": "cbd92d22449341a0720294a66d292ee7b2dd9bd65ee69924727f7f2529d40017",
+        "schema": "47ce91688f162cd5848cc6a44d738e85bb3aab0770c05c3be8f2cac0a1eafbe6",
+        "roles": "70c667c5cdf17199c08459270b8bd7006372e3e40299799bc19b092915bdd7d8",
+        "security": "5b99fafdd59f4cc447ddd14a2e55f5f0daf2d48d7ba929348fb824b346fe5af8",
+        "sequences": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+        "data": "39fa6ab7d2f6083cc5e50f0ab4ee847fdb7425d42987b07abd0f3fac275aac00",
+        "ledgerRows": 61,
+        "tables": 163,
+        "dataRows": 257
+      },
+      "after": {
+        "ledger": "cbd92d22449341a0720294a66d292ee7b2dd9bd65ee69924727f7f2529d40017",
+        "schema": "47ce91688f162cd5848cc6a44d738e85bb3aab0770c05c3be8f2cac0a1eafbe6",
+        "roles": "70c667c5cdf17199c08459270b8bd7006372e3e40299799bc19b092915bdd7d8",
+        "security": "5b99fafdd59f4cc447ddd14a2e55f5f0daf2d48d7ba929348fb824b346fe5af8",
+        "sequences": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+        "data": "39fa6ab7d2f6083cc5e50f0ab4ee847fdb7425d42987b07abd0f3fac275aac00",
+        "ledgerRows": 61,
+        "tables": 163,
+        "dataRows": 257
+      }
+    },
+    "preserved": {
+      "scope": "Actual exported operator reader over closed39-source staged execution; fixed reviewed role/schema profile plus original source/ledger/denial checker; no registry/task activation.",
+      "mode": "preserved",
+      "fingerprint": "04c70b75424e62760bd7ad4f85f4fd303a9da9fcd2444ee3a0fe1f7897074bb4",
+      "parts": {
+        "roles": {
+          "sha256": "f9dcc87573b8cba1d0ceb97682119a38a694e55d200557e177dc50c6fff1a405",
+          "records": 28
+        },
+        "memberships": {
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "records": 0
+        },
+        "settings": {
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "records": 0
+        },
+        "dependencies": {
+          "sha256": "f23d6543aa33d108f4ab90ba06afc7044e4d1384e91b5b95740512d3b382d371",
+          "records": 1732
+        },
+        "functions": {
+          "sha256": "b9ea91af0d32ec8559e4675576526a7631ffdd0c2ae61120016e49168ad6bfc3",
+          "records": 440
+        },
+        "permissions": {
+          "sha256": "918ce9e5b4e3b00b63472166f446f583155daab504fb51a3aa0e9cb4d83d57ce",
+          "records": 28
+        },
+        "schema": {
+          "sha256": "6e83d153a9fda439555cbedeed4e6076b052f9e332fb3297e31b126e3a3a1203",
+          "records": 2
+        },
+        "internalTriggers": {
+          "sha256": "52c13e0008e485b80459e46cc786d2cb82df583c9d92f8b8644531cf6c2367ca",
+          "records": 716
+        }
+      },
+      "searchPathPreserved": true,
+      "preabortPreserved": true,
+      "accepted": {
+        "original": {
+          "checkedRoles": 3,
+          "pinnedFunctions": 12,
+          "directCapabilities": 154,
+          "publicCapabilities": 357,
+          "pinnedPublicFunctions": 26
+        },
+        "purposeRoles": 28
+      },
+      "drifts": [
+        "creator_commerce_public_read_login",
+        "creator_generation_authority_login",
+        "creator_generation_conversation_context_login",
+        "creator_generation_cursor_authority_login",
+        "creator_generation_terminal_authority_login",
+        "creator_generation_terminal_discovery_login",
+        "creator_generation_worker_login",
+        "creator_privacy_accounting_boundary_login",
+        "creator_privacy_family_login",
+        "creator_privacy_ownership_metadata_login",
+        "creator_signature_read_authority_login",
+        "creator_usage_detachment_login",
+        "creator_usage_expiry_login",
+        "creator_w2_generation_guardrail_login",
+        "creator_w2_generation_input_login",
+        "creator_w2_generation_journal_login",
+        "creator_w2_generation_metadata_login",
+        "creator_w2_generation_retrieval_login",
+        "creator_w2_generation_terminal_journal_login",
+        "creator_w2_privacy_export_login",
+        "creator_w3_generation_output_login",
+        "creator_w3_generation_privacy_login",
+        "creator_w3_privacy_export_login",
+        "creator_w3_terminal_output_login",
+        "creator_w4_generation_audience_login",
+        "creator_w4_generation_safety_terminal_login",
+        "creator_w4_generation_terminal_login",
+        "creator_w5_generation_origin_login",
+        "purpose_parent",
+        "purpose_child",
+        "purpose_config",
+        "worker_body",
+        "private_scope_to_core",
+        "private_accounting_to_core",
+        "scope_insert_to_core",
+        "extra_owned_sequence",
+        "new_public_helper",
+        "changed_consumer_volatility",
+        "private_unforced",
+        "private_trigger_disabled",
+        "extra_private_column",
+        "disabled_internal_fk",
+        "replica_internal_fk",
+        "deferred_fk"
+      ],
+      "allDetectedAndRestored": true,
+      "equivalentForeignKeyRecreationStable": true,
+      "canonical61Refused": true,
+      "before": {
+        "ledger": "884d8cc8a15cc50aec771fde91730215f9965fce671c021275873aac3d3a6897",
+        "schema": "daa229d0ff1e43c4ac23a77829b5a8393499f281750e0eaabfb9c97e33424f95",
+        "roles": "1299e1c5afb74c63bae1cf777f62900fe46fa986c24289830c545c0481630f24",
+        "security": "94a67ff09f134c44b31a4e4e5d74d4cbac000d08a5597299568930824cf99474",
+        "sequences": "52fcbf4b187a82aded3cedc07cfbf251d9db000efb3a818f33ceb392179d3ea0",
+        "data": "e8c8ef79523c011f547372c51f0204dabf61cd62071996af75696cb5b1e6abaf",
+        "ledgerRows": 61,
+        "tables": 163,
+        "dataRows": 188
+      },
+      "after": {
+        "ledger": "884d8cc8a15cc50aec771fde91730215f9965fce671c021275873aac3d3a6897",
+        "schema": "daa229d0ff1e43c4ac23a77829b5a8393499f281750e0eaabfb9c97e33424f95",
+        "roles": "1299e1c5afb74c63bae1cf777f62900fe46fa986c24289830c545c0481630f24",
+        "security": "94a67ff09f134c44b31a4e4e5d74d4cbac000d08a5597299568930824cf99474",
+        "sequences": "52fcbf4b187a82aded3cedc07cfbf251d9db000efb3a818f33ceb392179d3ea0",
+        "data": "e8c8ef79523c011f547372c51f0204dabf61cd62071996af75696cb5b1e6abaf",
+        "ledgerRows": 61,
+        "tables": 163,
+        "dataRows": 188
+      }
+    }
+  },
+  "comparison": {
+    "purposeRoles": 28,
+    "dependencies": 1732,
+    "effectiveFunctions": 440,
+    "internalTriggers": 716,
+    "allInternalLogicalIdentitiesDistinct": true,
+    "longestIdentityCharacters": 126,
+    "equalParts": [
+      "roles",
+      "memberships",
+      "settings",
+      "dependencies",
+      "functions",
+      "permissions",
+      "internalTriggers"
+    ],
+    "difference": {
+      "part": "schema.metadata.memberships",
+      "fresh": [],
+      "preserved": [
+        {
+          "role": "creator_runtime",
+          "member": "creator_review_growth_api",
+          "grantor": "postgres",
+          "admin_option": false,
+          "inherit_option": true,
+          "set_option": true
+        },
+        {
+          "role": "growth_runtime",
+          "member": "creator_review_growth_api",
+          "grantor": "postgres",
+          "admin_option": false,
+          "inherit_option": true,
+          "set_option": true
+        }
+      ],
+      "interpretation": "Existing incoming creator_review_growth_api child of creator_runtime and growth_runtime is retained exactly; no role deletion or arbitrary normalization."
+    }
+  },
+  "originalOwnedTables": [
+    {
+      "role": "creator_usage_detachment",
+      "deptype": "o",
+      "type": "table",
+      "object_names": ["creator_trust", "detached_usage"],
+      "object_args": []
+    },
+    {
+      "role": "creator_usage_detachment",
+      "deptype": "o",
+      "type": "table",
+      "object_names": ["creator_trust", "detached_usage_expiry"],
+      "object_args": []
+    },
+    {
+      "role": "creator_usage_detachment",
+      "deptype": "o",
+      "type": "table",
+      "object_names": ["creator_trust", "detached_usage_summary"],
+      "object_args": []
+    },
+    {
+      "role": "creator_usage_expiry",
+      "deptype": "o",
+      "type": "table",
+      "object_names": ["creator_trust", "usage_expiry_job"],
+      "object_args": []
+    },
+    {
+      "role": "creator_usage_expiry",
+      "deptype": "o",
+      "type": "table",
+      "object_names": ["creator_trust", "usage_expiry_scope"],
+      "object_args": []
+    },
+    {
+      "role": "creator_w2_privacy_export",
+      "deptype": "o",
+      "type": "table",
+      "object_names": ["creator", "agent_privacy_export_scope"],
+      "object_args": []
+    },
+    {
+      "role": "creator_w3_privacy_export",
+      "deptype": "o",
+      "type": "table",
+      "object_names": ["creator", "conversation_privacy_export_scope"],
+      "object_args": []
+    }
+  ],
+  "reviewFindings": [
+    "The complete application schema/ACL projection is required: granting an existing core role access to a new private table need not change the table owner effective permissions. Both scope and detached-accounting exposure are refused.",
+    "Recognized generated internal FK names use constraint-owning relation, constraint, function and event identity. The first candidate implicitly returned PostgreSQL name, truncating at63 bytes and causing70 positions to reorder despite equal rows. The candidate guard correctly refused. Explicit text and full identity fix this; the prior provenance purger already used text and was unaffected.",
+    "The first internal-trigger query used reserved alias deferrable, refused42601; aliases corrected before successful qualification. The preliminary external collector separately corrected an alias/COLLATE42703. Every failed outer transaction rolled back with all six original custodies unchanged."
+  ],
+  "validation": {
+    "backendTypecheck": "passed",
+    "scopedESLintPrettierDiff": "passed",
+    "newTests": false,
+    "limits": [
+      "Six runtime purpose pins remain undefined; exact canonical executable registry and retained ledgers remain61.",
+      "Private backup/independent restore, reviewed activation packet, original privacy-wave composition and actual prepared graph operation remain open.",
+      "No populated generation, provider request, financial disposition, usage expiry, account erasure, original task, lease or completed receipt was fabricated. All-eight C10 and restoration replay remain unqualified."
+    ]
+  }
+}

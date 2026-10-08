@@ -1,0 +1,73 @@
+{
+  "definitions": {
+    "creator.fence_generation_first_claim()": "c1374b465c9a4ceaf58661a9e6f2e93b15a1f3462ae62af71301ab6dcc668171",
+    "creator.pending_generation_tasks(integer)": "69e18fd0c8f7f0cc1582f07980372587153e953ad20844d7720d7a4005e00330",
+    "creator.pending_generation_terminals(integer)": "b619edf7052bba513ea9b060289eabdf00424364b37ae75823018a7fcbb8cdef"
+  },
+  "metadataReady": true,
+  "realWorkerEmptyDiscovery": {
+    "fresh": [],
+    "cursors": [],
+    "terminal": []
+  },
+  "retained": {
+    "usage": 0,
+    "ledger": 61,
+    "threads": 0,
+    "generations": 0,
+    "workerScopes": 0,
+    "terminalScopes": 0
+  },
+  "scope": "Closed review of discovery provenance filters on the existing held 27-source graph. Temporary metadata fixtures are not accepted tasks or positive authority.",
+  "sourceSha256": "9eba74f6ae86c52eddde1acc4f7780a5c98762a86681920e11edfec15cd070a8",
+  "temporaryMetadataFixtures": 216,
+  "selectorResults": [
+    {
+      "selector": "fresh",
+      "limit": 1,
+      "matchedIds": [1]
+    },
+    {
+      "selector": "fresh",
+      "limit": 20,
+      "matchedIds": [1]
+    },
+    {
+      "selector": "fresh",
+      "limit": 64,
+      "matchedIds": [1]
+    },
+    {
+      "selector": "recovery",
+      "limit": 1,
+      "matchedIds": [3]
+    },
+    {
+      "selector": "recovery",
+      "limit": 20,
+      "matchedIds": [3, 4, 5]
+    },
+    {
+      "selector": "recovery",
+      "limit": 64,
+      "matchedIds": [3, 4, 5]
+    }
+  ],
+  "unchangedCatalogueParts": [
+    "cursor_relations",
+    "cursor_schemas",
+    "writer_relations",
+    "writer_schemas",
+    "discovery_relations",
+    "discovery_schemas",
+    "original_relations",
+    "original_schemas",
+    "output_catalogue"
+  ],
+  "all11CataloguePartsRestored": true,
+  "unacceptedCandidateFingerprints": {
+    "output": "34027fef46ea0ae7027172e5a9705c608ffb6998aa37c6b21aa5bf0d2a589e86",
+    "terminal": "89e236b9c416b7e00a4a3bf7800db7eac493b619d07bfcb4dd7b9fecee98e7d5",
+    "financial": "bfccb76cc60dd9bf18cee6c562ad5bcde384e63bfb05a3e2dd3a872621d3e4ab"
+  }
+}

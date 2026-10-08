@@ -1,0 +1,90 @@
+{
+  "scope": "Host shutdown and actual original ingestion transaction drain only; no accepted generation or provider execution.",
+  "ingestion": {
+    "scope": "Real canonical runtime, original AgentRepository transaction and IngestionWorker with absent creators. No ingestion job, provider, positive purpose or receipt fabricated.",
+    "observations": [
+      {
+        "case": "close_before_first_tick",
+        "noDatabaseCheckout": true,
+        "sameClosePromise": true
+      },
+      {
+        "case": "blocked_original_ingestion",
+        "realDatabaseLockObserved": true,
+        "closeWaitsForActualTransaction": true,
+        "sameClosePromise": true
+      },
+      {
+        "case": "drained_denial",
+        "originalFailureCode": "creator_required",
+        "originalRollbackClearsContext": true,
+        "poolReusable": true,
+        "businessRowsUnchanged": true,
+        "elapsedMs": 1094
+      }
+    ],
+    "before": {
+      "usage": 0,
+      "jobs": 0,
+      "workspaces": 0
+    },
+    "after": {
+      "usage": 0,
+      "jobs": 0,
+      "workspaces": 0
+    }
+  },
+  "backend": {
+    "scope": "Actual configured canonical backend without Trust, provider or feature activation. Tests only host resource shutdown.",
+    "observations": [
+      {
+        "case": "prepared_only",
+        "sameClosePromise": true,
+        "listenerClosed": true,
+        "poolClosed": true,
+        "sourceBackendGone": true,
+        "waitedForActualDatabaseRead": false,
+        "realtimeCloseCode": null,
+        "elapsedMs": 3
+      },
+      {
+        "case": "listening",
+        "sameClosePromise": true,
+        "listenerClosed": true,
+        "poolClosed": true,
+        "sourceBackendGone": true,
+        "waitedForActualDatabaseRead": false,
+        "realtimeCloseCode": null,
+        "elapsedMs": 4
+      },
+      {
+        "case": "active_database_read",
+        "sameClosePromise": true,
+        "listenerClosed": true,
+        "poolClosed": true,
+        "sourceBackendGone": true,
+        "waitedForActualDatabaseRead": true,
+        "realtimeCloseCode": null,
+        "elapsedMs": 208
+      },
+      {
+        "case": "realtime_connection",
+        "sameClosePromise": true,
+        "listenerClosed": true,
+        "poolClosed": true,
+        "sourceBackendGone": true,
+        "waitedForActualDatabaseRead": false,
+        "realtimeCloseCode": 1001,
+        "elapsedMs": 3
+      }
+    ]
+  },
+  "validation": {
+    "backendTypesAndBuild": "pass",
+    "scopedLint": "pass"
+  },
+  "limits": [
+    "Trust startup failure cleanup is source-reviewed, not operated with a configured Trust worker.",
+    "The standalone generation executable remains guarded until genuine purpose/catalogue, privacy and accepted-task qualification."
+  ]
+}

@@ -1,0 +1,116 @@
+diff --git a/apps/backend/src/modules/conversation/runtime.ts b/apps/backend/src/modules/conversation/runtime.ts
+index 5dad33c8..136a4568 100644
+--- a/apps/backend/src/modules/conversation/runtime.ts
++++ b/apps/backend/src/modules/conversation/runtime.ts
+@@ -22,6 +22,7 @@ import type { ConversationRecordings } from "./recordings.js";
+ import type { ConversationCorrections } from "./corrections.js";
+ import type { GenerationCostReconciliation } from "../commerce/generation-allowance.js";
+ import type { CommerceFulfillmentPlans } from "../commerce/fulfillment-plans.js";
++import { PreparedGenerationAcceptance } from "./generation-acceptance.js";
+ 
+ export function createConversationRuntime(input: {
+   database: Database;
+@@ -32,6 +33,7 @@ export function createConversationRuntime(input: {
+   offlineIssuer?: { origin: string; environment: string | undefined };
+   generator?: ConversationGenerator;
+   generatorFactory?: (memory: MemoryService) => ConversationGenerator;
++  generationAcceptance?: PreparedGenerationAcceptance;
+   allowance?: ConversationAllowance;
+   /** W4's prepared port proves the exact configured AccessService identity.
+    * Keep allowance absent to select its single canonical generation path. */
+@@ -92,8 +94,33 @@ export function createConversationRuntime(input: {
+     input.conversation.configureFulfillmentPlans(input.fulfillmentPlans);
+   const memory = new MemoryService(input.database, input.semantics);
+   const wellbeing = new ConversationWellbeing(input.database, input.mode);
++  const acceptance = input.generationAcceptance;
++  invariant(
++    !acceptance ||
++      (acceptance instanceof PreparedGenerationAcceptance &&
++        !input.generator &&
++        !input.generatorFactory &&
++        !input.allowance &&
++        input.generationCostReconciliation),
++    "generation_execution_conflict",
++    "Scoped generation requires its original acceptance and cost reconciliation.",
++  );
++  acceptance?.assertComposition(input.database, input.access);
+   const generator = input.generator ?? input.generatorFactory?.(memory);
+-  generator?.journal?.assertPool(input.database.pool);
++  const journal = acceptance?.journal ?? generator?.journal;
++  journal?.assertPool(input.database.pool);
++  const assertReady = acceptance
++    ? async (scope: ThreadScope, client: PoolClient) => {
++        await acceptance.assertReady(scope, client);
++        await input.assertReady?.(scope, client);
++      }
++    : input.assertReady;
++  const citation = acceptance
++    ? acceptance.citation.bind(acceptance)
++    : input.citation;
++  const routeSafety = acceptance
++    ? acceptance.routeSafety.bind(acceptance)
++    : generator?.routeSafety?.bind(generator);
+   const processor = generator
+     ? new ConversationGenerationProcessor(
+         input.database,
+@@ -109,11 +136,12 @@ export function createConversationRuntime(input: {
+     ...(input.generationCostReconciliation
+       ? { reconciliation: input.generationCostReconciliation }
+       : {}),
+-    ...(input.assertReady ? { assertReady: input.assertReady } : {}),
++    ...(assertReady ? { assertReady } : {}),
+     ...(input.assertApproved ? { assertApproved: input.assertApproved } : {}),
+-    ...(input.citation ? { citation: input.citation } : {}),
++    ...(citation ? { citation } : {}),
+     ...(input.lineage ? { lineage: input.lineage } : {}),
+-    ...(generator?.journal ? { journal: generator.journal } : {}),
++    ...(journal ? { journal } : {}),
++    ...(acceptance ? { generationAcceptance: acceptance } : {}),
+   });
+   const feature = new ConversationFeature(
+     input.database,
+@@ -122,24 +150,25 @@ export function createConversationRuntime(input: {
+     memory,
+     input.policy,
+     Boolean(
+-      generator &&
+-        generator.executionAttributed &&
+-        generator.journal &&
+-        generator.seal &&
++      (acceptance ||
++        (generator &&
++          generator.executionAttributed &&
++          generator.journal &&
++          generator.seal &&
++          input.assertApproved)) &&
+         (input.allowance || input.generationCostReconciliation) &&
+-        input.citation &&
+-        input.assertReady &&
+-        input.assertApproved &&
++        citation &&
++        assertReady &&
+         (input.policy?.verified || input.developmentPolicy),
+     ),
+     (scope) => processor?.schedule(scope),
+     conversationSocketTickets,
+-    input.citation,
++    citation,
+     wellbeing,
+     input.firstConversation,
+-    generator?.routeSafety
++    routeSafety
+       ? (scope, text, signal, deliver) =>
+-          generator.routeSafety!(
++          routeSafety(
+             scope,
+             text,
+             {
+@@ -156,7 +185,7 @@ export function createConversationRuntime(input: {
+     (scope, epoch) => processor?.interrupt(scope.threadId, epoch),
+     input.lineage,
+     input.corrections,
+-    input.assertReady,
++    assertReady,
+     input.recordings,
+     input.offlineIssuer
+       ? new ConversationOfflineIssuer(

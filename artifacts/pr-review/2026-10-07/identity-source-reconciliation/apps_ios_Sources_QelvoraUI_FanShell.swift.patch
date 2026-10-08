@@ -1,0 +1,91 @@
+diff --git a/apps/ios/Sources/QelvoraUI/FanShell.swift b/apps/ios/Sources/QelvoraUI/FanShell.swift
+index b77e736e..1e08dcff 100644
+--- a/apps/ios/Sources/QelvoraUI/FanShell.swift
++++ b/apps/ios/Sources/QelvoraUI/FanShell.swift
+@@ -403,6 +403,7 @@ public struct FanAppShell: View {
+     @State private var destinationDelivery = UUID()
+     private let features: [FanFeatureRegistration]
+     @Environment(\.colorScheme) private var scheme
++    @Environment(\.dynamicTypeSize) private var textSize
+     @Environment(\.scenePhase) private var scenePhase
+     #if os(iOS)
+     @ObservedObject private var push = GrowthPushCoordinator.shared
+@@ -410,19 +411,25 @@ public struct FanAppShell: View {
+     #endif
+     public init(baseURL: URL? = nil, returnTo: String = "/home", features: [FanFeatureRegistration] = []) { _model = StateObject(wrappedValue: FanSession(baseURL: baseURL, destination: returnTo)); self.features = features }
+     public var body: some View {
++        GeometryReader { frame in
+         VStack(spacing: 0) {
+-            if !model.error.isEmpty {
+-              Notice(tone: .error, title: "Account status", children: model.error, accessibilityIdentifier: model.session == nil && model.error == QelvoraCopy.text("pantopusUnavailable") ? "pantopus-unavailable" : "account-status").padding(16)
+-            }
+-            if model.localPurgeFailed {
+-                Button(QelvoraCopy.text("identityPrivateClearRetry"), variant: .secondary, block: true, disabled: model.busy || model.purgingPrivateState) { Task { await model.purge() } }.padding(.horizontal, 16)
++            if !model.error.isEmpty || model.localPurgeFailed || showsDevelopmentNotice {
++                if textSize.isAccessibilitySize {
++                    // Keep all status text reachable without displacing the destination or navigation.
++                    ViewThatFits(in: .vertical) {
++                        shellNotices.fixedSize(horizontal: false, vertical: true)
++                        ScrollView { shellNotices }
++                    }.frame(maxHeight: max(0, frame.size.height / 3), alignment: .top).clipped()
++                } else {
++                    shellNotices
++                }
+             }
+             if model.choosingDevelopmentActor {
+-                VStack(spacing: 16) {
++                ScrollView { VStack(spacing: 16) {
+                     Notice(title: "Development identity", children: "Synthetic isolated accounts. Pantopus production sign-in is not connected.")
+                     ForEach(model.actors, id: \.id) { actor in Button(actor.label, variant: .secondary, block: true, disabled: model.busy) { Task { await model.selectActor(actor.id) } } }
+                     Button("Cancel", variant: .quiet) { model.choosingDevelopmentActor = false }
+-                }.padding(16)
++                }.padding(16) }
+             } else if model.session == nil, let feature = features.first(where: { $0.matches(model.destination) && $0.allowsSignedOut(model.destination) }) {
+                 feature.screen(model).id(model.destination + destinationDelivery.uuidString)
+             } else if model.session == nil, model.hasSavedCredential {
+@@ -450,7 +457,6 @@ public struct FanAppShell: View {
+             } else {
+                 VStack(spacing: 0) {
+                     let feature = features.first(where: { $0.matches(model.destination) })
+-                    if model.session?.mode == .development { Notice(title: "Development identity", children: "Synthetic account · actual local API.").padding(16) }
+                     if model.destination == "/identity/account" || (model.destination == "/you" && feature == nil) {
+                         ScrollView { VStack(alignment: .leading, spacing: 16) {
+                             Text("Your account").qText("display-md")
+@@ -470,9 +476,10 @@ public struct FanAppShell: View {
+                     } else if model.destination == "/onboarding/handle" { NativeHandleForm(model: model).id((model.session?.accountId ?? "") + (model.session?.sessionId ?? "")) }
+                     else if let feature { feature.screen(model).id((model.session?.accountId ?? "") + (model.session?.sessionId ?? "") + model.destination + destinationDelivery.uuidString) }
+                     else { EmptyState(title: "This destination is not connected yet", body: "Your account and arrival context are kept. Return to your account or try again when this feature is available.") { Button("Your account", variant: .secondary) { model.destination = "/you" } }.frame(maxHeight: .infinity) }
+-                    TabBar(active: tab) { model.destination = "/" + $0.rawValue.lowercased() }
++                    TabBar(active: tab) { model.destination = "/" + $0.rawValue.lowercased() }.layoutPriority(1)
+                 }
+             }
++        }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+         }.foregroundStyle(qColor("ink", scheme)).background(qColor("ground", scheme))
+             .task(id: scenePhase) {
+                 guard scenePhase == .active else { return }
+@@ -502,6 +509,25 @@ public struct FanAppShell: View {
+                 if ApplicationDestination.isPermitted(target) { destinationDelivery = UUID() }
+             }
+     }
++    private var showsDevelopmentNotice: Bool {
++        guard model.session?.mode == .development, !model.choosingDevelopmentActor else { return false }
++        if model.session?.fan == nil {
++            if features.contains(where: { $0.matches(model.destination) && $0.allowsSignedOut(model.destination) }) { return false }
++            if ApplicationDestination.requiresFanProfile(model.destination) { return false }
++        }
++        return true
++    }
++    private var shellNotices: some View {
++        VStack(spacing: 0) {
++            if !model.error.isEmpty {
++                Notice(tone: .error, title: "Account status", children: model.error, accessibilityIdentifier: model.session == nil && model.error == QelvoraCopy.text("pantopusUnavailable") ? "pantopus-unavailable" : "account-status").padding(16)
++            }
++            if model.localPurgeFailed {
++                Button(QelvoraCopy.text("identityPrivateClearRetry"), variant: .secondary, block: true, disabled: model.busy || model.purgingPrivateState) { Task { await model.purge() } }.padding(.horizontal, 16)
++            }
++            if showsDevelopmentNotice { Notice(title: "Development identity", children: "Synthetic account · actual local API.").padding(16) }
++        }
++    }
+     private var tab: FanTab {
+         let path = model.destination.components(separatedBy: "?")[0]
+         if path.hasPrefix("/identity/") || path == "/support" || path.hasPrefix("/support/") || path == "/notifications/settings" || path == "/commerce/spending" || StudioTeamFeature.matches(path) { return .you }

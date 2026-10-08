@@ -1,0 +1,799 @@
+{
+  "scope": "Intermediate operations, including failed diagnostics; none is a completed generation qualification. Full sensitive receipts remain private.",
+  "attempts": [
+    {
+      "receipt": "generation-acceptance-source-1791413928923.json",
+      "sha256": "10ea8c7870463e6b8198c26d85a3b51a90e040aaf4a442ad8d8c590dde20b9a1",
+      "revision": "94c2428415b93938081c24654183bce212d296e4+candidate-host",
+      "database": "creator_pr132_privacy10_20261007",
+      "completedChecks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login"
+      ],
+      "workerPass": null,
+      "generationUsage": [],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "qualified": false
+    },
+    {
+      "receipt": "generation-acceptance-source-1791413974986.json",
+      "sha256": "cfbcfa087d183f63301a6c196daaccb2e190982515c62f8b4c2e388ebcee6629",
+      "revision": "53a72c52e4cdd05753bd26ff808b1809b3018322",
+      "database": "creator_pr132_privacy10_20261007",
+      "completedChecks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "isolated_candidate_original_generation_composed",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_worker_and_acceptance_composed"
+      ],
+      "workerPass": null,
+      "generationUsage": [],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "qualified": false
+    },
+    {
+      "receipt": "generation-acceptance-source-1791414020695.json",
+      "sha256": "37353d412e989a4812af1ccc4aa8052eb33da7e13b4c67782a5626114397aa85",
+      "revision": "53a72c52e4cdd05753bd26ff808b1809b3018322",
+      "database": "creator_pr132_privacy10_20261007",
+      "completedChecks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "isolated_candidate_original_generation_composed",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_worker_and_acceptance_composed",
+        "real_canonical_creator_session_and_studio_read"
+      ],
+      "workerPass": null,
+      "generationUsage": [],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "qualified": false
+    },
+    {
+      "receipt": "generation-acceptance-source-1791414155668.json",
+      "sha256": "b36b412cbb3b0c487175096855a39dfae78dc6e5adba3916585600eeae1839ef",
+      "revision": "87a9c91caa81173742d1ac6968737e013be72af4",
+      "database": "creator_pr132_privacy10_20261007",
+      "completedChecks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "isolated_candidate_original_generation_composed",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_worker_and_acceptance_composed"
+      ],
+      "workerPass": null,
+      "generationUsage": [],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "qualified": false
+    },
+    {
+      "receipt": "generation-acceptance-source-1791414181835.json",
+      "sha256": "e45d68e437e8f1d24becfe3e65a41d03bea4a47b8dd889d8215d3b511072e90f",
+      "revision": "87a9c91caa81173742d1ac6968737e013be72af4",
+      "database": "creator_pr132_privacy10_20261007",
+      "completedChecks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "isolated_candidate_original_generation_composed",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_worker_and_acceptance_composed",
+        "canonical_synthetic_creator_license_draft_source_and_approval",
+        "actual_provider_embedding_indexed_fictional_source",
+        "idempotent_shutdown",
+        "closed_registration_refused_before_sql"
+      ],
+      "workerPass": null,
+      "generationUsage": [],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "qualified": false
+    },
+    {
+      "receipt": "generation-acceptance-source-1791414272779.json",
+      "sha256": "2485cee1e9c1308d8ebcfe98026c04ac629b225c9fc6aa1b8c121acc1c33e832",
+      "revision": "87a9c91caa81173742d1ac6968737e013be72af4",
+      "database": "creator_pr132_privacy10_20261007",
+      "completedChecks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "isolated_candidate_original_generation_composed",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_worker_and_acceptance_composed",
+        "canonical_synthetic_creator_license_draft_source_and_approval",
+        "actual_provider_embedding_indexed_fictional_source"
+      ],
+      "workerPass": null,
+      "generationUsage": [],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "qualified": false
+    },
+    {
+      "receipt": "generation-acceptance-source-1791414510098.json",
+      "sha256": "6a6f4ec5059ed232780d2a6ecc4f156c3fa787c88f3ac7c202c63355960a126f",
+      "revision": "ebe06af2d1b7941275028214e6ba1f001ce787e5",
+      "database": "creator_pr132_privacy10_20261007",
+      "completedChecks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "isolated_candidate_original_generation_composed",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_worker_and_acceptance_composed",
+        "canonical_synthetic_creator_license_draft_source_and_approval",
+        "actual_provider_embedding_indexed_fictional_source"
+      ],
+      "workerPass": null,
+      "generationUsage": [],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "qualified": false
+    },
+    {
+      "receipt": "generation-acceptance-source-1791414611782.json",
+      "sha256": "ab21c222c5c95173ce7a4e042f097bc76f6f8555e6d6982548f133b695bb5b42",
+      "revision": "6080c87e09d3e6b986a8f1a2a207265e7f0b83df",
+      "database": "creator_pr132_privacy10_20261007",
+      "completedChecks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "isolated_candidate_original_generation_composed",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_worker_and_acceptance_composed",
+        "canonical_synthetic_creator_license_draft_source_and_approval",
+        "actual_provider_embedding_indexed_fictional_source",
+        "actual_six_case_provider_evaluation_passed_exact_draft",
+        "actual_studio_publication",
+        "actual_fan_consent_and_first_conversation_allowance"
+      ],
+      "workerPass": null,
+      "generationUsage": [],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "qualified": false
+    },
+    {
+      "receipt": "generation-acceptance-source-1791414694624.json",
+      "sha256": "7ec8add1c789b586b8db8d51e462dc426614c5e316ec557dee78a988ecc96ccb",
+      "revision": "2adff9e28260c9fc0238688fd24a929d081b301f",
+      "database": "creator_pr132_privacy10_20261007",
+      "completedChecks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "isolated_candidate_original_generation_composed",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_worker_and_acceptance_composed",
+        "canonical_synthetic_creator_license_draft_source_and_approval",
+        "actual_provider_embedding_indexed_fictional_source",
+        "actual_six_case_provider_evaluation_passed_exact_draft",
+        "actual_studio_publication",
+        "actual_fan_consent_and_first_conversation_allowance",
+        "actual_http_durable_message_and_generation_acceptance"
+      ],
+      "workerPass": {
+        "completed": 0,
+        "failed": 0,
+        "recovered": 0,
+        "skipped": 0,
+        "deferred": 1,
+        "failures": [
+          "generation_authority_unavailable",
+          "generation_terminal_unavailable"
+        ]
+      },
+      "generationUsage": [],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "qualified": false
+    },
+    {
+      "receipt": "generation-acceptance-fresh-source-1791414901037.json",
+      "sha256": "425a6fac1213a752624c99a7e1f6c13cea6d02b5403b3673dd69db66d6c373c1",
+      "revision": "916bf2f9532d0ba5c85a9d557068046b4fb152dd",
+      "database": "creator_pr132_privacy11_20261007",
+      "completedChecks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "isolated_candidate_original_generation_composed",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_worker_and_acceptance_composed",
+        "canonical_synthetic_creator_license_draft_source_and_approval",
+        "actual_provider_embedding_indexed_fictional_source",
+        "actual_six_case_provider_evaluation_passed_exact_draft",
+        "actual_studio_publication",
+        "actual_fan_consent_and_first_conversation_allowance",
+        "actual_http_durable_message_and_generation_acceptance"
+      ],
+      "workerPass": {
+        "completed": 0,
+        "failed": 1,
+        "recovered": 0,
+        "skipped": 0,
+        "deferred": 0,
+        "failures": ["generation_denied"]
+      },
+      "generationUsage": [],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "qualified": false
+    },
+    {
+      "receipt": "generation-diagnostic-source-1791414992937.json",
+      "sha256": "a4c26030e217e35a07d0822f4261caa841da587414e950d9b7798a5ef6157c32",
+      "revision": "916bf2f9532d0ba5c85a9d557068046b4fb152dd",
+      "database": "creator_pr132_privacy11_20261007",
+      "completedChecks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "isolated_candidate_original_generation_composed",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_worker_and_acceptance_composed",
+        "canonical_synthetic_creator_license_draft_source_and_approval",
+        "actual_provider_embedding_indexed_fictional_source",
+        "actual_six_case_provider_evaluation_passed_exact_draft",
+        "actual_studio_publication",
+        "actual_fan_consent_and_first_conversation_allowance",
+        "actual_http_durable_message_and_generation_acceptance"
+      ],
+      "workerPass": {
+        "completed": 0,
+        "failed": 1,
+        "recovered": 0,
+        "skipped": 0,
+        "deferred": 0,
+        "failures": ["generation_scope_changed"]
+      },
+      "generationUsage": [],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "qualified": false
+    },
+    {
+      "receipt": "generation-catalogue-batch-source-1791415241690.json",
+      "sha256": "093cd9ff1f4e5306a1638331b043fcbf2ae1e4e87a33e9f4660528494afddbcf",
+      "revision": "3aee834e2104e8c41cf3a23393475887b02d4f9c",
+      "database": "creator_pr132_privacy11_20261007",
+      "completedChecks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "isolated_candidate_original_generation_composed",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_worker_and_acceptance_composed",
+        "canonical_synthetic_creator_license_draft_source_and_approval",
+        "actual_provider_embedding_indexed_fictional_source",
+        "actual_six_case_provider_evaluation_passed_exact_draft",
+        "actual_studio_publication",
+        "actual_fan_consent_and_first_conversation_allowance",
+        "actual_http_durable_message_and_generation_acceptance"
+      ],
+      "workerPass": {
+        "completed": 0,
+        "failed": 1,
+        "recovered": 0,
+        "skipped": 0,
+        "deferred": 0,
+        "failures": ["generation_scope_changed"]
+      },
+      "generationUsage": [],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "qualified": false
+    },
+    {
+      "receipt": "generation-diagnostic-columns-source-1791415410566.json",
+      "sha256": "7eccecc25aad8a50bdd08921301ed10e7da98d612212242de66d6f474ef0b456",
+      "revision": "3a8b513c979beda4ce8fe63c4f280ff413bfbe59",
+      "database": "creator_pr132_privacy11_20261007",
+      "completedChecks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "isolated_candidate_original_generation_composed",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_worker_and_acceptance_composed",
+        "canonical_synthetic_creator_license_draft_source_and_approval",
+        "actual_provider_embedding_indexed_fictional_source",
+        "actual_six_case_provider_evaluation_passed_exact_draft",
+        "actual_studio_publication",
+        "actual_fan_consent_and_first_conversation_allowance",
+        "actual_http_durable_message_and_generation_acceptance"
+      ],
+      "workerPass": {
+        "completed": 0,
+        "failed": 1,
+        "recovered": 0,
+        "skipped": 0,
+        "deferred": 0,
+        "failures": ["generation_scope_changed"]
+      },
+      "generationUsage": [],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "qualified": false
+    },
+    {
+      "receipt": "generation-digest-source-1791415592431.json",
+      "sha256": "47555bd2d325ae75cb9c84d1723b1997f718ad9a6e8f388fc456adfc59ad5ce2",
+      "revision": "fc5ba2b3fce83294179504b1f4783dc402ad6a43",
+      "database": "creator_pr132_privacy11_20261007",
+      "completedChecks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "isolated_candidate_original_generation_composed",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_worker_and_acceptance_composed",
+        "canonical_synthetic_creator_license_draft_source_and_approval",
+        "actual_provider_embedding_indexed_fictional_source",
+        "actual_six_case_provider_evaluation_passed_exact_draft",
+        "actual_studio_publication",
+        "actual_fan_consent_and_first_conversation_allowance",
+        "actual_http_durable_message_and_generation_acceptance"
+      ],
+      "workerPass": {
+        "completed": 0,
+        "failed": 1,
+        "recovered": 0,
+        "skipped": 0,
+        "deferred": 0,
+        "failures": ["generation_denied"]
+      },
+      "generationUsage": [],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "qualified": false
+    },
+    {
+      "receipt": "generation-metadata-source-1791415876081.json",
+      "sha256": "5aae17856b538311e22d6bfa330751bbbdbfcc736190dbda5523e37805528491",
+      "revision": "31b1ae3f00a6c7affb5effef2bee92ce807d9199",
+      "database": "creator_pr132_privacy11_20261007",
+      "completedChecks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "isolated_candidate_original_generation_composed",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_worker_and_acceptance_composed",
+        "canonical_synthetic_creator_license_draft_source_and_approval",
+        "actual_provider_embedding_indexed_fictional_source",
+        "actual_six_case_provider_evaluation_passed_exact_draft",
+        "actual_studio_publication",
+        "actual_fan_consent_and_first_conversation_allowance",
+        "actual_http_durable_message_and_generation_acceptance"
+      ],
+      "workerPass": {
+        "completed": 0,
+        "failed": 1,
+        "recovered": 0,
+        "skipped": 0,
+        "deferred": 0,
+        "failures": ["generation_scope_changed"]
+      },
+      "generationUsage": [
+        {
+          "category": "guardrail",
+          "provider": "OpenAI",
+          "model": "gpt-4.1-mini-2025-04-14",
+          "provider_state": "completed",
+          "input_tokens": 128,
+          "output_tokens": 24,
+          "cost_micros": "90"
+        },
+        {
+          "category": "reply",
+          "provider": "OpenAI",
+          "model": "text-embedding-3-small",
+          "provider_state": "completed",
+          "input_tokens": 11,
+          "output_tokens": 0,
+          "cost_micros": "1"
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "qualified": false
+    },
+    {
+      "receipt": "generation-retrieval-source-1791415968608.json",
+      "sha256": "e9533c3649af788b41bd664a38d81c083128ed5c0aa90653d77ef3b7e8dd9089",
+      "revision": "7d211be12b86351afa0490ca8fb87d870c1c432b",
+      "database": "creator_pr132_privacy11_20261007",
+      "completedChecks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "isolated_candidate_original_generation_composed",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_worker_and_acceptance_composed",
+        "canonical_synthetic_creator_license_draft_source_and_approval",
+        "actual_provider_embedding_indexed_fictional_source",
+        "actual_six_case_provider_evaluation_passed_exact_draft",
+        "actual_studio_publication",
+        "actual_fan_consent_and_first_conversation_allowance",
+        "actual_http_durable_message_and_generation_acceptance"
+      ],
+      "workerPass": {
+        "completed": 0,
+        "failed": 1,
+        "recovered": 0,
+        "skipped": 0,
+        "deferred": 0,
+        "failures": ["generation_denied"]
+      },
+      "generationUsage": [
+        {
+          "category": "guardrail",
+          "provider": "OpenAI",
+          "model": "gpt-4.1-mini-2025-04-14",
+          "provider_state": "completed",
+          "input_tokens": 128,
+          "output_tokens": 24,
+          "cost_micros": "90"
+        },
+        {
+          "category": "reply",
+          "provider": "OpenAI",
+          "model": "text-embedding-3-small",
+          "provider_state": "completed",
+          "input_tokens": 11,
+          "output_tokens": 0,
+          "cost_micros": "1"
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "qualified": false
+    },
+    {
+      "receipt": "generation-licensed-evidence-source-1791416063604.json",
+      "sha256": "d792068c9db0cb70a4d7601d69268f31fa903ac06fc0ea1aeb77a8b2cd935b73",
+      "revision": "24c5d17b139178ad1d1726fc3ceaab2c0e017df6",
+      "database": "creator_pr132_privacy11_20261007",
+      "completedChecks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "isolated_candidate_original_generation_composed",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_worker_and_acceptance_composed",
+        "canonical_synthetic_creator_license_draft_source_and_approval",
+        "actual_provider_embedding_indexed_fictional_source",
+        "actual_six_case_provider_evaluation_passed_exact_draft",
+        "actual_studio_publication",
+        "actual_fan_consent_and_first_conversation_allowance",
+        "actual_http_durable_message_and_generation_acceptance"
+      ],
+      "workerPass": {
+        "completed": 0,
+        "failed": 1,
+        "recovered": 0,
+        "skipped": 0,
+        "deferred": 0,
+        "failures": ["generation_scope_changed"]
+      },
+      "generationUsage": [],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "qualified": false
+    },
+    {
+      "receipt": "generation-query-plans-source-1791416246719.json",
+      "sha256": "4a0f899566a1d9e98ca7be02b44e3444efecb9b49f9fb5763edc2d692adf1e15",
+      "revision": "25280ea4d56b8c6a55738bbc2a0a10a03fd058aa",
+      "database": "creator_pr132_privacy11_20261007",
+      "completedChecks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "isolated_candidate_original_generation_composed",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_worker_and_acceptance_composed",
+        "canonical_synthetic_creator_license_draft_source_and_approval",
+        "actual_provider_embedding_indexed_fictional_source",
+        "actual_six_case_provider_evaluation_passed_exact_draft",
+        "actual_studio_publication",
+        "actual_fan_consent_and_first_conversation_allowance",
+        "actual_http_durable_message_and_generation_acceptance"
+      ],
+      "workerPass": {
+        "completed": 0,
+        "failed": 1,
+        "recovered": 0,
+        "skipped": 0,
+        "deferred": 0,
+        "failures": ["generation_scope_changed"]
+      },
+      "generationUsage": [
+        {
+          "category": "guardrail",
+          "provider": "OpenAI",
+          "model": "gpt-4.1-mini-2025-04-14",
+          "provider_state": "completed",
+          "input_tokens": 128,
+          "output_tokens": 24,
+          "cost_micros": "90"
+        },
+        {
+          "category": "reply",
+          "provider": "OpenAI",
+          "model": "text-embedding-3-small",
+          "provider_state": "completed",
+          "input_tokens": 11,
+          "output_tokens": 0,
+          "cost_micros": "1"
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "qualified": false
+    },
+    {
+      "receipt": "generation-licensed-admission-source-1791416366522.json",
+      "sha256": "e83b24d4227c765beb831a3b0ce7f8bf6ce367751474e6008f44e94fe6952ef5",
+      "revision": "55e68dc43920918081d3f6bc2afc97de20416b59",
+      "database": "creator_pr132_privacy11_20261007",
+      "completedChecks": [
+        "core_noinherit_preserved",
+        "separate_narrow_growth_api_login",
+        "original_accounting_without_generation",
+        "complete_conversation_owners_bound",
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "isolated_candidate_original_generation_composed",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_worker_and_acceptance_composed",
+        "canonical_synthetic_creator_license_draft_source_and_approval",
+        "actual_provider_embedding_indexed_fictional_source",
+        "actual_six_case_provider_evaluation_passed_exact_draft",
+        "actual_studio_publication",
+        "actual_fan_consent_and_first_conversation_allowance",
+        "actual_http_durable_message_and_generation_acceptance"
+      ],
+      "workerPass": {
+        "completed": 0,
+        "failed": 0,
+        "recovered": 0,
+        "skipped": 0,
+        "deferred": 1,
+        "failures": ["generation_denied", "generation_terminal_unavailable"]
+      },
+      "generationUsage": [
+        {
+          "category": "guardrail",
+          "provider": "OpenAI",
+          "model": "gpt-4.1-mini-2025-04-14",
+          "provider_state": "completed",
+          "input_tokens": 128,
+          "output_tokens": 24,
+          "cost_micros": "90"
+        },
+        {
+          "category": "reply",
+          "provider": "OpenAI",
+          "model": "text-embedding-3-small",
+          "provider_state": "completed",
+          "input_tokens": 11,
+          "output_tokens": 0,
+          "cost_micros": "1"
+        },
+        {
+          "category": "reply",
+          "provider": "configured",
+          "model": "6d5018295548c65df384117e860fe4658a48887f666638b6f9b9894da04208e3",
+          "provider_state": "completed",
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "cost_micros": null
+        },
+        {
+          "category": "guardrail",
+          "provider": "OpenAI",
+          "model": "gpt-4.1-mini-2025-04-14",
+          "provider_state": "completed",
+          "input_tokens": 745,
+          "output_tokens": 20,
+          "cost_micros": "330"
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "qualified": false
+    }
+  ]
+}

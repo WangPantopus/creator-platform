@@ -414,6 +414,7 @@ export class ConversationGenerationProcessor {
     };
     const context: ConversationContextPort = {
       current: (scope) => this.memory.context(scope),
+      safetyCheckpoint: (scope) => this.conversations.safetyCheckpoint(scope),
       assertProcessorConsent: (scope) =>
         this.conversations.assertProcessorConsent(scope),
       assertDeliveryCurrent: async (current, expected) => {

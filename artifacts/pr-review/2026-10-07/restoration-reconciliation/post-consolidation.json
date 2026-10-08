@@ -1,0 +1,113 @@
+{
+  "observedAt": "2026-10-07T19:39:04.268307+00:00",
+  "closedSource": {
+    "closedAt": "2026-10-07T19:35:46Z",
+    "headRefName": "codex/w8-generation-terminal-denial",
+    "headRefOid": "da0e2af95baa19280ddf3ebdae4ce8ead1a5eca7",
+    "isDraft": true,
+    "mergeCommit": null,
+    "mergedAt": null,
+    "number": 145,
+    "state": "CLOSED"
+  },
+  "successor": {
+    "closedAt": null,
+    "headRefName": "codex/w2-generation-inputs-20261002",
+    "headRefOid": "9eb6a169e12feafd2b5214ac7294df20127db1ab",
+    "isDraft": true,
+    "mergeCommit": null,
+    "mergedAt": null,
+    "number": 132,
+    "state": "OPEN"
+  },
+  "mergedDocumentationPR": {
+    "closedAt": "2026-10-07T19:36:45Z",
+    "headRefName": "codex/pr-reconciliation-20261007",
+    "headRefOid": "6801fe4253db7f2a810252a5aaae6efe41463cf5",
+    "isDraft": false,
+    "mergeCommit": {
+      "oid": "6d62d31457f8ad741c38fd871004970209d6105e"
+    },
+    "mergedAt": "2026-10-07T19:36:45Z",
+    "number": 333,
+    "state": "MERGED"
+  },
+  "remainingOriginalDrafts": [
+    {
+      "headRefOid": "603282f520defa2b0267c5fa45121b6102fdc261",
+      "isDraft": true,
+      "number": 305
+    },
+    {
+      "headRefOid": "6a82fc1272dc8b25ac167598012aa5da4ff91dc5",
+      "isDraft": true,
+      "number": 303
+    },
+    {
+      "headRefOid": "b520000666fdb5595995702a76fe848edc0c79d2",
+      "isDraft": true,
+      "number": 302
+    },
+    {
+      "headRefOid": "cec286e9bdc16e9296f1e8af1fd59826c40a12c2",
+      "isDraft": true,
+      "number": 301
+    },
+    {
+      "headRefOid": "bf2a95f19c185786b2617895ff5c00712e76d63b",
+      "isDraft": true,
+      "number": 284
+    },
+    {
+      "headRefOid": "3f4d44611c5a3a2c30f44b5a5532c76fdc5c49bc",
+      "isDraft": true,
+      "number": 282
+    },
+    {
+      "headRefOid": "27cde2b04b65c8b29bd0ba59a9b18ba716260101",
+      "isDraft": true,
+      "number": 262
+    },
+    {
+      "headRefOid": "75bba77b53a5c0d0675309daed946f017d3d17bd",
+      "isDraft": true,
+      "number": 247
+    },
+    {
+      "headRefOid": "5290eedd1249832ad7e5c9325b8dcc1f9acccb49",
+      "isDraft": true,
+      "number": 200
+    },
+    {
+      "headRefOid": "05225166284225b966a0606192bbbb77821cc18b",
+      "isDraft": true,
+      "number": 192
+    },
+    {
+      "headRefOid": "9eb6a169e12feafd2b5214ac7294df20127db1ab",
+      "isDraft": true,
+      "number": 132
+    },
+    {
+      "headRefOid": "5b1675ca155f87957c8ad62201097de2563c3c4f",
+      "isDraft": true,
+      "number": 74
+    },
+    {
+      "headRefOid": "82c9abffdb00f73bc7ba3fb4baedb508b1170917",
+      "isDraft": true,
+      "number": 63
+    },
+    {
+      "headRefOid": "de8adebb5c4f1844a7ad7c9833b802548cf8578a",
+      "isDraft": true,
+      "number": 36
+    },
+    {
+      "headRefOid": "c052ef67fa85301562b5123b682c88b931107c9a",
+      "isDraft": true,
+      "number": 31
+    }
+  ],
+  "sourceBranches": "All 18 original branches retained; only #132 advanced, by normal fast-forward, to the restoration continuation."
+}

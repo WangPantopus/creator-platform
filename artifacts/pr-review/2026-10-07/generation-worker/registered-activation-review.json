@@ -1,0 +1,600 @@
+{
+  "scope": "Actual guarded canonical61+39 activation on a separately restored, closed owned PostgreSQL17 database. Complete executable registry100; original retained databases unchanged. No application/provider/task/financial/C10 acceptance.",
+  "sourceParent": "e9fafb2e083862698a05cd3386683f899cbcbff7",
+  "sourceSha256": {
+    "apps/backend/scripts/activate-wave.ts": "558538a6140f927832b04d8500d1db14dd5c67c9b01ae4e626096a2bd07ea650",
+    "apps/backend/scripts/migrate-trust.ts": "8edc0814574a3056f412e36e04fcb7f280eb67e473ee926359b668d79211800c",
+    "apps/backend/scripts/migration-privacy-roles.ts": "f03751060932ef384d2874e70aed20ecadf5f870681a95a9eb3282eb7c95e4e3",
+    "apps/backend/scripts/reconcile-restored-trust.ts": "e3ca9c22670273d6fdc986c17c3e90496335dc3795ef12b73212ffc4c3e0d465",
+    "apps/backend/src/modules/trust/privacy-catalog.ts": "f3dcf4297ab18fd2acb4b07eda04a5215bea83822e1f5c6c9a461333f84b3eef",
+    "apps/backend/src/modules/trust/account-detached-usage-catalogue.ts": "ba825cc48b044da178f7c9ef8d2b4cf63729bdadb44e6ba17fb412c930d10d30",
+    "infra/migrations.json": "57ec9026f1d2302963b0af33d69a8e0b34c597eeaadbeeaab12d67d7a0c1fd40",
+    "infra/migrations/waves/20261007-generation.json": "8418840a9b15bd71ca3e155ce8742deab90048991f1324c6096003a4e7e1e908",
+    "infra/migrations/reviews/20261007-generation-allocations.json": "ab31d857a11995132c54bc22762c9d2ebdbb26ab5fd510bac35e0ae9f91c6292"
+  },
+  "baselineRestore": {
+    "scope": "Actual PostgreSQL17 custom-format source backup restored twice into a separate owned cluster; original canonical source untouched. All six actual snapshots match. No generation DDL or activation.",
+    "container": "creator-generation-activation-20261007",
+    "port": 5549,
+    "database": "creator_generation_activation_test",
+    "independentDatabase": "creator_generation_restore_test",
+    "sourceBackupSha256": "c7a3b241d88b07485db81b9be9131fce086e918ff4cd15abcecccfecd6bbb142",
+    "original": {
+      "ledgerSha256": "cbd92d22449341a0720294a66d292ee7b2dd9bd65ee69924727f7f2529d40017",
+      "schemaSha256": "47ce91688f162cd5848cc6a44d738e85bb3aab0770c05c3be8f2cac0a1eafbe6",
+      "rolesSha256": "70c667c5cdf17199c08459270b8bd7006372e3e40299799bc19b092915bdd7d8",
+      "securitySha256": "5b99fafdd59f4cc447ddd14a2e55f5f0daf2d48d7ba929348fb824b346fe5af8",
+      "sequenceSha256": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+      "dataSha256": "39fa6ab7d2f6083cc5e50f0ab4ee847fdb7425d42987b07abd0f3fac275aac00",
+      "ledgerRows": 61,
+      "tables": 163,
+      "dataRows": 257
+    },
+    "restored": {
+      "ledgerSha256": "cbd92d22449341a0720294a66d292ee7b2dd9bd65ee69924727f7f2529d40017",
+      "schemaSha256": "47ce91688f162cd5848cc6a44d738e85bb3aab0770c05c3be8f2cac0a1eafbe6",
+      "rolesSha256": "70c667c5cdf17199c08459270b8bd7006372e3e40299799bc19b092915bdd7d8",
+      "securitySha256": "5b99fafdd59f4cc447ddd14a2e55f5f0daf2d48d7ba929348fb824b346fe5af8",
+      "sequenceSha256": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+      "dataSha256": "39fa6ab7d2f6083cc5e50f0ab4ee847fdb7425d42987b07abd0f3fac275aac00",
+      "ledgerRows": 61,
+      "tables": 163,
+      "dataRows": 257
+    },
+    "independent": {
+      "ledgerSha256": "cbd92d22449341a0720294a66d292ee7b2dd9bd65ee69924727f7f2529d40017",
+      "schemaSha256": "47ce91688f162cd5848cc6a44d738e85bb3aab0770c05c3be8f2cac0a1eafbe6",
+      "rolesSha256": "70c667c5cdf17199c08459270b8bd7006372e3e40299799bc19b092915bdd7d8",
+      "securitySha256": "5b99fafdd59f4cc447ddd14a2e55f5f0daf2d48d7ba929348fb824b346fe5af8",
+      "sequenceSha256": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+      "dataSha256": "39fa6ab7d2f6083cc5e50f0ab4ee847fdb7425d42987b07abd0f3fac275aac00",
+      "ledgerRows": 61,
+      "tables": 163,
+      "dataRows": 257
+    },
+    "canonicalPrivacyGuardsPass": true,
+    "trafficClosed": true
+  },
+  "preflight": {
+    "scope": "Actual original migration entrypoints, complete checked-out source registry, real backup/independent restore. No fixture ledger or tasks. Canonical runner leaves wave unapplied; five malformed preconditions refuse without changing any original custody.",
+    "baselineVerified": true,
+    "refusals": [
+      {
+        "name": "backup_hash",
+        "code": 1,
+        "message": "Private backup hash does not match the manifest."
+      },
+      {
+        "name": "backup_age",
+        "code": 1,
+        "message": "Create a current private backup/manifest before rollout."
+      },
+      {
+        "name": "restore_data",
+        "code": 1,
+        "message": "A verified separate restore and matching live data digest are required."
+      },
+      {
+        "name": "live_ledger",
+        "code": 1,
+        "message": "Live ledger/catalog differs from the private backup manifest."
+      },
+      {
+        "name": "other_client",
+        "code": 1,
+        "message": "Stop all other clients on the closed target before rollout."
+      }
+    ],
+    "before": {
+      "ledger": "cbd92d22449341a0720294a66d292ee7b2dd9bd65ee69924727f7f2529d40017",
+      "schema": "47ce91688f162cd5848cc6a44d738e85bb3aab0770c05c3be8f2cac0a1eafbe6",
+      "roles": "70c667c5cdf17199c08459270b8bd7006372e3e40299799bc19b092915bdd7d8",
+      "security": "5b99fafdd59f4cc447ddd14a2e55f5f0daf2d48d7ba929348fb824b346fe5af8",
+      "sequences": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+      "data": "39fa6ab7d2f6083cc5e50f0ab4ee847fdb7425d42987b07abd0f3fac275aac00",
+      "ledgerRows": 61,
+      "tables": 163,
+      "dataRows": 257
+    },
+    "after": {
+      "ledger": "cbd92d22449341a0720294a66d292ee7b2dd9bd65ee69924727f7f2529d40017",
+      "schema": "47ce91688f162cd5848cc6a44d738e85bb3aab0770c05c3be8f2cac0a1eafbe6",
+      "roles": "70c667c5cdf17199c08459270b8bd7006372e3e40299799bc19b092915bdd7d8",
+      "security": "5b99fafdd59f4cc447ddd14a2e55f5f0daf2d48d7ba929348fb824b346fe5af8",
+      "sequences": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+      "data": "39fa6ab7d2f6083cc5e50f0ab4ee847fdb7425d42987b07abd0f3fac275aac00",
+      "ledgerRows": 61,
+      "tables": 163,
+      "dataRows": 257
+    }
+  },
+  "activation": {
+    "wave": "20261007-generation",
+    "applied": [
+      "0157_w4_public_packet_read",
+      "0159_w1_generation_worker_scope",
+      "0163_w2_usage_lineage",
+      "0165_w2_usage_retention_expiry",
+      "0167_w1_signature_read_fence",
+      "0177_w8_generation_worker_denial",
+      "0179_w3_generation_purpose_consumers",
+      "0180_w2_generation_input_consumers",
+      "0181_w2_generation_attempt_admission",
+      "0182_w4_generation_allowance_audience",
+      "0183_w1_generation_terminal_scope",
+      "0184_w8_generation_terminal_denial",
+      "0186_w5_generation_content_origin",
+      "0187_w2_generation_retrieval_context",
+      "0188_w2_generation_terminal_journal",
+      "0189_w4_generation_terminal_settlement",
+      "0196_w2_privacy_export_snapshot",
+      "0203_w3_terminal_only_finalization",
+      "0209_w8_all_scope_privacy_ownership",
+      "0210_w2_generation_guardrail_event",
+      "0211_w2_generation_agent_metadata",
+      "0212_w3_generation_worker_output",
+      "0214_w8_original_privacy_family",
+      "0215_w4_generation_safety_terminal_settlement",
+      "0216_w1_generation_output_cursor",
+      "0217_w3_generation_provenance_purge",
+      "0218_w1_generation_terminal_discovery",
+      "0221_w3_generation_context_profile_bound",
+      "0222_w4_generation_audience_profile_fence",
+      "0223_w2_generation_profile_bound",
+      "0224_w5_generation_origin_profile_fence",
+      "0226_w1_generation_lifecycle",
+      "0227_w1_generation_terminal_page",
+      "0228_w4_generation_settlement_clock",
+      "0229_w2_accounting_retention_integrity",
+      "0230_w8_usage_expiry_tasks",
+      "0231_w2_account_detached_usage",
+      "0232_w8_conversation_accounting_boundary",
+      "0233_w3_privacy_cursor_export"
+    ],
+    "priorLedgerRows": 61,
+    "ledgerRows": 100,
+    "priorHistoryPreserved": true,
+    "originalDataPreserved": true,
+    "originalRows": 257,
+    "originalTables": 163,
+    "oldRolesPreserved": true,
+    "originalSequencesPreserved": true,
+    "originalSequences": 1,
+    "verifiedBackupSecurity": true,
+    "securityRecords": 16772,
+    "afterSecuritySha256": "d747c93f6da7f2a38c8beef1adaffabc761f0195ac990300e8ecc26479e1729f",
+    "roleSafety": {
+      "original": {
+        "checkedRoles": 3,
+        "pinnedFunctions": 12,
+        "directCapabilities": 154,
+        "publicCapabilities": 357,
+        "pinnedPublicFunctions": 26
+      },
+      "purposeRoles": 28
+    },
+    "privacyRoleSafety": {
+      "checkedPrivatePurposes": 2,
+      "administratorSelectedCatalogueReview": true
+    },
+    "afterSchemaSha256": "b18b6cb0f70284d783274135033aa014c48218197b233de4ec4b4ebaf747150e",
+    "trafficClosed": true,
+    "releaseReady": false
+  },
+  "activatedRestore": {
+    "scope": "Actual current target backup and separate restore, exact owner-default ACL representations retained; all six custody comparisons match, both copies closed.",
+    "schemaVersion": 1,
+    "database": "creator_generation_activation_test",
+    "backupSha256": "197db3dbb8e9d3ea81264cc8346fc95fb49c97b8eb9f0a754a93166c751b3c53",
+    "createdAt": "2026-10-07T13:34:26.595Z",
+    "ledgerSha256": "f446394e49c9cf6bb6704e01563b80239320c8a9f0cc0c72a9a565af8bae9413",
+    "schemaSha256": "b18b6cb0f70284d783274135033aa014c48218197b233de4ec4b4ebaf747150e",
+    "rolesSha256": "53fc55601035472c89dc503929a8c71801ce62c7b03b033ce69473c742bd7412",
+    "securitySha256": "d747c93f6da7f2a38c8beef1adaffabc761f0195ac990300e8ecc26479e1729f",
+    "sequenceSha256": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+    "dataSha256": "e03ff743e7e09edab2288ae26fc3518861f814c059087607f18529df7b951813",
+    "ledgerRows": 100,
+    "tables": 176,
+    "dataRows": 257,
+    "restored": {
+      "ledgerSha256": "f446394e49c9cf6bb6704e01563b80239320c8a9f0cc0c72a9a565af8bae9413",
+      "schemaSha256": "b18b6cb0f70284d783274135033aa014c48218197b233de4ec4b4ebaf747150e",
+      "rolesSha256": "53fc55601035472c89dc503929a8c71801ce62c7b03b033ce69473c742bd7412",
+      "securitySha256": "d747c93f6da7f2a38c8beef1adaffabc761f0195ac990300e8ecc26479e1729f",
+      "sequenceSha256": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+      "dataSha256": "e03ff743e7e09edab2288ae26fc3518861f814c059087607f18529df7b951813",
+      "ledgerRows": 100,
+      "tables": 176,
+      "dataRows": 257
+    }
+  },
+  "runtimeCatalogueComparisons": [
+    {
+      "label": "activated",
+      "hashes": {
+        "family": "ef16ad655958de236ae052f52d0840bd079301bbc1c291c0160e32a82c4fd24d",
+        "expiry": "44b10b0c30c4c0eaf41d7a2594c054eff11e9bfd590e231733582023ffdc9d7d",
+        "detached": "689b6af98b8bf3cfcb88c08c834a1adf32d34c488686eaae913830df6d64d74f",
+        "boundary": "1cc941e39c04c28bc6742ef0ccfe820216cb0e0ca3b662cfd67c487f08e1ffef",
+        "output": "4ab25081e5a7e6efb719179226278549a3f45fdbb381cac83328d4d33441e6d5",
+        "terminal": "3d569c14a6161000ec11059bca86d248196a1ecb97b612bb9270b47ed63673ab",
+        "financial": "cf13fe99e8f135a00b2a9e0b220fefcb4535ce9f20c46c2db0e84b5b619eec30"
+      }
+    },
+    {
+      "label": "activated",
+      "name": "family",
+      "passed": true
+    },
+    {
+      "label": "activated",
+      "name": "detached",
+      "passed": true
+    },
+    {
+      "label": "activated",
+      "name": "boundary",
+      "passed": true
+    },
+    {
+      "label": "activated",
+      "name": "privacy",
+      "passed": true
+    },
+    {
+      "label": "activated",
+      "name": "domainTrust",
+      "passed": true
+    },
+    {
+      "label": "activated",
+      "name": "domainGrowth",
+      "passed": true
+    },
+    {
+      "label": "restored",
+      "hashes": {
+        "family": "ef16ad655958de236ae052f52d0840bd079301bbc1c291c0160e32a82c4fd24d",
+        "expiry": "44b10b0c30c4c0eaf41d7a2594c054eff11e9bfd590e231733582023ffdc9d7d",
+        "detached": "689b6af98b8bf3cfcb88c08c834a1adf32d34c488686eaae913830df6d64d74f",
+        "boundary": "1cc941e39c04c28bc6742ef0ccfe820216cb0e0ca3b662cfd67c487f08e1ffef",
+        "output": "4ab25081e5a7e6efb719179226278549a3f45fdbb381cac83328d4d33441e6d5",
+        "terminal": "3d569c14a6161000ec11059bca86d248196a1ecb97b612bb9270b47ed63673ab",
+        "financial": "cf13fe99e8f135a00b2a9e0b220fefcb4535ce9f20c46c2db0e84b5b619eec30"
+      }
+    },
+    {
+      "label": "restored",
+      "name": "family",
+      "passed": true
+    },
+    {
+      "label": "restored",
+      "name": "detached",
+      "passed": true
+    },
+    {
+      "label": "restored",
+      "name": "boundary",
+      "passed": true
+    },
+    {
+      "label": "restored",
+      "name": "privacy",
+      "passed": true
+    },
+    {
+      "label": "restored",
+      "name": "domainTrust",
+      "passed": true
+    },
+    {
+      "label": "restored",
+      "name": "domainGrowth",
+      "passed": true
+    }
+  ],
+  "constraintDrifts": {
+    "scope": "Actual registered detached accounting guard on the activated database and actual restored copy, using administrator-selected core identity for catalogue review only. No task, lease, cost row or completed receipt.",
+    "reports": [
+      {
+        "database": "creator_generation_activation_test",
+        "drifts": [
+          "purpose_login",
+          "core_cost_grant",
+          "unforced_rls",
+          "changed_upper_bound",
+          "removed_null_protection",
+          "unvalidated_constraint",
+          "renamed_constraint"
+        ],
+        "allRejectedAndRestored": true,
+        "equivalentConstraintRecreationAccepted": true,
+        "before": {
+          "ledger": "f446394e49c9cf6bb6704e01563b80239320c8a9f0cc0c72a9a565af8bae9413",
+          "schema": "b18b6cb0f70284d783274135033aa014c48218197b233de4ec4b4ebaf747150e",
+          "roles": "53fc55601035472c89dc503929a8c71801ce62c7b03b033ce69473c742bd7412",
+          "security": "d747c93f6da7f2a38c8beef1adaffabc761f0195ac990300e8ecc26479e1729f",
+          "sequences": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+          "data": "e03ff743e7e09edab2288ae26fc3518861f814c059087607f18529df7b951813"
+        },
+        "after": {
+          "ledger": "f446394e49c9cf6bb6704e01563b80239320c8a9f0cc0c72a9a565af8bae9413",
+          "schema": "b18b6cb0f70284d783274135033aa014c48218197b233de4ec4b4ebaf747150e",
+          "roles": "53fc55601035472c89dc503929a8c71801ce62c7b03b033ce69473c742bd7412",
+          "security": "d747c93f6da7f2a38c8beef1adaffabc761f0195ac990300e8ecc26479e1729f",
+          "sequences": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+          "data": "e03ff743e7e09edab2288ae26fc3518861f814c059087607f18529df7b951813"
+        }
+      },
+      {
+        "database": "creator_generation_activated_restore_test",
+        "drifts": [
+          "purpose_login",
+          "core_cost_grant",
+          "unforced_rls",
+          "changed_upper_bound",
+          "removed_null_protection",
+          "unvalidated_constraint",
+          "renamed_constraint"
+        ],
+        "allRejectedAndRestored": true,
+        "equivalentConstraintRecreationAccepted": true,
+        "before": {
+          "ledger": "f446394e49c9cf6bb6704e01563b80239320c8a9f0cc0c72a9a565af8bae9413",
+          "schema": "b18b6cb0f70284d783274135033aa014c48218197b233de4ec4b4ebaf747150e",
+          "roles": "53fc55601035472c89dc503929a8c71801ce62c7b03b033ce69473c742bd7412",
+          "security": "d747c93f6da7f2a38c8beef1adaffabc761f0195ac990300e8ecc26479e1729f",
+          "sequences": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+          "data": "e03ff743e7e09edab2288ae26fc3518861f814c059087607f18529df7b951813"
+        },
+        "after": {
+          "ledger": "f446394e49c9cf6bb6704e01563b80239320c8a9f0cc0c72a9a565af8bae9413",
+          "schema": "b18b6cb0f70284d783274135033aa014c48218197b233de4ec4b4ebaf747150e",
+          "roles": "53fc55601035472c89dc503929a8c71801ce62c7b03b033ce69473c742bd7412",
+          "security": "d747c93f6da7f2a38c8beef1adaffabc761f0195ac990300e8ecc26479e1729f",
+          "sequences": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+          "data": "e03ff743e7e09edab2288ae26fc3518861f814c059087607f18529df7b951813"
+        }
+      }
+    ]
+  },
+  "postActivation": {
+    "scope": "Actual registered100 canonical runner readback, current verified-backup activation replay with zero DDL, and original read-only closed restore inventory. All six custody comparisons remain unchanged; no release authority or task generated.",
+    "alreadyApplied": 100,
+    "repeatedActivation": {
+      "wave": "20261007-generation",
+      "applied": [],
+      "priorLedgerRows": 100,
+      "ledgerRows": 100,
+      "priorHistoryPreserved": true,
+      "originalDataPreserved": true,
+      "originalRows": 257,
+      "originalTables": 176,
+      "oldRolesPreserved": true,
+      "originalSequencesPreserved": true,
+      "originalSequences": 1,
+      "verifiedBackupSecurity": true,
+      "securityRecords": 16772,
+      "afterSecuritySha256": "d747c93f6da7f2a38c8beef1adaffabc761f0195ac990300e8ecc26479e1729f",
+      "roleSafety": {
+        "original": {
+          "checkedRoles": 3,
+          "pinnedFunctions": 12,
+          "directCapabilities": 154,
+          "publicCapabilities": 357,
+          "pinnedPublicFunctions": 26
+        },
+        "purposeRoles": 28
+      },
+      "privacyRoleSafety": {
+        "checkedPrivatePurposes": 2,
+        "administratorSelectedCatalogueReview": true
+      },
+      "afterSchemaSha256": "b18b6cb0f70284d783274135033aa014c48218197b233de4ec4b4ebaf747150e",
+      "trafficClosed": true,
+      "releaseReady": false
+    },
+    "inventory": {
+      "schemaVersion": 1,
+      "observedAt": "2026-10-07T13:38:08.400Z",
+      "kind": "read-only-closed-target-inventory",
+      "trafficReady": false,
+      "closureVerified": true,
+      "ledger": {
+        "rows": 100,
+        "sha256": "f446394e49c9cf6bb6704e01563b80239320c8a9f0cc0c72a9a565af8bae9413"
+      },
+      "roles": {
+        "original": {
+          "checkedRoles": 3,
+          "pinnedFunctions": 12,
+          "directCapabilities": 154,
+          "publicCapabilities": 357,
+          "pinnedPublicFunctions": 26
+        },
+        "purposeRoles": 28
+      },
+      "privacyRoles": {
+        "checkedPrivatePurposes": 2,
+        "administratorSelectedCatalogueReview": true
+      },
+      "security": {
+        "records": 16772,
+        "sha256": "d747c93f6da7f2a38c8beef1adaffabc761f0195ac990300e8ecc26479e1729f"
+      },
+      "sequence": {
+        "sequences": 1,
+        "sha256": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e"
+      },
+      "privacy": {
+        "jobs": 22,
+        "tombstones": 0,
+        "unverified_jobs": 0,
+        "unknown_ownership": 0,
+        "deletion_jobs_without_tombstones": 0,
+        "mismatched_tombstones": 0,
+        "jobs_missing_domains": 0,
+        "unexpected_domains": 0,
+        "expired_running_tasks": 0,
+        "inconsistent_complete_jobs": 0,
+        "invalid_complete_receipts": 0,
+        "indefinite_retention_records": 0,
+        "expired_retention_records": 0
+      },
+      "domains": [
+        {
+          "domain": "agent",
+          "state": "complete",
+          "count": 22
+        },
+        {
+          "domain": "commerce",
+          "state": "blocked",
+          "count": 22
+        },
+        {
+          "domain": "content",
+          "state": "blocked",
+          "count": 22
+        },
+        {
+          "domain": "conversation",
+          "state": "blocked",
+          "count": 22
+        },
+        {
+          "domain": "growth",
+          "state": "blocked",
+          "count": 22
+        },
+        {
+          "domain": "identity",
+          "state": "complete",
+          "count": 22
+        },
+        {
+          "domain": "media",
+          "state": "complete",
+          "count": 22
+        },
+        {
+          "domain": "trust",
+          "state": "complete",
+          "count": 22
+        }
+      ],
+      "effects": [],
+      "relations": {
+        "creator.generation": 0,
+        "creator.commerce_packet": 0,
+        "creator.commerce_ledger": 0,
+        "creator.commerce_effect": 0,
+        "creator_trust.privacy_commit_scope": 0,
+        "creator.generation_worker_scope": 0,
+        "creator.generation_terminal_scope": 0,
+        "creator.agent_privacy_export_scope": 0,
+        "creator.conversation_privacy_export_scope": 0,
+        "creator_trust.usage_expiry_job": 0,
+        "creator_trust.usage_expiry_scope": 0,
+        "creator_trust.detached_usage": 0,
+        "creator_trust.detached_usage_expiry": 0,
+        "creator_trust.detached_usage_summary": 0
+      },
+      "unverifiedGates": [
+        "independently trusted journal provenance and replay",
+        "actual owner purge/export receipts and stored artifact verification",
+        "approved purpose-specific retention and expiry",
+        "original financial/provider reconciliation and capability readiness",
+        "current genuine family/acceptance/denial authority",
+        "launched web, Android and iOS acceptance at the candidate revision"
+      ]
+    },
+    "before": {
+      "ledger": "f446394e49c9cf6bb6704e01563b80239320c8a9f0cc0c72a9a565af8bae9413",
+      "schema": "b18b6cb0f70284d783274135033aa014c48218197b233de4ec4b4ebaf747150e",
+      "roles": "53fc55601035472c89dc503929a8c71801ce62c7b03b033ce69473c742bd7412",
+      "security": "d747c93f6da7f2a38c8beef1adaffabc761f0195ac990300e8ecc26479e1729f",
+      "sequences": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+      "data": "e03ff743e7e09edab2288ae26fc3518861f814c059087607f18529df7b951813",
+      "ledgerRows": 100,
+      "tables": 176,
+      "dataRows": 257
+    },
+    "after": {
+      "ledger": "f446394e49c9cf6bb6704e01563b80239320c8a9f0cc0c72a9a565af8bae9413",
+      "schema": "b18b6cb0f70284d783274135033aa014c48218197b233de4ec4b4ebaf747150e",
+      "roles": "53fc55601035472c89dc503929a8c71801ce62c7b03b033ce69473c742bd7412",
+      "security": "d747c93f6da7f2a38c8beef1adaffabc761f0195ac990300e8ecc26479e1729f",
+      "sequences": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+      "data": "e03ff743e7e09edab2288ae26fc3518861f814c059087607f18529df7b951813",
+      "ledgerRows": 100,
+      "tables": 176,
+      "dataRows": 257
+    }
+  },
+  "restoredOriginalOwnerDefaultAclRepresentations": [
+    {
+      "schema": "creator_trust",
+      "name": "privacy_commit_scope",
+      "owner": "creator_privacy_fence"
+    },
+    {
+      "schema": "creator_trust",
+      "name": "domain_privacy_commit_scope",
+      "owner": "creator_domain_privacy_fence"
+    },
+    {
+      "schema": "creator",
+      "name": "agent_privacy_export_scope",
+      "owner": "creator_w2_privacy_export"
+    },
+    {
+      "schema": "creator_trust",
+      "name": "usage_expiry_job",
+      "owner": "creator_usage_expiry"
+    },
+    {
+      "schema": "creator_trust",
+      "name": "usage_expiry_scope",
+      "owner": "creator_usage_expiry"
+    },
+    {
+      "schema": "creator_trust",
+      "name": "detached_usage",
+      "owner": "creator_usage_detachment"
+    },
+    {
+      "schema": "creator_trust",
+      "name": "detached_usage_expiry",
+      "owner": "creator_usage_detachment"
+    },
+    {
+      "schema": "creator_trust",
+      "name": "detached_usage_summary",
+      "owner": "creator_usage_detachment"
+    },
+    {
+      "schema": "creator",
+      "name": "conversation_privacy_export_scope",
+      "owner": "creator_w3_privacy_export"
+    }
+  ],
+  "findings": [
+    "The Docker temporary initialization server initially accepted a socket readiness probe then restarted during role restore. No target database existed yet; the private record is retained. The owned empty cluster resumed only its exact partial role restoration after TCP readiness.",
+    "pg_dump omits explicit owner-only default table ACLs. Effective privileges matched; exact original representations were restored only after verifying the same owner and default ACL on each copied relation. No source relation or actor grant changed.",
+    "pg_dump/reparse flattened nested AND groups expanded from BETWEEN in one detached expiry CHECK. The original guard refused the restored copy. Its reader now uses PostgreSQL canonical pretty deparse, already used by schemaCustody; all constraint names/validation/deferrability remain exact. Seven actual metadata/constraint drifts reject and restore on both activated/restored databases, while equivalent constraint recreation passes. Immutable SQL is unchanged."
+  ],
+  "validation": {
+    "shippingBuild": "Final shipping backend build passed with original W2 heavy-build lock after the constraint representation and recovery inventory changes.",
+    "existingBackendTests": "26 passed117.55s, including9 actual PostgreSQL foundation cases. T11113.126s is not application p95.",
+    "scopedLintFormat": "Final scoped ESLint, Prettier and git diff checks passed.",
+    "newTestCode": false,
+    "limits": [
+      "Success leaves CONNECTION LIMIT0 and the actual closed marker; no application traffic opened.",
+      "Owner-role session selection in operator catalogue checks is metadata review only, not actual password-login/task authority.",
+      "Real prepared application graph, provider/output/financial execution, populated usage expiry/detachment/recovery, all-eight C10 and restored repurge remain unqualified.",
+      "Existing privacy export jobs and their receipts are preserved verbatim; their incomplete states are not promoted."
+    ]
+  }
+}

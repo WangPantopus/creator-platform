@@ -1,0 +1,37 @@
+diff --git a/apps/backend/src/modules/commerce/generation-safety-terminal-settlement.ts b/apps/backend/src/modules/commerce/generation-safety-terminal-settlement.ts
+index c398322f..5f46a191 100644
+--- a/apps/backend/src/modules/commerce/generation-safety-terminal-settlement.ts
++++ b/apps/backend/src/modules/commerce/generation-safety-terminal-settlement.ts
+@@ -78,6 +78,32 @@ export class CommerceGenerationSafetyTerminalSettlement {
+       catalogueChecksum: string;
+     },
+   ) {}
++  assertComposition(
++    identity: GenerationIdentityAuthority,
++    terminal: GenerationTerminalAuthority,
++    hostPool: Pool,
++  ): void {
++    invariant(
++      identity === this.configuration.identity &&
++        terminal === this.configuration.terminal &&
++        hostPool === this.configuration.hostPool,
++      "generation_terminal_settlement_composition_changed",
++      "Use this settlement's original identity, terminal and canonical host.",
++    );
++  }
++
++  assertAcceptance(access: AccessService): void {
++    invariant(
++      access === this.configuration.access,
++      "generation_terminal_acceptance_changed",
++      "Acceptance must use this settlement's original allowance authority.",
++    );
++    this.configuration.allowance.assertComposition(
++      this.configuration.hostPool,
++      access,
++    );
++  }
++
+   static async prepare(input: {
+     identity: GenerationIdentityAuthority;
+     terminal: GenerationTerminalAuthority;

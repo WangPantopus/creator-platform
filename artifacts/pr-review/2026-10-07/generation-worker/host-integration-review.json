@@ -1,0 +1,54 @@
+{
+  "scope": "Guarded source integration; no provider execution or accepted generation qualification.",
+  "sourceReview": {
+    "contentOrigins": "Factory prepares the concrete original W5 verifier against its own W1 identity before inputs; copied callbacks and mismatched identities are refused.",
+    "acceptance": "Prepared acceptance binds the same worker, Agent service, journal, database and configured allowance. W1 confirms the actual accepted fan session after INSERT and journal initialization in the same transaction.",
+    "execution": "Scoped acceptance does not instantiate the legacy interactive generation processor. Legacy output, completion and settlement methods refuse this mode.",
+    "safety": "Safety and takeover preserve the generation and financial hold for original terminal recovery while committing the current epoch/revision boundary.",
+    "economics": "Canonical composition supplies the registered original cost-rule migration to reservation policy; no price, rate or amount is invented."
+  },
+  "qualification": {
+    "backendTests": {
+      "passed": 24,
+      "files": 3,
+      "postgresTests": 9,
+      "postgresScope": "Existing canonical61 non-owner regression suite, not held generation qualification."
+    },
+    "freshDatabase": "Canonical61 installed through the original migration runner in a separate disposable PostgreSQL17 container.",
+    "freshVersusPreserved": {
+      "equalParts": 11,
+      "comparison": "All original cursor/writer/discovery/terminal permission and schema projections plus output, terminal and typed financial catalogues are equal after closed 27-source composition.",
+      "closedTransaction": "Rolled back; no held ledger rows or business tasks retained."
+    },
+    "shippingBuild": "Backend types/build and composition module import pass; standalone unavailable exit1 remains.",
+    "lintAndFormat": "Scoped ESLint, Prettier and diff checks pass.",
+    "realWorkerRefusalReview": {
+      "installation": "Exact reviewed held source SQL was committed only in the new disposable database, with a separate real worker credential. No held ledger entries were written; original runtime registration gate still refuses preparation.",
+      "operations": 97,
+      "scope": "22 original functions in four contexts (absent scope, forged generation nonce, forged terminal nonce, interactive settings), plus six raw-data reads and three SET ROLE attempts.",
+      "sqlstates": {
+        "42501": 61,
+        "55000": 12,
+        "nullOrFalse": 24
+      },
+      "discovery": "Three empty discovery calls and six rejected out-of-range bounds.",
+      "activeQueryCancellationMs": 111,
+      "workerPoolReused": true,
+      "after": {
+        "canonicalMigrations": 61,
+        "threads": 0,
+        "generations": 0,
+        "workerScopes": 0,
+        "terminalScopes": 0,
+        "usageRows": 0
+      },
+      "limitation": "No prepared graph, accepted generation, real provider usage or terminal settlement is claimed."
+    }
+  },
+  "activation": {
+    "lifecycle": "Reserved0226 with exact source checksum; unregistered and unapplied.",
+    "cataloguePins": "Three whole-graph production pins remain absent.",
+    "canonicalHost": "Startup guard retained pending genuine prepared-task, cancellation/recovery and C10 qualification.",
+    "standalone": "Existing unavailable guard retained."
+  }
+}

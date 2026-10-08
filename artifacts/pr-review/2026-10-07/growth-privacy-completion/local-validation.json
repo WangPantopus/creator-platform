@@ -1,0 +1,65 @@
+{
+  "existingTestsOnly": true,
+  "newTests": 0,
+  "checks": [
+    {
+      "revision": "37ff616e623b71c701b3ae5236ac9ad487343148",
+      "passed": [
+        "backend build",
+        "17 existing backend contracts/lifetime tests",
+        "web typecheck",
+        "web production build",
+        "18 existing Swift tests",
+        "generator check: 12 resources/119 operations",
+        "scoped lint, format and diff checks"
+      ],
+      "limit": "SwiftPM uses the previously documented local test-only dependency resolution; the original Package.resolved was restored. Hosted shipping checks are separate."
+    },
+    {
+      "revision": "8e2289346c18272910f31fb12ee4164b7443c939",
+      "passed": [
+        "backend build",
+        "17 existing backend contracts/lifetime tests",
+        "scoped lint, format and diff checks",
+        "actual compiled export/delete/revocation and Commerce staging fault operation"
+      ]
+    }
+  ],
+  "privateLogDigests": [
+    {
+      "path": "/tmp/creator-pr31-backend.log",
+      "sha256": "625ec51432faf125ec93f1c1669b4838792babf02115f03c272372f872453423",
+      "bytes": 120
+    },
+    {
+      "path": "/tmp/creator-pr31-tests.log",
+      "sha256": "7ff168cf9c4bb0679d5907c02fff4e111307ced675a66fabe7bcb2624d9ad2e9",
+      "bytes": 442
+    },
+    {
+      "path": "/tmp/creator-pr31-typecheck.log",
+      "sha256": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92",
+      "bytes": 15
+    },
+    {
+      "path": "/tmp/creator-pr31-web.log",
+      "sha256": "afdfaf769293ae011d7a12647df60ede4faffe8bae1e5600509be27519695848",
+      "bytes": 2862
+    },
+    {
+      "path": "/tmp/creator-pr31-swift.log",
+      "sha256": "cd7d454f1b3551c0e3211c683ab572bfdddb34fe1cae366bee10c3bc5d1a7d7f",
+      "bytes": 43474
+    },
+    {
+      "path": "/tmp/creator-growth-privacy-build.log",
+      "sha256": "0b51ccefcb0066d08979b8eed448054444dc7ac403b22eb132b6171452acf1e1",
+      "bytes": 121
+    },
+    {
+      "path": "/tmp/creator-growth-privacy-tests.log",
+      "sha256": "49b5052a3dbdef56a4cf44434937c33ae2afc974303bbc081225542b419ac415",
+      "bytes": 442
+    }
+  ]
+}

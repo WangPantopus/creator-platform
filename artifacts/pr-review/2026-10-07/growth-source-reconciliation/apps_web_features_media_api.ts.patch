@@ -1,0 +1,61 @@
+diff --git a/apps/web/features/media/api.ts b/apps/web/features/media/api.ts
+index 33fac9b3..49547729 100644
+--- a/apps/web/features/media/api.ts
++++ b/apps/web/features/media/api.ts
+@@ -66,6 +66,56 @@ export function configureMediaRequests(current: MediaIdentity) {
+   };
+ }
+ 
++/** Retain the genuine opening W1 binding before any asynchronous draft cleanup.
++ * These are refusal pins, not identity or task authority. A later view cannot
++ * lend its session or lifetime to this operation. */
++export function captureMediaRequest(expectedAccountId?: string) {
++  const original = identity;
++  if (!original)
++    throw new MediaRequestError(
++      "Your session changed. Reopen this form before continuing.",
++      409,
++      "session_view_changed",
++    );
++  if (
++    expectedAccountId !== undefined &&
++    original.accountId !== expectedAccountId
++  )
++    throw new MediaRequestError(
++      "Your account changed. Reopen this content to continue.",
++      409,
++      "session_account_changed",
++    );
++  const check = () => {
++    original.signal.throwIfAborted();
++    if (identity !== original)
++      throw new MediaRequestError(
++        "Your session changed. Reopen this form before continuing.",
++        409,
++        "session_view_changed",
++      );
++  };
++  check();
++  return Object.freeze({
++    signal: original.signal,
++    check,
++    async request<T>(path: string, init: RequestInit = {}): Promise<T> {
++      check();
++      const result = await mediaRequest<T>(path, {
++        ...init,
++        expectedAccountId: original.accountId,
++        expectedSessionId: original.sessionId,
++        signal: AbortSignal.any([
++          original.signal,
++          ...(init.signal ? [init.signal] : []),
++        ]),
++      });
++      check();
++      return result;
++    },
++  });
++}
++
+ export async function mediaRequest<T>(
+   path: string,
+   init: RequestInit & {

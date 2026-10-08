@@ -1,0 +1,31 @@
+{
+  "source": "44c4c2247fb44700b48a140f0199d2c04ddb6034",
+  "identity": "explicit development; no creator authority",
+  "web": {
+    "emptyDiscover": "personally observed",
+    "search": "knitting submitted and empty result observed",
+    "category": "failed: connection refused",
+    "savedSearchScreenshot": false
+  },
+  "ios": {
+    "signedGenericBuild": "passed",
+    "strictCodesign": "passed",
+    "existingSwiftChecks": 18,
+    "originalImageComparisons": 110,
+    "deviceOperation": "not performed"
+  },
+  "android": {
+    "latestBuiltAndOperatedSource": "989c79f2df8465311862eebd32d57bcd12be26a2",
+    "discover44Build": "not performed"
+  },
+  "apiExit": {
+    "session": 12606,
+    "exitCode": 1,
+    "cause": "PostgreSQL unexpected postmaster exit; unhandled idle pool error"
+  },
+  "webExit": {
+    "session": 52803,
+    "exitCode": 143
+  },
+  "populatedAcceptance": false
+}

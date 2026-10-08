@@ -1,0 +1,9 @@
+# Agent exporter host binding — October 7, 2026
+
+Integration source5ddacfdc9582db832016de663998d85743c0e741 selects fixed reviewed100/101 metadata from exact executable0196/0198 source registration and prepares the original Agent exporter on the host core pool. Its actual W8 held task/restoration callback remains mandatory. The original canonical Agent owner is resolved at task execution and must retain that same pool and lifecycle. No SQL, role grant or executable activation changed.
+
+Personally operated this committed source on the labelled101 application copy using canonical development identity HTTP and the original privacy endpoint, TrustWorker claim/lease and original domain hooks. Both default Content and Agent exporters prepared. The actual Content task completed with its original fifteen empty collections, artifact, receipt and released lease. The actual Agent lifecycle refused with `thread_accounting_privacy_unconfigured`; the worker currently stores the generic `domain_hook_error`. The minimal operator did not compose Conversation owners, so its `conversation_lineage_unavailable` is not evidence about the full server host. No Agent EOF, streamed artifact, completed job or deletion is claimed.
+
+Backend shipping build, scoped types/lint/format and nine existing contracts passed (63ms after the host change). The private evidence preserves the preliminary uncommitted observation separately from the committed run. Closure restored the connection-limit0/closed marker, removed all temporary passwords and verified zero other clients. This run created actual application sessions/jobs on an independently restored labelled copy; originals remain closed and unchanged.
+
+Next is actual registered accounting/privacy composition: original journal, retention, expiry, Conversation sources and financial owner, followed by genuine stream/family/delete/expiry/restore acceptance. Full generation, all-eight privacy and C10 remain unfinished.

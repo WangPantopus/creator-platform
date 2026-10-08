@@ -1,0 +1,112 @@
+{
+  "scope": "Closed28-source graph metadata and real worker refusal review; temporary page fixtures are not accepted tasks or settlement.",
+  "sourceSha256": "8632008a15ba322f6caa3b7a393635851c9d7ea18dcd6ad7f175361d4281149c",
+  "definitions": {
+    "creator.pending_generation_terminal_cursor_page(integer,uuid)": "f6924de4ce05abea703aa6995dab1dbe2a49279c4e7e290e2722c1bb57f227c6",
+    "creator.pending_generation_terminal_page(integer,uuid)": "7eb0cd74822fb81b94a85d768ec672febef80372abad0cc640ff5144e2b478af"
+  },
+  "indexChecksum": "69de72702d9553ea0fdddf7568e94bab3b585e496b04ed611966c961d210f72d",
+  "indexDefinition": "CREATE INDEX generation_terminal_pending_page ON creator.generation USING btree (id) WHERE (state = ANY (ARRAY['queued'::text, 'generating'::text]))",
+  "metadataDrifts": [
+    "public_wrapper",
+    "worker_private_helper",
+    "search_path",
+    "volatility",
+    "definition",
+    "index_missing"
+  ],
+  "allDriftsDetectedAndRestored": true,
+  "temporaryMetadataFixtures": 85,
+  "pages": [
+    {
+      "after": null,
+      "count": 20,
+      "first": 1,
+      "last": 20
+    },
+    {
+      "after": 20,
+      "count": 20,
+      "first": 21,
+      "last": 40
+    },
+    {
+      "after": 40,
+      "count": 20,
+      "first": 41,
+      "last": 60
+    },
+    {
+      "after": 60,
+      "count": 20,
+      "first": 61,
+      "last": 80
+    },
+    {
+      "after": 80,
+      "count": 1,
+      "first": 81,
+      "last": 81
+    },
+    {
+      "after": 81,
+      "count": 0,
+      "first": null,
+      "last": null
+    }
+  ],
+  "realRefusals": 12,
+  "realEmptyPageLimits": [1, 20, 64],
+  "all11CataloguePartsRestored": true,
+  "unacceptedCandidateFingerprints": {
+    "output": "e658553a00f50a9dcac3daaec12f8b916169290924f88889578e3d238cef09de",
+    "terminal": "ce6a599ccc30bba0046c7347370c12e0f6708e5a041990b14c99aca5e72b99d8",
+    "financial": "7f86dc6a4831c33510e24fd7edbface9296b9b5e5321ac53e494521d39a3aa8b"
+  },
+  "retained": {
+    "index": null,
+    "pager": null,
+    "usage": 0,
+    "ledger": 61,
+    "threads": 0,
+    "generations": 0,
+    "workerScopes": 0,
+    "terminalScopes": 0
+  },
+  "forcedIndexPlan": ["generation_terminal_pending_page"],
+  "planLimit": "Empty graph with sequential scan disabled; verifies the partial index is usable, not a latency or production workload result.",
+  "preservedComparison": {
+    "scope": "Complete28-source closed composition in preserved canonical61, compared with fresh held-source database. No registered purpose/task/provider/settlement activation.",
+    "all11FreshAndPreservedPartsEqual": true,
+    "compiler": [
+      {
+        "compiler": "creator.fence_generation_first_claim()",
+        "diagnostics": []
+      },
+      {
+        "compiler": "creator.pending_generation_terminal_cursor_page(integer,uuid)",
+        "diagnostics": []
+      },
+      {
+        "compiler": "creator.pending_generation_tasks(integer)",
+        "diagnostics": []
+      },
+      {
+        "compiler": "creator.pending_generation_terminal_page(integer,uuid)",
+        "diagnostics": []
+      },
+      {
+        "compiler": "creator.pending_generation_terminals(integer)",
+        "diagnostics": []
+      }
+    ],
+    "originalCustodyRestored": {
+      "schemaSha256": "30ec4ec6c71eb2c4e02fb473e65356994e3dfbcd04d8982ff31f18fbb7b5bee2",
+      "rolesSha256": "367a2a706b7aa22b37cb18051881aa0f1eb0d2bcb82129e0a1ad98a8a063c8f9",
+      "rowsSha256": "36073ad827fc043be173cf1c015594361f0a366ff8acfc98a1281804f5148c05",
+      "tables": 137,
+      "rows": 236
+    },
+    "originalContainerStoppedAfterReview": true
+  }
+}

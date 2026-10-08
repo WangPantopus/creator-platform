@@ -59,12 +59,27 @@ export default function CasePage({
   const retryKey = useRef<string | null>(null);
   const key = useRef<string | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
+  const resolutionSource = useRef<string | null>(null);
+  const replyUnavailable = data?.evidence.some(
+    (item) => item.category === "reply_review_unavailable",
+  );
+  useEffect(() => {
+    if (!data) return;
+    const source = JSON.stringify([
+      id,
+      data.kind,
+      data.queue,
+      Boolean(replyUnavailable),
+    ]);
+    if (resolutionSource.current === source) return;
+    resolutionSource.current = source;
+    if (data.kind === "reply_review")
+      setResolution(replyUnavailable ? "close" : "allow_reply");
+    else setResolution(data.queue === "disputes" ? "uphold" : "close");
+  }, [id, data?.queue, data?.kind, replyUnavailable]);
   useLayoutEffect(() => {
     if (!data) dialog.current?.close();
   }, [data]);
-  useEffect(() => {
-    if (data && data.queue !== "disputes") setResolution("close");
-  }, [data?.queue]);
   useEffect(() => {
     if (!data) return;
     const remaining = new Date(data.access_expires_at).getTime() - Date.now();
@@ -84,6 +99,7 @@ export default function CasePage({
     setBusy(false);
     key.current = null;
     retryKey.current = null;
+    resolutionSource.current = null;
   });
   const confirm = async () => {
     if (!data || !sessionState.ready || busy) return;
@@ -150,44 +166,65 @@ export default function CasePage({
     }
   };
   const caseChoices =
-    data?.queue === "disputes"
-      ? choices
-      : [
-          {
-            value: "close" as const,
-            title: "Close case",
-            meta: "Reasoned review complete",
-          },
-          {
-            value: "pause_creator" as const,
-            title: "Pause creator",
-            meta: "Supervisor · needs agent acknowledgment",
-          },
-          {
-            value: "revoke_license" as const,
-            title: "Revoke license",
-            meta: "Supervisor · needs license acknowledgment",
-          },
-          {
-            value: "suspend_account" as const,
-            title: "Suspend account",
-            meta: "Supervisor · needs identity acknowledgment",
-          },
-          ...(data?.queue === "verification"
-            ? [
-                {
-                  value: "verify_creator" as const,
-                  title: "Approve verification",
-                  meta: "Supervisor · needs identity acknowledgment",
-                },
-                {
-                  value: "reject_verification" as const,
-                  title: "Reject verification",
-                  meta: "Supervisor · needs identity acknowledgment",
-                },
-              ]
-            : []),
-        ];
+    data?.kind === "reply_review"
+      ? replyUnavailable
+        ? [
+            {
+              value: "close" as const,
+              title: "Close unavailable review",
+              meta: "This does not allow the reply",
+            },
+          ]
+        : [
+            {
+              value: "allow_reply" as const,
+              title: "Allow this reply",
+              meta: "Only this exact reviewed version",
+            },
+            {
+              value: "flag_reply" as const,
+              title: "Flag this reply",
+              meta: "Keep the text out of creator delivery",
+            },
+          ]
+      : data?.queue === "disputes"
+        ? choices
+        : [
+            {
+              value: "close" as const,
+              title: "Close case",
+              meta: "Reasoned review complete",
+            },
+            {
+              value: "pause_creator" as const,
+              title: "Pause creator",
+              meta: "Supervisor · needs agent acknowledgment",
+            },
+            {
+              value: "revoke_license" as const,
+              title: "Revoke license",
+              meta: "Supervisor · needs license acknowledgment",
+            },
+            {
+              value: "suspend_account" as const,
+              title: "Suspend account",
+              meta: "Supervisor · needs identity acknowledgment",
+            },
+            ...(data?.queue === "verification"
+              ? [
+                  {
+                    value: "verify_creator" as const,
+                    title: "Approve verification",
+                    meta: "Supervisor · needs identity acknowledgment",
+                  },
+                  {
+                    value: "reject_verification" as const,
+                    title: "Reject verification",
+                    meta: "Supervisor · needs identity acknowledgment",
+                  },
+                ]
+              : []),
+          ];
   const sold = data?.evidence.find((item) => item.mode);
   const delivered = data?.evidence.find(
     (item) => item.author_kind && item.author_kind !== "fan",

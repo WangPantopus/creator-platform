@@ -1,0 +1,15 @@
+{
+  "revision": "7fd3ded4b1b3c6d2eccdff55395235abb30eea24",
+  "privateAuditSha256": "09595bda6fc4f11b40231a890028ddf61e9615936fe00c68e81a3cb00a5aa1fd",
+  "state": "delivered",
+  "sentences": 2,
+  "providerCalls": 5,
+  "providerCostMicros": 3373,
+  "journalState": "known",
+  "allowanceState": "consumed",
+  "allowanceUnits": 4,
+  "reservedAfter": 0,
+  "outputDelivered": true,
+  "originalUsageRowsUnchanged": 658,
+  "scope": "Source operator with fictional-only development licence/provider terms. The answer contains a cited approved prefix followed by a guard fallback; no full product/performance acceptance."
+}

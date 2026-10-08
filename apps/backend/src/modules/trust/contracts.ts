@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { PrivacyExportStream } from "./privacy-export.js";
 
-export const CaseKind = z.enum([
+const ReportKind = z.enum([
   "ai_report",
   "crisis",
   "abuse",
@@ -10,6 +10,7 @@ export const CaseKind = z.enum([
   "pause",
   "support",
 ]);
+export const CaseKind = z.enum([...ReportKind.options, "reply_review"]);
 export const Queue = z.enum([
   "safety",
   "disputes",
@@ -27,6 +28,8 @@ export const Resolution = z.enum([
   "verify_creator",
   "reject_verification",
   "close",
+  "allow_reply",
+  "flag_reply",
 ]);
 const key = z
   .string()
@@ -36,7 +39,7 @@ const key = z
 const reason = z.string().trim().min(12).max(2000);
 export const ReportInput = z
   .strictObject({
-    kind: CaseKind,
+    kind: ReportKind,
     creatorId: z.uuid().optional(),
     messageId: z.uuid().optional(),
     requestId: z.uuid().optional(),

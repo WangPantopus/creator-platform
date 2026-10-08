@@ -1,0 +1,308 @@
+{
+  "scope": "Six fixed runtime catalogue pins from independent closed full39-source metadata and drift review. Complete executable source graph is required; original caller, held database registration, task, lease, restoration and transaction checks remain. No activation or populated task qualification.",
+  "sourceParent": "25d5c264251b1007f90feefae0c48c26758fea35",
+  "sourceSha256": {
+    "apps/backend/src/db/generation-privacy-sources.ts": "1af7840d82878e97feb26f69263ab3ceabc59c1a8ad7546b84784de1ccafae72",
+    "apps/backend/src/modules/identity/generation-output-cursor.ts": "98eaa594787e87d8eb836d0b05df3c75fc1729ec3cae1107665599fe82cb11a3",
+    "apps/backend/src/modules/identity/generation-terminal-discovery.ts": "704025ce84db91e53433b0c76c308ead2bf6b709e8fccc844cb620c9e43d458a",
+    "apps/backend/src/modules/commerce/generation-safety-terminal-catalogue.ts": "b841b0f776ff0df6f1342201b919266dada4a5da332c806f2ad6c5adb509764b",
+    "apps/backend/src/modules/trust/usage-expiry-catalogue.ts": "6663718070a268de7dca2dc3960b70ced18937b70e25b81bab7de9a2066536b7",
+    "apps/backend/src/modules/trust/account-detached-usage-catalogue.ts": "bf8523ca8d65afe889981cd9dddf8772ac3af2230a42ac55eceafe4df43713d6",
+    "apps/backend/src/modules/trust/accounting-boundary-catalogue.ts": "39a1594889d38ffc83c5c57bf739de9d9585827847a0aa2c97eff4ce04e17448"
+  },
+  "profiles": {
+    "fresh": {
+      "scope": "Actual closed39-source role/schema-qualified metadata read using the exact exported W1 queries/shared reader and actual W4/W8 getters. All six runtime guards still refuse absent complete executable source registration despite all six fixed metadata pins. No positive caller/task or activation.",
+      "mode": "fresh",
+      "wave": {
+        "original": {
+          "checkedRoles": 3,
+          "pinnedFunctions": 12,
+          "directCapabilities": 154,
+          "publicCapabilities": 357,
+          "pinnedPublicFunctions": 26
+        },
+        "purposeRoles": 28
+      },
+      "allFixedPinsMatch": true,
+      "stagedLedgerDoesNotRegisterGraph": true,
+      "sourcePreabortPreserved": true,
+      "fingerprints": {
+        "output": "4ab25081e5a7e6efb719179226278549a3f45fdbb381cac83328d4d33441e6d5",
+        "terminal": "3d569c14a6161000ec11059bca86d248196a1ecb97b612bb9270b47ed63673ab",
+        "financial": "cf13fe99e8f135a00b2a9e0b220fefcb4535ce9f20c46c2db0e84b5b619eec30",
+        "expiry": "44b10b0c30c4c0eaf41d7a2594c054eff11e9bfd590e231733582023ffdc9d7d",
+        "detached": "b0d462dc6dad8bf3da71bb6ab1d36389d7b4ac01645631268dad8c1f3da4b753",
+        "boundary": "1cc941e39c04c28bc6742ef0ccfe820216cb0e0ca3b662cfd67c487f08e1ffef"
+      },
+      "refused": [
+        "output",
+        "terminal",
+        "financial",
+        "expiry",
+        "detached",
+        "boundary"
+      ],
+      "before": {
+        "ledger": "cbd92d22449341a0720294a66d292ee7b2dd9bd65ee69924727f7f2529d40017",
+        "schema": "47ce91688f162cd5848cc6a44d738e85bb3aab0770c05c3be8f2cac0a1eafbe6",
+        "roles": "70c667c5cdf17199c08459270b8bd7006372e3e40299799bc19b092915bdd7d8",
+        "security": "5b99fafdd59f4cc447ddd14a2e55f5f0daf2d48d7ba929348fb824b346fe5af8",
+        "sequences": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+        "data": "39fa6ab7d2f6083cc5e50f0ab4ee847fdb7425d42987b07abd0f3fac275aac00",
+        "ledgerRows": 61,
+        "tables": 163,
+        "dataRows": 257
+      },
+      "after": {
+        "ledger": "cbd92d22449341a0720294a66d292ee7b2dd9bd65ee69924727f7f2529d40017",
+        "schema": "47ce91688f162cd5848cc6a44d738e85bb3aab0770c05c3be8f2cac0a1eafbe6",
+        "roles": "70c667c5cdf17199c08459270b8bd7006372e3e40299799bc19b092915bdd7d8",
+        "security": "5b99fafdd59f4cc447ddd14a2e55f5f0daf2d48d7ba929348fb824b346fe5af8",
+        "sequences": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+        "data": "39fa6ab7d2f6083cc5e50f0ab4ee847fdb7425d42987b07abd0f3fac275aac00",
+        "ledgerRows": 61,
+        "tables": 163,
+        "dataRows": 257
+      },
+      "metadataDrifts": [
+        {
+          "name": "output_login",
+          "part": "output"
+        },
+        {
+          "name": "output_body",
+          "part": "output"
+        },
+        {
+          "name": "output_invoker",
+          "part": "output"
+        },
+        {
+          "name": "terminal_login",
+          "part": "terminal"
+        },
+        {
+          "name": "terminal_body",
+          "part": "terminal"
+        },
+        {
+          "name": "terminal_invoker",
+          "part": "terminal"
+        },
+        {
+          "name": "financial_login",
+          "part": "financial"
+        },
+        {
+          "name": "financial_public",
+          "part": "financial"
+        },
+        {
+          "name": "financial_invoker",
+          "part": "financial"
+        },
+        {
+          "name": "expiry_login",
+          "part": "expiry"
+        },
+        {
+          "name": "expiry_core_scope",
+          "part": "expiry"
+        },
+        {
+          "name": "expiry_unforced",
+          "part": "expiry"
+        },
+        {
+          "name": "detached_login",
+          "part": "detached"
+        },
+        {
+          "name": "detached_core_cost",
+          "part": "detached"
+        },
+        {
+          "name": "detached_unforced",
+          "part": "detached"
+        },
+        {
+          "name": "boundary_login",
+          "part": "boundary"
+        },
+        {
+          "name": "boundary_core_scope",
+          "part": "boundary"
+        },
+        {
+          "name": "boundary_unforced",
+          "part": "boundary"
+        }
+      ],
+      "metadataDriftsDetectedAndRestored": true
+    },
+    "preserved": {
+      "scope": "Actual closed39-source role/schema-qualified metadata read using the exact exported W1 queries/shared reader and actual W4/W8 getters. All six runtime guards still refuse absent complete executable source registration despite all six fixed metadata pins. No positive caller/task or activation.",
+      "mode": "preserved",
+      "wave": {
+        "original": {
+          "checkedRoles": 3,
+          "pinnedFunctions": 12,
+          "directCapabilities": 154,
+          "publicCapabilities": 357,
+          "pinnedPublicFunctions": 26
+        },
+        "purposeRoles": 28
+      },
+      "allFixedPinsMatch": true,
+      "stagedLedgerDoesNotRegisterGraph": true,
+      "sourcePreabortPreserved": true,
+      "fingerprints": {
+        "output": "4ab25081e5a7e6efb719179226278549a3f45fdbb381cac83328d4d33441e6d5",
+        "terminal": "3d569c14a6161000ec11059bca86d248196a1ecb97b612bb9270b47ed63673ab",
+        "financial": "cf13fe99e8f135a00b2a9e0b220fefcb4535ce9f20c46c2db0e84b5b619eec30",
+        "expiry": "44b10b0c30c4c0eaf41d7a2594c054eff11e9bfd590e231733582023ffdc9d7d",
+        "detached": "b0d462dc6dad8bf3da71bb6ab1d36389d7b4ac01645631268dad8c1f3da4b753",
+        "boundary": "1cc941e39c04c28bc6742ef0ccfe820216cb0e0ca3b662cfd67c487f08e1ffef"
+      },
+      "refused": [
+        "output",
+        "terminal",
+        "financial",
+        "expiry",
+        "detached",
+        "boundary"
+      ],
+      "before": {
+        "ledger": "884d8cc8a15cc50aec771fde91730215f9965fce671c021275873aac3d3a6897",
+        "schema": "daa229d0ff1e43c4ac23a77829b5a8393499f281750e0eaabfb9c97e33424f95",
+        "roles": "1299e1c5afb74c63bae1cf777f62900fe46fa986c24289830c545c0481630f24",
+        "security": "94a67ff09f134c44b31a4e4e5d74d4cbac000d08a5597299568930824cf99474",
+        "sequences": "52fcbf4b187a82aded3cedc07cfbf251d9db000efb3a818f33ceb392179d3ea0",
+        "data": "e8c8ef79523c011f547372c51f0204dabf61cd62071996af75696cb5b1e6abaf",
+        "ledgerRows": 61,
+        "tables": 163,
+        "dataRows": 188
+      },
+      "after": {
+        "ledger": "884d8cc8a15cc50aec771fde91730215f9965fce671c021275873aac3d3a6897",
+        "schema": "daa229d0ff1e43c4ac23a77829b5a8393499f281750e0eaabfb9c97e33424f95",
+        "roles": "1299e1c5afb74c63bae1cf777f62900fe46fa986c24289830c545c0481630f24",
+        "security": "94a67ff09f134c44b31a4e4e5d74d4cbac000d08a5597299568930824cf99474",
+        "sequences": "52fcbf4b187a82aded3cedc07cfbf251d9db000efb3a818f33ceb392179d3ea0",
+        "data": "e8c8ef79523c011f547372c51f0204dabf61cd62071996af75696cb5b1e6abaf",
+        "ledgerRows": 61,
+        "tables": 163,
+        "dataRows": 188
+      },
+      "metadataDrifts": [
+        {
+          "name": "output_login",
+          "part": "output"
+        },
+        {
+          "name": "output_body",
+          "part": "output"
+        },
+        {
+          "name": "output_invoker",
+          "part": "output"
+        },
+        {
+          "name": "terminal_login",
+          "part": "terminal"
+        },
+        {
+          "name": "terminal_body",
+          "part": "terminal"
+        },
+        {
+          "name": "terminal_invoker",
+          "part": "terminal"
+        },
+        {
+          "name": "financial_login",
+          "part": "financial"
+        },
+        {
+          "name": "financial_public",
+          "part": "financial"
+        },
+        {
+          "name": "financial_invoker",
+          "part": "financial"
+        },
+        {
+          "name": "expiry_login",
+          "part": "expiry"
+        },
+        {
+          "name": "expiry_core_scope",
+          "part": "expiry"
+        },
+        {
+          "name": "expiry_unforced",
+          "part": "expiry"
+        },
+        {
+          "name": "detached_login",
+          "part": "detached"
+        },
+        {
+          "name": "detached_core_cost",
+          "part": "detached"
+        },
+        {
+          "name": "detached_unforced",
+          "part": "detached"
+        },
+        {
+          "name": "boundary_login",
+          "part": "boundary"
+        },
+        {
+          "name": "boundary_core_scope",
+          "part": "boundary"
+        },
+        {
+          "name": "boundary_unforced",
+          "part": "boundary"
+        }
+      ],
+      "metadataDriftsDetectedAndRestored": true
+    }
+  },
+  "canonicalPasswordPools": {
+    "scope": "Actual original core and Trust-worker password pools on canonical61, and original generation-worker password pool on its preserved metadata-only review graph. Fixed pins cannot replace the missing full executable registry. No role selection, owner credential, invented prepared instance or private task.",
+    "readings": [
+      {
+        "role": "creator_runtime",
+        "guardRefusals": 2,
+        "reusable": true
+      },
+      {
+        "role": "creator_trust_worker",
+        "guardRefusals": 2,
+        "reusable": true
+      },
+      {
+        "role": "creator_generation_worker",
+        "guardRefusals": 3,
+        "reusable": true
+      }
+    ],
+    "completeSourceGraphUnavailable": true,
+    "sourcePreabortPreserved": true,
+    "originalPrivacyCataloguePasses": true
+  },
+  "validation": {
+    "shippingBackendBuild": "passed with original W2 heavy-build lock",
+    "scopedESLintPrettier": "passed",
+    "existingTests": "9 contracts and 8 generation-worker-lifetime passed",
+    "newTestCode": false,
+    "limits": [
+      "Canonical executable registry and original retained ledgers remain61.",
+      "Private backup and independent restore, actual activation, prepared tasks, provider/financial execution, populated expiry/detachment and all-eight C10 remain unqualified."
+    ]
+  }
+}

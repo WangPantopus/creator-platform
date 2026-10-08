@@ -1,0 +1,28 @@
+{
+  "sourcePR": 145,
+  "sourceHead": "da0e2af95baa19280ddf3ebdae4ce8ead1a5eca7",
+  "successorPR": 132,
+  "successorHeadAtClosure": "9eb6a169e12feafd2b5214ac7294df20127db1ab",
+  "actions": [
+    {
+      "at": "2026-10-07T19:35:42.059136+00:00",
+      "action": "record_successor_obligations",
+      "result": "https://github.com/WangPantopus/creator-platform/pull/132#issuecomment-6045377791"
+    },
+    {
+      "at": "2026-10-07T19:35:43.655069+00:00",
+      "action": "update_current_continuation",
+      "result": "https://github.com/WangPantopus/creator-platform/pull/132"
+    },
+    {
+      "at": "2026-10-07T19:35:44.948801+00:00",
+      "action": "record_source_preservation",
+      "result": "https://github.com/WangPantopus/creator-platform/pull/145#issuecomment-6045378523"
+    },
+    {
+      "at": "2026-10-07T19:35:47.518337+00:00",
+      "action": "close_unmerged_preserve_branch",
+      "result": "\u2713 Closed pull request WangPantopus/creator-platform#145 (Bind terminal trust denials to original generation custody)"
+    }
+  ]
+}

@@ -26,6 +26,7 @@ import { consumeSignedAct } from "../identity/signed-acts.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import { idempotent } from "../../core/idempotency.js";
 import { appendFrame } from "../../core/outbox.js";
+import { ThreadFrameNotifications } from "../../realtime/frame-notifications.js";
 import type { GuardrailProvider } from "../agent/providers.js";
 import type { ConversationWellbeing } from "./wellbeing.js";
 import {
@@ -45,6 +46,7 @@ import {
   type CommerceGroupRecipient,
 } from "../commerce/fulfillment-plans.js";
 import { ConversationSystemLinkSchema } from "../../../../../packages/api/src/conversation/system-link.js";
+import { PreparedGenerationAcceptance } from "./generation-acceptance.js";
 
 type ThreadRow = {
   control: ThreadControl;
@@ -97,6 +99,14 @@ function message(row: MessageRow): Message {
 }
 
 export class ConversationService {
+  private frameNotifications?: ThreadFrameNotifications;
+  watchFrames(threadId: string, wake: () => void): () => void {
+    this.frameNotifications ??= new ThreadFrameNotifications(this.db.pool);
+    return this.frameNotifications.subscribe(threadId, wake);
+  }
+  closeFrameNotifications(): void {
+    this.frameNotifications?.close();
+  }
   private fulfillmentPlans?: CommerceFulfillmentPlans;
   configureFulfillmentPlans(plans: CommerceFulfillmentPlans): void {
     CommerceFulfillmentPlans.assertRuntime(plans, this.db, this.access);
@@ -341,11 +351,29 @@ export class ConversationService {
     wellbeing?: ConversationWellbeing;
     lineage?: ConversationLineage;
     journal?: PreparedGenerationJournal;
+    generationAcceptance?: PreparedGenerationAcceptance;
     reconciliation?: GenerationCostReconciliation;
   } = {};
   configureDelivery(delivery: typeof this.delivery) {
     delivery.lineage?.assertPool(this.db.pool);
+    if (delivery.generationAcceptance) {
+      invariant(
+        delivery.generationAcceptance instanceof PreparedGenerationAcceptance &&
+          delivery.journal === delivery.generationAcceptance.journal &&
+          !delivery.allowance,
+        "generation_acceptance_unconfigured",
+        "Use the original scoped acceptance, journal and canonical allowance.",
+      );
+      delivery.generationAcceptance.assertComposition(this.db, this.access);
+    }
     this.delivery = delivery;
+  }
+  private assertInteractiveGeneration(): void {
+    invariant(
+      !this.delivery.generationAcceptance,
+      "generation_worker_required",
+      "This generation requires its original scoped output and terminal worker.",
+    );
   }
   /** Revalidate the current configured policy before every remote fan-text call.
    * A thread's historical notice alone is not current processor consent. */
@@ -390,6 +418,7 @@ export class ConversationService {
     generation: GenerationRow,
     consumed: boolean,
   ) {
+    this.assertInteractiveGeneration();
     // Terminal closure precedes W4's original-policy settlement. The durable
     // initialized admission, including queued zero-call cancellation, owns the
     // receipt; last_sequence alone never proves that no request was made.
@@ -435,6 +464,7 @@ export class ConversationService {
     client: PoolClient,
     generationId: string,
   ) {
+    this.assertInteractiveGeneration();
     assertThreadScope(scope);
     invariant(
       this.delivery.reconciliation && this.delivery.journal,
@@ -536,6 +566,13 @@ export class ConversationService {
       "SELECT * FROM creator.generation WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND state IN('queued','generating') FOR UPDATE",
       [scope.threadId, scope.creatorId, scope.fanId],
     );
+    if (this.delivery.generationAcceptance) {
+      // The caller commits its control epoch/revision boundary immediately.
+      // W1 then refuses further worker output. Leave the original generation,
+      // journal and hold intact for W1/W3/W4 terminal recovery, including an
+      // in-flight provider receipt. Free safety cannot depend on that receipt.
+      return active.rows.length;
+    }
     for (const generation of active.rows) {
       await client.query(
         "UPDATE creator.generation SET state='interrupted' WHERE id=$1 AND thread_id=$2 AND creator_id=$3 AND fan_id=$4",
@@ -837,11 +874,17 @@ export class ConversationService {
               );
             await this.delivery.assertReady?.(scope, client);
             const generationId = randomUUID();
-            const reservation = await this.delivery.allowance?.reserve(
-              scope,
-              client,
-              `generation:${generationId}`,
-            );
+            const reservation = this.delivery.generationAcceptance
+              ? await this.delivery.generationAcceptance.reserve(
+                  scope,
+                  client,
+                  generationId,
+                )
+              : await this.delivery.allowance?.reserve(
+                  scope,
+                  client,
+                  `generation:${generationId}`,
+                );
             const grantId =
               reservation?.grantId ??
               (await this.access.reserveAllowance(scope, client, generationId));
@@ -934,6 +977,11 @@ export class ConversationService {
               client,
               generationId,
             );
+            await this.delivery.generationAcceptance?.confirm(
+              scope,
+              client,
+              generationId,
+            );
             return { message: fan, generationId };
           },
         ),
@@ -1005,6 +1053,7 @@ export class ConversationService {
     approved?: ApprovedSentence,
     workerToken?: string,
   ): Promise<Frame | null> {
+    this.assertInteractiveGeneration();
     invariant(
       Number.isSafeInteger(sequence) && sequence > 0,
       "invalid_sequence",
@@ -1160,6 +1209,7 @@ export class ConversationService {
     failed = false,
     workerToken?: string,
   ): Promise<Frame | null> {
+    this.assertInteractiveGeneration();
     return this.db.withThread(
       scope,
       async (client) => {

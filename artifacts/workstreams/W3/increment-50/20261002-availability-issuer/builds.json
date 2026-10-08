@@ -1,0 +1,20 @@
+{
+  "source": "f355db907b4beada09f4ad6f6d40e0af8d9a43ca",
+  "iOS": {
+    "exitCode": 0,
+    "binarySha256": "9ae5e70054fec491874155df2bf23269d156b39f0802ecc4c6874ee21f1e729b",
+    "logSha256": "00daab1fe2973b2a7f0b48b21194c6c93c75e0eb6f315843ad1b6f0f2a39d10f",
+    "normalSigning": true,
+    "deviceOperated": false
+  },
+  "firstFailedSource": "c91958a7e677575223a9156528b7e8b15d112285",
+  "firstFailureLogSha256": "a4199b755f4a5ac32fd6a6aef3c3848bff7b07e9bac2191c23efcd6dba571143",
+  "failure": "new NativeAvailability called issuer-bound storage without issuer; personally fixed actual API origin",
+  "Android": {
+    "exitCode": 0,
+    "binarySha256": "872dd65f5554595b46314e8e982dac9041c917db99eedbb47068ecdb9522a018",
+    "logSha256": "3082c60efa1cc1f639d0253743c56f3635d8b6b4de58363dd591f33defac1173",
+    "deviceOperated": true,
+    "operationEvidence": "../../increment-49/20261002-synthetic-copy/run.md"
+  }
+}

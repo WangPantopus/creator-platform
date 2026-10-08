@@ -10,6 +10,7 @@ import {
 } from "./provider-usage.js";
 import type { Usage } from "../../../../../packages/api/src/agent/contracts.js";
 import type { PrivacyHook } from "../trust/contracts.js";
+import { agentPreparationRead } from "./preparation-read.js";
 
 export type JournalPrivacyFamily = {
   creatorId: string;
@@ -68,6 +69,7 @@ export class PreparedGenerationJournal {
     private readonly checksum: string,
     private readonly database: string,
     readonly retentionPolicyVersion: string,
+    private readonly assertPrivacyRegistered: () => Promise<void>,
   ) {}
   static async prepare(
     pool: Pool,
@@ -77,6 +79,7 @@ export class PreparedGenerationJournal {
       /** Trusted host checks actual owner-hook registration, including account
        * fan relationships and thread exports/deletion, before enabling lineage. */
       assertPrivacyRegistered: () => Promise<void>;
+      signal?: AbortSignal;
     },
   ) {
     invariant(
@@ -88,34 +91,46 @@ export class PreparedGenerationJournal {
       "usage_journal_unconfigured",
       "Exact canonical custody and reviewed thread-accounting retention are required.",
     );
-    const migration = (
-      await pool.query<{ checksum: string | null }>(
-        "SELECT checksum FROM creator.schema_migration WHERE version=$1",
-        [input.migration.version],
-      )
-    ).rows[0];
-    const schema = (
-      await pool.query<{ ready: boolean }>(
-        `SELECT
+    const { migration, schema, database } = await agentPreparationRead(
+      pool,
+      async (client) => {
+        const migration = (
+          await client.query<{ checksum: string | null }>(
+            "SELECT checksum FROM creator.schema_migration WHERE version=$1",
+            [input.migration.version],
+          )
+        ).rows[0];
+        const schema = (
+          await client.query<{ ready: boolean }>(
+            `SELECT
           (SELECT count(*)=11 FROM information_schema.columns WHERE table_schema='creator' AND table_name='ai_usage' AND column_name IN ('cached_input_tokens','cache_write_input_tokens','creator_hold_id','thread_id','fan_id','generation_id','attempt_id','call_ordinal','purpose','provider_state','completed_at'))
           AND (SELECT count(*)=3 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='creator' AND c.relname IN ('ai_generation_admission','ai_generation_attempt','ai_generation_receipt') AND c.relrowsecurity AND c.relforcerowsecurity)
           AS ready`,
-      )
-    ).rows[0];
+          )
+        ).rows[0];
+        const database = (
+          await client.query<{ name: string }>(
+            "SELECT current_database() AS name",
+          )
+        ).rows[0]!.name;
+        return { migration, schema, database };
+      },
+      input.signal,
+    );
     invariant(
       migration?.checksum === input.migration.checksum && schema?.ready,
       "usage_journal_schema_unconfigured",
       "The complete registered usage journal migration is required.",
     );
+    input.signal?.throwIfAborted();
     await input.assertPrivacyRegistered();
-    const database = (
-      await pool.query<{ name: string }>("SELECT current_database() AS name")
-    ).rows[0]!.name;
+    input.signal?.throwIfAborted();
     const journal = new PreparedGenerationJournal(
       pool,
       input.migration.checksum,
       database,
       input.retentionPolicyVersion,
+      input.assertPrivacyRegistered,
     );
     Object.freeze(journal);
     return journal;
@@ -128,6 +143,7 @@ export class PreparedGenerationJournal {
     );
   }
   async assertClient(client: PoolClient) {
+    await this.assertPrivacyRegistered();
     const ready = (
       await client.query(
         "SELECT version FROM creator.schema_migration WHERE version=$1 AND checksum=$2 AND current_database()=$3",

@@ -1,0 +1,105 @@
+diff --git a/apps/backend/src/modules/growth/database.ts b/apps/backend/src/modules/growth/database.ts
+index fd3b18da..00f0c714 100644
+--- a/apps/backend/src/modules/growth/database.ts
++++ b/apps/backend/src/modules/growth/database.ts
+@@ -3,6 +3,7 @@ import type { Pool, PoolClient } from "pg";
+ import type { Actor } from "../identity/adapter.js";
+ import { DomainError } from "../../core/errors.js";
+ import { assertCurrentSession } from "../identity/request-authority.js";
++import { growthTransaction, withGrowthTransaction } from "./transaction.js";
+ 
+ export class GrowthDatabase {
+   actorFence?: (
+@@ -111,40 +112,10 @@ export class GrowthDatabase {
+     work: (client: PoolClient) => Promise<T>,
+     signal?: AbortSignal,
+   ): Promise<T> {
+-    signal?.throwIfAborted();
+-    const client = await pool.connect();
+-    let released = false;
+-    const abort = () => {
+-      if (!released) {
+-        released = true;
+-        client.release(true);
+-      }
+-    };
+-    signal?.addEventListener("abort", abort, { once: true });
+-    try {
+-      signal?.throwIfAborted();
+-      await client.query("BEGIN");
+-      await client.query(
+-        "SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','2000',true)",
+-      );
+-      const value = await work(client);
+-      signal?.throwIfAborted();
+-      await client.query("COMMIT");
+-      signal?.throwIfAborted();
+-      return value;
+-    } catch (error) {
+-      if (!released) await client.query("ROLLBACK").catch(() => {});
+-      throw error;
+-    } finally {
+-      signal?.removeEventListener("abort", abort);
+-      if (!released) {
+-        released = true;
+-        client.release();
+-      }
+-    }
++    return growthTransaction(pool, work, signal);
+   }
+-  /** Device transfer removes former bindings through worker-only negative
+-   * scopes, while retaining the new account's actual session through commit. */
++  /** Reuses PR31's worker-before-session acquisition and worker-first commit.
++   * The actual session stays held through worker success or failure cleanup. */
+   async fencedWorkerActor<T>(
+     actor: Actor,
+     fence: (client: PoolClient) => Promise<void>,
+@@ -156,30 +127,30 @@ export class GrowthDatabase {
+         copy.growthErrorGrowthAuthorityRequired,
+         503,
+       );
+-    const worker = await this.worker.connect();
+-    try {
+-      await worker.query("BEGIN");
+-      await worker.query(
+-        "SELECT set_config('statement_timeout','5000',true),set_config('lock_timeout','2000',true)",
+-      );
+-      // Acquire negative scopes before locking the actual session, matching
+-      // account controls and erasure. The runtime lock survives worker COMMIT.
++    return withGrowthTransaction(this.worker, async (held) => {
++      const worker = held.client;
+       await fence(worker);
+-      return await this.transaction(this.runtime, async (runtime) => {
++      return this.transaction(this.runtime, async (runtime) => {
+         await runtime.query("SELECT set_config('app.account_id',$1,true)", [
+           actor.accountId,
+         ]);
+         await assertCurrentSession(runtime, actor.accountId);
+-        const result = await work(worker);
+-        await worker.query("COMMIT");
+-        return result;
++        let failure: unknown;
++        try {
++          const result = await work(worker);
++          await held.commit();
++          return result;
++        } catch (error) {
++          failure = error;
++          throw error;
++        } finally {
++          // Also keep the session on failed/uncertain worker COMMIT until
++          // rollback or original socket close completes. PR31's outer-only
++          // finalizer would release the session before this failure cleanup.
++          await held.close({ failure });
++        }
+       });
+-    } catch (error) {
+-      await worker.query("ROLLBACK").catch(() => {});
+-      throw error;
+-    } finally {
+-      worker.release();
+-    }
++    });
+   }
+ 
+   /** Worker-only tables used by account controls still lock the canonical session and erasure scope. */

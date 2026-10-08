@@ -1,0 +1,25 @@
+{
+  "sourceHead": "2f63ce35809e5ac1a4e615dfe29f5a9e64f8890b",
+  "main": "3085cf6d3addc8f8b85cd4a84b3ce0449f2558db",
+  "recordedAt": "2026-10-07T09:24:33.502222+00:00",
+  "scope": "Normal integration of independently qualified main PR325/326 plus three explicit original-pool bindings unique to132. No prepared task, source activation or authority invented.",
+  "backendShippingBuild": "passed under original shared heavy-build lock",
+  "scopedTypesLintFormat": "passed for the three additional original bindings",
+  "existingBackendTests": 26,
+  "foundationTests": 9,
+  "contractTests": 9,
+  "schedulerTests": 8,
+  "testDurationSeconds": 118.77,
+  "t11Seconds": 113.506,
+  "t11IsAppP95": false,
+  "testLogSHA256": "e5a01b16bdce3d0ec392997f35231d9cbc9ddd5da4cb949b4b67c559a1e8d7bc",
+  "mainQualifications": [
+    "../trust-transaction/receipt.json",
+    "../owner-source-cancellation/receipt.json"
+  ],
+  "limits": [
+    "Held Content-origin, Post-entry and Commerce-privacy pool bindings pass types/lint/format but are not a new positive held-purpose qualification.",
+    "All13 held-client call sites retain their original pools. Original helpers await callbacks and actual source cancellation/settlement.",
+    "All three production catalogue pins remain absent;0226/0227/0228 remain outside canonical61. Actual generation/provider/terminal and all-eight C10 still require composition/operation."
+  ]
+}

@@ -19,6 +19,9 @@ import {
   PrivacyArtifact,
   type PrivacyArtifactStore,
 } from "./privacy-export.js";
+import { trustReplyError } from "./reply-review.js";
+import { assertReplyReviewCatalog } from "./reply-review-catalog.js";
+import { querySettlementUncertain } from "../../core/query-settlement.js";
 
 type CaseRow = CaseSummary & {
   reporter_account_id: string;
@@ -293,6 +296,32 @@ export class TrustService {
         "SELECT snapshot FROM creator_trust.case_evidence WHERE case_id=$1 AND expires_at>now() ORDER BY created_at,id LIMIT 12",
         [caseId],
       );
+      const replyEvidence: Evidence[] = [];
+      if (current.kind === "reply_review") {
+        // A source lookup failure must not abort the case read transaction.
+        await client.query("SAVEPOINT reply_evidence");
+        try {
+          replyEvidence.push(await this.replyEvidence(client, caseId));
+        } catch (error) {
+          if (querySettlementUncertain(error)) throw error;
+          try {
+            await client.query("ROLLBACK TO SAVEPOINT reply_evidence");
+          } catch (cleanup) {
+            throw new AggregateError(
+              [error, cleanup],
+              "Reply evidence and savepoint restoration failed.",
+            );
+          }
+          const value = trustReplyError(error);
+          if (![409, 410].includes(value.status)) throw value;
+          replyEvidence.push({
+            id: caseId,
+            category: "reply_review_unavailable",
+            text: value.message,
+          });
+        }
+        await client.query("RELEASE SAVEPOINT reply_evidence");
+      }
       const timeline = await client.query<CaseDetail["timeline"][number]>(
         "SELECT id,type,reason,created_at FROM creator_trust.case_event WHERE case_id=$1 ORDER BY created_at,id LIMIT 100",
         [caseId],
@@ -312,7 +341,7 @@ export class TrustService {
       return {
         ...safe,
         number: caseDto(safe).number,
-        evidence: evidence.rows.map((r) => r.snapshot),
+        evidence: [...evidence.rows.map((r) => r.snapshot), ...replyEvidence],
         timeline: timeline.rows,
         effects: effects.rows,
         access_expires_at: lease.expires_at,
@@ -389,6 +418,56 @@ export class TrustService {
                   "Verification review needs the exact submitted proof in a verification case.",
                   409,
                 );
+            }
+            const replyDecision = ["allow_reply", "flag_reply"].includes(
+              input.resolution,
+            );
+            if (replyDecision && current.kind !== "reply_review")
+              throw new DomainError(
+                "reply_case_required",
+                "This decision requires an exact Note reply review.",
+                409,
+              );
+            if (current.kind === "reply_review") {
+              if (!replyDecision && input.resolution !== "close")
+                throw new DomainError(
+                  "reply_decision_required",
+                  "Allow or flag this exact reply, or close an unavailable review.",
+                  409,
+                );
+              if (replyDecision)
+                await this.replyEvidence(
+                  client,
+                  caseId,
+                  input.resolution === "allow_reply",
+                );
+              else {
+                await client.query("SAVEPOINT reply_closure");
+                let unavailable = false;
+                try {
+                  await this.replyEvidence(client, caseId);
+                } catch (error) {
+                  if (querySettlementUncertain(error)) throw error;
+                  try {
+                    await client.query("ROLLBACK TO SAVEPOINT reply_closure");
+                  } catch (cleanup) {
+                    throw new AggregateError(
+                      [error, cleanup],
+                      "Reply closure and savepoint restoration failed.",
+                    );
+                  }
+                  const value = trustReplyError(error);
+                  if (![409, 410].includes(value.status)) throw value;
+                  unavailable = true;
+                }
+                await client.query("RELEASE SAVEPOINT reply_closure");
+                if (!unavailable)
+                  throw new DomainError(
+                    "reply_decision_required",
+                    "This current reply needs an explicit allow or flag decision.",
+                    409,
+                  );
+              }
             }
             if (
               [
@@ -479,6 +558,16 @@ export class TrustService {
                 actor.accountId,
               ],
             );
+            if (replyDecision)
+              await client.query(
+                "INSERT INTO creator_trust.reply_review_decision(case_id,case_version,reviewer_account_id,state) VALUES($1,$2,$3,$4)",
+                [
+                  caseId,
+                  result.rows[0]!.version,
+                  actor.accountId,
+                  input.resolution === "allow_reply" ? "allowed" : "flagged",
+                ],
+              );
             await this.event(
               client,
               actor,
@@ -506,6 +595,25 @@ export class TrustService {
         ),
       )
       .then(caseDto);
+  }
+  private async replyEvidence(
+    client: PoolClient,
+    caseId: string,
+    allow = false,
+  ): Promise<Evidence> {
+    try {
+      await assertReplyReviewCatalog(client);
+      const evidence = (
+        await client.query<{ evidence: Evidence }>(
+          "SELECT creator_trust.reply_review_evidence($1,$2) AS evidence",
+          [caseId, allow],
+        )
+      ).rows[0]!.evidence;
+      await assertReplyReviewCatalog(client);
+      return evidence;
+    } catch (error) {
+      throw trustReplyError(error);
+    }
   }
   async ownCases(actor: Actor) {
     return this.store.actor(actor, async (client) => ({

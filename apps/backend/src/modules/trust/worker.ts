@@ -10,6 +10,7 @@ import {
 } from "./privacy-export.js";
 import { DomainError } from "../../core/errors.js";
 import { trustTransaction } from "./transaction.js";
+import { accountingPrivacyFailure } from "./accounting-privacy-failure.js";
 
 type Task = {
   job_id: string;
@@ -165,12 +166,22 @@ export class TrustWorker {
       await this.pool.query(`SELECT
       (SELECT count(*) FROM creator_trust.privacy_task WHERE state='blocked') AS privacy_blocked,
       (SELECT count(*) FROM creator_trust.privacy_task WHERE state='dead_letter') AS privacy_dead_letter,
+      (SELECT count(*) FROM creator_trust.privacy_task WHERE state<>'complete' AND error_code='accounting_reconciliation_escalated') AS accounting_escalated,
+      (SELECT count(*) FROM creator_trust.privacy_task WHERE state<>'complete' AND error_code='accounting_retention_breach') AS accounting_breached,
       (SELECT count(*) FROM creator_trust.effect WHERE state='blocked') AS effect_blocked,
       (SELECT count(*) FROM creator_trust.effect WHERE state='dead_letter') AS effect_dead_letter,
       (SELECT extract(epoch FROM now()-min(created_at)) FROM creator_trust.effect WHERE state IN ('pending','running','retry')) AS effect_age,
       (SELECT extract(epoch FROM now()-min(created_at)) FROM creator_trust.safety_case WHERE state='urgent') AS urgent_age`)
     ).rows[0];
     this.observe("privacy_blocked_count", Number(health.privacy_blocked));
+    this.observe(
+      "accounting_reconciliation_escalated_count",
+      Number(health.accounting_escalated),
+    );
+    this.observe(
+      "accounting_retention_breach_count",
+      Number(health.accounting_breached),
+    );
     this.observe(
       "dead_letter_count",
       Number(health.privacy_dead_letter) + Number(health.effect_dead_letter),
@@ -298,6 +309,7 @@ export class TrustWorker {
         "privacy_artifact_unconfigured",
         "privacy_commit_fence_unavailable",
         "privacy_ownership_missing",
+        "privacy_original_family_unavailable",
         "growth_held_authority_unavailable",
         "restoration_pending",
         "conversation_privacy_unavailable",
@@ -307,9 +319,20 @@ export class TrustWorker {
         "conversation_lineage_unavailable",
         "conversation_recordings_unavailable",
         "conversation_accounting_unavailable",
+        "conversation_provenance_purge_unavailable",
+        "conversation_provenance_purge_pool_unconfigured",
+        "conversation_provenance_purge_owner_changed",
         "conversation_retention_unavailable",
+        "accounting_retention_unconfigured",
+        "commerce_privacy_authority_unavailable",
+        "commerce_retention_unconfigured",
+        "privacy_authority_required",
+        "generation_settlement_clock_unavailable",
         "identity_retention_unconfigured",
         "identity_scope_adapter_required",
+        "content_retention_unconfigured",
+        "content_privacy_purpose_unconfigured",
+        "media_retention_unconfigured",
       ];
       const message =
         error instanceof DomainError
@@ -319,23 +342,35 @@ export class TrustWorker {
             : "";
       const code =
         error instanceof Error &&
-        [
-          ...unavailable,
-          "hook_timeout",
-          "privacy_family_cancel_unavailable",
-          "privacy_family_rollback_unavailable",
-          "artifact_too_large",
-          "receipt_invalid",
-          "export_artifact_missing",
-          "export_stream_invalid",
-          "export_stream_incomplete",
-          "export_artifact_invalid",
-          "trust_connection_budget_unavailable",
-          "trust_transaction_unavailable",
-          "trust_client_settlement_unavailable",
-        ].includes(message)
+        (accountingPrivacyFailure(message) ||
+          [
+            ...unavailable,
+            "hook_timeout",
+            "privacy_family_cancel_unavailable",
+            "privacy_family_rollback_unavailable",
+            "conversation_delete_cancel_unavailable",
+            "conversation_delete_rollback_unavailable",
+            "conversation_delete_release_unavailable",
+            "conversation_provenance_purge_cleanup_unavailable",
+            "conversation_provenance_purge_receipt_unavailable",
+            "conversation_export_cancel_unavailable",
+            "conversation_export_rollback_unavailable",
+            "conversation_export_release_unavailable",
+            "artifact_too_large",
+            "receipt_invalid",
+            "export_artifact_missing",
+            "export_stream_invalid",
+            "export_stream_incomplete",
+            "export_artifact_invalid",
+            "privacy_artifact_unconfigured",
+            "privacy_commit_fence_unavailable",
+            "trust_connection_budget_unavailable",
+            "trust_transaction_unavailable",
+            "trust_client_settlement_unavailable",
+          ].includes(message))
           ? message
           : "domain_hook_error";
+      const accounting = accountingPrivacyFailure(code);
       const blocked =
         unavailable.includes(code) && !retryableAuthorityFailure(error);
       const saved = await trustTransaction(this.pool, (client) =>
@@ -345,13 +380,19 @@ export class TrustWorker {
             task.job_id,
             task.domain,
             task.lease_token,
-            blocked ? "blocked" : task.attempts >= 8 ? "dead_letter" : "retry",
+            accounting?.state ??
+              (blocked
+                ? "blocked"
+                : task.attempts >= 8
+                  ? "dead_letter"
+                  : "retry"),
             code,
-            Math.min(3600, 2 ** task.attempts * 5),
+            accounting?.retrySeconds ?? Math.min(3600, 2 ** task.attempts * 5),
           ],
         ),
       );
-      if (saved.rowCount && !blocked) this.observe("privacy_retry", 1);
+      if (saved.rowCount && !blocked && accounting?.state !== "blocked")
+        this.observe("privacy_retry", 1);
     }
   }
   private async claimEffects(): Promise<Effect[]> {

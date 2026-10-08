@@ -1,0 +1,69 @@
+diff --git a/apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanShell.kt b/apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanShell.kt
+index 101ea6cb..a4c469e1 100644
+--- a/apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanShell.kt
++++ b/apps/android/app/src/main/java/com/pantopus/qelvora/identity/FanShell.kt
+@@ -147,9 +147,11 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
+     }
+     suspend fun purge(): Boolean = withContext(NonCancellable) {
+         if (purgingPrivateState) return@withContext false
++        val pushCredential = runCatching { currentToken() }.getOrNull()
+         purgingPrivateState = true; localPurgeFailed = true
+         try {
+             generation++; confirmedCredential = null; session = null; hasSavedCredential = false; checkingSession = false; actors = emptyList(); choosingActor = false; error = ""
++            GrowthPush.clearSession(context, pushCredential)
+             var cleared = true
+             try { storage.save(null) } catch (_: Exception) { cleared = false }
+             try { com.pantopus.qelvora.conversation.W3FanFeatures.clearPrivateState(context) } catch (_: Exception) { cleared = false }
+@@ -262,6 +264,24 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
+         }
+         finally { busy = false }
+     }
++    /** Preserves the current handle and never writes using a switched credential. */
++    suspend fun saveIntro(intro: String, accountId: String, sessionId: String): Boolean {
++        val current = session ?: return false
++        val fan = current.fan ?: return false
++        if (busy || current.accountId != accountId || current.sessionId != sessionId) return false
++        val capture = captureRequest(destination, maximumResponseBytes = 65_536, timeoutMs = 10_000) ?: return false
++        if (!capture.isCurrent()) return false
++        busy = true
++        try {
++            val text = intro.trim()
++            val saved = capture.client.saveFanIntro(APIFanIntroInput(text, fan.version))
++            if (!capture.isCurrent() || saved.id != fan.id || saved.intro != text) return false
++            refresh()
++            return capture.isCurrent()
++        } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
++        catch (failure: Exception) { if (capture.isCurrent()) error = message(failure); return false }
++        finally { busy = false }
++    }
+     /** Navigation only. Reject responses for a departed destination, account or credential. */
+     suspend fun resolveCallDestination(callId: String, from: String): Boolean {
+         val id = runCatching { java.util.UUID.fromString(callId).also { require(it.toString().equals(callId, ignoreCase = true)) } }.getOrNull() ?: return false
+@@ -318,7 +338,7 @@ class FanFeatureRegistration(
+ )
+ 
+ @Composable
+-fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/home", features: List<FanFeatureRegistration> = emptyList(), destinationDelivery: Long = 0L) {
++fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/home", features: List<FanFeatureRegistration> = emptyList(), destinationDelivery: Long = 0L, notificationID: String? = null, onNotificationConsumed: () -> Unit = {}) {
+     // This root owns one navigation snapshot. Save the actual route at the
+     // lifecycle save, not a mirror that can lag feature-local navigation.
+     // Credentials, session authority and feature payloads are never serialized.
+@@ -367,6 +387,18 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
+     }
+     LaunchedEffect(model.destination) { model.loadArrival() }
+     LaunchedEffect(model, foreground) { if (foreground) { model.refresh(); while (true) { delay(4000); if (!model.choosingActor && !model.busy && (model.session != null || model.hasSavedCredential)) model.refresh() } } }
++    LaunchedEffect(model.session) { GrowthPush.refresh(context) }
++    LaunchedEffect(notificationID, destinationDelivery, model.session?.accountId) {
++        val id = notificationID ?: return@LaunchedEffect
++        if (model.session == null) return@LaunchedEffect
++        val captured = runCatching { model.currentToken() }.getOrNull() ?: return@LaunchedEffect
++        val sameCredential = { runCatching { model.currentToken() }.getOrNull() == captured }
++        val origin = baseURL ?: return@LaunchedEffect
++        try { val target = GrowthPush.resolveTap(GrowthClient(origin, model::currentToken), id, captured); if (sameCredential()) model.open(target) }
++        catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
++        catch (_: Exception) { if (sameCredential()) { model.open("/notifications"); model.error = QelvoraCopy.text("growthUpdateUnavailable") } }
++        finally { if (sameCredential()) onNotificationConsumed() }
++    }
+     Column(Modifier.fillMaxSize().background(qColor("ground")).windowInsetsPadding(WindowInsets.safeDrawing)) {
+         if (model.error.isNotEmpty()) Notice("error", "Account status", model.error)
+         if (model.localPurgeFailed) Button(QelvoraCopy.text("identityPrivateClearRetry"), ButtonVariant.SECONDARY, block = true, disabled = model.busy || model.purgingPrivateState) { scope.launch { model.purge() } }

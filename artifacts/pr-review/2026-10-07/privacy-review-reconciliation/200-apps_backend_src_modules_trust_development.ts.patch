@@ -1,0 +1,108 @@
+diff --git a/apps/backend/src/modules/trust/development.ts b/apps/backend/src/modules/trust/development.ts
+index 23bc2a93..3cfa0ac0 100644
+--- a/apps/backend/src/modules/trust/development.ts
++++ b/apps/backend/src/modules/trust/development.ts
+@@ -1,4 +1,4 @@
+-import pg from "pg";
++import pg, { type PoolClient } from "pg";
+ import type { BackendRuntime } from "../../integration.js";
+ import type { createTrustRuntime } from "../../operations/runtime.js";
+ import { DomainError } from "../../core/errors.js";
+@@ -12,8 +12,15 @@ import {
+   agentPauseEffects,
+ } from "./domain-adapters.js";
+ import { createPrivacyConsumers } from "./privacy-consumers.js";
++import { COMMERCE_PRIVACY_CONFIGURATION } from "../commerce/privacy-purpose.js";
+ import { trustLocalRestorationInTransaction } from "./restoration.js";
+ import { trustTransaction } from "./transaction.js";
++import { PrivateFileArtifacts } from "./private-file-artifacts.js";
++import { registeredContentPrivacyProfile } from "../../db/content-privacy-profile.js";
++import { ContentPrivacyExport } from "../content/privacy-export.js";
++import { PreparedAgentPrivacyExport } from "../agent/privacy-export-snapshot.js";
++import { registeredAgentPrivacyExportReview } from "../agent/privacy-export-configuration.js";
++import { restoredPrivacyTaskAuthorityInTransaction } from "./privacy-authority.js";
+ 
+ /** W1 adds these to its development adapter. These are labels, never tokens,
+  * membership grants, production identities or a second session issuer. */
+@@ -38,7 +45,7 @@ type TrustConfiguration = Omit<
+ >;
+ type Consumers = Omit<
+   Parameters<typeof createPrivacyConsumers>[0],
+-  "runtimePool" | "coordinatorPool"
++  "runtimePool" | "coordinatorPool" | "privacyArtifacts"
+ >;
+ 
+ /** Check every reachable membership, including NOINHERIT/SET ROLE paths. An
+@@ -250,6 +257,43 @@ export async function createDevelopmentTrust(
+     const agent =
+       options.agent ?? createAgentDomain({ pool: runtime.pool, model: null });
+     const restoreReadyInTransaction = trustLocalRestorationInTransaction(env);
++    const assertRestoredInTransaction = async (client: PoolClient) => {
++      if (!(await restoreReadyInTransaction(client)))
++        throw new DomainError(
++          "restoration_pending",
++          "This environment is unavailable while recovery is verified.",
++          503,
++        );
++    };
++    // Prepare the real exporter on this host's original core pool. Trust still
++    // supplies restoration, verified ownership and its current task/lease at
++    // every operation; configuration cannot create a task authority receipt.
++    const content =
++      options.consumers?.content ??
++      ((await registeredContentPrivacyProfile())
++        ? {
++            purposePool: runtime.pool,
++            exporter: await ContentPrivacyExport.prepare(runtime.pool),
++          }
++        : undefined);
++    const agentReview = await registeredAgentPrivacyExportReview();
++    const agentExport =
++      options.consumers?.agentExport ??
++      (agentReview
++        ? await PreparedAgentPrivacyExport.prepare({
++            ...agentReview,
++            pool: runtime.pool,
++            assertTaskInTransaction: (client, job) =>
++              restoredPrivacyTaskAuthorityInTransaction(
++                client,
++                job,
++                assertRestoredInTransaction,
++              ),
++          })
++        : undefined);
++    const privacyArtifacts = env.TRUST_PRIVATE_ARTIFACT_DIRECTORY
++      ? await PrivateFileArtifacts.prepare(env.TRUST_PRIVATE_ARTIFACT_DIRECTORY)
++      : undefined;
+     return {
+       environment: "local-development",
+       identityMode: "development",
+@@ -257,6 +301,7 @@ export async function createDevelopmentTrust(
+       release: env.RELEASE_REVISION ?? "",
+       apiPool,
+       workerPool,
++      privacyArtifacts,
+       dependencies: {
+         ...identityAuthority,
+         evidence: scopedTrustEvidence({
+@@ -282,15 +327,12 @@ export async function createDevelopmentTrust(
+       privacyHooks: createPrivacyConsumers({
+         runtimePool: runtime.pool,
+         coordinatorPool: workerPool,
++        commercePrivacy: COMMERCE_PRIVACY_CONFIGURATION,
+         ...options.consumers,
+-        assertRestoredInTransaction: async (client) => {
+-          if (!(await restoreReadyInTransaction(client)))
+-            throw new DomainError(
+-              "restoration_pending",
+-              "This environment is unavailable while recovery is verified.",
+-              503,
+-            );
+-        },
++        content,
++        agentExport,
++        privacyArtifacts,
++        assertRestoredInTransaction,
+         agent: options.consumers?.agent ?? agent,
+       }),
+       effectHooks: [

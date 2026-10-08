@@ -1,6 +1,7 @@
 import type { PoolClient } from "pg";
 import { z } from "zod";
 import { DomainError } from "../../core/errors.js";
+import { querySettlementUncertain } from "../../core/query-settlement.js";
 import { requestAuthority } from "../identity/request-authority.js";
 import type { PrivacyHook } from "./contracts.js";
 import { assertDomainPrivacyTaskCatalog } from "./domain-privacy-catalog.js";
@@ -62,6 +63,7 @@ export async function domainPrivacyTaskAuthorityInTransaction(
       503,
     );
   await client.query("SAVEPOINT w8_domain_privacy_task_fence");
+  let owned: readonly string[];
   try {
     await assertDomainPrivacyTaskCatalog(client, domain);
     await assertRestoredInTransaction(client);
@@ -89,22 +91,39 @@ export async function domainPrivacyTaskAuthorityInTransaction(
       );
     await assertRestoredInTransaction(client);
     input.signal.throwIfAborted();
-    return z.array(z.uuid()).max(100).parse(row.owned);
+    owned = z.array(z.uuid()).max(100).parse(row.owned);
   } catch (error) {
-    await client.query("ROLLBACK TO SAVEPOINT w8_domain_privacy_task_fence");
+    // The original owner settles the actual task or uncertain source. Nested
+    // cleanup cannot send SQL after cancellation or an unknown response.
+    if (input.signal.aborted || querySettlementUncertain(error)) throw error;
+    try {
+      await client.query("ROLLBACK TO SAVEPOINT w8_domain_privacy_task_fence");
+      await client.query("RELEASE SAVEPOINT w8_domain_privacy_task_fence");
+    } catch (cause) {
+      throw new AggregateError(
+        [error, cause],
+        "Original domain task fence and savepoint restoration failures.",
+      );
+    }
     if (
       error &&
       typeof error === "object" &&
       "code" in error &&
       ["42883", "42501", "55P03", "40001"].includes(String(error.code))
-    )
-      throw new DomainError(
+    ) {
+      const failure = new DomainError(
         "privacy_commit_fence_unavailable",
         "Current lifecycle authority is unavailable. Try again.",
         503,
       );
+      Object.defineProperty(failure, "cause", {
+        value: error,
+        configurable: true,
+      });
+      throw failure;
+    }
     throw error;
-  } finally {
-    await client.query("RELEASE SAVEPOINT w8_domain_privacy_task_fence");
   }
+  await client.query("RELEASE SAVEPOINT w8_domain_privacy_task_fence");
+  return owned;
 }

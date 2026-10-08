@@ -1,0 +1,69 @@
+diff --git a/apps/backend/src/modules/trust/router.ts b/apps/backend/src/modules/trust/router.ts
+index 4cf0842b..4421d644 100644
+--- a/apps/backend/src/modules/trust/router.ts
++++ b/apps/backend/src/modules/trust/router.ts
+@@ -17,10 +17,12 @@ import {
+   AppealInput,
+   EffectRetryInput,
+   BlockInput,
++  FeedbackInput,
+   Queue,
+   PrivacyDomains,
+ } from "./contracts.js";
+ import type { TrustService } from "./service.js";
++import { command } from "./store.js";
+ import type { Readiness } from "../../operations/readiness.js";
+ import {
+   failureClass,
+@@ -400,29 +402,31 @@ export function createTrustRouter(options: TrustRouterOptions) {
+     res.json(options.telemetry.snapshot());
+   });
+   router.post("/v1/trust/feedback", async (req, res) => {
+-    const input = z
+-      .strictObject({
+-        consent: z.literal(true),
+-        cohort: z.enum(["expert", "companion", "blend", "unspecified"]),
+-        useful: z.boolean(),
+-        authorshipClear: z.boolean(),
+-        comment: z.string().trim().max(2000).optional(),
+-      })
+-      .parse(req.body);
++    const input = FeedbackInput.parse(req.body);
+     const current = await actor(req);
+-    await options.service.store.actor(current, (client) =>
+-      client.query(
+-        "INSERT INTO creator_trust.feedback(account_id,consent_version,cohort,useful,authorship_clear,comment) VALUES($1,'pilot-feedback-v1',$2,$3,$4,$5)",
+-        [
+-          current.accountId,
+-          input.cohort,
+-          input.useful,
+-          input.authorshipClear,
+-          input.comment ?? null,
+-        ],
++    const result = await options.service.store.actor(current, (client) =>
++      command(
++        client,
++        current,
++        "product_feedback",
++        input.idempotencyKey,
++        input,
++        async () => {
++          await client.query(
++            "INSERT INTO creator_trust.feedback(account_id,consent_version,cohort,useful,authorship_clear,comment) VALUES($1,'pilot-feedback-v1',$2,$3,$4,$5)",
++            [
++              current.accountId,
++              input.cohort,
++              input.useful,
++              input.authorshipClear,
++              input.comment ?? null,
++            ],
++          );
++          return { saved: true, retentionDays: 90 };
++        },
+       ),
+     );
+-    res.status(201).json({ saved: true, retentionDays: 90 });
++    res.status(201).json(result);
+   });
+   router.use(
+     (error: unknown, _req: Request, res: Response, _next: NextFunction) => {

@@ -8,6 +8,7 @@ import {
 } from "./recorder";
 import {
   MediaRequestError,
+  captureMediaRequest,
   mediaRequest,
   uploadCreatorMedia,
   uploadRecording,
@@ -19,7 +20,10 @@ import type {
   CreatorMediaUploadTicket,
   ProcessedMediaEvidence,
 } from "../../../../packages/api/src/media";
-import { ProcessedMediaEvidenceSchema } from "../../../../packages/api/src/media";
+import {
+  MediaRevocationSchema,
+  ProcessedMediaEvidenceSchema,
+} from "../../../../packages/api/src/media";
 import "./media.css";
 import { SignRecording } from "./SignRecording";
 import { CreatorVoicePlayer, VoicePlayer } from "./VoicePlayer";
@@ -119,6 +123,13 @@ function RecordingForm({
         : `threads/${creatorId}/${fanId}/media`
       : null;
   const notified = useRef<string | null>(null);
+  const lifetime = useRef(new AbortController());
+  useEffect(() => {
+    if (lifetime.current.signal.aborted)
+      lifetime.current = new AbortController();
+    const original = lifetime.current;
+    return () => original.abort();
+  }, []);
   const [recording, setRecording] = useState<RecordingSnapshot>({
     state: "idle",
     durationMs: 0,
@@ -148,6 +159,7 @@ function RecordingForm({
   const uploadKey = useRef<string | undefined>(undefined);
   const pendingUpload = useRef<Promise<void> | null>(null);
   const [discarding, setDiscarding] = useState(false);
+  const discardPending = useRef(false);
   const recordingAction = useRef<HTMLButtonElement | null>(null);
   const restoreRecordingFocus = useRef(false);
   useEffect(() => {
@@ -337,6 +349,8 @@ function RecordingForm({
     const firstAttempt = uploadKey.current === undefined;
     uploadKey.current ??= crypto.randomUUID();
     const abort = new AbortController();
+    const original = lifetime.current;
+    const signal = AbortSignal.any([abort.signal, original.signal]);
     controller.current = abort;
     setUpload("uploading");
     setError(null);
@@ -347,7 +361,7 @@ function RecordingForm({
         blob: recording.blob,
         durationMs: Math.round(recording.durationMs),
         idempotencyKey: uploadKey.current,
-        signal: abort.signal,
+        signal,
         progress: setProgress,
       };
       const result = objectId
@@ -369,9 +383,12 @@ function RecordingForm({
               ticket.current = value;
             },
           });
+      signal.throwIfAborted();
+      if (lifetime.current !== original) return;
       setAsset(result);
       setUpload("processing");
     } catch (e) {
+      if (original.signal.aborted || lifetime.current !== original) return;
       // A definitive rejection of the first opening request allocated no
       // ticket. A lost response or any later retry remains unconfirmed.
       if (
@@ -392,38 +409,62 @@ function RecordingForm({
     }
   }
   async function discard() {
-    if (discarding) return false;
+    if (discardPending.current) return false;
+    discardPending.current = true;
+    const originalView = lifetime.current;
+    const currentView = () =>
+      lifetime.current === originalView && !originalView.signal.aborted;
     setDiscarding(true);
-    controller.current?.abort();
-    await pendingUpload.current;
-    const current = ticket.current;
-    if (current && family) {
-      try {
+    try {
+      // Capture before waiting for upload or the host's draft detach. Never
+      // borrow a replacement MediaSession after either asynchronous step.
+      const original =
+        ticket.current || uploadKey.current || pendingUpload.current
+          ? captureMediaRequest(expectedAccountId)
+          : null;
+      const check = () => {
+        originalView.signal.throwIfAborted();
+        if (!currentView()) throw new DOMException("View closed", "AbortError");
+        original?.check();
+      };
+      check();
+      controller.current?.abort();
+      await pendingUpload.current;
+      check();
+      const current = ticket.current;
+      if (current && family) {
         await beforeDiscard?.(current.asset.id);
-        await mediaRequest(`${family}/${current.asset.id}`, {
-          method: "DELETE",
-          expectedAccountId,
-        });
-      } catch {
-        setError(copy.w6TheUploadedFileCouldNotBeRemovedTryAgainBefore);
-        setDiscarding(false);
+        check();
+        MediaRevocationSchema.parse(
+          await original!.request(`${family}/${current.asset.id}`, {
+            method: "DELETE",
+            signal: originalView.signal,
+          }),
+        );
+        check();
+      }
+      if (uploadKey.current && !current) {
+        setError(copy.w6TheUploadIsUnconfirmedRetryItToFindAndRemove);
         return false;
       }
-    }
-    if (uploadKey.current && !current) {
-      setError(copy.w6TheUploadIsUnconfirmedRetryItToFindAndRemove);
-      setDiscarding(false);
+      notified.current = null;
+      ticket.current = undefined;
+      uploadKey.current = undefined;
+      recorder.current?.discard();
+      setAsset(null);
+      setUpload("idle");
+      setError(null);
+      return true;
+    } catch {
+      if (currentView())
+        setError(copy.w6TheUploadedFileCouldNotBeRemovedTryAgainBefore);
       return false;
+    } finally {
+      if (currentView()) {
+        discardPending.current = false;
+        setDiscarding(false);
+      }
     }
-    notified.current = null;
-    ticket.current = undefined;
-    uploadKey.current = undefined;
-    recorder.current?.discard();
-    setAsset(null);
-    setUpload("idle");
-    setError(null);
-    setDiscarding(false);
-    return true;
   }
   const active = ["recording", "paused"].includes(recording.state);
   const time = `${Math.floor(recording.durationMs / 60_000)}:${String(Math.floor(recording.durationMs / 1000) % 60).padStart(2, "0")}`;
@@ -471,8 +512,14 @@ function RecordingForm({
             else if (recording.state === "recording") recorder.current?.pause();
             else if (recording.state === "paused") recorder.current?.resume();
             else {
+              const original = lifetime.current;
               void discard().then((discarded) => {
-                if (discarded) void recorder.current?.start();
+                if (
+                  discarded &&
+                  lifetime.current === original &&
+                  !original.signal.aborted
+                )
+                  void recorder.current?.start();
               });
             }
           }}

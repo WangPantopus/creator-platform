@@ -1,0 +1,29 @@
+diff --git a/apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt b/apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt
+index ef806cfd..25810cc7 100644
+--- a/apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt
++++ b/apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt
+@@ -3,6 +3,7 @@ package com.pantopus.qelvora.generated
+ object QelvoraCopy {
+   val strings = mapOf(
+     "continueWithPantopus" to "Continue with Pantopus",
++    "productFeedbackUnconfirmed" to "Your feedback could not be confirmed. Your answers are kept; retry the same submission.",
+     "identityInputKeptUnavailable" to "The service is unavailable. Your input has been kept; try again.",
+     "identityInputKeptUnreadable" to "The service returned an unreadable response. Your input has been kept; try again.",
+     "identityProfileSaveFailed" to "Could not save. Try again.",
+@@ -757,6 +758,8 @@ object QelvoraCopy {
+     "w6ConsentCouldNotBeSaved" to "Consent could not be saved.",
+     "w6TheCallCouldNotBeEndedTryAgain" to "The call could not be ended. Try again.",
+     "w6TheSummaryCouldNotBeChanged" to "The summary could not be changed.",
++    "w6CallActionUnconfirmed" to "This call action is unconfirmed. Retry the same action before making another change.",
++    "w6RetryCallAction" to "Retry this call action",
+     "w6ThisCallIsUnavailable" to "This call is unavailable",
+     "w6OpeningYourCall" to "Opening your call",
+     "w6CheckingTheBookingAndParticipantAccess" to "Checking the booking and participant access.",
+@@ -866,6 +869,7 @@ object QelvoraCopy {
+     "w6RecordingPausedAfterAnInterruptionResumeOrPreviewWhatWas" to "Recording paused after an interruption. Resume or preview what was saved.",
+     "w6RecordingCouldNotResumePreviewItOrRecordAgain" to "Recording could not resume. Preview it or record again.",
+     "w6TheSavedRecordingCouldNotBePlayedRecordAgain" to "The saved recording could not be played. Record again.",
++    "w6ThePrivatePreviewCouldNotBeClearedTryAgainBefore" to "The private preview could not be cleared. Try again before recording.",
+     "w6RecordAndListenBeforeUploadingYourPreviewStaysOnThis" to "Record and listen before uploading. Your preview stays on this device.",
+     "w6PlayPrivatePreview" to "Play private preview",
+     "w6PausePreview" to "Pause preview",

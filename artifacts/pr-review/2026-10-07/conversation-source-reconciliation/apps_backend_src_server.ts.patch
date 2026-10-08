@@ -1,0 +1,155 @@
+diff --git a/apps/backend/src/server.ts b/apps/backend/src/server.ts
+index e8acd2a2..31a83914 100644
+--- a/apps/backend/src/server.ts
++++ b/apps/backend/src/server.ts
+@@ -6,6 +6,8 @@ import { DevelopmentIdentityAdapter } from "./modules/identity/development.js";
+ import { commerceSignedSubjects } from "./modules/commerce/registration.js";
+ import { configureGrowthForBackend } from "./modules/growth/configured.js";
+ import { composeConversationHost } from "./modules/conversation/host.js";
++import { registeredConversationPrivacyReview } from "./modules/conversation/privacy-configuration.js";
++import { accountingRetentionPolicy } from "./modules/trust/accounting-retention-policy.js";
+ import { createCommerceStudio } from "./modules/commerce/studio.js";
+ import {
+   composeContentHost,
+@@ -21,10 +23,7 @@ import {
+   developmentTrustActors,
+ } from "./modules/trust/development.js";
+ import { agentFeature } from "./modules/agent/feature.js";
+-import {
+-  DevelopmentLicenseVerifier,
+-  developmentSyntheticJournalPolicy,
+-} from "./modules/agent/development-license.js";
++import { DevelopmentLicenseVerifier } from "./modules/agent/development-license.js";
+ import { contentPublicProjection } from "./modules/growth/content.js";
+ import { canonicalConversationHomePage } from "./modules/growth/home.js";
+ import { canonicalHomePage } from "./modules/growth/home-composition.js";
+@@ -36,7 +35,7 @@ import type {
+   AgentPrivacyOwnerPorts,
+   ConversationPrivacyOwnerPorts,
+ } from "./modules/trust/privacy-consumers.js";
+-import { createTrustReplyReviewer } from "./modules/trust/reply-review.js";
++import { prepareTrustReplyReviewer } from "./modules/trust/reply-review.js";
+ import { InteractiveCallControl } from "./modules/session/interactive-control.js";
+ import { AccountCallMetadata } from "./modules/session/account-call-metadata.js";
+ 
+@@ -58,8 +57,7 @@ const features: {
+   conversationPrivacy?: ConversationPrivacyOwnerPorts;
+   agentPrivacy?: AgentPrivacyOwnerPorts;
+   commerce?: import("./modules/commerce/service.js").CommerceService;
+-  close: (() => void | Promise<void>)[];
+-} = { growth: null, close: [] };
++} = { growth: null };
+ if (config.identityAdapter === "development" && !config.identitySessionKey)
+   throw new Error(
+     "Development identity requires an explicit IDENTITY_SESSION_KEY.",
+@@ -115,7 +113,7 @@ try {
+                   }),
+               }
+             : {}),
+-          registerFeatures: async (runtime) => {
++          registerFeatures: async (runtime, onClose) => {
+             const accountCalls = await AccountCallMetadata.prepare(runtime);
+             const callControl = await InteractiveCallControl.prepare(runtime);
+             const mediaEnvironment = readMediaEnvironment();
+@@ -150,12 +148,33 @@ try {
+                       runtime.pool,
+                       syntheticHost,
+                     ),
+-                    journalPolicy:
+-                      developmentSyntheticJournalPolicy(syntheticHost),
+                   }
+                 : {};
++            const usageAccounting = await runtime.prepareUsageAccounting?.();
++            const conversationPrivacy =
++              usageAccounting &&
++              mediaHost &&
++              process.env.W3_DEVELOPMENT_ECONOMICS_FILE &&
++              process.env.COMMERCE_CURRENCY
++                ? await registeredConversationPrivacyReview()
++                : undefined;
+             const host = await composeConversationHost(runtime, config, {
+               ...licensing,
++              ...(usageAccounting ? { usageAccounting } : {}),
++              ...(usageAccounting && conversationPrivacy
++                ? {
++                    privacyCursor: {
++                      usageRetention: usageAccounting.retention,
++                      custody: conversationPrivacy.cursor,
++                    },
++                    privacyAccounting: {
++                      retentionPolicyVersion: accountingRetentionPolicy.version,
++                      assertPrivacyRegistered:
++                        usageAccounting.assertPrivacyRegistered,
++                    },
++                    provenancePurge: conversationPrivacy.provenancePurge,
++                  }
++                : {}),
+               ...(mediaHost
+                 ? {
+                     media: mediaHost.media,
+@@ -164,7 +183,7 @@ try {
+                   }
+                 : {}),
+             });
+-            features.close.push(() => host.close());
++            onClose(() => host.close());
+             const { commerce, conversation, agent } = host;
+             features.agentPrivacy = agent;
+             features.commerce = commerce?.service;
+@@ -177,6 +196,7 @@ try {
+                 : "Call control: unavailable; canonical held request authority is not activated.\n",
+             );
+             features.conversationPrivacy = host.privacy;
++            usageAccounting?.bindRepository(agent.service.repository);
+             runtime.configureSignedSubjects(conversation.signedSubjectPolicies);
+             // Growth and Content share publication/follow composition. Resolve
+             // the actual reader after the canonical Content service is bound,
+@@ -243,6 +263,8 @@ try {
+                   }
+                 : undefined,
+             });
++            const growth = features.growth;
++            if (growth) onClose(() => growth.close());
+             const contentHost = composeContentHost({
+               pool: runtime.pool,
+               owners: {
+@@ -253,7 +275,7 @@ try {
+               },
+               dependencies: {
+                 assertAllowed: runtime.assertCreatorAllowed,
+-                reviewReply: createTrustReplyReviewer(),
++                reviewReply: await prepareTrustReplyReviewer(runtime),
+                 assertAllowedInTransaction: async (
+                   client,
+                   actor,
+@@ -345,11 +367,16 @@ try {
+         })
+       : undefined;
+ } catch (error) {
+-  await Promise.allSettled([
+-    features.growth?.close(),
+-    ...features.close.map((close) => Promise.resolve().then(close)),
+-    growthAPIPool?.end(),
+-  ]);
++  // Configured-host cleanup has already drained its features before its core
++  // pool. This independently owned API pool must remain alive until that ends.
++  try {
++    await growthAPIPool?.end();
++  } catch (cleanup) {
++    throw new AggregateError(
++      [error, cleanup],
++      "Server startup and Growth API pool cleanup failed.",
++    );
++  }
+   throw error;
+ }
+ features.growth?.start();
+@@ -378,8 +405,6 @@ const shutdown = () => {
+         console.error(`Shutdown could not close ${name}.`);
+       }
+     };
+-    await close("Growth worker", () => features.growth?.close());
+-    for (const action of features.close) await close("feature workers", action);
+     await close("configured backend", () =>
+       configured
+         ? configured.close()

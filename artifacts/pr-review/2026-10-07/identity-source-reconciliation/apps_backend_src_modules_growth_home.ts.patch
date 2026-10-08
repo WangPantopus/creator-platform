@@ -1,0 +1,30 @@
+diff --git a/apps/backend/src/modules/growth/home.ts b/apps/backend/src/modules/growth/home.ts
+index 890c8986..7326c206 100644
+--- a/apps/backend/src/modules/growth/home.ts
++++ b/apps/backend/src/modules/growth/home.ts
+@@ -62,6 +62,7 @@ export function canonicalConversationHomePage(
+   access: AccessService,
+   database: Database,
+   signing: Pick<SignedActService, "matchesThreadAct">,
++  handleFor: (creatorId: string) => Promise<string | null>,
+ ): NonNullable<GrowthOwners["homePage"]> {
+   return async (actor, cursor) => {
+     const directory = Directory.parse(
+@@ -123,6 +124,8 @@ export function canonicalConversationHomePage(
+             copy.growthErrorPrivateReplyUnavailable,
+             503,
+           );
++        const handle = await handleFor(scope.creatorId);
++        if (!handle || !/^[a-z0-9_]{3,30}$/u.test(handle)) continue;
+         const row = await database.withThread(
+           scope,
+           async (client) => {
+@@ -182,7 +185,7 @@ export function canonicalConversationHomePage(
+           creatorName: scope.creatorName,
+           label,
+           preview,
+-          destination: `/threads/${scope.creatorId}/${scope.fanId}`,
++          destination: `/creators/${handle}/chat`,
+           updatedAt:
+             entry.activityAt ??
+             new Date(

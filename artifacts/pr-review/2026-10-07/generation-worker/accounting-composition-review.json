@@ -1,0 +1,62 @@
+{
+  "sourceBase": "f74833db",
+  "sourceSha256": {
+    "apps/backend/src/modules/commerce/attributed-cost-policy.ts": "b1f84312b5c679dd6deac9272710eb1e761dbe0b1bf8b55624a3d634455fb1a4",
+    "apps/backend/src/modules/commerce/generation-allowance.ts": "fb3aed04d7afc967a8e3041be35223aaa61841fcedd84732c56d53407d8d433a",
+    "apps/backend/src/modules/conversation/host.ts": "ebe592e27498b5be8419c56f8bff9fee112653ea49176e45cab5a930bbecb6fd",
+    "apps/backend/src/modules/conversation/privacy-export-cursor.ts": "a2e8a6969a0949e7d85257531406b4a67e0c228a35ffcb9fff69437b2e095cbd",
+    "apps/backend/src/modules/trust/generation-accounting-retention.ts": "0e50263882f0341adf8424e711e4b90455719a184c0aec64f5cccd3da9b11874",
+    "apps/backend/src/modules/trust/privacy-consumers.ts": "40bab66d791d4bada1b3e8b1845ccb72470f29d819ac09100e634548aac3cb97",
+    "apps/backend/src/workers/generation-composition.ts": "1d81ed490da6a9f4e910824de83f0dafa81a660fafa20f794812505a3736b151"
+  },
+  "sourceReview": {
+    "binding": "Conversation host forwards its actual journal, expiry, allowance and AccessService. The existing Trust consumer supplies its original runtime pool and Conversation task/family authority.",
+    "journalIdentity": "The original attributed-cost-policy factory retains the exact captured journal by policy object identity; copies or different same-version readers cannot satisfy the new allowance check. Scoped worker and privacy preparation use it.",
+    "exportIdentity": "Prepared and lazily prepared export cursors must use the same original journal and expiry owner as accounting deletion. Conflicting direct and preparation paths are refused.",
+    "authority": "Existing task/family/restoration/final-COMMIT checks remain. No schema, grants, executable registry entries or production catalogue pins change."
+  },
+  "actualHostPreparation": {
+    "scope": "Actual canonical host preparation only; no genuine job, prepared accounting graph, C10 readiness or activation is claimed.",
+    "observations": [
+      {
+        "case": "approved_policy_without_original_accounting_owners",
+        "refusalCode": "conversation_accounting_unavailable",
+        "registrationCallbackNotInvoked": true,
+        "failedHostPoolClosed": true
+      },
+      {
+        "case": "ordinary_canonical_host",
+        "generationAvailable": false,
+        "accountingPreparationAbsent": true,
+        "workerAbsent": true,
+        "businessRowsUnchanged": true
+      }
+    ],
+    "before": {
+      "migrations": 61,
+      "usage": 0,
+      "ingestion": 0,
+      "threads": 0,
+      "generations": 0
+    },
+    "after": {
+      "migrations": 61,
+      "usage": 0,
+      "ingestion": 0,
+      "threads": 0,
+      "generations": 0
+    }
+  },
+  "validation": {
+    "backendShippingBuild": "passed under original W2 heavy-build lock",
+    "scopedEslint": "passed",
+    "prettier": "passed",
+    "existingContractTests": 9,
+    "existingSchedulerTests": 8
+  },
+  "limits": [
+    "Composition source and negative actual host preparation only.",
+    "Current canonical server does not yet supply full C10 registration, expiry authority, ordinary message retention, complete export/provenance custody or per-owner readiness probes.",
+    "No complete original leased privacy task, positive prepared accounting graph, provider receipt or generation activation is claimed."
+  ]
+}

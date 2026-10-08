@@ -1,0 +1,13 @@
+diff --git a/apps/ios/Sources/QelvoraUI/PublicVerification.swift b/apps/ios/Sources/QelvoraUI/PublicVerification.swift
+index f2869a6e..83b4673b 100644
+--- a/apps/ios/Sources/QelvoraUI/PublicVerification.swift
++++ b/apps/ios/Sources/QelvoraUI/PublicVerification.swift
+@@ -105,6 +105,8 @@ private struct PublicVerificationScreen: View {
+         configuration.urlCache = nil
+         configuration.httpCookieStorage = nil
+         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
++        configuration.timeoutIntervalForRequest = 30
++        configuration.timeoutIntervalForResource = 30
+         let transport = URLSession(configuration: configuration)
+         defer { transport.invalidateAndCancel() }
+         do {

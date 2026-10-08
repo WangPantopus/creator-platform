@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+import { readFile } from "node:fs/promises";
 import { Router } from "express";
 import { z } from "zod";
 import type { FeatureRegistration } from "../../app.js";
@@ -14,6 +16,83 @@ import {
  * schema. The same producer powers C02 review, C06 persistence and W3 delivery.
  */
 export const COMMERCE_APPROVAL_MIGRATION = "0044_w4_personal_approval";
+const approvalSource = {
+  owner: "W4",
+  path: "apps/backend/src/modules/commerce/schema-approval.sql",
+  checksum: "4480936ea99adbc954f1e3444673772922c49e6dab8b9cce9351cf6d61c493fb",
+} as const;
+declare const __QELVORA_REGISTERED_MIGRATION_SOURCES__:
+  | Readonly<Record<string, { owner: string; path: string; checksum: string }>>
+  | undefined;
+
+/** Hosts consume executable source custody before supplying the real graph.
+ * A table or database ledger entry alone never enables personal Approval.
+ * Shipping bundles retain these pins without needing a deployed source tree.
+ */
+export async function registeredCommerceApprovalMigration() {
+  let source: { owner: string; path: string; checksum: string } | undefined;
+  if (typeof __QELVORA_REGISTERED_MIGRATION_SOURCES__ !== "undefined") {
+    source = Object.hasOwn(
+      __QELVORA_REGISTERED_MIGRATION_SOURCES__,
+      COMMERCE_APPROVAL_MIGRATION,
+    )
+      ? __QELVORA_REGISTERED_MIGRATION_SOURCES__[COMMERCE_APPROVAL_MIGRATION]
+      : undefined;
+  } else {
+    const root = new URL("../../../../../", import.meta.url);
+    const registry = z
+      .object({
+        migrations: z.array(
+          z.object({
+            version: z.string(),
+            owner: z.string(),
+            path: z.string(),
+          }),
+        ),
+      })
+      .parse(
+        JSON.parse(
+          await readFile(new URL("infra/migrations.json", root), "utf8"),
+        ),
+      );
+    const entries = registry.migrations.filter(
+      (entry) => entry.version === COMMERCE_APPROVAL_MIGRATION,
+    );
+    invariant(
+      entries.length <= 1,
+      "approval_unconfigured",
+      "Personal Approval requires one exact executable migration.",
+    );
+    const entry = entries[0];
+    if (entry) {
+      invariant(
+        entry.owner === approvalSource.owner &&
+          entry.path === approvalSource.path,
+        "approval_unconfigured",
+        "Personal Approval requires its original registered source.",
+      );
+      source = {
+        owner: entry.owner,
+        path: entry.path,
+        checksum: createHash("sha256")
+          .update(await readFile(new URL(entry.path, root)))
+          .digest("hex"),
+      };
+    }
+  }
+  if (!source) return undefined;
+  invariant(
+    source.owner === approvalSource.owner &&
+      source.path === approvalSource.path &&
+      source.checksum === approvalSource.checksum,
+    "approval_unconfigured",
+    "Personal Approval requires its original executable source custody.",
+  );
+  return Object.freeze({
+    version: COMMERCE_APPROVAL_MIGRATION,
+    checksum: source.checksum,
+  });
+}
 
 export async function createCommerceApprovals(input: {
   database: Database;
@@ -21,9 +100,11 @@ export async function createCommerceApprovals(input: {
   conversation: ConversationService;
   migration: { version: string; checksum: string };
 }) {
+  const registered = await registeredCommerceApprovalMigration();
   invariant(
-    input.migration.version === COMMERCE_APPROVAL_MIGRATION &&
-      /^[a-f0-9]{64}$/u.test(input.migration.checksum),
+    registered &&
+      input.migration.version === registered.version &&
+      input.migration.checksum === registered.checksum,
     "approval_unconfigured",
     "Personal Approval requires its exact activated migration.",
   );

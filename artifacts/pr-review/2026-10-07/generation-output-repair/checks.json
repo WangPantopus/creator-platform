@@ -1,0 +1,17 @@
+{
+  "revision": "fac7b222b1f81612eb751e34a7f6582890897a86",
+  "backendShippingBuild": "passed",
+  "backendTypecheck": "passed",
+  "existingTests": {
+    "files": 2,
+    "passed": 17
+  },
+  "scopedLint": "passed",
+  "standaloneGenerationDisabled": true,
+  "logs": {
+    "creator-generation-final-build.log": "c1e47a98ba64cfe83cf2f31efd654697cfdf071e99c48b855e0eaf37593cf24d",
+    "creator-generation-final-tests.log": "eaee9cf4651a91b3c59dea2687d6a4ff2e7084600ceee0d559705c7d20d7986c",
+    "creator-output-final-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "creator-final-generation-disabled.log": "a0aea0a4c9de3274a19fc1e9c9be30801b383c97286f7371e856e0848da1190e"
+  }
+}

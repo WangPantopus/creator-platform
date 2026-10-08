@@ -1,0 +1,57 @@
+{
+  "scope": "Read-only startup metadata lifetime on a real canonical runtime pool. No purpose, accepted task, provider or settlement.",
+  "observations": [
+    {
+      "case": "canonical_metadata",
+      "database": "creator_generation_test",
+      "oid": 16384,
+      "poolBudgetUnchanged": true
+    },
+    {
+      "case": "distinct_worker_login_refused",
+      "discarded": true
+    },
+    {
+      "case": "preaborted",
+      "noCheckout": true
+    },
+    {
+      "case": "abort",
+      "realServerLockObserved": true,
+      "elapsedMs": 56,
+      "discardedBeforeReturn": true
+    },
+    {
+      "case": "abort_reuse",
+      "sourceBackendGone": true,
+      "newReadSucceeded": true
+    },
+    {
+      "case": "timeout",
+      "realServerLockObserved": true,
+      "elapsedMs": 201,
+      "discardedBeforeReturn": true
+    },
+    {
+      "case": "timeout_reuse",
+      "sourceBackendGone": true,
+      "newReadSucceeded": true
+    },
+    {
+      "case": "default_timeout",
+      "realServerLockObserved": true,
+      "elapsedMs": 5002,
+      "discardedBeforeReturn": true
+    },
+    {
+      "case": "default_timeout_reuse",
+      "sourceBackendGone": true,
+      "newReadSucceeded": true
+    }
+  ],
+  "verification": {
+    "backendBuild": "pass",
+    "scopedLint": "pass",
+    "changes": "Six owner preparations use bounded canonical metadata reads. Worker-held preparations read host metadata first. The terminal journal uses original cancellable transaction cleanup. No pool-wide interactive budget or schema changed."
+  }
+}

@@ -1,5 +1,28 @@
 import type { PoolClient } from "pg";
 import { DomainError } from "../../core/errors.js";
+import {
+  originalPrivacyFamilyRegisteredExtension,
+  assertOriginalPrivacyFamilyGenerationCatalog,
+  originalPrivacyBindingSignature,
+  originalPrivacyBindingDefinition,
+} from "./privacy-family-catalog.js";
+import generationReview from "../../../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
+import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
+import { contentHash } from "../../core/canonical.js";
+import {
+  accountDetachedUsageCatalogue,
+  accountDetachedUsageExpectedCatalogue,
+  accountDeleteBindingSignature,
+  accountDeleteBindingDefinition,
+} from "./account-detached-usage-catalogue.js";
+import {
+  accountingBoundaryCatalogue,
+  accountingBoundaryExpectedCatalogue,
+  accountingBoundaryBindingSignature,
+  accountingBoundaryBindingDefinition,
+} from "./accounting-boundary-catalogue.js";
+import { accountDetachedUsageRegisteredExtension } from "./account-detached-usage-catalogue.js";
+import { accountingBoundaryRegisteredExtension } from "./accounting-boundary-catalogue.js";
 
 const functions = [
   {
@@ -40,7 +63,98 @@ const columns = [
 /** Exact activated lifecycle source and metadata-only purpose custody. A
  * manually installed proposal, extra grant/owner/membership or early trigger
  * is unavailable. Do not cache this across the real held transaction. */
-export async function assertPrivacyTaskCatalog(client: PoolClient) {
+export async function assertPrivacyTaskCatalog(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  signal?.throwIfAborted();
+  const family = await originalPrivacyFamilyRegisteredExtension(client, signal);
+  const detached = await accountDetachedUsageRegisteredExtension(
+    client,
+    signal,
+  );
+  const boundary = await accountingBoundaryRegisteredExtension(client, signal);
+  return assertPrivacyTaskMetadata(
+    client,
+    { family, detached, boundary },
+    signal,
+  );
+}
+
+/** Exact canonical0087 metadata for the migration operator before any
+ * generation DDL. This issues no task authority and rejects every extension;
+ * runtime callers must use assertPrivacyTaskCatalog and its registered graph. */
+export async function assertCanonicalPrivacyTaskCatalog(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  return assertPrivacyTaskMetadata(client, {}, signal);
+}
+
+/** Fixed100 metadata for the closed migration operator after later Content
+ * registration. This supplies no task authority and accepts no caller pins;
+ * runtime callers retain the live registered graph above. */
+export async function assertGenerationPrivacyTaskCatalogForReview(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  for (const source of generationReview.sources)
+    await assertRegisteredMigration(client, source, signal);
+  await assertOriginalPrivacyFamilyGenerationCatalog(client, signal);
+  if (
+    contentHash(await accountDetachedUsageCatalogue(client, signal)) !==
+      accountDetachedUsageExpectedCatalogue ||
+    contentHash(await accountingBoundaryCatalogue(client, signal)) !==
+      accountingBoundaryExpectedCatalogue
+  )
+    throw new DomainError(
+      "privacy_commit_fence_unavailable",
+      "Original generation privacy metadata changed.",
+      503,
+    );
+  return assertPrivacyTaskMetadata(
+    client,
+    {
+      family: {
+        signature: originalPrivacyBindingSignature,
+        sha256: originalPrivacyBindingDefinition,
+      },
+      detached: {
+        signature: accountDeleteBindingSignature,
+        sha256: accountDeleteBindingDefinition,
+      },
+      boundary: {
+        signature: accountingBoundaryBindingSignature,
+        sha256: accountingBoundaryBindingDefinition,
+      },
+    },
+    signal,
+  );
+}
+
+async function assertPrivacyTaskMetadata(
+  client: PoolClient,
+  extensions: {
+    family?: { signature: string; sha256: string };
+    detached?: { signature: string; sha256: string };
+    boundary?: { signature: string; sha256: string };
+  },
+  signal?: AbortSignal,
+) {
+  signal?.throwIfAborted();
+  const { family, detached, boundary } = extensions;
+  const expectedFunctions = [
+    ...functions,
+    ...(family ? [family] : []),
+    ...(detached ? [detached] : []),
+    ...(boundary ? [boundary] : []),
+  ];
+  const expectedColumns = family
+    ? [
+        ...columns,
+        { relation: "privacy_job", column: "created_at", privilege: "SELECT" },
+      ]
+    : columns;
   const ready = (
     await client.query<{ ready: boolean }>(
       `WITH role AS (
@@ -80,7 +194,7 @@ export async function assertPrivacyTaskCatalog(client: PoolClient) {
         AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=(SELECT oid FROM role) AND relkind IN('r','p','v','m','S','f') AND oid<>(SELECT oid FROM scope))
         AND NOT EXISTS(SELECT FROM pg_type t WHERE t.typowner=(SELECT oid FROM role)
           AND t.oid<>(SELECT reltype FROM scope) AND t.typelem<>(SELECT reltype FROM scope))
-        AND (SELECT count(*)=2 FROM pg_proc p JOIN expected_functions e ON p.oid=e.oid
+        AND (SELECT count(*)=$5 FROM pg_proc p JOIN expected_functions e ON p.oid=e.oid
           WHERE p.proowner=(SELECT oid FROM role) AND p.prosecdef AND p.proconfig=ARRAY['search_path=pg_catalog']::text[]
           AND encode(sha256(convert_to(pg_get_functiondef(p.oid),'UTF8')),'hex')=e.sha256)
         AND NOT EXISTS(SELECT FROM pg_proc WHERE proowner=(SELECT oid FROM role) AND oid NOT IN(SELECT oid FROM expected_functions))
@@ -88,8 +202,15 @@ export async function assertPrivacyTaskCatalog(client: PoolClient) {
           WHERE (acl.grantee=(SELECT oid FROM role) AND p.oid NOT IN(SELECT oid FROM expected_functions))
           OR (p.oid IN(SELECT oid FROM expected_functions) AND
             (acl.privilege_type<>'EXECUTE' OR acl.is_grantable OR acl.grantor<>(SELECT oid FROM role)
-              OR (acl.grantee<>(SELECT oid FROM role) AND NOT(p.oid=to_regprocedure('creator_trust.fence_privacy_task(uuid,uuid,text,text,uuid,uuid,text,uuid)')
-                AND acl.grantee=(SELECT oid FROM pg_roles WHERE rolname='creator_runtime'))))))
+              OR (acl.grantee<>(SELECT oid FROM role) AND NOT(
+                (p.oid=to_regprocedure('creator_trust.fence_privacy_task(uuid,uuid,text,text,uuid,uuid,text,uuid)')
+                 AND acl.grantee=(SELECT oid FROM pg_roles WHERE rolname='creator_runtime'))
+                OR ($6::boolean AND p.oid=to_regprocedure('creator_trust.privacy_task_original_binding(uuid,text,uuid)')
+                 AND acl.grantee=(SELECT oid FROM pg_roles WHERE rolname='creator_privacy_family'))
+                OR ($7::boolean AND p.oid=to_regprocedure('creator_trust.usage_account_delete_bound(uuid)')
+                 AND acl.grantee=(SELECT oid FROM pg_roles WHERE rolname='creator_usage_detachment'))
+                OR ($8::boolean AND p.oid=to_regprocedure('creator_trust.privacy_accounting_original_scope(uuid,text,uuid)')
+                 AND acl.grantee=(SELECT oid FROM pg_roles WHERE rolname='creator_privacy_accounting_boundary')))))))
         AND has_function_privilege(current_user,to_regprocedure('creator_trust.fence_privacy_task(uuid,uuid,text,text,uuid,uuid,text,uuid)'),'EXECUTE')
         AND NOT EXISTS(SELECT FROM pg_class c CROSS JOIN LATERAL aclexplode(coalesce(c.relacl,acldefault(CASE WHEN c.relkind='S' THEN 's'::"char" ELSE 'r'::"char" END,c.relowner))) acl
           WHERE c.relkind IN('r','p','v','m','S','f') AND acl.grantee=(SELECT oid FROM role) AND c.oid<>(SELECT oid FROM scope))
@@ -138,11 +259,16 @@ export async function assertPrivacyTaskCatalog(client: PoolClient) {
       [
         "0087_w8_privacy_task_commit_fence",
         "33e619bfdea66355e1d8d2b90ed2d0389f21ae024fda63e1b984c99aede847ef",
-        JSON.stringify(functions),
-        JSON.stringify(columns),
+        JSON.stringify(expectedFunctions),
+        JSON.stringify(expectedColumns),
+        expectedFunctions.length,
+        family !== undefined,
+        detached !== undefined,
+        boundary !== undefined,
       ],
     )
   ).rows[0]?.ready;
+  signal?.throwIfAborted();
   if (ready !== true)
     throw new DomainError(
       "privacy_commit_fence_unavailable",

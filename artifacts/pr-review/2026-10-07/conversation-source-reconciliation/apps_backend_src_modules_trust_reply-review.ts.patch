@@ -1,0 +1,140 @@
+diff --git a/apps/backend/src/modules/trust/reply-review.ts b/apps/backend/src/modules/trust/reply-review.ts
+index 1a17abbe..bf4e66f4 100644
+--- a/apps/backend/src/modules/trust/reply-review.ts
++++ b/apps/backend/src/modules/trust/reply-review.ts
+@@ -3,9 +3,16 @@ import { z } from "zod";
+ import { contentHash } from "../../core/canonical.js";
+ import { DomainError } from "../../core/errors.js";
+ import {
+-  assertCurrentSession,
++  isConfiguredBackendRuntime,
++  type BackendRuntime,
++} from "../../integration.js";
++import {
++  holdCurrentRequestSession,
++  assertHeldCurrentRequestSession,
+   requestAuthority,
+ } from "../identity/request-authority.js";
++import { assertReplyReviewCatalog } from "./reply-review-catalog.js";
++import { trustTransaction } from "./transaction.js";
+ 
+ /** Transport ceiling, not paid-tenure permission. W5 retains its current4000
+  * limit until its actual policy/schema and mounted reviewer support expansion. */
+@@ -28,7 +35,56 @@ const Review = z.strictObject({
+ /** Exact current author on W5's held transaction, after the source INSERT.
+  * SQL creates an atomic idempotent queue item; only a recorded human decision
+  * can produce allowed/flagged. No extra pool, snapshot copy or ThreadScope. */
+-export function createTrustReplyReviewer() {
++/** Call after the genuine host graph is configured. Readiness grants no fan or
++ * case permission; every actual callback still validates its original request. */
++export async function prepareTrustReplyReviewer(runtime: BackendRuntime) {
++  if (!isConfiguredBackendRuntime(runtime))
++    throw new DomainError(
++      "reply_review_unavailable",
++      "Reply review is unavailable.",
++      503,
++    );
++  if (
++    !runtime.assertRestoredInTransaction ||
++    !runtime.assertContentAllowedInTransaction
++  )
++    return undefined;
++  const ports = Object.freeze({
++    restored: runtime.assertRestoredInTransaction,
++    denied: runtime.assertContentAllowedInTransaction,
++  });
++  try {
++    return await trustTransaction(
++      runtime.pool,
++      async (client) => {
++        await ports.restored(client);
++        await assertReplyReviewCatalog(client);
++        const database = (
++          await client.query<{ database: string }>(
++            "SELECT current_database() AS database",
++          )
++        ).rows[0]!.database;
++        return reviewer(runtime, database, ports);
++      },
++      { readOnly: true },
++    );
++  } catch (error) {
++    if (error instanceof DomainError && error.status === 503) return undefined;
++    throw error;
++  }
++}
++
++/** The old name retains the same prepared, asynchronous contract. */
++export const createTrustReplyReviewer = prepareTrustReplyReviewer;
++
++function reviewer(
++  runtime: BackendRuntime,
++  database: string,
++  ports: Readonly<{
++    restored: NonNullable<BackendRuntime["assertRestoredInTransaction"]>;
++    denied: NonNullable<BackendRuntime["assertContentAllowedInTransaction"]>;
++  }>,
++) {
+   const reviewReply = async (
+     client: PoolClient,
+     raw: z.infer<typeof Reply>,
+@@ -59,7 +115,27 @@ export function createTrustReplyReviewer() {
+         "The signed-in reply author changed.",
+         403,
+       );
+-    await assertCurrentSession(client, authority.accountId);
++    if (!isConfiguredBackendRuntime(runtime))
++      throw new DomainError(
++        "reply_review_unavailable",
++        "Reply review is unavailable.",
++        503,
++      );
++    const currentDatabase = (
++      await client.query<{ database: string }>(
++        "SELECT current_database() AS database",
++      )
++    ).rows[0]?.database;
++    if (currentDatabase !== database)
++      throw new DomainError(
++        "reply_review_unavailable",
++        "Use this reply's configured data service.",
++        503,
++      );
++    await ports.restored(client);
++    const held = await holdCurrentRequestSession(client, authority.accountId);
++    await ports.denied(client, held.actor, input.creatorId);
++    await assertReplyReviewCatalog(client);
+     await client.query("SELECT set_config('trust.reply_session_id',$1,true)", [
+       authority.sessionId,
+     ]);
+@@ -83,14 +159,27 @@ export function createTrustReplyReviewer() {
+           "This review belongs to a different reply version.",
+           409,
+         );
++      await assertHeldCurrentRequestSession(held, client);
++      if (!isConfiguredBackendRuntime(runtime))
++        throw new DomainError(
++          "reply_review_unavailable",
++          "Reply review is unavailable.",
++          503,
++        );
++      await ports.restored(client);
++      await ports.denied(client, held.actor, input.creatorId);
++      await assertReplyReviewCatalog(client);
++      await client.query("SELECT set_config('trust.reply_session_id','',true)");
+       return review;
+     } catch (error) {
+       throw trustReplyError(error);
+     }
+   };
+-  return Object.assign(reviewReply, {
+-    maxTextLength: TRUST_REPLY_REVIEW_MAX_TEXT_LENGTH,
+-  });
++  return Object.freeze(
++    Object.assign(reviewReply, {
++      maxTextLength: TRUST_REPLY_REVIEW_MAX_TEXT_LENGTH,
++    }),
++  );
+ }
+ 
+ /** Preserve actual negative authority across W5's unavailable-review fallback. */

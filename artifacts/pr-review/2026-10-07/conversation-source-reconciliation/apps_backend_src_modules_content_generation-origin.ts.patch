@@ -1,0 +1,32 @@
+diff --git a/apps/backend/src/modules/content/generation-origin.ts b/apps/backend/src/modules/content/generation-origin.ts
+index 9b3fc1b5..485dc4a0 100644
+--- a/apps/backend/src/modules/content/generation-origin.ts
++++ b/apps/backend/src/modules/content/generation-origin.ts
+@@ -67,6 +67,18 @@ export class PreparedContentGenerationOrigins {
+     private readonly catalogueChecksum: string,
+   ) {}
+ 
++  assertComposition(
++    identity: GenerationIdentityAuthority,
++    workerPool: Pool,
++  ): void {
++    invariant(
++      identity === this.identity,
++      "generation_content_origin_composition_mismatch",
++      "Content origins must use the original generation identity authority.",
++    );
++    this.identity.assertPool(workerPool);
++  }
++
+   static async prepare(input: {
+     identity: GenerationIdentityAuthority;
+     workerPool: Pool;
+@@ -116,7 +128,7 @@ export class PreparedContentGenerationOrigins {
+       ...(input.signal ? [input.signal] : []),
+       AbortSignal.timeout(6000),
+     ]);
+-    const held = new ContentHeldClient(client, signal);
++    const held = new ContentHeldClient(client, signal, input.workerPool);
+     let failure: unknown;
+     try {
+       await held.begin();

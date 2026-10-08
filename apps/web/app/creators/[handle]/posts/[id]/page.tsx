@@ -105,7 +105,10 @@ export default async function PostPage({
   } catch (error) {
     return (
       <GrowthShell>
-        <Failure error={error} />
+        <Failure
+          error={error}
+          returnTo={`/creators/${encodeURIComponent(handle)}/posts/${encodeURIComponent(id)}`}
+        />
       </GrowthShell>
     );
   }

@@ -8,9 +8,14 @@ import { invariant } from "../../core/errors.js";
 import type { ThreadScope } from "../access/scope.js";
 import { createAgentDomain } from "../agent/integration.js";
 import { modelFromEnvironment } from "../agent/model.js";
-import { PreparedGenerationJournal } from "../agent/generation-journal.js";
+import {
+  GENERATION_JOURNAL_MIGRATION,
+  PreparedGenerationJournal,
+} from "../agent/generation-journal.js";
 import type { LicenseVerifier } from "../agent/service.js";
-import type { ApprovedSentence } from "../agent/runtime.js";
+import { PreparedUsageRetention } from "../agent/usage-retention.js";
+import { DevelopmentLicenseVerifier } from "../agent/development-license.js";
+import { startDevelopmentIngestion } from "../ingestion/development-lifetime.js";
 import { createCommerceRuntime } from "../commerce/runtime.js";
 import { readCommerceEnvironment } from "../commerce/environment.js";
 import { createCommerceAudience } from "../commerce/audience.js";
@@ -20,14 +25,30 @@ import {
 } from "../commerce/attributed-cost-policy.js";
 import type { MediaService } from "../media/service.js";
 import { ProviderPolicySchema } from "../../../../../packages/api/src/conversation/contracts.js";
-import { conversationAgentGenerator } from "./agent-generator.js";
+import { PreparedGenerationAcceptance } from "./generation-acceptance.js";
+import { prepareGenerationWorker } from "../../workers/generation-composition.js";
 import { ConversationCorrections } from "./corrections.js";
 import { ConversationLineage } from "./lineage.js";
+import type { ReplyFeedbackAuthority } from "./lineage.js";
+import {
+  IdentityIntroOffers,
+  type IntroOfferPolicy,
+  type IntroOfferRetention,
+} from "../identity/intro-offers.js";
 import { ConversationRecordings } from "./recordings.js";
+import type { PreparedConversationPrivacyCursor } from "./privacy-export-cursor.js";
+import type {
+  ConversationPrivacyOwnerPorts,
+  GenerationAccountingPreparation,
+} from "../trust/privacy-consumers.js";
 import { createConversationRuntime } from "./runtime.js";
+import {
+  DevelopmentConversationPolicy,
+  SYNTHETIC_PROVIDER_REFERENCE,
+} from "./development-policy.js";
 
 const migrations = {
-  journal: "0048_w2_usage_lineage",
+  journal: GENERATION_JOURNAL_MIGRATION,
   cost: "0049_w4_generation_cost_settlement",
   lineage: "0056_w3_correction_feedback_lineage",
   feedbackConsent: "0057_w3_feedback_consent",
@@ -47,6 +68,22 @@ const DevelopmentEconomicsSchema = z.strictObject({
 
 /** Inputs supplied by their owners. Absent inputs keep their paths off. */
 export type ConversationHostProducers = {
+  /** Original journal and expiry prepared by the installed Trust host. */
+  usageAccounting?: Pick<
+    import("../trust/usage-accounting-host.js").HostUsageAccounting,
+    "journal" | "retention"
+  >;
+  /** Independently reviewed worker custody and its distinct bounded pool.
+   * Pool ownership stays with the host; API acceptance does not run a worker. */
+  generation?: Pick<
+    Parameters<typeof prepareGenerationWorker>[0],
+    "workerPool" | "custody" | "signal"
+  >;
+  /** W8: actual feedback notice/consent/expiry; no development substitute. */
+  feedbackAuthority?: ReplyFeedbackAuthority;
+  /** W8: approved minimal account-level intro-offer use and retention. */
+  introOfferPolicy?: IntroOfferPolicy;
+  introOfferRetention?: IntroOfferRetention;
   /** W4: genuinely prepared original group fulfillment on this exact graph. */
   fulfillmentPlans?: import("../commerce/fulfillment-plans.js").CommerceFulfillmentPlans;
   /** W2: the configured license authority for this host. */
@@ -56,6 +93,16 @@ export type ConversationHostProducers = {
     retentionPolicyVersion: string;
     assertPrivacyRegistered: () => Promise<void>;
   };
+  /** W2's actual prepared expiry producer plus W8's independently reviewed
+   *0233 custody. W8 fixes its real held-task authority when preparing exports. */
+  privacyCursor?: Omit<
+    Parameters<typeof PreparedConversationPrivacyCursor.prepare>[0],
+    "pool" | "authority" | "journal" | "lineage" | "recordings"
+  >;
+  /** W8's reviewed registration and finite policy. The host binds its actual
+   * accounting owners; W8 later fixes its own held-task/family authority. */
+  privacyAccounting?: GenerationAccountingPreparation["configuration"];
+  provenancePurge?: ConversationPrivacyOwnerPorts["provenancePurgePreparation"];
   /** W6: the host's media runtime on this same database pool. */
   media?: MediaService;
   /** W6: fan reads of signed recordings ask W3 for the exact publication. */
@@ -141,42 +188,146 @@ export async function composeConversationHost(
         JSON.parse(await readFile(env.W3_PROVIDER_POLICY_FILE, "utf8")),
       )
     : undefined;
-  if (!policy?.verified) missing.push("named provider policy");
+  let developmentPolicy: DevelopmentConversationPolicy | undefined;
+  if (
+    requested &&
+    producers.licenseVerifier instanceof DevelopmentLicenseVerifier
+  ) {
+    invariant(
+      !policy?.verified,
+      "synthetic_policy_unreviewed_required",
+      "Synthetic development policy must remain unreviewed. It cannot represent provider approval.",
+    );
+    if (
+      policy?.reference === SYNTHETIC_PROVIDER_REFERENCE &&
+      runtime.identity?.sessions
+    )
+      developmentPolicy = DevelopmentConversationPolicy.prepare({
+        pool: runtime.pool,
+        policy,
+        verifier: producers.licenseVerifier,
+        sessions: runtime.identity.sessions,
+        reference: env.W2_PROVIDER_POLICY_REFERENCE,
+        host: {
+          environment: env.NODE_ENV,
+          enabled: env.W2_DEVELOPMENT_SYNTHETIC_LICENSING,
+          identityMode: config.identityAdapter,
+          webOrigin: config.allowedOrigin,
+        },
+      });
+  }
+  if (!policy?.verified && !developmentPolicy)
+    missing.push("named provider policy");
   const economics =
-    requested && env.W3_DEVELOPMENT_ECONOMICS_FILE
+    (requested || producers.usageAccounting || producers.privacyAccounting) &&
+    env.W3_DEVELOPMENT_ECONOMICS_FILE
       ? DevelopmentEconomicsSchema.parse(
           JSON.parse(await readFile(env.W3_DEVELOPMENT_ECONOMICS_FILE, "utf8")),
         )
       : undefined;
   if (!economics) missing.push("development economics");
+  if (economics)
+    invariant(
+      env.NODE_ENV === "development" &&
+        config.identityAdapter === "development" &&
+        loopback(config.allowedOrigin),
+      "development_economics_unavailable",
+      "Development accounting rules require this explicit loopback development host.",
+    );
   const model = requested ? modelFromEnvironment(env) : null;
   if (!model) missing.push("provider model and credentials");
   else if (!model.pricingConfigured) missing.push("provider rates");
   if (!producers.licenseVerifier) missing.push("license verifier (W2)");
   if (!runtime.access.threadScopeInTransactionAvailable)
     missing.push("in-transaction denial (W8)");
+  // Held source allocations are not active custody. The legacy interactive
+  // generator below cannot replace the actual scoped worker/settlement graph.
+  for (const version of [
+    "0159_w1_generation_worker_scope",
+    "0177_w8_generation_worker_denial",
+    "0179_w3_generation_purpose_consumers",
+    "0180_w2_generation_input_consumers",
+    "0181_w2_generation_attempt_admission",
+    "0183_w1_generation_terminal_scope",
+    "0184_w8_generation_terminal_denial",
+    "0188_w2_generation_terminal_journal",
+    "0189_w4_generation_terminal_settlement",
+    "0203_w3_terminal_only_finalization",
+    "0215_w4_generation_safety_terminal_settlement",
+    "0218_w1_generation_terminal_discovery",
+    "0226_w1_generation_lifecycle",
+    "0227_w1_generation_terminal_page",
+    "0228_w4_generation_settlement_clock",
+  ])
+    if (!(await registeredChecksum(version)))
+      missing.push(`registered ${version}`);
+  if (requested && !producers.generation)
+    missing.push(
+      "current generation worker composition: reviewed custody and pool (W3/W1/W2/W4)",
+    );
 
-  let journal: PreparedGenerationJournal | undefined;
+  let journal = producers.usageAccounting?.journal;
+  if (producers.usageAccounting) {
+    invariant(
+      !producers.journalPolicy &&
+        journal instanceof PreparedGenerationJournal &&
+        producers.usageAccounting.retention instanceof PreparedUsageRetention &&
+        (!producers.privacyCursor ||
+          producers.privacyCursor.usageRetention ===
+            producers.usageAccounting.retention),
+      "usage_accounting_composition_mismatch",
+      "Use one original journal and retention owner throughout the host.",
+    );
+    journal.assertPool(runtime.pool);
+  }
+  const originalUsageRetention =
+    producers.usageAccounting?.retention ??
+    producers.privacyCursor?.usageRetention;
+  if (producers.privacyCursor)
+    invariant(
+      originalUsageRetention instanceof PreparedUsageRetention,
+      "accounting_retention_unconfigured",
+      "The original prepared accounting retention producer is required.",
+    );
   const journalChecksum = await registeredChecksum(migrations.journal);
   if (!journalChecksum) missing.push(`registered ${migrations.journal}`);
-  else if (!producers.journalPolicy) missing.push("journal policy (W2)");
-  else if (requested)
+  else if (!journal && !producers.journalPolicy)
+    missing.push("journal policy (W2)");
+  else if (
+    !journal &&
+    producers.journalPolicy &&
+    (requested || producers.privacyCursor || producers.privacyAccounting)
+  )
+    // Original privacy accounting is independent of provider/generation setup.
     journal = await PreparedGenerationJournal.prepare(runtime.pool, {
       migration: { version: migrations.journal, checksum: journalChecksum },
       ...producers.journalPolicy,
+      signal: producers.generation?.signal,
     });
+  // The Agent lifecycle and export cursor retain the same original expiry
+  // producer. A policy string or a matching URL cannot replace its custody.
+  const usageRetention = journal ? originalUsageRetention : undefined;
+  if (journal && usageRetention) usageRetention.assertJournal(journal);
   const costChecksum = await registeredChecksum(migrations.cost);
   if (!costChecksum) missing.push(`registered ${migrations.cost}`);
 
   const ready = requested && missing.length === 0;
-  let bound: ReturnType<typeof conversationAgentGenerator> | undefined;
+  // Retained financial history needs its original rules even when no model
+  // or generation worker is available. Preparing that reader admits no trial.
+  const originalRuleChecksum = await registeredChecksum(
+    "0189_w4_generation_terminal_settlement",
+  );
+  const accountingReady = Boolean(
+    journal && economics && costChecksum && originalRuleChecksum,
+  );
+  let acceptance: PreparedGenerationAcceptance | undefined;
   const current = () => {
     invariant(
-      bound,
+      acceptance,
       "generation_unconfigured",
       "AI messaging is not connected yet.",
     );
-    return bound;
+    return acceptance;
   };
   const commerce = base
     ? await createCommerceRuntime({
@@ -186,7 +337,7 @@ export async function composeConversationHost(
           ...base.policy,
           ...(ready ? { trialAllowance: economics!.trialAllowance } : {}),
         },
-        ...(ready
+        ...(accountingReady
           ? {
               generationCostPolicy: attributedGenerationCostPolicy({
                 journal: journal!,
@@ -199,7 +350,15 @@ export async function composeConversationHost(
                   version: migrations.cost,
                   checksum: costChecksum!,
                 },
+                originalRuleMigration: {
+                  version: "0189_w4_generation_terminal_settlement",
+                  checksum: originalRuleChecksum!,
+                },
               }),
+            }
+          : {}),
+        ...(ready
+          ? {
               trialReadiness: (scope: ThreadScope, client: PoolClient) =>
                 current().assertReady(scope, client),
             }
@@ -210,12 +369,26 @@ export async function composeConversationHost(
   const lineage = await ConversationLineage.prepare({
     database: runtime.database,
     migrationVersion: migrations.lineage,
+    feedbackAuthority: producers.feedbackAuthority,
     feedbackMigration: await registeredChecksum(
       migrations.feedbackConsent,
     ).then((checksum) =>
       checksum ? { version: migrations.feedbackConsent, checksum } : undefined,
     ),
   });
+  if (
+    lineage &&
+    producers.feedbackAuthority &&
+    producers.introOfferPolicy &&
+    producers.introOfferRetention
+  )
+    lineage.configureIntroOffers(
+      await IdentityIntroOffers.prepare({
+        database: runtime.database,
+        assertOfferAllowed: producers.introOfferPolicy,
+        retention: producers.introOfferRetention,
+      }),
+    );
   const corrections = lineage
     ? await ConversationCorrections.prepare({
         database: runtime.database,
@@ -233,51 +406,111 @@ export async function composeConversationHost(
           correctionMigrationVersion: migrations.correction,
         })
       : undefined;
+  let accountingPreparation: GenerationAccountingPreparation | undefined;
+  if (producers.privacyAccounting) {
+    invariant(
+      journal &&
+        usageRetention &&
+        commerce?.allowance &&
+        lineage &&
+        recordings &&
+        producers.privacyCursor,
+      "conversation_accounting_unavailable",
+      "Accounting privacy requires the host's original journal, expiry, financial and complete export owners.",
+    );
+    accountingPreparation = Object.freeze({
+      journal,
+      usageRetention,
+      allowance: commerce.allowance,
+      access: runtime.access,
+      configuration: Object.freeze({
+        retentionPolicyVersion:
+          producers.privacyAccounting.retentionPolicyVersion,
+        assertPrivacyRegistered:
+          producers.privacyAccounting.assertPrivacyRegistered.bind(
+            producers.privacyAccounting,
+          ),
+      }),
+    });
+  }
   if (recordings)
     producers.bindRecordingPublication?.((scope, recording, client) =>
       recordings.currentPublication(scope, recording, client),
     );
 
   const audience = createCommerceAudience(runtime.database);
-  let agent: ReturnType<typeof createAgentDomain> | undefined;
-  const generation =
-    ready && commerce?.generationCostReconciliation
+  const binding: {
+    conversation?: ReturnType<typeof createConversationRuntime>;
+  } = {};
+  const agent = createAgentDomain({
+    pool: runtime.pool,
+    model,
+    ...(producers.licenseVerifier
+      ? { licenseVerifier: producers.licenseVerifier }
+      : {}),
+    ...(journal ? { usageJournal: journal } : {}),
+    ...(usageRetention ? { usageRetention } : {}),
+    ...(ready
       ? {
-          generatorFactory: (
-            memory: Parameters<
-              NonNullable<
-                Parameters<
-                  typeof createConversationRuntime
-                >[0]["generatorFactory"]
-              >
-            >[0],
-          ) => {
-            agent = createAgentDomain({
-              pool: runtime.pool,
-              model,
-              licenseVerifier: producers.licenseVerifier!,
-              audience,
-              usageJournal: journal!,
-              conversation: {
-                current: (scope) => memory.context(scope),
-                assertProcessorConsent: (scope) =>
-                  runtime.conversation.assertProcessorConsent(scope),
-                assertDeliveryCurrent: (scope, expected) =>
-                  runtime.conversation.assertSafetyCurrent(scope, expected),
-              },
-            });
-            bound = conversationAgentGenerator(runtime.database, agent);
-            return bound.generator;
+          audience,
+          conversation: {
+            safetyCheckpoint: (scope: ThreadScope) =>
+              runtime.conversation.safetyCheckpoint(scope),
+            current: (scope: ThreadScope) => {
+              invariant(
+                binding.conversation,
+                "generation_host_unconfigured",
+                "The canonical conversation host is not ready.",
+              );
+              return binding.conversation.memory.context(scope);
+            },
+            assertProcessorConsent: (scope: ThreadScope) =>
+              runtime.conversation.assertProcessorConsent(scope),
+            assertDeliveryCurrent: (
+              scope: ThreadScope,
+              expected: Parameters<
+                typeof runtime.conversation.assertSafetyCurrent
+              >[1],
+            ) => runtime.conversation.assertSafetyCurrent(scope, expected),
           },
-          assertReady: (scope: ThreadScope, client: PoolClient) =>
-            current().assertReady(scope, client),
-          assertApproved: (
-            scope: ThreadScope,
-            client: PoolClient,
-            sentence: ApprovedSentence,
-          ) => current().assertApproved(scope, client, sentence),
-          citation: (scope: ThreadScope, id: string) =>
-            current().citation(scope, id),
+        }
+      : {}),
+  });
+  const worker =
+    ready && commerce?.allowance && journal && producers.generation
+      ? await prepareGenerationWorker({
+          ...producers.generation,
+          database: runtime.database,
+          access: runtime.access,
+          service: agent.service,
+          allowance: commerce.allowance,
+          journal,
+        })
+      : undefined;
+  if (worker && commerce?.allowance)
+    acceptance = PreparedGenerationAcceptance.prepare({
+      worker,
+      database: runtime.database,
+      access: runtime.access,
+      agent,
+      allowance: commerce.allowance,
+    });
+  const generation =
+    acceptance && commerce?.generationCostReconciliation
+      ? {
+          generationAcceptance: acceptance,
+          assertReady: async (scope: ThreadScope) => {
+            invariant(
+              !developmentPolicy ||
+                developmentPolicy.allowsAccounts(
+                  scope.actorAccountId,
+                  scope.fanAccountId,
+                  scope.creatorAccountId,
+                ),
+              "synthetic_accounts_required",
+              "Use configured fictional development accounts.",
+            );
+          },
           generationCostReconciliation: commerce.generationCostReconciliation,
           firstConversation: commerce.service,
         }
@@ -285,6 +518,15 @@ export async function composeConversationHost(
   const conversation = createConversationRuntime({
     ...runtime,
     ...(policy ? { policy } : {}),
+    ...(developmentPolicy ? { developmentPolicy } : {}),
+    ...(env.W3_OFFLINE_ISSUER_ORIGIN
+      ? {
+          offlineIssuer: {
+            origin: env.W3_OFFLINE_ISSUER_ORIGIN,
+            environment: env.NODE_ENV,
+          },
+        }
+      : {}),
     ...generation,
     ...(lineage ? { lineage } : {}),
     ...(corrections ? { corrections } : {}),
@@ -293,58 +535,66 @@ export async function composeConversationHost(
       ? { fulfillmentPlans: producers.fulfillmentPlans }
       : {}),
   });
-  // Studio drafting, evaluation and ingestion use the same configured model.
-  agent ??= createAgentDomain({
-    pool: runtime.pool,
-    model,
-    ...(producers.licenseVerifier
-      ? { licenseVerifier: producers.licenseVerifier }
-      : {}),
-    ...(journal ? { usageJournal: journal } : {}),
-  });
+  binding.conversation = conversation;
 
   const ingestion =
     requested && model && env.W3_DEVELOPMENT_INGESTION
       ? DevelopmentIngestionSchema.parse(env.W3_DEVELOPMENT_INGESTION)
       : [];
-  const controller = new AbortController();
-  let ingesting = false;
-  const timer = ingestion.length
-    ? setInterval(() => {
-        if (ingesting) return;
-        ingesting = true;
-        void (async () => {
-          for (const owner of ingestion)
-            await agent!.ingestion
-              .tick({ ...owner, development: true }, controller.signal)
-              .catch(() =>
-                process.stderr.write(
-                  "Development source processing is unavailable; inspect the saved source state.\n",
-                ),
-              );
-        })().finally(() => {
-          ingesting = false;
-        });
-      }, 1000)
-    : undefined;
-  timer?.unref();
+  const ingesting = startDevelopmentIngestion(
+    agent.ingestion,
+    ingestion.map((owner) => ({ ...owner, development: true })),
+  );
+  let closing: Promise<void> | undefined;
 
   const available = conversation.feature.capabilities().generationAvailable;
   if (requested)
     process.stdout.write(
       available
-        ? "Fan generation: available (development configuration).\n"
+        ? "Fan generation: available (development configuration; unreviewed policy; fictional accounts only).\n"
         : `Fan generation: unavailable; missing ${missing.join(", ") || "configured runtime"}.\n`,
     );
   return {
     commerce,
     conversation,
     agent,
+    generationWorker: worker,
+    privacy: {
+      ...(producers.provenancePurge
+        ? { provenancePurgePreparation: producers.provenancePurge }
+        : {}),
+      ...(accountingPreparation ? { accountingPreparation } : {}),
+      ...(lineage ? { lineage } : {}),
+      ...(recordings ? { recordings } : {}),
+      ...(journal && producers.privacyCursor
+        ? {
+            cursorPreparation: {
+              ...producers.privacyCursor,
+              journal,
+            },
+          }
+        : {}),
+    },
     fanGeneration: { available, missing },
-    close() {
-      if (timer) clearInterval(timer);
-      controller.abort();
-      conversation.close();
+    close(): Promise<void> {
+      closing ??= (async () => {
+        // Stop admissions synchronously, then retain the actual ingestion
+        // promise until its final job/accounting work has settled.
+        const draining = ingesting.close();
+        const outcomes = await Promise.allSettled([
+          draining,
+          Promise.resolve().then(() => conversation.close()),
+        ]);
+        const failures = outcomes.flatMap((outcome) =>
+          outcome.status === "rejected" ? [outcome.reason] : [],
+        );
+        if (failures.length)
+          throw new AggregateError(
+            failures,
+            "Conversation host shutdown failed.",
+          );
+      })();
+      return closing;
     },
   };
 }

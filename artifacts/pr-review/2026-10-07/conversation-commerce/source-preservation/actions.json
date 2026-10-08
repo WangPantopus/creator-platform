@@ -1,0 +1,62 @@
+[
+  {
+    "number": 262,
+    "before": {
+      "headRefName": "codex/w4-publication-worker-20261003",
+      "headRefOid": "27cde2b04b65c8b29bd0ba59a9b18ba716260101",
+      "number": 262,
+      "state": "OPEN",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/262"
+    },
+    "after": {
+      "headRefName": "codex/w4-publication-worker-20261003",
+      "headRefOid": "27cde2b04b65c8b29bd0ba59a9b18ba716260101",
+      "number": 262,
+      "state": "CLOSED",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/262"
+    },
+    "successor": 132,
+    "successorHead": "e0df89a7d57e26c1e9bd73ee9fc4d972a397c25a",
+    "sourceBranchPreserved": true
+  },
+  {
+    "number": 301,
+    "before": {
+      "headRefName": "codex/w4-commerce-privacy-settlement-20261003",
+      "headRefOid": "cec286e9bdc16e9296f1e8af1fd59826c40a12c2",
+      "number": 301,
+      "state": "OPEN",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/301"
+    },
+    "after": {
+      "headRefName": "codex/w4-commerce-privacy-settlement-20261003",
+      "headRefOid": "cec286e9bdc16e9296f1e8af1fd59826c40a12c2",
+      "number": 301,
+      "state": "CLOSED",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/301"
+    },
+    "successor": 132,
+    "successorHead": "e0df89a7d57e26c1e9bd73ee9fc4d972a397c25a",
+    "sourceBranchPreserved": true
+  },
+  {
+    "number": 302,
+    "before": {
+      "headRefName": "codex/w5-group-worker-consumer-20261003",
+      "headRefOid": "b520000666fdb5595995702a76fe848edc0c79d2",
+      "number": 302,
+      "state": "OPEN",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/302"
+    },
+    "after": {
+      "headRefName": "codex/w5-group-worker-consumer-20261003",
+      "headRefOid": "b520000666fdb5595995702a76fe848edc0c79d2",
+      "number": 302,
+      "state": "CLOSED",
+      "url": "https://github.com/WangPantopus/creator-platform/pull/302"
+    },
+    "successor": 132,
+    "successorHead": "e0df89a7d57e26c1e9bd73ee9fc4d972a397c25a",
+    "sourceBranchPreserved": true
+  }
+]

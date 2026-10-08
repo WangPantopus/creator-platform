@@ -1,0 +1,157 @@
+diff --git a/apps/web/app/ops/cases/[id]/page.tsx b/apps/web/app/ops/cases/[id]/page.tsx
+index b3651773..ed63175b 100644
+--- a/apps/web/app/ops/cases/[id]/page.tsx
++++ b/apps/web/app/ops/cases/[id]/page.tsx
+@@ -1,5 +1,5 @@
+ "use client";
+-import { use, useEffect, useRef, useState } from "react";
++import { use, useEffect, useLayoutEffect, useRef, useState } from "react";
+ import Link from "next/link";
+ import { AuditBanner, Message, ModeList } from "@qelvora/ui-web";
+ import type {
+@@ -10,13 +10,13 @@ import {
+   ErrorState,
+   TrustError,
+   TrustSession,
+-  type TrustSessionState,
+   useTrust,
+   useTrustSession,
+   useTrustRequest,
++  useTrustStatus,
++  retryTrustReads,
+   caseLabel,
+   dateLabel,
+-  retryTrustReads,
+ } from "../../trust-client";
+ 
+ const choices: {
+@@ -43,10 +43,7 @@ export default function CasePage({
+ }) {
+   const { id } = use(params);
+   const request = useTrustRequest();
+-  const [sessionState, setSessionState] = useState<TrustSessionState>({
+-    ready: false,
+-    error: null,
+-  });
++  const sessionState = useTrustStatus();
+   const { data, error, loading, refresh } = useTrust<CaseDetail>(
+     `cases/${id}`,
+     sessionState.ready,
+@@ -80,7 +77,7 @@ export default function CasePage({
+       setResolution(replyUnavailable ? "close" : "allow_reply");
+     else setResolution(data.queue === "disputes" ? "uphold" : "close");
+   }, [id, data?.queue, data?.kind, replyUnavailable]);
+-  useEffect(() => {
++  useLayoutEffect(() => {
+     if (!data) dialog.current?.close();
+   }, [data]);
+   useEffect(() => {
+@@ -105,7 +102,7 @@ export default function CasePage({
+     resolutionSource.current = null;
+   });
+   const confirm = async () => {
+-    if (!data || !sessionState.ready) return;
++    if (!data || !sessionState.ready || busy) return;
+     const current = epoch.current;
+     setBusy(true);
+     setActionError(null);
+@@ -139,7 +136,7 @@ export default function CasePage({
+     key.current = null;
+   };
+   const recover = async () => {
+-    if (!data || !sessionState.ready) return;
++    if (!data || !sessionState.ready || busy) return;
+     const current = epoch.current;
+     setBusy(true);
+     setActionError(null);
+@@ -246,7 +243,7 @@ export default function CasePage({
+         <Link className="qv-link-btn" href="/ops">
+           Back to cases
+         </Link>
+-        <TrustSession onSessionState={setSessionState} />
++        <TrustSession showErrors={false} />
+         {loading && <p role="status">Loading case…</p>}
+         {!data && (
+           <>
+@@ -260,10 +257,16 @@ export default function CasePage({
+               retry={retryTrustReads}
+             />
+             <form
++              hidden={sessionState.concealed}
+               className="ops-resolution"
+               onSubmit={async (event) => {
+                 event.preventDefault();
+-                if (!sessionState.ready) return;
++                if (
++                  !sessionState.ready ||
++                  busy ||
++                  error?.code !== "case_access_required"
++                )
++                  return;
+                 const current = epoch.current;
+                 setBusy(true);
+                 setActionError(null);
+@@ -300,11 +303,15 @@ export default function CasePage({
+               />
+               <button
+                 className="qv-btn qv-btn--secondary"
+-                disabled={busy || !sessionState.ready}
++                disabled={
++                  busy ||
++                  !sessionState.ready ||
++                  error?.code !== "case_access_required"
++                }
+               >
+                 Open case for 15 minutes
+               </button>
+-              <ErrorState error={actionError} />
++              <ErrorState error={sessionState.concealed ? null : actionError} />
+             </form>
+           </>
+         )}
+@@ -509,7 +516,7 @@ export default function CasePage({
+             />
+             <button
+               className="qv-btn qv-btn--secondary qv-btn--block"
+-              disabled={busy || !data.can_decide}
++              disabled={busy || !sessionState.ready || !data.can_decide}
+             >
+               Resolve and notify both
+             </button>
+@@ -519,7 +526,7 @@ export default function CasePage({
+                 different reviewer.
+               </p>
+             )}
+-            <ErrorState error={actionError} />
++            <ErrorState error={sessionState.concealed ? null : actionError} />
+           </form>
+           {data.state === "action_pending" && (
+             <form
+@@ -547,7 +554,10 @@ export default function CasePage({
+                   retryKey.current = null;
+                 }}
+               />
+-              <button className="qv-btn qv-btn--secondary" disabled={busy}>
++              <button
++                className="qv-btn qv-btn--secondary"
++                disabled={busy || !sessionState.ready}
++              >
+                 Retry pending action
+               </button>
+             </form>
+@@ -572,13 +582,13 @@ export default function CasePage({
+           </button>
+           <button
+             className="qv-btn qv-btn--quiet"
+-            disabled={busy}
++            disabled={busy || !sessionState.ready}
+             onClick={() => dialog.current?.close()}
+           >
+             Keep reviewing
+           </button>
+         </div>
+-        <ErrorState error={actionError} />
++        <ErrorState error={sessionState.concealed ? null : actionError} />
+       </dialog>
+     </div>
+   );

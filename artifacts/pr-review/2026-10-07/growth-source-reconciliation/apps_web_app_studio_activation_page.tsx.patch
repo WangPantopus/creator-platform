@@ -1,0 +1,42 @@
+diff --git a/apps/web/app/studio/activation/page.tsx b/apps/web/app/studio/activation/page.tsx
+index 02c54db3..434c883c 100644
+--- a/apps/web/app/studio/activation/page.tsx
++++ b/apps/web/app/studio/activation/page.tsx
+@@ -5,7 +5,7 @@ import {
+ } from "../../../features/growth/server";
+ import { GrowthShell, Failure, NoData } from "../../../features/growth/shell";
+ import { currentSession } from "../../../lib/session";
+-import { IdentitySessionBoundary } from "../../../features/identity/session-boundary";
++import { GrowthSessionBoundary } from "../../../features/growth/private-view";
+ export const dynamic = "force-dynamic";
+ interface Activation {
+   state: string;
+@@ -29,12 +29,17 @@ export default async function ActivationPage() {
+         "session_required",
+         growthCopy.growthContinueWithPantopusToOpenYourAccountSCurrentState,
+       );
+-    const init = { headers: { "X-Expected-Account-Id": session.accountId } };
++    const init = {
++      headers: {
++        "X-Expected-Account-Id": session.accountId,
++        "X-Expected-Session-Id": session.sessionId,
++      },
++    };
+     const { activation } = await growthRequest<{
+       activation: Activation | null;
+     }>("activation", init);
+     return (
+-      <IdentitySessionBoundary
++      <GrowthSessionBoundary
+         key={session.sessionId}
+         initial={session}
+         returnTo="/studio/activation"
+@@ -110,7 +115,7 @@ export default async function ActivationPage() {
+             )}
+           </section>
+         </GrowthShell>
+-      </IdentitySessionBoundary>
++      </GrowthSessionBoundary>
+     );
+   } catch (error) {
+     return (

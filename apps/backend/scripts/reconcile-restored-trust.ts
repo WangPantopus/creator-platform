@@ -13,6 +13,7 @@ import {
 } from "./migration-wave-custody.js";
 import { assertWaveRoleSafety } from "./migration-wave-roles.js";
 import { assertPrivacyWaveRoleSafety } from "./migration-privacy-roles.js";
+import { assertGenerationWaveRoleSafety } from "./migration-generation-roles.js";
 
 /** Read-only recovery inventory. Counts/hashes are diagnostic evidence, never
  * provider receipts, policy approval, a completed purge or a reopening grant. */
@@ -83,20 +84,36 @@ async function audit() {
       )
     )
       throw new Error("The closed target differs from the active registry.");
-    const roles = await assertWaveRoleSafety(client, {
-      trust: ledger.some(
-        (row) => row.version === "0053_w8_runtime_denial_projection",
-      ),
-      media: ledger.some(
-        (row) => row.version === "0062_w6_creator_media_worker",
-      ),
-      content: ledger.some(
-        (row) => row.version === "0074_w8_content_runtime_denial",
-      ),
-      interactive: ledger.some(
-        (row) => row.version === "0082_w8_interactive_denial_try_fence",
-      ),
-    });
+    const generation = ledger.some(
+      (row) => row.version === "0233_w3_privacy_cursor_export",
+    );
+    const roles = generation
+      ? await assertGenerationWaveRoleSafety(
+          client,
+          ledger.some(
+            (row) => row.version === "0234_w3_generation_first_visible_read",
+          )
+            ? "generation-output"
+            : ledger.some(
+                  (row) => row.version === "0198_w5_content_privacy_export",
+                )
+              ? "content-privacy"
+              : undefined,
+        )
+      : await assertWaveRoleSafety(client, {
+          trust: ledger.some(
+            (row) => row.version === "0053_w8_runtime_denial_projection",
+          ),
+          media: ledger.some(
+            (row) => row.version === "0062_w6_creator_media_worker",
+          ),
+          content: ledger.some(
+            (row) => row.version === "0074_w8_content_runtime_denial",
+          ),
+          interactive: ledger.some(
+            (row) => row.version === "0082_w8_interactive_denial_try_fence",
+          ),
+        });
     const privacyRoles = await assertPrivacyWaveRoleSafety(client, {
       privacy: ledger.some(
         (row) => row.version === "0087_w8_privacy_task_commit_fence",
@@ -160,6 +177,18 @@ async function audit() {
       "creator.commerce_effect",
       "creator_trust.privacy_commit_scope",
       "creator.generation_worker_scope",
+      ...(generation
+        ? [
+            "creator.generation_terminal_scope",
+            "creator.agent_privacy_export_scope",
+            "creator.conversation_privacy_export_scope",
+            "creator_trust.usage_expiry_job",
+            "creator_trust.usage_expiry_scope",
+            "creator_trust.detached_usage",
+            "creator_trust.detached_usage_expiry",
+            "creator_trust.detached_usage_summary",
+          ]
+        : []),
     ]) {
       const present = (
         await client.query<{ present: boolean }>(

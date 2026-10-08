@@ -1,0 +1,629 @@
+diff --git a/apps/ios/Sources/Generated/QelvoraAPI.swift b/apps/ios/Sources/Generated/QelvoraAPI.swift
+index 1b884d88..91699280 100644
+--- a/apps/ios/Sources/Generated/QelvoraAPI.swift
++++ b/apps/ios/Sources/Generated/QelvoraAPI.swift
+@@ -5301,6 +5301,15 @@ public struct APIFanProfileInput: Codable, Sendable {
+   }
+ }
+ 
++public struct APIFanIntroInput: Codable, Sendable {
++  public let `intro`: String
++  public let `expectedVersion`: Int
++  public init(intro: String, expectedVersion: Int) {
++    self.intro = intro
++    self.expectedVersion = expectedVersion
++  }
++}
++
+ public struct APIFanProfile: Codable, Sendable {
+   public let `id`: String
+   public let `handle`: String
+@@ -6139,10 +6148,12 @@ public struct APIErrorError: Codable, Sendable {
+   public let `code`: String
+   public let `message`: String
+   public let `requestId`: String
+-  public init(code: String, message: String, requestId: String) {
++  public let `correlationId`: String?
++  public init(code: String, message: String, requestId: String, correlationId: String? = nil) {
+     self.code = code
+     self.message = message
+     self.requestId = requestId
++    self.correlationId = correlationId
+   }
+ }
+ 
+@@ -6929,6 +6940,24 @@ public enum APIConversationConversationCorrectionInputCommandContentKind: String
+   case `conversation_correction` = "conversation_correction"
+ }
+ 
++public struct APIConversationConversationIntroOffer: Codable, Sendable {
++  public let `offerId`: String?
++  public init(offerId: String? = nil) {
++    self.offerId = offerId
++  }
++  private enum CodingKeys: String, CodingKey {
++    case `offerId`
++  }
++  public init(from decoder: Decoder) throws {
++    let container = try decoder.container(keyedBy: CodingKeys.self)
++    self.offerId = try container.decode(String?.self, forKey: .offerId)
++  }
++  public func encode(to encoder: Encoder) throws {
++    var container = encoder.container(keyedBy: CodingKeys.self)
++    try container.encode(offerId, forKey: .offerId)
++  }
++}
++
+ public struct APIConversationConversationMessage: Codable, Sendable {
+   public let `id`: String
+   public let `threadId`: String
+@@ -7103,6 +7132,401 @@ public struct APIConversationConversationMessageCorrection: Codable, Sendable {
+   }
+ }
+ 
++public struct APIConversationConversationOfflineLease: Codable, Sendable {
++  public let `issuer`: String
++  public let `accountId`: String
++  public let `sessionBinding`: String
++  public let `threadId`: String
++  public let `creatorId`: String
++  public let `fanId`: String
++  public let `revision`: Int
++  public let `epoch`: Int
++  public let `cursor`: Int
++  public let `policyVersion`: APIConversationConversationOfflineLeasePolicyVersion
++  public let `providerPolicyVersion`: String
++  public let `issuedAt`: String
++  public let `expiresAt`: String
++  public let `messages`: [APIConversationConversationOfflineLeaseMessagesItem]
++  public init(issuer: String, accountId: String, sessionBinding: String, threadId: String, creatorId: String, fanId: String, revision: Int, epoch: Int, cursor: Int, policyVersion: APIConversationConversationOfflineLeasePolicyVersion, providerPolicyVersion: String, issuedAt: String, expiresAt: String, messages: [APIConversationConversationOfflineLeaseMessagesItem]) {
++    self.issuer = issuer
++    self.accountId = accountId
++    self.sessionBinding = sessionBinding
++    self.threadId = threadId
++    self.creatorId = creatorId
++    self.fanId = fanId
++    self.revision = revision
++    self.epoch = epoch
++    self.cursor = cursor
++    self.policyVersion = policyVersion
++    self.providerPolicyVersion = providerPolicyVersion
++    self.issuedAt = issuedAt
++    self.expiresAt = expiresAt
++    self.messages = messages
++  }
++}
++
++public enum APIConversationConversationOfflineLeasePolicyVersion: String, Codable, Sendable {
++  case `conversation_offline_five_seconds_v1` = "conversation-offline-five-seconds-v1"
++}
++
++public struct APIConversationConversationOfflineLeaseMessagesItem: Codable, Sendable {
++  public let `id`: String
++  public let `version`: Int
++  public init(id: String, version: Int) {
++    self.id = id
++    self.version = version
++  }
++}
++
++public struct APIConversationConversationOfflineSnapshot: Codable, Sendable {
++  public let `lease`: APIConversationConversationOfflineSnapshotLease
++  public let `page`: APIConversationConversationOfflineSnapshotPage
++  public init(lease: APIConversationConversationOfflineSnapshotLease, page: APIConversationConversationOfflineSnapshotPage) {
++    self.lease = lease
++    self.page = page
++  }
++}
++
++public struct APIConversationConversationOfflineSnapshotLease: Codable, Sendable {
++  public let `issuer`: String
++  public let `accountId`: String
++  public let `sessionBinding`: String
++  public let `threadId`: String
++  public let `creatorId`: String
++  public let `fanId`: String
++  public let `revision`: Int
++  public let `epoch`: Int
++  public let `cursor`: Int
++  public let `policyVersion`: APIConversationConversationOfflineSnapshotLeasePolicyVersion
++  public let `providerPolicyVersion`: String
++  public let `issuedAt`: String
++  public let `expiresAt`: String
++  public let `messages`: [APIConversationConversationOfflineSnapshotLeaseMessagesItem]
++  public init(issuer: String, accountId: String, sessionBinding: String, threadId: String, creatorId: String, fanId: String, revision: Int, epoch: Int, cursor: Int, policyVersion: APIConversationConversationOfflineSnapshotLeasePolicyVersion, providerPolicyVersion: String, issuedAt: String, expiresAt: String, messages: [APIConversationConversationOfflineSnapshotLeaseMessagesItem]) {
++    self.issuer = issuer
++    self.accountId = accountId
++    self.sessionBinding = sessionBinding
++    self.threadId = threadId
++    self.creatorId = creatorId
++    self.fanId = fanId
++    self.revision = revision
++    self.epoch = epoch
++    self.cursor = cursor
++    self.policyVersion = policyVersion
++    self.providerPolicyVersion = providerPolicyVersion
++    self.issuedAt = issuedAt
++    self.expiresAt = expiresAt
++    self.messages = messages
++  }
++}
++
++public enum APIConversationConversationOfflineSnapshotLeasePolicyVersion: String, Codable, Sendable {
++  case `conversation_offline_five_seconds_v1` = "conversation-offline-five-seconds-v1"
++}
++
++public struct APIConversationConversationOfflineSnapshotLeaseMessagesItem: Codable, Sendable {
++  public let `id`: String
++  public let `version`: Int
++  public init(id: String, version: Int) {
++    self.id = id
++    self.version = version
++  }
++}
++
++public struct APIConversationConversationOfflineSnapshotPage: Codable, Sendable {
++  public let `threadId`: String
++  public let `creatorId`: String
++  public let `fanId`: String
++  public let `creatorName`: String
++  public let `fanHandle`: String
++  public let `control`: APIConversationConversationOfflineSnapshotPageControl
++  public let `epoch`: Int
++  public let `cursor`: Int
++  public let `revision`: Int
++  public let `generationSequences`: [String: Int]
++  public let `messages`: [APIConversationConversationOfflineSnapshotPageMessagesItem]
++  public let `before`: Int?
++  public let `offTheRecord`: Bool
++  public let `introShared`: Bool
++  public let `consentCurrent`: Bool
++  public let `canSend`: Bool
++  public let `unavailableReason`: String?
++  public let `feedbackPolicy`: APIConversationConversationOfflineSnapshotPageFeedbackPolicy?
++  public init(threadId: String, creatorId: String, fanId: String, creatorName: String, fanHandle: String, control: APIConversationConversationOfflineSnapshotPageControl, epoch: Int, cursor: Int, revision: Int, generationSequences: [String: Int], messages: [APIConversationConversationOfflineSnapshotPageMessagesItem], before: Int? = nil, offTheRecord: Bool, introShared: Bool, consentCurrent: Bool, canSend: Bool, unavailableReason: String? = nil, feedbackPolicy: APIConversationConversationOfflineSnapshotPageFeedbackPolicy? = nil) {
++    self.threadId = threadId
++    self.creatorId = creatorId
++    self.fanId = fanId
++    self.creatorName = creatorName
++    self.fanHandle = fanHandle
++    self.control = control
++    self.epoch = epoch
++    self.cursor = cursor
++    self.revision = revision
++    self.generationSequences = generationSequences
++    self.messages = messages
++    self.before = before
++    self.offTheRecord = offTheRecord
++    self.introShared = introShared
++    self.consentCurrent = consentCurrent
++    self.canSend = canSend
++    self.unavailableReason = unavailableReason
++    self.feedbackPolicy = feedbackPolicy
++  }
++  private enum CodingKeys: String, CodingKey {
++    case `threadId`
++    case `creatorId`
++    case `fanId`
++    case `creatorName`
++    case `fanHandle`
++    case `control`
++    case `epoch`
++    case `cursor`
++    case `revision`
++    case `generationSequences`
++    case `messages`
++    case `before`
++    case `offTheRecord`
++    case `introShared`
++    case `consentCurrent`
++    case `canSend`
++    case `unavailableReason`
++    case `feedbackPolicy`
++  }
++  public init(from decoder: Decoder) throws {
++    let container = try decoder.container(keyedBy: CodingKeys.self)
++    self.threadId = try container.decode(String.self, forKey: .threadId)
++    self.creatorId = try container.decode(String.self, forKey: .creatorId)
++    self.fanId = try container.decode(String.self, forKey: .fanId)
++    self.creatorName = try container.decode(String.self, forKey: .creatorName)
++    self.fanHandle = try container.decode(String.self, forKey: .fanHandle)
++    self.control = try container.decode(APIConversationConversationOfflineSnapshotPageControl.self, forKey: .control)
++    self.epoch = try container.decode(Int.self, forKey: .epoch)
++    self.cursor = try container.decode(Int.self, forKey: .cursor)
++    self.revision = try container.decode(Int.self, forKey: .revision)
++    self.generationSequences = try container.decode([String: Int].self, forKey: .generationSequences)
++    self.messages = try container.decode([APIConversationConversationOfflineSnapshotPageMessagesItem].self, forKey: .messages)
++    self.before = try container.decode(Int?.self, forKey: .before)
++    self.offTheRecord = try container.decode(Bool.self, forKey: .offTheRecord)
++    self.introShared = try container.decode(Bool.self, forKey: .introShared)
++    self.consentCurrent = try container.decode(Bool.self, forKey: .consentCurrent)
++    self.canSend = try container.decode(Bool.self, forKey: .canSend)
++    self.unavailableReason = try container.decode(String?.self, forKey: .unavailableReason)
++    self.feedbackPolicy = try container.decodeIfPresent(APIConversationConversationOfflineSnapshotPageFeedbackPolicy.self, forKey: .feedbackPolicy)
++  }
++  public func encode(to encoder: Encoder) throws {
++    var container = encoder.container(keyedBy: CodingKeys.self)
++    try container.encode(threadId, forKey: .threadId)
++    try container.encode(creatorId, forKey: .creatorId)
++    try container.encode(fanId, forKey: .fanId)
++    try container.encode(creatorName, forKey: .creatorName)
++    try container.encode(fanHandle, forKey: .fanHandle)
++    try container.encode(control, forKey: .control)
++    try container.encode(epoch, forKey: .epoch)
++    try container.encode(cursor, forKey: .cursor)
++    try container.encode(revision, forKey: .revision)
++    try container.encode(generationSequences, forKey: .generationSequences)
++    try container.encode(messages, forKey: .messages)
++    try container.encode(before, forKey: .before)
++    try container.encode(offTheRecord, forKey: .offTheRecord)
++    try container.encode(introShared, forKey: .introShared)
++    try container.encode(consentCurrent, forKey: .consentCurrent)
++    try container.encode(canSend, forKey: .canSend)
++    try container.encode(unavailableReason, forKey: .unavailableReason)
++    try container.encodeIfPresent(feedbackPolicy, forKey: .feedbackPolicy)
++  }
++}
++
++public enum APIConversationConversationOfflineSnapshotPageControl: String, Codable, Sendable {
++  case `ai_active` = "ai_active"
++  case `human_active` = "human_active"
++  case `ai_paused` = "ai_paused"
++  case `closed` = "closed"
++  case `blocked` = "blocked"
++}
++
++public struct APIConversationConversationOfflineSnapshotPageMessagesItem: Codable, Sendable {
++  public let `id`: String
++  public let `threadId`: String
++  public let `authorKind`: APIConversationConversationOfflineSnapshotPageMessagesItemAuthorKind
++  public let `text`: String
++  public let `deliveryState`: APIConversationConversationOfflineSnapshotPageMessagesItemDeliveryState
++  public let `controlEpoch`: Int
++  public let `sequence`: Int
++  public let `signedActId`: String?
++  public let `member`: String?
++  public let `authorAccountId`: String?
++  public let `systemLink`: APIConversationConversationOfflineSnapshotPageMessagesItemSystemLink?
++  public let `citations`: [String]
++  public let `createdAt`: String
++  public let `offTheRecord`: Bool
++  public let `version`: Int
++  public let `agentVersion`: APIConversationConversationOfflineSnapshotPageMessagesItemAgentVersion?
++  public let `feedback`: APIConversationConversationOfflineSnapshotPageMessagesItemFeedback?
++  public let `recording`: APIJSONValue?
++  public let `correction`: APIConversationConversationOfflineSnapshotPageMessagesItemCorrection?
++  public init(id: String, threadId: String, authorKind: APIConversationConversationOfflineSnapshotPageMessagesItemAuthorKind, text: String, deliveryState: APIConversationConversationOfflineSnapshotPageMessagesItemDeliveryState, controlEpoch: Int, sequence: Int, signedActId: String? = nil, member: String? = nil, authorAccountId: String? = nil, systemLink: APIConversationConversationOfflineSnapshotPageMessagesItemSystemLink? = nil, citations: [String], createdAt: String, offTheRecord: Bool, version: Int, agentVersion: APIConversationConversationOfflineSnapshotPageMessagesItemAgentVersion? = nil, feedback: APIConversationConversationOfflineSnapshotPageMessagesItemFeedback? = nil, recording: APIJSONValue? = nil, correction: APIConversationConversationOfflineSnapshotPageMessagesItemCorrection? = nil) {
++    self.id = id
++    self.threadId = threadId
++    self.authorKind = authorKind
++    self.text = text
++    self.deliveryState = deliveryState
++    self.controlEpoch = controlEpoch
++    self.sequence = sequence
++    self.signedActId = signedActId
++    self.member = member
++    self.authorAccountId = authorAccountId
++    self.systemLink = systemLink
++    self.citations = citations
++    self.createdAt = createdAt
++    self.offTheRecord = offTheRecord
++    self.version = version
++    self.agentVersion = agentVersion
++    self.feedback = feedback
++    self.recording = recording
++    self.correction = correction
++  }
++  private enum CodingKeys: String, CodingKey {
++    case `id`
++    case `threadId`
++    case `authorKind`
++    case `text`
++    case `deliveryState`
++    case `controlEpoch`
++    case `sequence`
++    case `signedActId`
++    case `member`
++    case `authorAccountId`
++    case `systemLink`
++    case `citations`
++    case `createdAt`
++    case `offTheRecord`
++    case `version`
++    case `agentVersion`
++    case `feedback`
++    case `recording`
++    case `correction`
++  }
++  public init(from decoder: Decoder) throws {
++    let container = try decoder.container(keyedBy: CodingKeys.self)
++    self.id = try container.decode(String.self, forKey: .id)
++    self.threadId = try container.decode(String.self, forKey: .threadId)
++    self.authorKind = try container.decode(APIConversationConversationOfflineSnapshotPageMessagesItemAuthorKind.self, forKey: .authorKind)
++    self.text = try container.decode(String.self, forKey: .text)
++    self.deliveryState = try container.decode(APIConversationConversationOfflineSnapshotPageMessagesItemDeliveryState.self, forKey: .deliveryState)
++    self.controlEpoch = try container.decode(Int.self, forKey: .controlEpoch)
++    self.sequence = try container.decode(Int.self, forKey: .sequence)
++    self.signedActId = try container.decode(String?.self, forKey: .signedActId)
++    self.member = try container.decode(String?.self, forKey: .member)
++    self.authorAccountId = try container.decodeIfPresent(String.self, forKey: .authorAccountId)
++    self.systemLink = try container.decodeIfPresent(APIConversationConversationOfflineSnapshotPageMessagesItemSystemLink.self, forKey: .systemLink)
++    self.citations = try container.decode([String].self, forKey: .citations)
++    self.createdAt = try container.decode(String.self, forKey: .createdAt)
++    self.offTheRecord = try container.decode(Bool.self, forKey: .offTheRecord)
++    self.version = try container.decode(Int.self, forKey: .version)
++    self.agentVersion = try container.decodeIfPresent(APIConversationConversationOfflineSnapshotPageMessagesItemAgentVersion.self, forKey: .agentVersion)
++    self.feedback = try container.decodeIfPresent(APIConversationConversationOfflineSnapshotPageMessagesItemFeedback.self, forKey: .feedback)
++    self.recording = try container.decodeIfPresent(APIJSONValue.self, forKey: .recording)
++    self.correction = try container.decodeIfPresent(APIConversationConversationOfflineSnapshotPageMessagesItemCorrection.self, forKey: .correction)
++  }
++  public func encode(to encoder: Encoder) throws {
++    var container = encoder.container(keyedBy: CodingKeys.self)
++    try container.encode(id, forKey: .id)
++    try container.encode(threadId, forKey: .threadId)
++    try container.encode(authorKind, forKey: .authorKind)
++    try container.encode(text, forKey: .text)
++    try container.encode(deliveryState, forKey: .deliveryState)
++    try container.encode(controlEpoch, forKey: .controlEpoch)
++    try container.encode(sequence, forKey: .sequence)
++    try container.encode(signedActId, forKey: .signedActId)
++    try container.encode(member, forKey: .member)
++    try container.encodeIfPresent(authorAccountId, forKey: .authorAccountId)
++    try container.encodeIfPresent(systemLink, forKey: .systemLink)
++    try container.encode(citations, forKey: .citations)
++    try container.encode(createdAt, forKey: .createdAt)
++    try container.encode(offTheRecord, forKey: .offTheRecord)
++    try container.encode(version, forKey: .version)
++    try container.encodeIfPresent(agentVersion, forKey: .agentVersion)
++    try container.encodeIfPresent(feedback, forKey: .feedback)
++    try container.encodeIfPresent(recording, forKey: .recording)
++    try container.encodeIfPresent(correction, forKey: .correction)
++  }
++}
++
++public enum APIConversationConversationOfflineSnapshotPageMessagesItemAuthorKind: String, Codable, Sendable {
++  case `fan` = "fan"
++  case `ai` = "ai"
++  case `approved_draft` = "approved_draft"
++  case `human_creator` = "human_creator"
++  case `human_call` = "human_call"
++  case `human_broadcast` = "human_broadcast"
++  case `human_reaction` = "human_reaction"
++  case `team` = "team"
++  case `system` = "system"
++}
++
++public enum APIConversationConversationOfflineSnapshotPageMessagesItemDeliveryState: String, Codable, Sendable {
++  case `accepted` = "accepted"
++  case `generating` = "generating"
++  case `delivered` = "delivered"
++  case `failed` = "failed"
++  case `interrupted` = "interrupted"
++}
++
++public struct APIConversationConversationOfflineSnapshotPageMessagesItemSystemLink: Codable, Sendable {
++  public let `kind`: APIConversationConversationOfflineSnapshotPageMessagesItemSystemLinkKind
++  public let `creatorId`: String
++  public let `contentId`: String
++  public let `contentVersion`: Int
++  public let `label`: APIConversationConversationOfflineSnapshotPageMessagesItemSystemLinkLabel
++  public init(kind: APIConversationConversationOfflineSnapshotPageMessagesItemSystemLinkKind, creatorId: String, contentId: String, contentVersion: Int, label: APIConversationConversationOfflineSnapshotPageMessagesItemSystemLinkLabel) {
++    self.kind = kind
++    self.creatorId = creatorId
++    self.contentId = contentId
++    self.contentVersion = contentVersion
++    self.label = label
++  }
++}
++
++public enum APIConversationConversationOfflineSnapshotPageMessagesItemSystemLinkKind: String, Codable, Sendable {
++  case `published_answer` = "published_answer"
++}
++
++public enum APIConversationConversationOfflineSnapshotPageMessagesItemSystemLinkLabel: String, Codable, Sendable {
++  case `Answered_publicly_` = "Answered publicly."
++}
++
++public struct APIConversationConversationOfflineSnapshotPageMessagesItemAgentVersion: Codable, Sendable {
++  public let `id`: String
++  public let `hash`: String
++  public init(id: String, hash: String) {
++    self.id = id
++    self.hash = hash
++  }
++}
++
++public enum APIConversationConversationOfflineSnapshotPageMessagesItemFeedback: String, Codable, Sendable {
++  case `helpful` = "helpful"
++  case `not_helpful` = "not_helpful"
++}
++
++public struct APIConversationConversationOfflineSnapshotPageMessagesItemCorrection: Codable, Sendable {
++  public let `originalMessageId`: String
++  public let `originalVersion`: Int
++  public init(originalMessageId: String, originalVersion: Int) {
++    self.originalMessageId = originalMessageId
++    self.originalVersion = originalVersion
++  }
++}
++
++public struct APIConversationConversationOfflineSnapshotPageFeedbackPolicy: Codable, Sendable {
++  public let `version`: String
++  public let `notice`: String
++  public init(version: String, notice: String) {
++    self.version = version
++    self.notice = notice
++  }
++}
++
+ public struct APIConversationConversationPage: Codable, Sendable {
+   public let `threadId`: String
+   public let `creatorId`: String
+@@ -7817,10 +8241,12 @@ public enum APIConversationMemoryProposalKind: String, Codable, Sendable {
+ 
+ public struct APIConversationProviderPolicy: Codable, Sendable {
+   public let `version`: String
++  public let `reference`: String?
+   public let `providers`: [APIConversationProviderPolicyProvidersItem]
+   public let `verified`: Bool
+-  public init(version: String, providers: [APIConversationProviderPolicyProvidersItem], verified: Bool) {
++  public init(version: String, reference: String? = nil, providers: [APIConversationProviderPolicyProvidersItem], verified: Bool) {
+     self.version = version
++    self.reference = reference
+     self.providers = providers
+     self.verified = verified
+   }
+@@ -7915,6 +8341,52 @@ public enum APIConversationReplyFeedbackRating: String, Codable, Sendable {
+   case `not_helpful` = "not_helpful"
+ }
+ 
++public struct APIConversationReplyFeedbackResult: Codable, Sendable {
++  public let `rating`: APIConversationReplyFeedbackResultRating?
++  public let `introOffer`: APIConversationReplyFeedbackResultIntroOffer?
++  public init(rating: APIConversationReplyFeedbackResultRating? = nil, introOffer: APIConversationReplyFeedbackResultIntroOffer? = nil) {
++    self.rating = rating
++    self.introOffer = introOffer
++  }
++  private enum CodingKeys: String, CodingKey {
++    case `rating`
++    case `introOffer`
++  }
++  public init(from decoder: Decoder) throws {
++    let container = try decoder.container(keyedBy: CodingKeys.self)
++    self.rating = try container.decode(APIConversationReplyFeedbackResultRating?.self, forKey: .rating)
++    self.introOffer = try container.decode(APIConversationReplyFeedbackResultIntroOffer?.self, forKey: .introOffer)
++  }
++  public func encode(to encoder: Encoder) throws {
++    var container = encoder.container(keyedBy: CodingKeys.self)
++    try container.encode(rating, forKey: .rating)
++    try container.encode(introOffer, forKey: .introOffer)
++  }
++}
++
++public enum APIConversationReplyFeedbackResultRating: String, Codable, Sendable {
++  case `helpful` = "helpful"
++  case `not_helpful` = "not_helpful"
++}
++
++public struct APIConversationReplyFeedbackResultIntroOffer: Codable, Sendable {
++  public let `offerId`: String?
++  public init(offerId: String? = nil) {
++    self.offerId = offerId
++  }
++  private enum CodingKeys: String, CodingKey {
++    case `offerId`
++  }
++  public init(from decoder: Decoder) throws {
++    let container = try decoder.container(keyedBy: CodingKeys.self)
++    self.offerId = try container.decode(String?.self, forKey: .offerId)
++  }
++  public func encode(to encoder: Encoder) throws {
++    var container = encoder.container(keyedBy: CodingKeys.self)
++    try container.encode(offerId, forKey: .offerId)
++  }
++}
++
+ public struct APIConversationTeamReply: Codable, Sendable {
+   public let `text`: String
+   public let `idempotencyKey`: String
+@@ -10189,6 +10661,55 @@ public enum APIStudioStudioThreadEntriesCoverage: String, Codable, Sendable {
+   case `notes_and_requests` = "notes_and_requests"
+ }
+ 
++public struct APIGrowthPostEntryContextResponse: Codable, Sendable {
++  public let `context`: APIGrowthPostEntryContextResponseContext
++  public init(context: APIGrowthPostEntryContextResponseContext) {
++    self.context = context
++  }
++}
++
++public struct APIGrowthPostEntryContextResponseContext: Codable, Sendable {
++  public let `source`: APIGrowthPostEntryContextResponseContextSource
++  public let `creatorId`: String
++  public let `contentId`: String
++  public let `version`: Int
++  public let `title`: String
++  public let `destination`: String
++  public init(source: APIGrowthPostEntryContextResponseContextSource, creatorId: String, contentId: String, version: Int, title: String, destination: String) {
++    self.source = source
++    self.creatorId = creatorId
++    self.contentId = contentId
++    self.version = version
++    self.title = title
++    self.destination = destination
++  }
++}
++
++public enum APIGrowthPostEntryContextResponseContextSource: String, Codable, Sendable {
++  case `post` = "post"
++}
++
++public struct APIGrowthPostEntryContext: Codable, Sendable {
++  public let `source`: APIGrowthPostEntryContextSource
++  public let `creatorId`: String
++  public let `contentId`: String
++  public let `version`: Int
++  public let `title`: String
++  public let `destination`: String
++  public init(source: APIGrowthPostEntryContextSource, creatorId: String, contentId: String, version: Int, title: String, destination: String) {
++    self.source = source
++    self.creatorId = creatorId
++    self.contentId = contentId
++    self.version = version
++    self.title = title
++    self.destination = destination
++  }
++}
++
++public enum APIGrowthPostEntryContextSource: String, Codable, Sendable {
++  case `post` = "post"
++}
++
+ public enum ReadCreatorMediaPolicyPurpose: String, Codable, Sendable {
+   case `source_audio` = "source_audio"
+   case `interview_audio` = "interview_audio"
+@@ -10440,6 +10961,9 @@ public actor CreatorAPIClient {
+   public func sendStudioReplyDraft(creatorId: String, fanId: String, xQelvoraExpectedAccount: String? = nil, body: APIStudioSendReplyDraft) async throws -> APIMessage {
+     try await request("/v1/studio/\(segment(creatorId))/threads/\(segment(fanId))/send-draft", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+   }
++  public func readPostEntryContext(handle: String, id: String, xQelvoraExpectedAccount: String? = nil) async throws -> APIGrowthPostEntryContextResponse {
++    try await request("/v1/growth/creators/\(segment(handle))/posts/\(segment(id))/context", method: "GET", authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
++  }
+   public func health() async throws -> APIHealth {
+     try await request("/health", method: "GET", authenticated: false)
+   }
+@@ -10467,6 +10991,9 @@ public actor CreatorAPIClient {
+   public func saveFanProfile(body: APIFanProfileInput) async throws -> APIFanProfile {
+     try await request("/v1/identity/fan-profile", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
+   }
++  public func saveFanIntro(body: APIFanIntroInput) async throws -> APIFanProfile {
++    try await request("/v1/identity/fan-profile/intro", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
++  }
+   public func saveCreatorProfile(body: APICreatorProfileInput) async throws -> APICreatorProfile {
+     try await request("/v1/identity/creator-profile", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
+   }
+@@ -10536,9 +11063,15 @@ public actor CreatorAPIClient {
+   public func sendHumanReply(creatorId: String, fanId: String, body: APIHumanReply) async throws -> APIMessage {
+     try await request("/v1/threads/\(segment(creatorId))/\(segment(fanId))/human-replies", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
+   }
++  public func beginConversation(xExpectedAccountId: String? = nil, xExpectedSessionId: String? = nil, body: APIConversationBeginConversation) async throws -> APIConversationConversationPage {
++    try await request("/v1/conversations/begin", method: "POST", body: JSONEncoder().encode(body), authenticated: true, headers: ["X-Expected-Account-Id": xExpectedAccountId, "X-Expected-Session-Id": xExpectedSessionId].compactMapValues { $0 })
++  }
+   public func deliverConversationRecording(creatorId: String, fanId: String, body: APIConversationConversationRecordingInput) async throws -> APIConversationConversationRecordingResult {
+     try await request("/v1/conversations/\(segment(creatorId))/\(segment(fanId))/recordings", method: "POST", body: JSONEncoder().encode(body), authenticated: true)
+   }
++  public func leaseOfflineConversation(creatorId: String, fanId: String) async throws -> APIConversationConversationOfflineSnapshot {
++    try await request("/v1/conversations/\(segment(creatorId))/\(segment(fanId))/offline", method: "GET", authenticated: true)
++  }
+   public func readThreadMedia(creatorId: String, fanId: String, assetId: String, xQelvoraExpectedAccount: String? = nil) async throws -> APIMediaMediaAsset {
+     try await request("/v1/w6/threads/\(segment(creatorId))/\(segment(fanId))/media/\(segment(assetId))", method: "GET", authenticated: true, headers: ["x-qelvora-expected-account": xQelvoraExpectedAccount].compactMapValues { $0 })
+   }
+@@ -10644,7 +11177,7 @@ public enum ApplicationDestination {
+   public static func isPermitted(_ value: String) -> Bool {
+     if value.count > 2048 || value.contains("%") || value.contains("\\") || value.contains("#") || value.rangeOfCharacter(from: .whitespacesAndNewlines) != nil { return false }
+     let parts = value.components(separatedBy: "?")
+-    guard parts.count <= 2, parts[0].range(of: "^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|ops(?:/(?:audits|metrics|cases/[a-f0-9-]{36}))?|status|notifications(?:/settings)?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}|/(?:workspace|setup|notes|requests|threads|ai(?:/(?:overview|sources|style|rules|test|versions|license|interview|onboard))?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post(?:/[a-f0-9-]{36})?|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$", options: .regularExpression) != nil else { return false }
++    guard parts.count <= 2, parts[0].range(of: "^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|ops(?:/(?:audits|metrics|cases/[a-f0-9-]{36}))?|status|notifications(?:/(?:settings|[a-f0-9-]{36}))?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}|/(?:workspace|setup|notes|requests|threads|ai(?:/(?:overview|sources|style|rules|test|versions|license|interview|onboard))?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post(?:/[a-f0-9-]{36})?|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$", options: .regularExpression) != nil else { return false }
+     if parts.count == 1 { return true }
+     let scopes = ["context": "^/creators/", "creatorId": "^(?:/commerce/|/support$|/you$|/media/voice$)", "fanId": "^/you$", "packetId": "^/commerce/", "offer": "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId": "^/support$", "quote": "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet": "^/studio/[a-f0-9-]{36}/publish$", "objectId": "^/media/voice$", "kind": "^/support$"]
+     let literalValues = ["offer": "1", "kind": "verification"]

@@ -1,0 +1,38 @@
+diff --git a/apps/ios/Sources/QelvoraUI/Commerce/CommerceFeature.swift b/apps/ios/Sources/QelvoraUI/Commerce/CommerceFeature.swift
+index c0c4af5d..869461a1 100644
+--- a/apps/ios/Sources/QelvoraUI/Commerce/CommerceFeature.swift
++++ b/apps/ios/Sources/QelvoraUI/Commerce/CommerceFeature.swift
+@@ -25,6 +25,7 @@ struct CommerceFeature: View {
+     @State private var accessSnapshot: CommerceAccess?; @State private var accessReceivedAt: Date?
+     @State private var accessNow = Date(); @State private var limitVersion: Int?
+     @State private var commerceAvailable = false; @State private var arrived = false
++    @State private var commandInFlight = false
+     @State private var disposed = false
+     @State private var operation: Task<Void, Never>?
+     @Environment(\.colorScheme) private var scheme
+@@ -167,6 +168,7 @@ struct CommerceFeature: View {
+     }
+     private func clearPrivateState() {
+         overview = nil; detail = nil; accessSnapshot = nil; accessReceivedAt = nil; commerceAvailable = false
++        commandInFlight = false
+         amount = ""; choice = ""; reminders = false; summary = ""; info = ""; selectedMode = nil
+         selectedPassCreators = []; replacementCreator = ""; creator = ""; keys.removeAll(); notice = ""; failure = ""; limitVersion = nil
+     }
+@@ -175,7 +177,7 @@ struct CommerceFeature: View {
+         operation = Task { await action(); operation = nil }
+     }
+     private func mutate(_ path: String, values: [String: Any], message: String) async {
+-        guard !commandDisabled, let api else { return }; busy = true; defer { busy = false }
++        guard !commandDisabled, let api else { return }; busy = true; commandInFlight = true; defer { busy = false; commandInFlight = false }
+         do {
+             var body = values
+             let canonical = try JSONSerialization.data(withJSONObject: values, options: [.sortedKeys])
+@@ -223,7 +225,7 @@ struct CommerceFeature: View {
+                 if choice == "amount" { monthlyAmountField(data.policy.currency).padding(12).frame(minHeight: 48).background(qColor("surface", scheme)).accessibilityLabel("Monthly amount") }
+                 Toggle("Remind me at 50% and 100%", isOn: $reminders).qText("body")
+                 Text("Increases take 24 hours. Decreases are immediate and affect new requests. Existing obligations remain.").qText("caption")
+-                Button(busy ? "Saving…" : "Save limit", variant: .secondary, block: true, disabled: commandDisabled || choice.isEmpty) { launch {
++                Button(commandInFlight ? "Saving…" : "Save limit", variant: .secondary, block: true, disabled: commandDisabled || choice.isEmpty) { launch {
+                     do { let value = choice == "none" ? nil : try CommerceAmount.parse(amount, data.policy.currency); await mutate("spend-limit", values: ["currency": data.policy.currency, "amount": value.map { $0 as Any } ?? NSNull(), "explicitNone": choice == "none", "remindersOn": reminders], message: "Your spending choice is saved.") } catch { await report(error) }
+                 } }
+             }

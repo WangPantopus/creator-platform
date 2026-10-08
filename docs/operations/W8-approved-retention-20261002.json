@@ -1,5 +1,5 @@
 {
-  "version": "w8-product-retention-20261002-v1",
+  "version": "w8-product-retention-20261007-v2",
   "approvalDate": "2026-10-02",
   "approvedBy": "project-owner",
   "scope": "creator-platform-product-data",
@@ -14,11 +14,18 @@
     "preserveOriginalAmountsAndReferences": true
   },
   "unresolvedAIAccounting": {
-    "status": "operator-and-maximum-period-missing",
-    "proposedEscalationAfterDays": 30,
-    "operator": null,
-    "maximumUnresolvedPeriod": null,
-    "preserveUnknownStateAndReservationCeiling": true
+    "status": "approved-product-policy",
+    "decisionDate": "2026-10-07",
+    "decisionBasis": "Project owner delegated the remaining operator and maximum-period decision to the implementation agent in this conversation.",
+    "escalationAfterDays": 30,
+    "operator": "project-owner",
+    "maximumUnresolvedPeriod": {
+      "days": 90,
+      "from": "original-durable-unknown-cost-record",
+      "restartOnRetryRestorationOrDeletion": false
+    },
+    "preserveUnknownStateAndReservationCeiling": true,
+    "deadlineAction": "Require actual provider reconciliation and disposition by the deadline. An unmet deadline is a retention breach: notify the project owner, keep affected paid generation closed, and refuse a successful purge or invented settlement. It is not an automatic retention extension or permission to replace unknown costs with zero."
   },
   "externalProviderRetentionAuthority": null,
   "externalSubscriptionAuthority": null,

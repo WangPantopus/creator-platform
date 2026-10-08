@@ -1,0 +1,28 @@
+diff --git a/packages/api/src/openapi.ts b/packages/api/src/openapi.ts
+index 130e0b37..48da0ed6 100644
+--- a/packages/api/src/openapi.ts
++++ b/packages/api/src/openapi.ts
+@@ -440,6 +440,9 @@ export function createOpenApi() {
+       "/v1/identity/fan-profile": {
+         post: operation("saveFanProfile", "FanProfile", "FanProfileInput"),
+       },
++      "/v1/identity/fan-profile/intro": {
++        post: operation("saveFanIntro", "FanProfile", "FanIntroInput"),
++      },
+       "/v1/identity/creator-profile": {
+         post: operation(
+           "saveCreatorProfile",
+@@ -611,6 +614,13 @@ export function createOpenApi() {
+           "ConversationConversationRecordingInput",
+         ),
+       },
++      "/v1/conversations/{creatorId}/{fanId}/offline": {
++        parameters: pair,
++        get: operation(
++          "leaseOfflineConversation",
++          "ConversationConversationOfflineSnapshot",
++        ),
++      },
+       ...mediaPaths,
+     },
+     components: {

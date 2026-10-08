@@ -1,0 +1,477 @@
+{
+  "recordedAt": "2026-10-02T12:52:06.158144+00:00",
+  "baseHead": "067a81d85a62676446c5f37969c6615650ef8f76",
+  "primary": "W7 personally implemented/reviewed/operated; no agents or new test code",
+  "state": "Compiled durable job/owner ports, unbound positive source/current-purpose authority, not release accepted",
+  "behavior": [
+    "Actual most recent closed Monday UTC window,25 canonical creators/keyset page, deterministic per-creator/week ID",
+    "Existing producer_relay durable job,45s lease,30s collection deadline, bounded retry/blocked state; directory failure drains existing jobs before reporting",
+    "Actual worker-client leased custody/xid/negative account observations before/after callback; no positive owner task or W1/W8 purpose is fabricated",
+    "Actual canonical W5 CurrentThanksTarget declaration and stable Thanks window/permission signatures; no inferred helpful/useful/AI metrics",
+    "Impact and notification readiness commit atomically under fresh exact unexpired lease; relay cannot claim incomplete digest",
+    "Current owner-authorized count-only weekly preview; no fan text/identity in push/email preview; absent reader stays unavailable"
+  ],
+  "checks": {
+    "backendBuild": "exit0 after directory repair",
+    "lint": "exit0",
+    "originalContracts": "9 passed, exit0",
+    "sharedGenerator": "12 shared files verified, exit0",
+    "productionWeb": "shipping production build exit0",
+    "ios": "shipping signed build exit0; codesign --deep --strict exit0",
+    "android": "shipping APK build exit0",
+    "noNewTestCode": true,
+    "format": "explicit changed source format check exit0"
+  },
+  "observations": {
+    "web": "Production Impact continuation retained destination but actual auth503 identity_unconfigured on local HTTP origin. Missing-share image export recovery observed. No authenticated/populated Impact",
+    "ios": "Actual shipping labeled development Home\u2192Notifications\u2192Settings; push default-off warning; Weekly Impact controls/save acknowledgement and actual Reload observed; empty Discover and unavailable share/retry",
+    "android": "Actual shipping labeled development sign-in\u2192Home\u2192Notifications\u2192Settings; push default-off warning, Weekly controls, empty Discover, unavailable share/retry. Save pressed but acknowledgement not visible; no save acceptance here",
+    "database": "Actual read-only current core role creator_runtime,40 migrations,verified creators0,fan profiles1,unbound fan GUC null; growth_worker Impact/jobs/weekly notification rows0",
+    "readiness": "503 trust_unconfigured; not waived",
+    "native": "390x844 pt/dp,Light only this checkpoint, no catalogues; binary build does not establish populated/provider acceptance",
+    "operatedSourceLimit": "API/native operated before final directory-starvation review; source-only unbound scheduling branch repaired/compiled afterwards. No directory collection runtime claim"
+  },
+  "binaries": {
+    "iosDebugDylibSha256": "f76b7e641e40936c734bb8a356d22cbee357645e802cc88e946c9bca33f0142b",
+    "androidDebugApkSha256": "5df649838e351b2a748e6d5681bb54fa229d32ef9af8f692b6a702b4fd03fe47"
+  },
+  "remaining": [
+    "Genuine verified canonical creator directory/eligibility",
+    "Actual W2/W3 closed distinct helpful and AI aggregates; no unresolved or inferred AI output",
+    "Actual W5 CurrentThanksTarget/current-permission task issuer on real held purpose client",
+    "Actual W1/W8 background task/family/negative custody and weekly notice read authority",
+    "Below/at/above five distinct fans, actual quotes/revocation/current-notice/readiness/lease-expiry/restart/delivery acceptance",
+    "All original W7 measurement/activation/privacy/native/design/runtime gates; no artificial five-fan floor added to Weekly Impact"
+  ],
+  "sources": [
+    {
+      "path": "apps/backend/src/modules/growth/weekly-impact.ts",
+      "sha256": "519a0567910f8c04443b6cbacbbeca397d575072e615366a09de6e40537ad304"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/impact-notifications.ts",
+      "sha256": "302f499e710079c84d64609f2d0ab31f59cf2c8401badf49060b64cfa2feaad4"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/retention.ts",
+      "sha256": "f4808eaebd79d9b9ce9818dda96318faf05c7303c34c890da5f9db96ea215fad"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/relay.ts",
+      "sha256": "e9ab34f6a8a0350dfd4ae9f1e05e244054fea37572b7adbff6ac08cb3548bedf"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/notification-custody.ts",
+      "sha256": "fa36ae13dae74722769cceb1a7a91dbae079df83e13c8c8a0c810abefcae7cb1"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/notifications.ts",
+      "sha256": "4a6ceb33a24780f430a27d3034fe710e9aa73e0416695e49a48a9e01c3619f87"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/configured.ts",
+      "sha256": "07e4a78608e05ef70a72b3eb219a9184b7c4d470f84ce208da9b33319f645aea"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/runtime.ts",
+      "sha256": "a89a54b57fa5a4e1e8f8cf07c00087a1f53af4801330a1a78ab0a9b6a20cfa50"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/core-follows.ts",
+      "sha256": "00aaa202cd1a7076558d6fc1d744fc97b88a915cad1152cb20a497eefb05f505"
+    },
+    {
+      "path": "apps/backend/src/modules/growth/migrations/pending_w7_core_follow_metadata.sql",
+      "sha256": "3a87bd2c899ce0083b9d7e97eb79e93372fb83aa8f941e1f29ea3f61f5e821b6"
+    },
+    {
+      "path": "apps/backend/src/modules/identity/request-authority.ts",
+      "sha256": "ae27c9e9f851f76e6921580763677a31bc95a1b857721cf4f54d7ed505d93fac"
+    },
+    {
+      "path": "apps/backend/src/modules/content/integration.ts",
+      "sha256": "cf6f03416417d6b3da411bafe737d2dc90f6fe045cbb4bad7d7b76d8c6669b2b"
+    },
+    {
+      "path": "apps/backend/src/modules/content/thanks-projection.ts",
+      "sha256": "b668579962bffbde23197e909003959670b46bebd9338970eb74d0d4cefd06ec"
+    },
+    {
+      "path": "config/copy.json",
+      "sha256": "f02631660074cdebbd28f4d1347671776d8eac46a8546a89cd46be407da7db0d"
+    },
+    {
+      "path": "packages/copy/src/index.ts",
+      "sha256": "e5925bb9422eb05846915287142956b70ab0d3a249432e0762041b440480f89a"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/QelvoraCopy.swift",
+      "sha256": "3ab90fb2605a7cdcf6475216e3c63a887ec37f9270b7ab1d84586625fd309c8d"
+    },
+    {
+      "path": "apps/ios/Sources/Generated/Localizable.xcstrings",
+      "sha256": "1c528e38d20aa0cbf31dad05af07f0d5e00096f79cdc9f4d56dd9f5eeb037663"
+    },
+    {
+      "path": "apps/android/app/src/main/java/com/pantopus/qelvora/generated/QelvoraCopy.kt",
+      "sha256": "63c68f2e1dbc0010ba937bcd62e24eaa5dbe7f712b3adaf5aac4dd5858f507e3"
+    },
+    {
+      "path": "apps/android/app/src/main/res/values/strings.xml",
+      "sha256": "2b7f08a2f80d010d32f5fdb0b2a624894e7d57c7a0b8957f926cfee264c164be"
+    }
+  ],
+  "raw": [
+    {
+      "path": "weekly-impact-raw/impact-auth-continue-body.txt",
+      "sha256": "bf80a7ab21f4b561c569b036ed70bc4f8cb20e762a3866cea131cb6b008ef9b1",
+      "bytes": 110
+    },
+    {
+      "path": "weekly-impact-raw/impact-production-auth-dom.txt",
+      "sha256": "21f609c353181f0cf7439892391ca9b43355cb10a7d3988c233c2e711b84e87d",
+      "bytes": 462
+    },
+    {
+      "path": "weekly-impact-raw/impact-production-auth.jpg",
+      "sha256": "dd57a0fe627dfde60fe74990ba181f9eee2d58be9674440cfbfc2e6ecfa272b7",
+      "bytes": 29969
+    },
+    {
+      "path": "weekly-impact-raw/impact-production-share-recovery-dom.txt",
+      "sha256": "b1945201d376c505d418df89278de9aa38bc09274f389804bef8e07fc0836641",
+      "bytes": 427
+    },
+    {
+      "path": "weekly-impact-raw/impact-production-share-recovery.jpg",
+      "sha256": "873eb7d2fd2ee555bc759ccacb218f053ec76bbb49c6dd386043ba0ad4c01880",
+      "bytes": 14804
+    },
+    {
+      "path": "weekly-impact-raw/preserved-tool-outcomes.txt",
+      "sha256": "c0fa0a64dee91341b536d8ccf265888eef6060999d6df2a891b69b68e4d4b437",
+      "bytes": 3043
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-android-actual-home.png",
+      "sha256": "ef82b602cc6d0d9b95c702d3ee58ecc14e78ae4ae228f0592470d8b9224371ea",
+      "bytes": 102729
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-android-auth-unconfigured.png",
+      "sha256": "a562e75fc70654925c1382150e5f99ae1bed22b6f83213390be4298b5875aaf9",
+      "bytes": 197297
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-android-build.log",
+      "sha256": "05cae4d3e0ec776bcf43fb1ac653e4773612e4a215eaddace323fb85eab6eb55",
+      "bytes": 2320
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-android-dev-choice.xml",
+      "sha256": "542db4ba546ae2de41432ea71aacb462ea5e7b36f9302fdcd35e444e24986b49",
+      "bytes": 12370
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-android-discover.png",
+      "sha256": "b2e0aa6562d6e3394eb59a8556bc8cf1e2719d7764fe1ffcafaf6b2e662b5c51",
+      "bytes": 115672
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-android-discover.xml",
+      "sha256": "a104e5be878e79b5365e73fbb769d905376e6e2281f89fac4d4ddbd8e0fa3ca8",
+      "bytes": 15656
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-android-home.png",
+      "sha256": "2bab992c77a1446a08e0d200e30e32fbd101c0c041dde8eef2f9aafe9ba9a59b",
+      "bytes": 92342
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-android-home.xml",
+      "sha256": "30f61b526db18bbf97a40ff9184862324a2e80e9d014507fea3e0e55921801b4",
+      "bytes": 12640
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-android-identity.xml",
+      "sha256": "3f412113d76866c0a1b0234ba213545cebe9c7c0222c06b6159a53030511bc8c",
+      "bytes": 6743
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-android-live-home.png",
+      "sha256": "cffad8beb9ca01d6f13f86cc4553842fe53f5a9be5764240cf2b9298f27906fc",
+      "bytes": 177192
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-android-live-home.xml",
+      "sha256": "ae31cb025625c6a91eba2435aa9a59692394686d1ec69db7b4903b065fe86918",
+      "bytes": 5382
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-android-notifications.png",
+      "sha256": "e50726171fef9abce33d9232f572616f63a5292d830918b517453d6b1f0536db",
+      "bytes": 95528
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-android-notifications.xml",
+      "sha256": "1f651e1a16421e6d56a6a8c78cb4d2bb5adbdb936b5bb200453adbc2be9dbba2",
+      "bytes": 11370
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-android-settings-saved.png",
+      "sha256": "2856f786fdb0c07614bdee333b2247368807bac5dce001c93531260c12b2627d",
+      "bytes": 174098
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-android-settings-saved.xml",
+      "sha256": "4333e304c60e1c18e415c8a451ceed77886197a236ad9b9ee251f5d56a1c49b0",
+      "bytes": 19423
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-android-settings-weekly.png",
+      "sha256": "f8efdabd7a4a6e2af1d5a1229a7cb8c7de5a760acfe8afcc4571acd6992dc5c2",
+      "bytes": 174033
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-android-settings-weekly.xml",
+      "sha256": "1dc6c19fbc2680c49f7d1bebae8872f1f6b6d9eaf1873f0dfcec781110058bc5",
+      "bytes": 20073
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-android-settings.png",
+      "sha256": "51e2478717565fabb62b37320b8a3272a97e5e2daad0d02d6328d49f52dd52ce",
+      "bytes": 185057
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-android-settings.xml",
+      "sha256": "beed30fa7af923bb82302a6468fcfcdc9582d2f71d65fcac92cfafd2ad796b77",
+      "bytes": 15955
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-android-share-retried.png",
+      "sha256": "6d0ff68cf97562b3ea4224ecd39953a19e3e198b4519e8bddbb6734a442472a9",
+      "bytes": 82128
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-android-share-retried.xml",
+      "sha256": "12f31e70f32573ba9975512f0cbfaadd379bec325bb74e34615f3d2cea7d8364",
+      "bytes": 11674
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-android-share.png",
+      "sha256": "6d0ff68cf97562b3ea4224ecd39953a19e3e198b4519e8bddbb6734a442472a9",
+      "bytes": 82128
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-android-share.xml",
+      "sha256": "12f31e70f32573ba9975512f0cbfaadd379bec325bb74e34615f3d2cea7d8364",
+      "bytes": 11674
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-build-current.log",
+      "sha256": "917c7b2b2d1648303f61e131958818f381e248ac4a1de166ca8edb0b3af53668",
+      "bytes": 1044
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-build-final.log",
+      "sha256": "917c7b2b2d1648303f61e131958818f381e248ac4a1de166ca8edb0b3af53668",
+      "bytes": 1044
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-build-first.log",
+      "sha256": "141f67db3a013309f117ed0fc1336ea2eb8e4cdd72f19958fe57fbe590db3227",
+      "bytes": 496
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-cleanup.json",
+      "sha256": "674e2785732ba8642127d398ec67720ccdf7672f17638d3d48a2ef48346d2735",
+      "bytes": 502
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-current-catalogue.json",
+      "sha256": "675ddd1924c22621f41473fcdbadc688f2b6c878bf1ca5b859ce2d3516dc64f7",
+      "bytes": 459
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-final-build.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+      "bytes": 41
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-final-contracts.log",
+      "sha256": "5ae5bab6cfd1e701fb9527f9208e04f0cc5f35d0b048b8110de7f31dfe307860",
+      "bytes": 328
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-final-format-check.log",
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20",
+      "bytes": 66
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-final-format.log",
+      "sha256": "0bf3a89011ea3eb7df27c37f7aa89d70dcd2e4c38669e88aaac040409d671a8d",
+      "bytes": 708
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-final-generator.log",
+      "sha256": "783d7687fc7ed684f97dba116550e9768a96fef4e1b17fef8ea5bc74a393c317",
+      "bytes": 52
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-final-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-ios-build.log",
+      "sha256": "ec13b658fdd9abde342816557ff33dd6a3f10657a57adc32a746b65b714bc3a1",
+      "bytes": 82889
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-ios-discover.ax.json",
+      "sha256": "1da1deb03e78451b4201318160f2af2916b455520606debb74d406779a682363",
+      "bytes": 4553
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-ios-discover.png",
+      "sha256": "1e3827db8b2b34aa684f6fa37281bdf36dee13e8ef292df8553b5b52cd1fde03",
+      "bytes": 168607
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-ios-home-initial.png",
+      "sha256": "eed434a458ae9d3da3ce9195a1db59a73887c6910dd807e7126f5c190404490c",
+      "bytes": 151702
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-ios-home.ax.json",
+      "sha256": "32653b707fb4d2d79aa274c31f9fccfc866a39d7e2e64fe65a9505ba1b267d44",
+      "bytes": 4600
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-ios-notifications.ax.json",
+      "sha256": "c859ca5d0ab5d61c152b6a2c50b88913124971d2353d222e3ccf30de1440c0de",
+      "bytes": 4104
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-ios-notifications.png",
+      "sha256": "3aa192c6058978562733fd5650983d1ef730fd05a75be922001f4f9e8b1c4894",
+      "bytes": 144374
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-ios-settings-reload-actual.ax.json",
+      "sha256": "e98e3d4550ba3791ec3798e200015879c19e409439d00002703fa19aa5423bf7",
+      "bytes": 32436
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-ios-settings-reload-actual.png",
+      "sha256": "39c11fca5f261832148a8472ee022209cbfffecbfaca094ae7d954b9af6ed5e1",
+      "bytes": 195183
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-ios-settings-reloaded.ax.json",
+      "sha256": "a48f729da90eda21fb8883c6d9508232e25768c8cbc9dbda1a48fc2952d6a69c",
+      "bytes": 32953
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-ios-settings-reloaded.png",
+      "sha256": "f93b7a92d0fe0260b48bfa91e67b32e7ff7900a468c6a1672397d8a3e8240710",
+      "bytes": 203904
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-ios-settings-saved.ax.json",
+      "sha256": "cbca5fba129115bef94daccc30da504daf848d587233d22fa3b78b7489ffed1c",
+      "bytes": 32953
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-ios-settings-saved.png",
+      "sha256": "f93b7a92d0fe0260b48bfa91e67b32e7ff7900a468c6a1672397d8a3e8240710",
+      "bytes": 203904
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-ios-settings-weekly.ax.json",
+      "sha256": "c3b3209c9a28c702ac2c2a3d7667d492ac8eb56ec7b5476ecd2657ae702bdc13",
+      "bytes": 32158
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-ios-settings-weekly.png",
+      "sha256": "b5bf59c73e0a3424660e58a235fd68152d618bd631dc4e5903059f0ae25eddc6",
+      "bytes": 226328
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-ios-settings.ax.json",
+      "sha256": "3ce0226c51c959835cbff73405e07192c75f99809139d04da389f4537a99e9ff",
+      "bytes": 32158
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-ios-settings.png",
+      "sha256": "b5bf59c73e0a3424660e58a235fd68152d618bd631dc4e5903059f0ae25eddc6",
+      "bytes": 226328
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-ios-share-retried.ax.json",
+      "sha256": "8f54d3f3f1ba530185efa4418f8d7b799b7d87cefcc9c0e13b57c259d5157f2b",
+      "bytes": 3237
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-ios-share-retried.png",
+      "sha256": "55d1ac9b1974f399c27f9c5e2fc1514fc7e919ee50744b4f286e8f15a24b1a54",
+      "bytes": 134624
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-ios-share.ax.json",
+      "sha256": "a5899dc28a7f5a61dcbcba58f9a7df6f29f40a07b930bb69a09a9d71148378d7",
+      "bytes": 3237
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-ios-share.png",
+      "sha256": "55d1ac9b1974f399c27f9c5e2fc1514fc7e919ee50744b4f286e8f15a24b1a54",
+      "bytes": 134624
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-ios-signature.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-readiness-body.json",
+      "sha256": "d8a935a49fa378149aee1fd9f99d10b76d2e229def017293d7c48538bd4e96e6",
+      "bytes": 162
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-session-build.log",
+      "sha256": "22d30d12b84f350c64656b600a5b8fa3fe5bed2b4cdd8fc3a70716c85ede04b5",
+      "bytes": 41
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-session-contracts.log",
+      "sha256": "2a34efae7d307805c2d57ce53381f3a65458ef3754fb27170c35ad24a9f2b90e",
+      "bytes": 329
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-session-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "weekly-impact-raw/weekly-impact-web-build.log",
+      "sha256": "1154ebada7f14707890e3334de674e1b0271ca5623130e5dc4d08d2b2b98057a",
+      "bytes": 2731
+    }
+  ],
+  "cleanup": {
+    "stoppedAt": "2026-10-02T12:47:21.298437+00:00",
+    "apiExit": 0,
+    "webExit": 143,
+    "softwareEmulatorExit": 0,
+    "idbCompanionExit": 0,
+    "simulator": "FAB31883-2F36-4E50-83B3-D9654B60FF00 shut down",
+    "emulator": "emulator-5580 killed explicitly",
+    "released": [
+      "creator-platform-simulator-slot-1",
+      "creator-platform-emulator-slot-1"
+    ],
+    "postgres": "creator-platform-w7-macstudio-20261001 normally stopped",
+    "browser": "own w7ImpactTab closed",
+    "peerResourcesTouched": false
+  }
+}

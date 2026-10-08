@@ -1,0 +1,69 @@
+diff --git a/apps/ios/Sources/Generated/Localizable.xcstrings b/apps/ios/Sources/Generated/Localizable.xcstrings
+index a2340386..be1c4a3f 100644
+--- a/apps/ios/Sources/Generated/Localizable.xcstrings
++++ b/apps/ios/Sources/Generated/Localizable.xcstrings
+@@ -12,6 +12,17 @@
+         }
+       }
+     },
++    "Your feedback could not be confirmed. Your answers are kept; retry the same submission.": {
++      "extractionState": "manual",
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Your feedback could not be confirmed. Your answers are kept; retry the same submission."
++          }
++        }
++      }
++    },
+     "The service is unavailable. Your input has been kept; try again.": {
+       "extractionState": "manual",
+       "localizations": {
+@@ -8207,6 +8218,28 @@
+         }
+       }
+     },
++    "This call action is unconfirmed. Retry the same action before making another change.": {
++      "extractionState": "manual",
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "This call action is unconfirmed. Retry the same action before making another change."
++          }
++        }
++      }
++    },
++    "Retry this call action": {
++      "extractionState": "manual",
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Retry this call action"
++          }
++        }
++      }
++    },
+     "This call is unavailable": {
+       "extractionState": "manual",
+       "localizations": {
+@@ -9384,6 +9417,17 @@
+         }
+       }
+     },
++    "The private preview could not be cleared. Try again before recording.": {
++      "extractionState": "manual",
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "The private preview could not be cleared. Try again before recording."
++          }
++        }
++      }
++    },
+     "Record and listen before uploading. Your preview stays on this device.": {
+       "extractionState": "manual",
+       "localizations": {

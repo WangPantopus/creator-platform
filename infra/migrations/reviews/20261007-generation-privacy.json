@@ -1,0 +1,290 @@
+{
+  "scope": "closed-catalogue-metadata-only",
+  "sourceParent": "2b3b76efe48d7802ebf89335a5d09f96f362b534",
+  "sources": [
+    {
+      "version": "0157_w4_public_packet_read",
+      "owner": "W4",
+      "path": "apps/backend/src/modules/commerce/schema-public-packet-read.sql",
+      "checksum": "0b11d09a2dcd11cbbe715d1dccf90185270e277fea7ce6f8eabe27a36e30d4b8",
+      "name": "w4_public_packet_read"
+    },
+    {
+      "version": "0159_w1_generation_worker_scope",
+      "owner": "W1",
+      "path": "apps/backend/src/modules/identity/schema-generation-scope.sql",
+      "checksum": "7de41bf10228219d69480e302bac7d69626d8d848d8276bb1fe54e49112a5627",
+      "name": "w1_generation_worker_scope"
+    },
+    {
+      "version": "0163_w2_usage_lineage",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/0048_w2_usage_lineage.sql",
+      "checksum": "16dddc80bebe32979f822104d8f411e0f545b4e212da6dc147c72f959e660f17",
+      "name": "w2_usage_lineage"
+    },
+    {
+      "version": "0165_w2_usage_retention_expiry",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/0067_w2_usage_retention_expiry.sql",
+      "checksum": "1c118f5ec90a5a3f3578e056af14d5e56b1379464977c4a79bd6c2b62be7f17e",
+      "name": "w2_usage_retention_expiry"
+    },
+    {
+      "version": "0167_w1_signature_read_fence",
+      "owner": "W1",
+      "path": "apps/backend/src/modules/identity/schema-signature-read-fence.sql",
+      "checksum": "157640de84f22d6d638d788dfe04314fd193efaed80a829f288bec7cbcb815b5",
+      "name": "w1_signature_read_fence"
+    },
+    {
+      "version": "0177_w8_generation_worker_denial",
+      "owner": "W8",
+      "path": "apps/backend/migrations/0093_w8_generation_worker_denial.sql",
+      "checksum": "d47b5916b0ac0c3cc33bd7d50bfdb663f39a9218dcff0b97d3a9dce7b6acc44c",
+      "name": "w8_generation_worker_denial"
+    },
+    {
+      "version": "0179_w3_generation_purpose_consumers",
+      "owner": "W3",
+      "path": "apps/backend/src/modules/conversation/migrations/0095_w3_generation_purpose_consumers.sql",
+      "checksum": "9449f7f9254aa1c9c77713b1683d5c85076b357f13e573882ee5d2d03d1715e0",
+      "name": "w3_generation_purpose_consumers"
+    },
+    {
+      "version": "0180_w2_generation_input_consumers",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/0096_w2_generation_input_consumers.sql",
+      "checksum": "25f89ddba69beed4dd780cd23a64eabb9b7481e2dcb5f192b167299a732b2c34",
+      "name": "w2_generation_input_consumers"
+    },
+    {
+      "version": "0181_w2_generation_attempt_admission",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/0097_w2_generation_attempt_admission.sql",
+      "checksum": "eab8c8e07b8a1e6ba4384f5300560bd46853bf98509faade5a1b555e130c75ee",
+      "name": "w2_generation_attempt_admission"
+    },
+    {
+      "version": "0182_w4_generation_allowance_audience",
+      "owner": "W4",
+      "path": "apps/backend/src/modules/commerce/schema-generation-audience-renumbered.sql",
+      "checksum": "98f9373fbf2403e05f6f26a4223a94779d3280fefa89f2ab2c6f30fbbef796be",
+      "name": "w4_generation_allowance_audience"
+    },
+    {
+      "version": "0183_w1_generation_terminal_scope",
+      "owner": "W1",
+      "path": "apps/backend/src/modules/identity/schema-generation-terminal.sql",
+      "checksum": "fadbf62a3ddf06142c3a6ad30313503f9bebe7b6d64f67f8ba01ff13ce2398c7",
+      "name": "w1_generation_terminal_scope"
+    },
+    {
+      "version": "0184_w8_generation_terminal_denial",
+      "owner": "W8",
+      "path": "apps/backend/migrations/0100_w8_generation_terminal_denial.sql",
+      "checksum": "393920665d8860ee53ee6ef740ba0ad4a6921aceddcbf33f6419727e846532af",
+      "name": "w8_generation_terminal_denial"
+    },
+    {
+      "version": "0186_w5_generation_content_origin",
+      "owner": "W5",
+      "path": "apps/backend/src/modules/content/schema-generation-origin.sql",
+      "checksum": "2f1c4b30133a0c8707b16b15c1e42a9daf539cb5edeeb48ad6a835352a4f444d",
+      "name": "w5_generation_content_origin"
+    },
+    {
+      "version": "0187_w2_generation_retrieval_context",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/0104_w2_generation_retrieval_context.sql",
+      "checksum": "bf9d9c35b3f0bb8c18518bd06b4459d16d421f4da4a6ad0ba06f8319acc89747",
+      "name": "w2_generation_retrieval_context"
+    },
+    {
+      "version": "0188_w2_generation_terminal_journal",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/0105_w2_generation_terminal_journal.sql",
+      "checksum": "7ab8974d065b1b9e5befa2ded26c6978876957fab0eee80b9632825bbac98477",
+      "name": "w2_generation_terminal_journal"
+    },
+    {
+      "version": "0189_w4_generation_terminal_settlement",
+      "owner": "W4",
+      "path": "apps/backend/src/modules/commerce/schema-generation-terminal-settlement.sql",
+      "checksum": "a6e386de7506035d6bc0d10da644cb8ee2620824217b9c2c61a9a34cb7fa4fc9",
+      "name": "w4_generation_terminal_settlement"
+    },
+    {
+      "version": "0196_w2_privacy_export_snapshot",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/0113_w2_privacy_export_snapshot.sql",
+      "checksum": "f0b86d507bcb7ad194c680f93487f582354f711ca91f3deffb01843c263ea65a",
+      "name": "w2_privacy_export_snapshot"
+    },
+    {
+      "version": "0203_w3_terminal_only_finalization",
+      "owner": "W3",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_terminal_only_finalization.sql",
+      "checksum": "8de1897f2e70f763382984459274eb7616ad7149b457811fffd90fb8b7df2e8c",
+      "name": "w3_terminal_only_finalization"
+    },
+    {
+      "version": "0209_w8_all_scope_privacy_ownership",
+      "owner": "W8",
+      "path": "apps/backend/migrations/0209_w8_all_scope_privacy_ownership.sql",
+      "checksum": "6fa4006cb8c2f6901c7006595d08196573daef33f06aa6cec866a546ffcd2f01",
+      "name": "w8_all_scope_privacy_ownership"
+    },
+    {
+      "version": "0210_w2_generation_guardrail_event",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_generation_guardrail_event.sql",
+      "checksum": "0c0fc7fee7182f3e77695222e51cce910268f7844437a5e974f68af5927a3382",
+      "name": "w2_generation_guardrail_event"
+    },
+    {
+      "version": "0211_w2_generation_agent_metadata",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_generation_agent_metadata.sql",
+      "checksum": "4bbcd9a24b622ee63525da6f20eaf21f84eb9c2d4d538a9122d8184347a76b4f",
+      "name": "w2_generation_agent_metadata"
+    },
+    {
+      "version": "0212_w3_generation_worker_output",
+      "owner": "W3",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_worker_output.sql",
+      "checksum": "76ee832c45e5dc422a8128afdc162a354fc54b7df4f611fb6186cdf3bd094df8",
+      "name": "w3_generation_worker_output"
+    },
+    {
+      "version": "0214_w8_original_privacy_family",
+      "owner": "W8",
+      "path": "apps/backend/migrations/0214_w8_original_privacy_family.sql",
+      "checksum": "fcb8f6174d48ed89b9a06d8a51ac4f0c5dd4288950f2d18b351825d9d81dd793",
+      "name": "w8_original_privacy_family"
+    },
+    {
+      "version": "0215_w4_generation_safety_terminal_settlement",
+      "owner": "W4",
+      "path": "apps/backend/src/modules/commerce/schema-generation-safety-terminal-settlement.sql",
+      "checksum": "5aba1bffa300a811630f66e8577d29801694a54b6f06de610f7f78a7184d9a24",
+      "name": "w4_generation_safety_terminal_settlement"
+    },
+    {
+      "version": "0216_w1_generation_output_cursor",
+      "owner": "W1",
+      "path": "apps/backend/src/modules/identity/schema-generation-output-cursor.sql",
+      "checksum": "a4f01c5f1eb1e19d79437b17cce872def1366965ba27c8c46b0d5f9bb73da436",
+      "name": "w1_generation_output_cursor"
+    },
+    {
+      "version": "0217_w3_generation_provenance_purge",
+      "owner": "W3",
+      "path": "apps/backend/migrations/0217_w3_generation_provenance_purge.sql",
+      "checksum": "f2318d7a49151544796e105fe62990dc43af6fe67e49fae253b7578a0c01684e",
+      "name": "w3_generation_provenance_purge"
+    },
+    {
+      "version": "0218_w1_generation_terminal_discovery",
+      "owner": "W1",
+      "path": "apps/backend/src/modules/identity/schema-generation-terminal-discovery.sql",
+      "checksum": "83a56963f6c37e05b0850fa6a0e97475282fbfa3e90d1372f86bea701622e7bc",
+      "name": "w1_generation_terminal_discovery"
+    },
+    {
+      "version": "0221_w3_generation_context_profile_bound",
+      "owner": "W3",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_generation_context_profile_bound.sql",
+      "checksum": "b0fe4643e110a4a6b752ae44847543c7cb8897bdd2a56c2daa58574b9c58536e",
+      "name": "w3_generation_context_profile_bound"
+    },
+    {
+      "version": "0222_w4_generation_audience_profile_fence",
+      "owner": "W4",
+      "path": "apps/backend/src/modules/commerce/schema-generation-audience-profile-fence.sql",
+      "checksum": "11d3d327f22082166d85f17179fe7a8cf94bcd9161714c8055b07537ff639e9d",
+      "name": "w4_generation_audience_profile_fence"
+    },
+    {
+      "version": "0223_w2_generation_profile_bound",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_generation_profile_bound.sql",
+      "checksum": "5b2571d4cc115fa8250351d2904126dcd8a09ff229807f6780ad819de4d21de0",
+      "name": "w2_generation_profile_bound"
+    },
+    {
+      "version": "0224_w5_generation_origin_profile_fence",
+      "owner": "W5",
+      "path": "apps/backend/src/modules/content/schema-generation-origin-profile-fence.sql",
+      "checksum": "09d3df2f3549d0267dce2fe049789e575b1c8f212ee887d2d5396f110bafc047",
+      "name": "w5_generation_origin_profile_fence"
+    },
+    {
+      "version": "0226_w1_generation_lifecycle",
+      "owner": "W1",
+      "path": "apps/backend/src/modules/identity/schema-generation-lifecycle.sql",
+      "checksum": "9eba74f6ae86c52eddde1acc4f7780a5c98762a86681920e11edfec15cd070a8",
+      "name": "w1_generation_lifecycle"
+    },
+    {
+      "version": "0227_w1_generation_terminal_page",
+      "owner": "W1",
+      "path": "apps/backend/src/modules/identity/schema-generation-terminal-page.sql",
+      "checksum": "8632008a15ba322f6caa3b7a393635851c9d7ea18dcd6ad7f175361d4281149c",
+      "name": "w1_generation_terminal_page"
+    },
+    {
+      "version": "0228_w4_generation_settlement_clock",
+      "owner": "W4",
+      "path": "apps/backend/src/modules/commerce/schema-generation-settlement-clock.sql",
+      "checksum": "542b271ee29a5fdede8eaa77620301854026831955b717229cb055bda5bf4296",
+      "name": "w4_generation_settlement_clock"
+    },
+    {
+      "version": "0229_w2_accounting_retention_integrity",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_accounting_retention_integrity.sql",
+      "checksum": "d5a3067868f232f5fda69b11b6f57e642c2913061108edae4943010fe3457c89",
+      "name": "w2_accounting_retention_integrity"
+    },
+    {
+      "version": "0230_w8_usage_expiry_tasks",
+      "owner": "W8",
+      "path": "apps/backend/migrations/0230_w8_usage_expiry_tasks.sql",
+      "checksum": "2e30ef05d54352d37f37deb9a33ddc22cd9fad64d71ad98d6f69f99ff394a72e",
+      "name": "w8_usage_expiry_tasks"
+    },
+    {
+      "version": "0231_w2_account_detached_usage",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_account_detached_usage.sql",
+      "checksum": "d19aa583d71250c85bdbce97c5d2c168dbb683009451de594f4434574c16874f",
+      "name": "w2_account_detached_usage"
+    },
+    {
+      "version": "0232_w8_conversation_accounting_boundary",
+      "owner": "W8",
+      "path": "apps/backend/migrations/0232_w8_conversation_accounting_boundary.sql",
+      "checksum": "2be4dc0bc2f74d01d506985f7dac31c49c6a7a567f19b2126025396949111643",
+      "name": "w8_conversation_accounting_boundary"
+    },
+    {
+      "version": "0233_w3_privacy_cursor_export",
+      "owner": "W3",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_privacy_cursor_export_ordered.sql",
+      "checksum": "99ad0ce10da98954d08b3fe31dedce0ef93be4c3be7e1aeecf3995059e41eb08",
+      "name": "w3_privacy_cursor_export"
+    }
+  ],
+  "originalFamilyProfiles": [
+    {
+      "review": "fresh",
+      "sha256": "ef16ad655958de236ae052f52d0840bd079301bbc1c291c0160e32a82c4fd24d"
+    },
+    {
+      "review": "preserved",
+      "sha256": "6c5f3b50f62bcd4d4b7554b2964b271b064753c1d676e32df3d871b90c457118"
+    }
+  ],
+  "qualification": "Fixed metadata profiles require the separate literal core caller check. Incoming API children are preserved; outbound parent memberships remain forbidden. This manifest does not register sources or issue a task, lease, private binding, DELETE or COMMIT authority."
+}

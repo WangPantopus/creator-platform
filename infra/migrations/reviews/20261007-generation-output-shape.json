@@ -1,0 +1,79 @@
+{
+  "scope": "Correct fixed generation output custody to match the original writer's combined privilege and relation/function-shape contract. Prior descriptors covered privilege metadata alone. No guard removed; no startup readback becomes authority.",
+  "sourceReview": "20261007-generation-privacy",
+  "originalPermissionReviewSha256": "1d4dcbcef41380531d1c874aa2ff171d5472018090711cb997d2b54e622468b9",
+  "readerSourceSha256": "de323c4c94a5e031f6fec3628e949a74d76d9f7937feea4850e2c3e7295cbc97",
+  "profiles": [
+    {
+      "profile": "generation",
+      "previousPermissionsOnly": "48d9135ea9e9480c9468574207e42a03397f0924bcd900125216ae3c06dba202",
+      "combined": "26d970eef57e859d77151fb0ecc833471a7d2381a31a83a63dc314aedefa5192",
+      "privilegesUnchangedFromOriginalReview": true,
+      "shapeSha256": "159b8edadc944487c2ee23415aad0efa3f7ed6de23ef74cda345f271496b80ef"
+    },
+    {
+      "profile": "content",
+      "previousPermissionsOnly": "64688558896c38dedbf26bd7d4fe051f19c1bdaaa6eb5367498f3173e3d664a7",
+      "combined": "6b6f2e3bc11b23eed454b590a9caab26eb8dcaecc54589e9eb2f9c858edbcd49",
+      "privilegesUnchangedFromOriginalReview": true,
+      "shapeSha256": "159b8edadc944487c2ee23415aad0efa3f7ed6de23ef74cda345f271496b80ef"
+    }
+  ],
+  "independentMetadata": [
+    {
+      "database": "creator_w2_archive_adoption_candidate",
+      "expected": "64688558896c38dedbf26bd7d4fe051f19c1bdaaa6eb5367498f3173e3d664a7",
+      "actual": "6b6f2e3bc11b23eed454b590a9caab26eb8dcaecc54589e9eb2f9c858edbcd49",
+      "definitionMatches": true
+    },
+    {
+      "database": "creator_w2_recovered101_restore",
+      "expected": "64688558896c38dedbf26bd7d4fe051f19c1bdaaa6eb5367498f3173e3d664a7",
+      "actual": "6b6f2e3bc11b23eed454b590a9caab26eb8dcaecc54589e9eb2f9c858edbcd49",
+      "definitionMatches": true
+    },
+    {
+      "database": "creator_pr132_privacy9_20261007",
+      "expected": "64688558896c38dedbf26bd7d4fe051f19c1bdaaa6eb5367498f3173e3d664a7",
+      "actual": "6b6f2e3bc11b23eed454b590a9caab26eb8dcaecc54589e9eb2f9c858edbcd49",
+      "definitionMatches": true
+    },
+    {
+      "database": "creator_w2_recovered100_restore",
+      "expected": "48d9135ea9e9480c9468574207e42a03397f0924bcd900125216ae3c06dba202",
+      "actual": "26d970eef57e859d77151fb0ecc833471a7d2381a31a83a63dc314aedefa5192",
+      "definitionMatches": true
+    }
+  ],
+  "rolledBackDrifts": {
+    "database": "creator_pr132_privacy9_20261007",
+    "before": "6b6f2e3bc11b23eed454b590a9caab26eb8dcaecc54589e9eb2f9c858edbcd49",
+    "observed": [
+      {
+        "name": "ordinary_column",
+        "hash": "0d0b67784e0ad6e10395f1d8fdf8ec712c6b24c3ce73871220e165ad949d621b"
+      },
+      {
+        "name": "constraint",
+        "hash": "75a4ed6186a2472c5e12a21885c9216ecf73b10ad5659c1e97c108e5f63ea2b6"
+      },
+      {
+        "name": "index",
+        "hash": "4ae886aca3c4dfd1aab7d51e3613a4d2d2edf296ad1c92392140f020521c7154"
+      },
+      {
+        "name": "disabled_trigger",
+        "hash": "742610cb173d9875d062c920a09638b29465aa554b187c77f71f643899995eb3"
+      },
+      {
+        "name": "private_column_grant",
+        "hash": "2bdc6df073c8b71119dd3f83c419ad9b8258c1e06b223b7076055429c45670ed"
+      }
+    ],
+    "rolledBack": true,
+    "taskAuthorityIssued": false,
+    "providerCalls": 0
+  },
+  "activation": false,
+  "providerCalls": 0
+}

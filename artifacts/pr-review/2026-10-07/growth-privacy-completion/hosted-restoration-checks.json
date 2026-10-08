@@ -1,0 +1,119 @@
+{
+  "checkedAt": "2026-10-07 22:31:47 UTC",
+  "headRevision": "ae309a06c9d2589d4eae55d46f22efb138f154a8",
+  "checks": [
+    {
+      "id": 113044173867,
+      "name": "ios-foundation",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37694724411/job/113044173867"
+    },
+    {
+      "id": 113044173827,
+      "name": "android-runtime",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37694724411/job/113044173827"
+    },
+    {
+      "id": 113044173779,
+      "name": "web-and-backend",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37694724411/job/113044173779"
+    },
+    {
+      "id": 113044173658,
+      "name": "android-foundation",
+      "status": "in_progress",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37694724411/job/113044173658"
+    },
+    {
+      "id": 113044173456,
+      "name": "web-visual",
+      "status": "queued",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37694724411/job/113044173456"
+    },
+    {
+      "id": 113043903690,
+      "name": "web-visual",
+      "status": "in_progress",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37694717509/job/113043903690"
+    },
+    {
+      "id": 113043903628,
+      "name": "ios-foundation",
+      "status": "in_progress",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37694717509/job/113043903628"
+    },
+    {
+      "id": 113043903615,
+      "name": "android-runtime",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37694717509/job/113043903615"
+    },
+    {
+      "id": 113043903544,
+      "name": "android-foundation",
+      "status": "in_progress",
+      "conclusion": null,
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37694717509/job/113043903544"
+    },
+    {
+      "id": 113043903297,
+      "name": "web-and-backend",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37694717509/job/113043903297"
+    },
+    {
+      "id": 113043789786,
+      "name": "android-runtime",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37694717585/job/113043789786"
+    },
+    {
+      "id": 113043789762,
+      "name": "android-foundation",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37694717585/job/113043789762"
+    },
+    {
+      "id": 113043789705,
+      "name": "web-and-backend",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37694717585/job/113043789705"
+    },
+    {
+      "id": 113043789553,
+      "name": "web-visual",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37694717585/job/113043789553"
+    },
+    {
+      "id": 113043789463,
+      "name": "ios-foundation",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37694717585/job/113043789463"
+    },
+    {
+      "id": 113043521404,
+      "name": "compile",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37694724431/job/113043521404"
+    }
+  ],
+  "scope": "Five Foundation jobs and Trust each have a successful execution at this Growth restoration revision; duplicate executions are still pending. Later backend-only revisions require their own checks."
+}

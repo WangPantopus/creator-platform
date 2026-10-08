@@ -2,7 +2,6 @@ import { rm } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import type { PoolClient } from "pg";
 import { DomainError } from "../../core/errors.js";
-import type { ThreadScope } from "../access/scope.js";
 import { MediaService } from "./service.js";
 import { withDeadline } from "./deadline.js";
 
@@ -30,36 +29,27 @@ export class MediaWorker {
   private readonly processor: MediaProcessor;
   constructor(
     private readonly service: MediaService,
+    private readonly workerTransaction: ThreadMediaWorkerTransaction,
     scanner?: MalwareScanner,
     private readonly credentials?: ContentCredentialSigner,
     ffmpeg = "ffmpeg",
     ffprobe = "ffprobe",
-    private readonly workerTransaction?: ThreadMediaWorkerTransaction,
   ) {
     this.processor = new MediaProcessor(scanner, ffmpeg, ffprobe);
   }
   private transaction<T>(
-    scope: ThreadScope | ThreadMediaWorkerScope,
+    scope: ThreadMediaWorkerScope,
     work: (client: PoolClient) => Promise<T>,
   ): Promise<T> {
-    if (this.workerTransaction) {
-      if (!("ownerAccountId" in scope))
-        throw new DomainError(
-          "media_worker_scope_required",
-          "A durable media worker family is required.",
-          503,
-        );
-      return this.workerTransaction(scope, work);
-    }
-    if (!("authority" in scope))
+    if (!this.workerTransaction || !("ownerAccountId" in scope))
       throw new DomainError(
         "media_worker_transaction_required",
-        "Media worker transaction authority is unconfigured.",
+        "The dedicated ingestion transaction and family are required.",
         503,
       );
-    return this.service.db.withThread(scope, work);
+    return this.workerTransaction(scope, work);
   }
-  async process(scope: ThreadScope | ThreadMediaWorkerScope): Promise<boolean> {
+  async process(scope: ThreadMediaWorkerScope): Promise<boolean> {
     const claimed = await this.transaction(scope, async (client) => {
       // Retention expiry first denies access, then uses the same durable deletion path as revocation.
       // Bound each pass; W8 enumerates authorized scopes rather than a cross-tenant sweep.

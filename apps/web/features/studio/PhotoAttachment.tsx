@@ -1,12 +1,14 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import {
   CreatorMediaAssetSchema,
+  MediaRevocationSchema,
   type CreatorMediaAsset,
   type CreatorMediaUploadTicket,
 } from "../../../../packages/api/src/media";
 import {
   MediaRequestError,
+  captureMediaRequest,
   mediaRequest,
   uploadCreatorMedia,
 } from "../media/api";
@@ -27,6 +29,7 @@ export function PhotoAttachment({
   onReady(asset: CreatorMediaAsset, alt: string): void;
   beforeDiscard(assetId: string): Promise<void>;
 }) {
+  const altId = useId();
   const [available, setAvailable] = useState(false),
     [file, setFile] = useState<File | null>(null),
     [alt, setAlt] = useState(""),
@@ -39,6 +42,13 @@ export function PhotoAttachment({
     controller = useRef<AbortController | null>(null),
     fileInput = useRef<HTMLInputElement | null>(null),
     pending = useRef(false);
+  const lifetime = useRef(new AbortController());
+  useEffect(() => {
+    if (lifetime.current.signal.aborted)
+      lifetime.current = new AbortController();
+    const original = lifetime.current;
+    return () => original.abort();
+  }, []);
   const busy = activity !== null;
   useEffect(() => {
     const abort = new AbortController();
@@ -59,7 +69,12 @@ export function PhotoAttachment({
     };
   }, [expectedAccountId]);
   useEffect(() => {
-    if (!asset || !["quarantined", "processing"].includes(asset.state)) return;
+    if (
+      activity === "discard" ||
+      !asset ||
+      !["quarantined", "processing"].includes(asset.state)
+    )
+      return;
     const abort = new AbortController();
     let timer: ReturnType<typeof setTimeout>;
     const poll = async () => {
@@ -94,13 +109,17 @@ export function PhotoAttachment({
       abort.abort();
       clearTimeout(timer);
     };
-  }, [asset, creatorId, objectId, expectedAccountId]);
+  }, [asset, creatorId, objectId, expectedAccountId, activity]);
   const upload = async () => {
     if (!file || pending.current) return;
     pending.current = true;
     setActivity("upload");
     setError("");
     const abort = new AbortController();
+    const original = lifetime.current;
+    const signal = AbortSignal.any([abort.signal, original.signal]);
+    const currentView = () =>
+      lifetime.current === original && !original.signal.aborted;
     controller.current = abort;
     const firstAttempt = uploadKey.current === undefined;
     uploadKey.current ??= crypto.randomUUID();
@@ -113,7 +132,7 @@ export function PhotoAttachment({
           purpose: "post_photo",
           blob: file,
           idempotencyKey: uploadKey.current,
-          signal: abort.signal,
+          signal,
           progress: setProgress,
           resumed: ticket.current,
           onTicket: (value) => {
@@ -121,8 +140,9 @@ export function PhotoAttachment({
           },
         }),
       );
-      if (!abort.signal.aborted) setAsset(value);
+      if (!signal.aborted && currentView()) setAsset(value);
     } catch (failure) {
+      if (!currentView()) return;
       if (
         firstAttempt &&
         !ticket.current &&
@@ -130,50 +150,74 @@ export function PhotoAttachment({
         [400, 403, 404, 413, 415, 422].includes(failure.status)
       )
         uploadKey.current = undefined;
-      if (!abort.signal.aborted)
+      if (!signal.aborted)
         setError(
           failure instanceof Error
             ? failure.message
             : "Photo upload is unavailable.",
         );
     } finally {
-      pending.current = false;
-      setActivity(null);
+      if (currentView()) {
+        pending.current = false;
+        setActivity(null);
+      }
     }
   };
   const discard = async () => {
     if (pending.current) return;
     pending.current = true;
+    const originalView = lifetime.current;
+    const currentView = () =>
+      lifetime.current === originalView && !originalView.signal.aborted;
     setActivity("discard");
     setError("");
     try {
+      // Retain the genuine opening binding before the host's draft detach.
+      const original =
+        ticket.current || uploadKey.current
+          ? captureMediaRequest(expectedAccountId)
+          : null;
+      const check = () => {
+        originalView.signal.throwIfAborted();
+        if (!currentView()) throw new DOMException("View closed", "AbortError");
+        original?.check();
+      };
+      check();
       const current = ticket.current?.asset;
       if (current) {
         await beforeDiscard(current.id);
-        await mediaRequest(`creators/${creatorId}/media/${current.id}`, {
-          method: "DELETE",
-          expectedAccountId,
-        });
+        check();
+        MediaRevocationSchema.parse(
+          await original!.request(`creators/${creatorId}/media/${current.id}`, {
+            method: "DELETE",
+            signal: originalView.signal,
+          }),
+        );
+        check();
       } else if (uploadKey.current)
         throw new Error(
           "Retry the unconfirmed upload before discarding its saved file.",
         );
       ticket.current = undefined;
       uploadKey.current = undefined;
+      setError("");
       setAsset(null);
       setFile(null);
       setAlt("");
       if (fileInput.current) fileInput.current.value = "";
       setProgress(0);
     } catch (failure) {
-      setError(
-        failure instanceof Error
-          ? failure.message
-          : "The saved photo could not be removed.",
-      );
+      if (currentView())
+        setError(
+          failure instanceof Error
+            ? failure.message
+            : "The saved photo could not be removed.",
+        );
     } finally {
-      pending.current = false;
-      setActivity(null);
+      if (currentView()) {
+        pending.current = false;
+        setActivity(null);
+      }
     }
   };
   return (
@@ -203,16 +247,17 @@ export function PhotoAttachment({
           }}
         />
       </label>
-      <label className="w5-field">
-        Alternative text
+      <div className="w5-field">
+        <label htmlFor={altId}>Alternative text</label>
         <textarea
+          id={altId}
           style={{ resize: "none" }}
           maxLength={1000}
           value={alt}
           onChange={(event) => setAlt(event.target.value)}
           placeholder="Describe the photo"
         />
-      </label>
+      </div>
       {file && <p>{file.name}</p>}
       {activity === "upload" && (
         <p role="status">Uploaded {Math.round(progress * 100)}%</p>

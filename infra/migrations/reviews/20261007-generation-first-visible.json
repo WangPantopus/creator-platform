@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "scope": "closed metadata review; activation requires verified backup and independent restore",
+  "source": {
+    "version": "0234_w3_generation_first_visible_read",
+    "name": "w3_generation_first_visible_read",
+    "owner": "W3",
+    "path": "apps/backend/src/modules/conversation/migrations/pending_w3_generation_first_visible_read.sql",
+    "checksum": "27f7cda8ceed6fbe80035d45c4cb6b8376470d9041a3407f558a879ce2d993b4"
+  },
+  "baselineWave": {
+    "path": "infra/migrations/waves/20261007-content.json",
+    "sha256": "0511a93b6df6fb2eb70527898fea04b59844b38bdb63c69bc6b85640765ff972"
+  },
+  "purposeProfiles": [
+    {
+      "review": "fresh",
+      "sha256": "b4f1d9f78ada010cd91aeaf81d3320eb744be33cc920d082ccb564dce69a20e0"
+    },
+    {
+      "review": "fresh-incoming",
+      "sha256": "abc81d16668eb70ab86c637c4147c319aa5637c0db6e1f67c1313e9ebe72974d"
+    }
+  ],
+  "runtimeCatalogues": {
+    "output": "7a4ae38da284a23d7bc529cdc42f2d6acac2dcbf8f282d7636186058e616a876",
+    "terminal": "050fcb190dfc84c41b9514ee3949ebc7291199b578c738ca4254b985ac4dae47",
+    "financial": "b391b8fe5772d244c9d0b3f1868a2b19849538b60ed3ed89d848c6d233288f53",
+    "expiry": "dff399afbbbee8ef7f6bbe9fcecd6490331f34a0758bdba1c123f5c240ea360a",
+    "detached": "6810670fbe552c9680c29ae6410a1a289a442e12492a0d14cd038a4ea9e32140",
+    "boundary": "afff7c0d475446ace27db7d17ac02eaa4efe8107b8defdfb1a871a77a09276ef"
+  },
+  "outputCatalogueChecksum": "d9c7d1ecb452f010d5a1e5a548bf55d529ae14c13ab287df1bdbb4e33b5b3f72",
+  "originalFamilyProfiles": [
+    {
+      "review": "original-and-independent-restore",
+      "sha256": "6bc50f04f6d3402b2026444f77a444269d9bc3b1a6cf43bd6ce3315686abb153"
+    },
+    {
+      "review": "preserved-incoming-api",
+      "sha256": "1872ac49dea0152507493aa677a9ee27cf8aaf6fb3be59c838c999c8fba72bcd"
+    }
+  ],
+  "sourceParent": "a690a350eda135f21c2c1a01d7a265aeeeb048c9"
+}

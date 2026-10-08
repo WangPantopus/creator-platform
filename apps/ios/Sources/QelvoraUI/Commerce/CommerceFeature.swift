@@ -3,7 +3,7 @@ import SwiftUI
 @MainActor
 public enum CommerceFanFeature {
     public static func registration(baseURL: URL?, storeProductIDs: [String] = []) -> FanFeatureRegistration {
-        FanFeatureRegistration(matches: { destination in let path = destination.components(separatedBy: "?")[0]; return path == "/requests" || (["requests","spending","access","packet","checkout","status","pass","membership"].contains(path.split(separator: "/").last.map(String.init) ?? "") && path.hasPrefix("/commerce/")) || (path.hasPrefix("/creators/") && path.hasSuffix("/access")) }, screen: { session in AnyView(CommerceFeature(baseURL: baseURL, session: session, accountId: session.session?.accountId, storeProductIDs: storeProductIDs)) })
+        FanFeatureRegistration(matches: { destination in let path = destination.components(separatedBy: "?")[0]; return path == "/requests" || (["requests","spending","access","packet","checkout","status","pass","membership"].contains(path.split(separator: "/").last.map(String.init) ?? "") && path.hasPrefix("/commerce/")) || (path.hasPrefix("/creators/") && path.hasSuffix("/access")) }, screen: { session in AnyView(CommerceFeature(baseURL: baseURL, session: session, accountId: session.session?.accountId, sessionId: session.session?.sessionId, destination: session.destination, storeProductIDs: storeProductIDs).id([session.session?.accountId ?? "signed-out", session.session?.sessionId ?? "no-session"])) })
     }
 }
 
@@ -11,6 +11,8 @@ public enum CommerceFanFeature {
 struct CommerceFeature: View {
     let baseURL: URL?; @ObservedObject var session: FanSession
     let accountId: String?
+    let sessionId: String?
+    let destination: String
     var storeProductIDs: [String] = []
     @State private var overview: CommerceOverview?; @State private var detail: CommerceDetail?
     @State private var screen = "requests"; @State private var category = "Open"; @State private var creator = ""
@@ -22,9 +24,24 @@ struct CommerceFeature: View {
     @State private var notice = ""; @State private var keys: [String: String] = [:]
     @State private var accessSnapshot: CommerceAccess?; @State private var accessReceivedAt: Date?
     @State private var accessNow = Date(); @State private var limitVersion: Int?
+    @State private var commerceAvailable = false; @State private var arrived = false
+    @State private var commandInFlight = false
+    @State private var disposed = false
+    @State private var operation: Task<Void, Never>?
     @Environment(\.colorScheme) private var scheme
     @Environment(\.scenePhase) private var scenePhase
-    private var api: CommerceClient? { baseURL.map { CommerceClient(baseURL: $0, accountId: accountId) } }
+    private var api: CommerceClient? {
+        guard baseURL != nil, let accountId, let sessionId else { return nil }
+        return CommerceClient(model: session, accountId: accountId, sessionId: sessionId, destination: destination)
+    }
+    private var originalViewCurrent: Bool { !disposed && accountId != nil && sessionId != nil && session.session?.accountId == accountId && session.session?.sessionId == sessionId && session.destination == destination }
+    private var privateVisible: Bool {
+        originalViewCurrent &&
+        !session.busy && session.error.isEmpty && !session.purgingPrivateState && !session.localPurgeFailed
+    }
+    private var privateReady: Bool { privateVisible && !session.checkingSession }
+    private var refreshDisabled: Bool { busy || !originalViewCurrent || session.busy || session.checkingSession || session.purgingPrivateState || session.localPurgeFailed }
+    private var commandDisabled: Bool { busy || !privateReady || !commerceAvailable }
     private var modes: [CommerceMode] { overview?.modes.filter { $0.creator_id == creator } ?? [] }
     private var creatorName: String { overview?.creators.first { $0.id == creator }?.display_name ?? "the creator" }
     var body: some View {
@@ -36,11 +53,12 @@ struct CommerceFeature: View {
                         else { screen = "requests"; detail = nil }
                     } }
                     Spacer(); Text(title.uppercased()).qText("data-sm"); Spacer()
-                    Button("Refresh", variant: .quiet, disabled: busy) { Task { await refresh() } }
+                    Button("Refresh", variant: .quiet, disabled: refreshDisabled) { launch(requireReady: false) { await retry() } }
                 }
-                if !failure.isEmpty { Notice(tone: .error, title: "Connection status", children: failure) }
-                if !notice.isEmpty { Notice(title: "Saved", children: notice) }
-                if let overview {
+                if !privateVisible { Notice(title: "Account status", children: "Reconnect to check your account. Your unsaved input is kept.") }
+                if privateVisible && !failure.isEmpty { Notice(tone: .error, title: "Connection status", children: failure) }
+                if privateVisible && !notice.isEmpty { Notice(title: "Saved", children: notice) }
+                if privateVisible, let overview {
                     switch screen {
                     case "spending": spending(overview)
                     case "access": access(overview)
@@ -51,37 +69,49 @@ struct CommerceFeature: View {
                     case "pass": pass(overview)
                     default: requests(overview)
                     }
-                } else if busy { ProgressView().accessibilityLabel("Loading commerce") }
-                else { EmptyState(title: "This information is unavailable", body: failure.isEmpty ? "Commerce is not connected yet. Reconnect to try again." : failure) }
+                } else if privateReady && busy { ProgressView().accessibilityLabel("Loading commerce") }
+                else if privateReady { EmptyState(title: "This information is unavailable", body: failure.isEmpty ? "Commerce is not connected yet. Reconnect to try again." : failure) }
             }.padding(.horizontal, screen == "packet" ? 20 : 16).padding(.top, 20).padding(.bottom, 36)
         }.background(qColor("ground", scheme)).foregroundStyle(qColor("ink", scheme))
-            .task { await arrive() }
-            .task(id: "\(screen):\(creator):\(overview?.fan?.id ?? ""):\(scenePhase)") { await refreshAccess() }
+            .task(id: privateReady) { if privateReady { if !arrived { arrived = true; await arrive() } else { await refresh() } } }
+            .task(id: "\(screen):\(creator):\(overview?.fan?.id ?? ""):\(scenePhase):\(privateReady)") { await refreshAccess() }
             .task(id: screen) {
                 while screen == "access", !Task.isCancelled {
                     accessNow = Date()
                     do { try await Task.sleep(for: .seconds(1)) } catch { return }
                 }
             }
-            .refreshable { await refresh() }
+            .refreshable { await retry() }
+            .onChange(of: session.session?.sessionId) { _, value in if value != sessionId { operation?.cancel(); clearPrivateState() } }
+            .onChange(of: session.session?.accountId) { _, value in if value != accountId { operation?.cancel(); clearPrivateState() } }
+            .onAppear { disposed = false }
+            .onChange(of: privateReady) { _, value in if !value { operation?.cancel() } }
+            .onDisappear { disposed = true; operation?.cancel(); clearPrivateState() }
     }
     private var title: String { ["spending":"Spending and time", "access":"Access", "packet":"Included in your request", "status":"Your request", "membership":"Manage membership", "pass":"Your pass"][screen] ?? "Requests" }
     private func arrive() async {
-        let parts = URLComponents(string: session.destination)
+        let parts = URLComponents(string: destination)
         let path = parts?.path ?? "/requests"
         screen = path.hasPrefix("/commerce/") ? String(path.split(separator: "/").last ?? "requests") : path.hasSuffix("/access") ? "access" : "requests"
         await refresh()
+        guard !Task.isCancelled, privateReady else { return }
         if let selected = parts?.queryItems?.first(where: { $0.name == "creatorId" })?.value { creator = selected }
         else if path.hasPrefix("/creators/"), let handle = path.split(separator: "/").dropFirst().first { creator = overview?.creators.first(where: { $0.handle == handle })?.id ?? creator }
         if screen == "status", let id = parts?.queryItems?.first(where: { $0.name == "packetId" })?.value, let api {
-            do { detail = try await api.request("packets/" + id) } catch { await report(error) }
+            do { let value: CommerceDetail = try await api.request("packets/" + id); guard !Task.isCancelled, privateReady else { return }; detail = value } catch { await report(error) }
         }
     }
-    private func refresh() async {
-        guard let api else { failure = "Commerce is not connected yet."; return }; busy = true; defer { busy = false }
+    private func retry() async {
+        guard !refreshDisabled else { return }
+        if !privateReady { await session.refresh() }
+        guard !Task.isCancelled, privateReady else { return }
+        await refresh()
+    }
+    private func refresh(allowBusy: Bool = false) async {
+        guard privateReady, !busy || allowBusy, let api else { return }; busy = true; defer { busy = false }
         do {
             let accountId = session.session?.accountId
-            let value: CommerceOverview = try await api.request("overview"); guard !Task.isCancelled, accountId == session.session?.accountId else { return }; overview = value; failure = ""
+            let value: CommerceOverview = try await api.request("overview"); guard !Task.isCancelled, privateReady, accountId == session.session?.accountId else { return }; overview = value; failure = ""; commerceAvailable = true
             if let limit = value.limits.first(where: { $0.currency == value.policy.currency }), limit.version != limitVersion {
                 let pending = limit.effective_at != nil
                 let none = pending ? limit.pending_none == true : limit.explicit_none
@@ -90,18 +120,18 @@ struct CommerceFeature: View {
                 reminders = limit.reminders_on; limitVersion = limit.version
             }
             if creator.isEmpty { creator = value.creators.first?.id ?? "" }
-            if let packet = detail?.packet { detail = try await api.request("packets/" + packet.id) }
+            if let packet = detail?.packet { let value: CommerceDetail = try await api.request("packets/" + packet.id); guard !Task.isCancelled, privateReady else { return }; detail = value }
         } catch { await report(error) }
     }
     private func refreshAccess() async {
         accessSnapshot = nil; accessReceivedAt = nil
-        guard screen == "access", scenePhase == .active, !creator.isEmpty, let fanId = overview?.fan?.id, let api else { return }
+        guard privateReady, screen == "access", scenePhase == .active, !creator.isEmpty, let fanId = overview?.fan?.id, let api else { return }
         let creatorId = creator; let accountId = session.session?.accountId
         while !Task.isCancelled {
             let checkedAt = Date()
             do {
                 let value: CommerceAccess = try await api.request("creators/\(creatorId)/fans/\(fanId)/access")
-                guard !Task.isCancelled, creator == creatorId, session.session?.accountId == accountId, value.creatorId == creatorId, value.fanId == fanId else { return }
+                guard !Task.isCancelled, privateReady, creator == creatorId, session.session?.accountId == accountId, value.creatorId == creatorId, value.fanId == fanId else { return }
                 accessSnapshot = value; accessReceivedAt = checkedAt; accessNow = Date()
             } catch {
                 guard !Task.isCancelled, session.session?.accountId == accountId else { return }
@@ -128,11 +158,26 @@ struct CommerceFeature: View {
         return sources.isEmpty ? "No included access for this creator." : sources.joined(separator: ", ")
     }
     private func report(_ error: Error) async {
-        if let error = error as? CommerceFailure { failure = error.message; if error.status == 401 { overview = nil; detail = nil; await session.refresh() } }
-        else if !(error is CancellationError) { failure = "Reconnect to refresh. Your input is kept; actions are unavailable while offline." }
+        guard !Task.isCancelled, !(error is CancellationError), privateReady else { return }
+        if let error = error as? CommerceFailure {
+            failure = error.message
+            if error.status >= 500 || error.status == 409 || error.status == 401 { commerceAvailable = false }
+            if error.code == "session_account_changed" || error.code == "session_view_changed" { clearPrivateState(); await session.refresh() }
+            else if error.status == 401 { overview = nil; detail = nil; await session.refresh() }
+        } else { commerceAvailable = false; failure = "Reconnect to refresh. Your input is kept; actions are unavailable while offline." }
+    }
+    private func clearPrivateState() {
+        overview = nil; detail = nil; accessSnapshot = nil; accessReceivedAt = nil; commerceAvailable = false
+        commandInFlight = false
+        amount = ""; choice = ""; reminders = false; summary = ""; info = ""; selectedMode = nil
+        selectedPassCreators = []; replacementCreator = ""; creator = ""; keys.removeAll(); notice = ""; failure = ""; limitVersion = nil
+    }
+    private func launch(requireReady: Bool = true, _ action: @escaping @MainActor () async -> Void) {
+        guard operation == nil, requireReady ? privateReady : !refreshDisabled else { return }
+        operation = Task { await action(); operation = nil }
     }
     private func mutate(_ path: String, values: [String: Any], message: String) async {
-        guard !busy, let api else { return }; busy = true; defer { busy = false }
+        guard !commandDisabled, let api else { return }; busy = true; commandInFlight = true; defer { busy = false; commandInFlight = false }
         do {
             var body = values
             let canonical = try JSONSerialization.data(withJSONObject: values, options: [.sortedKeys])
@@ -140,7 +185,8 @@ struct CommerceFeature: View {
             let key = keys[signature] ?? UUID().uuidString; keys[signature] = key; body["idempotencyKey"] = key
             struct Result: Decodable, Sendable {}
             let _: Result = try await api.request(path, body: JSONSerialization.data(withJSONObject: body))
-            notice = message; failure = ""; await refresh()
+            guard !Task.isCancelled, privateReady else { return }
+            notice = message; failure = ""; await refresh(allowBusy: true)
         } catch { await report(error) }
     }
     private func requests(_ data: CommerceOverview) -> some View {
@@ -151,7 +197,7 @@ struct CommerceFeature: View {
             if visible.isEmpty { EmptyState(title: "No requests here", body: data.packets.isEmpty ? "Requests appear after you send them." : "Choose another category to view your requests and retained receipts.") }
             ForEach(visible) { packet in
                 RequestStatus(reqId: reqID(packet.id), mode: packet.snapshot.title, price: CommerceAmount.display(packet.snapshot.amount, packet.snapshot.currency), outcome: outcome(packet))
-                Button("View request", variant: .secondary, block: true) { Task { await open(packet) } }
+                Button("View request", variant: .secondary, block: true) { launch { await open(packet) } }
             }
             Button("Spending and time", variant: .secondary, block: true) { screen = "spending" }
             Button("Creator access", variant: .secondary, block: true) { screen = "access" }
@@ -179,7 +225,7 @@ struct CommerceFeature: View {
                 if choice == "amount" { monthlyAmountField(data.policy.currency).padding(12).frame(minHeight: 48).background(qColor("surface", scheme)).accessibilityLabel("Monthly amount") }
                 Toggle("Remind me at 50% and 100%", isOn: $reminders).qText("body")
                 Text("Increases take 24 hours. Decreases are immediate and affect new requests. Existing obligations remain.").qText("caption")
-                Button(busy ? "Saving…" : "Save limit", variant: .secondary, block: true, disabled: busy || choice.isEmpty) { Task {
+                Button(commandInFlight ? "Saving…" : "Save limit", variant: .secondary, block: true, disabled: commandDisabled || choice.isEmpty) { launch {
                     do { let value = choice == "none" ? nil : try CommerceAmount.parse(amount, data.policy.currency); await mutate("spend-limit", values: ["currency": data.policy.currency, "amount": value.map { $0 as Any } ?? NSNull(), "explicitNone": choice == "none", "remindersOn": reminders], message: "Your spending choice is saved.") } catch { await report(error) }
                 } }
             }
@@ -221,8 +267,8 @@ struct CommerceFeature: View {
         }
     }
     private func open(_ packet: CommercePacket) async {
-        guard let api, !busy else { return }; busy = true; defer { busy = false }
-        do { detail = try await api.request("packets/" + packet.id); screen = "status"; failure = "" } catch { await report(error) }
+        guard let api, !busy, privateReady else { return }; busy = true; defer { busy = false }
+        do { let value: CommerceDetail = try await api.request("packets/" + packet.id); guard !Task.isCancelled, privateReady else { return }; detail = value; screen = "status"; failure = "" } catch { await report(error) }
     }
     private func status(_ detail: CommerceDetail) -> some View {
         let packet = detail.packet
@@ -236,9 +282,9 @@ struct CommerceFeature: View {
             if packet.state == "more_info" {
                 Text(packet.question ?? "The creator asked for more information.").qText("body")
                 TextEditor(text: $info).frame(minHeight: 100).accessibilityLabel("Your answer")
-                Button("Send answer", variant: .secondary, block: true, disabled: busy || info.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) { Task { await mutate("packets/\(packet.id)/info", values: ["version": packet.version, "text": info], message: "Your answer is saved.") } }
+                Button("Send answer", variant: .secondary, block: true, disabled: commandDisabled || info.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) { launch { await mutate("packets/\(packet.id)/info", values: ["version": packet.version, "text": info], message: "Your answer is saved.") } }
             }
-            if ["submitting", "submitted", "more_info", "offer_pending"].contains(packet.state) { Button("Withdraw request", variant: .secondary, block: true, disabled: busy) { Task { await mutate("packets/\(packet.id)/withdraw", values: ["version": packet.version], message: "Hold release is being confirmed.") } } }
+            if ["submitting", "submitted", "more_info", "offer_pending"].contains(packet.state) { Button("Withdraw request", variant: .secondary, block: true, disabled: commandDisabled) { launch { await mutate("packets/\(packet.id)/withdraw", values: ["version": packet.version], message: "Hold release is being confirmed.") } } }
             if packet.payment_state == "unknown" || packet.payment_state == "requires_action" { Notice(title: "Payment processing", children: "The provider must confirm payment. No completion is inferred from this screen.") }
             if let transport = detail.callTransport {
                 Notice(title: "System · call status", children: transport.state == "closed_unresolved" ? "The call room closed after neither participant joined during the arrival window. The service outcome remains unresolved. Recorded \(when(transport.recordedAt)). Check the current receipt for billing status." : "Current call status is unavailable. Your recorded receipt remains available.")
@@ -248,7 +294,7 @@ struct CommerceFeature: View {
                 if let signedActId = detail.commitment?.evidence?.signedActId ?? detail.commitment?.accept_act_id {
                     Button(detail.commitment?.evidence?.signedActId != nil ? "Open signed verification" : "Open signed acceptance", variant: .quiet, block: true) { session.destination = "/verify/" + signedActId }
                 }
-                if detail.commitment?.state == "delivered" || detail.share?.fan_choice == true { Button(detail.share?.fan_choice == true ? "Revoke sharing" : "Allow sharing without your handle", variant: .secondary, block: true, disabled: busy || (!packet.snapshot.shareable && detail.share?.fan_choice != true) || detail.share?.revoked_at != nil) { Task { await mutate("packets/\(packet.id)/share", values: ["version": detail.share?.version ?? 1, "enabled": detail.share?.fan_choice != true, "handleDisplay": "hidden"], message: "Your sharing choice is saved.") } } }
+                if detail.commitment?.state == "delivered" || detail.share?.fan_choice == true { Button(detail.share?.fan_choice == true ? "Revoke sharing" : "Allow sharing without your handle", variant: .secondary, block: true, disabled: commandDisabled || (!packet.snapshot.shareable && detail.share?.fan_choice != true) || detail.share?.revoked_at != nil) { launch { await mutate("packets/\(packet.id)/share", values: ["version": detail.share?.version ?? 1, "enabled": detail.share?.fan_choice != true, "handleDisplay": "hidden"], message: "Your sharing choice is saved.") } } }
             }
         }
     }
@@ -267,8 +313,8 @@ struct CommerceFeature: View {
             if data.memberships.isEmpty { EmptyState(title: "No memberships yet", body: "Choose an available membership or restore your current store purchases.") }
             ForEach(data.memberships) { member in panel { Text(member.name).qText("title"); row("Status", member.state); row("Access until", when(member.period_end)); row("Billing provider", member.provider) } }
             let currentProducts = data.tiers.filter { $0.state == "active" }.compactMap { $0.catalog.apple?.productId }
-            if let baseURL, let accountID = session.session?.accountId, data.capabilities.storePurchasesAvailable == true {
-                StoreMembershipPane(baseURL: baseURL, productIDs: currentProducts, accountID: accountID, onVerified: { await refresh() }).id(accountID)
+            if baseURL != nil, let accountID = session.session?.accountId, data.capabilities.storePurchasesAvailable == true {
+                if let api { StoreMembershipPane(client: api, productIDs: currentProducts, accountID: accountID, available: !commandDisabled, onVerified: { await refresh() }).id([accountID, sessionId ?? "no-session"]) }
             } else {
                 Notice(title: "Purchase and restore unavailable", children: "Store products must be configured and verified by the server before access is granted.")
                 if data.memberships.contains(where: { $0.provider == "apple" }) {
@@ -287,15 +333,15 @@ struct CommerceFeature: View {
                 Text("\(pass.used + pass.reserved) of \(pass.allowance) shared AI cost units used or reserved.").qText("body")
                 ForEach(data.passChoices.creators) { candidate in Toggle(candidate.display_name, isOn: Binding(get: { selectedPassCreators.contains(candidate.id) }, set: { enabled in if enabled { selectedPassCreators.insert(candidate.id) } else { selectedPassCreators.remove(candidate.id) } })).qText("body") }
                 let occupied = Set(data.slots.filter { $0.cycle_start == pass.cycle_start && ["active","draft_next","ended_readable","replaced"].contains($0.state) }.map(\.position)).count
-                if occupied < pass.slot_capacity { Button("Fill available slots", variant: .secondary, block: true, disabled: busy || !current || selectedPassCreators.isEmpty || selectedPassCreators.count > pass.slot_capacity - occupied) { Task { await mutate("pass/initial", values: ["version": pass.version, "creatorIds": selectedPassCreators.sorted()], message: "Your current choices are saved.") } } }
-                Button("Save next month’s choices", variant: .secondary, block: true, disabled: busy || !current || selectedPassCreators.count > pass.slot_capacity) { Task { await mutate("pass/draft", values: ["version": pass.version, "creatorIds": selectedPassCreators.sorted()], message: "Your next-month draft is saved.") } }
+                if occupied < pass.slot_capacity { Button("Fill available slots", variant: .secondary, block: true, disabled: commandDisabled || !current || selectedPassCreators.isEmpty || selectedPassCreators.count > pass.slot_capacity - occupied) { launch { await mutate("pass/initial", values: ["version": pass.version, "creatorIds": selectedPassCreators.sorted()], message: "Your current choices are saved.") } } }
+                Button("Save next month’s choices", variant: .secondary, block: true, disabled: commandDisabled || !current || selectedPassCreators.count > pass.slot_capacity) { launch { await mutate("pass/draft", values: ["version": pass.version, "creatorIds": selectedPassCreators.sorted()], message: "Your next-month draft is saved.") } }
                 Text("Complete all \(pass.slot_capacity) choices. An incomplete draft carries forward your current selection.").qText("caption")
             }
             ForEach(data.slots) { slot in panel {
                 row(slot.display_name, slot.state.replacingOccurrences(of: "_", with: " ")); Text("Through \(when(slot.ends_at))").qText("caption")
                 if data.policy.passEnabled, data.passChoices.replaceableSlotIds.contains(slot.id), let pass = data.pass.first {
                     Picker("Free replacement", selection: $replacementCreator) { Text("Choose a creator").tag(""); ForEach(data.passChoices.creators.filter { candidate in !data.slots.contains { $0.state == "active" && $0.creator_id == candidate.id } }) { Text($0.display_name).tag($0.id) } }
-                    Button("Replace unavailable creator", variant: .secondary, block: true, disabled: busy || replacementCreator.isEmpty) { Task { await mutate("pass/slots/\(slot.id)/replace", values: ["version": pass.version, "creatorId": replacementCreator], message: "Your replacement is saved.") } }
+                    Button("Replace unavailable creator", variant: .secondary, block: true, disabled: commandDisabled || replacementCreator.isEmpty) { launch { await mutate("pass/slots/\(slot.id)/replace", values: ["version": pass.version, "creatorId": replacementCreator], message: "Your replacement is saved.") } }
                 }
             } }
             Text("A pass grants AI reach. Separate memberships grant tier depth and do not consume a slot.").qText("body")

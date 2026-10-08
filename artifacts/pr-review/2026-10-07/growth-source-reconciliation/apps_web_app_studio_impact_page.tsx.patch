@@ -1,0 +1,43 @@
+diff --git a/apps/web/app/studio/impact/page.tsx b/apps/web/app/studio/impact/page.tsx
+index 15d9021a..736410d3 100644
+--- a/apps/web/app/studio/impact/page.tsx
++++ b/apps/web/app/studio/impact/page.tsx
+@@ -5,7 +5,7 @@ import {
+   GrowthUnavailable,
+ } from "../../../features/growth/server";
+ import { currentSession } from "../../../lib/session";
+-import { IdentitySessionBoundary } from "../../../features/identity/session-boundary";
++import { GrowthSessionBoundary } from "../../../features/growth/private-view";
+ export const dynamic = "force-dynamic";
+ interface Impact {
+   window_start: string;
+@@ -25,13 +25,18 @@ export default async function Impact() {
+         "session_required",
+         growthCopy.growthContinueWithPantopusToOpenYourAccountSCurrentState,
+       );
+-    const init = { headers: { "X-Expected-Account-Id": session.accountId } };
++    const init = {
++      headers: {
++        "X-Expected-Account-Id": session.accountId,
++        "X-Expected-Session-Id": session.sessionId,
++      },
++    };
+     const { impact } = await growthRequest<{ impact: Impact | null }>(
+       "impact",
+       init,
+     );
+     return (
+-      <IdentitySessionBoundary
++      <GrowthSessionBoundary
+         key={session.sessionId}
+         initial={session}
+         returnTo="/studio/impact"
+@@ -95,7 +100,7 @@ export default async function Impact() {
+             )}
+           </section>
+         </GrowthShell>
+-      </IdentitySessionBoundary>
++      </GrowthSessionBoundary>
+     );
+   } catch (error) {
+     return (

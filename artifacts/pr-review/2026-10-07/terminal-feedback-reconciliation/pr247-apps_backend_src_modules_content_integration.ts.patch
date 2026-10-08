@@ -1,0 +1,20 @@
+diff --git a/apps/backend/src/modules/content/integration.ts b/apps/backend/src/modules/content/integration.ts
+index 608a1fd7..179c1909 100644
+--- a/apps/backend/src/modules/content/integration.ts
++++ b/apps/backend/src/modules/content/integration.ts
+@@ -4,7 +4,15 @@ import { contentFeature, contentSignedSubjects } from "./registration.js";
+ import { ContentSources } from "./sources.js";
+ import { contentPublicProjection } from "../growth/content.js";
+ import { createCommercePublicationPermission } from "../commerce/publication.js";
++export {
++  createCurrentContentPostEntryReader,
++  type CurrentContentPostEntryReader,
++} from "./post-entry.js";
+ import { assertCommercePublicationSource } from "../commerce/publication-source.js";
++export {
++  ContentFulfillmentPublicationWorker,
++  type ContentFulfillmentPublicationConfiguration,
++} from "./fulfillment-publication.js";
+ export {
+   PreparedContentGenerationOrigins,
+   GENERATION_CONTENT_ORIGIN_MIGRATION,

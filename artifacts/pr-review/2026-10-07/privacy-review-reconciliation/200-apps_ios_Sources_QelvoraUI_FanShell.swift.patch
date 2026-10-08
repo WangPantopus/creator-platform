@@ -1,0 +1,104 @@
+diff --git a/apps/ios/Sources/QelvoraUI/FanShell.swift b/apps/ios/Sources/QelvoraUI/FanShell.swift
+index b406f37a..bbfd8c1e 100644
+--- a/apps/ios/Sources/QelvoraUI/FanShell.swift
++++ b/apps/ios/Sources/QelvoraUI/FanShell.swift
+@@ -222,6 +222,9 @@ public final class FanSession: ObservableObject {
+             confirmedCredential = token; session = value; error = ""
+             await restoreDestination(account: value, credential: token, generation: current)
+             guard current == generation, !Task.isCancelled else { return }
++            #if os(iOS)
++            GrowthPushCoordinator.shared.update(session: value, baseURL: baseURL)
++            #endif
+         } catch let failure as CreatorAPIError {
+             guard current == generation, !Task.isCancelled else { return }
+             let observedCredential = try? await storage.read()
+@@ -285,6 +288,24 @@ public final class FanSession: ObservableObject {
+             return false
+         }
+     }
++    /// Save only the intro, against the original account/profile version.
++    public func saveIntro(_ intro: String, accountId: String, sessionId: String) async -> Bool {
++        guard !busy, let current = session, current.accountId == accountId,
++              current.sessionId == sessionId, let fan = current.fan,
++              let capture = await captureRequest(from: destination, maximumResponseBytes: 65_536, timeoutSeconds: 10),
++              await capture.isCurrent() else { return false }
++        busy = true; defer { busy = false }
++        do {
++            let text = intro.trimmingCharacters(in: .whitespacesAndNewlines)
++            let saved = try await capture.client.saveFanIntro(body: APIFanIntroInput(intro: text, expectedVersion: fan.version))
++            guard await capture.isCurrent(), saved.id == fan.id, saved.intro == text else { return false }
++            await refresh()
++            return await capture.isCurrent()
++        } catch {
++            if await capture.isCurrent() { self.error = Self.message(error) }
++            return false
++        }
++    }
+     /// Recover navigation only with the credential and destination that opened it.
+     /// The call screen independently authorizes the booking and every action.
+     public func resolveCallDestination(_ callId: String, from target: String) async -> Bool {
+@@ -333,6 +354,9 @@ public final class FanSession: ObservableObject {
+         generation += 1; confirmedCredential = nil; session = nil; hasSavedCredential = false; checkingSession = false; actors = []; choosingDevelopmentActor = false; error = ""
+         navigationInitialized = false; navigationRestoreAllowed = false
+         URLCache.shared.removeAllCachedResponses()
++        #if os(iOS)
++        GrowthPushCoordinator.shared.update(session: nil, baseURL: baseURL)
++        #endif
+         var cleared = true
+         do { try await storage.save(nil) } catch { cleared = false }
+         do { try await W3FanFeatures.clearPrivateState() } catch { cleared = false }
+@@ -340,6 +364,27 @@ public final class FanSession: ObservableObject {
+         if !cleared { error = QelvoraCopy.text("identityPrivateClearFailed") }
+         return cleared
+     }
++    #if os(iOS)
++    func openNotification(_ id: UUID) async -> Bool {
++        guard let baseURL, let active = session else { open("/notifications"); return false }
++        let snapshot = generation
++        do {
++            guard let credential = try await storage.read() else { return false }
++            let target = try await GrowthClient(baseURL: baseURL).notificationDestination(id: id, expectedSession: credential)
++            guard !Task.isCancelled, snapshot == generation, session?.sessionId == active.sessionId else { return false }
++            open(target)
++            return true
++        } catch let failure as GrowthRequestFailure {
++            guard !Task.isCancelled, snapshot == generation else { return false }
++            open("/notifications"); error = failure.message
++            return [403, 404, 410].contains(failure.status)
++        } catch {
++            guard !Task.isCancelled, snapshot == generation else { return false }
++            open("/notifications"); self.error = QelvoraCopy.text("growthSettingsNeedACurrentSignedInAccountAndNetworkConnection")
++            return false
++        }
++    }
++    #endif
+     public func open(_ target: String) { guard ApplicationDestination.isPermitted(target) else { error = "This link is unavailable. Open the object from the app."; return }; navigationRestoreAllowed = false; removedArrivalFor = nil; destination = target; persistDestination() }
+     static func message(_ error: Error) -> String { if let failure = error as? CreatorAPIError, let result = try? JSONDecoder().decode(APIError.self, from: failure.body) { return result.error.message }; return "This action could not complete. Reconnect and try again." }
+ }
+@@ -360,6 +405,10 @@ public struct FanAppShell: View {
+     @Environment(\.colorScheme) private var scheme
+     @Environment(\.dynamicTypeSize) private var textSize
+     @Environment(\.scenePhase) private var scenePhase
++    #if os(iOS)
++    @ObservedObject private var push = GrowthPushCoordinator.shared
++    @State private var notificationArrivalRevision = 0
++    #endif
+     public init(baseURL: URL? = nil, returnTo: String = "/home", features: [FanFeatureRegistration] = []) { _model = StateObject(wrappedValue: FanSession(baseURL: baseURL, destination: returnTo)); self.features = features }
+     public var body: some View {
+         GeometryReader { frame in
+@@ -441,6 +490,15 @@ public struct FanAppShell: View {
+                 }
+             }
+             .task(id: model.destination + destinationDelivery.uuidString) { await model.loadArrival() }
++            #if os(iOS)
++            .onChange(of: scenePhase) { _, phase in
++                if phase == .active { push.refreshPermission(); notificationArrivalRevision += 1 }
++            }
++            .task(id: (push.pendingTap?.delivery.uuidString ?? "") + (model.session?.sessionId ?? "") + String(notificationArrivalRevision)) {
++                guard let tap = push.pendingTap else { return }
++                if await model.openNotification(tap.notificationID) { push.consumed(tap); destinationDelivery = UUID() }
++            }
++            #endif
+             .onOpenURL { url in
+                 guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false), components.user == nil, components.password == nil, components.fragment == nil else { model.error = "This link is unavailable."; return }
+                 let associationHost = Bundle.main.object(forInfoDictionaryKey: "CreatorLinkHost") as? String

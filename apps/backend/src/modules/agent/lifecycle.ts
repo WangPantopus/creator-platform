@@ -6,6 +6,10 @@ import { generationJournalInstalled } from "./generation-journal.js";
 import type { PoolClient } from "pg";
 import type { PreparedUsageRetention } from "./usage-retention.js";
 import { agentPrivacyTransaction } from "./privacy-transaction.js";
+import {
+  requireResolvedAccounting,
+  unresolvedAccountingInTransaction,
+} from "./accounting-uncertainty.js";
 
 /** Only the trusted W8 adapter calls this with a verified notice; not an unprotected HTTP route. */
 export class AgentLifecycle {
@@ -23,6 +27,13 @@ export class AgentLifecycle {
         "Use this lifecycle's actual original Agent repository.",
         503,
       );
+  }
+  assertUsageRetention(retention: PreparedUsageRetention): void {
+    invariant(
+      this.usageRetention === retention,
+      "agent_lifecycle_composition_mismatch",
+      "Accounting expiry must retain this lifecycle's original retention owner.",
+    );
   }
   async assertAccountingClient(client: PoolClient) {
     const installed = await generationJournalInstalled(client);
@@ -151,6 +162,19 @@ export class AgentLifecycle {
         await assertAuthorized();
         await assertTaskInTransaction(client);
         const lineage = await this.assertAccountingClient(client);
+        // Diagnose uncertainty before a dependent Conversation boundary can
+        // hide its deadline. Repeat under the original locks before erasure;
+        // this read does not change the profile-before-workspace lock order.
+        const assertAccountingResolved = async () =>
+          requireResolvedAccounting(
+            await unresolvedAccountingInTransaction(
+              client,
+              scope.creatorId,
+              undefined,
+              signal,
+            ),
+          );
+        await assertAccountingResolved();
         let boundaryReference: string | undefined;
         if (lineage) {
           invariant(
@@ -167,6 +191,7 @@ export class AgentLifecycle {
         }
         const assertDetached = async () => {
           await assertTaskInTransaction(client);
+          await assertAccountingResolved();
           if (!lineage) return;
           for (const table of [
             "ai_generation_receipt",
@@ -280,24 +305,13 @@ export class AgentLifecycle {
         // A replay must not acknowledge a resurrected family either.
         await assertDetached();
         const retainedAccounting = lineage
-          ? (
-              await client.query<{
-                policy_version: string;
-                reason: string;
-                unknown: boolean;
-                until: Date;
-                records: string;
-              }>(
-                "SELECT accounting_retention_version AS policy_version,accounting_retention_reason AS reason,cost_micros IS NULL AS unknown,max(accounting_retained_until) AS until,count(*)::text AS records FROM creator.ai_usage WHERE creator_id=$1 AND accounting_retained_until IS NOT NULL GROUP BY accounting_retention_version,accounting_retention_reason,cost_micros IS NULL LIMIT 201",
-                [scope.creatorId],
-              )
-            ).rows
+          ? await this.usageRetention!.detachAccount(
+              client,
+              scope,
+              assertTaskInTransaction,
+              signal,
+            )
           : [];
-        invariant(
-          retainedAccounting.length <= 200,
-          "bounded_subjob_required",
-          "Complete bounded retained-accounting receipts before acknowledging creator erasure.",
-        );
         if (lineage) {
           const currentBoundary = await accountingBoundary!(client);
           invariant(
@@ -310,21 +324,11 @@ export class AgentLifecycle {
         await assertTaskInTransaction(client);
         return {
           ...receipt,
-          retainedAccounting: retainedAccounting.map((row) => ({
-            policyVersion: row.policy_version,
-            records: row.records,
-            unknown: row.unknown,
-            until: row.unknown ? null : row.until.toISOString(),
-            reason: row.reason,
-          })),
+          retainedAccounting,
           retained: retainedAccounting.map((row) => ({
-            category: row.unknown
-              ? "unresolved_agent_cost"
-              : "unlinked_agent_accounting",
-            until: row.unknown ? null : row.until.toISOString(),
-            reason: row.unknown
-              ? `${row.reason} Unresolved provider cost requires actual reconciliation; expiry cannot clear this marker.`
-              : row.reason,
+            category: "unlinked_agent_accounting",
+            until: row.until,
+            reason: row.reason,
           })),
         };
       },

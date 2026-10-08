@@ -1,0 +1,134 @@
+diff --git a/apps/web/features/growth/session.ts b/apps/web/features/growth/session.ts
+index ecd37e0f..c4bcf949 100644
+--- a/apps/web/features/growth/session.ts
++++ b/apps/web/features/growth/session.ts
+@@ -1,7 +1,7 @@
+ "use client";
+ import { useCallback } from "react";
+-import { copy } from "@qelvora/copy";
+ import { SessionSchema } from "@qelvora/api";
++import { copy } from "@qelvora/copy";
+ import { useIdentityRequest } from "../identity/session-boundary";
+ 
+ export class GrowthActionError extends Error {
+@@ -13,31 +13,42 @@ export class GrowthActionError extends Error {
+   }
+ }
+ 
+-/** Private Growth forms use W1's actual issued session lifetime. Account/session
+- * headers are mismatch preconditions; the server still resolves authority. */
++/** Private fan views retain their actual issued session. Expected headers can
++ * only refuse a mismatch; the server still resolves the genuine credential. */
+ export function useGrowthSession() {
+-  const identity = useIdentityRequest();
+-  const { signal, session, end, request: identityRequest } = identity;
++  const {
++    session,
++    signal,
++    end,
++    request: identityRequest,
++  } = useIdentityRequest();
+   const request = useCallback(
+-    async <T>(path: string, init: RequestInit = {}): Promise<T> => {
++    async <T = Record<string, unknown>>(
++      path: string,
++      init: RequestInit = {},
++    ): Promise<T> => {
+       signal.throwIfAborted();
+       const workSignal = AbortSignal.any([
+         signal,
+         AbortSignal.timeout(10000),
+         ...(init.signal ? [init.signal] : []),
+       ]);
++      const headers = new Headers(init.headers);
++      headers.set("Content-Type", "application/json");
++      headers.set("X-Expected-Account-Id", session.accountId);
++      headers.set("X-Expected-Session-Id", session.sessionId);
+       const originalSession = async () => {
+         const response = await identityRequest("session", {
+           signal: workSignal,
+         });
++        workSignal.throwIfAborted();
+         if (!response.ok)
+           throw new GrowthActionError(
+             response.status,
+-            response.status === 401
+-              ? copy.growthContinueWithPantopusToOpenYourAccountSCurrentState
+-              : copy.growthTheServiceIsUnavailablePleaseTryAgain,
++            copy.growthTheServiceIsUnavailablePleaseTryAgain,
+           );
+         const current = SessionSchema.parse(await response.json());
++        workSignal.throwIfAborted();
+         if (
+           current.accountId !== session.accountId ||
+           current.sessionId !== session.sessionId
+@@ -45,36 +56,42 @@ export function useGrowthSession() {
+           end();
+         workSignal.throwIfAborted();
+       };
+-      // Read W1's actual session around each private action. A matching account
+-      // header cannot distinguish a replacement session for the same account.
+-      await originalSession();
+-      const headers = new Headers(init.headers);
+-      headers.set("Content-Type", "application/json");
+-      headers.set("X-Expected-Account-Id", session.accountId);
+-      headers.set("X-Expected-Session-Id", session.sessionId);
+-      const response = await fetch(`/api/growth/${path}`, {
+-        ...init,
+-        headers,
+-        cache: "no-store",
+-        signal: workSignal,
+-      });
+-      const result = await response.json();
+-      if (
+-        response.status === 409 &&
+-        (result.error?.code === "session_account_changed" ||
+-          result.error?.code === "session_view_changed")
+-      )
+-        end();
+-      await originalSession();
+-      workSignal.throwIfAborted();
+-      if (!response.ok)
++      try {
++        await originalSession();
++        const response = await fetch(`/api/growth/${path}`, {
++          ...init,
++          headers,
++          cache: "no-store",
++          signal: workSignal,
++        });
++        const result = await response.json();
++        workSignal.throwIfAborted();
++        if (
++          response.status === 409 &&
++          ["session_account_changed", "session_view_changed"].includes(
++            result.error?.code,
++          )
++        )
++          end();
++        workSignal.throwIfAborted();
++        await originalSession();
++        workSignal.throwIfAborted();
++        if (!response.ok)
++          throw new GrowthActionError(
++            response.status,
++            result.error?.message ?? copy.growthThisActionCouldNotBeCompleted,
++          );
++        return result as T;
++      } catch (error) {
++        signal.throwIfAborted();
++        if (error instanceof GrowthActionError) throw error;
+         throw new GrowthActionError(
+-          response.status,
+-          result.error?.message ?? copy.growthThisActionCouldNotBeCompleted,
++          503,
++          copy.growthTheServiceIsUnavailablePleaseTryAgain,
+         );
+-      return result as T;
++      }
+     },
+-    [signal, session.accountId, session.sessionId, end, identityRequest],
++    [session.accountId, session.sessionId, signal, end, identityRequest],
+   );
+   return { request, signal };
+ }

@@ -10,6 +10,7 @@ import { createConversationRuntime } from "../conversation/runtime.js";
 import { modelFromEnvironment } from "./model.js";
 import { createAgentDomain } from "./integration.js";
 import { agentFeature } from "./feature.js";
+import { startDevelopmentIngestion } from "../ingestion/development-lifetime.js";
 import { DevelopmentLicenseVerifier } from "./development-license.js";
 import { createDevelopmentTrust } from "../trust/development.js";
 import {
@@ -139,24 +140,19 @@ const backend = await createConfiguredBackend({
 if (!domain) throw new Error("Creator AI composition is unavailable.");
 const creatorId = process.env.W2_CREATOR_ID;
 const accountId = process.env.W2_DEVELOPMENT_ACCOUNT_ID;
-const controller = new AbortController();
-const worker = domain.ingestion;
 // A missing provider is a startup prerequisite, not a job to retry every second.
 // The real worker still owns leases, authority, failures and provider receipts
 // once the host has both priced configuration and its fictional creator tuple.
-const timer =
-  model?.pricingConfigured && creatorId && accountId
-    ? setInterval(() => {
-        void worker
-          .tick({ creatorId, accountId, development: true }, controller.signal)
-          .catch(() =>
-            process.stderr.write(
-              "W2 ingestion is unavailable; inspect scoped source state.\n",
-            ),
-          );
-      }, 1000)
-    : undefined;
-if (!timer)
+const ingestionConfigured = Boolean(
+  model?.pricingConfigured && creatorId && accountId,
+);
+const ingesting = startDevelopmentIngestion(
+  domain.ingestion,
+  ingestionConfigured
+    ? [{ creatorId: creatorId!, accountId: accountId!, development: true }]
+    : [],
+);
+if (!ingestionConfigured)
   process.stdout.write(
     "W2 ingestion is disabled: priced provider or fictional creator configuration is unavailable.\n",
   );
@@ -165,11 +161,25 @@ backend.server.listen(config.port, "127.0.0.1", () =>
     "W2 development API listening on loopback; external fan publication is disabled.\n",
   ),
 );
+let stopping: Promise<void> | undefined;
 const stop = () => {
-  if (timer) clearInterval(timer);
-  controller.abort();
-  conversations?.close();
-  void backend.close().then(() => process.exit(0));
+  stopping ??= (async () => {
+    const results = await Promise.allSettled([
+      ingesting.close(),
+      Promise.resolve().then(() => conversations?.close()),
+    ]);
+    let failed = results.some((result) => result.status === "rejected");
+    try {
+      await backend.close();
+    } catch {
+      failed = true;
+    }
+    if (failed)
+      process.stderr.write(
+        "Development host shutdown did not complete cleanly.\n",
+      );
+    process.exit(failed ? 1 : 0);
+  })();
 };
 process.on("SIGTERM", stop);
 process.on("SIGINT", stop);

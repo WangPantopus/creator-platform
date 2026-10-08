@@ -1,0 +1,22 @@
+diff --git a/apps/backend/src/modules/content/integration.ts b/apps/backend/src/modules/content/integration.ts
+index 4e0e8498..179c1909 100644
+--- a/apps/backend/src/modules/content/integration.ts
++++ b/apps/backend/src/modules/content/integration.ts
+@@ -9,12 +9,17 @@ export {
+   type CurrentContentPostEntryReader,
+ } from "./post-entry.js";
+ import { assertCommercePublicationSource } from "../commerce/publication-source.js";
++export {
++  ContentFulfillmentPublicationWorker,
++  type ContentFulfillmentPublicationConfiguration,
++} from "./fulfillment-publication.js";
+ export {
+   PreparedContentGenerationOrigins,
+   GENERATION_CONTENT_ORIGIN_MIGRATION,
+   GENERATION_CONTENT_ORIGIN_SIGNATURE,
+   type GenerationContentOriginSource,
+ } from "./generation-origin.js";
++export { GENERATION_CONTENT_ORIGIN_PROFILE_FENCE_SOURCE } from "./generation-origin-profile.js";
+ import { DomainError } from "../../core/errors.js";
+ import { StudioService } from "../studio/service.js";
+ import { studioFeature } from "../studio/registration.js";

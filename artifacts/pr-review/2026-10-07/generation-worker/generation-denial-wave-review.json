@@ -1,0 +1,347 @@
+{
+  "scope": "Original Trust/Media wave checker extension for the held39-source generation denial and exact PUBLIC trigger additions. This is not complete generation-purpose role safety or activation.",
+  "sourceParent": "fdcea2509a056e50427d7c9de4b58e9633ac473b",
+  "sourceSha256": {
+    "apps/backend/scripts/migration-wave-roles.ts": "5df503cdb3d6c7a4947e788df14667c5d7078a649f03cfbbfe3b242bef8c7bef",
+    "infra/migrations/reviews/20261007-generation-denial-roles.json": "765307971df815690def7cab2f3f6a688b8f2e2d33e9ae47b1e8ed8a7f1ca2fd"
+  },
+  "finding": "Existing canonical checker first refused the two unreviewed denial functions. The first extension then correctly refused three new original PUBLIC invoker trigger functions. The final extension pins exactly their definitions/owners/grants and trigger/invoker kind, with no blanket PUBLIC acceptance and no SQL rewrite.",
+  "profiles": {
+    "fresh": {
+      "canonicalGuard": {
+        "checkedRoles": 3,
+        "pinnedFunctions": 10,
+        "directCapabilities": 93,
+        "publicCapabilities": 331,
+        "pinnedPublicFunctions": 23
+      },
+      "extension": {
+        "checkedRoles": 3,
+        "pinnedFunctions": 12,
+        "directCapabilities": 154,
+        "publicCapabilities": 357,
+        "pinnedPublicFunctions": 26
+      },
+      "drifts": [
+        {
+          "name": "denial_login",
+          "diagnostic": "Unsafe migration purpose-role custody: creator_trust_denial."
+        },
+        {
+          "name": "denial_inherit",
+          "diagnostic": "Unsafe migration purpose-role custody: creator_trust_denial."
+        },
+        {
+          "name": "denial_member",
+          "diagnostic": "Unsafe migration purpose-role custody: creator_trust_denial."
+        },
+        {
+          "name": "worker_inherit",
+          "diagnostic": "Unsafe migration purpose-role custody: generation denial extension."
+        },
+        {
+          "name": "authority_member",
+          "diagnostic": "Unsafe migration purpose-role custody: generation denial extension."
+        },
+        {
+          "name": "authority_setting",
+          "diagnostic": "Unsafe migration purpose-role custody: generation denial extension."
+        },
+        {
+          "name": "private_worker_task",
+          "diagnostic": "Unsafe migration purpose-role custody: creator_trust_denial."
+        },
+        {
+          "name": "message_body",
+          "diagnostic": "Unsafe migration purpose-role custody: creator_trust_denial."
+        },
+        {
+          "name": "whole_scope",
+          "diagnostic": "Unsafe migration purpose-role custody: creator_trust_denial."
+        },
+        {
+          "name": "missing_metadata",
+          "diagnostic": "Unsafe migration purpose-role custody: generation denial extension."
+        },
+        {
+          "name": "public_denial",
+          "diagnostic": "Unsafe migration purpose-role custody: definer source/ACL packet."
+        },
+        {
+          "name": "worker_direct_denial",
+          "diagnostic": "Unsafe migration purpose-role custody: definer source/ACL packet."
+        },
+        {
+          "name": "grant_option",
+          "diagnostic": "Unsafe migration purpose-role custody: definer source/ACL packet."
+        },
+        {
+          "name": "disabled_rls",
+          "diagnostic": "Unsafe migration purpose-role custody: generation denial extension."
+        },
+        {
+          "name": "unforced_rls",
+          "diagnostic": "Unsafe migration purpose-role custody: generation denial extension."
+        },
+        {
+          "name": "policy_false",
+          "diagnostic": "Unsafe migration purpose-role custody: generation denial extension."
+        },
+        {
+          "name": "extra_policy",
+          "diagnostic": "Unsafe migration purpose-role custody: generation denial extension."
+        },
+        {
+          "name": "public_trigger_definer",
+          "diagnostic": "Unsafe migration purpose-role custody: generation denial extension."
+        },
+        {
+          "name": "extra_public_function",
+          "diagnostic": "Unsafe migration purpose-role custody: PUBLIC function source/ACL packet."
+        },
+        {
+          "name": "missing_source_ledger",
+          "diagnostic": "Unsafe migration purpose-role custody: generation denial extension."
+        },
+        {
+          "name": "changed_source_ledger",
+          "diagnostic": "Unsafe migration purpose-role custody: generation denial extension."
+        }
+      ],
+      "triggerRefusals": [
+        {
+          "name": "creator.ai_generation_receipt_immutable()",
+          "code": "0A000"
+        },
+        {
+          "name": "creator.fence_public_mode_write()",
+          "code": "0A000"
+        },
+        {
+          "name": "creator.fence_public_packet_write()",
+          "code": "0A000"
+        }
+      ],
+      "allDetectedAndRestored": true,
+      "scope": "Closed39-source staged actual SQL metadata review. Canonical guard remains exact and refuses by default; explicit reviewed denial extension checks actual sources/ledger/functions/grants/columns/policies. No runtime registration/task/lease/receipt.",
+      "mode": "fresh",
+      "functions": [
+        {
+          "name": "creator_trust.generation_terminal_denial(uuid)",
+          "owner": "creator_trust_denial",
+          "sha256": "fc465b04641c205007bc532f0e7f3e95450f1fb82bf0b66811d3a27c42923a22",
+          "grants": [
+            "creator_generation_terminal_authority=X/creator_trust_denial",
+            "creator_trust_denial=X/creator_trust_denial"
+          ]
+        },
+        {
+          "name": "creator_trust.generation_worker_denial(uuid)",
+          "owner": "creator_trust_denial",
+          "sha256": "8e6e20e8eb01b63075dd27c699048d60536e8952de3c433c349b7f843f90367d",
+          "grants": [
+            "creator_generation_authority=X/creator_trust_denial",
+            "creator_trust_denial=X/creator_trust_denial"
+          ]
+        }
+      ],
+      "originalWaveGuardRefusal": "Unsafe migration purpose-role custody: definer source/ACL packet.",
+      "before": {
+        "ledger": "cbd92d22449341a0720294a66d292ee7b2dd9bd65ee69924727f7f2529d40017",
+        "schema": "47ce91688f162cd5848cc6a44d738e85bb3aab0770c05c3be8f2cac0a1eafbe6",
+        "roles": "70c667c5cdf17199c08459270b8bd7006372e3e40299799bc19b092915bdd7d8",
+        "security": "5b99fafdd59f4cc447ddd14a2e55f5f0daf2d48d7ba929348fb824b346fe5af8",
+        "sequences": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+        "data": "39fa6ab7d2f6083cc5e50f0ab4ee847fdb7425d42987b07abd0f3fac275aac00",
+        "ledgerRows": 61,
+        "tables": 163,
+        "dataRows": 257
+      },
+      "after": {
+        "ledger": "cbd92d22449341a0720294a66d292ee7b2dd9bd65ee69924727f7f2529d40017",
+        "schema": "47ce91688f162cd5848cc6a44d738e85bb3aab0770c05c3be8f2cac0a1eafbe6",
+        "roles": "70c667c5cdf17199c08459270b8bd7006372e3e40299799bc19b092915bdd7d8",
+        "security": "5b99fafdd59f4cc447ddd14a2e55f5f0daf2d48d7ba929348fb824b346fe5af8",
+        "sequences": "c1ee2ff64284ef4ede09f9d2bffd3343f75c69d00b45ecd4e481e9b89aace73e",
+        "data": "39fa6ab7d2f6083cc5e50f0ab4ee847fdb7425d42987b07abd0f3fac275aac00",
+        "ledgerRows": 61,
+        "tables": 163,
+        "dataRows": 257
+      }
+    },
+    "preserved": {
+      "canonicalGuard": {
+        "checkedRoles": 3,
+        "pinnedFunctions": 10,
+        "directCapabilities": 93,
+        "publicCapabilities": 331,
+        "pinnedPublicFunctions": 23
+      },
+      "extension": {
+        "checkedRoles": 3,
+        "pinnedFunctions": 12,
+        "directCapabilities": 154,
+        "publicCapabilities": 357,
+        "pinnedPublicFunctions": 26
+      },
+      "drifts": [
+        {
+          "name": "denial_login",
+          "diagnostic": "Unsafe migration purpose-role custody: creator_trust_denial."
+        },
+        {
+          "name": "denial_inherit",
+          "diagnostic": "Unsafe migration purpose-role custody: creator_trust_denial."
+        },
+        {
+          "name": "denial_member",
+          "diagnostic": "Unsafe migration purpose-role custody: creator_trust_denial."
+        },
+        {
+          "name": "worker_inherit",
+          "diagnostic": "Unsafe migration purpose-role custody: generation denial extension."
+        },
+        {
+          "name": "authority_member",
+          "diagnostic": "Unsafe migration purpose-role custody: generation denial extension."
+        },
+        {
+          "name": "authority_setting",
+          "diagnostic": "Unsafe migration purpose-role custody: generation denial extension."
+        },
+        {
+          "name": "private_worker_task",
+          "diagnostic": "Unsafe migration purpose-role custody: creator_trust_denial."
+        },
+        {
+          "name": "message_body",
+          "diagnostic": "Unsafe migration purpose-role custody: creator_trust_denial."
+        },
+        {
+          "name": "whole_scope",
+          "diagnostic": "Unsafe migration purpose-role custody: creator_trust_denial."
+        },
+        {
+          "name": "missing_metadata",
+          "diagnostic": "Unsafe migration purpose-role custody: generation denial extension."
+        },
+        {
+          "name": "public_denial",
+          "diagnostic": "Unsafe migration purpose-role custody: definer source/ACL packet."
+        },
+        {
+          "name": "worker_direct_denial",
+          "diagnostic": "Unsafe migration purpose-role custody: definer source/ACL packet."
+        },
+        {
+          "name": "grant_option",
+          "diagnostic": "Unsafe migration purpose-role custody: definer source/ACL packet."
+        },
+        {
+          "name": "disabled_rls",
+          "diagnostic": "Unsafe migration purpose-role custody: generation denial extension."
+        },
+        {
+          "name": "unforced_rls",
+          "diagnostic": "Unsafe migration purpose-role custody: generation denial extension."
+        },
+        {
+          "name": "policy_false",
+          "diagnostic": "Unsafe migration purpose-role custody: generation denial extension."
+        },
+        {
+          "name": "extra_policy",
+          "diagnostic": "Unsafe migration purpose-role custody: generation denial extension."
+        },
+        {
+          "name": "public_trigger_definer",
+          "diagnostic": "Unsafe migration purpose-role custody: generation denial extension."
+        },
+        {
+          "name": "extra_public_function",
+          "diagnostic": "Unsafe migration purpose-role custody: PUBLIC function source/ACL packet."
+        },
+        {
+          "name": "missing_source_ledger",
+          "diagnostic": "Unsafe migration purpose-role custody: generation denial extension."
+        },
+        {
+          "name": "changed_source_ledger",
+          "diagnostic": "Unsafe migration purpose-role custody: generation denial extension."
+        }
+      ],
+      "triggerRefusals": [
+        {
+          "name": "creator.ai_generation_receipt_immutable()",
+          "code": "0A000"
+        },
+        {
+          "name": "creator.fence_public_mode_write()",
+          "code": "0A000"
+        },
+        {
+          "name": "creator.fence_public_packet_write()",
+          "code": "0A000"
+        }
+      ],
+      "allDetectedAndRestored": true,
+      "scope": "Closed39-source staged actual SQL metadata review. Canonical guard remains exact and refuses by default; explicit reviewed denial extension checks actual sources/ledger/functions/grants/columns/policies. No runtime registration/task/lease/receipt.",
+      "mode": "preserved",
+      "functions": [
+        {
+          "name": "creator_trust.generation_terminal_denial(uuid)",
+          "owner": "creator_trust_denial",
+          "sha256": "fc465b04641c205007bc532f0e7f3e95450f1fb82bf0b66811d3a27c42923a22",
+          "grants": [
+            "creator_generation_terminal_authority=X/creator_trust_denial",
+            "creator_trust_denial=X/creator_trust_denial"
+          ]
+        },
+        {
+          "name": "creator_trust.generation_worker_denial(uuid)",
+          "owner": "creator_trust_denial",
+          "sha256": "8e6e20e8eb01b63075dd27c699048d60536e8952de3c433c349b7f843f90367d",
+          "grants": [
+            "creator_generation_authority=X/creator_trust_denial",
+            "creator_trust_denial=X/creator_trust_denial"
+          ]
+        }
+      ],
+      "originalWaveGuardRefusal": "Unsafe migration purpose-role custody: definer source/ACL packet.",
+      "before": {
+        "ledger": "884d8cc8a15cc50aec771fde91730215f9965fce671c021275873aac3d3a6897",
+        "schema": "daa229d0ff1e43c4ac23a77829b5a8393499f281750e0eaabfb9c97e33424f95",
+        "roles": "1299e1c5afb74c63bae1cf777f62900fe46fa986c24289830c545c0481630f24",
+        "security": "94a67ff09f134c44b31a4e4e5d74d4cbac000d08a5597299568930824cf99474",
+        "sequences": "52fcbf4b187a82aded3cedc07cfbf251d9db000efb3a818f33ceb392179d3ea0",
+        "data": "e8c8ef79523c011f547372c51f0204dabf61cd62071996af75696cb5b1e6abaf",
+        "ledgerRows": 61,
+        "tables": 163,
+        "dataRows": 188
+      },
+      "after": {
+        "ledger": "884d8cc8a15cc50aec771fde91730215f9965fce671c021275873aac3d3a6897",
+        "schema": "daa229d0ff1e43c4ac23a77829b5a8393499f281750e0eaabfb9c97e33424f95",
+        "roles": "1299e1c5afb74c63bae1cf777f62900fe46fa986c24289830c545c0481630f24",
+        "security": "94a67ff09f134c44b31a4e4e5d74d4cbac000d08a5597299568930824cf99474",
+        "sequences": "52fcbf4b187a82aded3cedc07cfbf251d9db000efb3a818f33ceb392179d3ea0",
+        "data": "e8c8ef79523c011f547372c51f0204dabf61cd62071996af75696cb5b1e6abaf",
+        "ledgerRows": 61,
+        "tables": 163,
+        "dataRows": 188
+      }
+    }
+  },
+  "qualification": "Each actual run first passes the unchanged canonical61 checker, executes all39 exact SQL sources and staged execution records, observes default full-graph refusal, then passes the explicit extended checker. All21 role/column/table/function/policy/RLS/ledger drifts refuse and restore. Each of the three trigger-only functions refuses an ordinary selected-core call with0A000; selected session identity is metadata evidence, not a password login or task. All six original custodies match after full rollback.",
+  "validation": {
+    "backendTypecheck": "passed",
+    "scopedESLintPrettierDiff": "passed",
+    "shippingBuild": "No application source changed in this operator-only increment; prior fdcea250 shipping build retains its attribution.",
+    "newTests": false,
+    "limits": [
+      "No activation runner option or executable registry changes. Canonical retained ledger61.",
+      "Generation worker/consumer/accounting roles still need complete wave qualification; six purpose pins and original privacy-wave extension composition remain open.",
+      "Private backup/independent restore, actual prepared tasks, populated privacy/generation operation and all-eight C10 remain required."
+    ]
+  }
+}

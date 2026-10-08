@@ -1,0 +1,37 @@
+diff --git a/apps/web/app/ops/metrics/page.tsx b/apps/web/app/ops/metrics/page.tsx
+index c47c1e66..cc09483e 100644
+--- a/apps/web/app/ops/metrics/page.tsx
++++ b/apps/web/app/ops/metrics/page.tsx
+@@ -1,10 +1,9 @@
+ "use client";
+ import Link from "next/link";
+-import { useState } from "react";
+ import {
+   ErrorState,
+   TrustSession,
+-  type TrustSessionState,
++  useTrustStatus,
+   useTrust,
+   retryTrustReads,
+ } from "../trust-client";
+@@ -21,10 +20,7 @@ type Metrics = {
+   timings?: Record<string, { count: number; sum: number; buckets: number[] }>;
+ };
+ export default function MetricsPage() {
+-  const [sessionState, setSessionState] = useState<TrustSessionState>({
+-    ready: false,
+-    error: null,
+-  });
++  const sessionState = useTrustStatus();
+   const { data, error, loading, refresh } = useTrust<Metrics>(
+     "operations/metrics",
+     sessionState.ready,
+@@ -158,7 +154,7 @@ export default function MetricsPage() {
+       >
+         Refresh snapshot
+       </button>
+-      <TrustSession onSessionState={setSessionState} />
++      <TrustSession showErrors={false} />
+     </main>
+   );
+ }

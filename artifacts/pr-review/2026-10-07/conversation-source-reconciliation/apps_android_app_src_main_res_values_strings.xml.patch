@@ -1,0 +1,29 @@
+diff --git a/apps/android/app/src/main/res/values/strings.xml b/apps/android/app/src/main/res/values/strings.xml
+index 80050dfa..c16df0f4 100644
+--- a/apps/android/app/src/main/res/values/strings.xml
++++ b/apps/android/app/src/main/res/values/strings.xml
+@@ -3,6 +3,7 @@
+ <resources>
+   <string name="app_name">Qelvora</string>
+   <string name="continue_with_pantopus" formatted="false">Continue with Pantopus</string>
++  <string name="product_feedback_unconfirmed" formatted="false">Your feedback could not be confirmed. Your answers are kept; retry the same submission.</string>
+   <string name="identity_input_kept_unavailable" formatted="false">The service is unavailable. Your input has been kept; try again.</string>
+   <string name="identity_input_kept_unreadable" formatted="false">The service returned an unreadable response. Your input has been kept; try again.</string>
+   <string name="identity_profile_save_failed" formatted="false">Could not save. Try again.</string>
+@@ -758,6 +759,8 @@
+   <string name="w6_consent_could_not_be_saved" formatted="false">Consent could not be saved.</string>
+   <string name="w6_the_call_could_not_be_ended_try_again" formatted="false">The call could not be ended. Try again.</string>
+   <string name="w6_the_summary_could_not_be_changed" formatted="false">The summary could not be changed.</string>
++  <string name="w6_call_action_unconfirmed" formatted="false">This call action is unconfirmed. Retry the same action before making another change.</string>
++  <string name="w6_retry_call_action" formatted="false">Retry this call action</string>
+   <string name="w6_this_call_is_unavailable" formatted="false">This call is unavailable</string>
+   <string name="w6_opening_your_call" formatted="false">Opening your call</string>
+   <string name="w6_checking_the_booking_and_participant_access" formatted="false">Checking the booking and participant access.</string>
+@@ -867,6 +870,7 @@
+   <string name="w6_recording_paused_after_an_interruption_resume_or_preview_what_was" formatted="false">Recording paused after an interruption. Resume or preview what was saved.</string>
+   <string name="w6_recording_could_not_resume_preview_it_or_record_again" formatted="false">Recording could not resume. Preview it or record again.</string>
+   <string name="w6_the_saved_recording_could_not_be_played_record_again" formatted="false">The saved recording could not be played. Record again.</string>
++  <string name="w6_the_private_preview_could_not_be_cleared_try_again_before" formatted="false">The private preview could not be cleared. Try again before recording.</string>
+   <string name="w6_record_and_listen_before_uploading_your_preview_stays_on_this" formatted="false">Record and listen before uploading. Your preview stays on this device.</string>
+   <string name="w6_play_private_preview" formatted="false">Play private preview</string>
+   <string name="w6_pause_preview" formatted="false">Pause preview</string>

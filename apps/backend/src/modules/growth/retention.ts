@@ -4,14 +4,20 @@ import { z } from "zod";
 import type { GrowthService } from "./service.js";
 import type { Actor } from "../identity/adapter.js";
 import { DomainError } from "../../core/errors.js";
+import { canonical } from "../../core/canonical.js";
+import { EventEnvelope } from "./contracts.js";
+import {
+  weeklyImpactBinding,
+  type WeeklyImpactLease,
+} from "./weekly-impact.js";
 const Impact = z.strictObject({
   creatorId: z.uuid(),
   window: z.string().regex(/^\d{4}-\d{2}-\d{2}$/u),
-  uniqueFans: z.int().nonnegative(),
-  aiConversations: z.int().nonnegative(),
-  personalReplies: z.int().nonnegative(),
-  notes: z.int().nonnegative(),
-  thanksCount: z.int().nonnegative(),
+  uniqueFans: z.int().min(0).max(2147483647),
+  aiConversations: z.int().min(0).max(2147483647),
+  personalReplies: z.int().min(0).max(2147483647),
+  notes: z.int().min(0).max(2147483647),
+  thanksCount: z.int().min(0).max(2147483647),
   thanks: z
     .array(
       z.strictObject({
@@ -64,11 +70,13 @@ export class Retention {
     private readonly thanksPermission?: ThanksPermission,
   ) {}
   /** W2/W3/W5 provide aggregates and only W5's separately consented thanks. */
-  async recordImpact(input: unknown) {
+  async recordImpact(input: unknown, lease?: WeeklyImpactLease) {
     const value = Impact.parse(input);
+    const binding = lease ? weeklyImpactBinding(lease.event) : null;
     const window = new Date(`${value.window}T00:00:00Z`);
     if (
       Number.isNaN(window.valueOf()) ||
+      window.toISOString().slice(0, 10) !== value.window ||
       window.getUTCDay() !== 1 ||
       window.valueOf() + 7 * 86400000 > Date.now()
     )
@@ -77,6 +85,11 @@ export class Retention {
         copy.growthErrorImpactWindowOpen,
         409,
       );
+    if (
+      binding &&
+      (value.creatorId !== binding.creatorId || value.window !== binding.window)
+    )
+      throw new Error("impact_owner_binding_changed");
     const thanks = value.thanks.map((t) => ({
       id: t.id,
       version: t.version,
@@ -91,7 +104,10 @@ export class Retention {
         if (
           !(await this.service.erasure.subjects(
             client,
-            value.thanks.map((t) => t.fanAccountId),
+            [
+              ...value.thanks.map((t) => t.fanAccountId),
+              ...(binding ? [binding.accountId] : []),
+            ],
             [value.creatorId],
           ))
         )
@@ -100,6 +116,20 @@ export class Retention {
             copy.growthErrorGrowthDataErased,
             410,
           );
+        if (lease && binding) {
+          const job = (
+            await client.query<{ envelope: unknown }>(
+              "SELECT envelope FROM growth.producer_relay WHERE id=$1 AND producer='retention' AND lease_id=$2 AND state='leased' AND lease_until>clock_timestamp() FOR UPDATE NOWAIT",
+              [binding.event.id, lease.leaseId],
+            )
+          ).rows[0];
+          if (
+            !job ||
+            canonical(EventEnvelope.parse(job.envelope)) !==
+              canonical(binding.event)
+          )
+            throw new Error("impact_job_lease_unavailable");
+        }
         await client.query(
           "INSERT INTO growth.impact(creator_id,window_start,unique_fans,ai_conversations,personal_replies,notes,thanks_count,consented_thanks) VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT DO NOTHING",
           [
@@ -113,6 +143,13 @@ export class Retention {
             JSON.stringify(thanks),
           ],
         );
+        if (lease && binding) {
+          const ready = await client.query(
+            "UPDATE growth.producer_relay SET state='queued',available_at=now(),attempts=0,lease_id=NULL,lease_until=NULL,error_code=NULL WHERE id=$1 AND lease_id=$2 AND state='leased' AND lease_until>clock_timestamp() RETURNING id",
+            [binding.event.id, lease.leaseId],
+          );
+          if (!ready.rowCount) throw new Error("impact_job_lease_unavailable");
+        }
       },
     );
   }

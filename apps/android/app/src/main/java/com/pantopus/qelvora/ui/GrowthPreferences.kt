@@ -28,17 +28,20 @@ import org.json.JSONObject
 import java.util.TimeZone
 
 private val growthKinds = listOf("ai_reply", "approved_draft", "personal_reply", "request_status", "call_reminder", "answered_publicly", "content_match", "announcement", "creator_offer", "slot_change", "new_packet", "commitment_due", "guardrail", "pool_share", "note", "reaction", "public_answer", "spending_reminder", "weekly_impact")
+private enum class GrowthPreferenceOperation { LOADING, SAVING }
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
-internal fun GrowthNotificationSettings(client: GrowthClient?) {
+internal fun GrowthNotificationSettings(client: GrowthClient?, token: () -> String?) {
     var value by remember { mutableStateOf<JSONObject?>(null) }
+    var formSession by remember { mutableStateOf<String?>(null) }
     var creators by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
     var from by remember { mutableStateOf("") }
     var until by remember { mutableStateOf("") }
     var zone by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
-    var busy by remember { mutableStateOf(false) }
+    var operation by remember { mutableStateOf<GrowthPreferenceOperation?>(null) }
+    val busy = operation != null
     var reload by remember { mutableIntStateOf(0) }
     var errors by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     val fromFocus = remember { FocusRequester() }
@@ -47,6 +50,7 @@ internal fun GrowthNotificationSettings(client: GrowthClient?) {
     val fromView = remember { BringIntoViewRequester() }
     val untilView = remember { BringIntoViewRequester() }
     val zoneView = remember { BringIntoViewRequester() }
+    val messageView = remember { BringIntoViewRequester() }
     val timeZones = remember { TimeZone.getAvailableIDs().toSet() }
     val scope = rememberCoroutineScope()
     val ink = qColor("ink")
@@ -57,17 +61,19 @@ internal fun GrowthNotificationSettings(client: GrowthClient?) {
     fun time(current: JSONObject, key: String): String {if (current.isNull(key)) return "";val minute = current.getInt(key);return "%02d:%02d".format(java.util.Locale.ROOT, minute / 60, minute % 60)}
     fun minute(text: String): Any {if (text.isEmpty()) return JSONObject.NULL;require(Regex("[0-2][0-9]:[0-5][0-9]").matches(text));val parts = text.split(':').map {it.toInt()};require(parts[0] < 24);return parts[0] * 60 + parts[1]}
     LaunchedEffect(client, reload) {
-        busy = true
+        operation = GrowthPreferenceOperation.LOADING
         try {
             requireNotNull(client)
-            val preferences = client.request("preferences")
-            val directory = client.request("preferences/creators").getJSONArray("creators")
+            val captured = token() ?: throw GrowthRequestFailure(401)
+            val preferences = client.request("preferences", expectedSession = captured)
+            val directory = client.request("preferences/creators", expectedSession = captured).getJSONArray("creators")
             val nextCreators = (0 until directory.length()).map { val c = directory.getJSONObject(it); c.getString("id") to c.getString("name") }
             val nextFrom = time(preferences, "quietStart")
             val nextUntil = time(preferences, "quietEnd")
             val nextZone = preferences.getString("timeZone")
             // Keep the whole old form if any part of the reload fails.
             value = preferences
+            formSession = captured
             creators = nextCreators
             from = nextFrom
             until = nextUntil
@@ -76,20 +82,34 @@ internal fun GrowthNotificationSettings(client: GrowthClient?) {
             message = ""
         } catch (cancelled: CancellationException) { throw cancelled }
         catch (_: Exception) { message = QelvoraCopy.text("growthSettingsNeedACurrentSignedInAccountAndNetworkConnection") }
-        finally { busy = false }
+        finally { operation = null }
+    }
+    LaunchedEffect(message) {
+        if (message.isNotEmpty()) {
+            withFrameNanos { }
+            messageView.bringIntoView()
+        }
     }
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         BasicText(QelvoraCopy.text("growthNotificationSettings"), style = qText("display-md").copy(color = ink))
         BasicText(QelvoraCopy.text("growthYourInAppRecordCannotBeTurnedOffPushAnd"), style = qText("body").copy(color = ink))
         value?.let {current ->
+            GrowthDevicePushSettings()
             listOf("push" to QelvoraCopy.text("growthPushNotifications"), "email" to QelvoraCopy.text("growthEmailDigest"), "hideSensitive" to QelvoraCopy.text("growthHideSensitivePreviews")).forEach {(key, label) -> Button(QelvoraCopy.text("growthLabelWithState", mapOf("label" to label, "state" to if (current.getBoolean(key)) QelvoraCopy.text("growthOn") else QelvoraCopy.text("growthOff"))), ButtonVariant.SECONDARY, disabled = busy, block = true) {update(key, !current.getBoolean(key))} }
             GrowthPreferenceField(from, {from = it; clearError("from", "until")}, QelvoraCopy.text("growthQuietHoursFromHhMm"), errors["from"], fromFocus, fromView, !busy)
             GrowthPreferenceField(until, {until = it; clearError("from", "until")}, QelvoraCopy.text("growthQuietHoursUntilHhMm"), errors["until"], untilFocus, untilView, !busy)
             GrowthPreferenceField(zone, {zone = it; clearError("zone")}, QelvoraCopy.text("growthTimeZone"), errors["zone"], zoneFocus, zoneView, !busy)
             BasicText(QelvoraCopy.text("growthLeaveBothTimesEmptyForNoQuietHours"), style = qText("caption").copy(color = ink))
             creators.forEach {(id, name) -> Button(QelvoraCopy.text("growthCreatorWithState", mapOf("name" to name, "state" to if (contains("mutedCreators", id)) QelvoraCopy.text("growthMuted") else QelvoraCopy.text("growthPushAndEmailAllowed"))), ButtonVariant.SECONDARY, disabled = busy, block = true) {toggle("mutedCreators", id)} }
-            growthKinds.forEach {kind -> BasicText(QelvoraCopy.text("growthKind" + kind.split("_").joinToString("") { it.replaceFirstChar { c -> c.uppercase() } }), style = qText("label").copy(color = ink));listOf("disabledPushTypes" to QelvoraCopy.text("growthPush"), "disabledEmailTypes" to QelvoraCopy.text("growthEmail")).forEach {(key, label) -> Button(QelvoraCopy.text("growthLabelWithState", mapOf("label" to label, "state" to if (contains(key, kind)) QelvoraCopy.text("growthOff") else QelvoraCopy.text("growthOn"))), ButtonVariant.QUIET, disabled = busy) {toggle(key, kind)} } }
-            Button(if (busy) QelvoraCopy.text("growthSaving") else QelvoraCopy.text("growthSavePreferences"), ButtonVariant.SECONDARY, disabled = busy, block = true) {
+            growthKinds.forEach {kind ->
+                val typeLabel = QelvoraCopy.text("growthKind" + kind.split("_").joinToString("") { it.replaceFirstChar { c -> c.uppercase() } })
+                BasicText(typeLabel, style = qText("label").copy(color = ink))
+                listOf("disabledPushTypes" to QelvoraCopy.text("growthPush"), "disabledEmailTypes" to QelvoraCopy.text("growthEmail")).forEach {(key, channel) ->
+                    val label = QelvoraCopy.text("growthNotificationChannel", mapOf("kind" to typeLabel, "channel" to channel))
+                    Button(QelvoraCopy.text("growthLabelWithState", mapOf("label" to label, "state" to if (contains(key, kind)) QelvoraCopy.text("growthOff") else QelvoraCopy.text("growthOn"))), ButtonVariant.QUIET, disabled = busy) {toggle(key, kind)}
+                }
+            }
+            Button(if (operation == GrowthPreferenceOperation.SAVING) QelvoraCopy.text("growthSaving") else QelvoraCopy.text("growthSavePreferences"), ButtonVariant.SECONDARY, disabled = busy, block = true) {
                 if (!busy) {
                     message = ""
                     val next = linkedMapOf<String, String>()
@@ -113,23 +133,27 @@ internal fun GrowthNotificationSettings(client: GrowthClient?) {
                             target.second.bringIntoView()
                         }
                     } else {
-                        busy = true
+                        operation = GrowthPreferenceOperation.SAVING
                         val body = JSONObject(current.toString()).put("quietStart", minute(from)).put("quietEnd", minute(until)).put("timeZone", zone)
                         scope.launch {
                             try {
                                 requireNotNull(client)
-                                value = client.request("preferences", "PUT", body)
+                                // Bind writes to the form's original load, not
+                                // a credential acquired after account transfer.
+                                val captured = formSession ?: throw GrowthRequestFailure(401)
+                                value = client.request("preferences", "PUT", body, captured)
                                 message = QelvoraCopy.text("growthPreferencesSavedYourInAppRecordRemainsAvailable")
                             } catch (cancelled: CancellationException) { throw cancelled }
                             catch (_: Exception) { message = QelvoraCopy.text("growthPreferencesWereNotSaved") }
-                            finally { busy = false }
+                            finally { operation = null }
                         }
                     }
                 }
             }
         }
-        if (message.isNotEmpty()) BasicText(message, style = qText("body").copy(color = ink))
-        Button(QelvoraCopy.text("growthReloadSettings"), ButtonVariant.QUIET, disabled = busy) {reload++}
+        if (message.isNotEmpty()) BasicText(message, style = qText("body").copy(color = ink),
+            modifier = Modifier.bringIntoViewRequester(messageView).semantics { liveRegion = LiveRegionMode.Polite })
+        Button(QelvoraCopy.text(if (operation == GrowthPreferenceOperation.LOADING) "growthLoading" else "growthReloadSettings"), ButtonVariant.QUIET, disabled = busy) {reload++}
     }
 }
 

@@ -1,0 +1,139 @@
+{
+  "scope": "Held0232 original Conversation deletion receipt and Agent accounting boundary. Source and closed metadata/refusal qualification only; no actual populated task or activation.",
+  "problem": "Conversation previously built the deletion result after COMMIT and acknowledged later; a lost commit response could retry after the original families had already been erased. The canonical Agent accounting boundary producer was absent.",
+  "implementation": [
+    "Original0087 held Conversation delete scope writes a tagged immutable receipt before its own sole COMMIT. Actual worker acknowledgement preserves the same receipt.",
+    "A genuine current retry reads the original committed result before fresh family enumeration. No absent-family success is synthesized.",
+    "The actual Agent held scope reads the completed original Conversation boundary. Export requires the same protected artifact store and verification; expiry is rechecked after verification and held task/restoration checks.",
+    "Coordinator supplies the original prepared owner, pool, task/restoration authorities and actual artifact store; host owner ports cannot replace the receipt owner.",
+    "New isolated purpose has fixed column privileges and entrypoints, no raw runtime task/scope read. Original fence extension is accepted only with actual executable registration and complete accepted catalogue."
+  ],
+  "sourceParent": "0ce54413078a95ba1097fed281293bc99c5ee654",
+  "sourceSha256": {
+    "apps/backend/migrations/0232_w8_conversation_accounting_boundary.sql": "2be4dc0bc2f74d01d506985f7dac31c49c6a7a567f19b2126025396949111643",
+    "apps/backend/src/modules/trust/accounting-boundary.ts": "cf4dbeb44166e672c3454735b00e9547111bded30e909824d19e3fc7bede55c6",
+    "apps/backend/src/modules/trust/accounting-boundary-catalogue.ts": "67bdb3a8f8afafa392658dad85cec929f6c073d2aa2a3b1874aa8eec7abd112a",
+    "apps/backend/src/modules/trust/privacy-consumers.ts": "5ffc27459cb23f1ec938a3ab64f74a61b1152ef025474bf2d873e3e9a9efa529",
+    "apps/backend/src/modules/trust/privacy-catalog.ts": "a39faad663f2f09d0ce15dfea567e3cd9078df84e0eb5bdd1fe1c3fc85c0eda3",
+    "apps/backend/src/modules/trust/development.ts": "f7a18136b6e9769a3d4ec04be225e20efb76b3fb8538497a8aaa8ba1d0a2c970",
+    "apps/backend/src/modules/conversation/privacy.ts": "1154a33567b6bb9211aa6f7ad77aca10f68b0626cbc9de9ef36fba7a7fc8aabb"
+  },
+  "composition": {
+    "catalogueParts": 25,
+    "freshPreservedEqual": true,
+    "compilerContexts": 23,
+    "compilerDiagnostics": 0,
+    "scope": "Partial37-source closed rollback review; original0214/0217 prerequisites remain outstanding. No activation or populated task receipt qualification.",
+    "parts": {
+      "cursor_relations": "71b4bcb8b9218c8e98ecb18c215d6d060506945094867fd968768bd7130d0e23",
+      "cursor_schemas": "0ad47568318fc0b10433767aeb5e2f383e19faec9ed18ca3c533fedf9aae0e39",
+      "writer_relations": "4c78dac37be99df1c30cd2935c3ff37701f2fe90c04e12569086092eda1ba3a4",
+      "writer_schemas": "0ad47568318fc0b10433767aeb5e2f383e19faec9ed18ca3c533fedf9aae0e39",
+      "discovery_relations": "2b663fb2776bb2fdd5c522ce4ccce05fd9cb861755b1e407298908fe5a8c6516",
+      "discovery_schemas": "0ad47568318fc0b10433767aeb5e2f383e19faec9ed18ca3c533fedf9aae0e39",
+      "original_relations": "38ac1cc0069a0c396eb92ea207f609afaf1d9fa18b6f9e6fb7259bca68685534",
+      "original_schemas": "ba49ec633527dd097318496582f18fd99dbf1ab0d52d6e7c25ec2df2fdda1d05",
+      "agent_export_relations": "422da2a5e0b7c64b0f35353b9f19d5c61fcac4407267ccd385f427db78b413a5",
+      "agent_export_schemas": "ba49ec633527dd097318496582f18fd99dbf1ab0d52d6e7c25ec2df2fdda1d05",
+      "conversation_export_relations": "fa1a228161a0f60393515567f300cb01fe6f13df3d7ef811538f63b122da4118",
+      "conversation_export_schemas": "ba49ec633527dd097318496582f18fd99dbf1ab0d52d6e7c25ec2df2fdda1d05",
+      "expiry_relations": "6142ef04bf4b4aaf9513c809a56d39680268fdf751c73946d6aa83eb5439922d",
+      "expiry_schemas": "ba49ec633527dd097318496582f18fd99dbf1ab0d52d6e7c25ec2df2fdda1d05",
+      "detached_relations": "8f52a1cddebbab271ce4f129f64467966ac30293e8bf209e6cfa00f33b9873d5",
+      "detached_schemas": "ba49ec633527dd097318496582f18fd99dbf1ab0d52d6e7c25ec2df2fdda1d05",
+      "boundary_relations": "b9f63748d9956f3e92d981737ad7760f0354bb20e26bdcdec350e23ce4662f16",
+      "boundary_schemas": "7963754bef344a915109d593a957029a162aa8a10bc3ed31630f2c97e84f7aa8",
+      "output_catalogue": "67097c23e08c8b3388844100363936509eb321710cfe944eaaaa79e16e3a7af0",
+      "terminal_catalogue": "b1be10fe3394e851f4a42e467f1b719d2bd3eeb34e37e46ad6004dcfbb8f8233",
+      "financial_catalogue": "711ce2fddb83419c6e53463f3860285ba2059f562cee2cc79d46ebbe691f5542",
+      "retention_integrity": "8952c491125cc7cdff161ed5659a0a74c77c3e3c7f48fc799402a067c736d6b0",
+      "usage_expiry": "bc9b3799d12eed9d7c0fba8a7285863414e5c7275b72d60b0f970cb914cf2c3d",
+      "detached_usage": "1da14c04faed933a8118755730c84736eeeb00a29c8ae10df2d68fbc0c38e8af",
+      "accounting_boundary": "4ccb0daeeca04f9596c03548fb3acd9517b6d97e5d90c866198a8e907e14ea8e"
+    }
+  },
+  "drift": {
+    "scope": "Closed actual role/metadata review only. No task, lease, family, financial disposition, deletion or completion receipt manufactured. Positive populated purge and uncertain-COMMIT recovery remain unqualified.",
+    "sourceSha256": "2be4dc0bc2f74d01d506985f7dac31c49c6a7a567f19b2126025396949111643",
+    "metadataDrifts": [
+      "runtime_raw_receipt",
+      "purpose_raw_scope",
+      "public_scope_projection",
+      "worker_save_receipt",
+      "role_login",
+      "role_bypass",
+      "role_membership",
+      "role_setting",
+      "extra_profile_column",
+      "schema_create",
+      "invoker_save",
+      "disabled_receipt_trigger",
+      "replica_receipt_trigger",
+      "missing_receipt_trigger",
+      "task_force_rls",
+      "public_task_policy",
+      "broader_purpose_update",
+      "task_new_column",
+      "receipt_default",
+      "replaced_original_binding",
+      "replaced_immutability",
+      "save_search_path",
+      "extra_owned_function"
+    ],
+    "allDetectedAndRestored": true,
+    "actualRoleRefusals": 10,
+    "operations": [
+      {
+        "tasks": 0,
+        "ledger": 61,
+        "scopes": 0
+      },
+      {
+        "retained": {
+          "role": null,
+          "tasks": 0,
+          "ledger": 61,
+          "function": null
+        }
+      }
+    ]
+  },
+  "registration": {
+    "scope": "Actual canonical61 runtime: held boundary registration refuses while original privacy fence remains available; no task or lease created.",
+    "reservedSourceInactive": true,
+    "extensionAbsent": true,
+    "originalPrivacyCataloguePasses": true,
+    "preabortPreserved": true,
+    "poolReusable": true,
+    "originalFactoryRefused": true,
+    "actualHeldRestorationChecks": 1
+  },
+  "validation": {
+    "build": "Shipping backend build passed under original W2 shared lock, including final artifact-expiry bookend.",
+    "existingTests": "17 existing contract/scheduler cases passed; no new test code.",
+    "scopedLintAndFormat": "passed",
+    "custody": {
+      "fresh": {
+        "schemaSha256": "abb6c0506469c8b8f2507ca3e2cb4616a7d158213fb9fd661050ccad9fbe5bf3",
+        "rolesSha256": "7edf513d1efd243817a47418db4932a38b33b7da112f3c22e2344624ab993813",
+        "rowsSha256": "6a0ea90e18ad4e3a5e523c37f18e87179790dfd007168b4bd3fb21c3ae46cdc1",
+        "tables": 143,
+        "rows": 61
+      },
+      "preserved": {
+        "schemaSha256": "30ec4ec6c71eb2c4e02fb473e65356994e3dfbcd04d8982ff31f18fbb7b5bee2",
+        "rolesSha256": "367a2a706b7aa22b37cb18051881aa0f1eb0d2bcb82129e0a1ad98a8a063c8f9",
+        "rowsSha256": "36073ad827fc043be173cf1c015594361f0a366ff8acfc98a1281804f5148c05",
+        "tables": 137,
+        "rows": 236
+      }
+    },
+    "limits": [
+      "Six whole-purpose pins remain undefined.0232 is reserved outside61 executable migrations.",
+      "Original0214/0217 registration prerequisites remain outside the partial37-source review; no ledger row, task, lease or receipt manufactured.",
+      "No populated deletion, original uncertain-COMMIT recovery or positive protected artifact boundary is qualified.",
+      "Full generation, C10, Identity erasure, expiry journal restoration and repurge remain unfinished."
+    ]
+  },
+  "reviewTooling": "Initial compiler rehearsal recreated plpgsql_check in the wrong search_path; it rolled back. Explicit public extension schema corrected the review tooling. Original failed and corrected diagnostics are retained privately."
+}

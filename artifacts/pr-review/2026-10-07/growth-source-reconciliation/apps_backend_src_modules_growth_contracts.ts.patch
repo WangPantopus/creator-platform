@@ -1,0 +1,23 @@
+diff --git a/apps/backend/src/modules/growth/contracts.ts b/apps/backend/src/modules/growth/contracts.ts
+index 8f1d0580..91485d83 100644
+--- a/apps/backend/src/modules/growth/contracts.ts
++++ b/apps/backend/src/modules/growth/contracts.ts
+@@ -33,8 +33,8 @@ export const Destination = z
+   .regex(
+     /^\/(?:creators\/[a-z0-9_-]+(?:\/(?:posts\/[a-f0-9-]+|chat(?:\?context=[a-f0-9-]+)?))?|commerce\/(?:requests|spending|status\?packetId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})|requests\/[a-f0-9-]+|calls\/[a-f0-9-]{36}\/[a-f0-9-]{36}\/[a-f0-9-]{36}|notifications|studio\/(?:impact|insights)|you(?:\/spending)?|share\/[a-f0-9-]+)$/u,
+   );
+-/** Saved families are private Home destinations. Keep them out of public
+- * notification/share destinations; the route never grants family access. */
++/** Saved thread families are private Home destinations. Keep them out of the
++ * public notification/share destination contract. Navigation grants no access. */
+ export const HomeThreadDestination = ReturnTargetSchema.max(512).refine(
+   (value) => {
+     const parts = value.split("/");
+@@ -48,6 +48,7 @@ export const HomeThreadDestination = ReturnTargetSchema.max(512).refine(
+   },
+   "A registered private conversation destination is required",
+ );
++
+ const EventFields = {
+   id: z.uuid(),
+   aggregateId: z.uuid(),

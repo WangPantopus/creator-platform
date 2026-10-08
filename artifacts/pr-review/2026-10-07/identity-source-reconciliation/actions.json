@@ -1,0 +1,13 @@
+[
+  {
+    "number": 74,
+    "action": "closed_unmerged_into_132",
+    "sourceHead": "5b1675ca155f87957c8ad62201097de2563c3c4f",
+    "sourceBranch": "codex/w1-completion-20261001",
+    "sourceBranchPreserved": true,
+    "successorHead": "f6ae7f58c66ae8c8aa5d39e8f177228d89ca2153",
+    "evidence": "https://github.com/WangPantopus/creator-platform/blob/f6ae7f58c66ae8c8aa5d39e8f177228d89ca2153/artifacts/pr-review/2026-10-07/identity-source-reconciliation/README.md",
+    "url": "https://github.com/WangPantopus/creator-platform/pull/74",
+    "verifiedAt": "2026-10-07T22:06:18.762482+00:00"
+  }
+]

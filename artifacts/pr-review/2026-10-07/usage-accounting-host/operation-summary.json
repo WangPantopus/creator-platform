@@ -1,0 +1,272 @@
+{
+  "codeCommit": "25cd72edab615f7aa6fb2bb3c12ae569f75d6acc",
+  "baseCommit": "d7096bb60271a05d1fe3ab2784f2db0dc65f9143",
+  "sourceSha256": {
+    "apps/backend/src/integration.ts": "8a7994c09eeaf4f5c04406df6fe4b723ce650c5d1898e1f5c8ae48723eed6443",
+    "apps/backend/src/modules/agent/generation-journal.ts": "30dfb168be98afe5206a946a95b249eb639bfdf3c92e4e7181bc7727ccef7638",
+    "apps/backend/src/modules/agent/lifecycle.ts": "ab740d06d4476f0788299af26d7006d5227eb6b062ae5b7e9d5e10985683e109",
+    "apps/backend/src/modules/agent/usage-retention.ts": "6b827a152bc0832fd99e202c253605a599567051421201f6682b17bf19e28403",
+    "apps/backend/src/modules/conversation/host.ts": "c55c9d057ea542a10c3e413cfb2408e0798c008d405b68a63afe52845a2f0cad",
+    "apps/backend/src/modules/trust/privacy-consumers.ts": "517c45585d74210da6fb8e1f359ed77882d2af5a7dc76584c2c622cacc59465c",
+    "apps/backend/src/modules/trust/usage-accounting-host.ts": "e1f7b4f485579b65af678081a37267db1498aebc310c9d8ac7975f4f05b337c5",
+    "apps/backend/src/operations/runtime.ts": "4a60a7dca28dcf9587a31bdb58f4e28a2cd95d6e6916bbd2538b7ce6a4b97d2e",
+    "apps/backend/src/server.ts": "daf77668ea4fcd14cd32c0aa63aec497f6450fd5cec30e296ec85c0753696e67"
+  },
+  "bundleSha256": "c9af339c9abc19de8febefb60b4a4d1f246ff8374306378f39d7ef37b4e8ccee",
+  "privateEvidenceDirectory": "/Users/yingpengwang/.codex/visualizations/2026/10/07/01a11784-60b1-7fe3-8855-82bddf4675b6/usage-accounting-host",
+  "validation": {
+    "backendBuild": "passed",
+    "existingContracts": 9,
+    "existingWorkerLifetimeTests": 8,
+    "scopedEslint": "passed",
+    "scopedPrettier": "passed"
+  },
+  "operations": {
+    "source": {
+      "receiptFile": "operation-source-1791403674429.json",
+      "receiptSha256": "9c7885a76e26bce02a035471d50677c28fe654567a741accccc01c2f386f3fb3",
+      "checks": [
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "generation_disabled",
+        "copied_hook_array_refused",
+        "replacement_worker_refused",
+        "different_pool_refused",
+        "replaced_run_callback_refused",
+        "replacement_repository_refused",
+        "original_expiry_pass_completed",
+        "remaining_readiness_stays_unavailable",
+        "agent_waits_for_original_conversation_boundary",
+        "content_http_export_completed",
+        "unfinished_domains_remain_explicit",
+        "idempotent_shutdown",
+        "closed_registration_refused_before_sql"
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "expiry": {
+        "name": "usage_expiry",
+        "required": true,
+        "state": "available",
+        "code": "original_usage_expiry_running",
+        "checkedAt": "2026-10-07T20:07:47.330Z"
+      },
+      "expiryTasks": [],
+      "overallReady": false,
+      "tasks": [
+        {
+          "domain": "agent",
+          "state": "retry",
+          "error_code": "domain_hook_error",
+          "attempts": 1
+        },
+        {
+          "domain": "commerce",
+          "state": "retry",
+          "error_code": "domain_hook_error",
+          "attempts": 1
+        },
+        {
+          "domain": "content",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "conversation",
+          "state": "pending",
+          "error_code": null,
+          "attempts": 0
+        },
+        {
+          "domain": "growth",
+          "state": "pending",
+          "error_code": null,
+          "attempts": 0
+        },
+        {
+          "domain": "identity",
+          "state": "pending",
+          "error_code": null,
+          "attempts": 0
+        },
+        {
+          "domain": "media",
+          "state": "pending",
+          "error_code": null,
+          "attempts": 0
+        },
+        {
+          "domain": "trust",
+          "state": "pending",
+          "error_code": null,
+          "attempts": 0
+        }
+      ],
+      "agentBoundaryRefused": true
+    },
+    "standalone": {
+      "receiptFile": "operation-standalone-1791403743364.json",
+      "receiptSha256": "70def0cdc04ca97484798d70edfb8d81b2ce746a8fb9b0ae86b2993cf278bd49",
+      "checks": [
+        "original_expiry_pass_completed",
+        "remaining_readiness_stays_unavailable",
+        "agent_waits_for_original_conversation_boundary",
+        "content_http_export_completed",
+        "unfinished_domains_remain_explicit",
+        "standalone_sigterm_clean_exit"
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "expiry": {
+        "name": "usage_expiry",
+        "required": true,
+        "state": "available",
+        "code": "original_usage_expiry_running",
+        "checkedAt": "2026-10-07T20:08:54.369Z"
+      },
+      "expiryTasks": [],
+      "overallReady": false,
+      "tasks": [
+        {
+          "domain": "agent",
+          "state": "retry",
+          "error_code": "domain_hook_error",
+          "attempts": 1
+        },
+        {
+          "domain": "commerce",
+          "state": "retry",
+          "error_code": "domain_hook_error",
+          "attempts": 1
+        },
+        {
+          "domain": "content",
+          "state": "complete",
+          "error_code": null,
+          "attempts": 1
+        },
+        {
+          "domain": "conversation",
+          "state": "blocked",
+          "error_code": "conversation_recordings_unavailable",
+          "attempts": 1
+        },
+        {
+          "domain": "growth",
+          "state": "pending",
+          "error_code": null,
+          "attempts": 0
+        },
+        {
+          "domain": "identity",
+          "state": "pending",
+          "error_code": null,
+          "attempts": 0
+        },
+        {
+          "domain": "media",
+          "state": "pending",
+          "error_code": null,
+          "attempts": 0
+        },
+        {
+          "domain": "trust",
+          "state": "pending",
+          "error_code": null,
+          "attempts": 0
+        }
+      ],
+      "agentBoundaryRefused": true
+    },
+    "failure": {
+      "receiptFile": "operation-failure-1791403592814.json",
+      "receiptSha256": "decab972a70728961643c76abfa0eea1662de1b70d543197ed99703782b34f67",
+      "checks": [
+        "same_preparation_owner",
+        "original_repository_and_retention_bound",
+        "generation_disabled",
+        "actual_expiry_SQL_blocked",
+        "worker_failure_visible_in_readiness",
+        "failed_worker_invalidates_accounting",
+        "idempotent_shutdown_preserves_original_failure",
+        "pools_closed_despite_worker_failure"
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      },
+      "passwordsRemoved": true,
+      "expiryTasks": [],
+      "tasks": [],
+      "shutdownFailure": [
+        "trust_transaction_unavailable",
+        "57014"
+      ]
+    }
+  },
+  "limits": [
+    "Expiry discovery ran with no due records; no positive expiry deletion claim.",
+    "Agent waits for real Conversation completion; full privacy/generation remain unfinished.",
+    "Failure operation preceded the final post-await startup/stop race guard; final source and standalone operation include it.",
+    "No full feature UI or native-device acceptance in this increment."
+  ],
+  "custody": {
+    "originalUnchanged": true,
+    "original": {
+      "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+      "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+      "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+      "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+      "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+      "dataSha256": "add04093be921cf22d124ad4ce71d9942d4b1e215433050fa5e26670105bdf10",
+      "ledgerRows": 101,
+      "businessRows": 1001,
+      "businessTables": 177,
+      "privacyJobs": [
+        {
+          "kind": "delete",
+          "state": "running",
+          "count": 1
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      }
+    },
+    "application": {
+      "ledgerSha256": "ff0bb17a2ec23866f27d1ecef65f81feffc6686922d667c549d0e849c5cb5adf",
+      "schemaSha256": "f2066c41ec4b9cf22a5fae357d353350371aad34c214e9ec389eac064d7cb146",
+      "rolesSha256": "e230a53ac7b62efd9f5b96172ed9eeff990323668f33fe5901ac3b6493bda36f",
+      "securitySha256": "455eee1113c9b6808f13a1f8f2b5560fc3ef76571d48407366a908cb371646d2",
+      "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+      "dataSha256": "11b94f6a9ab228b6809fab922906e8b90f96d60ba54d03da8a4edd69935db652",
+      "ledgerRows": 101,
+      "businessRows": 1061,
+      "businessTables": 177,
+      "privacyJobs": [
+        {
+          "kind": "delete",
+          "state": "retry",
+          "count": 1
+        },
+        {
+          "kind": "export",
+          "state": "blocked",
+          "count": 5
+        }
+      ],
+      "closed": {
+        "closed": true,
+        "alone": true
+      }
+    }
+  }
+}

@@ -4,12 +4,15 @@ import { z } from "zod";
 import { canonical, contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import { Database } from "../../db/database.js";
+import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
 import type { AudienceSnapshot } from "../agent/pipeline.js";
 import {
   GenerationIdentityAuthority,
   type GenerationPurposeConsumer,
   type GenerationTaskScope,
 } from "../identity/generation-scope.js";
+import { assertGenerationPoolCustody } from "../identity/generation-transaction.js";
+import { generationHostDatabase } from "../identity/generation-host-database.js";
 
 export const GENERATION_AUDIENCE_MIGRATION =
   "0182_w4_generation_allowance_audience";
@@ -20,6 +23,12 @@ export const GENERATION_AUDIENCE_SQL_CHECKSUM =
   "98f9373fbf2403e05f6f26a4223a94779d3280fefa89f2ab2c6f30fbbef796be";
 export const GENERATION_AUDIENCE_DEFINITION_CHECKSUM =
   "0f8d71b2adf8e27ab5c3e94a96144ceb934f6a65fd420ab04e1eff9011e61d2f";
+export const GENERATION_AUDIENCE_PROFILE_FENCE_SOURCE = Object.freeze({
+  name: "w4_generation_audience_profile_fence",
+  owner: "W4",
+  path: "apps/backend/src/modules/commerce/schema-generation-audience-profile-fence.sql",
+  checksum: "11d3d327f22082166d85f17179fe7a8cf94bcd9161714c8055b07537ff639e9d",
+});
 const Hash = z.string().regex(/^[a-f0-9]{64}$/u);
 const Facts = z.strictObject({
   revision: Hash,
@@ -80,6 +89,7 @@ type Policy = {
   role: string;
   using: string | null;
   check: string | null;
+  permissive?: boolean;
 };
 // Reviewed pg_get_expr receipts include every policy applicable to this role,
 // including PUBLIC. A matching new policy name cannot conceal a wider predicate.
@@ -175,11 +185,32 @@ policies.push({
   using: nonce,
   check: null,
 });
-const unavailable = () =>
+policies.push(
+  {
+    relation: "creator_profile",
+    name: "w4_generation_audience_original_creator",
+    command: "r",
+    role: GENERATION_AUDIENCE_OWNER,
+    using: "f9a4338d1e987ecde1e6e016ef62015592d68fbe84d3cac911cf11a9b9b24b50",
+    check: null,
+    permissive: false,
+  },
+  {
+    relation: "fan_profile",
+    name: "w4_generation_audience_original_fan",
+    command: "r",
+    role: GENERATION_AUDIENCE_OWNER,
+    using: "9ce7f6ad231b902c60b8810ceb7ae176b5daf8bbcd5260ab582014fd953872d2",
+    check: null,
+    permissive: false,
+  },
+);
+const unavailable = (cause?: unknown) =>
   new DomainError(
     "generation_audience_unavailable",
     "Current generation allowance audience is unavailable.",
     503,
+    cause === undefined ? undefined : { cause },
   );
 
 /** A distinct prepared financial reader. W1 owns the genuine private scope;
@@ -220,6 +251,7 @@ export class CommerceGenerationAudience {
      * Neither a caller JSON audience nor a self-approved catalog hash is used.
      */
     consumer: GenerationPurposeConsumer;
+    signal?: AbortSignal;
   }): Promise<CommerceGenerationAudience> {
     invariant(
       input.identity instanceof GenerationIdentityAuthority &&
@@ -228,6 +260,7 @@ export class CommerceGenerationAudience {
       "The canonical financial database and genuine worker authority are required.",
     );
     input.identity.assertPool(input.workerPool);
+    assertGenerationPoolCustody(input.workerPool);
     const host = new Client(input.database.pool.options);
     const worker = new Client(input.workerPool.options);
     const endpoint = (client: Client) =>
@@ -257,29 +290,63 @@ export class CommerceGenerationAudience {
       "Use the exact reviewed W4 generation audience consumer.",
     );
     input.identity.assertConsumerRegistered(receipt);
-    const hostDatabase = (
-      await input.database.pool.query<{ name: string; oid: number }>(
-        "SELECT current_database() AS name,(SELECT oid FROM pg_database WHERE datname=current_database()) AS oid",
-      )
-    ).rows[0];
-    if (!hostDatabase) throw unavailable();
+    const hostDatabase = await generationHostDatabase(
+      input.database.pool,
+      input.signal,
+    );
     const audience = new CommerceGenerationAudience(
       input.identity,
       receipt,
-      Object.freeze(hostDatabase),
+      Object.freeze({ name: hostDatabase.database, oid: hostDatabase.oid }),
       input.database.pool,
     );
     const client = await input.workerPool.connect();
+    const transportFailures: Error[] = [];
+    const sourceError = (error: Error) => transportFailures.push(error);
+    client.on("error", sourceError);
     try {
+      input.signal?.throwIfAborted();
       await audience.assertCatalog(client);
-    } finally {
+      input.signal?.throwIfAborted();
+      if (transportFailures.length)
+        throw new AggregateError(
+          transportFailures,
+          "Audience metadata transport failed.",
+        );
+    } catch (cause) {
+      const failures: unknown[] = [cause, ...transportFailures];
+      // No transaction or purpose was issued. A failed/uncertain metadata
+      // read must finish source closure before this pool can reuse its slot.
+      try {
+        await client.end();
+      } catch (error) {
+        failures.push(error);
+      }
+      client.removeListener("error", sourceError);
+      try {
+        client.release(true);
+      } catch (error) {
+        failures.push(error);
+      }
+      throw unavailable(
+        new AggregateError(failures, "Audience preparation failed."),
+      );
+    }
+    client.removeListener("error", sourceError);
+    try {
       client.release();
+    } catch (cause) {
+      throw unavailable(cause);
     }
     return audience;
   }
 
   private async assertCatalog(client: PoolClient): Promise<void> {
     try {
+      await assertRegisteredMigration(
+        client,
+        GENERATION_AUDIENCE_PROFILE_FENCE_SOURCE,
+      );
       const row = (
         await client.query<{
           ready: boolean;
@@ -295,7 +362,7 @@ export class CommerceGenerationAudience {
            ), expected_columns AS (
             SELECT relation,"column",privilege FROM jsonb_to_recordset($5::jsonb) AS c(relation text,"column" text,privilege text)
            ), expected_policies AS (
-            SELECT * FROM jsonb_to_recordset($9::jsonb) AS p(relation text,name text,command text,role text,"using" text,"check" text)
+            SELECT * FROM jsonb_to_recordset($9::jsonb) AS p(relation text,name text,command text,role text,"using" text,"check" text,permissive boolean)
            ), actual_policies AS (
             SELECT c.relname AS relation,p.polname AS name,p.polcmd::text AS command,p.polpermissive,
              p.polroles=ARRAY[0::oid] AS public_only,p.polroles=ARRAY[(SELECT oid FROM role)] AS owner_only,
@@ -382,8 +449,9 @@ export class CommerceGenerationAudience {
              AND c.relname=ANY($6::text[]) AND c.relname<>'schema_migration' AND c.relkind='r'
              AND c.relrowsecurity AND c.relforcerowsecurity AND pg_get_userbyid(c.relowner)='creator_owner')
             AND (SELECT count(*) FROM actual_policies)=(SELECT count(*) FROM expected_policies)
-            AND NOT EXISTS(SELECT FROM actual_policies a WHERE NOT a.polpermissive OR NOT EXISTS(
+            AND NOT EXISTS(SELECT FROM actual_policies a WHERE NOT EXISTS(
              SELECT FROM expected_policies e WHERE e.relation=a.relation AND e.name=a.name AND e.command=a.command
+              AND a.polpermissive=coalesce(e.permissive,true)
               AND (e.role='PUBLIC' AND a.public_only OR e.role=$3 AND a.owner_only)
               AND e."using" IS NOT DISTINCT FROM a."using" AND e."check" IS NOT DISTINCT FROM a."check")) AS ready,
             (SELECT pg_get_functiondef(oid) FROM entry) AS definition`,
@@ -407,8 +475,8 @@ export class CommerceGenerationAudience {
           this.receipt.definitionChecksum
       )
         throw unavailable();
-    } catch {
-      throw unavailable();
+    } catch (cause) {
+      throw unavailable(cause);
     }
   }
 

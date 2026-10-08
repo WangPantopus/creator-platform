@@ -1,0 +1,146 @@
+{
+  "sourceBase": "eaad2bcd",
+  "sourceSha256": {
+    "apps/backend/src/modules/agent/preparation-read.ts": "402b498fc2903c4b23e74beeab9eb9957fb5888edf9fe84d996b467f1cc44965",
+    "apps/backend/src/modules/agent/generation-journal.ts": "9ca258b145fc3147bd4dbe7bff6a8e7c9242b2cff69d61f0a392a997e4ff492c",
+    "apps/backend/src/modules/agent/usage-retention.ts": "d9332981c38fb72261de4048464bd432ddaea488f6442b29bb7c5c42d6e62f2c",
+    "apps/backend/src/modules/conversation/host.ts": "89a32e1b845de9803a106394517d9f1097bc9e9ee18154214a709e48e89a7544"
+  },
+  "change": "Journal and retained-usage preparation now borrow one original canonical read-only client under a five-second host budget. Existing Agent cancellation/settlement handles its actual PID and preserves shorter pool budgets. Original privacy registration stays separate and mandatory, with caller cancellation checked around it. Canonical generation host forwards its original caller signal.",
+  "actualReview": {
+    "scope": "Actual canonical PostgreSQL metadata preparation and source cleanup only. Exact held source checksums are read from the existing registry metadata; no held registration is fabricated. Both registration and expiry callbacks unconditionally refuse and are never invoked.",
+    "observations": [
+      {
+        "kind": "journal",
+        "mode": "abort",
+        "sourceBackendGone": true,
+        "reusablePool": true,
+        "originalPoolBudgetUnchanged": true,
+        "elapsedMs": 41,
+        "codes": [
+          "57014"
+        ]
+      },
+      {
+        "kind": "journal",
+        "mode": "shorter_read_budget",
+        "sourceBackendGone": true,
+        "reusablePool": true,
+        "originalPoolBudgetUnchanged": true,
+        "elapsedMs": 232,
+        "codes": [
+          "Query read timeout"
+        ]
+      },
+      {
+        "kind": "journal",
+        "mode": "host_budget",
+        "sourceBackendGone": true,
+        "reusablePool": true,
+        "originalPoolBudgetUnchanged": true,
+        "elapsedMs": 5022,
+        "codes": [
+          "57014"
+        ]
+      },
+      {
+        "kind": "journal",
+        "mode": "actual_missing_registration",
+        "codes": [
+          "usage_journal_schema_unconfigured"
+        ]
+      },
+      {
+        "kind": "journal",
+        "mode": "preaborted_no_checkout"
+      },
+      {
+        "kind": "retention",
+        "mode": "abort",
+        "sourceBackendGone": true,
+        "reusablePool": true,
+        "originalPoolBudgetUnchanged": true,
+        "elapsedMs": 41,
+        "codes": [
+          "57014"
+        ]
+      },
+      {
+        "kind": "retention",
+        "mode": "shorter_read_budget",
+        "sourceBackendGone": true,
+        "reusablePool": true,
+        "originalPoolBudgetUnchanged": true,
+        "elapsedMs": 236,
+        "codes": [
+          "Query read timeout"
+        ]
+      },
+      {
+        "kind": "retention",
+        "mode": "host_budget",
+        "sourceBackendGone": true,
+        "reusablePool": true,
+        "originalPoolBudgetUnchanged": true,
+        "elapsedMs": 5021,
+        "codes": [
+          "57014"
+        ]
+      },
+      {
+        "kind": "retention",
+        "mode": "actual_missing_registration",
+        "codes": [
+          "accounting_retention_schema_unconfigured"
+        ]
+      },
+      {
+        "kind": "retention",
+        "mode": "preaborted_no_checkout"
+      },
+      {
+        "mode": "actual_canonical_metadata_read",
+        "database": "creator_generation_test",
+        "read_only": "on"
+      },
+      {
+        "mode": "read_only_write_refusal",
+        "codes": [
+          "25006"
+        ]
+      },
+      {
+        "mode": "database_owner_refused_before_callback"
+      }
+    ],
+    "before": {
+      "migrations": 61,
+      "usage": 0,
+      "admissions": 0,
+      "attempts": 0
+    },
+    "after": {
+      "migrations": 61,
+      "usage": 0,
+      "admissions": 0,
+      "attempts": 0
+    },
+    "registrationCalls": 0,
+    "expiryCalls": 0,
+    "limits": [
+      "No prepared journal or retention owner, real expiry task, generation purpose, provider receipt or C10 registration is claimed.",
+      "The original privacy-registration callback remains outside this metadata read and must supply its own actual authority and lifetime."
+    ]
+  },
+  "validation": {
+    "backendShippingBuild": "passed under original shared lock before final caller-signal forwarding; final forwarding typecheck/scoped lint passed",
+    "scopedEslint": "passed",
+    "prettier": "passed",
+    "existingContractTests": 9,
+    "existingSchedulerTests": 8
+  },
+  "limits": [
+    "Metadata preparation only; no actual prepared journal/expiry owner, original expiry task, C10 registration or provider/generation operation.",
+    "This does not replace or qualify the separate actual privacy-registration callback. No SQL, roles, grants, executable registry or production pins change."
+  ]
+}

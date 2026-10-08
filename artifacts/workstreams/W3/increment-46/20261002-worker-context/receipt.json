@@ -1,0 +1,29 @@
+{
+  "source": "32f9f6c64c478190bf69718329228314f7b06b72",
+  "W1Source": "dcb77f23833f8a79761ee072b018e7aa78d765b7",
+  "W2Source": "19b655b7",
+  "files": {
+    "apps/backend/src/modules/identity/generation-scope.ts": "590d381f72b66262f7c77bd8010332fe9249395e9aac8c0b4851db92a6decfd1",
+    "apps/backend/src/modules/identity/schema-generation-scope.sql": "7de41bf10228219d69480e302bac7d69626d8d848d8276bb1fe54e49112a5627",
+    "apps/backend/src/modules/agent/generation-inputs.ts": "8a76b5370a01e43852220e484ee2d28d8c3ce30e670170ba42a917040521e72b",
+    "apps/backend/src/modules/agent/migrations/0096_w2_generation_input_consumers.sql": "25f89ddba69beed4dd780cd23a64eabb9b7481e2dcb5f192b167299a732b2c34",
+    "apps/backend/src/modules/conversation/generation-context.ts": "62f3d3b697ef09b77eeaf64b2d1c03649e10ab17e7dd4efa2f8946fa2ac61680",
+    "apps/backend/src/modules/conversation/migrations/0095_w3_generation_purpose_consumers.sql": "9449f7f9254aa1c9c77713b1683d5c85076b357f13e573882ee5d2d03d1715e0"
+  },
+  "checks": {
+    "backendTypecheck": true,
+    "affectedESLint": true,
+    "contextPrettier": true,
+    "moduleImport": true,
+    "diffCheck": true
+  },
+  "SQLApplied": false,
+  "workerIssued": false,
+  "contextPositiveAcceptance": false,
+  "autonomousRecoveryAccepted": false,
+  "newTestCode": false,
+  "apiRunning": false,
+  "webRunning": false,
+  "devicesRunning": false,
+  "w3Complete": false
+}

@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "postgresMajor": 17,
+  "sourceReview": "20261007-generation-privacy",
+  "scope": "Fixed closed39-source new-purpose role and application schema metadata profiles. Requires original source/ledger and Trust/Media denial/PUBLIC checks. No executable registration, private task or release qualification.",
+  "roles": [
+    "creator_commerce_public_read",
+    "creator_generation_authority",
+    "creator_generation_conversation_context",
+    "creator_generation_cursor_authority",
+    "creator_generation_terminal_authority",
+    "creator_generation_terminal_discovery",
+    "creator_generation_worker",
+    "creator_privacy_accounting_boundary",
+    "creator_privacy_family",
+    "creator_privacy_ownership_metadata",
+    "creator_signature_read_authority",
+    "creator_usage_detachment",
+    "creator_usage_expiry",
+    "creator_w2_generation_guardrail",
+    "creator_w2_generation_input",
+    "creator_w2_generation_journal",
+    "creator_w2_generation_metadata",
+    "creator_w2_generation_retrieval",
+    "creator_w2_generation_terminal_journal",
+    "creator_w2_privacy_export",
+    "creator_w3_generation_output",
+    "creator_w3_generation_privacy",
+    "creator_w3_privacy_export",
+    "creator_w3_terminal_output",
+    "creator_w4_generation_audience",
+    "creator_w4_generation_safety_terminal",
+    "creator_w4_generation_terminal",
+    "creator_w5_generation_origin"
+  ],
+  "catalogueSha256": [
+    "2d7e24154f5b2a988df3e730d3280eb5b74a51747c2d80177dde27b315eec680",
+    "04c70b75424e62760bd7ad4f85f4fd303a9da9fcd2444ee3a0fe1f7897074bb4"
+  ]
+}

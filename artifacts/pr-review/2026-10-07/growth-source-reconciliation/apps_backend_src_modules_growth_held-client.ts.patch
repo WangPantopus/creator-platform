@@ -1,0 +1,36 @@
+diff --git a/apps/backend/src/modules/growth/held-client.ts b/apps/backend/src/modules/growth/held-client.ts
+index 359c1aba..6a86e64b 100644
+--- a/apps/backend/src/modules/growth/held-client.ts
++++ b/apps/backend/src/modules/growth/held-client.ts
+@@ -32,6 +32,7 @@ export class GrowthHeldClient {
+   private shutdown: Promise<void> | undefined;
+   private shutdownFailure: unknown;
+   private shutdownFailed = false;
++  private closing: Promise<void> | undefined;
+   private readonly onError = (error: Error) => {
+     this.transportFailure ??= error;
+     this.destroy();
+@@ -50,7 +51,7 @@ export class GrowthHeldClient {
+   assertCurrent() {
+     this.signal?.throwIfAborted();
+     if (this.transportFailure) throw this.transportFailure;
+-    if (this.shutdown) throw new Error("growth_client_closed");
++    if (this.shutdown || this.closing) throw new Error("growth_client_closed");
+   }
+ 
+   async begin(sql = "BEGIN") {
+@@ -94,7 +95,13 @@ export class GrowthHeldClient {
+     }
+   }
+ 
+-  async close(input: { destroy?: boolean; failure?: unknown } = {}) {
++  close(input: { destroy?: boolean; failure?: unknown } = {}) {
++    // A worker may settle while its enclosing session is still held. The
++    // outer finalizer awaits the same receipt without releasing twice.
++    return (this.closing ??= this.settle(input));
++  }
++
++  private async settle(input: { destroy?: boolean; failure?: unknown }) {
+     const errors: unknown[] = [];
+     if (
+       input.destroy ||

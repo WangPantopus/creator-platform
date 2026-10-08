@@ -42,6 +42,10 @@ import type {
   PublicAIReadScope,
 } from "../identity/public-ai-scope.js";
 import { isDevelopmentLicense } from "./development-license.js";
+import {
+  PreparedGenerationAgentInputs,
+  type GenerationAILicenseContext,
+} from "./generation-inputs.js";
 
 /** Genuine server-issued public metadata; this is never a creator Actor. */
 export type PublicAILicenseContext = Readonly<{
@@ -71,6 +75,12 @@ export interface LicenseVerifier {
    * changing visitor GUCs or inventing a creator scope. */
   isCurrentPublicInTransaction?(
     context: PublicAILicenseContext,
+    client: PoolClient,
+  ): Promise<boolean>;
+  /** Genuine worker-purpose current stored proof; never a CreatorScope or
+   * interactive session synthesized from accepted generation metadata. */
+  isCurrentGenerationInTransaction?(
+    context: GenerationAILicenseContext,
     client: PoolClient,
   ): Promise<boolean>;
 }
@@ -177,6 +187,46 @@ export class AgentService {
       context.facts,
     );
     return current === true ? license : null;
+  }
+  async currentGenerationLicense(
+    context: GenerationAILicenseContext,
+    client: PoolClient,
+  ): Promise<License | null> {
+    invariant(
+      context.inputs instanceof PreparedGenerationAgentInputs,
+      "generation_inputs_required",
+      "Genuine generation-purpose compiled inputs are required.",
+    );
+    context.inputs.assertHostPool(this.repository.pool);
+    await context.inputs.authorizeInTransaction(
+      context.facts,
+      context.scope,
+      client,
+    );
+    const license: License = {
+      ...context.facts.license,
+      permittedUses: [...context.facts.license.permittedUses],
+    };
+    if (!licensed(license)) return null;
+    const verifier = this.licenseVerifier;
+    if (!verifier?.isCurrentGenerationInTransaction)
+      throw new DomainError(
+        "generation_license_unconfigured",
+        "Current generation-purpose licence authority is unavailable.",
+        503,
+      );
+    if (isDevelopmentLicense(license) !== (verifier.synthetic === true))
+      return null;
+    const allowed = await verifier.isCurrentGenerationInTransaction(
+      context,
+      client,
+    );
+    await context.inputs.authorizeInTransaction(
+      context.facts,
+      context.scope,
+      client,
+    );
+    return allowed === true ? license : null;
   }
   async snapshot(
     client: PoolClient,
@@ -824,7 +874,9 @@ export class AgentService {
           prompt: item.prompt,
           state: judged.value.passed && !result.blocked ? "pass" : "fail",
           answer: result.sentences.map((s) => s.text).join("\n"),
-          reason: judged.value.reason,
+          reason: result.blocked
+            ? `The output guard withheld a proposed sentence (${result.category ?? "policy violation"}). A safe fallback does not qualify this case for publication.`
+            : judged.value.reason,
           ...(result.withheld ? { withheld: result.withheld } : {}),
           citations: result.sentences.flatMap((s) => s.citations),
           usage: judged.usage,
@@ -1288,15 +1340,15 @@ export class AgentService {
           )
         ).rows,
     );
-    await array(
-      "usage",
-      async (after) =>
-        (
-          await client.query(
-            "SELECT * FROM creator.ai_usage WHERE creator_id=$1 AND ($2::uuid IS NULL OR id>$2) ORDER BY id LIMIT 50",
-            [scope.creatorId, after],
-          )
-        ).rows,
+    await array("usage", async (after) =>
+      (
+        await client.query(
+          // Private completion custody is never part of a creator export.
+          // JSON subtraction also works before held0097 is activated.
+          "SELECT to_jsonb(t)-'completion_capability_hash' AS document FROM creator.ai_usage t WHERE creator_id=$1 AND ($2::uuid IS NULL OR id>$2) ORDER BY id LIMIT 50",
+          [scope.creatorId, after],
+        )
+      ).rows.map((row) => row.document),
     );
     for (const table of [
       "ai_evaluation",

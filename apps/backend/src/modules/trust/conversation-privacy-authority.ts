@@ -11,6 +11,7 @@ import {
   type PrivacyTaskInput,
 } from "./privacy-authority.js";
 import type { PoolClient } from "pg";
+import { assertOriginalPrivacyFamilyCatalog } from "./privacy-family-catalog.js";
 
 /** Enumerate metadata, then use existing pair RLS. No interactive ThreadScope,
  * runtime grant or denial bypass is issued to a client by this worker adapter. */
@@ -162,7 +163,8 @@ export function conversationPrivacyAuthority(
             "bounded_subjob_required",
             "Creator conversation enumeration needs a bounded lifecycle subjob.",
           );
-          for (const creatorId of owned)
+          for (const creatorId of owned) {
+            if (job.creatorId && job.creatorId !== creatorId) continue;
             for (const fan of fans) {
               await restoredPrivacyTaskAuthorityInTransaction(
                 client,
@@ -175,8 +177,8 @@ export function conversationPrivacyAuthority(
               );
               const row = (
                 await client.query<ConversationPrivacyFamily>(
-                  'SELECT id AS "threadId",creator_id AS "creatorId",fan_id AS "fanId" FROM creator.thread WHERE creator_id=$1 AND fan_id=$2',
-                  [creatorId, fan.id],
+                  'SELECT id AS "threadId",creator_id AS "creatorId",fan_id AS "fanId" FROM creator.thread WHERE creator_id=$1 AND fan_id=$2 AND ($3::uuid IS NULL OR id=$3)',
+                  [creatorId, fan.id, job.threadId],
                 )
               ).rows[0];
               if (
@@ -190,6 +192,7 @@ export function conversationPrivacyAuthority(
                 "Split this request into bounded conversation families.",
               );
             }
+          }
         }
         await restoredPrivacyTaskAuthorityInTransaction(
           client,
@@ -275,7 +278,7 @@ export function conversationPrivacyAuthority(
       }
     },
     async assertFamily(client, job, family) {
-      const owned = await restoredPrivacyTaskAuthorityInTransaction(
+      await restoredPrivacyTaskAuthorityInTransaction(
         client,
         job,
         assertRestoredInTransaction,
@@ -286,22 +289,33 @@ export function conversationPrivacyAuthority(
         "privacy_scope_mismatch",
         "This family is outside the verified request.",
       );
-      await client.query(
-        "SELECT set_config('app.account_id',$1,true),set_config('app.creator_id',$2,true),set_config('app.fan_id',$3,true)",
-        [job.accountId, family.creatorId, family.fanId],
-      );
+      await assertOriginalPrivacyFamilyCatalog(client, job.signal);
+      job.signal?.throwIfAborted();
       const row = (
-        await client.query<{ account_id: string }>(
-          "SELECT f.account_id FROM creator.thread t JOIN creator.fan_profile f ON f.id=t.fan_id WHERE t.id=$1 AND t.creator_id=$2 AND t.fan_id=$3 FOR SHARE OF t,f",
-          [family.threadId, family.creatorId, family.fanId],
+        await client.query<{ matches: boolean }>(
+          "SELECT creator_trust.privacy_task_family_matches($1,$2,$3,$4,$5) AS matches",
+          [
+            job.jobId,
+            job.leaseToken,
+            family.threadId,
+            family.creatorId,
+            family.fanId,
+          ],
         )
       ).rows[0];
       invariant(
-        row &&
-          (row.account_id === job.accountId ||
-            owned.includes(family.creatorId)),
+        row?.matches === true,
         "privacy_family_unavailable",
         "This conversation does not belong to the verified request.",
+      );
+      await restoredPrivacyTaskAuthorityInTransaction(
+        client,
+        job,
+        assertRestoredInTransaction,
+      );
+      await client.query(
+        "SELECT set_config('app.account_id',$1,true),set_config('app.creator_id',$2,true),set_config('app.fan_id',$3,true)",
+        [job.accountId, family.creatorId, family.fanId],
       );
     },
   };

@@ -8,6 +8,8 @@ Read [BRIEF.md](BRIEF.md) before working on any phase.
 Status keys: `[ ]` not started · `[~]` in progress · `[x]` done. Record the
 link to each published artifact next to its item when it exists.
 
+W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan export](../artifacts/workstreams/W3/increment-66/20261002-privacy61-handoff/run.md). Personally operated web Light/Night390 with a genuine saved request and four explicit blocked domains; current native builds pass, current native UI and full A–I remain incomplete. [Successor handoff](workstreams/handoffs/W3-mac-studio-2026-10-02.md). The [final source-pin correction](../artifacts/workstreams/W3/increment-67/20261002-cursor-source-pin/run.md) matches the corrected held privacy SQL without activating it; [abort cleanup correction](../artifacts/workstreams/W3/increment-68/20261002-cursor-abort-cleanup/run.md) retains the client through cancellation and rollback, with real held-purpose qualification still open. No design/implementation completion checkbox is advanced from this partial acceptance.
+
 ## Where the work lives
 
 | Deliverable | Home | Mirror in this repo |
@@ -22,6 +24,12 @@ link to each published artifact next to its item when it exists.
 ## Implementation continuation
 
 - [x] October 7, 2026: inventory and continuation decisions for all 18 original draft PRs, with per-file preservation evidence and outstanding acceptance in the [reconciliation ledger](operations/pr-reconciliation-2026-10-07.md).
+- [x] October 7, 2026: reused the missing #145 restoration protections in the #132 continuation; [source/built-runtime database fault evidence](../artifacts/pr-review/2026-10-07/restoration-reconciliation/README.md). This is a bounded runtime repair, not a completed generation journey.
+- [x] October 7, 2026: connect installed privacy consumers, original Agent accounting owners and the usage-expiry lifetime in #132; [source/standalone operation and failure evidence](../artifacts/pr-review/2026-10-07/usage-accounting-host/README.md). Complete privacy and generation journeys remain open.
+- [x] October 7, 2026: connect Conversation export and the original protected Commerce stream; source and standalone exports plus a source staging-closure check are recorded in [the bounded evidence](../artifacts/pr-review/2026-10-07/conversation-commerce/README.md). Preserve the original #262 publication signal checks and account for #262/#301/#302 in #132. Full privacy and publication acceptance remain open.
+- [x] October 7, 2026: preserve native Commerce, iOS recorder cleanup and Studio media sources from #284/#303/#305 with current integration repairs and [bounded validation](../artifacts/pr-review/2026-10-07/native-media-reconciliation/README.md); physical-device and complete journey acceptance remain open.
+- [x] October 7, 2026: reconcile #247 terminal cancellation and #192 finite feedback source, including actual sequence-catalogue correction and original Trust boundaries; [preservation evidence and retained gates](../artifacts/pr-review/2026-10-07/terminal-feedback-reconciliation/README.md). Generation and feedback activation remain closed.
+- [x] October 7, 2026: preserve #282 original call offers, signing and exact retries; [source and validation](../artifacts/pr-review/2026-10-07/call-source-reconciliation/README.md). Successful scheduling/provider/hardware journeys remain open.
 - [~] Reconcile and qualify the retained implementations in that ledger's journey order. Design deliverables marked complete below do not establish functional application acceptance. The [project checkpoint](operations/project-continuation-2026-10-07.md) preserves product, architecture and current engineering context.
 
 ## Sample content used in every design
