@@ -54,7 +54,7 @@ class GrowthClient(private val origin: String, private val token: () -> String? 
             credential?.let { connection.setRequestProperty("Authorization", "Bearer $it") }
             if (body != null) { connection.doOutput = true; connection.outputStream.use { it.write(body.toString().toByteArray()) } }
             if (connection.responseCode !in 200..299) throw GrowthRequestFailure(connection.responseCode)
-            val response = connection.inputStream.use { it.readNBytes(1_000_001) }
+            val response = connection.inputStream.use { it.readUpTo(1_000_001) }
             if (response.size > 1_000_000) throw IllegalStateException(QelvoraCopy.text("growthThisResponseIsUnavailable"))
             if(!publicRead && token() != credential) throw GrowthRequestFailure(401)
             JSONObject(response.toString(Charsets.UTF_8))
@@ -62,6 +62,18 @@ class GrowthClient(private val origin: String, private val token: () -> String? 
     }
     suspend fun registerDevice(installationId: String, registration: String, granted: Boolean, registrationRevision: Long, expectedSession: String) = request("devices", "PUT", JSONObject().put("installationId", installationId).put("platform", "android").put("token", registration).put("permission", if (granted) "granted" else "denied").put("registrationRevision", registrationRevision), expectedSession)
     suspend fun revokeDevice(installationId: String, registrationRevision: Long, expectedSession: String) = request("devices/$installationId", "DELETE", JSONObject().put("platform", "android").put("registrationRevision", registrationRevision), expectedSession)
+}
+
+/** InputStream.readNBytes(int) needs API 33 and this app supports API 26: read at most limit bytes. */
+private fun java.io.InputStream.readUpTo(limit: Int): ByteArray {
+    val out = java.io.ByteArrayOutputStream(minOf(limit, 8192))
+    val buffer = ByteArray(8192)
+    while (out.size() < limit) {
+        val read = read(buffer, 0, minOf(buffer.size, limit - out.size()))
+        if (read < 0) break
+        out.write(buffer, 0, read)
+    }
+    return out.toByteArray()
 }
 
 private fun JSONObject.objects(key: String): List<JSONObject> {val values = optJSONArray(key) ?: return emptyList(); return (0 until values.length()).mapNotNull { values.optJSONObject(it) }}

@@ -291,7 +291,9 @@ private object CreatorAPITransport {
 }
 
 class CreatorAPIClient(private val baseURL: String, private val maximumResponseBytes: Int = 268_435_456, private val timeoutMs: Int = 30_000, private val expectedAccountId: String? = null, private val expectedSessionId: String? = null, private val token: suspend () -> String?) {
-  private val json = Json { ignoreUnknownKeys = false }
+  // Debug builds stay strict so contract drift fails in development and connected tests.
+  // Release builds ignore unknown keys so an additive server field cannot break an installed app.
+  private val json = Json { ignoreUnknownKeys = !com.pantopus.qelvora.BuildConfig.DEBUG }
   /** W8 private transport on this original client, with denial-only pins. */
   suspend fun trustBytes(path: String, expectedAccountId: String, expectedSessionId: String, body: ByteArray? = null, binary: Boolean = false): CreatorAPIBinaryResponse {
     require(path.matches(Regex("^/v1/trust/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*$")) && expectedAccountId.isNotEmpty() && expectedSessionId.isNotEmpty() && (body?.size ?: 0) <= 1_048_576)
