@@ -1,0 +1,39 @@
+{
+  "result": {
+    "type": "object",
+    "value": {
+      "scrollWidth": 390,
+      "send": [
+        {
+          "duration": 1157.7999999970198,
+          "start": 58887.09999999404
+        }
+      ],
+      "timing": {
+        "accepted": 1321,
+        "firstDom": 28575,
+        "firstVisible": 28575,
+        "snapshots": [
+          {
+            "bottom": 587,
+            "composerTop": 660,
+            "ms": 28575,
+            "text": "This is Maya’s AI using approved source material.",
+            "top": 517
+          },
+          {
+            "bottom": 587,
+            "composerTop": 660,
+            "ms": 39087.29999999702,
+            "text": "This is Maya’s AI using approved source material. Maya recommends loosely covering the mug with plastic, turning it periodically, and allowing the handle and body to dry at a similar pace.",
+            "top": 386
+          }
+        ],
+        "start": 58886.29999999702,
+        "startedAt": "2026-10-08T04:46:52.635Z",
+        "terminal": 45231.79999999702
+      },
+      "width": 390
+    }
+  }
+}

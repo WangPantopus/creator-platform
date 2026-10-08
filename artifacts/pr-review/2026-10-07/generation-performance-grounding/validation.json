@@ -1,0 +1,26 @@
+{
+  "baseCommit": "d165d3116f4534b0de25def09dc5160657a76294",
+  "sourceSha256": {
+    "apps/backend/src/modules/agent/generation-consumer-catalogue.ts": "726fdf015bf910110f5a923dda49799fed73337fd45faddcc6e8d80bd8a4b2ad",
+    "apps/backend/src/modules/agent/model.ts": "d3e475f738149ac4195a80f63fba3e0193624a573c4581013ebd6e3d149181a7",
+    "apps/backend/src/modules/agent/pipeline.ts": "3babaf09f456e6f362bcb3560231ccc7f77baa71616e438f57e2dea62a8ffa90",
+    "apps/backend/src/modules/conversation/generation-context.ts": "d252cb66d3a7bb7c99d3ca08e9236f24362995051d1ced08eea65408a19d1c5a",
+    "apps/backend/src/modules/conversation/generation-output.ts": "033d536d25a734d4a9e30aa4f084978f8518e1dc3919612e9e75bd4a395886cd",
+    "apps/backend/src/modules/conversation/generation-terminal.ts": "9cd0ed190063cf5049fa8cf253ede677cf5d002d3539b3789d99fb019be53806"
+  },
+  "backendBuild": "pass (TypeScript and standalone bundle)",
+  "backendTests": {
+    "passed": 17,
+    "skippedExistingPostgresIntegration": 9
+  },
+  "scopedEslint": "pass",
+  "scopedPrettier": "pass",
+  "compiledFinalStartup": "prepared and owned worker running",
+  "compiledStopAndRestart": {
+    "firstIdleShutdownExit": 0,
+    "providerRecordsUnchanged": true,
+    "finalIdleShutdownExit": 0
+  },
+  "webCodeChanged": false,
+  "latencyTargetsMet": false
+}

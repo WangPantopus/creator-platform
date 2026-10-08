@@ -1,5 +1,4 @@
 import { catalogueQuery } from "../../core/catalogue-query.js";
-import { createHash } from "node:crypto";
 import type { Pool } from "pg";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError } from "../../core/errors.js";
@@ -67,7 +66,7 @@ export async function assertGenerationConsumerCustody(
     for (const consumer of custody.consumers) {
       signal?.throwIfAborted();
       const proof = (
-        await catalogueQuery<{ ready: boolean; definition: string }>(
+        await catalogueQuery<{ ready: boolean; definitionChecksum: string }>(
           query,
           `SELECT EXISTS(SELECT FROM creator.schema_migration WHERE version=$2 AND checksum=$3)
            AND p.prosecdef AND p.prokind='f' AND p.provolatile='v'
@@ -78,7 +77,7 @@ export async function assertGenerationConsumerCustody(
             WHERE a.privilege_type<>'EXECUTE' OR recipient.rolname IS NULL
              OR NOT recipient.rolname=ANY($5::text[])
              OR (a.grantee<>p.proowner AND a.is_grantable)) AS ready,
-           pg_get_functiondef(p.oid) AS definition FROM pg_proc p WHERE p.oid=to_regprocedure($1)`,
+           pg_catalog.encode(pg_catalog.sha256(pg_catalog.convert_to(pg_get_functiondef(p.oid),'UTF8')),'hex') AS "definitionChecksum" FROM pg_proc p WHERE p.oid=to_regprocedure($1)`,
           [
             consumer.signature,
             consumer.migration.version,
@@ -91,8 +90,7 @@ export async function assertGenerationConsumerCustody(
       signal?.throwIfAborted();
       if (
         proof?.ready !== true ||
-        createHash("sha256").update(proof.definition).digest("hex") !==
-          consumer.definitionChecksum
+        proof.definitionChecksum !== consumer.definitionChecksum
       )
         throw new Error("Changed fixed executable custody");
     }

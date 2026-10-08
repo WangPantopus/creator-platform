@@ -31,6 +31,8 @@ W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan expor
 - [x] October 7, 2026: reconcile #247 terminal cancellation and #192 finite feedback source, including actual sequence-catalogue correction and original Trust boundaries; [preservation evidence and retained gates](../artifacts/pr-review/2026-10-07/terminal-feedback-reconciliation/README.md). Generation and feedback activation remain closed.
 - [x] October 7, 2026: preserve #282 original call offers, signing and exact retries; [source and validation](../artifacts/pr-review/2026-10-07/call-source-reconciliation/README.md). Successful scheduling/provider/hardware journeys remain open.
 - [~] Reconcile and qualify the retained implementations in that ledger's journey order. Design deliverables marked complete below do not establish functional application acceptance. The [project checkpoint](operations/project-continuation-2026-10-07.md) preserves product, architecture and current engineering context.
+- [x] October 7, 2026: strengthen output grounding with complete sentence spans and exact authorized quotes; operate six boundary cases and two real fan replies with original accounting. [Evidence and preserved failures](../artifacts/pr-review/2026-10-07/generation-performance-grounding/README.md).
+- [~] Generation latency: equivalent column scans are faster, but real first useful answers still take 28–39 seconds. Retain the 300ms acknowledgement, 2.5s warm/4s cold first useful sentence and 8s completion targets; qualification remains open. Existing-version publication also requires the privacy-safe shadow feed.
 
 ## Sample content used in every design
 

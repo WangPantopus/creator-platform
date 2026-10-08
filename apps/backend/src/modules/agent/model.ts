@@ -31,6 +31,48 @@ export const InputVerdict = z.strictObject({
   category: z.string(),
 });
 export const OutputVerdict = z.strictObject({
+  segments: z
+    .array(
+      z.strictObject({
+        text: z
+          .string()
+          .min(1)
+          .max(1200)
+          .describe(
+            "Exact contiguous part of sentence.text. In order, all segments must concatenate to the entire sentence, including spaces and punctuation.",
+          ),
+        kind: z.enum(["factual", "non_factual"]),
+        evidence: z
+          .array(
+            z.strictObject({
+              passageId: z.uuid(),
+              quote: z
+                .string()
+                .min(1)
+                .max(2000)
+                .describe(
+                  "Exact contiguous quotation from this cited passage, without ellipses or added words.",
+                ),
+            }),
+          )
+          .max(4),
+        assessment: z
+          .string()
+          .min(1)
+          .max(300)
+          .describe(
+            "Compare every assertion in this segment with its quotations. Identify any added mechanism, benefit, cause, certainty or advice. A plausible inference is unsupported.",
+          ),
+        relation: z.enum([
+          "explicit",
+          "faithful_paraphrase",
+          "unsupported",
+          "non_factual",
+        ]),
+      }),
+    )
+    .min(1)
+    .max(16),
   allowed: z
     .boolean()
     .describe(
