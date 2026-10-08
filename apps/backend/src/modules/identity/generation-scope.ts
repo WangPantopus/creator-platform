@@ -496,6 +496,21 @@ export class GenerationIdentityAuthority {
         .array(terminalConsumerSchema)
         .max(11)
         .parse(input.terminalConsumers ?? []);
+      const outputCursor = consumers.find(
+        (consumer) => consumer.signature === generationOutputCursorSignature,
+      );
+      if (outputCursor) {
+        const source = await registeredMigration(generationOutputCursorSource);
+        if (
+          !source ||
+          outputCursor.migration.version !== source.version ||
+          outputCursor.migration.checksum !== source.checksum ||
+          outputCursor.owner !== "creator_generation_cursor_authority"
+        )
+          throw new Error(
+            "Output cursor requires its original reviewed source",
+          );
+      }
       const combined = [...consumers, ...terminalConsumers];
       if (
         new Set(combined.map((consumer) => consumer.signature)).size !==

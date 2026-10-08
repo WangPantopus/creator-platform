@@ -97,8 +97,8 @@
         },
         {
           "migration": {
-            "version": "0224_w5_generation_origin_profile_fence",
-            "checksum": "09d3df2f3549d0267dce2fe049789e575b1c8f212ee887d2d5396f110bafc047"
+            "version": "0216_w1_generation_output_cursor",
+            "checksum": "a4f01c5f1eb1e19d79437b17cce872def1366965ba27c8c46b0d5f9bb73da436"
           },
           "signature": "creator.generation_output_cursor_view(uuid,uuid,integer,integer)",
           "owner": "creator_generation_cursor_authority",
