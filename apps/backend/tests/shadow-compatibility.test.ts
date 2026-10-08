@@ -49,9 +49,9 @@ afterAll(() => pool.end());
 describe("published engine compatibility for shadow replay", () => {
   it("invalidates old comparison passes and binds new evidence to both engines", () => {
     const draft = "f".repeat(64);
-    const fingerprint = shadowReplayFingerprint(draft, version);
+    const fingerprint = shadowReplayFingerprint(draft, version, []);
     expect(fingerprint).not.toBe(draft);
-    expect(shadowReplayFingerprint("e".repeat(64), version)).not.toBe(
+    expect(shadowReplayFingerprint("e".repeat(64), version, [])).not.toBe(
       fingerprint,
     );
     for (const changed of [
@@ -63,7 +63,7 @@ describe("published engine compatibility for shadow replay", () => {
         sourceSet: [{ id: version.id, revision: 1, hash: "b".repeat(64) }],
       },
     ]) {
-      expect(shadowReplayFingerprint(draft, changed)).not.toBe(fingerprint);
+      expect(shadowReplayFingerprint(draft, changed, [])).not.toBe(fingerprint);
     }
   });
   it("accepts the exact engine and compiled creator identity", () => {

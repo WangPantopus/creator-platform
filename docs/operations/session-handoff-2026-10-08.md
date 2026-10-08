@@ -1,5 +1,12 @@
 # Session handoff — October 8, 2026
 
+Successor resumed in the same `637b` checkout on
+`codex/shadow-evidence-lifetime-20261008`. See the
+[full finish plan](product-finish-plan-2026-10-08.md) and
+[bounded comparison-evidence increment](../../artifacts/pr-review/2026-10-08/shadow-evidence-lifetime/README.md).
+The post-merge main workflow below has since completed successfully. The original
+handoff observations and all evidence remain preserved below.
+
 This is the starting point for the next session. The user requested a coherent handoff, all work committed and pushed, and owned resources stopped unless needed for continuation. This handoff adds documentation only; product implementation is already merged through #335. The overall product remains incomplete.
 
 ## Start here

@@ -1,0 +1,46 @@
+{
+  "observedAt": "2026-10-08T08:54:57.860Z",
+  "baseCommit": "a6d483c606e6a68aa8396e8e15f6cf4666c6ac6f",
+  "branch": "codex/shadow-evidence-lifetime-20261008",
+  "sourceSha256": {
+    "apps/backend/src/modules/agent/service.ts": "a93c746ab302ed810d7f5ca7ecb2417cc6171dad3b2ef8e23a8f060e06e70483",
+    "apps/backend/src/modules/agent/shadow.ts": "3606462c2d569d2929c58cb03997977debd7900a1f51db02c575b88de9d73eee",
+    "apps/backend/src/modules/agent/shadow-samples.ts": "91d4c49b8c1fe7bc1710d58f29da849c20377569ff211ef8fc4bfc2c97d25b72",
+    "apps/backend/src/modules/agent/shadow-fingerprint.ts": "a6dd188fbb4f461923a1aebc8060e552e8ed5839b4a582afbb8c103313366298",
+    "apps/backend/tests/shadow-compatibility.test.ts": "b39b18092b4f9a0ea7c0c72751f16b025591d92f7b6e0f6051db9255ac7e01ff",
+    "apps/backend/tests/shadow-evidence.test.ts": "8ef00d0d8cfea771ede06c63030418f5ad6d232afda1e7909b315aa561a91ed6",
+    "apps/backend/tests/postgres.integration.test.ts": "a309ed145be7e30d58ddce908cb3ddbcca290d1a2cda151d53c9e0519e4ff4f2"
+  },
+  "checks": {
+    "backendTypecheck": "passed",
+    "backendBuild": "passed",
+    "heavyBuildLockReleased": true,
+    "backendTests": {
+      "passed": 57,
+      "failed": 0,
+      "skipped": 0,
+      "files": 6,
+      "postgresTests": 11,
+      "durationSeconds": 117.55
+    },
+    "scopedEslint": "passed",
+    "scopedPrettier": "passed",
+    "database": "separate disposable pgvector/pgvector:pg17 Foundation fixture; actual non-owner runtime"
+  },
+  "baselinePostMergeCI": {
+    "sha": "13a2e03a0d1fd67fe737cfd88acd36d24f7db941",
+    "result": "success",
+    "foundationJobsPassed": 5,
+    "url": "https://github.com/WangPantopus/creator-platform/actions/runs/37749134304"
+  },
+  "preservedArchiveStarted": false,
+  "preservedJourneyCopiesOpened": false,
+  "liveProviderCalls": 0,
+  "qualification": {
+    "realPrivacyProducer": false,
+    "realPublishedVersionUpgrade": false,
+    "latency": false,
+    "production": false
+  },
+  "disposableTestContainer": "stopped and removed after fixture cleanup; preserved archive remained stopped"
+}

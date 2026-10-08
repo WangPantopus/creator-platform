@@ -23,6 +23,16 @@ W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan expor
 
 ## Implementation continuation
 
+**October 8 resumed plan:** [complete product finish plan and completion criteria](operations/product-finish-plan-2026-10-08.md).
+The first increment binds shadow comparison evidence to its exact current sample
+cohort. The real privacy producer and actual existing-version upgrade remain
+open; this does not advance full journey or design acceptance.
+
+- [x] October 8, 2026: repair shadow sample replacement, bind comparison evidence
+  to the current cohort, and reject stale/expired evidence at replay/publication.
+  Backend build and all 57 tests pass, including 11 PostgreSQL cases.
+  [Bounded evidence and remaining producer work](../artifacts/pr-review/2026-10-08/shadow-evidence-lifetime/README.md).
+
 **October 8 handoff:** [#335 is merged; successor instructions, remaining acceptance and retained resources](operations/session-handoff-2026-10-08.md). All original PRs are resolved. Product latency, safe upgrades and the broader finish plan remain open.
 
 - [x] October 7, 2026: inventory and continuation decisions for all 18 original draft PRs, with per-file preservation evidence and outstanding acceptance in the [reconciliation ledger](operations/pr-reconciliation-2026-10-07.md).

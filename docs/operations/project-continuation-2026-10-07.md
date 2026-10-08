@@ -4,6 +4,15 @@ Updated October 8, 2026 after #335 merged. Start with the [session handoff](sess
 
 ## Current status
 
+**October 8 successor:** continued in `637b` on
+`codex/shadow-evidence-lifetime-20261008`, carrying the handoff commit. The
+[full finish plan](product-finish-plan-2026-10-08.md) records the refreshed state,
+all remaining journeys and completion criteria. Post-merge main CI at
+`13a2e03a0` is now successful. The immediate increment repairs sample identity
+and eligibility in shadow comparison; the real privacy producer, existing-version
+upgrade, latency and whole-product acceptance remain open. See
+[increment evidence](../../artifacts/pr-review/2026-10-08/shadow-evidence-lifetime/README.md).
+
 **#335 merged at `13a2e03a0d1fd67fe737cfd88acd36d24f7db941` on October 8, 2026 at 1:20 a.m. America/Los_Angeles.** Its reviewed head `52d86e1ebd769bc1958b9cff1a10e2734d83365b` passed all ten hosted checks, including 47 backend tests. GitHub returned no open PRs at handoff. The [session handoff](session-handoff-2026-10-08.md) contains the current checkout/branch, private resource inventory, restart procedure, exact code map and recommended continuation. It is a documentation-only continuation from merged main, pushed on `codex/session-handoff-20261008`; no additional implementation PR was opened.
 
 All **18 original PRs have one continuation: [#132](https://github.com/WangPantopus/creator-platform/pull/132)**. The other 17 are closed unmerged after their useful source and full remaining acceptance were published in that successor. Every closed source branch remains at its reviewed head; #132 completed that consolidation. [Final original-PR custody](../../artifacts/pr-review/2026-10-07/growth-source-reconciliation/final-pr-custody.json) and the linked per-domain actions record the closures. Documentation PR #333 merged normally at `6d62d31457f8ad741c38fd871004970209d6105e`, which is included here.
