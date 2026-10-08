@@ -1,0 +1,6 @@
+{
+  "at": "2026-10-08T18:05:53.585Z",
+  "code": 1,
+  "stdout": "",
+  "stderr": "Unsafe migration purpose-role custody: definer source/ACL packet.\n"
+}

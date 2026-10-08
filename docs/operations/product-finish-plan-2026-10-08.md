@@ -9,6 +9,14 @@ The product is substantially implemented and remains incomplete.
 
 ## Continuing execution
 
+The [original populated comparison wave](../../artifacts/pr-review/2026-10-08/comparison-closed-wave/README.md)
+now activates all eight exact sources through the closed runner, with independent
+backups/restores and original1472 rows/history preserved. The actual compiled
+comparison host runs on copy43 and the original browser conversation works;
+all18 generations/69 usage rows/publication are unchanged. Actual fan choice,
+sanitizer/provider, native controls and preserved-version upgrade are next.
+All ten completion criteria remain open.
+
 [Scoped artifact recovery and legacy expiry](../../artifacts/pr-review/2026-10-08/comparison-legacy-custody/README.md)
 now distinguish unrelated mapped live exports and permit exact expired legacy
 cleanup under the original task. Six real isolated SQL/filesystem cases pass on

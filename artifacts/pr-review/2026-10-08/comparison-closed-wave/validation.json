@@ -1,0 +1,23 @@
+{
+  "observedAt": "2026-10-08T18:15:24.670935+00:00",
+  "waveSource": "6aa85edb41670e5099b48040566b6231646310d3",
+  "actualHostSource": "a2fccdc1ba92874d02ec08a02e1ea8df6adfb37b",
+  "backendBuildAndTypeScript": "passed",
+  "scopedESLintAndPrettier": "passed",
+  "existingSuite": {
+    "passed": 46,
+    "databaseSkipped": 11,
+    "newUnitCases": 0
+  },
+  "actualRuntime": {
+    "database": "creator_generation_journey43_20261007",
+    "sources": 114,
+    "port": 57304,
+    "comparisonPolicy": "explicit fictional development only",
+    "startup": "passed after original incoming core membership correction",
+    "healthLive": true,
+    "browser": "preserved fan conversation opens with original message history",
+    "comparisonConsentAndProviderAcceptance": false
+  },
+  "nativeDevices": "stopped with state preserved; this increment has no new native acceptance"
+}

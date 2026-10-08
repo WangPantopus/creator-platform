@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-08T17:58:47.448Z",
+  "hostPid": 12787,
+  "command": "node /Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/native-e2e/launch43-backend-comparison-runtime.mjs",
+  "liveGenerations": 0,
+  "observed": {
+    "pid": 35684,
+    "state": "active",
+    "query_start": "2026-10-08T17:58:47.438Z",
+    "observed_at": "2026-10-08T17:58:47.447Z"
+  },
+  "action": "SIGTERM to owned launcher while its idle generation worker performed actual SQL discovery"
+}

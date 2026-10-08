@@ -323,3 +323,11 @@ consent, source mapping or historical clock is backfilled. The isolated restored
 operations and remaining activation constraints are recorded in the
 [scope/legacy milestone](../artifacts/pr-review/2026-10-08/comparison-legacy-custody/README.md).
 All product finish criteria remain unchanged.
+
+### October 8 — preserved populated comparison activation
+
+The complete eight-source graph now has closed original/restore and actual
+migration evidence. The original application starts with the finite fictional
+comparison policy and preserved conversation history. This does not constitute
+fan choice, sanitization or provider acceptance; separate controls and operated
+journeys remain required. [Evidence](../artifacts/pr-review/2026-10-08/comparison-closed-wave/README.md).

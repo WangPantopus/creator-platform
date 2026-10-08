@@ -23,6 +23,12 @@ W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan expor
 
 ## Implementation continuation
 
+- [~] October 8, 2026: activate the exact comparison graph through the original
+  closed populated migration/restore chain and launch the real composed host.
+  Existing browser conversation and all prior history remain intact. Actual
+  comparison controls, provider and native journeys remain next.
+  [Evidence and preserved refusals](../artifacts/pr-review/2026-10-08/comparison-closed-wave/README.md).
+
 - [~] October 8, 2026: scope comparison artifact recovery to original deletion
   sources and permit exact expired legacy cleanup. Six isolated operations pass
   on the fully restored numbered graph; actual activation and journeys remain.
