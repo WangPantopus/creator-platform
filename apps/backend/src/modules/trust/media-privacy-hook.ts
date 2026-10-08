@@ -7,6 +7,7 @@ import {
   restoredPrivacyTaskAuthorityInTransaction,
 } from "./privacy-authority.js";
 import { conversationPrivacyAuthority } from "./conversation-privacy-authority.js";
+import { assertMediaPrivacyExportFamily } from "./media-privacy-family.js";
 import { z } from "zod";
 
 type Job = Parameters<PrivacyHook["run"]>[0];
@@ -53,7 +54,12 @@ export function mediaPrivacyHook(input: {
           input.assertRestoredInTransaction,
         );
         for (const family of families) {
-          await authority.assertFamily(client, job, family);
+          await assertMediaPrivacyExportFamily(
+            client,
+            job,
+            family,
+            input.assertRestoredInTransaction,
+          );
           const pair = [family.creatorId, family.fanId];
           const section: Record<string, unknown> = { ...family };
           const sources = [

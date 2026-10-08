@@ -613,7 +613,14 @@ export class PreparedConversationPrivacyCursor {
 
 /** Read-only metadata for independent review; it grants no runtime authority. */
 export async function conversationPrivacyCursorCatalogue(client: PoolClient) {
-  return {
+  // PostgreSQL renders type names relative to search_path. Independent review
+  // uses pg_catalog, so e.g. public.vector must not become vector on an ordinary
+  // runtime connection. Preserve the original checksum and restore the caller's
+  // setting after successful metadata reads. On failure the original client
+  // custodian settles/rolls back; never issue helper SQL after an uncertain read.
+  await client.query("SAVEPOINT w3_cursor_display");
+  await client.query("SET LOCAL search_path=pg_catalog");
+  const catalogue = {
     ...(await generationConsumerCatalogue(client, Owner)),
     // The shared effective-ACL catalogue does not encode types, defaults or
     // FK definitions. Keep the entire ordinary0212 relation shape in the
@@ -674,4 +681,7 @@ export async function conversationPrivacyCursorCatalogue(client: PoolClient) {
       )
     ).rows,
   };
+  await client.query("ROLLBACK TO SAVEPOINT w3_cursor_display");
+  await client.query("RELEASE SAVEPOINT w3_cursor_display");
+  return catalogue;
 }
