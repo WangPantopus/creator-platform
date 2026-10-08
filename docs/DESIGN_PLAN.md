@@ -23,6 +23,11 @@ W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan expor
 
 ## Implementation continuation
 
+- [x] October 8, 2026: recover an expired-verification download on the original
+  application origin, reconfirm the same creator and download the identical
+  existing artifact. Preserve the initial loopback-cookie failure; production
+  build and actual web journey pass. [Evidence and limits](../artifacts/pr-review/2026-10-08/privacy-download-recovery/README.md).
+
 - [x] October 8, 2026: repair and operate the original creator-account export
   across all eight domains; verify four downloaded streams and preserve exact
   publication/generation/accounting history. Actual catalogue, Media task and

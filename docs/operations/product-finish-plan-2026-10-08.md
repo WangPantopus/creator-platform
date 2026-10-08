@@ -58,7 +58,9 @@ Conversation pages within the original45s deadline. The original account request
 now completes all eight domains, and all four streamed UI downloads match their
 saved checksums. Publication and all18 generation/69 usage records remain exact.
 This is bounded creator-account evidence, not populated media or mature deletion.
-Repair the observed expired-verification download UX while continuing the producer.
+The [download recovery follow-up](../../artifacts/pr-review/2026-10-08/privacy-download-recovery/README.md)
+now passes the real expired-verification → sign-in → identical artifact journey.
+Original provider/read authority and saved-comparison artifact invalidation remain next.
 
 
 ## Refreshed starting point

@@ -7,6 +7,32 @@ const readable =
   /^(capabilities|help|status|session|cases|cases\/[0-9a-f-]{36}|my-cases|inbox|access-history|privacy\/jobs|privacy\/jobs\/[0-9a-f-]{36}(\/download(\/(identity|conversation|agent|commerce|content|media|growth|trust))?)?|operations\/(metrics|audits))$/i;
 const writable =
   /^(reports|blocks|feedback|cases\/[0-9a-f-]{36}\/(access|decisions|appeals|effects\/retry)|privacy\/jobs|privacy\/jobs\/[0-9a-f-]{36}\/retry|dev\/session|dev\/logout)$/i;
+
+function downloadFailure(request: NextRequest, target: string, code: unknown) {
+  // Keep API errors as JSON. A clicked download is a document navigation and
+  // needs a recovery page; returning401 JSON there becomes a browser error.
+  if (
+    request.method !== "GET" ||
+    request.headers.get("sec-fetch-dest") !== "document" ||
+    !/^privacy\/jobs\/[0-9a-f-]{36}\/download(?:\/[^/]+)?$/iu.test(target)
+  )
+    return undefined;
+  const reason =
+    code === "fresh_verification_required"
+      ? "verify"
+      : code === "export_expired"
+        ? "expired"
+        : "unavailable";
+  // Next normalizes loopback aliases. A relative Location preserves the
+  // browser's exact origin and its host-bound sign-in cookies.
+  return new NextResponse(null, {
+    status: 303,
+    headers: {
+      Location: `/support/privacy?download=${reason}`,
+      "Cache-Control": "no-store",
+    },
+  });
+}
 async function endCanonicalSession(request: NextRequest) {
   if (!request.cookies.has(sessionCookie)) return;
   // Cookie removal alone leaves an issued socket token valid. Reuse W1's
@@ -219,6 +245,10 @@ async function forward(
       return new NextResponse(result.body, { status: result.status, headers });
     }
     const data = await result.json();
+    if (!result.ok) {
+      const recovery = downloadFailure(request, target, data?.error?.code);
+      if (recovery) return recovery;
+    }
     if (target === "dev/session" && result.ok) {
       try {
         const refused = await endCanonicalSession(request);
@@ -250,6 +280,8 @@ async function forward(
     }
     return response;
   } catch {
+    const recovery = downloadFailure(request, target, "trust_unavailable");
+    if (recovery) return recovery;
     return NextResponse.json(
       {
         error: {

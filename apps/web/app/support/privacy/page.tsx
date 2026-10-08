@@ -1,5 +1,6 @@
 "use client";
 import {
+  Suspense,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -7,6 +8,7 @@ import {
   useState,
 } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import type { PrivacyJobView } from "../../../../backend/src/modules/trust/contracts";
 import {
   ErrorState,
@@ -19,6 +21,31 @@ import {
   retryTrustReads,
   dateLabel,
 } from "../../ops/trust-client";
+
+function DownloadNotice() {
+  const status = useSearchParams().get("download");
+  if (!["verify", "expired", "unavailable"].includes(status ?? "")) return null;
+  return (
+    <div className="trust-error" role="alert">
+      {status === "verify" ? (
+        <>
+          <p>Verify your account again to download your export.</p>
+          <a href="/api/auth/continue?returnTo=%2Fsupport%2Fprivacy">
+            Continue with Pantopus
+          </a>
+          <p>Your completed request will still be here when you return.</p>
+        </>
+      ) : status === "expired" ? (
+        <p>This download has expired. Request a new export below.</p>
+      ) : (
+        <p>
+          Your download is unavailable. Check your account and connection, then
+          try the download from your completed request again.
+        </p>
+      )}
+    </div>
+  );
+}
 
 function Job({
   id,
@@ -262,6 +289,9 @@ export default function PrivacyPage() {
         <Link href="/trust">Trust and help</Link>
       </nav>
       <h1>Export or delete your data</h1>
+      <Suspense fallback={null}>
+        <DownloadNotice />
+      </Suspense>
       <p>
         Deleting a conversation removes its memory and prevents future use.
         Packet disclosure and delivery records may remain for 12 months for

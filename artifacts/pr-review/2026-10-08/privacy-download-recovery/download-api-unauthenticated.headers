@@ -1,0 +1,11 @@
+HTTP/1.1 401 Unauthorized
+vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+cache-control: no-store
+content-type: application/json
+x-content-type-options: nosniff
+x-correlation-id: a3f706bb-d4f5-40d3-b3c9-e701964d21ef
+Date: Thu, 08 Oct 2026 13:29:29 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
