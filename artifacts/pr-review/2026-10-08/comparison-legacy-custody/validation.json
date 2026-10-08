@@ -1,0 +1,16 @@
+{
+  "observedAt": "2026-10-08T17:55:54.262540+00:00",
+  "backendBuildAndTypeScript": "passed",
+  "scopedESLint": "passed",
+  "scopedPrettier": "passed",
+  "diffCheck": "passed",
+  "existingBackendSuite": {
+    "passed": 46,
+    "databaseCasesSkipped": 11,
+    "newUnitCases": 0
+  },
+  "sourceReservations": 8,
+  "allOriginalAndReservedSourceHashesMatch": true,
+  "executableRegistrySources": 106,
+  "actualApplicationActivation": false
+}

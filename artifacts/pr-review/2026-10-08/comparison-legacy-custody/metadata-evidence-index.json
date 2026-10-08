@@ -1,0 +1,60 @@
+{
+  "scope": "Preserved isolated SQL/file operations and full catalogue source files; hashes only for large/private material",
+  "files": [
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/combined-catalogue-restored-22.json",
+      "bytes": 26238304,
+      "sha256": "228da3af871480cb584552aa2fe92dccd7bd5919479715478b28606f96bce229"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/combined-catalogue-observation-22.json",
+      "bytes": 33542,
+      "sha256": "072aebb6a124f672128b10de55e2ab4f4a3a7118dba6de7c0a72ab961e3e5556"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/combined-catalogue-baseline-22.json",
+      "bytes": 24385965,
+      "sha256": "51acefa19fbd633cc747324f07c1e27606426b76939f8edde93092c5fd6c100a"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/combined-catalogue-baseline-incoming-22.json",
+      "bytes": 24386474,
+      "sha256": "9e57da947c5574d53819d4a9ff9dd4141f570a790f7efc5b944fb6385f493511"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/combined-catalogue-combined-22.json",
+      "bytes": 26238304,
+      "sha256": "228da3af871480cb584552aa2fe92dccd7bd5919479715478b28606f96bce229"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/combined-catalogue-restored-incoming-22.json",
+      "bytes": 26238813,
+      "sha256": "e14e57ceefc44077f1fb0d4a7feafb9b6eb5bfc385bdc3bcfd828c1572d86ea5"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/combined-catalogue-combined-incoming-22.json",
+      "bytes": 26238813,
+      "sha256": "e14e57ceefc44077f1fb0d4a7feafb9b6eb5bfc385bdc3bcfd828c1572d86ea5"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/actual-baseline43-purpose.json",
+      "bytes": 11275838,
+      "sha256": "2c9be119c2de9eb6d056c59e309ce7ac2512111a8f6dba5b2e88cd93bab6b006"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/operate-scope-21.mts",
+      "bytes": 17771,
+      "sha256": "106d623127477a870702cb870733a450a3183120e3adaf60b9c6862f117db27e"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/operate-scope-23.mts",
+      "bytes": 17771,
+      "sha256": "5fa321d95496e2405298fbfac7079539f9d81f9d755d630ac2a37a0c6f4c4c00"
+    },
+    {
+      "path": "/Users/yingpengwang/.codex/visualizations/2026/10/08/01a11aa9-c32c-7821-bcaf-6675731d1ad9/comparison-artifact-review/private/combined22-backup.sql",
+      "bytes": 1421136,
+      "sha256": "ddd4b0f28f59d971a97f3caaed34726e0adb256287763179aa532f6c2a945230"
+    }
+  ]
+}

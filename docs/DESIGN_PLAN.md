@@ -23,6 +23,11 @@ W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan expor
 
 ## Implementation continuation
 
+- [~] October 8, 2026: scope comparison artifact recovery to original deletion
+  sources and permit exact expired legacy cleanup. Six isolated operations pass
+  on the fully restored numbered graph; actual activation and journeys remain.
+  [Evidence and limits](../artifacts/pr-review/2026-10-08/comparison-legacy-custody/README.md).
+
 - [~] October 8, 2026: reserve the complete comparison SQL graph, review all
   combined role catalogues and exact restoration, and wire the gated original
   runtime/Trust/export/expiry owners. Activation, legacy file lifecycle and actual

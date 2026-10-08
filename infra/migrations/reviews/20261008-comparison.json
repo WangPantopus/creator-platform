@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "scope": "Fixed metadata independently reviewed on isolated numbered113 graph19 and its complete dump/restore20, with and without incoming Growth API membership. Existing generation purpose permissions on existing relations are unchanged. Reserved sources only; actual preserved upgrade, executable registration, host composition and application acceptance remain separate.",
+  "scope": "Fixed metadata independently reviewed on isolated numbered114 graph22 and its complete dump/restore23, with and without incoming Growth API membership. Existing generation purpose permissions on existing relations are unchanged. Reserved sources only; actual preserved upgrade, executable registration, host composition and application acceptance remain separate.",
   "sources": [
     {
       "version": "0239_w3_comparison_samples",
@@ -50,16 +50,23 @@
       "path": "apps/backend/src/modules/conversation/migrations/0245_w3_comparison_reader.sql",
       "checksum": "4fcb07080002cd2001c565444bcbe870d868ca5b13e32224b6feb3d8849be834",
       "name": "w3_comparison_reader"
+    },
+    {
+      "version": "0246_comparison_artifact_scope",
+      "owner": "W8",
+      "path": "apps/backend/src/modules/trust/0246_comparison_artifact_scope.sql",
+      "checksum": "22de8203086fd7f7ad18140c087d0aa6355390616b90511da280bc71296c1b3f",
+      "name": "comparison_artifact_scope"
     }
   ],
   "purposeProfiles": [
     {
       "review": "original",
-      "sha256": "65f18199c73cc9cf75b37c3ea863194f8656dd18a0582e3b0c3c309c599396ae"
+      "sha256": "197a34966fe21e458ab63e4f94bdcec618052f84504cfa5e52a27cffaad78d29"
     },
     {
       "review": "original-incoming",
-      "sha256": "e4319a6c5d2d3745d74127efbd9bbb3e55652e86f7ec7604c8d594436315440e"
+      "sha256": "c64f5e02ac856ec49fbc7a87fdb4430fa36893fd42bc47ccbc92d0a4505cd1b1"
     }
   ],
   "runtimeCatalogues": {
@@ -84,7 +91,7 @@
   "outputCatalogueChecksum": "4b25e810204d989ebdf73e5be801f0896311653d6084cb58ce5060840fecee50",
   "publicCatalogueChecksum": "c2470500a034b9cd0368690b57b2c83b45f2e0c0fbbe089461bcd8fd68cbecec",
   "agentExportCatalogueChecksum": "1c3ad7a29dddbfb24a4181cc5af219d55f1eed5a8261c603daff605ef3dc18f2",
-  "conversationCursorCatalogueChecksum": "98e886fd0ce77a3d64f0452fad09fb0cfcd43b203a5b7515527a162a718556a6",
+  "conversationCursorCatalogueChecksum": "a8e7dbfb12280cddeea1f4e3b8eb7845600c5634bfa9de1e4f7cfa7b6e8e8c17",
   "provenancePurgeCatalogueChecksum": "1e4ab214abeb8d36ade388bfdef1d9a3227d675302d786e2bff1fd4738847adf",
   "provenancePurgeIncomingCatalogueChecksum": "da4fcfec2f052e6c1e21a4aef41b11b6c55dc371b11124a234e98f7faf4920b1",
   "workerCatalogues": {
@@ -128,6 +135,6 @@
       "definitionSha256": "5b39ca6d3af5cd279117e614e955ca88c4eaef50c5735ad4ac42531942f1cbab",
       "catalogueChecksum": "da218034389815e7198ed8bf1bdd3f93d39a675944d9b3ddb6cb1d18416324ce"
     },
-    "artifactsCatalogueChecksum": "f50dde0bd42419e4574770114b65543603bfb94cbd74bc3ecc00d6fb08977940"
+    "artifactsCatalogueChecksum": "e63b8cdcc37f639ea289d3b3e19f20f26fc1bb8fe8f504a7db1d306aa2b8046b"
   }
 }

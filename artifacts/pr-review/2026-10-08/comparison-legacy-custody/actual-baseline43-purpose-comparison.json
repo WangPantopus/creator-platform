@@ -1,0 +1,75 @@
+{
+  "kind": "read-only actual original application metadata, no activation or comparison authority",
+  "observedAt": "2026-10-08T17:40:24.565Z",
+  "sha256": "f9546dd7aa5270553ddb2215bc2e0b1ade2fe861ea494081a405295ffd616517",
+  "isolatedSha256": "b4ff2c810376652b388643f539a76299cf4c8c7f98a12027b360ab220b7cf680",
+  "differences": [
+    {
+      "path": ".schema.sha256",
+      "a": "856bd282e104fc681cf472aff290fde221fb4bb4f9e2909516e9d24169f87795",
+      "b": "5d59e9dcdd807486bc7273dbe7a8bc6e81fbb615994c791329f4e192c746c125"
+    },
+    {
+      "path": ".schema.metadata.relations.1.grants.0",
+      "b": "creator_w2_privacy_export=arwdDxtm/creator_w2_privacy_export"
+    },
+    {
+      "path": ".schema.metadata.relations.75.grants.0",
+      "b": "creator_w5_content_privacy_export=arwdDxtm/creator_w5_content_privacy_export"
+    },
+    {
+      "path": ".schema.metadata.relations.89.grants.0",
+      "b": "creator_w3_privacy_export=arwdDxtm/creator_w3_privacy_export"
+    },
+    {
+      "path": ".schema.metadata.relations.134.grants.0",
+      "b": "creator_usage_detachment=arwdDxtm/creator_usage_detachment"
+    },
+    {
+      "path": ".schema.metadata.relations.135.grants.0",
+      "b": "creator_usage_detachment=arwdDxtm/creator_usage_detachment"
+    },
+    {
+      "path": ".schema.metadata.relations.136.grants.0",
+      "b": "creator_usage_detachment=arwdDxtm/creator_usage_detachment"
+    },
+    {
+      "path": ".schema.metadata.relations.137.grants.0",
+      "b": "creator_domain_privacy_fence=arwdDxtm/creator_domain_privacy_fence"
+    },
+    {
+      "path": ".schema.metadata.relations.142.grants.0",
+      "b": "creator_privacy_fence=arwdDxtm/creator_privacy_fence"
+    },
+    {
+      "path": ".schema.metadata.relations.151.grants.0",
+      "b": "creator_usage_expiry=arwdDxtm/creator_usage_expiry"
+    },
+    {
+      "path": ".schema.metadata.relations.152.grants.0",
+      "b": "creator_usage_expiry=arwdDxtm/creator_usage_expiry"
+    },
+    {
+      "path": ".schema.metadata.memberships.0",
+      "b": {
+        "role": "creator_runtime",
+        "member": "creator_journey_growth_api_20261007",
+        "grantor": "postgres",
+        "admin_option": false,
+        "inherit_option": true,
+        "set_option": true
+      }
+    },
+    {
+      "path": ".schema.metadata.memberships.1",
+      "b": {
+        "role": "growth_runtime",
+        "member": "creator_journey_growth_api_20261007",
+        "grantor": "postgres",
+        "admin_option": false,
+        "inherit_option": true,
+        "set_option": true
+      }
+    }
+  ]
+}

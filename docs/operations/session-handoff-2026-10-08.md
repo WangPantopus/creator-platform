@@ -1,5 +1,30 @@
 # Session handoff — October 8, 2026
 
+## Active continuation — scoped export recovery and legacy expiry
+
+Continue on `codex/comparison-legacy-custody-20261008` in637b. The
+[scope/legacy increment](../../artifacts/pr-review/2026-10-08/comparison-legacy-custody/README.md)
+reserves0246, skips only unrelated known captures under the original held deletion,
+and physically removes exact original legacy artifacts only after their own saved
+expiry. Six isolated SQL/filesystem cases pass on pending graph21 and restored
+numbered graph23. Complete graph22→restore23 metadata is identical. All eight
+comparison sources remain unregistered; the actual graph is still106.
+
+Actual baseline read-only review found ten old explicit owner-ACL representations
+and the incoming Growth role name differ from the isolated schema-only review;
+all other metadata and old purpose permissions match. Next extend the exact wave
+runner and independently review a closed populated original restore. Do not copy
+actual readback into an approval profile. Unexpired unmapped files remain pending;
+legacy downloads will fail closed after activation. Actual comparison UI/provider
+and preserved revision13 upgrade remain next, followed by every full-plan milestone.
+
+PR346 merged6e2201f64 with all11 head checks passing. PR347 targets main atf9a25ba09;
+refresh its checks. PR345 main37812330409 failed because the hosted Android runner
+lost communication; its failed job is rerunning. That rerun cancelled346's separate
+main37819217990; refresh and rerun the newest main after the old rerun settles.
+Original backendb93e5d7c2 stays on57304, web3119; both native devices are stopped
+with state intact. No original data, clock, file or publication was changed.
+
 ## Active continuation — comparison runtime integration
 
 Continue on `codex/comparison-runtime-integration-20261008` in637b. The

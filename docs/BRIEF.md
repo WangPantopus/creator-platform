@@ -313,3 +313,13 @@ Resolve these during the design pass (proposals in the [design plan](DESIGN_PLAN
 10. **Brand name, colors, approved-draft treatment, theme default, AI vs human voice player, Discover's lead, studio density:** the seven open questions in Product Design section 12.
 
 | 2026-10-08 | Comparison source integration uses the original Trust worker and protected store; numbered SQL remains reserved until the preserved-data upgrade and legacy export/file lifecycle are operated. No legacy consent or source mapping is inferred from an empty export. [Evidence](../artifacts/pr-review/2026-10-08/comparison-runtime-integration/README.md). |
+
+### October 8 — original export scope and legacy retention
+
+Known unrelated export attempts no longer hold a different source deletion open.
+Legacy files without comparison provenance remain unknown; only their exact
+original task manifest and real elapsed expiry authorize recovery removal. No
+consent, source mapping or historical clock is backfilled. The isolated restored
+operations and remaining activation constraints are recorded in the
+[scope/legacy milestone](../artifacts/pr-review/2026-10-08/comparison-legacy-custody/README.md).
+All product finish criteria remain unchanged.

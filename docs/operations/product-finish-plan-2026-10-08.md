@@ -9,6 +9,14 @@ The product is substantially implemented and remains incomplete.
 
 ## Continuing execution
 
+[Scoped artifact recovery and legacy expiry](../../artifacts/pr-review/2026-10-08/comparison-legacy-custody/README.md)
+now distinguish unrelated mapped live exports and permit exact expired legacy
+cleanup under the original task. Six real isolated SQL/filesystem cases pass on
+a complete restored graph. The eight reserved sources still need the closed
+populated upgrade; actual owner ACL and incoming-role representation require
+independent review. Unexpired unknown mapping remains pending. Actual comparison
+controls/provider/upgrade and every ten-milestone finish criterion remain open.
+
 [Comparison runtime integration](../../artifacts/pr-review/2026-10-08/comparison-runtime-integration/README.md)
 now has seven reserved numbered sources, complete combined catalogue/restore
 review and gated original host, export/store, withdrawal and expiry composition.
