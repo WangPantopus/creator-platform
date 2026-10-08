@@ -258,7 +258,8 @@ Still to confirm:
 Inputs only the founder can supply:
 
 1. The Pantopus sign-in contract (Q01), or a decision to launch the pilot with an interim
-   sign-in.
+   sign-in. What is needed, and four decisions, are in the
+   [identity contract](operations/pantopus-identity-contract.md).
 2. The final domain and relying-party ID (Q09). Passkeys and universal links depend on it.
 3. Apple Developer and Google Play accounts, TestFlight and closed testing, and at least one
    physical iPhone and one Android phone (Q10, Q11).
