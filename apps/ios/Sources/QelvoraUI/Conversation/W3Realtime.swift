@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 
 enum W3RealtimeEvent: Sendable {
     case connected
@@ -139,6 +140,9 @@ actor W3Realtime {
                 for owner in owners { try emit(.frame(frame), to: owner) }
             }
         } catch {
+            #if DEBUG
+            Logger(subsystem: "com.pantopus.qelvora", category: "conversation-realtime").debug("socket_closed code=\(connection.socket.closeCode.rawValue, privacy: .public)")
+            #endif
             let denied = connection.socket.closeCode == .policyViolation || (connection.socket.response as? HTTPURLResponse)?.statusCode == 401
             stop(connection, error: denied ? accountChanged : error)
         }

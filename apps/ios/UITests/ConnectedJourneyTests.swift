@@ -5,6 +5,84 @@ import XCTest
 /// No account, consent, publication, message or provider response is seeded here.
 @MainActor
 final class ConnectedJourneyTests: XCTestCase {
+    /// Read-only check of the real reply while the software keyboard is open.
+    func testKeyboardKeepsLatestReply() throws {
+        let environment = ProcessInfo.processInfo.environment
+        guard let origin = environment["QELVORA_E2E_API_URL"],
+              let destination = environment["QELVORA_E2E_THREAD"],
+              let creator = environment["QELVORA_E2E_CREATOR"],
+              let expected = environment["QELVORA_E2E_LATEST_TEXT"] else {
+            throw XCTSkip("Requires an explicitly selected running development journey.")
+        }
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["--api-url", origin, "--return-to", destination,
+                               "--appearance", environment["QELVORA_E2E_APPEARANCE"] ?? "light",
+                               "-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
+        app.launch()
+        let composer = app.textFields["Message \(creator)'s AI"]
+        XCTAssertTrue(composer.waitForExistence(timeout: 30))
+        composer.tap(); composer.typeText("Unsent keyboard check")
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 10))
+        capture(app, name: "Read-keyboard-before-visibility-check")
+        let reply = app.staticTexts.matching(NSPredicate(format: "label == %@", expected)).allElementsBoundByIndex.last
+        XCTAssertTrue(reply?.isHittable == true)
+        XCTAssertTrue(app.buttons["Ask \(creator) to step in"].isHittable)
+        capture(app, name: "Read-keyboard-visible-reply")
+        composer.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: "Unsent keyboard check".count))
+    }
+
+    /// Explicit opt-in: one real send, no synthetic model or automatic resend.
+    func testSendMessageWithKeyboard() throws {
+        let environment = ProcessInfo.processInfo.environment
+        guard let origin = environment["QELVORA_E2E_API_URL"],
+              let destination = environment["QELVORA_E2E_THREAD"],
+              let creator = environment["QELVORA_E2E_CREATOR"],
+              let prompt = environment["QELVORA_E2E_PROMPT"],
+              let expected = environment["QELVORA_E2E_REPLY_CONTAINS"] else {
+            throw XCTSkip("Requires an explicitly authorized live development send.")
+        }
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["--api-url", origin, "--return-to", destination,
+                               "--appearance", environment["QELVORA_E2E_APPEARANCE"] ?? "light",
+                               "-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
+        app.launch()
+        defer { capture(app, name: "Send-final-state") }
+        let composer = app.textFields["Message \(creator)'s AI"]
+        XCTAssertTrue(composer.waitForExistence(timeout: 30))
+        composer.tap()
+        composer.typeText(prompt)
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 10))
+        let send = app.buttons["Send"]
+        XCTAssertTrue(wait(send, predicate: "enabled == true", seconds: 30))
+        capture(app, name: "Send-keyboard-ready")
+        let started = ProcessInfo.processInfo.systemUptime
+        send.tap()
+        XCTAssertTrue(wait(composer, predicate: "value != %@", argument: prompt, seconds: 90))
+        let accepted = ProcessInfo.processInfo.systemUptime - started
+        composer.typeText("Unsent verification draft")
+        XCTAssertTrue(wait(send, predicate: "enabled == true", seconds: 90))
+        let completed = ProcessInfo.processInfo.systemUptime - started
+        XCTAssertEqual(composer.value as? String, "Unsent verification draft")
+        // An authorization refresh can conceal and recreate the field. Resume
+        // through its actual touch target before editing the retained draft.
+        composer.tap()
+        composer.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: "Unsent verification draft".count))
+        capture(app, name: "Send-keyboard-completed")
+        let reply = app.staticTexts.matching(NSPredicate(format: "label CONTAINS[cd] %@", expected)).allElementsBoundByIndex.last
+        XCTAssertNotNil(reply)
+        XCTAssertTrue(reply?.isHittable == true)
+        XCTAssertTrue(app.buttons["Ask \(creator) to step in"].isHittable)
+        let timing = XCTAttachment(string: "draftClearedAfterSeconds=\(accepted)\nsendAvailableAfterSeconds=\(completed)\nUI observations; not HTTP timing or percentile qualification.")
+        timing.name = "Send-timing"; timing.lifetime = .keepAlways; add(timing)
+    }
+
+    private func wait(_ element: XCUIElement, predicate: String, argument: String? = nil, seconds: TimeInterval) -> Bool {
+        let condition = argument.map { NSPredicate(format: predicate, $0) } ?? NSPredicate(format: predicate)
+        return XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: condition, object: element)], timeout: seconds) == .completed
+    }
+
     func testPublishedConversationSurvivesNativeRelaunch() throws {
         let environment = ProcessInfo.processInfo.environment
         guard let origin = environment["QELVORA_E2E_API_URL"],

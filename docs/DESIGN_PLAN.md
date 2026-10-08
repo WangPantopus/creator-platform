@@ -23,6 +23,12 @@ W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan expor
 
 ## Implementation continuation
 
+- [x] October 8, 2026: operate bounded new native sends, stable keyboard/drafts and current
+  connection/account recovery, preserving every actual provider result and cost.
+  Actual iOS Light/Night and Android Light/Night keyboard checks pass; complete
+  native acceptance, largest text, physical devices and latency remain open.
+  [Native message reliability evidence](../artifacts/pr-review/2026-10-08/native-message-reliability/README.md).
+
 - [x] October 8, 2026: operate the preserved conversation in launched iOS and
   Android apps, repair initial reply visibility and Android cold navigation,
   and verify citations, consent, theme and account boundaries through actual UI.

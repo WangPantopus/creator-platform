@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import OSLog
 
 struct W3Message: Decodable, Identifiable, Sendable {
     let id: String; let threadId: String; let authorKind: APIMessageAuthorKind
@@ -271,7 +272,7 @@ final class W3ThreadModel: ObservableObject {
             let body = try JSONEncoder().encode(APISendMessage(text: item.text, idempotencyKey: item.key, clientSequence: item.clientSequence))
             if item.destination == "fan-replies" { let _: APIMessage = try await client.request(root + "/fan-replies", body: body) }
             else { let _: APIAcceptedMessage = try await client.request(root + "/messages", body: body) }
-            pending = nil; if !retry { draft = "" }; await refresh()
+            pending = nil; if draft.trimmingCharacters(in: .whitespacesAndNewlines) == item.text { draft = "" }; await refresh()
         } catch { let status = (error as? W3Failure)?.status; pending?.uncertain = status == nil || status! >= 500 || status == 409; pending?.rejected = !(pending?.uncertain ?? true); failed(error) }
     }
     func earlier() async {
@@ -315,6 +316,18 @@ final class W3ThreadModel: ObservableObject {
         } catch { failed(error); return false }
     }
     private func failed(_ error: Error) {
+        #if DEBUG
+        // Fixed domains/numeric codes only; never log errors' descriptions,
+        // URLs, credentials, message content or account identifiers.
+        let diagnostic = Logger(subsystem: "com.pantopus.qelvora", category: "conversation-realtime")
+        if let failure = error as? W3Failure { diagnostic.debug("conversation_refused status=\(failure.status, privacy: .public)") }
+        else if (error as NSError).domain == NSURLErrorDomain { diagnostic.debug("conversation_transport_failed code=\((error as NSError).code, privacy: .public)") }
+        else if (error as NSError).domain == NSPOSIXErrorDomain { diagnostic.debug("conversation_socket_failed code=\((error as NSError).code, privacy: .public)") }
+        else if error is ThreadDeliveryError { diagnostic.debug("conversation_replay_required") }
+        else if error is CancellationError { diagnostic.debug("conversation_cancelled") }
+        else if error is DecodingError { diagnostic.debug("conversation_decode_failed") }
+        else { diagnostic.debug("conversation_local_failed") }
+        #endif
         transportReady = false; offline = true
         if let id = activeLease { Task { await W3Realtime.shared.release(id) } }
         Task { [weak self] in await self?.showOffline() }

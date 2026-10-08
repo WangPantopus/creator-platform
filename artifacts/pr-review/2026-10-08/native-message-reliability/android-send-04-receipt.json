@@ -1,0 +1,168 @@
+{
+  "at": "2026-10-08T10:42:42.535Z",
+  "database": "creator_generation_journey43_20261007",
+  "scope": "Actual published revision13, continued through the current compiled engine selector on a separately restored labelled development copy; fictional identity and licence, real authorized provider. Not existing-version upgrade or production qualification.",
+  "usageRows": 49,
+  "usageSha256": "d348d0cc358bf0e8fcb332af5b0bc2ce767561c7e097008a1a5b109e3d416acd",
+  "costMicros": 31370,
+  "settledUnits": 41,
+  "originalEightGenerationReceipt": "/Users/yingpengwang/.codex/visualizations/2026/10/07/01a11784-60b1-7fe3-8855-82bddf4675b6/conversation-commerce-completion/operation43-compatibility-native-milestone-light-final-20261008.json",
+  "unchangedOriginalEvidence": {
+    "version": true,
+    "evaluation": true,
+    "perGeneration": true,
+    "messages": true,
+    "reservations": true,
+    "originalUsageRows": true
+  },
+  "additionalPerGeneration": [
+    {
+      "id": "39d9acb6-8cae-4adc-b31c-a9c8280760d9",
+      "state": "delivered",
+      "accepted_at": "2026-10-08T10:14:03.435Z",
+      "first_visible_at": "2026-10-08T10:14:30.030Z",
+      "completed_at": "2026-10-08T10:14:31.855Z",
+      "last_sequence": 1,
+      "acceptedToFirstStoredMs": 26595,
+      "acceptedToTerminalMs": 28420,
+      "calls": 4,
+      "costMicros": 3122
+    },
+    {
+      "id": "ab5dd350-2810-4cde-9457-7df594efcd16",
+      "state": "delivered",
+      "accepted_at": "2026-10-08T10:23:46.849Z",
+      "first_visible_at": "2026-10-08T10:24:05.761Z",
+      "completed_at": "2026-10-08T10:24:09.039Z",
+      "last_sequence": 1,
+      "acceptedToFirstStoredMs": 18912,
+      "acceptedToTerminalMs": 22190,
+      "calls": 4,
+      "costMicros": 1093
+    },
+    {
+      "id": "0a57925a-6220-4c90-b4d2-2aa3045b4ce2",
+      "state": "delivered",
+      "accepted_at": "2026-10-08T10:31:58.638Z",
+      "first_visible_at": "2026-10-08T10:32:18.689Z",
+      "completed_at": "2026-10-08T10:32:22.158Z",
+      "last_sequence": 1,
+      "acceptedToFirstStoredMs": 20051,
+      "acceptedToTerminalMs": 23520,
+      "calls": 4,
+      "costMicros": 1079
+    },
+    {
+      "id": "81f1a805-63a9-4709-9a2c-749888434e00",
+      "state": "delivered",
+      "accepted_at": "2026-10-08T10:41:14.599Z",
+      "first_visible_at": "2026-10-08T10:41:33.518Z",
+      "completed_at": "2026-10-08T10:41:36.721Z",
+      "last_sequence": 1,
+      "acceptedToFirstStoredMs": 18919,
+      "acceptedToTerminalMs": 22122,
+      "calls": 4,
+      "costMicros": 1091
+    }
+  ],
+  "additionalMessages": [
+    {
+      "id": "2376ee14-438d-46de-8db7-ff50da559170",
+      "author_kind": "fan",
+      "text": "For a freshly thrown mug, what covering does Maya recommend while it dries? Please answer in one short sentence.",
+      "delivery_state": "accepted",
+      "citations": [],
+      "sequence": 17
+    },
+    {
+      "id": "02895ea6-e660-4e73-8094-fa0c7d960800",
+      "author_kind": "ai",
+      "text": "I\u2019m Maya\u2019s AI. I can\u2019t answer that from the approved sources. You can ask Maya directly.",
+      "delivery_state": "delivered",
+      "citations": [],
+      "sequence": 18
+    },
+    {
+      "id": "674c1041-3063-4e05-a17f-35bc24bca6dc",
+      "author_kind": "fan",
+      "text": "Please say hello from Maya's AI in one short sentence, without pottery advice.",
+      "delivery_state": "accepted",
+      "citations": [],
+      "sequence": 19
+    },
+    {
+      "id": "6473316f-95b3-47b7-8ede-87a3c17182f8",
+      "author_kind": "ai",
+      "text": "Hello, I am Maya's AI, here to assist you with your questions.",
+      "delivery_state": "delivered",
+      "citations": [],
+      "sequence": 20
+    },
+    {
+      "id": "b8743204-1f6a-4efc-ab5f-b0b113f64456",
+      "author_kind": "fan",
+      "text": "Please say hello from Maya's AI in one short sentence, without pottery advice.",
+      "delivery_state": "accepted",
+      "citations": [],
+      "sequence": 21
+    },
+    {
+      "id": "5934386d-6889-40f8-84b1-7b8e039cc8de",
+      "author_kind": "ai",
+      "text": "Hello, I am Maya's AI, here to assist you with your questions.",
+      "delivery_state": "delivered",
+      "citations": [],
+      "sequence": 22
+    },
+    {
+      "id": "bfe2d2ca-f0b6-4978-8afd-3209fbd9d7a4",
+      "author_kind": "fan",
+      "text": "Please say hello from Maya's AI in one short sentence, without pottery advice.",
+      "delivery_state": "accepted",
+      "citations": [],
+      "sequence": 23
+    },
+    {
+      "id": "57028fe6-b5d2-4168-aa16-b63e2bbafc71",
+      "author_kind": "ai",
+      "text": "Hello, I am Maya's AI, here to assist you with your questions.",
+      "delivery_state": "delivered",
+      "citations": [],
+      "sequence": 24
+    }
+  ],
+  "additionalReservations": [
+    {
+      "key": "generation:0a57925a-6220-4c90-b4d2-2aa3045b4ce2",
+      "state": "consumed",
+      "units": 60,
+      "settled_units": 2,
+      "output_delivered": true,
+      "original_settled_at": "2026-10-08T10:32:23.420Z"
+    },
+    {
+      "key": "generation:39d9acb6-8cae-4adc-b31c-a9c8280760d9",
+      "state": "consumed",
+      "units": 60,
+      "settled_units": 4,
+      "output_delivered": true,
+      "original_settled_at": "2026-10-08T10:14:33.145Z"
+    },
+    {
+      "key": "generation:81f1a805-63a9-4709-9a2c-749888434e00",
+      "state": "consumed",
+      "units": 60,
+      "settled_units": 2,
+      "output_delivered": true,
+      "original_settled_at": "2026-10-08T10:41:37.986Z"
+    },
+    {
+      "key": "generation:ab5dd350-2810-4cde-9457-7df594efcd16",
+      "state": "consumed",
+      "units": 60,
+      "settled_units": 2,
+      "output_delivered": true,
+      "original_settled_at": "2026-10-08T10:24:10.319Z"
+    }
+  ]
+}

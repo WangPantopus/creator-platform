@@ -1,0 +1,10 @@
+{
+  "simulator": "D5ED8A7C-924E-4F1E-AC35-DB0FACF1E1B0",
+  "ios": "26.5 x86_64 on Intel macOS",
+  "android": "qelvora_finish_20261008 Pixel 7 API 35 x86_64",
+  "ios02Adjustment": "Only the mediaanalysisd process belonging to this dedicated simulator was suspended (SIGSTOP) after observing ~9 CPU cores consumed during ios01. No authorization or product deadline changed. Resume before simulator shutdown. This is functional evidence, not latency qualification.",
+  "activeSuspendedPid": null,
+  "PR337postMergeWorkflow": "https://github.com/WangPantopus/creator-platform/actions/runs/37764366158",
+  "PR337postMergeChecks": "all five success at 715cc0728d417f40e97d41eec64cab6e4121cd6f",
+  "iosSimulatorCleanup": "Owned mediaanalysisd PID 86332 resumed with SIGCONT and dedicated simulator shut down after Night keyboard read 04."
+}

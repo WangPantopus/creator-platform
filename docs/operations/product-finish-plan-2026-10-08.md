@@ -27,6 +27,15 @@ backed by passing iOS Night and Android Light/Night connected UI journeys.
 It is limited to the operated flows; new native sends, interruption/keyboard/largest
 text, physical devices and the rest of the finish criteria remain outstanding.
 
+PR #337 merged at `715cc0728d417f40e97d41eec64cab6e4121cd6f`; all ten head
+checks and all five post-merge checks passed. The [native send increment](../../artifacts/pr-review/2026-10-08/native-message-reliability/README.md)
+now passes actual sends, retained drafts and keyboard/reconnection checks on
+both native apps, including Android account reconfirmation. All eighteen actual
+operations and failures remain preserved. Copy 43 has seventeen delivered and
+one original zero-provider failed operation; its original eight operations and
+33 usage rows are unchanged. This bounded milestone does not qualify the missing
+existing-version upgrade, full native acceptance or useful-response latency.
+
 ## Refreshed starting point
 
 - Continuation branch: `codex/shadow-evidence-lifetime-20261008`, retaining

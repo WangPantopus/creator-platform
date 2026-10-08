@@ -1,0 +1,9 @@
+getpwuid_r did not find a match for uid 501
+Filtering the log data using "subsystem == "com.pantopus.qelvora" AND category == "conversation-realtime""
+Timestamp               Ty Process[PID:TID]
+2026-10-08 03:56:07.503 Db QelvoraApp[86460:31046a] [com.pantopus.qelvora:conversation-realtime] socket_closed code=1005
+2026-10-08 03:56:07.510 Db QelvoraApp[86460:310426] [com.pantopus.qelvora:conversation-realtime] conversation_local_failed
+2026-10-08 03:56:11.016 Db QelvoraApp[86460:310465] [com.pantopus.qelvora:conversation-realtime] socket_closed code=1005
+2026-10-08 03:56:12.240 Db QelvoraApp[86460:310426] [com.pantopus.qelvora:conversation-realtime] conversation_local_failed
+2026-10-08 03:56:21.593 Db QelvoraApp[86460:310465] [com.pantopus.qelvora:conversation-realtime] socket_closed code=1005
+2026-10-08 03:56:21.593 Db QelvoraApp[86460:310426] [com.pantopus.qelvora:conversation-realtime] conversation_local_failed

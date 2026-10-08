@@ -149,7 +149,11 @@ export function attachRealtime(
             const deadline = setTimeout(() => {
               if (connection.readyState !== WebSocket.OPEN) return;
               report("increment", "realtime_authority_deadline_closed", 1);
-              connection.close(1008, "Reconnect with current authority");
+              // A bounded authority read timed out; it did not establish an
+              // access denial. Close immediately, but let clients reconnect
+              // through a fresh authorized snapshot instead of treating this
+              // operational deadline as a revoked session (1008).
+              connection.close(1013, "Reconnect with current authority");
             }, 2000);
             deadline.unref();
             const batchStart = performance.now();

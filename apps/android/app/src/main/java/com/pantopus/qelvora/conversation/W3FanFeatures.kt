@@ -101,6 +101,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     var error by remember(root, accountId) { mutableStateOf("") }
     var offline by remember(root, accountId) { mutableStateOf(true) }
     var transportReady by remember(root, accountId) { mutableStateOf(false) }
+    var connectionRetry by remember(root, accountId) { mutableStateOf(0) }
     var busy by remember(root, accountId) { mutableStateOf(false) }
     var introOfferId by remember(root, accountId) { mutableStateOf<String?>(null) }
     var privacy by remember(root, accountId) { mutableStateOf(false) }
@@ -183,7 +184,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         if (failure is ConversationFailure && failure.status in listOf(401,403,404)) { offlineShowing = false; offlineContext?.let { ConversationOfflineStorage.purge(it) }; offlineContext = null; page = null; older = emptyList(); before = null; draft = ""; pending = null; gate = null; source = null; privacy = false; transportReady = false; scope.launch { runCatching { resumeStorage.remove(accountId, storageScope) } } }
         else scope.launch { showOffline() }
     }
-    suspend fun refresh() {
+    suspend fun refresh(propagateFailure: Boolean = false) {
         val run = viewRun
         if (!foreground || privacy) return
         try {
@@ -200,7 +201,10 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 offline = !transportReady; error = ""
                 pending?.let { item -> if (client.request("$root/messages/status", buildJsonObject { put("idempotencyKey", item.key) }).jsonObject["accepted"]?.jsonPrimitive?.boolean == true && pending?.key == item.key) { pending = null; if (draft.trim() == item.text) draft = "" } }
             }
-        } catch (failure: Throwable) { if (run == viewRun) fail(failure) }
+        } catch (failure: Throwable) {
+            if (run == viewRun) fail(failure)
+            if (propagateFailure) throw failure
+        }
     }
     LaunchedEffect(baseURL, root, accountId, foreground, privacy) {
         if (!foreground || privacy) {
@@ -234,21 +238,21 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             val path = item.destination
             val result = client.request("$root/$path", buildJsonObject { put("text", item.text); put("idempotencyKey", item.key); put("clientSequence", item.sequence) })
             if (path == "messages") client.json.decodeFromJsonElement<APIAcceptedMessage>(result) else client.json.decodeFromJsonElement<APIMessage>(result)
-            pending = null; if (!retry) draft = ""; refresh()
+            pending = null; if (draft.trim() == item.text) draft = ""; refresh()
         } catch (failure: Throwable) { val uncertain = failure !is ConversationFailure || failure.status >= 500 || failure.status == 409; pending = item.copy(uncertain = uncertain, rejected = !uncertain); fail(failure) }
         finally { busy = false }
     }
-    LaunchedEffect(baseURL, root, accountId, foreground, privacy) {
+    LaunchedEffect(baseURL, root, accountId, foreground, privacy, connectionRetry) {
         transportReady = false; offline = true
         if (!foreground || privacy) return@LaunchedEffect
         var backoff = 1000L
         while (isActive) {
             try {
-                refresh()
+                refresh(propagateFailure = true)
                 val current = page
                 val currentGate = gate
                 if (current != null && currentGate != null && error.isEmpty()) coroutineScope {
-                    val metadata = launch { while (isActive) { delay(15000); refresh() } }
+                    val metadata = launch { while (isActive) { delay(15000); refresh(propagateFailure = true) } }
                     try {
                         // A cursor without cached content is not a checkpoint.
                         // The freshly authorized atomic page is the resume base.
@@ -256,11 +260,11 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                             when (event) {
                                 ConversationRealtimeEvent.Connected -> {
                                     transportReady = true; backoff = 1000L
-                                    refresh()
+                                    refresh(propagateFailure = true)
                                 }
                                 is ConversationRealtimeEvent.Frame -> {
                                     val delivery = gate ?: throw ConversationFailure(503, "Reconnect to refresh this conversation.")
-                                    if (delivery.receive(event.value).isNotEmpty()) refresh()
+                                    if (delivery.receive(event.value).isNotEmpty()) refresh(propagateFailure = true)
                                 }
                             }
                         }
@@ -290,7 +294,13 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     BoxWithConstraints(Modifier.fillMaxSize().widthIn(max = 390.dp)) {
     // Keep the actual conversation and its privacy notice reachable when
     // enlarged text or the keyboard leaves too little room for fixed controls.
-    val scrollControls = LocalDensity.current.fontScale >= 1.5f || maxHeight < 480.dp
+    val density = LocalDensity.current
+    // Keep the composer in the same composition when the IME opens. Moving
+    // the focused field between the fixed footer and list destroys its focus
+    // and immediately closes the keyboard again.
+    val heightWithoutKeyboard = maxHeight + with(density) { WindowInsets.ime.getBottom(this).toDp() }
+    val keyboardVisible = WindowInsets.ime.getBottom(density) > 0
+    val scrollControls = density.fontScale >= 1.5f || heightWithoutKeyboard < 480.dp
     LaunchedEffect(current?.threadId, current?.messages?.lastOrNull(), pending?.key, scrollControls, maxHeight) {
         if (current != null && followingReply && !scroll.isScrollInProgress) {
             positioningReply = true
@@ -305,7 +315,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     Column(Modifier.fillMaxSize().background(qColor("ground"))) {
         if (current == null) {
             Notice(title = "Conversation unavailable", children = if (error.isEmpty()) "Loading your messages…" else error)
-            Button("Refresh", variant = ButtonVariant.SECONDARY) { scope.launch { refresh() } }
+            Button("Refresh", variant = ButtonVariant.SECONDARY) { connectionRetry++ }
             Button("Help and safety", variant = ButtonVariant.QUIET) { session.open("/support") }
         } else {
             val header: @Composable () -> Unit = {
@@ -336,13 +346,13 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             val composer: @Composable () -> Unit = {
                 Column(Modifier.imePadding().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     if (!current.canSend) Notice(title = "AI unavailable", children = current.unavailableReason ?: "Messaging is unavailable.")
+                    Button("Ask ${current.creatorName} to step in", variant = ButtonVariant.MAYA, block = true) { session.open("/commerce/packet?creatorId=$creatorId") }
                     if (scrollControls) {
                         BasicText(messageLabel, style = qText("label").copy(color = qColor("ink")))
                         input(Modifier.fillMaxWidth())
                         sendButton()
                     } else Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { input(Modifier.weight(1f)); sendButton() }
-                    Button("Ask ${current.creatorName} to step in", variant = ButtonVariant.MAYA, block = true) { session.open("/commerce/packet?creatorId=$creatorId") }
-                    if (scrollControls) Column { privacyControls() } else Row { privacyControls() }
+                    if (!keyboardVisible) { if (scrollControls) Column { privacyControls() } else Row { privacyControls() } }
                 }
             }
             if (!scrollControls) header()

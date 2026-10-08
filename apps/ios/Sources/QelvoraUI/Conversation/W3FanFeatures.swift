@@ -1,4 +1,7 @@
 import SwiftUI
+#if os(iOS)
+import UIKit
+#endif
 
 @MainActor
 public enum W3FanFeatures {
@@ -47,6 +50,7 @@ private struct W3ThreadScreen: View {
     @State private var originalReply: W3Message?
     @State private var sourceFailure = ""
     @State private var connectionRetry = 0
+    @FocusState private var composerFocused: Bool
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var scheme
     init(baseURL: URL, creatorId: String, fanId: String, session: FanSession) {
@@ -88,19 +92,29 @@ private struct W3ThreadScreen: View {
                         // content growth visible. SwiftUI preserves a reader's
                         // deliberate scroll away from that default position.
                         .defaultScrollAnchor(.bottom)
+                        .scrollDismissesKeyboard(.interactively)
+                        #if os(iOS)
+                        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardDidShowNotification)) { _ in
+                            // The default anchor does not follow the viewport
+                            // contraction when the software keyboard appears.
+                            // Align after that OS transition, only when editing.
+                            if composerFocused { proxy.scrollTo("conversation-end", anchor: .bottom) }
+                        }
+                        #endif
                         .onChange(of: model.pending?.key) { _, sent in if sent != nil { proxy.scrollTo("conversation-end", anchor: .bottom) } }
                 }
                 VStack(spacing: QelvoraTokens.space3) {
                     if !page.canSend { Notice(title: "AI unavailable", children: page.unavailableReason ?? "Messaging is unavailable.") }
+                    Button("Ask \(page.creatorName) to step in", variant: .maya, block: true) { session.open("/commerce/packet?creatorId=" + model.creatorId) }
                     HStack(alignment: .bottom, spacing: QelvoraTokens.space2) {
                         TextField(page.control == .human_active ? "Message \(page.creatorName)…" : "Message \(page.creatorName)'s AI…", text: $model.draft, axis: .vertical)
                             .lineLimit(1...5).qText("body").padding(12).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusMd))
                             .accessibilityLabel(page.control == .human_active ? "Message \(page.creatorName)" : "Message \(page.creatorName)'s AI")
+                            .focused($composerFocused)
                             .onChange(of: model.draft) { _, value in if value.count > 2000 { model.draft = String(value.prefix(2000)) } }
                         Button("Send", variant: page.control == .human_active ? .maya : .ai, disabled: scenePhase != .active || privacy || source != nil || originalReply != nil || !page.canSend || model.offline || model.busy || model.pending != nil || !page.generationSequences.isEmpty || model.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) { Task { await model.send() } }
                     }
-                    Button("Ask \(page.creatorName) to step in", variant: .maya, block: true) { session.open("/commerce/packet?creatorId=" + model.creatorId) }
-                    HStack { Button("Me and privacy", variant: .quiet) { privacy = true }; Button("Get support", variant: .quiet) { session.open("/support") } }
+                    if !composerFocused { HStack { Button("Me and privacy", variant: .quiet) { privacy = true }; Button("Get support", variant: .quiet) { session.open("/support") } } }
                 }.padding(QelvoraTokens.space4).background(qColor("ground", scheme))
             } else {
                 Notice(title: "Conversation unavailable", children: model.failure.isEmpty ? "Loading your messages…" : model.failure).padding(16)

@@ -2,6 +2,10 @@ package com.pantopus.qelvora
 
 import android.content.Intent
 import android.graphics.Bitmap
+import android.os.SystemClock
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
+import android.view.KeyEvent
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.test.core.app.ActivityScenario
@@ -18,6 +22,119 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class ConnectedJourneyTest {
     @get:Rule val compose = createEmptyComposeRule()
+
+    /** Explicit opt-in: this makes one real provider-backed send in the selected
+     * development conversation. It never retries by creating another message. */
+    @Test fun sendMessageWithKeyboard() {
+        val args = InstrumentationRegistry.getArguments()
+        val origin = args.getString("journeyApiUrl")
+        val destination = args.getString("journeyThread")
+        val creator = args.getString("journeyCreator")
+        val prompt = args.getString("journeyPrompt")
+        val expected = args.getString("journeyReplyContains")
+        assumeTrue("Requires an explicitly authorized live development send.",
+            origin != null && destination != null && creator != null && prompt != null && expected != null)
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val intent = Intent(context, MainActivity::class.java).putExtra("api_url", origin)
+            .putExtra("return_to", destination).putExtra("appearance", args.getString("journeyAppearance") ?: "light")
+        ActivityScenario.launch<MainActivity>(intent).use { scenario ->
+            try {
+                val composer = hasContentDescription("Message $creator's AI") and hasSetTextAction()
+                compose.waitUntil(30_000) { compose.onAllNodes(composer).fetchSemanticsNodes().isNotEmpty() }
+                compose.onNode(composer).performClick().performTextInput(prompt!!)
+                compose.waitUntil(10_000) {
+                    var shown = false
+                    scenario.onActivity { shown = it.window.decorView.rootWindowInsets?.isVisible(android.view.WindowInsets.Type.ime()) == true }
+                    shown
+                }
+                capture("send-keyboard-ready")
+                clickReady("Send")
+                val started = SystemClock.elapsedRealtime()
+                capture("send-keyboard-pending")
+                compose.waitUntil(90_000) {
+                    compose.onAllNodes(composer).fetchSemanticsNodes().singleOrNull()
+                        ?.config?.getOrNull(SemanticsProperties.EditableText)?.text == ""
+                }
+                val accepted = SystemClock.elapsedRealtime() - started
+                // A nonempty unsent draft makes Send's actual availability
+                // observable; it remains disabled while generation is active.
+                compose.onNode(composer).performTextInput("Unsent verification draft")
+                compose.waitUntil(90_000) {
+                    compose.onAllNodes(hasText("Send") and isEnabled()).fetchSemanticsNodes().isNotEmpty()
+                }
+                val completed = SystemClock.elapsedRealtime() - started
+                compose.onNode(composer).assertTextContains("Unsent verification draft")
+                // A delivered reply alone does not prove account refresh has
+                // recovered. Require the actual shell's denial banner to clear.
+                compose.waitUntil(30_000) { compose.onAllNodesWithText("Account status").fetchSemanticsNodes().isEmpty() }
+                compose.onNode(composer).performTextClearance()
+                compose.waitUntil(10_000) {
+                    var shown = false
+                    scenario.onActivity { shown = it.window.decorView.rootWindowInsets?.isVisible(android.view.WindowInsets.Type.ime()) == true }
+                    shown
+                }
+                val reply = hasText(expected!!, substring = true, ignoreCase = true)
+                compose.onAllNodes(reply).onLast().assertIsDisplayed()
+                compose.onNodeWithText("Ask $creator to step in").assertIsDisplayed()
+                capture("send-keyboard-completed")
+                InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_BACK)
+                awaitKeyboardHidden(scenario)
+                compose.onAllNodes(reply).onLast().assertIsDisplayed()
+                compose.onNodeWithText("Ask $creator to step in").assertIsDisplayed()
+                capture("send-visible-reply")
+                val root = File(context.getExternalFilesDir(null), "connected-journey-evidence")
+                File(root, "${System.currentTimeMillis()}-send-timing.json").writeText(
+                    "{\"draftClearedAfterMs\":$accepted,\"sendAvailableAfterMs\":$completed,\"scope\":\"UI observations; not HTTP timing or percentile qualification\"}\n")
+            } finally { capture("send-final-state") }
+        }
+    }
+
+    /** Read-only keyboard/layout check against the actual retained reply. */
+    @Test fun keyboardKeepsLatestReply() {
+        val args = InstrumentationRegistry.getArguments()
+        val origin = args.getString("journeyApiUrl")
+        val destination = args.getString("journeyThread")
+        val creator = args.getString("journeyCreator")
+        val expected = args.getString("journeyLatestText")
+        assumeTrue(origin != null && destination != null && creator != null && expected != null)
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val intent = Intent(context, MainActivity::class.java).putExtra("api_url", origin)
+            .putExtra("return_to", destination).putExtra("appearance", args.getString("journeyAppearance") ?: "light")
+        ActivityScenario.launch<MainActivity>(intent).use { scenario ->
+            try {
+                val composer = hasContentDescription("Message $creator's AI") and hasSetTextAction()
+                compose.waitUntil(30_000) { compose.onAllNodes(composer).fetchSemanticsNodes().isNotEmpty() }
+                compose.onNode(composer).performClick().performTextInput("Unsent keyboard check")
+                compose.waitUntil(10_000) {
+                    var shown = false
+                    scenario.onActivity { shown = it.window.decorView.rootWindowInsets?.isVisible(android.view.WindowInsets.Type.ime()) == true }
+                    shown
+                }
+                compose.onAllNodesWithText(expected!!).onLast().assertIsDisplayed()
+                compose.onNodeWithText("Ask $creator to step in").assertIsDisplayed()
+                capture("read-keyboard-visible")
+                compose.onNode(composer).performTextClearance()
+                InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_BACK)
+                awaitKeyboardHidden(scenario)
+                compose.onAllNodesWithText(expected).onLast().assertIsDisplayed()
+                compose.onNodeWithText("Ask $creator to step in").assertIsDisplayed()
+                capture("read-keyboard-hidden-reply")
+            } finally { capture("read-keyboard-final-state") }
+        }
+    }
+
+    private fun awaitKeyboardHidden(scenario: ActivityScenario<MainActivity>) {
+        // Insets change at the start of the OS hide animation. Require the
+        // hidden state to settle before asserting the resized conversation.
+        var hiddenSince: Long? = null
+        compose.waitUntil(10_000) {
+            var shown = true
+            scenario.onActivity { shown = it.window.decorView.rootWindowInsets?.isVisible(android.view.WindowInsets.Type.ime()) == true }
+            if (shown) hiddenSince = null else if (hiddenSince == null) hiddenSince = SystemClock.elapsedRealtime()
+            hiddenSince?.let { SystemClock.elapsedRealtime() - it >= 600 } == true
+        }
+        compose.waitForIdle()
+    }
 
     @Test fun publishedConversationAndCurrentConsent() {
         val args = InstrumentationRegistry.getArguments()
@@ -141,6 +258,7 @@ class ConnectedJourneyTest {
     }
 
     private fun capture(name: String) {
+        compose.waitForIdle()
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val root = File(instrumentation.targetContext.getExternalFilesDir(null), "connected-journey-evidence")
         root.mkdirs()

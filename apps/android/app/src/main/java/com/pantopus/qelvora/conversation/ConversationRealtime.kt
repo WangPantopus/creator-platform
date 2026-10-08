@@ -1,5 +1,7 @@
 package com.pantopus.qelvora.conversation
 
+import android.util.Log
+import com.pantopus.qelvora.BuildConfig
 import com.pantopus.qelvora.generated.APIFrame
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -25,6 +27,9 @@ sealed interface ConversationRealtimeEvent {
  * subscriptions. Credentials and frame buffers are memory-only. Overflow forces
  * a fresh authorized snapshot/replay rather than dropping a control boundary. */
 internal object ConversationRealtime {
+    // Fixed diagnostic classes only. Never include credentials, frame content,
+    // account/thread identifiers, URLs, server reasons or exception messages.
+    private fun trace(reason: String) { if (BuildConfig.DEBUG) Log.d("QelvoraRealtime", reason) }
     private data class Key(val origin: String, val account: String)
     private data class Subscription(
         val creatorId: String, val fanId: String, val threadId: String,
@@ -122,6 +127,7 @@ internal object ConversationRealtime {
             if (text.length > 1_000_000) { stop(ConversationFailure(503, "Reconnect to refresh this conversation.")); return@synchronized }
             val frame = runCatching { json.decodeFromString<APIFrame>(text) }.getOrNull()
             if (frame == null || subscriptions.values.none { it.threadId == frame.threadId }) {
+                trace(if (frame == null) "frame_decode_failed" else "frame_owner_missing")
                 stop(ConversationFailure(503, "Reconnect to refresh this conversation.")); return@synchronized
             }
             if (subscriptions.values.filter { it.threadId == frame.threadId }.any { !it.emit(ConversationRealtimeEvent.Frame(frame)) })
@@ -131,9 +137,17 @@ internal object ConversationRealtime {
             stop(ConversationFailure(503, "Reconnect to refresh this conversation."))
         }
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) = synchronized(connections) {
+            trace("socket_closing_code_$code")
+            trace(when (reason) {
+                "Reconnect with current authority" -> "server_authority_deadline"
+                "Conversation unavailable" -> "server_batch_refused"
+                "Subscription refused" -> "server_subscription_refused"
+                else -> "server_close_other"
+            })
             stop(ConversationFailure(if (code == 1008) 401 else 503, "Reconnect to refresh this conversation."))
         }
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) = synchronized(connections) {
+            trace(if (response?.code == 401) "socket_authentication_failed" else "socket_transport_failed")
             stop(ConversationFailure(if (response?.code == 401) 401 else 503, "Reconnect to refresh this conversation."))
         }
     }
