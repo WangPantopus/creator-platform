@@ -240,7 +240,7 @@ export class PreparedComparisonArtifacts {
           AND NOT EXISTS(SELECT FROM pg_db_role_setting WHERE setrole=r.oid)
           AND NOT EXISTS(SELECT FROM pg_namespace WHERE nspowner=r.oid)
           AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=r.oid)
-          AND (SELECT count(*)=18 FROM pg_proc WHERE proowner=r.oid))
+          AND (SELECT count(*)=19 FROM pg_proc WHERE proowner=r.oid))
          AND NOT EXISTS(SELECT FROM pg_database WHERE datname=current_database()
           AND (datconnlimit=0 OR shobj_description(oid,'pg_database')='creator-platform:restored-traffic-closed')) AS ready`,
         [role, Owner],
@@ -568,6 +568,15 @@ export class PreparedComparisonArtifacts {
     }
     let pending = false;
     for (const attempt of attempts.values()) {
+      // Only the original held SQL scope can establish that a known, immutable
+      // capture is unrelated. Missing/legacy provenance remains pending work.
+      const relevant = await query(
+        client,
+        "SELECT creator_trust.comparison_export_attempt_relevant($1,$2,$3) AS relevant",
+        [...parameters, JSON.stringify(attempt)],
+        signal,
+      );
+      if (!z.boolean().parse(relevant.rows[0]?.relevant)) continue;
       if (!(await this.recoverAttemptInTransaction(client, attempt, signal)))
         pending = true;
     }

@@ -70,6 +70,16 @@
         "path": "apps/backend/src/modules/conversation/migrations/pending_w3_comparison_reader.sql",
         "checksum": "f0a7ec9e16838c7b838dc0befa6097484c8683dfc67ea7b940fad00a3c7facba"
       }
+    },
+    {
+      "version": "0246_comparison_artifact_scope",
+      "owner": "W8",
+      "path": "apps/backend/src/modules/trust/0246_comparison_artifact_scope.sql",
+      "checksum": "22de8203086fd7f7ad18140c087d0aa6355390616b90511da280bc71296c1b3f",
+      "originalProposal": {
+        "path": "apps/backend/src/modules/trust/pending-comparison-artifact-scope.sql",
+        "checksum": "b479476196f3c1705ef12ba14f7a78d62b7b9f3871904478a47098502b743bf6"
+      }
     }
   ]
 }

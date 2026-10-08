@@ -1,0 +1,30 @@
+{
+  "kind": "isolated original SQL scopes and real filesystem operations; synthetic actors, legacy manifests and dependency receipts; not mature deletion or executable activation",
+  "results": [
+    {
+      "case": "original held deletion matches its source family and skips unrelated mapped live export; that export still waits under its own task and all bytes remain",
+      "pass": true
+    },
+    {
+      "case": "unknown mapping remains relevant; arbitrary attempt fields and an export-purpose scope cannot claim deletion relevance",
+      "pass": true
+    },
+    {
+      "case": "unexpired unmapped legacy stream remains pending with exact bytes and no invented source mapping",
+      "pass": true
+    },
+    {
+      "case": "original finite manifest expires in real wall time; original locked completed task permits exact physical removal and idempotent retry, retains durable marker and original task receipt",
+      "pass": true
+    },
+    {
+      "case": "expired legacy metadata with a mismatched original content type stays pending; file age cannot substitute for exact manifest custody",
+      "pass": true
+    },
+    {
+      "case": "interactive Trust reader cannot call private deletion relevance function",
+      "pass": true
+    }
+  ],
+  "observedAt": "2026-10-08T17:53:13.017Z"
+}
