@@ -43,6 +43,7 @@ import type {
 } from "../identity/public-ai-scope.js";
 import { isDevelopmentLicense } from "./development-license.js";
 import { shadowReplayFingerprint } from "./shadow-fingerprint.js";
+import { currentShadowSamples } from "./shadow-samples.js";
 import {
   PreparedGenerationAgentInputs,
   type GenerationAILicenseContext,
@@ -355,12 +356,17 @@ export class AgentService {
         )
           gates.push("Run passing boundary evaluations on this exact draft.");
         if (workspace.live_version_id) {
+          const samples = await currentShadowSamples(client, scope.creatorId);
           const shadow = await client.query<{ state: string }>(
             "SELECT state FROM creator.ai_shadow_evaluation WHERE creator_id=$1 AND fingerprint=$2 AND live_version_id=$3 ORDER BY created_at DESC LIMIT 1",
             [
               scope.creatorId,
-              liveVersion
-                ? shadowReplayFingerprint(snapshot.fingerprint, liveVersion)
+              liveVersion && samples.length
+                ? shadowReplayFingerprint(
+                    snapshot.fingerprint,
+                    liveVersion,
+                    samples,
+                  )
                 : null,
               workspace.live_version_id,
             ],
@@ -1063,11 +1069,17 @@ export class AgentService {
           this.pipeline.assertReplayVersion(live, creator.name);
           // Missing samples are not evidence that the trusted recent-conversation
           // feed is empty. Until that feed can attest emptiness, require replay.
+          const samples = await currentShadowSamples(client, scope.creatorId);
+          invariant(
+            samples.length,
+            "shadow_evaluation_required",
+            "Recent privacy-safe comparison samples are required for this revision.",
+          );
           const shadow = await client.query<{ state: string }>(
             "SELECT state FROM creator.ai_shadow_evaluation WHERE creator_id=$1 AND fingerprint=$2 AND live_version_id=$3 ORDER BY created_at DESC LIMIT 1",
             [
               scope.creatorId,
-              shadowReplayFingerprint(snapshot.fingerprint, live),
+              shadowReplayFingerprint(snapshot.fingerprint, live, samples),
               workspace.live_version_id,
             ],
           );

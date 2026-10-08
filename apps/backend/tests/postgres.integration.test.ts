@@ -23,6 +23,14 @@ import { SignedActService } from "../src/modules/identity/signed-acts.js";
 import { WebhookInbox } from "../src/core/inbox.js";
 import { OutboxRelay } from "../src/core/outbox.js";
 import type { Actor } from "../src/modules/identity/adapter.js";
+import { AgentRepository } from "../src/modules/agent/repository.js";
+import { AgentPipeline } from "../src/modules/agent/pipeline.js";
+import { AgentService } from "../src/modules/agent/service.js";
+import { ShadowReplay } from "../src/modules/agent/shadow.js";
+import {
+  currentShadowSamples,
+  type ShadowSample,
+} from "../src/modules/agent/shadow-samples.js";
 
 const adminUrl = process.env.CREATOR_TEST_DATABASE_URL;
 const ci = process.env.CI;
@@ -167,6 +175,102 @@ describe.skipIf(!adminUrl)(
       if (fixtureCreated)
         await bootstrap.query(`DROP DATABASE "${fixtureDatabase}"`);
       await bootstrap.end();
+    });
+
+    it("replaces a creator's shadow cohort, preserves other creators and rolls back conflicting IDs", async () => {
+      const repository = new AgentRepository(runtime);
+      const service = new AgentService(
+        repository,
+        new AgentPipeline(repository, null),
+      );
+      const scope = {
+        creatorId: creators[9]!.id,
+        accountId: creators[9]!.account,
+        development: true,
+      };
+      const other = {
+        creatorId: creators[8]!.id,
+        accountId: creators[8]!.account,
+        development: true,
+      };
+      const candidate = (): ShadowSample => ({
+        sampleId: randomUUID(),
+        occurredAt: new Date(Date.now() - 1000).toISOString(),
+        paraphrasedPrompt: "Test-only generic pottery question",
+        sanitizerReference: "scripted-test-not-privacy-authority",
+      });
+      const first = candidate();
+      const second = candidate();
+      let batch: readonly ShadowSample[] = [first];
+      const shadow = new ShadowReplay(service, {
+        verifiedParaphrases: async () => batch,
+      });
+      await shadow.collect(scope);
+      batch = [second];
+      await shadow.collect(other);
+      const read = (owner: typeof scope) =>
+        repository.transaction(owner, (client) =>
+          currentShadowSamples(client, owner.creatorId),
+        );
+      expect(await read(scope)).toEqual([first]);
+      expect(await read(other)).toEqual([second]);
+      // Actual forced RLS also denies another creator despite a supplied ID.
+      expect(
+        await repository.transaction(scope, (client) =>
+          currentShadowSamples(client, other.creatorId),
+        ),
+      ).toEqual([]);
+      batch = [
+        candidate(),
+        { ...first, paraphrasedPrompt: "Changed material under the same ID" },
+      ];
+      await expect(shadow.collect(scope)).rejects.toMatchObject({
+        code: "shadow_sample_conflict",
+      });
+      expect(await read(scope)).toEqual([first]);
+      batch = [candidate()];
+      await shadow.collect(scope);
+      expect(await read(scope)).toEqual(batch);
+      batch = [];
+      await shadow.collect(scope);
+      expect(await read(scope)).toEqual([]);
+      expect(await read(other)).toEqual([second]);
+      await shadow.collect(other);
+    });
+
+    it("bounds shadow eligibility by wall time, seven-day history and finite retention on a held transaction", async () => {
+      const repository = new AgentRepository(runtime);
+      const scope = {
+        creatorId: creators[7]!.id,
+        accountId: creators[7]!.account,
+        development: true,
+      };
+      await repository.transaction(scope, async (client) => {
+        await client.query(
+          `INSERT INTO creator.ai_shadow_sample(id,creator_id,paraphrased_prompt,sanitizer_reference,created_at,expires_at)
+          SELECT gen_random_uuid(),$1,'Test-only generic question',kind,created,expires FROM (VALUES
+            ('valid',clock_timestamp()-interval '1 day',clock_timestamp()+interval '20 days'),
+            ('future',clock_timestamp()+interval '1 day',clock_timestamp()+interval '20 days'),
+            ('old',clock_timestamp()-interval '8 days',clock_timestamp()+interval '20 days'),
+            ('expired',clock_timestamp()-interval '1 day',clock_timestamp()-interval '1 second'),
+            ('unbounded',clock_timestamp()-interval '1 day','infinity'::timestamptz),
+            ('overlong',clock_timestamp()-interval '1 day',clock_timestamp()+interval '31 days'),
+            ('expiring',clock_timestamp()-interval '1 day',clock_timestamp()+interval '0.5 seconds')
+          ) AS samples(kind,created,expires)`,
+          [scope.creatorId],
+        );
+        expect(
+          (await currentShadowSamples(client, scope.creatorId))
+            .map((s) => s.sanitizerReference)
+            .sort(),
+        ).toEqual(["expiring", "valid"]);
+        await client.query("SELECT pg_sleep(0.6)");
+        expect(
+          (await currentShadowSamples(client, scope.creatorId)).map(
+            (s) => s.sanitizerReference,
+          ),
+        ).toEqual(["valid"]);
+      });
     });
 
     it("T-11 denies unscoped read/write and leaves no tenant context on pooled connections", async () => {

@@ -1,0 +1,223 @@
+# Session handoff — October 8, 2026
+
+Successor resumed in the same `637b` checkout on
+`codex/shadow-evidence-lifetime-20261008`. See the
+[full finish plan](product-finish-plan-2026-10-08.md) and
+[bounded comparison-evidence increment](../../artifacts/pr-review/2026-10-08/shadow-evidence-lifetime/README.md).
+The post-merge main workflow below has since completed successfully. The original
+handoff observations and all evidence remain preserved below.
+
+This is the starting point for the next session. The user requested a coherent handoff, all work committed and pushed, and owned resources stopped unless needed for continuation. This handoff adds documentation only; product implementation is already merged through #335. The overall product remains incomplete.
+
+## Start here
+
+1. Read this file and [the project continuation checkpoint](project-continuation-2026-10-07.md). They supersede older status summaries, while retaining their evidence and unfinished acceptance.
+2. Read repository `AGENTS.md`, `CLAUDE.md`, [BRIEF](../BRIEF.md), [DESIGN_PLAN](../DESIGN_PLAN.md), and applicable directory instructions before changing files. For Turbo configuration/commands, read the installed package's `docs/README.md` and relevant bundled docs first; the repository has no general `docs/README.md`.
+3. Refresh Git/GitHub state. Reuse this clean checkout if suitable; the primary checkout was deliberately left untouched. Read the evidence linked below before repeating an operation.
+4. Continue from the merged implementation. The immediate recommendation is a bounded existing-version upgrade milestone, with privacy-safe shadow replay, followed by controlled end-to-end latency work. Both remain open. The upgrade path enables existing creators to receive the newer fixes while preserving their published identity until evaluation succeeds. The broader finish plan is below.
+
+Suggested opening prompt for the successor:
+
+> Resume creator-platform from `docs/operations/session-handoff-2026-10-08.md` and the linked project checkpoint. PR #335 is merged. Preserve all historical evidence, published engine fingerprints and unknown-cost holds. First inspect current Git/GitHub state, the authoritative designs, and the actual shadow-feed/upgrade implementation. Complete a real privacy-safe published-version upgrade and continue measured latency/grounding work in bounded reviewable increments. Carry the remaining product acceptance forward from the checkpoint; do not rebuild work already consolidated. The approved fictional Maya provider scenario and retention policy remain authorized. Keep the docs and evidence current, and distinguish implementation, real operation and release qualification.
+
+## Exact Git and review state
+
+- Repository: `WangPantopus/creator-platform`.
+- Reusable checkout: `/Users/yingpengwang/.codex/worktrees/637b/creator-platform`.
+- Handoff branch: `codex/session-handoff-20261008`, created from merged `origin/main` at `13a2e03a0d1fd67fe737cfd88acd36d24f7db941`. Its documentation commit is pushed to the same remote branch. It is not a new implementation PR and has not been merged separately. Use this branch for the handoff or bring its documentation commit into the next continuation branch.
+- [#335](https://github.com/WangPantopus/creator-platform/pull/335) merged on **October 8 at 1:20 a.m. America/Los_Angeles** (`2026-10-08T08:20:00Z`), merge commit `13a2e03a0d1fd67fe737cfd88acd36d24f7db941`. Its reviewed head is `52d86e1ebd769bc1958b9cff1a10e2734d83365b`. Merge and head trees match.
+- All **10 checks at that reviewed head passed**: [PR workflow](https://github.com/WangPantopus/creator-platform/actions/runs/37745791196), [push workflow](https://github.com/WangPantopus/creator-platform/actions/runs/37745787840). Hosted backend: **47 passing tests**, including all nine PostgreSQL integration tests. The completed iOS job also reports 18 Swift tests and two simulator flow tests passing. These checks do not qualify the whole application or production generation.
+- The separate [post-merge main workflow](https://github.com/WangPantopus/creator-platform/actions/runs/37749134304) was running when handoff preparation began. Refresh its result rather than attributing reviewed-head results to a later commit.
+- GitHub returned **zero open PRs** at handoff inspection. All **18 original PRs are resolved** through #132; #132 merged at `68f6a3958608557381d0692adc83cedf1caeeac3`, #333 at `6d62d31457f8ad741c38fd871004970209d6105e`, and #334 at `d165d3116f4534b0de25def09dc5160657a76294`. The original branches and `refs/review/20261007/<number>` remain preserved. The [reconciliation ledger](pr-reconciliation-2026-10-07.md) maps source preservation and remaining acceptance; its old open-PR counts are historical.
+- The primary `/Users/yingpengwang/creator-platform` was observed at `3027874ce` on `main`, not the latest remote main. Do not assume it is synchronized or overwrite its state. Older checkouts `0ba1`, `5f17` and `privacy-worker-drain` remain preserved and were not modified or removed for this handoff. They may contain earlier custody/evidence; inspect ownership and status before using them.
+
+Begin with:
+
+```sh
+cd /Users/yingpengwang/.codex/worktrees/637b/creator-platform
+git status --short
+git fetch origin
+git log -5 --oneline
+/Users/yingpengwang/.local/bin/gh pr list --state open
+```
+
+## Product intent and design authority
+
+Qelvora is a Pantopus app combining a clearly disclosed creator-authorized AI with genuine human presence: Notes, reactions, private replies and calls. Membership leads; the initial conversation is free for roughly 24 hours and ends at a natural pause. The human request action remains available. The pass follows a meaningful creator roster, approximately 30 active creators as a working threshold. Sample creators, tier names, prices and commercial assumptions are examples, not finalized decisions.
+
+Read the four authoritative documents in [docs/source](../source): [domain contract](../source/Domain_Model_and_Behavioral_Contract.md), [product flows/screens/copy](../source/Product_Design_Flows_Screens_and_Copy.md), [architecture](../source/System_Architecture.md), and [second review](../source/Second_Review_Strategy_Behavior_and_Additions.md). Apply accepted BUILD_PROMPT section 9 corrections and later [decisions](../workstreams/DECISIONS.md) where they amend older material. Exact screen designs are in the repository's [design directory](../../design), also available at `/Users/yingpengwang/creator-platform/design`. Use the corresponding screen/state, theme and size, not a generic approximation.
+
+Critical product constraints:
+
+- Authorship is server-owned and immediately legible through word, glyph and color. AI, approved draft, creator, creator call, broadcast, reaction, team, fan and system are distinct. Team cannot impersonate the creator; human signatures bind the exact content version.
+- AI must not imply the creator read, remembered, felt or promised something, invent private opinions, sell intimacy or exploit vulnerability. Preserve fixed copy and crisis routing.
+- One private thread per creator/fan, no cross-creator memory. Scope before retrieval. Current source rights, audience, processor/sensitive-memory consent, deletion exclusions and revocation remain authoritative. Off-the-record Q13 is still an explicitly unresolved product decision.
+- Takeover advances the server epoch, stops further AI output, and preserves delivered text as interrupted. A response that the DOM contains but the fan cannot see is not a visible-latency success.
+
+The implemented stack is a modular Node/Express TypeScript backend, PostgreSQL/pgvector, Next web/Studio, SwiftUI and Compose, with shared API contracts, generated clients, copy, brand and tokens. Eight domains: Identity, Agent, Conversation, Content, Commerce, Media/Session, Growth and Trust. Substantial code already exists; the remaining work is connected journeys, correctness and qualification.
+
+## What the merged work actually accomplished
+
+### Canonical generation, accounting and recovery (#334 and earlier)
+
+- Explicit development composition in `server.ts` owns admission, generation worker lifetime, provider/accounting drain and pool shutdown.
+- Separate real creator/fan browser sessions completed creator setup, approved source ingestion, six boundary evaluations, first publication, fan disclosure/consent, cited reply and original known-cost settlement.
+- Additive reviewed waves fixed output custody and public AI composition, then unknown-cost recovery for both zero-output and ordinary partial-output interruption. Applied migrations were not edited in place.
+- Active-provider SIGTERM and restart recover the exact interrupted conversation after its original lease, without provider replay. Unknown-cost calls retain full reserved holds with null settlement amount/reference/clock. Those earlier failure cases remain preserved.
+- Development fan export/download spans all eight domains. Immediate account deletion denies the old download and session. Full physical deletion still blocks on unconfigured retention/purge adapters; populated financial export and other missing scenarios remain unqualified.
+
+Start with [canonical journey evidence](../../artifacts/pr-review/2026-10-07/canonical-generation-journey/README.md), [output repair](../../artifacts/pr-review/2026-10-07/generation-output-repair/README.md), and [privacy completion evidence](../../artifacts/pr-review/2026-10-07/growth-privacy-completion/README.md). The project checkpoint links the preceding integration and all original PR sources.
+
+### Context, grounding, performance and compatibility (#335)
+
+- The actual fifth request lost its approved source because the 2,500-token budget was counted in UTF-8 bytes. The full context needed only 589 model tokens. Revision **14** uses pinned `js-tiktoken@1.0.21` with the configured models' encodings, preserves whole evidence and the existing priority/cap, and refuses unknown tokenizer models. Token counts for assembly are not provider billing receipts.
+- Revision **13** strengthened sentence grounding: complete contiguous spans must reconstruct the proposed sentence, factual spans need exact quotes from authorized cited passages, and unsupported mechanisms, benefits, certainty or extra advice are refused. Revision 14 retains this guard. Semantic support still depends on the classifier; code checks do not prove all language-model judgments correct.
+- Repeated current-check work is reduced through same-purpose original licensed-fact revalidation, equivalent ownership/privilege scans, and duplicate reads removed only where the original owner already brackets the operation. Current authority results are not cached across purposes.
+- Deploying a new fingerprint initially disabled existing publications. The final change selects **actual historical revision 12/13 behavior** under the exact original model/rates/policy fingerprint. New drafts use 14. Both live paths select the saved engine, with shared per-creator concurrency. Unknown engines/configurations refuse. Historical 12 retains its old grounding behavior and 12/13 retain the byte-counted budget until a legitimate evaluated upgrade. Do not silently apply new behavior to a saved old fingerprint.
+- Shadow replay now selects the actual published engine as the baseline, refuses unavailable engines before collecting fan-derived material, and binds comparison evidence to both live and draft identities. Old passes that used the new engine for both sides cannot authorize publication. **The privacy-safe paraphrase feed remains unconnected. No real existing-version upgrade has been qualified.**
+
+Key code map:
+
+| Area                                          | Files under `apps/backend/src/`                                                                                                                                                   |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Context, guard and published-engine selection | `modules/agent/pipeline.ts`, `model.ts`, `pipeline-compatibility.ts`                                                                                                              |
+| Upgrade comparison and publication gates      | `modules/agent/shadow.ts`, `shadow-fingerprint.ts`, `service.ts`                                                                                                                  |
+| Actual generation path                        | `modules/agent/generation-pipeline.ts`, `generation-inputs.ts`, `generation-metadata.ts`, `generation-runtime-context.ts`, `runtime.ts`, `delivery-authority.ts`                  |
+| Current catalogue work                        | `core/purpose-catalogue.ts`, `modules/identity/generation-scope.ts`, `modules/agent/generation-consumer-catalogue.ts`, `modules/commerce/generation-safety-terminal-catalogue.ts` |
+| Conversation ownership boundaries             | `modules/conversation/generation-context.ts`, `generation-output.ts`, `generation-terminal.ts`                                                                                    |
+| Public availability                           | `modules/agent/growth-adapter.ts`                                                                                                                                                 |
+
+`apps/backend/tests/historical-pipeline.test.ts` pins 14 differential cases against actual old source (12: `d165d3116`, 13: `eb714387d`). `shadow-compatibility.test.ts` adds exact selection, unavailable baseline, old-evidence invalidation, budget distinction and shared concurrency coverage. Scripted unit ports/models are explicitly not authority or live-provider acceptance.
+
+## Latest measured evidence and its limits
+
+Read these in reverse chronological order:
+
+1. [Published compatibility and final operation](../../artifacts/pr-review/2026-10-08/generation-published-compatibility/README.md).
+2. [Context-budget reproduction and revision 14 first publication](../../artifacts/pr-review/2026-10-07/generation-context-latency/README.md).
+3. [Grounding changes, boundary evaluation and preserved failures](../../artifacts/pr-review/2026-10-07/generation-performance-grounding/README.md).
+
+Latest compiled backend + Next development frontend, revision 14 on copy 45:
+
+| Observation                                         | Result                               |
+| --------------------------------------------------- | ------------------------------------ |
+| Browser click → HTTP acknowledgement                | 3.767s                               |
+| Browser click → fully visible useful cited sentence | 26.992s                              |
+| Server acceptance → first stored output             | 20.371s                              |
+| Server acceptance → terminal                        | 23.820s                              |
+| Final run cost / settlement                         | 4 calls, 2,425 microdollars, 3 units |
+
+Earlier revision 14 observation: 1.101s acknowledgement / 22.512s useful visibility. Neither is a controlled before/after or a percentile result. Saved history, provider stochasticity, local cold startup and the development frontend vary. Design targets remain **p95 <300ms acknowledgement, 2.5s warm / 4s cold first approved visible sentence, and 8s completion**, with p99 beside p95. Warm/cold are defined by actual prefix cache behavior, not merely a repeated HTTP call. **Latency is not resolved.**
+
+An earlier `citation_invalid` fallback on copy 45 is a preserved usefulness failure: 26.948s fallback visibility, four calls / 4,032 microdollars / five units. Its rejected proposal was not captured, so do not claim a known cause or a proven false positive. Two subsequent source-host diagnostic requests, including the repeated prompt, and the final compiled request deliver supported cited answers without relaxing the guard. Safely scoped diagnostics and a broader adversarial grounding corpus are still needed.
+
+Thirty alternating PostgreSQL before/after query pairs preserve identical results. Sixteen transactional privilege/policy drifts remain visible in both query families and rollback restores the baseline. The financial terminal catalogue median improves **491.870ms → 344.590ms**; purpose-role medians improve roughly 9ms → 8ms. These are isolated query improvements. A retained instrumented request window shows thousands of worker SQL calls and substantial repeated catalogue work. Background queries overlap; their summed duration is not causal wall-clock attribution. Further small prefilters alone should not be assumed to close a roughly 27-second useful-response gap.
+
+Copy 45 now has seven delivered generations, 28 completed known-cost provider rows, 24,102 microdollars and 29 settled units. The original twelve usage rows remain exact. Before/after compiled idle restart, the 28-row usage digest is `899842c1e7e8cb37dfa8e0992335c4236e4d003e5c2774dfbcc9066e32bd15f7`; versions, evaluation, messages, generations and reservations also match.
+
+The final compiled host also served a real browser greeting on the original revision 13 publication in copy 43, without republishing: four calls / 1,092 microdollars / two units. All prior seven generations and their history remain unchanged. This proves continued operation, not useful-knowledge latency or an upgrade.
+
+## Recommended continuation and acceptance
+
+### 1. Qualify a real published-version upgrade
+
+Trace `PrivacyParaphrasePort`, `ShadowReplay.collect/start/run`, its actual Conversation/privacy producer, and host composition. Identify the missing owner-approved sanitization, consent, deletion and provenance path. Connect a trusted creator-scoped feed; preserve finite sample lifetime, creator boundaries, revocation and exclusions. Use the source contract to resolve whether an attested empty feed is sufficient; absence of a configured producer is not evidence of emptiness.
+
+Then operate a real existing revision 12 or 13 creator through comparison, evaluation, publication and a fan response using revision 14. Prove the live baseline really used its saved engine, publication changed only through the legitimate command, and old comparison passes were rejected. Recheck accounting, current source rights and restart. Qualify rollback where current licensing and source revisions allow it. No fabricated paraphrases, direct database fingerprint edits, copied capabilities or privileged shortcuts count.
+
+### 2. Measure and reduce end-to-end latency
+
+Use the retained trace to build a request-correlated timing breakdown: browser acceptance, worker scheduling, actual held-purpose windows/row locks, current-check work, provider classification/embedding/reply/guard, output storage/transport and visible paint. Separate idle-worker/background queries from the request. Use a production-built frontend for representative measurement, a documented device/network/region/load profile, and explicit cold/warm cache evidence.
+
+Follow the nested current-check call graph through metadata, licensed inputs, W1 custody, provider accounting and W3 output. Consolidate duplicated work at the original owner/transaction boundary only with equivalent drift/revocation/lifetime checks. Query batching or reducing unnecessary nested ownership checks is more promising than assuming one more scan prefilter solves the whole path. This is an engineering recommendation, not a proven speedup. Preserve five-second purposes and the 60-second worker lease; do not trade away authorization checks or extend deadlines to obtain a green timing.
+
+Measure useful first output and full completion separately. A quick fallback is not success for a supported knowledge request. Capture the exact rejected proposal/guard verdict only under authorized scoped diagnostics; retain failures and costs. Keep complete span and quote checks and broaden unsupported-mechanism, mixed factual/refusal, certainty, quotation and multilingual tests. Report remaining model-dependent uncertainty honestly.
+
+### 3. Complete the remaining journey and product work
+
+The detailed prerequisites and evidence live in the project checkpoint. Carry these forward:
+
+- **Generation:** in-flight takeover, revocation and sensitive-memory consent, uncertain-send idempotency, cancellation boundaries, paid-membership first use, shared-pass accounting, representative p95/p99, source withdrawal and scope changes. Free development grants do not qualify paid behavior.
+- **Privacy:** compose actual domain retention/purge adapters and the original retained-financial purpose under the approved policy. Exercise populated exports, mature deletion, provenance purge, unresolved-cost escalation/breach, detachment, restoration/re-purge, cancellation/EOF/COMMIT boundaries. The preserved deletion matures October 30 at **1:48:22.966 a.m. America/Los_Angeles** (`08:48:22.966Z`); do not backdate it. The original 658 usage rows have no finite due-retention deadline and there are no expiry/detached jobs; an idle pass does not qualify expiry.
+- **Human presence:** actual signed audience-specific Notes, delivery, private replies, exact-version review and reactions; apply held reply-review/signature source through its reviewed migration process. Qualify Team invite/accept/remove and the handle-versus-email discrepancy against accepted design. Complete finite feedback/intro consent, withdrawal, expiry and recovery.
+- **Commerce / Content / Media:** membership, requests, authorization/capture/signed delivery/refund/reconciliation, native store callbacks, group publisher → Content consumer; successful recording/playback/upload/discard/publication; physical-device interruptions and complete real call scheduling/admission/history/consent/outcome/handback.
+- **Growth and design:** populated Home/discovery, authorized sharing/return, push arrival/settings/providers, withdrawal/retraction, reply export, creator activation/insights and consented impact. Verify exact web/iOS/Android screen states, Light/Night, phone/desktop, 200% web reflow, largest native text, labels/targets, reduced motion, citation navigation, persistent human action and scroll position. Gallery CI is a separate check, not complete journey acceptance.
+- **Release:** production identity/provider/licensing, incident/restore drills and a creator/fan pilot. Cloned voice requires explicit license/provenance and follows the pilot. Production generation is still gated.
+
+Use bounded milestones with a source diff, real operation evidence where relevant, exact validation and updated remaining-work notes. Preserve old work and its failed attempts instead of reopening the original PRs or reimplementing modules from scratch.
+
+## Resources retained for reuse
+
+All paths below are local to this Mac. They are not committed secrets or portable cloud resources.
+
+| Resource                                                            | State at handoff                                                                         | Why retained / how to use                                                                                                                                                                                                  |
+| ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Current `637b` checkout, dependencies and builds                    | Retained; no owned app process running                                                   | Reuse for the next session. `dist` and `.next` are build products, not proof of a future head; rebuild after code changes.                                                                                                 |
+| `creator-w2-original-archive-20261007` Docker container and storage | **Stopped**, not deleted                                                                 | Holds original archive and labelled application/restore copies; required for preserved history and future operation. PostgreSQL maps to `127.0.0.1:5550` when started.                                                     |
+| Original `creator_w2_archive_adoption_candidate` database           | Preserved, never used as disposable test fixture                                         | Archive hashes and all 658 original usage records match. Preserve its ledger/schema/data/roles/sequences.                                                                                                                  |
+| Labelled copies 19–29 and 31–46                                     | **27 closed copies**, no application clients at final audit                              | Failed runs and unknown-cost holds remain. Copy 43 is original revision 13; 44 is its independent initial restore; 45 is revision 14; 46 is the independent pre-wave restore. Earlier labelled copies/backups also remain. |
+| App port 57304 / web port 3119                                      | **No listener**                                                                          | Both last launchers exited normally on SIGTERM. No application process needs to be resumed blindly.                                                                                                                        |
+| Temporary DB credentials / Growth login                             | Passwords cleared; temporary role dropped                                                | Reviewed permanent `creator_public_ai_authority` remains. Private reopen scripts re-establish only the owned development credentials for a chosen closed copy.                                                             |
+| Browser                                                             | Test tabs/observers closed; temporary viewport overrides absent; automation kernel reset | User's repository and PR tabs remain open. Start a fresh browser binding/session for further tests.                                                                                                                        |
+| Heavy-build lock                                                    | Absent at handoff                                                                        | Use the repository lock script for heavy builds. Do not delete another session's lock.                                                                                                                                     |
+| Earlier worktrees and original branches                             | Retained, untouched                                                                      | May hold source/evidence. They are not active task resources to delete casually.                                                                                                                                           |
+
+Main private evidence root:
+
+`/Users/yingpengwang/.codex/visualizations/2026/10/07/01a11784-60b1-7fe3-8855-82bddf4675b6`
+
+Inside it, `conversation-commerce-completion/` holds runtime scripts, policy/configuration references, private custody and operation receipts. Sibling `generation-latency-335/` holds browser captures/timings. The original archive root is:
+
+`/Users/yingpengwang/.codex/visualizations/2026/10/07/01a114a4-1ada-7223-a954-e54a9d42c007/w2-original-archive`
+
+Its `private/admin.json` is the private local administrative connection descriptor. Never print or commit it. In the journey directory, `private/journey45-env.json` and `private/journey43-env.json` are 0600 configuration files containing keys and local credentials; retain privately and do not dump their values. Preserve their referenced storage directories and key material needed to decrypt historical artifacts. The designated provider key also exists at `~/.config/creator-platform/secrets/openai.env`; use the already authorized model/rate/policy configuration rather than inventing new rates or production terms.
+
+Reusable files in `conversation-commerce-completion/`:
+
+- `launch-journey45.mjs`, `launch-journey43.mjs`: compiled backend by default, `web` argument runs **Next dev** on 3119. They reference this exact checkout. These are development operation helpers, not a production deployment recipe.
+- `reopen-journey45.mts` / `close-journey45-for-review.mts`, and matching `43` scripts: verify closed/no-other-clients custody; restore/remove only temporary runtime credentials and the temporary Growth role; reopen/close the chosen labelled database. Reopen updates `RELEASE_REVISION` from the current checkout, so build/source identity still needs independent verification.
+- `record-operation45-current.mts`: currently expects seven generations and seven reservations; update the observation script deliberately after additional legitimate runs. The older `record-operation45.mts` expects three and is stale for the current copy.
+- `record-operation43-compatibility.mts`: final copy has eight generations; its count argument is explicit. Earlier snapshot expected seven.
+- `final-latency335-compatibility-custody.mts` and `latency335-compatibility-final-custody.json`: original archive and closed-copy preservation checks. Save future receipts under new names; do not overwrite historical ones.
+- `compare-historical-engines.mts`, `check-published-engines.mts`, private extracted `engine-baselines/`: reproduction support for actual historical engine identity. Read-only matching is not provider or publication authority.
+- `private/journey45-current-query-trace.jsonl`: raw query timing trace; includes background activity.
+- `private/journey45-current-grounding-diagnostic.jsonl`: actual scoped diagnostic outputs; private, not a substitute for public sanitized evidence.
+- `private/handoff-20261008/`: retained `qualify-purpose-prefilters.mts`, `qualify-financial-prefilters.mts`, and backend/iOS CI logs moved out of `/tmp`. Scripts may contain absolute paths and baseline assumptions; inspect before reusing. Their temporary originals and the redundant temporary PR-body file were removed.
+
+The final [public custody receipt](../../artifacts/pr-review/2026-10-08/generation-published-compatibility/final-custody.json) is the last completed DB audit, performed before the container stopped. No database was reopened just to prepare this handoff. The local `pr335-final-ci-52d86e1eb.json` records the exact reviewed-head checks. A stopped container is intentionally reusable; do not run `docker rm`, volume pruning or database reset to tidy this evidence.
+
+## Practical restart and validation
+
+The shell's default PATH may not include Node. The working tool paths are:
+
+```sh
+export PATH=/Users/yingpengwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:$PATH
+# gh: /Users/yingpengwang/.local/bin/gh
+# Docker: /Users/yingpengwang/.docker/bin/docker
+```
+
+For ordinary source validation, no preserved database should be started:
+
+```sh
+pnpm --filter @qelvora/backend typecheck
+pnpm --filter @qelvora/backend test
+node scripts/with-heavy-build-lock.mjs --owner successor-generation -- pnpm --filter @qelvora/backend build
+```
+
+The local suite has nine PostgreSQL cases that skip without `CREATOR_TEST_DATABASE_URL`. If running them locally, provision their disposable Foundation fixture. **Never point that suite at the preserved archive or any labelled journey copy.** Hosted CI already runs the fixture. Use scoped lint/format for changed files, generated-output checks when contracts change, and affected web/native builds as needed. Do not rerun unrelated broad suites without a reason.
+
+For another authorized live development operation:
+
+1. Inspect the chosen copy's configuration, scripts, latest receipt and existing history; record pre-operation custody. Prefer the existing labelled copy when appropriate. If a clean starting state is necessary, create a separately named restore and preserve its source/restore evidence; do not reset a used copy.
+2. Start only the preserved container. Review and execute the matching reopen helper from the current checkout. **43 and 45 share cluster-wide temporary roles and the same app ports: operate them sequentially.** The helper is deliberately strict about existing credentials and other clients.
+3. Build the intended sources, verify source/build identity, then start the matching compiled launcher. Acquire real development sessions through the actual UI; old session/token values may have expired. Use the existing approved provider configuration only for the fictional scenario.
+4. Capture original browser click, acceptance, truly visible useful sentence, terminal/accounting state, and failures. Keep observers read-only and remove them after capture. Do not substitute request scripts for the creator/fan browser journey.
+5. Stop owned app/web launchers normally and await drain/exit; close test tabs. Verify no other clients, run the matching close helper, audit retained data/holds, save a new receipt and stop the container. Preserve new outcomes, including failures. Do not erase unknown costs to make another request eligible.
+
+## Authorization, boundaries and successor judgment
+
+The user has already authorized the designated fictional Maya live-provider scenario and approved ordinary-data/accounting retention policy `w8-product-retention-20261007-v2`. An unconfigured adapter is engineering work, not by itself a reason to request the same approval again. Production identity/provider/licence terms and genuinely additional financial obligations are separate gates. Synthetic `development-unreviewed-openai-20261001` is not production approval.
+
+Do not mutate historical publication fingerprints, applied migration contents, original leases/purposes/clocks, financial holds, consent or failed evaluations to pass a check. No fabricated authority, unverified empty sample feed or copied capability is acceptable. Recheck current authority through its original owner; performance work must retain its revocation/drift/lifetime behavior. Read old handoffs for their remaining acceptance, but refresh stale PR states, heads and process IDs. No old PID should be killed based solely on a handoff.
+
+No subagents, recurring automation or new user-owned session were created for this handoff. It hands control back to the user; the next session can resume from the preserved checkout and this document.
