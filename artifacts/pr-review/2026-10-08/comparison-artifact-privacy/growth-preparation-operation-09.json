@@ -1,0 +1,25 @@
+{
+  "scope": "read-only source metadata; no runtime registry approval",
+  "results": [
+    {
+      "path": "public",
+      "catalogueChecksum": "058a0dcdc52b7e6b969e6b27074a632173332ec45630a3a49c5e7af09153d175",
+      "restored": true
+    },
+    {
+      "path": "pg_catalog",
+      "catalogueChecksum": "058a0dcdc52b7e6b969e6b27074a632173332ec45630a3a49c5e7af09153d175",
+      "restored": true
+    },
+    {
+      "path": "creator, pg_catalog",
+      "catalogueChecksum": "058a0dcdc52b7e6b969e6b27074a632173332ec45630a3a49c5e7af09153d175",
+      "restored": true
+    }
+  ],
+  "functions": 18,
+  "storage": 1,
+  "triggers": 9,
+  "dependencies": 68,
+  "observedAt": "2026-10-08T15:05:33.659Z"
+}

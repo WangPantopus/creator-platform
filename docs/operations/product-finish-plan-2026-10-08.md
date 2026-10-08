@@ -77,6 +77,15 @@ complete Trust export/deletion and explicitly review legacy exports before
 activation; full source/provider admission and actual producer operation remain.
 PRs340 and341 merged with eleven checks passing each;342 now targets main.
 
+The [Trust artifact privacy increment](../../artifacts/pr-review/2026-10-08/comparison-artifact-privacy/README.md)
+now has source-derived private mapping, own-only export, complete file inventory,
+physical removal and original 0103-authorized clearing. Six isolated operations
+pass; synthetic source-task receipts are not mature deletion acceptance. All
+pending sources remain unregistered. Complete original provider/read admission,
+legacy/restore review and compiled composition before actual producer/upgrade.
+No full milestone is closed. PR342 merged with all11 exact-head checks passing;
+343 targets main. Existing actual app hosts, devices and evidence are preserved.
+
 ## Refreshed starting point
 
 - Continuation branch: `codex/shadow-evidence-lifetime-20261008`, retaining

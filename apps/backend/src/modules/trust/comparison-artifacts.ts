@@ -31,6 +31,16 @@ export const comparisonAttemptSource = Object.freeze({
   path: "apps/backend/src/modules/trust/pending-comparison-export-attempts.sql",
   checksum: "f99563564a82d3ba6145b82760e177ae91b2c1fd0538a4c4187b0cae5de28380",
 });
+export const comparisonArtifactPrivacySource = Object.freeze({
+  owner: "W8",
+  name: "comparison_export_privacy",
+  path: "apps/backend/src/modules/trust/pending-comparison-export-privacy.sql",
+  checksum: "3633aace4fec87335582f8cb85b3cd1b87a4d03d526427612821769970eb3e01",
+});
+// Independently operated metadata for the complete pending graph. This is a
+// catalogue check only; all five exact executable registrations remain required.
+export const comparisonArtifactPrivacyCatalogueChecksum =
+  "058a0dcdc52b7e6b969e6b27074a632173332ec45630a3a49c5e7af09153d175";
 const Owner = "creator_comparison_artifact";
 const Snapshot = z.string().min(8).max(200);
 const Domain = z.enum(["agent", "conversation"]);
@@ -132,9 +142,12 @@ async function readComparisonArtifactCatalogue(
       client,
       `SELECT t.tgrelid::regclass::text AS relation,t.tgname,t.tgenabled,
        pg_get_triggerdef(t.oid,false) AS definition FROM pg_trigger t
-       WHERE NOT t.tgisinternal AND t.tgrelid=ANY(ARRAY[
-        to_regclass('creator_trust.privacy_task'),to_regclass('creator.conversation_comparison_consent'),
-        to_regclass('creator.conversation_comparison_sample')])
+       JOIN pg_class c ON c.oid=t.tgrelid JOIN pg_namespace n ON n.oid=c.relnamespace
+       WHERE NOT t.tgisinternal AND (n.nspname,c.relname) IN (
+        ('creator_trust','privacy_task'),('creator','conversation_comparison_consent'),
+        ('creator','conversation_comparison_sample'),
+        ('creator_trust','comparison_export_artifact'),
+        ('creator_trust','domain_privacy_commit_scope'))
        ORDER BY t.tgrelid::regclass::text COLLATE "C",t.tgname COLLATE "C"`,
       [],
       signal,
@@ -176,6 +189,7 @@ export class PreparedComparisonArtifacts {
       typeof input.artifacts.remove === "function" &&
         typeof input.artifacts.attempts === "function" &&
         typeof input.artifacts.removeAttempt === "function" &&
+        typeof input.artifacts.scanAttempts === "function" &&
         typeof input.artifacts.forgetAttempt === "function",
       "comparison_artifact_removal_unavailable",
       "The original protected store must support physical artifact removal.",
@@ -201,6 +215,7 @@ export class PreparedComparisonArtifacts {
       comparisonPrivacySource,
       comparisonArtifactSource,
       comparisonAttemptSource,
+      comparisonArtifactPrivacySource,
     ])
       await assertRegisteredMigration(client, source, signal);
     const row = (
@@ -219,7 +234,7 @@ export class PreparedComparisonArtifacts {
           AND NOT EXISTS(SELECT FROM pg_db_role_setting WHERE setrole=r.oid)
           AND NOT EXISTS(SELECT FROM pg_namespace WHERE nspowner=r.oid)
           AND NOT EXISTS(SELECT FROM pg_class WHERE relowner=r.oid)
-          AND (SELECT count(*)=9 FROM pg_proc WHERE proowner=r.oid))
+          AND (SELECT count(*)=18 FROM pg_proc WHERE proowner=r.oid))
          AND NOT EXISTS(SELECT FROM pg_database WHERE datname=current_database()
           AND (datconnlimit=0 OR shobj_description(oid,'pg_database')='creator-platform:restored-traffic-closed')) AS ready`,
         [role, Owner],
@@ -405,56 +420,151 @@ export class PreparedComparisonArtifacts {
       signal.throwIfAborted();
       const action = await trustTransaction(
         this.workerPool,
-        async (client) => {
-          await this.assertClient(client, "creator_trust_worker", signal);
-          const result = await query(
-            client,
-            "SELECT creator_trust.fence_comparison_export_attempt($1) AS decision",
-            [JSON.stringify(attempt)],
-            signal,
-          );
-          const decision = z
-            .discriminatedUnion("action", [
-              z.strictObject({ action: z.literal("wait") }),
-              z.strictObject({ action: z.literal("remove") }),
-              z.strictObject({
-                action: z.literal("keep"),
-                artifact: PrivacyArtifact,
-              }),
-            ])
-            .parse(result.rows[0]?.decision);
-          if (decision.action === "wait") return false;
-          if (decision.action === "keep") {
-            invariant(
-              decision.artifact.reference === attempt.reference &&
-                decision.artifact.snapshotRef === attempt.snapshotRef &&
-                decision.artifact.contentType === attempt.contentType,
-              "comparison_artifact_custody_changed",
-              "Keep only the original acknowledged artifact.",
-            );
-            await this.artifacts.verify(decision.artifact, attempt, signal);
-            await this.artifacts.forgetAttempt!(attempt, signal);
-          } else {
-            await this.artifacts.removeAttempt!(attempt, signal);
-            await this.assertClient(client, "creator_trust_worker", signal);
-            const finished = await query(
-              client,
-              "SELECT creator_trust.finish_comparison_export_attempt($1) AS removed",
-              [JSON.stringify(attempt)],
-              signal,
-            );
-            invariant(
-              finished.rows[0]?.removed === true,
-              "comparison_artifact_custody_changed",
-              "The original recovery task changed before acknowledgment.",
-            );
-          }
-          return true;
-        },
+        (client) => this.recoverAttemptInTransaction(client, attempt, signal),
         { signal },
       );
       if (action) recovered++;
     }
     return recovered;
+  }
+
+  private async recoverAttemptInTransaction(
+    client: PoolClient,
+    attempt: PrivacyArtifactAttempt,
+    signal: AbortSignal,
+  ): Promise<boolean> {
+    await this.assertClient(client, "creator_trust_worker", signal);
+    const result = await query(
+      client,
+      "SELECT creator_trust.fence_comparison_export_attempt($1) AS decision",
+      [JSON.stringify(attempt)],
+      signal,
+    );
+    const decision = z
+      .discriminatedUnion("action", [
+        z.strictObject({ action: z.literal("wait") }),
+        z.strictObject({ action: z.literal("remove") }),
+        z.strictObject({
+          action: z.literal("keep"),
+          artifact: PrivacyArtifact,
+        }),
+      ])
+      .parse(result.rows[0]?.decision);
+    if (decision.action === "wait") return false;
+    if (decision.action === "keep") {
+      invariant(
+        decision.artifact.reference === attempt.reference &&
+          decision.artifact.snapshotRef === attempt.snapshotRef &&
+          decision.artifact.contentType === attempt.contentType,
+        "comparison_artifact_custody_changed",
+        "Keep only the original acknowledged artifact.",
+      );
+      await this.artifacts.verify(decision.artifact, attempt, signal);
+      await this.artifacts.forgetAttempt!(attempt, signal);
+    } else {
+      await this.artifacts.removeAttempt!(attempt, signal);
+      await this.assertClient(client, "creator_trust_worker", signal);
+      const finished = await query(
+        client,
+        "SELECT creator_trust.finish_comparison_export_attempt($1) AS removed",
+        [JSON.stringify(attempt)],
+        signal,
+      );
+      invariant(
+        finished.rows[0]?.removed === true,
+        "comparison_artifact_custody_changed",
+        "The original recovery task changed before acknowledgment.",
+      );
+    }
+    return true;
+  }
+
+  /** The caller is Trust's original held 0103 task, never a replacement
+   * transaction. Pending work is committed without acknowledging the domain.
+   * This bounded step can then resume under its next genuine task lease. */
+  async privacyInTransaction(
+    client: PoolClient,
+    job: ExportJob,
+  ): Promise<{
+    pending: boolean;
+    data?: readonly unknown[];
+  }> {
+    invariant(
+      !requestAuthority.getStore() && job.signal,
+      "comparison_artifact_source_required",
+      "Use the original held Trust privacy task.",
+    );
+    const signal = job.signal;
+    await this.assertClient(client, "creator_trust_worker", signal);
+    const parameters = [job.jobId, z.uuid().parse(job.leaseToken)];
+    if (job.kind === "export") {
+      const result = await query(
+        client,
+        "SELECT creator_trust.export_comparison_artifact_privacy($1,$2) AS data",
+        parameters,
+        signal,
+      );
+      if (result.rows.length > 2000) throw new Error("bounded_subjob_required");
+      return { pending: false, data: result.rows.map((row) => row.data) };
+    }
+    const started = await query(
+      client,
+      "SELECT creator_trust.begin_comparison_artifact_privacy_delete($1,$2) AS ready",
+      parameters,
+      signal,
+    );
+    if (started.rows[0]?.ready !== true) return { pending: true };
+    // Read a complete fresh inventory before changing directory entries. The
+    // bounded background scan's empty page cannot establish this EOF.
+    const attempts = new Map<string, PrivacyArtifactAttempt>();
+    for await (const value of this.artifacts.scanAttempts!(signal)) {
+      const attempt = PrivacyArtifactAttempt.parse(value);
+      if (!Domain.safeParse(attempt.domain).success) continue;
+      attempts.set(attempt.reference, attempt);
+      if (attempts.size > 2000) throw new Error("bounded_subjob_required");
+    }
+    let pending = false;
+    for (const attempt of attempts.values()) {
+      if (!(await this.recoverAttemptInTransaction(client, attempt, signal)))
+        pending = true;
+    }
+    if (pending) return { pending: true };
+    const rows = await query(
+      client,
+      "SELECT * FROM creator_trust.comparison_artifact_privacy_delete_rows($1,$2)",
+      parameters,
+      signal,
+    );
+    for (const row of rows.rows) {
+      const reference = Snapshot.parse(row.snapshot_ref);
+      const artifact = PrivacyArtifact.nullable().parse(row.manifest);
+      if (artifact) {
+        invariant(
+          artifact.snapshotRef === reference,
+          "comparison_artifact_custody_changed",
+          "Delete only the exact original captured artifact.",
+        );
+        await this.artifacts.remove!(artifact, artifact, signal);
+      }
+      await this.assertClient(client, "creator_trust_worker", signal);
+      const removed = await query(
+        client,
+        "SELECT creator_trust.finish_comparison_artifact_privacy_delete($1,$2,$3,$4) AS removed",
+        [...parameters, reference, artifact ? JSON.stringify(artifact) : null],
+        signal,
+      );
+      invariant(
+        removed.rows[0]?.removed === true,
+        "comparison_artifact_custody_changed",
+        "Original artifact provenance changed before deletion.",
+      );
+    }
+    const remaining = await query(
+      client,
+      "SELECT * FROM creator_trust.comparison_artifact_privacy_delete_rows($1,$2)",
+      parameters,
+      signal,
+    );
+    return { pending: remaining.rows.length > 0 };
   }
 }

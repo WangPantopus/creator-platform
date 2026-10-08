@@ -323,6 +323,7 @@ export class TrustWorker {
         "comparison_export_unconfigured",
         "comparison_privacy_composition_changed",
         "comparison_privacy_custody_changed",
+        "comparison_artifact_privacy_unavailable",
         "agent_privacy_unavailable",
         "agent_lifecycle_composition_mismatch",
         "privacy_export_pool_mismatch",
@@ -355,6 +356,7 @@ export class TrustWorker {
         (accountingPrivacyFailure(message) ||
           [
             ...unavailable,
+            "comparison_artifact_purge_pending",
             "hook_timeout",
             "privacy_family_cancel_unavailable",
             "privacy_family_rollback_unavailable",
@@ -381,6 +383,7 @@ export class TrustWorker {
           ? message
           : "domain_hook_error";
       const accounting = accountingPrivacyFailure(code);
+      const artifactPending = code === "comparison_artifact_purge_pending";
       const blocked =
         unavailable.includes(code) && !retryableAuthorityFailure(error);
       const saved = await trustTransaction(this.pool, (client) =>
@@ -393,11 +396,12 @@ export class TrustWorker {
             accounting?.state ??
               (blocked
                 ? "blocked"
-                : task.attempts >= 8
+                : task.attempts >= 8 && !artifactPending
                   ? "dead_letter"
                   : "retry"),
             code,
-            accounting?.retrySeconds ?? Math.min(3600, 2 ** task.attempts * 5),
+            accounting?.retrySeconds ??
+              (artifactPending ? 30 : Math.min(3600, 2 ** task.attempts * 5)),
           ],
         ),
       );

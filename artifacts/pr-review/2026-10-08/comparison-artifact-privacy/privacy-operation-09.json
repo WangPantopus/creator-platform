@@ -1,0 +1,30 @@
+{
+  "kind": "isolated synthetic SQL/filesystem source operation; dependency receipts synthetic; not mature deletion or registration",
+  "results": [
+    {
+      "case": "source mapping derives from original held scopes; direct worker/actor access remains refused",
+      "pass": true
+    },
+    {
+      "case": "original 0103 export projects only own source families; no other fan IDs, lease tokens, private file refs or exporter job IDs leak",
+      "pass": true
+    },
+    {
+      "case": "unheld completed-export clearing and source-incomplete deletion are refused",
+      "pass": true
+    },
+    {
+      "case": "source-complete original Trust task holds full inventory and physical removal, erases both own and derived provenance, clears original completed export at actual COMMIT",
+      "pass": true
+    },
+    {
+      "case": "authorized clearing still fails at the original real-clock 0103 COMMIT after its lease expires",
+      "pass": true
+    },
+    {
+      "case": "canceled inventory cannot claim EOF; a fresh independent scan exhausts both durable removal markers",
+      "pass": true
+    }
+  ],
+  "observedAt": "2026-10-08T15:01:51.429Z"
+}

@@ -1,5 +1,26 @@
 # Session handoff — October 8, 2026
 
+## Active continuation — original Trust artifact privacy
+
+Continue on `codex/comparison-artifact-privacy-20261008` in637b. The
+[source/privacy increment](../../artifacts/pr-review/2026-10-08/comparison-artifact-privacy/README.md)
+adds private held-source mapping, own-only Trust projection, complete file inventory,
+physical removal and original 0103 deletion clearing. Fresh isolated graph09 passes
+six SQL/filesystem cases; dependency receipts are synthetic. All pending sources
+remain unregistered/uncomposed. The original app host remains compiled5bd6b6215
+on57304, web3119; both native devices remain stopped. No original data changed.
+
+PR342 merged at `d89a2ef024bf96ec6ea8af08d9688364a41a2c6f` after all11 exact-head
+checks passed. PR343 now targets main; refresh its final check. PR341's separate
+main run37791912750 passed; PR340's37790196313 was cancelled after a newer main
+update, so do not attribute later main checks to it. Refresh342's37795287433.
+
+Next finish original comparison read/provider admission and genuine producer
+operation, legacy export/restore graph review, executable registration and full
+prepared-owner composition. Then operate the legitimate preserved revision13
+upgrade and every remaining criterion in the complete product finish plan.
+
+
 ## Active continuation — durable export attempt recovery
 
 Continue on `codex/privacy-export-attempt-recovery-20261008` in 637b.
