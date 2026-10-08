@@ -1,0 +1,12 @@
+
+ RUN  v3.2.4 /Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/backend
+
+ ✓ tests/postgres.integration.test.ts (11 tests) 196770ms
+   ✓ PostgreSQL foundation using the real non-owner role > bounds shadow eligibility by wall time, seven-day history and finite retention on a held transaction  625ms
+   ✓ PostgreSQL foundation using the real non-owner role > T-11 checks 10,000 random pairs against 1,000 real scoped threads  189531ms
+
+ Test Files  1 passed (1)
+      Tests  11 passed (11)
+   Start at  11:35:03
+   Duration  199.86s (transform 1.25s, setup 0ms, collect 2.58s, tests 196.77s, environment 0ms, prepare 172ms)
+

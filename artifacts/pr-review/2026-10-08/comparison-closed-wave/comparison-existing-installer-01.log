@@ -1,0 +1,10 @@
+/Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/backend/scripts/migration-generation-roles.ts:215
+    throw new WaveRoleSafetyError("Generation-purpose wave catalogue changed.");
+          ^
+
+WaveRoleSafetyError: Generation-purpose wave catalogue changed.
+    at assertGenerationWaveRoleSafety (/Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/backend/scripts/migration-generation-roles.ts:215:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (/Users/yingpengwang/.codex/worktrees/637b/creator-platform/apps/backend/scripts/migrate-trust.ts:279:9)
+
+Node.js v24.19.0
