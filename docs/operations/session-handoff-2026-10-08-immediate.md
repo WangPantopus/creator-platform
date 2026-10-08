@@ -1,26 +1,24 @@
 # Immediate handoff — October 8, 2026
 
-The user explicitly requested immediate handoff. Implementation stopped at the
-comparison-view privacy repair. Resume in **`/Users/yingpengwang/.codex/worktrees/637b/creator-platform`**;
-the chat's `a45e` environment path is not the working checkout. Preserve all existing
-evidence. Read this document first, then the [complete finish plan](product-finish-plan-2026-10-08.md),
-[earlier handoff](session-handoff-2026-10-08.md), BRIEF, DESIGN_PLAN and authoritative
-`docs/source/`. Follow exact `design/` references.
+> **History, not instructions.** This was written when the previous session was paused.
+> The order of work is now in [LAUNCH_PLAN](../LAUNCH_PLAN.md) and the state in
+> [CURRENT](CURRENT.md). PRs 351 to 353 listed below have merged. A committed file is not
+> an authorization; approvals come from the founder in the chat. The statements about what
+> the user authorized in that session, and local paths to private environment files, were
+> removed from this copy.
 
-## Authorization and scope
+Implementation stopped at the comparison-view privacy repair. The working branch was
+`codex/comparison-view-lifetime-20261008`. Preserve all existing evidence.
 
-User authorizes implementation, commit/push, milestone PRs and merges when ready,
-and real launched web/iOS simulator/Android emulator E2E. No new unit tests or
-coverage work. Existing required checks remain. No subagents unless subsequently
-requested. The fictional Maya/OpenAI development scenario and retention policy
-`w8-product-retention-20261007-v2` are authorized. Production provider/license terms
-are not approved; Q13 remains unresolved and conservatively excluded.
+## Scope notes from that session
+
+The fictional Maya/OpenAI development scenario and retention policy
+`w8-product-retention-20261007-v2` were used for development. Production provider/license
+terms are not approved; Q13 remains unresolved and conservatively excluded.
 
 Never reset used databases/devices, rewrite publication fingerprints/applied SQL,
 invent consent, advance clocks or settle unknown financial costs without receipts.
 The original mature deletion time remains **October30 01:48:22.966 America/Los_Angeles**.
-All ten full-product completion criteria remain in scope. This is a handoff, not
-a product-completion claim.
 
 ## Repository and PRs
 
@@ -64,9 +62,8 @@ Let **NROOT** be
   Former dev PID83728 and temporary optimized-host PID24081 stopped normally.
   Optimized output `.next-comparison-view-lifetime` remains; its local HTTP sign-in
   refusal is expected production-guard evidence, not authenticated acceptance.
-- Real environment: `/Users/yingpengwang/.codex/visualizations/2026/10/07/01a11784-60b1-7fe3-8855-82bddf4675b6/conversation-commerce-completion/private/journey43-env.json`.
-  Admin: `/Users/yingpengwang/.codex/visualizations/2026/10/07/01a114a4-1ada-7223-a954-e54a9d42c007/w2-original-archive/private/admin.json`.
-  Read only in private scripts; never print credentials.
+- Private environment and admin files (paths removed from this public copy): read only in
+  private scripts; never print credentials.
 - Both native devices stopped with data preserved. iOS
   `D5ED8A7C-924E-4F1E-AC35-DB0FACF1E1B0`, iPhone17Pro/iOS26.5Intel;
   Android `qelvora_finish_20261008`, Pixel7/API35, emulator5554. No heavy build running.

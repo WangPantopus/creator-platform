@@ -1,11 +1,18 @@
 # Product finish plan — October 8, 2026
 
+> **Order and scope now live in [LAUNCH_PLAN](../LAUNCH_PLAN.md)**, decided later the same day;
+> the ten milestones below stay in scope and the launch plan only orders them (its section 9).
+> The "Present position" column predates the [launch review](launch-review-2026-10-08.md):
+> a comparison sanitizer and privacy producer now exist (row 1), and the latest measured
+> first stored sentence is 19.1 s, most of it platform overhead (row 3). Current state:
+> [CURRENT](CURRENT.md).
+
 ## Immediate requested handoff
 
 Implementation paused at the [comparison-view privacy repair](../../artifacts/pr-review/2026-10-08/comparison-view-lifetime/README.md).
 Offline/failed-read concealment and fresh-read recovery pass in the real web app;
 visibility/identity/cancellation and populated creator export withdrawal remain.
-Use the [exact current handoff](session-handoff-2026-10-08-immediate.md) to resume.
+The [immediate handoff](session-handoff-2026-10-08-immediate.md) is history.
 All ten milestones and every historical evidence/clock/hold remain in scope.
 
 

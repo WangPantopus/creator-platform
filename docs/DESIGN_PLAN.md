@@ -23,6 +23,14 @@ W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan expor
 
 ## Implementation continuation
 
+- [~] October 8, 2026: launch review and plan. PRs 351 to 353 (comparison export
+  reference, creator upgrade evidence, view lifetime) are merged; comparison stays
+  installed and off. The [launch plan](LAUNCH_PLAN.md) sets the order of work (five
+  moments, phone apps first, the share card in, the rest planned for later) and the
+  [launch review](operations/launch-review-2026-10-08.md) records what the code does
+  today. Current state: [CURRENT](operations/CURRENT.md). No design or implementation
+  completion checkbox is advanced.
+
 - [~] October 8, 2026: creator comparison results clear on offline or failed
   permission reads and recover after fresh reads. Launched web checks and production
   compilation pass; remaining lifetime/privacy operations are carried into the
@@ -150,7 +158,7 @@ open; this does not advance full journey or design acceptance.
 - [x] October 7, 2026: strengthen output grounding with complete sentence spans and exact authorized quotes; operate six boundary cases and two real fan replies with original accounting. [Evidence and preserved failures](../artifacts/pr-review/2026-10-07/generation-performance-grounding/README.md).
 - [x] October 7–8, 2026: fix the 2,500-token context budget being counted as UTF-8 bytes; retain the source in the actual longer conversation, reduce repeated current-authority reads, and complete revision 14 first publication and three settled fan replies. [Reproduction, live operation and custody](../artifacts/pr-review/2026-10-07/generation-context-latency/README.md).
 - [x] October 8, 2026: preserve published revision 12/13 engine behavior and immutable fingerprints while new drafts use revision 14; bind shadow evidence to both engines and invalidate old comparisons. All 14 historical differential cases pass; the current compiled host serves an existing revision 13 publication without republishing. Equivalent catalogue prefilters retain all checked privilege/policy drift. [Compatibility, live operation and custody](../artifacts/pr-review/2026-10-08/generation-published-compatibility/README.md).
-- [~] Generation latency: latest compiled useful answer is fully visible at 26.992s with a 3.767s HTTP acknowledgement; server acceptance-to-completion is 23.820s. Earlier revision 14 observations (22.512s visible / 1.101s acknowledgement) remain preserved; these are not controlled comparisons or percentile qualification. Retain the 300ms acknowledgement, 2.5s warm/4s cold first useful sentence and 8s completion targets. Existing-version upgrades still require the unconnected privacy-safe shadow feed; historical engine support preserves original limitations until an evaluated upgrade.
+- [~] Generation latency: latest compiled useful answer is fully visible at 26.992s with a 3.767s HTTP acknowledgement; server acceptance-to-completion is 23.820s. Earlier revision 14 observations (22.512s visible / 1.101s acknowledgement) remain preserved; these are not controlled comparisons or percentile qualification. Retain the 300ms acknowledgement, 2.5s warm/4s cold first useful sentence and 8s completion targets. Existing-version upgrades still require the unconnected privacy-safe shadow feed; historical engine support preserves original limitations until an evaluated upgrade. The [launch review](operations/launch-review-2026-10-08.md) supersedes these figures for planning: the latest measured first stored sentence is 19.1 s, most of the wait (roughly 15 s or more) is platform overhead, and the launch plan's bar is 4.5 s at the start of the pilot.
 
 ## Sample content used in every design
 

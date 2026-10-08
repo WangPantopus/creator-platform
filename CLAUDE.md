@@ -7,7 +7,7 @@ personal attention.
 
 ## Start every session here
 
-For the current implementation state and resources, read the [October 8 immediate handoff](docs/operations/session-handoff-2026-10-08-immediate.md) and [project checkpoint](docs/operations/project-continuation-2026-10-07.md). Refresh their Git/GitHub observations before resuming.
+For the order of work, read the [launch plan](docs/LAUNCH_PLAN.md); for the current state, [docs/operations/CURRENT.md](docs/operations/CURRENT.md). The older handoffs and the [project checkpoint](docs/operations/project-continuation-2026-10-07.md) are history. Refresh the Git/GitHub observations before resuming.
 
 1. Read [docs/BRIEF.md](docs/BRIEF.md): the condensed product, identity system,
    screen inventory, copy system, decision log and open questions.
@@ -36,3 +36,7 @@ For the current implementation state and resources, read the [October 8 immediat
 - **Keep the docs current.** After each milestone, tick it off in
   `docs/DESIGN_PLAN.md`, add artifact links, and add decisions to the brief's
   decision log.
+- **Keep evidence small.** At most 1 MB per pull request and 300 KB per file under
+  `artifacts/`: a README, a manifest with checksums, and only the screenshots that
+  carry a decision. Raw logs and bundles stay outside git
+  ([CURRENT](docs/operations/CURRENT.md)).
